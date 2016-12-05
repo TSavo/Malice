@@ -244,36 +244,52 @@ body.canFeel = ->
 body.getTorso = ->
   @torso
 
+body.say = body.says = (what) ->
+  return @tell "You try to speak but you cant!" if !@canSpeak()
+  @tell "You say, \"" + what + "\""
+  stimulus = new global.$game.classes.StimulusBuilder(what, what.location).visual(this).visual(" says, ").quoted(what).visual(".").build()
+  @location.everyoneExcept(this).stimulate(stimulus)
+  
+body.contextualizeLanguage = (message, language)->
+  _ = require("./node_modules/underscore")
+  understanding = @info.knownLanguages[language] or 0.0
+  return message if understanding == 1
+  _(stimulus.value.split(" ")).chain().map (word)->
+    return word if(Math.random() < understanding)
+    _(word.split("")).chain().map (letter)->
+      return letter if(Math.random < understanding)
+      if(letter.isNumeric())
+        parseInt(Math.random()*10)
+      else if(letter == letter.toUpperCase())
+        String.fromCharCode(65 + Math.floor(Math.random() * 26))
+      else
+        String.fromCharCode(97 + Math.floor(Math.random() * 26))
+    .join("").value()
+  .join(" ").value()
+  
 body.contextualizeStimulus = (stimulus)->
   if(stimulus.type == "visual" && !@canSee())
-    return "(Something happens but you can't see what.)"
+    ""
   else if(stimulus.type == "auditory" && ! @canHear())
-    return "..."
+    ""
   else if(stimulus.type == "smell" && ! @canSmell())
-    return ""
+    ""
   else if(stimulus.type == "taste" && ! @canTaste())
-    return ""
+    ""
   else if(stimulus.type == "mental" && ! @canThink())
-    return ""
+    ""
   else if(stimulus.type == "physical" && ! @canFeel())
-    return ""
-  if(stimulus.type == "auditory" && stimulus.language)
-    understanding = this.info.knownLanguages[language] or 0.0
-    if(understanding < 1.0)
-      _ = require("./node_modules/underscore")
-      return _(stimulus.value.split(" ")).chain().map (word)->
-        if(Math.random() < understanding)
-          _(word.split("")).chain().map (letter)->
-            if(letter.isNumeric())
-              parseInt(Math.random()*10)
-            else if(letter == letter.toUpperCase())
-              String.fromCharCode(65 + Math.floor(Math.random() * 26))
-            else
-              String.fromCharCode(97 + Math.floor(Math.random() * 26))
-          .join("").value()
-      .join(" ").value()
-  return stimulus.value
+    ""
+  else if(stimulus.type == "auditory" && stimulus.language)
+    this.contextualizeLanguage stimulus.value, stimulus.language
+  else if(stimulus.type == "visual" && typeof stimulus.value == "object")
+    stimulus.value.asSeenBy(this)
+    stimulus.value
 
+body.stimulate = (stimulus)->
+  _ = require("./node_modules/underscore")
+  @tell _(stimulus).chain().map(@contextualizeStimulus).join(" ").value()
+  
 body.getPart = (name)->
   @getTorso().getPart(name)
 

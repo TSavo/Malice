@@ -56,3 +56,19 @@ stimBuilder.in = (@language)->
   
 stimBuilder.build = ->
   @stimulus
+  
+if not global.$game.classes.StimulationGroup
+  global.$game.classes.StimulationGroup = class StimulationGroup
+    constructor:->
+      @type = "$game.classes.StimulationGroup"
+      this.init.apply(this, arguments)
+
+stimGroup = global.$game.classes.StimulationGroup.prototype
+      
+stimGroup.init = (@contents)->
+
+stimGroup.stimulate = (stimulation)->
+  _ = require("./node_modules/underscore")
+  _(@contents).each (who)->
+    who.stimulate? stimulation
+  
