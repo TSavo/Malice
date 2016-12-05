@@ -268,28 +268,29 @@ body.contextualizeLanguage = (message, language)->
   .join(" ").value()
   
 body.contextualizeStimulus = (stimulus)->
-  if(stimulus.type == "visual" && !@canSee())
+  if stimulus.type == "visual" && !@canSee()
     ""
-  else if(stimulus.type == "auditory" && ! @canHear())
+  else if stimulus.type == "auditory" and ! @canHear()
     ""
-  else if(stimulus.type == "smell" && ! @canSmell())
+  else if stimulus.type == "smell" and ! @canSmell()
     ""
-  else if(stimulus.type == "taste" && ! @canTaste())
+  else if stimulus.type == "taste" and ! @canTaste()
     ""
-  else if(stimulus.type == "mental" && ! @canThink())
+  else if stimulus.type == "mental" and ! @canThink()
     ""
-  else if(stimulus.type == "physical" && ! @canFeel())
+  else if stimulus.type == "physical" and ! @canFeel()
     ""
-  else if(stimulus.type == "auditory" && stimulus.language)
+  else if stimulus.type == "auditory" and stimulus.language
     this.contextualizeLanguage stimulus.value, stimulus.language
-  else if(stimulus.type == "visual" && typeof stimulus.value == "object")
-    stimulus.value.asSeenBy(this)
+  else if stimulus.type == "visual" and typeof stimulus.value == "object"
+    stimulus.value.asSeenBy?(this) or stimulus.value.name
+  else 
     stimulus.value
 
 body.stimulate = (stimulus)->
   _ = require("./node_modules/underscore")
-  @tell _(stimulus).chain().map(@contextualizeStimulus).join(" ").value()
-  
+  @tell _(stimulus).chain().map(@contextualizeStimulus).join("").value()
+
 body.getPart = (name)->
   @getTorso().getPart(name)
 
@@ -331,7 +332,7 @@ body.isBothHandsEmpty = ->
 
 body.holdInHands = (what)->
   q = require("./node_modules/q")
-  return q.reject("You don't have any free hands.") if not @isOneHandEmpty
+  return q.reject("You don't have any free hands.") if not @isOneHandEmpty()
   return q.reject("That requires both hands to hold.") if what.isTwoHanded?() and not @isBothHandsEmpty()
   firstHand = @getFreeHand()
   where = firstHand
