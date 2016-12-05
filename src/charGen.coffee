@@ -32,8 +32,12 @@ charGen.start = (socket)->
         socket.tell "This is your last chance to say no and make changes.".bold.underline
         return global.$game.common.yesorno socket, "Continue with creating your character?\n"
         .then ->
-          global.$game.common.charGen.cloneNewPlayer(socket, results)
-        .catch ->
+          try
+            global.$game.common.charGen.cloneNewPlayer(socket, results)
+          catch(e)
+            global.catch e
+              setTimeout makePlayerLoop, 0
+        .catch (err)->
           setTimeout makePlayerLoop, 0
       global.$game.common.charGen[option] socket
       .then (stats) ->
@@ -148,15 +152,15 @@ charGen.birthday = (socket) ->
     moment(birthday.trim(), "MM/DD/YYYY").toDate()
 
 charGen.ethnicity = (socket) ->
-  socket.choice "What is your ethnicity?",  global.$game.contants.body.human.ethnicity
+  socket.choice "What is your ethnicity?",  global.$game.constants.body.human.ethnicity
   .then (choice) ->
-     global.$game.contants.body.human.ethnicity[choice]
+    global.$game.constants.body.human.ethnicity[choice]
 
 charGen.language = (socket) ->
   socket.tell "The game is in English, but your character may be a foreigner, in which case they may not speak the local language. In any case, you can always learn a new language once in the game."
-  socket.choice "What is your primary language?", global.$game.contants.body.human.language
+  socket.choice "What is your primary language?", global.$game.constants.body.human.language
   .then (result)->
-    global.$game.contants.body.human.language[result]
+    global.$game.constants.body.human.language[result]
 
 charGen.name = (socket)->
   alias = firstName = lastName = middleName = ""
@@ -193,10 +197,10 @@ You can also log in with this name, and be addressed by others with it by defaul
   .then (middleNameAnswer) ->
     middleName = middleNameAnswer
     return {
-     alias:alias.trim(),
-     firstName:firstName.trim(),
-     lastName:lastName.trim(),
-     middleName:middleName.trim()
+      alias:alias.trim()
+      firstName:firstName.trim()
+      lastName:lastName.trim()
+      middleName:middleName.trim()
     }
 
 charGen.sex = (socket)->
@@ -209,54 +213,59 @@ What is your characters #{'sex'.bold}?
 charGen.stats = (socket) ->
   socket.tell("In The City of Malice, appearances matter.")
   socket.tell("The 'average' weight and height for people is about 1.7 meters and 75 kilograms (or about 6 foot tall and 180 pounds). Deviation from that is going to impact your play style.")
+  formatHeight = global.$game.constants.body.human.formatHeight
+  formatWeight = global.$game.constants.body.human.formatWeight
+  console.log(formatHeight)
   askQuestion = ->
-    ask = global.$game.common.question
     heightPrompt = """
 What is the #{'height'.bold} of your character? Please answer in meters, between 0.5 and 3.
 For example, if your character was 1.8 meters (about 6 feet tall), you would type: '1.8'.\n
 """
     height = weight = 0
-    ask socket, heightPrompt, (criteria) ->
-      return "Please enter a number between 0.5 and 3, like 1.8." if isNaN(criteria) || criteria < 0.5|| criteria > 3
+    socket.question heightPrompt, (criteria) ->
+      return "Please enter a number between 0.5 and 3, like 1.8." if isNaN(criteria) || parseFloat(criteria) < 0.5 || parseFloat(criteria) > 3
     .then (heightInput) ->
       height = Math.floor(heightInput * 100) / 100
-      ask socket, "That would make you #{ global.$game.contants.body.human.formatHeight(height)}. And your weight in kilograms?\n", (criteria) ->
+      heightWord = formatHeight(height)
+      console.log "Ok " + heightWord
+      socket.question "That would make you " + heightWord + ". And your weight in kilograms?\n", (criteria) ->
         return "Please enter a number between 15 and 300." if isNaN(parseInt(criteria)) || parseInt(criteria) < 15 || parseInt(criteria) > 300
     .then (weightInput)->
       weight = parseInt(weightInput)
-      socket.yesorno "That would make you #{ global.$game.contants.body.human.formatWeight(weight, height)} for your height. Is that ok?\n"
+      socket.yesorno "That would make you " + formatWeight(weight, height) + " for your height. Is that ok?\n"
     .then ->
       return {
         height:height
         weight:weight
       }
-    .catch ->
+    .catch (err)->
+      global.catch(err)
       askQuestion()
   askQuestion()
 
 charGen.appearance = (socket) ->
   hairCut = hairStyle = hairColor = eyeColor = eyeStyle = skinColor = skinStyle = undefined;
-  socket.choice "What would you like your #{'hair cut'.bold} to be?",  global.$game.contants.body.human.hairCut
+  socket.choice "What would you like your #{'hair cut'.bold} to be?",  global.$game.constants.body.human.hairCut
   .then (hairCutChoice)->
-    hairCut =  global.$game.contants.body.humanr.hairCut[hairCutChoice]
-    socket.choice "And the #{'hair style'.bold} to go with your #{hairCut} hair?",  global.$game.contants.body.human.hairStyle
+    hairCut =  global.$game.constants.body.human.hairCut[hairCutChoice]
+    socket.choice "And the #{'hair style'.bold} to go with your #{hairCut} hair?",  global.$game.constants.body.human.hairStyle
   .then (hairStyleChoice)->
-    hairStyle = global.$game.contants.body.human.hairStyle[hairStyleChoice]
-    socket.choice "And is the #{'hair color'.bold} of your #{hairCut} #{hairStyle} hair?", global.$game.contants.body.human.hairColor
+    hairStyle = global.$game.constants.body.human.hairStyle[hairStyleChoice]
+    socket.choice "And is the #{'hair color'.bold} of your #{hairCut} #{hairStyle} hair?", global.$game.constants.body.human.hairColor
   .then (hairColorChoice)->
-    hairColor = global.$game.contants.body.human.hairColor[hairColorChoice]
-    socket.choice "Fine. You have #{hairCut} #{hairColor} #{hairStyle} hair.\nWhat is your #{'eye color'.bold}?", global.$game.contants.body.human.eyeColor
+    hairColor = global.$game.constants.body.human.hairColor[hairColorChoice]
+    socket.choice "Fine. You have #{hairCut} #{hairColor} #{hairStyle} hair.\nWhat is your #{'eye color'.bold}?", global.$game.constants.body.human.eyeColor
   .then (eyeColorChoice)->
-    eyeColor = global.$game.contants.body.human.eyeColor[eyeColorChoice]
-    socket.choice "Ok, and the #{'eye style'.bold} of these #{eyeColor} eyes?", global.$game.contants.body.human.eyeStyle
+    eyeColor = global.$game.constants.body.human.eyeColor[eyeColorChoice]
+    socket.choice "Ok, and the #{'eye style'.bold} of these #{eyeColor} eyes?", global.$game.constants.body.human.eyeStyle
   .then (eyeStyleChoice)->
-    eyeStyle = global.$game.contants.body.human.eyeStyle[eyeStyleChoice]
-    socket.choice "Perfect. You've got #{eyeColor} #{eyeStyle} eyes. Let's talk about your #{'skin'.bold}. How would you describe it?", global.$game.contants.body.human.skinStyle
+    eyeStyle = global.$game.constants.body.human.eyeStyle[eyeStyleChoice]
+    socket.choice "Perfect. You've got #{eyeColor} #{eyeStyle} eyes. Let's talk about your #{'skin'.bold}. How would you describe it?", global.$game.constants.body.human.skinStyle
   .then (skinStyleChoice)->
-    skinStyle = global.$game.contants.body.human.skinStyle[skinStyleChoice]
-    socket.choice "Great. And what's the #{'skin color'.bold} of your #{skinStyle}?", global.$game.contants.body.human.skinColor
+    skinStyle = global.$game.constants.body.human.skinStyle[skinStyleChoice]
+    socket.choice "Great. And what's the #{'skin color'.bold} of your #{skinStyle}?", global.$game.constants.body.human.skinColor
   .then (skinColorChoice)->
-    skinColor = global.$game.contants.body.human.skinColor[skinColorChoice]
+    skinColor = global.$game.constants.body.human.skinColor[skinColorChoice]
     console.log({
       hairCut:hairCut,
       hairColor:hairColor,

@@ -25,11 +25,10 @@ human.stats.intelligence = ["brain-dead", "dim-witted", "stupid", "ignorant", "d
 human.stats.agility = ["useless", "sloth-like", "slow", "delayed", "adequate", "dexterous", "agile", "deft", "nimble", "quick", "cat-like", "fast", "ninja", "speeding bullet", "light-speed"]
 human.stats.luck = ["non-existant", "doomed", "terrible", "unfortunate", "not the best", "not an issue", "better than some", "better than most", "uncanny", "great", "charmed", "on a streak", "unstoppable", "favored by deities", "so good you can't possibly go wrong"]
 
-human.formatHeight = (height)->
-  console.log(global.$game.constants.body.human.height.proportionate)
-  global.$game.constants.body.human.height.proportionate(height, global.$game.constants.player.body.human.maxHeight)
+global.$game.constants.body.human.formatHeight = (height)->
+  global.$game.constants.body.human.height.proportionate(height, global.$game.constants.body.human.maxHeight)
 
-human.formatWeight = (weight, height = 1.7)->
+global.$game.constants.body.human.formatWeight = (weight, height = 1.7)->
   return global.$game.constants.body.human.weight.proportionate(weight, 100 * height)
 
 if not global.$game.classes.BodyPart
@@ -257,7 +256,7 @@ body.contextualizeLanguage = (message, language)->
   _(stimulus.value.split(" ")).chain().map (word)->
     return word if(Math.random() < understanding)
     _(word.split("")).chain().map (letter)->
-      return letter if(Math.random < understanding)
+      return letter if(Math.random() < understanding)
       if(letter.isNumeric())
         parseInt(Math.random()*10)
       else if(letter == letter.toUpperCase())
@@ -291,6 +290,8 @@ body.stimulate = (stimulus)->
   _ = require("./node_modules/underscore")
   @tell _(stimulus).chain().map(@contextualizeStimulus).join("").value()
 
+body.asSeenBy = (who)->
+  
 body.getPart = (name)->
   @getTorso().getPart(name)
 

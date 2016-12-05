@@ -103,10 +103,10 @@ global.$game.common.login.register = (socket) ->
         global.$game.common.login.loginLoop(socket)
 
 global.$game.common.login.createConfirmationCode = ->
+  x=Math.random().toString(36).substring(7).substr(0,5).toLowerCase()
+  while (x.length!=5)
     x=Math.random().toString(36).substring(7).substr(0,5).toLowerCase()
-    while (x.length!=5)
-      x=Math.random().toString(36).substring(7).substr(0,5).toLowerCase()
-    return x
+  return x
 
 global.$game.common.login.sendEmail = (username, email, confirmationCode) ->
   nodemailer = require('./node_modules/nodemailer');
