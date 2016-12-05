@@ -667,7 +667,7 @@ Client::resume = ->
 
 Client::write = (b) ->
   if @options.convertLF
-   arguments[0] = arguments[0].toString('utf8').replace(/\r?\n/g, '\r\n')
+    arguments[0] = arguments[0].toString('utf8').replace(/\r?\n/g, '\r\n')
   @output.write.apply @output, arguments
 
 Client::end = ->
