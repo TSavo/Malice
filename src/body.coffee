@@ -42,7 +42,6 @@ part = global.$game.classes.BodyPart.prototype
 
 part.init = (@name, @bones, @coverable, @removable, @critical, @parts = {})->
   @condition = {}
-  @wearing = []
   @contents = []
 
 part.findPart = (name)->
@@ -74,6 +73,12 @@ part.randomPart = ->
   keys = Object.keys(@parts)
   @parts[keys[keys.length * Math.random() << 0]]
 
+part.canFeel = ->
+  true
+  
+part.isEmpty = ->
+  @contents.length == 0
+  
 global.$game.common.makeBodyPart = (name, bones = [], coverable = false, removable = false, critical = false, parts={})->
   new global.$game.classes.BodyPart name, bones, coverable, removable, critical, parts
 
@@ -81,8 +86,8 @@ global.$game.common.makeHead = ->
   makeBodyPart = global.$game.common.makeBodyPart
   head = makeBodyPart "head", ["skull", "jaw", "teeth"], true, true, true,
     scalp:makeBodyPart "scalp", [], true, false, false
-    throat:makeBodyPart "throat", ["larynx"], true, false, true
-    neck:makeBodyPart "neck", ["spine"], true, false, true
+    neck:makeBodyPart "neck", ["spine"], true, false, true,
+      throat:makeBodyPart "throat", ["larynx"], true, false, true
     rightEar:makeBodyPart "right ear", [], true, true, false
     leftEar:makeBodyPart "left ear", [], true, true, false
     face:makeBodyPart "face", [], true, false, false,
@@ -90,12 +95,23 @@ global.$game.common.makeHead = ->
       rightEye:global.$game.common.makeEye("right")
       leftEar:global.$game.common.makeEar("left")
       rightEar:global.$game.common.makeEar("right")
-      mouth:makeBodyPart "mouth", [], true, false, false
+      mouth:makeBodyPart "mouth", [], true, false, false,
+        tongue:makeBodyPart "tongue", [], true, true, false
       nose:makeBodyPart "nose", [], true, true, false
+  head.face.mouth.tongue.canSpeak = ->
+    true
+  head.face.mouth.tongue.canTaste = ->
+    true
   head.canSee = ->
-    head?.leftEye?.canSee() || head?.rightEye?.canSee()
+    head?.leftEye?.canSee?() || head?.rightEye?.canSee?()
   head.canHear = ->
-    head?.leftEar?.canHear() || head?.rightEar?.canHear()
+    head?.leftEar?.canHear?() || head?.rightEar?.canHear?()
+  head.canThink = ->
+    true
+  head.canTaste = ->
+    head?.face?.mouh?.tongue?.canTaste?()
+  head.canSpeak = ->
+    head?.face?.mouth?.isEmpty?() and head?.face?.mouth?.tongue?.canSpeak?()
   head
                
 global.$game.common.makeArm = (leftOrRight)->
@@ -153,6 +169,9 @@ body = global.$game.classes.HumanBody.prototype
 
 body.init = (@owner, @info, @primaryHand = Math.floor(Math.random()*2) ? "right" : "left")->
   @concious = true
+  @knownLanguages = {}
+  @knownLanguages[@info.language] = 1.0
+  @language = @info.language
   torso = @torso = global.$game.common.makeBodyPart "torso", [], true, false, true,
     head:global.$game.common.makeHead()
     rightShoulder:global.$game.common.makeArm("right")
@@ -164,7 +183,28 @@ body.init = (@owner, @info, @primaryHand = Math.floor(Math.random()*2) ? "right"
     rightChest:global.$game.common.makeBodyPart "right half of the chest", ["ribs"], true, false, false
     stomach:global.$game.common.makeBodyPart "stomach", [], true, false, false
     back:global.$game.common.makeBodyPart "back", ["spine"], true, false, false
- 
+
+body.see = body.sees = (what)->
+  this.tell(what) if this.concious and this.canSee()
+
+body.hear = body.hears = (what)->
+  this.tell(what) if this.concious and this.canHear()
+
+body.feel = body.feels = (what)->
+  this.tell(what) if this.concious and this.canFeel()
+
+body.smells = (what)->
+  this.tell(what) if this.concious and this.canSmell()
+
+body.tastes = (what)->
+  this.tell(what) if this.concious and this.canTaste()
+
+body.thinks = (what)->
+  this.tell(what) if this.concious and this.canThink()
+
+body.tell = (what)->
+  @owner.tell(what)
+
 body.randomPart = ->
   @torso.randomPart()
 
@@ -181,13 +221,58 @@ body.resolveAllContents = ->
   @contents.concat(@torso.resolveAllContents())
 
 body.canSee = ->
-  @torso?.head?.canSee()
+  @torso?.head?.canSee?()
 
 body.canHear = ->
-  @torso?.head?.canHear()
+  @torso?.head?.canHear?()
+
+body.canSpeak = ->
+  @torso?.head?.canSpeak?()
+  
+body.canThink = ->
+  @torso?.head?.canThink()
+
+body.canSmell = ->
+  @torso?.head?.canSmell()
+  
+body.canTaste = ->
+  @torso?.head?.canTaste()
+  
+body.canFeel = ->
+  @torso?.head?.canFeel()
   
 body.getTorso = ->
   @torso
+
+body.contextualizeStimulus = (stimulus)->
+  if(stimulus.type == "visual" && !@canSee())
+    return "(Something happens but you can't see what.)"
+  else if(stimulus.type == "auditory" && ! @canHear())
+    return "..."
+  else if(stimulus.type == "smell" && ! @canSmell())
+    return ""
+  else if(stimulus.type == "taste" && ! @canTaste())
+    return ""
+  else if(stimulus.type == "mental" && ! @canThink())
+    return ""
+  else if(stimulus.type == "physical" && ! @canFeel())
+    return ""
+  if(stimulus.type == "auditory" && stimulus.language)
+    understanding = this.info.knownLanguages[language] or 0.0
+    if(understanding < 1.0)
+      _ = require("./node_modules/underscore")
+      return _(stimulus.value.split(" ")).chain().map (word)->
+        if(Math.random() < understanding)
+          _(word.split("")).chain().map (letter)->
+            if(letter.isNumeric())
+              parseInt(Math.random()*10)
+            else if(letter == letter.toUpperCase())
+              String.fromCharCode(65 + Math.floor(Math.random() * 26))
+            else
+              String.fromCharCode(97 + Math.floor(Math.random() * 26))
+          .join("").value()
+      .join(" ").value()
+  return stimulus.value
 
 body.getPart = (name)->
   @getTorso().getPart(name)
@@ -220,7 +305,7 @@ body.getBothHands = ->
   [@getPrimaryHand(), @getSecondaryHand()]
 
 body.getFreeHand = ->
-  if @getPrimaryHand.isEmpty() then @getPrimaryHand else if @getSecondaryHand().isEmpty() then @getSecondaryHand() else undefined
+  if @getPrimaryHand?.isEmpty() then @getPrimaryHand else if @getSecondaryHand()?.isEmpty() then @getSecondaryHand() else undefined
 
 body.isOneHandEmpty = ->
   @getPrimaryHand()?.isEmpty() || @getSecondaryHand()?.isEmpty()
