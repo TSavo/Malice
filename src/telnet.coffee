@@ -504,7 +504,6 @@ Client::naws = (cmd) ->
 Client::window_size = Client::naws
 
 Client::new_environ = (cmd) ->
-  `var s`
   data = cmd.data
   i = 0
   if cmd.commandCode != COMMANDS.SB
