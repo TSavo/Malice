@@ -28,6 +28,13 @@ room.asSeenBy = (who)->
     "(" + first.bold + ")" + rest
   )) + "." else result
 
+room.everyone = ->
+  new global.$game.classes.StimulationGroup @contents
+room.everyoneExcept = (who) ->
+  _ = require("./node_modules/underscore")
+  who = [who] if not Array.isArray who
+  new global.$game.classes.StimulationGroup _(@contents).reject (other)->
+    _(who).contains(other)
 
 room.getCommands = (who)->
   _ = require("./node_modules/underscore")
