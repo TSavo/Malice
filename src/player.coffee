@@ -52,6 +52,7 @@ player.init = (@name, @user, @info, @location = global.$game.$index.rooms.$nowhe
   @user.player = this
   @description = "Someone who needs a better description."
   @doing = ""
+  @body = new global.$game.classes.HumanBody(this, @info)
 
 player.moveTo = ->
   global.$game.common.moveTo.apply(this, arguments)
@@ -143,6 +144,7 @@ player.matchCommand = (command)->
       test.regexp.test command
 
 player.getCommands = (who)->
+  _ = require("./node_modules/underscore")
   self = this
   commands = [
     {
@@ -168,7 +170,7 @@ player.getCommands = (who)->
     }
   ]
   commands = commands.concat(@location?.getCommands(who)) if @location.getCommands
-  commands
+  _(commands).flatten()
 
 player.sees = (what)->
   if not @blind
@@ -188,9 +190,7 @@ player.lookAt = (who, what) ->
   @sees(if what.asSeenBy then what.asSeenBy(who) else what.description)
 
 player.resolveAllContents = ->
-  contents = []
-  contents = contents.concat(@contents)
-  contents = contents.concat(@location.contents)
+  @body.resolveAllContents().concat(@location.contents)
 
 player.resolve = (what) ->
   _ = require("./node_modules/underscore")

@@ -12,8 +12,6 @@ module.exports.testLoad = (name) ->
     console.log e
     return false
 
-
-
 module.exports.load = (name, callback) ->
   module.exports.loadResource((err, resource)->
     callback(nodeEval(resource))

@@ -110,15 +110,15 @@ global.$game.common.login.createConfirmationCode = ->
 
 global.$game.common.login.sendEmail = (username, email, confirmationCode) ->
   nodemailer = require('./node_modules/nodemailer');
-
+  credentials = JSON.parse(require("./dist/loader.js").loadResourceSync("./.credentials"))
   transporter = nodemailer.createTransport
     service: 'Gmail',
     auth:
-      user: 'shinmojo',
-      pass: 'Zabbas4242!'
+      user: credentials.username,
+      pass: credentials.password
 
   mailOptions =
-    from: 'ShinMojo@gmail.com',
+    from: credentials.sendFrom,
     to: email,
     subject: 'Confirmation code for ' + username + " from Malice.",
     text: 'Hello, ' + username + ". Here is your confirmation code: " + confirmationCode + "\nIf you didn't request this, then we apologize and please ignore this email."
