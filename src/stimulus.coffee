@@ -16,7 +16,43 @@ global.$game.constants.stimulus.typeList = require("./node_modules/underscore")(
 
 stim = global.$game.classes.Stimulus.prototype
 
-stim.init = (@type, @value)->
+stim.init = (@origin, @target, @value, @type = "visual", @language)->
   _ = require("./node_modules/underscore")
   throw new Error("Stimulus type must be of the supported types.") if _(global.$game.constants.stimulus.typeList).indexOf(@type) == -1
+
+if not global.$game.classes.StimulusBuilder
+  global.$game.classes.StimulusBuilder = class StimulusBuilder
+    constructor:->
+      @type = "$game.classes.StimulusBuilder"
+      this.init.apply(this, arguments)
+
+stimBuilder = global.$game.classes.StimulusBuilder.prototype
+      
+stimBuilder.init = (@origin, @target, @language = @origin?.language)->
+  @stimulus = []
+
+_ = require("./node_modules/underscore")
+_(global.$game.constants.stimulus.typeList).each (type)->
+  stimBuilder[type] = (what)->
+    @stimulus = @stimulus.concat(new Stimulus(@origin, @target, what, global.$game.constants.stimulus.types[type], @language))
+    this
+
+stimBuilder.hear = stimBuilder.hears = stimBuilder.auditory
+stimBuilder.sees = stimBuilder.see = stimBuilder.visual
+stimBuilder.feels = stimBuilder.feel = stimBuilder.physical
+stimBuilder.thinks = stimBuilder.think = stimBuilder.mental
+stimBuilder.smells = stimBuilder.stink = stimBuilder.smell
+stimBuilder.tastes = stimBuilder.taste
+
+stimBuilder.quoted = stimBuilder.says = stimBuilder.say = (what)->
+  this.hear who,  "\"" + what + "\""
   
+stimBuilder.from = (@origin)->
+  this
+stimBuilder.to = (@target)->
+  this
+stimBuilder.in = (@language)->
+  this
+  
+stimBuilder.build = ->
+  @stimulus
