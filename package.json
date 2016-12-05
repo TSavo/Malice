@@ -28,7 +28,7 @@
     "nesh": "^1.6.0",
     "node-eval": "^1.1.0",
     "node-serialize": "0.0.4",
-    "node-uuid": "^1.4.3",
+    "node-uuid": "^1.4.7",
     "nodemailer": "^2.6.4",
     "nodemon": "^1.5.0",
     "q": "^1.4.1",
