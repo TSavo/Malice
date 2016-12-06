@@ -131,10 +131,18 @@ repl.start(
   useGlobal:true
 ).on 'exit', ->
   socket.end()
-
+  
+ignoredFiles = [
+  /src\/driver\.coffee/,
+  /src\/loader\.coffee/,
+  /src\/telnet\.coffee/
+]
+  
 stalker = watchr.open "./src", (changeType,filePath,fileCurrentStat,filePreviousStat) ->
   try
-    if filePath.endsWith("driver.coffee") or filePath.endsWith("loader.coffee") then return
+    if _(ignoredFiles).some (item)->
+      item.test(filePath)
+    then return
     console.log("Reloading " + filePath)
     loader.loadSync("./" + filePath)
   catch e

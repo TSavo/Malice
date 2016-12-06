@@ -1,4 +1,4 @@
-require("./dist/user.js")
+require("./src/user")
 global.$game.$index.users = {} if not global.$game.$index.users
 
 global.$game.common = {} if not global.$game.common
@@ -82,7 +82,7 @@ global.$game.common.login.loginLoop = (socket) ->
     )
 
 global.$game.common.login.showWelcomeMessage = (socket, callback) ->
-  loader = require("./dist/loader.js")
+  loader = require("./src/loader")
   loader.loadResource "./txt/welcome.txt", (err, text)->
     socket.write(text.red + "\r\n")
     callback()
