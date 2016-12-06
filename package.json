@@ -4,7 +4,7 @@
   "description": "Malice",
   "main": "dist/driver.js",
   "scripts": {
-    "test": " mocha test --recursive --compilers coffee:coffee-script/register",
+    "test": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- test -R spec --compilers coffee:coffee-script/register --require coffee-coverage/register-istanbul",
     "start": "coffee ./src/driver.coffee",
     "compile": "echo No compilation necessary."
   },
