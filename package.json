@@ -5,7 +5,8 @@
   "main": "dist/driver.js",
   "scripts": {
     "test": " mocha test --recursive --compilers coffee:coffee-script/register",
-    "start": "coffee ./src/driver.coffee"
+    "start": "coffee ./src/driver.coffee",
+    "compile": "echo No compilation necessary."
   },
   "repository": "",
   "keywords": [
