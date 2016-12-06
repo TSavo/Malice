@@ -1,10 +1,16 @@
 language: node_js
+node_js:
+  - "0.10"
+  - "0.12"
+  - "4.2.3"
+  - "iojs 1.0"
+  - "iojs 2.0"
 env:
   # Set environment variable for test results output
   - XUNIT_FILE=shippable/testresults/result.xml
 build:
   ci:
-    - mkdir -p shippable
+    - mkdir -p shippable/testresults
     - mkdir -p shippable/codecoverage
 
     - npm install
