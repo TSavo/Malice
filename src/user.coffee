@@ -25,7 +25,7 @@ user.getSocket = ->
   global.$driver.getSocket(this)
 
 user.tell = (what) ->
-  global.$driver.getSocket(this)?.tell(what) if typeof what == "string"
+  global.$driver.getSocket(this)?.tell(what) if typeof what is "string"
 
 user.handleConnection = (socket) ->
   socket.question = (prompt, criteria, callback)->

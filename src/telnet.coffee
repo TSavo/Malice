@@ -119,7 +119,7 @@ SUB =
 
 Client = (options) ->
   self = this
-  if !(this instanceof Client)
+  if not (this instanceof Client)
     return new Client(arguments[0], arguments[1], arguments[2])
   Stream.call this
   if options.addListener
@@ -130,7 +130,7 @@ Client = (options) ->
   if options.socket
     options.input = options.socket
     options.output = options.socket
-  if !options.output
+  if not options.output
     options.output = options.input
     options.socket = options.input
   @input = options.input
@@ -214,7 +214,7 @@ Client::__proto__ = Stream.prototype
 Client::debug = ->
   args = Array::slice.call(arguments)
   msg = undefined
-  if !@remoteAddress and @input.remoteAddress
+  if not @remoteAddress and @input.remoteAddress
     @remoteAddress = @input.remoteAddress
   args.push '(' + @remoteAddress + ')'
   if @listeners('debug').length
