@@ -33,23 +33,23 @@ player.walkThrough = (exit) ->
   exit.accept(this)
 
 player.getSex = ->
-  @info.sex || "neuter"
+  @info.sex or "neuter"
 
 player.getHeight = ->
-  @info.height || 1.75
+  @info.height or 1.75
 
 player.getWeight = ->
-  @info.weight || 75
+  @info.weight or 75
 
 player.getHeightString = ->
-  return global.$game.constants.player.formatHeight @info?.appearance?.height || 1.7
+  return global.$game.constants.player.formatHeight @info?.appearance?.height or 1.7
 
 player.getWeightString = ->
-  return global.$game.constants.player.formatWeight @info?.appearance?.weight || 80, @getHeight()
+  return global.$game.constants.player.formatWeight @info?.appearance?.weight or 80, @getHeight()
 
 player.hold = (what)->
   return @tell("That's not something that can be held.") if what.cantBeHeld
-  return @tell("You'll need both hands free for that.") if what.twoHanded && (@leftHand || @rightHand)
+  return @tell("You'll need both hands free for that.") if what.twoHanded and (@leftHand || @rightHand)
   if what.twoHanded
     @leftHand = @rightHand = what
     hands = "both hands"

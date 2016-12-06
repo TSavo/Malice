@@ -140,7 +140,7 @@ Client = (options) ->
   @env = {}
   @terminal = 'ansi'
   @options = options
-  @options.convertLF = options.convertLF != false
+  @options.convertLF = options.convertLF isnt false
   if @options.tty
     @setRawMode = @_setRawMode
     @isTTY = true
@@ -156,9 +156,9 @@ Client = (options) ->
 
 Server = (options, callback) ->
   self = this
-  if !(this instanceof Server)
+  if not (this instanceof Server)
     return new Server(options, callback)
-  if typeof options != 'object'
+  if typeof options isnt 'object'
     callback = options
     options = null
   options = options or {}
@@ -327,9 +327,9 @@ Client::parse = (data) ->
         optionName: optionName
         data: cdata
       # compat
-      if cmd.option == 'new environ'
+      if cmd.option is 'new environ'
         cmd.option = 'environment variables'
-      else if cmd.option == 'naws'
+      else if cmd.option is 'naws'
         cmd.option = 'window size'
       if @[cmd.optionName]
         try
@@ -342,9 +342,9 @@ Client::parse = (data) ->
           len = -1
           @debug 'Not enough data to parse.'
       else
-        if cmd.commandCode == COMMANDS.SB
+        if cmd.commandCode is COMMANDS.SB
           len = 0
-          while cdata[len] and cdata[len] != COMMANDS.SE
+          while cdata[len] and cdata[len] isnt COMMANDS.SE
             len++
           if !cdata[len]
             len = 3
@@ -354,7 +354,7 @@ Client::parse = (data) ->
           len = 3
         cmd.data = cmd.data.slice(0, len)
         @debug 'Unknown option: %s', cmd.optionName
-      if len == -1
+      if len is -1
         @debug 'Waiting for more data.'
         @debug iacName, commandName, optionName, cmd.values or len
         @_last =
@@ -368,7 +368,7 @@ Client::parse = (data) ->
       l = i + len
       i += len - 1
     else
-      if data[i] == COMMANDS.IAC and data.length - 1 - i < 2
+      if data[i] is COMMANDS.IAC and data.length - 1 - i < 2
         @debug 'Waiting for more data.'
         @_last =
           data: data.slice(i)
@@ -377,7 +377,7 @@ Client::parse = (data) ->
         if i > l
           @emit 'data', data.slice(l, i)
         return
-      if needsPush or i == data.length - 1
+      if needsPush or i is data.length - 1
         bufs.push data.slice(l, i + 1)
         needsPush = false
     i++
@@ -451,7 +451,7 @@ Client::suppress_go_ahead = (cmd) ->
 Client::naws = (cmd) ->
   data = cmd.data
   i = 0
-  if cmd.commandCode != COMMANDS.SB
+  if cmd.commandCode isnt COMMANDS.SB
     if data.length < 3
       return -1
     cmd.data = cmd.data.slice(0, 3)
@@ -475,11 +475,11 @@ Client::naws = (cmd) ->
   i += 1
   se = data.readUInt8(i)
   i += 1
-  assert iac1 == COMMANDS.IAC
-  assert sb == COMMANDS.SB
-  assert naws == OPTIONS.NAWS
-  assert iac2 == COMMANDS.IAC
-  assert se == COMMANDS.SE
+  assert iac1 is COMMANDS.IAC
+  assert sb is COMMANDS.SB
+  assert naws is OPTIONS.NAWS
+  assert iac2 is COMMANDS.IAC
+  assert se is COMMANDS.SE
   cmd.cols = width
   cmd.columns = width
   cmd.width = width
@@ -506,7 +506,7 @@ Client::window_size = Client::naws
 Client::new_environ = (cmd) ->
   data = cmd.data
   i = 0
-  if cmd.commandCode != COMMANDS.SB
+  if cmd.commandCode isnt COMMANDS.SB
     if data.length < 3
       return -1
     cmd.data = cmd.data.slice(0, 3)
@@ -529,7 +529,7 @@ Client::new_environ = (cmd) ->
   name = undefined
   s = i
   while i < data.length
-    if data[i] == SUB.VALUE
+    if data[i] is SUB.VALUE
       name = data.toString('ascii', s, i)
       i++
       break
@@ -537,7 +537,7 @@ Client::new_environ = (cmd) ->
   value = undefined
   s = i
   while i < data.length
-    if data[i] == COMMANDS.IAC
+    if data[i] is COMMANDS.IAC
       value = data.toString('ascii', s, i)
       break
     i++
@@ -545,20 +545,20 @@ Client::new_environ = (cmd) ->
   i += 1
   se = data.readUInt8(i)
   i += 1
-  assert iac1 == COMMANDS.IAC
-  assert sb == COMMANDS.SB
-  assert newenv == OPTIONS.NEW_ENVIRON
-  assert info == SUB.INFO
-  assert variable == SUB.VARIABLE or variable == SUB.USER_VARIABLE
+  assert iac1 is COMMANDS.IAC
+  assert sb is COMMANDS.SB
+  assert newenv is OPTIONS.NEW_ENVIRON
+  assert info is SUB.INFO
+  assert variable is SUB.VARIABLE or variable is SUB.USER_VARIABLE
   assert name.length > 0
   assert value.length > 0
-  assert iac2 == COMMANDS.IAC
-  assert se == COMMANDS.SE
+  assert iac2 is COMMANDS.IAC
+  assert se is COMMANDS.SE
   cmd.name = name
   cmd.value = value
-  cmd.type = if variable == SUB.VARIABLE then 'system' else 'user'
+  cmd.type = if variable is SUB.VARIABLE then 'system' else 'user'
   # Always uppercase for some reason.
-  if cmd.name == 'TERM'
+  if cmd.name is 'TERM'
     cmd.value = cmd.value.toLowerCase()
     @terminal = cmd.value
     @emit 'term', cmd.value
@@ -581,12 +581,12 @@ Client::environment_variables = Client::new_environ
 Client::terminal_type = (cmd) ->
   data = cmd.data
   i = 0
-  if cmd.commandCode != COMMANDS.SB
+  if cmd.commandCode isnt COMMANDS.SB
     if data.length < 3
       return -1
     cmd.data = cmd.data.slice(0, 3)
     @emit 'terminal type', cmd
-    if cmd.commandCode == COMMANDS.WILL
+    if cmd.commandCode is COMMANDS.WILL
       @output.write new Buffer([
         COMMANDS.IAC
         COMMANDS.SB
@@ -609,7 +609,7 @@ Client::terminal_type = (cmd) ->
   name = undefined
   s = i
   while i < data.length
-    if data[i] == COMMANDS.IAC
+    if data[i] is COMMANDS.IAC
       name = data.toString('ascii', s, i)
       break
     i++
@@ -617,13 +617,13 @@ Client::terminal_type = (cmd) ->
   i += 1
   se = data.readUInt8(i)
   i += 1
-  assert iac1 == COMMANDS.IAC
-  assert sb == COMMANDS.SB
-  assert termtype == OPTIONS.TERMINAL_TYPE
-  assert isa == SUB.IS
+  assert iac1 is COMMANDS.IAC
+  assert sb is COMMANDS.SB
+  assert termtype is OPTIONS.TERMINAL_TYPE
+  assert isa is SUB.IS
   assert name.length > 0
-  assert iac2 == COMMANDS.IAC
-  assert se == COMMANDS.SE
+  assert iac2 is COMMANDS.IAC
+  assert se is COMMANDS.SE
   # Always uppercase for some reason.
   cmd.name = name.toLowerCase()
   cmd.values = [ cmd.name ]
@@ -681,7 +681,7 @@ Client::destroySoon = ->
 Server::__proto__ = EventEmitter.prototype
 Object.keys(net.Server.prototype).forEach ((key) ->
   value = net.Server.prototype[key]
-  if typeof value != 'function'
+  if typeof value isnt 'function'
     return
 
   Server.prototype[key] = ->

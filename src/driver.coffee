@@ -83,29 +83,25 @@ global.$driver.broadcast = (message) ->
   return
 
 global.$driver.load = (filename) ->
-  if !filename
+  if not filename
     try
       filename = _(fs.readdirSync('checkpoints')).chain().filter((name) ->
         name.indexOf('checkpoint') > -1
       ).sort().reverse().first().value()
     catch e
-      console.log e
-      return
-    if !filename
-      return
+      return console.log e
+    return if not filename
     try
       data = fs.readFileSync("checkpoints/" + filename)
     catch e
-      console.log e
-      return
+      return console.log e
     console.log 'Loading checkpoint from ' + filename + '...'
     try
       global.$game = serializer.unserialize(data.toString())
       console.log 'Checkpoint loaded.'
     catch e
       console.log e
-  return
-
+  
 global.$driver.handleNewConnection = (socket) ->
   global.$game.common.login.handleNewConnection(socket)
 
