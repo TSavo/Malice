@@ -6,4 +6,4 @@ node_modules
 checkpoints
 .credentials
 npm-debug.log*
-
+shippable
