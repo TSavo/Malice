@@ -15,7 +15,7 @@ global.$game.common.login.handleNewConnection = (socket) ->
   rl = readline.createInterface(socket, socket)
   rl.question "Can you see the " + "colors? ".rainbow, (useColor) ->
     rl.close()
-    if !useColor.toLowerCase().startsWith("n")
+    if not useColor.toLowerCase().startsWith("n")
       socket.tell = (str)->
         str.split("\n").forEach (s)->
           socket.write(wrap(width)(s) + "\n")
@@ -58,7 +58,7 @@ global.$game.common.login.loginLoop = (socket) ->
       hash = crypto.createHash "sha256"
       hash.update password
       hash.update user.salt + ""
-      if(user.password != hash.digest("hex"))
+      if(user.password isnt hash.digest("hex"))
         setTimeout(->
           socket.tell("Unknown user or bad password.")
           global.$game.common.login.loginLoop(socket)
@@ -66,7 +66,7 @@ global.$game.common.login.loginLoop = (socket) ->
         return
       if not user.verified
         global.$game.common.question socket, "Please enter your confirmation code: ", (check) ->
-          return "Invalid confirmation code." if check.toLowerCase() != user.confirmationCode.toLowerCase()
+          return "Invalid confirmation code." if check.toLowerCase() isnt user.confirmationCode.toLowerCase()
         , (err, answer) ->
           user.verified = true
           socket.tell("Successfully authenticated as " + login + ". Welcome back!")

@@ -48,7 +48,7 @@ global.$game.common.choice = (socket, prompt, choices, callback) ->
     index++
   index--
   global.$game.common.question socket, what, (answer)->
-    return "Please enter a number between 1 and #{index} or " + "@abort".underline + " to abort." if isNaN(parseInt(answer)) || parseInt(answer) < 1 || parseInt(answer) > index
+    return "Please enter a number between 1 and #{index} or " + "@abort".underline + " to abort." if isNaN(parseInt(answer)) or parseInt(answer) < 1 or parseInt(answer) > index
   , (err, finalAnswer) ->
     return deferred.reject("Abort") if err
     deferred.resolve(map[parseInt(finalAnswer)])

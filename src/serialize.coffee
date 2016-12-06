@@ -13,11 +13,11 @@ ISNATIVEFUNC = /^function\s*[^(]*\(.*\)\s*\{\s*\[native code\]\s*\}$/
 
 if (typeof String.prototype.startsWith != 'function')
   String.prototype.startsWith = (str)->
-    return this.slice(0, str.length) == str
+    return this.slice(0, str.length) is str
 
 if (typeof String.prototype.endsWith != 'function')
   String.prototype.endsWith = (str)->
-    return this.slice(-str.length) == str
+    return this.slice(-str.length) is str
 
 getKeyPath = (obj, path) ->
   try
@@ -35,7 +35,7 @@ getKeyPath = (obj, path) ->
 serializeCircular = (obj, cache) ->
   for subKey of cache
     if cache.hasOwnProperty(subKey)
-      if cache[subKey] == obj
+      if cache[subKey] is obj
         return CIRCULARFLAG + subKey
   false
 
@@ -58,8 +58,8 @@ unserializeFunction = (func, originObj) ->
 
 serializeWrapped = (obj) ->
   if obj instanceof Date then return DATEFLAG + obj.getTime()
-  if obj == undefined then return UNDEFINEDFLAG
-  if obj == Infinity then return INFINITYFLAG
+  if obj is undefined then return UNDEFINEDFLAG
+  if obj is Infinity then return INFINITYFLAG
   return obj
 
 unserializeWrapped = (str) ->
@@ -81,9 +81,9 @@ serializeObject = (obj, ignoreNativeFunc, outputObj, cache, path) ->
     keys.push 'prototype'
     keys.push '__proto__'
   keys.forEach (key) ->
-    if obj.hasOwnProperty(key) or key == 'prototype' or key == '__proto__'
-      destKey = if key == '__proto__' then PROTOFLAG else if key == 'prototype' then PROTOTYPEFLAG else key
-      if (typeof obj[key] == 'object' || typeof obj[key] == 'function') and obj[key] != null
+    if obj.hasOwnProperty(key) or key is 'prototype' or key is '__proto__'
+      destKey = if key is '__proto__' then PROTOFLAG else if key is 'prototype' then PROTOTYPEFLAG else key
+      if (typeof obj[key] is 'object' or typeof obj[key] is 'function') and obj[key] isnt null
         found = serializeCircular(obj[key], cache)
         if found
           output[destKey] = found
@@ -98,9 +98,9 @@ module.exports.serialize = (obj, ignoreNativeFunc, outputObj, cache, path) ->
   cache = cache or {}
   outputObj = outputObj or {}
   obj = serializeWrapped(obj)
-  if typeof obj == 'string' or typeof obj == 'number'
+  if typeof obj is 'string' or typeof obj is 'number'
     outputObj = obj
-  else if obj.constructor == Array
+  else if obj.constructor is Array
     outputObj = []
     cache[path] = outputObj
     obj.forEach (value, index) ->
@@ -113,30 +113,30 @@ module.exports.serialize = (obj, ignoreNativeFunc, outputObj, cache, path) ->
     else
       cache[path] = obj
       outputObj = serializeObject(obj, ignoreNativeFunc, outputObj, cache, path)
-      if typeof obj == 'function'
+      if typeof obj is 'function'
         outputObj[FUNCFLAG] = serializeFunction(obj, ignoreNativeFunc)
-  if path == '$' then JSON.stringify(outputObj) else outputObj
+  if path is '$' then JSON.stringify(outputObj) else outputObj
 
 module.exports.unserialize = (obj, originObj) ->
   isIndex = undefined
-  if typeof obj == 'string'
+  if typeof obj is 'string'
     obj = JSON.parse(obj)
   originObj = originObj or obj
   if obj && obj[FUNCFLAG]
     obj = unserializeFunction(obj)
-  if(typeof obj == 'string')
+  if(typeof obj is 'string')
     obj = unserializeWrapped(obj)
   circularTasks = []
   for key of obj
     if obj.hasOwnProperty(key)
-      destKey = if key == PROTOFLAG then '__proto__' else if key == PROTOTYPEFLAG then 'prototype' else key
-      if(destKey == 'prototype' && obj[key] == UNDEFINEDFLAG)
+      destKey = if key is PROTOFLAG then '__proto__' else if key is PROTOTYPEFLAG then 'prototype' else key
+      if(destKey is 'prototype' && obj[key] is UNDEFINEDFLAG)
         delete obj[key]
         continue
-      if typeof obj[key] == 'object' or typeof obj[key] == 'function'
+      if typeof obj[key] is 'object' or typeof obj[key] is 'function'
         obj[destKey] = module.exports.unserialize(obj[key], originObj)
-      else if typeof obj[key] == 'string'
-        if obj[key].indexOf(CIRCULARFLAG) == 0
+      else if typeof obj[key] is 'string'
+        if obj[key].indexOf(CIRCULARFLAG) is 0
           obj[key] = obj[key].substring(CIRCULARFLAG.length)
           circularTasks.push
             obj: obj

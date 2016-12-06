@@ -18,8 +18,8 @@ stim = global.$game.classes.Stimulus.prototype
 
 stim.init = (@origin, @target, @value, @type = "visual", @language)->
   _ = require("./node_modules/underscore")
-  throw new Error("Stimulus type must be of the supported types.") if _(global.$game.constants.stimulus.typeList).indexOf(@type) == -1
-
+  throw new Error("Stimulus type must be of the supported types.") if _(global.$game.constants.stimulus.typeList).indexOf(@type) is -1
+    
 if not global.$game.classes.StimulusBuilder
   global.$game.classes.StimulusBuilder = class StimulusBuilder
     constructor:->

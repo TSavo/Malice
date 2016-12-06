@@ -44,7 +44,7 @@ part.init = (@name, @bones, @coverable, @removable, @critical, @parts = {})->
   @contents = []
 
 part.findPart = (name)->
-  return this if name == @name || @name.indexOf(name) == 0 || name.test?(@name)
+  return this if name == @name or @name.indexOf(name) == 0 or name.test?(@name)
   _ = require("./node_modules/underscore")
   _(@parts).find (part)->
     part.findPart(name)
@@ -102,9 +102,9 @@ global.$game.common.makeHead = ->
   head.face.mouth.tongue.canTaste = ->
     true
   head.canSee = ->
-    head?.leftEye?.canSee?() || head?.rightEye?.canSee?()
+    head?.leftEye?.canSee?() or head?.rightEye?.canSee?()
   head.canHear = ->
-    head?.leftEar?.canHear?() || head?.rightEar?.canHear?()
+    head?.leftEar?.canHear?() or head?.rightEar?.canHear?()
   head.canThink = ->
     true
   head.canTaste = ->
@@ -244,7 +244,7 @@ body.getTorso = ->
   @torso
 
 body.say = body.says = (what) ->
-  return @tell "You try to speak but you cant!" if !@canSpeak()
+  return @tell "You try to speak but you cant!" if not @canSpeak()
   @tell "You say, \"" + what + "\""
   stimulus = new global.$game.classes.StimulusBuilder(what, what.location).visual(this).visual(" says, ").quoted(what).visual(".").build()
   @location.everyoneExcept(this).stimulate(stimulus)
@@ -267,23 +267,23 @@ body.contextualizeLanguage = (message, language)->
   .join(" ").value()
   
 body.contextualizeStimulus = (stimulus)->
-  if stimulus.type == "visual" && !@canSee()
+  if stimulus.type == "visual" and not @canSee()
     ""
-  else if stimulus.type == "auditory" and ! @canHear()
+  else if stimulus.type == "auditory" and not @canHear()
     ""
-  else if stimulus.type == "smell" and ! @canSmell()
+  else if stimulus.type == "smell" and not @canSmell()
     ""
-  else if stimulus.type == "taste" and ! @canTaste()
+  else if stimulus.type == "taste" and not @canTaste()
     ""
-  else if stimulus.type == "mental" and ! @canThink()
+  else if stimulus.type == "mental" and not @canThink()
     ""
-  else if stimulus.type == "physical" and ! @canFeel()
+  else if stimulus.type == "physical" and not @canFeel()
     ""
   else if stimulus.type == "auditory" and stimulus.language
     this.contextualizeLanguage stimulus.value, stimulus.language
   else if stimulus.type == "visual" and typeof stimulus.value == "object"
     stimulus.value.asSeenBy?(this) or stimulus.value.name
-  else 
+  else
     stimulus.value
 
 body.stimulate = (stimulus)->
@@ -317,7 +317,7 @@ body.getSecondaryHand = ->
   if primaryHand == "right" then @getLeftHand() else @getRightHand()
 
 body.getHand = ->
-  @getPrimaryHand() || @getSecondaryHand()
+  @getPrimaryHand() or @getSecondaryHand()
 
 body.getBothHands = ->
   [@getPrimaryHand(), @getSecondaryHand()]
@@ -326,10 +326,10 @@ body.getFreeHand = ->
   if @getPrimaryHand?.isEmpty() then @getPrimaryHand else if @getSecondaryHand()?.isEmpty() then @getSecondaryHand() else undefined
 
 body.isOneHandEmpty = ->
-  @getPrimaryHand()?.isEmpty() || @getSecondaryHand()?.isEmpty()
+  @getPrimaryHand()?.isEmpty() or @getSecondaryHand()?.isEmpty()
 
 body.isBothHandsEmpty = ->
-  @getPrimaryHand()?.isEmpty() && @getSecondaryHand()?.isEmpty()
+  @getPrimaryHand()?.isEmpty() and @getSecondaryHand()?.isEmpty()
 
 body.holdInHands = (what)->
   q = require("./node_modules/q")

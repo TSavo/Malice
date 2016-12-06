@@ -20,12 +20,12 @@ charGen.start = (socket)->
     prompt = "#{'Character Generation Main Menu'.bold.green}\n"
     prompt += progress if progress
     prompt += if remaining.length then "Things you still must do before you finish: #{remaining.join(', ').yellow}" else "You're all set. Select ".green + "Finish".green.bold + " to finalize your character.".green
-    if remaining.length == 0 && not options.finish then options.finish = "Finish".green.bold
+    if remaining.length is 0 and not options.finish then options.finish = "Finish".green.bold
     socket.choice(prompt, options)
     .then (option)->
       console.log("option: " + option)
-      if option == "abort" then throw new Error("Aborting...")
-      if option == "finish"
+      if option is "abort" then throw new Error("Aborting...")
+      if option is "finish"
         socket.tell("This is how you're character is going to start:")
         socket.tell global.$game.common.charGen.formatProgress(results)
         socket.tell "Now they may not be like that forever, but it may take a little doing to make changes after this."
@@ -34,9 +34,9 @@ charGen.start = (socket)->
         .then ->
           try
             global.$game.common.charGen.cloneNewPlayer(socket, results)
-          catch(e)
+          catch e
             global.catch e
-              setTimeout makePlayerLoop, 0
+            setTimeout makePlayerLoop, 0
         .catch (err)->
           setTimeout makePlayerLoop, 0
       global.$game.common.charGen[option] socket
@@ -98,7 +98,7 @@ charGen.cloneNewPlayer = (socket, info)->
     socket.tell("Please wait... this might take a minute.".italic)
     x = 2 + Math.floor(Math.random()*3)
     waitMore = ->
-      if x == 0
+      if x is 0
         socket.tell("Progress: ".cyan + "Vital signs detected! ".blue + "Completing cloning process...".yellow)
         return setTimeout ->
           socket.tell("Cloning process successful! Returning control to user...".green.bold.italic)
@@ -176,9 +176,9 @@ You can also log in with this name, and be addressed by others with it by defaul
     return "User names cannot contain any non alphabet characters." if not /^[a-zA-Z]*$/.test(criteria)
     _ = require("./node_modules/underscore")
     existingUsers = _(global.$game.$index.users).find (user) ->
-      user.name.toLowerCase() == criteria
+      user.name.toLowerCase() is criteria
     existingPlayers = _(global.$game.$index.players).find (player) ->
-      player.name.toLowerCase() == criteria
+      player.name.toLowerCase() is criteria
     if existingPlayers or existingPlayers then return "That name is taken."
   .then (aliasAnswer)->
     alias = aliasAnswer
@@ -223,13 +223,13 @@ For example, if your character was 1.8 meters (about 6 feet tall), you would typ
 """
     height = weight = 0
     socket.question heightPrompt, (criteria) ->
-      return "Please enter a number between 0.5 and 3, like 1.8." if isNaN(criteria) || parseFloat(criteria) < 0.5 || parseFloat(criteria) > 3
+      return "Please enter a number between 0.5 and 3, like 1.8." if isNaN(criteria) or parseFloat(criteria) < 0.5 or parseFloat(criteria) > 3
     .then (heightInput) ->
       height = Math.floor(heightInput * 100) / 100
       heightWord = formatHeight(height)
       console.log "Ok " + heightWord
       socket.question "That would make you " + heightWord + ". And your weight in kilograms?\n", (criteria) ->
-        return "Please enter a number between 15 and 300." if isNaN(parseInt(criteria)) || parseInt(criteria) < 15 || parseInt(criteria) > 300
+        return "Please enter a number between 15 and 300." if isNaN(parseInt(criteria)) or parseInt(criteria) < 15 or parseInt(criteria) > 300
     .then (weightInput)->
       weight = parseInt(weightInput)
       socket.yesorno "That would make you " + formatWeight(weight, height) + " for your height. Is that ok?\n"
