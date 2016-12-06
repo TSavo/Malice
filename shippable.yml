@@ -1,0 +1,16 @@
+env:
+  # Set environment variable for test results output
+  - XUNIT_FILE=shippable/testresults/result.xml
+build:
+  ci:
+    - mkdir -p shippable
+    - mkdir -p shippable/codecoverage
+
+    - npm install
+
+    #Run tests
+    - npm test
+
+    #Generate coverage report with istanbul
+    - ./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha -- test --ui=bdd --reporter=xunit-file --compilers coffee:coffee-script/register --require coffee-coverage/register-istanbul
+    - ./node_modules/.bin/istanbul report cobertura --dir shippable/codecoverage/
