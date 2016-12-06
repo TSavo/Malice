@@ -1,4 +1,4 @@
-global.$game.classes = {} if ! global.$game.classes
+global.$game.classes = {} if not global.$game.classes
 
 if not global.$game.classes.User
   global.$game.classes.User = class User
@@ -50,17 +50,17 @@ Please make a selection from the following options:
 
 """
   socket.question prompt, (answer) ->
-    return "Invalid selection." if answer.trim() != "1" && answer.trim() != "2"
+    return "Invalid selection." if answer.trim() isnt "1" && answer.trim() isnt "2"
   , (err, answer)->
-    if(answer == "2")
+    if(answer is "2")
       return socket.end()
-    if(answer == "1")
+    if(answer is "1")
       if(socket.user.player)
         x = 3
         socket.tell("Now entering the world in 3...")
         ready = ->
           x--
-          if(x == 0)
+          if(x is 0)
             socket.user.player.goIC(socket)
           else
             socket.tell(x + "...")

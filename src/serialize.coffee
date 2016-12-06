@@ -11,11 +11,11 @@ KEYPATHSEPARATOR = '_$$.$$_'
 ISNATIVEFUNC = /^function\s*[^(]*\(.*\)\s*\{\s*\[native code\]\s*\}$/
 
 
-if (typeof String.prototype.startsWith != 'function')
+if (typeof String.prototype.startsWith isnt 'function')
   String.prototype.startsWith = (str)->
     return this.slice(0, str.length) is str
 
-if (typeof String.prototype.endsWith != 'function')
+if (typeof String.prototype.endsWith isnt 'function')
   String.prototype.endsWith = (str)->
     return this.slice(-str.length) is str
 

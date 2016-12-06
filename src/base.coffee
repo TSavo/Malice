@@ -18,7 +18,7 @@ global.$game.common.question = (socket, prompt, criteria, callback)->
     rl = readline.createInterface(socket, socket)
     rl.question prompt, (answer) ->
       rl.close()
-      if answer == "@abort"
+      if answer is "@abort"
         return deferred.reject("Abort")
       result = if criteria then criteria(answer) else false
       if result

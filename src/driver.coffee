@@ -1,4 +1,4 @@
-require('app-module-path').addPath(__dirname + '/dist');
+require('app-module-path').addPath(__dirname + '/dist')
 serializer = require('./serialize.js')
 loader = require("./loader.js")
 watchr = require("watchr")
@@ -38,40 +38,40 @@ Array.prototype.remove = ->
   ax = undefined
   while (L && this.length)
     what = a[--L]
-    while ((ax = this.indexOf(what)) != -1)
+    while ((ax = this.indexOf(what)) isnt -1)
       this.splice(ax, 1)
   return this
 
 Array.prototype.proportionate = (num, max)->
-  return this[0] if num == 0
-  return this[this.length-1] if num == max
+  return this[0] if num is 0
+  return this[this.length-1] if num is max
   percent = num / max
   where = (this.length - 1) * percent
   return this[Math.min(this.length-2, Math.max(1,parseInt(where)))]
 
 if (typeof String.prototype.startsWith != 'function')
   String.prototype.startsWith = (str)->
-    return this.slice(0, str.length) == str
+    return this.slice(0, str.length) is str
 
 if (typeof String.prototype.endsWith != 'function')
   String.prototype.endsWith = (str)->
-    return this.slice(-str.length) == str
+    return this.slice(-str.length) is str
 
 global.$driver.save = ->
   state = serializer.serialize(global.$game)
   now = new Date
   year = now.getFullYear().toString()
   month = now.getMonth().toString()
-  if(month.length == 1)
+  if(month.length is 1)
     month = "0" + month
   day = now.getDate().toString()
-  if(day.length == 1)
+  if(day.length is 1)
     day = "0" + day
   hour = now.getHours().toString()
-  if(hour.length == 1)
+  if(hour.length is 1)
     hour = "0" + hour
   minute = now.getMinutes().toString()
-  if(minute.length == 1)
+  if(minute.length is 1)
     minute = "0" + minute
   fs.writeFile 'checkpoints/checkpoint-' + year + "" + month + "" + day + "" + hour + "" + minute + '.json', state
   return
