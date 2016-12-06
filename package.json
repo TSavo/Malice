@@ -19,12 +19,9 @@
   "readmeFilename": "README.md",
   "dependencies": {
     "app-module-path": "^2.1.0",
-    "codacy-coverage": "^2.0.0",
     "colors": "^1.1.2",
     "cryo": "0.0.6",
     "listify": "^1.0.0",
-    "mocha": "^3.2.0",
-    "mocha-lcov-reporter": "^1.2.0",
     "moment": "^2.17.1",
     "nesh": "^1.7.0",
     "node-eval": "^1.1.0",
@@ -38,9 +35,12 @@
     "wordwrap": "^1.0.0"
   },
   "devDependencies": {
+    "codacy-coverage": "^2.0.0",
     "chai": "^3.5.0",
     "coffee-coverage": "^1.0.1",
     "coffee-script": "^1.12.0",
+    "mocha": "^3.2.0",
+    "mocha-lcov-reporter": "^1.2.0",
     "istanbul": "^0.4.5",
     "xunit-file": "^1.0.0"
   }
