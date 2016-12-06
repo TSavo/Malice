@@ -20,7 +20,6 @@ build:
     - mkdir -p shippable/codecoverage
 
     - npm install
-
     #Run tests
     - npm test
 
