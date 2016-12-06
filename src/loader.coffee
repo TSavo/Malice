@@ -1,6 +1,7 @@
 fs=require("fs")
 vm = require("vm")
 nodeEval = require("node-eval")
+coffee = require "coffee-script"
 module.exports.testLoad = (name) ->
   m = require('module')
   sandbox = vm.createContext({})
@@ -14,11 +15,11 @@ module.exports.testLoad = (name) ->
 
 module.exports.load = (name, callback) ->
   module.exports.loadResource((err, resource)->
-    callback(nodeEval(resource))
+    callback(nodeEval(coffee.compile(resource, bare: true)))
   )
 
 module.exports.loadSync = (name) ->
-  nodeEval(module.exports.loadResourceSync(name))
+  nodeEval(coffee.compile(module.exports.loadResourceSync(name), bare:true))
 
 module.exports.loadResourceSync = (name) ->
   fs.readFileSync(name).toString()

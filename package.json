@@ -4,11 +4,8 @@
   "description": "Malice",
   "main": "dist/driver.js",
   "scripts": {
-    "test": "coffee -o test_dist -c test_src && mocha test_dist --recursive",
-    "watch": "(start coffee --compile --output dist --watch src)",
-    "watch-mac": "(coffee --compile --output dist --watch src)",
-    "start": "node ./dist/driver.js",
-    "compile": "coffee -o dist -c src"
+    "test": " mocha test --recursive --compilers coffee:coffee-script/register",
+    "start": "coffee ./src/driver.coffee"
   },
   "repository": "",
   "keywords": [
@@ -35,12 +32,13 @@
     "nodemailer": "^2.6.4",
     "nodemon": "^1.11.0",
     "q": "^2.0.3",
-    "telnet": "0.0.1",
     "underscore": "^1.8.3",
     "watchr": "^3.0.1",
     "wordwrap": "^1.0.0"
   },
   "devDependencies": {
-    "coffee-script": "^1.12.0"
+    "coffee-coverage": "^1.0.1",
+    "coffee-script": "^1.12.0",
+    "istanbul": "^0.4.5"
   }
 }
