@@ -1,4 +1,7 @@
 dist
+test_dist
+coverage
+.coverage
 node_modules
 checkpoints
 .credentials
