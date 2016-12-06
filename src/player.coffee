@@ -79,7 +79,7 @@ player.commandLoop = ->
 
 player.getInputHandler = ->
   self = this
-  return global.$driver.getInputHandler(self) || (input)->
+  return global.$driver.getInputHandler(self) or (input)->
     self.handleCommand(input)
 
 player.setInputHandler = (handler) ->
@@ -164,13 +164,13 @@ player.resolveAllContents = ->
 player.resolve = (what) ->
   _ = require("./node_modules/underscore")
   what = what.trim().toLowerCase()
-  return this if what == "me"
-  return @location if what == "here"
+  return this if what is "me"
+  return @location if what is "here"
   contents = @resolveAllContents()
   found = _(contents).filter (item)->
-    regexp.test(item?.name) || _(item?.aliases).find (alias)->
+    regexp.test(item?.name) or _(item?.aliases).find (alias)->
       regexp.test(alias)
-  return found[0] if found and found.length == 1
+  return found[0] if found and found.length is 1
   return found if found.length > 1
   groups = /^([\w-]+)\s(.*)$/i.exec what
   return undefined if not groups
@@ -179,10 +179,10 @@ player.resolve = (what) ->
   rest = groups[2]
   regexp = new RegExp("^(.*)\b(" + rest + ")(.*)$", "i")
   found = _(contents).filter (item)->
-    regexp.test(item?.name || "") || _(item?.aliases || []).find (alias)->
+    regexp.test(item?.name or "") or _(item?.aliases or []).find (alias)->
       regexp.test(alias)
   return found[position-1] if found.length > 0 and position > 0 and found.length > position-1
-  return undefined if found.length == 0
+  return undefined if found.length is 0
   found
 
 

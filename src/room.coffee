@@ -56,7 +56,7 @@ if not global.$game.classes.RoomExit
 exit = global.$game.classes.RoomExit.prototype
 
 exit.init = (@name, @description, @leaveMessage, @arriveMessage, @aliases, @source, @destination)->
-  throw new Error("RoomExits must have a name, description, leaveMessage, arriveMessage, aliases, source, and destination.") if not @name && @description && @direction && @leaveMessage && @arriveMessage && @aliases && @source && @destination
+  throw new Error("RoomExits must have a name, description, leaveMessage, arriveMessage, aliases, source, and destination.") if not @name and @description and @direction and @leaveMessage and @arriveMessage and @aliases and @source and @destination
   throw new Error("RoomExit names must be unique.") if global.$game.$index.roomExits[@source.name + " -> " + @destination.name + " (" + @name + ")"]
   global.$game.$index.roomExits[@source.name + " -> " + @destination.name + " (" + @name + ")"] = this
   @source.exits.push(this)
