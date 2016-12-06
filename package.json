@@ -4,11 +4,11 @@
   "description": "Malice",
   "main": "dist/driver.js",
   "scripts": {
-    "test": "echo \"Error: no test specified! Configure in package.json\" && exit 1",
+    "test": "coffee -o test_dist -c test_src && mocha test_dist --recursive",
     "watch": "(start coffee --compile --output dist --watch src)",
     "watch-mac": "(coffee --compile --output dist --watch src)",
     "start": "node ./dist/driver.js",
-    "compile": "coffee --compile --output dist src"
+    "compile": "coffee -o dist -c src"
   },
   "repository": "",
   "keywords": [
@@ -21,9 +21,12 @@
   "readmeFilename": "README.md",
   "dependencies": {
     "app-module-path": "^2.1.0",
+    "codacy-coverage": "^2.0.0",
     "colors": "^1.1.2",
     "cryo": "0.0.6",
     "listify": "^1.0.0",
+    "mocha": "^3.2.0",
+    "mocha-lcov-reporter": "^1.2.0",
     "moment": "^2.17.1",
     "nesh": "^1.7.0",
     "node-eval": "^1.1.0",
