@@ -3,8 +3,10 @@ node_js:
   - "0.10"
   - "0.12"
   - "4.2.3"
+  - "4.4.3"
   - 4
   - 6
+  - 7
 env:
   # Set environment variable for test results output
   - XUNIT_FILE=shippable/testresults/result.xml
