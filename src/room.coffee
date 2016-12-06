@@ -8,7 +8,7 @@ if not global.$game.classes.Room
 
 room = global.$game.classes.Room.prototype
 global.$game.$index = {} if not global.$game.$index
-global.$game.$index.rooms = {} if !global.$game.$index.rooms
+global.$game.$index.rooms = {} if not global.$game.$index.rooms
 
 room.init = (@name, @description, @aliases = [], @contents = [], location = global.$game.$index.rooms.$nowhere) ->
   throw new Error("Rooms must have a name.") if not @name
@@ -17,7 +17,7 @@ room.init = (@name, @description, @aliases = [], @contents = [], location = glob
   @exits = []
 
 room.asSeenBy = (who)->
-  result = @name[@color || "strip"] + "\n"
+  result = @name[@color or "strip"] + "\n"
   result += @description + "\n"
   _ = require("./node_modules/underscore")
   if @exits.length then result += "You can go " + require("./node_modules/listify")(_(@exits).map((exit)->

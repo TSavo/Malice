@@ -77,7 +77,7 @@ serializeObject = (obj, ignoreNativeFunc, outputObj, cache, path) ->
   obj = serializeWrapped(obj)
   output = {}
   keys = Object.keys(obj)
-  if !path.endsWith('prototype') and !path.endsWith('__proto__')
+  if not path.endsWith('prototype') and not path.endsWith('__proto__')
     keys.push 'prototype'
     keys.push '__proto__'
   keys.forEach (key) ->
@@ -122,7 +122,7 @@ module.exports.unserialize = (obj, originObj) ->
   if typeof obj is 'string'
     obj = JSON.parse(obj)
   originObj = originObj or obj
-  if obj && obj[FUNCFLAG]
+  if obj and obj[FUNCFLAG]
     obj = unserializeFunction(obj)
   if(typeof obj is 'string')
     obj = unserializeWrapped(obj)
@@ -130,7 +130,7 @@ module.exports.unserialize = (obj, originObj) ->
   for key of obj
     if obj.hasOwnProperty(key)
       destKey = if key is PROTOFLAG then '__proto__' else if key is PROTOTYPEFLAG then 'prototype' else key
-      if(destKey is 'prototype' && obj[key] is UNDEFINEDFLAG)
+      if(destKey is 'prototype' and obj[key] is UNDEFINEDFLAG)
         delete obj[key]
         continue
       if typeof obj[key] is 'object' or typeof obj[key] is 'function'

@@ -44,7 +44,7 @@ global.$game.common.login.loginLoop = (socket) ->
     rl.question(passwordPrompt, (password) ->
       rl.close()
       user = _(global.$game.$index.users).find((user) ->
-        return user.name.toLowerCase() is login.toLowerCase() || user.email.toLowerCase() is login.toLowerCase()
+        return user.name.toLowerCase() is login.toLowerCase() or user.email.toLowerCase() is login.toLowerCase()
       )
       if not user
         user = _(global.$game.$index.players).find((player) ->
@@ -104,12 +104,12 @@ global.$game.common.login.register = (socket) ->
 
 global.$game.common.login.createConfirmationCode = ->
   x=Math.random().toString(36).substring(7).substr(0,5).toLowerCase()
-  while (x.length!=5)
+  while (x.length isnt 5)
     x=Math.random().toString(36).substring(7).substr(0,5).toLowerCase()
   return x
 
 global.$game.common.login.sendEmail = (username, email, confirmationCode) ->
-  nodemailer = require('./node_modules/nodemailer');
+  nodemailer = require('./node_modules/nodemailer')
   credentials = JSON.parse(require("./dist/loader.js").loadResourceSync("./.credentials"))
   transporter = nodemailer.createTransport
     service: 'Gmail',
@@ -134,7 +134,7 @@ global.$game.common.login.getPassword = (socket, callback) ->
     return "Password must be 8 or more characters." if answer.trim().length < 8
   , (err, password)->
     global.$game.common.question socket, "Please enter your password again: ", null, (err, again) ->
-      if(again != password)
+      if(again isnt password)
         socket.tell("Your passwords did not match. Try again.")
         return setTimeout global.$game.common.login.getPassword socket, callback
       callback(password)

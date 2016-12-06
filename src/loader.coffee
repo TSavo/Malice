@@ -6,7 +6,7 @@ module.exports.testLoad = (name) ->
   sandbox = vm.createContext({})
   statement = "require(\"" + name + "\")"
   try
-    vm.runInContext(m.wrap(statement), sandbox)(exports, require, module, __filename, __dirname);
+    vm.runInContext(m.wrap(statement), sandbox)(exports, require, module, __filename, __dirname)
     return true
   catch e
     console.log e
