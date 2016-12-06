@@ -1,6 +1,0 @@
-<testsuite name="Mocha Tests" tests="4" failures="0" errors="0" skipped="0" timestamp="2016-12-06T21:21:48" time="0.023">
-<testcase classname="Serialization" name="should serialize a basic graph" time="0.011"/>
-<testcase classname="Serialization" name="should throw an error when encountering a native function" time="0"/>
-<testcase classname="Serialization" name="should serialize a complex graph" time="0.001"/>
-<testcase classname="Serialization" name="should serialize a function which knows about 'this'" time="0.001"/>
-</testsuite>
