@@ -2,11 +2,14 @@ language: node_js
 node_js:
   - "0.10"
   - "0.12"
-  - "4.2.3"
-  - "4.4.3"
+  - "4.2.6"
+  - "4.4.7"
   - 4
+  - "6.9.2"
   - 6
+  - "7.2.0"
   - 7
+  - "iojs"
   
 env:
   # Set environment variable for test results output
