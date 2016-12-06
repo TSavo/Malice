@@ -1,4 +1,4 @@
-require("./dist/proportionate.js")
+require("./src/proportionate")
 
 global.$game.$index = {} if not global.$game.$index
 global.$game.$index.players = {} if not global.$game.$index.players
