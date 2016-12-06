@@ -1,15 +1,16 @@
 "use strict"
 FUNCFLAG = '_$$ND_FUNC$$_'
-FUNCBODY = '_$$ND_FUNCBODY$$_'
 PROTOFLAG = '_$$ND_PROTO$$_'
 PROTOTYPEFLAG = '_$$ND_PROTOTYPE$$_'
 CIRCULARFLAG = '_$$ND_CC$$_'
 DATEFLAG = '_$$ND_DATE$$_'
 INFINITYFLAG = '_$$ND_INFINITY$$_'
+NEGINFINITYFLAG = '_$$ND_NEGINFINITY$$_'
+NANFLAG = '_$$ND_NAN$$_'
 UNDEFINEDFLAG = '_$$ND_UNDEFINED$$_'
+NULLFLAG = '_$$ND_NULL$$_'
 KEYPATHSEPARATOR = '_$$.$$_'
 ISNATIVEFUNC = /^function\s*[^(]*\(.*\)\s*\{\s*\[native code\]\s*\}$/
-
 
 if (typeof String.prototype.startsWith isnt 'function')
   String.prototype.startsWith = (str)->
@@ -24,19 +25,14 @@ getKeyPath = (obj, path) ->
     path = path.split(KEYPATHSEPARATOR)
     currentObj = obj
     path.forEach (p, index) ->
-      if index
-        currentObj = currentObj[p]
-      return
-    return currentObj
+      currentObj = currentObj[p] if index
+    currentObj
   catch e
-    return false
-  return
+    false
 
 serializeCircular = (obj, cache) ->
   for subKey of cache
-    if cache.hasOwnProperty(subKey)
-      if cache[subKey] is obj
-        return CIRCULARFLAG + subKey
+    return CIRCULARFLAG + subKey if cache.hasOwnProperty(subKey) and cache[subKey] is obj
   false
 
 serializeFunction = (func, ignoreNativeFunc) ->
@@ -59,19 +55,28 @@ unserializeFunction = (func, originObj) ->
 serializeWrapped = (obj) ->
   if obj instanceof Date then return DATEFLAG + obj.getTime()
   if obj is undefined then return UNDEFINEDFLAG
+  if obj is null then return NULLFLAG
   if obj is Infinity then return INFINITYFLAG
-  return obj
+  if obj is -Infinity then return NEGINFINITYFLAG
+  if Number.isNaN(obj) then return NANFLAG
+  obj
 
 unserializeWrapped = (str) ->
   if str.startsWith(DATEFLAG)
     dateNum = parseInt(str.slice(DATEFLAG.length), 10)
-    return new Date(dateNum)
+    new Date(dateNum)
   else if str.startsWith(INFINITYFLAG)
-    return Infinity
+    Infinity
+  else if str.startsWith(NEGINFINITYFLAG)
+    -Infinity
   else if str.startsWith(UNDEFINEDFLAG)
-    return undefined
+    undefined
+  else if str.startsWith(NULLFLAG)
+    null
+  else if str.startsWith(NANFLAG)
+    NaN
   else
-    return str
+    str
 
 serializeObject = (obj, ignoreNativeFunc, outputObj, cache, path) ->
   obj = serializeWrapped(obj)
@@ -93,10 +98,7 @@ serializeObject = (obj, ignoreNativeFunc, outputObj, cache, path) ->
         output[destKey] = serializeWrapped(obj[key])
   output
 
-module.exports.serialize = (obj, ignoreNativeFunc, outputObj, cache, path) ->
-  path = path or '$'
-  cache = cache or {}
-  outputObj = outputObj or {}
+module.exports.serialize = (obj, ignoreNativeFunc = false, outputObj = {}, cache = {}, path = "$") ->
   obj = serializeWrapped(obj)
   if typeof obj is 'string' or typeof obj is 'number'
     outputObj = obj
@@ -105,7 +107,6 @@ module.exports.serialize = (obj, ignoreNativeFunc, outputObj, cache, path) ->
     cache[path] = outputObj
     obj.forEach (value, index) ->
       outputObj.push module.exports.serialize(value, ignoreNativeFunc, outputObj, cache, path + KEYPATHSEPARATOR + index)
-      return
   else
     found = serializeCircular(obj, cache)
     if found
@@ -113,19 +114,15 @@ module.exports.serialize = (obj, ignoreNativeFunc, outputObj, cache, path) ->
     else
       cache[path] = obj
       outputObj = serializeObject(obj, ignoreNativeFunc, outputObj, cache, path)
-      if typeof obj is 'function'
-        outputObj[FUNCFLAG] = serializeFunction(obj, ignoreNativeFunc)
+      outputObj[FUNCFLAG] = serializeFunction(obj, ignoreNativeFunc) if typeof obj is 'function'
   if path is '$' then JSON.stringify(outputObj) else outputObj
 
 module.exports.unserialize = (obj, originObj) ->
   isIndex = undefined
-  if typeof obj is 'string'
-    obj = JSON.parse(obj)
+  obj = JSON.parse(obj) if typeof obj is 'string'
   originObj = originObj or obj
-  if obj and obj[FUNCFLAG]
-    obj = unserializeFunction(obj)
-  if(typeof obj is 'string')
-    obj = unserializeWrapped(obj)
+  obj = unserializeFunction(obj) if obj and obj[FUNCFLAG]
+  obj = unserializeWrapped(obj) if(typeof obj is 'string')
   circularTasks = []
   for key of obj
     if obj.hasOwnProperty(key)
@@ -146,9 +143,7 @@ module.exports.unserialize = (obj, originObj) ->
           obj[destKey] = unserializeWrapped(obj[key])
   circularTasks.forEach (task) ->
     found = getKeyPath(originObj, task.obj[task.sourceKey])
-    if found
-      task.obj[task.destKey] = found
-
-  delete obj[PROTOTYPEFLAG]
-  delete obj[PROTOFLAG]
+    task.obj[task.destKey] = found if found
+  delete obj[PROTOTYPEFLAG] if obj
+  delete obj[PROTOFLAG] if obj
   obj

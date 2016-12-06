@@ -1,6 +1,6 @@
-require('app-module-path').addPath(__dirname + '/dist')
-serializer = require('./serialize.js')
-loader = require("./loader.js")
+require('app-module-path').addPath(__dirname + '/src')
+serializer = require('./serialize')
+loader = require("./loader")
 watchr = require("watchr")
 _ = require('underscore')
 repl = require('repl')
@@ -106,7 +106,7 @@ global.$driver.handleNewConnection = (socket) ->
   global.$game.common.login.handleNewConnection(socket)
 
 global.$driver.startDriver = ->
-  net = require('./telnet.js')
+  net = require('./telnet')
   net.createServer((socket) ->
     socket.do.window_size()
     global.$driver.clients.push socket
@@ -132,9 +132,9 @@ repl.start(
 ).on 'exit', ->
   socket.end()
 
-stalker = watchr.open "./dist", (changeType,filePath,fileCurrentStat,filePreviousStat) ->
+stalker = watchr.open "./src", (changeType,filePath,fileCurrentStat,filePreviousStat) ->
   try
-    if filePath.endsWith("driver.js") or filePath.endsWith("loader.js") then return
+    if filePath.endsWith("driver.coffee") or filePath.endsWith("loader.coffee") then return
     console.log("Reloading " + filePath)
     loader.loadSync("./" + filePath)
   catch e
