@@ -5,8 +5,8 @@ serialize = require("../src/serialize")
 
 describe "Serialization", ->
   it "should serialize a basic graph", ->
-    base = 
-      int:1 
+    base =
+      int:1
       float:2.99e81
       str:"test"
       obj:
@@ -59,7 +59,7 @@ describe "Serialization", ->
     deserialized.y.z.y.should.equal deserialized.y
     
   it "should serialize a function which knows about 'this'", ->
-    x = 
+    x =
       value:"hello"
       func: ->
         @value
