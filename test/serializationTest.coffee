@@ -64,3 +64,5 @@ describe "Serialization", ->
       func: ->
         @value
     serialize.unserialize(serialize.serialize(x)).func().should.equal x.value
+    
+    
