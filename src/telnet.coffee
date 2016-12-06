@@ -308,7 +308,7 @@ Client::parse = (data) ->
     l = @_last.l
     delete @_last
   while i < data.length
-    if data.length - 1 - i >= 2 and data[i] == COMMANDS.IAC and COMMAND_NAMES[data[i + 1]] and OPTION_NAMES[data[i + 2]]
+    if data.length - 1 - i >= 2 and data[i] is COMMANDS.IAC and COMMAND_NAMES[data[i + 1]] and OPTION_NAMES[data[i + 2]]
       cdata = data.slice(i)
       iacCode = cdata.readUInt8(0)
       iacName = COMMAND_NAMES[iacCode]
@@ -335,7 +335,7 @@ Client::parse = (data) ->
         try
           len = @[cmd.optionName](cmd)
         catch e
-          if !(e instanceof RangeError)
+          if not (e instanceof RangeError)
             @debug 'error: %s', e.message
             @emit 'error', e
             return
@@ -346,7 +346,7 @@ Client::parse = (data) ->
           len = 0
           while cdata[len] and cdata[len] isnt COMMANDS.SE
             len++
-          if !cdata[len]
+          if not cdata[len]
             len = 3
           else
             len++
@@ -635,7 +635,7 @@ Client::terminal_type = (cmd) ->
 
 Client::_setRawMode = (mode) ->
   @isRaw = mode
-  if !@writable
+  if not @writable
     return
   if mode
     @debug 'switching to raw:'

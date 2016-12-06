@@ -53,7 +53,7 @@ player.hold = (what)->
   if what.twoHanded
     @leftHand = @rightHand = what
     hands = "both hands"
-  if(!@rightHand)
+  if not @rightHand
     return @tell("You're now holding the #{what.description()} in your right hand")
 
 player.getSocket = ->

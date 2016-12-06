@@ -50,7 +50,7 @@ charGen.start = (socket)->
         socket.tell error.message
         setTimeout makePlayerLoop, 0
     .catch (error) ->
-      global.catch(error)  
+      global.catch(error)
       socket.tell error.message
       setTimeout ->
         socket.user.handleConnection socket

@@ -9,7 +9,7 @@ global.$game.common.login.handleNewConnection = (socket) ->
   readline = require("readline")
   width = 80
   socket.on 'window size', (e) ->
-    if e.command == 'sb'
+    if e.command is 'sb'
       console.log 'telnet window resized to %d x %d', e.width, e.height
       width = e.width
   rl = readline.createInterface(socket, socket)
@@ -30,25 +30,25 @@ global.$game.common.login.loginLoop = (socket) ->
   readline = require('readline')
   _ = require("./node_modules/underscore")
   rl = readline.createInterface(socket, socket)
-  loginPrompt = "Login> ";
-  passwordPrompt = "Password> ";
+  loginPrompt = "Login> "
+  passwordPrompt = "Password> "
   socket.tell("Please login with your user name, character name or email address.")
   socket.tell("If you don't have a user, please type " + "register".underline.bold + " to create one.")
   socket.tell("One account per person, please.".bold)
   socket.tell("If you require any assistance please email " + "shinmojo@gmail.com".underline.bold + ".")
   rl.question loginPrompt, (login)->
-    if(login == "register")
+    if(login is "register")
       rl.close()
       return global.$game.common.login.register socket, ->
         global.$game.common.login.loginLoop(socket)
     rl.question(passwordPrompt, (password) ->
       rl.close()
       user = _(global.$game.$index.users).find((user) ->
-        return user.name.toLowerCase() == login.toLowerCase() || user.email.toLowerCase() == login.toLowerCase()
+        return user.name.toLowerCase() is login.toLowerCase() || user.email.toLowerCase() is login.toLowerCase()
       )
       if not user
         user = _(global.$game.$index.players).find((player) ->
-          return player.name.toLowerCase() == login.toLowerCase()
+          return player.name.toLowerCase() is login.toLowerCase()
         )?.user
       return setTimeout(->
         socket.tell("No such user, player, email or bad password.")
@@ -140,17 +140,17 @@ global.$game.common.login.getPassword = (socket, callback) ->
       callback(password)
 
 global.$game.common.login.validateEmail = (email) ->
-  re = /\S+@\S+\.\S+/;
+  re = /\S+@\S+\.\S+/
   re.test(email)
 
 global.$game.common.login.getUserName = (socket, callback) ->
   global.$game.common.question socket, "What would you like your user name to be? ", (answer) ->
     _ = require("./node_modules/underscore")
     if(_(global.$game.$index.users).find (user) ->
-      user.name.toLowerCase() == answer
+      user.name.toLowerCase() is answer
     ) then return "That user name is taken."
     if(_(global.$game.$index.players).find (player) ->
-      player.name.toLowerCase() == answer
+      player.name.toLowerCase() is answer
     ) then return "That user name is taken."
     if answer.length < 3 then return "User names must be 3 or more characters."
     if not /^[a-zA-Z0-9]*$/.test(answer) then return "User names cannot contain any non alphanumeric characters."

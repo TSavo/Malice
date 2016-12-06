@@ -44,7 +44,7 @@ part.init = (@name, @bones, @coverable, @removable, @critical, @parts = {})->
   @contents = []
 
 part.findPart = (name)->
-  return this if name == @name or @name.indexOf(name) == 0 or name.test?(@name)
+  return this if name is @name or @name.indexOf(name) is 0 or name.test?(@name)
   _ = require("./node_modules/underscore")
   _(@parts).find (part)->
     part.findPart(name)
@@ -76,7 +76,7 @@ part.canFeel = ->
   true
   
 part.isEmpty = ->
-  @contents.length == 0
+  @contents.length is 0
   
 global.$game.common.makeBodyPart = (name, bones = [], coverable = false, removable = false, critical = false, parts={})->
   new global.$game.classes.BodyPart name, bones, coverable, removable, critical, parts
@@ -177,7 +177,7 @@ body.init = (@owner, @info, @primaryHand = Math.floor(Math.random()*2) ? "right"
     leftShoulder:global.$game.common.makeArm("left")
     rightThigh:global.$game.common.makeLeg("right")
     leftThigh:global.$game.common.makeLeg("left")
-    groin:if @info.sex == "male" then global.$game.common.makePenis() else if @info.sex == "female" then global.$game.common.makeVagina() else global.$game.common.makeNeuter()
+    groin:if @info.sex is "male" then global.$game.common.makePenis() else if @info.sex is "female" then global.$game.common.makeVagina() else global.$game.common.makeNeuter()
     leftChest:global.$game.common.makeBodyPart "left half of the chest", ["ribs"], true, false, false
     rightChest:global.$game.common.makeBodyPart "right half of the chest", ["ribs"], true, false, false
     stomach:global.$game.common.makeBodyPart "stomach", [], true, false, false
@@ -252,14 +252,14 @@ body.say = body.says = (what) ->
 body.contextualizeLanguage = (message, language)->
   _ = require("./node_modules/underscore")
   understanding = @info.knownLanguages[language] or 0.0
-  return message if understanding == 1
+  return message if understanding is 1
   _(stimulus.value.split(" ")).chain().map (word)->
     return word if(Math.random() < understanding)
     _(word.split("")).chain().map (letter)->
       return letter if(Math.random() < understanding)
       if(letter.isNumeric())
         parseInt(Math.random()*10)
-      else if(letter == letter.toUpperCase())
+      else if(letter is letter.toUpperCase())
         String.fromCharCode(65 + Math.floor(Math.random() * 26))
       else
         String.fromCharCode(97 + Math.floor(Math.random() * 26))
@@ -267,21 +267,21 @@ body.contextualizeLanguage = (message, language)->
   .join(" ").value()
   
 body.contextualizeStimulus = (stimulus)->
-  if stimulus.type == "visual" and not @canSee()
+  if stimulus.type is "visual" and not @canSee()
     ""
-  else if stimulus.type == "auditory" and not @canHear()
+  else if stimulus.type is "auditory" and not @canHear()
     ""
-  else if stimulus.type == "smell" and not @canSmell()
+  else if stimulus.type is "smell" and not @canSmell()
     ""
-  else if stimulus.type == "taste" and not @canTaste()
+  else if stimulus.type is "taste" and not @canTaste()
     ""
-  else if stimulus.type == "mental" and not @canThink()
+  else if stimulus.type is "mental" and not @canThink()
     ""
-  else if stimulus.type == "physical" and not @canFeel()
+  else if stimulus.type is "physical" and not @canFeel()
     ""
-  else if stimulus.type == "auditory" and stimulus.language
+  else if stimulus.type is "auditory" and stimulus.language
     this.contextualizeLanguage stimulus.value, stimulus.language
-  else if stimulus.type == "visual" and typeof stimulus.value == "object"
+  else if stimulus.type is "visual" and typeof stimulus.value is "object"
     stimulus.value.asSeenBy?(this) or stimulus.value.name
   else
     stimulus.value
@@ -311,10 +311,10 @@ body.getLeftFoot = ->
   @getTorso().parts.leftThigh?.parts?.knee?.parts?.leg?.parts?.foot
 
 body.getPrimaryHand = ->
-  if primaryHand == "right" then @getRightHand() else @getLeftHand()
+  if primaryHand is "right" then @getRightHand() else @getLeftHand()
 
 body.getSecondaryHand = ->
-  if primaryHand == "right" then @getLeftHand() else @getRightHand()
+  if primaryHand is "right" then @getLeftHand() else @getRightHand()
 
 body.getHand = ->
   @getPrimaryHand() or @getSecondaryHand()
