@@ -244,7 +244,7 @@ For example, if your character was 1.8 meters (about 6 feet tall), you would typ
   askQuestion()
 
 charGen.appearance = (socket) ->
-  hairCut = hairStyle = hairColor = eyeColor = eyeStyle = skinColor = skinStyle = undefined;
+  hairCut = hairStyle = hairColor = eyeColor = eyeStyle = skinColor = skinStyle = undefined
   socket.choice "What would you like your #{'hair cut'.bold} to be?",  global.$game.constants.body.human.hairCut
   .then (hairCutChoice)->
     hairCut =  global.$game.constants.body.human.hairCut[hairCutChoice]

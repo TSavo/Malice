@@ -27,7 +27,7 @@ player.moveTo = ->
   global.$game.common.moveTo.apply(this, arguments)
 
 player.tell = (what)->
-  @user.tell(what);
+  @user.tell(what)
 
 player.walkThrough = (exit) ->
   exit.accept(this)
@@ -49,7 +49,7 @@ player.getWeightString = ->
 
 player.hold = (what)->
   return @tell("That's not something that can be held.") if what.cantBeHeld
-  return @tell("You'll need both hands free for that.") if what.twoHanded and (@leftHand || @rightHand)
+  return @tell("You'll need both hands free for that.") if what.twoHanded and (@leftHand or @rightHand)
   if what.twoHanded
     @leftHand = @rightHand = what
     hands = "both hands"

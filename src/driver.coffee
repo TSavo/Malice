@@ -12,8 +12,8 @@ global.$game = {}
 $driver = global.$driver
 $game = global.$game
 global.$driver.clients = []
-global.$driver.authenticatedUsers = {};
-global.$driver.inputHandlers = {};
+global.$driver.authenticatedUsers = {}
+global.$driver.inputHandlers = {}
 
 global.$driver.getSocket = (user) ->
   global.$driver.authenticatedUsers[user]
@@ -36,7 +36,7 @@ Array.prototype.remove = ->
   a = arguments
   L = a.length
   ax = undefined
-  while (L && this.length)
+  while (L and this.length)
     what = a[--L]
     while ((ax = this.indexOf(what)) isnt -1)
       this.splice(ax, 1)
@@ -49,11 +49,11 @@ Array.prototype.proportionate = (num, max)->
   where = (this.length - 1) * percent
   return this[Math.min(this.length-2, Math.max(1,parseInt(where)))]
 
-if (typeof String.prototype.startsWith != 'function')
+if (typeof String.prototype.startsWith isnt 'function')
   String.prototype.startsWith = (str)->
     return this.slice(0, str.length) is str
 
-if (typeof String.prototype.endsWith != 'function')
+if (typeof String.prototype.endsWith isnt 'function')
   String.prototype.endsWith = (str)->
     return this.slice(-str.length) is str
 
@@ -130,7 +130,7 @@ repl.start(
   output: process.stdout,
   useGlobal:true
 ).on 'exit', ->
-  socket.end();
+  socket.end()
 
 stalker = watchr.open "./dist", (changeType,filePath,fileCurrentStat,filePreviousStat) ->
   try

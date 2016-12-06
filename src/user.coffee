@@ -50,7 +50,7 @@ Please make a selection from the following options:
 
 """
   socket.question prompt, (answer) ->
-    return "Invalid selection." if answer.trim() isnt "1" && answer.trim() isnt "2"
+    return "Invalid selection." if answer.trim() isnt "1" and answer.trim() isnt "2"
   , (err, answer)->
     if(answer is "2")
       return socket.end()
