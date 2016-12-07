@@ -1,0 +1,7 @@
+image: node:6.9
+
+all_tests:
+  script:
+   - npm install
+   - npm test
+   
