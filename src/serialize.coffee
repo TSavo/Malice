@@ -21,18 +21,16 @@ if (typeof String.prototype.endsWith isnt 'function')
     return this.slice(-str.length) is str
 
 getKeyPath = (obj, path) ->
-  try
-    path = path.split(KEYPATHSEPARATOR)
-    currentObj = obj
-    path.forEach (p, index) ->
-      currentObj = currentObj[p] if index
-    currentObj
-  catch e
-    false
+  path = path.split(KEYPATHSEPARATOR)
+  currentObj = obj
+  path.forEach (p, index) ->
+    currentObj = currentObj[p] if index
+  currentObj
 
 serializeCircular = (obj, cache) ->
   for subKey of cache
-    return CIRCULARFLAG + subKey if cache.hasOwnProperty(subKey) and cache[subKey] is obj
+    if cache.hasOwnProperty(subKey) and cache[subKey] is obj
+      return CIRCULARFLAG + subKey
   false
 
 serializeFunction = (func, ignoreNativeFunc) ->
