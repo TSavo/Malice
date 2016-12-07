@@ -1,14 +1,14 @@
 module.exports = function () {
     return {
         files: [
-            'src/**/*.coffee'
+            "src/**/*.coffee"
         ],
 
         tests: [
-            'test/**/*Test.coffee'
+            "test/**/*Test.coffee"
         ],
         env: {
-            type: 'node'
+            type: "node"
         }
     };
 };
