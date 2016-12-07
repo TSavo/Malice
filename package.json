@@ -2,12 +2,14 @@
   "name": "Malice",
   "version": "0.1.1",
   "description": "Malice",
-  "main": "dist/driver.js",
+  "main": "src/driver.coffee",
+  "bin": "coffee ./src/driver.coffee",
   "scripts": {
     "test": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- test -R spec --compilers coffee:coffee-script/register --require coffee-coverage/register-istanbul",
-    "start": "coffee ./src/driver.coffee"
+    "start": "coffee ./src/driver.coffee",
+    "compile": "coffee -c -o dist src"
   },
-  "repository": "",
+  "repository": "github:tsavo/malice",
   "keywords": [
     "node.js",
     "eclipse",
@@ -17,7 +19,6 @@
   "license": "MIT",
   "readmeFilename": "README.md",
   "dependencies": {
-    "another-telnet-client": "^0.1.3",
     "app-module-path": "^2.1.0",
     "colors": "^1.1.2",
     "cryo": "^0.0.6",
