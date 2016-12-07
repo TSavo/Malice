@@ -23,9 +23,12 @@ if (typeof String.prototype.endsWith isnt 'function')
 getKeyPath = (obj, path) ->
   path = path.split(KEYPATHSEPARATOR)
   currentObj = obj
-  path.forEach (p, index) ->
-    currentObj = currentObj[p] if index
-  currentObj
+  try
+    path.forEach (p, index) ->
+      currentObj = currentObj[p] if index
+    currentObj
+  catch e
+    false
 
 serializeCircular = (obj, cache) ->
   for subKey of cache
@@ -116,32 +119,29 @@ module.exports.serialize = (obj, ignoreNativeFunc = false, outputObj = {}, cache
   if path is '$' then JSON.stringify(outputObj) else outputObj
 
 module.exports.unserialize = (obj, originObj) ->
-  isIndex = undefined
+  circularTasks = []
   obj = JSON.parse(obj) if typeof obj is 'string'
   originObj = originObj or obj
   obj = unserializeFunction(obj) if obj and obj[FUNCFLAG]
   obj = unserializeWrapped(obj) if(typeof obj is 'string')
-  circularTasks = []
   for key of obj
-    if obj.hasOwnProperty(key)
-      destKey = if key is PROTOFLAG then '__proto__' else if key is PROTOTYPEFLAG then 'prototype' else key
-      if(destKey is 'prototype' and obj[key] is UNDEFINEDFLAG)
-        delete obj[key]
-        continue
-      if typeof obj[key] is 'object' or typeof obj[key] is 'function'
-        obj[destKey] = module.exports.unserialize(obj[key], originObj)
-      else if typeof obj[key] is 'string'
-        if obj[key].indexOf(CIRCULARFLAG) is 0
-          obj[key] = obj[key].substring(CIRCULARFLAG.length)
-          circularTasks.push
-            obj: obj
-            sourceKey: key
-            destKey: destKey
-        else
-          obj[destKey] = unserializeWrapped(obj[key])
+    return if not obj.hasOwnProperty(key)
+    destKey = if key is PROTOFLAG then '__proto__' else if key is PROTOTYPEFLAG then 'prototype' else key
+    if(destKey is 'prototype' and obj[key] is UNDEFINEDFLAG)
+      delete obj[key]
+      continue
+    if typeof obj[key] is 'object' or typeof obj[key] is 'function'
+      obj[destKey] = module.exports.unserialize(obj[key], originObj)
+    else if typeof obj[key] is 'string'
+      if obj[key].indexOf(CIRCULARFLAG) is 0
+        obj[key] = obj[key].substring(CIRCULARFLAG.length)
+        circularTasks.push
+          obj: obj
+          sourceKey: key
+          destKey: destKey
+      else
+        obj[destKey] = unserializeWrapped(obj[key])
   circularTasks.forEach (task) ->
-    found = getKeyPath(originObj, task.obj[task.sourceKey])
-    task.obj[task.destKey] = found if found
-  delete obj[PROTOTYPEFLAG] if obj
-  delete obj[PROTOFLAG] if obj
+    task.obj[task.destKey] = found if found = getKeyPath(originObj, task.obj[task.sourceKey])
+  delete obj[PROTOTYPEFLAG] + delete obj[PROTOFLAG] if obj
   obj

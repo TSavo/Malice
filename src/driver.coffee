@@ -73,7 +73,7 @@ global.$driver.save = ->
   minute = now.getMinutes().toString()
   if(minute.length is 1)
     minute = "0" + minute
-  fs.writeFile 'checkpoints/checkpoint-' + year + "" + month + "" + day + "" + hour + "" + minute + '.json', state
+  fs.writeFile 'checkpoints/checkpoint-' + year + "" + month + "" + day + "" + hour + "" + minute + '.json', state, ->
   return
 
 global.$driver.broadcast = (message) ->

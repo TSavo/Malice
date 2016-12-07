@@ -23,8 +23,6 @@ player.init = (@name, @user, @info, @location = global.$game.$index.rooms.$nowhe
   @doing = ""
   @body = new global.$game.classes.HumanBody(this, @info)
 
-player.moveTo = ->
-  global.$game.common.moveTo.apply(this, arguments)
 
 player.tell = (what)->
   @user.tell(what)
@@ -114,7 +112,6 @@ player.matchCommand = (command)->
 
 player.getCommands = (who)->
   _ = require("./node_modules/underscore")
-  self = this
   commands = [
     {
       name:"l~ook"
@@ -141,25 +138,6 @@ player.getCommands = (who)->
   commands = commands.concat(@location?.getCommands(who)) if @location.getCommands
   _(commands).flatten()
 
-player.sees = (what)->
-  if not @blind
-    @tell what
-
-player.look = ()->
-  @sees(if @location.asSeenBy then @location?.asSeenBy(this) else @location.description)
-
-player.lookAt = (who, what) ->
-  listify = require("./node_modules/listify")
-  return @tell("You're blind.") if @blind
-  what = @resolve(what)
-  return @tell("I don't see that here.") if not what
-  return @tell("Did you mean the " + listify(_(what).map((item)->
-    item.name
-  ), {finalWord:"or"})) if what?.length and what.length > 0
-  @sees(if what.asSeenBy then what.asSeenBy(who) else what.description)
-
-player.resolveAllContents = ->
-  @body.resolveAllContents().concat(@location.contents)
 
 player.resolve = (what) ->
   _ = require("./node_modules/underscore")

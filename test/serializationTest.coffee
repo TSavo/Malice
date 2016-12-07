@@ -63,12 +63,15 @@ describe "Serialization", ->
     x.n.n.n = {}
     x.n.n.n.n = y
     z.y = y
-    
+    x.func = x.func2 = x.func3 = ->
+
     deserialized = serialize.unserialize serialize.serialize x
     deserialized.y.z.a.x.should.equal deserialized
     deserialized.n.n.n.n.should.equal deserialized.y
     deserialized.y.z.y.should.equal deserialized.y
-    
+    deserialized.func.should.equal deserialized.func2
+    deserialized.func.should.equal deserialized.func3
+
   it "should serialize a function which knows about 'this'", ->
     x =
       value:"hello"
