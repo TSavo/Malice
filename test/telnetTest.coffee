@@ -25,6 +25,4 @@ describe "Telnet", ->
       debug:true
     })
     q.allSettled([serverDefer, clientDefer])
-  .timeout 5000    
-
-
+  .timeout 5000
