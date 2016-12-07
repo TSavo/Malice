@@ -13,12 +13,18 @@ describe "Serialization", ->
         int:1
         str:"test"
       nullValue:null
+      arrayValue:[{}]
       infinityValue:Infinity
       negInfinityValue:-Infinity
       nanValue:NaN
+      dateValue:new Date()
       func: (a, b)->
         a+b
-    
+    base.dupe1 = {}
+    base.dupe2 = base.dupe1
+    base.dupe1.dupe2 = base.dupe2
+    base.dupe3 = {dupe2:base.dupe2}
+    base.dupe3.more = {base:base, dupe2:base.dupe2}
     base.self = base
     deserialized = serialize.unserialize serialize.serialize base, true
     base.int.should.equal deserialized.int
@@ -33,11 +39,16 @@ describe "Serialization", ->
     base.func.toString().should.equal deserialized.func.toString()
     deserialized.self.self.self.self.self.should.equal deserialized
     deserialized.func(2, 2).should.equal 4
+    console.log serialize.serialize base
     
   it "should throw an error when encountering a native function", ->
     expect ->
       serialize.serialize {console:console}
-    .to.throw
+    .to.throw()
+  it "should not trown an error when it's allowed to serialize native functions", ->
+    expect ->
+      serialize.serialize {console:console}, true
+    .not.to.throw()
   
   it "should serialize a complex graph", ->
     x = {}
