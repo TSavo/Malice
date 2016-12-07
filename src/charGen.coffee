@@ -39,7 +39,7 @@ charGen.start = (socket)->
             setTimeout makePlayerLoop, 0
         .catch (err)->
           setTimeout makePlayerLoop, 0
-      global.$game.common.charGen[option] socket
+      global.$game.common.charGen[option](socket)
       .then (stats) ->
         console.log("stat: " + stats)
         results[option] = stats
@@ -179,7 +179,7 @@ You can also log in with this name, and be addressed by others with it by defaul
       user.name.toLowerCase() is criteria
     existingPlayers = _(global.$game.$index.players).find (player) ->
       player.name.toLowerCase() is criteria
-    if existingPlayers or existingPlayers then return "That name is taken."
+    if existingUsers or existingPlayers then return "That name is taken."
   .then (aliasAnswer)->
     alias = aliasAnswer
     socket.question "Ok. What is their real first name from birth?\n", (criteria) ->
@@ -244,7 +244,7 @@ For example, if your character was 1.8 meters (about 6 feet tall), you would typ
   askQuestion()
 
 charGen.appearance = (socket) ->
-  hairCut = hairStyle = hairColor = eyeColor = eyeStyle = skinColor = skinStyle = undefined
+  hairCut = hairStyle = hairColor = eyeColor = eyeStyle = skinStyle = undefined
   socket.choice "What would you like your #{'hair cut'.bold} to be?",  global.$game.constants.body.human.hairCut
   .then (hairCutChoice)->
     hairCut =  global.$game.constants.body.human.hairCut[hairCutChoice]

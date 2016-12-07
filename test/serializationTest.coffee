@@ -39,8 +39,7 @@ describe "Serialization", ->
     base.func.toString().should.equal deserialized.func.toString()
     deserialized.self.self.self.self.self.should.equal deserialized
     deserialized.func(2, 2).should.equal 4
-    console.log serialize.serialize base
-    
+
   it "should throw an error when encountering a native function", ->
     expect ->
       serialize.serialize {console:console}
