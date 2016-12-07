@@ -1,4 +1,5 @@
 require("./src/user")
+global.$game.$index = {} if not global.$game.$index
 global.$game.$index.users = {} if not global.$game.$index.users
 
 global.$game.common = {} if not global.$game.common
