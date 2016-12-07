@@ -17,7 +17,7 @@ player.init = (@name, @user, @info, @location = global.$game.$index.rooms.$nowhe
   throw new Error("Player names must be unique.") if global.$game.$index.players[@name]
   throw new Error("Player must be associated with a user.") if not @user
   global.$game.$index.players[@name] = this
-  @salt = require("./node_modules/node-uuid").v4()
+  @salt = require("./node_modules/uuid").v4()
   @user.player = this
   @description = "Someone who needs a better description."
   @doing = ""
