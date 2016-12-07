@@ -1,3 +1,8 @@
+_ = require("underscore")
+global.$game = {} if not global.$game
+global.$game.classes = {} if not global.$game.classes
+global.$game.constants = {} if not global.$game.constants
+
 if not global.$game.classes.Stimulus
   global.$game.classes.Stimulus = class Stimulus
     constructor:->
@@ -12,12 +17,12 @@ global.$game.constants.stimulus.types.visual = "visual"
 global.$game.constants.stimulus.types.auditory = "auditory"
 global.$game.constants.stimulus.types.smell = "smell"
 global.$game.constants.stimulus.types.taste = "taste"
-global.$game.constants.stimulus.typeList = require("./node_modules/underscore")(global.$game.constants.stimulus.types).pluck()
+global.$game.constants.stimulus.typeList = _(global.$game.constants.stimulus.types).pluck()
 
 stim = global.$game.classes.Stimulus.prototype
 
 stim.init = (@origin, @target, @value, @type = "visual", @language)->
-  _ = require("./node_modules/underscore")
+  _ = require("underscore")
   throw new Error("Stimulus type must be of the supported types.") if _(global.$game.constants.stimulus.typeList).indexOf(@type) is -1
     
 if not global.$game.classes.StimulusBuilder
@@ -31,7 +36,6 @@ stimBuilder = global.$game.classes.StimulusBuilder.prototype
 stimBuilder.init = (@origin, @target, @language = @origin?.language)->
   @stimulus = []
 
-_ = require("./node_modules/underscore")
 _(global.$game.constants.stimulus.typeList).each (type)->
   stimBuilder[type] = (what)->
     @stimulus = @stimulus.concat(new Stimulus(@origin, @target, what, global.$game.constants.stimulus.types[type], @language))
