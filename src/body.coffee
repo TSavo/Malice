@@ -1,5 +1,8 @@
+global.$game = {} if not global.$game
+global.$game.constants = {} if not global.$game.constants
 global.$game.constants.body = {} if not global.$game.constants.body
 global.$game.constants.body.human = {} if not global.$game.constants.body.human
+global.$game.classes = {} if not global.$game.classes
 
 human = global.$game.constants.body.human
 
