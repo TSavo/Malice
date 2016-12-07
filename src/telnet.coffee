@@ -117,16 +117,16 @@ SUB =
 # Client
 ###
 
-Client = (options) ->
+Client = (options = {}) ->
   self = this
   if not (this instanceof Client)
     return new Client(arguments[0], arguments[1], arguments[2])
   Stream.call this
   if options.addListener
     options =
-      input: arguments[0]
-      output: arguments[1]
-      server: arguments[2]
+      input: this
+      output: this
+      server: this
   if options.socket
     options.input = options.socket
     options.output = options.socket

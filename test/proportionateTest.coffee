@@ -24,3 +24,8 @@ describe "Proportionate", ->
     [1,2,3,4,5,6,7,8,9,10].proportionate(1,3).should.equal 4
     [1,2,3,4,5,6,7,8,9,10].proportionate(2,3).should.equal 7
     [1,2,3,4,5,6,7,8,9,10].proportionate(3,3).should.equal 10
+    
+  it "should clamp to the extremes when out of bounds", ->
+    [1, 2, 3].proportionate(-1, 3).should.equal 1
+    [1, 2, 3].proportionate(4, 3).should.equal 3
+    
