@@ -1,7 +1,9 @@
 {
   "name": "Malice",
   "version": "0.1.1",
-  "engines" : { "node" : ">=6" },
+  "engines": {
+    "node": ">=6"
+  },
   "description": "Malice",
   "main": "src/driver.coffee",
   "bin": "coffee ./src/driver.coffee",
@@ -9,7 +11,7 @@
     "test": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- test -R spec --compilers coffee:coffee-script/register --require coffee-coverage/register-istanbul --debug",
     "start": "coffee ./src/driver.coffee",
     "compile": "coffee -c -o dist src",
-    "codacy": "cat ./coverage/lcov.info | ./node_modules/.bin/codacy-coverage"
+    "codacy": "cat ./coverage/lcov.info | ./node_modules/.bin/codacy-coverage -p ."
   },
   "repository": "github:tsavo/malice",
   "keywords": [
@@ -36,6 +38,7 @@
   },
   "devDependencies": {
     "chai": "^3.5.0",
+    "codacy-coverage": "^2.0.0",
     "coffee-coverage": "^1.0.1",
     "coffee-script": "^1.12.0",
     "istanbul": "^0.4.5",
