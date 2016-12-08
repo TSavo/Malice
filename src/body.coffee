@@ -294,8 +294,6 @@ body.stimulate = (stimulus)->
   _ = require("./node_modules/underscore")
   @tell _(stimulus).chain().map(@contextualizeStimulus).join("").value()
 
-body.asSeenBy = (who)->
-  
 body.getPart = (name)->
   @getTorso().getPart(name)
 
@@ -359,9 +357,7 @@ body.lookAt = (who, what) ->
   return @tell("You're blind.") if not @canSee()
   what = @resolve(what)
   return @tell("I don't see that here.") if not what
-  return @tell("Did you mean the " + listify(_(what).map((item)->
-    item.name
-  ), {finalWord:"or"})) if what?.length and what.length > 0
+  return @tell("Did you mean the " + listify(_(what).pluck("name"), {finalWord:"or"})) if what?.length and what.length > 0
   @sees(if what.asSeenBy then what.asSeenBy(who) else what.description)
 
 
