@@ -1,6 +1,7 @@
 {
   "name": "Malice",
   "version": "0.1.1",
+  "engines" : { "node" : ">=6" },
   "description": "Malice",
   "main": "src/driver.coffee",
   "bin": "coffee ./src/driver.coffee",
@@ -11,11 +12,9 @@
   },
   "repository": "github:tsavo/malice",
   "keywords": [
-    "node.js",
-    "eclipse",
-    "nodeclipse"
+    "malice"
   ],
-  "author": "",
+  "author": "Travis Savo <evilgenius@nefariousplan.com>",
   "license": "MIT",
   "readmeFilename": "README.md",
   "dependencies": {
