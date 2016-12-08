@@ -360,8 +360,8 @@ body.lookAt = (who, what) ->
   what = @resolve(what)
   return @tell("I don't see that here.") if not what
   return @tell("Did you mean the " + listify(_(what).map((item)->
-      item.name
-    ), {finalWord:"or"})) if what?.length and what.length > 0
+    item.name
+  ), {finalWord:"or"})) if what?.length and what.length > 0
   @sees(if what.asSeenBy then what.asSeenBy(who) else what.description)
 
 
