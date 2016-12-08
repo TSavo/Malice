@@ -43,6 +43,8 @@ room.getCommands = (who)->
     exit.getCommands(who)
   ).flatten(true).value()
 
+
+
 global.$game.$nowhere = new global.$game.classes.Room("$nowhere", "Nowhere. Literally. The place where things go when they are not in the game.") if not global.$game.$nowhere
 
 if not global.$game.classes.RoomExit
@@ -56,9 +58,6 @@ exit = global.$game.classes.RoomExit.prototype
 exit.init = (@name, @description, @leaveMessage, @arriveMessage, @aliases, @source, @destination)->
   throw new Error("RoomExits must have a name, description, leaveMessage, arriveMessage, aliases, source, and destination.") if not @name and @description and @direction and @leaveMessage and @arriveMessage and @aliases and @source and @destination
   @source.exits.push(this)
-
-exit.destroy = ->
-  delete global.$game.$index.roomExits[@keyName]
 
 exit.accept = (who)->
   who.tell(@leaveMessage)

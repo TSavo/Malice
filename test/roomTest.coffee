@@ -21,6 +21,16 @@ describe "Room", ->
     room.everyone().contents.should.not.be.empty
     room.everyoneExcept(room.contents[0]).contents.should.be.empty
 
-  it "should have some commands", ->
-    room = new global.$game.classes.Room("Name")
-    #room.getCommands().should.not.be.empty
+  it "should have some commands when exits are present", ->
+    room1 = new global.$game.classes.Room("Name")
+    room2 = new global.$game.classes.Room("Name")
+    exit1 = new global.$game.classes.RoomExit("north", "north", "%N leaves.", "%N arrives.", ["n", "north"], room1, room2)
+    new global.$game.classes.RoomExit("south", "south", "%N leaves.", "%N arrives.", ["s", "south"], room2, room1)
+    room1.getCommands().should.not.be.empty
+    exit1.accept
+      tell:(what)->
+        what.should.not.be.empty
+      moveTo:(what)->
+        what.should.be.equal room2
+      look:->
+
