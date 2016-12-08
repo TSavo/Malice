@@ -20,30 +20,32 @@ part.init = (@name, @bones, @coverable, @removable, @critical, @parts = {})->
 
 part.findPart = (name)->
   return this if name is @name or @name.indexOf(name) is 0 or name.test?(@name)
-  _ = require("./node_modules/underscore")
+  _ = require("underscore")
   _(@parts).find (part)->
     part.findPart(name)
 
 part.coverageMap = (map = {})->
   return map if not @coverable
+  _ = require("underscore")
   map[@name] = this
-  @parts.forEach (part)->
+  _(@parts).map (part)->
     part.coverageMap map
   map
 
 part.contentsMap = (map = {})->
   if(this.contents?.length)
     map[this] = this.contents
-  @parts.forEach (part)->
+  _ = require("underscore")
+  _(@parts).map (part)->
     part.contentsMap(map)
   map
 
 part.resolveAllContents = ->
-  _ = require("./node_modules/underscore")
+  _ = require("underscore")
   _(this.contentsMap()).chain().pluck().flatten().value()
 
 part.randomPart = ->
-  return this if not @parts.length
+  return this if not Object.keys(@parts).length
   keys = Object.keys(@parts)
   @parts[keys[keys.length * Math.random() << 0]]
 
