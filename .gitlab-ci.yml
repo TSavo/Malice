@@ -4,4 +4,5 @@ all_tests:
   script:
    - npm install
    - npm test
+   - npm run-script codacy
    
