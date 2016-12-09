@@ -1,4 +1,9 @@
+require("base")
+
+global.$game = {} if not global.$game
 global.$game.classes = {} if not global.$game.classes
+global.$game.$index = {} if not global.$game.$index
+global.$game.$index.users = {} if not global.$game.$index.users
 
 if not global.$game.classes.User
   global.$game.classes.User = class User
@@ -8,11 +13,10 @@ if not global.$game.classes.User
 
 user = global.$game.classes.User.prototype
 
-global.$game.$index.users = {} if not global.$game.$index.users
 
 user.init = (@name, @email, password, @lastIp) ->
   throw new Error("Username already in use.") if global.$game.$index.users[@name]
-  @salt = require("./node_modules/uuid").v4()
+  @salt = require("uuid").v4()
   global.$game.$index.users[@name] = this
   crypto = require "crypto"
   hash = crypto.createHash "sha256"

@@ -1,3 +1,4 @@
+global.$game = {} if not global.$game
 global.$game.common = {} if not global.$game.common
 
 global.$game.common.move = (what, to)->

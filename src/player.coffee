@@ -1,4 +1,4 @@
-require("./src/proportionate")
+require("proportionate")
 
 global.$game.$index = {} if not global.$game.$index
 global.$game.$index.players = {} if not global.$game.$index.players
@@ -17,7 +17,7 @@ player.init = (@name, @user, @info, @location = global.$game.$index.rooms.$nowhe
   throw new Error("Player names must be unique.") if global.$game.$index.players[@name]
   throw new Error("Player must be associated with a user.") if not @user
   global.$game.$index.players[@name] = this
-  @salt = require("./node_modules/uuid").v4()
+  @salt = require("uuid").v4()
   @user.player = this
   @description = "Someone who needs a better description."
   @doing = ""
@@ -90,7 +90,7 @@ player.handleCommand = (command)->
   self = this
   func = @matchCommand(command)
   return @tell("I don't understand that.") if not func
-  _ = require("./node_modules/underscore")
+  _ = require("underscore")
   test = _(func.tests).find (test)->
     test.regexp.test command
   args = [self]
@@ -104,14 +104,14 @@ player.handleCommand = (command)->
   func.func.apply(func.source, args)
 
 player.matchCommand = (command)->
-  _ = require("./node_modules/underscore")
+  _ = require("underscore")
   self = this
   _(@getCommands(self)).find (options)->
     _(options.tests).find (test)->
       test.regexp.test command
 
 player.getCommands = (who)->
-  _ = require("./node_modules/underscore")
+  _ = require("underscore")
   commands = [
     {
       name:"l~ook"
@@ -140,7 +140,7 @@ player.getCommands = (who)->
 
 
 player.resolve = (what) ->
-  _ = require("./node_modules/underscore")
+  _ = require("underscore")
   what = what.trim().toLowerCase()
   return this if what is "me"
   return @location if what is "here"
@@ -152,7 +152,7 @@ player.resolve = (what) ->
   return found if found.length > 1
   groups = /^([\w-]+)\s(.*)$/i.exec what
   return undefined if not groups
-  ordinal = require("./src/ordinal")
+  ordinal = require("ordinal")
   position = ordinal(groups[1])
   rest = groups[2]
   regexp = new RegExp("^(.*)\b(" + rest + ")(.*)$", "i")
