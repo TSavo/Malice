@@ -19,4 +19,4 @@ ratings:
   - "**.coffee"
   - "**.js"
 exclude_paths:
-- test/
+- .settings/

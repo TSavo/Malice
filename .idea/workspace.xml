@@ -4,7 +4,7 @@
     <list default="true" id="51af5636-89fe-487e-841f-aa0aaeac39fa" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.codeclimate.yml" afterPath="$PROJECT_DIR$/.codeclimate.yml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/coffeelint.json" afterPath="$PROJECT_DIR$/coffeelint.json" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.jshintrc" afterPath="$PROJECT_DIR$/.jshintrc" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -25,16 +25,6 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="body.coffee" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/body.coffee">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="19" lean-forward="false" selection-start-line="0" selection-start-column="19" selection-end-line="0" selection-end-column="19" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="package.json" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/package.json">
           <provider selected="true" editor-type-id="text-editor">
@@ -88,11 +78,21 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name=".codeclimate.yml" pinned="false" current-in-tab="true">
+      <file leaf-file-name=".codeclimate.yml" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/.codeclimate.yml">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="102">
-              <caret line="6" column="4" lean-forward="false" selection-start-line="6" selection-start-column="4" selection-end-line="6" selection-end-column="4" />
+            <state relative-caret-position="374">
+              <caret line="22" column="0" lean-forward="true" selection-start-line="22" selection-start-column="0" selection-end-line="22" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name=".jshintrc" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/.jshintrc">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="293">
+              <caret line="90" column="26" lean-forward="false" selection-start-line="90" selection-start-column="26" selection-end-line="90" selection-end-column="26" />
               <folding />
             </state>
           </provider>
@@ -135,6 +135,7 @@
       <find>replace</find>
       <find>sees</find>
       <find>this.</find>
+      <find>TODO</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -166,6 +167,7 @@
         <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/coffeelint.json" />
         <option value="$PROJECT_DIR$/.codeclimate.yml" />
+        <option value="$PROJECT_DIR$/.jshintrc" />
       </list>
     </option>
   </component>
@@ -238,34 +240,6 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="Malice" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Malice" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Malice" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="test" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Malice" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Malice" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -414,7 +388,7 @@
       <workItem from="1481218880513" duration="5336000" />
       <workItem from="1481228496995" duration="599000" />
       <workItem from="1481246381709" duration="1150000" />
-      <workItem from="1481248694443" duration="491000" />
+      <workItem from="1481248694443" duration="640000" />
     </task>
     <task id="LOCAL-00001" summary="Adding wallaby support">
       <created>1481085329059</created>
@@ -563,11 +537,18 @@
       <option name="project" value="LOCAL" />
       <updated>1481249010944</updated>
     </task>
-    <option name="localTasksCounter" value="22" />
+    <task id="LOCAL-00022" summary="Disable code climate line length checks">
+      <created>1481249197116</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1481249197116</updated>
+    </task>
+    <option name="localTasksCounter" value="23" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="29018000" />
+    <option name="totallyTimeSpent" value="29167000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -619,21 +600,14 @@
     <MESSAGE value="Adding gitlab badges and coverage reporting" />
     <MESSAGE value="Adding all the badges" />
     <MESSAGE value="Adding CodeClimate to Travis build" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding CodeClimate to Travis build" />
+    <MESSAGE value="Disable code climate line length checks" />
+    <option name="LAST_COMMIT_MESSAGE" value="Disable code climate line length checks" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/body.coffee">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="6766">
-          <caret line="398" column="6" lean-forward="false" selection-start-line="398" selection-start-column="6" selection-end-line="398" selection-end-column="6" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/room.coffee">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -1005,8 +979,16 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/.codeclimate.yml">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="102">
-          <caret line="6" column="4" lean-forward="false" selection-start-line="6" selection-start-column="4" selection-end-line="6" selection-end-column="4" />
+        <state relative-caret-position="374">
+          <caret line="22" column="0" lean-forward="true" selection-start-line="22" selection-start-column="0" selection-end-line="22" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.jshintrc">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="293">
+          <caret line="90" column="26" lean-forward="false" selection-start-line="90" selection-start-column="26" selection-end-line="90" selection-end-column="26" />
           <folding />
         </state>
       </provider>
