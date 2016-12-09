@@ -2,6 +2,9 @@
 engines:
   coffeelint:
     enabled: true
+    checks:
+      max_line_length:
+        enabled: false
   duplication:
     enabled: true
     config:
