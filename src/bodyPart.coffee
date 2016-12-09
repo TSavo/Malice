@@ -74,14 +74,16 @@ global.$game.common.makeHead = ->
       mouth:makeBodyPart "mouth", [], true, false, false,
         tongue:makeBodyPart "tongue", [], true, true, false
       nose:makeBodyPart "nose", [], true, true, false
-  head.face.mouth.tongue.canSpeak = ->
+
+  head.parts.face.parts.mouth.parts.tongue.canSpeak = ->
     true
-  head.face.mouth.tongue.canTaste = ->
+  head.parts.face.parts.mouth.parts.tongue.canTaste = ->
     true
   head.canSee = ->
-    head?.leftEye?.canSee?() or head?.rightEye?.canSee?()
+    console.log(head.parts.face.parts.leftEye)
+    head.parts?.face?.parts?.leftEye?.canSee?() or head.parts?.face?.parts?.rightEye?.canSee?()
   head.canHear = ->
-    head?.leftEar?.canHear?() or head?.rightEar?.canHear?()
+    head.parts?.leftEar?.canHear?() or head.parts?.rightEar?.canHear?()
   head.canThink = ->
     true
   head.canTaste = ->
@@ -126,11 +128,15 @@ global.$game.common.makeNeuter = ->
   makeBodyPart "groin", ["pelvis"], true, false, false
 
 global.$game.common.makeEye = (leftOrRight) ->
+  makeBodyPart = global.$game.common.makeBodyPart
   eye = makeBodyPart leftOrRight + " eye", [], true, true, false
   eye.canSee = ->
-    not eye.condition.length
+    not Object.keys(eye.condition).length
+  eye
 
 global.$game.common.makeEar = (leftOrRight) ->
+  makeBodyPart = global.$game.common.makeBodyPart
   ear = makeBodyPart leftOrRight + " ear", [], true, true, false
   ear.canHear = ->
     not ear.contents.length
+  ear
