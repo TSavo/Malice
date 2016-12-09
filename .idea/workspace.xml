@@ -60,8 +60,8 @@
       <file leaf-file-name="circle.yml" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/circle.yml">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="85">
-              <caret line="5" column="35" lean-forward="false" selection-start-line="5" selection-start-column="35" selection-end-line="5" selection-end-column="35" />
+            <state relative-caret-position="68">
+              <caret line="4" column="4" lean-forward="false" selection-start-line="4" selection-start-column="4" selection-end-line="4" selection-end-column="4" />
               <folding />
             </state>
           </provider>
@@ -389,7 +389,7 @@
       <workItem from="1481218880513" duration="5336000" />
       <workItem from="1481228496995" duration="599000" />
       <workItem from="1481246381709" duration="1150000" />
-      <workItem from="1481248694443" duration="3416000" />
+      <workItem from="1481248694443" duration="3492000" />
     </task>
     <task id="LOCAL-00001" summary="Adding wallaby support">
       <created>1481085329059</created>
@@ -580,11 +580,18 @@
       <option name="project" value="LOCAL" />
       <updated>1481253488916</updated>
     </task>
-    <option name="localTasksCounter" value="28" />
+    <task id="LOCAL-00028" summary="Fix circle.yml&#10;">
+      <created>1481253629190</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1481253629190</updated>
+    </task>
+    <option name="localTasksCounter" value="29" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="31943000" />
+    <option name="totallyTimeSpent" value="32019000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -640,7 +647,8 @@
     <MESSAGE value="Don't alert on TODO" />
     <MESSAGE value="Adding support for Circle CI" />
     <MESSAGE value="Adding support for Circle CI test coverage" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding support for Circle CI test coverage" />
+    <MESSAGE value="Fix circle.yml&#10;" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fix circle.yml&#10;" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -1028,8 +1036,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/circle.yml">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="85">
-          <caret line="5" column="35" lean-forward="false" selection-start-line="5" selection-start-column="35" selection-end-line="5" selection-end-column="35" />
+        <state relative-caret-position="68">
+          <caret line="4" column="4" lean-forward="false" selection-start-line="4" selection-start-column="4" selection-end-line="4" selection-end-column="4" />
           <folding />
         </state>
       </provider>
