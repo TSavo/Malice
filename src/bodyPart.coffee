@@ -19,10 +19,12 @@ part.init = (@name, @bones, @coverable, @removable, @critical, @parts = {})->
   @contents = []
 
 part.findPart = (name)->
-  return this if name is @name or @name.indexOf(name) is 0 or name.test?(@name)
+  console.log(name, @name)
+  return this if name is @name
   _ = require("underscore")
-  _(@parts).find (part)->
-    part.findPart(name)
+  _(@parts).chain().map (myPart)->
+    myPart.findPart(name)
+  .flatten().without(undefined).first().value()
 
 part.coverageMap = (map = {})->
   return map if not @coverable
@@ -79,16 +81,23 @@ global.$game.common.makeHead = ->
     true
   head.parts.face.parts.mouth.parts.tongue.canTaste = ->
     true
+  head.parts.face.parts.nose.canSmell = ->
+    not @contents.length
+
   head.canSee = ->
-    head.parts.face?.parts?.leftEye?.canSee?() or head.parts?.face?.parts?.rightEye?.canSee?()
+    @parts.face?.parts?.leftEye?.canSee?() or head.parts?.face?.parts?.rightEye?.canSee?()
   head.canHear = ->
-    head.parts.face?.parts?.leftEar?.canHear?() or head.parts.face?.rightEar?.canHear?()
+    @parts.face?.parts?.leftEar?.canHear?() or head.parts.face?.rightEar?.canHear?()
   head.canThink = ->
     true
   head.canTaste = ->
-    head.parts.face?.parts?.mouth?.parts?.tongue?.canTaste?()
+    @parts.face?.parts?.mouth?.parts?.tongue?.canTaste?()
   head.canSpeak = ->
-    head.parts.face?.parts?.mouth?.isEmpty?() and head.parts.face?.parts?.mouth?.parts?.tongue?.canSpeak?()
+    @parts.face?.parts?.mouth?.isEmpty?() and head.parts.face?.parts?.mouth?.parts?.tongue?.canSpeak?()
+  head.canSmell = ->
+    @parts.face?.parts?.nose?.canSmell()
+
+
   head
 
 global.$game.common.makeArm = (leftOrRight)->
@@ -130,12 +139,12 @@ global.$game.common.makeEye = (leftOrRight) ->
   makeBodyPart = global.$game.common.makeBodyPart
   eye = makeBodyPart leftOrRight + " eye", [], true, true, false
   eye.canSee = ->
-    not Object.keys(eye.condition).length
+    not Object.keys(@condition).length
   eye
 
 global.$game.common.makeEar = (leftOrRight) ->
   makeBodyPart = global.$game.common.makeBodyPart
   ear = makeBodyPart leftOrRight + " ear", [], true, true, false
   ear.canHear = ->
-    not ear.contents.length
+    not @contents.length
   ear

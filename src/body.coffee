@@ -66,6 +66,7 @@ body.tell = (what)->
   @owner.tell(what)
 
 body.see = body.sees = (what)->
+  console.log(@canSee())
   @tell(what) if @concious and @canSee()
 
 body.hear = body.hears = (what)->
@@ -75,6 +76,7 @@ body.feel = body.feels = (what)->
   @tell(what) if @concious and @canFeel()
 
 body.smells = (what)->
+  console.log(@canSmell())
   @tell(what) if @concious and @canSmell()
 
 body.tastes = (what)->
@@ -99,29 +101,26 @@ body.resolveAllContents = ->
   @contents.concat(@torso.resolveAllContents())
 
 body.canSee = ->
-  @torso?.head?.canSee?()
+  @torso.parts.head?.canSee?()
 
 body.canHear = ->
-  @torso?.head?.canHear?()
+  @torso.parts.head?.canHear?()
 
 body.canSpeak = ->
-  @torso?.head?.canSpeak?()
+  @torso.parts.head?.canSpeak?()
   
 body.canThink = ->
-  @torso?.head?.canThink()
+  @torso.parts.head?.canThink?()
 
 body.canSmell = ->
-  @torso?.head?.canSmell()
+  @torso.parts.head?.canSmell?()
   
 body.canTaste = ->
-  @torso?.head?.canTaste()
+  @torso.parts.head?.canTaste?()
   
 body.canFeel = ->
-  @torso?.head?.canFeel()
+  @torso.canFeel?()
   
-body.getTorso = ->
-  @torso
-
 body.say = body.says = (what) ->
   return @tell "You try to speak but you cant!" if not @canSpeak()
   @tell "You say, \"" + what + "\""

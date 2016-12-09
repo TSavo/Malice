@@ -1,4 +1,4 @@
-require('app-module-path').addPath(__dirname + '/src')
+require('app-module-path').addPath(__dirname)
 serializer = require('./serialize')
 loader = require("./loader")
 watchr = require("watchr")
