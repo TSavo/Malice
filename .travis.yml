@@ -1,9 +1,9 @@
 language: node_js
 node_js:
-  - "node"
   - "6"
-  - "5"
-  - "4"
-  - "iojs"
-script: npm run-script compile
-  
+  - "7"
+script:
+  - npm test
+addons:
+  code_climate:
+    repo_token: 6b82adabb394686a5f688e12e09772f89d3636045a19f23067f1757fed1b55d9
