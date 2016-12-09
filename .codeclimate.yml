@@ -20,4 +20,4 @@ ratings:
   - "**.js"
 exclude_paths:
 - .settings/
-- .idea
+- .idea/
