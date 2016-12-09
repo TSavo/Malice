@@ -3,8 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="51af5636-89fe-487e-841f-aa0aaeac39fa" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.codeclimate.yml" afterPath="$PROJECT_DIR$/.codeclimate.yml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.jshintrc" afterPath="$PROJECT_DIR$/.jshintrc" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -78,21 +78,31 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name=".codeclimate.yml" pinned="false" current-in-tab="false">
+      <file leaf-file-name=".codeclimate.yml" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/.codeclimate.yml">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="374">
-              <caret line="22" column="0" lean-forward="true" selection-start-line="22" selection-start-column="0" selection-end-line="22" selection-end-column="0" />
+              <caret line="22" column="7" lean-forward="false" selection-start-line="22" selection-start-column="7" selection-end-line="22" selection-end-column="7" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name=".jshintrc" pinned="false" current-in-tab="true">
+      <file leaf-file-name=".jshintrc" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/.jshintrc">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="293">
               <caret line="90" column="26" lean-forward="false" selection-start-line="90" selection-start-column="26" selection-end-line="90" selection-end-column="26" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name=".gitignore" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/.gitignore">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="153">
+              <caret line="9" column="0" lean-forward="true" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -103,16 +113,6 @@
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="34">
               <caret line="2" column="0" lean-forward="false" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Procfile" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Procfile">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="15" lean-forward="false" selection-start-line="0" selection-start-column="15" selection-end-line="0" selection-end-column="15" />
               <folding />
             </state>
           </provider>
@@ -166,8 +166,9 @@
         <option value="$PROJECT_DIR$/package.json" />
         <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/coffeelint.json" />
-        <option value="$PROJECT_DIR$/.codeclimate.yml" />
         <option value="$PROJECT_DIR$/.jshintrc" />
+        <option value="$PROJECT_DIR$/.gitignore" />
+        <option value="$PROJECT_DIR$/.codeclimate.yml" />
       </list>
     </option>
   </component>
@@ -388,7 +389,7 @@
       <workItem from="1481218880513" duration="5336000" />
       <workItem from="1481228496995" duration="599000" />
       <workItem from="1481246381709" duration="1150000" />
-      <workItem from="1481248694443" duration="640000" />
+      <workItem from="1481248694443" duration="701000" />
     </task>
     <task id="LOCAL-00001" summary="Adding wallaby support">
       <created>1481085329059</created>
@@ -544,11 +545,18 @@
       <option name="project" value="LOCAL" />
       <updated>1481249197116</updated>
     </task>
-    <option name="localTasksCounter" value="23" />
+    <task id="LOCAL-00023" summary="Don't alert on TODO">
+      <created>1481249345260</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1481249345260</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="29167000" />
+    <option name="totallyTimeSpent" value="29228000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -601,20 +609,14 @@
     <MESSAGE value="Adding all the badges" />
     <MESSAGE value="Adding CodeClimate to Travis build" />
     <MESSAGE value="Disable code climate line length checks" />
-    <option name="LAST_COMMIT_MESSAGE" value="Disable code climate line length checks" />
+    <MESSAGE value="Don't alert on TODO" />
+    <option name="LAST_COMMIT_MESSAGE" value="Don't alert on TODO" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/room.coffee">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/player.coffee">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2771">
@@ -977,18 +979,26 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/.codeclimate.yml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="374">
-          <caret line="22" column="0" lean-forward="true" selection-start-line="22" selection-start-column="0" selection-end-line="22" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/.jshintrc">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="293">
           <caret line="90" column="26" lean-forward="false" selection-start-line="90" selection-start-column="26" selection-end-line="90" selection-end-column="26" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="153">
+          <caret line="9" column="0" lean-forward="true" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.codeclimate.yml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="374">
+          <caret line="22" column="7" lean-forward="false" selection-start-line="22" selection-start-column="7" selection-end-line="22" selection-end-column="7" />
           <folding />
         </state>
       </provider>
