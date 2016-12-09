@@ -128,7 +128,7 @@ body.say = body.says = (what) ->
   @location.everyoneExcept(this).stimulate(stimulus)
   
 body.contextualizeLanguage = (message, language)->
-  _ = require("./node_modules/underscore")
+  _ = require("underscore")
   understanding = @info.knownLanguages[language] or 0.0
   return message if understanding is 1
   _(stimulus.value.split(" ")).chain().map (word)->
@@ -165,7 +165,7 @@ body.contextualizeStimulus = (stimulus)->
     stimulus.value
 
 body.stimulate = (stimulus)->
-  _ = require("./node_modules/underscore")
+  _ = require("underscore")
   @tell _(stimulus).chain().map(@contextualizeStimulus).join("").value()
 
 body.getPart = (name)->
@@ -248,7 +248,7 @@ body.resolve = (what) ->
   return found if found.length > 1
   groups = /^([\w-]+)\s(.*)$/i.exec what
   return undefined if not groups
-  ordinal = require("./src/ordinal")
+  ordinal = require("ordinal")
   position = ordinal(groups[1])
   rest = groups[2]
   regexp = new RegExp("^(.*)\b(" + rest + ")(.*)$", "i")
