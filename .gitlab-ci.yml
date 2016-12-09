@@ -5,4 +5,5 @@ all_tests:
    - npm install
    - npm test
    - npm run-script codacy
+   - npm run-script codeclimate
    
