@@ -8,3 +8,4 @@ checkpoints
 npm-debug.log*
 shippable
 test-results.xml
+.idea
