@@ -1,7 +1,8 @@
 chai = require "chai"
 expect = chai.expect
 chai.should()
-require("../src/bodyPart")
+require('app-module-path').addPath(__dirname + '/../src')
+require("bodyPart")
 
 
 
