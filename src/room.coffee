@@ -44,7 +44,6 @@ room.getCommands = (who)->
   ).flatten(true).value()
 
 
-
 global.$game.$nowhere = new global.$game.classes.Room("$nowhere", "Nowhere. Literally. The place where things go when they are not in the game.") if not global.$game.$nowhere
 
 if not global.$game.classes.RoomExit
