@@ -1,3 +1,10 @@
 machine:
   node:
     version: 6.1.0
+
+
+test:
+  override:
+    - mocha test --reporter mocha-circleci-reporter --compilers coffee:coffee-script/register
+        environment:
+          MOCHA_FILE: $CIRCLE_TEST_REPORTS/junit/test-results.xml
