@@ -75,5 +75,44 @@ describe "Human Head", ->
     head = harnessHead()
     head.canSee().should.be.true
 
+  it "can speaak, but only when the mouth is empty", ->
+    harnessHead().canSpeak().should.be.true
 
+  it "can taste, but only when it has a tongue", ->
+    harnessHead().canTaste().should.be.true
 
+  it "can hear, but only when there's not something in one of it's ears", ->
+    harnessHead().canHear()
+
+  it "can think", ->
+    harnessHead().canThink()
+
+describe "Human Arm", ->
+  harnessArm = global.$game.common.makeArm
+  it "can be constructed", ->
+    harnessArm("left").should.not.be.undefined
+
+describe "Human Leg", ->
+  harnessLeg = global.$game.common.makeLeg
+  it "can be constructed", ->
+    harnessLeg("left").should.not.be.undefined
+
+describe "Human Penis", ->
+  harnessPenis = global.$game.common.makePenis
+  it "can be constructed", ->
+    harnessPenis().should.not.be.undefined
+
+describe "Human Vagina", ->
+  harnessVagina = global.$game.common.makeVagina
+  it "can be constructed", ->
+    harnessVagina().should.not.be.undefined
+
+describe "Human Neuter", ->
+  harnessNeuter = global.$game.common.makeNeuter
+  it "can be constructed", ->
+    harnessNeuter().should.not.be.undefined
+
+describe "Human Ear", ->
+  harnessEar = global.$game.common.makeEar
+  it "can be constructed", ->
+    harnessEar().should.not.be.undefined

@@ -80,16 +80,15 @@ global.$game.common.makeHead = ->
   head.parts.face.parts.mouth.parts.tongue.canTaste = ->
     true
   head.canSee = ->
-    console.log(head.parts.face.parts.leftEye)
-    head.parts?.face?.parts?.leftEye?.canSee?() or head.parts?.face?.parts?.rightEye?.canSee?()
+    head.parts.face?.parts?.leftEye?.canSee?() or head.parts?.face?.parts?.rightEye?.canSee?()
   head.canHear = ->
-    head.parts?.leftEar?.canHear?() or head.parts?.rightEar?.canHear?()
+    head.parts.face?.parts?.leftEar?.canHear?() or head.parts.face?.rightEar?.canHear?()
   head.canThink = ->
     true
   head.canTaste = ->
-    head?.face?.mouh?.tongue?.canTaste?()
+    head.parts.face?.parts?.mouth?.parts?.tongue?.canTaste?()
   head.canSpeak = ->
-    head?.face?.mouth?.isEmpty?() and head?.face?.mouth?.tongue?.canSpeak?()
+    head.parts.face?.parts?.mouth?.isEmpty?() and head.parts.face?.parts?.mouth?.parts?.tongue?.canSpeak?()
   head
 
 global.$game.common.makeArm = (leftOrRight)->
