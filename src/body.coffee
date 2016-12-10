@@ -62,6 +62,18 @@ body.init = (@owner, @info, @primaryHand = Math.floor(Math.random()*2) ? "right"
     stomach:global.$game.common.makeBodyPart "stomach", [], true, false, false
     back:global.$game.common.makeBodyPart "back", ["spine"], true, false, false
 
+body.getHeight = ->
+  @info.appearance.height
+
+body.getWeight = ->
+  @info.appearance.weight
+
+body.getHeightString = ->
+  global.$game.constants.body.human.formatHeight @info?.appearance?.height or 1.7
+
+body.getWeightString = ->
+  global.$game.constants.body.human.formatWeight @info?.appearance?.weight or 80, @getHeight()
+
 body.tell = (what)->
   @owner.tell(what)
 
