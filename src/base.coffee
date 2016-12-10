@@ -13,7 +13,7 @@ global.$game.common.moveTo = (to)->
   global.$game.common.move(this, to)
 
 global.$game.common.question = (socket, prompt, criteria, callback)->
-  deferred = require("./node_modules/q").defer()
+  deferred = require("q").defer()
   readline = require("readline")
   askQuestion = ->
     rl = readline.createInterface(socket, socket)
@@ -30,7 +30,7 @@ global.$game.common.question = (socket, prompt, criteria, callback)->
   return deferred.promise.nodeify(callback)
 
 global.$game.common.yesorno = (socket, prompt, callback)->
-  deferred = require("./node_modules/q").defer()
+  deferred = require("q").defer()
   global.$game.common.question socket, prompt, (criteria)->
     return "Please answer yes or no." if not criteria or not criteria.toLowerCase().startsWith("y") and not criteria.toLowerCase().startsWith("n")
   .then (answer) ->
@@ -38,7 +38,7 @@ global.$game.common.yesorno = (socket, prompt, callback)->
   return deferred.promise.nodeify(callback)
 
 global.$game.common.choice = (socket, prompt, choices, callback) ->
-  deferred = require("./node_modules/q").defer()
+  deferred = require("q").defer()
   what = prompt + "\n"
   index = 1
   map = {}
@@ -56,6 +56,9 @@ global.$game.common.choice = (socket, prompt, choices, callback) ->
   return deferred.promise.nodeify(callback)
 
 global.$game.common.gameTime = ->
-  moment = require("./node_modules/moment")
+  moment = require("moment")
   now = moment()
   now.year(now.year() + 85)
+
+global.randomString = (size)->
+  Array(size+1).join((Math.random().toString(36)+'00000000000000000').slice(2, 18)).slice(0, size)

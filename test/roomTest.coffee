@@ -1,7 +1,7 @@
-require('app-module-path').addPath(".")
 chai = require "chai"
 expect = chai.expect
 chai.should()
+require('app-module-path').addPath(__dirname + '/../src')
 require("../src/room")
 
 describe "Room", ->

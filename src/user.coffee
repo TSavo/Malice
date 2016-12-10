@@ -13,7 +13,6 @@ if not global.$game.classes.User
 
 user = global.$game.classes.User.prototype
 
-
 user.init = (@name, @email, password, @lastIp) ->
   throw new Error("Username already in use.") if global.$game.$index.users[@name]
   @salt = require("uuid").v4()
@@ -29,48 +28,49 @@ user.getSocket = ->
   global.$driver.getSocket(this)
 
 user.tell = (what) ->
-  global.$driver.getSocket(this)?.tell(what) if typeof what is "string"
-
-user.handleConnection = (socket) ->
-  socket.question = (prompt, criteria, callback)->
-    global.$game.common.question socket, prompt, criteria, callback
-  socket.choice = (prompt, options, callback)->
-    global.$game.common.choice socket, prompt, options, callback
-  socket.yesorno = (prompt, callback)->
-    global.$game.common.yesorno socket, prompt, callback
-  choices = []
-  if not socket.user.player
-    prompt = """
-Please make a selection from the following options:
-1. Make a new character
-2. Quit
-
-"""
-  else
-    prompt = """
-Please make a selection from the following options:
-1. Enter the game as #{socket.user.player.name}
-2. Quit
-
-"""
-  socket.question prompt, (answer) ->
-    return "Invalid selection." if answer.trim() isnt "1" and answer.trim() isnt "2"
-  , (err, answer)->
-    if(answer is "2")
-      return socket.end()
-    if(answer is "1")
-      if(socket.user.player)
-        x = 3
-        socket.tell("Now entering the world in 3...")
-        ready = ->
-          x--
-          if(x is 0)
-            socket.user.player.goIC(socket)
-          else
-            socket.tell(x + "...")
-            setTimeout ready, 1000
-        return setTimeout ready, 1000
-      global.$game.common.charGen.start(socket)
+  @getSocket()?.tell(what) if typeof what is "string"
 
 user.isConnected = ->
-  if global.$driver.getSocket(this) then return true else return false
+  console.log("Ah hell")
+  !!global.$driver.getSocket(this)
+
+user.goIC = () ->
+  @commandLoop()
+
+user.commandLoop = ->
+  if not @isConnected() then return console.log("Not connected")
+  self = this
+  global.$game.common.question @getSocket(), ""
+  .then (input)->
+    try
+      @handleCommand(input)
+    catch err
+      console.log(err, err.stack.split("\n"))
+  .then(self.commandLoop)
+  .done()
+
+user.handleCommand = (command)->
+  self = this
+  func = @matchCommand(command)
+  return @tell("I don't understand that.") if not func
+  _ = require("underscore")
+  test = _(func.tests).find (test)->
+    test.regexp.test command
+  args = [self]
+  groups = test.regexp.exec(command)
+  if test.position
+    if test.position > -1
+      args.push groups[test.position]
+    else
+      test.position.forEach (item)->
+        args.push groups[item]
+  func.func.apply(func.source, args)
+
+user.matchCommand = (command)->
+  _ = require("underscore")
+  self = this
+  _(@body.getCommands(self)).find (options)->
+    _(options.tests).find (test)->
+      test.regexp.test command
+
+

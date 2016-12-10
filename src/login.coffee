@@ -1,4 +1,4 @@
-require("./src/user")
+require("user")
 global.$game.$index = {} if not global.$game.$index
 global.$game.$index.users = {} if not global.$game.$index.users
 
@@ -29,7 +29,7 @@ global.$game.common.login.handleNewConnection = (socket) ->
 
 global.$game.common.login.loginLoop = (socket) ->
   readline = require('readline')
-  _ = require("./node_modules/underscore")
+  _ = require("underscore")
   rl = readline.createInterface(socket, socket)
   loginPrompt = "Login> "
   passwordPrompt = "Password> "
@@ -73,13 +73,13 @@ global.$game.common.login.loginLoop = (socket) ->
           socket.tell("Successfully authenticated as " + login + ". Welcome back!")
           global.$driver.authenticatedUsers[user] = socket
           socket.user = user
-          user.handleConnection(socket)
+          global.$game.common.login.handleConnection(socket)
         return
       socket.tell("Successfully authenticated as " + login + ". Welcome back!")
       global.$driver.authenticatedUsers[user] = socket
       socket.user = user
       user.lastLogin = new Date()
-      user.handleConnection(socket)
+      global.$game.common.login.handleConnection(socket)
     )
 
 global.$game.common.login.showWelcomeMessage = (socket, callback) ->
@@ -158,6 +158,48 @@ global.$game.common.login.getUserName = (socket, callback) ->
     return false
   , (err, answer) ->
     callback(answer)
+
+
+global.$game.common.login.handleConnection = (socket) ->
+  socket.question = (prompt, criteria, callback)->
+    global.$game.common.question socket, prompt, criteria, callback
+  socket.choice = (prompt, options, callback)->
+    global.$game.common.choice socket, prompt, options, callback
+  socket.yesorno = (prompt, callback)->
+    global.$game.common.yesorno socket, prompt, callback
+  choices = []
+  if not socket.user.body
+    prompt = """
+Please make a selection from the following options:
+1. Make a new character
+2. Quit
+
+"""
+  else
+    prompt = """
+Please make a selection from the following options:
+1. Enter the game as #{socket.user.player.name}
+2. Quit
+
+"""
+  socket.question prompt, (answer) ->
+    return "Invalid selection." if answer.trim() isnt "1" and answer.trim() isnt "2"
+  , (err, answer)->
+    if(answer is "2")
+      return socket.end()
+    if(answer is "1")
+      if(socket.user.player)
+        x = 3
+        socket.tell("Now entering the world in 3...")
+        ready = ->
+          x--
+          if(x is 0)
+            socket.user.player.goIC(socket)
+          else
+            socket.tell(x + "...")
+            setTimeout ready, 1000
+        return setTimeout ready, 1000
+      global.$game.common.charGen.start(socket)
 
 global.$game.common.login.repl = (socket) ->
   repl = require("repl")

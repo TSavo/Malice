@@ -58,7 +58,8 @@ charGen.start = (socket)->
   makePlayerLoop()
 
 charGen.cloneNewPlayer = (socket, info)->
-  player = new global.$game.classes.Player(info.name.alias, socket.user, info)
+  socket.user.createBody
+  socket.user.body = new global.$game.classes.Player(info.name.alias, socket.user, info)
   socket.tell("Designing bio-specification for clone job.".cyan)
   socket.tell("Please wait...".italic)
 

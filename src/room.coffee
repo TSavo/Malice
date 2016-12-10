@@ -1,4 +1,4 @@
-require("src/stimulus")
+require("stimulus")
 
 global.$game = {} if not global.$game
 global.$game.classes = {} if not global.$game.classes
