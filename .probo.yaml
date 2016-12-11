@@ -7,5 +7,5 @@ steps:
   - name: Install dependencies
     command: 'npm -g install npm@latest && npm install'
   - name: Run tests
-    command: 'npm test'
+    command: 'nvm use 7 && npm test'
     
