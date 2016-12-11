@@ -4,8 +4,6 @@ chai.should()
 require('app-module-path').addPath(__dirname + '/../src')
 require("bodyPart")
 
-
-
 describe "BodyPart", ->
   harnessPart = ->
     bodyPart = global.$game.common.makeBodyPart "Test body part", [], true, true, true,
