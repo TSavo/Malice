@@ -1,8 +1,12 @@
-
-
 # The City of Malice
 
-##Project Status:
+##Overview:
+
+The City of Malice is a TMMO game: A text-based massively multipler online game.
+
+The code base is 100% Open Source, written in Coffeescript, and runs on NodeJS >= 6.
+
+##Project Build:
 | Service                         |  Status |
 |---|---|
 | GitLab Continous Deployment     | [![buildstatus](https://gitlab.com/TSavo/Malice/badges/master/build.svg)](https://gitlab.com/TSavo/Malice/commits/master) [![coverage report](https://gitlab.com/TSavo/Malice/badges/master/coverage.svg)](https://gitlab.com/TSavo/Malice/commits/master)                                                                                                                                                                                                                              |
@@ -18,3 +22,4 @@
 | Snap CI                         | [![Build Status](https://app.snap-ci.com/TSavo/Malice/branch/master/build_image)](https://app.snap-ci.com/TSavo/Malice/branch/master) |
 | Magnum CI                       | [![Magnum CI](https://magnum-ci.com/status/231d6835620015c564d80ac62ece7374.png)](https://magnum-ci.com/projects/4715) |
 | Circle CI                       | [![CircleCI](https://circleci.com/gh/TSavo/Malice.svg?style=svg)](https://circleci.com/gh/TSavo/Malice) |
+
