@@ -6,3 +6,4 @@ steps:
     command: 'npm install'
   - name: Run tests
     command: 'npm test'
+    
