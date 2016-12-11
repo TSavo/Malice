@@ -19,7 +19,6 @@ part.init = (@name, @bones, @coverable, @removable, @critical, @parts = {})->
   @contents = []
 
 part.findPart = (name)->
-  console.log(name, @name)
   return this if name is @name
   _ = require("underscore")
   _(@parts).chain().map (myPart)->
