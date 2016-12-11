@@ -2,13 +2,8 @@ steps:
   - plugin: Script
     name: Install NVM, Install dependencies, run tests
     script: |
-      npm -g install npm@latest
-      NVM_PROFILE=/etc/profile.d/nvm.sh
-      touch "${NVM_PROFILE}" 
-      curl https://raw.githubusercontent.com/creationix/nvm/v0.32.1/install.sh -o install.sh
-      NVM_DIR=/usr/local/nvm PROFILE="${NVM_PROFILE}" SHELL=nosh bash install.sh
-      git clone http://github.com/creationix/nvm.git .nvm
-      source .nvm/nvm.sh
-      nvm install 7
-      npm -g install npm@latest && npm install
+      apt-get update
+      apt-get install build-essentials libssl-dev
+      npm install -g npm@latest
+      npm install
       npm test   
