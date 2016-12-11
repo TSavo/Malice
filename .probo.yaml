@@ -2,8 +2,10 @@ steps:
   - plugin: Script
     name: Install NVM, Install dependencies, run tests
     script: |
+      NVM_PROFILE=/etc/profile.d/nvm.sh
+      touch "${NVM_PROFILE}" 
       curl https://raw.githubusercontent.com/creationix/nvm/v0.32.1/install.sh -o install.sh
-      bash install.sh
+      NVM_DIR=/usr/local/nvm PROFILE="${NVM_PROFILE}" SHELL=nosh bash install.sh
       export NVM_DIR="/root/.nvm" && . "$NVM_DIR/nvm.sh"
       nvm install 7
       npm -g install npm@latest && npm install
