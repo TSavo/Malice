@@ -1,0 +1,8 @@
+steps:
+  - name: Install Node 7
+    plugin: Shell
+    command: 'nvm install 7'
+  - name: Install dependencies
+    command: 'npm install'
+  - name: Run tests
+    command: 'npm test'
