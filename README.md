@@ -22,4 +22,4 @@ The code base is 100% Open Source, written in Coffeescript, and runs on NodeJS >
 | Snap CI                         | [![Build Status](https://app.snap-ci.com/TSavo/Malice/branch/master/build_image)](https://app.snap-ci.com/TSavo/Malice/branch/master) |
 | Magnum CI                       | [![Magnum CI](https://magnum-ci.com/status/231d6835620015c564d80ac62ece7374.png)](https://magnum-ci.com/projects/4715) |
 | Circle CI                       | [![CircleCI](https://circleci.com/gh/TSavo/Malice.svg?style=svg)](https://circleci.com/gh/TSavo/Malice) |
-
+| Vexor CI                        | [![Vexor status](https://ci.vexor.io/projects/e9c6aa49-1a76-4fc6-bb02-a3b04a422f3d/status.svg)](https://ci.vexor.io/ui/projects/e9c6aa49-1a76-4fc6-bb02-a3b04a422f3d/builds) |
