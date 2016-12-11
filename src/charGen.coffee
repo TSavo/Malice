@@ -24,7 +24,6 @@ charGen.start = (socket)->
     if remaining.length is 0 and not options.finish then options.finish = "Finish".green.bold
     socket.choice(prompt, options)
     .then (option)->
-      console.log("option: " + option)
       if option is "abort" then throw new Error("Aborting...")
       if option is "finish"
         socket.tell("This is how you're character is going to start:")
@@ -42,7 +41,6 @@ charGen.start = (socket)->
           setTimeout makePlayerLoop, 0
       global.$game.common.charGen[option](socket)
       .then (stats) ->
-        console.log("stat: " + stats)
         results[option] = stats
         remaining.remove options[option]
         setTimeout makePlayerLoop, 0
@@ -217,7 +215,6 @@ charGen.stats = (socket) ->
   socket.tell("The 'average' weight and height for people is about 1.7 meters and 75 kilograms (or about 6 foot tall and 180 pounds). Deviation from that is going to impact your play style.")
   formatHeight = global.$game.constants.body.human.formatHeight
   formatWeight = global.$game.constants.body.human.formatWeight
-  console.log(formatHeight)
   askQuestion = ->
     heightPrompt = """
 What is the #{'height'.bold} of your character? Please answer in meters, between 0.5 and 3.
@@ -229,7 +226,6 @@ For example, if your character was 1.8 meters (about 6 feet tall), you would typ
     .then (heightInput) ->
       height = Math.floor(heightInput * 100) / 100
       heightWord = formatHeight(height)
-      console.log "Ok " + heightWord
       socket.question "That would make you " + heightWord + ". And your weight in kilograms?\n", (criteria) ->
         return "Please enter a number between 15 and 300." if isNaN(parseInt(criteria)) or parseInt(criteria) < 15 or parseInt(criteria) > 300
     .then (weightInput)->
@@ -268,15 +264,6 @@ charGen.appearance = (socket) ->
     socket.choice "Great. And what's the #{'skin color'.bold} of your #{skinStyle}?", global.$game.constants.body.human.skinColor
   .then (skinColorChoice)->
     skinColor = global.$game.constants.body.human.skinColor[skinColorChoice]
-    console.log({
-      hairCut:hairCut,
-      hairColor:hairColor,
-      hairStyle:hairStyle,
-      eyeColor:eyeColor,
-      eyeStyle:eyeStyle,
-      skinColor:skinColor,
-      skinStyle:skinStyle
-    })
     return {
       hairCut:hairCut,
       hairColor:hairColor,

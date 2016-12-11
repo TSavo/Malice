@@ -78,7 +78,6 @@ body.tell = (what)->
   @owner.tell(what)
 
 body.see = body.sees = (what)->
-  console.log(@canSee())
   @tell(what) if @concious and @canSee()
 
 body.hear = body.hears = (what)->
@@ -88,7 +87,6 @@ body.feel = body.feels = (what)->
   @tell(what) if @concious and @canFeel()
 
 body.smells = (what)->
-  console.log(@canSmell())
   @tell(what) if @concious and @canSmell()
 
 body.tastes = (what)->

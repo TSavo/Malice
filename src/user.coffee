@@ -31,7 +31,6 @@ user.tell = (what) ->
   @getSocket()?.tell(what) if typeof what is "string"
 
 user.isConnected = ->
-  console.log("Ah hell")
   !!global.$driver.getSocket(this)
 
 user.goIC = () ->
