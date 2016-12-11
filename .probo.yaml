@@ -3,7 +3,7 @@ steps:
     name: Install NVM, Install dependencies, run tests
     script: |
       apt-get update
-      apt-get install -y upgrade
+      apt-get -y upgrade
       apt-get install build-essential libssl-dev
       npm install -g npm@latest
       npm install
