@@ -118,26 +118,28 @@ global.$driver.startDriver = ->
     global.$driver.handleNewConnection socket
   ).listen 5555
   console.log 'Server listening at port 5555\n'
+  setInterval global.$driver.save, 1000 * 60 * 10
 
 global.$driver.load()
 global.$driver.startDriver()
 global.$game?.common?.startGame() if global.$game?.common?.startGame
-setInterval global.$driver.save, 1000 * 60 * 10
 
-repl.start(
-  prompt: '> ',
-  input: process.stdin,
-  output: process.stdout,
-  useGlobal:true
-).on 'exit', ->
-  socket.end()
+module.exports.repl = ->
+  repl.start(
+    prompt: '> ',
+    input: process.stdin,
+    output: process.stdout,
+    useGlobal:true
+  ).on 'exit', ->
+    socket.end()
   
 ignoredFiles = [
   /src\/driver\.coffee/,
   /src\/loader\.coffee/,
   /src\/telnet\.coffee/
 ]
-  
+
+module.exports.sourceWatch = ->
 stalker = watchr.open "./src", (changeType,filePath,fileCurrentStat,filePreviousStat) ->
   try
     if _(ignoredFiles).some (item)->
