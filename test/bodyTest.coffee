@@ -12,6 +12,9 @@ describe "Human Body", ->
       tell:chai.spy()
     ,
       language:"English"
+      appearance:
+        height:1.7
+        weight:80
 
 
   it "should be constructable", ->
@@ -30,7 +33,6 @@ describe "Human Body", ->
     body.concious = false
     body.sees "what"
     body.owner.tell.should.not.have.been.called()
-
 
   it "should tell it's owner what it hears, unless it's not conscious", ->
     body = harnessBody()
@@ -77,6 +79,12 @@ describe "Human Body", ->
     body.thinks "what"
     body.owner.tell.should.not.have.been.called()
 
+  it "should know it's height and weight", ->
+    body = harnessBody()
+    body.getHeight().should.equal 1.7
+    body.getWeight().should.equal 80
+    body.getHeightString().should.equal "of average height"
+    body.getWeightString().should.equal "of average weight"
 
   it "should produce a random body part", ->
     harnessBody().randomPart().should.not.be.undefined

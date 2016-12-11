@@ -45,4 +45,7 @@ describe "User", ->
     harnessUser().goIC()
 
   it "should handle a command", ->
-    #harnessUser().handleCommand("look")
+    user = harnessUser()
+    user.createBody({language:"English"})
+    user.handleCommand("look")
+
