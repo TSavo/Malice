@@ -6,6 +6,5 @@ steps:
       curl -sL https://deb.nodesource.com/setup_7.x -o setup_7.x
       . setup_7.x
       apt-get install nodejs
-      npm install -g npm@latest
       npm install
       npm test   
