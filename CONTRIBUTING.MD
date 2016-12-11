@@ -23,7 +23,7 @@ Make your change. Add tests for your change. Make the tests pass Push to your fo
 
 [pr]: https://github.com/tsavo/malice/compare/
 
-The contious deployment process will take over from there and give you lots of feedback.
+The continuous deployment process will take over from there and give you lots of feedback.
 
 Some things that will increase the chance that your pull request is accepted:
 
