@@ -6,7 +6,7 @@ The City of Malice is a TMMO game: A text-based massively multipler online game.
 
 The code base is 100% Open Source, written in Coffeescript, and runs on NodeJS 6 or higher.
 
-##Project Build:
+####Cloud Build Status:
 | Service                         |  Status |
 |---|---|
 | GitLab Continous Deployment     | [![buildstatus](https://gitlab.com/TSavo/Malice/badges/master/build.svg)](https://gitlab.com/TSavo/Malice/commits/master) [![coverage report](https://gitlab.com/TSavo/Malice/badges/master/coverage.svg)](https://gitlab.com/TSavo/Malice/commits/master)                                                                                                                                                                                                                              |
