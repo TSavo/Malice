@@ -1,3 +1,4 @@
+require "base"
 require "bodyPart"
 require "proportionate"
 
@@ -179,6 +180,9 @@ body.stimulate = (stimulus)->
   _ = require("underscore")
   @tell _(stimulus).chain().map(@contextualizeStimulus).join("").value()
 
+body.getTorso = ->
+  @torso
+
 body.getPart = (name)->
   @getTorso().getPart(name)
 
@@ -189,6 +193,7 @@ body.getRightHand = ->
   @getTorso().parts.rightShoulder?.parts?.arm?.parts?.forearm?.parts?.hand
 
 body.getLeftHand = ->
+
   @getTorso().parts.leftShoulder?.parts?.arm?.parts?.forearm?.parts?.hand
 
 body.getRightFoot = ->
@@ -198,10 +203,10 @@ body.getLeftFoot = ->
   @getTorso().parts.leftThigh?.parts?.knee?.parts?.leg?.parts?.foot
 
 body.getPrimaryHand = ->
-  if primaryHand is "right" then @getRightHand() else @getLeftHand()
+  if @primaryHand is "right" then @getRightHand() else @getLeftHand()
 
 body.getSecondaryHand = ->
-  if primaryHand is "right" then @getLeftHand() else @getRightHand()
+  if @primaryHand is "right" then @getLeftHand() else @getRightHand()
 
 body.getHand = ->
   @getPrimaryHand() or @getSecondaryHand()
@@ -210,7 +215,8 @@ body.getBothHands = ->
   [@getPrimaryHand(), @getSecondaryHand()]
 
 body.getFreeHand = ->
-  if @getPrimaryHand?.isEmpty() then @getPrimaryHand else if @getSecondaryHand()?.isEmpty() then @getSecondaryHand() else undefined
+
+  if @getPrimaryHand.isEmpty?() then @getPrimaryHand() else if @getSecondaryHand().isEmpty?() then @getSecondaryHand() else undefined
 
 body.isOneHandEmpty = ->
   @getPrimaryHand()?.isEmpty() or @getSecondaryHand()?.isEmpty()

@@ -3,6 +3,7 @@ spies = require('chai-spies')
 chai.use spies
 chai.should()
 require('app-module-path').addPath(__dirname + '/../src')
+require "base"
 require("body")
 
 describe "Human Body", ->
@@ -93,3 +94,8 @@ describe "Human Body", ->
     body = harnessBody()
     #body.findPart("head").should.equal body.torso.parts.head
     body.findPart("left eye").should.equal body.torso.parts.head.parts.face.parts.leftEye
+
+  it "should be able to hold something in it's hands", ->
+    body = harnessBody()
+    body.holdInHands
+      moveTo:global.$game.common.moveTo

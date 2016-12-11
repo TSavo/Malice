@@ -2,10 +2,10 @@ global.$game = {} if not global.$game
 global.$game.common = {} if not global.$game.common
 
 global.$game.common.move = (what, to)->
-  what.location = global.$game.$index.rooms.$nowhere if not what.location
+  what.location = global.$game.$nowhere if not what.location
   if what.location?.contents?
     what.location.contents = what.location.contents.remove(what)
-  place.contents = [] if not place.contents
+  to.contents = [] if not to.contents
   to.contents.push what
   what.location = to
 
