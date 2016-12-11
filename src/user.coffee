@@ -1,4 +1,5 @@
-require("base")
+require "base"
+require "body"
 
 global.$game = {} if not global.$game
 global.$game.classes = {} if not global.$game.classes
@@ -25,16 +26,19 @@ user.init = (@name, @email, password, @lastIp) ->
 user.moveTo = global.$game.common.moveTo
 
 user.getSocket = ->
-  global.$driver.getSocket(this)
+  global?.$driver?.getSocket?(this)
 
 user.tell = (what) ->
-  @getSocket()?.tell(what) if typeof what is "string"
+  @getSocket().tell?(what) if typeof what is "string"
 
 user.isConnected = ->
   !!global.$driver.getSocket(this)
 
 user.goIC = () ->
   @commandLoop()
+
+user.createBody = (info)->
+  @body = new global.$game.classes.HumanBody this, info
 
 user.commandLoop = ->
   if not @isConnected() then return console.log("Not connected")
@@ -71,5 +75,3 @@ user.matchCommand = (command)->
   _(@body.getCommands(self)).find (options)->
     _(options.tests).find (test)->
       test.regexp.test command
-
-

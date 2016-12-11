@@ -1,4 +1,5 @@
-require("bodyPart")
+require "bodyPart"
+require "proportionate"
 
 global.$game = {} if not global.$game
 global.$game.constants = {} if not global.$game.constants
@@ -34,7 +35,7 @@ human.stats.luck = ["non-existant", "doomed", "terrible", "unfortunate", "not th
 global.$game.constants.body.human.formatHeight = (height)->
   global.$game.constants.body.human.height.proportionate(height, global.$game.constants.body.human.maxHeight)
 
-global.$game.constants.body.human.formatWeight = (weight, height = 1.7)->
+global.$game.constants.body.human.formatWeight = (weight, height = @getHeight())->
   return global.$game.constants.body.human.weight.proportionate(weight, 100 * height)
 
 if not global.$game.classes.HumanBody
@@ -136,7 +137,7 @@ body.say = body.says = (what) ->
   @tell "You say, \"" + what + "\""
   stimulus = new global.$game.classes.StimulusBuilder(what, what.location).visual(this).visual(" says, ").quoted(what).visual(".").build()
   @location.everyoneExcept(this).stimulate(stimulus)
-  
+
 body.contextualizeLanguage = (message, language)->
   _ = require("underscore")
   understanding = @info.knownLanguages[language] or 0.0
@@ -234,7 +235,7 @@ body.moveTo = ->
   global.$game.common.moveTo.apply(this, arguments)
 
 body.look = ()->
-  @sees(if @location.asSeenBy then @location?.asSeenBy(this) else @location.description)
+  @sees @location?.asSeenBy?(this) || @location?.description || "There doesn't seem to be anything to see."
 
 body.lookAt = (who, what) ->
   listify = require("listify")
@@ -283,7 +284,7 @@ body.getCommands = ->
       ]
       description:"Describes the room you're presently in."
       func:@look
-      source:self
+      source:this
     },
     {
       name:"l~ook [at/in] <something>"
@@ -298,5 +299,5 @@ body.getCommands = ->
       source:this
     }
   ]
-  commands = commands.concat(@location?.getCommands(this)) if @location.getCommands
+  commands = commands.concat(@location?.getCommands?(this)) if @location?.getCommands
   _(commands).flatten()
