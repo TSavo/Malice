@@ -235,7 +235,7 @@ body.moveTo = ->
   global.$game.common.moveTo.apply(this, arguments)
 
 body.look = ()->
-  @sees @location?.asSeenBy?(this) || @location?.description || "There doesn't seem to be anything to see."
+  @sees @location?.asSeenBy?(this) or @location?.description or "There doesn't seem to be anything to see."
 
 body.lookAt = (who, what) ->
   listify = require("listify")
