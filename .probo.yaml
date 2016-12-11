@@ -1,8 +1,10 @@
 steps:
-  - name: Install Node 7
-    plugin: Shell
-    command: 'nvm install 7'
-  - name: Install dependencies
-    command: 'npm install'
-  - name: Run tests
-    command: 'npm test'
+  - plugin: Script
+    name: Install NVM, Install dependencies, run tests
+    script: |
+      apt-get update
+      curl -sL https://deb.nodesource.com/setup_7.x -o setup_7.x
+      . setup_7.x
+      apt-get install nodejs
+      npm install
+      npm test   
