@@ -5,7 +5,7 @@ steps:
   - name: Install Node 7
     command: 'export NVM_DIR="/root/.nvm" && . "$NVM_DIR/nvm.sh" && nvm install 7'
   - name: Install dependencies
-    command: 'npm install'
+    command: 'npm -g install npm@latest && npm install'
   - name: Run tests
     command: 'npm test'
     
