@@ -5,11 +5,12 @@
     "node": ">=6"
   },
   "description": "Malice",
+  "entrypoint":"index.js",
   "main": "src/driver.coffee",
   "bin": "coffee ./src/driver.coffee",
   "scripts": {
     "test": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- test -R spec --compilers coffee:coffee-script/register --require coffee-coverage/register-istanbul --debug",
-    "start": "coffee ./src/driver.coffee",
+    "start": "node index.js",
     "compile": "coffee -c -o dist src",
     "codacy": "cat ./coverage/lcov.info | ./node_modules/.bin/codacy-coverage -p .",
     "codeclimate": "codeclimate-test-reporter < coverage/lcov.info"
