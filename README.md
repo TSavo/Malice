@@ -27,7 +27,7 @@ The code base is 100% Open Source, written in Coffeescript, and runs on NodeJS 6
 
 ## Design 
 
-Please reference the [coding style guide](wiki/Style-guide) for the reasons for the design decisions, and [CONTRIBUTING.MD](blob/master/CONTRIBUTING.MD) for how to contribute. We LOVE pull requests!
+Please reference the [coding style guide](https://github.com/TSavo/Malice/wiki/Style-guide) for the reasons for the design decisions, and [CONTRIBUTING.MD](CONTRIBUTING.MD) for how to contribute. We LOVE pull requests!
 
 ## Running your own copy of the game
 
