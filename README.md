@@ -25,71 +25,9 @@ The code base is 100% Open Source, written in Coffeescript, and runs on NodeJS 6
 | Vexor CI                        | [![Vexor status](https://ci.vexor.io/projects/e9c6aa49-1a76-4fc6-bb02-a3b04a422f3d/status.svg)](https://ci.vexor.io/ui/projects/e9c6aa49-1a76-4fc6-bb02-a3b04a422f3d/builds) |
 
 
-## Design and Style
+## Design 
 
-The City of Malice lives entirely in the Node VM memory space, and is accessible throught the global.$game namespace. Changes to object states represent changes in the game world. The entire global.$game graph is peridocally serialized to disk, including all the objects's prototypes and functions, so if the VM needs to be brought down, the latest checkpoint can be loaded on startup.
-
-That means there's no database to worry about: The game objects are the database, and it's captured at intervals. If the VM goes down, the latest snapshot is reloaded.
-
-That means no object property references to native code are permissable in the global.$game graph, or references to exotic objects with large serialization graphs, because have the potential to cause problems with the custom serialization.
-
-For this reason it's critical to observe the following rules:
-
-- EVERYTHING that isn't core driver code loaded at startup needs to be accessible via the global.$game namespace. This includes all game world assets AND object prototypes.
-- Every code with an external dependency that isn't accessible via global.$game needs to be loaded at each use. For example, each method that uses _ need to include the line `_ = require "underscore"` inside the method (not at the top)
-- Code is hot-loaded off the file system when it changes without restarting the VM. Changes to prototypes's methods need to be made on existing global.$game objects.
-- For this reason, class definitions need to follow the following format without exception, so that they can be executed against a new AND live environment, maintaining the live references:
-
-```coffeescript
-### Ensue our global namespace is set up correctly. ###
-global.$game = {} if not global.$game
-global.$game.classes = {} if not global.$game.classes
-
-### If there's not an existing definition ###
-if not global.$game.classes.MyClass
-  ### Define a new class and register it in the global.$game.classes namespace ###
-  global.$game.classes.MyClass = class MyClass
-    constructor:->
-      ### Set it's type the same as it's class name ###
-      @type = "$game.classes.MyClass"
-      ### Delegate construction a potentially live method reference ###
-      @init.apply(this, arguments)
-
-### Get the prototype reference ###
-### Note that this could be a live object that we have existing instances of this class in memory. ###
-myClass = global.$game.classes.MyClass.prototype
-
-### (Re)Set the methods on the prototype which use 'this' (@). These could be in use by live objects in the VM. ###
-### Only code after this point can be customized.###
-  
-myClass.init = (@prop1, @prop2, @prop3 = "default value")->
-  #constructor code goes here
-  
-myClass.method1 = ->
-  #method code goes here
-  _ = require "underscore"
-  ...
-  
-myClass.method2 = (arg1, arg2)->
-  #method code goes here
-  _ = require "underscore"
-  ...
-  
-```
-
-First, we ensure that our global namespace is set up correctly, but only if it's not done already. If it's done already, we're running in a live environment and hot-loading code.
-
-Then, we define our new class, and set it on the global.$game.classes namespace, but only if we've not done this once before. The first time we start out, this won't be loaded, but once it's in the global.$game namespace, it will be serialized/deserialzied and not loaded from the file UNLESS the file changes.
-
-Then, we grab the current prototype of the object in our global.$game namespace. If this is the first time, we just make this object. But subsequent times this object may have been loaded from a snapshot of the serialized global.$game graph, so you may be overwriting 'live' object's methods.
-
-Finally we set, without concern if we've done this before, methods on our class prototype. These can use the this operator (@), and they can reference objects by name. They can use closures and do all the things you want to do. But they cannot themselves be closures, for instance over a require at the top of the file, because when they are serialized and deserialized those closure contexts are lost. That's why each method requires underscore reduntantly, because they cannot share a common reference to it though closures.
-
----
-
-Now, what happens when a change to the code need to be made? The updated file is detected by the server, and automatically 'eval'ed against the current running code in memory. That means that any existing objects which are 'live' with pick up the changes, since the values that were changes were the 'live' objects in memory, which were not overwritten with new ones if they already existed.
-
-In this way, the game can accept live changes to it's codebase without experiencing any downtime.
+Please reference the [[coding style guide|https://github.com/TSavo/Malice/wiki/Style-guide]] for the reasons for the design decisions, and [[CONTRIBUTING.MD|blob/master/CONTRIBUTING.MD]] for how to contribute. We LOVE pull requests!
 
 ## Running your own copy of the game
 
