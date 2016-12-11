@@ -111,7 +111,7 @@ global.$game.common.login.createConfirmationCode = ->
 
 global.$game.common.login.sendEmail = (username, email, confirmationCode) ->
   nodemailer = require('./node_modules/nodemailer')
-  credentials = JSON.parse(require("./src/loader").loadResourceSync("./.credentials"))
+  credentials = JSON.parse(require("loader").loadResourceSync(".credentials"))
   transporter = nodemailer.createTransport
     service: 'Gmail',
     auth:
