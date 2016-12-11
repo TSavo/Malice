@@ -43,7 +43,7 @@ if not global.$game.classes.HumanBody
   global.$game.classes.HumanBody = class HumanBody
     constructor:->
       @type = "$game.classes.HumanBody"
-      this.init.apply(this, arguments)
+      @init.apply(this, arguments)
 
 body = global.$game.classes.HumanBody.prototype
 
