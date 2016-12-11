@@ -1,7 +1,7 @@
 steps:
   - plugin: Script
     name: Install NVM, Install dependencies, run tests
-    script: |
+    script: >
       curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.32.1/install.sh | bash
       export NVM_DIR="/root/.nvm" && . "$NVM_DIR/nvm.sh"
       nvm install 7
