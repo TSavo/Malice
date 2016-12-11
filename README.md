@@ -27,13 +27,15 @@ The code base is 100% Open Source, written in Coffeescript, and runs on NodeJS 6
 
 ## Design and Style
 
-The City of Malice lives entirely in the Node VM memory space, and is accessable throught the global.$game namespace, AND serializable. Changes to object states represent changes in the game world. The entire global.$game graph is peridocally serialized to disk, including all the objects's prototypes and functions, so if the VM needs to be brought down, the latest checkpoint can be loaded on startup.
+The City of Malice lives entirely in the Node VM memory space, and is accessible throught the global.$game namespace. Changes to object states represent changes in the game world. The entire global.$game graph is peridocally serialized to disk, including all the objects's prototypes and functions, so if the VM needs to be brought down, the latest checkpoint can be loaded on startup.
 
-That means no object property references to native code in the global.$game graph, or references to exotic objects with large serialization graphs.
+That means there's no database to worry about: The game objects are the database, and it's captured at intervals. If the VM goes down, the latest snapshot is reloaded.
+
+That means no object property references to native code are permissable in the global.$game graph, or references to exotic objects with large serialization graphs, because have the potential to cause problems with the custom serialization.
 
 For this reason it's critical to observe the following rules:
 
-- EVERYTHING that isn't core driver code to be loaded at startup needs to be accessible via the global.$game namespace. This includes all game world assets AND object prototypes.
+- EVERYTHING that isn't core driver code loaded at startup needs to be accessible via the global.$game namespace. This includes all game world assets AND object prototypes.
 - Every code with an external dependency that isn't accessible via global.$game needs to be loaded at each use. For example, each method that uses _ need to include the line `_ = require "underscore"` inside the method (not at the top)
 - Code is hot-loaded off the file system when it changes without restarting the VM. Changes to prototypes's methods need to be made on existing global.$game objects.
 - For this reason, class definitions need to follow the following format without exception, so that they can be executed against a new AND live environment, maintaining the live references:
