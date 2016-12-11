@@ -85,6 +85,12 @@ Then, we grab the current prototype of the object in our global.$game namespace.
 
 Finally we set, without concern if we've done this before, methods on our class prototype. These can use the this operator (@), and they can reference objects by name. They can use closures and do all the things you want to do. But they cannot themselves be closures, for instance over a require at the top of the file, because when they are serialized and deserialized those closure contexts are lost. That's why each method requires underscore reduntantly, because they cannot share a common reference to it though closures.
 
+---
+
+Now, what happens when a change to the code need to be made? The updated file is detected by the server, and automatically 'eval'ed against the current running code in memory. That means that any existing objects which are 'live' with pick up the changes, since the values that were changes were the 'live' objects in memory, which were not overwritten with new ones if they already existed.
+
+In this way, the game can accept live changes to it's codebase without experiencing any downtime.
+
 ## Running your own copy of the game
 
 `npm install && npm start`
