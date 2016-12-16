@@ -5,7 +5,7 @@
     "node": ">=6"
   },
   "description": "Malice",
-  "entrypoint":"index.js",
+  "entrypoint": "index.js",
   "main": "src/driver.coffee",
   "bin": "coffee ./src/driver.coffee",
   "scripts": {
@@ -33,6 +33,7 @@
     "node-serialize": "0.0.4",
     "nodemailer": "^2.6.4",
     "q": "^2.0.3",
+    "serially": "^3.0.3",
     "underscore": "^1.8.3",
     "uuid": "^3.0.1",
     "watchr": "^3.0.1",
