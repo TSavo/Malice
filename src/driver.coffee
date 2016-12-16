@@ -1,5 +1,5 @@
 require('app-module-path').addPath(__dirname)
-serializer = require('./serialize')
+serializer = require('serially')
 loader = require("./loader")
 watchr = require("watchr")
 _ = require('underscore')
@@ -97,7 +97,7 @@ global.$driver.load = (filename) ->
       return console.log e
     console.log 'Loading checkpoint from ' + filename + '...'
     try
-      global.$game = serializer.unserialize(data.toString())
+      global.$game = serializer.deserialize(data.toString())
       console.log 'Checkpoint loaded.'
     catch e
       console.log e
