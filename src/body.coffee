@@ -1,6 +1,5 @@
 require "base"
 require "bodyPart"
-require "proportionate"
 
 global.$game = {} if not global.$game
 global.$game.constants = {} if not global.$game.constants
@@ -34,10 +33,12 @@ human.stats.agility = ["useless", "sloth-like", "slow", "delayed", "adequate", "
 human.stats.luck = ["non-existant", "doomed", "terrible", "unfortunate", "not the best", "not an issue", "better than some", "better than most", "uncanny", "great", "charmed", "on a streak", "unstoppable", "favored by deities", "so good you can't possibly go wrong"]
 
 global.$game.constants.body.human.formatHeight = (height)->
+  require("proportionate").arrays()
   global.$game.constants.body.human.height.proportionate(height, global.$game.constants.body.human.maxHeight)
 
 global.$game.constants.body.human.formatWeight = (weight, height = @getHeight())->
-  return global.$game.constants.body.human.weight.proportionate(weight, 100 * height)
+  require("proportionate").arrays()
+  global.$game.constants.body.human.weight.proportionate(weight, 100 * height)
 
 if not global.$game.classes.HumanBody
   global.$game.classes.HumanBody = class HumanBody
