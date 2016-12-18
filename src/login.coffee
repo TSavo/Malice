@@ -88,6 +88,8 @@ global.$game.common.login.showWelcomeMessage = (socket, callback) ->
     socket.write(text.red + "\r\n")
     callback()
 
+    
+    
 global.$game.common.login.register = (socket) ->
   global.$game.common.login.getUserName socket, (username) ->
     global.$game.common.login.getPassword socket, (password) ->
