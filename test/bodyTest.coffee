@@ -95,7 +95,3 @@ describe "Human Body", ->
     #body.findPart("head").should.equal body.torso.parts.head
     body.findPart("left eye").should.equal body.torso.parts.head.parts.face.parts.leftEye
 
-  it "should be able to hold something in it's hands", ->
-    body = harnessBody()
-    body.holdInHands
-      moveTo:global.$game.common.moveTo
