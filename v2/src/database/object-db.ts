@@ -1,4 +1,4 @@
-import { MongoClient, Db, Collection } from 'mongodb';
+import { MongoClient, Db, Collection, ChangeStream } from 'mongodb';
 import type { GameObject, ObjId } from '../../types/object.js';
 
 /**
@@ -9,6 +9,7 @@ export class ObjectDatabase {
   private db!: Db;
   private objects!: Collection<GameObject>;
   private connected = false;
+  private changeStream?: ChangeStream;
 
   constructor(private uri: string, private dbName: string = 'malice') {}
 
@@ -34,6 +35,10 @@ export class ObjectDatabase {
    * Disconnect from MongoDB
    */
   async disconnect(): Promise<void> {
+    if (this.changeStream) {
+      await this.changeStream.close();
+      this.changeStream = undefined;
+    }
     if (!this.connected) return;
     await this.client.close();
     this.connected = false;
@@ -173,5 +178,44 @@ export class ObjectDatabase {
         methods: {},
       });
     }
+  }
+
+  /**
+   * Watch for changes to objects (for cache invalidation across servers)
+   * Enables multiple game servers / DevTools to share one MongoDB and stay in sync
+   */
+  watch(callback: (change: any) => void): void {
+    if (this.changeStream) {
+      console.warn('[ObjectDatabase] Already watching for changes');
+      return;
+    }
+
+    console.log('[ObjectDatabase] Watching for changes (multi-server cache sync enabled)');
+
+    this.changeStream = this.objects.watch([], {
+      fullDocument: 'updateLookup', // Include full document on updates
+    });
+
+    this.changeStream.on('change', (change) => {
+      callback(change);
+    });
+
+    this.changeStream.on('error', (err) => {
+      console.error('[ObjectDatabase] Change stream error:', err);
+      // Attempt to reconnect
+      this.changeStream = undefined;
+      setTimeout(() => {
+        if (!this.changeStream) {
+          this.watch(callback);
+        }
+      }, 5000);
+    });
+  }
+
+  /**
+   * List all objects (for DevTools)
+   */
+  async listAll(): Promise<GameObject[]> {
+    return await this.objects.find({ recycled: { $ne: true } }).toArray();
   }
 }

@@ -13,12 +13,18 @@ import type {
  * Provides caching and high-level object operations
  * Exposes core objects via convenient properties ($.system, $.charGen, etc.)
  * Supports dynamic aliases: $.myAlias = object
+ * Watches MongoDB change streams for multi-server cache invalidation
  */
 export class ObjectManager {
   private cache = new Map<ObjId, RuntimeObject>();
   private aliases = new Map<string, RuntimeObject>();
+  public readonly db: ObjectDatabase; // Expose for DevTools direct access
 
-  constructor(private db: ObjectDatabase) {
+  constructor(db: ObjectDatabase) {
+    this.db = db;
+
+    // Watch for changes from other servers/processes
+    this.setupChangeStreamWatcher();
     // Return a Proxy to enable dynamic property access
     return new Proxy(this, {
       get: (target, prop: string | symbol) => {
@@ -240,5 +246,50 @@ export class ObjectManager {
         this.aliases.delete(name);
       }
     }
+  }
+
+  /**
+   * Invalidate cache for a specific object
+   * Forces reload from database on next access
+   * Used by DevTools when external changes are made
+   */
+  invalidate(id: ObjId): void {
+    if (this.cache.has(id)) {
+      console.log(`[ObjectManager] Invalidating cache for object #${id}`);
+      this.cache.delete(id);
+    }
+  }
+
+  /**
+   * Setup MongoDB change stream watcher
+   * Invalidates cache when objects are modified by other servers/processes
+   * Enables multi-server deployment with shared MongoDB
+   */
+  private setupChangeStreamWatcher(): void {
+    this.db.watch((change) => {
+      const operationType = change.operationType;
+
+      if (operationType === 'update' || operationType === 'replace') {
+        const id = change.documentKey._id as ObjId;
+
+        // Only log if we actually had it cached
+        if (this.cache.has(id)) {
+          console.log(
+            `[ObjectManager] External change detected for object #${id} - invalidating cache`
+          );
+          this.cache.delete(id);
+        }
+      } else if (operationType === 'delete') {
+        const id = change.documentKey._id as ObjId;
+        this.cache.delete(id);
+
+        // Remove from aliases
+        for (const [name, obj] of this.aliases) {
+          if (obj.id === id) {
+            this.aliases.delete(name);
+          }
+        }
+      }
+    });
   }
 }
