@@ -1,4 +1,4 @@
-import type { GameObject, ObjId, PropertyValue, MethodCode, RuntimeObject } from '../../types/object.js';
+import type { GameObject, ObjId, PropertyValue, MethodCode, Method, RuntimeObject } from '../../types/object.js';
 import type { ObjectManager } from './object-manager.js';
 
 /**
@@ -99,6 +99,20 @@ export class RuntimeObjectImpl implements RuntimeObject {
   }
 
   /**
+   * Add or update a method on this object
+   */
+  addMethod(name: string, code: string, options?: { callable?: boolean; aliases?: string[]; help?: string }): void {
+    if (!this.obj.methods) {
+      this.obj.methods = {};
+    }
+    this.obj.methods[name] = {
+      code,
+      ...options,
+    };
+    this.dirty = true;
+  }
+
+  /**
    * Call method - walks inheritance chain, executes in context
    */
   async call(method: string, ...args: unknown[]): Promise<unknown> {
@@ -123,7 +137,9 @@ export class RuntimeObjectImpl implements RuntimeObject {
   private findMethod(method: string): MethodCode | null {
     // Check this object first
     if (method in this.obj.methods) {
-      return this.obj.methods[method];
+      const methodDef = this.obj.methods[method];
+      // Extract code from Method object or return string directly (for backwards compatibility)
+      return typeof methodDef === 'string' ? methodDef : methodDef.code;
     }
 
     // Walk up parent chain
@@ -200,7 +216,7 @@ export class RuntimeObjectImpl implements RuntimeObject {
   /**
    * Get all own methods (not inherited)
    */
-  getOwnMethods(): Record<string, MethodCode> {
+  getOwnMethods(): Record<string, Method> {
     return { ...this.obj.methods };
   }
 
