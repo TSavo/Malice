@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { ObjectDatabase } from '../src/database/object-db.js';
 import { ObjectManager } from '../src/database/object-manager.js';
 
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017';
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/?replicaSet=rs0&directConnection=true';
 
 describe('MongoDB Change Stream Cache Invalidation', () => {
   let db1: ObjectDatabase;
@@ -27,7 +27,10 @@ describe('MongoDB Change Stream Cache Invalidation', () => {
     // Create two ObjectManagers (simulating two game servers)
     manager1 = new ObjectManager(db1);
     manager2 = new ObjectManager(db2);
-  });
+
+    // Give change streams time to initialize
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+  }, 15000);
 
   afterAll(async () => {
     await db1.disconnect();
