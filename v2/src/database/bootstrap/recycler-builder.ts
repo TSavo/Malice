@@ -30,8 +30,10 @@ export class RecyclerBuilder {
         description: 'Object deletion and recovery system',
         recycleBin: [],
       },
-      methods: {
-        create: `
+      methods: {},
+    });
+
+    this.recycler.setMethod('create', `
           const params = args[0];
           const caller = args[1]; // Optional - can be null for system-created objects
 
@@ -89,9 +91,9 @@ export class RecyclerBuilder {
           console.log(\`[Recycler] Created object #\${newObject.id} (\${ownerInfo})\`);
 
           return newObject;
-        `,
+        `);
 
-        recycle: `
+    this.recycler.setMethod('recycle', `
           const objectId = args[0];
           const caller = args[1];
 
@@ -137,9 +139,9 @@ export class RecyclerBuilder {
           });
 
           console.log(\`Recycled object #\${objectId}\`);
-        `,
+        `);
 
-        canRecycle: `
+    this.recycler.setMethod('canRecycle', `
           const caller = args[0];
           const obj = args[1];
 
@@ -154,9 +156,9 @@ export class RecyclerBuilder {
           if (caller && owner === caller.id) return true;
 
           return false;
-        `,
+        `);
 
-        unrecycle: `
+    this.recycler.setMethod('unrecycle', `
           const objectId = args[0];
 
           // Find in recycle bin
@@ -181,9 +183,9 @@ export class RecyclerBuilder {
           await self.save();
 
           console.log(\`Restored object #\${objectId}\`);
-        `,
+        `);
 
-        purge: `
+    this.recycler.setMethod('purge', `
           const objectId = args[0];
           const caller = args[1];
 
@@ -209,9 +211,9 @@ export class RecyclerBuilder {
           }
 
           console.log(\`Purged object #\${objectId}\`);
-        `,
-      },
-    });
+        `);
+
+    await this.recycler.save();
   }
 
   async registerAlias(): Promise<void> {

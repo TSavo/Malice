@@ -21,10 +21,17 @@ export type PropertyValue =
 
 /**
  * Method with metadata
+ * Code is TypeScript that gets compiled to JavaScript at runtime
  */
 export interface Method {
-  /** The method code (TypeScript as string) */
+  /** The method code (TypeScript source as string) */
   code: string;
+
+  /** Compiled JavaScript (cached, not stored in DB) */
+  compiledJS?: string;
+
+  /** Compilation timestamp (for cache invalidation) */
+  compiledAt?: Date;
 
   /** Can this method be invoked via player commands? */
   callable?: boolean;
