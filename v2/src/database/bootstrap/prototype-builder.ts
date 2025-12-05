@@ -53,26 +53,30 @@ export class PrototypeBuilder {
   }
 
   private async createDescribable(): Promise<RuntimeObject> {
-    return await this.manager.create({
+    const obj = await this.manager.create({
       parent: 1,
       properties: {
         name: 'Describable',
         description: 'Base prototype for things that can be described',
         aliases: [],
       },
-      methods: {
-        describe: `
-          return \`\${self.name}\\r\\n\${self.description}\`;
-        `,
-        shortDesc: `
-          return self.name;
-        `,
-      },
+      methods: {},
     });
+
+    obj.setMethod('describe', `
+      return \`\${self.name}\\r\\n\${self.description}\`;
+    `);
+
+    obj.setMethod('shortDesc', `
+      return self.name;
+    `);
+
+    await obj.save();
+    return obj;
   }
 
   private async createAgent(describableId: number): Promise<RuntimeObject> {
-    return await this.manager.create({
+    const obj = await this.manager.create({
       parent: describableId,
       properties: {
         name: 'Agent',
@@ -80,30 +84,35 @@ export class PrototypeBuilder {
         location: 0,
         inventory: [],
       },
-      methods: {
-        moveTo: `
-          const targetId = args[0];
-          // TODO: Notify old location
-          self.location = targetId;
-          // TODO: Notify new location
-          await self.save();
-        `,
-        say: `
-          const message = args[0];
-          // TODO: Broadcast to room
-          return \`\${self.name} says: \${message}\`;
-        `,
-        emote: `
-          const action = args[0];
-          // TODO: Broadcast to room
-          return \`\${self.name} \${action}\`;
-        `,
-      },
+      methods: {},
     });
+
+    obj.setMethod('moveTo', `
+      const targetId = args[0];
+      // TODO: Notify old location
+      self.location = targetId;
+      // TODO: Notify new location
+      await self.save();
+    `);
+
+    obj.setMethod('say', `
+      const message = args[0];
+      // TODO: Broadcast to room
+      return \`\${self.name} says: \${message}\`;
+    `);
+
+    obj.setMethod('emote', `
+      const action = args[0];
+      // TODO: Broadcast to room
+      return \`\${self.name} \${action}\`;
+    `);
+
+    await obj.save();
+    return obj;
   }
 
   private async createHuman(agentId: number): Promise<RuntimeObject> {
-    return await this.manager.create({
+    const obj = await this.manager.create({
       parent: agentId,
       properties: {
         name: 'Human',
@@ -117,17 +126,20 @@ export class PrototypeBuilder {
         age: 25,
         species: 'human',
       },
-      methods: {
-        pronoun: `
-          const type = args[0]; // 'subject', 'object', 'possessive'
-          return self.pronouns[type] || 'they';
-        `,
-      },
+      methods: {},
     });
+
+    obj.setMethod('pronoun', `
+      const type = args[0]; // 'subject', 'object', 'possessive'
+      return self.pronouns[type] || 'they';
+    `);
+
+    await obj.save();
+    return obj;
   }
 
   private async createPlayer(humanId: number): Promise<RuntimeObject> {
-    return await this.manager.create({
+    const obj = await this.manager.create({
       parent: humanId,
       properties: {
         name: 'Player',
@@ -154,51 +166,54 @@ export class PrototypeBuilder {
         title: '',
         homepage: '',
       },
-      methods: {
-        connect: `
-          const context = args[0];
-
-          context.send(\`\\r\\nWelcome back, \${self.name}!\\r\\n\`);
-          context.send(\`You are \${self.description}\\r\\n\`);
-
-          // Update last login
-          self.lastLogin = new Date();
-          await self.save();
-
-          // Show location if set
-          if (self.location && self.location !== 0) {
-            const location = await $.load(self.location);
-            if (location) {
-              const desc = await location.describe();
-              context.send(\`\\r\\n\${desc}\\r\\n\`);
-            }
-          }
-
-          // TODO: Notify others in room
-        `,
-
-        disconnect: `
-          // Save any unsaved state
-          await self.save();
-
-          // TODO: Notify room
-        `,
-
-        checkPassword: `
-          const password = args[0];
-          const bcrypt = require('bcrypt');
-          return await bcrypt.compare(password, self.passwordHash);
-        `,
-
-        setPassword: `
-          const password = args[0];
-          const bcrypt = require('bcrypt');
-          const hash = await bcrypt.hash(password, 10);
-          self.passwordHash = hash;
-          await self.save();
-        `,
-      },
+      methods: {},
     });
+
+    obj.setMethod('connect', `
+      const context = args[0];
+
+      context.send(\`\\r\\nWelcome back, \${self.name}!\\r\\n\`);
+      context.send(\`You are \${self.description}\\r\\n\`);
+
+      // Update last login
+      self.lastLogin = new Date();
+      await self.save();
+
+      // Show location if set
+      if (self.location && self.location !== 0) {
+        const location = await $.load(self.location);
+        if (location) {
+          const desc = await location.describe();
+          context.send(\`\\r\\n\${desc}\\r\\n\`);
+        }
+      }
+
+      // TODO: Notify others in room
+    `);
+
+    obj.setMethod('disconnect', `
+      // Save any unsaved state
+      await self.save();
+
+      // TODO: Notify room
+    `);
+
+    obj.setMethod('checkPassword', `
+      const password = args[0];
+      const bcrypt = require('bcrypt');
+      return await bcrypt.compare(password, self.passwordHash);
+    `);
+
+    obj.setMethod('setPassword', `
+      const password = args[0];
+      const bcrypt = require('bcrypt');
+      const hash = await bcrypt.hash(password, 10);
+      self.passwordHash = hash;
+      await self.save();
+    `);
+
+    await obj.save();
+    return obj;
   }
 
   private async registerAliases(ids: {

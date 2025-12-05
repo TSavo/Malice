@@ -78,8 +78,8 @@ export interface RuntimeObject {
   /** Set property (always on this object) */
   set(prop: string, value: PropertyValue): void;
 
-  /** Add or update a method on this object */
-  addMethod(name: string, code: string, options?: { callable?: boolean; aliases?: string[]; help?: string }): void;
+  /** Set a method on this object */
+  setMethod(name: string, code: string, options?: { callable?: boolean; aliases?: string[]; help?: string }): void;
 
   /** Call method (walks inheritance chain, executes in context) */
   call(method: string, ...args: unknown[]): Promise<unknown>;

@@ -73,10 +73,10 @@ describe('MongoDB Change Stream Cache Invalidation', () => {
     const obj1 = await manager1.create({
       parent: 1,
       properties: {},
-      methods: {
-        greet: 'return "Hello";',
-      },
+      methods: {},
     });
+    obj1.setMethod('greet', 'return "Hello";');
+    await obj1.save();
 
     const id = obj1.id;
 
@@ -88,7 +88,7 @@ describe('MongoDB Change Stream Cache Invalidation', () => {
     // DevTools: Modify the method directly (simulating VS Code edit)
     await db1.update(id, {
       methods: {
-        greet: 'return "Hello, World!";',
+        greet: { code: 'return "Hello, World!";' },
       },
     });
 
