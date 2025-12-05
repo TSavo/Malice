@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: malice-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      - MONGO_INITDB_DATABASE=malice
+    networks:
+      - malice-network
+
+  game:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: malice-game
+    restart: unless-stopped
+    ports:
+      - "5555:5555"  # Telnet
+      - "8080:8080"  # WebSocket
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017
+      - NODE_ENV=production
+    depends_on:
+      - mongodb
+    networks:
+      - malice-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  malice-network:
+    driver: bridge
