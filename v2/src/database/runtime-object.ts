@@ -24,6 +24,11 @@ export class RuntimeObjectImpl implements RuntimeObject {
           return (target as any)[prop];
         }
 
+        // Check if it's a method - return callable function
+        if (target.hasMethod(prop)) {
+          return (...args: unknown[]) => target.call(prop, ...args);
+        }
+
         // For string properties, try to get from object properties
         return target.get(prop);
       },
