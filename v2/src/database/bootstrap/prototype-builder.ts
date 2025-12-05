@@ -111,7 +111,7 @@ export class PrototypeBuilder {
         for (const objId of others) {
           const obj = await $.load(objId);
           if (obj) {
-            const shortDesc = obj.shortDesc ? await obj.shortDesc() : obj.name;
+            const shortDesc = await obj.shortDesc();
             output += \`  - \${shortDesc}\\r\\n\`;
           }
         }
@@ -179,7 +179,7 @@ export class PrototypeBuilder {
         for (const objId of others) {
           const obj = await $.load(objId);
           if (obj) {
-            const shortDesc = obj.shortDesc ? await obj.shortDesc() : obj.name;
+            const shortDesc = await obj.shortDesc();
             output += \`  - \${shortDesc}\\r\\n\`;
           }
         }

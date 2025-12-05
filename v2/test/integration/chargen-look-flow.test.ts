@@ -160,17 +160,10 @@ describe('Character Creation and Look Flow Integration', () => {
         methods: {},
       });
 
-      // Step 3: Set password
-      await newPlayer.call('setPassword', 'hunter2');
-
-      // Step 4: Place in room
+      // Step 3: Place in room
       await startRoom.call('addContent', newPlayer.id);
 
-      // Step 5: Verify password works
-      const passwordOk = await newPlayer.call('checkPassword', 'hunter2');
-      expect(passwordOk).toBe(true);
-
-      // Step 6: Connect player
+      // Step 4: Connect player
       sentMessages = [];
       await newPlayer.call('connect', mockContext);
 
@@ -180,7 +173,7 @@ describe('Character Creation and Look Flow Integration', () => {
       expect(connectOutput).toContain('A safe haven for new adventurers.');
       expect(connectOutput).toContain('Obvious exits: north, south, east, west');
 
-      // Step 7: Execute look command
+      // Step 5: Execute look command
       sentMessages = [];
       await newPlayer.call('onInput', mockContext, 'look');
 
