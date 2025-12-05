@@ -316,7 +316,8 @@ export class RuntimeObjectImpl implements RuntimeObject {
   async refresh(): Promise<void> {
     const updated = await this.manager.load(this.id);
     if (updated) {
-      this.obj = (updated as RuntimeObjectImpl).obj;
+      // Use _getRaw() to get the underlying GameObject from the loaded object
+      this.obj = updated._getRaw();
       this.dirty = false;
     }
   }
