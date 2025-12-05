@@ -31,6 +31,66 @@ export class RecyclerBuilder {
         recycleBin: [],
       },
       methods: {
+        create: `
+          const params = args[0];
+          const caller = args[1]; // Optional - can be null for system-created objects
+
+          // Validate parameters
+          if (!params || typeof params !== 'object') {
+            throw new Error('Invalid create parameters');
+          }
+
+          if (params.parent === undefined) {
+            throw new Error('Parent must be specified');
+          }
+
+          // Check if caller has permission to create objects
+          // Allow creation if:
+          // - No caller (system creation like CharGen)
+          // - Caller is wizard
+          // - Caller has canBuild flag
+          if (caller && caller.get) {
+            const isWizard = caller.get('isWizard');
+            const canBuild = caller.get('canBuild');
+
+            if (!isWizard && !canBuild) {
+              throw new Error('Permission denied: You do not have build privileges');
+            }
+          }
+
+          // Set ownership if caller provided
+          if (!params.properties) {
+            params.properties = {};
+          }
+
+          if (caller && !params.properties.owner) {
+            params.properties.owner = caller.id;
+          }
+
+          // Set creation metadata
+          if (!params.properties.createdAt) {
+            params.properties.createdAt = new Date();
+          }
+
+          if (caller && !params.properties.createdBy) {
+            params.properties.createdBy = caller.id;
+          }
+
+          // Create the object through ObjectManager
+          const newObject = await $.create(params);
+
+          // Call onCreate hook if it exists
+          if (newObject.hasMethod && newObject.hasMethod('onCreate')) {
+            await newObject.call('onCreate', caller);
+          }
+
+          // Log creation
+          const ownerInfo = params.properties.owner ? \`owner: #\${params.properties.owner}\` : 'system';
+          console.log(\`[Recycler] Created object #\${newObject.id} (\${ownerInfo})\`);
+
+          return newObject;
+        `,
+
         recycle: `
           const objectId = args[0];
           const caller = args[1];

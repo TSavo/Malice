@@ -44,12 +44,27 @@ export class CharGenBuilder {
           const passwordHash = await bcrypt.hash(password, 10);
 
           // Get Player prototype via alias
-          const root = await $.load(1);
+          const objectManager = await $.load(0);
           const aliases = objectManager.get('aliases') || {};
           const playerPrototypeId = aliases.player;
 
-          // Create Player object (inherits from Player prototype)
-          const player = await context.$.create({
+          // Check if this is the first player (admin user)
+          // Count existing player objects by checking objects with playername property
+          const db = $.db;
+          const existingPlayers = await db.objects.countDocuments({
+            'properties.playername': { $exists: true, $ne: '' }
+          });
+          const isFirstPlayer = existingPlayers === 0;
+
+          // Get recycler for object creation
+          const recycler = await $.recycler;
+          if (!recycler) {
+            throw new Error('Recycler not available');
+          }
+
+          // Create Player object through recycler (inherits from Player prototype)
+          // Pass null as caller since player is not yet authenticated
+          const player = await recycler.call('create', {
             parent: playerPrototypeId,
             properties: {
               // Describable
@@ -75,15 +90,26 @@ export class CharGenBuilder {
               playername: username.toLowerCase(),
               email: '',
               passwordHash: passwordHash,
-              canUseDevTools: false,
-              isWizard: false,
+              canUseDevTools: isFirstPlayer,
+              isWizard: isFirstPlayer,
               isSuspended: false,
               createdAt: new Date(),
               lastLogin: new Date(),
               totalPlaytime: 0,
-              title: 'the Newbie',
+              title: isFirstPlayer ? 'the Administrator' : 'the Newbie',
             },
-          });
+          }, null); // null caller - player not yet authenticated
+
+          if (isFirstPlayer) {
+            context.send('\\\\r\\\\n');
+            context.send('═══════════════════════════════════════════════════════════\\\\r\\\\n');
+            context.send('  🔱 YOU ARE THE FIRST USER - ADMIN PRIVILEGES GRANTED 🔱\\\\r\\\\n');
+            context.send('═══════════════════════════════════════════════════════════\\\\r\\\\n');
+            context.send('\\\\r\\\\n');
+            context.send('You have been granted wizard status and DevTools access.\\\\r\\\\n');
+            context.send('Use these powers wisely to build your world!\\\\r\\\\n');
+            context.send('\\\\r\\\\n');
+          }
 
           context.send(\`Character created! You are #\${player.id}\\\\r\\\\n\`);
           context.authenticate(player.id);
