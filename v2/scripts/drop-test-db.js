@@ -9,9 +9,17 @@ async function dropDatabase() {
     await client.connect();
     console.log('Connected to MongoDB');
 
-    // Drop the test database
-    await client.db('malice_test_chargen_look').dropDatabase();
-    console.log('✅ Dropped database: malice_test_chargen_look');
+    // List all databases
+    const adminDb = client.db().admin();
+    const dbs = await adminDb.listDatabases();
+
+    // Drop all test databases
+    for (const db of dbs.databases) {
+      if (db.name.startsWith('malice_test_')) {
+        await client.db(db.name).dropDatabase();
+        console.log(`✅ Dropped database: ${db.name}`);
+      }
+    }
 
   } catch (err) {
     console.error('Error:', err);

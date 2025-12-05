@@ -188,10 +188,19 @@ export class RuntimeObjectImpl implements RuntimeObject {
   /**
    * Execute method code in context
    * Compiles TypeScript to JavaScript before execution
+   * Uses caching for compiled code
    */
   private async executeMethod(code: MethodCode, args: unknown[], methodName = 'anonymous'): Promise<unknown> {
-    // Compile TypeScript to JavaScript
-    const jsCode = this.compileTypeScript(code, methodName);
+    // Check cache for compiled code (avoids repeated compilation)
+    let jsCode = this.manager.getCompiledMethod(this.id, methodName);
+
+    if (!jsCode) {
+      // Cache miss - compile TypeScript to JavaScript
+      jsCode = this.compileTypeScript(code, methodName);
+
+      // Store in cache (never evicts)
+      this.manager.setCompiledMethod(this.id, methodName, jsCode);
+    }
 
     // Create execution context with access to:
     // - self: the proxied object (enables self.hp instead of self.get('hp'))
