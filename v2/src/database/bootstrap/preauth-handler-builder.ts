@@ -29,8 +29,10 @@ export class PreAuthHandlerBuilder {
         name: 'PreAuthHandler',
         description: 'Pre-authenticated connection handler (SSL, HTTP auth, OAuth)',
       },
-      methods: {
-        onPreAuth: `
+      methods: {},
+    });
+
+    this.preAuthHandler.setMethod('onPreAuth', `
           const context = args[0];
           const authInfo = args[1];
 
@@ -64,9 +66,9 @@ export class PreAuthHandlerBuilder {
             context.send(\`Authentication error: \${err.message}\\\\r\\\\n\`);
             context.close();
           }
-        `,
+        `);
 
-        handleSSLCert: `
+    this.preAuthHandler.setMethod('handleSSLCert', `
           const context = args[0];
           const cert = args[1];
 
@@ -121,9 +123,9 @@ export class PreAuthHandlerBuilder {
           // Authenticate and connect
           context.authenticate(player.id);
           await player.connect(context);
-        `,
+        `);
 
-        handleHTTPBasic: `
+    this.preAuthHandler.setMethod('handleHTTPBasic', `
           const context = args[0];
           const basic = args[1];
 
@@ -169,9 +171,9 @@ export class PreAuthHandlerBuilder {
           // Authenticate and connect
           context.authenticate(player.id);
           await player.connect(context);
-        `,
+        `);
 
-        handleOAuth: `
+    this.preAuthHandler.setMethod('handleOAuth', `
           const context = args[0];
           const oauth = args[1];
 
@@ -186,18 +188,18 @@ export class PreAuthHandlerBuilder {
           // const user = users.find(u => u.properties.oauthSubject === payload.sub);
 
           context.close();
-        `,
+        `);
 
-        handleCustom: `
+    this.preAuthHandler.setMethod('handleCustom', `
           const context = args[0];
           const custom = args[1];
 
           context.send(\`Custom authentication type: \${custom.type}\\\\r\\\\n\`);
           context.send('Custom authentication not yet implemented\\\\r\\\\n');
           context.close();
-        `,
-      },
-    });
+        `);
+
+    await this.preAuthHandler.save();
   }
 
   async registerAlias(): Promise<void> {

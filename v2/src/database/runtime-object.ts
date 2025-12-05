@@ -1,5 +1,6 @@
 import type { GameObject, ObjId, PropertyValue, MethodCode, Method, RuntimeObject } from '../../types/object.js';
 import type { ObjectManager } from './object-manager.js';
+import * as ts from 'typescript';
 
 /**
  * Runtime wrapper around GameObject with inheritance and method execution
@@ -121,7 +122,7 @@ export class RuntimeObjectImpl implements RuntimeObject {
       throw new Error(`Method ${method} not found on object #${this.id}`);
     }
 
-    return await this.executeMethod(code, args);
+    return await this.executeMethod(code, args, method);
   }
 
   /**
@@ -154,9 +155,44 @@ export class RuntimeObjectImpl implements RuntimeObject {
   }
 
   /**
-   * Execute method code in context
+   * Compile TypeScript code to JavaScript
    */
-  private async executeMethod(code: MethodCode, args: unknown[]): Promise<unknown> {
+  private compileTypeScript(tsCode: string, methodName: string): string {
+    try {
+      const result = ts.transpileModule(tsCode, {
+        compilerOptions: {
+          target: ts.ScriptTarget.ES2022,
+          module: ts.ModuleKind.ESNext,
+          strict: false, // Allow implicit any for now
+          esModuleInterop: true,
+          skipLibCheck: true,
+        },
+      });
+
+      if (result.diagnostics && result.diagnostics.length > 0) {
+        const errors = result.diagnostics.map((d) => {
+          const message = ts.flattenDiagnosticMessageText(d.messageText, '\n');
+          return `Line ${d.start}: ${message}`;
+        });
+        throw new Error(`TypeScript compilation errors in method '${methodName}':\n${errors.join('\n')}`);
+      }
+
+      return result.outputText;
+    } catch (err) {
+      throw new Error(
+        `Failed to compile TypeScript for method '${methodName}': ${err instanceof Error ? err.message : String(err)}`
+      );
+    }
+  }
+
+  /**
+   * Execute method code in context
+   * Compiles TypeScript to JavaScript before execution
+   */
+  private async executeMethod(code: MethodCode, args: unknown[], methodName = 'anonymous'): Promise<unknown> {
+    // Compile TypeScript to JavaScript
+    const jsCode = this.compileTypeScript(code, methodName);
+
     // Create execution context with access to:
     // - self: the proxied object (enables self.hp instead of self.get('hp'))
     // - $: the object manager (for finding other objects)
@@ -177,14 +213,14 @@ export class RuntimeObjectImpl implements RuntimeObject {
       const fn = new AsyncFn('ctx', `
         const { self, $, args } = ctx;
         return (async () => {
-          ${code}
+          ${jsCode}
         })();
       `);
 
       return await fn(context);
     } catch (err) {
       throw new Error(
-        `Error executing method on object #${this.id}: ${err instanceof Error ? err.message : String(err)}`
+        `Error executing method '${methodName}' on object #${this.id}: ${err instanceof Error ? err.message : String(err)}`
       );
     }
   }

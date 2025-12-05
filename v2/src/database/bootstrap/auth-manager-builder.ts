@@ -30,17 +30,19 @@ export class AuthManagerBuilder {
         description: 'Interactive login and authentication',
         welcomeMessage: 'Welcome to Malice!\\r\\n\\r\\nLogin: ',
       },
-      methods: {
-        onConnect: `
+      methods: {},
+    });
+
+    this.authManager.setMethod('onConnect', `
           const context = args[0];
           const welcome = self.welcomeMessage;
           context.send(welcome);
 
           // Set state to collect username
           self._state = { stage: 'username', context: context };
-        `,
+        `);
 
-        onInput: `
+    this.authManager.setMethod('onInput', `
           const context = args[0];
           const input = args[1];
 
@@ -119,9 +121,9 @@ export class AuthManagerBuilder {
               await chargen.onNewUser(context, state.username, password);
             }
           }
-        `,
-      },
-    });
+        `);
+
+    await this.authManager.save();
   }
 
   async registerAlias(): Promise<void> {

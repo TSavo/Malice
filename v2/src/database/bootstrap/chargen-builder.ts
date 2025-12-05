@@ -29,8 +29,10 @@ export class CharGenBuilder {
         name: 'CharGen',
         description: 'Character creation system',
       },
-      methods: {
-        onNewUser: `
+      methods: {},
+    });
+
+    this.charGen.setMethod('onNewUser', `
           const context = args[0];
           const username = args[1];
           const password = args[2];
@@ -116,9 +118,9 @@ export class CharGenBuilder {
 
           // Call player's connect method
           await player.connect(context);
-        `,
-      },
-    });
+        `);
+
+    await this.charGen.save();
   }
 
   async registerAlias(): Promise<void> {
