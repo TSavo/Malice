@@ -1,5 +1,5 @@
 import { ObjectDatabase, ObjectManager } from '../database/index.js';
-import { GameBootstrap } from '../database/bootstrap.js';
+import { GameBootstrap } from '../database/game-bootstrap.js';
 import { ConnectionManager } from '../connection/connection-manager.js';
 import { ConnectionContext } from './connection-context.js';
 import type { Connection } from '../connection/connection.js';
