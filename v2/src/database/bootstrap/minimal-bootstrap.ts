@@ -112,7 +112,7 @@ export class MinimalBootstrap {
             if (authInfo === null) {
               // Mode 1: Interactive authentication
               context.setHandler(authManager);
-              await authManager.call('onConnect', context);
+              await authManager.onConnect(context);
             } else {
               // Mode 2: Pre-authenticated (SSL cert, HTTP auth, etc.)
               const preAuth = await $.preAuthHandler;
@@ -123,7 +123,7 @@ export class MinimalBootstrap {
               }
 
               context.setHandler(preAuth);
-              await preAuth.call('onPreAuth', context, authInfo);
+              await preAuth.onPreAuth(context, authInfo);
             }
           `,
         },

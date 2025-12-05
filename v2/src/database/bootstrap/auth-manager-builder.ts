@@ -90,7 +90,7 @@ export class AuthManagerBuilder {
             }
 
             // Verify password
-            const valid = await player.call('checkPassword', password);
+            const valid = await player.checkPassword(password);
 
             if (!valid) {
               context.send('Invalid password\\\\r\\\\n');
@@ -101,7 +101,7 @@ export class AuthManagerBuilder {
 
             // Authenticate and connect
             context.authenticate(player.id);
-            await player.call('connect', context);
+            await player.connect(context);
 
           } else if (state.stage === 'new-password') {
             // Create new user
@@ -116,7 +116,7 @@ export class AuthManagerBuilder {
             // Hand off to CharGen
             const chargen = (await $).charGen;
             if (chargen) {
-              await chargen.call('onNewUser', context, state.username, password);
+              await chargen.onNewUser(context, state.username, password);
             }
           }
         `,

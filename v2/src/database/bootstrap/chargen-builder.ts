@@ -64,7 +64,7 @@ export class CharGenBuilder {
 
           // Create Player object through recycler (inherits from Player prototype)
           // Pass null as caller since player is not yet authenticated
-          const player = await recycler.call('create', {
+          const player = await recycler.create({
             parent: playerPrototypeId,
             properties: {
               // Describable
@@ -115,7 +115,7 @@ export class CharGenBuilder {
           context.authenticate(player.id);
 
           // Call player's connect method
-          await player.call('connect', context);
+          await player.connect(context);
         `,
       },
     });

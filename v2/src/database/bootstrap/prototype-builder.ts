@@ -169,7 +169,7 @@ export class PrototypeBuilder {
           if (self.location && self.location !== 0) {
             const location = await $.load(self.location);
             if (location) {
-              const desc = await location.call('describe');
+              const desc = await location.describe();
               context.send(\`\\r\\n\${desc}\\r\\n\`);
             }
           }

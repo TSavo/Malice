@@ -120,7 +120,7 @@ export class PreAuthHandlerBuilder {
 
           // Authenticate and connect
           context.authenticate(player.id);
-          await player.call('connect', context);
+          await player.connect(context);
         `,
 
         handleHTTPBasic: `
@@ -158,7 +158,7 @@ export class PreAuthHandlerBuilder {
           }
 
           // Verify password using Player's checkPassword method
-          const valid = await player.call('checkPassword', basic.password);
+          const valid = await player.checkPassword(basic.password);
 
           if (!valid) {
             context.send('Invalid username or password\\\\r\\\\n');
@@ -168,7 +168,7 @@ export class PreAuthHandlerBuilder {
 
           // Authenticate and connect
           context.authenticate(player.id);
-          await player.call('connect', context);
+          await player.connect(context);
         `,
 
         handleOAuth: `

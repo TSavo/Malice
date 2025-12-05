@@ -81,7 +81,7 @@ export class RecyclerBuilder {
 
           // Call onCreate hook if it exists
           if (newObject.hasMethod && newObject.hasMethod('onCreate')) {
-            await newObject.call('onCreate', caller);
+            await newObject.onCreate(caller);
           }
 
           // Log creation
@@ -108,7 +108,7 @@ export class RecyclerBuilder {
 
           // Notify object it's being deleted
           if (obj.hasMethod && obj.hasMethod('beforeRecycle')) {
-            await obj.call('beforeRecycle');
+            await obj.beforeRecycle();
           }
 
           // Clear all aliases pointing to this object
