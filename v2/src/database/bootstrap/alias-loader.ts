@@ -3,12 +3,16 @@ import { ObjectManager } from '../object-manager.js';
 /**
  * Loads aliases from MongoDB root object
  * Registers them in the ObjectManager at startup
+ *
+ * ALL aliases are stored in root.properties.aliases
+ * NO hardcoded aliases in TypeScript - everything is property-driven
  */
 export class AliasLoader {
   constructor(private manager: ObjectManager) {}
 
   /**
    * Load and register all aliases from root.properties.aliases
+   * This is the ONLY way aliases are registered - from MongoDB
    */
   async loadAliases(): Promise<void> {
     const root = await this.manager.load(1);
@@ -17,7 +21,7 @@ export class AliasLoader {
       return;
     }
 
-    const aliases = root.get('aliases') || {};
+    const aliases = root.get('aliases') as Record<string, number> || {};
     const aliasCount = Object.keys(aliases).length;
 
     if (aliasCount === 0) {
@@ -31,7 +35,7 @@ export class AliasLoader {
       try {
         const obj = await this.manager.load(id as number);
         if (obj) {
-          await this.manager.registerAliasById(name, id as number);
+          this.manager.registerAlias(name, obj);
           registered++;
         } else {
           console.log(`⚠️  Alias '${name}' points to non-existent object #${id}`);
@@ -42,25 +46,5 @@ export class AliasLoader {
     }
 
     console.log(`✅ Registered ${registered}/${aliasCount} aliases from MongoDB`);
-  }
-
-  /**
-   * Register core system aliases (minimal set)
-   */
-  async registerCoreAliases(): Promise<void> {
-    // Always register these core aliases, even if not in root.aliases yet
-    const coreAliases: Record<string, number> = {
-      system: 2,
-      programmer: 3,
-    };
-
-    for (const [name, id] of Object.entries(coreAliases)) {
-      const obj = await this.manager.load(id);
-      if (obj) {
-        await this.manager.registerAliasById(name, id);
-      }
-    }
-
-    console.log('✅ Registered core system aliases');
   }
 }

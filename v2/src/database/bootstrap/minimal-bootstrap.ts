@@ -20,8 +20,29 @@ export class MinimalBootstrap {
     await this.ensureRoot();
     await this.ensureSystem();
     await this.ensureProgrammer();
+    await this.registerCoreAliases();
 
     console.log('✅ Minimal bootstrap complete');
+  }
+
+  /**
+   * Register core aliases in root.properties.aliases
+   * These are the ONLY aliases TypeScript needs to know about
+   */
+  private async registerCoreAliases(): Promise<void> {
+    const root = await this.manager.load(1);
+    if (!root) return;
+
+    const aliases = (root.get('aliases') as Record<string, number>) || {};
+
+    // Only register if not already present
+    if (!aliases.system) aliases.system = 2;
+    if (!aliases.programmer) aliases.programmer = 3;
+
+    root.set('aliases', aliases);
+    await root.save();
+
+    console.log('✅ Registered core aliases in root.properties.aliases');
   }
 
   /**

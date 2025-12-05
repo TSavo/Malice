@@ -28,9 +28,10 @@ export class GameBootstrap {
     await minimalBootstrap.bootstrap();
 
     // Phase 2: Load aliases from MongoDB
+    // ALL aliases are loaded from root.properties.aliases
+    // No hardcoded aliases in TypeScript!
     const aliasLoader = new AliasLoader(this.manager);
-    await aliasLoader.registerCoreAliases();  // system, programmer
-    await aliasLoader.loadAliases();           // everything else from root.aliases
+    await aliasLoader.loadAliases();
 
     // Phase 3: Check if world is built
     await this.checkWorldStatus();
