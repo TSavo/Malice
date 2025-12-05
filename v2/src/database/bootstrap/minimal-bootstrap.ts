@@ -87,49 +87,48 @@ export class MinimalBootstrap {
           name: 'System',
           description: 'Connection router and system coordinator',
         },
-        methods: {
-          // Called when a new connection arrives
-          onConnection: {
-            code: `
-            const context = args[0];
-            const authInfo = context.getAuthInfo();
-
-            // Check if world is built
-            const authManager = await $.authManager;
-            if (!authManager) {
-              context.send('\\r\\n');
-              context.send('═══════════════════════════════════════════════════════════\\r\\n');
-              context.send('  MALICE - System Not Initialized\\r\\n');
-              context.send('═══════════════════════════════════════════════════════════\\r\\n');
-              context.send('\\r\\n');
-              context.send('The game world has not been built yet.\\r\\n');
-              context.send('This should not happen - world builds automatically on startup.\\r\\n');
-              context.send('Please restart the server.\\r\\n');
-              context.send('\\r\\n');
-              context.close();
-              return;
-            }
-
-            if (authInfo === null) {
-              // Mode 1: Interactive authentication
-              context.setHandler(authManager);
-              await authManager.onConnect(context);
-            } else {
-              // Mode 2: Pre-authenticated (SSL cert, HTTP auth, etc.)
-              const preAuth = await $.preAuthHandler;
-              if (!preAuth) {
-                context.send('Pre-authentication not available.\\r\\n');
-                context.close();
-                return;
-              }
-
-              context.setHandler(preAuth);
-              await preAuth.onPreAuth(context, authInfo);
-            }
-          `,
-          },
-        },
+        methods: {},
       });
+
+      // Called when a new connection arrives
+      system.setMethod('onConnection', `
+        const context = args[0];
+        const authInfo = context.getAuthInfo();
+
+        // Check if world is built
+        const authManager = await $.authManager;
+        if (!authManager) {
+          context.send('\\r\\n');
+          context.send('═══════════════════════════════════════════════════════════\\r\\n');
+          context.send('  MALICE - System Not Initialized\\r\\n');
+          context.send('═══════════════════════════════════════════════════════════\\r\\n');
+          context.send('\\r\\n');
+          context.send('The game world has not been built yet.\\r\\n');
+          context.send('This should not happen - world builds automatically on startup.\\r\\n');
+          context.send('Please restart the server.\\r\\n');
+          context.send('\\r\\n');
+          context.close();
+          return;
+        }
+
+        if (authInfo === null) {
+          // Mode 1: Interactive authentication
+          context.setHandler(authManager);
+          await authManager.onConnect(context);
+        } else {
+          // Mode 2: Pre-authenticated (SSL cert, HTTP auth, etc.)
+          const preAuth = await $.preAuthHandler;
+          if (!preAuth) {
+            context.send('Pre-authentication not available.\\r\\n');
+            context.close();
+            return;
+          }
+
+          context.setHandler(preAuth);
+          await preAuth.onPreAuth(context, authInfo);
+        }
+      `);
+      await system.save();
       console.log(`✅ Created System object #${system.id}`);
     }
   }

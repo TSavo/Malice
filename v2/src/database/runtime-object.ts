@@ -99,9 +99,9 @@ export class RuntimeObjectImpl implements RuntimeObject {
   }
 
   /**
-   * Add or update a method on this object
+   * Set a method on this object
    */
-  addMethod(name: string, code: string, options?: { callable?: boolean; aliases?: string[]; help?: string }): void {
+  setMethod(name: string, code: string, options?: { callable?: boolean; aliases?: string[]; help?: string }): void {
     if (!this.obj.methods) {
       this.obj.methods = {};
     }
@@ -138,8 +138,7 @@ export class RuntimeObjectImpl implements RuntimeObject {
     // Check this object first
     if (method in this.obj.methods) {
       const methodDef = this.obj.methods[method];
-      // Extract code from Method object or return string directly (for backwards compatibility)
-      return typeof methodDef === 'string' ? methodDef : methodDef.code;
+      return methodDef.code;
     }
 
     // Walk up parent chain
