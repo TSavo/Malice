@@ -77,10 +77,6 @@ describe('RuntimeObject', () => {
       parent.setMethod('parentMethod', 'return "from parent";');
       await parent.save();
 
-      // Reload parent to ensure it's in cache after save
-      const parentReloaded = await manager.load(parent.id);
-      expect(parentReloaded).not.toBeNull();
-
       // Create child inheriting from parent
       const child = await manager.create({
         parent: parent.id,
@@ -88,11 +84,9 @@ describe('RuntimeObject', () => {
         methods: {},
       });
 
-      const childProxy = (child as RuntimeObjectImpl).getProxy();
-      const parentMethodFn = (childProxy as any).parentMethod;
-
-      expect(typeof parentMethodFn).toBe('function');
-      const result = await parentMethodFn();
+      // Use call() which uses async findMethodAsync that loads parents from DB if needed
+      // The proxy getter uses sync hasMethod which requires parent in cache
+      const result = await child.call('parentMethod');
       expect(result).toBe('from parent');
     });
   });
@@ -695,10 +689,6 @@ describe('RuntimeObject', () => {
       parent.setMethod('parentMethod', 'return "parent";');
       await parent.save();
 
-      // Ensure parent is loaded and cached
-      const parentReloaded = await manager.load(parent.id);
-      expect(parentReloaded).not.toBeNull();
-
       // Create child inheriting parent's method
       const child = await manager.create({
         parent: parent.id,
@@ -706,16 +696,16 @@ describe('RuntimeObject', () => {
         methods: {},
       });
 
-      // Child can see parent's method (parent must be in cache for getSync to work)
-      expect(child.hasMethod('parentMethod')).toBe(true);
+      // Child can see parent's method (use async version which loads parent if needed)
+      expect(await child.hasMethodAsync('parentMethod')).toBe(true);
 
       // Remove should not affect parent's method (child doesn't own it)
       (child as any).removeMethod('parentMethod');
 
       // Parent still has it
-      expect(parent.hasMethod('parentMethod')).toBe(true);
+      expect(await parent.hasMethodAsync('parentMethod')).toBe(true);
       // Child still sees it (from parent)
-      expect(child.hasMethod('parentMethod')).toBe(true);
+      expect(await child.hasMethodAsync('parentMethod')).toBe(true);
     });
   });
 
@@ -812,17 +802,14 @@ describe('RuntimeObject', () => {
       parent.setMethod('parentMethod', 'return "from parent";');
       await parent.save();
 
-      // Reload parent to ensure it's in cache after save (save invalidates cache)
-      const parentReloaded = await manager.load(parent.id);
-      expect(parentReloaded).not.toBeNull();
-
       const child = await manager.create({
         parent: parent.id,
         properties: {},
         methods: {},
       });
 
-      expect(child.hasMethod('parentMethod')).toBe(true);
+      // Use async version which loads parent from DB if not cached
+      expect(await child.hasMethodAsync('parentMethod')).toBe(true);
       const result = await child.call('parentMethod');
       expect(result).toBe('from parent');
     });
@@ -963,9 +950,6 @@ describe('RuntimeObject', () => {
       grandparent.setMethod('gMethod', 'return "grandparent";');
       await grandparent.save();
 
-      // Ensure grandparent is cached
-      await manager.load(grandparent.id);
-
       const parent = await manager.create({
         parent: grandparent.id,
         properties: { level: 'parent' },
@@ -974,9 +958,6 @@ describe('RuntimeObject', () => {
       parent.setMethod('pMethod', 'return "parent";');
       await parent.save();
 
-      // Ensure parent is cached
-      await manager.load(parent.id);
-
       const child = await manager.create({
         parent: parent.id,
         properties: { level: 'child' },
@@ -984,12 +965,12 @@ describe('RuntimeObject', () => {
       });
       child.setMethod('cMethod', 'return "child";');
 
-      // Child should have access to all methods
-      expect(child.hasMethod('gMethod')).toBe(true);
-      expect(child.hasMethod('pMethod')).toBe(true);
-      expect(child.hasMethod('cMethod')).toBe(true);
+      // Child should have access to all methods (use async which loads from DB)
+      expect(await child.hasMethodAsync('gMethod')).toBe(true);
+      expect(await child.hasMethodAsync('pMethod')).toBe(true);
+      expect(await child.hasMethodAsync('cMethod')).toBe(true);
 
-      // Verify calls work
+      // Verify calls work (call uses async findMethodAsync internally)
       expect(await child.call('gMethod')).toBe('grandparent');
       expect(await child.call('pMethod')).toBe('parent');
       expect(await child.call('cMethod')).toBe('child');

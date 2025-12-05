@@ -111,6 +111,9 @@ export interface RuntimeObject {
 
   /** Save changes to database */
   save(): Promise<void>;
+
+  /** Get the raw GameObject (for internal use) */
+  _getRaw(): GameObject;
 }
 
 /**
