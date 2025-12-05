@@ -48,7 +48,14 @@ export class ConnectionManager {
    */
   addTransport(transport: ITransport, authInfo: AuthInfo | null = null): Connection {
     const connection = new Connection(transport, authInfo);
+    return this.add(connection);
+  }
 
+  /**
+   * Add an existing Connection to the manager
+   * Used when transport layer already created the Connection
+   */
+  add(connection: Connection): Connection {
     // Add to pool
     const current = this.connectionsSubject.value;
     this.connectionsSubject.next([...current, connection]);
@@ -57,7 +64,7 @@ export class ConnectionManager {
     this.connected$.next(connection);
 
     // Remove on close
-    transport.closed$.subscribe(() => {
+    connection.transport.closed$.subscribe(() => {
       this.removeConnection(connection);
     });
 

@@ -11,8 +11,13 @@ import type {
 /**
  * Object manager - coordinates ObjectDatabase and RuntimeObjects
  * Provides caching and high-level object operations
- * Exposes core objects via convenient properties ($.system, $.charGen, etc.)
- * Supports dynamic aliases: $.myAlias = object
+ *
+ * Dynamic Alias System:
+ * - Core objects ($.system, $.authManager, etc.) are registered during bootstrap
+ * - Custom aliases can be set: $.myAlias = object
+ * - All aliases are loaded from MongoDB, not hardcoded in TypeScript
+ * - Aliases can be configured via MOO code for maximum flexibility
+ *
  * Watches MongoDB change streams for multi-server cache invalidation
  */
 export class ObjectManager {
@@ -62,26 +67,6 @@ export class ObjectManager {
     }) as any;
   }
 
-  /**
-   * Get System object (#2)
-   */
-  get system(): Promise<RuntimeObject | null> {
-    return this.load(2);
-  }
-
-  /**
-   * Get AuthManager object (#3)
-   */
-  get authManager(): Promise<RuntimeObject | null> {
-    return this.load(3);
-  }
-
-  /**
-   * Get CharGen object (#4)
-   */
-  get charGen(): Promise<RuntimeObject | null> {
-    return this.load(4);
-  }
 
   /**
    * Load object from database (with caching)
@@ -203,6 +188,18 @@ export class ObjectManager {
    */
   async preload(ids: ObjId[]): Promise<void> {
     await Promise.all(ids.map((id) => this.load(id)));
+  }
+
+  /**
+   * Register an alias for an object by ID
+   * Loads the object and registers it with the given alias name
+   * Used during bootstrap to set up core system aliases ($.system, $.authManager, etc.)
+   */
+  async registerAliasById(name: string, id: ObjId): Promise<void> {
+    const obj = await this.load(id);
+    if (obj) {
+      this.aliases.set(name, obj);
+    }
   }
 
   /**

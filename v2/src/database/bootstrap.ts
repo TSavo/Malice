@@ -16,6 +16,31 @@ export class GameBootstrap {
     await this.ensureAuthManager();
     await this.ensureCharGen();
     await this.ensurePreAuthHandler();
+    await this.ensureDescribable();
+    await this.ensureAgent();
+    await this.ensureHuman();
+    await this.ensurePlayer();
+
+    // Register core aliases dynamically
+    await this.registerCoreAliases();
+  }
+
+  /**
+   * Register core system aliases
+   * These are loaded from MongoDB object IDs and made available as $.alias
+   * In the future, this mapping could be stored in MongoDB itself
+   */
+  private async registerCoreAliases(): Promise<void> {
+    await this.manager.registerAliasById('system', 2);
+    await this.manager.registerAliasById('authManager', 3);
+    await this.manager.registerAliasById('charGen', 4);
+    await this.manager.registerAliasById('preAuthHandler', 5);
+    await this.manager.registerAliasById('describable', 10);
+    await this.manager.registerAliasById('agent', 11);
+    await this.manager.registerAliasById('human', 12);
+    await this.manager.registerAliasById('player', 13);
+
+    console.log('✅ Registered core system aliases');
   }
 
   /**
@@ -121,6 +146,9 @@ export class GameBootstrap {
             const context = args[0]; // ConnectionContext passed in
             const welcome = self.welcomeMessage;
             context.send(welcome);
+
+            // Set state to collect username
+            self._state = { stage: 'username', context: context };
           `,
 
           // Called when user sends input
@@ -128,19 +156,75 @@ export class GameBootstrap {
             const context = args[0]; // ConnectionContext
             const input = args[1];   // User input
 
-            const username = input.trim();
+            const state = self._state || { stage: 'username' };
 
-            if (!username) {
-              context.send('Please enter a username: ');
-              return;
-            }
+            if (state.stage === 'username') {
+              const username = input.trim();
 
-            // For now, just create new user via CharGen
-            context.send(\`Creating new character for \${username}...\\r\\n\`);
+              if (!username) {
+                context.send('Please enter a username: ');
+                return;
+              }
 
-            const chargen = await $.charGen;
-            if (chargen) {
-              await chargen.call('onNewUser', context, username);
+              // Check if user exists
+              const users = await context.$.db.listAll();
+              const existingUser = users.find(u =>
+                u.parent === 13 && // Is a Player object
+                u.properties.playername === username.toLowerCase()
+              );
+
+              if (existingUser) {
+                // Existing user - ask for password
+                self._state = { stage: 'password', username: username, userId: existingUser._id };
+                context.send('Password: ');
+              } else {
+                // New user - ask for password to create account
+                self._state = { stage: 'new-password', username: username };
+                context.send('New user! Choose a password: ');
+              }
+            } else if (state.stage === 'password') {
+              // Login existing user
+              const password = input.trim();
+
+              // Load user as RuntimeObject
+              const player = await context.$.load(state.userId);
+
+              // Check if suspended
+              if (player.get('isSuspended')) {
+                context.send('Your account has been suspended\\r\\n');
+                context.close();
+                return;
+              }
+
+              // Verify password
+              const valid = await player.call('checkPassword', password);
+
+              if (!valid) {
+                context.send('Invalid password\\r\\n');
+                context.send('Login: ');
+                self._state = { stage: 'username' };
+                return;
+              }
+
+              // Authenticate and connect
+              context.authenticate(player.id);
+              await player.call('connect', context);
+
+            } else if (state.stage === 'new-password') {
+              // Create new user
+              const password = input.trim();
+
+              if (password.length < 6) {
+                context.send('Password must be at least 6 characters\\r\\n');
+                context.send('Choose a password: ');
+                return;
+              }
+
+              // Hand off to CharGen
+              const chargen = await $.charGen;
+              if (chargen) {
+                await chargen.call('onNewUser', context, state.username, password);
+              }
             }
           `,
         },
@@ -166,29 +250,58 @@ export class GameBootstrap {
           onNewUser: `
             const context = args[0]; // ConnectionContext
             const username = args[1];
+            const password = args[2];
 
             context.send('=== Character Creation ===\\r\\n');
             context.send(\`Username: \${username}\\r\\n\`);
             context.send('\\r\\nCreating your character...\\r\\n');
 
-            // Create user object (inherits from root for now)
-            const user = await context.$.create({
-              parent: 1, // Inherit from root
+            // Hash password
+            const bcrypt = require('bcrypt');
+            const passwordHash = await bcrypt.hash(password, 10);
+
+            // Create Player object (inherits from Player prototype #13)
+            const player = await context.$.create({
+              parent: 13, // Inherit from Player prototype
               properties: {
-                username: username,
+                // Describable
                 name: username,
-                hp: 100,
-                maxHp: 100,
-                location: 0, // No location yet
+                description: 'A new adventurer',
+                aliases: [username.toLowerCase()],
+
+                // Agent
+                location: 0, // TODO: Set to starting room
+                inventory: [],
+
+                // Human
+                sex: 'non-binary',
+                pronouns: {
+                  subject: 'they',
+                  object: 'them',
+                  possessive: 'their',
+                },
+                age: 25,
+                species: 'human',
+
+                // Player
+                playername: username.toLowerCase(),
+                email: '',
+                passwordHash: passwordHash,
+                canUseDevTools: false,
+                isWizard: false,
+                isSuspended: false,
+                createdAt: new Date(),
+                lastLogin: new Date(),
+                totalPlaytime: 0,
+                title: 'the Newbie',
               },
             });
 
-            context.send(\`Character created! You are #\${user.id}\\r\\n\`);
-            context.authenticate(user.id);
+            context.send(\`Character created! You are #\${player.id}\\r\\n\`);
+            context.authenticate(player.id);
 
-            // TODO: Hand off to game state manager
-            context.send('Welcome to the game!\\r\\n');
-            context.send('Type commands here...\\r\\n');
+            // Call player's connect method
+            await player.call('connect', context);
           `,
         },
       });
@@ -261,35 +374,42 @@ export class GameBootstrap {
             context.send(\`Certificate CN: \${cert.commonName}\\r\\n\`);
             context.send(\`Fingerprint: \${cert.fingerprint}\\r\\n\`);
 
-            // Find user by SSL fingerprint or email
+            // Find Player by SSL fingerprint or email
             const users = await context.$.db.listAll();
-            const user = users.find(u =>
-              u.properties.sslFingerprint === cert.fingerprint ||
-              u.properties.email === cert.commonName
+            const playerDoc = users.find(u =>
+              u.parent === 13 && // Is a Player object
+              (u.properties.sslFingerprint === cert.fingerprint ||
+               u.properties.email === cert.commonName)
             );
 
-            if (!user) {
-              context.send(\`No user found for certificate: \${cert.commonName}\\r\\n\`);
+            if (!playerDoc) {
+              context.send(\`No player found for certificate: \${cert.commonName}\\r\\n\`);
               context.send('Contact an administrator to register your certificate.\\r\\n');
               context.close();
               return;
             }
 
-            // Check if user object has DevTools permission
-            const canUseDevTools = user.properties.canUseDevTools === true;
+            // Load as RuntimeObject
+            const player = await context.$.load(playerDoc._id);
+
+            // Check if suspended
+            if (player.get('isSuspended')) {
+              context.send('Your account has been suspended\\r\\n');
+              context.close();
+              return;
+            }
+
+            // Check if user has DevTools permission
+            const canUseDevTools = player.get('canUseDevTools') === true;
             if (!canUseDevTools) {
               context.send('Your account does not have DevTools access.\\r\\n');
               context.close();
               return;
             }
 
-            // Authenticate and welcome
-            context.authenticate(user._id);
-            context.send(\`Welcome back, \${user.properties.name}!\\r\\n\`);
-            context.send('SSL authentication successful.\\r\\n');
-
-            // TODO: Hand off to appropriate handler (game, devtools, etc.)
-            context.send('You are now authenticated. Type commands...\\r\\n');
+            // Authenticate and connect
+            context.authenticate(player.id);
+            await player.call('connect', context);
           `,
 
           // Handle HTTP Basic Authentication
@@ -299,36 +419,41 @@ export class GameBootstrap {
 
             context.send(\`Authenticating user: \${basic.username}\\r\\n\`);
 
-            // Find user by username
+            // Find Player by playername
             const users = await context.$.db.listAll();
-            const user = users.find(u =>
-              u.properties.username === basic.username
+            const userDoc = users.find(u =>
+              u.parent === 13 && // Is a Player object
+              u.properties.playername === basic.username.toLowerCase()
             );
 
-            if (!user) {
+            if (!userDoc) {
               context.send('Invalid username or password\\r\\n');
               context.close();
               return;
             }
 
-            // TODO: Verify password hash (need bcrypt or similar)
-            // For now, just check if passwordHash property exists
-            if (!user.properties.passwordHash) {
-              context.send('Account not configured for password authentication\\r\\n');
+            // Load as RuntimeObject to use methods
+            const player = await context.$.load(userDoc._id);
+
+            // Check if suspended
+            if (player.get('isSuspended')) {
+              context.send('Your account has been suspended\\r\\n');
               context.close();
               return;
             }
 
-            // TODO: Actual password verification
-            // const bcrypt = require('bcrypt');
-            // const valid = await bcrypt.compare(basic.password, user.properties.passwordHash);
+            // Verify password using Player's checkPassword method
+            const valid = await player.call('checkPassword', basic.password);
 
-            // Authenticate
-            context.authenticate(user._id);
-            context.send(\`Welcome back, \${user.properties.name}!\\r\\n\`);
+            if (!valid) {
+              context.send('Invalid username or password\\r\\n');
+              context.close();
+              return;
+            }
 
-            // TODO: Hand off to appropriate handler
-            context.send('You are now authenticated. Type commands...\\r\\n');
+            // Authenticate and connect
+            context.authenticate(player.id);
+            await player.call('connect', context);
           `,
 
           // Handle OAuth / JWT
@@ -361,6 +486,197 @@ export class GameBootstrap {
         },
       });
       console.log('✅ Created PreAuthHandler object #5');
+    }
+  }
+
+  /**
+   * Ensure Describable object #10 exists
+   * Base for all things that can be described (rooms, objects, NPCs, players)
+   */
+  private async ensureDescribable(): Promise<void> {
+    let describable = await this.manager.load(10);
+    if (!describable) {
+      describable = await this.manager.create({
+        parent: 1,
+        properties: {
+          name: 'Describable',
+          description: 'Base prototype for things that can be described',
+          aliases: [],
+        },
+        methods: {
+          // Return full description
+          describe: `
+            return \`\${self.name}\\r\\n\${self.description}\`;
+          `,
+
+          // Return short description (just name)
+          shortDesc: `
+            return self.name;
+          `,
+        },
+      });
+      console.log('✅ Created Describable object #10');
+    }
+  }
+
+  /**
+   * Ensure Agent object #11 exists
+   * Base for things that can act (NPCs, players)
+   */
+  private async ensureAgent(): Promise<void> {
+    let agent = await this.manager.load(11);
+    if (!agent) {
+      agent = await this.manager.create({
+        parent: 10, // Inherits from Describable
+        properties: {
+          name: 'Agent',
+          description: 'Base prototype for things that can act',
+          location: 0,
+          inventory: [],
+        },
+        methods: {
+          // Move to a new location
+          moveTo: `
+            const targetId = args[0];
+            // TODO: Notify old location
+            self.location = targetId;
+            // TODO: Notify new location
+          `,
+
+          // Say something in current location
+          say: `
+            const message = args[0];
+            // TODO: Broadcast to room
+            return \`\${self.name} says: \${message}\`;
+          `,
+
+          // Emote an action
+          emote: `
+            const action = args[0];
+            // TODO: Broadcast to room
+            return \`\${self.name} \${action}\`;
+          `,
+        },
+      });
+      console.log('✅ Created Agent object #11');
+    }
+  }
+
+  /**
+   * Ensure Human object #12 exists
+   * Base for human-like agents (players and human NPCs)
+   */
+  private async ensureHuman(): Promise<void> {
+    let human = await this.manager.load(12);
+    if (!human) {
+      human = await this.manager.create({
+        parent: 11, // Inherits from Agent
+        properties: {
+          name: 'Human',
+          description: 'Base prototype for human-like agents',
+          sex: 'non-binary',
+          pronouns: {
+            subject: 'they',
+            object: 'them',
+            possessive: 'their',
+          },
+          age: 25,
+          species: 'human',
+        },
+        methods: {
+          // Get pronoun of specified type
+          pronoun: `
+            const type = args[0]; // 'subject', 'object', 'possessive'
+            return self.pronouns[type] || 'they';
+          `,
+        },
+      });
+      console.log('✅ Created Human object #12');
+    }
+  }
+
+  /**
+   * Ensure Player object #13 exists
+   * Prototype for all player characters
+   */
+  private async ensurePlayer(): Promise<void> {
+    let player = await this.manager.load(13);
+    if (!player) {
+      player = await this.manager.create({
+        parent: 12, // Inherits from Human
+        properties: {
+          name: 'Player',
+          description: 'Base prototype for player characters',
+          playername: '',
+          email: '',
+          passwordHash: '',
+          sslFingerprint: '',
+          oauthSubject: '',
+
+          // Permissions
+          canUseDevTools: false,
+          isWizard: false,
+          isSuspended: false,
+
+          // Stats
+          createdAt: null,
+          lastLogin: null,
+          totalPlaytime: 0,
+
+          // Player-specific
+          title: '',
+          homepage: '',
+        },
+        methods: {
+          // Called when player connects
+          connect: `
+            const context = args[0];
+
+            context.send(\`\\r\\nWelcome back, \${self.name}!\\r\\n\`);
+            context.send(\`You are \${self.description}\\r\\n\`);
+
+            // Update last login
+            self.lastLogin = new Date();
+            await self.save();
+
+            // Show location if set
+            if (self.location && self.location !== 0) {
+              const location = await $.load(self.location);
+              if (location) {
+                const desc = await location.call('describe');
+                context.send(\`\\r\\n\${desc}\\r\\n\`);
+              }
+            }
+
+            // TODO: Notify others in room
+          `,
+
+          // Called when player disconnects
+          disconnect: `
+            // Save any unsaved state
+            await self.save();
+
+            // TODO: Notify room
+          `,
+
+          // Check if password matches
+          checkPassword: `
+            const password = args[0];
+            const bcrypt = require('bcrypt');
+            return await bcrypt.compare(password, self.passwordHash);
+          `,
+
+          // Set new password
+          setPassword: `
+            const password = args[0];
+            const bcrypt = require('bcrypt');
+            const hash = await bcrypt.hash(password, 10);
+            self.passwordHash = hash;
+            await self.save();
+          `,
+        },
+      });
+      console.log('✅ Created Player object #13');
     }
   }
 }

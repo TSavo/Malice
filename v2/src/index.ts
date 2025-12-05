@@ -57,11 +57,12 @@ async function main() {
     await game.handleConnection(connection);
   });
 
-  wsServer.connection$.subscribe(async (transport) => {
-    const connection = connectionManager.addTransport(transport);
-    console.log(`✅ New ${transport.type} connection: ${connection.id}`);
+  // WebSocket server now emits Connection objects (may have HTTP auth)
+  wsServer.connection$.subscribe(async (connection) => {
+    connectionManager.add(connection);
+    console.log(`✅ New ${connection.transport.type} connection: ${connection.id}`);
 
-    // Hand connection to game coordinator (will invoke AuthManager)
+    // Hand connection to game coordinator (will invoke System object)
     await game.handleConnection(connection);
   });
 
