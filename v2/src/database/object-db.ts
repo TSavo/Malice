@@ -192,23 +192,41 @@ export class ObjectDatabase {
 
     console.log('[ObjectDatabase] Watching for changes (multi-server cache sync enabled)');
 
-    this.changeStream = this.objects.watch([], {
-      fullDocument: 'updateLookup', // Include full document on updates
-    });
+    // Use setImmediate to avoid blocking the constructor
+    setImmediate(() => {
+      try {
+        this.changeStream = this.objects.watch([], {
+          fullDocument: 'updateLookup', // Include full document on updates
+        });
 
-    this.changeStream.on('change', (change) => {
-      callback(change);
-    });
+        this.changeStream.on('change', (change) => {
+          callback(change);
+        });
 
-    this.changeStream.on('error', (err) => {
-      console.error('[ObjectDatabase] Change stream error:', err);
-      // Attempt to reconnect
-      this.changeStream = undefined;
-      setTimeout(() => {
-        if (!this.changeStream) {
-          this.watch(callback);
-        }
-      }, 5000);
+        this.changeStream.on('error', (err) => {
+          console.error('[ObjectDatabase] Change stream error:', err);
+          // Attempt to reconnect
+          this.changeStream = undefined;
+          setTimeout(() => {
+            if (!this.changeStream) {
+              this.watch(callback);
+            }
+          }, 5000);
+        });
+
+        // Handle the 'close' event
+        this.changeStream.on('close', () => {
+          console.log('[ObjectDatabase] Change stream closed');
+        });
+      } catch (err) {
+        console.error('[ObjectDatabase] Failed to start change stream:', err);
+        // Retry after a delay
+        setTimeout(() => {
+          if (!this.changeStream) {
+            this.watch(callback);
+          }
+        }, 5000);
+      }
     });
   }
 
