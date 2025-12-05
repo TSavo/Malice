@@ -7,11 +7,11 @@ import { RecyclerBuilder } from './recycler-builder.js';
 /**
  * Orchestrates building all core system objects
  *
- * Creates:
- * - #4 AuthManager: Interactive login (username/password)
- * - #5 CharGen: Character creation
- * - #6 PreAuthHandler: Pre-authenticated connections (SSL, HTTP auth)
- * - #20 Recycler: Object deletion and cleanup
+ * Creates (with dynamic IDs):
+ * - AuthManager: Interactive login (username/password)
+ * - CharGen: Character creation
+ * - PreAuthHandler: Pre-authenticated connections (SSL, HTTP auth)
+ * - Recycler: Object deletion and cleanup
  */
 export class CoreSystemBuilder {
   constructor(private manager: ObjectManager) {}

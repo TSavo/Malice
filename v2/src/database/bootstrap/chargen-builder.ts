@@ -1,17 +1,29 @@
 import { ObjectManager } from '../object-manager.js';
+import type { RuntimeObject } from '../../types/object.js';
 
 /**
- * Builds CharGen object (#5)
+ * Builds CharGen object (dynamic ID)
  * Handles character creation
  */
 export class CharGenBuilder {
+  private charGen: RuntimeObject | null = null;
+
   constructor(private manager: ObjectManager) {}
 
   async build(): Promise<void> {
-    const existing = await this.manager.load(5);
-    if (existing) return;
+    // Check if already exists via alias
+    const objectManager = await this.manager.load(0);
+    if (!objectManager) throw new Error('Root object not found');
 
-    await this.manager.create({
+    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
+
+    if (aliases.charGen) {
+      this.charGen = await this.manager.load(aliases.charGen);
+      if (this.charGen) return; // Already exists
+    }
+
+    // Create new CharGen
+    this.charGen = await this.manager.create({
       parent: 1,
       properties: {
         name: 'CharGen',
@@ -31,9 +43,14 @@ export class CharGenBuilder {
           const bcrypt = require('bcrypt');
           const passwordHash = await bcrypt.hash(password, 10);
 
-          // Create Player object (inherits from Player prototype #13)
+          // Get Player prototype via alias
+          const root = await $.load(1);
+          const aliases = objectManager.get('aliases') || {};
+          const playerPrototypeId = aliases.player;
+
+          // Create Player object (inherits from Player prototype)
           const player = await context.$.create({
-            parent: 13, // Inherit from Player prototype
+            parent: playerPrototypeId,
             properties: {
               // Describable
               name: username,
@@ -79,12 +96,16 @@ export class CharGenBuilder {
   }
 
   async registerAlias(): Promise<void> {
-    const root = await this.manager.load(1);
-    if (!root) return;
+    if (!this.charGen) return;
 
-    const aliases = (root.get('aliases') as Record<string, number>) || {};
-    aliases.charGen = 5;
-    root.set('aliases', aliases);
-    await root.save();
+    const objectManager = await this.manager.load(0);
+    if (!objectManager) return;
+
+    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
+    aliases.charGen = this.charGen.id;
+    objectManager.set('aliases', aliases);
+    await objectManager.save();
+
+    console.log(`✅ Registered charGen alias -> #${this.charGen.id}`);
   }
 }

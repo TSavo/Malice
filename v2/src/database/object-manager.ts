@@ -70,8 +70,68 @@ export class ObjectManager {
 
   /**
    * Load object from database (with caching)
+   * Special cases:
+   * - load(-1) returns $.nothing - immutable null object reference
+   * - load(0) returns the ObjectManager itself as a RuntimeObject
    */
   async load(id: ObjId): Promise<RuntimeObject | null> {
+    // Special case: #-1 is the null object reference ($.nothing)
+    if (id === -1) {
+      // Check if we've already created it
+      if (this.cache.has(-1)) {
+        return this.cache.get(-1)!;
+      }
+
+      // Load or create #-1 in database
+      let obj = await this.db.get(-1);
+      if (!obj) {
+        // Create #-1 as immutable null object
+        obj = await this.db.create({
+          _id: -1,
+          parent: -1, // Self-parented
+          properties: {
+            name: 'nothing',
+            description: 'The null object reference - immutable, no properties or methods',
+          },
+          methods: {},
+        });
+      }
+
+      // Wrap as RuntimeObject
+      const runtime = new RuntimeObjectImpl(obj, this);
+      this.cache.set(-1, runtime);
+      return runtime;
+    }
+
+    // Special case: #0 is the ObjectManager itself
+    if (id === 0) {
+      // Check if we've already wrapped ourselves
+      if (this.cache.has(0)) {
+        return this.cache.get(0)!;
+      }
+
+      // Load or create #0 in database
+      let obj = await this.db.get(0);
+      if (!obj) {
+        // Create #0 on first access
+        obj = await this.db.create({
+          _id: 0,
+          parent: 0, // Self-parented
+          properties: {
+            name: 'ObjectManager',
+            description: 'The root system object - provides object management and global aliases',
+            aliases: {}, // Global alias registry
+          },
+          methods: {},
+        });
+      }
+
+      // Wrap ourselves as a RuntimeObject
+      const runtime = new RuntimeObjectImpl(obj, this);
+      this.cache.set(0, runtime);
+      return runtime;
+    }
+
     // Check cache first
     if (this.cache.has(id)) {
       return this.cache.get(id)!;

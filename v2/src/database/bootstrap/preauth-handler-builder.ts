@@ -1,17 +1,29 @@
 import { ObjectManager } from '../object-manager.js';
+import type { RuntimeObject } from '../../types/object.js';
 
 /**
- * Builds PreAuthHandler object (#6)
+ * Builds PreAuthHandler object (dynamic ID)
  * Handles pre-authenticated connections (SSL certs, HTTP Basic Auth, OAuth)
  */
 export class PreAuthHandlerBuilder {
+  private preAuthHandler: RuntimeObject | null = null;
+
   constructor(private manager: ObjectManager) {}
 
   async build(): Promise<void> {
-    const existing = await this.manager.load(6);
-    if (existing) return;
+    // Check if already exists via alias
+    const objectManager = await this.manager.load(0);
+    if (!objectManager) throw new Error('Root object not found');
 
-    await this.manager.create({
+    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
+
+    if (aliases.preAuthHandler) {
+      this.preAuthHandler = await this.manager.load(aliases.preAuthHandler);
+      if (this.preAuthHandler) return; // Already exists
+    }
+
+    // Create new PreAuthHandler
+    this.preAuthHandler = await this.manager.create({
       parent: 1,
       properties: {
         name: 'PreAuthHandler',
@@ -68,10 +80,15 @@ export class PreAuthHandlerBuilder {
           context.send(\`Certificate CN: \${cert.commonName}\\\\r\\\\n\`);
           context.send(\`Fingerprint: \${cert.fingerprint}\\\\r\\\\n\`);
 
+          // Get Player prototype via alias
+          const root = await $.load(1);
+          const aliases = objectManager.get('aliases') || {};
+          const playerPrototypeId = aliases.player;
+
           // Find Player by SSL fingerprint or email
           const users = await context.$.db.listAll();
           const playerDoc = users.find(u =>
-            u.parent === 13 && // Is a Player object
+            u.parent === playerPrototypeId &&
             (u.properties.sslFingerprint === cert.fingerprint ||
              u.properties.email === cert.commonName)
           );
@@ -112,10 +129,15 @@ export class PreAuthHandlerBuilder {
 
           context.send(\`Authenticating user: \${basic.username}\\\\r\\\\n\`);
 
+          // Get Player prototype via alias
+          const root = await $.load(1);
+          const aliases = objectManager.get('aliases') || {};
+          const playerPrototypeId = aliases.player;
+
           // Find Player by playername
           const users = await context.$.db.listAll();
           const userDoc = users.find(u =>
-            u.parent === 13 && // Is a Player object
+            u.parent === playerPrototypeId &&
             u.properties.playername === basic.username.toLowerCase()
           );
 
@@ -179,12 +201,16 @@ export class PreAuthHandlerBuilder {
   }
 
   async registerAlias(): Promise<void> {
-    const root = await this.manager.load(1);
-    if (!root) return;
+    if (!this.preAuthHandler) return;
 
-    const aliases = (root.get('aliases') as Record<string, number>) || {};
-    aliases.preAuthHandler = 6;
-    root.set('aliases', aliases);
-    await root.save();
+    const objectManager = await this.manager.load(0);
+    if (!objectManager) return;
+
+    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
+    aliases.preAuthHandler = this.preAuthHandler.id;
+    objectManager.set('aliases', aliases);
+    await objectManager.save();
+
+    console.log(`✅ Registered preAuthHandler alias -> #${this.preAuthHandler.id}`);
   }
 }

@@ -1,17 +1,29 @@
 import { ObjectManager } from '../object-manager.js';
+import type { RuntimeObject } from '../../types/object.js';
 
 /**
- * Builds AuthManager object (#4)
+ * Builds AuthManager object (dynamic ID)
  * Handles interactive login (username/password)
  */
 export class AuthManagerBuilder {
+  private authManager: RuntimeObject | null = null;
+
   constructor(private manager: ObjectManager) {}
 
   async build(): Promise<void> {
-    const existing = await this.manager.load(4);
-    if (existing) return;
+    // Check if already exists via alias
+    const objectManager = await this.manager.load(0);
+    if (!objectManager) throw new Error('Root object not found');
 
-    await this.manager.create({
+    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
+
+    if (aliases.authManager) {
+      this.authManager = await this.manager.load(aliases.authManager);
+      if (this.authManager) return; // Already exists
+    }
+
+    // Create new AuthManager
+    this.authManager = await this.manager.create({
       parent: 1,
       properties: {
         name: 'AuthManager',
@@ -42,10 +54,15 @@ export class AuthManagerBuilder {
               return;
             }
 
-            // Check if user exists
+            // Check if user exists via alias lookup
+            const objectManager = await $.load(0);
+            const aliases = objectManager.get('aliases') || {};
+            const playerPrototypeId = aliases.player;
+
+            // Find player with this username
             const users = await context.$.db.listAll();
             const existingUser = users.find(u =>
-              u.parent === 13 && // Is a Player object
+              u.parent === playerPrototypeId &&
               u.properties.playername === username.toLowerCase()
             );
 
@@ -97,7 +114,7 @@ export class AuthManagerBuilder {
             }
 
             // Hand off to CharGen
-            const chargen = await $.charGen;
+            const chargen = (await $).charGen;
             if (chargen) {
               await chargen.call('onNewUser', context, state.username, password);
             }
@@ -108,12 +125,16 @@ export class AuthManagerBuilder {
   }
 
   async registerAlias(): Promise<void> {
-    const root = await this.manager.load(1);
-    if (!root) return;
+    if (!this.authManager) return;
 
-    const aliases = (root.get('aliases') as Record<string, number>) || {};
-    aliases.authManager = 4;
-    root.set('aliases', aliases);
-    await root.save();
+    const objectManager = await this.manager.load(0);
+    if (!objectManager) return;
+
+    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
+    aliases.authManager = this.authManager.id;
+    objectManager.set('aliases', aliases);
+    await objectManager.save();
+
+    console.log(`✅ Registered authManager alias -> #${this.authManager.id}`);
   }
 }

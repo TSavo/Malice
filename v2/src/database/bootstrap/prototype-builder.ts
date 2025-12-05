@@ -1,35 +1,59 @@
 import { ObjectManager } from '../object-manager.js';
+import type { RuntimeObject } from '../../types/object.js';
 
 /**
  * Builds the object prototype hierarchy
  *
- * Creates:
- * - #10 Describable: name, description, aliases
- * - #11 Agent: location, inventory, moveTo/say/emote
- * - #12 Human: sex, pronouns, age
- * - #13 Player: auth fields, permissions, connect/checkPassword
+ * Creates prototypes with DYNAMIC IDs (no hardcoding):
+ * - Describable: name, description, aliases
+ * - Agent: location, inventory, moveTo/say/emote
+ * - Human: sex, pronouns, age
+ * - Player: auth fields, permissions, connect/checkPassword
+ *
+ * All IDs are dynamically assigned and registered as aliases in root.properties.aliases
  */
 export class PrototypeBuilder {
   constructor(private manager: ObjectManager) {}
 
   /**
    * Build all prototype objects
+   * Idempotent - checks for existing aliases before creating
    */
   async buildPrototypes(): Promise<void> {
-    await this.createDescribable();
-    await this.createAgent();
-    await this.createHuman();
-    await this.createPlayer();
+    // Check if prototypes already exist via aliases
+    const objectManager = await this.manager.load(0);
+    if (!objectManager) throw new Error('Root object not found - run minimal bootstrap first');
 
-    // Update root.aliases
-    await this.registerAliases();
+    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
+
+    // Create prototypes (or get existing ones)
+    const describable = aliases.describable
+      ? await this.manager.load(aliases.describable)
+      : await this.createDescribable();
+
+    const agent = aliases.agent
+      ? await this.manager.load(aliases.agent)
+      : await this.createAgent(describable!.id);
+
+    const human = aliases.human
+      ? await this.manager.load(aliases.human)
+      : await this.createHuman(agent!.id);
+
+    const player = aliases.player
+      ? await this.manager.load(aliases.player)
+      : await this.createPlayer(human!.id);
+
+    // Register aliases in root.properties.aliases
+    await this.registerAliases({
+      describable: describable!.id,
+      agent: agent!.id,
+      human: human!.id,
+      player: player!.id,
+    });
   }
 
-  private async createDescribable(): Promise<void> {
-    const existing = await this.manager.load(10);
-    if (existing) return;
-
-    await this.manager.create({
+  private async createDescribable(): Promise<RuntimeObject> {
+    return await this.manager.create({
       parent: 1,
       properties: {
         name: 'Describable',
@@ -47,12 +71,9 @@ export class PrototypeBuilder {
     });
   }
 
-  private async createAgent(): Promise<void> {
-    const existing = await this.manager.load(11);
-    if (existing) return;
-
-    await this.manager.create({
-      parent: 10, // Inherits from Describable
+  private async createAgent(describableId: number): Promise<RuntimeObject> {
+    return await this.manager.create({
+      parent: describableId,
       properties: {
         name: 'Agent',
         description: 'Base prototype for things that can act',
@@ -81,12 +102,9 @@ export class PrototypeBuilder {
     });
   }
 
-  private async createHuman(): Promise<void> {
-    const existing = await this.manager.load(12);
-    if (existing) return;
-
-    await this.manager.create({
-      parent: 11, // Inherits from Agent
+  private async createHuman(agentId: number): Promise<RuntimeObject> {
+    return await this.manager.create({
+      parent: agentId,
       properties: {
         name: 'Human',
         description: 'Base prototype for human-like agents',
@@ -108,12 +126,9 @@ export class PrototypeBuilder {
     });
   }
 
-  private async createPlayer(): Promise<void> {
-    const existing = await this.manager.load(13);
-    if (existing) return;
-
-    await this.manager.create({
-      parent: 12, // Inherits from Human
+  private async createPlayer(humanId: number): Promise<RuntimeObject> {
+    return await this.manager.create({
+      parent: humanId,
       properties: {
         name: 'Player',
         description: 'Base prototype for player characters',
@@ -186,17 +201,26 @@ export class PrototypeBuilder {
     });
   }
 
-  private async registerAliases(): Promise<void> {
-    const root = await this.manager.load(1);
-    if (!root) return;
+  private async registerAliases(ids: {
+    describable: number;
+    agent: number;
+    human: number;
+    player: number;
+  }): Promise<void> {
+    const objectManager = await this.manager.load(0);
+    if (!objectManager) return;
 
-    const aliases = (root.get('aliases') as Record<string, number>) || {};
-    aliases.describable = 10;
-    aliases.agent = 11;
-    aliases.human = 12;
-    aliases.player = 13;
+    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
+    aliases.describable = ids.describable;
+    aliases.agent = ids.agent;
+    aliases.human = ids.human;
+    aliases.player = ids.player;
 
-    root.set('aliases', aliases);
-    await root.save();
+    objectManager.set('aliases', aliases);
+    await objectManager.save();
+
+    console.log(
+      `✅ Registered prototype aliases: describable=#${ids.describable}, agent=#${ids.agent}, human=#${ids.human}, player=#${ids.player}`,
+    );
   }
 }

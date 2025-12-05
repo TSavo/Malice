@@ -4,11 +4,10 @@ import { ObjectManager } from '../object-manager.js';
  * Minimal Bootstrap - Creates only the absolute essentials
  *
  * Creates:
- * - #1 Root: Empty base object
- * - #2 System: Connection router
- * - #3 Programmer: Can build everything else via DevTools
+ * - #1 Root: Empty base object (always #1, parent of all objects)
+ * - #2 System: Connection router (registered as $.system)
  *
- * Everything else is created by Programmer.buildWorld() at runtime
+ * World is automatically built on first run (prototypes + core systems)
  */
 export class MinimalBootstrap {
   constructor(private manager: ObjectManager) {}
@@ -19,30 +18,30 @@ export class MinimalBootstrap {
   async bootstrap(): Promise<void> {
     await this.ensureRoot();
     await this.ensureSystem();
-    await this.ensureProgrammer();
     await this.registerCoreAliases();
 
     console.log('✅ Minimal bootstrap complete');
   }
 
   /**
-   * Register core aliases in root.properties.aliases
-   * These are the ONLY aliases TypeScript needs to know about
+   * Register core aliases in #0.properties.aliases (ObjectManager)
    */
   private async registerCoreAliases(): Promise<void> {
-    const root = await this.manager.load(1);
-    if (!root) return;
+    const objectManager = await this.manager.load(0);
+    if (!objectManager) return;
 
-    const aliases = (root.get('aliases') as Record<string, number>) || {};
+    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
 
-    // Only register if not already present
+    // Register core aliases
+    if (!aliases.nothing) aliases.nothing = -1;
+    if (!aliases.object_manager) aliases.object_manager = 0;
+    if (!aliases.root) aliases.root = 1;
     if (!aliases.system) aliases.system = 2;
-    if (!aliases.programmer) aliases.programmer = 3;
 
-    root.set('aliases', aliases);
-    await root.save();
+    objectManager.set('aliases', aliases);
+    await objectManager.save();
 
-    console.log('✅ Registered core aliases in root.properties.aliases');
+    console.log('✅ Registered core aliases in #0.properties.aliases');
   }
 
   /**
@@ -58,9 +57,6 @@ export class MinimalBootstrap {
           name: 'Root',
           description: 'Base of all objects',
 
-          // Alias mappings (populated by Programmer.buildWorld)
-          aliases: {},
-
           // System configuration
           config: {
             siteName: 'Malice',
@@ -75,11 +71,15 @@ export class MinimalBootstrap {
   }
 
   /**
-   * Ensure System object #2 exists
+   * Ensure System object exists
    * Routes new connections to appropriate handlers
    */
   private async ensureSystem(): Promise<void> {
-    let system = await this.manager.load(2);
+    // Check if System already exists via alias
+    const objectManager = await this.manager.load(0);
+    const aliases = (objectManager?.get('aliases') as Record<string, number>) || {};
+
+    let system = aliases.system ? await this.manager.load(aliases.system) : null;
     if (!system) {
       system = await this.manager.create({
         parent: 1,
@@ -102,9 +102,8 @@ export class MinimalBootstrap {
               context.send('═══════════════════════════════════════════════════════════\\r\\n');
               context.send('\\r\\n');
               context.send('The game world has not been built yet.\\r\\n');
-              context.send('\\r\\n');
-              context.send('Administrator: Connect via DevTools and run:\\r\\n');
-              context.send('  await $.programmer.call("buildWorld", context)\\r\\n');
+              context.send('This should not happen - world builds automatically on startup.\\r\\n');
+              context.send('Please restart the server.\\r\\n');
               context.send('\\r\\n');
               context.close();
               return;
@@ -129,156 +128,8 @@ export class MinimalBootstrap {
           `,
         },
       });
-      console.log('✅ Created System object #2');
+      console.log(`✅ Created System object #${system.id}`);
     }
   }
 
-  /**
-   * Ensure Programmer object #3 exists
-   * Provides tools to build the world and manage objects
-   */
-  private async ensureProgrammer(): Promise<void> {
-    let programmer = await this.manager.load(3);
-    if (!programmer) {
-      programmer = await this.manager.create({
-        parent: 1,
-        properties: {
-          name: 'Programmer',
-          description: 'World builder and object management tools',
-
-          // Security: Only accessible via DevTools with SSL cert
-          requiresDevTools: true,
-        },
-        methods: {
-          // Build the entire world from scratch
-          buildWorld: `
-            const context = args[0];
-
-            context.send('\\r\\n');
-            context.send('═══════════════════════════════════════════════════════════\\r\\n');
-            context.send('  MALICE - World Builder\\r\\n');
-            context.send('═══════════════════════════════════════════════════════════\\r\\n');
-            context.send('\\r\\n');
-            context.send('Building world from minimal bootstrap...\\r\\n');
-            context.send('\\r\\n');
-
-            try {
-              // Load builders
-              const { PrototypeBuilder } = await import('./bootstrap/prototype-builder.js');
-              const { CoreSystemBuilder } = await import('./bootstrap/core-system-builder.js');
-
-              const prototypeBuilder = new PrototypeBuilder($);
-              const coreSystemBuilder = new CoreSystemBuilder($);
-
-              // Build prototypes
-              context.send('Creating object prototypes...\\r\\n');
-              await prototypeBuilder.buildPrototypes();
-              context.send('  ✅ Created Describable, Agent, Human, Player\\r\\n');
-
-              // Build core systems
-              context.send('Creating core systems...\\r\\n');
-              await coreSystemBuilder.buildCoreSystems();
-              context.send('  ✅ Created AuthManager, CharGen, PreAuthHandler\\r\\n');
-
-              // Register aliases
-              context.send('Registering system aliases...\\r\\n');
-              const root = await $.load(1);
-              const aliases = root.get('aliases') || {};
-
-              for (const [name, id] of Object.entries(aliases)) {
-                await $.registerAliasById(name, id);
-              }
-              context.send('  ✅ Registered aliases\\r\\n');
-
-              context.send('\\r\\n');
-              context.send('═══════════════════════════════════════════════════════════\\r\\n');
-              context.send('  World built successfully!\\r\\n');
-              context.send('═══════════════════════════════════════════════════════════\\r\\n');
-              context.send('\\r\\n');
-              context.send('Users can now connect via telnet or websocket.\\r\\n');
-              context.send('\\r\\n');
-
-            } catch (err) {
-              context.send(\`\\r\\n❌ Error building world: \${err.message}\\r\\n\`);
-              console.error('World build error:', err);
-              throw err;
-            }
-          `,
-
-          // Create a new object
-          create: `
-            const spec = args[0];
-            const obj = await $.create(spec);
-            return obj;
-          `,
-
-          // Edit an object's properties
-          setProperty: `
-            const objectId = args[0];
-            const key = args[1];
-            const value = args[2];
-
-            const obj = await $.load(objectId);
-            if (!obj) throw new Error('Object not found');
-
-            obj.set(key, value);
-            await obj.save();
-
-            return obj;
-          `,
-
-          // Edit an object's method
-          setMethod: `
-            const objectId = args[0];
-            const methodName = args[1];
-            const methodCode = args[2];
-
-            const obj = await $.load(objectId);
-            if (!obj) throw new Error('Object not found');
-
-            obj.setMethod(methodName, methodCode);
-            await obj.save();
-
-            return obj;
-          `,
-
-          // Register an alias
-          registerAlias: `
-            const name = args[0];
-            const objectId = args[1];
-
-            // Register in runtime
-            await $.registerAliasById(name, objectId);
-
-            // Persist in root.aliases
-            const root = await $.load(1);
-            const aliases = root.get('aliases') || {};
-            aliases[name] = objectId;
-            root.set('aliases', aliases);
-            await root.save();
-
-            return true;
-          `,
-
-          // Clear an alias
-          clearAlias: `
-            const name = args[0];
-
-            // Clear from runtime
-            $.clearAlias(name);
-
-            // Remove from root.aliases
-            const root = await $.load(1);
-            const aliases = root.get('aliases') || {};
-            delete aliases[name];
-            root.set('aliases', aliases);
-            await root.save();
-
-            return true;
-          `,
-        },
-      });
-      console.log('✅ Created Programmer object #3');
-    }
-  }
 }

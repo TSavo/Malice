@@ -1,17 +1,29 @@
 import { ObjectManager } from '../object-manager.js';
+import type { RuntimeObject } from '../../types/object.js';
 
 /**
- * Builds Recycler object (#20)
+ * Builds Recycler object (dynamic ID)
  * Handles object deletion, recovery, and cache cleanup
  */
 export class RecyclerBuilder {
+  private recycler: RuntimeObject | null = null;
+
   constructor(private manager: ObjectManager) {}
 
   async build(): Promise<void> {
-    const existing = await this.manager.load(20);
-    if (existing) return;
+    // Check if already exists via alias
+    const objectManager = await this.manager.load(0);
+    if (!objectManager) throw new Error('Root object not found');
 
-    await this.manager.create({
+    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
+
+    if (aliases.recycler) {
+      this.recycler = await this.manager.load(aliases.recycler);
+      if (this.recycler) return; // Already exists
+    }
+
+    // Create new Recycler
+    this.recycler = await this.manager.create({
       parent: 1,
       properties: {
         name: 'Recycler',
@@ -143,12 +155,16 @@ export class RecyclerBuilder {
   }
 
   async registerAlias(): Promise<void> {
-    const root = await this.manager.load(1);
-    if (!root) return;
+    if (!this.recycler) return;
 
-    const aliases = (root.get('aliases') as Record<string, number>) || {};
-    aliases.recycler = 20;
-    root.set('aliases', aliases);
-    await root.save();
+    const objectManager = await this.manager.load(0);
+    if (!objectManager) return;
+
+    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
+    aliases.recycler = this.recycler.id;
+    objectManager.set('aliases', aliases);
+    await objectManager.save();
+
+    console.log(`✅ Registered recycler alias -> #${this.recycler.id}`);
   }
 }

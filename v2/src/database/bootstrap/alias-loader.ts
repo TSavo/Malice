@@ -1,31 +1,31 @@
 import { ObjectManager } from '../object-manager.js';
 
 /**
- * Loads aliases from MongoDB root object
+ * Loads aliases from ObjectManager (#0)
  * Registers them in the ObjectManager at startup
  *
- * ALL aliases are stored in root.properties.aliases
+ * ALL aliases are stored in #0.properties.aliases (the ObjectManager itself)
  * NO hardcoded aliases in TypeScript - everything is property-driven
  */
 export class AliasLoader {
   constructor(private manager: ObjectManager) {}
 
   /**
-   * Load and register all aliases from root.properties.aliases
+   * Load and register all aliases from #0.properties.aliases
    * This is the ONLY way aliases are registered - from MongoDB
    */
   async loadAliases(): Promise<void> {
-    const root = await this.manager.load(1);
-    if (!root) {
-      console.log('⚠️  Root object not found, skipping alias loading');
+    const objectManager = await this.manager.load(0);
+    if (!objectManager) {
+      console.log('⚠️  ObjectManager (#0) not found, skipping alias loading');
       return;
     }
 
-    const aliases = root.get('aliases') as Record<string, number> || {};
+    const aliases = objectManager.get('aliases') as Record<string, number> || {};
     const aliasCount = Object.keys(aliases).length;
 
     if (aliasCount === 0) {
-      console.log('⚠️  No aliases found in root.properties.aliases');
+      console.log('⚠️  No aliases found in #0.properties.aliases');
       return;
     }
 
