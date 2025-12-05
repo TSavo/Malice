@@ -140,8 +140,9 @@ describe('MinimalBootstrap', () => {
       const method = system!['_getRaw']().methods.onConnection;
 
       expect(method).toBeTruthy();
-      expect(method).toContain('context');
-      expect(method).toContain('authInfo');
+      const code = typeof method === 'string' ? method : method.code;
+      expect(code).toContain('context');
+      expect(code).toContain('authInfo');
     });
   });
 

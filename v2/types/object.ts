@@ -20,7 +20,24 @@ export type PropertyValue =
   | { [key: string]: PropertyValue };
 
 /**
- * Method signature - TypeScript code stored as string
+ * Method with metadata
+ */
+export interface Method {
+  /** The method code (TypeScript as string) */
+  code: string;
+
+  /** Can this method be invoked via player commands? */
+  callable?: boolean;
+
+  /** Command aliases (e.g., 'l' for 'look') */
+  aliases?: string[];
+
+  /** Help text for this verb/command */
+  help?: string;
+}
+
+/**
+ * Method signature - TypeScript code stored as string (legacy - for backwards compatibility)
  */
 export type MethodCode = string;
 
@@ -37,8 +54,8 @@ export interface GameObject {
   /** Properties defined on this object */
   properties: Record<string, PropertyValue>;
 
-  /** Methods defined on this object (TypeScript code as strings) */
-  methods: Record<string, MethodCode>;
+  /** Methods defined on this object */
+  methods: Record<string, Method>;
 
   /** Is this object recycled (deleted but ID can be reused)? */
   recycled?: boolean;
@@ -61,6 +78,9 @@ export interface RuntimeObject {
   /** Set property (always on this object) */
   set(prop: string, value: PropertyValue): void;
 
+  /** Add or update a method on this object */
+  addMethod(name: string, code: string, options?: { callable?: boolean; aliases?: string[]; help?: string }): void;
+
   /** Call method (walks inheritance chain, executes in context) */
   call(method: string, ...args: unknown[]): Promise<unknown>;
 
@@ -77,7 +97,7 @@ export interface RuntimeObject {
   getOwnProperties(): Record<string, PropertyValue>;
 
   /** Get all own methods */
-  getOwnMethods(): Record<string, MethodCode>;
+  getOwnMethods(): Record<string, Method>;
 
   /** Save changes to database */
   save(): Promise<void>;
@@ -94,5 +114,5 @@ export interface CreateObjectParams {
   properties?: Record<string, PropertyValue>;
 
   /** Initial methods */
-  methods?: Record<string, MethodCode>;
+  methods?: Record<string, Method>;
 }

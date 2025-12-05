@@ -89,7 +89,8 @@ export class MinimalBootstrap {
         },
         methods: {
           // Called when a new connection arrives
-          onConnection: `
+          onConnection: {
+            code: `
             const context = args[0];
             const authInfo = context.getAuthInfo();
 
@@ -126,6 +127,7 @@ export class MinimalBootstrap {
               await preAuth.onPreAuth(context, authInfo);
             }
           `,
+          },
         },
       });
       console.log(`✅ Created System object #${system.id}`);
