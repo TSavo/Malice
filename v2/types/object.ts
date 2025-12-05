@@ -91,8 +91,11 @@ export interface RuntimeObject {
   /** Call method (walks inheritance chain, executes in context) */
   call(method: string, ...args: unknown[]): Promise<unknown>;
 
-  /** Check if method exists */
+  /** Check if method exists (sync - cache only) */
   hasMethod(method: string): boolean;
+
+  /** Check if method exists (async - loads parents if needed) */
+  hasMethodAsync(method: string): Promise<boolean>;
 
   /** Get parent object ID */
   getParent(): ObjId;

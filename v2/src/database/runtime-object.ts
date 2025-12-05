@@ -117,7 +117,7 @@ export class RuntimeObjectImpl implements RuntimeObject {
    * Call method - walks inheritance chain, executes in context
    */
   async call(method: string, ...args: unknown[]): Promise<unknown> {
-    const code = this.findMethod(method);
+    const code = await this.findMethodAsync(method);
     if (!code) {
       throw new Error(`Method ${method} not found on object #${this.id}`);
     }
@@ -126,14 +126,21 @@ export class RuntimeObjectImpl implements RuntimeObject {
   }
 
   /**
-   * Check if method exists (walks chain)
+   * Check if method exists (walks chain) - sync version, uses cache only
    */
   hasMethod(method: string): boolean {
     return this.findMethod(method) !== null;
   }
 
   /**
-   * Find method code by walking inheritance chain
+   * Check if method exists (walks chain) - async version, loads parents if needed
+   */
+  async hasMethodAsync(method: string): Promise<boolean> {
+    return (await this.findMethodAsync(method)) !== null;
+  }
+
+  /**
+   * Find method code by walking inheritance chain (sync - cache only)
    */
   private findMethod(method: string): MethodCode | null {
     // Check this object first
@@ -142,12 +149,36 @@ export class RuntimeObjectImpl implements RuntimeObject {
       return methodDef.code;
     }
 
-    // Walk up parent chain
+    // Walk up parent chain (sync - uses cache only)
     if (this.obj.parent !== 0) {
       const parent = this.manager.getSync(this.obj.parent);
       if (parent && parent.hasMethod(method)) {
         const parentImpl = parent as RuntimeObjectImpl;
         return parentImpl.findMethod(method);
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Find method code by walking inheritance chain (async - loads from DB if needed)
+   */
+  private async findMethodAsync(method: string): Promise<MethodCode | null> {
+    // Check this object first
+    if (method in this.obj.methods) {
+      const methodDef = this.obj.methods[method];
+      return methodDef.code;
+    }
+
+    // Walk up parent chain (async - loads from DB if not cached)
+    if (this.obj.parent !== 0) {
+      const parent = await this.manager.load(this.obj.parent);
+      if (parent) {
+        const hasIt = await (parent as RuntimeObjectImpl).hasMethodAsync(method);
+        if (hasIt) {
+          return (parent as RuntimeObjectImpl).findMethodAsync(method);
+        }
       }
     }
 
