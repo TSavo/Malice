@@ -67,7 +67,7 @@ export class RuntimeObjectImpl implements RuntimeObject {
    */
   get(prop: string): PropertyValue | undefined {
     // Check this object first
-    if (prop in this.obj.properties) {
+    if (this.obj.properties && prop in this.obj.properties) {
       return this.obj.properties[prop];
     }
 
@@ -86,6 +86,9 @@ export class RuntimeObjectImpl implements RuntimeObject {
    * Set property - always on this object
    */
   set(prop: string, value: PropertyValue): void {
+    if (!this.obj.properties) {
+      this.obj.properties = {};
+    }
     this.obj.properties[prop] = value;
     this.dirty = true;
   }
