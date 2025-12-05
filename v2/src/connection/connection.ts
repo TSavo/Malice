@@ -2,14 +2,16 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import type { IConnection, ConnectionState } from '../../types/connection.js';
 import type { ITransport } from '../../types/transport.js';
+import type { AuthInfo } from '../../types/auth.js';
 
 /**
  * Connection wraps a transport with session state
- * This is where authentication and user state will live
+ * Can carry authentication info from transport layer (SSL cert, HTTP auth, etc.)
  */
 export class Connection implements IConnection {
   public readonly id: string;
   public readonly transport: ITransport;
+  public readonly authInfo: AuthInfo | null;
 
   private readonly stateSubject: BehaviorSubject<ConnectionState>;
   public readonly state$: Observable<ConnectionState>;
@@ -20,9 +22,10 @@ export class Connection implements IConnection {
   public readonly input$: Observable<string>;
   public readonly output$;
 
-  constructor(transport: ITransport) {
+  constructor(transport: ITransport, authInfo: AuthInfo | null = null) {
     this.id = transport.id;
     this.transport = transport;
+    this.authInfo = authInfo;
 
     // Initialize state
     this.stateSubject = new BehaviorSubject<ConnectionState>('connecting');

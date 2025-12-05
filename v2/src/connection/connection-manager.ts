@@ -2,6 +2,7 @@ import { BehaviorSubject, merge, Observable } from 'rxjs';
 import { map, share, switchMap } from 'rxjs/operators';
 import { Connection } from './connection.js';
 import type { ITransport } from '../../types/transport.js';
+import type { AuthInfo } from '../../types/auth.js';
 
 /**
  * Manages all active connections
@@ -43,9 +44,10 @@ export class ConnectionManager {
 
   /**
    * Add a new transport (creates a Connection)
+   * Optionally pass authInfo from transport layer
    */
-  addTransport(transport: ITransport): Connection {
-    const connection = new Connection(transport);
+  addTransport(transport: ITransport, authInfo: AuthInfo | null = null): Connection {
+    const connection = new Connection(transport, authInfo);
 
     // Add to pool
     const current = this.connectionsSubject.value;
