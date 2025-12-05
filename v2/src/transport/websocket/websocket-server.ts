@@ -1,8 +1,10 @@
 import { WebSocketServer as WSServer, WebSocket } from 'ws';
-import { Subject, fromEvent } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
+import { IncomingMessage } from 'http';
 import { WebSocketTransport } from './websocket-transport.js';
 import type { TransportServerConfig } from '../../../types/transport.js';
+import type { AuthInfo } from '../../../types/auth.js';
+import { Connection } from '../../connection/connection.js';
 
 /**
  * WebSocket server
@@ -12,8 +14,8 @@ export class WebSocketServer {
   private server: WSServer;
   private readonly destroyed$ = new Subject<void>();
 
-  /** Observable stream of new connections */
-  public readonly connection$ = new Subject<WebSocketTransport>();
+  /** Observable stream of new connections (with auth info) */
+  public readonly connection$ = new Subject<Connection>();
 
   /** Observable stream of errors */
   public readonly error$ = new Subject<Error>();
@@ -31,55 +33,73 @@ export class WebSocketServer {
    * Set up server event handlers
    */
   private setupEventHandlers(): void {
-    const connection$ = fromEvent<WebSocket>(this.server, 'connection');
-    const error$ = fromEvent<Error>(this.server, 'error');
-    const listening$ = fromEvent(this.server, 'listening');
-
-    // Handle new connections
-    connection$.pipe(takeUntil(this.destroyed$)).subscribe((ws) => {
-      this.handleConnection(ws);
+    // ws library emits 'connection' with (socket, request)
+    this.server.on('connection', (ws: WebSocket, req: IncomingMessage) => {
+      this.handleConnection(ws, req);
     });
 
-    // Propagate errors
-    error$.pipe(takeUntil(this.destroyed$)).subscribe({
-      next: (err) => {
-        if (this.config.debug) {
-          console.error('[WebSocketServer] Error:', err);
-        }
-        this.error$.next(err);
-      },
+    this.server.on('error', (err: Error) => {
+      if (this.config.debug) {
+        console.error('[WebSocketServer] Error:', err);
+      }
+      this.error$.next(err);
     });
 
-    // Log when listening
-    listening$.pipe(takeUntil(this.destroyed$)).subscribe({
-      next: () => {
-        if (this.config.debug) {
-          console.log(`[WebSocketServer] Listening on ${this.config.host || '0.0.0.0'}:${this.config.port}`);
-        }
-      },
+    this.server.on('listening', () => {
+      if (this.config.debug) {
+        console.log(`[WebSocketServer] Listening on ${this.config.host || '0.0.0.0'}:${this.config.port}`);
+      }
     });
   }
 
   /**
    * Handle new WebSocket connection
+   * Extracts HTTP Basic Auth from headers if present
    */
-  private handleConnection(ws: WebSocket): void {
-    // Extract remote address (not available in basic ws events)
-    const remoteAddress = 'websocket-client';
+  private handleConnection(ws: WebSocket, req: IncomingMessage): void {
+    const remoteAddress = req.socket.remoteAddress || 'unknown';
 
     if (this.config.debug) {
       console.log(`[WebSocketServer] New connection from ${remoteAddress}`);
     }
 
-    const transport = new WebSocketTransport(ws, remoteAddress);
+    // Extract HTTP Basic Auth if present
+    let authInfo: AuthInfo | null = null;
+    const authHeader = req.headers.authorization;
 
-    // Emit the new transport
-    this.connection$.next(transport);
+    if (authHeader?.startsWith('Basic ')) {
+      const base64 = authHeader.substring(6);
+      const decoded = Buffer.from(base64, 'base64').toString('utf-8');
+      const [username, password] = decoded.split(':', 2);
+
+      if (username && password) {
+        authInfo = {
+          mode: 'http-basic',
+          httpBasic: { username, password },
+          metadata: {
+            remoteAddress,
+            userAgent: req.headers['user-agent'],
+            protocol: 'websocket',
+          },
+        };
+
+        if (this.config.debug) {
+          console.log(`[WebSocketServer] HTTP Basic Auth detected for user: ${username}`);
+        }
+      }
+    }
+
+    // Create transport and connection
+    const transport = new WebSocketTransport(ws, remoteAddress);
+    const connection = new Connection(transport, authInfo);
+
+    // Emit the connection
+    this.connection$.next(connection);
 
     // Log when closed
     if (this.config.debug) {
       transport.closed$.subscribe(() => {
-        console.log(`[WebSocketServer] Connection closed: ${transport.remoteAddress}`);
+        console.log(`[WebSocketServer] Connection closed: ${connection.id}`);
       });
     }
   }
