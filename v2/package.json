@@ -15,13 +15,17 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "mongodb": "^7.0.0",
     "rxjs": "^7.8.1",
     "tsx": "^4.19.0",
     "uuid": "^10.0.0",
+    "vscode-languageserver": "^9.0.1",
+    "vscode-languageserver-textdocument": "^1.0.12",
     "ws": "^8.18.0"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
     "@types/bun": "latest",
     "@types/node": "^24.10.1",
     "@types/uuid": "^10.0.0",
@@ -34,10 +38,5 @@
   "engines": {
     "node": ">=20.0.0",
     "bun": ">=1.0"
-  },
-  "overrides": {
-    "vitest": {
-      "vite": "^5.0.0"
-    }
   }
 }

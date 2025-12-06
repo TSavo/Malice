@@ -1,5 +1,6 @@
-import type { GameObject, ObjId, PropertyValue, MethodCode, RuntimeObject } from '../../types/object.js';
+import type { GameObject, ObjId, PropertyValue, MethodCode, Method, RuntimeObject } from '../../types/object.js';
 import type { ObjectManager } from './object-manager.js';
+import * as ts from 'typescript';
 
 /**
  * Runtime wrapper around GameObject with inheritance and method execution
@@ -22,6 +23,11 @@ export class RuntimeObjectImpl implements RuntimeObject {
         // Allow access to methods and built-in properties
         if (typeof prop === 'symbol' || prop in target) {
           return (target as any)[prop];
+        }
+
+        // Check if it's a method - return callable function
+        if (target.hasMethod(prop)) {
+          return (...args: unknown[]) => target.call(prop, ...args);
         }
 
         // For string properties, try to get from object properties
@@ -67,7 +73,7 @@ export class RuntimeObjectImpl implements RuntimeObject {
    */
   get(prop: string): PropertyValue | undefined {
     // Check this object first
-    if (prop in this.obj.properties) {
+    if (this.obj.properties && prop in this.obj.properties) {
       return this.obj.properties[prop];
     }
 
@@ -86,7 +92,24 @@ export class RuntimeObjectImpl implements RuntimeObject {
    * Set property - always on this object
    */
   set(prop: string, value: PropertyValue): void {
+    if (!this.obj.properties) {
+      this.obj.properties = {};
+    }
     this.obj.properties[prop] = value;
+    this.dirty = true;
+  }
+
+  /**
+   * Set a method on this object
+   */
+  setMethod(name: string, code: string, options?: { callable?: boolean; aliases?: string[]; help?: string }): void {
+    if (!this.obj.methods) {
+      this.obj.methods = {};
+    }
+    this.obj.methods[name] = {
+      code,
+      ...options,
+    };
     this.dirty = true;
   }
 
@@ -94,31 +117,39 @@ export class RuntimeObjectImpl implements RuntimeObject {
    * Call method - walks inheritance chain, executes in context
    */
   async call(method: string, ...args: unknown[]): Promise<unknown> {
-    const code = this.findMethod(method);
+    const code = await this.findMethodAsync(method);
     if (!code) {
       throw new Error(`Method ${method} not found on object #${this.id}`);
     }
 
-    return await this.executeMethod(code, args);
+    return await this.executeMethod(code, args, method);
   }
 
   /**
-   * Check if method exists (walks chain)
+   * Check if method exists (walks chain) - sync version, uses cache only
    */
   hasMethod(method: string): boolean {
     return this.findMethod(method) !== null;
   }
 
   /**
-   * Find method code by walking inheritance chain
+   * Check if method exists (walks chain) - async version, loads parents if needed
+   */
+  async hasMethodAsync(method: string): Promise<boolean> {
+    return (await this.findMethodAsync(method)) !== null;
+  }
+
+  /**
+   * Find method code by walking inheritance chain (sync - cache only)
    */
   private findMethod(method: string): MethodCode | null {
     // Check this object first
     if (method in this.obj.methods) {
-      return this.obj.methods[method];
+      const methodDef = this.obj.methods[method];
+      return methodDef.code;
     }
 
-    // Walk up parent chain
+    // Walk up parent chain (sync - uses cache only)
     if (this.obj.parent !== 0) {
       const parent = this.manager.getSync(this.obj.parent);
       if (parent && parent.hasMethod(method)) {
@@ -131,9 +162,77 @@ export class RuntimeObjectImpl implements RuntimeObject {
   }
 
   /**
-   * Execute method code in context
+   * Find method code by walking inheritance chain (async - loads from DB if needed)
    */
-  private async executeMethod(code: MethodCode, args: unknown[]): Promise<unknown> {
+  private async findMethodAsync(method: string): Promise<MethodCode | null> {
+    // Check this object first
+    if (method in this.obj.methods) {
+      const methodDef = this.obj.methods[method];
+      return methodDef.code;
+    }
+
+    // Walk up parent chain (async - loads from DB if not cached)
+    if (this.obj.parent !== 0) {
+      const parent = await this.manager.load(this.obj.parent);
+      if (parent) {
+        const hasIt = await (parent as RuntimeObjectImpl).hasMethodAsync(method);
+        if (hasIt) {
+          return (parent as RuntimeObjectImpl).findMethodAsync(method);
+        }
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Compile TypeScript code to JavaScript
+   */
+  private compileTypeScript(tsCode: string, methodName: string): string {
+    try {
+      const result = ts.transpileModule(tsCode, {
+        compilerOptions: {
+          target: ts.ScriptTarget.ES2022,
+          module: ts.ModuleKind.ESNext,
+          strict: false, // Allow implicit any for now
+          esModuleInterop: true,
+          skipLibCheck: true,
+        },
+      });
+
+      if (result.diagnostics && result.diagnostics.length > 0) {
+        const errors = result.diagnostics.map((d) => {
+          const message = ts.flattenDiagnosticMessageText(d.messageText, '\n');
+          return `Line ${d.start}: ${message}`;
+        });
+        throw new Error(`TypeScript compilation errors in method '${methodName}':\n${errors.join('\n')}`);
+      }
+
+      return result.outputText;
+    } catch (err) {
+      throw new Error(
+        `Failed to compile TypeScript for method '${methodName}': ${err instanceof Error ? err.message : String(err)}`
+      );
+    }
+  }
+
+  /**
+   * Execute method code in context
+   * Compiles TypeScript to JavaScript before execution
+   * Uses caching for compiled code
+   */
+  private async executeMethod(code: MethodCode, args: unknown[], methodName = 'anonymous'): Promise<unknown> {
+    // Check cache for compiled code (avoids repeated compilation)
+    let jsCode = this.manager.getCompiledMethod(this.id, methodName);
+
+    if (!jsCode) {
+      // Cache miss - compile TypeScript to JavaScript
+      jsCode = this.compileTypeScript(code, methodName);
+
+      // Store in cache (never evicts)
+      this.manager.setCompiledMethod(this.id, methodName, jsCode);
+    }
+
     // Create execution context with access to:
     // - self: the proxied object (enables self.hp instead of self.get('hp'))
     // - $: the object manager (for finding other objects)
@@ -154,14 +253,14 @@ export class RuntimeObjectImpl implements RuntimeObject {
       const fn = new AsyncFn('ctx', `
         const { self, $, args } = ctx;
         return (async () => {
-          ${code}
+          ${jsCode}
         })();
       `);
 
       return await fn(context);
     } catch (err) {
       throw new Error(
-        `Error executing method on object #${this.id}: ${err instanceof Error ? err.message : String(err)}`
+        `Error executing method '${methodName}' on object #${this.id}: ${err instanceof Error ? err.message : String(err)}`
       );
     }
   }
@@ -192,7 +291,7 @@ export class RuntimeObjectImpl implements RuntimeObject {
   /**
    * Get all own methods (not inherited)
    */
-  getOwnMethods(): Record<string, MethodCode> {
+  getOwnMethods(): Record<string, Method> {
     return { ...this.obj.methods };
   }
 
@@ -217,7 +316,8 @@ export class RuntimeObjectImpl implements RuntimeObject {
   async refresh(): Promise<void> {
     const updated = await this.manager.load(this.id);
     if (updated) {
-      this.obj = (updated as RuntimeObjectImpl).obj;
+      // Use _getRaw() to get the underlying GameObject from the loaded object
+      this.obj = updated._getRaw();
       this.dirty = false;
     }
   }

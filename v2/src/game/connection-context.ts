@@ -2,10 +2,12 @@ import { Connection } from '../connection/connection.js';
 import { ObjectManager } from '../database/object-manager.js';
 import type { RuntimeObject } from '../../types/object.js';
 import type { ObjId } from '../../types/object.js';
+import type { AuthInfo } from '../../types/auth.js';
 
 /**
  * Connection context - bridges transport layer with object system
  * Wraps a Connection and provides methods for objects to interact with it
+ * Exposes authentication info from transport for MOO code to validate
  */
 export class ConnectionContext {
   private currentHandler: RuntimeObject | null = null;
@@ -85,6 +87,31 @@ export class ConnectionContext {
   }
 
   /**
+   * Check if user is authenticated
+   */
+  isAuthenticated(): boolean {
+    return this.userId !== null;
+  }
+
+  /**
+   * Get authentication info provided by transport (if any)
+   * Returns null for unauthenticated connections (raw telnet, etc.)
+   * Returns AuthInfo for pre-authenticated connections (SSL cert, HTTP auth, etc.)
+   */
+  getAuthInfo(): AuthInfo | null {
+    return this.connection.authInfo;
+  }
+
+  /**
+   * Check if connection arrived with transport-level authentication
+   * true = SSL cert, HTTP auth, OAuth, etc. (credentials present, need validation)
+   * false = Raw connection, interactive login required
+   */
+  isPreAuthenticated(): boolean {
+    return this.connection.authInfo !== null;
+  }
+
+  /**
    * Get the object manager (for objects to find other objects)
    */
   get $(): ObjectManager {
@@ -113,7 +140,7 @@ export class ConnectionContext {
     prompt: string,
     validator?: (input: string) => string | undefined
   ): Promise<string> {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       const askAgain = (errorMsg?: string) => {
         if (errorMsg) {
           this.send(`${errorMsg}\r\n`);
