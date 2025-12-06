@@ -115,14 +115,17 @@ export class RuntimeObjectImpl implements RuntimeObject {
 
   /**
    * Call method - walks inheritance chain, executes in context
+   * @param method - Method name to call
+   * @param context - Optional execution context (ConnectionContext, player, etc.)
+   * @param args - Method arguments
    */
-  async call(method: string, ...args: unknown[]): Promise<unknown> {
+  async call(method: string, context?: any, ...args: unknown[]): Promise<unknown> {
     const code = await this.findMethodAsync(method);
     if (!code) {
       throw new Error(`Method ${method} not found on object #${this.id}`);
     }
 
-    return await this.executeMethod(code, args, method);
+    return await this.executeMethod(code, context, args, method);
   }
 
   /**
@@ -221,7 +224,7 @@ export class RuntimeObjectImpl implements RuntimeObject {
    * Compiles TypeScript to JavaScript before execution
    * Uses caching for compiled code
    */
-  private async executeMethod(code: MethodCode, args: unknown[], methodName = 'anonymous'): Promise<unknown> {
+  private async executeMethod(code: MethodCode, userContext: any, args: unknown[], methodName = 'anonymous'): Promise<unknown> {
     // Check cache for compiled code (avoids repeated compilation)
     let jsCode = this.manager.getCompiledMethod(this.id, methodName);
 
@@ -264,6 +267,8 @@ export class RuntimeObjectImpl implements RuntimeObject {
       this: self, // Also expose as 'this' but it might be shadowed
       $: $proxy,
       args,
+      context: userContext, // ConnectionContext or other execution context
+      player: userContext?.player || self, // Player object if available, otherwise self
     };
 
     try {
@@ -275,6 +280,8 @@ export class RuntimeObjectImpl implements RuntimeObject {
         const self = ctx.self;
         const $ = ctx.$;
         const args = ctx.args;
+        const context = ctx.context;
+        const player = ctx.player;
         return (async () => {
           ${jsCode}
         })();

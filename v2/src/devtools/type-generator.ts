@@ -303,6 +303,12 @@ declare const $: ObjectManager;
 /** Method arguments array */
 declare const args: any[];
 
+/** Execution context (ConnectionContext if invoked from connection) */
+declare const context: any;
+
+/** Player object (from context.player, or self if not available) */
+declare const player: RuntimeObject;
+
 /**
  * Direct object references - access any object by ID
  * Usage: const sys = $2; await sys.someMethod();
