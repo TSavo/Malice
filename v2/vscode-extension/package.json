@@ -24,8 +24,22 @@
       {
         "command": "malice.browseObjects",
         "title": "Malice: Browse Objects"
+      },
+      {
+        "command": "malice.refresh",
+        "title": "Malice: Refresh",
+        "icon": "$(refresh)"
       }
     ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "malice.refresh",
+          "when": "view == malice-objects",
+          "group": "navigation"
+        }
+      ]
+    },
     "viewsContainers": {
       "activitybar": [
         {
@@ -46,15 +60,10 @@
     "configuration": {
       "title": "Malice",
       "properties": {
-        "malice.serverUrl": {
+        "malice.devtoolsUrl": {
           "type": "string",
-          "default": "mongodb://localhost:27017",
-          "description": "MongoDB connection URL"
-        },
-        "malice.database": {
-          "type": "string",
-          "default": "malice",
-          "description": "MongoDB database name"
+          "default": "ws://localhost:9999",
+          "description": "Malice DevTools WebSocket server URL"
         }
       }
     }
@@ -63,15 +72,22 @@
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
-    "package": "vsce package"
+    "package": "vsce package",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
     "@types/vscode": "^1.80.0",
+    "@types/ws": "^8.5.0",
+    "@vitest/coverage-v8": "^2.0.0",
     "typescript": "^5.0.0",
+    "vitest": "^2.0.0",
     "@vscode/vsce": "^2.19.0"
   },
   "dependencies": {
-    "vscode-languageclient": "^9.0.1"
+    "vscode-languageclient": "^9.0.1",
+    "ws": "^8.14.0"
   }
 }

@@ -1,199 +1,234 @@
 /**
  * Malice VS Code Extension
- * Provides TypeScript language support for MOO objects
+ * Provides TypeScript language support for MOO objects via DevTools WebSocket server
  */
 
 import * as vscode from 'vscode';
-import * as path from 'path';
-import {
-  LanguageClient,
-  LanguageClientOptions,
-  ServerOptions,
-  TransportKind,
-} from 'vscode-languageclient/node';
+import { DevToolsClient } from './devtools-client.js';
+import { MaliceTreeProvider } from './tree-view.js';
+import { TypeDefinitionManager } from './type-manager.js';
 
-let client: LanguageClient;
+let client: DevToolsClient;
+let treeView: vscode.TreeView<vscode.TreeItem>;
+let typeManager: TypeDefinitionManager;
 
 /**
  * Extension activation
  */
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
   console.log('Malice extension activated');
 
+  // Get DevTools URL from configuration
+  const config = vscode.workspace.getConfiguration('malice');
+  const devtoolsUrl = config.get<string>('devtoolsUrl', 'ws://localhost:9999');
+
+  // Create DevTools client
+  client = new DevToolsClient(devtoolsUrl);
+
+  try {
+    await client.connect();
+    vscode.window.showInformationMessage('Connected to Malice DevTools server');
+
+    // Initialize type definition manager
+    typeManager = new TypeDefinitionManager(client);
+    await typeManager.initialize(context);
+    context.subscriptions.push(typeManager);
+  } catch (err) {
+    vscode.window.showErrorMessage(`Failed to connect to DevTools server: ${err}`);
+    console.error('[Malice] Connection failed:', err);
+  }
+
   // Register malice:// file system provider
-  const fileSystemProvider = new MaliceFileSystemProvider();
+  const fileSystemProvider = new MaliceFileSystemProvider(client);
   context.subscriptions.push(
     vscode.workspace.registerFileSystemProvider('malice', fileSystemProvider, {
       isCaseSensitive: true,
     })
   );
 
+  // Create tree view provider
+  const treeProvider = new MaliceTreeProvider(client);
+  treeView = vscode.window.createTreeView('malice-objects', {
+    treeDataProvider: treeProvider,
+  });
+
+  // Track expand/collapse
+  context.subscriptions.push(
+    treeView.onDidExpandElement(e => treeProvider.onDidExpandElement(e.element))
+  );
+  context.subscriptions.push(
+    treeView.onDidCollapseElement(e => treeProvider.onDidCollapseElement(e.element))
+  );
+
   // Register commands
   context.subscriptions.push(
-    vscode.commands.registerCommand('malice.openObject', async () => {
-      const objectId = await vscode.window.showInputBox({
-        prompt: 'Enter object ID',
-        placeHolder: '5',
-      });
+    vscode.commands.registerCommand('malice.refresh', () => {
+      treeProvider.refresh();
+    })
+  );
 
-      if (objectId) {
-        const uri = vscode.Uri.parse(`malice://objects/${objectId}/`);
-        const files = await fileSystemProvider.readDirectory(uri);
+  context.subscriptions.push(
+    vscode.commands.registerCommand('malice.openObject', async (objectId?: number) => {
+      if (!objectId) {
+        const input = await vscode.window.showInputBox({
+          prompt: 'Enter object ID',
+          placeHolder: '5',
+        });
 
-        // Show quick pick of methods
-        const selected = await vscode.window.showQuickPick(
-          files.map(([name]) => name),
-          { placeHolder: 'Select method or property to edit' }
-        );
+        if (!input) return;
+        objectId = parseInt(input, 10);
+      }
+
+      try {
+        const obj = await client.getObject(objectId);
+        const methods = Object.keys(obj.methods || {});
+        const properties = Object.keys(obj.properties || {});
+
+        const items = [
+          ...methods.map(m => ({ label: `📝 ${m}`, type: 'method', name: m })),
+          ...properties.map(p => ({ label: `🔧 ${p}`, type: 'property', name: p })),
+        ];
+
+        const selected = await vscode.window.showQuickPick(items, {
+          placeHolder: 'Select method or property to edit',
+        });
 
         if (selected) {
-          const fileUri = vscode.Uri.parse(`malice://objects/${objectId}/${selected}`);
-          const doc = await vscode.workspace.openTextDocument(fileUri);
-          await vscode.window.showTextDocument(doc);
+          if (selected.type === 'method') {
+            await vscode.commands.executeCommand('malice.openMethod', objectId, selected.name);
+          } else {
+            await vscode.commands.executeCommand('malice.openProperty', objectId, selected.name);
+          }
         }
+      } catch (err) {
+        vscode.window.showErrorMessage(`Failed to load object #${objectId}: ${err}`);
       }
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('malice.openMethod', async (objectId: number, methodName: string) => {
+      const uri = vscode.Uri.parse(`malice://objects/${objectId}/${methodName}.ts`);
+      const doc = await vscode.workspace.openTextDocument(uri);
+      await vscode.window.showTextDocument(doc);
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('malice.openProperty', async (objectId: number, propertyName: string) => {
+      const uri = vscode.Uri.parse(`malice://objects/${objectId}/${propertyName}.json`);
+      const doc = await vscode.workspace.openTextDocument(uri);
+      await vscode.window.showTextDocument(doc);
     })
   );
 
   context.subscriptions.push(
     vscode.commands.registerCommand('malice.browseObjects', async () => {
-      const uri = vscode.Uri.parse('malice://objects/');
-      const files = await fileSystemProvider.readDirectory(uri);
+      try {
+        const objects = await client.listObjects(false);
+        const items = objects.map((obj: any) => ({
+          label: `#${obj.id}`,
+          description: `parent: #${obj.parent}`,
+          id: obj.id,
+        }));
 
-      const selected = await vscode.window.showQuickPick(
-        files.map(([name]) => `#${name}`),
-        { placeHolder: 'Select object to open' }
-      );
+        const selected = await vscode.window.showQuickPick(items, {
+          placeHolder: 'Select object to open',
+        });
 
-      if (selected) {
-        const objectId = selected.substring(1); // Remove #
-        vscode.commands.executeCommand('malice.openObject');
+        if (selected) {
+          await vscode.commands.executeCommand('malice.openObject', selected.id);
+        }
+      } catch (err) {
+        vscode.window.showErrorMessage(`Failed to browse objects: ${err}`);
       }
     })
   );
 
-  // Start language server
-  startLanguageServer(context);
-}
-
-/**
- * Start the Malice LSP server
- */
-function startLanguageServer(context: vscode.ExtensionContext) {
-  // Path to LSP server
-  const serverModule = context.asAbsolutePath(
-    path.join('..', 'out', 'lsp', 'server-launcher.js')
-  );
-
-  // Server options
-  const serverOptions: ServerOptions = {
-    run: { module: serverModule, transport: TransportKind.ipc },
-    debug: {
-      module: serverModule,
-      transport: TransportKind.ipc,
-      options: { execArgv: ['--nolazy', '--inspect=6009'] },
-    },
-  };
-
-  // Client options
-  const clientOptions: LanguageClientOptions = {
-    documentSelector: [
-      { scheme: 'malice', language: 'typescript' },
-      { scheme: 'malice', language: 'json' },
-    ],
-    synchronize: {
-      fileEvents: vscode.workspace.createFileSystemWatcher('**/*.{ts,json}'),
-    },
-  };
-
-  // Create and start client
-  client = new LanguageClient(
-    'maliceLSP',
-    'Malice Language Server',
-    serverOptions,
-    clientOptions
-  );
-
-  client.start();
+  context.subscriptions.push(treeView);
 }
 
 /**
  * Extension deactivation
  */
-export function deactivate(): Thenable<void> | undefined {
-  if (!client) {
-    return undefined;
+export function deactivate(): void {
+  if (client) {
+    client.close();
   }
-  return client.stop();
 }
 
 /**
  * File system provider for malice:// URIs
- * Reads from Malice MongoDB via HTTP API
+ * Reads/writes from Malice DevTools WebSocket server
  */
 class MaliceFileSystemProvider implements vscode.FileSystemProvider {
   private _emitter = new vscode.EventEmitter<vscode.FileChangeEvent[]>();
   readonly onDidChangeFile: vscode.Event<vscode.FileChangeEvent[]> = this._emitter.event;
 
+  constructor(private client: DevToolsClient) {
+    // Listen for change notifications from server
+    client.onNotification((method, params) => {
+      if (method === 'method.changed' || method === 'property.changed') {
+        const { objectId, name } = params;
+        const ext = method === 'method.changed' ? 'ts' : 'json';
+        const uri = vscode.Uri.parse(`malice://objects/${objectId}/${name}.${ext}`);
+        this._emitter.fire([{ type: vscode.FileChangeType.Changed, uri }]);
+      }
+    });
+  }
+
   watch(uri: vscode.Uri): vscode.Disposable {
-    // TODO: Watch MongoDB change stream
+    // Real-time updates handled via WebSocket notifications
     return new vscode.Disposable(() => {});
   }
 
   async stat(uri: vscode.Uri): Promise<vscode.FileStat> {
-    // Parse URI to determine if directory or file
-    const parts = uri.path.split('/').filter(Boolean);
-
-    if (parts.length === 1) {
-      // malice://objects/{id}/ - directory
-      return {
-        type: vscode.FileType.Directory,
-        ctime: Date.now(),
-        mtime: Date.now(),
-        size: 0,
-      };
-    } else {
-      // malice://objects/{id}/{file}.{ts|json} - file
-      return {
-        type: vscode.FileType.File,
-        ctime: Date.now(),
-        mtime: Date.now(),
-        size: 0,
-      };
-    }
+    // All files are virtual, just return basic stats
+    return {
+      type: vscode.FileType.File,
+      ctime: Date.now(),
+      mtime: Date.now(),
+      size: 0,
+    };
   }
 
-  async readDirectory(uri: vscode.Uri): Promise<[string, vscode.FileType][]> {
-    // TODO: Query MongoDB via HTTP API
-    // For now, return mock data
-    const config = vscode.workspace.getConfiguration('malice');
-    const apiUrl = config.get<string>('apiUrl', 'http://localhost:3000');
-
-    try {
-      const response = await fetch(`${apiUrl}/api/lsp/list${uri.path}`);
-      const entries = await response.json();
-
-      return entries.map((entry: { name: string; type: string }) => [
-        entry.name,
-        entry.type === 'directory' ? vscode.FileType.Directory : vscode.FileType.File,
-      ]);
-    } catch (err) {
-      console.error('Failed to read directory:', err);
-      return [];
-    }
+  readDirectory(uri: vscode.Uri): Promise<[string, vscode.FileType][]> {
+    // Not used (tree view handles directory browsing)
+    return Promise.resolve([]);
   }
 
   async readFile(uri: vscode.Uri): Promise<Uint8Array> {
-    // TODO: Query MongoDB via HTTP API
-    const config = vscode.workspace.getConfiguration('malice');
-    const apiUrl = config.get<string>('apiUrl', 'http://localhost:3000');
-
     try {
-      const response = await fetch(`${apiUrl}/api/lsp/read${uri.path}`);
-      const content = await response.text();
-      return Buffer.from(content, 'utf-8');
+      const parts = uri.path.split('/').filter(Boolean);
+      // malice://objects/{id}/{name}.{ext}
+      if (parts.length !== 3 || parts[0] !== 'objects') {
+        throw vscode.FileSystemError.FileNotFound(uri);
+      }
+
+      const objectId = parseInt(parts[1], 10);
+      const filename = parts[2];
+      const ext = filename.substring(filename.lastIndexOf('.') + 1);
+      const name = filename.substring(0, filename.lastIndexOf('.'));
+
+      if (ext === 'ts') {
+        // Method
+        const method = await this.client.getMethod(objectId, name);
+
+        // Inject type reference at the top of the file
+        // This makes VS Code's TypeScript language service aware of generated types
+        const typeReference = '/// <reference path="../.malice/malice.d.ts" />\n\n';
+        const code = typeReference + method.code;
+
+        return Buffer.from(code, 'utf-8');
+      } else if (ext === 'json') {
+        // Property
+        const value = await this.client.getProperty(objectId, name);
+        return Buffer.from(JSON.stringify(value, null, 2), 'utf-8');
+      } else {
+        throw vscode.FileSystemError.FileNotFound(uri);
+      }
     } catch (err) {
-      console.error('Failed to read file:', err);
+      console.error('[FileSystem] Failed to read file:', err);
       throw vscode.FileSystemError.FileNotFound(uri);
     }
   }
@@ -203,33 +238,47 @@ class MaliceFileSystemProvider implements vscode.FileSystemProvider {
     content: Uint8Array,
     options: { create: boolean; overwrite: boolean }
   ): Promise<void> {
-    // TODO: Update MongoDB via HTTP API
-    const config = vscode.workspace.getConfiguration('malice');
-    const apiUrl = config.get<string>('apiUrl', 'http://localhost:3000');
-
     try {
-      await fetch(`${apiUrl}/api/lsp/write${uri.path}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain' },
-        body: Buffer.from(content).toString('utf-8'),
-      });
+      const parts = uri.path.split('/').filter(Boolean);
+      if (parts.length !== 3 || parts[0] !== 'objects') {
+        throw vscode.FileSystemError.NoPermissions(uri);
+      }
+
+      const objectId = parseInt(parts[1], 10);
+      const filename = parts[2];
+      const ext = filename.substring(filename.lastIndexOf('.') + 1);
+      const name = filename.substring(0, filename.lastIndexOf('.'));
+      const text = Buffer.from(content).toString('utf-8');
+
+      if (ext === 'ts') {
+        // Method - strip type reference directive before saving
+        const typeReferencePattern = /^\/\/\/ <reference path="[^"]*" \/>\s*/;
+        const cleanCode = text.replace(typeReferencePattern, '');
+        await this.client.setMethod(objectId, name, cleanCode);
+      } else if (ext === 'json') {
+        // Property
+        const value = JSON.parse(text);
+        await this.client.setProperty(objectId, name, value);
+      } else {
+        throw vscode.FileSystemError.NoPermissions(uri);
+      }
 
       this._emitter.fire([{ type: vscode.FileChangeType.Changed, uri }]);
     } catch (err) {
-      console.error('Failed to write file:', err);
+      console.error('[FileSystem] Failed to write file:', err);
       throw vscode.FileSystemError.Unavailable(uri);
     }
   }
 
   rename(): void {
-    throw new Error('Rename not supported');
+    throw vscode.FileSystemError.NoPermissions('Rename not supported');
   }
 
   delete(): void {
-    throw new Error('Delete not supported');
+    throw vscode.FileSystemError.NoPermissions('Delete not supported');
   }
 
   createDirectory(): void {
-    throw new Error('Create directory not supported');
+    throw vscode.FileSystemError.NoPermissions('Create directory not supported');
   }
 }

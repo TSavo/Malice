@@ -491,6 +491,51 @@ describe('VirtualFileSystem', () => {
     it('should handle invalid URI gracefully', async () => {
       await expect(vfs.updateDocument('invalid://uri', 'code')).resolves.not.toThrow();
     });
+
+    it('should extract method code from TypeScript context wrapper', async () => {
+      const uri = 'malice://objects/15/greet.ts';
+
+      // Get initial document to cache it
+      await vfs.getDocument(uri);
+
+      // Update with code that includes the TypeScript context marker
+      const codeWithContext = `// Malice MOO Method: greet
+declare const self: RuntimeObject;
+declare const $: ObjectManager;
+declare const args: unknown[];
+
+// Method code:
+return "Extracted Code";`;
+
+      await vfs.updateDocument(uri, codeWithContext);
+
+      // Verify the cached document now contains the extracted code
+      const doc = await vfs.getDocument(uri);
+      expect(doc?.content).toContain('return "Extracted Code"');
+    });
+
+    it('should strip leading newline after marker', async () => {
+      const uri = 'malice://objects/15/greet.ts';
+
+      await vfs.getDocument(uri);
+
+      // Code with newline right after marker
+      const codeWithNewline = `// Method code:
+return "test";`;
+
+      await vfs.updateDocument(uri, codeWithNewline);
+
+      // Wait for save to complete
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Reload from database
+      manager.invalidate(15);
+      const obj = await manager.load(15);
+      const raw = obj!['_getRaw']();
+
+      // The extracted code should not have a leading newline
+      expect(raw.methods.greet.code).toBe('return "test";');
+    });
   });
 
   describe('invalidate()', () => {
