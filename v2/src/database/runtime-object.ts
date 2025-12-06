@@ -129,8 +129,14 @@ export class RuntimeObjectImpl implements RuntimeObject {
    * Also handles raw values for backwards compatibility
    */
   private fromValue(value: Value | any | undefined): any {
-    if (!value) {
+    // Only return undefined for actual undefined
+    if (value === undefined) {
       return undefined;
+    }
+
+    // Handle null explicitly (could be raw null or typed null)
+    if (value === null) {
+      return null;
     }
 
     // Backwards compatibility: Handle raw values (not typed)
