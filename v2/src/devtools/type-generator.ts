@@ -41,7 +41,7 @@ export class TypeGenerator {
     output += '\n';
 
     // Global declarations
-    output += this.generateGlobalDeclarations();
+    output += await this.generateGlobalDeclarations();
 
     return output;
   }
@@ -287,8 +287,10 @@ interface ObjectManager {
   /**
    * Generate global declarations available in all methods
    */
-  private generateGlobalDeclarations(): string {
-    return `/**
+  private async generateGlobalDeclarations(): Promise<string> {
+    const objects = await this.manager.db.listAll(true);
+
+    let output = `/**
  * Global declarations available in all object methods
  */
 
@@ -300,7 +302,22 @@ declare const $: ObjectManager;
 
 /** Method arguments array */
 declare const args: any[];
+
+/**
+ * Direct object references - access any object by ID
+ * Usage: const sys = $2; await sys.someMethod();
+ */
 `;
+
+    // Generate $N globals for each object
+    for (const obj of objects) {
+      if (obj.recycled) continue;
+
+      output += `/** Direct reference to object #${obj._id} */\n`;
+      output += `declare const $${obj._id}: RuntimeObject & MaliceObject_${obj._id};\n`;
+    }
+
+    return output;
   }
 
   /**
