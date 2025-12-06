@@ -87,7 +87,8 @@ export class PrototypeBuilder {
     // Return true to allow, or a string explaining why not
     obj.setMethod('canContain', `
       const obj = args[0];
-      return true; // Default: can contain anything
+      const objName = obj?.name || 'that';
+      return \`The \${self.name} cannot contain \${objName}.\`;
     `);
 
     // THE primitive for all location changes
@@ -365,6 +366,12 @@ export class PrototypeBuilder {
       // TODO: Announce departure to others in room
     `);
 
+    // Rooms can contain things
+    obj.setMethod('canContain', `
+      const obj = args[0];
+      return true;
+    `);
+
     await obj.save();
     return obj;
   }
@@ -450,17 +457,60 @@ export class PrototypeBuilder {
 
     obj.setMethod('look', `
       const context = args[0];
+      const player = args[1]; // self when called via verb dispatch
+      const target = args[2]; // optional: "at <object>" or "<object>"
 
-      // Look at current location
+      // Parse target - strip leading "at " if present
+      let targetName = (target || '').trim();
+      if (targetName.toLowerCase().startsWith('at ')) {
+        targetName = targetName.slice(3).trim();
+      }
+
+      // If no target, look at current location
+      if (!targetName) {
+        if (self.location && self.location !== 0) {
+          const location = await $.load(self.location);
+          if (location) {
+            return await location.describe(self);
+          }
+        }
+        return 'You are in a void.';
+      }
+
+      // Search for target object
+      const lowerTarget = targetName.toLowerCase();
+
+      // Helper to check if object matches target name
+      const matches = (obj) => {
+        if (!obj) return false;
+        const name = obj.name || '';
+        if (name.toLowerCase() === lowerTarget) return true;
+        const aliases = obj.aliases || [];
+        return aliases.some(a => a.toLowerCase() === lowerTarget);
+      };
+
+      // Search in room contents
       if (self.location && self.location !== 0) {
         const location = await $.load(self.location);
         if (location) {
-          const desc = await location.describe(self);
-          return desc;
+          const contents = location.contents || [];
+          for (const objId of contents) {
+            const obj = await $.load(objId);
+            if (matches(obj)) {
+              return await obj.describe(self);
+            }
+          }
         }
       }
 
-      return 'You are in a void.';
+      // Special keywords for looking at yourself
+      if (['me', 'self', 'myself'].includes(lowerTarget)) {
+        return await self.describe(self);
+      }
+
+      // TODO: Search body parts, implants, etc.
+
+      return \`You don't see "\${targetName}" here.\`;
     `);
 
     await obj.save();
