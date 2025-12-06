@@ -1,4 +1,4 @@
-import type { GameObject, ObjId, PropertyValue, MethodCode, Method, RuntimeObject } from '../../types/object.js';
+import type { GameObject, ObjId, PropertyValue, MethodCode, Method, RuntimeObject, Value, ValueType } from '../../types/object.js';
 import type { ObjectManager } from './object-manager.js';
 import * as ts from 'typescript';
 
@@ -69,12 +69,112 @@ export class RuntimeObjectImpl implements RuntimeObject {
   }
 
   /**
+   * Convert a JavaScript value to a typed Value
+   */
+  private toValue(jsValue: any): Value {
+    // Handle null
+    if (jsValue === null) {
+      return { type: 'null', value: null };
+    }
+
+    // Handle undefined (treat as null)
+    if (jsValue === undefined) {
+      return { type: 'null', value: null };
+    }
+
+    // Handle RuntimeObject (store as objref)
+    if (jsValue && typeof jsValue === 'object' && 'id' in jsValue && typeof jsValue.id === 'number') {
+      return { type: 'objref', value: jsValue.id };
+    }
+
+    // Handle primitives
+    const jsType = typeof jsValue;
+
+    if (jsType === 'string') {
+      return { type: 'string', value: jsValue };
+    }
+
+    if (jsType === 'number') {
+      return { type: 'number', value: jsValue };
+    }
+
+    if (jsType === 'boolean') {
+      return { type: 'boolean', value: jsValue };
+    }
+
+    // Handle arrays (recursively convert elements)
+    if (Array.isArray(jsValue)) {
+      return {
+        type: 'array',
+        value: jsValue.map(item => this.toValue(item))
+      };
+    }
+
+    // Handle objects (recursively convert properties)
+    if (jsType === 'object') {
+      const objValue: Record<string, Value> = {};
+      for (const [key, val] of Object.entries(jsValue)) {
+        objValue[key] = this.toValue(val);
+      }
+      return { type: 'object', value: objValue };
+    }
+
+    // Fallback to null for unknown types
+    return { type: 'null', value: null };
+  }
+
+  /**
+   * Convert a typed Value to a JavaScript value
+   * Resolves objrefs to RuntimeObjects
+   */
+  private fromValue(value: Value | undefined): any {
+    if (!value) {
+      return undefined;
+    }
+
+    switch (value.type) {
+      case 'null':
+        return null;
+
+      case 'string':
+      case 'number':
+      case 'boolean':
+        return value.value;
+
+      case 'objref':
+        // Resolve object reference
+        const obj = this.manager.getSync(value.value);
+        if (!obj) {
+          // Object not in cache or doesn't exist - return raw ID
+          return value.value;
+        }
+        return obj.proxy;
+
+      case 'array':
+        // Recursively convert array elements
+        return (value.value as Value[]).map(item => this.fromValue(item));
+
+      case 'object':
+        // Recursively convert object properties
+        const result: Record<string, any> = {};
+        for (const [key, val] of Object.entries(value.value as Record<string, Value>)) {
+          result[key] = this.fromValue(val);
+        }
+        return result;
+
+      default:
+        return undefined;
+    }
+  }
+
+  /**
    * Get property - walks inheritance chain
+   * Resolves typed Values to JavaScript values (objrefs become RuntimeObjects)
    */
   get(prop: string): PropertyValue | undefined {
     // Check this object first
     if (this.obj.properties && prop in this.obj.properties) {
-      return this.obj.properties[prop];
+      return this.fromValue(this.obj.properties[prop]);
     }
 
     // Walk up parent chain
@@ -90,12 +190,14 @@ export class RuntimeObjectImpl implements RuntimeObject {
 
   /**
    * Set property - always on this object
+   * Automatically detects type and creates typed Value
    */
   set(prop: string, value: PropertyValue): void {
     if (!this.obj.properties) {
       this.obj.properties = {};
     }
-    this.obj.properties[prop] = value;
+    // Convert JavaScript value to typed Value
+    this.obj.properties[prop] = this.toValue(value);
     this.dirty = true;
   }
 
@@ -313,9 +415,14 @@ export class RuntimeObjectImpl implements RuntimeObject {
 
   /**
    * Get all own properties (not inherited)
+   * Returns JavaScript values (objrefs resolved to RuntimeObjects)
    */
   getOwnProperties(): Record<string, PropertyValue> {
-    return { ...this.obj.properties };
+    const result: Record<string, PropertyValue> = {};
+    for (const [key, value] of Object.entries(this.obj.properties || {})) {
+      result[key] = this.fromValue(value);
+    }
+    return result;
   }
 
   /**

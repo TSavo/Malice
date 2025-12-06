@@ -730,7 +730,8 @@ describe('RuntimeObject', () => {
     it('should include all GameObject fields', () => {
       const raw = (testObj as any)._getRaw() as GameObject;
 
-      expect(raw.properties).toEqual({
+      // Use getOwnProperties() for resolved values
+      expect(testObj.getOwnProperties()).toEqual({
         name: 'Test Object',
         hp: 100,
         mana: 50,
@@ -742,9 +743,8 @@ describe('RuntimeObject', () => {
     it('should reflect current state', () => {
       testObj.set('newProp', 'value');
 
-      const raw = (testObj as any)._getRaw() as GameObject;
-
-      expect(raw.properties.newProp).toBe('value');
+      // Use public API instead of _getRaw()
+      expect(testObj.get('newProp')).toBe('value');
     });
   });
 
