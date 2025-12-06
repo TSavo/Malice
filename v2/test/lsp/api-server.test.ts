@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll, beforeEach, vi } from 'vitest';
 import { ObjectDatabase } from '../../src/database/object-db.js';
 import { ObjectManager } from '../../src/database/object-manager.js';
 import { LSPApiServer } from '../../src/lsp/api-server.js';
@@ -527,6 +527,79 @@ describe('LSP API Server', () => {
       // Should handle gracefully
       expect([404, 500]).toContain(response.status);
     });
+
+    it('should return 500 with error message when exception occurs', async () => {
+      // Create a server with a broken VFS that throws
+      const brokenPort = TEST_PORT + 1;
+      const brokenServer = new LSPApiServer(manager, brokenPort);
+
+      // Override the VFS to throw an error
+      const originalVfs = (brokenServer as any).vfs;
+      (brokenServer as any).vfs = {
+        listDirectory: async () => {
+          throw new Error('Database connection failed');
+        },
+        getDocument: originalVfs.getDocument.bind(originalVfs),
+        updateDocument: originalVfs.updateDocument.bind(originalVfs),
+      };
+
+      // Start the broken server
+      const brokenHttpServer = require('http').createServer(
+        (brokenServer as any).handleRequest.bind(brokenServer)
+      );
+
+      await new Promise<void>((resolve) => {
+        brokenHttpServer.listen(brokenPort, () => resolve());
+      });
+
+      try {
+        const response = await fetch(`http://localhost:${brokenPort}/api/lsp/list/objects/`);
+        expect(response.status).toBe(500);
+
+        const text = await response.text();
+        expect(text).toBe('Database connection failed');
+      } finally {
+        await new Promise<void>((resolve, reject) => {
+          brokenHttpServer.close((err: Error) => err ? reject(err) : resolve());
+        });
+      }
+    });
+
+    it('should return generic error message for non-Error exceptions', async () => {
+      // Create a server with a VFS that throws a non-Error
+      const brokenPort = TEST_PORT + 2;
+      const brokenServer = new LSPApiServer(manager, brokenPort);
+
+      // Override the VFS to throw a non-Error
+      (brokenServer as any).vfs = {
+        listDirectory: async () => {
+          throw 'String error'; // Not an Error instance
+        },
+        getDocument: async () => null,
+        updateDocument: async () => {},
+      };
+
+      // Start the broken server
+      const brokenHttpServer = require('http').createServer(
+        (brokenServer as any).handleRequest.bind(brokenServer)
+      );
+
+      await new Promise<void>((resolve) => {
+        brokenHttpServer.listen(brokenPort, () => resolve());
+      });
+
+      try {
+        const response = await fetch(`http://localhost:${brokenPort}/api/lsp/list/objects/`);
+        expect(response.status).toBe(500);
+
+        const text = await response.text();
+        expect(text).toBe('Internal server error');
+      } finally {
+        await new Promise<void>((resolve, reject) => {
+          brokenHttpServer.close((err: Error) => err ? reject(err) : resolve());
+        });
+      }
+    });
   });
 
   describe('Integration Tests', () => {
@@ -651,6 +724,36 @@ describe('LSP API Server', () => {
         const content = await readResponse.text();
         expect(content).toContain(`return ${i};`);
       }
+    });
+  });
+
+  describe('Server Lifecycle', () => {
+    it('should start server via start() method', async () => {
+      const startPort = TEST_PORT + 3;
+      const startServer = new LSPApiServer(manager, startPort);
+
+      // Use spyOn to capture console.log
+      const consoleSpy = vi.spyOn(console, 'log');
+
+      // Start the server
+      startServer.start();
+
+      // Wait for server to start
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Verify the log message was printed
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining(`LSP API Server listening on http://localhost:${startPort}`)
+      );
+
+      // Verify server is actually listening by making a request
+      const response = await fetch(`http://localhost:${startPort}/api/lsp/list/objects/`);
+      expect(response.status).toBe(200);
+
+      // Cleanup - we need to close the server
+      // The start() method doesn't return the server, so we need to find another way
+      // For now, we'll just leave it running as it will be cleaned up when the test process exits
+      consoleSpy.mockRestore();
     });
   });
 

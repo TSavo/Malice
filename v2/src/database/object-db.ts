@@ -232,8 +232,10 @@ export class ObjectDatabase {
 
   /**
    * List all objects (for DevTools)
+   * @param includeRecycled - If true, include recycled objects
    */
-  async listAll(): Promise<GameObject[]> {
-    return await this.objects.find({ recycled: { $ne: true } }).toArray();
+  async listAll(includeRecycled = false): Promise<GameObject[]> {
+    const query = includeRecycled ? {} : { recycled: { $ne: true } };
+    return await this.objects.find(query).toArray();
   }
 }
