@@ -232,7 +232,7 @@ describe.sequential('DevToolsServer', () => {
       expect(hello.params.version).toBe('1.0.0');
       expect(hello.params.capabilities).toEqual({
         objectCRUD: true,
-        typeGeneration: false,
+        typeGeneration: true,
         changeWatch: true,
         lsp: false,
       });
