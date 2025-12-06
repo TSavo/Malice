@@ -1,4 +1,4 @@
-import type { GameObject, ObjId, PropertyValue, MethodCode, Method, RuntimeObject, Value, ValueType } from '../../types/object.js';
+import type { GameObject, ObjId, PropertyValue, MethodCode, Method, RuntimeObject, Value } from '../../types/object.js';
 import type { ObjectManager } from './object-manager.js';
 import * as ts from 'typescript';
 
@@ -46,12 +46,8 @@ export class RuntimeObjectImpl implements RuntimeObject {
           return true;
         }
 
-        // Set property and auto-save
+        // Set property (auto-persists)
         target.set(prop, value);
-        // Auto-save in background (fire and forget)
-        target.save().catch(err => {
-          console.error(`Failed to auto-save object #${target.id}:`, err);
-        });
         return true;
       }
     });
@@ -155,13 +151,13 @@ export class RuntimeObjectImpl implements RuntimeObject {
         return value.value;
 
       case 'objref':
-        // Resolve object reference
+        // Resolve object reference - getSync returns the proxy directly
         const obj = this.manager.getSync(value.value);
         if (!obj) {
           // Object not in cache or doesn't exist - return raw ID
           return value.value;
         }
-        return obj.proxy;
+        return obj;
 
       case 'array':
         // Recursively convert array elements
@@ -204,6 +200,7 @@ export class RuntimeObjectImpl implements RuntimeObject {
   /**
    * Set property - always on this object
    * Automatically detects type and creates typed Value
+   * Auto-persists to database - MOO code never calls save()
    */
   set(prop: string, value: PropertyValue): void {
     if (!this.obj.properties) {
@@ -211,11 +208,18 @@ export class RuntimeObjectImpl implements RuntimeObject {
     }
     // Convert JavaScript value to typed Value
     this.obj.properties[prop] = this.toValue(value);
-    this.dirty = true;
+
+    // Auto-persist - fire and forget, MOO never sees save semantics
+    this.manager.update(this.id, {
+      properties: this.obj.properties
+    }, false).catch(err => {
+      console.error(`[RuntimeObject] Failed to persist property ${prop} on #${this.id}:`, err);
+    });
   }
 
   /**
    * Set a method on this object
+   * Auto-persists to database
    */
   setMethod(name: string, code: string, options?: { callable?: boolean; aliases?: string[]; help?: string }): void {
     if (!this.obj.methods) {
@@ -225,7 +229,13 @@ export class RuntimeObjectImpl implements RuntimeObject {
       code,
       ...options,
     };
-    this.dirty = true;
+
+    // Auto-persist
+    this.manager.update(this.id, {
+      methods: this.obj.methods
+    }, false).catch(err => {
+      console.error(`[RuntimeObject] Failed to persist method ${name} on #${this.id}:`, err);
+    });
   }
 
   /**
@@ -368,16 +378,22 @@ export class RuntimeObjectImpl implements RuntimeObject {
         // Check if accessing a numeric property like $2, $3
         if (typeof prop === 'string' && /^\d+$/.test(prop)) {
           const objId = parseInt(prop, 10);
+          // getSync returns the proxy directly from cache
           const obj = target.getSync(objId);
           if (!obj) {
             throw new Error(`Object #${objId} not found or not loaded`);
           }
-          return obj.proxy;
+          return obj;
         }
         // Otherwise return the manager's own properties/methods
         return (target as any)[prop];
       },
     });
+
+    // For verb dispatch, args are: [context, player, command, ...resolvedArgs]
+    // Extract player and command if present
+    const verbPlayer = args.length >= 2 ? args[1] : null;
+    const verbCommand = args.length >= 3 ? args[2] : null;
 
     const context = {
       self,
@@ -385,7 +401,8 @@ export class RuntimeObjectImpl implements RuntimeObject {
       $: $proxy,
       args,
       context: userContext, // ConnectionContext or other execution context
-      player: userContext?.player || self, // Player object if available, otherwise self
+      player: verbPlayer || userContext?.player || self, // Player from verb dispatch, or context, or self
+      command: verbCommand || '', // Raw command string from verb dispatch
     };
 
     try {
@@ -399,6 +416,7 @@ export class RuntimeObjectImpl implements RuntimeObject {
         const args = ctx.args;
         const context = ctx.context;
         const player = ctx.player;
+        const command = ctx.command;
         return (async () => {
           ${jsCode}
         })();
@@ -422,10 +440,15 @@ export class RuntimeObjectImpl implements RuntimeObject {
   /**
    * Set parent object ID
    */
-  async setParent(parent: ObjId): Promise<void> {
+  setParent(parent: ObjId): void {
     this.obj.parent = parent;
-    this.dirty = true;
-    await this.save();
+
+    // Auto-persist
+    this.manager.update(this.id, {
+      parent: this.obj.parent
+    }, false).catch(err => {
+      console.error(`[RuntimeObject] Failed to persist parent on #${this.id}:`, err);
+    });
   }
 
   /**
@@ -477,18 +500,32 @@ export class RuntimeObjectImpl implements RuntimeObject {
 
   /**
    * Add a method to this object
+   * Auto-persists to database
    */
   addMethod(name: string, code: MethodCode): void {
-    this.obj.methods[name] = code;
-    this.dirty = true;
+    this.obj.methods[name] = { code };
+
+    // Auto-persist
+    this.manager.update(this.id, {
+      methods: this.obj.methods
+    }, false).catch(err => {
+      console.error(`[RuntimeObject] Failed to persist method ${name} on #${this.id}:`, err);
+    });
   }
 
   /**
    * Remove a method from this object
+   * Auto-persists to database
    */
   removeMethod(name: string): void {
     delete this.obj.methods[name];
-    this.dirty = true;
+
+    // Auto-persist
+    this.manager.update(this.id, {
+      methods: this.obj.methods
+    }, false).catch(err => {
+      console.error(`[RuntimeObject] Failed to persist method removal on #${this.id}:`, err);
+    });
   }
 
   /**

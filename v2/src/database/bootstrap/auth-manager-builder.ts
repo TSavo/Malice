@@ -1,5 +1,5 @@
 import { ObjectManager } from '../object-manager.js';
-import type { RuntimeObject } from '../../types/object.js';
+import type { RuntimeObject } from '../../../types/object.js';
 
 /**
  * Builds AuthManager object (dynamic ID)
@@ -122,8 +122,6 @@ export class AuthManagerBuilder {
             }
           }
         `);
-
-    await this.authManager.save();
   }
 
   async registerAlias(): Promise<void> {
@@ -135,7 +133,6 @@ export class AuthManagerBuilder {
     const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
     aliases.authManager = this.authManager.id;
     objectManager.set('aliases', aliases);
-    await objectManager.save();
 
     console.log(`✅ Registered authManager alias -> #${this.authManager.id}`);
   }

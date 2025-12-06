@@ -135,6 +135,12 @@ export interface RuntimeObject {
   /** Set a method on this object */
   setMethod(name: string, code: string, options?: { callable?: boolean; aliases?: string[]; help?: string }): void;
 
+  /** Add a method to this object (alias for setMethod with just code) */
+  addMethod(name: string, code: string): void;
+
+  /** Remove a method from this object */
+  removeMethod(name: string): void;
+
   /** Call method (walks inheritance chain, executes in context) */
   call(method: string, ...args: unknown[]): Promise<unknown>;
 
@@ -147,17 +153,14 @@ export interface RuntimeObject {
   /** Get parent object ID */
   getParent(): ObjId;
 
-  /** Set parent object ID */
-  setParent(parent: ObjId): Promise<void>;
+  /** Set parent object ID (auto-persists) */
+  setParent(parent: ObjId): void;
 
   /** Get all own properties (resolved to JavaScript values, objrefs become RuntimeObjects) */
   getOwnProperties(): Record<string, PropertyValue>;
 
   /** Get all own methods */
   getOwnMethods(): Record<string, Method>;
-
-  /** Save changes to database */
-  save(): Promise<void>;
 
   /** Get the raw GameObject (for internal use) */
   _getRaw(): GameObject;

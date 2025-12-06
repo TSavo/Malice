@@ -1,6 +1,7 @@
 import { ObjectDatabase } from './object-db.js';
 import { RuntimeObjectImpl } from './runtime-object.js';
 import { ObjectCache } from './object-cache.js';
+import * as bcrypt from 'bcrypt';
 import type {
   GameObject,
   ObjId,
@@ -114,7 +115,6 @@ export class ObjectManager {
         // Set properties through proxy to auto-convert to typed Values
         proxy.set('name', 'nothing');
         proxy.set('description', 'The null object reference - immutable, no properties or methods');
-        await proxy.save();
 
         return proxy;
       }
@@ -154,7 +154,6 @@ export class ObjectManager {
         proxy.set('name', 'ObjectManager');
         proxy.set('description', 'The root system object - provides object management and global aliases');
         proxy.set('aliases', {});
-        await proxy.save();
 
         return proxy;
       }
@@ -213,7 +212,6 @@ export class ObjectManager {
       for (const [key, value] of Object.entries(params.properties)) {
         proxy.set(key, value);
       }
-      await proxy.save();
     }
 
     return proxy;
@@ -222,7 +220,7 @@ export class ObjectManager {
   /**
    * Update object in database
    * @param invalidateCache - Whether to invalidate cache after update (default: true)
-   *   Set to false when called by RuntimeObject.save() (in-memory is source of truth)
+   *   Set to false when called by RuntimeObject's auto-persist (in-memory is source of truth)
    *   Set to true for external updates (DevTools, tests, etc)
    */
   async update(
@@ -414,6 +412,49 @@ export class ObjectManager {
       console.log(`[ObjectManager] Invalidating cache for object #${id}`);
     }
     this.cache.invalidate(id);
+  }
+
+  /**
+   * Evict object from cache (for recycler to use)
+   * Does not reload - just removes from cache
+   */
+  evictFromCache(id: ObjId): void {
+    this.cache.invalidate(id);
+  }
+
+  // ==========================================================================
+  // MOO Helper Methods
+  // These methods are exposed to MOO code via $ and hide infrastructure details
+  // ==========================================================================
+
+  /**
+   * Count the number of player objects in the database
+   * Used by CharGen to determine if this is the first player (admin)
+   * Searches for objects that have a non-empty playername property
+   */
+  async countPlayers(): Promise<number> {
+    return await this.db.countPlayers();
+  }
+
+  /**
+   * Hash a password using bcrypt
+   * Used by Player.setPassword and CharGen
+   * @param password - Plain text password
+   * @returns Hashed password
+   */
+  async hashPassword(password: string): Promise<string> {
+    return await bcrypt.hash(password, 10);
+  }
+
+  /**
+   * Check a password against a bcrypt hash
+   * Used by Player.checkPassword and AuthManager
+   * @param password - Plain text password to check
+   * @param hash - Bcrypt hash to compare against
+   * @returns true if password matches
+   */
+  async checkPassword(password: string, hash: string): Promise<boolean> {
+    return await bcrypt.compare(password, hash);
   }
 
   /**
