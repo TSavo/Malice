@@ -67,9 +67,9 @@ export class PrototypeBuilder {
       parent: 1,
       properties: {
         name: 'Describable',
-        description: 'Base prototype for things that can be described',
+        description: 'Base prototype for things that exist in the world',
         aliases: [],
-        location: null, // ObjId | null - Optional: where this object is located (Location prototype)
+        location: null, // ObjId | null - where this object is located
       },
       methods: {},
     });
@@ -80,6 +80,69 @@ export class PrototypeBuilder {
 
     obj.setMethod('shortDesc', `
       return self.name;
+    `);
+
+    // THE primitive for all location changes
+    // Everything that moves goes through this method
+    obj.setMethod('moveTo', `
+      const destination = args[0]; // ObjId or RuntimeObject
+      const mover = args[1]; // Who/what is causing the move (optional)
+
+      const destId = typeof destination === 'number' ? destination : destination?.id;
+      if (destId === undefined || destId === null) {
+        throw new Error('Invalid destination');
+      }
+
+      const sourceId = self.location;
+      const source = sourceId ? await $.load(sourceId) : null;
+      const dest = await $.load(destId);
+
+      if (!dest) {
+        throw new Error(\`Destination #\${destId} not found\`);
+      }
+
+      // Pre-move hooks (can throw to cancel the move)
+      if (source && source.onContentLeaving) {
+        await source.onContentLeaving(self, dest, mover);
+      }
+      await self.onLeaving(source, dest, mover);
+
+      // Perform the actual move
+      if (source && source.removeContent) {
+        await source.removeContent(self.id);
+      }
+      self.location = destId;
+      if (dest.addContent) {
+        await dest.addContent(self.id);
+      }
+      await self.save();
+
+      // Post-move hooks (for notifications, verb registration, etc.)
+      if (source && source.onContentLeft) {
+        await source.onContentLeft(self, dest, mover);
+      }
+      await self.onArrived(dest, source, mover);
+      if (dest.onContentArrived) {
+        await dest.onContentArrived(self, source, mover);
+      }
+    `);
+
+    // Hook: called before leaving current location
+    // Override to prepare for departure, can throw to cancel
+    obj.setMethod('onLeaving', `
+      const source = args[0];
+      const dest = args[1];
+      const mover = args[2];
+      // Default: do nothing, allow move
+    `);
+
+    // Hook: called after arriving at new location
+    // Override to register verbs, announce arrival, etc.
+    obj.setMethod('onArrived', `
+      const dest = args[0];
+      const source = args[1];
+      const mover = args[2];
+      // Default: do nothing
     `);
 
     await obj.save();
@@ -139,6 +202,33 @@ export class PrototypeBuilder {
         self.contents = contents;
         await self.save();
       }
+    `);
+
+    // Hook: called before an object leaves this location
+    // Can throw to prevent the move
+    obj.setMethod('onContentLeaving', `
+      const obj = args[0];
+      const dest = args[1];
+      const mover = args[2];
+      // Default: allow all departures
+    `);
+
+    // Hook: called after an object has left this location
+    // Use for cleanup, unregistering verbs, notifications
+    obj.setMethod('onContentLeft', `
+      const obj = args[0];
+      const dest = args[1];
+      const mover = args[2];
+      // Default: do nothing
+    `);
+
+    // Hook: called after an object has arrived in this location
+    // Use for announcements, registering verbs, triggers
+    obj.setMethod('onContentArrived', `
+      const obj = args[0];
+      const source = args[1];
+      const mover = args[2];
+      // Default: do nothing
     `);
 
     await obj.save();
@@ -205,6 +295,62 @@ export class PrototypeBuilder {
       await self.save();
     `);
 
+    // The 'go' verb - used by exit directions
+    obj.setMethod('go', `
+      const context = args[0];
+      const player = args[1];
+      const direction = args[2];
+
+      const exits = self.exits || {};
+      const destId = exits[direction];
+
+      if (!destId) {
+        return \`You can't go \${direction} from here.\`;
+      }
+
+      // Move player to destination (triggers all hooks)
+      await player.moveTo(destId, player);
+
+      // Show new room
+      const dest = await $.load(destId);
+      if (dest) {
+        return await dest.describe(player);
+      }
+    `);
+
+    // Override: when an agent arrives, register exit verbs
+    obj.setMethod('onContentArrived', `
+      const obj = args[0];
+      const source = args[1];
+      const mover = args[2];
+
+      // Only register verbs for agents (things with registerVerb)
+      if (!obj.registerVerb) return;
+
+      // Register each exit direction as a verb
+      const exits = self.exits || {};
+      for (const direction of Object.keys(exits)) {
+        await obj.registerVerb(direction, self, 'go');
+      }
+
+      // TODO: Announce arrival to others in room
+    `);
+
+    // Override: when an agent leaves, unregister exit verbs
+    obj.setMethod('onContentLeft', `
+      const obj = args[0];
+      const dest = args[1];
+      const mover = args[2];
+
+      // Only unregister verbs for agents
+      if (!obj.unregisterVerbsFrom) return;
+
+      // Unregister all verbs this room provided
+      await obj.unregisterVerbsFrom(self.id);
+
+      // TODO: Announce departure to others in room
+    `);
+
     await obj.save();
     return obj;
   }
@@ -215,18 +361,65 @@ export class PrototypeBuilder {
       properties: {
         name: 'Agent',
         description: 'Base prototype for things that can act',
-        location: 0,
-        inventory: [],
+        // Verb registry: { verbName: { obj: ObjId, method: string } }
+        verbs: {},
       },
       methods: {},
     });
 
-    obj.setMethod('moveTo', `
-      const targetId = args[0];
-      // TODO: Notify old location
-      self.location = targetId;
-      // TODO: Notify new location
+    // Register a verb that this agent can use
+    // verbName: the command word (e.g., 'shoot', 'look')
+    // sourceObj: the object that provides the verb
+    // methodName: the method to call on sourceObj (defaults to verbName)
+    obj.setMethod('registerVerb', `
+      const verbName = args[0];
+      const sourceObj = args[1]; // RuntimeObject or ObjId
+      const methodName = args[2] || verbName;
+
+      const sourceId = typeof sourceObj === 'number' ? sourceObj : sourceObj.id;
+      const verbs = self.verbs || {};
+      verbs[verbName] = { obj: sourceId, method: methodName };
+      self.verbs = verbs;
       await self.save();
+    `);
+
+    // Unregister a verb
+    obj.setMethod('unregisterVerb', `
+      const verbName = args[0];
+      const verbs = self.verbs || {};
+      delete verbs[verbName];
+      self.verbs = verbs;
+      await self.save();
+    `);
+
+    // Unregister all verbs provided by a specific object
+    obj.setMethod('unregisterVerbsFrom', `
+      const sourceObj = args[0];
+      const sourceId = typeof sourceObj === 'number' ? sourceObj : sourceObj.id;
+      const verbs = self.verbs || {};
+
+      for (const [verbName, info] of Object.entries(verbs)) {
+        if (info.obj === sourceId) {
+          delete verbs[verbName];
+        }
+      }
+
+      self.verbs = verbs;
+      await self.save();
+    `);
+
+    // Check if agent has a specific verb registered
+    obj.setMethod('hasVerb', `
+      const verbName = args[0];
+      const verbs = self.verbs || {};
+      return verbName in verbs;
+    `);
+
+    // Get verb info (for dispatch)
+    obj.setMethod('getVerb', `
+      const verbName = args[0];
+      const verbs = self.verbs || {};
+      return verbs[verbName] || null;
     `);
 
     obj.setMethod('say', `
@@ -326,18 +519,25 @@ export class PrototypeBuilder {
 
       // Update last login
       self.lastLogin = new Date();
-      await self.save();
 
-      // Show location if set
+      // Register player's default verbs
+      await self.registerVerb('look', self);
+      await self.registerVerb('l', self, 'look'); // alias
+      await self.registerVerb('say', self);
+      await self.registerVerb('emote', self);
+      await self.registerVerb('quit', self);
+
+      // If we have a location, move into it to trigger verb registration
       if (self.location && self.location !== 0) {
         const location = await $.load(self.location);
         if (location) {
+          // Trigger onArrived to register room verbs
+          await self.onArrived(location, null, null);
+          // Show room description
           const desc = await location.describe(self);
           context.send(\`\\r\\n\${desc}\\r\\n\`);
         }
       }
-
-      // TODO: Notify others in room
 
       // Set up command loop - player handles their own input now
       context.setHandler(self);
@@ -361,36 +561,26 @@ export class PrototypeBuilder {
       const verb = parts[0].toLowerCase();
       const argString = parts.slice(1).join(' ');
 
-      // Try to find callable method on self or location
       try {
-        // Check if player has this verb as a callable method
-        if (self.hasMethod && self.hasMethod(verb)) {
-          const result = await self[verb](context, argString);
-          if (result !== undefined) {
-            context.send(\`\${result}\\r\\n\`);
-          }
-          context.send('> ');
-          return;
-        }
+        // Look up verb in registry
+        const verbInfo = await self.getVerb(verb);
 
-        // Check location for callable methods (room verbs)
-        if (self.location && self.location !== 0) {
-          const location = await $.load(self.location);
-          if (location && location.hasMethod && location.hasMethod(verb)) {
-            const result = await location[verb](context, self, argString);
+        if (verbInfo) {
+          // Found registered verb - dispatch to handler
+          const handler = await $.load(verbInfo.obj);
+          if (handler) {
+            const result = await handler[verbInfo.method](context, self, argString);
             if (result !== undefined) {
               context.send(\`\${result}\\r\\n\`);
             }
-            context.send('> ');
-            return;
+          } else {
+            context.send(\`Error: verb handler #\${verbInfo.obj} not found.\\r\\n\`);
           }
+        } else {
+          // No registered verb found
+          context.send(\`I don't understand "\${verb}".\\r\\n\`);
         }
 
-        // TODO: Check objects in location for callable methods
-        // TODO: Check inventory for callable methods
-
-        // No matching verb found
-        context.send(\`I don't understand "\${verb}".\\r\\n\`);
         context.send('> ');
       } catch (err) {
         context.send(\`Error: \${err.message}\\r\\n\`);
@@ -398,11 +588,28 @@ export class PrototypeBuilder {
       }
     `);
 
+    obj.setMethod('quit', `
+      const context = args[0];
+      const player = args[1]; // self
+
+      context.send('Goodbye!\\r\\n');
+      await self.disconnect();
+      context.close();
+    `);
+
     obj.setMethod('disconnect', `
+      // Unregister all verbs from current location
+      if (self.location && self.location !== 0) {
+        const location = await $.load(self.location);
+        if (location) {
+          await self.unregisterVerbsFrom(location.id);
+        }
+      }
+
       // Save any unsaved state
       await self.save();
 
-      // TODO: Notify room
+      // TODO: Notify room that player left
     `);
 
     obj.setMethod('checkPassword', `

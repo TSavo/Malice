@@ -307,6 +307,9 @@ describe('ObjectDatabase', () => {
       const testDb = new ObjectDatabase(MONGO_URI, TEST_DB_NAME + '_watch');
       await testDb.connect();
 
+      // Clean up any existing data
+      await testDb['objects'].deleteMany({});
+
       const changes: any[] = [];
       testDb.watch((change) => {
         changes.push(change);
@@ -315,11 +318,11 @@ describe('ObjectDatabase', () => {
       // Wait for change stream to initialize
       await new Promise((resolve) => setTimeout(resolve, 500));
 
-      // Create an object
+      // Create an object (properties are typed Values)
       await testDb.create({
         _id: 50,
         parent: 0,
-        properties: { test: true },
+        properties: { test: { type: 'boolean', value: true } },
         methods: {},
       });
 
