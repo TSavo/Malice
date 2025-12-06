@@ -13,6 +13,7 @@
 import { TelnetServer } from './transport/telnet/index.js';
 import { WebSocketServer } from './transport/websocket/index.js';
 import { GameCoordinator } from './game/index.js';
+import { LSPApiServer } from './lsp/api-server.js';
 
 async function main() {
   console.log('🎮 Malice v2 - Modern TypeScript MUD\n');
@@ -36,6 +37,10 @@ async function main() {
   // Get connection manager
   const connectionManager = game.getConnectionManager();
 
+  // Start LSP API Server for VS Code extension
+  const lspApi = new LSPApiServer(game.getObjectManager(), 3000);
+  lspApi.start();
+
   // Create telnet server (port 5555)
   const telnetServer = new TelnetServer({
     port: 5555,
@@ -57,11 +62,12 @@ async function main() {
     await game.handleConnection(connection);
   });
 
-  wsServer.connection$.subscribe(async (transport) => {
-    const connection = connectionManager.addTransport(transport);
-    console.log(`✅ New ${transport.type} connection: ${connection.id}`);
+  // WebSocket server now emits Connection objects (may have HTTP auth)
+  wsServer.connection$.subscribe(async (connection) => {
+    connectionManager.add(connection);
+    console.log(`✅ New ${connection.transport.type} connection: ${connection.id}`);
 
-    // Hand connection to game coordinator (will invoke AuthManager)
+    // Hand connection to game coordinator (will invoke System object)
     await game.handleConnection(connection);
   });
 

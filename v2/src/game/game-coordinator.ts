@@ -1,5 +1,5 @@
 import { ObjectDatabase, ObjectManager } from '../database/index.js';
-import { GameBootstrap } from '../database/bootstrap.js';
+import { GameBootstrap } from '../database/game-bootstrap.js';
 import { ConnectionManager } from '../connection/connection-manager.js';
 import { ConnectionContext } from './connection-context.js';
 import type { Connection } from '../connection/connection.js';
@@ -53,8 +53,8 @@ export class GameCoordinator {
     const context = new ConnectionContext(connection, this.manager);
     this.contexts.set(connection.id, context);
 
-    // Load System object (#2) and let it handle the connection
-    const system = await this.manager.load(2);
+    // Load System object via alias and let it handle the connection
+    const system = (this.manager as any).system;
     if (!system) {
       connection.send('Error: System not available.\r\n');
       connection.close();

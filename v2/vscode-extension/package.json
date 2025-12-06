@@ -1,0 +1,77 @@
+{
+  "name": "malice-lsp",
+  "displayName": "Malice MOO Language Support",
+  "description": "TypeScript language support for Malice MOO objects",
+  "version": "0.1.0",
+  "publisher": "malice",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "activationEvents": [
+    "onLanguage:typescript",
+    "onFileSystem:malice"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "malice.openObject",
+        "title": "Malice: Open Object"
+      },
+      {
+        "command": "malice.browseObjects",
+        "title": "Malice: Browse Objects"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "malice-explorer",
+          "title": "Malice MOO",
+          "icon": "resources/malice-icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "malice-explorer": [
+        {
+          "id": "malice-objects",
+          "name": "Objects"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Malice",
+      "properties": {
+        "malice.serverUrl": {
+          "type": "string",
+          "default": "mongodb://localhost:27017",
+          "description": "MongoDB connection URL"
+        },
+        "malice.database": {
+          "type": "string",
+          "default": "malice",
+          "description": "MongoDB database name"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.80.0",
+    "typescript": "^5.0.0",
+    "@vscode/vsce": "^2.19.0"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^9.0.1"
+  }
+}
