@@ -4,7 +4,7 @@
  */
 
 import type { ObjectManager } from '../database/object-manager.js';
-import type { GameObject } from '../../types/object.js';
+import type { GameObject, Value } from '../../types/object.js';
 
 /**
  * Generates TypeScript definition files from MongoDB objects
@@ -178,20 +178,17 @@ interface Connection {
   }
 
   /**
-   * Infer TypeScript type from JavaScript value
+   * Infer TypeScript type from typed Value
    */
-  private inferType(value: any): string {
-    if (value === null) {
-      return 'null';
-    }
-
-    if (value === undefined) {
+  private inferType(value: Value): string {
+    if (!value) {
       return 'any';
     }
 
-    const type = typeof value;
+    switch (value.type) {
+      case 'null':
+        return 'null';
 
-    switch (type) {
       case 'string':
         return 'string';
 
@@ -201,26 +198,33 @@ interface Connection {
       case 'boolean':
         return 'boolean';
 
-      case 'object':
-        if (Array.isArray(value)) {
-          // Try to infer array element type
-          if (value.length === 0) {
-            return 'any[]';
-          }
+      case 'objref':
+        // Resolve objref to specific object type
+        const objId = value.value as number;
+        return `RuntimeObject & MaliceObject_${objId}`;
 
-          // Check if all elements are same type
-          const firstType = this.inferType(value[0]);
-          const allSameType = value.every(item => this.inferType(item) === firstType);
-
-          if (allSameType && firstType !== 'any') {
-            return `${firstType}[]`;
-          }
-
+      case 'array': {
+        const arrayValue = value.value as Value[];
+        if (arrayValue.length === 0) {
           return 'any[]';
         }
 
-        // Plain object
+        // Check if all elements are same type
+        const firstType = this.inferType(arrayValue[0]);
+        const allSameType = arrayValue.every(item => this.inferType(item) === firstType);
+
+        if (allSameType && firstType !== 'any') {
+          return `${firstType}[]`;
+        }
+
+        return 'any[]';
+      }
+
+      case 'object': {
+        // For now, just use Record<string, any>
+        // Could recursively infer object structure in the future
         return 'Record<string, any>';
+      }
 
       default:
         return 'any';

@@ -9,15 +9,62 @@
 export type ObjId = number;
 
 /**
- * Property value - can be primitives, arrays of ObjIds, or nested objects
+ * Value type - represents the type of a stored value
+ */
+export type ValueType =
+  | 'number'   // JavaScript number (int or float)
+  | 'string'   // JavaScript string
+  | 'boolean'  // JavaScript boolean
+  | 'null'     // JavaScript null
+  | 'objref'   // Object reference (stores ObjId, resolves to RuntimeObject)
+  | 'array'    // Array of Values
+  | 'object';  // Record of Values
+
+/**
+ * Typed value container
+ * All properties are stored as Values with explicit type information
+ */
+export interface Value {
+  type: ValueType;
+  value: any; // Actual value depends on type
+}
+
+/**
+ * Array value - contains typed elements
+ */
+export interface ArrayValue extends Value {
+  type: 'array';
+  value: Value[];
+}
+
+/**
+ * Object value - contains typed properties
+ */
+export interface ObjectValue extends Value {
+  type: 'object';
+  value: Record<string, Value>;
+}
+
+/**
+ * Object reference value - stores object ID, resolves to RuntimeObject
+ */
+export interface ObjRefValue extends Value {
+  type: 'objref';
+  value: ObjId;
+}
+
+/**
+ * Property value - resolved JavaScript value
+ * This is what you get from get() - objrefs are resolved to RuntimeObjects
  */
 export type PropertyValue =
   | string
   | number
   | boolean
   | null
-  | ObjId[]
-  | { [key: string]: PropertyValue };
+  | RuntimeObject  // Resolved objref
+  | PropertyValue[]  // Recursive array
+  | { [key: string]: PropertyValue };  // Recursive object
 
 /**
  * Method with metadata
@@ -58,8 +105,8 @@ export interface GameObject {
   /** Parent object for inheritance (#0 = no parent) */
   parent: ObjId;
 
-  /** Properties defined on this object */
-  properties: Record<string, PropertyValue>;
+  /** Properties defined on this object (typed values) */
+  properties: Record<string, Value>;
 
   /** Methods defined on this object */
   methods: Record<string, Method>;
@@ -79,10 +126,10 @@ export interface RuntimeObject {
   /** The object ID */
   id: ObjId;
 
-  /** Get property (walks inheritance chain) */
+  /** Get property (walks inheritance chain, resolves objrefs to RuntimeObjects) */
   get(prop: string): PropertyValue | undefined;
 
-  /** Set property (always on this object) */
+  /** Set property (always on this object, auto-detects type) */
   set(prop: string, value: PropertyValue): void;
 
   /** Set a method on this object */
@@ -103,7 +150,7 @@ export interface RuntimeObject {
   /** Set parent object ID */
   setParent(parent: ObjId): Promise<void>;
 
-  /** Get all own properties */
+  /** Get all own properties (resolved to JavaScript values, objrefs become RuntimeObjects) */
   getOwnProperties(): Record<string, PropertyValue>;
 
   /** Get all own methods */
@@ -123,7 +170,7 @@ export interface CreateObjectParams {
   /** Parent object to inherit from */
   parent: ObjId;
 
-  /** Initial properties */
+  /** Initial properties (will be auto-converted to typed Values) */
   properties?: Record<string, PropertyValue>;
 
   /** Initial methods */

@@ -175,16 +175,26 @@ export class ObjectManager {
   async create(params: CreateObjectParams): Promise<RuntimeObject> {
     const id = await this.db.getNextId();
 
+    // Create object with empty properties first
     const obj = await this.db.create({
       _id: id,
       parent: params.parent,
-      properties: params.properties || {},
+      properties: {},
       methods: params.methods || {},
     });
 
     const runtime = new RuntimeObjectImpl(obj, this);
     const proxy = runtime.getProxy();
     this.cache.setObject(id, proxy);
+
+    // Set properties through RuntimeObject to auto-convert to typed Values
+    if (params.properties) {
+      for (const [key, value] of Object.entries(params.properties)) {
+        proxy.set(key, value);
+      }
+      await proxy.save();
+    }
+
     return proxy;
   }
 
