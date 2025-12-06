@@ -237,21 +237,44 @@ export class RuntimeObjectImpl implements RuntimeObject {
     // - self: the proxied object (enables self.hp instead of self.get('hp'))
     // - $: the object manager (for finding other objects)
     // - args: method arguments
+    // - $N: direct object references ($2, $3, etc.) via Proxy
 
     const self = this.proxy;
+
+    // Create a Proxy for $ that allows $2, $3, etc. syntax
+    const manager = this.manager;
+    const $proxy = new Proxy(manager, {
+      get(target, prop) {
+        // Check if accessing a numeric property like $2, $3
+        if (typeof prop === 'string' && /^\d+$/.test(prop)) {
+          const objId = parseInt(prop, 10);
+          const obj = target.getSync(objId);
+          if (!obj) {
+            throw new Error(`Object #${objId} not found or not loaded`);
+          }
+          return obj.proxy;
+        }
+        // Otherwise return the manager's own properties/methods
+        return (target as any)[prop];
+      },
+    });
+
     const context = {
       self,
       this: self, // Also expose as 'this' but it might be shadowed
-      $: this.manager,
+      $: $proxy,
       args,
     };
 
     try {
       // Wrap code in async function for execution
+      // Don't destructure $ so we can use $2, $3, etc. via Proxy
       // eslint-disable-next-line @typescript-eslint/no-implied-eval
       const AsyncFn = async function () {}.constructor as FunctionConstructor;
       const fn = new AsyncFn('ctx', `
-        const { self, $, args } = ctx;
+        const self = ctx.self;
+        const $ = ctx.$;
+        const args = ctx.args;
         return (async () => {
           ${jsCode}
         })();
