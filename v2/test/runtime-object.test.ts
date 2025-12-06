@@ -520,10 +520,10 @@ describe('RuntimeObject', () => {
 
   describe('refresh()', () => {
     it('should reload object from database', async () => {
-      // Modify object in database directly
+      // Modify object in database directly (properties are now typed Values)
       await db['objects'].updateOne(
         { _id: testObj.id },
-        { $set: { 'properties.hp': 999 } }
+        { $set: { 'properties.hp': { type: 'number', value: 999 } } }
       );
 
       // Invalidate cache so refresh loads from DB
@@ -559,10 +559,10 @@ describe('RuntimeObject', () => {
     it('should load latest properties', async () => {
       testObj.set('local', 'local value');
 
-      // Modify in database
+      // Modify in database (properties are now typed Values)
       await db['objects'].updateOne(
         { _id: testObj.id },
-        { $set: { 'properties.db': 'db value' } }
+        { $set: { 'properties.db': { type: 'string', value: 'db value' } } }
       );
 
       // Invalidate cache so refresh loads from DB

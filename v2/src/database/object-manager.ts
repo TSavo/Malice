@@ -207,8 +207,9 @@ export class ObjectManager {
   ): Promise<void> {
     await this.db.update(id, updates);
 
-    // Invalidate cache entry to force reload (object, methods, parent chains)
-    this.cache.invalidate(id);
+    // Don't invalidate cache - the in-memory object is the source of truth
+    // Cache is only invalidated when external changes occur (via change stream)
+    // or when explicitly called via invalidate()
   }
 
   /**
@@ -381,15 +382,21 @@ export class ObjectManager {
       if (operationType === 'update' || operationType === 'replace') {
         const id = change.documentKey._id as ObjId;
 
-        // Only log if we actually had it cached
-        if (this.cache.hasObject(id)) {
-          console.log(
-            `[ObjectManager] External change detected for object #${id} - invalidating cache`
-          );
-        }
+        // TODO: Distinguish between our own writes and external writes
+        // For now, don't invalidate cache - the in-memory object is source of truth
+        // Change stream should only invalidate for truly external changes
+        // (from other servers/processes), but MongoDB doesn't provide this info
 
-        // Invalidate object, compiled methods, and parent chains
-        this.cache.invalidate(id);
+        // TEMPORARILY DISABLED to prevent cache thrashing
+        // Re-enable when we can distinguish own writes from external writes
+        if (false) {
+          if (this.cache.hasObject(id)) {
+            console.log(
+              `[ObjectManager] External change detected for object #${id} - invalidating cache`
+            );
+          }
+          this.cache.invalidate(id);
+        }
       } else if (operationType === 'delete') {
         const id = change.documentKey._id as ObjId;
 
