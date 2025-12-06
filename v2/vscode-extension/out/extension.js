@@ -42,8 +42,10 @@ exports.deactivate = deactivate;
 const vscode = __importStar(require("vscode"));
 const devtools_client_js_1 = require("./devtools-client.js");
 const tree_view_js_1 = require("./tree-view.js");
+const type_manager_js_1 = require("./type-manager.js");
 let client;
 let treeView;
+let typeManager;
 /**
  * Extension activation
  */
@@ -57,6 +59,10 @@ async function activate(context) {
     try {
         await client.connect();
         vscode.window.showInformationMessage('Connected to Malice DevTools server');
+        // Initialize type definition manager
+        typeManager = new type_manager_js_1.TypeDefinitionManager(client);
+        await typeManager.initialize(context);
+        context.subscriptions.push(typeManager);
     }
     catch (err) {
         vscode.window.showErrorMessage(`Failed to connect to DevTools server: ${err}`);
@@ -202,7 +208,11 @@ class MaliceFileSystemProvider {
             if (ext === 'ts') {
                 // Method
                 const method = await this.client.getMethod(objectId, name);
-                return Buffer.from(method.code, 'utf-8');
+                // Inject type reference at the top of the file
+                // This makes VS Code's TypeScript language service aware of generated types
+                const typeReference = '/// <reference path="../.malice/malice.d.ts" />\n\n';
+                const code = typeReference + method.code;
+                return Buffer.from(code, 'utf-8');
             }
             else if (ext === 'json') {
                 // Property
@@ -230,8 +240,10 @@ class MaliceFileSystemProvider {
             const name = filename.substring(0, filename.lastIndexOf('.'));
             const text = Buffer.from(content).toString('utf-8');
             if (ext === 'ts') {
-                // Method
-                await this.client.setMethod(objectId, name, text);
+                // Method - strip type reference directive before saving
+                const typeReferencePattern = /^\/\/\/ <reference path="[^"]*" \/>\s*/;
+                const cleanCode = text.replace(typeReferencePattern, '');
+                await this.client.setMethod(objectId, name, cleanCode);
             }
             else if (ext === 'json') {
                 // Property
