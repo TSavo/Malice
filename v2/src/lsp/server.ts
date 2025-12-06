@@ -33,7 +33,7 @@ export class MaliceLSPServer {
   private vfs: VirtualFileSystem;
   private tsService: TypeScriptService;
 
-  constructor(private manager: ObjectManager) {
+  constructor(manager: ObjectManager) {
     this.vfs = new VirtualFileSystem(manager);
     this.tsService = new TypeScriptService(this.vfs);
 
@@ -69,7 +69,7 @@ export class MaliceLSPServer {
   /**
    * Handle initialization
    */
-  private onInitialize(params: InitializeParams): InitializeResult {
+  private onInitialize(_params: InitializeParams): InitializeResult {
     return {
       capabilities: {
         textDocumentSync: TextDocumentSyncKind.Incremental,
@@ -96,7 +96,7 @@ export class MaliceLSPServer {
 
     return completions.entries.map((entry) => ({
       label: entry.name,
-      kind: this.convertCompletionKind(entry.kind),
+      kind: this.convertCompletionKind(entry.kind) as CompletionItem['kind'],
       detail: entry.kind,
       documentation: entry.kindModifiers,
     }));

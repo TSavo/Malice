@@ -231,6 +231,18 @@ export class ObjectDatabase {
   }
 
   /**
+   * Count the number of player objects in the database
+   * Used by CharGen to determine if this is the first player (admin)
+   * Searches for objects that have a non-empty playername property
+   */
+  async countPlayers(): Promise<number> {
+    return await this.objects.countDocuments({
+      'properties.playername.type': 'string',
+      'properties.playername.value': { $ne: '' },
+    });
+  }
+
+  /**
    * List all objects (for DevTools)
    * @param includeRecycled - If true, include recycled objects
    */

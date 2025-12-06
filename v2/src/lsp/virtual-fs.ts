@@ -203,7 +203,6 @@ export class VirtualFileSystem {
 
     // Update method in MongoDB
     obj.setMethod(parsed.name, actualCode);
-    await obj.save();
 
     // Update cache
     const prototypeType = await this.inferPrototypeType(obj);

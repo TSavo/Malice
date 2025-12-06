@@ -39,7 +39,6 @@ export class MinimalBootstrap {
     if (!aliases.system) aliases.system = 2;
 
     objectManager.set('aliases', aliases);
-    await objectManager.save();
 
     console.log('✅ Registered core aliases in #0.properties.aliases');
   }
@@ -128,7 +127,6 @@ export class MinimalBootstrap {
           await preAuth.onPreAuth(context, authInfo);
         }
       `);
-      await system.save();
       console.log(`✅ Created System object #${system.id}`);
     }
   }

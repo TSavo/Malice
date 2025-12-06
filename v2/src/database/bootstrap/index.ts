@@ -5,4 +5,8 @@ export { AuthManagerBuilder } from './auth-manager-builder.js';
 export { CharGenBuilder } from './chargen-builder.js';
 export { PreAuthHandlerBuilder } from './preauth-handler-builder.js';
 export { RecyclerBuilder } from './recycler-builder.js';
+export { BodyFactoryBuilder } from './body-factory-builder.js';
+export { PronounSubBuilder } from './pronoun-sub-builder.js';
+export { RoomBuilder } from './room-builder.js';
+export { PromptBuilder } from './prompt-builder.js';
 export { AliasLoader } from './alias-loader.js';
