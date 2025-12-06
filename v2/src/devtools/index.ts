@@ -4,3 +4,4 @@
  */
 
 export { DevToolsServer } from './devtools-server.js';
+export { TypeGenerator } from './type-generator.js';

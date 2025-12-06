@@ -8,6 +8,7 @@
 import { WebSocketServer, WebSocket } from 'ws';
 import type { ObjectManager } from '../database/object-manager.js';
 import type { ObjId } from '../../types/object.js';
+import { TypeGenerator } from './type-generator.js';
 
 interface JsonRpcRequest {
   jsonrpc: '2.0';
@@ -67,7 +68,7 @@ export class DevToolsServer {
         version: '1.0.0',
         capabilities: {
           objectCRUD: true,
-          typeGeneration: false, // TODO: implement
+          typeGeneration: true,
           changeWatch: true,
           lsp: false, // TODO: implement
         },
@@ -155,6 +156,10 @@ export class DevToolsServer {
 
         case 'property.delete':
           result = await this.deleteProperty(params);
+          break;
+
+        case 'types.generate':
+          result = await this.generateTypes(params);
           break;
 
         default:
@@ -404,6 +409,25 @@ export class DevToolsServer {
     this.broadcast('property.deleted', { objectId, name });
 
     return { success: true };
+  }
+
+  /**
+   * Generate TypeScript definitions from database
+   */
+  private async generateTypes(params: { objectId?: ObjId } = {}): Promise<any> {
+    const generator = new TypeGenerator(this.manager);
+
+    let definitions: string;
+
+    if (params.objectId !== undefined) {
+      // Generate types for specific object (with enhanced self type)
+      definitions = await generator.generateForObject(params.objectId);
+    } else {
+      // Generate general types for all objects
+      definitions = await generator.generate();
+    }
+
+    return { definitions };
   }
 
   /**
