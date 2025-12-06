@@ -126,10 +126,17 @@ export class RuntimeObjectImpl implements RuntimeObject {
   /**
    * Convert a typed Value to a JavaScript value
    * Resolves objrefs to RuntimeObjects
+   * Also handles raw values for backwards compatibility
    */
-  private fromValue(value: Value | undefined): any {
+  private fromValue(value: Value | any | undefined): any {
     if (!value) {
       return undefined;
+    }
+
+    // Backwards compatibility: Handle raw values (not typed)
+    if (typeof value !== 'object' || !('type' in value)) {
+      // It's a raw value, return as-is
+      return value;
     }
 
     switch (value.type) {
@@ -221,13 +228,15 @@ export class RuntimeObjectImpl implements RuntimeObject {
    * @param context - Optional execution context (ConnectionContext, player, etc.)
    * @param args - Method arguments
    */
-  async call(method: string, context?: any, ...args: unknown[]): Promise<unknown> {
+  async call(method: string, ...args: unknown[]): Promise<unknown> {
     const code = await this.findMethodAsync(method);
     if (!code) {
       throw new Error(`Method ${method} not found on object #${this.id}`);
     }
 
-    return await this.executeMethod(code, context, args, method);
+    // Context will be undefined for programmatic calls
+    // In production, context would be set by the connection handler
+    return await this.executeMethod(code, undefined, args, method);
   }
 
   /**
@@ -438,11 +447,12 @@ export class RuntimeObjectImpl implements RuntimeObject {
   async save(): Promise<void> {
     if (!this.dirty) return;
 
+    // Don't invalidate cache - we're the source of truth
     await this.manager.update(this.id, {
       parent: this.obj.parent,
       properties: this.obj.properties,
       methods: this.obj.methods,
-    });
+    }, false);
 
     this.dirty = false;
   }

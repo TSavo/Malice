@@ -33,6 +33,9 @@ export class ObjectManager {
   private aliases = new Map<string, RuntimeObject>();
   public readonly db: ObjectDatabase; // Expose for DevTools direct access
 
+  // Track our own writes to avoid invalidating cache for them
+  private pendingWrites = new Map<ObjId, NodeJS.Timeout>();
+
   constructor(db: ObjectDatabase) {
     this.db = db;
     this.cache = new ObjectCache();
@@ -95,16 +98,25 @@ export class ObjectManager {
       // Load or create #-1 in database
       let obj = await this.db.get(-1);
       if (!obj) {
-        // Create #-1 as immutable null object
+        // Create #-1 as immutable null object with empty properties
         obj = await this.db.create({
           _id: -1,
           parent: -1, // Self-parented
-          properties: {
-            name: 'nothing',
-            description: 'The null object reference - immutable, no properties or methods',
-          },
+          properties: {},
           methods: {},
         });
+
+        // Wrap as RuntimeObject and cache THE PROXY
+        const runtime = new RuntimeObjectImpl(obj, this);
+        const proxy = runtime.getProxy();
+        this.cache.setObject(-1, proxy);
+
+        // Set properties through proxy to auto-convert to typed Values
+        proxy.set('name', 'nothing');
+        proxy.set('description', 'The null object reference - immutable, no properties or methods');
+        await proxy.save();
+
+        return proxy;
       }
 
       // Wrap as RuntimeObject and cache THE PROXY
@@ -125,17 +137,26 @@ export class ObjectManager {
       // Load or create #0 in database
       let obj = await this.db.get(0);
       if (!obj) {
-        // Create #0 on first access
+        // Create #0 on first access with empty properties
         obj = await this.db.create({
           _id: 0,
           parent: 0, // Self-parented
-          properties: {
-            name: 'ObjectManager',
-            description: 'The root system object - provides object management and global aliases',
-            aliases: {}, // Global alias registry
-          },
+          properties: {},
           methods: {},
         });
+
+        // Wrap ourselves as a RuntimeObject and cache THE PROXY
+        const runtime = new RuntimeObjectImpl(obj, this);
+        const proxy = runtime.getProxy();
+        this.cache.setObject(0, proxy);
+
+        // Set properties through proxy to auto-convert to typed Values
+        proxy.set('name', 'ObjectManager');
+        proxy.set('description', 'The root system object - provides object management and global aliases');
+        proxy.set('aliases', {});
+        await proxy.save();
+
+        return proxy;
       }
 
       // Wrap ourselves as a RuntimeObject and cache THE PROXY
@@ -200,16 +221,41 @@ export class ObjectManager {
 
   /**
    * Update object in database
+   * @param invalidateCache - Whether to invalidate cache after update (default: true)
+   *   Set to false when called by RuntimeObject.save() (in-memory is source of truth)
+   *   Set to true for external updates (DevTools, tests, etc)
    */
   async update(
     id: ObjId,
-    updates: Partial<Omit<GameObject, '_id' | 'created'>>
+    updates: Partial<Omit<GameObject, '_id' | 'created'>>,
+    invalidateCache = true
   ): Promise<void> {
+    // Track this write as ours so change stream doesn't invalidate it
+    this.trackWrite(id);
+
     await this.db.update(id, updates);
 
-    // Don't invalidate cache - the in-memory object is the source of truth
-    // Cache is only invalidated when external changes occur (via change stream)
-    // or when explicitly called via invalidate()
+    if (invalidateCache) {
+      this.cache.invalidate(id);
+    }
+  }
+
+  /**
+   * Track a write as belonging to this session
+   * Change stream will ignore changes to tracked writes
+   */
+  private trackWrite(id: ObjId): void {
+    // Clear existing timeout if present
+    if (this.pendingWrites.has(id)) {
+      clearTimeout(this.pendingWrites.get(id)!);
+    }
+
+    // Track this write for 2 seconds (change streams are usually fast)
+    const timeout = setTimeout(() => {
+      this.pendingWrites.delete(id);
+    }, 2000);
+
+    this.pendingWrites.set(id, timeout);
   }
 
   /**
@@ -382,21 +428,19 @@ export class ObjectManager {
       if (operationType === 'update' || operationType === 'replace') {
         const id = change.documentKey._id as ObjId;
 
-        // TODO: Distinguish between our own writes and external writes
-        // For now, don't invalidate cache - the in-memory object is source of truth
-        // Change stream should only invalidate for truly external changes
-        // (from other servers/processes), but MongoDB doesn't provide this info
-
-        // TEMPORARILY DISABLED to prevent cache thrashing
-        // Re-enable when we can distinguish own writes from external writes
-        if (false) {
-          if (this.cache.hasObject(id)) {
-            console.log(
-              `[ObjectManager] External change detected for object #${id} - invalidating cache`
-            );
-          }
-          this.cache.invalidate(id);
+        // Ignore our own writes (tracked by manager.update())
+        if (this.pendingWrites.has(id)) {
+          // This is our own write - don't invalidate cache
+          return;
         }
+
+        // This is an external change (from another server/process)
+        if (this.cache.hasObject(id)) {
+          console.log(
+            `[ObjectManager] External change detected for object #${id} - invalidating cache`
+          );
+        }
+        this.cache.invalidate(id);
       } else if (operationType === 'delete') {
         const id = change.documentKey._id as ObjId;
 

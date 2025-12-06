@@ -225,7 +225,7 @@ export class DevToolsServer {
       object: {
         _id: raw._id,
         parent: raw.parent,
-        properties: raw.properties,
+        properties: obj.getOwnProperties(), // Return resolved values, not typed Values
         methods: raw.methods,
         created: raw.created,
         modified: raw.modified,

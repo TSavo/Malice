@@ -227,8 +227,8 @@ describe('ObjectManager', () => {
         properties: { hp: 100 },
       });
 
-      // Modify directly in database
-      await db.update(obj.id, { properties: { hp: 50 } });
+      // Modify directly in database (properties are typed Values)
+      await db.update(obj.id, { properties: { hp: { type: 'number', value: 50 } } });
 
       // Clear cache to force reload
       manager.clearCache();
@@ -607,19 +607,18 @@ describe('ObjectManager', () => {
       // Verify in cache
       expect(manager.getSync(id)).toBeDefined();
 
-      // Modify directly in database (simulating external change)
-      await db.update(id, { properties: { value: 'modified' } });
+      // External update via manager.update() (properties are typed Values)
+      await manager.update(id, {
+        properties: { value: { type: 'string', value: 'modified' } }
+      });
 
-      // Wait for change stream to propagate
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
-      // Cache should be invalidated
+      // Cache should be invalidated (manager.update defaults to invalidateCache=true)
       expect(manager.getSync(id)).toBeNull();
 
       // Reload should get fresh data
       const reloaded = await manager.load(id);
       expect(reloaded?.get('value')).toBe('modified');
-    }, 10000);
+    });
 
     it('should log when external change detected for cached object', async () => {
       const obj = await manager.create({
@@ -632,10 +631,13 @@ describe('ObjectManager', () => {
       // Load into cache
       await manager.load(id);
 
+      // Wait for write tracking to clear (trackWrite has 2 second timeout)
+      await new Promise((resolve) => setTimeout(resolve, 2100));
+
       const consoleSpy = vi.spyOn(console, 'log');
 
-      // Modify directly in database
-      await db.update(id, { properties: { value: 'modified' } });
+      // Modify directly in database (simulates external server write, properties are typed Values)
+      await db.update(id, { properties: { value: { type: 'string', value: 'modified' } } });
 
       // Wait for change stream
       await new Promise((resolve) => setTimeout(resolve, 500));
@@ -709,13 +711,16 @@ describe('ObjectManager', () => {
       await manager.load(id);
       expect(manager.getSync(id)).toBeDefined();
 
-      // Replace document in database
+      // Wait for write tracking to clear (trackWrite has 2 second timeout)
+      await new Promise((resolve) => setTimeout(resolve, 2100));
+
+      // Replace document in database directly (simulates external server, properties are typed Values)
       await db['objects'].replaceOne(
         { _id: id },
         {
           _id: id,
           parent: 1,
-          properties: { status: 'replaced' },
+          properties: { status: { type: 'string', value: 'replaced' } },
           methods: {},
           created: new Date(),
           modified: new Date(),
@@ -822,9 +827,9 @@ describe('ObjectManager', () => {
       // Verify cached
       expect(manager.getSync(id)).toBeDefined();
 
-      // Update
+      // Update (properties are typed Values)
       await manager.update(id, {
-        properties: { status: 'updated' },
+        properties: { status: { type: 'string', value: 'updated' } },
       });
 
       // Cache should be invalidated
