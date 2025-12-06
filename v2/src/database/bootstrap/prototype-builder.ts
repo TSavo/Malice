@@ -70,6 +70,7 @@ export class PrototypeBuilder {
         description: 'Base prototype for things that exist in the world',
         aliases: [],
         location: null, // ObjId | null - where this object is located
+        contents: [], // ObjId[] - what's inside this object
       },
       methods: {},
     });
@@ -80,6 +81,13 @@ export class PrototypeBuilder {
 
     obj.setMethod('shortDesc', `
       return self.name;
+    `);
+
+    // Check if this object can contain another object
+    // Return true to allow, or a string explaining why not
+    obj.setMethod('canContain', `
+      const obj = args[0];
+      return true; // Default: can contain anything
     `);
 
     // THE primitive for all location changes
@@ -99,6 +107,12 @@ export class PrototypeBuilder {
 
       if (!dest) {
         throw new Error(\`Destination #\${destId} not found\`);
+      }
+
+      // Check if destination can contain us
+      const canContain = await dest.canContain(self);
+      if (canContain !== true) {
+        return canContain; // Return the rejection reason
       }
 
       // Pre-move hooks (can throw to cancel the move)
@@ -155,7 +169,7 @@ export class PrototypeBuilder {
       properties: {
         name: 'Location',
         description: 'Base prototype for locations (things that can contain other things)',
-        contents: [], // List of object IDs in this location
+        // contents inherited from Describable
       },
       methods: {},
     });

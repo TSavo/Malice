@@ -2,222 +2,393 @@
 
 ## What Was Built
 
-A complete, modern, reactive transport layer for Malice TMMO, built from first principles with TypeScript and RxJS.
+A complete, modern, reactive TMMO engine with a LambdaMOO-style object system, built from first principles with TypeScript, RxJS, and MongoDB.
 
 ### Architecture
 
 ```
-┌─────────────────────────────────────────────────┐
-│           Connection Layer                      │
-│  - ConnectionManager (reactive pool)            │
-│  - Connection (session wrapper)                 │
-└──────────────┬──────────────────────────────────┘
-               │
-               ├── ITransport (interface)
-               │
-┌──────────────┴──────────────┬──────────────────┐
-│   TelnetTransport           │ WebSocketTransport│
-│   - RFC854 protocol         │ - Modern WS       │
-│   - NAWS, TERM negotiation  │ - Text/binary     │
-│   - Raw/cooked modes        │ - ANSI support    │
-└─────────────────────────────┴───────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│                     Game Clients                            │
+│     Telnet (5555)    WebSocket (8080)    TLS (5556)        │
+└────────────────────────────┬────────────────────────────────┘
+                             │
+┌────────────────────────────┴────────────────────────────────┐
+│                    Transport Layer                          │
+│  - TelnetTransport (RFC854 protocol)                        │
+│  - WebSocketTransport (text/binary frames)                  │
+│  - TLSTransport (SSL client certificates)                   │
+└────────────────────────────┬────────────────────────────────┘
+                             │
+┌────────────────────────────┴────────────────────────────────┐
+│                   Connection Layer                          │
+│  - ConnectionContext (bridges transport to objects)         │
+│  - GameCoordinator (thin routing layer)                     │
+│  - Handler pattern (onInput delegation)                     │
+└────────────────────────────┬────────────────────────────────┘
+                             │
+┌────────────────────────────┴────────────────────────────────┐
+│                    Object System                            │
+│  - ObjectManager (loading, caching, $N syntax)              │
+│  - RuntimeObject (executable methods, property proxy)       │
+│  - ObjectDatabase (MongoDB persistence)                     │
+│  - Verb Registration (dynamic command system)               │
+└────────────────────────────┬────────────────────────────────┘
+                             │
+┌────────────────────────────┴────────────────────────────────┐
+│                      MongoDB                                │
+│  - Game objects (properties + methods as TypeScript)        │
+│  - Change streams (multi-server cache sync)                 │
+│  - Replica set (required for change streams)                │
+└─────────────────────────────────────────────────────────────┘
 ```
 
-## File Structure (All <500 lines)
+## Core Design Principles
+
+### 1. Everything is MOO Code
+
+All game logic lives in MongoDB as methods, not in TypeScript:
+
+```typescript
+// TypeScript provides ONLY:
+// - Transport (Telnet, WebSocket, TLS)
+// - Object database (CRUD, caching)
+// - Method execution (RuntimeObject)
+
+// Everything else is MOO code in MongoDB:
+// - Authentication flow (AuthManager.onInput)
+// - Player command loop (Player.onInput)
+// - Movement (Describable.moveTo)
+// - Verb registration (Agent.registerVerb)
+// - Room exits (Room.go)
+```
+
+### 2. Dynamic Verb Registration
+
+Commands aren't hardcoded. Objects register their verbs dynamically:
+
+```
+Player connects:
+  → Player.connect() registers: look, say, quit
+
+Player enters room with exits {north: 51, south: 52}:
+  → Room.onContentArrived() registers: north, south
+
+Player picks up gun:
+  → Gun.onArrived() registers: shoot, aim
+
+Player drops gun:
+  → Gun.onLeaving() unregisters: shoot, aim
+
+Player leaves room:
+  → Room.onContentLeft() unregisters: north, south
+```
+
+### 3. Single Primitive for Movement
+
+`Describable.moveTo()` is the ONLY way to change location:
+
+```
+moveTo(destination, mover):
+  1. source.onContentLeaving(self, dest, mover)  ← Can throw to cancel
+  2. self.onLeaving(source, dest, mover)
+  3. self.location = dest.id
+  4. source.onContentLeft(self, dest, mover)     ← Unregister verbs
+  5. self.onArrived(dest, source, mover)         ← Register verbs
+  6. dest.onContentArrived(self, source, mover)  ← Register verbs
+```
+
+### 4. Handler Pattern for Input
+
+ConnectionContext delegates input to a handler object:
+
+```
+New connection → System.onConnection()
+  → context.setHandler(AuthManager)
+
+AuthManager.onInput() validates credentials
+  → context.authenticate(playerId)
+  → context.setHandler(player)
+
+Player.onInput() handles all commands
+  → Looks up verb in registry
+  → Dispatches to handler object
+```
+
+## File Structure
 
 ```
 v2/
-├── types/                           # Type definitions only
-│   ├── transport.ts        (60 lines)   - Core transport interfaces
-│   ├── telnet.ts           (75 lines)   - Telnet protocol constants
-│   └── connection.ts       (25 lines)   - Connection state types
-│
 ├── src/
-│   ├── transport/
-│   │   ├── base-transport.ts      (120 lines)  - Abstract base class
-│   │   ├── telnet/
-│   │   │   ├── protocol-parser.ts (230 lines)  - RFC854 parser
-│   │   │   ├── command-builder.ts (130 lines)  - Command construction
-│   │   │   ├── telnet-transport.ts(180 lines)  - Telnet implementation
-│   │   │   ├── telnet-server.ts   (115 lines)  - Telnet server
-│   │   │   └── index.ts           (4 lines)    - Exports
-│   │   └── websocket/
-│   │       ├── websocket-transport.ts (115 lines) - WS implementation
-│   │       ├── websocket-server.ts    (105 lines) - WS server
-│   │       └── index.ts               (2 lines)   - Exports
+│   ├── transport/                 # Network layer
+│   │   ├── telnet/               # Telnet protocol (RFC854)
+│   │   ├── websocket/            # WebSocket protocol
+│   │   └── tls/                  # TLS with client certs
 │   │
-│   ├── connection/
-│   │   ├── connection.ts           (95 lines)  - Session wrapper
-│   │   ├── connection-manager.ts   (120 lines) - Reactive pool
-│   │   └── index.ts                (2 lines)   - Exports
+│   ├── connection/               # Connection management
+│   │   ├── connection.ts         # Connection wrapper
+│   │   └── connection-manager.ts # Pool management
 │   │
-│   └── index.ts                    (165 lines) - Demo application
+│   ├── database/                 # Object system
+│   │   ├── object-db.ts          # MongoDB CRUD
+│   │   ├── runtime-object.ts     # Executable objects (Proxy-based)
+│   │   ├── object-manager.ts     # Caching, $N syntax, aliases
+│   │   ├── object-cache.ts       # In-memory cache
+│   │   └── bootstrap/            # Core object builders
+│   │       ├── minimal-bootstrap.ts      # Root, System
+│   │       ├── prototype-builder.ts      # Describable, Location, Room, Agent, Human, Player
+│   │       ├── auth-manager-builder.ts   # AuthManager
+│   │       ├── chargen-builder.ts        # CharGen
+│   │       ├── preauth-handler-builder.ts # PreAuthHandler
+│   │       └── recycler-builder.ts       # Recycler
+│   │
+│   ├── game/                     # Game coordination
+│   │   ├── connection-context.ts # Bridges transport to objects
+│   │   └── game-coordinator.ts   # Main game loop (thin)
+│   │
+│   └── index.ts                  # Server entry point
 │
-├── package.json
-├── tsconfig.json
-└── README.md
+├── types/                        # TypeScript definitions
+│   ├── object.ts                 # Object system types
+│   ├── transport.ts              # Transport interfaces
+│   ├── telnet.ts                 # Telnet protocol constants
+│   └── connection.ts             # Connection state types
+│
+├── test/                         # Test suite
+│   ├── bootstrap/                # Bootstrap tests
+│   ├── lsp/                      # DevTools LSP tests
+│   └── *.test.ts                 # Unit tests
+│
+└── devtools/                     # DevTools server (LSP)
+    └── ...
 ```
 
-**Total: ~1,540 lines across 17 focused files**
+## Object Hierarchy
 
-## Key Design Decisions
+```
+#-1 Nothing
+#0 ObjectManager
+#1 Root
+├─ #2 System               (connection routing)
+├─ #3 AuthManager          (interactive login)
+├─ #4 CharGen              (character creation)
+├─ #5 PreAuthHandler       (SSL/OAuth auth)
+├─ #10 Describable         (name, description, moveTo)
+│   ├─ #11 Location        (container hooks)
+│   │   └─ #14 Room        (exits, go)
+│   └─ #15 Agent           (verbs, registerVerb)
+│       └─ #12 Human       (sex, pronouns)
+│           └─ #13 Player  (auth, onInput)
+└─ #20 Recycler            (object deletion)
+```
 
-### 1. Reactive Everything (RxJS)
-- All I/O is Observable streams
-- Automatic cleanup via `takeUntil(closed$)`
-- Backpressure handling built-in
-- Event-driven by default
+## Key Features
 
-### 2. Transport Abstraction
+### Transport Layer
+- ✅ Telnet (RFC854 with NAWS, terminal type)
+- ✅ WebSocket (text/binary frames)
+- ✅ TLS (SSL client certificates)
+- ✅ Reactive (RxJS Observables)
+- ✅ Transport abstraction (game logic is transport-agnostic)
+
+### Object System
+- ✅ MongoDB persistence
+- ✅ Prototype inheritance
+- ✅ Method execution (TypeScript compiled at runtime)
+- ✅ Property proxy (`self.hp` instead of `self.get('hp')`)
+- ✅ `$N` syntax (`$.50`, `$.4.describe()`)
+- ✅ Registered aliases (`$.system`, `$.authManager`)
+- ✅ Typed values (objrefs auto-resolve to RuntimeObjects)
+- ✅ Change streams (multi-server cache sync)
+
+### Verb System
+- ✅ Dynamic verb registration
+- ✅ Verbs stored on Agent (`self.verbs`)
+- ✅ Register/unregister verbs (`registerVerb`, `unregisterVerb`)
+- ✅ Room exit verbs registered on enter
+- ✅ Item verbs registered on pickup
+
+### Location System
+- ✅ `moveTo()` as single primitive
+- ✅ Transition hooks (onLeaving, onArrived, onContentLeaving, etc.)
+- ✅ Hook can throw to cancel movement
+- ✅ Verbs registered/unregistered during transitions
+
+### Authentication
+- ✅ Interactive login (AuthManager)
+- ✅ SSL client certificates (PreAuthHandler)
+- ✅ HTTP Basic Auth (WebSocket)
+- ✅ Password hashing (bcrypt)
+- ✅ Permission system (canUseDevTools, isWizard, isSuspended)
+
+### DevTools
+- ✅ LSP server for IDE integration
+- ✅ Object browsing
+- ✅ Method editing with IntelliSense
+- ✅ Property inspection
+- ✅ Virtual filesystem (`malice://objects/2/onConnection.ts`)
+
+## Connection Flow
+
+```
+1. Client connects (Telnet/WebSocket/TLS)
+   ↓
+2. Transport creates connection
+   ↓
+3. GameCoordinator wraps in ConnectionContext
+   ↓
+4. GameCoordinator calls System.onConnection(context)
+   ↓
+5. System loads AuthManager, sets as handler
+   ↓
+6. AuthManager.onConnect shows login prompt
+   ↓
+7. User enters "alice:password123"
+   ↓
+8. AuthManager.onInput validates credentials
+   ↓
+9. AuthManager calls Player.connect(context)
+   ↓
+10. Player.connect:
+    - Registers default verbs (look, say, quit)
+    - Triggers onArrived on current location
+    - Room registers exit verbs
+    ↓
+11. context.setHandler(player)
+    ↓
+12. Player.onInput handles all commands
+    - Looks up verb in registry
+    - Dispatches to handler object
+```
+
+## Command Dispatch
+
 ```typescript
-interface ITransport {
-  input$: Observable<string>;      // What comes in
-  output$: Subject<string>;        // What goes out
-  connected$: Observable<boolean>; // Connection state
-  capabilities$: Observable<...>;  // Terminal info
-  closed$: Observable<void>;       // Lifecycle
+// Player.onInput
+const input = args[1].trim();
+const [verb, ...argParts] = input.split(/\s+/);
+const argString = argParts.join(' ');
+
+// Look up verb in registry
+const verbInfo = await self.getVerb(verb.toLowerCase());
+
+if (verbInfo) {
+  // Dispatch to handler
+  const handler = await $.load(verbInfo.obj);
+  const result = await handler[verbInfo.method](context, self, argString);
+  if (result) context.send(`${result}\r\n`);
+} else {
+  context.send(`I don't understand "${verb}".\r\n`);
 }
 ```
 
-Game logic NEVER knows if it's telnet or websocket.
+## MOO Code Execution Context
 
-### 3. Separation of Concerns
-- **Types** - Pure type definitions
-- **Protocol** - Parsing/encoding logic
-- **Transport** - I/O handling
-- **Connection** - Session state
-- **Manager** - Pool management
+Methods execute with these variables:
 
-Each layer can be tested, replaced, or extended independently.
+| Variable | Type | Description |
+|----------|------|-------------|
+| `self` | `RuntimeObject` | The object the method is on (proxied) |
+| `$` | `ObjectManager` | Access to all objects (`$.50`, `$.system`) |
+| `args` | `any[]` | Arguments passed to the method |
+| `context` | `ConnectionContext` | The connection (if player action) |
+| `player` | `RuntimeObject` | The player who triggered this |
 
-### 4. No Global State
-Unlike v1's `global.$driver`, everything is injected:
+### Property Access
 ```typescript
-const manager = new ConnectionManager();
-const telnet = new TelnetServer(config);
-telnet.connection$.subscribe(t => manager.addTransport(t));
+// Direct access (recommended)
+self.hp = 100;
+const name = self.name;
+
+// Object references auto-resolve
+const room = self.location;  // Returns RuntimeObject, not number
+room.name;  // Works directly
 ```
 
-### 5. TypeScript Strict Mode
-- Full type safety
-- No `any` types (except intentional interfaces)
-- Proper async handling
-- Build-time error catching
+### Object Access
+```typescript
+// By ID
+const room = $.50;
+await $.4.describe();
 
-## What Works Right Now
+// By alias
+const sys = $.system;
+const auth = $.authManager;
 
-✅ **Telnet Server** (port 5555)
-- Full RFC854 protocol support
-- Window size negotiation (NAWS)
-- Terminal type detection
-- Environment variables
-- Raw/cooked mode switching
-- Automatic CRLF conversion
-
-✅ **WebSocket Server** (port 8080)
-- Text and binary frames
-- ANSI escape code support
-- Clean disconnect handling
-
-✅ **Connection Management**
-- Reactive connection pool
-- Aggregated input stream
-- Broadcast capabilities
-- Authentication hooks (ready)
-
-✅ **Demo Commands**
-- `help` - Show commands
-- `info` - Connection details
-- `who` - User count
-- `quit` - Disconnect
+// Async load
+const obj = await $.load(someId);
+```
 
 ## Testing
 
 ```bash
-# Type check
-npx tsc --noEmit
+# Run all tests
+npm test
 
-# Run demo
-npx tsx src/index.ts
+# Run with coverage
+npm run test:coverage
 
-# Connect via telnet
-telnet localhost 5555
+# Run specific test
+npm test -- agent.test.ts
 
-# Connect via WebSocket (need ws client)
-# npm install -g wscat
-# wscat -c ws://localhost:8080
+# Type checking
+npm run typecheck
 ```
 
 ## What's Next
 
-This is **ONLY the transport layer**. Still needed:
+### Phase 2: Game Mechanics (In Progress)
+- [ ] Inventory system (get, drop, put)
+- [ ] Look at objects
+- [ ] Communication (say, emote, whisper)
+- [ ] Help system
 
-1. **Domain Models**
-   - User, Room, Body, BodyPart
-   - Reactive entities (Observable properties)
-   - Event emission
+### Phase 3: World Building
+- [ ] MOO commands (@create, @dig, @property, @method)
+- [ ] In-game programming
+- [ ] Room builder
+- [ ] Object editor
 
-2. **Command System**
-   - Input parsing
-   - Command routing
-   - Permission checking
+### Phase 4: Advanced Features
+- [ ] Combat system
+- [ ] Skills/abilities
+- [ ] NPC AI
+- [ ] Quest system
+- [ ] Economy
 
-3. **Sensory System**
-   - Stimulus events
-   - Perception filtering
-   - Multi-sensory aggregation
+## Performance
 
-4. **Persistence**
-   - MongoDB integration
-   - User authentication
-   - State serialization
+- **Object caching**: RuntimeObjects cached in memory
+- **Change streams**: Automatic cache invalidation across servers
+- **Compiled methods**: TypeScript compiled once, cached
+- **Lazy loading**: Objects loaded on-demand
+- **Prototype sharing**: Methods inherited, not duplicated
 
-5. **Game Logic**
-   - Movement, combat, etc.
-   - Port from v1
+## Security Notes
 
-## Migration Path from v1
+⚠️ **IMPORTANT**: Methods are executed as **trusted code** with **full system access**.
 
-The old CoffeeScript code has:
-- ❌ `global.$game` → ✅ Proper dependency injection
-- ❌ `serially` (dead lib) → ✅ MongoDB (next step)
-- ❌ Callback soup → ✅ RxJS Observables
-- ❌ Manual socket tracking → ✅ ConnectionManager
-- ❌ No types → ✅ Full TypeScript
+Currently implemented:
+- ✅ Password hashing (bcrypt)
+- ✅ SSL certificate validation
+- ✅ Permission checks (canUseDevTools, isWizard)
+- ✅ Suspension support (isSuspended)
 
-**We can import old checkpoint data and migrate incrementally.**
-
-## Performance Characteristics
-
-- **Memory**: O(n) connections, no global state bloat
-- **CPU**: Event-driven, no polling
-- **Latency**: Direct streams, minimal overhead
-- **Scalability**: Ready for clustering (stateless design)
-
-## Code Quality
-
-- ✅ TypeScript strict mode (no errors)
-- ✅ All files <500 lines (largest: protocol-parser at 230)
-- ✅ Proper separation of concerns
-- ✅ Comprehensive JSDoc comments
-- ✅ Zero dependencies on deprecated packages
-- ✅ Modern ES2022 target
-
-## Running with Bun (Recommended)
-
-Once Bun is installed:
-```bash
-bun install
-bun run dev    # Auto-reload on changes
-bun run start  # Production mode
-```
-
-Bun is 3-4x faster than Node.js for this workload.
+Not yet implemented:
+- ❌ Method sandboxing
+- ❌ Resource limits (CPU, memory)
+- ❌ Object ownership/permissions
+- ❌ Rate limiting
 
 ## Philosophy
 
-> "Small files, clear boundaries, reactive flows."
+> "All game logic in MOO code. TypeScript is just infrastructure."
 
-Every file has ONE job. Every boundary is an interface. Every change is an event.
+The TypeScript layer provides:
+1. Transport (getting bytes in/out)
+2. Object database (CRUD, caching)
+3. Method execution (compiling and running)
 
-This is how you build maintainable systems in 2025.
+Everything else - authentication, commands, movement, combat - lives as methods in MongoDB. This enables:
+- Live updates without restart
+- In-game programming
+- True LambdaMOO-style extensibility
