@@ -6,9 +6,11 @@
 import * as vscode from 'vscode';
 import { DevToolsClient } from './devtools-client.js';
 import { MaliceTreeProvider } from './tree-view.js';
+import { TypeDefinitionManager } from './type-manager.js';
 
 let client: DevToolsClient;
 let treeView: vscode.TreeView<vscode.TreeItem>;
+let typeManager: TypeDefinitionManager;
 
 /**
  * Extension activation
@@ -26,6 +28,11 @@ export async function activate(context: vscode.ExtensionContext) {
   try {
     await client.connect();
     vscode.window.showInformationMessage('Connected to Malice DevTools server');
+
+    // Initialize type definition manager
+    typeManager = new TypeDefinitionManager(client);
+    await typeManager.initialize(context);
+    context.subscriptions.push(typeManager);
   } catch (err) {
     vscode.window.showErrorMessage(`Failed to connect to DevTools server: ${err}`);
     console.error('[Malice] Connection failed:', err);
@@ -206,7 +213,13 @@ class MaliceFileSystemProvider implements vscode.FileSystemProvider {
       if (ext === 'ts') {
         // Method
         const method = await this.client.getMethod(objectId, name);
-        return Buffer.from(method.code, 'utf-8');
+
+        // Inject type reference at the top of the file
+        // This makes VS Code's TypeScript language service aware of generated types
+        const typeReference = '/// <reference path="../.malice/malice.d.ts" />\n\n';
+        const code = typeReference + method.code;
+
+        return Buffer.from(code, 'utf-8');
       } else if (ext === 'json') {
         // Property
         const value = await this.client.getProperty(objectId, name);
@@ -238,8 +251,10 @@ class MaliceFileSystemProvider implements vscode.FileSystemProvider {
       const text = Buffer.from(content).toString('utf-8');
 
       if (ext === 'ts') {
-        // Method
-        await this.client.setMethod(objectId, name, text);
+        // Method - strip type reference directive before saving
+        const typeReferencePattern = /^\/\/\/ <reference path="[^"]*" \/>\s*/;
+        const cleanCode = text.replace(typeReferencePattern, '');
+        await this.client.setMethod(objectId, name, cleanCode);
       } else if (ext === 'json') {
         // Property
         const value = JSON.parse(text);
