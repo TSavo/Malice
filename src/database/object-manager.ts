@@ -195,11 +195,19 @@ export class ObjectManager {
   async create(params: CreateObjectParams): Promise<RuntimeObject> {
     const id = await this.db.getNextId();
 
-    // Create object with empty properties first
+    // Convert properties to typed Values upfront
+    const typedProperties: Record<string, any> = {};
+    if (params.properties) {
+      for (const [key, value] of Object.entries(params.properties)) {
+        typedProperties[key] = this.toValue(value);
+      }
+    }
+
+    // Create object with all properties in one atomic operation
     const obj = await this.db.create({
       _id: id,
       parent: params.parent,
-      properties: {},
+      properties: typedProperties,
       methods: params.methods || {},
     });
 
@@ -207,14 +215,63 @@ export class ObjectManager {
     const proxy = runtime.getProxy();
     this.cache.setObject(id, proxy);
 
-    // Set properties through RuntimeObject to auto-convert to typed Values
-    if (params.properties) {
-      for (const [key, value] of Object.entries(params.properties)) {
-        proxy.set(key, value);
-      }
+    return proxy;
+  }
+
+  /**
+   * Convert a JavaScript value to a typed Value
+   * Duplicated from RuntimeObjectImpl for use in create()
+   */
+  private toValue(jsValue: any): any {
+    // Handle null
+    if (jsValue === null) {
+      return { type: 'null', value: null };
     }
 
-    return proxy;
+    // Handle undefined (treat as null)
+    if (jsValue === undefined) {
+      return { type: 'null', value: null };
+    }
+
+    // Handle RuntimeObject (store as objref)
+    if (jsValue && typeof jsValue === 'object' && 'id' in jsValue && typeof jsValue.id === 'number') {
+      return { type: 'objref', value: jsValue.id };
+    }
+
+    // Handle primitives
+    const jsType = typeof jsValue;
+
+    if (jsType === 'string') {
+      return { type: 'string', value: jsValue };
+    }
+
+    if (jsType === 'number') {
+      return { type: 'number', value: jsValue };
+    }
+
+    if (jsType === 'boolean') {
+      return { type: 'boolean', value: jsValue };
+    }
+
+    // Handle arrays (recursively convert elements)
+    if (Array.isArray(jsValue)) {
+      return {
+        type: 'array',
+        value: jsValue.map(item => this.toValue(item))
+      };
+    }
+
+    // Handle objects (recursively convert properties)
+    if (jsType === 'object') {
+      const objValue: Record<string, any> = {};
+      for (const [key, val] of Object.entries(jsValue)) {
+        objValue[key] = this.toValue(val);
+      }
+      return { type: 'object', value: objValue };
+    }
+
+    // Fallback to null for unknown types
+    return { type: 'null', value: null };
   }
 
   /**

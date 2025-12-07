@@ -8,14 +8,17 @@ import { TypeGenerator } from '../../src/devtools/type-generator.js';
 import { ObjectManager } from '../../src/database/object-manager.js';
 import { ObjectDatabase } from '../../src/database/object-db.js';
 
-describe('TypeGenerator', () => {
+// Use unique database name to avoid conflicts with other test files
+const TEST_DB_NAME = `malice_test_typegen_${process.pid}`;
+
+describe.sequential('TypeGenerator', () => {
   let db: ObjectDatabase;
   let manager: ObjectManager;
   let generator: TypeGenerator;
 
   beforeAll(async () => {
     const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/?replicaSet=rs0&directConnection=true';
-    db = new ObjectDatabase(MONGO_URI, 'malice_test_typegen');
+    db = new ObjectDatabase(MONGO_URI, TEST_DB_NAME);
 
     await Promise.race([
       db.connect(),
