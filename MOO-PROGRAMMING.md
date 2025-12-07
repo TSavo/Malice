@@ -1,449 +1,429 @@
 # MOO Programming Guide
 
-This guide explains how to write MOO code (method code) in Malice v2. Methods are written in **TypeScript** and compiled at runtime.
+This guide teaches you how to write code for Malice, a MOO-style virtual world engine. Methods are written in **TypeScript** and run on the server.
 
-## Execution Context
+## What is a MOO?
 
-When a method executes, it has access to these variables:
+A MOO is a text-based virtual world where everything is an **object**. Players are objects. Rooms are objects. Items are objects. Each object can have:
 
-| Variable | Type | Description |
-|----------|------|-------------|
-| `self` | `RuntimeObject` | The object the method is defined on (proxied) |
-| `$` | `ObjectManager` | Access to all objects and aliases |
-| `args` | `any[]` | Arguments passed to the method |
-| `context` | `ConnectionContext` | The connection context (if called from a player action) |
-| `player` | `RuntimeObject` | The player who triggered this (or `self` if no player) |
+- **Properties** - Data like `name`, `description`, `hp`
+- **Methods** - Code that does things like `look`, `say`, `attack`
+- **A Parent** - Objects inherit from their parent (like classes in OOP)
 
-## Object References
+## Your First Method
 
-### The `$` Object Manager
-
-The `$` variable is your gateway to all objects in the database. It supports multiple access patterns:
-
-#### Direct ID Access (`$N`)
-
-Access any object by its numeric ID:
+Here's a simple method that greets someone:
 
 ```typescript
-// Access object #2 (System)
-const system = $.2;
-
-// Access object #100 (some player)
-const player = $.100;
-
-// Call a method on object #4
-await $.4.describe();
-
-// Get a property from object #50
-const name = $.50.name;
+// Method: greet
+const name = args[0] || 'stranger';
+return `Hello, ${name}!`;
 ```
 
-#### Registered Aliases (`$.alias`)
+When someone calls `await obj.greet('Alice')`, it returns `"Hello, Alice!"`.
 
-Core objects are registered as aliases during bootstrap:
+## The Magic Variables
+
+Every method has access to these variables automatically:
+
+| Variable | What it is |
+|----------|------------|
+| `self` | The object this method belongs to |
+| `$` | Access to ALL objects in the world |
+| `args` | Arguments passed to this method |
+| `player` | The player who triggered this action |
+| `context` | The connection (for sending messages) |
+
+### `self` - The Current Object
+
+`self` is the object your code is running on:
 
 ```typescript
-// Access System object
-const system = $.system;
+// Get properties
+const myName = self.name;
+const myHp = self.hp;
 
-// Access AuthManager
-const auth = $.authManager;
+// Set properties (auto-saves!)
+self.hp = 100;
+self.description = 'A brave adventurer';
 
-// Access CharGen
-const chargen = $.charGen;
-
-// Access PreAuthHandler
-const preauth = $.preauthHandler;
-
-// Access Recycler
-const recycler = $.recycler;
-
-// Access the null object (nothing)
-const nothing = $.nothing;
+// Call other methods on yourself
+await self.describe();
 ```
 
-#### Loading Objects by ID
+### `$` - The Object Manager
 
-For programmatic access when the ID is in a variable:
+`$` is your gateway to every object in the world:
 
 ```typescript
-// Load object by ID (async)
-const obj = await $.load(playerId);
+// Load an object by ID
+const room = await $.load(42);
 
-// Synchronous cache lookup (returns null if not cached)
-const cached = $.getSync(playerId);
+// Use registered aliases (set up by the system)
+const recycler = $.recycler;      // Creates new objects
+const root = $.root;              // Base of all inheritance
+
+// Access prototypes
+const playerProto = $.player;     // Player prototype
+const roomProto = $.room;         // Room prototype
 ```
 
-## The `self` Object
+### `args` - Method Arguments
 
-`self` refers to the current object with full property and method access.
-
-### Property Access
-
-Properties can be accessed directly (no `.get()` needed):
+Arguments passed to your method:
 
 ```typescript
-// Direct property access (recommended)
+// Method: attack
+const target = args[0];    // First argument
+const weapon = args[1];    // Second argument
+
+// With defaults
+const damage = args[2] || 10;
+```
+
+### `player` - Who Did This?
+
+The player who triggered this action:
+
+```typescript
+// Method: look (on a Room)
+// Don't show the player themselves in the room
+const contents = self.contents.filter(id => id !== player.id);
+```
+
+## Properties
+
+Properties are just data on an object. Access them directly:
+
+```typescript
+// Reading
 const name = self.name;
 const hp = self.hp;
-const location = self.location;
+const items = self.inventory;
 
-// Or via .get() method
-const name = self.get('name');
-```
-
-### Setting Properties
-
-Properties are set directly and auto-saved:
-
-```typescript
-// Direct assignment (auto-saves to MongoDB)
+// Writing (auto-saves to database!)
+self.name = 'Alice';
 self.hp = 100;
-self.location = 50;
-self.inventory = [101, 102, 103];
-
-// Or via .set() method
-self.set('hp', 100);
-await self.save();  // Manual save if needed
+self.inventory = [1, 2, 3];
 ```
 
-### Calling Methods
+### Property Types
 
-```typescript
-// Call a method on self
-await self.call('describe');
-await self.call('moveTo', roomId);
-
-// Or via direct method call (if method exists)
-await self.describe();
-await self.moveTo(roomId);
-```
-
-## Property Types
-
-Properties are stored as typed values. The system auto-detects types:
-
-| JavaScript Value | Stored Type | Example |
-|-----------------|-------------|---------|
-| `"hello"` | `string` | `self.name = "Alice"` |
-| `42` | `number` | `self.hp = 100` |
-| `true` | `boolean` | `self.isWizard = true` |
-| `null` | `null` | `self.target = null` |
-| RuntimeObject | `objref` | `self.location = $.50` |
-| `[1, 2, 3]` | `array` | `self.inventory = [1, 2]` |
-| `{a: 1}` | `object` | `self.stats = {str: 10}` |
+| Type | Example |
+|------|---------|
+| String | `self.name = 'Sword'` |
+| Number | `self.damage = 25` |
+| Boolean | `self.isHidden = true` |
+| Null | `self.target = null` |
+| Array | `self.items = [1, 2, 3]` |
+| Object | `self.stats = { str: 10, dex: 15 }` |
+| Object Reference | `self.location = room` (stores the ID) |
 
 ### Object References
 
-When you store a RuntimeObject in a property, it's stored as an `objref` (just the ID). When you read it back, it's automatically resolved:
+When you store an object in a property, it saves the ID. When you read it back, you get the object:
 
 ```typescript
-// Store an object reference
-self.location = $.50;  // Stores: { type: 'objref', value: 50 }
+// Store a reference to room #50
+self.location = await $.load(50);
 
-// Read it back - automatically resolved to RuntimeObject
-const room = self.location;  // Returns the RuntimeObject for #50
+// Later, read it back - automatically loads the object
+const room = self.location;
 room.name;  // "Town Square"
+```
+
+## Calling Methods
+
+```typescript
+// Call a method on self
+await self.describe();
+
+// Call with arguments
+await self.moveTo(newRoom);
+await self.attack(enemy, 25);
+
+// Call on another object
+const room = await $.load(self.location);
+await room.announce('A loud noise echoes!');
 ```
 
 ## Inheritance
 
-Objects inherit properties and methods from their parent chain.
-
-### Property Inheritance
-
-When you access a property, the system walks up the parent chain:
+Objects inherit from their parent. If you ask for a property or method that doesn't exist on the object, it checks the parent, then the grandparent, and so on.
 
 ```typescript
-// Object #100 (parent: #13)
-// Object #13 has: { maxHp: 100 }
+// Player inherits: Player -> Human -> Embodied -> Agent -> Describable -> Root
+//
+// If player doesn't have 'describe' method, it uses the one from Describable
+await player.describe();
 
-// Reading from #100 walks up to find maxHp
-const maxHp = self.maxHp;  // Found on #13, returns 100
-
-// Setting always sets on the current object
-self.maxHp = 150;  // Now #100 has its own maxHp
+// Set a property - always sets on THIS object, not the parent
+self.customProp = 'only on this object';
 ```
 
-### Method Inheritance
+### The Prototype Chain
 
-Methods are also inherited:
-
-```typescript
-// #10 Describable defines 'describe' method
-// #100 Alice inherits from #13 -> #12 -> #11 -> #10
-
-// This finds and executes the describe method from #10
-await self.describe();
-
-// Override by defining the method on #100
-self.setMethod('describe', `
-  return \`\${self.name} (customized)\`;
-`);
+```
+Root (#1)
+  └── Describable - has name, description, aliases
+        └── Location - can contain things
+        │     └── Room - has exits, crowd mechanics
+        └── Agent - can move, speak, has verbs
+              └── Embodied - has a body, senses
+                    └── Human - has pronouns, age
+                          └── Player - has login, commands
 ```
 
-## Method Arguments
+## The Verb System
 
-Arguments passed to a method are available in the `args` array:
+Players type commands like `look`, `get sword`, `say hello`. The verb system matches these to methods.
+
+### Registering Verbs
 
 ```typescript
-// Method definition
-{
-  methods: {
-    greet: `
-      const targetName = args[0];
-      return \`Hello, \${targetName}!\`;
-    `
+// Simple verb - just the word
+await self.registerVerb('look', self, 'look');
+
+// With aliases
+await self.registerVerb(['look', 'l'], self, 'look');
+
+// With patterns
+await self.registerVerb('get %i', self, 'get');        // %i = item in room
+await self.registerVerb('say %s', self, 'say');        // %s = rest of line
+await self.registerVerb('put %i in %t', self, 'put');  // %t = target item
+```
+
+### Pattern Tokens
+
+| Token | Meaning | Example |
+|-------|---------|---------|
+| `%i` | An item (matched by name/alias) | `get %i` matches "get sword" |
+| `%t` | A target item | `put %i in %t` matches "put key in box" |
+| `%s` | Rest of the line (string) | `say %s` matches "say hello everyone" |
+
+### How Verbs Work
+
+1. Player types: `get sword`
+2. System finds verb `get %i` registered by player
+3. Matches "sword" to an object in the room
+4. Calls `player.get(swordObject)`
+
+## Sending Messages to Players
+
+Use `tell()` for system messages and `see()` for visual descriptions:
+
+```typescript
+// System message (always delivered)
+await player.tell('You feel hungry.');
+
+// Visual message (requires consciousness, not blind)
+await player.see('The room is dark and dusty.');
+
+// From a room - message everyone
+for (const id of self.contents) {
+  const obj = await $.load(id);
+  if (obj.tell) {
+    await obj.tell('A bell rings in the distance.');
+  }
+}
+```
+
+## Creating Objects
+
+Use the recycler to create new objects:
+
+```typescript
+// Create a simple object
+const sword = await $.recycler.create({
+  parent: $.describable.id,
+  properties: {
+    name: 'Iron Sword',
+    description: 'A sturdy iron blade.',
+    damage: 15,
+  },
+}, player);  // player = who's creating it (for permissions)
+
+// Create a room
+const room = await $.recycler.create({
+  parent: $.room.id,
+  properties: {
+    name: 'Dark Cave',
+    description: 'A damp cave with water dripping from stalactites.',
+    exits: [],
+  },
+}, player);
+```
+
+## Common Patterns
+
+### Room Description
+
+```typescript
+// Method: describe (on Room)
+const viewer = args[0];
+
+let output = `${self.name}\r\n${self.description}\r\n`;
+
+// Show exits
+const exits = self.exits || [];
+if (exits.length > 0) {
+  const exitNames = [];
+  for (const exitId of exits) {
+    const exit = await $.load(exitId);
+    if (exit && !exit.hidden) {
+      exitNames.push(exit.name);
+    }
+  }
+  output += `\r\nExits: ${exitNames.join(', ')}\r\n`;
+}
+
+// Show contents (but not the viewer)
+const contents = (self.contents || []).filter(id => id !== viewer?.id);
+if (contents.length > 0) {
+  output += '\r\nYou see:\r\n';
+  for (const id of contents) {
+    const obj = await $.load(id);
+    if (obj) {
+      output += `  ${obj.name}\r\n`;
+    }
   }
 }
 
-// Calling with arguments
-await self.call('greet', 'Alice');  // Returns "Hello, Alice!"
-
-// Or via direct call
-await self.greet('Alice');
+return output;
 ```
 
-## Async/Await
-
-All method code runs in an async context. Use `await` for:
+### Movement
 
 ```typescript
-// Loading objects
-const room = await $.load(self.location);
-
-// Calling methods
-await self.moveTo(newRoom);
-await player.call('notify', 'You arrive.');
-
-// Multiple operations
-const [source, target] = await Promise.all([
-  $.load(args[0]),
-  $.load(args[1])
-]);
-```
-
-## Complete Examples
-
-### Simple Greeter
-
-```typescript
-// Method: greet
-return `Hello, I'm ${self.name}!`;
-```
-
-### Movement Method
-
-```typescript
-// Method: moveTo (on Agent prototype)
-const newLocation = args[0];
-
-// Get the destination room
-const destRoom = typeof newLocation === 'number'
-  ? await $.load(newLocation)
-  : newLocation;
+// Method: moveTo (on Agent)
+const dest = args[0];
+const destRoom = typeof dest === 'number' ? await $.load(dest) : dest;
 
 if (!destRoom) {
   throw new Error('Invalid destination');
 }
 
-// Leave current room
-const oldRoom = await $.load(self.location);
-if (oldRoom) {
-  await oldRoom.call('onExit', self);
+// Leave old room
+if (self.location) {
+  const oldRoom = await $.load(self.location);
+  if (oldRoom) {
+    await oldRoom.removeContent(self.id);
+  }
 }
-
-// Update location
-self.location = destRoom.id;
-await self.save();
 
 // Enter new room
-await destRoom.call('onEnter', self);
+self.location = destRoom.id;
+await destRoom.addContent(self.id);
+
+// Show the new room
+const desc = await destRoom.describe(self);
+await self.see(desc);
 ```
 
-### Room Description
+### Say Command
 
 ```typescript
-// Method: describe (on Room object)
-const exits = self.exits || {};
-const exitNames = Object.keys(exits);
+// Method: say
+const message = args[0];
 
-let desc = `${self.name}\n`;
-desc += `${self.description}\n`;
-
-if (exitNames.length > 0) {
-  desc += `\nExits: ${exitNames.join(', ')}`;
+if (!message) {
+  await self.tell('Say what?');
+  return;
 }
 
-return desc;
-```
-
-### Combat Action
-
-```typescript
-// Method: attack
-const target = args[0];
-const damage = args[1] || self.baseDamage || 10;
-
-// Resolve target if it's an ID
-const enemy = typeof target === 'number'
-  ? await $.load(target)
-  : target;
-
-if (!enemy) {
-  throw new Error('No target');
+// Announce to the room
+const room = await $.load(self.location);
+if (room) {
+  for (const id of room.contents || []) {
+    const obj = await $.load(id);
+    if (obj && obj.hear) {
+      if (id === self.id) {
+        await obj.hear(`You say "${message}"`);
+      } else {
+        await obj.hear(`${self.name} says "${message}"`);
+      }
+    }
+  }
 }
-
-// Calculate damage
-const finalDamage = Math.max(1, damage - (enemy.defense || 0));
-
-// Apply damage
-enemy.hp = (enemy.hp || 0) - finalDamage;
-await enemy.save();
-
-// Check for death
-if (enemy.hp <= 0) {
-  await enemy.call('onDeath', self);
-}
-
-return {
-  target: enemy.id,
-  damage: finalDamage,
-  killed: enemy.hp <= 0
-};
 ```
 
-### Login Handler
+## Async/Await
+
+All methods run asynchronously. Always use `await` when:
 
 ```typescript
-// Method: onConnect (on AuthManager)
-const ctx = args[0];
+// Loading objects
+const room = await $.load(42);
 
-// Check if already authenticated
-if (ctx.player) {
-  return await ctx.player.call('onLogin', ctx);
-}
+// Calling methods
+await self.moveTo(room);
 
-// Show login prompt
-await ctx.send('Welcome to Malice!\r\n');
-await ctx.send('Enter username:password to login\r\n');
-await ctx.send('Or "create <username> <password>" to create a new character\r\n');
+// Multiple loads at once
+const [sword, shield] = await Promise.all([
+  $.load(swordId),
+  $.load(shieldId)
+]);
 ```
-
-## DevTools Type Generation
-
-The DevTools server can generate TypeScript definitions for all objects. This gives you IntelliSense when editing methods:
-
-```typescript
-// Auto-generated types show:
-// - All properties with their types
-// - All methods with signatures
-// - All registered aliases
-
-declare const self: RuntimeObject & {
-  name: string;
-  hp: number;
-  location: RuntimeObject;
-  describe(): Promise<string>;
-  moveTo(room: RuntimeObject | number): Promise<void>;
-};
-
-declare const $: ObjectManager & {
-  readonly system: RuntimeObject;
-  readonly authManager: RuntimeObject;
-  // ... more aliases
-};
-```
-
-## Special Objects
-
-### #-1 (Nothing)
-
-The null object reference. Used to represent "no object":
-
-```typescript
-// Check if location is set
-if (self.location === $.nothing) {
-  // No location set
-}
-
-// Clear a reference
-self.target = $.nothing;
-```
-
-### #0 (ObjectManager)
-
-The root system object. Represents the ObjectManager itself:
-
-```typescript
-const mgr = await $.load(0);
-mgr.name;  // "ObjectManager"
-```
-
-### #1 (Root)
-
-The base of all inheritance. All objects ultimately inherit from Root.
 
 ## Error Handling
 
-Errors in methods propagate to the caller:
+Throw errors to stop execution:
 
 ```typescript
-// Method: validate
+// Validation
 if (!self.name) {
   throw new Error('Object must have a name');
 }
 
-if (self.hp < 0) {
-  throw new Error('HP cannot be negative');
+// Catching errors
+try {
+  await target.attack(self);
+} catch (err) {
+  await player.tell(`Attack failed: ${err.message}`);
 }
-
-return true;
 ```
 
-Catch errors when calling methods:
+## Quick Reference
 
 ```typescript
-try {
-  await target.call('attack', self);
-} catch (err) {
-  await player.send(`Attack failed: ${err.message}\r\n`);
-}
+// Properties
+self.name                    // Read
+self.name = 'New Name'       // Write (auto-saves)
+
+// Objects
+await $.load(42)             // Load by ID
+$.recycler                   // System alias
+$.player                     // Player prototype
+
+// Methods
+await self.describe()        // Call method
+await obj.call('method', arg) // Dynamic call
+
+// Messages
+await player.tell('...')     // System message
+await player.see('...')      // Visual message
+
+// Create objects
+await $.recycler.create({ parent: $.thing.id, properties: {...} }, player)
+
+// Verbs
+await self.registerVerb('look', self, 'look')
+await self.registerVerb('get %i', self, 'get')
 ```
 
-## Best Practices
+## Tips for New Coders
 
-1. **Use direct property access** - `self.name` is cleaner than `self.get('name')`
+1. **Everything is an object** - Players, rooms, items, even exits
+2. **Use `await`** - Almost everything is async
+3. **Properties auto-save** - Just set them, no need to call save()
+4. **Inherit behavior** - Put shared code on parent prototypes
+5. **Test in-game** - Use `@eval` (if you're an admin) to run code live
+6. **Check for null** - `$.load()` can return null if object doesn't exist
 
-2. **Always await async operations** - Methods run async, use `await`
-
-3. **Handle missing objects** - `$.load()` can return `null`
-
-4. **Use objrefs for relationships** - Store object IDs, let the system resolve them
-
-5. **Keep methods focused** - Small methods are easier to debug
-
-6. **Inherit wisely** - Put shared behavior on parent objects
-
-7. **Document with help** - Use the `help` property in method definitions:
-   ```typescript
-   self.setMethod('look', code, {
-     callable: true,
-     aliases: ['l'],
-     help: 'Look at your surroundings'
-   });
-   ```
-
-## TypeScript Features
-
-Since methods are TypeScript, you can use:
-
-- Type annotations (for documentation)
-- Destructuring: `const { name, hp } = self.getOwnProperties()`
-- Spread operator: `const allItems = [...inventory, newItem]`
-- Template literals: `` `${self.name} attacks!` ``
-- Optional chaining: `target?.hp`
-- Nullish coalescing: `self.hp ?? 100`
-- Arrow functions: `items.filter(i => i.value > 10)`
-
-The TypeScript is compiled to ES2022 JavaScript at runtime.
+```typescript
+const obj = await $.load(id);
+if (!obj) {
+  await player.tell('Object not found!');
+  return;
+}
+```
