@@ -5,6 +5,9 @@ import { GameBootstrap } from '../../src/database/game-bootstrap.js';
 
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/?replicaSet=rs0&directConnection=true';
 
+// Use lower iterations for regular tests, set PERF_ITERATIONS=1000000 for benchmarks
+const ITERATIONS = parseInt(process.env.PERF_ITERATIONS || '10000', 10);
+
 describe('Method Call Performance', () => {
   let db: ObjectDatabase;
   let manager: ObjectManager;
@@ -33,9 +36,9 @@ describe('Method Call Performance', () => {
     // Method b just returns true
     testObj.setMethod('b', `return true;`);
 
-    // Method a calls b 1 million times
+    // Method a calls b ITERATIONS times
     testObj.setMethod('a', `
-      const iterations = 1000000;
+      const iterations = ${ITERATIONS};
       const startTime = Date.now();
 
       for (let i = 0; i < iterations; i++) {
@@ -54,19 +57,15 @@ describe('Method Call Performance', () => {
       };
     `);
 
-    console.log('\n=== Direct method call (self.b) ===');
-    console.log('Starting 1 million method calls...');
+    console.log(`\n=== Direct method call (self.b) [${ITERATIONS} iterations] ===`);
 
     const result = await testObj.a();
 
-    console.log('Results:');
-    console.log(`  Iterations: ${result.iterations.toLocaleString()}`);
     console.log(`  Elapsed: ${result.elapsedMs.toLocaleString()}ms`);
     console.log(`  Calls/second: ${result.callsPerSecond.toLocaleString()}`);
-    console.log(`  Avg per call: ${result.avgMicrosPerCall}μs`);
 
     // Just verify it completed
-    expect(result.iterations).toBe(1000000);
+    expect(result.iterations).toBe(ITERATIONS);
     expect(result.callsPerSecond).toBeGreaterThan(0);
   }, 300000);
 
@@ -88,9 +87,9 @@ describe('Method Call Performance', () => {
     // B has the method
     objB.setMethod('method', `return true;`);
 
-    // A calls target.method 1 million times
+    // A calls target.method ITERATIONS times
     objA.setMethod('runTest', `
-      const iterations = 1000000;
+      const iterations = ${ITERATIONS};
       const startTime = Date.now();
 
       for (let i = 0; i < iterations; i++) {
@@ -109,18 +108,14 @@ describe('Method Call Performance', () => {
       };
     `);
 
-    console.log('\n=== Property lookup + method call (self.target.method) ===');
-    console.log('Starting 1 million property lookups + method calls...');
+    console.log(`\n=== Property lookup + method call (self.target.method) [${ITERATIONS} iterations] ===`);
 
     const result = await objA.runTest();
 
-    console.log('Results:');
-    console.log(`  Iterations: ${result.iterations.toLocaleString()}`);
     console.log(`  Elapsed: ${result.elapsedMs.toLocaleString()}ms`);
     console.log(`  Calls/second: ${result.callsPerSecond.toLocaleString()}`);
-    console.log(`  Avg per call: ${result.avgMicrosPerCall}μs`);
 
-    expect(result.iterations).toBe(1000000);
+    expect(result.iterations).toBe(ITERATIONS);
     expect(result.callsPerSecond).toBeGreaterThan(0);
   }, 300000);
 
@@ -148,9 +143,9 @@ describe('Method Call Performance', () => {
     // Target has the method
     target.setMethod('method', `return true;`);
 
-    // A calls middle.target.method 1 million times
+    // A calls middle.target.method ITERATIONS times
     objA.setMethod('runTest', `
-      const iterations = 1000000;
+      const iterations = ${ITERATIONS};
       const startTime = Date.now();
 
       for (let i = 0; i < iterations; i++) {
@@ -169,18 +164,14 @@ describe('Method Call Performance', () => {
       };
     `);
 
-    console.log('\n=== Chained property lookup + method call (self.middle.target.method) ===');
-    console.log('Starting 1 million chained lookups + method calls...');
+    console.log(`\n=== Chained property lookup + method call (self.middle.target.method) [${ITERATIONS} iterations] ===`);
 
     const result = await objA.runTest();
 
-    console.log('Results:');
-    console.log(`  Iterations: ${result.iterations.toLocaleString()}`);
     console.log(`  Elapsed: ${result.elapsedMs.toLocaleString()}ms`);
     console.log(`  Calls/second: ${result.callsPerSecond.toLocaleString()}`);
-    console.log(`  Avg per call: ${result.avgMicrosPerCall}μs`);
 
-    expect(result.iterations).toBe(1000000);
+    expect(result.iterations).toBe(ITERATIONS);
     expect(result.callsPerSecond).toBeGreaterThan(0);
   }, 300000);
 });

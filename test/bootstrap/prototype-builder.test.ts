@@ -73,12 +73,15 @@ describe('PrototypeBuilder', () => {
 
       const describableParent = $.describable.getParent();
       const agentParent = $.agent.getParent();
+      const embodiedParent = $.embodied.getParent();
       const humanParent = $.human.getParent();
       const playerParent = $.player.getParent();
 
+      // Inheritance chain: Root -> Describable -> Agent -> Embodied -> Human -> Player
       expect(describableParent).toBe($.root.id);
       expect(agentParent).toBe($.describable.id);
-      expect(humanParent).toBe($.agent.id);
+      expect(embodiedParent).toBe($.agent.id);
+      expect(humanParent).toBe($.embodied.id);
       expect(playerParent).toBe($.human.id);
     });
 
@@ -206,9 +209,9 @@ describe('PrototypeBuilder', () => {
       expect($.human.hasMethod('pronoun')).toBe(true);
     });
 
-    it('should inherit from Agent', async () => {
+    it('should inherit from Embodied', async () => {
       const $ = manager as any;
-      expect($.human.getParent()).toBe($.agent.id);
+      expect($.human.getParent()).toBe($.embodied.id);
     });
   });
 
@@ -287,9 +290,10 @@ describe('PrototypeBuilder', () => {
     it('should create proper inheritance hierarchy', async () => {
       const $ = manager as any;
 
-      // Player -> Human -> Agent -> Describable -> Root
+      // Player -> Human -> Embodied -> Agent -> Describable -> Root
       expect($.player.getParent()).toBe($.human.id);
-      expect($.human.getParent()).toBe($.agent.id);
+      expect($.human.getParent()).toBe($.embodied.id);
+      expect($.embodied.getParent()).toBe($.agent.id);
       expect($.agent.getParent()).toBe($.describable.id);
       expect($.describable.getParent()).toBe($.root.id);
     });
