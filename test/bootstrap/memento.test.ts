@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { ObjectDatabase } from '../../src/database/object-db.js';
 import { ObjectManager } from '../../src/database/object-manager.js';
 import { GameBootstrap } from '../../src/database/game-bootstrap.js';
@@ -10,7 +10,7 @@ describe('$.memento', () => {
   let manager: ObjectManager;
   let $: any;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     db = new ObjectDatabase(MONGO_URI, 'malice_test_memento');
     await db.connect();
 
@@ -22,9 +22,9 @@ describe('$.memento', () => {
     await bootstrap.bootstrap();
 
     $ = manager as any;
-  });
+  }, 30000);
 
-  afterEach(async () => {
+  afterAll(async () => {
     await db.disconnect();
   });
 

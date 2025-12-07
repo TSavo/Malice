@@ -178,17 +178,67 @@ interface Connection {
   }
 
   /**
-   * Infer TypeScript type from typed Value
+   * Infer TypeScript type from typed Value or raw JavaScript value
    */
-  private inferType(value: Value): string {
-    if (!value) {
-      return 'any';
+  private inferType(value: any): string {
+    if (value === null) {
+      return 'null';
     }
 
-    switch (value.type) {
-      case 'null':
-        return 'null';
+    if (value === undefined) {
+      return 'null'; // MongoDB converts undefined to null
+    }
 
+    // Handle typed Value objects (have a 'type' property)
+    if (value && typeof value === 'object' && 'type' in value && typeof value.type === 'string') {
+      switch (value.type) {
+        case 'null':
+          return 'null';
+
+        case 'string':
+          return 'string';
+
+        case 'number':
+          return 'number';
+
+        case 'boolean':
+          return 'boolean';
+
+        case 'objref':
+          // Resolve objref to specific object type
+          const objId = value.value as number;
+          return `RuntimeObject & MaliceObject_${objId}`;
+
+        case 'array': {
+          const arrayValue = value.value as any[];
+          if (!arrayValue || arrayValue.length === 0) {
+            return 'any[]';
+          }
+
+          // Check if all elements are same type
+          const firstType = this.inferType(arrayValue[0]);
+          const allSameType = arrayValue.every(item => this.inferType(item) === firstType);
+
+          if (allSameType && firstType !== 'any') {
+            return `${firstType}[]`;
+          }
+
+          return 'any[]';
+        }
+
+        case 'object': {
+          return 'Record<string, any>';
+        }
+
+        default:
+          return 'any';
+      }
+    }
+
+    // Handle raw JavaScript values (no 'type' property)
+    const jsType = typeof value;
+
+    switch (jsType) {
       case 'string':
         return 'string';
 
@@ -198,33 +248,25 @@ interface Connection {
       case 'boolean':
         return 'boolean';
 
-      case 'objref':
-        // Resolve objref to specific object type
-        const objId = value.value as number;
-        return `RuntimeObject & MaliceObject_${objId}`;
+      case 'object':
+        if (Array.isArray(value)) {
+          if (value.length === 0) {
+            return 'any[]';
+          }
 
-      case 'array': {
-        const arrayValue = value.value as Value[];
-        if (arrayValue.length === 0) {
+          // Check if all elements are same type
+          const firstType = this.inferType(value[0]);
+          const allSameType = value.every(item => this.inferType(item) === firstType);
+
+          if (allSameType && firstType !== 'any') {
+            return `${firstType}[]`;
+          }
+
           return 'any[]';
         }
 
-        // Check if all elements are same type
-        const firstType = this.inferType(arrayValue[0]);
-        const allSameType = arrayValue.every(item => this.inferType(item) === firstType);
-
-        if (allSameType && firstType !== 'any') {
-          return `${firstType}[]`;
-        }
-
-        return 'any[]';
-      }
-
-      case 'object': {
-        // For now, just use Record<string, any>
-        // Could recursively infer object structure in the future
+        // Plain object
         return 'Record<string, any>';
-      }
 
       default:
         return 'any';
