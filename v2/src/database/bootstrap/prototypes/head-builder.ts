@@ -22,32 +22,70 @@ export class HeadBuilder {
       methods: {},
     });
 
-    // Check if can see (needs at least one working eye)
+    // Aggregate vision from both eyes
+    // Returns { max, percent } - combined capacity and current function
     obj.setMethod('canSee', `
       const face = await self.getPart('face');
-      if (!face) return false;
+      if (!face) return { max: 0, percent: 0 };
 
       const leftEye = await face.getPart('leftEye');
       const rightEye = await face.getPart('rightEye');
 
-      const leftCanSee = leftEye && await leftEye.canSee();
-      const rightCanSee = rightEye && await rightEye.canSee();
+      // Get each eye's stats
+      const left = leftEye ? await leftEye.canSee() : { max: 0, percent: 0 };
+      const right = rightEye ? await rightEye.canSee() : { max: 0, percent: 0 };
 
-      return leftCanSee || rightCanSee;
+      // Combine max: sum of both, but with diminishing returns for second eye
+      // First eye = 100%, second eye adds 50% of its max (depth perception, peripheral)
+      let combinedMax;
+      if (left.max >= right.max) {
+        combinedMax = left.max + Math.floor(right.max * 0.5);
+      } else {
+        combinedMax = right.max + Math.floor(left.max * 0.5);
+      }
+
+      if (combinedMax === 0) return { max: 0, percent: 0 };
+
+      // Combined percent: weighted average by max
+      const leftEffective = left.max * (left.percent / 100);
+      const rightEffective = right.max * (right.percent / 100);
+      const totalEffective = leftEffective + rightEffective * 0.5; // Same diminishing returns
+      const percent = Math.round((totalEffective / combinedMax) * 100);
+
+      return { max: combinedMax, percent };
     `);
 
-    // Check if can hear (needs at least one working ear)
+    // Aggregate hearing from both ears
+    // Returns { max, percent } - combined capacity and current function
     obj.setMethod('canHear', `
       const face = await self.getPart('face');
-      if (!face) return false;
+      if (!face) return { max: 0, percent: 0 };
 
       const leftEar = await face.getPart('leftEar');
       const rightEar = await face.getPart('rightEar');
 
-      const leftCanHear = leftEar && await leftEar.canHear();
-      const rightCanHear = rightEar && await rightEar.canHear();
+      // Get each ear's stats
+      const left = leftEar ? await leftEar.canHear() : { max: 0, percent: 0 };
+      const right = rightEar ? await rightEar.canHear() : { max: 0, percent: 0 };
 
-      return leftCanHear || rightCanHear;
+      // Combine max: sum of both, with diminishing returns for second ear
+      // First ear = 100%, second ear adds 50% (directional hearing, filtering)
+      let combinedMax;
+      if (left.max >= right.max) {
+        combinedMax = left.max + Math.floor(right.max * 0.5);
+      } else {
+        combinedMax = right.max + Math.floor(left.max * 0.5);
+      }
+
+      if (combinedMax === 0) return { max: 0, percent: 0 };
+
+      // Combined percent: weighted average by max
+      const leftEffective = left.max * (left.percent / 100);
+      const rightEffective = right.max * (right.percent / 100);
+      const totalEffective = leftEffective + rightEffective * 0.5;
+      const percent = Math.round((totalEffective / combinedMax) * 100);
+
+      return { max: combinedMax, percent };
     `);
 
     // Check if can speak (needs tongue and empty mouth)
