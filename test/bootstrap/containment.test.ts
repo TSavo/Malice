@@ -395,8 +395,7 @@ describe('Containment System', () => {
     });
   });
 
-  describe.skip('Dimension-based containment', () => {
-    // These tests require canFitIn to be more sophisticated
+  describe('Dimension-based containment', () => {
     it('should check if object fits in container', async () => {
       const container = await $.recycler.create({
         parent: $.describable.id,
