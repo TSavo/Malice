@@ -60,6 +60,9 @@ export class BodyFactoryBuilder {
           dexterity: options.dexterity,
           perception: options.perception,
           iq: options.iq,
+          // Calories - for energy/endurance system
+          calories: options.calories,
+          maxCalories: options.maxCalories,
         },
       });
       return part;
@@ -99,6 +102,8 @@ export class BodyFactoryBuilder {
         aliases: [side === primaryHand ? 'primary hand' : 'secondary hand'],
         strength: 1,
         dexterity: 1,
+        calories: 50,
+        maxCalories: 75,
       });
       await self.createFingers(bodyPartId, side, hand, ownerId);
       return hand;
@@ -128,6 +133,8 @@ export class BodyFactoryBuilder {
         coverable: true,
         removable: true,
         strength: 1,
+        calories: 100,
+        maxCalories: 150,
       });
       await arm.addPart('forearm', forearm.id);
 
@@ -162,6 +169,8 @@ export class BodyFactoryBuilder {
         removable: true,
         strength: 1,
         dexterity: 1,
+        calories: 200,
+        maxCalories: 300,
       });
       await leg.addPart('foot', foot.id);
 
@@ -346,8 +355,17 @@ export class BodyFactoryBuilder {
         bones: ['ribs'],
         coverable: true,
       });
-      const stomach = await self.createPart(bodyPartId, 'stomach', ownerId, {
+      const abdomen = await self.createPart(bodyPartId, 'abdomen', ownerId, {
         coverable: true,
+      });
+
+      // Internal digestive stomach (using Stomach prototype if available)
+      const stomachProtoId = aliases.stomach;
+      const digestiveStomach = await self.createPart(stomachProtoId || bodyPartId, 'digestive stomach', ownerId, {
+        internal: true,
+        maxContents: 10,
+        maxVolume: 1000,
+        digestionRate: 50,
       });
       const back = await self.createPart(bodyPartId, 'back', ownerId, {
         bones: ['spine'],
@@ -361,6 +379,9 @@ export class BodyFactoryBuilder {
         coverable: true,
         critical: true,
         strength: 1,
+        // Main calorie store (where digestion happens)
+        calories: 2000,
+        maxCalories: 3000,
       });
 
       await torso.addPart('head', head.id);
@@ -371,7 +392,8 @@ export class BodyFactoryBuilder {
       await torso.addPart('groin', groin.id);
       await torso.addPart('leftChest', leftChest.id);
       await torso.addPart('rightChest', rightChest.id);
-      await torso.addPart('stomach', stomach.id);
+      await torso.addPart('abdomen', abdomen.id);
+      await torso.addPart('digestiveStomach', digestiveStomach.id);
       await torso.addPart('back', back.id);
 
       // Store primary hand preference on torso

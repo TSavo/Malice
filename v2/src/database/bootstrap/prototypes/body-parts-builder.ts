@@ -7,6 +7,7 @@ import type { RuntimeObject } from '../../../../types/object.js';
  *
  * Hierarchy:
  * - Torso (critical, central hub)
+ *   - Stomach (digestion, internal organ)
  *   - Head (critical, sense hub)
  *     - Eye (sight)
  *     - Ear (hearing)
@@ -30,6 +31,7 @@ export class BodyPartsBuilder {
 
     // Build in dependency order
     parts.torso = await this.buildTorso(bodyPartId);
+    parts.stomach = await this.buildStomach(bodyPartId);
     parts.head = await this.buildHead(bodyPartId);
     parts.eye = await this.buildEye(bodyPartId);
     parts.ear = await this.buildEar(bodyPartId);
@@ -59,6 +61,16 @@ export class BodyPartsBuilder {
         bones: ['spine', 'ribs', 'pelvis'],
         // Stats
         strength: 1, // Core strength
+        // Calories - main body store (where digestion happens)
+        // Average adult has ~2000 kcal/day needs, store represents available energy
+        calories: 2000, // Current calories available
+        maxCalories: 3000, // Max calorie storage (glycogen)
+        // Fat - overflow calorie storage, acts as reserves but imposes penalties
+        // 1 unit of fat = ~100 calories when burned
+        // Accumulates when calories are maxed but still eating
+        // Burns when out of digestible food and calories
+        fat: 0, // Current fat reserves (0 = lean)
+        maxFat: 100, // Max fat storage (100 = severely overweight)
       },
       methods: {},
     });
@@ -72,6 +84,147 @@ export class BodyPartsBuilder {
       }
 
       return desc;
+    `);
+
+    return obj;
+  }
+
+  async buildStomach(bodyPartId: number): Promise<RuntimeObject> {
+    const obj = await this.manager.create({
+      parent: bodyPartId,
+      properties: {
+        name: 'Stomach',
+        description: 'The stomach',
+        aliases: ['belly', 'gut'],
+        size: 'medium',
+        weight: 0.15, // ~150g empty
+        coverable: false,
+        removable: false,
+        internal: true, // Internal organ
+        // Stomach capacity
+        maxContents: 10, // Max number of items
+        maxVolume: 1000, // ml (about 1 liter when stretched)
+        // Digestion rate - calories extracted per tick
+        digestionRate: 50, // kcal per tick
+      },
+      methods: {},
+    });
+
+    // Stomach can contain food/drink
+    obj.setMethod('canContain', `
+      const item = args[0];
+      const contents = self.contents || [];
+
+      // Check item count
+      if (contents.length >= (self.maxContents || 10)) {
+        return 'Your stomach is too full.';
+      }
+
+      // Only edible items can be in stomach
+      // Check if item has calories (simplified check for edibility)
+      if (item.calories === undefined) {
+        return 'That is not digestible.';
+      }
+
+      return true;
+    `);
+
+    // Digest one tick - process StomachContents and extract calories
+    // Returns calories extracted this tick
+    obj.setMethod('digest', `
+      const contents = self.contents || [];
+      if (contents.length === 0) {
+        return 0;
+      }
+
+      let totalCalories = 0;
+      const toRemove = [];
+      const digestionRate = self.digestionRate || 50;
+
+      for (const itemId of contents) {
+        const item = await $.load(itemId);
+        if (!item) {
+          toRemove.push(itemId);
+          continue;
+        }
+
+        // Use StomachContents.digestTick if available
+        if (item.digestTick) {
+          const extracted = await item.digestTick(digestionRate);
+          totalCalories += extracted;
+
+          // Check if fully digested
+          if (item.isFullyDigested && await item.isFullyDigested()) {
+            toRemove.push(itemId);
+          }
+        } else {
+          // Fallback for old-style items (direct edibles)
+          const itemCalories = item.calories || 0;
+          const itemBites = item.bites || 1;
+          const caloriesPerBite = Math.ceil(itemCalories / itemBites);
+
+          if (item.bitesRemaining > 0) {
+            item.bitesRemaining = (item.bitesRemaining || 1) - 1;
+            totalCalories += caloriesPerBite;
+          }
+
+          if ((item.bitesRemaining || 0) <= 0) {
+            toRemove.push(itemId);
+          }
+        }
+      }
+
+      // Remove fully digested items - recycle them
+      for (const itemId of toRemove) {
+        const item = await $.load(itemId);
+        if (item) {
+          // Move to recycler
+          if ($.recycler && $.recycler.recycle) {
+            await $.recycler.recycle(item);
+          }
+        }
+        // Remove from contents
+        const idx = (self.contents || []).indexOf(itemId);
+        if (idx >= 0) {
+          self.contents.splice(idx, 1);
+        }
+      }
+
+      return totalCalories;
+    `);
+
+    // Describe stomach contents (for autopsy)
+    obj.setMethod('describe', `
+      const contents = self.contents || [];
+      let desc = self.description;
+
+      if (contents.length === 0) {
+        desc += '\\r\\nIt is empty.';
+      } else {
+        const items = [];
+        for (const itemId of contents) {
+          const item = await $.load(itemId);
+          if (item) {
+            // Use StomachContents describe if available
+            if (item.describe) {
+              const itemDesc = await item.describe();
+              items.push(itemDesc);
+            } else {
+              items.push(item.name || 'something');
+            }
+          }
+        }
+        desc += '\\r\\nContents:\\r\\n  - ' + items.join('\\r\\n  - ');
+      }
+
+      return desc;
+    `);
+
+    // Get fullness as a proportion
+    obj.setMethod('getFullness', `
+      const contents = self.contents || [];
+      const max = self.maxContents || 10;
+      return { current: contents.length, max: max };
     `);
 
     return obj;
@@ -308,6 +461,9 @@ export class BodyPartsBuilder {
         bones: ['humerus', 'radius', 'ulna'],
         // Stats
         strength: 1, // Arm strength
+        // Local muscle energy (glycogen in arm muscles)
+        calories: 100, // Current arm calories
+        maxCalories: 150, // Max arm calorie storage
       },
       methods: {},
     });
@@ -336,7 +492,11 @@ export class BodyPartsBuilder {
         description: 'A hand',
         aliases: [],
         size: 'small',
-        weight: 0.5,
+        // Physical dimensions in cm
+        width: 10, // palm width
+        height: 20, // fingers extended
+        depth: 5, // grip thickness
+        weight: 500, // grams
         coverable: true,
         removable: true,
         canGrasp: true,
@@ -344,10 +504,13 @@ export class BodyPartsBuilder {
         bones: ['carpals', 'metacarpals'],
         // Grasp capacity
         maxItems: 2,
-        maxWeight: 10,
+        maxWeight: 10000, // 10kg in grams
         // Stats
         strength: 1, // Grip strength
         dexterity: 1, // Fine motor control
+        // Local muscle energy (hand/forearm muscles)
+        calories: 50, // Current hand calories
+        maxCalories: 75, // Max hand calorie storage
       },
       methods: {},
     });
@@ -358,20 +521,23 @@ export class BodyPartsBuilder {
       const contents = self.contents || [];
 
       // Check item count
-      if (contents.length >= self.maxItems) {
+      if (contents.length >= (self.maxItems || 2)) {
         return 'Your hand is already full.';
       }
 
-      // Check weight
+      // Check weight (in grams) - strength affects max carry weight
+      const strengthMult = (self.strength || 1) * 5000; // 5kg per strength point
+      const maxWeight = self.maxWeight || strengthMult;
+
       let currentWeight = 0;
       for (const itemId of contents) {
         const item = await $.load(itemId);
         if (item) {
-          currentWeight += item.weight || 1;
+          currentWeight += item.weight || 0;
         }
       }
 
-      if (currentWeight + (obj.weight || 1) > self.maxWeight) {
+      if (currentWeight + (obj.weight || 0) > maxWeight) {
         return 'That is too heavy to hold.';
       }
 
@@ -448,6 +614,9 @@ export class BodyPartsBuilder {
         // Stats
         strength: 1, // Leg power
         dexterity: 1, // Coordination/balance
+        // Local muscle energy (leg muscles - largest muscle group)
+        calories: 200, // Current leg calories
+        maxCalories: 300, // Max leg calorie storage
       },
       methods: {},
     });

@@ -94,11 +94,14 @@ export class RecyclerBuilder {
         `);
 
     this.recycler.setMethod('recycle', `
-          const objectId = args[0];
+          const objectOrId = args[0];
           const caller = args[1];
 
+          // Accept either object or ID
+          const objectId = typeof objectOrId === 'number' ? objectOrId : objectOrId.id;
+
           // Load the object
-          const obj = await $.load(objectId);
+          const obj = typeof objectOrId === 'number' ? await $.load(objectId) : objectOrId;
           if (!obj) {
             throw new Error('Object not found');
           }

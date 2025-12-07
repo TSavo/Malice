@@ -55,6 +55,11 @@ export class HumanBuilder {
       return null;
     `);
 
+    // Alias for getBody - torso is the body root
+    obj.setMethod('getTorso', `
+      return await self.getBody();
+    `);
+
     // Get head (for sensory access)
     obj.setMethod('getHead', `
       const body = await self.getBody();
@@ -337,6 +342,15 @@ export class HumanBuilder {
       const viewer = args[0]; // Who is looking
       const parts = [];
 
+      // Body composition (fat level) - most noticeable physical trait
+      const fatInfo = await self.getFat();
+      const bodyDesc = await $.proportional.sub(
+        ['very lean', 'lean', 'fit', 'healthy-looking', 'soft', 'heavyset', 'overweight', 'obese', 'morbidly obese'],
+        fatInfo.fat,
+        fatInfo.maxFat
+      );
+      parts.push(bodyDesc);
+
       // Basic description
       const heightDesc = self.height >= 1.9 ? 'tall' :
                         self.height >= 1.8 ? 'above average height' :
@@ -470,6 +484,7 @@ export class HumanBuilder {
     `);
 
     // Get total dexterity (hands + legs + feet)
+    // Affected by fat modifier
     obj.setMethod('getDexterity', `
       let total = 0;
       const body = await self.getBody();
@@ -510,7 +525,9 @@ export class HumanBuilder {
         }
       }
 
-      return total;
+      // Apply fat penalty
+      const fatMod = await self.getFatModifier();
+      return Math.floor(total * fatMod);
     `);
 
     // Get intelligence (from head)
@@ -542,6 +559,7 @@ export class HumanBuilder {
     `);
 
     // Get derived speed (leg strength + leg dexterity)
+    // Heavily affected by fat modifier
     obj.setMethod('getSpeed', `
       let legStrength = 0;
       let legDexterity = 0;
@@ -564,18 +582,463 @@ export class HumanBuilder {
       }
 
       // Speed is average of leg strength and dexterity
-      return Math.floor((legStrength + legDexterity) / 2);
+      const base = Math.floor((legStrength + legDexterity) / 2);
+
+      // Apply fat penalty (speed is more affected by fat)
+      const fatMod = await self.getFatModifier();
+      // Speed penalty is double the normal fat penalty
+      const speedMod = 1.0 - ((1.0 - fatMod) * 2);
+      return Math.floor(base * Math.max(0.25, speedMod));
     `);
 
     // Get all stats as an object
     obj.setMethod('getStats', `
+      const fat = await self.getFat();
       return {
         strength: await self.getStrength(),
         dexterity: await self.getDexterity(),
         intelligence: await self.getIntelligence(),
         perception: await self.getPerception(),
         speed: await self.getSpeed(),
+        fatModifier: await self.getFatModifier(),
+        fat: fat.fat,
+        fatStatus: fat.status,
       };
+    `);
+
+    // === CALORIE AND STRENGTH CHECK METHODS ===
+
+    // Get the arm path from hand to torso for a given side
+    // Returns array of parts: [hand, forearm, arm, shoulder, torso]
+    obj.setMethod('getArmPath', `
+      const side = args[0]; // 'right' or 'left'
+      const body = await self.getBody();
+      if (!body) return [];
+
+      const path = [];
+      const shoulder = await body.getPart(side + 'Shoulder');
+      if (!shoulder) return [];
+
+      const arm = await shoulder.getPart('arm');
+      if (!arm) return [shoulder, body];
+
+      const forearm = await arm.getPart('forearm');
+      if (!forearm) return [arm, shoulder, body];
+
+      const hand = await forearm.getPart('hand');
+      if (!hand) return [forearm, arm, shoulder, body];
+
+      return [hand, forearm, arm, shoulder, body];
+    `);
+
+    // Get both arm paths for two-handed operations
+    obj.setMethod('getBothArmPaths', `
+      const rightPath = await self.getArmPath('right');
+      const leftPath = await self.getArmPath('left');
+      return { right: rightPath, left: leftPath };
+    `);
+
+    // Get total calories in the body
+    obj.setMethod('getTotalCalories', `
+      const body = await self.getBody();
+      if (!body) return 0;
+
+      let total = body.calories || 0;
+
+      // Add limb calories
+      const armPaths = await self.getBothArmPaths();
+      for (const path of [armPaths.right, armPaths.left]) {
+        for (const part of path) {
+          if (part && part !== body) {
+            total += part.calories || 0;
+          }
+        }
+      }
+
+      // Add leg calories
+      for (const side of ['right', 'left']) {
+        const thigh = await body.getPart(side + 'Thigh');
+        if (thigh) {
+          const knee = await thigh.getPart('knee');
+          if (knee) {
+            const leg = await knee.getPart('leg');
+            if (leg) {
+              total += leg.calories || 0;
+            }
+          }
+        }
+      }
+
+      return total;
+    `);
+
+    // Check if a body part path can handle a given weight
+    // Returns: { canLift, canHold, canDrag, weakestPart, requiredCalories }
+    // Weight in grams, strength gives ~5kg (5000g) lift capacity per point
+    obj.setMethod('strengthCheck', `
+      const weight = args[0]; // in grams
+      const path = args[1]; // array of body parts from extremity to torso
+
+      if (!path || path.length === 0) {
+        return { canLift: false, canHold: false, canDrag: false, error: 'No body path available' };
+      }
+
+      // Find the weakest link in the chain
+      let minStrength = Infinity;
+      let minCalories = Infinity;
+      let weakestPart = null;
+      let lowestCaloriePart = null;
+      let totalPathStrength = 0;
+
+      for (const part of path) {
+        if (!part) continue;
+        const str = part.strength || 0;
+        const cal = part.calories || 0;
+
+        totalPathStrength += str;
+
+        if (str > 0 && str < minStrength) {
+          minStrength = str;
+          weakestPart = part;
+        }
+        if (cal < minCalories) {
+          minCalories = cal;
+          lowestCaloriePart = part;
+        }
+      }
+
+      // Each strength point gives ~5kg lift capacity
+      // Weakest link determines max lift
+      const liftCapacity = minStrength * 5000; // grams
+      // Can hold longer at lower weights - hold capacity is 2x lift
+      const holdCapacity = minStrength * 10000;
+      // Dragging uses legs primarily but arms help - much higher capacity
+      const dragCapacity = minStrength * 25000;
+
+      // Calorie cost scales with weight relative to capacity
+      // Lifting something at max capacity costs ~10 cal/action
+      // Holding costs ~1 cal/second at max capacity
+      const liftCaloriesNeeded = Math.ceil((weight / liftCapacity) * 10);
+      const holdCaloriesPerSecond = Math.ceil((weight / holdCapacity) * 1);
+
+      // Check if we have enough calories
+      const hasCalories = minCalories >= liftCaloriesNeeded;
+
+      return {
+        canLift: weight <= liftCapacity && hasCalories,
+        canHold: weight <= holdCapacity && hasCalories,
+        canDrag: weight <= dragCapacity && hasCalories,
+        liftCapacity,
+        holdCapacity,
+        dragCapacity,
+        weight,
+        weakestPart: weakestPart?.name || 'unknown',
+        lowestCaloriePart: lowestCaloriePart?.name || 'unknown',
+        minCalories,
+        liftCaloriesNeeded,
+        holdCaloriesPerSecond,
+        hasCalories,
+      };
+    `);
+
+    // Burn calories from body parts doing work
+    // Distributes calorie burn across the path proportionally
+    obj.setMethod('burnCalories', `
+      const path = args[0]; // array of body parts
+      const amount = args[1]; // total calories to burn
+      const body = await self.getBody();
+
+      if (!path || path.length === 0 || !body) return;
+
+      // Distribute burn across parts with calories
+      const partsWithCalories = path.filter(p => p && (p.calories || 0) > 0);
+      if (partsWithCalories.length === 0) {
+        // Fall back to torso
+        body.calories = Math.max(0, (body.calories || 0) - amount);
+        return;
+      }
+
+      const perPart = Math.ceil(amount / partsWithCalories.length);
+      for (const part of partsWithCalories) {
+        const current = part.calories || 0;
+        const burned = Math.min(current, perPart);
+        part.set('calories', current - burned);
+      }
+    `);
+
+    // Replenish calories from eating (distributes to body and limbs)
+    // Returns { absorbed, storedAsFat } - how much was used
+    obj.setMethod('replenishCalories', `
+      const amount = args[0]; // calories from food
+      const body = await self.getBody();
+      if (!body) return { absorbed: 0, storedAsFat: 0 };
+
+      // First fill torso (main storage), then distribute to limbs
+      const torsoMax = body.maxCalories || 3000;
+      const torsoCurrent = body.calories || 0;
+      const torsoSpace = torsoMax - torsoCurrent;
+      const toTorso = Math.min(amount, torsoSpace);
+      body.set('calories', torsoCurrent + toTorso);
+
+      let remaining = amount - toTorso;
+      if (remaining <= 0) return { absorbed: amount, storedAsFat: 0 };
+
+      // Distribute remainder to limbs
+      const limbs = [];
+      const armPaths = await self.getBothArmPaths();
+      for (const path of [armPaths.right, armPaths.left]) {
+        for (const part of path) {
+          if (part && part !== body && (part.maxCalories || 0) > 0) {
+            limbs.push(part);
+          }
+        }
+      }
+
+      // Add legs
+      for (const side of ['right', 'left']) {
+        const thigh = await body.getPart(side + 'Thigh');
+        if (thigh) {
+          const knee = await thigh.getPart('knee');
+          if (knee) {
+            const leg = await knee.getPart('leg');
+            if (leg && (leg.maxCalories || 0) > 0) {
+              limbs.push(leg);
+            }
+          }
+        }
+      }
+
+      // Distribute evenly to limbs
+      if (limbs.length > 0) {
+        const perLimb = Math.floor(remaining / limbs.length);
+        for (const limb of limbs) {
+          const max = limb.maxCalories || 0;
+          const current = limb.calories || 0;
+          const space = max - current;
+          const toLimb = Math.min(perLimb, space);
+          limb.set('calories', current + toLimb);
+          remaining -= toLimb;
+        }
+      }
+
+      // If still remaining, store as fat (1 fat = 100 calories)
+      let storedAsFat = 0;
+      if (remaining > 0) {
+        const currentFat = body.fat || 0;
+        const maxFat = body.maxFat || 100;
+        const fatSpace = maxFat - currentFat;
+
+        // Convert calories to fat: 100 cal = 1 fat unit
+        const fatToAdd = Math.min(Math.floor(remaining / 100), fatSpace);
+        if (fatToAdd > 0) {
+          body.set('fat', currentFat + fatToAdd);
+          storedAsFat = fatToAdd;
+          remaining -= fatToAdd * 100;
+        }
+      }
+
+      return { absorbed: amount - remaining, storedAsFat };
+    `);
+
+    // Digest tick - process stomach contents and absorb calories
+    // Called periodically by the game tick system
+    // If stomach is empty but body needs calories, burns fat
+    obj.setMethod('digestTick', `
+      const body = await self.getBody();
+      if (!body) return { digested: 0, fatBurned: 0 };
+
+      const stomach = await body.getPart('digestiveStomach');
+      let digestedCalories = 0;
+
+      // First try to digest food in stomach
+      if (stomach && stomach.digest) {
+        digestedCalories = await stomach.digest();
+      }
+
+      // Replenish body with extracted calories
+      let fatGained = 0;
+      if (digestedCalories > 0) {
+        const result = await self.replenishCalories(digestedCalories);
+        fatGained = result.storedAsFat || 0;
+      }
+
+      // If stomach is empty and we're low on calories, burn fat
+      let fatBurned = 0;
+      const stomachContents = stomach ? (stomach.contents || []) : [];
+      const currentCalories = body.calories || 0;
+      const maxCalories = body.maxCalories || 3000;
+      const caloriePercent = currentCalories / maxCalories;
+
+      // Start burning fat when below 50% calories and stomach is empty
+      if (stomachContents.length === 0 && caloriePercent < 0.5) {
+        const currentFat = body.fat || 0;
+        if (currentFat > 0) {
+          // Burn fat to replenish calories
+          // Burn more aggressively when more depleted
+          const urgency = 1 - (caloriePercent * 2); // 1.0 at 0%, 0.0 at 50%
+          const fatToBurn = Math.max(1, Math.ceil(urgency * 3)); // 1-3 fat per tick
+          const actualBurn = Math.min(fatToBurn, currentFat);
+
+          body.set('fat', currentFat - actualBurn);
+          fatBurned = actualBurn;
+
+          // Convert fat back to calories (1 fat = 100 cal)
+          const caloriesFromFat = actualBurn * 100;
+          await self.replenishCalories(caloriesFromFat);
+        }
+      }
+
+      return { digested: digestedCalories, fatBurned, fatGained };
+    `);
+
+    // Get stomach contents (for examining corpses, etc.)
+    obj.setMethod('getStomachContents', `
+      const body = await self.getBody();
+      if (!body) return [];
+
+      const stomach = await body.getPart('digestiveStomach');
+      if (!stomach) return [];
+
+      const contents = stomach.contents || [];
+      const items = [];
+      for (const itemId of contents) {
+        const item = await $.load(itemId);
+        if (item) {
+          items.push(item);
+        }
+      }
+      return items;
+    `);
+
+    // Get current fat level and status
+    obj.setMethod('getFat', `
+      const body = await self.getBody();
+      if (!body) return { fat: 0, maxFat: 100, percentage: 0, status: 'lean' };
+
+      const fat = body.fat || 0;
+      const maxFat = body.maxFat || 100;
+      const percentage = Math.round((fat / maxFat) * 100);
+
+      // Status description based on fat percentage
+      const status = await $.proportional.sub(
+        ['lean', 'fit', 'soft', 'overweight', 'obese', 'morbidly obese'],
+        fat,
+        maxFat
+      );
+
+      return { fat, maxFat, percentage, status };
+    `);
+
+    // Get fat modifier for stats (negative modifier based on fat)
+    // Returns a multiplier: 1.0 = no penalty, lower = penalty
+    // Fat affects: dexterity, speed, stealth
+    // No penalty for fat <= 20 (healthy-looking and below)
+    // Penalty only starts at "soft" (fat > 20) and scales from there
+    obj.setMethod('getFatModifier', `
+      const body = await self.getBody();
+      if (!body) return 1.0;
+
+      const fat = body.fat || 0;
+      const maxFat = body.maxFat || 100;
+
+      // No penalty for healthy weight (very lean through healthy-looking)
+      // ~20% of maxFat is the threshold
+      const healthyThreshold = Math.floor(maxFat * 0.2); // 20 for maxFat=100
+      if (fat <= healthyThreshold) return 1.0;
+
+      // Penalty only applies to fat above healthy threshold
+      // Scales from 1.0 at threshold to 0.5 at max fat
+      const excessFat = fat - healthyThreshold;
+      const excessRange = maxFat - healthyThreshold; // 80 for maxFat=100
+      const penalty = (excessFat / excessRange) * 0.5; // 0 to 0.5
+
+      return Math.max(0.5, 1.0 - penalty);
+    `);
+
+    // Get calorie status for display
+    obj.setMethod('getCalorieStatus', `
+      const body = await self.getBody();
+      if (!body) return { status: 'no body', percentage: 0, feeling: '' };
+
+      const total = await self.getTotalCalories();
+      // Rough max based on body + 2 arms + 2 legs
+      // torso: 3000 + 2*(arm:150 + hand:75) + 2*(leg:300) = 3000 + 450 + 600 = 4050
+      const maxTotal = 4050;
+      const percentage = Math.round((total / maxTotal) * 100);
+
+      const status = await $.proportional.sub(
+        ['exhausted', 'starving', 'very hungry', 'hungry', 'satisfied', 'well-fed'],
+        total,
+        maxTotal
+      );
+
+      // Feeling is how the player experiences their calorie level
+      const feeling = await $.proportional.sub(
+        [
+          'completely drained, barely able to move',
+          'weak and shaky from hunger',
+          'very hungry, stomach growling',
+          'hungry, could use a meal',
+          'comfortable and satisfied',
+          'energized and well-fed'
+        ],
+        total,
+        maxTotal
+      );
+
+      return { status, percentage, total, maxTotal, feeling };
+    `);
+
+    // Get how the player feels overall (combines calorie status + sleep + other factors)
+    obj.setMethod('getFeeling', `
+      const calorieStatus = await self.getCalorieStatus();
+      const fatInfo = await self.getFat();
+      const sleepState = self.sleepState || 'awake';
+
+      const parts = [];
+
+      // Sleep state feeling
+      if (sleepState === 'falling_asleep') {
+        parts.push('drowsy and drifting off');
+      } else if (sleepState === 'waking_up') {
+        parts.push('groggy and waking');
+      } else if (sleepState === 'asleep') {
+        parts.push('asleep');
+      }
+
+      // Calorie feeling (only mention if notable)
+      if (calorieStatus.percentage < 50) {
+        parts.push(calorieStatus.feeling);
+      } else if (calorieStatus.percentage >= 90) {
+        parts.push('well-fed');
+      }
+
+      // Fat feeling (only mention if notable)
+      if (fatInfo.fat >= 50) {
+        const fatFeeling = await $.proportional.sub(
+          ['sluggish', 'heavy', 'labored'],
+          fatInfo.fat - 50,
+          50
+        );
+        parts.push(fatFeeling);
+      }
+
+      // Sedation
+      const sedation = self.sedation || 0;
+      if (sedation > 0) {
+        const sedFeeling = await $.proportional.sub(
+          ['slightly foggy', 'sedated', 'heavily drugged'],
+          sedation,
+          10
+        );
+        parts.push(sedFeeling);
+      }
+
+      if (parts.length === 0) {
+        return 'normal';
+      }
+
+      return parts.join(', ');
     `);
 
     return obj;

@@ -10,3 +10,4 @@ export { PronounSubBuilder } from './pronoun-sub-builder.js';
 export { RoomBuilder } from './room-builder.js';
 export { PromptBuilder } from './prompt-builder.js';
 export { AliasLoader } from './alias-loader.js';
+export { EnglishBuilder } from './english-builder.js';
