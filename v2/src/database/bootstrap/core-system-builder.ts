@@ -4,9 +4,12 @@ import { CharGenBuilder } from './chargen-builder.js';
 import { PreAuthHandlerBuilder } from './preauth-handler-builder.js';
 import { RecyclerBuilder } from './recycler-builder.js';
 import { PronounSubBuilder } from './pronoun-sub-builder.js';
+import { ProportionalBuilder } from './proportional-builder.js';
+import { EnglishBuilder } from './english-builder.js';
 import { RoomBuilder } from './room-builder.js';
 import { BodyFactoryBuilder } from './body-factory-builder.js';
 import { PromptBuilder } from './prompt-builder.js';
+import { SchedulerBuilder } from './scheduler-builder.js';
 
 /**
  * Orchestrates building all core system objects
@@ -17,9 +20,12 @@ import { PromptBuilder } from './prompt-builder.js';
  * - PreAuthHandler: Pre-authenticated connections (SSL, HTTP auth)
  * - Recycler: Object deletion and cleanup
  * - PronounSub ($.pronoun): Pronoun substitution system
+ * - Proportional ($.proportional): Proportional message selection
+ * - English ($.english): English text formatting utilities
  * - Room ($.room): Room-wide announcement utility
  * - BodyFactory ($.bodyFactory): Creates human bodies
  * - Prompt ($.prompt): Interactive prompt system
+ * - Scheduler ($.scheduler): Global job scheduler for periodic tasks
  */
 export class CoreSystemBuilder {
   constructor(private manager: ObjectManager) {}
@@ -33,18 +39,24 @@ export class CoreSystemBuilder {
     const preAuthHandlerBuilder = new PreAuthHandlerBuilder(this.manager);
     const recyclerBuilder = new RecyclerBuilder(this.manager);
     const pronounSubBuilder = new PronounSubBuilder(this.manager);
+    const proportionalBuilder = new ProportionalBuilder(this.manager);
+    const englishBuilder = new EnglishBuilder(this.manager);
     const roomBuilder = new RoomBuilder(this.manager);
     const bodyFactoryBuilder = new BodyFactoryBuilder(this.manager);
     const promptBuilder = new PromptBuilder(this.manager);
+    const schedulerBuilder = new SchedulerBuilder(this.manager);
 
     await authManagerBuilder.build();
     await charGenBuilder.build();
     await preAuthHandlerBuilder.build();
     await recyclerBuilder.build();
     await pronounSubBuilder.build();
+    await proportionalBuilder.build();
+    await englishBuilder.build();
     await roomBuilder.build();
     await bodyFactoryBuilder.build();
     await promptBuilder.build();
+    await schedulerBuilder.build();
 
     // Register aliases
     await authManagerBuilder.registerAlias();
@@ -52,8 +64,11 @@ export class CoreSystemBuilder {
     await preAuthHandlerBuilder.registerAlias();
     await recyclerBuilder.registerAlias();
     await pronounSubBuilder.registerAlias();
+    await proportionalBuilder.registerAlias();
+    await englishBuilder.registerAlias();
     await roomBuilder.registerAlias();
     await bodyFactoryBuilder.registerAlias();
     await promptBuilder.registerAlias();
+    await schedulerBuilder.registerAlias();
   }
 }

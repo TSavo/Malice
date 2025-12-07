@@ -192,96 +192,190 @@ export class BodyPartBuilder {
     `);
 
     // DAMAGE: takeDamage() - receive and process damage
-    // Body parts can take damage, which may cause conditions and pain
+    // damage: { type: string, force: 0-100, breakChance: 0-1, bleedChance: 0-1 }
+    // type is freeform and includes severity (e.g. "severe bruise", "minor cut", "bullet hole")
+    // force determines bone break potential, breakChance/bleedChance are base probabilities
+    // Both bleeding and breaking scale with existing damage - weakened parts bleed/break easier
     obj.setMethod('takeDamage', `
-      const damage = args[0]; // { type: 'blunt'|'slash'|'pierce'|'burn'|etc., amount, source }
+      const damage = args[0];
       const attacker = args[1];
 
       const condition = self.condition || {};
+      const damageType = damage.type || 'wound';
+      const force = damage.force || 0; // 0-100, how much impact force
+      const breakChance = damage.breakChance || 0; // 0-1, base chance to break bone
+      const bleedChance = damage.bleedChance || 0; // 0-1, base chance to bleed
 
-      // Already destroyed - no further damage
-      if (condition.destroyed) {
-        return { absorbed: true, message: 'The ' + self.name + ' is already destroyed.' };
+      // wounds: { [type]: [] of { bleeding, healed } }
+      // brokenBones: [] of { bone, set, healed }
+      const wounds = condition.wounds || {};
+      const existingDamage = Object.values(wounds).flat().length;
+
+      // Determine if this wound bleeds
+      // More damaged = higher chance to bleed (each existing wound adds 0.1 to chance)
+      let bleeding = false;
+      if (bleedChance > 0) {
+        const damageBonus = existingDamage * 0.1;
+        const finalBleedChance = Math.min(1, bleedChance + damageBonus);
+        bleeding = Math.random() < finalBleedChance;
       }
 
-      // Apply damage based on type
-      const damageType = damage.type || 'blunt';
-      const damageAmount = damage.amount || 1;
+      const typeWounds = wounds[damageType] || [];
+      typeWounds.push({ bleeding, healed: false });
+      wounds[damageType] = typeWounds;
+      condition.wounds = wounds;
 
-      // Track health/damage (simple model)
-      const currentDamage = condition.damage || 0;
-      const newDamage = currentDamage + damageAmount;
-      condition.damage = newDamage;
+      let resultDesc = damage.description || (self.name + ' receives a ' + damageType + '.');
+      let bonesBroken = [];
 
-      // Determine severity and add conditions
-      let severity = 'minor';
-      if (newDamage >= 10) {
-        severity = 'destroyed';
-        condition.destroyed = true;
-      } else if (newDamage >= 7) {
-        severity = 'critical';
-        condition.critical = true;
-      } else if (newDamage >= 4) {
-        severity = 'wounded';
-        condition.wounded = true;
-      } else if (newDamage >= 2) {
-        severity = 'bruised';
-        condition.bruised = true;
+      // Check for bone breaks if this part has bones
+      if (self.bones && self.bones.length > 0 && breakChance > 0) {
+        const brokenBones = condition.brokenBones || [];
+
+        // Force threshold: need sufficient force OR weakened by prior damage
+        const forceThreshold = 50; // Base threshold
+        const weakenedThreshold = forceThreshold - (existingDamage * 10); // Each wound lowers threshold by 10
+        const effectiveThreshold = Math.max(10, weakenedThreshold); // Minimum threshold of 10
+
+        if (force >= effectiveThreshold) {
+          // Roll for each bone based on breakChance
+          for (const bone of self.bones) {
+            // Skip already broken bones
+            if (brokenBones.some(b => b.bone === bone && !b.healed)) continue;
+
+            // Higher force = higher chance, scaled by breakChance
+            const forceBonus = (force - effectiveThreshold) / 100;
+            const finalChance = breakChance + forceBonus;
+
+            if (Math.random() < finalChance) {
+              brokenBones.push({ bone, set: false, healed: false });
+              bonesBroken.push(bone);
+            }
+          }
+          condition.brokenBones = brokenBones;
+        }
       }
 
       self.condition = condition;
 
       // Generate pain sensation
+      const painIntensity = 5 + (bonesBroken.length * 5);
       await self.feel({
         type: 'pain',
-        intensity: damageAmount,
+        intensity: painIntensity,
         damageType: damageType,
         source: attacker?.id,
       });
 
-      // Check for critical damage (death)
-      if (condition.destroyed && self.critical) {
-        const owner = await self.getOwner();
-        if (owner && owner.onCriticalDamage) {
-          await owner.onCriticalDamage(self);
-        }
+      // Build result description
+      if (bleeding) {
+        resultDesc += ' It bleeds profusely.';
+      }
+      if (bonesBroken.length > 0) {
+        resultDesc += ' The ' + bonesBroken.join(' and ') + ' breaks with a sickening crack!';
       }
 
       return {
         part: self.name,
-        severity: severity,
-        totalDamage: newDamage,
-        conditions: Object.keys(condition).filter(k => condition[k] === true),
+        type: damageType,
+        bleeding,
+        bonesBroken,
+        description: resultDesc,
       };
     `);
 
-    // Heal damage/conditions
+    // Heal a wound by type, or heal a bone
+    // healWound(type) - heals oldest unhealed wound of that type
+    // healWound('bone') - heals oldest set broken bone
     obj.setMethod('heal', `
-      const amount = args[0] || 1;
+      const healType = args[0];
       const condition = self.condition || {};
 
-      const currentDamage = condition.damage || 0;
-      const newDamage = Math.max(0, currentDamage - amount);
-      condition.damage = newDamage;
+      let healed = null;
 
-      // Clear conditions based on healing
-      if (newDamage < 2) {
-        delete condition.bruised;
+      if (healType === 'bone') {
+        const bones = condition.brokenBones || [];
+        const idx = bones.findIndex(b => b.set && !b.healed);
+        if (idx >= 0) {
+          bones[idx].healed = true;
+          healed = bones[idx];
+        }
+        condition.brokenBones = bones.filter(b => !b.healed);
+      } else if (healType) {
+        // Heal a specific wound type
+        const wounds = condition.wounds || {};
+        const typeWounds = wounds[healType] || [];
+        const idx = typeWounds.findIndex(w => !w.healed);
+        if (idx >= 0) {
+          typeWounds[idx].bleeding = false;
+          typeWounds[idx].healed = true;
+          healed = typeWounds[idx];
+        }
+        wounds[healType] = typeWounds.filter(w => !w.healed);
+        if (wounds[healType].length === 0) {
+          delete wounds[healType];
+        }
+        condition.wounds = wounds;
       }
-      if (newDamage < 4) {
-        delete condition.wounded;
-      }
-      if (newDamage < 7) {
-        delete condition.critical;
-      }
-      // Note: destroyed parts don't heal without special treatment
 
       self.condition = condition;
 
       return {
         part: self.name,
-        healed: amount,
-        remaining: newDamage,
+        type: healType,
+        healed: healed,
+      };
+    `);
+
+    // Set a broken bone (required before healing)
+    obj.setMethod('setBone', `
+      const boneName = args[0]; // optional - specific bone to set
+      const condition = self.condition || {};
+      const bones = condition.brokenBones || [];
+
+      // Find unset bone to set
+      let idx = -1;
+      if (boneName) {
+        idx = bones.findIndex(b => b.bone === boneName && !b.set);
+      } else {
+        idx = bones.findIndex(b => !b.set);
+      }
+
+      if (idx >= 0) {
+        bones[idx].set = true;
+        condition.brokenBones = bones;
+        self.condition = condition;
+        return {
+          success: true,
+          bone: bones[idx].bone,
+          message: 'The ' + bones[idx].bone + ' has been set.',
+        };
+      }
+
+      return { success: false, message: 'No broken bone to set.' };
+    `);
+
+    // Stop all bleeding wounds
+    obj.setMethod('stopBleeding', `
+      const condition = self.condition || {};
+      const wounds = condition.wounds || {};
+      let stopped = 0;
+
+      for (const type of Object.keys(wounds)) {
+        for (const wound of wounds[type]) {
+          if (wound.bleeding) {
+            wound.bleeding = false;
+            stopped++;
+          }
+        }
+      }
+
+      condition.wounds = wounds;
+      self.condition = condition;
+
+      return {
+        stopped,
+        message: stopped > 0 ? 'The bleeding has been stopped.' : 'No bleeding to stop.',
       };
     `);
 
@@ -498,16 +592,85 @@ export class BodyPartBuilder {
       }
     `);
 
-    // Describe this body part
+    // Describe this body part with damage
+    // Uses $.pronoun for "Her head", $.proportional for wound count descriptions
+    // Output example: "Her head is covered in severe bruises, has a few minor cuts, and is missing an eye."
     obj.setMethod('describe', `
-      let desc = self.name;
-
-      // Add condition descriptions
+      const viewer = args[0]; // Who is looking (for pronouns)
       const condition = self.condition || {};
-      const conditions = Object.keys(condition);
-      if (conditions.length > 0) {
-        desc += ' (' + conditions.join(', ') + ')';
+      const owner = self.owner ? await $.load(self.owner) : null;
+
+      // Get possessive pronoun for owner ("Her head", "His arm", "Your leg")
+      let partName = self.name;
+      if (owner) {
+        partName = await $.pronoun.sub('%p ' + self.name.toLowerCase(), owner, viewer);
       }
+
+      const phrases = [];
+
+      // Count wounds by type (type includes severity, e.g. "severe bruise", "minor cut")
+      const wounds = condition.wounds || {};
+      const woundTypes = Object.keys(wounds);
+      let hasBleeding = false;
+
+      for (const type of woundTypes) {
+        const typeWounds = wounds[type].filter(w => !w.healed);
+        if (typeWounds.length === 0) continue;
+
+        // Check for bleeding
+        if (typeWounds.some(w => w.bleeding)) {
+          hasBleeding = true;
+        }
+
+        // Use proportional for count description
+        // 1 = "has a", 2-3 = "has a few", 4-6 = "has several", 7+ = "is covered in"
+        const count = typeWounds.length;
+        const plural = count > 1 ? 's' : '';
+        const countPhrase = await $.proportional.sub(
+          ['has a ' + type, 'has a few ' + type + 's', 'has several ' + type + 's', 'is covered in ' + type + 's'],
+          count,
+          7
+        );
+        phrases.push(countPhrase);
+      }
+
+      // Bleeding as a phrase
+      if (hasBleeding) {
+        phrases.push('is bleeding');
+      }
+
+      // Broken bones
+      const brokenBones = (condition.brokenBones || []).filter(b => !b.healed);
+      if (brokenBones.length > 0) {
+        const unset = brokenBones.filter(b => !b.set);
+        const set = brokenBones.filter(b => b.set);
+        if (unset.length > 0) {
+          phrases.push('has a broken ' + unset.map(b => b.bone).join(' and '));
+        }
+        if (set.length > 0) {
+          phrases.push('has a splinted ' + set.map(b => b.bone).join(' and '));
+        }
+      }
+
+      // Severed
+      if (condition.severed) {
+        phrases.push('has been severed');
+      }
+
+      // Missing parts (check for expected parts that are gone)
+      const missingParts = condition.missingParts || [];
+      for (const missing of missingParts) {
+        phrases.push('is missing ' + missing);
+      }
+
+      // Build final description
+      if (phrases.length === 0) {
+        return partName + ' looks healthy.';
+      }
+
+      // Join phrases naturally using $.english.list: "X, Y, and Z"
+      const joined = await $.english.list(phrases);
+      let desc = partName + ' ' + joined + '.';
 
       // Add contents if any
       const contents = self.contents || [];
@@ -520,7 +683,7 @@ export class BodyPartBuilder {
           }
         }
         if (items.length > 0) {
-          desc += ' holding ' + items.join(', ');
+          desc += ' Holding ' + items.join(', ') + '.';
         }
       }
 

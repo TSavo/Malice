@@ -6,6 +6,10 @@ import {
   AgentBuilder,
   HumanBuilder,
   PlayerBuilder,
+  EdibleBuilder,
+  FoodBuilder,
+  DrinkBuilder,
+  StomachContentsBuilder,
   BodyPartBuilder,
   BodyPartsBuilder,
 } from './prototypes/index.js';
@@ -32,6 +36,10 @@ export class PrototypeBuilder {
   private agentBuilder: AgentBuilder;
   private humanBuilder: HumanBuilder;
   private playerBuilder: PlayerBuilder;
+  private edibleBuilder: EdibleBuilder;
+  private foodBuilder: FoodBuilder;
+  private drinkBuilder: DrinkBuilder;
+  private stomachContentsBuilder: StomachContentsBuilder;
   private bodyPartBuilder: BodyPartBuilder;
   private bodyPartsBuilder: BodyPartsBuilder;
 
@@ -42,6 +50,10 @@ export class PrototypeBuilder {
     this.agentBuilder = new AgentBuilder(manager);
     this.humanBuilder = new HumanBuilder(manager);
     this.playerBuilder = new PlayerBuilder(manager);
+    this.edibleBuilder = new EdibleBuilder(manager);
+    this.foodBuilder = new FoodBuilder(manager);
+    this.drinkBuilder = new DrinkBuilder(manager);
+    this.stomachContentsBuilder = new StomachContentsBuilder(manager);
     this.bodyPartBuilder = new BodyPartBuilder(manager);
     this.bodyPartsBuilder = new BodyPartsBuilder(manager);
   }
@@ -82,6 +94,22 @@ export class PrototypeBuilder {
       ? await this.manager.load(aliases.player as number)
       : await this.playerBuilder.build(human!.id);
 
+    const edible = aliases.edible
+      ? await this.manager.load(aliases.edible as number)
+      : await this.edibleBuilder.build(describable!.id);
+
+    const food = aliases.food
+      ? await this.manager.load(aliases.food as number)
+      : await this.foodBuilder.build(edible!.id);
+
+    const drink = aliases.drink
+      ? await this.manager.load(aliases.drink as number)
+      : await this.drinkBuilder.build(edible!.id);
+
+    const stomachContents = aliases.stomachContents
+      ? await this.manager.load(aliases.stomachContents as number)
+      : await this.stomachContentsBuilder.build(describable!.id);
+
     const bodyPart = aliases.bodyPart
       ? await this.manager.load(aliases.bodyPart as number)
       : await this.bodyPartBuilder.build(describable!.id);
@@ -107,6 +135,10 @@ export class PrototypeBuilder {
       agent: agent!.id,
       human: human!.id,
       player: player!.id,
+      edible: edible!.id,
+      food: food!.id,
+      drink: drink!.id,
+      stomachContents: stomachContents!.id,
       bodyPart: bodyPart!.id,
       bodyParts,
     });
@@ -119,6 +151,10 @@ export class PrototypeBuilder {
     agent: number;
     human: number;
     player: number;
+    edible: number;
+    food: number;
+    drink: number;
+    stomachContents: number;
     bodyPart: number;
     bodyParts: Record<string, number>;
   }): Promise<void> {
@@ -132,6 +168,10 @@ export class PrototypeBuilder {
     aliases.agent = ids.agent;
     aliases.human = ids.human;
     aliases.player = ids.player;
+    aliases.edible = ids.edible;
+    aliases.food = ids.food;
+    aliases.drink = ids.drink;
+    aliases.stomachContents = ids.stomachContents;
     aliases.bodyPart = ids.bodyPart;
     aliases.bodyParts = ids.bodyParts;
 

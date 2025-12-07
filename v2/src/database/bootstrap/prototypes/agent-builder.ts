@@ -24,6 +24,12 @@ export class AgentBuilder {
           color: true,         // Enable ANSI color output
           screenReader: false, // Screen reader accessibility mode
         },
+        // Sleep state: 'awake', 'falling_asleep', 'asleep', 'waking_up'
+        sleepState: 'awake',
+        // Scheduled job name for sleep transitions (for cancellation)
+        sleepTransitionJob: null,
+        // Sedation level (0 = none, higher = harder to wake)
+        sedation: 0,
       },
       methods: {},
     });
@@ -32,6 +38,7 @@ export class AgentBuilder {
     this.addResolutionMethods(obj);
     this.addActionMethods(obj);
     this.addColorMethods(obj);
+    this.addSleepMethods(obj);
 
     return obj;
   }
@@ -286,6 +293,10 @@ export class AgentBuilder {
     // Pattern: say %s
     // args[3] = the message string
     obj.setMethod('say', `
+      /** Say something out loud to everyone in the room.
+       *  Usage: say <message>, "<message>, '<message>
+       *  Everyone in your current location will hear what you say.
+       */
       const message = args[3];
       // TODO: Broadcast to room
       return \`\${player.name} says: \${message}\`;
@@ -294,6 +305,11 @@ export class AgentBuilder {
     // Pattern: emote %s
     // args[3] = the action string
     obj.setMethod('emote', `
+      /** Perform an action or express an emotion.
+       *  Usage: emote <action>, :<action>
+       *  Displays "YourName <action>" to everyone in the room.
+       *  Example: emote waves hello → "Bob waves hello"
+       */
       const action = args[3];
       // TODO: Broadcast to room
       return \`\${player.name} \${action}\`;
@@ -302,6 +318,10 @@ export class AgentBuilder {
     // Pattern: look (no args)
     // Look at current location
     obj.setMethod('look', `
+      /** Look at your surroundings.
+       *  Usage: look, l
+       *  Displays the description of your current location and any visible items.
+       */
       if (player.location && player.location !== 0) {
         const location = await $.load(player.location);
         if (location) {
@@ -314,6 +334,10 @@ export class AgentBuilder {
     // Pattern: look %i
     // args[3] = the resolved item (RuntimeObject)
     obj.setMethod('lookAt', `
+      /** Examine something in detail.
+       *  Usage: look <item>, look at <item>, examine <item>, ex <item>
+       *  Shows the detailed description of the item or person.
+       */
       const target = args[3];
 
       // Special case: looking at self
@@ -328,6 +352,10 @@ export class AgentBuilder {
     // args[3] = the item (RuntimeObject)
     // args[4] = the container (RuntimeObject)
     obj.setMethod('lookIn', `
+      /** Examine something inside a container.
+       *  Usage: look <item> in <container>, look <item> on <container>
+       *  Shows the description of an item that's inside or on something else.
+       */
       const item = args[3];
       const container = args[4];
 
@@ -342,6 +370,10 @@ export class AgentBuilder {
 
     // Enter options menu
     obj.setMethod('options', `
+      /** Open the options menu to configure your display settings.
+       *  Usage: @options
+       *  Configure color output, screen reader mode, and message prefixes.
+       */
       player._inOptionsMenu = true;
       await player.showOptionsMenu();
     `);
@@ -615,6 +647,245 @@ export class AgentBuilder {
         // Unknown - leave as-is
         return match;
       });
+    `);
+  }
+
+  private addSleepMethods(obj: RuntimeObject): void {
+    // Check if agent is awake (can act)
+    obj.setMethod('isAwake', `
+      return self.sleepState === 'awake';
+    `);
+
+    // Check if agent is asleep (fully)
+    obj.setMethod('isAsleep', `
+      return self.sleepState === 'asleep';
+    `);
+
+    // Check if agent can be interrupted while falling asleep
+    // Override in subclasses to add conditions (noise level, etc.)
+    obj.setMethod('canBeInterrupted', `
+      // Default: can always be interrupted
+      // Subclasses can check room noise, etc.
+      return true;
+    `);
+
+    // Check if agent can wake up
+    // Override in subclasses to add conditions (sedation, exhaustion, etc.)
+    obj.setMethod('canWakeUp', `
+      // Can't wake if sedated
+      if ((self.sedation || 0) > 0) {
+        return { allowed: false, reason: 'You are too sedated to wake.' };
+      }
+      // Default: can wake
+      return { allowed: true };
+    `);
+
+    // Check if agent can fall asleep
+    // Override in subclasses to add conditions (in combat, etc.)
+    obj.setMethod('canFallAsleep', `
+      // Default: can sleep if awake
+      if (self.sleepState !== 'awake') {
+        return { allowed: false, reason: 'You are already sleeping or trying to.' };
+      }
+      return { allowed: true };
+    `);
+
+    // Cancel any pending sleep transition
+    obj.setMethod('cancelSleepTransition', `
+      const jobName = self.sleepTransitionJob;
+      if (jobName && $.scheduler) {
+        await $.scheduler.unschedule(jobName);
+        self.set('sleepTransitionJob', null);
+      }
+    `);
+
+    // Start falling asleep (voluntary or from exhaustion)
+    // delay: ms until fully asleep (default 10s)
+    obj.setMethod('startSleep', `
+      const delay = args[0] || 10000; // 10 seconds default
+
+      const check = await self.canFallAsleep();
+      if (!check.allowed) {
+        return { success: false, reason: check.reason };
+      }
+
+      // Cancel any existing transition
+      await self.cancelSleepTransition();
+
+      // Set state
+      self.set('sleepState', 'falling_asleep');
+
+      // Schedule the completion
+      const jobName = 'sleep_' + self.id + '_' + Date.now();
+      await $.scheduler.schedule(jobName, delay, 0, self, 'completeSleep');
+      self.set('sleepTransitionJob', jobName);
+
+      return { success: true, state: 'falling_asleep', completesIn: delay };
+    `);
+
+    // Called by scheduler when falling asleep completes
+    obj.setMethod('completeSleep', `
+      // Only complete if still falling asleep (wasn't interrupted)
+      if (self.sleepState !== 'falling_asleep') {
+        return { success: false, reason: 'No longer falling asleep' };
+      }
+
+      self.set('sleepState', 'asleep');
+      self.set('sleepTransitionJob', null);
+
+      // Notify (override in Player to send message)
+      if (self.onFellAsleep) {
+        await self.onFellAsleep();
+      }
+
+      return { success: true, state: 'asleep' };
+    `);
+
+    // Interrupt falling asleep (noise, damage, etc.)
+    obj.setMethod('interruptSleep', `
+      const reason = args[0] || 'You were disturbed.';
+
+      if (self.sleepState !== 'falling_asleep') {
+        return { success: false, reason: 'Not falling asleep' };
+      }
+
+      const canInterrupt = await self.canBeInterrupted();
+      if (!canInterrupt) {
+        return { success: false, reason: 'Cannot be interrupted' };
+      }
+
+      // Cancel the scheduled completion
+      await self.cancelSleepTransition();
+
+      self.set('sleepState', 'awake');
+
+      // Notify
+      if (self.onSleepInterrupted) {
+        await self.onSleepInterrupted(reason);
+      }
+
+      return { success: true, state: 'awake', reason: reason };
+    `);
+
+    // Start waking up (voluntary or from external stimulus)
+    // delay: ms until fully awake (default 5s)
+    obj.setMethod('startWake', `
+      const delay = args[0] || 5000; // 5 seconds default
+
+      if (self.sleepState !== 'asleep') {
+        return { success: false, reason: 'Not asleep' };
+      }
+
+      const check = await self.canWakeUp();
+      if (!check.allowed) {
+        return { success: false, reason: check.reason };
+      }
+
+      // Cancel any existing transition
+      await self.cancelSleepTransition();
+
+      // Set state
+      self.set('sleepState', 'waking_up');
+
+      // Schedule the completion
+      const jobName = 'wake_' + self.id + '_' + Date.now();
+      await $.scheduler.schedule(jobName, delay, 0, self, 'completeWake');
+      self.set('sleepTransitionJob', jobName);
+
+      return { success: true, state: 'waking_up', completesIn: delay };
+    `);
+
+    // Called by scheduler when waking up completes
+    obj.setMethod('completeWake', `
+      // Only complete if still waking (wasn't blocked)
+      if (self.sleepState !== 'waking_up') {
+        return { success: false, reason: 'No longer waking up' };
+      }
+
+      // Final check - might have been sedated during wake
+      const check = await self.canWakeUp();
+      if (!check.allowed) {
+        // Fall back asleep
+        self.set('sleepState', 'asleep');
+        self.set('sleepTransitionJob', null);
+        if (self.onWakeBlocked) {
+          await self.onWakeBlocked(check.reason);
+        }
+        return { success: false, reason: check.reason, state: 'asleep' };
+      }
+
+      self.set('sleepState', 'awake');
+      self.set('sleepTransitionJob', null);
+
+      // Notify
+      if (self.onWokeUp) {
+        await self.onWokeUp();
+      }
+
+      return { success: true, state: 'awake' };
+    `);
+
+    // Block waking up (e.g., re-sedation during wake process)
+    obj.setMethod('blockWake', `
+      const reason = args[0] || 'You fall back asleep.';
+
+      if (self.sleepState !== 'waking_up') {
+        return { success: false, reason: 'Not waking up' };
+      }
+
+      // Cancel the scheduled completion
+      await self.cancelSleepTransition();
+
+      self.set('sleepState', 'asleep');
+
+      if (self.onWakeBlocked) {
+        await self.onWakeBlocked(reason);
+      }
+
+      return { success: true, state: 'asleep', reason: reason };
+    `);
+
+    // Force wake (bypasses checks, for admin/emergency)
+    obj.setMethod('forceWake', `
+      await self.cancelSleepTransition();
+      self.set('sleepState', 'awake');
+      self.set('sedation', 0);
+      return { success: true, state: 'awake' };
+    `);
+
+    // Force sleep (bypasses checks, for admin/emergency)
+    obj.setMethod('forceSleep', `
+      await self.cancelSleepTransition();
+      self.set('sleepState', 'asleep');
+      return { success: true, state: 'asleep' };
+    `);
+
+    // Get calorie regen multiplier based on sleep state
+    obj.setMethod('getCalorieRegenMultiplier', `
+      const state = self.sleepState || 'awake';
+      if (state === 'asleep') return 1.0;
+      return 0.5; // awake, falling_asleep, waking_up
+    `);
+
+    // Called each heartbeat to handle sleep-related effects
+    obj.setMethod('sleepTick', `
+      const state = self.sleepState || 'awake';
+      const results = { state: state };
+
+      // Decrease sedation over time
+      const sedation = self.sedation || 0;
+      if (sedation > 0) {
+        const newSedation = Math.max(0, sedation - 1);
+        self.set('sedation', newSedation);
+        results.sedation = newSedation;
+
+        // If sedation wore off while asleep, might start waking naturally
+        if (newSedation === 0 && state === 'asleep') {
+          // Could trigger natural wake here if desired
+        }
+      }
+
+      return results;
     `);
   }
 }

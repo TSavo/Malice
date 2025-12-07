@@ -17,6 +17,13 @@ export class DescribableBuilder {
         aliases: [],
         location: null, // ObjId | null - where this object is located
         contents: [], // ObjId[] - what's inside this object
+        // Physical dimensions (in centimeters for width/height/depth, grams for weight)
+        width: 0, // cm
+        height: 0, // cm
+        depth: 0, // cm
+        weight: 0, // grams
+        // Movement restrictions
+        boltedDown: false, // If true, cannot be moved at all
       },
       methods: {},
     });
@@ -27,6 +34,21 @@ export class DescribableBuilder {
 
     obj.setMethod('shortDesc', `
       return self.name;
+    `);
+
+    // Get volume in cubic centimeters
+    obj.setMethod('getVolume', `
+      return (self.width || 0) * (self.height || 0) * (self.depth || 0);
+    `);
+
+    // Check if this object can fit inside another based on dimensions
+    obj.setMethod('canFitIn', `
+      const container = args[0];
+      // Simple check: object's smallest bounding dimension vs container's largest
+      const dims = [self.width || 0, self.height || 0, self.depth || 0].sort((a, b) => a - b);
+      const containerDims = [container.width || 0, container.height || 0, container.depth || 0].sort((a, b) => b - a);
+      // Check if smallest dimension of object fits in largest of container, etc.
+      return dims[0] <= containerDims[0] && dims[1] <= containerDims[1] && dims[2] <= containerDims[2];
     `);
 
     // Check if this object can contain another object
