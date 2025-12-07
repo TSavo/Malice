@@ -15,6 +15,7 @@ import { WebSocketServer } from './transport/websocket/index.js';
 import { GameCoordinator } from './game/index.js';
 import { LSPApiServer } from './lsp/api-server.js';
 import { DevToolsServer } from './devtools/index.js';
+import { createMCPServer } from './mcp/index.js';
 
 async function main() {
   console.log('🎮 Malice v2 - Modern TypeScript MUD\n');
@@ -45,6 +46,12 @@ async function main() {
   // Start DevTools WebSocket Server for VS Code extension (JSON-RPC)
   new DevToolsServer(game.getObjectManager(), 9999);
   console.log('🛠️  DevTools ready for VS Code extension');
+
+  // Start MCP Server for Claude Code (Streamable HTTP)
+  await createMCPServer(game.getObjectManager(), {
+    port: 3001,
+    host: '0.0.0.0', // Allow Docker host access
+  });
 
   // Create telnet server (port 5555)
   const telnetServer = new TelnetServer({
