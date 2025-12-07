@@ -1,58 +1,42 @@
 {
-  "name": "malice",
-  "version": "0.0.1",
-  "engines": {
-    "node": ">=6"
-  },
-  "description": "Malice",
-  "entrypoint": "index.js",
-  "main": "src/driver.coffee",
-  "bin": "coffee ./src/driver.coffee",
-  "scripts": {
-    "test": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- test -R spec --compilers coffee:coffee-script/register --require coffee-coverage/register-istanbul --debug",
-    "start": "node index.js",
-    "compile": "coffee -c -o dist src",
-    "codacy": "cat ./coverage/lcov.info | ./node_modules/.bin/codacy-coverage -p .",
-    "codeclimate": "codeclimate-test-reporter < coverage/lcov.info"
-  },
-  "repository": "github:tsavo/malice",
-  "keywords": [
-    "malice"
-  ],
+  "name": "malice-v2",
+  "version": "2.0.0",
+  "type": "module",
+  "description": "Malice - Modern TypeScript Reactive TMMO",
   "author": "Travis Savo <evilgenius@nefariousplan.com>",
   "license": "MIT",
-  "readmeFilename": "README.md",
+  "scripts": {
+    "dev": "bun --watch src/index.ts",
+    "start": "node --import tsx src/index.ts",
+    "build": "tsc",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage",
+    "typecheck": "tsc --noEmit"
+  },
   "dependencies": {
-    "app-module-path": "^2.1.0",
-    "colors": "^1.1.2",
-    "cryo": "^0.0.6",
-    "listify": "^1.0.0",
-    "moment": "^2.17.1",
-    "nesh": "^1.7.0",
-    "node-eval": "^1.1.0",
-    "node-serialize": "0.0.4",
-    "nodemailer": "^2.6.4",
-    "proportionate": "^1.0.1",
-    "q": "^2.0.3",
-    "serially": "^3.0.3",
-    "underscore": "^1.8.3",
-    "uuid": "^3.0.1",
-    "watchr": "^3.0.1",
-    "wordwrap": "^1.0.0"
+    "bcrypt": "^5.1.1",
+    "mongodb": "^7.0.0",
+    "rxjs": "^7.8.1",
+    "tsx": "^4.19.0",
+    "uuid": "^10.0.0",
+    "vscode-languageserver": "^9.0.1",
+    "vscode-languageserver-textdocument": "^1.0.12",
+    "ws": "^8.18.0"
   },
   "devDependencies": {
-    "chai": "^3.5.0",
-    "chai-spies": "^0.7.1",
-    "codacy-coverage": "^2.0.0",
-    "codeclimate-test-reporter": "^0.4.0",
-    "coffee-coverage": "^1.0.1",
-    "coffee-script": "^1.12.0",
-    "istanbul": "^0.4.5",
-    "mocha": "^3.2.0",
-    "mocha-circleci-reporter": "0.0.2",
-    "mocha-junit-reporter": "^1.12.1",
-    "mock-socket": "^6.0.3",
-    "telnet-client": "^0.12.3",
-    "xunit-file": "^1.0.0"
+    "@types/bcrypt": "^5.0.2",
+    "@types/bun": "latest",
+    "@types/node": "^24.10.1",
+    "@types/uuid": "^10.0.0",
+    "@types/ws": "^8.5.12",
+    "@vitest/coverage-v8": "^4.0.15",
+    "@vitest/ui": "^4.0.15",
+    "typescript": "^5.6.3",
+    "vitest": "^4.0.15"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "bun": ">=1.0"
   }
 }
