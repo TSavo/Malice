@@ -10,6 +10,12 @@ import type { RuntimeObject } from '../../../../types/object.js';
  * - Watched people are easier to perceive in crowds
  * - Auto-watch triggers when interacting (emote/talk to someone)
  * - Manual watch/unwatch commands for focus
+ *
+ * Skill system:
+ * - Skills emerge from use, not predefined
+ * - Each use can grant XP if off cooldown
+ * - Higher skill = slower progression (diminishing returns)
+ * - Cooldown prevents spam-grinding
  */
 export class AgentBuilder {
   constructor(private manager: ObjectManager) {}
@@ -41,6 +47,13 @@ export class AgentBuilder {
         sleepTransitionJob: null,
         // Sedation level (0 = none, higher = harder to wake)
         sedation: 0,
+        // Skills learned through use: { skillName: { level, xp, lastProgressed } }
+        skills: {},
+        // Skill cooldown in ms (how long before same skill can progress again)
+        skillCooldown: 3600000, // 1 hour
+        // Hidden luck attribute (1-100) - failed rolls get a luck save
+        // Roll d100, if <= luck, failure becomes success
+        luck: 1, // Everyone starts with 1
       },
       methods: {},
     });
@@ -51,6 +64,7 @@ export class AgentBuilder {
     this.addColorMethods(obj);
     this.addSleepMethods(obj);
     this.addWatchMethods(obj);
+    this.addSkillMethods(obj);
 
     return obj;
   }
@@ -966,6 +980,7 @@ export class AgentBuilder {
        *  - Blindness: 3 slots (rely on hearing only)
        *  - Deafness: 3 slots (rely on vision only)
        *  - Both blind and deaf: 1 slot (immediate awareness only)
+       *  Higher trained senses can add bonus slots.
        *  @returns Max watch slots
        */
       // Base capacity for agents without full perception
@@ -973,8 +988,11 @@ export class AgentBuilder {
 
       // Check if we have perception methods (Human/Player)
       if (self.canSee && self.canHear) {
-        const canSee = await self.canSee();
-        const canHear = await self.canHear();
+        const vision = await self.canSee(); // { max, percent }
+        const hearing = await self.canHear(); // { max, percent }
+
+        const canSee = vision && vision.max > 0;
+        const canHear = hearing && hearing.max > 0;
 
         if (!canSee && !canHear) {
           // Both blind and deaf - minimal awareness
@@ -985,8 +1003,15 @@ export class AgentBuilder {
         } else if (!canHear) {
           // Deaf - rely on vision only
           capacity = 3;
+        } else {
+          // Full perception - base 5, bonus for high training
+          capacity = 5;
+          // Bonus slot for every 50 points of combined max above 200
+          const combinedMax = (vision.max || 0) + (hearing.max || 0);
+          if (combinedMax > 200) {
+            capacity += Math.floor((combinedMax - 200) / 50);
+          }
         }
-        // Full perception = 5 slots
       }
 
       return capacity;
@@ -1284,6 +1309,221 @@ export class AgentBuilder {
       if (otherId && await self.isWatching(otherId)) {
         await self.unwatch(otherId);
       }
+    `);
+  }
+
+  private addSkillMethods(obj: RuntimeObject): void {
+    // Get current skill level (0 if never used)
+    obj.setMethod('getSkillLevel', `
+      /** Get current level for a skill.
+       *  @param skillName - Name of the skill
+       *  @returns Skill level (0 if never used)
+       */
+      const skillName = args[0];
+      const skills = self.skills || {};
+      const skill = skills[skillName];
+      return skill ? skill.level : 0;
+    `);
+
+    // Get full skill info
+    obj.setMethod('getSkill', `
+      /** Get full skill info.
+       *  @param skillName - Name of the skill
+       *  @returns { level, xp, lastProgressed } or null if never used
+       */
+      const skillName = args[0];
+      const skills = self.skills || {};
+      return skills[skillName] || null;
+    `);
+
+    // Check if skill is off cooldown for progression
+    obj.setMethod('canProgress', `
+      /** Check if a skill can progress (off cooldown).
+       *  @param skillName - Name of the skill
+       *  @returns true if off cooldown
+       */
+      const skillName = args[0];
+      const skills = self.skills || {};
+      const skill = skills[skillName];
+
+      if (!skill) return true; // New skill, can always progress
+
+      const cooldown = self.skillCooldown || 3600000; // 1 hour default
+      const now = Date.now();
+      return (now - (skill.lastProgressed || 0)) >= cooldown;
+    `);
+
+    // Calculate XP needed for next level (diminishing returns)
+    obj.setMethod('xpForLevel', `
+      /** Calculate XP needed to reach a level.
+       *  Quadratic scaling - 100 levels, ~10,000 total uses to master.
+       *  Level 1: 1 XP, Level 50: 50 XP, Level 100: 199 XP
+       *  Sum of all levels ≈ 10,000 XP
+       *  @param level - Target level
+       *  @returns XP needed
+       */
+      const level = args[0];
+      if (level <= 0) return 0;
+      // Quadratic: 2 * level - 1 (arithmetic progression)
+      // Sum from 1 to 100 = 100^2 = 10,000
+      return (2 * level) - 1;
+    `);
+
+    // Use a skill - may grant XP if off cooldown
+    obj.setMethod('useSkill', `
+      /** Use a skill, potentially gaining XP.
+       *  Only grants XP if off cooldown.
+       *  @param skillName - Name of the skill
+       *  @param xpGain - Base XP to gain (default 1)
+       *  @returns { level, gained, leveledUp, onCooldown }
+       */
+      const skillName = args[0];
+      const xpGain = args[1] || 1;
+
+      const skills = self.skills || {};
+      let skill = skills[skillName];
+
+      // Initialize skill if new
+      if (!skill) {
+        skill = { level: 0, xp: 0, lastProgressed: 0 };
+      }
+
+      const now = Date.now();
+      const cooldown = self.skillCooldown || 3600000;
+      const onCooldown = (now - (skill.lastProgressed || 0)) < cooldown;
+
+      if (onCooldown) {
+        return {
+          level: skill.level,
+          gained: 0,
+          leveledUp: false,
+          onCooldown: true,
+        };
+      }
+
+      // Grant XP
+      skill.xp += xpGain;
+      skill.lastProgressed = now;
+
+      // Check for level up
+      let leveledUp = false;
+      const xpNeeded = await self.xpForLevel(skill.level + 1);
+      if (skill.xp >= xpNeeded) {
+        skill.level += 1;
+        skill.xp -= xpNeeded; // Carry over excess
+        leveledUp = true;
+      }
+
+      // Save
+      skills[skillName] = skill;
+      self.set('skills', skills);
+
+      return {
+        level: skill.level,
+        gained: xpGain,
+        leveledUp,
+        onCooldown: false,
+      };
+    `);
+
+    // List all skills
+    obj.setMethod('listSkills', `
+      /** Get all skills with levels.
+       *  @returns Array of { name, level, xp, xpToNext }
+       */
+      const skills = self.skills || {};
+      const result = [];
+
+      for (const [name, skill] of Object.entries(skills)) {
+        const xpToNext = await self.xpForLevel(skill.level + 1) - skill.xp;
+        result.push({
+          name,
+          level: skill.level,
+          xp: skill.xp,
+          xpToNext,
+        });
+      }
+
+      // Sort by level descending
+      result.sort((a, b) => b.level - a.level);
+      return result;
+    `);
+
+    // Skill check - roll skill level dice against opposing skill level
+    obj.setMethod('skillCheck', `
+      /** Perform a skill check.
+       *  Roll X d100s (X = skill level), count successes against opposing level.
+       *  Each die succeeds if roll > opposing level.
+       *  Failed rolls get a luck save: roll d100, if <= luck, failure becomes success.
+       *  Also uses the skill (may gain XP).
+       *  @param skillName - Name of the skill
+       *  @param opposingLevel - The opposing skill level to beat (1-100)
+       *  @returns { successes, luckSaves, level, opposingLevel }
+       */
+      const skillName = args[0];
+      const opposingLevel = Math.max(0, Math.min(100, args[1] || 50));
+
+      const level = await self.getSkillLevel(skillName);
+      const luck = await self.getLuck();
+
+      // Roll 'level' d100s, each succeeds if > opposingLevel
+      let successes = 0;
+      let luckSaves = 0;
+
+      for (let i = 0; i < level; i++) {
+        const roll = Math.floor(Math.random() * 100) + 1;
+        if (roll > opposingLevel) {
+          successes++;
+        } else {
+          // Failed - try luck save
+          const luckRoll = Math.floor(Math.random() * 100) + 1;
+          if (luckRoll <= luck) {
+            successes++;
+            luckSaves++;
+          }
+        }
+      }
+
+      // Using the skill grants XP
+      await self.useSkill(skillName, 1);
+
+      return {
+        successes,
+        luckSaves,
+        level,
+        opposingLevel,
+      };
+    `);
+
+    // Get current luck (base + temporary bonuses)
+    obj.setMethod('getLuck', `
+      /** Get current effective luck.
+       *  @returns Current luck value (1-100)
+       */
+      const baseLuck = self.luck || 1;
+      const tempLuck = self.tempLuck || 0;
+      return Math.min(100, Math.max(1, baseLuck + tempLuck));
+    `);
+
+    // Set temporary luck bonus (replaces any existing boost)
+    obj.setMethod('boostLuck', `
+      /** Set temporary luck bonus. Replaces any existing boost.
+       *  Caller is responsible for scheduling removal.
+       *  @param amount - Luck bonus to set
+       *  @returns New effective luck
+       */
+      const amount = args[0] || 0;
+      self.set('tempLuck', amount);
+      return await self.getLuck();
+    `);
+
+    // Clear luck boost
+    obj.setMethod('clearLuckBoost', `
+      /** Clear any temporary luck bonus.
+       *  @returns New effective luck (base only)
+       */
+      self.set('tempLuck', 0);
+      return await self.getLuck();
     `);
   }
 }

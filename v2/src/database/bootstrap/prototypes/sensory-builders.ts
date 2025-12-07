@@ -20,19 +20,31 @@ export class EyeBuilder {
       methods: {},
     });
 
-    // Can see if not damaged/blocked
+    // Returns { max: number, percent: number }
+    // max = trained capacity minus permanent decay damage
+    // percent = current function (100 = fully rested, 0 = exhausted)
     obj.setMethod('canSee', `
       const condition = self.condition || {};
       // Can't see if blinded, destroyed, or missing
       if (condition.blind || condition.destroyed || condition.missing) {
-        return false;
+        return { max: 0, percent: 0 };
       }
       // Can't see if something is blocking it
       const contents = self.contents || [];
       if (contents.length > 0) {
-        return false;
+        return { max: 0, percent: 0 };
       }
-      return true;
+
+      // Max capacity = trained level minus permanent decay damage
+      const trainedMax = self.maxCalories || 100;
+      const permanentDamage = self.decayLevel || 0;
+      const max = Math.max(0, trainedMax - permanentDamage);
+
+      // Percent = current calories as percentage of max
+      const currentCalories = self.calories || max;
+      const percent = max > 0 ? Math.round((currentCalories / max) * 100) : 0;
+
+      return { max, percent };
     `);
 
     return obj;
@@ -58,14 +70,31 @@ export class EarBuilder {
       methods: {},
     });
 
-    // Can hear if not damaged/blocked
+    // Returns { max: number, percent: number }
+    // max = trained capacity minus permanent decay damage
+    // percent = current function (100 = fully rested, 0 = exhausted)
     obj.setMethod('canHear', `
       const condition = self.condition || {};
       if (condition.deaf || condition.destroyed || condition.missing) {
-        return false;
+        return { max: 0, percent: 0 };
       }
-      // Can hear even with earplugs, just muffled
-      return true;
+
+      // Max capacity = trained level minus permanent decay damage
+      const trainedMax = self.maxCalories || 100;
+      const permanentDamage = self.decayLevel || 0;
+      let max = Math.max(0, trainedMax - permanentDamage);
+
+      // Earplugs or contents muffle - reduce effective max
+      const contents = self.contents || [];
+      if (contents.length > 0) {
+        max = Math.floor(max * 0.3); // Heavily muffled
+      }
+
+      // Percent = current calories as percentage of max
+      const currentCalories = self.calories || max;
+      const percent = max > 0 ? Math.round((currentCalories / max) * 100) : 0;
+
+      return { max, percent };
     `);
 
     return obj;

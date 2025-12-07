@@ -197,10 +197,13 @@ export class RoomBuilder {
     `);
 
     // Check if viewer can perceive target in this room
-    // Returns { canSee: bool, canHear: bool, clarity: 0-100 }
+    // Returns { canSee: bool, canHear: bool, visualClarity: 0-100, audioClarity: 0-100 }
     obj.setMethod('getPerception', `
       /** Check how well viewer can perceive target in this room.
-       *  Factors: crowd level, lighting, whether target is watched.
+       *  Factors: crowd level, lighting, viewer's sensory ability, whether target is watched.
+       *  Viewer's canSee/canHear return { max, percent } where:
+       *    - max = trained capacity (higher = better potential)
+       *    - percent = current function (100 = fully rested)
        *  @param viewer - The person trying to perceive
        *  @param target - The person/object being perceived
        *  @returns {canSee, canHear, visualClarity, audioClarity}
@@ -216,6 +219,15 @@ export class RoomBuilder {
       const noiseLevel = await self.getNoiseLevel();
       const lighting = self.lighting || 100;
 
+      // Get viewer's sensory capabilities { max, percent }
+      const visionStats = viewer.canSee ? await viewer.canSee() : { max: 100, percent: 100 };
+      const hearingStats = viewer.canHear ? await viewer.canHear() : { max: 100, percent: 100 };
+
+      // Effective sensory quality: max determines potential, percent is current capacity
+      // Scale to 0-1 where 100 max at 100% = 1.0
+      const visionQuality = (visionStats.max / 100) * (visionStats.percent / 100);
+      const hearingQuality = (hearingStats.max / 100) * (hearingStats.percent / 100);
+
       // Check if viewer is watching target
       const watchList = viewer.watchList || [];
       const isWatching = watchList.includes(target.id);
@@ -224,30 +236,34 @@ export class RoomBuilder {
       // Watching someone gives +50 clarity bonus
       const watchBonus = isWatching ? 50 : 0;
 
-      // Visual clarity: affected by crowd and lighting
-      // Crowd makes it hard to pick out individuals
-      // Low light makes everything hard to see
+      // Visual clarity: affected by crowd, lighting, and viewer's vision quality
+      // High vision max allows seeing through crowds better
+      // Current percent affects sharpness
       let visualClarity = 100 - (crowdLevel * 0.7) + watchBonus;
       visualClarity = visualClarity * (lighting / 100); // Scale by lighting
+      visualClarity = visualClarity * visionQuality; // Scale by viewer's vision
       visualClarity = Math.max(0, Math.min(100, visualClarity));
 
-      // Audio clarity: affected by noise level
+      // Audio clarity: affected by noise level and viewer's hearing quality
       let audioClarity = 100 - (noiseLevel * 0.8) + watchBonus;
+      audioClarity = audioClarity * hearingQuality; // Scale by viewer's hearing
       audioClarity = Math.max(0, Math.min(100, audioClarity));
 
-      // Check viewer's actual ability to see/hear
-      const viewerCanSee = viewer.canSee ? await viewer.canSee() : true;
-      const viewerCanHear = viewer.canHear ? await viewer.canHear() : true;
+      const canSee = visionStats.max > 0 && visualClarity > 10;
+      const canHear = hearingStats.max > 0 && audioClarity > 10;
 
       return {
-        canSee: viewerCanSee && visualClarity > 10,
-        canHear: viewerCanHear && audioClarity > 10,
-        visualClarity: viewerCanSee ? visualClarity : 0,
-        audioClarity: viewerCanHear ? audioClarity : 0,
+        canSee,
+        canHear,
+        visualClarity: canSee ? visualClarity : 0,
+        audioClarity: canHear ? audioClarity : 0,
         isWatching,
         crowdLevel,
         noiseLevel,
         lighting,
+        // Include viewer's sensory stats for debugging/display
+        visionStats,
+        hearingStats,
       };
     `);
 

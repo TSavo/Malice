@@ -827,24 +827,50 @@ export class EmoteBuilder {
         const visualDegraded = perception.visualClarity < 50;
         const audioDegraded = perception.audioClarity < 50;
 
+        // Helper to garble speech in text based on audio clarity
+        // Uses $.english.garble for realistic audio degradation
+        const garbleSpeech = async (text, clarity) => {
+          if (clarity >= 80) return text; // Clear enough
+          // Convert clarity (0-80) to garble amount (100-0)
+          // clarity 80 = 0% garble, clarity 0 = 100% garble
+          const garbleAmount = Math.round(100 - (clarity * 100 / 80));
+          // Garble only the quoted speech portions
+          const parts = [];
+          let lastEnd = 0;
+          const regex = /(["'])([^"']*?)\\1/g;
+          let match;
+          while ((match = regex.exec(text)) !== null) {
+            // Add text before this quote
+            parts.push(text.slice(lastEnd, match.index));
+            // Garble the speech content
+            const quote = match[1];
+            const speech = match[2];
+            const garbled = await $.english.garble(speech, garbleAmount);
+            parts.push(quote + garbled + quote);
+            lastEnd = regex.lastIndex;
+          }
+          parts.push(text.slice(lastEnd));
+          return parts.join('');
+        };
+
         if (canSee && canHear) {
           // Full experience - route through see (visual includes speech text)
           let message = sensory.combined;
 
-          // Degraded perception might miss details
+          // Degraded visual perception - can't identify who
           if (visualDegraded && !isSelf) {
             message = 'Someone nearby ' + sensory.combined.replace(/^\\w+\\s+/, '');
+          }
+
+          // Degraded audio - garble any speech in the message
+          if (audioDegraded && !isSelf) {
+            message = await garbleSpeech(message, perception.audioClarity);
           }
 
           if (viewer.see) {
             await viewer.see(message);
           } else if (viewer.tell) {
             await viewer.tell(message);
-          }
-
-          // Auto-watch the actor (they drew our attention)
-          if (!isSelf && viewer.autoWatch) {
-            await viewer.autoWatch(actor);
           }
         } else if (canSee && !canHear) {
           // Deaf - see action with *inaudible* for speech
@@ -859,17 +885,15 @@ export class EmoteBuilder {
           } else if (viewer.tell) {
             await viewer.tell(message);
           }
-
-          if (!isSelf && viewer.autoWatch) {
-            await viewer.autoWatch(actor);
-          }
         } else if (!canSee && canHear) {
           // Blind - only hear speech
           if (sensory.audible) {
             let message = sensory.audible;
 
+            // Degraded audio - don't know who's speaking and garble speech
             if (audioDegraded && !isSelf) {
               message = 'Someone says, ' + sensory.audible.replace(/^\\w+\\s+says,?\\s*/, '');
+              message = await garbleSpeech(message, perception.audioClarity);
             }
 
             if (viewer.hear) {
@@ -877,28 +901,24 @@ export class EmoteBuilder {
             } else if (viewer.tell) {
               await viewer.tell(message);
             }
-
-            if (!isSelf && viewer.autoWatch) {
-              await viewer.autoWatch(actor);
-            }
           }
         }
         // If both blind and deaf, or can't perceive due to crowd, nothing is perceived
 
-        // Auto-watch targets who were specifically addressed in emote
-        if (!isSelf && viewer.autoWatch) {
-          for (const target of targets) {
-            if (target && target.id !== viewer.id) {
-              await viewer.autoWatch(target);
-            }
-          }
+        // Only auto-watch if THIS viewer was specifically mentioned in the emote
+        const isTarget = targets.some(t => t && t.id === viewer.id);
+        if (isTarget && !isSelf && viewer.autoWatch) {
+          // I was mentioned - auto-watch the actor back
+          await viewer.autoWatch(actor);
         }
       }
 
-      // Targets auto-watch the actor back (mutual attention)
-      for (const target of targets) {
-        if (target && target.id !== actor.id && target.autoWatch) {
-          await target.autoWatch(actor);
+      // Actor auto-watches anyone they specifically addressed
+      if (actor.autoWatch) {
+        for (const target of targets) {
+          if (target && target.id !== actor.id) {
+            await actor.autoWatch(target);
+          }
         }
       }
     `);

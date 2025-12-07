@@ -35,6 +35,12 @@ export class PlayerBuilder {
         // Player-specific
         title: '',
         homepage: '',
+
+        // Fitness training
+        fitnessXP: 0, // Accumulated XP pool to spend
+        fitnessPlaytime: 0, // Minutes played toward next XP (resets at 180)
+        fitnessXPToday: 0, // XP earned today (max 3)
+        fitnessLastDay: null, // Date string of last XP day (for reset)
       },
       methods: {},
     });
@@ -43,6 +49,7 @@ export class PlayerBuilder {
     this.addInputMethods(obj);
     this.addAuthMethods(obj);
     this.addActionMethods(obj);
+    this.addFitnessMethods(obj);
 
     return obj;
   }
@@ -78,6 +85,7 @@ export class PlayerBuilder {
       await self.registerVerb(['wake', 'wake up'], self, 'wake');
       await self.registerVerb(['watch', 'watch %i'], self, 'watchCommand');
       await self.registerVerb(['unwatch %i', 'stop watching %i'], self, 'unwatchCommand');
+      await self.registerVerb('@fitness', self, 'fitness');
 
       // If we have a location, move into it to trigger verb registration
       if (self.location && self.location !== 0) {
@@ -153,6 +161,12 @@ export class PlayerBuilder {
       // Check if in options menu
       if (self._inOptionsMenu) {
         await self.handleOptionsInput(trimmed);
+        return;
+      }
+
+      // Check if in fitness menu
+      if (self._inFitnessMenu) {
+        await self.handleFitnessInput(trimmed);
         return;
       }
 
@@ -741,6 +755,30 @@ export class PlayerBuilder {
         // TODO: Apply starvation damage
       }
 
+      // 6. Fitness XP from playtime (1 XP per 3 hours, max 3 XP/day)
+      // Check if it's a new day
+      const today = new Date().toDateString();
+      if (self.fitnessLastDay !== today) {
+        self.set('fitnessLastDay', today);
+        self.set('fitnessXPToday', 0);
+      }
+
+      // Only earn XP if under daily cap
+      if ((self.fitnessXPToday || 0) < 3) {
+        // Add 1 minute of playtime
+        const playtime = (self.fitnessPlaytime || 0) + 1;
+
+        if (playtime >= 180) {
+          // 3 hours reached - award 1 XP to pool
+          self.set('fitnessPlaytime', 0);
+          self.set('fitnessXPToday', (self.fitnessXPToday || 0) + 1);
+          self.set('fitnessXP', (self.fitnessXP || 0) + 1);
+          await self.tell('You earned 1 fitness XP! (Use @fitness to spend it)');
+        } else {
+          self.set('fitnessPlaytime', playtime);
+        }
+      }
+
       return results;
     `);
 
@@ -845,6 +883,312 @@ export class PlayerBuilder {
       }
 
       return { allowed: true };
+    `);
+  }
+
+  private addFitnessMethods(obj: RuntimeObject): void {
+    // @fitness verb - enter the fitness menu
+    obj.setMethod('fitness', `
+      /** Open the fitness training menu.
+       *  Usage: @fitness
+       *  Manage your physical training goals.
+       */
+      self.set('_inFitnessMenu', true);
+      await self.showFitnessMenu();
+    `);
+
+    // Show the fitness menu
+    obj.setMethod('showFitnessMenu', `
+      const xpPool = self.fitnessXP || 0;
+
+      await self.tell('');
+      await self.tell('=== FITNESS TRAINING ===');
+      await self.tell('');
+      await self.tell('Available XP: ' + xpPool);
+
+      // Show daily XP info
+      const xpToday = self.fitnessXPToday || 0;
+      const playtime = self.fitnessPlaytime || 0;
+      const hoursPlayed = Math.floor(playtime / 60);
+      const minsPlayed = playtime % 60;
+      const minsRemaining = 60 - minsPlayed;
+      const hoursRemaining = 2 - hoursPlayed;
+      if (xpToday >= 3) {
+        await self.tell('Daily XP: 3/3 (maxed for today)');
+      } else {
+        await self.tell('Daily XP: ' + xpToday + '/3 (next in ' + hoursRemaining + 'h ' + minsRemaining + 'm)');
+      }
+      await self.tell('');
+
+      // Show current body part capacities with XP cost
+      await self.tell('Body Parts (cost to advance):');
+      await self.tell('');
+
+      const body = await self.getBody();
+      if (body) {
+        // Get head parts
+        const head = await body.getPart('head');
+        if (head) {
+          const headMax = head.maxCalories || 100;
+          const headCost = await self.getFitnessXPNeeded('head');
+          await self.tell('  [1] Head: ' + headMax + ' cal (cost: ' + headCost + ' XP)');
+
+          const face = await head.getPart('face');
+          if (face) {
+            const leftEye = await face.getPart('leftEye');
+            const rightEye = await face.getPart('rightEye');
+            const leftEar = await face.getPart('leftEar');
+            const rightEar = await face.getPart('rightEar');
+
+            if (leftEye || rightEye) {
+              const eyeMax = Math.max(leftEye?.maxCalories || 100, rightEye?.maxCalories || 100);
+              const eyeCost = await self.getFitnessXPNeeded('eyes');
+              await self.tell('  [2] Eyes: ' + eyeMax + ' cal (cost: ' + eyeCost + ' XP)');
+            }
+            if (leftEar || rightEar) {
+              const earMax = Math.max(leftEar?.maxCalories || 100, rightEar?.maxCalories || 100);
+              const earCost = await self.getFitnessXPNeeded('ears');
+              await self.tell('  [3] Ears: ' + earMax + ' cal (cost: ' + earCost + ' XP)');
+            }
+          }
+        }
+
+        // Get torso
+        const torso = await body.getPart('torso');
+        if (torso) {
+          const torsoMax = torso.maxCalories || 100;
+          const torsoCost = await self.getFitnessXPNeeded('torso');
+          await self.tell('  [4] Torso: ' + torsoMax + ' cal (cost: ' + torsoCost + ' XP)');
+        }
+
+        // Get limbs
+        const leftArm = await body.getPart('leftArm');
+        const rightArm = await body.getPart('rightArm');
+        if (leftArm || rightArm) {
+          const armMax = Math.max(leftArm?.maxCalories || 100, rightArm?.maxCalories || 100);
+          const armCost = await self.getFitnessXPNeeded('arms');
+          await self.tell('  [5] Arms: ' + armMax + ' cal (cost: ' + armCost + ' XP)');
+        }
+
+        const leftHand = leftArm ? await leftArm.getPart('hand') : null;
+        const rightHand = rightArm ? await rightArm.getPart('hand') : null;
+        if (leftHand || rightHand) {
+          const handMax = Math.max(leftHand?.maxCalories || 100, rightHand?.maxCalories || 100);
+          const handCost = await self.getFitnessXPNeeded('hands');
+          await self.tell('  [6] Hands: ' + handMax + ' cal (cost: ' + handCost + ' XP)');
+        }
+
+        const leftLeg = await body.getPart('leftLeg');
+        const rightLeg = await body.getPart('rightLeg');
+        if (leftLeg || rightLeg) {
+          const legMax = Math.max(leftLeg?.maxCalories || 100, rightLeg?.maxCalories || 100);
+          const legCost = await self.getFitnessXPNeeded('legs');
+          await self.tell('  [7] Legs: ' + legMax + ' cal (cost: ' + legCost + ' XP)');
+        }
+
+        const leftFoot = leftLeg ? await leftLeg.getPart('foot') : null;
+        const rightFoot = rightLeg ? await rightLeg.getPart('foot') : null;
+        if (leftFoot || rightFoot) {
+          const footMax = Math.max(leftFoot?.maxCalories || 100, rightFoot?.maxCalories || 100);
+          const footCost = await self.getFitnessXPNeeded('feet');
+          await self.tell('  [8] Feet: ' + footMax + ' cal (cost: ' + footCost + ' XP)');
+        }
+      }
+
+      await self.tell('');
+      await self.tell('Enter 1-8 to spend XP, or q to exit.');
+      await self.tell('');
+    `);
+
+    // Handle fitness menu input
+    obj.setMethod('handleFitnessInput', `
+      const input = args[0].toLowerCase().trim();
+
+      const partMap = {
+        '1': 'head',
+        '2': 'eyes',
+        '3': 'ears',
+        '4': 'torso',
+        '5': 'arms',
+        '6': 'hands',
+        '7': 'legs',
+        '8': 'feet',
+      };
+
+      if (input === 'q' || input === 'quit' || input === 'exit') {
+        self.set('_inFitnessMenu', false);
+        await self.tell('Exiting fitness menu.');
+        await self.tell('> ');
+        return;
+      }
+
+      if (partMap[input]) {
+        const part = partMap[input];
+        const result = await self.spendFitnessXP(part);
+        if (result.success) {
+          await self.tell('Your ' + part + ' capacity increased to ' + result.newCapacity + ' cal!');
+        } else {
+          await self.tell(result.reason);
+        }
+        await self.showFitnessMenu();
+        return;
+      }
+
+      await self.tell('Invalid option. Enter 1-8 or q.');
+    `);
+
+    // Add fitness XP (called when body parts are used)
+    // Get current capacity for a fitness goal
+    obj.setMethod('getFitnessCapacity', `
+      /** Get the current maxCalories for a fitness goal.
+       *  @param goal - The body part goal name
+       *  @returns Current maxCalories (highest of paired parts)
+       */
+      const goal = args[0];
+      const body = await self.getBody();
+      if (!body) return 100;
+
+      if (goal === 'head') {
+        const head = await body.getPart('head');
+        return head?.maxCalories || 100;
+      } else if (goal === 'torso') {
+        const torso = await body.getPart('torso');
+        return torso?.maxCalories || 100;
+      } else if (goal === 'arms') {
+        const leftArm = await body.getPart('leftArm');
+        const rightArm = await body.getPart('rightArm');
+        return Math.max(leftArm?.maxCalories || 100, rightArm?.maxCalories || 100);
+      } else if (goal === 'hands') {
+        const leftArm = await body.getPart('leftArm');
+        const rightArm = await body.getPart('rightArm');
+        const leftHand = leftArm ? await leftArm.getPart('hand') : null;
+        const rightHand = rightArm ? await rightArm.getPart('hand') : null;
+        return Math.max(leftHand?.maxCalories || 100, rightHand?.maxCalories || 100);
+      } else if (goal === 'legs') {
+        const leftLeg = await body.getPart('leftLeg');
+        const rightLeg = await body.getPart('rightLeg');
+        return Math.max(leftLeg?.maxCalories || 100, rightLeg?.maxCalories || 100);
+      } else if (goal === 'feet') {
+        const leftLeg = await body.getPart('leftLeg');
+        const rightLeg = await body.getPart('rightLeg');
+        const leftFoot = leftLeg ? await leftLeg.getPart('foot') : null;
+        const rightFoot = rightLeg ? await rightLeg.getPart('foot') : null;
+        return Math.max(leftFoot?.maxCalories || 100, rightFoot?.maxCalories || 100);
+      } else if (goal === 'eyes') {
+        const head = await body.getPart('head');
+        const face = head ? await head.getPart('face') : null;
+        if (!face) return 100;
+        const leftEye = await face.getPart('leftEye');
+        const rightEye = await face.getPart('rightEye');
+        return Math.max(leftEye?.maxCalories || 100, rightEye?.maxCalories || 100);
+      } else if (goal === 'ears') {
+        const head = await body.getPart('head');
+        const face = head ? await head.getPart('face') : null;
+        if (!face) return 100;
+        const leftEar = await face.getPart('leftEar');
+        const rightEar = await face.getPart('rightEar');
+        return Math.max(leftEar?.maxCalories || 100, rightEar?.maxCalories || 100);
+      }
+      return 100;
+    `);
+
+    // Calculate XP needed for next level based on current capacity
+    obj.setMethod('getFitnessXPNeeded', `
+      /** Calculate XP needed to advance based on current level.
+       *  Uses 2*level - 1 formula where level = (maxCalories - 90) / 10
+       *  Level 1 (100 cal) = 1 XP, Level 2 (110 cal) = 3 XP, etc.
+       *  @param goal - The body part goal name
+       *  @returns XP needed for next advancement
+       */
+      const goal = args[0];
+      const capacity = await self.getFitnessCapacity(goal);
+      const level = Math.floor((capacity - 90) / 10); // 100 cal = level 1
+      return (2 * level) - 1;
+    `);
+
+    // Spend XP to advance a body part
+    obj.setMethod('spendFitnessXP', `
+      /** Spend XP from pool to advance a body part.
+       *  @param part - The body part to advance
+       *  @returns { success, reason?, newCapacity? }
+       */
+      const part = args[0];
+      const xpPool = self.fitnessXP || 0;
+      const xpNeeded = await self.getFitnessXPNeeded(part);
+
+      if (xpPool < xpNeeded) {
+        return { success: false, reason: 'Not enough XP. Need ' + xpNeeded + ', have ' + xpPool + '.' };
+      }
+
+      // Deduct XP
+      self.set('fitnessXP', xpPool - xpNeeded);
+
+      const body = await self.getBody();
+      if (!body) return { success: false, reason: 'No body found.' };
+
+      const boostAmount = 10; // +10 maxCalories per advancement
+
+      // Helper to boost a part (only increases max, not current calories)
+      const boostPart = async (partObj) => {
+        if (partObj) {
+          const current = partObj.maxCalories || 100;
+          partObj.set('maxCalories', current + boostAmount);
+        }
+      };
+
+      // Boost the appropriate parts
+      if (part === 'head') {
+        const head = await body.getPart('head');
+        await boostPart(head);
+      } else if (part === 'torso') {
+        const torso = await body.getPart('torso');
+        await boostPart(torso);
+      } else if (part === 'arms') {
+        const leftArm = await body.getPart('leftArm');
+        const rightArm = await body.getPart('rightArm');
+        await boostPart(leftArm);
+        await boostPart(rightArm);
+      } else if (part === 'hands') {
+        const leftArm = await body.getPart('leftArm');
+        const rightArm = await body.getPart('rightArm');
+        const leftHand = leftArm ? await leftArm.getPart('hand') : null;
+        const rightHand = rightArm ? await rightArm.getPart('hand') : null;
+        await boostPart(leftHand);
+        await boostPart(rightHand);
+      } else if (part === 'legs') {
+        const leftLeg = await body.getPart('leftLeg');
+        const rightLeg = await body.getPart('rightLeg');
+        await boostPart(leftLeg);
+        await boostPart(rightLeg);
+      } else if (part === 'feet') {
+        const leftLeg = await body.getPart('leftLeg');
+        const rightLeg = await body.getPart('rightLeg');
+        const leftFoot = leftLeg ? await leftLeg.getPart('foot') : null;
+        const rightFoot = rightLeg ? await rightLeg.getPart('foot') : null;
+        await boostPart(leftFoot);
+        await boostPart(rightFoot);
+      } else if (part === 'eyes') {
+        const head = await body.getPart('head');
+        const face = head ? await head.getPart('face') : null;
+        if (face) {
+          const leftEye = await face.getPart('leftEye');
+          const rightEye = await face.getPart('rightEye');
+          await boostPart(leftEye);
+          await boostPart(rightEye);
+        }
+      } else if (part === 'ears') {
+        const head = await body.getPart('head');
+        const face = head ? await head.getPart('face') : null;
+        if (face) {
+          const leftEar = await face.getPart('leftEar');
+          const rightEar = await face.getPart('rightEar');
+          await boostPart(leftEar);
+          await boostPart(rightEar);
+        }
+      }
+
+      const newCapacity = await self.getFitnessCapacity(part);
+      return { success: true, newCapacity };
     `);
   }
 }

@@ -4,19 +4,23 @@ import type { RuntimeObject } from '../../../types/object.js';
 /**
  * Stat allocation costs for chargen
  * Single parts cost 1 point, paired parts cost 2 points
+ * Each point adds to maxCalories on the body part(s)
  */
 export const STAT_COSTS = {
-  headIq: 1, // Head IQ (single)
-  torsoStrength: 1, // Torso strength (single)
-  armsStrength: 2, // Both arms strength
-  handsStrength: 2, // Both hands grip strength
-  handsDexterity: 2, // Both hands dexterity
-  legsStrength: 2, // Both legs strength
-  legsDexterity: 2, // Both legs dexterity
-  feetDexterity: 2, // Both feet dexterity
-  eyesPerception: 2, // Both eyes perception
-  earsPerception: 2, // Both ears perception
+  head: 1, // Head/brain capacity
+  torso: 1, // Core/torso capacity
+  arms: 2, // Both arms
+  hands: 2, // Both hands
+  legs: 2, // Both legs
+  feet: 2, // Both feet
+  eyes: 2, // Both eyes
+  ears: 2, // Both ears
 } as const;
+
+/**
+ * How much maxCalories each point adds
+ */
+export const CALORIES_PER_POINT = 10;
 
 /**
  * Starting stat points for new characters
@@ -339,11 +343,6 @@ export class CharGenBuilder {
       }
 
       await player.tell('');
-      await player.tell('Stats:');
-      const stats = await player.getStats();
-      await player.tell('  Total Strength: ' + stats.strength + '  Total Dexterity: ' + stats.dexterity);
-      await player.tell('  Intelligence: ' + stats.intelligence + '  Perception: ' + stats.perception);
-      await player.tell('');
 
       const finalConfirm = await $.prompt.yesorno(player, 'Create this character and enter the game?');
       if (!finalConfirm) {
@@ -375,23 +374,23 @@ export class CharGenBuilder {
       await player.connect(player._context);
     `);
 
-    // Method to allocate a stat point
+    // Method to allocate a stat point - increases maxCalories on body parts
     this.charGen.setMethod('allocateStat', `
       const player = args[0];
       const statName = args[1];
 
       const costs = {
-        headIq: 1,
-        torsoStrength: 1,
-        armsStrength: 2,
-        handsStrength: 2,
-        handsDexterity: 2,
-        legsStrength: 2,
-        legsDexterity: 2,
-        feetDexterity: 2,
-        eyesPerception: 2,
-        earsPerception: 2,
+        head: 1,
+        torso: 1,
+        arms: 2,
+        hands: 2,
+        legs: 2,
+        feet: 2,
+        eyes: 2,
+        ears: 2,
       };
+
+      const CALORIES_PER_POINT = 10;
 
       const cost = costs[statName];
       if (!cost) {
@@ -412,44 +411,38 @@ export class CharGenBuilder {
         return { error: 'You have no body!' };
       }
 
-      // Apply stat based on name
+      // Helper to increase maxCalories on a part
+      const boostPart = (part) => {
+        if (part) {
+          const current = part.maxCalories || 100;
+          part.set('maxCalories', current + CALORIES_PER_POINT);
+          // Also set current calories to match (start fully rested)
+          part.set('calories', part.maxCalories);
+        }
+      };
+
+      // Apply calories boost based on body part
       switch (statName) {
-        case 'headIq': {
+        case 'head': {
           const head = await body.getPart('head');
-          if (head) head.set('iq', (head.iq || 1) + 1);
+          boostPart(head);
           break;
         }
-        case 'torsoStrength': {
-          body.set('strength', (body.strength || 1) + 1);
+        case 'torso': {
+          boostPart(body);
           break;
         }
-        case 'armsStrength': {
+        case 'arms': {
           for (const side of ['right', 'left']) {
             const shoulder = await body.getPart(side + 'Shoulder');
             if (shoulder) {
               const arm = await shoulder.getPart('arm');
-              if (arm) arm.set('strength', (arm.strength || 1) + 1);
+              boostPart(arm);
             }
           }
           break;
         }
-        case 'handsStrength': {
-          for (const side of ['right', 'left']) {
-            const shoulder = await body.getPart(side + 'Shoulder');
-            if (shoulder) {
-              const arm = await shoulder.getPart('arm');
-              if (arm) {
-                const forearm = await arm.getPart('forearm');
-                if (forearm) {
-                  const hand = await forearm.getPart('hand');
-                  if (hand) hand.set('strength', (hand.strength || 1) + 1);
-                }
-              }
-            }
-          }
-          break;
-        }
-        case 'handsDexterity': {
+        case 'hands': {
           for (const side of ['right', 'left']) {
             const shoulder = await body.getPart(side + 'Shoulder');
             if (shoulder) {
@@ -458,40 +451,27 @@ export class CharGenBuilder {
                 const forearm = await arm.getPart('forearm');
                 if (forearm) {
                   const hand = await forearm.getPart('hand');
-                  if (hand) hand.set('dexterity', (hand.dexterity || 1) + 1);
+                  boostPart(hand);
                 }
               }
             }
           }
           break;
         }
-        case 'legsStrength': {
+        case 'legs': {
           for (const side of ['right', 'left']) {
             const thigh = await body.getPart(side + 'Thigh');
             if (thigh) {
               const knee = await thigh.getPart('knee');
               if (knee) {
                 const leg = await knee.getPart('leg');
-                if (leg) leg.set('strength', (leg.strength || 1) + 1);
+                boostPart(leg);
               }
             }
           }
           break;
         }
-        case 'legsDexterity': {
-          for (const side of ['right', 'left']) {
-            const thigh = await body.getPart(side + 'Thigh');
-            if (thigh) {
-              const knee = await thigh.getPart('knee');
-              if (knee) {
-                const leg = await knee.getPart('leg');
-                if (leg) leg.set('dexterity', (leg.dexterity || 1) + 1);
-              }
-            }
-          }
-          break;
-        }
-        case 'feetDexterity': {
+        case 'feet': {
           for (const side of ['right', 'left']) {
             const thigh = await body.getPart(side + 'Thigh');
             if (thigh) {
@@ -500,35 +480,35 @@ export class CharGenBuilder {
                 const leg = await knee.getPart('leg');
                 if (leg) {
                   const foot = await leg.getPart('foot');
-                  if (foot) foot.set('dexterity', (foot.dexterity || 1) + 1);
+                  boostPart(foot);
                 }
               }
             }
           }
           break;
         }
-        case 'eyesPerception': {
+        case 'eyes': {
           const head = await body.getPart('head');
           if (head) {
             const face = await head.getPart('face');
             if (face) {
               const leftEye = await face.getPart('leftEye');
               const rightEye = await face.getPart('rightEye');
-              if (leftEye) leftEye.set('perception', (leftEye.perception || 1) + 1);
-              if (rightEye) rightEye.set('perception', (rightEye.perception || 1) + 1);
+              boostPart(leftEye);
+              boostPart(rightEye);
             }
           }
           break;
         }
-        case 'earsPerception': {
+        case 'ears': {
           const head = await body.getPart('head');
           if (head) {
             const face = await head.getPart('face');
             if (face) {
               const leftEar = await face.getPart('leftEar');
               const rightEar = await face.getPart('rightEar');
-              if (leftEar) leftEar.set('perception', (leftEar.perception || 1) + 1);
-              if (rightEar) rightEar.set('perception', (rightEar.perception || 1) + 1);
+              boostPart(leftEar);
+              boostPart(rightEar);
             }
           }
           break;
@@ -548,19 +528,17 @@ export class CharGenBuilder {
       const player = args[0];
 
       const statOptions = {
-        headIq: { label: 'Head IQ', cost: 1 },
-        torsoStrength: { label: 'Torso Strength', cost: 1 },
-        armsStrength: { label: 'Arms Strength', cost: 2 },
-        handsStrength: { label: 'Hands Strength', cost: 2 },
-        handsDexterity: { label: 'Hands Dexterity', cost: 2 },
-        legsStrength: { label: 'Legs Strength', cost: 2 },
-        legsDexterity: { label: 'Legs Dexterity', cost: 2 },
-        feetDexterity: { label: 'Feet Dexterity', cost: 2 },
-        eyesPerception: { label: 'Eyes Perception', cost: 2 },
-        earsPerception: { label: 'Ears Perception', cost: 2 },
+        head: { label: 'Head', cost: 1 },
+        torso: { label: 'Torso', cost: 1 },
+        arms: { label: 'Arms', cost: 2 },
+        hands: { label: 'Hands', cost: 2 },
+        legs: { label: 'Legs', cost: 2 },
+        feet: { label: 'Feet', cost: 2 },
+        eyes: { label: 'Eyes', cost: 2 },
+        ears: { label: 'Ears', cost: 2 },
       };
 
-      // Show current stats by body part
+      // Show current body part capacities (maxCalories)
       const showStats = async () => {
         const body = await player.getBody();
         if (!body) {
@@ -568,35 +546,43 @@ export class CharGenBuilder {
           return;
         }
 
-        await player.tell('Current Stats:');
+        await player.tell('Body Part Capacities (maxCalories):');
+
+        // Torso
+        await player.tell('  Torso: ' + (body.maxCalories || 100));
 
         // Head
         const head = await body.getPart('head');
         if (head) {
-          await player.tell('  Head IQ: ' + (head.iq || 1));
+          await player.tell('  Head: ' + (head.maxCalories || 100));
+
+          // Eyes and Ears
+          const face = await head.getPart('face');
+          if (face) {
+            const eye = await face.getPart('rightEye');
+            const ear = await face.getPart('rightEar');
+            if (eye) {
+              await player.tell('  Eyes: ' + (eye.maxCalories || 100) + ' each');
+            }
+            if (ear) {
+              await player.tell('  Ears: ' + (ear.maxCalories || 100) + ' each');
+            }
+          }
         }
 
-        // Torso
-        await player.tell('  Torso Strength: ' + (body.strength || 1));
-
-        // Arms (get one arm's stats - they're symmetric)
+        // Arms
         const rightShoulder = await body.getPart('rightShoulder');
         if (rightShoulder) {
           const arm = await rightShoulder.getPart('arm');
           if (arm) {
-            await player.tell('  Arms Strength: ' + (arm.strength || 1) + ' each');
-          }
-        }
+            await player.tell('  Arms: ' + (arm.maxCalories || 100) + ' each');
 
-        // Hands
-        if (rightShoulder) {
-          const arm = await rightShoulder.getPart('arm');
-          if (arm) {
+            // Hands
             const forearm = await arm.getPart('forearm');
             if (forearm) {
               const hand = await forearm.getPart('hand');
               if (hand) {
-                await player.tell('  Hands Strength: ' + (hand.strength || 1) + ', Dexterity: ' + (hand.dexterity || 1) + ' each');
+                await player.tell('  Hands: ' + (hand.maxCalories || 100) + ' each');
               }
             }
           }
@@ -609,43 +595,13 @@ export class CharGenBuilder {
           if (knee) {
             const leg = await knee.getPart('leg');
             if (leg) {
-              await player.tell('  Legs Strength: ' + (leg.strength || 1) + ', Dexterity: ' + (leg.dexterity || 1) + ' each');
-            }
-          }
-        }
+              await player.tell('  Legs: ' + (leg.maxCalories || 100) + ' each');
 
-        // Feet
-        if (rightThigh) {
-          const knee = await rightThigh.getPart('knee');
-          if (knee) {
-            const leg = await knee.getPart('leg');
-            if (leg) {
+              // Feet
               const foot = await leg.getPart('foot');
               if (foot) {
-                await player.tell('  Feet Dexterity: ' + (foot.dexterity || 1) + ' each');
+                await player.tell('  Feet: ' + (foot.maxCalories || 100) + ' each');
               }
-            }
-          }
-        }
-
-        // Eyes
-        if (head) {
-          const face = await head.getPart('face');
-          if (face) {
-            const eye = await face.getPart('rightEye');
-            if (eye) {
-              await player.tell('  Eyes Perception: ' + (eye.perception || 1) + ' each');
-            }
-          }
-        }
-
-        // Ears
-        if (head) {
-          const face = await head.getPart('face');
-          if (face) {
-            const ear = await face.getPart('rightEar');
-            if (ear) {
-              await player.tell('  Ears Perception: ' + (ear.perception || 1) + ' each');
             }
           }
         }
@@ -675,7 +631,7 @@ export class CharGenBuilder {
           break;
         }
 
-        const choice = await $.prompt.choice(player, 'Which stat to increase?', choices);
+        const choice = await $.prompt.choice(player, 'Which body part to strengthen?', choices);
 
         if (choice === 'done') {
           break;
@@ -685,7 +641,7 @@ export class CharGenBuilder {
         if (result.error) {
           await player.tell('Error: ' + result.error);
         } else {
-          await player.tell('Increased ' + statOptions[choice].label + '! (' + result.remaining + ' points left)');
+          await player.tell('Increased ' + statOptions[choice].label + ' capacity! (' + result.remaining + ' points left)');
         }
         await player.tell('');
       }

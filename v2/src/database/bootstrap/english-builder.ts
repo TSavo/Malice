@@ -595,94 +595,238 @@ export class EnglishBuilder {
       return verb + 'ing';
     `);
 
-    // Scramble text to simulate hearing loss
-    this.english.setMethod('scramble', `
-      /** Scramble text to simulate hearing loss/degradation.
-       *  Usage: $.english.scramble(text, amount)
-       *  At 0%, text is unchanged. At 100%, text is completely garbled.
-       *  Uses phonetically similar substitutions (b/p, m/n, s/sh, etc.)
-       *  @param text - The text to scramble
+    // Garble text to simulate hearing difficulty in noisy environments
+    this.english.setMethod('garble', `
+      /** Garble text to simulate hearing difficulty (crowd noise, distance, etc.).
+       *  Usage: $.english.garble(text, amount)
+       *  Progressive degradation with realistic audio distortion effects:
+       *  - 0-20%: Slight - occasional letter substitutions
+       *  - 20-40%: Mild - phonetic confusions, some dropped endings
+       *  - 40-60%: Moderate - words replaced with similar sounds, gaps
+       *  - 60-80%: Heavy - mostly unintelligible, key words remain
+       *  - 80-100%: Extreme - fragments and mumbling
+       *  @param text - The text to garble
        *  @param amount - 0-100, percentage of degradation
-       *  @example scramble('Hello there', 0) -> "Hello there"
-       *  @example scramble('Hello there', 50) -> "Heppo dere"
-       *  @example scramble('Hello there', 100) -> "Kebbo beve"
+       *  @example garble('Hello there friend', 0) -> "Hello there friend"
+       *  @example garble('Hello there friend', 30) -> "Hello dere frien"
+       *  @example garble('Hello there friend', 60) -> "...lo ...ere ...end"
+       *  @example garble('Hello there friend', 90) -> "...mm... ...something..."
        */
       const text = args[0];
       const amount = Math.max(0, Math.min(100, args[1] || 0));
 
       if (!text || amount === 0) return text;
 
-      // Phonetically similar substitution pairs (confused when hearing is impaired)
-      // These represent sounds that are commonly confused with hearing loss
+      // Work on words
+      const words = text.split(/\\s+/);
+      if (words.length === 0) return text;
+
+      // Phonetically similar substitution pairs
       const confusions = {
-        // Voiced/unvoiced pairs
-        'b': 'p', 'p': 'b',
-        'd': 't', 't': 'd',
-        'g': 'k', 'k': 'g',
-        'v': 'f', 'f': 'v',
-        'z': 's', 's': 'z',
-        // Nasal confusions
-        'm': 'n', 'n': 'm',
-        // Sibilant confusions
-        'sh': 'ch', 'ch': 'sh',
-        'th': 'd',
-        // Liquid confusions
-        'l': 'r', 'r': 'l',
-        // High frequency sounds (lost first in hearing loss)
-        's': 'th', 'f': 'th',
+        'b': 'p', 'p': 'b', 'd': 't', 't': 'd',
+        'g': 'k', 'k': 'g', 'v': 'f', 'f': 'v',
+        'z': 's', 's': 'z', 'm': 'n', 'n': 'm',
+        'l': 'r', 'r': 'l', 'w': 'r', 'j': 'ch',
       };
 
-      // Higher confusion rates for higher amounts
-      const confusionRate = amount / 100;
+      // Similar sounding word replacements
+      const soundAlikes = {
+        'what': ['wha', 'huh', 'wa'],
+        'you': ['ya', 'yuh'],
+        'your': ['yer', 'yur'],
+        'the': ['da', 'duh', 'tha'],
+        'that': ['dat', 'tha'],
+        'this': ['dis', 'thi'],
+        'there': ['dere', 'der'],
+        'they': ['dey', 'day'],
+        'them': ['dem', 'em'],
+        'with': ['wif', 'wit'],
+        'have': ['haf', 'av'],
+        'here': ['hea', 'ere'],
+        'where': ['wher', 'wha'],
+        'going': ['goin', 'gonna'],
+        'want': ['wan', 'wanna'],
+        'something': ['somethin', 'sumthin'],
+        'nothing': ['nothin', 'nuthin'],
+        'anything': ['anythin', 'anyt...'],
+        'because': ['cuz', 'coz'],
+        'about': ['abou', 'bout'],
+        'could': ['coul', 'cud'],
+        'would': ['woul', 'wud'],
+        'should': ['shoul', 'shud'],
+        'think': ['thin', 'tink'],
+        'know': ['kno', 'no'],
+        'really': ['reall', 'rilly'],
+        'actually': ['acshully', 'achly'],
+        'probably': ['probly', 'prolly'],
+        'definitely': ['definly', 'defntly'],
+      };
 
-      let result = '';
-      let i = 0;
+      // Filler sounds for heavy garbling
+      const fillers = ['...', 'mm', 'uh', 'er', 'um'];
+      const mumbles = ['...something...', '...mumble...', '...'];
 
-      while (i < text.length) {
-        const char = text[i];
-        const lower = char.toLowerCase();
+      const garbleWord = (word) => {
+        if (!word) return word;
 
-        // Check for digraphs first (sh, ch, th)
-        if (i < text.length - 1) {
-          const digraph = text.slice(i, i + 2).toLowerCase();
-          if (confusions[digraph] && Math.random() < confusionRate) {
-            const replacement = confusions[digraph];
-            // Preserve case of first letter
-            if (char === char.toUpperCase()) {
-              result += replacement[0].toUpperCase() + replacement.slice(1);
-            } else {
-              result += replacement;
+        const lower = word.toLowerCase();
+        const isCapitalized = word[0] === word[0].toUpperCase();
+
+        // LEVEL 1 (0-20%): Occasional letter substitutions
+        if (amount <= 20) {
+          if (Math.random() < amount / 100) {
+            let result = '';
+            for (const char of word) {
+              const lc = char.toLowerCase();
+              if (confusions[lc] && Math.random() < 0.3) {
+                const repl = confusions[lc];
+                result += char === char.toUpperCase() ? repl.toUpperCase() : repl;
+              } else {
+                result += char;
+              }
             }
-            i += 2;
-            continue;
+            return result;
           }
+          return word;
         }
 
-        // Single character confusion
-        if (confusions[lower] && Math.random() < confusionRate) {
-          const replacement = confusions[lower];
-          // Preserve case
-          if (char === char.toUpperCase()) {
-            result += replacement.toUpperCase();
-          } else {
-            result += replacement;
+        // LEVEL 2 (20-40%): Phonetic confusions + dropped endings
+        if (amount <= 40) {
+          const rate = (amount - 20) / 20; // 0-1 within this range
+
+          // Maybe use a sound-alike
+          if (soundAlikes[lower] && Math.random() < rate * 0.5) {
+            const alts = soundAlikes[lower];
+            let result = alts[Math.floor(Math.random() * alts.length)];
+            if (isCapitalized) result = result[0].toUpperCase() + result.slice(1);
+            return result;
           }
-        } else {
-          result += char;
+
+          // Drop word ending
+          if (word.length > 3 && Math.random() < rate * 0.4) {
+            const keepLen = Math.max(2, Math.floor(word.length * (1 - rate * 0.3)));
+            return word.slice(0, keepLen);
+          }
+
+          // Letter substitutions
+          let result = '';
+          for (const char of word) {
+            const lc = char.toLowerCase();
+            if (confusions[lc] && Math.random() < rate * 0.5) {
+              const repl = confusions[lc];
+              result += char === char.toUpperCase() ? repl.toUpperCase() : repl;
+            } else {
+              result += char;
+            }
+          }
+          return result;
         }
-        i++;
+
+        // LEVEL 3 (40-60%): Gaps, fragments, sound-alikes common
+        if (amount <= 60) {
+          const rate = (amount - 40) / 20;
+
+          // Sometimes just a gap
+          if (Math.random() < rate * 0.3) {
+            return '...';
+          }
+
+          // Sound-alikes more common
+          if (soundAlikes[lower] && Math.random() < 0.6) {
+            const alts = soundAlikes[lower];
+            let result = alts[Math.floor(Math.random() * alts.length)];
+            if (isCapitalized) result = result[0].toUpperCase() + result.slice(1);
+            return result;
+          }
+
+          // Fragment the word (keep start or end)
+          if (word.length > 2 && Math.random() < rate * 0.5) {
+            if (Math.random() < 0.5) {
+              return '...' + word.slice(-Math.max(2, Math.floor(word.length * 0.4)));
+            } else {
+              return word.slice(0, Math.max(2, Math.floor(word.length * 0.5))) + '...';
+            }
+          }
+
+          // Heavy letter substitutions
+          let result = '';
+          for (const char of word) {
+            const lc = char.toLowerCase();
+            if (confusions[lc] && Math.random() < 0.6) {
+              const repl = confusions[lc];
+              result += char === char.toUpperCase() ? repl.toUpperCase() : repl;
+            } else {
+              result += char;
+            }
+          }
+          return result;
+        }
+
+        // LEVEL 4 (60-80%): Mostly unintelligible, some key words
+        if (amount <= 80) {
+          const rate = (amount - 60) / 20;
+
+          // High chance of just being a gap or filler
+          if (Math.random() < rate * 0.5) {
+            return fillers[Math.floor(Math.random() * fillers.length)];
+          }
+
+          // Fragment most words
+          if (word.length > 3) {
+            if (Math.random() < 0.7) {
+              const keepLen = Math.max(1, Math.floor(word.length * 0.3));
+              return '...' + word.slice(-keepLen);
+            }
+          }
+
+          // Short words might survive
+          if (word.length <= 3 && Math.random() < 0.4) {
+            return word;
+          }
+
+          return '...';
+        }
+
+        // LEVEL 5 (80-100%): Extreme - just fragments and mumbles
+        const rate = (amount - 80) / 20;
+
+        // Very high chance of mumble
+        if (Math.random() < 0.7 + rate * 0.25) {
+          if (Math.random() < rate) {
+            return mumbles[Math.floor(Math.random() * mumbles.length)];
+          }
+          return fillers[Math.floor(Math.random() * fillers.length)];
+        }
+
+        // Tiny fragment
+        if (word.length > 2) {
+          return '...' + word[word.length - 1];
+        }
+
+        return '...';
+      };
+
+      // Process each word
+      let result = words.map(garbleWord);
+
+      // At higher levels, also drop some words entirely
+      if (amount > 50) {
+        const dropRate = (amount - 50) / 200; // 0-25% word drop
+        result = result.filter(() => Math.random() > dropRate);
       }
 
-      // At very high amounts, also drop some words entirely
-      if (amount > 80) {
-        const dropRate = (amount - 80) / 100; // 0-20% word drop rate
-        const words = result.split(' ');
-        result = words
-          .filter(() => Math.random() > dropRate)
-          .join(' ');
-      }
+      // Clean up multiple consecutive ellipses
+      let final = result.join(' ');
+      final = final.replace(/(\\.\\.\\.\\s*)+/g, '... ');
+      final = final.replace(/^\\.\\.\\. /, '');
+      final = final.trim();
 
-      return result || '...';
+      return final || '...';
+    `);
+
+    // Keep scramble as alias for backwards compatibility
+    this.english.setMethod('scramble', `
+      return await self.garble(args[0], args[1]);
     `);
   }
 
