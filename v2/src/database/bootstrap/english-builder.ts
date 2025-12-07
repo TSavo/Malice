@@ -205,10 +205,16 @@ export class EnglishBuilder {
       return rest.join(', ') + ', ' + conjunction + ' ' + last;
     `);
 
-    // plural(n, word) -> pluralized word
-    // plural(1, 'cat') -> "cat"
-    // plural(3, 'wolf') -> "wolves"
     this.english.setMethod('plural', `
+      /** Pluralize a word based on count.
+       *  Usage: $.english.plural(n, word)
+       *  Handles irregular plurals (wolf->wolves, child->children).
+       *  @param n - The count (1 returns singular, else plural)
+       *  @param word - The word to pluralize
+       *  @example plural(1, 'cat') -> "cat"
+       *  @example plural(3, 'wolf') -> "wolves"
+       *  @example plural(2, 'child') -> "children"
+       */
       const n = args[0];
       const word = args[1];
 
@@ -259,13 +265,19 @@ export class EnglishBuilder {
       return word + 's';
     `);
 
-    // count(n, word, zeroWord?) -> "five bruises", "a bruise", "no bruises"
-    // zeroWord defaults to 'no', but can be 'nothing', 'none', etc.
-    // Supports %i for plural item in zeroWord: "empty of %i" -> "empty of items"
-    // count(0, 'item') -> "no items"
-    // count(0, 'item', 'nothing') -> "nothing"
-    // count(0, 'coin', 'empty of %i') -> "empty of coins"
     this.english.setMethod('count', `
+      /** Count items with proper English phrasing.
+       *  Usage: $.english.count(n, word, zeroWord?)
+       *  Returns "a cat", "five cats", "no cats", etc.
+       *  @param n - The count
+       *  @param word - The item name (singular)
+       *  @param zeroWord - Optional custom zero phrase. Use %i for plural item.
+       *  @example count(1, 'cat') -> "a cat"
+       *  @example count(5, 'bruise') -> "five bruises"
+       *  @example count(0, 'item') -> "no items"
+       *  @example count(0, 'coin', 'nothing') -> "nothing"
+       *  @example count(0, 'wound', 'free of %i') -> "free of wounds"
+       */
       const n = args[0];
       const word = args[1];
       const zeroWord = args[2]; // Optional custom zero word
@@ -297,8 +309,15 @@ export class EnglishBuilder {
       return n + ' ' + pluralized;
     `);
 
-    // article(word) -> "an apple", "a banana"
     this.english.setMethod('article', `
+      /** Add indefinite article (a/an) to a word.
+       *  Usage: $.english.article(word)
+       *  @param word - The word to add an article to
+       *  @example article('apple') -> "an apple"
+       *  @example article('banana') -> "a banana"
+       *  @example article('hour') -> "an hour"
+       *  @example article('uniform') -> "a uniform"
+       */
       const word = args[0];
       if (!word) return '';
 
@@ -322,8 +341,15 @@ export class EnglishBuilder {
       return 'a ' + word;
     `);
 
-    // ordinal(n) -> "first", "second", "23rd"
     this.english.setMethod('ordinal', `
+      /** Convert a number to its ordinal form.
+       *  Usage: $.english.ordinal(n)
+       *  @param n - The number
+       *  @example ordinal(1) -> "first"
+       *  @example ordinal(3) -> "third"
+       *  @example ordinal(23) -> "23rd"
+       *  @example ordinal(11) -> "11th"
+       */
       const n = args[0];
 
       const ordinalWords = self.ordinalWords || [];
@@ -353,8 +379,13 @@ export class EnglishBuilder {
       return n + suffix;
     `);
 
-    // possessive(name) -> "Bob's", "James'"
     this.english.setMethod('possessive', `
+      /** Make a name possessive.
+       *  Usage: $.english.possessive(name)
+       *  @param name - The name
+       *  @example possessive('Bob') -> "Bob's"
+       *  @example possessive('James') -> "James'"
+       */
       const name = args[0];
       if (!name) return '';
 
@@ -366,15 +397,24 @@ export class EnglishBuilder {
       return name + "'s";
     `);
 
-    // capitalize(str) -> "Hello world" (first letter only)
     this.english.setMethod('capitalize', `
+      /** Capitalize the first letter of a string.
+       *  Usage: $.english.capitalize(str)
+       *  @param str - The string
+       *  @example capitalize('hello world') -> "Hello world"
+       */
       const str = args[0];
       if (!str) return '';
       return str[0].toUpperCase() + str.slice(1);
     `);
 
-    // titleCase(str) -> "Hello World" (each word)
     this.english.setMethod('titleCase', `
+      /** Convert a string to title case.
+       *  Usage: $.english.titleCase(str)
+       *  Small words (a, the, of, etc.) are not capitalized unless first/last.
+       *  @param str - The string
+       *  @example titleCase('the lord of the rings') -> "The Lord of the Rings"
+       */
       const str = args[0];
       if (!str) return '';
 
@@ -396,8 +436,14 @@ export class EnglishBuilder {
       }).join(' ');
     `);
 
-    // numberWord(n) -> "five", "twenty", or the number as string
     this.english.setMethod('numberWord', `
+      /** Convert a number to its word form (for 0-20).
+       *  Usage: $.english.numberWord(n)
+       *  @param n - The number
+       *  @example numberWord(5) -> "five"
+       *  @example numberWord(20) -> "twenty"
+       *  @example numberWord(42) -> "42"
+       */
       const n = args[0];
       const numberWords = self.numberWords || [];
 
@@ -408,12 +454,17 @@ export class EnglishBuilder {
       return String(n);
     `);
 
-    // conjugate(verb, person) -> conjugated verb
-    // person: 1 = I/we, 2 = you, 3 = he/she/it/they(singular)
-    // "walk", 3 -> "walks"
-    // "kiss", 3 -> "kisses"
-    // "be", 3 -> "is"
     this.english.setMethod('conjugate', `
+      /** Conjugate a verb for a given person.
+       *  Usage: $.english.conjugate(verb, person)
+       *  @param verb - The base verb
+       *  @param person - 1 (I/we), 2 (you), 3 (he/she/it). Default: 3
+       *  @example conjugate('walk', 3) -> "walks"
+       *  @example conjugate('kiss', 3) -> "kisses"
+       *  @example conjugate('cry', 3) -> "cries"
+       *  @example conjugate('be', 3) -> "is"
+       *  @example conjugate('have', 3) -> "has"
+       */
       const verb = args[0];
       const person = args[1] || 3; // Default to third person
 
@@ -456,12 +507,18 @@ export class EnglishBuilder {
       return verb + 's';
     `);
 
-    // pastTense(verb) -> past tense form
-    // "walk" -> "walked"
-    // "kiss" -> "kissed"
-    // "be" -> "was"
-    // "cry" -> "cried"
     this.english.setMethod('pastTense', `
+      /** Convert a verb to its past tense form.
+       *  Usage: $.english.pastTense(verb)
+       *  Handles irregular verbs and regular -ed endings.
+       *  @param verb - The base verb
+       *  @example pastTense('walk') -> "walked"
+       *  @example pastTense('kiss') -> "kissed"
+       *  @example pastTense('cry') -> "cried"
+       *  @example pastTense('stop') -> "stopped"
+       *  @example pastTense('be') -> "was"
+       *  @example pastTense('go') -> "went"
+       */
       const verb = args[0];
       if (!verb) return '';
 
@@ -497,11 +554,17 @@ export class EnglishBuilder {
       return verb + 'ed';
     `);
 
-    // presentParticiple(verb) -> "-ing" form
-    // "walk" -> "walking"
-    // "run" -> "running"
-    // "lie" -> "lying"
     this.english.setMethod('presentParticiple', `
+      /** Convert a verb to its present participle (-ing) form.
+       *  Usage: $.english.presentParticiple(verb)
+       *  Handles doubling consonants, dropping 'e', and special cases.
+       *  @param verb - The base verb
+       *  @example presentParticiple('walk') -> "walking"
+       *  @example presentParticiple('run') -> "running"
+       *  @example presentParticiple('make') -> "making"
+       *  @example presentParticiple('lie') -> "lying"
+       *  @example presentParticiple('be') -> "being"
+       */
       const verb = args[0];
       if (!verb) return '';
 
@@ -530,6 +593,96 @@ export class EnglishBuilder {
 
       // Default: add 'ing'
       return verb + 'ing';
+    `);
+
+    // Scramble text to simulate hearing loss
+    this.english.setMethod('scramble', `
+      /** Scramble text to simulate hearing loss/degradation.
+       *  Usage: $.english.scramble(text, amount)
+       *  At 0%, text is unchanged. At 100%, text is completely garbled.
+       *  Uses phonetically similar substitutions (b/p, m/n, s/sh, etc.)
+       *  @param text - The text to scramble
+       *  @param amount - 0-100, percentage of degradation
+       *  @example scramble('Hello there', 0) -> "Hello there"
+       *  @example scramble('Hello there', 50) -> "Heppo dere"
+       *  @example scramble('Hello there', 100) -> "Kebbo beve"
+       */
+      const text = args[0];
+      const amount = Math.max(0, Math.min(100, args[1] || 0));
+
+      if (!text || amount === 0) return text;
+
+      // Phonetically similar substitution pairs (confused when hearing is impaired)
+      // These represent sounds that are commonly confused with hearing loss
+      const confusions = {
+        // Voiced/unvoiced pairs
+        'b': 'p', 'p': 'b',
+        'd': 't', 't': 'd',
+        'g': 'k', 'k': 'g',
+        'v': 'f', 'f': 'v',
+        'z': 's', 's': 'z',
+        // Nasal confusions
+        'm': 'n', 'n': 'm',
+        // Sibilant confusions
+        'sh': 'ch', 'ch': 'sh',
+        'th': 'd',
+        // Liquid confusions
+        'l': 'r', 'r': 'l',
+        // High frequency sounds (lost first in hearing loss)
+        's': 'th', 'f': 'th',
+      };
+
+      // Higher confusion rates for higher amounts
+      const confusionRate = amount / 100;
+
+      let result = '';
+      let i = 0;
+
+      while (i < text.length) {
+        const char = text[i];
+        const lower = char.toLowerCase();
+
+        // Check for digraphs first (sh, ch, th)
+        if (i < text.length - 1) {
+          const digraph = text.slice(i, i + 2).toLowerCase();
+          if (confusions[digraph] && Math.random() < confusionRate) {
+            const replacement = confusions[digraph];
+            // Preserve case of first letter
+            if (char === char.toUpperCase()) {
+              result += replacement[0].toUpperCase() + replacement.slice(1);
+            } else {
+              result += replacement;
+            }
+            i += 2;
+            continue;
+          }
+        }
+
+        // Single character confusion
+        if (confusions[lower] && Math.random() < confusionRate) {
+          const replacement = confusions[lower];
+          // Preserve case
+          if (char === char.toUpperCase()) {
+            result += replacement.toUpperCase();
+          } else {
+            result += replacement;
+          }
+        } else {
+          result += char;
+        }
+        i++;
+      }
+
+      // At very high amounts, also drop some words entirely
+      if (amount > 80) {
+        const dropRate = (amount - 80) / 100; // 0-20% word drop rate
+        const words = result.split(' ');
+        result = words
+          .filter(() => Math.random() > dropRate)
+          .join(' ');
+      }
+
+      return result || '...';
     `);
   }
 

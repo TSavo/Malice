@@ -76,6 +76,8 @@ export class PlayerBuilder {
       await self.registerVerb(['help', 'help %s', '?', '? %s'], self, 'help');
       await self.registerVerb(['sleep', 'go to sleep'], self, 'sleep');
       await self.registerVerb(['wake', 'wake up'], self, 'wake');
+      await self.registerVerb(['watch', 'watch %i'], self, 'watchCommand');
+      await self.registerVerb(['unwatch %i', 'stop watching %i'], self, 'unwatchCommand');
 
       // If we have a location, move into it to trigger verb registration
       if (self.location && self.location !== 0) {

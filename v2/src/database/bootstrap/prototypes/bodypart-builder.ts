@@ -3,22 +3,29 @@ import type { RuntimeObject } from '../../../../types/object.js';
 
 /**
  * Builds the BodyPart prototype
- * Base prototype for body parts that make up a body
+ * Base prototype for body parts that make up a body.
+ * Inherits from Edible - severed body parts can be consumed (cannibalism).
  *
  * BodyParts:
- * - Are Describable (have name, description, can be looked at)
+ * - Are Edible (can be eaten when severed, provide calories based on mass)
+ * - Are Decayable (decay when severed, becoming rotten meat)
  * - Have an owner (the player/agent whose body this is part of)
  * - Can contain items (hands hold things, stomach contains food)
  * - Can have child parts (arm -> forearm -> hand -> fingers)
  * - Can be damaged, have conditions
  * - Can be coverable (clothing), removable (severed), critical (death if destroyed)
+ *
+ * Decay:
+ * - decayCondition: 'severed' - decay starts when severed from owner
+ * - decayRate: 2% per tick (body parts decay faster than preserved food)
+ * - Calories based on weight (meat ~2 kcal/gram)
  */
 export class BodyPartBuilder {
   constructor(private manager: ObjectManager) {}
 
-  async build(describableId: number): Promise<RuntimeObject> {
+  async build(edibleId: number): Promise<RuntimeObject> {
     const obj = await this.manager.create({
-      parent: describableId,
+      parent: edibleId,
       properties: {
         name: 'BodyPart',
         description: 'A body part',
@@ -29,27 +36,40 @@ export class BodyPartBuilder {
         removable: false, // Can be severed/detached
         critical: false, // Death if destroyed
         condition: {}, // { conditionName: severity } - injuries/status
+        // Decay overrides - body parts decay when severed
+        decayCondition: 'severed', // Only decay when severed
+        decayRate: 2, // Faster decay than preserved food (2% per tick)
+        // Edible overrides - meat is ~2 kcal/gram, set by weight
+        // calories will be calculated from weight in getCaloriesPerPortion override
+        portions: 4, // A body part is multiple portions
       },
       methods: {},
     });
 
-    // Override canContain - body parts can hold things
     obj.setMethod('canContain', `
+      /** Check if this body part can contain items.
+       *  Override in specific parts (e.g., Hand has limited capacity).
+       *  @returns true if can contain
+       */
       // By default, body parts can contain things
       // Override in specific parts (e.g., Hand has limited capacity)
       return true;
     `);
 
-    // Get the player/agent who owns this body part
     obj.setMethod('getOwner', `
+      /** Get the player/agent who owns this body part.
+       *  @returns The owner RuntimeObject or null
+       */
       if (self.owner) {
         return await $.load(self.owner);
       }
       return null;
     `);
 
-    // Set owner recursively for all child parts
     obj.setMethod('setOwner', `
+      /** Set owner recursively for all child parts.
+       *  @param ownerId - Owner ID or RuntimeObject
+       */
       const ownerId = args[0];
       self.owner = typeof ownerId === 'number' ? ownerId : ownerId?.id;
 
@@ -66,8 +86,11 @@ export class BodyPartBuilder {
       }
     `);
 
-    // Find a part by name (recursive)
     obj.setMethod('findPart', `
+      /** Find a part by name (recursive search).
+       *  @param name - Part name to find
+       *  @returns The found part or null
+       */
       const name = args[0]?.toLowerCase();
       if (!name) return null;
 
@@ -96,8 +119,10 @@ export class BodyPartBuilder {
       return null;
     `);
 
-    // Get a random part (for random targeting)
     obj.setMethod('randomPart', `
+      /** Get a random part (for random targeting).
+       *  @returns Random child part or self
+       */
       const parts = self.parts || {};
       const partNames = Object.keys(parts);
       if (partNames.length === 0) return self;
@@ -113,8 +138,10 @@ export class BodyPartBuilder {
       return self;
     `);
 
-    // Get all contents recursively (this part + all child parts)
     obj.setMethod('resolveAllContents', `
+      /** Get all contents recursively (this part + all child parts).
+       *  @returns Array of all object IDs
+       */
       let allContents = [...(self.contents || [])];
 
       const parts = self.parts || {};
@@ -132,8 +159,11 @@ export class BodyPartBuilder {
       return allContents;
     `);
 
-    // Build a map of all coverable parts (for clothing)
     obj.setMethod('coverageMap', `
+      /** Build a map of all coverable parts (for clothing).
+       *  @param map - Accumulator map (optional)
+       *  @returns Map of partName -> part
+       */
       const map = args[0] || {};
 
       if (self.coverable) {
@@ -154,8 +184,10 @@ export class BodyPartBuilder {
       return map;
     `);
 
-    // Check if this part can feel (tactile sense)
     obj.setMethod('canFeel', `
+      /** Check if this part can feel (tactile sense).
+       *  @returns true if can feel (not numb, destroyed, or severed)
+       */
       // Most body parts can feel by default
       const condition = self.condition || {};
       // Can't feel if numb, destroyed, or severed
@@ -165,9 +197,12 @@ export class BodyPartBuilder {
       return true;
     `);
 
-    // DELEGATION: feel() - process tactile input (touch, pain, temperature)
-    // Every body part can feel, and reports to owner
     obj.setMethod('feel', `
+      /** Process tactile input (touch, pain, temperature).
+       *  Reports sensation to owner.
+       *  @param sensation - Object with type, intensity, source
+       *  @returns Sensation report or null
+       */
       const sensation = args[0]; // { type: 'pain'|'touch'|'temperature', intensity, source }
 
       // Check if we can feel
@@ -191,12 +226,12 @@ export class BodyPartBuilder {
       return report;
     `);
 
-    // DAMAGE: takeDamage() - receive and process damage
-    // damage: { type: string, force: 0-100, breakChance: 0-1, bleedChance: 0-1 }
-    // type is freeform and includes severity (e.g. "severe bruise", "minor cut", "bullet hole")
-    // force determines bone break potential, breakChance/bleedChance are base probabilities
-    // Both bleeding and breaking scale with existing damage - weakened parts bleed/break easier
     obj.setMethod('takeDamage', `
+      /** Receive and process damage to this body part.
+       *  @param damage - Object with type, force (0-100), breakChance, bleedChance
+       *  @param attacker - Who/what caused the damage
+       *  @returns Object with part, type, bleeding, bonesBroken, description
+       */
       const damage = args[0];
       const attacker = args[1];
 
@@ -284,10 +319,11 @@ export class BodyPartBuilder {
       };
     `);
 
-    // Heal a wound by type, or heal a bone
-    // healWound(type) - heals oldest unhealed wound of that type
-    // healWound('bone') - heals oldest set broken bone
     obj.setMethod('heal', `
+      /** Heal a wound by type, or heal a set bone.
+       *  @param healType - Wound type to heal, or 'bone' for bones
+       *  @returns Object with part, type, healed item
+       */
       const healType = args[0];
       const condition = self.condition || {};
 
@@ -327,8 +363,11 @@ export class BodyPartBuilder {
       };
     `);
 
-    // Set a broken bone (required before healing)
     obj.setMethod('setBone', `
+      /** Set a broken bone (required before healing).
+       *  @param boneName - Optional specific bone to set
+       *  @returns Object with success, bone, message
+       */
       const boneName = args[0]; // optional - specific bone to set
       const condition = self.condition || {};
       const bones = condition.brokenBones || [];
@@ -355,8 +394,10 @@ export class BodyPartBuilder {
       return { success: false, message: 'No broken bone to set.' };
     `);
 
-    // Stop all bleeding wounds
     obj.setMethod('stopBleeding', `
+      /** Stop all bleeding wounds on this part.
+       *  @returns Object with stopped count and message
+       */
       const condition = self.condition || {};
       const wounds = condition.wounds || {};
       let stopped = 0;
@@ -379,13 +420,18 @@ export class BodyPartBuilder {
       };
     `);
 
-    // Is this part empty (no contents)
     obj.setMethod('isEmpty', `
+      /** Check if this part is empty (no contents).
+       *  @returns true if empty
+       */
       return (self.contents || []).length === 0;
     `);
 
-    // Add a child part
     obj.setMethod('addPart', `
+      /** Add a child part to this body part.
+       *  @param partName - Slot name for the part
+       *  @param partId - ID or RuntimeObject of the part
+       */
       const partName = args[0];
       const partId = args[1];
       const parts = self.parts || {};
@@ -401,8 +447,11 @@ export class BodyPartBuilder {
       }
     `);
 
-    // Get a specific child part by name
     obj.setMethod('getPart', `
+      /** Get a specific child part by name.
+       *  @param partName - Name of the part slot
+       *  @returns The part RuntimeObject or null
+       */
       const partName = args[0];
       const parts = self.parts || {};
       const partId = parts[partName];
@@ -412,8 +461,11 @@ export class BodyPartBuilder {
       return null;
     `);
 
-    // Remove a child part by name (internal, doesn't handle consequences)
     obj.setMethod('removePart', `
+      /** Remove a child part by name (internal, doesn't handle consequences).
+       *  @param partName - Name of the part slot
+       *  @returns The removed part ID or null
+       */
       const partName = args[0];
       const parts = self.parts || {};
       const partId = parts[partName];
@@ -425,11 +477,13 @@ export class BodyPartBuilder {
       return null;
     `);
 
-    // Amputate a child part - severs it from this body part
-    // The severed part (with all its sub-parts) drops to the ground
-    // Uses player.tell(), player.hear(), bodyPart.feel() for multi-perspective messaging
-    // Everyone SEEs (tell) the amputation, HEARs the sound, victim FEELs the pain
     obj.setMethod('amputate', `
+      /** Amputate a child part - severs it from this body part.
+       *  The severed part drops to the ground.
+       *  @param partName - Name of the part to amputate
+       *  @param amputator - Who/what is doing the amputation
+       *  @returns Object with success, part, victim, amputator or error
+       */
       const partName = args[0];
       const amputator = args[1]; // Who/what is doing the amputation
 
@@ -521,8 +575,12 @@ export class BodyPartBuilder {
       };
     `);
 
-    // Reattach a previously severed part
     obj.setMethod('reattach', `
+      /** Reattach a previously severed part.
+       *  @param part - The part RuntimeObject to reattach
+       *  @param partName - The slot name (e.g., 'leftArm')
+       *  @returns Object with part, message or error
+       */
       const part = args[0]; // The part object to reattach
       const partName = args[1]; // The slot name (e.g., 'leftArm')
 
@@ -561,9 +619,13 @@ export class BodyPartBuilder {
       };
     `);
 
-    // When something arrives in this body part (e.g., item placed in hand)
-    // Register verbs on the owner
     obj.setMethod('onContentArrived', `
+      /** Called when something arrives in this body part.
+       *  Registers verbs on the owner.
+       *  @param obj - The arriving object
+       *  @param source - Where it came from
+       *  @param mover - Who moved it
+       */
       const obj = args[0];
       const source = args[1];
       const mover = args[2];
@@ -688,6 +750,40 @@ export class BodyPartBuilder {
       }
 
       return desc;
+    `);
+
+    // Override getCaloriesPerPortion - body parts calculate calories from weight
+    // Meat is approximately 2 kcal/gram (accounting for bones, non-edible parts)
+    obj.setMethod('getCaloriesPerPortion', `
+      /** Calculate calories per portion based on body part weight.
+       *  Uses meat calorie density (~2 kcal/g) adjusted for decay.
+       *  Body parts are only edible when severed.
+       *  @returns Calories (adjusted for decay, can be negative if rotten)
+       */
+      const condition = self.condition || {};
+      if (!condition.severed) {
+        return 0; // Can't eat an attached body part
+      }
+
+      // Calculate base calories from weight (meat ~2 kcal/gram)
+      const weight = self.weight || 500; // Default 500g
+      const totalCal = weight * 2; // 2 kcal per gram
+      const totalPortions = self.portions || 4;
+      const baseCal = Math.ceil(totalCal / totalPortions);
+
+      // Apply decay penalty (inherited from Edible logic)
+      const decayLevel = self.decayLevel || 0;
+      const decayMultiplier = 1 - (decayLevel / 50);
+      return Math.round(baseCal * decayMultiplier);
+    `);
+
+    // Override shouldDecay - only decay when severed from owner
+    obj.setMethod('shouldDecay', `
+      /** Body parts only decay when severed.
+       *  Attached body parts don't decay (maintained by living body).
+       */
+      const condition = self.condition || {};
+      return condition.severed === true || self.owner === null || self.owner === 0;
     `);
 
     return obj;

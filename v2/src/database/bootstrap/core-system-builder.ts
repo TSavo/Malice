@@ -10,6 +10,7 @@ import { RoomBuilder } from './room-builder.js';
 import { BodyFactoryBuilder } from './body-factory-builder.js';
 import { PromptBuilder } from './prompt-builder.js';
 import { SchedulerBuilder } from './scheduler-builder.js';
+import { EmoteBuilder } from './emote-builder.js';
 
 /**
  * Orchestrates building all core system objects
@@ -26,6 +27,7 @@ import { SchedulerBuilder } from './scheduler-builder.js';
  * - BodyFactory ($.bodyFactory): Creates human bodies
  * - Prompt ($.prompt): Interactive prompt system
  * - Scheduler ($.scheduler): Global job scheduler for periodic tasks
+ * - Emote ($.emote): Freeform emote parsing and formatting
  */
 export class CoreSystemBuilder {
   constructor(private manager: ObjectManager) {}
@@ -45,6 +47,7 @@ export class CoreSystemBuilder {
     const bodyFactoryBuilder = new BodyFactoryBuilder(this.manager);
     const promptBuilder = new PromptBuilder(this.manager);
     const schedulerBuilder = new SchedulerBuilder(this.manager);
+    const emoteBuilder = new EmoteBuilder(this.manager);
 
     await authManagerBuilder.build();
     await charGenBuilder.build();
@@ -57,6 +60,7 @@ export class CoreSystemBuilder {
     await bodyFactoryBuilder.build();
     await promptBuilder.build();
     await schedulerBuilder.build();
+    await emoteBuilder.build();
 
     // Register aliases
     await authManagerBuilder.registerAlias();
@@ -70,5 +74,6 @@ export class CoreSystemBuilder {
     await bodyFactoryBuilder.registerAlias();
     await promptBuilder.registerAlias();
     await schedulerBuilder.registerAlias();
+    await emoteBuilder.registerAlias();
   }
 }

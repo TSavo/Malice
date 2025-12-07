@@ -239,6 +239,54 @@ export class SchedulerBuilder {
       }
     `);
 
+    // Decay tick - process decay for all decayable objects
+    // Called periodically (every game minute) to update decay levels
+    this.scheduler.setMethod('decayTick', `
+      /** Process decay for all objects that inherit from Decayable.
+       *  Iterates through all objects and calls decayTick() on those
+       *  that have the method (i.e., inherit from Decayable).
+       *  @returns {processed: number, decayed: number, destroyed: number}
+       */
+      let processed = 0;
+      let decayed = 0;
+      let destroyed = 0;
+
+      // Get the decayable prototype ID from aliases
+      const aliases = $.aliases || {};
+      const decayableId = aliases.decayable;
+      if (!decayableId) {
+        return { error: 'Decayable prototype not found in aliases' };
+      }
+
+      // Iterate all objects - use $.objectManager to iterate
+      // This is expensive, so we rely on shouldDecay() to skip most objects
+      const allIds = await $.objectManager.getAllIds();
+
+      for (const id of allIds) {
+        const obj = await $.load(id);
+        if (!obj) continue;
+
+        // Check if object has decayTick method (inherits from Decayable)
+        if (obj.decayTick) {
+          processed++;
+          try {
+            const result = await obj.decayTick();
+            if (result && result.decayed > 0) {
+              decayed++;
+            }
+            if (result && result.destroyed) {
+              destroyed++;
+            }
+          } catch (err) {
+            // Log but don't stop processing
+            console.log('Decay error on #' + id + ': ' + String(err));
+          }
+        }
+      }
+
+      return { processed, decayed, destroyed };
+    `);
+
     // Describe scheduler state
     this.scheduler.setMethod('describe', `
       const jobs = self.jobs || {};
@@ -290,25 +338,41 @@ export class SchedulerBuilder {
     if (!this.scheduler) return;
 
     const jobs = (this.scheduler.get('jobs') as Record<string, unknown>) || {};
+    const systemId = aliases.system || 2;
+    let modified = false;
 
-    // Only register if not already present
+    // Player heartbeat - every 60 seconds
     if (!jobs.playerHeartbeat) {
-      const systemId = aliases.system || 2;
-
-      // Schedule player heartbeat every 60 seconds (first run in 60s)
-      this.scheduler.set('jobs', {
-        ...jobs,
-        playerHeartbeat: {
-          interval: 60000, // 1 minute repeat
-          nextRun: Date.now() + 60000, // first run in 60s
-          targetId: systemId,
-          method: 'tickAllPlayers',
-          args: [],
-          enabled: true,
-        },
-      });
-
+      (jobs as Record<string, unknown>).playerHeartbeat = {
+        interval: 60000, // 1 minute repeat
+        nextRun: Date.now() + 60000, // first run in 60s
+        targetId: systemId,
+        method: 'tickAllPlayers',
+        args: [],
+        enabled: true,
+      };
+      modified = true;
       console.log('✅ Registered playerHeartbeat job (every 60s)');
+    }
+
+    // Decay tick - every 60 seconds (1 game minute)
+    // Processes all decayable objects (food, drinks, severed body parts)
+    if (!jobs.decayTick) {
+      (jobs as Record<string, unknown>).decayTick = {
+        interval: 60000, // 1 minute repeat (1 tick = 1 game minute)
+        nextRun: Date.now() + 60000, // first run in 60s
+        targetId: this.scheduler.id, // scheduler calls itself
+        method: 'decayTick',
+        args: [],
+        enabled: true,
+      };
+      modified = true;
+      console.log('✅ Registered decayTick job (every 60s)');
+    }
+
+    if (modified) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      this.scheduler.set('jobs', jobs as any);
     }
   }
 }
