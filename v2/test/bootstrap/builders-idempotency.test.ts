@@ -60,7 +60,7 @@ describe('Bootstrap Builders Idempotency', () => {
 
       // Verify only one AuthManager exists in database
       const allObjects = await db.listAll();
-      const authManagers = allObjects.filter(obj => obj.properties.name === 'AuthManager');
+      const authManagers = allObjects.filter(obj => (obj.properties.name?.value || obj.properties.name) === 'AuthManager');
       expect(authManagers.length).toBe(1);
       expect(authManagers[0]._id).toBe(firstAuthManagerId);
     });
@@ -83,7 +83,7 @@ describe('Bootstrap Builders Idempotency', () => {
 
       // Verify object count hasn't changed
       const allObjects = await db.listAll();
-      const authManagers = allObjects.filter(obj => obj.properties.name === 'AuthManager');
+      const authManagers = allObjects.filter(obj => (obj.properties.name?.value || obj.properties.name) === 'AuthManager');
       expect(authManagers.length).toBe(1);
       expect(authManagers[0]._id).toBe(authManagerId);
     });
@@ -118,7 +118,7 @@ describe('Bootstrap Builders Idempotency', () => {
 
       // Verify only one CharGen exists in database
       const allObjects = await db.listAll();
-      const charGens = allObjects.filter(obj => obj.properties.name === 'CharGen');
+      const charGens = allObjects.filter(obj => (obj.properties.name?.value || obj.properties.name) === 'CharGen');
       expect(charGens.length).toBe(1);
       expect(charGens[0]._id).toBe(firstCharGenId);
     });
@@ -141,7 +141,7 @@ describe('Bootstrap Builders Idempotency', () => {
 
       // Verify object count hasn't changed
       const allObjects = await db.listAll();
-      const charGens = allObjects.filter(obj => obj.properties.name === 'CharGen');
+      const charGens = allObjects.filter(obj => (obj.properties.name?.value || obj.properties.name) === 'CharGen');
       expect(charGens.length).toBe(1);
       expect(charGens[0]._id).toBe(charGenId);
     });
@@ -176,7 +176,7 @@ describe('Bootstrap Builders Idempotency', () => {
 
       // Verify only one PreAuthHandler exists in database
       const allObjects = await db.listAll();
-      const preAuthHandlers = allObjects.filter(obj => obj.properties.name === 'PreAuthHandler');
+      const preAuthHandlers = allObjects.filter(obj => (obj.properties.name?.value || obj.properties.name) === 'PreAuthHandler');
       expect(preAuthHandlers.length).toBe(1);
       expect(preAuthHandlers[0]._id).toBe(firstPreAuthHandlerId);
     });
@@ -199,7 +199,7 @@ describe('Bootstrap Builders Idempotency', () => {
 
       // Verify object count hasn't changed
       const allObjects = await db.listAll();
-      const preAuthHandlers = allObjects.filter(obj => obj.properties.name === 'PreAuthHandler');
+      const preAuthHandlers = allObjects.filter(obj => (obj.properties.name?.value || obj.properties.name) === 'PreAuthHandler');
       expect(preAuthHandlers.length).toBe(1);
       expect(preAuthHandlers[0]._id).toBe(preAuthHandlerId);
     });
@@ -234,7 +234,7 @@ describe('Bootstrap Builders Idempotency', () => {
 
       // Verify only one Recycler exists in database
       const allObjects = await db.listAll();
-      const recyclers = allObjects.filter(obj => obj.properties.name === 'Recycler');
+      const recyclers = allObjects.filter(obj => (obj.properties.name?.value || obj.properties.name) === 'Recycler');
       expect(recyclers.length).toBe(1);
       expect(recyclers[0]._id).toBe(firstRecyclerId);
     });
@@ -257,7 +257,7 @@ describe('Bootstrap Builders Idempotency', () => {
 
       // Verify object count hasn't changed
       const allObjects = await db.listAll();
-      const recyclers = allObjects.filter(obj => obj.properties.name === 'Recycler');
+      const recyclers = allObjects.filter(obj => (obj.properties.name?.value || obj.properties.name) === 'Recycler');
       expect(recyclers.length).toBe(1);
       expect(recyclers[0]._id).toBe(recyclerId);
     });
@@ -309,10 +309,10 @@ describe('Bootstrap Builders Idempotency', () => {
 
       // Verify object counts
       const allObjects = await db.listAll();
-      const authManagers = allObjects.filter(obj => obj.properties.name === 'AuthManager');
-      const charGens = allObjects.filter(obj => obj.properties.name === 'CharGen');
-      const preAuthHandlers = allObjects.filter(obj => obj.properties.name === 'PreAuthHandler');
-      const recyclers = allObjects.filter(obj => obj.properties.name === 'Recycler');
+      const authManagers = allObjects.filter(obj => (obj.properties.name?.value || obj.properties.name) === 'AuthManager');
+      const charGens = allObjects.filter(obj => (obj.properties.name?.value || obj.properties.name) === 'CharGen');
+      const preAuthHandlers = allObjects.filter(obj => (obj.properties.name?.value || obj.properties.name) === 'PreAuthHandler');
+      const recyclers = allObjects.filter(obj => (obj.properties.name?.value || obj.properties.name) === 'Recycler');
 
       expect(authManagers.length).toBe(1);
       expect(charGens.length).toBe(1);
@@ -338,8 +338,8 @@ describe('Bootstrap Builders Idempotency', () => {
 
       // Verify no duplicates
       const allObjects = await db.listAll();
-      const authManagers = allObjects.filter(obj => obj.properties.name === 'AuthManager');
-      const charGens = allObjects.filter(obj => obj.properties.name === 'CharGen');
+      const authManagers = allObjects.filter(obj => (obj.properties.name?.value || obj.properties.name) === 'AuthManager');
+      const charGens = allObjects.filter(obj => (obj.properties.name?.value || obj.properties.name) === 'CharGen');
 
       expect(authManagers.length).toBe(1);
       expect(charGens.length).toBe(1);
@@ -379,7 +379,7 @@ describe('Bootstrap Builders Idempotency', () => {
 
       // Verify a new object was created
       const allObjects = await db.listAll();
-      const authManagers = allObjects.filter(obj => obj.properties.name === 'AuthManager');
+      const authManagers = allObjects.filter(obj => (obj.properties.name?.value || obj.properties.name) === 'AuthManager');
       expect(authManagers.length).toBe(1);
 
       const objectManager2 = await manager.load(0);
@@ -406,7 +406,7 @@ describe('Bootstrap Builders Idempotency', () => {
       await builder.registerAlias();
 
       const allObjects = await db.listAll();
-      const authManagers = allObjects.filter(obj => obj.properties.name === 'AuthManager');
+      const authManagers = allObjects.filter(obj => (obj.properties.name?.value || obj.properties.name) === 'AuthManager');
       expect(authManagers.length).toBe(1);
     });
 
@@ -463,10 +463,10 @@ describe('Bootstrap Builders Idempotency', () => {
 
       // Verify no duplicates
       const allObjects = await db.listAll();
-      expect(allObjects.filter(obj => obj.properties.name === 'AuthManager').length).toBe(1);
-      expect(allObjects.filter(obj => obj.properties.name === 'CharGen').length).toBe(1);
-      expect(allObjects.filter(obj => obj.properties.name === 'PreAuthHandler').length).toBe(1);
-      expect(allObjects.filter(obj => obj.properties.name === 'Recycler').length).toBe(1);
+      expect(allObjects.filter(obj => (obj.properties.name?.value || obj.properties.name) === 'AuthManager').length).toBe(1);
+      expect(allObjects.filter(obj => (obj.properties.name?.value || obj.properties.name) === 'CharGen').length).toBe(1);
+      expect(allObjects.filter(obj => (obj.properties.name?.value || obj.properties.name) === 'PreAuthHandler').length).toBe(1);
+      expect(allObjects.filter(obj => (obj.properties.name?.value || obj.properties.name) === 'Recycler').length).toBe(1);
     });
   });
 });

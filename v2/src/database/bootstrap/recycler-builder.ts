@@ -1,5 +1,5 @@
 import { ObjectManager } from '../object-manager.js';
-import type { RuntimeObject } from '../../types/object.js';
+import type { RuntimeObject } from '../../../types/object.js';
 
 /**
  * Builds Recycler object (dynamic ID)
@@ -94,11 +94,14 @@ export class RecyclerBuilder {
         `);
 
     this.recycler.setMethod('recycle', `
-          const objectId = args[0];
+          const objectOrId = args[0];
           const caller = args[1];
 
+          // Accept either object or ID
+          const objectId = typeof objectOrId === 'number' ? objectOrId : objectOrId.id;
+
           // Load the object
-          const obj = await $.load(objectId);
+          const obj = typeof objectOrId === 'number' ? await $.load(objectId) : objectOrId;
           if (!obj) {
             throw new Error('Object not found');
           }
@@ -128,7 +131,6 @@ export class RecyclerBuilder {
             data: obj.properties
           });
           self.recycleBin = bin;
-          await self.save();
 
           // Mark as deleted in database
           await $.db.update(objectId, {
@@ -180,10 +182,33 @@ export class RecyclerBuilder {
           // Remove from bin
           bin.splice(index, 1);
           self.recycleBin = bin;
-          await self.save();
 
           console.log(\`Restored object #\${objectId}\`);
         `);
+
+    // Recursively recycle an object and all nested parts (for body trees)
+    this.recycler.setMethod('recycleTree', `
+      const objectId = args[0];
+      const caller = args[1];
+
+      const obj = await $.load(objectId);
+      if (!obj) return;
+
+      // Recursively delete all parts first
+      const parts = obj.parts || {};
+      for (const key of Object.keys(parts)) {
+        await self.recycleTree(parts[key], caller);
+      }
+
+      // Also check contents
+      const contents = obj.contents || [];
+      for (const childId of contents) {
+        await self.recycleTree(childId, caller);
+      }
+
+      // Now recycle this object
+      await self.recycle(objectId, caller);
+    `);
 
     this.recycler.setMethod('purge', `
           const objectId = args[0];
@@ -207,13 +232,10 @@ export class RecyclerBuilder {
           if (index !== -1) {
             bin.splice(index, 1);
             self.recycleBin = bin;
-            await self.save();
           }
 
           console.log(\`Purged object #\${objectId}\`);
         `);
-
-    await this.recycler.save();
   }
 
   async registerAlias(): Promise<void> {
@@ -225,7 +247,6 @@ export class RecyclerBuilder {
     const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
     aliases.recycler = this.recycler.id;
     objectManager.set('aliases', aliases);
-    await objectManager.save();
 
     console.log(`✅ Registered recycler alias -> #${this.recycler.id}`);
   }

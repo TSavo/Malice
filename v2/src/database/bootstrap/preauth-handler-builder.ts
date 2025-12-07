@@ -1,5 +1,5 @@
 import { ObjectManager } from '../object-manager.js';
-import type { RuntimeObject } from '../../types/object.js';
+import type { RuntimeObject } from '../../../types/object.js';
 
 /**
  * Builds PreAuthHandler object (dynamic ID)
@@ -198,8 +198,6 @@ export class PreAuthHandlerBuilder {
           context.send('Custom authentication not yet implemented\\\\r\\\\n');
           context.close();
         `);
-
-    await this.preAuthHandler.save();
   }
 
   async registerAlias(): Promise<void> {
@@ -211,7 +209,6 @@ export class PreAuthHandlerBuilder {
     const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
     aliases.preAuthHandler = this.preAuthHandler.id;
     objectManager.set('aliases', aliases);
-    await objectManager.save();
 
     console.log(`✅ Registered preAuthHandler alias -> #${this.preAuthHandler.id}`);
   }

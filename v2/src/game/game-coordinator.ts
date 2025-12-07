@@ -12,6 +12,7 @@ export class GameCoordinator {
   private manager: ObjectManager;
   private connections: ConnectionManager;
   private contexts = new Map<string, ConnectionContext>();
+  private schedulerInterval: ReturnType<typeof setInterval> | null = null;
 
   constructor(mongoUri: string, dbName = 'malice') {
     this.db = new ObjectDatabase(mongoUri, dbName);
@@ -41,6 +42,42 @@ export class GameCoordinator {
     // Preload critical objects into cache
     await this.manager.preload([1, 2, 3, 4]); // Root, System, Auth, CharGen
     console.log('✅ Core objects cached');
+
+    // Start scheduler tick loop (every second)
+    this.startScheduler();
+  }
+
+  /**
+   * Start the scheduler tick loop
+   * Calls $.scheduler.tick() every second to run due jobs
+   */
+  private startScheduler(): void {
+    if (this.schedulerInterval) return;
+
+    this.schedulerInterval = setInterval(async () => {
+      try {
+        const scheduler = (this.manager as any).scheduler;
+        if (scheduler?.tick) {
+          await scheduler.call('tick');
+        }
+      } catch (err) {
+        // Log but don't crash - scheduler errors shouldn't bring down the server
+        console.error('Scheduler tick error:', err);
+      }
+    }, 1000);
+
+    console.log('✅ Scheduler tick loop started (1s interval)');
+  }
+
+  /**
+   * Stop the scheduler tick loop
+   */
+  private stopScheduler(): void {
+    if (this.schedulerInterval) {
+      clearInterval(this.schedulerInterval);
+      this.schedulerInterval = null;
+      console.log('🛑 Scheduler tick loop stopped');
+    }
   }
 
   /**
@@ -96,6 +133,7 @@ export class GameCoordinator {
    */
   async shutdown(): Promise<void> {
     console.log('🛑 Shutting down game system...');
+    this.stopScheduler();
     this.connections.closeAll();
     await this.db.disconnect();
     console.log('✅ Shutdown complete');

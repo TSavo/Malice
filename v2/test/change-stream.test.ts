@@ -54,9 +54,9 @@ describe('MongoDB Change Stream Cache Invalidation', () => {
     // Verify Server 2 has it cached
     expect(manager2.getCacheSize()).toBeGreaterThan(0);
 
-    // Server 1: Modify the object directly in database
+    // Server 1: Modify the object directly in database (properties are typed Values)
     await db1.update(id, {
-      properties: { hp: 50 },
+      properties: { hp: { type: 'number', value: 50 } },
     });
 
     // Wait for change stream to propagate
@@ -118,14 +118,17 @@ describe('MongoDB Change Stream Cache Invalidation', () => {
       methods: {},
     });
 
-    // Server 1: Modify object A
+    // Wait for write tracking to clear (trackWrite has 2 second timeout)
+    await new Promise((resolve) => setTimeout(resolve, 2100));
+
+    // Server 1: Modify object A (properties are typed Values)
     const updatePromise1 = db1.update(obj1.id, {
-      properties: { name: 'Object A Modified' },
+      properties: { name: { type: 'string', value: 'Object A Modified' } },
     });
 
-    // Server 2: Modify object B (at the same time)
+    // Server 2: Modify object B (at the same time, properties are typed Values)
     const updatePromise2 = db2.update(obj2.id, {
-      properties: { name: 'Object B Modified' },
+      properties: { name: { type: 'string', value: 'Object B Modified' } },
     });
 
     // Wait for both updates to complete

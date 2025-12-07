@@ -520,10 +520,10 @@ describe('RuntimeObject', () => {
 
   describe('refresh()', () => {
     it('should reload object from database', async () => {
-      // Modify object in database directly
+      // Modify object in database directly (properties are now typed Values)
       await db['objects'].updateOne(
         { _id: testObj.id },
-        { $set: { 'properties.hp': 999 } }
+        { $set: { 'properties.hp': { type: 'number', value: 999 } } }
       );
 
       // Invalidate cache so refresh loads from DB
@@ -557,12 +557,17 @@ describe('RuntimeObject', () => {
     });
 
     it('should load latest properties', async () => {
+      // With auto-persist, local changes are immediately saved
+      // This test verifies that refresh reloads from database correctly
       testObj.set('local', 'local value');
 
-      // Modify in database
+      // Wait for auto-persist to complete
+      await new Promise(resolve => setTimeout(resolve, 50));
+
+      // Modify in database directly (bypassing auto-persist)
       await db['objects'].updateOne(
         { _id: testObj.id },
-        { $set: { 'properties.db': 'db value' } }
+        { $set: { 'properties.db': { type: 'string', value: 'db value' } } }
       );
 
       // Invalidate cache so refresh loads from DB
@@ -570,15 +575,19 @@ describe('RuntimeObject', () => {
 
       await testObj.refresh();
 
-      // Should have db value, lose local changes
+      // Should have both - local was auto-persisted, db was added directly
       expect(testObj.get('db')).toBe('db value');
-      expect(testObj.get('local')).toBeUndefined();
+      expect(testObj.get('local')).toBe('local value');
     });
 
     it('should load latest methods', async () => {
+      // With auto-persist, method changes are immediately saved
       testObj.setMethod('localMethod', 'return "local";');
 
-      // Add method in database
+      // Wait for auto-persist to complete
+      await new Promise(resolve => setTimeout(resolve, 50));
+
+      // Add method in database directly
       await db['objects'].updateOne(
         { _id: testObj.id },
         {
@@ -595,9 +604,9 @@ describe('RuntimeObject', () => {
 
       await testObj.refresh();
 
-      // Should have db method, lose local changes
+      // Should have both - localMethod was auto-persisted, dbMethod was added directly
       expect(testObj.hasMethod('dbMethod')).toBe(true);
-      expect(testObj.hasMethod('localMethod')).toBe(false);
+      expect(testObj.hasMethod('localMethod')).toBe(true);
     });
 
     it('should handle refresh when object does not exist', async () => {
@@ -631,15 +640,15 @@ describe('RuntimeObject', () => {
       expect('method' in (methods || {})).toBe(true);
     });
 
-    it('should store method code incorrectly (documents bug)', () => {
-      // addMethod has a bug - it assigns the code string directly instead of wrapping it
+    it('should store method code correctly as Method object', () => {
+      // addMethod now correctly wraps code in a Method object
       const code = 'return "test";';
-      (testObj as any).addMethod('buggyMethod', code);
+      (testObj as any).addMethod('newMethod', code);
 
       const raw = (testObj as any)._getRaw();
-      // Bug: methods[name] should be { code: string } but is just string
-      expect(typeof raw.methods.buggyMethod).toBe('string');
-      expect(raw.methods.buggyMethod).toBe(code);
+      // Now correctly stores as { code: string }
+      expect(typeof raw.methods.newMethod).toBe('object');
+      expect(raw.methods.newMethod.code).toBe(code);
     });
 
     it('should use setMethod instead for proper method adding', async () => {
@@ -730,7 +739,8 @@ describe('RuntimeObject', () => {
     it('should include all GameObject fields', () => {
       const raw = (testObj as any)._getRaw() as GameObject;
 
-      expect(raw.properties).toEqual({
+      // Use getOwnProperties() for resolved values
+      expect(testObj.getOwnProperties()).toEqual({
         name: 'Test Object',
         hp: 100,
         mana: 50,
@@ -742,9 +752,8 @@ describe('RuntimeObject', () => {
     it('should reflect current state', () => {
       testObj.set('newProp', 'value');
 
-      const raw = (testObj as any)._getRaw() as GameObject;
-
-      expect(raw.properties.newProp).toBe('value');
+      // Use public API instead of _getRaw()
+      expect(testObj.get('newProp')).toBe('value');
     });
   });
 

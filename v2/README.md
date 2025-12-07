@@ -171,25 +171,47 @@ Objects inherit properties and methods from their parent:
 
 #### 3. In-Database Programming
 
-All game logic lives as methods in MongoDB, not in TypeScript:
+All game logic lives as methods in MongoDB, written in TypeScript:
 
 ```typescript
-// TypeScript is just infrastructure
-const system = await $.system;
-await system.call('onConnection', context);
+// Method code has access to these variables:
+// - self: The current object (proxied for direct property access)
+// - $: ObjectManager for accessing other objects
+// - args: Arguments passed to the method
+// - context: Connection context (if called from player action)
+// - player: The player who triggered this
 
-// Game logic is in MongoDB:
+// Access objects by ID with $N syntax:
+const room = $.50;           // Get object #50
+await $.4.describe();        // Call method on #4
+
+// Or use registered aliases:
+const system = $.system;     // System object
+const auth = $.authManager;  // AuthManager object
+
+// Direct property access on self:
+self.hp = 100;               // Set property (auto-saves)
+const name = self.name;      // Get property
+
+// Call methods:
+await self.call('describe');
+await target.moveTo(room);
+```
+
+Example method stored in MongoDB:
+```typescript
 {
   _id: 2,
   methods: {
     onConnection: `
-      const context = args[0];
-      const authManager = await $.authManager;
-      await authManager.call('onConnect', context);
+      const ctx = args[0];
+      await $.authManager.call('onConnect', ctx);
     `
   }
 }
 ```
+
+See [**MOO-PROGRAMMING.md**](./MOO-PROGRAMMING.md) for the complete guide.
 
 #### 4. Multi-Server Architecture
 
@@ -244,6 +266,7 @@ v2/
 ## Documentation
 
 ### Core Concepts
+- [**MOO-PROGRAMMING.md**](./MOO-PROGRAMMING.md) - **How to write MOO code** (methods, `$`, `self`, properties)
 - [**OBJECT-SYSTEM.md**](./OBJECT-SYSTEM.md) - Object model, inheritance, methods
 - [**OBJECT-HIERARCHY.md**](./OBJECT-HIERARCHY.md) - Complete object tree
 

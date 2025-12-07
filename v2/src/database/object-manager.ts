@@ -1,6 +1,7 @@
 import { ObjectDatabase } from './object-db.js';
 import { RuntimeObjectImpl } from './runtime-object.js';
 import { ObjectCache } from './object-cache.js';
+import * as bcrypt from 'bcrypt';
 import type {
   GameObject,
   ObjId,
@@ -32,6 +33,9 @@ export class ObjectManager {
   private cache: ObjectCache;
   private aliases = new Map<string, RuntimeObject>();
   public readonly db: ObjectDatabase; // Expose for DevTools direct access
+
+  // Track our own writes to avoid invalidating cache for them
+  private pendingWrites = new Map<ObjId, NodeJS.Timeout>();
 
   constructor(db: ObjectDatabase) {
     this.db = db;
@@ -95,16 +99,24 @@ export class ObjectManager {
       // Load or create #-1 in database
       let obj = await this.db.get(-1);
       if (!obj) {
-        // Create #-1 as immutable null object
+        // Create #-1 as immutable null object with empty properties
         obj = await this.db.create({
           _id: -1,
           parent: -1, // Self-parented
-          properties: {
-            name: 'nothing',
-            description: 'The null object reference - immutable, no properties or methods',
-          },
+          properties: {},
           methods: {},
         });
+
+        // Wrap as RuntimeObject and cache THE PROXY
+        const runtime = new RuntimeObjectImpl(obj, this);
+        const proxy = runtime.getProxy();
+        this.cache.setObject(-1, proxy);
+
+        // Set properties through proxy to auto-convert to typed Values
+        proxy.set('name', 'nothing');
+        proxy.set('description', 'The null object reference - immutable, no properties or methods');
+
+        return proxy;
       }
 
       // Wrap as RuntimeObject and cache THE PROXY
@@ -125,17 +137,25 @@ export class ObjectManager {
       // Load or create #0 in database
       let obj = await this.db.get(0);
       if (!obj) {
-        // Create #0 on first access
+        // Create #0 on first access with empty properties
         obj = await this.db.create({
           _id: 0,
           parent: 0, // Self-parented
-          properties: {
-            name: 'ObjectManager',
-            description: 'The root system object - provides object management and global aliases',
-            aliases: {}, // Global alias registry
-          },
+          properties: {},
           methods: {},
         });
+
+        // Wrap ourselves as a RuntimeObject and cache THE PROXY
+        const runtime = new RuntimeObjectImpl(obj, this);
+        const proxy = runtime.getProxy();
+        this.cache.setObject(0, proxy);
+
+        // Set properties through proxy to auto-convert to typed Values
+        proxy.set('name', 'ObjectManager');
+        proxy.set('description', 'The root system object - provides object management and global aliases');
+        proxy.set('aliases', {});
+
+        return proxy;
       }
 
       // Wrap ourselves as a RuntimeObject and cache THE PROXY
@@ -175,30 +195,65 @@ export class ObjectManager {
   async create(params: CreateObjectParams): Promise<RuntimeObject> {
     const id = await this.db.getNextId();
 
+    // Create object with empty properties first
     const obj = await this.db.create({
       _id: id,
       parent: params.parent,
-      properties: params.properties || {},
+      properties: {},
       methods: params.methods || {},
     });
 
     const runtime = new RuntimeObjectImpl(obj, this);
     const proxy = runtime.getProxy();
     this.cache.setObject(id, proxy);
+
+    // Set properties through RuntimeObject to auto-convert to typed Values
+    if (params.properties) {
+      for (const [key, value] of Object.entries(params.properties)) {
+        proxy.set(key, value);
+      }
+    }
+
     return proxy;
   }
 
   /**
    * Update object in database
+   * @param invalidateCache - Whether to invalidate cache after update (default: true)
+   *   Set to false when called by RuntimeObject's auto-persist (in-memory is source of truth)
+   *   Set to true for external updates (DevTools, tests, etc)
    */
   async update(
     id: ObjId,
-    updates: Partial<Omit<GameObject, '_id' | 'created'>>
+    updates: Partial<Omit<GameObject, '_id' | 'created'>>,
+    invalidateCache = true
   ): Promise<void> {
+    // Track this write as ours so change stream doesn't invalidate it
+    this.trackWrite(id);
+
     await this.db.update(id, updates);
 
-    // Invalidate cache entry to force reload (object, methods, parent chains)
-    this.cache.invalidate(id);
+    if (invalidateCache) {
+      this.cache.invalidate(id);
+    }
+  }
+
+  /**
+   * Track a write as belonging to this session
+   * Change stream will ignore changes to tracked writes
+   */
+  private trackWrite(id: ObjId): void {
+    // Clear existing timeout if present
+    if (this.pendingWrites.has(id)) {
+      clearTimeout(this.pendingWrites.get(id)!);
+    }
+
+    // Track this write for 2 seconds (change streams are usually fast)
+    const timeout = setTimeout(() => {
+      this.pendingWrites.delete(id);
+    }, 2000);
+
+    this.pendingWrites.set(id, timeout);
   }
 
   /**
@@ -360,6 +415,49 @@ export class ObjectManager {
   }
 
   /**
+   * Evict object from cache (for recycler to use)
+   * Does not reload - just removes from cache
+   */
+  evictFromCache(id: ObjId): void {
+    this.cache.invalidate(id);
+  }
+
+  // ==========================================================================
+  // MOO Helper Methods
+  // These methods are exposed to MOO code via $ and hide infrastructure details
+  // ==========================================================================
+
+  /**
+   * Count the number of player objects in the database
+   * Used by CharGen to determine if this is the first player (admin)
+   * Searches for objects that have a non-empty playername property
+   */
+  async countPlayers(): Promise<number> {
+    return await this.db.countPlayers();
+  }
+
+  /**
+   * Hash a password using bcrypt
+   * Used by Player.setPassword and CharGen
+   * @param password - Plain text password
+   * @returns Hashed password
+   */
+  async hashPassword(password: string): Promise<string> {
+    return await bcrypt.hash(password, 10);
+  }
+
+  /**
+   * Check a password against a bcrypt hash
+   * Used by Player.checkPassword and AuthManager
+   * @param password - Plain text password to check
+   * @param hash - Bcrypt hash to compare against
+   * @returns true if password matches
+   */
+  async checkPassword(password: string, hash: string): Promise<boolean> {
+    return await bcrypt.compare(password, hash);
+  }
+
+  /**
    * Setup MongoDB change stream watcher
    * Invalidates cache when objects are modified by other servers/processes
    * Enables multi-server deployment with shared MongoDB
@@ -371,14 +469,18 @@ export class ObjectManager {
       if (operationType === 'update' || operationType === 'replace') {
         const id = change.documentKey._id as ObjId;
 
-        // Only log if we actually had it cached
+        // Ignore our own writes (tracked by manager.update())
+        if (this.pendingWrites.has(id)) {
+          // This is our own write - don't invalidate cache
+          return;
+        }
+
+        // This is an external change (from another server/process)
         if (this.cache.hasObject(id)) {
           console.log(
             `[ObjectManager] External change detected for object #${id} - invalidating cache`
           );
         }
-
-        // Invalidate object, compiled methods, and parent chains
         this.cache.invalidate(id);
       } else if (operationType === 'delete') {
         const id = change.documentKey._id as ObjId;

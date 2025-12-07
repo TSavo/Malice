@@ -39,7 +39,6 @@ export class MinimalBootstrap {
     if (!aliases.system) aliases.system = 2;
 
     objectManager.set('aliases', aliases);
-    await objectManager.save();
 
     console.log('✅ Registered core aliases in #0.properties.aliases');
   }
@@ -128,8 +127,34 @@ export class MinimalBootstrap {
           await preAuth.onPreAuth(context, authInfo);
         }
       `);
-      await system.save();
       console.log(`✅ Created System object #${system.id}`);
+    }
+
+    // Always ensure tickAllPlayers exists (may not exist on older systems)
+    if (!system.hasMethod('tickAllPlayers')) {
+      // Tick all online players (heartbeat)
+      // Called by scheduler every minute
+      system.setMethod('tickAllPlayers', `
+        const authManager = $.authManager;
+        if (!authManager) return { error: 'No authManager' };
+
+        const onlinePlayers = authManager.onlinePlayers || [];
+        const results = [];
+
+        for (const playerId of onlinePlayers) {
+          const player = await $.load(playerId);
+          if (player && player.heartbeat) {
+            try {
+              await player.heartbeat();
+              results.push({ player: playerId, success: true });
+            } catch (err) {
+              results.push({ player: playerId, success: false, error: String(err) });
+            }
+          }
+        }
+
+        return { tickedPlayers: results.length, results: results };
+      `);
     }
   }
 

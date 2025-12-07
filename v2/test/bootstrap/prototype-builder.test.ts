@@ -150,8 +150,8 @@ describe('PrototypeBuilder', () => {
       const agent = $.agent;
 
       expect(agent.get('name')).toBe('Agent');
-      expect(agent.get('location')).toBe(0);
-      expect(agent.get('inventory')).toEqual([]);
+      expect(agent.get('location')).toBeNull(); // Inherited from Describable
+      // inventory is not set on the prototype - would be set on instances
     });
 
     it('should have moveTo method', async () => {
