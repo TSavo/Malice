@@ -79,14 +79,18 @@ export class CharGenBuilder {
       // Hash password
       const passwordHash = await $.hashPassword(password);
 
-      // Get Player prototype via alias
+      // Get prototypes via alias
       const objectManager = await $.load(0);
       const aliases = objectManager.get('aliases') || {};
       const playerPrototypeId = aliases.player;
+      const adminPrototypeId = aliases.admin;
 
       // Check if this is the first player (admin user)
       const existingPlayers = await $.countPlayers();
       const isFirstPlayer = existingPlayers === 0;
+
+      // First player uses Admin prototype, others use Player
+      const prototypeId = isFirstPlayer ? adminPrototypeId : playerPrototypeId;
 
       // Get recycler for object creation
       const recycler = await $.recycler;
@@ -96,7 +100,7 @@ export class CharGenBuilder {
 
       // Create Player object with minimal defaults first
       const player = await recycler.create({
-        parent: playerPrototypeId,
+        parent: prototypeId,
         properties: {
           name: username,
           description: 'A new adventurer',

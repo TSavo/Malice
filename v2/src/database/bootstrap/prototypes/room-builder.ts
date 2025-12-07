@@ -5,6 +5,11 @@ import type { RuntimeObject } from '../../../../types/object.js';
  * Builds the Room prototype
  * Base prototype for rooms with exits and crowd mechanics.
  *
+ * Spatial coordinates (integer only):
+ * - x, y, z: Position in world space (meters)
+ * - Rooms MUST have coordinates to be spatially related
+ * - Exit distances can be computed from coordinates if not specified
+ *
  * Crowding affects perception:
  * - population: artificial crowd (NPCs, busy streets) 0-100
  * - Actual agents in room add to effective crowd
@@ -27,7 +32,13 @@ export class RoomBuilder {
       properties: {
         name: 'Room',
         description: 'Base prototype for rooms',
-        exits: {}, // Map of direction -> destination room ID
+        // Spatial coordinates (integers, in meters)
+        x: 0,
+        y: 0,
+        z: 0, // Vertical: negative = underground, positive = above ground
+        // Array of Exit object IDs
+        // Each Exit has: name, aliases, destRoom, distance, hidden, locked
+        exits: [],
         // Crowd mechanics
         population: 0, // Artificial crowd level (0-100)
         ambientNoise: 0, // Base noise level (0-100)
@@ -43,11 +54,18 @@ export class RoomBuilder {
       // Show room name and description
       let output = \`\${self.name}\\r\\n\${self.description}\\r\\n\`;
 
-      // Show exits
-      const exits = self.exits || {};
-      const exitNames = Object.keys(exits);
-      if (exitNames.length > 0) {
-        output += \`\\r\\nObvious exits: \${exitNames.join(', ')}\\r\\n\`;
+      // Show exits (only non-hidden ones)
+      const exitIds = self.exits || [];
+      const visibleExits = [];
+      for (const exitId of exitIds) {
+        const exit = await $.load(exitId);
+        if (exit && !exit.hidden) {
+          const desc = exit.describe ? await exit.describe() : exit.name;
+          visibleExits.push(desc);
+        }
+      }
+      if (visibleExits.length > 0) {
+        output += \`\\r\\nObvious exits: \${visibleExits.join(', ')}\\r\\n\`;
       } else {
         output += '\\r\\nThere are no obvious exits.\\r\\n';
       }
@@ -70,39 +88,211 @@ export class RoomBuilder {
     `);
 
     obj.setMethod('addExit', `
-      const direction = args[0];
-      const destId = args[1];
-      const exits = self.exits || {};
-      exits[direction] = destId;
-      self.exits = exits;
+      /** Add an exit to this room.
+       *  @param exit - Exit object (ID or RuntimeObject)
+       */
+      const exitArg = args[0];
+      const exitId = typeof exitArg === 'number' ? exitArg : exitArg?.id;
+
+      if (!exitId) return;
+
+      const exits = self.exits || [];
+      if (!exits.includes(exitId)) {
+        exits.push(exitId);
+        self.exits = exits;
+      }
     `);
 
     obj.setMethod('removeExit', `
-      const direction = args[0];
-      const exits = self.exits || {};
-      delete exits[direction];
-      self.exits = exits;
+      /** Remove an exit from this room.
+       *  @param exit - Exit object (ID or RuntimeObject) or direction name
+       */
+      const exitArg = args[0];
+      const exits = self.exits || [];
+
+      if (typeof exitArg === 'string') {
+        // Find exit by direction name
+        for (let i = 0; i < exits.length; i++) {
+          const exit = await $.load(exits[i]);
+          if (exit && exit.matches && await exit.matches(exitArg)) {
+            exits.splice(i, 1);
+            self.exits = exits;
+            return;
+          }
+        }
+      } else {
+        // Remove by ID
+        const exitId = typeof exitArg === 'number' ? exitArg : exitArg?.id;
+        const idx = exits.indexOf(exitId);
+        if (idx >= 0) {
+          exits.splice(idx, 1);
+          self.exits = exits;
+        }
+      }
+    `);
+
+    obj.setMethod('findExit', `
+      /** Find an exit by direction name (matches name or aliases).
+       *  @param direction - Direction to search for (e.g., 'n', 'north')
+       *  @returns The matching Exit object or null
+       */
+      const direction = args[0]?.toLowerCase();
+      if (!direction) return null;
+
+      const exits = self.exits || [];
+      for (const exitId of exits) {
+        const exit = await $.load(exitId);
+        if (exit && exit.matches && await exit.matches(direction)) {
+          return exit;
+        }
+      }
+      return null;
+    `);
+
+    obj.setMethod('getExits', `
+      /** Get all exit objects.
+       *  @returns Array of Exit RuntimeObjects
+       */
+      const exitIds = self.exits || [];
+      const exits = [];
+      for (const exitId of exitIds) {
+        const exit = await $.load(exitId);
+        if (exit) exits.push(exit);
+      }
+      return exits;
+    `);
+
+    // Coordinate methods
+    obj.setMethod('getCoordinates', `
+      /** Get this room's spatial coordinates.
+       *  @returns { x, y, z } integer coordinates in meters
+       */
+      return {
+        x: self.x || 0,
+        y: self.y || 0,
+        z: self.z || 0,
+      };
+    `);
+
+    obj.setMethod('setCoordinates', `
+      /** Set this room's spatial coordinates.
+       *  @param x - X coordinate (integer)
+       *  @param y - Y coordinate (integer)
+       *  @param z - Z coordinate (integer, optional)
+       */
+      const x = args[0];
+      const y = args[1];
+      const z = args[2] !== undefined ? args[2] : (self.z || 0);
+
+      // Enforce integers
+      self.set('x', Math.round(x));
+      self.set('y', Math.round(y));
+      self.set('z', Math.round(z));
+    `);
+
+    obj.setMethod('distanceTo', `
+      /** Calculate 3D distance to another room.
+       *  @param otherRoom - Room ID or RuntimeObject
+       *  @returns Distance in meters (integer), or null if room not found
+       */
+      const otherRoomArg = args[0];
+      const otherId = typeof otherRoomArg === 'number' ? otherRoomArg : otherRoomArg?.id;
+
+      if (!otherId) return null;
+
+      const other = typeof otherRoomArg === 'number' ? await $.load(otherId) : otherRoomArg;
+      if (!other) return null;
+
+      const dx = (other.x || 0) - (self.x || 0);
+      const dy = (other.y || 0) - (self.y || 0);
+      const dz = (other.z || 0) - (self.z || 0);
+
+      // Euclidean distance, rounded to integer
+      return Math.round(Math.sqrt(dx * dx + dy * dy + dz * dz));
+    `);
+
+    obj.setMethod('directionTo', `
+      /** Get compass direction to another room.
+       *  @param otherRoom - Room ID or RuntimeObject
+       *  @returns Direction string (n, s, e, w, ne, nw, se, sw, up, down) or null
+       */
+      const otherRoomArg = args[0];
+      const otherId = typeof otherRoomArg === 'number' ? otherRoomArg : otherRoomArg?.id;
+
+      if (!otherId) return null;
+
+      const other = typeof otherRoomArg === 'number' ? await $.load(otherId) : otherRoomArg;
+      if (!other) return null;
+
+      const dx = (other.x || 0) - (self.x || 0);
+      const dy = (other.y || 0) - (self.y || 0);
+      const dz = (other.z || 0) - (self.z || 0);
+
+      // Check vertical first
+      if (Math.abs(dz) > Math.abs(dx) && Math.abs(dz) > Math.abs(dy)) {
+        return dz > 0 ? 'up' : 'down';
+      }
+
+      // Determine horizontal direction
+      let dir = '';
+      if (dy > 0) dir += 'n';
+      else if (dy < 0) dir += 's';
+
+      if (dx > 0) dir += 'e';
+      else if (dx < 0) dir += 'w';
+
+      return dir || null;
     `);
 
     // The 'go' verb - used by exit directions
     // Pattern is just the direction word like 'north', 'south'
-    // args[3] = direction string (from %s in pattern, but we store it as literal)
+    // Queues movement instead of instant teleportation
     obj.setMethod('go', `
+      /** Move in a direction. Queues movement based on distance.
+       *  Uses player's current movement mode (walk/run).
+       *  Distance is taken from exit, or computed from room coordinates.
+       */
       // The direction is embedded in the command - extract first word
       const direction = command.trim().toLowerCase().split(/\\s+/)[0];
 
-      const exits = self.exits || {};
-      const destId = exits[direction];
-
-      if (!destId) {
+      // Find matching exit
+      const exit = await self.findExit(direction);
+      if (!exit) {
         return \`You can't go \${direction} from here.\`;
       }
 
-      // Move player to destination (triggers all hooks)
-      await player.moveTo(destId, player);
+      // Check if exit can be used (locked, etc.)
+      if (exit.canUse) {
+        const check = await exit.canUse(player);
+        if (!check.allowed) {
+          return check.reason;
+        }
+      }
 
-      // Show new room
-      const dest = await $.load(destId);
+      const destRoom = exit.destRoom;
+
+      // Get distance: explicit on exit, or compute from coordinates
+      let distance = exit.distance;
+      if (!distance && destRoom) {
+        distance = await self.distanceTo(destRoom);
+      }
+      // Fallback to 10m if no coordinates set
+      distance = distance || 10;
+
+      // Check if player is already moving
+      if (player.isMoving && await player.isMoving()) {
+        return 'You are already moving. Use "stop" to cancel.';
+      }
+
+      // Queue the movement
+      if (player.startMovement) {
+        const result = await player.startMovement(destRoom, distance, exit.name);
+        return result.message;
+      }
+
+      // Fallback: instant movement if no queue system
+      await player.moveTo(destRoom, player);
+      const dest = await $.load(destRoom);
       if (dest) {
         return await dest.describe(player);
       }
@@ -117,10 +307,20 @@ export class RoomBuilder {
       // Only register verbs for agents (things with registerVerb)
       if (!obj.registerVerb) return;
 
-      // Register each exit direction as a verb (simple pattern, just the word)
-      const exits = self.exits || {};
-      for (const direction of Object.keys(exits)) {
-        await obj.registerVerb(direction, self, 'go');
+      // Register each exit's name and aliases as verbs
+      const exitIds = self.exits || [];
+      for (const exitId of exitIds) {
+        const exit = await $.load(exitId);
+        if (!exit) continue;
+
+        // Register primary name
+        await obj.registerVerb(exit.name.toLowerCase(), self, 'go');
+
+        // Register aliases
+        const aliases = exit.aliases || [];
+        for (const alias of aliases) {
+          await obj.registerVerb(alias.toLowerCase(), self, 'go');
+        }
       }
 
       // TODO: Announce arrival to others in room

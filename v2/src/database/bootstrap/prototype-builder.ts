@@ -2,10 +2,13 @@ import { ObjectManager } from '../object-manager.js';
 import {
   DescribableBuilder,
   LocationBuilder,
+  ExitBuilder,
   RoomBuilder,
   AgentBuilder,
+  EmbodiedBuilder,
   HumanBuilder,
   PlayerBuilder,
+  AdminBuilder,
   DecayableBuilder,
   EdibleBuilder,
   FoodBuilder,
@@ -21,10 +24,13 @@ import {
  * Creates prototypes with DYNAMIC IDs (no hardcoding):
  * - Describable: name, description, aliases, location, contents
  * - Location: container behavior (addContent, removeContent)
+ * - Exit: direction aliases, destination, distance, locks
  * - Room: exits, go verb
  * - Agent: verbs, movement, actions
- * - Human: sex, pronouns, age
+ * - Embodied: physical body, sensory organs, calorie/fat/decay metabolism
+ * - Human: sex, pronouns, age, language understanding, stat aggregation
  * - Player: auth fields, permissions, connect/checkPassword
+ * - Admin: building commands (@dig, @teleport, @set, etc.)
  * - Decayable: objects that decay over time (food, body parts, corpses)
  * - BodyPart: body parts with owner, child parts, conditions (inherits Decayable)
  * - Specialized body parts: Torso, Head, Eye, Ear, Nose, Mouth, Arm, Hand, Finger, Leg, Foot
@@ -34,10 +40,13 @@ import {
 export class PrototypeBuilder {
   private describableBuilder: DescribableBuilder;
   private locationBuilder: LocationBuilder;
+  private exitBuilder: ExitBuilder;
   private roomBuilder: RoomBuilder;
   private agentBuilder: AgentBuilder;
+  private embodiedBuilder: EmbodiedBuilder;
   private humanBuilder: HumanBuilder;
   private playerBuilder: PlayerBuilder;
+  private adminBuilder: AdminBuilder;
   private decayableBuilder: DecayableBuilder;
   private edibleBuilder: EdibleBuilder;
   private foodBuilder: FoodBuilder;
@@ -49,10 +58,13 @@ export class PrototypeBuilder {
   constructor(private manager: ObjectManager) {
     this.describableBuilder = new DescribableBuilder(manager);
     this.locationBuilder = new LocationBuilder(manager);
+    this.exitBuilder = new ExitBuilder(manager);
     this.roomBuilder = new RoomBuilder(manager);
     this.agentBuilder = new AgentBuilder(manager);
+    this.embodiedBuilder = new EmbodiedBuilder(manager);
     this.humanBuilder = new HumanBuilder(manager);
     this.playerBuilder = new PlayerBuilder(manager);
+    this.adminBuilder = new AdminBuilder(manager);
     this.decayableBuilder = new DecayableBuilder(manager);
     this.edibleBuilder = new EdibleBuilder(manager);
     this.foodBuilder = new FoodBuilder(manager);
@@ -82,6 +94,11 @@ export class PrototypeBuilder {
       ? await this.manager.load(aliases.location as number)
       : await this.locationBuilder.build(describable!.id);
 
+    // Exit inherits from Describable (has name, aliases)
+    const exit = aliases.exit
+      ? await this.manager.load(aliases.exit as number)
+      : await this.exitBuilder.build(describable!.id);
+
     const room = aliases.room
       ? await this.manager.load(aliases.room as number)
       : await this.roomBuilder.build(location!.id);
@@ -90,13 +107,22 @@ export class PrototypeBuilder {
       ? await this.manager.load(aliases.agent as number)
       : await this.agentBuilder.build(describable!.id);
 
+    const embodied = aliases.embodied
+      ? await this.manager.load(aliases.embodied as number)
+      : await this.embodiedBuilder.build(agent!.id);
+
     const human = aliases.human
       ? await this.manager.load(aliases.human as number)
-      : await this.humanBuilder.build(agent!.id);
+      : await this.humanBuilder.build(embodied!.id);
 
     const player = aliases.player
       ? await this.manager.load(aliases.player as number)
       : await this.playerBuilder.build(human!.id);
+
+    // Admin inherits from Player
+    const admin = aliases.admin
+      ? await this.manager.load(aliases.admin as number)
+      : await this.adminBuilder.build(player!.id);
 
     // Decayable - base for anything that decays over time
     const decayable = aliases.decayable
@@ -142,10 +168,13 @@ export class PrototypeBuilder {
     await this.registerAliases({
       describable: describable!.id,
       location: location!.id,
+      exit: exit!.id,
       room: room!.id,
       agent: agent!.id,
+      embodied: embodied!.id,
       human: human!.id,
       player: player!.id,
+      admin: admin!.id,
       decayable: decayable!.id,
       edible: edible!.id,
       food: food!.id,
@@ -159,10 +188,13 @@ export class PrototypeBuilder {
   private async registerAliases(ids: {
     describable: number;
     location: number;
+    exit: number;
     room: number;
     agent: number;
+    embodied: number;
     human: number;
     player: number;
+    admin: number;
     decayable: number;
     edible: number;
     food: number;
@@ -177,10 +209,13 @@ export class PrototypeBuilder {
     const aliases = (objectManager.get('aliases') as Record<string, number | Record<string, number>>) || {};
     aliases.describable = ids.describable;
     aliases.location = ids.location;
+    aliases.exit = ids.exit;
     aliases.room = ids.room;
     aliases.agent = ids.agent;
+    aliases.embodied = ids.embodied;
     aliases.human = ids.human;
     aliases.player = ids.player;
+    aliases.admin = ids.admin;
     aliases.decayable = ids.decayable;
     aliases.edible = ids.edible;
     aliases.food = ids.food;
@@ -198,7 +233,7 @@ export class PrototypeBuilder {
 
     const partNames = Object.keys(ids.bodyParts).join(', ');
     console.log(
-      `✅ Registered prototype aliases: describable=#${ids.describable}, location=#${ids.location}, room=#${ids.room}, agent=#${ids.agent}, human=#${ids.human}, player=#${ids.player}, decayable=#${ids.decayable}, bodyPart=#${ids.bodyPart}`,
+      `✅ Registered prototype aliases: describable=#${ids.describable}, location=#${ids.location}, exit=#${ids.exit}, room=#${ids.room}, agent=#${ids.agent}, embodied=#${ids.embodied}, human=#${ids.human}, player=#${ids.player}, admin=#${ids.admin}, decayable=#${ids.decayable}, bodyPart=#${ids.bodyPart}`,
     );
     console.log(`✅ Registered body part prototypes: ${partNames}`);
   }

@@ -173,6 +173,20 @@ export class PromptBuilder {
           }
         }
 
+        case 'multiline': {
+          // Check for terminator - '.' alone on a line
+          if (trimmed === '.') {
+            const result = state.lines.join('\\n');
+            player._promptState = null;
+            state.resolve(result);
+            return true;
+          }
+
+          // Accumulate lines
+          state.lines.push(input); // Keep original line with whitespace
+          return true;
+        }
+
         default:
           return false;
       }
@@ -192,6 +206,24 @@ export class PromptBuilder {
         state.resolve(null);
       }
       player._promptState = null;
+    `);
+
+    // Multiline text input - collects lines until '.' alone on a line
+    // Returns the joined text (without the '.')
+    this.prompt.setMethod('multiline', `
+      const player = args[0];
+      const text = args[1] || 'Enter text (end with . on its own line):';
+
+      await player.tell(text);
+
+      return new Promise((resolve) => {
+        player._promptState = {
+          type: 'multiline',
+          text: text,
+          lines: [],
+          resolve: resolve,
+        };
+      });
     `);
   }
 

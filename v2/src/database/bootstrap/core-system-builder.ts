@@ -11,6 +11,8 @@ import { BodyFactoryBuilder } from './body-factory-builder.js';
 import { PromptBuilder } from './prompt-builder.js';
 import { SchedulerBuilder } from './scheduler-builder.js';
 import { EmoteBuilder } from './emote-builder.js';
+import { MutexBuilder } from './mutex-builder.js';
+import { MementoBuilder } from './memento-builder.js';
 
 /**
  * Orchestrates building all core system objects
@@ -28,6 +30,8 @@ import { EmoteBuilder } from './emote-builder.js';
  * - Prompt ($.prompt): Interactive prompt system
  * - Scheduler ($.scheduler): Global job scheduler for periodic tasks
  * - Emote ($.emote): Freeform emote parsing and formatting
+ * - Mutex ($.mutex): Object-based mutex locks with data and expiration
+ * - Memento ($.memento): Object graph serialization for cloning/templates
  */
 export class CoreSystemBuilder {
   constructor(private manager: ObjectManager) {}
@@ -48,6 +52,8 @@ export class CoreSystemBuilder {
     const promptBuilder = new PromptBuilder(this.manager);
     const schedulerBuilder = new SchedulerBuilder(this.manager);
     const emoteBuilder = new EmoteBuilder(this.manager);
+    const mutexBuilder = new MutexBuilder(this.manager);
+    const mementoBuilder = new MementoBuilder(this.manager);
 
     await authManagerBuilder.build();
     await charGenBuilder.build();
@@ -61,6 +67,8 @@ export class CoreSystemBuilder {
     await promptBuilder.build();
     await schedulerBuilder.build();
     await emoteBuilder.build();
+    await mutexBuilder.build();
+    await mementoBuilder.build();
 
     // Register aliases
     await authManagerBuilder.registerAlias();
@@ -75,5 +83,7 @@ export class CoreSystemBuilder {
     await promptBuilder.registerAlias();
     await schedulerBuilder.registerAlias();
     await emoteBuilder.registerAlias();
+    await mutexBuilder.registerAlias();
+    await mementoBuilder.registerAlias();
   }
 }
