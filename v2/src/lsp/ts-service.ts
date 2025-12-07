@@ -4,7 +4,7 @@
  */
 
 import * as ts from 'typescript';
-import type { VirtualFileSystem, VirtualDocument } from './virtual-fs.js';
+import type { VirtualFileSystem } from './virtual-fs.js';
 
 /**
  * TypeScript Language Service for Malice
@@ -100,7 +100,8 @@ export class TypeScriptService {
     if (!doc) return undefined;
 
     const offset = this.getOffset(doc.content, line, character);
-    return this.languageService.getDefinitionAtPosition(uri, offset);
+    const result = this.languageService.getDefinitionAtPosition(uri, offset);
+    return result ? [...result] : undefined;
   }
 
   /**
@@ -129,26 +130,5 @@ export class TypeScriptService {
 
     offset += character;
     return offset;
-  }
-
-  /**
-   * Convert offset to line/character
-   */
-  private getLineAndCharacter(content: string, offset: number): { line: number; character: number } {
-    const lines = content.split('\n');
-    let currentOffset = 0;
-
-    for (let line = 0; line < lines.length; line++) {
-      const lineLength = lines[line].length + 1; // +1 for newline
-      if (currentOffset + lineLength > offset) {
-        return {
-          line,
-          character: offset - currentOffset,
-        };
-      }
-      currentOffset += lineLength;
-    }
-
-    return { line: lines.length - 1, character: lines[lines.length - 1].length };
   }
 }

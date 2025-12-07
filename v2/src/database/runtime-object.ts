@@ -1,4 +1,4 @@
-import type { GameObject, ObjId, PropertyValue, MethodCode, Method, RuntimeObject } from '../../types/object.js';
+import type { GameObject, ObjId, PropertyValue, MethodCode, Method, RuntimeObject, Value } from '../../types/object.js';
 import type { ObjectManager } from './object-manager.js';
 import * as ts from 'typescript';
 
@@ -46,12 +46,8 @@ export class RuntimeObjectImpl implements RuntimeObject {
           return true;
         }
 
-        // Set property and auto-save
+        // Set property (auto-persists)
         target.set(prop, value);
-        // Auto-save in background (fire and forget)
-        target.save().catch(err => {
-          console.error(`Failed to auto-save object #${target.id}:`, err);
-        });
         return true;
       }
     });
@@ -69,12 +65,125 @@ export class RuntimeObjectImpl implements RuntimeObject {
   }
 
   /**
+   * Convert a JavaScript value to a typed Value
+   */
+  private toValue(jsValue: any): Value {
+    // Handle null
+    if (jsValue === null) {
+      return { type: 'null', value: null };
+    }
+
+    // Handle undefined (treat as null)
+    if (jsValue === undefined) {
+      return { type: 'null', value: null };
+    }
+
+    // Handle RuntimeObject (store as objref)
+    if (jsValue && typeof jsValue === 'object' && 'id' in jsValue && typeof jsValue.id === 'number') {
+      return { type: 'objref', value: jsValue.id };
+    }
+
+    // Handle primitives
+    const jsType = typeof jsValue;
+
+    if (jsType === 'string') {
+      return { type: 'string', value: jsValue };
+    }
+
+    if (jsType === 'number') {
+      return { type: 'number', value: jsValue };
+    }
+
+    if (jsType === 'boolean') {
+      return { type: 'boolean', value: jsValue };
+    }
+
+    // Handle arrays (recursively convert elements)
+    if (Array.isArray(jsValue)) {
+      return {
+        type: 'array',
+        value: jsValue.map(item => this.toValue(item))
+      };
+    }
+
+    // Handle objects (recursively convert properties)
+    if (jsType === 'object') {
+      const objValue: Record<string, Value> = {};
+      for (const [key, val] of Object.entries(jsValue)) {
+        objValue[key] = this.toValue(val);
+      }
+      return { type: 'object', value: objValue };
+    }
+
+    // Fallback to null for unknown types
+    return { type: 'null', value: null };
+  }
+
+  /**
+   * Convert a typed Value to a JavaScript value
+   * Resolves objrefs to RuntimeObjects
+   * Also handles raw values for backwards compatibility
+   */
+  private fromValue(value: Value | any | undefined): any {
+    // Only return undefined for actual undefined
+    if (value === undefined) {
+      return undefined;
+    }
+
+    // Handle null explicitly (could be raw null or typed null)
+    if (value === null) {
+      return null;
+    }
+
+    // Backwards compatibility: Handle raw values (not typed)
+    if (typeof value !== 'object' || !('type' in value)) {
+      // It's a raw value, return as-is
+      return value;
+    }
+
+    switch (value.type) {
+      case 'null':
+        return null;
+
+      case 'string':
+      case 'number':
+      case 'boolean':
+        return value.value;
+
+      case 'objref':
+        // Resolve object reference - getSync returns the proxy directly
+        const obj = this.manager.getSync(value.value);
+        if (!obj) {
+          // Object not in cache or doesn't exist - return raw ID
+          return value.value;
+        }
+        return obj;
+
+      case 'array':
+        // Recursively convert array elements
+        return (value.value as Value[]).map(item => this.fromValue(item));
+
+      case 'object':
+        // Recursively convert object properties
+        const result: Record<string, any> = {};
+        for (const [key, val] of Object.entries(value.value as Record<string, Value>)) {
+          result[key] = this.fromValue(val);
+        }
+        return result;
+
+      default:
+        return undefined;
+    }
+  }
+
+  /**
    * Get property - walks inheritance chain
+   * Resolves typed Values to JavaScript values (objrefs become RuntimeObjects)
    */
   get(prop: string): PropertyValue | undefined {
     // Check this object first
     if (this.obj.properties && prop in this.obj.properties) {
-      return this.obj.properties[prop];
+      return this.fromValue(this.obj.properties[prop]);
     }
 
     // Walk up parent chain
@@ -90,17 +199,27 @@ export class RuntimeObjectImpl implements RuntimeObject {
 
   /**
    * Set property - always on this object
+   * Automatically detects type and creates typed Value
+   * Auto-persists to database - MOO code never calls save()
    */
   set(prop: string, value: PropertyValue): void {
     if (!this.obj.properties) {
       this.obj.properties = {};
     }
-    this.obj.properties[prop] = value;
-    this.dirty = true;
+    // Convert JavaScript value to typed Value
+    this.obj.properties[prop] = this.toValue(value);
+
+    // Auto-persist - fire and forget, MOO never sees save semantics
+    this.manager.update(this.id, {
+      properties: this.obj.properties
+    }, false).catch(err => {
+      console.error(`[RuntimeObject] Failed to persist property ${prop} on #${this.id}:`, err);
+    });
   }
 
   /**
    * Set a method on this object
+   * Auto-persists to database
    */
   setMethod(name: string, code: string, options?: { callable?: boolean; aliases?: string[]; help?: string }): void {
     if (!this.obj.methods) {
@@ -110,11 +229,20 @@ export class RuntimeObjectImpl implements RuntimeObject {
       code,
       ...options,
     };
-    this.dirty = true;
+
+    // Auto-persist
+    this.manager.update(this.id, {
+      methods: this.obj.methods
+    }, false).catch(err => {
+      console.error(`[RuntimeObject] Failed to persist method ${name} on #${this.id}:`, err);
+    });
   }
 
   /**
    * Call method - walks inheritance chain, executes in context
+   * @param method - Method name to call
+   * @param context - Optional execution context (ConnectionContext, player, etc.)
+   * @param args - Method arguments
    */
   async call(method: string, ...args: unknown[]): Promise<unknown> {
     const code = await this.findMethodAsync(method);
@@ -122,7 +250,9 @@ export class RuntimeObjectImpl implements RuntimeObject {
       throw new Error(`Method ${method} not found on object #${this.id}`);
     }
 
-    return await this.executeMethod(code, args, method);
+    // Context will be undefined for programmatic calls
+    // In production, context would be set by the connection handler
+    return await this.executeMethod(code, undefined, args, method);
   }
 
   /**
@@ -221,7 +351,7 @@ export class RuntimeObjectImpl implements RuntimeObject {
    * Compiles TypeScript to JavaScript before execution
    * Uses caching for compiled code
    */
-  private async executeMethod(code: MethodCode, args: unknown[], methodName = 'anonymous'): Promise<unknown> {
+  private async executeMethod(code: MethodCode, userContext: any, args: unknown[], methodName = 'anonymous'): Promise<unknown> {
     // Check cache for compiled code (avoids repeated compilation)
     let jsCode = this.manager.getCompiledMethod(this.id, methodName);
 
@@ -237,21 +367,56 @@ export class RuntimeObjectImpl implements RuntimeObject {
     // - self: the proxied object (enables self.hp instead of self.get('hp'))
     // - $: the object manager (for finding other objects)
     // - args: method arguments
+    // - $N: direct object references ($2, $3, etc.) via Proxy
 
     const self = this.proxy;
+
+    // Create a Proxy for $ that allows $2, $3, etc. syntax
+    const manager = this.manager;
+    const $proxy = new Proxy(manager, {
+      get(target, prop) {
+        // Check if accessing a numeric property like $2, $3
+        if (typeof prop === 'string' && /^\d+$/.test(prop)) {
+          const objId = parseInt(prop, 10);
+          // getSync returns the proxy directly from cache
+          const obj = target.getSync(objId);
+          if (!obj) {
+            throw new Error(`Object #${objId} not found or not loaded`);
+          }
+          return obj;
+        }
+        // Otherwise return the manager's own properties/methods
+        return (target as any)[prop];
+      },
+    });
+
+    // For verb dispatch, args are: [context, player, command, ...resolvedArgs]
+    // Extract player and command if present
+    const verbPlayer = args.length >= 2 ? args[1] : null;
+    const verbCommand = args.length >= 3 ? args[2] : null;
+
     const context = {
       self,
       this: self, // Also expose as 'this' but it might be shadowed
-      $: this.manager,
+      $: $proxy,
       args,
+      context: userContext, // ConnectionContext or other execution context
+      player: verbPlayer || userContext?.player || self, // Player from verb dispatch, or context, or self
+      command: verbCommand || '', // Raw command string from verb dispatch
     };
 
     try {
       // Wrap code in async function for execution
+      // Don't destructure $ so we can use $2, $3, etc. via Proxy
       // eslint-disable-next-line @typescript-eslint/no-implied-eval
       const AsyncFn = async function () {}.constructor as FunctionConstructor;
       const fn = new AsyncFn('ctx', `
-        const { self, $, args } = ctx;
+        const self = ctx.self;
+        const $ = ctx.$;
+        const args = ctx.args;
+        const context = ctx.context;
+        const player = ctx.player;
+        const command = ctx.command;
         return (async () => {
           ${jsCode}
         })();
@@ -275,17 +440,27 @@ export class RuntimeObjectImpl implements RuntimeObject {
   /**
    * Set parent object ID
    */
-  async setParent(parent: ObjId): Promise<void> {
+  setParent(parent: ObjId): void {
     this.obj.parent = parent;
-    this.dirty = true;
-    await this.save();
+
+    // Auto-persist
+    this.manager.update(this.id, {
+      parent: this.obj.parent
+    }, false).catch(err => {
+      console.error(`[RuntimeObject] Failed to persist parent on #${this.id}:`, err);
+    });
   }
 
   /**
    * Get all own properties (not inherited)
+   * Returns JavaScript values (objrefs resolved to RuntimeObjects)
    */
   getOwnProperties(): Record<string, PropertyValue> {
-    return { ...this.obj.properties };
+    const result: Record<string, PropertyValue> = {};
+    for (const [key, value] of Object.entries(this.obj.properties || {})) {
+      result[key] = this.fromValue(value);
+    }
+    return result;
   }
 
   /**
@@ -301,11 +476,12 @@ export class RuntimeObjectImpl implements RuntimeObject {
   async save(): Promise<void> {
     if (!this.dirty) return;
 
+    // Don't invalidate cache - we're the source of truth
     await this.manager.update(this.id, {
       parent: this.obj.parent,
       properties: this.obj.properties,
       methods: this.obj.methods,
-    });
+    }, false);
 
     this.dirty = false;
   }
@@ -324,18 +500,32 @@ export class RuntimeObjectImpl implements RuntimeObject {
 
   /**
    * Add a method to this object
+   * Auto-persists to database
    */
   addMethod(name: string, code: MethodCode): void {
-    this.obj.methods[name] = code;
-    this.dirty = true;
+    this.obj.methods[name] = { code };
+
+    // Auto-persist
+    this.manager.update(this.id, {
+      methods: this.obj.methods
+    }, false).catch(err => {
+      console.error(`[RuntimeObject] Failed to persist method ${name} on #${this.id}:`, err);
+    });
   }
 
   /**
    * Remove a method from this object
+   * Auto-persists to database
    */
   removeMethod(name: string): void {
     delete this.obj.methods[name];
-    this.dirty = true;
+
+    // Auto-persist
+    this.manager.update(this.id, {
+      methods: this.obj.methods
+    }, false).catch(err => {
+      console.error(`[RuntimeObject] Failed to persist method removal on #${this.id}:`, err);
+    });
   }
 
   /**

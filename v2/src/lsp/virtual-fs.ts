@@ -168,8 +168,8 @@ export class VirtualFileSystem {
         prototypeType
       );
     } else {
-      // Get property value as JSON
-      const propValue = raw.properties[parsed.name];
+      // Get property value as JSON (use resolved value, not typed Value)
+      const propValue = obj.get(parsed.name);
       if (propValue === undefined) return null;
 
       content = JSON.stringify(propValue, null, 2);
@@ -203,7 +203,6 @@ export class VirtualFileSystem {
 
     // Update method in MongoDB
     obj.setMethod(parsed.name, actualCode);
-    await obj.save();
 
     // Update cache
     const prototypeType = await this.inferPrototypeType(obj);

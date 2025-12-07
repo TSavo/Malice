@@ -7,7 +7,7 @@
 
 import { WebSocketServer, WebSocket } from 'ws';
 import type { ObjectManager } from '../database/object-manager.js';
-import type { ObjId } from '../../types/object.js';
+import type { ObjId, Method, Value } from '../../types/object.js';
 import { TypeGenerator } from './type-generator.js';
 
 interface JsonRpcRequest {
@@ -225,7 +225,7 @@ export class DevToolsServer {
       object: {
         _id: raw._id,
         parent: raw.parent,
-        properties: raw.properties,
+        properties: obj.getOwnProperties(), // Return resolved values, not typed Values
         methods: raw.methods,
         created: raw.created,
         modified: raw.modified,
@@ -245,7 +245,7 @@ export class DevToolsServer {
     const obj = await this.manager.create({
       parent: params.parent,
       properties: params.properties || {},
-      methods: params.methods || {},
+      methods: (params.methods || {}) as unknown as Record<string, Method>,
     });
 
     // Notify all clients
@@ -316,7 +316,6 @@ export class DevToolsServer {
     }
 
     obj.setMethod(name, code, options);
-    await obj.save();
 
     // Notify all clients
     this.broadcast('method.changed', { objectId, name });
@@ -336,7 +335,6 @@ export class DevToolsServer {
     }
 
     obj.removeMethod(name);
-    await obj.save();
 
     // Notify all clients
     this.broadcast('method.deleted', { objectId, name });
@@ -381,7 +379,6 @@ export class DevToolsServer {
     }
 
     obj.set(name, value);
-    await obj.save();
 
     // Notify all clients
     this.broadcast('property.changed', { objectId, name });
@@ -403,7 +400,7 @@ export class DevToolsServer {
     const properties = obj.getOwnProperties();
     delete properties[name];
 
-    await this.manager.update(objectId, { properties });
+    await this.manager.update(objectId, { properties: properties as unknown as Record<string, Value> });
 
     // Notify all clients
     this.broadcast('property.deleted', { objectId, name });

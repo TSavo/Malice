@@ -3,18 +3,34 @@
 ## Core Object Tree
 
 ```
+#-1 Nothing (no parent)
+#0 ObjectManager (no parent)
 #1 Root (parent: 0)
   └─ #2 System (parent: 1)
   └─ #3 AuthManager (parent: 1)
   └─ #4 CharGen (parent: 1)
   └─ #5 PreAuthHandler (parent: 1)
   └─ #10 Describable (parent: 1)
-      └─ #11 Agent (parent: 10)
-          └─ #12 Human (parent: 11)
+      └─ #11 Location (parent: 10)
+          └─ #14 Room (parent: 11)
+      └─ #15 Agent (parent: 10)
+          └─ #12 Human (parent: 15)
               └─ #13 Player (parent: 12)
+  └─ #20 Recycler (parent: 1)
 ```
 
 ## Object Purposes
+
+### #-1 Nothing
+**Purpose:** Null object reference
+- Represents "no object"
+- Used for empty references
+- Accessible via `$.nothing`
+
+### #0 ObjectManager
+**Purpose:** System root
+- Manages object aliases
+- Not a game object
 
 ### #1 Root
 **Purpose:** Base of all inheritance
@@ -24,57 +40,119 @@
 ### #2 System
 **Purpose:** Connection routing
 - Routes new connections to auth
+- Method: `onConnection(context)` → delegates to AuthManager
 - Not in the Describable tree
 
 ### #3 AuthManager
 **Purpose:** Interactive login
 - Shows login screen
 - Handles username/password input
+- Method: `onConnect(context)` → shows login prompt
+- Method: `onInput(context, input)` → validates credentials
 - Not in the Describable tree
 
 ### #4 CharGen
 **Purpose:** Character creation
 - Creates new Player objects (inherits from Player #13)
 - Sets up initial properties
+- Method: `onNewUser(context, username, password)`
 - Not in the Describable tree
 
 ### #5 PreAuthHandler
 **Purpose:** Transport-level auth (SSL, OAuth, etc.)
 - Validates certificates/tokens
 - Looks up existing Player objects
+- Method: `handleSSLCert(context, cert)`
 - Not in the Describable tree
 
 ### #10 Describable
-**Purpose:** Things that can be described
+**Purpose:** Things that can be described AND moved
 ```typescript
 properties: {
   name: string;           // Short name
   description: string;    // Long description
   aliases: string[];      // Alternative names
+  location: ObjId;        // Where this object is (0 = nowhere)
 }
 
 methods: {
   describe(): string;     // Return full description
   shortDesc(): string;    // Return name
+  moveTo(dest, mover?): void;  // THE primitive for all location changes
+  onLeaving(source, dest, mover): void;  // Called before leaving
+  onArrived(dest, source, mover): void;  // Called after arriving
 }
 ```
 
-**Examples:** rooms, objects, NPCs, players
+**Key Design:** `moveTo()` is the SINGLE PRIMITIVE for ALL location changes. It:
+1. Calls source container's `onContentLeaving()` (can throw to cancel)
+2. Calls self's `onLeaving()` (prepare for departure)
+3. Updates location property
+4. Calls source container's `onContentLeft()` (cleanup, unregister verbs)
+5. Calls self's `onArrived()` (register verbs)
+6. Calls destination container's `onContentArrived()` (announce, register verbs)
 
-### #11 Agent
-**Purpose:** Things that can act
+**Examples:** Items, furniture, anything that can be somewhere
+
+### #11 Location
+**Purpose:** Things that can contain other things
 ```typescript
 properties: {
-  location: ObjId;        // Where this agent is
-  inventory: ObjId[];     // What agent is carrying
+  // Inherits from Describable
 }
 
 methods: {
-  moveTo(location: ObjId): void;
-  say(message: string): void;
-  emote(action: string): void;
+  // Container transition hooks
+  onContentLeaving(obj, dest, mover): void;   // Before content leaves (can throw to cancel)
+  onContentLeft(obj, dest, mover): void;      // After content has left
+  onContentArrived(obj, source, mover): void; // After content has arrived
 }
 ```
+
+**Examples:** Rooms, containers, bags
+
+### #14 Room
+**Purpose:** Navigable locations with exits
+```typescript
+properties: {
+  // Inherits from Location
+  exits: { [direction: string]: ObjId };  // e.g., { north: 51, south: 52 }
+}
+
+methods: {
+  go(context, player, direction): void;   // Handle exit navigation
+  onContentArrived(obj, source, mover): void;  // Register exit verbs on arriving agents
+  onContentLeft(obj, dest, mover): void;       // Unregister exit verbs on leaving agents
+}
+```
+
+**Examples:** Town Square, Tavern, Forest Path
+
+### #15 Agent
+**Purpose:** Things that can act and have verbs registered on them
+```typescript
+properties: {
+  // Inherits from Describable (has location)
+  verbs: { [verbName: string]: { obj: ObjId, method: string } };  // Registered commands
+}
+
+methods: {
+  say(message: string): void;
+  emote(action: string): void;
+
+  // Verb registration
+  registerVerb(name, sourceObj, method?): void;   // Register a command
+  unregisterVerb(name): void;                     // Remove a command
+  unregisterVerbsFrom(sourceObjId): void;         // Remove all verbs from an object
+  hasVerb(name): boolean;                         // Check if verb exists
+  getVerb(name): { obj, method } | null;          // Get verb info
+}
+```
+
+**Key Design:** Verbs are dynamically registered/unregistered as objects move around:
+- Room registers its exits when you enter, unregisters when you leave
+- Gun registers `shoot` when picked up, unregisters when dropped
+- Default verbs (`look`, `say`, `quit`) registered on player connect
 
 **Examples:** NPCs, players
 
@@ -93,7 +171,7 @@ methods: {
 }
 ```
 
-**Examples:** players, human NPCs
+**Examples:** Players, human NPCs
 
 ### #13 Player
 **Purpose:** Prototype for all player objects
@@ -121,14 +199,62 @@ properties: {
 }
 
 methods: {
-  connect(context: ConnectionContext): void;
-  disconnect(): void;
-  checkPassword(password: string): Promise<boolean>;
-  setPassword(password: string): Promise<void>;
+  connect(context): void;     // Called on login - registers default verbs
+  disconnect(): void;         // Called on logout
+  onInput(context, input): void;  // THE player command loop
+  checkPassword(password): Promise<boolean>;
+  setPassword(password): Promise<void>;
+
+  // Built-in commands
+  look(): void;
+  say(message): void;
+  quit(): void;
 }
 ```
 
+**Command Flow:**
+1. Player connects → `connect()` registers `look`, `say`, `quit` verbs
+2. Player moves to room → Room's `onContentArrived()` registers exit verbs
+3. Player types "north" → `onInput()` finds verb in registry, calls Room's `go()` method
+4. Player leaves room → Room's `onContentLeft()` unregisters exit verbs
+
 **Examples:** Individual player characters
+
+### #20 Recycler
+**Purpose:** Object deletion and ID reuse
+- Soft-deletes objects
+- Maintains list of recyclable IDs
+- New objects reuse lowest available ID
+
+## Verb Registration Flow
+
+```
+Player enters room with exits: { north: 100, south: 101 }
+
+1. player.moveTo(roomId)
+2. room.onContentArrived(player, ...)
+3.   player.registerVerb('north', room, 'go')
+4.   player.registerVerb('south', room, 'go')
+
+Player types "north":
+
+1. player.onInput(..., 'north')
+2. verbInfo = player.getVerb('north')  → { obj: roomId, method: 'go' }
+3. room.go(context, player, 'north')
+4.   player.moveTo(100, player)
+5.     room.onContentLeft(player, ...)  → unregisters 'north', 'south'
+6.     newRoom.onContentArrived(player, ...) → registers new exits
+```
+
+## Location Transition Hooks
+
+| Hook | Called On | When | Purpose |
+|------|-----------|------|---------|
+| `onContentLeaving(obj, dest, mover)` | Source container | Before move | Can throw to cancel |
+| `onLeaving(source, dest, mover)` | Moving object | Before move | Prepare for departure |
+| `onContentLeft(obj, dest, mover)` | Source container | After move | Cleanup, unregister verbs |
+| `onArrived(dest, source, mover)` | Moving object | After move | Register verbs |
+| `onContentArrived(obj, source, mover)` | Dest container | After move | Announce arrival, register verbs |
 
 ## Inheritance Examples
 
@@ -140,10 +266,16 @@ properties: {
   name: "Alice",
   description: "A skilled adventurer",
   aliases: ["ali"],
-
-  // From Agent (#11):
   location: 50,  // In room #50
-  inventory: [101, 102],
+
+  // From Agent (#15):
+  verbs: {
+    look: { obj: 100, method: 'look' },
+    say: { obj: 100, method: 'say' },
+    quit: { obj: 100, method: 'quit' },
+    north: { obj: 50, method: 'go' },  // Registered by room #50
+    south: { obj: 50, method: 'go' },
+  },
 
   // From Human (#12):
   sex: "female",
@@ -175,304 +307,146 @@ When code calls `player.call('describe')`:
 1. Check #100 methods → Not found
 2. Check #13 (Player) methods → Not found
 3. Check #12 (Human) methods → Not found
-4. Check #11 (Agent) methods → Not found
+4. Check #15 (Agent) methods → Not found
 5. Check #10 (Describable) methods → Found `describe()` ✓
 6. Execute method with `self` = player #100
 
-## CharGen Creates Players
-
+### Room Instance (#50)
 ```typescript
-// CharGen (#4) creates new Player objects
-methods: {
-  onNewUser: `
-    const context = args[0];
-    const username = args[1];
-    const password = args[2];  // NEW: require password
+// Object #50 (parent: 14)
+properties: {
+  // From Describable (#10):
+  name: "Town Square",
+  description: "A bustling square with a central fountain.",
+  aliases: ["square", "fountain"],
+  location: 0,  // Rooms don't have a location
 
-    // Hash password
-    const bcrypt = require('bcrypt');
-    const passwordHash = await bcrypt.hash(password, 10);
-
-    // Create new player (inherits from Player prototype #13)
-    const player = await context.$.create({
-      parent: 13,  // ← Inherit from Player prototype
-      properties: {
-        // Describable
-        name: username,
-        description: "A new player",
-        aliases: [username.toLowerCase()],
-
-        // Agent
-        location: 100,  // Starting room
-        inventory: [],
-
-        // Human
-        sex: "non-binary",  // Default, can be changed
-        pronouns: { subject: "they", object: "them", possessive: "their" },
-        age: 25,
-        species: "human",
-
-        // Player
-        playername: username.toLowerCase(),
-        email: "",  // To be filled in
-        passwordHash: passwordHash,
-        canUseDevTools: false,  // Default: no DevTools access
-        isWizard: false,
-        isSuspended: false,
-        createdAt: new Date(),
-        lastLogin: new Date(),
-        totalPlaytime: 0,
-        title: "the Newbie"
-      }
-    });
-
-    context.authenticate(player.id);
-    context.send(\`Welcome, \${player.get('name')}!\\r\\n\`);
-
-    // Call player's connect method
-    await player.call('connect', context);
-  `
+  // From Room (#14):
+  exits: {
+    north: 51,
+    south: 52,
+    east: 53
+  }
 }
 ```
 
-## AuthManager Validates Players
+When a player enters:
+1. `player.moveTo(50)` is called
+2. Room #50's `onContentArrived()` runs
+3. For each exit direction, registers verb on player
+4. Player can now type "north", "south", "east"
 
+### Item with Verbs (#200)
 ```typescript
-// AuthManager (#3) validates username/password
-methods: {
-  onInput: `
-    const context = args[0];
-    const input = args[1];
-
-    // Parse username:password
-    const [username, password] = input.split(':');
-
-    if (!username || !password) {
-      context.send('Format: username:password\\r\\n');
-      return;
-    }
-
-    // Find player by playername
-    const players = await context.$.db.listAll();
-    const player = players.find(p =>
-      p.parent === 13 &&  // Is a Player object
-      p.properties.playername === username.toLowerCase()
-    );
-
-    if (!player) {
-      context.send('Invalid username or password\\r\\n');
-      return;
-    }
-
-    // Load as RuntimeObject
-    const playerObj = await context.$.load(player._id);
-
-    // Check password
-    const valid = await playerObj.call('checkPassword', password);
-    if (!valid) {
-      context.send('Invalid username or password\\r\\n');
-      return;
-    }
-
-    // Check if suspended
-    if (playerObj.get('isSuspended')) {
-      context.send('Your account has been suspended\\r\\n');
-      context.close();
-      return;
-    }
-
-    // Authenticate and connect
-    context.authenticate(playerObj.id);
-    playerObj.set('lastLogin', new Date());
-
-    await playerObj.call('connect', context);
-  `
+// Object #200 (parent: 10) - A Gun
+properties: {
+  name: "revolver",
+  description: "A weathered six-shooter.",
+  location: 100,  // In Alice's hand
 }
-```
 
-## PreAuthHandler Finds Players
-
-```typescript
-// PreAuthHandler (#5) finds Player by cert/token
 methods: {
-  handleSSLCert: `
-    const context = args[0];
-    const cert = args[1];
-
-    if (!cert.verified) {
-      context.send('SSL certificate not verified\\r\\n');
-      context.close();
-      return;
+  onArrived: `
+    const dest = args[0];
+    const owner = await $.load(dest.location);
+    if (owner && owner.registerVerb) {
+      await owner.registerVerb('shoot', self);
+      await owner.registerVerb('aim', self);
     }
-
-    // Find Player by SSL fingerprint or email
-    const players = await context.$.db.listAll();
-    const playerDoc = players.find(p =>
-      p.parent === 13 &&  // Is a Player object
-      (p.properties.sslFingerprint === cert.fingerprint ||
-       p.properties.email === cert.commonName)
-    );
-
-    if (!playerDoc) {
-      context.send('No player found for certificate\\r\\n');
-      context.close();
-      return;
-    }
-
-    // Load as RuntimeObject
-    const player = await context.$.load(playerDoc._id);
-
-    // Check suspension
-    if (player.get('isSuspended')) {
-      context.send('Your account has been suspended\\r\\n');
-      context.close();
-      return;
-    }
-
-    // Check DevTools permission for this connection
-    const canUseDevTools = player.get('canUseDevTools') === true;
-    if (!canUseDevTools) {
-      context.send('Your account does not have DevTools access\\r\\n');
-      context.close();
-      return;
-    }
-
-    // Authenticate and connect
-    context.authenticate(player.id);
-    player.set('lastLogin', new Date());
-
-    await player.call('connect', context);
-  `
-}
-```
-
-## Player Methods
-
-```typescript
-// Player prototype (#13)
-methods: {
-  // Called when player connects
-  connect: `
-    const context = args[0];
-
-    context.send(\`\\r\\nWelcome back, \${self.name}!\\r\\n\`);
-    context.send(\`You are \${self.description}\\r\\n\`);
-
-    // Show location
-    const location = await $.load(self.location);
-    if (location) {
-      const desc = await location.call('describe');
-      context.send(\`\\r\\n\${desc}\\r\\n\`);
-    }
-
-    // Notify others in room
-    // TODO: Implement room.announce()
   `,
 
-  // Called when player disconnects
-  disconnect: `
-    // Save any unsaved state
-    await self.save();
-
-    // Notify room
-    // TODO: Implement room.announce()
+  onLeaving: `
+    const source = args[0];
+    const owner = await $.load(source.location);
+    if (owner && owner.unregisterVerbsFrom) {
+      await owner.unregisterVerbsFrom(self.id);
+    }
   `,
 
-  // Check if password matches
-  checkPassword: `
-    const password = args[0];
-    const bcrypt = require('bcrypt');
-    return await bcrypt.compare(password, self.passwordHash);
-  `,
-
-  // Set new password
-  setPassword: `
-    const password = args[0];
-    const bcrypt = require('bcrypt');
-    const hash = await bcrypt.hash(password, 10);
-    self.passwordHash = hash;
-    await self.save();
+  shoot: `
+    const target = args[0];
+    context.send('BANG!\\r\\n');
+    // ... shooting logic
   `
 }
 ```
 
-## Bootstrap Changes
+## Player Command Loop
 
-The bootstrap process creates:
-1. #1 Root (empty base)
-2. #2 System (connection router)
-3. #3 AuthManager (interactive login)
-4. #4 CharGen (creates Players)
-5. #5 PreAuthHandler (SSL/OAuth/etc)
-6. **#10 Describable** (has name, description)
-7. **#11 Agent** (can act, has location)
-8. **#12 Human** (has sex, pronouns)
-9. **#13 Player** (login, auth, permissions)
+The `onInput` method on Player handles all commands:
+
+```typescript
+// Player.onInput
+const input = args[1].trim();
+if (!input) return;
+
+const parts = input.split(/\s+/);
+const verb = parts[0].toLowerCase();
+const argString = parts.slice(1).join(' ');
+
+// Look up verb in registry
+const verbInfo = await self.getVerb(verb);
+
+if (verbInfo) {
+  // Dispatch to handler
+  const handler = await $.load(verbInfo.obj);
+  const result = await handler[verbInfo.method](context, self, argString);
+  if (result !== undefined) {
+    context.send(`${result}\r\n`);
+  }
+} else {
+  context.send(`I don't understand "${verb}".\r\n`);
+}
+```
+
+## Bootstrap Order
+
+The bootstrap process creates objects in this order:
+1. **#1 Root** (empty base)
+2. **#2 System** (connection router)
+3. **#3 AuthManager** (interactive login)
+4. **#4 CharGen** (creates Players)
+5. **#5 PreAuthHandler** (SSL/OAuth/etc)
+6. **#10 Describable** (has name, description, location, moveTo)
+7. **#11 Location** (container hooks)
+8. **#14 Room** (exits, go, registers exit verbs)
+9. **#15 Agent** (verbs registry, registerVerb, unregisterVerb)
+10. **#12 Human** (has sex, pronouns)
+11. **#13 Player** (login, auth, onInput command loop)
+12. **#20 Recycler** (object deletion/recovery)
 
 All player objects created by CharGen inherit from Player (#13), which inherits from Human → Agent → Describable → Root.
 
-## Querying Players
+## Key Design Principles
 
-```typescript
-// Find all players
-const players = await db.listAll();
-const playerObjects = players.filter(obj => obj.parent === 13);
+### 1. Everything is MOO Code
+All game logic lives in MongoDB as methods. TypeScript only provides:
+- Transport layer (Telnet, WebSocket)
+- Object database (MongoDB persistence)
+- Method execution (RuntimeObject)
 
-// Find player by username
-const alice = playerObjects.find(p =>
-  p.properties.playername === 'alice'
-);
+### 2. Dynamic Verb Registration
+Commands aren't hardcoded. Objects register their verbs when they become relevant:
+- Room registers exits when you enter
+- Weapon registers `shoot` when picked up
+- Player registers `look`, `say`, `quit` on connect
 
-// Find wizards
-const wizards = playerObjects.filter(p =>
-  p.properties.isWizard === true
-);
+### 3. Single Primitive for Movement
+`moveTo()` is the ONLY way to change location. It ensures:
+- All transition hooks fire
+- Verb registration/unregistration happens
+- No bypassing the lifecycle
 
-// Find players with DevTools access
-const devToolsUsers = playerObjects.filter(p =>
-  p.properties.canUseDevTools === true
-);
-```
-
-## Migration from Current System
-
-Current user creation in CharGen creates objects with `parent: 1` (Root).
-
-New system creates objects with `parent: 13` (Player):
-- Inherit all Describable/Agent/Human/Player properties
-- Proper property resolution via prototype chain
-- Can add/override methods on Player prototype
-- All players instantly get new capabilities
+### 4. Prototype Inheritance
+Objects inherit from parents. Override by defining locally:
+- Player #100's `name` = "Alice" shadows any parent's `name`
+- Method lookup walks the chain until found
 
 ## Benefits
 
-✅ **Proper inheritance** - Players automatically get describe(), moveTo(), etc.
-✅ **DRY** - Properties defined once on prototypes
-✅ **Extensible** - Add properties to Player prototype, all instances inherit
-✅ **MOO-style** - Matches LambdaMOO object model
-✅ **Type-safe auth** - Only Player objects have passwordHash, canUseDevTools
-✅ **Clear hierarchy** - Easy to understand what each object is
-
-## Example: Granting DevTools Access
-
-```typescript
-// Via MOO command (future)
-@property alice.canUseDevTools = true
-
-// Via DevTools (now)
-{
-  "method": "property.set",
-  "params": {
-    "objectId": 100,  // Alice's object ID
-    "name": "canUseDevTools",
-    "value": true
-  }
-}
-
-// Via code
-const alice = await manager.load(100);
-alice.set('canUseDevTools', true);
-await alice.save();
-```
-
-Alice can now connect via SSL cert and use DevTools!
+✅ **Dynamic commands** - Objects bring their own verbs
+✅ **Clean transitions** - Hooks ensure proper cleanup
+✅ **Extensible** - Add new item types with their own verbs
+✅ **MOO-style** - All logic in the database, not TypeScript
+✅ **Testable** - Each method can be tested in isolation
+✅ **Live updates** - Change methods without restarting server

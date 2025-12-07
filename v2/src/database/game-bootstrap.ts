@@ -82,6 +82,7 @@ export class GameBootstrap {
     console.log('Creating core systems...');
     await coreSystemBuilder.buildCoreSystems();
     console.log('  ✅ Created AuthManager, CharGen, PreAuthHandler, Recycler');
+    console.log('  ✅ Created $.pronoun, $.proportional, $.room, $.bodyFactory');
 
     // Reload aliases so they're available immediately
     const aliasLoader = new AliasLoader(this.manager);

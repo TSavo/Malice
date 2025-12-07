@@ -43,7 +43,7 @@ async function main() {
   lspApi.start();
 
   // Start DevTools WebSocket Server for VS Code extension (JSON-RPC)
-  const devTools = new DevToolsServer(game.getObjectManager(), 9999);
+  new DevToolsServer(game.getObjectManager(), 9999);
   console.log('🛠️  DevTools ready for VS Code extension');
 
   // Create telnet server (port 5555)

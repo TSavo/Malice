@@ -14,7 +14,7 @@ export class LSPApiServer {
   private vfs: VirtualFileSystem;
 
   constructor(
-    private manager: ObjectManager,
+    manager: ObjectManager,
     private port = 3000
   ) {
     this.vfs = new VirtualFileSystem(manager);
