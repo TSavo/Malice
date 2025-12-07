@@ -5,6 +5,9 @@ export { AgentBuilder } from './agent-builder.js';
 export { HumanBuilder } from './human-builder.js';
 export { PlayerBuilder } from './player-builder.js';
 
+// Decay system
+export { DecayableBuilder } from './decayable-builder.js';
+
 // Consumables
 export { EdibleBuilder } from './edible-builder.js';
 export { FoodBuilder } from './food-builder.js';

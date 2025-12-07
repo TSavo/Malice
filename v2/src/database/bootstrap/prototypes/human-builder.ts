@@ -43,25 +43,35 @@ export class HumanBuilder {
     });
 
     obj.setMethod('pronoun', `
+      /** Get a pronoun for this human.
+       *  @param type - 'subject', 'object', or 'possessive'
+       *  @returns The appropriate pronoun (e.g., 'they', 'them', 'their')
+       */
       const type = args[0]; // 'subject', 'object', 'possessive'
       return self.pronouns[type] || 'they';
     `);
 
-    // Get the body (torso root)
     obj.setMethod('getBody', `
+      /** Get the body (torso root) of this human.
+       *  @returns The torso RuntimeObject or null if no body
+       */
       if (self.body) {
         return await $.load(self.body);
       }
       return null;
     `);
 
-    // Alias for getBody - torso is the body root
     obj.setMethod('getTorso', `
+      /** Get the torso (alias for getBody).
+       *  @returns The torso RuntimeObject or null
+       */
       return await self.getBody();
     `);
 
-    // Get head (for sensory access)
     obj.setMethod('getHead', `
+      /** Get the head body part.
+       *  @returns The head RuntimeObject or null
+       */
       const body = await self.getBody();
       if (body) {
         return await body.getPart('head');
@@ -69,8 +79,10 @@ export class HumanBuilder {
       return null;
     `);
 
-    // Get mouth (for speaking)
     obj.setMethod('getMouth', `
+      /** Get the mouth body part (for speaking).
+       *  @returns The mouth RuntimeObject or null
+       */
       const head = await self.getHead();
       if (head) {
         const face = await head.getPart('face');
@@ -81,8 +93,10 @@ export class HumanBuilder {
       return null;
     `);
 
-    // Get ears (for hearing) - returns array of ear parts
     obj.setMethod('getEars', `
+      /** Get all ear body parts (for hearing).
+       *  @returns Array of ear RuntimeObjects
+       */
       const head = await self.getHead();
       if (head) {
         const face = await head.getPart('face');
@@ -95,8 +109,10 @@ export class HumanBuilder {
       return [];
     `);
 
-    // Get eyes (for seeing) - returns array of eye parts
     obj.setMethod('getEyes', `
+      /** Get all eye body parts (for seeing).
+       *  @returns Array of eye RuntimeObjects
+       */
       const head = await self.getHead();
       if (head) {
         const face = await head.getPart('face');
@@ -109,8 +125,10 @@ export class HumanBuilder {
       return [];
     `);
 
-    // Get hands - returns { primary, secondary, both }
     obj.setMethod('getHands', `
+      /** Get hand body parts.
+       *  @returns Object with primary, secondary, and both hand arrays
+       */
       const body = await self.getBody();
       if (!body) return { primary: null, secondary: null, both: [] };
 
@@ -136,9 +154,12 @@ export class HumanBuilder {
       };
     `);
 
-    // DELEGATION: speak() - route through mouth
-    // Returns the speech object that gets broadcast to the room
     obj.setMethod('speak', `
+      /** Speak a message through the mouth.
+       *  Routes through mouth body part and broadcasts to room.
+       *  @param message - The text to speak
+       *  @returns Speech object or error
+       */
       const message = args[0];
 
       if (!self.conscious) {
@@ -169,13 +190,14 @@ export class HumanBuilder {
       return speech;
     `);
 
-    // DELEGATION: hear() - route through ears
-    // Ears pass through sound, understanding is based on knownLanguages
-    // Usage: player.hear(message, language, source)
-    //   - message: string or speech object
-    //   - language: optional language string (default: English)
-    //   - source: optional source object (who is speaking)
     obj.setMethod('hear', `
+      /** Hear a sound or speech through the ears.
+       *  Routes through ear body parts. Language understanding based on knownLanguages.
+       *  @param message - String or speech object
+       *  @param language - Optional language (default: English)
+       *  @param source - Optional source object (speaker)
+       *  @returns Heard speech object or null if deaf/unconscious
+       */
       const messageOrSpeech = args[0];
       const languageOrSource = args[1];
       const sourceArg = args[2];
@@ -248,10 +270,13 @@ export class HumanBuilder {
       return result;
     `);
 
-    // DELEGATION: see() - route through eyes
-    // If can see, sends message via tell() and returns true
-    // If blind/unconscious, returns false (message not delivered)
     obj.setMethod('see', `
+      /** See a visual message through the eyes.
+       *  If can see, sends message via tell() and returns true.
+       *  @param message - The visual message to see
+       *  @param source - Optional source of the message
+       *  @returns true if seen, false if blind/unconscious
+       */
       const message = args[0];
       const source = args[1];
 
@@ -283,8 +308,10 @@ export class HumanBuilder {
       return false; // All eyes blocked/blind
     `);
 
-    // Handle incoming sensation from body parts
     obj.setMethod('onSensation', `
+      /** Handle incoming sensation from body parts.
+       *  @param sensation - Object with part, partName, type, intensity
+       */
       const sensation = args[0]; // { part, partName, type, intensity, ... }
 
       if (!self.conscious) {
@@ -299,8 +326,10 @@ export class HumanBuilder {
       }
     `);
 
-    // Handle critical damage (death)
     obj.setMethod('onCriticalDamage', `
+      /** Handle critical damage to body parts (may cause death).
+       *  @param part - The body part that was critically damaged
+       */
       const part = args[0]; // The body part that was critically damaged
 
       // Critical parts being destroyed = death
@@ -314,8 +343,10 @@ export class HumanBuilder {
       }
     `);
 
-    // Resolve all contents including body
     obj.setMethod('resolveAllContents', `
+      /** Get all contents including items in body (hands, etc).
+       *  @returns Array of object IDs
+       */
       // Start with direct contents
       let allContents = [...(self.contents || [])];
 
@@ -337,8 +368,11 @@ export class HumanBuilder {
       return allContents;
     `);
 
-    // Generate appearance description from body parts
     obj.setMethod('describeAppearance', `
+      /** Generate appearance description from body parts.
+       *  @param viewer - Who is looking at this human
+       *  @returns Descriptive string of appearance
+       */
       const viewer = args[0]; // Who is looking
       const parts = [];
 
@@ -392,8 +426,11 @@ export class HumanBuilder {
       return parts.join(' ');
     `);
 
-    // Override describe to include appearance
     obj.setMethod('describe', `
+      /** Generate full description including appearance.
+       *  @param viewer - Who is looking at this human
+       *  @returns Full description string
+       */
       const viewer = args[0];
       let desc = self.name;
 
@@ -438,8 +475,10 @@ export class HumanBuilder {
 
     // === STAT AGGREGATION METHODS ===
 
-    // Get total strength (torso + arms + hands + legs)
     obj.setMethod('getStrength', `
+      /** Get total strength (torso + arms + hands + legs).
+       *  @returns Total strength stat
+       */
       let total = 0;
       const body = await self.getBody();
       if (!body) return 0;
@@ -483,9 +522,11 @@ export class HumanBuilder {
       return total;
     `);
 
-    // Get total dexterity (hands + legs + feet)
-    // Affected by fat modifier
     obj.setMethod('getDexterity', `
+      /** Get total dexterity (hands + legs + feet).
+       *  Affected by fat modifier.
+       *  @returns Total dexterity stat
+       */
       let total = 0;
       const body = await self.getBody();
       if (!body) return 0;
@@ -530,15 +571,19 @@ export class HumanBuilder {
       return Math.floor(total * fatMod);
     `);
 
-    // Get intelligence (from head)
     obj.setMethod('getIntelligence', `
+      /** Get intelligence stat (from head).
+       *  @returns Intelligence stat
+       */
       const head = await self.getHead();
       if (!head) return 0;
       return head.iq || 0;
     `);
 
-    // Get perception (eyes + ears)
     obj.setMethod('getPerception', `
+      /** Get total perception stat (eyes + ears).
+       *  @returns Total perception stat
+       */
       let total = 0;
 
       const eyes = await self.getEyes();
@@ -558,9 +603,11 @@ export class HumanBuilder {
       return total;
     `);
 
-    // Get derived speed (leg strength + leg dexterity)
-    // Heavily affected by fat modifier
     obj.setMethod('getSpeed', `
+      /** Get derived speed stat (leg strength + leg dexterity).
+       *  Heavily affected by fat modifier.
+       *  @returns Speed stat
+       */
       let legStrength = 0;
       let legDexterity = 0;
 
@@ -591,8 +638,10 @@ export class HumanBuilder {
       return Math.floor(base * Math.max(0.25, speedMod));
     `);
 
-    // Get all stats as an object
     obj.setMethod('getStats', `
+      /** Get all stats as an object.
+       *  @returns Object with all stat values
+       */
       const fat = await self.getFat();
       return {
         strength: await self.getStrength(),
@@ -608,9 +657,11 @@ export class HumanBuilder {
 
     // === CALORIE AND STRENGTH CHECK METHODS ===
 
-    // Get the arm path from hand to torso for a given side
-    // Returns array of parts: [hand, forearm, arm, shoulder, torso]
     obj.setMethod('getArmPath', `
+      /** Get the arm path from hand to torso for a given side.
+       *  @param side - 'right' or 'left'
+       *  @returns Array of parts: [hand, forearm, arm, shoulder, torso]
+       */
       const side = args[0]; // 'right' or 'left'
       const body = await self.getBody();
       if (!body) return [];
@@ -631,15 +682,19 @@ export class HumanBuilder {
       return [hand, forearm, arm, shoulder, body];
     `);
 
-    // Get both arm paths for two-handed operations
     obj.setMethod('getBothArmPaths', `
+      /** Get both arm paths for two-handed operations.
+       *  @returns Object with right and left arm paths
+       */
       const rightPath = await self.getArmPath('right');
       const leftPath = await self.getArmPath('left');
       return { right: rightPath, left: leftPath };
     `);
 
-    // Get total calories in the body
     obj.setMethod('getTotalCalories', `
+      /** Get total calories stored in the body.
+       *  @returns Total calorie count across all body parts
+       */
       const body = await self.getBody();
       if (!body) return 0;
 
@@ -672,10 +727,12 @@ export class HumanBuilder {
       return total;
     `);
 
-    // Check if a body part path can handle a given weight
-    // Returns: { canLift, canHold, canDrag, weakestPart, requiredCalories }
-    // Weight in grams, strength gives ~5kg (5000g) lift capacity per point
     obj.setMethod('strengthCheck', `
+      /** Check if a body part path can handle a given weight.
+       *  @param weight - Weight in grams
+       *  @param path - Array of body parts from extremity to torso
+       *  @returns Object with canLift, canHold, canDrag, capacities, calories
+       */
       const weight = args[0]; // in grams
       const path = args[1]; // array of body parts from extremity to torso
 
@@ -741,9 +798,12 @@ export class HumanBuilder {
       };
     `);
 
-    // Burn calories from body parts doing work
-    // Distributes calorie burn across the path proportionally
     obj.setMethod('burnCalories', `
+      /** Burn calories from body parts doing work.
+       *  Distributes calorie burn across the path proportionally.
+       *  @param path - Array of body parts
+       *  @param amount - Total calories to burn
+       */
       const path = args[0]; // array of body parts
       const amount = args[1]; // total calories to burn
       const body = await self.getBody();
@@ -766,9 +826,12 @@ export class HumanBuilder {
       }
     `);
 
-    // Replenish calories from eating (distributes to body and limbs)
-    // Returns { absorbed, storedAsFat } - how much was used
     obj.setMethod('replenishCalories', `
+      /** Replenish calories from eating (distributes to body and limbs).
+       *  Excess calories stored as fat.
+       *  @param amount - Calories from food
+       *  @returns Object with absorbed and storedAsFat counts
+       */
       const amount = args[0]; // calories from food
       const body = await self.getBody();
       if (!body) return { absorbed: 0, storedAsFat: 0 };
@@ -840,10 +903,11 @@ export class HumanBuilder {
       return { absorbed: amount - remaining, storedAsFat };
     `);
 
-    // Digest tick - process stomach contents and absorb calories
-    // Called periodically by the game tick system
-    // If stomach is empty but body needs calories, burns fat
     obj.setMethod('digestTick', `
+      /** Process stomach contents and absorb calories.
+       *  Called periodically by heartbeat. Burns fat if needed.
+       *  @returns Object with digested calories, fatBurned, fatGained
+       */
       const body = await self.getBody();
       if (!body) return { digested: 0, fatBurned: 0 };
 
@@ -891,8 +955,10 @@ export class HumanBuilder {
       return { digested: digestedCalories, fatBurned, fatGained };
     `);
 
-    // Get stomach contents (for examining corpses, etc.)
     obj.setMethod('getStomachContents', `
+      /** Get stomach contents (for examining corpses, etc).
+       *  @returns Array of item RuntimeObjects in stomach
+       */
       const body = await self.getBody();
       if (!body) return [];
 
@@ -910,8 +976,10 @@ export class HumanBuilder {
       return items;
     `);
 
-    // Get current fat level and status
     obj.setMethod('getFat', `
+      /** Get current fat level and status.
+       *  @returns Object with fat, maxFat, percentage, status
+       */
       const body = await self.getBody();
       if (!body) return { fat: 0, maxFat: 100, percentage: 0, status: 'lean' };
 
@@ -929,12 +997,12 @@ export class HumanBuilder {
       return { fat, maxFat, percentage, status };
     `);
 
-    // Get fat modifier for stats (negative modifier based on fat)
-    // Returns a multiplier: 1.0 = no penalty, lower = penalty
-    // Fat affects: dexterity, speed, stealth
-    // No penalty for fat <= 20 (healthy-looking and below)
-    // Penalty only starts at "soft" (fat > 20) and scales from there
     obj.setMethod('getFatModifier', `
+      /** Get fat modifier for stats (dexterity, speed, stealth).
+       *  Returns multiplier: 1.0 = no penalty, lower = penalty.
+       *  No penalty for fat <= 20% (healthy weight).
+       *  @returns Modifier between 0.5 and 1.0
+       */
       const body = await self.getBody();
       if (!body) return 1.0;
 
@@ -955,8 +1023,10 @@ export class HumanBuilder {
       return Math.max(0.5, 1.0 - penalty);
     `);
 
-    // Get calorie status for display
     obj.setMethod('getCalorieStatus', `
+      /** Get calorie status for display.
+       *  @returns Object with status, percentage, total, maxTotal, feeling
+       */
       const body = await self.getBody();
       if (!body) return { status: 'no body', percentage: 0, feeling: '' };
 
@@ -989,8 +1059,11 @@ export class HumanBuilder {
       return { status, percentage, total, maxTotal, feeling };
     `);
 
-    // Get how the player feels overall (combines calorie status + sleep + other factors)
     obj.setMethod('getFeeling', `
+      /** Get how the player feels overall.
+       *  Combines calorie status, sleep, fat, sedation.
+       *  @returns Description string of current feeling
+       */
       const calorieStatus = await self.getCalorieStatus();
       const fatInfo = await self.getFat();
       const sleepState = self.sleepState || 'awake';

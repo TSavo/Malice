@@ -6,6 +6,7 @@ import {
   AgentBuilder,
   HumanBuilder,
   PlayerBuilder,
+  DecayableBuilder,
   EdibleBuilder,
   FoodBuilder,
   DrinkBuilder,
@@ -24,7 +25,8 @@ import {
  * - Agent: verbs, movement, actions
  * - Human: sex, pronouns, age
  * - Player: auth fields, permissions, connect/checkPassword
- * - BodyPart: body parts with owner, child parts, conditions
+ * - Decayable: objects that decay over time (food, body parts, corpses)
+ * - BodyPart: body parts with owner, child parts, conditions (inherits Decayable)
  * - Specialized body parts: Torso, Head, Eye, Ear, Nose, Mouth, Arm, Hand, Finger, Leg, Foot
  *
  * All IDs are dynamically assigned and registered as aliases in root.properties.aliases
@@ -36,6 +38,7 @@ export class PrototypeBuilder {
   private agentBuilder: AgentBuilder;
   private humanBuilder: HumanBuilder;
   private playerBuilder: PlayerBuilder;
+  private decayableBuilder: DecayableBuilder;
   private edibleBuilder: EdibleBuilder;
   private foodBuilder: FoodBuilder;
   private drinkBuilder: DrinkBuilder;
@@ -50,6 +53,7 @@ export class PrototypeBuilder {
     this.agentBuilder = new AgentBuilder(manager);
     this.humanBuilder = new HumanBuilder(manager);
     this.playerBuilder = new PlayerBuilder(manager);
+    this.decayableBuilder = new DecayableBuilder(manager);
     this.edibleBuilder = new EdibleBuilder(manager);
     this.foodBuilder = new FoodBuilder(manager);
     this.drinkBuilder = new DrinkBuilder(manager);
@@ -94,9 +98,15 @@ export class PrototypeBuilder {
       ? await this.manager.load(aliases.player as number)
       : await this.playerBuilder.build(human!.id);
 
+    // Decayable - base for anything that decays over time
+    const decayable = aliases.decayable
+      ? await this.manager.load(aliases.decayable as number)
+      : await this.decayableBuilder.build(describable!.id);
+
+    // Edible inherits from Decayable (food/drink decay)
     const edible = aliases.edible
       ? await this.manager.load(aliases.edible as number)
-      : await this.edibleBuilder.build(describable!.id);
+      : await this.edibleBuilder.build(decayable!.id);
 
     const food = aliases.food
       ? await this.manager.load(aliases.food as number)
@@ -110,9 +120,10 @@ export class PrototypeBuilder {
       ? await this.manager.load(aliases.stomachContents as number)
       : await this.stomachContentsBuilder.build(describable!.id);
 
+    // BodyPart inherits from Edible (severed parts can be eaten, decay over time)
     const bodyPart = aliases.bodyPart
       ? await this.manager.load(aliases.bodyPart as number)
-      : await this.bodyPartBuilder.build(describable!.id);
+      : await this.bodyPartBuilder.build(edible!.id);
 
     // Build specialized body parts (inherit from BodyPart)
     // Store under bodyParts.* namespace in aliases
@@ -135,6 +146,7 @@ export class PrototypeBuilder {
       agent: agent!.id,
       human: human!.id,
       player: player!.id,
+      decayable: decayable!.id,
       edible: edible!.id,
       food: food!.id,
       drink: drink!.id,
@@ -151,6 +163,7 @@ export class PrototypeBuilder {
     agent: number;
     human: number;
     player: number;
+    decayable: number;
     edible: number;
     food: number;
     drink: number;
@@ -168,6 +181,7 @@ export class PrototypeBuilder {
     aliases.agent = ids.agent;
     aliases.human = ids.human;
     aliases.player = ids.player;
+    aliases.decayable = ids.decayable;
     aliases.edible = ids.edible;
     aliases.food = ids.food;
     aliases.drink = ids.drink;
@@ -184,7 +198,7 @@ export class PrototypeBuilder {
 
     const partNames = Object.keys(ids.bodyParts).join(', ');
     console.log(
-      `✅ Registered prototype aliases: describable=#${ids.describable}, location=#${ids.location}, room=#${ids.room}, agent=#${ids.agent}, human=#${ids.human}, player=#${ids.player}, bodyPart=#${ids.bodyPart}`,
+      `✅ Registered prototype aliases: describable=#${ids.describable}, location=#${ids.location}, room=#${ids.room}, agent=#${ids.agent}, human=#${ids.human}, player=#${ids.player}, decayable=#${ids.decayable}, bodyPart=#${ids.bodyPart}`,
     );
     console.log(`✅ Registered body part prototypes: ${partNames}`);
   }

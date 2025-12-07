@@ -6,9 +6,14 @@ import type { RuntimeObject } from '../../../../types/object.js';
  * Inherits from Edible, provides the 'drink' verb
  *
  * Drink is consumed by drinking, which:
- * 1. Takes a sip (via Edible.takeBite)
+ * 1. Takes a sip (via Edible.consume)
  * 2. When fully consumed, moves to stomach for digestion
  * 3. Stomach digests over time and releases calories
+ *
+ * Decay (1 tick = 1 minute):
+ * - decayRate: 0.005% per tick (~14 days to spoil at room temp)
+ * - Drinks last longer than solid food due to less surface area
+ * - Refrigeration: 5x longer (70 days)
  */
 export class DrinkBuilder {
   constructor(private manager: ObjectManager) {}
@@ -31,6 +36,9 @@ export class DrinkBuilder {
         weight: 300, // grams (with liquid)
         // Drink-specific
         containerWeight: 50, // Weight of empty container
+        // Decay overrides - drinks last longer than food (14 days vs 7)
+        // 14 days = 20160 ticks, 100% / 20160 = ~0.005% per tick
+        decayRate: 0.005, // ~14 days to fully spoil at room temp
       },
       methods: {},
     });

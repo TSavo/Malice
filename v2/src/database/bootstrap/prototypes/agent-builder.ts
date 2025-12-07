@@ -4,6 +4,12 @@ import type { RuntimeObject } from '../../../../types/object.js';
 /**
  * Builds the Agent prototype
  * Base prototype for things that can act (verb handling, movement)
+ *
+ * Watch system:
+ * - watchList: array of object IDs being actively observed
+ * - Watched people are easier to perceive in crowds
+ * - Auto-watch triggers when interacting (emote/talk to someone)
+ * - Manual watch/unwatch commands for focus
  */
 export class AgentBuilder {
   constructor(private manager: ObjectManager) {}
@@ -17,6 +23,11 @@ export class AgentBuilder {
         // Verb registry: { pattern: { obj: ObjId, method: string } }
         // Patterns like 'get %i', 'shoot %i with %t', 'say %s'
         verbs: {},
+        // Watch list - people we're paying attention to
+        // Watching someone gives +50 perception clarity in crowds
+        // Limited by perception capacity (computed from eyes/ears)
+        watchList: [], // Array of object IDs
+        watchExpiry: {}, // { objId: expiryTimestamp } for auto-expire
         // Display options
         options: {
           seePrompt: '',       // Prefix for visual messages (empty = none)
@@ -39,16 +50,18 @@ export class AgentBuilder {
     this.addActionMethods(obj);
     this.addColorMethods(obj);
     this.addSleepMethods(obj);
+    this.addWatchMethods(obj);
 
     return obj;
   }
 
   private addVerbMethods(obj: RuntimeObject): void {
-    // Register verb pattern(s) that this agent can use
-    // patterns: string or string[] - patterns like 'get %i', 'shoot %i with %t'
-    // sourceObj: the object that provides the verb
-    // methodName: the method to call on sourceObj
     obj.setMethod('registerVerb', `
+      /** Register verb pattern(s) that this agent can use.
+       *  @param patterns - String or array of patterns (e.g., 'get %i', 'shoot %i with %t')
+       *  @param sourceObj - The object providing the verb handler
+       *  @param methodName - Method to call (derived from pattern if not specified)
+       */
       const patterns = args[0];
       const sourceObj = args[1]; // RuntimeObject or ObjId
       const methodName = args[2];
@@ -66,16 +79,20 @@ export class AgentBuilder {
       self.verbs = verbs;
     `);
 
-    // Unregister a specific pattern
     obj.setMethod('unregisterVerb', `
+      /** Unregister a specific verb pattern.
+       *  @param pattern - The pattern to remove
+       */
       const pattern = args[0];
       const verbs = self.verbs || {};
       delete verbs[pattern];
       self.verbs = verbs;
     `);
 
-    // Unregister all verbs provided by a specific object
     obj.setMethod('unregisterVerbsFrom', `
+      /** Unregister all verbs provided by a specific object.
+       *  @param sourceObj - The object whose verbs should be removed
+       */
       const sourceObj = args[0];
       const sourceId = typeof sourceObj === 'number' ? sourceObj : sourceObj.id;
       const verbs = self.verbs || {};
@@ -89,8 +106,11 @@ export class AgentBuilder {
       self.verbs = verbs;
     `);
 
-    // Match input against all registered verbs, return best match
     obj.setMethod('matchVerb', `
+      /** Match input against all registered verbs.
+       *  @param input - The user's input string
+       *  @returns Best matching verb info or null
+       */
       const input = args[0];
 
       const verbs = self.verbs || {};
@@ -121,8 +141,13 @@ export class AgentBuilder {
       return null;
     `);
 
-    // Match input against a pattern, return resolved args or null
     obj.setMethod('tryMatchPattern', `
+      /** Match input against a specific pattern.
+       *  @param input - The user's input string
+       *  @param pattern - The pattern to match against
+       *  @param verbInfo - Verb info for %t resolution
+       *  @returns Object with resolved args or null/error
+       */
       const input = args[0];
       const pattern = args[1];
       const verbInfo = args[2];
@@ -204,8 +229,11 @@ export class AgentBuilder {
   }
 
   private addResolutionMethods(obj: RuntimeObject): void {
-    // Parse ordinal from item reference: "first sword" → { ordinal: 0, name: "sword" }
     obj.setMethod('parseOrdinal', `
+      /** Parse ordinal from item reference (e.g., "first sword" → { ordinal: 0, name: "sword" }).
+       *  @param text - The item reference text
+       *  @returns Object with ordinal (null if none) and name
+       */
       const text = args[0];
       const ordinals = {
         'first': 0, '1st': 0, '1': 0,
@@ -228,8 +256,12 @@ export class AgentBuilder {
       return { ordinal: null, name: text.trim().toLowerCase() };
     `);
 
-    // Find objects matching a name in a list of contents
     obj.setMethod('findMatches', `
+      /** Find objects matching a name in a list of contents.
+       *  @param name - The name to search for
+       *  @param contents - Array of object IDs to search
+       *  @returns Array of matching RuntimeObjects
+       */
       const name = args[0];
       const contents = args[1] || [];
 
@@ -248,9 +280,11 @@ export class AgentBuilder {
       return matches;
     `);
 
-    // Resolve %i - find item by name with ordinal support
-    // Returns: { resolved: RuntimeObject, error: null } or { resolved: null, error: string }
     obj.setMethod('resolveItem', `
+      /** Resolve %i - find item by name with ordinal support.
+       *  @param text - The item reference (e.g., "sword", "second apple")
+       *  @returns Object with resolved RuntimeObject or error string
+       */
       const text = args[0];
 
       // Parse ordinal
@@ -651,27 +685,35 @@ export class AgentBuilder {
   }
 
   private addSleepMethods(obj: RuntimeObject): void {
-    // Check if agent is awake (can act)
     obj.setMethod('isAwake', `
+      /** Check if agent is awake and can act.
+       *  @returns true if awake
+       */
       return self.sleepState === 'awake';
     `);
 
-    // Check if agent is asleep (fully)
     obj.setMethod('isAsleep', `
+      /** Check if agent is fully asleep.
+       *  @returns true if asleep
+       */
       return self.sleepState === 'asleep';
     `);
 
-    // Check if agent can be interrupted while falling asleep
-    // Override in subclasses to add conditions (noise level, etc.)
     obj.setMethod('canBeInterrupted', `
+      /** Check if agent can be interrupted while falling asleep.
+       *  Override in subclasses to add conditions (noise level, etc.).
+       *  @returns true if can be interrupted
+       */
       // Default: can always be interrupted
       // Subclasses can check room noise, etc.
       return true;
     `);
 
-    // Check if agent can wake up
-    // Override in subclasses to add conditions (sedation, exhaustion, etc.)
     obj.setMethod('canWakeUp', `
+      /** Check if agent can wake up.
+       *  Override to add conditions (sedation, exhaustion, etc.).
+       *  @returns Object with allowed boolean and optional reason
+       */
       // Can't wake if sedated
       if ((self.sedation || 0) > 0) {
         return { allowed: false, reason: 'You are too sedated to wake.' };
@@ -680,9 +722,11 @@ export class AgentBuilder {
       return { allowed: true };
     `);
 
-    // Check if agent can fall asleep
-    // Override in subclasses to add conditions (in combat, etc.)
     obj.setMethod('canFallAsleep', `
+      /** Check if agent can fall asleep.
+       *  Override to add conditions (in combat, etc.).
+       *  @returns Object with allowed boolean and optional reason
+       */
       // Default: can sleep if awake
       if (self.sleepState !== 'awake') {
         return { allowed: false, reason: 'You are already sleeping or trying to.' };
@@ -690,8 +734,9 @@ export class AgentBuilder {
       return { allowed: true };
     `);
 
-    // Cancel any pending sleep transition
     obj.setMethod('cancelSleepTransition', `
+      /** Cancel any pending sleep/wake transition.
+       */
       const jobName = self.sleepTransitionJob;
       if (jobName && $.scheduler) {
         await $.scheduler.unschedule(jobName);
@@ -699,9 +744,11 @@ export class AgentBuilder {
       }
     `);
 
-    // Start falling asleep (voluntary or from exhaustion)
-    // delay: ms until fully asleep (default 10s)
     obj.setMethod('startSleep', `
+      /** Start falling asleep (voluntary or from exhaustion).
+       *  @param delay - Milliseconds until fully asleep (default 10000)
+       *  @returns Object with success, state, and completesIn
+       */
       const delay = args[0] || 10000; // 10 seconds default
 
       const check = await self.canFallAsleep();
@@ -723,8 +770,10 @@ export class AgentBuilder {
       return { success: true, state: 'falling_asleep', completesIn: delay };
     `);
 
-    // Called by scheduler when falling asleep completes
     obj.setMethod('completeSleep', `
+      /** Called by scheduler when falling asleep completes.
+       *  @returns Object with success and state
+       */
       // Only complete if still falling asleep (wasn't interrupted)
       if (self.sleepState !== 'falling_asleep') {
         return { success: false, reason: 'No longer falling asleep' };
@@ -741,8 +790,11 @@ export class AgentBuilder {
       return { success: true, state: 'asleep' };
     `);
 
-    // Interrupt falling asleep (noise, damage, etc.)
     obj.setMethod('interruptSleep', `
+      /** Interrupt falling asleep (noise, damage, etc.).
+       *  @param reason - Message to show (default: 'You were disturbed.')
+       *  @returns Object with success, state, and reason
+       */
       const reason = args[0] || 'You were disturbed.';
 
       if (self.sleepState !== 'falling_asleep') {
@@ -767,9 +819,11 @@ export class AgentBuilder {
       return { success: true, state: 'awake', reason: reason };
     `);
 
-    // Start waking up (voluntary or from external stimulus)
-    // delay: ms until fully awake (default 5s)
     obj.setMethod('startWake', `
+      /** Start waking up (voluntary or from external stimulus).
+       *  @param delay - Milliseconds until fully awake (default 5000)
+       *  @returns Object with success, state, and completesIn
+       */
       const delay = args[0] || 5000; // 5 seconds default
 
       if (self.sleepState !== 'asleep') {
@@ -795,8 +849,10 @@ export class AgentBuilder {
       return { success: true, state: 'waking_up', completesIn: delay };
     `);
 
-    // Called by scheduler when waking up completes
     obj.setMethod('completeWake', `
+      /** Called by scheduler when waking up completes.
+       *  @returns Object with success and state
+       */
       // Only complete if still waking (wasn't blocked)
       if (self.sleepState !== 'waking_up') {
         return { success: false, reason: 'No longer waking up' };
@@ -825,8 +881,11 @@ export class AgentBuilder {
       return { success: true, state: 'awake' };
     `);
 
-    // Block waking up (e.g., re-sedation during wake process)
     obj.setMethod('blockWake', `
+      /** Block waking up (e.g., re-sedation during wake process).
+       *  @param reason - Message to show (default: 'You fall back asleep.')
+       *  @returns Object with success, state, and reason
+       */
       const reason = args[0] || 'You fall back asleep.';
 
       if (self.sleepState !== 'waking_up') {
@@ -845,30 +904,39 @@ export class AgentBuilder {
       return { success: true, state: 'asleep', reason: reason };
     `);
 
-    // Force wake (bypasses checks, for admin/emergency)
     obj.setMethod('forceWake', `
+      /** Force wake (bypasses checks, for admin/emergency).
+       *  @returns Object with success and state
+       */
       await self.cancelSleepTransition();
       self.set('sleepState', 'awake');
       self.set('sedation', 0);
       return { success: true, state: 'awake' };
     `);
 
-    // Force sleep (bypasses checks, for admin/emergency)
     obj.setMethod('forceSleep', `
+      /** Force sleep (bypasses checks, for admin/emergency).
+       *  @returns Object with success and state
+       */
       await self.cancelSleepTransition();
       self.set('sleepState', 'asleep');
       return { success: true, state: 'asleep' };
     `);
 
-    // Get calorie regen multiplier based on sleep state
     obj.setMethod('getCalorieRegenMultiplier', `
+      /** Get calorie regeneration multiplier based on sleep state.
+       *  @returns Multiplier (1.0 if asleep, 0.5 otherwise)
+       */
       const state = self.sleepState || 'awake';
       if (state === 'asleep') return 1.0;
       return 0.5; // awake, falling_asleep, waking_up
     `);
 
-    // Called each heartbeat to handle sleep-related effects
     obj.setMethod('sleepTick', `
+      /** Called each heartbeat to handle sleep-related effects.
+       *  Decreases sedation over time.
+       *  @returns Object with state and sedation
+       */
       const state = self.sleepState || 'awake';
       const results = { state: state };
 
@@ -886,6 +954,336 @@ export class AgentBuilder {
       }
 
       return results;
+    `);
+  }
+
+  private addWatchMethods(obj: RuntimeObject): void {
+    // Get current watch capacity based on perception (eyes/ears)
+    obj.setMethod('getWatchCapacity', `
+      /** Calculate max people we can watch based on sensory capabilities.
+       *  Computed value based on eyes and ears - not stored.
+       *  Base: 5 slots (normal human perception)
+       *  - Blindness: 3 slots (rely on hearing only)
+       *  - Deafness: 3 slots (rely on vision only)
+       *  - Both blind and deaf: 1 slot (immediate awareness only)
+       *  @returns Max watch slots
+       */
+      // Base capacity for agents without full perception
+      let capacity = 5;
+
+      // Check if we have perception methods (Human/Player)
+      if (self.canSee && self.canHear) {
+        const canSee = await self.canSee();
+        const canHear = await self.canHear();
+
+        if (!canSee && !canHear) {
+          // Both blind and deaf - minimal awareness
+          capacity = 1;
+        } else if (!canSee) {
+          // Blind - rely on hearing only
+          capacity = 3;
+        } else if (!canHear) {
+          // Deaf - rely on vision only
+          capacity = 3;
+        }
+        // Full perception = 5 slots
+      }
+
+      return capacity;
+    `);
+
+    // Watch someone (add to watch list)
+    obj.setMethod('watch', `
+      /** Add someone to your watch list.
+       *  Watched people are easier to perceive in crowds (+50 clarity).
+       *  Limited by maxWatchSlots - if full, oldest watch is silently dropped.
+       *  @param target - Object or ID to watch
+       *  @param duration - Optional duration in ms (default: 5 minutes, 0 = permanent)
+       *  @returns {success, message}
+       */
+      const target = args[0];
+      const duration = args[1] !== undefined ? args[1] : 300000; // 5 min default
+
+      const targetId = typeof target === 'number' ? target : target?.id;
+      if (!targetId) {
+        return { success: false, message: 'Watch who?' };
+      }
+
+      // Can't watch yourself
+      if (targetId === self.id) {
+        return { success: false, message: 'You are always aware of yourself.' };
+      }
+
+      const watchList = self.watchList || [];
+      const watchExpiry = self.watchExpiry || {};
+
+      // Get dynamic capacity based on perception (eyes/ears)
+      const maxSlots = await self.getWatchCapacity();
+
+      // Add to watch list if not already there
+      if (!watchList.includes(targetId)) {
+        // Check if at capacity - silently drop oldest (first in list)
+        while (watchList.length >= maxSlots) {
+          const droppedId = watchList.shift(); // Remove oldest
+          delete watchExpiry[droppedId];
+        }
+        watchList.push(targetId);
+        self.set('watchList', watchList);
+      }
+
+      // Set expiry if duration specified
+      if (duration > 0) {
+        watchExpiry[targetId] = Date.now() + duration;
+        self.set('watchExpiry', watchExpiry);
+      } else {
+        // Permanent - remove any expiry
+        delete watchExpiry[targetId];
+        self.set('watchExpiry', watchExpiry);
+      }
+
+      const targetObj = await $.load(targetId);
+      const name = targetObj?.name || '#' + targetId;
+      return { success: true, message: 'You are now watching ' + name + '.' };
+    `);
+
+    // Unwatch someone (remove from watch list)
+    obj.setMethod('unwatch', `
+      /** Remove someone from your watch list.
+       *  @param target - Object or ID to stop watching
+       *  @returns {success, message}
+       */
+      const target = args[0];
+      const targetId = typeof target === 'number' ? target : target?.id;
+
+      if (!targetId) {
+        return { success: false, message: 'Unwatch who?' };
+      }
+
+      const watchList = self.watchList || [];
+      const watchExpiry = self.watchExpiry || {};
+
+      const index = watchList.indexOf(targetId);
+      if (index === -1) {
+        return { success: false, message: 'You are not watching them.' };
+      }
+
+      watchList.splice(index, 1);
+      delete watchExpiry[targetId];
+
+      self.set('watchList', watchList);
+      self.set('watchExpiry', watchExpiry);
+
+      const targetObj = await $.load(targetId);
+      const name = targetObj?.name || '#' + targetId;
+      return { success: true, message: 'You stop watching ' + name + '.' };
+    `);
+
+    // Check if watching someone
+    obj.setMethod('isWatching', `
+      /** Check if this agent is watching a target.
+       *  @param target - Object or ID to check
+       *  @returns true if watching
+       */
+      const target = args[0];
+      const targetId = typeof target === 'number' ? target : target?.id;
+      const watchList = self.watchList || [];
+      return watchList.includes(targetId);
+    `);
+
+    // Auto-watch (called when interacting with someone)
+    obj.setMethod('autoWatch', `
+      /** Automatically watch someone for a short duration.
+       *  Called when emoting at or talking to someone.
+       *  @param target - Object or ID to auto-watch
+       *  @param duration - Duration in ms (default: 2 minutes)
+       */
+      const target = args[0];
+      const duration = args[1] || 120000; // 2 min default for auto-watch
+
+      const targetId = typeof target === 'number' ? target : target?.id;
+      if (!targetId || targetId === self.id) return;
+
+      const watchList = self.watchList || [];
+      const watchExpiry = self.watchExpiry || {};
+
+      // Add to watch list if not already there
+      if (!watchList.includes(targetId)) {
+        watchList.push(targetId);
+        self.set('watchList', watchList);
+      }
+
+      // Update expiry (only if not permanently watching)
+      const currentExpiry = watchExpiry[targetId];
+      if (currentExpiry !== 0) { // 0 means permanent
+        watchExpiry[targetId] = Math.max(currentExpiry || 0, Date.now() + duration);
+        self.set('watchExpiry', watchExpiry);
+      }
+    `);
+
+    // Clean up expired watches (called on heartbeat)
+    obj.setMethod('cleanExpiredWatches', `
+      /** Remove expired watches from watch list.
+       *  Called periodically by heartbeat.
+       *  @returns Number of watches removed
+       */
+      const now = Date.now();
+      const watchList = self.watchList || [];
+      const watchExpiry = self.watchExpiry || {};
+      let removed = 0;
+
+      const newWatchList = [];
+      for (const id of watchList) {
+        const expiry = watchExpiry[id];
+        if (expiry && expiry > 0 && now >= expiry) {
+          // Expired - remove
+          delete watchExpiry[id];
+          removed++;
+        } else {
+          newWatchList.push(id);
+        }
+      }
+
+      if (removed > 0) {
+        self.set('watchList', newWatchList);
+        self.set('watchExpiry', watchExpiry);
+      }
+
+      return removed;
+    `);
+
+    // List who you're watching
+    obj.setMethod('listWatching', `
+      /** Get list of who this agent is watching.
+       *  @returns Array of {id, name, permanent, expiresIn}
+       */
+      const watchList = self.watchList || [];
+      const watchExpiry = self.watchExpiry || {};
+      const now = Date.now();
+      const result = [];
+
+      for (const id of watchList) {
+        const obj = await $.load(id);
+        const expiry = watchExpiry[id];
+        const permanent = !expiry || expiry === 0;
+        const expiresIn = permanent ? null : Math.max(0, expiry - now);
+
+        result.push({
+          id: id,
+          name: obj?.name || '#' + id,
+          permanent: permanent,
+          expiresIn: expiresIn,
+        });
+      }
+
+      return result;
+    `);
+
+    // Watch command (for player use)
+    obj.setMethod('watchCommand', `
+      /** Command handler for 'watch <person>'.
+       *  @param target - Resolved target from %i
+       */
+      const target = args[3];
+
+      if (!target) {
+        // Show who we're watching
+        const watching = await self.listWatching();
+        if (watching.length === 0) {
+          return 'You are not watching anyone.';
+        }
+        let msg = 'You are watching:\\r\\n';
+        for (const w of watching) {
+          if (w.permanent) {
+            msg += '  - ' + w.name + ' (permanent)\\r\\n';
+          } else {
+            const mins = Math.ceil(w.expiresIn / 60000);
+            msg += '  - ' + w.name + ' (' + mins + ' min remaining)\\r\\n';
+          }
+        }
+        return msg;
+      }
+
+      const result = await self.watch(target, 0); // Permanent manual watch
+      return result.message;
+    `);
+
+    // Unwatch command
+    obj.setMethod('unwatchCommand', `
+      /** Command handler for 'unwatch <person>'.
+       *  @param target - Resolved target from %i
+       */
+      const target = args[3];
+
+      if (!target) {
+        return 'Unwatch who?';
+      }
+
+      const result = await self.unwatch(target);
+      return result.message;
+    `);
+
+    // Clear watches for people not in current room
+    obj.setMethod('clearOutOfRangeWatches', `
+      /** Remove people from watch list who are no longer in the same room.
+       *  Called when leaving a room or when someone else leaves.
+       *  @returns Number of watches removed
+       */
+      const watchList = self.watchList || [];
+      if (watchList.length === 0) return 0;
+
+      // Get current room's contents
+      let roomContents = [];
+      if (self.location && self.location !== 0) {
+        const room = await $.load(self.location);
+        if (room) {
+          roomContents = room.contents || [];
+        }
+      }
+
+      // Find watches that are no longer in range
+      const toRemove = [];
+      for (const id of watchList) {
+        if (!roomContents.includes(id)) {
+          toRemove.push(id);
+        }
+      }
+
+      // Remove them
+      for (const id of toRemove) {
+        await self.unwatch(id);
+      }
+
+      return toRemove.length;
+    `);
+
+    // Called when this agent enters a new room
+    obj.setMethod('onEnterRoom', `
+      /** Called when entering a new room.
+       *  Clears out-of-range watches from previous room.
+       *  @param newRoom - The room being entered
+       *  @param oldRoom - The room being left (may be null)
+       */
+      const newRoom = args[0];
+      const oldRoom = args[1];
+
+      // Clear watches for people left behind
+      if (oldRoom) {
+        await self.clearOutOfRangeWatches();
+      }
+    `);
+
+    // Called when someone else leaves the room
+    obj.setMethod('onOtherLeft', `
+      /** Called when someone else leaves our room.
+       *  Removes them from watch list if we were watching them.
+       *  @param other - The person who left
+       */
+      const other = args[0];
+      const otherId = typeof other === 'number' ? other : other?.id;
+
+      if (otherId && await self.isWatching(otherId)) {
+        await self.unwatch(otherId);
+      }
     `);
   }
 }
