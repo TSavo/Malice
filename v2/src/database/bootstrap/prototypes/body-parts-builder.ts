@@ -59,8 +59,6 @@ export class BodyPartsBuilder {
         critical: true,
         removable: false, // Torso is the root - you amputate FROM it, not it itself
         bones: ['spine', 'ribs', 'pelvis'],
-        // Stats
-        strength: 1, // Core strength
         // Calories - main body store (where digestion happens)
         // Average adult has ~2000 kcal/day needs, store represents available energy
         calories: 2000, // Current calories available
@@ -459,8 +457,6 @@ export class BodyPartsBuilder {
         coverable: true,
         removable: true,
         bones: ['humerus', 'radius', 'ulna'],
-        // Stats
-        strength: 1, // Arm strength
         // Local muscle energy (glycogen in arm muscles)
         calories: 100, // Current arm calories
         maxCalories: 150, // Max arm calorie storage
@@ -505,9 +501,6 @@ export class BodyPartsBuilder {
         // Grasp capacity
         maxItems: 2,
         maxWeight: 10000, // 10kg in grams
-        // Stats
-        strength: 1, // Grip strength
-        dexterity: 1, // Fine motor control
         // Local muscle energy (hand/forearm muscles)
         calories: 50, // Current hand calories
         maxCalories: 75, // Max hand calorie storage
@@ -525,9 +518,14 @@ export class BodyPartsBuilder {
         return 'Your hand is already full.';
       }
 
-      // Check weight (in grams) - strength affects max carry weight
-      const strengthMult = (self.strength || 1) * 5000; // 5kg per strength point
-      const maxWeight = self.maxWeight || strengthMult;
+      // Check weight - effective capacity determines max carry weight
+      // effectiveCapacity = maxCalories - decayLevel
+      const maxCal = self.maxCalories || 75;
+      const decay = self.decayLevel || 0;
+      const effectiveCapacity = Math.max(0, maxCal - decay);
+
+      // ~133g per calorie of capacity (75 cal = 10kg)
+      const maxWeight = self.maxWeight || Math.floor(effectiveCapacity * 133);
 
       let currentWeight = 0;
       for (const itemId of contents) {
@@ -611,9 +609,6 @@ export class BodyPartsBuilder {
         removable: true,
         canMove: true,
         bones: ['femur', 'tibia', 'fibula'],
-        // Stats
-        strength: 1, // Leg power
-        dexterity: 1, // Coordination/balance
         // Local muscle energy (leg muscles - largest muscle group)
         calories: 200, // Current leg calories
         maxCalories: 300, // Max leg calorie storage
@@ -638,8 +633,6 @@ export class BodyPartsBuilder {
         canMove: true,
         canSense: ['touch'],
         bones: ['tarsals', 'metatarsals', 'phalanges'],
-        // Stats
-        dexterity: 1, // Balance/footwork
       },
       methods: {},
     });

@@ -8,14 +8,18 @@ import type { RuntimeObject } from '../../../types/object.js';
  * Usage from MOO code:
  *   $.emote.broadcast('.fall and .say "Hello!"', actor, room)
  *
- * Three input modes:
+ * Five input modes:
  *   " text    - say: Speech only (audible) -> Bob says, "text"
  *   . emote   - emote: Visual action with optional speech
  *   , amote   - amote: Audible non-speech (growl, sigh, footsteps)
+ *   ~ smote   - smote: Olfactory (smell) action (perfume, stench, etc.)
+ *   ^ tmote   - tmote: Gustatory (taste) action (bitter, sweet, metallic)
  *
  * Emote syntax:
  *   .verb phrase - verb is conjugated (you fall / Bob falls)
  *   ,verb phrase - audible action (heard, not seen)
+ *   ~verb phrase - olfactory action (smelled, not seen/heard)
+ *   ^verb phrase - gustatory action (tasted, requires tongue)
  *   Names - shift currentTarget, e.g., "Player2" makes pronouns refer to Player2
  *   Pronouns (him/her/them) - refer to currentTarget
  *   Reflexives (myself/yourself) - always refer to actor
@@ -24,15 +28,26 @@ import type { RuntimeObject } from '../../../types/object.js';
  * Sensory routing:
  *   - Visual actions (.) route through viewer.see()
  *   - Audible actions (,) route through viewer.hear()
+ *   - Olfactory actions (~) route through viewer.smell()
  *   - Speech routes through viewer.hear()
  *   - Blind players hear speech and amotes, miss visual emotes
  *   - Deaf players see visual emotes with "*inaudible*" for speech/amotes
+ *   - Anosmic players miss smotes but see/hear other components
+ *   - Tongueless players miss tmotes but perceive other components
  *
  * Example:
  *   Input: .fall on my knees and .say "Hey!" to Player2
  *   Sighted+Hearing: Bob falls on his knees and says, "Hey!" to Player2.
  *   Blind: Bob says, "Hey!"
  *   Deaf: Bob falls on his knees and says, "*inaudible*" to Player2.
+ *
+ *   Input: ~reek of garlic
+ *   Can smell: Bob reeks of garlic.
+ *   Anosmic: (nothing)
+ *
+ *   Input: ^taste metallic on your tongue
+ *   Has tongue: You taste metallic on your tongue.
+ *   No tongue: (nothing)
  */
 export class EmoteBuilder {
   private emote: RuntimeObject | null = null;
@@ -214,13 +229,13 @@ export class EmoteBuilder {
 
     // Format emote with sensory separation
     this.emote.setMethod('formatSensory', `
-      /** Format an emote into separate visual and audible components.
+      /** Format an emote into separate visual, audible, olfactory, and gustatory components.
        *  Usage: $.emote.formatSensory(emoteStr, actor, viewer, knownNames)
        *  @param emoteStr - The emote string
        *  @param actor - The player performing the emote
        *  @param viewer - The player viewing the emote
        *  @param knownNames - Map of lowercase names to objects
-       *  @returns {visual, audible, visualDeaf, combined} - Different versions for sensory states
+       *  @returns {visual, audible, olfactory, gustatory, visualDeaf, combined}
        */
       const emoteStr = args[0];
       const actor = args[1];
@@ -228,7 +243,7 @@ export class EmoteBuilder {
       const knownNames = args[3];
 
       if (!emoteStr || !actor || !viewer) {
-        return { visual: '', audible: '', visualDeaf: '', combined: '' };
+        return { visual: '', audible: '', olfactory: '', gustatory: '', visualDeaf: '', combined: '' };
       }
 
       const isActor = viewer.id === actor.id;
@@ -242,6 +257,8 @@ export class EmoteBuilder {
       // Build different output versions
       let visual = '';      // Visual-only parts (for blind: nothing visual)
       let audible = '';     // Speech and amote content (for blind)
+      let olfactory = '';   // Smell-only parts (for anosmic: nothing)
+      let gustatory = '';   // Taste-only parts (for tongueless: nothing)
       let visualDeaf = '';  // Visual actions + "says something" for speech (no amotes)
       let combined = '';    // Full message for sighted+hearing
 
@@ -258,6 +275,16 @@ export class EmoteBuilder {
           audible += seg.audibleText; // What blind hear
           // Deaf get nothing for amotes - they can't hear them
           // Note: amotes don't go in visual (blind can hear them)
+        } else if (seg.type === 'smote') {
+          // Smote segment: "~reek" -> olfactory, not visual/audible
+          combined += seg.text;
+          olfactory += seg.olfactoryText; // What those who can smell perceive
+          // Anosmic players don't perceive smotes at all
+        } else if (seg.type === 'tmote') {
+          // Tmote segment: "^taste" -> gustatory, requires tongue
+          combined += seg.text;
+          gustatory += seg.gustatoryText; // What those with tongues perceive
+          // Tongueless players don't perceive tmotes at all
         } else {
           // Visual action segment
           combined += seg.text;
@@ -278,6 +305,8 @@ export class EmoteBuilder {
       return {
         visual: finalize(visual),
         audible: finalize(audible),
+        olfactory: finalize(olfactory),
+        gustatory: finalize(gustatory),
         visualDeaf: finalize(visualDeaf),
         combined: finalize(combined),
       };
@@ -285,12 +314,12 @@ export class EmoteBuilder {
 
     // Parse emote into typed segments
     this.emote.setMethod('parseSegments', `
-      /** Parse emote text into visual, audible, and amote segments.
+      /** Parse emote text into visual, audible, olfactory, and gustatory segments.
        *  @param text - The emote text
        *  @param actor - The emote actor
        *  @param viewer - Who is viewing
        *  @param knownNames - Map of lowercase names to objects
-       *  @returns Array of {type: 'visual'|'speech'|'amote', text, ...}
+       *  @returns Array of {type: 'visual'|'speech'|'amote'|'smote'|'tmote', text, ...}
        */
       const text = args[0];
       const actor = args[1];
@@ -480,6 +509,194 @@ export class EmoteBuilder {
               text: fullAmote,
               audibleText: amoteOnly,  // What's heard
               // No deafText - deaf players don't perceive amotes at all
+            });
+
+            continue;
+          }
+        }
+
+        // Check for smote marker (~) - olfactory action
+        if (text[i] === '~') {
+          const smoteMatch = text.slice(i + 1).match(/^(\\w+)/);
+          if (smoteMatch) {
+            // Save current visual segment if any
+            if (currentSegment.text.trim()) {
+              segments.push(currentSegment);
+              currentSegment = { type: 'visual', text: '' };
+            }
+
+            const verb = smoteMatch[1];
+            i += 1 + verb.length;
+
+            // Conjugate verb
+            let conjugated;
+            if (isActor) {
+              conjugated = verb;
+            } else {
+              conjugated = await $.english.conjugate(verb, 3);
+            }
+
+            // Build smote segment - olfactory action
+            const prefix = (segments.length === 0 && !currentSegment.text.trim()) ? getActorPrefix() : '';
+            const smoteText = prefix + conjugated;
+
+            // Collect the rest of the smote phrase until next marker or end
+            let phraseEnd = i;
+            while (phraseEnd < text.length && text[phraseEnd] !== '.' && text[phraseEnd] !== ',' && text[phraseEnd] !== '~' && text[phraseEnd] !== '^') {
+              phraseEnd++;
+            }
+            const phrase = text.slice(i, phraseEnd);
+            i = phraseEnd;
+
+            // Process phrase for pronouns/names
+            let processedPhrase = '';
+            let j = 0;
+            while (j < phrase.length) {
+              const phraseWordMatch = phrase.slice(j).match(/^(\\w+)/);
+              if (phraseWordMatch) {
+                const word = phraseWordMatch[1];
+                const lower = word.toLowerCase();
+                j += word.length;
+
+                // Handle pronouns and names in smote phrase
+                if (knownNames[lower]) {
+                  const named = knownNames[lower];
+                  currentTarget = named;
+                  if (named.id === viewer.id) {
+                    processedPhrase += 'you';
+                  } else if (named.id === actor.id && isActor) {
+                    processedPhrase += 'yourself';
+                  } else {
+                    processedPhrase += named.name;
+                  }
+                } else if (lower === 'my') {
+                  processedPhrase += isActor ? 'your' : await self.getPossessive(actor);
+                } else if (self.objectPronouns.includes(lower)) {
+                  if (currentTarget.id === viewer.id) {
+                    processedPhrase += 'you';
+                  } else if (currentTarget.id === actor.id && isActor) {
+                    processedPhrase += 'yourself';
+                  } else {
+                    processedPhrase += await self.getObjectPronoun(currentTarget);
+                  }
+                } else if (self.possessivePronouns.includes(lower)) {
+                  if (currentTarget.id === viewer.id) {
+                    processedPhrase += 'your';
+                  } else if (currentTarget.id === actor.id && isActor) {
+                    processedPhrase += 'your';
+                  } else {
+                    processedPhrase += await self.getPossessive(currentTarget);
+                  }
+                } else {
+                  processedPhrase += word;
+                }
+                continue;
+              }
+              processedPhrase += phrase[j];
+              j++;
+            }
+
+            const fullSmote = smoteText + processedPhrase;
+            const smoteOnly = getActorPrefix() + conjugated + processedPhrase;
+
+            segments.push({
+              type: 'smote',
+              text: fullSmote,
+              olfactoryText: smoteOnly,  // What's smelled
+            });
+
+            continue;
+          }
+        }
+
+        // Check for tmote marker (^) - gustatory action
+        if (text[i] === '^') {
+          const tmoteMatch = text.slice(i + 1).match(/^(\\w+)/);
+          if (tmoteMatch) {
+            // Save current visual segment if any
+            if (currentSegment.text.trim()) {
+              segments.push(currentSegment);
+              currentSegment = { type: 'visual', text: '' };
+            }
+
+            const verb = tmoteMatch[1];
+            i += 1 + verb.length;
+
+            // Conjugate verb
+            let conjugated;
+            if (isActor) {
+              conjugated = verb;
+            } else {
+              conjugated = await $.english.conjugate(verb, 3);
+            }
+
+            // Build tmote segment - gustatory action
+            const prefix = (segments.length === 0 && !currentSegment.text.trim()) ? getActorPrefix() : '';
+            const tmoteText = prefix + conjugated;
+
+            // Collect the rest of the tmote phrase until next marker or end
+            let phraseEnd = i;
+            while (phraseEnd < text.length && text[phraseEnd] !== '.' && text[phraseEnd] !== ',' && text[phraseEnd] !== '~' && text[phraseEnd] !== '^') {
+              phraseEnd++;
+            }
+            const phrase = text.slice(i, phraseEnd);
+            i = phraseEnd;
+
+            // Process phrase for pronouns/names
+            let processedPhrase = '';
+            let j = 0;
+            while (j < phrase.length) {
+              const phraseWordMatch = phrase.slice(j).match(/^(\\w+)/);
+              if (phraseWordMatch) {
+                const word = phraseWordMatch[1];
+                const lower = word.toLowerCase();
+                j += word.length;
+
+                // Handle pronouns and names in tmote phrase
+                if (knownNames[lower]) {
+                  const named = knownNames[lower];
+                  currentTarget = named;
+                  if (named.id === viewer.id) {
+                    processedPhrase += 'you';
+                  } else if (named.id === actor.id && isActor) {
+                    processedPhrase += 'yourself';
+                  } else {
+                    processedPhrase += named.name;
+                  }
+                } else if (lower === 'my') {
+                  processedPhrase += isActor ? 'your' : await self.getPossessive(actor);
+                } else if (self.objectPronouns.includes(lower)) {
+                  if (currentTarget.id === viewer.id) {
+                    processedPhrase += 'you';
+                  } else if (currentTarget.id === actor.id && isActor) {
+                    processedPhrase += 'yourself';
+                  } else {
+                    processedPhrase += await self.getObjectPronoun(currentTarget);
+                  }
+                } else if (self.possessivePronouns.includes(lower)) {
+                  if (currentTarget.id === viewer.id) {
+                    processedPhrase += 'your';
+                  } else if (currentTarget.id === actor.id && isActor) {
+                    processedPhrase += 'your';
+                  } else {
+                    processedPhrase += await self.getPossessive(currentTarget);
+                  }
+                } else {
+                  processedPhrase += word;
+                }
+                continue;
+              }
+              processedPhrase += phrase[j];
+              j++;
+            }
+
+            const fullTmote = tmoteText + processedPhrase;
+            const tmoteOnly = getActorPrefix() + conjugated + processedPhrase;
+
+            segments.push({
+              type: 'tmote',
+              text: fullTmote,
+              gustatoryText: tmoteOnly,  // What's tasted
             });
 
             continue;
@@ -818,10 +1035,14 @@ export class EmoteBuilder {
         // Check viewer's sensory capabilities
         const viewerCanSee = viewer.canSee ? await viewer.canSee() : true;
         const viewerCanHear = viewer.canHear ? await viewer.canHear() : true;
+        const viewerCanSmell = viewer.canSmell ? await viewer.canSmell() : true;
+        const viewerCanTaste = viewer.canTaste ? await viewer.canTaste() : true;
 
         // Combine physical ability with crowd perception
         const canSee = viewerCanSee && perception.canSee;
         const canHear = viewerCanHear && perception.canHear;
+        const canSmell = !!viewerCanSmell;  // No crowd perception for smell (yet)
+        const canTaste = !!viewerCanTaste;  // Taste is direct contact, no perception needed
 
         // Determine if perception is degraded (for potential partial messages)
         const visualDegraded = perception.visualClarity < 50;
@@ -904,6 +1125,25 @@ export class EmoteBuilder {
           }
         }
         // If both blind and deaf, or can't perceive due to crowd, nothing is perceived
+
+        // Handle olfactory (smote) - routed through viewer.smell()
+        if (canSmell && sensory.olfactory) {
+          if (viewer.smell) {
+            await viewer.smell(sensory.olfactory, actor);
+          } else if (viewer.tell) {
+            await viewer.tell(sensory.olfactory);
+          }
+        }
+
+        // Handle gustatory (tmote) - routed through viewer.taste()
+        // Requires a tongue to perceive taste
+        if (canTaste && sensory.gustatory) {
+          if (viewer.taste) {
+            await viewer.taste(sensory.gustatory, actor);
+          } else if (viewer.tell) {
+            await viewer.tell(sensory.gustatory);
+          }
+        }
 
         // Only auto-watch if THIS viewer was specifically mentioned in the emote
         const isTarget = targets.some(t => t && t.id === viewer.id);

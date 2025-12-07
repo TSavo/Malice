@@ -54,6 +54,13 @@ export class AgentBuilder {
         // Hidden luck attribute (1-100) - failed rolls get a luck save
         // Roll d100, if <= luck, failure becomes success
         luck: 1, // Everyone starts with 1
+        // Movement system
+        movementMode: 'walk', // 'walk' or 'run'
+        // Movement state (null if not moving)
+        // { destId, direction, distanceRemaining, startTime, mode }
+        movementState: null,
+        // Movement job name (for cancellation)
+        movementJob: null,
       },
       methods: {},
     });
@@ -65,6 +72,7 @@ export class AgentBuilder {
     this.addSleepMethods(obj);
     this.addWatchMethods(obj);
     this.addSkillMethods(obj);
+    this.addMovementMethods(obj);
 
     return obj;
   }
@@ -1524,6 +1532,284 @@ export class AgentBuilder {
        */
       self.set('tempLuck', 0);
       return await self.getLuck();
+    `);
+  }
+
+  private addMovementMethods(obj: RuntimeObject): void {
+    // Movement constants:
+    // Walk: 1.4 m/s (5 km/h), 1 calorie per 10 meters
+    // Run:  2.8 m/s (10 km/h), 2.5 calories per 10 meters
+    // Time to travel = distance / speed (in seconds)
+
+    obj.setMethod('isMoving', `
+      /** Check if agent is currently moving.
+       *  @returns true if in motion
+       */
+      return self.movementState !== null;
+    `);
+
+    obj.setMethod('getMovementMode', `
+      /** Get current movement mode.
+       *  @returns 'walk' or 'run'
+       */
+      return self.movementMode || 'walk';
+    `);
+
+    obj.setMethod('setMovementMode', `
+      /** Set movement mode for future movement.
+       *  @param mode - 'walk' or 'run'
+       *  @returns { success, mode }
+       */
+      const mode = args[0];
+      if (mode !== 'walk' && mode !== 'run') {
+        return { success: false, message: 'Mode must be walk or run.' };
+      }
+      self.set('movementMode', mode);
+      return { success: true, mode };
+    `);
+
+    obj.setMethod('getMovementSpeed', `
+      /** Get movement speed in m/s for a mode.
+       *  Walk: 1.4 m/s, Run: 2.8 m/s
+       *  @param mode - Optional mode override (uses current mode if not specified)
+       *  @returns Speed in meters per second
+       */
+      const mode = args[0] || self.movementMode || 'walk';
+      return mode === 'run' ? 2.8 : 1.4;
+    `);
+
+    obj.setMethod('getMovementCalorieCost', `
+      /** Get calorie cost per 10 meters for a mode.
+       *  Base: Walk: 1 cal/10m, Run: 2.5 cal/10m
+       *  Modifiers:
+       *  - Fat: +50% cost at max fat (linear scale from 20% threshold)
+       *  - Carried weight: +1% cost per kg carried
+       *  @param mode - Optional mode override
+       *  @returns Calories per 10 meters
+       */
+      const mode = args[0] || self.movementMode || 'walk';
+      let baseCost = mode === 'run' ? 2.5 : 1.0;
+
+      // Fat modifier - heavier body = more energy to move
+      // No penalty up to 20% fat, then linear to +50% at max fat
+      if (self.getFat) {
+        const fatInfo = await self.getFat();
+        const fatPercent = fatInfo.fat / fatInfo.maxFat;
+        if (fatPercent > 0.2) {
+          // 0.2 to 1.0 maps to 0% to 50% penalty
+          const fatPenalty = ((fatPercent - 0.2) / 0.8) * 0.5;
+          baseCost *= (1 + fatPenalty);
+        }
+      }
+
+      // Carried weight modifier
+      // Each kg adds 1% to movement cost
+      if (self.getCarriedWeight) {
+        const carriedGrams = await self.getCarriedWeight();
+        const carriedKg = carriedGrams / 1000;
+        baseCost *= (1 + carriedKg * 0.01);
+      }
+
+      return baseCost;
+    `);
+
+    obj.setMethod('startMovement', `
+      /** Start moving toward a destination.
+       *  @param destRoom - Destination room (ID or RuntimeObject)
+       *  @param distance - Distance in meters
+       *  @param direction - Direction name for display
+       *  @returns { success, message, timeMs }
+       */
+      const destRoomArg = args[0];
+      const distance = args[1] || 10;
+      const direction = args[2] || 'ahead';
+
+      // Accept either ID or RuntimeObject
+      const destRoom = typeof destRoomArg === 'number' ? destRoomArg : destRoomArg?.id;
+
+      // Check if already moving
+      if (self.movementState) {
+        return { success: false, message: 'You are already moving.' };
+      }
+
+      // Check if awake
+      if (self.isAwake && !(await self.isAwake())) {
+        return { success: false, message: 'You cannot move while asleep.' };
+      }
+
+      const mode = self.movementMode || 'walk';
+      const speed = await self.getMovementSpeed(mode);
+      const timeMs = Math.ceil((distance / speed) * 1000);
+
+      // Calculate calorie cost
+      const costPer10m = await self.getMovementCalorieCost(mode);
+      const totalCost = (distance / 10) * costPer10m;
+
+      // Check if we have enough calories (if Embodied)
+      if (self.getCalorieStatus) {
+        const status = await self.getCalorieStatus();
+        if (status.total < totalCost) {
+          return {
+            success: false,
+            message: 'You are too exhausted to ' + mode + ' that far.'
+          };
+        }
+      }
+
+      // Set movement state
+      const state = {
+        destRoom,
+        direction,
+        distance,
+        distanceRemaining: distance,
+        startTime: Date.now(),
+        mode,
+        calorieCost: totalCost,
+      };
+      self.set('movementState', state);
+
+      // Schedule completion
+      const jobName = 'move_' + self.id + '_' + Date.now();
+      await $.scheduler.schedule(jobName, timeMs, 0, self, 'completeMovement');
+      self.set('movementJob', jobName);
+
+      const verb = mode === 'run' ? 'start running' : 'start walking';
+      const timeStr = timeMs >= 1000
+        ? Math.ceil(timeMs / 1000) + ' seconds'
+        : timeMs + 'ms';
+
+      return {
+        success: true,
+        message: 'You ' + verb + ' ' + direction + '. (' + timeStr + ')',
+        timeMs,
+      };
+    `);
+
+    obj.setMethod('completeMovement', `
+      /** Called by scheduler when movement completes.
+       *  Burns calories and moves to destination.
+       *  @returns { success, message }
+       */
+      const state = self.movementState;
+      if (!state) {
+        return { success: false, message: 'Not moving.' };
+      }
+
+      const destRoom = state.destRoom;
+      const direction = state.direction;
+      const calorieCost = state.calorieCost || 0;
+
+      // Clear movement state first
+      self.set('movementState', null);
+      self.set('movementJob', null);
+
+      // Burn calories (if Embodied)
+      if (self.burnCalories && calorieCost > 0) {
+        await self.burnCalories(calorieCost);
+      }
+
+      // Actually move to destination
+      await self.moveTo(destRoom, self);
+
+      // Notify arrival
+      if (self.tell) {
+        const dest = await $.load(destRoom);
+        if (dest) {
+          const desc = await dest.describe(self);
+          await self.tell('\\r\\nYou arrive ' + direction + '.\\r\\n' + desc);
+        }
+      }
+
+      return { success: true, message: 'Arrived.' };
+    `);
+
+    obj.setMethod('stopMovement', `
+      /** Stop current movement. Partial calorie cost applies.
+       *  @returns { success, message }
+       */
+      const state = self.movementState;
+      if (!state) {
+        return { success: false, message: 'You are not moving.' };
+      }
+
+      // Cancel scheduled completion
+      const jobName = self.movementJob;
+      if (jobName && $.scheduler) {
+        await $.scheduler.unschedule(jobName);
+      }
+
+      // Calculate partial distance traveled
+      const elapsed = Date.now() - state.startTime;
+      const speed = await self.getMovementSpeed(state.mode);
+      const distanceTraveled = (elapsed / 1000) * speed;
+
+      // Burn partial calories
+      if (self.burnCalories && distanceTraveled > 0) {
+        const costPer10m = await self.getMovementCalorieCost(state.mode);
+        const partialCost = (distanceTraveled / 10) * costPer10m;
+        await self.burnCalories(partialCost);
+      }
+
+      // Clear state
+      self.set('movementState', null);
+      self.set('movementJob', null);
+
+      return {
+        success: true,
+        message: 'You stop moving after ' + Math.round(distanceTraveled) + 'm.'
+      };
+    `);
+
+    obj.setMethod('getMovementStatus', `
+      /** Get current movement status.
+       *  @returns { moving, mode, direction, progress, timeRemaining } or null
+       */
+      const state = self.movementState;
+      if (!state) {
+        return null;
+      }
+
+      const elapsed = Date.now() - state.startTime;
+      const speed = await self.getMovementSpeed(state.mode);
+      const distanceTraveled = (elapsed / 1000) * speed;
+      const progress = Math.min(100, (distanceTraveled / state.distance) * 100);
+      const remaining = state.distance - distanceTraveled;
+      const timeRemaining = Math.max(0, (remaining / speed) * 1000);
+
+      return {
+        moving: true,
+        mode: state.mode,
+        direction: state.direction,
+        distance: state.distance,
+        distanceTraveled: Math.round(distanceTraveled),
+        progress: Math.round(progress),
+        timeRemainingMs: Math.round(timeRemaining),
+      };
+    `);
+
+    // Command handlers for walk/run mode switching
+    obj.setMethod('walkCommand', `
+      /** Switch to walk mode.
+       *  Usage: walk
+       */
+      const result = await self.setMovementMode('walk');
+      return 'You will now walk.';
+    `);
+
+    obj.setMethod('runCommand', `
+      /** Switch to run mode.
+       *  Usage: run
+       */
+      const result = await self.setMovementMode('run');
+      return 'You will now run.';
+    `);
+
+    obj.setMethod('stopCommand', `
+      /** Stop current movement.
+       *  Usage: stop
+       */
+      const result = await self.stopMovement();
+      return result.message;
     `);
   }
 }
