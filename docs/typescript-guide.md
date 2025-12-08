@@ -213,6 +213,62 @@ interface Goblin extends BaseMob {
 }
 ```
 
+#### Using `pass()` for Method Overrides (MOO-style super)
+
+When you override a parent's method but still want to call the parent's implementation, use `pass()`. This is Malice's equivalent of `super()` in traditional OOP.
+
+**Basic usage:**
+
+```typescript
+// Parent object #3 (BaseMob) has:
+// attack method: return self.strength * 2;
+
+// Child object #10 (Goblin) overrides attack:
+const parentDamage = await pass();  // Calls BaseMob.attack()
+const sneakBonus = Math.random() > 0.7 ? 10 : 0;
+return parentDamage + sneakBonus;
+```
+
+**Key behaviors:**
+
+1. **`pass()` with no arguments** - Uses the original `args` passed to the current method
+2. **`pass(arg1, arg2, ...)`** - Passes custom arguments to the parent method
+3. **`self` binding preserved** - In the parent method, `self` still refers to the child instance
+4. **Works through inheritance chains** - Each `pass()` finds the next parent up the chain
+
+**Example: Deep inheritance chain**
+
+```typescript
+// Grandparent (#1 Root)
+// method: describe
+return "A thing";
+
+// Parent (#3 BaseMob, parent: 1)
+// method: describe (overrides Root)
+const base = await pass();  // Gets "A thing"
+return base + " that moves";
+
+// Child (#10 Goblin, parent: 3)
+// method: describe (overrides BaseMob)
+const base = await pass();  // Gets "A thing that moves"
+return base + " and attacks";
+
+// Result of goblin.describe(): "A thing that moves and attacks"
+```
+
+**Important:** `pass()` searches from where the method is *defined*, not where it's *called on*. This means if a Goblin instance calls an inherited method from BaseMob that uses `pass()`, it correctly calls Root's method (BaseMob's parent), not Goblin's parent.
+
+**Error handling:**
+
+```typescript
+// If there's no parent method, pass() throws:
+try {
+  await pass();
+} catch (e) {
+  // "pass(): No parent implementation of 'methodName' found"
+}
+```
+
 ### Option 3: Copy/Paste Utility Functions (Not Recommended)
 
 ```typescript

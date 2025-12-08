@@ -948,6 +948,272 @@ describe('RuntimeObject', () => {
     });
   });
 
+  describe('pass() - MOO-style super calls', () => {
+    it('should call parent method with pass()', async () => {
+      // Create parent with a method
+      const parent = await manager.create({
+        parent: 0,
+        properties: {},
+        methods: {},
+      });
+      parent.setMethod('greet', 'return "Hello from parent";');
+      await parent.save();
+
+      // Create child that overrides and calls pass()
+      const child = await manager.create({
+        parent: parent.id,
+        properties: {},
+        methods: {},
+      });
+      child.setMethod('greet', `
+        const parentResult = await pass();
+        return parentResult + " and child";
+      `);
+
+      const result = await child.call('greet');
+      expect(result).toBe('Hello from parent and child');
+    });
+
+    it('should pass arguments through pass()', async () => {
+      const parent = await manager.create({
+        parent: 0,
+        properties: {},
+        methods: {},
+      });
+      parent.setMethod('add', 'return args[0] + args[1];');
+      await parent.save();
+
+      const child = await manager.create({
+        parent: parent.id,
+        properties: {},
+        methods: {},
+      });
+      child.setMethod('add', `
+        const parentResult = await pass(args[0], args[1]);
+        return parentResult * 2;
+      `);
+
+      const result = await child.call('add', 3, 4);
+      expect(result).toBe(14); // (3 + 4) * 2
+    });
+
+    it('should pass original args when pass() called with no arguments', async () => {
+      const parent = await manager.create({
+        parent: 0,
+        properties: {},
+        methods: {},
+      });
+      parent.setMethod('echo', 'return args[0];');
+      await parent.save();
+
+      const child = await manager.create({
+        parent: parent.id,
+        properties: {},
+        methods: {},
+      });
+      child.setMethod('echo', `
+        const parentResult = await pass();
+        return "child: " + parentResult;
+      `);
+
+      const result = await child.call('echo', 'test message');
+      expect(result).toBe('child: test message');
+    });
+
+    it('should maintain self binding in parent method', async () => {
+      const parent = await manager.create({
+        parent: 0,
+        properties: { name: 'Parent' },
+        methods: {},
+      });
+      parent.setMethod('getName', 'return self.name;');
+      await parent.save();
+
+      const child = await manager.create({
+        parent: parent.id,
+        properties: { name: 'Child' },
+        methods: {},
+      });
+      child.setMethod('getName', `
+        const parentName = await pass();
+        return parentName;
+      `);
+
+      // Even though pass() calls parent's method, self should still be child
+      const result = await child.call('getName');
+      expect(result).toBe('Child');
+    });
+
+    it('should work with grandchild calling pass() through chain', async () => {
+      // grandparent -> parent -> child
+      const grandparent = await manager.create({
+        parent: 0,
+        properties: {},
+        methods: {},
+      });
+      grandparent.setMethod('level', 'return "grandparent";');
+      await grandparent.save();
+
+      const parent = await manager.create({
+        parent: grandparent.id,
+        properties: {},
+        methods: {},
+      });
+      parent.setMethod('level', `
+        const up = await pass();
+        return up + " -> parent";
+      `);
+      await parent.save();
+
+      const child = await manager.create({
+        parent: parent.id,
+        properties: {},
+        methods: {},
+      });
+      child.setMethod('level', `
+        const up = await pass();
+        return up + " -> child";
+      `);
+
+      const result = await child.call('level');
+      expect(result).toBe('grandparent -> parent -> child');
+    });
+
+    it('should throw when pass() called with no parent method', async () => {
+      const obj = await manager.create({
+        parent: 0,
+        properties: {},
+        methods: {},
+      });
+      obj.setMethod('noParent', `
+        await pass();
+        return "never reached";
+      `);
+
+      await expect(obj.call('noParent')).rejects.toThrow(/no parent implementation/i);
+    });
+
+    it('should work when method defined on ancestor is called on descendant', async () => {
+      // grandparent defines method, parent overrides with pass(), child inherits
+      const grandparent = await manager.create({
+        parent: 0,
+        properties: {},
+        methods: {},
+      });
+      grandparent.setMethod('action', 'return "base action";');
+      await grandparent.save();
+
+      const parent = await manager.create({
+        parent: grandparent.id,
+        properties: {},
+        methods: {},
+      });
+      parent.setMethod('action', `
+        const base = await pass();
+        return base + " + parent enhancement";
+      `);
+      await parent.save();
+
+      // Child doesn't override, just inherits parent's method
+      const child = await manager.create({
+        parent: parent.id,
+        properties: {},
+        methods: {},
+      });
+
+      // When child calls action, it uses parent's method which calls pass() to grandparent
+      const result = await child.call('action');
+      expect(result).toBe('base action + parent enhancement');
+    });
+
+    it('should correctly identify defining object even when called from child instance', async () => {
+      // This tests the core fix: pass() should search from where method is DEFINED,
+      // not from where it's CALLED ON
+      const grandparent = await manager.create({
+        parent: 0,
+        properties: {},
+        methods: {},
+      });
+      grandparent.setMethod('identify', 'return "grandparent";');
+      await grandparent.save();
+
+      const parent = await manager.create({
+        parent: grandparent.id,
+        properties: {},
+        methods: {},
+      });
+      // Parent overrides and calls pass()
+      parent.setMethod('identify', `
+        const parentResult = await pass();
+        return parentResult + " -> parent";
+      `);
+      await parent.save();
+
+      const child = await manager.create({
+        parent: parent.id,
+        properties: {},
+        methods: {},
+      });
+      // Child does NOT override identify - inherits from parent
+
+      // When child.call('identify') runs:
+      // - Method is found on parent (not child)
+      // - pass() should search from parent's parent (grandparent), NOT child's parent
+      const result = await child.call('identify');
+      expect(result).toBe('grandparent -> parent');
+    });
+
+    it('should allow pass() with different arguments than original', async () => {
+      const parent = await manager.create({
+        parent: 0,
+        properties: {},
+        methods: {},
+      });
+      parent.setMethod('multiply', 'return args[0] * args[1];');
+      await parent.save();
+
+      const child = await manager.create({
+        parent: parent.id,
+        properties: {},
+        methods: {},
+      });
+      child.setMethod('multiply', `
+        // Child doubles the first argument before passing
+        const result = await pass(args[0] * 2, args[1]);
+        return result;
+      `);
+
+      const result = await child.call('multiply', 5, 3);
+      expect(result).toBe(30); // (5 * 2) * 3
+    });
+
+    it('should work with async parent methods', async () => {
+      const parent = await manager.create({
+        parent: 0,
+        properties: {},
+        methods: {},
+      });
+      parent.setMethod('asyncOp', `
+        await new Promise(r => setTimeout(r, 10));
+        return "async parent done";
+      `);
+      await parent.save();
+
+      const child = await manager.create({
+        parent: parent.id,
+        properties: {},
+        methods: {},
+      });
+      child.setMethod('asyncOp', `
+        const parentResult = await pass();
+        return parentResult + " and child";
+      `);
+
+      const result = await child.call('asyncOp');
+      expect(result).toBe('async parent done and child');
+    });
+  });
+
   describe('Complex scenarios', () => {
     it('should handle deep inheritance chains', async () => {
       // Create chain: grandparent -> parent -> child

@@ -246,14 +246,15 @@ export class RuntimeObjectImpl implements RuntimeObject {
    * @param args - Method arguments
    */
   async call(method: string, ...args: unknown[]): Promise<unknown> {
-    const code = await this.findMethodAsync(method);
-    if (!code) {
+    const found = await this.findMethodAsync(method);
+    if (!found) {
       throw new Error(`Method ${method} not found on object #${this.id}`);
     }
 
     // Context will be undefined for programmatic calls
     // In production, context would be set by the connection handler
-    return await this.executeMethod(code, undefined, args, method);
+    // Pass the object ID where method was found for pass() support
+    return await this.executeMethod(found.code, undefined, args, method, found.objectId);
   }
 
   /**
@@ -295,12 +296,13 @@ export class RuntimeObjectImpl implements RuntimeObject {
 
   /**
    * Find method code by walking inheritance chain (async - loads from DB if needed)
+   * Returns both the code AND the object ID where method was found (for pass() support)
    */
-  private async findMethodAsync(method: string): Promise<MethodCode | null> {
+  private async findMethodAsync(method: string): Promise<{ code: MethodCode; objectId: number } | null> {
     // Check this object first
     if (method in this.obj.methods) {
       const methodDef = this.obj.methods[method];
-      return methodDef.code;
+      return { code: methodDef.code, objectId: this.id };
     }
 
     // Walk up parent chain (async - loads from DB if not cached)
@@ -308,10 +310,7 @@ export class RuntimeObjectImpl implements RuntimeObject {
     if (this.obj.parent !== 0 && this.obj.parent !== this.obj._id) {
       const parent = await this.manager.load(this.obj.parent);
       if (parent) {
-        const hasIt = await (parent as RuntimeObjectImpl).hasMethodAsync(method);
-        if (hasIt) {
-          return (parent as RuntimeObjectImpl).findMethodAsync(method);
-        }
+        return (parent as RuntimeObjectImpl).findMethodAsync(method);
       }
     }
 
@@ -319,9 +318,33 @@ export class RuntimeObjectImpl implements RuntimeObject {
   }
 
   /**
-   * Compile TypeScript code to JavaScript
+   * Find method code on parent object (for pass/super functionality)
+   * Starts search from parent, not from self
    */
-  private compileTypeScript(tsCode: string, methodName: string): string {
+  async findParentMethod(method: string): Promise<{ code: MethodCode; objectId: number } | null> {
+    // Start from parent, not self
+    if (this.obj.parent === 0 || this.obj.parent === this.obj._id) {
+      return null; // No parent to search
+    }
+
+    const parent = await this.manager.load(this.obj.parent);
+    if (!parent) return null;
+
+    // Check if parent has the method directly
+    const parentImpl = parent as RuntimeObjectImpl;
+    if (method in parentImpl.obj.methods) {
+      return { code: parentImpl.obj.methods[method].code, objectId: parent.id };
+    }
+
+    // Otherwise, search up parent's chain
+    return parentImpl.findParentMethod(method);
+  }
+
+  /**
+   * Compile TypeScript code to JavaScript
+   * Note: Not private so pass() can access it for compiling parent methods
+   */
+  compileTypeScript(tsCode: string, methodName: string): string {
     try {
       const result = ts.transpileModule(tsCode, {
         compilerOptions: {
@@ -353,17 +376,21 @@ export class RuntimeObjectImpl implements RuntimeObject {
    * Execute method code in context
    * Compiles TypeScript to JavaScript before execution
    * Uses caching for compiled code
+   * @param definingObjectId - The object ID where this method was found (for pass() support)
    */
-  private async executeMethod(code: MethodCode, userContext: any, args: unknown[], methodName = 'anonymous'): Promise<unknown> {
+  private async executeMethod(code: MethodCode, userContext: any, args: unknown[], methodName = 'anonymous', definingObjectId?: number): Promise<unknown> {
+    // Use definingObjectId if provided, otherwise fall back to this.id
+    const methodObjectId = definingObjectId ?? this.id;
+
     // Check cache for compiled code (avoids repeated compilation)
-    let jsCode = this.manager.getCompiledMethod(this.id, methodName);
+    let jsCode = this.manager.getCompiledMethod(methodObjectId, methodName);
 
     if (!jsCode) {
       // Cache miss - compile TypeScript to JavaScript
       jsCode = this.compileTypeScript(code, methodName);
 
       // Store in cache (never evicts)
-      this.manager.setCompiledMethod(this.id, methodName, jsCode);
+      this.manager.setCompiledMethod(methodObjectId, methodName, jsCode);
     }
 
     // Create execution context with access to:
@@ -398,6 +425,77 @@ export class RuntimeObjectImpl implements RuntimeObject {
     const verbPlayer = args.length >= 2 ? args[1] : null;
     const verbCommand = args.length >= 3 ? args[2] : null;
 
+    // Create pass() function for calling parent's version of this method
+    // MOO-style: pass(@args) calls the same method on parent with current self
+    // IMPORTANT: We search from the object where method is DEFINED (definingObjectId),
+    // not from self (self might be a child instance calling inherited method)
+
+    const createPass = (searchFromId: number) => {
+      return async (...passArgs: unknown[]) => {
+        // Use passed args if provided, otherwise use original args
+        const argsToPass = passArgs.length > 0 ? passArgs : args;
+
+        // Find parent's version starting from the object that defines current method
+        const searchFrom = await manager.load(searchFromId);
+        if (!searchFrom) {
+          throw new Error(`pass(): Could not load object #${searchFromId}`);
+        }
+
+        const searchFromImpl = searchFrom as RuntimeObjectImpl;
+        const parentMethod = await searchFromImpl.findParentMethod(methodName);
+        if (!parentMethod) {
+          throw new Error(`pass(): No parent implementation of '${methodName}' found above #${searchFromId}`);
+        }
+
+        // Execute parent's method with current self binding
+        let parentJsCode = manager.getCompiledMethod(parentMethod.objectId, methodName);
+        if (!parentJsCode) {
+          const parentObj = await manager.load(parentMethod.objectId);
+          if (parentObj) {
+            parentJsCode = (parentObj as RuntimeObjectImpl).compileTypeScript(parentMethod.code, methodName);
+            manager.setCompiledMethod(parentMethod.objectId, methodName, parentJsCode);
+          }
+        }
+
+        if (!parentJsCode) {
+          throw new Error(`pass(): Could not compile parent method '${methodName}'`);
+        }
+
+        // Create new pass for chained calls - search from the parent's object
+        const chainedPass = createPass(parentMethod.objectId);
+
+        // Re-execute with same self but parent's code
+        const parentContext = {
+          self,
+          this: self,
+          $: $proxy,
+          args: argsToPass,
+          context: userContext,
+          player: verbPlayer || userContext?.player || self,
+          command: verbCommand || '',
+          pass: chainedPass, // New pass that searches from parent's parent
+          methodName,
+        };
+
+        const AsyncFn = async function () {}.constructor as FunctionConstructor;
+        const parentFn = new AsyncFn('ctx', `
+          const self = ctx.self;
+          const $ = ctx.$;
+          const args = ctx.args;
+          const context = ctx.context;
+          const player = ctx.player;
+          const command = ctx.command;
+          const pass = ctx.pass;
+          return (async () => {
+            ${parentJsCode}
+          })();
+        `);
+        return await parentFn(parentContext);
+      };
+    };
+
+    const pass = createPass(methodObjectId);
+
     const context = {
       self,
       this: self, // Also expose as 'this' but it might be shadowed
@@ -406,6 +504,8 @@ export class RuntimeObjectImpl implements RuntimeObject {
       context: userContext, // ConnectionContext or other execution context
       player: verbPlayer || userContext?.player || self, // Player from verb dispatch, or context, or self
       command: verbCommand || '', // Raw command string from verb dispatch
+      pass, // MOO-style pass() to call parent's method
+      methodName, // Current method name (useful for debugging/reflection)
     };
 
     try {
@@ -420,6 +520,7 @@ export class RuntimeObjectImpl implements RuntimeObject {
         const context = ctx.context;
         const player = ctx.player;
         const command = ctx.command;
+        const pass = ctx.pass;
         return (async () => {
           ${jsCode}
         })();
