@@ -54,12 +54,6 @@ export class CharGenBuilder {
       properties: {
         name: 'CharGen',
         description: 'Character creation system',
-        // Appearance options
-        eyeColors: ['brown', 'blue', 'green', 'hazel', 'gray', 'amber'],
-        eyeStyles: ['almond', 'round', 'hooded', 'monolid', 'upturned', 'downturned'],
-        hairColors: ['black', 'brown', 'blonde', 'red', 'gray', 'white', 'auburn'],
-        hairStyles: ['straight', 'wavy', 'curly', 'coily', 'bald'],
-        skinTones: ['pale', 'fair', 'light', 'medium', 'olive', 'tan', 'brown', 'dark'],
       },
       methods: {},
     });
@@ -206,58 +200,129 @@ export class CharGenBuilder {
       // === APPEARANCE ===
       await player.tell('');
       await player.tell('Now let\\'s define your appearance...');
+      await player.tell('');
 
-      // Eye color
-      const eyeColor = await $.prompt.choice(player, 'What color are your eyes?', {
+      // Eye colors - expanded list
+      const eyeColors = {
+        // Common natural colors
         brown: 'Brown',
-        blue: 'Blue',
-        green: 'Green',
-        hazel: 'Hazel',
-        gray: 'Gray',
+        darkBrown: 'Dark Brown',
+        lightBrown: 'Light Brown',
         amber: 'Amber',
-      });
+        hazel: 'Hazel',
+        green: 'Green',
+        emerald: 'Emerald',
+        blue: 'Blue',
+        skyBlue: 'Sky Blue',
+        steelBlue: 'Steel Blue',
+        gray: 'Gray',
+        blueGray: 'Blue-Gray',
+        // Rare natural colors
+        violet: 'Violet',
+        black: 'Black',
+        // Heterochromia hint
+        heterochromia: 'Heterochromia (mixed)',
+      };
 
-      // Eye style
-      const eyeStyle = await $.prompt.choice(player, 'What shape are your eyes?', {
+      const eyeColor = await $.prompt.menu(player, 'What color are your eyes?', eyeColors, 3);
+
+      // Eye shapes
+      const eyeStyles = {
         almond: 'Almond',
         round: 'Round',
         hooded: 'Hooded',
         monolid: 'Monolid',
         upturned: 'Upturned',
         downturned: 'Downturned',
-      });
+        deepSet: 'Deep-set',
+        prominent: 'Prominent',
+        closeset: 'Close-set',
+        wideset: 'Wide-set',
+      };
 
-      // Hair color
-      const hairColor = await $.prompt.choice(player, 'What color is your hair?', {
+      const eyeStyle = await $.prompt.menu(player, 'What shape are your eyes?', eyeStyles, 2);
+
+      // Hair colors - expanded
+      const hairColors = {
+        // Natural blacks/browns
         black: 'Black',
+        jetBlack: 'Jet Black',
+        darkBrown: 'Dark Brown',
         brown: 'Brown',
-        blonde: 'Blonde',
-        red: 'Red',
-        gray: 'Gray',
-        white: 'White',
+        chestnut: 'Chestnut',
         auburn: 'Auburn',
-      });
+        // Reds
+        red: 'Red',
+        ginger: 'Ginger',
+        strawberry: 'Strawberry Blonde',
+        copper: 'Copper',
+        // Blondes
+        blonde: 'Blonde',
+        golden: 'Golden Blonde',
+        platinum: 'Platinum',
+        sandy: 'Sandy Blonde',
+        ashBlonde: 'Ash Blonde',
+        // Grays/whites
+        gray: 'Gray',
+        silver: 'Silver',
+        white: 'White',
+        salt: 'Salt & Pepper',
+      };
 
-      // Hair style
-      const hairStyle = await $.prompt.choice(player, 'What style is your hair?', {
+      const hairColor = await $.prompt.menu(player, 'What color is your hair?', hairColors, 3);
+
+      // Hair styles
+      const hairStyles = {
         straight: 'Straight',
         wavy: 'Wavy',
         curly: 'Curly',
-        coily: 'Coily',
+        coily: 'Coily/Kinky',
         bald: 'Bald',
-      });
+        shaved: 'Shaved',
+        buzzcut: 'Buzz Cut',
+        cropped: 'Cropped Short',
+        shoulderLength: 'Shoulder Length',
+        long: 'Long',
+        veryLong: 'Very Long',
+      };
 
-      // Skin tone
-      const skinTone = await $.prompt.choice(player, 'What is your skin tone?', {
+      const hairStyle = await $.prompt.menu(player, 'What style is your hair?', hairStyles, 2);
+
+      // Skin tones - expanded with descriptive names
+      const skinTones = {
+        // Very light
+        porcelain: 'Porcelain',
+        ivory: 'Ivory',
         pale: 'Pale',
         fair: 'Fair',
+        // Light
         light: 'Light',
+        cream: 'Cream',
+        peach: 'Peach',
+        // Medium
+        beige: 'Beige',
+        sand: 'Sand',
         medium: 'Medium',
         olive: 'Olive',
+        golden: 'Golden',
+        // Tan
         tan: 'Tan',
+        caramel: 'Caramel',
+        honey: 'Honey',
+        bronze: 'Bronze',
+        // Brown
+        almond: 'Almond',
+        chestnutSkin: 'Chestnut',
         brown: 'Brown',
-        dark: 'Dark',
-      });
+        umber: 'Umber',
+        // Dark
+        espresso: 'Espresso',
+        mahogany: 'Mahogany',
+        ebony: 'Ebony',
+        obsidian: 'Obsidian',
+      };
+
+      const skinTone = await $.prompt.menu(player, 'What is your skin tone?', skinTones, 3);
 
       // Store appearance for body creation
       const appearance = {
@@ -279,14 +344,23 @@ export class CharGenBuilder {
       // === CONFIRMATION ===
       await player.tell('');
       await player.tell('=== Your Character ===');
-      await player.tell('Name: ' + player.name);
-      await player.tell('Sex: ' + sex + ' (' + pronouns.subject + '/' + pronouns.object + ')');
-      await player.tell('Age: ' + age);
-      await player.tell('Height: ' + height + 'm');
-      await player.tell('Weight: ' + weight + 'kg');
-      await player.tell('Eyes: ' + eyeColor + ' ' + eyeStyle);
-      await player.tell('Hair: ' + hairColor + ' ' + hairStyle);
-      await player.tell('Skin: ' + skinTone);
+
+      // Use $.format for nice display
+      const format = $.format;
+      const summary = await format.keyValue({
+        'Name': player.name,
+        'Sex': sex + ' (' + pronouns.subject + '/' + pronouns.object + ')',
+        'Age': age,
+        'Height': height + 'm',
+        'Weight': weight + 'kg',
+        'Eyes': eyeColors[eyeColor] + ', ' + eyeStyles[eyeStyle],
+        'Hair': hairColors[hairColor] + ', ' + hairStyles[hairStyle],
+        'Skin': skinTones[skinTone],
+      });
+
+      for (const line of summary) {
+        await player.tell(line);
+      }
       await player.tell('');
 
       const confirmed = await $.prompt.yesorno(player, 'Is this correct?');
@@ -306,12 +380,15 @@ export class CharGenBuilder {
       // === ADMIN MESSAGE ===
       if (isFirstPlayer) {
         await player.tell('');
-        await player.tell('═══════════════════════════════════════════════════════════');
-        await player.tell('  YOU ARE THE FIRST USER - ADMIN PRIVILEGES GRANTED');
-        await player.tell('═══════════════════════════════════════════════════════════');
-        await player.tell('');
-        await player.tell('You have been granted wizard status and DevTools access.');
-        await player.tell('Use these powers wisely to build your world!');
+        const adminBox = await format.box([
+          'YOU ARE THE FIRST USER - ADMIN PRIVILEGES GRANTED',
+          '',
+          'You have been granted wizard status and DevTools access.',
+          'Use these powers wisely to build your world!',
+        ], { style: 'double', padding: 1 });
+        for (const line of adminBox) {
+          await player.tell(line);
+        }
       }
 
       // === STAT ALLOCATION ===
@@ -325,9 +402,17 @@ export class CharGenBuilder {
       // === FINAL CONFIRMATION ===
       await player.tell('');
       await player.tell('=== Final Character Summary ===');
-      await player.tell('Name: ' + player.name);
-      await player.tell('Sex: ' + player.sex + ' (' + player.pronouns.subject + '/' + player.pronouns.object + ')');
-      await player.tell('Age: ' + player.age + '  Height: ' + player.height + 'm  Weight: ' + player.weight + 'kg');
+
+      const finalSummary = await format.keyValue({
+        'Name': player.name,
+        'Sex': player.sex + ' (' + player.pronouns.subject + '/' + player.pronouns.object + ')',
+        'Age': player.age,
+        'Height': player.height + 'm',
+        'Weight': player.weight + 'kg',
+      });
+      for (const line of finalSummary) {
+        await player.tell(line);
+      }
 
       // Show appearance from body
       const playerBody = await player.getBody();
@@ -533,6 +618,7 @@ export class CharGenBuilder {
     // Interactive stat allocation loop
     this.charGen.setMethod('runStatAllocation', `
       const player = args[0];
+      const format = $.format;
 
       const statOptions = {
         head: { label: 'Head', cost: 1 },
@@ -553,15 +639,18 @@ export class CharGenBuilder {
           return;
         }
 
-        await player.tell('Body Part Capacities (maxCalories):');
+        await player.tell('Body Part Capacities:');
+        await player.tell(await format.hr(40, '-'));
+
+        const stats = [];
 
         // Torso
-        await player.tell('  Torso: ' + (body.maxCalories || 100));
+        stats.push(['Torso', body.maxCalories || 100]);
 
         // Head
         const head = await body.getPart('head');
         if (head) {
-          await player.tell('  Head: ' + (head.maxCalories || 100));
+          stats.push(['Head', head.maxCalories || 100]);
 
           // Eyes and Ears
           const face = await head.getPart('face');
@@ -569,10 +658,10 @@ export class CharGenBuilder {
             const eye = await face.getPart('rightEye');
             const ear = await face.getPart('rightEar');
             if (eye) {
-              await player.tell('  Eyes: ' + (eye.maxCalories || 100) + ' each');
+              stats.push(['Eyes (each)', eye.maxCalories || 100]);
             }
             if (ear) {
-              await player.tell('  Ears: ' + (ear.maxCalories || 100) + ' each');
+              stats.push(['Ears (each)', ear.maxCalories || 100]);
             }
           }
         }
@@ -582,14 +671,14 @@ export class CharGenBuilder {
         if (rightShoulder) {
           const arm = await rightShoulder.getPart('arm');
           if (arm) {
-            await player.tell('  Arms: ' + (arm.maxCalories || 100) + ' each');
+            stats.push(['Arms (each)', arm.maxCalories || 100]);
 
             // Hands
             const forearm = await arm.getPart('forearm');
             if (forearm) {
               const hand = await forearm.getPart('hand');
               if (hand) {
-                await player.tell('  Hands: ' + (hand.maxCalories || 100) + ' each');
+                stats.push(['Hands (each)', hand.maxCalories || 100]);
               }
             }
           }
@@ -602,15 +691,21 @@ export class CharGenBuilder {
           if (knee) {
             const leg = await knee.getPart('leg');
             if (leg) {
-              await player.tell('  Legs: ' + (leg.maxCalories || 100) + ' each');
+              stats.push(['Legs (each)', leg.maxCalories || 100]);
 
               // Feet
               const foot = await leg.getPart('foot');
               if (foot) {
-                await player.tell('  Feet: ' + (foot.maxCalories || 100) + ' each');
+                stats.push(['Feet (each)', foot.maxCalories || 100]);
               }
             }
           }
+        }
+
+        // Display as table
+        const tableLines = await format.table(stats, { header: false, separator: '  ' });
+        for (const line of tableLines) {
+          await player.tell('  ' + line);
         }
 
         await player.tell('');
@@ -638,7 +733,7 @@ export class CharGenBuilder {
           break;
         }
 
-        const choice = await $.prompt.choice(player, 'Which body part to strengthen?', choices);
+        const choice = await $.prompt.menu(player, 'Which body part to strengthen?', choices, 2);
 
         if (choice === 'done') {
           break;

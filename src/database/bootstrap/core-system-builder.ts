@@ -13,6 +13,7 @@ import { SchedulerBuilder } from './scheduler-builder.js';
 import { EmoteBuilder } from './emote-builder.js';
 import { MutexBuilder } from './mutex-builder.js';
 import { MementoBuilder } from './memento-builder.js';
+import { FormatBuilder } from './format-builder.js';
 
 /**
  * Orchestrates building all core system objects
@@ -32,6 +33,7 @@ import { MementoBuilder } from './memento-builder.js';
  * - Emote ($.emote): Freeform emote parsing and formatting
  * - Mutex ($.mutex): Object-based mutex locks with data and expiration
  * - Memento ($.memento): Object graph serialization for cloning/templates
+ * - Format ($.format): Text formatting for columns, tables, and layout
  */
 export class CoreSystemBuilder {
   constructor(private manager: ObjectManager) {}
@@ -54,6 +56,7 @@ export class CoreSystemBuilder {
     const emoteBuilder = new EmoteBuilder(this.manager);
     const mutexBuilder = new MutexBuilder(this.manager);
     const mementoBuilder = new MementoBuilder(this.manager);
+    const formatBuilder = new FormatBuilder(this.manager);
 
     await authManagerBuilder.build();
     await charGenBuilder.build();
@@ -69,6 +72,7 @@ export class CoreSystemBuilder {
     await emoteBuilder.build();
     await mutexBuilder.build();
     await mementoBuilder.build();
+    await formatBuilder.build();
 
     // Register aliases
     await authManagerBuilder.registerAlias();
@@ -85,5 +89,6 @@ export class CoreSystemBuilder {
     await emoteBuilder.registerAlias();
     await mutexBuilder.registerAlias();
     await mementoBuilder.registerAlias();
+    await formatBuilder.registerAlias();
   }
 }
