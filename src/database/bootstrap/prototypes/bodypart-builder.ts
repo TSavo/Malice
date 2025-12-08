@@ -920,12 +920,18 @@ export class BodyPartBuilder {
       }
 
       // DECAY STATE - always describe using $.proportional
+      // More granular states for detailed examination
       const decayStates = [
-        null, // Fresh - don't mention
-        'Early signs of decomposition are present.',
-        'Decomposition has begun to affect the tissue.',
-        'Advanced decomposition makes detailed examination difficult.',
-        'The flesh has largely decomposed, leaving mostly bone.',
+        null, // 0-10%: Fresh - don't mention
+        'Slight discoloration suggests early decomposition.', // 10-20%
+        'Decomposition is evident in the tissue coloring.', // 20-30%
+        'Bloating and discoloration from decomposition gases.', // 30-40%
+        'Significant tissue breakdown from decomposition.', // 40-50%
+        'Active decay - soft tissue is breaking down.', // 50-60%
+        'Advanced decay - much tissue has been lost.', // 60-70%
+        'Severe decay - mostly skeletal with tissue remnants.', // 70-80%
+        'Near-skeletal - only dried tissue remains.', // 80-90%
+        'Skeletal - examination limited to bone structure.', // 90-100%
       ];
       const decayMsg = await $.proportional.fromPercent(decayStates, decay);
       if (decayMsg) {
