@@ -331,6 +331,14 @@ export class BodyFactoryBuilder {
       const eyeStyle = appearance.eyeStyle || 'almond';
       const hairColor = appearance.hairColor || 'brown';
       const hairStyle = appearance.hairStyle || 'straight';
+      const hairTexture = appearance.hairTexture || 'medium';
+      const buildType = appearance.buildType || 'average';
+      const faceShape = appearance.faceShape || 'oval';
+      const noseShape = appearance.noseShape || 'straight';
+      const lipShape = appearance.lipShape || 'medium';
+      const freckles = appearance.freckles || 'none';
+      const distinguishingMark = appearance.distinguishingMark || 'none';
+      const facialHair = appearance.facialHair || 'none';
 
       // Get prototype IDs from aliases
       const objectManager = await $.load(0);
@@ -429,8 +437,9 @@ export class BodyFactoryBuilder {
       const face = await head.getPart('face');
       const scalp = await head.getPart('scalp');
       if (scalp) {
-        scalp.set('hairColor', hairColor);
-        scalp.set('hairStyle', hairStyle);
+        scalp.hairColor = hairColor;
+        scalp.hairStyle = hairStyle;
+        scalp.hairTexture = hairTexture;
       }
 
       // Eyes (supports heterochromia - different colors per eye)
@@ -438,14 +447,35 @@ export class BodyFactoryBuilder {
         const leftEye = await face.getPart('leftEye');
         const rightEye = await face.getPart('rightEye');
         if (leftEye) {
-          leftEye.set('color', leftEyeColor);
-          leftEye.set('shape', eyeStyle);
+          leftEye.color = leftEyeColor;
+          leftEye.shape = eyeStyle;
         }
         if (rightEye) {
-          rightEye.set('color', rightEyeColor);
-          rightEye.set('shape', eyeStyle);
+          rightEye.color = rightEyeColor;
+          rightEye.shape = eyeStyle;
+        }
+
+        // Face shape and features
+        face.faceShape = faceShape;
+        face.freckles = freckles;
+        face.distinguishingMark = distinguishingMark;
+        face.facialHair = facialHair;
+
+        // Nose
+        const nose = await face.getPart('nose');
+        if (nose) {
+          nose.shape = noseShape;
+        }
+
+        // Mouth/lips
+        const mouth = await face.getPart('mouth');
+        if (mouth) {
+          mouth.lipShape = lipShape;
         }
       }
+
+      // Build type on torso
+      torso.buildType = buildType;
 
       return torso;
     `);
