@@ -976,14 +976,24 @@ export class AdminBuilder {
     obj.setMethod('@evalm', `
       /** Execute multiline MOO code using $.prompt.multiline.
        *  Enter code, then '.' on its own line to execute.
+       *  Type @abort to cancel.
        *
        *  Available variables: self, $, player, context
        */
-      await player.tell('Enter MOO code (end with . on its own line):');
+      await player.tell('Enter MOO code (end with . on its own line, @abort to cancel):');
       await player.tell('Available: self, $, player, context');
       await player.tell('---');
 
-      const code = await $.prompt.multiline(player, '');
+      let code;
+      try {
+        code = await $.prompt.multiline(player, '');
+      } catch (err) {
+        if (err.message && err.message.includes('Aborted by user')) {
+          await player.tell('Aborted.');
+          return;
+        }
+        throw err;
+      }
 
       if (!code || code.trim() === '') {
         await player.tell('Cancelled (empty input).');
