@@ -95,28 +95,6 @@ export class CorpseBuilder {
       ];
       let desc = await $.proportional.fromPercent(decayDescriptions, decay);
 
-      // Get the actual body and describe visible wounds/state
-      const body = await self.getBody();
-      if (body) {
-        // Check for missing/damaged parts
-        const injuries = [];
-        const leftArm = body.getPart ? await body.getPart('leftArm') : null;
-        const rightArm = body.getPart ? await body.getPart('rightArm') : null;
-        const leftLeg = body.getPart ? await body.getPart('leftLeg') : null;
-        const rightLeg = body.getPart ? await body.getPart('rightLeg') : null;
-        const head = body.getPart ? await body.getPart('head') : null;
-
-        if (!leftArm) injuries.push('missing left arm');
-        if (!rightArm) injuries.push('missing right arm');
-        if (!leftLeg) injuries.push('missing left leg');
-        if (!rightLeg) injuries.push('missing right leg');
-        if (!head) injuries.push('missing head');
-
-        if (injuries.length > 0) {
-          desc += '\\r\\nThe body is ' + injuries.join(', ') + '.';
-        }
-      }
-
       // Check for items that could be looted
       if (!self.searched) {
         desc += '\\r\\nThe body could be searched for belongings.';
@@ -278,7 +256,6 @@ export class CorpseBuilder {
         bodyFindings: {},
         stomachContents: [],
         toxicology: [],
-        missingParts: [],
         summary: null,
       };
 
@@ -416,15 +393,6 @@ export class CorpseBuilder {
         report.causeOfDeath.push(...traumaFindings);
       }
 
-      // MISSING PARTS
-      const expectedParts = ['head', 'leftArm', 'rightArm', 'leftLeg', 'rightLeg'];
-      for (const partName of expectedParts) {
-        const part = body.getPart ? await body.getPart(partName) : null;
-        if (!part) {
-          report.missingParts.push(partName.replace(/([A-Z])/g, ' $1').toLowerCase().trim());
-        }
-      }
-
       // BODY PART FINDINGS - get detailed findings from each part
       if (body.getFullAutopsyFindings) {
         report.bodyFindings = await body.getFullAutopsyFindings(examinerSkill);
@@ -524,79 +492,6 @@ export class CorpseBuilder {
 
       return report;
     `);
-
-    // Format autopsy report as readable text
-    obj.setMethod('formatAutopsyReport', `
-      /** Format an autopsy report as readable text.
-       *  @param report - Report from performAutopsy
-       *  @returns Formatted string
-       */
-      const report = args[0];
-      const lines = [];
-
-      lines.push('=== AUTOPSY REPORT ===');
-      lines.push('Subject: ' + report.subject);
-      if (report.sex) {
-        lines.push('Sex: ' + report.sex);
-      }
-      if (report.species) {
-        lines.push('Species: ' + report.species);
-      }
-      lines.push('');
-      lines.push('CONDITION: ' + report.overallCondition);
-      lines.push('');
-
-      if (report.missingParts.length > 0) {
-        lines.push('MISSING: ' + report.missingParts.join(', '));
-        lines.push('');
-      }
-
-      if (report.causeOfDeath.length > 0) {
-        lines.push('CAUSE OF DEATH:');
-        for (const cause of report.causeOfDeath) {
-          lines.push('  - ' + cause);
-        }
-        lines.push('');
-      }
-
-      if (report.stomachContents.length > 0) {
-        lines.push('STOMACH CONTENTS:');
-        for (const content of report.stomachContents) {
-          lines.push('  - ' + content);
-        }
-        lines.push('');
-      }
-
-      if (report.toxicology.length > 0) {
-        lines.push('TOXICOLOGY:');
-        for (const tox of report.toxicology) {
-          lines.push('  - ' + tox);
-        }
-        lines.push('');
-      }
-
-      // Body findings by part
-      const partNames = Object.keys(report.bodyFindings || {});
-      if (partNames.length > 0) {
-        lines.push('EXAMINATION FINDINGS:');
-        for (const partName of partNames) {
-          const findings = report.bodyFindings[partName];
-          if (findings.length > 0) {
-            lines.push('  ' + partName + ':');
-            for (const finding of findings) {
-              lines.push('    - ' + finding);
-            }
-          }
-        }
-        lines.push('');
-      }
-
-      lines.push('SUMMARY: ' + report.summary);
-      lines.push('======================');
-
-      return lines.join('\\r\\n');
-    `);
-
     // When decay reaches 100%, transform into human remains (not recycle!)
     obj.setMethod('onFullyDecayed', `
       /** Called when corpse is fully decomposed.
