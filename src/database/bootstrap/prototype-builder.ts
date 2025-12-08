@@ -10,6 +10,7 @@ import {
   PlayerBuilder,
   AdminBuilder,
   DecayableBuilder,
+  CorpseBuilder,
   EdibleBuilder,
   FoodBuilder,
   DrinkBuilder,
@@ -48,6 +49,7 @@ export class PrototypeBuilder {
   private playerBuilder: PlayerBuilder;
   private adminBuilder: AdminBuilder;
   private decayableBuilder: DecayableBuilder;
+  private corpseBuilder: CorpseBuilder;
   private edibleBuilder: EdibleBuilder;
   private foodBuilder: FoodBuilder;
   private drinkBuilder: DrinkBuilder;
@@ -66,6 +68,7 @@ export class PrototypeBuilder {
     this.playerBuilder = new PlayerBuilder(manager);
     this.adminBuilder = new AdminBuilder(manager);
     this.decayableBuilder = new DecayableBuilder(manager);
+    this.corpseBuilder = new CorpseBuilder(manager);
     this.edibleBuilder = new EdibleBuilder(manager);
     this.foodBuilder = new FoodBuilder(manager);
     this.drinkBuilder = new DrinkBuilder(manager);
@@ -129,6 +132,11 @@ export class PrototypeBuilder {
       ? await this.manager.load(aliases.decayable as number)
       : await this.decayableBuilder.build(describable!.id);
 
+    // Corpse inherits from Decayable (dead bodies decay)
+    const corpse = aliases.corpse
+      ? await this.manager.load(aliases.corpse as number)
+      : await this.corpseBuilder.build(decayable!.id);
+
     // Edible inherits from Decayable (food/drink decay)
     const edible = aliases.edible
       ? await this.manager.load(aliases.edible as number)
@@ -176,6 +184,7 @@ export class PrototypeBuilder {
       player: player!.id,
       admin: admin!.id,
       decayable: decayable!.id,
+      corpse: corpse!.id,
       edible: edible!.id,
       food: food!.id,
       drink: drink!.id,
@@ -196,6 +205,7 @@ export class PrototypeBuilder {
     player: number;
     admin: number;
     decayable: number;
+    corpse: number;
     edible: number;
     food: number;
     drink: number;
@@ -217,6 +227,7 @@ export class PrototypeBuilder {
     aliases.player = ids.player;
     aliases.admin = ids.admin;
     aliases.decayable = ids.decayable;
+    aliases.corpse = ids.corpse;
     aliases.edible = ids.edible;
     aliases.food = ids.food;
     aliases.drink = ids.drink;

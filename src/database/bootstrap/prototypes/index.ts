@@ -10,6 +10,7 @@ export { AdminBuilder } from './admin-builder.js';
 
 // Decay system
 export { DecayableBuilder } from './decayable-builder.js';
+export { CorpseBuilder } from './corpse-builder.js';
 
 // Consumables
 export { EdibleBuilder } from './edible-builder.js';

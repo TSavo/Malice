@@ -56,6 +56,10 @@ export class AgentBuilder {
         sleepDebt: 0,
         // Skills learned through use: { skillName: { level, xp, lastProgressed } }
         skills: {},
+        // Dying state - 15 minute countdown before death
+        // Progress 0-100, increases ~6.67 per minute (100 in 15 min)
+        dyingProgress: 0,
+        isDying: false,
         // Skill cooldown in ms (how long before same skill can progress again)
         skillCooldown: 3600000, // 1 hour
         // Hidden luck attribute (1-100) - failed rolls get a luck save
@@ -81,6 +85,7 @@ export class AgentBuilder {
     this.addSkillMethods(obj);
     this.addMovementMethods(obj);
     this.addStatusEffectMethods(obj);
+    this.addDyingMethods(obj);
 
     return obj;
   }
@@ -2145,6 +2150,217 @@ export class AgentBuilder {
       }
 
       return lines;
+    `);
+  }
+
+  private addDyingMethods(obj: RuntimeObject): void {
+    // Death funnel messages - one per minute for 15 minutes
+    // Progress through stages of dying
+    obj.setMethod('getDeathMessage', `
+      /** Get the death message for current dying progress.
+       *  @returns Creative death funnel message
+       */
+      const progress = self.dyingProgress || 0;
+      const minute = Math.floor(progress / 6.67); // ~6.67 progress per minute
+
+      const messages = [
+        // Minutes 0-2: Initial shock
+        'Everything goes dark. You feel yourself slipping away...',
+        'A cold numbness spreads through your body. Sounds fade to silence.',
+        'You try to move but your body refuses. The darkness deepens.',
+
+        // Minutes 3-5: Fading
+        'Memories flash before you - faces, places, moments lost to time.',
+        'The cold reaches your core. You feel so very tired.',
+        'Is that light in the distance? Or just the last flickers of consciousness?',
+
+        // Minutes 6-8: Deeper
+        'Your thoughts scatter like leaves in wind. Hard to remember... what was your name?',
+        'The silence is absolute now. No heartbeat. No breath. Just... nothing.',
+        'You drift in an endless void. Time has no meaning here.',
+
+        // Minutes 9-11: Nearly gone
+        'Something pulls at you from far away. A thread, growing thinner.',
+        'The last warmth fades. You are becoming part of the darkness.',
+        'Fragments of self dissolve into the void. Almost peaceful now.',
+
+        // Minutes 12-14: Final moments
+        'A distant voice? No... just an echo of what was.',
+        'The thread snaps. You feel yourself falling into forever.',
+        'This is the end. Let go...',
+      ];
+
+      const index = Math.min(minute, messages.length - 1);
+      return messages[index];
+    `);
+
+    // Start the dying process
+    obj.setMethod('startDying', `
+      /** Begin the dying process. Called when body decay reaches 100%.
+       *  @returns { success, message }
+       */
+      if (self.isDying) {
+        return { success: false, message: 'Already dying.' };
+      }
+
+      self.set('isDying', true);
+      self.set('dyingProgress', 0);
+
+      // Force asleep state - dying person can't act
+      await self.cancelSleepTransition();
+      self.set('sleepState', 'asleep');
+
+      // Send first death message
+      if (self.tell) {
+        const msg = await self.getDeathMessage();
+        await self.tell('\\r\\n' + msg);
+      }
+
+      return { success: true, message: 'You are dying.' };
+    `);
+
+    // Process dying tick - called each heartbeat (1 minute)
+    obj.setMethod('dyingTick', `
+      /** Process one tick of dying. Called each heartbeat.
+       *  Progress increases ~6.67 per tick (100 in 15 ticks/minutes).
+       *  @returns { progress, dead, message }
+       */
+      if (!self.isDying) {
+        return { progress: 0, dead: false };
+      }
+
+      const oldProgress = self.dyingProgress || 0;
+      const newProgress = Math.min(100, oldProgress + 6.67);
+      self.set('dyingProgress', newProgress);
+
+      // Check if dead
+      if (newProgress >= 100) {
+        return { progress: 100, dead: true, message: 'You have died.' };
+      }
+
+      // Send death message if we crossed a minute boundary
+      const oldMinute = Math.floor(oldProgress / 6.67);
+      const newMinute = Math.floor(newProgress / 6.67);
+
+      let message = null;
+      if (newMinute > oldMinute && self.tell) {
+        message = await self.getDeathMessage();
+        await self.tell('\\r\\n' + message);
+      }
+
+      return { progress: newProgress, dead: false, message };
+    `);
+
+    // Stabilize - reduce dying progress (for doctors)
+    obj.setMethod('stabilize', `
+      /** Reduce dying progress. Used by doctors to save a dying person.
+       *  @param amount - Amount to reduce (default 20)
+       *  @returns { success, progress, stabilized }
+       */
+      const amount = args[0] || 20;
+
+      if (!self.isDying) {
+        return { success: false, message: 'Not dying.' };
+      }
+
+      const oldProgress = self.dyingProgress || 0;
+      const newProgress = Math.max(0, oldProgress - amount);
+      self.set('dyingProgress', newProgress);
+
+      // If progress reaches 0, they're stabilized (no longer dying)
+      if (newProgress <= 0) {
+        self.set('isDying', false);
+        self.set('dyingProgress', 0);
+
+        // They're still unconscious but stable
+        if (self.tell) {
+          await self.tell('\\r\\nYou feel yourself being pulled back from the void...');
+        }
+
+        return { success: true, progress: 0, stabilized: true };
+      }
+
+      return { success: true, progress: newProgress, stabilized: false };
+    `);
+
+    // Complete death - convert to corpse, send player to chargen
+    obj.setMethod('completeDeath', `
+      /** Complete the death process. Body becomes corpse, player goes to chargen.
+       *  @returns { success, corpseId }
+       */
+      if (!self.isDying) {
+        return { success: false, message: 'Not dying.' };
+      }
+
+      // Create corpse from this body
+      const corpseProto = $.corpse;
+      if (!corpseProto) {
+        // Fallback: just recycle this object
+        if ($.recycler) {
+          await $.recycler.recycle(self);
+        }
+        return { success: true, corpseId: null };
+      }
+
+      // Get our location before death
+      const deathLocation = self.location;
+
+      // Create corpse object with our inventory
+      const corpse = await $.create({
+        parent: corpseProto,
+        properties: {
+          name: 'corpse of ' + (self.name || 'someone'),
+          description: 'The lifeless body of ' + (self.name || 'someone') + '.',
+          originalName: self.name,
+          // Transfer physical properties
+          weight: self.weight || 70000, // ~70kg
+          // Copy inventory - corpse holds what we had
+          contents: [...(self.contents || [])],
+        },
+      });
+
+      // Move corpse to where we died
+      if (deathLocation) {
+        await corpse.moveTo(deathLocation);
+      }
+
+      // Clear our contents (transferred to corpse)
+      self.set('contents', []);
+
+      // Disconnect player from this body - they go to chargen
+      // The connection handling is done by the player's session
+      if (self.onDeath) {
+        await self.onDeath(corpse);
+      }
+
+      return { success: true, corpseId: corpse.id };
+    `);
+
+    // Check if dying
+    obj.setMethod('checkDying', `
+      /** Check if this agent is in dying state.
+       *  @returns true if dying
+       */
+      return self.isDying === true;
+    `);
+
+    // Get dying progress
+    obj.setMethod('getDyingProgress', `
+      /** Get current dying progress (0-100).
+       *  @returns Progress percentage
+       */
+      return self.dyingProgress || 0;
+    `);
+
+    // Get time remaining before death (in minutes)
+    obj.setMethod('getTimeUntilDeath', `
+      /** Get estimated time until death in minutes.
+       *  @returns Minutes remaining (0-15)
+       */
+      if (!self.isDying) return null;
+      const progress = self.dyingProgress || 0;
+      const remaining = 100 - progress;
+      return Math.ceil(remaining / 6.67);
     `);
   }
 }
