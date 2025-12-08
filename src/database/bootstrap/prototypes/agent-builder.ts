@@ -45,8 +45,11 @@ export class AgentBuilder {
         sleepState: 'awake',
         // Scheduled job name for sleep transitions (for cancellation)
         sleepTransitionJob: null,
-        // Sedation level (0 = none, higher = harder to wake)
-        sedation: 0,
+        // Status effects from substances, injuries, etc.
+        // Each effect: { intensity: 0-100, decay: rate per tick }
+        // Effects: sedation, stimulation, impaired_coordination, impaired_perception,
+        //          nausea, euphoria, pain
+        statusEffects: {},
         // Sleep debt - accumulates while awake (+1/tick), decreases while asleep (-3/tick)
         // 960 = ~16 hours awake (normal bedtime)
         // Higher debt = higher metabolism, chance to doze off
@@ -77,6 +80,7 @@ export class AgentBuilder {
     this.addWatchMethods(obj);
     this.addSkillMethods(obj);
     this.addMovementMethods(obj);
+    this.addStatusEffectMethods(obj);
 
     return obj;
   }
@@ -1858,6 +1862,289 @@ export class AgentBuilder {
        */
       const result = await self.stopMovement();
       return result.message;
+    `);
+  }
+
+  private addStatusEffectMethods(obj: RuntimeObject): void {
+    // Add a status effect or increase existing intensity
+    obj.setMethod('addEffect', `
+      /** Add or increase a status effect.
+       *  @param name - Effect name (sedation, stimulation, impaired_coordination, etc.)
+       *  @param intensity - Amount to add (0-100)
+       *  @param decay - Decay rate per tick (default 0.5)
+       *  @returns New effect state
+       */
+      const name = args[0];
+      const intensity = args[1] || 0;
+      const decay = args[2] ?? 0.5;
+
+      if (!name || intensity <= 0) return null;
+
+      const effects = self.statusEffects || {};
+      const current = effects[name] || { intensity: 0, decay: decay };
+
+      // Add intensity, cap at 100
+      current.intensity = Math.min(100, current.intensity + intensity);
+      // Use higher decay rate if specified
+      current.decay = Math.max(current.decay, decay);
+
+      effects[name] = current;
+      self.set('statusEffects', effects);
+
+      return current;
+    `);
+
+    // Get current intensity of an effect
+    obj.setMethod('getEffect', `
+      /** Get current intensity of an effect.
+       *  @param name - Effect name
+       *  @returns Intensity (0-100) or 0 if not present
+       */
+      const name = args[0];
+      const effects = self.statusEffects || {};
+      return effects[name]?.intensity || 0;
+    `);
+
+    // Get all active effects
+    obj.setMethod('getActiveEffects', `
+      /** Get all effects with intensity > 0.
+       *  @returns Object of active effects
+       */
+      const effects = self.statusEffects || {};
+      const active = {};
+      for (const [name, data] of Object.entries(effects)) {
+        if (data.intensity > 0) {
+          active[name] = data;
+        }
+      }
+      return active;
+    `);
+
+    // Remove or reduce an effect
+    obj.setMethod('reduceEffect', `
+      /** Reduce an effect's intensity.
+       *  @param name - Effect name
+       *  @param amount - Amount to reduce
+       *  @returns New intensity or 0 if removed
+       */
+      const name = args[0];
+      const amount = args[1] || 0;
+
+      const effects = self.statusEffects || {};
+      if (!effects[name]) return 0;
+
+      effects[name].intensity = Math.max(0, effects[name].intensity - amount);
+
+      // Remove if at 0
+      if (effects[name].intensity <= 0) {
+        delete effects[name];
+      }
+
+      self.set('statusEffects', effects);
+      return effects[name]?.intensity || 0;
+    `);
+
+    // Process decay for all effects (called each tick)
+    obj.setMethod('decayEffects', `
+      /** Process natural decay of all effects.
+       *  Called each heartbeat tick.
+       *  @returns Summary of decayed effects
+       */
+      const effects = self.statusEffects || {};
+      const decayed = {};
+
+      for (const [name, data] of Object.entries(effects)) {
+        if (data.intensity > 0) {
+          const decayAmount = data.decay || 0.5;
+          const oldIntensity = data.intensity;
+          data.intensity = Math.max(0, data.intensity - decayAmount);
+          decayed[name] = { from: oldIntensity, to: data.intensity, decay: decayAmount };
+
+          // Remove if at 0
+          if (data.intensity <= 0) {
+            delete effects[name];
+          }
+        }
+      }
+
+      self.set('statusEffects', effects);
+      return decayed;
+    `);
+
+    // Get net alertness (stimulation - sedation) for doze mechanic
+    obj.setMethod('getNetAlertness', `
+      /** Get net alertness level.
+       *  Positive = stimulated (harder to sleep)
+       *  Negative = sedated (easier to doze)
+       *  @returns Net alertness value
+       */
+      const stimulation = await self.getEffect('stimulation');
+      const sedation = await self.getEffect('sedation');
+      return stimulation - sedation;
+    `);
+
+    // Check if an effect is at dangerous levels
+    obj.setMethod('isEffectDangerous', `
+      /** Check if effect is at dangerous intensity.
+       *  @param name - Effect name
+       *  @param threshold - Danger threshold (default 80)
+       *  @returns true if dangerous
+       */
+      const name = args[0];
+      const threshold = args[1] || 80;
+      const intensity = await self.getEffect(name);
+      return intensity >= threshold;
+    `);
+
+    // Check for dangerous combination (both sedation and stimulation high)
+    obj.setMethod('hasDangerousCombination', `
+      /** Check for dangerous drug combinations.
+       *  High sedation + high stimulation = heart strain
+       *  @returns { dangerous: boolean, reason: string }
+       */
+      const sedation = await self.getEffect('sedation');
+      const stimulation = await self.getEffect('stimulation');
+
+      // Both over 50 is concerning, both over 70 is dangerous
+      if (sedation >= 70 && stimulation >= 70) {
+        return { dangerous: true, reason: 'Your heart races while your body tries to shut down.' };
+      }
+      if (sedation >= 50 && stimulation >= 50) {
+        return { dangerous: false, reason: 'You feel jittery and unstable.' };
+      }
+      return { dangerous: false, reason: null };
+    `);
+
+    // Get coordination penalty from effects
+    obj.setMethod('getCoordinationPenalty', `
+      /** Get total coordination penalty from effects.
+       *  Used for dexterity checks.
+       *  @returns Penalty value (0-100)
+       */
+      const impaired = await self.getEffect('impaired_coordination');
+      const sedation = await self.getEffect('sedation');
+      // Sedation also affects coordination at 50% rate
+      return Math.min(100, impaired + (sedation * 0.5));
+    `);
+
+    // Get perception penalty from effects
+    obj.setMethod('getPerceptionPenalty', `
+      /** Get total perception penalty from effects.
+       *  Used for see/hear checks.
+       *  @returns Penalty value (0-100)
+       */
+      const impaired = await self.getEffect('impaired_perception');
+      const sedation = await self.getEffect('sedation');
+      const euphoria = await self.getEffect('euphoria');
+      // Sedation and euphoria also affect perception
+      return Math.min(100, impaired + (sedation * 0.3) + (euphoria * 0.2));
+    `);
+
+    // Check nausea for vomiting
+    obj.setMethod('checkNausea', `
+      /** Check if nausea triggers vomiting.
+       *  @returns { vomit: boolean, intensity: number }
+       */
+      const nausea = await self.getEffect('nausea');
+      if (nausea < 30) return { vomit: false, intensity: nausea };
+
+      // Chance to vomit scales with intensity
+      // 30 = 5% chance, 50 = 20%, 70 = 50%, 90 = 90%
+      const vomitChance = Math.min(0.9, (nausea - 30) / 100 + 0.05);
+      const vomit = Math.random() < vomitChance;
+
+      return { vomit, intensity: nausea, chance: vomitChance };
+    `);
+
+    // Describe current effect state for health command
+    obj.setMethod('describeEffects', `
+      /** Get human-readable description of active effects.
+       *  @returns Array of description strings
+       */
+      const lines = [];
+      const effects = self.statusEffects || {};
+
+      // Sedation
+      const sedation = effects.sedation?.intensity || 0;
+      if (sedation >= 70) {
+        lines.push('You can barely keep your eyes open.');
+      } else if (sedation >= 50) {
+        lines.push('You feel very drowsy.');
+      } else if (sedation >= 30) {
+        lines.push('You feel drowsy.');
+      } else if (sedation >= 10) {
+        lines.push('You feel slightly sedated.');
+      }
+
+      // Stimulation
+      const stimulation = effects.stimulation?.intensity || 0;
+      if (stimulation >= 70) {
+        lines.push('Your heart is racing. You feel wired.');
+      } else if (stimulation >= 50) {
+        lines.push('You feel very alert and jittery.');
+      } else if (stimulation >= 30) {
+        lines.push('You feel alert and awake.');
+      } else if (stimulation >= 10) {
+        lines.push('You feel slightly energized.');
+      }
+
+      // Impaired coordination
+      const coord = effects.impaired_coordination?.intensity || 0;
+      if (coord >= 70) {
+        lines.push('You can barely stand straight.');
+      } else if (coord >= 50) {
+        lines.push('Your movements are clumsy and uncoordinated.');
+      } else if (coord >= 30) {
+        lines.push('Your coordination is impaired.');
+      } else if (coord >= 10) {
+        lines.push('You feel slightly unsteady.');
+      }
+
+      // Impaired perception
+      const percep = effects.impaired_perception?.intensity || 0;
+      if (percep >= 70) {
+        lines.push('Everything is blurry and muffled.');
+      } else if (percep >= 50) {
+        lines.push('Your senses are dulled.');
+      } else if (percep >= 30) {
+        lines.push('Things seem slightly hazy.');
+      }
+
+      // Nausea
+      const nausea = effects.nausea?.intensity || 0;
+      if (nausea >= 70) {
+        lines.push('You feel like you might vomit.');
+      } else if (nausea >= 50) {
+        lines.push('Your stomach churns unpleasantly.');
+      } else if (nausea >= 30) {
+        lines.push('You feel queasy.');
+      } else if (nausea >= 10) {
+        lines.push('Your stomach feels unsettled.');
+      }
+
+      // Euphoria
+      const euphoria = effects.euphoria?.intensity || 0;
+      if (euphoria >= 70) {
+        lines.push('You feel amazing, invincible even.');
+      } else if (euphoria >= 50) {
+        lines.push('You feel really good.');
+      } else if (euphoria >= 30) {
+        lines.push('You feel pleasantly relaxed.');
+      }
+
+      // Pain
+      const pain = effects.pain?.intensity || 0;
+      if (pain >= 70) {
+        lines.push('You are in agony.');
+      } else if (pain >= 50) {
+        lines.push('You are in significant pain.');
+      } else if (pain >= 30) {
+        lines.push('You are in pain.');
+      } else if (pain >= 10) {
+        lines.push('You feel some discomfort.');
+      }
+
+      return lines;
     `);
   }
 }

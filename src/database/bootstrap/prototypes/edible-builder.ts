@@ -43,6 +43,10 @@ export class EdibleBuilder {
         // Status
         spoiled: false,
         poisoned: false,
+        // Status effects applied when consumed
+        // Each effect: { intensity, decay } - applied per portion
+        // e.g., { sedation: { intensity: 10, decay: 0.3 }, euphoria: { intensity: 5, decay: 0.5 } }
+        effects: {},
         // Physical - default small item
         width: 5, // cm
         height: 5,
@@ -190,6 +194,23 @@ export class EdibleBuilder {
         }
       }
 
+      // Apply status effects from this item
+      const appliedEffects = [];
+      const itemEffects = self.effects || {};
+      if (consumer && consumer.addEffect) {
+        for (const [effectName, effectData] of Object.entries(itemEffects)) {
+          // Scale effect by portion (divide by total portions)
+          const totalPortions = self.portions || 1;
+          const effectIntensity = (effectData.intensity || 0) / totalPortions;
+          const effectDecay = effectData.decay ?? 0.5;
+
+          if (effectIntensity > 0) {
+            await consumer.addEffect(effectName, effectIntensity, effectDecay);
+            appliedEffects.push({ name: effectName, intensity: effectIntensity });
+          }
+        }
+      }
+
       // When fully consumed, recycle the food item
       if (fullyConsumed) {
         const recycler = $.recycler;
@@ -201,6 +222,7 @@ export class EdibleBuilder {
       return {
         calories: caloriesPerPortion,
         hydration: hydrationPerPortion,
+        effects: appliedEffects,
         warnings,
         fullyConsumed,
         remaining: self.remaining,
