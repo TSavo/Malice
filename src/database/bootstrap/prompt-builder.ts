@@ -174,6 +174,13 @@ export class PromptBuilder {
         }
 
         case 'multiline': {
+          // Check for abort command
+          if (trimmed === '@abort') {
+            player._promptState = null;
+            state.reject(new Error('Aborted by user'));
+            return true;
+          }
+
           // Check for terminator - '.' alone on a line
           if (trimmed === '.') {
             const result = state.lines.join('\\n');
@@ -210,18 +217,20 @@ export class PromptBuilder {
 
     // Multiline text input - collects lines until '.' alone on a line
     // Returns the joined text (without the '.')
+    // User can type @abort to cancel (throws Error)
     this.prompt.setMethod('multiline', `
       const player = args[0];
       const text = args[1] || 'Enter text (end with . on its own line):';
 
       await player.tell(text);
 
-      return new Promise((resolve) => {
+      return new Promise((resolve, reject) => {
         player._promptState = {
           type: 'multiline',
           text: text,
           lines: [],
           resolve: resolve,
+          reject: reject,
         };
       });
     `);
