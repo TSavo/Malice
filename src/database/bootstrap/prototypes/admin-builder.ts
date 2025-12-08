@@ -37,12 +37,48 @@ export class AdminBuilder {
   }
 
   private addConnectionOverride(obj: RuntimeObject): void {
-    // Override connect to register admin verbs
+    // Override connect to register admin verbs (includes player verbs since super doesn't work)
     obj.setMethod('connect', `
-      // Call parent connect first
-      const parentConnect = self.__proto__ && self.__proto__.connect;
-      if (parentConnect) {
-        await parentConnect.call(self, args[0]);
+      const context = args[0];
+
+      // Store context reference so tell() can send messages
+      self._context = context;
+
+      await self.tell('');
+      await self.tell('Welcome back, ' + self.name + '!');
+      await self.tell('You are ' + self.description);
+
+      // Update last login
+      self.lastLogin = new Date();
+
+      // Register player's default verbs (copied from Player.connect since super doesn't work in MOO)
+      await self.registerVerb(['look', 'l'], self, 'look');
+      await self.registerVerb(['look %i', 'look at %i', 'l %i', 'examine %i', 'ex %i'], self, 'lookAt');
+      await self.registerVerb(['look %i in %t', 'look at %i in %t', 'look %i on %t'], self, 'lookIn');
+      await self.registerVerb(['say %s', '"' + '%s', "'" + '%s'], self, 'say');
+      await self.registerVerb(['emote %s', ':' + '%s'], self, 'emote');
+      await self.registerVerb('quit', self);
+      await self.registerVerb(['@options', '@options %s', '@options %s %s'], self, 'options');
+      await self.registerVerb(['get %i', 'take %i', 'pick up %i', 'grab %i'], self, 'get');
+      await self.registerVerb(['lift %i', 'heft %i'], self, 'lift');
+      await self.registerVerb(['drag %i'], self, 'drag');
+      await self.registerVerb(['drop %i', 'put down %i', 'release %i'], self, 'drop');
+      await self.registerVerb(['help', 'help %s', '?', '? %s'], self, 'help');
+      await self.registerVerb(['sleep', 'go to sleep'], self, 'sleep');
+      await self.registerVerb(['wake', 'wake up'], self, 'wake');
+      await self.registerVerb(['watch', 'watch %i'], self, 'watchCommand');
+      await self.registerVerb(['unwatch %i', 'stop watching %i'], self, 'unwatchCommand');
+      await self.registerVerb('@fitness', self, 'fitness');
+
+      // If we have a location, move into it to trigger verb registration
+      if (self.location && self.location !== 0) {
+        const location = await $.load(self.location);
+        if (location) {
+          await self.onArrived(location, null, null);
+          const desc = await location.describe(self);
+          await self.tell('');
+          await self.see(desc);
+        }
       }
 
       // Register admin verbs
@@ -66,6 +102,12 @@ export class AdminBuilder {
 
       await self.tell('');
       await self.tell('[Admin commands: @dig, @link, @teleport, @examine, @set, @create, @destroy, @eval, @evalm]');
+
+      // Set up command loop - player handles their own input now
+      context.setHandler(self);
+
+      // Show prompt
+      await self.tell('> ');
     `);
   }
 
