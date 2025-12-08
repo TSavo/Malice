@@ -124,9 +124,11 @@ export class EdibleBuilder {
         }
       }
 
-      // Check if spoiled/poisoned
+      // Check if spoiled/poisoned based on decay level
       const warnings = [];
-      if (self.spoiled) {
+      const decayLevel = self.decayLevel || 0;
+      // Spoilage starts at 25% decay (per Edible design)
+      if (decayLevel >= 25 || self.spoiled) {
         warnings.push('spoiled');
       }
       if (self.poisoned) {
@@ -225,8 +227,9 @@ export class EdibleBuilder {
         if (!existing) continue;
 
         // Aggregate if same food prototype and same spoiled/poisoned state
+        const isSpoiled = (self.decayLevel || 0) >= 25 || self.spoiled;
         if (existing.sourceProto === protoId &&
-            existing.spoiled === (self.spoiled || false) &&
+            existing.spoiled === isSpoiled &&
             existing.poisoned === (self.poisoned || false)) {
           // Add this bite's calories and volume to existing
           existing.set('calories', (existing.calories || 0) + biteCalories);
@@ -241,6 +244,7 @@ export class EdibleBuilder {
 
       if (!aggregated) {
         // Create new StomachContents for this food type
+        const isSpoiled = (self.decayLevel || 0) >= 25 || self.spoiled;
         contents = await $.create({
           parent: stomachContentsProto,
           properties: {
@@ -252,7 +256,7 @@ export class EdibleBuilder {
             volume: biteVolume,
             volumeOriginal: biteVolume,
             quantity: 1,
-            spoiled: self.spoiled || false,
+            spoiled: isSpoiled,
             poisoned: self.poisoned || false,
           },
         });
@@ -294,8 +298,9 @@ export class EdibleBuilder {
         if (!existing) continue;
 
         // Check if same source prototype and compatible
+        const isSpoiled = (self.decayLevel || 0) >= 25 || self.spoiled;
         if (existing.sourceProto === protoId &&
-            existing.spoiled === (self.spoiled || false) &&
+            existing.spoiled === isSpoiled &&
             existing.poisoned === (self.poisoned || false)) {
           // Aggregate into existing contents
           existing.calories = (existing.calories || 0) + (self.calories || 0);
@@ -309,6 +314,7 @@ export class EdibleBuilder {
 
       if (!aggregated) {
         // Create new StomachContents
+        const isSpoiled = (self.decayLevel || 0) >= 25 || self.spoiled;
         contents = await $.create({
           parent: stomachContentsProto,
           properties: {
@@ -318,7 +324,7 @@ export class EdibleBuilder {
             calories: self.calories || 0,
             caloriesOriginal: self.calories || 0,
             quantity: 1,
-            spoiled: self.spoiled || false,
+            spoiled: isSpoiled,
             poisoned: self.poisoned || false,
           },
         });
@@ -346,8 +352,20 @@ export class EdibleBuilder {
         desc += '\\r\\n' + statusMsg;
       }
 
-      if (self.spoiled) {
-        desc += '\\r\\nIt looks spoiled.';
+      // Show decay state based on decayLevel
+      const decayLevel = self.decayLevel || 0;
+      if (decayLevel >= 75) {
+        desc += '\\r\\nIt is severely rotted and looks dangerous to eat.';
+      } else if (decayLevel >= 50) {
+        desc += '\\r\\nIt is clearly rotten.';
+      } else if (decayLevel >= 25) {
+        desc += '\\r\\nIt looks a bit off - starting to spoil.';
+      } else if (decayLevel > 0) {
+        desc += '\\r\\nIt looks slightly past its prime.';
+      }
+
+      if (self.poisoned) {
+        desc += '\\r\\nSomething about it seems wrong...';
       }
 
       return desc;
