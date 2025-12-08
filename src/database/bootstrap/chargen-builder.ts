@@ -127,6 +127,9 @@ export class CharGenBuilder {
       // Authenticate early so $.prompt works
       context.authenticate(player.id);
 
+      // Set player as handler so input routes to player.onInput -> $.prompt.handleInput
+      context.setHandler(player);
+
       // Now run interactive chargen
       await $.charGen.runCharGen(player, isFirstPlayer);
     `);
