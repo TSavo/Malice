@@ -48,6 +48,19 @@ export class CorpseBuilder {
       methods: {},
     });
 
+    // Get the body object inside this corpse
+    obj.setMethod('getBody', `
+      const contents = self.contents || [];
+      for (const id of contents) {
+        const obj = await $.load(id);
+        // Body has torso, head, etc - check for body-like properties
+        if (obj && (obj.torso !== undefined || obj.getPart)) {
+          return obj;
+        }
+      }
+      return null;
+    `);
+
     // Describe corpse with decay state
     obj.setMethod('describe', `
       const decay = self.decayLevel || 0;
@@ -71,40 +84,84 @@ export class CorpseBuilder {
         desc += ' Little flesh remains on the bones.';
       }
 
-      // Show if has items
-      const contents = self.contents || [];
-      if (contents.length > 0 && !self.searched) {
-        desc += '\\r\\nThe body appears to have belongings that could be searched.';
-      } else if (contents.length > 0) {
+      // Get the actual body and describe visible wounds/state
+      const body = await self.getBody();
+      if (body) {
+        // Check for missing/damaged parts
+        const injuries = [];
+        const leftArm = body.getPart ? await body.getPart('leftArm') : null;
+        const rightArm = body.getPart ? await body.getPart('rightArm') : null;
+        const leftLeg = body.getPart ? await body.getPart('leftLeg') : null;
+        const rightLeg = body.getPart ? await body.getPart('rightLeg') : null;
+        const head = body.getPart ? await body.getPart('head') : null;
+
+        if (!leftArm) injuries.push('missing left arm');
+        if (!rightArm) injuries.push('missing right arm');
+        if (!leftLeg) injuries.push('missing left leg');
+        if (!rightLeg) injuries.push('missing right leg');
+        if (!head) injuries.push('missing head');
+
+        if (injuries.length > 0) {
+          desc += '\\r\\nThe body is ' + injuries.join(', ') + '.';
+        }
+      }
+
+      // Check for items that could be looted
+      if (!self.searched) {
+        desc += '\\r\\nThe body could be searched for belongings.';
+      } else {
         desc += '\\r\\nThe body has been searched.';
       }
 
       return desc;
     `);
 
-    // Search/loot the corpse
+    // Search/loot the corpse - looks in hands and on body
     obj.setMethod('search', `
       /** Search the corpse for items.
        *  @param searcher - The person searching
-       *  @returns List of items found
+       *  @returns List of items found (in hands, on body)
        */
       const searcher = args[0];
-      const contents = self.contents || [];
+      const items = [];
 
-      if (contents.length === 0) {
-        return { success: false, message: 'The body has nothing of value.' };
+      // Get the body inside corpse
+      const body = await self.getBody();
+      if (body) {
+        // Check hands for held items
+        const leftArm = body.getPart ? await body.getPart('leftArm') : null;
+        const rightArm = body.getPart ? await body.getPart('rightArm') : null;
+        const leftHand = leftArm && leftArm.getPart ? await leftArm.getPart('hand') : null;
+        const rightHand = rightArm && rightArm.getPart ? await rightArm.getPart('hand') : null;
+
+        for (const hand of [leftHand, rightHand]) {
+          if (hand && hand.contents) {
+            for (const itemId of hand.contents) {
+              const item = await $.load(itemId);
+              if (item) {
+                items.push({ id: itemId, name: item.name || 'something', location: 'hand' });
+              }
+            }
+          }
+        }
+
+        // Check torso for worn/carried items
+        const torso = body.getPart ? await body.getPart('torso') : null;
+        if (torso && torso.contents) {
+          for (const itemId of torso.contents) {
+            const item = await $.load(itemId);
+            if (item) {
+              items.push({ id: itemId, name: item.name || 'something', location: 'torso' });
+            }
+          }
+        }
       }
 
       // Mark as searched
-      self.set('searched', true);
+      self.searched = true;
 
-      // List what's there
-      const items = [];
-      for (const itemId of contents) {
-        const item = await $.load(itemId);
-        if (item) {
-          items.push({ id: itemId, name: item.name || 'something' });
-        }
+      if (items.length === 0) {
+        return { success: false, message: 'The body has nothing of value.' };
       }
 
       return {
@@ -123,29 +180,59 @@ export class CorpseBuilder {
        */
       const itemName = args[0];
       const looter = args[1];
+      const itemNameLower = (itemName || '').toLowerCase();
 
-      const contents = self.contents || [];
-      if (contents.length === 0) {
+      // Get the body inside corpse
+      const body = await self.getBody();
+      if (!body) {
         return { success: false, message: 'The body has nothing to take.' };
       }
 
-      // Find matching item
-      const itemNameLower = (itemName || '').toLowerCase();
-      for (const itemId of contents) {
-        const item = await $.load(itemId);
-        if (!item) continue;
+      // Search hands for the item
+      const leftArm = body.getPart ? await body.getPart('leftArm') : null;
+      const rightArm = body.getPart ? await body.getPart('rightArm') : null;
+      const leftHand = leftArm && leftArm.getPart ? await leftArm.getPart('hand') : null;
+      const rightHand = rightArm && rightArm.getPart ? await rightArm.getPart('hand') : null;
 
-        const name = (item.name || '').toLowerCase();
-        const aliases = (item.aliases || []).map(a => a.toLowerCase());
+      for (const hand of [leftHand, rightHand]) {
+        if (hand && hand.contents) {
+          for (const itemId of hand.contents) {
+            const item = await $.load(itemId);
+            if (!item) continue;
 
-        if (name === itemNameLower || aliases.includes(itemNameLower)) {
-          // Move item to looter
-          await item.moveTo(looter);
-          return {
-            success: true,
-            message: 'You take the ' + item.name + ' from the corpse.',
-            item,
-          };
+            const name = (item.name || '').toLowerCase();
+            const aliases = (item.aliases || []).map(a => a.toLowerCase());
+
+            if (name === itemNameLower || name.includes(itemNameLower) || aliases.includes(itemNameLower)) {
+              await item.moveTo(looter);
+              return {
+                success: true,
+                message: 'You take ' + item.name + ' from the corpse.',
+                item,
+              };
+            }
+          }
+        }
+      }
+
+      // Search torso
+      const torso = body.getPart ? await body.getPart('torso') : null;
+      if (torso && torso.contents) {
+        for (const itemId of torso.contents) {
+          const item = await $.load(itemId);
+          if (!item) continue;
+
+          const name = (item.name || '').toLowerCase();
+          const aliases = (item.aliases || []).map(a => a.toLowerCase());
+
+          if (name === itemNameLower || name.includes(itemNameLower) || aliases.includes(itemNameLower)) {
+            await item.moveTo(looter);
+            return {
+              success: true,
+              message: 'You take ' + item.name + ' from the corpse.',
+              item,
+            };
+          }
         }
       }
 

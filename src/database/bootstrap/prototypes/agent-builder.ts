@@ -2305,27 +2305,39 @@ export class AgentBuilder {
       // Get our location before death
       const deathLocation = self.location;
 
-      // Create corpse object with our inventory
+      // Get the actual body object (with all its parts, wounds, items in hands)
+      const body = self.getBody ? await self.getBody() : null;
+      const bodyWeight = body ? (body.weight || 70000) : 70000;
+
+      // Create corpse object
       const corpse = await $.create({
         parent: corpseProto,
         properties: {
           name: 'corpse of ' + (self.name || 'someone'),
           description: 'The lifeless body of ' + (self.name || 'someone') + '.',
           originalName: self.name,
-          // Transfer physical properties
-          weight: self.weight || 70000, // ~70kg
-          // Copy inventory - corpse holds what we had
-          contents: [...(self.contents || [])],
+          // Weight from actual body
+          weight: bodyWeight,
+          // Contents will include the body
+          contents: [],
         },
       });
+
+      // Move the actual body into the corpse (with all its parts, hands, items)
+      if (body) {
+        // Detach body from player
+        self.bodyId = null;
+        // Move body into corpse
+        body.location = corpse.id;
+        corpse.contents = [body.id];
+        // Mark body as dead (stops any body processes)
+        body.isDead = true;
+      }
 
       // Move corpse to where we died
       if (deathLocation) {
         await corpse.moveTo(deathLocation);
       }
-
-      // Clear our contents (transferred to corpse)
-      self.set('contents', []);
 
       // Disconnect player from this body - they go to chargen
       // The connection handling is done by the player's session
