@@ -37,10 +37,10 @@ export class CorpseBuilder {
         weight: 70000, // grams (~70kg)
         // Inventory from dead player
         contents: [],
-        // Corpse-specific decay
-        // ~1 hour to fully decompose (60 ticks)
-        // 100% / 60 = ~1.67% per tick
-        decayRate: 1.67,
+        // Corpse-specific decay - this is hardcore survival
+        // ~2 weeks to fully decompose (20160 ticks)
+        // 100% / 20160 = ~0.005% per tick
+        decayRate: 0.005,
         decayCondition: 'always', // Always decaying
         // Can be searched/looted
         searched: false,
