@@ -31,6 +31,7 @@ export class AdminBuilder {
     this.addBuildingCommands(obj);
     this.addTeleportCommands(obj);
     this.addInspectCommands(obj);
+    this.addEvalCommands(obj);
 
     return obj;
   }
@@ -60,9 +61,11 @@ export class AdminBuilder {
       await self.registerVerb(['@setVerb %s %s', '@setverb %s %s'], self, '@setVerb');
       await self.registerVerb(['@listVerbs %s', '@listverbs %s'], self, '@listVerbs');
       await self.registerVerb(['@rmVerb %s %s', '@rmverb %s %s'], self, '@rmVerb');
+      await self.registerVerb(['@eval %s'], self, '@eval');
+      await self.registerVerb('@evalm', self);
 
       await self.tell('');
-      await self.tell('[Admin commands: @dig, @link, @teleport, @examine, @set, @create, @destroy, @setVerb, @listVerbs]');
+      await self.tell('[Admin commands: @dig, @link, @teleport, @examine, @set, @create, @destroy, @eval, @evalm]');
     `);
   }
 
@@ -919,6 +922,108 @@ export class AdminBuilder {
 
       target.removeMethod(methodName);
       await self.tell('Removed ' + target.name + ' (#' + target.id + ').' + methodName);
+    `);
+  }
+
+  private addEvalCommands(obj: RuntimeObject): void {
+    // @eval - Execute single-line MOO code
+    obj.setMethod('@eval', `
+      /** Execute arbitrary MOO code.
+       *  Usage: @eval <code>
+       *  Example: @eval self.name = "Test"
+       *  Example: @eval await $.load(42).describe()
+       *
+       *  Available variables: self, $, args, player, context
+       */
+      const code = args[0];
+
+      if (!code) {
+        await self.tell('Usage: @eval <code>');
+        await self.tell('Example: @eval self.name');
+        await self.tell('Example: @eval await $.load(42).describe()');
+        return;
+      }
+
+      try {
+        // Wrap in async function to allow await
+        const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
+        const fn = new AsyncFunction('self', '$', 'args', 'player', 'context',
+          'return (async () => { return (' + code + '); })();'
+        );
+
+        const result = await fn(self, $, [], player, context);
+
+        // Format result
+        if (result === undefined) {
+          await self.tell('=> undefined');
+        } else if (result === null) {
+          await self.tell('=> null');
+        } else if (typeof result === 'object' && result.id !== undefined) {
+          // RuntimeObject
+          await self.tell('=> #' + result.id + ' (' + (result.name || 'unnamed') + ')');
+        } else if (typeof result === 'object') {
+          await self.tell('=> ' + JSON.stringify(result, null, 2));
+        } else {
+          await self.tell('=> ' + String(result));
+        }
+      } catch (err) {
+        await self.tell('Error: ' + err.message);
+      }
+    `);
+
+    // @evalm - Execute multiline MOO code
+    obj.setMethod('@evalm', `
+      /** Execute multiline MOO code using $.prompt.multiline.
+       *  Enter code, then '.' on its own line to execute.
+       *
+       *  Available variables: self, $, args, player, context
+       */
+      await self.tell('Enter MOO code (end with . on its own line):');
+      await self.tell('Available: self, $, player, context');
+      await self.tell('---');
+
+      const code = await $.prompt.multiline(self, '');
+
+      if (!code || code.trim() === '') {
+        await self.tell('Cancelled (empty input).');
+        return;
+      }
+
+      await self.tell('---');
+      await self.tell('Executing...');
+
+      try {
+        // Wrap in async function to allow await and multiple statements
+        const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
+        const fn = new AsyncFunction('self', '$', 'args', 'player', 'context',
+          code
+        );
+
+        const result = await fn(self, $, [], player, context);
+
+        // Format result
+        if (result === undefined) {
+          await self.tell('=> undefined');
+        } else if (result === null) {
+          await self.tell('=> null');
+        } else if (typeof result === 'object' && result.id !== undefined) {
+          // RuntimeObject
+          await self.tell('=> #' + result.id + ' (' + (result.name || 'unnamed') + ')');
+        } else if (typeof result === 'object') {
+          await self.tell('=> ' + JSON.stringify(result, null, 2));
+        } else {
+          await self.tell('=> ' + String(result));
+        }
+      } catch (err) {
+        await self.tell('Error: ' + err.message);
+        if (err.stack) {
+          // Show first few lines of stack
+          const stackLines = err.stack.split('\\n').slice(0, 3);
+          for (const line of stackLines) {
+            await self.tell('  ' + line);
+          }
+        }
+      }
     `);
   }
 }
