@@ -679,6 +679,33 @@ export class PlayerBuilder {
         results.breathing = await self.breathTick();
       }
 
+      // 2b. Dying state - if dying, only process death funnel
+      results.dying = { isDying: false };
+      if (self.isDying) {
+        const dyingResult = await self.dyingTick();
+        results.dying = dyingResult;
+
+        if (dyingResult.dead) {
+          // Death is final - complete the death process
+          await self.completeDeath();
+          return results; // Don't process anything else
+        }
+
+        // While dying, skip most other processing
+        // Only breathing/bleeding can accelerate death
+        return results;
+      }
+
+      // 2c. Check if body decay reached 100% - triggers dying state
+      const bodyForDeath = await self.getBody();
+      if (bodyForDeath) {
+        const bodyDecay = bodyForDeath.decayLevel || 0;
+        if (bodyDecay >= 100 && !self.isDying) {
+          await self.startDying();
+          return results;
+        }
+      }
+
       // 3. Sleep debt & tiredness
       const sleepState = self.sleepState || 'awake';
       let sleepDebt = self.sleepDebt || 0;
@@ -1297,6 +1324,54 @@ export class PlayerBuilder {
     obj.setMethod('onWakeBlocked', `
       const reason = args[0];
       await self.tell(reason || 'You fall back asleep.');
+    `);
+
+    // Called when player dies - body becomes corpse, player goes to chargen
+    obj.setMethod('onDeath', `
+      /** Called when the player dies and their body becomes a corpse.
+       *  @param corpse - The corpse object created from the body
+       */
+      const corpse = args[0];
+
+      // Final death message
+      await self.tell('');
+      await self.tell('You have died.');
+      await self.tell('');
+
+      // Unregister all verbs
+      self.set('verbs', {});
+
+      // Clear body reference
+      self.set('bodyId', null);
+
+      // Disconnect from old location
+      if (self.location) {
+        const location = await $.load(self.location);
+        if (location && location.removeContent) {
+          await location.removeContent(self.id);
+        }
+        self.set('location', null);
+      }
+
+      // Reset player state for new character
+      self.set('isDying', false);
+      self.set('dyingProgress', 0);
+      self.set('sleepState', 'awake');
+      self.set('sleepDebt', 0);
+      self.set('statusEffects', {});
+
+      // Send to chargen for new character
+      if (self._context && $.charGen) {
+        await self.tell('Creating a new character...');
+        await self.tell('');
+
+        // Hand off to chargen
+        await $.charGen.start(self._context, self);
+      } else if (self._context) {
+        // Fallback: just show message
+        await self.tell('Please reconnect to create a new character.');
+        self._context.close();
+      }
     `);
 
     // Override canFallAsleep to check for combat, etc.
