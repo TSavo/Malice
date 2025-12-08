@@ -647,6 +647,17 @@ export class BodyPartBuilder {
       delete parts[partName];
       self.parts = parts;
 
+      // Record the severance point on the parent body part
+      // This allows autopsy to report "left arm was severed at the shoulder"
+      const severedPoints = self.severedPoints || [];
+      severedPoints.push({
+        partName: partName,
+        partDesc: part.name || partName,
+        timestamp: Date.now(),
+        amputator: amputator?.id || null,
+      });
+      self.severedPoints = severedPoints;
+
       // Mark the severed part with condition
       const condition = part.condition || {};
       condition.severed = true;
@@ -1064,6 +1075,21 @@ export class BodyPartBuilder {
         findings.push('This ' + self.name.toLowerCase() + ' has been severed from the body.');
       }
 
+      // SEVERED POINTS - where child parts were amputated from this part
+      const severedPoints = self.severedPoints || [];
+      if (severedPoints.length > 0) {
+        for (const point of severedPoints) {
+          const partDesc = point.partDesc || point.partName;
+          if (decay < 30) {
+            findings.push('The ' + partDesc + ' was severed here. The wound shows exposed tissue and bone.');
+          } else if (decay < 60 && canSeeDetail(40)) {
+            findings.push('Evidence of amputation - the ' + partDesc + ' was removed. Wound edges are decomposed.');
+          } else if (canSeeDetail(50)) {
+            findings.push('A missing attachment point where the ' + partDesc + ' was likely severed.');
+          }
+        }
+      }
+
       // APPEARANCE PROPERTIES - eye color, hair, etc.
       // These are preserved longer than soft tissue details and help identify the deceased
 
@@ -1082,12 +1108,115 @@ export class BodyPartBuilder {
       if (self.hairColor && canSeeDetail(20)) {
         // Hair is very durable - visible even on skeletal remains
         if (decay < 30) {
-          findings.push('The hair is ' + self.hairColor + ' and ' + (self.hairStyle || 'unstyled') + '.');
+          let hairDesc = 'The hair is ' + self.hairColor;
+          if (self.hairTexture && self.hairTexture !== 'medium') {
+            hairDesc += ', ' + self.hairTexture;
+          }
+          hairDesc += ' and ' + (self.hairStyle || 'unstyled') + '.';
+          findings.push(hairDesc);
         } else if (decay < 70) {
           findings.push('The hair appears to be ' + self.hairColor + ', ' + (self.hairStyle || 'matted') + '.');
         } else {
           // Hair still attached to skull even on skeletal remains
           findings.push('Remnants of ' + self.hairColor + ' hair cling to the scalp.');
+        }
+      }
+
+      // Facial hair - persists well on male corpses
+      if (self.facialHair && self.facialHair !== 'none' && canSeeDetail(25)) {
+        if (decay < 40) {
+          findings.push('The deceased had ' + self.facialHair + ' facial hair.');
+        } else if (decay < 70) {
+          findings.push('Remnants of facial hair suggest ' + self.facialHair + '.');
+        }
+      }
+
+      // Face shape - bone structure visible even on skeletal remains
+      if (self.faceShape && canSeeDetail(30)) {
+        if (decay < 30) {
+          findings.push('The face has ' + (self.faceShape === 'oval' ? 'an' : 'a') + ' ' + self.faceShape + ' shape.');
+        } else if (decay >= 70 && canSeeDetail(45)) {
+          // Bone structure visible on skeletal
+          findings.push('Skull structure suggests ' + (self.faceShape === 'oval' ? 'an' : 'a') + ' ' + self.faceShape + ' face shape.');
+        }
+      }
+
+      // Nose shape - cartilage and bone structure
+      if (self.shape && self.name && self.name.toLowerCase().includes('nose') && canSeeDetail(35)) {
+        if (decay < 35) {
+          findings.push('The nose appears ' + self.shape + '.');
+        } else if (decay >= 70 && canSeeDetail(55)) {
+          findings.push('Nasal bone structure suggests a ' + self.shape + ' nose.');
+        }
+      }
+
+      // Lip shape - soft tissue, obscured quickly
+      if (self.lipShape && canSeeDetail(40)) {
+        if (decay < 20) {
+          findings.push('The lips are ' + self.lipShape + '.');
+        } else if (canSeeDetail(60) && decay < 35) {
+          findings.push('The lips appear to have been ' + self.lipShape + '.');
+        }
+      }
+
+      // Freckles - skin pigmentation, visible until skin breaks down
+      if (self.freckles && self.freckles !== 'none' && canSeeDetail(35)) {
+        if (decay < 25) {
+          findings.push('The skin shows ' + self.freckles + ' freckles.');
+        } else if (canSeeDetail(50) && decay < 40) {
+          findings.push('Faint freckle patterns are visible on the skin.');
+        }
+      }
+
+      // Distinguishing marks - scars, birthmarks, tattoos - very useful for ID
+      if (self.distinguishingMark && self.distinguishingMark !== 'none' && canSeeDetail(25)) {
+        // Different marks persist differently
+        const mark = self.distinguishingMark;
+        if (mark === 'scar' || mark === 'large scar') {
+          // Scars visible even on decayed tissue
+          if (decay < 60) {
+            findings.push('A distinctive ' + mark + ' is visible.');
+          } else if (canSeeDetail(40)) {
+            findings.push('Scarring is visible on the remaining tissue.');
+          }
+        } else if (mark === 'tattoo' || mark === 'multiple tattoos') {
+          // Tattoos persist in dermis
+          if (decay < 50) {
+            findings.push('The deceased had ' + (mark === 'tattoo' ? 'a tattoo' : 'multiple tattoos') + '.');
+          } else if (canSeeDetail(45) && decay < 70) {
+            findings.push('Faded tattoo ink is visible in the remaining skin.');
+          }
+        } else if (mark === 'birthmark' || mark === 'large birthmark') {
+          if (decay < 40) {
+            findings.push('A ' + mark + ' is present.');
+          }
+        } else if (mark === 'mole' || mark === 'prominent mole') {
+          if (decay < 35) {
+            findings.push('A ' + mark + ' is visible.');
+          }
+        } else {
+          // Generic mark
+          if (decay < 40) {
+            findings.push('A distinctive ' + mark + ' is visible.');
+          }
+        }
+      }
+
+      // Build type - observable from muscle/fat distribution on torso
+      if (self.buildType && self.buildType !== 'average' && canSeeDetail(35)) {
+        const build = self.buildType;
+        if (decay < 30) {
+          findings.push('The body appears to have been ' + build + ' in build.');
+        } else if (canSeeDetail(50) && decay < 60) {
+          // Some builds visible from bone/remaining tissue
+          if (['muscular', 'athletic', 'tall', 'short', 'stocky', 'heavyset'].includes(build)) {
+            findings.push('Body structure suggests a ' + build + ' build.');
+          }
+        } else if (decay >= 70 && canSeeDetail(60)) {
+          // Skeletal - only bone-based observations
+          if (['tall', 'short'].includes(build)) {
+            findings.push('Skeletal measurements indicate a ' + build + ' stature.');
+          }
         }
       }
 
