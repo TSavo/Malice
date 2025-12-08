@@ -62,10 +62,13 @@ export class AuthManagerBuilder {
             const playerPrototypeId = aliases.player;
 
             // Find player with this username
+            // Helper to extract value from typed Value or raw value
+            const getValue = (v) => v && typeof v === 'object' && 'type' in v ? v.value : v;
             const users = await context.$.db.listAll();
+            const adminPrototypeId = aliases.admin;
             const existingUser = users.find(u =>
-              u.parent === playerPrototypeId &&
-              u.properties.playername === username.toLowerCase()
+              (u.parent === playerPrototypeId || u.parent === adminPrototypeId) &&
+              getValue(u.properties.playername) === username.toLowerCase()
             );
 
             if (existingUser) {

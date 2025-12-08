@@ -202,11 +202,7 @@ export class VirtualFileSystem {
     const actualCode = this.extractMethodCode(newCode);
 
     // Update method in MongoDB and wait for persistence
-    if (!obj['obj'].methods) {
-      obj['obj'].methods = {};
-    }
-    obj['obj'].methods[parsed.name] = { code: actualCode };
-    await this.manager.update(parsed.objectId, { methods: obj['obj'].methods }, false);
+    obj.setMethod(parsed.name, actualCode);
 
     // Update cache
     const prototypeType = await this.inferPrototypeType(obj);

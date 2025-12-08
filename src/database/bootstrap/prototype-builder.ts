@@ -13,6 +13,7 @@ import {
   CorpseBuilder,
   HumanRemainsBuilder,
   SkeletalRemainsBuilder,
+  WoundBuilder,
   EdibleBuilder,
   FoodBuilder,
   DrinkBuilder,
@@ -54,6 +55,7 @@ export class PrototypeBuilder {
   private corpseBuilder: CorpseBuilder;
   private humanRemainsBuilder: HumanRemainsBuilder;
   private skeletalRemainsBuilder: SkeletalRemainsBuilder;
+  private woundBuilder: WoundBuilder;
   private edibleBuilder: EdibleBuilder;
   private foodBuilder: FoodBuilder;
   private drinkBuilder: DrinkBuilder;
@@ -75,6 +77,7 @@ export class PrototypeBuilder {
     this.corpseBuilder = new CorpseBuilder(manager);
     this.humanRemainsBuilder = new HumanRemainsBuilder(manager);
     this.skeletalRemainsBuilder = new SkeletalRemainsBuilder(manager);
+    this.woundBuilder = new WoundBuilder(manager);
     this.edibleBuilder = new EdibleBuilder(manager);
     this.foodBuilder = new FoodBuilder(manager);
     this.drinkBuilder = new DrinkBuilder(manager);
@@ -153,6 +156,11 @@ export class PrototypeBuilder {
       ? await this.manager.load(aliases.skeletalRemains as number)
       : await this.skeletalRemainsBuilder.build(describable!.id);
 
+    // Wound inherits from Describable (wounds are objects on body parts)
+    const wound = aliases.wound
+      ? await this.manager.load(aliases.wound as number)
+      : await this.woundBuilder.build(describable!.id);
+
     // Edible inherits from Decayable (food/drink decay)
     const edible = aliases.edible
       ? await this.manager.load(aliases.edible as number)
@@ -203,6 +211,7 @@ export class PrototypeBuilder {
       corpse: corpse!.id,
       humanRemains: humanRemains!.id,
       skeletalRemains: skeletalRemains!.id,
+      wound: wound!.id,
       edible: edible!.id,
       food: food!.id,
       drink: drink!.id,
@@ -226,6 +235,7 @@ export class PrototypeBuilder {
     corpse: number;
     humanRemains: number;
     skeletalRemains: number;
+    wound: number;
     edible: number;
     food: number;
     drink: number;
@@ -250,6 +260,7 @@ export class PrototypeBuilder {
     aliases.corpse = ids.corpse;
     aliases.humanRemains = ids.humanRemains;
     aliases.skeletalRemains = ids.skeletalRemains;
+    aliases.wound = ids.wound;
     aliases.edible = ids.edible;
     aliases.food = ids.food;
     aliases.drink = ids.drink;

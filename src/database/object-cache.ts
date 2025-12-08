@@ -119,6 +119,17 @@ export class ObjectCache {
   }
 
   /**
+   * Invalidate a specific compiled method
+   */
+  invalidateCompiledMethod(objId: ObjId, methodName: string): void {
+    const key = `${objId}:${methodName}`;
+    if (this.compiledMethods.has(key)) {
+      this.compiledMethods.delete(key);
+      this.stats.methodCompilationsCached--;
+    }
+  }
+
+  /**
    * Get cached parent chain
    */
   getParentChain(objId: ObjId): ParentChain | undefined {

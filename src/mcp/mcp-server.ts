@@ -730,6 +730,44 @@ Core Objects:
 
       // Handle the initialize request
       await transport.handleRequest(req, res, message);
+    } else if (sessionId && !this.sessions.has(sessionId)) {
+      // Stale session - server restarted. Auto-recreate session with same ID.
+      console.log(`[MCP] Recreating stale session ${sessionId}`);
+      const transport = new StreamableHTTPServerTransport({
+        sessionIdGenerator: () => sessionId, // Reuse the same session ID
+        onsessioninitialized: (newSessionId) => {
+          this.sessions.set(newSessionId, transport);
+        },
+      });
+
+      // Connect server to transport
+      await this.server.connect(transport);
+
+      // Synthesize an initialize to set up the session properly
+      const initMessage = {
+        jsonrpc: '2.0',
+        id: 0,
+        method: 'initialize',
+        params: {
+          protocolVersion: '2024-11-05',
+          capabilities: {},
+          clientInfo: { name: 'reconnected-client', version: '1.0.0' }
+        }
+      };
+
+      // Create a fake response to absorb the initialize response
+      const fakeRes = {
+        writeHead: () => {},
+        end: () => {},
+        setHeader: () => {},
+        write: () => true,
+        on: () => {},
+      } as unknown as ServerResponse;
+
+      await transport.handleRequest(req, fakeRes, initMessage);
+
+      // Now handle the actual request
+      await transport.handleRequest(req, res, message);
     } else {
       res.writeHead(400);
       res.end(JSON.stringify({ error: 'Bad Request: No session ID and not an initialize request' }));
@@ -740,9 +778,19 @@ Core Objects:
    * Handle GET requests (SSE streaming for server-to-client notifications)
    */
   private async handleGet(req: IncomingMessage, res: ServerResponse, sessionId?: string): Promise<void> {
-    if (!sessionId || !this.sessions.has(sessionId)) {
+    if (!sessionId) {
       res.writeHead(400);
-      res.end(JSON.stringify({ error: 'Invalid or missing session ID' }));
+      res.end(JSON.stringify({ error: 'Missing session ID' }));
+      return;
+    }
+    if (!this.sessions.has(sessionId)) {
+      // Stale session on GET - can't auto-recreate for SSE, just return error
+      // The POST handler will recreate the session on next tool call
+      res.writeHead(410);
+      res.end(JSON.stringify({
+        error: 'Session expired. Next request will auto-reconnect.',
+        code: 'SESSION_EXPIRED'
+      }));
       return;
     }
 

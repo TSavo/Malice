@@ -14,6 +14,9 @@ export { CorpseBuilder } from './corpse-builder.js';
 export { HumanRemainsBuilder } from './human-remains-builder.js';
 export { SkeletalRemainsBuilder } from './skeletal-remains-builder.js';
 
+// Wound system
+export { WoundBuilder } from './wound-builder.js';
+
 // Consumables
 export { EdibleBuilder } from './edible-builder.js';
 export { FoodBuilder } from './food-builder.js';

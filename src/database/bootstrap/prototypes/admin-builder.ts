@@ -932,41 +932,43 @@ export class AdminBuilder {
        *  Example: @eval self.name = "Test"
        *  Example: @eval await $.load(42).describe()
        *
-       *  Available variables: self, $, args, player, context
+       *  Available variables: self, $, player, context
        */
+      // args[0] contains the captured %s from "@eval %s"
       const code = args[0];
 
       if (!code) {
-        await self.tell('Usage: @eval <code>');
-        await self.tell('Example: @eval self.name');
-        await self.tell('Example: @eval await $.load(42).describe()');
+        await player.tell('Usage: @eval <code>');
+        await player.tell('Example: @eval self.name');
+        await player.tell('Example: @eval await $.load(42).describe()');
         return;
       }
 
       try {
-        // Wrap in async function to allow await
-        const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
-        const fn = new AsyncFunction('self', '$', 'args', 'player', 'context',
+        const AsyncFunction = (async function(){}).constructor;
+        const fn = new AsyncFunction('self', '$', 'player', 'context',
           'return (async () => { return (' + code + '); })();'
         );
 
-        const result = await fn(self, $, [], player, context);
+        const result = await fn(self, $, player, context);
 
-        // Format result
         if (result === undefined) {
-          await self.tell('=> undefined');
+          await player.tell('=> undefined');
         } else if (result === null) {
-          await self.tell('=> null');
+          await player.tell('=> null');
         } else if (typeof result === 'object' && result.id !== undefined) {
-          // RuntimeObject
-          await self.tell('=> #' + result.id + ' (' + (result.name || 'unnamed') + ')');
+          await player.tell('=> #' + result.id + ' (' + (result.name || 'unnamed') + ')');
         } else if (typeof result === 'object') {
-          await self.tell('=> ' + JSON.stringify(result, null, 2));
+          try {
+            await player.tell('=> ' + JSON.stringify(result, null, 2));
+          } catch {
+            await player.tell('=> [object]');
+          }
         } else {
-          await self.tell('=> ' + String(result));
+          await player.tell('=> ' + String(result));
         }
       } catch (err) {
-        await self.tell('Error: ' + err.message);
+        await player.tell('Error: ' + err.message);
       }
     `);
 
@@ -975,51 +977,49 @@ export class AdminBuilder {
       /** Execute multiline MOO code using $.prompt.multiline.
        *  Enter code, then '.' on its own line to execute.
        *
-       *  Available variables: self, $, args, player, context
+       *  Available variables: self, $, player, context
        */
-      await self.tell('Enter MOO code (end with . on its own line):');
-      await self.tell('Available: self, $, player, context');
-      await self.tell('---');
+      await player.tell('Enter MOO code (end with . on its own line):');
+      await player.tell('Available: self, $, player, context');
+      await player.tell('---');
 
-      const code = await $.prompt.multiline(self, '');
+      const code = await $.prompt.multiline(player, '');
 
       if (!code || code.trim() === '') {
-        await self.tell('Cancelled (empty input).');
+        await player.tell('Cancelled (empty input).');
         return;
       }
 
-      await self.tell('---');
-      await self.tell('Executing...');
+      await player.tell('---');
+      await player.tell('Executing...');
 
       try {
-        // Wrap in async function to allow await and multiple statements
-        const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
-        const fn = new AsyncFunction('self', '$', 'args', 'player', 'context',
-          code
-        );
+        const AsyncFunction = (async function(){}).constructor;
+        const fn = new AsyncFunction('self', '$', 'player', 'context', code);
 
-        const result = await fn(self, $, [], player, context);
+        const result = await fn(self, $, player, context);
 
-        // Format result
         if (result === undefined) {
-          await self.tell('=> undefined');
+          await player.tell('=> undefined');
         } else if (result === null) {
-          await self.tell('=> null');
+          await player.tell('=> null');
         } else if (typeof result === 'object' && result.id !== undefined) {
-          // RuntimeObject
-          await self.tell('=> #' + result.id + ' (' + (result.name || 'unnamed') + ')');
+          await player.tell('=> #' + result.id + ' (' + (result.name || 'unnamed') + ')');
         } else if (typeof result === 'object') {
-          await self.tell('=> ' + JSON.stringify(result, null, 2));
+          try {
+            await player.tell('=> ' + JSON.stringify(result, null, 2));
+          } catch {
+            await player.tell('=> [object]');
+          }
         } else {
-          await self.tell('=> ' + String(result));
+          await player.tell('=> ' + String(result));
         }
       } catch (err) {
-        await self.tell('Error: ' + err.message);
+        await player.tell('Error: ' + err.message);
         if (err.stack) {
-          // Show first few lines of stack
           const stackLines = err.stack.split('\\n').slice(0, 3);
           for (const line of stackLines) {
-            await self.tell('  ' + line);
+            await player.tell('  ' + line);
           }
         }
       }

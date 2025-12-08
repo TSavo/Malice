@@ -403,6 +403,9 @@ export class BodyFactoryBuilder {
       // Store primary hand preference on torso
       torso.set('primaryHand', primaryHand);
 
+      // Store species on torso for autopsy identification
+      torso.set('species', 'human');
+
       // Apply appearance to body parts
       // Skin tone to all visible parts (not eyes)
       const applyToAllParts = async (part, prop, value, excludeNames) => {

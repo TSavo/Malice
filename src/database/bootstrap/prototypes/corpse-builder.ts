@@ -28,7 +28,7 @@ export class CorpseBuilder {
       properties: {
         name: 'Corpse',
         description: 'A lifeless body.',
-        // Original identity
+        // Original identity - for autopsy, sex is determined from anatomy
         originalName: null,
         // Physical - average human body
         width: 50, // cm
@@ -270,6 +270,8 @@ export class CorpseBuilder {
 
       const report = {
         subject: self.originalName || 'Unknown',
+        sex: null,
+        species: null,
         timeOfExamination: 'present',
         overallCondition: null,
         causeOfDeath: [],
@@ -314,6 +316,31 @@ export class CorpseBuilder {
       if (!body) {
         report.summary = 'No body found within the corpse to examine.';
         return report;
+      }
+
+      // DETERMINE SEX FROM ANATOMY
+      // Examine groin parts to determine biological sex
+      const torsoForSex = body.getPart ? await body.getPart('torso') : null;
+      const groin = torsoForSex && torsoForSex.getPart ? await torsoForSex.getPart('groin') : null;
+      if (groin && groin.parts) {
+        const groinParts = groin.parts;
+        if (groinParts.penis) {
+          report.sex = 'male';
+        } else if (groinParts.vagina) {
+          report.sex = 'female';
+        } else {
+          report.sex = 'indeterminate';
+        }
+      } else {
+        report.sex = 'unknown (groin not found or too decayed)';
+      }
+
+      // DETERMINE SPECIES FROM BODY STRUCTURE
+      // Species stored on torso, or inferred from body structure
+      if (torsoForSex) {
+        report.species = torsoForSex.species || 'human';
+      } else {
+        report.species = 'unknown';
       }
 
       // CAUSE OF DEATH ANALYSIS
@@ -509,6 +536,12 @@ export class CorpseBuilder {
 
       lines.push('=== AUTOPSY REPORT ===');
       lines.push('Subject: ' + report.subject);
+      if (report.sex) {
+        lines.push('Sex: ' + report.sex);
+      }
+      if (report.species) {
+        lines.push('Species: ' + report.species);
+      }
       lines.push('');
       lines.push('CONDITION: ' + report.overallCondition);
       lines.push('');
