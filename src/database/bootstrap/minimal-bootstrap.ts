@@ -46,25 +46,33 @@ export class MinimalBootstrap {
   /**
    * Ensure Root object #1 exists
    * Base of all inheritance, stores global configuration
+   *
+   * Note: Root is a special bootstrap object created via db.create() with explicit ID.
+   * Normal objects should be created via $.recycler which uses manager.create().
    */
   private async ensureRoot(): Promise<void> {
     let root = await this.manager.load(1);
     if (!root) {
-      root = await this.manager.create({
+      // Create directly in database with explicit ID (bootstrap-only pattern)
+      await this.manager.db.create({
+        _id: 1,
         parent: 0,
         properties: {
-          name: 'Root',
-          description: 'Base of all objects',
-
-          // System configuration
+          name: { type: 'string', value: 'Root' },
+          description: { type: 'string', value: 'Base of all objects' },
           config: {
-            siteName: 'Malice',
-            motd: 'Welcome to Malice!',
-            maxConnections: 100,
+            type: 'object',
+            value: {
+              siteName: { type: 'string', value: 'Malice' },
+              motd: { type: 'string', value: 'Welcome to Malice!' },
+              maxConnections: { type: 'number', value: 100 },
+            },
           },
         },
         methods: {},
       });
+      // Now load it to get the RuntimeObject
+      root = await this.manager.load(1);
       console.log('✅ Created Root object #1');
     }
   }
@@ -80,14 +88,20 @@ export class MinimalBootstrap {
 
     let system = aliases.system ? await this.manager.load(aliases.system) : null;
     if (!system) {
-      system = await this.manager.create({
+      // Create directly in database with explicit ID (bootstrap-only pattern)
+      // Normal objects should be created via $.recycler
+      await this.manager.db.create({
+        _id: 2,
         parent: 1,
         properties: {
-          name: 'System',
-          description: 'Connection router and system coordinator',
+          name: { type: 'string', value: 'System' },
+          description: { type: 'string', value: 'Connection router and system coordinator' },
         },
         methods: {},
       });
+      // Now load it to get the RuntimeObject
+      system = await this.manager.load(2);
+      if (!system) throw new Error('Failed to load System object after creation');
 
       // Called when a new connection arrives
       system.setMethod('onConnection', `

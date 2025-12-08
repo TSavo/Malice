@@ -395,6 +395,13 @@ export class ObjectManager {
   }
 
   /**
+   * Invalidate a specific compiled method from cache
+   */
+  invalidateCompiledMethod(objId: ObjId, methodName: string): void {
+    this.cache.invalidateCompiledMethod(objId, methodName);
+  }
+
+  /**
    * Preload objects into cache
    * Marks them as preloaded for statistics
    */

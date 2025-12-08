@@ -30,11 +30,7 @@ export class GameCoordinator {
     await this.db.connect();
     console.log('✅ Connected to MongoDB');
 
-    // Ensure root object exists
-    await this.db.ensureRoot();
-    console.log('✅ Root object #1 ready');
-
-    // Bootstrap core game objects
+    // Bootstrap core game objects (MinimalBootstrap handles Root creation)
     const bootstrap = new GameBootstrap(this.manager);
     await bootstrap.bootstrap();
     console.log('✅ Core objects bootstrapped');

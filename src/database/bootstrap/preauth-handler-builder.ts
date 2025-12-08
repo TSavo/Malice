@@ -137,10 +137,13 @@ export class PreAuthHandlerBuilder {
           const playerPrototypeId = aliases.player;
 
           // Find Player by playername
+          // Helper to extract value from typed Value or raw value
+          const getValue = (v) => v && typeof v === 'object' && 'type' in v ? v.value : v;
           const users = await context.$.db.listAll();
+          const adminPrototypeId = aliases.admin;
           const userDoc = users.find(u =>
-            u.parent === playerPrototypeId &&
-            u.properties.playername === basic.username.toLowerCase()
+            (u.parent === playerPrototypeId || u.parent === adminPrototypeId) &&
+            getValue(u.properties.playername) === basic.username.toLowerCase()
           );
 
           if (!userDoc) {

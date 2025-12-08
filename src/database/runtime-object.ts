@@ -231,6 +231,9 @@ export class RuntimeObjectImpl implements RuntimeObject {
       ...options,
     };
 
+    // Invalidate compiled method cache for this method
+    this.manager.invalidateCompiledMethod(this.id, name);
+
     // Auto-persist
     this.manager.update(this.id, {
       methods: this.obj.methods
@@ -242,7 +245,6 @@ export class RuntimeObjectImpl implements RuntimeObject {
   /**
    * Call method - walks inheritance chain, executes in context
    * @param method - Method name to call
-   * @param context - Optional execution context (ConnectionContext, player, etc.)
    * @param args - Method arguments
    */
   async call(method: string, ...args: unknown[]): Promise<unknown> {
@@ -252,9 +254,32 @@ export class RuntimeObjectImpl implements RuntimeObject {
     }
 
     // Context will be undefined for programmatic calls
-    // In production, context would be set by the connection handler
-    // Pass the object ID where method was found for pass() support
     return await this.executeMethod(found.code, undefined, args, method, found.objectId);
+  }
+
+  /**
+   * Call method with verb dispatch context
+   * Used by verb dispatcher to properly pass context, player, command separately from args
+   * @param method - Method name to call
+   * @param context - Connection context
+   * @param player - Player object invoking the verb
+   * @param command - Raw command string
+   * @param args - Verb-resolved arguments only
+   */
+  async callVerb(method: string, context: any, player: RuntimeObject, command: string, args: unknown[]): Promise<unknown> {
+    const found = await this.findMethodAsync(method);
+    if (!found) {
+      throw new Error(`Method ${method} not found on object #${this.id}`);
+    }
+
+    // Create verb context with player and command
+    const verbContext = {
+      ...context,
+      player,
+      command,
+    };
+
+    return await this.executeMethod(found.code, verbContext, args, method, found.objectId);
   }
 
   /**
@@ -285,7 +310,8 @@ export class RuntimeObjectImpl implements RuntimeObject {
     // Stop at root (parent=0) or self-parented objects (parent=self) like #-1 and #0
     if (this.obj.parent !== 0 && this.obj.parent !== this.obj._id) {
       const parent = this.manager.getSync(this.obj.parent);
-      if (parent && parent.hasMethod(method)) {
+      if (parent) {
+        // Directly call findMethod on the impl to avoid hasMethod->findMethod loop
         const parentImpl = parent as RuntimeObjectImpl;
         return parentImpl.findMethod(method);
       }
@@ -420,10 +446,10 @@ export class RuntimeObjectImpl implements RuntimeObject {
       },
     });
 
-    // For verb dispatch, args are: [context, player, command, ...resolvedArgs]
-    // Extract player and command if present
-    const verbPlayer = args.length >= 2 ? args[1] : null;
-    const verbCommand = args.length >= 3 ? args[2] : null;
+    // Get player and command from userContext (set by callVerb)
+    // This is cleaner than the old approach of stuffing them into args
+    const verbPlayer = userContext?.player || null;
+    const verbCommand = userContext?.command || '';
 
     // Create pass() function for calling parent's version of this method
     // MOO-style: pass(@args) calls the same method on parent with current self
@@ -471,10 +497,13 @@ export class RuntimeObjectImpl implements RuntimeObject {
           $: $proxy,
           args: argsToPass,
           context: userContext,
-          player: verbPlayer || userContext?.player || self,
+          player: verbPlayer || userContext?.player || null,
           command: verbCommand || '',
           pass: chainedPass, // New pass that searches from parent's parent
           methodName,
+          // Standard JavaScript globals
+          Object, Array, Math, JSON, Date, String, Number, Boolean,
+          RegExp, Error, Promise, console, parseInt, parseFloat, isNaN, isFinite,
         };
 
         const AsyncFn = async function () {}.constructor as FunctionConstructor;
@@ -486,6 +515,22 @@ export class RuntimeObjectImpl implements RuntimeObject {
           const player = ctx.player;
           const command = ctx.command;
           const pass = ctx.pass;
+          const Object = ctx.Object;
+          const Array = ctx.Array;
+          const Math = ctx.Math;
+          const JSON = ctx.JSON;
+          const Date = ctx.Date;
+          const String = ctx.String;
+          const Number = ctx.Number;
+          const Boolean = ctx.Boolean;
+          const RegExp = ctx.RegExp;
+          const Error = ctx.Error;
+          const Promise = ctx.Promise;
+          const console = ctx.console;
+          const parseInt = ctx.parseInt;
+          const parseFloat = ctx.parseFloat;
+          const isNaN = ctx.isNaN;
+          const isFinite = ctx.isFinite;
           return (async () => {
             ${parentJsCode}
           })();
@@ -502,10 +547,27 @@ export class RuntimeObjectImpl implements RuntimeObject {
       $: $proxy,
       args,
       context: userContext, // ConnectionContext or other execution context
-      player: verbPlayer || userContext?.player || self, // Player from verb dispatch, or context, or self
+      player: verbPlayer || userContext?.player || null, // Player from verb dispatch or context (null for non-verb calls)
       command: verbCommand || '', // Raw command string from verb dispatch
       pass, // MOO-style pass() to call parent's method
       methodName, // Current method name (useful for debugging/reflection)
+      // Standard JavaScript globals for @eval and general use
+      Object,
+      Array,
+      Math,
+      JSON,
+      Date,
+      String,
+      Number,
+      Boolean,
+      RegExp,
+      Error,
+      Promise,
+      console,
+      parseInt,
+      parseFloat,
+      isNaN,
+      isFinite,
     };
 
     try {
@@ -521,6 +583,22 @@ export class RuntimeObjectImpl implements RuntimeObject {
         const player = ctx.player;
         const command = ctx.command;
         const pass = ctx.pass;
+        const Object = ctx.Object;
+        const Array = ctx.Array;
+        const Math = ctx.Math;
+        const JSON = ctx.JSON;
+        const Date = ctx.Date;
+        const String = ctx.String;
+        const Number = ctx.Number;
+        const Boolean = ctx.Boolean;
+        const RegExp = ctx.RegExp;
+        const Error = ctx.Error;
+        const Promise = ctx.Promise;
+        const console = ctx.console;
+        const parseInt = ctx.parseInt;
+        const parseFloat = ctx.parseFloat;
+        const isNaN = ctx.isNaN;
+        const isFinite = ctx.isFinite;
         return (async () => {
           ${jsCode}
         })();

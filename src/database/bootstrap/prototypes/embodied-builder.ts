@@ -874,10 +874,11 @@ export class EmbodiedBuilder {
     obj.setMethod('digestTick', `
       /** Process stomach contents and absorb calories.
        *  Called periodically by heartbeat. Burns fat if needed.
-       *  @returns Object with digested calories, fatBurned, fatGained
+       *  Infected wounds reduce calorie absorption.
+       *  @returns Object with digested calories, fatBurned, fatGained, infectionPenalty
        */
       const body = await self.getBody();
-      if (!body) return { digested: 0, fatBurned: 0 };
+      if (!body) return { digested: 0, fatBurned: 0, infectionPenalty: 0 };
 
       const stomach = await body.getPart('digestiveStomach');
       let digestedCalories = 0;
@@ -887,10 +888,42 @@ export class EmbodiedBuilder {
         digestedCalories = await stomach.digest();
       }
 
-      // Replenish body with extracted calories
+      // Check for infected wounds - they inhibit calorie absorption
+      // Body diverts energy to fighting infection
+      let totalInfectionSeverity = 0;
+      const countInfections = async (part) => {
+        if (!part) return;
+
+        // Check wounds on this part
+        const woundIds = part.wounds || [];
+        for (const woundId of woundIds) {
+          const wound = await $.load(woundId);
+          if (wound && wound.infected) {
+            totalInfectionSeverity += (wound.infectionSeverity || 10);
+          }
+        }
+
+        // Recurse to child parts
+        const parts = part.parts || {};
+        for (const partName of Object.keys(parts)) {
+          const childId = parts[partName];
+          if (childId) {
+            const child = await $.load(childId);
+            await countInfections(child);
+          }
+        }
+      };
+      await countInfections(body);
+
+      // Infection penalty: each 10 severity = 5% less absorption (max 80% penalty)
+      const infectionPenalty = Math.min(0.8, totalInfectionSeverity * 0.005);
+      const effectiveCalories = Math.floor(digestedCalories * (1 - infectionPenalty));
+      const caloriesLostToInfection = digestedCalories - effectiveCalories;
+
+      // Replenish body with extracted calories (reduced by infection)
       let fatGained = 0;
-      if (digestedCalories > 0) {
-        const result = await self.replenishCalories(digestedCalories);
+      if (effectiveCalories > 0) {
+        const result = await self.replenishCalories(effectiveCalories);
         fatGained = result.storedAsFat || 0;
       }
 
@@ -920,86 +953,118 @@ export class EmbodiedBuilder {
         }
       }
 
-      return { digested: digestedCalories, fatBurned, fatGained };
+      return {
+        digested: digestedCalories,
+        absorbed: effectiveCalories,
+        fatBurned,
+        fatGained,
+        infectionPenalty: Math.round(infectionPenalty * 100),
+        caloriesLostToInfection
+      };
     `);
 
     obj.setMethod('bleedTick', `
-      /** Process bleeding damage for all body parts.
+      /** Process all wounds on all body parts.
        *  Called periodically by heartbeat.
-       *  Bleeding drains calories (blood loss). Only causes decay when calories depleted.
-       *  @returns Object with totalBleeding, caloriesLost, messages
+       *  Wounds tick (bleed, heal, infect, cause pain).
+       *  Bleeding drains hydration. Severe blood loss causes decay.
+       *  @returns Object with totalBleeding, woundsHealed, infections, messages
        */
       const body = await self.getBody();
-      if (!body) return { totalBleeding: 0, caloriesLost: 0, messages: [] };
-
-      // Get all bleeding parts
-      const bleedingParts = body.getAllBleedingParts ? await body.getAllBleedingParts() : [];
-      if (bleedingParts.length === 0) {
-        return { totalBleeding: 0, caloriesLost: 0, messages: [] };
-      }
+      if (!body) return { totalBleeding: 0, woundsHealed: 0, infections: 0, messages: [] };
 
       const messages = [];
       let totalBleeding = 0;
-      let totalCaloriesLost = 0;
+      let totalWoundsHealed = 0;
+      let totalInfections = 0;
 
-      for (const { part, count } of bleedingParts) {
-        totalBleeding += count;
+      // Process wounds on all body parts recursively
+      const processPartWounds = async (part) => {
+        if (!part) return;
 
-        // Build descriptive message
-        if (count === 1) {
-          messages.push('Your ' + part.name + ' is bleeding.');
-        } else {
-          messages.push('Your ' + part.name + ' bleeds from ' + count + ' wounds.');
+        // Tick wounds on this part
+        if (part.tickWounds) {
+          // Get wound descriptions before ticking (for reporting)
+          const woundsBefore = part.getWounds ? await part.getWounds() : [];
+          const woundDescriptions = {};
+          for (const w of woundsBefore) {
+            woundDescriptions[w.id] = w.description || ('wound on your ' + part.name.toLowerCase());
+          }
+
+          const result = await part.tickWounds();
+          totalBleeding += result.totalBled || 0;
+          totalWoundsHealed += result.fullyHealedIds?.length || 0;
+          totalInfections += result.woundsInfected || 0;
+
+          // Report newly healed wounds with their description
+          if (result.fullyHealedIds?.length > 0) {
+            for (const healedId of result.fullyHealedIds) {
+              const desc = woundDescriptions[healedId] || 'wound';
+              // desc is like "A moderate deep cut, bleeding steadily."
+              // Convert to "The moderate deep cut on your arm has healed."
+              const cleanDesc = desc.replace(/^A /, '').replace(/[,.].*$/, '');
+              messages.push('The ' + cleanDesc + ' on your ' + part.name.toLowerCase() + ' has healed.');
+            }
+          }
+
+          // Report new infections - get current wound descriptions
+          if (result.woundsInfected > 0) {
+            const currentWounds = part.getWounds ? await part.getWounds() : [];
+            for (const w of currentWounds) {
+              if (w.infected && w.infectionSeverity < 15) { // Newly infected
+                const desc = (w.description || 'wound').replace(/^A /, '').replace(/[,.].*$/, '');
+                messages.push('The ' + desc + ' on your ' + part.name.toLowerCase() + ' has become infected!');
+              }
+            }
+          }
         }
 
-        // Generate pain sensation from blood loss
-        if (part.feel) {
-          await part.feel({
-            type: 'pain',
-            subtype: 'bleeding',
-            intensity: count * 2,
-          });
+        // Process child parts
+        const parts = part.parts || {};
+        for (const partName of Object.keys(parts)) {
+          const childId = parts[partName];
+          if (childId) {
+            const child = await $.load(childId);
+            await processPartWounds(child);
+          }
+        }
+      };
+
+      await processPartWounds(body);
+
+      // Report bleeding status
+      if (totalBleeding > 0) {
+        const bleedingRate = totalBleeding; // Hydration lost this tick
+        if (bleedingRate >= 20) {
+          messages.push('You are losing blood rapidly!');
+        } else if (bleedingRate >= 10) {
+          messages.push('You are bleeding badly.');
+        } else if (bleedingRate >= 5) {
+          messages.push('You are bleeding.');
         }
       }
 
-      // Each bleeding wound drains calories (blood loss)
-      // 50 calories per wound per tick (1 minute)
-      // Blood loss is systemic - drain from body, cascades to fat → decay
-      const caloriesPerWound = 50;
-      const caloriesToDrain = totalBleeding * caloriesPerWound;
-
-      if (caloriesToDrain > 0 && self.burnCalories) {
-        // Burn from body directly - blood loss is systemic
-        await self.burnCalories(caloriesToDrain, [body]);
-        totalCaloriesLost = caloriesToDrain;
-      }
-
-      // Notify the agent about blood loss
-      if (self.tell && messages.length > 0) {
-        // Consolidate into one message with severity
-        if (totalBleeding >= 5) {
-          await self.tell('You are losing a lot of blood! ' + messages.join(' '));
-        } else if (totalBleeding >= 3) {
-          await self.tell('You are bleeding badly. ' + messages.join(' '));
-        } else {
-          await self.tell(messages.join(' '));
+      // Notify the agent
+      if (self.tell && messages.length > 0 && self.sleepState === 'awake') {
+        for (const msg of messages) {
+          await self.tell(msg);
         }
       }
 
-      // Check for death from blood loss (same threshold as starvation: 50% total body decay)
-      const decayInfo = await self.getTotalBodyDecay();
-      if (decayInfo.percentage >= 50) {
-        // Trigger death from blood loss
-        if (self.onStarvationDeath) {
-          // Reuse starvation death handler - blood loss causes same effect
-          self.set('causeOfDeath', 'blood loss');
-          await self.onStarvationDeath(decayInfo);
-        } else if (self.die) {
-          await self.die('blood loss');
+      // Check for death from blood loss (severe hydration depletion)
+      const hydration = body.hydration ?? 100;
+      if (hydration <= 0) {
+        // Already handled by hydration depletion in heartbeat
+        // But set cause of death if bleeding caused it
+        if (totalBleeding > 0) {
+          self.causeOfDeath = 'blood loss';
         }
       }
 
-      return { totalBleeding, caloriesLost: totalCaloriesLost, messages };
+      // Check for sepsis (severe infection spreads to whole body)
+      // This is handled by wound.tick() adding sepsis status effect
+
+      return { totalBleeding, woundsHealed: totalWoundsHealed, infections: totalInfections, messages };
     `);
 
     obj.setMethod('breathTick', `

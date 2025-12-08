@@ -4,7 +4,7 @@
  */
 
 import type { ObjectManager } from '../database/object-manager.js';
-import type { GameObject, Value } from '../../types/object.js';
+import type { GameObject } from '../../types/object.js';
 
 /**
  * Generates TypeScript definition files from MongoDB objects

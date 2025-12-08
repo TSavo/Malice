@@ -32,6 +32,7 @@ export class BodyPartBuilder {
         owner: null, // ObjRef to the player/agent who owns this body
         parts: {}, // { partName: ObjId } - child body parts
         bones: [], // string[] - bones in this part (for damage)
+        wounds: [], // ObjRef[] - wound objects on this body part
         coverable: false, // Can wear clothing on this part
         removable: false, // Can be severed/detached
         critical: false, // Death if destroyed
@@ -228,39 +229,52 @@ export class BodyPartBuilder {
 
     obj.setMethod('takeDamage', `
       /** Receive and process damage to this body part.
-       *  @param damage - Object with type, force (0-100), breakChance, bleedChance
+       *  Creates a $.wound object and attaches it to this part.
+       *  @param damage - Object with type, severity (0-100), depth, cause, force, breakChance
        *  @param attacker - Who/what caused the damage
-       *  @returns Object with part, type, bleeding, bonesBroken, description
+       *  @returns Object with part, type, wound, bonesBroken, description
        */
       const damage = args[0];
       const attacker = args[1];
 
       const condition = self.condition || {};
-      const damageType = damage.type || 'wound';
-      const force = damage.force || 0; // 0-100, how much impact force
-      const breakChance = damage.breakChance || 0; // 0-1, base chance to break bone
-      const bleedChance = damage.bleedChance || 0; // 0-1, base chance to bleed
+      const damageType = damage.type || 'cut';
+      const severity = damage.severity || damage.force || 30;
+      const depth = damage.depth || (severity > 60 ? 'deep' : severity > 30 ? 'shallow' : 'superficial');
+      const cause = damage.cause || null;
+      const force = damage.force || severity;
+      const breakChance = damage.breakChance || 0;
 
-      // wounds: { [type]: [] of { bleeding, healed } }
-      // brokenBones: [] of { bone, set, healed }
-      const wounds = condition.wounds || {};
-      const existingDamage = Object.values(wounds).flat().length;
+      // Get existing wounds count for bone break calculations
+      const existingWounds = self.wounds || [];
+      const existingDamage = existingWounds.length;
 
-      // Determine if this wound bleeds
-      // More damaged = higher chance to bleed (each existing wound adds 0.1 to chance)
-      let bleeding = false;
-      if (bleedChance > 0) {
-        const damageBonus = existingDamage * 0.1;
-        const finalBleedChance = Math.min(1, bleedChance + damageBonus);
-        bleeding = Math.random() < finalBleedChance;
+      // Create wound object
+      const woundProto = $.wound;
+      if (!woundProto) {
+        // Fallback if wound prototype not available
+        return { success: false, message: 'Wound system not initialized.' };
       }
 
-      const typeWounds = wounds[damageType] || [];
-      typeWounds.push({ bleeding, healed: false });
-      wounds[damageType] = typeWounds;
-      condition.wounds = wounds;
+      const wound = await $.create({
+        parent: woundProto,
+        properties: {},
+      });
 
-      let resultDesc = damage.description || (self.name + ' receives a ' + damageType + '.');
+      // Initialize the wound with proper values
+      await wound.initialize(damageType, severity, {
+        depth,
+        cause,
+        attacker: attacker?.id,
+        bodyPart: self.id,
+      });
+
+      // Add wound to this body part's wounds list
+      const wounds = self.wounds || [];
+      wounds.push(wound.id);
+      self.wounds = wounds;
+
+      let resultDesc = damage.description || await wound.describe();
       let bonesBroken = [];
 
       // Check for bone breaks if this part has bones
@@ -268,17 +282,14 @@ export class BodyPartBuilder {
         const brokenBones = condition.brokenBones || [];
 
         // Force threshold: need sufficient force OR weakened by prior damage
-        const forceThreshold = 50; // Base threshold
-        const weakenedThreshold = forceThreshold - (existingDamage * 10); // Each wound lowers threshold by 10
-        const effectiveThreshold = Math.max(10, weakenedThreshold); // Minimum threshold of 10
+        const forceThreshold = 50;
+        const weakenedThreshold = forceThreshold - (existingDamage * 10);
+        const effectiveThreshold = Math.max(10, weakenedThreshold);
 
         if (force >= effectiveThreshold) {
-          // Roll for each bone based on breakChance
           for (const bone of self.bones) {
-            // Skip already broken bones
             if (brokenBones.some(b => b.bone === bone && !b.healed)) continue;
 
-            // Higher force = higher chance, scaled by breakChance
             const forceBonus = (force - effectiveThreshold) / 100;
             const finalChance = breakChance + forceBonus;
 
@@ -288,24 +299,11 @@ export class BodyPartBuilder {
             }
           }
           condition.brokenBones = brokenBones;
+          self.condition = condition;
         }
       }
 
-      self.condition = condition;
-
-      // Generate pain sensation
-      const painIntensity = 5 + (bonesBroken.length * 5);
-      await self.feel({
-        type: 'pain',
-        intensity: painIntensity,
-        damageType: damageType,
-        source: attacker?.id,
-      });
-
-      // Build result description
-      if (bleeding) {
-        resultDesc += ' It bleeds profusely.';
-      }
+      // Bones broken adds to description
       if (bonesBroken.length > 0) {
         resultDesc += ' The ' + bonesBroken.join(' and ') + ' breaks with a sickening crack!';
       }
@@ -313,53 +311,140 @@ export class BodyPartBuilder {
       return {
         part: self.name,
         type: damageType,
-        bleeding,
+        wound: wound,
+        woundId: wound.id,
+        bleeding: wound.bleeding,
         bonesBroken,
         description: resultDesc,
       };
     `);
 
-    obj.setMethod('heal', `
-      /** Heal a wound by type, or heal a set bone.
-       *  @param healType - Wound type to heal, or 'bone' for bones
-       *  @returns Object with part, type, healed item
+    // Process all wounds on this body part (called each tick)
+    obj.setMethod('tickWounds', `
+      /** Process all wounds on this body part for one tick.
+       *  @returns { totalBled, healed, infected, fullyHealed }
        */
-      const healType = args[0];
+      const results = {
+        totalBled: 0,
+        woundsHealed: 0,
+        woundsInfected: 0,
+        fullyHealedIds: [],
+      };
+
+      const woundIds = self.wounds || [];
+      const activeWounds = [];
+
+      for (const woundId of woundIds) {
+        const wound = await $.load(woundId);
+        if (!wound) continue;
+
+        const tickResult = await wound.tick();
+
+        results.totalBled += tickResult.bled || 0;
+        if (tickResult.healed > 0) results.woundsHealed++;
+        if (tickResult.infected) results.woundsInfected++;
+
+        if (tickResult.fullyHealed) {
+          results.fullyHealedIds.push(woundId);
+          // Optionally recycle the wound object
+          if ($.recycler) {
+            await $.recycler.recycle(wound);
+          }
+        } else {
+          activeWounds.push(woundId);
+        }
+      }
+
+      // Update wounds list to remove fully healed ones
+      self.wounds = activeWounds;
+
+      return results;
+    `);
+
+    // Get all wound objects on this part
+    obj.setMethod('getWounds', `
+      /** Get all wound objects on this body part.
+       *  @returns Array of wound RuntimeObjects
+       */
+      const woundIds = self.wounds || [];
+      const wounds = [];
+      for (const id of woundIds) {
+        const wound = await $.load(id);
+        if (wound) wounds.push(wound);
+      }
+      return wounds;
+    `);
+
+    // Check if actively bleeding
+    obj.setMethod('isBleeding', `
+      /** Check if any wounds are bleeding.
+       *  @returns Total bleeding rate (0-100+)
+       */
+      const wounds = await self.getWounds();
+      let totalBleeding = 0;
+      for (const wound of wounds) {
+        totalBleeding += wound.bleeding || 0;
+      }
+      return totalBleeding;
+    `);
+
+    obj.setMethod('heal', `
+      /** Heal a wound or a set bone.
+       *  @param target - 'bone' for bones, or wound ID, or 'all' for all wounds
+       *  @param amount - Healing amount (0-100), default 10
+       *  @returns Object with part, healed items
+       */
+      const target = args[0];
+      const amount = args[1] || 10;
       const condition = self.condition || {};
+      const healed = [];
 
-      let healed = null;
-
-      if (healType === 'bone') {
+      if (target === 'bone') {
+        // Heal bones (bones don't use wound objects)
         const bones = condition.brokenBones || [];
         const idx = bones.findIndex(b => b.set && !b.healed);
         if (idx >= 0) {
           bones[idx].healed = true;
-          healed = bones[idx];
+          healed.push({ type: 'bone', bone: bones[idx].bone });
         }
         condition.brokenBones = bones.filter(b => !b.healed);
-      } else if (healType) {
-        // Heal a specific wound type
-        const wounds = condition.wounds || {};
-        const typeWounds = wounds[healType] || [];
-        const idx = typeWounds.findIndex(w => !w.healed);
-        if (idx >= 0) {
-          typeWounds[idx].bleeding = false;
-          typeWounds[idx].healed = true;
-          healed = typeWounds[idx];
+        self.condition = condition;
+      } else if (target === 'all') {
+        // Heal all wounds on this part
+        const wounds = await self.getWounds();
+        for (const wound of wounds) {
+          wound.healingProgress = Math.min(100, (wound.healingProgress || 0) + amount);
+          if (wound.healingProgress >= 100) {
+            healed.push({ type: wound.type, wound });
+          }
         }
-        wounds[healType] = typeWounds.filter(w => !w.healed);
-        if (wounds[healType].length === 0) {
-          delete wounds[healType];
+      } else if (typeof target === 'number') {
+        // Heal specific wound by ID
+        const wound = await $.load(target);
+        if (wound && wound.healingProgress !== undefined) {
+          wound.healingProgress = Math.min(100, (wound.healingProgress || 0) + amount);
+          if (wound.healingProgress >= 100) {
+            healed.push({ type: wound.type, wound });
+          }
         }
-        condition.wounds = wounds;
+      } else {
+        // Heal first wound of given type
+        const wounds = await self.getWounds();
+        for (const wound of wounds) {
+          if (wound.type === target) {
+            wound.healingProgress = Math.min(100, (wound.healingProgress || 0) + amount);
+            if (wound.healingProgress >= 100) {
+              healed.push({ type: wound.type, wound });
+            }
+            break;
+          }
+        }
       }
-
-      self.condition = condition;
 
       return {
         part: self.name,
-        type: healType,
-        healed: healed,
+        healed,
+        message: healed.length > 0 ? 'Wounds have been treated.' : 'No wounds to heal.',
       };
     `);
 
@@ -395,24 +480,27 @@ export class BodyPartBuilder {
     `);
 
     obj.setMethod('stopBleeding', `
-      /** Stop all bleeding wounds on this part.
+      /** Stop bleeding on all wounds (apply pressure/bandage).
+       *  @param effectiveness - How effective the treatment is (0-100)
        *  @returns Object with stopped count and message
        */
-      const condition = self.condition || {};
-      const wounds = condition.wounds || {};
+      const effectiveness = args[0] || 50;
+      const wounds = await self.getWounds();
       let stopped = 0;
 
-      for (const type of Object.keys(wounds)) {
-        for (const wound of wounds[type]) {
-          if (wound.bleeding) {
-            wound.bleeding = false;
+      for (const wound of wounds) {
+        if (wound.bleeding > 0) {
+          const reduction = effectiveness;
+          wound.bleeding = Math.max(0, wound.bleeding - reduction);
+          if (wound.bleeding === 0) {
             stopped++;
+          }
+          // Bandaging also helps
+          if (effectiveness > 40 && !wound.bandaged) {
+            await wound.bandage(effectiveness);
           }
         }
       }
-
-      condition.wounds = wounds;
-      self.condition = condition;
 
       return {
         stopped,
@@ -424,15 +512,12 @@ export class BodyPartBuilder {
       /** Count bleeding wounds on this part only (not children).
        *  @returns Number of actively bleeding wounds
        */
-      const condition = self.condition || {};
-      const wounds = condition.wounds || {};
+      const wounds = await self.getWounds();
       let count = 0;
 
-      for (const type of Object.keys(wounds)) {
-        for (const wound of wounds[type]) {
-          if (wound.bleeding && !wound.healed) {
-            count++;
-          }
+      for (const wound of wounds) {
+        if (wound.bleeding > 0) {
+          count++;
         }
       }
 
@@ -853,32 +938,110 @@ export class BodyPartBuilder {
       const visibility = Math.max(0, 100 - decay);
       const canSeeDetail = (threshold) => (visibility + examinerSkill / 2) >= threshold;
 
-      // WOUNDS - always somewhat visible unless skeletal
-      const wounds = condition.wounds || {};
-      const woundTypes = Object.keys(wounds);
-      for (const type of woundTypes) {
-        const typeWounds = wounds[type].filter(w => !w.healed);
-        if (typeWounds.length === 0) continue;
+      // SKIN COLOR - requires examining tissue, progressively obscured by decay
+      // Original skin tone from chargen, modified by death conditions
+      const skinTone = self.skinTone || 'medium';
+      const hydration = self.hydration ?? 100;
+      const maxHydration = self.maxHydration || 100;
+      const hydrationPct = hydration / maxHydration;
 
-        const bleedingCount = typeWounds.filter(w => w.bleeding).length;
-        const count = typeWounds.length;
+      // Check for blood loss (wounds with bleeding) using wound objects
+      const bleedingWounds = await self.getWounds();
+      let totalBleeding = 0;
+      for (const wound of bleedingWounds) {
+        if (wound.bleeding > 0) totalBleeding++;
+      }
 
-        // Describe wound severity narratively
-        if (decay < 80) { // Can see wounds until skeletal
-          if (count === 1) {
-            findings.push('There is a ' + type + ' on the ' + self.name.toLowerCase() + '.');
-          } else if (count < 4) {
-            findings.push('There are several ' + type + 's on the ' + self.name.toLowerCase() + '.');
-          } else {
-            findings.push('The ' + self.name.toLowerCase() + ' is covered in ' + type + 's.');
+      // Base skin tone observation - easy to see on fresh body (threshold 25)
+      // Gets harder as decay progresses
+      if (canSeeDetail(25)) {
+        // Original skin tone visible on very fresh bodies
+        if (decay < 10) {
+          findings.push('The skin appears to be naturally ' + skinTone + '.');
+        } else if (canSeeDetail(35) && decay < 30) {
+          findings.push('The skin was likely ' + skinTone + ' in life.');
+        } else if (canSeeDetail(60) && decay < 60) {
+          findings.push('Original skin tone is difficult to determine due to decomposition.');
+        }
+      }
+
+      // Death-related skin changes (threshold varies by observation)
+      // Dehydration - leathery/shriveled skin
+      if (canSeeDetail(40) && hydrationPct < 0.2) {
+        findings.push('The skin is shriveled and paper-thin from severe dehydration.');
+      } else if (canSeeDetail(55) && hydrationPct < 0.5) {
+        findings.push('The skin appears dry and lacks elasticity.');
+      }
+
+      // Blood loss pallor - easier to see on lighter skin
+      const pallorBonus = ['pale', 'fair', 'light'].includes(skinTone) ? 10 : 0;
+      if (canSeeDetail(30 - pallorBonus) && totalBleeding >= 3) {
+        findings.push('The skin is waxy and pale, consistent with significant blood loss.');
+      } else if (canSeeDetail(45 - pallorBonus) && totalBleeding >= 1) {
+        findings.push('The skin shows pallor suggesting some blood loss.');
+      }
+
+      // Lividity (blood pooling) - dark patches where blood settled
+      // Easier to see on lighter skin, forms in first hours, fixed after ~8 hours
+      if (canSeeDetail(45 - pallorBonus) && decay < 15) {
+        findings.push('Lividity is clearly visible - dark purple-red discoloration where blood has pooled.');
+      } else if (canSeeDetail(60 - pallorBonus) && decay < 35) {
+        findings.push('Faint lividity patterns are still discernible.');
+      }
+
+      // Cyanosis (blue tinge from oxygen deprivation) - suffocation/drowning
+      const owner = self.owner ? await $.load(self.owner) : null;
+      if (owner && canSeeDetail(50)) {
+        const causeOfDeath = owner.causeOfDeath || '';
+        if (causeOfDeath.includes('drown') || causeOfDeath.includes('suffoc') || causeOfDeath.includes('strangle')) {
+          if (decay < 20) {
+            findings.push('A distinct bluish tinge to the lips and extremities suggests oxygen deprivation.');
+          } else if (canSeeDetail(65) && decay < 40) {
+            findings.push('There may be cyanosis present, though decomposition obscures it.');
           }
+        }
+      }
 
-          // Bleeding visible only when fresh
-          if (bleedingCount > 0 && decay < 30 && canSeeDetail(40)) {
-            if (bleedingCount === count) {
-              findings.push('The wounds appear to have been actively bleeding at time of death.');
-            } else {
-              findings.push('Some wounds show signs of active bleeding.');
+      // Decay discoloration - overrides original skin tone progressively
+      if (canSeeDetail(35) && decay >= 20 && decay < 40) {
+        findings.push('Greenish discoloration is spreading across the skin.');
+      } else if (canSeeDetail(30) && decay >= 40 && decay < 60) {
+        findings.push('The skin has taken on a mottled green-brown color from decomposition.');
+      } else if (canSeeDetail(25) && decay >= 60 && decay < 80) {
+        findings.push('The skin is blackened and sloughing in places.');
+      }
+
+      // WOUNDS - get findings from wound objects
+      const woundObjects = await self.getWounds();
+      if (woundObjects.length > 0) {
+        // Group wounds by type for reporting
+        const woundsByType = {};
+        for (const wound of woundObjects) {
+          const type = wound.type || 'wound';
+          if (!woundsByType[type]) woundsByType[type] = [];
+          woundsByType[type].push(wound);
+        }
+
+        for (const type of Object.keys(woundsByType)) {
+          const typeWounds = woundsByType[type];
+          const count = typeWounds.length;
+
+          // Severity affects visibility threshold
+          const avgSeverity = typeWounds.reduce((sum, w) => sum + (w.severity || 20), 0) / count;
+          const woundThreshold = avgSeverity > 60 ? 20 : (avgSeverity > 30 ? 30 : 45);
+
+          if (canSeeDetail(woundThreshold)) {
+            // Get detailed findings from each wound object
+            for (const wound of typeWounds) {
+              if (wound.getAutopsyFindings) {
+                const woundFindings = await wound.getAutopsyFindings(examinerSkill, decay);
+                for (const finding of woundFindings) {
+                  findings.push(finding);
+                }
+              } else {
+                // Fallback if wound doesn't have autopsy method
+                findings.push(wound.description || ('A ' + type + ' on the ' + self.name.toLowerCase() + '.'));
+              }
             }
           }
         }
@@ -899,6 +1062,43 @@ export class BodyPartBuilder {
       // SEVERED - always visible
       if (condition.severed) {
         findings.push('This ' + self.name.toLowerCase() + ' has been severed from the body.');
+      }
+
+      // APPEARANCE PROPERTIES - eye color, hair, etc.
+      // These are preserved longer than soft tissue details and help identify the deceased
+
+      // Eye color - visible even on somewhat decayed eyes (vitreous humor preserves)
+      if (self.color && canSeeDetail(35)) {
+        if (decay < 40) {
+          findings.push('The eye appears to be ' + self.color + '.');
+        } else if (canSeeDetail(55) && decay < 70) {
+          findings.push('The eye was likely ' + self.color + ', though clouding obscures it.');
+        } else if (canSeeDetail(75) && decay < 90) {
+          findings.push('Eye color is difficult to determine - possibly ' + self.color + '.');
+        }
+      }
+
+      // Hair color and style - hair lasts long after death (doesn't decay)
+      if (self.hairColor && canSeeDetail(20)) {
+        // Hair is very durable - visible even on skeletal remains
+        if (decay < 30) {
+          findings.push('The hair is ' + self.hairColor + ' and ' + (self.hairStyle || 'unstyled') + '.');
+        } else if (decay < 70) {
+          findings.push('The hair appears to be ' + self.hairColor + ', ' + (self.hairStyle || 'matted') + '.');
+        } else {
+          // Hair still attached to skull even on skeletal remains
+          findings.push('Remnants of ' + self.hairColor + ' hair cling to the scalp.');
+        }
+      }
+
+      // Eye shape - visible on fresh faces, hard to see on decayed
+      // (stored as 'shape' property on eye parts)
+      if (self.shape && canSeeDetail(50)) {
+        if (decay < 25) {
+          findings.push('The eyes have an ' + self.shape + ' shape.');
+        } else if (canSeeDetail(70) && decay < 50) {
+          findings.push('The eye sockets suggest ' + self.shape + ' eyes.');
+        }
       }
 
       // ENERGY STATE (calories) - only visible when fresh, requires skill

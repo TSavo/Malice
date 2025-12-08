@@ -210,13 +210,13 @@ export class PlayerBuilder {
           await self.tell(match.error);
         } else if (match && match.handler) {
           // Found matching pattern - dispatch to handler
-          // Method receives: self=handler, player=self, command=trimmed, args=resolved
-          const result = await match.handler.call(
+          // callVerb properly separates context/player/command from verb args
+          const result = await match.handler.callVerb(
             match.verbInfo.method,
             context,
             self,           // player
             trimmed,        // command (raw input)
-            ...match.args   // resolved %i, %t, %s in pattern order
+            match.args      // resolved %i, %t, %s in pattern order
           );
           if (result !== undefined) {
             await self.tell(result);
