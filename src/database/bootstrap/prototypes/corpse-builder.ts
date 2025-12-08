@@ -38,9 +38,10 @@ export class CorpseBuilder {
         // Inventory from dead player
         contents: [],
         // Corpse-specific decay - this is hardcore survival
-        // ~2 weeks to fully decompose (20160 ticks)
-        // 100% / 20160 = ~0.005% per tick
-        decayRate: 0.005,
+        // ~2 months to fully decompose (86400 ticks = 60 days)
+        // 100% / 86400 = ~0.00116% per tick
+        // Bones will litter the landscape for a long time
+        decayRate: 0.00116,
         decayCondition: 'always', // Always decaying
         // Can be searched/looted
         searched: false,
