@@ -326,6 +326,8 @@ export class BodyFactoryBuilder {
 
       const skinTone = appearance.skinTone || 'medium';
       const eyeColor = appearance.eyeColor || 'brown';
+      const leftEyeColor = appearance.leftEyeColor || eyeColor;
+      const rightEyeColor = appearance.rightEyeColor || eyeColor;
       const eyeStyle = appearance.eyeStyle || 'almond';
       const hairColor = appearance.hairColor || 'brown';
       const hairStyle = appearance.hairStyle || 'straight';
@@ -431,16 +433,16 @@ export class BodyFactoryBuilder {
         scalp.set('hairStyle', hairStyle);
       }
 
-      // Eyes
+      // Eyes (supports heterochromia - different colors per eye)
       if (face) {
         const leftEye = await face.getPart('leftEye');
         const rightEye = await face.getPart('rightEye');
         if (leftEye) {
-          leftEye.set('color', eyeColor);
+          leftEye.set('color', leftEyeColor);
           leftEye.set('shape', eyeStyle);
         }
         if (rightEye) {
-          rightEye.set('color', eyeColor);
+          rightEye.set('color', rightEyeColor);
           rightEye.set('shape', eyeStyle);
         }
       }

@@ -224,7 +224,26 @@ export class CharGenBuilder {
         heterochromia: 'Heterochromia (mixed)',
       };
 
-      const eyeColor = await $.prompt.menu(player, 'What color are your eyes?', eyeColors, 3);
+      let eyeColor = await $.prompt.menu(player, 'What color are your eyes?', eyeColors, 3);
+
+      // Handle heterochromia - need two different colors
+      let leftEyeColor = eyeColor;
+      let rightEyeColor = eyeColor;
+
+      if (eyeColor === 'heterochromia') {
+        await player.tell('');
+        await player.tell('Heterochromia - choose a color for each eye:');
+
+        // Remove heterochromia from the options for individual eye selection
+        const singleEyeColors = { ...eyeColors };
+        delete singleEyeColors.heterochromia;
+
+        leftEyeColor = await $.prompt.menu(player, 'Left eye color?', singleEyeColors, 3);
+        rightEyeColor = await $.prompt.menu(player, 'Right eye color?', singleEyeColors, 3);
+
+        // For display purposes, show both colors
+        eyeColor = leftEyeColor + '/' + rightEyeColor;
+      }
 
       // Eye shapes
       const eyeStyles = {
@@ -327,6 +346,8 @@ export class CharGenBuilder {
       // Store appearance for body creation
       const appearance = {
         eyeColor: eyeColor,
+        leftEyeColor: leftEyeColor,
+        rightEyeColor: rightEyeColor,
         eyeStyle: eyeStyle,
         hairColor: hairColor,
         hairStyle: hairStyle,
@@ -347,13 +368,22 @@ export class CharGenBuilder {
 
       // Use $.format for nice display
       const format = $.format;
+
+      // Format eye color display (handle heterochromia)
+      let eyeColorDisplay;
+      if (leftEyeColor !== rightEyeColor) {
+        eyeColorDisplay = 'Left: ' + eyeColors[leftEyeColor] + ', Right: ' + eyeColors[rightEyeColor];
+      } else {
+        eyeColorDisplay = eyeColors[leftEyeColor];
+      }
+
       const summary = await format.keyValue({
         'Name': player.name,
         'Sex': sex + ' (' + pronouns.subject + '/' + pronouns.object + ')',
         'Age': age,
         'Height': height + 'm',
         'Weight': weight + 'kg',
-        'Eyes': eyeColors[eyeColor] + ', ' + eyeStyles[eyeStyle],
+        'Eyes': eyeColorDisplay + ', ' + eyeStyles[eyeStyle],
         'Hair': hairColors[hairColor] + ', ' + hairStyles[hairStyle],
         'Skin': skinTones[skinTone],
       });
