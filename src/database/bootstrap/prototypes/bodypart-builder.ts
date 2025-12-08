@@ -905,28 +905,31 @@ export class BodyPartBuilder {
       if (decay < 30 && canSeeDetail(60)) {
         const calories = self.calories || 0;
         const maxCalories = self.maxCalories || 100;
-        const ratio = calories / maxCalories;
 
-        if (ratio < 0.1) {
-          findings.push('The muscle tissue appears severely atrophied and depleted.');
-        } else if (ratio < 0.3) {
-          findings.push('The muscle tissue shows signs of significant wasting.');
-        } else if (ratio < 0.5) {
-          findings.push('The muscle tissue appears somewhat diminished.');
-        } else if (ratio > 0.9) {
-          findings.push('The muscle tissue appears well-developed and healthy.');
+        const muscleStates = [
+          'The muscle tissue appears severely atrophied and depleted.',
+          'The muscle tissue shows signs of significant wasting.',
+          'The muscle tissue appears somewhat diminished.',
+          null, // Normal - don't mention
+          'The muscle tissue appears well-developed and healthy.',
+        ];
+        const muscleMsg = await $.proportional.sub(muscleStates, calories, maxCalories);
+        if (muscleMsg) {
+          findings.push(muscleMsg);
         }
       }
 
-      // DECAY STATE - always describe
-      if (decay >= 80) {
-        findings.push('The flesh has largely decomposed, leaving mostly bone.');
-      } else if (decay >= 50) {
-        findings.push('Advanced decomposition makes detailed examination difficult.');
-      } else if (decay >= 30) {
-        findings.push('Decomposition has begun to affect the tissue.');
-      } else if (decay >= 10) {
-        findings.push('Early signs of decomposition are present.');
+      // DECAY STATE - always describe using $.proportional
+      const decayStates = [
+        null, // Fresh - don't mention
+        'Early signs of decomposition are present.',
+        'Decomposition has begun to affect the tissue.',
+        'Advanced decomposition makes detailed examination difficult.',
+        'The flesh has largely decomposed, leaving mostly bone.',
+      ];
+      const decayMsg = await $.proportional.fromPercent(decayStates, decay);
+      if (decayMsg) {
+        findings.push(decayMsg);
       }
 
       return findings;

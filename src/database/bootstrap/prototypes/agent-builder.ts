@@ -2155,43 +2155,49 @@ export class AgentBuilder {
 
   private addDyingMethods(obj: RuntimeObject): void {
     // Death funnel messages - one per minute for 15 minutes
-    // Progress through stages of dying
+    // Progress through stages of dying using $.proportional
     obj.setMethod('getDeathMessage', `
       /** Get the death message for current dying progress.
+       *  Uses $.proportional to select from death stages.
        *  @returns Creative death funnel message
        */
       const progress = self.dyingProgress || 0;
-      const minute = Math.floor(progress / 6.67); // ~6.67 progress per minute
 
+      // Death stages - $.proportional distributes these across 0-100%
       const messages = [
-        // Minutes 0-2: Initial shock
+        // 0% - Just started dying
         'Everything goes dark. You feel yourself slipping away...',
+        // ~7% - Initial shock
         'A cold numbness spreads through your body. Sounds fade to silence.',
+        // ~14%
         'You try to move but your body refuses. The darkness deepens.',
-
-        // Minutes 3-5: Fading
+        // ~21% - Fading
         'Memories flash before you - faces, places, moments lost to time.',
+        // ~28%
         'The cold reaches your core. You feel so very tired.',
+        // ~35%
         'Is that light in the distance? Or just the last flickers of consciousness?',
-
-        // Minutes 6-8: Deeper
+        // ~42% - Deeper
         'Your thoughts scatter like leaves in wind. Hard to remember... what was your name?',
+        // ~49%
         'The silence is absolute now. No heartbeat. No breath. Just... nothing.',
+        // ~56%
         'You drift in an endless void. Time has no meaning here.',
-
-        // Minutes 9-11: Nearly gone
+        // ~63% - Nearly gone
         'Something pulls at you from far away. A thread, growing thinner.',
+        // ~70%
         'The last warmth fades. You are becoming part of the darkness.',
+        // ~77%
         'Fragments of self dissolve into the void. Almost peaceful now.',
-
-        // Minutes 12-14: Final moments
+        // ~84% - Final moments
         'A distant voice? No... just an echo of what was.',
+        // ~91%
         'The thread snaps. You feel yourself falling into forever.',
+        // 100% - Death
         'This is the end. Let go...',
       ];
 
-      const index = Math.min(minute, messages.length - 1);
-      return messages[index];
+      return await $.proportional.fromPercent(messages, progress);
     `);
 
     // Start the dying process

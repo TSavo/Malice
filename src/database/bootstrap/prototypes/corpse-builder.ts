@@ -61,28 +61,20 @@ export class CorpseBuilder {
       return null;
     `);
 
-    // Describe corpse with decay state
+    // Describe corpse with decay state using $.proportional
     obj.setMethod('describe', `
       const decay = self.decayLevel || 0;
       const name = self.originalName || 'someone';
-      let desc = '';
 
-      if (decay < 10) {
-        desc = 'The body of ' + name + ' lies here, seemingly at peace.';
-        desc += ' The skin is pale but otherwise the body looks intact.';
-      } else if (decay < 30) {
-        desc = 'The stiff body of ' + name + ' lies here.';
-        desc += ' Rigor mortis has set in, and the skin has taken on a waxy pallor.';
-      } else if (decay < 50) {
-        desc = 'The bloated remains of ' + name + ' lie here.';
-        desc += ' Decomposition gases have swollen the body, and the smell is unpleasant.';
-      } else if (decay < 80) {
-        desc = 'The decaying remains of what was once ' + name + ' lie here.';
-        desc += ' The flesh is discolored and falling away in places. The stench is overwhelming.';
-      } else {
-        desc = 'The skeletal remains of ' + name + ' lie here.';
-        desc += ' Little flesh remains on the bones.';
-      }
+      // Main description based on decay
+      const decayDescriptions = [
+        'The body of ' + name + ' lies here, seemingly at peace. The skin is pale but otherwise the body looks intact.',
+        'The stiff body of ' + name + ' lies here. Rigor mortis has set in, and the skin has taken on a waxy pallor.',
+        'The bloated remains of ' + name + ' lie here. Decomposition gases have swollen the body, and the smell is unpleasant.',
+        'The decaying remains of what was once ' + name + ' lie here. The flesh is discolored and falling away in places. The stench is overwhelming.',
+        'The skeletal remains of ' + name + ' lie here. Little flesh remains on the bones.',
+      ];
+      let desc = await $.proportional.fromPercent(decayDescriptions, decay);
 
       // Get the actual body and describe visible wounds/state
       const body = await self.getBody();
@@ -272,18 +264,15 @@ export class CorpseBuilder {
       const corpseDecay = self.decayLevel || 0;
       const body = await self.getBody();
 
-      // OVERALL CONDITION based on corpse decay
-      if (corpseDecay < 10) {
-        report.overallCondition = 'The body is fresh, recently deceased.';
-      } else if (corpseDecay < 30) {
-        report.overallCondition = 'Rigor mortis has set in. Death occurred some time ago.';
-      } else if (corpseDecay < 50) {
-        report.overallCondition = 'The body is bloated with decomposition gases. Death occurred days ago.';
-      } else if (corpseDecay < 80) {
-        report.overallCondition = 'Advanced decomposition. Many details are difficult to determine.';
-      } else {
-        report.overallCondition = 'Only skeletal remains. Cause of death may be impossible to determine.';
-      }
+      // OVERALL CONDITION based on corpse decay using $.proportional
+      const conditionStates = [
+        'The body is fresh, recently deceased.',
+        'Rigor mortis has set in. Death occurred some time ago.',
+        'The body is bloated with decomposition gases. Death occurred days ago.',
+        'Advanced decomposition. Many details are difficult to determine.',
+        'Only skeletal remains. Cause of death may be impossible to determine.',
+      ];
+      report.overallCondition = await $.proportional.fromPercent(conditionStates, corpseDecay);
 
       if (!body) {
         report.summary = 'No body found within the corpse to examine.';
