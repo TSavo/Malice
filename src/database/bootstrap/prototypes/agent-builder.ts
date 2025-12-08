@@ -47,6 +47,10 @@ export class AgentBuilder {
         sleepTransitionJob: null,
         // Sedation level (0 = none, higher = harder to wake)
         sedation: 0,
+        // Sleep debt - accumulates while awake (+1/tick), decreases while asleep (-3/tick)
+        // 960 = ~16 hours awake (normal bedtime)
+        // Higher debt = higher metabolism, chance to doze off
+        sleepDebt: 0,
         // Skills learned through use: { skillName: { level, xp, lastProgressed } }
         skills: {},
         // Skill cooldown in ms (how long before same skill can progress again)
@@ -841,6 +845,38 @@ export class AgentBuilder {
       return { success: true, state: 'awake', reason: reason };
     `);
 
+    obj.setMethod('receiveStimulus', `
+      /** Called when agent receives external stimulus (sound, touch, etc.).
+       *  If dozing (falling_asleep), this cancels the doze silently.
+       *  @param intensity - How strong the stimulus is (0-10, default 5)
+       *  @returns true if stimulus woke them from dozing
+       */
+      const intensity = args[0] ?? 5;
+
+      // Only affects falling_asleep state (dozing)
+      if (self.sleepState !== 'falling_asleep') {
+        return false;
+      }
+
+      // Higher intensity = more likely to wake
+      // intensity 10 = always wakes, intensity 1 = 10% chance
+      const wakeChance = intensity / 10;
+      if (Math.random() > wakeChance) {
+        return false; // Stimulus not strong enough
+      }
+
+      // Cancel the doze
+      await self.cancelSleepTransition();
+      self.set('sleepState', 'awake');
+
+      // Notify
+      if (self.tell) {
+        await self.tell('You jerk awake.');
+      }
+
+      return true;
+    `);
+
     obj.setMethod('startWake', `
       /** Start waking up (voluntary or from external stimulus).
        *  @param delay - Milliseconds until fully awake (default 5000)
@@ -945,13 +981,25 @@ export class AgentBuilder {
       return { success: true, state: 'asleep' };
     `);
 
-    obj.setMethod('getCalorieRegenMultiplier', `
-      /** Get calorie regeneration multiplier based on sleep state.
-       *  @returns Multiplier (1.0 if asleep, 0.5 otherwise)
+    obj.setMethod('getMetabolismMultiplier', `
+      /** Get metabolism multiplier based on sleep state and debt.
+       *  Sleeping reduces calorie burn by ~65% (real BMR reduction).
+       *  Sleep debt increases burn rate when awake (body working harder).
+       *  @returns Multiplier (0.35 if asleep, 1.0-4.0+ based on debt if awake)
        */
       const state = self.sleepState || 'awake';
-      if (state === 'asleep') return 1.0;
-      return 0.5; // awake, falling_asleep, waking_up
+      if (state === 'asleep') return 0.35;
+
+      // When awake, sleep debt increases metabolism
+      // 960 = normal bedtime (16h), no penalty yet
+      // 1440 = 24h awake, 1.5x
+      // 1920 = 32h awake, 2x
+      // 2880 = 48h awake, 4x
+      const debt = self.sleepDebt || 0;
+      if (debt <= 960) return 1.0;
+      if (debt <= 1440) return 1.5;
+      if (debt <= 1920) return 2.0;
+      return 4.0;
     `);
 
     obj.setMethod('sleepTick', `

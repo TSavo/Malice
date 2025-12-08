@@ -420,6 +420,53 @@ export class BodyPartBuilder {
       };
     `);
 
+    obj.setMethod('getBleedingCount', `
+      /** Count bleeding wounds on this part only (not children).
+       *  @returns Number of actively bleeding wounds
+       */
+      const condition = self.condition || {};
+      const wounds = condition.wounds || {};
+      let count = 0;
+
+      for (const type of Object.keys(wounds)) {
+        for (const wound of wounds[type]) {
+          if (wound.bleeding && !wound.healed) {
+            count++;
+          }
+        }
+      }
+
+      return count;
+    `);
+
+    obj.setMethod('getAllBleedingParts', `
+      /** Get all parts (including children) that are bleeding.
+       *  @returns Array of { part, count } for parts with bleeding wounds
+       */
+      const results = [];
+
+      // Check this part
+      const myCount = await self.getBleedingCount();
+      if (myCount > 0) {
+        results.push({ part: self, count: myCount });
+      }
+
+      // Check child parts recursively
+      const parts = self.parts || {};
+      for (const partName of Object.keys(parts)) {
+        const partId = parts[partName];
+        if (partId) {
+          const part = await $.load(partId);
+          if (part && part.getAllBleedingParts) {
+            const childResults = await part.getAllBleedingParts();
+            results.push(...childResults);
+          }
+        }
+      }
+
+      return results;
+    `);
+
     obj.setMethod('isEmpty', `
       /** Check if this part is empty (no contents).
        *  @returns true if empty

@@ -44,6 +44,8 @@ export class RoomBuilder {
         ambientNoise: 0, // Base noise level (0-100)
         // Lighting (affects vision)
         lighting: 100, // 0=pitch black, 50=dim, 100=well-lit
+        // Water level (affects breathing)
+        waterLevel: 0, // 0=dry, 50=waist-deep, 100=fully submerged
       },
       methods: {},
     });
@@ -53,6 +55,18 @@ export class RoomBuilder {
 
       // Show room name and description
       let output = \`\${self.name}\\r\\n\${self.description}\\r\\n\`;
+
+      // Show water level if any
+      const waterDesc = await self.getWaterDescription();
+      if (waterDesc) {
+        output += \`\\r\\n\${waterDesc}\\r\\n\`;
+      }
+
+      // Show crowd/atmosphere description if notable
+      const crowdDesc = await self.getCrowdDescription();
+      if (crowdDesc && crowdDesc !== 'The area is quiet and empty.') {
+        output += \`\\r\\n\${crowdDesc}\\r\\n\`;
+      }
 
       // Show exits (only non-hidden ones)
       const exitIds = self.exits || [];
@@ -465,6 +479,54 @@ export class RoomBuilder {
         visionStats,
         hearingStats,
       };
+    `);
+
+    // Get water level description
+    obj.setMethod('getWaterDescription', `
+      /** Get a text description of the room's water level.
+       *  @returns Description string or empty if dry
+       */
+      const waterLevel = self.waterLevel || 0;
+
+      if (waterLevel <= 0) {
+        return '';
+      } else if (waterLevel <= 10) {
+        return 'Shallow water covers the floor.';
+      } else if (waterLevel <= 30) {
+        return 'Water rises to knee level.';
+      } else if (waterLevel <= 50) {
+        return 'Water reaches waist-deep here.';
+      } else if (waterLevel <= 70) {
+        return 'Water rises to chest level.';
+      } else if (waterLevel <= 90) {
+        return 'Water nearly reaches the ceiling.';
+      } else {
+        return 'This area is completely submerged underwater.';
+      }
+    `);
+
+    // Check if an agent at a given height would be submerged
+    obj.setMethod('isSubmerged', `
+      /** Check if an agent of given height would have their head underwater.
+       *  @param agentHeight - Height of the agent in cm (default 170)
+       *  @returns boolean - true if head would be underwater
+       */
+      const agentHeight = args[0] || 170; // Default human height
+      const waterLevel = self.waterLevel || 0;
+
+      // Water level 100 = 3 meters deep (300cm)
+      // Agent is submerged if water exceeds their height
+      const waterDepthCm = (waterLevel / 100) * 300;
+      return waterDepthCm >= agentHeight;
+    `);
+
+    // Get water depth in cm
+    obj.setMethod('getWaterDepth', `
+      /** Get water depth in centimeters.
+       *  @returns Depth in cm (0-300)
+       */
+      const waterLevel = self.waterLevel || 0;
+      return (waterLevel / 100) * 300;
     `);
 
     // Get a description of the crowd/atmosphere
