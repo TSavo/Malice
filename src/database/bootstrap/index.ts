@@ -12,3 +12,4 @@ export { PromptBuilder } from './prompt-builder.js';
 export { AliasLoader } from './alias-loader.js';
 export { EnglishBuilder } from './english-builder.js';
 export { EmoteBuilder } from './emote-builder.js';
+export { FormatBuilder } from './format-builder.js';

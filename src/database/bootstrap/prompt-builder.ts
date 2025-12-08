@@ -173,6 +173,47 @@ export class PromptBuilder {
           }
         }
 
+        case 'menu': {
+          // Accept number, key name, or label match
+          const lower = trimmed.toLowerCase();
+
+          // Try number first
+          const num = parseInt(trimmed, 10);
+          if (!isNaN(num) && num >= 1 && num <= state.keys.length) {
+            const selectedKey = state.keys[num - 1];
+            player._promptState = null;
+            state.resolve(selectedKey);
+            return true;
+          }
+
+          // Try exact key match
+          if (state.keys.includes(trimmed)) {
+            player._promptState = null;
+            state.resolve(trimmed);
+            return true;
+          }
+
+          // Try case-insensitive key match
+          const keyMatch = state.keys.find(k => k.toLowerCase() === lower);
+          if (keyMatch) {
+            player._promptState = null;
+            state.resolve(keyMatch);
+            return true;
+          }
+
+          // Try partial key match (starts with)
+          const partialMatch = state.keys.find(k => k.toLowerCase().startsWith(lower));
+          if (partialMatch) {
+            player._promptState = null;
+            state.resolve(partialMatch);
+            return true;
+          }
+
+          await player.tell('Invalid choice. Enter a number or option name.\\r\\n');
+          await player.tell(state.text);
+          return true;
+        }
+
         case 'multiline': {
           // Check for abort command
           if (trimmed === '@abort') {
@@ -213,6 +254,50 @@ export class PromptBuilder {
         state.resolve(null);
       }
       player._promptState = null;
+    `);
+
+    // Menu with columnar display - accepts number or text input
+    this.prompt.setMethod('menu', `
+      /** Display a menu with options in columns.
+       *  Usage: $.prompt.menu(player, prompt, options, numCols?)
+       *  @param player - Player to prompt
+       *  @param prompt - Prompt text to display
+       *  @param options - Object { key: 'Display Label', ... }
+       *  @param numCols - Number of columns (default: 3)
+       *  @returns The selected key
+       */
+      const player = args[0];
+      const prompt = args[1];
+      const options = args[2];
+      const numCols = args[3] || 3;
+
+      const keys = Object.keys(options);
+
+      // Build numbered items for display
+      const items = keys.map((key, i) => (i + 1) + ') ' + options[key]);
+
+      // Format in columns
+      const format = $.format;
+      const lines = await format.columns(items, numCols, { width: 78 });
+
+      // Build menu text
+      let menuText = prompt + '\\r\\n';
+      for (const line of lines) {
+        menuText += line + '\\r\\n';
+      }
+      menuText += 'Enter number or name: ';
+
+      return new Promise((resolve) => {
+        player._promptState = {
+          type: 'menu',
+          text: menuText,
+          options: options,
+          keys: keys,
+          resolve: resolve,
+        };
+
+        player.tell(menuText);
+      });
     `);
 
     // Multiline text input - collects lines until '.' alone on a line
