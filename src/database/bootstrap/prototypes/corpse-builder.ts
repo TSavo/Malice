@@ -62,17 +62,35 @@ export class CorpseBuilder {
     `);
 
     // Describe corpse with decay state using $.proportional
+    // Name only visible when fresh - after that, need autopsy to identify
     obj.setMethod('describe', `
       const decay = self.decayLevel || 0;
       const name = self.originalName || 'someone';
 
-      // Main description based on decay
+      // More granular decay states - name fades as decay increases
       const decayDescriptions = [
-        'The body of ' + name + ' lies here, seemingly at peace. The skin is pale but otherwise the body looks intact.',
-        'The stiff body of ' + name + ' lies here. Rigor mortis has set in, and the skin has taken on a waxy pallor.',
-        'The bloated remains of ' + name + ' lie here. Decomposition gases have swollen the body, and the smell is unpleasant.',
-        'The decaying remains of what was once ' + name + ' lie here. The flesh is discolored and falling away in places. The stench is overwhelming.',
-        'The skeletal remains of ' + name + ' lie here. Little flesh remains on the bones.',
+        // 0-5%: Fresh - clearly recognizable
+        'The body of ' + name + ' lies here, seemingly at peace. The skin is pale but the face is recognizable.',
+        // 5-10%: Very recent - still identifiable
+        'The body of ' + name + ' lies here. The skin has a grayish pallor and the eyes have clouded over.',
+        // 10-20%: Rigor setting in - features distorting
+        'A stiff body lies here. Rigor mortis has set in, the features beginning to distort.',
+        // 20-30%: Full rigor - hard to recognize
+        'A rigid corpse lies here, locked in rigor mortis. The skin has taken on a waxy, mottled appearance.',
+        // 30-40%: Early bloat - unrecognizable
+        'A bloated body lies here. Decomposition gases have begun to swell the flesh. The smell is unpleasant.',
+        // 40-50%: Full bloat
+        'Bloated remains lie here, swollen grotesquely by decomposition. The stench is difficult to bear.',
+        // 50-60%: Active decay
+        'Decaying remains lie here. The flesh is discolored and beginning to slough off. The smell is overwhelming.',
+        // 60-70%: Advanced decay
+        'Badly decayed remains lie here. Much of the soft tissue has liquefied or been consumed. The stench is unbearable.',
+        // 70-80%: Late decay
+        'Rotting remains lie here, more bone than flesh now. Only scraps of tissue cling to the frame.',
+        // 80-90%: Dry remains
+        'Desiccated remains lie here. The bones are largely exposed, with dried sinew and skin clinging in places.',
+        // 90-100%: Skeletal
+        'Skeletal remains lie here. Little more than bones, scattered and picked clean.',
       ];
       let desc = await $.proportional.fromPercent(decayDescriptions, decay);
 
@@ -265,12 +283,30 @@ export class CorpseBuilder {
       const body = await self.getBody();
 
       // OVERALL CONDITION based on corpse decay using $.proportional
+      // More granular states matching the describe() progression
       const conditionStates = [
-        'The body is fresh, recently deceased.',
-        'Rigor mortis has set in. Death occurred some time ago.',
-        'The body is bloated with decomposition gases. Death occurred days ago.',
-        'Advanced decomposition. Many details are difficult to determine.',
-        'Only skeletal remains. Cause of death may be impossible to determine.',
+        // 0-5%: Fresh
+        'The body is fresh, death occurred very recently. All features are clearly identifiable.',
+        // 5-10%: Very recent
+        'The body is recently deceased. Livor mortis is present, features still recognizable.',
+        // 10-20%: Early rigor
+        'Rigor mortis is setting in. Facial features are beginning to distort.',
+        // 20-30%: Full rigor
+        'Full rigor mortis. Identification by appearance alone is becoming difficult.',
+        // 30-40%: Early bloat
+        'Early bloating stage. Facial features are distorted beyond recognition.',
+        // 40-50%: Full bloat
+        'Advanced bloating. The body is significantly swollen. Visual identification impossible.',
+        // 50-60%: Active decay
+        'Active decay stage. Soft tissues are breaking down rapidly.',
+        // 60-70%: Advanced decay
+        'Advanced decay. Much soft tissue has been lost. Examination is limited.',
+        // 70-80%: Late decay
+        'Late decay stage. Mostly skeletal with some tissue remaining.',
+        // 80-90%: Dry
+        'Dry remains. Examination limited to skeletal structure and any preserved tissue.',
+        // 90-100%: Skeletal
+        'Skeletal remains only. Cause of death may be impossible to determine from physical examination.',
       ];
       report.overallCondition = await $.proportional.fromPercent(conditionStates, corpseDecay);
 
