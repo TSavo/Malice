@@ -564,34 +564,49 @@ export class CorpseBuilder {
       return lines.join('\\r\\n');
     `);
 
-    // When decay reaches 100%, recycle the corpse and its contents
+    // When decay reaches 100%, transform into human remains (not recycle!)
     obj.setMethod('onFullyDecayed', `
       /** Called when corpse is fully decomposed.
-       *  Recycles the corpse and dumps remaining contents.
+       *  Transforms into $.humanRemains - dried remains that decay to skeleton.
        */
-      const contents = self.contents || [];
-      const location = self.location;
+      const humanRemainsProto = $.humanRemains;
+      if (!humanRemainsProto) {
+        // Fallback: stay as corpse, just stop decaying
+        self.decayRate = 0;
+        return;
+      }
 
-      // Dump remaining contents to location
-      if (location && contents.length > 0) {
+      const location = self.location;
+      const body = await self.getBody();
+
+      // Create human remains
+      const remains = await $.create({
+        parent: humanRemainsProto,
+        properties: {
+          name: 'human remains',
+          originalName: self.originalName,
+          contents: body ? [body.id] : [],
+          searched: self.searched,
+        },
+      });
+
+      // Update body location to new container
+      if (body) {
+        body.location = remains.id;
+      }
+
+      // Move remains to corpse's location
+      if (location) {
+        await remains.moveTo(location);
         const room = await $.load(location);
-        if (room) {
-          for (const itemId of contents) {
-            const item = await $.load(itemId);
-            if (item) {
-              await item.moveTo(location);
-            }
-          }
-          // Announce if room has announce
-          if (room.announce) {
-            const name = self.originalName || 'someone';
-            await room.announce('The remains of ' + name + ' crumble to dust, leaving behind some belongings.');
-          }
+        if (room && room.announce) {
+          await room.announce('The rotting corpse has dried into desiccated remains.');
         }
       }
 
-      // Recycle self
+      // Recycle the corpse shell (body is now in remains)
       if ($.recycler) {
+        self.contents = []; // Don't recycle the body
         await $.recycler.recycle(self);
       }
     `);

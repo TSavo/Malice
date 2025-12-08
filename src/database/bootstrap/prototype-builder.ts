@@ -11,6 +11,8 @@ import {
   AdminBuilder,
   DecayableBuilder,
   CorpseBuilder,
+  HumanRemainsBuilder,
+  SkeletalRemainsBuilder,
   EdibleBuilder,
   FoodBuilder,
   DrinkBuilder,
@@ -50,6 +52,8 @@ export class PrototypeBuilder {
   private adminBuilder: AdminBuilder;
   private decayableBuilder: DecayableBuilder;
   private corpseBuilder: CorpseBuilder;
+  private humanRemainsBuilder: HumanRemainsBuilder;
+  private skeletalRemainsBuilder: SkeletalRemainsBuilder;
   private edibleBuilder: EdibleBuilder;
   private foodBuilder: FoodBuilder;
   private drinkBuilder: DrinkBuilder;
@@ -69,6 +73,8 @@ export class PrototypeBuilder {
     this.adminBuilder = new AdminBuilder(manager);
     this.decayableBuilder = new DecayableBuilder(manager);
     this.corpseBuilder = new CorpseBuilder(manager);
+    this.humanRemainsBuilder = new HumanRemainsBuilder(manager);
+    this.skeletalRemainsBuilder = new SkeletalRemainsBuilder(manager);
     this.edibleBuilder = new EdibleBuilder(manager);
     this.foodBuilder = new FoodBuilder(manager);
     this.drinkBuilder = new DrinkBuilder(manager);
@@ -137,6 +143,16 @@ export class PrototypeBuilder {
       ? await this.manager.load(aliases.corpse as number)
       : await this.corpseBuilder.build(decayable!.id);
 
+    // HumanRemains inherits from Describable (dried remains, very slow decay)
+    const humanRemains = aliases.humanRemains
+      ? await this.manager.load(aliases.humanRemains as number)
+      : await this.humanRemainsBuilder.build(describable!.id);
+
+    // SkeletalRemains inherits from Describable (permanent bones)
+    const skeletalRemains = aliases.skeletalRemains
+      ? await this.manager.load(aliases.skeletalRemains as number)
+      : await this.skeletalRemainsBuilder.build(describable!.id);
+
     // Edible inherits from Decayable (food/drink decay)
     const edible = aliases.edible
       ? await this.manager.load(aliases.edible as number)
@@ -185,6 +201,8 @@ export class PrototypeBuilder {
       admin: admin!.id,
       decayable: decayable!.id,
       corpse: corpse!.id,
+      humanRemains: humanRemains!.id,
+      skeletalRemains: skeletalRemains!.id,
       edible: edible!.id,
       food: food!.id,
       drink: drink!.id,
@@ -206,6 +224,8 @@ export class PrototypeBuilder {
     admin: number;
     decayable: number;
     corpse: number;
+    humanRemains: number;
+    skeletalRemains: number;
     edible: number;
     food: number;
     drink: number;
@@ -228,6 +248,8 @@ export class PrototypeBuilder {
     aliases.admin = ids.admin;
     aliases.decayable = ids.decayable;
     aliases.corpse = ids.corpse;
+    aliases.humanRemains = ids.humanRemains;
+    aliases.skeletalRemains = ids.skeletalRemains;
     aliases.edible = ids.edible;
     aliases.food = ids.food;
     aliases.drink = ids.drink;
