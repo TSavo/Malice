@@ -146,6 +146,16 @@ describe.sequential('DevToolsServer', () => {
   }> {
     const client2 = new WebSocket(SERVER_URL);
 
+    // Register message listener BEFORE connection opens to catch hello
+    const helloPromise = new Promise<void>((resolve, reject) => {
+      const helloTimeout = setTimeout(() => reject(new Error('Hello timeout')), 10000);
+      client2.once('message', () => {
+        clearTimeout(helloTimeout);
+        resolve();
+      });
+    });
+
+    // Wait for connection
     await new Promise<void>((resolve, reject) => {
       const connectTimeout = setTimeout(() => reject(new Error('Connect timeout')), 5000);
       client2.on('open', () => {
@@ -158,14 +168,8 @@ describe.sequential('DevToolsServer', () => {
       });
     });
 
-    // Skip hello message
-    await new Promise((resolve, reject) => {
-      const helloTimeout = setTimeout(() => reject(new Error('Hello timeout')), 3000);
-      client2.once('message', (data) => {
-        clearTimeout(helloTimeout);
-        resolve(data);
-      });
-    });
+    // Wait for hello message (listener was already registered)
+    await helloPromise;
 
     // Set up notification listener
     let notificationResolve: (value: any) => void;
@@ -183,7 +187,7 @@ describe.sequential('DevToolsServer', () => {
         resolved = true;
         notificationReject(new Error('Notification timeout'));
       }
-    }, 3000);
+    }, 10000);
 
     client2.once('message', (data) => {
       if (!resolved) {
@@ -426,7 +430,7 @@ describe.sequential('DevToolsServer', () => {
     });
 
     // Skip: Multi-client broadcast tests are flaky in test environment due to timing
-    it.skip('should broadcast object.created notification', async () => {
+    it('should broadcast object.created notification', async () => {
       await connectClient();
       const { waitForNotification, cleanup } = await setupNotificationClient();
 
@@ -463,7 +467,7 @@ describe.sequential('DevToolsServer', () => {
     });
 
     // Skip: Multi-client broadcast tests are flaky in test environment due to timing
-    it.skip('should broadcast object.deleted notification', async () => {
+    it('should broadcast object.deleted notification', async () => {
       await connectClient();
       const obj = await manager.create({ parent: 1, properties: {}, methods: {} });
       const { waitForNotification, cleanup } = await setupNotificationClient();
@@ -544,7 +548,7 @@ describe.sequential('DevToolsServer', () => {
     });
 
     // Skip: Multi-client broadcast tests are flaky in test environment due to timing
-    it.skip('should broadcast method.changed notification', async () => {
+    it('should broadcast method.changed notification', async () => {
       await connectClient();
       const obj = await manager.create({ parent: 1, properties: {}, methods: {} });
       const { waitForNotification, cleanup } = await setupNotificationClient();
@@ -587,7 +591,7 @@ describe.sequential('DevToolsServer', () => {
     });
 
     // Skip: Multi-client broadcast tests are flaky in test environment due to timing
-    it.skip('should broadcast method.deleted notification', async () => {
+    it('should broadcast method.deleted notification', async () => {
       await connectClient();
       const obj = await manager.create({
         parent: 1,
@@ -645,7 +649,7 @@ describe.sequential('DevToolsServer', () => {
     });
 
     // Skip: Multi-client broadcast tests are flaky in test environment due to timing
-    it.skip('should broadcast property.changed notification', async () => {
+    it('should broadcast property.changed notification', async () => {
       await connectClient();
       const obj = await manager.create({ parent: 1, properties: {}, methods: {} });
       const { waitForNotification, cleanup } = await setupNotificationClient();
@@ -682,7 +686,7 @@ describe.sequential('DevToolsServer', () => {
     });
 
     // Skip: Multi-client broadcast tests are flaky in test environment due to timing
-    it.skip('should broadcast property.deleted notification', async () => {
+    it('should broadcast property.deleted notification', async () => {
       await connectClient();
       const obj = await manager.create({
         parent: 1,

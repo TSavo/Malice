@@ -327,9 +327,9 @@ export class CharGenBuilder {
       await player.tell('Age: ' + player.age + '  Height: ' + player.height + 'm  Weight: ' + player.weight + 'kg');
 
       // Show appearance from body
-      const body = await player.getBody();
-      if (body) {
-        const head = await body.getPart('head');
+      const playerBody = await player.getBody();
+      if (playerBody) {
+        const head = await playerBody.getPart('head');
         if (head) {
           const scalp = await head.getPart('scalp');
           const face = await head.getPart('face');
@@ -343,7 +343,7 @@ export class CharGenBuilder {
             }
           }
         }
-        await player.tell('Skin: ' + (body.skinTone || 'medium'));
+        await player.tell('Skin: ' + (playerBody.skinTone || 'medium'));
       }
 
       await player.tell('');

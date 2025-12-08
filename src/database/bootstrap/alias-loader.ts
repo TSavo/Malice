@@ -31,9 +31,16 @@ export class AliasLoader {
 
     // Register each alias
     let registered = 0;
+    let skipped = 0;
     for (const [name, id] of Object.entries(aliases)) {
+      // Skip nested objects (like bodyParts which is a namespace, not an alias)
+      if (typeof id !== 'number') {
+        skipped++;
+        continue;
+      }
+
       try {
-        const obj = await this.manager.load(id as number);
+        const obj = await this.manager.load(id);
         if (obj) {
           this.manager.registerAlias(name, obj);
           registered++;
@@ -45,6 +52,7 @@ export class AliasLoader {
       }
     }
 
-    console.log(`✅ Registered ${registered}/${aliasCount} aliases from MongoDB`);
+    const actualCount = aliasCount - skipped;
+    console.log(`✅ Registered ${registered}/${actualCount} aliases from MongoDB`);
   }
 }
