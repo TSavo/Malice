@@ -47,6 +47,7 @@ export class EdibleBuilder {
         height: 5,
         depth: 5,
         weight: 100, // grams
+        volume: 100, // ml (defaults to weight - water is 1g/ml)
         // Decay overrides for food (1 tick = 1 minute)
         // 7 days = 10080 ticks, 100% / 10080 = ~0.01% per tick
         decayCondition: 'harvested', // Start decay when harvested
@@ -91,6 +92,13 @@ export class EdibleBuilder {
       return Math.round(baseCal * decayMultiplier);
     `);
 
+    // Get volume per portion (ml)
+    obj.setMethod('getVolumePerPortion', `
+      const totalVolume = self.volume || self.weight || 100;
+      const totalPortions = self.portions || 1;
+      return Math.ceil(totalVolume / totalPortions);
+    `);
+
     // Consume a portion - returns calories consumed or error
     // Handles weight reduction, stomach transfer, and recycling when fully consumed
     obj.setMethod('consume', `
@@ -99,6 +107,21 @@ export class EdibleBuilder {
 
       if (self.remaining <= 0) {
         return { error: 'There is nothing left.' };
+      }
+
+      // Calculate volume for this bite and check stomach capacity FIRST
+      const biteVolume = await self.getVolumePerPortion();
+      if (consumer) {
+        const torso = consumer.getTorso ? await consumer.getTorso() : null;
+        if (torso) {
+          const stomach = torso.getPart ? await torso.getPart('digestiveStomach') : null;
+          if (stomach && stomach.hasRoomFor) {
+            const hasRoom = await stomach.hasRoomFor(biteVolume);
+            if (!hasRoom) {
+              return { error: 'Your stomach is too full.' };
+            }
+          }
+        }
       }
 
       // Check if spoiled/poisoned
@@ -130,13 +153,12 @@ export class EdibleBuilder {
       // Check if fully consumed
       const fullyConsumed = self.remaining <= 0;
 
-      // Send THIS BITE's calories to stomach immediately
+      // Send THIS BITE's calories and volume to stomach
       if (consumer) {
         const torso = consumer.getTorso ? await consumer.getTorso() : null;
         if (torso) {
           const stomach = torso.getPart ? await torso.getPart('digestiveStomach') : null;
           if (stomach) {
-            // Send partial calories for this bite (not full food)
             await self.sendBiteToStomach(stomach, sourceType, caloriesPerPortion);
           }
         }
@@ -163,7 +185,7 @@ export class EdibleBuilder {
       return (self.remaining || 0) > 0;
     `);
 
-    // Send a single bite's calories to stomach
+    // Send a single bite's calories and volume to stomach
     // Creates/aggregates StomachContents for this food type
     obj.setMethod('sendBiteToStomach', `
       const stomach = args[0]; // The digestive stomach
@@ -172,6 +194,17 @@ export class EdibleBuilder {
 
       if (!stomach) {
         return { error: 'No stomach to send to.' };
+      }
+
+      // Calculate volume for this bite
+      const biteVolume = await self.getVolumePerPortion();
+
+      // Check if stomach has room for this bite
+      if (stomach.hasRoomFor) {
+        const hasRoom = await stomach.hasRoomFor(biteVolume);
+        if (!hasRoom) {
+          return { error: 'Your stomach is too full.' };
+        }
       }
 
       // Get prototype ID for aggregation
@@ -195,9 +228,11 @@ export class EdibleBuilder {
         if (existing.sourceProto === protoId &&
             existing.spoiled === (self.spoiled || false) &&
             existing.poisoned === (self.poisoned || false)) {
-          // Add this bite's calories to existing
+          // Add this bite's calories and volume to existing
           existing.set('calories', (existing.calories || 0) + biteCalories);
           existing.set('caloriesOriginal', (existing.caloriesOriginal || 0) + biteCalories);
+          existing.set('volume', (existing.volume || 0) + biteVolume);
+          existing.set('volumeOriginal', (existing.volumeOriginal || 0) + biteVolume);
           contents = existing;
           aggregated = true;
           break;
@@ -214,6 +249,8 @@ export class EdibleBuilder {
             sourceType: sourceType,
             calories: biteCalories,
             caloriesOriginal: biteCalories,
+            volume: biteVolume,
+            volumeOriginal: biteVolume,
             quantity: 1,
             spoiled: self.spoiled || false,
             poisoned: self.poisoned || false,
@@ -224,7 +261,7 @@ export class EdibleBuilder {
         await contents.moveTo(stomach.id);
       }
 
-      return { contents, aggregated, calories: biteCalories };
+      return { contents, aggregated, calories: biteCalories, volume: biteVolume };
     `);
 
     // Send this edible to stomach as StomachContents (DEPRECATED - use sendBiteToStomach)

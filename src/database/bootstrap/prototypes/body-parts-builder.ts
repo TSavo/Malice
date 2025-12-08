@@ -103,12 +103,33 @@ export class BodyPartsBuilder {
         maxContents: 10, // Max number of items
         maxVolume: 1000, // ml (about 1 liter when stretched)
         // Digestion rate - calories extracted per tick
-        // 2 cal/tick = just enough to sustain awake metabolism
-        // Must sleep to actually recover
-        digestionRate: 2, // kcal per tick
+        // 5 cal/tick = enough to sustain activity and slowly gain
+        // Activity burns more, so healthy eating matters
+        digestionRate: 5, // kcal per tick
       },
       methods: {},
     });
+
+    // Get current total volume of stomach contents
+    obj.setMethod('getCurrentVolume', `
+      const contents = self.contents || [];
+      let total = 0;
+      for (const itemId of contents) {
+        const item = await $.load(itemId);
+        if (item) {
+          total += (item.volume || 0);
+        }
+      }
+      return total;
+    `);
+
+    // Check if there's room for a given volume (ml)
+    obj.setMethod('hasRoomFor', `
+      const volumeToAdd = args[0] || 0;
+      const currentVolume = await self.getCurrentVolume();
+      const maxVolume = self.maxVolume || 1000;
+      return (currentVolume + volumeToAdd) <= maxVolume;
+    `);
 
     // Stomach can contain food/drink
     obj.setMethod('canContain', `
@@ -118,6 +139,15 @@ export class BodyPartsBuilder {
       // Check item count
       if (contents.length >= (self.maxContents || 10)) {
         return 'Your stomach is too full.';
+      }
+
+      // Check volume capacity
+      const itemVolume = item.volume || 0;
+      if (itemVolume > 0) {
+        const hasRoom = await self.hasRoomFor(itemVolume);
+        if (!hasRoom) {
+          return 'Your stomach is too full.';
+        }
       }
 
       // Only edible items can be in stomach
@@ -150,7 +180,9 @@ export class BodyPartsBuilder {
 
         // Use StomachContents.digestTick if available
         if (item.digestTick) {
-          const extracted = await item.digestTick(digestionRate);
+          const result = await item.digestTick(digestionRate);
+          // Handle both old (number) and new ({calories, volume}) return format
+          const extracted = typeof result === 'number' ? result : (result.calories || 0);
           totalCalories += extracted;
 
           // Check if fully digested
@@ -220,11 +252,20 @@ export class BodyPartsBuilder {
       return desc;
     `);
 
-    // Get fullness as a proportion
+    // Get fullness as a proportion (by count and volume)
     obj.setMethod('getFullness', `
       const contents = self.contents || [];
-      const max = self.maxContents || 10;
-      return { current: contents.length, max: max };
+      const maxCount = self.maxContents || 10;
+      const maxVolume = self.maxVolume || 1000;
+      const currentVolume = await self.getCurrentVolume();
+      return {
+        count: contents.length,
+        maxCount: maxCount,
+        volume: currentVolume,
+        maxVolume: maxVolume,
+        // Overall fullness is the higher of the two ratios
+        ratio: Math.max(contents.length / maxCount, currentVolume / maxVolume),
+      };
     `);
 
     return obj;
