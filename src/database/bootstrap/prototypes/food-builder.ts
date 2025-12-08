@@ -92,15 +92,53 @@ export class FoodBuilder {
         return result.error;
       }
 
-      // Process warnings
+      // Process warnings and apply effects
       let warnMsg = '';
       if (result.warnings.includes('spoiled')) {
         warnMsg += ' It tastes off...';
-        // TODO: Apply spoiled food effects
+        // Spoiled food: chance of nausea based on how spoiled
+        const decayLevel = self.decayLevel || 0;
+        const nauseaChance = Math.min(0.8, decayLevel / 100); // Up to 80% at full rot
+        if (Math.random() < nauseaChance) {
+          // Nausea - lose some of what you just ate
+          const torso = eater.getTorso ? await eater.getTorso() : null;
+          if (torso) {
+            const stomach = torso.getPart ? await torso.getPart('digestiveStomach') : null;
+            if (stomach && stomach.contents) {
+              // Reduce calories in stomach by 10-50%
+              const lossPercent = 0.1 + (Math.random() * 0.4);
+              for (const itemId of stomach.contents) {
+                const item = await $.load(itemId);
+                if (item && item.calories !== undefined) {
+                  const newCal = Math.floor(item.calories * (1 - lossPercent));
+                  item.set('calories', newCal);
+                }
+              }
+            }
+          }
+          warnMsg += ' You feel nauseous...';
+        }
       }
       if (result.warnings.includes('poisoned')) {
         warnMsg += ' A strange taste lingers...';
-        // TODO: Apply poison effects
+        // Poison: damage internal organs and potentially sedate
+        const body = await eater.getBody();
+        if (body) {
+          const torso = await body.getPart('torso');
+          if (torso) {
+            // Damage torso directly (bypasses calories, goes to decay)
+            const currentDecay = torso.decayLevel || 0;
+            const poisonDamage = 5 + Math.floor(Math.random() * 10); // 5-15% decay
+            torso.set('decayLevel', Math.min(100, currentDecay + poisonDamage));
+
+            // Chance of sedation (50% chance, 1-3 sedation level)
+            if (Math.random() < 0.5) {
+              const currentSedation = eater.sedation || 0;
+              eater.set('sedation', currentSedation + 1 + Math.floor(Math.random() * 3));
+              warnMsg += ' You feel woozy...';
+            }
+          }
+        }
       }
 
       // Get flavor from ingredients
