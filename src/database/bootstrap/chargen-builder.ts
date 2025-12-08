@@ -261,7 +261,7 @@ export class CharGenBuilder {
 
       const eyeStyle = await $.prompt.menu(player, 'What shape are your eyes?', eyeStyles, 2);
 
-      // Hair colors - expanded
+      // Hair colors - expanded with unnatural/dyed options
       const hairColors = {
         // Natural blacks/browns
         black: 'Black',
@@ -286,6 +286,17 @@ export class CharGenBuilder {
         silver: 'Silver',
         white: 'White',
         salt: 'Salt & Pepper',
+        // Unnatural/dyed
+        purple: 'Purple',
+        violet: 'Violet',
+        blue: 'Blue',
+        teal: 'Teal',
+        green: 'Green',
+        pink: 'Pink',
+        hotPink: 'Hot Pink',
+        rose: 'Rose Gold',
+        orange: 'Orange',
+        multicolor: 'Multicolored',
       };
 
       const hairColor = await $.prompt.menu(player, 'What color is your hair?', hairColors, 3);
@@ -306,6 +317,18 @@ export class CharGenBuilder {
       };
 
       const hairStyle = await $.prompt.menu(player, 'What style is your hair?', hairStyles, 2);
+
+      // Hair texture
+      const hairTextures = {
+        fine: 'Fine',
+        medium: 'Medium',
+        thick: 'Thick',
+        coarse: 'Coarse',
+        silky: 'Silky',
+        wiry: 'Wiry',
+      };
+
+      const hairTexture = await $.prompt.menu(player, 'What texture is your hair?', hairTextures, 3);
 
       // Skin tones - expanded with descriptive names
       const skinTones = {
@@ -343,6 +366,114 @@ export class CharGenBuilder {
 
       const skinTone = await $.prompt.menu(player, 'What is your skin tone?', skinTones, 3);
 
+      // Build/body type
+      await player.tell('');
+      await player.tell('Now describe your build and features...');
+
+      const buildTypes = {
+        petite: 'Petite',
+        slim: 'Slim',
+        lean: 'Lean',
+        athletic: 'Athletic',
+        average: 'Average',
+        toned: 'Toned',
+        muscular: 'Muscular',
+        stocky: 'Stocky',
+        heavyset: 'Heavyset',
+        curvy: 'Curvy',
+        broad: 'Broad-shouldered',
+        lanky: 'Lanky',
+      };
+
+      const buildType = await $.prompt.menu(player, 'What is your build?', buildTypes, 3);
+
+      // Face shape
+      const faceShapes = {
+        oval: 'Oval',
+        round: 'Round',
+        square: 'Square',
+        rectangular: 'Rectangular',
+        heart: 'Heart',
+        diamond: 'Diamond',
+        oblong: 'Oblong',
+        triangular: 'Triangular',
+      };
+
+      const faceShape = await $.prompt.menu(player, 'What is your face shape?', faceShapes, 2);
+
+      // Nose shape
+      const noseShapes = {
+        straight: 'Straight',
+        roman: 'Roman/Aquiline',
+        button: 'Button',
+        upturned: 'Upturned',
+        hawk: 'Hawk',
+        wide: 'Wide',
+        narrow: 'Narrow',
+        flat: 'Flat',
+        bulbous: 'Bulbous',
+        snub: 'Snub',
+      };
+
+      const noseShape = await $.prompt.menu(player, 'What shape is your nose?', noseShapes, 2);
+
+      // Lip shape
+      const lipShapes = {
+        full: 'Full',
+        thin: 'Thin',
+        medium: 'Medium',
+        bowShaped: 'Bow-shaped',
+        wide: 'Wide',
+        narrow: 'Narrow',
+        hearted: 'Heart-shaped',
+        pouty: 'Pouty',
+      };
+
+      const lipShape = await $.prompt.menu(player, 'What shape are your lips?', lipShapes, 2);
+
+      // Distinguishing features
+      await player.tell('');
+      await player.tell('Any distinguishing features?');
+
+      const freckleOptions = {
+        none: 'None',
+        light: 'Light freckling',
+        moderate: 'Moderate freckling',
+        heavy: 'Heavy freckling',
+      };
+
+      const freckles = await $.prompt.menu(player, 'Freckles?', freckleOptions, 2);
+
+      const markOptions = {
+        none: 'None',
+        dimplesCheeks: 'Dimples (cheeks)',
+        dimpleChin: 'Dimple (chin)',
+        moleLeft: 'Beauty mark (left)',
+        moleRight: 'Beauty mark (right)',
+        birthmark: 'Birthmark',
+        cleftChin: 'Cleft chin',
+      };
+
+      const distinguishingMark = await $.prompt.menu(player, 'Any distinguishing marks?', markOptions, 2);
+
+      // Facial hair (offer to all, some may choose none)
+      const facialHairOptions = {
+        none: 'None/Clean-shaven',
+        stubble: 'Stubble',
+        lightBeard: 'Light beard',
+        fullBeard: 'Full beard',
+        longBeard: 'Long beard',
+        goatee: 'Goatee',
+        vandyke: 'Van Dyke',
+        mustache: 'Mustache',
+        handlebars: 'Handlebar mustache',
+        soulPatch: 'Soul patch',
+        sideburns: 'Sideburns',
+        mutton: 'Mutton chops',
+      };
+
+      const facialHair = await $.prompt.menu(player, 'Facial hair?', facialHairOptions, 3);
+
       // Store appearance for body creation
       const appearance = {
         eyeColor: eyeColor,
@@ -351,7 +482,15 @@ export class CharGenBuilder {
         eyeStyle: eyeStyle,
         hairColor: hairColor,
         hairStyle: hairStyle,
+        hairTexture: hairTexture,
         skinTone: skinTone,
+        buildType: buildType,
+        faceShape: faceShape,
+        noseShape: noseShape,
+        lipShape: lipShape,
+        freckles: freckles,
+        distinguishingMark: distinguishingMark,
+        facialHair: facialHair,
       };
 
       // === CREATE BODY ===
@@ -377,15 +516,25 @@ export class CharGenBuilder {
         eyeColorDisplay = eyeColors[leftEyeColor];
       }
 
+      // Format features for display
+      let featuresDisplay = [];
+      if (freckles !== 'none') featuresDisplay.push(freckleOptions[freckles]);
+      if (distinguishingMark !== 'none') featuresDisplay.push(markOptions[distinguishingMark]);
+      if (facialHair !== 'none') featuresDisplay.push(facialHairOptions[facialHair]);
+      const featuresStr = featuresDisplay.length > 0 ? featuresDisplay.join(', ') : 'None';
+
       const summary = await format.keyValue({
         'Name': player.name,
         'Sex': sex + ' (' + pronouns.subject + '/' + pronouns.object + ')',
         'Age': age,
         'Height': height + 'm',
         'Weight': weight + 'kg',
+        'Build': buildTypes[buildType],
+        'Face': faceShapes[faceShape] + ', ' + noseShapes[noseShape] + ' nose, ' + lipShapes[lipShape] + ' lips',
         'Eyes': eyeColorDisplay + ', ' + eyeStyles[eyeStyle],
-        'Hair': hairColors[hairColor] + ', ' + hairStyles[hairStyle],
+        'Hair': hairColors[hairColor] + ' ' + hairStyles[hairStyle] + ' (' + hairTextures[hairTexture] + ')',
         'Skin': skinTones[skinTone],
+        'Features': featuresStr,
       });
 
       for (const line of summary) {
