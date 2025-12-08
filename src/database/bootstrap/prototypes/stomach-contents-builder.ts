@@ -30,6 +30,9 @@ export class StomachContentsBuilder {
         // Nutrition to extract
         calories: 0, // Total calories remaining
         caloriesOriginal: 0, // Original calories (for % digested)
+        // Volume tracking (for stomach capacity)
+        volume: 0, // ml - current volume in stomach
+        volumeOriginal: 0, // ml - original volume consumed
         // Aggregation
         quantity: 1, // How many of this item were eaten
         // Status
@@ -62,26 +65,35 @@ export class StomachContentsBuilder {
 
       if (!await self.canAggregateWith(other)) return false;
 
-      // Combine calories and quantity
+      // Combine calories, volume, and quantity
       self.calories = (self.calories || 0) + (other.calories || 0);
       self.caloriesOriginal = (self.caloriesOriginal || 0) + (other.caloriesOriginal || 0);
+      self.volume = (self.volume || 0) + (other.volume || 0);
+      self.volumeOriginal = (self.volumeOriginal || 0) + (other.volumeOriginal || 0);
       self.quantity = (self.quantity || 1) + (other.quantity || 1);
 
       return true;
     `);
 
     // Extract calories during digestion (one tick)
-    // Returns calories extracted
+    // Returns { calories, volume } extracted
     obj.setMethod('digestTick', `
       const rate = args[0] || 50; // Calories per tick
 
       const remaining = self.calories || 0;
-      if (remaining <= 0) return 0;
+      if (remaining <= 0) return { calories: 0, volume: 0 };
 
       const extracted = Math.min(rate, remaining);
       self.calories = remaining - extracted;
 
-      return extracted;
+      // Reduce volume proportionally with calories
+      const currentVolume = self.volume || 0;
+      const originalCalories = self.caloriesOriginal || 1;
+      const volumeRatio = extracted / originalCalories;
+      const volumeExtracted = Math.ceil(currentVolume * volumeRatio);
+      self.volume = Math.max(0, currentVolume - volumeExtracted);
+
+      return { calories: extracted, volume: volumeExtracted };
     `);
 
     // Check if fully digested
