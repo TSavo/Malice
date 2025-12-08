@@ -86,6 +86,7 @@ export class PlayerBuilder {
       await self.registerVerb(['watch', 'watch %i'], self, 'watchCommand');
       await self.registerVerb(['unwatch %i', 'stop watching %i'], self, 'unwatchCommand');
       await self.registerVerb('@fitness', self, 'fitness');
+      await self.registerVerb(['health', 'hp', 'status'], self, 'health');
 
       // If we have a location, move into it to trigger verb registration
       if (self.location && self.location !== 0) {
@@ -175,21 +176,28 @@ export class PlayerBuilder {
         return;
       }
 
-      // Check sleep state - only "wake" allowed while asleep
+      // Check sleep state
       const sleepState = self.sleepState || 'awake';
       if (sleepState !== 'awake') {
         const firstWord = trimmed.split(/\\s+/)[0].toLowerCase();
         const wakeCommands = ['wake', 'quit'];
 
-        if (!wakeCommands.includes(firstWord)) {
-          if (sleepState === 'asleep') {
-            await self.tell('You are asleep. Type "wake" to wake up.');
-          } else if (sleepState === 'falling_asleep') {
-            await self.tell('You are falling asleep. Type "wake" to stay awake.');
-          } else if (sleepState === 'waking_up') {
+        if (sleepState === 'falling_asleep') {
+          // Stimulus! Any input cancels dozing - player jerks awake
+          await self.cancelSleepTransition();
+          self.set('sleepState', 'awake');
+          await self.tell('You jerk awake, catching yourself before nodding off.');
+          // Continue processing their command normally
+        } else if (sleepState === 'waking_up') {
+          if (!wakeCommands.includes(firstWord)) {
             await self.tell('You are waking up. Please wait...');
+            return;
           }
-          return;
+        } else if (sleepState === 'asleep') {
+          if (!wakeCommands.includes(firstWord)) {
+            await self.tell('You are asleep. Type "wake" to wake up.');
+            return;
+          }
         }
       }
 
@@ -647,24 +655,101 @@ export class PlayerBuilder {
     `);
 
     // Heartbeat - called every minute by scheduler
-    // Handles digestion, metabolism, sleep, and other periodic effects
+    // Handles digestion, metabolism, sleep, bleeding, breathing, and other periodic effects
     obj.setMethod('heartbeat', `
       const results = {
         digestion: null,
         metabolism: 0,
         sleep: null,
+        bleeding: null,
+        breathing: null,
       };
 
       // Remember previous status for change detection
       const prevCalorieStatus = self._lastCalorieStatus || 'satisfied';
       const prevFatStatus = self._lastFatStatus || 'lean';
 
-      // 1. Sleep tick - handles sedation decay, etc.
-      if (self.sleepTick) {
-        results.sleep = await self.sleepTick();
+      // 1. Bleeding tick - process bleeding wounds FIRST (can kill)
+      if (self.bleedTick) {
+        results.bleeding = await self.bleedTick();
       }
 
-      // 2. Digestion - extract calories from stomach, burn fat if needed
+      // 2. Breathing tick - process drowning if underwater (can kill)
+      if (self.breathTick) {
+        results.breathing = await self.breathTick();
+      }
+
+      // 3. Sleep debt & tiredness
+      const sleepState = self.sleepState || 'awake';
+      let sleepDebt = self.sleepDebt || 0;
+      results.sleep = { state: sleepState, debt: sleepDebt };
+
+      if (sleepState === 'asleep') {
+        // Sleeping: reduce debt at 3x rate
+        sleepDebt = Math.max(0, sleepDebt - 3);
+        self.set('sleepDebt', sleepDebt);
+        results.sleep.debt = sleepDebt;
+
+        // Wake naturally when debt hits 0 (fully rested)
+        if (sleepDebt === 0 && self.startWake) {
+          await self.startWake(3000); // Quick wake when fully rested
+        }
+      } else if (sleepState === 'awake') {
+        // Awake: accumulate debt
+        sleepDebt += 1;
+        self.set('sleepDebt', sleepDebt);
+        results.sleep.debt = sleepDebt;
+
+        // Tiredness messages at thresholds
+        const prevDebt = sleepDebt - 1;
+        if (sleepDebt >= 960 && prevDebt < 960) {
+          await self.tell('You feel tired. It might be time to sleep.');
+        } else if (sleepDebt >= 1200 && prevDebt < 1200) {
+          await self.tell('You feel very tired. Your eyelids are heavy.');
+        } else if (sleepDebt >= 1440 && prevDebt < 1440) {
+          await self.tell('You are exhausted. Staying awake is becoming difficult.');
+        } else if (sleepDebt >= 1920 && prevDebt < 1920) {
+          await self.tell('You can barely keep your eyes open. You NEED sleep.');
+        }
+
+        // Doze chance based on debt - SILENT, player doesn't know they're dozing
+        // until they try to act and find out they're asleep
+        // 1440 (24h): 0.1% chance, 10 min timer
+        // 1920 (32h): 5% chance, 3 min timer
+        // 2880 (48h): 20% chance, 30 sec timer
+        let dozeChance = 0;
+        let dozeTimer = 600000; // 10 minutes default
+
+        if (sleepDebt > 1440) {
+          // Calculate chance: 0.1% at 1440, scaling to 20% at 2880
+          const debtRange = Math.min(sleepDebt - 1440, 1440); // 0 to 1440
+          dozeChance = 0.001 + (debtRange / 1440) * 0.199; // 0.1% to 20%
+
+          // Calculate timer: 10 min at 1440, down to 30 sec at 2880
+          // 600000ms -> 30000ms
+          dozeTimer = Math.max(30000, 600000 - (debtRange / 1440) * 570000);
+        }
+
+        // Roll for dozing off - SILENT
+        if (dozeChance > 0 && Math.random() < dozeChance) {
+          if (self.startSleep) {
+            // Silent doze - no message, player discovers when they try to act
+            await self.startSleep(dozeTimer);
+          }
+          results.sleep.dozingOff = true;
+          results.sleep.dozeTimer = dozeTimer;
+        }
+      }
+
+      // Sedation decay (regardless of sleep state)
+      const sedation = self.sedation || 0;
+      if (sedation > 0) {
+        const newSedation = Math.max(0, sedation - 1);
+        self.set('sedation', newSedation);
+        results.sleep.sedation = newSedation;
+      }
+
+      // 4. Digestion - extract calories from stomach, burn fat if needed
       if (self.digestTick) {
         results.digestion = await self.digestTick();
 
@@ -677,33 +762,21 @@ export class PlayerBuilder {
         }
       }
 
-      // 3. Base metabolism - burn calories just for being alive
-      // ~2000 kcal/day = ~1.4 kcal/minute
-      // Sleeping agents regenerate calories instead of burning
+      // 5. Base metabolism - burn calories just for being alive
+      // ~2000 kcal/day = ~1.4 kcal/minute = 2 cal/tick
+      // Sleeping reduces burn rate by ~65%
       const baseRate = 2; // kcal per heartbeat (1 minute)
-      const regenMultiplier = await self.getCalorieRegenMultiplier();
+      const metabolismMultiplier = await self.getMetabolismMultiplier();
       const body = await self.getBody();
 
-      if (body) {
-        const currentCalories = body.calories || 0;
-        const maxCalories = body.maxCalories || 2000;
-
-        if (regenMultiplier >= 1.0) {
-          // Asleep - regenerate calories (from digestion, resting)
-          const regen = Math.min(baseRate * regenMultiplier, maxCalories - currentCalories);
-          if (regen > 0) {
-            body.set('calories', currentCalories + regen);
-            results.metabolism = -regen; // Negative = gained
-          }
-        } else {
-          // Awake - burn calories
-          const burned = Math.min(baseRate * regenMultiplier, currentCalories);
-          body.set('calories', currentCalories - burned);
-          results.metabolism = burned;
-        }
+      if (body && self.burnCalories) {
+        // Burn from body - cascades to fat → decay if needed
+        const toBurn = baseRate * metabolismMultiplier;
+        const burnResult = await self.burnCalories(toBurn, [body]);
+        results.metabolism = burnResult.burned || 0;
       }
 
-      // 4. Check for status changes and notify player
+      // 6. Check for status changes and notify player
       const calorieStatus = await self.getCalorieStatus();
       const fatInfo = await self.getFat();
 
@@ -746,16 +819,14 @@ export class PlayerBuilder {
         }
       }
 
-      // 5. Check for exhaustion -> forced sleep
+      // 7. Check for calorie exhaustion -> collapse (separate from sleep debt)
+      // This is when you have NO energy, not just tired
       if (calorieStatus.status === 'exhausted' && self.sleepState === 'awake') {
-        // Too exhausted - start falling asleep involuntarily
-        await self.tell('You are so exhausted you can barely keep your eyes open...');
-        await self.startSleep(5000); // Fall asleep in 5 seconds
-      } else if (calorieStatus.status === 'starving') {
-        // TODO: Apply starvation damage
+        await self.tell('You collapse from lack of energy...');
+        await self.startSleep(2000); // Immediate collapse
       }
 
-      // 6. Fitness XP from playtime (1 XP per 3 hours, max 3 XP/day)
+      // 8. Fitness XP from playtime (1 XP per 3 hours, max 3 XP/day)
       // Check if it's a new day
       const today = new Date().toDateString();
       if (self.fitnessLastDay !== today) {
@@ -834,6 +905,121 @@ export class PlayerBuilder {
       }
 
       return 'You begin to stir awake...';
+    `);
+
+    obj.setMethod('health', `
+      /** Check your health status.
+       *  Usage: health, hp, status
+       *  Shows how you're feeling without exact numbers.
+       */
+      const lines = [];
+
+      // Energy (calories)
+      const body = await player.getBody();
+      if (body) {
+        const calories = body.calories || 0;
+        const maxCalories = body.maxCalories || 2000;
+        const energyMsg = await $.proportional.sub([
+          'You feel completely drained, barely able to move.',
+          'You feel weak and shaky from hunger.',
+          'You feel very hungry. Your stomach growls.',
+          'Your stomach rumbles. You could use a meal.',
+          'You feel comfortable and satisfied.',
+          'You feel energized and well-fed.',
+        ], calories, maxCalories);
+        lines.push(energyMsg);
+
+        // Fat reserves
+        const fat = body.fat || 0;
+        const maxFat = body.maxFat || 100;
+        if (fat > 0) {
+          const fatMsg = await $.proportional.sub([
+            'Your body has no reserves to draw on.',
+            'You feel lean and light.',
+            'You feel fit and healthy.',
+            'Your body has softened a bit.',
+            'You feel heavier than usual.',
+            'You feel sluggish under your weight.',
+          ], fat, maxFat);
+          lines.push(fatMsg);
+        }
+      }
+
+      // Tiredness (sleep debt)
+      const sleepDebt = player.sleepDebt || 0;
+      if (sleepDebt > 480) { // Only mention if notably tired (8+ hours awake)
+        const tirednessMsg = await $.proportional.sub([
+          'You feel well-rested.',
+          'You feel alert and awake.',
+          'You feel a bit tired.',
+          'Your eyelids feel heavy.',
+          'You are exhausted. Staying awake is difficult.',
+          'You can barely keep your eyes open.',
+        ], sleepDebt, 2400); // 40 hours as max for scale
+        lines.push(tirednessMsg);
+      } else {
+        lines.push('You feel well-rested.');
+      }
+
+      // Sleep state
+      if (player.sleepState === 'asleep') {
+        lines.push('You are asleep.');
+      } else if (player.sleepState === 'falling_asleep') {
+        lines.push('You are nodding off...');
+      } else if (player.sleepState === 'waking_up') {
+        lines.push('You are waking up.');
+      }
+
+      // Bleeding
+      if (player.bleedTick) {
+        const bleedResult = await player.getAllBleedingParts ? await player.getAllBleedingParts() : [];
+        if (bleedResult && bleedResult.length > 0) {
+          let totalBleeding = 0;
+          for (const { count } of bleedResult) {
+            totalBleeding += count;
+          }
+          const bleedMsg = await $.proportional.sub([
+            '',
+            'You have a minor wound bleeding.',
+            'You are bleeding from several wounds.',
+            'You are bleeding badly.',
+            'You are losing a lot of blood!',
+          ], totalBleeding, 10);
+          if (bleedMsg) lines.push(bleedMsg);
+        }
+      }
+
+      // Breath (if underwater or recovering)
+      const breath = player.breath ?? 100;
+      const maxBreath = player.maxBreath || 100;
+      if (breath < maxBreath) {
+        const breathMsg = await $.proportional.sub([
+          'You are drowning! You desperately need air!',
+          'Your lungs burn! You are running out of air!',
+          'You are holding your breath.',
+          'You are catching your breath.',
+          'You are breathing normally.',
+        ], breath, maxBreath);
+        lines.push(breathMsg);
+      }
+
+      // Body decay (serious damage)
+      if (player.getTotalBodyDecay) {
+        const decayInfo = await player.getTotalBodyDecay();
+        if (decayInfo.percentage > 5) {
+          const decayMsg = await $.proportional.sub([
+            'Your body is healthy.',
+            'You have some minor injuries.',
+            'Your body has taken significant damage.',
+            'You are seriously injured.',
+            'You are critically wounded!',
+            'You are dying!',
+          ], decayInfo.percentage, 50); // 50% = death
+          lines.push(decayMsg);
+        }
+      }
+
+      return lines.join('\\r\\n');
     `);
 
     // Sleep notification hooks - override Agent's empty ones

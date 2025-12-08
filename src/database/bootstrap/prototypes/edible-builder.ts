@@ -130,19 +130,20 @@ export class EdibleBuilder {
       // Check if fully consumed
       const fullyConsumed = self.remaining <= 0;
 
-      // When fully consumed, send to stomach and recycle
-      if (fullyConsumed && consumer) {
-        // Get the consumer's stomach
+      // Send THIS BITE's calories to stomach immediately
+      if (consumer) {
         const torso = consumer.getTorso ? await consumer.getTorso() : null;
         if (torso) {
           const stomach = torso.getPart ? await torso.getPart('digestiveStomach') : null;
           if (stomach) {
-            // Create/aggregate StomachContents
-            await self.sendToStomach(stomach, sourceType);
+            // Send partial calories for this bite (not full food)
+            await self.sendBiteToStomach(stomach, sourceType, caloriesPerPortion);
           }
         }
+      }
 
-        // Recycle the consumed item
+      // When fully consumed, recycle the food item
+      if (fullyConsumed) {
         const recycler = $.recycler;
         if (recycler && recycler.recycle) {
           await recycler.recycle(self);
@@ -162,7 +163,71 @@ export class EdibleBuilder {
       return (self.remaining || 0) > 0;
     `);
 
-    // Send this edible to stomach as StomachContents
+    // Send a single bite's calories to stomach
+    // Creates/aggregates StomachContents for this food type
+    obj.setMethod('sendBiteToStomach', `
+      const stomach = args[0]; // The digestive stomach
+      const sourceType = args[1] || 'food'; // 'food', 'drink', etc.
+      const biteCalories = args[2] || 0; // Calories for THIS bite only
+
+      if (!stomach) {
+        return { error: 'No stomach to send to.' };
+      }
+
+      // Get prototype ID for aggregation
+      let protoId = self.parent;
+
+      const stomachContentsProto = $.stomachContents;
+      if (!stomachContentsProto) {
+        return { error: 'StomachContents prototype not found.' };
+      }
+
+      // Check for existing compatible contents in stomach (aggregate by food type)
+      const existingContents = stomach.contents || [];
+      let aggregated = false;
+      let contents = null;
+
+      for (const id of existingContents) {
+        const existing = await $.load(id);
+        if (!existing) continue;
+
+        // Aggregate if same food prototype and same spoiled/poisoned state
+        if (existing.sourceProto === protoId &&
+            existing.spoiled === (self.spoiled || false) &&
+            existing.poisoned === (self.poisoned || false)) {
+          // Add this bite's calories to existing
+          existing.set('calories', (existing.calories || 0) + biteCalories);
+          existing.set('caloriesOriginal', (existing.caloriesOriginal || 0) + biteCalories);
+          contents = existing;
+          aggregated = true;
+          break;
+        }
+      }
+
+      if (!aggregated) {
+        // Create new StomachContents for this food type
+        contents = await $.create({
+          parent: stomachContentsProto,
+          properties: {
+            sourceName: self.name || 'unknown',
+            sourceProto: protoId,
+            sourceType: sourceType,
+            calories: biteCalories,
+            caloriesOriginal: biteCalories,
+            quantity: 1,
+            spoiled: self.spoiled || false,
+            poisoned: self.poisoned || false,
+          },
+        });
+
+        // Add to stomach contents
+        await contents.moveTo(stomach.id);
+      }
+
+      return { contents, aggregated, calories: biteCalories };
+    `);
+
+    // Send this edible to stomach as StomachContents (DEPRECATED - use sendBiteToStomach)
     // Creates StomachContents object with metadata, handles aggregation
     // Returns the StomachContents object (new or aggregated)
     obj.setMethod('sendToStomach', `

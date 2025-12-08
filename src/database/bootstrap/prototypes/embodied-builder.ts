@@ -29,6 +29,9 @@ export class EmbodiedBuilder {
         body: null, // ObjRef to torso (root of body tree)
         // Consciousness state
         conscious: true,
+        // Breath/air tracking for drowning
+        breath: 100, // Current breath 0-100 (100 = full lungs)
+        maxBreath: 100, // Max breath capacity (trained swimmers have more)
       },
       methods: {},
     });
@@ -332,6 +335,12 @@ export class EmbodiedBuilder {
         return null; // Couldn't hear anything (all ears blocked/deaf)
       }
 
+      // Sound is a stimulus - may wake from dozing
+      if (self.receiveStimulus) {
+        // Intensity 5 for normal speech, could vary by volume
+        await self.receiveStimulus(5);
+      }
+
       // Output what was heard via tell()
       if (self.tell) {
         const options = self.options || {};
@@ -366,6 +375,11 @@ export class EmbodiedBuilder {
         if (eye) {
           const condition = eye.condition || {};
           if (!condition.blind && !condition.destroyed) {
+            // Visual stimulus - may wake from dozing
+            if (self.receiveStimulus) {
+              await self.receiveStimulus(4); // Slightly less than sound
+            }
+
             // Can see - send the message
             if (self.tell) {
               const options = self.options || {};
@@ -435,6 +449,11 @@ export class EmbodiedBuilder {
         return false; // Nose blocked/destroyed/missing
       }
 
+      // Smell is weak stimulus
+      if (self.receiveStimulus) {
+        await self.receiveStimulus(3); // 30% wake chance
+      }
+
       // Can smell - send the message
       if (self.tell) {
         const options = self.options || {};
@@ -469,6 +488,11 @@ export class EmbodiedBuilder {
         return false; // Tongue missing/destroyed
       }
 
+      // Taste is very weak stimulus
+      if (self.receiveStimulus) {
+        await self.receiveStimulus(2); // 20% wake chance
+      }
+
       // Can taste - send the message
       if (self.tell) {
         const options = self.options || {};
@@ -488,10 +512,24 @@ export class EmbodiedBuilder {
         return; // No sensation when unconscious
       }
 
+      // Physical sensation is strong stimulus - wakes from dozing
+      if (self.receiveStimulus) {
+        // Pain is very alerting (8-10), touch moderate (6-7)
+        let stimulusIntensity = 6; // Default for touch
+        if (sensation.type === 'pain') {
+          // Pain intensity 1-10 maps to stimulus 8-10
+          const painLevel = sensation.intensity || 5;
+          stimulusIntensity = Math.min(10, 8 + (painLevel / 5));
+        } else if (sensation.type === 'temperature') {
+          // Extreme temp is alerting
+          stimulusIntensity = 7;
+        }
+        await self.receiveStimulus(stimulusIntensity);
+      }
+
       // Different handling based on sensation type
       if (sensation.type === 'pain') {
         // Pain sensation - could trigger reactions
-        // For now, just acknowledge it
         // Future: pain tolerance, shock, etc.
       }
     `);
@@ -883,6 +921,193 @@ export class EmbodiedBuilder {
       }
 
       return { digested: digestedCalories, fatBurned, fatGained };
+    `);
+
+    obj.setMethod('bleedTick', `
+      /** Process bleeding damage for all body parts.
+       *  Called periodically by heartbeat.
+       *  Bleeding drains calories (blood loss). Only causes decay when calories depleted.
+       *  @returns Object with totalBleeding, caloriesLost, messages
+       */
+      const body = await self.getBody();
+      if (!body) return { totalBleeding: 0, caloriesLost: 0, messages: [] };
+
+      // Get all bleeding parts
+      const bleedingParts = body.getAllBleedingParts ? await body.getAllBleedingParts() : [];
+      if (bleedingParts.length === 0) {
+        return { totalBleeding: 0, caloriesLost: 0, messages: [] };
+      }
+
+      const messages = [];
+      let totalBleeding = 0;
+      let totalCaloriesLost = 0;
+
+      for (const { part, count } of bleedingParts) {
+        totalBleeding += count;
+
+        // Build descriptive message
+        if (count === 1) {
+          messages.push('Your ' + part.name + ' is bleeding.');
+        } else {
+          messages.push('Your ' + part.name + ' bleeds from ' + count + ' wounds.');
+        }
+
+        // Generate pain sensation from blood loss
+        if (part.feel) {
+          await part.feel({
+            type: 'pain',
+            subtype: 'bleeding',
+            intensity: count * 2,
+          });
+        }
+      }
+
+      // Each bleeding wound drains calories (blood loss)
+      // 50 calories per wound per tick (1 minute)
+      // Blood loss is systemic - drain from body, cascades to fat → decay
+      const caloriesPerWound = 50;
+      const caloriesToDrain = totalBleeding * caloriesPerWound;
+
+      if (caloriesToDrain > 0 && self.burnCalories) {
+        // Burn from body directly - blood loss is systemic
+        await self.burnCalories(caloriesToDrain, [body]);
+        totalCaloriesLost = caloriesToDrain;
+      }
+
+      // Notify the agent about blood loss
+      if (self.tell && messages.length > 0) {
+        // Consolidate into one message with severity
+        if (totalBleeding >= 5) {
+          await self.tell('You are losing a lot of blood! ' + messages.join(' '));
+        } else if (totalBleeding >= 3) {
+          await self.tell('You are bleeding badly. ' + messages.join(' '));
+        } else {
+          await self.tell(messages.join(' '));
+        }
+      }
+
+      // Check for death from blood loss (same threshold as starvation: 50% total body decay)
+      const decayInfo = await self.getTotalBodyDecay();
+      if (decayInfo.percentage >= 50) {
+        // Trigger death from blood loss
+        if (self.onStarvationDeath) {
+          // Reuse starvation death handler - blood loss causes same effect
+          self.set('causeOfDeath', 'blood loss');
+          await self.onStarvationDeath(decayInfo);
+        } else if (self.die) {
+          await self.die('blood loss');
+        }
+      }
+
+      return { totalBleeding, caloriesLost: totalCaloriesLost, messages };
+    `);
+
+    obj.setMethod('breathTick', `
+      /** Process breathing/drowning for submerged agents.
+       *  Called periodically by heartbeat.
+       *  When underwater: breath depletes. When out: breath refills.
+       *  Drowning drains calories like bleeding does.
+       *  @returns Object with isUnderwater, breath, maxBreath, drowning, messages
+       */
+      const messages = [];
+      let drowning = false;
+
+      // Check if we're in a location with water
+      if (!self.location) {
+        return { isUnderwater: false, breath: self.breath, maxBreath: self.maxBreath, drowning: false, messages: [] };
+      }
+
+      const location = await $.load(self.location);
+      if (!location) {
+        return { isUnderwater: false, breath: self.breath, maxBreath: self.maxBreath, drowning: false, messages: [] };
+      }
+
+      // Get agent height (from body or default)
+      let agentHeight = 170; // Default human height in cm
+      const body = await self.getBody();
+      if (body && body.height) {
+        agentHeight = body.height;
+      }
+
+      // Check if submerged
+      const isUnderwater = location.isSubmerged ? await location.isSubmerged(agentHeight) : false;
+      const currentBreath = self.breath ?? 100;
+      const maxBreath = self.maxBreath || 100;
+
+      if (isUnderwater) {
+        // Underwater - deplete breath
+        // Lose 20 breath per tick (can hold breath for 5 ticks/5 minutes at full)
+        const breathLoss = 20;
+        const newBreath = Math.max(0, currentBreath - breathLoss);
+        self.set('breath', newBreath);
+
+        if (newBreath <= 0) {
+          // Out of breath - drowning!
+          drowning = true;
+          messages.push('You are drowning! You desperately need air!');
+
+          // Drowning damage - drain calories like bleeding
+          // 100 calories per tick of drowning (severe)
+          if (self.burnCalories) {
+            await self.burnCalories(100, [body]);
+          }
+
+          // Generate pain/panic sensation
+          if (body && body.feel) {
+            await body.feel({
+              type: 'pain',
+              subtype: 'drowning',
+              intensity: 10,
+            });
+          }
+
+          // Check for death from drowning (same as other decay deaths)
+          const decayInfo = await self.getTotalBodyDecay();
+          if (decayInfo.percentage >= 50) {
+            if (self.onStarvationDeath) {
+              self.set('causeOfDeath', 'drowning');
+              await self.onStarvationDeath(decayInfo);
+            } else if (self.die) {
+              await self.die('drowning');
+            }
+          }
+        } else if (newBreath <= 20) {
+          messages.push('Your lungs burn! You are running out of air!');
+        } else if (newBreath <= 50) {
+          messages.push('You are holding your breath underwater.');
+        } else if (currentBreath === maxBreath) {
+          // Just went underwater
+          messages.push('You take a deep breath as the water closes over you.');
+        }
+      } else {
+        // Above water - restore breath
+        if (currentBreath < maxBreath) {
+          // Restore 50 breath per tick (quick recovery when surfacing)
+          const newBreath = Math.min(maxBreath, currentBreath + 50);
+          self.set('breath', newBreath);
+
+          if (currentBreath <= 20 && newBreath > 20) {
+            messages.push('You gasp for air as you surface!');
+          } else if (currentBreath < maxBreath && newBreath >= maxBreath) {
+            messages.push('You catch your breath.');
+          }
+        }
+      }
+
+      // Notify the agent
+      if (self.tell && messages.length > 0) {
+        for (const msg of messages) {
+          await self.tell(msg);
+        }
+      }
+
+      return {
+        isUnderwater,
+        breath: self.breath,
+        maxBreath: self.maxBreath,
+        drowning,
+        messages,
+      };
     `);
 
     obj.setMethod('getStomachContents', `

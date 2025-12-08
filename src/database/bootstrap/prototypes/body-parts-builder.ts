@@ -103,7 +103,9 @@ export class BodyPartsBuilder {
         maxContents: 10, // Max number of items
         maxVolume: 1000, // ml (about 1 liter when stretched)
         // Digestion rate - calories extracted per tick
-        digestionRate: 50, // kcal per tick
+        // 2 cal/tick = just enough to sustain awake metabolism
+        // Must sleep to actually recover
+        digestionRate: 2, // kcal per tick
       },
       methods: {},
     });
