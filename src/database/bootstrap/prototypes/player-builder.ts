@@ -712,6 +712,56 @@ export class PlayerBuilder {
           await self.tell('You can barely keep your eyes open. You NEED sleep.');
         }
 
+        // Periodic tiredness reminders (between thresholds)
+        let tiredReminder = null;
+        if (sleepDebt >= 1920) {
+          // Extreme exhaustion: 30% chance of reminder
+          if (Math.random() < 0.3) {
+            const msgs = [
+              'Your vision blurs momentarily.',
+              'You catch yourself swaying.',
+              'Your head droops, then snaps back up.',
+              'Everything seems distant and foggy.',
+              'You blink slowly, struggling to focus.',
+            ];
+            tiredReminder = msgs[Math.floor(Math.random() * msgs.length)];
+          }
+        } else if (sleepDebt >= 1440) {
+          // Severe exhaustion: 15% chance
+          if (Math.random() < 0.15) {
+            const msgs = [
+              'Your eyelids feel impossibly heavy.',
+              'You stifle a yawn.',
+              'Your thoughts feel sluggish.',
+              'You have to fight to stay alert.',
+            ];
+            tiredReminder = msgs[Math.floor(Math.random() * msgs.length)];
+          }
+        } else if (sleepDebt >= 1200) {
+          // Very tired: 8% chance
+          if (Math.random() < 0.08) {
+            const msgs = [
+              'You yawn widely.',
+              'Your body aches for rest.',
+              'You feel drowsy.',
+            ];
+            tiredReminder = msgs[Math.floor(Math.random() * msgs.length)];
+          }
+        } else if (sleepDebt >= 960) {
+          // Tired: 3% chance
+          if (Math.random() < 0.03) {
+            const msgs = [
+              'You yawn.',
+              'You feel a bit sleepy.',
+            ];
+            tiredReminder = msgs[Math.floor(Math.random() * msgs.length)];
+          }
+        }
+
+        if (tiredReminder) {
+          await self.tell(tiredReminder);
+        }
+
         // Doze chance based on debt - SILENT, player doesn't know they're dozing
         // until they try to act and find out they're asleep
         // 1440 (24h): 0.1% chance, 10 min timer
@@ -797,6 +847,41 @@ export class PlayerBuilder {
           if (statusMessages[calorieStatus.status]) {
             await self.tell(statusMessages[calorieStatus.status]);
           }
+        }
+      }
+
+      // Periodic hunger reminders (even without status change)
+      if (self.sleepState === 'awake') {
+        const hungerReminders = {
+          'hungry': { chance: 0.05, messages: [
+            'Your stomach growls quietly.',
+            'You feel a bit hungry.',
+            'You could use something to eat.',
+          ]},
+          'very hungry': { chance: 0.15, messages: [
+            'Your stomach growls loudly.',
+            'You really need to eat something.',
+            'Hunger gnaws at your belly.',
+            'Your hands tremble slightly from hunger.',
+          ]},
+          'starving': { chance: 0.3, messages: [
+            'Your stomach cramps painfully.',
+            'You feel faint from hunger.',
+            'Your body screams for nourishment.',
+            'Waves of weakness wash over you.',
+            'You can barely focus through the hunger.',
+          ]},
+          'exhausted': { chance: 0.5, messages: [
+            'Your body is shutting down from lack of energy.',
+            'You can barely stay conscious.',
+            'Every movement is agony.',
+          ]},
+        };
+
+        const reminder = hungerReminders[calorieStatus.status];
+        if (reminder && Math.random() < reminder.chance) {
+          const msg = reminder.messages[Math.floor(Math.random() * reminder.messages.length)];
+          await self.tell(msg);
         }
       }
 
