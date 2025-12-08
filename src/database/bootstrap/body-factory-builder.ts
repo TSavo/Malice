@@ -382,6 +382,10 @@ export class BodyFactoryBuilder {
         // Main calorie store (where digestion happens)
         calories: 2000,
         maxCalories: 3000,
+        // Hydration - depletes faster than calories (3 days vs 3 weeks)
+        // 100% hydration depletes in ~4320 ticks (72 hours) without water
+        hydration: 100,
+        maxHydration: 100,
       });
 
       await torso.addPart('head', head.id);

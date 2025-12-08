@@ -36,6 +36,7 @@ export class EdibleBuilder {
         description: 'Base prototype for consumable items',
         // Nutrition
         calories: 100, // kcal per whole item
+        hydration: 20, // ml water equivalent (most food has some water)
         // Consumption
         portions: 1, // Total portions to consume
         remaining: 1, // Portions left (starts full)
@@ -99,6 +100,13 @@ export class EdibleBuilder {
       return Math.ceil(totalVolume / totalPortions);
     `);
 
+    // Get hydration per portion (ml water equivalent)
+    obj.setMethod('getHydrationPerPortion', `
+      const totalHydration = self.hydration || 0;
+      const totalPortions = self.portions || 1;
+      return Math.ceil(totalHydration / totalPortions);
+    `);
+
     // Consume a portion - returns calories consumed or error
     // Handles weight reduction, stomach transfer, and recycling when fully consumed
     obj.setMethod('consume', `
@@ -155,13 +163,29 @@ export class EdibleBuilder {
       // Check if fully consumed
       const fullyConsumed = self.remaining <= 0;
 
+      // Calculate hydration for this bite
+      const hydrationPerPortion = await self.getHydrationPerPortion();
+
       // Send THIS BITE's calories and volume to stomach
+      // Also restore hydration directly to body (water absorbs fast)
       if (consumer) {
         const torso = consumer.getTorso ? await consumer.getTorso() : null;
         if (torso) {
           const stomach = torso.getPart ? await torso.getPart('digestiveStomach') : null;
           if (stomach) {
             await self.sendBiteToStomach(stomach, sourceType, caloriesPerPortion);
+          }
+
+          // Restore hydration directly to body (water absorbs quickly)
+          if (hydrationPerPortion !== 0) {
+            const body = await consumer.getBody();
+            if (body) {
+              const currentHydration = body.hydration ?? 100;
+              const maxHydration = body.maxHydration || 100;
+              // Hydration can be negative (alcohol dehydrates)
+              const newHydration = Math.max(0, Math.min(maxHydration, currentHydration + hydrationPerPortion));
+              body.set('hydration', newHydration);
+            }
           }
         }
       }
@@ -176,6 +200,7 @@ export class EdibleBuilder {
 
       return {
         calories: caloriesPerPortion,
+        hydration: hydrationPerPortion,
         warnings,
         fullyConsumed,
         remaining: self.remaining,

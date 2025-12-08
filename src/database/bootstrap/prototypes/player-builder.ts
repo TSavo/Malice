@@ -826,6 +826,43 @@ export class PlayerBuilder {
         results.metabolism = burnResult.burned || 0;
       }
 
+      // 5b. Hydration depletion - faster than calories (3 days vs 3 weeks)
+      // 100% hydration depletes in 4320 ticks (72 hours) = ~0.023 per tick
+      // Sleeping reduces depletion by 50% (less sweating)
+      results.hydration = { depleted: 0, level: 100, status: 'hydrated' };
+      if (body) {
+        const hydrationRate = sleepState === 'asleep' ? 0.0115 : 0.023;
+        const currentHydration = body.hydration ?? 100;
+        const newHydration = Math.max(0, currentHydration - hydrationRate);
+        body.set('hydration', newHydration);
+        results.hydration.depleted = hydrationRate;
+        results.hydration.level = newHydration;
+
+        // When hydration hits 0, cascade to body decay (like starvation)
+        if (newHydration <= 0) {
+          // Severe dehydration damages the body directly
+          // 2% decay per tick when fully dehydrated = death in ~50 ticks (under 1 hour)
+          const currentDecay = body.decayLevel || 0;
+          body.set('decayLevel', Math.min(100, currentDecay + 2));
+          results.hydration.decaying = true;
+        }
+
+        // Calculate hydration status
+        const maxHydration = body.maxHydration || 100;
+        const hydrationPercent = (newHydration / maxHydration) * 100;
+        if (hydrationPercent > 75) {
+          results.hydration.status = 'hydrated';
+        } else if (hydrationPercent > 50) {
+          results.hydration.status = 'thirsty';
+        } else if (hydrationPercent > 25) {
+          results.hydration.status = 'dehydrated';
+        } else if (hydrationPercent > 10) {
+          results.hydration.status = 'severely dehydrated';
+        } else {
+          results.hydration.status = 'critical';
+        }
+      }
+
       // 6. Check for status changes and notify player
       const calorieStatus = await self.getCalorieStatus();
       const fatInfo = await self.getFat();
@@ -881,6 +918,55 @@ export class PlayerBuilder {
         const reminder = hungerReminders[calorieStatus.status];
         if (reminder && Math.random() < reminder.chance) {
           const msg = reminder.messages[Math.floor(Math.random() * reminder.messages.length)];
+          await self.tell(msg);
+        }
+
+        // Thirst status change notifications
+        const prevThirstStatus = self._lastThirstStatus || 'hydrated';
+        const thirstStatus = results.hydration.status;
+        if (thirstStatus !== prevThirstStatus) {
+          self.set('_lastThirstStatus', thirstStatus);
+          const thirstMessages = {
+            'hydrated': 'You feel well-hydrated.',
+            'thirsty': 'You feel thirsty. You could use a drink.',
+            'dehydrated': 'Your mouth is dry. You need water.',
+            'severely dehydrated': 'You feel dizzy and weak from dehydration.',
+            'critical': 'You are dying of thirst!',
+          };
+          if (thirstMessages[thirstStatus]) {
+            await self.tell(thirstMessages[thirstStatus]);
+          }
+        }
+
+        // Periodic thirst reminders
+        const thirstReminders = {
+          'thirsty': { chance: 0.08, messages: [
+            'Your mouth feels dry.',
+            'You lick your parched lips.',
+            'You could use something to drink.',
+          ]},
+          'dehydrated': { chance: 0.2, messages: [
+            'Your throat is painfully dry.',
+            'You desperately need water.',
+            'Your lips are cracked and dry.',
+            'A headache throbs behind your eyes.',
+          ]},
+          'severely dehydrated': { chance: 0.4, messages: [
+            'Your vision swims.',
+            'You can barely swallow.',
+            'Your body is shutting down from dehydration.',
+            'Every breath burns your parched throat.',
+          ]},
+          'critical': { chance: 0.6, messages: [
+            'You are dying of thirst.',
+            'Your organs are failing from dehydration.',
+            'You can barely stay conscious.',
+          ]},
+        };
+
+        const thirstReminder = thirstReminders[thirstStatus];
+        if (thirstReminder && Math.random() < thirstReminder.chance) {
+          const msg = thirstReminder.messages[Math.floor(Math.random() * thirstReminder.messages.length)];
           await self.tell(msg);
         }
       }
@@ -1028,6 +1114,18 @@ export class PlayerBuilder {
           ], fat, maxFat);
           lines.push(fatMsg);
         }
+
+        // Hydration
+        const hydration = body.hydration ?? 100;
+        const maxHydration = body.maxHydration || 100;
+        const hydrationMsg = await $.proportional.sub([
+          'You are dying of thirst!',
+          'You feel dizzy and weak from dehydration.',
+          'Your mouth is dry. You need water.',
+          'You feel a bit thirsty.',
+          'You feel well-hydrated.',
+        ], hydration, maxHydration);
+        lines.push(hydrationMsg);
       }
 
       // Tiredness (sleep debt)
