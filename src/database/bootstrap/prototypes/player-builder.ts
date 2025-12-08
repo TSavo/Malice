@@ -762,13 +762,16 @@ export class PlayerBuilder {
           await self.tell(tiredReminder);
         }
 
-        // Doze chance based on debt - SILENT, player doesn't know they're dozing
-        // until they try to act and find out they're asleep
+        // Doze chance based on debt AND status effects
+        // Sedation increases chance, stimulation decreases it
         // 1440 (24h): 0.1% chance, 10 min timer
         // 1920 (32h): 5% chance, 3 min timer
         // 2880 (48h): 20% chance, 30 sec timer
         let dozeChance = 0;
         let dozeTimer = 600000; // 10 minutes default
+
+        // Get net alertness: positive = stimulated (can't sleep), negative = sedated (drowsy)
+        const netAlertness = self.getNetAlertness ? await self.getNetAlertness() : 0;
 
         if (sleepDebt > 1440) {
           // Calculate chance: 0.1% at 1440, scaling to 20% at 2880
@@ -778,6 +781,21 @@ export class PlayerBuilder {
           // Calculate timer: 10 min at 1440, down to 30 sec at 2880
           // 600000ms -> 30000ms
           dozeTimer = Math.max(30000, 600000 - (debtRange / 1440) * 570000);
+        }
+
+        // Modify by net alertness
+        // Sedated (negative): increase doze chance, can doze even without debt
+        // Stimulated (positive): decrease doze chance, may prevent sleep entirely
+        if (netAlertness < 0) {
+          // Sedated: -50 = +50% chance, can doze even at low debt
+          const sedationBonus = Math.abs(netAlertness) / 100;
+          dozeChance = Math.min(0.5, dozeChance + sedationBonus);
+          // Also shorten timer when sedated
+          dozeTimer = Math.max(10000, dozeTimer * (1 - sedationBonus));
+        } else if (netAlertness > 0) {
+          // Stimulated: reduce chance, at 50+ basically can't doze
+          const stimPenalty = netAlertness / 50; // 50 stim = 100% reduction
+          dozeChance = Math.max(0, dozeChance * (1 - stimPenalty));
         }
 
         // Roll for dozing off - SILENT
@@ -809,6 +827,54 @@ export class PlayerBuilder {
         }
         if (results.digestion.fatGained > 0) {
           await self.tell('You feel your body storing excess energy.');
+        }
+      }
+
+      // 4b. Status effect decay and processing
+      results.effects = {};
+      if (self.decayEffects) {
+        results.effects.decayed = await self.decayEffects();
+
+        // Check for nausea/vomiting
+        if (self.checkNausea) {
+          const nauseaCheck = await self.checkNausea();
+          if (nauseaCheck.vomit) {
+            await self.tell('You vomit violently!');
+            // Empty stomach contents
+            const torso = self.getTorso ? await self.getTorso() : null;
+            if (torso) {
+              const stomach = torso.getPart ? await torso.getPart('digestiveStomach') : null;
+              if (stomach && stomach.contents) {
+                for (const itemId of [...stomach.contents]) {
+                  const item = await $.load(itemId);
+                  if (item && $.recycler) {
+                    await $.recycler.recycle(item);
+                  }
+                }
+                stomach.set('contents', []);
+              }
+            }
+            // Reduce nausea after vomiting
+            await self.reduceEffect('nausea', 30);
+            results.effects.vomited = true;
+          }
+        }
+
+        // Check for dangerous drug combinations
+        if (self.hasDangerousCombination) {
+          const danger = await self.hasDangerousCombination();
+          if (danger.reason) {
+            await self.tell(danger.reason);
+          }
+          if (danger.dangerous) {
+            // Cause heart damage
+            const body = await self.getBody();
+            if (body) {
+              const currentDecay = body.decayLevel || 0;
+              body.set('decayLevel', Math.min(100, currentDecay + 1));
+              results.effects.heartDamage = true;
+            }
+          }
         }
       }
 
@@ -1184,6 +1250,14 @@ export class PlayerBuilder {
           'You are breathing normally.',
         ], breath, maxBreath);
         lines.push(breathMsg);
+      }
+
+      // Status effects (substances, etc.)
+      if (player.describeEffects) {
+        const effectLines = await player.describeEffects();
+        for (const line of effectLines) {
+          lines.push(line);
+        }
       }
 
       // Body decay (serious damage)
