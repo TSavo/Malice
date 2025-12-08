@@ -19,8 +19,9 @@ export class FoodBuilder {
       properties: {
         name: 'Food',
         description: 'Base prototype for solid food items',
-        // Typical food calories
+        // Typical food nutrition
         calories: 200,
+        hydration: 50, // ml water equivalent - solid food has some moisture
         // Food-specific properties
         portions: 4, // Takes 4 bites to eat
         remaining: 4,

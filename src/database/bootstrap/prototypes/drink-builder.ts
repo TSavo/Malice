@@ -24,8 +24,9 @@ export class DrinkBuilder {
       properties: {
         name: 'Drink',
         description: 'Base prototype for liquid consumables',
-        // Typical drink calories
-        calories: 50,
+        // Typical drink nutrition
+        calories: 50, // Some drinks have calories (juice, soda)
+        hydration: 200, // ml water equivalent - drinks are very hydrating
         // Drink-specific properties
         portions: 5, // Takes 5 sips to drink
         remaining: 5,
