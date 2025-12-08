@@ -187,7 +187,8 @@ export class RuntimeObjectImpl implements RuntimeObject {
     }
 
     // Walk up parent chain
-    if (this.obj.parent !== 0) {
+    // Stop at root (parent=0) or self-parented objects (parent=self) like #-1 and #0
+    if (this.obj.parent !== 0 && this.obj.parent !== this.obj._id) {
       const parent = this.manager.getSync(this.obj.parent);
       if (parent) {
         return parent.get(prop);
@@ -280,7 +281,8 @@ export class RuntimeObjectImpl implements RuntimeObject {
     }
 
     // Walk up parent chain (sync - uses cache only)
-    if (this.obj.parent !== 0) {
+    // Stop at root (parent=0) or self-parented objects (parent=self) like #-1 and #0
+    if (this.obj.parent !== 0 && this.obj.parent !== this.obj._id) {
       const parent = this.manager.getSync(this.obj.parent);
       if (parent && parent.hasMethod(method)) {
         const parentImpl = parent as RuntimeObjectImpl;
@@ -302,7 +304,8 @@ export class RuntimeObjectImpl implements RuntimeObject {
     }
 
     // Walk up parent chain (async - loads from DB if not cached)
-    if (this.obj.parent !== 0) {
+    // Stop at root (parent=0) or self-parented objects (parent=self) like #-1 and #0
+    if (this.obj.parent !== 0 && this.obj.parent !== this.obj._id) {
       const parent = await this.manager.load(this.obj.parent);
       if (parent) {
         const hasIt = await (parent as RuntimeObjectImpl).hasMethodAsync(method);

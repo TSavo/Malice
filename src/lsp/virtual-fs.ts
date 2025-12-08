@@ -201,8 +201,12 @@ export class VirtualFileSystem {
     // Extract actual code from TypeScript context (if present)
     const actualCode = this.extractMethodCode(newCode);
 
-    // Update method in MongoDB
-    obj.setMethod(parsed.name, actualCode);
+    // Update method in MongoDB and wait for persistence
+    if (!obj['obj'].methods) {
+      obj['obj'].methods = {};
+    }
+    obj['obj'].methods[parsed.name] = { code: actualCode };
+    await this.manager.update(parsed.objectId, { methods: obj['obj'].methods }, false);
 
     // Update cache
     const prototypeType = await this.inferPrototypeType(obj);
