@@ -833,6 +833,138 @@ export class BodyPartBuilder {
       return condition.severed === true || self.owner === null || self.owner === 0;
     `);
 
+    // === AUTOPSY HOOKS ===
+    // These methods return narrative descriptions without exposing raw numbers.
+    // Decay level obscures findings - the more decayed, the less you can determine.
+
+    // Get autopsy findings for this body part
+    obj.setMethod('getAutopsyFindings', `
+      /** Get narrative autopsy findings for this body part.
+       *  @param examinerSkill - 0-100, higher reveals more detail
+       *  @returns Array of finding strings
+       */
+      const examinerSkill = args[0] || 50;
+      const findings = [];
+      const condition = self.condition || {};
+      const decay = self.decayLevel || 0;
+
+      // Decay obscures findings - calculate visibility threshold
+      // At 0% decay, can see everything. At 100%, can only see obvious things.
+      const visibility = Math.max(0, 100 - decay);
+      const canSeeDetail = (threshold) => (visibility + examinerSkill / 2) >= threshold;
+
+      // WOUNDS - always somewhat visible unless skeletal
+      const wounds = condition.wounds || {};
+      const woundTypes = Object.keys(wounds);
+      for (const type of woundTypes) {
+        const typeWounds = wounds[type].filter(w => !w.healed);
+        if (typeWounds.length === 0) continue;
+
+        const bleedingCount = typeWounds.filter(w => w.bleeding).length;
+        const count = typeWounds.length;
+
+        // Describe wound severity narratively
+        if (decay < 80) { // Can see wounds until skeletal
+          if (count === 1) {
+            findings.push('There is a ' + type + ' on the ' + self.name.toLowerCase() + '.');
+          } else if (count < 4) {
+            findings.push('There are several ' + type + 's on the ' + self.name.toLowerCase() + '.');
+          } else {
+            findings.push('The ' + self.name.toLowerCase() + ' is covered in ' + type + 's.');
+          }
+
+          // Bleeding visible only when fresh
+          if (bleedingCount > 0 && decay < 30 && canSeeDetail(40)) {
+            if (bleedingCount === count) {
+              findings.push('The wounds appear to have been actively bleeding at time of death.');
+            } else {
+              findings.push('Some wounds show signs of active bleeding.');
+            }
+          }
+        }
+      }
+
+      // BROKEN BONES - visible even when skeletal
+      const brokenBones = (condition.brokenBones || []).filter(b => !b.healed);
+      if (brokenBones.length > 0) {
+        for (const bone of brokenBones) {
+          if (bone.set) {
+            findings.push('The ' + bone.bone + ' was broken but appears to have been set.');
+          } else {
+            findings.push('The ' + bone.bone + ' is broken.');
+          }
+        }
+      }
+
+      // SEVERED - always visible
+      if (condition.severed) {
+        findings.push('This ' + self.name.toLowerCase() + ' has been severed from the body.');
+      }
+
+      // ENERGY STATE (calories) - only visible when fresh, requires skill
+      if (decay < 30 && canSeeDetail(60)) {
+        const calories = self.calories || 0;
+        const maxCalories = self.maxCalories || 100;
+        const ratio = calories / maxCalories;
+
+        if (ratio < 0.1) {
+          findings.push('The muscle tissue appears severely atrophied and depleted.');
+        } else if (ratio < 0.3) {
+          findings.push('The muscle tissue shows signs of significant wasting.');
+        } else if (ratio < 0.5) {
+          findings.push('The muscle tissue appears somewhat diminished.');
+        } else if (ratio > 0.9) {
+          findings.push('The muscle tissue appears well-developed and healthy.');
+        }
+      }
+
+      // DECAY STATE - always describe
+      if (decay >= 80) {
+        findings.push('The flesh has largely decomposed, leaving mostly bone.');
+      } else if (decay >= 50) {
+        findings.push('Advanced decomposition makes detailed examination difficult.');
+      } else if (decay >= 30) {
+        findings.push('Decomposition has begun to affect the tissue.');
+      } else if (decay >= 10) {
+        findings.push('Early signs of decomposition are present.');
+      }
+
+      return findings;
+    `);
+
+    // Get autopsy findings for child parts recursively
+    obj.setMethod('getFullAutopsyFindings', `
+      /** Get autopsy findings for this part and all children.
+       *  @param examinerSkill - 0-100
+       *  @returns Object mapping part names to finding arrays
+       */
+      const examinerSkill = args[0] || 50;
+      const allFindings = {};
+
+      // Get findings for this part
+      const myFindings = await self.getAutopsyFindings(examinerSkill);
+      if (myFindings.length > 0) {
+        allFindings[self.name] = myFindings;
+      }
+
+      // Get findings for child parts
+      const parts = self.parts || {};
+      for (const partName of Object.keys(parts)) {
+        const partId = parts[partName];
+        if (partId) {
+          const part = await $.load(partId);
+          if (part && part.getFullAutopsyFindings) {
+            const childFindings = await part.getFullAutopsyFindings(examinerSkill);
+            for (const [name, findings] of Object.entries(childFindings)) {
+              allFindings[name] = findings;
+            }
+          }
+        }
+      }
+
+      return allFindings;
+    `);
+
     return obj;
   }
 }
