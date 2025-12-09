@@ -249,62 +249,74 @@ const parts = self.bodyParts;
 // (if all are cached)
 ```
 
-### IDs vs Objects: When to Use Which
+### Always Store Objects, Not IDs
 
 ```javascript
-// Store as ID when you just need a reference for later
-self.location = room.id;      // Stores as number (simpler)
-self.location = room;         // Stores as objref (same effect)
+// DO: Store RuntimeObjects - they become objrefs automatically
+self.location = room;         // Stored as { type: 'objref', value: 42 }
+self.owner = player;          // Stored as { type: 'objref', value: 17 }
+self.contents = [item1, item2];  // Array of objrefs
 
-// The contents array typically stores IDs
-self.contents = [item1.id, item2.id];  // Array of numbers
-self.contents = [item1, item2];        // Array of objrefs (auto-converted)
-
-// When calling methods, ALWAYS ensure you have a RuntimeObject
-const loc = await $.load(self.location);  // Guaranteed RuntimeObject
-await loc.announce('Hello!');             // Safe
-
-// DON'T do this
-await self.location.announce('Hello!');   // Might fail if not cached!
+// DON'T: Store raw IDs - you lose type information
+self.location = room.id;      // Stored as { type: 'number', value: 42 }
+// Now the system doesn't know this is an object reference!
 ```
 
-### The Safe Pattern
+**Why objrefs matter:**
+- The system knows it's an object reference, not just a number
+- On read, objrefs auto-resolve to RuntimeObjects (if cached)
+- Numbers stay as numbers - no auto-resolution
+
+### Reading Object References
+
+When you read an objref property:
 
 ```javascript
-// ALWAYS: Load before using
-async function teleport(player, destId) {
-  const dest = await $.load(destId);
-  const source = await $.load(player.location);
+// If the referenced object IS in cache:
+const loc = self.location;  // Returns RuntimeObject - can call methods!
+await loc.announce('...');  // Works!
 
-  await source.removeContent(player.id);
-  player.location = dest.id;
-  await dest.addContent(player.id);
+// If the referenced object is NOT in cache:
+const loc = self.location;  // Returns the raw ID (number)
+await loc.announce('...');  // CRASH - number has no methods!
+```
 
-  await dest.announce(player.name + ' appears in a flash of light!');
-}
+**The safe pattern - always use $.load():**
 
-// NEVER: Assume property is RuntimeObject
-async function broken(player) {
-  const loc = player.location;  // Might be ID!
-  await loc.announce('...');    // CRASH if loc is just a number
-}
+```javascript
+// SAFE: $.load() always returns RuntimeObject (loads if needed)
+const loc = await $.load(self.location);
+await loc.announce('Hello!');  // Always works
+
+// SAFE: Works whether self.location is objref OR number
+// $.load() handles both cases
+```
+
+### Why $.load() Works Either Way
+
+```javascript
+// If self.location resolved to RuntimeObject:
+const loc = await $.load(self.location);  // $.load(RuntimeObject) -> returns it
+// If self.location resolved to number:
+const loc = await $.load(self.location);  // $.load(42) -> loads #42
+
+// $.load() is smart - it accepts both!
 ```
 
 ### Why This Design?
 
-1. **Database storage** - Can't store RuntimeObjects, only IDs
-2. **Memory efficiency** - Don't load every referenced object automatically
-3. **Lazy loading** - Objects loaded on demand via `$.load()`
-4. **Cache coherence** - If it's in cache, you get the live object
+1. **Type preservation** - objrefs know they're object references
+2. **Auto-resolution** - Cached objects resolve automatically
+3. **Lazy loading** - Uncached objects load on demand via `$.load()`
+4. **Cache coherence** - You always get the live, in-memory object
 
 ### Quick Reference
 
 | Operation | Use |
 |-----------|-----|
-| Store reference | `self.owner = player` or `self.owner = player.id` |
-| Read reference (unsafe) | `self.owner` (might be ID) |
-| Read reference (safe) | `await $.load(self.owner)` |
-| Check if loaded | `typeof self.owner === 'object'` |
+| Store reference | `self.owner = player` (NOT `player.id`) |
+| Read (might need load) | `await $.load(self.owner)` |
+| Read (if you know it's cached) | `self.owner` |
 | Get ID from object | `player.id` |
 | Load by ID | `await $.load(id)` or `await $[id]` |
 
