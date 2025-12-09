@@ -526,7 +526,45 @@ await $.format.center('hi', 10)     // "    hi    "
 
 ## $.recycler - Object Lifecycle
 
-**Always use `$.recycler` for creating and destroying objects.**
+**Always use `$.recycler` for creating and destroying objects. There is NO other correct way.**
+
+### Why This Is Non-Negotiable
+
+```javascript
+// DON'T: Direct object creation - BROKEN
+const sword = await manager.create({ parent: weaponId, properties: { name: 'Sword' } });
+// Problems:
+// - No object pooling (memory bloat over time)
+// - No recycled object reuse (wasted allocations)
+// - Parent chain not validated
+// - No creation hooks called
+// - Object not tracked for cleanup
+
+// DON'T: Manual deletion - CATASTROPHIC
+delete objects[sword.id];           // Orphans references everywhere
+sword.set('recycled', true);        // Doesn't clean up contents
+await manager.delete(sword.id);     // Bypasses all cleanup hooks
+// Problems:
+// - References from other objects now point to nothing
+// - Contents left floating in limbo
+// - Location's contents array not updated
+// - No cascade to child objects
+// - Database inconsistency
+
+// DO: Always use $.recycler
+const sword = await $.recycler.create($.weapon, { name: 'Iron Sword', damage: 10 });
+await $.recycler.recycle(sword);  // Proper cleanup, available for reuse
+```
+
+$.recycler handles:
+- ✅ Object pooling (reuses recycled objects of same parent type)
+- ✅ Location cleanup (removes from container's contents)
+- ✅ Contents cascade (optionally recycles everything inside)
+- ✅ Reference safety (marks as recycled, doesn't hard-delete)
+- ✅ Memory efficiency (recycle + reuse vs create + delete)
+- ✅ Undo support (unrecycle brings objects back)
+
+**If you bypass $.recycler, you WILL cause database corruption.**
 
 ### Creating Objects
 
