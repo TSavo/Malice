@@ -2,6 +2,34 @@
 
 This guide covers MOO code conventions and the utility objects available via `$.*`.
 
+> **For game rules and player documentation, see [PLAYER-GUIDE.md](./PLAYER-GUIDE.md)**
+
+## Architecture
+
+Malice has three layers:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  Layer 3: DATABASE CONTENT (Closed Source)                  │
+│  The actual world. Specific items, rooms, NPCs, secrets.    │
+├─────────────────────────────────────────────────────────────┤
+│  Layer 2: BOOTSTRAP CODE (Open Source - MOO)                │
+│  Foundational prototypes. "Common knowledge."               │
+├─────────────────────────────────────────────────────────────┤
+│  Layer 1: TYPESCRIPT CORE (Open Source - Minimal)           │
+│  Transport, database, VM. Only what CAN'T be MOO code.      │
+└─────────────────────────────────────────────────────────────┘
+```
+
+| Question | Answer |
+|----------|--------|
+| Does it require network sockets, MongoDB, or VM? | TypeScript (reluctantly) |
+| Is it foundational knowledge everyone has? | Bootstrap (MOO) |
+| Is it specific world content or secrets? | Database (closed) |
+| Can it be MOO code? | **It should be MOO code.** |
+
+TypeScript requires restart. MOO code is hot-reloadable. Everything possible goes in MOO.
+
 ## The Golden Rule: Combine Utilities, Never Duplicate Logic
 
 The utilities in this codebase are designed to **compose together**. Using them correctly turns 20 lines of buggy, inconsistent code into 3 lines of robust, correct code. **NEVER** write your own grammar logic, pronoun handling, list formatting, or message construction.
@@ -110,12 +138,12 @@ const name = player.get('name'); // NO!
 ```javascript
 // CORRECT - Direct assignment via Proxy
 self.hp = 100;
-player.location = room.id;
+player.location = room;   // Store the object, not .id
 item.weight = 5;
 
 // WRONG - Never use .set() in MOO code
 self.set('hp', 100);            // NO!
-player.set('location', room.id); // NO!
+player.set('location', room);   // NO! (and never use .id either)
 ```
 
 ### Calling Methods
@@ -264,10 +292,15 @@ self.owner = player.id;       // NO! Just use player!
 
 **The system stores objrefs. That's the whole point.** When you write `self.location = room`, it stores `{ type: 'objref', value: 42 }` automatically. You never need to extract the ID yourself.
 
-Using `.id` is:
+Using `.id` for storage is:
 - **Pointless** - the system extracts IDs automatically
 - **Harmful** - you lose type information (becomes `number` not `objref`)
-- **Broken** - numbers don't auto-resolve to RuntimeObjects on read
+
+**Exception: Comparison is fine.** Use `.id` when comparing objects:
+```javascript
+if (viewer.id === actor.id) continue;  // ✓ Comparing IDs
+if (viewer === actor) continue;        // ✓ Also works (same cache instance)
+```
 
 ### Reading Object References
 
@@ -1475,7 +1508,7 @@ Since `$` is the ObjectManager, it has methods for alias management:
 
 ```javascript
 // Add an alias (makes $.myUtils work)
-await $.addAlias('myUtils', obj.id);
+await $.addAlias('myUtils', obj);  // Pass object, not .id
 
 // Remove an alias
 await $.removeAlias('myUtils');  // Returns true if removed
@@ -1528,7 +1561,7 @@ myUtils.setMethod('hello', `
 `);
 
 // 3. Register the alias ($ is the ObjectManager)
-await $.addAlias('myUtils', myUtils.id);
+await $.addAlias('myUtils', myUtils);  // Pass object, not .id
 
 // 4. Now it's available everywhere as $.myUtils
 await $.myUtils.hello('Bob');  // "Hello, Bob!"
@@ -1576,7 +1609,7 @@ utils.setMethod('greet', `
   return 'Hello, ' + (args[0] || 'stranger') + '!';
 `);
 
-await $.addAlias('myUtils', utils.id);
+await $.addAlias('myUtils', utils);  // Pass object, not .id
 // Now $.myUtils.greet('Bob') works from anywhere
 ```
 
@@ -1628,7 +1661,7 @@ export class MyUtilsBuilder {
     if (!objectManager) return;
 
     // Use the addAlias method on ObjectManager (#0)
-    await objectManager.call('addAlias', 'myUtils', this.myUtils.id);
+    await objectManager.call('addAlias', 'myUtils', this.myUtils);
   }
 }
 ```
@@ -2486,7 +2519,7 @@ async onLeaving(source, dest, mover) {
   if (source && source.owner) {
     const owner = await $.load(source.owner);
     // Remove all verbs this item registered
-    await owner.unregisterVerbsFrom(self.id);
+    await owner.unregisterVerbsFrom(self);  // Pass object, not .id
   }
 }
 ```
@@ -2588,7 +2621,7 @@ obj.setMethod('myVerb', `
 │        │                   │                    │           │
 │        v                   v                    v           │
 │  unregisterVerbsFrom  unregisterVerbsFrom  unregisterVerbsFrom │
-│  (self.id)            (item.id)          (exit.id)          │
+│  (self)               (item)              (exit)              │
 │                                                             │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -2628,11 +2661,11 @@ Many objects need to swap verbs based on state:
 
 ```javascript
 // In doWear (when wearing succeeds):
-await player.unregisterVerbsFrom(self.id);  // Remove 'wear'
+await player.unregisterVerbsFrom(self);  // Remove 'wear'
 await player.registerVerb(['remove %t', 'take off %t'], self, 'doRemove');
 
 // In doRemove (when removing succeeds):
-await player.unregisterVerbsFrom(self.id);  // Remove 'remove'
+await player.unregisterVerbsFrom(self);  // Remove 'remove'
 await player.registerVerb(['wear %t', 'put on %t'], self, 'doWear');
 ```
 
@@ -2739,7 +2772,7 @@ obj.setMethod('doWear', `
   if (!result.success) return result.error;
 
   // 2. Swap verbs: unregister 'wear', register 'remove'
-  await wearer.unregisterVerbsFrom(self.id);
+  await wearer.unregisterVerbsFrom(self);
   await wearer.registerVerb(['remove ' + self.name], self, 'doRemove');
 
   // 3. Announce to room using utilities
@@ -2758,13 +2791,13 @@ obj.setMethod('doRemove', `
   if (!result.success) return result.error;
 
   // 2. Swap verbs: unregister 'remove', register 'wear'
-  await wearer.unregisterVerbsFrom(self.id);
+  await wearer.unregisterVerbsFrom(self);
   await wearer.registerVerb(['wear ' + self.name], self, 'doWear');
 
   // 3. Place item (try hands, then drop)
   const hands = await wearer.getHands();
   if (hands.primary) {
-    await hands.primary.addContent(self.id);
+    await hands.primary.addContent(self);
   }
 
   // 4. Announce
@@ -2797,7 +2830,7 @@ obj.setMethod('onLeaving', `
   if (source && source.owner) {
     const owner = await $.load(source.owner);
     // Unregister all verbs from this item
-    await owner.unregisterVerbsFrom(self.id);
+    await owner.unregisterVerbsFrom(self);
   }
 `);
 ```
@@ -3064,3 +3097,751 @@ $.clothing.setMethod('wear', `
 | Sensory-aware emotes | `$.emote.broadcast()` |
 | Parse emote to segments | `$.emote.parseSegments()` |
 | Get pronouns for object | `$.emote.getObjectPronoun()` |
+
+## Error Handling
+
+### Errors in MOO Methods
+
+Methods can throw errors just like any JavaScript code. How you handle them depends on context:
+
+```javascript
+// In a player command handler - catch and report gracefully
+async doEat(player, item) {
+  try {
+    await item.consume(player);
+    await player.tell('You eat ' + item.name + '.');
+  } catch (e) {
+    await player.tell('You cannot eat that: ' + e.message);
+  }
+}
+
+// In internal logic - let it propagate or handle specifically
+async transferItem(item, from, to) {
+  // This might throw if movement is blocked
+  await item.moveTo(to);  // Let caller handle errors
+}
+```
+
+### Error Propagation
+
+When a method throws and isn't caught:
+- The error propagates up to the caller
+- If it reaches the player command loop, the player sees a generic error
+- The error is logged server-side
+
+```javascript
+// Player.onInput wraps command dispatch in try/catch
+// So unhandled errors don't crash the server
+try {
+  await handler[verbInfo.method](context, self, argString);
+} catch (e) {
+  context.send('Something went wrong: ' + e.message + '\r\n');
+  console.error('Command error:', e);
+}
+```
+
+### When to Catch vs Let Propagate
+
+```javascript
+// CATCH: When you can recover or give user feedback
+async doOpen(player, container) {
+  try {
+    await container.open(player);
+  } catch (e) {
+    // Specific feedback is better than generic error
+    await player.tell(e.message);
+    return;
+  }
+  await player.tell('You open ' + container.name + '.');
+}
+
+// PROPAGATE: When failure means the whole operation should fail
+async complexOperation(player) {
+  // If any step fails, the whole thing should fail
+  const item = await this.createItem();
+  await item.moveTo(player);  // Let errors bubble up
+  await this.recordTransaction();
+}
+```
+
+### Throwing Meaningful Errors
+
+```javascript
+// DON'T: Generic errors
+throw new Error('Failed');
+
+// DO: Specific, user-friendly messages
+throw new Error('The container is locked.');
+throw new Error('You cannot reach that from here.');
+throw new Error(item.name + ' is too heavy to lift.');
+```
+
+### Movement Cancellation
+
+The `onContentLeaving` hook can throw to cancel movement:
+
+```javascript
+// Container that won't let cursed items leave
+async onContentLeaving(obj, dest, mover) {
+  if (obj.cursed) {
+    throw new Error(obj.name + ' seems stuck to the bottom!');
+  }
+}
+```
+
+## Async/Await Patterns
+
+### Everything is Async
+
+Almost all MOO operations are async:
+
+```javascript
+// Loading objects
+const room = await $.load(42);
+const player = await $.load(playerId);
+
+// Calling methods
+const result = await item.describe();
+await player.moveTo(room);
+
+// Property access through objects loaded async
+const loc = await $.load(self.location);  // If location is just an ID
+const locName = loc.name;
+```
+
+### Always Await When You Need Results
+
+```javascript
+// WRONG: Forgot to await
+const room = $.load(42);  // room is a Promise, not a RuntimeObject!
+room.name;  // undefined - Promises don't have .name
+
+// RIGHT: Await the load
+const room = await $.load(42);
+room.name;  // "Town Square"
+```
+
+### Parallel Loading with Promise.all
+
+When loading multiple independent objects, load them in parallel:
+
+```javascript
+// SLOW: Sequential loading
+const room = await $.load(roomId);
+const player = await $.load(playerId);
+const item = await $.load(itemId);
+
+// FAST: Parallel loading
+const [room, player, item] = await Promise.all([
+  $.load(roomId),
+  $.load(playerId),
+  $.load(itemId)
+]);
+```
+
+### Loading Contents in Parallel
+
+```javascript
+// SLOW: Sequential
+const descriptions = [];
+for (const obj of self.contents) {
+  const desc = await obj.describe();
+  descriptions.push(desc);
+}
+
+// FAST: Parallel
+const descriptions = await Promise.all(
+  self.contents.map(obj => obj.describe())
+);
+```
+
+### Fire-and-Forget is Dangerous
+
+If you don't await, errors are silently lost:
+
+```javascript
+// DANGEROUS: Error is lost
+player.tell('Hello');  // No await - if this fails, you'll never know
+
+// SAFE: Error will propagate
+await player.tell('Hello');
+```
+
+### When Fire-and-Forget is OK
+
+Only skip await when:
+1. You truly don't care about success/failure
+2. You don't need to wait for completion
+3. The operation handles its own errors internally
+
+```javascript
+// OK: Background logging that handles its own errors
+$.logger.logAsync('Player connected');  // Handles errors internally
+
+// OK: Scheduling something for later
+$.scheduler.schedule(60000, self, 'decay');  // Returns immediately
+```
+
+## Context and Output
+
+### The Context Object
+
+`context` is available in player-triggered methods and represents the connection:
+
+```javascript
+// Available in verb handlers
+async doLook(context, player, argString) {
+  // context = the network connection
+  // player = the player RuntimeObject
+  // argString = arguments after the verb
+}
+```
+
+### The `player` Variable
+
+In verb handlers, `player` is the RuntimeObject of who typed the command:
+
+```javascript
+async doLook(context, player, argString) {
+  // player.name - their name
+  // player.location - where they are
+  // player.tell() - send them a message
+
+  // 'self' is the object the method is ON (could be room, item, etc.)
+  // 'player' is WHO triggered the command
+}
+```
+
+## Sensory Output System
+
+Malice distinguishes between **player communication** and **world events**:
+
+- **`tell()`** - The player NEEDS to see this. Direct feedback, system messages. Always delivered.
+- **Five senses** - Something happened in the world. The body might perceive it... or might not (asleep, blind, unconscious, etc.)
+
+This is not just about disabilities. A sleeping player won't see someone enter the room. An unconscious player won't feel pain. The senses are **world events filtered through the body**.
+
+### The Five Senses
+
+Every embodied agent has sensory methods:
+
+```javascript
+// Visual - requires working eyes
+await player.see('Bob waves at you.');     // Returns false if blind
+
+// Auditory - requires working ears
+await player.hear('Bob says, "Hello!"');   // Returns null if deaf
+
+// Olfactory - requires working nose
+await player.smell('A pungent odor of garlic.');  // Returns false if anosmic
+
+// Gustatory - requires working tongue
+await player.taste('A bitter, metallic taste.');  // Returns false if tongueless
+
+// Physical sensation - routed through body parts
+await bodyPart.feel({ type: 'pain', intensity: 7 });  // Pain, touch, temperature
+
+// General output - always works (bypasses senses)
+await player.tell('You feel hungry.');     // System messages, feelings
+```
+
+### When to Use Which
+
+```javascript
+// player.tell() - Player MUST see this. Always delivered.
+// Use for: direct feedback, system messages, internal states
+await player.tell('You pick up the sword.');      // Feedback from their action
+await player.tell('You feel hungry.');            // Internal body state
+await player.tell('You gained 50 experience.');   // System/game message
+await player.tell('Connection lost in 60 seconds.'); // Meta information
+
+// player.see() - World event: something visual happened
+// Player sees it IF awake AND conscious AND has working eyes
+await player.see('Bob enters from the north.');   // World event
+await player.see('A sword lies on the ground.');  // Environment description
+
+// player.hear() - World event: something audible happened
+// Player hears it IF awake AND conscious AND has working ears
+await player.hear('You hear footsteps approaching.');
+await player.hear('Bob says, "Watch out!"');
+
+// player.smell() - World event: an odor is present
+// Player smells it IF conscious AND has working nose
+await player.smell('The air smells of decay.');
+
+// player.taste() - World event: something touches tongue
+// Player tastes it IF conscious AND has working tongue
+await player.taste('The potion tastes bitter.');
+
+// bodyPart.feel() - Physical sensations (pain, touch, temperature)
+// Routes through body part's owner to player.onSensation()
+await targetPart.feel({ type: 'pain', subtype: 'cut', intensity: 6 });
+await targetPart.feel({ type: 'touch', intensity: 3 });
+await targetPart.feel({ type: 'temperature', subtype: 'cold', intensity: 8 });
+```
+
+### Physical Sensations
+
+Physical sensations go through body parts, not directly to the player:
+
+```javascript
+// Inflicting pain on a body part
+async doStab(attacker, targetPart) {
+  // Create wound on the body part
+  await targetPart.inflictWound('stab', 7);
+
+  // The wound creation triggers feel() which routes to owner
+  // Owner receives onSensation({ part, partName, type: 'pain', intensity: 7 })
+}
+
+// Body parts propagate sensations to their owner
+// bodyPart.feel() internally does:
+async feel(sensation) {
+  const owner = await self.getOwner();
+  if (owner && owner.onSensation) {
+    await owner.onSensation({
+      part: self,
+      partName: self.name,
+      ...sensation
+    });
+  }
+}
+```
+
+### Sensory Methods Check Capabilities
+
+The sensory methods check if the player CAN perceive. They return `false` if the message wasn't delivered:
+
+```javascript
+// player.see() internally does:
+async see(message, source) {
+  // First: consciousness check (asleep? knocked out?)
+  if (!self.conscious) return false;
+
+  // Second: do they have the organ?
+  const eyes = await self.getEyes();
+  if (eyes.length === 0) return false;
+
+  // Third: is the organ working?
+  for (const eye of eyes) {
+    if (!eye.condition?.blind && !eye.condition?.destroyed) {
+      // Can perceive - wake them slightly (stimulus)
+      if (self.receiveStimulus) await self.receiveStimulus(4);
+      // Deliver via tell()
+      await self.tell(message);
+      return true;
+    }
+  }
+  return false;  // All eyes blind/destroyed
+}
+```
+
+**Key point:** Sensory events can wake a sleeping player! A loud noise (`hear`) has higher stimulus intensity than a faint smell. Strong enough stimulus transitions sleep state.
+
+### The Emote System: $.emote.broadcast()
+
+For complex actions involving multiple senses, use `$.emote.broadcast()`:
+
+```javascript
+// Simple usage
+await $.emote.broadcast('.wave', player, room);
+// Sighted see: "Bob waves."
+// Blind see: (nothing)
+
+// With speech
+await $.emote.broadcast('.smile and .say "Hello!"', player, room);
+// Sighted+hearing: "Bob smiles and says, 'Hello!'"
+// Blind but hearing: "Bob says, 'Hello!'"
+// Deaf but sighted: "Bob smiles and says something."
+// Blind and deaf: (nothing)
+```
+
+### Emote Syntax Markers
+
+Different markers route to different senses:
+
+| Marker | Type | Sense | Example |
+|--------|------|-------|---------|
+| `.` | Visual action | `see()` | `.wave` → "Bob waves." |
+| `"` | Speech | `hear()` | `"Hello"` → "Bob says, 'Hello.'" |
+| `.say` | Speech verb | `hear()` | `.say "Hi"` → "Bob says, 'Hi.'" |
+| `,` | Audible action | `hear()` | `,growl` → "Bob growls." |
+| `~` | Olfactory | `smell()` | `~reek of garlic` → "Bob reeks of garlic." |
+| `^` | Gustatory | `taste()` | `^taste metallic` → "You taste metallic." |
+
+### Complex Emote Examples
+
+```javascript
+// Visual + speech
+await $.emote.broadcast('.fall to my knees and .say "Help me!"', player, room);
+// Sighted+hearing: "Bob falls to his knees and says, 'Help me!'"
+// Blind: "Bob says, 'Help me!'"
+// Deaf: "Bob falls to his knees and says something."
+
+// Audible non-speech (footsteps, growls)
+await $.emote.broadcast(',stomp loudly', player, room);
+// Hearing: "Bob stomps loudly."
+// Deaf: (nothing - stomping is audible, not visual)
+
+// Olfactory
+await $.emote.broadcast('~emanate a powerful stench', player, room);
+// Can smell: "Bob emanates a powerful stench."
+// Anosmic: (nothing)
+
+// Combined
+await $.emote.broadcast('.grin and ,chuckle softly', player, room);
+// Sighted+hearing: "Bob grins and chuckles softly."
+// Blind: "Bob chuckles softly."
+// Deaf: "Bob grins."
+```
+
+### Pronoun Handling in Emotes
+
+Names shift pronoun targets. `my` always refers to actor:
+
+```javascript
+await $.emote.broadcast('.wave at Alice and .smile at her', bob, room);
+// Alice sees: "Bob waves at you and smiles at you."
+// Others see: "Bob waves at Alice and smiles at her."
+// Bob sees: "You wave at Alice and smile at her."
+```
+
+### Room Broadcasting
+
+For simple room messages, use `room.announce()`:
+
+```javascript
+// Everyone sees (bypasses sensory checks)
+await room.announce('The ground shakes violently!');
+
+// Everyone except one player
+await room.announce('Bob picks up a sword.', bob);
+```
+
+### Perspective-Aware with $.pronoun
+
+For perspective substitution without full emote parsing:
+
+```javascript
+await $.pronoun.announce(room, '%N picks up %t.', player, sword);
+// Actor: "You pick up the sword."
+// Others: "Bob picks up the sword."
+```
+
+### Best Practice: Sensory-Aware Actions
+
+```javascript
+async doPickUp(player, item) {
+  // Move item to player's hand
+  await item.moveTo(player);
+
+  // Actor always gets feedback via tell()
+  await player.tell('You pick up ' + item.name + '.');
+
+  // Others perceive via their senses
+  const room = player.location;
+  await $.emote.broadcast('.pick up ' + item.name, player, room);
+}
+```
+
+### Low-Level: context.send()
+
+For raw output (ANSI codes, special formatting):
+
+```javascript
+// Raw telnet output - needs \r\n
+context.send('\x1b[2J');  // Clear screen
+context.send('Custom formatted text\r\n');
+```
+
+## Debugging
+
+### Console Logging
+
+`console.log()` works but goes to server logs, not the player:
+
+```javascript
+async doSomething(player) {
+  console.log('doSomething called by', player.name);
+  console.log('Location:', player.location?.name);
+  // Check server terminal to see these
+}
+```
+
+### Player-Visible Debugging
+
+For in-game debugging, tell the player:
+
+```javascript
+async doDebugItem(player, item) {
+  await player.tell('=== DEBUG ===');
+  await player.tell('Item ID: #' + item.id);
+  await player.tell('Parent: #' + item.getParent());
+  await player.tell('Location: ' + (item.location?.name || 'nowhere'));
+  await player.tell('Properties: ' + JSON.stringify(item.getOwnProperties(), null, 2));
+}
+```
+
+### Inspecting Object State
+
+```javascript
+// Get all own properties
+const props = obj.getOwnProperties();
+
+// Get all own methods
+const methods = obj.getOwnMethods();
+
+// Get parent chain
+const parent = obj.getParent();  // Just the immediate parent ID
+const chain = await $.getInheritanceChain(obj);  // Full chain
+
+// Check if method exists
+const hasLook = await obj.hasMethodAsync('look');
+```
+
+### Common Debugging Patterns
+
+```javascript
+// Log method entry/exit
+async complexMethod(player) {
+  console.log('>>> complexMethod START', { player: player.name });
+  try {
+    // ... method body ...
+    console.log('<<< complexMethod END success');
+  } catch (e) {
+    console.log('<<< complexMethod END error:', e.message);
+    throw e;
+  }
+}
+
+// Dump object for inspection
+async dumpObject(obj) {
+  return {
+    id: obj.id,
+    parent: obj.getParent(),
+    properties: obj.getOwnProperties(),
+    methods: Object.keys(obj.getOwnMethods())
+  };
+}
+```
+
+### DevTools Integration
+
+The VS Code extension provides:
+- IntelliSense for method editing
+- Type information from `.malice/malice.d.ts`
+- Object browser for inspecting database state
+
+## Contents Manipulation
+
+### The Golden Rule: Use moveTo()
+
+**Never manipulate contents arrays directly.** Always use `moveTo()`:
+
+```javascript
+// WRONG: Direct array manipulation
+room.contents.push(item);      // Breaks verb registration!
+room.contents = [...room.contents, item];  // Breaks hooks!
+
+// WRONG: Manual location setting
+item.location = room;          // Doesn't update room.contents!
+item.set('location', room);    // Doesn't trigger hooks!
+
+// RIGHT: Use moveTo()
+await item.moveTo(room);       // Handles everything correctly
+await item.moveTo(room, player);  // With mover context
+```
+
+### Why moveTo() Matters
+
+`moveTo()` does all of this automatically:
+1. Calls source container's `onContentLeaving()` (can cancel)
+2. Calls moving object's `onLeaving()`
+3. Updates `location` property
+4. Removes from source's `contents` array
+5. Calls source's `onContentLeft()` (unregisters verbs)
+6. Adds to destination's `contents` array
+7. Calls moving object's `onArrived()` (registers verbs)
+8. Calls destination's `onContentArrived()` (registers verbs)
+
+Skipping any of these breaks verb registration.
+
+### Getting Contents
+
+```javascript
+// Contents is an array of RuntimeObjects (if cached)
+for (const obj of room.contents) {
+  await player.tell('- ' + obj.name);
+}
+
+// Filter contents
+const items = room.contents.filter(obj => obj.getParent() === $.item.id);
+const players = room.contents.filter(obj => obj.getParent() === $.player.id);
+
+// Find specific item
+const sword = room.contents.find(obj => obj.name === 'sword');
+```
+
+### Checking Containment
+
+```javascript
+// Is item in this container?
+const isHere = container.contents.some(obj => obj === item);
+const isHere2 = item.location === container;  // Also works
+
+// Recursive containment check
+async isInside(item, container) {
+  let loc = item.location;
+  while (loc) {
+    if (loc === container) return true;
+    loc = loc.location;
+  }
+  return false;
+}
+```
+
+### Moving Multiple Items
+
+```javascript
+// Move all items from one container to another
+async transferAll(from, to, mover) {
+  // Copy array since we're modifying it
+  const items = [...from.contents];
+  for (const item of items) {
+    await item.moveTo(to, mover);
+  }
+}
+```
+
+## Object Creation
+
+### Always Use $.recycler.create()
+
+```javascript
+// WRONG: Never create objects any other way
+const obj = await $.create({ parent: 1, properties: {} });  // NO!
+
+// RIGHT: Use the recycler
+const obj = await $.recycler.create($.item);  // Reuses IDs properly
+const obj2 = await $.recycler.create($.room, { name: 'New Room' });
+```
+
+### Choosing the Right Parent
+
+Pick the most specific prototype that matches what your object IS:
+
+```javascript
+// Creating a room
+const room = await $.recycler.create($.room, {
+  name: 'Dark Cave',
+  description: 'A damp, dark cave.'
+});
+
+// Creating a player
+const player = await $.recycler.create($.player, {
+  name: 'Alice',
+  playername: 'alice'
+});
+
+// Creating clothing
+const shirt = await $.recycler.create($.clothing, {
+  name: 'red shirt',
+  warmth: 5,
+  slots: ['torso']
+});
+
+// Creating food
+const apple = await $.recycler.create($.food, {
+  name: 'apple',
+  calories: 50,
+  bites: 3
+});
+```
+
+### Prototype vs Instance
+
+Most objects are **instances** - they inherit from a prototype but have their own state:
+
+```javascript
+// Instance: A specific apple in the game
+const apple = await $.recycler.create($.food, { name: 'apple' });
+
+// Prototype: Define once, many instances inherit
+// Only create new prototypes when you need new BEHAVIOR, not just new data
+```
+
+### When to Create New Prototypes
+
+Create a new prototype when you need **new methods or different behavior**:
+
+```javascript
+// New prototype: Magical food with special effects
+const magicFood = await $.recycler.create($.food, { name: 'MagicFood' });
+magicFood.setMethod('onEat', `
+  await pass();  // Normal eating
+  await player.tell('You feel magical energy coursing through you!');
+  player.mana = (player.mana || 0) + 50;
+`);
+await $.addAlias('magicFood', magicFood);
+
+// Now create instances of the new prototype
+const manaPotion = await $.recycler.create($.magicFood, {
+  name: 'mana potion',
+  calories: 10
+});
+```
+
+### Setting Properties After Creation
+
+```javascript
+const sword = await $.recycler.create($.item, { name: 'sword' });
+
+// Set additional properties
+sword.description = 'A sharp steel sword.';
+sword.damage = 10;
+sword.weight = 5;
+sword.aliases = ['blade', 'weapon'];
+
+// Place it somewhere
+await sword.moveTo(room);
+```
+
+### Initial Placement
+
+Always use `moveTo()` for initial placement:
+
+```javascript
+// Create and place
+const chest = await $.recycler.create($.container, { name: 'chest' });
+await chest.moveTo(room);  // Place in room
+
+const gold = await $.recycler.create($.item, { name: 'gold coins' });
+await gold.moveTo(chest);  // Place in chest
+```
+
+### Creating Multiple Related Objects
+
+```javascript
+// Create a room with contents
+async createShop() {
+  const shop = await $.recycler.create($.room, {
+    name: 'General Store',
+    description: 'A cluttered shop full of goods.'
+  });
+
+  // Create items and place them
+  const items = ['rope', 'torch', 'rations'];
+  for (const name of items) {
+    const item = await $.recycler.create($.item, { name });
+    await item.moveTo(shop);
+  }
+
+  // Create the shopkeeper
+  const keeper = await $.recycler.create($.npc, {
+    name: 'shopkeeper',
+    description: 'A friendly merchant.'
+  });
+  await keeper.moveTo(shop);
+
+  return shop;
+}

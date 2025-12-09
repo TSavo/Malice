@@ -110,7 +110,7 @@ declare global {
 
 ```typescript
 // Run this once in the bootstrap
-await objectManager.registerAlias('system', systemObject);
+await $.addAlias('system', systemObject);
 ```
 
 **Step 5:** Use from ANY method:
@@ -236,7 +236,8 @@ return Math.floor(Math.random() * sides) + 1;
 **4. Register alias (bootstrap):**
 
 ```typescript
-await objectManager.registerAlias('system', await objectManager.load(2));
+const systemObj = await $.load(2);
+await $.addAlias('system', systemObj);
 ```
 
 ### Use (In Any Method)
@@ -261,7 +262,7 @@ player.location = 1;
 
 // Use system utilities
 const startingGold = await $.system.rollDice(100);
-await $.system.sendMessage(player.id, `You start with ${startingGold} gold!`);
+await $.system.sendMessage(player, `You start with ${startingGold} gold!`);
 
 // Save
 await player.save();
