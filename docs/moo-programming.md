@@ -79,7 +79,11 @@ await victim.call('tell', 'You take ' + damage + ' damage!');
 | `$.pronoun` | Pronoun substitution, perspective-aware messaging |
 | `$.format` | Text layout: columns, tables, lists, templates |
 | `$.proportional` | Proportional message selection (health bars, etc.) |
+| `$.prompt` | Interactive prompts (question, choice, menu, multiline) |
 | `$.recycler` | Object lifecycle: create, recycle, unrecycle |
+| `$.memento` | Object graph serialization and cloning |
+| `$.mutex` | Object-based mutex locks with timeouts |
+| `$.scheduler` | Periodic job scheduling (heartbeats, decay) |
 | `$.emote` | Sensory-aware emotes with `.verb` syntax |
 
 ## $.english - Grammar Utilities
@@ -551,6 +555,289 @@ const condition = await $.proportional.sub(
 );
 ```
 
+## $.prompt - Interactive Prompts
+
+Use `$.prompt` for gathering input from players. All prompts return Promises that resolve when the player responds.
+
+### Text Questions
+
+```javascript
+// Simple text question
+const name = await $.prompt.question(player, 'What is your name? ');
+await player.tell('Hello, ' + name + '!');
+
+// With validation
+const age = await $.prompt.question(player, 'Enter your age: ', (input) => {
+  const num = parseInt(input, 10);
+  if (isNaN(num) || num < 1 || num > 150) {
+    return 'Please enter a valid age (1-150).';
+  }
+  return null; // null = valid
+});
+```
+
+### Yes/No Questions
+
+```javascript
+const confirmed = await $.prompt.yesorno(player, 'Are you sure?');
+if (confirmed) {
+  await player.tell('Proceeding...');
+} else {
+  await player.tell('Cancelled.');
+}
+// Accepts: yes, y, no, n (case insensitive)
+```
+
+### Choice Menus
+
+```javascript
+// Simple numbered choice
+const choice = await $.prompt.choice(player, 'Pick a class:', {
+  warrior: 'Warrior - Strong melee fighter',
+  mage: 'Mage - Powerful spellcaster',
+  rogue: 'Rogue - Stealthy assassin',
+});
+await player.tell('You chose: ' + choice); // Returns key: 'warrior', 'mage', or 'rogue'
+
+// Columnar menu (better for many options)
+const race = await $.prompt.menu(player, 'Choose your race:', {
+  human: 'Human',
+  elf: 'Elf',
+  dwarf: 'Dwarf',
+  orc: 'Orc',
+  halfling: 'Halfling',
+  gnome: 'Gnome',
+}, 2); // 2 columns
+// Accepts: number, key name, or partial match
+```
+
+### Multiline Input
+
+```javascript
+// Collect multiple lines (ends with '.' on its own line)
+const description = await $.prompt.multiline(player, 'Enter your description:');
+// Player types multiple lines, ends with just "."
+// User can type @abort to cancel (throws Error)
+
+player.description = description;
+await player.tell('Description set!');
+```
+
+### Prompt State Management
+
+```javascript
+// Check if player is in a prompt
+if (await $.prompt.isActive(player)) {
+  await player.tell('Please answer the current question first.');
+  return;
+}
+
+// Cancel current prompt (resolves with null)
+await $.prompt.cancel(player);
+```
+
+## $.memento - Object Cloning
+
+Use `$.memento` to serialize object graphs and create clones with new IDs. Perfect for body templates, equipment sets, or any object tree that needs duplication.
+
+### How It Works
+
+- **capture()** - Serializes objects to JSON, replacing in-graph IDs with placeholders
+- **rehydrate()** - Creates new objects from the serialized data with fresh IDs
+- External references (objects not in the capture list) stay as-is
+
+### Basic Cloning
+
+```javascript
+// Clone a single object
+const clone = await $.memento.clone([original]);
+const newObj = clone['%0']; // %0 is first object
+
+// Clone a connected tree (body with parts)
+const clones = await $.memento.clone([body, head, leftArm, rightArm]);
+// clones['%0'] = new body, clones['%1'] = new head, etc.
+// Internal references are updated to point to new objects
+```
+
+### Capture and Rehydrate Separately
+
+```javascript
+// Capture to JSON (for storage/templates)
+const template = await $.memento.capture([body, head, leftArm, rightArm]);
+// template is a JSON string
+
+// Store the template
+prototype.bodyTemplate = template;
+
+// Later: create instances from template
+const newParts = await $.memento.rehydrate(prototype.bodyTemplate);
+const newBody = newParts['%0'];
+```
+
+### What Gets Captured
+
+```javascript
+// Objects in the array = "in-graph" -> get new IDs
+// References to other objects = "external" -> stay as existing IDs
+
+const parts = await $.memento.clone([body, arm]);
+// body.owner = #123 (external) -> stays #123
+// arm.parent = body (in-graph) -> updated to new body's ID
+```
+
+## $.mutex - Object Locks
+
+Use `$.mutex` for preventing race conditions on objects. Locks are stored on the objects themselves and can auto-expire.
+
+### Basic Locking
+
+```javascript
+// Try to acquire a lock
+const blocked = await $.mutex.acquire(room, 'movement');
+
+if (blocked) {
+  // Lock already held - blocked contains the stored data
+  await player.tell('Room is busy, please wait.');
+  return;
+}
+
+// Got the lock - do work
+await movePlayer(player, room);
+
+// Release when done
+await $.mutex.release(room, 'movement');
+```
+
+### Locks with Data
+
+```javascript
+// Store data with the lock (who/what is holding it)
+const blocked = await $.mutex.acquire(room, 'combat', {
+  attacker: player.id,
+  startedAt: Date.now()
+});
+
+if (blocked) {
+  // blocked = { attacker: 456, startedAt: 1234567890 }
+  await player.tell('Combat in progress by player #' + blocked.attacker);
+  return;
+}
+```
+
+### Auto-Expiring Locks
+
+```javascript
+// Lock with timeout (auto-releases after 30 seconds)
+await $.mutex.acquire(player, 'crafting', { item: 'sword' }, 30000);
+
+// Do long operation...
+
+// Release manually (cancels auto-release)
+await $.mutex.release(player, 'crafting');
+
+// Or let it auto-release if player disconnects/times out
+```
+
+### Other Operations
+
+```javascript
+// Check without acquiring
+const holder = await $.mutex.check(obj, 'lockName');
+if (holder) {
+  // Lock is held, holder contains the data
+}
+
+// Update data on existing lock
+await $.mutex.update(obj, 'lockName', { newData: true });
+
+// Extend timeout on existing lock
+await $.mutex.extend(obj, 'lockName', 60000); // Another 60s
+
+// List all locks on object (debugging)
+const locks = await $.mutex.list(obj);
+// { lockName: { data: {...}, acquiredAt: 1234567890 }, ... }
+
+// Release all locks on object
+await $.mutex.releaseAll(obj);
+```
+
+## $.scheduler - Periodic Jobs
+
+Use `$.scheduler` for recurring tasks like heartbeats, decay processing, and timed events.
+
+### Scheduling Jobs
+
+```javascript
+// schedule(name, delay, interval, target, method, ...args)
+
+// One-shot: runs once after delay, then deleted
+await $.scheduler.schedule('reminder', 60000, 0, player, 'tell', 'Remember to save!');
+// Runs in 60 seconds, then job is removed
+
+// Repeating: runs every interval after initial delay
+await $.scheduler.schedule('heartbeat', 0, 60000, $.system, 'tick');
+// First run immediately (delay=0), then every 60 seconds
+
+// Delayed start repeating
+await $.scheduler.schedule('warmup', 10000, 60000, $.system, 'tick');
+// First run in 10s, then every 60s thereafter
+```
+
+### Job Parameters
+
+| Parameter | Description |
+|-----------|-------------|
+| `name` | Unique job identifier |
+| `delay` | ms until first run (0 = next tick) |
+| `interval` | ms between runs (0 = one-shot, deleted after run) |
+| `target` | Object (or ID) to call method on |
+| `method` | Method name to call |
+| `...args` | Arguments to pass to method |
+
+### Managing Jobs
+
+```javascript
+// Remove a job
+await $.scheduler.unschedule('jobName');
+
+// Enable/disable without removing
+await $.scheduler.setEnabled('jobName', false);
+await $.scheduler.setEnabled('jobName', true);
+
+// Get job info
+const job = await $.scheduler.getJob('jobName');
+// { interval, nextRun, targetId, method, args, enabled }
+
+// List all job names
+const names = await $.scheduler.listJobs();
+// ['heartbeat', 'decayTick', ...]
+
+// Force immediate run (for testing)
+await $.scheduler.runNow('jobName');
+```
+
+### Built-in Jobs
+
+The system registers these jobs automatically:
+
+| Job | Interval | Purpose |
+|-----|----------|---------|
+| `playerHeartbeat` | 60s | Calls `$.system.tickAllPlayers()` |
+| `decayTick` | 60s | Processes decay on all decayable objects |
+
+### Custom Recurring Tasks
+
+```javascript
+// Example: save all players every 5 minutes
+await $.scheduler.schedule('autosave', 0, 300000, $.system, 'saveAllPlayers');
+
+// Example: respawn enemies every 10 minutes
+await $.scheduler.schedule('respawn', 0, 600000, spawner, 'respawnAll');
+
+// Example: clean up expired sessions hourly
+await $.scheduler.schedule('cleanup', 0, 3600000, $.authManager, 'cleanupSessions');
+```
+
 ## $.emote - Sensory Emotes
 
 Freeform emote parsing with sensory awareness. Different viewers perceive different parts based on their senses.
@@ -881,6 +1168,16 @@ When creating new object types, inherit from the appropriate prototype:
 | Destroy objects | `$.recycler.recycle()` |
 | Proportional message | `$.proportional.sub()` |
 | Percentage message | `$.proportional.fromPercent()` |
+| Ask text question | `$.prompt.question()` |
+| Ask yes/no | `$.prompt.yesorno()` |
+| Show choice menu | `$.prompt.choice()`, `$.prompt.menu()` |
+| Multiline input | `$.prompt.multiline()` |
+| Clone object tree | `$.memento.clone()` |
+| Serialize objects | `$.memento.capture()` |
+| Acquire lock | `$.mutex.acquire()` |
+| Release lock | `$.mutex.release()` |
+| Schedule job | `$.scheduler.schedule()` |
+| Remove job | `$.scheduler.unschedule()` |
 | Format tables/columns | `$.format.table()`, `$.format.columns()` |
 | Sensory-aware emotes | `$.emote.broadcast()` |
 | Parse emote to segments | `$.emote.parseSegments()` |
