@@ -78,6 +78,7 @@ await victim.call('tell', 'You take ' + damage + ' damage!');
 | `$.english` | Grammar: articles, plurals, conjugation, ordinals |
 | `$.pronoun` | Pronoun substitution, perspective-aware messaging |
 | `$.format` | Text layout: columns, tables, lists, templates |
+| `$.proportional` | Proportional message selection (health bars, etc.) |
 | `$.recycler` | Object lifecycle: create, recycle, unrecycle |
 | `$.emote` | Sensory-aware emotes with `.verb` syntax |
 
@@ -144,43 +145,125 @@ await $.english.list(['a', 'b', 'c'])  // "a, b, and c"
 
 ## $.pronoun - Perspective-Aware Text
 
-Use `$.pronoun.sub()` for text that varies by viewer (second vs third person).
+Use `$.pronoun.sub()` for text that varies by viewer (second vs third person). This is essential for immersive messaging where the actor sees "You" while others see the actor's name.
 
 ### Template Codes
 
-| Code | Meaning | You | Third Person |
-|------|---------|-----|--------------|
+**Actor codes** (the person performing the action):
+
+| Code | Meaning | Actor Sees | Others See |
+|------|---------|------------|------------|
 | `%N` | Actor name (cap) | You | Bob |
-| `%n` | Actor name | you | Bob |
+| `%n` | Actor name (lower) | you | Bob |
 | `%s` | Subject pronoun | you | he/she/they |
 | `%o` | Object pronoun | you | him/her/them |
-| `%p` | Possessive | your | his/her/their |
-| `%r` | Reflexive | yourself | himself/herself |
-| `%v{verb}` | Conjugated verb | cut | cuts |
-| `%d` | Direct object name | | |
-| `%i` | Item/indirect object | | |
-| `%l` | Location name | | |
+| `%p` | Possessive pronoun | your | his/her/their |
+| `%q` | Possessive noun | yours | his/hers/theirs |
+| `%r` | Reflexive | yourself | himself/herself/themselves |
+| `%v{verb}` | Conjugated verb | walk | walks |
 
-### Usage
+**Target codes** (the person being acted upon) - prefix with `%t`:
+
+| Code | Meaning | Target Sees | Others See |
+|------|---------|-------------|------------|
+| `%tN` | Target name (cap) | You | Jim |
+| `%tn` | Target name (lower) | you | Jim |
+| `%ts` | Target subject | you | he/she/they |
+| `%to` | Target object | you | him/her/them |
+| `%tp` | Target possessive | your | his/her/their |
+| `%tq` | Target possessive noun | yours | his/hers/theirs |
+| `%tr` | Target reflexive | yourself | himself/herself |
+
+**Object codes** (things involved in the action):
+
+| Code | Meaning | Example |
+|------|---------|---------|
+| `%d` | Direct object | "the sword" |
+| `%D` | Direct object (cap) | "The sword" |
+| `%i` | Indirect object | "the chest" |
+| `%I` | Indirect object (cap) | "The chest" |
+| `%l` | Location name | "the tavern" |
+| `%L` | Location name (cap) | "The tavern" |
+
+### Basic Usage
 
 ```javascript
-// Basic substitution
+// sub(template, actor, directObj?, target?, indirectObj?, location?)
+
+// Simple action
 const msg = await $.pronoun.sub('%N %v{pick} up %d.', actor, sword);
 // Actor sees: "You pick up the sword."
 // Others see: "Bob picks up the sword."
 
-// With target pronouns (%tN, %ts, %to, %tp, %tr)
-const msg = await $.pronoun.sub('%N %v{punch} %tN in %tp face!', attacker, null, target);
-// Attacker: "You punch Bob in his face!"
-// Target:   "Bob punches you in your face!"
-// Others:   "Bob punches Jim in his face!"
+// Action with target
+const msg = await $.pronoun.sub('%N %v{give} %d to %tN.', giver, sword, receiver);
+// Giver sees:    "You give the sword to Jim."
+// Receiver sees: "Bob gives the sword to you."
+// Others see:    "Bob gives the sword to Jim."
+
+// Complex interaction
+const msg = await $.pronoun.sub(
+  '%N %v{punch} %tN in %tp face, breaking %tr nose!',
+  attacker, null, victim
+);
+// Attacker sees: "You punch Jim in his face, breaking his nose!"
+// Victim sees:   "Bob punches you in your face, breaking your nose!"
+// Others see:    "Bob punches Jim in his face, breaking his nose!"
+```
+
+### Possessives
+
+```javascript
+// Possessive pronoun (adjective form)
+await $.pronoun.sub('%N %v{take} %p sword.', actor);
+// Actor: "You take your sword."
+// Others: "Bob takes his sword."
+
+// Possessive noun (standalone form)
+await $.pronoun.sub('The victory is %q!', actor);
+// Actor: "The victory is yours!"
+// Others: "The victory is his!"
 ```
 
 ### announce() - Room Messaging
 
+The main way to send perspective-correct messages to a room:
+
 ```javascript
-// Send perspective-correct message to everyone in a room
+// Everyone in the room gets the appropriate perspective
 await $.pronoun.announce(room, '%N %v{enter} from the north.', actor);
+
+// With objects
+await $.pronoun.announce(room, '%N %v{drop} %d.', actor, item);
+
+// With targets
+await $.pronoun.announce(room, '%N %v{wave} at %tN.', actor, null, target);
+
+// Full signature
+await $.pronoun.announce(room, template, actor, directObj, target, indirectObj, location);
+```
+
+### tell() vs announce()
+
+```javascript
+// tell() - Send to one specific person
+await $.pronoun.tell(player, '%N %v{feel} dizzy.', player);
+// Player sees: "You feel dizzy."
+
+// announce() - Send to everyone in a room
+await $.pronoun.announce(room, '%N %v{collapse}.', actor);
+// Actor sees: "You collapse."
+// Others see: "Bob collapses."
+```
+
+### Custom Viewer
+
+```javascript
+// Format for a specific viewer (not the actor)
+const msg = await $.pronoun.sub('%N %v{smile} at %tN.', actor, null, target, null, null, viewer);
+// If viewer is actor: "You smile at Bob."
+// If viewer is target: "Jim smiles at you."
+// If viewer is neither: "Jim smiles at Bob."
 ```
 
 ## $.format - Text Formatting
@@ -197,24 +280,110 @@ await $.format.prose(['red', 'blue'], 'or')        // "red or blue"
 
 ### compose() - Template Composition
 
-Combines list formatting, verb conjugation, and pronoun substitution:
+The most powerful formatting tool - combines list formatting, count-based verb conjugation, and pronoun substitution in one call.
+
+**Template codes for lists:**
+
+| Code | Meaning | 1 item | 2+ items |
+|------|---------|--------|----------|
+| `%T` | List with "The" | "The sword" | "The sword and shield" |
+| `%t` | List with "the" | "the sword" | "the sword and shield" |
+| `%A` | List with "A/An" | "A sword" | "A sword and shield" |
+| `%a` | List with "a/an" | "a sword" | "a sword and shield" |
+| `%v{verb}` | Verb conjugated by list count | "falls" | "fall" |
+
+**Plus all `$.pronoun` codes** (`%N`, `%s`, `%p`, `%tN`, etc.) when you pass an actor.
+
+### Basic List Formatting
 
 ```javascript
-// Template codes:
-//   %T - Capitalized list with article ("The sword and shield")
-//   %t - Lowercase list with article ("the sword and shield")
-//   %v{verb} - Verb conjugated by count (falls/fall)
-//   Plus all $.pronoun.sub codes
+// Single item
+await $.format.compose('%T %v{fall} to the ground.', ['sword'])
+// "The sword falls to the ground."
 
-await $.format.compose('%T %v{fall} away in tatters.', ['pants'])
-// "The pants falls away in tatters."
+// Multiple items
+await $.format.compose('%T %v{fall} to the ground.', ['sword', 'shield'])
+// "The sword and shield fall to the ground."
 
-await $.format.compose('%T %v{fall} away in tatters.', ['shirt', 'pants'])
-// "The shirt and pants fall away in tatters."
+// Three+ items (Oxford comma)
+await $.format.compose('%T %v{clatter} noisily.', ['sword', 'shield', 'helm'])
+// "The sword, shield, and helm clatter noisily."
+```
 
-await $.format.compose('%N watches as %t %v{tumble} to the ground.',
-  ['coins'], { actor: player })
-// "Bob watches as the coins tumble to the ground."
+### Combining with Pronouns
+
+```javascript
+// compose(template, items, options)
+// options: { actor, directObj, target, indirectObj, location, viewer }
+
+// Actor watching items fall
+await $.format.compose(
+  '%N %v{watch} as %t %v{tumble} to the ground.',
+  ['coins'],
+  { actor: player }
+);
+// Player sees: "You watch as the coins tumble to the ground."
+// Others see:  "Bob watches as the coins tumble to the ground."
+
+// Actor dropping multiple items
+await $.format.compose(
+  '%N %v{drop} %t.',
+  ['sword', 'shield'],
+  { actor: player }
+);
+// Player sees: "You drop the sword and shield."
+// Others see:  "Bob drops the sword and shield."
+
+// Full interaction with target
+await $.format.compose(
+  '%N %v{throw} %t at %tN!',
+  ['dagger', 'rock'],
+  { actor: attacker, target: victim }
+);
+// Attacker sees: "You throw the dagger and rock at Bob!"
+// Victim sees:   "Jim throws the dagger and rock at you!"
+// Others see:    "Jim throws the dagger and rock at Bob!"
+```
+
+### Verb Conjugation by Count
+
+The `%v{verb}` in compose uses the **list count** for conjugation:
+
+```javascript
+// 1 item = singular verb (falls, is, has)
+// 2+ items = plural verb (fall, are, have)
+
+await $.format.compose('%T %v{is} broken.', ['sword'])
+// "The sword is broken."
+
+await $.format.compose('%T %v{is} broken.', ['sword', 'shield'])
+// "The sword and shield are broken."
+
+// Works with irregular verbs
+await $.format.compose('%T %v{have} been destroyed.', ['sword'])
+// "The sword has been destroyed."
+
+await $.format.compose('%T %v{have} been destroyed.', ['sword', 'armor'])
+// "The sword and armor have been destroyed."
+```
+
+### Real-World Examples
+
+```javascript
+// Inventory pickup
+const items = ['rusty sword', 'torn cloak', 'gold coin'];
+await $.format.compose('%N %v{pick} up %t.', items, { actor: player });
+// "You pick up the rusty sword, torn cloak, and gold coin."
+
+// Clothing destruction (decay system)
+const destroyed = ['shirt', 'pants'];
+await $.format.compose('%p %T %v{fall} away in tatters.', destroyed, { actor: corpse });
+// "His shirt and pants fall away in tatters."
+
+// Combat hit
+const wounds = ['deep gash', 'bruise'];
+await $.format.compose('%N %v{inflict} %a on %tN!', wounds, { actor: attacker, target: victim });
+// "You inflict a deep gash and bruise on Bob!"
 ```
 
 ### Count-Based Verb Conjugation
@@ -310,6 +479,76 @@ if (await $.recycler.canRecycle(obj)) {
 ```javascript
 // Bring back from the dead
 await $.recycler.unrecycle(obj);
+```
+
+## $.proportional - Proportional Message Selection
+
+Use `$.proportional` to select messages based on a value within a range. Perfect for health bars, hunger, thirst, capacity indicators, etc.
+
+### How It Works
+
+- First message (index 0) is returned ONLY when amount = 0
+- Last message (index n-1) is returned ONLY when amount = total
+- Middle messages are distributed evenly across the remaining range
+
+### Basic Usage
+
+```javascript
+// Select message based on current/max value
+const healthMsg = await $.proportional.sub(
+  ['dead', 'critical', 'wounded', 'hurt', 'healthy'],
+  player.hp,      // current value
+  player.maxHp    // maximum value
+);
+
+// Example with hp=15, maxHp=100:
+//   hp=0:      'dead'
+//   hp=1-24:   'critical'
+//   hp=25-49:  'wounded'
+//   hp=50-74:  'hurt'
+//   hp=75-99:  'healthy' (close but not at max)
+//   hp=100:    'healthy' (at max)
+```
+
+### Get Index Instead
+
+```javascript
+// Get which message index (0-based) would be selected
+const idx = await $.proportional.index(['empty', 'low', 'half', 'full'], 50, 100);
+// idx = 2 (would select 'half')
+```
+
+### Percentage Shorthand
+
+```javascript
+// Use percentage directly (0-100 scale)
+const msg = await $.proportional.fromPercent(
+  ['empty', 'quarter', 'half', 'three-quarters', 'full'],
+  75
+);
+// Returns 'three-quarters'
+```
+
+### Common Use Cases
+
+```javascript
+// Hunger system
+const hunger = await $.proportional.sub(
+  ['starving', 'famished', 'hungry', 'peckish', 'satisfied', 'full', 'stuffed'],
+  player.food, player.maxFood
+);
+
+// Container capacity
+const capacity = await $.proportional.sub(
+  ['empty', 'nearly empty', 'partially filled', 'mostly full', 'full'],
+  container.contents.length, container.capacity
+);
+
+// Weapon durability
+const condition = await $.proportional.sub(
+  ['broken', 'badly damaged', 'damaged', 'worn', 'good', 'pristine'],
+  weapon.durability, weapon.maxDurability
+);
 ```
 
 ## $.emote - Sensory Emotes
@@ -640,6 +879,8 @@ When creating new object types, inherit from the appropriate prototype:
 | Room announcements | `$.pronoun.announce()` |
 | Create objects | `$.recycler.create()` |
 | Destroy objects | `$.recycler.recycle()` |
+| Proportional message | `$.proportional.sub()` |
+| Percentage message | `$.proportional.fromPercent()` |
 | Format tables/columns | `$.format.table()`, `$.format.columns()` |
 | Sensory-aware emotes | `$.emote.broadcast()` |
 | Parse emote to segments | `$.emote.parseSegments()` |
