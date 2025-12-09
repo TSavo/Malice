@@ -194,7 +194,7 @@ export class PlayerBuilder {
         if (sleepState === 'falling_asleep') {
           // Stimulus! Any input cancels dozing - player jerks awake
           await self.cancelSleepTransition();
-          self.set('sleepState', 'awake');
+          self.sleepState = 'awake';
           await self.tell('You jerk awake, catching yourself before nodding off.');
           // Continue processing their command normally
         } else if (sleepState === 'waking_up') {
@@ -425,7 +425,7 @@ export class PlayerBuilder {
       await player.burnCalories(secondaryPath, check.liftCaloriesNeeded);
 
       // Mark as two-hand carry
-      player.set('twoHandCarry', item.id);
+      player.twoHandCarry = item.id;
 
       // Announce to room
       const location = player.location ? await $.load(player.location) : null;
@@ -512,7 +512,7 @@ export class PlayerBuilder {
       await player.burnCalories(armPath, dragCalories);
 
       // Mark as dragging
-      player.set('dragging', item.id);
+      player.dragging = item.id;
 
       // Announce to room
       const location = player.location ? await $.load(player.location) : null;
@@ -569,10 +569,10 @@ export class PlayerBuilder {
 
       // Clear carry mode flags if this was the item being carried
       if (player.dragging === item.id) {
-        player.set('dragging', null);
+        player.dragging = null;
       }
       if (player.twoHandCarry === item.id) {
-        player.set('twoHandCarry', null);
+        player.twoHandCarry = null;
       }
 
       // Announce to room
@@ -723,7 +723,7 @@ export class PlayerBuilder {
       if (sleepState === 'asleep') {
         // Sleeping: reduce debt at 3x rate
         sleepDebt = Math.max(0, sleepDebt - 3);
-        self.set('sleepDebt', sleepDebt);
+        self.sleepDebt = sleepDebt;
         results.sleep.debt = sleepDebt;
 
         // Wake naturally when debt hits 0 (fully rested)
@@ -733,7 +733,7 @@ export class PlayerBuilder {
       } else if (sleepState === 'awake') {
         // Awake: accumulate debt
         sleepDebt += 1;
-        self.set('sleepDebt', sleepDebt);
+        self.sleepDebt = sleepDebt;
         results.sleep.debt = sleepDebt;
 
         // Tiredness messages at thresholds
@@ -849,7 +849,7 @@ export class PlayerBuilder {
       const sedation = self.sedation || 0;
       if (sedation > 0) {
         const newSedation = Math.max(0, sedation - 1);
-        self.set('sedation', newSedation);
+        self.sedation = newSedation;
         results.sleep.sedation = newSedation;
       }
 
@@ -887,7 +887,7 @@ export class PlayerBuilder {
                     await $.recycler.recycle(item);
                   }
                 }
-                stomach.set('contents', []);
+                stomach.contents = [];
               }
             }
             // Reduce nausea after vomiting
@@ -907,7 +907,7 @@ export class PlayerBuilder {
             const body = await self.getBody();
             if (body) {
               const currentDecay = body.decayLevel || 0;
-              body.set('decayLevel', Math.min(100, currentDecay + 1));
+              body.decayLevel = Math.min(100, currentDecay + 1);
               results.effects.heartDamage = true;
             }
           }
@@ -936,7 +936,7 @@ export class PlayerBuilder {
         const hydrationRate = sleepState === 'asleep' ? 0.0115 : 0.023;
         const currentHydration = body.hydration ?? 100;
         const newHydration = Math.max(0, currentHydration - hydrationRate);
-        body.set('hydration', newHydration);
+        body.hydration = newHydration;
         results.hydration.depleted = hydrationRate;
         results.hydration.level = newHydration;
 
@@ -945,7 +945,7 @@ export class PlayerBuilder {
           // Severe dehydration damages the body directly
           // 2% decay per tick when fully dehydrated = death in ~50 ticks (under 1 hour)
           const currentDecay = body.decayLevel || 0;
-          body.set('decayLevel', Math.min(100, currentDecay + 2));
+          body.decayLevel = Math.min(100, currentDecay + 2);
           results.hydration.decaying = true;
         }
 
@@ -971,7 +971,7 @@ export class PlayerBuilder {
 
       // Notify on calorie status change (e.g., satisfied -> hungry)
       if (calorieStatus.status !== prevCalorieStatus) {
-        self.set('_lastCalorieStatus', calorieStatus.status);
+        self._lastCalorieStatus = calorieStatus.status;
 
         // Only notify if awake
         if (self.sleepState === 'awake') {
@@ -1027,7 +1027,7 @@ export class PlayerBuilder {
         const prevThirstStatus = self._lastThirstStatus || 'hydrated';
         const thirstStatus = results.hydration.status;
         if (thirstStatus !== prevThirstStatus) {
-          self.set('_lastThirstStatus', thirstStatus);
+          self._lastThirstStatus = thirstStatus;
           const thirstMessages = {
             'hydrated': 'You feel well-hydrated.',
             'thirsty': 'You feel thirsty. You could use a drink.',
@@ -1075,7 +1075,7 @@ export class PlayerBuilder {
 
       // Notify on fat status change
       if (fatInfo.status !== prevFatStatus) {
-        self.set('_lastFatStatus', fatInfo.status);
+        self._lastFatStatus = fatInfo.status;
 
         if (self.sleepState === 'awake') {
           const fatMessages = {
@@ -1103,8 +1103,8 @@ export class PlayerBuilder {
       // Check if it's a new day
       const today = new Date().toDateString();
       if (self.fitnessLastDay !== today) {
-        self.set('fitnessLastDay', today);
-        self.set('fitnessXPToday', 0);
+        self.fitnessLastDay = today;
+        self.fitnessXPToday = 0;
       }
 
       // Only earn XP if under daily cap
@@ -1114,12 +1114,12 @@ export class PlayerBuilder {
 
         if (playtime >= 180) {
           // 3 hours reached - award 1 XP to pool
-          self.set('fitnessPlaytime', 0);
-          self.set('fitnessXPToday', (self.fitnessXPToday || 0) + 1);
-          self.set('fitnessXP', (self.fitnessXP || 0) + 1);
+          self.fitnessPlaytime = 0;
+          self.fitnessXPToday = (self.fitnessXPToday || 0) + 1;
+          self.fitnessXP = (self.fitnessXP || 0) + 1;
           await self.tell('You earned 1 fitness XP! (Use @fitness to spend it)');
         } else {
-          self.set('fitnessPlaytime', playtime);
+          self.fitnessPlaytime = playtime;
         }
       }
 
@@ -1167,7 +1167,7 @@ export class PlayerBuilder {
       if (player.sleepState === 'falling_asleep') {
         // Cancel sleep attempt
         await player.cancelSleepTransition();
-        player.set('sleepState', 'awake');
+        player.sleepState = 'awake';
         return 'You stop yourself from falling asleep.';
       }
 
@@ -1348,10 +1348,10 @@ export class PlayerBuilder {
       await self.tell('');
 
       // Unregister all verbs
-      self.set('verbs', {});
+      self.verbs = {};
 
       // Clear body reference
-      self.set('bodyId', null);
+      self.bodyId = null;
 
       // Disconnect from old location
       if (self.location) {
@@ -1359,15 +1359,15 @@ export class PlayerBuilder {
         if (location && location.removeContent) {
           await location.removeContent(self.id);
         }
-        self.set('location', null);
+        self.location = null;
       }
 
       // Reset player state for new character
-      self.set('isDying', false);
-      self.set('dyingProgress', 0);
-      self.set('sleepState', 'awake');
-      self.set('sleepDebt', 0);
-      self.set('statusEffects', {});
+      self.isDying = false;
+      self.dyingProgress = 0;
+      self.sleepState = 'awake';
+      self.sleepDebt = 0;
+      self.statusEffects = {};
 
       // Send to chargen for new character
       if (self._context && $.charGen) {
@@ -1420,7 +1420,7 @@ export class PlayerBuilder {
        *  Usage: @fitness
        *  Manage your physical training goals.
        */
-      self.set('_inFitnessMenu', true);
+      self._inFitnessMenu = true;
       await self.showFitnessMenu();
     `);
 
@@ -1543,7 +1543,7 @@ export class PlayerBuilder {
       };
 
       if (input === 'q' || input === 'quit' || input === 'exit') {
-        self.set('_inFitnessMenu', false);
+        self._inFitnessMenu = false;
         await self.tell('Exiting fitness menu.');
         await self.print('> ');
         return;
@@ -1648,7 +1648,7 @@ export class PlayerBuilder {
       }
 
       // Deduct XP
-      self.set('fitnessXP', xpPool - xpNeeded);
+      self.fitnessXP = xpPool - xpNeeded;
 
       const body = await self.getBody();
       if (!body) return { success: false, reason: 'No body found.' };
@@ -1659,7 +1659,7 @@ export class PlayerBuilder {
       const boostPart = async (partObj) => {
         if (partObj) {
           const current = partObj.maxCalories || 100;
-          partObj.set('maxCalories', current + boostAmount);
+          partObj.maxCalories = current + boostAmount;
         }
       };
 

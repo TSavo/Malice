@@ -321,24 +321,21 @@ export class SchedulerBuilder {
     const objectManager = await this.manager.load(0);
     if (!objectManager) return;
 
-    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
-    aliases.scheduler = this.scheduler.id;
-    objectManager.set('aliases', aliases);
-
+    await objectManager.call('addAlias', 'scheduler', this.scheduler.id);
     console.log(`✅ Registered scheduler alias -> #${this.scheduler.id}`);
 
     // Register default jobs
-    await this.registerDefaultJobs(aliases);
+    await this.registerDefaultJobs(objectManager);
   }
 
   /**
    * Register default scheduled jobs
    */
-  private async registerDefaultJobs(aliases: Record<string, number>): Promise<void> {
+  private async registerDefaultJobs(objectManager: RuntimeObject): Promise<void> {
     if (!this.scheduler) return;
 
     const jobs = (this.scheduler.get('jobs') as Record<string, unknown>) || {};
-    const systemId = aliases.system || 2;
+    const systemId = (await objectManager.call('getAlias', 'system') as number | undefined) || 2;
     let modified = false;
 
     // Player heartbeat - every 60 seconds

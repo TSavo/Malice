@@ -163,10 +163,7 @@ export class ProportionalBuilder {
     const objectManager = await this.manager.load(0);
     if (!objectManager) return;
 
-    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
-    aliases.proportional = this.proportional.id;
-    objectManager.set('aliases', aliases);
-
+    await objectManager.call('addAlias', 'proportional', this.proportional.id);
     console.log(`✅ Registered proportional alias -> #${this.proportional.id}`);
   }
 }

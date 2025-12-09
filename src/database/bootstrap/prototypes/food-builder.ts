@@ -112,7 +112,7 @@ export class FoodBuilder {
                 const item = await $.load(itemId);
                 if (item && item.calories !== undefined) {
                   const newCal = Math.floor(item.calories * (1 - lossPercent));
-                  item.set('calories', newCal);
+                  item.calories = newCal;
                 }
               }
             }
@@ -130,12 +130,12 @@ export class FoodBuilder {
             // Damage torso directly (bypasses calories, goes to decay)
             const currentDecay = torso.decayLevel || 0;
             const poisonDamage = 5 + Math.floor(Math.random() * 10); // 5-15% decay
-            torso.set('decayLevel', Math.min(100, currentDecay + poisonDamage));
+            torso.decayLevel = Math.min(100, currentDecay + poisonDamage);
 
             // Chance of sedation (50% chance, 1-3 sedation level)
             if (Math.random() < 0.5) {
               const currentSedation = eater.sedation || 0;
-              eater.set('sedation', currentSedation + 1 + Math.floor(Math.random() * 3));
+              eater.sedation = currentSedation + 1 + Math.floor(Math.random() * 3);
               warnMsg += ' You feel woozy...';
             }
           }

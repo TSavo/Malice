@@ -217,23 +217,46 @@ export class HumanBuilder {
         desc += 'A ' + appearance + '.\\r\\n';
       }
 
-      // Describe what they're wearing/holding
+      // Describe what they're holding
       const hands = await self.getHands();
-      if (hands.both.length > 0) {
-        for (const hand of hands.both) {
-          if (hand) {
-            const contents = hand.contents || [];
-            if (contents.length > 0) {
-              for (const itemId of contents) {
-                const item = await $.load(itemId);
-                if (item) {
-                  const handSide = hand === hands.primary ? 'primary' : 'secondary';
-                  desc += self.pronoun('subject') + ' ' + (handSide === 'primary' ? 'holds' : 'also holds') + ' ' + item.name + '.\\r\\n';
-                }
-              }
-            }
+      const body = await self.getBody();
+      const primarySide = body?.primaryHand || 'right';
+      const secondarySide = primarySide === 'right' ? 'left' : 'right';
+
+      const heldItems = [];
+
+      // Helper to get items from a hand
+      const getHandItems = async (hand, side) => {
+        if (!hand) return [];
+        const contents = hand.contents || [];
+        const items = [];
+        for (const itemId of contents) {
+          const item = await $.load(itemId);
+          if (item) {
+            items.push({ name: item.name, side: side });
           }
         }
+        return items;
+      };
+
+      // Get items from each hand
+      if (hands.primary) {
+        const primaryItems = await getHandItems(hands.primary, primarySide);
+        heldItems.push(...primaryItems);
+      }
+      if (hands.secondary) {
+        const secondaryItems = await getHandItems(hands.secondary, secondarySide);
+        heldItems.push(...secondaryItems);
+      }
+
+      if (heldItems.length > 0) {
+        // Format each item with its hand location
+        const itemDescriptions = heldItems.map(i => i.name + ' in ' + self.pronoun('possessive') + ' ' + i.side + ' hand');
+        const itemList = await $.format.prose(itemDescriptions);
+        const subject = self.pronoun('subject');
+        // Capitalize first letter
+        const capSubject = subject.charAt(0).toUpperCase() + subject.slice(1);
+        desc += capSubject + ' is holding ' + itemList + '.\\r\\n';
       }
 
       return desc.trim();

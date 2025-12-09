@@ -257,10 +257,7 @@ export class MutexBuilder {
     const objectManager = await this.manager.load(0);
     if (!objectManager) return;
 
-    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
-    aliases.mutex = this.mutex.id;
-    objectManager.set('aliases', aliases);
-
+    await objectManager.call('addAlias', 'mutex', this.mutex.id);
     console.log(`Registered mutex alias -> #${this.mutex.id}`);
   }
 }

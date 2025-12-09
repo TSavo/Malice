@@ -157,12 +157,12 @@ export class EdibleBuilder {
       // Update weight proportionally
       const originalWeight = self.originalWeight || self.weight || 100;
       if (!self.originalWeight) {
-        self.set('originalWeight', originalWeight);
+        self.originalWeight = originalWeight;
       }
       const containerWeight = self.containerWeight || 0; // For drinks with containers
       const consumableWeight = originalWeight - containerWeight;
       const remainingRatio = self.remaining / totalPortions;
-      self.set('weight', containerWeight + Math.round(consumableWeight * remainingRatio));
+      self.weight = containerWeight + Math.round(consumableWeight * remainingRatio);
 
       // Check if fully consumed
       const fullyConsumed = self.remaining <= 0;
@@ -188,7 +188,7 @@ export class EdibleBuilder {
               const maxHydration = body.maxHydration || 100;
               // Hydration can be negative (alcohol dehydrates)
               const newHydration = Math.max(0, Math.min(maxHydration, currentHydration + hydrationPerPortion));
-              body.set('hydration', newHydration);
+              body.hydration = newHydration;
             }
           }
         }
@@ -279,10 +279,10 @@ export class EdibleBuilder {
             existing.spoiled === isSpoiled &&
             existing.poisoned === (self.poisoned || false)) {
           // Add this bite's calories and volume to existing
-          existing.set('calories', (existing.calories || 0) + biteCalories);
-          existing.set('caloriesOriginal', (existing.caloriesOriginal || 0) + biteCalories);
-          existing.set('volume', (existing.volume || 0) + biteVolume);
-          existing.set('volumeOriginal', (existing.volumeOriginal || 0) + biteVolume);
+          existing.calories = (existing.calories || 0) + biteCalories;
+          existing.caloriesOriginal = (existing.caloriesOriginal || 0) + biteCalories;
+          existing.volume = (existing.volume || 0) + biteVolume;
+          existing.volumeOriginal = (existing.volumeOriginal || 0) + biteVolume;
           contents = existing;
           aggregated = true;
           break;

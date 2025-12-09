@@ -278,10 +278,7 @@ export class MementoBuilder {
     const objectManager = await this.manager.load(0);
     if (!objectManager) return;
 
-    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
-    aliases.memento = this.memento.id;
-    objectManager.set('aliases', aliases);
-
+    await objectManager.call('addAlias', 'memento', this.memento.id);
     console.log(`Registered memento alias -> #${this.memento.id}`);
   }
 }

@@ -509,6 +509,133 @@ export class FormatBuilder {
       });
     `);
 
+    // Compose a sentence with template substitution
+    this.format.setMethod('compose', `
+      /** Compose a sentence with list, verb conjugation, and pronoun substitution.
+       *  Usage: $.format.compose(template, items, options?)
+       *
+       *  Template codes (list-specific):
+       *    %T - The formatted list with article, capitalized ("The sword and shield")
+       *    %t - The formatted list with article, lowercase ("the sword and shield")
+       *    %v{verb} - Verb conjugated based on list count (fall->falls for 1 item)
+       *
+       *  Plus all $.pronoun.sub codes (except %t which is shadowed):
+       *    %N/%n - Actor name, %s/%o/%p/%r - Actor pronouns
+       *    %d - Direct object, %i - Indirect object, %l - Location
+       *
+       *  @param template - Template string with substitution codes
+       *  @param items - Array of items for the list
+       *  @param options - { actor, article: 'the'|'a'|null, conjunction: 'and'|'or' }
+       *  @returns Formatted string
+       *
+       *  @example compose('%T %v{fall} away.', ['pants']) -> 'The pants falls away.'
+       *  @example compose('%T %v{fall} away.', ['shirt','pants']) -> 'The shirt and pants fall away.'
+       *  @example compose('%N watches as %t %v{tumble} to the ground.', ['coins'], {actor})
+       *           -> 'Bob watches as the coins tumble to the ground.'
+       */
+      const template = args[0] || '';
+      const items = args[1] || [];
+      const options = args[2] || {};
+
+      if (!template) return '';
+
+      const article = options.article !== undefined ? options.article : 'the';
+      const conjunction = options.conjunction || 'and';
+      const count = Array.isArray(items) ? items.length : 0;
+
+      // Build the list string (without article)
+      let listBase = '';
+      if (count === 1) {
+        listBase = items[0];
+      } else if (count === 2) {
+        listBase = items[0] + ' ' + conjunction + ' ' + items[1];
+      } else if (count > 2) {
+        const allButLast = items.slice(0, -1).join(', ');
+        listBase = allButLast + ', ' + conjunction + ' ' + items[items.length - 1];
+      }
+
+      // Build list with article
+      let listWithArticle = listBase;
+      if (article && listBase) {
+        listWithArticle = article + ' ' + listBase;
+      }
+
+      // Capitalize helper
+      const cap = (s) => s ? s.charAt(0).toUpperCase() + s.slice(1) : '';
+
+      let result = template;
+
+      // List substitutions - process BEFORE pronoun.sub to take precedence
+      // %T = capitalized list with article ("The sword and shield")
+      // %t = lowercase list with article ("the sword and shield")
+      result = result.replace(/%T/g, cap(listWithArticle));
+      result = result.replace(/%t/g, listWithArticle);
+
+      // Verb conjugation: %v{base} - count-based, uses $.english.conjugate
+      // Need to handle async conjugation with a workaround since replace is sync
+      const verbMatches = [...result.matchAll(/%v\\{([^}]+)\\}/g)];
+      for (const match of verbMatches) {
+        const verb = match[1];
+        const conjugated = count !== 1 ? verb : await $.english.conjugate(verb, 3);
+        result = result.replace(match[0], conjugated);
+      }
+
+      // Delegate pronoun/name substitution to $.pronoun.sub
+      // This handles %N, %n, %s, %o, %p, %r, %d, %i, %l (location)
+      // Note: %t is shadowed by our list substitution above
+      if ($.pronoun && $.pronoun.sub) {
+        result = await $.pronoun.sub(result, options.actor, options.directObj, options.indirectObj, options.item);
+      }
+
+      return result;
+    `);
+
+    // Count-based verb conjugation (singular/plural)
+    this.format.setMethod('verb', `
+      /** Conjugate a verb based on count (singular/plural).
+       *  Usage: $.format.verb(base, count)
+       *  @param base - Base verb form (plural form, e.g., 'fall', 'are', 'have')
+       *  @param count - Number of subjects
+       *  @returns Conjugated verb ('falls' for count=1, 'fall' for count>1)
+       *  @example verb('fall', 1) -> 'falls'
+       *  @example verb('fall', 3) -> 'fall'
+       *  @example verb('are', 1) -> 'is'
+       *  @example verb('have', 1) -> 'has'
+       */
+      const base = args[0] || '';
+      const count = args[1] ?? 1;
+
+      // Plural (count != 1) uses base form
+      if (count !== 1) return base;
+
+      // Singular - delegate to $.english.conjugate for third person
+      return await $.english.conjugate(base, 3);
+    `);
+
+    // Natural language list (prose style with Oxford comma)
+    this.format.setMethod('prose', `
+      /** Format items as a natural language list with Oxford comma.
+       *  Usage: $.format.prose(items, conjunction?)
+       *  @param items - Array of items
+       *  @param conjunction - 'and' or 'or' (default: 'and')
+       *  @returns String like "a, b, and c"
+       *  @example prose(['sword']) -> 'sword'
+       *  @example prose(['sword','shield']) -> 'sword and shield'
+       *  @example prose(['sword','shield','dagger']) -> 'sword, shield, and dagger'
+       *  @example prose(['red','blue'], 'or') -> 'red or blue'
+       */
+      const items = args[0] || [];
+      const conjunction = args[1] || 'and';
+
+      if (!Array.isArray(items) || items.length === 0) return '';
+      if (items.length === 1) return items[0];
+      if (items.length === 2) return items[0] + ' ' + conjunction + ' ' + items[1];
+
+      // 3+ items: use Oxford comma
+      const allButLast = items.slice(0, -1).join(', ');
+      return allButLast + ', ' + conjunction + ' ' + items[items.length - 1];
+    `);
+
     // Key-value pairs aligned
     this.format.setMethod('keyValue', `
       /** Format key-value pairs with aligned values.
@@ -551,10 +678,7 @@ export class FormatBuilder {
     const objectManager = await this.manager.load(0);
     if (!objectManager) return;
 
-    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
-    aliases.format = this.format.id;
-    objectManager.set('aliases', aliases);
-
+    await objectManager.call('addAlias', 'format', this.format.id);
     console.log(`Registered format alias -> #${this.format.id}`);
   }
 }

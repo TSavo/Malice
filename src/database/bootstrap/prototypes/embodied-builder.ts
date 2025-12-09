@@ -720,7 +720,7 @@ export class EmbodiedBuilder {
         for (const part of partsWithCalories) {
           const current = part.calories || 0;
           const burned = Math.min(current, perPart);
-          part.set('calories', current - burned);
+          part.calories = current - burned;
           totalBurned += burned;
           amount -= burned;
         }
@@ -732,7 +732,7 @@ export class EmbodiedBuilder {
       const torsoCurrent = body.calories || 0;
       if (torsoCurrent > 0) {
         const fromTorso = Math.min(torsoCurrent, amount);
-        body.set('calories', torsoCurrent - fromTorso);
+        body.calories = torsoCurrent - fromTorso;
         totalBurned += fromTorso;
         amount -= fromTorso;
       }
@@ -744,7 +744,7 @@ export class EmbodiedBuilder {
       if (currentFat > 0) {
         const fatNeeded = Math.ceil(amount / 100);
         const fatToBurn = Math.min(fatNeeded, currentFat);
-        body.set('fat', currentFat - fatToBurn);
+        body.fat = currentFat - fatToBurn;
         const caloriesFromFat = fatToBurn * 100;
         fromFat = fatToBurn;
         totalBurned += Math.min(caloriesFromFat, amount);
@@ -765,18 +765,18 @@ export class EmbodiedBuilder {
 
         if (actualDecay > 0) {
           // Increase decay level
-          partToDecay.set('decayLevel', currentDecay + actualDecay);
+          partToDecay.decayLevel = currentDecay + actualDecay;
           decayed = actualDecay;
 
           // Reduce maxCalories permanently
           const currentMax = partToDecay.maxCalories || 100;
           const newMax = Math.max(0, currentMax - actualDecay);
-          partToDecay.set('maxCalories', newMax);
+          partToDecay.maxCalories = newMax;
 
           // Restore some calories from consuming muscle tissue
           const caloriesRestored = actualDecay * 10;
           const partCurrent = partToDecay.calories || 0;
-          partToDecay.set('calories', Math.min(newMax, partCurrent + caloriesRestored));
+          partToDecay.calories = Math.min(newMax, partCurrent + caloriesRestored);
 
           totalBurned += Math.min(caloriesRestored, amount);
         }
@@ -809,7 +809,7 @@ export class EmbodiedBuilder {
       const torsoCurrent = body.calories || 0;
       const torsoSpace = torsoMax - torsoCurrent;
       const toTorso = Math.min(amount, torsoSpace);
-      body.set('calories', torsoCurrent + toTorso);
+      body.calories = torsoCurrent + toTorso;
 
       let remaining = amount - toTorso;
       if (remaining <= 0) return { absorbed: amount, storedAsFat: 0 };
@@ -847,7 +847,7 @@ export class EmbodiedBuilder {
           const current = limb.calories || 0;
           const space = max - current;
           const toLimb = Math.min(perLimb, space);
-          limb.set('calories', current + toLimb);
+          limb.calories = current + toLimb;
           remaining -= toLimb;
         }
       }
@@ -862,7 +862,7 @@ export class EmbodiedBuilder {
         // Convert calories to fat: 100 cal = 1 fat unit
         const fatToAdd = Math.min(Math.floor(remaining / 100), fatSpace);
         if (fatToAdd > 0) {
-          body.set('fat', currentFat + fatToAdd);
+          body.fat = currentFat + fatToAdd;
           storedAsFat = fatToAdd;
           remaining -= fatToAdd * 100;
         }
@@ -944,7 +944,7 @@ export class EmbodiedBuilder {
           const fatToBurn = Math.max(1, Math.ceil(urgency * 3)); // 1-3 fat per tick
           const actualBurn = Math.min(fatToBurn, currentFat);
 
-          body.set('fat', currentFat - actualBurn);
+          body.fat = currentFat - actualBurn;
           fatBurned = actualBurn;
 
           // Convert fat back to calories (1 fat = 100 cal)
@@ -1104,7 +1104,7 @@ export class EmbodiedBuilder {
         // Lose 20 breath per tick (can hold breath for 5 ticks/5 minutes at full)
         const breathLoss = 20;
         const newBreath = Math.max(0, currentBreath - breathLoss);
-        self.set('breath', newBreath);
+        self.breath = newBreath;
 
         if (newBreath <= 0) {
           // Out of breath - drowning!
@@ -1130,7 +1130,7 @@ export class EmbodiedBuilder {
           const decayInfo = await self.getTotalBodyDecay();
           if (decayInfo.percentage >= 50) {
             if (self.onStarvationDeath) {
-              self.set('causeOfDeath', 'drowning');
+              self.causeOfDeath = 'drowning';
               await self.onStarvationDeath(decayInfo);
             } else if (self.die) {
               await self.die('drowning');
@@ -1149,7 +1149,7 @@ export class EmbodiedBuilder {
         if (currentBreath < maxBreath) {
           // Restore 50 breath per tick (quick recovery when surfacing)
           const newBreath = Math.min(maxBreath, currentBreath + 50);
-          self.set('breath', newBreath);
+          self.breath = newBreath;
 
           if (currentBreath <= 20 && newBreath > 20) {
             messages.push('You gasp for air as you surface!');
@@ -1416,10 +1416,10 @@ export class EmbodiedBuilder {
       const decayInfo = args[0];
 
       // Mark as dead
-      self.set('alive', false);
-      self.set('conscious', false);
-      self.set('causeOfDeath', 'starvation');
-      self.set('deathDecay', decayInfo);
+      self.alive = false;
+      self.conscious = false;
+      self.causeOfDeath = 'starvation';
+      self.deathDecay = decayInfo;
 
       // Notify if we have an onDeath handler
       if (self.onDeath) {

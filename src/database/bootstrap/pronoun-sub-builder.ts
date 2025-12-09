@@ -360,10 +360,7 @@ export class PronounSubBuilder {
     const objectManager = await this.manager.load(0);
     if (!objectManager) return;
 
-    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
-    aliases.pronoun = this.pronounSub.id;
-    objectManager.set('aliases', aliases);
-
+    await objectManager.call('addAlias', 'pronoun', this.pronounSub.id);
     console.log(`✅ Registered pronoun alias -> #${this.pronounSub.id}`);
   }
 }

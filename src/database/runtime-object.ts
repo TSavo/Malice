@@ -427,19 +427,15 @@ export class RuntimeObjectImpl implements RuntimeObject {
 
     const self = this.proxy;
 
-    // Create a Proxy for $ that allows $2, $3, etc. syntax
+    // Create a Proxy for $ that allows $[42] syntax (returns Promise)
     const manager = this.manager;
     const $proxy = new Proxy(manager, {
       get(target, prop) {
-        // Check if accessing a numeric property like $2, $3
+        // Check if accessing a numeric property like $[42], $[123]
         if (typeof prop === 'string' && /^\d+$/.test(prop)) {
           const objId = parseInt(prop, 10);
-          // getSync returns the proxy directly from cache
-          const obj = target.getSync(objId);
-          if (!obj) {
-            throw new Error(`Object #${objId} not found or not loaded`);
-          }
-          return obj;
+          // Return a Promise - caller must await: const obj = await $[42]
+          return target.load(objId);
         }
         // Otherwise return the manager's own properties/methods
         return (target as any)[prop];

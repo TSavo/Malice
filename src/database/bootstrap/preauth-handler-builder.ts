@@ -209,10 +209,7 @@ export class PreAuthHandlerBuilder {
     const objectManager = await this.manager.load(0);
     if (!objectManager) return;
 
-    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
-    aliases.preAuthHandler = this.preAuthHandler.id;
-    objectManager.set('aliases', aliases);
-
+    await objectManager.call('addAlias', 'preAuthHandler', this.preAuthHandler.id);
     console.log(`✅ Registered preAuthHandler alias -> #${this.preAuthHandler.id}`);
   }
 }
