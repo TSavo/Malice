@@ -91,7 +91,7 @@ Player leaves room:
 moveTo(destination, mover):
   1. source.onContentLeaving(self, dest, mover)  ← Can throw to cancel
   2. self.onLeaving(source, dest, mover)
-  3. self.location = dest.id
+  3. self.location = dest                        ← Store object, not .id
   4. source.onContentLeft(self, dest, mover)     ← Unregister verbs
   5. self.onArrived(dest, source, mover)         ← Register verbs
   6. dest.onContentArrived(self, source, mover)  ← Register verbs
