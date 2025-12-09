@@ -1,6 +1,7 @@
 import { ObjectDatabase } from './object-db.js';
 import { RuntimeObjectImpl } from './runtime-object.js';
 import { ObjectCache } from './object-cache.js';
+import { getLoggerFacade, RESERVED_ALIASES } from './logger-facade.js';
 import * as bcrypt from 'bcrypt';
 import type {
   GameObject,
@@ -50,6 +51,11 @@ export class ObjectManager {
           return (target as any)[prop];
         }
 
+        // Infrastructure objects (not stored in MongoDB)
+        if (prop === 'logger') {
+          return getLoggerFacade();
+        }
+
         // Check if it's a registered alias
         if (target.aliases.has(prop)) {
           return target.aliases.get(prop);
@@ -62,6 +68,12 @@ export class ObjectManager {
         if (typeof prop === 'symbol') {
           (target as any)[prop] = value;
           return true;
+        }
+
+        // Block reserved infrastructure aliases
+        if (RESERVED_ALIASES.has(prop)) {
+          console.warn(`[ObjectManager] Cannot overwrite reserved alias: ${prop}`);
+          return false;
         }
 
         // Don't allow overwriting internal properties
@@ -416,6 +428,12 @@ export class ObjectManager {
    * Used during bootstrap to set up core system aliases ($.system, $.authManager, etc.)
    */
   async registerAliasById(name: string, id: ObjId): Promise<void> {
+    // Block reserved infrastructure aliases
+    if (RESERVED_ALIASES.has(name)) {
+      console.warn(`[ObjectManager] Cannot register reserved alias: ${name}`);
+      return;
+    }
+
     const obj = await this.load(id);
     if (obj) {
       this.aliases.set(name, obj);
@@ -427,14 +445,66 @@ export class ObjectManager {
    * Enables: $.alias = object; then later: await $.alias
    */
   registerAlias(name: string, obj: RuntimeObject): void {
+    // Block reserved infrastructure aliases
+    if (RESERVED_ALIASES.has(name)) {
+      console.warn(`[ObjectManager] Cannot register reserved alias: ${name}`);
+      return;
+    }
+
     this.aliases.set(name, obj);
   }
 
   /**
    * Remove an alias
+   * Cannot remove reserved infrastructure aliases
    */
   removeAlias(name: string): void {
+    if (RESERVED_ALIASES.has(name)) {
+      console.warn(`[ObjectManager] Cannot remove reserved alias: ${name}`);
+      return;
+    }
     this.aliases.delete(name);
+  }
+
+  /**
+   * Check if an object reference is valid
+   * Returns false for:
+   * - null/undefined
+   * - Objects with id < 0 (infrastructure objects like $.logger)
+   * - Recycled objects
+   * - Objects not in cache/database
+   */
+  isValid(obj: any): boolean {
+    // Null check
+    if (obj === null || obj === undefined) {
+      return false;
+    }
+
+    // Must have an id property
+    if (typeof obj !== 'object' || !('id' in obj)) {
+      return false;
+    }
+
+    const id = obj.id;
+
+    // Infrastructure objects have id < 0
+    if (typeof id !== 'number' || id < 0) {
+      return false;
+    }
+
+    // Check if it's in cache (we cache everything after first load)
+    const cached = this.cache.getObject(id);
+    if (!cached) {
+      return false;
+    }
+
+    // Check if recycled
+    const recycled = cached.get('recycled');
+    if (recycled === true) {
+      return false;
+    }
+
+    return true;
   }
 
   /**

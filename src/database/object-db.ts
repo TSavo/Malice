@@ -166,6 +166,16 @@ export class ObjectDatabase {
   }
 
   /**
+   * Get the database instance (for shared access, e.g., logging)
+   */
+  getDatabase(): Db {
+    if (!this.connected) {
+      throw new Error('Database not connected');
+    }
+    return this.db;
+  }
+
+  /**
    * Initialize database with root object #1 if it doesn't exist
    */
   async ensureRoot(): Promise<void> {
