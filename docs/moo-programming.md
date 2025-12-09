@@ -1727,6 +1727,202 @@ When creating new object types, inherit from the appropriate prototype:
 | `$.wearable` | `$.describable` | Items that can be worn |
 | `$.clothing` | `$.wearable` | Wearable clothing items |
 
+## Inheritance, Shadowing, and pass()
+
+Objects inherit properties and methods from their parent chain. Understanding how shadowing and `pass()` work is essential.
+
+### Property Inheritance
+
+When you read a property, the system walks up the parent chain until it finds a value:
+
+```javascript
+// Player #100 (parent: $.player)
+// $.player (parent: $.human)
+// $.human has: maxHp = 100
+
+const hp = player.maxHp;  // Found on $.human -> returns 100
+```
+
+### Property Shadowing
+
+When you **set** a property, it's ALWAYS set on the object itself, creating a shadow:
+
+```javascript
+// $.human has: maxHp = 100
+
+player.maxHp = 150;  // Sets on player #100, NOT on $.human
+
+// Now:
+// - player.maxHp = 150 (own property, shadows parent)
+// - $.human.maxHp = 100 (unchanged)
+// - Other players still inherit 100 from $.human
+```
+
+**This is how instances customize inherited defaults:**
+
+```javascript
+// All players inherit maxHp=100 from $.human
+// But a specific player can override:
+player.maxHp = 200;  // This player is special
+
+// Another player still gets the default:
+otherPlayer.maxHp;  // 100 (inherited from $.human)
+```
+
+### Method Inheritance
+
+Methods work the same way - the system searches up the parent chain:
+
+```javascript
+// Player #100 doesn't have 'describe' method
+// $.player doesn't have it
+// $.human doesn't have it
+// $.embodied doesn't have it
+// $.agent doesn't have it
+// $.describable HAS it!
+
+await player.describe();  // Executes $.describable's describe method
+                          // But 'self' is player #100
+```
+
+### Method Shadowing
+
+Define a method on your object to shadow the parent's version:
+
+```javascript
+// $.describable has: describe() -> returns name + description
+
+// Override on a specific room:
+room.setMethod('describe', `
+  // Custom description that adds exit info
+  let text = self.name + '\\n' + self.description;
+  text += '\\nExits: ' + Object.keys(self.exits || {}).join(', ');
+  return text;
+`);
+
+// Now room.describe() uses the custom version
+// Other rooms still use $.describable's version
+```
+
+### The pass() Function - Calling Parent Methods
+
+`pass()` calls the **parent's version** of the current method. Essential for extending rather than replacing behavior.
+
+```javascript
+// In $.admin.connect():
+// We want to add admin verbs, then do everything $.player.connect() does
+
+async connect() {
+  // Register admin-specific verbs FIRST
+  await self.registerVerb(['@dig %s'], self, 'dig');
+  await self.registerVerb(['@create'], self, 'create');
+  await self.registerVerb(['@teleport %i to %i'], self, 'teleport');
+
+  // NOW call parent's connect() to get all player verbs
+  await pass();  // Calls $.player.connect()
+}
+```
+
+### pass() with Arguments
+
+Pass different arguments to the parent method:
+
+```javascript
+// In a custom describe() method:
+async describe() {
+  // Get the parent's description first
+  const baseDesc = await pass();  // Calls parent's describe()
+
+  // Add our custom stuff
+  return baseDesc + '\\nIt glows faintly.';
+}
+
+// Pass different args:
+async damage(amount) {
+  // Double the damage, then let parent handle it
+  await pass(amount * 2);
+}
+```
+
+### pass() Chains Correctly
+
+`pass()` always searches from where the **current method is defined**, not from `self`:
+
+```javascript
+// Hierarchy: $.admin -> $.player -> $.human -> ...
+// $.player has connect()
+// $.admin has connect() that calls pass()
+
+// When admin player connects:
+// 1. $.admin.connect() runs (self = admin player)
+// 2. pass() searches from $.admin's parent ($.player)
+// 3. $.player.connect() runs (self still = admin player)
+// 4. If $.player.connect() also called pass(), it would search from $.player's parent
+```
+
+### Common pass() Patterns
+
+**Extend behavior (do extra stuff):**
+```javascript
+// Add behavior before parent
+async onArrived(dest, source, mover) {
+  await self.registerVerb(['special'], self, 'doSpecial');  // Our addition
+  await pass(dest, source, mover);  // Then do normal arrival stuff
+}
+
+// Add behavior after parent
+async describe() {
+  const base = await pass();  // Get parent's description
+  return base + '\\n[SPECIAL ITEM]';  // Add our suffix
+}
+```
+
+**Modify input:**
+```javascript
+async damage(amount) {
+  // Armor reduces damage
+  const reduced = Math.max(0, amount - self.armor);
+  await pass(reduced);  // Parent handles reduced damage
+}
+```
+
+**Modify output:**
+```javascript
+async getWeight() {
+  const base = await pass();  // Get parent's weight calculation
+  return base + self.carryingWeight;  // Add what we're carrying
+}
+```
+
+**Conditional override:**
+```javascript
+async canContain(item) {
+  // Special rejection
+  if (item.isEvil && self.isHoly) {
+    return 'The holy container rejects the evil item!';
+  }
+  // Otherwise use parent's logic
+  return await pass(item);
+}
+```
+
+### When NOT to Use pass()
+
+```javascript
+// DON'T: Call pass() when completely replacing behavior
+async describe() {
+  // We're doing something completely different
+  return 'You cannot see this object.';
+  // No pass() - we don't want parent's behavior at all
+}
+
+// DON'T: Forget to pass arguments
+async onArrived(dest, source, mover) {
+  await pass();  // WRONG - lost the arguments!
+  await pass(dest, source, mover);  // RIGHT
+}
+```
+
 ## $.describable - The Foundation
 
 **Everything that exists in the world inherits from `$.describable`.** It provides:
