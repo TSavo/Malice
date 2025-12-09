@@ -99,7 +99,8 @@ describe('Character Creation and Look Flow Integration', () => {
     });
 
     it('should execute look command and get room description', async () => {
-      const result = await player.call('look', mockContext) as string;
+      // Use callVerb to properly pass player context (as verb system would)
+      const result = await player.callVerb('look', mockContext, player, 'look', []) as string;
 
       expect(result).toContain('Tavern');
       expect(result).toContain('A cozy tavern with wooden tables and a roaring fireplace.');
@@ -110,7 +111,7 @@ describe('Character Creation and Look Flow Integration', () => {
     });
 
     it('should not show the player in their own room description', async () => {
-      const result = await player.call('look', mockContext) as string;
+      const result = await player.callVerb('look', mockContext, player, 'look', []) as string;
 
       // Player should NOT see themselves in the room
       expect(result).not.toContain('Diana the Bold');
@@ -133,7 +134,7 @@ describe('Character Creation and Look Flow Integration', () => {
 
       await room.call('addContent', otherPlayer.id);
 
-      const result = await player.call('look', mockContext) as string;
+      const result = await player.callVerb('look', mockContext, player, 'look', []) as string;
 
       // Should see the other player
       expect(result).toContain('You see:');
@@ -208,7 +209,7 @@ describe('Character Creation and Look Flow Integration', () => {
       expect(connectOutput).toContain('Welcome back, Henry!');
 
       // Step 5: Execute look command directly (not via onInput, to test core look functionality)
-      const lookResult = await newPlayer.call('look', mockContext) as string;
+      const lookResult = await newPlayer.callVerb('look', mockContext, newPlayer, 'look', []) as string;
 
       expect(lookResult).toContain('Newbie Landing');
       expect(lookResult).toContain('A safe haven for new adventurers.');
