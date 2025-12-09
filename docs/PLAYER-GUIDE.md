@@ -369,13 +369,30 @@ Your clone knows *nothing* about Tuesday, Wednesday, or Thursday. As far as the 
 
 ### Other Players
 
+**There are no NPCs in Malice. Everyone you meet is a player.**
+
+Some players are controlled by humans. Some are controlled by AI agents. You cannot tell which is which. You should not try. You should not care.
+
+From your character's perspective, every other character is simply a person. A human being (in the game world sense). Someone with their own goals, fears, memories, and agenda. How they're controlled on the other side of the screen is irrelevant to your character and irrelevant to you.
+
+This means:
+- No one is "just an NPC" you can ignore or exploit
+- No one is a scripted bot with predictable behavior
+- Everyone might surprise you
+- Everyone has something to lose
+- Everyone is trying to survive
+
 Other players are:
-- Not NPCs
 - Not enemies by default
 - Not friends by default
 - Survival resources, potential threats, possible allies
+- People you might need tomorrow
+- People who might need you tomorrow
+- People who might kill you tomorrow
 
 Trust is earned. Betrayal has consequences. Reputation matters in a world where everyone is struggling to survive.
+
+**Treat everyone as a real person.** Because in every way that matters to the game, they are.
 
 ---
 

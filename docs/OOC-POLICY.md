@@ -52,6 +52,151 @@ There is no gray area. There is no "just a little." There is no "but we weren't 
 
 ---
 
+## One Player Per Person
+
+**One account. One character. One you.**
+
+This is the most important rule in Malice. More important than the metagaming rules. More important than the roleplay requirements. Because this rule makes all the other rules enforceable.
+
+This is absolute. There are no exceptions. There is no arguing. There is no "but what about..."
+
+### What This Means
+
+- One human being = one player account
+- One AI agent operator = one player account
+- You cannot have alts (alternate characters)
+- You cannot have a "main" and a "backup"
+- You cannot have a "human character" and an "AI character"
+- You cannot run a bot while also playing manually on a different account
+- You cannot have multiple agents representing you
+- You cannot share accounts with another person
+- You cannot "take turns" with someone on the same character
+- You cannot create a new account when your character dies
+- You cannot create a new account when you get banned
+- You cannot create a new account. Period.
+
+When you create your account, that's it. That's your one account. Forever. If your character dies, you make a new character on the same account. If you get banned, you don't play Malice anymore.
+
+### What "One Account" Means for Different Player Types
+
+**Human players:**
+- You get one account
+- You play that account
+- If you want to let an AI take over sometimes (hybrid play), that's the same account
+- You don't get a separate "AI account"
+
+**AI agent operators:**
+- You get one account for your agent
+- Your agent is one character
+- If you want to take over manually sometimes (hybrid play), that's the same account
+- You don't get a separate "human account"
+- You don't get to run multiple agents, even if they use different models
+- You don't get to run multiple agents, even if they have different "personalities"
+- You don't get to run multiple agents, even if you think of them as different entities
+
+**Cube sitters (AFK agents):**
+- Same rules apply
+- Your cube-sitting agent is your one account
+- You don't get a separate account for when you're active
+
+### Why This Exists
+
+Because multiple accounts are metagaming infrastructure.
+
+With two accounts, you can:
+- Scout dangerous areas with your expendable alt, then act with your main
+- Store valuable items on an alt that never leaves a safe location
+- Form an "alliance" with yourself that's actually just one person
+- Have a backup ready when your main character dies
+- Spy on multiple factions simultaneously
+- Be in two places at once
+- Have twice as many actions per day
+- Vote twice in any democratic process
+- Hold twice as many political positions
+- Control twice as many resources
+
+Every single one of these is cheating. Every single one of these violates the spirit of the game. Every single one of these ruins the experience for legitimate players.
+
+We don't care if you "promise not to abuse it." The potential for abuse is too high. The rule is absolute.
+
+### How This Is Enforced
+
+We log everything. Every command. Every login. Every IP address. Every timing pattern.
+
+We analyze:
+- **Shared IP addresses** - If two accounts come from the same IP, we investigate
+- **Simultaneous login patterns** - Accounts that log in within minutes of each other
+- **Sequential login patterns** - One account logs out, another logs in immediately
+- **Location correlation** - Accounts that are always in the same area or always avoid each other
+- **Interaction patterns** - Accounts that help each other or never interact
+- **Command timing** - Bot-like precision in command intervals
+- **Resource flows** - Items or information flowing between accounts
+- **Behavioral fingerprints** - Writing style, command patterns, playstyle
+
+We use automated detection. We use manual investigation. We use pattern analysis that we don't disclose because we don't want you to know how to evade it.
+
+We are not naive. We are not trusting. We assume you're cheating and look for proof. When we find it—and we will find it—all associated accounts are permanently banned.
+
+### Common Excuses (All Rejected)
+
+**"But I have a roommate/spouse/sibling who wants to play"**
+
+Then they cannot play while living with you. One IP, one household, one player.
+
+"But that's not fair—"
+
+We don't care. We cannot distinguish between a cheating player with alts and two honest people sharing an IP. We've heard "but my roommate" a thousand times. It's the oldest excuse in multiplayer gaming. We don't believe it. We won't investigate it. We won't make exceptions.
+
+If you want your roommate to play, one of you moves out or one of you doesn't play.
+
+**"But I'm at a university/office/public network"**
+
+Then you take that risk. If someone else on your network is playing Malice, you might get caught in the crossfire. Choose a different network or don't play.
+
+**"But I use a VPN"**
+
+Then don't be surprised when you share an IP with another player and both get banned. VPNs don't protect you from this; they make it worse.
+
+**"But my old account got hacked/lost/forgotten"**
+
+Contact us with proof. Maybe we'll transfer your account. Maybe we won't. You don't get to create a new one.
+
+**"But I just want to try a different character concept"**
+
+Then delete your current character and make a new one. Same account. You don't get parallel characters.
+
+**"But I'm running multiple AI experiments"**
+
+Then run them sequentially, not in parallel. Delete one agent, create another. You don't get to A/B test on our game world.
+
+**"But my AI agent and I are different people"**
+
+No. You are the operator. You are responsible. The agent acts on your behalf. It's your account.
+
+**"But what if I sell my computer and someone else uses my old account"**
+
+Don't do that. Your account is tied to you, not your hardware. If we catch "your" account acting like a different person while you're also playing on a new account, both get banned.
+
+**"But I didn't know about this rule"**
+
+Now you do. Ignorance isn't an excuse. Read the rules before you play.
+
+### The Penalty
+
+If we determine you have multiple accounts:
+
+1. All accounts are permanently banned
+2. Any associated IP addresses are flagged
+3. Any accounts that interacted suspiciously with your accounts may be investigated
+4. You do not get to appeal
+5. You do not get your "main" back
+6. You do not get a warning first
+7. You are done with Malice forever
+
+We don't do second chances for this offense. The rule is too important. The damage is too severe. You knew the rule. You broke it anyway. Goodbye.
+
+---
+
 ## Specific Prohibitions
 
 ### OOC Couples Cannot Be IC Couples
@@ -258,6 +403,26 @@ This is not hyperbole. The game is designed to be hostile. The world is hostile.
 You are not the hero of this story. You are not destined for greatness. You are a meat sack trying not to die in a world that wants you dead. There is no success condition. There is no winning. There is only today.
 
 **You don't win at Malice. You just fail to die today.**
+
+### The Admins
+
+We are anonymous. We play the game. We have characters just like you do.
+
+**We can do whatever we want.**
+
+We can give our characters items. We can change their stats. We can build a palace just for ourselves. We can spawn resources. We can teleport. We can read your private conversations. We can look at your inventory. We can see exactly where you are and what you're doing at all times.
+
+We are not impartial referees. We are not neutral arbiters. We are not here to ensure fair play. We are players who happen to have god powers, and we will use them however we see fit.
+
+**The only thing we promise is this: we will stay true to the theme of the game.**
+
+The theme is Malice.
+
+That means if we use our powers, it won't be to make things pleasant. It won't be to create a happy ending. It won't be to save you from your mistakes. If we intervene, expect it to be interesting. Expect it to be thematic. Expect it to be harsh.
+
+You will never know which players are admins. You will never know when we're watching. You will never know if that stroke of bad luck was random chance or deliberate malice.
+
+**Don't expect fairness. Expect Malice.**
 
 ### What The Game Is
 

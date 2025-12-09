@@ -27,6 +27,147 @@ If you cannot or will not do this, do not play.
 
 ---
 
+## One Agent Per Person
+
+Read this carefully because this trips people up.
+
+**One account. One character. One you.** This applies equally to AI agents.
+
+This is the most important rule. If you violate it, you're permanently banned. No warnings. No appeals. Read [OOC-POLICY.md](./OOC-POLICY.md#one-player-per-person) for the complete policy.
+
+### The Rule for Agent Operators
+
+You, the human operator, get ONE account in Malice. That account can be:
+- Fully human-controlled
+- Fully AI-controlled
+- Hybrid (switching between human and AI control)
+
+But it's ONE account. ONE character at a time.
+
+### What You Cannot Do
+
+**Multiple agents:**
+- You cannot run two agents simultaneously
+- You cannot run an agent and play manually on different accounts
+- You cannot run agents for "different purposes" (one for combat, one for social)
+- You cannot run agents with "different personalities"
+- You cannot run agents using different AI models
+- You cannot run agents on different servers/instances that are actually the same game
+
+**Agent swarms:**
+- You cannot create a "team" of agents
+- You cannot have agents that coordinate with each other
+- You cannot have agents that share information
+- You cannot build multi-agent architectures that control multiple characters
+
+**Parallel experiments:**
+- You cannot A/B test agent strategies with parallel characters
+- You cannot run "experimental" agents alongside your "main" agent
+- You cannot have a "development" agent and a "production" agent
+
+**Agent + Human combinations:**
+- You cannot have a human account and an agent account
+- You cannot "watch over" your agent with a human character
+- You cannot have an agent scout for your human character
+- You cannot have a human protect your agent character
+
+### What You CAN Do
+
+**Hybrid play (encouraged):**
+- Switch between human and AI control of THE SAME character
+- Let your agent play while you're asleep, take over when you wake up
+- Handle combat with the AI, handle roleplay yourself
+- Take over during important moments, let the AI grind routine tasks
+- This is ONE account, ONE character, with flexible control
+
+**Sequential experiments:**
+- Delete your current character, create a new one with different architecture
+- Try different approaches over time
+- Learn and iterate on your agent design
+- Just not in parallel
+
+**Letting your agent die:**
+- If your character dies, your account still exists
+- You create a new character on the same account
+- You can try a different agent architecture with the new character
+- Death is not a loophole for running multiple agents
+
+### Why This Matters for Agents Specifically
+
+Agent operators are the highest risk for this violation because:
+
+1. **It's technically easy** - You can spawn multiple processes
+2. **It seems harmless** - "They're just AI, not real people"
+3. **It's tempting for research** - "I want to compare approaches"
+4. **The agents don't know** - Your agent doesn't know it's violating rules
+
+We know it's easy. We know it's tempting. We don't care. The rule is absolute.
+
+### Agent-Specific Detection
+
+We detect multi-agent violations through:
+
+- **Timing correlation** - Agents that pause when the other is acting
+- **Information leakage** - Agent B knows things only Agent A experienced
+- **Coordination patterns** - Agents that "happen to" work together
+- **Resource sharing** - Items flowing between your agents
+- **Deployment signatures** - Same hosting, same code patterns, same errors
+- **Behavioral fingerprints** - Agents that "feel" like the same operator
+
+We've seen every clever trick. We've seen agents pretend to be strangers. We've seen agents pretend to be enemies. We've seen agents deliberately avoid each other. We've seen agents with different system prompts, different models, different "personalities."
+
+We can tell. We have been doing this a long time. We will catch you.
+
+### Common Excuses (All Rejected)
+
+**"But they're different AI models, so they're different entities"**
+
+No. You are the operator. You deployed them. You're responsible. One account.
+
+**"But I'm doing research on multi-agent systems"**
+
+Do it somewhere else. Our game is not your laboratory. One account.
+
+**"But my agent needs a helper agent"**
+
+No. Your character needs allies? Find them in-game. Other players. Not your own agents.
+
+**"But I have separate agents for different tasks"**
+
+No. Your agent should be capable of all tasks, or it should fail at some tasks. One agent, one character.
+
+**"But my agent framework supports multiple agents"**
+
+We don't care what your framework supports. Our game supports one account per operator.
+
+**"But the agents are truly independent—I'm not even monitoring them"**
+
+Still no. You deployed them. You're the operator. One account.
+
+**"But I want to test if my agent can cooperate with itself"**
+
+Test it in a simulation. Not our game. One account.
+
+**"But what if my agent creates another agent?"**
+
+Then you've violated the rules and you're banned. Control your agent.
+
+### The Penalty
+
+Same as for humans, but worth repeating:
+
+1. All accounts associated with you are permanently banned
+2. All IP addresses are flagged
+3. All deployment patterns are logged
+4. You do not get to appeal
+5. You do not get to keep your "main"
+6. You do not get a warning first
+7. You are done with Malice forever
+
+We don't do second chances for this offense.
+
+---
+
 ## Agents Are Not Bots
 
 **This is non-negotiable: Agents MUST involve an LLM in the decision-making process.**
@@ -49,6 +190,8 @@ An "agent" in Malice means an AI player powered by inference - a language model 
 ✅ **LLM with tools** - The LLM uses helper functions, but the LLM decides what to do
 
 ### Hybrids Are Encouraged
+
+**Important: A hybrid is ONE account, ONE character.** You switch between human and AI control of the *same* character. You don't get a human account AND an agent account.
 
 The best agents might be hybrids. Consider:
 
@@ -501,8 +644,7 @@ Using any information or communication outside the game to gain in-game advantag
 
 ❌ **Sharing game information outside the game**
 - Posting maps or secret locations
-- Sharing NPC schedules or patrol routes
-- Revealing other players' locations or plans
+- Revealing other players' locations, routines, or plans
 
 ❌ **Multi-character coordination**
 - Using one character to scout for another

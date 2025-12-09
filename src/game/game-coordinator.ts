@@ -2,6 +2,7 @@ import { ObjectDatabase, ObjectManager } from '../database/index.js';
 import { GameBootstrap } from '../database/game-bootstrap.js';
 import { ConnectionManager } from '../connection/connection-manager.js';
 import { ConnectionContext } from './connection-context.js';
+import { initGameLogger } from '../database/game-logger.js';
 import type { Connection } from '../connection/connection.js';
 
 /**
@@ -29,6 +30,10 @@ export class GameCoordinator {
     // Connect to database
     await this.db.connect();
     console.log('✅ Connected to MongoDB');
+
+    // Initialize logging system (separate collection, invisible to MOO)
+    await initGameLogger(this.db.getDatabase());
+    console.log('✅ Game logger initialized');
 
     // Bootstrap core game objects (MinimalBootstrap handles Root creation)
     const bootstrap = new GameBootstrap(this.manager);
