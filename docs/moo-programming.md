@@ -2,6 +2,92 @@
 
 This guide covers MOO code conventions and the utility objects available via `$.*`.
 
+## The Golden Rule: Combine Utilities, Never Duplicate Logic
+
+The utilities in this codebase are designed to **compose together**. Using them correctly turns 20 lines of buggy, inconsistent code into 3 lines of robust, correct code. **NEVER** write your own grammar logic, pronoun handling, list formatting, or message construction.
+
+### Before: 22 Lines of Fragile Code
+
+```javascript
+// DON'T DO THIS - Manual message construction
+async function announcePickup(actor, items, room) {
+  let itemList;
+  if (items.length === 1) {
+    itemList = 'the ' + items[0].name;
+  } else if (items.length === 2) {
+    itemList = 'the ' + items[0].name + ' and ' + items[1].name;
+  } else {
+    itemList = 'the ' + items.slice(0, -1).map(i => i.name).join(', ') +
+               ', and ' + items[items.length - 1].name;
+  }
+
+  const verb = items.length === 1 ? 'picks' : 'pick';
+
+  for (const viewer of room.contents) {
+    if (viewer.id === actor.id) {
+      await viewer.tell('You ' + (items.length === 1 ? 'pick' : 'pick') + ' up ' + itemList + '.');
+    } else {
+      await viewer.tell(actor.name + ' ' + verb + ' up ' + itemList + '.');
+    }
+  }
+}
+```
+
+### After: 3 Lines of Correct Code
+
+```javascript
+// DO THIS - Let utilities handle everything
+async function announcePickup(actor, items, room) {
+  const names = items.map(i => i.name);
+  await $.format.compose('%N %v{pick} up %t.', names, { actor, room });
+}
+```
+
+The compose() call handles:
+- ✅ Oxford comma for 3+ items
+- ✅ Verb conjugation based on actor perspective ("pick" vs "picks")
+- ✅ Article handling ("the sword and shield")
+- ✅ Second-person for actor ("You pick up"), third-person for others
+- ✅ No edge case bugs
+
+### Another Example: Damage Announcement
+
+```javascript
+// DON'T: 15 lines of manual work
+async function announceDamage(attacker, victim, damage, room) {
+  const wounds = [];
+  if (damage > 20) wounds.push('a deep gash');
+  if (damage > 10) wounds.push('a bruise');
+  if (damage > 5) wounds.push('a scratch');
+
+  let woundText = wounds.length === 1 ? wounds[0] :
+    wounds.slice(0, -1).join(', ') + ' and ' + wounds[wounds.length - 1];
+
+  const verb = wounds.length === 1 ? 'inflicts' : 'inflict';
+
+  for (const viewer of room.contents) {
+    // ... 10 more lines of viewer-specific formatting
+  }
+}
+
+// DO: 2 lines
+async function announceDamage(attacker, victim, wounds, room) {
+  await $.format.compose('%N %v{inflict} %a on %tN!', wounds, { actor: attacker, target: victim, room });
+}
+```
+
+### The Utilities Compose Seamlessly
+
+| Combination | What It Gives You |
+|-------------|-------------------|
+| `$.format.compose()` + actor | Pronoun substitution + list formatting + verb conjugation |
+| `$.pronoun.announce()` + room | Perspective-correct messages to all room occupants |
+| `$.proportional.sub()` + value/max | Condition descriptions without if/else chains |
+| `$.prompt.choice()` + validation | Complete input flow without manual parsing |
+| `$.memento.clone()` + object tree | Deep copy with ID remapping, zero manual work |
+
+**If you're writing more than 5 lines for any of these tasks, you're doing it wrong.**
+
 ## Property Access and Method Calls
 
 **RuntimeObjects use a Proxy for direct property access.** Never use `.get()`, `.set()`, or `.call()` in MOO code.
@@ -489,6 +575,35 @@ await $.recycler.unrecycle(obj);
 
 Use `$.proportional` to select messages based on a value within a range. Perfect for health bars, hunger, thirst, capacity indicators, etc.
 
+### Why Not If/Else Chains?
+
+```javascript
+// DON'T: 15 lines of unmaintainable if/else
+function getHealthStatus(hp, maxHp) {
+  const pct = hp / maxHp * 100;
+  if (hp === 0) return 'dead';
+  if (pct < 10) return 'near death';
+  if (pct < 25) return 'critical';
+  if (pct < 50) return 'wounded';
+  if (pct < 75) return 'hurt';
+  if (pct < 100) return 'scratched';
+  return 'healthy';
+  // Edge cases? Rounding errors? Off-by-one? Good luck.
+}
+
+// DO: 1 line with mathematically correct distribution
+const status = await $.proportional.sub(
+  ['dead', 'near death', 'critical', 'wounded', 'hurt', 'scratched', 'healthy'],
+  hp, maxHp
+);
+```
+
+$.proportional handles:
+- ✅ First message only at exactly 0
+- ✅ Last message only at exactly max
+- ✅ Even distribution of middle messages
+- ✅ No edge case bugs
+
 ### How It Works
 
 - First message (index 0) is returned ONLY when amount = 0
@@ -558,6 +673,39 @@ const condition = await $.proportional.sub(
 ## $.prompt - Interactive Prompts
 
 Use `$.prompt` for gathering input from players. All prompts return Promises that resolve when the player responds.
+
+### Why Not Manual Input Handling?
+
+```javascript
+// DON'T: 25 lines of fragile manual input handling
+async function getPlayerChoice(player, options) {
+  await player.tell('Choose an option:');
+  for (let i = 0; i < options.length; i++) {
+    await player.tell((i + 1) + '. ' + options[i]);
+  }
+  player.pendingInput = true;
+  player.inputCallback = (input) => {
+    player.pendingInput = false;
+    const num = parseInt(input, 10);
+    if (isNaN(num) || num < 1 || num > options.length) {
+      player.tell('Invalid choice.');
+      return getPlayerChoice(player, options); // Retry
+    }
+    return options[num - 1];
+  };
+  // ... handle disconnects, timeouts, nested prompts, etc.
+}
+
+// DO: 1 line that handles everything
+const choice = await $.prompt.choice(player, 'Choose:', { opt1: 'Option 1', opt2: 'Option 2' });
+```
+
+$.prompt handles:
+- ✅ Display formatting
+- ✅ Input validation and retry
+- ✅ Nested prompt prevention
+- ✅ @abort cancellation
+- ✅ Disconnect cleanup
 
 ### Text Questions
 
@@ -640,6 +788,48 @@ await $.prompt.cancel(player);
 
 Use `$.memento` to serialize object graphs and create clones with new IDs. Perfect for body templates, equipment sets, or any object tree that needs duplication.
 
+### Why Not Manual Cloning?
+
+```javascript
+// DON'T: 30+ lines of error-prone manual cloning
+async function cloneBody(body) {
+  const newBody = await $.recycler.create(body.parent);
+  newBody.name = body.name;
+  newBody.hp = body.hp;
+  // ... copy 20 more properties ...
+
+  const newParts = {};
+  for (const partId of body.parts) {
+    const part = await $.load(partId);
+    const newPart = await $.recycler.create(part.parent);
+    newPart.name = part.name;
+    newPart.owner = newBody.id;  // Update reference
+    // ... copy properties ...
+
+    // Handle nested parts (recursive nightmare)
+    for (const childId of part.children || []) {
+      // ... another 20 lines of recursive cloning ...
+    }
+    newParts[part.name] = newPart.id;
+  }
+  newBody.parts = Object.values(newParts);
+  return newBody;
+}
+
+// DO: 2 lines that handle the entire object graph
+async function cloneBody(body, ...allParts) {
+  const clones = await $.memento.clone([body, ...allParts]);
+  return clones['%0']; // New body with all internal refs updated
+}
+```
+
+$.memento handles:
+- ✅ Deep object graph traversal
+- ✅ Internal reference remapping (part.owner -> new body ID)
+- ✅ External reference preservation (prototype stays same)
+- ✅ New ID allocation for every cloned object
+- ✅ Property copying
+
 ### How It Works
 
 - **capture()** - Serializes objects to JSON, replacing in-graph IDs with placeholders
@@ -688,6 +878,47 @@ const parts = await $.memento.clone([body, arm]);
 ## $.mutex - Object Locks
 
 Use `$.mutex` for preventing race conditions on objects. Locks are stored on the objects themselves and can auto-expire.
+
+### Why Not Manual Lock Tracking?
+
+```javascript
+// DON'T: 20+ lines of buggy manual locking
+const locks = {}; // Global state - bad!
+
+async function startCrafting(player, item) {
+  const key = item.id + ':craft';
+  if (locks[key]) {
+    await player.tell('Item is being crafted by someone else.');
+    return;
+  }
+  locks[key] = { player: player.id, time: Date.now() };
+
+  try {
+    await doCrafting(item);
+  } finally {
+    delete locks[key]; // Easy to forget!
+  }
+  // What if server crashes? Lock never released.
+  // What if timeout? Need separate cleanup job.
+  // What about lock data? Need separate structure.
+}
+
+// DO: 4 lines with automatic timeout and data storage
+async function startCrafting(player, item) {
+  const blocked = await $.mutex.acquire(item, 'craft', { player: player.id }, 60000);
+  if (blocked) return player.tell('Being crafted by #' + blocked.player);
+
+  await doCrafting(item);
+  await $.mutex.release(item, 'craft');
+}
+```
+
+$.mutex handles:
+- ✅ Lock state persisted on the object itself
+- ✅ Automatic timeout/expiry
+- ✅ Arbitrary data storage with lock
+- ✅ Survives server restarts
+- ✅ No global state pollution
 
 ### Basic Locking
 
@@ -764,6 +995,42 @@ await $.mutex.releaseAll(obj);
 ## $.scheduler - Periodic Jobs
 
 Use `$.scheduler` for recurring tasks like heartbeats, decay processing, and timed events.
+
+### Why Not setInterval/setTimeout?
+
+```javascript
+// DON'T: 25 lines of fragile timer management
+const jobs = {};
+
+function startDecayJob() {
+  if (jobs.decay) clearInterval(jobs.decay);
+  jobs.decay = setInterval(async () => {
+    try {
+      await processDecay();
+    } catch (e) {
+      console.error('Decay failed:', e);
+      // Job silently dies, nothing restarts it
+    }
+  }, 60000);
+}
+
+// On server restart: all jobs lost!
+// On crash mid-job: state inconsistent!
+// Want to pause? Add more tracking code.
+// Want to run now for testing? More code.
+// Enable/disable? More code.
+
+// DO: 1 line, persistent, manageable
+await $.scheduler.schedule('decayTick', 0, 60000, $.system, 'processDecay');
+// Survives restarts, can pause/resume, can runNow for testing
+```
+
+$.scheduler handles:
+- ✅ Persistence across server restarts
+- ✅ Enable/disable without losing config
+- ✅ Manual trigger for testing (`runNow`)
+- ✅ Job inspection (`getJob`, `listJobs`)
+- ✅ Proper error isolation
 
 ### Scheduling Jobs
 
