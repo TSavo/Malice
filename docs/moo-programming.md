@@ -160,7 +160,7 @@ await victim.call('tell', 'You take ' + damage + ' damage!');
 
 | Alias | Purpose |
 |-------|---------|
-| `$[0]` | ObjectManager: alias management, object ID allocation |
+| `$` | ObjectManager (#0): alias management, object ID allocation |
 | `$.english` | Grammar: articles, plurals, conjugation, ordinals |
 | `$.pronoun` | Pronoun substitution, perspective-aware messaging |
 | `$.format` | Text layout: columns, tables, lists, templates |
@@ -1234,21 +1234,22 @@ await $.emote.getSubjectPronoun(player)    // "he"/"she"/"they"
 
 The `$` variable in MOO code is a **Proxy** that provides convenient access to the object system. Understanding how it works is essential.
 
-### #0 Is the ObjectManager
+### `$` Is the ObjectManager (#0)
 
-Object #0 is special—it's the **ObjectManager**, the root of the entire object system. It:
+**`$` itself is object #0**—the ObjectManager, the root of the entire object system. It:
 - Allocates new object IDs
 - Stores the global alias registry
 - Is always the first object created during bootstrap
 - Cannot be recycled or deleted
 
 ```javascript
-// These are equivalent
-const om = await $.load(0);
-const om = await $[0];
+// $ IS #0 - these are all the same object
+$                    // The ObjectManager
+await $.load(0)      // Load #0
+await $[0]           // Load #0 by index
 
-// #0 has an 'aliases' property - a simple { name: id } map
-$[0].aliases
+// $ has an 'aliases' property - a simple { name: id } map
+$.aliases
 // { nothing: -1, root: 1, system: 2, english: 5, format: 6, ... }
 ```
 
@@ -1258,20 +1259,20 @@ When you write `$.english`, the Proxy does this:
 
 ```javascript
 // $.english internally does:
-const id = $[0].aliases['english'];  // Look up 'english' in #0.aliases -> 5
-const obj = await $.load(id);         // Load object #5
-return obj;                           // Return the RuntimeObject
+const id = $.aliases['english'];  // Look up 'english' in $.aliases -> 5
+const obj = await $.load(id);     // Load object #5
+return obj;                       // Return the RuntimeObject
 ```
 
 So `$.english.plural('cat')` is really:
-1. Get #0's aliases property
+1. Get `$.aliases` property
 2. Find `english` -> `5`
 3. Load object #5
 4. Call its `plural` method
 
 ### The Alias Registry
 
-All aliases live in `#0.properties.aliases`:
+All aliases live in `$.aliases` (which is `$.properties.aliases`):
 
 ```javascript
 {
@@ -1303,20 +1304,20 @@ const english = $.english;   // Always works
 
 ### Managing Aliases
 
-The ObjectManager (#0) has methods for alias management:
+Since `$` is the ObjectManager, it has methods for alias management:
 
 ```javascript
 // Add an alias (makes $.myUtils work)
-await $[0].addAlias('myUtils', obj.id);
+await $.addAlias('myUtils', obj.id);
 
 // Remove an alias
-await $[0].removeAlias('myUtils');  // Returns true if removed
+await $.removeAlias('myUtils');  // Returns true if removed
 
 // Look up an alias
-const id = await $[0].getAlias('myUtils');  // Returns ID or undefined
+const id = await $.getAlias('myUtils');  // Returns ID or undefined
 
 // Direct access to the map (read-only preferred)
-const allAliases = $[0].aliases;
+const allAliases = $.aliases;
 ```
 
 ### Core Aliases (Protected)
@@ -1341,8 +1342,8 @@ const obj = await $.load(42);  // Equivalent
 const english = $.english;
 const format = $.format;
 
-// Special: #0 is always the ObjectManager
-const om = await $[0];
+// $ itself is #0, so these are redundant but valid:
+const om = await $[0];  // Same as just using $
 ```
 
 ### Creating Your Own Aliases
@@ -1359,8 +1360,8 @@ myUtils.setMethod('hello', `
   return 'Hello, ' + (args[0] || 'world') + '!';
 `);
 
-// 3. Register the alias on #0
-await $[0].addAlias('myUtils', myUtils.id);
+// 3. Register the alias ($ is the ObjectManager)
+await $.addAlias('myUtils', myUtils.id);
 
 // 4. Now it's available everywhere as $.myUtils
 await $.myUtils.hello('Bob');  // "Hello, Bob!"
@@ -1397,9 +1398,9 @@ Then add methods to it:
 
 Now callable as `await $.myUtils.greet()` from anywhere.
 
-### 2. MOO Code: $[0].addAlias()
+### 2. MOO Code: $.addAlias()
 
-From within MOO code, use the ObjectManager's alias methods:
+From within MOO code, use `$` (the ObjectManager) directly:
 
 ```javascript
 // Create an object and register it as an alias
@@ -1408,7 +1409,7 @@ utils.setMethod('greet', `
   return 'Hello, ' + (args[0] || 'stranger') + '!';
 `);
 
-await $[0].addAlias('myUtils', utils.id);
+await $.addAlias('myUtils', utils.id);
 // Now $.myUtils.greet('Bob') works from anywhere
 ```
 
@@ -1562,9 +1563,9 @@ When creating new object types, inherit from the appropriate prototype:
 
 | Task | Use |
 |------|-----|
-| Register a system alias | `$[0].addAlias()` |
-| Remove a system alias | `$[0].removeAlias()` |
-| Lookup an alias | `$[0].getAlias()` |
+| Register a system alias | `$.addAlias()` |
+| Remove a system alias | `$.removeAlias()` |
+| Lookup an alias | `$.getAlias()` |
 | Pluralize a noun | `$.english.plural()` |
 | Conjugate a verb (person) | `$.english.conjugate()` |
 | Conjugate by count | `$.format.verb()` |
