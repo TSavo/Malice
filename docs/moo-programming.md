@@ -1952,6 +1952,146 @@ Follow this pattern for every new object type:
 // They just differ in verbs and messaging
 ```
 
+### Second Example: $.edible (Base) + $.food/$.drink (Implementations)
+
+Same pattern, different domain. One base, multiple implementations sharing the same state logic.
+
+#### $.edible - The Base Prototype
+
+Handles consumption state. No verbs. No "eat" or "drink".
+
+**Properties:**
+```javascript
+{
+  calories: 100,          // kcal per whole item
+  hydration: 20,          // ml water equivalent
+  portions: 1,            // Total portions
+  remaining: 1,           // Portions left
+  spoiled: false,         // Gone bad?
+  poisoned: false,        // Poisoned?
+  effects: {},            // Status effects when consumed
+  decayRate: 0.01,        // Decay per tick
+}
+```
+
+**Methods (state only):**
+```javascript
+// Calculations - factor in decay, portions
+const cal = await food.getCaloriesPerPortion();
+const vol = await food.getVolumePerPortion();
+const hyd = await food.getHydrationPerPortion();
+
+// THE state change method - handles everything
+const result = await food.consume(player, 'food');
+// Returns: { calories, hydration, effects, warnings, fullyConsumed, remaining }
+// - Checks stomach capacity
+// - Reduces remaining portions
+// - Updates weight
+// - Sends to stomach
+// - Applies status effects
+// - Recycles when empty
+// - NO messaging, NO verbs
+
+// Query
+const hasMore = await food.hasRemaining();
+```
+
+**Notice:** `consume()` does ALL the work but sends NO messages. It returns data for the caller to format.
+
+#### $.food - Implementation for Solid Food
+
+Adds `eat` verb, handles presentation:
+
+```javascript
+obj.setMethod('eat', `
+  const eater = args[1];
+
+  // 1. Validation (not in base - verb-specific)
+  if (!holdingFood) {
+    return 'You need to pick that up first.';
+  }
+
+  // 2. Call base method for state change
+  const result = await self.consume(eater, 'food');
+  if (result.error) return result.error;
+
+  // 3. Process warnings (presentation layer concern)
+  let warnMsg = '';
+  if (result.warnings.includes('spoiled')) {
+    warnMsg += ' It tastes off...';
+    // Maybe cause nausea...
+  }
+
+  // 4. Build response message
+  let msg = result.fullyConsumed
+    ? 'You finish eating ' + self.name + '.'
+    : 'You take a bite of ' + self.name + '.';
+
+  // 5. Announce to room using $.pronoun
+  const eatMsg = await $.pronoun.sub('%N takes a bite of %t.', eater, null, null, self);
+  await location.announce(eatMsg, eater);
+
+  return msg + warnMsg;
+`);
+
+// Register 'eat' verb when arriving in hand
+obj.setMethod('onArrived', `
+  if (dest && dest.owner) {
+    const owner = await $.load(dest.owner);
+    await owner.registerVerb(['eat ' + self.name], self, 'eat');
+  }
+`);
+```
+
+#### $.drink - Implementation for Liquids
+
+Same base, different verb and messaging:
+
+```javascript
+obj.setMethod('drink', `
+  const drinker = args[1];
+
+  // Same pattern: validate, call base, format messages
+  const result = await self.consume(drinker, 'drink');
+  if (result.error) return result.error;
+
+  // Different messaging for drinks
+  let msg = result.fullyConsumed
+    ? 'You finish drinking ' + self.name + '.'
+    : 'You take a sip of ' + self.name + '.';
+
+  const drinkMsg = await $.pronoun.sub('%N takes a sip of %t.', drinker, null, null, self);
+  await location.announce(drinkMsg, drinker);
+
+  return msg;
+`);
+
+// 'sip' is just an alias
+obj.setMethod('sip', `
+  return await self.drink(args[0], args[1]);
+`);
+
+// Register 'drink' and 'sip' verbs
+obj.setMethod('onArrived', `
+  if (dest && dest.owner) {
+    const owner = await $.load(dest.owner);
+    await owner.registerVerb(['drink ' + self.name, 'sip ' + self.name], self, 'drink');
+  }
+`);
+```
+
+#### The Pattern in Action
+
+| What | $.edible (Base) | $.food (Impl) | $.drink (Impl) |
+|------|-----------------|---------------|----------------|
+| State change | `consume()` | calls it | calls it |
+| Verb | none | `eat` | `drink`, `sip` |
+| Message | none | "take a bite" | "take a sip" |
+| Announce | none | $.pronoun.sub | $.pronoun.sub |
+| Hook | none | onArrived | onArrived |
+
+**Both implementations share 100% of the state logic in $.edible.**
+
 ### Anti-Patterns to Avoid
 
 ```javascript
