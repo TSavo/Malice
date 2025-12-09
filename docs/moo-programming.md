@@ -1742,6 +1742,249 @@ magicBox.setMethod('canContain', `
 `);
 ```
 
+## The Core Design Pattern: Base + Implementation
+
+**This is the most important pattern in the codebase.** Every object type should be designed this way:
+
+1. **Base prototype** - Handles metadata and state (no verbs, no messaging)
+2. **Implementation prototype** - Handles verbs and user-facing messaging
+3. **Hooks** - Connect to movement system for dynamic verb registration
+
+### Why This Pattern?
+
+```javascript
+// DON'T: Mix state and presentation in one prototype
+// This creates unmaintainable spaghetti code
+obj.setMethod('wear', `
+  // 50 lines of validation
+  // 30 lines of state changes
+  // 20 lines of verb registration
+  // 15 lines of room announcements
+  // Impossible to extend or customize
+`);
+
+// DO: Separate concerns into layers
+// Base: state and validation
+// Implementation: verbs and messaging
+// Result: Clean, extensible, testable
+```
+
+### Example: $.wearable (Base) + $.clothing (Implementation)
+
+#### $.wearable - The Base Prototype
+
+Handles **metadata** and **state manipulation**. No verbs. No messaging.
+
+**Properties (metadata):**
+```javascript
+{
+  covers: ['torso'],      // Which body slots this covers
+  layer: 2,               // 1=underwear, 2=base, 3=mid, 4=outer, 5=outerwear
+  warmth: 10,             // Cold protection (0-100)
+  protection: 0,          // Damage reduction (0-100)
+  wornOn: null,           // Body part ID when worn
+  wornBy: null,           // Player ID when worn
+  wornDescription: null,  // Description when worn (replaces naked desc)
+}
+```
+
+**Methods (state/validation):**
+```javascript
+// Validation - returns { success: boolean, error?: string }
+const result = await item.canWear(player);
+// Checks: not already worn, player has body parts, no layer conflicts
+
+// State change - updates wornBy, wornOn, body part worn arrays
+const result = await item.wear(player);
+// Returns { success: boolean, message: string }
+
+// State change - clears wornBy, wornOn, removes from body parts
+const result = await item.remove(player);
+
+// Query - get items worn on a slot
+const items = await item.getWornOnSlot(player, 'torso');
+
+// Description utility
+const desc = await item.getWornDescription();
+```
+
+**Notice:** No `doWear`, no `doRemove`, no room announcements, no verb registration. Just pure state management.
+
+#### $.clothing - The Implementation Prototype
+
+Inherits from `$.wearable`. Adds **verbs**, **messaging**, and **hooks**.
+
+**Additional Properties:**
+```javascript
+{
+  material: 'cotton',  // Fabric type
+  color: 'white',      // Color
+  condition: 100,      // Degradation (0-100)
+}
+```
+
+**Verb Handlers (call base methods, then handle presentation):**
+```javascript
+obj.setMethod('doWear', `
+  // Called by verb system when player types 'wear shirt'
+  const wearer = args[1];
+
+  // 1. Call base method for state change
+  const result = await self.wear(wearer);
+  if (!result.success) return result.error;
+
+  // 2. Swap verbs: unregister 'wear', register 'remove'
+  await wearer.unregisterVerbsFrom(self.id);
+  await wearer.registerVerb(['remove ' + self.name], self, 'doRemove');
+
+  // 3. Announce to room using utilities
+  const room = await $.load(wearer.location);
+  const msg = await $.pronoun.sub('%N puts on %t.', wearer, null, null, self);
+  await room.announce(msg, wearer);
+
+  return result.message;
+`);
+
+obj.setMethod('doRemove', `
+  const wearer = args[1];
+
+  // 1. Call base method
+  const result = await self.remove(wearer);
+  if (!result.success) return result.error;
+
+  // 2. Swap verbs: unregister 'remove', register 'wear'
+  await wearer.unregisterVerbsFrom(self.id);
+  await wearer.registerVerb(['wear ' + self.name], self, 'doWear');
+
+  // 3. Place item (try hands, then drop)
+  const hands = await wearer.getHands();
+  if (hands.primary) {
+    await hands.primary.addContent(self.id);
+  }
+
+  // 4. Announce
+  const msg = await $.pronoun.sub('%N takes off %t.', wearer, null, null, self);
+  await room.announce(msg, wearer);
+
+  return result.message;
+`);
+```
+
+**Hooks (connect to movement system):**
+```javascript
+obj.setMethod('onArrived', `
+  // Called when clothing arrives in a hand
+  const dest = args[0];
+
+  if (dest && dest.owner) {
+    const owner = await $.load(dest.owner);
+    if (owner && !self.wornBy) {
+      // Register 'wear' verb with the player
+      await owner.registerVerb(['wear ' + self.name], self, 'doWear');
+    }
+  }
+`);
+
+obj.setMethod('onLeaving', `
+  // Called when clothing leaves a hand
+  const source = args[0];
+
+  if (source && source.owner) {
+    const owner = await $.load(source.owner);
+    // Unregister all verbs from this item
+    await owner.unregisterVerbsFrom(self.id);
+  }
+`);
+```
+
+### The Verb Lifecycle
+
+```
+[Item on ground]
+     |
+     v  player picks up
+[Item in hand] --> onArrived() --> registers 'wear' verb
+     |
+     v  player types 'wear shirt'
+[doWear called] --> wear() --> unregisters 'wear', registers 'remove'
+     |
+     v  player types 'remove shirt'
+[doRemove called] --> remove() --> unregisters 'remove', registers 'wear'
+     |
+     v  player drops item
+[onLeaving called] --> unregisters all verbs
+```
+
+### Why This Works
+
+| Layer | Responsibility | Changes When |
+|-------|----------------|--------------|
+| Base ($.wearable) | State, validation | Core mechanics change |
+| Impl ($.clothing) | Verbs, messaging | UI/UX changes |
+| Hooks | Registration timing | Movement system changes |
+
+**Benefits:**
+- Base can be tested without verb system
+- Messaging can be changed without touching state logic
+- New implementations ($.armor, $.jewelry) reuse base methods
+- Hooks are the ONLY connection to movement - clean interface
+
+### Creating Your Own Object Types
+
+Follow this pattern for every new object type:
+
+```javascript
+// 1. BASE: $.consumable - handles state
+//    Properties: calories, hydration, spoilage, consumed
+//    Methods: canConsume(), consume(), getCalories()
+//    NO verbs, NO messaging
+
+// 2. IMPL: $.food - handles verbs + messaging
+//    doEat() - calls consume(), announces, registers 'eat more' or removes verb
+//    onArrived() - registers 'eat' verb when in hand
+//    onLeaving() - unregisters verbs
+
+// 3. IMPL: $.drink - different verbs, same base
+//    doDrink() - calls consume(), announces differently
+//    onArrived() - registers 'drink' verb
+
+// Both $.food and $.drink reuse $.consumable's state logic
+// They just differ in verbs and messaging
+```
+
+### Anti-Patterns to Avoid
+
+```javascript
+// BAD: Putting verbs in base prototype
+// Now every wearable has doWear - armor, jewelry, everything
+// Can't customize messaging per subtype
+$.wearable.setMethod('doWear', ...);  // NO!
+
+// BAD: Putting state logic in implementation
+// Now you duplicate wear logic in $.clothing, $.armor, $.jewelry
+$.clothing.setMethod('wear', `
+  // 100 lines of state logic that should be in base
+`);  // NO!
+
+// BAD: Hardcoding messages in base
+$.wearable.setMethod('wear', `
+  // ...
+  await room.announce(player.name + ' puts on the ' + self.name);  // NO!
+  // This should be in the implementation
+`);
+
+// BAD: Not using hooks
+$.clothing.setMethod('wear', `
+  // Manually register verbs
+  await wearer.registerVerb(['remove'], self, 'doRemove');
+  // What if player drops it? Verb is still registered!
+`);  // Let onLeaving handle cleanup
+
+// GOOD: Let hooks manage the verb lifecycle
+// onArrived registers, onLeaving unregisters
+// Verbs are always consistent with object location
+```
+
 ## Summary: What to Use Where
 
 | Task | Use |
