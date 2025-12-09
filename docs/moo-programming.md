@@ -156,6 +156,158 @@ self.set('hp', self.get('hp') - damage);
 await victim.call('tell', 'You take ' + damage + ' damage!');
 ```
 
+## Property Types and Object References
+
+Properties are stored as **typed values** in the database. The system automatically converts between JavaScript values and typed storage.
+
+### Value Types
+
+| Type | Stored As | JavaScript Value |
+|------|-----------|------------------|
+| `string` | `{ type: 'string', value: 'hello' }` | `'hello'` |
+| `number` | `{ type: 'number', value: 42 }` | `42` |
+| `boolean` | `{ type: 'boolean', value: true }` | `true` |
+| `null` | `{ type: 'null', value: null }` | `null` |
+| `objref` | `{ type: 'objref', value: 5 }` | `RuntimeObject` or `5` |
+| `array` | `{ type: 'array', value: [...] }` | `[...]` (recursive) |
+| `object` | `{ type: 'object', value: {...} }` | `{...}` (recursive) |
+
+### Object References (`objref`)
+
+This is where it gets interesting. **Object references are stored as IDs but resolved to RuntimeObjects when read.**
+
+```javascript
+// WRITING: RuntimeObject → stored as objref
+self.owner = player;  // player is a RuntimeObject
+// Stored as: { type: 'objref', value: 42 }  (where 42 is player.id)
+
+// READING: objref → RuntimeObject (if in cache)
+const owner = self.owner;
+// If #42 is cached: returns RuntimeObject (can call owner.tell())
+// If #42 not cached: returns raw ID (42)
+```
+
+### The Caching Gotcha
+
+Object references only resolve to RuntimeObjects if the target is **already in the cache**:
+
+```javascript
+// SAFE: Object is definitely loaded
+const room = await $.load(self.location);  // Loads into cache
+const exits = room.exits;  // Returns RuntimeObjects (they're cached from room load)
+
+// UNSAFE: Object might not be cached
+const owner = self.owner;  // Might be RuntimeObject OR raw ID!
+if (typeof owner === 'number') {
+  // Oops, it's just the ID - need to load it
+  owner = await $.load(owner);
+}
+
+// BEST PRACTICE: Always use $.load() for object refs you need to call
+const owner = await $.load(self.owner);  // Always returns RuntimeObject
+await owner.tell('Hello!');  // Safe to call methods
+```
+
+### How the Proxy Auto-Converts
+
+When you **set** a property:
+
+```javascript
+self.location = room;  // room is RuntimeObject
+// The Proxy's set handler calls toValue():
+// - Detects RuntimeObject (has 'id' property)
+// - Stores as { type: 'objref', value: room.id }
+```
+
+When you **get** a property:
+
+```javascript
+const loc = self.location;
+// The Proxy's get handler calls fromValue():
+// - Sees type: 'objref', value: 42
+// - Calls manager.getSync(42)
+// - Returns RuntimeObject if cached, raw ID if not
+```
+
+### Arrays and Objects with References
+
+References are resolved **recursively** in arrays and nested objects:
+
+```javascript
+// Setting an array with RuntimeObjects
+self.bodyParts = [head, torso, leftArm, rightArm];
+// Stored as: { type: 'array', value: [
+//   { type: 'objref', value: 10 },
+//   { type: 'objref', value: 11 },
+//   { type: 'objref', value: 12 },
+//   { type: 'objref', value: 13 }
+// ]}
+
+// Reading resolves each element
+const parts = self.bodyParts;
+// Returns: [RuntimeObject, RuntimeObject, RuntimeObject, RuntimeObject]
+// (if all are cached)
+```
+
+### IDs vs Objects: When to Use Which
+
+```javascript
+// Store as ID when you just need a reference for later
+self.location = room.id;      // Stores as number (simpler)
+self.location = room;         // Stores as objref (same effect)
+
+// The contents array typically stores IDs
+self.contents = [item1.id, item2.id];  // Array of numbers
+self.contents = [item1, item2];        // Array of objrefs (auto-converted)
+
+// When calling methods, ALWAYS ensure you have a RuntimeObject
+const loc = await $.load(self.location);  // Guaranteed RuntimeObject
+await loc.announce('Hello!');             // Safe
+
+// DON'T do this
+await self.location.announce('Hello!');   // Might fail if not cached!
+```
+
+### The Safe Pattern
+
+```javascript
+// ALWAYS: Load before using
+async function teleport(player, destId) {
+  const dest = await $.load(destId);
+  const source = await $.load(player.location);
+
+  await source.removeContent(player.id);
+  player.location = dest.id;
+  await dest.addContent(player.id);
+
+  await dest.announce(player.name + ' appears in a flash of light!');
+}
+
+// NEVER: Assume property is RuntimeObject
+async function broken(player) {
+  const loc = player.location;  // Might be ID!
+  await loc.announce('...');    // CRASH if loc is just a number
+}
+```
+
+### Why This Design?
+
+1. **Database storage** - Can't store RuntimeObjects, only IDs
+2. **Memory efficiency** - Don't load every referenced object automatically
+3. **Lazy loading** - Objects loaded on demand via `$.load()`
+4. **Cache coherence** - If it's in cache, you get the live object
+
+### Quick Reference
+
+| Operation | Use |
+|-----------|-----|
+| Store reference | `self.owner = player` or `self.owner = player.id` |
+| Read reference (unsafe) | `self.owner` (might be ID) |
+| Read reference (safe) | `await $.load(self.owner)` |
+| Check if loaded | `typeof self.owner === 'object'` |
+| Get ID from object | `player.id` |
+| Load by ID | `await $.load(id)` or `await $[id]` |
+
 ## Core Utilities
 
 | Alias | Purpose |
