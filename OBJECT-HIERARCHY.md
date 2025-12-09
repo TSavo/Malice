@@ -359,7 +359,7 @@ methods: {
     const source = args[0];
     const owner = await $.load(source.location);
     if (owner && owner.unregisterVerbsFrom) {
-      await owner.unregisterVerbsFrom(self.id);
+      await owner.unregisterVerbsFrom(self);
     }
   `,
 

@@ -110,17 +110,17 @@ const room = await $.create({
 
 ```javascript
 // Register an alias
-$.tavern = tavernObject;
-$.registerAlias('square', squareObj);
+await $.addAlias('tavern', tavernObject);
+await $.addAlias('square', squareObj);
 
 // Use the alias later
 const tav = $.tavern;
 
 // Remove an alias
-$.removeAlias('tavern');
+await $.removeAlias('tavern');
 
-// List all aliases
-const aliases = $.getAliases();
+// Get all aliases
+const aliases = $.aliases;
 ```
 
 ## Verb Registration System
@@ -177,7 +177,7 @@ methods: {
     // Unregister verbs when leaving
     if (source.unregisterVerbsFrom) {
       const owner = await $.load(source.location);
-      await owner.unregisterVerbsFrom(self.id);
+      await owner.unregisterVerbsFrom(self);
     }
   `
 }
