@@ -38,7 +38,10 @@ describe('Telnet Integration Tests', () => {
 
   describe('Connection and Welcome', () => {
     it('should receive welcome message with logo on connect', async () => {
-      const welcome = await client.connect();
+      await client.connect();
+      // Wait for full welcome message to arrive
+      await client.waitFor('Login:', 3000);
+      const welcome = client.getBuffer();
 
       // Should contain login instructions (logo is ASCII art, may not have literal text)
       expect(welcome).toContain('Enter your username');
@@ -47,6 +50,7 @@ describe('Telnet Integration Tests', () => {
 
     it('should handle empty input gracefully at login prompt', async () => {
       await client.connect();
+      await client.waitFor('Login:', 3000);
       client.clearBuffer();
 
       // Send empty lines (simulating accidental enters)
@@ -54,7 +58,7 @@ describe('Telnet Integration Tests', () => {
       client.send('');
       client.send('');
 
-      await client.wait(200);
+      await client.waitFor('Please enter a username', 2000);
       const buffer = client.getBuffer();
 
       // Should prompt for username again without crashing
