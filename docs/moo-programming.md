@@ -1923,6 +1923,250 @@ async onArrived(dest, source, mover) {
 }
 ```
 
+### Real-World Example: The Clothing Hierarchy
+
+This shows how `$.wearable` → `$.clothing` → specific item uses shadowing and pass():
+
+```javascript
+// ═══════════════════════════════════════════════════════════
+// $.wearable - Base prototype (defines core properties)
+// ═══════════════════════════════════════════════════════════
+// Properties defined here:
+//   covers: ['torso']     - body slots this covers
+//   layer: 2              - layering order
+//   warmth: 0             - cold protection
+//   wornBy: null          - who's wearing it
+
+// Method: wear() - core state change logic
+async wear(wearer) {
+  if (self.wornBy) return { success: false, error: 'Already worn' };
+
+  // Find body part, check layer conflicts, etc.
+  self.wornBy = wearer;
+  self.wornOn = bodyPart;
+  return { success: true };
+}
+
+// ═══════════════════════════════════════════════════════════
+// $.clothing - Inherits from $.wearable (adds verbs + messaging)
+// ═══════════════════════════════════════════════════════════
+// Properties ADDED here (shadows nothing):
+//   material: 'cotton'
+//   color: 'white'
+
+// Method: doWear() - verb handler that USES parent's wear()
+async doWear() {
+  const wearer = args[1];
+
+  // Call the BASE method (on $.wearable) for state change
+  const result = await self.wear(wearer);  // NOT pass() - different method!
+  if (!result.success) return result.error;
+
+  // Swap verbs
+  await wearer.unregisterVerbsFrom(self);
+  await wearer.registerVerb(['remove %t'], self, 'doRemove');
+
+  // Announce
+  await $.pronoun.announce(room, '%N puts on %d.', wearer, self);
+  return result.message;
+}
+
+// ═══════════════════════════════════════════════════════════
+// Warm Wool Cloak (instance, parent: $.clothing)
+// ═══════════════════════════════════════════════════════════
+// Properties that SHADOW parent defaults:
+//   name: 'warm wool cloak'     - shadows $.describable default
+//   warmth: 40                  - shadows $.wearable's 0
+//   covers: ['shoulders']       - shadows $.wearable's ['torso']
+//   material: 'wool'            - shadows $.clothing's 'cotton'
+//   color: 'gray'               - shadows $.clothing's 'white'
+
+// NO methods defined - inherits doWear from $.clothing
+// When player types "wear cloak":
+//   1. cloak.doWear() found on $.clothing
+//   2. Executes with self = this specific cloak
+//   3. self.warmth = 40 (own property)
+//   4. self.wear() calls $.wearable.wear() with self = cloak
+```
+
+### Real-World Example: Admin Extends Player
+
+```javascript
+// ═══════════════════════════════════════════════════════════
+// $.player.connect() - registers base commands
+// ═══════════════════════════════════════════════════════════
+async connect() {
+  // Register player verbs
+  await self.registerVerb(['look', 'l'], self, 'look');
+  await self.registerVerb(['inventory', 'i'], self, 'inventory');
+  await self.registerVerb(['say %s', '"%s"'], self, 'say');
+  await self.registerVerb(['go %s'], self, 'go');
+  await self.registerVerb(['get %i', 'take %i'], self, 'get');
+  await self.registerVerb(['drop %i'], self, 'drop');
+  await self.registerVerb(['quit', '@quit'], self, 'quit');
+
+  // Move to starting location, trigger room announcements
+  const startRoom = await $.load(self.location);
+  await startRoom.onContentArrived(self, null, self);
+}
+
+// ═══════════════════════════════════════════════════════════
+// $.admin.connect() - adds admin commands, then calls parent
+// ═══════════════════════════════════════════════════════════
+async connect() {
+  // FIRST: Register admin-only verbs
+  await self.registerVerb(['@dig %s'], self, 'dig');
+  await self.registerVerb(['@create'], self, 'create');
+  await self.registerVerb(['@teleport %i to %i', '@tel %i to %i'], self, 'teleport');
+  await self.registerVerb(['@set %s'], self, 'setProperty');
+  await self.registerVerb(['@examine %i', '@exam %i'], self, 'examine');
+  await self.registerVerb(['@eval %s'], self, 'eval');
+  await self.registerVerb(['@alias %s'], self, 'alias');
+
+  // THEN: Call parent to get all player verbs too
+  await pass();
+  // Now admin has: @dig, @create, @teleport... AND look, inventory, say, go...
+}
+```
+
+### Real-World Example: Custom Room Description
+
+```javascript
+// ═══════════════════════════════════════════════════════════
+// $.describable.describe() - base description
+// ═══════════════════════════════════════════════════════════
+async describe(viewer) {
+  return self.name + '\n' + self.description;
+}
+
+// ═══════════════════════════════════════════════════════════
+// $.location.describe() - adds contents listing
+// ═══════════════════════════════════════════════════════════
+async describe(viewer) {
+  let text = await pass(viewer);  // Get base description
+
+  // Add contents (excluding viewer)
+  const visible = [];
+  for (const id of self.contents || []) {
+    if (id === viewer?.id) continue;
+    const obj = await $.load(id);
+    if (obj) visible.push(obj.name);
+  }
+
+  if (visible.length > 0) {
+    text += '\n\nYou see: ' + visible.join(', ');
+  }
+  return text;
+}
+
+// ═══════════════════════════════════════════════════════════
+// $.room.describe() - adds exits
+// ═══════════════════════════════════════════════════════════
+async describe(viewer) {
+  let text = await pass(viewer);  // Get location description (includes contents)
+
+  // Add exits
+  const exitDirs = Object.keys(self.exits || {});
+  if (exitDirs.length > 0) {
+    text += '\n\nExits: ' + exitDirs.join(', ');
+  }
+  return text;
+}
+
+// ═══════════════════════════════════════════════════════════
+// The Haunted Library (specific room instance)
+// ═══════════════════════════════════════════════════════════
+// Shadows the describe() method for special behavior
+room.setMethod('describe', `
+  // Get the normal room description (name, desc, contents, exits)
+  let text = await pass(args[0]);
+
+  // Add spooky atmospheric text
+  const hour = new Date().getHours();
+  if (hour >= 22 || hour < 6) {
+    text += '\\n\\nThe shadows seem to move in the candlelight...';
+  }
+
+  // Add book count
+  const books = (self.contents || []).filter(async id => {
+    const obj = await $.load(id);
+    return obj?.isBook;
+  });
+  if (books.length > 0) {
+    text += '\\n\\n' + books.length + ' dusty tomes line the shelves.';
+  }
+
+  return text;
+`);
+
+// Result when looking at Haunted Library at midnight:
+// "The Haunted Library
+// A vast room filled with ancient bookshelves reaching to the vaulted ceiling.
+//
+// You see: old lantern, wooden ladder
+//
+// Exits: north, east, up
+//
+// The shadows seem to move in the candlelight...
+//
+// 47 dusty tomes line the shelves."
+```
+
+### Real-World Example: Damage Reduction Chain
+
+```javascript
+// ═══════════════════════════════════════════════════════════
+// $.embodied.takeDamage() - base damage handling
+// ═══════════════════════════════════════════════════════════
+async takeDamage(amount, type, source) {
+  self.hp = Math.max(0, self.hp - amount);
+
+  if (self.hp <= 0) {
+    await self.die(source);
+  }
+
+  return amount;  // Return actual damage taken
+}
+
+// ═══════════════════════════════════════════════════════════
+// $.human.takeDamage() - adds armor reduction
+// ═══════════════════════════════════════════════════════════
+async takeDamage(amount, type, source) {
+  // Calculate armor reduction
+  let reduced = amount;
+  const armor = await self.getArmorValue(type);
+  reduced = Math.max(1, amount - armor);  // Always at least 1
+
+  // Pass reduced damage to parent
+  return await pass(reduced, type, source);
+}
+
+// ═══════════════════════════════════════════════════════════
+// $.player.takeDamage() - adds pain messages
+// ═══════════════════════════════════════════════════════════
+async takeDamage(amount, type, source) {
+  // Let parent chain handle the actual damage
+  const actualDamage = await pass(amount, type, source);
+
+  // Add player feedback
+  const severity = await $.proportional.sub(
+    ['a scratch', 'painful', 'serious', 'devastating'],
+    actualDamage, 50
+  );
+  await self.tell('You take ' + severity + ' damage!');
+
+  return actualDamage;
+}
+
+// When a player takes 30 slashing damage:
+// 1. $.player.takeDamage(30, 'slashing', enemy) called
+// 2. pass(30, ...) → $.human.takeDamage(30, 'slashing', enemy)
+// 3. Armor reduces to 22, pass(22, ...) → $.embodied.takeDamage(22, ...)
+// 4. HP reduced by 22, returns 22
+// 5. Back in $.human, returns 22
+// 6. Back in $.player, shows "You take serious damage!", returns 22
+```
+
 ## $.describable - The Foundation
 
 **Everything that exists in the world inherits from `$.describable`.** It provides:
