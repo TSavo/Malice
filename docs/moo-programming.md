@@ -1541,23 +1541,206 @@ const msg = await $.format.compose('%T %v{fall}.', items.map(i => i.name));
 
 When creating new object types, inherit from the appropriate prototype:
 
-| Prototype | Use For |
-|-----------|---------|
-| `$.describable` | Anything with name/description |
-| `$.location` | Containers (holds contents) |
-| `$.room` | Rooms with exits |
-| `$.agent` | Things that can act (NPCs) |
-| `$.embodied` | Agents with physical bodies |
-| `$.human` | Human-type embodied agents |
-| `$.player` | Player characters |
-| `$.admin` | Wizard/admin players |
-| `$.decayable` | Things that decay over time |
-| `$.edible` | Consumable items |
-| `$.food` | Solid food |
-| `$.drink` | Liquids |
-| `$.bodyPart` | Body parts (inherit from $.edible!) |
-| `$.wearable` | Items that can be worn |
-| `$.clothing` | Wearable clothing items |
+| Prototype | Inherits From | Use For |
+|-----------|---------------|---------|
+| `$.describable` | `$.root` | **Foundation** - anything that exists in the world |
+| `$.location` | `$.describable` | Containers (holds contents) |
+| `$.room` | `$.location` | Rooms with exits |
+| `$.exit` | `$.describable` | Directional links between rooms |
+| `$.agent` | `$.describable` | Things that can act (NPCs) |
+| `$.embodied` | `$.agent` | Agents with physical bodies |
+| `$.human` | `$.embodied` | Human-type embodied agents |
+| `$.player` | `$.human` | Player characters |
+| `$.admin` | `$.player` | Wizard/admin players |
+| `$.decayable` | `$.describable` | Things that decay over time |
+| `$.edible` | `$.decayable` | Consumable items |
+| `$.food` | `$.edible` | Solid food |
+| `$.drink` | `$.edible` | Liquids |
+| `$.bodyPart` | `$.edible` | Body parts (yes, they're edible!) |
+| `$.wearable` | `$.describable` | Items that can be worn |
+| `$.clothing` | `$.wearable` | Wearable clothing items |
+
+## $.describable - The Foundation
+
+**Everything that exists in the world inherits from `$.describable`.** It provides:
+
+### Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `name` | string | Display name |
+| `description` | string | Long description |
+| `aliases` | string[] | Alternative names for matching |
+| `location` | number \| null | Object ID of container, or null |
+| `contents` | number[] | Object IDs of contained objects |
+| `width` | number | Width in centimeters |
+| `height` | number | Height in centimeters |
+| `depth` | number | Depth in centimeters |
+| `weight` | number | Weight in grams |
+| `boltedDown` | boolean | If true, cannot be moved |
+
+### Core Methods
+
+```javascript
+// Get description (name + description text)
+const desc = await obj.describe();
+
+// Get short description (just name)
+const short = await obj.shortDesc();
+
+// Get volume in cubic centimeters
+const volume = await obj.getVolume();
+
+// Check if this fits inside a container
+const fits = await obj.canFitIn(container);  // true/false
+
+// Check if this can contain another object
+const result = await obj.canContain(item);   // true or rejection string
+```
+
+### The moveTo() Method - THE Primitive for Movement
+
+**ALL movement goes through `moveTo()`.** This is critical:
+
+```javascript
+// Move an object to a new location
+await item.moveTo(room);              // Item moves to room
+await item.moveTo(room, player);      // Player caused the move
+
+// moveTo() handles everything:
+// 1. Calls dest.canContain(self) - can reject with string
+// 2. Calls source.onContentLeaving() - can throw to cancel
+// 3. Calls self.onLeaving() - can throw to cancel
+// 4. Updates source.contents and dest.contents
+// 5. Updates self.location
+// 6. Calls source.onContentLeft() - for cleanup
+// 7. Calls self.onArrived() - for setup
+// 8. Calls dest.onContentArrived() - for announcements
+```
+
+### Movement Hooks
+
+Override these to customize behavior:
+
+```javascript
+// On the OBJECT being moved:
+obj.setMethod('onLeaving', `
+  const [source, dest, mover] = args;
+  // Called BEFORE leaving source
+  // Throw to cancel the move
+  if (self.boltedDown) {
+    throw new Error('This is bolted down!');
+  }
+`);
+
+obj.setMethod('onArrived', `
+  const [dest, source, mover] = args;
+  // Called AFTER arriving at dest
+  // Register verbs, trigger effects, etc.
+`);
+
+// On the CONTAINER:
+container.setMethod('onContentLeaving', `
+  const [obj, dest, mover] = args;
+  // Called BEFORE obj leaves this container
+  // Throw to prevent departure
+`);
+
+container.setMethod('onContentLeft', `
+  const [obj, dest, mover] = args;
+  // Called AFTER obj left - cleanup
+`);
+
+container.setMethod('onContentArrived', `
+  const [obj, source, mover] = args;
+  // Called AFTER obj arrived - announcements
+  await $.pronoun.announce(self, '%N %v{arrive}.', obj);
+`);
+```
+
+### Why moveTo() Matters
+
+```javascript
+// DON'T: Manual location manipulation - BROKEN
+item.location = room.id;
+room.contents.push(item.id);
+// Problems:
+// - Old container's contents not updated
+// - No hooks fired (announcements, verbs, triggers)
+// - No permission checks
+// - No canContain validation
+
+// DO: Always use moveTo()
+await item.moveTo(room, player);
+// Handles everything correctly
+```
+
+## $.location - Containers
+
+`$.location` extends `$.describable` to support containing other objects.
+
+### Additional Methods
+
+```javascript
+// Add object to contents (called by moveTo)
+await container.addContent(objId);
+
+// Remove object from contents (called by moveTo)
+await container.removeContent(objId);
+
+// Describe location (shows contents)
+const desc = await room.describe(viewer);  // Excludes viewer from "You see:"
+```
+
+### Room Messaging
+
+Locations provide messaging to all occupants:
+
+```javascript
+// Announce with perspective-aware messages
+await room.announce(actor, target, {
+  actor: 'You pick up the sword.',      // Actor sees this
+  target: 'Bob picks up your sword.',   // Target sees this
+  others: 'Bob picks up the sword.'     // Everyone else sees this
+}, 'You hear metal scraping.');         // Optional sound
+
+// Message placeholders in announce():
+// %a/%A = actor name (you/You if viewer is actor)
+// %t/%T = target name (you/You if viewer is target)
+// %as/%ao/%ap = actor subject/object/possessive pronoun
+// %ts/%to/%tp = target subject/object/possessive pronoun
+// %av{verb} = conjugated verb (cut/cuts based on viewer)
+
+// Broadcast speech (respects language understanding)
+await room.broadcastSpeech({ content: 'Hello!', language: 'english' }, speaker);
+```
+
+### Container Validation
+
+Override `canContain` to restrict what goes in:
+
+```javascript
+// A bag that only holds small items
+bag.setMethod('canContain', `
+  const item = args[0];
+  if (item.weight > 1000) {
+    return 'The ' + item.name + ' is too heavy for the bag.';
+  }
+  if (!await item.canFitIn(self)) {
+    return 'The ' + item.name + ' is too large for the bag.';
+  }
+  return true;  // Allow
+`);
+
+// A magic box that only holds gems
+magicBox.setMethod('canContain', `
+  const item = args[0];
+  if (!item.isGem) {
+    return 'The magic box rejects the ' + item.name + '.';
+  }
+  return true;
+`);
+```
 
 ## Summary: What to Use Where
 
