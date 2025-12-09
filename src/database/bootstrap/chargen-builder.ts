@@ -65,9 +65,22 @@ export class CharGenBuilder {
       const password = args[2];
 
       // Pre-player messages go through context directly (no player yet)
+      // Send welcome BEFORE async chargen starts to avoid race conditions
       context.send('\\r\\n');
-      context.send('=== Character Creation ===\\r\\n');
-      context.send('Warning: You must complete this process without disconnecting.\\r\\n');
+      context.send('╔══════════════════════════════════════════════════════════╗\\r\\n');
+      context.send('║               ✦ Welcome to MALICE ✦                      ║\\r\\n');
+      context.send('╠══════════════════════════════════════════════════════════╣\\r\\n');
+      context.send('║                                                          ║\\r\\n');
+      context.send('║  You stand at the threshold of a dark and dangerous      ║\\r\\n');
+      context.send('║  world. Before you can enter, you must give form to      ║\\r\\n');
+      context.send('║  your vessel.                                            ║\\r\\n');
+      context.send('║                                                          ║\\r\\n');
+      context.send('║  Take your time. Choose wisely.                          ║\\r\\n');
+      context.send('║  Your choices here will shape your destiny.              ║\\r\\n');
+      context.send('║                                                          ║\\r\\n');
+      context.send('╚══════════════════════════════════════════════════════════╝\\r\\n');
+      context.send('\\r\\n');
+      context.send('⚠  Warning: You must complete this process without disconnecting.\\r\\n');
       context.send('\\r\\n');
 
       // Hash password
@@ -132,18 +145,23 @@ export class CharGenBuilder {
     this.charGen.setMethod('runCharGen', `
       const player = args[0];
       const isFirstPlayer = args[1];
+      const format = $.format;
 
-      await player.tell('');
-      await player.tell('Let\\'s create your character...');
-      await player.tell('');
+      // Helper to show section header (inline, no extra tells before prompt)
+      const showSection = (step, total, title) => {
+        const filled = '█'.repeat(Math.round((step / total) * 15));
+        const empty = '░'.repeat(15 - filled.length);
+        return '[ Step ' + step + '/' + total + ' ' + filled + empty + ' ] ' + title;
+      };
 
-      // === NAME ===
-      const alias = await $.prompt.question(player, 'What name do you go by? (This is how others will address you) ');
+      // === STEP 1: NAME ===
+      // Go straight to the first prompt - welcome was shown in onNewUser
+      const alias = await $.prompt.question(player, showSection(1, 6, 'IDENTITY') + '\\r\\n  Your name is how others will know you.\\r\\n  What name do you go by? ');
       player.set('name', alias);
       player.set('aliases', [alias.toLowerCase()]);
 
       // === SEX ===
-      const sex = await $.prompt.choice(player, 'What is your sex?', {
+      const sex = await $.prompt.choice(player, '  What is your sex?', {
         male: 'Male',
         female: 'Female',
         nonbinary: 'Non-binary',
@@ -158,321 +176,158 @@ export class CharGenBuilder {
       player.set('sex', sex);
       player.set('pronouns', pronouns);
 
-      // === AGE ===
+      // === STEP 2: PHYSICAL ===
       let age = null;
       while (!age) {
-        const ageInput = await $.prompt.question(player, 'How old are you? (18-100) ');
+        const ageInput = await $.prompt.question(player, showSection(2, 6, 'PHYSICAL') + '\\r\\n  How old are you? (18-100) ');
         const parsed = parseInt(ageInput, 10);
         if (isNaN(parsed) || parsed < 18 || parsed > 100) {
-          await player.tell('Please enter a valid age between 18 and 100.');
+          await player.tell('  ⚠ Please enter a valid age between 18 and 100.');
         } else {
           age = parsed;
         }
       }
       player.set('age', age);
 
-      // === HEIGHT ===
+      // HEIGHT
       let height = null;
       while (!height) {
-        const heightInput = await $.prompt.question(player, 'How tall are you in meters? (1.0 - 2.5, e.g. 1.75) ');
+        const heightInput = await $.prompt.question(player, '  How tall are you in meters? (1.0 - 2.5) ');
         const parsed = parseFloat(heightInput);
         if (isNaN(parsed) || parsed < 1.0 || parsed > 2.5) {
-          await player.tell('Please enter a valid height between 1.0 and 2.5 meters.');
+          await player.tell('  ⚠ Please enter a valid height between 1.0 and 2.5 meters.');
         } else {
           height = Math.round(parsed * 100) / 100;
         }
       }
       player.set('height', height);
 
-      // === WEIGHT ===
+      // WEIGHT
       let weight = null;
       while (!weight) {
-        const weightInput = await $.prompt.question(player, 'How much do you weigh in kilograms? (30 - 200) ');
+        const weightInput = await $.prompt.question(player, '  Weight in kilograms? (30 - 200) ');
         const parsed = parseInt(weightInput, 10);
         if (isNaN(parsed) || parsed < 30 || parsed > 200) {
-          await player.tell('Please enter a valid weight between 30 and 200 kg.');
+          await player.tell('  ⚠ Please enter a valid weight between 30 and 200 kg.');
         } else {
           weight = parsed;
         }
       }
       player.set('weight', weight);
 
-      // === APPEARANCE ===
-      await player.tell('');
-      await player.tell('Now let\\'s define your appearance...');
-      await player.tell('');
-
-      // Eye colors - expanded list
+      // === STEP 3: EYES ===
       const eyeColors = {
-        // Common natural colors
-        brown: 'Brown',
-        darkBrown: 'Dark Brown',
-        lightBrown: 'Light Brown',
-        amber: 'Amber',
-        hazel: 'Hazel',
-        green: 'Green',
-        emerald: 'Emerald',
-        blue: 'Blue',
-        skyBlue: 'Sky Blue',
-        steelBlue: 'Steel Blue',
-        gray: 'Gray',
-        blueGray: 'Blue-Gray',
-        // Rare natural colors
-        violet: 'Violet',
-        black: 'Black',
-        // Heterochromia hint
+        brown: 'Brown', darkBrown: 'Dark Brown', lightBrown: 'Light Brown',
+        amber: 'Amber', hazel: 'Hazel', green: 'Green', emerald: 'Emerald',
+        blue: 'Blue', skyBlue: 'Sky Blue', steelBlue: 'Steel Blue',
+        gray: 'Gray', blueGray: 'Blue-Gray', violet: 'Violet', black: 'Black',
         heterochromia: 'Heterochromia (mixed)',
       };
 
-      let eyeColor = await $.prompt.menu(player, 'What color are your eyes?', eyeColors, 3);
+      let eyeColor = await $.prompt.menu(player, showSection(3, 6, 'EYES') + '\\r\\n  What color are your eyes?', eyeColors, 3);
 
       // Handle heterochromia - need two different colors
       let leftEyeColor = eyeColor;
       let rightEyeColor = eyeColor;
 
       if (eyeColor === 'heterochromia') {
-        await player.tell('');
-        await player.tell('Heterochromia - choose a color for each eye:');
-
-        // Remove heterochromia from the options for individual eye selection
         const singleEyeColors = { ...eyeColors };
         delete singleEyeColors.heterochromia;
-
-        leftEyeColor = await $.prompt.menu(player, 'Left eye color?', singleEyeColors, 3);
-        rightEyeColor = await $.prompt.menu(player, 'Right eye color?', singleEyeColors, 3);
-
-        // For display purposes, show both colors
+        leftEyeColor = await $.prompt.menu(player, '  ✦ Heterochromia! Left eye color?', singleEyeColors, 3);
+        rightEyeColor = await $.prompt.menu(player, '  Right eye color?', singleEyeColors, 3);
         eyeColor = leftEyeColor + '/' + rightEyeColor;
       }
 
       // Eye shapes
       const eyeStyles = {
-        almond: 'Almond',
-        round: 'Round',
-        hooded: 'Hooded',
-        monolid: 'Monolid',
-        upturned: 'Upturned',
-        downturned: 'Downturned',
-        deepSet: 'Deep-set',
-        prominent: 'Prominent',
-        closeset: 'Close-set',
-        wideset: 'Wide-set',
+        almond: 'Almond', round: 'Round', hooded: 'Hooded', monolid: 'Monolid',
+        upturned: 'Upturned', downturned: 'Downturned', deepSet: 'Deep-set',
+        prominent: 'Prominent', closeset: 'Close-set', wideset: 'Wide-set',
       };
+      const eyeStyle = await $.prompt.menu(player, '  What shape are your eyes?', eyeStyles, 2);
 
-      const eyeStyle = await $.prompt.menu(player, 'What shape are your eyes?', eyeStyles, 2);
-
-      // Hair colors - expanded with unnatural/dyed options
+      // === STEP 4: HAIR ===
       const hairColors = {
-        // Natural blacks/browns
-        black: 'Black',
-        jetBlack: 'Jet Black',
-        darkBrown: 'Dark Brown',
-        brown: 'Brown',
-        chestnut: 'Chestnut',
-        auburn: 'Auburn',
-        // Reds
-        red: 'Red',
-        ginger: 'Ginger',
-        strawberry: 'Strawberry Blonde',
-        copper: 'Copper',
-        // Blondes
-        blonde: 'Blonde',
-        golden: 'Golden Blonde',
-        platinum: 'Platinum',
-        sandy: 'Sandy Blonde',
-        ashBlonde: 'Ash Blonde',
-        // Grays/whites
-        gray: 'Gray',
-        silver: 'Silver',
-        white: 'White',
-        salt: 'Salt & Pepper',
-        // Unnatural/dyed
-        purple: 'Purple',
-        violet: 'Violet',
-        blue: 'Blue',
-        teal: 'Teal',
-        green: 'Green',
-        pink: 'Pink',
-        hotPink: 'Hot Pink',
-        rose: 'Rose Gold',
-        orange: 'Orange',
-        multicolor: 'Multicolored',
+        black: 'Black', jetBlack: 'Jet Black', darkBrown: 'Dark Brown', brown: 'Brown',
+        chestnut: 'Chestnut', auburn: 'Auburn', red: 'Red', ginger: 'Ginger',
+        strawberry: 'Strawberry Blonde', copper: 'Copper', blonde: 'Blonde',
+        golden: 'Golden Blonde', platinum: 'Platinum', sandy: 'Sandy Blonde',
+        ashBlonde: 'Ash Blonde', gray: 'Gray', silver: 'Silver', white: 'White',
+        salt: 'Salt & Pepper', purple: 'Purple', violet: 'Violet', blue: 'Blue',
+        teal: 'Teal', green: 'Green', pink: 'Pink', hotPink: 'Hot Pink',
+        rose: 'Rose Gold', orange: 'Orange', multicolor: 'Multicolored',
       };
-
-      const hairColor = await $.prompt.menu(player, 'What color is your hair?', hairColors, 3);
+      const hairColor = await $.prompt.menu(player, showSection(4, 6, 'HAIR') + '\\r\\n  What color is your hair?', hairColors, 3);
 
       // Hair styles
       const hairStyles = {
-        straight: 'Straight',
-        wavy: 'Wavy',
-        curly: 'Curly',
-        coily: 'Coily/Kinky',
-        bald: 'Bald',
-        shaved: 'Shaved',
-        buzzcut: 'Buzz Cut',
-        cropped: 'Cropped Short',
-        shoulderLength: 'Shoulder Length',
-        long: 'Long',
-        veryLong: 'Very Long',
+        straight: 'Straight', wavy: 'Wavy', curly: 'Curly', coily: 'Coily/Kinky',
+        bald: 'Bald', shaved: 'Shaved', buzzcut: 'Buzz Cut', cropped: 'Cropped Short',
+        shoulderLength: 'Shoulder Length', long: 'Long', veryLong: 'Very Long',
       };
-
-      const hairStyle = await $.prompt.menu(player, 'What style is your hair?', hairStyles, 2);
+      const hairStyle = await $.prompt.menu(player, '  What style is your hair?', hairStyles, 2);
 
       // Hair texture
-      const hairTextures = {
-        fine: 'Fine',
-        medium: 'Medium',
-        thick: 'Thick',
-        coarse: 'Coarse',
-        silky: 'Silky',
-        wiry: 'Wiry',
-      };
+      const hairTextures = { fine: 'Fine', medium: 'Medium', thick: 'Thick', coarse: 'Coarse', silky: 'Silky', wiry: 'Wiry' };
+      const hairTexture = await $.prompt.menu(player, '  What texture is your hair?', hairTextures, 3);
 
-      const hairTexture = await $.prompt.menu(player, 'What texture is your hair?', hairTextures, 3);
-
-      // Skin tones - expanded with descriptive names
+      // === STEP 5: SKIN & BUILD ===
       const skinTones = {
-        // Very light
-        porcelain: 'Porcelain',
-        ivory: 'Ivory',
-        pale: 'Pale',
-        fair: 'Fair',
-        // Light
-        light: 'Light',
-        cream: 'Cream',
-        peach: 'Peach',
-        // Medium
-        beige: 'Beige',
-        sand: 'Sand',
-        medium: 'Medium',
-        olive: 'Olive',
-        golden: 'Golden',
-        // Tan
-        tan: 'Tan',
-        caramel: 'Caramel',
-        honey: 'Honey',
-        bronze: 'Bronze',
-        // Brown
-        almond: 'Almond',
-        chestnutSkin: 'Chestnut',
-        brown: 'Brown',
-        umber: 'Umber',
-        // Dark
-        espresso: 'Espresso',
-        mahogany: 'Mahogany',
-        ebony: 'Ebony',
-        obsidian: 'Obsidian',
+        porcelain: 'Porcelain', ivory: 'Ivory', pale: 'Pale', fair: 'Fair',
+        light: 'Light', cream: 'Cream', peach: 'Peach', beige: 'Beige',
+        sand: 'Sand', medium: 'Medium', olive: 'Olive', golden: 'Golden',
+        tan: 'Tan', caramel: 'Caramel', honey: 'Honey', bronze: 'Bronze',
+        almond: 'Almond', chestnutSkin: 'Chestnut', brown: 'Brown', umber: 'Umber',
+        espresso: 'Espresso', mahogany: 'Mahogany', ebony: 'Ebony', obsidian: 'Obsidian',
       };
-
-      const skinTone = await $.prompt.menu(player, 'What is your skin tone?', skinTones, 3);
+      const skinTone = await $.prompt.menu(player, showSection(5, 6, 'SKIN & BUILD') + '\\r\\n  What is your skin tone?', skinTones, 3);
 
       // Build/body type
-      await player.tell('');
-      await player.tell('Now describe your build and features...');
-
       const buildTypes = {
-        petite: 'Petite',
-        slim: 'Slim',
-        lean: 'Lean',
-        athletic: 'Athletic',
-        average: 'Average',
-        toned: 'Toned',
-        muscular: 'Muscular',
-        stocky: 'Stocky',
-        heavyset: 'Heavyset',
-        curvy: 'Curvy',
-        broad: 'Broad-shouldered',
-        lanky: 'Lanky',
+        petite: 'Petite', slim: 'Slim', lean: 'Lean', athletic: 'Athletic',
+        average: 'Average', toned: 'Toned', muscular: 'Muscular', stocky: 'Stocky',
+        heavyset: 'Heavyset', curvy: 'Curvy', broad: 'Broad-shouldered', lanky: 'Lanky',
       };
+      const buildType = await $.prompt.menu(player, '  What is your build?', buildTypes, 3);
 
-      const buildType = await $.prompt.menu(player, 'What is your build?', buildTypes, 3);
-
-      // Face shape
+      // === STEP 6: FACE & FEATURES ===
       const faceShapes = {
-        oval: 'Oval',
-        round: 'Round',
-        square: 'Square',
-        rectangular: 'Rectangular',
-        heart: 'Heart',
-        diamond: 'Diamond',
-        oblong: 'Oblong',
-        triangular: 'Triangular',
+        oval: 'Oval', round: 'Round', square: 'Square', rectangular: 'Rectangular',
+        heart: 'Heart', diamond: 'Diamond', oblong: 'Oblong', triangular: 'Triangular',
       };
-
-      const faceShape = await $.prompt.menu(player, 'What is your face shape?', faceShapes, 2);
+      const faceShape = await $.prompt.menu(player, showSection(6, 6, 'FACE') + '\\r\\n  What is your face shape?', faceShapes, 2);
 
       // Nose shape
       const noseShapes = {
-        straight: 'Straight',
-        roman: 'Roman/Aquiline',
-        button: 'Button',
-        upturned: 'Upturned',
-        hawk: 'Hawk',
-        wide: 'Wide',
-        narrow: 'Narrow',
-        flat: 'Flat',
-        bulbous: 'Bulbous',
-        snub: 'Snub',
+        straight: 'Straight', roman: 'Roman/Aquiline', button: 'Button', upturned: 'Upturned',
+        hawk: 'Hawk', wide: 'Wide', narrow: 'Narrow', flat: 'Flat', bulbous: 'Bulbous', snub: 'Snub',
       };
-
-      const noseShape = await $.prompt.menu(player, 'What shape is your nose?', noseShapes, 2);
+      const noseShape = await $.prompt.menu(player, '  What shape is your nose?', noseShapes, 2);
 
       // Lip shape
       const lipShapes = {
-        full: 'Full',
-        thin: 'Thin',
-        medium: 'Medium',
-        bowShaped: 'Bow-shaped',
-        wide: 'Wide',
-        narrow: 'Narrow',
-        hearted: 'Heart-shaped',
-        pouty: 'Pouty',
+        full: 'Full', thin: 'Thin', medium: 'Medium', bowShaped: 'Bow-shaped',
+        wide: 'Wide', narrow: 'Narrow', hearted: 'Heart-shaped', pouty: 'Pouty',
       };
-
-      const lipShape = await $.prompt.menu(player, 'What shape are your lips?', lipShapes, 2);
+      const lipShape = await $.prompt.menu(player, '  What shape are your lips?', lipShapes, 2);
 
       // Distinguishing features
-      await player.tell('');
-      await player.tell('Any distinguishing features?');
-
-      const freckleOptions = {
-        none: 'None',
-        light: 'Light freckling',
-        moderate: 'Moderate freckling',
-        heavy: 'Heavy freckling',
-      };
-
-      const freckles = await $.prompt.menu(player, 'Freckles?', freckleOptions, 2);
+      const freckleOptions = { none: 'None', light: 'Light freckling', moderate: 'Moderate freckling', heavy: 'Heavy freckling' };
+      const freckles = await $.prompt.menu(player, '  Freckles?', freckleOptions, 2);
 
       const markOptions = {
-        none: 'None',
-        dimplesCheeks: 'Dimples (cheeks)',
-        dimpleChin: 'Dimple (chin)',
-        moleLeft: 'Beauty mark (left)',
-        moleRight: 'Beauty mark (right)',
-        birthmark: 'Birthmark',
-        cleftChin: 'Cleft chin',
+        none: 'None', dimplesCheeks: 'Dimples (cheeks)', dimpleChin: 'Dimple (chin)',
+        moleLeft: 'Beauty mark (left)', moleRight: 'Beauty mark (right)', birthmark: 'Birthmark', cleftChin: 'Cleft chin',
       };
-
-      const distinguishingMark = await $.prompt.menu(player, 'Any distinguishing marks?', markOptions, 2);
+      const distinguishingMark = await $.prompt.menu(player, '  Any distinguishing marks?', markOptions, 2);
 
       // Facial hair (offer to all, some may choose none)
       const facialHairOptions = {
-        none: 'None/Clean-shaven',
-        stubble: 'Stubble',
-        lightBeard: 'Light beard',
-        fullBeard: 'Full beard',
-        longBeard: 'Long beard',
-        goatee: 'Goatee',
-        vandyke: 'Van Dyke',
-        mustache: 'Mustache',
-        handlebars: 'Handlebar mustache',
-        soulPatch: 'Soul patch',
-        sideburns: 'Sideburns',
-        mutton: 'Mutton chops',
+        none: 'None/Clean-shaven', stubble: 'Stubble', lightBeard: 'Light beard', fullBeard: 'Full beard',
+        longBeard: 'Long beard', goatee: 'Goatee', vandyke: 'Van Dyke', mustache: 'Mustache',
+        handlebars: 'Handlebar mustache', soulPatch: 'Soul patch', sideburns: 'Sideburns', mutton: 'Mutton chops',
       };
-
-      const facialHair = await $.prompt.menu(player, 'Facial hair?', facialHairOptions, 3);
+      const facialHair = await $.prompt.menu(player, '  Facial hair?', facialHairOptions, 3);
 
       // Store appearance for body creation
       const appearance = {
@@ -495,18 +350,33 @@ export class CharGenBuilder {
 
       // === CREATE BODY ===
       await player.tell('');
-      await player.tell('Growing your body...');
+      await player.tell('╔══════════════════════════════════════════════════════════╗');
+      await player.tell('║               ✦ MANIFESTING YOUR FORM ✦                  ║');
+      await player.tell('╚══════════════════════════════════════════════════════════╝');
+      await player.tell('');
+      await player.tell('  The ritual begins...');
+      await player.tell('  ' + await format.bar(1, 4, 30, { filled: '▓', empty: '░' }));
+      await player.tell('  Weaving flesh and bone...');
 
       const bodyFactory = await $.bodyFactory;
       const body = await bodyFactory.createHumanBody(player.id, sex, appearance);
       player.set('body', body.id);
 
-      // === CONFIRMATION ===
+      await player.tell('  ' + await format.bar(4, 4, 30, { filled: '▓', empty: '░' }));
+      await player.tell('  ✓ Your body has been formed!');
       await player.tell('');
-      await player.tell('=== Your Character ===');
 
-      // Use $.format for nice display
-      const format = $.format;
+      // === CONFIRMATION ===
+      const charBox = await format.box([
+        '✦ CHARACTER PREVIEW ✦',
+        '',
+        'Review your creation before it is finalized.',
+        'You may start over if anything is not to your liking.',
+      ], { style: 'heavy', padding: 1 });
+      for (const line of charBox) {
+        await player.tell(line);
+      }
+      await player.tell('');
 
       // Format eye color display (handle heterochromia)
       let eyeColorDisplay;
@@ -572,53 +442,73 @@ export class CharGenBuilder {
 
       // === STAT ALLOCATION ===
       await player.tell('');
-      await player.tell('Now allocate your stat points!');
-      await player.tell('You have 20 points to spend. Single body parts cost 1, paired parts cost 2.');
+      const statBox = await format.box([
+        '✦ STAT ALLOCATION ✦',
+        '',
+        'Now strengthen your body! You have 20 points to spend.',
+        '',
+        '  • Single parts (head, torso): 1 point each',
+        '  • Paired parts (arms, legs, etc): 2 points each',
+        '',
+        'Higher capacity means more endurance and resilience.',
+      ], { style: 'single', padding: 1 });
+      for (const line of statBox) {
+        await player.tell(line);
+      }
       await player.tell('');
 
       await $.charGen.runStatAllocation(player);
 
       // === FINAL CONFIRMATION ===
       await player.tell('');
-      await player.tell('=== Final Character Summary ===');
+      await player.tell('╔══════════════════════════════════════════════════════════╗');
+      await player.tell('║              ✦ FINAL CHARACTER SUMMARY ✦                 ║');
+      await player.tell('╠══════════════════════════════════════════════════════════╣');
 
-      const finalSummary = await format.keyValue({
+      // Show character info in a nice format
+      const summaryData = {
         'Name': player.name,
         'Sex': player.sex + ' (' + player.pronouns.subject + '/' + player.pronouns.object + ')',
-        'Age': player.age,
+        'Age': player.age + ' years',
         'Height': player.height + 'm',
         'Weight': player.weight + 'kg',
-      });
-      for (const line of finalSummary) {
-        await player.tell(line);
+      };
+
+      const finalSummaryLines = await format.keyValue(summaryData);
+      for (const line of finalSummaryLines) {
+        await player.tell('║  ' + line.padEnd(54) + '  ║');
       }
 
       // Show appearance from body
       const playerBody = await player.getBody();
       if (playerBody) {
+        await player.tell('╟──────────────────────────────────────────────────────────╢');
         const head = await playerBody.getPart('head');
         if (head) {
           const scalp = await head.getPart('scalp');
           const face = await head.getPart('face');
           if (scalp) {
-            await player.tell('Hair: ' + (scalp.hairColor || 'brown') + ' ' + (scalp.hairStyle || 'straight'));
+            const hairLine = 'Hair: ' + (scalp.hairColor || 'brown') + ' ' + (scalp.hairStyle || 'straight');
+            await player.tell('║  ' + hairLine.padEnd(54) + '  ║');
           }
           if (face) {
             const eye = await face.getPart('rightEye');
             if (eye) {
-              await player.tell('Eyes: ' + (eye.color || 'brown') + ' ' + (eye.shape || 'almond'));
+              const eyeLine = 'Eyes: ' + (eye.color || 'brown') + ', ' + (eye.shape || 'almond');
+              await player.tell('║  ' + eyeLine.padEnd(54) + '  ║');
             }
           }
         }
-        await player.tell('Skin: ' + (playerBody.skinTone || 'medium'));
+        const skinLine = 'Skin: ' + (playerBody.skinTone || 'medium');
+        await player.tell('║  ' + skinLine.padEnd(54) + '  ║');
       }
-
+      await player.tell('╚══════════════════════════════════════════════════════════╝');
       await player.tell('');
 
-      const finalConfirm = await $.prompt.yesorno(player, 'Create this character and enter the game?');
+      const finalConfirm = await $.prompt.yesorno(player, '  Create this character and enter the game?');
       if (!finalConfirm) {
         await player.tell('');
-        await player.tell('Starting over from the beginning...');
+        await player.tell('  ↻ Starting over from the beginning...');
         await player.tell('');
 
         // Delete old body and all its parts
@@ -638,7 +528,20 @@ export class CharGenBuilder {
 
       // === DONE ===
       await player.tell('');
-      await player.tell('Character created! You are #' + player.id);
+      const welcomeBox2 = await format.box([
+        '✦ CHARACTER CREATED SUCCESSFULLY! ✦',
+        '',
+        'Welcome to MALICE, ' + player.name + '!',
+        '',
+        'You are now Player #' + player.id,
+        '',
+        'Type "help" for a list of commands.',
+        'Type "look" to see your surroundings.',
+        'Type "quit" to leave the game.',
+      ], { style: 'double', padding: 1 });
+      for (const line of welcomeBox2) {
+        await player.tell(line);
+      }
       await player.tell('');
 
       // Connect player to the game
