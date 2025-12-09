@@ -249,23 +249,25 @@ const parts = self.bodyParts;
 // (if all are cached)
 ```
 
-### Always Store Objects, Not IDs
+### Never Use `.id` - Just Store Objects
 
 ```javascript
-// DO: Store RuntimeObjects - they become objrefs automatically
-self.location = room;         // Stored as { type: 'objref', value: 42 }
-self.owner = player;          // Stored as { type: 'objref', value: 17 }
-self.contents = [item1, item2];  // Array of objrefs
+// DO: Store RuntimeObjects directly
+self.location = room;
+self.owner = player;
+self.contents = [item1, item2];
 
-// DON'T: Store raw IDs - you lose type information
-self.location = room.id;      // Stored as { type: 'number', value: 42 }
-// Now the system doesn't know this is an object reference!
+// DON'T: Never use .id - it's pointless
+self.location = room.id;      // NO! Why would you do this?
+self.owner = player.id;       // NO! Just use player!
 ```
 
-**Why objrefs matter:**
-- The system knows it's an object reference, not just a number
-- On read, objrefs auto-resolve to RuntimeObjects (if cached)
-- Numbers stay as numbers - no auto-resolution
+**The system stores objrefs. That's the whole point.** When you write `self.location = room`, it stores `{ type: 'objref', value: 42 }` automatically. You never need to extract the ID yourself.
+
+Using `.id` is:
+- **Pointless** - the system extracts IDs automatically
+- **Harmful** - you lose type information (becomes `number` not `objref`)
+- **Broken** - numbers don't auto-resolve to RuntimeObjects on read
 
 ### Reading Object References
 
@@ -314,11 +316,12 @@ const loc = await $.load(self.location);  // $.load(42) -> loads #42
 
 | Operation | Use |
 |-----------|-----|
-| Store reference | `self.owner = player` (NOT `player.id`) |
-| Read (might need load) | `await $.load(self.owner)` |
-| Read (if you know it's cached) | `self.owner` |
-| Get ID from object | `player.id` |
-| Load by ID | `await $.load(id)` or `await $[id]` |
+| Store reference | `self.owner = player` |
+| Read (safe) | `await $.load(self.owner)` |
+| Read (if cached) | `self.owner` |
+| Load by ID | `await $.load(42)` or `await $[42]` |
+
+**Never use `.id` for storage. Just store the object.**
 
 ## Core Utilities
 
