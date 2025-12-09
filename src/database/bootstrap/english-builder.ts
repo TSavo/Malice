@@ -836,10 +836,7 @@ export class EnglishBuilder {
     const objectManager = await this.manager.load(0);
     if (!objectManager) return;
 
-    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
-    aliases.english = this.english.id;
-    objectManager.set('aliases', aliases);
-
+    await objectManager.call('addAlias', 'english', this.english.id);
     console.log(`✅ Registered english alias -> #${this.english.id}`);
   }
 }

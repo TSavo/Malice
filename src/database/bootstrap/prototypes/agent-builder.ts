@@ -775,7 +775,7 @@ export class AgentBuilder {
       const jobName = self.sleepTransitionJob;
       if (jobName && $.scheduler) {
         await $.scheduler.unschedule(jobName);
-        self.set('sleepTransitionJob', null);
+        self.sleepTransitionJob = null;
       }
     `);
 
@@ -795,12 +795,12 @@ export class AgentBuilder {
       await self.cancelSleepTransition();
 
       // Set state
-      self.set('sleepState', 'falling_asleep');
+      self.sleepState = 'falling_asleep';
 
       // Schedule the completion
       const jobName = 'sleep_' + self.id + '_' + Date.now();
       await $.scheduler.schedule(jobName, delay, 0, self, 'completeSleep');
-      self.set('sleepTransitionJob', jobName);
+      self.sleepTransitionJob = jobName;
 
       return { success: true, state: 'falling_asleep', completesIn: delay };
     `);
@@ -814,8 +814,8 @@ export class AgentBuilder {
         return { success: false, reason: 'No longer falling asleep' };
       }
 
-      self.set('sleepState', 'asleep');
-      self.set('sleepTransitionJob', null);
+      self.sleepState = 'asleep';
+      self.sleepTransitionJob = null;
 
       // Notify (override in Player to send message)
       if (self.onFellAsleep) {
@@ -844,7 +844,7 @@ export class AgentBuilder {
       // Cancel the scheduled completion
       await self.cancelSleepTransition();
 
-      self.set('sleepState', 'awake');
+      self.sleepState = 'awake';
 
       // Notify
       if (self.onSleepInterrupted) {
@@ -876,7 +876,7 @@ export class AgentBuilder {
 
       // Cancel the doze
       await self.cancelSleepTransition();
-      self.set('sleepState', 'awake');
+      self.sleepState = 'awake';
 
       // Notify
       if (self.tell) {
@@ -906,12 +906,12 @@ export class AgentBuilder {
       await self.cancelSleepTransition();
 
       // Set state
-      self.set('sleepState', 'waking_up');
+      self.sleepState = 'waking_up';
 
       // Schedule the completion
       const jobName = 'wake_' + self.id + '_' + Date.now();
       await $.scheduler.schedule(jobName, delay, 0, self, 'completeWake');
-      self.set('sleepTransitionJob', jobName);
+      self.sleepTransitionJob = jobName;
 
       return { success: true, state: 'waking_up', completesIn: delay };
     `);
@@ -929,16 +929,16 @@ export class AgentBuilder {
       const check = await self.canWakeUp();
       if (!check.allowed) {
         // Fall back asleep
-        self.set('sleepState', 'asleep');
-        self.set('sleepTransitionJob', null);
+        self.sleepState = 'asleep';
+        self.sleepTransitionJob = null;
         if (self.onWakeBlocked) {
           await self.onWakeBlocked(check.reason);
         }
         return { success: false, reason: check.reason, state: 'asleep' };
       }
 
-      self.set('sleepState', 'awake');
-      self.set('sleepTransitionJob', null);
+      self.sleepState = 'awake';
+      self.sleepTransitionJob = null;
 
       // Notify
       if (self.onWokeUp) {
@@ -962,7 +962,7 @@ export class AgentBuilder {
       // Cancel the scheduled completion
       await self.cancelSleepTransition();
 
-      self.set('sleepState', 'asleep');
+      self.sleepState = 'asleep';
 
       if (self.onWakeBlocked) {
         await self.onWakeBlocked(reason);
@@ -976,8 +976,8 @@ export class AgentBuilder {
        *  @returns Object with success and state
        */
       await self.cancelSleepTransition();
-      self.set('sleepState', 'awake');
-      self.set('sedation', 0);
+      self.sleepState = 'awake';
+      self.sedation = 0;
       return { success: true, state: 'awake' };
     `);
 
@@ -986,7 +986,7 @@ export class AgentBuilder {
        *  @returns Object with success and state
        */
       await self.cancelSleepTransition();
-      self.set('sleepState', 'asleep');
+      self.sleepState = 'asleep';
       return { success: true, state: 'asleep' };
     `);
 
@@ -1023,7 +1023,7 @@ export class AgentBuilder {
       const sedation = self.sedation || 0;
       if (sedation > 0) {
         const newSedation = Math.max(0, sedation - 1);
-        self.set('sedation', newSedation);
+        self.sedation = newSedation;
         results.sedation = newSedation;
 
         // If sedation wore off while asleep, might start waking naturally
@@ -1118,17 +1118,17 @@ export class AgentBuilder {
           delete watchExpiry[droppedId];
         }
         watchList.push(targetId);
-        self.set('watchList', watchList);
+        self.watchList = watchList;
       }
 
       // Set expiry if duration specified
       if (duration > 0) {
         watchExpiry[targetId] = Date.now() + duration;
-        self.set('watchExpiry', watchExpiry);
+        self.watchExpiry = watchExpiry;
       } else {
         // Permanent - remove any expiry
         delete watchExpiry[targetId];
-        self.set('watchExpiry', watchExpiry);
+        self.watchExpiry = watchExpiry;
       }
 
       const targetObj = await $.load(targetId);
@@ -1160,8 +1160,8 @@ export class AgentBuilder {
       watchList.splice(index, 1);
       delete watchExpiry[targetId];
 
-      self.set('watchList', watchList);
-      self.set('watchExpiry', watchExpiry);
+      self.watchList = watchList;
+      self.watchExpiry = watchExpiry;
 
       const targetObj = await $.load(targetId);
       const name = targetObj?.name || '#' + targetId;
@@ -1199,14 +1199,14 @@ export class AgentBuilder {
       // Add to watch list if not already there
       if (!watchList.includes(targetId)) {
         watchList.push(targetId);
-        self.set('watchList', watchList);
+        self.watchList = watchList;
       }
 
       // Update expiry (only if not permanently watching)
       const currentExpiry = watchExpiry[targetId];
       if (currentExpiry !== 0) { // 0 means permanent
         watchExpiry[targetId] = Math.max(currentExpiry || 0, Date.now() + duration);
-        self.set('watchExpiry', watchExpiry);
+        self.watchExpiry = watchExpiry;
       }
     `);
 
@@ -1234,8 +1234,8 @@ export class AgentBuilder {
       }
 
       if (removed > 0) {
-        self.set('watchList', newWatchList);
-        self.set('watchExpiry', watchExpiry);
+        self.watchList = newWatchList;
+        self.watchExpiry = watchExpiry;
       }
 
       return removed;
@@ -1481,7 +1481,7 @@ export class AgentBuilder {
 
       // Save
       skills[skillName] = skill;
-      self.set('skills', skills);
+      self.skills = skills;
 
       return {
         level: skill.level,
@@ -1578,7 +1578,7 @@ export class AgentBuilder {
        *  @returns New effective luck
        */
       const amount = args[0] || 0;
-      self.set('tempLuck', amount);
+      self.tempLuck = amount;
       return await self.getLuck();
     `);
 
@@ -1587,7 +1587,7 @@ export class AgentBuilder {
       /** Clear any temporary luck bonus.
        *  @returns New effective luck (base only)
        */
-      self.set('tempLuck', 0);
+      self.tempLuck = 0;
       return await self.getLuck();
     `);
   }
@@ -1621,7 +1621,7 @@ export class AgentBuilder {
       if (mode !== 'walk' && mode !== 'run') {
         return { success: false, message: 'Mode must be walk or run.' };
       }
-      self.set('movementMode', mode);
+      self.movementMode = mode;
       return { success: true, mode };
     `);
 
@@ -1723,12 +1723,12 @@ export class AgentBuilder {
         mode,
         calorieCost: totalCost,
       };
-      self.set('movementState', state);
+      self.movementState = state;
 
       // Schedule completion
       const jobName = 'move_' + self.id + '_' + Date.now();
       await $.scheduler.schedule(jobName, timeMs, 0, self, 'completeMovement');
-      self.set('movementJob', jobName);
+      self.movementJob = jobName;
 
       const verb = mode === 'run' ? 'start running' : 'start walking';
       const timeStr = timeMs >= 1000
@@ -1757,8 +1757,8 @@ export class AgentBuilder {
       const calorieCost = state.calorieCost || 0;
 
       // Clear movement state first
-      self.set('movementState', null);
-      self.set('movementJob', null);
+      self.movementState = null;
+      self.movementJob = null;
 
       // Burn calories (if Embodied)
       if (self.burnCalories && calorieCost > 0) {
@@ -1808,8 +1808,8 @@ export class AgentBuilder {
       }
 
       // Clear state
-      self.set('movementState', null);
-      self.set('movementJob', null);
+      self.movementState = null;
+      self.movementJob = null;
 
       return {
         success: true,
@@ -1894,7 +1894,7 @@ export class AgentBuilder {
       current.decay = Math.max(current.decay, decay);
 
       effects[name] = current;
-      self.set('statusEffects', effects);
+      self.statusEffects = effects;
 
       return current;
     `);
@@ -1945,7 +1945,7 @@ export class AgentBuilder {
         delete effects[name];
       }
 
-      self.set('statusEffects', effects);
+      self.statusEffects = effects;
       return effects[name]?.intensity || 0;
     `);
 
@@ -1972,7 +1972,7 @@ export class AgentBuilder {
         }
       }
 
-      self.set('statusEffects', effects);
+      self.statusEffects = effects;
       return decayed;
     `);
 
@@ -2209,12 +2209,12 @@ export class AgentBuilder {
         return { success: false, message: 'Already dying.' };
       }
 
-      self.set('isDying', true);
-      self.set('dyingProgress', 0);
+      self.isDying = true;
+      self.dyingProgress = 0;
 
       // Force asleep state - dying person can't act
       await self.cancelSleepTransition();
-      self.set('sleepState', 'asleep');
+      self.sleepState = 'asleep';
 
       // Send first death message
       if (self.tell) {
@@ -2237,7 +2237,7 @@ export class AgentBuilder {
 
       const oldProgress = self.dyingProgress || 0;
       const newProgress = Math.min(100, oldProgress + 6.67);
-      self.set('dyingProgress', newProgress);
+      self.dyingProgress = newProgress;
 
       // Check if dead
       if (newProgress >= 100) {
@@ -2271,12 +2271,12 @@ export class AgentBuilder {
 
       const oldProgress = self.dyingProgress || 0;
       const newProgress = Math.max(0, oldProgress - amount);
-      self.set('dyingProgress', newProgress);
+      self.dyingProgress = newProgress;
 
       // If progress reaches 0, they're stabilized (no longer dying)
       if (newProgress <= 0) {
-        self.set('isDying', false);
-        self.set('dyingProgress', 0);
+        self.isDying = false;
+        self.dyingProgress = 0;
 
         // They're still unconscious but stable
         if (self.tell) {

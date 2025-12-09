@@ -487,10 +487,7 @@ export class BodyFactoryBuilder {
     const objectManager = await this.manager.load(0);
     if (!objectManager) return;
 
-    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
-    aliases.bodyFactory = this.bodyFactory.id;
-    objectManager.set('aliases', aliases);
-
+    await objectManager.call('addAlias', 'bodyFactory', this.bodyFactory.id);
     console.log(`✅ Registered bodyFactory alias -> #${this.bodyFactory.id}`);
   }
 }

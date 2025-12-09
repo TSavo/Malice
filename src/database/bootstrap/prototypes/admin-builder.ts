@@ -31,6 +31,7 @@ export class AdminBuilder {
     this.addBuildingCommands(obj);
     this.addTeleportCommands(obj);
     this.addInspectCommands(obj);
+    this.addAliasCommands(obj);
     this.addEvalCommands(obj);
 
     return obj;
@@ -58,6 +59,9 @@ export class AdminBuilder {
       await self.registerVerb(['@rmVerb %s %s', '@rmverb %s %s'], self, '@rmVerb');
       await self.registerVerb(['@eval %s'], self, '@eval');
       await self.registerVerb('@evalm', self);
+      await self.registerVerb('@aliases', self);
+      await self.registerVerb(['@alias %s'], self, '@alias');
+      await self.registerVerb(['@unalias %s'], self, '@unalias');
 
       // Call parent's connect (Player -> registers player verbs, shows welcome, prompt)
       await pass(args[0]);
@@ -921,6 +925,202 @@ export class AdminBuilder {
 
       target.removeMethod(methodName);
       await self.tell('Removed ' + target.name + ' (#' + target.id + ').' + methodName);
+    `);
+  }
+
+  private addAliasCommands(obj: RuntimeObject): void {
+    // @aliases - List all system aliases
+    obj.setMethod('@aliases', `
+      /** List all system aliases ($.* objects).
+       *  Usage: @aliases
+       */
+      const aliases = $.system.aliases || {};
+
+      await self.tell('=== System Aliases ($.name -> #id) ===');
+
+      // Separate into categories
+      const prototypes = [];
+      const utilities = [];
+      const bodyParts = {};
+
+      for (const [name, value] of Object.entries(aliases)) {
+        if (name === 'bodyParts' && typeof value === 'object') {
+          // Nested body parts
+          Object.assign(bodyParts, value);
+          continue;
+        }
+
+        // Check if it's a prototype (has typical prototype names)
+        const protoNames = ['describable', 'location', 'exit', 'room', 'agent', 'embodied',
+          'human', 'player', 'admin', 'decayable', 'corpse', 'humanRemains', 'skeletalRemains',
+          'wound', 'edible', 'food', 'drink', 'stomachContents', 'bodyPart', 'wearable', 'clothing',
+          'nothing', 'root', 'system', 'object_manager'];
+
+        if (protoNames.includes(name)) {
+          prototypes.push([name, value]);
+        } else {
+          utilities.push([name, value]);
+        }
+      }
+
+      // Show utilities first
+      if (utilities.length > 0) {
+        await self.tell('\\r\\n--- Utilities ---');
+        for (const [name, id] of utilities.sort((a, b) => a[0].localeCompare(b[0]))) {
+          const obj = await $.load(id);
+          const desc = obj ? obj.name || '(no name)' : '(not found)';
+          await self.tell('  $.' + name + ' -> #' + id + ' (' + desc + ')');
+        }
+      }
+
+      // Show prototypes
+      if (prototypes.length > 0) {
+        await self.tell('\\r\\n--- Prototypes ---');
+        for (const [name, id] of prototypes.sort((a, b) => a[0].localeCompare(b[0]))) {
+          await self.tell('  $.' + name + ' -> #' + id);
+        }
+      }
+
+      // Show body parts if any
+      const bodyPartNames = Object.keys(bodyParts);
+      if (bodyPartNames.length > 0) {
+        await self.tell('\\r\\n--- Body Part Prototypes ---');
+        for (const name of bodyPartNames.sort()) {
+          await self.tell('  $.bodyParts.' + name + ' -> #' + bodyParts[name]);
+        }
+      }
+
+      await self.tell('\\r\\nTotal: ' + Object.keys(aliases).length + ' aliases');
+    `);
+
+    // @alias - Create or show an alias
+    obj.setMethod('@alias', `
+      /** Create or view a system alias.
+       *  Usage: @alias name=#123     - Set alias
+       *  Usage: @alias name          - Show alias
+       *  Usage: @alias name=         - Clear alias
+       *
+       *  Examples:
+       *    @alias myUtil=#42         - Create $.myUtil pointing to #42
+       *    @alias myUtil             - Show what $.myUtil points to
+       *    @alias myUtil=            - Remove $.myUtil
+       */
+      const input = args[0];
+      if (!input) {
+        await self.tell('Usage: @alias name=#123  (set)');
+        await self.tell('       @alias name       (show)');
+        await self.tell('       @alias name=      (clear)');
+        return;
+      }
+
+      const aliases = $.system.aliases || {};
+
+      // Check if setting or viewing
+      const setMatch = input.match(/^(\\w+)\\s*=\\s*(.*)$/);
+
+      if (setMatch) {
+        const name = setMatch[1];
+        const valueStr = setMatch[2].trim();
+
+        // Clearing?
+        if (!valueStr) {
+          if (aliases[name] === undefined) {
+            await self.tell('Alias $.' + name + ' does not exist.');
+            return;
+          }
+
+          // Protect system aliases
+          const protected = ['nothing', 'object_manager', 'root', 'system'];
+          if (protected.includes(name)) {
+            await self.tell('Cannot remove protected alias $.' + name);
+            return;
+          }
+
+          delete aliases[name];
+          $.system.aliases = aliases;
+          await self.tell('Removed alias $.' + name);
+          return;
+        }
+
+        // Setting
+        const objId = parseInt(valueStr.replace('#', ''), 10);
+        if (isNaN(objId)) {
+          await self.tell('Invalid object ID: ' + valueStr);
+          await self.tell('Usage: @alias name=#123');
+          return;
+        }
+
+        // Verify object exists
+        const obj = await $.load(objId);
+        if (!obj) {
+          await self.tell('Object #' + objId + ' not found.');
+          return;
+        }
+
+        // Protect system aliases from being overwritten
+        const protected = ['nothing', 'object_manager', 'root', 'system'];
+        if (protected.includes(name) && aliases[name] !== undefined) {
+          await self.tell('Cannot overwrite protected alias $.' + name);
+          return;
+        }
+
+        aliases[name] = objId;
+        $.system.aliases = aliases;
+        await self.tell('Set $.' + name + ' -> #' + objId + ' (' + (obj.name || 'unnamed') + ')');
+
+      } else {
+        // Viewing
+        const name = input.trim();
+        if (aliases[name] === undefined) {
+          await self.tell('Alias $.' + name + ' does not exist.');
+          await self.tell('Use @aliases to list all aliases.');
+          return;
+        }
+
+        const objId = aliases[name];
+        if (typeof objId === 'object') {
+          // Nested object (like bodyParts)
+          await self.tell('$.' + name + ' = {');
+          for (const [k, v] of Object.entries(objId)) {
+            await self.tell('  ' + k + ': #' + v);
+          }
+          await self.tell('}');
+        } else {
+          const obj = await $.load(objId);
+          await self.tell('$.' + name + ' -> #' + objId + ' (' + (obj?.name || 'not found') + ')');
+        }
+      }
+    `);
+
+    // @unalias - Remove an alias
+    obj.setMethod('@unalias', `
+      /** Remove a system alias.
+       *  Usage: @unalias name
+       */
+      const name = args[0];
+      if (!name) {
+        await self.tell('Usage: @unalias <name>');
+        return;
+      }
+
+      const aliases = $.system.aliases || {};
+
+      if (aliases[name] === undefined) {
+        await self.tell('Alias $.' + name + ' does not exist.');
+        return;
+      }
+
+      // Protect system aliases
+      const protected = ['nothing', 'object_manager', 'root', 'system'];
+      if (protected.includes(name)) {
+        await self.tell('Cannot remove protected alias $.' + name);
+        return;
+      }
+
+      const oldId = aliases[name];
+      delete aliases[name];
+      $.system.aliases = aliases;
+      await self.tell('Removed alias $.' + name + ' (was #' + oldId + ')');
     `);
   }
 

@@ -40,6 +40,75 @@ export class MinimalBootstrap {
 
     objectManager.set('aliases', aliases);
 
+    // Add alias management methods to #0
+    if (!objectManager.hasMethod('addAlias')) {
+      objectManager.setMethod('addAlias', `
+        /** Register a system alias.
+         *  Usage: await $[0].addAlias('myUtil', obj.id)
+         *  @param name - Alias name (becomes $.name)
+         *  @param objId - Object ID to alias
+         *  @returns true on success
+         */
+        const name = args[0];
+        const objId = args[1];
+
+        if (!name || typeof name !== 'string') {
+          throw new Error('addAlias: name required');
+        }
+        if (objId === undefined || objId === null) {
+          throw new Error('addAlias: objId required');
+        }
+
+        const aliases = self.aliases || {};
+        aliases[name] = objId;
+        self.aliases = aliases;
+        return true;
+      `);
+    }
+
+    if (!objectManager.hasMethod('removeAlias')) {
+      objectManager.setMethod('removeAlias', `
+        /** Remove a system alias.
+         *  Usage: await $[0].removeAlias('myUtil')
+         *  @param name - Alias name to remove
+         *  @returns true if removed, false if didn't exist
+         */
+        const name = args[0];
+
+        if (!name || typeof name !== 'string') {
+          throw new Error('removeAlias: name required');
+        }
+
+        // Protect core aliases
+        const protected_aliases = ['nothing', 'object_manager', 'root', 'system'];
+        if (protected_aliases.includes(name)) {
+          throw new Error('removeAlias: cannot remove protected alias ' + name);
+        }
+
+        const aliases = self.aliases || {};
+        if (aliases[name] === undefined) {
+          return false;
+        }
+
+        delete aliases[name];
+        self.aliases = aliases;
+        return true;
+      `);
+    }
+
+    if (!objectManager.hasMethod('getAlias')) {
+      objectManager.setMethod('getAlias', `
+        /** Get an alias by name.
+         *  Usage: const id = await $[0].getAlias('myUtil')
+         *  @param name - Alias name
+         *  @returns Object ID or undefined
+         */
+        const name = args[0];
+        const aliases = self.aliases || {};
+        return aliases[name];
+      `);
+    }
+
     console.log('✅ Registered core aliases in #0.properties.aliases');
   }
 

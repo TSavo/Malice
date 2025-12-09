@@ -94,7 +94,7 @@ export class ExitBuilder {
       }
 
       // If no specific key required, any key works (or just unlock)
-      self.set('locked', false);
+      self.locked = false;
       return { success: true, message: 'You unlock the way ' + self.name + '.' };
     `);
 
@@ -105,7 +105,7 @@ export class ExitBuilder {
       if (self.locked) {
         return { success: false, message: 'It is already locked.' };
       }
-      self.set('locked', true);
+      self.locked = true;
       return { success: true, message: 'You lock the way ' + self.name + '.' };
     `);
 

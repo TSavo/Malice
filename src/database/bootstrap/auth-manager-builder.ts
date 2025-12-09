@@ -159,10 +159,7 @@ Login: `,
     const objectManager = await this.manager.load(0);
     if (!objectManager) return;
 
-    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
-    aliases.authManager = this.authManager.id;
-    objectManager.set('aliases', aliases);
-
+    await objectManager.call('addAlias', 'authManager', this.authManager.id);
     console.log(`✅ Registered authManager alias -> #${this.authManager.id}`);
   }
 }

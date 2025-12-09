@@ -139,10 +139,7 @@ export class RoomBuilder {
     const objectManager = await this.manager.load(0);
     if (!objectManager) return;
 
-    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
-    aliases.room = this.room.id;
-    objectManager.set('aliases', aliases);
-
+    await objectManager.call('addAlias', 'room', this.room.id);
     console.log(`Registered room alias -> #${this.room.id}`);
   }
 }

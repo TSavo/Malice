@@ -121,6 +121,7 @@ export interface GameObject {
 
 /**
  * Runtime object with resolved properties and callable methods
+ * Uses Proxy for direct property access: obj.hp instead of obj.get('hp')
  */
 export interface RuntimeObject {
   /** The object ID */

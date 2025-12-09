@@ -1170,10 +1170,7 @@ export class EmoteBuilder {
     const objectManager = await this.manager.load(0);
     if (!objectManager) return;
 
-    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
-    aliases.emote = this.emote.id;
-    objectManager.set('aliases', aliases);
-
+    await objectManager.call('addAlias', 'emote', this.emote.id);
     console.log(`✅ Registered emote alias -> #${this.emote.id}`);
   }
 }

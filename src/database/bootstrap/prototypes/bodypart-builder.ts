@@ -37,6 +37,9 @@ export class BodyPartBuilder {
         removable: false, // Can be severed/detached
         critical: false, // Death if destroyed
         condition: {}, // { conditionName: severity } - injuries/status
+        // Wearable system - for coverable body parts
+        nakedDescription: null, // Description shown when this part is bare (set by specific parts)
+        worn: [], // Array of wearable IDs currently covering this part
         // Decay overrides - body parts decay when severed
         decayCondition: 'severed', // Only decay when severed
         decayRate: 2, // Faster decay than preserved food (2% per tick)
@@ -183,6 +186,75 @@ export class BodyPartBuilder {
       }
 
       return map;
+    `);
+
+    obj.setMethod('getVisibleDescription', `
+      /** Get the visible description of this body part.
+       *  If covered by wearables, shows the outermost wearable's description.
+       *  If bare, shows nakedDescription or defaults.
+       *  @param viewer - Who is looking at this body part
+       *  @returns Description string
+       */
+      const viewer = args[0];
+
+      // If not coverable, just return name
+      if (!self.coverable) {
+        return self.name;
+      }
+
+      // Check worn items - get the outermost layer
+      const wornIds = self.worn || [];
+      if (wornIds.length > 0) {
+        // Find the item with the highest layer value (outermost)
+        let outermostItem = null;
+        let highestLayer = -1;
+
+        for (const itemId of wornIds) {
+          const item = await $.load(itemId);
+          if (item) {
+            const layer = item.layer || 0;
+            if (layer > highestLayer) {
+              highestLayer = layer;
+              outermostItem = item;
+            }
+          }
+        }
+
+        if (outermostItem) {
+          // Use the wearable's wornDescription, or its name
+          if (outermostItem.getWornDescription) {
+            return await outermostItem.getWornDescription();
+          }
+          return outermostItem.wornDescription || outermostItem.name;
+        }
+      }
+
+      // No worn items - show naked description
+      if (self.nakedDescription) {
+        return self.nakedDescription;
+      }
+
+      // Default naked description for body parts
+      return 'bare ' + self.name.toLowerCase();
+    `);
+
+    obj.setMethod('getWornItems', `
+      /** Get all items worn on this body part, sorted by layer (innermost first).
+       *  @returns Array of worn item RuntimeObjects
+       */
+      const wornIds = self.worn || [];
+      const items = [];
+
+      for (const itemId of wornIds) {
+        const item = await $.load(itemId);
+        if (item) {
+          items.push(item);
+        }
+      }
+
+      // Sort by layer (innermost/lowest layer first)
+      items.sort((a, b) => (a.layer || 0) - (b.layer || 0));
+      return items;
     `);
 
     obj.setMethod('canFeel', `
@@ -674,6 +746,54 @@ export class BodyPartBuilder {
         await dropLocation.addContent(part.id);
       }
 
+      // === DESTROY WORN CLOTHING ===
+      // Any clothing worn on the severed part (or its children) is destroyed
+      const destroyedClothing = [];
+
+      // Helper to collect and destroy worn items recursively
+      const destroyWornOnPart = async (bodyPart) => {
+        if (!bodyPart) return;
+
+        // Destroy worn items on this part
+        const wornIds = bodyPart.worn || [];
+        for (const wornId of wornIds) {
+          const worn = await $.load(wornId);
+          if (worn) {
+            destroyedClothing.push(worn.name || 'clothing');
+
+            // Unregister verbs from owner
+            if (owner && owner.unregisterVerbsFrom) {
+              await owner.unregisterVerbsFrom(wornId);
+            }
+
+            // Recycle the destroyed clothing
+            if ($.recycler) {
+              await $.recycler.recycle(worn);
+            }
+          }
+        }
+        // Clear the worn array
+        bodyPart.worn = [];
+
+        // Recursively handle child parts
+        const childParts = bodyPart.parts || {};
+        for (const childName of Object.keys(childParts)) {
+          const childId = childParts[childName];
+          if (childId) {
+            const child = await $.load(childId);
+            await destroyWornOnPart(child);
+          }
+        }
+      };
+
+      await destroyWornOnPart(part);
+
+      // Announce destroyed clothing
+      let clothingMsg = '';
+      if (destroyedClothing.length > 0) {
+        clothingMsg = ' ' + await $.format.compose('%T %v{fall} away in tatters.', destroyedClothing);
+      }
+
       // === MULTI-PERSPECTIVE MESSAGING ===
       // Actor SEES: "You cut off Bob's left arm!"
       // Target SEES: "Alice cuts off your left arm!"
@@ -688,7 +808,7 @@ export class BodyPartBuilder {
           room: dropLocation,
           actor: amputator,
           target: owner,
-          see: '%A %v{cut} off %tp ' + partDesc + '! It falls to the ground.',
+          see: '%A %v{cut} off %tp ' + partDesc + '! It falls to the ground.' + clothingMsg,
           hear: '*SCHLICK* The wet sound of flesh separating.',
           item: part,
         });

@@ -327,10 +327,7 @@ export class PromptBuilder {
     const objectManager = await this.manager.load(0);
     if (!objectManager) return;
 
-    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
-    aliases.prompt = this.prompt.id;
-    objectManager.set('aliases', aliases);
-
+    await objectManager.call('addAlias', 'prompt', this.prompt.id);
     console.log(`Registered prompt alias -> #${this.prompt.id}`);
   }
 }

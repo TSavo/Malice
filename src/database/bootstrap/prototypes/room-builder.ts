@@ -199,9 +199,9 @@ export class RoomBuilder {
       const z = args[2] !== undefined ? args[2] : (self.z || 0);
 
       // Enforce integers
-      self.set('x', Math.round(x));
-      self.set('y', Math.round(y));
-      self.set('z', Math.round(z));
+      self.x = Math.round(x);
+      self.y = Math.round(y);
+      self.z = Math.round(z);
     `);
 
     obj.setMethod('distanceTo', `

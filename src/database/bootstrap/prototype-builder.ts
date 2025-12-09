@@ -20,6 +20,8 @@ import {
   StomachContentsBuilder,
   BodyPartBuilder,
   BodyPartsBuilder,
+  WearableBuilder,
+  ClothingBuilder,
 } from './prototypes/index.js';
 
 /**
@@ -62,6 +64,8 @@ export class PrototypeBuilder {
   private stomachContentsBuilder: StomachContentsBuilder;
   private bodyPartBuilder: BodyPartBuilder;
   private bodyPartsBuilder: BodyPartsBuilder;
+  private wearableBuilder: WearableBuilder;
+  private clothingBuilder: ClothingBuilder;
 
   constructor(private manager: ObjectManager) {
     this.describableBuilder = new DescribableBuilder(manager);
@@ -84,6 +88,8 @@ export class PrototypeBuilder {
     this.stomachContentsBuilder = new StomachContentsBuilder(manager);
     this.bodyPartBuilder = new BodyPartBuilder(manager);
     this.bodyPartsBuilder = new BodyPartsBuilder(manager);
+    this.wearableBuilder = new WearableBuilder(manager);
+    this.clothingBuilder = new ClothingBuilder(manager);
   }
 
   /**
@@ -196,6 +202,16 @@ export class PrototypeBuilder {
       }
     }
 
+    // Wearable - base for clothing, armor, jewelry (inherits from Describable)
+    const wearable = aliases.wearable
+      ? await this.manager.load(aliases.wearable as number)
+      : await this.wearableBuilder.build(describable!.id);
+
+    // Clothing - wearable items that provide warmth (inherits from Wearable)
+    const clothing = aliases.clothing
+      ? await this.manager.load(aliases.clothing as number)
+      : await this.clothingBuilder.build(wearable!.id);
+
     // Register aliases in root.properties.aliases
     await this.registerAliases({
       describable: describable!.id,
@@ -218,6 +234,8 @@ export class PrototypeBuilder {
       stomachContents: stomachContents!.id,
       bodyPart: bodyPart!.id,
       bodyParts,
+      wearable: wearable!.id,
+      clothing: clothing!.id,
     });
   }
 
@@ -242,42 +260,48 @@ export class PrototypeBuilder {
     stomachContents: number;
     bodyPart: number;
     bodyParts: Record<string, number>;
+    wearable: number;
+    clothing: number;
   }): Promise<void> {
     const objectManager = await this.manager.load(0);
     if (!objectManager) return;
 
+    // Register all prototype aliases using addAlias
+    await objectManager.call('addAlias', 'describable', ids.describable);
+    await objectManager.call('addAlias', 'location', ids.location);
+    await objectManager.call('addAlias', 'exit', ids.exit);
+    await objectManager.call('addAlias', 'room', ids.room);
+    await objectManager.call('addAlias', 'agent', ids.agent);
+    await objectManager.call('addAlias', 'embodied', ids.embodied);
+    await objectManager.call('addAlias', 'human', ids.human);
+    await objectManager.call('addAlias', 'player', ids.player);
+    await objectManager.call('addAlias', 'admin', ids.admin);
+    await objectManager.call('addAlias', 'decayable', ids.decayable);
+    await objectManager.call('addAlias', 'corpse', ids.corpse);
+    await objectManager.call('addAlias', 'humanRemains', ids.humanRemains);
+    await objectManager.call('addAlias', 'skeletalRemains', ids.skeletalRemains);
+    await objectManager.call('addAlias', 'wound', ids.wound);
+    await objectManager.call('addAlias', 'edible', ids.edible);
+    await objectManager.call('addAlias', 'food', ids.food);
+    await objectManager.call('addAlias', 'drink', ids.drink);
+    await objectManager.call('addAlias', 'stomachContents', ids.stomachContents);
+    await objectManager.call('addAlias', 'bodyPart', ids.bodyPart);
+    await objectManager.call('addAlias', 'wearable', ids.wearable);
+    await objectManager.call('addAlias', 'clothing', ids.clothing);
+
+    // Store bodyParts object directly (addAlias only supports simple id values)
     const aliases = (objectManager.get('aliases') as Record<string, number | Record<string, number>>) || {};
-    aliases.describable = ids.describable;
-    aliases.location = ids.location;
-    aliases.exit = ids.exit;
-    aliases.room = ids.room;
-    aliases.agent = ids.agent;
-    aliases.embodied = ids.embodied;
-    aliases.human = ids.human;
-    aliases.player = ids.player;
-    aliases.admin = ids.admin;
-    aliases.decayable = ids.decayable;
-    aliases.corpse = ids.corpse;
-    aliases.humanRemains = ids.humanRemains;
-    aliases.skeletalRemains = ids.skeletalRemains;
-    aliases.wound = ids.wound;
-    aliases.edible = ids.edible;
-    aliases.food = ids.food;
-    aliases.drink = ids.drink;
-    aliases.stomachContents = ids.stomachContents;
-    aliases.bodyPart = ids.bodyPart;
     aliases.bodyParts = ids.bodyParts;
+    objectManager.set('aliases', aliases);
 
     // Also expose individual body part prototypes at top level for BodyFactory
     for (const [name, id] of Object.entries(ids.bodyParts)) {
-      aliases[name] = id;
+      await objectManager.call('addAlias', name, id);
     }
-
-    objectManager.set('aliases', aliases);
 
     const partNames = Object.keys(ids.bodyParts).join(', ');
     console.log(
-      `✅ Registered prototype aliases: describable=#${ids.describable}, location=#${ids.location}, exit=#${ids.exit}, room=#${ids.room}, agent=#${ids.agent}, embodied=#${ids.embodied}, human=#${ids.human}, player=#${ids.player}, admin=#${ids.admin}, decayable=#${ids.decayable}, bodyPart=#${ids.bodyPart}`,
+      `✅ Registered prototype aliases: describable=#${ids.describable}, location=#${ids.location}, exit=#${ids.exit}, room=#${ids.room}, agent=#${ids.agent}, embodied=#${ids.embodied}, human=#${ids.human}, player=#${ids.player}, admin=#${ids.admin}, decayable=#${ids.decayable}, bodyPart=#${ids.bodyPart}, wearable=#${ids.wearable}, clothing=#${ids.clothing}`,
     );
     console.log(`✅ Registered body part prototypes: ${partNames}`);
   }

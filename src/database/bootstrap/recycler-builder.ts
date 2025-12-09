@@ -244,10 +244,7 @@ export class RecyclerBuilder {
     const objectManager = await this.manager.load(0);
     if (!objectManager) return;
 
-    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
-    aliases.recycler = this.recycler.id;
-    objectManager.set('aliases', aliases);
-
+    await objectManager.call('addAlias', 'recycler', this.recycler.id);
     console.log(`✅ Registered recycler alias -> #${this.recycler.id}`);
   }
 }

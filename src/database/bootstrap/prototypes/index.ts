@@ -28,5 +28,9 @@ export { BodyPartBuilder } from './bodypart-builder.js';
 export { BodyPartsBuilder } from './body-parts-builder.js';
 export { BodyFactory } from './body-factory.js';
 
+// Wearables
+export { WearableBuilder } from './wearable-builder.js';
+export { ClothingBuilder } from './clothing-builder.js';
+
 // Appearance
 export * from './appearance-constants.js';

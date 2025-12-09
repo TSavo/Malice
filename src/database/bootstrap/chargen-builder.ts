@@ -841,10 +841,7 @@ export class CharGenBuilder {
     const objectManager = await this.manager.load(0);
     if (!objectManager) return;
 
-    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
-    aliases.charGen = this.charGen.id;
-    objectManager.set('aliases', aliases);
-
+    await objectManager.call('addAlias', 'charGen', this.charGen.id);
     console.log(`Registered charGen alias -> #${this.charGen.id}`);
   }
 }
