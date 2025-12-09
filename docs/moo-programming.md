@@ -1742,6 +1742,304 @@ magicBox.setMethod('canContain', `
 `);
 ```
 
+## Verb Registration and Lifecycles
+
+Verbs are **dynamically registered per-player**. There is no global verb table. Each player has their own set of available commands based on what they're holding, wearing, and where they are.
+
+### The Verb System
+
+```javascript
+// A verb registration has three parts:
+await player.registerVerb(
+  ['eat %t', 'devour %t'],  // 1. Patterns (what the player types)
+  foodItem,                  // 2. Source object (who handles it)
+  'eat'                      // 3. Method name (what to call)
+);
+
+// When player types "eat apple":
+// 1. matchVerb() scans registered patterns
+// 2. Finds 'eat %t' matches, %t resolves to apple in inventory
+// 3. Calls foodItem.eat(player, apple)
+```
+
+### Pattern Syntax
+
+| Pattern | Meaning | Example Input | Resolves To |
+|---------|---------|---------------|-------------|
+| `%t` | "this" - the source object | `eat apple` | The registered item |
+| `%i` | Item in inventory/room | `give %i to bob` | Any matching object |
+| `%s` | String capture | `say %s` | Raw text |
+| `literal` | Exact match | `north` | Nothing (just matches) |
+
+**Pattern examples:**
+```javascript
+// Object-specific verb
+await player.registerVerb(['eat %t', 'consume %t'], food, 'eat');
+// "eat apple" -> food.eat(player) where food IS the apple
+
+// Item-targeting verb
+await player.registerVerb(['give %i to %i'], player, 'doGive');
+// "give sword to bob" -> player.doGive(sword, bob)
+
+// Free-form text
+await player.registerVerb(['say %s', '"%s"'], player, 'doSay');
+// "say hello world" -> player.doSay('hello world')
+
+// Direction (literal match)
+await player.registerVerb(['north', 'n'], exit, 'go');
+// "north" or "n" -> exit.go(player)
+```
+
+### Who Registers Verbs and When
+
+| Source | When | Verbs | Unregistered When |
+|--------|------|-------|-------------------|
+| **Player prototype** | `connect()` | Core commands (`look`, `inventory`, `say`) | `disconnect()` |
+| **Admin prototype** | `connect()` before `pass()` | @commands (`@dig`, `@create`, `@set`) | `disconnect()` |
+| **Items (onArrived)** | Picked up/equipped | Object-specific (`eat`, `wear`, `drink`) | Dropped (`onLeaving`) |
+| **Room exits (onArrived)** | Enter room | Directions (`north`, `south`, `up`) | Leave room |
+| **Worn items** | Equipped | State-change (`remove`) | Removed |
+
+### Registration Flow Examples
+
+**Player Login:**
+```javascript
+// In $.player.connect():
+async connect() {
+  // Register base commands
+  await self.registerVerb(['look', 'l'], self, 'look');
+  await self.registerVerb(['inventory', 'i', 'inv'], self, 'inventory');
+  await self.registerVerb(['say %s', '"%s"'], self, 'say');
+  await self.registerVerb(['go %s'], self, 'go');
+  // ...more core verbs
+}
+```
+
+**Admin Extends Player:**
+```javascript
+// In $.admin.connect():
+async connect() {
+  // Register admin commands BEFORE calling parent
+  await self.registerVerb(['@dig %s'], self, 'dig');
+  await self.registerVerb(['@create'], self, 'create');
+  await self.registerVerb(['@set %i.%s=%s'], self, 'setProp');
+  await self.registerVerb(['@teleport %i to %i', '@tel %i to %i'], self, 'teleport');
+
+  // Then call parent's connect to get player verbs
+  await pass('connect');
+}
+```
+
+**Item Pickup:**
+```javascript
+// In $.clothing.onArrived():
+async onArrived(dest, source, mover) {
+  // dest = the hand that now holds this item
+  if (dest && dest.owner) {
+    const owner = await $.load(dest.owner);
+
+    // Register 'wear' verb with the player (not the hand)
+    await owner.registerVerb(['wear %t', 'put on %t'], self, 'doWear');
+  }
+}
+```
+
+**Room Entry:**
+```javascript
+// In $.room.onContentArrived():
+async onContentArrived(obj, source, mover) {
+  // If a player just entered, register exit verbs
+  if (obj.isPlayer) {
+    for (const exitId of self.exits || []) {
+      const exit = await $.load(exitId);
+      const dirs = exit.directions || [];  // ['north', 'n']
+      await obj.registerVerb(dirs, exit, 'go');
+    }
+  }
+}
+```
+
+### Unregistering Verbs
+
+**Critical:** Always unregister when the source becomes unavailable.
+
+```javascript
+// Unregister ALL verbs from a specific source object
+await player.unregisterVerbsFrom(itemId);
+
+// This is called automatically in:
+// - onLeaving() when item leaves player's possession
+// - disconnect() for player's own verbs
+// - Room's onContentLeaving() for exit verbs
+```
+
+**In $.clothing.onLeaving():**
+```javascript
+async onLeaving(source, dest, mover) {
+  if (source && source.owner) {
+    const owner = await $.load(source.owner);
+    // Remove all verbs this item registered
+    await owner.unregisterVerbsFrom(self.id);
+  }
+}
+```
+
+**In $.room.onContentLeaving():**
+```javascript
+async onContentLeaving(obj, dest, mover) {
+  if (obj.isPlayer) {
+    // Remove exit verbs when player leaves
+    for (const exitId of self.exits || []) {
+      await obj.unregisterVerbsFrom(exitId);
+    }
+  }
+}
+```
+
+### Verb Handler Signature
+
+All verb handlers receive:
+
+```javascript
+obj.setMethod('myVerb', `
+  // args[0] = player who typed the command
+  // args[1...n] = resolved items from pattern
+
+  const player = args[0];
+  const target = args[1];  // If pattern had %i or %t
+  const text = args[2];    // If pattern had %s
+
+  // Return string to send to player
+  // Return nothing for silent success
+  return 'You did the thing!';
+`);
+```
+
+**Examples:**
+```javascript
+// Pattern: 'eat %t'
+// Input: "eat apple"
+// Handler receives: args = [player]
+// (%t is self - the handler knows which object it is)
+
+// Pattern: 'give %i to %i'
+// Input: "give sword to bob"
+// Handler receives: args = [player, sword, bob]
+
+// Pattern: 'say %s'
+// Input: 'say hello everyone'
+// Handler receives: args = [player, 'hello everyone']
+```
+
+### The Complete Verb Lifecycle
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     REGISTRATION                             │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  Player connects     Admin connects      Item picked up     │
+│        │                   │                    │           │
+│        v                   v                    v           │
+│  registerVerb()      registerVerb()       onArrived()       │
+│  (look, inv, say)    (@dig, @set)         registerVerb()    │
+│        │                   │              (wear, eat)       │
+│        │                   v                    │           │
+│        │              pass('connect')           │           │
+│        │                   │                    │           │
+│        └───────────────────┴────────────────────┘           │
+│                            │                                │
+│                            v                                │
+│                   player.verbs = [...]                      │
+│                                                             │
+├─────────────────────────────────────────────────────────────┤
+│                       EXECUTION                              │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  Player types: "wear shirt"                                 │
+│        │                                                    │
+│        v                                                    │
+│  matchVerb("wear shirt")                                    │
+│        │                                                    │
+│        v                                                    │
+│  Pattern "wear %t" matches (shirt = source object)          │
+│        │                                                    │
+│        v                                                    │
+│  shirt.doWear(player)                                       │
+│        │                                                    │
+│        v                                                    │
+│  Handler returns message -> sent to player                  │
+│                                                             │
+├─────────────────────────────────────────────────────────────┤
+│                    UNREGISTRATION                            │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  Player disconnects   Item dropped      Player leaves room  │
+│        │                   │                    │           │
+│        v                   v                    v           │
+│  disconnect()         onLeaving()       onContentLeaving()  │
+│        │                   │                    │           │
+│        v                   v                    v           │
+│  unregisterVerbsFrom  unregisterVerbsFrom  unregisterVerbsFrom │
+│  (self.id)            (item.id)          (exit.id)          │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Why Dynamic Per-Player Verbs?
+
+```javascript
+// WRONG: Global verb table
+const VERBS = {
+  'eat': handleEat,
+  'wear': handleWear,
+};
+// Problems:
+// - How do you know WHICH food to eat?
+// - What if player has no food?
+// - "eat" shows up in help even when impossible
+
+// RIGHT: Per-player, per-item registration
+// Only registered when:
+// - Player is holding the food
+// - Food hasn't been eaten yet
+// Automatically unregistered when:
+// - Player drops it
+// - Food is consumed
+// - Player disconnects
+
+// Benefits:
+// - Tab completion only shows available commands
+// - "help" only shows what you can actually do
+// - No "you can't eat that" errors - verb doesn't exist
+// - Multiple items with same verb work correctly
+```
+
+### Verb Swap Pattern
+
+Many objects need to swap verbs based on state:
+
+```javascript
+// In doWear (when wearing succeeds):
+await player.unregisterVerbsFrom(self.id);  // Remove 'wear'
+await player.registerVerb(['remove %t', 'take off %t'], self, 'doRemove');
+
+// In doRemove (when removing succeeds):
+await player.unregisterVerbsFrom(self.id);  // Remove 'remove'
+await player.registerVerb(['wear %t', 'put on %t'], self, 'doWear');
+```
+
+This pattern keeps available verbs in sync with object state.
+
+### Best Practices
+
+1. **Register in onArrived, unregister in onLeaving** - Hooks handle the lifecycle
+2. **Use `unregisterVerbsFrom(id)`** - Removes ALL verbs from that source
+3. **Return strings from handlers** - They're sent to the player
+4. **Use %t for "this object"** - Cleaner than %i when verb is item-specific
+5. **Include aliases** - `['eat %t', 'consume %t', 'devour %t']`
+6. **Swap verbs on state change** - wear/remove, open/close, etc.
+
 ## The Core Design Pattern: Base + Implementation
 
 **This is the most important pattern in the codebase.** Every object type should be designed this way:
