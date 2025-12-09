@@ -105,7 +105,7 @@ export class PlayerBuilder {
       context.setHandler(self);
 
       // Show prompt (system - uses tell)
-      await self.tell('> ');
+      await self.print('> ');
     `);
 
     obj.setMethod('disconnect', `
@@ -143,6 +143,15 @@ export class PlayerBuilder {
         self._context.send(processed + '\\r\\n');
       }
     `);
+
+    // Send without trailing newline (for prompts)
+    obj.setMethod('print', `
+      const message = args[0];
+      if (self._context && self._context.send) {
+        const processed = await self.processColors(message);
+        self._context.send(processed);
+      }
+    `);
   }
 
   private addInputMethods(obj: RuntimeObject): void {
@@ -155,7 +164,7 @@ export class PlayerBuilder {
       // Check if in prompt state ($.prompt handles questions, choices, yesorno)
       if (await $.prompt.isActive(self)) {
         await $.prompt.handleInput(self, trimmed);
-        await self.tell('> ');
+        await self.print('> ');
         return;
       }
 
@@ -172,7 +181,7 @@ export class PlayerBuilder {
       }
 
       if (!trimmed) {
-        await self.tell('> ');
+        await self.print('> ');
         return;
       }
 
@@ -227,10 +236,10 @@ export class PlayerBuilder {
           await self.tell('I don\\'t understand "' + firstWord + '".');
         }
 
-        await self.tell('> ');
+        await self.print('> ');
       } catch (err) {
         await self.tell('Error: ' + err.message);
-        await self.tell('> ');
+        await self.print('> ');
       }
     `);
   }
@@ -1313,7 +1322,7 @@ export class PlayerBuilder {
 
     obj.setMethod('onWokeUp', `
       await self.tell('You wake up.');
-      await self.tell('> ');
+      await self.print('> ');
     `);
 
     obj.setMethod('onSleepInterrupted', `
@@ -1536,7 +1545,7 @@ export class PlayerBuilder {
       if (input === 'q' || input === 'quit' || input === 'exit') {
         self.set('_inFitnessMenu', false);
         await self.tell('Exiting fitness menu.');
-        await self.tell('> ');
+        await self.print('> ');
         return;
       }
 

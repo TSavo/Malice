@@ -28,7 +28,23 @@ export class AuthManagerBuilder {
       properties: {
         name: 'AuthManager',
         description: 'Interactive login and authentication',
-        welcomeMessage: 'Welcome to Malice!\\r\\n\\r\\nLogin: ',
+        welcomeMessage: `
+    ,·'´¨;.  '                                   ‚.,       '              ,.  '             ,.-·.                  ,. - ., ‚     '        '        ,_,.‚
+    ;   ';:\\           .·´¨';\\                 ;'   '·‚.,               /   ';\\            /    ;'\\'           ,·'´ ,. - ,   ';\\'             ,.·'´  ,. , \`\`;\\
+   ;     ';:'\\      .'´     ;:'\\              .´  .-‚   ";\\           ,'   ,'::'\\          ;    ;:::\\      ,·´  .'´\\:::::;'   ;:'\\          .´   ;´"::::\\'\`'´ \\'\\
+   ;   ,  '·:;  .·´,.´';  ,'::;'             /   /:\\:';   ;:'\\        ,'    ;:::';'        ';    ;::::;'    /  ,'´::::'\\;:-/   ,' ::;\`       /   ,'::\\::::::\\::::\\:'
+  ;   ;'\`.    ¨,.·´::;'  ;:::;            ,'  ,'::::'\\';   ;::';      ';   ,':::;'          ;   ;::::;   ,'   ;':::::;'´ ';   /\\::;'        ;   ;:;:-·'~^ª*';\\'´
+  ;  ';::; \\*´\\:::::;  ,':::;'        ,.-·'  '·~^*'´¨   ;::;\`     ;  ,':::;' '         ';  ;'::::;    ;   ;:::::;   '\\*'´\\::\\'          ;  ,.-·:*'´¨'\`*´\\::\\
+ ';  ,'::;   \\::\\;:·';  ;:::; '        ':,  ,·:²*´¨¯'\`;  ;::';     ,'  ,'::;'            ;  ';:::';     ';   ';::::';    '\\::'\\/.´        ;   ;\\:::::::::::::'\\;'
+ ;  ';::;     '*´  ;',·':::;'          ,'  / \\:::::::::';   ;::;     ;  ';_:,.-·´';\\'     ';  ;::::;'     \\    '·:;:'_ ‚.‚-·'´.·´\\‚      ;  ;'_\\_:;::'-·^*';\\'
+ \\´¨\\::;          \\¨\\::::;          ,' ,'::::\\·²*'´¨¯':,'\\.;'     ',   _,.-·'´:\\:\\'     \\*´\\:::;'      '\\:\` ·  .,.  -·:´:::::::\\     ';    ‚  ‚.‚-·:*'´::\\:'\\
+  '\\::\\;            \\:\\;·'           \\\`¨\\::·/           \\:·\\'       \\¨:::::::::::\\';      '\\::\\:;'         \\:::::::\\::::::::;:·'''´      \\\`*´ ¯\\::::::::::::\\;'
+    '´¨               ¨'              \\'°\\;'              \\;'         '\\;::_;:-·'´'          \`*´'            \`· :;::\\;::-·'´              \\::::::\\;::-·^*'´
+                                      \`¨''                '            '¨                                                  '                \`*´¯'
+
+Enter your username, or a new name to create a character.
+
+Login: `,
       },
       methods: {},
     });
@@ -84,12 +100,17 @@ export class AuthManagerBuilder {
             // Login existing user
             const password = input.trim();
 
+            // Ignore empty input (e.g., stray newlines)
+            if (!password) {
+              return;
+            }
+
             // Load user as RuntimeObject
             const player = await context.$.load(state.userId);
 
             // Check if suspended
             if (player.get('isSuspended')) {
-              context.send('Your account has been suspended\\\\r\\\\n');
+              context.send('Your account has been suspended\\r\\n');
               context.close();
               return;
             }
@@ -98,7 +119,7 @@ export class AuthManagerBuilder {
             const valid = await player.checkPassword(password);
 
             if (!valid) {
-              context.send('Invalid password\\\\r\\\\n');
+              context.send('Invalid password\\r\\n');
               context.send('Login: ');
               self._state = { stage: 'username' };
               return;
@@ -112,8 +133,13 @@ export class AuthManagerBuilder {
             // Create new user
             const password = input.trim();
 
+            // Ignore empty input (e.g., stray newlines)
+            if (!password) {
+              return;
+            }
+
             if (password.length < 6) {
-              context.send('Password must be at least 6 characters\\\\r\\\\n');
+              context.send('Password must be at least 6 characters\\r\\n');
               context.send('Choose a password: ');
               return;
             }

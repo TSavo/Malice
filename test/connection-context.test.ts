@@ -314,15 +314,23 @@ describe('ConnectionContext', () => {
       expect(answer).toBe('Alice');
     });
 
-    it('should handle empty input after trimming', async () => {
+    it('should ignore empty input and wait for non-empty input', async () => {
       const questionPromise = context.question('Enter something: ');
 
       await new Promise(resolve => setTimeout(resolve, 10));
 
+      // Empty inputs should be ignored
       transport.input$.next('   \n');
+      transport.input$.next('');
+      transport.input$.next('\r\n');
+
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      // Promise should still be pending - send real input
+      transport.input$.next('actual input');
 
       const answer = await questionPromise;
-      expect(answer).toBe('');
+      expect(answer).toBe('actual input');
     });
 
     it('should re-prompt on validation failure', async () => {
@@ -537,6 +545,34 @@ describe('ConnectionContext', () => {
       const choice = await choicePromise;
       expect(choice).toBe('third');
     });
+
+    it('should ignore empty input and wait for valid selection', async () => {
+      const options = {
+        a: 'Option A',
+        b: 'Option B',
+      };
+
+      const choicePromise = context.choice('Choose:', options);
+
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      // Empty inputs should be ignored (not treated as invalid)
+      transport.input$.next('');
+      transport.input$.next('   ');
+      transport.input$.next('\r\n');
+
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      // Should NOT have "Invalid choice" messages for empty input
+      const invalidMessages = sentMessages.filter(msg => msg.includes('Invalid choice'));
+      expect(invalidMessages).toHaveLength(0);
+
+      // Provide valid input
+      transport.input$.next('1');
+
+      const choice = await choicePromise;
+      expect(choice).toBe('a');
+    });
   });
 
   describe('yesorno()', () => {
@@ -670,6 +706,29 @@ describe('ConnectionContext', () => {
       await new Promise(resolve => setTimeout(resolve, 10));
 
       transport.input$.next('Y');
+
+      const answer = await yesnoPromise;
+      expect(answer).toBe(true);
+    });
+
+    it('should ignore empty input and wait for valid answer', async () => {
+      const yesnoPromise = context.yesorno('Continue?');
+
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      // Empty inputs should be ignored
+      transport.input$.next('');
+      transport.input$.next('   ');
+      transport.input$.next('\n');
+
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      // Should NOT have "Please answer yes or no" for empty input
+      const errorMessages = sentMessages.filter(msg => msg.includes('Please answer yes or no'));
+      expect(errorMessages).toHaveLength(0);
+
+      // Provide valid input
+      transport.input$.next('yes');
 
       const answer = await yesnoPromise;
       expect(answer).toBe(true);

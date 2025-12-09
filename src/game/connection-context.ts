@@ -149,9 +149,14 @@ export class ConnectionContext {
 
         // Set up one-time input handler
         const subscription = this.connection.input$.subscribe((input) => {
-          subscription.unsubscribe();
-
           const trimmed = input.trim();
+
+          // Ignore empty input (stray newlines)
+          if (!trimmed) {
+            return;
+          }
+
+          subscription.unsubscribe();
 
           // Validate if validator provided
           if (validator) {
@@ -193,9 +198,16 @@ export class ConnectionContext {
         this.send(menuText);
 
         const subscription = this.connection.input$.subscribe((input) => {
+          const trimmed = input.trim();
+
+          // Ignore empty input (stray newlines)
+          if (!trimmed) {
+            return;
+          }
+
           subscription.unsubscribe();
 
-          const num = parseInt(input.trim());
+          const num = parseInt(trimmed);
           if (isNaN(num) || num < 1 || num > keys.length) {
             askAgain('Invalid choice. Please enter a number from the menu.');
             return;
@@ -222,9 +234,16 @@ export class ConnectionContext {
         this.send(`${prompt} (yes/no): `);
 
         const subscription = this.connection.input$.subscribe((input) => {
+          const trimmed = input.trim();
+
+          // Ignore empty input (stray newlines)
+          if (!trimmed) {
+            return;
+          }
+
           subscription.unsubscribe();
 
-          const answer = input.trim().toLowerCase();
+          const answer = trimmed.toLowerCase();
           if (answer === 'yes' || answer === 'y') {
             resolve(true);
           } else if (answer === 'no' || answer === 'n') {
