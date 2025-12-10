@@ -127,6 +127,81 @@ export class DescribableBuilder {
       // Default: do nothing
     `);
 
+    // ═══════════════════════════════════════════════════════════════════
+    // PLOT HOOKS - Allow plots to watch for events on this object
+    // ═══════════════════════════════════════════════════════════════════
+
+    // triggerPlotHooks(eventName, data) - notify all plots watching for this event
+    // Called by objects when something interesting happens (e.g., item deposited)
+    // Checks filter criteria: all filter keys must match corresponding data keys
+    obj.setMethod('triggerPlotHooks', `
+      const eventName = args[0];
+      const data = args[1] || {};
+
+      const plotHooks = self.plotHooks || {};
+      const hooks = plotHooks[eventName] || [];
+
+      if (hooks.length === 0) {
+        return 0; // No hooks registered
+      }
+
+      let triggered = 0;
+
+      for (const hook of hooks) {
+        // Check filter - all filter keys must match data
+        const filter = hook.filter || {};
+        let matches = true;
+        for (const [key, value] of Object.entries(filter)) {
+          if (data[key] !== value) {
+            matches = false;
+            break;
+          }
+        }
+
+        if (!matches) {
+          continue; // Filter didn't match, skip this hook
+        }
+
+        const plot = await $.load(hook.plotId);
+        if (!plot) {
+          continue; // Plot no longer exists
+        }
+
+        try {
+          if (hook.jobId) {
+            // Job-specific hook
+            if (plot.onJobHookTriggered) {
+              await plot.onJobHookTriggered(hook.jobId, eventName, self.id, data, filter);
+              triggered++;
+            }
+          } else {
+            // Plot-level hook
+            if (plot.onHookTriggered) {
+              await plot.onHookTriggered(eventName, self.id, data, filter);
+              triggered++;
+            }
+          }
+        } catch (e) {
+          console.error('Error triggering hook for plot #' + hook.plotId + ':', e.message);
+        }
+      }
+
+      return triggered;
+    `);
+
+    // getPlotHooks() - list all plot hooks registered on this object
+    obj.setMethod('getPlotHooks', `
+      return self.plotHooks || {};
+    `);
+
+    // hasPlotHook(eventName) - check if any plot is watching for this event
+    obj.setMethod('hasPlotHook', `
+      const eventName = args[0];
+      const plotHooks = self.plotHooks || {};
+      const hooks = plotHooks[eventName] || [];
+      return hooks.length > 0;
+    `);
+
     return obj;
   }
 }

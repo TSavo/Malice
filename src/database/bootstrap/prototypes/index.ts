@@ -32,5 +32,9 @@ export { BodyFactory } from './body-factory.js';
 export { WearableBuilder } from './wearable-builder.js';
 export { ClothingBuilder } from './clothing-builder.js';
 
+// Lockers
+export { LockerBuilder } from './locker-builder.js';
+export { OneTimeLockerBuilder } from './one-time-locker-builder.js';
+
 // Appearance
 export * from './appearance-constants.js';
