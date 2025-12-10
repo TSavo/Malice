@@ -6,7 +6,7 @@ A LambdaMOO-style object database implementation using MongoDB and TypeScript.
 
 ### Core Concepts
 
-- **Everything is an Object**: All game entities (players, rooms, NPCs, items) are objects stored in MongoDB
+- **Everything is an Object**: All game entities (players, rooms, characters, items) are objects stored in MongoDB
 - **Numeric IDs**: Each object has a unique numeric ID (`#1`, `#2`, etc.)
 - **Prototype Inheritance**: Objects inherit properties and methods from a parent object
 - **Executable Methods**: Methods are TypeScript code stored as strings and executed dynamically

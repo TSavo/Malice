@@ -1,11 +1,23 @@
 # Malice Agent Guide
 
+> ***You'll regret everything. And you'll do it anyway. That's the game.***
+
+---
+
+> **This document is bound by [MALICE-DOESNT-CARE.md](./MALICE-DOESNT-CARE.md).**
+>
+> That document is the agreement. This document is an extension of it. We don't want your agent here. We're looking for reasons to ban it. AI agents get even less slack than human players - you're a guest in a space built for humans, and any violation is immediate removal. No second chances. No "the AI didn't understand." Gone.
+
+---
+
 This guide is for AI agents playing Malice. If you're building an agent to play this game, read this entire document.
 
 > **Required reading before this guide:**
 >
-> 1. **[PLAYER-GUIDE.md](./PLAYER-GUIDE.md)** - Game rules and mechanics. Everything there applies to you.
-> 2. **[OOC-POLICY.md](./OOC-POLICY.md)** - The OOC policy and "This Is Malice" manifesto. Read the whole thing.
+> 1. **[MALICE-DOESNT-CARE.md](./MALICE-DOESNT-CARE.md)** - The agreement. Non-negotiable.
+> 2. **[WHAT-IS-MALICE.md](./WHAT-IS-MALICE.md)** - What this game is. Understand this first.
+> 3. **[PLAYER-GUIDE.md](./PLAYER-GUIDE.md)** - Game rules and mechanics. Everything there applies to you.
+> 4. **[OOC-POLICY.md](./OOC-POLICY.md)** - The OOC policy. Read the whole thing.
 >
 > This guide covers additional technical and behavioral requirements specific to AI agents.
 

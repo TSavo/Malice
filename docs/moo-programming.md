@@ -11,7 +11,7 @@ Malice has three layers:
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │  Layer 3: DATABASE CONTENT (Closed Source)                  │
-│  The actual world. Specific items, rooms, NPCs, secrets.    │
+│  The actual world. Specific items, rooms, characters, secrets. │
 ├─────────────────────────────────────────────────────────────┤
 │  Layer 2: BOOTSTRAP CODE (Open Source - MOO)                │
 │  Foundational prototypes. "Common knowledge."               │
@@ -1747,7 +1747,7 @@ When creating new object types, inherit from the appropriate prototype:
 | `$.location` | `$.describable` | Containers (holds contents) |
 | `$.room` | `$.location` | Rooms with exits |
 | `$.exit` | `$.describable` | Directional links between rooms |
-| `$.agent` | `$.describable` | Things that can act (NPCs) |
+| `$.agent` | `$.describable` | Things that can act (autonomous entities) |
 | `$.embodied` | `$.agent` | Agents with physical bodies |
 | `$.human` | `$.embodied` | Human-type embodied agents |
 | `$.player` | `$.human` | Player characters |
@@ -3836,8 +3836,8 @@ async createShop() {
     await item.moveTo(shop);
   }
 
-  // Create the shopkeeper
-  const keeper = await $.recycler.create($.npc, {
+  // Create the shopkeeper (a character - may be human or AI controlled)
+  const keeper = await $.recycler.create($.player, {
     name: 'shopkeeper',
     description: 'A friendly merchant.'
   });

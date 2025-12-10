@@ -351,7 +351,7 @@ npm run typecheck
 ### Phase 4: Advanced Features
 - [ ] Combat system
 - [ ] Skills/abilities
-- [ ] NPC AI
+- [ ] AI agent integration
 - [ ] Quest system
 - [ ] Economy
 

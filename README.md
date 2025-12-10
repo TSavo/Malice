@@ -135,7 +135,7 @@ openssl s_client -connect localhost:5556 \
 
 #### 1. Everything is an Object
 
-All game entities (players, rooms, NPCs, items) are objects stored in MongoDB with:
+All game entities (players, rooms, characters, items) are objects stored in MongoDB with:
 - Numeric IDs (#1, #2, #3, ...)
 - Parent for inheritance
 - Properties (data)
@@ -391,11 +391,15 @@ const room = await $.create({
 });
 ```
 
-## Example: Creating an NPC
+## Example: Creating a Character
+
+> **Note:** In Malice, there are no "NPCs" - every character you meet is controlled
+> by either a human or an AI agent. However, characters can be created programmatically
+> and may be AI-controlled players in the game world.
 
 ```typescript
 const merchant = await $.create({
-  parent: 11,  // Inherit from Agent
+  parent: 13,  // Inherit from Player
   properties: {
     name: 'Shopkeeper',
     description: 'A gruff shopkeeper with a weathered face.',
@@ -498,7 +502,7 @@ See [AUTH-ARCHITECTURE.md](./AUTH-ARCHITECTURE.md) for details.
 ### Phase 4: Advanced Features 📋
 - [ ] Combat system
 - [ ] Skills/abilities
-- [ ] NPC AI
+- [ ] AI agent integration
 - [ ] Quest system
 - [ ] Economy
 - [ ] Guilds/factions

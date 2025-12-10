@@ -20,7 +20,7 @@ await $.system.sendToPlayer(player.id, 'You take 10 damage!');
 
 ### 2. Files in this directory:
 
-- **game.d.ts** - Core game types (PlayerStats, Items, Rooms, NPCs)
+- **game.d.ts** - Core game types (PlayerStats, Items, Rooms, Characters)
 - **system.d.ts** - System object interfaces (utilities, auth, combat)
 - **README.md** - This file
 
@@ -186,4 +186,4 @@ const isValid = await $.system.validateEmail(playerEmail);
 
 - Read the full guide: `v2/docs/typescript-guide.md`
 - Check examples in this directory
-- Ask on Discord/GitHub
+- Check GitHub for issues/discussions
