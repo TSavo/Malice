@@ -14,6 +14,7 @@ import { EmoteBuilder } from './emote-builder.js';
 import { MutexBuilder } from './mutex-builder.js';
 import { MementoBuilder } from './memento-builder.js';
 import { FormatBuilder } from './format-builder.js';
+import { PlotBuilder } from './plot-builder.js';
 
 /**
  * Orchestrates building all core system objects
@@ -34,6 +35,8 @@ import { FormatBuilder } from './format-builder.js';
  * - Mutex ($.mutex): Object-based mutex locks with data and expiration
  * - Memento ($.memento): Object graph serialization for cloning/templates
  * - Format ($.format): Text formatting for columns, tables, and layout
+ * - Plot ($.plot): Narrative event log prototype
+ * - PlotSpawner ($.plotSpawner): Base prototype for plot-generating entities
  */
 export class CoreSystemBuilder {
   constructor(private manager: ObjectManager) {}
@@ -57,6 +60,7 @@ export class CoreSystemBuilder {
     const mutexBuilder = new MutexBuilder(this.manager);
     const mementoBuilder = new MementoBuilder(this.manager);
     const formatBuilder = new FormatBuilder(this.manager);
+    const plotBuilder = new PlotBuilder(this.manager);
 
     await authManagerBuilder.build();
     await charGenBuilder.build();
@@ -73,6 +77,7 @@ export class CoreSystemBuilder {
     await mutexBuilder.build();
     await mementoBuilder.build();
     await formatBuilder.build();
+    await plotBuilder.build();
 
     // Register aliases
     await authManagerBuilder.registerAlias();
@@ -90,5 +95,6 @@ export class CoreSystemBuilder {
     await mutexBuilder.registerAlias();
     await mementoBuilder.registerAlias();
     await formatBuilder.registerAlias();
+    await plotBuilder.registerAliases();
   }
 }

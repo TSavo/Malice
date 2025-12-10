@@ -22,6 +22,8 @@ import {
   BodyPartsBuilder,
   WearableBuilder,
   ClothingBuilder,
+  LockerBuilder,
+  OneTimeLockerBuilder,
 } from './prototypes/index.js';
 
 /**
@@ -66,6 +68,8 @@ export class PrototypeBuilder {
   private bodyPartsBuilder: BodyPartsBuilder;
   private wearableBuilder: WearableBuilder;
   private clothingBuilder: ClothingBuilder;
+  private lockerBuilder: LockerBuilder;
+  private oneTimeLockerBuilder: OneTimeLockerBuilder;
 
   constructor(private manager: ObjectManager) {
     this.describableBuilder = new DescribableBuilder(manager);
@@ -90,6 +94,8 @@ export class PrototypeBuilder {
     this.bodyPartsBuilder = new BodyPartsBuilder(manager);
     this.wearableBuilder = new WearableBuilder(manager);
     this.clothingBuilder = new ClothingBuilder(manager);
+    this.lockerBuilder = new LockerBuilder(manager);
+    this.oneTimeLockerBuilder = new OneTimeLockerBuilder(manager);
   }
 
   /**
@@ -212,6 +218,16 @@ export class PrototypeBuilder {
       ? await this.manager.load(aliases.clothing as number)
       : await this.clothingBuilder.build(wearable!.id);
 
+    // Locker - lockable containers with codes (inherits from Location)
+    const locker = aliases.locker
+      ? await this.manager.load(aliases.locker as number)
+      : await this.lockerBuilder.build(location!.id);
+
+    // OneTimeLocker - courier-friendly lockers (inherits from Locker)
+    const oneTimeLocker = aliases.oneTimeLocker
+      ? await this.manager.load(aliases.oneTimeLocker as number)
+      : await this.oneTimeLockerBuilder.build(locker!.id);
+
     // Register aliases in root.properties.aliases
     await this.registerAliases({
       describable: describable!.id,
@@ -236,6 +252,8 @@ export class PrototypeBuilder {
       bodyParts,
       wearable: wearable!.id,
       clothing: clothing!.id,
+      locker: locker!.id,
+      oneTimeLocker: oneTimeLocker!.id,
     });
   }
 
@@ -262,6 +280,8 @@ export class PrototypeBuilder {
     bodyParts: Record<string, number>;
     wearable: number;
     clothing: number;
+    locker: number;
+    oneTimeLocker: number;
   }): Promise<void> {
     const objectManager = await this.manager.load(0);
     if (!objectManager) return;
@@ -288,6 +308,8 @@ export class PrototypeBuilder {
     await objectManager.call('addAlias', 'bodyPart', ids.bodyPart);
     await objectManager.call('addAlias', 'wearable', ids.wearable);
     await objectManager.call('addAlias', 'clothing', ids.clothing);
+    await objectManager.call('addAlias', 'locker', ids.locker);
+    await objectManager.call('addAlias', 'oneTimeLocker', ids.oneTimeLocker);
 
     // Store bodyParts object directly (addAlias only supports simple id values)
     const aliases = (objectManager.get('aliases') as Record<string, number | Record<string, number>>) || {};
@@ -301,7 +323,7 @@ export class PrototypeBuilder {
 
     const partNames = Object.keys(ids.bodyParts).join(', ');
     console.log(
-      `✅ Registered prototype aliases: describable=#${ids.describable}, location=#${ids.location}, exit=#${ids.exit}, room=#${ids.room}, agent=#${ids.agent}, embodied=#${ids.embodied}, human=#${ids.human}, player=#${ids.player}, admin=#${ids.admin}, decayable=#${ids.decayable}, bodyPart=#${ids.bodyPart}, wearable=#${ids.wearable}, clothing=#${ids.clothing}`,
+      `✅ Registered prototype aliases: describable=#${ids.describable}, location=#${ids.location}, exit=#${ids.exit}, room=#${ids.room}, agent=#${ids.agent}, embodied=#${ids.embodied}, human=#${ids.human}, player=#${ids.player}, admin=#${ids.admin}, decayable=#${ids.decayable}, bodyPart=#${ids.bodyPart}, wearable=#${ids.wearable}, clothing=#${ids.clothing}, locker=#${ids.locker}, oneTimeLocker=#${ids.oneTimeLocker}`,
     );
     console.log(`✅ Registered body part prototypes: ${partNames}`);
   }

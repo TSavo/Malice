@@ -411,6 +411,228 @@ export class MaliceMCPServer {
       }
     );
 
+    // List all rooms
+    this.server.tool(
+      'list_rooms',
+      'List all rooms in the world with their coordinates and exit counts.',
+      {},
+      async () => {
+        const allObjects = await this.manager.db.listAll(false);
+        const roomProto = allObjects.find(o => o.properties?.name?.value === 'Room');
+        if (!roomProto) {
+          return { content: [{ type: 'text', text: 'Room prototype not found' }], isError: true };
+        }
+
+        const rooms = [];
+        for (const obj of allObjects) {
+          // Check if this object inherits from Room (with cycle protection)
+          let parentId = obj.parent;
+          let isRoom = obj._id === roomProto._id;
+          const seen = new Set<number>();
+          while (parentId !== -1 && !isRoom && !seen.has(parentId)) {
+            seen.add(parentId);
+            if (parentId === roomProto._id) {
+              isRoom = true;
+              break;
+            }
+            const parent = allObjects.find(o => o._id === parentId);
+            if (!parent) break;
+            parentId = parent.parent;
+          }
+
+          if (isRoom && obj._id !== roomProto._id) {
+            rooms.push({
+              id: obj._id,
+              name: obj.properties?.name?.value || '(unnamed)',
+              x: obj.properties?.x?.value ?? 0,
+              y: obj.properties?.y?.value ?? 0,
+              z: obj.properties?.z?.value ?? 0,
+              exitCount: (obj.properties?.exits?.value || []).length,
+            });
+          }
+        }
+
+        return {
+          content: [{ type: 'text', text: JSON.stringify({ count: rooms.length, rooms }, null, 2) }],
+        };
+      }
+    );
+
+    // List all players
+    this.server.tool(
+      'list_players',
+      'List all player characters with their location and online status.',
+      {},
+      async () => {
+        const allObjects = await this.manager.db.listAll(false);
+        const playerProto = allObjects.find(o => o.properties?.name?.value === 'Player');
+        if (!playerProto) {
+          return { content: [{ type: 'text', text: 'Player prototype not found' }], isError: true };
+        }
+
+        const players = [];
+        for (const obj of allObjects) {
+          // Check if this object inherits from Player (with cycle protection)
+          let parentId = obj.parent;
+          let isPlayer = false;
+          const seen = new Set<number>();
+          while (parentId !== -1 && !seen.has(parentId)) {
+            seen.add(parentId);
+            if (parentId === playerProto._id) {
+              isPlayer = true;
+              break;
+            }
+            const parent = allObjects.find(o => o._id === parentId);
+            if (!parent) break;
+            parentId = parent.parent;
+          }
+
+          if (isPlayer) {
+            players.push({
+              id: obj._id,
+              name: obj.properties?.name?.value || '(unnamed)',
+              location: obj.properties?.location?.value ?? null,
+              connected: obj.properties?.connected?.value ?? false,
+            });
+          }
+        }
+
+        return {
+          content: [{ type: 'text', text: JSON.stringify({ count: players.length, players }, null, 2) }],
+        };
+      }
+    );
+
+    // Link two rooms with exits
+    this.server.tool(
+      'link_rooms',
+      'Create an exit from one room to another, optionally with a return exit.',
+      {
+        fromRoomId: z.number().describe('Source room ID'),
+        toRoomId: z.number().describe('Destination room ID'),
+        exitDirection: z.string().describe('Exit direction (e.g., "north", "east", "up")'),
+        returnDirection: z.string().optional().describe('Return exit direction (e.g., "south", "west", "down")'),
+      },
+      async ({ fromRoomId, toRoomId, exitDirection, returnDirection }) => {
+        const aliasMap: Record<string, string[]> = {
+          north: ['n'], south: ['s'], east: ['e'], west: ['w'],
+          northeast: ['ne'], northwest: ['nw'], southeast: ['se'], southwest: ['sw'],
+          up: ['u'], down: ['d', 'dn'], in: ['i'], out: ['o'],
+        };
+
+        const fromRoom = await this.manager.load(fromRoomId as ObjId);
+        const toRoom = await this.manager.load(toRoomId as ObjId);
+
+        if (!fromRoom) {
+          return { content: [{ type: 'text', text: `Source room #${fromRoomId} not found` }], isError: true };
+        }
+        if (!toRoom) {
+          return { content: [{ type: 'text', text: `Destination room #${toRoomId} not found` }], isError: true };
+        }
+
+        const allObjects = await this.manager.db.listAll(false);
+        const exitProto = allObjects.find(o => o.properties?.name?.value === 'Exit');
+        if (!exitProto) {
+          return { content: [{ type: 'text', text: 'Exit prototype not found' }], isError: true };
+        }
+
+        const result: any = { exits: [] };
+
+        // Create exit from source to destination
+        const exitTo = await this.manager.create({
+          parent: exitProto._id as ObjId,
+          properties: {
+            name: { type: 'string', value: exitDirection },
+            aliases: { type: 'array', value: aliasMap[exitDirection.toLowerCase()] || [] },
+            destRoom: { type: 'objref', value: toRoomId },
+          },
+          methods: {},
+        });
+        await fromRoom.call('addExit', exitTo);
+        result.exits.push({ id: exitTo.id, direction: exitDirection, from: fromRoomId, to: toRoomId });
+
+        // Create return exit if requested
+        if (returnDirection) {
+          const exitBack = await this.manager.create({
+            parent: exitProto._id as ObjId,
+            properties: {
+              name: { type: 'string', value: returnDirection },
+              aliases: { type: 'array', value: aliasMap[returnDirection.toLowerCase()] || [] },
+              destRoom: { type: 'objref', value: fromRoomId },
+            },
+            methods: {},
+          });
+          await toRoom.call('addExit', exitBack);
+          result.exits.push({ id: exitBack.id, direction: returnDirection, from: toRoomId, to: fromRoomId });
+        }
+
+        return {
+          content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
+        };
+      }
+    );
+
+    // Remove an exit
+    this.server.tool(
+      'unlink',
+      'Remove an exit from a room.',
+      {
+        roomId: z.number().describe('Room ID containing the exit'),
+        exitId: z.number().describe('Exit object ID to remove'),
+      },
+      async ({ roomId, exitId }) => {
+        const room = await this.manager.load(roomId as ObjId);
+        if (!room) {
+          return { content: [{ type: 'text', text: `Room #${roomId} not found` }], isError: true };
+        }
+
+        try {
+          await room.call('removeExit', exitId);
+          return {
+            content: [{ type: 'text', text: `Exit #${exitId} removed from room #${roomId}` }],
+          };
+        } catch (err) {
+          return {
+            content: [{ type: 'text', text: `Error removing exit: ${err instanceof Error ? err.message : String(err)}` }],
+            isError: true,
+          };
+        }
+      }
+    );
+
+    // Move an object to a location
+    this.server.tool(
+      'move_object',
+      'Move an object to a new location (room or container).',
+      {
+        objectId: z.number().describe('Object ID to move'),
+        destinationId: z.number().describe('Destination room or container ID'),
+      },
+      async ({ objectId, destinationId }) => {
+        const obj = await this.manager.load(objectId as ObjId);
+        const dest = await this.manager.load(destinationId as ObjId);
+
+        if (!obj) {
+          return { content: [{ type: 'text', text: `Object #${objectId} not found` }], isError: true };
+        }
+        if (!dest) {
+          return { content: [{ type: 'text', text: `Destination #${destinationId} not found` }], isError: true };
+        }
+
+        try {
+          await obj.call('moveTo', dest);
+          return {
+            content: [{ type: 'text', text: `Moved #${objectId} (${obj.get('name')}) to #${destinationId} (${dest.get('name')})` }],
+          };
+        } catch (err) {
+          return {
+            content: [{ type: 'text', text: `Error moving object: ${err instanceof Error ? err.message : String(err)}` }],
+            isError: true,
+          };
+        }
+      }
+    );
+
     // === Telnet Session Tools ===
 
     // Connect to MOO via telnet
@@ -523,6 +745,170 @@ export class MaliceMCPServer {
         };
       }
     );
+
+    // === Plot/Job Tools ===
+
+    // Get next job needing attention
+    this.server.tool(
+      'get_next_job',
+      'Get the next plot/job needing attention from the FIFO queue. Returns the plot with event log and metadata, and bumps its attention timer by 24 hours.',
+      {},
+      async () => {
+        const plotDB = await this.getPlotDB();
+        if (!plotDB) {
+          return {
+            content: [{ type: 'text', text: 'PlotDB not found - plot system not initialized' }],
+            isError: true,
+          };
+        }
+
+        try {
+          const plot = await plotDB.call('getNext');
+          if (!plot) {
+            return {
+              content: [{ type: 'text', text: JSON.stringify({ plot: null, message: 'No jobs need attention' }, null, 2) }],
+            };
+          }
+
+          const result = {
+            id: plot.id,
+            name: plot.name,
+            events: plot.events || [],
+            metadata: plot.metadata || {},
+          };
+
+          return {
+            content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
+          };
+        } catch (err) {
+          return {
+            content: [{ type: 'text', text: `Error getting next job: ${err instanceof Error ? err.message : String(err)}` }],
+            isError: true,
+          };
+        }
+      }
+    );
+
+    // Respond to a job
+    this.server.tool(
+      'respond_to_job',
+      'Add an event to a plot as the city AI handler. Use this to progress the narrative, give instructions, or respond to player actions. Use metadata to track objects, locations, and state.',
+      {
+        plotId: z.number().describe('Plot object ID'),
+        message: z.string().describe('The message/event to add to the plot'),
+        metadata: z.record(z.any()).optional().describe('Arbitrary metadata (e.g., { createdObject: 56, deliveryTarget: 49 })'),
+      },
+      async ({ plotId, message, metadata }) => {
+        const plot = await this.manager.load(plotId as ObjId);
+        if (!plot) {
+          return {
+            content: [{ type: 'text', text: `Plot #${plotId} not found` }],
+            isError: true,
+          };
+        }
+
+        try {
+          await plot.call('addEvent', {
+            from: 'handler',
+            message: message,
+            ...(metadata ? { metadata } : {}),
+          });
+          return {
+            content: [{ type: 'text', text: `Event added to plot #${plotId}` }],
+          };
+        } catch (err) {
+          return {
+            content: [{ type: 'text', text: `Error adding event: ${err instanceof Error ? err.message : String(err)}` }],
+            isError: true,
+          };
+        }
+      }
+    );
+
+    // List active jobs
+    this.server.tool(
+      'list_active_jobs',
+      'List all active plots/jobs with their metadata. Shows which jobs exist and their current state.',
+      {},
+      async () => {
+        const plotDB = await this.getPlotDB();
+        if (!plotDB) {
+          return {
+            content: [{ type: 'text', text: 'PlotDB not found - plot system not initialized' }],
+            isError: true,
+          };
+        }
+
+        try {
+          const plots = await plotDB.call('active');
+          const results = [];
+
+          for (const plot of plots || []) {
+            results.push({
+              id: plot.id,
+              name: plot.name,
+              metadata: plot.metadata || {},
+              eventCount: (plot.events || []).length,
+            });
+          }
+
+          return {
+            content: [{ type: 'text', text: JSON.stringify({ count: results.length, jobs: results }, null, 2) }],
+          };
+        } catch (err) {
+          return {
+            content: [{ type: 'text', text: `Error listing jobs: ${err instanceof Error ? err.message : String(err)}` }],
+            isError: true,
+          };
+        }
+      }
+    );
+
+    // Set job metadata
+    this.server.tool(
+      'set_job_metadata',
+      'Set or update metadata on a plot/job. Use for tracking status, state, flags, etc.',
+      {
+        plotId: z.number().describe('Plot object ID'),
+        key: z.string().describe('Metadata key'),
+        value: z.any().describe('Metadata value (any JSON-serializable value, or null to delete)'),
+      },
+      async ({ plotId, key, value }) => {
+        const plot = await this.manager.load(plotId as ObjId);
+        if (!plot) {
+          return {
+            content: [{ type: 'text', text: `Plot #${plotId} not found` }],
+            isError: true,
+          };
+        }
+
+        try {
+          await plot.call('setMetadata', key, value);
+          return {
+            content: [{ type: 'text', text: `Set metadata '${key}' on plot #${plotId}` }],
+          };
+        } catch (err) {
+          return {
+            content: [{ type: 'text', text: `Error setting metadata: ${err instanceof Error ? err.message : String(err)}` }],
+            isError: true,
+          };
+        }
+      }
+    );
+
+  }
+
+  /**
+   * Get the PlotDB object
+   */
+  private async getPlotDB(): Promise<any> {
+    const objectManager = await this.manager.load(0 as ObjId);
+    if (!objectManager) return null;
+
+    const aliases = objectManager.get('aliases') as Record<string, number> | undefined;
+    if (!aliases?.plotDB) return null;
+
+    return this.manager.load(aliases.plotDB as ObjId);
   }
 
   /**
