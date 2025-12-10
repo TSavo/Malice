@@ -154,10 +154,10 @@ methods: {
 - Gun registers `shoot` when picked up, unregisters when dropped
 - Default verbs (`look`, `say`, `quit`) registered on player connect
 
-**Examples:** NPCs, players
+**Examples:** AI-controlled characters, human-controlled players
 
 ### #12 Human
-**Purpose:** Human-like agents (players and realistic NPCs)
+**Purpose:** Human-like agents (all players have human bodies)
 ```typescript
 properties: {
   sex: 'male' | 'female' | 'non-binary';
@@ -171,7 +171,7 @@ methods: {
 }
 ```
 
-**Examples:** Players, human NPCs
+**Examples:** All player characters (human or AI controlled)
 
 ### #13 Player
 **Purpose:** Prototype for all player objects

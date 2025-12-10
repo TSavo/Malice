@@ -481,4 +481,4 @@ Possible improvements to the type system:
 
 ---
 
-**Questions?** Check the main Malice documentation or ask in Discord!
+**Questions?** Check the main Malice documentation.

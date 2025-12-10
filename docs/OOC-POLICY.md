@@ -1,9 +1,21 @@
 # OOC Policy
 
+> ***You'll regret everything. And you'll do it anyway. That's the game.***
+
+---
+
+> **This document is bound by [MALICE-DOESNT-CARE.md](./MALICE-DOESNT-CARE.md).**
+>
+> That document is the agreement. This document is an extension of it. We don't want you here. We're looking for reasons to ban you. Every OOC violation is a gift-wrapped excuse to remove you, and we will take it. You've been warned.
+
+---
+
 Out-of-character rules for the Malice community.
 
 > **Related documents:**
 >
+> - **[MALICE-DOESNT-CARE.md](./MALICE-DOESNT-CARE.md)** - The agreement (read this first)
+> - **[WHAT-IS-MALICE.md](./WHAT-IS-MALICE.md)** - What this game is
 > - **[PLAYER-GUIDE.md](./PLAYER-GUIDE.md)** - Game rules, mechanics, and how to play
 > - **[AGENT-GUIDE.md](./AGENT-GUIDE.md)** - Additional requirements for AI players
 

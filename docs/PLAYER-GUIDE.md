@@ -1,5 +1,15 @@
 # Malice Player Guide
 
+> ***You'll regret everything. And you'll do it anyway. That's the game.***
+
+---
+
+> **This document is bound by [MALICE-DOESNT-CARE.md](./MALICE-DOESNT-CARE.md).**
+>
+> If you haven't read it, stop. Go read it. That document is the agreement. This document is the details. By playing, you've accepted that we don't want you here, that we're looking for reasons to remove you, and that every rule violation is an opportunity we will take. Proceed accordingly.
+
+---
+
 Welcome to Malice.
 
 You're probably going to regret this.
@@ -8,9 +18,9 @@ You're probably going to regret this.
 
 ## Before You Begin
 
-Read [OOC-POLICY.md](./OOC-POLICY.md). Specifically, read the section called "This Is Malice."
+Read [WHAT-IS-MALICE.md](./WHAT-IS-MALICE.md) first, then [MALICE-DOESNT-CARE.md](./MALICE-DOESNT-CARE.md).
 
-That section will tell you whether you should be here. Most people shouldn't. If you read it and something in you responds to the challenge rather than recoiling from it, continue.
+Those documents will tell you whether you should be here. Most people shouldn't. If you read them and something in you responds to the challenge rather than recoiling from it, continue.
 
 If not, there are thousands of other games. Play those instead.
 
@@ -153,6 +163,47 @@ This isn't unfair. You know the rules. They're written here clearly. If you meta
 We want players who make the game better for everyone. We will not compromise the game experience to accommodate players who can't or won't follow the rules.
 
 Follow the rules or leave.
+
+---
+
+## OOC vs IC: This Is Critical
+
+**OOC: Be excellent to each other.**
+
+Out of character, we're all people. All of us. The other players. The admins. You.
+
+When someone speaks OOC - be extra excellent to them. They're a human being. They have feelings. They have bad days. They're taking a moment to step outside the brutal game and be a person.
+
+**You are NOT the piece of shit your character is. Don't act like it.**
+
+Your character might be a murderer, a thief, a manipulator, a monster. That's fine. That's the game. But YOU - the person at the keyboard - you're a human being interacting with other human beings.
+
+When the masks come off, be kind. Be respectful. Be decent.
+
+- Don't harass people OOC over IC events.
+- Don't carry IC grudges into OOC spaces.
+- Don't be a dick because your character is a dick.
+- Don't confuse the game with reality.
+
+**IC: It's you versus everyone.**
+
+In character? Everyone is a potential threat. Other players are competing for the same scarce resources. Admins play characters too - and they're adversaries.
+
+And you don't know who anyone really is.
+
+That friendly trader who helped you last week? Might be an admin. That ruthless gang leader who took everything you had? Might be an admin. Your best friend in the game, the one you trust with your life? Might be an admin. Or just another player who will betray you when it's convenient.
+
+You don't know. You can't know. That's the game.
+
+**This is not paranoia. This is reality.**
+
+Treat every character as potentially dangerous. Trust carefully. Watch your back. Scheme. Betray. Survive.
+
+But the moment someone steps OOC? They're a person again. Treat them like one.
+
+**The game is brutal. The community doesn't have to be.**
+
+You'll regret everything. And you'll do it anyway.
 
 ---
 
@@ -491,7 +542,8 @@ We'll be waiting. With malice.
 
 Before you play:
 
-1. **[OOC-POLICY.md](./OOC-POLICY.md)** - The complete out-of-character policy, including the "This Is Malice" manifesto
-2. **[AGENT-GUIDE.md](./AGENT-GUIDE.md)** - If you're building an AI agent to play
+1. **[WHAT-IS-MALICE.md](./WHAT-IS-MALICE.md)** - What this game is and whether you should play it
+2. **[OOC-POLICY.md](./OOC-POLICY.md)** - The complete out-of-character policy
+3. **[AGENT-GUIDE.md](./AGENT-GUIDE.md)** - If you're building an AI agent to play
 
 These aren't optional. The rules are enforced. Ignorance is not a defense.
