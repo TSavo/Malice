@@ -1725,6 +1725,9 @@ export class AgentBuilder {
       };
       self.movementState = state;
 
+      // Acquire walk exclusion
+      await $.exclusions.start(self, 'walk', "You'll need to stop moving first.");
+
       // Schedule completion
       const jobName = 'move_' + self.id + '_' + Date.now();
       await $.scheduler.schedule(jobName, timeMs, 0, self, 'completeMovement');
@@ -1759,6 +1762,9 @@ export class AgentBuilder {
       // Clear movement state first
       self.movementState = null;
       self.movementJob = null;
+
+      // Release walk exclusion
+      await $.exclusions.end(self, 'walk');
 
       // Burn calories (if Embodied)
       if (self.burnCalories && calorieCost > 0) {
@@ -1810,6 +1816,9 @@ export class AgentBuilder {
       // Clear state
       self.movementState = null;
       self.movementJob = null;
+
+      // Release walk exclusion
+      await $.exclusions.end(self, 'walk');
 
       return {
         success: true,

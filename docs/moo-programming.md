@@ -368,6 +368,7 @@ const loc = await $.load(self.location);  // $.load(42) -> loads #42
 | `$.prompt` | Interactive prompts (question, choice, menu, multiline) |
 | `$.recycler` | Object lifecycle: create, recycle, unrecycle |
 | `$.memento` | Object graph serialization and cloning |
+| `$.exclusions` | Action exclusion system (sitting/walking conflicts) |
 | `$.mutex` | Object-based mutex locks with timeouts |
 | `$.scheduler` | Periodic job scheduling (heartbeats, decay) |
 | `$.emote` | Sensory-aware emotes with `.verb` syntax |
@@ -1113,9 +1114,182 @@ const parts = await $.memento.clone([body, arm]);
 // arm.parent = body (in-graph) -> updated to new body's ID
 ```
 
+## $.exclusions - Action Exclusion System
+
+Use `$.exclusions` to prevent incompatible simultaneous actions (sitting while walking, crafting while fighting, etc.). Built on top of `$.mutex` with predefined rules for common actions.
+
+### Why Use Exclusions?
+
+Without exclusions, you write the same "you can't do X while doing Y" checks everywhere:
+
+```javascript
+// DON'T: Scattered checks everywhere
+async function startWalking(player) {
+  if (player.isSitting) {
+    return "You'll need to stand up first.";
+  }
+  if (player.isFighting) {
+    return "You can't move during combat.";
+  }
+  if (player.isCrafting) {
+    return "Finish crafting first.";
+  }
+  // ... endless checks
+}
+
+async function sit(player) {
+  if (player.isWalking) {
+    return "You'll need to stop moving first.";
+  }
+  if (player.isFighting) {
+    return "You can't sit during combat.";
+  }
+  // ... duplicated everywhere
+}
+
+// DO: Centralized exclusion system
+async function startWalking(player) {
+  const blocked = await $.exclusions.check(player, 'walk');
+  if (blocked) return blocked; // Returns the message string
+  
+  await $.exclusions.start(player, 'walk', "You'll need to stop moving first.");
+  // ... do walking
+}
+
+async function sit(player) {
+  const blocked = await $.exclusions.start(player, 'sit', "You'll need to stand up first.");
+  if (blocked) return blocked;
+  
+  // ... sitting succeeds
+}
+```
+
+### How It Works
+
+1. **Define rules once**: Actions list what they exclude
+2. **Store custom messages**: Each action specifies its blocking message
+3. **Automatic checks**: System prevents incompatible actions
+4. **Clean up on completion**: Release the exclusion when done
+
+### Basic Usage
+
+```javascript
+// Start an action (returns false on success, or blocking message string)
+const result = await $.exclusions.start(player, 'sit', "You'll need to stand up first.");
+if (result) {
+  return result; // "You'll need to stop moving first." (if walking)
+}
+
+// Do the sitting...
+player.sitting = true;
+
+// End the action
+await $.exclusions.end(player, 'sit');
+```
+
+### Check Before Starting
+
+```javascript
+// Just check without acquiring
+const blocked = await $.exclusions.check(player, 'walk');
+if (blocked) {
+  return blocked; // Returns the message string
+}
+
+// Not blocked, proceed
+await startWalking(player);
+```
+
+### Predefined Rules
+
+The system comes with common exclusions:
+
+| Action | Excludes |
+|--------|----------|
+| `walk`, `run`, `crawl`, `swim` | Each other, plus `sit`, `sleep`, `crafting`, `operating` |
+| `sit` | Movement, `sleep`, `operating` |
+| `sleep` | Everything active |
+| `crafting` | Movement, `fighting`, `operating` |
+| `fighting` | `crafting`, `sleep`, `operating` |
+| `operating` (terminals) | Most active behaviors |
+| `eating`, `drinking` | Only `sleep` |
+| `talking`, `watching` | Nothing (can do simultaneously) |
+
+### Custom Exclusions
+
+```javascript
+// Define new action and what it excludes
+await $.exclusions.define('fly', ['walk', 'sit', 'swim']);
+
+// Now flying excludes those actions
+const result = await $.exclusions.start(player, 'fly', "You'll need to land first.");
+```
+
+### Advanced: Get Current Actions
+
+```javascript
+// See what actions are currently active
+const actions = await $.exclusions.current(player);
+// [{ action: 'sit', data: "You'll need to stand up first.", acquiredAt: 1234567890 }]
+
+// Check specific exclusions for an action
+const exclusions = await $.exclusions.get('walk');
+// ['sit', 'sleep', 'crafting', 'operating']
+```
+
+### Real Example: Room Sitting
+
+```javascript
+obj.setMethod('sit', `
+  const sittables = self.sittables || [];
+  if (sittables.length === 0) {
+    return 'There is nowhere to sit here.';
+  }
+
+  // Check if blocked by other actions (walking, fighting, etc.)
+  const blocked = await $.exclusions.check(player, 'sit');
+  if (blocked) return blocked; // "You'll need to stop moving first."
+
+  // Find available seat
+  const sittable = sittables.find(s => s.occupied.length < s.capacity);
+  if (!sittable) return 'All seating is occupied.';
+
+  // Sit down and acquire exclusion
+  sittable.occupied.push(player.id);
+  player.sitting = self.id;
+  await $.exclusions.start(player, 'sit', "You'll need to stand up first.");
+
+  // Now walking is blocked until they stand
+  await self.announce(player, null, {
+    actor: 'You sit down on ' + sittable.name + '.',
+    others: await $.pronoun.sub('%N sits down on ' + sittable.name + '.', player),
+  });
+`);
+```
+
+### Movement Queueing Exception
+
+Walking while already walking **doesn't block** - it queues the next movement. The room's `go` method handles this specially:
+
+```javascript
+// Check only non-movement exclusions
+const currentActions = await $.exclusions.current(player);
+for (const actionInfo of currentActions) {
+  if (actionInfo.action !== 'walk' && actionInfo.action !== 'run') {
+    const exclusions = await $.exclusions.get(actionInfo.action);
+    if (exclusions.includes('walk')) {
+      return actionInfo.data; // Return the blocking message
+    }
+  }
+}
+// Walking while walking is OK - queues movement
+```
+
 ## $.mutex - Object Locks
 
 Use `$.mutex` for preventing race conditions on objects. Locks are stored on the objects themselves and can auto-expire.
+
+**Note:** For preventing incompatible actions (sitting/walking), use `$.exclusions` instead - it's built on top of mutex with better semantics.
 
 ### Why Not Manual Lock Tracking?
 

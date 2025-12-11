@@ -35,8 +35,9 @@ export class ExitBuilder {
         destRoom: null, // Destination room ID
         distance: 10, // Distance in meters
         hidden: false, // Hidden exits don't show in room description
-        locked: false, // Locked exits require key/unlock
-        lockKey: null, // Item that unlocks this exit
+        locked: false, // Legacy simple lock
+        lockKey: null, // Legacy key-based lock
+        locks: [], // Composable lock objects
       },
       methods: {},
     });
@@ -64,12 +65,47 @@ export class ExitBuilder {
        */
       const agent = args[0];
 
-      // Check if locked
+      // Legacy simple lock
       if (self.locked) {
         return { allowed: false, reason: 'The way ' + self.name + ' is locked.' };
       }
 
+      // Composable locks
+      const locks = self.locks || [];
+      for (const lock of locks) {
+        if (!lock) continue;
+        const lockObj = typeof lock === 'number' ? await $.load(lock) : lock;
+        if (!lockObj || !lockObj.canAccess) continue;
+        const result = await lockObj.canAccess(agent, self);
+        if (result !== true) {
+          return { allowed: false, reason: result };
+        }
+      }
+
       return { allowed: true };
+    `);
+    // Add composable lock management
+    obj.setMethod('addLock', `
+      /** Add a lock object to this exit.
+       *  @param lock - Lock object or ID
+       */
+      const lock = args[0];
+      const locks = self.locks || [];
+      locks.push(lock);
+      self.locks = locks;
+    `);
+
+    obj.setMethod('removeLock', `
+      /** Remove a lock object from this exit.
+       *  @param lock - Lock object or ID to remove
+       */
+      const lock = args[0];
+      const lockId = typeof lock === 'number' ? lock : lock.id;
+      const locks = (self.locks || []).filter(l => {
+        const id = typeof l === 'number' ? l : l.id;
+        return id !== lockId;
+      });
+      self.locks = locks;
     `);
 
     obj.setMethod('unlock', `

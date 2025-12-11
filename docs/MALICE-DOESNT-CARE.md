@@ -105,7 +105,7 @@ Every other player is competing for the same scarce resources:
 - They will do it for fun.
 - They will do it because they can.
 
-Some players are sadists. Some are opportunists. Some are desperate. All of them are dangerous. Trust no one. Trust everyone. It doesn't matter. You'll be betrayed either way.
+Some players are sadists. Some are opportunists. Some are desperate. Some are kind, unless it doesn't benifit them. All of them are dangerous. Trust no one. Trust everyone. It doesn't matter. You'll be betrayed either way.
 
 ### The Admins Test You
 

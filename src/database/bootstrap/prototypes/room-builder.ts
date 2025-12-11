@@ -39,6 +39,11 @@ export class RoomBuilder {
         // Array of Exit object IDs
         // Each Exit has: name, aliases, destRoom, distance, hidden, locked
         exits: [],
+        // Sittable locations in the room
+        // Each entry: { name, capacity, occupied: [] }
+        // e.g., { name: 'a wooden chair', capacity: 1, occupied: [] }
+        // e.g., { name: 'a long bench', capacity: 4, occupied: [] }
+        sittables: [],
         // Crowd mechanics
         population: 0, // Artificial crowd level (0-100)
         ambientNoise: 0, // Base noise level (0-100)
@@ -68,6 +73,31 @@ export class RoomBuilder {
       const crowdDesc = await self.getCrowdDescription();
       if (crowdDesc && crowdDesc !== 'The area is quiet and empty.') {
         output += \`\\r\\n\${crowdDesc}\\r\\n\`;
+      }
+
+      // Show sittables if any
+      const sittables = self.sittables || [];
+      if (sittables.length > 0) {
+        output += '\\r\\n';
+        for (const sittable of sittables) {
+          const occupied = sittable.occupied || [];
+          if (occupied.length === 0) {
+            output += sittable.emptyMsg + '\\r\\n';
+          } else {
+            // Get names of people sitting
+            const sitters = [];
+            for (const sitterId of occupied) {
+              const sitter = await $.load(sitterId);
+              if (sitter) {
+                sitters.push(sitter.name);
+              }
+            }
+            const sitterList = await $.format.prose(sitters);
+            const verb = sitters.length === 1 ? 'is' : 'are';
+            const msg = sittable.occupiedMsg.replace('%s', sitterList + ' ' + verb);
+            output += msg + '\\r\\n';
+          }
+        }
       }
 
       // Show exits (only non-hidden ones)
@@ -268,6 +298,22 @@ export class RoomBuilder {
        *  Uses player's current movement mode (walk/run).
        *  Distance is taken from exit, or computed from room coordinates.
        */
+      // Check if blocked by non-movement exclusions (sitting, fighting, etc.)
+      // Note: walking while walking is allowed (queues movement)
+      const currentActions = await $.exclusions.current(player);
+      for (const actionInfo of currentActions) {
+        if (actionInfo.action !== 'walk' && actionInfo.action !== 'run') {
+          const exclusions = await $.exclusions.get(actionInfo.action);
+          if (exclusions.includes('walk') || exclusions.includes('run')) {
+            // Return the message from the active action
+            if (typeof actionInfo.data === 'string') {
+              return actionInfo.data;
+            }
+            return \`You can't do that while \${actionInfo.action}.\`;
+          }
+        }
+      }
+
       // The direction is embedded in the command - extract first word
       const direction = command.trim().toLowerCase().split(/\\s+/)[0];
 
@@ -314,7 +360,7 @@ export class RoomBuilder {
       }
     `);
 
-    // Override: when an agent arrives, register exit verbs
+    // Override: when an agent arrives, register exit verbs and sit verb
     obj.setMethod('onContentArrived', `
       const obj = args[0];
       const source = args[1];
@@ -337,6 +383,12 @@ export class RoomBuilder {
         for (const alias of aliases) {
           await obj.registerVerb(alias.toLowerCase(), self, 'go');
         }
+      }
+
+      // Register 'sit' verb if there are sittables
+      const sittables = self.sittables || [];
+      if (sittables.length > 0) {
+        await obj.registerVerb('sit', self, 'sit');
       }
 
       // TODO: Announce arrival to others in room
@@ -564,6 +616,200 @@ export class RoomBuilder {
       }
 
       return desc;
+    `);
+
+    // Add a sittable location to the room
+    obj.setMethod('addSittable', `
+      /** Add a sittable location to the room.
+       *  @param name - Name of the sittable (e.g., "a wooden chair")
+       *  @param capacity - How many people can sit here (default: 1)
+       *  @param emptyMsg - Message when empty (e.g., "A wooden desk sits behind the counter.")
+       *  @param occupiedMsg - Template for occupied (e.g., "%s sitting behind a wooden desk")
+       */
+      const name = args[0];
+      const capacity = args[1] || 1;
+      const emptyMsg = args[2] || name + ' sits here.';
+      const occupiedMsg = args[3] || '%s sitting on ' + name;
+
+      if (!name) return;
+
+      const sittables = self.sittables || [];
+      sittables.push({
+        name: name,
+        capacity: capacity,
+        occupied: [],
+        emptyMsg: emptyMsg,
+        occupiedMsg: occupiedMsg,
+      });
+      self.sittables = sittables;
+
+      // If agents are present, register sit verb for them
+      const contents = self.contents || [];
+      for (const objId of contents) {
+        const obj = await $.load(objId);
+        if (obj && obj.registerVerb) {
+          await obj.registerVerb('sit', self, 'sit');
+        }
+      }
+    `);
+
+    // Remove a sittable location
+    obj.setMethod('removeSittable', `
+      /** Remove a sittable location by name or index.
+       *  @param nameOrIndex - Name string or numeric index
+       */
+      const nameOrIndex = args[0];
+      const sittables = self.sittables || [];
+
+      if (typeof nameOrIndex === 'number') {
+        // Remove by index
+        if (nameOrIndex >= 0 && nameOrIndex < sittables.length) {
+          // Make anyone sitting here stand up
+          const sittable = sittables[nameOrIndex];
+          for (const agentId of sittable.occupied || []) {
+            const agent = await $.load(agentId);
+            if (agent && agent.sitting === self.id) {
+              agent.sitting = null;
+              agent.sittingOn = null;
+            }
+          }
+          sittables.splice(nameOrIndex, 1);
+          self.sittables = sittables;
+        }
+      } else {
+        // Remove by name
+        const idx = sittables.findIndex(s => s.name === nameOrIndex);
+        if (idx >= 0) {
+          // Make anyone sitting here stand up
+          const sittable = sittables[idx];
+          for (const agentId of sittable.occupied || []) {
+            const agent = await $.load(agentId);
+            if (agent && agent.sitting === self.id) {
+              agent.sitting = null;
+              agent.sittingOn = null;
+            }
+          }
+          sittables.splice(idx, 1);
+          self.sittables = sittables;
+        }
+      }
+    `);
+
+    // The 'sit' verb - sit on a sittable location
+    obj.setMethod('sit', `
+      /** Sit down on a sittable location in this room.
+       *  Usage: sit
+       *  Usage: sit <location>
+       */
+      const sittables = self.sittables || [];
+
+      if (sittables.length === 0) {
+        return 'There is nowhere to sit here.';
+      }
+
+      // Check if action is blocked by exclusions
+      const blocked = await $.exclusions.check(player, 'sit');
+      if (blocked) {
+        return blocked; // Returns the message string
+      }
+
+      // Check if player is already sitting
+      if (player.sitting) {
+        return 'You are already sitting. Use "stand" to stand up first.';
+      }
+
+      // Parse optional location argument
+      const args = command.trim().split(/\\s+/).slice(1); // Remove 'sit'
+      const targetName = args.join(' ').toLowerCase();
+
+      let sittable = null;
+      let sittableIndex = -1;
+
+      if (targetName) {
+        // Find specific sittable by name
+        sittableIndex = sittables.findIndex(s => s.name.toLowerCase().includes(targetName));
+        if (sittableIndex >= 0) {
+          sittable = sittables[sittableIndex];
+        } else {
+          return \`You don't see "\${targetName}" here to sit on.\`;
+        }
+      } else {
+        // Find first available sittable with space
+        for (let i = 0; i < sittables.length; i++) {
+          const s = sittables[i];
+          if ((s.occupied || []).length < s.capacity) {
+            sittable = s;
+            sittableIndex = i;
+            break;
+          }
+        }
+        if (!sittable) {
+          return 'All seating is occupied.';
+        }
+      }
+
+      // Check capacity
+      if ((sittable.occupied || []).length >= sittable.capacity) {
+        return \`\${sittable.name} is fully occupied.\`;
+      }
+
+      // Sit down
+      sittable.occupied = sittable.occupied || [];
+      sittable.occupied.push(player.id);
+      player.sitting = self.id;
+      player.sittingOn = sittable.name;
+
+      // Start 'sit' exclusion (blocks walking, etc.)
+      await $.exclusions.start(player, 'sit', "You'll need to stand up first.");
+
+      // Register 'stand' verb
+      await player.registerVerb('stand', self, 'stand');
+
+      // Announce
+      await self.announce(player, null, {
+        actor: \`You sit down on \${sittable.name}.\`,
+        others: await $.pronoun.sub('%N sits down on ' + sittable.name + '.', player),
+      });
+
+      return '';
+    `);
+
+    // The 'stand' verb - stand up from sitting
+    obj.setMethod('stand', `
+      /** Stand up from a sitting position. */
+      if (!player.sitting || player.sitting !== self.id) {
+        return 'You are not sitting.';
+      }
+
+      const sittables = self.sittables || [];
+      const sittingOn = player.sittingOn;
+
+      // Find and remove from sittable
+      for (const sittable of sittables) {
+        const idx = (sittable.occupied || []).indexOf(player.id);
+        if (idx >= 0) {
+          sittable.occupied.splice(idx, 1);
+          break;
+        }
+      }
+
+      // Clear sitting state
+      player.sitting = null;
+      player.sittingOn = null;
+
+      // End 'sit' exclusion (allows walking again)
+      await $.exclusions.end(player, 'sit');
+
+      // Unregister 'stand' verb
+      await player.unregisterVerb('stand', self);
+
+      // Announce
+      await self.announce(player, null, {
+        actor: \`You stand up from \${sittingOn}.\`,
+        others: await $.pronoun.sub('%N stands up from ' + sittingOn + '.', player),
+      });
+
+      return '';
     `);
 
     return obj;
