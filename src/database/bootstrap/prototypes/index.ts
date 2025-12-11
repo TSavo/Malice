@@ -36,5 +36,12 @@ export { ClothingBuilder } from './clothing-builder.js';
 export { LockerBuilder } from './locker-builder.js';
 export { OneTimeLockerBuilder } from './one-time-locker-builder.js';
 
+// Banking
+export { BankBuilder } from './bank-builder.js';
+export { BankTerminalBuilder } from './bank-terminal-builder.js';
+
+// Stackables (physical commodities)
+export { StackableBuilder } from './stackable-builder.js';
+
 // Appearance
 export * from './appearance-constants.js';

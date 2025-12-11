@@ -3,27 +3,17 @@ import type { RuntimeObject } from '../../../../types/object.js';
 
 /**
  * Builds the OneTimeLocker prototype
- * Implementation prototype for courier-friendly lockers.
- * Inherits from Locker - handles verbs, messaging, and hooks.
+ * Implementation prototype for courier-friendly locker banks.
+ * Inherits from Locker (bank) - handles verbs, messaging, and hooks.
  *
- * OneTimeLocker:
- * - Owner can set/change master code
- * - Owner can generate one-time codes for couriers
- * - Anyone with a valid code can open and deposit/retrieve items
- * - One-time codes are consumed on use
- *
- * Verb registration flow:
- * 1. Locker placed in room -> onArrived registers verbs for players in room
- * 2. Player opens locker -> can put/get items
- * 3. Player closes/locks locker -> items secured
- *
- * Usage flow for couriers:
- * 1. Owner gets a one-time code from locker: "get code from locker"
- * 2. Owner gives code to courier out-of-band
- * 3. Courier opens locker with code: "open locker" then enters code
- * 4. Courier deposits package
- * 5. Courier closes locker: "close locker"
- * 6. One-time code is now consumed
+ * This adds player-facing verbs to interact with the locker bank:
+ * - "rent locker" - claim an available compartment
+ * - "open locker A1" - unlock and open a compartment
+ * - "close locker A1" - close and lock
+ * - "get code from locker A1" - generate one-time code (owner only)
+ * - "set code on locker A1" - set master code (owner only)
+ * - "check locker A1" - view status (owner only)
+ * - "release locker A1" - give up ownership
  */
 export class OneTimeLockerBuilder {
   constructor(private manager: ObjectManager) {}
@@ -32,299 +22,459 @@ export class OneTimeLockerBuilder {
     const obj = await this.manager.create({
       parent: lockerId,
       properties: {
-        name: 'One-Time Locker',
-        description: 'A locker that supports one-time access codes for couriers.',
+        name: 'One-Time Locker Bank',
+        description: 'A bank of storage lockers that support one-time access codes for couriers.',
+        // Override rental duration - courier lockers are shorter term (24 hours default)
+        rentalDurationMs: 24 * 60 * 60 * 1000,
       },
       methods: {},
     });
 
-    // Verb: open the locker
-    obj.setMethod('doOpen', `
-      /** Open this locker.
-       *  If locked, prompts for code.
-       *  @param context - Command context
-       *  @param player - The player opening this
-       *  @returns Result message
-       */
+    // ═══════════════════════════════════════════════════════════════════
+    // VERB HANDLERS
+    // ═══════════════════════════════════════════════════════════════════
+
+    // doRent - rent an available compartment
+    obj.setMethod('doRent', `
       const context = args[0];
       const player = args[1];
 
-      if (!player) {
-        return 'Open what?';
+      if (!player) return 'Rent what?';
+
+      const available = await self.listAvailable();
+
+      if (available.length === 0) {
+        return 'No compartments available.';
       }
 
-      // If not locked, just open
-      if (!self.locked) {
-        // Show contents
-        const desc = await self.describe();
-        return 'The locker is already open.\\r\\n' + desc;
+      // Prompt for choice if multiple
+      let compId;
+      if (available.length === 1) {
+        compId = available[0];
+      } else {
+        if (!$.prompt) {
+          return 'Available compartments: ' + available.join(', ') + '. Specify which one.';
+        }
+
+        const options = {};
+        for (const id of available.slice(0, 10)) {  // Limit to 10
+          options[id] = 'Compartment ' + id;
+        }
+
+        compId = await $.prompt.choice(player, 'Select compartment:', options);
+        if (!compId) return 'Cancelled.';
       }
 
-      // Need to prompt for code
+      const result = await self.rentCompartment(compId, player);
+      if (!result.success) {
+        return result.error;
+      }
+
+      // Announce
+      const location = player.location ? await $.load(player.location) : null;
+      if (location && location.announce) {
+        await location.announce(player, null, {
+          actor: 'You rent locker ' + compId + '.',
+          others: player.name + ' rents a locker.',
+        });
+      }
+
+      return 'You now own compartment ' + compId + '. Set a master code with: set code on locker ' + compId;
+    `);
+
+    // doOpen - open a compartment
+    obj.setMethod('doOpen', `
+      const context = args[0];
+      const player = args[1];
+      const compId = args[2];  // Compartment ID from verb parsing
+
+      if (!player) return 'Open what?';
+      if (!compId) return 'Which compartment? Try: open locker [number]';
+
+      const comp = await self.getCompartment(compId);
+      if (!comp) {
+        return 'No compartment ' + compId + '.';
+      }
+
+      // If not locked, just show contents
+      if (!comp.locked) {
+        return await self.describeCompartment(compId, player);
+      }
+
+      // Need code
       if (!$.prompt) {
-        return 'The locker is locked. You need a code to open it.';
+        return 'Compartment ' + compId + ' is locked. You need a code.';
       }
 
       const code = await $.prompt.question(player, 'Enter code: ');
+      if (!code) return 'Cancelled.';
 
-      if (!code) {
-        return 'Cancelled.';
-      }
-
-      // Try to unlock
-      const result = await self.unlock(code);
-
+      const result = await self.unlock(compId, code);
       if (!result.success) {
         return result.error || 'Invalid code.';
       }
 
-      // Announce to room
+      // Announce
       const location = player.location ? await $.load(player.location) : null;
       if (location && location.announce) {
         await location.announce(player, null, {
-          actor: 'You unlock and open the locker.',
+          actor: 'You unlock and open locker ' + compId + '.',
           others: player.name + ' unlocks and opens a locker.',
         });
       }
 
-      // Trigger plot hooks - include the code used for filtering
+      // Trigger plot hooks
       await self.triggerPlotHooks('opened', {
+        compartment: compId,
         player: player.id,
         playerName: player.name,
         usedOneTimeCode: result.usedOneTime || false,
         code: result.codeUsed || null,
       });
 
-      // If a one-time code was used, trigger that hook too
       if (result.usedOneTime) {
         await self.triggerPlotHooks('oneTimeCodeUsed', {
+          compartment: compId,
           player: player.id,
           playerName: player.name,
           code: result.codeUsed,
         });
       }
 
-      // Show contents
-      const contents = self.contents || [];
-      if (contents.length > 0) {
-        let msg = 'The locker contains:\\r\\n';
-        for (const objId of contents) {
-          const item = await $.load(objId);
-          if (item) {
-            msg += '  - ' + (item.name || 'something') + '\\r\\n';
-          }
-        }
-        return msg;
-      } else {
-        return 'The locker is empty.';
-      }
+      return await self.describeCompartment(compId, player);
     `);
 
-    // Verb: close the locker
+    // doClose - close and lock a compartment
     obj.setMethod('doClose', `
-      /** Close and lock this locker.
-       *  @param context - Command context
-       *  @param player - The player closing this
-       *  @returns Result message
-       */
       const context = args[0];
       const player = args[1];
+      const compId = args[2];
 
-      if (!player) {
-        return 'Close what?';
+      if (!player) return 'Close what?';
+      if (!compId) return 'Which compartment? Try: close locker [number]';
+
+      const comp = await self.getCompartment(compId);
+      if (!comp) {
+        return 'No compartment ' + compId + '.';
       }
 
-      if (self.locked) {
-        return 'The locker is already closed and locked.';
+      if (comp.locked) {
+        return 'Compartment ' + compId + ' is already locked.';
       }
 
-      // Lock it
-      const result = await self.lock();
-
+      const result = await self.lock(compId);
       if (!result.success) {
-        return result.error || 'Could not close the locker.';
+        return result.error;
       }
 
-      // Announce to room
+      // Announce
       const location = player.location ? await $.load(player.location) : null;
       if (location && location.announce) {
         await location.announce(player, null, {
-          actor: 'You close and lock the locker.',
+          actor: 'You close and lock locker ' + compId + '.',
           others: player.name + ' closes and locks a locker.',
         });
       }
 
       // Trigger plot hooks
       await self.triggerPlotHooks('closed', {
+        compartment: compId,
         player: player.id,
         playerName: player.name,
       });
 
-      return 'You close and lock the locker.';
+      return 'Compartment ' + compId + ' is now locked.';
     `);
 
-    // Verb: look at locker contents
-    obj.setMethod('doLook', `
-      /** Look inside the locker.
-       *  @param context - Command context
-       *  @param player - The player looking
-       *  @returns Result message
-       */
-      const context = args[0];
-      const player = args[1];
-
-      return await self.describe();
-    `);
-
-    // Verb: set master code (owner only)
+    // doSetCode - set master code (owner only)
     obj.setMethod('doSetCode', `
-      /** Set or change the master code.
-       *  @param context - Command context
-       *  @param player - The player (must be owner)
-       *  @returns Result message
-       */
       const context = args[0];
       const player = args[1];
+      const compId = args[2];
 
-      if (!player) {
-        return 'Set code on what?';
-      }
+      if (!player) return 'Set code on what?';
+      if (!compId) return 'Which compartment? Try: set code on locker [number]';
 
       // Check ownership
-      if (self.ownerId && !await self.isOwner(player)) {
-        return 'You are not the owner of this locker.';
+      if (!await self.isOwner(compId, player)) {
+        return 'You do not own compartment ' + compId + '.';
       }
 
-      // Prompt for new code
       if (!$.prompt) {
         return 'Cannot set code - prompt system unavailable.';
       }
 
       const code = await $.prompt.question(player, 'Enter new master code (at least 4 characters): ');
+      if (!code) return 'Cancelled.';
 
-      if (!code) {
-        return 'Cancelled.';
-      }
-
-      const result = await self.setMasterCode(code);
-
+      const result = await self.setMasterCode(compId, code);
       if (!result.success) {
-        return result.error || 'Could not set code.';
+        return result.error;
       }
 
-      // If no owner, set this player as owner
-      if (!self.ownerId) {
-        await self.setOwner(player);
-      }
-
-      return 'Master code set successfully.';
+      return 'Master code set for compartment ' + compId + '.';
     `);
 
-    // Verb: get a one-time code (owner only)
+    // doGetCode - generate one-time code (owner only)
     obj.setMethod('doGetCode', `
-      /** Generate a one-time code for a courier.
-       *  @param context - Command context
-       *  @param player - The player (must be owner)
-       *  @returns Result message
-       */
       const context = args[0];
       const player = args[1];
+      const compId = args[2];
 
-      if (!player) {
-        return 'Get code from what?';
-      }
+      if (!player) return 'Get code from what?';
+      if (!compId) return 'Which compartment? Try: get code from locker [number]';
 
       // Check ownership
-      if (!await self.isOwner(player)) {
-        return 'You are not the owner of this locker.';
+      if (!await self.isOwner(compId, player)) {
+        return 'You do not own compartment ' + compId + '.';
       }
 
-      // Check if master code is set
-      if (!self.masterCode) {
-        return 'You must set a master code first. Use: set code on locker';
+      // Check master code is set
+      const comp = await self.getCompartment(compId);
+      if (!comp.masterCode) {
+        return 'Set a master code first: set code on locker ' + compId;
       }
 
-      // Generate one-time code
-      const result = await self.createOneTimeCode();
-
+      const result = await self.createOneTimeCode(compId);
       if (!result.success) {
-        return result.error || 'Could not generate code.';
+        return result.error;
       }
 
-      // Only tell the owner
-      await player.tell('One-time code generated: ' + result.code);
-      await player.tell('Give this code to a courier. It can only be used once.');
+      // Tell player privately
+      await player.tell('One-time code for ' + compId + ': ' + result.code);
+      await player.tell('Give this to a courier. It can only be used once.');
 
-      return '';  // Already told the player
+      return '';
     `);
 
-    // Verb: check locker status (owner only)
-    obj.setMethod('doStatus', `
-      /** Check locker status and active codes.
-       *  @param context - Command context
-       *  @param player - The player (must be owner)
-       *  @returns Result message
-       */
+    // doCheck - view status (owner only)
+    obj.setMethod('doCheck', `
       const context = args[0];
       const player = args[1];
+      const compId = args[2];
 
-      if (!player) {
-        return 'Check status of what?';
-      }
+      if (!player) return 'Check what?';
+      if (!compId) return 'Which compartment? Try: check locker [number]';
 
       // Check ownership
-      if (!await self.isOwner(player)) {
-        return 'You are not the owner of this locker.';
+      if (!await self.isOwner(compId, player)) {
+        return 'You do not own compartment ' + compId + '.';
       }
 
-      let status = 'Locker Status:\\r\\n';
-      status += 'State: ' + (self.locked ? 'Locked' : 'Unlocked') + '\\r\\n';
-      status += 'Master code: ' + (self.masterCode ? 'Set' : 'Not set') + '\\r\\n';
+      const comp = await self.getCompartment(compId);
 
-      const activeCount = await self.getActiveCodeCount();
+      let status = 'Compartment ' + compId + ' Status:\\r\\n';
+      status += 'State: ' + (comp.locked ? 'Locked' : 'Unlocked') + '\\r\\n';
+      status += 'Master code: ' + (comp.masterCode ? 'Set' : 'Not set') + '\\r\\n';
+
+      const activeCount = await self.getActiveCodeCount(compId);
       status += 'Active one-time codes: ' + activeCount + '\\r\\n';
 
-      const contents = self.contents || [];
+      const contents = comp.contents || [];
       status += 'Items inside: ' + contents.length + '\\r\\n';
+
+      // Show expiration
+      const expInfo = await self.getExpirationInfo(compId);
+      if (expInfo) {
+        if (expInfo.expired) {
+          status += 'EXPIRED - renew now to avoid losing contents!';
+        } else {
+          status += 'Expires in: ' + expInfo.timeRemaining;
+        }
+      }
 
       return status;
     `);
 
-    // Verb: claim ownership of an unclaimed locker
-    obj.setMethod('doClaim', `
-      /** Claim ownership of an unclaimed locker.
-       *  @param context - Command context
-       *  @param player - The player claiming
-       *  @returns Result message
-       */
+    // doRelease - give up ownership
+    obj.setMethod('doRelease', `
       const context = args[0];
       const player = args[1];
+      const compId = args[2];
 
-      if (!player) {
-        return 'Claim what?';
+      if (!player) return 'Release what?';
+      if (!compId) return 'Which compartment? Try: release locker [number]';
+
+      // Check ownership
+      if (!await self.isOwner(compId, player)) {
+        return 'You do not own compartment ' + compId + '.';
       }
 
-      if (self.ownerId) {
-        if (await self.isOwner(player)) {
-          return 'You already own this locker.';
-        }
-        return 'This locker is already owned by someone else.';
+      // Check if empty
+      const contents = await self.getContents(compId);
+      if (contents.length > 0) {
+        return 'Empty the compartment first.';
       }
 
-      await self.setOwner(player);
-      return 'You now own this locker. Set a master code with: set code on locker';
+      const result = await self.releaseCompartment(compId, player);
+      if (!result.success) {
+        return result.error;
+      }
+
+      return 'You no longer own compartment ' + compId + '.';
     `);
 
-    // Hook: register verbs when in a room
+    // doRenew - extend rental period
+    obj.setMethod('doRenew', `
+      const context = args[0];
+      const player = args[1];
+      const compId = args[2];
+
+      if (!player) return 'Renew what?';
+      if (!compId) return 'Which compartment? Try: renew locker [number]';
+
+      // Check ownership
+      if (!await self.isOwner(compId, player)) {
+        return 'You do not own compartment ' + compId + '.';
+      }
+
+      const result = await self.renewCompartment(compId);
+      if (!result.success) {
+        return result.error;
+      }
+
+      const info = await self.getExpirationInfo(compId);
+      return 'Rental extended. Expires in ' + info.timeRemaining + '.';
+    `);
+
+    // doLook - look at locker bank or specific compartment
+    obj.setMethod('doLook', `
+      const context = args[0];
+      const player = args[1];
+      const compId = args[2];
+
+      if (compId) {
+        return await self.describeCompartment(compId, player);
+      }
+
+      return await self.describe();
+    `);
+
+    // doPut - put item in compartment
+    obj.setMethod('doPut', `
+      const context = args[0];
+      const player = args[1];
+      const item = args[2];
+      const compId = args[3];
+
+      if (!player) return 'Put what where?';
+      if (!item) return 'Put what in the locker?';
+      if (!compId) return 'Which compartment?';
+
+      const canAdd = await self.canAddContent(compId, item);
+      if (canAdd !== true) {
+        return canAdd;
+      }
+
+      // Move item
+      const result = await self.addContent(compId, item);
+      if (!result.success) {
+        return result.error;
+      }
+
+      // Update item's location
+      item.location = self.id;
+
+      // Announce
+      const location = player.location ? await $.load(player.location) : null;
+      if (location && location.announce) {
+        await location.announce(player, null, {
+          actor: 'You put ' + item.name + ' in locker ' + compId + '.',
+          others: player.name + ' puts something in a locker.',
+        });
+      }
+
+      return 'You put ' + item.name + ' in compartment ' + compId + '.';
+    `);
+
+    // doGet - get item from compartment
+    obj.setMethod('doGet', `
+      const context = args[0];
+      const player = args[1];
+      const itemName = args[2];
+      const compId = args[3];
+
+      if (!player) return 'Get what?';
+      if (!itemName) return 'Get what from the locker?';
+      if (!compId) return 'Which compartment?';
+
+      const comp = await self.getCompartment(compId);
+      if (!comp) return 'No compartment ' + compId + '.';
+
+      if (comp.locked) {
+        return 'Compartment ' + compId + ' is locked.';
+      }
+
+      // Find item by name
+      const contents = comp.contents || [];
+      let foundItem = null;
+      for (const itemRef of contents) {
+        const item = typeof itemRef === 'object' ? itemRef : await $.load(itemRef);
+        if (item && item.name && item.name.toLowerCase().includes(itemName.toLowerCase())) {
+          foundItem = item;
+          break;
+        }
+      }
+
+      if (!foundItem) {
+        return 'No ' + itemName + ' in compartment ' + compId + '.';
+      }
+
+      // Remove from compartment
+      const result = await self.removeContent(compId, foundItem);
+      if (!result.success) {
+        return result.error;
+      }
+
+      // Move to player
+      foundItem.location = player.id;
+
+      // Announce
+      const location = player.location ? await $.load(player.location) : null;
+      if (location && location.announce) {
+        await location.announce(player, null, {
+          actor: 'You take ' + foundItem.name + ' from locker ' + compId + '.',
+          others: player.name + ' takes something from a locker.',
+        });
+      }
+
+      return 'You take ' + foundItem.name + '.';
+    `);
+
+    // ═══════════════════════════════════════════════════════════════════
+    // VERB REGISTRATION HOOKS
+    // ═══════════════════════════════════════════════════════════════════
+
+    // registerVerbsFor - register verbs for a player
+    obj.setMethod('registerVerbsFor', `
+      const player = args[0];
+      if (!player || !player.registerVerb) return;
+
+      // Basic verbs (no compartment ID needed)
+      await player.registerVerb(['rent locker', 'rent compartment'], self, 'doRent');
+      await player.registerVerb(['look at locker', 'examine locker', 'look locker'], self, 'doLook');
+
+      // Compartment-specific verbs (ID captured as args[2])
+      await player.registerVerb(['open locker %w', 'unlock locker %w'], self, 'doOpen');
+      await player.registerVerb(['close locker %w', 'lock locker %w'], self, 'doClose');
+      await player.registerVerb(['set code on locker %w', 'change code on locker %w'], self, 'doSetCode');
+      await player.registerVerb(['get code from locker %w', 'generate code for locker %w'], self, 'doGetCode');
+      await player.registerVerb(['check locker %w', 'status locker %w'], self, 'doCheck');
+      await player.registerVerb(['release locker %w', 'abandon locker %w'], self, 'doRelease');
+      await player.registerVerb(['renew locker %w', 'extend locker %w'], self, 'doRenew');
+      await player.registerVerb(['look at locker %w', 'examine locker %w', 'look locker %w'], self, 'doLook');
+
+      // Put/get verbs
+      await player.registerVerb(['put %d in locker %w', 'place %d in locker %w'], self, 'doPut');
+      await player.registerVerb(['get %w from locker %w', 'take %w from locker %w'], self, 'doGet');
+    `);
+
+    // onArrived - register verbs when placed in room
     obj.setMethod('onArrived', `
-      /** Called when this locker arrives somewhere.
-       *  Registers verbs for players in the location.
-       */
       const dest = args[0];
       const source = args[1];
       const mover = args[2];
 
-      // If arriving in a room, register verbs for all players there
       if (dest && dest.contents) {
         for (const objId of dest.contents) {
           const obj = await $.load(objId);
@@ -335,16 +485,12 @@ export class OneTimeLockerBuilder {
       }
     `);
 
-    // Hook: unregister verbs when leaving
+    // onLeaving - unregister verbs when leaving
     obj.setMethod('onLeaving', `
-      /** Called when this locker is about to leave somewhere.
-       *  Unregisters verbs from players.
-       */
       const source = args[0];
       const dest = args[1];
       const mover = args[2];
 
-      // Unregister verbs from all players in the source location
       if (source && source.contents) {
         for (const objId of source.contents) {
           const obj = await $.load(objId);
@@ -355,83 +501,10 @@ export class OneTimeLockerBuilder {
       }
     `);
 
-    // Helper: register verbs for a specific player
-    obj.setMethod('registerVerbsFor', `
-      /** Register locker verbs for a player.
-       *  @param player - The player to register verbs for
-       */
-      const player = args[0];
-
-      if (!player || !player.registerVerb) return;
-
-      // Basic interaction verbs for everyone
-      await player.registerVerb(['open %t', 'unlock %t'], self, 'doOpen');
-      await player.registerVerb(['close %t', 'lock %t'], self, 'doClose');
-      await player.registerVerb(['look at %t', 'examine %t', 'look in %t'], self, 'doLook');
-
-      // Owner-only verbs (will check ownership in handler)
-      await player.registerVerb(['set code on %t', 'change code on %t'], self, 'doSetCode');
-      await player.registerVerb(['get code from %t', 'get one-time code from %t', 'generate code for %t'], self, 'doGetCode');
-      await player.registerVerb(['check %t', 'status of %t', 'locker status %t'], self, 'doStatus');
-      await player.registerVerb(['claim %t'], self, 'doClaim');
-    `);
-
-    // Room arrival hook - register verbs when player enters room with locker
+    // onPlayerArrived - register verbs when player enters room
     obj.setMethod('onPlayerArrived', `
-      /** Called by room when a player arrives.
-       *  Registers verbs for the player.
-       */
       const player = args[0];
-
       await self.registerVerbsFor(player);
-    `);
-
-    // Override describe to include owner info for owner
-    obj.setMethod('describe', `
-      /** Get description of this locker.
-       *  Shows extra info for owner.
-       *  @param viewer - Optional viewer for context
-       *  @returns Description string
-       */
-      const viewer = args[0];
-
-      let desc = self.name + '\\r\\n';
-
-      if (self.description && self.description !== 'A locker that supports one-time access codes for couriers.') {
-        desc += self.description + '\\r\\n';
-      }
-
-      // Show lock state
-      desc += self.locked ? 'It is locked.\\r\\n' : 'It is unlocked.\\r\\n';
-
-      // Show contents if unlocked
-      if (!self.locked) {
-        const contents = self.contents || [];
-        if (contents.length > 0) {
-          desc += '\\r\\nContents:\\r\\n';
-          for (const objId of contents) {
-            const obj = await $.load(objId);
-            if (obj) {
-              desc += '  - ' + (obj.name || 'something') + '\\r\\n';
-            }
-          }
-        } else {
-          desc += '\\r\\nIt is empty.\\r\\n';
-        }
-      }
-
-      // Owner-only info
-      if (viewer && await self.isOwner(viewer)) {
-        const activeCount = await self.getActiveCodeCount();
-        desc += '\\r\\n[Owner: ' + activeCount + ' active one-time codes]\\r\\n';
-      }
-
-      // Show if unclaimed
-      if (!self.ownerId) {
-        desc += '\\r\\nThis locker is unclaimed. Use "claim locker" to own it.\\r\\n';
-      }
-
-      return desc.trim();
     `);
 
     return obj;

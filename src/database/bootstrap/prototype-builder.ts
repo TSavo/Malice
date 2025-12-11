@@ -24,6 +24,9 @@ import {
   ClothingBuilder,
   LockerBuilder,
   OneTimeLockerBuilder,
+  BankBuilder,
+  BankTerminalBuilder,
+  StackableBuilder,
 } from './prototypes/index.js';
 
 /**
@@ -70,6 +73,9 @@ export class PrototypeBuilder {
   private clothingBuilder: ClothingBuilder;
   private lockerBuilder: LockerBuilder;
   private oneTimeLockerBuilder: OneTimeLockerBuilder;
+  private bankBuilder: BankBuilder;
+  private bankTerminalBuilder: BankTerminalBuilder;
+  private stackableBuilder: StackableBuilder;
 
   constructor(private manager: ObjectManager) {
     this.describableBuilder = new DescribableBuilder(manager);
@@ -96,6 +102,9 @@ export class PrototypeBuilder {
     this.clothingBuilder = new ClothingBuilder(manager);
     this.lockerBuilder = new LockerBuilder(manager);
     this.oneTimeLockerBuilder = new OneTimeLockerBuilder(manager);
+    this.bankBuilder = new BankBuilder(manager);
+    this.bankTerminalBuilder = new BankTerminalBuilder(manager);
+    this.stackableBuilder = new StackableBuilder(manager);
   }
 
   /**
@@ -228,6 +237,21 @@ export class PrototypeBuilder {
       ? await this.manager.load(aliases.oneTimeLocker as number)
       : await this.oneTimeLockerBuilder.build(locker!.id);
 
+    // Bank - electronic currency ledger (inherits from Root)
+    const bank = aliases.bank
+      ? await this.manager.load(aliases.bank as number)
+      : await this.bankBuilder.build(1);
+
+    // BankTerminal - player-facing banking kiosk (inherits from Describable)
+    const bankTerminal = aliases.bankTerminal
+      ? await this.manager.load(aliases.bankTerminal as number)
+      : await this.bankTerminalBuilder.build(describable!.id);
+
+    // Stackable - physical commodities (inherits from Describable)
+    const stackable = aliases.stackable
+      ? await this.manager.load(aliases.stackable as number)
+      : await this.stackableBuilder.build(describable!.id);
+
     // Register aliases in root.properties.aliases
     await this.registerAliases({
       describable: describable!.id,
@@ -254,6 +278,9 @@ export class PrototypeBuilder {
       clothing: clothing!.id,
       locker: locker!.id,
       oneTimeLocker: oneTimeLocker!.id,
+      bank: bank!.id,
+      bankTerminal: bankTerminal!.id,
+      stackable: stackable!.id,
     });
   }
 
@@ -282,6 +309,9 @@ export class PrototypeBuilder {
     clothing: number;
     locker: number;
     oneTimeLocker: number;
+    bank: number;
+    bankTerminal: number;
+    stackable: number;
   }): Promise<void> {
     const objectManager = await this.manager.load(0);
     if (!objectManager) return;
@@ -310,6 +340,9 @@ export class PrototypeBuilder {
     await objectManager.call('addAlias', 'clothing', ids.clothing);
     await objectManager.call('addAlias', 'locker', ids.locker);
     await objectManager.call('addAlias', 'oneTimeLocker', ids.oneTimeLocker);
+    await objectManager.call('addAlias', 'bank', ids.bank);
+    await objectManager.call('addAlias', 'bankTerminal', ids.bankTerminal);
+    await objectManager.call('addAlias', 'stackable', ids.stackable);
 
     // Store bodyParts object directly (addAlias only supports simple id values)
     const aliases = (objectManager.get('aliases') as Record<string, number | Record<string, number>>) || {};

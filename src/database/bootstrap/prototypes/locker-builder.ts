@@ -3,14 +3,15 @@ import type { RuntimeObject } from '../../../../types/object.js';
 
 /**
  * Builds the Locker prototype
- * Base prototype for lockable containers with code-based access.
- * Inherits from Location - lockers can contain things.
+ * A BANK of lockers - like at a train station or gym.
+ * Contains multiple compartments, each rentable by different users.
  *
- * Lockers:
- * - Have a master code that can always open them
- * - Can generate one-time codes for temporary access
- * - One-time codes are consumed on first use
- * - Support locked/unlocked state
+ * Structure:
+ *   compartments: {
+ *     "A1": { owner, masterCode, oneTimeCodes[], locked, contents[] },
+ *     "A2": { ... },
+ *     ...
+ *   }
  *
  * This is the BASE prototype - handles state and validation only.
  * NO verbs, NO messaging.
@@ -24,58 +25,346 @@ export class LockerBuilder {
     const obj = await this.manager.create({
       parent: locationId,
       properties: {
-        name: 'Locker',
-        description: 'A lockable container',
-        // Lock state
-        locked: true,
-        // Master code (string) - always works
-        masterCode: null,
-        // One-time codes array: [{ code: string, used: boolean, createdAt: string, usedAt?: string }]
-        oneTimeCodes: [],
-        // Owner player ID (who can set codes and get one-time codes)
-        ownerId: null,
+        name: 'Locker Bank',
+        description: 'A wall of storage lockers.',
+        // Compartments keyed by ID (e.g., "A1", "B2", "1", "2")
+        // Each: { owner: objref, masterCode: string, oneTimeCodes: [], locked: bool, contents: [], rentedAt: ISO, expiresAt: ISO }
+        compartments: {},
+        // Configuration
+        compartmentPrefix: '', // e.g., "A" for A1, A2, A3...
+        nextCompartmentNum: 1,
+        // Rental duration in milliseconds (default: 7 days)
+        rentalDurationMs: 7 * 24 * 60 * 60 * 1000,
       },
       methods: {},
     });
 
-    // Set the master code
-    obj.setMethod('setMasterCode', `
-      /** Set or change the master code.
-       *  @param code - The new master code (string)
-       *  @returns { success: boolean, error?: string }
-       */
-      const code = args[0];
+    // ═══════════════════════════════════════════════════════════════════
+    // COMPARTMENT MANAGEMENT
+    // ═══════════════════════════════════════════════════════════════════
 
-      if (!code || typeof code !== 'string') {
-        return { success: false, error: 'Code must be a non-empty string.' };
+    // createCompartment(id?) - create a new empty compartment
+    // If id not provided, auto-generates one
+    obj.setMethod('createCompartment', `
+      let id = args[0];
+
+      if (!id) {
+        // Auto-generate ID
+        const prefix = self.compartmentPrefix || '';
+        const num = self.nextCompartmentNum || 1;
+        id = prefix + num;
+        self.nextCompartmentNum = num + 1;
       }
 
-      if (code.length < 4) {
-        return { success: false, error: 'Code must be at least 4 characters.' };
+      const compartments = self.compartments || {};
+      if (compartments[id]) {
+        return { success: false, error: 'Compartment ' + id + ' already exists.' };
       }
 
-      self.masterCode = code;
+      compartments[id] = {
+        owner: null,
+        masterCode: null,
+        oneTimeCodes: [],
+        locked: true,
+        contents: [],
+      };
+      self.compartments = compartments;
+
+      return { success: true, id: id };
+    `);
+
+    // getCompartment(id) - get compartment data
+    obj.setMethod('getCompartment', `
+      const id = args[0];
+      if (!id) return null;
+
+      const compartments = self.compartments || {};
+      return compartments[id] || null;
+    `);
+
+    // listCompartments() - list all compartment IDs
+    obj.setMethod('listCompartments', `
+      const compartments = self.compartments || {};
+      return Object.keys(compartments);
+    `);
+
+    // listAvailable() - list unrented compartments (auto-expires old ones first)
+    obj.setMethod('listAvailable', `
+      // Check for expired rentals first
+      await self.checkExpired();
+
+      const compartments = self.compartments || {};
+      const available = [];
+
+      for (const [id, comp] of Object.entries(compartments)) {
+        if (!comp.owner) {
+          available.push(id);
+        }
+      }
+
+      return available;
+    `);
+
+    // ═══════════════════════════════════════════════════════════════════
+    // OWNERSHIP
+    // ═══════════════════════════════════════════════════════════════════
+
+    // rentCompartment(id, player) - assign ownership to player
+    obj.setMethod('rentCompartment', `
+      const id = args[0];
+      const player = args[1];
+
+      if (!id || !player) {
+        return { success: false, error: 'Requires compartment ID and player.' };
+      }
+
+      const compartments = self.compartments || {};
+      const comp = compartments[id];
+
+      if (!comp) {
+        return { success: false, error: 'Compartment ' + id + ' does not exist.' };
+      }
+
+      if (comp.owner) {
+        // Check if same owner
+        const ownerId = typeof comp.owner === 'object' ? comp.owner.id : comp.owner;
+        if (ownerId === player.id) {
+          return { success: false, error: 'You already own this compartment.' };
+        }
+        return { success: false, error: 'Compartment ' + id + ' is already rented.' };
+      }
+
+      const now = Date.now();
+      const duration = self.rentalDurationMs || (7 * 24 * 60 * 60 * 1000);
+
+      comp.owner = player;  // Stored as objref
+      comp.rentedAt = new Date(now).toISOString();
+      comp.expiresAt = new Date(now + duration).toISOString();
+      self.compartments = compartments;
+
+      return { success: true, expiresAt: comp.expiresAt };
+    `);
+
+    // releaseCompartment(id, player) - release ownership (must be owner or empty)
+    obj.setMethod('releaseCompartment', `
+      const id = args[0];
+      const player = args[1];
+
+      const compartments = self.compartments || {};
+      const comp = compartments[id];
+
+      if (!comp) {
+        return { success: false, error: 'Compartment ' + id + ' does not exist.' };
+      }
+
+      if (comp.owner) {
+        const ownerId = typeof comp.owner === 'object' ? comp.owner.id : comp.owner;
+        if (player && ownerId !== player.id) {
+          return { success: false, error: 'You do not own this compartment.' };
+        }
+      }
+
+      // Clear ownership, codes, and timestamps
+      comp.owner = null;
+      comp.masterCode = null;
+      comp.oneTimeCodes = [];
+      comp.rentedAt = null;
+      comp.expiresAt = null;
+      self.compartments = compartments;
+
       return { success: true };
     `);
 
-    // Validate master code
-    obj.setMethod('validateMasterCode', `
-      /** Check if the given code matches the master code.
-       *  @param code - The code to validate
-       *  @returns boolean
-       */
-      const code = args[0];
+    // isOwner(id, player) - check if player owns compartment
+    obj.setMethod('isOwner', `
+      const id = args[0];
+      const player = args[1];
 
-      if (!self.masterCode) return false;
-      return self.masterCode === code;
+      if (!id || !player) return false;
+
+      const compartments = self.compartments || {};
+      const comp = compartments[id];
+
+      if (!comp || !comp.owner) return false;
+
+      const ownerId = typeof comp.owner === 'object' ? comp.owner.id : comp.owner;
+      return ownerId === player.id;
     `);
 
-    // Generate a random one-time code
+    // getOwner(id) - get owner of compartment
+    obj.setMethod('getOwner', `
+      const id = args[0];
+      const compartments = self.compartments || {};
+      const comp = compartments[id];
+
+      if (!comp) return null;
+      return comp.owner;
+    `);
+
+    // renewCompartment(id) - extend rental by another duration
+    obj.setMethod('renewCompartment', `
+      const id = args[0];
+      const compartments = self.compartments || {};
+      const comp = compartments[id];
+
+      if (!comp) {
+        return { success: false, error: 'Compartment not found.' };
+      }
+
+      if (!comp.owner) {
+        return { success: false, error: 'Compartment is not rented.' };
+      }
+
+      const duration = self.rentalDurationMs || (7 * 24 * 60 * 60 * 1000);
+      const now = Date.now();
+      const currentExpiry = comp.expiresAt ? new Date(comp.expiresAt).getTime() : now;
+      const newExpiry = Math.max(currentExpiry, now) + duration;
+
+      comp.expiresAt = new Date(newExpiry).toISOString();
+      self.compartments = compartments;
+
+      return { success: true, expiresAt: comp.expiresAt };
+    `);
+
+    // isExpired(id) - check if compartment rental has expired
+    obj.setMethod('isExpired', `
+      const id = args[0];
+      const compartments = self.compartments || {};
+      const comp = compartments[id];
+
+      if (!comp || !comp.owner) return false;
+      if (!comp.expiresAt) return false;
+
+      return new Date(comp.expiresAt) <= new Date();
+    `);
+
+    // expireCompartment(id) - force expire, recycle contents, clear ownership
+    obj.setMethod('expireCompartment', `
+      const id = args[0];
+      const compartments = self.compartments || {};
+      const comp = compartments[id];
+
+      if (!comp) {
+        return { success: false, error: 'Compartment not found.' };
+      }
+
+      const recycler = $.recycler;
+      const recycledItems = [];
+
+      // Recycle all contents
+      const contents = comp.contents || [];
+      for (const itemRef of contents) {
+        const item = typeof itemRef === 'object' ? itemRef : await $.load(itemRef);
+        if (item && recycler) {
+          await recycler.recycle(item);
+          recycledItems.push(item.name || 'item');
+        }
+      }
+
+      // Clear the compartment
+      comp.owner = null;
+      comp.masterCode = null;
+      comp.oneTimeCodes = [];
+      comp.locked = true;
+      comp.contents = [];
+      comp.rentedAt = null;
+      comp.expiresAt = null;
+      self.compartments = compartments;
+
+      return { success: true, recycledItems: recycledItems };
+    `);
+
+    // checkExpired() - check all compartments for expiration, expire any past due
+    // Returns list of expired compartment IDs
+    obj.setMethod('checkExpired', `
+      const compartments = self.compartments || {};
+      const now = new Date();
+      const expired = [];
+
+      for (const [id, comp] of Object.entries(compartments)) {
+        if (comp.owner && comp.expiresAt && new Date(comp.expiresAt) <= now) {
+          await self.expireCompartment(id);
+          expired.push(id);
+        }
+      }
+
+      return expired;
+    `);
+
+    // getExpirationInfo(id) - get time remaining on rental
+    obj.setMethod('getExpirationInfo', `
+      const id = args[0];
+      const compartments = self.compartments || {};
+      const comp = compartments[id];
+
+      if (!comp || !comp.owner || !comp.expiresAt) {
+        return null;
+      }
+
+      const now = Date.now();
+      const expiry = new Date(comp.expiresAt).getTime();
+      const remaining = expiry - now;
+
+      if (remaining <= 0) {
+        return { expired: true, remaining: 0, expiresAt: comp.expiresAt };
+      }
+
+      // Calculate human-readable time
+      const hours = Math.floor(remaining / (60 * 60 * 1000));
+      const days = Math.floor(hours / 24);
+      const remainingHours = hours % 24;
+
+      let timeStr;
+      if (days > 0) {
+        timeStr = days + ' day' + (days !== 1 ? 's' : '');
+        if (remainingHours > 0) {
+          timeStr += ', ' + remainingHours + ' hour' + (remainingHours !== 1 ? 's' : '');
+        }
+      } else {
+        timeStr = hours + ' hour' + (hours !== 1 ? 's' : '');
+      }
+
+      return {
+        expired: false,
+        remaining: remaining,
+        expiresAt: comp.expiresAt,
+        timeRemaining: timeStr,
+      };
+    `);
+
+    // ═══════════════════════════════════════════════════════════════════
+    // CODES
+    // ═══════════════════════════════════════════════════════════════════
+
+    // setMasterCode(id, code) - set master code for compartment
+    obj.setMethod('setMasterCode', `
+      const id = args[0];
+      const code = args[1];
+
+      if (!id) {
+        return { success: false, error: 'Compartment ID required.' };
+      }
+
+      if (!code || typeof code !== 'string' || code.length < 4) {
+        return { success: false, error: 'Code must be at least 4 characters.' };
+      }
+
+      const compartments = self.compartments || {};
+      const comp = compartments[id];
+
+      if (!comp) {
+        return { success: false, error: 'Compartment ' + id + ' does not exist.' };
+      }
+
+      comp.masterCode = code;
+      self.compartments = compartments;
+
+      return { success: true };
+    `);
+
+    // generateCode() - generate a random 6-character code
     obj.setMethod('generateCode', `
-      /** Generate a random alphanumeric code.
-       *  @returns string - A 6-character code
-       */
-      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // No I, O, 0, 1 to avoid confusion
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
       let code = '';
       for (let i = 0; i < 6; i++) {
         code += chars.charAt(Math.floor(Math.random() * chars.length));
@@ -83,15 +372,21 @@ export class LockerBuilder {
       return code;
     `);
 
-    // Create a new one-time code
+    // createOneTimeCode(id) - create one-time code for compartment
     obj.setMethod('createOneTimeCode', `
-      /** Create a new one-time code for temporary access.
-       *  @returns { success: boolean, code?: string, error?: string }
-       */
-      // Generate a unique code
+      const id = args[0];
+
+      const compartments = self.compartments || {};
+      const comp = compartments[id];
+
+      if (!comp) {
+        return { success: false, error: 'Compartment ' + id + ' does not exist.' };
+      }
+
+      // Generate unique code
       let code;
       let attempts = 0;
-      const existingCodes = (self.oneTimeCodes || []).map(c => c.code);
+      const existingCodes = (comp.oneTimeCodes || []).map(c => c.code);
 
       do {
         code = await self.generateCode();
@@ -102,295 +397,326 @@ export class LockerBuilder {
         return { success: false, error: 'Failed to generate unique code.' };
       }
 
-      // Add to list
-      const oneTimeCodes = self.oneTimeCodes || [];
-      oneTimeCodes.push({
+      comp.oneTimeCodes = comp.oneTimeCodes || [];
+      comp.oneTimeCodes.push({
         code: code,
         used: false,
         createdAt: new Date().toISOString(),
       });
-      self.oneTimeCodes = oneTimeCodes;
+      self.compartments = compartments;
 
       return { success: true, code: code };
     `);
 
-    // Validate a one-time code (without consuming it)
-    obj.setMethod('validateOneTimeCode', `
-      /** Check if a one-time code is valid (exists and not used).
-       *  @param code - The code to validate
-       *  @returns boolean
-       */
-      const code = args[0];
+    // validateCode(id, code) - check if code is valid for compartment
+    // Returns { valid: bool, isMaster: bool, isOneTime: bool }
+    obj.setMethod('validateCode', `
+      const id = args[0];
+      const code = args[1];
 
-      if (!code) return false;
+      const compartments = self.compartments || {};
+      const comp = compartments[id];
 
-      const oneTimeCodes = self.oneTimeCodes || [];
-      const entry = oneTimeCodes.find(c => c.code === code && !c.used);
-
-      return !!entry;
-    `);
-
-    // Consume (mark as used) a one-time code
-    obj.setMethod('consumeOneTimeCode', `
-      /** Mark a one-time code as used.
-       *  @param code - The code to consume
-       *  @returns { success: boolean, error?: string }
-       */
-      const code = args[0];
-
-      if (!code) {
-        return { success: false, error: 'No code provided.' };
+      if (!comp || !code) {
+        return { valid: false };
       }
 
-      const oneTimeCodes = self.oneTimeCodes || [];
-      const entry = oneTimeCodes.find(c => c.code === code && !c.used);
+      // Check master code
+      if (comp.masterCode && comp.masterCode === code) {
+        return { valid: true, isMaster: true, isOneTime: false };
+      }
 
-      if (!entry) {
+      // Check one-time codes
+      const otc = (comp.oneTimeCodes || []).find(c => c.code === code && !c.used);
+      if (otc) {
+        return { valid: true, isMaster: false, isOneTime: true };
+      }
+
+      return { valid: false };
+    `);
+
+    // consumeOneTimeCode(id, code) - mark one-time code as used
+    obj.setMethod('consumeOneTimeCode', `
+      const id = args[0];
+      const code = args[1];
+
+      const compartments = self.compartments || {};
+      const comp = compartments[id];
+
+      if (!comp) {
+        return { success: false, error: 'Compartment not found.' };
+      }
+
+      const otc = (comp.oneTimeCodes || []).find(c => c.code === code && !c.used);
+      if (!otc) {
         return { success: false, error: 'Invalid or already used code.' };
       }
 
-      entry.used = true;
-      entry.usedAt = new Date().toISOString();
-      self.oneTimeCodes = oneTimeCodes;
+      otc.used = true;
+      otc.usedAt = new Date().toISOString();
+      self.compartments = compartments;
 
       return { success: true };
     `);
 
-    // Lock the locker
+    // getActiveCodeCount(id) - count unused one-time codes
+    obj.setMethod('getActiveCodeCount', `
+      const id = args[0];
+      const compartments = self.compartments || {};
+      const comp = compartments[id];
+
+      if (!comp) return 0;
+
+      return (comp.oneTimeCodes || []).filter(c => !c.used).length;
+    `);
+
+    // ═══════════════════════════════════════════════════════════════════
+    // LOCK STATE
+    // ═══════════════════════════════════════════════════════════════════
+
+    // isLocked(id) - check if compartment is locked
+    obj.setMethod('isLocked', `
+      const id = args[0];
+      const compartments = self.compartments || {};
+      const comp = compartments[id];
+
+      if (!comp) return true;  // Non-existent = locked
+      return comp.locked !== false;
+    `);
+
+    // lock(id) - lock a compartment
     obj.setMethod('lock', `
-      /** Lock the locker.
-       *  @returns { success: boolean, error?: string }
-       */
-      if (self.locked) {
+      const id = args[0];
+      const compartments = self.compartments || {};
+      const comp = compartments[id];
+
+      if (!comp) {
+        return { success: false, error: 'Compartment not found.' };
+      }
+
+      if (comp.locked) {
         return { success: false, error: 'Already locked.' };
       }
 
-      self.locked = true;
+      comp.locked = true;
+      self.compartments = compartments;
+
       return { success: true };
     `);
 
-    // Unlock the locker with a code
+    // unlock(id, code) - unlock with code
     obj.setMethod('unlock', `
-      /** Unlock the locker with a code.
-       *  @param code - The code to use (master or one-time)
-       *  @returns { success: boolean, usedOneTime?: boolean, codeUsed?: string, error?: string }
-       */
-      const code = args[0];
+      const id = args[0];
+      const code = args[1];
 
-      if (!self.locked) {
-        return { success: true, error: 'Already unlocked.' };
+      const compartments = self.compartments || {};
+      const comp = compartments[id];
+
+      if (!comp) {
+        return { success: false, error: 'Compartment not found.' };
+      }
+
+      if (!comp.locked) {
+        return { success: true, alreadyOpen: true };
       }
 
       if (!code) {
         return { success: false, error: 'Code required.' };
       }
 
-      // Try master code first
-      if (await self.validateMasterCode(code)) {
-        self.locked = false;
-        self.lastCodeUsed = null; // Master code doesn't get tracked for hooks
-        self.lastOpenedBy = null;
-        return { success: true, usedOneTime: false, codeUsed: null };
+      const validation = await self.validateCode(id, code);
+      if (!validation.valid) {
+        return { success: false, error: 'Invalid code.' };
       }
 
-      // Try one-time code
-      if (await self.validateOneTimeCode(code)) {
-        await self.consumeOneTimeCode(code);
-        self.locked = false;
-        self.lastCodeUsed = code; // Track which one-time code was used
-        return { success: true, usedOneTime: true, codeUsed: code };
+      // Consume one-time code if used
+      if (validation.isOneTime) {
+        await self.consumeOneTimeCode(id, code);
       }
 
-      return { success: false, error: 'Invalid code.' };
+      comp.locked = false;
+      self.compartments = compartments;
+
+      return {
+        success: true,
+        usedOneTime: validation.isOneTime,
+        codeUsed: validation.isOneTime ? code : null,
+      };
     `);
 
-    // Check if a player is the owner
-    obj.setMethod('isOwner', `
-      /** Check if a player is the owner of this locker.
-       *  @param player - The player to check
-       *  @returns boolean
-       */
-      const player = args[0];
+    // ═══════════════════════════════════════════════════════════════════
+    // CONTENTS
+    // ═══════════════════════════════════════════════════════════════════
 
-      if (!player) return false;
-      return self.ownerId === player.id;
+    // getContents(id) - get contents of compartment
+    obj.setMethod('getContents', `
+      const id = args[0];
+      const compartments = self.compartments || {};
+      const comp = compartments[id];
+
+      if (!comp) return [];
+      return comp.contents || [];
     `);
 
-    // Set the owner
-    obj.setMethod('setOwner', `
-      /** Set the owner of this locker.
-       *  @param player - The new owner
-       *  @returns { success: boolean }
-       */
-      const player = args[0];
+    // canAddContent(id, item) - check if item can be added
+    obj.setMethod('canAddContent', `
+      const id = args[0];
+      const item = args[1];
 
-      if (!player) {
-        self.ownerId = null;
-        return { success: true };
+      const compartments = self.compartments || {};
+      const comp = compartments[id];
+
+      if (!comp) {
+        return 'Compartment does not exist.';
       }
 
-      self.ownerId = player.id;
-      return { success: true };
-    `);
-
-    // Check if locker can be opened (validates code)
-    obj.setMethod('canOpen', `
-      /** Check if the locker can be opened with the given code.
-       *  @param code - The code to validate (optional if unlocked)
-       *  @returns { success: boolean, error?: string }
-       */
-      const code = args[0];
-
-      // If not locked, anyone can open
-      if (!self.locked) {
-        return { success: true };
+      if (comp.locked) {
+        return 'The compartment is locked.';
       }
 
-      // Need a valid code
-      if (!code) {
-        return { success: false, error: 'This locker is locked. You need a code to open it.' };
-      }
-
-      // Check master code
-      if (await self.validateMasterCode(code)) {
-        return { success: true };
-      }
-
-      // Check one-time code
-      if (await self.validateOneTimeCode(code)) {
-        return { success: true };
-      }
-
-      return { success: false, error: 'Invalid code.' };
-    `);
-
-    // Override canContain to check if locker is open
-    obj.setMethod('canContain', `
-      /** Check if an object can be placed in this locker.
-       *  @param item - The item to check
-       *  @returns true or error string
-       */
-      const item = args[0];
-
-      // Can't put things in a locked locker
-      if (self.locked) {
-        return 'The locker is locked.';
-      }
-
-      // Default container checks (size, etc.) would go here
       return true;
     `);
 
-    // Override onContentLeaving to check if locker is open
-    obj.setMethod('onContentLeaving', `
-      /** Called when something is about to leave the locker.
-       *  Throws if locker is locked.
-       */
-      const obj = args[0];
-      const dest = args[1];
-      const mover = args[2];
+    // addContent(id, item) - add item to compartment
+    obj.setMethod('addContent', `
+      const id = args[0];
+      const item = args[1];
 
-      if (self.locked) {
-        throw new Error('The locker is locked.');
+      const compartments = self.compartments || {};
+      const comp = compartments[id];
+
+      if (!comp) {
+        return { success: false, error: 'Compartment not found.' };
       }
-    `);
 
-    // Hook: called after content arrives - trigger plot hooks
-    obj.setMethod('onContentArrived', `
-      /** Called when something arrives in the locker.
-       *  Triggers itemDeposited plot hook.
-       */
-      const obj = args[0];
-      const source = args[1];
-      const mover = args[2];
+      if (comp.locked) {
+        return { success: false, error: 'Compartment is locked.' };
+      }
+
+      comp.contents = comp.contents || [];
+      // Store as objref
+      comp.contents.push(item);
+      self.compartments = compartments;
 
       // Trigger plot hooks
       await self.triggerPlotHooks('itemDeposited', {
-        item: obj.id,
-        itemName: obj.name,
-        mover: mover?.id,
-        moverName: mover?.name,
+        compartment: id,
+        item: item.id,
+        itemName: item.name,
       });
+
+      return { success: true };
     `);
 
-    // Hook: called after content leaves - trigger plot hooks
-    obj.setMethod('onContentLeft', `
-      /** Called when something leaves the locker.
-       *  Triggers itemRemoved plot hook.
-       */
-      const obj = args[0];
-      const dest = args[1];
-      const mover = args[2];
+    // removeContent(id, item) - remove item from compartment
+    obj.setMethod('removeContent', `
+      const id = args[0];
+      const item = args[1];
+
+      const compartments = self.compartments || {};
+      const comp = compartments[id];
+
+      if (!comp) {
+        return { success: false, error: 'Compartment not found.' };
+      }
+
+      if (comp.locked) {
+        return { success: false, error: 'Compartment is locked.' };
+      }
+
+      const contents = comp.contents || [];
+      const itemId = typeof item === 'object' ? item.id : item;
+
+      const idx = contents.findIndex(c => {
+        const cId = typeof c === 'object' ? c.id : c;
+        return cId === itemId;
+      });
+
+      if (idx === -1) {
+        return { success: false, error: 'Item not in compartment.' };
+      }
+
+      contents.splice(idx, 1);
+      comp.contents = contents;
+      self.compartments = compartments;
 
       // Trigger plot hooks
       await self.triggerPlotHooks('itemRemoved', {
-        item: obj.id,
-        itemName: obj.name,
-        mover: mover?.id,
-        moverName: mover?.name,
-        destination: dest?.id,
-      });
-    `);
-
-    // Get active (unused) one-time codes count
-    obj.setMethod('getActiveCodeCount', `
-      /** Get the number of active (unused) one-time codes.
-       *  @returns number
-       */
-      const oneTimeCodes = self.oneTimeCodes || [];
-      return oneTimeCodes.filter(c => !c.used).length;
-    `);
-
-    // Clean up old used codes (housekeeping)
-    obj.setMethod('cleanupCodes', `
-      /** Remove used one-time codes older than the specified age.
-       *  @param maxAgeMs - Maximum age in milliseconds (default: 24 hours)
-       *  @returns number - Number of codes removed
-       */
-      const maxAgeMs = args[0] || 24 * 60 * 60 * 1000; // Default 24 hours
-      const cutoff = new Date(Date.now() - maxAgeMs).toISOString();
-
-      const oneTimeCodes = self.oneTimeCodes || [];
-      const before = oneTimeCodes.length;
-
-      // Keep unused codes and recently used codes
-      const filtered = oneTimeCodes.filter(c => {
-        if (!c.used) return true; // Keep unused
-        if (!c.usedAt) return false; // Remove used without timestamp
-        return c.usedAt > cutoff; // Keep recently used
+        compartment: id,
+        item: itemId,
+        itemName: item.name || 'item',
       });
 
-      self.oneTimeCodes = filtered;
-      return before - filtered.length;
+      return { success: true };
     `);
 
-    // Describe the locker
+    // ═══════════════════════════════════════════════════════════════════
+    // DESCRIPTION
+    // ═══════════════════════════════════════════════════════════════════
+
     obj.setMethod('describe', `
-      /** Get description of this locker.
-       *  @returns Description string
-       */
       let desc = self.name + '\\r\\n';
 
-      if (self.description && self.description !== 'A lockable container') {
+      if (self.description) {
         desc += self.description + '\\r\\n';
       }
 
-      // Show lock state
-      desc += self.locked ? 'It is locked.\\r\\n' : 'It is unlocked.\\r\\n';
+      const compartments = self.compartments || {};
+      const ids = Object.keys(compartments);
+
+      if (ids.length === 0) {
+        desc += '\\r\\nNo compartments available.';
+      } else {
+        const available = ids.filter(id => !compartments[id].owner).length;
+        desc += '\\r\\n' + ids.length + ' compartments (' + available + ' available).';
+      }
+
+      return desc;
+    `);
+
+    // describeCompartment(id, viewer) - describe a specific compartment
+    obj.setMethod('describeCompartment', `
+      const id = args[0];
+      const viewer = args[1];
+
+      const compartments = self.compartments || {};
+      const comp = compartments[id];
+
+      if (!comp) {
+        return 'No compartment ' + id + '.';
+      }
+
+      let desc = 'Compartment ' + id + '\\r\\n';
+      desc += comp.locked ? 'Status: Locked\\r\\n' : 'Status: Unlocked\\r\\n';
+
+      if (comp.owner) {
+        const ownerId = typeof comp.owner === 'object' ? comp.owner.id : comp.owner;
+        const viewerId = viewer ? (typeof viewer === 'object' ? viewer.id : viewer) : null;
+
+        if (viewerId === ownerId) {
+          desc += 'Owner: You\\r\\n';
+          const activeCount = await self.getActiveCodeCount(id);
+          desc += 'Active one-time codes: ' + activeCount + '\\r\\n';
+        } else {
+          desc += 'Status: Rented\\r\\n';
+        }
+      } else {
+        desc += 'Status: Available\\r\\n';
+      }
 
       // Show contents if unlocked
-      if (!self.locked) {
-        const contents = self.contents || [];
+      if (!comp.locked) {
+        const contents = comp.contents || [];
         if (contents.length > 0) {
           desc += '\\r\\nContents:\\r\\n';
-          for (const objId of contents) {
-            const obj = await $.load(objId);
-            if (obj) {
-              desc += '  - ' + (obj.name || 'something') + '\\r\\n';
+          for (const itemRef of contents) {
+            const item = typeof itemRef === 'object' ? itemRef : await $.load(itemRef);
+            if (item) {
+              desc += '  - ' + (item.name || 'something') + '\\r\\n';
             }
           }
         } else {
-          desc += '\\r\\nIt is empty.\\r\\n';
+          desc += '\\r\\nEmpty.\\r\\n';
         }
       }
 

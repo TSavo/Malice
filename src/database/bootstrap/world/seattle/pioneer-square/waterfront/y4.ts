@@ -1,0 +1,15 @@
+// Waterfront - between S. Washington St and S. Main St
+
+export const room = {
+  name: 'Alaskan Way',
+  description: `The waterfront bends slightly here, following the natural curve of Elliott Bay. The seawall is newer in this section, reinforced concrete poured sometime in the last decade. It's holding better than the older sections, though cracks are already forming where the fill has settled.
+
+A public art installation stands near the water's edge. Steel ribbons twisted into abstract shapes, meant to evoke waves or wind or civic optimism. The placard explaining the artist's vision is weathered past reading. The art remains, meaning whatever it means now.
+
+Benches line the walkway, bolted to the concrete. They face the water, offering views of the bay and the islands beyond. The view hasn't changed. The people who sat here to enjoy it have.
+
+Pioneer Square rises to the east, its historic brick buildings dark and silent.`,
+  x: -15,
+  y: 4,
+  z: 0,
+};
