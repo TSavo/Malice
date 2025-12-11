@@ -118,12 +118,23 @@ Historic brick buildings, the Underground beneath, and urban decay.
 |------|---------|---------|-------|
 | Occidental Park | -4 to +2 | 0 to +3 | Plaza, dead trees, ⊕ underground access |
 
+## Alleys (Service corridors with reduced lighting)
+
+| Name | X Range | Y Range | Notes |
+|------|---------|---------|-------|
+| Behind Grand Central | -7 | +1 to +3 | Loading dock, fire escapes, lighting 35-50 |
+| Behind Smith Tower | -4 | +7 to +9 | Very narrow (3m), very dark (lighting 25-35) |
+| Behind Pioneer Building | +2 | +7 to +9 | Loading docks, service doors, lighting 30-45 |
+| East of Occidental Park | +1 | 0 to +2 | Wider alley, park-adjacent, lighting 55-65 |
+| Mid-block (2nd-3rd) | +6 | -2, +2 | East-west cut-through, lighting 35-40 |
+
 ## Room Counts
 
 - **Total grid:** 31 x 21 = 651 coordinates
 - **Blocked by buildings:** ~80 coordinates
 - **Blocked by hazards:** ~40 coordinates
 - **Walkable:** ~530 rooms at street level
+- **Alleys:** +14 rooms (darker, more dangerous)
 - **Building interiors (future):** +150 rooms when opened
 - **Underground (future):** +75 rooms
 
