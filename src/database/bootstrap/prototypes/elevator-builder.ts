@@ -41,6 +41,7 @@ export class ElevatorBuilder {
         doorsOpen: true,
         travelTimePerFloor: 2000, // 2 seconds per floor
         capacity: 10, // Max passengers
+          door: null, // Reference to $.door object
       },
       methods: {},
     });
@@ -63,6 +64,16 @@ export class ElevatorBuilder {
         return 'That floor is not accessible.';
       }
 
+        // If a door is present, delegate access check
+        if (self.door) {
+          const doorObj = typeof self.door === 'number' ? await $.load(self.door) : self.door;
+          if (doorObj && doorObj.canAccess) {
+            const result = await doorObj.canAccess(agent, self);
+            if (result !== true) {
+              return result;
+            }
+          }
+        }
       // Check all locks
       const locks = self.locks || [];
       for (const lock of locks) {

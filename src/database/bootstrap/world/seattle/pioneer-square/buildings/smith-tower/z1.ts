@@ -28,7 +28,7 @@ The car smells of machine oil and old dust. The doors are dented but intact, and
           39: '%ODL', // Observation deck lobby (defined in z39)
           40: '%PHL', // Penthouse landing (defined in z40)
         },
-        locks: ['%L1'],
+        locks: ['%L1', '%LR'],
       },
     },
 

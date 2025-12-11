@@ -10,6 +10,35 @@ export const building = {
       },
     },
 
+    '%LR': {
+      // Roof hatch biometric lock
+      prototype: 'biometricLock',
+      name: 'Roof Hatch Scanner',
+      description: 'A recessed retinal scanner set into the hatch frame.',
+      scanners: [
+        { type: 'retinal', part: 'eye', message: 'Roof access denied: retinal scan failed.' },
+      ],
+      authorizedUsers: {},
+    },
+
+    '%DROOF': {
+      // Shared door object for the roof hatch (both directions use this door)
+      prototype: 'door',
+      name: 'Roof Hatch',
+      description: 'A square steel hatch with an integrated biometric reader.',
+      locked: true,
+      locks: ['%LR'],
+      open: false,
+      messages: {
+        locked: 'The roof hatch is locked.',
+        unlocked: 'The roof hatch unlocks with a solid thunk.',
+        open: 'You swing the roof hatch open.',
+        closed: 'You pull the roof hatch closed.',
+        denied: 'Access denied.',
+        prompt: 'Enter code for the roof hatch:'
+      },
+    },
+
     '%PHL': {
       // Penthouse Landing (-4, +8, 40)
       name: 'Penthouse Landing',
@@ -24,7 +53,7 @@ export const building = {
       outdoor: false,
       exits: {
         west: '%PH',
-        up: '%PHDOME',
+        up: { room: '%RH5', door: '%DROOF' },
         in: '%E',
         down: '%ODL',
       },

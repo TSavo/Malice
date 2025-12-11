@@ -47,6 +47,23 @@ if (result === true) {
 }
 ```
 
+## Door Integration
+
+Both `$.exit` and `$.elevator` now support a `door` property. If present, all access checks are delegated to the referenced `$.door` object. This enables unified, bidirectional access control, lock state, and messaging for doors, exits, and elevators.
+
+**Example:**
+```javascript
+// Create a door object
+const door = await $.recycler.create($.door, { ... });
+// Attach to both exits
+exitAtoB.door = door.id;
+exitBtoA.door = door.id;
+// Or attach to an elevator
+myElevator.door = door.id;
+```
+
+See [door.md](./door.md) for details.
+
 ## Notes
 - Elevators can have multiple locks (biometric, keycard, etc.)
 - All locks must approve access for movement
