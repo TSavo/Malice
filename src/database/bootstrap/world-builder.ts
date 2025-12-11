@@ -180,6 +180,28 @@ export class WorldBuilder {
         }
       }
     }
+
+    // Load Occidental Park rooms (all *.ts files in occidental-park directory)
+    const parkDir = path.join(worldDir, 'occidental-park');
+    if (fs.existsSync(parkDir)) {
+      const files = fs.readdirSync(parkDir).filter(f => f.endsWith('.ts'));
+
+      for (const file of files) {
+        try {
+          const filePath = path.join(parkDir, file);
+          const fileUrl = pathToFileURL(filePath).href;
+          const module = await import(fileUrl);
+          const roomDef = module.room as RoomData;
+
+          if (roomDef && typeof roomDef.x === 'number') {
+            const key = this.coordKey(roomDef.x, roomDef.y, roomDef.z || 0);
+            this.roomData.set(key, roomDef);
+          }
+        } catch (err) {
+          console.warn(`    Warning: Could not load park ${file}: ${err}`);
+        }
+      }
+    }
   }
 
   /**
