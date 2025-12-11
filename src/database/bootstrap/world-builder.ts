@@ -158,6 +158,28 @@ export class WorldBuilder {
         }
       }
     }
+
+    // Load alley rooms (all *.ts files in alleys directory)
+    const alleysDir = path.join(worldDir, 'alleys');
+    if (fs.existsSync(alleysDir)) {
+      const files = fs.readdirSync(alleysDir).filter(f => f.endsWith('.ts'));
+
+      for (const file of files) {
+        try {
+          const filePath = path.join(alleysDir, file);
+          const fileUrl = pathToFileURL(filePath).href;
+          const module = await import(fileUrl);
+          const roomDef = module.room as RoomData;
+
+          if (roomDef && typeof roomDef.x === 'number') {
+            const key = this.coordKey(roomDef.x, roomDef.y, roomDef.z || 0);
+            this.roomData.set(key, roomDef);
+          }
+        } catch (err) {
+          console.warn(`    Warning: Could not load alley ${file}: ${err}`);
+        }
+      }
+    }
   }
 
   /**
