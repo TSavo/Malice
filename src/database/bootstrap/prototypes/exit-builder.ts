@@ -38,6 +38,7 @@ export class ExitBuilder {
         locked: false, // Legacy simple lock
         lockKey: null, // Legacy key-based lock
         locks: [], // Composable lock objects
+          door: null, // Reference to $.door object
       },
       methods: {},
     });
@@ -64,12 +65,20 @@ export class ExitBuilder {
        *  @returns { allowed, reason }
        */
       const agent = args[0];
-
+      // If a door is present, delegate access check
+      if (self.door) {
+        const doorObj = typeof self.door === 'number' ? await $.load(self.door) : self.door;
+        if (doorObj && doorObj.canAccess) {
+          const result = await doorObj.canAccess(agent, self);
+          if (result !== true) {
+            return { allowed: false, reason: result };
+          }
+        }
+      }
       // Legacy simple lock
       if (self.locked) {
         return { allowed: false, reason: 'The way ' + self.name + ' is locked.' };
       }
-
       // Composable locks
       const locks = self.locks || [];
       for (const lock of locks) {
@@ -81,7 +90,6 @@ export class ExitBuilder {
           return { allowed: false, reason: result };
         }
       }
-
       return { allowed: true };
     `);
     // Add composable lock management

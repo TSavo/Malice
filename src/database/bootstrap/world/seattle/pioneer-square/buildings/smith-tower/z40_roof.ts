@@ -101,7 +101,7 @@ export const building = {
         west: '%RH4',
         east: '%RH6',
         south: '%RH8',
-        down: { room: '%PHL', locks: ['%L1'] },
+        down: { room: '%PHL', door: '%DROOF' },
       },
     },
 

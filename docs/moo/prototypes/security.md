@@ -331,3 +331,18 @@ if (result === true) {
 - [Security System](./security.md)
 - [Room System](./rooms.md)
 - [Body System](./body.md)
+
+## Door Integration
+
+Exits now support a `door` property. If present, all access checks are delegated to the referenced `$.door` object. This enables unified, bidirectional access control, lock state, and messaging for doors and exits.
+
+**Example:**
+```javascript
+// Create a door object
+const door = await $.recycler.create($.door, { ... });
+// Attach to both exits
+exitAtoB.door = door.id;
+exitBtoA.door = door.id;
+```
+
+See [door.md](./door.md) for details.

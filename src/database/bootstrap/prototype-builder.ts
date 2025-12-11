@@ -1,36 +1,38 @@
 import { ObjectManager } from '../object-manager.js';
 import {
-  DescribableBuilder,
-  LocationBuilder,
-  ExitBuilder,
-  RoomBuilder,
-  AgentBuilder,
-  EmbodiedBuilder,
-  HumanBuilder,
-  PlayerBuilder,
-  AdminBuilder,
-  DecayableBuilder,
-  CorpseBuilder,
-  HumanRemainsBuilder,
-  SkeletalRemainsBuilder,
-  WoundBuilder,
-  EdibleBuilder,
-  FoodBuilder,
-  DrinkBuilder,
-  StomachContentsBuilder,
-  BodyPartBuilder,
-  BodyPartsBuilder,
-  WearableBuilder,
-  ClothingBuilder,
-  LockerBuilder,
-  OneTimeLockerBuilder,
-  BankBuilder,
-  BankTerminalBuilder,
-  StackableBuilder,
-  ElevatorBuilder,
-  LockBuilder,
-  BiometricLockBuilder,
-} from './prototypes/index.js';
+   DescribableBuilder,
+   LocationBuilder,
+   ExitBuilder,
+   RoomBuilder,
+   AgentBuilder,
+   EmbodiedBuilder,
+   HumanBuilder,
+   PlayerBuilder,
+   AdminBuilder,
+   DecayableBuilder,
+   CorpseBuilder,
+   HumanRemainsBuilder,
+   SkeletalRemainsBuilder,
+   WoundBuilder,
+   EdibleBuilder,
+   FoodBuilder,
+   DrinkBuilder,
+   StomachContentsBuilder,
+   BodyPartBuilder,
+   BodyPartsBuilder,
+   WearableBuilder,
+   ClothingBuilder,
+   LockerBuilder,
+   OneTimeLockerBuilder,
+   BankBuilder,
+   BankTerminalBuilder,
+   StackableBuilder,
+   ElevatorBuilder,
+   LockBuilder,
+   BiometricLockBuilder,
+   RentableLockBuilder,
+ } from './prototypes/index.js';
+
 
 /**
  * Orchestrates building the object prototype hierarchy
@@ -78,13 +80,15 @@ export class PrototypeBuilder {
   private oneTimeLockerBuilder: OneTimeLockerBuilder;
   private bankBuilder: BankBuilder;
   private bankTerminalBuilder: BankTerminalBuilder;
-  private stackableBuilder: StackableBuilder;
-  private elevatorBuilder: ElevatorBuilder;
-  private lockBuilder: LockBuilder;
-  private biometricLockBuilder: BiometricLockBuilder;
+   private stackableBuilder: StackableBuilder;
+   private elevatorBuilder: ElevatorBuilder;
+   private lockBuilder: LockBuilder;
+   private biometricLockBuilder: BiometricLockBuilder;
+   private rentableLockBuilder: RentableLockBuilder;
 
-  constructor(private manager: ObjectManager) {
-    this.describableBuilder = new DescribableBuilder(manager);
+   constructor(private manager: ObjectManager) {
+     this.describableBuilder = new DescribableBuilder(manager);
+
     this.locationBuilder = new LocationBuilder(manager);
     this.exitBuilder = new ExitBuilder(manager);
     this.roomBuilder = new RoomBuilder(manager);
@@ -110,11 +114,13 @@ export class PrototypeBuilder {
     this.oneTimeLockerBuilder = new OneTimeLockerBuilder(manager);
     this.bankBuilder = new BankBuilder(manager);
     this.bankTerminalBuilder = new BankTerminalBuilder(manager);
-    this.stackableBuilder = new StackableBuilder(manager);
-    this.elevatorBuilder = new ElevatorBuilder(manager);
-    this.lockBuilder = new LockBuilder(manager);
-    this.biometricLockBuilder = new BiometricLockBuilder(manager);
-  }
+     this.stackableBuilder = new StackableBuilder(manager);
+     this.elevatorBuilder = new ElevatorBuilder(manager);
+     this.lockBuilder = new LockBuilder(manager);
+     this.biometricLockBuilder = new BiometricLockBuilder(manager);
+     this.rentableLockBuilder = new RentableLockBuilder(manager);
+   }
+
 
   /**
    * Build all prototype objects
@@ -272,12 +278,17 @@ export class PrototypeBuilder {
       : await this.lockBuilder.build(describable!.id);
 
     // BiometricLock - body-scanning access control (inherits from Lock)
-    const biometricLock = aliases.biometricLock
-      ? await this.manager.load(aliases.biometricLock as number)
-      : await this.biometricLockBuilder.build(lock!.id);
+     const biometricLock = aliases.biometricLock
+       ? await this.manager.load(aliases.biometricLock as number)
+       : await this.biometricLockBuilder.build(lock!.id);
+ 
+     const rentableLock = aliases.rentableLock
+       ? await this.manager.load(aliases.rentableLock as number)
+       : await this.rentableLockBuilder.build(lock!.id);
+ 
+     // Register aliases in root.properties.aliases
+     await this.registerAliases({
 
-    // Register aliases in root.properties.aliases
-    await this.registerAliases({
       describable: describable!.id,
       location: location!.id,
       exit: exit!.id,
@@ -304,15 +315,17 @@ export class PrototypeBuilder {
       oneTimeLocker: oneTimeLocker!.id,
       bank: bank!.id,
       bankTerminal: bankTerminal!.id,
-      stackable: stackable!.id,
-      elevator: elevator!.id,
-      lock: lock!.id,
-      biometricLock: biometricLock!.id,
-    });
-  }
+       stackable: stackable!.id,
+       elevator: elevator!.id,
+       lock: lock!.id,
+       biometricLock: biometricLock!.id,
+       rentableLock: rentableLock!.id,
+     });
+   }
+ 
+   private async registerAliases(ids: {
+     describable: number;
 
-  private async registerAliases(ids: {
-    describable: number;
     location: number;
     exit: number;
     room: number;
@@ -332,20 +345,22 @@ export class PrototypeBuilder {
     stomachContents: number;
     bodyPart: number;
     bodyParts: Record<string, number>;
-    wearable: number;
-    clothing: number;
-    locker: number;
-    oneTimeLocker: number;
-    bank: number;
-    bankTerminal: number;
-    stackable: number;
-    elevator: number;
-    lock: number;
-    biometricLock: number;
-    bank: number;
-    bankTerminal: number;
-    stackable: number;
-  }): Promise<void> {
+     wearable: number;
+     clothing: number;
+     locker: number;
+     oneTimeLocker: number;
+     bank: number;
+     bankTerminal: number;
+     stackable: number;
+     elevator: number;
+     lock: number;
+     biometricLock: number;
+     rentableLock: number;
+     bank: number;
+     bankTerminal: number;
+     stackable: number;
+   }): Promise<void> {
+
     const objectManager = await this.manager.load(0);
     if (!objectManager) return;
 
@@ -372,12 +387,14 @@ export class PrototypeBuilder {
     await objectManager.call('addAlias', 'wearable', ids.wearable);
     await objectManager.call('addAlias', 'clothing', ids.clothing);
     await objectManager.call('addAlias', 'locker', ids.locker);
-    await objectManager.call('addAlias', 'oneTimeLocker', ids.oneTimeLocker);
-    await objectManager.call('addAlias', 'bank', ids.bank);
-    await objectManager.call('addAlias', 'bankTerminal', ids.bankTerminal);
-    await objectManager.call('addAlias', 'stackable', ids.stackable);
+     await objectManager.call('addAlias', 'oneTimeLocker', ids.oneTimeLocker);
+     await objectManager.call('addAlias', 'bank', ids.bank);
+     await objectManager.call('addAlias', 'bankTerminal', ids.bankTerminal);
+     await objectManager.call('addAlias', 'stackable', ids.stackable);
+     await objectManager.call('addAlias', 'rentableLock', ids.rentableLock);
+ 
+     // Store bodyParts object directly (addAlias only supports simple id values)
 
-    // Store bodyParts object directly (addAlias only supports simple id values)
     const aliases = (objectManager.get('aliases') as Record<string, number | Record<string, number>>) || {};
     aliases.bodyParts = ids.bodyParts;
     objectManager.set('aliases', aliases);

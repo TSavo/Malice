@@ -47,6 +47,7 @@ export { StackableBuilder } from './stackable-builder.js';
 export { ElevatorBuilder } from './elevator-builder.js';
 export { LockBuilder } from './lock-builder.js';
 export { BiometricLockBuilder } from './biometric-lock-builder.js';
+export { RentableLockBuilder } from './rentable-lock-builder.js';
 
 // Appearance
 export * from './appearance-constants.js';

@@ -33,9 +33,419 @@ export class AdminBuilder {
     this.addInspectCommands(obj);
     this.addAliasCommands(obj);
     this.addEvalCommands(obj);
+    this.addDoorCommands(obj);
+    this.addElevatorCommands(obj);
 
     return obj;
   }
+
+  /** Elevator management commands */
+  private addElevatorCommands(obj: RuntimeObject): void {
+    // @elevator — interactive elevator creation/wiring
+    obj.setMethod('@elevator', `
+      // Menu-driven elevator management
+      const aliases = $.system.aliases || {};
+      const elevProto = aliases.elevator;
+      if (!elevProto) {
+        await self.tell('Elevator prototype not found.');
+        return;
+      }
+
+      const menu = async () => {
+        await self.tell('--- @elevator ---');
+        await self.tell('[1] Create new elevator');
+        await self.tell('[2] Attach existing elevator to this room (as in/out)');
+        await self.tell('[3] Configure existing elevator (id)');
+        await self.tell('[0] Done');
+        const choice = await $.prompt.question(self, 'Choice: ');
+        return choice && choice.trim();
+      };
+
+      let exitLoop = false;
+      while (!exitLoop) {
+        const choice = await menu();
+        if (choice === null) break;
+        switch (choice) {
+          case '1': {
+            // Create elevator and minimal wiring
+            const name = await $.prompt.question(self, 'Elevator name: ');
+            const floorsStr = await $.prompt.question(self, 'Floors (comma-separated numbers): ');
+            if (floorsStr === null) break;
+            const floors = floorsStr.split(',').map(f => parseInt(f.trim(), 10)).filter(n => !isNaN(n));
+            if (!floors.length) { await self.tell('No valid floors.'); break; }
+            const currentFloor = floors[0];
+            const elev = await $.create({ parent: elevProto, properties: { name: name || 'Elevator', floors, currentFloor, floorRooms: {} } });
+            await self.tell('Created elevator #' + elev.id + ' (' + (elev.name || '') + ').');
+            break;
+          }
+          case '2': {
+            const elevIdStr = await $.prompt.question(self, 'Elevator id to attach: ');
+            const eid = elevIdStr ? parseInt(elevIdStr, 10) : NaN;
+            if (isNaN(eid)) { await self.tell('Invalid id.'); break; }
+            const elev = await $.load(eid);
+            if (!elev) { await self.tell('Elevator not found.'); break; }
+            const currentRoom = self.location ? await $.load(self.location) : null;
+            if (!currentRoom) { await self.tell('You are nowhere.'); break; }
+            // Attach in/out exits to this room (avoid duplicates)
+            const exitProto = aliases.exit;
+            if (!exitProto) { await self.tell('Exit prototype not found.'); break; }
+            const roomExits = currentRoom.exits || [];
+            const elevExits = elev.exits || [];
+
+            // in -> elevator (from room)
+            let inExit = roomExits.find(ex => {
+              const exObj = typeof ex === 'number' ? null : ex;
+              return exObj && exObj.destRoom === elev.id;
+            });
+            if (!inExit) {
+              inExit = await $.create({ parent: exitProto, properties: { name: 'in', aliases: ['in','i'], destRoom: elev.id } });
+              await currentRoom.addExit(inExit);
+            }
+
+            // out -> room (from elevator)
+            let outExit = elevExits.find(ex => {
+              const exObj = typeof ex === 'number' ? null : ex;
+              return exObj && exObj.destRoom === currentRoom.id;
+            });
+            if (!outExit) {
+              outExit = await $.create({ parent: exitProto, properties: { name: 'out', aliases: ['out','o'], destRoom: currentRoom.id } });
+              await elev.addExit(outExit);
+            }
+
+            // Optionally map this room to a floor
+            const mapNow = await $.prompt.yesorno(self, 'Map this room to a floor number?');
+            if (mapNow) {
+              const fStr = await $.prompt.question(self, 'Floor number to map to this room: ');
+              const fnum = fStr ? parseInt(fStr, 10) : NaN;
+              if (!isNaN(fnum)) {
+                const fr = elev.floorRooms || {};
+                fr[fnum] = currentRoom.id;
+                elev.floorRooms = fr;
+                if (!Array.isArray(elev.floors)) elev.floors = [];
+                if (!elev.floors.includes(fnum)) elev.floors.push(fnum);
+                elev.currentFloor = fnum;
+                await self.tell('Mapped floor ' + fnum + ' to room #' + currentRoom.id + ', added to floors list, and set current floor.');
+              }
+            }
+
+            // Optionally attach a door to this elevator
+            const attachDoor = await $.prompt.yesorno(self, 'Attach a door object to this elevator?');
+            if (attachDoor) {
+              const doorIdStr = await $.prompt.question(self, 'Door object id (blank to cancel): ');
+              const did = doorIdStr ? parseInt(doorIdStr, 10) : NaN;
+              if (!isNaN(did)) {
+                elev.door = did;
+                await self.tell('Attached door #' + did + ' to elevator.');
+              }
+            }
+
+            await self.tell('Attached elevator #' + eid + ' to this room (in/out exits ensured both ways).');
+            break;
+          }
+          case '3': {
+            const elevIdStr = await $.prompt.question(self, 'Elevator id to configure: ');
+            const eid = elevIdStr ? parseInt(elevIdStr, 10) : NaN;
+            if (isNaN(eid)) { await self.tell('Invalid id.'); break; }
+            const elev = await $.load(eid);
+            if (!elev) { await self.tell('Elevator not found.'); break; }
+            await self.tell('Elevator #' + eid + ' (' + (elev.name || '') + ')');
+            let cfgDone = false;
+            while (!cfgDone) {
+              const floors = elev.floors || [];
+              const locksDetailed = [];
+              for (const l of elev.locks || []) {
+                const obj = typeof l === 'number' ? await $.load(l) : l;
+                const id = typeof l === 'number' ? l : l.id;
+                locksDetailed.push('#' + id + (obj?.name ? ' ' + obj.name : ''));
+              }
+              const doorInfo = elev.door ? ('#' + (typeof elev.door === 'number' ? elev.door : elev.door.id)) : 'none';
+              await self.tell('Floors: ' + floors.join(', '));
+              await self.tell('Locks: ' + (locksDetailed.join(', ') || 'none'));
+              await self.tell('Door: ' + doorInfo);
+              await self.tell('[a] Set floors\n[b] Set floorRooms\n[c] Add lock (id)\n[d] Add lock by type\n[e] Remove lock (id)\n[f] Attach door (id)\n[g] Set travel time per floor\n[h] Set capacity\n[i] Set current floor\n[0] Done');
+              const sub = await $.prompt.question(self, 'Choice: ');
+              if (sub === null) { cfgDone = true; break; }
+              switch ((sub || '').trim()) {
+                case 'a': {
+                  const floorsStr2 = await $.prompt.question(self, 'Floors (comma-separated numbers): ');
+                  if (floorsStr2 !== null) {
+                    const nf = floorsStr2.split(',').map(f => parseInt(f.trim(), 10)).filter(n => !isNaN(n));
+                    if (nf.length) elev.floors = nf;
+                  }
+                  break;
+                }
+                case 'b': {
+                  const floorNumStr = await $.prompt.question(self, 'Floor number to map: ');
+                  const fnum = floorNumStr ? parseInt(floorNumStr, 10) : NaN;
+                  if (isNaN(fnum)) { await self.tell('Invalid floor.'); break; }
+                  const roomIdStr = await $.prompt.question(self, 'Room id for floor ' + fnum + ': ');
+                  const rid = roomIdStr ? parseInt(roomIdStr, 10) : NaN;
+                  if (isNaN(rid)) { await self.tell('Invalid room id.'); break; }
+                  const fr = elev.floorRooms || {};
+                  fr[fnum] = rid;
+                  elev.floorRooms = fr;
+                  await self.tell('Mapped floor ' + fnum + ' -> room #' + rid + '.');
+                  break;
+                }
+                case 'c': {
+                  const lockIdStr = await $.prompt.question(self, 'Lock object id to add: ');
+                  const lid = lockIdStr ? parseInt(lockIdStr, 10) : NaN;
+                  if (isNaN(lid)) { await self.tell('Invalid id.'); break; }
+                  const existing = elev.locks || [];
+                  if (!existing.some(l => (typeof l === 'number' ? l : l.id) === lid)) {
+                    existing.push(lid);
+                    elev.locks = existing;
+                    await self.tell('Added lock #' + lid + '.');
+                  } else {
+                    await self.tell('Lock already present.');
+                  }
+                  break;
+                }
+                case 'd': {
+                  const aliasMap = $.system.aliases || {};
+                  const lockAliases = Object.keys(aliasMap).filter(k => k.toLowerCase().includes('lock'));
+                  if (lockAliases.length) {
+                    await self.tell('Known lock aliases: ' + lockAliases.join(', '));
+                  }
+                  const lockType = await $.prompt.question(self, 'Lock prototype alias: ');
+                  if (!lockType) { await self.tell('Cancelled.'); break; }
+                  const protoId = aliasMap[lockType];
+                  if (!protoId) { await self.tell('Unknown lock prototype alias.'); break; }
+                  const newLock = await $.recycler.create(protoId, {});
+                  const existing = elev.locks || [];
+                  existing.push(newLock.id);
+                  elev.locks = existing;
+                  await self.tell('Created and added lock #' + newLock.id + ' (' + (newLock.name || lockType) + ').');
+                  break;
+                }
+                case 'e': {
+                  const lockIdStr = await $.prompt.question(self, 'Lock object id to remove: ');
+                  const lid = lockIdStr ? parseInt(lockIdStr, 10) : NaN;
+                  if (isNaN(lid)) { await self.tell('Invalid id.'); break; }
+                  elev.locks = (elev.locks || []).filter(l => (typeof l === 'number' ? l : l.id) !== lid);
+                  await self.tell('Removed lock #' + lid + '.');
+                  break;
+                }
+                case 'f': {
+                  const doorIdStr = await $.prompt.question(self, 'Door object id to attach: ');
+                  const did = doorIdStr ? parseInt(doorIdStr, 10) : NaN;
+                  if (isNaN(did)) { await self.tell('Invalid id.'); break; }
+                  elev.door = did;
+                  await self.tell('Attached door #' + did + ' to elevator.');
+                  break;
+                }
+                case 'g': {
+                  const tStr = await $.prompt.question(self, 'Travel time per floor (ms): ');
+                  const t = tStr ? parseInt(tStr, 10) : NaN;
+                  if (!isNaN(t)) { elev.travelTimePerFloor = t; await self.tell('Set to ' + t + ' ms.'); }
+                  break;
+                }
+                case 'h': {
+                  const capStr = await $.prompt.question(self, 'Capacity: ');
+                  const cap = capStr ? parseInt(capStr, 10) : NaN;
+                  if (!isNaN(cap)) { elev.capacity = cap; await self.tell('Capacity set to ' + cap + '.'); }
+                  break;
+                }
+                case 'i': {
+                  const cfStr = await $.prompt.question(self, 'Current floor: ');
+                  const cf = cfStr ? parseInt(cfStr, 10) : NaN;
+                  if (!isNaN(cf)) { elev.currentFloor = cf; await self.tell('Current floor set to ' + cf + '.'); }
+                  break;
+                }
+                case '0':
+                  cfgDone = true;
+                  break;
+                default:
+                  await self.tell('Invalid choice.');
+              }
+            }
+            break;
+          }
+          case '0':
+            exitLoop = true;
+            break;
+          default:
+            await self.tell('Invalid choice.');
+        }
+      }
+    `);
+  }
+
+  /** Door/exit management commands */
+
+  private addDoorCommands(obj: RuntimeObject): void {
+    // @door <direction> — interactive door/lock management for an exit
+    obj.setMethod('@door', `
+      const direction = (args[0] || '').toLowerCase();
+      if (!direction) {
+        await self.tell('Usage: @door <direction>');
+        return;
+      }
+
+      const currentRoom = self.location ? await $.load(self.location) : null;
+      if (!currentRoom) {
+        await self.tell('You are nowhere.');
+        return;
+      }
+
+      const exits = currentRoom.exits || [];
+      const exit = exits.find(ex => ex && ex.matches && ex.matches(direction));
+      if (!exit) {
+        await self.tell('No exit in that direction.');
+        return;
+      }
+
+      const exitObj = typeof exit === 'number' ? await $.load(exit) : exit;
+      if (!exitObj) {
+        await self.tell('Exit not found.');
+        return;
+      }
+
+      // Resolve or create the door
+      let door = exitObj.door ? await $.load(exitObj.door) : null;
+      const aliases = $.system.aliases || {};
+      const doorProto = aliases.door;
+      if (!door && !doorProto) {
+        await self.tell('Door prototype not found.');
+        return;
+      }
+
+      if (!door) {
+        const name = (exitObj.name || 'Exit') + ' Door';
+        door = await $.create({
+          parent: doorProto,
+          properties: { name }
+        });
+        exitObj.door = door.id;
+
+        // Attach to reverse exit if present
+        const dest = exitObj.destRoom ? await $.load(exitObj.destRoom) : null;
+        if (dest && dest.exits) {
+          const rev = dest.exits.find(ex => ex && ex.matches && ex.matches(exitObj.getReverseDirection ? exitObj.getReverseDirection() : ''));
+          if (rev) {
+            const revObj = typeof rev === 'number' ? await $.load(rev) : rev;
+            if (revObj) revObj.door = door.id;
+          }
+        }
+      }
+
+      const doorObj = door;
+
+      // Menu loop
+      let done = false;
+      while (!done) {
+        const stateLocked = doorObj.locked ? 'locked' : 'unlocked';
+        const stateOpen = doorObj.open ? 'open' : 'closed';
+        const locksDetailed = [];
+        for (const l of doorObj.locks || []) {
+          const obj = typeof l === 'number' ? await $.load(l) : l;
+          const id = typeof l === 'number' ? l : l.id;
+          locksDetailed.push('#' + id + (obj?.name ? ' ' + obj.name : ''));
+        }
+        const locks = locksDetailed.join(', ') || 'none';
+        const code = doorObj.code ? '(set)' : '(none)';
+        await self.tell('--- @door ' + direction + ' ---');
+        await self.tell('Door #' + doorObj.id + ' ' + (doorObj.name || '') + '\nState: ' + stateLocked + ', ' + stateOpen + '\nLocks: ' + locks + '\nCode: ' + code);
+        await self.tell('[1] Toggle locked\n[2] Toggle open\n[3] Set/clear code\n[4] Add lock (id)\n[5] Add lock by type\n[6] Remove lock (id)\n[7] Rename door\n[8] Set description\n[9] Attach door to elevator (by id)\n[0] Done');
+
+        const choice = await $.prompt.question(self, 'Choice: ');
+        if (choice === null) { done = true; break; }
+        switch (choice.trim()) {
+          case '1':
+            doorObj.locked = !doorObj.locked;
+            await self.tell('Door is now ' + (doorObj.locked ? 'locked' : 'unlocked') + '.');
+            break;
+          case '2':
+            doorObj.open = !doorObj.open;
+            await self.tell('Door is now ' + (doorObj.open ? 'open' : 'closed') + '.');
+            break;
+          case '3': {
+            const newCode = await $.prompt.question(self, 'Enter code (blank to clear): ');
+            if (newCode === '') {
+              doorObj.code = null;
+              await self.tell('Code cleared.');
+            } else if (newCode !== null) {
+              doorObj.code = newCode;
+              await self.tell('Code set.');
+            }
+            break;
+          }
+          case '4': {
+            const lockIdStr = await $.prompt.question(self, 'Lock object id to add: ');
+            const lid = lockIdStr ? parseInt(lockIdStr, 10) : NaN;
+            if (isNaN(lid)) { await self.tell('Invalid id.'); break; }
+            const existing = doorObj.locks || [];
+            if (!existing.some(l => (typeof l === 'number' ? l : l.id) === lid)) {
+              existing.push(lid);
+              doorObj.locks = existing;
+              await self.tell('Added lock #' + lid + '.');
+            } else {
+              await self.tell('Lock already present.');
+            }
+            break;
+          }
+          case '5': {
+            // Add lock by type
+            const aliasMap = $.system.aliases || {};
+            const lockAliases = Object.keys(aliasMap).filter(k => k.toLowerCase().includes('lock'));
+            if (lockAliases.length) {
+              await self.tell('Known lock aliases: ' + lockAliases.join(', '));
+            }
+            const lockType = await $.prompt.question(self, 'Lock prototype alias (e.g., biometricLock, keycardLock): ');
+            if (!lockType) { await self.tell('Cancelled.'); break; }
+            const protoId = aliasMap[lockType];
+            if (!protoId) { await self.tell('Unknown lock prototype alias.'); break; }
+            const newLock = await $.recycler.create(protoId, {});
+            const existing = doorObj.locks || [];
+            existing.push(newLock.id);
+            doorObj.locks = existing;
+            await self.tell('Created and added lock #' + newLock.id + ' (' + (newLock.name || lockType) + ').');
+            break;
+          }
+          case '6': {
+            const lockIdStr = await $.prompt.question(self, 'Lock object id to remove: ');
+            const lid = lockIdStr ? parseInt(lockIdStr, 10) : NaN;
+            if (isNaN(lid)) { await self.tell('Invalid id.'); break; }
+            doorObj.locks = (doorObj.locks || []).filter(l => (typeof l === 'number' ? l : l.id) !== lid);
+            await self.tell('Removed lock #' + lid + '.');
+            break;
+          }
+          case '7': {
+            const newName = await $.prompt.question(self, 'Door name: ');
+            if (newName !== null && newName !== '') {
+              doorObj.name = newName;
+              await self.tell('Name set.');
+            }
+            break;
+          }
+          case '8': {
+            const newDesc = await $.prompt.question(self, 'Door description: ');
+            if (newDesc !== null) {
+              doorObj.description = newDesc;
+              await self.tell('Description set.');
+            }
+            break;
+          }
+          case '9': {
+            const elevIdStr = await $.prompt.question(self, 'Elevator object id to attach this door to: ');
+            const eid = elevIdStr ? parseInt(elevIdStr, 10) : NaN;
+            if (isNaN(eid)) { await self.tell('Invalid id.'); break; }
+            const elev = await $.load(eid);
+            if (!elev) { await self.tell('Elevator not found.'); break; }
+            elev.door = doorObj.id;
+            await self.tell('Door #' + doorObj.id + ' attached to elevator #' + eid + '.');
+            break;
+          }
+          case '0':
+            done = true;
+            break;
+          default:
+            await self.tell('Invalid choice.');
+        }
+      }
+    `);
+  }
+
 
   private addConnectionOverride(obj: RuntimeObject): void {
     // Override connect to add admin verbs after parent's connect
