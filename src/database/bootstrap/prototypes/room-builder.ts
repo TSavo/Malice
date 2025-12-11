@@ -46,6 +46,8 @@ export class RoomBuilder {
         lighting: 100, // 0=pitch black, 50=dim, 100=well-lit
         // Water level (affects breathing)
         waterLevel: 0, // 0=dry, 50=waist-deep, 100=fully submerged
+        // Environment
+        outdoor: true, // Is this room outdoors? (affects weather, natural light)
       },
       methods: {},
     });

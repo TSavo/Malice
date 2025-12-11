@@ -69,9 +69,11 @@ export class GameBootstrap {
   private async buildWorld(): Promise<void> {
     const { PrototypeBuilder } = await import('./bootstrap/prototype-builder.js');
     const { CoreSystemBuilder } = await import('./bootstrap/core-system-builder.js');
+    const { WorldBuilder } = await import('./bootstrap/world-builder.js');
 
     const prototypeBuilder = new PrototypeBuilder(this.manager);
     const coreSystemBuilder = new CoreSystemBuilder(this.manager);
+    const worldBuilder = new WorldBuilder(this.manager);
 
     // Build prototypes
     console.log('Creating object prototypes...');
@@ -84,9 +86,16 @@ export class GameBootstrap {
     console.log('  ✅ Created AuthManager, CharGen, PreAuthHandler, Recycler');
     console.log('  ✅ Created $.pronoun, $.proportional, $.room, $.bodyFactory');
 
-    // Reload aliases so they're available immediately
+    // Reload aliases so they're available for world building
     const aliasLoader = new AliasLoader(this.manager);
     await aliasLoader.loadAliases();
     console.log('  ✅ Loaded all aliases');
+
+    // Build world geometry (rooms and exits)
+    console.log('Creating world geometry...');
+    await worldBuilder.build();
+
+    // Reload aliases again to include startRoom
+    await aliasLoader.loadAliases();
   }
 }

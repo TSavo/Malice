@@ -125,15 +125,17 @@ Completing the job:
 - Unregisters all hooks for this job
 - Adds a completion event to the log
 
-## Available Events on Lockers
+## Available Events on Locker Banks
+
+Locker banks contain multiple compartments. Events include the compartment ID.
 
 | Event | Trigger | Data |
 |-------|---------|------|
-| `itemDeposited` | Item placed in locker | `{ item, itemName, mover, moverName }` |
-| `itemRemoved` | Item taken from locker | `{ item, itemName, mover, moverName, destination }` |
-| `opened` | Locker unlocked | `{ player, playerName, usedOneTimeCode, code }` |
-| `closed` | Locker locked | `{ player, playerName }` |
-| `oneTimeCodeUsed` | One-time code consumed | `{ player, playerName, code }` |
+| `itemDeposited` | Item placed in compartment | `{ compartment, item, itemName }` |
+| `itemRemoved` | Item taken from compartment | `{ compartment, item, itemName }` |
+| `opened` | Compartment unlocked | `{ compartment, player, playerName, usedOneTimeCode, code }` |
+| `closed` | Compartment locked | `{ compartment, player, playerName }` |
+| `oneTimeCodeUsed` | One-time code consumed | `{ compartment, player, playerName, code }` |
 
 ## Filter Matching
 
@@ -142,6 +144,9 @@ Filters are key-value pairs that must ALL match the trigger data:
 ```javascript
 // Only fires when code is 'XYZ789'
 { code: 'XYZ789' }
+
+// Only fires for compartment 'A1' with code 'XYZ789'
+{ compartment: 'A1', code: 'XYZ789' }
 
 // Only fires when code is 'XYZ789' AND player is #42
 { code: 'XYZ789', player: 42 }
