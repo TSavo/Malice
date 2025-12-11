@@ -12,4 +12,10 @@ A bus shelter offers minimal protection from elements that don't care about shel
   x: 9,
   y: -1,
   z: 0,
+  // Environmental properties
+  population: 0, // Empty (post-Event)
+  ambientNoise: 0, // Quiet/abandoned
+  lighting: 100, // Daylight (outdoor)
+  waterLevel: 0, // Dry
+  outdoor: true, // Street level
 };

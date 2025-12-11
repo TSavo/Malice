@@ -10,4 +10,10 @@ A sign on the door says HARD HAT AREA. The hard hats are gone. The area doesn't 
   x: -11,
   y: -10,
   z: 0,
+  // Environmental properties
+  population: 0, // Empty (post-Event)
+  ambientNoise: 0, // Quiet/abandoned
+  lighting: 100, // Daylight (outdoor)
+  waterLevel: 0, // Dry
+  outdoor: true, // Street level
 };

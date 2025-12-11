@@ -12,4 +12,10 @@ The street continues east toward 4th Avenue and the International District beyon
   x: 10,
   y: 5,
   z: 0,
+  // Environmental properties
+  population: 0, // Empty (post-Event)
+  ambientNoise: 0, // Quiet/abandoned
+  lighting: 100, // Daylight (outdoor)
+  waterLevel: 0, // Dry
+  outdoor: true, // Street level
 };

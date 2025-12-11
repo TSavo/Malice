@@ -10,4 +10,10 @@ A utility box on the corner has been covered in stickers and graffiti, layers of
   x: 0,
   y: -10,
   z: 0,
+  // Environmental properties
+  population: 0, // Empty (post-Event)
+  ambientNoise: 0, // Quiet/abandoned
+  lighting: 100, // Daylight (outdoor)
+  waterLevel: 0, // Dry
+  outdoor: true, // Street level
 };

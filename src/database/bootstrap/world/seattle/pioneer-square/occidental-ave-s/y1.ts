@@ -10,4 +10,10 @@ A vintage lamp post stands at the corner, its globe intact, its light extinguish
   x: -3,
   y: 1,
   z: 0,
+  // Environmental properties
+  population: 0, // Empty (post-Event)
+  ambientNoise: 0, // Quiet/abandoned
+  lighting: 100, // Daylight (outdoor)
+  waterLevel: 0, // Dry
+  outdoor: true, // Street level
 };

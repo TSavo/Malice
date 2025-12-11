@@ -10,4 +10,10 @@ Three gold balls hang above the door, the universal symbol of the trade. The bal
   x: 2,
   y: 0,
   z: 0,
+  // Environmental properties
+  population: 0, // Empty (post-Event)
+  ambientNoise: 0, // Quiet/abandoned
+  lighting: 100, // Daylight (outdoor)
+  waterLevel: 0, // Dry
+  outdoor: true, // Street level
 };

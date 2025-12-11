@@ -12,4 +12,10 @@ Pigeons roost in the parking structure, their cooing echoing down the concrete r
   x: 15,
   y: 8,
   z: 0,
+  // Environmental properties
+  population: 0, // Empty (post-Event)
+  ambientNoise: 0, // Quiet/abandoned
+  lighting: 100, // Daylight (outdoor)
+  waterLevel: 0, // Dry
+  outdoor: true, // Street level
 };

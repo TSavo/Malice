@@ -13,4 +13,10 @@ The intersection is clear. First Avenue runs north and south. S. Jackson continu
   y: -5,
   z: 0,
   intersection: ['1st Ave S', 'S. Jackson St'],
+  // Environmental properties
+  population: 0, // Empty (post-Event)
+  ambientNoise: 0, // Quiet/abandoned
+  lighting: 100, // Daylight (outdoor)
+  waterLevel: 0, // Dry
+  outdoor: true, // Street level
 };

@@ -10,4 +10,10 @@ A red paper dragon hangs in the window of the building next door, its scales dus
   x: -8,
   y: -5,
   z: 0,
+  // Environmental properties
+  population: 0, // Empty (post-Event)
+  ambientNoise: 0, // Quiet/abandoned
+  lighting: 100, // Daylight (outdoor)
+  waterLevel: 0, // Dry
+  outdoor: true, // Street level
 };

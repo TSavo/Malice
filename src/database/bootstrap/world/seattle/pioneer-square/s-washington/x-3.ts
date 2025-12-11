@@ -13,4 +13,10 @@ The buildings of Pioneer Square rise on all sides, their windows dark, their doo
   y: 5,
   z: 0,
   intersection: ['Occidental Ave S', 'S. Washington St'],
+  // Environmental properties
+  population: 0, // Empty (post-Event)
+  ambientNoise: 0, // Quiet/abandoned
+  lighting: 100, // Daylight (outdoor)
+  waterLevel: 0, // Dry
+  outdoor: true, // Street level
 };

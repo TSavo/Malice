@@ -10,4 +10,10 @@ A delivery truck sits abandoned at the curb, its cargo unknown, its driver gone.
   x: 3,
   y: 2,
   z: 0,
+  // Environmental properties
+  population: 0, // Empty (post-Event)
+  ambientNoise: 0, // Quiet/abandoned
+  lighting: 100, // Daylight (outdoor)
+  waterLevel: 0, // Dry
+  outdoor: true, // Street level
 };

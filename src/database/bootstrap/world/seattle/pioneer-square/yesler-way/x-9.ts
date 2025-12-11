@@ -16,4 +16,10 @@ To the north, 1st Avenue should continue into Downtown. It does not. A six-story
   y: 10,
   z: 0,
   intersection: ['1st Ave S', 'Yesler Way'],
+  // Environmental properties
+  population: 0, // Empty (post-Event)
+  ambientNoise: 0, // Quiet/abandoned
+  lighting: 100, // Daylight (outdoor)
+  waterLevel: 0, // Dry
+  outdoor: true, // Street level
 };

@@ -10,4 +10,10 @@ A sandwich board lies on its side, knocked over by wind or time, its chalkboard 
   x: -3,
   y: 3,
   z: 0,
+  // Environmental properties
+  population: 0, // Empty (post-Event)
+  ambientNoise: 0, // Quiet/abandoned
+  lighting: 100, // Daylight (outdoor)
+  waterLevel: 0, // Dry
+  outdoor: true, // Street level
 };

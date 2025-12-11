@@ -10,4 +10,10 @@ A chess table is built into one of the benches, its squares faded but visible. T
   x: -3,
   y: -3,
   z: 0,
+  // Environmental properties
+  population: 0, // Empty (post-Event)
+  ambientNoise: 0, // Quiet/abandoned
+  lighting: 100, // Daylight (outdoor)
+  waterLevel: 0, // Dry
+  outdoor: true, // Street level
 };

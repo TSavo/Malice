@@ -13,4 +13,10 @@ The intersection is clear in all directions. First Avenue runs north and south. 
   y: 0,
   z: 0,
   intersection: ['1st Ave S', 'S. Main St'],
+  // Environmental properties
+  population: 0, // Empty (post-Event)
+  ambientNoise: 0, // Quiet/abandoned
+  lighting: 100, // Daylight (outdoor)
+  waterLevel: 0, // Dry
+  outdoor: true, // Street level
 };

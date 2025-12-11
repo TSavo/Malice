@@ -10,4 +10,10 @@ A fire escape zigzags down the building across the street, its iron steps rusted
   x: -9,
   y: -9,
   z: 0,
+  // Environmental properties
+  population: 0, // Empty (post-Event)
+  ambientNoise: 0, // Quiet/abandoned
+  lighting: 100, // Daylight (outdoor)
+  waterLevel: 0, // Dry
+  outdoor: true, // Street level
 };

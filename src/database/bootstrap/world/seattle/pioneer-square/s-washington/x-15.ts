@@ -13,4 +13,10 @@ The wind comes off the water, cold and salt-tinged. It smells like the sea. It s
   y: 5,
   z: 0,
   intersection: ['Waterfront', 'S. Washington St'],
+  // Environmental properties
+  population: 0, // Empty (post-Event)
+  ambientNoise: 0, // Quiet/abandoned
+  lighting: 100, // Daylight (outdoor)
+  waterLevel: 0, // Dry
+  outdoor: true, // Street level
 };

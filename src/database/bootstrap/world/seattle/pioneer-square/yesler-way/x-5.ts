@@ -12,4 +12,10 @@ The tour entrance is padlocked. Whatever is down there now, it is not a tourist 
   x: -5,
   y: 10,
   z: 0,
+  // Environmental properties
+  population: 0, // Empty (post-Event)
+  ambientNoise: 0, // Quiet/abandoned
+  lighting: 100, // Daylight (outdoor)
+  waterLevel: 0, // Dry
+  outdoor: true, // Street level
 };

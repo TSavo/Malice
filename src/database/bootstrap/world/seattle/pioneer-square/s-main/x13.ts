@@ -10,4 +10,10 @@ Red paper lanterns hang from the ceiling inside, their color faded but their sha
   x: 13,
   y: 0,
   z: 0,
+  // Environmental properties
+  population: 0, // Empty (post-Event)
+  ambientNoise: 0, // Quiet/abandoned
+  lighting: 100, // Daylight (outdoor)
+  waterLevel: 0, // Dry
+  outdoor: true, // Street level
 };
