@@ -27,6 +27,9 @@ import {
   BankBuilder,
   BankTerminalBuilder,
   StackableBuilder,
+  ElevatorBuilder,
+  LockBuilder,
+  BiometricLockBuilder,
 } from './prototypes/index.js';
 
 /**
@@ -76,6 +79,9 @@ export class PrototypeBuilder {
   private bankBuilder: BankBuilder;
   private bankTerminalBuilder: BankTerminalBuilder;
   private stackableBuilder: StackableBuilder;
+  private elevatorBuilder: ElevatorBuilder;
+  private lockBuilder: LockBuilder;
+  private biometricLockBuilder: BiometricLockBuilder;
 
   constructor(private manager: ObjectManager) {
     this.describableBuilder = new DescribableBuilder(manager);
@@ -105,6 +111,9 @@ export class PrototypeBuilder {
     this.bankBuilder = new BankBuilder(manager);
     this.bankTerminalBuilder = new BankTerminalBuilder(manager);
     this.stackableBuilder = new StackableBuilder(manager);
+    this.elevatorBuilder = new ElevatorBuilder(manager);
+    this.lockBuilder = new LockBuilder(manager);
+    this.biometricLockBuilder = new BiometricLockBuilder(manager);
   }
 
   /**
@@ -252,6 +261,21 @@ export class PrototypeBuilder {
       ? await this.manager.load(aliases.stackable as number)
       : await this.stackableBuilder.build(describable!.id);
 
+    // Elevator - vertical transport system (inherits from Location)
+    const elevator = aliases.elevator
+      ? await this.manager.load(aliases.elevator as number)
+      : await this.elevatorBuilder.build(location!.id);
+
+    // Lock - base access control (inherits from Describable)
+    const lock = aliases.lock
+      ? await this.manager.load(aliases.lock as number)
+      : await this.lockBuilder.build(describable!.id);
+
+    // BiometricLock - body-scanning access control (inherits from Lock)
+    const biometricLock = aliases.biometricLock
+      ? await this.manager.load(aliases.biometricLock as number)
+      : await this.biometricLockBuilder.build(lock!.id);
+
     // Register aliases in root.properties.aliases
     await this.registerAliases({
       describable: describable!.id,
@@ -281,6 +305,9 @@ export class PrototypeBuilder {
       bank: bank!.id,
       bankTerminal: bankTerminal!.id,
       stackable: stackable!.id,
+      elevator: elevator!.id,
+      lock: lock!.id,
+      biometricLock: biometricLock!.id,
     });
   }
 
@@ -309,6 +336,12 @@ export class PrototypeBuilder {
     clothing: number;
     locker: number;
     oneTimeLocker: number;
+    bank: number;
+    bankTerminal: number;
+    stackable: number;
+    elevator: number;
+    lock: number;
+    biometricLock: number;
     bank: number;
     bankTerminal: number;
     stackable: number;

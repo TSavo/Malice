@@ -43,5 +43,10 @@ export { BankTerminalBuilder } from './bank-terminal-builder.js';
 // Stackables (physical commodities)
 export { StackableBuilder } from './stackable-builder.js';
 
+// Elevators and locks
+export { ElevatorBuilder } from './elevator-builder.js';
+export { LockBuilder } from './lock-builder.js';
+export { BiometricLockBuilder } from './biometric-lock-builder.js';
+
 // Appearance
 export * from './appearance-constants.js';
