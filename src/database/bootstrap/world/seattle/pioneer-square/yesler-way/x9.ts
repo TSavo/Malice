@@ -18,4 +18,10 @@ The light rail station was supposed to connect Pioneer Square to Downtown. When 
   y: 10,
   z: 0,
   intersection: ['3rd Ave S', 'Yesler Way'],
+  // Environmental properties
+  population: 0, // Empty (post-Event)
+  ambientNoise: 0, // Quiet/abandoned
+  lighting: 100, // Daylight (outdoor)
+  waterLevel: 0, // Dry
+  outdoor: true, // Street level
 };

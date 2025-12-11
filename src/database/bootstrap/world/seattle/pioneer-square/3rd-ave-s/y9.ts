@@ -12,4 +12,10 @@ The Corp Construction zone begins to the south, its fences newer, its purpose eq
   x: 9,
   y: 9,
   z: 0,
+  // Environmental properties
+  population: 0, // Empty (post-Event)
+  ambientNoise: 0, // Quiet/abandoned
+  lighting: 100, // Daylight (outdoor)
+  waterLevel: 0, // Dry
+  outdoor: true, // Street level
 };

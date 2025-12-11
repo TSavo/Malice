@@ -10,4 +10,10 @@ A fire escape has partially collapsed on one building, its iron stairs dangling 
   x: 3,
   y: 4,
   z: 0,
+  // Environmental properties
+  population: 0, // Empty (post-Event)
+  ambientNoise: 0, // Quiet/abandoned
+  lighting: 100, // Daylight (outdoor)
+  waterLevel: 0, // Dry
+  outdoor: true, // Street level
 };

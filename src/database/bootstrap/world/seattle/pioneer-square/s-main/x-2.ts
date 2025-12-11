@@ -10,4 +10,10 @@ Across the street, a building with a mural covering its entire side. A scene of 
   x: -2,
   y: 0,
   z: 0,
+  // Environmental properties
+  population: 0, // Empty (post-Event)
+  ambientNoise: 0, // Quiet/abandoned
+  lighting: 100, // Daylight (outdoor)
+  waterLevel: 0, // Dry
+  outdoor: true, // Street level
 };

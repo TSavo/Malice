@@ -10,4 +10,10 @@ A stone guardian lion sits at the base of the stairs, one of a pair. Its partner
   x: 13,
   y: -10,
   z: 0,
+  // Environmental properties
+  population: 0, // Empty (post-Event)
+  ambientNoise: 0, // Quiet/abandoned
+  lighting: 100, // Daylight (outdoor)
+  waterLevel: 0, // Dry
+  outdoor: true, // Street level
 };

@@ -10,4 +10,10 @@ The smell of mustard and onions is long gone, replaced by the neutral smell of d
   x: 12,
   y: 0,
   z: 0,
+  // Environmental properties
+  population: 0, // Empty (post-Event)
+  ambientNoise: 0, // Quiet/abandoned
+  lighting: 100, // Daylight (outdoor)
+  waterLevel: 0, // Dry
+  outdoor: true, // Street level
 };

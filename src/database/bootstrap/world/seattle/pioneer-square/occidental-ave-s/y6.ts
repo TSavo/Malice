@@ -10,4 +10,10 @@ A public art installation stands at the edge of the walkway, abstract metal form
   x: -3,
   y: 6,
   z: 0,
+  // Environmental properties
+  population: 0, // Empty (post-Event)
+  ambientNoise: 0, // Quiet/abandoned
+  lighting: 100, // Daylight (outdoor)
+  waterLevel: 0, // Dry
+  outdoor: true, // Street level
 };

@@ -12,4 +12,10 @@ A hot dog cart sits at the curb, its umbrella faded, its condiment bottles empty
   x: 9,
   y: 3,
   z: 0,
+  // Environmental properties
+  population: 0, // Empty (post-Event)
+  ambientNoise: 0, // Quiet/abandoned
+  lighting: 100, // Daylight (outdoor)
+  waterLevel: 0, // Dry
+  outdoor: true, // Street level
 };

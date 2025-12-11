@@ -14,4 +14,10 @@ Second Avenue stretches north and south, empty in both directions. The Collapsed
   y: 5,
   z: 0,
   intersection: ['2nd Ave S', 'S. Washington St'],
+  // Environmental properties
+  population: 0, // Empty (post-Event)
+  ambientNoise: 0, // Quiet/abandoned
+  lighting: 100, // Daylight (outdoor)
+  waterLevel: 0, // Dry
+  outdoor: true, // Street level
 };

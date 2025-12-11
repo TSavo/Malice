@@ -16,4 +16,10 @@ Not that it matters now. The buildings on either side of 2nd Avenue leaned into 
   y: 10,
   z: 0,
   intersection: ['2nd Ave S', 'Yesler Way'],
+  // Environmental properties
+  population: 0, // Empty (post-Event)
+  ambientNoise: 0, // Quiet/abandoned
+  lighting: 100, // Daylight (outdoor)
+  waterLevel: 0, // Dry
+  outdoor: true, // Street level
 };

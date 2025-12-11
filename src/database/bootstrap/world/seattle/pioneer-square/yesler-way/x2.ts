@@ -12,4 +12,10 @@ The buildings stand in silence. The wind moves through broken windows. Nothing e
   x: 2,
   y: 10,
   z: 0,
+  // Environmental properties
+  population: 0, // Empty (post-Event)
+  ambientNoise: 0, // Quiet/abandoned
+  lighting: 100, // Daylight (outdoor)
+  waterLevel: 0, // Dry
+  outdoor: true, // Street level
 };

@@ -13,4 +13,10 @@ The intersection is clear. Fourth Avenue runs north and south. S. Jackson ends h
   y: -5,
   z: 0,
   intersection: ['4th Ave S', 'S. Jackson St'],
+  // Environmental properties
+  population: 0, // Empty (post-Event)
+  ambientNoise: 0, // Quiet/abandoned
+  lighting: 100, // Daylight (outdoor)
+  waterLevel: 0, // Dry
+  outdoor: true, // Street level
 };

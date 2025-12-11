@@ -13,4 +13,10 @@ The intersection is clear. Third Avenue runs north and south. S. King continues 
   y: -10,
   z: 0,
   intersection: ['3rd Ave S', 'S. King St'],
+  // Environmental properties
+  population: 0, // Empty (post-Event)
+  ambientNoise: 0, // Quiet/abandoned
+  lighting: 100, // Daylight (outdoor)
+  waterLevel: 0, // Dry
+  outdoor: true, // Street level
 };
