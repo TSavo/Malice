@@ -1,109 +1,175 @@
-// Smith Tower - Observation Deck Level (z=39)
-// Public-ish observation deck with speakeasy remnants and chained access
+// Smith Tower - Roof (z=39)
+// Exterior crown roof area
 
 export const building = {
   rooms: {
+    // Shared elevator car placeholder (not directly exiting onto roof; access via ladder/hatch)
     '%E': {
       prototype: 'elevator',
       exits: {
-        out: '%ODL',
+        out: '%PHL',
       },
     },
 
-    '%ODL': {
-      // Observation Deck Landing (-4, +8, 39)
-      name: 'Observation Deck Landing',
-      description: `A cramped landing tucked just under the glass crown. Brass plaques listing emergency numbers are gouged by pocketknives. The air is cool and smells of stale liquor and metal polish. A chain-link gate blocks the stair down, and the elevator doors here are scarred by pry marks and boot dents.`,
-      x: -4,
-      y: 8,
+    // Roof grid, 4x3 spanning x=-5..-2, y=7..9
+
+    '%RH1': {
+      name: 'Roof - Northwest Corner',
+      description: `Tar and gravel run to a low parapet stained by a century of rain. Wind up here tastes of salt, diesel, and ozone from the old radio kit below. Rusted conduit stubs jut from the deck where antenna masts once bristled.`,
+      x: -5,
+      y: 9,
       z: 39,
       population: 0,
-      ambientNoise: 7,
-      lighting: 60,
+      ambientNoise: 14,
+      lighting: 100,
       waterLevel: 0,
-      outdoor: false,
+      outdoor: true,
       exits: {
-        west: '%ODECK',
-        east: '%ODB',
-        in: '%E',
-        down: '%ZSTAIR',
-        up: '%PHL',
+        east: '%RH2',
+        south: '%RH4',
       },
-      methods: {
-        onContentArrived: `
-          const obj = args[0];
-          if (!obj?.registerVerb) return;
-          await obj.registerVerb(['call elevator', 'summon elevator', 'press elevator button'], self, 'callElevator');
-        `,
-        onContentLeaving: `
-          const obj = args[0];
-          if (obj?.unregisterVerbsFrom) {
-            await obj.unregisterVerbsFrom(self.id);
-          }
-        `,
-        callElevator: `
-          const player = args[0];
-          const floorNumber = 39;
-          const elevatorId = self.elevatorId || null;
-
-          if (!elevatorId) {
-            return 'The call button clicks uselessly. No power.';
-          }
-
-          const elevator = await $.load(elevatorId);
-          if (!elevator) {
-            return 'Nothing answers the button press.';
-          }
-
-          if (elevator.currentFloor === floorNumber) {
-            if (!elevator.doorsOpen && elevator.openDoors) {
-              await elevator.openDoors();
-            }
-            return 'The elevator is already here.';
-          }
-
-          if (elevator.selectFloor) {
-            const result = await elevator.selectFloor(player, floorNumber);
-            return result?.message || 'You press the button. Machinery stirs above.';
-          }
-
-          return 'The button light flickers, but nothing happens.';
-        `,
-      },
-      elevatorId: '%E',
     },
 
-    '%ODECK': {
-      // Observation Deck (-5, +8, 39)
-      name: 'Observation Deck',
-      description: `Tall glass panes arc around a slim walkway, offering a vertigo-inducing view of rooftops and freeways far below. Sun-faded placards point out landmarks that no longer match the skyline. Several cracked panes are backed by plywood screwed in from the inside.`,
+    '%RH2': {
+      name: 'Roof - North Run',
+      description: `A narrow run of roof between the crown's terracotta ribs. The drop to the street canyons is dizzying; buses creep like toy models below. Pigeons explode away when you set foot here, leaving dusty feathers stuck to the tar.`,
+      x: -4,
+      y: 9,
+      z: 39,
+      population: 0,
+      ambientNoise: 15,
+      lighting: 100,
+      waterLevel: 0,
+      outdoor: true,
+      exits: {
+        west: '%RH1',
+        east: '%RH3',
+        south: '%RH5',
+      },
+    },
+
+    '%RH3': {
+      name: 'Roof - Northeast Corner',
+      description: `The parapet here overlooks the old viaduct traces and the bay beyond. A lightning rod, bent at its base, leans seaward with slack copper strap coiled beside it.`,
+      x: -3,
+      y: 9,
+      z: 39,
+      population: 0,
+      ambientNoise: 15,
+      lighting: 100,
+      waterLevel: 0,
+      outdoor: true,
+      exits: {
+        west: '%RH2',
+        south: '%RH6',
+      },
+    },
+
+    '%RH4': {
+      name: 'Roof - West Walk',
+      description: `A tight walk along the crown wall. Terracotta tiles here are crazed with hairline cracks and patched with mismatched caulk. Condensation beads on metal service boxes bolted to the parapet, trickling rust down the face.`,
       x: -5,
       y: 8,
       z: 39,
       population: 0,
-      ambientNoise: 6,
-      lighting: 55,
+      ambientNoise: 13,
+      lighting: 100,
       waterLevel: 0,
-      outdoor: false,
+      outdoor: true,
       exits: {
-        east: '%ODL',
+        north: '%RH1',
+        east: '%RH5',
+        south: '%RH7',
       },
     },
 
-    '%ODB': {
-      // Temperance Bar remnant (-3, +8, 39)
-      name: 'Shuttered Speakeasy',
-      description: `A narrow barroom with a curved counter and a shuttered backbar that still smells faintly of bitters. A fractured mirror clouds the wall behind it. Tap handles are zip-tied in place; an undercounter fridge hums weakly off a jury-rigged battery pack.`,
+    '%RH5': {
+      name: 'Roof - Central Deck',
+      description: `The central expanse between the crown faces. Fresh tar smears around a square hatch, layered over decades of older patches. From here the white terracotta pyramid rises above you, its seams stained and its glass cap catching stray light.`,
+      x: -4,
+      y: 8,
+      z: 39,
+      population: 0,
+      ambientNoise: 14,
+      lighting: 100,
+      waterLevel: 0,
+      outdoor: true,
+      exits: {
+        north: '%RH2',
+        west: '%RH4',
+        east: '%RH6',
+        south: '%RH8',
+        down: { room: '%PHL', door: '%DROOF' },
+      },
+    },
+
+    '%RH6': {
+      name: 'Roof - East Walk',
+      description: `A narrow strip pressed against the eastern crown wall. The brick parapet is streaked dark by decades of runoff and moss. Wind whistles through a gap where a railing segment sheared away long ago.`,
       x: -3,
       y: 8,
       z: 39,
       population: 0,
-      ambientNoise: 5,
-      lighting: 45,
+      ambientNoise: 14,
+      lighting: 100,
       waterLevel: 0,
-      outdoor: false,
+      outdoor: true,
       exits: {
-        west: '%ODL',
+        north: '%RH3',
+        west: '%RH5',
+        south: '%RH9',
+      },
+    },
+
+    '%RH7': {
+      name: 'Roof - Southwest Corner',
+      description: `The roof sags slightly here. A drain choked with leaves and pigeon feathers holds a shallow puddle that mirrors the crown above in ripples.`,
+      x: -5,
+      y: 7,
+      z: 39,
+      population: 0,
+      ambientNoise: 12,
+      lighting: 100,
+      waterLevel: 1,
+      outdoor: true,
+      exits: {
+        north: '%RH4',
+        east: '%RH8',
+      },
+    },
+
+    '%RH8': {
+      name: 'Roof - South Run',
+      description: `A south-facing strip with a long view toward the stadium roofs and freight yards. On sunny days, heat shimmers off the tar; now, it holds footprints in soft black. The parapet is chest-high, chipped, and cold to the touch.`,
+      x: -4,
+      y: 7,
+      z: 39,
+      population: 0,
+      ambientNoise: 13,
+      lighting: 100,
+      waterLevel: 0,
+      outdoor: true,
+      exits: {
+        north: '%RH5',
+        west: '%RH7',
+        east: '%RH9',
+      },
+    },
+
+    '%RH9': {
+      name: 'Roof - Southeast Corner',
+      description: `The southeastern corner peers down toward Occidental and the waterfront cranes. A bent safety rail rattles in the wind until you brace it. Initials are scratched into the tar at your feet, half-filled with grit.`,
+      x: -3,
+      y: 7,
+      z: 39,
+      population: 0,
+      ambientNoise: 13,
+      lighting: 100,
+      waterLevel: 0,
+      outdoor: true,
+      exits: {
+        north: '%RH6',
+        west: '%RH8',
       },
     },
   },

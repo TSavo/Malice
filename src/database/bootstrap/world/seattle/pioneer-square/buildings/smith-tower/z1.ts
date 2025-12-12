@@ -17,16 +17,52 @@ The car smells of machine oil and old dust. The doors are dented but intact, and
         out: '%5', // Back to Elevator Bank (floor-specific lobby via floorRooms)
       },
       elevator: {
-        floors: [1, 2, 3, 38, 39, 40],
+        floors: [
+          1,
+          2,
+          3,
+          4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33,
+          38,
+          
+          
+        ],
         currentFloor: 1,
         doorsOpen: true,
         floorRooms: {
           1: '%5', // Floor 1 lobby/bank
           2: '%F', // Floor 2 lobby/bank (defined in z2)
           3: '%P', // Floor 3 lobby/bank (defined in z3)
-          38: '%ZL', // Floor 38 landing (defined in z38)
-          39: '%ODL', // Observation deck lobby (defined in z39)
-          40: '%PHL', // Penthouse landing (defined in z40)
+          4: '%EL_z4',
+          5: '%EL_z5',
+          6: '%EL_z6',
+          7: '%EL_z7',
+          8: '%EL_z8',
+          9: '%EL_z9',
+          10: '%EL_z10',
+          11: '%EL_z11',
+          12: '%EL_z12',
+          13: '%EL_z13',
+          14: '%EL_z14',
+          15: '%EL_z15',
+          16: '%EL_z16',
+          17: '%EL_z17',
+          18: '%EL_z18',
+          19: '%EL_z19',
+          20: '%EL_z20',
+          21: '%EL_z21',
+          22: '%EL_z22',
+          23: '%EL_z23',
+          24: '%EL_z24',
+          25: '%EL_z25',
+          26: '%EL_z26',
+          27: '%EL_z27',
+          28: '%EL_z28',
+          29: '%EL_z29',
+          30: '%EL_z30',
+          31: '%EL_z31',
+          32: '%EL_z32',
+          33: '%EL_z33',
+          38: "%ODL", // Floor 38 observation deck (defined in z38)
         },
         locks: ['%L1', '%LR'],
       },
