@@ -8,7 +8,7 @@ Pigeons have colonized the upper levels, their cooing a constant murmur from abo
 
 A security booth sits at the base of the elevator, its windows intact, its door locked. Inside, monitors display static. The cameras they connected to are probably still working, recording nothing to drives that will eventually fill and stop.
 
-The industrial waterfront stretches south toward the port.`,
+The industrial waterfront stretches south toward the port. To the west, Elliott Bay lies beyond the seawall—fifteen feet down to cold water that stretches to shores you cannot reach. The bay accepts no travelers on foot.`,
   x: -21,
   y: -3,
   z: 0,

@@ -6,7 +6,7 @@ export const room = {
 
 The ferry terminal is visible to the north, its massive steel structure still standing though no ferries have docked in decades. The terminal was built for the Bainbridge Island and Bremerton routes, carrying commuters across the sound. The routes stopped when the commuters disappeared. The terminal waits for boats that will never come.
 
-The wind off the bay is constant here, salt spray carried on air that never quite stops moving. The wind has polished the seawall smooth in places, wearing down what weather alone couldn't erode.`,
+The wind off the bay is constant here, salt spray carried on air that never quite stops moving. Beyond the seawall, Elliott Bay stretches west toward the Olympic Peninsula, grey water marking the absolute western boundary of Pioneer Square. Without a boat, the water offers nothing but a view.`,
   x: -21,
   y: -4,
   z: 0,

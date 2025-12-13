@@ -8,7 +8,7 @@ A public art installation stands near the water's edge. Steel ribbons twisted in
 
 Benches line the walkway, bolted to the concrete. They face the water, offering views of the bay and the islands beyond. The view hasn't changed. The people who sat here to enjoy it have.
 
-Pioneer Square rises to the east, its historic brick buildings dark and silent.`,
+The seawall drops fifteen feet to Elliott Bay—cold grey water stretching west to the Olympic Mountains, invisible today behind the clouds. The bay accepts no passage. It never did, not without a hull beneath you. Pioneer Square rises to the east, offering the only way forward.`,
   x: -21,
   y: 4,
   z: 0,

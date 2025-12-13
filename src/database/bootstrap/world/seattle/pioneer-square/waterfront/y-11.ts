@@ -2,13 +2,13 @@
 
 export const room = {
   name: 'Alaskan Way',
-  description: `The waterfront narrows here as the port facilities crowd against the seawall. Chain-link fences topped with razor wire line both sides of the road, creating a corridor between the container yards and the water. The fences are intact but the gates are open, swinging in the wind.
+  description: `The waterfront narrows here as the port facilities crowd against the seawall. Chain-link fences topped with razor wire create a corridor between the container yards and the water. The fences are intact but the gates swing open in the wind.
 
-A customs inspection station sits at the corner, its booth empty, its barrier arm raised and stuck. The x-ray machine inside is dark. The drug dogs are gone. The contraband that passed through here in the early days is long since dispersed into the city.
+To the west, Elliott Bay laps against the seawall—cold grey water stretching to the horizon, impassable without a boat. The seawall is fifteen feet of sheer concrete. The bay is Pioneer Square's western edge, as absolute a boundary as the mountains.
 
-Shipping manifests flutter in the breeze, escaped from some office and scattered across the concrete. Bills of lading for goods from Shanghai and Busan and Ho Chi Minh City. The global supply chain, reduced to litter.
+A customs inspection station sits at the corner, its booth empty, barrier arm raised and stuck. Shipping manifests flutter in the breeze—bills of lading for goods from Shanghai and Busan. The global supply chain, reduced to litter.
 
-S. King Street is visible to the south, marking the edge of Pioneer Square.`,
+S. King Street intersection lies just ahead to the south. The waterfront continues north. The bay stretches west toward shores that might as well be another world—Bainbridge, Bremerton, places that exist only in memory now.`,
   x: -21,
   y: -11,
   z: 0,

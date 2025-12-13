@@ -6,7 +6,7 @@ export const room = {
 
 The sinkhole is visible to the east, a flooded depression where the ground collapsed and never stopped sinking. The water in the hole is dark and still, connected to the bay through cracks in the seawall that no one ever repaired. The smell of salt water and decay mixes here, ocean and ruin becoming indistinguishable.
 
-Gulls circle overhead, the only consistent life along this stretch. They've adapted to the post-human waterfront, finding food in the bay as they did before the city existed. The gulls will outlast everything built here.`,
+Gulls circle overhead, the only consistent life along this stretch. They've adapted to the post-human waterfront, finding food in the bay as they did before the city existed. The gulls will outlast everything built here. The bay will outlast even them—cold grey water marking the western edge of everything, impassable as it has always been.`,
   x: -21,
   y: -9,
   z: 0,
