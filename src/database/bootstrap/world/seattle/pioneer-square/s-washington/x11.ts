@@ -1,14 +1,14 @@
-// S. Washington St - between 3rd and 4th Ave
+// S. Washington St - approaching 4th Ave
 
 export const room = {
   name: 'S. Washington St',
-  description: `The streetscape begins its transition here, Pioneer Square's Victorian brick mixing with the more varied architecture that characterizes the International District. The shift is gradual—a building here with signage in Vietnamese, another there with Chinese characters alongside English translations. The neighborhoods bleed into each other along Washington Street, their boundaries administrative rather than physical.
+  description: `The architecture along this block reflects decades of development without coordination—a Victorian brick building beside a 1960s concrete box beside a glass-fronted structure from the 2000s. The result is the visual cacophony that characterizes urban edges, where neighborhoods overlap and no single aesthetic dominates. Each building follows its own logic, unified only by the street grid that contains them.
 
-PHO CYCLO occupies a narrow storefront, its name painted on the window in both Vietnamese and English. The restaurant served the lunch crowds that once flowed between Pioneer Square's offices and the International District's density—bowls of soup, banh mi sandwiches, the fast and filling meals that working people needed. Through the window: formica tables arranged efficiently, a service counter with the covered containers that held condiments and garnishes.
+JADE GARDEN occupies the corner building, a dim sum restaurant that served the weekend crowds who lined up for carts of steamed dumplings and rice noodle rolls. The interior is visible through plate glass: round tables with lazy susans, the kitchen window where bamboo steamers once emerged in clouds of vapor, the red and gold color scheme that Cantonese restaurants favor. The space was designed for noise and bustle, for the controlled chaos of dim sum service.
 
-The building opposite houses the KING COUNTY SOCIAL SERVICES satellite office, its institutional signage mounted above plate glass windows covered with informational posters. The office connected residents to programs—housing assistance, food benefits, the bureaucratic infrastructure of the safety net. The waiting room inside is visible: plastic chairs arranged along the walls, a reception window with numbered service tickets.`,
+Decorative wire spans the street overhead, the infrastructure for festival lighting that the International District Business Improvement Area maintained. The wire connects to buildings on both sides, creating a grid that supported paper lanterns during Lunar New Year and Moon Festival celebrations. The wire remains, though the lanterns are gone, a permanent framework awaiting decorations that may not come.`,
   x: 11,
-  y: 5,
+  y: 6,
   z: 0,
   // Environmental properties
   population: 0, // Empty (post-Event)

@@ -1,16 +1,15 @@
-// 3rd Ave S & S. Main St intersection
+// S. Main St - between 3rd and 4th Ave
 
 export const room = {
-  name: '3rd Ave S & S. Main St',
-  description: `Third Avenue and Main Street cross here at the foot of the King County Courthouse, a concrete ziggurat that rises five stories above the intersection, its brutalist facade designed to project the weight of civic authority. The courthouse processed the county's criminal and civil matters—arraignments and sentencings and divorces and restraining orders, the legal infrastructure that kept society's conflicts contained within paperwork and procedure. The doors are bronze and massive. The authority they projected has dissolved along with everything else.
+  name: 'S. Main St',
+  description: `Main Street passes through a canyon of government architecture here—the courthouse on one side, the King County Administration Building on the other, both structures built in the brutalist style that dominated civic construction in the 1960s. Concrete and right angles and minimal ornamentation, the aesthetic of institutions that wanted to project permanence and efficiency. The permanence remains. The institutions that occupied these buildings have gone wherever institutions go.
 
-JUSTICE CENTER reads the lettering carved above the entrance, flanked by relief sculptures depicting the scales of law—balanced, impartial, the whole artistic language of fairness rendered in stone. The scales were always aspirational. The aspiration has become archaeology.
+A bronze plaque is mounted at eye level on the administration building's facade, commemorating a county commissioner who served three terms and died in office. The plaque lists achievements that seemed significant at the time—infrastructure projects, budget reforms, the particular concerns of a particular era. The bronze has developed a green patina that fills the engraved letters, making them harder to read. The commissioner is remembered here, or would be, if anyone were reading.
 
-Parking meters line the curb in ranks, their mechanical faces showing TIME EXPIRED in faded red, their coin slots accepting nothing because there's nothing to accept. The meters were the front line of civic revenue collection, extracting quarters from citizens who wanted to park near the courthouse. The enforcement officers are gone. The meters remain at attention, collecting data from an experiment that has concluded. A few still have coins jammed in their slots, quarters that someone fed into the machine before the concept of paid parking became absurd.`,
+A bicycle rack stands on the sidewalk, one of those wave-shaped installations that accommodate a dozen bikes locked at various points along the curve. The rack is empty. Government workers used to bike to work here, locking their commuter hybrids and folding bikes before entering the building to process permits and forms. The biking has stopped. The permits are unprocessed. The rack holds nothing, its curves an invitation that will not be accepted.`,
   x: 9,
   y: 0,
   z: 0,
-  intersection: ['3rd Ave S', 'S. Main St'],
   // Environmental properties
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned

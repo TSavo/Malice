@@ -1,14 +1,14 @@
-// S. Jackson St - east of 3rd Ave
+// S. Jackson St - between 3rd and 4th Ave
 
 export const room = {
   name: 'S. Jackson St',
-  description: `S. Jackson enters the heart of the International District here, the streetscape expressing the neighborhood's Asian-American character even in ruin. The signage is multilingual—Chinese characters predominant, Vietnamese, Japanese, English—all faded, all marking businesses that served communities now scattered or dead. The decorative elements that Asian business districts favor remain: red-painted trim oxidized to rust, ornamental tile work cracked but intact.
+  description: `A Vietnamese grocery occupies the corner building, its produce bins empty and rusted under a tattered awning. The storefront displays the visual vocabulary of Vietnamese retail frozen in abandonment: the store name painted in Vietnamese script with English translation below, both faded but legible. Through the grimy window: narrow aisles still packed with inventory—the dried goods that outlasted everything perishable, organizational logic preserving products no one will buy.
 
-HARBOR CITY RESTAURANT occupies the corner building, its windows dark, its kitchen cold. The dim sum establishment served the Cantonese tradition of small plates and tea service. Through the grimy glass: round tables with built-in lazy susans arranged for service that ended fifty-five years ago, the kitchen window where carts emerged loaded with steamer baskets now framing only darkness. The red and gold color scheme is faded to pink and brown. The multi-generational meals ended. The generations scattered.
+The interior layout follows the pattern common to immigrant groceries: where fresh produce stood near the entrance, only empty bins remain. Dry goods on ceiling-high shelving have outlasted their expiration by decades. The refrigerated cases along the back wall are dark and warm, whatever perishables they held long since rotted to nothing. A small altar occupies a high shelf near the register—a statue of Quan Am, the bodhisattva of compassion, still watching over a business that will never reopen. The incense holder is empty. No offerings for fifty-five years.
 
-The wire infrastructure for festival lighting spans the street here, the permanent mounting points holding nothing now. The wire connects buildings on both sides, the grid that supported paper lanterns during Lunar New Year. No lanterns. No celebrations. The festivals are fifty-five years past.`,
+The buildings along this stretch are uniformly two-story, the scale preserved even as the community that built them scattered. The facades show accumulated modifications of decades, then accumulated decay of decades more.`,
   x: 10,
-  y: -5,
+  y: -6,
   z: 0,
   // Environmental properties
   population: 0, // Empty (post-Event)

@@ -13,8 +13,8 @@ export const building = {
       description: `A high-floor landing with polished floors and soft lighting. Wall panels display: EXECUTIVE AMENITIES - FLOOR 35. Direction signs point to the fitness center, lounge, and meeting rooms. Everything is clean, modern, unmanned.
 
 The space echoes with emptiness. The air circulation hums steadily. Waiting for executives who haven't arrived.`,
-      x: -4,
-      y: 8,
+      x: -12,
+      y: 10,
       z: 35,
       population: 0,
       ambientNoise: 4,
@@ -81,8 +81,8 @@ The space echoes with emptiness. The air circulation hums steadily. Waiting for 
       description: `A spacious lounge with floor-to-ceiling windows overlooking the grey city. Modern seating arranged in conversational clusters - clean lines, minimalist design. A beverage station stands ready but unstocked, its display reading: INVENTORY PENDING.
 
 No one sits in the chairs. The lighting is warm but the space feels cold. A showroom waiting for occupants.`,
-      x: -4,
-      y: 9,
+      x: -12,
+      y: 11,
       z: 35,
       population: 0,
       ambientNoise: 3,
@@ -108,8 +108,8 @@ No one sits in the chairs. The lighting is warm but the space feels cold. A show
       description: `A quiet reading space with built-in shelving - empty except for a few sample books wrapped in plastic. Study carrels with integrated terminals line one wall. A sign reads: DIGITAL ARCHIVE ACCESS - CONFIGURATION PENDING.
 
 The lighting is soft, conducive to reading. The air is silent. No one studies here.`,
-      x: -5,
-      y: 9,
+      x: -13,
+      y: 11,
       z: 35,
       population: 0,
       ambientNoise: 1,
@@ -138,8 +138,8 @@ The lighting is soft, conducive to reading. The air is silent. No one studies he
       description: `A gym space with modern equipment still wrapped in protective plastic. Treadmills, resistance machines, free weight racks - all new, all unused. Mirrored walls reflect empty space. A terminal displays: FITNESS CENTER - EQUIPMENT CALIBRATION REQUIRED.
 
 The air smells of new rubber and cleaning solution. The floor is pristine. No one works out here.`,
-      x: -4,
-      y: 7,
+      x: -12,
+      y: 9,
       z: 35,
       population: 0,
       ambientNoise: 2,
@@ -157,8 +157,8 @@ The air smells of new rubber and cleaning solution. The floor is pristine. No on
       description: `An empty studio with polished wood floors and one mirrored wall. Rolled exercise mats stacked in the corner, still in packaging. A sound system bracket on the wall - no equipment installed. The lighting is adjustable, currently set to soft daylight simulation.
 
 The space echoes. Everything ready, nothing used.`,
-      x: -5,
-      y: 7,
+      x: -13,
+      y: 9,
       z: 35,
       population: 0,
       ambientNoise: 1,
@@ -179,8 +179,8 @@ The space echoes. Everything ready, nothing used.`,
       description: `A glass-walled meeting room with a long table and modern chairs. Wall-mounted displays show: ROOM AVAILABLE - NO RESERVATIONS. Presentation equipment installed but idle. The table surface is spotless.
 
 The room has never been used. The chairs have never been sat in. Waiting for meetings that haven't been scheduled.`,
-      x: -3,
-      y: 8,
+      x: -11,
+      y: 10,
       z: 35,
       population: 0,
       ambientNoise: 2,
@@ -206,8 +206,8 @@ The room has never been used. The chairs have never been sat in. Waiting for mee
       description: `A smaller meeting space with a round table and six chairs. A wall screen displays collaboration software in demo mode. The table has integrated power and data ports - all functional, none used.
 
 Clean, modern, empty. A space for decisions that haven't been made.`,
-      x: -3,
-      y: 9,
+      x: -11,
+      y: 11,
       z: 35,
       population: 0,
       ambientNoise: 2,
@@ -233,8 +233,8 @@ Clean, modern, empty. A space for decisions that haven't been made.`,
       description: `A small executive office with a desk, chair, and credenza. Windows offer city views. The desk surface is bare except for a terminal displaying: WORKSPACE AVAILABLE - UNASSIGNED. The chair is new, never sat in.
 
 A space for an executive who hasn't been hired.`,
-      x: -2,
-      y: 9,
+      x: -10,
+      y: 11,
       z: 35,
       population: 0,
       ambientNoise: 1,
@@ -263,8 +263,8 @@ A space for an executive who hasn't been hired.`,
       description: `A wraparound terrace behind floor-to-ceiling windows. Views of grey Seattle stretch in all directions. Built-in seating runs along the windows. The floor is polished concrete. The lighting is natural, filtered through the windows.
 
 A peaceful space. Entirely empty. The city visible but distant below.`,
-      x: -5,
-      y: 8,
+      x: -13,
+      y: 10,
       z: 35,
       population: 0,
       ambientNoise: 2,
@@ -290,8 +290,8 @@ A peaceful space. Entirely empty. The city visible but distant below.`,
       description: `The southern section of the observation terrace. Windows show the industrial waterfront and distant hills. The view is grey, muted, real. A small plant - artificial - sits in a corner planter.
 
 Quiet. Empty. Waiting.`,
-      x: -5,
-      y: 7,
+      x: -13,
+      y: 9,
       z: 35,
       population: 0,
       ambientNoise: 2,

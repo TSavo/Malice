@@ -1,15 +1,16 @@
-// S. Jackson St - between 1st Ave and Occidental
+// Occidental Ave S & S. Jackson St intersection
 
 export const room = {
-  name: 'S. Jackson St',
-  description: `A Buddhist temple occupies the second and third floors of a narrow building, its presence marked by a steep stairway entrance and a sign in Chinese characters: SEATTLE BUDDHIST TEMPLE, according to smaller English text. The building dates to the 1920s, when the community established religious institutions that immigrant populations require—places for worship, for maintaining traditions across generations and oceans. The traditions crossed oceans only to end here, in a temple with no congregation. The incense that once burned has long since turned to ash.
+  name: 'Occidental Ave S & S. Jackson St',
+  description: `Occidental Avenue intersects S. Jackson Street at the southern terminus of the pedestrian mall, cobblestones cracked and heaved ending where vehicular traffic once resumed. The maple trees that line Occidental's pedestrian stretch are visible to the north, overgrown and wild, their branches forming a canopy over emptiness.
 
-HAPPY LEMON occupies the ground floor, its neon accents dark, its Instagram-friendly design dusty and abandoned. The bubble tea shop served the drink craze that swept from Taiwan through Asian-American communities. The menu board behind the counter lists permutations no one will order: milk tea, fruit tea, tapioca pearls and jellies. The white walls are grey now with neglect. The tea was never made. The happiness was marketed, not delivered.
+King Street Station rises to the south, its clock tower—modeled on the campanile in Venice's Piazza San Marco—visible above surrounding buildings. The station served Amtrak and Sounder commuter rail, the transit hub where regional and national networks connected. The tower's four clock faces are stopped at different times, massive hands frozen when the power failed. No trains. No commuters. The Venetian campanile it emulated survived centuries. This one may outlast the memory of Venice itself.
 
-The buildings along this stretch maintain the mixed-use pattern that characterized the International District: ground-floor retail dark and empty, upper floors housing apartments whose residents are fifty-five years gone. The organizations that immigrant neighborhoods sustained have no immigrants to organize.`,
+PIKE PLACE FLOWERS occupied the corner building, its refrigerated display cases dark and empty. The florist served foot traffic that no longer exists—commuters grabbing bouquets for home, weddings and funerals generating event trade. The flowers are long dead. The coolers that extended cut flower life hold nothing. The weddings ended. The funerals, eventually, ended too.`,
   x: -7,
-  y: -5,
+  y: -6,
   z: 0,
+  intersection: ['Occidental Ave S', 'S. Jackson St'],
   // Environmental properties
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned

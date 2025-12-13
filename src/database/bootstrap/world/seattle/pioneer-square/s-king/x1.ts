@@ -1,14 +1,14 @@
-// S. King St - between Occidental and 2nd Ave
+// S. King St - east of 2nd Ave
 
 export const room = {
   name: 'S. King St',
-  description: `The stadiums rise to the south, their scale still dominating the view. T-Mobile Park's retractable roof and Lumen Field's distinctive cantilevers establish the visual identity of what was Seattle's stadium district—architecture designed to assert major league status. The structures were designed to be seen. They are still seen. They are not used.
+  description: `The Corp Construction zone looms to the north, its black fabric barriers and security drones marking the southern edge of whatever the corporation is building. The site doesn't extend to S. King Street, but the perimeter is close enough to feel—the hum of machinery, the occasional flash of welding behind the barriers. New construction in a dead city. The contrast is jarring.
 
-RALLY HOUSE occupies a retail space at this corner, its windows still displaying merchandise that sports fandom once generated: Mariners green and navy faded by sun, Seahawks blue and green dusty behind glass. The inventory arranged by team and sport commemorates allegiances that no longer matter. The teams are gone. The fans are scattered. The merchandise waits to be purchased by no one.
+A surface parking lot occupies most of this block, the asphalt cracked and heaved by fifty-five years of freeze-thaw cycles. The painted lines have faded to ghosts, barely visible, organizing spaces for vehicles that will never return. Rate signage near the entrance lists event-day pricing—premium rates for games that ended half a century ago. The sign is weathered, the numbers still legible, the prices absurdly low by any modern standard.
 
-The security infrastructure of the stadium complex is visible from here: fencing defining venue perimeters, turnstile arrays at entrance gates rusted shut, camera housings pointing at nothing. The surveillance evolved after 9/11. It didn't evolve for what came after the war.`,
+The buildings along the block's edges are single-story commercial shells—a tire shop with its bay doors rusted shut, a storage facility with units that haven't been opened since the war. The low-density construction survived better than the towers, less to fall, less to burn. The stadium district's edges, where event-day infrastructure meets the ordinary decay of urban periphery.`,
   x: 1,
-  y: -10,
+  y: -12,
   z: 0,
   // Environmental properties
   population: 0, // Empty (post-Event)

@@ -1,14 +1,14 @@
-// S. Jackson St - between Occidental and 2nd Ave
+// S. Jackson St - east of 2nd Ave
 
 export const room = {
   name: 'S. Jackson St',
-  description: `A parking structure rises on the south side of the street, multiple levels of poured concrete built to accommodate event-day demand. The structure is massive—helical ramps climbing through darkness, open sides no longer ventilating anything. The capacity suggested the crowds that baseball and football generated: tens of thousands of people requiring parking. The parking spaces are empty. A few vehicles remain scattered through the levels, abandoned when their owners fled or died, tires flat, batteries long dead.
+  description: `The Corp Construction perimeter begins here, the black fabric barriers extending south along the block—new and maintained, in stark contrast to the surrounding decay. The construction zone occupies what was once surface parking and several older buildings, the assembly of parcels that major development requires. The barriers are industrial but fresh: chain-link fence panels wrapped in opaque fabric, security drones humming at intervals along the perimeter.
 
-Rate signs near the entrance list event pricing and monthly permits—the economics that made it work before economics stopped working. The upper levels still offer views across the stadium district and toward Elliott Bay, the panorama that Seattle's topography provides to no one who climbs to see it.
+Warning signs are mounted at regular intervals: CORP CONSTRUCTION • AUTHORIZED PERSONNEL ONLY • HARD HAT AREA. The signage is crisp, corporate standard, the same templates used at Corp development sites worldwide. Security cameras watch the perimeter with the alertness that suggests active monitoring. Something is being built here, in a dead city. The machinery hum and occasional worker voices are jarring against the silence.
 
-The buildings across the street are older, two- and three-story structures that predate the stadium era. A print shop occupies one ground floor, STADIUM GRAPHICS according to faded window signage. The business served the sports industry's constant need for promotional materials—banners, signs, the printed matter that marketing departments consumed. No more sports. No more industry. No more promotional materials needed.`,
+The street continues along the fence line, the sidewalk maintained within Corp's perimeter, returning to decay beyond. The buildings on the north side predate the Corp development—a two-story commercial building housing a Vietnamese restaurant on the ground floor, dark and abandoned. The building's facade is painted faded yellow, the color scheme of the International District's older structures, preserved in neglect while Corp builds something new next door.`,
   x: 1,
-  y: -5,
+  y: -6,
   z: 0,
   // Environmental properties
   population: 0, // Empty (post-Event)

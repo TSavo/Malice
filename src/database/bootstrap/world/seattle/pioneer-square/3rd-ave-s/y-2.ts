@@ -2,14 +2,14 @@
 
 export const room = {
   name: '3rd Ave S',
-  description: `The International District asserts itself more strongly here. Signs in Chinese and Vietnamese and Korean compete for attention on storefronts built for immigrant entrepreneurs who came to America seeking opportunity. The opportunity has changed shape. The signs remain.
+  description: `South of Main, Third Avenue enters the transition zone between Pioneer Square and the International District. The architecture shifts, the massive courthouse giving way to smaller buildings with more varied facades. The Corp Construction zone is behind now, its mysteries contained to the north.
 
-A travel agency window displays posters of destinations that might as well be other planets. Vietnam. China. Thailand. The beaches and temples and city skylines of places that exist somewhere across oceans that no one crosses anymore.
+A bail bonds office occupies the corner, its neon sign still glowing fitfully—someone's solar setup keeping the promise of freedom alive. "24 HOUR SERVICE" the sign claims. The service has been suspended. The sign keeps advertising.
 
-A money transfer service occupies the corner, its wire transfer rates still posted in the window. The wires are down. The rates are academic. The money that flowed through here to support families overseas has stopped flowing.
+Across the avenue, a law office displays its shingle: immigration services, family law, personal injury. The lawyers served the community. The community has dispersed. The shingle swings in the wind, creaking on its chains.
 
-The avenue continues south toward Jackson Street, where the district's heart beats—or used to beat.`,
-  x: 9,
+A bus shelter offers minimal protection from elements that don't care about shelters. The schedule inside shows routes to places that exist only in memory.`,
+  x: 7,
   y: -2,
   z: 0,
   // Environmental properties

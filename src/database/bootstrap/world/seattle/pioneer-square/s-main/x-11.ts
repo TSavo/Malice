@@ -1,12 +1,12 @@
-// S. Main St - between Waterfront and 1st Ave
+// S. Main St - between 1st Ave and Occidental
 
 export const room = {
   name: 'S. Main St',
-  description: `The brick-and-stone canyon deepens here, buildings rising four and five stories on both sides of Main Street, their facades heavy with the ornamental vocabulary of the 1890s—corbelled cornices, arched windows, cast-iron columns supporting weight that was meant to be permanent. This is post-fire Seattle, the city that rebuilt itself in masonry after the wooden one burned. They built to last. They got their wish, sort of.
+  description: `The asphalt has failed here in patches, revealing the cobblestones beneath—the original street surface from the 1890s, granite blocks that were meant to be permanent but ended up buried under progress. The cobblestones push through where the asphalt is weakest, geological layers in an archaeological site that nobody is excavating. Seattle paved over its history. The history keeps coming back.
 
-THE ARCTIC BUILDING rises on the south side, its terra cotta facade decorated with twenty-seven walrus heads—actual sculptural walruses, tusks and all, jutting from the sixth floor. The building was headquarters for an Alaska mining company in 1917, the walruses a statement of arctic ambitions. The tusks were ivory originally, stolen by vandals in the 1940s, replaced with epoxy replicas that have weathered to the same grey-white. The walruses stare down at Main Street with expressions that haven't changed in a century. The street has changed. The walruses don't seem to notice.
+GLOBE BOOKS fills a narrow building on the north side, three floors of used and antiquarian titles stacked floor to ceiling in that particular bookstore geometry that prioritizes density over accessibility. Through the window: shelves bent under the weight of accumulated reading, thousands of volumes arranged by logic known only to the owner. The owner locked up one morning and didn't return. The CLOSED sign in the window has faded from red to pink. Inside, first editions slowly appreciate in value and simultaneously deteriorate in condition, a race between economics and entropy.
 
-JOHN'S BARBER SHOP occupies a narrow storefront across the street, its pole dark and still, the red-white-blue spiral frozen. Through the window: three chairs facing a mirror, each chair positioned at the same angle, chrome arms and leather cushions and the mechanical pumps that raise and lower the seats. Hair clippings still cover the floor beneath the center chair, swept toward the wall but never collected. The last haircut ended mid-sentence. The conversation continues in the dust.`,
+A fire escape descends the building opposite, cast iron stairs zigzagging down the brick facade. Someone hung a planter from the lowest landing—a macrame holder cradling a pot that once held something green. The plant has died, desiccated to brown stems and crisp leaves, but it's still hanging there, still part of someone's vision for what urban living should look like. The vision has outlived the visionary.`,
   x: -11,
   y: 0,
   z: 0,

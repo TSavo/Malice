@@ -10,8 +10,8 @@ export const building = {
       description: `A modern elevator car with brushed steel panels and anti-slip flooring. The indicator displays crisp numbers as the car moves. The control panel glows with LED buttons, all functional. The doors close with hydraulic precision.
 
 The car is spotless, recently maintained. It smells faintly of cleaning solution and metal. The ride is smooth, quieter than expected.`,
-      x: -4,
-      y: 8,
+      x: -12,
+      y: 10,
       z: 0,
       exits: {
         out: '%5', // Back to Elevator Bank
@@ -120,8 +120,8 @@ The car is spotless, recently maintained. It smells faintly of cleaning solution
       description: `A minimalist reception counter of white composite material. Behind it, a wall-mounted display cycles through Continuum branding: THE UNBROKEN CHAIN. The desk surface is bare, no papers, no person. A terminal sits powered but idle, screen displaying: AUTOMATED RECEPTION - TOUCH TO BEGIN.
 
 The floor is polished concrete. The walls are matte white. Overhead, recessed lighting casts even illumination. Everything is clean, functional, empty.`,
-      x: -5,
-      y: 9,
+      x: -13,
+      y: 11,
       z: 0,
       population: 0,
       ambientNoise: 3,
@@ -141,8 +141,8 @@ The floor is polished concrete. The walls are matte white. Overhead, recessed li
 The space is almost entirely empty. No furniture, no plants, no decorations. Just clean lines and echoing silence. The HVAC hums steadily, moving fresh air through vents that were installed weeks ago, not decades.
 
 This is Continuum's flagship - ultra-modern, functional, depopulated. A showroom waiting for occupants who haven't arrived.`,
-      x: -4,
-      y: 9,
+      x: -12,
+      y: 11,
       z: 0,
       population: 0,
       ambientNoise: 5,
@@ -150,6 +150,7 @@ This is Continuum's flagship - ultra-modern, functional, depopulated. A showroom
       waterLevel: 0,
       outdoor: false,
       exits: {
+        north: { to: "yesler-way/x-12.ts", description: "Glass doors lead north to Yesler Way" },
         west: '%0',
         east: '%2',
         south: '%4',
@@ -162,8 +163,8 @@ This is Continuum's flagship - ultra-modern, functional, depopulated. A showroom
       description: `A sparse room with two automated banking terminals against the far wall. Each terminal displays: CONTINUUM BANKING - TOUCH TO ACCESS ACCOUNT. The screens glow pale blue in the otherwise empty space.
 
 No tellers, no counters, no waiting area. Just terminals and emptiness. The floor is sealed concrete, the walls bare white composite. The lighting is bright and clinical.`,
-      x: -3,
-      y: 9,
+      x: -11,
+      y: 11,
       z: 0,
       population: 0,
       ambientNoise: 4,
@@ -171,7 +172,6 @@ No tellers, no counters, no waiting area. Just terminals and emptiness. The floo
       waterLevel: 0,
       outdoor: false,
       exits: {
-        north: { to: "yesler-way/x-3.ts", description: "Glass doors lead north to Yesler Way" },
         west: '%1',
         east: '%3',
         south: '%6',
@@ -184,8 +184,8 @@ No tellers, no counters, no waiting area. Just terminals and emptiness. The floo
       description: `An empty conference room with glass walls on two sides. A single table stands in the center - white composite, no chairs. A wall-mounted display shows: ROOM AVAILABLE - NO RESERVATIONS.
 
 The windows are clean, offering a view of the grey city outside. The room echoes. Everything is new, nothing is used. The air smells faintly of fresh paint and plastic.`,
-      x: -2,
-      y: 9,
+      x: -10,
+      y: 11,
       z: 0,
       population: 0,
       ambientNoise: 2,
@@ -208,8 +208,8 @@ The windows are clean, offering a view of the grey city outside. The room echoes
       description: `A designated waiting space with no seating. The floor is polished concrete. A wall display shows account services information and BUCKS exchange rates. The numbers update in real-time, managed by AI.
 
 The space is clean, bare, echoing. Modern but hollow. Functional but unwelcoming.`,
-      x: -5,
-      y: 8,
+      x: -13,
+      y: 10,
       z: 0,
       population: 0,
       ambientNoise: 4,
@@ -217,7 +217,7 @@ The space is clean, bare, echoing. Modern but hollow. Functional but unwelcoming
       waterLevel: 0,
       outdoor: false,
       exits: {
-        west: { to: "1st-ave-s/y8.ts", description: "Heavy glass doors lead west to 1st Ave" },
+        west: { to: "1st-ave-s/y10.ts", description: "Glass doors lead west to 1st Ave S" },
         north: '%1',
         east: '%5',
         south: '%8',
@@ -244,8 +244,8 @@ Stay informed. Stay compliant.
       description: `A sleek corridor with modern elevator doors in brushed steel. Digital displays above each door show floor numbers and directional arrows. The elevators are new, maintained, functional.
 
 The floor is polished marble. The walls are white composite with Continuum branding at intervals. The lighting is bright and even. Everything works. A digital city announcement board glows on one wall, displaying official updates. Nobody's here.`,
-      x: -4,
-      y: 8,
+      x: -12,
+      y: 10,
       z: 0,
       population: 0,
       ambientNoise: 8,
@@ -307,8 +307,8 @@ The floor is polished marble. The walls are white composite with Continuum brand
       description: `A room with four automated transaction terminals arranged in a row. Each displays: CONTINUUM BANKING - DEPOSITS - WITHDRAWALS - TRANSFERS. The terminals glow softly in the empty space.
 
 No counters, no staff, no furniture. Just terminals and the hum of automated systems. The floor is sealed concrete. The ceiling has recessed lighting, bright and clinical. The air is temperature-controlled but sterile.`,
-      x: -3,
-      y: 8,
+      x: -11,
+      y: 10,
       z: 0,
       population: 0,
       ambientNoise: 6,
@@ -329,8 +329,8 @@ No counters, no staff, no furniture. Just terminals and the hum of automated sys
       description: `A clean corridor with matte white walls and sealed concrete floors. LED strips provide even lighting overhead. Doors lead to administrative spaces, each marked with minimalist signage.
 
 The hallway echoes. Every footstep sounds hollow in the empty space. The air circulation is precise, temperature-controlled. The building's systems hum faintly.`,
-      x: -2,
-      y: 8,
+      x: -10,
+      y: 10,
       z: 0,
       population: 0,
       ambientNoise: 4,
@@ -356,8 +356,8 @@ The hallway echoes. Every footstep sounds hollow in the empty space. The air cir
 No physical cash, no safety deposit boxes. Just data. The servers hum steadily. Cooling vents circulate cold air. A terminal displays: VAULT SYSTEMS OPERATIONAL - AUTOMATED BACKUP CYCLE ACTIVE.
 
 The lighting is harsh white. The floor is raised, hiding cable runs beneath. Everything is new, functional, unmanned.`,
-      x: -5,
-      y: 7,
+      x: -13,
+      y: 9,
       z: 0,
       population: 0,
       ambientNoise: 12,
@@ -376,8 +376,8 @@ The lighting is harsh white. The floor is raised, hiding cable runs beneath. Eve
       description: `A secure checkpoint with biometric scanners flanking the vault entrance. A terminal displays: VAULT ACCESS - AUTHORIZATION REQUIRED. The scanners glow with standby lights, ready but idle.
 
 The room is sparse - just the scanners, the terminal, and empty space. The floor is polished concrete. Overhead cameras watch, recording to systems in the vault beyond. No guards, no staff. Just automated security.`,
-      x: -4,
-      y: 7,
+      x: -12,
+      y: 9,
       z: 0,
       population: 0,
       ambientNoise: 8,
@@ -397,8 +397,8 @@ The room is sparse - just the scanners, the terminal, and empty space. The floor
       description: `A room with wall-mounted displays showing camera feeds from throughout the building. The monitors cycle through views automatically. A terminal reads: AUTOMATED SURVEILLANCE ACTIVE - NO OPERATOR REQUIRED.
 
 No security guards, no staff. Just screens and empty chairs that were never delivered. The AI watches everything, logs everything, responds to nothing. The room echoes with the hum of electronics.`,
-      x: -3,
-      y: 7,
+      x: -11,
+      y: 9,
       z: 0,
       population: 0,
       ambientNoise: 10,
@@ -419,8 +419,8 @@ No security guards, no staff. Just screens and empty chairs that were never deli
 A central terminal displays: CONTINUUM BANKING SYSTEMS - ALL NOMINAL - AUTOMATED OPERATION. No operators, no staff, no intervention needed. The systems run themselves.
 
 The room is clean, modern, hollow. The lighting is bright. The air is cool. The floor echoes.`,
-      x: -2,
-      y: 7,
+      x: -10,
+      y: 9,
       z: 0,
       population: 0,
       ambientNoise: 9,

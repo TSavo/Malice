@@ -9,7 +9,7 @@ A souvenir stand sits beneath the wheel's shadow, its windows smashed, its shelv
 The waterfront promenade is wide here, meant for crowds that no longer come. The concrete is stained with salt and oil and things that washed up and were never cleaned away.
 
 The ferry terminal is visible to the south. The wheel watches from above.`,
-  x: -15,
+  x: -21,
   y: 2,
   z: 0,
   // Environmental properties

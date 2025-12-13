@@ -1,14 +1,14 @@
-// S. Jackson St - between Waterfront and 1st Ave
+// S. Jackson St - east of 1st Ave
 
 export const room = {
   name: 'S. Jackson St',
-  description: `The BNSF Railway mainline crosses S. Jackson Street here, the tracks rusted orange from decades without trains, the rails that once connected port terminals to the transcontinental network. The crossing gates are locked in the upright position, their striped arms faded, signal lights dark. The concrete pad is cracked and heaved, weeds pushing through the joints.
+  description: `S. Jackson enters the International District proper here, the streetscape shifting from Pioneer Square's Victorian decay to the eclectic storefronts of Seattle's Chinatown, equally decayed. The buildings are older—early twentieth century construction adapted over decades to serve immigrant communities from China, Japan, Vietnam, the Philippines. The communities are scattered now, the adaptations frozen in place.
 
-The tracks themselves are heavy rail, the 136-pound continuous welded rail that modern freight operations required. The ballast has been colonized by vegetation, weeds and small trees growing between the rails, the railroad right-of-way becoming a corridor of accidental wilderness. No trains have passed here in fifty-five years. The vibration and noise that railroad-adjacent construction was designed to withstand has been replaced by silence.
+VIET WAH PRODUCE occupies the corner building, its windows grimy, its awning—green canvas printed with Vietnamese and English—tattered and faded. The display bins that held bok choy and bitter melon are empty and rusted. Through the window: stacked bags of jasmine rice collapsed and rotted, shelving lined with fish sauce and coconut milk bottles dusty and expired decades ago. The inventory of immigrant foodways, preserved like a museum exhibit no one visits.
 
-Buildings crowd up to the edge of the right-of-way on both sides, their walls still darkened by diesel soot from the days when trains ran. A warehouse on the south side shows its windows broken, its loading docks empty, the freight that once moved through here stopped moving when everything stopped.`,
+The building next door houses a cultural association, its second-floor windows displaying Chinese characters that identify the organization—a family name association, one of the tongs that provided mutual aid for early immigrants. The families are gone now, scattered or dead. The ground floor's souvenir shop catered to tourists who visited before tourism ended. The souvenirs wait behind dusty glass for tourists who will never come.`,
   x: -13,
-  y: -5,
+  y: -6,
   z: 0,
   // Environmental properties
   population: 0, // Empty (post-Event)

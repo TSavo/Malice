@@ -1,20 +1,18 @@
-// Waterfront & S. Jackson St intersection
+// S. Jackson St - between Waterfront and 1st Ave
 
 export const room = {
-  name: 'Alaskan Way & S. Jackson St',
-  description: `Alaskan Way intersects S. Jackson Street at the edge of what was Seattle's working waterfront. The container cranes of Terminal 46 rise to the south, their red-orange frames rusted to deep brown, frozen in whatever position they held when the operators abandoned them. The infrastructure of global trade that once moved goods between Pacific Rim ports and American distribution networks. The trade stopped. The infrastructure remains, monuments to a global economy that no longer exists.
+  name: 'S. Jackson St',
+  description: `Jackson Street climbs from the waterfront into Pioneer Square, the grade steeper here than on the parallel streets. The hill made this corridor less desirable for commerce in the early days, before the streets were graded and sidewalks installed. The grading helped, but the incline remains, a reminder that Seattle was built on hills that refused to flatten entirely.
 
-PACIFIC COAST SEAFOOD occupies the corner building, a processing facility built to handle salmon and halibut and Dungeness crab. The building is utilitarian—corrugated metal siding rusted through in places, loading docks sized for refrigerated trucks that will never arrive. The refrigeration units lining the rooftop are silent, their compressors seized, their condensers streaked with salt corrosion and fifty-five years of weather. Whatever was inside when the power failed is best not thought about.
+The sinkhole dominates the view to the south, its flooded crater visible between the buildings. The collapse took part of the street grid with it, isolating this stretch from the blocks below. The isolation has made the area quieter, traffic routing around rather than through.
 
-The waterfront promenade extends north from here, the pedestrian path cracked and overgrown with whatever vegetation survives Seattle's wet climate. To the east, S. Jackson Street climbs toward Pioneer Square's decay, the grade increasing as the street moves away from the filled tideflats.`,
+A rusted pickup truck sits at the curb, its tires flat, its bed filled with rainwater and debris. The truck has been here for decades, becoming part of the landscape, a landmark that no one chose but everyone recognizes.`,
   x: -15,
-  y: -5,
+  y: -6,
   z: 0,
-  intersection: ['Alaskan Way', 'S. Jackson St'],
-  // Environmental properties
-  population: 0, // Empty (post-Event)
-  ambientNoise: 0, // Quiet/abandoned
-  lighting: 100, // Daylight (outdoor)
-  waterLevel: 0, // Dry
-  outdoor: true, // Street level
+  population: 0,
+  ambientNoise: 0,
+  lighting: 100,
+  waterLevel: 0,
+  outdoor: true,
 };

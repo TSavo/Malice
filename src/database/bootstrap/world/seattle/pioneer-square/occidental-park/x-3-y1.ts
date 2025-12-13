@@ -1,12 +1,12 @@
-// Occidental Park - along what was once Occidental Avenue
+// Occidental Park - central-southern section
 
 export const room = {
   name: 'Occidental Park',
-  description: `An information kiosk stands at an angle here, knocked from its foundation by something—impact or earthquake or fifty-five years of Seattle wind. The glass panels are shattered, the maps inside faded to illegibility, the tourist information serving no tourists. "PIONEER SQUARE HISTORIC DISTRICT" reads the header, the text beneath it a blur of water damage and UV decay. The district is still historic. More historic now than ever.
+  description: `A metal hatch is set into the brick paving here, flush with the surface, marked with the symbol ⊕—the old Underground Seattle access point. The hatch is locked, its padlock rusted solid, but the frame shows marks where someone tried to pry it open. The Underground tours ended decades ago, but whatever lies beneath—the buried streets, the sealed storefronts, the original Seattle entombed when the city raised itself after the Great Fire—remains.
 
-This was the heart of the pedestrian mall when people still gathered here. The brick herringbone pattern underfoot is worn smooth in places where foot traffic concentrated—the paths people took without thinking, the desire lines made physical. Those paths lead nowhere now. The desire has gone elsewhere.
+The hatch is cold to the touch. Air moves through gaps in the seal, carrying the smell of damp earth and old brick, the exhalation of a buried city. The Underground extends beneath most of Pioneer Square, a parallel world preserved in darkness. Whatever lived down there when people stopped tending it... that's a different question.
 
-A dead maple stands nearby, its trunk hollow, its bark peeling in sheets. Birds nested in the hollow once. The nest is visible through a gap in the wood, abandoned like everything else.`,
+The brick plaza stretches away in all directions, sun-faded and cracked. But here at the hatch, you're standing on a threshold between worlds.`,
   x: -3,
   y: 1,
   z: 0,

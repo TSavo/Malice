@@ -1,14 +1,14 @@
-// S. King St - between 1st Ave and Occidental
+// S. King St - between Occidental and 2nd Ave
 
 export const room = {
   name: 'S. King St',
-  description: `Lumen Field rises to the south, the football stadium's distinctive roof structure visible above surrounding development. The Seahawks played here from 2002 until the war ended professional sports. The stadium was designed to amplify crowd noise through its partially enclosed bowl. The bowl is silent now. The acoustics amplify nothing but wind.
+  description: `Union Station is visible to the north, its Beaux-Arts facade complementing King Street Station's similar architecture a block away. The two stations served different railroads—Union for the Union Pacific, King Street for Great Northern—the competition of the railroad era expressed in parallel terminals. Union Station's grand hall was converted to office space in the 1990s. The offices are empty now, the conversion serving no purpose.
 
-SEAHAWKS PRO SHOP occupies a corner retail space, its windows still displaying inventory: Action Green and College Navy arranged on mannequins faded by decades of sun. The jerseys commemorate players no one remembers. The fan base that supported Pacific Northwest football scattered or died or forgot that football ever mattered.
+KING STREET DELI occupies a ground-floor space in the adjacent building, the kind of establishment that served commuter traffic. Through the grimy window: counter service, limited seating, the configuration designed for speed. No one is in a hurry here anymore. The deli counter is dark, whatever was inside it long since spoiled and desiccated.
 
-A bronze statue stands outside the shop, a player captured mid-motion, frozen in a pose that sports sculpture favors. The statue commemorates a franchise legend. The plaque on the base bears career statistics—touchdowns, yards, the numerical achievements that justified commemoration when numbers meant something. The statue watches an empty street, waiting for crowds that will never come.`,
+The buildings along this stretch show varied construction spanning eras—early twentieth-century commercial structures beside mid-century concrete. The railroad money that once flowed through this district stopped flowing. The buildings remain, monuments to industries that died before the war and industries that died with it.`,
   x: -5,
-  y: -10,
+  y: -12,
   z: 0,
   // Environmental properties
   population: 0, // Empty (post-Event)

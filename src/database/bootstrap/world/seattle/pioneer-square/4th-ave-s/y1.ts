@@ -9,7 +9,7 @@ A dumpling house sits on the corner, its hand-painted sign promising the best xi
 A community bulletin board stands on the sidewalk, still covered with flyers for events that never happened. ESL classes. Citizenship workshops. Lunar New Year celebrations. The paper has yellowed. The thumbtacks are rusting. The community has dispersed.
 
 A red mailbox stands at the curb, its collection times still posted. The mail stopped. The box remains, waiting for letters that will never come.`,
-  x: 15,
+  x: 14,
   y: 1,
   z: 0,
   // Environmental properties

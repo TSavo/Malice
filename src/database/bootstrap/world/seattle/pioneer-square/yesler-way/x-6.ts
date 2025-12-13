@@ -1,14 +1,14 @@
-// Yesler Way - between 1st Ave and Occidental
+// Yesler Way - east of Occidental
 
 export const room = {
   name: 'Yesler Way',
-  description: `A residential hotel occupies this corner, four stories of rooms that once provided affordable housing for urban workers. The building dates to the early twentieth century, solid brick construction that has endured when so much else hasn't. A neon sign on the facade still spells HOTEL, though the neon hasn't glowed in decades.
+  description: `Occidental Park extends to the south from this corner, a wasteland of cracked cobblestones and dead maple trees. The iron pergola is visible at the north end, listing to one side where rust has weakened its supports. The Victorian structure sheltered farmers markets and art fairs once. It shelters nothing now except pigeons and rain.
 
-Through the cracked glass entry doors: a modest lobby with a reception desk, the layout that single-room-occupancy hotels maintain. The buildings provided housing for workers who needed central locations—maritime workers, railroad men, the transient labor force that port cities attracted. The workers are gone. The transience has become permanent. The rooms above are dark, their occupants long departed through doors they never meant to leave open.
+VIA TRIBUNALI occupies the corner building, a pizzeria that was part of Pioneer Square's dining scene. Through the grimy window: the brick oven cold and dark, the marble counter cracked, the communal tables thick with dust. The evening crowds that filled this place are fifty-five years gone. The wood-fired smell of Neapolitan pizza is a memory no one alive remembers.
 
-Occidental Park is visible ahead, dead maple trees rising above the surrounding rooflines like grave markers. The park's pergola creates a crooked silhouette against grey sky.`,
+The Pioneer Building is visible ahead, six stories of red brick that have weathered better than most. Elmer Fisher designed it to last. It has.`,
   x: -6,
-  y: 10,
+  y: 12,
   z: 0,
   // Environmental properties
   population: 0, // Empty (post-Event)

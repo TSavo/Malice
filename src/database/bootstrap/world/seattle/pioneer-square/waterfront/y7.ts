@@ -2,14 +2,14 @@
 
 export const room = {
   name: 'Alaskan Way',
-  description: `An old steamship is moored here, or what's left of one. The Virginia V, a historic vessel that once carried passengers across Puget Sound. She's listing now, taking on water, her white paint gone grey and her brass fixtures green with verdigris. Someone tried to live aboard her for a while. The makeshift curtains in the portholes are the only color left.
+  description: `A parking lot occupies the block between the waterfront and Pioneer Square proper. It's empty now except for a few abandoned vehicles, their tires flat, their windows fogged with condensation or grime. A pay station stands in the center, still displaying rates by the hour. Time has become meaningless, but the machine doesn't know that.
 
-The pier she's tied to groans with each swell. The ropes are fraying. Eventually she'll sink or drift away or both. No one is coming to save her.
+The asphalt is cracked, weeds pushing through. Blackberry brambles have claimed the eastern edge, their thorns a natural barrier between the lot and the buildings beyond.
 
-A ticket booth stands on the waterfront, its window smashed, its cash drawer hanging open and empty. The schedule posted inside lists departures that will never happen to destinations that don't matter anymore.
+A seagull stands on a rusted shopping cart, watching. It has learned that humans sometimes mean food. It hasn't unlearned this yet.
 
-The city rises to the east. The water waits to the west.`,
-  x: -15,
+The water is close here, the sound of it lapping against the seawall a constant rhythm beneath the silence.`,
+  x: -21,
   y: 7,
   z: 0,
   // Environmental properties

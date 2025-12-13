@@ -2,13 +2,13 @@
 
 export const room = {
   name: 'S. Jackson St',
-  description: `The Wing Luke Museum of the Asian Pacific American Experience is visible down the block, the Smithsonian affiliate that documented Asian immigration to the Pacific Northwest. The museum occupied a historic hotel building, the structure itself part of the exhibit—preserved spaces showing how early immigrants lived. The spaces are still preserved, the exhibits still arranged. No one visits. The experience the museum documented has ended, replaced by a different experience no museum will chronicle.
+  description: `A karaoke bar occupies the basement level of one building, its entrance a narrow stairway descending into darkness. Neon signage above the stairs is dead: PRIVATE ROOMS • THOUSANDS OF SONGS • OPEN LATE. The private rooms below provided controlled environments where groups could sing without performance anxiety. The singing stopped fifty-five years ago. The songs remain, thousands of them on servers that haven't powered on since the war.
 
-The CHINATOWN-INTERNATIONAL DISTRICT COMMUNITY CENTER occupies this corner, the social services hub that neighborhood organizations shared. The center hosted language classes, citizenship preparation, senior programs—the programming that maintained community cohesion. The building's institutional design—1970s construction, federal community development grants—shows through the neglect. No classes. No programs. No community left to serve.
+The building's ground floor houses JADE PALACE JEWELERS, its security gate pulled down and locked. The shop specialized in jade and gold that Chinese communities traditionally valued. The inventory is probably still inside—jade bangles arranged by shade, gold chains and pendants, the 24-karat pieces that Asian buyers preferred. Looters took electronics and food. They left the traditional financial instruments of immigrant communities, the portable wealth that no longer means anything.
 
-A mural covers the windowless wall of the adjacent building, depicting the neighborhood's history. The imagery spans generations: Chinese laborers building railroads, Japanese farmers at Pike Place Market, the internment that emptied the neighborhood during World War II, the rebuilding that followed. The paint has faded and peeled. Another emptying came, worse than internment. No rebuilding has followed.`,
+The buildings along this block maintain the International District's characteristic density, narrow facades packed with signage in multiple languages—all faded, all dark. Fire escapes climb exterior walls, rusted to orange-brown, the iron platforms providing emergency egress from residential units whose residents are fifty-five years gone.`,
   x: 11,
-  y: -5,
+  y: -6,
   z: 0,
   // Environmental properties
   population: 0, // Empty (post-Event)

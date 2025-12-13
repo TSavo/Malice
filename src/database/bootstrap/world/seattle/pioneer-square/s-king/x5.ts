@@ -1,14 +1,14 @@
-// S. King St - between 2nd and 3rd Ave
+// S. King St - approaching 3rd Ave
 
 export const room = {
   name: 'S. King St',
-  description: `The International District's character asserts itself here, even in ruin. The signage shifts to Vietnamese and Chinese characters, faded and weather-beaten but still legible, the storefronts showing the densely-packed arrangement that immigrant retail neighborhoods maintained. The community that built this place is scattered now—those who survived the war dispersed to wherever survivors went.
+  description: `Third Avenue approaches from the east, the intersection ahead marking what was once the center of the International District's commercial strip. The neighborhood's density shows in the buildings packed close together, the multilingual signage faded but still marking the district's Asian character. The density that once meant vibrancy now means concentrated emptiness.
 
-PHO 88 occupies the corner building, its windows dark, its kitchen cold. Through the grimy glass: tables for four still arranged for service, condiment trays dried and crusted with whatever was in them fifty-five years ago. The pass-through window to the kitchen frames stainless steel equipment rusted brown. The lucky number in the name brought no luck when the war came.
+GOLDEN GATE BAKERY occupies a ground-floor space, its display cases empty and dark. The Chinese bakery specialized in pastries that dim sum restaurants served and families purchased for special occasions. The window display shows only dust now—no pineapple buns, no egg tarts, no barbecue pork buns. The glass shelving that showcased the day's production holds nothing. The ovens in back are cold. The last day's production was fifty-five years ago.
 
-A golden Buddha statue sits in the restaurant's front window, dust-covered but intact, still maintaining its vigil over a business that will never reopen. The iconography of prosperity and protection, watching over nothing. The buildings along this block are uniformly two-story, their scale preserving the neighborhood's historic character even as the neighborhood itself died.`,
+A wedding photo studio occupies the second floor, HAPPY DAY PHOTOGRAPHY according to faded window signage. The studio specialized in the elaborate portrait sessions that Asian weddings traditionally include. Sample portraits still hang in the window—couples in elaborate gowns and suits, posed against backgrounds that promised prosperity. The photos have faded in the sun, the happy couples reduced to ghosts. The marriages they celebrated are over now, one way or another.`,
   x: 5,
-  y: -10,
+  y: -12,
   z: 0,
   // Environmental properties
   population: 0, // Empty (post-Event)

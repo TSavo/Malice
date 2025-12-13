@@ -1,14 +1,14 @@
-// S. Washington St - between 3rd and 4th Ave
+// S. Washington St - nearly to 4th Ave
 
 export const room = {
   name: 'S. Washington St',
-  description: `A parking structure dominates the block, five levels of poured concrete rising above the streetscape. The design is pure function—helical ramps, open sides for ventilation, the minimum structure required to stack automobiles. The beige paint that once softened the brutalist aesthetic has weathered to grey, stained darker where water runs down the facade during Seattle's frequent rains.
+  description: `The formal boundary between Pioneer Square and the International District lies somewhere along this block, though the transition has been gradual enough that the line feels arbitrary. City planning documents specify 4th Avenue as the demarcation, but the International District's influence extends westward, its signage and storefronts bleeding into Pioneer Square's historic district.
 
-The garage served the workers and visitors who filled this transitional zone between Pioneer Square and the International District. The rate sign near the entrance lists prices in the incremental structure that parking garages favored: first hour, additional hours, daily maximum. The structure's open sides reveal the interior—ramps spiraling upward, fluorescent fixtures mounted to concrete ceilings, the painted lines that organized space into monetizable rectangles.
+PHOENIX TEA occupies a ground-floor space, its window displaying the implements of gongfu tea ceremony—yixing clay pots, porcelain cups without handles, the wooden tea trays with drainage systems. The shop served both practitioners who understood the ritual and curious visitors who wanted to learn. The interior is arranged for demonstration: a long table where the owner conducted tastings, shelving lined with canisters of loose-leaf varieties, the aesthetic minimalism that tea culture requires.
 
-The storefronts across the street reflect the International District's retail character: import shops with signage in Chinese and English, herbalists with window displays of dried goods in glass jars, the specialty stores that served both the local community and tourists seeking authenticity. GREEN LEAF HERBS occupies the corner, its window lined with the ceramic containers and wooden drawers of traditional Chinese medicine.`,
+The CHINESE COMMUNITY CENTER anchors the opposite corner, a two-story building that housed language classes, cultural programs, and the social services that immigrant communities need. The center was built in the 1970s, its architecture reflecting the era—flat roof, minimal ornamentation, the institutional aesthetic of nonprofit budgets. A glass-fronted bulletin board beside the entrance once held community announcements, its cork backing still visible behind clouded glass.`,
   x: 12,
-  y: 5,
+  y: 6,
   z: 0,
   // Environmental properties
   population: 0, // Empty (post-Event)

@@ -1,21 +1,18 @@
-// 4th Ave S - between S. Main St and S. Jackson St
+// 4th Ave S - between S. Jackson and S. Main
 
 export const room = {
   name: '4th Ave S',
-  description: `A Buddhist temple occupies a converted storefront here, its modest facade giving no hint of the sanctuary within. Through the window, a golden Buddha statue is visible, still seated in meditation, still radiating calm into an empty room. Incense ash covers the altar. The offerings of oranges have mummified.
+  description: `Fourth Avenue runs straight as a surveyor's line through this block, the geometry of the original plat visible in the regular lot lines and uniform setbacks. The Denny Party laid out Seattle's streets in 1853, imposing order on wilderness. The order survived the wilderness's return.
 
-Next door, a Vietnamese sandwich shop displays its menu board, the bánh mì combinations still listed with their prices. The bread went stale months ago. The pickled vegetables fermented past edibility. The menu remains, a catalog of lunches that will never be eaten.
+The International District's heart lies to the east—the core blocks of Chinatown, the Japanese community that was here before the internment and diminished after, the Vietnamese who arrived in the 1970s. The neighborhoods layer like geological strata, each wave leaving its mark. The marks remain visible even without the people.
 
-A newspaper box stands on the corner, still holding copies of the International Examiner, the community paper that served the district for decades. The headline announces something that mattered then. The paper is free now. No one takes it.
-
-Jackson Street is visible to the south, the heart of the district.`,
-  x: 15,
+A dragon lamp post stands at the corner, one of a series installed in the 1970s to mark Chinatown's boundaries. The lamp is dark now, has been dark for decades, but the dragon still coils around the post, bronze scales catching whatever light the sky provides.`,
+  x: 14,
   y: -4,
   z: 0,
-  // Environmental properties
-  population: 0, // Empty (post-Event)
-  ambientNoise: 0, // Quiet/abandoned
-  lighting: 100, // Daylight (outdoor)
-  waterLevel: 0, // Dry
-  outdoor: true, // Street level
+  population: 0,
+  ambientNoise: 0,
+  lighting: 100,
+  waterLevel: 0,
+  outdoor: true,
 };

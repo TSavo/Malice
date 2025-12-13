@@ -2,12 +2,12 @@
 
 export const room = {
   name: '2nd Ave S',
-  description: `A pocket plaza opens on the east side of Second Avenue, one of those urban design gestures that cities make when developers trade floor area for public space. The plaza is maybe thirty feet deep—concrete pavers, two zelkova trees planted in grates, metal benches bolted to the ground, the whole vocabulary of activated ground-floor space rendered in materials that resist skateboarding and sleeping.
+  description: `S. Main Street opens ahead, and with it the northern edge of the Corp Construction zone. The black barrier ends at the intersection, yielding to buildings that predate the project—Pioneer Square's original warehouses and commercial blocks, brick and stone that survived the fire and the rebuild and every development wave since. The contrast is stark: preserved history on one side, hidden present on the other, and somewhere in the gap between them, an explanation that nobody ever provided.
 
-The Corp fence forms the plaza's west edge, transforming what should have been a pass-through into a cul-de-sac. Before the construction, this might have been a pleasant shortcut, a sunny corner where office workers ate lunch. The fence threw it into permanent shadow. The zelkovas responded by dying slowly from the crown down, their upper branches skeletal, their lower branches still producing leaves that don't know any better.
+WASHINGTON FEDERAL stands at the corner, a neoclassical bank building with marble columns and bronze doors and the architectural language of trustworthiness—cornices and pediments and Latin words carved into stone. The bank wanted you to believe your money was safe behind all that marble. The money is presumably still there, locked in a vault that runs on time locks and redundant security, inaccessible to everyone including the people who deposited it. Wealth measured in numbers that exist only as magnetic patterns on servers that may or may not still function.
 
-WALTER PIERCE MEMORIAL PLAZA reads a bronze plaque set into the pavers. Walter Pierce, whoever he was, donated money or land or political leverage to get this square named after him. The plaque lists his birth year and death year and the words "CIVIC LEADER," which covers a lot of ground. His memorial plaza has become a dead end against a fence hiding something he never knew about. Legacies are funny that way.`,
-  x: 3,
+A clock is set into the bank's facade, analog hands frozen at 2:47. The clock ran on a different kind of mechanism—springs and gears and the steady tick of mainspring unwinding—and when it stopped, it stopped honestly, preserving the moment rather than blinking error codes. 2:47 PM or AM, on some day that seemed ordinary when it was happening. The day when the world was still the world and banks were still banks and clocks still told time that mattered.`,
+  x: 0,
   y: -2,
   z: 0,
   // Environmental properties

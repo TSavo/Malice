@@ -12,7 +12,7 @@ The western buildings show their service sides—metal doors with peeling paint,
 Water has pooled in a depression in the pavement, dark and still. The pool hasn't dried since the last rain, suggesting something seeps up from below or condenses perpetually in this shadowed space.
 
 The avenue continues north and south between the buildings.`,
-  x: -9,
+  x: -14,
   y: 2,
   z: 0,
   // Environmental properties

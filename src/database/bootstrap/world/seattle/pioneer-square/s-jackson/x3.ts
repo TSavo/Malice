@@ -1,16 +1,15 @@
-// 2nd Ave S & S. Jackson St intersection
+// S. Jackson St - between 2nd and 3rd Ave
 
 export const room = {
-  name: '2nd Ave S & S. Jackson St',
-  description: `Second Avenue intersects S. Jackson Street at the primary pedestrian approach to the stadium district. The intersection is wide, designed for thousands of fans who crossed here on game days. The crosswalks are painted in Seahawks blue and green on one side, Mariners navy and teal on the other—team colors faded but still visible, brand identity built into infrastructure for brands that no longer exist.
+  name: 'S. Jackson St',
+  description: `The Corp Construction perimeter continues unbroken here, black fabric barriers maintained and crisp against the decay opposite. Whatever rises within remains invisible from street level—the tower cranes suggesting something substantial, their movement a jarring contrast to the stillness everywhere else. Corporate mystery in a city with no one left to wonder.
 
-The Stadium Station entrance occupies the northeast corner, the Sound Transit light rail stop that connected the stadiums to Sea-Tac Airport. The glass-and-steel canopy shelters escalators frozen mid-step, descending to platforms that haven't seen a train in fifty-five years. The station was designed for capacity—wide escalators, multiple fare gates—the infrastructure that handled tens of thousands of passengers handling nothing now.
+SUPER CLEAN LAUNDROMAT occupies a ground-floor space opposite, its plate glass window intact but grimy. Through the glass: rows of front-loading washers and stackable dryers standing silent, the industrial equipment that coin-operated laundries required. The machines are dead, their coin slots accepting currency that no longer exists. A counter in back suggests wash-and-fold service no one needs—nothing left to wash, no one to fold it for.
 
-The buildings at this intersection are newer construction, built during the stadium-era development boom. Glass and steel facades weathered and dirty, ground-floor retail dark behind locked gates. The corners once hosted mobile vendors on game days—food carts and merchandise sellers claiming spots with unwritten agreements. The carts are gone. The agreements forgotten. The territory they claimed means nothing.`,
+The buildings along this stretch maintain the International District's characteristic scale—two and three stories, ground-floor commercial with residential above, all equally empty. The facades show accumulated adaptations of buildings repurposed over decades, then abandoned. The mix of old structure and new function that characterized urban neighborhoods, frozen when function ended.`,
   x: 3,
-  y: -5,
+  y: -6,
   z: 0,
-  intersection: ['2nd Ave S', 'S. Jackson St'],
   // Environmental properties
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned

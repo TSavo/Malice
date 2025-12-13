@@ -2,14 +2,14 @@
 
 export const room = {
   name: '4th Ave S',
-  description: `A parking garage rises on the Pioneer Square side of the avenue, its concrete ramps spiraling upward into darkness. Cars are still parked inside, visible through the open walls of the structure. Their owners never came back for them. The daily rate continues to accumulate on tickets that no one will ever pay.
+  description: `The edge of the Collapsed Building is visible to the west, a mountain of debris that used to be an office tower. From this angle you can see into the exposed floors, the desks and chairs and filing cabinets all tumbled together like a child's dollhouse kicked over in anger.
 
-Across the avenue, a Vietnamese restaurant occupies the corner, its pho sign still lit by solar panels on the roof. The broth pots are cold. The herbs in the window boxes have gone to seed. Someone left a tip on the counter, coins scattered next to an empty bowl.
+A dim sum restaurant sits across the avenue, its bamboo steamers still stacked in the window. The dumplings inside became biology experiments long ago. The steamers remain, towers of woven bamboo waiting for a kitchen that will never reopen.
 
-The elevated light rail tracks cast shadows across the street, geometric patterns that shift with the sun. The trains don't run. The shadows still move.
+A bus shelter stands at the curb, its schedule still posted behind scratched plexiglass. Route 7, running every fifteen minutes to Rainier Beach. The route hasn't run in months. The schedule hasn't been updated. Someone scratched "LIES" into the plexiglass over the times.
 
-Pigeons roost in the parking structure, their cooing echoing down the concrete ramps.`,
-  x: 15,
+The light rail tracks overhead are silent, their catenary wires slack and swaying.`,
+  x: 14,
   y: 8,
   z: 0,
   // Environmental properties

@@ -2,14 +2,14 @@
 
 export const room = {
   name: '4th Ave S',
-  description: `A bank building anchors the corner, one of those institutions that served the immigrant community when mainstream banks wouldn't. Remittances to Vietnam, to China, to the Philippines—money flowing back to families who depended on it. The money stopped flowing. The families stopped receiving. The building remains, its vault full of currency that measures nothing.
+  description: `A martial arts studio occupies the second floor of a building here, its windows still displaying faded posters of Bruce Lee and Jackie Chan. The training dummies inside are visible through the glass, wooden arms extended, waiting for students who will never return to practice their forms.
 
-Across the street, a karaoke bar sits dark and silent. The neon signs that once blazed with Chinese characters are dead, their tubes filled with inert gas that no longer glows. The song books inside are still arranged on tables, waiting for voices that will never sing.
+Below the studio, a noodle shop advertises hand-pulled noodles in both Chinese and English. The flour is probably still good. The technique died with the person who knew it. Some things cannot be preserved in jars or freezers.
 
-A pay phone stands on the corner, its receiver dangling. Someone tried to call home. Someone didn't get an answer. Someone walked away and left the phone off the hook.
+A fire hydrant on the corner has been painted gold, a tradition in the district meant to bring prosperity. The gold paint is chipping, revealing layers beneath—red, then silver, then the original iron. Decades of hope, layered and peeling.
 
-The elevated tracks overhead are beginning to rust.`,
-  x: 15,
+The street is quiet except for the wind through the elevated tracks above.`,
+  x: 14,
   y: -3,
   z: 0,
   // Environmental properties

@@ -1,14 +1,14 @@
-// Yesler Way - between Occidental and 2nd Ave
+// Yesler Way - between 2nd and 3rd Ave
 
 export const room = {
   name: 'Yesler Way',
-  description: `The PIONEER BUILDING continues along the south side of the street, its red brick facade stretching nearly the full block. Most of the windows are intact, though a few on the upper floors have been replaced with plywood or plastic sheeting. The Romanesque arches frame dark interiors. The decorative terra cotta shows chips and cracks but has held together better than anyone expected.
+  description: `Mid-century concrete lines this stretch of Yesler Way, the utilitarian buildings that replaced older structures after a fire. They built for function, not beauty. Function has proven more durable than anyone expected.
 
-A surface parking lot takes up the north side, surrounded by chain link fence topped with razor wire that someone added after the war. The razor wire is thorough. Whatever was worth protecting here is long gone. Weeds have cracked the asphalt into islands, each hosting its own ecosystem of dead grass and debris.
+A mixed-use building occupies the south side, four stories of apartments above ground-floor retail. Security bars still protect the storefront windows, the iron grilles rusted but intact. The bars kept people out for fifty-five years. The apartments above are dark, their intercom panel listing unit numbers for residents who stopped answering decades ago.
 
-The Pioneer Building's fire escapes descend the rear facade in geometric zigzags, rusted solid in some places, collapsed entirely in others. The structure has stood since 1892. It will probably stand for another century. The people who built it understood permanence.`,
+The street slopes gently downward toward the waterfront, following the grade that Henry Yesler's original skid road established. The timber industry is gone. The sawmill is gone. The slope remains, carrying rainwater and silence toward Elliott Bay.`,
   x: 2,
-  y: 10,
+  y: 12,
   z: 0,
   // Environmental properties
   population: 0, // Empty (post-Event)

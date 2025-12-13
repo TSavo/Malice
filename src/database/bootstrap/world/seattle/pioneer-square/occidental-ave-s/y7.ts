@@ -2,12 +2,12 @@
 
 export const room = {
   name: 'Occidental Ave S',
-  description: `Waterfall Garden Park hides behind a brick wall to the east, one of Seattle's strangest landmarks—a twenty-two foot artificial waterfall tucked into a courtyard the size of a parking space. UPS built it in 1978 to mark the site where the company started, back when it was the American Messenger Company and James Casey was a teenager with an idea. The waterfall runs on a recirculating pump, no input required, just electricity and physics. Against all odds, it's still running. You can hear it through the wall—the rush of water that never goes anywhere, falling and rising and falling again in an endless loop.
+  description: `The Occidental Mall narrows here as it approaches its terminus, the cobblestones transitioning into plain concrete where someone ran out of budget or enthusiasm for historical authenticity. Ahead, the debris wall at Yesler Way rises into view, a tumbled mass of brick and steel that closes the street like a dam.
 
-The wrought-iron gate stands open, its hours of operation sign still mounted on the wall: 8AM-5PM MONDAY-FRIDAY. The schedule hasn't been enforced in so long that moss has begun to grow in the hinges. Beyond the gate, a narrow passage leads to the courtyard where the waterfall cascades over concrete terraces into a pool. Ferns crowd the walls. The space was designed to feel secret, discovered, a hidden garden in the urban jungle. It still feels that way. The secret has just stopped being shared.
+To the east, the Corp Construction barriers run along the block—black fabric over chain-link, the kind of screening that hides embarrassments and mysteries in equal measure. Whatever Corp was building swallowed three city blocks, and the barriers went up before anyone could see what was growing inside. The barriers are still up. Whatever grew or didn't grow is still hidden. The mystery has outlasted everyone curious enough to investigate it.
 
-A bronze plaque near the gate tells the UPS story—the bicycle messengers, the twenty-dollar startup, the rise to global logistics dominance. The plaque is green with age, the letters filling with verdigris. Success stories read differently when you're standing in the wreckage of the success.`,
-  x: -3,
+OBLIQUE STRATEGIES reads the plaque beneath a public art installation—steel rods of varying heights arranged in a pattern that might be random or might be calculated, the kind of sculpture that required a grant application and an artist's statement full of words like "liminality" and "negotiated space." The rods have rusted in streaks of orange and brown. Whether that was the artist's intention is impossible to determine. Whether anything was the artist's intention is impossible to determine.`,
+  x: -7,
   y: 7,
   z: 0,
   // Environmental properties

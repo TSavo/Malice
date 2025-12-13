@@ -7,7 +7,7 @@ export const room = {
 QuickPrint occupied the ground floor here, one of those shops that produced concert posters and band flyers and the paper detritus of a city with a music scene. The letterpress in the window still holds a forme locked with wood type: SATURDAY NIGHT. Whatever happened Saturday night, it's not happening anymore. Stacks of paper have yellowed in the window display, bleached by sun that doesn't care about ultraviolet damage.
 
 A bike rack bolted to the sidewalk holds a single frame—no wheels, no handlebars, just a triangle of chrome tubing locked to the rack with a U-lock that would take an angle grinder to remove. Someone took everything they could. Someone left the rest.`,
-  x: -9,
+  x: -14,
   y: 3,
   z: 0,
   // Environmental properties

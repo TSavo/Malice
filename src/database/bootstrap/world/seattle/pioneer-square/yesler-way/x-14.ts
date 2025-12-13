@@ -1,15 +1,17 @@
-// Yesler Way - between Waterfront and 1st Ave
+// 1st Ave S & Yesler Way
+// Major intersection, Smith Tower
 
 export const room = {
-  name: 'Yesler Way',
-  description: `Yesler Way climbs eastward from the waterfront, following the grade that the original "Skid Road" established in the 1850s. Seattle's terrain still asserts itself against the street grid's attempt to impose order—the pitch noticeable here, buildings rising to meet the slope on stepped foundations.
+  name: '1st Ave S & Yesler Way',
+  description: `Smith Tower rises at this intersection, thirty-eight stories of white terra cotta stained grey by decades of Seattle rain and neglect. The building dominated the skyline when it opened in 1914—tallest structure west of the Mississippi. The tower's neo-Gothic crown still creates the distinctive silhouette that identifies Pioneer Square, the Chinese guardian figures at each corner still watching over a city that's largely empty now.
 
-A Metro bus stop marks this location, its shelter yellowed and cracked, its bench weathered grey. Route maps are still posted behind scratched plexiglass, showing connections to destinations that exist only in memory. The buses stopped running when the fuel ran out. The infrastructure remains, waiting for transit that will never come.
+The bronze doors at street level are tarnished green, the elaborate terra cotta ornament chipped and weathered. The building was too well-built to fall, too solid to fail. It stands like a tombstone, marking where Seattle's ambitions once reached toward the sky.
 
-The ground-floor retail along this stretch is shuttered and dark: a nail salon, a convenience store, small businesses that served local foot traffic. The foot traffic ended. The businesses closed. The buildings are mixed construction—early twentieth-century brick beside mid-century renovation—all of it empty now, the accumulated development of a neighborhood that grew incrementally and died all at once.`,
+Yesler Way and 1st Avenue intersect here at a point that represents Seattle's geographic origins—two survey teams, two street grids, a disagreement encoded in asphalt that still confuses what little navigation happens now. The intersection marks where Pioneer Square's grid meets downtown's, the historical boundary between one kind of ruin and another.`,
   x: -14,
-  y: 10,
+  y: 12,
   z: 0,
+  intersection: ['1st Ave S', 'Yesler Way'],
   // Environmental properties
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned

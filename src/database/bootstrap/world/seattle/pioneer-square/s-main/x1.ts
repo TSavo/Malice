@@ -1,12 +1,12 @@
-// S. Main St - between Occidental and 2nd Ave
+// S. Main St - east of 2nd Ave
 
 export const room = {
   name: 'S. Main St',
-  description: `The architectural temperature cools here as Main Street moves east—the ornate Romanesque facades of Pioneer Square's core giving way to simpler elevations, buildings that were built to function rather than impress. These are the back-office blocks, the spaces where insurance companies and wholesalers and other unglamorous businesses did unglamorous work. The glamour has drained from both ends of the spectrum now.
+  description: `East of Second Avenue, Main Street loses the last vestiges of Pioneer Square's curated historicism. The buildings here are mid-century plain—concrete and glass, parking structures and municipal offices, architecture that prioritizes function over heritage. The old Seattle gave way to the efficient Seattle somewhere around this line. Now both are equally defunct.
 
-KENMORE CAMERA occupies a ground-floor retail space, one of those specialty shops that survived the smartphone era by serving photographers who cared about lenses and f-stops and the craft of making images. The window display is a museum of optical technology—DSLRs with prices still attached, mirrorless bodies, telephoto lenses that could resolve details at a thousand meters. The equipment represents thousands of hours of engineering and billions of dollars of R&D. The equipment sits behind glass, unused, its potential unactivated. Someone's wedding photos didn't get taken. Someone's portfolio didn't get built.
+LABOR READY occupies a ground-floor storefront, a day-labor agency that matched workers with employers for warehouse shifts, construction gigs, and the various temporary positions that the economy required when the economy was requiring things. The window display is a bulletin board of job listings, each one describing work that existed for someone—forklift operator wanted, $15/hr, must pass drug test. The listings have been there long enough for the paper to yellow. The drug tests are no longer administered. The forklifts are no longer operated.
 
-PACIFIC TRAVEL occupied the building across the street, a travel agency that specialized in corporate bookings and vacation packages to destinations that now feel theoretical. Posters in the window advertise Paris and Tokyo and Machu Picchu, the visual language of aspiration rendered in saturated color. The flights are cancelled. The destinations exist somewhere, presumably unchanged by whatever happened here. The distance between Seattle and everywhere else has become infinite.`,
+TOGO'S GREAT SANDWICHES occupies the building opposite, a chain operation that served the office-worker lunch crowd with submarine sandwiches named after Italian geography. The menu board above the counter lists combinations: #1 ORIGINAL ITALIAN • #4 TURKEY & AVOCADO • #7 PASTRAMI. The prices seemed reasonable once. The sandwiches don't exist anymore. The menu is a document from another economy, another lunch hour, another version of normal that required sandwiches to function.`,
   x: 1,
   y: 0,
   z: 0,

@@ -1,19 +1,18 @@
-// Occidental Ave S - between S. King and S. Jackson
+// Occidental Ave S - between S. Jackson and S. King
 
 export const room = {
   name: 'Occidental Ave S',
-  description: `STONINGTON GALLERY reads the sign above a storefront that dealt in Northwest Coast art—bentwood boxes, cedar masks, prints by artists whose names meant something in certain circles. The gallery window still holds a display: a raven mask with mother-of-pearl eyes, positioned to catch light that no longer matters. The mask's expression suggests it finds something funny about all this. Raven usually does.
+  description: `The avenue widens slightly here, a small plaza carved out of the streetscape where food carts once gathered during lunch hours. The asphalt shows the ghostly outlines of where trucks parked daily, oil stains marking territories as clearly as any fence. The lunch crowds are gone. The food carts are gone. The oil stains remain, petroleum fossils of a working economy.
 
-Tree roots have heaved the cobblestones here, creating ridges and valleys in what was meant to be a flat pedestrian surface. The city fought this battle for decades, trimming roots, releveling stones, fighting the slow vegetable insistence of maples that wanted more room. The trees have won. Their roots crack through the brick like fingers pushing up through a grave.
+An old street clock stands at the plaza's edge, its face cracked, hands frozen at 2:47. These clocks were installed throughout Pioneer Square in the 1980s, replicas of Victorian designs meant to evoke the neighborhood's heritage. The heritage they evoked is now as dead as the clock itself.
 
-A drinking fountain stands at the walkway's edge, the kind with a steel basin and a push-button spout, a gift from some Rotary Club whose plaque has weathered into illegibility. The basin has become a planter—moss grows thick in the bowl, small ferns sprouting from cracks in the concrete base. Whatever water pressure once fed the fountain gave out long ago. The infrastructure beneath the street is as silent as the street itself.`,
-  x: -3,
+Fire escapes zigzag down the eastern building's facade, their metal ladders extended to street level as if expecting evacuees who never came. The rust on the railings has progressed past orange into a deep brown that flakes at the slightest touch.`,
+  x: -7,
   y: -7,
   z: 0,
-  // Environmental properties
-  population: 0, // Empty (post-Event)
-  ambientNoise: 0, // Quiet/abandoned
-  lighting: 100, // Daylight (outdoor)
-  waterLevel: 0, // Dry
-  outdoor: true, // Street level
+  population: 0,
+  ambientNoise: 0,
+  lighting: 100,
+  waterLevel: 0,
+  outdoor: true,
 };

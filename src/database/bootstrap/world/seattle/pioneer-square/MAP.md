@@ -5,80 +5,102 @@ Historic brick buildings, the Underground beneath, and urban decay.
 
 ## Coordinate System
 
-- **Grid:** Integer coordinates, (0,0) at center (S. Main & Occidental)
+- **Grid:** Integer coordinates, (0,0) at center (S. Main & 2nd Ave S)
 - **X-axis:** West (-) to East (+)
 - **Y-axis:** South (-) to North (+)
 - **Z-axis:** Vertical (0 = street, negative = underground, positive = upper floors)
 
-### Avenues (W→E) - 6 apart, 5 rooms between
+### Avenues (W→E) - 7 apart, 6 walkable rooms between
 | Avenue | X |
 |--------|---|
-| Waterfront | -15 |
-| 1st Ave S | -9 |
-| Occidental | -3 |
-| 2nd Ave S | +3 |
-| 3rd Ave S | +9 |
-| 4th Ave S | +15 |
+| Waterfront | -21 |
+| 1st Ave S | -14 |
+| Occidental | -7 |
+| 2nd Ave S | 0 |
+| 3rd Ave S | +7 |
+| 4th Ave S | +14 |
 
-### Streets (S→N) - 5 apart, 4 rooms between
+### Streets (S→N) - 6 apart, 5 walkable rooms between
 | Street | Y |
 |--------|---|
-| S. King | -10 |
-| S. Jackson | -5 |
+| S. King | -12 |
+| S. Jackson | -6 |
 | S. Main | 0 |
-| S. Washington | +5 |
-| Yesler Way | +10 |
+| S. Washington | +6 |
+| Yesler Way | +12 |
+
+## Block Layout
+
+Each block between avenues (7 units):
+```
+Ave ─ sidewalk ─ Building (4 wide) ─ sidewalk ─ Ave
+ 0       1         2   3   4   5        6        7
+```
+
+Each block between streets (6 units):
+```
+Street ─ sidewalk ─ Building (3 tall) ─ sidewalk ─ Street
+   0         1         2    3    4          5         6
+```
 
 ## Street Level (z=0)
 
 ```
-     -15 -14 -13 -12 -11 -10  -9  -8  -7  -6  -5  -4  -3  -2  -1   0  +1  +2  +3  +4  +5  +6  +7  +8  +9 +10 +11 +12 +13 +14 +15
-     ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-+10  │ ●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───● │ YESLER
-     │ │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │ │
- +9  │ ●   │   │   │   │   ●   │   │   │   │   ●   ╔═══════════╗   ╔═══════════════════════════╗   ●   │   │   │   │   ●   │   ● │
-     │ │   │   │   │   │   │   │   │   │   │   │   ║           ║   ║                           ║   │   │   │   │   │   │   │   │ │
- +8  │ ●   │   │   │   │   ●   │   │   │   │   ●   ║   SMITH   ║   ║       PIONEER             ║   ●   │   │   │   │   ●   ╔═══════════╗
-     │ │   │   │   │   │   │   │   │   │   │   │   ║   TOWER   D   ║       BUILDING        D   ║   │   │   │   │   │   │   ║ COLLAPSED ║
- +7  │ ●   │   │   │   │   ●   │   │   │   │   ●   ║           ║   ║                           ║   ●   │   │   │   │   ●   ║  (rubble) ║
-     │ │   │   │   │   │   │   │   │   │   │   │   ╚═══════════╝   ╚═══════════════════════════╝   │   │   │   │   │   │   ╚═══════════╝
- +6  │ ●   │   │   │   │   ●   │   │   │   │   ●   │   │   │   │   │   │   │   │   │   │   │   ●   │   │   │   │   ●   │   │   │   ● │
-     │ │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │ │
- +5  │ ●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───● │ WASHINGTON
-     │ │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │ │
- +4  │ ●   │   │   │   │   ●   │   │   │   │   ●   │   │   │   │   │   │   │   ●   │   │   │   │   ●   │   │   │   │   │   │   ● │
-     │ │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │ │
- +3  │ ●   │   │   │   │   ●   ╔═══════════════╗   ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓   ╔═════════════════════════════════╗   │   │   │   ● │
-     │ │   │   │   │   │   │   ║               ║   ▓                     ▓   ║                                 ║   │   │   │   │ │
- +2  │ ●   │   │   │   │   ●   ║    GRAND      D   ▓                     ▓   ║                                 ║   │   │   │   ● │
-     │ │   │   │   │   │   │   ║    CENTRAL    ║   ▓    OCCIDENTAL       ▓   ║         CORP                    ║   │   │   │   │ │
- +1  │ ●   │   │   │   │   ●   ║               ║   ▓       PARK      ⊕   ▓   ║      CONSTRUCTION               ║   │   │   │   ● │
-     │ │   │   │   │   │   │   ╚═══════════════╝   ▓                     ▓   ║        (fenced)                 ║   │   │   │   │ │
-  0  │ ●───●───●───●───●───●───●───●───●───●───●───▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓───║            D                    ║───●───●───●───● │ MAIN
-     │ │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   ╚═════════════════════════════════╝   │   │   │   │ │
- -1  │ ●   │   │   │   │   ●   │   │   │   │   ●   │   │   │   │   │   │   ●   │   │   │   │   │   ●   │   │   │   │   │   │   ● │
-     │ │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │ │
- -2  │ ●   │   │   │   │   ●   │   │   │   │   ●   │   │   │   │   │   │   ●   │   │   │   │   │   ●   │   │   │   │   │   │   ● │
-     │ │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │ │
- -3  │ ●   │   │   │   │   ●   │   │   │   │   ●   │   │   │   │   │   │   ●   │   │   │   │   │   ●   │   │   │   │   │   │   ● │
-     │ │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │ │
- -4  │ ●   │   │   │   │   ●   │   │   │   │   ●   │   │   │   │   │   │   ●   │   │   │   │   │   ●   │   │   │   │   │   │   ● │
-     │ │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │ │
- -5  │ ●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───● │ JACKSON
-     │ │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │ │
- -6  │ ●   │   │   ╔═══════════════════════╗   │   │   │   │   ●   │   │   │   │   ●   │   │   │   │   │   │   ╔═══════════╗   ● │
-     │ │   │   │   ║                       ║   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   ║  CONDEMN  ║   │ │
- -7  │ ●   │   │   ║       SINKHOLE        ║   │   │   │   │   ●   │   │   │   │   ●   │   │   │   │   │   │   ║  (toxic)  ║   ● │
-     │ │   │   │   ║    ~~~FLOODED~~~      ║   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   ║     ☠     ║   │ │
- -8  │ ●   │   │   ║          ☠            ║   │   │   │   │   ●   │   │   │   │   ●   │   │   │   │   │   │   ╚═══════════╝   ● │
-     │ │   │   │   ╚═══════════════════════╝   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │ │
- -9  │ ●   │   │   │   │   │   │   │   │   │   ●   │   │   │   │   ●   │   │   │   │   ●   │   │   │   │   │   │   │   │   │   ● │
-     │ │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │   │ │
--10  │ ●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───●───● │ KING
-     ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-       ↑                       ↑                       ↑                       ↑                       ↑                       ↑
-    WATERFRONT              1ST AVE               OCCIDENTAL               2ND AVE                 3RD AVE                 4TH AVE
-      x=-15                   x=-9                   x=-3                    x=+3                    x=+9                   x=+15
+      -21-20-19-18-17-16-15-14-13-12-11-10 -9 -8 -7 -6 -5 -4 -3 -2 -1  0 +1 +2 +3 +4 +5 +6 +7 +8 +9+10+11+12+13+14
+      ──────────────────────────────────────────────────────────────────────────────────────────────────────────────
++12   │ ●──●──●──●──●──●──●──●──●──D──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──● │ YESLER
+      │ │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │ │
++11   │ ●  │  │  │  │  │  │  ●  ╔══════════╗  │  │  ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ● │
+      │ │  │  │  │  │  │  │  │  ║ SMITH    ║  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │ │
++10   │ ●  │  │  │  │  │  │  D  ║ TOWER    ║  │  │  ●  │  │  │  │  │  │  ●  ╔══════════════════╗  ●  │  │  │  │  │  ● │
+      │ │  │  │  │  │  │  │  │  ║          ║  │  │  │  │  │  │  │  │  │  │  ║                  ║  │  │  │  │  │  │  │ │
+ +9   │ ●  │  │  │  │  │  │  ●  ╚══════════╝  │  │  ●  │  │  │  │  │  │  ●  ║    PIONEER       ║  ●  │  │  │  │  │  ● │
+      │ │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  ║    BUILDING      ║  │  │  │  │  │  │  │ │
+ +8   │ ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ●  ╚══════════════════╝  ●  │  │  │  ╔═══════════╗
+      │ │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  ║ COLLAPSED ║
+ +7   │ ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ●  │  │  │  │  ║  (rubble) ║
+      │ │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  ╚═══════════╝
+ +6   │ ●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──● │ WASHINGTON
+      │ │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │ │
+ +5   │ ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ● │
+      │ │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │ │
+ +4   │ ●  │  │  │  │  │  │  ●  ╔══════════════╗  ●  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  ╔══════════════════════════╗  │  │  │  ● │
+      │ │  │  │  │  │  │  │  │  ║              ║  │  ▓                 ▓  ║                          ║  │  │  │  │ │
+ +3   │ ●  │  │  │  │  │  │  ●  ║    GRAND     ║  ●  ▓                 ▓  ║                          ║  │  │  │  ● │
+      │ │  │  │  │  │  │  │  │  ║    CENTRAL   ║  │  ▓   OCCIDENTAL    ▓  ║       CORP               ║  │  │  │  │ │
+ +2   │ ●  │  │  │  │  │  │  ●  ║              ║  D  ▓      PARK    ⊕  ▓  ║    CONSTRUCTION          ║  │  │  │  ● │
+      │ │  │  │  │  │  │  │  │  ╚══════════════╝  │  ▓                 ▓  ║      (fenced)            ║  │  │  │  │ │
+ +1   │ ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ●  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  ║          D               ║  │  │  │  ● │
+      │ │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  ╚══════════════════════════╝  │  │  │  │ │
+  0   │ ●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──● │ MAIN
+      │ │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │ │
+ -1   │ ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ● │
+      │ │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │ │
+ -2   │ ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ● │
+      │ │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │ │
+ -3   │ ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ● │
+      │ │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │ │
+ -4   │ ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ● │
+      │ │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │ │
+ -5   │ ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ● │
+      │ │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │ │
+ -6   │ ●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──● │ JACKSON
+      │ │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │ │
+ -7   │ ●  │  │  ╔════════════════════╗  │  │  │  ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ●  ╔══════════╗  │  ● │
+      │ │  │  │  ║                    ║  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  ║ CONDEMN  ║  │  │ │
+ -8   │ ●  │  │  ║     SINKHOLE       ║  │  │  │  ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ●  ║  (toxic) ║  │  ● │
+      │ │  │  │  ║   ~~~FLOODED~~~    ║  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  ║    ☠     ║  │  │ │
+ -9   │ ●  │  │  ║        ☠           ║  │  │  │  ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ●  ╚══════════╝  │  ● │
+      │ │  │  │  ╚════════════════════╝  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │ │
+-10   │ ●  │  │  │  │  │  │  │  │  │  │  ●  │  │  │  │  │  │  │  │  │  ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ● │
+      │ │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │ │
+-11   │ ●  │  │  │  │  │  │  │  │  │  │  ●  │  │  │  │  │  │  │  │  │  ●  │  │  │  │  │  │  ●  │  │  │  │  │  │  ● │
+      │ │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │  │ │
+-12   │ ●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──●──● │ KING
+      ──────────────────────────────────────────────────────────────────────────────────────────────────────────────
+         ↑                       ↑                       ↑                       ↑                       ↑
+      WATERFRONT              1ST AVE               OCCIDENTAL               2ND AVE                 3RD AVE
+        x=-21                  x=-14                   x=-7                    x=0                     x=+7
 ```
 
 ## Legend
@@ -86,69 +108,55 @@ Historic brick buildings, the Underground beneath, and urban decay.
 | Symbol | Meaning |
 |--------|---------|
 | `●` | Walkable coordinate (room) |
-| `●───●` | East-west connection |
+| `●──●` | East-west connection |
 | `│` | North-south connection |
-| `╔═══╗` | Building footprint (sealed interior) |
-| `D` | Door (sealed entry point) |
-| `▓▓▓` | Occidental Park (open plaza) |
+| `╔═══╗` | Building footprint (blocked) |
+| `D` | Door (entry point to building interior) |
+| `▓▓▓` | Occidental Park (open plaza, walkable) |
 | `⊕` | Underground access |
 | `~~~~` | Flooded area |
 | `☠` | Hazard zone |
 
-## Buildings (Sealed Interiors)
+## Buildings
 
-| Name | X Range | Y Range | Door | Notes |
-|------|---------|---------|------|-------|
-| Smith Tower | -5 to -2 | +7 to +9 | (-2, +8) | 12 floors, historic landmark |
-| Pioneer Building | 0 to +4 | +7 to +9 | (+4, +8) | 6 floors, offices |
-| Grand Central | -8 to -5 | +1 to +3 | (-5, +2) | 4 floors, arcade |
-| Corp Construction | +5 to +10 | 0 to +3 | (+10, 0) | Unknown, armed guards |
+| Name | X Range | Y Range | Door Location | Notes |
+|------|---------|---------|---------------|-------|
+| Smith Tower | -13 to -10 | +9 to +11 | N: (-12, +11), W: (-13, +10) | 38 floors, historic landmark |
+| Pioneer Building | +1 to +4 | +8 to +10 | (+5, +9) | 6 floors, offices |
+| Grand Central | -13 to -10 | +2 to +4 | (-9, +2) | 4 floors, arcade |
+| Corp Construction | 0 to +6 | +1 to +4 | (+6, +1) | Unknown, armed guards, blocks 2nd Ave |
 
 ## Hazard Zones (Impassable)
 
 | Name | X Range | Y Range | Notes |
 |------|---------|---------|-------|
-| Collapsed Building | +11 to +15 | +7 to +9 | Rubble, unstable |
-| Sinkhole | -12 to -8 | -8 to -6 | Flooded 15m deep |
-| Condemned Block | +11 to +14 | -8 to -6 | Toxic, fenced |
+| Collapsed Building | +9 to +14 | +7 to +10 | Rubble, unstable |
+| Sinkhole | -18 to -15 | -9 to -7 | Flooded 15m deep |
+| Condemned Block | +9 to +12 | -9 to -7 | Toxic, fenced |
 
 ## Open Spaces
 
 | Name | X Range | Y Range | Notes |
 |------|---------|---------|-------|
-| Occidental Park | -4 to +2 | 0 to +3 | Plaza, dead trees, ⊕ underground access |
-
-## Alley Sections (Service character, reduced lighting)
-
-Between S. Main (y=0) and S. Washington (y=+5), these avenue sections take on alley character:
-
-| Avenue | X | Y Range | Notes |
-|--------|---|---------|-------|
-| 1st Ave S | -9 | +1, +2 | Service corridor, lighting 35-45 |
-| Occidental | -3 | +1, +2 | Park-adjacent, lighting 50-55 |
-| 2nd Ave S | +3 | +1, +2 | Narrow/dark, lighting 30-40 |
-| 3rd Ave S | +9 | +1, +2 | Loading docks, lighting 35-40 |
-
-All alley sections use standard grid coordinates and auto-connect with adjacent rooms.
+| Occidental Park | -6 to -1 | +1 to +4 | Plaza, dead trees, ⊕ underground access |
 
 ## Room Counts
 
-- **Total grid:** 31 x 21 = 651 coordinates
-- **Blocked by buildings:** ~80 coordinates
-- **Blocked by hazards:** ~40 coordinates
-- **Walkable:** ~530 rooms at street level
-- **Alley sections:** +8 rooms (service corridors, darker, y=1-2 between Main & Washington)
-- **Building interiors (future):** +150 rooms when opened
-- **Underground (future):** +75 rooms
+- **Total grid:** 36 x 25 = 900 coordinates
+- **Blocked by buildings:** ~100 coordinates
+- **Blocked by hazards:** ~50 coordinates
+- **Walkable:** ~750 rooms at street level
+- **Building interiors (future):** +200 rooms when opened
+- **Underground (future):** +100 rooms
 
 ## Connections to Other Districts
 
 | Direction | Via | Destination |
 |-----------|-----|-------------|
-| North | **Waterfront only (x=-15, y=+10)** | Downtown (grid rotates 32 degrees) |
-| East | 4th Ave (x=+15) | International District |
-| South | S. King (y=-10) | SoDo Industrial |
-| West | Waterfront (x=-15) | Piers, Elliott Bay |
+| North | **Waterfront only (x=-21, y=+12)** | Downtown (grid rotates 32 degrees) |
+| East | 4th Ave (x=+14) | International District |
+| South | S. King (y=-12) | SoDo Industrial |
+| West | Waterfront (x=-21) | Piers, Elliott Bay |
 | Down | Occidental Park ⊕ | Seattle Underground |
 
 ## The Grid Collision
@@ -159,11 +167,11 @@ After the Event, all but one crossing was blocked:
 
 | Intersection | X | Blockage |
 |--------------|---|----------|
-| Waterfront | -15 | **OPEN** - gap in cracked seawall |
-| 1st Ave | -9 | 6-story building collapsed across street |
-| Occidental | -3 | Blast wave debris pile |
-| 2nd Ave | +3 | Buildings leaned together, 1-foot gap |
-| 3rd Ave | +9 | Light rail tunnel collapse, flooded crater |
-| 4th Ave | +15 | Chinatown gate fell across intersection |
+| Waterfront | -21 | **OPEN** - gap in cracked seawall |
+| 1st Ave | -14 | 6-story building collapsed across street |
+| Occidental | -7 | Blast wave debris pile |
+| 2nd Ave | 0 | Buildings leaned together, 1-foot gap |
+| 3rd Ave | +7 | Light rail tunnel collapse, flooded crater |
+| 4th Ave | +14 | Chinatown gate fell across intersection |
 
 The Waterfront passage is the only way between Pioneer Square and Downtown.

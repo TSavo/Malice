@@ -2,18 +2,17 @@
 
 export const room = {
   name: '1st Ave S',
-  description: `Main Street opens ahead, and with it the heart of Pioneer Square's old commercial district. The Merchant's Cafe anchors the corner in weathered brick, its window still proclaiming SEATTLE'S OLDEST RESTAURANT in gold leaf that's flaking at the edges. EST. 1890. Through the glass: a mahogany bar, stools with torn leather seats, bottles arranged on shelves behind the bar in neat rows. The arrangement suggests someone left expecting to return.
+  description: `Main Street approaches from the north, the intersection visible where First Avenue crosses one of Pioneer Square's primary axes. The buildings grow slightly taller near the intersection, five and six stories rather than the three and four that line most of the avenue. Height meant status once, proximity to Main Street meaning higher rents, better visibility, more foot traffic. The foot traffic is gone. The height remains.
 
-The carriage tours launched from this corner—tourists in horse-drawn buggies, clip-clopping past historic buildings while guides recited facts about the Great Fire. The carriage is gone, probably stabled somewhere that isn't here. The horse that pulled it is probably dead. A hitching post remains bolted to the curb, cast iron shaped into a horse's head, rings for reins on either side. Decorative for fifty years, functional for fifty before that. Now just a shape.
+The sidewalks widen as the intersection approaches, the public right-of-way expanding to accommodate the crowds that once gathered at this commercial hub. The extra width feels like absence now, empty space where density once lived. The concrete is worn smooth in paths that feet no longer walk.
 
-The curb cut here still shows yellow paint where carriages loaded passengers. The paint has faded to a color that doesn't have a name.`,
-  x: -9,
+A street lamp leans at a slight angle, its pole bent by some long-ago impact—vehicle, falling debris, the physics of collapse. The lamp doesn't work regardless. The angle gives it a quality of arrested motion, falling forever without ever hitting the ground.`,
+  x: -14,
   y: -1,
   z: 0,
-  // Environmental properties
-  population: 0, // Empty (post-Event)
-  ambientNoise: 0, // Quiet/abandoned
-  lighting: 100, // Daylight (outdoor)
-  waterLevel: 0, // Dry
-  outdoor: true, // Street level
+  population: 0,
+  ambientNoise: 0,
+  lighting: 100,
+  waterLevel: 0,
+  outdoor: true,
 };

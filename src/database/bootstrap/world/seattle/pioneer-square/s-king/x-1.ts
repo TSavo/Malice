@@ -2,18 +2,17 @@
 
 export const room = {
   name: 'S. King St',
-  description: `Union Station is visible to the north, its Beaux-Arts facade complementing King Street Station's similar architecture a block away. The two stations served different railroads—Union for the Union Pacific, King Street for Great Northern—the competition of the railroad era expressed in parallel terminals. Union Station's grand hall was converted to office space in the 1990s. The offices are empty now, the conversion serving no purpose.
+  description: `King Street approaches Second Avenue, the commercial heart of Pioneer Square's southern edge. The buildings here are taller than those further west, four and five stories rather than three, their facades more ornate. This was prime real estate once, proximity to the train station making it valuable for businesses that served travelers.
 
-KING STREET DELI occupies a ground-floor space in the adjacent building, the kind of establishment that served commuter traffic. Through the grimy window: counter service, limited seating, the configuration designed for speed. No one is in a hurry here anymore. The deli counter is dark, whatever was inside it long since spoiled and desiccated.
+Union Station is visible to the south, its Beaux-Arts grandeur dominating the skyline. The station was built in 1911, designed to impress arriving passengers with Seattle's ambitions. The ambitions are ruins now, but the station still impresses—its scale alone demands attention.
 
-The buildings along this stretch show varied construction spanning eras—early twentieth-century commercial structures beside mid-century concrete. The railroad money that once flowed through this district stopped flowing. The buildings remain, monuments to industries that died before the war and industries that died with it.`,
+The street is wide here, designed for the vehicle and pedestrian traffic that once flowed to and from the station. The width feels excessive now, a boulevard for no one, its lanes marked with faded paint that cars will never follow again.`,
   x: -1,
-  y: -10,
+  y: -12,
   z: 0,
-  // Environmental properties
-  population: 0, // Empty (post-Event)
-  ambientNoise: 0, // Quiet/abandoned
-  lighting: 100, // Daylight (outdoor)
-  waterLevel: 0, // Dry
-  outdoor: true, // Street level
+  population: 0,
+  ambientNoise: 0,
+  lighting: 100,
+  waterLevel: 0,
+  outdoor: true,
 };

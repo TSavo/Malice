@@ -1,12 +1,12 @@
-// Occidental Park - central-northern section
+// Occidental Park - central area
 
 export const room = {
   name: 'Occidental Park',
-  description: `Three abstract sculptures occupy this section of the plaza, welded steel forms installed in the 1980s as part of Seattle's public art program. The sculptures were meant to represent something—movement, connection, the human condition—but fifty-five years of weather have transformed them into something else entirely.
+  description: `A row of dead maples creates a colonnade through this section of the park, their trunks aligned with military precision, their spacing calculated to maximize shade while maintaining sightlines. The urban foresters who planted them understood both biology and sociology—trees that welcomed without concealing, shade that cooled without hiding.
 
-Rust has eaten through the steel in places, creating organic patterns that the artist never intended. Moss grows in the joints where metal meets metal. One sculpture has partially collapsed, its upper section hanging at an angle, connected to the base by a single corroded weld. The collapse happened slowly, metal fatiguing over decades until gravity finally won.
+The trees are dead now, but they still define the space. Their trunks mark rhythm, their branches create patterns of shadow even without leaves. Walking between them feels ceremonial, a procession through a space designed for movement. The destination was always the center of the park. The center is empty now, but the procession continues for anyone willing to walk it.
 
-The sculptures cast long shadows across the brick. Even diminished, even decaying, they have presence. Someone made these things. Someone thought they mattered enough to weld and paint and install in a public space. The caring shows, even now.`,
+One tree has begun to lean, its root system compromised by decades of drought and freeze cycles. The lean is perhaps ten degrees off vertical. In another decade, it will fall. In another century, it will have rotted into the brick. Time moves at its own pace.`,
   x: -2,
   y: 3,
   z: 0,

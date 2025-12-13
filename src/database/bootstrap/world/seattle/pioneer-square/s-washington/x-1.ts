@@ -2,18 +2,17 @@
 
 export const room = {
   name: 'S. Washington St',
-  description: `The Pioneer Building dominates the northern view, its six stories of red brick and Romanesque arches establishing the architectural vocabulary that defines Pioneer Square. Elmer Fisher designed it in 1892, part of the building boom that followed the Great Fire—fifty blocks of wooden structures replaced with brick and stone and terra cotta, the city literally fireproofing itself against repetition.
+  description: `Washington Street approaches Second Avenue, passing along the northern edge of Occidental Park. The park's brick paving extends right up to the street edge, the boundary between thoroughfare and plaza marked only by a subtle change in brick pattern. The distinction was intentional—park and street meant to flow together, public space expanding to fill whatever area people chose to occupy.
 
-SEATTLE FLOWER MARKET occupies the ground floor of the adjacent building, a narrow storefront with a green awning that has faded to something closer to grey. The refrigerated display cases line the front window, their glass fogged with condensation that dried into mineral deposits. Florists depended on occasions—weddings, funerals, anniversaries, the calendar of human milestones that required botanical punctuation.
+The Corp Construction barrier is visible to the east, its black fabric wall cutting across the view where the street would continue toward Third Avenue. The barrier blocks more than passage—it blocks sight, hiding whatever activity occurs behind it. The mystery of the hidden construction has become part of the neighborhood's character.
 
-The street narrows slightly here as older buildings crowd closer to the sidewalk, their facades predating modern setback requirements. Fire escapes zigzag up the eastern walls, the iron platforms and ladders that building codes mandated after the lessons of 1889.`,
+A row of young trees was planted along this block in the 1990s, intended to soften the urban landscape. The trees grew, then stopped growing, then died. Their bare branches reach toward each other across the street, forming an arch of dead wood.`,
   x: -1,
-  y: 5,
+  y: 6,
   z: 0,
-  // Environmental properties
-  population: 0, // Empty (post-Event)
-  ambientNoise: 0, // Quiet/abandoned
-  lighting: 100, // Daylight (outdoor)
-  waterLevel: 0, // Dry
-  outdoor: true, // Street level
+  population: 0,
+  ambientNoise: 0,
+  lighting: 100,
+  waterLevel: 0,
+  outdoor: true,
 };

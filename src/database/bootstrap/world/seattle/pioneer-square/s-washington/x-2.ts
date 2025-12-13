@@ -1,14 +1,14 @@
-// S. Washington St - east of Occidental
+// S. Washington St - approaching 2nd Ave
 
 export const room = {
   name: 'S. Washington St',
-  description: `S. Washington runs along the southern edge of Occidental Park here, the cobblestones giving way to asphalt where pedestrian mall meets vehicular street. The transition is marked by bollards—cast iron posts meant to prevent cars from entering the park proper. They still do their job, standing sentinel over traffic that no longer comes.
+  description: `The street widens as it approaches 2nd Avenue, the buildings stepping back to create a broader public space at the intersection. The pavement here is brick rather than asphalt, the herringbone pattern that Seattle used for pedestrian-priority areas. The bricks have heaved and settled over the decades, frost and tree roots and the general subsidence of fill undermining the careful geometry.
 
-POUR DECISIONS occupies a corner space, its name spelled out in neon tubing that curves and loops in a font meant to suggest sophistication. The wine bar catered to the after-work crowd, the creative professionals who filled Pioneer Square's offices and needed somewhere to decompress before commuting home. The interior is visible through floor-to-ceiling windows: a long bar of reclaimed wood, industrial pendant lights, the carefully curated atmosphere of urban refinement.
+The building on the south corner housed a succession of restaurants, the ground floor configured with the large windows and open kitchen that modern dining demanded. BRACKET occupies the space now—or occupied it—a farm-to-table concept that sourced ingredients from Puget Sound farms and served them to tech workers who appreciated the provenance. The Edison bulbs and reclaimed wood aesthetic is visible through windows that need cleaning.
 
-The building opposite held a pottery studio, FIREHOUSE CLAY, its name a reference to the Great Fire that shaped Pioneer Square's architecture. Through the window: a row of potter's wheels, shelving units displaying student work in various stages of completion, the communal tables where people came to learn an ancient craft in a modern city.`,
+Ahead, the intersection with 2nd Avenue marks a transition. East of here, the Collapsed Building's debris field interrupts the streetscape, a reminder that even Pioneer Square's sturdy brick construction has limits.`,
   x: -2,
-  y: 5,
+  y: 6,
   z: 0,
   // Environmental properties
   population: 0, // Empty (post-Event)

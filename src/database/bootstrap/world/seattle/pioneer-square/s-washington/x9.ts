@@ -1,16 +1,15 @@
-// 3rd Ave S & S. Washington St
+// S. Washington St - between 3rd and 4th Ave
 
 export const room = {
-  name: '3rd Ave S & S. Washington St',
-  description: `Third Avenue intersects Washington here at the edge of the Collapsed Building's debris field. The rubble forms an impassable barrier to the east, forcing traffic—when there was traffic—to detour around the destruction. The intersection has become a de facto terminus, Washington Street effectively ending where the building came down.
+  name: 'S. Washington St',
+  description: `The streetscape begins its transition here, Pioneer Square's Victorian brick mixing with the more varied architecture that characterizes the International District. The shift is gradual—a building here with signage in Vietnamese, another there with Chinese characters alongside English translations. The neighborhoods bleed into each other along Washington Street, their boundaries administrative rather than physical.
 
-The northwest corner holds a building that survived, its brick facade cracked but intact. PACIFIC NORTHWEST TITLE COMPANY occupies the ground floor, the name etched in the glass transom above the entrance. Title companies handled the paperwork of property ownership, the searches and insurance that made real estate transactions possible. The filing cabinets inside hold the ownership histories of properties throughout King County, the chain of title going back to territorial days.
+PHO CYCLO occupies a narrow storefront, its name painted on the window in both Vietnamese and English. The restaurant served the lunch crowds that once flowed between Pioneer Square's offices and the International District's density—bowls of soup, banh mi sandwiches, the fast and filling meals that working people needed. Through the window: formica tables arranged efficiently, a service counter with the covered containers that held condiments and garnishes.
 
-A fire hydrant marks the corner, its red paint weathered to something closer to rust. The hydrant is canted slightly, knocked off true by debris that scattered when the building collapsed. Third Avenue stretches north toward the stadiums and south toward the International District, the cross-axis that connects Pioneer Square to the rest of the city.`,
+The building opposite houses the KING COUNTY SOCIAL SERVICES satellite office, its institutional signage mounted above plate glass windows covered with informational posters. The office connected residents to programs—housing assistance, food benefits, the bureaucratic infrastructure of the safety net. The waiting room inside is visible: plastic chairs arranged along the walls, a reception window with numbered service tickets.`,
   x: 9,
-  y: 5,
+  y: 6,
   z: 0,
-  intersection: ['3rd Ave S', 'S. Washington St'],
   // Environmental properties
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned

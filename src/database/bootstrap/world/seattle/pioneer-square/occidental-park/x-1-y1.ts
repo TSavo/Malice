@@ -1,12 +1,12 @@
-// Occidental Park - center of the park
+// Occidental Park - eastern-central section near S. Main
 
 export const room = {
   name: 'Occidental Park',
-  description: `This is the center of Occidental Park, the point where the plaza opens widest, where the sky feels closest. On clear days—rare in Seattle even before the Event—you could see the Olympic Mountains from here, their snow-capped peaks visible above the waterfront buildings. The mountains are probably still there. The haze that hangs over the city now makes them invisible.
+  description: `A wooden bench faces west here, oriented toward the Underground access hatch visible across the plaza. The positioning seems deliberate—as if someone once sat here watching that entrance, waiting to see who came up from below or went down into darkness. The bench is weathered silver-grey, its slats warped by seasons of rain and sun.
 
-The open space feels exposed, vulnerable. The buildings around the plaza's edges create walls that channel wind and amplify sound. Every footstep echoes off brick and glass. Every movement is visible from multiple angles. The design was meant to create a sense of civic gathering, of shared space. Now it creates a sense of being watched.
+Carved initials mark one armrest, the cuts deepened by weather: "M + J" inside a heart, the kind of mark that lovers made everywhere once. M and J are probably dead now. Or scattered. Or simply elsewhere, their love a casualty of whatever happened to everyone else. The heart persists, outlasting the emotion that carved it.
 
-A drinking fountain stands near the center, its basin dry, its spout corroded green. A plaque dedicates the fountain to someone whose name has weathered away. The drinking stopped. The dedication persists, illegible but present.`,
+S. Main Street is visible to the south, the storefronts along its edge dark and shuttered. The Underground hatch to the west gleams dully in whatever light filters through the overcast. This is a good place to sit and watch. There's just nothing left to watch for.`,
   x: -1,
   y: 1,
   z: 0,

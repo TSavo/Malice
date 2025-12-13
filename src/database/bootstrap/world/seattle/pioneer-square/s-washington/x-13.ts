@@ -1,14 +1,14 @@
-// S. Washington St - between Waterfront and 1st Ave
+// S. Washington St - between 1st Ave and Occidental
 
 export const room = {
   name: 'S. Washington St',
-  description: `A warehouse dominates this block, a utilitarian structure of corrugated steel that has rusted to the color of dried blood. The building was constructed for function rather than beauty, its walls windowless except for a row of clerestories near the roofline, most of those panes now broken, letting rain and pigeons enter freely. The loading dock doors are sealed—welded shut or rusted into their frames, impossible to tell which without tools that nobody is applying.
+  description: `Smith Tower casts its shadow here, the white terra cotta facade visible to the north, rising above the surrounding buildings like a monument to the ambitions of a previous century. The tower has stood since 1914. It will probably stand for another century. Some things refuse to die.
 
-PACIFIC RIM IMPORTS reads the faded logo painted on the warehouse's south wall, the text accompanied by a stylized ship that might be a container vessel or might be a clipper, the paint too weathered to distinguish. The company imported something—electronics or furniture or the endless stream of consumer goods that crossed the Pacific before the crossings stopped. Whatever inventory remains inside the warehouse remains inside, sealed behind doors that don't open, protected by walls that don't care about protection.
+CHEN'S QUALITY PRINTING occupies the ground floor of a narrow building, the name painted in gold leaf on the front window, the typeface chosen to suggest precision and permanence. Through the glass: printing presses in various sizes, paper stock on industrial shelving, the infrastructure of a trade that documented milestones—business cards for new ventures, wedding invitations for hopeful couples, menus for restaurants that needed menus. The machines are silent now. The paper is yellowing in its stacks.
 
-The street here smells like rust and rot, the particular chemistry of metal oxidizing and organic matter decomposing in the damp Seattle air. This was never a pretty block—industrial and utilitarian, built to move goods rather than impress visitors. The lack of pretension feels almost refreshing now. At least this block isn't pretending to be anything other than what it is.`,
+The street continues east toward Occidental Park, the maple canopy visible in the distance. The buildings on this block are three and four stories, the standard Pioneer Square height, their facades weathered to similar shades of grey and brown. History has made them uniform. Time does that to neighborhoods.`,
   x: -13,
-  y: 5,
+  y: 6,
   z: 0,
   // Environmental properties
   population: 0, // Empty (post-Event)

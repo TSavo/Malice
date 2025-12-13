@@ -1,14 +1,14 @@
-// S. King St - approaching Occidental
+// S. King St - between Occidental and 2nd Ave
 
 export const room = {
   name: 'S. King St',
-  description: `Occidental Avenue approaches from the north, the intersection ahead marking the transition between the stadium district and Pioneer Square's historic pedestrian mall. The cobblestones of Occidental's pedestrian stretch are visible beyond, cracked and heaved but still distinct from the asphalt that stadium traffic required.
+  description: `The International District/Chinatown Station entrance descends here, the Sound Transit light rail stop that once connected this neighborhood to the regional transit network. The station entrance shows the standard design: a glass-and-steel canopy sheltering escalators that lead to darkness. The escalators are frozen. The platforms below haven't seen a train in fifty-five years.
 
-PYRAMID ALEHOUSE occupies the corner building, one of Seattle's craft breweries that established taprooms to capture event-day traffic. Through grimy windows: the fermentation tanks still standing, copper tarnished green, the serving bar backed by tap handles that pour nothing. The brewing equipment visible through large windows was meant to be production as performance. The performance ended. The equipment remains.
+The streetscape shows the infrastructure of transit-oriented development that no longer orients toward transit: wide sidewalks accommodating no pedestrian flow, street furniture rusted and tilted. A utility cabinet on the corner has accumulated decades of stickers and graffiti, the surfaces serving as impromptu bulletin boards for announcements no one reads.
 
-The buildings at this corner represent the stadium district's architectural character: newer construction designed to serve event-day crowds that no longer exist. The scale is larger than Pioneer Square proper, the facades less ornate, the ground floors configured for high-volume hospitality that has been reduced to silence.`,
+The buildings flanking the station entrance represent different eras: early twentieth-century brick beside contemporary mixed-use construction. The ground-floor retail designed to capture transit traffic captures nothing. The traffic stopped. The retail closed. The buildings wait for customers who will never arrive.`,
   x: -4,
-  y: -10,
+  y: -12,
   z: 0,
   // Environmental properties
   population: 0, // Empty (post-Event)

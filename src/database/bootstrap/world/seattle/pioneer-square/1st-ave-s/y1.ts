@@ -7,7 +7,7 @@ export const room = {
 Through the windows of TWELVE, you can see white walls hung with photographs: black and white portraits of people's hands, close-up studies of wrinkles and calluses. The gallery had a show about work. Manual labor. Blue collar hands. The irony probably wasn't intentional.
 
 Below the galleries, a coffee shop called Zeitgeist pitched itself to the art crowd—exposed brick, mismatched furniture, a chalkboard menu with prices that assumed a certain kind of customer. The espresso machine is a chrome beast behind the counter, Italian, probably worth more than some of the art upstairs. The cups stacked beside it have gathered a film of grey dust.`,
-  x: -9,
+  x: -14,
   y: 1,
   z: 0,
   // Environmental properties

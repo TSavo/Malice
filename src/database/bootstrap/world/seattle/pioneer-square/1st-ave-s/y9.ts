@@ -1,19 +1,19 @@
-// 1st Ave S - between S. Washington and Yesler Way
+// 1st Ave S - south of Smith Tower entrance
 
 export const room = {
   name: '1st Ave S',
-  description: `Yesler Way opens just ahead, and with it the view of Smith Tower rising at the intersection—thirty-eight stories of white terra cotta, an Edwardian giant watching over a dead city. The tower was L.C. Smith's monument to ambition, typewriter money transformed into height and permanence. The typewriters are museum pieces now. The tower still stands. There's probably a lesson in that about what survives.
+  description: `Smith Tower's white terra cotta facade rises to the north, its ground floor windows dark and unwelcoming. This stretch of 1st Ave runs along the tower's western face—thirty-eight stories of Edwardian ambition casting a permanent shadow over the street below.
 
-The debris wall reaches nearly to the tower's base, a frozen avalanche of brick and steel and shattered glass. From this angle you can see where the Merrill Building's upper floors accordioned down onto the lower ones, each floor pancaking into the one below until the whole structure became a single compressed mass. The physics of collapse, demonstrated in brick. Downtown's grid meets Pioneer Square's here at an angle—the two men who platted Seattle couldn't agree on which way was north. The grids collide at Yesler. They always did. The rubble just made it visible.
+The sidewalk here is cracked but clear, the debris from the collapse having been pushed aside at some point to create a narrow passage. A service entrance to the tower is visible nearby, utilitarian compared to the grand lobbies on the north side. CONTINUUM BANKING reads a small placard beside the door.
 
-A bus shelter stands at the corner, its plexiglass walls spider-webbed with cracks but still upright. The route map inside shows lines that once connected Pioneer Square to Capitol Hill, to Ballard, to places that might as well be other planets now. The 99 ran this route. The schedule promised a bus every fifteen minutes. The next bus is not coming.`,
-  x: -9,
+Across the street, the storefronts that once housed Pioneer Square's boutiques and galleries stand empty. A vintage clothing store. An art gallery. A coffee shop with chairs still stacked inside. The windows are intact, the interiors frozen in the moment everyone left.`,
+  x: -14,
   y: 9,
   z: 0,
   // Environmental properties
-  population: 0, // Empty (post-Event)
-  ambientNoise: 0, // Quiet/abandoned
-  lighting: 100, // Daylight (outdoor)
-  waterLevel: 0, // Dry
-  outdoor: true, // Street level
+  population: 0,
+  ambientNoise: 0,
+  lighting: 100,
+  waterLevel: 0,
+  outdoor: true,
 };

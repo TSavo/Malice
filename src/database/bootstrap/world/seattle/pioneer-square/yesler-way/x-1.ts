@@ -1,19 +1,18 @@
-// Yesler Way - along north edge of Occidental Park
+// Yesler Way - between Occidental and 2nd Ave
 
 export const room = {
   name: 'Yesler Way',
-  description: `Occidental Park stretches south from here, a wasteland of dead trees and cracked cobblestones. The maple trees that once shaded the plaza are skeletal now, bare branches reaching toward grey sky. The iron pergola lists slightly, one of its supports having given way to rust and gravity sometime in the last five decades.
+  description: `Yesler Way approaches Second Avenue, the intersection where two street grids collide. South of Yesler, Pioneer Square's streets run cardinal—north, south, east, west. North of Yesler, downtown's streets rotate thirty-two degrees to follow the shoreline. The collision was a surveying decision made in 1853. The consequences echo through every map ever drawn of Seattle.
 
-The PIONEER BUILDING anchors the corner ahead, six stories of red brick and terra cotta that somehow survived when so much else didn't. Elmer Fisher designed it after the Great Fire of 1889, and it outlasted another catastrophe. The Romanesque arches frame ground-floor retail spaces that have been dark for generations. A corner turret rises above the main facade, its decorative stonework stained with decades of rain and neglect.
+The intersection itself is a knot of angles, streets meeting at corners that seem wrong to eyes trained on ninety degrees. Buildings on the corners adapted, their facades angled to face both grids, their floor plans compromising between orientations. The compromises are visible in the architecture.
 
-The buildings along the north side of the street look down at the park with dark windows and blank facades. They've seen what happened here. They're not saying.`,
+The Pioneer Building rises to the east, its Romanesque bulk anchoring the intersection. The building was designed to be a landmark, visible from both grids, claiming the junction as its own. The claim was successful. The building still dominates views from every approach.`,
   x: -1,
-  y: 10,
+  y: 12,
   z: 0,
-  // Environmental properties
-  population: 0, // Empty (post-Event)
-  ambientNoise: 0, // Quiet/abandoned
-  lighting: 100, // Daylight (outdoor)
-  waterLevel: 0, // Dry
-  outdoor: true, // Street level
+  population: 0,
+  ambientNoise: 0,
+  lighting: 100,
+  waterLevel: 0,
+  outdoor: true,
 };

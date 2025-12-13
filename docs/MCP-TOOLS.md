@@ -374,6 +374,25 @@ Get detailed information about an AI-controlled human.
 // Returns: { id, name, role, spawnedAt, spawnedBy, ... }
 ```
 
+### ai_do
+Execute a command as an AI-controlled human (like typing in the game).
+
+```javascript
+{
+  humanId: 567,
+  command: "say Hello everyone!"  // Any command: "north", "get sword", "look", etc.
+}
+// Returns: Command result/output
+```
+
+### ai_look
+Get what an AI-controlled human sees in their current location.
+
+```javascript
+{ humanId: 567 }
+// Returns: { location, description, exits, people, items }
+```
+
 ## Plot Management
 
 Plots are narrative containers that track storylines, player requests, and AI-initiated events.
@@ -670,7 +689,7 @@ await set_job_metadata({
 - Combine with other MCP tools to create objects, move items, spawn NPCs, etc.
 - See [plot-jobs.md](plot-jobs.md) for full documentation on the plot system
 
-### Spawning AI-Controlled NPCs
+### Spawning and Controlling AI NPCs
 
 ```javascript
 // 1. Spawn a guard
@@ -683,15 +702,24 @@ const guard = await spawn_ai({
 });
 // Returns: { id: 567, name: "Marcus" }
 
-// 2. List all guards
+// 2. See what the guard sees
+const view = await ai_look({ humanId: 567 });
+// Returns: { location: "Lobby", exits: ["north", "south"], people: [...], items: [...] }
+
+// 3. Make the guard do things
+await ai_do({ humanId: 567, command: "say Halt! Who goes there?" });
+await ai_do({ humanId: 567, command: "north" });  // Walk north
+await ai_do({ humanId: 567, command: "get sword" });
+
+// 4. List all guards
 const guards = await list_ai({ role: "guard" });
 // Returns: { count: 1, humans: [{ id: 567, name: "Marcus", role: "guard", location: 100 }] }
 
-// 3. Get detailed info
+// 5. Get detailed info
 const info = await get_ai_info({ humanId: 567 });
 // Returns: { id: 567, name: "Marcus", role: "guard", spawnedAt: "...", ... }
 
-// 4. When no longer needed
+// 6. When no longer needed
 await despawn_ai({ humanId: 567, recycle: true });
 ```
 

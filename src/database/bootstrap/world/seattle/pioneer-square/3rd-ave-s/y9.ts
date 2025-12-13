@@ -1,21 +1,18 @@
-// 3rd Ave S - between Yesler Way and S. Washington St
+// 3rd Ave S - between S. Washington and Yesler Way
 
 export const room = {
   name: '3rd Ave S',
-  description: `The flooded crater from the tunnel collapse is just to the north, its edge marked by broken pavement and warning signs that nobody put up officially. Someone spray-painted "DEEP" on a chunk of concrete. Someone else added "WATER." Both are understatements.
+  description: `The collapsed building's rubble pile is visible to the east, a mountain of brick and concrete that once was a seven-story structure. The collapse happened during the burning—whether from direct strike, fire damage, or just accumulated neglect finally giving way. The rubble has been here long enough that vegetation grows from the pile, hardy shrubs finding purchase in the destruction.
 
-The wrapped building on the corner extends down this block, its chain-link and black fabric barrier continuing along the avenue. Whatever they were hiding in there, they were serious about it. The fabric has torn in places, but the glimpses reveal only darkness. No structure visible. No equipment. Just void.
+Third Avenue passes close to the debris field here, the street narrowed by rubble that spilled beyond the building's original footprint. A cleared path keeps the route passable, the debris pushed aside by someone at some point to maintain passage. The maintenance was minimal—just enough to walk through, not enough to call it clean.
 
-Security cameras on poles still point inward, toward whatever the fabric conceals. Their power source must be internal. Their red recording lights are dark, but the cameras themselves seem intact. Watching nothing. Recording nothing. Waiting.
-
-The Corp Construction zone begins to the south, its fences newer, its purpose equally unclear.`,
-  x: 9,
+The smell of old fire lingers, decades of rain unable to wash away completely the char and ash that permeated the rubble. On hot days, the smell intensifies, released by sun-warmed concrete.`,
+  x: 7,
   y: 9,
   z: 0,
-  // Environmental properties
-  population: 0, // Empty (post-Event)
-  ambientNoise: 0, // Quiet/abandoned
-  lighting: 100, // Daylight (outdoor)
-  waterLevel: 0, // Dry
-  outdoor: true, // Street level
+  population: 0,
+  ambientNoise: 0,
+  lighting: 100,
+  waterLevel: 0,
+  outdoor: true,
 };

@@ -2,12 +2,12 @@
 
 export const room = {
   name: 'Occidental Ave S',
-  description: `The debris field begins here in earnest, the first scattered bricks and chunks of concrete appearing on the pavement like advance scouts for the catastrophe ahead. The main collapse at Yesler Way is thirty yards north—a wall of rubble that rises three stories high, the compressed remains of a building that gravity remembered all at once. From here you can see the stratification, the layers of floor that pancaked down into each other, office furniture and ductwork and human things compressed into geological strata.
+  description: `Waterfall Garden Park hides behind a brick wall to the east, one of Seattle's strangest landmarks—a twenty-two foot artificial waterfall tucked into a courtyard the size of a parking space. UPS built it in 1978 to mark the site where the company started, back when it was the American Messenger Company and James Casey was a teenager with an idea. The waterfall runs on a recirculating pump, no input required, just electricity and physics. Against all odds, it's still running. You can hear it through the wall—the rush of water that never goes anywhere, falling and rising and falling again in an endless loop.
 
-A construction crane lies across the top of the debris pile, its boom bent at forty-five degrees, its cable dangling into the wreckage like a fishing line dropped into stone. The cab has been crushed flat. The crane was working on something when the something stopped. The counterweights still hang from the back, balanced perfectly against nothing. Someone calculated those weights for a job that will never finish.
+The wrought-iron gate stands open, its hours of operation sign still mounted on the wall: 8AM-5PM MONDAY-FRIDAY. The schedule hasn't been enforced in so long that moss has begun to grow in the hinges. Beyond the gate, a narrow passage leads to the courtyard where the waterfall cascades over concrete terraces into a pool. Ferns crowd the walls. The space was designed to feel secret, discovered, a hidden garden in the urban jungle. It still feels that way. The secret has just stopped being shared.
 
-The maple canopy ends here, the last tree standing at the edge of the destruction like a sentry who refused to retreat. Beyond it, dust has settled over everything—a grey film that coats the debris, the street, the facades of buildings that are still standing. The dust gets in your eyes. It gets in your lungs. It tastes like the inside of a tomb.`,
-  x: -3,
+A bronze plaque near the gate tells the UPS story—the bicycle messengers, the twenty-dollar startup, the rise to global logistics dominance. The plaque is green with age, the letters filling with verdigris. Success stories read differently when you're standing in the wreckage of the success.`,
+  x: -7,
   y: 8,
   z: 0,
   // Environmental properties

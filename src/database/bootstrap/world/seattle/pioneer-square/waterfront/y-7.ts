@@ -1,21 +1,18 @@
-// Waterfront - between S. Jackson St and S. King St
+// Waterfront - between S. Jackson and S. King
 
 export const room = {
-  name: 'Alaskan Way',
-  description: `A container ship is moored at the pier here, the MV Pacific Trader, her hull streaked with rust, her deck stacked with containers that will never reach their destinations. She was mid-loading when everything stopped. Half her cargo is still on the dock, half is aboard. She'll sit here until she rusts through or someone decides to move her.
+  name: 'Waterfront',
+  description: `The waterfront curves slightly here, following the natural contour of Elliott Bay where it meets the mouth of the Duwamish River. The river is invisible from this angle, hidden by the industrial port facilities to the south, but its influence is present in the sediment patterns visible at low tide—darker mud where river water meets salt water.
 
-The ship's gangway is still extended, swaying slightly in the wind. The crew quarters are dark. Whatever happened to the crew, they're not aboard anymore. Probably.
+The buildings that once lined this stretch are gone, cleared for waterfront development projects that never materialized. Concrete foundations mark where structures stood, gridlines of what might have been. The empty lots have returned to scrub grass and blackberry brambles, the city's edge rewilding itself one season at a time.
 
-Seabirds have claimed the deck, their guano coating the containers in white streaks. They've built nests in the cranes and the rigging. The ship is theirs now.
-
-The waterfront continues, grey concrete and grey water and grey sky all merging at the edges.`,
-  x: -15,
+The smell of the bay is strong here—salt and seaweed and something organic decomposing slowly in the tidal zone. It's not unpleasant, exactly. It's the smell of edges, of transitions, of places where one thing becomes another.`,
+  x: -21,
   y: -7,
   z: 0,
-  // Environmental properties
-  population: 0, // Empty (post-Event)
-  ambientNoise: 0, // Quiet/abandoned
-  lighting: 100, // Daylight (outdoor)
-  waterLevel: 0, // Dry
-  outdoor: true, // Street level
+  population: 0,
+  ambientNoise: 15,
+  lighting: 100,
+  waterLevel: 0,
+  outdoor: true,
 };

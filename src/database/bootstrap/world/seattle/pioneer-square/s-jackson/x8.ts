@@ -1,14 +1,14 @@
-// S. Jackson St - approaching 3rd Ave
+// S. Jackson St - east of 3rd Ave
 
 export const room = {
   name: 'S. Jackson St',
-  description: `Third Avenue approaches from the east, the intersection marking the boundary where the Corp Construction zone ends and the International District's abandoned streetscape resumes. The construction barriers terminate at the property line—Corp's maintained perimeter meeting buildings Corp didn't buy, the contrast between active development and decay sharper here than anywhere.
+  description: `S. Jackson enters the heart of the International District here, the streetscape expressing the neighborhood's Asian-American character even in ruin. The signage is multilingual—Chinese characters predominant, Vietnamese, Japanese, English—all faded, all marking businesses that served communities now scattered or dead. The decorative elements that Asian business districts favor remain: red-painted trim oxidized to rust, ornamental tile work cracked but intact.
 
-PACIFIC RIM CURRENCY EXCHANGE occupies the corner building, its windows dark, its services obsolete. Currency exchanges clustered in immigrant neighborhoods, providing the service families needed to send money home. The window still displays exchange rates in columned format: USD to JPY, USD to PHP, USD to VND—currencies that may not exist anymore, exchange rates frozen when the markets stopped. The families that sent money home are scattered. Home, for most of them, is gone.
+HARBOR CITY RESTAURANT occupies the corner building, its windows dark, its kitchen cold. The dim sum establishment served the Cantonese tradition of small plates and tea service. Through the grimy glass: round tables with built-in lazy susans arranged for service that ended fifty-five years ago, the kitchen window where carts emerged loaded with steamer baskets now framing only darkness. The red and gold color scheme is faded to pink and brown. The multi-generational meals ended. The generations scattered.
 
-Security cameras are mounted at the building's corners, their weatherproof housings intact, their lenses pointed at nothing. The coverage they provided protected against theft and vandalism. The war was neither theft nor vandalism. The cameras recorded nothing useful.`,
+The wire infrastructure for festival lighting spans the street here, the permanent mounting points holding nothing now. The wire connects buildings on both sides, the grid that supported paper lanterns during Lunar New Year. No lanterns. No celebrations. The festivals are fifty-five years past.`,
   x: 8,
-  y: -5,
+  y: -6,
   z: 0,
   // Environmental properties
   population: 0, // Empty (post-Event)

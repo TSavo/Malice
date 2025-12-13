@@ -1,12 +1,12 @@
-// Occidental Park - heart of the plaza
+// Occidental Park - central-southern area
 
 export const room = {
   name: 'Occidental Park',
-  description: `A raised platform occupies the center of the park—the performance stage where musicians and speakers once addressed crowds. The brick surface is elevated six inches, its edges trimmed in weathered steel, the geometry designed to create a focal point. The stage faced west, audiences gathered on the plaza below, the buildings providing a backdrop for whatever spectacle was being performed.
+  description: `A diagonal pathway cuts across the plaza here, its basket-weave brick pattern contrasting with the surrounding herringbone. The path was added later, a concession to the way people actually walked rather than the way designers wanted them to. Desire lines made permanent.
 
-No one performs here now. The stage collects leaves and debris, its surface stained by seasons of rain. Bolt holes mark where equipment was once mounted—speaker stands, lighting rigs, the infrastructure of performance. The bolts are gone, salvaged long ago. The holes remain, filling with rainwater, small wells in the brick.
+The bricks along the path are more worn than those around it, polished smooth by feet that no longer walk here. The contrast reveals how heavily trafficked this route was—office workers cutting through on lunch breaks, commuters shortening their walks home, the accumulated friction of thousands of passages.
 
-The dead trees ringing the plaza create an accidental amphitheater, their bare branches framing the sky like the ribs of a cathedral.`,
+A storm drain grate is set into the path, its metal bars clogged with leaves and debris that have accumulated over seasons. Water pools here when it rains, the drain no longer draining, creating a puddle that freezes and thaws and freezes again. The puddle reflects sky and dead trees and the buildings beyond.`,
   x: -2,
   y: 1,
   z: 0,

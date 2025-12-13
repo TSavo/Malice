@@ -2,18 +2,17 @@
 
 export const room = {
   name: 'Occidental Ave S',
-  description: `S. Main Street opens just ahead, and with it Pioneer Square's most photographed landmark—the totem pole at the intersection, sixty feet of carved cedar that Seattle businessmen stole from a Tlingit village in 1899 and erected here as a trophy of civic ambition. The original burned in 1938. The city had the nerve to ask the Tlingit for a replacement. They charged $5,000 and sent the new pole with a note: "Thanks for paying for the first one." The story is on a plaque at the pole's base, sanitized into heritage.
+  description: `The transition toward Main Street brings a subtle shift in architecture—the buildings here are slightly newer, early twentieth century rather than late nineteenth, their ornamentation more restrained. The Victorians gave way to the Edwardians gave way to whatever came next. Now they're all just old together.
 
-ARUNDEL BOOKS occupies the corner building, three floors of used and antiquarian titles stacked floor to ceiling in the way that only real bookstores achieve. The window display hasn't changed in months, maybe years—first editions under glass, travel guides to places that don't function anymore, a handwritten card promising "We Buy Books." The door is unlocked. It usually was. The owner believed in trust, or indifference, or the understanding that anyone desperate enough to steal books probably needed them more than he needed the sale.
+A recessed doorway on the west side shows signs of habitation—blankets piled in the corner, the smell of old smoke, marks on the walls from cooking fires long extinguished. Someone lived here once, after everything fell apart. Whether they moved on or simply stopped living is impossible to say.
 
-A sandwich board lies face-down on the cobblestones, knocked over by wind or carelessness. It advertised something once—coffee, maybe, or a poetry reading, or the kind of optimistic event that required advertising. Whatever it was happened or didn't. The board lies there still, its message pressed against stone, speaking to no one.`,
-  x: -3,
+The cobblestones give way to asphalt as the avenue approaches Main Street, the pedestrian zone ending where the cross-street begins. The transition is marked by a change in texture underfoot, smooth replacing rough, modern replacing historical.`,
+  x: -7,
   y: -1,
   z: 0,
-  // Environmental properties
-  population: 0, // Empty (post-Event)
-  ambientNoise: 0, // Quiet/abandoned
-  lighting: 100, // Daylight (outdoor)
-  waterLevel: 0, // Dry
-  outdoor: true, // Street level
+  population: 0,
+  ambientNoise: 0,
+  lighting: 100,
+  waterLevel: 0,
+  outdoor: true,
 };

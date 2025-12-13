@@ -1,15 +1,17 @@
-// Yesler Way - center point
+// 2nd Ave S & Yesler Way
+// Major intersection
 
 export const room = {
-  name: 'Yesler Way',
-  description: `This is the center of Pioneer Square, or close enough. Occidental Park stretches south, its cobblestones cracked and heaved by decades of freeze-thaw cycles no one bothers to repair. The iron pergola is visible to the west, the Victorian structure rusted to a deep brown, its lattice roof collapsed in places where the climbing plants died and the weight of winters accumulated.
+  name: '2nd Ave S & Yesler Way',
+  description: `Second Avenue crosses Yesler Way here. A mural covers the corner building's brick facade, five stories of salmon swimming upstream in Coast Salish style—bold reds and blacks faded now but still visible, the fish heading somewhere they'll never arrive. The mural has outlasted the salmon runs it commemorated, outlasted the artists who painted it, outlasted nearly everything.
 
-ZEITGEIST COFFEE occupies the corner, its windows dark, its espresso machines cold. Through the grimy glass: exposed brick walls, industrial lighting fixtures hanging dead from their cords. The morning crowds that once filled the outdoor tables are fifty-five years gone. The tables themselves were scavenged long ago.
+The street grid shifts at this intersection, a quirk of Seattle's founding visible in the misaligned blocks. North of Yesler Way, nothing quite lines up with what's south—two survey teams, two ideas of true north, a disagreement encoded in concrete and asphalt for two centuries and counting.
 
-Beneath the street, the original city lies entombed—the ground floors that became basements when Seattle raised its streets after the Great Fire. The Underground Tour departed from nearby once, guiding tourists through buried passages. The passages are still down there, darker now, the tours long ended. A city built atop itself, layers of abandonment all the way down.`,
+The corner buildings lean into each other slightly, the settling of foundations over decades creating a subtle tilt that's easier to feel than see. Four and five stories of brick and terra cotta, their facades stained with rain and time. The intersection sits at what used to be a boundary. Boundaries mean less now than they did.`,
   x: 0,
-  y: 10,
+  y: 12,
   z: 0,
+  intersection: ['2nd Ave S', 'Yesler Way'],
   // Environmental properties
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned

@@ -1,21 +1,18 @@
-// 4th Ave S - between S. Main St and S. Jackson St
+// 4th Ave S - between S. Jackson and S. Main
 
 export const room = {
   name: '4th Ave S',
-  description: `The heart of the International District surrounds you now, Pioneer Square just a memory to the north. The buildings here are older, built by immigrants who came to Seattle when Seattle was still becoming something. They built for permanence. They built well.
+  description: `Main Street is visible to the north, the intersection where Fourth Avenue crosses one of Pioneer Square's primary east-west axes. The Chinatown Gate stands at that intersection—or stood, before it fell across the road during the burning, blocking the route to downtown. The gate's remains are visible from here, carved stone and painted wood collapsed into rubble.
 
-A dim sum palace occupies half the block, its dragon-painted facade still magnificent despite the grime. The rolling carts inside are frozen in place, their contents long since claimed by time and vermin. The lazy susan tables still hold plastic menus, their photos of gleaming dishes a cruel reminder of abundance.
+The blocked intersection funnels traffic away from this stretch of Fourth Avenue, making it quieter than the parallel routes. The quiet has a weight to it, the absence of sound as present as sound itself. Even footsteps seem muffled here.
 
-A feng shui compass is painted on the sidewalk outside, its Chinese characters marking the cardinal directions. The compass was meant to bring luck to the businesses here. The luck ran out. The compass remains, pointing at nothing.
-
-The elevated tracks hum overhead when the wind blows right. It sounds almost like trains.`,
-  x: 15,
+Buildings on both sides show the mixed heritage of the transitional zone—Victorian brick next to 1950s concrete, Chinese signage next to English, the jumbled timeline of a city that was always building over itself.`,
+  x: 14,
   y: -1,
   z: 0,
-  // Environmental properties
-  population: 0, // Empty (post-Event)
-  ambientNoise: 0, // Quiet/abandoned
-  lighting: 100, // Daylight (outdoor)
-  waterLevel: 0, // Dry
-  outdoor: true, // Street level
+  population: 0,
+  ambientNoise: 0,
+  lighting: 100,
+  waterLevel: 0,
+  outdoor: true,
 };

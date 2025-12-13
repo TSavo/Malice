@@ -1,16 +1,15 @@
-// 1st Ave S & S. Jackson St intersection
+// S. Jackson St - approaching Occidental
 
 export const room = {
-  name: '1st Ave S & S. Jackson St',
-  description: `First Avenue intersects S. Jackson Street at a corner that once marked the boundary between Seattle's waterfront development and the International District. The intersection is wide—turn lanes and pedestrian crossings designed for urban density that no longer exists. The traffic signals hang dark, their LED units dead, the municipal standards that required yellow housings irrelevant now.
+  name: 'S. Jackson St',
+  description: `Occidental Avenue approaches from the north, its intersection marking the approximate boundary between the International District's Asian character and Pioneer Square's Victorian district. The transition is gradual—Chinese signage fading as Victorian brick becomes prominent—but both traditions arrive at the same abandonment. The overlap this block captures is the overlap of decay.
 
-WARRIOR MARTIAL ARTS SUPPLY occupies the corner building, its windows intact but grimy. The specialty retailer served martial arts schools that clustered in this area. Through the glass: uniforms in white and black cotton faded by decades of sun, padded sparring gear dusty on shelves, wooden and metal training weapons arranged for customers who will never come. The disciplines the store served—taekwondo, karate, kung fu, Brazilian jiu-jitsu—survive only in the memories of survivors scattered across whatever remains of the world.
+KEEFER BAKERY occupies a narrow storefront, its display cases empty and dark. The Chinese bakery specialized in pastries that dim sum restaurants served: egg tarts, pineapple buns, the barbecue pork buns that Cantonese bakeries perfected. The glass shelving designed to showcase the day's production showcases only dust. The ovens in back are cold. The last day's production was fifty-five years ago, whatever remained long since consumed by time and vermin.
 
-The buildings at this intersection represent different eras of Seattle development, all arriving at the same destination: a 1920s brick structure weathered but standing, a 1960s concrete box cracking at the seams, a 2000s mixed-use building with apartments empty above dark retail. Different eras, same emptiness.`,
+A stone foo dog guards the entrance to the building next door, one of a traditional pair. Its partner is missing—vandalism or theft or the entropy that claims unattended things. The remaining lion maintains its post, carved stone in the stylized form that centuries of tradition established: curled mane, muscular haunches, the ball beneath one paw. Still guarding. Nothing left to guard.`,
   x: -9,
-  y: -5,
+  y: -6,
   z: 0,
-  intersection: ['1st Ave S', 'S. Jackson St'],
   // Environmental properties
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned

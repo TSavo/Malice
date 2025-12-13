@@ -1,12 +1,12 @@
-// S. Main St - approaching 1st Ave
+// S. Main St - between 1st Ave and Occidental
 
 export const room = {
   name: 'S. Main St',
-  description: `First Avenue opens ahead, the intersection visible at the end of the block. This is the transition zone—waterfront giving way to Pioneer Square proper, tourist Seattle yielding to historic Seattle, though the distinction matters less now than it did when both parts were functioning. The architectural vocabulary shifts here: less maritime practicality, more urban aspiration. The buildings want to be taken seriously.
+  description: `THE NEW ORLEANS CREOLE RESTAURANT occupied the building here, but that's not what people came for. They came for the basement—DIMITRIOU'S JAZZ ALLEY, a venue that hosted touring acts and local musicians in a subterranean space where the acoustics were accidental and perfect. The entrance is a narrow stairway at street level, unmarked except for a neon saxophone sign that hangs above the stairs, its tubes cold, its blues silenced. The sign shows a stylized sax in profile, caught mid-note, frozen in a moment of music that will never finish.
 
-PIONEER PRINTING occupies the corner building, a family operation since 1956, specializing in the paper ephemera that documented milestones. Business cards for new ventures. Wedding invitations for hopeful couples. Funeral programs for departures. Birth announcements for arrivals. The window display shows samples of each, arranged in a timeline that tracks a hypothetical life from beginning to end. The Heidelberg press inside is silent, its rollers inked and ready for a job that will never run. The sample wedding invitation is for a date that passed six months ago. The sample funeral program belongs to someone who got their ceremony, at least.
+The stairs descend into darkness. The door at the bottom is steel, windowless, designed to contain sound rather than light. Whether anyone is inside—whether anyone was inside when whatever happened happened—is unknown. The door doesn't offer information. The saxophone above keeps its counsel.
 
-A fire hydrant stands at the corner, painted Seattle yellow, the color mandated after the Great Fire when firefighters couldn't locate hydrants in smoke and chaos. The paint is fading now, peeling in places, revealing older layers beneath—red, then silver, then the original cast iron. The hydrant is an archaeological record of civic fire safety, each layer a policy decision, each decision someone's response to someone else's disaster. The newest layer is the oldest now. Nobody is adding more.`,
+SLAVE TO THE NEEDLE occupies a storefront across the street, a tattoo parlor that specialized in custom work and charged accordingly. Flash art still covers the walls—traditional designs in the American style, eagles and roses and pin-up girls and hearts wrapped in banners bearing names that belonged to someone once. The needles are autoclave-sterile in their pouches. The ink has separated in its bottles, pigment settling to the bottom. The apprentice chairs sit empty. The art is patient. It waited years for the right skin to walk in. It can wait longer.`,
   x: -10,
   y: 0,
   z: 0,

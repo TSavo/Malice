@@ -1,20 +1,18 @@
-// Waterfront & S. Main intersection
+// S. Main St - between Waterfront and 1st Ave
 
 export const room = {
-  name: 'Alaskan Way & S. Main St',
-  description: `S. Main Street begins here at the Waterfront—or ends here, depending on your perspective. The intersection marks the boundary between water and city, between the salt air of Elliott Bay and the brick-and-stone canyon of Pioneer Square rising to the east. Seagulls wheel overhead, the only things still commuting.
+  name: 'S. Main St',
+  description: `Main Street climbs from the waterfront into Pioneer Square, the commercial artery that once connected the ferry terminal to the neighborhood's heart. The connection mattered when ferries brought commuters and tourists daily. The ferries stopped. The connection became theoretical.
 
-The Alaskan Way Viaduct is gone, demolished years before the Event, replaced by a surface boulevard that was supposed to reconnect the city to its waterfront. The reconnection worked beautifully for about eighteen months. Now the boulevard carries no traffic, just wind off the bay and the occasional dead leaf skittering across empty lanes. The absence of the viaduct lets in sky that was hidden for decades. The sky doesn't seem to care about the gift.
+The buildings here were built to serve waterfront commerce—shipping offices, customs brokers, the paper-pushers who kept cargo moving. Their ground floors had high ceilings and loading doors; their upper floors had windows facing the bay. The views are unchanged. The commerce they served is dust.
 
-IVAR'S ACRES OF CLAMS occupies the corner building, a Seattle institution since 1938, feeding tourists and locals alike with fish and chips and chowder served in styrofoam cups. The neon sign—a cartoon clam with a fork and knife—has gone dark. The deep fryers inside are cold. The tanks that held live Dungeness crabs are dry, their former occupants either released or consumed or simply gone the way of things that needed tending. A faded menu board outside still promises ALL YOU CAN EAT FRIDAYS. The Fridays continue. The eating does not.`,
+A brass plaque mounted on one building commemorates the 1889 fire that destroyed everything here, forcing the reconstruction that created Pioneer Square's current character. The fire is ancient history. The reconstruction is ancient history. The plaque tarnishes slowly, telling a story no one reads.`,
   x: -15,
   y: 0,
   z: 0,
-  intersection: ['Alaskan Way', 'S. Main St'],
-  // Environmental properties
-  population: 0, // Empty (post-Event)
-  ambientNoise: 0, // Quiet/abandoned
-  lighting: 100, // Daylight (outdoor)
-  waterLevel: 0, // Dry
-  outdoor: true, // Street level
+  population: 0,
+  ambientNoise: 0,
+  lighting: 100,
+  waterLevel: 0,
+  outdoor: true,
 };

@@ -1,14 +1,14 @@
-// S. Jackson St - between Waterfront and 1st Ave
+// S. Jackson St - between 1st Ave and Occidental
 
 export const room = {
   name: 'S. Jackson St',
-  description: `The streetscape captures the neighborhood mid-transition, frozen at whatever stage it had reached when the war came. A tower crane rises from a construction site on the north side of the street, its latticed arm rusted and motionless, extending over a partially completed structure—concrete floors poured, exterior cladding only partially installed. JACKSON PLACE, according to signage on the construction fence. Luxury condominiums with views of Elliott Bay and the Olympic Mountains. The views are still there. No one will ever live here.
+  description: `Hing Hay Park opens to the south, the neighborhood's central gathering space overgrown and silent. The park's pagoda pavilion—a gift from Taipei commemorating the sister city relationship—rises above the surrounding rooflines, its curved eaves weathered, its red-painted columns faded to rust-pink. Chinese architectural vocabulary in an American city, both traditions ending in the same abandonment.
 
-The construction fence itself is plywood painted with architectural renderings: happy residents on rooftop decks, a fitness center with floor-to-ceiling windows, the amenities that Seattle's real estate market demanded before it stopped demanding anything. The renderings have faded and peeled, the happy residents ghostly. Behind the fence, the structure rises eight stories, its exposed concrete and protruding rebar suggesting a building caught between foundation and finish, forever incomplete.
+SUN MAY COMPANY occupies the corner building, its windows dark, its door hanging ajar. The pharmacy bridged Western and traditional Chinese medicine—one side displaying American pharmaceuticals long expired, the other showing wooden drawers and glass jars of Chinese herbal remedies dried to dust. The herbs stored in specific ways, the scales for measuring doses, the mortar and pestle for grinding compounds—all still arranged for practitioners who will never return.
 
-Across the street, a 1920s commercial building maintains its brick facade with the confidence of structures that have already survived one century. The ground floor held retail—a frame shop, a dry cleaner—their windows dark, their services ended. The building survived the century. It will survive the next one, empty.`,
+The building's upper floors hold apartments, their windows fitted with security bars that protected nothing when it mattered. Fire escapes climb the exterior, rusted to deep orange-brown, the iron platforms unsafe now for emergency egress or anything else. The small apartments they served are dark and empty, the outdoor space they provided overlooking only decay.`,
   x: -11,
-  y: -5,
+  y: -6,
   z: 0,
   // Environmental properties
   population: 0, // Empty (post-Event)

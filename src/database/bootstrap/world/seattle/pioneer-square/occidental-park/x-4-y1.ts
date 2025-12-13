@@ -1,23 +1,19 @@
-// Occidental Park - Western edge (x=-4, y=1)
+// Occidental Park - just west of the former Occidental Avenue centerline, near S. Main
 
 export const room = {
   name: 'Occidental Park',
-  description: `The western edge of Occidental Park, where the brick plaza meets the buildings that line First Avenue to the west. The park stretches east from here, opening into the broader plaza space.
+  description: `A chain-link fence sags across this section of the park, an old construction barrier that was never removed—or perhaps installed after the Event to keep something out or in. The posts lean at angles, the fabric rusted through in places, whatever it once protected or contained long since irrelevant. The fence creates a corridor of sorts, channeling movement through the plaza in ways the original designers never intended.
 
-A metal sculpture stands near the edge, an abstract piece from the 1980s—welded steel painted in colors that have faded and chipped away. The sculpture represents something. Movement, maybe. Energy. Connection. The artist had an intention. The sculpture remains, silent and rusting.
+The brick paving is heaved here, frost damage accumulating over fifty-five winters without repair. Weeds push through the joints, hardy urban plants that found purchase in the cracks. A shopping cart rusted to lace sits abandoned near the fence, its metal reduced to almost nothing by oxidation.
 
-Dead trees line this edge of the park at intervals, their trunks still upright, their branches creating stark patterns against the sky. They were London Plane trees once, chosen for their tolerance of urban conditions. They tolerated everything until they couldn't anymore.
-
-A wooden bench faces east toward the center of the park. Its slats are weathered, one cracked through the middle, the break revealing wood grain patterns like frozen water. Nobody has sat here in a long time.
-
-The park extends north, east, and south.`,
+S. Main Street is visible to the south through gaps in the surrounding buildings. The sound of wind across brick is the only sound, a low whisper that the plaza's geometry amplifies and distorts.`,
   x: -4,
   y: 1,
   z: 0,
   // Environmental properties
   population: 0, // Empty (post-Event)
-  ambientNoise: 15, // Open space, wind
-  lighting: 100, // Full daylight
+  ambientNoise: 15, // Open plaza, wind across brick
+  lighting: 100, // Full daylight (open space)
   waterLevel: 0, // Dry
   outdoor: true, // Open plaza
 };

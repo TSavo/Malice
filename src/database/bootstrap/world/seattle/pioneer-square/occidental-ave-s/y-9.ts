@@ -1,19 +1,18 @@
-// Occidental Ave S - between S. King and S. Jackson
+// Occidental Ave S - between S. Jackson and S. King
 
 export const room = {
   name: 'Occidental Ave S',
-  description: `The Occidental Mall stretches north from here, a pedestrian corridor of weathered brick and overgrown maples that was once Pioneer Square's spine. The cobblestones underfoot survived the Great Fire of 1889—they hauled them from ships' ballast, smoothed them with a century of feet, and now those same stones lie beneath drifts of maple leaves that no one rakes. The trees have grown wild in the absence of pruning, their branches interlocking overhead like fingers clasped in prayer or conspiracy.
+  description: `The cobblestones here have buckled and heaved, frost cycles and neglect conspiring to turn what was once a carefully laid pedestrian way into something resembling a frozen sea. The bricks jut at angles, creating trip hazards that would have generated lawsuits in the old world. Now they're just terrain.
 
-Wrought-iron benches line the walkway at intervals, the kind of Victorian reproduction that cities install when they want history without the inconvenience of actual age. Green paint flakes from the armrests. Bird droppings have calcified on the seats. A newspaper vending box stands beside one bench, its window too dirty to read, its coin slot jammed with something that might have been gum or might have been spite.
+A building on the west side has partially collapsed, its upper floors pancaked onto the lower ones in a cascade of brick and timber. The collapse looks old—decades old—the edges softened by weather, weeds growing from the rubble pile. Whatever happened here happened long ago. No one cleaned it up. No one will.
 
-To the south, the stadiums rise like monuments to distraction—T-Mobile Park's retractable roof frozen half-open, Lumen Field's lighting rigs standing skeletal against the sky. They built this mall to funnel fans from the games into the bars. The funnel worked beautifully. Forty thousand people pouring through on summer nights, buying beer and shouting and being alive. The cobblestones remember the weight of all those feet. The stones don't care that the feet stopped coming.`,
-  x: -3,
+The street narrows where debris has spilled across the roadway, forcing passage through a gap barely wide enough for two people abreast. The walls on either side lean inward slightly, creating a sense of compression, of the city slowly closing in on itself.`,
+  x: -7,
   y: -9,
   z: 0,
-  // Environmental properties
-  population: 0, // Empty (post-Event)
-  ambientNoise: 0, // Quiet/abandoned
-  lighting: 100, // Daylight (outdoor)
-  waterLevel: 0, // Dry
-  outdoor: true, // Street level
+  population: 0,
+  ambientNoise: 0,
+  lighting: 100,
+  waterLevel: 0,
+  outdoor: true,
 };

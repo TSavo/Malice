@@ -9,7 +9,7 @@ The building on the Pioneer Square side is newer, a mixed-use development that w
 A basketball hoop is mounted on a pole at the edge of a small plaza, its net rotted away, its backboard tagged with graffiti. Someone left a ball nearby, deflated and cracked. The game ended mid-play and never resumed.
 
 The elevated tracks cast their shadows across the street.`,
-  x: 15,
+  x: 14,
   y: 3,
   z: 0,
   // Environmental properties

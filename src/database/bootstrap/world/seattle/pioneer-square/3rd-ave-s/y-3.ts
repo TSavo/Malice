@@ -2,14 +2,14 @@
 
 export const room = {
   name: '3rd Ave S',
-  description: `Hing Hay Park is visible to the east, its pagoda pavilion rising above the surrounding rooftops. The park was the heart of the International District, a gathering place for tai chi and gossip and the slow accumulation of community. The tai chi practitioners are gone. The gossip has stopped. The community has scattered.
+  description: `The International District asserts itself more strongly here. Signs in Chinese and Vietnamese and Korean compete for attention on storefronts built for immigrant entrepreneurs who came to America seeking opportunity. The opportunity has changed shape. The signs remain.
 
-A Chinese grocery store occupies the western corner, its windows still displaying the plastic grass mats and ceramic lucky cats that signaled authenticity to tourists and familiarity to residents. The produce section is dark, its refrigeration silent, its vegetables returned to earth in their own way.
+A travel agency window displays posters of destinations that might as well be other planets. Vietnam. China. Thailand. The beaches and temples and city skylines of places that exist somewhere across oceans that no one crosses anymore.
 
-A red paper lantern hangs from a fire escape above, somehow surviving the months of weather. Its color has faded to pink, but it still sways in the breeze, still marking this as a place where celebration once happened.
+A money transfer service occupies the corner, its wire transfer rates still posted in the window. The wires are down. The rates are academic. The money that flowed through here to support families overseas has stopped flowing.
 
-Jackson Street is visible to the south, the district's main artery.`,
-  x: 9,
+The avenue continues south toward Jackson Street, where the district's heart beats—or used to beat.`,
+  x: 7,
   y: -3,
   z: 0,
   // Environmental properties

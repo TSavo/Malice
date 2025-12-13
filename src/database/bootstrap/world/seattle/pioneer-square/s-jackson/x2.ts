@@ -1,14 +1,14 @@
-// S. Jackson St - approaching 2nd Ave
+// S. Jackson St - between 2nd and 3rd Ave
 
 export const room = {
   name: 'S. Jackson St',
-  description: `The approach to 2nd Avenue widens here, the streetscape designed to accommodate pedestrian flow between Pioneer Square and the stadiums. The sidewalks are broad, the sightlines clear—urban design optimized for crowd management rather than intimate streetscape. The scale feels institutional, the public space that civic investment created for public that no longer exists.
+  description: `The Corp Construction perimeter continues along the south side of S. Jackson, black fabric barriers maintained and patrolled, the visual wall separating the active site from the dead city beyond. The fence runs for three blocks, the footprint suggesting the scale of whatever Corp is building. Tower cranes move above the barriers—actually move, their arms swinging in ways no other machinery in this district has moved in fifty-five years.
 
-SEATTLE TEAM SHOP occupies a ground-floor retail space, its windows dusty but intact. Through the glass: jerseys displayed on mannequins faded by decades of sun, caps arranged by team and style—Seahawks, Mariners, teams that played their last games before the war. The branded merchandise that sports fandom required, waiting for fans who will never return. The souvenirs of a culture that ended.
+LUCKY MART occupies the ground floor opposite, a convenience store that served the neighborhood before the war. The awning—red canvas printed with English and Vietnamese—is faded and torn, the sidewalk produce display empty and rusted. Through the grimy window: coolers along the back wall dark and dead, snack aisles picked clean decades ago, the lottery terminal behind the counter offering jackpots no one will ever claim.
 
-A bronze statue stands outside the building—a baseball player captured mid-swing, the moment of contact frozen in metal. The statue commemorates a franchise legend, part of the public art program that stadium districts installed to create sense of place. The bronze has weathered to patina green, the plaque at its base listing statistics and achievements that mean nothing now. Athletic excellence measured in numbers no one remembers.`,
+The buildings along this stretch show the International District's characteristic mix, equally abandoned: older brick structures adapted for uses that ended, newer construction built to codes that no longer matter. The residential character the block maintained is silent now, apartments above dark retail housing no one. The community that gave the neighborhood its identity is gone, while Corp builds something new in its ruins.`,
   x: 2,
-  y: -5,
+  y: -6,
   z: 0,
   // Environmental properties
   population: 0, // Empty (post-Event)

@@ -1,14 +1,14 @@
-// S. King St - approaching 1st Ave
+// S. King St - between 1st Ave and Occidental
 
 export const room = {
   name: 'S. King St',
-  description: `The streetscape transitions here as S. King approaches 1st Avenue, industrial architecture giving way to mixed-use buildings. The buildings gain stories—two and three floors rather than single-story warehouses—and ground floors show storefronts rather than loading docks. The storefronts are dark. The loading docks are silent.
+  description: `Lumen Field rises to the south, the football stadium's distinctive roof structure visible above surrounding development. The Seahawks played here from 2002 until the war ended professional sports. The stadium was designed to amplify crowd noise through its partially enclosed bowl. The bowl is silent now. The acoustics amplify nothing but wind.
 
-THE SHIPYARD TAVERN occupies a corner building, a dive bar that served waterfront workers who needed somewhere to drink after shift. Through the grimy window: pool tables visible in the dim interior, a long bar backed by bottles no one has poured from in decades. The neon beer signs are dark, their tubes dead. The building shows its age—original wood paneling, tin ceiling tiles that early twentieth-century construction favored, all of it covered in dust.
+SEAHAWKS PRO SHOP occupies a corner retail space, its windows still displaying inventory: Action Green and College Navy arranged on mannequins faded by decades of sun. The jerseys commemorate players no one remembers. The fan base that supported Pacific Northwest football scattered or died or forgot that football ever mattered.
 
-The buildings along this stretch date to the 1920s and 1930s, brick facades replacing corrugated metal as Pioneer Square's southern boundary transitioned from pure industrial to commercial. The commercial development stopped. The bricks remain.`,
+A bronze statue stands outside the shop, a player captured mid-motion, frozen in a pose that sports sculpture favors. The statue commemorates a franchise legend. The plaque on the base bears career statistics—touchdowns, yards, the numerical achievements that justified commemoration when numbers meant something. The statue watches an empty street, waiting for crowds that will never come.`,
   x: -10,
-  y: -10,
+  y: -12,
   z: 0,
   // Environmental properties
   population: 0, // Empty (post-Event)

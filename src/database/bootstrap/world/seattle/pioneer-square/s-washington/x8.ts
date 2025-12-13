@@ -1,14 +1,14 @@
-// S. Washington St - approaching 3rd Ave
+// S. Washington St - between 3rd and 4th Ave
 
 export const room = {
   name: 'S. Washington St',
-  description: `The debris field narrows the street to a single lane here, the rubble from the Collapsed Building forming a wall along the north side. The pile has settled over time, rain and gravity compacting the loose material into something more stable. Weeds have begun colonizing the edges—dandelions and grass, the pioneer species that establish in disturbed ground.
+  description: `The Corp Construction site's perimeter ends here, the black fabric barriers giving way to the older buildings that line Washington Street's final blocks before 4th Avenue. The fence line creates a sharp boundary between the construction zone's mystery and the street's ordinary dereliction.
 
-The buildings along the south side of the street survived, their proximity to the collapse evident in cracked windows and facades streaked with brick dust. A parking structure occupies most of the block, its concrete ramps spiraling upward to levels that held cars for the office workers who once populated this area. The structure's design dates it to the 1970s—poured concrete, minimal ornamentation, the brutalist aesthetic that municipal architecture favored.
+RUBY'S DINER claims the corner building, its chrome-and-glass facade preserved from a 1950s renovation that aimed for mid-century modern and achieved mid-century adequate. The interior is visible through plate glass windows: a long Formica counter with chrome stools bolted to the floor, red vinyl booths along the walls, the layout of a classic American diner designed for efficiency rather than ambiance. The neon sign above the door—RUBY'S in cursive script—is dark but intact.
 
-The intersection with 3rd Avenue opens ahead, the cross-street providing a route around the debris field. The Corp Construction site's perimeter fencing is visible to the south, black fabric screening whatever lies within from casual observation.`,
+The buildings along this stretch transition from Pioneer Square's Victorian brick to the more varied architecture of the International District ahead. The boundary between neighborhoods is gradual rather than sharp, marked by changes in signage language and storefront style rather than any formal demarcation.`,
   x: 8,
-  y: 5,
+  y: 6,
   z: 0,
   // Environmental properties
   population: 0, // Empty (post-Event)

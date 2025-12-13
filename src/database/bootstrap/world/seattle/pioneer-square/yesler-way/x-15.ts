@@ -1,21 +1,18 @@
-// Yesler Way at the Waterfront Edge
-// Western terminus where the street meets Elliott Bay
+// Yesler Way - between Waterfront and 1st Ave
 
 export const room = {
-  name: 'Yesler Way at Waterfront',
-  description: `Yesler Way terminates at the waterfront seawall, the western edge of a street grid established when Henry Yesler built Seattle's first sawmill here in 1853. This location represents the city's founding geography—Elliott Bay meeting steep hillside, the narrow flat where Yesler's mill processed timber and established the "Skid Road" that gave Pioneer Square its original name.
+  name: 'Yesler Way',
+  description: `Yesler Way begins its diagonal climb from the waterfront here, the original skid road that gave Seattle's Skid Row its name. Logs once rolled down this grade to Henry Yesler's sawmill at the water's edge, the first industry in a settlement that would become a city. The sawmill is a memory. The grade remains.
 
-The seawall is crumbling, early twentieth-century concrete giving way to salt water and time. Cracks run through the barrier where settlement has occurred over decades of neglect. The bay laps at foundations that were never meant to stand this long without maintenance. Rebar shows through spalled concrete like bones through rotting flesh.
+The diagonal cuts across the grid at an angle that confuses navigation, streets meeting at odd corners, lots assuming triangular shapes that architects struggled to fill. The confusion was built into the city's bones in 1853. It persists in the ruins.
 
-The street rises eastward from here, climbing the grade that Yesler's original road established. The topography that made Seattle possible is visible from this vantage: the steep bluff that the early city carved into, the filled tidelands that extended the buildable area, the intersection of water and earth that all port cities share. The water is patient. The earth is indifferent. The city between them is mostly gone.`,
+The debris pile that blocks passage to downtown is visible ahead, the collapsed building's rubble forming a wall across the intersection with First Avenue. The only way through is along the waterfront, through the gap in the seawall. Everything else ends here, at the barrier that geography and gravity created.`,
   x: -15,
-  y: 10,
+  y: 12,
   z: 0,
-  intersection: ['Waterfront', 'Yesler Way'],
-  // Environmental properties
-  population: 0, // Empty (post-Event)
-  ambientNoise: 0, // Quiet/abandoned
-  lighting: 100, // Daylight (outdoor)
-  waterLevel: 0, // Dry
-  outdoor: true, // Street level
+  population: 0,
+  ambientNoise: 0,
+  lighting: 100,
+  waterLevel: 0,
+  outdoor: true,
 };

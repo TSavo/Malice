@@ -1,14 +1,14 @@
-// S. Washington St - between Occidental and 2nd Ave
+// S. Washington St - between 2nd and 3rd Ave
 
 export const room = {
   name: 'S. Washington St',
-  description: `The Pioneer Building's retail arcade continues here, a covered walkway that runs along the ground floor, its arched openings framing storefronts that changed tenants regularly but never purpose. The arcade was designed to shelter pedestrians from Seattle's rain, a practical feature that became architectural signature. Similar arcades appear throughout Pioneer Square, the covered sidewalks connecting buildings into a coherent urban fabric.
+  description: `The architectural character shifts here, the Victorian brick of Pioneer Square proper giving way to mid-century pragmatism. These buildings went up in the sixties and seventies, when Seattle was more interested in parking lots than preservation. Flat facades, aluminum storefronts, the anonymous construction that fills gaps between landmark buildings.
 
-PIONEER ANTIQUES occupies a double-wide storefront, its display windows crammed with furniture arranged in the maximalist style that antique stores favor—every surface covered, every corner filled, the accumulated inventory of estate sales and consignment and the things people couldn't take with them. A grandfather clock stands near the window, its case dark walnut, its brass pendulum frozen mid-swing.
+QUICK CASH occupies the corner, its storefront armored with the bulletproof glass and security cameras that check-cashing establishments require. The business model depended on people who needed money faster than banks would provide it, who paid fees that reflected their lack of options. The neon signs in the window advertised services: CHECK CASHING • PAYDAY LOANS • MONEY ORDERS. The fees were posted in small print.
 
-The buildings along this stretch maintain consistent cornice lines, their facades varying in detail but unified in scale. Pioneer Square's building codes enforced this uniformity after the Great Fire, ensuring that the rebuilt neighborhood would present a coherent streetscape. The codes worked. The streetscape endures.`,
+A vacant lot opens across the street, chain-link fence surrounding a rectangle of cracked concrete and weeds. The lot has been vacant long enough for the weeds to become established—Himalayan blackberry, Scotch broom, the invasive species that colonize any unmaintained ground in the Pacific Northwest. A sun-faded sign on the fence shows an architectural rendering of the mixed-use development that was planned for the site.`,
   x: 1,
-  y: 5,
+  y: 6,
   z: 0,
   // Environmental properties
   population: 0, // Empty (post-Event)

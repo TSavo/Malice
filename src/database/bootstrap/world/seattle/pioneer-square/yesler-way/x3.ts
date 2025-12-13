@@ -1,17 +1,15 @@
-// 2nd Ave S & Yesler Way
-// Major intersection
+// Yesler Way - between 2nd and 3rd Ave
 
 export const room = {
-  name: '2nd Ave S & Yesler Way',
-  description: `Second Avenue crosses Yesler Way here. A mural covers the corner building's brick facade, five stories of salmon swimming upstream in Coast Salish style—bold reds and blacks faded now but still visible, the fish heading somewhere they'll never arrive. The mural has outlasted the salmon runs it commemorated, outlasted the artists who painted it, outlasted nearly everything.
+  name: 'Yesler Way',
+  description: `A construction site occupies the south side of the street, plywood barriers weathered grey surrounding foundation work that never progressed beyond rebar and poured concrete. A faded sign promises "THE YESLER" with "152 LUXURY UNITS." The luxury units were never built. The sign keeps promising.
 
-The street grid shifts at this intersection, a quirk of Seattle's founding visible in the misaligned blocks. North of Yesler Way, nothing quite lines up with what's south—two survey teams, two ideas of true north, a disagreement encoded in concrete and asphalt for two centuries and counting.
+RAIN CITY MARTIAL ARTS occupies a ground-floor space on the north side, its mirrored windows cracked and clouded, reflecting a distorted version of the street. Through gaps in the mirror: heavy bags hanging motionless, their leather cracked and split. Training mats covered in dust. The building's brick facade dates to the early twentieth century; the dojo opened sometime before the war and closed when everyone did.
 
-The corner buildings lean into each other slightly, the settling of foundations over decades creating a subtle tilt that's easier to feel than see. Four and five stories of brick and terra cotta, their facades stained with rain and time. The intersection sits at what used to be a boundary. Boundaries mean less now than they did.`,
+Third Avenue approaches. The light rail used to run through here, connecting this neighborhood to downtown and beyond. The trains stopped. The tunnels remain, dark and silent beneath the street.`,
   x: 3,
-  y: 10,
+  y: 12,
   z: 0,
-  intersection: ['2nd Ave S', 'Yesler Way'],
   // Environmental properties
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned

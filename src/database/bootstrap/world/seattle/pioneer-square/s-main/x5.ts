@@ -1,12 +1,12 @@
-// S. Main St - between 2nd and 3rd Ave
+// S. Main St - approaching 3rd Ave
 
 export const room = {
   name: 'S. Main St',
-  description: `KING COUNTY COMMUNITY SERVICES fills the entire south side of the block, a mid-century municipal building with the architectural warmth of a filing cabinet. The building housed social workers and case managers and the bureaucratic infrastructure of compassion—SNAP applications and disability claims and the thousand forms required to prove you needed help badly enough to receive it. The revolving door is frozen mid-rotation. The lobby beyond is visible through glass walls: reception desks, waiting-area chairs, a numbered ticket dispenser. The numbers stopped being called.
+  description: `Third Avenue opens ahead, the intersection marking the eastern edge of the Corp Construction zone and the beginning of whatever lies beyond—taller buildings, the municipal towers of city government, the glass-and-steel commercial district that Seattle built when it decided to be a real city. The transition is visible in the skyline: Pioneer Square's four-story brick gives way to twenty-story concrete, the human scale yielding to the corporate.
 
-A bulletin board near the entrance holds the archaeology of assistance: flyers for shelters with addresses and hours that may or may not still apply, food bank schedules printed on fluorescent paper, hotline numbers for crisis services that ring through to voicemail that fills and empties into nowhere. One flyer offers HELP FOR DOMESTIC VIOLENCE SURVIVORS, another FREE LEGAL AID FOR TENANTS FACING EVICTION. The problems the flyers addressed still exist. The help the flyers offered has relocated to wherever help goes.
+CHECK INTO CASH occupies the corner building, a payday lender that served the customers the banks wouldn't serve. The window displays list services for the underbanked: PAYDAY LOANS UP TO $700 • MONEY ORDERS • WIRE TRANSFERS • CHECK CASHING NO BANK ACCOUNT NEEDED. The services extracted fees from desperation, charging 400% APR for the privilege of accessing your own future income. The business model was predatory. The predation has become moot. The fees still listed on the rate card assume an economy where fees can be extracted from something.
 
-A shopping cart leans against the building's foundation, positioned under an overhang that offers some protection from rain. The cart is packed with the portable archaeology of a life lived without shelter—sleeping bag compressed into a stuff sack, plastic tarps folded carefully, cans and bottles sorted into bags for recycling that no longer happens. The cart's owner assembled these possessions through choices and calculations that made sense at the time. The owner is gone. The possessions remain, a memorial to survival strategies that worked until they didn't.`,
+Bars cover the windows, iron grates bolted to the brick, security measures that spoke to a neighborhood where property needed protecting from people. The bars are rusted but intact. The glass behind them is unbroken. Whatever threat the bars were meant to deter has evolved beyond the ability of iron to stop it. The bars remain, a defensive gesture frozen in metal, protecting an empty space from nothing in particular.`,
   x: 5,
   y: 0,
   z: 0,

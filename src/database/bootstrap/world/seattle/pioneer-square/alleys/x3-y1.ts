@@ -12,7 +12,7 @@ The western wall is darker brick, water-stained where downspouts have failed, ma
 A dumpster sits near the western curb, listing slightly where the ground has settled beneath it. Its lid is missing, its interior long emptied of everything but rust and accumulated rainwater.
 
 Second Avenue continues north toward S. Washington and south toward S. Main.`,
-  x: 3,
+  x: 0,
   y: 1,
   z: 0,
   // Environmental properties

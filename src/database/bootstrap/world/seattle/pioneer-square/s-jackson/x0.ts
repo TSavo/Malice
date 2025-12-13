@@ -1,15 +1,16 @@
-// S. Jackson St - between Occidental and 2nd Ave
+// 2nd Ave S & S. Jackson St intersection
 
 export const room = {
-  name: 'S. Jackson St',
-  description: `The stadium district rises to the south, T-Mobile Park and Lumen Field dominating the skyline with the scale that professional sports facilities require. The two stadiums were built in the late 1990s, replacing the Kingdome. The corporate names are probably meaningless now—T-Mobile and Lumen gone the way of everything else—but the signs remain, advertising companies that no longer exist to crowds that will never gather.
+  name: '2nd Ave S & S. Jackson St',
+  description: `Second Avenue intersects S. Jackson Street at the primary pedestrian approach to the stadium district. The intersection is wide, designed for thousands of fans who crossed here on game days. The crosswalks are painted in Seahawks blue and green on one side, Mariners navy and teal on the other—team colors faded but still visible, brand identity built into infrastructure for brands that no longer exist.
 
-SLUGGERS SPORTS BAR occupies the corner building, its windows plastered with team decals faded to ghosts. Through the grimy glass: multiple television screens dark and dead, a long bar backed by beer taps rusted in place, sports memorabilia gathering dust on walls no one looks at. The business model depended on event-day traffic. The events ended. The traffic stopped. The bar serves no one.
+The Stadium Station entrance occupies the northeast corner, the Sound Transit light rail stop that connected the stadiums to Sea-Tac Airport. The glass-and-steel canopy shelters escalators frozen mid-step, descending to platforms that haven't seen a train in fifty-five years. The station was designed for capacity—wide escalators, multiple fare gates—the infrastructure that handled tens of thousands of passengers handling nothing now.
 
-The streetscape was designed for pedestrian flow—wide sidewalks and clear sightlines guiding thousands of fans on game days. The infrastructure of crowd management remains: signal poles dark and rusting, curb cuts and crosswalks faded. The predictable patterns accommodated masses of people moving together. No masses. No patterns. Just the silence of spaces designed for noise.`,
+The buildings at this intersection are newer construction, built during the stadium-era development boom. Glass and steel facades weathered and dirty, ground-floor retail dark behind locked gates. The corners once hosted mobile vendors on game days—food carts and merchandise sellers claiming spots with unwritten agreements. The carts are gone. The agreements forgotten. The territory they claimed means nothing.`,
   x: 0,
-  y: -5,
+  y: -6,
   z: 0,
+  intersection: ['2nd Ave S', 'S. Jackson St'],
   // Environmental properties
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned

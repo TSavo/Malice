@@ -1,14 +1,14 @@
-// Yesler Way - eastern edge of park area
+// Yesler Way - between 2nd and 3rd Ave
 
 export const room = {
   name: 'Yesler Way',
-  description: `The PIONEER BUILDING dominates this intersection, six stories of red brick that have weathered better than most. Built in 1892, it survived the Great Fire that necessitated its construction and the war that ended everything else. The Romanesque arches frame windows that are mostly intact, a rarity. The corner turret still rises above the roofline, though pigeons have claimed it for their own.
+  description: `The architecture transitions here from Pioneer Square's historic brick to mid-century concrete—the ugly buildings that replaced the beautiful ones after a fire in the seventies. Ironic that the ugly ones survived the war better. Concrete doesn't burn the way wood trim and ornamental terra cotta do.
 
-ELYSIAN BREWING occupies the ground floor across the street, or did. The copper brewing tanks are visible through grimy windows, tarnished green-brown now, the beer long since drunk or evaporated or turned to something worse. The tap handles behind the bar are still there, pouring nothing.
+A four-story office building occupies the south side, its aluminum-framed windows mostly shattered, aggregate panels stained with decades of rain and neglect. Ground-floor retail spaces are gutted, their contents looted in the early years when looting still seemed like a viable survival strategy. The storefronts gape open now, picked clean.
 
-This intersection marks the eastern edge of Occidental Park, where the cobblestone plaza gives way to cracked asphalt. The buildings maintain their historic facades—brick and terra cotta don't care about the passage of time the way glass and steel do.`,
+Yesler Way continues its gentle slope toward the waterfront, following the grade that Henry Yesler's original skid road established. Logs once rolled down this hill to the sawmill at the water's edge. Nothing rolls downhill anymore except rain and debris.`,
   x: 1,
-  y: 10,
+  y: 12,
   z: 0,
   // Environmental properties
   population: 0, // Empty (post-Event)

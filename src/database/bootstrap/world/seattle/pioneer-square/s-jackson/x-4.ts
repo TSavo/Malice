@@ -1,14 +1,14 @@
-// S. Jackson St - approaching Occidental
+// S. Jackson St - between Occidental and 2nd Ave
 
 export const room = {
   name: 'S. Jackson St',
-  description: `Occidental Avenue approaches from the north, its intersection marking the approximate boundary between the International District's Asian character and Pioneer Square's Victorian district. The transition is gradual—Chinese signage fading as Victorian brick becomes prominent—but both traditions arrive at the same abandonment. The overlap this block captures is the overlap of decay.
+  description: `The stadium district rises to the south, T-Mobile Park and Lumen Field dominating the skyline with the scale that professional sports facilities require. The two stadiums were built in the late 1990s, replacing the Kingdome. The corporate names are probably meaningless now—T-Mobile and Lumen gone the way of everything else—but the signs remain, advertising companies that no longer exist to crowds that will never gather.
 
-KEEFER BAKERY occupies a narrow storefront, its display cases empty and dark. The Chinese bakery specialized in pastries that dim sum restaurants served: egg tarts, pineapple buns, the barbecue pork buns that Cantonese bakeries perfected. The glass shelving designed to showcase the day's production showcases only dust. The ovens in back are cold. The last day's production was fifty-five years ago, whatever remained long since consumed by time and vermin.
+SLUGGERS SPORTS BAR occupies the corner building, its windows plastered with team decals faded to ghosts. Through the grimy glass: multiple television screens dark and dead, a long bar backed by beer taps rusted in place, sports memorabilia gathering dust on walls no one looks at. The business model depended on event-day traffic. The events ended. The traffic stopped. The bar serves no one.
 
-A stone foo dog guards the entrance to the building next door, one of a traditional pair. Its partner is missing—vandalism or theft or the entropy that claims unattended things. The remaining lion maintains its post, carved stone in the stylized form that centuries of tradition established: curled mane, muscular haunches, the ball beneath one paw. Still guarding. Nothing left to guard.`,
+The streetscape was designed for pedestrian flow—wide sidewalks and clear sightlines guiding thousands of fans on game days. The infrastructure of crowd management remains: signal poles dark and rusting, curb cuts and crosswalks faded. The predictable patterns accommodated masses of people moving together. No masses. No patterns. Just the silence of spaces designed for noise.`,
   x: -4,
-  y: -5,
+  y: -6,
   z: 0,
   // Environmental properties
   population: 0, // Empty (post-Event)

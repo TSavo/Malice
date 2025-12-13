@@ -1,16 +1,15 @@
-// 2nd Ave S & S. King St intersection
+// S. King St - between 2nd and 3rd Ave
 
 export const room = {
-  name: '2nd Ave S & S. King St',
-  description: `Second Avenue intersects S. King Street at what was once a primary approach to the stadium complex. The street is wider here than typical, extra lanes and broader sidewalks accommodating thousands of fans who no longer flow through. The game days ended. The infrastructure that served them remains, oversized for the emptiness it now accommodates.
+  name: 'S. King St',
+  description: `LUEN FUNG MARKET occupies the ground floor, its windows opaque with decades of grime. The produce bins that once extended onto the sidewalk are empty and rusted, the awning above them tattered and sagging. Through what glass remains visible: narrow aisles still packed with inventory from ceiling to floor, the dried goods and preserved foods that outlasted everything else. Whatever was perishable is long gone—rotted, consumed, or desiccated to unrecognizable husks.
 
-The Stadium Station entrance descends at the corner, the light rail stop that connected the stadiums to the regional transit network. The entrance canopy shelters escalators frozen mid-step, leading to underground platforms that haven't seen a train in decades. The infrastructure of mass transit serves no mass. The transit stopped.
+The store served the community's need for ingredients unavailable elsewhere—dried mushrooms, preserved vegetables, the sauces and seasonings that Chinese cooking requires. The live seafood tanks are dark and dry, the filtration systems silent. The supply chains that stretched across the Pacific broke when the war came. Hong Kong, Taiwan, mainland China—the import networks that sustained this place dissolved into the same chaos that took everything else.
 
-The intersection's corners show the infrastructure of event-day commerce that no longer operates: designated vendor spaces empty, utility hookups capped and corroded. Second Avenue stretches north from here toward Pioneer Square's historic core, one kind of abandonment leading to another.`,
+The building's upper floors hold residential units, their windows dark, their fire escapes rusted to a deep orange-brown. The iron platforms still cling to the exterior wall, the emergency egress that no one will ever need. Some of the windows are broken. Some are boarded. The residents who lived here are fifty-five years gone.`,
   x: 3,
-  y: -10,
+  y: -12,
   z: 0,
-  intersection: ['2nd Ave S', 'S. King St'],
   // Environmental properties
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned

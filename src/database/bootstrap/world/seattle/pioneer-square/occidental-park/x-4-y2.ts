@@ -1,23 +1,19 @@
-// Occidental Park - Western edge (x=-4, y=2)
+// Occidental Park - along what was once Occidental Avenue
 
 export const room = {
   name: 'Occidental Park',
-  description: `The western side of Occidental Park, where brick plaza meets the alley-like space along First Avenue. The park opens east from here into its central expanse.
+  description: `An information kiosk stands at an angle here, knocked from its foundation by something—impact or earthquake or fifty-five years of Seattle wind. The glass panels are shattered, the maps inside faded to illegibility, the tourist information serving no tourists. "PIONEER SQUARE HISTORIC DISTRICT" reads the header, the text beneath it a blur of water damage and UV decay. The district is still historic. More historic now than ever.
 
-A pergola structure extends overhead, its wooden beams weathered to grey, its lattice top open to the sky. The pergola was meant to provide shade and define space, to create intimate zones within the larger plaza. It serves that function still, though there are no people to enjoy the shade or intimacy.
+This was the heart of the pedestrian mall when people still gathered here. The brick herringbone pattern underfoot is worn smooth in places where foot traffic concentrated—the paths people took without thinking, the desire lines made physical. Those paths lead nowhere now. The desire has gone elsewhere.
 
-Benches line the pergola's length, arranged in a social configuration—facing each other, inviting conversation. The benches are empty. Their arrangement suggests a use that no longer happens, a social interaction frozen in architectural form.
-
-A drinking fountain stands near the path, its basin stained with mineral deposits, its spout dry. A small plaque mounted on the fountain dedicates it to someone, their name and dates visible despite the weathering. They donated money for this fountain. The water has stopped but the plaque remains.
-
-The park extends in all cardinal directions from here.`,
+A dead maple stands nearby, its trunk hollow, its bark peeling in sheets. Birds nested in the hollow once. The nest is visible through a gap in the wood, abandoned like everything else.`,
   x: -4,
   y: 2,
   z: 0,
   // Environmental properties
   population: 0, // Empty (post-Event)
-  ambientNoise: 12, // Pergola slightly muffles wind
-  lighting: 90, // Slight shade from pergola
+  ambientNoise: 15, // Open plaza, wind across brick
+  lighting: 100, // Full daylight (open space)
   waterLevel: 0, // Dry
-  outdoor: true, // Open plaza with pergola
+  outdoor: true, // Open plaza
 };

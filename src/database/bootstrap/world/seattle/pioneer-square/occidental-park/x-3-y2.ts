@@ -1,12 +1,12 @@
-// Occidental Park - center-west section
+// Occidental Park - heart of the plaza
 
 export const room = {
   name: 'Occidental Park',
-  description: `A brick planter box rises from the plaza here, waist-high, its original plantings dead and reduced to brittle sticks. But something else grows there now—a scraggly volunteer, some wind-seeded sapling that found purchase in the neglected soil. The tree is small and struggling, bent by wind, but alive. Green leaves. Actual green leaves, the first living plant you've seen in blocks.
+  description: `A raised platform occupies the center of the park—the performance stage where musicians and speakers once addressed crowds. The brick surface is elevated six inches, its edges trimmed in weathered steel, the geometry designed to create a focal point. The stage faced west, audiences gathered on the plaza below, the buildings providing a backdrop for whatever spectacle was being performed.
 
-Life persists. That's what the sapling says. Fifty-five years of abandonment and something still reaches for the sky, still converts sunlight to sugar, still grows. The contrast with the dead trees surrounding the plaza is stark—those were cultivated, watered, cared for. This one survives on nothing but rain and whatever nutrients leach from the decaying brick.
+No one performs here now. The stage collects leaves and debris, its surface stained by seasons of rain. Bolt holes mark where equipment was once mounted—speaker stands, lighting rigs, the infrastructure of performance. The bolts are gone, salvaged long ago. The holes remain, filling with rainwater, small wells in the brick.
 
-The buildings ringing the park loom dark and empty, their windows reflecting grey sky. The sapling doesn't care about the buildings. It just grows.`,
+The dead trees ringing the plaza create an accidental amphitheater, their bare branches framing the sky like the ribs of a cathedral.`,
   x: -3,
   y: 2,
   z: 0,

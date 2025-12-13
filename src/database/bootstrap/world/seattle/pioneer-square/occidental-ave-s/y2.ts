@@ -7,7 +7,7 @@ export const room = {
 The cobblestones here are worn concave in the center of the walkway, a subtle dip created by a century of feet following the same path. You can feel it if you pay attention—the way your weight settles into the groove, the way the stone guides you forward. A million people walked this exact line before you. The stone remembers all of them and none of them.
 
 Concrete planters flank the walkway, their metal cages meant to discourage skateboarders from grinding the edges. The cages are rust-streaked. The planters hold only dirt and the skeletal remains of ornamental grasses that died when the city stopped watering them. A few weeds have established themselves—dandelion and clover, survivors that don't need tending. Life finds a way. It's just not the life anyone planned for.`,
-  x: -3,
+  x: -7,
   y: 2,
   z: 0,
   // Environmental properties

@@ -2,13 +2,13 @@
 
 export const room = {
   name: 'Yesler Way',
-  description: `The architecture transitions here from Pioneer Square's historic brick to mid-century concrete—the ugly buildings that replaced the beautiful ones after a fire in the seventies. Ironic that the ugly ones survived the war better. Concrete doesn't burn the way wood trim and ornamental terra cotta do.
+  description: `A parking structure rises on the south side, four levels of concrete and open-sided decks. Cars are still up there, visible through the open sides—lined up in neat rows on the upper levels, waiting for owners who will never return. Fifty-five years of waiting. The cars have rusted in place, tires flat, paint oxidized to uniform grey.
 
-A four-story office building occupies the south side, its aluminum-framed windows mostly shattered, aggregate panels stained with decades of rain and neglect. Ground-floor retail spaces are gutted, their contents looted in the early years when looting still seemed like a viable survival strategy. The storefronts gape open now, picked clean.
+A row of storefronts lines the north side, their windows covered with plywood spray-painted with warnings and pleas and graffiti that stopped meaning anything decades ago. The buildings date to different eras—early twentieth-century brick beside mid-century concrete—but they share the same emptiness now.
 
-Yesler Way continues its gentle slope toward the waterfront, following the grade that Henry Yesler's original skid road established. Logs once rolled down this hill to the sawmill at the water's edge. Nothing rolls downhill anymore except rain and debris.`,
+Third Avenue and the Pioneer Square light rail station are visible ahead. The station entrance gapes dark, stairs descending into tunnels that haven't seen a train in half a century. The street slopes gently downward, following the grade toward a waterfront that's changed beyond recognition.`,
   x: 4,
-  y: 10,
+  y: 12,
   z: 0,
   // Environmental properties
   population: 0, // Empty (post-Event)

@@ -12,7 +12,7 @@ Fire escapes cling to the eastern buildings, their metal stairs zigzagging upwar
 The pavement here is rougher than the main streets, patched concrete and broken asphalt creating an uneven surface. Weeds push through the cracks, more aggressive here where the shadows linger and foot traffic was always lighter.
 
 First Avenue continues north toward S. Washington and south toward S. Main.`,
-  x: -9,
+  x: -14,
   y: 1,
   z: 0,
   // Environmental properties

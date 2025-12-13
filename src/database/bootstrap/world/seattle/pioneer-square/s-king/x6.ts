@@ -1,19 +1,18 @@
-// S. King St - between 2nd and 3rd Ave
+// S. King St - between 2nd Ave and 3rd Ave
 
 export const room = {
   name: 'S. King St',
-  description: `LUEN FUNG MARKET occupies the ground floor, its windows opaque with decades of grime. The produce bins that once extended onto the sidewalk are empty and rusted, the awning above them tattered and sagging. Through what glass remains visible: narrow aisles still packed with inventory from ceiling to floor, the dried goods and preserved foods that outlasted everything else. Whatever was perishable is long gone—rotted, consumed, or desiccated to unrecognizable husks.
+  description: `King Street continues east toward the International District, the neighborhood boundaries blurring along this transitional block. The buildings show mixed heritage—Victorian commercial next to mid-century utilitarian, the layers of Seattle's development compressed into a single streetscape.
 
-The store served the community's need for ingredients unavailable elsewhere—dried mushrooms, preserved vegetables, the sauces and seasonings that Chinese cooking requires. The live seafood tanks are dark and dry, the filtration systems silent. The supply chains that stretched across the Pacific broke when the war came. Hong Kong, Taiwan, mainland China—the import networks that sustained this place dissolved into the same chaos that took everything else.
+The light rail viaduct once crossed above this point, carrying trains between downtown and the airport. The viaduct collapsed during the burning, its elevated tracks crashing down onto the street below. The debris has been cleared, pushed to the sides to open a path, but the support pillars remain—concrete sentinels standing guard over nothing.
 
-The building's upper floors hold residential units, their windows dark, their fire escapes rusted to a deep orange-brown. The iron platforms still cling to the exterior wall, the emergency egress that no one will ever need. Some of the windows are broken. Some are boarded. The residents who lived here are fifty-five years gone.`,
+The street dips slightly where it crosses the old rail alignment, a subtle depression marking where infrastructure once ran underground. The depression fills with water when it rains, creating a temporary pond that drains slowly through cracks in the pavement.`,
   x: 6,
-  y: -10,
+  y: -12,
   z: 0,
-  // Environmental properties
-  population: 0, // Empty (post-Event)
-  ambientNoise: 0, // Quiet/abandoned
-  lighting: 100, // Daylight (outdoor)
-  waterLevel: 0, // Dry
-  outdoor: true, // Street level
+  population: 0,
+  ambientNoise: 0,
+  lighting: 100,
+  waterLevel: 0,
+  outdoor: true,
 };

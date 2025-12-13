@@ -7,7 +7,7 @@ export const room = {
 A vintage clothing store called REDUX occupies the corner, its window display frozen mid-arrangement. Two mannequins in '70s disco wear—sequins, platforms, a feather boa—posed as if caught mid-dance. A third mannequin has toppled backward and lies staring at the ceiling, its wig askew, its painted smile unchanged. Nobody righted it. Nobody was there to right it.
 
 A Pacific Bell payphone stands at the corner, one of the last of its kind, preserved here either for nostalgia or neglect. The receiver hangs from its armored cord. Whether there's a dial tone inside is anyone's guess. The coin slot shows a dark rectangle where quarters once fell. Everything costs money. Nothing costs money. It depends on how you look at it.`,
-  x: -9,
+  x: -14,
   y: 4,
   z: 0,
   // Environmental properties

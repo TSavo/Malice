@@ -1,15 +1,16 @@
-// S. Jackson St - between 2nd and 3rd Ave
+// 3rd Ave S & S. Jackson St intersection
 
 export const room = {
-  name: 'S. Jackson St',
-  description: `The Corp Construction perimeter angles here, following property boundaries that create an irregular setback from the sidewalk. The angle opens a small triangular plaza—an accidental public space where Corp's maintained fence meets the decaying neighborhood. The contrast is sharp: fresh barriers beside collapsing buildings.
+  name: '3rd Ave S & S. Jackson St',
+  description: `Third Avenue intersects S. Jackson Street at the eastern edge of the Corp Construction zone, the maintained fence terminating at the cross-street. East of here, the International District continues in its abandoned form—the contrast between Corp's active site and the neighborhood's decay creating a sharp visual boundary. One side alive with construction noise. The other side silent.
 
-A community garden once occupied this space, one of the interim uses that city programs encouraged. The raised beds are still visible, their wooden frames weathered and rotting, the soil growing whatever volunteers seeded themselves over fifty-five years—weeds mostly, but hardy vegetables gone feral. The International District always struggled for green space. Now it has all the green space it needs, nature reclaiming what people abandoned.
+A Metro bus stop occupies the northeast corner, the standard infrastructure of Seattle's transit system: a shelter with transparent walls clouded by age, a bench inside, the route information panel listing buses that haven't run in fifty-five years. The location connected the International District to the rest of the city—Chinatown to Capitol Hill, the U District, neighborhoods beyond. All equally empty now, connected by routes no bus travels.
 
-The buildings flanking the plaza show the neighborhood's characteristic architecture: early twentieth-century construction with ground-floor storefronts dark and shuttered. A Vietnamese restaurant occupies one space, PHO BANG according to the sign, its neon lettering dark, the name still legible. The facades adapted over decades to serve successive waves of immigrant communities. The waves stopped. The facades remain.`,
+The buildings at this intersection span eras, all arriving at the same destination: a 1920s brick structure on the southwest corner, decorative detail weathered but visible; a 1970s concrete box to the northeast, functional and crumbling; and the Corp Construction fence to the northwest, new and maintained, the only thing here that isn't dying.`,
   x: 7,
-  y: -5,
+  y: -6,
   z: 0,
+  intersection: ['3rd Ave S', 'S. Jackson St'],
   // Environmental properties
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned

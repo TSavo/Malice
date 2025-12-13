@@ -9,7 +9,7 @@ The courthouse steps rise across the avenue, granite worn smooth by generations 
 A statue stands at the base of the steps, a robed figure holding scales. The scales are balanced. They were always balanced. That was the promise. The statue's bronze has gone green with verdigris, giving the figure a sickly pallor.
 
 Main Street stretches east and west, empty and wide.`,
-  x: 9,
+  x: 7,
   y: 1,
   z: 0,
   // Environmental properties

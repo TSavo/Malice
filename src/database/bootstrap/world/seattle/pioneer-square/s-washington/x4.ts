@@ -1,14 +1,14 @@
-// S. Washington St - between 2nd and 3rd Ave
+// S. Washington St - approaching 3rd Ave
 
 export const room = {
   name: 'S. Washington St',
-  description: `The architectural character shifts here, the Victorian brick of Pioneer Square proper giving way to mid-century pragmatism. These buildings went up in the sixties and seventies, when Seattle was more interested in parking lots than preservation. Flat facades, aluminum storefronts, the anonymous construction that fills gaps between landmark buildings.
+  description: `The Collapsed Building's debris field begins here, the rubble spilling westward from what was once a seven-story office building. The structure dated to 1923, unreinforced masonry construction of the type that seismic engineers call "soft story"—ground floor retail with open spans, upper floors heavy with brick and concrete, the whole assembly balanced on columns that work fine until they don't.
 
-QUICK CASH occupies the corner, its storefront armored with the bulletproof glass and security cameras that check-cashing establishments require. The business model depended on people who needed money faster than banks would provide it, who paid fees that reflected their lack of options. The neon signs in the window advertised services: CHECK CASHING • PAYDAY LOANS • MONEY ORDERS. The fees were posted in small print.
+The collapse pattern suggests pancaking, each floor driving the one below it down in sequence. The debris pile preserves a rough stratigraphy—basement at the bottom, penthouse at the top, everything in between compressed into a layer cake of destruction. Rebar protrudes from concrete chunks at angles that suggest the violence of the failure. Brick dust has settled over everything, giving the rubble a uniform reddish hue.
 
-A vacant lot opens across the street, chain-link fence surrounding a rectangle of cracked concrete and weeds. The lot has been vacant long enough for the weeds to become established—Himalayan blackberry, Scotch broom, the invasive species that colonize any unmaintained ground in the Pacific Northwest. A sun-faded sign on the fence shows an architectural rendering of the mixed-use development that was planned for the site.`,
+Third Avenue is visible ahead, the intersection threading between the debris field and the buildings that remained standing. The Corp Construction zone's fencing begins just south of here, its black fabric barriers concealing whatever development was underway when construction stopped.`,
   x: 4,
-  y: 5,
+  y: 6,
   z: 0,
   // Environmental properties
   population: 0, // Empty (post-Event)

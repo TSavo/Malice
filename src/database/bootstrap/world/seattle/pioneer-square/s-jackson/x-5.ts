@@ -1,14 +1,14 @@
-// S. Jackson St - between 1st Ave and Occidental
+// S. Jackson St - between Occidental and 2nd Ave
 
 export const room = {
   name: 'S. Jackson St',
-  description: `The streetscape intensifies here, storefronts crowded together in the dense commercial pattern that Asian urban neighborhoods favored. The buildings are narrow but deep, their facades packed with signage in Chinese, Vietnamese, and English—faded now, the visual density reflecting cultural mixing that no longer mixes. The International District defined by its internationalism, now defined by its emptiness.
+  description: `Union Station is visible to the south, its Beaux-Arts facade weathered but intact, the grandeur that early twentieth-century rail terminals demanded surviving what came after. The station opened in 1911, designed by Reed & Stem—the same architects who created New York's Grand Central Terminal. Grand Central is probably rubble now. Union Station still stands, its ornate windows dark, its grand hall empty.
 
-JADE NOODLE HOUSE occupies a ground-floor space, its kitchen visible through a pass-through window designed to showcase noodle-making. Hand-pulled noodles required performance as much as skill, dough stretched and folded in rhythms customers watched. The pass-through frames only dust and darkness now. The wok stations along the back wall are cold, the high-BTU burners silent, the industrial ventilation still as a held breath. No one makes noodles. No one watches.
+The ground floor of the adjacent building housed DESC—the Downtown Emergency Service Center—one of the social service organizations that clustered in this transitional zone. The organization provided housing and services to people experiencing homelessness. The intake windows are shuttered now, the waiting rooms empty. Everyone experienced homelessness when the war came. The services ended. The need became universal and unmet.
 
-Decorative wire spans the street overhead at intervals, the infrastructure that supported festival lighting during Lunar New Year. Paper lanterns once transformed the streetscape. The wire remains, holding nothing, the festivals fifty-five years past. The cultural identity the neighborhood maintained is memory now, and fading.`,
+A mural spans the wall opposite, a public art commission depicting Seattle's railroad heritage. Workers driving spikes, locomotives pulling into stations—the iconography of the railroad era when Seattle was the terminus of the Great Northern Railway. The paint has faded and peeled, the railroad heritage becoming as distant as the rails themselves, rusting to nothing on rights-of-way no train will ever use again.`,
   x: -5,
-  y: -5,
+  y: -6,
   z: 0,
   // Environmental properties
   population: 0, // Empty (post-Event)

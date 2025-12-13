@@ -1,12 +1,12 @@
-// S. Main St - between Waterfront and 1st Ave
+// S. Main St - between 1st Ave and Occidental
 
 export const room = {
   name: 'S. Main St',
-  description: `A pocket plaza opens on the south side of Main Street, one of those urban oases that cities carve out when developers need to offset floor area or when donations need to be commemorated. This one is called Morrison Plaza, according to a plaque that nobody reads anymore. Concrete benches face a fountain in the center—three tiers of granite, water meant to cascade from top to bottom, creating the soothing sound of flow that drowns out traffic noise. The water stopped flowing when the pumps stopped working. The traffic noise stopped needing to be drowned.
+  description: `FOSTER/WHITE GALLERY occupies the corner building, a white-walled space that dealt in Northwest art before Northwest art became a recognized category. Through the floor-to-ceiling windows: paintings still hung on their hooks, sculptures still positioned on their pedestals, the whole arrangement frozen in a moment of curatorial intention. A canvas near the window shows abstract shapes in red and black, the kind of work that required a gallery statement to interpret. The statement is filed somewhere. The interpretation has expired.
 
-Pigeons have claimed the plaza, dozens of them, pecking at cracks in the concrete where food once fell. They're feral now, or more feral than they were—aggressive, territorial, their instinct for human charity fading as the charity disappears. One of them roosts on the fountain's dry upper tier, watching the street with the beady calculation of a creature that has outlasted its benefactors.
+The gallery door is locked but transparent, giving the space the quality of a diorama—art in its natural habitat, preserved behind glass like the stuffed animals at natural history museums. A twisted metal sculpture stands in the center of the room, lit by skylights that still admit grey Seattle light. The sculpture's title card reads EMERGENCE. What's emerging is unclear. The emergence continues.
 
-CARNEY BADLEY SPELLMAN reads the brass plaque beside a door on the north side—maritime lawyers, the specialty a holdover from when Seattle's port actually functioned. Their work involved ships and cargo and the endless disputes that arise when valuable things move across water. The ships are anchored or grounded or gone. The cargo sits in containers that no one is claiming. The disputes have resolved themselves through the universal arbitration of irrelevance.`,
+STORYVILLE COFFEE occupies the building across the street, an artisanal roaster that sourced beans from Ethiopia and Guatemala and places where the supply chains no longer reach. Through the window: a Probat roaster the size of a small car, its drum cold, its chaff collector full. Bags of green beans wait on shelves for roasting that will never happen. The smell that used to drift from this building—dark roast and caramelized sugar and the particular chemistry of coffee becoming coffee—is a memory now, replaced by the neutral scent of dust and stale air.`,
   x: -12,
   y: 0,
   z: 0,

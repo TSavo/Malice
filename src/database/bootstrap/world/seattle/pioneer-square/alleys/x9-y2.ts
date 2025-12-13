@@ -12,7 +12,7 @@ A chain-link fence closes off part of the eastern side, its gate hanging open on
 The pavement here is industrial-grade concrete, thicker and heavier than the asphalt used on residential streets. It's cracked but mostly intact, bearing the weight of decades of delivery trucks that no longer come.
 
 The avenue continues north and south, maintaining its service corridor character.`,
-  x: 9,
+  x: 7,
   y: 2,
   z: 0,
   // Environmental properties

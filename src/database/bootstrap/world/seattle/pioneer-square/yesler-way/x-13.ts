@@ -1,14 +1,14 @@
-// Yesler Way - between Waterfront and 1st Ave
+// Yesler Way - between 1st Ave and Occidental
 
 export const room = {
   name: 'Yesler Way',
-  description: `The street's grade steepens here as Yesler Way climbs away from the waterfront, the buildings pressing close together in the dense pattern that early Seattle established. The brick facades show a century of weathering plus fifty-five years of neglect—dark staining where water runs down walls, efflorescence blooming across masonry, the accumulated patina of abandonment.
+  description: `Smith Tower casts its shadow across this block when afternoon sun breaks through Seattle's perpetual overcast, the white terra cotta facade stained grey but still visible to the west. The tower dominates the western view, rising above the surrounding four- and five-story buildings with the confidence of a structure that has stood for over a century and expects to stand for another.
 
-YESLER FURNITURE occupies the ground floor of a three-story building, its display window still showing the inventory: a dining set arranged as if in use, thick with dust, the staging that furniture stores employed to help customers envision pieces in their own homes. The customers stopped coming. The furniture remains, waiting for a household that will never claim it.
+PIONEER BOOKS occupies a corner space, an independent bookstore that served the neighborhood's literary community. Through the window: floor-to-ceiling shelves still packed with books—paperback fiction, academic volumes, philosophy and architecture. Looters don't take books. The inventory remains, organized by subject and author, appreciated by no one. The knowledge inside is patient. It can wait.
 
-The building opposite houses apartments on its upper floors, accessed through a street-level entrance that hangs open on broken hinges. The structure is early twentieth-century construction, solid brick that has outlasted its occupants. Fire escapes climb the exterior, iron platforms rusted brown, ladders missing rungs. The emergency egress leads to rooftops that no one occupies.`,
+A vacant lot opens across the street, chain-link fence surrounding the foundation of a building that was demolished before the war. A sign on the fence displays architectural renderings of the mixed-use development that was planned for the site—standard imagery of urban development marketing, promises of luxury units and ground-floor retail. The development never happened. The sign keeps promising.`,
   x: -13,
-  y: 10,
+  y: 12,
   z: 0,
   // Environmental properties
   population: 0, // Empty (post-Event)

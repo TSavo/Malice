@@ -2,13 +2,13 @@
 
 export const room = {
   name: 'S. Washington St',
-  description: `The Corp Construction site's perimeter ends here, the black fabric barriers giving way to the older buildings that line Washington Street's final blocks before 4th Avenue. The fence line creates a sharp boundary between the construction zone's mystery and the street's ordinary dereliction.
+  description: `A parking structure dominates the block, five levels of poured concrete rising above the streetscape. The design is pure function—helical ramps, open sides for ventilation, the minimum structure required to stack automobiles. The beige paint that once softened the brutalist aesthetic has weathered to grey, stained darker where water runs down the facade during Seattle's frequent rains.
 
-RUBY'S DINER claims the corner building, its chrome-and-glass facade preserved from a 1950s renovation that aimed for mid-century modern and achieved mid-century adequate. The interior is visible through plate glass windows: a long Formica counter with chrome stools bolted to the floor, red vinyl booths along the walls, the layout of a classic American diner designed for efficiency rather than ambiance. The neon sign above the door—RUBY'S in cursive script—is dark but intact.
+The garage served the workers and visitors who filled this transitional zone between Pioneer Square and the International District. The rate sign near the entrance lists prices in the incremental structure that parking garages favored: first hour, additional hours, daily maximum. The structure's open sides reveal the interior—ramps spiraling upward, fluorescent fixtures mounted to concrete ceilings, the painted lines that organized space into monetizable rectangles.
 
-The buildings along this stretch transition from Pioneer Square's Victorian brick to the more varied architecture of the International District ahead. The boundary between neighborhoods is gradual rather than sharp, marked by changes in signage language and storefront style rather than any formal demarcation.`,
+The storefronts across the street reflect the International District's retail character: import shops with signage in Chinese and English, herbalists with window displays of dried goods in glass jars, the specialty stores that served both the local community and tourists seeking authenticity. GREEN LEAF HERBS occupies the corner, its window lined with the ceramic containers and wooden drawers of traditional Chinese medicine.`,
   x: 10,
-  y: 5,
+  y: 6,
   z: 0,
   // Environmental properties
   population: 0, // Empty (post-Event)

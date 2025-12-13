@@ -1,14 +1,14 @@
-// Yesler Way - approaching Occidental
+// Yesler Way - center point
 
 export const room = {
   name: 'Yesler Way',
-  description: `Occidental Park opens just ahead, the iron pergola visible at the north end of the pedestrian mall, leaning against Seattle's grey sky. The pergola's Victorian curves create a distinctive silhouette—decorative ironwork rusted brown, cast iron framework outlasting everything it was built to shelter.
+  description: `This is the center of Pioneer Square, or close enough. Occidental Park stretches south, its cobblestones cracked and heaved by decades of freeze-thaw cycles no one bothers to repair. The iron pergola is visible to the west, the Victorian structure rusted to a deep brown, its lattice roof collapsed in places where the climbing plants died and the weight of winters accumulated.
 
-YESLER LAUNDRY occupies a ground-floor space, a coin-operated laundromat that served the neighborhood's residential population. Through the grimy window: rows of front-loading washers and stacked dryers stand silent, their doors hanging open. The machines haven't run in fifty-five years. The last loads were never retrieved. Someone's clothes are still in there, rotted to fiber and stain.
+ZEITGEIST COFFEE occupies the corner, its windows dark, its espresso machines cold. Through the grimy glass: exposed brick walls, industrial lighting fixtures hanging dead from their cords. The morning crowds that once filled the outdoor tables are fifty-five years gone. The tables themselves were scavenged long ago.
 
-The buildings along this stretch maintain the scale that historic preservation required: brick facades, decorative cornices, the architectural vocabulary established after the Great Fire. The preservation stopped mattering when everyone left. The buildings stand anyway, too solid to fall on their own.`,
+Beneath the street, the original city lies entombed—the ground floors that became basements when Seattle raised its streets after the Great Fire. The Underground Tour departed from nearby once, guiding tourists through buried passages. The passages are still down there, darker now, the tours long ended. A city built atop itself, layers of abandonment all the way down.`,
   x: -4,
-  y: 10,
+  y: 12,
   z: 0,
   // Environmental properties
   population: 0, // Empty (post-Event)

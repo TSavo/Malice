@@ -9,7 +9,7 @@ Someone has set up a shrine at the station entrance. Candles in red glass holder
 A jewelry store occupies the corner, its window display still arranged with jade pendants and gold chains. The security gate is down but the glass behind it is intact. The jewels remain, valuable and useless, waiting for customers with currency that no longer matters.
 
 The avenue stretches north and south, empty and wide.`,
-  x: 15,
+  x: 14,
   y: 4,
   z: 0,
   // Environmental properties

@@ -2,13 +2,13 @@
 
 export const room = {
   name: 'Yesler Way',
-  description: `The street widens into a small plaza, concrete planters and benches with center armrests—the defensive design that discouraged sleeping, back when anyone cared who slept where. The benches are empty now. The planters hold dead soil and the skeletal remains of ornamental shrubs.
+  description: `The neighborhood transition becomes visible here. Signs in Chinese, Vietnamese, and Korean still mark businesses along this stretch, their characters faded but still legible, still proclaiming restaurants and markets and services in languages that have outlasted cities before and will outlast them again.
 
-A bronze statue stands at the plaza's center, a figure in work clothes holding a lunch pail. The plaque identifies him as representing "the workers who built Seattle." The workers are gone. The statue remains, lunch pail in hand, waiting for a shift that ended fifty-five years ago. Pigeons have claimed his shoulders and head, leaving white streaks down the bronze.
+A social services building occupies the north side, its reinforced doors sealed, its narrow windows dark. The building housed the programs that served this neighborhood's neediest residents—food stamps, housing assistance, the bureaucratic infrastructure that urban poverty requires. The services ended. The need persisted. The building remains, a monument to systems that failed.
 
-A construction site dominates the south side, its fencing rusted, its black fabric torn and flapping. Through the gaps: crane arms reaching toward grey sky, the skeleton of a building that was never completed. Steel beams and concrete cores and nothing else. The project died mid-birth, another monument to interrupted ambitions.`,
+The streetscape mixes eras and styles: early twentieth-century brick beside mid-century concrete, all of it empty now, all of it waiting. Development pressure was transforming this corridor before the war. The transformation stopped. The pressure released. What remains is neither old nor new, just abandoned.`,
   x: 10,
-  y: 10,
+  y: 12,
   z: 0,
   // Environmental properties
   population: 0, // Empty (post-Event)

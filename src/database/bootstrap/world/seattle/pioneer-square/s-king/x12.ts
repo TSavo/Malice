@@ -1,14 +1,14 @@
-// S. King St - between 3rd and 4th Ave
+// S. King St - approaching 4th Ave
 
 export const room = {
   name: 'S. King St',
-  description: `The INTERNATIONAL DISTRICT SENIOR CENTER occupies the ground floor, its large windows grimy but still allowing views into the activity room. The open space designed for exercise classes and social gatherings is empty and dark. The center served multiple functions—recreation, health education, meal service, the support systems that helped seniors maintain independence. The seniors it served are dead now. They would be over a hundred if they'd survived the war.
+  description: `Fourth Avenue approaches from the east, the intersection ahead marking what bureaucrats once designated as the formal boundary between historic districts. The neighborhood continues beyond the administrative line, its character uninterrupted by zoning—equally abandoned on both sides. City planners drew the lines. The war erased them.
 
-The interior layout is still visible through the windows: exercise equipment along one wall gathering dust—stationary bikes with flat tires, balance aids toppled over. Folding tables and chairs remain configured for group activities that ended fifty-five years ago. The kitchen area in the back is dark, the meal programs that provided nutrition and social connection silent.
+JADE HAPPINESS JEWELRY occupies a ground-floor retail space, its security gate pulled down and rusted shut. The jade pieces that Chinese communities traditionally valued are likely still inside—looters in the aftermath took electronics and food, not cultural artifacts. Through gaps in the gate: display cases dusty but intact, bangles and Buddha pendants and zodiac charms waiting behind glass. The protection and prosperity the stones promised protected and prospered nothing.
 
-Signage inside appears in multiple languages—Chinese, Vietnamese, Japanese, Tagalog—reflecting the diverse Asian communities that the International District encompassed. The multilingual welcome extends to no one. The community center that served as a gathering point for elderly residents gathers only silence now.`,
+A lantern shop shares the building, CHINATOWN LANTERNS according to faded signage. The store supplied paper lanterns for festival celebrations—red spheres for Lunar New Year, illuminated shapes for Moon Festival. Through the grimy window: lanterns of various sizes still suspended from the ceiling, faded and dusty, awaiting celebrations that will never come. The rhythm the International District once had is fifty-five years silent.`,
   x: 12,
-  y: -10,
+  y: -12,
   z: 0,
   // Environmental properties
   population: 0, // Empty (post-Event)
