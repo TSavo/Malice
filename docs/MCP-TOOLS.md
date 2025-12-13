@@ -420,3 +420,58 @@ const results = await search_objects({ pattern: "Lock", limit: 10 });
 // Find the base Lock prototype
 const lockProto = results.find(r => r.name === "Lock");
 ```
+
+### AI City Management with Plot Jobs
+
+The plot/job system enables AI assistants to handle ongoing narratives and player requests.
+Jobs are created by players (e.g., "I want to rent an apartment") and processed by AI handlers.
+
+**Typical workflow:**
+
+```javascript
+// 1. Check for pending jobs
+const job = await get_next_job({});
+// Returns: { plotId, events, metadata, needsAttention, ... }
+
+if (!job) {
+  // No jobs need attention
+  return;
+}
+
+// 2. Read the event history to understand context
+// job.events contains the full narrative log:
+// - Player actions and requests
+// - Previous AI responses
+// - State changes
+
+// 3. Use other MCP tools to affect the world
+// Example: Player requested a delivery
+const item = await spawn_item({
+  prototypeId: 40,  // $.stackable
+  locationId: job.metadata.targetRoomId,
+  properties: { name: "package", description: "A wrapped package" }
+});
+
+// 4. Respond to progress the narrative
+await respond_to_job({
+  plotId: job.plotId,
+  message: "A courier arrives and places a package on the table.",
+  metadata: {
+    deliveredItemId: item.objectId,
+    status: "delivered"
+  }
+});
+
+// 5. Or mark job as resolved
+await set_job_metadata({
+  plotId: job.plotId,
+  key: "resolved",
+  value: true
+});
+```
+
+**Key concepts:**
+- `get_next_job` returns the oldest job needing attention and bumps its timer by 24 hours
+- Use `respond_to_job` to add events visible to players and track state in metadata
+- Combine with other MCP tools to create objects, move items, spawn NPCs, etc.
+- See [plot-jobs.md](plot-jobs.md) for full documentation on the plot system
