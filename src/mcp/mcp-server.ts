@@ -322,7 +322,7 @@ export class MaliceMCPServer {
       'Find MOO objects that have a specific property value.',
       {
         name: z.string().describe('Property name to search'),
-        value: z.any().describe('Property value to match'),
+        value: z.any().optional().describe('Property value to match (omit to find all objects with this property)'),
       },
       async ({ name, value }) => {
         const objects = await this.manager.findByProperty(name, value);
@@ -333,6 +333,261 @@ export class MaliceMCPServer {
 
         return {
           content: [{ type: 'text', text: JSON.stringify({ count: results.length, objects: results }, null, 2) }],
+        };
+      }
+    );
+
+    // Search objects by name pattern
+    this.server.tool(
+      'search_objects',
+      'Search MOO objects by name. Supports substring matching and regex patterns.',
+      {
+        pattern: z.string().describe('Search pattern - substring or regex (e.g., "Tower", "^Smith", "Lock$")'),
+        regex: z.boolean().optional().describe('Treat pattern as regex (default: substring match)'),
+        limit: z.number().optional().describe('Max results to return (default 50)'),
+      },
+      async ({ pattern, regex, limit }) => {
+        const allObjects = await this.manager.db.listAll(false);
+        const maxResults = limit ?? 50;
+        const results: Array<{ id: number; name: string; parent: number }> = [];
+
+        let matcher: (name: string) => boolean;
+        if (regex) {
+          try {
+            const re = new RegExp(pattern, 'i');
+            matcher = (name: string) => re.test(name);
+          } catch {
+            return {
+              content: [{ type: 'text', text: `Invalid regex pattern: ${pattern}` }],
+              isError: true,
+            };
+          }
+        } else {
+          const lower = pattern.toLowerCase();
+          matcher = (name: string) => name.toLowerCase().includes(lower);
+        }
+
+        for (const obj of allObjects) {
+          const name = obj.properties?.name?.value;
+          if (typeof name === 'string' && matcher(name)) {
+            results.push({
+              id: obj._id,
+              name,
+              parent: obj.parent,
+            });
+            if (results.length >= maxResults) break;
+          }
+        }
+
+        return {
+          content: [{ type: 'text', text: JSON.stringify({ count: results.length, objects: results }, null, 2) }],
+        };
+      }
+    );
+
+    // Find children/instances of a prototype
+    this.server.tool(
+      'find_children',
+      'Find all objects that inherit from a given parent (direct children only, or all descendants).',
+      {
+        parentId: z.number().describe('Parent object ID to find children of'),
+        recursive: z.boolean().optional().describe('Include all descendants, not just direct children (default: false)'),
+        limit: z.number().optional().describe('Max results to return (default 100)'),
+      },
+      async ({ parentId, recursive, limit }) => {
+        const allObjects = await this.manager.db.listAll(false);
+        const maxResults = limit ?? 100;
+        const results: Array<{ id: number; name: string; parent: number }> = [];
+
+        if (recursive) {
+          // Build set of all descendant parent IDs
+          const validParents = new Set<number>([parentId]);
+          let changed = true;
+          while (changed) {
+            changed = false;
+            for (const obj of allObjects) {
+              if (validParents.has(obj.parent) && !validParents.has(obj._id)) {
+                validParents.add(obj._id);
+                changed = true;
+              }
+            }
+          }
+          validParents.delete(parentId); // Don't include the parent itself
+
+          for (const obj of allObjects) {
+            if (validParents.has(obj._id) || obj.parent === parentId) {
+              results.push({
+                id: obj._id,
+                name: obj.properties?.name?.value || '(unnamed)',
+                parent: obj.parent,
+              });
+              if (results.length >= maxResults) break;
+            }
+          }
+        } else {
+          // Direct children only
+          for (const obj of allObjects) {
+            if (obj.parent === parentId) {
+              results.push({
+                id: obj._id,
+                name: obj.properties?.name?.value || '(unnamed)',
+                parent: obj.parent,
+              });
+              if (results.length >= maxResults) break;
+            }
+          }
+        }
+
+        return {
+          content: [{ type: 'text', text: JSON.stringify({ count: results.length, objects: results }, null, 2) }],
+        };
+      }
+    );
+
+    // Find objects in a location
+    this.server.tool(
+      'find_in_location',
+      'Find all objects in a room or container.',
+      {
+        locationId: z.number().describe('Room or container ID to search in'),
+        recursive: z.boolean().optional().describe('Include contents of containers within (default: false)'),
+      },
+      async ({ locationId, recursive }) => {
+        const allObjects = await this.manager.db.listAll(false);
+        const results: Array<{ id: number; name: string; parent: number; location: number }> = [];
+
+        const locationsToSearch = new Set<number>([locationId]);
+
+        if (recursive) {
+          // Keep expanding until no new containers found
+          let changed = true;
+          while (changed) {
+            changed = false;
+            for (const obj of allObjects) {
+              const loc = obj.properties?.location?.value;
+              if (typeof loc === 'number' && locationsToSearch.has(loc) && !locationsToSearch.has(obj._id)) {
+                // This object is in a location we're searching - add it as a potential container
+                locationsToSearch.add(obj._id);
+                changed = true;
+              }
+            }
+          }
+          locationsToSearch.delete(locationId); // We want contents, not the location itself
+        }
+
+        for (const obj of allObjects) {
+          const loc = obj.properties?.location?.value;
+          if (typeof loc === 'number' && (loc === locationId || (recursive && locationsToSearch.has(loc)))) {
+            results.push({
+              id: obj._id,
+              name: obj.properties?.name?.value || '(unnamed)',
+              parent: obj.parent,
+              location: loc,
+            });
+          }
+        }
+
+        return {
+          content: [{ type: 'text', text: JSON.stringify({ count: results.length, objects: results }, null, 2) }],
+        };
+      }
+    );
+
+    // Alias lookup
+    this.server.tool(
+      'alias_lookup',
+      'Look up an object by its alias (e.g., "lock", "recycler", "room"). Returns the object ID and basic info.',
+      {
+        alias: z.string().describe('Alias name without $ prefix (e.g., "lock", "room", "recycler")'),
+      },
+      async ({ alias }) => {
+        // Remove $ prefix if provided
+        const cleanAlias = alias.startsWith('$') ? alias.slice(1) : alias;
+        // Handle $.foo format
+        const finalAlias = cleanAlias.startsWith('.') ? cleanAlias.slice(1) : cleanAlias;
+
+        const objectManager = await this.manager.load(0 as ObjId);
+        if (!objectManager) {
+          return {
+            content: [{ type: 'text', text: 'ObjectManager not found' }],
+            isError: true,
+          };
+        }
+
+        const aliases = objectManager.get('aliases') as Record<string, number> | undefined;
+        if (!aliases) {
+          return {
+            content: [{ type: 'text', text: 'No aliases registered' }],
+            isError: true,
+          };
+        }
+
+        const objectId = aliases[finalAlias];
+        if (objectId === undefined) {
+          // List available aliases if not found
+          const available = Object.keys(aliases).sort();
+          return {
+            content: [{ type: 'text', text: JSON.stringify({
+              error: `Alias '${finalAlias}' not found`,
+              available: available.slice(0, 50),
+              total: available.length,
+            }, null, 2) }],
+            isError: true,
+          };
+        }
+
+        const obj = await this.manager.load(objectId as ObjId);
+        if (!obj) {
+          return {
+            content: [{ type: 'text', text: `Alias '${finalAlias}' points to #${objectId} but object not found` }],
+            isError: true,
+          };
+        }
+
+        return {
+          content: [{ type: 'text', text: JSON.stringify({
+            alias: finalAlias,
+            id: objectId,
+            name: obj.get('name'),
+            parent: obj.getParent(),
+            description: obj.get('description'),
+          }, null, 2) }],
+        };
+      }
+    );
+
+    // List all aliases
+    this.server.tool(
+      'list_aliases',
+      'List all registered object aliases ($.foo names).',
+      {},
+      async () => {
+        const objectManager = await this.manager.load(0 as ObjId);
+        if (!objectManager) {
+          return {
+            content: [{ type: 'text', text: 'ObjectManager not found' }],
+            isError: true,
+          };
+        }
+
+        const aliases = objectManager.get('aliases') as Record<string, number> | undefined;
+        if (!aliases) {
+          return {
+            content: [{ type: 'text', text: JSON.stringify({ count: 0, aliases: {} }, null, 2) }],
+          };
+        }
+
+        // Sort by alias name
+        const sorted: Record<string, number> = {};
+        for (const key of Object.keys(aliases).sort()) {
+          sorted[key] = aliases[key];
+        }
+
+        return {
+          content: [{ type: 'text', text: JSON.stringify({
+            count: Object.keys(sorted).length,
+            aliases: sorted,
+          }, null, 2) }],
         };
       }
     );
@@ -672,6 +927,427 @@ export class MaliceMCPServer {
       }
     );
 
+    // Recycle (delete) an object
+    this.server.tool(
+      'recycle_object',
+      'Recycle (soft-delete) a MOO object. Removes it from the world and marks it for reuse.',
+      {
+        objectId: z.number().describe('Object ID to recycle'),
+      },
+      async ({ objectId }) => {
+        const recycler = await this.getAlias('recycler');
+        if (!recycler) {
+          return {
+            content: [{ type: 'text', text: 'Recycler not found' }],
+            isError: true,
+          };
+        }
+
+        const obj = await this.manager.load(objectId as ObjId);
+        if (!obj) {
+          return {
+            content: [{ type: 'text', text: `Object #${objectId} not found` }],
+            isError: true,
+          };
+        }
+
+        const name = obj.get('name');
+        try {
+          await recycler.call('recycle', obj);
+          return {
+            content: [{ type: 'text', text: `Recycled #${objectId} (${name})` }],
+          };
+        } catch (err) {
+          return {
+            content: [{ type: 'text', text: `Error recycling: ${err instanceof Error ? err.message : String(err)}` }],
+            isError: true,
+          };
+        }
+      }
+    );
+
+    // Clone an object
+    this.server.tool(
+      'clone_object',
+      'Create a deep copy of an object with all its properties. Optionally place at a location.',
+      {
+        objectId: z.number().describe('Object ID to clone'),
+        locationId: z.number().optional().describe('Location to place the clone'),
+      },
+      async ({ objectId, locationId }) => {
+        const obj = await this.manager.load(objectId as ObjId);
+        if (!obj) {
+          return {
+            content: [{ type: 'text', text: `Object #${objectId} not found` }],
+            isError: true,
+          };
+        }
+
+        // Get raw data and create new object with same parent
+        const raw = obj._getRaw();
+        const props: Record<string, any> = {};
+
+        // Copy own properties (not inherited)
+        for (const [key, val] of Object.entries(raw.properties || {})) {
+          if (key !== 'location') {
+            props[key] = val;
+          }
+        }
+
+        // Set location if provided
+        if (locationId !== undefined) {
+          props.location = { type: 'number', value: locationId };
+        }
+
+        const clone = await this.manager.create({
+          parent: raw.parent as ObjId,
+          properties: props,
+          methods: raw.methods || {},
+        });
+
+        return {
+          content: [{ type: 'text', text: JSON.stringify({
+            cloned: objectId,
+            newId: clone.id,
+            name: clone.get('name'),
+            location: locationId ?? null,
+          }, null, 2) }],
+        };
+      }
+    );
+
+    // Get exits from a room
+    this.server.tool(
+      'get_exits',
+      'List all exits from a room with their destinations and any attached doors.',
+      {
+        roomId: z.number().describe('Room ID to get exits from'),
+      },
+      async ({ roomId }) => {
+        const room = await this.manager.load(roomId as ObjId);
+        if (!room) {
+          return {
+            content: [{ type: 'text', text: `Room #${roomId} not found` }],
+            isError: true,
+          };
+        }
+
+        const exitIds = (room as any).exits as number[] | undefined;
+        if (!exitIds || exitIds.length === 0) {
+          return {
+            content: [{ type: 'text', text: JSON.stringify({ roomId, roomName: (room as any).name, exits: [] }, null, 2) }],
+          };
+        }
+
+        const exits = [];
+        for (const exitId of exitIds) {
+          const exit = await this.manager.load(exitId as ObjId);
+          if (exit) {
+            const destId = (exit as any).destRoom as number | undefined;
+            let destName = null;
+            if (typeof destId === 'number') {
+              const dest = await this.manager.load(destId as ObjId);
+              destName = dest ? (dest as any).name : null;
+            }
+
+            const doorId = (exit as any).door as number | undefined;
+            let doorInfo = null;
+            if (typeof doorId === 'number') {
+              const door = await this.manager.load(doorId as ObjId);
+              if (door) {
+                doorInfo = {
+                  id: doorId,
+                  name: (door as any).name,
+                  open: (door as any).open,
+                  locks: (door as any).locks || [],
+                };
+              }
+            }
+
+            exits.push({
+              id: exitId,
+              direction: (exit as any).name,
+              aliases: (exit as any).aliases || [],
+              destRoom: destId,
+              destName,
+              door: doorInfo,
+            });
+          }
+        }
+
+        return {
+          content: [{ type: 'text', text: JSON.stringify({
+            roomId,
+            roomName: (room as any).name,
+            exits,
+          }, null, 2) }],
+        };
+      }
+    );
+
+    // Spawn an item at a location
+    this.server.tool(
+      'spawn_item',
+      'Create an instance of a prototype and place it at a location in one step.',
+      {
+        prototypeId: z.number().describe('Prototype object ID (or use alias with alias_lookup first)'),
+        locationId: z.number().describe('Room or container ID to place the item'),
+        properties: z.record(z.any()).optional().describe('Override properties (name, description, etc.)'),
+      },
+      async ({ prototypeId, locationId, properties }) => {
+        const proto = await this.manager.load(prototypeId as ObjId);
+        if (!proto) {
+          return {
+            content: [{ type: 'text', text: `Prototype #${prototypeId} not found` }],
+            isError: true,
+          };
+        }
+
+        const location = await this.manager.load(locationId as ObjId);
+        if (!location) {
+          return {
+            content: [{ type: 'text', text: `Location #${locationId} not found` }],
+            isError: true,
+          };
+        }
+
+        // Build properties with location
+        const props: Record<string, any> = {
+          location: { type: 'number', value: locationId },
+        };
+
+        // Add any override properties
+        if (properties) {
+          for (const [key, value] of Object.entries(properties)) {
+            if (typeof value === 'string') {
+              props[key] = { type: 'string', value };
+            } else if (typeof value === 'number') {
+              props[key] = { type: 'number', value };
+            } else if (typeof value === 'boolean') {
+              props[key] = { type: 'boolean', value };
+            } else if (Array.isArray(value)) {
+              props[key] = { type: 'array', value };
+            } else if (value && typeof value === 'object') {
+              props[key] = { type: 'object', value };
+            }
+          }
+        }
+
+        const item = await this.manager.create({
+          parent: prototypeId as ObjId,
+          properties: props,
+          methods: {},
+        });
+
+        return {
+          content: [{ type: 'text', text: JSON.stringify({
+            created: item.id,
+            prototype: prototypeId,
+            prototypeName: proto.get('name'),
+            name: item.get('name'),
+            location: locationId,
+            locationName: location.get('name'),
+          }, null, 2) }],
+        };
+      }
+    );
+
+    // Attach door to exit
+    this.server.tool(
+      'set_exit_door',
+      'Create and attach a door to an exit, or attach an existing door.',
+      {
+        exitId: z.number().describe('Exit object ID'),
+        doorId: z.number().optional().describe('Existing door ID (if omitted, creates new door)'),
+        doorName: z.string().optional().describe('Name for new door (default: "door")'),
+        doorDescription: z.string().optional().describe('Description for new door'),
+        open: z.boolean().optional().describe('Whether door starts open (default: true)'),
+      },
+      async ({ exitId, doorId, doorName, doorDescription, open }) => {
+        const exit = await this.manager.load(exitId as ObjId);
+        if (!exit) {
+          return {
+            content: [{ type: 'text', text: `Exit #${exitId} not found` }],
+            isError: true,
+          };
+        }
+
+        let door;
+        if (doorId !== undefined) {
+          door = await this.manager.load(doorId as ObjId);
+          if (!door) {
+            return {
+              content: [{ type: 'text', text: `Door #${doorId} not found` }],
+              isError: true,
+            };
+          }
+        } else {
+          // Create new door
+          const doorProto = await this.getAlias('door');
+          if (!doorProto) {
+            return {
+              content: [{ type: 'text', text: 'Door prototype not found' }],
+              isError: true,
+            };
+          }
+
+          door = await this.manager.create({
+            parent: doorProto.id as ObjId,
+            properties: {
+              name: { type: 'string', value: doorName ?? 'door' },
+              description: { type: 'string', value: doorDescription ?? 'A door.' },
+              open: { type: 'boolean', value: open ?? true },
+            },
+            methods: {},
+          });
+        }
+
+        // Attach door to exit
+        exit.set('door', door.id);
+
+        return {
+          content: [{ type: 'text', text: JSON.stringify({
+            exitId,
+            exitName: exit.get('name'),
+            doorId: door.id,
+            doorName: door.get('name'),
+            open: door.get('open'),
+            created: doorId === undefined,
+          }, null, 2) }],
+        };
+      }
+    );
+
+    // Get room contents with rich info
+    this.server.tool(
+      'get_room_info',
+      'Get comprehensive room information: exits, contents, players, and objects.',
+      {
+        roomId: z.number().describe('Room ID'),
+      },
+      async ({ roomId }) => {
+        const room = await this.manager.load(roomId as ObjId);
+        if (!room) {
+          return {
+            content: [{ type: 'text', text: `Room #${roomId} not found` }],
+            isError: true,
+          };
+        }
+
+        const allObjects = await this.manager.db.listAll(false);
+
+        // Find objects in this room
+        const contents: Array<{ id: number; name: string; type: string }> = [];
+        const players: Array<{ id: number; name: string; connected: boolean }> = [];
+
+        // Get player prototype for checking
+        const playerProto = allObjects.find(o => o.properties?.name?.value === 'Player');
+        const playerProtoId = playerProto?._id;
+
+        for (const obj of allObjects) {
+          const loc = obj.properties?.location?.value;
+          if (loc === roomId) {
+            // Check if it's a player
+            let isPlayer = false;
+            if (playerProtoId) {
+              let parentId = obj.parent;
+              const seen = new Set<number>();
+              while (parentId !== -1 && !seen.has(parentId)) {
+                seen.add(parentId);
+                if (parentId === playerProtoId) {
+                  isPlayer = true;
+                  break;
+                }
+                const parent = allObjects.find(o => o._id === parentId);
+                if (!parent) break;
+                parentId = parent.parent;
+              }
+            }
+
+            if (isPlayer) {
+              players.push({
+                id: obj._id,
+                name: obj.properties?.name?.value || '(unnamed)',
+                connected: obj.properties?.connected?.value ?? false,
+              });
+            } else {
+              // Determine type from parent chain
+              const parentObj = allObjects.find(o => o._id === obj.parent);
+              contents.push({
+                id: obj._id,
+                name: obj.properties?.name?.value || '(unnamed)',
+                type: parentObj?.properties?.name?.value || 'object',
+              });
+            }
+          }
+        }
+
+        // Get exits
+        const exitIds = (room as any).exits as number[] | undefined;
+        const exits: Array<{ direction: string; destId: number; destName: string }> = [];
+        if (exitIds) {
+          for (const exitId of exitIds) {
+            const exit = await this.manager.load(exitId as ObjId);
+            if (exit) {
+              const destId = (exit as any).destRoom as number;
+              const dest = destId ? await this.manager.load(destId as ObjId) : null;
+              exits.push({
+                direction: (exit as any).name as string,
+                destId,
+                destName: dest ? (dest as any).name as string : '(unknown)',
+              });
+            }
+          }
+        }
+
+        return {
+          content: [{ type: 'text', text: JSON.stringify({
+            id: roomId,
+            name: (room as any).name,
+            description: (room as any).description,
+            coordinates: {
+              x: (room as any).x ?? 0,
+              y: (room as any).y ?? 0,
+              z: (room as any).z ?? 0,
+            },
+            exits,
+            players,
+            contents,
+          }, null, 2) }],
+        };
+      }
+    );
+
+    // Describe object as player would see it
+    this.server.tool(
+      'describe_object',
+      'Get the runtime description of an object as a player would see it (calls describe() method).',
+      {
+        objectId: z.number().describe('Object ID'),
+      },
+      async ({ objectId }) => {
+        const obj = await this.manager.load(objectId as ObjId);
+        if (!obj) {
+          return {
+            content: [{ type: 'text', text: `Object #${objectId} not found` }],
+            isError: true,
+          };
+        }
+
+        try {
+          const description = await obj.call('describe');
+          return {
+            content: [{ type: 'text', text: typeof description === 'string' ? description : JSON.stringify(description, null, 2) }],
+          };
+        } catch (err) {
+          // Fall back to basic description property
+          return {
+            content: [{ type: 'text', text: `${obj.get('name')}\n${obj.get('description') || 'You see nothing special.'}` }],
+          };
+        }
+      }
+    );
+
     // === Telnet Session Tools ===
 
     // Connect to MOO via telnet
@@ -935,6 +1611,19 @@ export class MaliceMCPServer {
       }
     );
 
+  }
+
+  /**
+   * Get an object by its alias
+   */
+  private async getAlias(alias: string): Promise<any> {
+    const objectManager = await this.manager.load(0 as ObjId);
+    if (!objectManager) return null;
+
+    const aliases = objectManager.get('aliases') as Record<string, number> | undefined;
+    if (!aliases?.[alias]) return null;
+
+    return this.manager.load(aliases[alias] as ObjId);
   }
 
   /**

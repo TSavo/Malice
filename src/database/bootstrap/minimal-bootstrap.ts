@@ -109,6 +109,39 @@ export class MinimalBootstrap {
       `);
     }
 
+    if (!objectManager.hasMethod('clearAliasesForObject')) {
+      objectManager.setMethod('clearAliasesForObject', `
+        /** Remove all aliases pointing to a specific object ID.
+         *  Used by recycler to clean up when deleting objects.
+         *  Usage: await $[0].clearAliasesForObject(123)
+         *  @param objId - Object ID to clear aliases for
+         *  @returns number of aliases removed
+         */
+        const objId = args[0];
+
+        if (objId === undefined || objId === null) {
+          return 0;
+        }
+
+        const aliases = self.aliases || {};
+        let removed = 0;
+
+        // Find and remove all aliases pointing to this object
+        for (const [name, id] of Object.entries(aliases)) {
+          if (id === objId) {
+            delete aliases[name];
+            removed++;
+          }
+        }
+
+        if (removed > 0) {
+          self.aliases = aliases;
+        }
+
+        return removed;
+      `);
+    }
+
     console.log('✅ Registered core aliases in #0.properties.aliases');
   }
 

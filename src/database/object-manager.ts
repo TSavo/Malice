@@ -245,6 +245,14 @@ export class ObjectManager {
       return { type: 'null', value: null };
     }
 
+    // Already a typed Value - return as-is to avoid double-wrapping
+    if (jsValue && typeof jsValue === 'object' && 'type' in jsValue && 'value' in jsValue) {
+      const validTypes = ['null', 'string', 'number', 'boolean', 'objref', 'array', 'object'];
+      if (validTypes.includes(jsValue.type)) {
+        return jsValue;
+      }
+    }
+
     // Handle RuntimeObject (store as objref)
     if (jsValue && typeof jsValue === 'object' && 'id' in jsValue && typeof jsValue.id === 'number') {
       return { type: 'objref', value: jsValue.id };
