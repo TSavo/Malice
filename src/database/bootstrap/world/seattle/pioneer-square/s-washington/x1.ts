@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'S. Washington St',
-  description: `The Pioneer Building continues along the north side of the street here, its retail spaces empty, its upper floors dark. The building has good bones, as they used to say. The bones are all that remain.
+  description: `The Pioneer Building's retail arcade continues here, a covered walkway that runs along the ground floor, its arched openings framing storefronts that changed tenants regularly but never purpose. The arcade was designed to shelter pedestrians from Seattle's rain, a practical feature that became architectural signature. Similar arcades appear throughout Pioneer Square, the covered sidewalks connecting buildings into a coherent urban fabric.
 
-An antique store occupies a narrow space, its window crammed with furniture and lamps and the accumulated debris of other people's lives. A sign says "ESTATE SALES OUR SPECIALTY." Every sale is an estate sale now. Everyone has an estate.
+PIONEER ANTIQUES occupies a double-wide storefront, its display windows crammed with furniture arranged in the maximalist style that antique stores favor—every surface covered, every corner filled, the accumulated inventory of estate sales and consignment and the things people couldn't take with them. A grandfather clock stands near the window, its case dark walnut, its brass pendulum frozen mid-swing.
 
-A grandfather clock is visible through the window, its pendulum still, its hands stopped at 3:47. That was probably when the power went out. That was probably when a lot of things stopped.
-
-The intersection with 2nd Avenue is ahead.`,
+The buildings along this stretch maintain consistent cornice lines, their facades varying in detail but unified in scale. Pioneer Square's building codes enforced this uniformity after the Great Fire, ensuring that the rebuilt neighborhood would present a coherent streetscape. The codes worked. The streetscape endures.`,
   x: 1,
   y: 5,
   z: 0,

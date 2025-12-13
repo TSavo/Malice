@@ -2,11 +2,11 @@
 
 export const room = {
   name: 'S. Jackson St',
-  description: `The Hing Hay Park is visible to the south, its pagoda pavilion rising above the surrounding buildings. The pavilion was a gift from Taipei, a symbol of sister city friendship. The friendship persists, theoretically, across an ocean that neither city can cross anymore.
+  description: `Hing Hay Park opens to the south, the neighborhood's central gathering space overgrown and silent. The park's pagoda pavilion—a gift from Taipei commemorating the sister city relationship—rises above the surrounding rooflines, its curved eaves weathered, its red-painted columns faded to rust-pink. Chinese architectural vocabulary in an American city, both traditions ending in the same abandonment.
 
-A pharmacy occupies the corner, its windows displaying both Western medications and traditional Chinese remedies. The best of both worlds, the sign claimed. Both worlds have collapsed, but the sign still makes the claim.
+SUN MAY COMPANY occupies the corner building, its windows dark, its door hanging ajar. The pharmacy bridged Western and traditional Chinese medicine—one side displaying American pharmaceuticals long expired, the other showing wooden drawers and glass jars of Chinese herbal remedies dried to dust. The herbs stored in specific ways, the scales for measuring doses, the mortar and pestle for grinding compounds—all still arranged for practitioners who will never return.
 
-Dried herbs hang in bundles in the window, their medicinal properties intact even if the people who understood them are gone. The herbs wait, patient and aromatic.`,
+The building's upper floors hold apartments, their windows fitted with security bars that protected nothing when it mattered. Fire escapes climb the exterior, rusted to deep orange-brown, the iron platforms unsafe now for emergency egress or anything else. The small apartments they served are dark and empty, the outdoor space they provided overlooking only decay.`,
   x: -6,
   y: -5,
   z: 0,

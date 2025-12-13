@@ -300,15 +300,16 @@ export class HumanRemainsBuilder {
       const body = await self.getBody();
 
       // Create skeletal remains
-      const skeleton = await $.create({
-        parent: skeletalProto,
-        properties: {
-          name: 'skeletal remains',
-          originalName: self.originalName,
-          contents: body ? [body.id] : [],
-          searched: self.searched,
-        },
+      const skeleton = await $.recycler.create($.skeleton, {
+        name: 'skeleton of ' + (self.originalName || 'unknown'),
+        description: 'The cleaned skeleton of ' + (self.originalName || 'someone') + '. Bones neatly arranged.',
+        owner: self.owner,
+        contents: self.contents || [],
+        decayLevel: 100,
+        decayRate: 0,
+        decayCondition: 'none',
       });
+
 
       // Update body location
       if (body) {

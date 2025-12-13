@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'Occidental Park',
-  description: `Occidental Park spreads out here, its brick plaza center-west section. The park was created in the 1970s by closing Occidental Avenue to traffic, converting asphalt to pedestrian space. The brick paving in herringbone pattern stretches in all directions, weathered but intact.
+  description: `A brick planter box rises from the plaza here, waist-high, its original plantings dead and reduced to brittle sticks. But something else grows there now—a scraggly volunteer, some wind-seeded sapling that found purchase in the neglected soil. The tree is small and struggling, bent by wind, but alive. Green leaves. Actual green leaves, the first living plant you've seen in blocks.
 
-A brick planter box contains dead shrubs, their branches brittle, their roots still gripping the dry soil. The detail speaks to a time when the park was maintained, when someone cared about these spaces and the people who used them.
+Life persists. That's what the sapling says. Fifty-five years of abandonment and something still reaches for the sky, still converts sunlight to sugar, still grows. The contrast with the dead trees surrounding the plaza is stark—those were cultivated, watered, cared for. This one survives on nothing but rain and whatever nutrients leach from the decaying brick.
 
-Dead trees punctuate the plaza at intervals, their bare branches creating stark silhouettes. They were planted with intention, part of an urban design that valued green space and shade. The trees are dead now but still standing, monuments to earlier optimism.
-
-The brick plaza continues in all accessible directions, open to sky and weather.`,
+The buildings ringing the park loom dark and empty, their windows reflecting grey sky. The sapling doesn't care about the buildings. It just grows.`,
   x: -3,
   y: 2,
   z: 0,

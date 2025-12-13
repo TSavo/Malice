@@ -2,11 +2,11 @@
 
 export const room = {
   name: 'S. Main St',
-  description: `The grade steepens here as the street pulls away from sea level. Seattle was built on hills. The hills remain. The city is debatable.
+  description: `The grade intensifies here, Main Street pulling hard against gravity as it rises toward First Avenue. This stretch was always a transition zone—waterfront tourist traps giving way to the brick warehouses and iron-fronted buildings that define Pioneer Square's architectural character. The transition still happens. The tourists just don't make the climb anymore.
 
-A luggage repair shop occupies a narrow storefront, its window displaying suitcases in various states of disassembly. The owner fixed bags for travelers passing through the ferry terminal. The travelers have stopped passing. The bags wait, unrepaired and unclaimed.
+PIONEER LUGGAGE & LEATHER occupies a narrow storefront wedged between larger buildings, a repair shop that has served ferry commuters and travelers since 1952. The window display is a taxonomy of luggage disasters—suitcases with torn handles, briefcases with broken latches, garment bags with zipper failures, each piece tagged with a repair ticket and a customer name. The repair work was never completed. The customers never collected. Some of those bags have been waiting for years now, their owners' travel plans permanently suspended.
 
-Next door, a copy shop with faded posters advertising services. Copies. Faxes. Notary public. The machines inside are dark. The notary has notarized their last document.`,
+A FedEx Office shares the block, its windows dark, its self-service copiers and fax machines idle. A sign on the door reads OPEN 24 HOURS, the promise of perpetual availability that used to mean something. The notary desk inside still holds a stamp and a logbook, the last few entries dated months ago—mortgage documents, affidavits, the paperwork of legal lives. The notary's seal is still valid, technically. The government that issued it is less so.`,
   x: -13,
   y: 0,
   z: 0,

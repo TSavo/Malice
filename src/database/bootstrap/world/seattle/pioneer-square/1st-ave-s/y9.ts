@@ -2,11 +2,11 @@
 
 export const room = {
   name: '1st Ave S',
-  description: `Yesler Way is just ahead, and with it the impassable wall of debris that blocks all northward travel on this avenue. Smith Tower stands at the intersection, its ornate lobby visible through glass doors, its upper floors silent.
+  description: `Yesler Way opens just ahead, and with it the view of Smith Tower rising at the intersection—thirty-eight stories of white terra cotta, an Edwardian giant watching over a dead city. The tower was L.C. Smith's monument to ambition, typewriter money transformed into height and permanence. The typewriters are museum pieces now. The tower still stands. There's probably a lesson in that about what survives.
 
-The debris is massive, six stories of building collapsed into a heap that reaches from facade to facade. The street grids never quite aligned here anyway, Downtown's grid meeting Pioneer Square's at an angle. The collision of grids has been made physical.
+The debris wall reaches nearly to the tower's base, a frozen avalanche of brick and steel and shattered glass. From this angle you can see where the Merrill Building's upper floors accordioned down onto the lower ones, each floor pancaking into the one below until the whole structure became a single compressed mass. The physics of collapse, demonstrated in brick. Downtown's grid meets Pioneer Square's here at an angle—the two men who platted Seattle couldn't agree on which way was north. The grids collide at Yesler. They always did. The rubble just made it visible.
 
-A sign on the debris fence says DANGER - NO ENTRY. The danger is obvious. The entry is impossible. The sign is redundant.`,
+A bus shelter stands at the corner, its plexiglass walls spider-webbed with cracks but still upright. The route map inside shows lines that once connected Pioneer Square to Capitol Hill, to Ballard, to places that might as well be other planets now. The 99 ran this route. The schedule promised a bus every fifteen minutes. The next bus is not coming.`,
   x: -9,
   y: 9,
   z: 0,

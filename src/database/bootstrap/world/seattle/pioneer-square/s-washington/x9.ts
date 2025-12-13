@@ -2,13 +2,11 @@
 
 export const room = {
   name: '3rd Ave S & S. Washington St',
-  description: `Third Avenue crosses Washington here, but Washington does not continue much further. The Collapsed Building has seen to that. The entire east side of the intersection is blocked by debris, a mountain of rubble that used to be architecture.
+  description: `Third Avenue intersects Washington here at the edge of the Collapsed Building's debris field. The rubble forms an impassable barrier to the east, forcing traffic—when there was traffic—to detour around the destruction. The intersection has become a de facto terminus, Washington Street effectively ending where the building came down.
 
-The building fell toward the street when it went, pancaking floor by floor, each one driving the next one down. The physics of collapse are simple. The results are not. Somewhere in that pile are desks and computers and coffee mugs and photographs and all the other things that make an office an office. Somewhere in there are the people who worked at those desks.
+The northwest corner holds a building that survived, its brick facade cracked but intact. PACIFIC NORTHWEST TITLE COMPANY occupies the ground floor, the name etched in the glass transom above the entrance. Title companies handled the paperwork of property ownership, the searches and insurance that made real estate transactions possible. The filing cabinets inside hold the ownership histories of properties throughout King County, the chain of title going back to territorial days.
 
-A fire hydrant stands at the corner, knocked askew by falling debris but still intact. The red paint is chipped and faded. Water pressure is a memory. If something catches fire now, it burns until it stops burning.
-
-Third Avenue runs north and south, threading between the ruins. The Corp Construction zone is visible to the south, its fences and barriers still standing, still protecting whatever they were building in there.`,
+A fire hydrant marks the corner, its red paint weathered to something closer to rust. The hydrant is canted slightly, knocked off true by debris that scattered when the building collapsed. Third Avenue stretches north toward the stadiums and south toward the International District, the cross-axis that connects Pioneer Square to the rest of the city.`,
   x: 9,
   y: 5,
   z: 0,

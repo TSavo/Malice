@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'S. Washington St',
-  description: `The street opens up here as it approaches the intersection. The buildings pull back, creating a plaza of sorts, paved with bricks that have heaved and cracked over the decades.
+  description: `The street widens as it approaches 2nd Avenue, the buildings stepping back to create a broader public space at the intersection. The pavement here is brick rather than asphalt, the herringbone pattern that Seattle used for pedestrian-priority areas. The bricks have heaved and settled over the decades, frost and tree roots and the general subsidence of fill undermining the careful geometry.
 
-A coffee cart sits at the curb, its awning torn, its espresso machine rusted solid. The menu board is still readable. Americano. Latte. Mocha. The prices are listed in dollars. The dollars are worthless. The coffee is gone.
+The building on the south corner housed a succession of restaurants, the ground floor configured with the large windows and open kitchen that modern dining demanded. BRACKET occupies the space now—or occupied it—a farm-to-table concept that sourced ingredients from Puget Sound farms and served them to tech workers who appreciated the provenance. The Edison bulbs and reclaimed wood aesthetic is visible through windows that need cleaning.
 
-A newspaper box stands nearby, its coin slot jammed, its window displaying a headline from before. Something about politics. Something about the economy. Something that seemed important at the time.
-
-Second Avenue crosses just ahead. The Collapsed Building is visible to the east.`,
+Ahead, the intersection with 2nd Avenue marks a transition. East of here, the Collapsed Building's debris field interrupts the streetscape, a reminder that even Pioneer Square's sturdy brick construction has limits.`,
   x: 2,
   y: 5,
   z: 0,

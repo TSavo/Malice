@@ -2,11 +2,11 @@
 
 export const room = {
   name: '2nd Ave S',
-  description: `S. Main Street is just ahead, its intersection marking the boundary between the Corp Construction zone and Pioneer Square's commercial core. The construction fence ends somewhere near the intersection, yielding to older buildings.
+  description: `S. Main Street opens ahead, and with it the northern edge of the Corp Construction zone. The black barrier ends at the intersection, yielding to buildings that predate the project—Pioneer Square's original warehouses and commercial blocks, brick and stone that survived the fire and the rebuild and every development wave since. The contrast is stark: preserved history on one side, hidden present on the other, and somewhere in the gap between them, an explanation that nobody ever provided.
 
-A bank building stands at the corner, its marble facade projecting stability that turned out to be unstable. The vault is locked. The deposits are inaccessible. The stability was always theoretical.
+WASHINGTON FEDERAL stands at the corner, a neoclassical bank building with marble columns and bronze doors and the architectural language of trustworthiness—cornices and pediments and Latin words carved into stone. The bank wanted you to believe your money was safe behind all that marble. The money is presumably still there, locked in a vault that runs on time locks and redundant security, inaccessible to everyone including the people who deposited it. Wealth measured in numbers that exist only as magnetic patterns on servers that may or may not still function.
 
-A clock on the bank's facade has stopped at some moment that seemed ordinary when it happened. The moment has been preserved. The ordinariness has become extraordinary.`,
+A clock is set into the bank's facade, analog hands frozen at 2:47. The clock ran on a different kind of mechanism—springs and gears and the steady tick of mainspring unwinding—and when it stopped, it stopped honestly, preserving the moment rather than blinking error codes. 2:47 PM or AM, on some day that seemed ordinary when it was happening. The day when the world was still the world and banks were still banks and clocks still told time that mattered.`,
   x: 3,
   y: -1,
   z: 0,

@@ -2,11 +2,11 @@
 
 export const room = {
   name: 'S. Main St',
-  description: `A gallery occupies the corner here, its windows displaying art that was avant-garde when it was hung and is simply present now. Abstract shapes and bold colors and statements that required explanation. The explanation is no longer available.
+  description: `FOSTER/WHITE GALLERY occupies the corner building, a white-walled space that dealt in Northwest art before Northwest art became a recognized category. Through the floor-to-ceiling windows: paintings still hung on their hooks, sculptures still positioned on their pedestals, the whole arrangement frozen in a moment of curatorial intention. A canvas near the window shows abstract shapes in red and black, the kind of work that required a gallery statement to interpret. The statement is filed somewhere. The interpretation has expired.
 
-The gallery door is locked but the art is visible. A canvas of red and black that could be rage or could be roses. A sculpture of twisted metal that could be pain or could be just twisted metal. Art is patient. It can wait.
+The gallery door is locked but transparent, giving the space the quality of a diorama—art in its natural habitat, preserved behind glass like the stuffed animals at natural history museums. A twisted metal sculpture stands in the center of the room, lit by skylights that still admit grey Seattle light. The sculpture's title card reads EMERGENCE. What's emerging is unclear. The emergence continues.
 
-Across the street, a coffee roaster with bags of beans still stacked in the window. The beans are stale. The roaster is cold. The smell of fresh coffee is a memory.`,
+STORYVILLE COFFEE occupies the building across the street, an artisanal roaster that sourced beans from Ethiopia and Guatemala and places where the supply chains no longer reach. Through the window: a Probat roaster the size of a small car, its drum cold, its chaff collector full. Bags of green beans wait on shelves for roasting that will never happen. The smell that used to drift from this building—dark roast and caramelized sugar and the particular chemistry of coffee becoming coffee—is a memory now, replaced by the neutral scent of dust and stale air.`,
   x: -7,
   y: 0,
   z: 0,

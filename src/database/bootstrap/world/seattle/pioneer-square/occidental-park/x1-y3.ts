@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'Occidental Park',
-  description: `Occidental Park spreads out here, its brick plaza northeastern section. The park was created in the 1970s by closing Occidental Avenue to traffic, converting asphalt to pedestrian space. The brick paving in herringbone pattern stretches in all directions, weathered but intact.
+  description: `The northeastern corner of the park approaches S. Washington Street, the brick plaza ending at a low concrete curb. A drinking fountain stands here, one of the old cast-iron models with a foot pedal and an arcing spout. The fountain is dry, its basin stained with mineral deposits, its mechanism seized by corrosion. Someone scratched words into the basin's rim—"STILL WAITING"—the letters crude but legible.
 
-A drinking fountain stands dry, its basin stained, its mechanism frozen or broken. The detail speaks to a time when the park was maintained, when someone cared about these spaces and the people who used them.
+The fountain was a gathering point once. People met here, filled water bottles, let dogs drink from cupped hands. The basin is cracked now, a freeze-thaw fracture running through the cast iron. Even if water flowed, it would leak away.
 
-Dead trees punctuate the plaza at intervals, their bare branches creating stark silhouettes. They were planted with intention, part of an urban design that valued green space and shade. The trees are dead now but still standing, monuments to earlier optimism.
-
-The brick plaza continues in all accessible directions, open to sky and weather.`,
+S. Washington Street stretches away to the east and west, Victorian storefronts dark on both sides. The intersection with 2nd Avenue is visible nearby, the traffic signals hanging dark and useless over pavement that hasn't seen a car in fifty-five years.`,
   x: 1,
   y: 3,
   z: 0,

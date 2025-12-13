@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'Alaskan Way & S. Jackson St',
-  description: `The Waterfront meets S. Jackson Street at Seattle's southern port district. The container cranes loom to the south, frozen mid-lift, their cables slack and their loads abandoned. The port was always working, day and night, ships loading and unloading. The work has stopped.
+  description: `Alaskan Way intersects S. Jackson Street at the edge of what was Seattle's working waterfront. The container cranes of Terminal 46 rise to the south, their red-orange frames rusted to deep brown, frozen in whatever position they held when the operators abandoned them. The infrastructure of global trade that once moved goods between Pacific Rim ports and American distribution networks. The trade stopped. The infrastructure remains, monuments to a global economy that no longer exists.
 
-A seafood processing plant occupies the corner, its loading dock empty, its refrigeration units silent. The smell of fish is gone, replaced by rust and salt air and the absence of industry.
+PACIFIC COAST SEAFOOD occupies the corner building, a processing facility built to handle salmon and halibut and Dungeness crab. The building is utilitarian—corrugated metal siding rusted through in places, loading docks sized for refrigerated trucks that will never arrive. The refrigeration units lining the rooftop are silent, their compressors seized, their condensers streaked with salt corrosion and fifty-five years of weather. Whatever was inside when the power failed is best not thought about.
 
-The ferry terminal is visible to the north, its tower a landmark for a transportation system that no longer transports. The water laps against the pilings, patient and indifferent.
-
-The intersection is clear. The waterfront runs north and south. S. Jackson rises east into Pioneer Square.`,
+The waterfront promenade extends north from here, the pedestrian path cracked and overgrown with whatever vegetation survives Seattle's wet climate. To the east, S. Jackson Street climbs toward Pioneer Square's decay, the grade increasing as the street moves away from the filled tideflats.`,
   x: -15,
   y: -5,
   z: 0,

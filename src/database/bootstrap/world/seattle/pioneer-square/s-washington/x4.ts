@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'S. Washington St',
-  description: `The character of the street changes here. The historic brick gives way to cheaper construction, buildings thrown up in the seventies when no one cared about aesthetics. Function over form. Profit over pride.
+  description: `The architectural character shifts here, the Victorian brick of Pioneer Square proper giving way to mid-century pragmatism. These buildings went up in the sixties and seventies, when Seattle was more interested in parking lots than preservation. Flat facades, aluminum storefronts, the anonymous construction that fills gaps between landmark buildings.
 
-A check cashing place occupies the corner, its neon signs dark, its bulletproof glass still intact. The glass was meant to keep the money safe. The money is worthless now, but the glass remains, protecting nothing from no one.
+QUICK CASH occupies the corner, its storefront armored with the bulletproof glass and security cameras that check-cashing establishments require. The business model depended on people who needed money faster than banks would provide it, who paid fees that reflected their lack of options. The neon signs in the window advertised services: CHECK CASHING • PAYDAY LOANS • MONEY ORDERS. The fees were posted in small print.
 
-Across the street, a vacant lot filled with the debris of demolition. Concrete chunks and twisted rebar and the bones of a building that was torn down and never replaced. A sign on the fence announces future development. The future never arrived.
-
-The Collapsed Building is closer now. The rubble is visible ahead.`,
+A vacant lot opens across the street, chain-link fence surrounding a rectangle of cracked concrete and weeds. The lot has been vacant long enough for the weeds to become established—Himalayan blackberry, Scotch broom, the invasive species that colonize any unmaintained ground in the Pacific Northwest. A sun-faded sign on the fence shows an architectural rendering of the mixed-use development that was planned for the site.`,
   x: 4,
   y: 5,
   z: 0,

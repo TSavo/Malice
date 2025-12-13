@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'Occidental Park',
-  description: `Occidental Park spreads out here, its brick plaza along what was once Occidental Avenue. The park was created in the 1970s by closing Occidental Avenue to traffic, converting asphalt to pedestrian space. The brick paving in herringbone pattern stretches in all directions, weathered but intact.
+  description: `An information kiosk stands at an angle here, knocked from its foundation by something—impact or earthquake or fifty-five years of Seattle wind. The glass panels are shattered, the maps inside faded to illegibility, the tourist information serving no tourists. "PIONEER SQUARE HISTORIC DISTRICT" reads the header, the text beneath it a blur of water damage and UV decay. The district is still historic. More historic now than ever.
 
-An information kiosk stands here, its glass panels shattered, its maps of Pioneer Square faded and outdated. The detail speaks to a time when the park was maintained, when someone cared about these spaces and the people who used them.
+This was the heart of the pedestrian mall when people still gathered here. The brick herringbone pattern underfoot is worn smooth in places where foot traffic concentrated—the paths people took without thinking, the desire lines made physical. Those paths lead nowhere now. The desire has gone elsewhere.
 
-Dead trees punctuate the plaza at intervals, their bare branches creating stark silhouettes. They were planted with intention, part of an urban design that valued green space and shade. The trees are dead now but still standing, monuments to earlier optimism.
-
-The brick plaza continues in all accessible directions, open to sky and weather.`,
+A dead maple stands nearby, its trunk hollow, its bark peeling in sheets. Birds nested in the hollow once. The nest is visible through a gap in the wood, abandoned like everything else.`,
   x: -3,
   y: 1,
   z: 0,

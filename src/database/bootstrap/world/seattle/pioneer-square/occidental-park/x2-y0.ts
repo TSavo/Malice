@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'Occidental Park',
-  description: `Occidental Park spreads out here, its brick plaza southeast corner where park meets S. Main. The park was created in the 1970s by closing Occidental Avenue to traffic, converting asphalt to pedestrian space. The brick paving in herringbone pattern stretches in all directions, weathered but intact.
+  description: `The southeastern corner of Occidental Park opens toward S. Main Street, a low concrete barrier marking the boundary between plaza and roadway. The barrier is more symbolic than functional—easy to step over, designed to suggest rather than enforce separation. Graffiti tags cover its surface, accumulated over decades, the oldest ones weathered to ghosts.
 
-A low concrete barrier marks the park's edge, separating plaza from street. The detail speaks to a time when the park was maintained, when someone cared about these spaces and the people who used them.
+A newspaper box stands near the corner, the coin-operated kind that once dispensed the Seattle Times. The box is rusted shut, its window opaque with grime, but the masthead is still visible through the haze. Whatever edition remains inside is fifty-five years old, its headlines reporting a world that no longer exists.
 
-Dead trees punctuate the plaza at intervals, their bare branches creating stark silhouettes. They were planted with intention, part of an urban design that valued green space and shade. The trees are dead now but still standing, monuments to earlier optimism.
-
-The brick plaza continues in all accessible directions, open to sky and weather.`,
+S. Main Street stretches away to the east and west, its storefronts dark. The sound of wind through the dead trees creates a constant whisper, the breath of the plaza, the only voice that speaks here now.`,
   x: 2,
   y: 0,
   z: 0,

@@ -2,13 +2,11 @@
 
 export const room = {
   name: '4th Ave S & S. Main St',
-  description: `Fourth Avenue crosses S. Main Street at the eastern boundary of Pioneer Square. The International District begins here, its character distinct from the neighborhood behind. Different history. Different architecture. Different silence.
+  description: `Fourth Avenue and Main Street cross here at the gateway to the International District—the corner where Pioneer Square's Victorian brick gives way to Chinatown's particular blend of mid-century storefronts and cultural signifiers. The transition is marked by a traditional Chinese gate spanning the street to the east, red-painted timber with curved eaves and guardian lions, built in 2008 to announce WELCOME TO CHINATOWN-INTERNATIONAL DISTRICT in English and Chinese. The gate was always somewhat theatrical, a civic gesture toward authenticity. The theater continues. The audience is elsewhere.
 
-A pagoda-style gateway spans the street to the east, its red paint bright against the gray sky. The gateway was built for tourists, a promise of authenticity that was always somewhat manufactured. The tourists are gone. The gateway remains, welcoming no one.
+The International District/Chinatown Station entrance descends into the earth at the corner, one of the Link Light Rail stops that connected this neighborhood to the airport and Capitol Hill and destinations that now feel impossibly distant. The escalators are frozen mid-step, their treads dusty, their handrails motionless. Below ground level: platforms where trains stopped every seven minutes during rush hour, tunnels that continue north toward Westlake and south toward the stadiums. The trains are down there somewhere, stopped wherever they stopped when the stopping happened. The platforms wait in darkness. The schedules posted on the walls are accurate only in the sense that they document a system that once existed.
 
-A light rail station entrance descends into the earth nearby, its escalators frozen mid-step. The trains stopped running. The station waits underground, platforms empty, tunnels dark.
-
-The intersection is clear. Fourth Avenue runs north and south. S. Main ends here at the edge of the International District.`,
+This is where Main Street ends and the International District begins—different neighborhood, different history, different architecture, same silence. The paifang gate frames a view down the street, storefronts with signs in Chinese and Vietnamese, a heritage that outlasted the people who carried it. Pioneer Square is behind you now. Whatever's ahead is something else.`,
   x: 15,
   y: 0,
   z: 0,

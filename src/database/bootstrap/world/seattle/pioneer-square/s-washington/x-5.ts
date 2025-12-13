@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'S. Washington St',
-  description: `The buildings press close together here, their upper floors almost touching, creating a canyon of brick and shadow. Fire escapes zigzag up the walls, rusted but intact.
+  description: `The buildings press close together here, their upper stories nearly touching, creating a canyon of brick and shadow that blocks the grey Seattle light. Fire escapes zigzag up the walls on both sides, cast iron platforms and stairs rusted to various shades of orange, the infrastructure of emergency egress frozen in place.
 
-A barbershop occupies a narrow space between larger buildings, its striped pole still and dark. The chairs inside are leather and chrome, the kind that adjust with a lever. Hair clippings still cover the floor, swept into piles that no one bothered to collect.
+RAY'S BARBERSHOP occupies a narrow storefront squeezed between larger buildings, its striped pole dark and still. Through the window: leather and chrome chairs arranged in a row, each facing its own mirror, the geometry of vanity repeated three times. The floor is covered in hair clippings swept toward the walls but never collected, the final evidence of final haircuts.
 
-A calendar on the wall shows a month from before. The days are crossed off in red marker, counting down to something. The countdown stopped before it reached its destination.
-
-Occidental Park is close now. The iron pergola is visible ahead.`,
+Occidental Park opens at the end of the block, the iron pergola visible through the gap between buildings. The maple canopy beyond has grown wild, branches extending past their planned positions, nature reclaiming the careful urban forestry that once kept it contained. The air here carries the smell of wet stone and rotting leaves, the organic chemistry of spaces going back to earth.`,
   x: -5,
   y: 5,
   z: 0,

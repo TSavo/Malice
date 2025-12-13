@@ -2,13 +2,11 @@
 
 export const room = {
   name: '1st Ave S & S. Jackson St',
-  description: `First Avenue crosses S. Jackson Street at a corner that marks the transition from waterfront to neighborhood. The International District is visible to the east, its character distinct, its silence the same as everywhere else.
+  description: `First Avenue intersects S. Jackson Street at a corner that once marked the boundary between Seattle's waterfront development and the International District. The intersection is wide—turn lanes and pedestrian crossings designed for urban density that no longer exists. The traffic signals hang dark, their LED units dead, the municipal standards that required yellow housings irrelevant now.
 
-A martial arts supply store occupies the corner, its window displaying uniforms and training equipment and weapons that require skill to use. The students who trained here are gone. The equipment waits for hands that remember the forms.
+WARRIOR MARTIAL ARTS SUPPLY occupies the corner building, its windows intact but grimy. The specialty retailer served martial arts schools that clustered in this area. Through the glass: uniforms in white and black cotton faded by decades of sun, padded sparring gear dusty on shelves, wooden and metal training weapons arranged for customers who will never come. The disciplines the store served—taekwondo, karate, kung fu, Brazilian jiu-jitsu—survive only in the memories of survivors scattered across whatever remains of the world.
 
-A traffic signal cycles through its colors, green to yellow to red, governing traffic that no longer exists. The light is consistent. The traffic is not.
-
-The intersection is clear. First Avenue runs north and south. S. Jackson continues east and west.`,
+The buildings at this intersection represent different eras of Seattle development, all arriving at the same destination: a 1920s brick structure weathered but standing, a 1960s concrete box cracking at the seams, a 2000s mixed-use building with apartments empty above dark retail. Different eras, same emptiness.`,
   x: -9,
   y: -5,
   z: 0,

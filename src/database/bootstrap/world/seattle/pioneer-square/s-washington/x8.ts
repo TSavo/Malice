@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'S. Washington St',
-  description: `The rubble of the Collapsed Building spills into the street here, chunks of concrete and tangles of rebar and the shattered remains of what was once a workplace. The debris field extends for half a block, forcing the street to narrow around it.
+  description: `The debris field narrows the street to a single lane here, the rubble from the Collapsed Building forming a wall along the north side. The pile has settled over time, rain and gravity compacting the loose material into something more stable. Weeds have begun colonizing the edges—dandelions and grass, the pioneer species that establish in disturbed ground.
 
-A car is half-buried in the rubble, its rear end visible, its license plate still readable. Someone ran a check on that plate once, looking for the owner. They found a name and an address and a next of kin. The notification was never delivered.
+The buildings along the south side of the street survived, their proximity to the collapse evident in cracked windows and facades streaked with brick dust. A parking structure occupies most of the block, its concrete ramps spiraling upward to levels that held cars for the office workers who once populated this area. The structure's design dates it to the 1970s—poured concrete, minimal ornamentation, the brutalist aesthetic that municipal architecture favored.
 
-Caution tape stretches across the debris pile, yellow and black and faded by weather. "DO NOT CROSS" it says. The message is clear. The enforcement is absent.
-
-Third Avenue is just ahead, threading between the ruins.`,
+The intersection with 3rd Avenue opens ahead, the cross-street providing a route around the debris field. The Corp Construction site's perimeter fencing is visible to the south, black fabric screening whatever lies within from casual observation.`,
   x: 8,
   y: 5,
   z: 0,

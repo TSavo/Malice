@@ -127,6 +127,31 @@ export class DescribableBuilder {
       // Default: do nothing
     `);
 
+    // Room-centric verb registration API
+    obj.setMethod('onPlayerEnter', `
+      /** Called when a player enters the room. Registers verbs from all contents. */
+      const player = args[0];
+      for (const obj of self.contents || []) {
+        if (obj.getRoomVerbs) {
+          for (const { pattern, method } of obj.getRoomVerbs()) {
+            await player.registerVerb(pattern, obj, method);
+          }
+        }
+      }
+    `);
+
+    obj.setMethod('onPlayerExit', `
+      /** Called when a player leaves the room. Unregisters verbs from all contents. */
+      const player = args[0];
+      for (const obj of self.contents || []) {
+        if (obj.getRoomVerbs) {
+          for (const { pattern } of obj.getRoomVerbs()) {
+            await player.unregisterVerb(pattern);
+          }
+        }
+      }
+    `);
+
     // ═══════════════════════════════════════════════════════════════════
     // PLOT HOOKS - Allow plots to watch for events on this object
     // ═══════════════════════════════════════════════════════════════════

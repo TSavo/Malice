@@ -2,11 +2,11 @@
 
 export const room = {
   name: 'S. King St',
-  description: `First Avenue is just ahead, marking the transition from industrial waterfront to urban neighborhood. The character of the buildings shifts here, warehouses giving way to mixed-use structures with retail on the ground floor.
+  description: `The streetscape transitions here as S. King approaches 1st Avenue, industrial architecture giving way to mixed-use buildings. The buildings gain stories—two and three floors rather than single-story warehouses—and ground floors show storefronts rather than loading docks. The storefronts are dark. The loading docks are silent.
 
-A dive bar occupies the corner, its neon sign dark but intact. The bar served the port workers and the railroad men and the people who did hard work for not enough money. The workers are gone. The bar remains, ready to serve drinks that won't be ordered.
+THE SHIPYARD TAVERN occupies a corner building, a dive bar that served waterfront workers who needed somewhere to drink after shift. Through the grimy window: pool tables visible in the dim interior, a long bar backed by bottles no one has poured from in decades. The neon beer signs are dark, their tubes dead. The building shows its age—original wood paneling, tin ceiling tiles that early twentieth-century construction favored, all of it covered in dust.
 
-A pool table is visible through the window, its felt faded, its balls racked and waiting. The game will never be played. The rack will never be broken.`,
+The buildings along this stretch date to the 1920s and 1930s, brick facades replacing corrugated metal as Pioneer Square's southern boundary transitioned from pure industrial to commercial. The commercial development stopped. The bricks remain.`,
   x: -10,
   y: -10,
   z: 0,

@@ -2,13 +2,11 @@
 
 export const room = {
   name: '2nd Ave S & S. Jackson St',
-  description: `Second Avenue crosses S. Jackson Street at the main pedestrian approach to the stadiums. The crosswalks are painted in team colors, faded now but still visible, guiding nonexistent crowds to games that will never be played.
+  description: `Second Avenue intersects S. Jackson Street at the primary pedestrian approach to the stadium district. The intersection is wide, designed for thousands of fans who crossed here on game days. The crosswalks are painted in Seahawks blue and green on one side, Mariners navy and teal on the other—team colors faded but still visible, brand identity built into infrastructure for brands that no longer exist.
 
-A light rail station entrance descends into the earth nearby, its escalators frozen, its platform empty. The station connected the stadiums to the rest of the city. The connections have been severed. The station waits underground.
+The Stadium Station entrance occupies the northeast corner, the Sound Transit light rail stop that connected the stadiums to Sea-Tac Airport. The glass-and-steel canopy shelters escalators frozen mid-step, descending to platforms that haven't seen a train in fifty-five years. The station was designed for capacity—wide escalators, multiple fare gates—the infrastructure that handled tens of thousands of passengers handling nothing now.
 
-A hot dog stand occupied this corner on game days, its umbrella bright, its onions fragrant. The stand is gone. The smell of game-day food is a memory shared by no one present.
-
-The intersection is clear. Second Avenue runs north and south. S. Jackson continues east and west.`,
+The buildings at this intersection are newer construction, built during the stadium-era development boom. Glass and steel facades weathered and dirty, ground-floor retail dark behind locked gates. The corners once hosted mobile vendors on game days—food carts and merchandise sellers claiming spots with unwritten agreements. The carts are gone. The agreements forgotten. The territory they claimed means nothing.`,
   x: 3,
   y: -5,
   z: 0,

@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'Occidental Park',
-  description: `Occidental Park spreads out here, its brick plaza central area. The park was created in the 1970s by closing Occidental Avenue to traffic, converting asphalt to pedestrian space. The brick paving in herringbone pattern stretches in all directions, weathered but intact.
+  description: `A row of dead maples creates a colonnade through this section of the park, their trunks aligned with military precision, their spacing calculated to maximize shade while maintaining sightlines. The urban foresters who planted them understood both biology and sociology—trees that welcomed without concealing, shade that cooled without hiding.
 
-Dead trees create a line through this space, their trunks marking rhythm, their shadows creating patterns. The detail speaks to a time when the park was maintained, when someone cared about these spaces and the people who used them.
+The trees are dead now, but they still define the space. Their trunks mark rhythm, their branches create patterns of shadow even without leaves. Walking between them feels ceremonial, a procession through a space designed for movement. The destination was always the center of the park. The center is empty now, but the procession continues for anyone willing to walk it.
 
-Dead trees punctuate the plaza at intervals, their bare branches creating stark silhouettes. They were planted with intention, part of an urban design that valued green space and shade. The trees are dead now but still standing, monuments to earlier optimism.
-
-The brick plaza continues in all accessible directions, open to sky and weather.`,
+One tree has begun to lean, its root system compromised by decades of drought and freeze cycles. The lean is perhaps ten degrees off vertical. In another decade, it will fall. In another century, it will have rotted into the brick. Time moves at its own pace.`,
   x: -1,
   y: 2,
   z: 0,

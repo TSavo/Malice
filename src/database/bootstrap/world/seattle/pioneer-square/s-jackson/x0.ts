@@ -2,11 +2,11 @@
 
 export const room = {
   name: 'S. Jackson St',
-  description: `The stadiums are visible to the south, their massive structures dominating the skyline. Baseball and football, the civic religions of America, played in temples of concrete and steel. The games have stopped. The temples remain, monuments to entertainments that required crowds.
+  description: `The stadium district rises to the south, T-Mobile Park and Lumen Field dominating the skyline with the scale that professional sports facilities require. The two stadiums were built in the late 1990s, replacing the Kingdome. The corporate names are probably meaningless now—T-Mobile and Lumen gone the way of everything else—but the signs remain, advertising companies that no longer exist to crowds that will never gather.
 
-A sports bar occupies the corner, its windows decorated with team logos and pennants. The TVs inside are dark. The beer taps are dry. The crowds that gathered here on game days have dispersed to wherever crowds go when games end permanently.
+SLUGGERS SPORTS BAR occupies the corner building, its windows plastered with team decals faded to ghosts. Through the grimy glass: multiple television screens dark and dead, a long bar backed by beer taps rusted in place, sports memorabilia gathering dust on walls no one looks at. The business model depended on event-day traffic. The events ended. The traffic stopped. The bar serves no one.
 
-A ticket scalper's spot near the entrance is marked by nothing but memory. The scalpers knew their corners. The corners have forgotten them.`,
+The streetscape was designed for pedestrian flow—wide sidewalks and clear sightlines guiding thousands of fans on game days. The infrastructure of crowd management remains: signal poles dark and rusting, curb cuts and crosswalks faded. The predictable patterns accommodated masses of people moving together. No masses. No patterns. Just the silence of spaces designed for noise.`,
   x: 0,
   y: -5,
   z: 0,

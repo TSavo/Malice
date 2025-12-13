@@ -3893,7 +3893,8 @@ async transferAll(from, to, mover) {
 
 ```javascript
 // WRONG: Never create objects any other way
-const obj = await $.create({ parent: 1, properties: {} });  // NO!
+const obj = await $.recycler.create($.agent, {});  // NO!
+
 
 // RIGHT: Use the recycler
 const obj = await $.recycler.create($.item);  // Reuses IDs properly

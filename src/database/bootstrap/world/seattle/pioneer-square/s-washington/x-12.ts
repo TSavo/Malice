@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'S. Washington St',
-  description: `The street widens here where a building used to stand. The lot is empty now, filled with the rubble of whatever was demolished and never replaced. A chain link fence surrounds the property, but sections have been cut away or pulled down.
+  description: `The street opens here where a building used to stand—an empty lot surrounded by chain-link fence, the ground littered with rubble and weeds that have pushed through concrete that was never meant to be permanent. A sign on the fence announces COMING SOON: LUXURY CONDOMINIUMS • 47 UNITS • UNDERGROUND PARKING, the development plans dated from an era when developers still developed things. The condominiums never came. The lot remains, a gap in the streetscape like a missing tooth.
 
-A portable toilet sits in one corner of the lot, bright blue plastic faded to grey. It has been here since the construction that never happened. No one has emptied it. No one ever will.
+Mixed-use buildings line the opposite side of the street—storefronts at ground level, apartments above, the standard Pioneer Square configuration of commerce supporting residence. The storefronts are dark, their windows soaped over or simply grimy, their inventories invisible. The apartments are harder to read. Curtains hang in some windows, moved by air currents that might be HVAC systems still running on backup power, or might be wind through cracked seals, or might be something else.
 
-Across the street, a row of storefronts with apartments above. The storefronts are empty. The apartments might not be. Curtains move in one window, or maybe it is just the wind.
-
-Smith Tower is visible ahead, white against the grey sky.`,
+Smith Tower rises into view at the end of the block, its white terra cotta spire catching whatever light the overcast allows. The building has stood here since 1914, watching the neighborhood through booms and busts and whatever this is. Thirty-eight stories of Edwardian ambition. The ambition hasn't changed. The context has.`,
   x: -12,
   y: 5,
   z: 0,

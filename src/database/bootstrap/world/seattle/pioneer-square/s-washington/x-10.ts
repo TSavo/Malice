@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'S. Washington St',
-  description: `The buildings here are older, taller, built when this neighborhood was the center of everything. Red brick and sandstone, carved cornices and arched windows. They built to impress back then. They built to last.
+  description: `The buildings here are older, taller, built when this neighborhood was the center of everything. Red brick and sandstone, carved cornices and arched windows, the architectural vocabulary of a city that wanted to be taken seriously. They built to impress back then. They built to last. The impressiveness has outlived the impressing.
 
-A jewelry store occupies the ground floor, its display cases empty, its security gate torn from its tracks. The cases themselves are smashed, the glass scattered across the floor like ice. Whatever was inside is long gone. Probably traded for food. Probably worthless now anyway.
+A jewelry store occupies the ground floor of one building, PACIFIC GOLD & GEMS according to the painted glass. The security gate has been torn from its tracks, bent metal hanging at an angle that suggests force rather than finesse. Through the shattered front window: empty display cases, glass scattered across the floor, the aftermath of decisions made when gold still seemed valuable.
 
-Across the street, a shoe repair shop with a hand-painted sign. "WHILE U WAIT" it promises. The wait has been long. The shoes are still there, tagged and organized on shelves, waiting for customers who will never return.
-
-The intersection with 1st Avenue is just ahead.`,
+The building opposite houses PIONEER SHOE REPAIR, a narrow storefront with a hand-painted sign promising "WHILE U WAIT." The wait has become indefinite. Through the window: walls of shelving, a cobbler's bench, the silent machinery of a trade that required feet to walk in the door. First Avenue is just ahead, the intersection opening at the end of the block.`,
   x: -10,
   y: 5,
   z: 0,

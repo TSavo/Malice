@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'Yesler Way',
-  description: `The last stretch before 4th Avenue. The buildings here are a mix of old and new, three-story walk-ups beside modern low-rises with underground parking. A dry cleaner with plastic-wrapped clothes still hanging in the window, waiting to be picked up. A nail salon with chairs arranged in neat rows. A restaurant with a faded awning and a menu in the window. The lunch special is pho. The lunch special has always been pho.
+  description: `The last stretch before Fourth Avenue mixes old and new construction—three-story walk-ups beside modern low-rises, all of it dark, all of it empty. The buildings housed businesses that served transitional neighborhoods: dry cleaners, nail salons, the service economy that filled space between anchor tenants. The services ended. The anchor tenants left. The buildings persist.
 
-The food smells are gone now. The garlic and ginger and frying oil, replaced by dust and decay and the particular silence of empty kitchens. The woks are cold. The burners are dead. The recipes will not be passed down.
+A Vietnamese restaurant occupies a ground-floor space, its awning faded and torn, still advertising pho and banh mi. Through the grimy window: the open kitchen layout that noodle shops favor, steam tables rusted, prep stations bare. The restaurant represented the culinary culture of this neighborhood's eastern edge. The food smells are gone now—garlic and ginger and frying oil replaced by dust and decay.
 
-A plastic crate sits outside the restaurant, the kind someone might sit on while smoking a cigarette and watching the street change around them. The crate is empty. The street has finished changing.
-
-Fourth Avenue lies ahead. Beyond it, what remains of Chinatown.`,
+Fourth Avenue is visible ahead. The ornate Chinatown gate stands a few blocks south, its dragons watching the empty street with faded eyes. The gate marked the boundary between communities. Boundaries mean less now.`,
   x: 14,
   y: 10,
   z: 0,

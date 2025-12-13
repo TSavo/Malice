@@ -2,13 +2,11 @@
 
 export const room = {
   name: '2nd Ave S & S. Main St',
-  description: `Second Avenue crosses S. Main Street at an intersection that once saw steady traffic, cars and buses and delivery trucks. The traffic has stopped. The intersection remembers motion.
+  description: `Second Avenue and Main Street cross here at an intersection that marks the eastern edge of Pioneer Square's commercial core. Beyond this corner, the neighborhood transitions toward the International District, the architecture shifting from Victorian commercial to mid-century municipal, the character changing from tourist destination to working city. The transition still holds, even if neither side of it is working anymore.
 
-A bank occupies the corner, its marble facade projecting permanence and stability. The vault is locked. The money inside is worthless or valuable, depending on how you define both terms. The ATM screen is dark. The deposits have been discontinued.
+BANK OF AMERICA occupies the corner building, a financial institution housed in a structure that predates the bank itself—the building was a different bank, then another different bank, then finally absorbed into the national chain that added its own signage and branding and ATM vestibule. The marble facade projects permanence, the bronze doors suggest security, the whole architectural vocabulary saying "your money is safe here." The vault is locked. The safety deposit boxes hold contents that matter to people who aren't here to retrieve them. The ATMs have gone dark, their screens displaying error codes in a language that means nothing without a network to interpret it.
 
-A clock mounted on the bank's facade shows the correct time twice a day. The rest of the time it lies, its hands frozen at 3:47. Something happened at 3:47. Or the battery just died. Either explanation works.
-
-The intersection is clear. Second Avenue runs north and south. S. Main continues east and west.`,
+A clock is mounted above the bank's entrance, analog hands showing 3:47—the moment when the mechanism stopped, whether through power failure or battery death or some other mundane malfunction. The clock is accurate twice a day, which is more than can be said for most things. The hands point at numbers that used to mean something. The meaning has become optional.`,
   x: 3,
   y: 0,
   z: 0,

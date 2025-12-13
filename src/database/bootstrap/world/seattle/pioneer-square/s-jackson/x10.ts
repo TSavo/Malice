@@ -2,11 +2,11 @@
 
 export const room = {
   name: 'S. Jackson St',
-  description: `The street enters the heart of the International District here, its identity clear and distinct. Red lanterns and Chinese characters and the architectural flourishes of a neighborhood that maintained its character against gentrification. The character remains. The gentrification has stopped.
+  description: `S. Jackson enters the heart of the International District here, the streetscape expressing the neighborhood's Asian-American character even in ruin. The signage is multilingual—Chinese characters predominant, Vietnamese, Japanese, English—all faded, all marking businesses that served communities now scattered or dead. The decorative elements that Asian business districts favor remain: red-painted trim oxidized to rust, ornamental tile work cracked but intact.
 
-A dim sum restaurant occupies the corner, its rolling carts visible through the window, its bamboo steamers stacked on shelves. The carts are empty. The steamers are cold. The recipes are memories held by no one present.
+HARBOR CITY RESTAURANT occupies the corner building, its windows dark, its kitchen cold. The dim sum establishment served the Cantonese tradition of small plates and tea service. Through the grimy glass: round tables with built-in lazy susans arranged for service that ended fifty-five years ago, the kitchen window where carts emerged loaded with steamer baskets now framing only darkness. The red and gold color scheme is faded to pink and brown. The multi-generational meals ended. The generations scattered.
 
-A pay phone stands at the corner, its receiver dangling, its cord twisted. The phone still works, probably. No one is calling.`,
+The wire infrastructure for festival lighting spans the street here, the permanent mounting points holding nothing now. The wire connects buildings on both sides, the grid that supported paper lanterns during Lunar New Year. No lanterns. No celebrations. The festivals are fifty-five years past.`,
   x: 10,
   y: -5,
   z: 0,

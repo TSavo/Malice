@@ -9,7 +9,6 @@ Common mistakes to avoid when programming in Malice MOO.
 ```javascript
 // WRONG - breaks pooling
 const obj = await manager.create({ parent: 1 });
-const obj2 = await $.create(...);
 
 // RIGHT
 const obj = await $.recycler.create($.item);

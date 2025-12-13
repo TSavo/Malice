@@ -2,11 +2,11 @@
 
 export const room = {
   name: 'Yesler Way',
-  description: `The park ends here. A brewpub occupies the corner building, copper tanks still visible through grimy windows. The tanks are empty now, the beer long since drunk or evaporated or turned to something worse. A chalkboard by the door lists beers with names like "Pioneer Stout" and "Skid Road IPA." The prices seem quaint.
+  description: `The PIONEER BUILDING dominates this intersection, six stories of red brick that have weathered better than most. Built in 1892, it survived the Great Fire that necessitated its construction and the war that ended everything else. The Romanesque arches frame windows that are mostly intact, a rarity. The corner turret still rises above the roofline, though pigeons have claimed it for their own.
 
-Across the street, the Pioneer Building rises six stories of red brick and terra cotta. Built in 1892. Survived the fire that year, and every fire since. The windows are dark, the retail spaces at street level gutted, but the structure remains.
+ELYSIAN BREWING occupies the ground floor across the street, or did. The copper brewing tanks are visible through grimy windows, tarnished green-brown now, the beer long since drunk or evaporated or turned to something worse. The tap handles behind the bar are still there, pouring nothing.
 
-A brass plaque by the main entrance lists the building's history in careful detail. Fire of 1889. Rebuild of 1892. Renovation of 1974. Condo conversion of 2018. The plaque ends there. No one added what happened next.`,
+This intersection marks the eastern edge of Occidental Park, where the cobblestone plaza gives way to cracked asphalt. The buildings maintain their historic facades—brick and terra cotta don't care about the passage of time the way glass and steel do.`,
   x: 1,
   y: 10,
   z: 0,

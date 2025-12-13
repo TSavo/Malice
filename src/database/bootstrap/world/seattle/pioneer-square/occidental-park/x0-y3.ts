@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'Occidental Park',
-  description: `Occidental Park spreads out here, its brick plaza eastern-northern section. The park was created in the 1970s by closing Occidental Avenue to traffic, converting asphalt to pedestrian space. The brick paving in herringbone pattern stretches in all directions, weathered but intact.
+  description: `Benches line the northern edge of the park here, facing south toward the plaza's interior, their backs to S. Washington Street. The benches are memorial donations, each with a small brass plaque on the backrest: "In loving memory of..." Names and dates. People remembered by people who are themselves now forgotten or dead.
 
-Benches line the northern edge here, facing south toward the park's interior. The detail speaks to a time when the park was maintained, when someone cared about these spaces and the people who used them.
+One plaque has been scratched through, deliberate vandalism that obliterated whatever name was there. Someone was angry at the dead person, or angry at death itself, or just angry. The scratch marks are deep, made with a key or knife, the violence of the gesture preserved in metal.
 
-Dead trees punctuate the plaza at intervals, their bare branches creating stark silhouettes. They were planted with intention, part of an urban design that valued green space and shade. The trees are dead now but still standing, monuments to earlier optimism.
-
-The brick plaza continues in all accessible directions, open to sky and weather.`,
+S. Washington Street is visible beyond the park's northern edge, Victorian buildings rising dark and silent. The Grand Central Building's corner is visible to the northwest, its distinctive clock tower—modeled after Big Ben—showing a time that stopped when the power failed. The clock was always a few minutes fast. Now it's years behind.`,
   x: 0,
   y: 3,
   z: 0,

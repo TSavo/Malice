@@ -2,11 +2,11 @@
 
 export const room = {
   name: '2nd Ave S',
-  description: `A small plaza opens up on the east side of the street, a pocket of public space carved out of the urban grid. The plaza has benches and a few scraggly trees and the kind of hopeful landscaping that never quite thrives in shade.
+  description: `A pocket plaza opens on the east side of Second Avenue, one of those urban design gestures that cities make when developers trade floor area for public space. The plaza is maybe thirty feet deep—concrete pavers, two zelkova trees planted in grates, metal benches bolted to the ground, the whole vocabulary of activated ground-floor space rendered in materials that resist skateboarding and sleeping.
 
-The construction fence forms the west wall of the plaza, black fabric turning the space into a dead end rather than a through-way. The plaza was probably nicer before they started building.
+The Corp fence forms the plaza's west edge, transforming what should have been a pass-through into a cul-de-sac. Before the construction, this might have been a pleasant shortcut, a sunny corner where office workers ate lunch. The fence threw it into permanent shadow. The zelkovas responded by dying slowly from the crown down, their upper branches skeletal, their lower branches still producing leaves that don't know any better.
 
-A dedication plaque names the plaza after someone who donated money or land or influence. The donation is commemorated. The someone is forgotten.`,
+WALTER PIERCE MEMORIAL PLAZA reads a bronze plaque set into the pavers. Walter Pierce, whoever he was, donated money or land or political leverage to get this square named after him. The plaque lists his birth year and death year and the words "CIVIC LEADER," which covers a lot of ground. His memorial plaza has become a dead end against a fence hiding something he never knew about. Legacies are funny that way.`,
   x: 3,
   y: -2,
   z: 0,

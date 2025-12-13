@@ -2,11 +2,11 @@
 
 export const room = {
   name: 'Occidental Ave S',
-  description: `The debris blocking Yesler Way is fully visible now, a mass of brick and concrete and steel that fills the intersection ahead. The collapse happened during the Event, one of many collapses that sealed Pioneer Square off from Downtown.
+  description: `The debris field begins here in earnest, the first scattered bricks and chunks of concrete appearing on the pavement like advance scouts for the catastrophe ahead. The main collapse at Yesler Way is thirty yards north—a wall of rubble that rises three stories high, the compressed remains of a building that gravity remembered all at once. From here you can see the stratification, the layers of floor that pancaked down into each other, office furniture and ductwork and human things compressed into geological strata.
 
-A construction crane lies twisted in the debris, its arm bent at an impossible angle, its operator's cab crushed. The crane was building something when the building stopped. The irony writes itself.
+A construction crane lies across the top of the debris pile, its boom bent at forty-five degrees, its cable dangling into the wreckage like a fishing line dropped into stone. The cab has been crushed flat. The crane was working on something when the something stopped. The counterweights still hang from the back, balanced perfectly against nothing. Someone calculated those weights for a job that will never finish.
 
-The maple trees end here, giving way to dust and destruction. The canopy of green yields to a wall of gray.`,
+The maple canopy ends here, the last tree standing at the edge of the destruction like a sentry who refused to retreat. Beyond it, dust has settled over everything—a grey film that coats the debris, the street, the facades of buildings that are still standing. The dust gets in your eyes. It gets in your lungs. It tastes like the inside of a tomb.`,
   x: -3,
   y: 8,
   z: 0,

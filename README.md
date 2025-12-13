@@ -370,25 +370,24 @@ Player connects to game
 
 ```typescript
 // Via MOO code (future)
-const room = await $.create({
-  parent: 10,  // Inherit from Describable
-  properties: {
-    name: 'Town Square',
-    description: 'A bustling town square with a fountain.',
-    exits: {
-      north: 51,  // Room #51
-      south: 52,  // Room #52
-      west: 53    // Room #53
-    }
-  },
-  methods: {
-    onEnter: `
-      const player = args[0];
-      const desc = await self.call('describe');
-      player.send(\`\${desc}\\r\\n\`);
-    `
-  }
+const room = await $.recycler.create($.room, {
+  name: 'Town Square'
 });
+
+// Create a merchant agent
+const merchant = await $.recycler.create($.agent, {
+  name: 'Grizzled Merchant',
+  description: 'A weathered trader with a sharp eye for deals.',
+  credits: 500
+});
+
+// Add a greet method
+merchant.setMethod('greet', `
+  const player = args[0];
+  await player.tell('Welcome to my shop!');
+`);
+
+
 ```
 
 ## Example: Creating a Character

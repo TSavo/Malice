@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'Occidental Park',
-  description: `Occidental Park spreads out here, its brick plaza central plaza. The park was created in the 1970s by closing Occidental Avenue to traffic, converting asphalt to pedestrian space. The brick paving in herringbone pattern stretches in all directions, weathered but intact.
+  description: `Benches are arranged in a circle here, facing inward, creating a conversation pit in the middle of the plaza. The arrangement was intentional—urban designers believed that facing benches toward each other would encourage interaction, would transform strangers into neighbors. The benches face each other still, holding conversations with no one.
 
-Benches arranged in a circle face inward, creating a social space that suggests gathering, conversation. The detail speaks to a time when the park was maintained, when someone cared about these spaces and the people who used them.
+One bench has collapsed, its wooden slats rotted through, its metal frame twisted. Someone sits there anyway—not a person, but a mannequin, its plastic form weathered to grey, its features smoothed by decades of rain. The mannequin wears the remains of a coat. Its hands rest on its knees. Its blank face stares at the bench opposite, patient and waiting.
 
-Dead trees punctuate the plaza at intervals, their bare branches creating stark silhouettes. They were planted with intention, part of an urban design that valued green space and shade. The trees are dead now but still standing, monuments to earlier optimism.
-
-The brick plaza continues in all accessible directions, open to sky and weather.`,
+Someone placed the mannequin here. Someone thought it was funny, or meaningful, or just wanted to see how it would feel to make the empty park seem occupied. The joke persists. The mannequin waits.`,
   x: -2,
   y: 2,
   z: 0,

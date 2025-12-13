@@ -2,11 +2,11 @@
 
 export const room = {
   name: 'S. Jackson St',
-  description: `A temple occupies the second floor of one building, its entrance marked by a narrow stairway and a sign in Chinese characters. The incense that burned here is long cold. The prayers that were offered have gone unanswered, or perhaps answered in ways that weren't expected.
+  description: `A Buddhist temple occupies the second and third floors of a narrow building, its presence marked by a steep stairway entrance and a sign in Chinese characters: SEATTLE BUDDHIST TEMPLE, according to smaller English text. The building dates to the 1920s, when the community established religious institutions that immigrant populations require—places for worship, for maintaining traditions across generations and oceans. The traditions crossed oceans only to end here, in a temple with no congregation. The incense that once burned has long since turned to ash.
 
-A bubble tea shop occupies the ground floor, its menu of improbable flavors still posted on the wall. Taro and lychee and things that required an adventurous palate. The tapioca pearls have long since dissolved. The adventures are over.
+HAPPY LEMON occupies the ground floor, its neon accents dark, its Instagram-friendly design dusty and abandoned. The bubble tea shop served the drink craze that swept from Taiwan through Asian-American communities. The menu board behind the counter lists permutations no one will order: milk tea, fruit tea, tapioca pearls and jellies. The white walls are grey now with neglect. The tea was never made. The happiness was marketed, not delivered.
 
-The street is quiet in the particular way of places that were once loud with multiple languages.`,
+The buildings along this stretch maintain the mixed-use pattern that characterized the International District: ground-floor retail dark and empty, upper floors housing apartments whose residents are fifty-five years gone. The organizations that immigrant neighborhoods sustained have no immigrants to organize.`,
   x: -7,
   y: -5,
   z: 0,

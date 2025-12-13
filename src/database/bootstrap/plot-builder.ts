@@ -47,7 +47,8 @@ export class PlotBuilder {
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
 
-    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
+    const aliases = (objectManager.aliases as Record<string, number>) || {};
+
 
     if (aliases.plot) {
       this.plotPrototype = await this.manager.load(aliases.plot);

@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'S. Washington St',
-  description: `This is the heart of the neighborhood, or close enough. The buildings rise on all sides, their brick facades stained dark by a century of rain and smoke. Somewhere beneath the street, the old city lies buried and forgotten.
+  description: `The Underground Tour entrance occupies a storefront here, marked by a painted sign depicting the buried streets below. Seattle raised itself twelve feet after the Great Fire of 1889, building new sidewalks at second-story level and leaving the original street grid entombed beneath. Tour guides used to lead visitors through the subterranean passages, explaining how the city literally buried its past. The passages are still down there, accessible through basements and abandoned storefronts, a parallel Seattle preserved in darkness.
 
-A corner pub once served drinks here, the kind of place with brass fixtures and dark wood and the smell of hops and history. The brass is tarnished now. The wood is warped. The smell is something else entirely.
+J&M CAFE claims the corner building, its name painted on the window in gold leaf worn thin by decades of weather. The bar opened in 1889, survived the fire, and served drinks through prohibition and depression and war. The interior visible through clouded glass suggests the accumulated history—dark wood worn smooth by elbows, brass fixtures green with patina, tin ceiling tiles pressed with Victorian patterns.
 
-A plaque on the wall commemorates something historical. The words are worn smooth by time and weather. It probably explained why this corner mattered. It probably does not matter anymore.
-
-The street continues east and west. The past is somewhere below. The future is uncertain.`,
+A bronze plaque mounted on the brick facade marks this as a Seattle Landmark, explaining the neighborhood's significance in language that assumes readers have time for historical context. The plaque has developed the particular green of oxidized copper, its raised letters still legible but softened by chemistry and rain.`,
   x: 0,
   y: 5,
   z: 0,

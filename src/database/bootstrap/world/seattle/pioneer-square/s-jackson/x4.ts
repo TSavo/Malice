@@ -2,11 +2,11 @@
 
 export const room = {
   name: 'S. Jackson St',
-  description: `The Corp Construction zone begins here, its black fabric barriers blocking the view of whatever is happening inside. The zone extends for blocks, a corporate secret that the corporation can no longer protect.
+  description: `The Corp Construction perimeter begins here, the black fabric barriers extending south along the block—new and maintained, in stark contrast to the surrounding decay. The construction zone occupies what was once surface parking and several older buildings, the assembly of parcels that major development requires. The barriers are industrial but fresh: chain-link fence panels wrapped in opaque fabric, security drones humming at intervals along the perimeter.
 
-Warning signs are posted at intervals, their threats empty. AUTHORIZED PERSONNEL ONLY. There are no authorized personnel. There are no personnel at all.
+Warning signs are mounted at regular intervals: CORP CONSTRUCTION • AUTHORIZED PERSONNEL ONLY • HARD HAT AREA. The signage is crisp, corporate standard, the same templates used at Corp development sites worldwide. Security cameras watch the perimeter with the alertness that suggests active monitoring. Something is being built here, in a dead city. The machinery hum and occasional worker voices are jarring against the silence.
 
-A gap in the fence has been cut, the chain-link peeled back like a wound. Someone wanted to see what was inside. Whether they found it, or it found them, is unclear. The gap remains, an invitation and a warning.`,
+The street continues along the fence line, the sidewalk maintained within Corp's perimeter, returning to decay beyond. The buildings on the north side predate the Corp development—a two-story commercial building housing a Vietnamese restaurant on the ground floor, dark and abandoned. The building's facade is painted faded yellow, the color scheme of the International District's older structures, preserved in neglect while Corp builds something new next door.`,
   x: 4,
   y: -5,
   z: 0,

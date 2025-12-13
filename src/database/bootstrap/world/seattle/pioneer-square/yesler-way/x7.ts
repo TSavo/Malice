@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'Yesler Way',
-  description: `A parking structure rises on the south side of the street, four levels of concrete and rebar, its entrance blocked by a car that ran out of gas or hope or both. The driver is not inside. The keys are still in the ignition.
+  description: `A parking structure rises on the south side, four levels of concrete and open-sided decks. Cars are still up there, visible through the open sides—lined up in neat rows on the upper levels, waiting for owners who will never return. Fifty-five years of waiting. The cars have rusted in place, tires flat, paint oxidized to uniform grey.
 
-The structure itself is intact, its levels visible through the open sides. Cars are still parked up there, lined up in neat rows, waiting for owners who will never return. A convertible on the third level has its top down. It has been rained in for months.
+A row of storefronts lines the north side, their windows covered with plywood spray-painted with warnings and pleas and graffiti that stopped meaning anything decades ago. The buildings date to different eras—early twentieth-century brick beside mid-century concrete—but they share the same emptiness now.
 
-Across the street, a row of storefronts, their signs faded, their windows covered with plywood spray-painted with warnings and pleas and the kind of graffiti that means nothing to anyone anymore.
-
-Third Avenue is close. The light rail station is ahead, or what is left of it.`,
+Third Avenue and the Pioneer Square light rail station are visible ahead. The station entrance gapes dark, stairs descending into tunnels that haven't seen a train in half a century. The street slopes gently downward, following the grade toward a waterfront that's changed beyond recognition.`,
   x: 7,
   y: 10,
   z: 0,

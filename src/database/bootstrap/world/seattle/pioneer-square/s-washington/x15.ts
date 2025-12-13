@@ -3,13 +3,11 @@
 
 export const room = {
   name: '4th Ave S & S. Washington St',
-  description: `Washington Street emerges here on the far side of the Collapsed Building, or what would be Washington Street if the Collapsed Building had not eaten most of the block. The rubble pile extends almost to 4th Avenue, a barrier of concrete and steel and broken glass that separates this corner from the rest of the neighborhood.
+  description: `Fourth Avenue marks the formal eastern boundary of Pioneer Square, the intersection creating a corner that belongs to both neighborhoods and neither. The International District's signage dominates the buildings to the east, while the Collapsed Building's debris field spreads westward, a physical barrier more absolute than any administrative boundary.
 
-The building that fell was on the other side of the debris. From here, you can see the back of the collapse, the exposed floors and dangling pipes and the intimate architecture of destruction. Wallpaper is visible on one intact section of wall, a cheerful floral pattern that someone chose for their office. The flowers are faded but still there, still blooming in the ruins.
+From this angle, the collapse reveals its interior—the cross-section of a building's private spaces exposed to weather and observation. Floor plates are visible in the debris pile's stratigraphy, each level distinguishable by the layer of rubble it contributed. Pipes and conduit dangle from broken walls. A section of interior wall remains partially intact, its wallpaper—a geometric pattern in muted greens—still adhered to plaster that has nowhere to fall.
 
-Fourth Avenue marks the edge of Pioneer Square, the boundary with the International District. The boundary feels less meaningful now. Rubble does not care about neighborhood lines.
-
-The street is passable heading north and south, but heading west means climbing over what is left of someone else's workplace. Most people go around.`,
+The buildings at this intersection survived, their proximity to the collapse evident in cracked windows and facades streaked with the particular grey of concrete dust. UWAJIMAYA VILLAGE is visible to the south, the Asian grocery and retail complex that anchors the International District's commercial core. The wing nut sculpture at the intersection—a piece of public art that predates the Event—stands undamaged, its abstract bronze forms indifferent to the destruction nearby.`,
   x: 15,
   y: 5,
   z: 0,

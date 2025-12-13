@@ -2,11 +2,11 @@
 
 export const room = {
   name: 'Occidental Ave S',
-  description: `S. Washington Street is just ahead, its intersection marking the transition from Pioneer Square's core to its northern edge. The buildings beyond are slightly newer, slightly less ornate, the neighborhood fading toward the collapsed building that blocks Yesler Way.
+  description: `S. Washington Street opens ahead, the intersection marking the northern edge of the Occidental Mall proper. Beyond here the pedestrian zone gives way to regular streets, the manicured urban design fading into the harder edges of a working neighborhood. You can see the difference in the buildings—south of Washington, everything is restoration and preservation; north of it, the architecture gets practical, the ornamentation stops trying so hard.
 
-A boutique hotel occupied one building, offering rooms with exposed brick and reclaimed wood and the industrial chic that was fashionable when fashions existed. The rooms are empty now. The chic has become just industrial.
+THE ALEXIS HOTEL occupies the corner building, one of those boutique operations that converted warehouse space into rooms with exposed beam ceilings and brick walls and the kind of industrial chic that interior design magazines were obsessed with. The lobby is visible through tall windows—leather furniture, modern art, a reception desk made from reclaimed timber that probably came with its own provenance documentation. A crystal chandelier hangs over the lobby, still intact, still beautiful, lighting nothing. The rooms upstairs are dark. Whatever was in the mini-bars has long since expired.
 
-A bike share station stands at the corner, its docking ports full, its bikes uncharged and waiting for riders who won't come.`,
+A Lime bike share station runs along the building's base, twenty docking ports in a row, each one holding a green electric bicycle. The bikes are fully docked, fully uncharged, their batteries dead from months of disuse. The app that unlocked them required a smartphone, cellular service, a credit card, a working economy. The bikes are just sculpture now. Very heavy sculpture that no one is moving.`,
   x: -3,
   y: 4,
   z: 0,

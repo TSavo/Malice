@@ -71,10 +71,12 @@ export class GameBootstrap {
     const { CoreSystemBuilder } = await import('./bootstrap/core-system-builder.js');
     const { WorldBuilder } = await import('./bootstrap/world-builder.js');
 
+    const { BuildingBuilder } = await import('./bootstrap/building-builder.js');
     const prototypeBuilder = new PrototypeBuilder(this.manager);
     const coreSystemBuilder = new CoreSystemBuilder(this.manager);
     const worldBuilder = new WorldBuilder(this.manager);
 
+    const buildingBuilder = new BuildingBuilder(this.manager);
     // Build prototypes
     console.log('Creating object prototypes...');
     await prototypeBuilder.buildPrototypes();
@@ -94,6 +96,20 @@ export class GameBootstrap {
     // Build world geometry (rooms and exits)
     console.log('Creating world geometry...');
     await worldBuilder.build();
+    // Build buildings (multi-floor structures)
+    console.log('Creating buildings...');
+    await buildingBuilder.build();
+    console.log('  ✅ Built Smith Tower and other buildings');
+    // Register global building object aliases
+    console.log("Registering global building aliases...");
+    const citySign = await this.manager.find(obj => obj.name === "City Announcement Board");
+    if (citySign) {
+      const objectManager = await this.manager.load(0);
+      await objectManager?.call("addAlias", "cityAnnounce", citySign.id);
+      console.log("  ✅ Registered $.cityAnnounce");
+    } else {
+      console.warn("  ⚠️  City Announcement Board not found");
+    }
 
     // Reload aliases again to include startRoom
     await aliasLoader.loadAliases();

@@ -2,11 +2,11 @@
 
 export const room = {
   name: 'S. Main St',
-  description: `The cobblestones show through the asphalt here, patches of the original street surface exposed by wear and neglect. Seattle paved over its past but the past keeps pushing through, stubborn and uneven.
+  description: `The asphalt has failed here in patches, revealing the cobblestones beneath—the original street surface from the 1890s, granite blocks that were meant to be permanent but ended up buried under progress. The cobblestones push through where the asphalt is weakest, geological layers in an archaeological site that nobody is excavating. Seattle paved over its history. The history keeps coming back.
 
-A used bookstore occupies the building on the north side, its shelves visible through a window that hasn't been cleaned in months. Thousands of books wait inside, their stories untold, their pages slowly yellowing. The owner locked up one day and never came back. The books don't mind. They're used to waiting.
+GLOBE BOOKS fills a narrow building on the north side, three floors of used and antiquarian titles stacked floor to ceiling in that particular bookstore geometry that prioritizes density over accessibility. Through the window: shelves bent under the weight of accumulated reading, thousands of volumes arranged by logic known only to the owner. The owner locked up one morning and didn't return. The CLOSED sign in the window has faded from red to pink. Inside, first editions slowly appreciate in value and simultaneously deteriorate in condition, a race between economics and entropy.
 
-A fire escape zigzags down the building across the street, its iron steps rusted orange. Someone has hung a plant from the lowest landing. The plant is dead, but it's still hanging there, committed to the aesthetic.`,
+A fire escape descends the building opposite, cast iron stairs zigzagging down the brick facade. Someone hung a planter from the lowest landing—a macrame holder cradling a pot that once held something green. The plant has died, desiccated to brown stems and crisp leaves, but it's still hanging there, still part of someone's vision for what urban living should look like. The vision has outlived the visionary.`,
   x: -6,
   y: 0,
   z: 0,

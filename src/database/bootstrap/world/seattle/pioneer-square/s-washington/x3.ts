@@ -3,13 +3,11 @@
 
 export const room = {
   name: '2nd Ave S & S. Washington St',
-  description: `The Pioneer Building occupies the entire block here, six stories of red brick and Romanesque arches. They built it in 1892, right after the Great Fire, when the city was still smoking and everyone was convinced Seattle would rise from the ashes greater than before. They were half right.
+  description: `The Pioneer Building anchors this intersection, its northwestern corner marked by the original entrance—a triple-arched portal of carved sandstone that architects called Richardsonian Romanesque. Henry Hobson Richardson never designed buildings in Seattle, but his style traveled west on railroad and telegram, influencing the post-fire reconstruction. The arches have the solid weight that Richardson favored, the stone rough-cut to suggest permanence.
 
-The ground floor windows are boarded over with plywood that has weathered grey. Someone painted "OPEN FOR BUSINESS" on one of the boards. The joke was funnier before.
+A cornerstone near the entrance bears the building's credentials: PIONEER BUILDING • 1892 • ELMER FISHER, ARCHITECT. Fisher designed a third of Pioneer Square's post-fire buildings, establishing the neighborhood's visual vocabulary. His name appears on cornerstones throughout the district, a signature repeated across blocks.
 
-A cornerstone near the entrance is carved with the building's name and date. Below it, someone has scratched initials and a heart, the way people used to mark their presence. J + M, 1994. They were probably tourists. They probably thought they would come back someday.
-
-Second Avenue stretches north and south, empty in both directions. The Collapsed Building is visible to the east, a heap of rubble that used to be something else.`,
+Second Avenue stretches north and south from here, the cross-axis that connects Pioneer Square to the International District and points beyond. The Collapsed Building is visible to the east, its rubble pile a sharp contrast to the Pioneer Building's endurance—same era, same construction methods, different outcomes.`,
   x: 3,
   y: 5,
   z: 0,

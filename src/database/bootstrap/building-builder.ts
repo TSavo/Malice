@@ -142,7 +142,7 @@ export class BuildingBuilder {
         throw new Error(`Invalid placeholder ${placeholder}: must start with %`);
       }
 
-      // Reuse shared placeholder if already created (cross-floor objects like elevators)
+      // Reuse shared placeholder if already created (cross-floor objects like elevators/doors/locks)
       if (sharedPlaceholders.has(placeholder)) {
         const existing = sharedPlaceholders.get(placeholder)!;
         placeholderToRoom.set(placeholder, existing);
@@ -151,13 +151,16 @@ export class BuildingBuilder {
 
       const def = roomDef as any;
 
-      // Decide prototype (default room; allow elevator)
+      // Decide prototype (default room; allow elevator + arbitrary aliases)
       let parentProto = roomProto;
-      if (def.prototype === 'elevator') {
-        if (elevatorProto) {
+      if (def.prototype) {
+        const protoName = def.prototype;
+        if (protoName === 'elevator' && elevatorProto) {
           parentProto = elevatorProto;
+        } else if ($.system?.aliases && $.system.aliases[protoName]) {
+          parentProto = $.system.aliases[protoName];
         } else {
-          console.warn(`    Warning: elevator prototype not found for ${placeholder}, defaulting to room.`);
+          console.warn(`    Warning: prototype alias '${protoName}' not found for ${placeholder}, defaulting to room.`);
         }
       }
 
@@ -169,7 +172,7 @@ export class BuildingBuilder {
       delete extraProps.elevator;
 
       const room = await recycler.create({
-        parent: parentProto.id,
+        parent: parentProto.id ? parentProto.id : parentProto,
         properties: {
           name: def.name || 'Unnamed Room',
           description: def.description || 'An empty room.',
@@ -192,6 +195,14 @@ export class BuildingBuilder {
 
     const resolvePlaceholder = (ph: string): RuntimeObject | undefined => {
       return placeholderToRoom.get(ph) || sharedPlaceholders.get(ph);
+    };
+
+    const resolveValue = (val: any) => {
+      if (typeof val === 'string' && val.startsWith('%')) {
+        const target = resolvePlaceholder(val);
+        return target || val;
+      }
+      return val;
     };
 
     // Second pass: create exits based on connections
@@ -234,9 +245,14 @@ export class BuildingBuilder {
 
         // Calculate distance if not specified
         const distance = exitProps.distance || this.calculateDistance(
-          sourceRoom.get('x'), sourceRoom.get('y'), sourceRoom.get('z'),
-          destRoom.get('x'), destRoom.get('y'), destRoom.get('z')
+          (sourceRoom.get('x') as number) || 0, (sourceRoom.get('y') as number) || 0, (sourceRoom.get('z') as number) || 0,
+          (destRoom.get('x') as number) || 0, (destRoom.get('y') as number) || 0, (destRoom.get('z') as number) || 0
         );
+
+        const doorResolved = resolveValue(exitProps.door);
+        const locksResolved = Array.isArray(exitProps.locks)
+          ? exitProps.locks.map((l: string | number) => resolveValue(l)).filter(Boolean)
+          : undefined;
 
         // Create exit
         const exit = await recycler.create({
@@ -249,6 +265,9 @@ export class BuildingBuilder {
             hidden: exitProps.hidden ?? false,
             locked: exitProps.locked ?? false,
             lockKey: exitProps.lockKey ?? null,
+            door: doorResolved || undefined,
+            locks: locksResolved || [],
+            code: exitProps.code ?? undefined,
           },
         });
 
@@ -283,6 +302,17 @@ export class BuildingBuilder {
             room.setMethod(methodName, body);
           }
         }
+      }
+
+      // Resolve door/lock placeholders on rooms if present
+      if (def.door) {
+        const resolvedDoor = resolveValue(def.door);
+        if (resolvedDoor && resolvedDoor.id) room.set('door', resolvedDoor.id);
+        else if (resolvedDoor) room.set('door', resolvedDoor);
+      }
+      if (Array.isArray(def.locks)) {
+        const resolvedLocks = def.locks.map((l: string | number) => resolveValue(l)).filter(Boolean).map((l: any) => (l.id ? l.id : l));
+        room.set('locks', resolvedLocks);
       }
 
       // Elevator-specific config (only applied if object exists)

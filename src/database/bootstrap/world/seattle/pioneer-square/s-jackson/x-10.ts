@@ -2,11 +2,11 @@
 
 export const room = {
   name: 'S. Jackson St',
-  description: `First Avenue is just ahead, its intersection marking the edge of the waterfront district. The buildings grow more urban here, less industrial, their purposes shifting from shipping to commerce.
+  description: `The character of S. Jackson shifts here as it approaches 1st Avenue, the industrial waterfront giving way to mixed-use development—1990s construction designed to bridge the gap between maritime industry and urban living. The bridge leads nowhere now. The maritime industry is dead. The urban living is empty.
 
-A coffee roasting facility occupies one building, its industrial equipment visible through large windows. The roasters are cold. The beans are stale. The smell of fresh coffee is a memory shared by those who remember when mornings had routines.
+LIGHTHOUSE ROASTERS occupies a ground-floor space, its large windows revealing industrial equipment coated in dust: a vintage Probat roaster rusted and cold, green coffee storage silos empty, the sorting and bagging equipment still arranged for production that ended fifty-five years ago. The facility served as both production space and marketing tool, customers watching their coffee being roasted. The roasting stopped. The watching stopped. The smell of coffee that once filled this block is a memory no one alive can recall.
 
-A mural covers the side of the building opposite, depicting the history of Seattle's waterfront. Longshore workers and fishing boats and container ships. The history has ended. The mural continues, telling a story that stopped mid-sentence.`,
+A mural covers the windowless wall of the adjacent building, a public art commission depicting Seattle's maritime history. The imagery spans eras: Coast Salish canoes, nineteenth-century sailing ships, container vessels. The paint has faded and peeled, the maritime history becoming as distant as the canoes that started it. The artists' names are listed on a plaque at street level, most of them dead now like everyone else.`,
   x: -10,
   y: -5,
   z: 0,

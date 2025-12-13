@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'Yesler Way',
-  description: `A parking garage dominates one side of the street, its concrete facade stained black in long vertical streaks. The entrance is a dark rectangle descending into the earth. No way to tell how deep the water goes.
+  description: `A parking structure dominates the south side of the street, poured concrete stained dark with fifty-five years of Seattle rain. The entrance ramp descends into blackness. Cars are still visible on the upper levels through the open sides, arranged in rows, waiting for owners who died or fled decades ago. The below-grade levels are flooded—water table rising where pumps no longer run.
 
-Something happened in there. The blast marks around the entrance tell part of the story. The collapsed upper level tells the rest. Rebar hangs from broken concrete like exposed tendons.
+The building opposite is four stories of brick, YESLER ARTIST LOFTS according to faded signage on the facade. The building was converted to live-work spaces during the neighborhood's gentrification, the creative-class development that preceded the war. The upper floors feature large windows that artists favored—north-facing light for studio work. The windows are dark now. The art is abandoned. The artists left or died like everyone else.
 
-Across the street, a building that might have been a hotel. Four stories of brick, the upper floors burned out, the windows empty sockets. A sign above the door reads "AFFORDABLE ARTIST LOFTS" in cheerful colors. The irony has aged well.
-
-The street continues east and west. A narrow gap between buildings leads south, choked with debris.`,
+The buildings along this stretch maintain the scale that historic preservation once enforced: three to five stories, brick facades, the vocabulary established after the Great Fire. Preservation guidelines stopped mattering when there was nothing left to preserve for.`,
   x: -12,
   y: 10,
   z: 0,

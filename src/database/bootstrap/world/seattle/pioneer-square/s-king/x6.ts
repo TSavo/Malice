@@ -2,11 +2,11 @@
 
 export const room = {
   name: 'S. King St',
-  description: `A Chinese grocery occupies the ground floor here, its produce bins empty, its shelves still stocked with things that don't spoil quickly. Dried mushrooms and canned bamboo shoots and sauces that came from the other side of the Pacific.
+  description: `LUEN FUNG MARKET occupies the ground floor, its windows opaque with decades of grime. The produce bins that once extended onto the sidewalk are empty and rusted, the awning above them tattered and sagging. Through what glass remains visible: narrow aisles still packed with inventory from ceiling to floor, the dried goods and preserved foods that outlasted everything else. Whatever was perishable is long gone—rotted, consumed, or desiccated to unrecognizable husks.
 
-The store served a community that valued these things, ingredients for recipes passed down through generations. The generations have been interrupted. The recipes wait.
+The store served the community's need for ingredients unavailable elsewhere—dried mushrooms, preserved vegetables, the sauces and seasonings that Chinese cooking requires. The live seafood tanks are dark and dry, the filtration systems silent. The supply chains that stretched across the Pacific broke when the war came. Hong Kong, Taiwan, mainland China—the import networks that sustained this place dissolved into the same chaos that took everything else.
 
-A red paper banner hangs over the door, its characters promising good fortune. The fortune has been mixed. The banner continues its promise anyway.`,
+The building's upper floors hold residential units, their windows dark, their fire escapes rusted to a deep orange-brown. The iron platforms still cling to the exterior wall, the emergency egress that no one will ever need. Some of the windows are broken. Some are boarded. The residents who lived here are fifty-five years gone.`,
   x: 6,
   y: -10,
   z: 0,

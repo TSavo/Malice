@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'Yesler Way',
-  description: `The Pioneer Building continues along the south side of the street, its red brick facade punctuated by arched windows. Most of the glass is gone. Fire escapes zigzag down the back, rusted solid in some places, collapsed entirely in others. A sheet hangs from one of the upper landings, bleached white by sun and rain, forgotten by whoever left it there.
+  description: `The PIONEER BUILDING continues along the south side of the street, its red brick facade stretching nearly the full block. Most of the windows are intact, though a few on the upper floors have been replaced with plywood or plastic sheeting. The Romanesque arches frame dark interiors. The decorative terra cotta shows chips and cracks but has held together better than anyone expected.
 
-A parking lot takes up the north side, surrounded by chain link fence topped with razor wire. The razor wire is thorough. Whatever was worth protecting here is long gone. Weeds have cracked the asphalt into islands, each one hosting its own ecosystem of dead grass and debris.
+A surface parking lot takes up the north side, surrounded by chain link fence topped with razor wire that someone added after the war. The razor wire is thorough. Whatever was worth protecting here is long gone. Weeds have cracked the asphalt into islands, each hosting its own ecosystem of dead grass and debris.
 
-A shopping cart lies on its side near the fence. The wheels are missing. Someone needed them for something. In this city, everything eventually becomes parts for something else.
-
-The buildings stand in silence. The wind moves through broken windows. Nothing else does.`,
+The Pioneer Building's fire escapes descend the rear facade in geometric zigzags, rusted solid in some places, collapsed entirely in others. The structure has stood since 1892. It will probably stand for another century. The people who built it understood permanence.`,
   x: 2,
   y: 10,
   z: 0,

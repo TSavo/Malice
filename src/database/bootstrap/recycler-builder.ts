@@ -17,6 +17,7 @@ export class RecyclerBuilder {
 
     const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
 
+
     if (aliases.recycler) {
       this.recycler = await this.manager.load(aliases.recycler);
       if (this.recycler) return; // Already exists
@@ -55,10 +56,12 @@ export class RecyclerBuilder {
             const isWizard = caller.get('isWizard');
             const canBuild = caller.get('canBuild');
 
+
             if (!isWizard && !canBuild) {
               throw new Error('Permission denied: You do not have build privileges');
             }
           }
+
 
           // Set ownership if caller provided
           if (!params.properties) {
@@ -80,6 +83,7 @@ export class RecyclerBuilder {
 
           // Create the object through ObjectManager
           const newObject = await $.create(params);
+
 
           // Call onCreate hook if it exists
           if (newObject.hasMethod && newObject.hasMethod('onCreate')) {
@@ -148,7 +152,8 @@ export class RecyclerBuilder {
           const obj = args[1];
 
           // Wizards can recycle anything
-          if (caller && caller.get && caller.get('isWizard')) return true;
+          if (caller && caller.get('isWizard')) return true;
+
 
           // Can't recycle core system objects
           if (obj.id < 20) return false;
@@ -156,6 +161,8 @@ export class RecyclerBuilder {
           // Owner can recycle their own objects
           const owner = obj.get('owner');
           if (caller && owner === caller.id) return true;
+
+
 
           return false;
         `);
@@ -215,9 +222,10 @@ export class RecyclerBuilder {
           const caller = args[1];
 
           // Only wizards can purge
-          if (!caller || !caller.get || !caller.get('isWizard')) {
+          if (!caller || !caller.get('isWizard')) {
             throw new Error('Only wizards can permanently delete objects');
           }
+
 
           // Clear caches
           $.clearAliasesForObject(objectId);

@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'Occidental Park',
-  description: `Occidental Park spreads out here, its brick plaza eastern-central section near S. Main. The park was created in the 1970s by closing Occidental Avenue to traffic, converting asphalt to pedestrian space. The brick paving in herringbone pattern stretches in all directions, weathered but intact.
+  description: `A wooden bench faces west here, oriented toward the Underground access hatch visible across the plaza. The positioning seems deliberate—as if someone once sat here watching that entrance, waiting to see who came up from below or went down into darkness. The bench is weathered silver-grey, its slats warped by seasons of rain and sun.
 
-A bench faces the underground access point to the west, positioned as if watching over that entrance. The detail speaks to a time when the park was maintained, when someone cared about these spaces and the people who used them.
+Carved initials mark one armrest, the cuts deepened by weather: "M + J" inside a heart, the kind of mark that lovers made everywhere once. M and J are probably dead now. Or scattered. Or simply elsewhere, their love a casualty of whatever happened to everyone else. The heart persists, outlasting the emotion that carved it.
 
-Dead trees punctuate the plaza at intervals, their bare branches creating stark silhouettes. They were planted with intention, part of an urban design that valued green space and shade. The trees are dead now but still standing, monuments to earlier optimism.
-
-The brick plaza continues in all accessible directions, open to sky and weather.`,
+S. Main Street is visible to the south, the storefronts along its edge dark and shuttered. The Underground hatch to the west gleams dully in whatever light filters through the overcast. This is a good place to sit and watch. There's just nothing left to watch for.`,
   x: 0,
   y: 0,
   z: 0,

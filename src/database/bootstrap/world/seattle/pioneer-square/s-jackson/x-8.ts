@@ -2,11 +2,11 @@
 
 export const room = {
   name: 'S. Jackson St',
-  description: `The street enters the International District proper here, its character shifting with every storefront. Chinese groceries and Vietnamese bakeries and Japanese restaurants, a collection of cultures that found common ground in this corner of Seattle.
+  description: `S. Jackson enters the International District proper here, the streetscape shifting from Pioneer Square's Victorian decay to the eclectic storefronts of Seattle's Chinatown, equally decayed. The buildings are older—early twentieth century construction adapted over decades to serve immigrant communities from China, Japan, Vietnam, the Philippines. The communities are scattered now, the adaptations frozen in place.
 
-A produce market occupies the corner, its bins empty, its awning faded. The bins once held bok choy and daikon and bitter melon and vegetables that required explanation for some customers. The explanations are no longer needed.
+VIET WAH PRODUCE occupies the corner building, its windows grimy, its awning—green canvas printed with Vietnamese and English—tattered and faded. The display bins that held bok choy and bitter melon are empty and rusted. Through the window: stacked bags of jasmine rice collapsed and rotted, shelving lined with fish sauce and coconut milk bottles dusty and expired decades ago. The inventory of immigrant foodways, preserved like a museum exhibit no one visits.
 
-A red paper dragon hangs in the window of the building next door, its scales dusty and its eyes bright. Dragons are symbols of power and good fortune. This one guards an empty room.`,
+The building next door houses a cultural association, its second-floor windows displaying Chinese characters that identify the organization—a family name association, one of the tongs that provided mutual aid for early immigrants. The families are gone now, scattered or dead. The ground floor's souvenir shop catered to tourists who visited before tourism ended. The souvenirs wait behind dusty glass for tourists who will never come.`,
   x: -8,
   y: -5,
   z: 0,

@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'S. Washington St',
-  description: `The Pioneer Building looms to the north here, six stories of red brick and arched windows. It has stood since 1892, when the city was still smoldering from the Great Fire. It will probably stand for another century, outlasting everything except the stones it was built on.
+  description: `The Pioneer Building dominates the northern view, its six stories of red brick and Romanesque arches establishing the architectural vocabulary that defines Pioneer Square. Elmer Fisher designed it in 1892, part of the building boom that followed the Great Fire—fifty blocks of wooden structures replaced with brick and stone and terra cotta, the city literally fireproofing itself against repetition.
 
-A florist shop occupies the ground floor of a smaller building, its refrigerated cases dark, its flowers long dead. The smell of decay drifts through the broken door. Roses and lilies and carnations, rotting into compost. Someone was supposed to pick up an order. The order is still waiting.
+SEATTLE FLOWER MARKET occupies the ground floor of the adjacent building, a narrow storefront with a green awning that has faded to something closer to grey. The refrigerated display cases line the front window, their glass fogged with condensation that dried into mineral deposits. Florists depended on occasions—weddings, funerals, anniversaries, the calendar of human milestones that required botanical punctuation.
 
-A sandwich board on the sidewalk advertises bouquets for every occasion. "SAY IT WITH FLOWERS." There is nothing left to say.
-
-Second Avenue is close now.`,
+The street narrows slightly here as older buildings crowd closer to the sidewalk, their facades predating modern setback requirements. Fire escapes zigzag up the eastern walls, the iron platforms and ladders that building codes mandated after the lessons of 1889.`,
   x: -1,
   y: 5,
   z: 0,

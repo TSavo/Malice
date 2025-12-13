@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'S. Washington St',
-  description: `A narrow building wedges itself between larger neighbors here, three stories of dirty brick with fire escapes clinging to the facade like metal vines. The windows are intact but dark. A faded sign above the ground floor reads "BAIL BONDS - 24 HOURS" in letters that were probably red once.
+  description: `A narrow building occupies the lot between larger neighbors, its three stories of unreinforced brick rising to a flat roof lined with ancient ventilation equipment. The fire escape bolted to the facade has rusted into a unified mass, the individual ladders and platforms merged by corrosion into something that resembles iron lacework more than emergency egress.
 
-The bail bondsman kept interesting hours. His clients kept interesting company. Neither of them are keeping anything anymore.
+AAA BAIL BONDS claims the ground floor, its services painted on the window in red lettering that has faded to pink. The bail bonds industry clustered near courthouses and jails, providing the financial mechanism that allowed defendants to await trial outside custody. The business required 24-hour availability—arrests happen at inconvenient times—and the painted hours on the door reflect that: OPEN 24 HOURS • 7 DAYS.
 
-A payphone booth stands on the corner, its glass panels shattered, the phone itself hanging by its cord. The dial tone died years ago, but someone has taped a handwritten note inside the booth. The note is illegible, weathered to a brown smear. It probably was not important. It probably was desperately important. There is no way to know.
-
-The Collapsed Building looms closer now, a wall of broken concrete and twisted rebar. The street is impassable beyond it.`,
+A payphone enclosure stands at the corner, the aluminum frame intact but the phone itself reduced to a metal box trailing severed cables. Payphones were already obsolete before the Event, maintained more from inertia than necessity. The enclosure has the boxy design of 1980s street furniture, when cities still believed in public telecommunications infrastructure.`,
   x: 6,
   y: 5,
   z: 0,

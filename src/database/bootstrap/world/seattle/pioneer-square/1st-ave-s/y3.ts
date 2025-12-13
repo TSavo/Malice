@@ -2,11 +2,11 @@
 
 export const room = {
   name: '1st Ave S',
-  description: `The Corp Construction zone is visible to the east, its black fabric barriers blocking the view of whatever was being built. The zone doesn't extend to First Avenue, but its presence is felt, a shadow over the neighborhood.
+  description: `The Corp Construction barrier is visible one block east, black fabric stretched over chain-link, cutting the view like a curtain dropped across a stage. Whatever Corp was building over there, it was big enough to swallow three city blocks. The barrier doesn't extend to First Avenue, but it throws a shadow nonetheless—something about it feels like a held breath.
 
-A print shop occupied the ground floor here, producing posters and flyers and the paper ephemera of urban life. The presses are still. The paper has yellowed. The ephemera is all that's left.
+QuickPrint occupied the ground floor here, one of those shops that produced concert posters and band flyers and the paper detritus of a city with a music scene. The letterpress in the window still holds a forme locked with wood type: SATURDAY NIGHT. Whatever happened Saturday night, it's not happening anymore. Stacks of paper have yellowed in the window display, bleached by sun that doesn't care about ultraviolet damage.
 
-A bike rack stands at the curb, its metal loops designed for bikes that messengers rode between buildings. The messengers are gone. The messages are undelivered.`,
+A bike rack bolted to the sidewalk holds a single frame—no wheels, no handlebars, just a triangle of chrome tubing locked to the rack with a U-lock that would take an angle grinder to remove. Someone took everything they could. Someone left the rest.`,
   x: -9,
   y: 3,
   z: 0,

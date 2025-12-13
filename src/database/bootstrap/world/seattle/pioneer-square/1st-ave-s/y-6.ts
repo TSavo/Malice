@@ -2,11 +2,11 @@
 
 export const room = {
   name: '1st Ave S',
-  description: `S. Jackson Street is just ahead, its intersection marking passage into the International District to the east. The boundary between neighborhoods is visible here, Pioneer Square giving way to something with different languages and different histories.
+  description: `The transition happens mid-block, unmarked but unmistakable: Pioneer Square's brick and brownstone yielding to the International District's painted signs and red awnings. A grocery store's facade announces itself in Chinese characters three feet tall, the English subtitle underneath almost an afterthought. HUNG LONG MARKET. The windows are dark, but through them you can see shelves still stocked with things in packages you'd need another language to read.
 
-A liquor store occupies the corner, its windows covered with advertisements for brands that promised happiness in a bottle. The bottles are still inside, their happiness unclaimed. The advertisements continue their promises.
+Jackson Street opens ahead, its intersection pulling the eye east toward the heart of Chinatown. But first, this corner: a liquor store with bars on its windows and a lottery sign that still promises millions. The door stands open six inches, wedged that way by something inside. Nobody's going in. Nobody's coming out.
 
-A shopping cart has been abandoned against the wall, filled with plastic bags and blankets and the careful accumulation of survival. The owner is gone. The accumulation remains.`,
+Against the wall, a shopping cart overflows with the archaeology of homelessness—sleeping bag, tarp, plastic bags knotted tight around mysterious contents, a single shoe. The arrangement speaks to careful planning, to someone who knew exactly where everything was. That someone left it here. That someone isn't coming back for it.`,
   x: -9,
   y: -6,
   z: 0,

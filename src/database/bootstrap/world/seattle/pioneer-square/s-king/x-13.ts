@@ -2,11 +2,11 @@
 
 export const room = {
   name: 'S. King St',
-  description: `The railroad tracks cross the street here, same as they cross every street in this district. The trains carried freight from the port to everywhere else. Everywhere else stopped receiving. The tracks rust quietly.
+  description: `The BNSF Railway mainline crosses S. King Street here, tracks rusted orange from disuse, the rails that once connected port terminals to the transcontinental network. The crossing infrastructure is heavy-duty—reinforced concrete pads cracked and heaved, crossing gates with striped arms locked in the upright position. The warning lights are dark. No trains have passed in decades.
 
-A rail yard is visible to the south, its switching equipment frozen, its boxcars coupled and still. The cars contain things that were being shipped somewhere. The somewhere is no longer accepting deliveries.
+A rail yard extends to the south, visible through gaps in industrial buildings. The yard's multiple sidings hold freight cars that were never moved, their cargo containers faded and weathered, holding goods that never reached their destinations. The logistics that kept goods moving through the transportation network stopped moving. Everything stopped.
 
-A crossing signal stands at the edge of the tracks, its lights dark, its bell silent. The signal was meant to protect pedestrians from trains. The trains aren't running. The pedestrians aren't walking. The protection is unnecessary.`,
+The buildings flanking the crossing show the wear of decades without maintenance—facades blackened by old diesel exhaust, windows broken or boarded. PACIFIC LOGISTICS, the signage reads on one structure, the freight forwarding company that coordinated handoffs between shipping modes. No freight. No modes. No coordination.`,
   x: -13,
   y: -10,
   z: 0,

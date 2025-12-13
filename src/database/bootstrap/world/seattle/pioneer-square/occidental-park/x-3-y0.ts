@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'Occidental Park',
-  description: `Occidental Park spreads out here, its brick plaza just west of the former Occidental Avenue centerline, near S. Main. The park was created in the 1970s by closing Occidental Avenue to traffic, converting asphalt to pedestrian space. The brick paving in herringbone pattern stretches in all directions, weathered but intact.
+  description: `A chain-link fence sags across this section of the park, an old construction barrier that was never removed—or perhaps installed after the Event to keep something out or in. The posts lean at angles, the fabric rusted through in places, whatever it once protected or contained long since irrelevant. The fence creates a corridor of sorts, channeling movement through the plaza in ways the original designers never intended.
 
-A chain-link fence partially encloses this section, its posts leaning, its fabric sagging. The detail speaks to a time when the park was maintained, when someone cared about these spaces and the people who used them.
+The brick paving is heaved here, frost damage accumulating over fifty-five winters without repair. Weeds push through the joints, hardy urban plants that found purchase in the cracks. A shopping cart rusted to lace sits abandoned near the fence, its metal reduced to almost nothing by oxidation.
 
-Dead trees punctuate the plaza at intervals, their bare branches creating stark silhouettes. They were planted with intention, part of an urban design that valued green space and shade. The trees are dead now but still standing, monuments to earlier optimism.
-
-The brick plaza continues in all accessible directions, open to sky and weather.`,
+S. Main Street is visible to the south through gaps in the surrounding buildings. The sound of wind across brick is the only sound, a low whisper that the plaza's geometry amplifies and distorts.`,
   x: -3,
   y: 0,
   z: 0,

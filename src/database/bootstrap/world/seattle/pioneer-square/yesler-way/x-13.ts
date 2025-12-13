@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'Yesler Way',
-  description: `The street climbs away from the water here, each step taking you further from the smell of salt and rot. The buildings press closer together, brick walls stained with decades of rain and smoke and whatever else drifted down from the sky.
+  description: `The street's grade steepens here as Yesler Way climbs away from the waterfront, the buildings pressing close together in the dense pattern that early Seattle established. The brick facades show a century of weathering plus fifty-five years of neglect—dark staining where water runs down walls, efflorescence blooming across masonry, the accumulated patina of abandonment.
 
-A furniture store occupies the ground floor of one building, its display window somehow intact. A dining set is arranged inside, table and chairs and place settings, as if waiting for a family that will never arrive. Dust covers everything. The price tag is still visible. It was expensive.
+YESLER FURNITURE occupies the ground floor of a three-story building, its display window still showing the inventory: a dining set arranged as if in use, thick with dust, the staging that furniture stores employed to help customers envision pieces in their own homes. The customers stopped coming. The furniture remains, waiting for a household that will never claim it.
 
-Across the street, a doorway leads into darkness. The sign above it is gone, leaving only bolt holes and a shadow where letters used to be. The door itself hangs open. No one has closed it in a long time.
-
-The waterfront is downhill. The rest of the neighborhood is uphill. The choice is simple. The consequences are not.`,
+The building opposite houses apartments on its upper floors, accessed through a street-level entrance that hangs open on broken hinges. The structure is early twentieth-century construction, solid brick that has outlasted its occupants. Fire escapes climb the exterior, iron platforms rusted brown, ladders missing rungs. The emergency egress leads to rooftops that no one occupies.`,
   x: -13,
   y: 10,
   z: 0,

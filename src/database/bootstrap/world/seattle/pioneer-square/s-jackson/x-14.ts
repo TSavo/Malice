@@ -2,11 +2,11 @@
 
 export const room = {
   name: 'S. Jackson St',
-  description: `The street climbs away from the waterfront through what was once the maritime industrial district. Warehouses and shipping offices and businesses that served the port. The port is quiet. The businesses are empty.
+  description: `S. Jackson climbs eastward from the waterfront through what was the maritime supply district, where ship chandlers and marine equipment dealers clustered near the working port. The buildings here are functional—concrete and corrugated metal, roll-up doors rusted shut or hanging open, the architecture of logistics left to decay.
 
-A ship chandler's shop occupies the ground floor, its window displaying rope and chain and nautical supplies. Life jackets hang from hooks. Anchors rust on the floor. The ships that needed these things no longer need anything.
+PUGET SOUND MARINE SUPPLY occupies the ground floor of a two-story building, its windows grimy, its door barricaded from inside. The business served the commercial fishing fleet and recreational boaters who needed rope, chain, navigation equipment. The window display still shows inventory—coils of manila and synthetic line, galvanized shackles and cleats—the marine hardware sitting exactly where it was arranged fifty-five years ago. No boats. No fleet. No one needing rope or chain.
 
-Across the street, a warehouse with a painted sign advertising cold storage. The storage is no longer cold. The contents are better left uninvestigated.`,
+A cold storage warehouse dominates the opposite side of the street, its windowless facade broken only by loading docks and massive doors rusted shut. SEATTLE COLD STORAGE is painted on the building in faded blue letters, the name barely legible. The cold chain infrastructure that kept Pacific seafood fresh between boat and plate. The boats stopped coming. The plates are empty. The cold storage is warm now, whatever it contained long since rotted to nothing.`,
   x: -14,
   y: -5,
   z: 0,

@@ -2,11 +2,11 @@
 
 export const room = {
   name: 'S. Main St',
-  description: `The Corp Construction fence appears here, black fabric stretched over chain-link, blocking the view of whatever is happening inside. The construction zone extends for blocks, a wound in the city that was never meant to heal.
+  description: `The Corp Construction barrier begins here, appearing on the south side of Main Street like a black curtain drawn across a stage. The barrier runs east for blocks—chain-link fence ten feet high, covered with opaque fabric that shows the CORP INDUSTRIES logo at measured intervals. Whatever was being built behind this barrier swallowed an entire city block, then two, then three, growing by acquisition until the project's footprint exceeded the public's ability to imagine what could require that much space.
 
-Warning signs are posted at intervals. DANGER. HARD HAT AREA. NO TRESPASSING. The warnings are redundant now. Everything is dangerous. Hard hats won't help. Trespassing implies someone to stop you.
+Warning signs are posted at intervals along the fence: DANGER - CONSTRUCTION AREA • HARD HAT REQUIRED • NO TRESPASSING - VIOLATORS WILL BE PROSECUTED. The signs reference safety protocols and legal consequences that assumed someone was watching, someone would respond, someone cared about trespass and liability. The signs remain official and ignored. The hard hats are wherever hard hats go when no one is building anything.
 
-A gap in the fence has been cut and then patched and then cut again, the chain-link telling a story of curiosity and repair and more curiosity. Someone wanted to see what was inside. Maybe they did.`,
+A gap has been cut in the chain-link at waist height—wire snipped clean, the fabric behind it slit with a blade or torn by hands. Someone patched the gap with fresh wire, wound tight around the damaged links. Someone else cut through the patch. The cycle of cutting and repairing has left a scar in the fence, evidence of curiosity that couldn't be contained. What was on the other side? What is on the other side? The fence keeps its counsel. The gap remains, inviting and warning in equal measure.`,
   x: 6,
   y: 0,
   z: 0,

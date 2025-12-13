@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'Yesler Way',
-  description: `The architecture changes here. The historic brick gives way to concrete, the decorative cornices to flat rooflines. This stretch was rebuilt after a fire in the seventies, and it shows. They built for function, not beauty. Ironic that the ugly buildings survived while the beautiful ones burned.
+  description: `Mid-century concrete lines this stretch of Yesler Way, the utilitarian buildings that replaced older structures after a fire. They built for function, not beauty. Function has proven more durable than anyone expected.
 
-A convenience store occupies a ground floor space. The windows are smashed out but the security bars remain, a cage protecting nothing. Faded advertisements still cling to the remaining glass: lottery tickets, prepaid phones, energy drinks. The prices seem optimistic in retrospect.
+A mixed-use building occupies the south side, four stories of apartments above ground-floor retail. Security bars still protect the storefront windows, the iron grilles rusted but intact. The bars kept people out for fifty-five years. The apartments above are dark, their intercom panel listing unit numbers for residents who stopped answering decades ago.
 
-The door to the apartments above hangs open on one hinge. The intercom panel beside it has sixteen buttons. Half are labeled with names in faded marker. The other half are blank. A note taped to the doorframe reads "DELIVERY LEAVE PACKAGES WITH 4B." The tape has yellowed. The ink has faded. 4B is not receiving packages anymore.
-
-The street slopes downward slightly. Water collects in the low spots when it rains.`,
+The street slopes gently downward toward the waterfront, following the grade that Henry Yesler's original skid road established. The timber industry is gone. The sawmill is gone. The slope remains, carrying rainwater and silence toward Elliott Bay.`,
   x: 5,
   y: 10,
   z: 0,

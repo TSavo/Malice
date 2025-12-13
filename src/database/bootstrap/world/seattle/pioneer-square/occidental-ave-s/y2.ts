@@ -2,11 +2,11 @@
 
 export const room = {
   name: 'Occidental Ave S',
-  description: `A wine bar occupied the corner here, its racks still visible through the window, bottles arranged by region and vintage. The vintages continue to age. The regions no longer export. The wine waits for someone to drink it.
+  description: `PURPLE CAFE AND WINE BAR sprawls across the corner lot, its double-height windows revealing a wall of wine bottles that rises two stories—climate-controlled racks holding thousands of bottles organized by region, varietal, vintage. The wall was the restaurant's signature, its Instagram moment, the thing that made people feel sophisticated just for sitting near it. Burgundy and Bordeaux and bottles from Washington vineyards that desperately wanted to be Burgundy. The climate control has failed. Whatever's happening to that wine now, it isn't aging gracefully.
 
-The cobblestones are worn smooth here, polished by decades of foot traffic that has stopped. The smoothness feels strange underfoot, history made tangible, time made physical.
+The cobblestones here are worn concave in the center of the walkway, a subtle dip created by a century of feet following the same path. You can feel it if you pay attention—the way your weight settles into the groove, the way the stone guides you forward. A million people walked this exact line before you. The stone remembers all of them and none of them.
 
-A planter box sits at the edge of the walkway, its flowers long dead, its soil dry and cracked. Someone planted petunias or impatiens or something cheerful. The cheer has withered.`,
+Concrete planters flank the walkway, their metal cages meant to discourage skateboarders from grinding the edges. The cages are rust-streaked. The planters hold only dirt and the skeletal remains of ornamental grasses that died when the city stopped watering them. A few weeds have established themselves—dandelion and clover, survivors that don't need tending. Life finds a way. It's just not the life anyone planned for.`,
   x: -3,
   y: 2,
   z: 0,

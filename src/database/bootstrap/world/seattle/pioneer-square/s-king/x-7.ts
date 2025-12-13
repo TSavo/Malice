@@ -2,11 +2,11 @@
 
 export const room = {
   name: 'S. King St',
-  description: `The street passes through a canyon of parking garages here, multi-level structures built to absorb the thousands of cars that came for games and concerts. The cars are gone. The structures remain, empty and echoing.
+  description: `Parking structures rise on both sides of the street, multi-level garages built to accommodate thousands of vehicles that stadium events once generated. The structures are functional architecture—poured concrete stained with decades of Seattle rain, helical ramps leading to levels still holding cars that were never retrieved. The vehicles rust in place, tires flat, windows filmed with dust.
 
-A pedestrian bridge connects two garages overhead, allowing fans to cross the street without touching ground. The bridge is still there, spanning nothing, connecting empty to empty.
+A pedestrian bridge spans the street at the third level, its windows cracked and clouded, connecting garages that serve no purpose now. The bridge sheltered pedestrians from Seattle's rain. The rain still falls. The pedestrians are gone.
 
-A pay station stands at each garage entrance, screens dark, receipts unprinted. The parking was expensive. Now it's free. Now everything is free.`,
+Rate signage near each entrance still lists pricing: EVENT RATES • MONTHLY PERMITS. The numbers seem quaint now, the revenue model that parking facilities relied upon. The revenue stopped. The structures remain, concrete monuments to the economics of entertainment.`,
   x: -7,
   y: -10,
   z: 0,

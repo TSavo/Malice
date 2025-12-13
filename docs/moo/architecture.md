@@ -105,8 +105,7 @@ Malice uses a three-layer architecture that maximizes flexibility and hot-reload
 ### Layer 2 (Bootstrap)
 ```javascript
 // Food prototype - how food works in general
-$.food = await $.create({
-  parent: $.thing,
+$.food = await $.recycler.create($.thing, {
   properties: {
     calories: 0,
     portions: 1,
@@ -129,8 +128,7 @@ $.food = await $.create({
 ### Layer 3 (Database)
 ```javascript
 // Specific food item - secret effect
-const mysteryMeat = await $.create({
-  parent: $.food,
+const mysteryMeat = await $.recycler.create($.food, {
   properties: {
     name: 'mystery meat',
     description: 'Smells... questionable.',

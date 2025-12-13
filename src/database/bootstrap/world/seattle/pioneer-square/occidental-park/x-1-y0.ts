@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'Occidental Park',
-  description: `Occidental Park spreads out here, its brick plaza central-southern area. The park was created in the 1970s by closing Occidental Avenue to traffic, converting asphalt to pedestrian space. The brick paving in herringbone pattern stretches in all directions, weathered but intact.
+  description: `A diagonal pathway cuts across the plaza here, its basket-weave brick pattern contrasting with the surrounding herringbone. The path was added later, a concession to the way people actually walked rather than the way designers wanted them to. Desire lines made permanent.
 
-A brick pathway cuts through here at an angle, its pattern contrasting with the plaza's herringbone. The detail speaks to a time when the park was maintained, when someone cared about these spaces and the people who used them.
+The bricks along the path are more worn than those around it, polished smooth by feet that no longer walk here. The contrast reveals how heavily trafficked this route was—office workers cutting through on lunch breaks, commuters shortening their walks home, the accumulated friction of thousands of passages.
 
-Dead trees punctuate the plaza at intervals, their bare branches creating stark silhouettes. They were planted with intention, part of an urban design that valued green space and shade. The trees are dead now but still standing, monuments to earlier optimism.
-
-The brick plaza continues in all accessible directions, open to sky and weather.`,
+A storm drain grate is set into the path, its metal bars clogged with leaves and debris that have accumulated over seasons. Water pools here when it rains, the drain no longer draining, creating a puddle that freezes and thaws and freezes again. The puddle reflects sky and dead trees and the buildings beyond.`,
   x: -1,
   y: 0,
   z: 0,

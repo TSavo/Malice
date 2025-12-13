@@ -2,11 +2,11 @@
 
 export const room = {
   name: 'S. Jackson St',
-  description: `The Wing Luke Museum is nearby, its exhibitions celebrating the history of Asian Pacific Americans in Seattle. The celebrations have been put on hold. The history continues, unexhibited.
+  description: `The Wing Luke Museum of the Asian Pacific American Experience is visible down the block, the Smithsonian affiliate that documented Asian immigration to the Pacific Northwest. The museum occupied a historic hotel building, the structure itself part of the exhibit—preserved spaces showing how early immigrants lived. The spaces are still preserved, the exhibits still arranged. No one visits. The experience the museum documented has ended, replaced by a different experience no museum will chronicle.
 
-A community center occupies one building, its bulletin board covered with announcements in multiple languages. ESL classes and cultural events and social services. The services have been discontinued. The announcements remain, promising help that can't be delivered.
+The CHINATOWN-INTERNATIONAL DISTRICT COMMUNITY CENTER occupies this corner, the social services hub that neighborhood organizations shared. The center hosted language classes, citizenship preparation, senior programs—the programming that maintained community cohesion. The building's institutional design—1970s construction, federal community development grants—shows through the neglect. No classes. No programs. No community left to serve.
 
-A mural covers one wall, depicting scenes from the neighborhood's history. Immigration and discrimination and resilience. The resilience continues, painted and permanent.`,
+A mural covers the windowless wall of the adjacent building, depicting the neighborhood's history. The imagery spans generations: Chinese laborers building railroads, Japanese farmers at Pike Place Market, the internment that emptied the neighborhood during World War II, the rebuilding that followed. The paint has faded and peeled. Another emptying came, worse than internment. No rebuilding has followed.`,
   x: 11,
   y: -5,
   z: 0,

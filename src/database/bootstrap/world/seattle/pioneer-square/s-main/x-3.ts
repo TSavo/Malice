@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'Occidental Ave S & S. Main St',
-  description: `The center of Pioneer Square. The heart of old Seattle. The zero point from which the rest of the city measures itself, though no one is measuring anymore.
+  description: `This is the center of Pioneer Square, the geographic and historical heart of Seattle's original commercial district. Occidental Avenue crosses Main Street here at the zero point—the intersection from which early surveyors measured distances, the corner where the city began before the city knew what it was beginning. The significance has been commemorated on plaques that nobody reads. The significance persists regardless.
 
-The Occidental Mall stretches north and south, a pedestrian corridor lined with maple trees and wrought-iron benches and the ghosts of better intentions. The cobblestones are uneven, the original street surface preserved for tourists who wanted to feel something historical beneath their feet.
+The Pioneer Square totem pole rises sixty feet from its concrete base at the intersection's northwest corner, carved cedar depicting Raven and other figures from Tlingit mythology. The city's businessmen stole the original from a Tlingit village in Alaska during an 1899 "goodwill expedition"—they literally sawed it down and loaded it onto a steamer. When the original burned in 1938, the city commissioned a replacement from the same Tlingit community and had the audacity to be surprised when they charged $5,000. The replacement stands here still, weathered to silver-grey, its story more complicated than the heritage plaques admit.
 
-A totem pole stands at the corner, carved by artists who were not from here, depicting figures from stories that were not Seattle's stories. The city stole it from Alaska in 1899 and called it heritage. The pole remains, silent witness to a theft that no longer matters.
-
-The intersection is clear. Occidental runs north toward Yesler Way and south toward Jackson. S. Main continues east and west.`,
+Occidental Mall stretches north and south, its cobblestones and maples and wrought-iron benches designed to evoke a pedestrian urbanism that Seattle never quite had. The design was an aspiration, not a restoration. The aspiration remains, even if the pedestrians don't. Maple branches interlock overhead. Benches wait for sitters who aren't coming. The zero point is silent now, measuring nothing from nothing.`,
   x: -3,
   y: 0,
   z: 0,

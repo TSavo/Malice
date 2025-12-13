@@ -2,13 +2,11 @@
 
 export const room = {
   name: '2nd Ave S & S. King St',
-  description: `Second Avenue crosses S. King Street at one of the main arteries to the stadium complex. The street is wide here, built for the surge of humanity that came for games. The surge has receded. The width seems wasteful now.
+  description: `Second Avenue intersects S. King Street at what was once a primary approach to the stadium complex. The street is wider here than typical, extra lanes and broader sidewalks accommodating thousands of fans who no longer flow through. The game days ended. The infrastructure that served them remains, oversized for the emptiness it now accommodates.
 
-A light rail station entrance descends nearby, connecting the stadiums to the rest of the city. The connections have been severed. The entrance leads to platforms that lead to tunnels that lead to darkness.
+The Stadium Station entrance descends at the corner, the light rail stop that connected the stadiums to the regional transit network. The entrance canopy shelters escalators frozen mid-step, leading to underground platforms that haven't seen a train in decades. The infrastructure of mass transit serves no mass. The transit stopped.
 
-A hot dog cart sat here on game days, its vendor shouting prices and options. The cart is gone. The prices are irrelevant. The options have been reduced to one: move forward or don't.
-
-The intersection is clear. Second Avenue runs north and south. S. King continues east and west.`,
+The intersection's corners show the infrastructure of event-day commerce that no longer operates: designated vendor spaces empty, utility hookups capped and corroded. Second Avenue stretches north from here toward Pioneer Square's historic core, one kind of abandonment leading to another.`,
   x: 3,
   y: -10,
   z: 0,

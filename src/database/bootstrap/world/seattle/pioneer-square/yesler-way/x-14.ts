@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'Yesler Way',
-  description: `The street climbs here, cracked asphalt buckled by roots and time and whatever else happened. Buildings line both sides, their windows dark or missing entirely. Glass crunches underfoot.
+  description: `Yesler Way climbs eastward from the waterfront, following the grade that the original "Skid Road" established in the 1850s. Seattle's terrain still asserts itself against the street grid's attempt to impose order—the pitch noticeable here, buildings rising to meet the slope on stepped foundations.
 
-A bus shelter stands at the curb, its roof collapsed inward, the bench beneath buried in debris. The route map is still visible behind shattered plexiglass. It lists destinations that no longer exist.
+A Metro bus stop marks this location, its shelter yellowed and cracked, its bench weathered grey. Route maps are still posted behind scratched plexiglass, showing connections to destinations that exist only in memory. The buses stopped running when the fuel ran out. The infrastructure remains, waiting for transit that will never come.
 
-The storefronts are gutted. A nail salon, maybe. A vape shop. Hard to tell now. Everything has been picked clean, leaving only empty shelves and scattered debris. Someone spray-painted "ALREADY LOOTED" on one door. Helpful.
-
-The waterfront is visible downhill. The street continues uphill to the east.`,
+The ground-floor retail along this stretch is shuttered and dark: a nail salon, a convenience store, small businesses that served local foot traffic. The foot traffic ended. The businesses closed. The buildings are mixed construction—early twentieth-century brick beside mid-century renovation—all of it empty now, the accumulated development of a neighborhood that grew incrementally and died all at once.`,
   x: -14,
   y: 10,
   z: 0,

@@ -43,11 +43,9 @@ export class BodyFactoryBuilder {
       const ownerId = args[2];
       const options = args[3] || {};
 
-      const part = await $.create({
-        parent: parentProto,
-        properties: {
-          name: name,
-          description: 'A ' + name.toLowerCase(),
+      const part = await $.recycler.create(parentProto, {
+        name: name,
+        description: 'A ' + name.toLowerCase(),
           owner: ownerId,
           parts: {},
           bones: options.bones || [],

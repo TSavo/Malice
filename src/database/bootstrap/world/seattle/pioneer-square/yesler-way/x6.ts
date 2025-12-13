@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'Yesler Way',
-  description: `A vacant lot breaks the streetwall on the south side. Plywood construction barriers surround it, covered in graffiti and wheat-pasted posters advertising concerts and protests and missing persons. The posters layer one over another, years of them, until the oldest are just fragments of color beneath the newest decay.
+  description: `A construction site occupies the south side of the street, plywood barriers weathered grey surrounding foundation work that never progressed beyond rebar and poured concrete. A faded sign promises "THE YESLER" with "152 LUXURY UNITS." The luxury units were never built. The sign keeps promising.
 
-Through gaps in the barrier, concrete foundation and rebar reach toward the sky like broken fingers. A sign promises "THE YESLER" with "152 LUXURY UNITS." The sign is weathered, the construction obviously stopped mid-pour. A blue tarp is stretched between rebar posts in one corner. The tarp is empty now, but the smell remains.
+RAIN CITY MARTIAL ARTS occupies a ground-floor space on the north side, its mirrored windows cracked and clouded, reflecting a distorted version of the street. Through gaps in the mirror: heavy bags hanging motionless, their leather cracked and split. Training mats covered in dust. The building's brick facade dates to the early twentieth century; the dojo opened sometime before the war and closed when everyone did.
 
-A martial arts studio on the north side. The mirrored windows are shattered, reflecting the street in fragments. Through the jagged glass, heavy bags hang motionless, their leather cracked and split. Wooden practice weapons lie scattered on the mats. Someone left in a hurry. Or did not leave at all.
-
-The wind makes a sound through the rebar. Almost like breathing.`,
+Third Avenue approaches. The light rail used to run through here, connecting this neighborhood to downtown and beyond. The trains stopped. The tunnels remain, dark and silent beneath the street.`,
   x: 6,
   y: 10,
   z: 0,

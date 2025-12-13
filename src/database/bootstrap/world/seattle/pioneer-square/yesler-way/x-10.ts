@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'Yesler Way',
-  description: `The intersection with 1st Avenue is visible ahead. So is the white tower that still stands there, somehow, defying gravity and good sense and whatever fell from the sky.
+  description: `First Avenue approaches from the east, the intersection ahead marking where Smith Tower rises—the white terra cotta landmark stained grey now but still standing, still dominating the view as it has since 1914.
 
-A check cashing place occupies a corner building, its windows long since smashed, its neon signs dark. "SE HABLA ESPANOL" one says. "PAYDAY LOANS" another. The promises of a dead economy preserved in plastic and gas.
+CASH N GO occupies a corner building, its window signage still advertising services in English and Spanish: CHECK CASHING • PAYDAY LOANS • MONEY ORDERS. The business served the neighborhood's unbanked population—workers who needed immediate access to funds, who paid the fees that urgency commanded. The fees stopped mattering when the funds stopped having value. The signage remains, promising services no one needs.
 
-Across the street, a soup kitchen. The serving window is shuttered with plywood. Someone painted a mural on the plywood, bright colors depicting people sharing a meal. The people in the mural look happy. That was probably the point.
-
-A shopping cart lies on its side in the gutter, wheels pointing at the sky like the legs of a dead animal.`,
+The building opposite houses what was YESLER COMMUNITY KITCHEN, a meal service facility that fed neighborhood residents experiencing homelessness. The serving line is visible through grimy windows, the institutional kitchen cold and dark. A mural on the facade depicts community members sharing a meal, the imagery that social service organizations commission to humanize their work. The community scattered. The meal ended. The mural's painted faces still smile at an empty street.`,
   x: -10,
   y: 10,
   z: 0,

@@ -2,11 +2,11 @@
 
 export const room = {
   name: 'S. King St',
-  description: `The Corp Construction zone's southern boundary is visible here, its black fabric barriers marking the edge of whatever they were building. The zone doesn't extend this far south, but its presence is felt, a looming mystery that shadows the neighborhood.
+  description: `The Corp Construction zone looms to the north, its black fabric barriers and security drones marking the southern edge of whatever the corporation is building. The site doesn't extend to S. King Street, but the perimeter is close enough to feel—the hum of machinery, the occasional flash of welding behind the barriers. New construction in a dead city. The contrast is jarring.
 
-A surface parking lot occupies the block, its painted lines fading, its numbered signs pointless. The lot charged premium rates on game days. The games are over. The premiums have been cancelled.
+A surface parking lot occupies most of this block, the asphalt cracked and heaved by fifty-five years of freeze-thaw cycles. The painted lines have faded to ghosts, barely visible, organizing spaces for vehicles that will never return. Rate signage near the entrance lists event-day pricing—premium rates for games that ended half a century ago. The sign is weathered, the numbers still legible, the prices absurdly low by any modern standard.
 
-A lone car sits in the far corner of the lot, its tires flat, its windows dusty. Someone parked here and never came back. The parking fee has accumulated to infinity.`,
+The buildings along the block's edges are single-story commercial shells—a tire shop with its bay doors rusted shut, a storage facility with units that haven't been opened since the war. The low-density construction survived better than the towers, less to fall, less to burn. The stadium district's edges, where event-day infrastructure meets the ordinary decay of urban periphery.`,
   x: 4,
   y: -10,
   z: 0,

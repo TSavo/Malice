@@ -26,6 +26,7 @@ export class CorpseBuilder {
     const obj = await this.manager.create({
       parent: decayableId,
       properties: {
+
         name: 'Corpse',
         description: 'A lifeless body.',
         // Original identity - for autopsy, sex is determined from anatomy
@@ -508,15 +509,17 @@ export class CorpseBuilder {
       const body = await self.getBody();
 
       // Create human remains
-      const remains = await $.create({
-        parent: humanRemainsProto,
-        properties: {
-          name: 'human remains',
-          originalName: self.originalName,
-          contents: body ? [body.id] : [],
-          searched: self.searched,
-        },
+      const remains = await $.recycler.create($.humanRemains, {
+        name: 'remains of ' + (self.originalName || 'unknown'),
+        description: 'Remains of ' + (self.originalName || 'someone') + '. Bones and fragments scattered.',
+        owner: self.owner,
+        contents: self.contents || [],
+        decayLevel: 80,
+        decayRate: 0.005,
+        decayCondition: 'always',
+        decayStart: Date.now(),
       });
+
 
       // Update body location to new container
       if (body) {

@@ -2,11 +2,11 @@
 
 export const room = {
   name: 'S. Main St',
-  description: `A small park occupies the southeast corner, a triangle of grass and benches where government workers used to eat lunch. The grass has grown wild, reclaiming the carefully planned space. Nature doesn't care about zoning.
+  description: `A triangular park fills the intersection's southeast corner, one of those urban fragments created when street grids don't quite align. The city named it something—there's a sign somewhere—and installed benches and grass and a few young trees that were supposed to provide shade in twenty years. The trees have grown unchecked now, their branches extending past any plan. The grass has gone to meadow, seed heads nodding in whatever breeze finds its way between the buildings.
 
-A hot dog cart sits abandoned near the park entrance, its umbrella faded and its wheels flat. The vendor who worked this corner is gone. The cart remains, a monument to street food and entrepreneurship.
+A hot dog cart sits abandoned near the park's pedestrian entrance, a stainless steel affair with a fold-out umbrella and wheels that have gone flat from months of sitting. The vendor who worked this corner had a rhythm: set up at 10:30, catch the early lunch crowd, stay through the afternoon court breaks, pack up at 4:00. The rhythm has stopped. The cart is locked, its propane tank still connected, its condiment bottles still arranged in their holders—mustard, relish, sauerkraut, onions in that mystery liquid. Whatever's in those bottles has achieved a state of preservation or decomposition that no one is investigating.
 
-The smell of mustard and onions is long gone, replaced by the neutral smell of decay and patience. The city waits for something to happen. The city is patient.`,
+The smell that used to define this corner—grilled meat and onions and the particular steam of hot dog water—has faded into the general quiet. The city smells like dust now, and rain, and the slow chemistry of things going back to earth. The park waits. It's good at waiting. Parks are patient by design.`,
   x: 12,
   y: 0,
   z: 0,

@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'S. Washington St',
-  description: `A warehouse takes up most of the block here, its corrugated metal walls rusted orange, its windows set high and mostly broken. The loading bay doors are sealed shut, welded or rusted or both.
+  description: `A warehouse dominates this block, a utilitarian structure of corrugated steel that has rusted to the color of dried blood. The building was constructed for function rather than beauty, its walls windowless except for a row of clerestories near the roofline, most of those panes now broken, letting rain and pigeons enter freely. The loading dock doors are sealed—welded shut or rusted into their frames, impossible to tell which without tools that nobody is applying.
 
-A faded logo on the side of the building shows a ship and the words "PACIFIC RIM IMPORTS." Whatever they imported, it is still in there, or it was taken long ago. The doors do not open to answer the question.
+PACIFIC RIM IMPORTS reads the faded logo painted on the warehouse's south wall, the text accompanied by a stylized ship that might be a container vessel or might be a clipper, the paint too weathered to distinguish. The company imported something—electronics or furniture or the endless stream of consumer goods that crossed the Pacific before the crossings stopped. Whatever inventory remains inside the warehouse remains inside, sealed behind doors that don't open, protected by walls that don't care about protection.
 
-A dumpster sits at the curb, overflowing with debris that has been rained on and dried and rained on again until it forms a solid mass. Something is living in there. Rats, probably. There are always rats.
-
-The street continues east toward the old neighborhood.`,
+The street here smells like rust and rot, the particular chemistry of metal oxidizing and organic matter decomposing in the damp Seattle air. This was never a pretty block—industrial and utilitarian, built to move goods rather than impress visitors. The lack of pretension feels almost refreshing now. At least this block isn't pretending to be anything other than what it is.`,
   x: -13,
   y: 5,
   z: 0,

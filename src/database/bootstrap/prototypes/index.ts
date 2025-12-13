@@ -43,6 +43,15 @@ export { BankTerminalBuilder } from './bank-terminal-builder.js';
 // Stackables (physical commodities)
 export { StackableBuilder } from './stackable-builder.js';
 
+// Vendors
+export { VendableBuilder } from './vendable-builder.js';
+
+// Phones
+export { PhoneBuilder } from './phone-builder.js';
+export { WirelessPhoneBuilder } from './wireless-phone-builder.js';
+export { PayphoneBuilder } from './payphone-builder.js';
+export { PhoneDbBuilder } from './phone-db-builder.js';
+
 // Elevators and locks
 export { ElevatorBuilder } from './elevator-builder.js';
 export { LockBuilder } from './lock-builder.js';

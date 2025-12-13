@@ -2,11 +2,11 @@
 
 export const room = {
   name: '1st Ave S',
-  description: `The avenue passes between buildings that have seen better days and worse days and all the days in between. The architecture is eclectic, decades of construction layered on top of each other, none of it matching, all of it empty.
+  description: `Three eras of Seattle architecture collide at this block: a Romanesque Revival building from 1892, its arched windows filled with plywood; a concrete box from the 1960s, all function and no apology; and a glass-fronted renovation from 2015 that already looks dated. All three share the same silence now, the same dust on their doorsteps.
 
-A bail bonds office occupies one storefront, its neon sign dark, its services no longer required. The justice system that created demand for bail bonds has stopped functioning. The bonds are worthless. So is freedom, in a way.
+AAA BAIL BONDS occupies the 1960s box, its neon sign a tangle of dead tubes and empty promises. BAIL BONDS 24 HOURS. FREE PARKING. SE HABLA ESPAÑOL. Through the window, a desk still holds stacked papers, a telephone with a cord, a coffee mug with something growing in it. The business model assumed a functioning justice system. It assumed a lot of things.
 
-A barber pole stands outside a shop that cut hair for generations. The pole no longer spins. The generations have been interrupted.`,
+A barber pole bolted to the brick facade catches the eye—the spiral stripes have faded to pink and grey, and the motor that once spun it has seized. The plate glass window behind it frames three chairs, three mirrors, three reflections of an empty room.`,
   x: -9,
   y: -7,
   z: 0,

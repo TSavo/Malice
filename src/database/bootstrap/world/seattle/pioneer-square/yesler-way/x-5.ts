@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'Yesler Way',
-  description: `Trees are visible ahead, or what is left of them. The dead branches of Occidental Park reach over the rooftops like skeletal fingers.
+  description: `Occidental Park's dead maple trees are visible ahead, their bare branches rising above the surrounding rooflines like skeletal fingers. The park opens just beyond this block, what's left of it.
 
-A gallery occupies the ground floor here, its windows displaying art that no one will ever buy. Abstract shapes in expensive frames, gathering dust. A red "SOLD" sticker on one piece. Optimistic.
+FOSTER/WHITE GALLERY occupies a ground-floor space, its white walls visible through windows that haven't been cleaned in decades. The track lighting is dark. The abstract paintings and sculptures are still there—looters don't take art—displayed with the careful spacing that once conveyed value. The First Thursday art walks brought crowds through galleries like this. The crowds stopped coming. The art remains, appreciated by no one.
 
-Across the street, a door marked "UNDERGROUND TOUR" with a price list still posted. Ten dollars for adults, eight for seniors, five for children. The tours went down into the buried city beneath the streets, the original Seattle that was paved over after the fire of 1889. Now there are two dead cities stacked on top of each other.
-
-The tour entrance is padlocked. Whatever is down there now, it is not a tourist attraction.`,
+The UNDERGROUND TOUR entrance occupies a storefront across the street, the departure point for guided tours that explored Seattle's buried original city. After the Great Fire, Seattle raised its streets, entombing the original ground floors beneath the new surface. The tours ended when everything ended. The passages are still down there, darker now, the guides long gone. A city built atop itself, layer upon layer of abandonment.`,
   x: -5,
   y: 10,
   z: 0,

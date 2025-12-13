@@ -1,5 +1,5 @@
-// Smith Tower - Mall Floor (z=37)
-// Upper retail level, automated services
+// Smith Tower - Retail Level 2 (z=37)
+// Continuum service infrastructure - prepared spaces awaiting build-out
 
 export const building = {
   rooms: {
@@ -9,14 +9,14 @@ export const building = {
     },
 
     '%PROMENADE': {
-      name: 'Shopping Promenade',
-      description: 'An upper-level retail corridor with skylights that filter grey daylight through grime. Digital advertising panels cycle through product promos for no one. The floor is synthetic wood laminate, scuffed but intact. Security cameras swivel on their mounts, tracking movement through dead systems.',
+      name: 'Smith Tower - 37th Floor - Service Promenade',
+      description: `An upper retail corridor with skylights showing grey daylight. Service storefronts display digital signs reading COMING SOON. The floor is clean synthetic laminate. Security cameras are installed but show standby lights. Everything is new, nothing is operational.`,
       x: -4,
       y: 8,
       z: 37,
       population: 0,
-      ambientNoise: 7,
-      lighting: 65,
+      ambientNoise: 5,
+      lighting: 70,
       waterLevel: 0,
       outdoor: false,
       exits: {
@@ -35,14 +35,14 @@ export const building = {
     },
 
     '%SALON': {
-      name: 'Automated Salon',
-      description: 'A hair and beauty service station. Articulated arms hang from ceiling rails above adjustable seats. A color-mixing carousel sits idle. The booking screen displays available appointments for a Thursday that already happened. Swept hair still lies in corners.',
+      name: 'Smith Tower - 37th Floor - Salon',
+      description: `A beauty service space with articulated robotic arms mounted on ceiling rails but locked in maintenance position. Adjustable salon chairs are covered in protective plastic. A booking screen displays: AUTOMATED SALON - EQUIPMENT CALIBRATION REQUIRED - PRODUCT INVENTORY NEEDED.`,
       x: -4,
       y: 9,
       z: 37,
       population: 0,
-      ambientNoise: 2,
-      lighting: 80,
+      ambientNoise: 3,
+      lighting: 75,
       waterLevel: 0,
       outdoor: false,
       exits: {
@@ -52,21 +52,21 @@ export const building = {
         {
           name: 'a salon chair',
           capacity: 1,
-          emptyMsg: 'Adjustable salon chairs sit empty.',
+          emptyMsg: 'Salon chairs sit wrapped in plastic.',
           occupiedMsg: '%s sitting in a salon chair',
         },
       ],
     },
 
     '%PET': {
-      name: 'Pet Care Station',
-      description: 'A self-service pet grooming and supply shop. Washing stations with temperature controls line one wall. Vending dispensers are locked now, their displays dark. The air still smells faintly of wet fur and pet shampoo.',
+      name: 'Smith Tower - 37th Floor - Pet Services',
+      description: `A pet care facility with washing stations installed but dry. Vending dispensers are mounted but empty, their displays dark. Supply racks are bare. A terminal reads: PET CARE SERVICES - SUPPLY LOADING REQUIRED - SYSTEM CONFIGURATION PENDING.`,
       x: -4,
       y: 7,
       z: 37,
       population: 0,
-      ambientNoise: 3,
-      lighting: 70,
+      ambientNoise: 2,
+      lighting: 75,
       waterLevel: 0,
       outdoor: false,
       exits: {
@@ -75,14 +75,14 @@ export const building = {
     },
 
     '%GYM': {
-      name: 'Automated Fitness Center',
-      description: 'An unmanned gym accessed by membership card. The turnstile is stuck open. Rows of cardio equipment with dead screens, weight racks still loaded, resistance machines waiting. Touchless water dispensers blink red. The air smells of rubber mats and disinfectant.',
+      name: 'Smith Tower - 37th Floor - Fitness Center',
+      description: `An unmanned gym space with cardio equipment still in shipping wrap. Weight racks are installed but unloaded. Resistance machines have protective covers. A turnstile stands unlocked. A screen displays: FITNESS CENTER - EQUIPMENT SETUP INCOMPLETE - MEMBERSHIP SYSTEM NOT ACTIVE.`,
       x: -3,
       y: 8,
       z: 37,
       population: 0,
-      ambientNoise: 9,
-      lighting: 85,
+      ambientNoise: 4,
+      lighting: 75,
       waterLevel: 0,
       outdoor: false,
       exits: {
@@ -93,22 +93,22 @@ export const building = {
         {
           name: 'a weight bench',
           capacity: 1,
-          emptyMsg: 'Weight benches sit ready.',
+          emptyMsg: 'Weight benches sit covered in plastic.',
           occupiedMsg: '%s using a weight bench',
         },
       ],
     },
 
     '%SHOWER': {
-      name: 'Shower Bay',
-      description: 'A communal shower facility with touchless controls and privacy partitions. Water still drips from one showerhead, a slow leak that never got fixed. Tile walls, floor drains, frosted glass. The towel dispenser is empty.',
+      name: 'Smith Tower - 37th Floor - Shower Facility',
+      description: `A communal shower area with touchless controls installed but not programmed. Tile walls are clean and new. Privacy partitions are in place. The towel dispenser is empty. A notice reads: FACILITY SETUP INCOMPLETE - WATER SYSTEM TESTING REQUIRED.`,
       x: -3,
       y: 9,
       z: 37,
       population: 0,
-      ambientNoise: 11,
+      ambientNoise: 2,
       lighting: 75,
-      waterLevel: 1,
+      waterLevel: 0,
       outdoor: false,
       exits: {
         south: '%GYM',
@@ -116,14 +116,14 @@ export const building = {
     },
 
     '%GROCERY': {
-      name: 'Micro Market',
-      description: 'An automated convenience store with refrigerated walls and smart shelving. Most shelves are empty, weight sensors blinking error codes. A few shelf-stable items remain—protein bars, instant noodles, canned coffee. The refrigeration units died—everything inside spoiled long ago. Self-checkout gates stand open, payment terminals dark.',
+      name: 'Smith Tower - 37th Floor - Market',
+      description: `An automated convenience store with refrigerated wall units powered but empty. Smart shelving displays error codes for missing inventory. Self-checkout gates are installed but show: MARKET SERVICES - INVENTORY LOADING REQUIRED - PRICING DATABASE NOT CONFIGURED. The space is ready, waiting for stock.`,
       x: -5,
       y: 8,
       z: 37,
       population: 0,
-      ambientNoise: 4,
-      lighting: 60,
+      ambientNoise: 6,
+      lighting: 75,
       waterLevel: 0,
       outdoor: false,
       exits: {
@@ -133,14 +133,14 @@ export const building = {
     },
 
     '%STORAGE': {
-      name: 'Stock Room',
-      description: 'A back room with industrial shelving and inventory tracking screens. Boxes of shelf-stable goods sit unopened, their expiration dates long past. The inventory system displays STOCKOUT warnings in red.',
+      name: 'Smith Tower - 37th Floor - Stock Room',
+      description: `A back room with industrial shelving installed but empty. Inventory tracking screens display: NO STOCK LOADED. The space is clean, organized, ready for deliveries that haven't arrived.`,
       x: -5,
       y: 7,
       z: 37,
       population: 0,
       ambientNoise: 2,
-      lighting: 55,
+      lighting: 70,
       waterLevel: 0,
       outdoor: false,
       exits: {

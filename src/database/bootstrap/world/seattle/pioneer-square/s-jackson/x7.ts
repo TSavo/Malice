@@ -2,11 +2,11 @@
 
 export const room = {
   name: 'S. Jackson St',
-  description: `The construction fence angles here, following property lines that made sense on blueprints. The angle creates a small plaza, an accidental public space where the fence meets the sidewalk.
+  description: `The Corp Construction perimeter angles here, following property boundaries that create an irregular setback from the sidewalk. The angle opens a small triangular plaza—an accidental public space where Corp's maintained fence meets the decaying neighborhood. The contrast is sharp: fresh barriers beside collapsing buildings.
 
-Someone has set up a shrine in the plaza. Candles and flowers and photographs of people who were loved. The shrine has been maintained, which means someone is still here, still remembering, still placing fresh flowers among the wilted ones.
+A community garden once occupied this space, one of the interim uses that city programs encouraged. The raised beds are still visible, their wooden frames weathered and rotting, the soil growing whatever volunteers seeded themselves over fifty-five years—weeds mostly, but hardy vegetables gone feral. The International District always struggled for green space. Now it has all the green space it needs, nature reclaiming what people abandoned.
 
-The photographs show faces that smile at a camera that clicked before everything clicked off. The faces are young and old and beautiful and ordinary. They were someone's something. Now they're laminated and leaning against a construction fence.`,
+The buildings flanking the plaza show the neighborhood's characteristic architecture: early twentieth-century construction with ground-floor storefronts dark and shuttered. A Vietnamese restaurant occupies one space, PHO BANG according to the sign, its neon lettering dark, the name still legible. The facades adapted over decades to serve successive waves of immigrant communities. The waves stopped. The facades remain.`,
   x: 7,
   y: -5,
   z: 0,

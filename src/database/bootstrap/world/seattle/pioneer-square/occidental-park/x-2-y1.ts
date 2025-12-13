@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'Occidental Park',
-  description: `Occidental Park spreads out here, its brick plaza heart of the plaza. The park was created in the 1970s by closing Occidental Avenue to traffic, converting asphalt to pedestrian space. The brick paving in herringbone pattern stretches in all directions, weathered but intact.
+  description: `A raised platform occupies the center of the park—the performance stage where musicians and speakers once addressed crowds. The brick surface is elevated six inches, its edges trimmed in weathered steel, the geometry designed to create a focal point. The stage faced west, audiences gathered on the plaza below, the buildings providing a backdrop for whatever spectacle was being performed.
 
-A performance space occupies this area, its brick surface raised slightly, its edges marked with metal trim. The detail speaks to a time when the park was maintained, when someone cared about these spaces and the people who used them.
+No one performs here now. The stage collects leaves and debris, its surface stained by seasons of rain. Bolt holes mark where equipment was once mounted—speaker stands, lighting rigs, the infrastructure of performance. The bolts are gone, salvaged long ago. The holes remain, filling with rainwater, small wells in the brick.
 
-Dead trees punctuate the plaza at intervals, their bare branches creating stark silhouettes. They were planted with intention, part of an urban design that valued green space and shade. The trees are dead now but still standing, monuments to earlier optimism.
-
-The brick plaza continues in all accessible directions, open to sky and weather.`,
+The dead trees ringing the plaza create an accidental amphitheater, their bare branches framing the sky like the ribs of a cathedral.`,
   x: -2,
   y: 1,
   z: 0,

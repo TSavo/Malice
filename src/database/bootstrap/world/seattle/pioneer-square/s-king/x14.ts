@@ -2,11 +2,11 @@
 
 export const room = {
   name: 'S. King St',
-  description: `Fourth Avenue is just ahead, marking the eastern edge of Pioneer Square's territory. The International District continues beyond, deeper into its own geography, its own history, its own silence.
+  description: `Fourth Avenue approaches from the east, the intersection ahead marking what bureaucrats once designated as the formal boundary between historic districts. The neighborhood continues beyond the administrative line, its character uninterrupted by zoning—equally abandoned on both sides. City planners drew the lines. The war erased them.
 
-A jewelry store specializes in jade, its window displaying green stones in gold settings. Jade was worn for protection and good fortune. The protection proved inadequate. The fortune ran out. The jade remains, green and cold and beautiful.
+JADE HAPPINESS JEWELRY occupies a ground-floor retail space, its security gate pulled down and rusted shut. The jade pieces that Chinese communities traditionally valued are likely still inside—looters in the aftermath took electronics and food, not cultural artifacts. Through gaps in the gate: display cases dusty but intact, bangles and Buddha pendants and zodiac charms waiting behind glass. The protection and prosperity the stones promised protected and prospered nothing.
 
-A lantern-maker's shop occupies the ground floor, paper lanterns in various sizes hanging from the ceiling. The lanterns were made for festivals and celebrations. The festivals have been cancelled. The lanterns wait, ready to light celebrations that won't happen.`,
+A lantern shop shares the building, CHINATOWN LANTERNS according to faded signage. The store supplied paper lanterns for festival celebrations—red spheres for Lunar New Year, illuminated shapes for Moon Festival. Through the grimy window: lanterns of various sizes still suspended from the ceiling, faded and dusty, awaiting celebrations that will never come. The rhythm the International District once had is fifty-five years silent.`,
   x: 14,
   y: -10,
   z: 0,

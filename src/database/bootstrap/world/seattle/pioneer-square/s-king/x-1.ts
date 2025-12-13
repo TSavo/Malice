@@ -2,11 +2,11 @@
 
 export const room = {
   name: 'S. King St',
-  description: `Union Station is visible to the north, its grand hall converted to offices before the offices were converted to emptiness. The station was meant to be a gateway, a point of arrival and departure. Now it's just a building with good bones and no purpose.
+  description: `Union Station is visible to the north, its Beaux-Arts facade complementing King Street Station's similar architecture a block away. The two stations served different railroads—Union for the Union Pacific, King Street for Great Northern—the competition of the railroad era expressed in parallel terminals. Union Station's grand hall was converted to office space in the 1990s. The offices are empty now, the conversion serving no purpose.
 
-A sandwich shop served the commuters who passed through here, quick lunches for people with somewhere to be. The commuters are gone. The shop is dark. The bread has molded and been consumed by things that don't mind mold.
+KING STREET DELI occupies a ground-floor space in the adjacent building, the kind of establishment that served commuter traffic. Through the grimy window: counter service, limited seating, the configuration designed for speed. No one is in a hurry here anymore. The deli counter is dark, whatever was inside it long since spoiled and desiccated.
 
-A clock hangs in the shop window, stopped at some arbitrary time. The time doesn't matter. All times are the same now.`,
+The buildings along this stretch show varied construction spanning eras—early twentieth-century commercial structures beside mid-century concrete. The railroad money that once flowed through this district stopped flowing. The buildings remain, monuments to industries that died before the war and industries that died with it.`,
   x: -1,
   y: -10,
   z: 0,
