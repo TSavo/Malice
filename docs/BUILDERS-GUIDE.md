@@ -193,9 +193,33 @@ Methods are written as string templates. Available globals:
 |--------|-------------|
 | `self` | The object the method is defined on |
 | `args` | Array of arguments passed to the method |
-| `$` | Alias resolver - `await $.prototypeName` or `await $.load(id)` |
+| `$` | System proxy - access aliases, load objects, call ObjectManager methods |
 | `caller` | The agent who invoked (for verbs/commands) |
 | `context` | Connection context (for player commands) |
+
+### The $ Proxy
+
+The `$` object provides several capabilities:
+
+```javascript
+// 1. Access registered aliases (singletons)
+const recycler = await $.recycler;
+const bank = await $.bank;
+
+// 2. Load objects by ID
+const obj = await $.load(123);
+const player = await $[42];  // Shorthand for $.load(42)
+
+// 3. Call methods on ObjectManager #0
+// Any unknown property delegates to #0
+await $.clearAliasesForObject(objectId);
+await $.addAlias('myAlias', objectId);
+const aliasId = await $.getAlias('myAlias');
+
+// 4. Access infrastructure
+$.db           // Database access
+$.evictFromCache(id)  // Cache management
+```
 
 ### Common Patterns
 
