@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'Occidental Park',
-  description: `Occidental Park spreads out here, its brick plaza central-northern section. The park was created in the 1970s by closing Occidental Avenue to traffic, converting asphalt to pedestrian space. The brick paving in herringbone pattern stretches in all directions, weathered but intact.
+  description: `Three abstract sculptures occupy this section of the plaza, welded steel forms installed in the 1980s as part of Seattle's public art program. The sculptures were meant to represent something—movement, connection, the human condition—but fifty-five years of weather have transformed them into something else entirely.
 
-A sculpture garden occupies this space—three abstract metal pieces arranged in relation to each other. The detail speaks to a time when the park was maintained, when someone cared about these spaces and the people who used them.
+Rust has eaten through the steel in places, creating organic patterns that the artist never intended. Moss grows in the joints where metal meets metal. One sculpture has partially collapsed, its upper section hanging at an angle, connected to the base by a single corroded weld. The collapse happened slowly, metal fatiguing over decades until gravity finally won.
 
-Dead trees punctuate the plaza at intervals, their bare branches creating stark silhouettes. They were planted with intention, part of an urban design that valued green space and shade. The trees are dead now but still standing, monuments to earlier optimism.
-
-The brick plaza continues in all accessible directions, open to sky and weather.`,
+The sculptures cast long shadows across the brick. Even diminished, even decaying, they have presence. Someone made these things. Someone thought they mattered enough to weld and paint and install in a public space. The caring shows, even now.`,
   x: -2,
   y: 3,
   z: 0,

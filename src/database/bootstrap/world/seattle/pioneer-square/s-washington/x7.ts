@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'S. Washington St',
-  description: `Third Avenue is close now, the intersection visible ahead. But the Collapsed Building has changed the geography here. Rubble spills into the street from the east, chunks of concrete and tangles of rebar and the detritus of what was once a seven-story office building.
+  description: `The Collapsed Building's debris field begins here, the rubble spilling westward from what was once a seven-story office building. The structure dated to 1923, unreinforced masonry construction of the type that seismic engineers call "soft story"—ground floor retail with open spans, upper floors heavy with brick and concrete, the whole assembly balanced on columns that work fine until they don't.
 
-Nobody knows exactly what happened. The building stood for eighty years, survived earthquakes and neglect and the slow rot of deferred maintenance. Then one day it did not stand anymore. Some say it was the shaking. Some say it was the blast wave. Some say it was just time, catching up all at once.
+The collapse pattern suggests pancaking, each floor driving the one below it down in sequence. The debris pile preserves a rough stratigraphy—basement at the bottom, penthouse at the top, everything in between compressed into a layer cake of destruction. Rebar protrudes from concrete chunks at angles that suggest the violence of the failure. Brick dust has settled over everything, giving the rubble a uniform reddish hue.
 
-A shoe lies in the rubble near the street. Just one shoe, a woman's flat, grey with dust. The other shoe is somewhere in there. So is everything else.
-
-Caution tape flutters from a bent signpost, yellow and black, the universal language of do not enter. The tape has been here long enough to fade. No one is coming to clean this up.`,
+Third Avenue is visible ahead, the intersection threading between the debris field and the buildings that remained standing. The Corp Construction zone's fencing begins just south of here, its black fabric barriers concealing whatever development was underway when construction stopped.`,
   x: 7,
   y: 5,
   z: 0,

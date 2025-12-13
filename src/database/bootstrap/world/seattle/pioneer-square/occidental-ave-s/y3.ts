@@ -2,11 +2,11 @@
 
 export const room = {
   name: 'Occidental Ave S',
-  description: `The maple trees form a complete canopy here, their branches intertwined overhead, creating a green tunnel that blocks the sky. In summer this was shade. In autumn it was gold and red. Now it's just overgrown, nature asserting itself over urban planning.
+  description: `The maples close overhead here, their branches so intertwined that the canopy blocks most of the sky. In summer this was Seattle's idea of shade—green filtered light, the rustle of leaves in the breeze off Elliott Bay. In autumn the tourists came with cameras to photograph the gold and red. The leaves still turn. The cameras are elsewhere. The branches keep growing, reaching for each other across the walkway like hands clasped in the dark.
 
-A jazz club occupied the basement of one building, its entrance a nondescript door that led down into music and smoke and the kind of nights that became stories. The stories are over. The door is locked. The jazz has gone silent.
+A steel door painted matte black sits flush with the building's facade, so unremarkable you'd walk past it without noticing. A small brass plaque reads TULA'S, nothing more. The door led down a flight of stairs into a jazz club that didn't need to advertise—if you knew, you knew, and if you didn't, the music filtering up through the sidewalk grates on summer nights told you everything. The door is locked. The basement beyond is silent. Whatever was in the air down there—smoke and whiskey and the particular electricity of live jazz—has dissipated into the brick.
 
-A sandwich board lies on its side, knocked over by wind or time, its chalkboard message long since washed away by rain.`,
+A bicycle pump is chained to a stand bolted into the cobblestones, one of those municipal installations meant to encourage cycling. The pump's gauge has cracked. The hose has perished. Someone took the trouble to chain it here, and then the trouble stopped being taken.`,
   x: -3,
   y: 3,
   z: 0,

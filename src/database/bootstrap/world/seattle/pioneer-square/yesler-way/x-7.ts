@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'Yesler Way',
-  description: `Red brick buildings line both sides of the street, four and five stories tall, built in the 1890s to last forever. They might actually make it. The decorative cornices are crumbling, the arched windows mostly broken, but the walls still stand. They built things differently then.
+  description: `Red brick buildings line both sides of Yesler Way here, four and five stories tall, the post-fire construction that defines what's left of Pioneer Square. The buildings date to the 1890s, built after the Great Fire forced Seattle to rebuild in brick and stone. Brick outlasted the city that built it. The facades show decorative cornices and arched window headers, ornament that no one admires anymore.
 
-A coffee shop occupies a corner space. The windows are dark, the espresso machines silent, the sandwich board on the sidewalk still advertising "POUR OVER $7." Someone added "OVER MY DEAD BODY" underneath in marker. Comedy persists.
+ZEITGEIST COFFEE occupies a corner space, its windows dark, its espresso machines cold. Through the grimy glass: the counter seating where customers once watched baristas work, the exposed brick and industrial fixtures that third-wave coffee shops favored. Seattle's coffee culture ended with everything else. The beans rotted long ago. The machines stand ready to serve no one.
 
-A tattoo parlor next door. Flash art still covers the windows, designs for anchors and roses and skulls. The skulls seem more relevant now.
-
-The street continues east toward what used to be Occidental Park.`,
+ATLAS TATTOO shares the building, its windows still displaying the flash art that traditional shops maintain—anchors, roses, skulls and daggers faded behind dusty glass. Walk-in customers don't walk in anymore. The needles are still there, probably. The ink has dried.`,
   x: -7,
   y: 10,
   z: 0,

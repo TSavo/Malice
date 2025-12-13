@@ -2,11 +2,11 @@
 
 export const room = {
   name: 'S. King St',
-  description: `A senior center occupies the ground floor here, its activity room visible through large windows. The room was designed for exercise classes and social gatherings and the community-building that kept elders connected. The connections have been cut. The room is empty.
+  description: `The INTERNATIONAL DISTRICT SENIOR CENTER occupies the ground floor, its large windows grimy but still allowing views into the activity room. The open space designed for exercise classes and social gatherings is empty and dark. The center served multiple functions—recreation, health education, meal service, the support systems that helped seniors maintain independence. The seniors it served are dead now. They would be over a hundred if they'd survived the war.
 
-Exercise equipment lines one wall, stationary bikes and treadmills that went nowhere even when they were being used. They still go nowhere. The going is the same.
+The interior layout is still visible through the windows: exercise equipment along one wall gathering dust—stationary bikes with flat tires, balance aids toppled over. Folding tables and chairs remain configured for group activities that ended fifty-five years ago. The kitchen area in the back is dark, the meal programs that provided nutrition and social connection silent.
 
-A bulletin board inside lists events and services in multiple Asian languages. The events have been cancelled. The services have been discontinued. The languages persist, untranslated.`,
+Signage inside appears in multiple languages—Chinese, Vietnamese, Japanese, Tagalog—reflecting the diverse Asian communities that the International District encompassed. The multilingual welcome extends to no one. The community center that served as a gathering point for elderly residents gathers only silence now.`,
   x: 12,
   y: -10,
   z: 0,

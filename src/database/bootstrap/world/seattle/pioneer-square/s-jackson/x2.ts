@@ -2,11 +2,11 @@
 
 export const room = {
   name: 'S. Jackson St',
-  description: `Second Avenue is just ahead, its intersection busy with nothing. The street here served as the main approach to the stadiums, wide enough for the crowds that surged toward games and concerts and events. The width seems excessive now.
+  description: `The approach to 2nd Avenue widens here, the streetscape designed to accommodate pedestrian flow between Pioneer Square and the stadiums. The sidewalks are broad, the sightlines clear—urban design optimized for crowd management rather than intimate streetscape. The scale feels institutional, the public space that civic investment created for public that no longer exists.
 
-A memorabilia shop sold jerseys and caps and foam fingers, the uniform of fandom. The shop is dark. The merchandise remains, sized for fans who have vanished, in colors of teams that no longer play.
+SEATTLE TEAM SHOP occupies a ground-floor retail space, its windows dusty but intact. Through the glass: jerseys displayed on mannequins faded by decades of sun, caps arranged by team and style—Seahawks, Mariners, teams that played their last games before the war. The branded merchandise that sports fandom required, waiting for fans who will never return. The souvenirs of a culture that ended.
 
-A bronze statue of a baseball player stands outside, frozen in mid-swing. The player it commemorates is probably dead. The statue persists, swinging at a pitch that will never arrive.`,
+A bronze statue stands outside the building—a baseball player captured mid-swing, the moment of contact frozen in metal. The statue commemorates a franchise legend, part of the public art program that stadium districts installed to create sense of place. The bronze has weathered to patina green, the plaque at its base listing statistics and achievements that mean nothing now. Athletic excellence measured in numbers no one remembers.`,
   x: 2,
   y: -5,
   z: 0,

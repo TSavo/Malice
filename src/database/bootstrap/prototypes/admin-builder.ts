@@ -74,7 +74,9 @@ export class AdminBuilder {
             const floors = floorsStr.split(',').map(f => parseInt(f.trim(), 10)).filter(n => !isNaN(n));
             if (!floors.length) { await self.tell('No valid floors.'); break; }
             const currentFloor = floors[0];
-            const elev = await $.create({ parent: elevProto, properties: { name: name || 'Elevator', floors, currentFloor, floorRooms: {} } });
+             const elev = $.recycler ? await $.recycler.create($.elevator, { name: name || 'Elevator', floors, currentFloor, floorRooms: {} }, self) : null;
+             if (!elev) { await self.tell('Recycler unavailable.'); break; }
+
             await self.tell('Created elevator #' + elev.id + ' (' + (elev.name || '') + ').');
             break;
           }
@@ -98,7 +100,9 @@ export class AdminBuilder {
               return exObj && exObj.destRoom === elev.id;
             });
             if (!inExit) {
-              inExit = await $.create({ parent: exitProto, properties: { name: 'in', aliases: ['in','i'], destRoom: elev.id } });
+               inExit = $.recycler ? await $.recycler.create($.exit, { name: 'in', aliases: ['in','i'], destRoom: elev.id }, self) : null;
+
+              if (!inExit) { await self.tell('Recycler unavailable.'); break; }
               await currentRoom.addExit(inExit);
             }
 
@@ -108,7 +112,9 @@ export class AdminBuilder {
               return exObj && exObj.destRoom === currentRoom.id;
             });
             if (!outExit) {
-              outExit = await $.create({ parent: exitProto, properties: { name: 'out', aliases: ['out','o'], destRoom: currentRoom.id } });
+               outExit = $.recycler ? await $.recycler.create($.exit, { name: 'out', aliases: ['out','o'], destRoom: currentRoom.id }, self) : null;
+
+              if (!outExit) { await self.tell('Recycler unavailable.'); break; }
               await elev.addExit(outExit);
             }
 
@@ -295,28 +301,30 @@ export class AdminBuilder {
         return;
       }
 
-      const exitObj = typeof exit === 'number' ? await $.load(exit) : exit;
-      if (!exitObj) {
-        await self.tell('Exit not found.');
-        return;
-      }
+       const exitObj = typeof exit === 'number' ? await $.load(exit) : exit;
+       if (!exitObj) {
+         await self.tell('Exit not found.');
+         return;
+       }
 
-      // Resolve or create the door
-      let door = exitObj.door ? await $.load(exitObj.door) : null;
-      const aliases = $.system.aliases || {};
-      const doorProto = aliases.door;
-      if (!door && !doorProto) {
-        await self.tell('Door prototype not found.');
-        return;
-      }
+       // Resolve or create the door
+       let door = exitObj.door ? await $.load(exitObj.door) : null;
+       const aliases = $.system.aliases || {};
+       const doorProto = aliases.door;
+       if (!door && !doorProto) {
+         await self.tell('Door prototype not found.');
+         return;
+       }
 
-      if (!door) {
-        const name = (exitObj.name || 'Exit') + ' Door';
-        door = await $.create({
-          parent: doorProto,
-          properties: { name }
-        });
-        exitObj.door = door.id;
+       if (!door) {
+         const name = (exitObj.name || 'Exit') + ' Door';
+         if (!$.recycler) { await self.tell('Recycler unavailable.'); return; }
+         door = await $.recycler.create({
+           parent: doorProto,
+           properties: { name }
+         }, self);
+         exitObj.door = door.id;
+
 
         // Attach to reverse exit if present
         const dest = exitObj.destRoom ? await $.load(exitObj.destRoom) : null;
@@ -457,6 +465,7 @@ export class AdminBuilder {
       await self.registerVerb(['@unlink %s'], self, '@unlink');
       await self.registerVerb(['@set %s', '@set %s %s'], self, '@set');
       await self.registerVerb(['@create', '@create %s'], self, '@create');
+      await self.registerVerb(['@create-object', '@create-object %s'], self, '@create-object');
       await self.registerVerb(['@destroy %s'], self, '@destroy');
       await self.registerVerb(['@teleport %s', '@tp %s'], self, '@teleport');
       await self.registerVerb(['@goto %s'], self, '@goto');
@@ -574,16 +583,13 @@ export class AdminBuilder {
         return;
       }
 
-      const newRoom = await $.create({
-        parent: roomProtoId,
-        properties: {
-          name: name,
-          description: description,
-          x: x,
-          y: y,
-          z: z,
-        },
-      });
+      const newRoom = await $.recycler.create($.room, {
+        name: name,
+        description: description,
+        x: x,
+        y: y,
+        z: z,
+      }, self);
 
       await self.tell('\\r\\nCreated room #' + newRoom.id + ': ' + name);
 
@@ -592,27 +598,21 @@ export class AdminBuilder {
         const exitProtoId = aliases.exit;
         if (exitProtoId) {
           // Exit from current to new
-          const exitToNew = await $.create({
-            parent: exitProtoId,
-            properties: {
-              name: exitDirection,
-              aliases: self.getExitAliases(exitDirection),
-              destRoom: newRoom.id,
-            },
-          });
+          const exitToNew = await $.recycler.create($.exit, {
+            name: exitDirection,
+            aliases: self.getExitAliases(exitDirection),
+            destRoom: newRoom.id,
+          }, self);
           await currentRoom.addExit(exitToNew);
           await self.tell('Created exit ' + exitDirection + ' (#' + exitToNew.id + ')');
 
           // Return exit from new to current
           if (returnDirection) {
-            const exitToCurrent = await $.create({
-              parent: exitProtoId,
-              properties: {
-                name: returnDirection,
-                aliases: self.getExitAliases(returnDirection),
-                destRoom: currentRoom.id,
-              },
-            });
+            const exitToCurrent = await $.recycler.create($.exit, {
+              name: returnDirection,
+              aliases: self.getExitAliases(returnDirection),
+              destRoom: currentRoom.id,
+            }, self);
             await newRoom.addExit(exitToCurrent);
             await self.tell('Created exit ' + returnDirection + ' (#' + exitToCurrent.id + ')');
           }
@@ -710,26 +710,20 @@ export class AdminBuilder {
         return;
       }
 
-      const exitToNew = await $.create({
-        parent: exitProtoId,
-        properties: {
-          name: exitDirection,
-          aliases: self.getExitAliases(exitDirection),
-          destRoom: destRoom.id,
-        },
-      });
+      const exitToNew = await $.recycler.create($.exit, {
+        name: exitDirection,
+        aliases: self.getExitAliases(exitDirection),
+        destRoom: destRoom.id,
+      }, self);
       await currentRoom.addExit(exitToNew);
       await self.tell('Created exit ' + exitDirection + ' (#' + exitToNew.id + ')');
 
       if (returnDirection) {
-        const exitToCurrent = await $.create({
-          parent: exitProtoId,
-          properties: {
-            name: returnDirection,
-            aliases: self.getExitAliases(returnDirection),
-            destRoom: currentRoom.id,
-          },
-        });
+        const exitToCurrent = await $.recycler.create($.exit, {
+          name: returnDirection,
+          aliases: self.getExitAliases(returnDirection),
+          destRoom: currentRoom.id,
+        }, self);
         await destRoom.addExit(exitToCurrent);
         await self.tell('Created exit ' + returnDirection + ' (#' + exitToCurrent.id + ')');
       }
@@ -819,14 +813,14 @@ export class AdminBuilder {
       await self.tell('Set ' + target.name + ' (#' + target.id + ').' + propName + ' = ' + JSON.stringify(value));
     `);
 
-    // @create - Create a generic object
+    // @create - Create a generic object (defaults to prompt flow)
     obj.setMethod('@create', `
       /** Create a new object.
        *  Usage: @create [parent_id]
        */
       const parentStr = command.replace('@create', '').trim();
 
-      await self.tell('=== @create: Create Object ===\\r\\n');
+      await self.tell('=== @create: Create Object ===\r\n');
 
       // 1. Parent
       let parentId;
@@ -853,16 +847,196 @@ export class AdminBuilder {
       const description = await $.prompt.question(self, 'Description: ');
 
       // 4. Create
-      const newObj = await $.create({
-        parent: parentId,
-        properties: {
-          name: name,
-          description: description || '',
-        },
-      });
+      const newObj = await $.recycler.create(parentId, {
+        name: name,
+        description: description || '',
+      }, self);
 
       await self.tell('Created object #' + newObj.id + ': ' + name);
     `);
+
+    // @create-object - Guided creation of common items (vendable with lock, locker, bank terminal, etc.)
+    obj.setMethod('@create-object', `
+      /** Interactive helper to create common object setups. */
+      await self.tell('=== @create-object: Helper ===\\r\\n');
+      const menu = [
+        ' 1) Vendable (with rentable lock)',
+        ' 2) Locker (with lock)',
+        ' 3) Bank terminal',
+        ' 4) Phone (base)',
+        ' 5) Phone (wireless)',
+        ' 6) Payphone (bolted, banked)',
+        ' 7) Generic object',
+        ' 8) Cancel',
+      ].join('\n');
+      const choiceStr = await $.prompt.question(self, menu + '\nChoice: ');
+      const choice = Number(choiceStr);
+      if (!Number.isInteger(choice) || choice < 1 || choice > 8) {
+        await self.tell('Cancelled.');
+        return;
+      }
+      if (choice === 8) {
+        await self.tell('Cancelled.');
+        return;
+      }
+
+      if (choice === 5) {
+        await self.tell('Cancelled.');
+        return;
+      }
+
+      // Helper: resolve parent (defaults to 1)
+      const parentInput = await $.prompt.question(self, 'Parent object ID [1]: ');
+      const parentId = parentInput ? parseInt(parentInput.replace('#', ''), 10) : 1;
+      if (isNaN(parentId)) {
+        await self.tell('Invalid parent ID.');
+        return;
+      }
+
+      const name = await $.prompt.question(self, 'Object name: ');
+      if (!name) {
+        await self.tell('Cancelled.');
+        return;
+      }
+      const description = await $.prompt.question(self, 'Description: ');
+      const recycler = $.recycler;
+      if (!recycler) { await self.tell('Recycler unavailable.'); return; }
+
+      if (choice === 1) {
+        // Vendable with rentable lock
+        const bankDefault = $.bank ? $.bank.id : null;
+        const bankRefInput = await $.prompt.question(self, 'Bank object id/alias' + (bankDefault ? ' [' + bankDefault + ']' : '') + ': ');
+        const bankRef = bankRefInput || bankDefault || null;
+
+        const payoutAccount = await $.prompt.question(self, 'Vend payout account id: ');
+        if (!payoutAccount) {
+          await self.tell('Cancelled.');
+          return;
+        }
+
+        const lockPayoutDefault = payoutAccount;
+        const lockPayoutInput = await $.prompt.question(self, 'Lock rental payout account id [' + lockPayoutDefault + ']: ');
+        const lockPayoutAccount = lockPayoutInput || lockPayoutDefault;
+
+        const defaultPriceInput = await $.prompt.question(self, 'Default item price [0]: ');
+        const defaultPrice = defaultPriceInput === '' ? 0 : Number(defaultPriceInput);
+        if (!Number.isFinite(defaultPrice) || defaultPrice < 0) {
+          await self.tell('Invalid default price.');
+          return;
+        }
+
+        const rentalPriceInput = await $.prompt.question(self, 'Lock rental price [100]: ');
+        const rentalPrice = rentalPriceInput === '' ? 100 : Number(rentalPriceInput);
+        if (!Number.isFinite(rentalPrice) || rentalPrice < 0) {
+          await self.tell('Invalid rental price.');
+          return;
+        }
+
+        const durationMinutesInput = await $.prompt.question(self, 'Rental duration minutes [60]: ');
+        const durationMinutes = durationMinutesInput === '' ? 60 : Number(durationMinutesInput);
+        if (!Number.isFinite(durationMinutes) || durationMinutes <= 0) {
+          await self.tell('Invalid rental duration.');
+          return;
+        }
+        const durationMs = durationMinutes * 60000;
+
+        const vendor = await recycler.create({
+          parent: $.vendable,
+          properties: {
+            name,
+            description: description || '',
+            bank: bankRef,
+            bankAccount: payoutAccount,
+            defaultPrice,
+          },
+        }, self);
+        const lock = await recycler.create({
+          parent: $.rentableLock,
+          properties: {
+            name: name + ' lock',
+            bank: bankRef,
+            account: lockPayoutAccount,
+            price: rentalPrice,
+            duration: durationMs,
+          },
+        }, self);
+        // Attach lock
+        vendor.locks = [lock.id];
+        await self.tell('Created vendable #' + vendor.id + ' with rentable lock #' + lock.id + '.');
+        return;
+      }
+
+      if (choice === 2) {
+        // Locker with base lock
+        const locker = await recycler.create({ parent: $.locker, properties: { name, description: description || '' } }, self);
+        const lock = await recycler.create({ parent: $.lock, properties: { name: name + ' lock' } }, self);
+        locker.locks = [lock.id];
+        await self.tell('Created locker #' + locker.id + ' with lock #' + lock.id + '.');
+        return;
+      }
+
+      if (choice === 3) {
+        const terminal = await recycler.create({ parent: $.bankTerminal, properties: { name, description: description || '' } }, self);
+        await self.tell('Created bank terminal #' + terminal.id + '.');
+        return;
+      }
+
+      if (choice === 4) {
+        const number = await $.prompt.question(self, 'Phone number: ');
+        if (!number) { await self.tell('Cancelled.'); return; }
+        const phoneDb = $.phoneDb ? $.phoneDb : null;
+        const phone = await recycler.create({ parent: $.phone, properties: { name, description: description || '', number, phoneDb: phoneDb ? phoneDb.id : null } }, self);
+        if (phoneDb && phoneDb.register) await phoneDb.register(number, phone);
+        await self.tell('Created phone #' + phone.id + ' number ' + number + '.');
+        return;
+      }
+
+      if (choice === 5) {
+        const number = await $.prompt.question(self, 'Phone number: ');
+        if (!number) { await self.tell('Cancelled.'); return; }
+        const phoneDb = $.phoneDb ? $.phoneDb : null;
+        const phone = await recycler.create({ parent: $.wirelessPhone, properties: { name, description: description || '', number, phoneDb: phoneDb ? phoneDb.id : null } }, self);
+        if (phoneDb && phoneDb.register) await phoneDb.register(number, phone);
+        await self.tell('Created wireless phone #' + phone.id + ' number ' + number + '.');
+        return;
+      }
+
+      if (choice === 6) {
+        const number = await $.prompt.question(self, 'Phone number: ');
+        if (!number) { await self.tell('Cancelled.'); return; }
+        const bankDefault = $.bank ? $.bank.id : null;
+        const bankRefInput = await $.prompt.question(self, 'Bank object id/alias' + (bankDefault ? ' [' + bankDefault + ']' : '') + ': ');
+        const bankRef = bankRefInput || bankDefault || null;
+        const payout = await $.prompt.question(self, 'Payphone payout account id: ');
+        if (!payout) { await self.tell('Cancelled.'); return; }
+        const callPriceInput = await $.prompt.question(self, 'Price per call [1]: ');
+        const callPrice = callPriceInput === '' ? 1 : Number(callPriceInput);
+        if (!Number.isFinite(callPrice) || callPrice < 0) { await self.tell('Invalid price.'); return; }
+        const phoneDb = $.phoneDb ? $.phoneDb : null;
+        const phone = await recycler.create({
+          parent: $.payphone,
+          properties: {
+            name,
+            description: description || '',
+            number,
+            phoneDb: phoneDb ? phoneDb.id : null,
+            bank: bankRef,
+            account: payout,
+            pricePerCall: callPrice,
+          },
+        }, self);
+        if (phoneDb && phoneDb.register) await phoneDb.register(number, phone);
+        await self.tell('Created payphone #' + phone.id + ' number ' + number + '.');
+        return;
+      }
+
+      if (choice === 7) {
+        const obj = await recycler.create({ parent: parentId, properties: { name, description: description || '' } }, self);
+        await self.tell('Created object #' + obj.id + '.');
+        return;
+      }
+    `);
+
 
     // @destroy - Destroy an object
     obj.setMethod('@destroy', `

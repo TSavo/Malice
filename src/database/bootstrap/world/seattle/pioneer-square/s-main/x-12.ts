@@ -2,11 +2,11 @@
 
 export const room = {
   name: 'S. Main St',
-  description: `A small plaza opens up on the south side of the street, a pocket park with benches and a fountain that no longer runs. The benches are arranged to face the fountain, as if waiting for a performance that was cancelled.
+  description: `A pocket plaza opens on the south side of Main Street, one of those urban oases that cities carve out when developers need to offset floor area or when donations need to be commemorated. This one is called Morrison Plaza, according to a plaque that nobody reads anymore. Concrete benches face a fountain in the center—three tiers of granite, water meant to cascade from top to bottom, creating the soothing sound of flow that drowns out traffic noise. The water stopped flowing when the pumps stopped working. The traffic noise stopped needing to be drowned.
 
-Pigeons congregate here, pecking at the concrete where people once ate lunch. The people are gone. The pigeons have adapted. They always do.
+Pigeons have claimed the plaza, dozens of them, pecking at cracks in the concrete where food once fell. They're feral now, or more feral than they were—aggressive, territorial, their instinct for human charity fading as the charity disappears. One of them roosts on the fountain's dry upper tier, watching the street with the beady calculation of a creature that has outlasted its benefactors.
 
-A law office occupies the building on the north side, its brass nameplate listing partners who practiced maritime law. Shipping disputes. Cargo claims. The ships don't come anymore. The disputes have been resolved by default.`,
+CARNEY BADLEY SPELLMAN reads the brass plaque beside a door on the north side—maritime lawyers, the specialty a holdover from when Seattle's port actually functioned. Their work involved ships and cargo and the endless disputes that arise when valuable things move across water. The ships are anchored or grounded or gone. The cargo sits in containers that no one is claiming. The disputes have resolved themselves through the universal arbitration of irrelevance.`,
   x: -12,
   y: 0,
   z: 0,

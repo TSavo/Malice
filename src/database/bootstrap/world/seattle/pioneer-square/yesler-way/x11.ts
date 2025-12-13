@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'Yesler Way',
-  description: `The Corp Construction zone ends here, its fences and barriers giving way to older buildings that somehow survived whatever the corporation was building inside. The contrast is stark. Old brick beside black fabric. History beside secrecy.
+  description: `The construction zone gives way to older buildings here, three and four-story structures that have weathered better than the newer construction. Early twentieth-century brick doesn't fail the way concrete does; the facades are stained and cracked but structurally sound after a century of use and half a century of neglect.
 
-A convenience store occupies the corner, its windows barred, its door reinforced with steel. Someone was serious about security. It did not help. The bars are bent, the door is open, and whatever was inside is gone now.
+A convenience store occupies the corner, its security bars bent inward where someone forced entry long ago. The door hangs open on one hinge. Whatever was inside worth taking was taken in the first years after the war. The shelves are bare now, the coolers dark and silent.
 
-A bus shelter stands at the curb, its advertisement still visible behind cracked plexiglass. A smiling family. A vacation destination. "Paradise awaits." The family is still smiling. Paradise is still waiting. Neither of them knows what happened.
-
-Fourth Avenue is ahead. The International District begins beyond it.`,
+Fourth Avenue and the International District are visible ahead. Signs in Chinese, Vietnamese, and Korean still hang from buildings, their characters faded but legible—languages that outlasted the city that surrounded them. The transition between neighborhoods happens gradually, Pioneer Square's brick bleeding into Chinatown's red lanterns and ornate facades.`,
   x: 11,
   y: 10,
   z: 0,

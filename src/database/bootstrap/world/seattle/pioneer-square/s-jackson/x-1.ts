@@ -2,11 +2,11 @@
 
 export const room = {
   name: 'S. Jackson St',
-  description: `Union Station is visible to the south, its grand Beaux-Arts facade a reminder of when trains were romantic and travel was an event. The station was converted to offices before everything was converted to emptiness. The facade remains, promising arrivals that will never happen.
+  description: `Union Station is visible to the south, its Beaux-Arts facade weathered but intact, the grandeur that early twentieth-century rail terminals demanded surviving what came after. The station opened in 1911, designed by Reed & Stem—the same architects who created New York's Grand Central Terminal. Grand Central is probably rubble now. Union Station still stands, its ornate windows dark, its grand hall empty.
 
-A homeless services office occupies the ground floor of one building, its intake window dark, its waiting room empty. The people who needed services still need them. The services are no longer available.
+The ground floor of the adjacent building housed DESC—the Downtown Emergency Service Center—one of the social service organizations that clustered in this transitional zone. The organization provided housing and services to people experiencing homelessness. The intake windows are shuttered now, the waiting rooms empty. Everyone experienced homelessness when the war came. The services ended. The need became universal and unmet.
 
-A mural on the wall depicts Seattle's railroad history. Workers and locomotives and the promise of connection. The connections have been severed. The mural continues its celebration.`,
+A mural spans the wall opposite, a public art commission depicting Seattle's railroad heritage. Workers driving spikes, locomotives pulling into stations—the iconography of the railroad era when Seattle was the terminus of the Great Northern Railway. The paint has faded and peeled, the railroad heritage becoming as distant as the rails themselves, rusting to nothing on rights-of-way no train will ever use again.`,
   x: -1,
   y: -5,
   z: 0,

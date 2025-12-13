@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'S. Washington St',
-  description: `The last block before 4th Avenue. The buildings here are a mix of old and new, brick beside glass beside concrete. The architects called it eclectic. The residents called it a mess. Now it is all the same. Ruins do not have styles.
+  description: `The architecture along this block reflects decades of development without coordination—a Victorian brick building beside a 1960s concrete box beside a glass-fronted structure from the 2000s. The result is the visual cacophony that characterizes urban edges, where neighborhoods overlap and no single aesthetic dominates. Each building follows its own logic, unified only by the street grid that contains them.
 
-A dim sum restaurant occupies the corner, its rolling carts still visible through the window, its bamboo steamers stacked on shelves. The carts are empty. The steamers are dry. The recipes are lost.
+JADE GARDEN occupies the corner building, a dim sum restaurant that served the weekend crowds who lined up for carts of steamed dumplings and rice noodle rolls. The interior is visible through plate glass: round tables with lazy susans, the kitchen window where bamboo steamers once emerged in clouds of vapor, the red and gold color scheme that Cantonese restaurants favor. The space was designed for noise and bustle, for the controlled chaos of dim sum service.
 
-Red lanterns hang from a wire strung across the street, their silk faded and torn. They were put up for a festival that never ended properly. They swing in the wind now, tattered and forgotten, celebrating nothing.
-
-Fourth Avenue is just ahead. The International District begins beyond it.`,
+Decorative wire spans the street overhead, the infrastructure for festival lighting that the International District Business Improvement Area maintained. The wire connects to buildings on both sides, creating a grid that supported paper lanterns during Lunar New Year and Moon Festival celebrations. The wire remains, though the lanterns are gone, a permanent framework awaiting decorations that may not come.`,
   x: 13,
   y: 5,
   z: 0,

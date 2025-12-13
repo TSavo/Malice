@@ -2,11 +2,11 @@
 
 export const room = {
   name: '1st Ave S',
-  description: `A small plaza opens up on the west side of the street, one of the pocket parks that dot Pioneer Square. The plaza has benches and trees and a fountain that no longer runs. The water in the fountain has evaporated, leaving a basin of coins and leaves and optimism.
+  description: `A triangular plaza wedges into the western block here, one of those pocket parks that city planners squeeze into leftover spaces. Honey locusts grow from iron grates, their branches untrimmed and tangling overhead. The benches—wrought iron, bolted to concrete—face a fountain that's become a dry basin of dead leaves and tarnished coins. Pennies mostly. A few quarters that catch what light there is.
 
-The benches face the fountain as if expecting a performance. The performance has been cancelled. The benches continue their vigil.
+The fountain's centerpiece is a bronze salmon leaping upstream, green with verdigris, frozen at the apex of a jump it will never complete. Water once sheeted down its flanks into the pool below. Now it just hangs there, mid-leap, waiting for a river that's been turned off.
 
-A bronze plaque mounted on a pedestal explains the history of the plaza. The history has ended. The explanation continues.`,
+A bronze plaque bolted to a granite pedestal explains that this plaza commemorates the Duwamish people who lived here first. It lists dates and names and treaties. The explanation is thorough and inadequate. It's been here for thirty years. It will be here for thirty more. Nobody's reading it.`,
   x: -9,
   y: -3,
   z: 0,

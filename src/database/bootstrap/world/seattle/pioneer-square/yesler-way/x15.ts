@@ -3,15 +3,13 @@
 
 export const room = {
   name: '4th Ave S & Yesler Way',
-  description: `This is the edge of Pioneer Square, the boundary where one neighborhood ends and another begins. Fourth Avenue runs north and south, a river of cracked asphalt separating the historic district from the International District.
+  description: `Fourth Avenue marks Pioneer Square's eastern boundary, where the historic district meets what was once Chinatown-International District. The transition is visible in the architecture—brick facades giving way to signs in Chinese characters, Victorian ornamentation to hanging red lanterns that have faded to pink and rotted to ribbons over fifty-five years.
 
-The difference is immediate. Signs in Chinese characters hang across the avenue, faded but still visible. Red lanterns are strung between buildings, their silk rotted to ribbons. The ornate Chinatown gate is visible a few blocks south, its paint peeling, its dragons watching the empty street with faded eyes.
+A gas station occupies the corner, its canopy stained and sagging, its pumps rusted solid. The station served this intersection for decades before the war and has stood empty since. A sign still lists prices for gas that will never be pumped. The convenience store behind security bars is dark and stripped.
 
-A gas station occupies this corner. It has been here for decades, somehow surviving while everything around it changed. The pumps are old, the canopy stained, the convenience store dark behind security bars. A sign lists prices for gas that will never be pumped. The lottery machine inside still shows the jackpot from the last drawing. Nobody won.
+The ornate Chinatown gate is visible to the south, its dragons watching the empty street with painted eyes that have faded to suggestion. The gate represented community investment, the visible declaration that this place belonged to the people who built it. The people are scattered now. The gate remains, marking a boundary between one kind of emptiness and another.
 
-Pioneer Square ends here. The International District begins. The boundary was always arbitrary, lines on a map drawn by people who are gone now. The neighborhoods have merged in their emptiness. One ruin is much like another.
-
-The ornate Chinatown gate that once spanned the street lies across the intersection now, its dragons broken, its red paint scorched black. The posts that held it snapped during the Event. No one has moved it. It weighs tons. It will be here forever, blocking the way north, a monument to something that used to matter.`,
+Yesler Way continues east, named for the mill owner whose skid road became Seattle's first street. The timber is gone. The mills are gone. The street remains.`,
   x: 15,
   y: 10,
   z: 0,

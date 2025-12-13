@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'S. Washington St',
-  description: `The park extends to the north here, but the street runs along its southern edge, lined with buildings that once held art galleries and boutiques and the kind of shops that sold handmade things for handsome prices.
+  description: `S. Washington runs along the southern edge of Occidental Park here, the cobblestones giving way to asphalt where pedestrian mall meets vehicular street. The transition is marked by bollards—cast iron posts meant to prevent cars from entering the park proper. They still do their job, standing sentinel over traffic that no longer comes.
 
-A pottery studio occupies one storefront, its windows displaying vases and bowls and decorative pieces that no one will ever buy. The kiln inside is cold. The wheel is still. The clay has dried to dust.
+POUR DECISIONS occupies a corner space, its name spelled out in neon tubing that curves and loops in a font meant to suggest sophistication. The wine bar catered to the after-work crowd, the creative professionals who filled Pioneer Square's offices and needed somewhere to decompress before commuting home. The interior is visible through floor-to-ceiling windows: a long bar of reclaimed wood, industrial pendant lights, the carefully curated atmosphere of urban refinement.
 
-Across the street, a wine bar with a clever name spelled out in neon. The neon is dark, but the name is still visible. "POUR DECISIONS." The decisions have been made. The pouring has stopped.
-
-The Pioneer Building is visible ahead, red brick against the grey sky.`,
+The building opposite held a pottery studio, FIREHOUSE CLAY, its name a reference to the Great Fire that shaped Pioneer Square's architecture. Through the window: a row of potter's wheels, shelving units displaying student work in various stages of completion, the communal tables where people came to learn an ancient craft in a modern city.`,
   x: -2,
   y: 5,
   z: 0,

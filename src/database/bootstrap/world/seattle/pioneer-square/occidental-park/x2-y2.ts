@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'Occidental Park',
-  description: `Occidental Park spreads out here, its brick plaza eastern edge. The park was created in the 1970s by closing Occidental Avenue to traffic, converting asphalt to pedestrian space. The brick paving in herringbone pattern stretches in all directions, weathered but intact.
+  description: `A solitary bench faces west here, oriented toward the park's center, its back to the buildings along 2nd Avenue. The positioning is protective—you can sit here with solid wall behind you, watching the open plaza without being watched from behind. A defensive posture. Someone understood that parks could feel threatening as well as welcoming.
 
-A bench faces west toward the park's center, its back to the buildings beyond the park's edge. The detail speaks to a time when the park was maintained, when someone cared about these spaces and the people who used them.
+The bench's wooden slats are weathered silver-grey, smooth from years of use before the use stopped. Someone carved something into one slat—not initials, but what looks like a chess notation. E4, the King's Pawn opening. A game that was never finished, recorded in wood.
 
-Dead trees punctuate the plaza at intervals, their bare branches creating stark silhouettes. They were planted with intention, part of an urban design that valued green space and shade. The trees are dead now but still standing, monuments to earlier optimism.
-
-The brick plaza continues in all accessible directions, open to sky and weather.`,
+From this bench, you can see most of the park's eastern half—the dead trees, the sculptures, the pergola to the northwest. It's a good vantage point. You can see anyone approaching long before they reach you. In a dead city, that matters. It matters more than whoever carved it knew.`,
   x: 2,
   y: 2,
   z: 0,

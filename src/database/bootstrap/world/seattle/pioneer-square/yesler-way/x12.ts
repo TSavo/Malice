@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'Yesler Way',
-  description: `The transition is visible here. Pioneer Square's brick and history giving way to the International District's signs in Chinese and Vietnamese and Korean. The signs are still there, faded but legible, marking restaurants and markets and services in languages that have outlasted this city before.
+  description: `The neighborhood transition becomes visible here. Signs in Chinese, Vietnamese, and Korean still mark businesses along this stretch, their characters faded but still legible, still proclaiming restaurants and markets and services in languages that have outlasted cities before and will outlast them again.
 
-A social services building on the north side. The windows are dark, the doors locked or jammed. A line used to form here every morning. Now there is just the sign listing required documents and the faded tape marks on the sidewalk where people stood six feet apart. That was a different emergency. Simpler, in hindsight.
+A social services building occupies the north side, its reinforced doors sealed, its narrow windows dark. The building housed the programs that served this neighborhood's neediest residents—food stamps, housing assistance, the bureaucratic infrastructure that urban poverty requires. The services ended. The need persisted. The building remains, a monument to systems that failed.
 
-A poster on the construction fence advertises a community meeting about the development. The date was three months before everything ended. Someone wrote "THEY DIDN'T LISTEN" across it in red marker. They were talking about the development. They could have been talking about anything.
-
-The street continues. The signs change languages. The silence stays the same.`,
+The streetscape mixes eras and styles: early twentieth-century brick beside mid-century concrete, all of it empty now, all of it waiting. Development pressure was transforming this corridor before the war. The transformation stopped. The pressure released. What remains is neither old nor new, just abandoned.`,
   x: 12,
   y: 10,
   z: 0,

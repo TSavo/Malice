@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'Occidental Park',
-  description: `Occidental Park spreads out here, its brick plaza eastern section near S. Main. The park was created in the 1970s by closing Occidental Avenue to traffic, converting asphalt to pedestrian space. The brick paving in herringbone pattern stretches in all directions, weathered but intact.
+  description: `The park's eastern edge approaches here, the enclosed feeling of the plaza giving way to the more open streetscape of 2nd Avenue beyond. The transition is marked by a change in ground level—three shallow steps down to the sidewalk, the brick giving way to concrete.
 
-The park transitions here toward 2nd Avenue, the brick paving continuing but the space feeling less enclosed. The detail speaks to a time when the park was maintained, when someone cared about these spaces and the people who used them.
+A bicycle rack stands near the steps, the old-fashioned kind with loops of metal pipe. Three bicycles are still locked to it, their frames rusted, their tires flat and rotted, their locks seized solid. The owners never came back for them. The bicycles wait with the patience of objects, indifferent to the passage of time.
 
-Dead trees punctuate the plaza at intervals, their bare branches creating stark silhouettes. They were planted with intention, part of an urban design that valued green space and shade. The trees are dead now but still standing, monuments to earlier optimism.
-
-The brick plaza continues in all accessible directions, open to sky and weather.`,
+One bicycle was expensive once—you can tell by the frame geometry, the remnants of what was quality hardware. Someone's commuter bike, locked here on a day that turned out to be their last day at work. The lock is still engaged. The key is somewhere else, perhaps with bones, perhaps in a drawer in an empty apartment.`,
   x: 1,
   y: 0,
   z: 0,

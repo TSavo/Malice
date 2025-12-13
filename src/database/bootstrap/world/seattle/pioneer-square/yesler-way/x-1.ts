@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'Yesler Way',
-  description: `The park stretches away to the south, a wasteland of dead trees and shattered paths. The buildings along the north side look down at it with dark windows and blank facades. Whatever happened here, they are not saying either.
+  description: `Occidental Park stretches south from here, a wasteland of dead trees and cracked cobblestones. The maple trees that once shaded the plaza are skeletal now, bare branches reaching toward grey sky. The iron pergola lists slightly, one of its supports having given way to rust and gravity sometime in the last five decades.
 
-A food cart sits at the curb, overturned, its griddle rusted solid. The hand-painted menu board lies face up on the sidewalk, still advertising hot dogs and tamales and something called a "Seattle Dog" which apparently involved cream cheese. The locals were proud of that. Strange thing to be proud of.
+The PIONEER BUILDING anchors the corner ahead, six stories of red brick and terra cotta that somehow survived when so much else didn't. Elmer Fisher designed it after the Great Fire of 1889, and it outlasted another catastrophe. The Romanesque arches frame ground-floor retail spaces that have been dark for generations. A corner turret rises above the main facade, its decorative stonework stained with decades of rain and neglect.
 
-The cart's umbrella is gone. So is everything else worth taking. Just the shell remains, a monument to street food and better times.
-
-The park continues to the south. The street runs east and west, empty and quiet.`,
+The buildings along the north side of the street look down at the park with dark windows and blank facades. They've seen what happened here. They're not saying.`,
   x: -1,
   y: 10,
   z: 0,

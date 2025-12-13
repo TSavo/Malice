@@ -1,132 +1,148 @@
-// Smith Tower - Second Floor (z=2)
-// Corporate support: executive offices, accounting, records, IT, break area
+// Smith Tower - CorpSec Floor (z=2)
+// Prepared space for Continuum's security division - infrastructure ready, personnel needed
 
 export const building = {
   rooms: {
-    // Shared elevator car placeholder, reused from z1 via sharedPlaceholders
+    // Shared elevator car placeholder
     '%E': {
       prototype: 'elevator',
-      // no per-floor overrides here; z1 sets the elevator config
       exits: {
-        out: '%F', // back to floor-2 elevator lobby
+        out: '%P', // back to floor-3 elevator lobby
       },
     },
 
     // ═══════════════════════════════════════════════════════════════════
-    // TOP ROW (y=+9)
+    // TOP ROW (y=+9): Command, Operations, Records, Comms
     // ═══════════════════════════════════════════════════════════════════
 
-    '%A': {
-      // Corner Office North (-5, +9, 2)
-      name: 'Corner Office (North)',
-      description: `A corner office with north-facing windows looking over Washington Street. The glass is dirty but intact, muting the daylight to a diffuse grey. The desk is gone; indentations in the carpet show where it once stood. A credenza against the wall bears ring stains from long-evaporated coffee.`,
+    '%M': {
+      // Security Command (-5, +9, 3)
+      name: 'Smith Tower - 2nd Floor - Security Command',
+      description: `A room prepared for operations. Wall-mounted displays show feed slots labeled CAM-01 through CAM-24, all reading NO SIGNAL. A central console sits clean and powered, its screens cycling through standby diagnostics. New chairs still wrapped in plastic. A placard reads: CORPSEC COMMAND CENTER.`,
       x: -5,
       y: 9,
       z: 2,
       population: 0,
-      ambientNoise: 3,
-      lighting: 65,
+      ambientNoise: 7,
+      lighting: 70,
       waterLevel: 0,
       outdoor: false,
       exits: {
-        east: '%B',
+        east: '%N',
       },
+      sittables: [
+        {
+          name: 'a command console chair',
+          capacity: 3,
+          emptyMsg: 'Three operator chairs sit empty, still wrapped.',
+          occupiedMsg: '%s sitting at the command console',
+        },
+      ],
     },
 
-    '%B': {
-      // North Corridor Node (-4, +9, 2)
-      name: 'North Corridor',
-      description: `A short stretch of hallway with ceiling tiles ajar, showing conduit and sprinkler pipes. The carpet is commercial grade, worn thin. Dust has collected in the corners.`,
+    '%N': {
+      // Operations Room (-4, +9, 3)
+      name: 'Smith Tower - 2nd Floor - Operations Room',
+      description: `A briefing room with a long table and wall-mounted displays. The displays show: AWAITING PERSONNEL ASSIGNMENT. Stacked equipment boxes line one wall: tactical gear, comm units, body cameras. Everything new, everything waiting.`,
       x: -4,
       y: 9,
       z: 2,
       population: 0,
-      ambientNoise: 4,
-      lighting: 60,
+      ambientNoise: 5,
+      lighting: 70,
       waterLevel: 0,
       outdoor: false,
       exits: {
-        west: '%A',
-        east: '%C',
-        south: '%F',
+        west: '%M',
+        east: '%O',
+        south: '%P',
       },
+      sittables: [
+        {
+          name: 'a briefing table',
+          capacity: 8,
+          emptyMsg: 'Eight chairs around the briefing table, empty.',
+          occupiedMsg: '%s sitting at the briefing table',
+        },
+      ],
     },
 
-    '%C': {
-      // Conference B (-3, +9, 2)
-      name: 'Conference Room B',
-      description: `Glass walls on two sides give this room a view of the corridor and the street beyond. The table is gone; impressions in the carpet trace its outline. A wall-mount for a display hangs empty, cables snaked back into the wall.`,
+    '%O': {
+      // Records & Evidence (-3, +9, 3)
+      name: 'Smith Tower - 2nd Floor - Records & Evidence',
+      description: `Secure filing cabinets with digital locks, all sealed and empty. Evidence lockers with clear doors show pristine interiors. A terminal displays: EVIDENCE MANAGEMENT SYSTEM - NO CASES LOGGED. The room smells of new paint and fresh plastic.`,
       x: -3,
       y: 9,
       z: 2,
       population: 0,
       ambientNoise: 3,
-      lighting: 65,
+      lighting: 75,
       waterLevel: 0,
       outdoor: false,
       exits: {
-        west: '%B',
-        east: '%D',
-        south: '%G',
+        west: '%N',
+        east: '%Q',
+        south: '%S',
       },
     },
 
-    '%D': {
-      // Records Staging (-2, +9, 2)
-      name: 'Records Staging',
-      description: `Rolling carts and empty banker boxes are scattered across the floor. Labels read QUARTERLIES and AUDIT 3Y RETAIN, faded to grey. Metal shelving lines one wall, mostly bare, a few binders slumped and mildewed.`,
+    '%Q': {
+      // Server & Communications (-2, +9, 3)
+      name: 'Smith Tower - 2nd Floor - Server Room',
+      description: `Climate-controlled and humming with active cooling. Rack-mounted servers blink with activity, LEDs showing green across the board. Cable management is immaculate. The equipment is enterprise-grade, recently installed. A screen reads: CORPSEC NETWORK - 47 NODES AWAITING CONNECTION.`,
       x: -2,
       y: 9,
       z: 2,
       population: 0,
-      ambientNoise: 2,
-      lighting: 60,
+      ambientNoise: 11,
+      lighting: 65,
       waterLevel: 0,
       outdoor: false,
       exits: {
-        west: '%C',
-        south: '%H',
+        west: '%O',
+        south: '%T',
       },
     },
 
     // ═══════════════════════════════════════════════════════════════════
-    // MIDDLE ROW (y=+8)
+    // MIDDLE ROW (y=+8): Mechanical, Lobby, Armory, Comms Station
     // ═══════════════════════════════════════════════════════════════════
 
-    '%E1': {
-      // Break Room (-5, +8, 2)
-      name: 'Break Room',
-      description: `A small break room with a dead microwave, a coffee maker missing its carafe, and a refrigerator wedged open to prevent the smell from becoming worse. Cabinet doors hang slightly ajar. Someone scrawled DO NOT CLEAN on the whiteboard long ago.`,
+    '%R': {
+      // Mechanical & Power (-5, +8, 3)
+      name: 'Smith Tower - 2nd Floor - Mechanical Room',
+      description: `Breakers, backup generators, and power distribution. Everything is labeled with fresh tags. A maintenance log clipboard shows recent installation dates. The backup generator reads: TEST CYCLE PENDING - REQUIRES TECHNICIAN.`,
       x: -5,
       y: 8,
       z: 2,
       population: 0,
-      ambientNoise: 5,
-      lighting: 55,
+      ambientNoise: 13,
+      lighting: 70,
       waterLevel: 0,
       outdoor: false,
       exits: {
-        east: '%F',
-        south: '%I',
+        east: '%P',
+        south: '%U',
       },
     },
 
-    '%F': {
-      // Elevator Lobby (-4, +8, 2)
-      name: 'Elevator Lobby',
-      description: `A compact elevator lobby with tarnished brass call buttons and a narrow landing. The carpet is threadbare near the doors. A wall panel lists tenants no longer here. The machinery hum is louder here, just behind the walls.`,
+    '%P': {
+      // Elevator Lobby (-4, +8, 3)
+      name: 'Smith Tower - 2nd Floor - Elevator Lobby',
+      description: `A clean landing with new floor tiles. The wall displays a directory: FLOOR 3 - CORPSEC DIVISION. Below it, a digital notice board reads: RECRUITMENT ACTIVE - REPORT TO JOB CENTER FL.2. The air smells faintly of fresh paint.`,
       x: -4,
       y: 8,
       z: 2,
       population: 0,
       ambientNoise: 10,
-      lighting: 70,
+      lighting: 75,
       waterLevel: 0,
       outdoor: false,
       exits: {
-        west: '%E1',
-        east: '%G',
-        south: '%J',
+        west: '%R',
+        east: '%S',
+        south: '%V',
+        north: '%N',
         in: '%E',
       },
       methods: {
@@ -143,7 +159,7 @@ export const building = {
         `,
         callElevator: `
           const player = args[0];
-          const floorNumber = 2;
+          const floorNumber = 3;
           const elevatorId = self.elevatorId || null;
 
           if (!elevatorId) {
@@ -173,119 +189,116 @@ export const building = {
       elevatorId: '%E',
     },
 
-    '%G': {
-      // Accounting Pit (-3, +8, 2)
-      name: 'Accounting Pit',
-      description: `Rows of low cubicles fill the space, their fabric walls stained and sagging. Desktop mounts are empty, power strips dangle. The air smells faintly of stale coffee and dust.`,
+    '%S': {
+      // Armory (-3, +8, 3)
+      name: 'Smith Tower - 2nd Floor - Armory',
+      description: `A secured room with heavy doors and biometric locks. Through the reinforced window: weapon racks holding stun batons, shock gloves, riot shields. Ammunition lockers sealed with warning labels. A terminal reads: ARMORY SYSTEM ACTIVE - NO AUTHORIZED PERSONNEL. Everything is stocked, nothing is issued.`,
       x: -3,
       y: 8,
       z: 2,
       population: 0,
-      ambientNoise: 6,
+      ambientNoise: 4,
       lighting: 70,
       waterLevel: 0,
       outdoor: false,
       exits: {
-        west: '%F',
-        east: '%H',
-        south: '%K',
-        north: '%C',
+        west: '%P',
+        east: '%T',
+        north: '%O',
       },
     },
 
-    '%H': {
-      // Records Archive (-2, +8, 2)
-      name: 'Records Archive',
-      description: `Compactor shelves line the walls, some still jammed in half-closed positions. A few drawers remain locked; others hang open, their folders curled and dusty. The air is dry, with a faint ozone tang from old dehumidifiers.`,
+    '%T': {
+      // Communications Station (-2, +8, 3)
+      name: 'Smith Tower - 2nd Floor - Communications Station',
+      description: `Radio consoles and dispatch terminals arranged in a semicircle. Headsets hang on hooks, cables neatly coiled. A large display shows: DISPATCH SYSTEM IDLE - AWAITING OPERATOR LOGIN. The equipment hums with standby power.`,
       x: -2,
       y: 8,
       z: 2,
       population: 0,
-      ambientNoise: 4,
-      lighting: 65,
+      ambientNoise: 8,
+      lighting: 70,
       waterLevel: 0,
       outdoor: false,
       exits: {
-        west: '%G',
-        north: '%D',
-        south: '%L',
+        west: '%S',
+        north: '%Q',
+        south: '%W',
       },
+      sittables: [
+        {
+          name: 'a dispatch console',
+          capacity: 2,
+          emptyMsg: 'Two dispatch stations sit unmanned.',
+          occupiedMsg: '%s sitting at a dispatch console',
+        },
+      ],
     },
 
     // ═══════════════════════════════════════════════════════════════════
-    // BOTTOM ROW (y=+7)
+    // BOTTOM ROW (y=+7): Locker Room, Stairwell, Equipment
     // ═══════════════════════════════════════════════════════════════════
 
-    '%I': {
-      // Copy/Print & Supplies (-5, +7, 2)
-      name: 'Copy Room',
-      description: `Two dead copiers dominate the room, their access panels open and toner streaked across the floor. Shelves of paper reams are mostly empty; a few packs remain, edges rippled from humidity.`,
+    '%U': {
+      // Locker Room (-5, +7, 3)
+      name: 'Smith Tower - 2nd Floor - Locker Room',
+      description: `Rows of metal lockers, all empty and unlocked. Benches bolted to the floor. Shower stalls in the back, clean and unused. A sign reads: PERSONNEL LOCKERS - ASSIGNMENT PENDING.`,
       x: -5,
       y: 7,
       z: 2,
       population: 0,
-      ambientNoise: 3,
-      lighting: 60,
+      ambientNoise: 2,
+      lighting: 70,
       waterLevel: 0,
       outdoor: false,
       exits: {
-        north: '%E1',
-        east: '%J',
+        north: '%R',
+        east: '%V',
       },
+      sittables: [
+        {
+          name: 'a locker room bench',
+          capacity: 6,
+          emptyMsg: 'Empty benches wait for personnel.',
+          occupiedMsg: '%s sitting on a bench',
+        },
+      ],
     },
 
-    '%J': {
-      // IT Closet (-4, +7, 2)
-      name: 'IT Closet',
-      description: `A narrow room of metal racks, most of them stripped for parts. One UPS still hums faintly, its single LED winking amber. Patch panels are labeled but half the punchdowns are gone.`,
+    '%V': {
+      // Stairwell Access (-4, +7, 3)
+      name: 'Smith Tower - 2nd Floor - Stairwell Access',
+      description: `A emergency exit with new safety lighting. The concrete stairs are clean, recently swept. A sign reads: EMERGENCY EGRESS - FLOOR 3 CORPSEC.`,
       x: -4,
       y: 7,
       z: 2,
       population: 0,
-      ambientNoise: 8,
-      lighting: 55,
-      waterLevel: 0,
-      outdoor: false,
-      exits: {
-        north: '%F',
-        east: '%K',
-      },
-    },
-
-    '%K': {
-      // Shared Offices (-3, +7, 2)
-      name: 'Shared Offices',
-      description: `A pair of small offices carved out of a larger open space. Glass sidelights on the doors are cracked. The carpet is cleaner here, as if someone tried to keep this area presentable longer.`,
-      x: -3,
-      y: 7,
-      z: 2,
-      population: 0,
-      ambientNoise: 4,
-      lighting: 65,
-      waterLevel: 0,
-      outdoor: false,
-      exits: {
-        north: '%G',
-        west: '%J',
-        east: '%L',
-      },
-    },
-
-    '%L': {
-      // Corner Office South (-2, +7, 2)
-      name: 'Corner Office (South)',
-      description: `Windows along two walls face south and east. The view takes in Washington Street and the debris toward Yesler. A floor lamp lies on its side; its shade is dented.`,
-      x: -2,
-      y: 7,
-      z: 2,
-      population: 0,
       ambientNoise: 3,
       lighting: 65,
       waterLevel: 0,
       outdoor: false,
       exits: {
-        north: '%H',
-        west: '%K',
+        north: '%P',
+        east: '%W',
+        down: '%5', // connects to floor 1
+      },
+    },
+
+    '%W': {
+      // Equipment Storage (-3, +7, 3)
+      name: 'Smith Tower - 2nd Floor - Equipment Storage',
+      description: `Shelving stocked with sealed boxes: radios, flashlights, restraints, med kits, batteries. Everything is inventoried and labeled. A clipboard shows: EQUIPMENT INVENTORY - FULL STOCK - NO ASSIGNMENTS.`,
+      x: -3,
+      y: 7,
+      z: 2,
+      population: 0,
+      ambientNoise: 2,
+      lighting: 70,
+      waterLevel: 0,
+      outdoor: false,
+      exits: {
+        north: '%T',
+        west: '%V',
       },
     },
   },

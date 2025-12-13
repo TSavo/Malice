@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'Occidental Park',
-  description: `Occidental Park spreads out here, its brick plaza eastern-central area. The park was created in the 1970s by closing Occidental Avenue to traffic, converting asphalt to pedestrian space. The brick paving in herringbone pattern stretches in all directions, weathered but intact.
+  description: `The brick paving shows wear patterns here, the paths of ten thousand daily passages worn smooth while the surrounding brick retains its texture. You can read the ghost of old traffic in the surface—the diagonal shortcut office workers took, the arc around the performance stage, the straight line from the coffee shop on Main to the office tower on Washington. Desire lines, the urban planners called them. The desires are gone. The lines remain.
 
-The brick paving shows wear patterns here, paths where foot traffic was heaviest before it stopped. The detail speaks to a time when the park was maintained, when someone cared about these spaces and the people who used them.
+A commemorative brick is set into the plaza here, one of hundreds sold to raise funds in some long-forgotten campaign. "IN MEMORY OF DAVID CHEN, WHO LOVED THIS PLACE." The brass letters are oxidized green. David Chen is dead now, one way or another. His love for this place outlasted him, outlasted the place itself as a living thing.
 
-Dead trees punctuate the plaza at intervals, their bare branches creating stark silhouettes. They were planted with intention, part of an urban design that valued green space and shade. The trees are dead now but still standing, monuments to earlier optimism.
-
-The brick plaza continues in all accessible directions, open to sky and weather.`,
+The wind shifts, carrying the smell of salt from the bay mixed with the musty scent of decaying leaves. The plaza is exposed here, nothing to break the weather that sweeps in off Elliott Bay.`,
   x: 0,
   y: 1,
   z: 0,

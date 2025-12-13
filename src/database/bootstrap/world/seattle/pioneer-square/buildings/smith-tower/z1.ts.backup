@@ -1,0 +1,390 @@
+// Smith Tower - First Floor (z=1)
+// The Bank - Continuum's automated financial center
+
+export const building = {
+  rooms: {
+    '%E': {
+      // Elevator Car (shared across floors)
+      prototype: 'elevator',
+      name: 'Elevator Car',
+      description: `A modern elevator car with brushed steel panels and anti-slip flooring. The indicator displays crisp numbers as the car moves. The control panel glows with LED buttons, all functional. The doors close with hydraulic precision.
+
+The car is spotless, recently maintained. It smells faintly of cleaning solution and metal. The ride is smooth, quieter than expected.`,
+      x: -4,
+      y: 8,
+      z: 1,
+      exits: {
+        out: '%5', // Back to Elevator Bank
+      },
+      elevator: {
+        floors: [
+          1,
+          2,
+          3,
+          4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33,
+          38,
+        ],
+        currentFloor: 1,
+        doorsOpen: true,
+        floorRooms: {
+          1: '%5', // Floor 1 bank
+          2: '%F', // Floor 2 job center
+          3: '%P', // Floor 3 corpsec
+          4: '%EL_z4',
+          5: '%EL_z5',
+          6: '%EL_z6',
+          7: '%EL_z7',
+          8: '%EL_z8',
+          9: '%EL_z9',
+          10: '%EL_z10',
+          11: '%EL_z11',
+          12: '%EL_z12',
+          13: '%EL_z13',
+          14: '%EL_z14',
+          15: '%EL_z15',
+          16: '%EL_z16',
+          17: '%EL_z17',
+          18: '%EL_z18',
+          19: '%EL_z19',
+          20: '%EL_z20',
+          21: '%EL_z21',
+          22: '%EL_z22',
+          23: '%EL_z23',
+          24: '%EL_z24',
+          25: '%EL_z25',
+          26: '%EL_z26',
+          27: '%EL_z27',
+          28: '%EL_z28',
+          29: '%EL_z29',
+          30: '%EL_z30',
+          31: '%EL_z31',
+          32: '%EL_z32',
+          33: '%EL_z33',
+          38: "%ODL", // Floor 38 observation deck
+        },
+        locks: ['%L1', '%LR'],
+      },
+    },
+
+    '%L1': {
+      // Elevator biometric lock
+      prototype: 'biometricLock',
+      name: 'Elevator Retina Scanner',
+      description: 'A recessed retinal scanner with a steady red glow.',
+      scanners: [
+        { type: 'retinal', part: 'eye', message: 'Retinal scan failed.' },
+      ],
+      authorizedUsers: {
+        2: [],
+        3: [],
+      },
+    },
+
+    // ═══════════════════════════════════════════════════════════════════
+    // TOP ROW (y=+9): Reception, North Lobby, Account Services, Conference
+    // ═══════════════════════════════════════════════════════════════════
+
+    '%0': {
+      // Reception Desk (-5, +9, 1)
+      name: 'Reception Desk',
+      description: `A minimalist reception counter of white composite material. Behind it, a wall-mounted display cycles through Continuum branding: THE UNBROKEN CHAIN. The desk surface is bare, no papers, no person. A terminal sits powered but idle, screen displaying: AUTOMATED RECEPTION - TOUCH TO BEGIN.
+
+The floor is polished concrete. The walls are matte white. Overhead, recessed lighting casts even illumination. Everything is clean, functional, empty.`,
+      x: -5,
+      y: 9,
+      z: 1,
+      population: 0,
+      ambientNoise: 3,
+      lighting: 80,
+      waterLevel: 0,
+      outdoor: false,
+      exits: {
+        east: '%1',
+      },
+    },
+
+    '%1': {
+      // North Lobby (-4, +9, 1)
+      name: 'Main Lobby',
+      description: `A soaring lobby with high ceilings and white marble floors that echo every footstep. The marble is pristine, recently installed. Overhead, modern fixtures provide bright, even lighting. The far wall displays the Continuum logo in brushed steel: a chain link forming an infinity symbol.
+
+The space is almost entirely empty. No furniture, no plants, no decorations. Just clean lines and echoing silence. The HVAC hums steadily, moving fresh air through vents that were installed weeks ago, not decades.
+
+This is Continuum's flagship - ultra-modern, functional, depopulated. A showroom waiting for occupants who haven't arrived.`,
+      x: -4,
+      y: 9,
+      z: 1,
+      population: 0,
+      ambientNoise: 5,
+      lighting: 85,
+      waterLevel: 0,
+      outdoor: false,
+      exits: {
+        west: '%0',
+        east: '%2',
+        south: '%4',
+      },
+    },
+
+    '%2': {
+      // Account Services (-3, +9, 1)
+      name: 'Account Services',
+      description: `A sparse room with two automated banking terminals against the far wall. Each terminal displays: CONTINUUM BANKING - TOUCH TO ACCESS ACCOUNT. The screens glow pale blue in the otherwise empty space.
+
+No tellers, no counters, no waiting area. Just terminals and emptiness. The floor is sealed concrete, the walls bare white composite. The lighting is bright and clinical.`,
+      x: -3,
+      y: 9,
+      z: 1,
+      population: 0,
+      ambientNoise: 4,
+      lighting: 85,
+      waterLevel: 0,
+      outdoor: false,
+      exits: {
+        west: '%1',
+        east: '%3',
+        south: '%6',
+      },
+    },
+
+    '%3': {
+      // Conference Room (-2, +9, 1)
+      name: 'Conference Room',
+      description: `An empty conference room with glass walls on two sides. A single table stands in the center - white composite, no chairs. A wall-mounted display shows: ROOM AVAILABLE - NO RESERVATIONS.
+
+The windows are clean, offering a view of the grey city outside. The room echoes. Everything is new, nothing is used. The air smells faintly of fresh paint and plastic.`,
+      x: -2,
+      y: 9,
+      z: 1,
+      population: 0,
+      ambientNoise: 2,
+      lighting: 80,
+      waterLevel: 0,
+      outdoor: false,
+      exits: {
+        west: '%2',
+        south: '%7',
+      },
+    },
+
+    // ═══════════════════════════════════════════════════════════════════
+    // MIDDLE ROW (y=+8): Waiting Area, Elevator Bank, Transaction Center, Corridor
+    // ═══════════════════════════════════════════════════════════════════
+
+    '%4': {
+      // Waiting Area (-5, +8, 1)
+      name: 'Waiting Area',
+      description: `A designated waiting space with no seating. The floor is polished concrete. A wall display shows account services information and BUCKS exchange rates. The numbers update in real-time, managed by AI.
+
+The space is clean, bare, echoing. Modern but hollow. Functional but unwelcoming.`,
+      x: -5,
+      y: 8,
+      z: 1,
+      population: 0,
+      ambientNoise: 4,
+      lighting: 80,
+      waterLevel: 0,
+      outdoor: false,
+      exits: {
+        north: '%1',
+        east: '%5',
+        south: '%8',
+      },
+    },
+
+    '%5': {
+      // Elevator Bank (-4, +8, 1)
+      name: 'Elevator Bank',
+      description: `A sleek corridor with modern elevator doors in brushed steel. Digital displays above each door show floor numbers and directional arrows. The elevators are new, maintained, functional.
+
+The floor is polished marble. The walls are white composite with Continuum branding at intervals. The lighting is bright and even. Everything works. Nobody's here.`,
+      x: -4,
+      y: 8,
+      z: 1,
+      population: 0,
+      ambientNoise: 8,
+      lighting: 85,
+      waterLevel: 0,
+      outdoor: false,
+      exits: {
+        west: '%4',
+        east: '%6',
+        in: '%E',
+      },
+      methods: {
+        onContentArrived: `
+          const obj = args[0];
+          if (!obj?.registerVerb) return;
+          await obj.registerVerb(['call elevator', 'summon elevator', 'press elevator button'], self, 'callElevator');
+        `,
+        onContentLeaving: `
+          const obj = args[0];
+          if (obj?.unregisterVerbsFrom) {
+            await obj.unregisterVerbsFrom(self.id);
+          }
+        `,
+        callElevator: `
+          const player = args[0];
+          const floorNumber = 1;
+          const elevatorId = self.elevatorId || null;
+
+          if (!elevatorId) {
+            return 'The call button clicks uselessly. No power.';
+          }
+
+          const elevator = await $.load(elevatorId);
+          if (!elevator) {
+            return 'Nothing answers the button press.';
+          }
+
+          if (elevator.currentFloor === floorNumber) {
+            if (!elevator.doorsOpen && elevator.openDoors) {
+              await elevator.openDoors();
+            }
+            return 'The elevator is already here.';
+          }
+
+          if (elevator.selectFloor) {
+            const result = await elevator.selectFloor(player, floorNumber);
+            return result?.message || 'You press the button. Machinery stirs above.';
+          }
+
+          return 'The button light flickers, but nothing happens.';
+        `,
+      },
+      elevatorId: '%E',
+    },
+
+    '%6': {
+      // Transaction Center (-3, +8, 1)
+      name: 'Transaction Center',
+      description: `A room with four automated transaction terminals arranged in a row. Each displays: CONTINUUM BANKING - DEPOSITS - WITHDRAWALS - TRANSFERS. The terminals glow softly in the empty space.
+
+No counters, no staff, no furniture. Just terminals and the hum of automated systems. The floor is sealed concrete. The ceiling has recessed lighting, bright and clinical. The air is temperature-controlled but sterile.`,
+      x: -3,
+      y: 8,
+      z: 1,
+      population: 0,
+      ambientNoise: 6,
+      lighting: 85,
+      waterLevel: 0,
+      outdoor: false,
+      exits: {
+        north: '%2',
+        west: '%5',
+        east: '%7',
+        south: '%10',
+      },
+    },
+
+    '%7': {
+      // Administrative Corridor (-2, +8, 1)
+      name: 'Administrative Corridor',
+      description: `A clean corridor with matte white walls and sealed concrete floors. LED strips provide even lighting overhead. Doors lead to administrative spaces, each marked with minimalist signage.
+
+The hallway echoes. Every footstep sounds hollow in the empty space. The air circulation is precise, temperature-controlled. The building's systems hum faintly.`,
+      x: -2,
+      y: 8,
+      z: 1,
+      population: 0,
+      ambientNoise: 4,
+      lighting: 80,
+      waterLevel: 0,
+      outdoor: false,
+      exits: {
+        north: '%3',
+        west: '%6',
+        south: '%11',
+      },
+    },
+
+    // ═══════════════════════════════════════════════════════════════════
+    // BOTTOM ROW (y=+7): Vault, Vault Access, Security, Operations
+    // ═══════════════════════════════════════════════════════════════════
+
+    '%8': {
+      // Digital Vault (-5, +7, 1)
+      name: 'Digital Vault',
+      description: `A secure room with reinforced walls and a heavy automated door. Inside: server racks with blinking status LEDs. This is where The Bank's transaction records are stored, encrypted and redundant.
+
+No physical cash, no safety deposit boxes. Just data. The servers hum steadily. Cooling vents circulate cold air. A terminal displays: VAULT SYSTEMS OPERATIONAL - AUTOMATED BACKUP CYCLE ACTIVE.
+
+The lighting is harsh white. The floor is raised, hiding cable runs beneath. Everything is new, functional, unmanned.`,
+      x: -5,
+      y: 7,
+      z: 1,
+      population: 0,
+      ambientNoise: 12,
+      lighting: 90,
+      waterLevel: 0,
+      outdoor: false,
+      exits: {
+        north: '%4',
+        east: '%9',
+      },
+    },
+
+    '%9': {
+      // Vault Access (-4, +7, 1)
+      name: 'Vault Access',
+      description: `A secure checkpoint with biometric scanners flanking the vault entrance. A terminal displays: VAULT ACCESS - AUTHORIZATION REQUIRED. The scanners glow with standby lights, ready but idle.
+
+The room is sparse - just the scanners, the terminal, and empty space. The floor is polished concrete. Overhead cameras watch, recording to systems in the vault beyond. No guards, no staff. Just automated security.`,
+      x: -4,
+      y: 7,
+      z: 1,
+      population: 0,
+      ambientNoise: 8,
+      lighting: 85,
+      waterLevel: 0,
+      outdoor: false,
+      exits: {
+        west: '%8',
+        north: '%6',
+        east: '%10',
+      },
+    },
+
+    '%10': {
+      // Security Monitoring (-3, +7, 1)
+      name: 'Security Monitoring',
+      description: `A room with wall-mounted displays showing camera feeds from throughout the building. The monitors cycle through views automatically. A terminal reads: AUTOMATED SURVEILLANCE ACTIVE - NO OPERATOR REQUIRED.
+
+No security guards, no staff. Just screens and empty chairs that were never delivered. The AI watches everything, logs everything, responds to nothing. The room echoes with the hum of electronics.`,
+      x: -3,
+      y: 7,
+      z: 1,
+      population: 0,
+      ambientNoise: 10,
+      lighting: 75,
+      waterLevel: 0,
+      outdoor: false,
+      exits: {
+        west: '%9',
+        east: '%11',
+      },
+    },
+
+    '%11': {
+      // System Operations (-2, +7, 1)
+      name: 'System Operations',
+      description: `The nerve center of The Bank's automated systems. Wall-mounted displays show transaction flows, account activity, BUCKS issuance rates. Everything updates in real-time, managed by AI.
+
+A central terminal displays: CONTINUUM BANKING SYSTEMS - ALL NOMINAL - AUTOMATED OPERATION. No operators, no staff, no intervention needed. The systems run themselves.
+
+The room is clean, modern, hollow. The lighting is bright. The air is cool. The floor echoes.`,
+      x: -2,
+      y: 7,
+      z: 1,
+      population: 0,
+      ambientNoise: 9,
+      lighting: 85,
+      waterLevel: 0,
+      outdoor: false,
+      exits: {
+        north: '%7',
+        west: '%10',
+      },
+    },
+  },
+};

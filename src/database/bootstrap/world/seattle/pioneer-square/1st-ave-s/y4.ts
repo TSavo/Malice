@@ -2,11 +2,11 @@
 
 export const room = {
   name: '1st Ave S',
-  description: `S. Washington Street is just ahead, its intersection marking the northern edge of Pioneer Square's commercial core. The buildings beyond are more residential, apartments and lofts converted from warehouses.
+  description: `Washington Street opens a block ahead, marking where Pioneer Square's commercial core gives way to residential conversions—old warehouses carved into lofts for the kind of people who thought exposed brick was a lifestyle choice. The buildings get quieter north of here. Fewer storefronts. More windows with curtains drawn, or blinds snapped shut, or nothing at all behind the glass.
 
-A vintage clothing store occupies the corner, its window mannequins dressed in styles from decades that seem ancient now. The mannequins pose with eternal patience. The styles will never come back in fashion. Fashion has been discontinued.
+A vintage clothing store called REDUX occupies the corner, its window display frozen mid-arrangement. Two mannequins in '70s disco wear—sequins, platforms, a feather boa—posed as if caught mid-dance. A third mannequin has toppled backward and lies staring at the ceiling, its wig askew, its painted smile unchanged. Nobody righted it. Nobody was there to right it.
 
-A payphone stands at the corner, its receiver intact, its dial tone a mystery. The phones might still work. No one is calling to find out.`,
+A Pacific Bell payphone stands at the corner, one of the last of its kind, preserved here either for nostalgia or neglect. The receiver hangs from its armored cord. Whether there's a dial tone inside is anyone's guess. The coin slot shows a dark rectangle where quarters once fell. Everything costs money. Nothing costs money. It depends on how you look at it.`,
   x: -9,
   y: 4,
   z: 0,

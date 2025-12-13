@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'S. Washington St',
-  description: `Smith Tower casts its shadow here, the white terra cotta facade visible to the north. The tower has stood for over a century. It will probably stand for another. Some things refuse to die.
+  description: `Smith Tower casts its shadow here, the white terra cotta facade visible to the north, rising above the surrounding buildings like a monument to the ambitions of a previous century. The tower has stood since 1914. It will probably stand for another century. Some things refuse to die.
 
-A print shop occupies the ground floor, its presses silent, its paper stock yellowed and curling. Business cards and wedding invitations and menus for restaurants that no longer exist. The proprietor's name is on the door. "CHEN'S QUALITY PRINTING." Mr. Chen's quality is no longer available.
+CHEN'S QUALITY PRINTING occupies the ground floor of a narrow building, the name painted in gold leaf on the front window, the typeface chosen to suggest precision and permanence. Through the glass: printing presses in various sizes, paper stock on industrial shelving, the infrastructure of a trade that documented milestones—business cards for new ventures, wedding invitations for hopeful couples, menus for restaurants that needed menus. The machines are silent now. The paper is yellowing in its stacks.
 
-A sandwich board on the sidewalk advertises a lunch special from before. Soup and half sandwich, $12.95. The price seems reasonable. The lunch is no longer being served.
-
-The street continues east toward the park.`,
+The street continues east toward Occidental Park, the maple canopy visible in the distance. The buildings on this block are three and four stories, the standard Pioneer Square height, their facades weathered to similar shades of grey and brown. History has made them uniform. Time does that to neighborhoods.`,
   x: -8,
   y: 5,
   z: 0,

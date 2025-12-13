@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'Yesler Way',
-  description: `A hotel once operated here, four stories of rooms with views of the park. The neon sign still clings to the facade, its tubes dark and broken. "HOTEL" it says. Just that. No name, no pretense, no promise of anything except a room.
+  description: `A residential hotel occupies this corner, four stories of rooms that once provided affordable housing for urban workers. The building dates to the early twentieth century, solid brick construction that has endured when so much else hasn't. A neon sign on the facade still spells HOTEL, though the neon hasn't glowed in decades.
 
-The lobby is visible through the glass doors, marble floors and a reception desk and a rack of keys behind the counter. The keys are still there, hanging in neat rows, waiting for guests who will never check in. Room 214 looks popular. The key is missing.
+Through the cracked glass entry doors: a modest lobby with a reception desk, the layout that single-room-occupancy hotels maintain. The buildings provided housing for workers who needed central locations—maritime workers, railroad men, the transient labor force that port cities attracted. The workers are gone. The transience has become permanent. The rooms above are dark, their occupants long departed through doors they never meant to leave open.
 
-A newspaper vending machine stands on the sidewalk, its window cracked, its coin slot jammed. The headline visible inside is from before. It talks about elections. It talks about the economy. It talks about things that mattered once.
-
-Occidental Park is visible ahead, dead trees reaching over the rooftops.`,
+Occidental Park is visible ahead, dead maple trees rising above the surrounding rooflines like grave markers. The park's pergola creates a crooked silhouette against grey sky.`,
   x: -6,
   y: 10,
   z: 0,

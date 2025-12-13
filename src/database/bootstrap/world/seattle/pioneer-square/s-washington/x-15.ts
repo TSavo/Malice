@@ -2,13 +2,13 @@
 
 export const room = {
   name: 'S. Washington St',
-  description: `The street ends here at the waterfront, or what used to be the waterfront before they raised the city. The original Seattle is down there somewhere, beneath the streets, beneath the fill, beneath the layers of ambition and failure that this city was built on.
+  description: `S. Washington Street terminates here at the waterfront—or rather, at the edge of the raised city that Seattle built on top of its original waterfront after the Great Fire. The current street level is twelve feet higher than it was in 1889. The original Seattle is down there still, buried beneath fill and ambition, its storefronts sealed in darkness, its sidewalks preserved like insects in amber. The Underground tours used to bring tourists down to see it. The tourists stopped coming. The Underground waits beneath your feet, patient and dark.
 
-A retaining wall marks the edge of solid ground. Beyond it, the land drops away toward the piers and the grey water of Elliott Bay. The seawall is cracked in places, sections sagging where the fill has shifted. Engineers worried about this for years. They were right to worry. They just worried about the wrong things.
+A seawall retains the fill that retains the city, concrete and steel holding back the bay's patient pressure. The wall has developed cracks over the decades—engineers worried about liquefaction, about the big earthquake that would turn the fill to quicksand and send downtown sliding into Elliott Bay. They were right to worry. The big earthquake hasn't come yet. Something else came instead.
 
-The buildings of Pioneer Square rise behind, brick and stone and terra cotta, their windows dark, their doors sealed or broken. Smith Tower is visible a block away, still the tallest thing in the neighborhood, still standing when everything else has fallen.
+Alaskan Way runs along the waterfront below, empty now, the surface boulevard that replaced the viaduct carrying no traffic. The ferry terminal is visible to the northwest, its clock tower rising over water the color of old pewter. The ferries to Bainbridge and Bremerton have stopped running. The schedules posted in the terminal are historical documents now, timetables from an era when people moved between islands on a regular basis.
 
-The wind comes off the water, cold and salt-tinged. It smells like the sea. It smells like rot.`,
+Wind comes off the bay carrying the smell of salt and marine decay—seaweed rotting on the piers, whatever the fishing boats left behind when the fishing stopped. Elliott Bay is still beautiful in its grey way, still reflecting whatever light the sky offers. The beauty persists. The people who appreciated it have gone elsewhere.`,
   x: -15,
   y: 5,
   z: 0,

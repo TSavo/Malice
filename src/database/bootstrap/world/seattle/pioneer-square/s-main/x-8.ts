@@ -2,11 +2,11 @@
 
 export const room = {
   name: 'S. Main St',
-  description: `The heart of Pioneer Square begins here. The buildings are ornate, decorated with cornices and columns and details that cost money and meant something once. The Romanesque Revival style, the guidebooks called it. The guidebooks are out of print.
+  description: `This is where Pioneer Square stops apologizing for itself and starts announcing its intentions. The buildings here are the real thing—Romanesque Revival warehouses from the 1890s, designed by architects who had studied in Chicago and Paris and wanted Seattle to look like a city that mattered. The facades are heavy with ornament: arched windows bracketed by carved stone, cornices that project like shelves, columns of cast iron that carry loads they were engineered to carry. The style was called "commercial palace" at the time. The palaces have been abandoned.
 
-An antique shop occupies the ground floor, its window a museum of objects that outlived their owners. Pocket watches and porcelain dolls and furniture that survived the Great Fire. They will survive this too, probably.
+ANTIQUES AT PIKE PLACE reads the sign over a ground-floor shop, despite being nowhere near Pike Place—the name borrowed from a more famous market for the cachet. The window is a taxonomy of survival: clocks that stopped telling time decades ago, china that outlived the tables it was set on, furniture that moved from house to house as estates dissolved. These objects have seen more history than the people who owned them. They'll see more yet, probably. Objects are patient.
 
-A sandwich board stands on the sidewalk, its chalkboard listing daily specials that are no longer daily or special. The chalk has faded. The board remains, advertising nothing.`,
+A sandwich board lies face-down on the sidewalk, knocked over by wind or neglect or someone's hurried passage. The chalkboard face is pressed against concrete, whatever specials it advertised now speaking to an audience of asphalt. Someone will right it eventually. Or no one will. The specials have expired either way.`,
   x: -8,
   y: 0,
   z: 0,

@@ -2,11 +2,11 @@
 
 export const room = {
   name: '1st Ave S',
-  description: `The avenue runs north from S. King Street, leaving behind the stadium district and entering the older fabric of Pioneer Square. The buildings here predate the stadiums, brick structures that watched the neighborhood change around them.
+  description: `First Avenue narrows here between brick warehouses that predate the stadiums by half a century. Their loading docks gape at street level, roll-up doors frozen at various heights like mouths caught mid-sentence. A forklift rusts on one dock, its forks still raised, holding nothing.
 
-A loading dock occupies one building's ground floor, its roll-up door half-open, its interior dark. Trucks backed up here to deliver things. The deliveries have stopped. The dock waits, patient and empty.
+The eastern wall of one warehouse has become an archaeology of advertising: ghost signs for flour and coffee and shipping companies, layered over decades, the oldest ones bleeding through where rain has worn the paint. OLYMPIC FLOUR. CARNATION MILK. Names from a Seattle that existed before anyone alive was born.
 
-A fire escape zigzags down the building across the street, its iron steps rusted but solid. Someone has left a chair on one of the landings, a place to sit and watch a street that no longer needs watching.`,
+Across the street, a fire escape descends in sharp zigzags, each landing collecting its own ecosystem of dead leaves and bird droppings. A folding chair sits on the third landing, positioned to face the street. The seat has rusted through. Whoever sat there isn't sitting anymore.`,
   x: -9,
   y: -9,
   z: 0,

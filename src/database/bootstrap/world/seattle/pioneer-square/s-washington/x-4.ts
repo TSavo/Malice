@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'S. Washington St',
-  description: `A travel agency occupies the corner here, its windows plastered with posters of destinations that seem impossibly far away now. Beaches and mountains and cities with lights that still work. "ESCAPE TO PARADISE" one poster says. The escape route has been closed.
+  description: `ADVENTURE TRAVEL occupies the corner building, its windows plastered with posters of destinations that feel impossibly distant now. Beaches with turquoise water. Mountains covered in snow. Cities with skylines that still glow at night. "ESCAPE TO PARADISE" one poster promises in fonts designed to trigger wanderlust. The escape routes have been closed.
 
-Inside, the desks are arranged in neat rows, each one with a computer and a phone and a nameplate. The computers are dark. The phones are silent. The nameplates identify people who sold dreams for a living. The dreams are no longer for sale.
+Through the window: an open office layout, desks arranged in rows, each workstation equipped with the tools of the trade—computers and phones and the promotional brochures that made faraway places seem accessible. The screens are dark. The phones are silent. The brochures advertise tours that departed and returned, or departed and didn't. The travel industry assumed a world where people moved freely between places. That assumption has become historical.
 
-A globe sits on one desk, the kind that lights up when you plug it in. It is not plugged in. It shows a world that no longer exists, with borders that no longer matter.
-
-The park opens up to the east.`,
+Occidental Park opens to the east, the intersection ahead marking the transition from street to pedestrian mall. The maple canopy is visible, grown wild now, branches reaching toward each other across the walkway. The pergola's iron framework stands silhouetted against the grey sky, its purpose—to support wisteria that never quite thrived—still evident in its design.`,
   x: -4,
   y: 5,
   z: 0,

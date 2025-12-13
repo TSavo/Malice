@@ -2,11 +2,11 @@
 
 export const room = {
   name: 'Occidental Ave S',
-  description: `S. Jackson Street is just ahead, its intersection marking passage between the stadium district to the south and Pioneer Square's commercial core to the north. King Street Station is visible to the east, its clock tower keeping time for trains that don't run.
+  description: `S. Jackson Street opens just ahead, the cross-street that connects the waterfront to King Street Station and the International District beyond. From here you can see the station's clock tower rising to the east, its four faces still showing the same time they showed when the trains stopped running. The clock was modeled after St. Mark's Campanile in Venice. Seattle's founders had ambitions. They wanted their train station to reference Italian Renaissance architecture. They got what they wanted, and then some.
 
-A flower cart occupied this corner during daylight hours, selling bouquets and arrangements and the small beauties that made urban life bearable. The cart is gone. The flowers are gone. The beauty has relocated to wherever beauty goes.
+A bronze relief mounted on a nearby wall commemorates the Great Seattle Fire—1889, twenty-five blocks burned to the foundations, the whole commercial district reduced to ash and ambition. The relief shows flames and firefighters and a phoenix rising. They rebuilt the city six feet higher, on top of the rubble, and called it progress. The relief doesn't mention how many died. History tends to emphasize the rising.
 
-A fire station plaque on a nearby building commemorates the volunteers who fought the Great Fire. They lost. The city rebuilt. The plaque remains.`,
+An overflowing newspaper box lies tipped against a bench, its door hanging open, yellowed copies of the Seattle Times spilling across the cobblestones. The headlines are months old, maybe years—something about traffic, something about housing prices, the daily concerns of a city that thought its problems were traffic and housing prices. The paper has weathered into pulp, words bleeding into each other until the news becomes abstract, just grey shapes on grey paper, meaning nothing.`,
   x: -3,
   y: -6,
   z: 0,

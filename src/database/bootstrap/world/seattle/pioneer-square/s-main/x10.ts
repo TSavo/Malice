@@ -2,11 +2,11 @@
 
 export const room = {
   name: 'S. Main St',
-  description: `The courthouse looms to the north, its concrete walls absorbing light and returning nothing. Government buildings are designed to intimidate. This one still does, even with no government inside.
+  description: `The courthouse shadows this stretch of Main Street, its concrete mass blocking the morning sun, creating a permanent twilight that feels intentional. Brutalist architecture was designed to intimidate, to make individuals feel small against the weight of institutions. The architecture still works. The institutions don't, but the intimidation persists in stone and shadow.
 
-A bail bonds office occupies the building across the street, its neon sign advertising freedom for a price. BAIL BONDS 24 HOURS. The hours have been discontinued. Freedom is no longer for sale, or perhaps it's finally free.
+AAAA BAIL BONDS occupies a building across the street, the quadruple-A naming a transparent ploy to appear first in the phone book—back when phone books existed and people consulted them in moments of legal crisis. The neon sign in the window promises 24 HOUR SERVICE • FAST RELEASE • ALL JAILS, the vocabulary of desperate transactions conducted at three in the morning by people who needed to get their loved ones out. The sign is dark. The transactions have concluded. Freedom, whatever form it takes now, is no longer priced at 10% of bail with a non-refundable fee.
 
-A flagpole stands in front of the courthouse, its rope slapping against the metal pole in the wind. The flag is gone, taken or stolen or simply blown away. The pole remains, saluting nothing.`,
+A flagpole rises from the courthouse plaza, aluminum and hollow, its rope slapping against the pole in the wind that funnels down the street. The flag is gone—stolen by someone who wanted it, or torn away by weather, or simply released into whatever happened next. The clips at the rope's end dangle empty. The pole remains at attention, presenting arms to a nation that may or may not still exist in any recognizable form.`,
   x: 10,
   y: 0,
   z: 0,

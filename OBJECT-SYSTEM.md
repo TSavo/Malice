@@ -99,11 +99,10 @@ const cg = $.charGen;         // CharGen object (#4)
 const player = await $.load(42);
 
 // Create new objects
-const room = await $.create({
-  parent: 1,
-  properties: { name: 'Town Square' },
-  methods: { ... }
+const room = await $.recycler.create($.room, {
+  name: 'Town Square'
 });
+
 ```
 
 ### Dynamic Aliases

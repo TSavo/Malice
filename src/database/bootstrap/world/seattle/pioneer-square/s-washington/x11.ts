@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'S. Washington St',
-  description: `The transition between neighborhoods is visible here. The brick of Pioneer Square gives way to the signs and storefronts of the International District. The languages change. The silence stays the same.
+  description: `The streetscape begins its transition here, Pioneer Square's Victorian brick mixing with the more varied architecture that characterizes the International District. The shift is gradual—a building here with signage in Vietnamese, another there with Chinese characters alongside English translations. The neighborhoods bleed into each other along Washington Street, their boundaries administrative rather than physical.
 
-A Vietnamese restaurant occupies one building, its menu still posted in the window. Pho and banh mi and spring rolls. The kitchen is dark. The tables are empty. The food smells are gone, replaced by dust and decay.
+PHO CYCLO occupies a narrow storefront, its name painted on the window in both Vietnamese and English. The restaurant served the lunch crowds that once flowed between Pioneer Square's offices and the International District's density—bowls of soup, banh mi sandwiches, the fast and filling meals that working people needed. Through the window: formica tables arranged efficiently, a service counter with the covered containers that held condiments and garnishes.
 
-Across the street, a social services office with bulletins and flyers still pinned to a cork board outside. Housing assistance. Food stamps. Job training. The services have been discontinued.
-
-Fourth Avenue is close now.`,
+The building opposite houses the KING COUNTY SOCIAL SERVICES satellite office, its institutional signage mounted above plate glass windows covered with informational posters. The office connected residents to programs—housing assistance, food benefits, the bureaucratic infrastructure of the safety net. The waiting room inside is visible: plastic chairs arranged along the walls, a reception window with numbered service tickets.`,
   x: 11,
   y: 5,
   z: 0,

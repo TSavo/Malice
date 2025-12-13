@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'Occidental Park',
-  description: `Occidental Park spreads out here, its brick plaza central-southern section. The park was created in the 1970s by closing Occidental Avenue to traffic, converting asphalt to pedestrian space. The brick paving in herringbone pattern stretches in all directions, weathered but intact.
+  description: `A metal hatch is set into the brick paving here, flush with the surface, marked with the symbol ⊕—the old Underground Seattle access point. The hatch is locked, its padlock rusted solid, but the frame shows marks where someone tried to pry it open. The Underground tours ended decades ago, but whatever lies beneath—the buried streets, the sealed storefronts, the original Seattle entombed when the city raised itself after the Great Fire—remains.
 
-An underground access point is visible here—a metal hatch set flush with the brick paving, marked with the symbol ⊕. The detail speaks to a time when the park was maintained, when someone cared about these spaces and the people who used them.
+The hatch is cold to the touch. Air moves through gaps in the seal, carrying the smell of damp earth and old brick, the exhalation of a buried city. The Underground extends beneath most of Pioneer Square, a parallel world preserved in darkness. Whatever lived down there when people stopped tending it... that's a different question.
 
-Dead trees punctuate the plaza at intervals, their bare branches creating stark silhouettes. They were planted with intention, part of an urban design that valued green space and shade. The trees are dead now but still standing, monuments to earlier optimism.
-
-The brick plaza continues in all accessible directions, open to sky and weather.`,
+The brick plaza stretches away in all directions, sun-faded and cracked. But here at the hatch, you're standing on a threshold between worlds.`,
   x: -2,
   y: 0,
   z: 0,

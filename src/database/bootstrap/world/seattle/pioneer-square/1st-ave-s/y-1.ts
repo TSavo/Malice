@@ -2,11 +2,11 @@
 
 export const room = {
   name: '1st Ave S',
-  description: `S. Main Street is just ahead, marking the center of Pioneer Square's commercial district. The Merchant's Cafe is visible at the intersection, claiming to be Seattle's oldest restaurant. The claim is painted in gold leaf on the window. The restaurant is dark. The claim persists.
+  description: `Main Street opens ahead, and with it the heart of Pioneer Square's old commercial district. The Merchant's Cafe anchors the corner in weathered brick, its window still proclaiming SEATTLE'S OLDEST RESTAURANT in gold leaf that's flaking at the edges. EST. 1890. Through the glass: a mahogany bar, stools with torn leather seats, bottles arranged on shelves behind the bar in neat rows. The arrangement suggests someone left expecting to return.
 
-A horse-drawn carriage once offered tours from this corner, clip-clopping through the historic district while a guide recited facts about the Great Fire and the rebuilding. The horse is gone. The carriage is gone. The facts remain, unrecited.
+The carriage tours launched from this corner—tourists in horse-drawn buggies, clip-clopping past historic buildings while guides recited facts about the Great Fire. The carriage is gone, probably stabled somewhere that isn't here. The horse that pulled it is probably dead. A hitching post remains bolted to the curb, cast iron shaped into a horse's head, rings for reins on either side. Decorative for fifty years, functional for fifty before that. Now just a shape.
 
-A hitching post stands at the curb, ornamental now but functional once. The ornament persists.`,
+The curb cut here still shows yellow paint where carriages loaded passengers. The paint has faded to a color that doesn't have a name.`,
   x: -9,
   y: -1,
   z: 0,

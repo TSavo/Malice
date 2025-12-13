@@ -2,11 +2,11 @@
 
 export const room = {
   name: '1st Ave S',
-  description: `The avenue continues north from S. Washington toward Yesler Way and the wall of debris that blocks passage to Downtown. Smith Tower is visible ahead, its white terra cotta facade rising above the surrounding buildings.
+  description: `Smith Tower rises into view ahead, its white terra cotta spire catching what light filters through the overcast. From this angle you can see the Chinese Room's observation deck near the top, the brass railings green with decades of rain. The Naga heads carved into the building's facade stare down at the street with expressions that might be wisdom or might be hunger. Hard to tell with Nagas.
 
-A law office occupied the building here, its brass nameplate listing partners who practiced the kinds of law that required proximity to courthouses. The practice has been discontinued. The nameplate remains, promising services that can't be rendered.
+MORRISON & KLINE, ATTORNEYS AT LAW reads the brass nameplate beside a door with frosted glass. The kind of firm that handled shipping disputes, maritime law, the endless paperwork of goods moving through the port. Filing cabinets visible through the window hold decades of contracts and depositions and letters threatening legal action. The threats have all expired. The statutes of limitations have run out on everything.
 
-A fire hydrant painted yellow stands at the curb, a remnant of the city's obsession with fire safety after 1889. The fires have been replaced by other concerns.`,
+Someone wedged a bicycle between the building and a dumpster, locked to a drainpipe with a cable lock. The bike has good components—Shimano derailleurs, Continental tires gone flat but not rotted. Whoever left it planned to come back. The plan didn't survive whatever happened next.`,
   x: -9,
   y: 6,
   z: 0,

@@ -11,7 +11,7 @@ Essential patterns for creating, destroying, and moving objects in Malice.
 ```javascript
 // WRONG - breaks pooling system
 const obj = await manager.create({ parent: 1 });  // NO!
-const obj = await $.create(...);  // NO!
+const obj = await $.recycler.create($.item);  // NO!
 
 // RIGHT - uses recycler
 const obj = await $.recycler.create($.item);  // Reuses recycled IDs
@@ -101,7 +101,7 @@ async createShop() {
   }
 
   // Create the shopkeeper
-  const keeper = await $.recycler.create($.npc, {
+  const keeper = await $.recycler.create($.agent, {
     name: 'Merchant',
     description: 'A friendly merchant with a ready smile.'
   });

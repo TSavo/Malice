@@ -2,11 +2,11 @@
 
 export const room = {
   name: '1st Ave S',
-  description: `The avenue continues north from S. Main, passing through the heart of Pioneer Square's gallery district. Art spaces and studios occupy the upper floors of buildings that were warehouses a century ago. The art remains. The artists are gone.
+  description: `Pioneer Square's gallery row begins here—or began here, or whatever tense applies to things that existed and then stopped. A dozen studios and exhibition spaces occupy the upper floors of these old warehouses, their windows tall enough to admit the grey Seattle light that painters supposedly loved. The galleries have names like AXIS and TWELVE and SPACE, words chosen to mean nothing and everything.
 
-A coffee shop served the gallery crowd, espresso and pastries and conversations about meaning. The conversations have ended. The espresso machine is cold. The meaning is debatable.
+Through the windows of TWELVE, you can see white walls hung with photographs: black and white portraits of people's hands, close-up studies of wrinkles and calluses. The gallery had a show about work. Manual labor. Blue collar hands. The irony probably wasn't intentional.
 
-A sandwich board on the sidewalk advertises an opening that opened and closed and will never open again. The chalk has faded. The advertisement persists.`,
+Below the galleries, a coffee shop called Zeitgeist pitched itself to the art crowd—exposed brick, mismatched furniture, a chalkboard menu with prices that assumed a certain kind of customer. The espresso machine is a chrome beast behind the counter, Italian, probably worth more than some of the art upstairs. The cups stacked beside it have gathered a film of grey dust.`,
   x: -9,
   y: 1,
   z: 0,

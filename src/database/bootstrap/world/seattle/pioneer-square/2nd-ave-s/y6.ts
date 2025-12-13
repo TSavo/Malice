@@ -2,11 +2,11 @@
 
 export const room = {
   name: '2nd Ave S',
-  description: `The avenue continues north from S. Washington toward the wall of debris at Yesler Way. The damage to buildings increases here, proximity to the collapse having taken its toll.
+  description: `The violence of the collapse becomes visible here in the architecture. Buildings show cracks that weren't there before—jagged lines running up facades, window frames torqued out of square, the slow-motion evidence of foundations that shifted when the shockwave passed through. Some structures have settled unevenly, their rooflines no longer parallel to the street. The neighborhood is leaning toward the disaster like a crowd drawn to an accident.
 
-A hotel stands on the corner, its windows shattered, its lobby visible through gaps in the facade. The hotel offered rooms to visitors who wanted to experience Pioneer Square. The experience has changed. The rooms are uninhabitable.
+THE PIONEER BUILDING rises on the corner, one of the grand dames of the post-fire reconstruction, six stories of Romanesque Revival brick that has seen two centuries of earthquakes and fires and economic collapses. This latest collapse has tested it. The corner turret has cracked, a fissure running from foundation to roofline like a scar. Glass has blown out of the upper windows. Through the gaps you can see the hotel rooms inside—beds still made, luggage still waiting, bathrobes hanging on bathroom doors like shed skins.
 
-A neon sign hangs at an angle from the hotel's facade, its tubes shattered, its message incomplete. HOTEL, it used to say. Now it says nothing.`,
+A neon sign hangs at forty-five degrees from the building's facade, still attached by one bracket, the other having torn free from brick that couldn't hold it. The sign reads HOTEL in art deco script, or would if the tubes weren't shattered. Now it's just metal and broken glass, a skeleton of the word it used to be, still trying to advertise something that isn't for sale anymore.`,
   x: 3,
   y: 6,
   z: 0,

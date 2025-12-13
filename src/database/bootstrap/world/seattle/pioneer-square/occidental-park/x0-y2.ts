@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'Occidental Park',
-  description: `Occidental Park spreads out here, its brick plaza eastern plaza. The park was created in the 1970s by closing Occidental Avenue to traffic, converting asphalt to pedestrian space. The brick paving in herringbone pattern stretches in all directions, weathered but intact.
+  description: `A pergola structure extends overhead here, its wooden beams weathered silver-grey but still intact. The lattice roof was designed to support climbing vines—wisteria, perhaps, or climbing roses—the plants that would have softened the geometry with organic curves. The vines are dead now, their dried stems still clinging to the lattice, creating a net of brown against the grey sky.
 
-A pergola extends overhead, its beams creating geometric shadows on the brick below. The detail speaks to a time when the park was maintained, when someone cared about these spaces and the people who used them.
+The pergola provides psychological shelter more than physical—the beams overhead create a sense of enclosure without blocking wind or rain. People gathered here for the intimacy the structure provided, the sense of being in a room within the larger plaza. The benches beneath the pergola are arranged for conversation, facing each other across a narrow space.
 
-Dead trees punctuate the plaza at intervals, their bare branches creating stark silhouettes. They were planted with intention, part of an urban design that valued green space and shade. The trees are dead now but still standing, monuments to earlier optimism.
-
-The brick plaza continues in all accessible directions, open to sky and weather.`,
+Light filters through the dead vines and lattice, creating complex shadows on the brick below. The shadows move with the sun, the only thing in the plaza that still keeps regular hours.`,
   x: 0,
   y: 2,
   z: 0,

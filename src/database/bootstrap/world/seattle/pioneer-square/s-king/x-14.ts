@@ -2,11 +2,11 @@
 
 export const room = {
   name: 'S. King St',
-  description: `The street rises from the waterfront through the remains of Seattle's industrial past. Warehouses and machine shops and businesses that required heavy equipment and strong backs. The equipment is still. The backs are gone.
+  description: `S. King Street rises eastward from the waterfront through what was once Seattle's maritime industrial district. The buildings are utilitarian—steel frames and corrugated siding rusted brown, the architecture of function rather than aesthetics. Machine shops and fabrication facilities clustered here to serve commercial shipping. The shipping stopped. The facilities stand empty.
 
-A marine repair facility occupies one building, its dry dock visible through open bay doors. A boat sits on blocks inside, its hull half-scraped, its repair interrupted by something more pressing than barnacles.
+PUGET SOUND MARINE SERVICES occupies a large facility on the south side, its roll-up doors rusted shut, its dry dock filled with stagnant water. The ceiling heights that once accommodated cranes and hoists now shelter nothing but darkness and the nests of whatever birds have claimed the rafters.
 
-The smell of diesel and salt water lingers, ghosts of an industry that kept the waterfront alive. The industry is dead. The smells persist, fading slowly.`,
+The street's grade increases as it climbs away from filled tideflats. The original shoreline was blocks to the east; everything between here and there is fill—sawdust and mill waste and construction debris that Seattle dumped to extend the usable land. The fill is settling now, without maintenance. The buildings tilt slightly, foundations shifting in unstable ground.`,
   x: -14,
   y: -10,
   z: 0,

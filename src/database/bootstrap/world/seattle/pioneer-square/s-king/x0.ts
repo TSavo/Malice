@@ -2,11 +2,11 @@
 
 export const room = {
   name: 'S. King St',
-  description: `The light rail station entrance descends into the earth nearby, the International District/Chinatown Station serving a transit system that no longer transits. The escalators are frozen. The platforms are empty. The trains sit in tunnels, waiting for passengers who will never arrive.
+  description: `The International District/Chinatown Station entrance descends here, the Sound Transit light rail stop that once connected this neighborhood to the regional transit network. The station entrance shows the standard design: a glass-and-steel canopy sheltering escalators that lead to darkness. The escalators are frozen. The platforms below haven't seen a train in fifty-five years.
 
-A street musician's spot is marked by a stain on the concrete, years of foot traffic wearing a different pattern where the audience gathered. The musician is gone. The audience is gone. The stain remains, abstract art created by appreciation.
+The streetscape shows the infrastructure of transit-oriented development that no longer orients toward transit: wide sidewalks accommodating no pedestrian flow, street furniture rusted and tilted. A utility cabinet on the corner has accumulated decades of stickers and graffiti, the surfaces serving as impromptu bulletin boards for announcements no one reads.
 
-A utility box on the corner has been covered in stickers and graffiti, layers of expression from people who needed to say something. The something has been said. No one is listening.`,
+The buildings flanking the station entrance represent different eras: early twentieth-century brick beside contemporary mixed-use construction. The ground-floor retail designed to capture transit traffic captures nothing. The traffic stopped. The retail closed. The buildings wait for customers who will never arrive.`,
   x: 0,
   y: -10,
   z: 0,

@@ -2,11 +2,11 @@
 
 export const room = {
   name: 'Occidental Ave S',
-  description: `The mall continues north from S. Jackson, the cobblestones widening into a proper pedestrian plaza. This was the heart of Pioneer Square's social life, where people gathered for First Thursday art walks and farmers markets and the casual collisions of urban existence.
+  description: `The cobblestones widen here into Occidental Park proper, the pedestrian plaza that anchored Pioneer Square's social calendar. First Thursday art walks started here—galleries opening their doors, wine in plastic cups, the carefully disheveled mingling with the genuinely broke. The plaza filled with people pretending to understand art and people pretending not to. Both groups are equally absent now.
 
-A bronze firefighter statue stands at the edge of the plaza, commemorating the department that rebuilt after 1889. The firefighter holds a hose, frozen in the act of fighting flames that went out long ago. The statue is green with verdigris, patient and permanent.
+A bronze firefighter stands at the plaza's edge, hose raised against flames that exist only in metal memory. The statue commemorates the Seattle Fire Department's response to 1889, though "response" is generous—they lost most of downtown before the flames burned themselves out. The firefighter's face has gone green with verdigris, his expression somewhere between determination and indigestion. Pigeons have claimed his helmet as a perch. They don't care about history.
 
-Cafe tables and chairs are scattered across the plaza, arranged by wind and time into patterns no designer intended.`,
+Cafe tables lie scattered across the bricks like debris from an explosion of leisure. Metal chairs, the kind that pinch your thighs if you sit wrong, have been blown into clusters by wind or dragged into configurations by people who aren't here anymore. One table still holds a ceramic cup, miracle of inertia, its contents long evaporated into a dark ring at the bottom. Someone ordered something once. Someone never finished it.`,
   x: -3,
   y: -4,
   z: 0,

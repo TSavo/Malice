@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'Occidental Park',
-  description: `Occidental Park spreads out here, its brick plaza northeast corner where park meets S. Washington. The park was created in the 1970s by closing Occidental Avenue to traffic, converting asphalt to pedestrian space. The brick paving in herringbone pattern stretches in all directions, weathered but intact.
+  description: `The northeastern corner of Occidental Park meets S. Washington Street at a low concrete barrier, the brick plaza ending where the sidewalk begins. This is one of the park's exits—or entrances, depending on your direction of travel. The barrier is low enough to step over, its surface worn smooth where countless feet swung across it.
 
-The park's brick paving meets S. Washington Street at a low barrier, easy to step over. The detail speaks to a time when the park was maintained, when someone cared about these spaces and the people who used them.
+A street lamp rises near the corner, its fixture dark, its pole leaning slightly from decades of wind pressure. The lamp is an old design, ornamental ironwork meant to evoke gas lamps, the kind of historical reference that Pioneer Square's preservation ordinances required. The ordinances meant nothing when the power failed. The historical reference is more complete now—genuinely dark, like gas lamps before the gas.
 
-Dead trees punctuate the plaza at intervals, their bare branches creating stark silhouettes. They were planted with intention, part of an urban design that valued green space and shade. The trees are dead now but still standing, monuments to earlier optimism.
-
-The brick plaza continues in all accessible directions, open to sky and weather.`,
+S. Washington Street opens to the east and west, connecting the park to the rest of Pioneer Square. The pergola with its totem pole is visible to the west. The intersection with 2nd Avenue is visible to the east. Both directions lead to emptiness.`,
   x: 2,
   y: 3,
   z: 0,

@@ -2,11 +2,11 @@
 
 export const room = {
   name: '1st Ave S',
-  description: `A parking garage entrance yawns open on the east side of the street, its darkness absolute, its depths unknowable. The garage served the stadium crowds and the office workers and anyone willing to pay the rates. The rates are posted. No one is paying.
+  description: `A parking garage swallows the eastern block whole, its entrance a concrete throat descending into absolute darkness. The booth where attendants once collected fees stands empty, its window spider-webbed with cracks. A rate sign lists prices in dollars that mean nothing now: $8 EVENT, $15 ALL DAY. Inside, somewhere in that darkness, cars still sit in numbered spaces. Their owners parked and walked away and never walked back.
 
-The buildings here are mixed use, retail on the ground floor and offices or apartments above. The retail is dark. The offices are empty. The apartments may or may not contain people. It's hard to tell from the street.
+The western side offers three stories of mixed-use optimism from the 1990s renovation boom: retail that became restaurants that became vacant storefronts, offices that became lofts that became silent boxes stacked toward the sky. The windows reflect nothing but grey.
 
-A newspaper box stands at the corner, its window displaying a headline from a day when headlines mattered.`,
+A Seattle Times box stands at the corner, its blue paint chalky and faded. Through the scratched window, a headline announces something about the Mariners. Opening Day, maybe. Or a playoff run. The date is illegible. The sports section has yellowed to the color of old teeth.`,
   x: -9,
   y: -8,
   z: 0,

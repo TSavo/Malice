@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'Yesler Way',
-  description: `A parking garage dominates the north side, five levels of concrete painted institutional beige. The entrance ramp descends into darkness. A sign lists hourly and daily rates that seem quaint now. Another sign warns that management is not responsible for theft or damage. Management is not responsible for anything anymore.
+  description: `A parking garage dominates the north side, five levels of concrete painted institutional beige that has faded to grey. The entrance ramp descends into darkness. Cars are still visible on the upper levels through the open sides, arranged in rows that haven't moved in decades. The garage provided automobile storage for urban workers who drove in each morning and home each evening. The routine ended. The cars remained.
 
-The construction fence finally ends on the south side. A small park fills the space, more concrete than green. The trees are dead, their branches like veins against the sky. A drinking fountain stands in the center, its basin filled with leaves and debris. Blue tarps and shopping carts cluster along the back edge, arranged with care, abandoned with haste.
+A small urban park occupies the south side, more hardscape than landscape. The trees are dead, their bare branches stark against grey sky. The concrete benches remain, the drinking fountain dry and cracked. The park was a minimal amenity when it was built. It's less than that now.
 
-The tarps are empty. The shopping carts are full of things that mattered to someone. Blankets. Cans. A stuffed animal, face down in the dirt.
-
-The city gave thirty days notice before the sweeps. The sweeps never came. Something else did instead.`,
+Fourth Avenue approaches, the boundary between Pioneer Square and the International District. The neighborhoods blur together in their emptiness—brick facades and Chinese characters and red lanterns all equally abandoned.`,
   x: 13,
   y: 10,
   z: 0,

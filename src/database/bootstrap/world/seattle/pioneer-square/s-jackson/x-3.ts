@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'Occidental Ave S & S. Jackson St',
-  description: `Occidental Avenue crosses S. Jackson Street at the southern edge of its pedestrian mall. The maple trees that line the mall are visible to the north, their branches forming a canopy over the cobblestones.
+  description: `Occidental Avenue intersects S. Jackson Street at the southern terminus of the pedestrian mall, cobblestones cracked and heaved ending where vehicular traffic once resumed. The maple trees that line Occidental's pedestrian stretch are visible to the north, overgrown and wild, their branches forming a canopy over emptiness.
 
-The King Street Station is visible to the south, its clock tower rising above the surrounding buildings. The clock still keeps time, wound by some mechanism that doesn't require people. The trains stopped running. The clock persists.
+King Street Station rises to the south, its clock tower—modeled on the campanile in Venice's Piazza San Marco—visible above surrounding buildings. The station served Amtrak and Sounder commuter rail, the transit hub where regional and national networks connected. The tower's four clock faces are stopped at different times, massive hands frozen when the power failed. No trains. No commuters. The Venetian campanile it emulated survived centuries. This one may outlast the memory of Venice itself.
 
-A flower shop occupied the corner here, its buckets empty, its coolers dark. The flowers that brightened this intersection are gone, their petals scattered, their colors faded to memory.
-
-The intersection is clear. Occidental runs north to the mall and south toward the stadiums. S. Jackson continues east and west.`,
+PIKE PLACE FLOWERS occupied the corner building, its refrigerated display cases dark and empty. The florist served foot traffic that no longer exists—commuters grabbing bouquets for home, weddings and funerals generating event trade. The flowers are long dead. The coolers that extended cut flower life hold nothing. The weddings ended. The funerals, eventually, ended too.`,
   x: -3,
   y: -5,
   z: 0,

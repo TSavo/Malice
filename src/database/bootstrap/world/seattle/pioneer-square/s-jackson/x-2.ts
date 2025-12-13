@@ -2,11 +2,11 @@
 
 export const room = {
   name: 'S. Jackson St',
-  description: `The street passes beneath the shadow of taller buildings here, office towers that catered to the government and legal workers from the courthouse district. The workers are gone. The towers remain, their windows dark, their lobbies empty.
+  description: `The streetscape shifts here as S. Jackson passes into the shadow of office towers that once served the nearby courthouse complex. The King County Courthouse and federal building are blocks away—the legal industry's support services clustered in this transitional zone. Bail bondsmen, copy shops, the cafes where attorneys met clients. No bail now. Nothing to copy. No clients to meet.
 
-A food cart pod occupied this corner once, a collection of trucks selling everything from tacos to Thai food. The trucks are gone, driven away or abandoned, their propane tanks empty, their griddles cold. Only the painted parking spaces remain, outlines of commerce.
+The buildings along this stretch are mid-rise, six to ten stories, their windows dark and many broken. A 1970s office tower dominates the north side, its concrete facade weathered, ribbon windows reflecting only grey sky. The ground floor held a deli that served the lunch rush—quick service, easy eating. The lunch rush ended. The deli is dark. Whatever was easy about eating here is fifty-five years past.
 
-A newspaper box displays a headline about something that happened before. The headline is faded. The something has been superseded by everything.`,
+A vacant lot opens on the south side, the painted rectangles of a former food cart pod still visible through the weeds that colonize the asphalt. Seattle's food truck scene claimed unused lots throughout downtown. The painted lines remain—numbered spots, loading zones, the infrastructure of mobile commerce—though the trucks moved on long before the war and never moved back.`,
   x: -2,
   y: -5,
   z: 0,

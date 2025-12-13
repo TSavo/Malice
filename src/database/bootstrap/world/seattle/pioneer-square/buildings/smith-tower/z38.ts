@@ -13,7 +13,7 @@ export const building = {
     '%LR': {
       // Roof hatch biometric lock
       prototype: 'biometricLock',
-      name: 'Roof Hatch Scanner',
+      name: 'Smith Tower - 38th Floor - Roof Hatch Scanner',
       description: 'A recessed retinal scanner set into the hatch frame.',
       scanners: [
         { type: 'retinal', part: 'eye', message: 'Roof access denied: retinal scan failed.' },
@@ -24,7 +24,7 @@ export const building = {
     '%DROOF': {
       // Shared door object for the roof hatch (both directions use this door)
       prototype: 'door',
-      name: 'Roof Hatch',
+      name: 'Smith Tower - 38th Floor - Roof Hatch',
       description: 'A square steel hatch with an integrated biometric reader.',
       locked: true,
       locks: ['%LR'],
@@ -41,7 +41,7 @@ export const building = {
 
     '%ODL': {
       // Observation Deck Landing (-4, +8, 38)
-      name: 'Observation Deck Landing',
+      name: 'Smith Tower - 38th Floor - Observation Deck Landing',
       description: `A cramped landing tucked just under the glass crown. Brass plaques listing emergency numbers are gouged by pocketknives. The air is cool and smells of stale liquor and metal polish. A chain-link gate blocks the stair down, and the elevator doors here are scarred by pry marks and boot dents.`,
       x: -4,
       y: 8,
@@ -104,7 +104,7 @@ export const building = {
 
     '%ODECK': {
       // Observation Deck (-5, +8, 38)
-      name: 'Observation Deck',
+      name: 'Smith Tower - 38th Floor - Observation Deck',
       description: `Tall glass panes arc around a slim walkway, offering a vertigo-inducing view of rooftops and freeways far below. Sun-faded placards point out landmarks that no longer match the skyline. Several cracked panes are backed by plywood screwed in from the inside.`,
       x: -5,
       y: 8,
@@ -121,7 +121,7 @@ export const building = {
 
     '%ODB': {
       // Temperance Bar remnant (-3, +8, 38)
-      name: 'Shuttered Speakeasy',
+      name: 'Smith Tower - 38th Floor - Shuttered Speakeasy',
       description: `A narrow barroom with a curved counter and a shuttered backbar that still smells faintly of bitters. A fractured mirror clouds the wall behind it. Tap handles are zip-tied in place; an undercounter fridge hums weakly off a jury-rigged battery pack.`,
       x: -3,
       y: 8,
@@ -138,7 +138,7 @@ export const building = {
 
     '%PHL': {
       // Penthouse Landing (-4, +7, 38)
-      name: 'Penthouse Landing',
+      name: 'Smith Tower - 38th Floor - Penthouse Landing',
       description: `A narrow landing wrapped in scuffed brass trim. A heavy oak door leads west into the penthouse, its handle worn to bright metal. Overhead, a square hatch labeled ROOF ACCESS sits flush with the plaster; a recessed ladder disappears into it. The air is warm and carries the scent of old polish and trapped heat.`,
       x: -4,
       y: 7,
@@ -157,7 +157,7 @@ export const building = {
 
     '%PH': {
       // Penthouse Suite (-5, +7, 38)
-      name: 'Penthouse Suite',
+      name: 'Smith Tower - 38th Floor - Penthouse Suite',
       description: `A low-ceilinged suite pressed under the pyramid roof. Dark wood paneling wraps the room; a built-in bar of dull brass and glass sits dry and dusty. A narrow view slit is cut into the terracotta skin, framing a sliver of skyline. Most furniture is draped in canvas sheets. A tight spiral stair winds up toward the dome framing.`,
       x: -5,
       y: 7,
@@ -175,7 +175,7 @@ export const building = {
 
     '%PHDOME': {
       // Dome Service (-4, +9, 38) – inside the glass dome
-      name: 'Glass Dome Catwalk',
+      name: 'Smith Tower - 38th Floor - Glass Dome Catwalk',
       description: `A narrow metal catwalk circles the inside of the glass dome, every step ringing against the frame. A string of tired blue LEDs washes the beams in cold light. An access panel hums softly, and through the glass the city glitters in distorted reflections.`,
       x: -4,
       y: 9,

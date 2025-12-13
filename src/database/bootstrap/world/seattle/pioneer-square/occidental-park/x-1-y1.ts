@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'Occidental Park',
-  description: `Occidental Park spreads out here, its brick plaza center of the park. The park was created in the 1970s by closing Occidental Avenue to traffic, converting asphalt to pedestrian space. The brick paving in herringbone pattern stretches in all directions, weathered but intact.
+  description: `This is the center of Occidental Park, the point where the plaza opens widest, where the sky feels closest. On clear days—rare in Seattle even before the Event—you could see the Olympic Mountains from here, their snow-capped peaks visible above the waterfront buildings. The mountains are probably still there. The haze that hangs over the city now makes them invisible.
 
-The central open space, where the plaza is widest and most open to the sky. The detail speaks to a time when the park was maintained, when someone cared about these spaces and the people who used them.
+The open space feels exposed, vulnerable. The buildings around the plaza's edges create walls that channel wind and amplify sound. Every footstep echoes off brick and glass. Every movement is visible from multiple angles. The design was meant to create a sense of civic gathering, of shared space. Now it creates a sense of being watched.
 
-Dead trees punctuate the plaza at intervals, their bare branches creating stark silhouettes. They were planted with intention, part of an urban design that valued green space and shade. The trees are dead now but still standing, monuments to earlier optimism.
-
-The brick plaza continues in all accessible directions, open to sky and weather.`,
+A drinking fountain stands near the center, its basin dry, its spout corroded green. A plaque dedicates the fountain to someone whose name has weathered away. The drinking stopped. The dedication persists, illegible but present.`,
   x: -1,
   y: 1,
   z: 0,

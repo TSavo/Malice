@@ -2,13 +2,11 @@
 
 export const room = {
   name: '3rd Ave S & S. King St',
-  description: `Third Avenue crosses S. King Street at the heart of the International District's commercial strip. The intersection was always busy, foot traffic from the transit center mixing with shoppers and residents and tourists seeking authentic experiences.
+  description: `Third Avenue intersects S. King Street at what was once the commercial heart of the International District, the intersection where foot traffic from multiple directions converged. The transit center is blocks away—not that transit runs anymore. The pedestrian flow that supported the retail density is fifty-five years gone. The density remains. The pedestrians don't.
 
-Hing Hay Park is visible to the north, its pagoda pavilion rising above the surrounding buildings. The pavilion was a gift from Taipei, a symbol of sister city friendship. The friendship persists across an ocean neither city can cross.
+Hing Hay Park is visible to the north, the neighborhood's central gathering space overgrown and silent. The park's pagoda pavilion—a gift from Taipei commemorating the sister-city relationship—rises above the surrounding rooflines, its curved eaves weathered, its red columns faded to rust-pink. The landmark that identified the International District still identifies it. The community it served is scattered or dead.
 
-A phone store occupies the corner, its window displaying devices that connected people to everything. The connections have been severed. The devices are dark. The everything has become nothing.
-
-The intersection is clear. Third Avenue runs north and south. S. King continues east and west.`,
+PACIFIC WIRELESS occupies the corner building, its windows smashed, its inventory long since looted. The mobile phone retailer served the neighborhood's communication needs—smartphones, prepaid plans, international calling cards that let immigrants call home. The window displays are empty now. The phones are gone. The networks they connected to are gone. Home, for most of these families, is gone too.`,
   x: 9,
   y: -10,
   z: 0,

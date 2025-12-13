@@ -2,11 +2,11 @@
 
 export const room = {
   name: 'Yesler Way',
-  description: `The shadow of Smith Tower falls across the street here in the afternoon, or it would if the sun ever came out. The tower looms to the west, impossibly tall, impossibly still standing. Some things refuse to fall.
+  description: `Smith Tower casts its shadow across this block when afternoon sun breaks through Seattle's perpetual overcast, the white terra cotta facade stained grey but still visible to the west. The tower dominates the western view, rising above the surrounding four- and five-story buildings with the confidence of a structure that has stood for over a century and expects to stand for another.
 
-A bookstore occupies the corner space, its windows dark, its door propped open with a brick. The shelves inside are mostly empty, picked clean by scavengers looking for something to burn. A few hardcovers remain, too dense to be useful as kindling. Philosophy. Economics. The kind of books no one reads even in good times.
+PIONEER BOOKS occupies a corner space, an independent bookstore that served the neighborhood's literary community. Through the window: floor-to-ceiling shelves still packed with books—paperback fiction, academic volumes, philosophy and architecture. Looters don't take books. The inventory remains, organized by subject and author, appreciated by no one. The knowledge inside is patient. It can wait.
 
-Across the street, a vacant lot where a building used to be. The foundation remains, a rectangle of concrete and rebar, filling slowly with rainwater and debris. A sign on the fence announces future development. The future has been cancelled.`,
+A vacant lot opens across the street, chain-link fence surrounding the foundation of a building that was demolished before the war. A sign on the fence displays architectural renderings of the mixed-use development that was planned for the site—standard imagery of urban development marketing, promises of luxury units and ground-floor retail. The development never happened. The sign keeps promising.`,
   x: -8,
   y: 10,
   z: 0,

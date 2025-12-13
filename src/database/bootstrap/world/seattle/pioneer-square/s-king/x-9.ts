@@ -2,13 +2,11 @@
 
 export const room = {
   name: '1st Ave S & S. King St',
-  description: `First Avenue crosses S. King Street at the southwestern corner of Pioneer Square proper. The stadiums are visible to the east, their massive structures dominating the horizon. T-Mobile Park and Lumen Field, temples to baseball and football, built with public money and private profits.
+  description: `First Avenue intersects S. King Street at the southwestern corner of the stadium district, the intersection where Pioneer Square's historic neighborhood meets the sports and entertainment zone built in the 1990s. The stadiums dominate the view to the south and east: T-Mobile Park's retractable roof structure, Lumen Field's distinctive roof cantilevers, the architecture scaled for tens of thousands of spectators.
 
-The stadium district begins here. Everything is scaled for crowds: wide sidewalks, large plazas, restaurants that could seat hundreds. The crowds are gone. The scale seems absurd now, infrastructure for gatherings that will never gather.
+The streetscape here reflects the stadium district's design priorities: wide sidewalks to accommodate game-day crowds, street trees planted in tree grates sized for high foot traffic, the infrastructure of mass pedestrian movement. The buildings at this corner are newer construction, their ground floors configured for the restaurants and bars that event-day traffic supports.
 
-A ticket office occupies the corner, its windows dark, its future games unlisted. The tickets are worthless. The games are cancelled. The season has been permanently postponed.
-
-The intersection is clear. First Avenue runs north and south. S. King continues east and west.`,
+MARINERS TEAM STORE occupies one corner space, the official merchandise outlet where fans purchased jerseys and caps and the branded goods that professional sports generate. The windows display the inventory: player jerseys on mannequins, the green and navy color scheme that the franchise maintains. First Avenue stretches north from here toward Pioneer Square proper, the historic district's brick facades visible up the slope.`,
   x: -9,
   y: -10,
   z: 0,

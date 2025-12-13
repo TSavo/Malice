@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'S. Washington St',
-  description: `The street runs between the Pioneer Building and what remains of the block to the east. This stretch was never the prettiest part of the neighborhood. Service entrances and loading docks, dumpsters and utility poles, the parts of the city that worked so the pretty parts could pretend to be pretty.
+  description: `This stretch of Washington was always the back-of-house, the service corridor that kept Pioneer Square's storefronts supplied. Loading docks line the south side of the street, their roll-up doors sized for delivery trucks, their concrete aprons stained with decades of diesel and hydraulic fluid. The buildings here show their utility infrastructure—electrical conduit, ventilation ducts, the mechanical systems that retail facades conceal.
 
-A loading dock gapes open on the south side, its metal door hanging at an angle. Inside, darkness and the smell of things that have been wet too long. Wooden pallets are stacked against one wall, warped and splitting. Whatever was delivered here was delivered a long time ago.
+A mid-century warehouse dominates the block, its corrugated metal siding rusted to various shades of orange and brown. The building housed a restaurant supply company, SEATTLE FOODSERVICE EQUIPMENT according to faded lettering on the loading bay. The restaurant industry required a constant flow of replacement parts—fryer baskets, steam table pans, the specialized tools that commercial kitchens destroy through use.
 
-Power lines sag overhead, some of them down, some of them tangled in the dead branches of a street tree. The tree was probably an oak. It is hard to tell now. It is hard to tell a lot of things now.
-
-The rubble of the Collapsed Building is visible ahead, blocking the street. There is no going that way. Not anymore.`,
+Power lines cross overhead, the utility poles leaning slightly from decades of accumulated strain. A street tree—some variety of ornamental pear, planted when the city still maintained such things—has grown into the wires, its branches intertwined with the cables in a way that would have concerned the power company.`,
   x: 5,
   y: 5,
   z: 0,

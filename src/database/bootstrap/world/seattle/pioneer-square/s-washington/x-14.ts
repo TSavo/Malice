@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'S. Washington St',
-  description: `The street rises here from the waterfront, leaving behind the smell of salt and decay. The buildings on either side are old, their brick facades stained dark by decades of rain and neglect.
+  description: `S. Washington rises here from the waterfront, climbing the grade that separates sea level from Pioneer Square's elevated heart. This is the in-between zone—maritime Seattle giving way to commercial Seattle, the smell of salt yielding to the smell of old brick and exhaust residue. The buildings on both sides date from the 1890s rebuild, their facades stained dark by a century of Seattle rain.
 
-A maritime supply store occupies the ground floor, its windows clouded with grime. Rope and anchors and navigation equipment are visible inside, tools for ships that will never sail again. A sign offers "FRESH BAIT" in hand-painted letters. The bait is no longer fresh.
+FISHERIES SUPPLY CO. occupies the ground floor of a narrow building, a chandlery that served the fishing fleet when Seattle had a fishing fleet worth serving. Through the grimy windows: coils of manila rope, galvanized anchors in various sizes, navigation lights with brass housings, the whole inventory of maritime necessity arranged on shelves that haven't been restocked. A hand-painted sign in the window promises FRESH BAIT • TACKLE • ICE. The ice melted months ago. The bait achieved a different kind of freshness. The tackle waits for fishermen who aren't coming.
 
-Across the street, a loading dock stands empty, its roll-up door bent and rusted. Pallets are stacked against the wall, slowly rotting into the concrete.
-
-The waterfront is downhill. The neighborhood continues uphill.`,
+A loading dock gapes on the opposite side of the street, its roll-up door frozen at a thirty-degree angle, the mechanism rusted or jammed or simply abandoned mid-cycle. Pallets are stacked against the building's foundation, wooden flats that have weathered through seasons of rain until they've begun to merge with the concrete beneath them. Moss grows in the gaps between slats. Whatever these pallets were meant to carry has been carried or forgotten.`,
   x: -14,
   y: 5,
   z: 0,

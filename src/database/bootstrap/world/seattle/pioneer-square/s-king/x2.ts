@@ -2,11 +2,11 @@
 
 export const room = {
   name: 'S. King St',
-  description: `Second Avenue is just ahead, its intersection one of the main approaches to the stadium complex. The street was designed for game-day traffic, extra lanes and special signals and all the infrastructure of mass movement.
+  description: `Second Avenue approaches from the north, the intersection ahead once serving as one of the main pedestrian approaches to the stadium complex. The street design reflects event-day priorities: wider than typical for the neighborhood, with turn lanes and signal timing optimized for crowd surges that haven't surged in fifty-five years.
 
-A police substation occupies the corner, its windows dark, its parking spots empty. The police maintained order during events, managed crowds, directed traffic. The order has been discontinued. The crowds have dispersed. The traffic has stopped.
+A Seattle Police Department substation occupies the corner building, the satellite facility that law enforcement maintained in the stadium district. The building's institutional design—minimal windows, secured entrance—is intact. The patrol vehicles are gone, the parking spaces empty, the law enforcement presence that deterred opportunistic crime no longer present. Opportunistic crime found other deterrents, eventually.
 
-A memorial plaque on the wall commemorates officers who served. The officers are gone. The plaque remains, honoring service to a public that no longer needs serving.`,
+A memorial plaque mounted on the building's facade commemorates officers who served in the stadium district. The brass is weathered green, the names still legible but softened by oxidation and decades of Seattle rain. The officers being honored are dead now, one way or another. So is everyone else.`,
   x: 2,
   y: -10,
   z: 0,

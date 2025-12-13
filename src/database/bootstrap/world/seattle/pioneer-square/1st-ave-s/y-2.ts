@@ -2,11 +2,11 @@
 
 export const room = {
   name: '1st Ave S',
-  description: `The Underground Tour entrance is nearby, one of the attractions that drew tourists to Pioneer Square. The tour explored the buried streets beneath the current city, the original Seattle that was covered over after the Great Fire. The tours have stopped. The underground waits, darker than ever.
+  description: `Bill Speidel's Underground Tour operated from this block for sixty years, leading tourists down into the buried streets beneath Pioneer Square. After the Great Fire, Seattle didn't rebuild at street level—it rebuilt one story up and paved over the ruins. The old sidewalks and storefronts are still down there, sealed in darkness, preserved in the airless spaces beneath the new city.
 
-A gift shop sold souvenirs of the underground experience. Postcards and books and things that said "I SURVIVED THE UNDERGROUND TOUR." The survival seems ironic now. The souvenirs remain, celebrating an underground that survived when the surface did not.
+The tour entrance is a purple door wedged between a shuttered souvenir shop and a defunct espresso stand. A sandwich board lies face-down on the sidewalk, its chalkboard message hidden. Through the gift shop window: t-shirts that read I SURVIVED THE UNDERGROUND TOUR and coffee mugs shaped like rats and snow globes containing tiny Pioneer Square streetscapes. All of it coated in dust. All of it unsold.
 
-A sign points the way to the tour entrance. The entrance is locked. The pointing continues.`,
+The underground is still down there, of course. Darker now than ever. The tours brought lights and voices and the shuffle of feet. Now it's just the drip of groundwater and whatever rats survived to inherit it.`,
   x: -9,
   y: -2,
   z: 0,

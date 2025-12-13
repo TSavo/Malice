@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'Alaskan Way & S. Main St',
-  description: `The Waterfront meets S. Main Street at the edge of Pioneer Square. The elevated highway that once shadowed this corner is gone, torn down in a fit of urban renewal that happened just before urban anything stopped mattering.
+  description: `S. Main Street begins here at the Waterfront—or ends here, depending on your perspective. The intersection marks the boundary between water and city, between the salt air of Elliott Bay and the brick-and-stone canyon of Pioneer Square rising to the east. Seagulls wheel overhead, the only things still commuting.
 
-The ferry terminal is visible to the west, its tower rising over Elliott Bay. The ferries stopped running months ago. The terminal remains, a cathedral to departures that will never happen.
+The Alaskan Way Viaduct is gone, demolished years before the Event, replaced by a surface boulevard that was supposed to reconnect the city to its waterfront. The reconnection worked beautifully for about eighteen months. Now the boulevard carries no traffic, just wind off the bay and the occasional dead leaf skittering across empty lanes. The absence of the viaduct lets in sky that was hidden for decades. The sky doesn't seem to care about the gift.
 
-A seafood restaurant occupies the corner, its neon crab sign dark and unlit. The tanks in the window are empty. The crab is gone. The smell of Old Bay seasoning lingers, a ghost of butter and garlic and better times.
-
-The street rises east into Pioneer Square proper. The waterfront stretches north and south along the bay.`,
+IVAR'S ACRES OF CLAMS occupies the corner building, a Seattle institution since 1938, feeding tourists and locals alike with fish and chips and chowder served in styrofoam cups. The neon sign—a cartoon clam with a fork and knife—has gone dark. The deep fryers inside are cold. The tanks that held live Dungeness crabs are dry, their former occupants either released or consumed or simply gone the way of things that needed tending. A faded menu board outside still promises ALL YOU CAN EAT FRIDAYS. The Fridays continue. The eating does not.`,
   x: -15,
   y: 0,
   z: 0,

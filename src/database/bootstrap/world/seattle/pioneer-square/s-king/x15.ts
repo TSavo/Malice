@@ -2,13 +2,11 @@
 
 export const room = {
   name: '4th Ave S & S. King St',
-  description: `Fourth Avenue crosses S. King Street at the southeastern corner of Pioneer Square's grid. The International District stretches in every direction from here, its character fully established, its silence identical to everywhere else.
+  description: `Fourth Avenue intersects S. King Street at the southeastern corner of Pioneer Square's grid. The Chinatown Gate is visible to the east, its traditional pagoda-style arch spanning the street—red columns faded to rust-pink, curved eaves weathered, the golden characters declaring welcome in Chinese to no one who can read them. The gate was built in the 1970s to announce the community's presence and attract visitors. The community is scattered. The visitors stopped coming fifty-five years ago.
 
-A dragon gate spans the street to the east, its red columns supporting a traditional curved roof. The gate was built to mark the entrance to Chinatown, a declaration that you were entering somewhere different. The somewhere different is the same as everywhere now.
+EAST WEST BANK occupies the corner building, its windows dark, its vault presumably still sealed. The bank's signage appears in English, Chinese, and Vietnamese—the multilingual communication fading but legible. Banks like this one processed remittances that immigrant families sent home, maintained savings that financed small businesses. The remittances stopped. The savings are meaningless numbers in computers that no longer run. Home, for most of these families, no longer exists.
 
-A bank occupies the corner, its multilingual signs welcoming customers in English and Chinese and Vietnamese. The customers are gone. The welcome continues, extended to no one.
-
-The intersection marks the corner of the grid. Fourth Avenue runs north. S. King runs west. The district extends to the east, patient and waiting.`,
+The intersection provides views in multiple directions: north toward Pioneer Square's historic decay, west toward the silent stadiums, east into the International District's empty commercial heart. Fourth Avenue continues north from here, the transit corridor connecting nothing to nothing.`,
   x: 15,
   y: -10,
   z: 0,

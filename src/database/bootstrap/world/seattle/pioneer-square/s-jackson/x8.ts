@@ -2,11 +2,11 @@
 
 export const room = {
   name: 'S. Jackson St',
-  description: `Third Avenue is just ahead, its intersection marking the eastern edge of the Corp Construction zone. Whatever they were building inside, it doesn't extend past Third Avenue. The mystery has boundaries.
+  description: `Third Avenue approaches from the east, the intersection marking the boundary where the Corp Construction zone ends and the International District's abandoned streetscape resumes. The construction barriers terminate at the property line—Corp's maintained perimeter meeting buildings Corp didn't buy, the contrast between active development and decay sharper here than anywhere.
 
-A currency exchange occupies the corner, its rates posted in the window. Dollars to yen, euros to pesos, everything to everything else. The exchange rates are frozen at some moment when exchange still mattered. They don't matter now. Nothing exchanges for anything.
+PACIFIC RIM CURRENCY EXCHANGE occupies the corner building, its windows dark, its services obsolete. Currency exchanges clustered in immigrant neighborhoods, providing the service families needed to send money home. The window still displays exchange rates in columned format: USD to JPY, USD to PHP, USD to VND—currencies that may not exist anymore, exchange rates frozen when the markets stopped. The families that sent money home are scattered. Home, for most of them, is gone.
 
-A security camera points at the street from the exchange's facade, its lens dusty, its recordings unseen. It captured everything and nothing watches.`,
+Security cameras are mounted at the building's corners, their weatherproof housings intact, their lenses pointed at nothing. The coverage they provided protected against theft and vandalism. The war was neither theft nor vandalism. The cameras recorded nothing useful.`,
   x: 8,
   y: -5,
   z: 0,

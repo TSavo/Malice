@@ -1,37 +1,43 @@
 import { ObjectManager } from '../object-manager.js';
 import {
-   DescribableBuilder,
-   LocationBuilder,
-   ExitBuilder,
-   RoomBuilder,
-   AgentBuilder,
-   EmbodiedBuilder,
-   HumanBuilder,
-   PlayerBuilder,
-   AdminBuilder,
-   DecayableBuilder,
-   CorpseBuilder,
-   HumanRemainsBuilder,
-   SkeletalRemainsBuilder,
-   WoundBuilder,
-   EdibleBuilder,
-   FoodBuilder,
-   DrinkBuilder,
-   StomachContentsBuilder,
-   BodyPartBuilder,
-   BodyPartsBuilder,
-   WearableBuilder,
-   ClothingBuilder,
-   LockerBuilder,
-   OneTimeLockerBuilder,
-   BankBuilder,
-   BankTerminalBuilder,
-   StackableBuilder,
-   ElevatorBuilder,
-   LockBuilder,
-   BiometricLockBuilder,
-   RentableLockBuilder,
- } from './prototypes/index.js';
+    DescribableBuilder,
+    LocationBuilder,
+    ExitBuilder,
+    RoomBuilder,
+    AgentBuilder,
+    EmbodiedBuilder,
+    HumanBuilder,
+    PlayerBuilder,
+    AdminBuilder,
+    DecayableBuilder,
+    CorpseBuilder,
+    HumanRemainsBuilder,
+    SkeletalRemainsBuilder,
+    WoundBuilder,
+    EdibleBuilder,
+    FoodBuilder,
+    DrinkBuilder,
+    StomachContentsBuilder,
+    BodyPartBuilder,
+    BodyPartsBuilder,
+    WearableBuilder,
+    ClothingBuilder,
+    LockerBuilder,
+    OneTimeLockerBuilder,
+    BankBuilder,
+    BankTerminalBuilder,
+    StackableBuilder,
+    ElevatorBuilder,
+    LockBuilder,
+    BiometricLockBuilder,
+    RentableLockBuilder,
+    PhoneBuilder,
+    WirelessPhoneBuilder,
+    PhoneDbBuilder,
+    VendableBuilder,
+    PayphoneBuilder,
+  } from './prototypes/index.js';
+
 
 
 /**
@@ -80,16 +86,23 @@ export class PrototypeBuilder {
   private oneTimeLockerBuilder: OneTimeLockerBuilder;
   private bankBuilder: BankBuilder;
   private bankTerminalBuilder: BankTerminalBuilder;
-   private stackableBuilder: StackableBuilder;
-   private elevatorBuilder: ElevatorBuilder;
-   private lockBuilder: LockBuilder;
-   private biometricLockBuilder: BiometricLockBuilder;
-   private rentableLockBuilder: RentableLockBuilder;
+    private stackableBuilder: StackableBuilder;
+    private vendableBuilder: VendableBuilder;
+    private elevatorBuilder: ElevatorBuilder;
+    private lockBuilder: LockBuilder;
+    private biometricLockBuilder: BiometricLockBuilder;
+    private rentableLockBuilder: RentableLockBuilder;
+    private phoneBuilder: PhoneBuilder;
+    private wirelessPhoneBuilder: WirelessPhoneBuilder;
+    private payphoneBuilder: PayphoneBuilder;
+    private phoneDbBuilder: PhoneDbBuilder;
+
 
    constructor(private manager: ObjectManager) {
      this.describableBuilder = new DescribableBuilder(manager);
 
     this.locationBuilder = new LocationBuilder(manager);
+
     this.exitBuilder = new ExitBuilder(manager);
     this.roomBuilder = new RoomBuilder(manager);
     this.agentBuilder = new AgentBuilder(manager);
@@ -114,12 +127,19 @@ export class PrototypeBuilder {
     this.oneTimeLockerBuilder = new OneTimeLockerBuilder(manager);
     this.bankBuilder = new BankBuilder(manager);
     this.bankTerminalBuilder = new BankTerminalBuilder(manager);
-     this.stackableBuilder = new StackableBuilder(manager);
-     this.elevatorBuilder = new ElevatorBuilder(manager);
-     this.lockBuilder = new LockBuilder(manager);
-     this.biometricLockBuilder = new BiometricLockBuilder(manager);
-     this.rentableLockBuilder = new RentableLockBuilder(manager);
-   }
+    this.stackableBuilder = new StackableBuilder(manager);
+    this.vendableBuilder = new VendableBuilder(manager);
+    this.elevatorBuilder = new ElevatorBuilder(manager);
+    this.lockBuilder = new LockBuilder(manager);
+    this.biometricLockBuilder = new BiometricLockBuilder(manager);
+    this.rentableLockBuilder = new RentableLockBuilder(manager);
+    this.phoneBuilder = new PhoneBuilder(manager);
+    this.wirelessPhoneBuilder = new WirelessPhoneBuilder(manager);
+    this.payphoneBuilder = new PayphoneBuilder(manager);
+    this.phoneDbBuilder = new PhoneDbBuilder(manager);
+  }
+
+
 
 
   /**
@@ -130,8 +150,9 @@ export class PrototypeBuilder {
     // Check if prototypes already exist via aliases
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found - run minimal bootstrap first');
-
     const aliases = (objectManager.get('aliases') as Record<string, number | Record<string, number>>) || {};
+
+
 
     // Create prototypes (or get existing ones)
     const describable = aliases.describable
@@ -267,11 +288,33 @@ export class PrototypeBuilder {
       ? await this.manager.load(aliases.stackable as number)
       : await this.stackableBuilder.build(describable!.id);
 
+    const vendable = aliases.vendable
+      ? await this.manager.load(aliases.vendable as number)
+      : await this.vendableBuilder.build(location!.id);
+ 
     // Elevator - vertical transport system (inherits from Location)
     const elevator = aliases.elevator
       ? await this.manager.load(aliases.elevator as number)
       : await this.elevatorBuilder.build(location!.id);
 
+    // Phones
+    const phone = aliases.phone
+      ? await this.manager.load(aliases.phone as number)
+      : await this.phoneBuilder.build(describable!.id);
+
+    const wirelessPhone = aliases.wirelessPhone
+      ? await this.manager.load(aliases.wirelessPhone as number)
+      : await this.wirelessPhoneBuilder.build(phone!.id);
+
+    const payphone = aliases.payphone
+      ? await this.manager.load(aliases.payphone as number)
+      : await this.payphoneBuilder.build(phone!.id);
+
+    const phoneDb = aliases.phoneDb
+      ? await this.manager.load(aliases.phoneDb as number)
+      : await this.phoneDbBuilder.build(describable!.id);
+
+ 
     // Lock - base access control (inherits from Describable)
     const lock = aliases.lock
       ? await this.manager.load(aliases.lock as number)
@@ -288,6 +331,7 @@ export class PrototypeBuilder {
  
      // Register aliases in root.properties.aliases
      await this.registerAliases({
+
 
       describable: describable!.id,
       location: location!.id,
@@ -315,17 +359,22 @@ export class PrototypeBuilder {
       oneTimeLocker: oneTimeLocker!.id,
       bank: bank!.id,
       bankTerminal: bankTerminal!.id,
-       stackable: stackable!.id,
-       elevator: elevator!.id,
-       lock: lock!.id,
-       biometricLock: biometricLock!.id,
-       rentableLock: rentableLock!.id,
-     });
-   }
+      stackable: stackable!.id,
+      vendable: vendable!.id,
+      elevator: elevator!.id,
+      phone: phone!.id,
+      wirelessPhone: wirelessPhone!.id,
+      payphone: payphone!.id,
+      phoneDb: phoneDb!.id,
+      lock: lock!.id,
+      biometricLock: biometricLock!.id,
+      rentableLock: rentableLock!.id,
+    });
+  }
  
-   private async registerAliases(ids: {
+  private async registerAliases(ids: {
      describable: number;
-
+ 
     location: number;
     exit: number;
     room: number;
@@ -352,14 +401,17 @@ export class PrototypeBuilder {
      bank: number;
      bankTerminal: number;
      stackable: number;
+     vendable: number;
      elevator: number;
+     phone: number;
+     wirelessPhone: number;
+     payphone: number;
+     phoneDb: number;
      lock: number;
      biometricLock: number;
      rentableLock: number;
-     bank: number;
-     bankTerminal: number;
-     stackable: number;
    }): Promise<void> {
+
 
     const objectManager = await this.manager.load(0);
     if (!objectManager) return;
@@ -391,6 +443,14 @@ export class PrototypeBuilder {
      await objectManager.call('addAlias', 'bank', ids.bank);
      await objectManager.call('addAlias', 'bankTerminal', ids.bankTerminal);
      await objectManager.call('addAlias', 'stackable', ids.stackable);
+     await objectManager.call('addAlias', 'vendable', ids.vendable);
+     await objectManager.call('addAlias', 'elevator', ids.elevator);
+     await objectManager.call('addAlias', 'phone', ids.phone);
+     await objectManager.call('addAlias', 'wirelessPhone', ids.wirelessPhone);
+     await objectManager.call('addAlias', 'payphone', ids.payphone);
+     await objectManager.call('addAlias', 'phoneDb', ids.phoneDb);
+     await objectManager.call('addAlias', 'lock', ids.lock);
+     await objectManager.call('addAlias', 'biometricLock', ids.biometricLock);
      await objectManager.call('addAlias', 'rentableLock', ids.rentableLock);
  
      // Store bodyParts object directly (addAlias only supports simple id values)
@@ -398,6 +458,7 @@ export class PrototypeBuilder {
     const aliases = (objectManager.get('aliases') as Record<string, number | Record<string, number>>) || {};
     aliases.bodyParts = ids.bodyParts;
     objectManager.set('aliases', aliases);
+
 
     // Also expose individual body part prototypes at top level for BodyFactory
     for (const [name, id] of Object.entries(ids.bodyParts)) {

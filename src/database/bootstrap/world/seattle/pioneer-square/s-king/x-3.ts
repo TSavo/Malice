@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'Occidental Ave S & S. King St',
-  description: `Occidental Avenue crosses S. King Street at the southern tip of the pedestrian mall. King Street Station is visible to the east, its clock tower rising above the train sheds, keeping time for trains that no longer run.
+  description: `Occidental Avenue intersects S. King Street at the southern terminus of the pedestrian mall, cracked cobblestones ending where asphalt begins. King Street Station is visible to the east, its clock tower—modeled on the campanile of St. Mark's Basilica in Venice—rising above surrounding buildings. The clock stopped at some point in the last fifty-five years. No one has reset it. The station served Amtrak's Cascades corridor and Sounder commuter trains. The trains stopped running when the fuel ran out.
 
-The cobblestones of Occidental give way to asphalt here, the careful urban planning of the mall yielding to the practical needs of stadium traffic. The traffic has stopped. The planning seems wasted.
+The streetscape transitions here: the intimate scale of Occidental's pedestrian mall giving way to broader streets that stadium traffic once required. The infrastructure shows competing demands that no longer compete—historic preservation and contemporary function both suspended in abandonment.
 
-A newsstand occupies the corner, its papers yellowed, its magazines faded. The headlines announced things that mattered then. They don't matter now. Nothing matters now, or everything does, depending on how you look at it.
-
-The intersection is clear. Occidental runs north toward the mall. S. King continues east and west.`,
+The buildings at this corner bridge two districts: older structures adapted to serve stadium crowds that scattered decades ago. The ground floors are dark. The restaurants and shops closed when the customers stopped coming.`,
   x: -3,
   y: -10,
   z: 0,

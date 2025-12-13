@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'Occidental Ave S & S. Washington St',
-  description: `The park stretches away to the north and south here, a rectangle of dead trees and cracked cobblestones. The iron pergola is visible to the north, holding up nothing, its paint flaking away to reveal rust beneath.
+  description: `Occidental Park opens here at the intersection, its cobblestone expanse stretching north toward the iron pergola. The park was designed to feel European—intimate scale, careful plantings, pedestrian rhythms borrowed from cities that evolved before automobiles. The design succeeded. The maintenance has lapsed.
 
-This corner was busy once. Food carts and street musicians and office workers on lunch breaks. Now there is only silence and the wind moving through the dead branches.
+The maple trees that line the walkways have grown beyond their intended shapes, branches interlocking overhead to form a canopy that filters the grey Seattle light into something dimmer, greener. Moss has colonized the cobblestones where foot traffic once kept it at bay. The iron benches have rusted into the brick planters they were bolted to.
 
-A trash can stands at the corner, overflowing with debris that has composted into a solid mass. The city logo is still visible on the side. "SEATTLE - THE EMERALD CITY." The emeralds are gone. The city remains.
-
-The buildings of Pioneer Square rise on all sides, their windows dark, their doors sealed.`,
+The buildings surrounding the park maintain their Victorian facades—arched windows, decorative cornices, the ornamental ironwork that Pioneer Square architects favored in the 1890s. Most ground floors held galleries and boutiques, the kind of retail that depended on foot traffic and discretionary income. The upper floors held offices and apartments, the density that made the neighborhood function.`,
   x: -3,
   y: 5,
   z: 0,

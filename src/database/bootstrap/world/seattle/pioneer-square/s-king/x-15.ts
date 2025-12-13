@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'Alaskan Way & S. King St',
-  description: `The Waterfront meets S. King Street at the southern boundary of Pioneer Square. The container port stretches to the south, its cranes frozen against the sky, its ships rusting at anchor. The port was never beautiful. Now it's not even functional.
+  description: `Alaskan Way terminates at S. King Street, where the waterfront becomes industrial access road serving container terminals that no longer operate. The Port of Seattle's facilities stretch south from here—Terminal 30, Terminal 46, the container yards rusted and empty where goods once moved in the choreography of global trade. The choreography ended. The cranes stand frozen over empty docks.
 
-A fishing pier extends into Elliott Bay here, its planks weathered and warped. The fishermen who cast lines from this pier are gone. The fish remain, presumably, swimming beneath waters that have become cleaner in humanity's absence.
+A public fishing pier extends from the seawall, wooden planking rotting on concrete pilings. The railing still holds rod holders; no one has fished here in decades. The structure provides views across Elliott Bay to West Seattle and Bainbridge Island, the geography unchanged even as everything else has.
 
-Seagulls circle overhead, their cries the only voice in this corner of the city. They've adapted. They always do.
-
-The intersection marks the corner of the grid. The waterfront runs north. S. King runs east. The bay waits to the west, patient and cold.`,
+The seawall shows its age and neglect—concrete spalling, rebar exposed to salt air, the barrier between city and water slowly losing the battle. A bait and tackle shop occupies a converted shipping container, rusted shut, its inventory of hooks and sinkers waiting for anglers who'll never come.`,
   x: -15,
   y: -10,
   z: 0,

@@ -14,7 +14,7 @@ export const building = {
     // Roof grid, 4x3 spanning x=-5..-2, y=7..9
 
     '%RH1': {
-      name: 'Roof - Northwest Corner',
+      name: 'Smith Tower - Roof - Northwest Corner',
       description: `Tar and gravel run to a low parapet stained by a century of rain. Wind up here tastes of salt, diesel, and ozone from the old radio kit below. Rusted conduit stubs jut from the deck where antenna masts once bristled.`,
       x: -5,
       y: 9,
@@ -31,7 +31,7 @@ export const building = {
     },
 
     '%RH2': {
-      name: 'Roof - North Run',
+      name: 'Smith Tower - Roof - North Run',
       description: `A narrow run of roof between the crown's terracotta ribs. The drop to the street canyons is dizzying; buses creep like toy models below. Pigeons explode away when you set foot here, leaving dusty feathers stuck to the tar.`,
       x: -4,
       y: 9,
@@ -49,7 +49,7 @@ export const building = {
     },
 
     '%RH3': {
-      name: 'Roof - Northeast Corner',
+      name: 'Smith Tower - Roof - Northeast Corner',
       description: `The parapet here overlooks the old viaduct traces and the bay beyond. A lightning rod, bent at its base, leans seaward with slack copper strap coiled beside it.`,
       x: -3,
       y: 9,
@@ -66,7 +66,7 @@ export const building = {
     },
 
     '%RH4': {
-      name: 'Roof - West Walk',
+      name: 'Smith Tower - Roof - West Walk',
       description: `A tight walk along the crown wall. Terracotta tiles here are crazed with hairline cracks and patched with mismatched caulk. Condensation beads on metal service boxes bolted to the parapet, trickling rust down the face.`,
       x: -5,
       y: 8,
@@ -84,7 +84,7 @@ export const building = {
     },
 
     '%RH5': {
-      name: 'Roof - Central Deck',
+      name: 'Smith Tower - Roof - Central Deck',
       description: `The central expanse between the crown faces. Fresh tar smears around a square hatch, layered over decades of older patches. From here the white terracotta pyramid rises above you, its seams stained and its glass cap catching stray light.`,
       x: -4,
       y: 8,
@@ -104,7 +104,7 @@ export const building = {
     },
 
     '%RH6': {
-      name: 'Roof - East Walk',
+      name: 'Smith Tower - Roof - East Walk',
       description: `A narrow strip pressed against the eastern crown wall. The brick parapet is streaked dark by decades of runoff and moss. Wind whistles through a gap where a railing segment sheared away long ago.`,
       x: -3,
       y: 8,
@@ -122,7 +122,7 @@ export const building = {
     },
 
     '%RH7': {
-      name: 'Roof - Southwest Corner',
+      name: 'Smith Tower - Roof - Southwest Corner',
       description: `The roof sags slightly here. A drain choked with leaves and pigeon feathers holds a shallow puddle that mirrors the crown above in ripples.`,
       x: -5,
       y: 7,
@@ -139,7 +139,7 @@ export const building = {
     },
 
     '%RH8': {
-      name: 'Roof - South Run',
+      name: 'Smith Tower - Roof - South Run',
       description: `A south-facing strip with a long view toward the stadium roofs and freight yards. On sunny days, heat shimmers off the tar; now, it holds footprints in soft black. The parapet is chest-high, chipped, and cold to the touch.`,
       x: -4,
       y: 7,
@@ -157,7 +157,7 @@ export const building = {
     },
 
     '%RH9': {
-      name: 'Roof - Southeast Corner',
+      name: 'Smith Tower - Roof - Southeast Corner',
       description: `The southeastern corner peers down toward Occidental and the waterfront cranes. A bent safety rail rattles in the wind until you brace it. Initials are scratched into the tar at your feet, half-filled with grit.`,
       x: -3,
       y: 7,

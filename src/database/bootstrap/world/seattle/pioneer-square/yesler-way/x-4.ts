@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'Yesler Way',
-  description: `The park is close now. The iron pergola is visible ahead, its Victorian curves black against the grey sky. It looks delicate from here. It is not. It has survived everything this city has thrown at it for over a century.
+  description: `Occidental Park opens just ahead, the iron pergola visible at the north end of the pedestrian mall, leaning against Seattle's grey sky. The pergola's Victorian curves create a distinctive silhouette—decorative ironwork rusted brown, cast iron framework outlasting everything it was built to shelter.
 
-A laundromat occupies the ground floor here, its washers and dryers visible through the window. The machines are silent, their drums still, their doors hanging open. Someone's clothes are still inside one of the dryers, faded and forgotten. Whoever left them is not coming back for them.
+YESLER LAUNDRY occupies a ground-floor space, a coin-operated laundromat that served the neighborhood's residential population. Through the grimy window: rows of front-loading washers and stacked dryers stand silent, their doors hanging open. The machines haven't run in fifty-five years. The last loads were never retrieved. Someone's clothes are still in there, rotted to fiber and stain.
 
-The coin-op machines by the door still have prices listed. Two dollars for a wash. A dollar fifty for a dry. The coins inside are worthless now, but the machines still hold them, patient and stupid and waiting for a world that no longer exists.
-
-A shopping cart sits outside, filled with blankets and cans. The owner is not in sight.`,
+The buildings along this stretch maintain the scale that historic preservation required: brick facades, decorative cornices, the architectural vocabulary established after the Great Fire. The preservation stopped mattering when everyone left. The buildings stand anyway, too solid to fall on their own.`,
   x: -4,
   y: 10,
   z: 0,

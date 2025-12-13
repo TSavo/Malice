@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'Occidental Park',
-  description: `Occidental Park spreads out here, its brick plaza eastern plaza. The park was created in the 1970s by closing Occidental Avenue to traffic, converting asphalt to pedestrian space. The brick paving in herringbone pattern stretches in all directions, weathered but intact.
+  description: `Dead trees line the park's eastern boundary here, their trunks creating a permeable wall between plaza and the alley-like space that runs along 2nd Avenue. The trees were planted to define the edge without blocking it—a design choice that acknowledged people's desire to see through barriers even while accepting them.
 
-Dead trees line this edge, creating a natural fence between park and the alley-like space beyond. The detail speaks to a time when the park was maintained, when someone cared about these spaces and the people who used them.
+The space between the trees frames views of the buildings beyond—glimpses of fire escapes and loading docks and the service infrastructure that Pioneer Square's commercial facades concealed. The back-of-house revealed, the careful stage management of urban retail exposed.
 
-Dead trees punctuate the plaza at intervals, their bare branches creating stark silhouettes. They were planted with intention, part of an urban design that valued green space and shade. The trees are dead now but still standing, monuments to earlier optimism.
-
-The brick plaza continues in all accessible directions, open to sky and weather.`,
+A cat slinks between the dead trees, a tabby with torn ears and a wary posture. Feral, probably, or just adapted to the absence of people who would once have chased it away. The cat pauses to watch you, assessing threat or opportunity, then continues on its patrol. Life persists, even here.`,
   x: 1,
   y: 2,
   z: 0,

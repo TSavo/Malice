@@ -2,11 +2,11 @@
 
 export const room = {
   name: 'S. King St',
-  description: `T-Mobile Park looms to the south, its retractable roof closed or open, it's hard to tell from here. The Mariners played there, Seattle's baseball team, lovable losers for most of their existence. The losing has stopped. So has the loving.
+  description: `T-Mobile Park dominates the view to the south, the baseball stadium's retractable roof a distinctive silhouette against grey sky. The Mariners played here from 1999 until the war, the franchise that Seattle supported through decades of losing seasons. The stadium stands empty now, its retractable roof stuck in whatever position it held when the power failed. No one has played baseball here in fifty-five years.
 
-A sports bar occupies the building here, its walls covered with jerseys and photographs and memorabilia from seasons that happened. The memorabilia is still there. The seasons are over.
+HOME PLATE BAR & GRILL occupies the ground floor of a building designed to capture game-day traffic. Through grimy windows: walls still covered with memorabilia from franchise history, jerseys and photographs faded behind dust-covered glass. The television screens are dark. The infrastructure of communal sports watching serves no community.
 
-A street vendor's cart sits abandoned at the curb, its umbrella torn, its hot dogs long gone. The vendor worked this corner on game days, making more money in a few hours than most people made in a day. The money doesn't matter anymore.`,
+The streetscape shows the stadium district's design priorities: wide sidewalks for crowd movement that no longer occurs, decorative paving cracked and heaved. The buildings along this block are newer construction, their architecture coordinated with stadium development that transformed this area in the 1990s. The transformation is frozen in place, a monument to entertainment that ended.`,
   x: -8,
   y: -10,
   z: 0,

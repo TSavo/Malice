@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'Occidental Park',
-  description: `Occidental Park spreads out here, its brick plaza eastern edge. The park was created in the 1970s by closing Occidental Avenue to traffic, converting asphalt to pedestrian space. The brick paving in herringbone pattern stretches in all directions, weathered but intact.
+  description: `The park's eastern edge meets the alley-like space along 2nd Avenue here, the brick paving ending abruptly at asphalt. The contrast is deliberate—the designers wanted you to know when you'd left the pedestrian realm and entered the vehicular one. The vehicles are gone now, but the boundary persists.
 
-The brick paving continues to the very edge of the park, meeting the alley-like space along 2nd Avenue. The detail speaks to a time when the park was maintained, when someone cared about these spaces and the people who used them.
+A fire hydrant stands at the edge, painted the municipal red that Seattle used, its paint faded to rust-pink. The hydrant is buried to its coupling in debris—leaves and paper and urban detritus accumulated around its base, making it look like something emerging from the ground rather than installed on it.
 
-Dead trees punctuate the plaza at intervals, their bare branches creating stark silhouettes. They were planted with intention, part of an urban design that valued green space and shade. The trees are dead now but still standing, monuments to earlier optimism.
-
-The brick plaza continues in all accessible directions, open to sky and weather.`,
+The buildings along 2nd Avenue rise beyond the park's edge, their facades showing the loading docks and service entrances that front on this side. The back of things. The infrastructure that kept the front running. The back and front are equally abandoned now, the distinction meaningless.`,
   x: 2,
   y: 1,
   z: 0,

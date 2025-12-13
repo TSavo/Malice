@@ -2,13 +2,11 @@
 
 export const room = {
   name: 'Yesler Way',
-  description: `A narrow alley opens to the south here, disappearing between buildings into shadow. The alley is filled with dumpsters and fire escapes and the accumulated debris of a city that stopped cleaning up after itself. Something moved back there once. It might still be moving.
+  description: `A service alley opens to the south here, the narrow passage between buildings dark and uninviting. Fire escapes climb the walls, their iron platforms rusted and listing. The back-of-house infrastructure that retail facades concealed is exposed now—utility connections corroded, dumpster enclosures long since raided for anything useful.
 
-The buildings on either side are four stories of brick and iron, their facades decorated with the kind of ornate stonework that no one builds anymore. Carved faces peer down from the cornices, their features worn smooth by a century of weather. They have seen everything. They judge nothing.
+The buildings flanking the alley are four stories of brick and cast iron, their facades showing the ornamental detail that survived when so much else didn't. Carved stone faces peer down from the cornices—gargoyles and grotesques softened by a century of weathering, their features rounded by freeze-thaw cycles and acid rain. They've watched the city empty. They don't seem surprised.
 
-A fire hydrant stands at the corner, its yellow paint chipped and faded. The cap is missing. Someone took it for scrap, or for a weapon, or just because they could. In this city, everything that can be taken will be taken eventually.
-
-Smith Tower is visible ahead, rising above the rooftops like a white finger pointing at the sky.`,
+Smith Tower is visible ahead, its white terra cotta facade stained grey but still rising above the surrounding rooflines. The tower has dominated Pioneer Square's skyline since 1914. It continues to dominate, even now. A fire hydrant marks the corner, its yellow paint faded to something paler, the municipal infrastructure that no one maintains anymore.`,
   x: -11,
   y: 10,
   z: 0,

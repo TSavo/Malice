@@ -2,11 +2,11 @@
 
 export const room = {
   name: 'S. King St',
-  description: `A social club occupies the second floor of one building, its windows covered with paper, its activities private. The club served the older generation, men who played mahjong and discussed politics and remembered a country they left decades ago. The games have ended. The memories have no one to hold them.
+  description: `A family association occupies the second floor of one building, its windows still screened with paper yellowed by decades. The tong provided mutual aid and social organization for immigrant communities—people who shared surnames or regional origins gathering for mahjong and conversation. The social infrastructure that helped new arrivals navigate an unfamiliar city. The new arrivals stopped coming. The familiar and unfamiliar became equally uninhabitable.
 
-A grocery cart sits abandoned on the sidewalk, its wheels locked, its basket empty. Someone was shopping when shopping stopped mattering. The cart waits to be pushed.
+The buildings along this stretch show the International District's characteristic architecture weathered by abandonment: early twentieth-century construction adapted over decades, then left to decay. The aluminum storefronts are dented and grimy, the upper floor windows broken or boarded. Fire escapes rust along exterior walls, their iron platforms that served as impromptu balconies now unsafe to stand on.
 
-A fire hydrant painted in the colors of the Chinese flag stands at the corner, a small assertion of identity in a city that didn't always welcome it.`,
+A fire hydrant at the corner is painted in red and gold, the auspicious colors faded but still visible beneath the patina of age. The cultural expression outlasted the culture. The practical safety it provided is irrelevant now—nothing left here worth protecting from fire, no one to call if something burned.`,
   x: 11,
   y: -10,
   z: 0,

@@ -2,11 +2,11 @@
 
 export const room = {
   name: 'S. Jackson St',
-  description: `Occidental Avenue is just ahead, its intersection marking the border between the International District and Pioneer Square proper. The neighborhoods blend here, their boundaries approximate, their emptiness identical.
+  description: `Occidental Avenue approaches from the north, its intersection marking the approximate boundary between the International District's Asian character and Pioneer Square's Victorian district. The transition is gradual—Chinese signage fading as Victorian brick becomes prominent—but both traditions arrive at the same abandonment. The overlap this block captures is the overlap of decay.
 
-A bakery specializes in mooncakes and egg tarts and things that require specific ovens and specific skills. The ovens are cold. The skills are gone. The display cases hold the last batch, perfectly preserved and perfectly stale.
+KEEFER BAKERY occupies a narrow storefront, its display cases empty and dark. The Chinese bakery specialized in pastries that dim sum restaurants served: egg tarts, pineapple buns, the barbecue pork buns that Cantonese bakeries perfected. The glass shelving designed to showcase the day's production showcases only dust. The ovens in back are cold. The last day's production was fifty-five years ago, whatever remained long since consumed by time and vermin.
 
-A stone lion guards the entrance, one of a pair. Its partner is missing, broken or stolen or simply wandered off. The remaining lion looks incomplete, half of a symmetry that will never be restored.`,
+A stone foo dog guards the entrance to the building next door, one of a traditional pair. Its partner is missing—vandalism or theft or the entropy that claims unattended things. The remaining lion maintains its post, carved stone in the stylized form that centuries of tradition established: curled mane, muscular haunches, the ball beneath one paw. Still guarding. Nothing left to guard.`,
   x: -4,
   y: -5,
   z: 0,

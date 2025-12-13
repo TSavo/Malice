@@ -2,11 +2,11 @@
 
 export const room = {
   name: '2nd Ave S',
-  description: `The Corp Construction zone begins here on the west side of the street, its black fabric barriers marking the edge of the mystery. The zone extends for blocks to the north and west, whatever they were building hidden behind opaque screens.
+  description: `The Corp Construction barrier begins here, running along the entire west side of the street—black privacy fabric stretched over ten-foot chain-link, the kind of screening that says "nothing to see here" loudly enough that everyone looks anyway. The barrier extends north for blocks, marking the boundary of whatever Corp Industries was building before the Event made building things obsolete. Three city blocks swallowed whole. No windows. No signage. No indication of what shape the mystery takes on the other side.
 
-A gap in the fence has been cut and patched and cut again, the chain-link telling a story of curiosity that wouldn't be denied. The curiosity is understandable. The zone was always suspicious, even before.
+Someone has cut a gap in the chain-link at waist height, big enough to crawl through, and someone else has patched it with wire, and someone after that has cut through the patch. The cycle of cutting and patching tells its own story—curiosity that wouldn't be denied, even when denying it was someone's job. The black fabric beyond the gap reveals nothing, just darkness that smells faintly of machine oil and concrete dust and something else, something that might be your imagination filling in blanks.
 
-A security camera points at the street from a pole, its lens dusty, its recordings unwatched.`,
+A security camera is mounted on a pole at the corner, its dome of smoked plastic pointing at the street, at the gap in the fence, at whatever it was programmed to watch. The camera's power indicator is dark. The recordings, if there were any, exist only on servers that may or may not still function. The camera watches nothing. Or watches everything. It's hard to tell the difference when no one's reviewing the footage.`,
   x: 3,
   y: -8,
   z: 0,

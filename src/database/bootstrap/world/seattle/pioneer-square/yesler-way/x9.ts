@@ -3,17 +3,13 @@
 
 export const room = {
   name: '3rd Ave S & Yesler Way',
-  description: `Third Avenue had a reputation. This was the street where trouble concentrated, where the police made their sweeps, where the news crews came for footage of urban decay. They worried about crime and homelessness and property values. They had no idea what trouble actually looked like.
+  description: `Third Avenue crosses Yesler Way at this major intersection. The light rail used to run underground here, connecting Pioneer Square to downtown and beyond. The PIONEER SQUARE STATION entrance gapes open to the north, escalators frozen, stairs descending into darkness. No one has gone down there in decades. No one comes up.
 
-The intersection is wide. A light rail station entrance gapes open to the north, stairs descending into darkness. No one has gone down there in a long time. No one comes up.
+The KING COUNTY ADMINISTRATION BUILDING occupies the northeast corner, its glass facade starred with cracks, its steel frame showing rust where the cladding has fallen away. The building housed government services once—permits, licenses, the bureaucratic machinery of civilization. The machinery stopped. The building remains, hollow and purposeless.
 
-The southwest corner building is wrapped in chain link and black fabric, completely hidden. The fencing was thorough. The fabric is torn now, flapping in the wind, revealing glimpses of something behind it. Security cameras on posts still point at the perimeter. Their red lights are dark.
+The southwest corner is wrapped in chain link and black fabric, a construction site that never finished. The fencing has held for fifty-five years, though the fabric is torn now, flapping in the wind, revealing glimpses of rebar and poured concrete foundations that never received their buildings. The cranes are gone. The workers are gone. The development died mid-birth.
 
-The northeast corner held a King County services building, all glass and bureaucratic purpose. The glass is mostly gone. Numbered tickets litter the lobby floor, scattered by wind and time. People waited in line for those tickets once. They waited for a lot of things.
-
-The Corp Construction zone lies beyond, silent and still.
-
-The light rail station was supposed to connect Pioneer Square to Downtown. When the tunnel collapsed, it took the street with it. The pavement north of here buckled and sank, forming a crater fifteen feet deep. Water fills the bottom now, black and still and deeper than it looks. The trains are down there somewhere. So are the passengers.`,
+Third Avenue had a reputation before the war. It still does, though the nature of the trouble has changed.`,
   x: 9,
   y: 10,
   z: 0,

@@ -3,15 +3,11 @@
 
 export const room = {
   name: '2nd Ave S & Yesler Way',
-  description: `Second Avenue crosses Yesler here. The traffic light still hangs from its pole, swaying slightly when the wind picks up. The lights do not work. Nothing works. But the pole remains, and the signal box, and the faded crosswalk paint on the cracked asphalt.
+  description: `Second Avenue crosses Yesler Way here. A mural covers the corner building's brick facade, five stories of salmon swimming upstream in Coast Salish style—bold reds and blacks faded now but still visible, the fish heading somewhere they'll never arrive. The mural has outlasted the salmon runs it commemorated, outlasted the artists who painted it, outlasted nearly everything.
 
-A mural covers one side of the corner building, five stories of salmon swimming upstream. Coast Salish art, bright reds and blacks against brick that has faded to match. The salmon are heading somewhere. They have been heading there for years. They will never arrive.
+The street grid shifts at this intersection, a quirk of Seattle's founding visible in the misaligned blocks. North of Yesler Way, nothing quite lines up with what's south—two survey teams, two ideas of true north, a disagreement encoded in concrete and asphalt for two centuries and counting.
 
-A bus stop shelter stands on the corner, its plastic panels yellowed and cracked. The bench inside is intact. The electronic sign above it is dark. The schedule posted behind scratched plexiglass lists routes and times that mean nothing now.
-
-The street grid shifts slightly here. North of Yesler, the blocks no longer quite align with the ones to the south. Two surveyors, one city, two different ideas of which way was up. The argument is visible in every intersection.
-
-Not that it matters now. The buildings on either side of 2nd Avenue leaned into each other when the shaking stopped, meeting in the middle like tired drunks. The gap between them is barely a foot wide at street level. Pigeons nest in there somewhere. Nothing larger gets through.`,
+The corner buildings lean into each other slightly, the settling of foundations over decades creating a subtle tilt that's easier to feel than see. Four and five stories of brick and terra cotta, their facades stained with rain and time. The intersection sits at what used to be a boundary. Boundaries mean less now than they did.`,
   x: 3,
   y: 10,
   z: 0,

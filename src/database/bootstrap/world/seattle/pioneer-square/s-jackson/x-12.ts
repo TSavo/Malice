@@ -2,11 +2,11 @@
 
 export const room = {
   name: 'S. Jackson St',
-  description: `A viaduct once passed overhead here, carrying traffic above the surface streets. The viaduct is gone, torn down before everything else was torn down, leaving behind a wide corridor of sky where concrete used to be.
+  description: `The Alaskan Way Viaduct once passed overhead here, the double-decker highway that carried SR 99 along Seattle's waterfront. The structure came down in 2019, replaced by a tunnel, and the surface streets reclaimed the sky. Urban planners intended to transform the corridor into parkland and mixed-use development. The war came instead. The transformation was abandonment rather than renewal.
 
-The absence feels strange, an empty space that should contain something. The city planned to build a park here. The park was never built. The emptiness remains, neither viaduct nor park, just space.
+The foundations of the viaduct's support columns are still visible, concrete pads embedded in the ground, now cracked and sprouting weeds. The demolition crews removed the visible infrastructure but left the underground elements—pilings and footings that will outlast the memory of what they supported.
 
-A homeless encampment occupied this spot for a while. The tents are gone but the evidence remains: scorch marks from fires, scattered belongings, the geography of survival.`,
+The buildings that line this corridor show the effects of decades in the viaduct's shadow, then decades more in the war's aftermath—facades weathered and crumbling, windows broken or boarded. Some buildings had been renovated before the war, their owners anticipating a waterfront transformation that would never come. The renovations are indistinguishable from the decay now, fresh paint faded, new windows broken, investment and neglect arriving at the same destination.`,
   x: -12,
   y: -5,
   z: 0,
