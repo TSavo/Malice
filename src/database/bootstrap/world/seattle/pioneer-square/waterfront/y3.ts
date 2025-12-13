@@ -8,7 +8,7 @@ The station itself is intact, its brick facade blackened by smoke from some fire
 
 Emergency lights still flash on the roof, powered by solar panels that don't know the emergency is over. Red and white, red and white, a beacon for rescuers who aren't coming.
 
-The waterfront continues north and south. The city waits to the east.`,
+Beyond the seawall, Elliott Bay stretches toward Bainbridge Island and the Kitsap Peninsula beyond. The water is grey today, as it usually is—Puget Sound reflecting Puget Sound weather. The bay has always been Seattle's western boundary, as impassable as it is beautiful. The only way forward is back into the city.`,
   x: -21,
   y: 3,
   z: 0,

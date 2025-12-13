@@ -8,7 +8,7 @@ A souvenir stand sits beneath the wheel's shadow, its windows smashed, its shelv
 
 The waterfront promenade is wide here, meant for crowds that no longer come. The concrete is stained with salt and oil and things that washed up and were never cleaned away.
 
-The ferry terminal is visible to the south. The wheel watches from above.`,
+The seawall drops away to Elliott Bay, fifteen feet of air and then cold grey water that stretches to the horizon. The ferries that once crossed to Bainbridge are gone. The water remains, eternal and indifferent, accepting nothing that cannot float.`,
   x: -21,
   y: 2,
   z: 0,

@@ -8,7 +8,7 @@ A derelict pier juts into the bay, its planks rotted through in places, its pili
 
 The elevated highway that once shadowed this stretch was torn down years ago. The city called it progress. Now the open sky just means there's nothing between you and the grey clouds rolling in off the Sound.
 
-Smith Tower is visible to the east, rising above the brick buildings of Pioneer Square. It watches. It has always watched.`,
+Smith Tower is visible to the east, rising above the brick buildings of Pioneer Square. It watches. It has always watched. To the west, Elliott Bay offers nothing but grey water and the distant promise of shores you cannot reach—not without a boat, and the boats are gone or sunk or someone else's problem now.`,
   x: -21,
   y: 10,
   z: 0,

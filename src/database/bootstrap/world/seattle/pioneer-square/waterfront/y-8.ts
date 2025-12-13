@@ -6,7 +6,7 @@ export const room = {
 
 Rusted bollards line the water's edge, their chains long since stolen or corroded away. The bollards were decorative as much as functional, meant to evoke maritime heritage rather than actually secure anything. The heritage they evoked is more genuine now, in the decay, than it ever was in the design.
 
-A collapsed pier extends into the water to the west, its wooden planks rotted through, its pilings listing at angles that speak to decades of tidal assault. The pier was probably historic once, probably had a plaque. The plaque is underwater now, with whatever history it commemorated.`,
+A collapsed pier extends into the water to the west, its wooden planks rotted through, its pilings listing at angles that speak to decades of tidal assault. Beyond the ruins, Elliott Bay stretches to the horizon—cold grey water that accepts no passage. The far shore might as well be the moon.`,
   x: -21,
   y: -8,
   z: 0,

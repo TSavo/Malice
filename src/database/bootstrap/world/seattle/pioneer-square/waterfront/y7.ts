@@ -8,7 +8,7 @@ The asphalt is cracked, weeds pushing through. Blackberry brambles have claimed 
 
 A seagull stands on a rusted shopping cart, watching. It has learned that humans sometimes mean food. It hasn't unlearned this yet.
 
-The water is close here, the sound of it lapping against the seawall a constant rhythm beneath the silence.`,
+The water is close here, the sound of it lapping against the seawall a constant rhythm beneath the silence. Elliott Bay stretches west beyond the concrete barrier—cold, grey, and impassable without a boat you don't have.`,
   x: -21,
   y: 7,
   z: 0,

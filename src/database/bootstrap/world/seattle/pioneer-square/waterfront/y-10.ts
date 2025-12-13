@@ -8,7 +8,7 @@ A crane this size was worth millions. Now it's worth whatever someone will trade
 
 The operator's lunch box is still in the cab. You can see it through the window if you look up at the right angle. A blue cooler, faded by sun. Whatever was inside has long since rotted away.
 
-The port stretches south. The city huddles to the east. The bay waits to the west, patient and cold.`,
+The port stretches south. The city huddles to the east. The bay waits to the west, patient and cold and absolute—fifteen feet of seawall, then nothing but grey water stretching to shores you cannot reach. The western boundary has always been the water. It will be the water long after the city is gone.`,
   x: -21,
   y: -10,
   z: 0,

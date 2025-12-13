@@ -8,7 +8,7 @@ A warehouse dominates the block to the east, its loading doors sealed with corru
 
 The seawall here is stained with rust bleeding down from the railroad tracks above. The trains stopped running months ago, but the tracks remain, parallel lines of oxidizing steel leading north and south to nowhere.
 
-Oil rainbows swirl on puddles between the cobblestones. The water never quite goes away here.`,
+Oil rainbows swirl on puddles between the cobblestones. Beyond the seawall, Elliott Bay stretches west—grey water meeting grey sky, offering nothing to those without boats. The bay has always been Seattle's western edge. It always will be.`,
   x: -21,
   y: -2,
   z: 0,
