@@ -1,12 +1,12 @@
-// Occidental Park - northern section along the old avenue line
+// Occidental Park - central plaza
 
 export const room = {
   name: 'Occidental Park',
-  description: `The northern edge of the park approaches S. Washington Street, the brick giving way to concrete curbing. A trash receptacle stands here, its green municipal paint flaked away to reveal rusted steel beneath. The basket inside has corroded through, whatever garbage it once held long since scattered by wind or scavengers. The receptacle still stands at attention, waiting for trash that will never come.
+  description: `Benches are arranged in a circle here, facing inward, creating a conversation pit in the middle of the plaza. The arrangement was intentional—urban designers believed that facing benches toward each other would encourage interaction, would transform strangers into neighbors. The benches face each other still, holding conversations with no one.
 
-Graffiti covers a nearby utility box—layers of tags accumulating over decades, the oldest ones barely visible beneath newer marks. Someone painted "2055" in silver, the year they made their mark. Someone else crossed it out and wrote "GONE" in red. Both statements are equally true now. The year is gone. Everything is gone.
+One bench has collapsed, its wooden slats rotted through, its metal frame twisted. Someone sits there anyway—not a person, but a mannequin, its plastic form weathered to grey, its features smoothed by decades of rain. The mannequin wears the remains of a coat. Its hands rest on its knees. Its blank face stares at the bench opposite, patient and waiting.
 
-S. Washington Street is visible to the north, the Victorian buildings beyond it dark and silent. The totem pole in the park's northwest corner is visible from here, its carved figures watching over emptiness.`,
+Someone placed the mannequin here. Someone thought it was funny, or meaningful, or just wanted to see how it would feel to make the empty park seem occupied. The joke persists. The mannequin waits.`,
   x: -3,
   y: 3,
   z: 0,

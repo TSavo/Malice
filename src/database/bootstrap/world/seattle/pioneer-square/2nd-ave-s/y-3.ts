@@ -2,12 +2,12 @@
 
 export const room = {
   name: '2nd Ave S',
-  description: `Standing here, you can feel the scale of the Corp project—the fence stretches north and south as far as the buildings allow you to see, and the site extends west for blocks, swallowing what used to be surface lots and warehouses and a building or two that the historical society tried to save. The scale suggests something institutional. A hospital. A campus. A data center large enough to process the thoughts of a small nation. The permits never specified. The fence never opened. The scale just kept growing until it stopped.
+  description: `A pocket plaza opens on the east side of Second Avenue, one of those urban design gestures that cities make when developers trade floor area for public space. The plaza is maybe thirty feet deep—concrete pavers, two zelkova trees planted in grates, metal benches bolted to the ground, the whole vocabulary of activated ground-floor space rendered in materials that resist skateboarding and sleeping.
 
-MORRISON & FOERSTER, CONSTRUCTION LAW reads a brass plate beside a door on the east side—lawyers who specialized in building disputes, delays, defects, the endless litigation that follows when concrete meets ambition. The irony of practicing construction law across from the city's most mysterious construction project presumably wasn't lost on them. The disputes have been permanently settled now. Not by lawyers.
+The Corp fence forms the plaza's west edge, transforming what should have been a pass-through into a cul-de-sac. Before the construction, this might have been a pleasant shortcut, a sunny corner where office workers ate lunch. The fence threw it into permanent shadow. The zelkovas responded by dying slowly from the crown down, their upper branches skeletal, their lower branches still producing leaves that don't know any better.
 
-A fire hydrant stands at the curb, painted yellow in accordance with Seattle Municipal Code—the city standardized on yellow after the Great Fire of 1889, when firefighters couldn't find hydrants in the smoke and flame. The hydrant's paint has faded to the color of old mustard. The valve hasn't been turned in months. Whatever's in the pipes beneath the street—water or air or nothing—stays there, under pressure or not, waiting for fires that will have to burn themselves out.`,
-  x: 3,
+WALTER PIERCE MEMORIAL PLAZA reads a bronze plaque set into the pavers. Walter Pierce, whoever he was, donated money or land or political leverage to get this square named after him. The plaque lists his birth year and death year and the words "CIVIC LEADER," which covers a lot of ground. His memorial plaza has become a dead end against a fence hiding something he never knew about. Legacies are funny that way.`,
+  x: 0,
   y: -3,
   z: 0,
   // Environmental properties

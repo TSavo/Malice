@@ -1,14 +1,14 @@
-// S. King St - between Waterfront and 1st Ave
+// S. King St - east of 1st Ave
 
 export const room = {
   name: 'S. King St',
-  description: `The BNSF Railway mainline crosses S. King Street here, tracks rusted orange from disuse, the rails that once connected port terminals to the transcontinental network. The crossing infrastructure is heavy-duty—reinforced concrete pads cracked and heaved, crossing gates with striped arms locked in the upright position. The warning lights are dark. No trains have passed in decades.
+  description: `T-Mobile Park dominates the view to the south, the baseball stadium's retractable roof a distinctive silhouette against grey sky. The Mariners played here from 1999 until the war, the franchise that Seattle supported through decades of losing seasons. The stadium stands empty now, its retractable roof stuck in whatever position it held when the power failed. No one has played baseball here in fifty-five years.
 
-A rail yard extends to the south, visible through gaps in industrial buildings. The yard's multiple sidings hold freight cars that were never moved, their cargo containers faded and weathered, holding goods that never reached their destinations. The logistics that kept goods moving through the transportation network stopped moving. Everything stopped.
+HOME PLATE BAR & GRILL occupies the ground floor of a building designed to capture game-day traffic. Through grimy windows: walls still covered with memorabilia from franchise history, jerseys and photographs faded behind dust-covered glass. The television screens are dark. The infrastructure of communal sports watching serves no community.
 
-The buildings flanking the crossing show the wear of decades without maintenance—facades blackened by old diesel exhaust, windows broken or boarded. PACIFIC LOGISTICS, the signage reads on one structure, the freight forwarding company that coordinated handoffs between shipping modes. No freight. No modes. No coordination.`,
+The streetscape shows the stadium district's design priorities: wide sidewalks for crowd movement that no longer occurs, decorative paving cracked and heaved. The buildings along this block are newer construction, their architecture coordinated with stadium development that transformed this area in the 1990s. The transformation is frozen in place, a monument to entertainment that ended.`,
   x: -13,
-  y: -10,
+  y: -12,
   z: 0,
   // Environmental properties
   population: 0, // Empty (post-Event)

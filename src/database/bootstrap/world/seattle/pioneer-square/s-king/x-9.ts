@@ -1,16 +1,15 @@
-// 1st Ave S & S. King St intersection
+// S. King St - approaching Occidental
 
 export const room = {
-  name: '1st Ave S & S. King St',
-  description: `First Avenue intersects S. King Street at the southwestern corner of the stadium district, the intersection where Pioneer Square's historic neighborhood meets the sports and entertainment zone built in the 1990s. The stadiums dominate the view to the south and east: T-Mobile Park's retractable roof structure, Lumen Field's distinctive roof cantilevers, the architecture scaled for tens of thousands of spectators.
+  name: 'S. King St',
+  description: `Occidental Avenue approaches from the north, the intersection ahead marking the transition between the stadium district and Pioneer Square's historic pedestrian mall. The cobblestones of Occidental's pedestrian stretch are visible beyond, cracked and heaved but still distinct from the asphalt that stadium traffic required.
 
-The streetscape here reflects the stadium district's design priorities: wide sidewalks to accommodate game-day crowds, street trees planted in tree grates sized for high foot traffic, the infrastructure of mass pedestrian movement. The buildings at this corner are newer construction, their ground floors configured for the restaurants and bars that event-day traffic supports.
+PYRAMID ALEHOUSE occupies the corner building, one of Seattle's craft breweries that established taprooms to capture event-day traffic. Through grimy windows: the fermentation tanks still standing, copper tarnished green, the serving bar backed by tap handles that pour nothing. The brewing equipment visible through large windows was meant to be production as performance. The performance ended. The equipment remains.
 
-MARINERS TEAM STORE occupies one corner space, the official merchandise outlet where fans purchased jerseys and caps and the branded goods that professional sports generate. The windows display the inventory: player jerseys on mannequins, the green and navy color scheme that the franchise maintains. First Avenue stretches north from here toward Pioneer Square proper, the historic district's brick facades visible up the slope.`,
+The buildings at this corner represent the stadium district's architectural character: newer construction designed to serve event-day crowds that no longer exist. The scale is larger than Pioneer Square proper, the facades less ornate, the ground floors configured for high-volume hospitality that has been reduced to silence.`,
   x: -9,
-  y: -10,
+  y: -12,
   z: 0,
-  intersection: ['1st Ave S', 'S. King St'],
   // Environmental properties
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned

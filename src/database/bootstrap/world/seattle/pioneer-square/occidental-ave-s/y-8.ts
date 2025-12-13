@@ -1,19 +1,18 @@
-// Occidental Ave S - between S. King and S. Jackson
+// Occidental Ave S - between S. Jackson and S. King
 
 export const room = {
   name: 'Occidental Ave S',
-  description: `A brass plaque set into the cobblestones marks this spot as the site of a totem pole that stood here for decades—carved by Tlingit artists, stolen from Alaska in 1899, eventually replaced with an authorized copy after the original burned. The replacement was removed for "restoration" before the Event. The plaque remains, explaining the history of something that isn't here anymore. History explaining absence. It feels appropriate.
+  description: `A loading dock gapes open on the eastern side of the avenue, its metal rollup door frozen half-raised, rust having welded it in place decades ago. The darkness beyond suggests depth—a warehouse or storage facility that once served the businesses above. The smell of mold and stagnant water drifts from the opening.
 
-A circle worn into the bricks marks where a street performer used to draw crowds—you can see it if you look, a patch slightly lighter than the surrounding stone, polished by shuffling feet that stopped to watch whatever magic happened here. Guitar case open. Coins tossed. Applause echoing off brick facades. The performer took their talent elsewhere. The worn spot remains like a scar.
+The western buildings here are brick Victorians, three and four stories, their facades decorated with the ornamental flourishes that late nineteenth-century architects considered essential. Carved stone faces peer down from cornices—lions, eagles, human visages worn smooth by a century of rain. Their expressions have become ambiguous, features eroding into suggestions.
 
-Someone dragged a shopping cart here and left it tipped on its side, wheels still spinning slowly when the wind catches them. The cart held blankets once, or cans, or someone's entire portable existence. The blankets are gone, scattered or stolen or just blown away. A single sock remains tangled in the cart's wire mesh—grey wool, hole in the heel, the kind of detail that makes you wonder about the foot that wore it and where that foot walked next.`,
-  x: -3,
+Broken glass crunches underfoot where it's collected in the gaps between cobblestones. The shards have been ground down by weather and time into something almost like gravel, glittering dully in the light.`,
+  x: -7,
   y: -8,
   z: 0,
-  // Environmental properties
-  population: 0, // Empty (post-Event)
-  ambientNoise: 0, // Quiet/abandoned
-  lighting: 100, // Daylight (outdoor)
-  waterLevel: 0, // Dry
-  outdoor: true, // Street level
+  population: 0,
+  ambientNoise: 0,
+  lighting: 100,
+  waterLevel: 0,
+  outdoor: true,
 };

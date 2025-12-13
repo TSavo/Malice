@@ -1,15 +1,16 @@
-// S. Main St - approaching 4th Ave
+// 4th Ave S & S. Main St intersection
 
 export const room = {
-  name: 'S. Main St',
-  description: `Fourth Avenue opens ahead, marking the official boundary between Pioneer Square and the International District—though the boundaries were always negotiated rather than fixed, Chinese grocers and Vietnamese restaurants bleeding west into Pioneer Square while galleries and coffee shops pushed east into Chinatown. The mixing happened at these margins. The margins are quiet now.
+  name: '4th Ave S & S. Main St',
+  description: `Fourth Avenue and Main Street cross here at the gateway to the International District—the corner where Pioneer Square's Victorian brick gives way to Chinatown's particular blend of mid-century storefronts and cultural signifiers. The transition is marked by a traditional Chinese gate spanning the street to the east, red-painted timber with curved eaves and guardian lions, built in 2008 to announce WELCOME TO CHINATOWN-INTERNATIONAL DISTRICT in English and Chinese. The gate was always somewhat theatrical, a civic gesture toward authenticity. The theater continues. The audience is elsewhere.
 
-UWAJIMAYA sprawls across the south side of the block, an Asian supermarket that has served the community since 1928, when the Moriguchi family opened their first fish store in Tacoma. The current building is newer, a 60,000-square-foot complex with groceries and housewares and a food court. The windows display products that crossed the Pacific before the crossings stopped—Pocky and Meiji chocolate, rice crackers in foil packaging, instant noodles in flavors that never caught on in mainstream supermarkets. The inventory represents supply chains that spanned oceans. The oceans still exist. The chains don't.
+The International District/Chinatown Station entrance descends into the earth at the corner, one of the Link Light Rail stops that connected this neighborhood to the airport and Capitol Hill and destinations that now feel impossibly distant. The escalators are frozen mid-step, their treads dusty, their handrails motionless. Below ground level: platforms where trains stopped every seven minutes during rush hour, tunnels that continue north toward Westlake and south toward the stadiums. The trains are down there somewhere, stopped wherever they stopped when the stopping happened. The platforms wait in darkness. The schedules posted on the walls are accurate only in the sense that they document a system that once existed.
 
-A dragon statue guards the store entrance, ceramic scales painted in green and gold, whiskers bristling, pearl clutched in carved claws. The dragon is a guardian figure, meant to ward off evil spirits and attract prosperity. Its paint has faded in the sun that angles through this corridor. Its eyes are still watchful, still facing outward, still waiting for something worth guarding against. The dragon's patience is legendary. It can wait longer than this.`,
+This is where Main Street ends and the International District begins—different neighborhood, different history, different architecture, same silence. The paifang gate frames a view down the street, storefronts with signs in Chinese and Vietnamese, a heritage that outlasted the people who carried it. Pioneer Square is behind you now. Whatever's ahead is something else.`,
   x: 14,
   y: 0,
   z: 0,
+  intersection: ['4th Ave S', 'S. Main St'],
   // Environmental properties
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned

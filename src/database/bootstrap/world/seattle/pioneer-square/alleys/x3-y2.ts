@@ -12,7 +12,7 @@ The ground here slopes slightly, encouraging water to flow south. The pavement i
 A metal trash can lies on its side, dented and empty. Next to it, a wooden pallet has collapsed into a pile of rotting slats. These are the remnants of commerce, of deliveries and pickups and the movement of goods through spaces that were purely functional.
 
 The avenue continues north and south between the close walls.`,
-  x: 3,
+  x: 0,
   y: 2,
   z: 0,
   // Environmental properties

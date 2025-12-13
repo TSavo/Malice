@@ -1,12 +1,12 @@
-// S. Main St - approaching Occidental
+// S. Main St - between Occidental and 2nd Ave
 
 export const room = {
   name: 'S. Main St',
-  description: `Occidental Avenue opens ahead, the pedestrian mall that runs north through the heart of Pioneer Square. From here you can see the maple canopy, branches grown wild in the absence of trimming, creating a tunnel of green where sunshine used to filter through in carefully managed amounts. The urban forestry plan called for annual pruning. The plan has been indefinitely suspended.
+  description: `A parking garage entrance opens on the south side of Main Street, its ramp descending into subterranean darkness. The garage serves—served—the office buildings above it, their workers driving in each morning and out each evening, the daily rhythm of commuter capitalism. The entrance gate is up, frozen in the position it held when the power went out or the attendant stopped attending. The darkness beyond is absolute. The depths are unknowable. A sign beside the entrance lists rates: $8/HR • $28/DAY • $180/MONTH. The economics that made those numbers meaningful have dissolved.
 
-THE CENTRAL SALOON occupies the corner building, a Seattle institution that has served drinks since 1892, making it one of the oldest continually operating bars in the city—or was, until operation ceased being continuous. The windows are papered with Seahawks schedules and Mariners posters and promotional materials for sporting events that happened or didn't. A hand-lettered sign announces GAME DAY SPECIALS. The games may have continued somewhere. The specials have expired here.
+A pedestrian bridge spans Main Street overhead, connecting two office buildings at the second-floor level. The bridges were called "skyways" when they were fashionable in the 1970s, climate-controlled corridors that let office workers move between buildings without exposure to Seattle's weather. The workers who used this bridge carried coffee cups and manila folders and the concerns of their particular professional domains. The bridge is empty now, its glass walls clouded with condensation that no one wipes away. It connects nothing to nothing, a shortcut to nowhere.
 
-These buildings connect to Seattle's underground—the original street level that was buried after the Great Fire, when the city decided to raise itself above the tide flats rather than keep pumping out basements. The entrances are locked and alarmed and pointless, the tours that used to run through the underground suspended along with everything else. Below your feet: gas-lit storefronts from the 1880s, preserved in darkness, waiting for tourists who paid $20 to walk through history. The history is still there. The $20 is worth nothing.`,
+A Seattle Times newspaper box stands at the corner, its window displaying a front page from months ago. The headline—something about interest rates, something about elections, something that seemed to matter—is yellowed and water-stained. The box accepted quarters for the privilege of reading yesterday's news. Yesterday has become indistinguishable from every other day. The news stopped. The box preserves its final edition like a fossil.`,
   x: -4,
   y: 0,
   z: 0,

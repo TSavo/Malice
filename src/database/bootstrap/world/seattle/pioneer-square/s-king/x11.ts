@@ -2,13 +2,13 @@
 
 export const room = {
   name: 'S. King St',
-  description: `A family association occupies the second floor of one building, its windows still screened with paper yellowed by decades. The tong provided mutual aid and social organization for immigrant communities—people who shared surnames or regional origins gathering for mahjong and conversation. The social infrastructure that helped new arrivals navigate an unfamiliar city. The new arrivals stopped coming. The familiar and unfamiliar became equally uninhabitable.
+  description: `A Chinese temple occupies the upper floors of this building, its entrance marked by a narrow doorway and signage in traditional characters weathered but legible. Temples like this one served the spiritual needs of immigrant communities, maintaining religious practices carried across the Pacific. The building's upper floors were converted for worship—altars and ceremonial space for Buddhist and Taoist traditions. The gods that were honored here receive no offerings now. The incense has long since burned out.
 
-The buildings along this stretch show the International District's characteristic architecture weathered by abandonment: early twentieth-century construction adapted over decades, then left to decay. The aluminum storefronts are dented and grimy, the upper floor windows broken or boarded. Fire escapes rust along exterior walls, their iron platforms that served as impromptu balconies now unsafe to stand on.
+A pair of stone guardian lions flanks the temple entrance at the base of the stairs, the foo dogs that traditional architecture places at thresholds. The sculptures are substantial—carved granite, their poses formal and protective—the community investment visible in their quality. The lions face outward in traditional configuration, still guarding a threshold no one crosses. Their protection extended to nothing that mattered when the war came.
 
-A fire hydrant at the corner is painted in red and gold, the auspicious colors faded but still visible beneath the patina of age. The cultural expression outlasted the culture. The practical safety it provided is irrelevant now—nothing left here worth protecting from fire, no one to call if something burned.`,
+The building's ground floor housed a gift shop selling temple supplies: incense, ceremonial paper for burning, prayer beads and devotional objects. The inventory is dust-covered behind grimy glass, the jade figurines and decorative items waiting for tourists who will never arrive. The souvenirs of Chinatown visits, unsold and forgotten.`,
   x: 11,
-  y: -10,
+  y: -12,
   z: 0,
   // Environmental properties
   population: 0, // Empty (post-Event)

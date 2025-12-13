@@ -1,14 +1,14 @@
-// S. Washington St - between Waterfront and 1st Ave
+// S. Washington St - between 1st Ave and Occidental
 
 export const room = {
   name: 'S. Washington St',
-  description: `A bar occupied this corner once—MIKE'S WATERFRONT, according to the faded sign above the door, the kind of place that served longshoremen and sailors and anyone else who needed a drink before the sun was properly up. The neon signs are dark now but still mounted in the windows. "OPEN" promises one in cursive script. "COLD BEER" announces another. Both statements have become historical.
+  description: `SECOND CHANCE THRIFT occupies the ground floor of a three-story building, its windows crowded with mannequins dressed in fashions from previous decades—polyester and shoulder pads and patterns that were ironic purchases when irony was affordable. The mannequins stare out at the street with blank eyes and frozen smiles, their poses suggesting occasions that no longer exist. They were unsettling before. Time has not improved them.
 
-The windows are boarded from the inside, plywood visible through grimy glass, someone's response to something that required boarding. The door is steel with a small window at eye level, the kind of door that expects trouble. Graffiti covers the plywood and the brick beside it—tags and symbols and "RIP MIKE" in black marker, a memorial to whoever Mike was, written by whoever cared enough to write.
+Through the glass: racks of clothing organized by color and type, the taxonomy of secondhand commerce preserved in its final arrangement. The store is locked but not looted. Clothing has little value when survival is the priority. The inventory waits, organized and useless, a museum of what people once chose to wear.
 
-A fire escape climbs the building's north face, cast iron in the old style, its platform landings rusted but intact. The ladder is down, extended to within reach of the sidewalk, frozen in that position by corrosion or choice. First Avenue opens at the end of the block, the intersection visible through the grey air.`,
+The building's upper floors hold apartments, their windows curtained or bare, their occupants either sealed inside or departed. The smell of mold drifts from somewhere—perhaps the building, perhaps the street, perhaps the accumulated dampness of a city that gets 150 days of rain a year. The smell has become part of Pioneer Square's atmosphere, unremarkable until you notice it.`,
   x: -11,
-  y: 5,
+  y: 6,
   z: 0,
   // Environmental properties
   population: 0, // Empty (post-Event)

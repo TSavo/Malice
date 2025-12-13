@@ -2,12 +2,12 @@
 
 export const room = {
   name: '1st Ave S',
-  description: `The Hotel Morrison fills the east side of the block, six stories of brick and terracotta from the 1920s, back when Pioneer Square hotels catered to merchant sailors and longshoremen. The building went upscale in the 2000s—exposed brick boutique rooms, a rooftop bar, rates that would have made those longshoremen choke on their whiskey. The rooftop bar's neon sign still hangs from the parapet: SUMMIT. The neon tubes have gone milky with age, holding their last charge of gas like a held breath.
+  description: `Smith Tower rises into view ahead, its white terra cotta spire catching what light filters through the overcast. From this angle you can see the Chinese Room's observation deck near the top, the brass railings green with decades of rain. The Naga heads carved into the building's facade stare down at the street with expressions that might be wisdom or might be hunger. Hard to tell with Nagas.
 
-Fire escapes zigzag down the hotel's facade, each landing a small stage. On the fourth floor, someone left a suitcase on the landing—hard-shell Samsonite, the kind with combination locks. It sits there still, latches facing out, whatever's inside sealed away. An evacuation interrupted, or a decision reversed, or just someone who set their bag down for a moment and never picked it up again.
+MORRISON & KLINE, ATTORNEYS AT LAW reads the brass nameplate beside a door with frosted glass. The kind of firm that handled shipping disputes, maritime law, the endless paperwork of goods moving through the port. Filing cabinets visible through the window hold decades of contracts and depositions and letters threatening legal action. The threats have all expired. The statutes of limitations have run out on everything.
 
-The lobby doors are plate glass etched with art deco patterns, geometric sunbursts that catch the grey light. Through them you can see a marble floor, a reception desk with a brass bell, wingback chairs arranged around a fireplace that burns nothing. The clock above the desk stopped at 3:47. Morning or afternoon, impossible to say.`,
-  x: -9,
+Someone wedged a bicycle between the building and a dumpster, locked to a drainpipe with a cable lock. The bike has good components—Shimano derailleurs, Continental tires gone flat but not rotted. Whoever left it planned to come back. The plan didn't survive whatever happened next.`,
+  x: -14,
   y: 7,
   z: 0,
   // Environmental properties

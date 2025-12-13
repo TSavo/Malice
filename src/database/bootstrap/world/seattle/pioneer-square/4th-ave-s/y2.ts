@@ -9,7 +9,7 @@ Across the avenue, a construction site sits abandoned, its tower crane frozen mi
 Orange construction fencing has blown down in sections, revealing the pit where the foundation was being dug. Rainwater has filled the excavation, creating an urban pond where ducks have taken up residence. They seem content.
 
 The cranes arm points accusingly at the sky, holding nothing.`,
-  x: 15,
+  x: 14,
   y: 2,
   z: 0,
   // Environmental properties

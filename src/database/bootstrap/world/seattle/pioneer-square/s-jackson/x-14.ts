@@ -1,15 +1,16 @@
-// S. Jackson St - east of Waterfront
+// 1st Ave S & S. Jackson St intersection
 
 export const room = {
-  name: 'S. Jackson St',
-  description: `S. Jackson climbs eastward from the waterfront through what was the maritime supply district, where ship chandlers and marine equipment dealers clustered near the working port. The buildings here are functional—concrete and corrugated metal, roll-up doors rusted shut or hanging open, the architecture of logistics left to decay.
+  name: '1st Ave S & S. Jackson St',
+  description: `First Avenue intersects S. Jackson Street at a corner that once marked the boundary between Seattle's waterfront development and the International District. The intersection is wide—turn lanes and pedestrian crossings designed for urban density that no longer exists. The traffic signals hang dark, their LED units dead, the municipal standards that required yellow housings irrelevant now.
 
-PUGET SOUND MARINE SUPPLY occupies the ground floor of a two-story building, its windows grimy, its door barricaded from inside. The business served the commercial fishing fleet and recreational boaters who needed rope, chain, navigation equipment. The window display still shows inventory—coils of manila and synthetic line, galvanized shackles and cleats—the marine hardware sitting exactly where it was arranged fifty-five years ago. No boats. No fleet. No one needing rope or chain.
+WARRIOR MARTIAL ARTS SUPPLY occupies the corner building, its windows intact but grimy. The specialty retailer served martial arts schools that clustered in this area. Through the glass: uniforms in white and black cotton faded by decades of sun, padded sparring gear dusty on shelves, wooden and metal training weapons arranged for customers who will never come. The disciplines the store served—taekwondo, karate, kung fu, Brazilian jiu-jitsu—survive only in the memories of survivors scattered across whatever remains of the world.
 
-A cold storage warehouse dominates the opposite side of the street, its windowless facade broken only by loading docks and massive doors rusted shut. SEATTLE COLD STORAGE is painted on the building in faded blue letters, the name barely legible. The cold chain infrastructure that kept Pacific seafood fresh between boat and plate. The boats stopped coming. The plates are empty. The cold storage is warm now, whatever it contained long since rotted to nothing.`,
+The buildings at this intersection represent different eras of Seattle development, all arriving at the same destination: a 1920s brick structure weathered but standing, a 1960s concrete box cracking at the seams, a 2000s mixed-use building with apartments empty above dark retail. Different eras, same emptiness.`,
   x: -14,
-  y: -5,
+  y: -6,
   z: 0,
+  intersection: ['1st Ave S', 'S. Jackson St'],
   // Environmental properties
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned

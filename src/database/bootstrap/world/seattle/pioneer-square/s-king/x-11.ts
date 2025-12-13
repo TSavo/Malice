@@ -1,14 +1,14 @@
-// S. King St - between Waterfront and 1st Ave
+// S. King St - between 1st Ave and Occidental
 
 export const room = {
   name: 'S. King St',
-  description: `A cold storage facility occupies the south side of the street, the windowless bulk of refrigerated warehouse construction. PACIFIC COLD STORAGE, the faded letters read. The company served the seafood industry's need to maintain catch at temperatures that prevent spoilage. The refrigeration compressors on the roof are silent now, rusted solid. Whatever was in the freezers when the power failed is best not thought about. Fifty-five years of decay sealed behind insulated walls.
+  description: `A public plaza opens here, one of the gathering spaces that stadium district planning included for crowd management. The decorative brick paving is cracked and pushed up by weeds, the planters along the edges holding dead soil and whatever hardy plants survived fifty-five years without maintenance. The plaza was designed to accommodate thousands of people. No thousands have gathered here in decades.
 
-The loading docks face the street, roll-up doors rusted shut. Safety signage still marks the work zones: HARD HAT AREA, FORKLIFT TRAFFIC. OSHA doesn't require anything anymore. The hard hats are probably still hanging on their hooks.
+A fountain occupies the plaza's center, its bronze waves dry and verdigrised, its spray patterns silent. The fountain incorporated maritime imagery that Seattle's public art often references—stylized waves evoking Puget Sound. The Sound is still there. The water stopped flowing through the fountain when the pumps failed.
 
-SEATTLE PRECISION MACHINING occupies the building opposite, the kind of facility that fabricated custom parts for the industries the waterfront supported. The precision is frozen in place now—lathes and mills waiting for operators who'll never return, the patient machines holding their last calibrations.`,
+The plaza's edges show the utility hookups where mobile vendors once parked, the infrastructure that food truck operations required. The bollards still define the pedestrian zone. Pedestrians don't need protection from vehicle intrusion anymore.`,
   x: -11,
-  y: -10,
+  y: -12,
   z: 0,
   // Environmental properties
   population: 0, // Empty (post-Event)

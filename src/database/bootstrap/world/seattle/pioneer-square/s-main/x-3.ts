@@ -1,16 +1,15 @@
-// Occidental Ave S & S. Main St intersection - CENTER OF MAP (0,0)
+// S. Main St - between Occidental and 2nd Ave
 
 export const room = {
-  name: 'Occidental Ave S & S. Main St',
-  description: `This is the center of Pioneer Square, the geographic and historical heart of Seattle's original commercial district. Occidental Avenue crosses Main Street here at the zero point—the intersection from which early surveyors measured distances, the corner where the city began before the city knew what it was beginning. The significance has been commemorated on plaques that nobody reads. The significance persists regardless.
+  name: 'S. Main St',
+  description: `The architectural temperature cools here as Main Street moves east—the ornate Romanesque facades of Pioneer Square's core giving way to simpler elevations, buildings that were built to function rather than impress. These are the back-office blocks, the spaces where insurance companies and wholesalers and other unglamorous businesses did unglamorous work. The glamour has drained from both ends of the spectrum now.
 
-The Pioneer Square totem pole rises sixty feet from its concrete base at the intersection's northwest corner, carved cedar depicting Raven and other figures from Tlingit mythology. The city's businessmen stole the original from a Tlingit village in Alaska during an 1899 "goodwill expedition"—they literally sawed it down and loaded it onto a steamer. When the original burned in 1938, the city commissioned a replacement from the same Tlingit community and had the audacity to be surprised when they charged $5,000. The replacement stands here still, weathered to silver-grey, its story more complicated than the heritage plaques admit.
+KENMORE CAMERA occupies a ground-floor retail space, one of those specialty shops that survived the smartphone era by serving photographers who cared about lenses and f-stops and the craft of making images. The window display is a museum of optical technology—DSLRs with prices still attached, mirrorless bodies, telephoto lenses that could resolve details at a thousand meters. The equipment represents thousands of hours of engineering and billions of dollars of R&D. The equipment sits behind glass, unused, its potential unactivated. Someone's wedding photos didn't get taken. Someone's portfolio didn't get built.
 
-Occidental Mall stretches north and south, its cobblestones and maples and wrought-iron benches designed to evoke a pedestrian urbanism that Seattle never quite had. The design was an aspiration, not a restoration. The aspiration remains, even if the pedestrians don't. Maple branches interlock overhead. Benches wait for sitters who aren't coming. The zero point is silent now, measuring nothing from nothing.`,
+PACIFIC TRAVEL occupied the building across the street, a travel agency that specialized in corporate bookings and vacation packages to destinations that now feel theoretical. Posters in the window advertise Paris and Tokyo and Machu Picchu, the visual language of aspiration rendered in saturated color. The flights are cancelled. The destinations exist somewhere, presumably unchanged by whatever happened here. The distance between Seattle and everywhere else has become infinite.`,
   x: -3,
   y: 0,
   z: 0,
-  intersection: ['Occidental Ave S', 'S. Main St'],
   // Environmental properties
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned

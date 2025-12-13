@@ -1,15 +1,19 @@
-// Yesler Way - between 2nd and 3rd Ave
+// 3rd Ave S & Yesler Way
+// Major intersection, light rail station nearby
 
 export const room = {
-  name: 'Yesler Way',
-  description: `A parking structure rises on the south side, four levels of concrete and open-sided decks. Cars are still up there, visible through the open sides—lined up in neat rows on the upper levels, waiting for owners who will never return. Fifty-five years of waiting. The cars have rusted in place, tires flat, paint oxidized to uniform grey.
+  name: '3rd Ave S & Yesler Way',
+  description: `Third Avenue crosses Yesler Way at this major intersection. The light rail used to run underground here, connecting Pioneer Square to downtown and beyond. The PIONEER SQUARE STATION entrance gapes open to the north, escalators frozen, stairs descending into darkness. No one has gone down there in decades. No one comes up.
 
-A row of storefronts lines the north side, their windows covered with plywood spray-painted with warnings and pleas and graffiti that stopped meaning anything decades ago. The buildings date to different eras—early twentieth-century brick beside mid-century concrete—but they share the same emptiness now.
+The KING COUNTY ADMINISTRATION BUILDING occupies the northeast corner, its glass facade starred with cracks, its steel frame showing rust where the cladding has fallen away. The building housed government services once—permits, licenses, the bureaucratic machinery of civilization. The machinery stopped. The building remains, hollow and purposeless.
 
-Third Avenue and the Pioneer Square light rail station are visible ahead. The station entrance gapes dark, stairs descending into tunnels that haven't seen a train in half a century. The street slopes gently downward, following the grade toward a waterfront that's changed beyond recognition.`,
+The southwest corner is wrapped in chain link and black fabric, a construction site that never finished. The fencing has held for fifty-five years, though the fabric is torn now, flapping in the wind, revealing glimpses of rebar and poured concrete foundations that never received their buildings. The cranes are gone. The workers are gone. The development died mid-birth.
+
+Third Avenue had a reputation before the war. It still does, though the nature of the trouble has changed.`,
   x: 7,
-  y: 10,
+  y: 12,
   z: 0,
+  intersection: ['3rd Ave S', 'Yesler Way'],
   // Environmental properties
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned

@@ -1,21 +1,18 @@
-// 4th Ave S - between S. Jackson St and S. King St
+// 4th Ave S - between S. Jackson and S. King
 
 export const room = {
   name: '4th Ave S',
-  description: `The southern edge of the Condemned Block ends here, its fence turning west toward the interior of Pioneer Square. Whatever contaminated that area, the boundary is clear. On one side, decay. On the other, merely abandonment. There's a difference, though it's hard to articulate.
+  description: `Fourth Avenue marks the eastern boundary of Pioneer Square, where the historic district's preservation zone gives way to the International District's different character. The architecture here has always been transitional—buildings that belong to neither neighborhood fully, serving both with equal indifference.
 
-A convenience store occupies the corner, its windows boarded but its door intact. Someone has been inside recently—the boards over the door can be moved. Whether they found anything worth taking is unknown. Convenience stores were picked clean early.
+The condemned block is visible to the west, its toxic reputation keeping even the most desperate scavengers at bay. The eastern side offers safer passage, buildings that are merely abandoned rather than actively dangerous. The distinction matters when every decision carries risk.
 
-The International District continues to the east, its character shifting as it approaches the industrial areas near the stadiums. The stadiums are visible in the distance, their massive forms unchanged, their purpose obsolete.
-
-S. King Street is visible to the south, marking the edge of Pioneer Square's grid.`,
-  x: 15,
+A railroad viaduct once crossed Fourth Avenue here, carrying freight trains to and from the waterfront. The viaduct was demolished in the 2010s, replaced by nothing. The support pillars remain, orphaned columns that once held something up. They hold up only themselves now.`,
+  x: 14,
   y: -9,
   z: 0,
-  // Environmental properties
-  population: 0, // Empty (post-Event)
-  ambientNoise: 0, // Quiet/abandoned
-  lighting: 100, // Daylight (outdoor)
-  waterLevel: 0, // Dry
-  outdoor: true, // Street level
+  population: 0,
+  ambientNoise: 0,
+  lighting: 100,
+  waterLevel: 0,
+  outdoor: true,
 };

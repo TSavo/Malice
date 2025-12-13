@@ -2,14 +2,14 @@
 
 export const room = {
   name: '3rd Ave S',
-  description: `The Corp Construction zone dominates both sides of the avenue here, its fences running parallel, creating a channel of public space between private mysteries. The black fabric covering the fences blocks any view of what lies beyond. The fabric is newer here, less weathered, replaced more recently than elsewhere.
+  description: `The Collapsed Building's debris field begins to encroach from the east here, rubble spilling past the Corp Construction fence and onto the avenue. Someone tried to clear a path—the debris shows signs of being moved—but the effort was abandoned. The pile was too large. The machinery too precious. The will too fragile.
 
-Guard booths stand at intervals along the fence, their windows dark, their doors sealed. The guards left when the paychecks stopped. The booths remain, checkpoints for a workforce that no longer arrives.
+A crane arm extends from the rubble, its yellow paint visible beneath concrete dust. The crane was on top of the building when it fell, or maybe it fell with the building. The physics of collapse don't discriminate between structure and machine.
 
-A porta-potty row sits against the eastern fence, the blue plastic units still standing in formation. The smell has faded with time. Whatever biological processes occurred inside have long since completed.
+The Corp Construction fence on the western side is intact here, its black fabric pristine, its warning signs stern. "HARD HAT AREA." "NO UNAUTHORIZED ENTRY." "VIOLATORS WILL BE PROSECUTED." The prosecution system has collapsed more thoroughly than the building.
 
-The avenue is quiet. The construction zone is quieter. Nothing moves behind those fences. Nothing has moved there in a long time.`,
-  x: 9,
+Washington Street is visible to the south, marking the edge of the debris field.`,
+  x: 7,
   y: 7,
   z: 0,
   // Environmental properties

@@ -9,7 +9,7 @@ What did they find inside? The people who got through aren't talking. The people
 Across the avenue, the King County Administration building rises, a brutalist tower of concrete and purpose. The county administered things from here—property records, business licenses, the bureaucratic machinery of civilization. The machinery has stopped. The records remain, filed in cabinets that no one will ever open again.
 
 A hot dog cart sits at the curb, its umbrella faded, its condiment bottles empty. The hot dog vendor served the courthouse workers. The workers are gone. The cart remains.`,
-  x: 9,
+  x: 7,
   y: 3,
   z: 0,
   // Environmental properties

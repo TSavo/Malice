@@ -1,12 +1,12 @@
-// S. Main St - approaching 3rd Ave
+// S. Main St - east of 3rd Ave
 
 export const room = {
   name: 'S. Main St',
-  description: `Third Avenue opens ahead, the intersection marking the eastern edge of the Corp Construction zone and the beginning of whatever lies beyond—taller buildings, the municipal towers of city government, the glass-and-steel commercial district that Seattle built when it decided to be a real city. The transition is visible in the skyline: Pioneer Square's four-story brick gives way to twenty-story concrete, the human scale yielding to the corporate.
+  description: `The courthouse shadows this stretch of Main Street, its concrete mass blocking the morning sun, creating a permanent twilight that feels intentional. Brutalist architecture was designed to intimidate, to make individuals feel small against the weight of institutions. The architecture still works. The institutions don't, but the intimidation persists in stone and shadow.
 
-CHECK INTO CASH occupies the corner building, a payday lender that served the customers the banks wouldn't serve. The window displays list services for the underbanked: PAYDAY LOANS UP TO $700 • MONEY ORDERS • WIRE TRANSFERS • CHECK CASHING NO BANK ACCOUNT NEEDED. The services extracted fees from desperation, charging 400% APR for the privilege of accessing your own future income. The business model was predatory. The predation has become moot. The fees still listed on the rate card assume an economy where fees can be extracted from something.
+AAAA BAIL BONDS occupies a building across the street, the quadruple-A naming a transparent ploy to appear first in the phone book—back when phone books existed and people consulted them in moments of legal crisis. The neon sign in the window promises 24 HOUR SERVICE • FAST RELEASE • ALL JAILS, the vocabulary of desperate transactions conducted at three in the morning by people who needed to get their loved ones out. The sign is dark. The transactions have concluded. Freedom, whatever form it takes now, is no longer priced at 10% of bail with a non-refundable fee.
 
-Bars cover the windows, iron grates bolted to the brick, security measures that spoke to a neighborhood where property needed protecting from people. The bars are rusted but intact. The glass behind them is unbroken. Whatever threat the bars were meant to deter has evolved beyond the ability of iron to stop it. The bars remain, a defensive gesture frozen in metal, protecting an empty space from nothing in particular.`,
+A flagpole rises from the courthouse plaza, aluminum and hollow, its rope slapping against the pole in the wind that funnels down the street. The flag is gone—stolen by someone who wanted it, or torn away by weather, or simply released into whatever happened next. The clips at the rope's end dangle empty. The pole remains at attention, presenting arms to a nation that may or may not still exist in any recognizable form.`,
   x: 8,
   y: 0,
   z: 0,

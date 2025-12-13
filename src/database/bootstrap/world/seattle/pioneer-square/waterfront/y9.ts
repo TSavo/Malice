@@ -1,21 +1,18 @@
-// Waterfront - between Yesler Way and S. Washington St
+// Waterfront - between S. Washington and Yesler Way
 
 export const room = {
-  name: 'Alaskan Way',
-  description: `The waterfront stretches along the edge of Elliott Bay, a narrow strip of concrete and decay between the water and the city. The seawall here is holding, mostly. Cracks spider across its surface but the fill behind it hasn't slumped yet. Small victories.
+  name: 'Waterfront',
+  description: `The waterfront curves toward the gap in the seawall that provides passage to downtown—the only crossing point that remained open after the burning blocked all other routes. The gap is visible ahead, a crack in the concrete barrier where the wall collapsed and was never repaired. The collapse was accidental, a structural failure rather than deliberate destruction, but it became the most important geography in the district.
 
-A derelict pier juts into the bay, its planks rotted through in places, its pilings wrapped in barnacles and rust. A sign advertises harbor tours. The tour boats are gone, sunk or stolen or simply drifted away.
+The pier buildings thin out here, the tourist district giving way to working waterfront that predates the gentrification. Old warehouse structures line the eastern edge, their brick and timber construction dating to the early twentieth century when cargo moved by hand and dock workers were plentiful. The warehouses are empty now, their contents long since scavenged, but the structures themselves remain sound.
 
-The elevated highway that once shadowed this stretch was torn down years ago. The city called it progress. Now the open sky just means there's nothing between you and the grey clouds rolling in off the Sound.
-
-Smith Tower is visible to the east, rising above the brick buildings of Pioneer Square. It watches. It has always watched.`,
-  x: -15,
+The sound of water against the seawall is louder here, waves channeled by the gap ahead into patterns that slap and surge. The acoustic change marks the approach to the crossing, the only way through to whatever lies beyond.`,
+  x: -21,
   y: 9,
   z: 0,
-  // Environmental properties
-  population: 0, // Empty (post-Event)
-  ambientNoise: 0, // Quiet/abandoned
-  lighting: 100, // Daylight (outdoor)
-  waterLevel: 0, // Dry
-  outdoor: true, // Street level
+  population: 0,
+  ambientNoise: 25,
+  lighting: 100,
+  waterLevel: 0,
+  outdoor: true,
 };

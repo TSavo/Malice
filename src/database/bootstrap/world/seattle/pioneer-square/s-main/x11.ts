@@ -2,11 +2,11 @@
 
 export const room = {
   name: 'S. Main St',
-  description: `Main Street passes through a canyon of government architecture here—the courthouse on one side, the King County Administration Building on the other, both structures built in the brutalist style that dominated civic construction in the 1960s. Concrete and right angles and minimal ornamentation, the aesthetic of institutions that wanted to project permanence and efficiency. The permanence remains. The institutions that occupied these buildings have gone wherever institutions go.
+  description: `The architectural vocabulary shifts here as Main Street approaches the International District—government brutalism giving way to the particular vernacular of immigrant commerce. Signs appear in Chinese and Vietnamese, sometimes with English below, sometimes without. The languages on these signs survived longer than many of their speakers, the characters persisting as a kind of memorial to communities that gathered here.
 
-A bronze plaque is mounted at eye level on the administration building's facade, commemorating a county commissioner who served three terms and died in office. The plaque lists achievements that seemed significant at the time—infrastructure projects, budget reforms, the particular concerns of a particular era. The bronze has developed a green patina that fills the engraved letters, making them harder to read. The commissioner is remembered here, or would be, if anyone were reading.
+JADE GARDEN occupies the corner building, a dim sum restaurant that served the neighborhood since 1981. The menu is still posted in the window, photographs of dishes numbered for easy ordering—har gow, siu mai, char siu bao, the greatest hits of Cantonese brunch. Through the window: tables set with white tablecloths and ceramic teacups, lazy susans at each table's center, the whole apparatus of communal eating frozen mid-gesture. The kitchen beyond is dark. The dim sum carts are parked against the wall. The meal service that should have started at 10 AM has been permanently delayed.
 
-A bicycle rack stands on the sidewalk, one of those wave-shaped installations that accommodate a dozen bikes locked at various points along the curve. The rack is empty. Government workers used to bike to work here, locking their commuter hybrids and folding bikes before entering the building to process permits and forms. The biking has stopped. The permits are unprocessed. The rack holds nothing, its curves an invitation that will not be accepted.`,
+Red paper lanterns hang from the ceiling inside, their color faded from crimson to rose, their shapes still round and correct. The lanterns are symbols of prosperity and good fortune, hung for Lunar New Year and kept up because taking them down would have been bad luck. The luck didn't hold. The lanterns sway slightly when air moves through cracks in the door, their tassels dancing for an audience that isn't watching.`,
   x: 11,
   y: 0,
   z: 0,

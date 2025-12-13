@@ -1,14 +1,14 @@
-// S. King St - east of Occidental
+// S. King St - approaching 2nd Ave
 
 export const room = {
   name: 'S. King St',
-  description: `King Street Station rises to the south, its Beaux-Arts facade a monument to the golden age of rail travel. The station opened in 1906, designed to serve railroads that connected Seattle to the transcontinental network. The building's terra cotta ornament is weathered, the clock tower's hands frozen at a time no one remembers. The grand waiting room is dark, its restored ceiling admired by no one.
+  description: `Second Avenue approaches from the north, the intersection ahead once serving as one of the main pedestrian approaches to the stadium complex. The street design reflects event-day priorities: wider than typical for the neighborhood, with turn lanes and signal timing optimized for crowd surges that haven't surged in fifty-five years.
 
-The station served Amtrak's long-distance routes and Sound Transit's commuter service until the war ended rail travel. The Cascades corridor ran north to Vancouver and south to Portland; the Empire Builder crossed the mountains to Chicago. The corridors are silent now. The trains stand where they stopped, rusting on tracks no one maintains.
+A Seattle Police Department substation occupies the corner building, the satellite facility that law enforcement maintained in the stadium district. The building's institutional design—minimal windows, secured entrance—is intact. The patrol vehicles are gone, the parking spaces empty, the law enforcement presence that deterred opportunistic crime no longer present. Opportunistic crime found other deterrents, eventually.
 
-The station's frontage shows the infrastructure of ground transportation that no longer operates: taxi queue signage faded to illegibility, rideshare pickup zones that contemporary stations required before rideshares ended. The plaza before the entrance is cracked and weedy. No arriving passengers need to orient themselves to a city that barely exists.`,
+A memorial plaque mounted on the building's facade commemorates officers who served in the stadium district. The brass is weathered green, the names still legible but softened by oxidation and decades of Seattle rain. The officers being honored are dead now, one way or another. So is everyone else.`,
   x: -2,
-  y: -10,
+  y: -12,
   z: 0,
   // Environmental properties
   population: 0, // Empty (post-Event)

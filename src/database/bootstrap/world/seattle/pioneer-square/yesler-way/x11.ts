@@ -1,14 +1,14 @@
-// Yesler Way - between 3rd and 4th Ave
+// Yesler Way - approaching 4th Ave
 
 export const room = {
   name: 'Yesler Way',
-  description: `The construction zone gives way to older buildings here, three and four-story structures that have weathered better than the newer construction. Early twentieth-century brick doesn't fail the way concrete does; the facades are stained and cracked but structurally sound after a century of use and half a century of neglect.
+  description: `A parking garage dominates the north side, five levels of concrete painted institutional beige that has faded to grey. The entrance ramp descends into darkness. Cars are still visible on the upper levels through the open sides, arranged in rows that haven't moved in decades. The garage provided automobile storage for urban workers who drove in each morning and home each evening. The routine ended. The cars remained.
 
-A convenience store occupies the corner, its security bars bent inward where someone forced entry long ago. The door hangs open on one hinge. Whatever was inside worth taking was taken in the first years after the war. The shelves are bare now, the coolers dark and silent.
+A small urban park occupies the south side, more hardscape than landscape. The trees are dead, their bare branches stark against grey sky. The concrete benches remain, the drinking fountain dry and cracked. The park was a minimal amenity when it was built. It's less than that now.
 
-Fourth Avenue and the International District are visible ahead. Signs in Chinese, Vietnamese, and Korean still hang from buildings, their characters faded but legible—languages that outlasted the city that surrounded them. The transition between neighborhoods happens gradually, Pioneer Square's brick bleeding into Chinatown's red lanterns and ornate facades.`,
+Fourth Avenue approaches, the boundary between Pioneer Square and the International District. The neighborhoods blur together in their emptiness—brick facades and Chinese characters and red lanterns all equally abandoned.`,
   x: 11,
-  y: 10,
+  y: 12,
   z: 0,
   // Environmental properties
   population: 0, // Empty (post-Event)

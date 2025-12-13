@@ -1,16 +1,15 @@
-// 2nd Ave S & S. Main St intersection
+// S. Main St - between 2nd and 3rd Ave
 
 export const room = {
-  name: '2nd Ave S & S. Main St',
-  description: `Second Avenue and Main Street cross here at an intersection that marks the eastern edge of Pioneer Square's commercial core. Beyond this corner, the neighborhood transitions toward the International District, the architecture shifting from Victorian commercial to mid-century municipal, the character changing from tourist destination to working city. The transition still holds, even if neither side of it is working anymore.
+  name: 'S. Main St',
+  description: `The Corp Construction barrier begins here, appearing on the south side of Main Street like a black curtain drawn across a stage. The barrier runs east for blocks—chain-link fence ten feet high, covered with opaque fabric that shows the CORP INDUSTRIES logo at measured intervals. Whatever was being built behind this barrier swallowed an entire city block, then two, then three, growing by acquisition until the project's footprint exceeded the public's ability to imagine what could require that much space.
 
-BANK OF AMERICA occupies the corner building, a financial institution housed in a structure that predates the bank itself—the building was a different bank, then another different bank, then finally absorbed into the national chain that added its own signage and branding and ATM vestibule. The marble facade projects permanence, the bronze doors suggest security, the whole architectural vocabulary saying "your money is safe here." The vault is locked. The safety deposit boxes hold contents that matter to people who aren't here to retrieve them. The ATMs have gone dark, their screens displaying error codes in a language that means nothing without a network to interpret it.
+Warning signs are posted at intervals along the fence: DANGER - CONSTRUCTION AREA • HARD HAT REQUIRED • NO TRESPASSING - VIOLATORS WILL BE PROSECUTED. The signs reference safety protocols and legal consequences that assumed someone was watching, someone would respond, someone cared about trespass and liability. The signs remain official and ignored. The hard hats are wherever hard hats go when no one is building anything.
 
-A clock is mounted above the bank's entrance, analog hands showing 3:47—the moment when the mechanism stopped, whether through power failure or battery death or some other mundane malfunction. The clock is accurate twice a day, which is more than can be said for most things. The hands point at numbers that used to mean something. The meaning has become optional.`,
+A gap has been cut in the chain-link at waist height—wire snipped clean, the fabric behind it slit with a blade or torn by hands. Someone patched the gap with fresh wire, wound tight around the damaged links. Someone else cut through the patch. The cycle of cutting and repairing has left a scar in the fence, evidence of curiosity that couldn't be contained. What was on the other side? What is on the other side? The fence keeps its counsel. The gap remains, inviting and warning in equal measure.`,
   x: 3,
   y: 0,
   z: 0,
-  intersection: ['2nd Ave S', 'S. Main St'],
   // Environmental properties
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned

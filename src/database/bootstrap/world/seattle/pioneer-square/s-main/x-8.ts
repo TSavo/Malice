@@ -1,19 +1,18 @@
-// S. Main St - east of 1st Ave
+// S. Main St - between 1st Ave and Occidental
 
 export const room = {
   name: 'S. Main St',
-  description: `This is where Pioneer Square stops apologizing for itself and starts announcing its intentions. The buildings here are the real thing—Romanesque Revival warehouses from the 1890s, designed by architects who had studied in Chicago and Paris and wanted Seattle to look like a city that mattered. The facades are heavy with ornament: arched windows bracketed by carved stone, cornices that project like shelves, columns of cast iron that carry loads they were engineered to carry. The style was called "commercial palace" at the time. The palaces have been abandoned.
+  description: `Main Street runs through the center of Pioneer Square here, the buildings on either side representing the neighborhood at its most preserved. The storefronts were designated historic in the 1970s, protected by ordinances that mandated restoration rather than demolition. The ordinances succeeded—the buildings look much as they did in 1900. They just stand empty now.
 
-ANTIQUES AT PIKE PLACE reads the sign over a ground-floor shop, despite being nowhere near Pike Place—the name borrowed from a more famous market for the cachet. The window is a taxonomy of survival: clocks that stopped telling time decades ago, china that outlived the tables it was set on, furniture that moved from house to house as estates dissolved. These objects have seen more history than the people who owned them. They'll see more yet, probably. Objects are patient.
+A row of decorative streetlights lines the sidewalk, their ornate bases and glass globes designed to evoke the gaslight era. The lights were installed during the 1970s restoration, electric bulbs hidden in period-appropriate fixtures. The electricity is gone. The period-appropriate darkness has returned.
 
-A sandwich board lies face-down on the sidewalk, knocked over by wind or neglect or someone's hurried passage. The chalkboard face is pressed against concrete, whatever specials it advertised now speaking to an audience of asphalt. Someone will right it eventually. Or no one will. The specials have expired either way.`,
+The Underground tours once started somewhere near here, guides leading tourists through the buried sidewalks of the pre-1889 city. The tours stopped when the tourists did. The underground remains, dark and silent beneath the streets.`,
   x: -8,
   y: 0,
   z: 0,
-  // Environmental properties
-  population: 0, // Empty (post-Event)
-  ambientNoise: 0, // Quiet/abandoned
-  lighting: 100, // Daylight (outdoor)
-  waterLevel: 0, // Dry
-  outdoor: true, // Street level
+  population: 0,
+  ambientNoise: 0,
+  lighting: 100,
+  waterLevel: 0,
+  outdoor: true,
 };

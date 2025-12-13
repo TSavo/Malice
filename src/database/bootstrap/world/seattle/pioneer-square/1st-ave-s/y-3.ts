@@ -2,12 +2,12 @@
 
 export const room = {
   name: '1st Ave S',
-  description: `A triangular plaza wedges into the western block here, one of those pocket parks that city planners squeeze into leftover spaces. Honey locusts grow from iron grates, their branches untrimmed and tangling overhead. The benches—wrought iron, bolted to concrete—face a fountain that's become a dry basin of dead leaves and tarnished coins. Pennies mostly. A few quarters that catch what light there is.
+  description: `Bill Speidel's Underground Tour operated from this block for sixty years, leading tourists down into the buried streets beneath Pioneer Square. After the Great Fire, Seattle didn't rebuild at street level—it rebuilt one story up and paved over the ruins. The old sidewalks and storefronts are still down there, sealed in darkness, preserved in the airless spaces beneath the new city.
 
-The fountain's centerpiece is a bronze salmon leaping upstream, green with verdigris, frozen at the apex of a jump it will never complete. Water once sheeted down its flanks into the pool below. Now it just hangs there, mid-leap, waiting for a river that's been turned off.
+The tour entrance is a purple door wedged between a shuttered souvenir shop and a defunct espresso stand. A sandwich board lies face-down on the sidewalk, its chalkboard message hidden. Through the gift shop window: t-shirts that read I SURVIVED THE UNDERGROUND TOUR and coffee mugs shaped like rats and snow globes containing tiny Pioneer Square streetscapes. All of it coated in dust. All of it unsold.
 
-A bronze plaque bolted to a granite pedestal explains that this plaza commemorates the Duwamish people who lived here first. It lists dates and names and treaties. The explanation is thorough and inadequate. It's been here for thirty years. It will be here for thirty more. Nobody's reading it.`,
-  x: -9,
+The underground is still down there, of course. Darker now than ever. The tours brought lights and voices and the shuffle of feet. Now it's just the drip of groundwater and whatever rats survived to inherit it.`,
+  x: -14,
   y: -3,
   z: 0,
   // Environmental properties

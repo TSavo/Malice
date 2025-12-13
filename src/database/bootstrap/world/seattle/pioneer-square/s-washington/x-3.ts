@@ -1,16 +1,15 @@
-// Occidental Ave S & S. Washington St
+// S. Washington St - between Occidental and 2nd Ave
 
 export const room = {
-  name: 'Occidental Ave S & S. Washington St',
-  description: `Occidental Park opens here at the intersection, its cobblestone expanse stretching north toward the iron pergola. The park was designed to feel European—intimate scale, careful plantings, pedestrian rhythms borrowed from cities that evolved before automobiles. The design succeeded. The maintenance has lapsed.
+  name: 'S. Washington St',
+  description: `The Pioneer Building's retail arcade continues here, a covered walkway that runs along the ground floor, its arched openings framing storefronts that changed tenants regularly but never purpose. The arcade was designed to shelter pedestrians from Seattle's rain, a practical feature that became architectural signature. Similar arcades appear throughout Pioneer Square, the covered sidewalks connecting buildings into a coherent urban fabric.
 
-The maple trees that line the walkways have grown beyond their intended shapes, branches interlocking overhead to form a canopy that filters the grey Seattle light into something dimmer, greener. Moss has colonized the cobblestones where foot traffic once kept it at bay. The iron benches have rusted into the brick planters they were bolted to.
+PIONEER ANTIQUES occupies a double-wide storefront, its display windows crammed with furniture arranged in the maximalist style that antique stores favor—every surface covered, every corner filled, the accumulated inventory of estate sales and consignment and the things people couldn't take with them. A grandfather clock stands near the window, its case dark walnut, its brass pendulum frozen mid-swing.
 
-The buildings surrounding the park maintain their Victorian facades—arched windows, decorative cornices, the ornamental ironwork that Pioneer Square architects favored in the 1890s. Most ground floors held galleries and boutiques, the kind of retail that depended on foot traffic and discretionary income. The upper floors held offices and apartments, the density that made the neighborhood function.`,
+The buildings along this stretch maintain consistent cornice lines, their facades varying in detail but unified in scale. Pioneer Square's building codes enforced this uniformity after the Great Fire, ensuring that the rebuilt neighborhood would present a coherent streetscape. The codes worked. The streetscape endures.`,
   x: -3,
-  y: 5,
+  y: 6,
   z: 0,
-  intersection: ['Occidental Ave S', 'S. Washington St'],
   // Environmental properties
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned

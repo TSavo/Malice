@@ -12,7 +12,7 @@ Graffiti covers the lower walls here, layer upon layer accumulating over decades
 A dumpster sits against the western wall, its metal corroded to lace in places. Something has nested inside—you can see torn fabric and newspaper—but whatever made the nest isn't here now.
 
 The avenue continues north toward S. Washington and south toward S. Main.`,
-  x: -3,
+  x: -7,
   y: 1,
   z: 0,
   // Environmental properties

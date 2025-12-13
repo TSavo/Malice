@@ -1,19 +1,18 @@
-// 2nd Ave S - between S. King and S. Jackson
+// 2nd Ave S - between S. Jackson and S. King
 
 export const room = {
   name: '2nd Ave S',
-  description: `Second Avenue runs north through the shadow of the Link Light Rail's elevated track, a ribbon of steel and concrete that carries trains between SeaTac and Capitol Hill—or carried them, before the trains stopped and the power failed and the whole system became a linear sculpture of frozen expectation. A train sits visible on the track above, its articulated cars straddling a curve, windows dark, passengers presumably evacuated or absorbed into whatever happened next. The train has been there long enough for birds to nest in its undercarriage.
+  description: `Second Avenue runs straight and wide through this block, a proper arterial compared to the pedestrian scale of Occidental. The buildings here are larger, more institutional—banks and office buildings that needed the gravitas of a major street address. The gravitas survives in stone and brick even if the institutions don't.
 
-A parking garage fills the east side of the street, five levels of open-sided concrete designed to absorb the flood of cars that arrived for Mariners games. The structure's geometry is pure function—ramps spiraling upward, slots sized for SUVs and sedans, painted lines and arrows directing traffic that will never flow. A few cars remain on the upper levels, visible through the open walls like fish in an aquarium. Their owners didn't make it back. Or chose not to return. Or stopped existing in ways that don't leave cars behind.
+The pavement shows the characteristic cracking of freeze-thaw cycles working on asphalt for decades without maintenance. Weeds have exploited every fissure, their roots widening cracks into crevasses. In some places the asphalt has heaved entirely, creating miniature ridges that would destroy a car's suspension. No cars to worry about anymore.
 
-The pay station at the entrance still displays its rates—$40 EVENT PARKING, $15 DAILY MAX—prices calculated for an economy that traded in dollars. The screen has frozen on PLEASE INSERT PAYMENT, a request that will never be honored. The gate arm is up. Nobody is enforcing anything anymore.`,
-  x: 3,
+A traffic signal dangles from its wire overhead, swaying slightly in whatever breeze finds its way between the buildings. The lights are dead, have been dead for decades. The signal still points in directions that once mattered.`,
+  x: 0,
   y: -9,
   z: 0,
-  // Environmental properties
-  population: 0, // Empty (post-Event)
-  ambientNoise: 0, // Quiet/abandoned
-  lighting: 100, // Daylight (outdoor)
-  waterLevel: 0, // Dry
-  outdoor: true, // Street level
+  population: 0,
+  ambientNoise: 0,
+  lighting: 100,
+  waterLevel: 0,
+  outdoor: true,
 };

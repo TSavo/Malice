@@ -1,19 +1,15 @@
-// 3rd Ave S & Yesler Way
-// Major intersection, light rail station nearby
+// Yesler Way - between 3rd and 4th Ave
 
 export const room = {
-  name: '3rd Ave S & Yesler Way',
-  description: `Third Avenue crosses Yesler Way at this major intersection. The light rail used to run underground here, connecting Pioneer Square to downtown and beyond. The PIONEER SQUARE STATION entrance gapes open to the north, escalators frozen, stairs descending into darkness. No one has gone down there in decades. No one comes up.
+  name: 'Yesler Way',
+  description: `The construction zone gives way to older buildings here, three and four-story structures that have weathered better than the newer construction. Early twentieth-century brick doesn't fail the way concrete does; the facades are stained and cracked but structurally sound after a century of use and half a century of neglect.
 
-The KING COUNTY ADMINISTRATION BUILDING occupies the northeast corner, its glass facade starred with cracks, its steel frame showing rust where the cladding has fallen away. The building housed government services once—permits, licenses, the bureaucratic machinery of civilization. The machinery stopped. The building remains, hollow and purposeless.
+A convenience store occupies the corner, its security bars bent inward where someone forced entry long ago. The door hangs open on one hinge. Whatever was inside worth taking was taken in the first years after the war. The shelves are bare now, the coolers dark and silent.
 
-The southwest corner is wrapped in chain link and black fabric, a construction site that never finished. The fencing has held for fifty-five years, though the fabric is torn now, flapping in the wind, revealing glimpses of rebar and poured concrete foundations that never received their buildings. The cranes are gone. The workers are gone. The development died mid-birth.
-
-Third Avenue had a reputation before the war. It still does, though the nature of the trouble has changed.`,
+Fourth Avenue and the International District are visible ahead. Signs in Chinese, Vietnamese, and Korean still hang from buildings, their characters faded but legible—languages that outlasted the city that surrounded them. The transition between neighborhoods happens gradually, Pioneer Square's brick bleeding into Chinatown's red lanterns and ornate facades.`,
   x: 9,
-  y: 10,
+  y: 12,
   z: 0,
-  intersection: ['3rd Ave S', 'Yesler Way'],
   // Environmental properties
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned

@@ -12,7 +12,7 @@ The western buildings show where utilities run—electrical conduits snaking up 
 Weeds push through cracks in the pavement, more aggressive here in the shadows. Blackberry vines have begun to climb the western wall, their thorns catching on the rough brick, their leaves dusty but alive.
 
 Third Avenue continues north toward S. Washington and south toward S. Main.`,
-  x: 9,
+  x: 7,
   y: 1,
   z: 0,
   // Environmental properties

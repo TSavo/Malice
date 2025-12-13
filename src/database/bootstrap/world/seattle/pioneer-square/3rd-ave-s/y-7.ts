@@ -1,21 +1,18 @@
-// 3rd Ave S - between S. Jackson St and S. King St
+// 3rd Ave S - between S. Jackson and S. King
 
 export const room = {
   name: '3rd Ave S',
-  description: `A Vietnamese community center occupies the eastern side of the avenue, its bulletin boards still covered with announcements for events that never happened. English classes. Citizenship ceremonies. Lunar New Year celebrations. The announcements have yellowed. The thumbtacks have rusted. The community has dispersed to wherever communities go when cities fail.
+  description: `The condemned block's eastern edge meets Third Avenue here, marked by warning signs and remnants of barricades. The contamination that rendered those buildings uninhabitable—chemical spill, bioweapon residue, the stories vary—supposedly doesn't extend this far. Supposedly. People still give the area a wide berth.
 
-Across the avenue, a Buddhist supply store displays statues and incense and the material goods of spiritual practice. A golden Buddha sits in the window, serene and unchanging, radiating calm into an empty street. The calm persists. The street does not argue with it.
+The smell is faint but present, something chemical beneath the ordinary urban decay. Whether it's imagination or actual contamination is hard to say. The body responds to warnings even when the mind questions them.
 
-Someone has left offerings at the store's doorstep—oranges and flowers and joss paper. The offerings are recent. Someone still believes. Someone still hopes. The oranges are fresh.
-
-The avenue continues toward King Street, the southern boundary of the district.`,
-  x: 9,
+On the western side, buildings that should have been demolished stand empty and waiting. Their windows are boarded, their doors sealed with official notices that lost their authority decades ago. The seals are mostly intact. People have learned to respect boundaries marked with warnings, even when the warners are gone.`,
+  x: 7,
   y: -7,
   z: 0,
-  // Environmental properties
-  population: 0, // Empty (post-Event)
-  ambientNoise: 0, // Quiet/abandoned
-  lighting: 100, // Daylight (outdoor)
-  waterLevel: 0, // Dry
-  outdoor: true, // Street level
+  population: 0,
+  ambientNoise: 0,
+  lighting: 100,
+  waterLevel: 0,
+  outdoor: true,
 };

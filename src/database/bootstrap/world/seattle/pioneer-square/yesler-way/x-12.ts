@@ -1,14 +1,14 @@
-// Yesler Way - between Waterfront and 1st Ave
+// Yesler Way - between 1st Ave and Occidental
 
 export const room = {
   name: 'Yesler Way',
-  description: `A parking structure dominates the south side of the street, poured concrete stained dark with fifty-five years of Seattle rain. The entrance ramp descends into blackness. Cars are still visible on the upper levels through the open sides, arranged in rows, waiting for owners who died or fled decades ago. The below-grade levels are flooded—water table rising where pumps no longer run.
+  description: `Red brick buildings line both sides of Yesler Way here, four and five stories tall, the post-fire construction that defines what's left of Pioneer Square. The buildings date to the 1890s, built after the Great Fire forced Seattle to rebuild in brick and stone. Brick outlasted the city that built it. The facades show decorative cornices and arched window headers, ornament that no one admires anymore.
 
-The building opposite is four stories of brick, YESLER ARTIST LOFTS according to faded signage on the facade. The building was converted to live-work spaces during the neighborhood's gentrification, the creative-class development that preceded the war. The upper floors feature large windows that artists favored—north-facing light for studio work. The windows are dark now. The art is abandoned. The artists left or died like everyone else.
+ZEITGEIST COFFEE occupies a corner space, its windows dark, its espresso machines cold. Through the grimy glass: the counter seating where customers once watched baristas work, the exposed brick and industrial fixtures that third-wave coffee shops favored. Seattle's coffee culture ended with everything else. The beans rotted long ago. The machines stand ready to serve no one.
 
-The buildings along this stretch maintain the scale that historic preservation once enforced: three to five stories, brick facades, the vocabulary established after the Great Fire. Preservation guidelines stopped mattering when there was nothing left to preserve for.`,
+ATLAS TATTOO shares the building, its windows still displaying the flash art that traditional shops maintain—anchors, roses, skulls and daggers faded behind dusty glass. Walk-in customers don't walk in anymore. The needles are still there, probably. The ink has dried.`,
   x: -12,
-  y: 10,
+  y: 12,
   z: 0,
   // Environmental properties
   population: 0, // Empty (post-Event)

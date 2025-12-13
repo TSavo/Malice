@@ -1,15 +1,19 @@
-// Yesler Way - nearly to 4th Ave
+// 4th Ave S & Yesler Way
+// Eastern boundary, gateway to the International District
 
 export const room = {
-  name: 'Yesler Way',
-  description: `The last stretch before Fourth Avenue mixes old and new construction—three-story walk-ups beside modern low-rises, all of it dark, all of it empty. The buildings housed businesses that served transitional neighborhoods: dry cleaners, nail salons, the service economy that filled space between anchor tenants. The services ended. The anchor tenants left. The buildings persist.
+  name: '4th Ave S & Yesler Way',
+  description: `Fourth Avenue marks Pioneer Square's eastern boundary, where the historic district meets what was once Chinatown-International District. The transition is visible in the architecture—brick facades giving way to signs in Chinese characters, Victorian ornamentation to hanging red lanterns that have faded to pink and rotted to ribbons over fifty-five years.
 
-A Vietnamese restaurant occupies a ground-floor space, its awning faded and torn, still advertising pho and banh mi. Through the grimy window: the open kitchen layout that noodle shops favor, steam tables rusted, prep stations bare. The restaurant represented the culinary culture of this neighborhood's eastern edge. The food smells are gone now—garlic and ginger and frying oil replaced by dust and decay.
+A gas station occupies the corner, its canopy stained and sagging, its pumps rusted solid. The station served this intersection for decades before the war and has stood empty since. A sign still lists prices for gas that will never be pumped. The convenience store behind security bars is dark and stripped.
 
-Fourth Avenue is visible ahead. The ornate Chinatown gate stands a few blocks south, its dragons watching the empty street with faded eyes. The gate marked the boundary between communities. Boundaries mean less now.`,
+The ornate Chinatown gate is visible to the south, its dragons watching the empty street with painted eyes that have faded to suggestion. The gate represented community investment, the visible declaration that this place belonged to the people who built it. The people are scattered now. The gate remains, marking a boundary between one kind of emptiness and another.
+
+Yesler Way continues east, named for the mill owner whose skid road became Seattle's first street. The timber is gone. The mills are gone. The street remains.`,
   x: 14,
-  y: 10,
+  y: 12,
   z: 0,
+  intersection: ['4th Ave S', 'Yesler Way'],
   // Environmental properties
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned

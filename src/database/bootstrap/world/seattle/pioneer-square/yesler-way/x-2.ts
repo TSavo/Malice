@@ -1,14 +1,14 @@
-// Yesler Way - east of Occidental
+// Yesler Way - between Occidental and 2nd Ave
 
 export const room = {
   name: 'Yesler Way',
-  description: `Occidental Park extends to the south from this corner, a wasteland of cracked cobblestones and dead maple trees. The iron pergola is visible at the north end, listing to one side where rust has weakened its supports. The Victorian structure sheltered farmers markets and art fairs once. It shelters nothing now except pigeons and rain.
+  description: `The PIONEER BUILDING continues along the south side of the street, its red brick facade stretching nearly the full block. Most of the windows are intact, though a few on the upper floors have been replaced with plywood or plastic sheeting. The Romanesque arches frame dark interiors. The decorative terra cotta shows chips and cracks but has held together better than anyone expected.
 
-VIA TRIBUNALI occupies the corner building, a pizzeria that was part of Pioneer Square's dining scene. Through the grimy window: the brick oven cold and dark, the marble counter cracked, the communal tables thick with dust. The evening crowds that filled this place are fifty-five years gone. The wood-fired smell of Neapolitan pizza is a memory no one alive remembers.
+A surface parking lot takes up the north side, surrounded by chain link fence topped with razor wire that someone added after the war. The razor wire is thorough. Whatever was worth protecting here is long gone. Weeds have cracked the asphalt into islands, each hosting its own ecosystem of dead grass and debris.
 
-The Pioneer Building is visible ahead, six stories of red brick that have weathered better than most. Elmer Fisher designed it to last. It has.`,
+The Pioneer Building's fire escapes descend the rear facade in geometric zigzags, rusted solid in some places, collapsed entirely in others. The structure has stood since 1892. It will probably stand for another century. The people who built it understood permanence.`,
   x: -2,
-  y: 10,
+  y: 12,
   z: 0,
   // Environmental properties
   population: 0, // Empty (post-Event)

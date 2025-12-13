@@ -1,14 +1,14 @@
-// Yesler Way - approaching 1st Ave
+// Yesler Way - between 1st Ave and Occidental
 
 export const room = {
   name: 'Yesler Way',
-  description: `First Avenue approaches from the east, the intersection ahead marking where Smith Tower rises—the white terra cotta landmark stained grey now but still standing, still dominating the view as it has since 1914.
+  description: `Occidental Park's dead maple trees are visible ahead, their bare branches rising above the surrounding rooflines like skeletal fingers. The park opens just beyond this block, what's left of it.
 
-CASH N GO occupies a corner building, its window signage still advertising services in English and Spanish: CHECK CASHING • PAYDAY LOANS • MONEY ORDERS. The business served the neighborhood's unbanked population—workers who needed immediate access to funds, who paid the fees that urgency commanded. The fees stopped mattering when the funds stopped having value. The signage remains, promising services no one needs.
+FOSTER/WHITE GALLERY occupies a ground-floor space, its white walls visible through windows that haven't been cleaned in decades. The track lighting is dark. The abstract paintings and sculptures are still there—looters don't take art—displayed with the careful spacing that once conveyed value. The First Thursday art walks brought crowds through galleries like this. The crowds stopped coming. The art remains, appreciated by no one.
 
-The building opposite houses what was YESLER COMMUNITY KITCHEN, a meal service facility that fed neighborhood residents experiencing homelessness. The serving line is visible through grimy windows, the institutional kitchen cold and dark. A mural on the facade depicts community members sharing a meal, the imagery that social service organizations commission to humanize their work. The community scattered. The meal ended. The mural's painted faces still smile at an empty street.`,
+The UNDERGROUND TOUR entrance occupies a storefront across the street, the departure point for guided tours that explored Seattle's buried original city. After the Great Fire, Seattle raised its streets, entombing the original ground floors beneath the new surface. The tours ended when everything ended. The passages are still down there, darker now, the guides long gone. A city built atop itself, layer upon layer of abandonment.`,
   x: -10,
-  y: 10,
+  y: 12,
   z: 0,
   // Environmental properties
   population: 0, // Empty (post-Event)

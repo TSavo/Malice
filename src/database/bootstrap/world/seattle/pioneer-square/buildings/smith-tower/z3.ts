@@ -15,8 +15,8 @@ export const building = {
 The floor is bare concrete, dusty. Overhead, fluorescent work lights cast harsh shadows. The air smells of sawdust and drywall compound. Everything is paused mid-construction.
 
 A sign on the wall reads: FLOOR 3 - COMPLETION PENDING - CONTINUUM DEVELOPMENT.`,
-      x: -4,
-      y: 8,
+      x: -12,
+      y: 10,
       z: 3,
       population: 0,
       ambientNoise: 2,

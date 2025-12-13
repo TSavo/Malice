@@ -2,18 +2,17 @@
 
 export const room = {
   name: '2nd Ave S',
-  description: `S. Main Street opens ahead, and with it the northern edge of the Corp Construction zone. The black barrier ends at the intersection, yielding to buildings that predate the project—Pioneer Square's original warehouses and commercial blocks, brick and stone that survived the fire and the rebuild and every development wave since. The contrast is stark: preserved history on one side, hidden present on the other, and somewhere in the gap between them, an explanation that nobody ever provided.
+  description: `Main Street is visible ahead, the cross-axis that once defined Pioneer Square's commercial center. The buildings on either side of Second Avenue grow more ornate as the intersection approaches—architects competing for attention at the neighborhood's busiest corner. The competition continued until there was no one left to impress.
 
-WASHINGTON FEDERAL stands at the corner, a neoclassical bank building with marble columns and bronze doors and the architectural language of trustworthiness—cornices and pediments and Latin words carved into stone. The bank wanted you to believe your money was safe behind all that marble. The money is presumably still there, locked in a vault that runs on time locks and redundant security, inaccessible to everyone including the people who deposited it. Wealth measured in numbers that exist only as magnetic patterns on servers that may or may not still function.
+A bank building dominates the western corner, its marble facade projecting the permanence that financial institutions once claimed. The brass doors are tarnished green, their handles worn smooth by generations of hands that reached for money. The money is still inside, theoretically. It means nothing now.
 
-A clock is set into the bank's facade, analog hands frozen at 2:47. The clock ran on a different kind of mechanism—springs and gears and the steady tick of mainspring unwinding—and when it stopped, it stopped honestly, preserving the moment rather than blinking error codes. 2:47 PM or AM, on some day that seemed ordinary when it was happening. The day when the world was still the world and banks were still banks and clocks still told time that mattered.`,
-  x: 3,
+The streetscape shows evidence of the last days—barriers that were erected and abandoned, sandbags that have rotted into piles of mud and fabric, a burned-out vehicle pushed to the curb and left to rust. The archaeology of collapse, preserved in place.`,
+  x: 0,
   y: -1,
   z: 0,
-  // Environmental properties
-  population: 0, // Empty (post-Event)
-  ambientNoise: 0, // Quiet/abandoned
-  lighting: 100, // Daylight (outdoor)
-  waterLevel: 0, // Dry
-  outdoor: true, // Street level
+  population: 0,
+  ambientNoise: 0,
+  lighting: 100,
+  waterLevel: 0,
+  outdoor: true,
 };

@@ -26,6 +26,7 @@ import { pathToFileURL } from 'url';
  *         north: '%1',      // Connects to room %1
  *         east: '%2',       // Connects to room %2
  *         up: { room: '%3', locked: true, lockKey: '%4' }, // With exit properties
+ *         west: { to: '1st-ave-s/y10.ts', description: 'Doors lead west' }, // World room ref
  *       },
  *       objects: [
  *         { prototype: 'jobBoard', name: 'Employment Terminal' },
@@ -36,6 +37,13 @@ import { pathToFileURL } from 'url';
  *   }
  * }
  *
+ * Exit types:
+ * - Simple: '%1' - connects to room placeholder %1 within the building
+ * - Complex: { room: '%1', locked: true } - placeholder with properties
+ * - World ref: { to: 'path/file.ts', description: '...' } - connects to a world room
+ *   The 'to' path is relative to pioneer-square/ and the room's coordinates are
+ *   read from the file. Bidirectional exits are created automatically.
+ *
  * Objects in rooms:
  * - prototype: Required. Name of the prototype alias (e.g., 'jobBoard', 'sign')
  * - All other properties are passed to the created object
@@ -43,8 +51,17 @@ import { pathToFileURL } from 'url';
  * This allows precise control over building interiors where not every adjacent
  * coordinate should be connected (walls exist).
  */
+interface DeferredWorldExit {
+  sourceRoom: RuntimeObject;
+  direction: string;
+  toPath: string;
+  exitProps: any;
+  description?: string;
+}
+
 export class BuildingBuilder {
   private buildings: Map<string, Map<string, RuntimeObject>> = new Map();
+  private deferredWorldExits: DeferredWorldExit[] = [];
 
   constructor(private manager: ObjectManager) {}
 
@@ -61,6 +78,9 @@ export class BuildingBuilder {
     console.log('  🏢 Building structures...');
 
     await this.loadBuildings();
+
+    // Connect buildings to world rooms (deferred exits with 'to:' paths)
+    await this.connectWorldExits();
 
     console.log('  ✅ Buildings built');
   }
@@ -235,6 +255,7 @@ export class BuildingBuilder {
         // Exit definition can be:
         // - Simple: '%1' (just a room placeholder)
         // - Complex: { room: '%1', locked: true, hidden: false, distance: 10 }
+        // - World ref: { to: 'path/file.ts', description: '...' } - deferred until world rooms exist
         let destPlaceholder: string;
         let exitProps: any = {};
 
@@ -242,7 +263,19 @@ export class BuildingBuilder {
           // Simple form
           destPlaceholder = exitDef;
         } else if (typeof exitDef === 'object' && exitDef !== null) {
-          // Complex form
+          // Check for world reference (to: path.ts)
+          if ((exitDef as any).to && typeof (exitDef as any).to === 'string') {
+            // Defer this exit - will be resolved after all buildings are built
+            this.deferredWorldExits.push({
+              sourceRoom,
+              direction,
+              toPath: (exitDef as any).to,
+              exitProps: exitDef,
+              description: (exitDef as any).description,
+            });
+            continue;
+          }
+          // Complex form with room placeholder
           destPlaceholder = (exitDef as any).room;
           exitProps = exitDef;
         } else {
@@ -434,6 +467,167 @@ export class BuildingBuilder {
     const dy = (y2 - y1) * 30;
     const dz = (z2 - z1) * 3; // 3m per floor vertical
     return Math.round(Math.sqrt(dx * dx + dy * dy + dz * dz));
+  }
+
+  /**
+   * Connect building rooms to world rooms via deferred exits
+   * Resolves { to: 'path/file.ts' } references by finding world rooms by coordinates
+   */
+  private async connectWorldExits(): Promise<void> {
+    if (this.deferredWorldExits.length === 0) {
+      return;
+    }
+
+    const $ = this.manager as any;
+    const recycler = $.recycler;
+    const exitProto = $.exit;
+
+    console.log(`    Connecting ${this.deferredWorldExits.length} building-to-world exits...`);
+
+    let connectedCount = 0;
+
+    for (const deferred of this.deferredWorldExits) {
+      const { sourceRoom, direction, toPath, exitProps, description } = deferred;
+
+      // Parse the path to extract coordinates
+      // Format: "yesler-way/x-12.ts" or "1st-ave-s/y10.ts"
+      const targetCoords = await this.parsePathToCoordinates(toPath);
+      if (!targetCoords) {
+        console.warn(`    Warning: Could not parse coordinates from path: ${toPath}`);
+        continue;
+      }
+
+      // Find the world room by coordinates
+      const worldRoom = await this.findRoomByCoordinates(targetCoords.x, targetCoords.y, targetCoords.z);
+      if (!worldRoom) {
+        console.warn(`    Warning: No world room found at (${targetCoords.x}, ${targetCoords.y}, ${targetCoords.z}) for path: ${toPath}`);
+        continue;
+      }
+
+      // Calculate distance
+      const distance = exitProps.distance || this.calculateDistance(
+        (sourceRoom.get('x') as number) || 0,
+        (sourceRoom.get('y') as number) || 0,
+        (sourceRoom.get('z') as number) || 0,
+        targetCoords.x,
+        targetCoords.y,
+        targetCoords.z
+      );
+
+      // Create exit from building room to world room
+      const exitToWorld = await recycler.create({
+        parent: exitProto.id,
+        properties: {
+          name: direction,
+          aliases: this.getDirectionAliases(direction),
+          destRoom: worldRoom.id,
+          distance: distance,
+          hidden: exitProps.hidden ?? false,
+          locked: exitProps.locked ?? false,
+          description: description,
+        },
+      });
+
+      await sourceRoom.call('addExit', exitToWorld);
+
+      // Create reverse exit from world room back to building room
+      const reverseDirection = this.getOppositeDirection(direction);
+      const exitToBuilding = await recycler.create({
+        parent: exitProto.id,
+        properties: {
+          name: reverseDirection,
+          aliases: this.getDirectionAliases(reverseDirection),
+          destRoom: sourceRoom.id,
+          distance: distance,
+          hidden: exitProps.hidden ?? false,
+          locked: exitProps.locked ?? false,
+          description: description ? description.replace(/lead[s]? (\w+) to/, `lead $1 into`) : undefined,
+        },
+      });
+
+      await worldRoom.call('addExit', exitToBuilding);
+
+      connectedCount++;
+    }
+
+    console.log(`    Connected ${connectedCount} building-to-world exits`);
+  }
+
+  /**
+   * Parse a file path to extract room coordinates
+   * Examples: "yesler-way/x-12.ts" -> x=-12, y=12, z=0
+   *           "1st-ave-s/y10.ts" -> x=-14, y=10, z=0
+   */
+  private async parsePathToCoordinates(toPath: string): Promise<{ x: number; y: number; z: number } | null> {
+    // Try to load the file and get coordinates directly
+    const worldDir = path.join(
+      process.cwd(),
+      'src/database/bootstrap/world/seattle/pioneer-square'
+    );
+
+    const filePath = path.join(worldDir, toPath);
+
+    try {
+      const fileUrl = pathToFileURL(filePath).href;
+      const module = await import(fileUrl);
+      const roomDef = module.room;
+
+      if (roomDef && typeof roomDef.x === 'number' && typeof roomDef.y === 'number') {
+        return {
+          x: roomDef.x,
+          y: roomDef.y,
+          z: roomDef.z || 0,
+        };
+      }
+    } catch (err) {
+      console.warn(`    Warning: Could not load room file ${toPath}: ${err}`);
+    }
+
+    return null;
+  }
+
+  /**
+   * Find a world room by its coordinates
+   */
+  private async findRoomByCoordinates(x: number, y: number, z: number): Promise<RuntimeObject | null> {
+    // Find rooms with matching coordinates
+    const rooms = await this.manager.findByProperty('x', x);
+
+    for (const room of rooms) {
+      if (room.get('y') === y && room.get('z') === z) {
+        // Verify it's a world room (not a building room) by checking if it has outdoor or is named after a street
+        const name = room.get('name') as string || '';
+        const outdoor = room.get('outdoor') as boolean;
+
+        // World rooms are typically streets/avenues and are outdoor
+        if (outdoor || name.includes('Way') || name.includes('Ave') || name.includes('St')) {
+          return room;
+        }
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Get the opposite direction for bidirectional exits
+   */
+  private getOppositeDirection(direction: string): string {
+    const opposites: Record<string, string> = {
+      north: 'south',
+      south: 'north',
+      east: 'west',
+      west: 'east',
+      northeast: 'southwest',
+      northwest: 'southeast',
+      southeast: 'northwest',
+      southwest: 'northeast',
+      up: 'down',
+      down: 'up',
+      in: 'out',
+      out: 'in',
+    };
+    return opposites[direction.toLowerCase()] || direction;
   }
 
   /**

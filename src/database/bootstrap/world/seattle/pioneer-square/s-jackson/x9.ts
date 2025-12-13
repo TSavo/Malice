@@ -1,16 +1,15 @@
-// 3rd Ave S & S. Jackson St intersection
+// S. Jackson St - between 3rd and 4th Ave
 
 export const room = {
-  name: '3rd Ave S & S. Jackson St',
-  description: `Third Avenue intersects S. Jackson Street at the eastern edge of the Corp Construction zone, the maintained fence terminating at the cross-street. East of here, the International District continues in its abandoned form—the contrast between Corp's active site and the neighborhood's decay creating a sharp visual boundary. One side alive with construction noise. The other side silent.
+  name: 'S. Jackson St',
+  description: `The Wing Luke Museum of the Asian Pacific American Experience is visible down the block, the Smithsonian affiliate that documented Asian immigration to the Pacific Northwest. The museum occupied a historic hotel building, the structure itself part of the exhibit—preserved spaces showing how early immigrants lived. The spaces are still preserved, the exhibits still arranged. No one visits. The experience the museum documented has ended, replaced by a different experience no museum will chronicle.
 
-A Metro bus stop occupies the northeast corner, the standard infrastructure of Seattle's transit system: a shelter with transparent walls clouded by age, a bench inside, the route information panel listing buses that haven't run in fifty-five years. The location connected the International District to the rest of the city—Chinatown to Capitol Hill, the U District, neighborhoods beyond. All equally empty now, connected by routes no bus travels.
+The CHINATOWN-INTERNATIONAL DISTRICT COMMUNITY CENTER occupies this corner, the social services hub that neighborhood organizations shared. The center hosted language classes, citizenship preparation, senior programs—the programming that maintained community cohesion. The building's institutional design—1970s construction, federal community development grants—shows through the neglect. No classes. No programs. No community left to serve.
 
-The buildings at this intersection span eras, all arriving at the same destination: a 1920s brick structure on the southwest corner, decorative detail weathered but visible; a 1970s concrete box to the northeast, functional and crumbling; and the Corp Construction fence to the northwest, new and maintained, the only thing here that isn't dying.`,
+A mural covers the windowless wall of the adjacent building, depicting the neighborhood's history. The imagery spans generations: Chinese laborers building railroads, Japanese farmers at Pike Place Market, the internment that emptied the neighborhood during World War II, the rebuilding that followed. The paint has faded and peeled. Another emptying came, worse than internment. No rebuilding has followed.`,
   x: 9,
-  y: -5,
+  y: -6,
   z: 0,
-  intersection: ['3rd Ave S', 'S. Jackson St'],
   // Environmental properties
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned

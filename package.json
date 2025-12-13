@@ -12,7 +12,8 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "docker:rebuild": "docker compose down && docker volume rm malice_mongodb_data malice_mongodb-data 2>/dev/null; docker compose build --no-cache game && docker compose up -d"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.24.3",

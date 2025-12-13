@@ -1779,6 +1779,191 @@ export class MaliceMCPServer {
       }
     );
 
+    // Execute a command as an AI human
+    this.server.tool(
+      'ai_do',
+      'Execute a command as an AI-controlled human (like typing in the game). Returns the result/output.',
+      {
+        humanId: z.number().describe('AI human object ID'),
+        command: z.string().describe('Command to execute (e.g., "say Hello!", "north", "get sword", "look")'),
+      },
+      async ({ humanId, command }) => {
+        const ai = await this.getAlias('ai');
+        if (!ai) {
+          return {
+            content: [{ type: 'text', text: 'AI registry not found' }],
+            isError: true,
+          };
+        }
+
+        // Verify this is an AI-controlled human
+        const isAi = await ai.call('isAiControlled', humanId);
+        if (!isAi) {
+          return {
+            content: [{ type: 'text', text: `Human #${humanId} is not AI-controlled` }],
+            isError: true,
+          };
+        }
+
+        const human = await this.manager.load(humanId as ObjId);
+        if (!human) {
+          return {
+            content: [{ type: 'text', text: `Human #${humanId} not found` }],
+            isError: true,
+          };
+        }
+
+        try {
+          const trimmed = command.trim();
+
+          // Match input against registered verb patterns
+          const match = await human.call('matchVerb', trimmed) as {
+            error?: string;
+            handler?: any;
+            verbInfo?: { method: string };
+            args?: any[];
+          } | null;
+
+          if (match && match.error) {
+            return {
+              content: [{ type: 'text', text: match.error }],
+            };
+          }
+
+          if (match && match.handler && match.verbInfo) {
+            // Execute the verb - pass null for context (no connection)
+            const result = await match.handler.call(
+              'callVerb',
+              match.verbInfo.method,
+              null,       // context (null for AI)
+              human,      // player/agent
+              trimmed,    // raw command
+              match.args  // resolved args
+            );
+
+            return {
+              content: [{ type: 'text', text: result !== undefined ? String(result) : '(no output)' }],
+            };
+          }
+
+          // No matching pattern found
+          const firstWord = trimmed.split(/\s+/)[0];
+          return {
+            content: [{ type: 'text', text: `I don't understand "${firstWord}".` }],
+          };
+        } catch (err) {
+          return {
+            content: [{ type: 'text', text: `Error executing command: ${err instanceof Error ? err.message : String(err)}` }],
+            isError: true,
+          };
+        }
+      }
+    );
+
+    // Get what an AI human sees (look from their perspective)
+    this.server.tool(
+      'ai_look',
+      'Get what an AI-controlled human sees in their current location.',
+      {
+        humanId: z.number().describe('AI human object ID'),
+      },
+      async ({ humanId }) => {
+        const ai = await this.getAlias('ai');
+        if (!ai) {
+          return {
+            content: [{ type: 'text', text: 'AI registry not found' }],
+            isError: true,
+          };
+        }
+
+        const isAi = await ai.call('isAiControlled', humanId);
+        if (!isAi) {
+          return {
+            content: [{ type: 'text', text: `Human #${humanId} is not AI-controlled` }],
+            isError: true,
+          };
+        }
+
+        const human = await this.manager.load(humanId as ObjId);
+        if (!human) {
+          return {
+            content: [{ type: 'text', text: `Human #${humanId} not found` }],
+            isError: true,
+          };
+        }
+
+        try {
+          // Get the room
+          const locationId = (human as any).location;
+          if (!locationId) {
+            return {
+              content: [{ type: 'text', text: 'Human has no location' }],
+              isError: true,
+            };
+          }
+
+          const room = await this.manager.load(locationId as ObjId);
+          if (!room) {
+            return {
+              content: [{ type: 'text', text: `Location #${locationId} not found` }],
+              isError: true,
+            };
+          }
+
+          // Build what they see
+          const roomName = (room as any).name || 'Unknown';
+          const roomDesc = (room as any).description || '';
+
+          // Get exits
+          const exits = (room as any).exits || [];
+          const exitNames: string[] = [];
+          for (const exitRef of exits) {
+            const exitId = typeof exitRef === 'string' ? parseInt(exitRef.replace('#', ''), 10) : exitRef;
+            const exit = await this.manager.load(exitId as ObjId);
+            if (exit) {
+              exitNames.push((exit as any).name || 'exit');
+            }
+          }
+
+          // Get contents (excluding the AI human itself)
+          const contents = (room as any).contents || [];
+          const items: string[] = [];
+          const people: string[] = [];
+
+          for (const objId of contents) {
+            if (objId === humanId) continue;
+            const obj = await this.manager.load(objId as ObjId);
+            if (!obj) continue;
+
+            const name = (obj as any).name || `#${objId}`;
+            // Check if it's a person (has conscious property or is player/human)
+            if ((obj as any).conscious !== undefined || (obj as any).playername) {
+              people.push(name);
+            } else {
+              items.push(name);
+            }
+          }
+
+          const result = {
+            location: roomName,
+            description: roomDesc,
+            exits: exitNames,
+            people,
+            items,
+          };
+
+          return {
+            content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
+          };
+        } catch (err) {
+          return {
+            content: [{ type: 'text', text: `Error looking: ${err instanceof Error ? err.message : String(err)}` }],
+            isError: true,
+          };
+        }
+      }
+    );
+
     // ═══════════════════════════════════════════════════════════════════════
     // PLOT MANAGEMENT TOOLS
     // ═══════════════════════════════════════════════════════════════════════

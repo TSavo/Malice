@@ -1,14 +1,14 @@
-// S. Jackson St - between 2nd and 3rd Ave
+// S. Jackson St - approaching 3rd Ave
 
 export const room = {
   name: 'S. Jackson St',
-  description: `The Corp Construction perimeter continues along the south side of S. Jackson, black fabric barriers maintained and patrolled, the visual wall separating the active site from the dead city beyond. The fence runs for three blocks, the footprint suggesting the scale of whatever Corp is building. Tower cranes move above the barriers—actually move, their arms swinging in ways no other machinery in this district has moved in fifty-five years.
+  description: `Third Avenue approaches from the east, the intersection marking the boundary where the Corp Construction zone ends and the International District's abandoned streetscape resumes. The construction barriers terminate at the property line—Corp's maintained perimeter meeting buildings Corp didn't buy, the contrast between active development and decay sharper here than anywhere.
 
-LUCKY MART occupies the ground floor opposite, a convenience store that served the neighborhood before the war. The awning—red canvas printed with English and Vietnamese—is faded and torn, the sidewalk produce display empty and rusted. Through the grimy window: coolers along the back wall dark and dead, snack aisles picked clean decades ago, the lottery terminal behind the counter offering jackpots no one will ever claim.
+PACIFIC RIM CURRENCY EXCHANGE occupies the corner building, its windows dark, its services obsolete. Currency exchanges clustered in immigrant neighborhoods, providing the service families needed to send money home. The window still displays exchange rates in columned format: USD to JPY, USD to PHP, USD to VND—currencies that may not exist anymore, exchange rates frozen when the markets stopped. The families that sent money home are scattered. Home, for most of them, is gone.
 
-The buildings along this stretch show the International District's characteristic mix, equally abandoned: older brick structures adapted for uses that ended, newer construction built to codes that no longer matter. The residential character the block maintained is silent now, apartments above dark retail housing no one. The community that gave the neighborhood its identity is gone, while Corp builds something new in its ruins.`,
+Security cameras are mounted at the building's corners, their weatherproof housings intact, their lenses pointed at nothing. The coverage they provided protected against theft and vandalism. The war was neither theft nor vandalism. The cameras recorded nothing useful.`,
   x: 5,
-  y: -5,
+  y: -6,
   z: 0,
   // Environmental properties
   population: 0, // Empty (post-Event)

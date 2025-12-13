@@ -9,7 +9,7 @@ The Corp Construction fence continues west, but here it's been decorated. Someon
 A newspaper box stands at the corner, still holding copies of the Seattle Times from months ago. The headline announces something that seemed important then. The newsprint has yellowed. The importance has evaporated.
 
 The courthouse steps are visible to the south, leading up to doors that dispense nothing.`,
-  x: 9,
+  x: 7,
   y: 2,
   z: 0,
   // Environmental properties

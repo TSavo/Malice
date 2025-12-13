@@ -7,7 +7,7 @@ export const room = {
 A bouncer's stool sits beside the door, black metal, bolted to the sidewalk. The stool is empty. The velvet rope that once stretched from door to stanchion lies coiled at the base of the wall like a dead snake.
 
 These buildings connect below street level—the Underground passages run beneath the whole neighborhood, a labyrinth of old storefronts and sidewalks preserved in darkness. Most entrances are sealed, bricked up or padlocked. But the passages are still there, beneath your feet right now, silent except for dripping water and the scuttle of things that live in darkness.`,
-  x: -9,
+  x: -14,
   y: 2,
   z: 0,
   // Environmental properties

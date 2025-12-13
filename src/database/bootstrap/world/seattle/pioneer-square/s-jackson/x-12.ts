@@ -1,14 +1,14 @@
-// S. Jackson St - between Waterfront and 1st Ave
+// S. Jackson St - between 1st Ave and Occidental
 
 export const room = {
   name: 'S. Jackson St',
-  description: `The Alaskan Way Viaduct once passed overhead here, the double-decker highway that carried SR 99 along Seattle's waterfront. The structure came down in 2019, replaced by a tunnel, and the surface streets reclaimed the sky. Urban planners intended to transform the corridor into parkland and mixed-use development. The war came instead. The transformation was abandonment rather than renewal.
+  description: `A Buddhist temple occupies the second and third floors of a narrow building, its presence marked by a steep stairway entrance and a sign in Chinese characters: SEATTLE BUDDHIST TEMPLE, according to smaller English text. The building dates to the 1920s, when the community established religious institutions that immigrant populations require—places for worship, for maintaining traditions across generations and oceans. The traditions crossed oceans only to end here, in a temple with no congregation. The incense that once burned has long since turned to ash.
 
-The foundations of the viaduct's support columns are still visible, concrete pads embedded in the ground, now cracked and sprouting weeds. The demolition crews removed the visible infrastructure but left the underground elements—pilings and footings that will outlast the memory of what they supported.
+HAPPY LEMON occupies the ground floor, its neon accents dark, its Instagram-friendly design dusty and abandoned. The bubble tea shop served the drink craze that swept from Taiwan through Asian-American communities. The menu board behind the counter lists permutations no one will order: milk tea, fruit tea, tapioca pearls and jellies. The white walls are grey now with neglect. The tea was never made. The happiness was marketed, not delivered.
 
-The buildings that line this corridor show the effects of decades in the viaduct's shadow, then decades more in the war's aftermath—facades weathered and crumbling, windows broken or boarded. Some buildings had been renovated before the war, their owners anticipating a waterfront transformation that would never come. The renovations are indistinguishable from the decay now, fresh paint faded, new windows broken, investment and neglect arriving at the same destination.`,
+The buildings along this stretch maintain the mixed-use pattern that characterized the International District: ground-floor retail dark and empty, upper floors housing apartments whose residents are fifty-five years gone. The organizations that immigrant neighborhoods sustained have no immigrants to organize.`,
   x: -12,
-  y: -5,
+  y: -6,
   z: 0,
   // Environmental properties
   population: 0, // Empty (post-Event)

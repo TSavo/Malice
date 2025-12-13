@@ -1,21 +1,18 @@
-// 4th Ave S - between S. Jackson St and S. King St
+// 4th Ave S - between S. Jackson and S. King
 
 export const room = {
   name: '4th Ave S',
-  description: `The Condemned Block is visible to the west, its toxic warning signs bright against the grey buildings. Whatever happened there, it happened fast and it happened badly. The fences around it are serious—razor wire, biohazard symbols, warnings in multiple languages. People stay away.
+  description: `The condemned block's eastern edge runs parallel to Fourth Avenue here, separated by a single row of buildings that serves as a buffer between the toxic zone and the street. The buffer buildings are empty—too close to the contamination for comfort, too intact to demolish. They stand as a wall between the bad and the worse.
 
-On the eastern side of the avenue, life continues in a way. A scrap metal dealer has set up operations in an old warehouse, piles of copper and aluminum visible through gaps in the fence. Someone is still trading here, still finding value in what others abandon.
+Faded warning signs are visible on the side streets leading west, their messages still legible despite decades of weather: DANGER - CONTAMINATED AREA - NO ENTRY. The warnings were posted by authorities that no longer exist, enforced by systems that no longer function. The danger presumably remains.
 
-The smell from the Condemned Block carries on certain winds. Chemical and organic at once. The kind of smell that makes you breathe shallow and walk fast.
-
-The light rail tracks at street level are covered in debris and weeds. The trains haven't run this way in a long time.`,
-  x: 15,
+Fourth Avenue itself feels cleaner here, the pavement less damaged, the buildings less decayed. Perhaps the proximity to danger kept people away, reducing the wear of occupation. Perhaps it's just random variation. The city's ruin is uneven.`,
+  x: 14,
   y: -7,
   z: 0,
-  // Environmental properties
-  population: 0, // Empty (post-Event)
-  ambientNoise: 0, // Quiet/abandoned
-  lighting: 100, // Daylight (outdoor)
-  waterLevel: 0, // Dry
-  outdoor: true, // Street level
+  population: 0,
+  ambientNoise: 0,
+  lighting: 100,
+  waterLevel: 0,
+  outdoor: true,
 };

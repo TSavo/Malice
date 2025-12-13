@@ -2,14 +2,14 @@
 
 export const room = {
   name: 'Alaskan Way',
-  description: `The railroad tracks here are partially buried under debris that washed up during the storm surge. Driftwood and plastic bottles and the bloated remains of things that floated. No one cleaned it up. No one was left to care.
+  description: `A grain elevator rises from the waterfront here, a concrete monolith stained with decades of weather and neglect. The conveyor belts that once carried wheat from rail cars to ship holds hang slack, their rubber cracked and peeling. The grain is gone. The ships that carried it are gone. The farmers who grew it are probably gone too.
 
-A maintenance shed sits beside the tracks, its corrugated walls dented, its padlock hanging open and useless. Tools are scattered inside, rusted but potentially useful. Someone took the best ones already. They left behind a workbench and a calendar from two years ago, still turned to March.
+Pigeons have colonized the upper levels, their cooing a constant murmur from above. Their droppings coat the sidewalk in grey-white streaks. They don't care about the end of the world. They never cared about anything.
 
-The waterfront curves slightly here, following the natural contour of the bay. The view of the city from this angle is almost beautiful, if you squint and forget what happened. The buildings still stand. The skyline still has its shape. From here, you could almost believe nothing changed.
+A security booth sits at the base of the elevator, its windows intact, its door locked. Inside, monitors display static. The cameras they connected to are probably still working, recording nothing to drives that will eventually fill and stop.
 
-You would be wrong.`,
-  x: -15,
+The industrial waterfront stretches south toward the port.`,
+  x: -21,
   y: -3,
   z: 0,
   // Environmental properties

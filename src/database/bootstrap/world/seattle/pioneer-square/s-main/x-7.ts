@@ -1,15 +1,16 @@
-// S. Main St - between 1st Ave and Occidental
+// Occidental Ave S & S. Main St intersection - CENTER OF MAP (0,0)
 
 export const room = {
-  name: 'S. Main St',
-  description: `FOSTER/WHITE GALLERY occupies the corner building, a white-walled space that dealt in Northwest art before Northwest art became a recognized category. Through the floor-to-ceiling windows: paintings still hung on their hooks, sculptures still positioned on their pedestals, the whole arrangement frozen in a moment of curatorial intention. A canvas near the window shows abstract shapes in red and black, the kind of work that required a gallery statement to interpret. The statement is filed somewhere. The interpretation has expired.
+  name: 'Occidental Ave S & S. Main St',
+  description: `This is the center of Pioneer Square, the geographic and historical heart of Seattle's original commercial district. Occidental Avenue crosses Main Street here at the zero point—the intersection from which early surveyors measured distances, the corner where the city began before the city knew what it was beginning. The significance has been commemorated on plaques that nobody reads. The significance persists regardless.
 
-The gallery door is locked but transparent, giving the space the quality of a diorama—art in its natural habitat, preserved behind glass like the stuffed animals at natural history museums. A twisted metal sculpture stands in the center of the room, lit by skylights that still admit grey Seattle light. The sculpture's title card reads EMERGENCE. What's emerging is unclear. The emergence continues.
+The Pioneer Square totem pole rises sixty feet from its concrete base at the intersection's northwest corner, carved cedar depicting Raven and other figures from Tlingit mythology. The city's businessmen stole the original from a Tlingit village in Alaska during an 1899 "goodwill expedition"—they literally sawed it down and loaded it onto a steamer. When the original burned in 1938, the city commissioned a replacement from the same Tlingit community and had the audacity to be surprised when they charged $5,000. The replacement stands here still, weathered to silver-grey, its story more complicated than the heritage plaques admit.
 
-STORYVILLE COFFEE occupies the building across the street, an artisanal roaster that sourced beans from Ethiopia and Guatemala and places where the supply chains no longer reach. Through the window: a Probat roaster the size of a small car, its drum cold, its chaff collector full. Bags of green beans wait on shelves for roasting that will never happen. The smell that used to drift from this building—dark roast and caramelized sugar and the particular chemistry of coffee becoming coffee—is a memory now, replaced by the neutral scent of dust and stale air.`,
+Occidental Mall stretches north and south, its cobblestones and maples and wrought-iron benches designed to evoke a pedestrian urbanism that Seattle never quite had. The design was an aspiration, not a restoration. The aspiration remains, even if the pedestrians don't. Maple branches interlock overhead. Benches wait for sitters who aren't coming. The zero point is silent now, measuring nothing from nothing.`,
   x: -7,
   y: 0,
   z: 0,
+  intersection: ['Occidental Ave S', 'S. Main St'],
   // Environmental properties
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned

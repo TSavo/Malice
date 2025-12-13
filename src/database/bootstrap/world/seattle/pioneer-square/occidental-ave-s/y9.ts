@@ -2,18 +2,17 @@
 
 export const room = {
   name: 'Occidental Ave S',
-  description: `Yesler Way ends here in a wall of destruction that rises higher than the buildings it buried. The debris forms an almost perfect barrier, filling the intersection from facade to facade, the compressed mass of a building that fell sideways instead of down. Rebar bristles from the pile like metal bones. Glass glitters in the rubble where sunlight catches it, a thousand tiny mirrors reflecting nothing in particular. Somewhere in that mass, sealed beneath tons of brick and concrete, are the contents of an office building—computers and cubicles and coffee mugs with jokes printed on them. Personal effects. Personal histories. All of it compressed into aggregate now.
+  description: `The avenue climbs slightly here as it approaches Yesler Way, following the natural grade that once made this hillside ideal for skidding logs down to Henry Yesler's mill. The incline is barely perceptible now, smoothed by a century of street improvements, but feet can feel what eyes can't see.
 
-A jersey barrier stands in front of the pile, orange and white striped, the kind of thing you see at construction sites. Behind it, caution tape has been strung across the rubble, bright yellow with black letters repeating DANGER DANGER DANGER. The tape has torn in places, fluttering in the wind that funnels down the corridor of buildings. Official responses to unofficial disasters. The tape was meant to last weeks. It's lasted years.
+The buildings on this block are a mix of brick and stone, their ground floors showing the characteristic high ceilings and large windows of commercial space designed for natural light. Before electricity became cheap, architects worked harder. The windows are dark now, but they still catch what light the sky offers.
 
-The Occidental Mall ends here in the literal sense—the cobblestones stop ten feet short of the debris, giving way to concrete that disappears under fallen brick. Everything south of this point is preserved history, curated nostalgia, urban heritage protected and polished. Everything north is rubble. The transition is abrupt. The transition is permanent. Seattle's grid ends at Yesler Way, and Yesler Way ends here.`,
-  x: -3,
+A ghost sign is barely visible on one brick facade—white paint faded almost to illegibility, advertising a business whose name can only be partially reconstructed. SOMETHING & SON. ESTABLISHED 18-something. The son would be long dead even if the world hadn't ended.`,
+  x: -7,
   y: 9,
   z: 0,
-  // Environmental properties
-  population: 0, // Empty (post-Event)
-  ambientNoise: 0, // Quiet/abandoned
-  lighting: 100, // Daylight (outdoor)
-  waterLevel: 0, // Dry
-  outdoor: true, // Street level
+  population: 0,
+  ambientNoise: 0,
+  lighting: 100,
+  waterLevel: 0,
+  outdoor: true,
 };

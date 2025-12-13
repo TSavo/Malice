@@ -1,14 +1,14 @@
-// S. King St - approaching 3rd Ave
+// S. King St - east of 3rd Ave
 
 export const room = {
   name: 'S. King St',
-  description: `Third Avenue approaches from the east, the intersection ahead marking what was once the center of the International District's commercial strip. The neighborhood's density shows in the buildings packed close together, the multilingual signage faded but still marking the district's Asian character. The density that once meant vibrancy now means concentrated emptiness.
+  description: `The International District's density reaches its maximum here, buildings packed together in the tight configuration that Asian urban neighborhoods favored. The vertical stacking shows through the decay: retail on the ground floor dark and empty, professional services on the second floor with windows smashed, residential above with curtains still hanging behind broken glass. The density that once meant community now means concentrated abandonment.
 
-GOLDEN GATE BAKERY occupies a ground-floor space, its display cases empty and dark. The Chinese bakery specialized in pastries that dim sum restaurants served and families purchased for special occasions. The window display shows only dust now—no pineapple buns, no egg tarts, no barbecue pork buns. The glass shelving that showcased the day's production holds nothing. The ovens in back are cold. The last day's production was fifty-five years ago.
+SHANGHAI HAND-PULLED NOODLES occupies the ground-floor space, its kitchen cold, its dining room dusty. The restaurant specialized in the la mian tradition—noodles stretched and pulled by hand, the technique that creates texture machine-made noodles can't replicate. The pass-through window to the kitchen frames rusted equipment and empty prep surfaces. Photographs of menu items still line the walls, faded and water-stained, the visual ordering system serving no one who can order.
 
-A wedding photo studio occupies the second floor, HAPPY DAY PHOTOGRAPHY according to faded window signage. The studio specialized in the elaborate portrait sessions that Asian weddings traditionally include. Sample portraits still hang in the window—couples in elaborate gowns and suits, posed against backgrounds that promised prosperity. The photos have faded in the sun, the happy couples reduced to ghosts. The marriages they celebrated are over now, one way or another.`,
+The building's upper floors house HARMONY ACUPUNCTURE on the second level, its windows dark, its treatment rooms abandoned. Apartments occupy the floors above, their fire escapes rusted, their residents fifty-five years gone. The needles and herbs that promised to restore harmony couldn't restore what the war took.`,
   x: 8,
-  y: -10,
+  y: -12,
   z: 0,
   // Environmental properties
   population: 0, // Empty (post-Event)

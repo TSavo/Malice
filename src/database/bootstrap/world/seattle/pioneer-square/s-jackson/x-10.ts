@@ -1,14 +1,14 @@
-// S. Jackson St - approaching 1st Ave
+// S. Jackson St - between 1st Ave and Occidental
 
 export const room = {
   name: 'S. Jackson St',
-  description: `The character of S. Jackson shifts here as it approaches 1st Avenue, the industrial waterfront giving way to mixed-use development—1990s construction designed to bridge the gap between maritime industry and urban living. The bridge leads nowhere now. The maritime industry is dead. The urban living is empty.
+  description: `The streetscape intensifies here, storefronts crowded together in the dense commercial pattern that Asian urban neighborhoods favored. The buildings are narrow but deep, their facades packed with signage in Chinese, Vietnamese, and English—faded now, the visual density reflecting cultural mixing that no longer mixes. The International District defined by its internationalism, now defined by its emptiness.
 
-LIGHTHOUSE ROASTERS occupies a ground-floor space, its large windows revealing industrial equipment coated in dust: a vintage Probat roaster rusted and cold, green coffee storage silos empty, the sorting and bagging equipment still arranged for production that ended fifty-five years ago. The facility served as both production space and marketing tool, customers watching their coffee being roasted. The roasting stopped. The watching stopped. The smell of coffee that once filled this block is a memory no one alive can recall.
+JADE NOODLE HOUSE occupies a ground-floor space, its kitchen visible through a pass-through window designed to showcase noodle-making. Hand-pulled noodles required performance as much as skill, dough stretched and folded in rhythms customers watched. The pass-through frames only dust and darkness now. The wok stations along the back wall are cold, the high-BTU burners silent, the industrial ventilation still as a held breath. No one makes noodles. No one watches.
 
-A mural covers the windowless wall of the adjacent building, a public art commission depicting Seattle's maritime history. The imagery spans eras: Coast Salish canoes, nineteenth-century sailing ships, container vessels. The paint has faded and peeled, the maritime history becoming as distant as the canoes that started it. The artists' names are listed on a plaque at street level, most of them dead now like everyone else.`,
+Decorative wire spans the street overhead at intervals, the infrastructure that supported festival lighting during Lunar New Year. Paper lanterns once transformed the streetscape. The wire remains, holding nothing, the festivals fifty-five years past. The cultural identity the neighborhood maintained is memory now, and fading.`,
   x: -10,
-  y: -5,
+  y: -6,
   z: 0,
   // Environmental properties
   population: 0, // Empty (post-Event)

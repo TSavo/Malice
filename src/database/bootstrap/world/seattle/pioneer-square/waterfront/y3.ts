@@ -9,7 +9,7 @@ The station itself is intact, its brick facade blackened by smoke from some fire
 Emergency lights still flash on the roof, powered by solar panels that don't know the emergency is over. Red and white, red and white, a beacon for rescuers who aren't coming.
 
 The waterfront continues north and south. The city waits to the east.`,
-  x: -15,
+  x: -21,
   y: 3,
   z: 0,
   // Environmental properties

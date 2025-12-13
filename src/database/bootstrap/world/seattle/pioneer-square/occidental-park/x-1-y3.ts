@@ -1,12 +1,12 @@
-// Occidental Park - central-northern section
+// Occidental Park - eastern plaza
 
 export const room = {
   name: 'Occidental Park',
-  description: `A concrete planter dominates this section of the plaza, hexagonal, waist-high, containing a dead cherry tree that was once the centerpiece of the park's spring display. The tree's bark has gone silver-grey, its branches bare, but you can still see the buds that never opened—tiny knots along each twig, frozen in potential.
+  description: `A pergola structure extends overhead here, its wooden beams weathered silver-grey but still intact. The lattice roof was designed to support climbing vines—wisteria, perhaps, or climbing roses—the plants that would have softened the geometry with organic curves. The vines are dead now, their dried stems still clinging to the lattice, creating a net of brown against the grey sky.
 
-Cherry blossoms drew crowds here in April. The tree was Japanese, a gift from Seattle's sister city, planted with ceremony and maintained with care. People photographed themselves beneath its branches, petals falling like pink snow. The tree was beautiful. Now it's a monument to what beauty once meant here.
+The pergola provides psychological shelter more than physical—the beams overhead create a sense of enclosure without blocking wind or rain. People gathered here for the intimacy the structure provided, the sense of being in a room within the larger plaza. The benches beneath the pergola are arranged for conversation, facing each other across a narrow space.
 
-The soil in the planter has shrunk away from the concrete edges, cracked and dry despite Seattle's rain. A drainage problem, perhaps, or just the accumulated damage of fifty-five years without care. The tree died slowly. Some things do.`,
+Light filters through the dead vines and lattice, creating complex shadows on the brick below. The shadows move with the sun, the only thing in the plaza that still keeps regular hours.`,
   x: -1,
   y: 3,
   z: 0,

@@ -1,14 +1,14 @@
-// Yesler Way - between Waterfront and 1st Ave
+// Yesler Way - between 1st Ave and Occidental
 
 export const room = {
   name: 'Yesler Way',
-  description: `A service alley opens to the south here, the narrow passage between buildings dark and uninviting. Fire escapes climb the walls, their iron platforms rusted and listing. The back-of-house infrastructure that retail facades concealed is exposed now—utility connections corroded, dumpster enclosures long since raided for anything useful.
+  description: `A residential hotel occupies this corner, four stories of rooms that once provided affordable housing for urban workers. The building dates to the early twentieth century, solid brick construction that has endured when so much else hasn't. A neon sign on the facade still spells HOTEL, though the neon hasn't glowed in decades.
 
-The buildings flanking the alley are four stories of brick and cast iron, their facades showing the ornamental detail that survived when so much else didn't. Carved stone faces peer down from the cornices—gargoyles and grotesques softened by a century of weathering, their features rounded by freeze-thaw cycles and acid rain. They've watched the city empty. They don't seem surprised.
+Through the cracked glass entry doors: a modest lobby with a reception desk, the layout that single-room-occupancy hotels maintain. The buildings provided housing for workers who needed central locations—maritime workers, railroad men, the transient labor force that port cities attracted. The workers are gone. The transience has become permanent. The rooms above are dark, their occupants long departed through doors they never meant to leave open.
 
-Smith Tower is visible ahead, its white terra cotta facade stained grey but still rising above the surrounding rooflines. The tower has dominated Pioneer Square's skyline since 1914. It continues to dominate, even now. A fire hydrant marks the corner, its yellow paint faded to something paler, the municipal infrastructure that no one maintains anymore.`,
+Occidental Park is visible ahead, dead maple trees rising above the surrounding rooflines like grave markers. The park's pergola creates a crooked silhouette against grey sky.`,
   x: -11,
-  y: 10,
+  y: 12,
   z: 0,
   // Environmental properties
   population: 0, // Empty (post-Event)

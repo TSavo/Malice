@@ -1,17 +1,15 @@
-// 2nd Ave S & S. Washington St
-// Pioneer Building corner
+// S. Washington St - mid-block
 
 export const room = {
-  name: '2nd Ave S & S. Washington St',
-  description: `The Pioneer Building anchors this intersection, its northwestern corner marked by the original entrance—a triple-arched portal of carved sandstone that architects called Richardsonian Romanesque. Henry Hobson Richardson never designed buildings in Seattle, but his style traveled west on railroad and telegram, influencing the post-fire reconstruction. The arches have the solid weight that Richardson favored, the stone rough-cut to suggest permanence.
+  name: 'S. Washington St',
+  description: `A narrow building occupies the lot between larger neighbors, its three stories of unreinforced brick rising to a flat roof lined with ancient ventilation equipment. The fire escape bolted to the facade has rusted into a unified mass, the individual ladders and platforms merged by corrosion into something that resembles iron lacework more than emergency egress.
 
-A cornerstone near the entrance bears the building's credentials: PIONEER BUILDING • 1892 • ELMER FISHER, ARCHITECT. Fisher designed a third of Pioneer Square's post-fire buildings, establishing the neighborhood's visual vocabulary. His name appears on cornerstones throughout the district, a signature repeated across blocks.
+AAA BAIL BONDS claims the ground floor, its services painted on the window in red lettering that has faded to pink. The bail bonds industry clustered near courthouses and jails, providing the financial mechanism that allowed defendants to await trial outside custody. The business required 24-hour availability—arrests happen at inconvenient times—and the painted hours on the door reflect that: OPEN 24 HOURS • 7 DAYS.
 
-Second Avenue stretches north and south from here, the cross-axis that connects Pioneer Square to the International District and points beyond. The Collapsed Building is visible to the east, its rubble pile a sharp contrast to the Pioneer Building's endurance—same era, same construction methods, different outcomes.`,
+A payphone enclosure stands at the corner, the aluminum frame intact but the phone itself reduced to a metal box trailing severed cables. Payphones were already obsolete before the Event, maintained more from inertia than necessity. The enclosure has the boxy design of 1980s street furniture, when cities still believed in public telecommunications infrastructure.`,
   x: 3,
-  y: 5,
+  y: 6,
   z: 0,
-  intersection: ['2nd Ave S', 'S. Washington St'],
   // Environmental properties
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned

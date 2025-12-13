@@ -1,12 +1,12 @@
-// Occidental Park - central plaza
+// Occidental Park - center of the park
 
 export const room = {
   name: 'Occidental Park',
-  description: `Benches are arranged in a circle here, facing inward, creating a conversation pit in the middle of the plaza. The arrangement was intentional—urban designers believed that facing benches toward each other would encourage interaction, would transform strangers into neighbors. The benches face each other still, holding conversations with no one.
+  description: `This is the center of Occidental Park, the point where the plaza opens widest, where the sky feels closest. On clear days—rare in Seattle even before the Event—you could see the Olympic Mountains from here, their snow-capped peaks visible above the waterfront buildings. The mountains are probably still there. The haze that hangs over the city now makes them invisible.
 
-One bench has collapsed, its wooden slats rotted through, its metal frame twisted. Someone sits there anyway—not a person, but a mannequin, its plastic form weathered to grey, its features smoothed by decades of rain. The mannequin wears the remains of a coat. Its hands rest on its knees. Its blank face stares at the bench opposite, patient and waiting.
+The open space feels exposed, vulnerable. The buildings around the plaza's edges create walls that channel wind and amplify sound. Every footstep echoes off brick and glass. Every movement is visible from multiple angles. The design was meant to create a sense of civic gathering, of shared space. Now it creates a sense of being watched.
 
-Someone placed the mannequin here. Someone thought it was funny, or meaningful, or just wanted to see how it would feel to make the empty park seem occupied. The joke persists. The mannequin waits.`,
+A drinking fountain stands near the center, its basin dry, its spout corroded green. A plaque dedicates the fountain to someone whose name has weathered away. The drinking stopped. The dedication persists, illegible but present.`,
   x: -2,
   y: 2,
   z: 0,

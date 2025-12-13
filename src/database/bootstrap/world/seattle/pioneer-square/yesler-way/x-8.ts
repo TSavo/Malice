@@ -2,18 +2,17 @@
 
 export const room = {
   name: 'Yesler Way',
-  description: `Smith Tower casts its shadow across this block when afternoon sun breaks through Seattle's perpetual overcast, the white terra cotta facade stained grey but still visible to the west. The tower dominates the western view, rising above the surrounding four- and five-story buildings with the confidence of a structure that has stood for over a century and expects to stand for another.
+  description: `Yesler Way continues its diagonal path through Pioneer Square, cutting across the grid at the angle that has confused visitors for over a century. The triangular buildings that fill the odd-shaped lots give this stretch a distinctive character—narrow frontages, sharp corners, architecture adapting to geometry.
 
-PIONEER BOOKS occupies a corner space, an independent bookstore that served the neighborhood's literary community. Through the window: floor-to-ceiling shelves still packed with books—paperback fiction, academic volumes, philosophy and architecture. Looters don't take books. The inventory remains, organized by subject and author, appreciated by no one. The knowledge inside is patient. It can wait.
+Smith Tower is visible to the south, its white terra cotta spire rising above the surrounding buildings. The tower was the tallest building west of the Mississippi when it opened in 1914, a claim to fame that Seattle cherished. The claim expired decades later when taller buildings rose. The tower remains, outlasting its superlatives.
 
-A vacant lot opens across the street, chain-link fence surrounding the foundation of a building that was demolished before the war. A sign on the fence displays architectural renderings of the mixed-use development that was planned for the site—standard imagery of urban development marketing, promises of luxury units and ground-floor retail. The development never happened. The sign keeps promising.`,
+A historic marker is mounted on one building, commemorating Yesler's original sawmill and the skid road that gave the street its name. The marker was installed in 1952, during an era when Seattle was trying to remember its past. The remembering became more urgent after the city forgot its future.`,
   x: -8,
-  y: 10,
+  y: 12,
   z: 0,
-  // Environmental properties
-  population: 0, // Empty (post-Event)
-  ambientNoise: 0, // Quiet/abandoned
-  lighting: 100, // Daylight (outdoor)
-  waterLevel: 0, // Dry
-  outdoor: true, // Street level
+  population: 0,
+  ambientNoise: 0,
+  lighting: 100,
+  waterLevel: 0,
+  outdoor: true,
 };

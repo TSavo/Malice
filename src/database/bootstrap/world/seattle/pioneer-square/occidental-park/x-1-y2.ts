@@ -1,12 +1,12 @@
-// Occidental Park - central area
+// Occidental Park - eastern-central area
 
 export const room = {
   name: 'Occidental Park',
-  description: `A row of dead maples creates a colonnade through this section of the park, their trunks aligned with military precision, their spacing calculated to maximize shade while maintaining sightlines. The urban foresters who planted them understood both biology and sociology—trees that welcomed without concealing, shade that cooled without hiding.
+  description: `The brick paving shows wear patterns here, the paths of ten thousand daily passages worn smooth while the surrounding brick retains its texture. You can read the ghost of old traffic in the surface—the diagonal shortcut office workers took, the arc around the performance stage, the straight line from the coffee shop on Main to the office tower on Washington. Desire lines, the urban planners called them. The desires are gone. The lines remain.
 
-The trees are dead now, but they still define the space. Their trunks mark rhythm, their branches create patterns of shadow even without leaves. Walking between them feels ceremonial, a procession through a space designed for movement. The destination was always the center of the park. The center is empty now, but the procession continues for anyone willing to walk it.
+A commemorative brick is set into the plaza here, one of hundreds sold to raise funds in some long-forgotten campaign. "IN MEMORY OF DAVID CHEN, WHO LOVED THIS PLACE." The brass letters are oxidized green. David Chen is dead now, one way or another. His love for this place outlasted him, outlasted the place itself as a living thing.
 
-One tree has begun to lean, its root system compromised by decades of drought and freeze cycles. The lean is perhaps ten degrees off vertical. In another decade, it will fall. In another century, it will have rotted into the brick. Time moves at its own pace.`,
+The wind shifts, carrying the smell of salt from the bay mixed with the musty scent of decaying leaves. The plaza is exposed here, nothing to break the weather that sweeps in off Elliott Bay.`,
   x: -1,
   y: 2,
   z: 0,

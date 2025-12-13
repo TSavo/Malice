@@ -1,15 +1,16 @@
-// S. Main St - between Occidental and 2nd Ave
+// 2nd Ave S & S. Main St intersection
 
 export const room = {
-  name: 'S. Main St',
-  description: `A parking garage entrance opens on the south side of Main Street, its ramp descending into subterranean darkness. The garage serves—served—the office buildings above it, their workers driving in each morning and out each evening, the daily rhythm of commuter capitalism. The entrance gate is up, frozen in the position it held when the power went out or the attendant stopped attending. The darkness beyond is absolute. The depths are unknowable. A sign beside the entrance lists rates: $8/HR • $28/DAY • $180/MONTH. The economics that made those numbers meaningful have dissolved.
+  name: '2nd Ave S & S. Main St',
+  description: `Second Avenue and Main Street cross here at an intersection that marks the eastern edge of Pioneer Square's commercial core. Beyond this corner, the neighborhood transitions toward the International District, the architecture shifting from Victorian commercial to mid-century municipal, the character changing from tourist destination to working city. The transition still holds, even if neither side of it is working anymore.
 
-A pedestrian bridge spans Main Street overhead, connecting two office buildings at the second-floor level. The bridges were called "skyways" when they were fashionable in the 1970s, climate-controlled corridors that let office workers move between buildings without exposure to Seattle's weather. The workers who used this bridge carried coffee cups and manila folders and the concerns of their particular professional domains. The bridge is empty now, its glass walls clouded with condensation that no one wipes away. It connects nothing to nothing, a shortcut to nowhere.
+BANK OF AMERICA occupies the corner building, a financial institution housed in a structure that predates the bank itself—the building was a different bank, then another different bank, then finally absorbed into the national chain that added its own signage and branding and ATM vestibule. The marble facade projects permanence, the bronze doors suggest security, the whole architectural vocabulary saying "your money is safe here." The vault is locked. The safety deposit boxes hold contents that matter to people who aren't here to retrieve them. The ATMs have gone dark, their screens displaying error codes in a language that means nothing without a network to interpret it.
 
-A Seattle Times newspaper box stands at the corner, its window displaying a front page from months ago. The headline—something about interest rates, something about elections, something that seemed to matter—is yellowed and water-stained. The box accepted quarters for the privilege of reading yesterday's news. Yesterday has become indistinguishable from every other day. The news stopped. The box preserves its final edition like a fossil.`,
+A clock is mounted above the bank's entrance, analog hands showing 3:47—the moment when the mechanism stopped, whether through power failure or battery death or some other mundane malfunction. The clock is accurate twice a day, which is more than can be said for most things. The hands point at numbers that used to mean something. The meaning has become optional.`,
   x: 0,
   y: 0,
   z: 0,
+  intersection: ['2nd Ave S', 'S. Main St'],
   // Environmental properties
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned

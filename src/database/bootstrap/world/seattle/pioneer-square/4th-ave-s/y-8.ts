@@ -1,21 +1,18 @@
-// 4th Ave S - between S. Jackson St and S. King St
+// 4th Ave S - between S. Jackson and S. King
 
 export const room = {
   name: '4th Ave S',
-  description: `The Condemned Block extends along the western side of the avenue here, its perimeter fence reinforced with concrete barriers. Whatever containment was attempted, it was done in a hurry. The barriers are misaligned, the fencing hastily welded. It holds, mostly.
+  description: `The street widens here where Fourth Avenue approaches its intersection with the old viaduct alignment. The extra width was meant for merging traffic, vehicles transitioning from surface streets to elevated highway. The highway is gone. The width remains, feeling excessive for the nothing that uses it now.
 
-An auto repair shop operates on the eastern side, one of the few businesses still functioning in any sense. Cars in various states of disassembly fill the lot. Parts are currency now, and this place has parts. The owner—if there is still an owner—has done well.
+Chinatown's influence is stronger here, the architecture showing more of the International District's character—lower buildings, ground-floor retail, residential above. The bilingual signage has weathered at different rates, English fading faster than the Chinese characters that seem more resistant to sun and rain.
 
-Graffiti covers the concrete barriers around the Condemned Block. Tags and murals and warnings. "DON'T BREATHE" someone wrote in letters three feet tall. Good advice, probably.
-
-A shopping cart sits in the middle of the avenue, filled with blankets and cans and the accumulated necessities of someone who lived rough. The cart's owner is not visible. The cart remains.`,
-  x: 15,
+A fire hydrant stands at the corner, its red paint faded to pink, its cap rusted shut. The water mains might still hold pressure, or might have burst somewhere underground years ago. No one has tested them. No one wants to know.`,
+  x: 14,
   y: -8,
   z: 0,
-  // Environmental properties
-  population: 0, // Empty (post-Event)
-  ambientNoise: 0, // Quiet/abandoned
-  lighting: 100, // Daylight (outdoor)
-  waterLevel: 0, // Dry
-  outdoor: true, // Street level
+  population: 0,
+  ambientNoise: 0,
+  lighting: 100,
+  waterLevel: 0,
+  outdoor: true,
 };

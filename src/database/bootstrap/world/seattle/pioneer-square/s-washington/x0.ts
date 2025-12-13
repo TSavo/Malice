@@ -1,15 +1,17 @@
-// S. Washington St - center point
+// 2nd Ave S & S. Washington St
+// Pioneer Building corner
 
 export const room = {
-  name: 'S. Washington St',
-  description: `The Underground Tour entrance occupies a storefront here, marked by a painted sign depicting the buried streets below. Seattle raised itself twelve feet after the Great Fire of 1889, building new sidewalks at second-story level and leaving the original street grid entombed beneath. Tour guides used to lead visitors through the subterranean passages, explaining how the city literally buried its past. The passages are still down there, accessible through basements and abandoned storefronts, a parallel Seattle preserved in darkness.
+  name: '2nd Ave S & S. Washington St',
+  description: `The Pioneer Building anchors this intersection, its northwestern corner marked by the original entrance—a triple-arched portal of carved sandstone that architects called Richardsonian Romanesque. Henry Hobson Richardson never designed buildings in Seattle, but his style traveled west on railroad and telegram, influencing the post-fire reconstruction. The arches have the solid weight that Richardson favored, the stone rough-cut to suggest permanence.
 
-J&M CAFE claims the corner building, its name painted on the window in gold leaf worn thin by decades of weather. The bar opened in 1889, survived the fire, and served drinks through prohibition and depression and war. The interior visible through clouded glass suggests the accumulated history—dark wood worn smooth by elbows, brass fixtures green with patina, tin ceiling tiles pressed with Victorian patterns.
+A cornerstone near the entrance bears the building's credentials: PIONEER BUILDING • 1892 • ELMER FISHER, ARCHITECT. Fisher designed a third of Pioneer Square's post-fire buildings, establishing the neighborhood's visual vocabulary. His name appears on cornerstones throughout the district, a signature repeated across blocks.
 
-A bronze plaque mounted on the brick facade marks this as a Seattle Landmark, explaining the neighborhood's significance in language that assumes readers have time for historical context. The plaque has developed the particular green of oxidized copper, its raised letters still legible but softened by chemistry and rain.`,
+Second Avenue stretches north and south from here, the cross-axis that connects Pioneer Square to the International District and points beyond. The Collapsed Building is visible to the east, its rubble pile a sharp contrast to the Pioneer Building's endurance—same era, same construction methods, different outcomes.`,
   x: 0,
-  y: 5,
+  y: 6,
   z: 0,
+  intersection: ['2nd Ave S', 'S. Washington St'],
   // Environmental properties
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned

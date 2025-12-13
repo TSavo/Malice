@@ -19,7 +19,8 @@ export class VendableBuilder {
          defaultPrice: 0,
          owner: null, // agent id that can manage stock/prices
          locks: [], // optional composable locks controlling manage access
-         spawnables: [], // [{ protoId, price, name, properties, autoNumber, numberPrefix }]
+         spawnables: [], // [{ protoId, price, name, properties, randomize, autoNumber, numberPrefix }]
+                         // randomize: { propertyName: [option1, option2, ...] } - picks random value
          phoneDb: null, // optional phone directory to use for phone sales
        },
        methods: {},
@@ -107,6 +108,15 @@ export class VendableBuilder {
         if (!protoId) return 'Spawn config missing prototype.';
         if (!$.recycler) return 'Spawner unavailable.';
         const properties = { ...(spawn.properties || {}) };
+
+        // Apply randomized properties
+        const randomize = spawn.randomize || {};
+        for (const key of Object.keys(randomize)) {
+          const options = randomize[key];
+          if (Array.isArray(options) && options.length > 0) {
+            properties[key] = options[Math.floor(Math.random() * options.length)];
+          }
+        }
 
         // Auto-assign phone number if requested
         if (spawn.autoNumber && self.phoneDb) {

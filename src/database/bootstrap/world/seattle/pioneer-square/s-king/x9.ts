@@ -1,16 +1,15 @@
-// 3rd Ave S & S. King St intersection
+// S. King St - between 3rd and 4th Ave
 
 export const room = {
-  name: '3rd Ave S & S. King St',
-  description: `Third Avenue intersects S. King Street at what was once the commercial heart of the International District, the intersection where foot traffic from multiple directions converged. The transit center is blocks away—not that transit runs anymore. The pedestrian flow that supported the retail density is fifty-five years gone. The density remains. The pedestrians don't.
+  name: 'S. King St',
+  description: `A family association occupies the second floor of one building, its windows still screened with paper yellowed by decades. The tong provided mutual aid and social organization for immigrant communities—people who shared surnames or regional origins gathering for mahjong and conversation. The social infrastructure that helped new arrivals navigate an unfamiliar city. The new arrivals stopped coming. The familiar and unfamiliar became equally uninhabitable.
 
-Hing Hay Park is visible to the north, the neighborhood's central gathering space overgrown and silent. The park's pagoda pavilion—a gift from Taipei commemorating the sister-city relationship—rises above the surrounding rooflines, its curved eaves weathered, its red columns faded to rust-pink. The landmark that identified the International District still identifies it. The community it served is scattered or dead.
+The buildings along this stretch show the International District's characteristic architecture weathered by abandonment: early twentieth-century construction adapted over decades, then left to decay. The aluminum storefronts are dented and grimy, the upper floor windows broken or boarded. Fire escapes rust along exterior walls, their iron platforms that served as impromptu balconies now unsafe to stand on.
 
-PACIFIC WIRELESS occupies the corner building, its windows smashed, its inventory long since looted. The mobile phone retailer served the neighborhood's communication needs—smartphones, prepaid plans, international calling cards that let immigrants call home. The window displays are empty now. The phones are gone. The networks they connected to are gone. Home, for most of these families, is gone too.`,
+A fire hydrant at the corner is painted in red and gold, the auspicious colors faded but still visible beneath the patina of age. The cultural expression outlasted the culture. The practical safety it provided is irrelevant now—nothing left here worth protecting from fire, no one to call if something burned.`,
   x: 9,
-  y: -10,
+  y: -12,
   z: 0,
-  intersection: ['3rd Ave S', 'S. King St'],
   // Environmental properties
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned

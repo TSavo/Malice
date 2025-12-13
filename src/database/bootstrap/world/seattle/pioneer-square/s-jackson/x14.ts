@@ -1,15 +1,16 @@
-// S. Jackson St - approaching 4th Ave
+// 4th Ave S & S. Jackson St intersection
 
 export const room = {
-  name: 'S. Jackson St',
-  description: `Fourth Avenue approaches from the east, the intersection ahead marking what was the ceremonial entrance to the International District—the Chinatown Gate visible in the distance, its pagoda-style arch faded and weathered. This block represents the neighborhood's eastern boundary, the transition zone between historic districts that are equally abandoned.
+  name: '4th Ave S & S. Jackson St',
+  description: `Fourth Avenue intersects S. Jackson Street beneath the Chinatown Gate, the ceremonial arch weathered and faded but still standing. The gate is traditional pagoda style: curved eaves, columns that were red and are now rust-pink, golden Chinese characters that declare welcome in a language that survived dynasties and emigrations—only to find no one left to welcome. The structure was built in the 1970s to announce the community's presence. The community is scattered. The announcement reaches no one.
 
-DRAGON WELL TEA occupies a corner space, its windows dusty, its interior dark. The specialty shop served connoisseurs who appreciated quality Chinese tea. The window display still shows the implements: yixing clay teapots in various sizes, porcelain gaiwans for gongfu brewing, bamboo tea trays. The interior arranged for education as much as retail—a demonstration table where the owner conducted tastings. No tastings now. No connoisseurs. The differences between green and oolong and pu-erh matter only to whoever remembers them.
+The Central Link light rail runs above the intersection on elevated tracks, the transit infrastructure silent and still. The trains that connected the International District to Sea-Tac Airport, Capitol Hill, the University haven't run in fifty-five years. The station entrance is nearby, escalators frozen mid-step descending to platforms in darkness. The node in the regional transit network connects nothing to nothing.
 
-A pair of stone foo dogs flank the shop's entrance, carved granite in the protective posture that centuries of tradition prescribed. Both lions remain intact, still guarding, their investment in proper feng shui as meaningless now as everything else. The threshold they protect leads to a shop that will never reopen.`,
+CATHAY BANK occupies the corner building, its windows dark, its vault presumably still sealed. The bank processed remittances, maintained savings accounts, provided financial services the neighborhood required. The signage includes Chinese characters alongside English, marking clientele that scattered or died when the war came. The remittances stopped. The savings are numbers on computers that no longer run.`,
   x: 14,
-  y: -5,
+  y: -6,
   z: 0,
+  intersection: ['4th Ave S', 'S. Jackson St'],
   // Environmental properties
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned

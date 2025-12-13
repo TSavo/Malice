@@ -1,14 +1,14 @@
-// S. Jackson St - between 3rd and 4th Ave
+// S. Jackson St - approaching 4th Ave
 
 export const room = {
   name: 'S. Jackson St',
-  description: `A Vietnamese grocery occupies the corner building, its produce bins empty and rusted under a tattered awning. The storefront displays the visual vocabulary of Vietnamese retail frozen in abandonment: the store name painted in Vietnamese script with English translation below, both faded but legible. Through the grimy window: narrow aisles still packed with inventory—the dried goods that outlasted everything perishable, organizational logic preserving products no one will buy.
+  description: `Fourth Avenue approaches from the east, the intersection ahead marking what was the ceremonial entrance to the International District—the Chinatown Gate visible in the distance, its pagoda-style arch faded and weathered. This block represents the neighborhood's eastern boundary, the transition zone between historic districts that are equally abandoned.
 
-The interior layout follows the pattern common to immigrant groceries: where fresh produce stood near the entrance, only empty bins remain. Dry goods on ceiling-high shelving have outlasted their expiration by decades. The refrigerated cases along the back wall are dark and warm, whatever perishables they held long since rotted to nothing. A small altar occupies a high shelf near the register—a statue of Quan Am, the bodhisattva of compassion, still watching over a business that will never reopen. The incense holder is empty. No offerings for fifty-five years.
+DRAGON WELL TEA occupies a corner space, its windows dusty, its interior dark. The specialty shop served connoisseurs who appreciated quality Chinese tea. The window display still shows the implements: yixing clay teapots in various sizes, porcelain gaiwans for gongfu brewing, bamboo tea trays. The interior arranged for education as much as retail—a demonstration table where the owner conducted tastings. No tastings now. No connoisseurs. The differences between green and oolong and pu-erh matter only to whoever remembers them.
 
-The buildings along this stretch are uniformly two-story, the scale preserved even as the community that built them scattered. The facades show accumulated modifications of decades, then accumulated decay of decades more.`,
+A pair of stone foo dogs flank the shop's entrance, carved granite in the protective posture that centuries of tradition prescribed. Both lions remain intact, still guarding, their investment in proper feng shui as meaningless now as everything else. The threshold they protect leads to a shop that will never reopen.`,
   x: 12,
-  y: -5,
+  y: -6,
   z: 0,
   // Environmental properties
   population: 0, // Empty (post-Event)

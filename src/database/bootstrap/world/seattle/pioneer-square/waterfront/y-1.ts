@@ -1,21 +1,18 @@
-// Waterfront - between S. Main St and S. Jackson St
+// Waterfront - between S. Jackson and S. Main
 
 export const room = {
-  name: 'Alaskan Way',
-  description: `South of the ferry terminal, the waterfront takes on an industrial character. The tourist attractions give way to working piers, or what used to be working piers. Forklifts sit abandoned, their forks raised, their batteries dead. Pallets are stacked in rows, wrapped in plastic that has turned brittle and torn.
+  name: 'Waterfront',
+  description: `The waterfront approaches the old pier district here, where tourist attractions once clustered along the bay. The Great Wheel's skeleton is visible to the north, the massive Ferris wheel that dominated the skyline until it collapsed during a winter storm sometime in the long dark years. Its gondolas lie scattered in the water, slowly rusting into artificial reefs.
 
-A warehouse dominates the block to the east, its loading doors sealed with corrugated steel. Whatever is inside, someone wanted it to stay inside. The locks are heavy. The welds are recent.
+Pier buildings line the waterfront to the east, their facades showing the deliberate rusticity that tourist districts cultivate—weathered wood that was never actually weathered, nautical themes applied by designers who'd never been to sea. The deliberate charm has become genuine decay, artificial rusticity giving way to actual rot.
 
-The seawall here is stained with rust bleeding down from the railroad tracks above. The trains stopped running months ago, but the tracks remain, parallel lines of oxidizing steel leading north and south to nowhere.
-
-Oil rainbows swirl on puddles between the cobblestones. The water never quite goes away here.`,
-  x: -15,
+The seawall path is wider here, designed for the foot traffic of the tourist trade. The extra width feels extravagant now, empty space that once held crowds, cotton candy vendors, street performers, the whole apparatus of leisure. The apparatus rusted along with everything else.`,
+  x: -21,
   y: -1,
   z: 0,
-  // Environmental properties
-  population: 0, // Empty (post-Event)
-  ambientNoise: 0, // Quiet/abandoned
-  lighting: 100, // Daylight (outdoor)
-  waterLevel: 0, // Dry
-  outdoor: true, // Street level
+  population: 0,
+  ambientNoise: 15,
+  lighting: 100,
+  waterLevel: 0,
+  outdoor: true,
 };

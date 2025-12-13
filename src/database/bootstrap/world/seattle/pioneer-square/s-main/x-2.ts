@@ -1,12 +1,12 @@
-// S. Main St - east of Occidental
+// S. Main St - approaching 2nd Ave
 
 export const room = {
   name: 'S. Main St',
-  description: `East of Occidental, Main Street returns to vehicular scale—the cobblestones yield to asphalt, the pedestrian mall's careful curation gives way to the regular rhythm of storefronts and loading zones and fire hydrants. The transition is abrupt, like stepping from a museum back into the street. Both are equally empty now, but the street at least doesn't pretend otherwise.
+  description: `Second Avenue opens ahead, the intersection visible at the end of the block. The traffic light still cycles through its colors—green to yellow to red, the automated rhythm continuing in the absence of traffic to regulate. The light was programmed to optimize flow, to minimize wait times, to serve a city that moved. The city has stopped moving. The light keeps optimizing.
 
-ATLAS CLOTHING occupies the corner building, a vintage shop that dealt in the sartorial archaeology of previous generations. Through the window: mannequins dressed in styles that were already retro when they were purchased here—a flapper dress from the 1920s, a zoot suit from the 1940s, a powder-blue leisure suit from the 1970s. Each piece represented someone's fashion choice, someone's night out, someone's attempt to look like something they wanted to be. The mannequins model these aspirations with plastic composure, their poses unchanged since the last visual merchandising session.
+PIONEER LOAN & JEWELRY occupies the corner building, a pawn shop that has served the neighborhood's desperate and optimistic since 1932. The window is a taxonomy of value exchanged: guitars pawned by musicians who needed rent money more than instruments, watches traded by collectors who needed cash more than time, wedding rings sold by people whose marriages didn't work out, the whole archaeology of financial stress rendered in gold and silver and cubic zirconia. Each item has a tag. Each tag has a number. Each number represented someone's calculation about what they could afford to lose. The calculations have become moot. The items wait behind glass for claims that aren't coming.
 
-A mural covers the entire west wall of the building opposite—a WPA-style scene of Seattle's working waterfront circa 1935, painted by an artist whose name appears in small letters at the bottom corner. Longshoremen and cranes and ships being loaded with timber and fish. The colors have faded to the soft palette of age, blues gone grey, reds gone brown. The waterfront depicted doesn't exist anymore. Neither does the workforce. The mural is a memorial to a memorial, history layered on history.`,
+Three brass balls hang above the entrance, the traditional symbol of the pawnbroker's trade—allegedly derived from the Medici coat of arms, though the history is contested. The balls have gone green with verdigris. The symbol persists, even if the trade it represents has transformed from commerce into archaeology.`,
   x: -2,
   y: 0,
   z: 0,

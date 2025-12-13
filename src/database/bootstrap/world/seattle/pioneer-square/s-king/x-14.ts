@@ -1,15 +1,16 @@
-// S. King St - east of Waterfront
+// 1st Ave S & S. King St intersection
 
 export const room = {
-  name: 'S. King St',
-  description: `S. King Street rises eastward from the waterfront through what was once Seattle's maritime industrial district. The buildings are utilitarian—steel frames and corrugated siding rusted brown, the architecture of function rather than aesthetics. Machine shops and fabrication facilities clustered here to serve commercial shipping. The shipping stopped. The facilities stand empty.
+  name: '1st Ave S & S. King St',
+  description: `First Avenue intersects S. King Street at the southwestern corner of the stadium district, the intersection where Pioneer Square's historic neighborhood meets the sports and entertainment zone built in the 1990s. The stadiums dominate the view to the south and east: T-Mobile Park's retractable roof structure, Lumen Field's distinctive roof cantilevers, the architecture scaled for tens of thousands of spectators.
 
-PUGET SOUND MARINE SERVICES occupies a large facility on the south side, its roll-up doors rusted shut, its dry dock filled with stagnant water. The ceiling heights that once accommodated cranes and hoists now shelter nothing but darkness and the nests of whatever birds have claimed the rafters.
+The streetscape here reflects the stadium district's design priorities: wide sidewalks to accommodate game-day crowds, street trees planted in tree grates sized for high foot traffic, the infrastructure of mass pedestrian movement. The buildings at this corner are newer construction, their ground floors configured for the restaurants and bars that event-day traffic supports.
 
-The street's grade increases as it climbs away from filled tideflats. The original shoreline was blocks to the east; everything between here and there is fill—sawdust and mill waste and construction debris that Seattle dumped to extend the usable land. The fill is settling now, without maintenance. The buildings tilt slightly, foundations shifting in unstable ground.`,
+MARINERS TEAM STORE occupies one corner space, the official merchandise outlet where fans purchased jerseys and caps and the branded goods that professional sports generate. The windows display the inventory: player jerseys on mannequins, the green and navy color scheme that the franchise maintains. First Avenue stretches north from here toward Pioneer Square proper, the historic district's brick facades visible up the slope.`,
   x: -14,
-  y: -10,
+  y: -12,
   z: 0,
+  intersection: ['1st Ave S', 'S. King St'],
   // Environmental properties
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned

@@ -2,18 +2,17 @@
 
 export const room = {
   name: 'Occidental Ave S',
-  description: `The cobblestones widen here into Occidental Park proper, the pedestrian plaza that anchored Pioneer Square's social calendar. First Thursday art walks started here—galleries opening their doors, wine in plastic cups, the carefully disheveled mingling with the genuinely broke. The plaza filled with people pretending to understand art and people pretending not to. Both groups are equally absent now.
+  description: `The pedestrian character of Occidental Avenue is most evident here, where the cobblestones spread wide and the buildings step back from the street. This was designed as public space—benches, planters, room to breathe in a neighborhood otherwise compressed by Victorian lot lines. The design intent survives even if the public doesn't.
 
-A bronze firefighter stands at the plaza's edge, hose raised against flames that exist only in metal memory. The statue commemorates the Seattle Fire Department's response to 1889, though "response" is generous—they lost most of downtown before the flames burned themselves out. The firefighter's face has gone green with verdigris, his expression somewhere between determination and indigestion. Pigeons have claimed his helmet as a perch. They don't care about history.
+A series of decorative lamp posts line the avenue, their globes clouded with age and internal moisture. The posts were installed during a 1970s beautification project, meant to evoke gas lamps without the inconvenience of actual gas. The electricity that powered them is long gone. The evocation of history continues, unlit.
 
-Cafe tables lie scattered across the bricks like debris from an explosion of leisure. Metal chairs, the kind that pinch your thighs if you sit wrong, have been blown into clusters by wind or dragged into configurations by people who aren't here anymore. One table still holds a ceramic cup, miracle of inertia, its contents long evaporated into a dark ring at the bottom. Someone ordered something once. Someone never finished it.`,
-  x: -3,
+Moss has colonized the north-facing surfaces of every building here, green creeping up brick and stone with patient determination. In another few decades it might consume the facades entirely, turning architecture back into landscape.`,
+  x: -7,
   y: -4,
   z: 0,
-  // Environmental properties
-  population: 0, // Empty (post-Event)
-  ambientNoise: 0, // Quiet/abandoned
-  lighting: 100, // Daylight (outdoor)
-  waterLevel: 0, // Dry
-  outdoor: true, // Street level
+  population: 0,
+  ambientNoise: 0,
+  lighting: 100,
+  waterLevel: 0,
+  outdoor: true,
 };

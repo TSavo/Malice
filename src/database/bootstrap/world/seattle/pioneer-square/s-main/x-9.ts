@@ -1,16 +1,15 @@
-// 1st Ave S & S. Main St intersection
+// S. Main St - approaching Occidental
 
 export const room = {
-  name: '1st Ave S & S. Main St',
-  description: `First Avenue and S. Main Street cross here at one of Pioneer Square's historic corners, the intersection where Seattle's original commercial district met its waterfront lifeline. The geometry is significant—Yesler Way angles northeast from here, Main Street runs due east, First Avenue heads north toward a blockage that didn't exist when this intersection was designed. The city planners who laid out these streets never imagined a scenario where the grid would stop mattering.
+  name: 'S. Main St',
+  description: `Occidental Avenue opens ahead, the pedestrian mall that runs north through the heart of Pioneer Square. From here you can see the maple canopy, branches grown wild in the absence of trimming, creating a tunnel of green where sunshine used to filter through in carefully managed amounts. The urban forestry plan called for annual pruning. The plan has been indefinitely suspended.
 
-THE MERCHANT'S CAFE & SALOON occupies the southwest corner, a brick building with arched windows and a claim painted in gold leaf on the glass: "Seattle's Oldest Restaurant - Est. 1890." The claim may or may not be accurate—other establishments have contested it—but accuracy matters less than persistence. The Merchant's has persisted. The bar inside runs forty feet along the south wall, mahogany and brass, mirrors behind it that doubled the room's apparent size. The mirrors are dusty now. The doubling just creates more emptiness.
+THE CENTRAL SALOON occupies the corner building, a Seattle institution that has served drinks since 1892, making it one of the oldest continually operating bars in the city—or was, until operation ceased being continuous. The windows are papered with Seahawks schedules and Mariners posters and promotional materials for sporting events that happened or didn't. A hand-lettered sign announces GAME DAY SPECIALS. The games may have continued somewhere. The specials have expired here.
 
-A streetlight leans at fifteen degrees from vertical, bent by some impact—a vehicle, probably, during the chaos, or maybe before, during the normal accidents of normal traffic. The light still works, its photocell still functioning, clicking on at dusk and off at dawn, illuminating pavement that no one walks. The lean gives the light a quality of inquiry, as if it's asking the intersection a question. The intersection doesn't answer.`,
+These buildings connect to Seattle's underground—the original street level that was buried after the Great Fire, when the city decided to raise itself above the tide flats rather than keep pumping out basements. The entrances are locked and alarmed and pointless, the tours that used to run through the underground suspended along with everything else. Below your feet: gas-lit storefronts from the 1880s, preserved in darkness, waiting for tourists who paid $20 to walk through history. The history is still there. The $20 is worth nothing.`,
   x: -9,
   y: 0,
   z: 0,
-  intersection: ['1st Ave S', 'S. Main St'],
   // Environmental properties
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned

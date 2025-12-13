@@ -2,18 +2,17 @@
 
 export const room = {
   name: 'S. Washington St',
-  description: `Smith Tower casts its shadow here, the white terra cotta facade visible to the north, rising above the surrounding buildings like a monument to the ambitions of a previous century. The tower has stood since 1914. It will probably stand for another century. Some things refuse to die.
+  description: `Washington Street passes along the northern edge of the Grand Central Building here, the arcade's ornate entrance visible in the facade. The arcade was Seattle's first indoor shopping center when it opened in 1890, its iron and glass construction revolutionary for the frontier city. The revolution became a landmark became a ruin, the glass cracked, the iron rusting, but the structure intact.
 
-CHEN'S QUALITY PRINTING occupies the ground floor of a narrow building, the name painted in gold leaf on the front window, the typeface chosen to suggest precision and permanence. Through the glass: printing presses in various sizes, paper stock on industrial shelving, the infrastructure of a trade that documented milestones—business cards for new ventures, wedding invitations for hopeful couples, menus for restaurants that needed menus. The machines are silent now. The paper is yellowing in its stacks.
+Occidental Park opens to the north, its dead trees visible over the low walls that separate the park from the street. The park was designed as an extension of the sidewalk, the boundary between public street and public plaza deliberately blurred. The blur persists—park and street equally empty, equally decaying, the distinction mattering less with each passing year.
 
-The street continues east toward Occidental Park, the maple canopy visible in the distance. The buildings on this block are three and four stories, the standard Pioneer Square height, their facades weathered to similar shades of grey and brown. History has made them uniform. Time does that to neighborhoods.`,
+A decorative clock is mounted on one building's corner, its hands frozen at a time that no longer matters. The clock was a landmark once, a meeting point—"I'll meet you at the Washington Street clock." The meetings ended. The clock waits, keeping time that no one needs.`,
   x: -8,
-  y: 5,
+  y: 6,
   z: 0,
-  // Environmental properties
-  population: 0, // Empty (post-Event)
-  ambientNoise: 0, // Quiet/abandoned
-  lighting: 100, // Daylight (outdoor)
-  waterLevel: 0, // Dry
-  outdoor: true, // Street level
+  population: 0,
+  ambientNoise: 0,
+  lighting: 100,
+  waterLevel: 0,
+  outdoor: true,
 };

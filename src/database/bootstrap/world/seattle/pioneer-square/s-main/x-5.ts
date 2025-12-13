@@ -1,12 +1,12 @@
-// S. Main St - between 1st Ave and Occidental
+// S. Main St - between Occidental and 2nd Ave
 
 export const room = {
   name: 'S. Main St',
-  description: `THE NEW ORLEANS CREOLE RESTAURANT occupied the building here, but that's not what people came for. They came for the basement—DIMITRIOU'S JAZZ ALLEY, a venue that hosted touring acts and local musicians in a subterranean space where the acoustics were accidental and perfect. The entrance is a narrow stairway at street level, unmarked except for a neon saxophone sign that hangs above the stairs, its tubes cold, its blues silenced. The sign shows a stylized sax in profile, caught mid-note, frozen in a moment of music that will never finish.
+  description: `The buildings narrow here, squeezed into lots that were afterthoughts in the post-fire rebuilding. These are the buildings that filled gaps rather than claimed corners—ten feet wide, sometimes fifteen, their facades just broad enough for a door and a window and a sign. The architecture of economy, spaces carved from margins.
 
-The stairs descend into darkness. The door at the bottom is steel, windowless, designed to contain sound rather than light. Whether anyone is inside—whether anyone was inside when whatever happened happened—is unknown. The door doesn't offer information. The saxophone above keeps its counsel.
+MARKET MAGIC & NOVELTY occupies one of these narrow storefronts, a magic shop that has served amateur prestidigitators since 1981. The window display is a taxonomy of wonder: decks of Bicycle cards with marked backs, coins that transform into different denominations, linking rings, cups and balls, silk scarves that change color when you know the secret. The secrets are all inside, filed in the proprietor's head and in the instruction booklets that came with each trick. The proprietor is gone. The secrets wait for practitioners.
 
-SLAVE TO THE NEEDLE occupies a storefront across the street, a tattoo parlor that specialized in custom work and charged accordingly. Flash art still covers the walls—traditional designs in the American style, eagles and roses and pin-up girls and hearts wrapped in banners bearing names that belonged to someone once. The needles are autoclave-sterile in their pouches. The ink has separated in its bottles, pigment settling to the bottom. The apprentice chairs sit empty. The art is patient. It waited years for the right skin to walk in. It can wait longer.`,
+PIONEER SHOE REPAIR shares the building, its entrance just to the left, its sign hand-painted on the transom window: HEELS WHILE U WAIT • SOLES • ZIPPERS • KEYS CUT. The cobbler's bench is visible through the window, surrounded by the tools of the trade—lasts and awls and stitching machines and the particular smell of leather and glue. Shoes line the shelves behind the bench, each pair tagged with a customer name and phone number, each pair waiting for pickup that isn't coming. The heels are repaired. The soles are renewed. The customers have walked their last miles.`,
   x: -5,
   y: 0,
   z: 0,

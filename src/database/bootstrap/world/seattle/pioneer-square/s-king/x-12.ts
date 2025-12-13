@@ -1,14 +1,14 @@
-// S. King St - between Waterfront and 1st Ave
+// S. King St - between 1st Ave and Occidental
 
 export const room = {
   name: 'S. King St',
-  description: `The corridor where the Alaskan Way Viaduct once passed overhead opens here, the wide right-of-way that the demolished highway left behind. The viaduct came down in 2019, replaced by a tunnel beneath downtown. City planners intended this space for parks and development. The war happened instead. The intentions remain unrealized, fifty-five years of weeds and decay where urban renewal was supposed to occur.
+  description: `Parking structures rise on both sides of the street, multi-level garages built to accommodate thousands of vehicles that stadium events once generated. The structures are functional architecture—poured concrete stained with decades of Seattle rain, helical ramps leading to levels still holding cars that were never retrieved. The vehicles rust in place, tires flat, windows filmed with dust.
 
-The buildings along this stretch are industrial—concrete-block construction, windows broken or boarded. PIONEER BUILDING MATERIALS, faded signage reads, the kind of business that served the construction industry before construction stopped. The inventory is probably still inside. Building materials don't spoil. They just wait.
+A pedestrian bridge spans the street at the third level, its windows cracked and clouded, connecting garages that serve no purpose now. The bridge sheltered pedestrians from Seattle's rain. The rain still falls. The pedestrians are gone.
 
-The viaduct's former alignment is legible in the landscape: the spacing between buildings, the abandoned foundations where support columns once stood, vacant lots surrounded by chain-link fence that's rusted through in places. The investment never came. The real estate market died with everything else.`,
+Rate signage near each entrance still lists pricing: EVENT RATES • MONTHLY PERMITS. The numbers seem quaint now, the revenue model that parking facilities relied upon. The revenue stopped. The structures remain, concrete monuments to the economics of entertainment.`,
   x: -12,
-  y: -10,
+  y: -12,
   z: 0,
   // Environmental properties
   population: 0, // Empty (post-Event)

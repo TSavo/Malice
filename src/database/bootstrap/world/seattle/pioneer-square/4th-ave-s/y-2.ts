@@ -2,14 +2,14 @@
 
 export const room = {
   name: '4th Ave S',
-  description: `A martial arts studio occupies the second floor of a building here, its windows still displaying faded posters of Bruce Lee and Jackie Chan. The training dummies inside are visible through the glass, wooden arms extended, waiting for students who will never return to practice their forms.
+  description: `The heart of the International District surrounds you now, Pioneer Square just a memory to the north. The buildings here are older, built by immigrants who came to Seattle when Seattle was still becoming something. They built for permanence. They built well.
 
-Below the studio, a noodle shop advertises hand-pulled noodles in both Chinese and English. The flour is probably still good. The technique died with the person who knew it. Some things cannot be preserved in jars or freezers.
+A dim sum palace occupies half the block, its dragon-painted facade still magnificent despite the grime. The rolling carts inside are frozen in place, their contents long since claimed by time and vermin. The lazy susan tables still hold plastic menus, their photos of gleaming dishes a cruel reminder of abundance.
 
-A fire hydrant on the corner has been painted gold, a tradition in the district meant to bring prosperity. The gold paint is chipping, revealing layers beneath—red, then silver, then the original iron. Decades of hope, layered and peeling.
+A feng shui compass is painted on the sidewalk outside, its Chinese characters marking the cardinal directions. The compass was meant to bring luck to the businesses here. The luck ran out. The compass remains, pointing at nothing.
 
-The street is quiet except for the wind through the elevated tracks above.`,
-  x: 15,
+The elevated tracks hum overhead when the wind blows right. It sounds almost like trains.`,
+  x: 14,
   y: -2,
   z: 0,
   // Environmental properties

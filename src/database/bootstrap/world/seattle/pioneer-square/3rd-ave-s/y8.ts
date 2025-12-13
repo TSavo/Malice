@@ -2,14 +2,14 @@
 
 export const room = {
   name: '3rd Ave S',
-  description: `The wrapped building ends here, its southern corner marked by a gap in the black fabric where someone cut through. The cut is precise, surgical almost, made by someone who knew what they were doing. The chain-link behind it has been bent back, creating an opening just large enough for a person to slip through.
+  description: `The Corp Construction zone dominates both sides of the avenue here, its fences running parallel, creating a channel of public space between private mysteries. The black fabric covering the fences blocks any view of what lies beyond. The fabric is newer here, less weathered, replaced more recently than elsewhere.
 
-No one is visible inside. The darkness beyond the gap is absolute. Whatever is in there, it's not lit from within.
+Guard booths stand at intervals along the fence, their windows dark, their doors sealed. The guards left when the paychecks stopped. The booths remain, checkpoints for a workforce that no longer arrives.
 
-Across the avenue, the Corp Construction zone fence begins, standard construction barriers topped with barbed wire. Signs warn of authorized personnel only. The authorization system is probably still in some database somewhere, still checking credentials that no longer matter.
+A porta-potty row sits against the eastern fence, the blue plastic units still standing in formation. The smell has faded with time. Whatever biological processes occurred inside have long since completed.
 
-The avenue narrows here, the wrapped building on one side and the construction fence on the other creating a corridor effect. It feels like being watched.`,
-  x: 9,
+The avenue is quiet. The construction zone is quieter. Nothing moves behind those fences. Nothing has moved there in a long time.`,
+  x: 7,
   y: 8,
   z: 0,
   // Environmental properties

@@ -2,12 +2,12 @@
 
 export const room = {
   name: 'Occidental Ave S',
-  description: `The pergola spans the park here, cedar beams weathered silver-grey, the kind of urban furniture that cities build when they want to signal investment in public space. Wisteria was supposed to climb these posts and drape the beams in purple, but the vines died years ago, leaving just the skeleton of intention. Rain drips through the slats in patterns that shift with the wind.
+  description: `S. Main Street opens just ahead, and with it Pioneer Square's most photographed landmark—the totem pole at the intersection, sixty feet of carved cedar that Seattle businessmen stole from a Tlingit village in 1899 and erected here as a trophy of civic ambition. The original burned in 1938. The city had the nerve to ask the Tlingit for a replacement. They charged $5,000 and sent the new pole with a note: "Thanks for paying for the first one." The story is on a plaque at the pole's base, sanitized into heritage.
 
-Someone made a home in the pergola's southeast corner—sleeping bag rated for twenty degrees, foam pad beneath it, a milk crate serving as nightstand and storage. Plastic bags hang from the pergola's crossbeams like ornaments, holding clothes or food or whatever else fit in a life small enough to carry. The inhabitant is elsewhere, or everywhere, or nowhere. The camp remains, unmolested by the absent authorities, unclaimed by anyone else. There's an etiquette to these spaces that survives even the end of things.
+ARUNDEL BOOKS occupies the corner building, three floors of used and antiquarian titles stacked floor to ceiling in the way that only real bookstores achieve. The window display hasn't changed in months, maybe years—first editions under glass, travel guides to places that don't function anymore, a handwritten card promising "We Buy Books." The door is unlocked. It usually was. The owner believed in trust, or indifference, or the understanding that anyone desperate enough to steal books probably needed them more than he needed the sale.
 
-Pigeons have colonized the rafters, their cooing a constant murmur like distant conversation. Droppings streak the wooden beams, accumulate on the cobblestones below in patterns that would be abstract art if anyone were looking for meaning. A feather drifts down, grey with bars of darker grey, and settles in a crack between stones where it will stay until something moves it.`,
-  x: -3,
+A sandwich board lies face-down on the cobblestones, knocked over by wind or carelessness. It advertised something once—coffee, maybe, or a poetry reading, or the kind of optimistic event that required advertising. Whatever it was happened or didn't. The board lies there still, its message pressed against stone, speaking to no one.`,
+  x: -7,
   y: -2,
   z: 0,
   // Environmental properties

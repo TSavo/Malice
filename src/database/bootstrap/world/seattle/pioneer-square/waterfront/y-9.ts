@@ -1,21 +1,18 @@
-// Waterfront - between S. Jackson St and S. King St
+// Waterfront - between S. Jackson and S. King
 
 export const room = {
-  name: 'Alaskan Way',
-  description: `The waterfront narrows here as the port facilities crowd against the seawall. Chain-link fences topped with razor wire line both sides of the road, creating a corridor between the container yards and the water. The fences are intact but the gates are open, swinging in the wind.
+  name: 'Waterfront',
+  description: `The waterfront runs along Elliott Bay's edge, the seawall holding back the Puget Sound as it has since the 1930s. The seawall was built during the Depression, a WPA project that employed thousands and lasted nearly a century. Its concrete is cracked now, water seeping through in places, but the wall still holds. Mostly.
 
-A customs inspection station sits at the corner, its booth empty, its barrier arm raised and stuck. The x-ray machine inside is dark. The drug dogs are gone. The contraband that passed through here in the early days is long since dispersed into the city.
+The sinkhole is visible to the east, a flooded depression where the ground collapsed and never stopped sinking. The water in the hole is dark and still, connected to the bay through cracks in the seawall that no one ever repaired. The smell of salt water and decay mixes here, ocean and ruin becoming indistinguishable.
 
-Shipping manifests flutter in the breeze, escaped from some office and scattered across the concrete. Bills of lading for goods from Shanghai and Busan and Ho Chi Minh City. The global supply chain, reduced to litter.
-
-S. King Street is visible to the south, marking the edge of Pioneer Square.`,
-  x: -15,
+Gulls circle overhead, the only consistent life along this stretch. They've adapted to the post-human waterfront, finding food in the bay as they did before the city existed. The gulls will outlast everything built here.`,
+  x: -21,
   y: -9,
   z: 0,
-  // Environmental properties
-  population: 0, // Empty (post-Event)
-  ambientNoise: 0, // Quiet/abandoned
-  lighting: 100, // Daylight (outdoor)
-  waterLevel: 0, // Dry
-  outdoor: true, // Street level
+  population: 0,
+  ambientNoise: 15,
+  lighting: 100,
+  waterLevel: 0,
+  outdoor: true,
 };

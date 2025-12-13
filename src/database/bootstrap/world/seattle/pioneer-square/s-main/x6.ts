@@ -1,19 +1,18 @@
-// S. Main St - between 2nd and 3rd Ave
+// S. Main St - between 2nd Ave and 3rd Ave
 
 export const room = {
   name: 'S. Main St',
-  description: `The Corp Construction barrier begins here, appearing on the south side of Main Street like a black curtain drawn across a stage. The barrier runs east for blocks—chain-link fence ten feet high, covered with opaque fabric that shows the CORP INDUSTRIES logo at measured intervals. Whatever was being built behind this barrier swallowed an entire city block, then two, then three, growing by acquisition until the project's footprint exceeded the public's ability to imagine what could require that much space.
+  description: `Main Street continues east toward Third Avenue, the commercial character of the corridor thinning as it moves away from the neighborhood's core. The buildings here are smaller, less ornate—the businesses that couldn't afford Main and Second settled for Main and Third. The compromise shows in the architecture.
 
-Warning signs are posted at intervals along the fence: DANGER - CONSTRUCTION AREA • HARD HAT REQUIRED • NO TRESPASSING - VIOLATORS WILL BE PROSECUTED. The signs reference safety protocols and legal consequences that assumed someone was watching, someone would respond, someone cared about trespass and liability. The signs remain official and ignored. The hard hats are wherever hard hats go when no one is building anything.
+The Corp Construction barrier is visible to the north, its black fabric wall running parallel to the street for the entire block. Whatever they're doing behind that barrier, they're doing it quietly. The contrast between corporate activity and urban decay is stark here—resources flowing into the fenced compound while the surrounding blocks crumble.
 
-A gap has been cut in the chain-link at waist height—wire snipped clean, the fabric behind it slit with a blade or torn by hands. Someone patched the gap with fresh wire, wound tight around the damaged links. Someone else cut through the patch. The cycle of cutting and repairing has left a scar in the fence, evidence of curiosity that couldn't be contained. What was on the other side? What is on the other side? The fence keeps its counsel. The gap remains, inviting and warning in equal measure.`,
+A former coffee shop occupies one corner, its espresso machine still visible through the window. The machine was expensive once, Italian engineering meant to produce perfect shots. The shots stopped. The machine waits, corroding slowly, for a barista who will never return.`,
   x: 6,
   y: 0,
   z: 0,
-  // Environmental properties
-  population: 0, // Empty (post-Event)
-  ambientNoise: 0, // Quiet/abandoned
-  lighting: 100, // Daylight (outdoor)
-  waterLevel: 0, // Dry
-  outdoor: true, // Street level
+  population: 0,
+  ambientNoise: 0,
+  lighting: 100,
+  waterLevel: 0,
+  outdoor: true,
 };

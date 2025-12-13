@@ -1,20 +1,18 @@
-// Waterfront & S. King St intersection
+// S. King St - between Waterfront and 1st Ave
 
 export const room = {
-  name: 'Alaskan Way & S. King St',
-  description: `Alaskan Way terminates at S. King Street, where the waterfront becomes industrial access road serving container terminals that no longer operate. The Port of Seattle's facilities stretch south from here—Terminal 30, Terminal 46, the container yards rusted and empty where goods once moved in the choreography of global trade. The choreography ended. The cranes stand frozen over empty docks.
+  name: 'S. King St',
+  description: `King Street runs east from the waterfront here, climbing the grade that separates the bay from the rest of the city. The incline is modest but steady, the kind of slope that wears on legs after a few blocks. The street was built for horses and wagons that didn't notice grades the way feet do.
 
-A public fishing pier extends from the seawall, wooden planking rotting on concrete pilings. The railing still holds rod holders; no one has fished here in decades. The structure provides views across Elliott Bay to West Seattle and Bainbridge Island, the geography unchanged even as everything else has.
+The buildings on this block are industrial—warehouses and storage facilities that served the waterfront trade. Their loading docks face the street, roll-up doors frozen in various positions, interiors dark and empty. Whatever they once held has been stripped away, leaving only echoing spaces and the smell of old concrete.
 
-The seawall shows its age and neglect—concrete spalling, rebar exposed to salt air, the barrier between city and water slowly losing the battle. A bait and tackle shop occupies a converted shipping container, rusted shut, its inventory of hooks and sinkers waiting for anglers who'll never come.`,
+The sinkhole's edge is visible to the north, its flooded depression a constant presence in this part of the neighborhood. The street itself is intact here, but the proximity to the collapse keeps traffic—what traffic there is—moving quickly through.`,
   x: -15,
-  y: -10,
+  y: -12,
   z: 0,
-  intersection: ['Alaskan Way', 'S. King St'],
-  // Environmental properties
-  population: 0, // Empty (post-Event)
-  ambientNoise: 0, // Quiet/abandoned
-  lighting: 100, // Daylight (outdoor)
-  waterLevel: 0, // Dry
-  outdoor: true, // Street level
+  population: 0,
+  ambientNoise: 0,
+  lighting: 100,
+  waterLevel: 0,
+  outdoor: true,
 };

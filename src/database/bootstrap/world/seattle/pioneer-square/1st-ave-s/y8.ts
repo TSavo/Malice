@@ -2,12 +2,12 @@
 
 export const room = {
   name: '1st Ave S',
-  description: `The debris wall dominates the view north—six stories of the Merrill Building brought down in a cascade that filled the intersection like concrete poured into a mold. Rebar tangles through the rubble like metal vines. A section of facade leans against the pile at a forty-five degree angle, windows still intact in their frames, reflecting nothing. Somewhere in that mass of brick and steel are the things that were inside the building when it fell. Office furniture. Files. People. The pile doesn't distinguish.
+  description: `The Hotel Morrison fills the east side of the block, six stories of brick and terracotta from the 1920s, back when Pioneer Square hotels catered to merchant sailors and longshoremen. The building went upscale in the 2000s—exposed brick boutique rooms, a rooftop bar, rates that would have made those longshoremen choke on their whiskey. The rooftop bar's neon sign still hangs from the parapet: SUMMIT. The neon tubes have gone milky with age, holding their last charge of gas like a held breath.
 
-Dust coats everything this close to the collapse. A fine grey powder that settles on windowsills, gathers in doorways, films the surfaces of parked cars until they all look the same color. The dust gets in your lungs if you breathe too deep. It tastes like chalk and age and things that used to be solid.
+Fire escapes zigzag down the hotel's facade, each landing a small stage. On the fourth floor, someone left a suitcase on the landing—hard-shell Samsonite, the kind with combination locks. It sits there still, latches facing out, whatever's inside sealed away. An evacuation interrupted, or a decision reversed, or just someone who set their bag down for a moment and never picked it up again.
 
-Orange construction fencing runs across the street, jersey barriers behind it, the whole apparatus of official response that happened before there was no one left to respond. DANGER - UNSTABLE STRUCTURE reads a sign wired to the fence. The structure has been unstable for years now. Nothing has fallen since the initial collapse. Nothing has been cleared either. The rubble has become geography.`,
-  x: -9,
+The lobby doors are plate glass etched with art deco patterns, geometric sunbursts that catch the grey light. Through them you can see a marble floor, a reception desk with a brass bell, wingback chairs arranged around a fireplace that burns nothing. The clock above the desk stopped at 3:47. Morning or afternoon, impossible to say.`,
+  x: -14,
   y: 8,
   z: 0,
   // Environmental properties

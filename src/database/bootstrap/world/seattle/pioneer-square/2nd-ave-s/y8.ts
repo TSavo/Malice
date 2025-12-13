@@ -2,12 +2,12 @@
 
 export const room = {
   name: '2nd Ave S',
-  description: `The debris spills into the street here, the leading edge of the collapse zone spreading outward like a frozen wave. Walking becomes picking—stepping over bricks, around rebar, past chunks of concrete that used to be floors or walls or the distinction between them. The asphalt beneath is cracked and buckled, stressed by the weight of everything that fell on it. Glass crunches under every step. Some of it is window glass, tempered and safety. Some of it is decorative, cut crystal from chandeliers or mirrors from vanities, the finer things scattered among the debris like ironic commentary.
+  description: `From here you can see how the building fell—not straight down in the controlled manner of demolition, but outward and sideways, the upper floors sliding off the lower ones like a deck of cards pushed from one end. The collapse happened in stages, you can tell from the way the debris is layered. First the facade peeled away. Then the floors pancaked. Then the whole mass slumped forward into the intersection, filling the street with the compressed remains of a century of occupation.
 
-A Prius has been flattened by a section of facade that landed squarely on its roof, compressing the passenger compartment to maybe eighteen inches. The hybrid's hood is crumpled but the front wheels are still pointed straight ahead, the car still aimed at wherever it was going when going stopped being an option. A parking meter stands next to it, undamaged, its display showing thirty-seven minutes remaining. The meter outlasted the car. The meter will outlast a lot of things.
+DELICATUS occupied the corner restaurant space, one of those upscale sandwich shops that charged $18 for a pastrami and justified it with locally-sourced this and house-made that. The front windows have been blown out, whether by the shockwave or by flying debris or by someone seeking shelter or supplies. Through the empty frames: tables still set for lunch, white paper covering red-checkered cloth, chairs scattered but not overturned, dust coating everything like grey snow. The menu board on the wall still lists specials. The specials have expired.
 
-The smell is different this close to the collapse. Dust, yes—the powdered concrete and pulverized brick that coats your lungs if you breathe too deep. But underneath that: the organic smell of things that lived and stopped living, the slow chemistry of decomposition that happens when moisture and darkness and time get together with whatever was inside the building when it came down. You don't want to think about what that smell means. You think about it anyway.`,
-  x: 3,
+A bicycle rack stands at the corner, still bolted to the concrete, still doing its job. Three bikes remain locked to it—a commuter hybrid, a fixie with deep-dish rims, a folding bike with tiny wheels. One of the bikes has been bent at the top tube, frame warped by something heavy that hit it and bounced away. The locks hold. The owners don't collect what they locked up. The bikes wait with the patience of objects, which is infinite and indifferent.`,
+  x: 0,
   y: 8,
   z: 0,
   // Environmental properties

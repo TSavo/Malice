@@ -1,23 +1,19 @@
-// Occidental Park - Northwest corner (x=-4, y=3)
+// Occidental Park - center-west section
 
 export const room = {
   name: 'Occidental Park',
-  description: `The northwestern corner of Occidental Park, where the plaza meets S. Washington Street to the north. The park's brick paving continues to the low concrete barrier that marks the boundary with the street.
+  description: `A brick planter box rises from the plaza here, waist-high, its original plantings dead and reduced to brittle sticks. But something else grows there now—a scraggly volunteer, some wind-seeded sapling that found purchase in the neglected soil. The tree is small and struggling, bent by wind, but alive. Green leaves. Actual green leaves, the first living plant you've seen in blocks.
 
-A totem pole stands near this corner, carved from a single cedar log, rising seven meters into the air. The pole was installed in the 1970s, a nod to Pacific Northwest indigenous art, though its presence here—far from its cultural context—was always complicated. The figures carved into the pole—raven, bear, whale—stare out over the empty plaza with painted eyes.
+Life persists. That's what the sapling says. Fifty-five years of abandonment and something still reaches for the sky, still converts sunlight to sugar, still grows. The contrast with the dead trees surrounding the plaza is stark—those were cultivated, watered, cared for. This one survives on nothing but rain and whatever nutrients leach from the decaying brick.
 
-The pole's paint has weathered, colors fading to ghost versions of their original brightness. Rain has darkened the wood where water runs down from the carved protrusions. Moss has begun to grow in the deeper carved spaces, finding purchase in the texture.
-
-A bench sits near the pole, oriented to face it, positioned so someone could sit and contemplate the carving. The bench is empty. The pole is still worth contemplating, but there's no one to do it.
-
-The park extends south and east from here.`,
+The buildings ringing the park loom dark and empty, their windows reflecting grey sky. The sapling doesn't care about the buildings. It just grows.`,
   x: -4,
   y: 3,
   z: 0,
   // Environmental properties
   population: 0, // Empty (post-Event)
-  ambientNoise: 15, // Open corner, street sounds closer
-  lighting: 100, // Full daylight
+  ambientNoise: 15, // Open plaza, wind across brick
+  lighting: 100, // Full daylight (open space)
   waterLevel: 0, // Dry
   outdoor: true, // Open plaza
 };

@@ -1,21 +1,18 @@
-// 3rd Ave S - between S. Main St and S. Jackson St
+// 3rd Ave S - between S. Jackson and S. Main
 
 export const room = {
   name: '3rd Ave S',
-  description: `The approach to Jackson Street brings a density of commerce, storefronts packed tightly together, each one offering something the community needed. Herbalists and jewelers and noodle shops and import stores, the ecosystem of an immigrant neighborhood compressed into a few blocks.
+  description: `Third Avenue passes through what was once a transitional zone between neighborhoods—not quite Pioneer Square, not quite the International District, claimed by neither and serving both. The buildings reflect this ambiguity, a mix of styles and eras that never cohered into a distinct identity.
 
-A fortune teller's shop displays a faded sign promising insights into the future. The future turned out differently than anyone predicted. The fortune teller didn't see it coming either.
+A former bus shelter stands at the curb, its Plexiglas panels cracked and yellowed, its bench long since removed or stolen. The shelter's route map is still mounted inside, showing lines and stops that haven't operated in decades. The 14 bus once ran this route. The 14 bus is a memory now, if anyone remembers.
 
-Across the avenue, a dim sum restaurant's window is filled with vintage photographs—the district in the 1920s, in the 1950s, in the 1980s. The photographs show change and persistence, the neighborhood adapting and surviving. It survived exclusion acts and internment and urban renewal and gentrification. It survived everything until it didn't.
-
-The pagoda gates of Jackson Street are visible to the south, marking the ceremonial entrance to Chinatown.`,
-  x: 9,
+Graffiti covers the lower stories of buildings on both sides—tags and murals layered over decades, a compressed timeline of urban expression. The oldest tags are almost illegible, faded to shadows. The newest are still sharp, proof that someone still cares enough to make their mark.`,
+  x: 7,
   y: -4,
   z: 0,
-  // Environmental properties
-  population: 0, // Empty (post-Event)
-  ambientNoise: 0, // Quiet/abandoned
-  lighting: 100, // Daylight (outdoor)
-  waterLevel: 0, // Dry
-  outdoor: true, // Street level
+  population: 0,
+  ambientNoise: 0,
+  lighting: 100,
+  waterLevel: 0,
+  outdoor: true,
 };

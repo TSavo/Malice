@@ -1,14 +1,14 @@
-// S. Washington St - between 1st Ave and Occidental
+// S. Washington St - between Occidental and 2nd Ave
 
 export const room = {
   name: 'S. Washington St',
-  description: `The buildings press close together here, their upper stories nearly touching, creating a canyon of brick and shadow that blocks the grey Seattle light. Fire escapes zigzag up the walls on both sides, cast iron platforms and stairs rusted to various shades of orange, the infrastructure of emergency egress frozen in place.
+  description: `The Pioneer Building dominates the northern view, its six stories of red brick and Romanesque arches establishing the architectural vocabulary that defines Pioneer Square. Elmer Fisher designed it in 1892, part of the building boom that followed the Great Fire—fifty blocks of wooden structures replaced with brick and stone and terra cotta, the city literally fireproofing itself against repetition.
 
-RAY'S BARBERSHOP occupies a narrow storefront squeezed between larger buildings, its striped pole dark and still. Through the window: leather and chrome chairs arranged in a row, each facing its own mirror, the geometry of vanity repeated three times. The floor is covered in hair clippings swept toward the walls but never collected, the final evidence of final haircuts.
+SEATTLE FLOWER MARKET occupies the ground floor of the adjacent building, a narrow storefront with a green awning that has faded to something closer to grey. The refrigerated display cases line the front window, their glass fogged with condensation that dried into mineral deposits. Florists depended on occasions—weddings, funerals, anniversaries, the calendar of human milestones that required botanical punctuation.
 
-Occidental Park opens at the end of the block, the iron pergola visible through the gap between buildings. The maple canopy beyond has grown wild, branches extending past their planned positions, nature reclaiming the careful urban forestry that once kept it contained. The air here carries the smell of wet stone and rotting leaves, the organic chemistry of spaces going back to earth.`,
+The street narrows slightly here as older buildings crowd closer to the sidewalk, their facades predating modern setback requirements. Fire escapes zigzag up the eastern walls, the iron platforms and ladders that building codes mandated after the lessons of 1889.`,
   x: -5,
-  y: 5,
+  y: 6,
   z: 0,
   // Environmental properties
   population: 0, // Empty (post-Event)

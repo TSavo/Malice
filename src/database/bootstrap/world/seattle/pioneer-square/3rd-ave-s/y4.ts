@@ -9,7 +9,7 @@ The eastern side opens up here, the Collapsed Building's shadow receding, replac
 A food truck sits in the lot, its serving window closed, its menu board still advertising tacos and burritos. The truck fed the rescue workers. Now it feeds no one. The propane tanks are probably still full.
 
 The avenue continues, bordered by mystery and abandonment.`,
-  x: 9,
+  x: 7,
   y: 4,
   z: 0,
   // Environmental properties

@@ -1,12 +1,12 @@
-// S. Main St - east of 2nd Ave
+// S. Main St - between 2nd and 3rd Ave
 
 export const room = {
   name: 'S. Main St',
-  description: `East of Second Avenue, Main Street loses the last vestiges of Pioneer Square's curated historicism. The buildings here are mid-century plain—concrete and glass, parking structures and municipal offices, architecture that prioritizes function over heritage. The old Seattle gave way to the efficient Seattle somewhere around this line. Now both are equally defunct.
+  description: `The Corp barrier continues unbroken along the south side of Main Street, that endless wall of black fabric creating the unsettling sensation of walking beside a void—as if the city simply stopped existing on that side of the street and was replaced by something that doesn't want to be seen. The north side offers a reminder of what the construction displaced: two-story buildings from the 1950s, brick and concrete, the functional architecture of a city that needed space for businesses rather than statements.
 
-LABOR READY occupies a ground-floor storefront, a day-labor agency that matched workers with employers for warehouse shifts, construction gigs, and the various temporary positions that the economy required when the economy was requiring things. The window display is a bulletin board of job listings, each one describing work that existed for someone—forklift operator wanted, $15/hr, must pass drug test. The listings have been there long enough for the paper to yellow. The drug tests are no longer administered. The forklifts are no longer operated.
+7-ELEVEN occupies one of these buildings, a franchise that served the neighborhood's convenience needs—lottery tickets and energy drinks and microwave burritos and the small transactions of daily life. The windows are papered with promotional posters that promise SLURPEE SUMMER and BIG GULP DAYS, seasonal campaigns from a company that still exists somewhere, probably. The door is locked. The Big Gulps are flat. The lottery tickets wait for winners who will never come to scratch them.
 
-TOGO'S GREAT SANDWICHES occupies the building opposite, a chain operation that served the office-worker lunch crowd with submarine sandwiches named after Italian geography. The menu board above the counter lists combinations: #1 ORIGINAL ITALIAN • #4 TURKEY & AVOCADO • #7 PASTRAMI. The prices seemed reasonable once. The sandwiches don't exist anymore. The menu is a document from another economy, another lunch hour, another version of normal that required sandwiches to function.`,
+A Metro bus shelter stands at the corner, its curved plexiglass walls tagged with graffiti in a dozen hands—names and symbols and the territorial markings of people who wanted to prove they existed here. The bench inside is empty. The route map shows lines that connected this corner to Capitol Hill, to the U District, to places that might as well be other continents. The buses stopped running when the drivers stopped coming. The shelter remains, its purpose reduced to providing slight protection from rain that falls on no commuters.`,
   x: 4,
   y: 0,
   z: 0,

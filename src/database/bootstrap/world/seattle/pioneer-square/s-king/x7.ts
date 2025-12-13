@@ -1,15 +1,16 @@
-// S. King St - between 2nd and 3rd Ave
+// 3rd Ave S & S. King St intersection
 
 export const room = {
-  name: 'S. King St',
-  description: `KING PHARMACY occupies the corner building, its windows dark, its door hanging open on rusted hinges. The independent pharmacy served the International District for decades before the war—one of the few places where language barriers and cultural preferences were understood. The storefront's hybrid character is still visible: Western pharmaceuticals on one side, traditional Chinese medicine on the other. Both sides were looted long ago.
+  name: '3rd Ave S & S. King St',
+  description: `Third Avenue intersects S. King Street at what was once the commercial heart of the International District, the intersection where foot traffic from multiple directions converged. The transit center is blocks away—not that transit runs anymore. The pedestrian flow that supported the retail density is fifty-five years gone. The density remains. The pedestrians don't.
 
-The pharmacy's dual inventory reflected the community's approach to health—antibiotics beside herbal formulations, blood pressure medications beside roots and bark. The wooden drawers that line one wall still hold their labels, the dried ingredients long since taken or spoiled. The formulas refined over centuries required ingredients that no longer arrive from anywhere.
+Hing Hay Park is visible to the north, the neighborhood's central gathering space overgrown and silent. The park's pagoda pavilion—a gift from Taipei commemorating the sister-city relationship—rises above the surrounding rooflines, its curved eaves weathered, its red columns faded to rust-pink. The landmark that identified the International District still identifies it. The community it served is scattered or dead.
 
-The building's brick facade shows a century of weathering plus fifty-five years of abandonment. The corner location that once provided valuable visibility now provides visibility of nothing. A painted sign on the wall advertises services in Chinese and English, the bilingual communication fading but still legible. The services ended. The sign remains.`,
+PACIFIC WIRELESS occupies the corner building, its windows smashed, its inventory long since looted. The mobile phone retailer served the neighborhood's communication needs—smartphones, prepaid plans, international calling cards that let immigrants call home. The window displays are empty now. The phones are gone. The networks they connected to are gone. Home, for most of these families, is gone too.`,
   x: 7,
-  y: -10,
+  y: -12,
   z: 0,
+  intersection: ['3rd Ave S', 'S. King St'],
   // Environmental properties
   population: 0, // Empty (post-Event)
   ambientNoise: 0, // Quiet/abandoned

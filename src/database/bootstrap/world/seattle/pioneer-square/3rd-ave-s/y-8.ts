@@ -1,21 +1,18 @@
-// 3rd Ave S - between S. Jackson St and S. King St
+// 3rd Ave S - between S. Jackson and S. King
 
 export const room = {
   name: '3rd Ave S',
-  description: `The stadiums loom to the west, visible over the rooftops—the baseball stadium with its retractable roof, the football stadium with its exposed steel and dramatic angles. They built the stadiums here because the land was cheap and the neighborhood had no political power to resist. The neighborhood adapted, as it always had.
+  description: `A warehouse dominates the eastern side of the avenue, its corrugated metal walls rusted but intact. The building was designed to be temporary, a prefab structure meant to serve for a decade or two until something permanent could be built. Sixty years later, nothing permanent was ever built. The temporary became eternal through neglect.
 
-A sports bar occupies the corner, its windows plastered with team logos and pennants from championships that seemed important once. The TVs inside are dark. The kegs are dry. The jerseys on the walls commemorate victories that no one celebrates anymore.
+Loading bays line the warehouse's street face, their roll-up doors in various states of failure—some open, some closed, some frozen at odd angles. Whatever the warehouse held was cleaned out long ago, scavenged in waves by people who needed anything they could find. The interior is empty now, echoing and dark.
 
-Across the avenue, a senior housing complex rises, its balconies decorated with plants that have either thrived or died depending on their water needs. The seniors who lived here were the last generation to remember what the neighborhood was before the stadiums, before the light rail, before everything. They remembered and they stayed. They're not here now.
-
-King Street approaches from the south.`,
-  x: 9,
+The street surface here is concrete rather than asphalt, heavy-duty paving designed for truck traffic. The concrete has cracked but not crumbled, more durable than the asphalt elsewhere. Even the infrastructure here was built for function over form.`,
+  x: 7,
   y: -8,
   z: 0,
-  // Environmental properties
-  population: 0, // Empty (post-Event)
-  ambientNoise: 0, // Quiet/abandoned
-  lighting: 100, // Daylight (outdoor)
-  waterLevel: 0, // Dry
-  outdoor: true, // Street level
+  population: 0,
+  ambientNoise: 0,
+  lighting: 100,
+  waterLevel: 0,
+  outdoor: true,
 };

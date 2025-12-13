@@ -12,7 +12,7 @@ A chain-link fence partially separates the avenue from the park, but it's collap
 The pavement here is broken, chunks of asphalt missing to reveal the dirt and buried debris beneath. Weeds grow aggressively, fed by runoff from the park and shaded enough to survive.
 
 Occidental continues north and south, running between park and buildings.`,
-  x: -3,
+  x: -7,
   y: 2,
   z: 0,
   // Environmental properties

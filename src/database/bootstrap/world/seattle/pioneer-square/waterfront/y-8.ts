@@ -1,21 +1,18 @@
-// Waterfront - between S. Jackson St and S. King St
+// Waterfront - between S. Jackson and S. King
 
 export const room = {
-  name: 'Alaskan Way',
-  description: `The largest of the port cranes stands here, a red-painted giant that could lift forty-ton containers like a child lifting blocks. Its operator cab is fifty meters up, accessible by a ladder that nobody has climbed in months. The controls are probably still functional. The diesel that powered it is probably still in the tanks.
+  name: 'Waterfront',
+  description: `The seawall path continues along the bay, the concrete walkway that once carried tourists and joggers and lunchtime wanderers. The path is cracked but passable, weeds growing through the gaps where maintenance crews no longer venture. The view of the bay is unobstructed—grey water meeting grey sky at a horizon that looks closer than it should.
 
-A crane this size was worth millions. Now it's worth whatever someone will trade for scrap steel. Which is nothing, because there's no one left to smelt it.
+Rusted bollards line the water's edge, their chains long since stolen or corroded away. The bollards were decorative as much as functional, meant to evoke maritime heritage rather than actually secure anything. The heritage they evoked is more genuine now, in the decay, than it ever was in the design.
 
-The operator's lunch box is still in the cab. You can see it through the window if you look up at the right angle. A blue cooler, faded by sun. Whatever was inside has long since rotted away.
-
-The port stretches south. The city huddles to the east. The bay waits to the west, patient and cold.`,
-  x: -15,
+A collapsed pier extends into the water to the west, its wooden planks rotted through, its pilings listing at angles that speak to decades of tidal assault. The pier was probably historic once, probably had a plaque. The plaque is underwater now, with whatever history it commemorated.`,
+  x: -21,
   y: -8,
   z: 0,
-  // Environmental properties
-  population: 0, // Empty (post-Event)
-  ambientNoise: 0, // Quiet/abandoned
-  lighting: 100, // Daylight (outdoor)
-  waterLevel: 0, // Dry
-  outdoor: true, // Street level
+  population: 0,
+  ambientNoise: 15,
+  lighting: 100,
+  waterLevel: 0,
+  outdoor: true,
 };

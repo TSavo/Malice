@@ -1,19 +1,18 @@
-// Yesler Way - between 2nd and 3rd Ave
+// Yesler Way - between 2nd Ave and 3rd Ave
 
 export const room = {
   name: 'Yesler Way',
-  description: `A construction site occupies the south side of the street, plywood barriers weathered grey surrounding foundation work that never progressed beyond rebar and poured concrete. A faded sign promises "THE YESLER" with "152 LUXURY UNITS." The luxury units were never built. The sign keeps promising.
+  description: `Yesler Way passes between the Pioneer Building and the ruins of what was once a thriving commercial block. The contrast is stark—the Pioneer Building intact, its stone and brick having survived whatever destroyed its neighbor. The survival seems arbitrary, the destruction equally so. The universe played favorites, and no one knows the criteria.
 
-RAIN CITY MARTIAL ARTS occupies a ground-floor space on the north side, its mirrored windows cracked and clouded, reflecting a distorted version of the street. Through gaps in the mirror: heavy bags hanging motionless, their leather cracked and split. Training mats covered in dust. The building's brick facade dates to the early twentieth century; the dojo opened sometime before the war and closed when everyone did.
+The light rail tunnel entrance is visible ahead, or what remains of it. The tunnel collapsed during the burning, its structural supports failing, the ground above subsiding into a flooded crater. The collapse blocked one of the main routes between Pioneer Square and the districts to the north. The blockage became permanent when no one came to repair it.
 
-Third Avenue approaches. The light rail used to run through here, connecting this neighborhood to downtown and beyond. The trains stopped. The tunnels remain, dark and silent beneath the street.`,
+The street surface buckles and heaves where it approaches the crater's edge, the pavement cracked by the subsidence, tilting toward the water that fills the depression. The tilt is subtle but noticeable, a wrongness in the geometry that feet register before eyes.`,
   x: 6,
-  y: 10,
+  y: 12,
   z: 0,
-  // Environmental properties
-  population: 0, // Empty (post-Event)
-  ambientNoise: 0, // Quiet/abandoned
-  lighting: 100, // Daylight (outdoor)
-  waterLevel: 0, // Dry
-  outdoor: true, // Street level
+  population: 0,
+  ambientNoise: 5,
+  lighting: 100,
+  waterLevel: 0,
+  outdoor: true,
 };

@@ -2,12 +2,12 @@
 
 export const room = {
   name: '2nd Ave S',
-  description: `From here you can see how the building fell—not straight down in the controlled manner of demolition, but outward and sideways, the upper floors sliding off the lower ones like a deck of cards pushed from one end. The collapse happened in stages, you can tell from the way the debris is layered. First the facade peeled away. Then the floors pancaked. Then the whole mass slumped forward into the intersection, filling the street with the compressed remains of a century of occupation.
+  description: `The violence of the collapse becomes visible here in the architecture. Buildings show cracks that weren't there before—jagged lines running up facades, window frames torqued out of square, the slow-motion evidence of foundations that shifted when the shockwave passed through. Some structures have settled unevenly, their rooflines no longer parallel to the street. The neighborhood is leaning toward the disaster like a crowd drawn to an accident.
 
-DELICATUS occupied the corner restaurant space, one of those upscale sandwich shops that charged $18 for a pastrami and justified it with locally-sourced this and house-made that. The front windows have been blown out, whether by the shockwave or by flying debris or by someone seeking shelter or supplies. Through the empty frames: tables still set for lunch, white paper covering red-checkered cloth, chairs scattered but not overturned, dust coating everything like grey snow. The menu board on the wall still lists specials. The specials have expired.
+THE PIONEER BUILDING rises on the corner, one of the grand dames of the post-fire reconstruction, six stories of Romanesque Revival brick that has seen two centuries of earthquakes and fires and economic collapses. This latest collapse has tested it. The corner turret has cracked, a fissure running from foundation to roofline like a scar. Glass has blown out of the upper windows. Through the gaps you can see the hotel rooms inside—beds still made, luggage still waiting, bathrobes hanging on bathroom doors like shed skins.
 
-A bicycle rack stands at the corner, still bolted to the concrete, still doing its job. Three bikes remain locked to it—a commuter hybrid, a fixie with deep-dish rims, a folding bike with tiny wheels. One of the bikes has been bent at the top tube, frame warped by something heavy that hit it and bounced away. The locks hold. The owners don't collect what they locked up. The bikes wait with the patience of objects, which is infinite and indifferent.`,
-  x: 3,
+A neon sign hangs at forty-five degrees from the building's facade, still attached by one bracket, the other having torn free from brick that couldn't hold it. The sign reads HOTEL in art deco script, or would if the tubes weren't shattered. Now it's just metal and broken glass, a skeleton of the word it used to be, still trying to advertise something that isn't for sale anymore.`,
+  x: 0,
   y: 7,
   z: 0,
   // Environmental properties

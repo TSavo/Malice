@@ -1,14 +1,14 @@
-// S. King St - east of 3rd Ave
+// S. King St - between 3rd and 4th Ave
 
 export const room = {
   name: 'S. King St',
-  description: `The International District's density reaches its maximum here, buildings packed together in the tight configuration that Asian urban neighborhoods favored. The vertical stacking shows through the decay: retail on the ground floor dark and empty, professional services on the second floor with windows smashed, residential above with curtains still hanging behind broken glass. The density that once meant community now means concentrated abandonment.
+  description: `The INTERNATIONAL DISTRICT SENIOR CENTER occupies the ground floor, its large windows grimy but still allowing views into the activity room. The open space designed for exercise classes and social gatherings is empty and dark. The center served multiple functions—recreation, health education, meal service, the support systems that helped seniors maintain independence. The seniors it served are dead now. They would be over a hundred if they'd survived the war.
 
-SHANGHAI HAND-PULLED NOODLES occupies the ground-floor space, its kitchen cold, its dining room dusty. The restaurant specialized in the la mian tradition—noodles stretched and pulled by hand, the technique that creates texture machine-made noodles can't replicate. The pass-through window to the kitchen frames rusted equipment and empty prep surfaces. Photographs of menu items still line the walls, faded and water-stained, the visual ordering system serving no one who can order.
+The interior layout is still visible through the windows: exercise equipment along one wall gathering dust—stationary bikes with flat tires, balance aids toppled over. Folding tables and chairs remain configured for group activities that ended fifty-five years ago. The kitchen area in the back is dark, the meal programs that provided nutrition and social connection silent.
 
-The building's upper floors house HARMONY ACUPUNCTURE on the second level, its windows dark, its treatment rooms abandoned. Apartments occupy the floors above, their fire escapes rusted, their residents fifty-five years gone. The needles and herbs that promised to restore harmony couldn't restore what the war took.`,
+Signage inside appears in multiple languages—Chinese, Vietnamese, Japanese, Tagalog—reflecting the diverse Asian communities that the International District encompassed. The multilingual welcome extends to no one. The community center that served as a gathering point for elderly residents gathers only silence now.`,
   x: 10,
-  y: -10,
+  y: -12,
   z: 0,
   // Environmental properties
   population: 0, // Empty (post-Event)
