@@ -5,6 +5,160 @@ A comprehensive guide for creating new prototypes and systems in Malice.
 **Related Documentation:**
 - [MCP-TOOLS.md](MCP-TOOLS.md) - MCP tools for AI assistants and automation
 - [moo-programming.md](moo-programming.md) - MOO programming reference
+- [plot-jobs.md](plot-jobs.md) - Plot/job system for AI city management
+
+## Two Ways to Build
+
+Malice supports two building approaches:
+
+1. **Code-based (Bootstrap)** - TypeScript builders for prototypes that are part of the core system. Changes require a rebuild.
+
+2. **Runtime (MCP)** - Create objects, add methods, and build content at runtime via MCP tools. No rebuild required. Ideal for AI-assisted building and iteration.
+
+**When to use Code vs MCP:**
+
+| Use Code (Bootstrap) | Use MCP (Runtime) |
+|---------------------|-------------------|
+| Core prototypes that many things inherit from | One-off instances and content |
+| Complex systems requiring TypeScript types | Iterating on new prototype designs |
+| Things that must exist at startup | AI-created NPCs and storylines |
+| Performance-critical methods | Testing method changes live |
+
+## Runtime Building with MCP
+
+MCP tools allow you to create and modify objects without rebuilding. This is the preferred approach for content creation and AI integration.
+
+### Creating Objects via MCP
+
+```javascript
+// Create a new object
+mcp.create_object({
+  parent: 49,  // $.lock prototype
+  properties: {
+    name: "Combination Lock",
+    description: "A lock with a dial combination.",
+    combination: "12-34-56"
+  }
+});
+// Returns: { objectId: 2500 }
+
+// Add a method
+mcp.set_method({
+  objectId: 2500,
+  name: "canAccess",
+  code: `
+    const agent = args[0];
+    const input = args[1];
+    if (!self.combination) return true;
+    if (input === self.combination) return true;
+    return 'Wrong combination.';
+  `
+});
+
+// Register as a prototype alias (optional)
+mcp.call_method({
+  objectId: 0,  // ObjectManager
+  name: "addAlias",
+  args: ["combinationLock", 2500]
+});
+```
+
+### Creating Prototype Hierarchies
+
+```javascript
+// 1. Create base prototype
+const base = await mcp.create_object({
+  parent: 3,  // $.describable
+  properties: { name: "Container", description: "Something that holds things.", contents: [] }
+});
+
+// 2. Add methods to base
+await mcp.set_method({
+  objectId: base.objectId,
+  name: "add",
+  code: `
+    const item = args[0];
+    const contents = self.contents || [];
+    contents.push(item.id);
+    self.contents = contents;
+    item.location = self.id;
+    return 'Added ' + item.name;
+  `
+});
+
+// 3. Create specialized variant
+const chest = await mcp.create_object({
+  parent: base.objectId,
+  properties: { name: "Chest", description: "A wooden chest.", locked: false }
+});
+
+// 4. Override method in child
+await mcp.set_method({
+  objectId: chest.objectId,
+  name: "add",
+  code: `
+    if (self.locked) return 'The chest is locked.';
+    // Call parent method
+    const parent = await $.load(self._parent);
+    return parent.add(args[0]);
+  `
+});
+```
+
+### AI Registry Integration
+
+The $.ai registry tracks AI-controlled humans:
+
+```javascript
+// Spawn an AI human
+mcp.spawn_ai({
+  role: "guard",
+  name: "Marcus",
+  locationId: 100,
+  sex: "male",
+  age: 35
+});
+
+// List all guards
+mcp.list_ai({ role: "guard" });
+
+// Remove when done
+mcp.despawn_ai({ humanId: 567 });
+```
+
+### Plot/Job System Integration
+
+Create narratives and quests via MCP:
+
+```javascript
+// Create a plot
+mcp.create_plot({
+  name: "Missing Jewels",
+  metadata: { participants: [100], type: "investigation" }
+});
+
+// Add a job with a hook
+mcp.create_job({
+  plotId: 500,
+  jobId: "find_jewels",
+  metadata: { reward: 100 }
+});
+
+// Watch for events
+mcp.register_job_hook({
+  plotId: 500,
+  jobId: "find_jewels",
+  targetId: 200,
+  eventName: "itemPickedUp",
+  filter: { itemName: "jewels" }
+});
+```
+
+See [MCP-TOOLS.md](MCP-TOOLS.md) for complete tool reference.
+
+## Code-Based Building (Bootstrap)
+
+For core prototypes that need to exist at startup, use TypeScript builders.
 
 ## Directory Structure
 

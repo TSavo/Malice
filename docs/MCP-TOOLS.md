@@ -328,16 +328,148 @@ Close a telnet session.
 // Returns: Confirmation
 ```
 
-## Plot/Job System
+## AI Registry
 
-For AI city management and narrative handling.
+Tools for managing AI-controlled humans. AI humans are regular `$.human` instances tracked by role in the `$.ai` registry.
+
+### spawn_ai
+Spawn a new AI-controlled human with a full body.
+
+```javascript
+{
+  role: "guard",              // Required: role for this AI
+  name: "Marcus",             // Optional: name
+  description: "A burly...",  // Optional: description
+  locationId: 100,            // Optional: room to place in
+  sex: "male",                // Optional: "male", "female", "non-binary"
+  age: 35                     // Optional: age in years
+}
+// Returns: Created human ID and name
+```
+
+### despawn_ai
+Remove an AI-controlled human from the registry.
+
+```javascript
+{
+  humanId: 567,
+  recycle: true  // Optional: whether to recycle the object (default: true)
+}
+// Returns: Confirmation
+```
+
+### list_ai
+List all AI-controlled humans.
+
+```javascript
+{ role: "guard" }  // Optional: filter by role
+// Returns: Array of { id, name, role, location }
+```
+
+### get_ai_info
+Get detailed information about an AI-controlled human.
+
+```javascript
+{ humanId: 567 }
+// Returns: { id, name, role, spawnedAt, spawnedBy, ... }
+```
+
+## Plot Management
+
+Plots are narrative containers that track storylines, player requests, and AI-initiated events.
+
+### create_plot
+Create a new plot for AI-initiated storylines.
+
+```javascript
+{
+  name: "Guard Investigation",
+  metadata: {               // Optional initial metadata
+    participants: [100],
+    status: "active"
+  }
+}
+// Returns: Created plot ID
+```
+
+### close_plot
+Close a plot with a final status.
+
+```javascript
+{
+  plotId: 500,
+  status: "completed",  // "completed", "abandoned", or "failed"
+  reason: "Mystery solved"  // Optional
+}
+// Returns: Confirmation
+```
+
+### get_plot_events
+Get the event log for a plot.
+
+```javascript
+{
+  plotId: 500,
+  limit: 10  // Optional: limit to last N events
+}
+// Returns: { plotId, name, eventCount, events: [...] }
+```
+
+### add_plot_event
+Add an event to a plot's narrative log.
+
+```javascript
+{
+  plotId: 500,
+  message: "The guard arrived at the scene.",
+  from: "handler"  // Optional: "handler" or "system"
+}
+// Returns: Confirmation
+```
+
+### list_plots
+List all plots with optional filtering.
+
+```javascript
+{
+  status: "active",  // Optional: "active", "completed", "abandoned", "failed"
+  limit: 50          // Optional
+}
+// Returns: Array of plot summaries
+```
+
+### plots_by_player
+Get all plots involving a specific player.
+
+```javascript
+{
+  playerId: 100,
+  activeOnly: true  // Optional: filter to active plots only
+}
+// Returns: Array of plots involving the player
+```
+
+### search_plots
+Search plot event logs for text.
+
+```javascript
+{
+  query: "stolen jewels",
+  limit: 10  // Optional
+}
+// Returns: Plots with matching content
+```
+
+## Job System
+
+Jobs are tasks within plots that can watch for game events via hooks.
 
 ### get_next_job
 Get the next plot/job needing attention from the FIFO queue.
 
 ```javascript
 {}
-// Returns: Plot with event log and metadata
+// Returns: Plot with event log and metadata, bumps attention timer by 24h
 ```
 
 ### respond_to_job
@@ -366,6 +498,68 @@ Set or update metadata on a plot/job.
 ```javascript
 { plotId: 500, key: "status", value: "resolved" }
 // Returns: Confirmation
+```
+
+### create_job
+Create a job (task) within a plot.
+
+```javascript
+{
+  plotId: 500,
+  jobId: "deliver_package",
+  expiresAt: "2024-12-15T00:00:00Z",  // Optional
+  metadata: { targetRoom: 100 }       // Optional
+}
+// Returns: Confirmation
+```
+
+### complete_job
+Mark a job as completed (unregisters all hooks).
+
+```javascript
+{
+  plotId: 500,
+  jobId: "deliver_package",
+  reason: "Package delivered"  // Optional
+}
+// Returns: Confirmation
+```
+
+### fail_job
+Mark a job as failed (unregisters all hooks).
+
+```javascript
+{
+  plotId: 500,
+  jobId: "deliver_package",
+  reason: "Package lost"  // Optional
+}
+// Returns: Confirmation
+```
+
+### register_job_hook
+Register a hook to watch for events on a target object.
+
+```javascript
+{
+  plotId: 500,
+  jobId: "deliver_package",
+  targetId: 100,           // Object to watch
+  eventName: "itemDeposited",
+  filter: { itemType: "package" }  // Optional filter
+}
+// Returns: Confirmation
+```
+
+### get_job
+Get information about a specific job.
+
+```javascript
+{
+  plotId: 500,
+  jobId: "deliver_package"
+}
+// Returns: Job details including hooks and metadata
 ```
 
 ## Examples
@@ -475,3 +669,105 @@ await set_job_metadata({
 - Use `respond_to_job` to add events visible to players and track state in metadata
 - Combine with other MCP tools to create objects, move items, spawn NPCs, etc.
 - See [plot-jobs.md](plot-jobs.md) for full documentation on the plot system
+
+### Spawning AI-Controlled NPCs
+
+```javascript
+// 1. Spawn a guard
+const guard = await spawn_ai({
+  role: "guard",
+  name: "Marcus",
+  sex: "male",
+  age: 35,
+  locationId: 100  // Smith Tower Lobby
+});
+// Returns: { id: 567, name: "Marcus" }
+
+// 2. List all guards
+const guards = await list_ai({ role: "guard" });
+// Returns: { count: 1, humans: [{ id: 567, name: "Marcus", role: "guard", location: 100 }] }
+
+// 3. Get detailed info
+const info = await get_ai_info({ humanId: 567 });
+// Returns: { id: 567, name: "Marcus", role: "guard", spawnedAt: "...", ... }
+
+// 4. When no longer needed
+await despawn_ai({ humanId: 567, recycle: true });
+```
+
+### Creating AI-Driven Plot with Jobs
+
+```javascript
+// 1. Create a plot for a delivery quest
+const plot = await create_plot({
+  name: "Package Delivery",
+  metadata: {
+    participants: [100],  // Player ID
+    type: "delivery"
+  }
+});
+// Returns: Created plot #500
+
+// 2. Create a job within the plot
+await create_job({
+  plotId: 500,
+  jobId: "deliver_to_lobby",
+  metadata: { targetRoom: 50, item: "package" }
+});
+
+// 3. Register a hook to watch for item drop
+await register_job_hook({
+  plotId: 500,
+  jobId: "deliver_to_lobby",
+  targetId: 50,          // Watch the lobby room
+  eventName: "itemDropped",
+  filter: { itemName: "package" }
+});
+
+// 4. Add narrative event
+await add_plot_event({
+  plotId: 500,
+  message: "Quest accepted: Deliver the package to the lobby."
+});
+
+// 5. When the hook fires, complete the job
+await complete_job({
+  plotId: 500,
+  jobId: "deliver_to_lobby",
+  reason: "Package delivered successfully"
+});
+
+// 6. Close the plot
+await close_plot({
+  plotId: 500,
+  status: "completed",
+  reason: "Delivery completed"
+});
+```
+
+### Searching and Monitoring Plots
+
+```javascript
+// Find all plots involving a player
+const playerPlots = await plots_by_player({
+  playerId: 100,
+  activeOnly: true
+});
+
+// Search plot events
+const results = await search_plots({
+  query: "stolen jewels"
+});
+
+// List all active plots
+const active = await list_plots({
+  status: "active",
+  limit: 20
+});
+
+// Get full event history
+const events = await get_plot_events({
+  plotId: 500,
+  limit: 50
+});
+```
