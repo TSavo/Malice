@@ -9,7 +9,7 @@ Beyond the fallen gate, Yesler Way is impassable. Buildings on both sides of the
 
 A gas station occupies the corner, its canopy stained and sagging, its pumps rusted solid. The station served this intersection for decades before the war and has stood empty since. A sign still lists prices for gas that will never be pumped. The convenience store behind security bars is dark and stripped.
 
-This is as far east as you can go. The International District lies beyond the barricade, unreachable from here.`,
+This is as far east as you can go. The International District lies beyond the barricade, unreachable from here. North is equally blocked—the debris wall that isolates Pioneer Square from downtown sealing off passage in that direction as well.`,
   x: 14,
   y: 12,
   z: 0,

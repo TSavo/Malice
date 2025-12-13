@@ -6,7 +6,7 @@ export const room = {
 
 A row of storefronts lines the north side, their windows covered with plywood spray-painted with warnings and pleas and graffiti that stopped meaning anything decades ago. The buildings date to different eras—early twentieth-century brick beside mid-century concrete—but they share the same emptiness now.
 
-Third Avenue and the Pioneer Square light rail station are visible ahead. The station entrance gapes dark, stairs descending into tunnels that haven't seen a train in half a century. The street slopes gently downward, following the grade toward a waterfront that's changed beyond recognition.`,
+Third Avenue and the Pioneer Square light rail station are visible ahead. The station entrance gapes dark, stairs descending into tunnels that haven't seen a train in half a century. The street slopes gently downward, following the grade toward a waterfront that's changed beyond recognition. North of here, collapsed structures and debris form an impassable barrier—downtown Seattle sealed off by the destruction.`,
   x: 4,
   y: 12,
   z: 0,

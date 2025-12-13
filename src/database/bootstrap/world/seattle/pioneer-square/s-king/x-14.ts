@@ -2,11 +2,11 @@
 
 export const room = {
   name: '1st Ave S & S. King St',
-  description: `First Avenue intersects S. King Street at the southwestern corner of the stadium district, the intersection where Pioneer Square's historic neighborhood meets the sports and entertainment zone built in the 1990s. The stadiums dominate the view to the south and east: T-Mobile Park's retractable roof structure, Lumen Field's distinctive roof cantilevers, the architecture scaled for tens of thousands of spectators.
+  description: `First Avenue intersects S. King Street at the southern edge of Pioneer Square—and the end of passage south. The stadiums are visible beyond the barricade: T-Mobile Park's retractable roof, Lumen Field's distinctive cantilevers, the architecture scaled for tens of thousands. But there's no way through. Collapsed overpasses and debris have sealed the stadium district off completely.
 
-The streetscape here reflects the stadium district's design priorities: wide sidewalks to accommodate game-day crowds, street trees planted in tree grates sized for high foot traffic, the infrastructure of mass pedestrian movement. The buildings at this corner are newer construction, their ground floors configured for the restaurants and bars that event-day traffic supports.
+The streetscape here was built for game-day crowds that no longer come: wide sidewalks, tree grates sized for high foot traffic, the infrastructure of mass movement serving no one. MARINERS TEAM STORE occupies one corner, player jerseys still displayed on mannequins, green and navy fading behind dusty glass.
 
-MARINERS TEAM STORE occupies one corner space, the official merchandise outlet where fans purchased jerseys and caps and the branded goods that professional sports generate. The windows display the inventory: player jerseys on mannequins, the green and navy color scheme that the franchise maintains. First Avenue stretches north from here toward Pioneer Square proper, the historic district's brick facades visible up the slope.`,
+First Avenue stretches north toward Pioneer Square's historic core. King Street continues east and west. South is a wall of concrete and twisted rebar, the stadium district visible but unreachable, the roar of crowds replaced by absolute silence.`,
   x: -14,
   y: -12,
   z: 0,

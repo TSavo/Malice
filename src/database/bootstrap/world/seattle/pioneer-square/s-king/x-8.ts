@@ -6,7 +6,7 @@ export const room = {
 
 The street surface is cobblestone on this block, one of the few stretches where the original paving survives. The cobbles were laid in the 1890s, hand-set by workers whose names were never recorded. The stones have shifted over the decades, creating an uneven surface that would be charming if it weren't treacherous.
 
-A faded crosswalk marks an intersection with an alley that leads north, the white paint worn to grey ghosts. The alley is dark and narrow, the buildings on either side leaning together overhead.`,
+A faded crosswalk marks an intersection with an alley that leads north, the white paint worn to grey ghosts. The alley is dark and narrow, the buildings on either side leaning together overhead. South is impassable—the stadium district blocked by collapsed overpasses and debris that seals this edge of Pioneer Square.`,
   x: -8,
   y: -12,
   z: 0,

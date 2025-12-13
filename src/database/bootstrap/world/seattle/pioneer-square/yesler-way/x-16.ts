@@ -6,7 +6,7 @@ export const room = {
 
 CASH N GO occupies a corner building, its window signage still advertising services in English and Spanish: CHECK CASHING • PAYDAY LOANS • MONEY ORDERS. The business served the neighborhood's unbanked population—workers who needed immediate access to funds, who paid the fees that urgency commanded. The fees stopped mattering when the funds stopped having value. The signage remains, promising services no one needs.
 
-The building opposite houses what was YESLER COMMUNITY KITCHEN, a meal service facility that fed neighborhood residents experiencing homelessness. The serving line is visible through grimy windows, the institutional kitchen cold and dark. A mural on the facade depicts community members sharing a meal, the imagery that social service organizations commission to humanize their work. The community scattered. The meal ended. The mural's painted faces still smile at an empty street.`,
+The building opposite houses what was YESLER COMMUNITY KITCHEN, a meal service facility that fed neighborhood residents experiencing homelessness. The serving line is visible through grimy windows, the institutional kitchen cold and dark. A mural on the facade depicts community members sharing a meal, the imagery that social service organizations commission to humanize their work. The community scattered. The meal ended. The mural's painted faces still smile at an empty street. North of here, collapsed buildings and debris form an impassable barrier—downtown Seattle sealed off beyond the destruction.`,
   x: -16,
   y: 12,
   z: 0,

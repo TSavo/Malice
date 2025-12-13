@@ -6,7 +6,7 @@ export const room = {
 
 Union Station is visible to the south, its Beaux-Arts grandeur dominating the skyline. The station was built in 1911, designed to impress arriving passengers with Seattle's ambitions. The ambitions are ruins now, but the station still impresses—its scale alone demands attention.
 
-The street is wide here, designed for the vehicle and pedestrian traffic that once flowed to and from the station. The width feels excessive now, a boulevard for no one, its lanes marked with faded paint that cars will never follow again.`,
+The street is wide here, designed for the vehicle and pedestrian traffic that once flowed to and from the station. The width feels excessive now, a boulevard for no one, its lanes marked with faded paint that cars will never follow again. South is impassable—the stadium district sealed behind collapsed infrastructure and accumulated debris.`,
   x: -1,
   y: -12,
   z: 0,

@@ -7,7 +7,7 @@ export const room = {
 
 The seawall is crumbling, early twentieth-century concrete giving way to salt water and time. Cracks run through the barrier where settlement has occurred over decades of neglect. The bay laps at foundations that were never meant to stand this long without maintenance. Rebar shows through spalled concrete like bones through rotting flesh.
 
-The street rises eastward from here, climbing the grade that Yesler's original road established. The topography that made Seattle possible is visible from this vantage: the steep bluff that the early city carved into, the filled tidelands that extended the buildable area, the intersection of water and earth that all port cities share. The water is patient. The earth is indifferent. The city between them is mostly gone.`,
+The street rises eastward from here, climbing the grade that Yesler's original road established. The topography that made Seattle possible is visible from this vantage: the steep bluff that the early city carved into, the filled tidelands that extended the buildable area, the intersection of water and earth that all port cities share. The water is patient. The earth is indifferent. The city between them is mostly gone. North is impassable—collapsed buildings and debris seal off downtown, the destruction that isolated Pioneer Square from the rest of the city.`,
   x: -21,
   y: 12,
   z: 0,

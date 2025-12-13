@@ -6,7 +6,7 @@ export const room = {
 
 SHANGHAI HAND-PULLED NOODLES occupies the ground-floor space, its kitchen cold, its dining room dusty. The restaurant specialized in the la mian tradition—noodles stretched and pulled by hand, the technique that creates texture machine-made noodles can't replicate. The pass-through window to the kitchen frames rusted equipment and empty prep surfaces. Photographs of menu items still line the walls, faded and water-stained, the visual ordering system serving no one who can order.
 
-The building's upper floors house HARMONY ACUPUNCTURE on the second level, its windows dark, its treatment rooms abandoned. Apartments occupy the floors above, their fire escapes rusted, their residents fifty-five years gone. The needles and herbs that promised to restore harmony couldn't restore what the war took.`,
+The building's upper floors house HARMONY ACUPUNCTURE on the second level, its windows dark, its treatment rooms abandoned. Apartments occupy the floors above, their fire escapes rusted, their residents fifty-five years gone. The needles and herbs that promised to restore harmony couldn't restore what the war took. South is impassable—collapsed infrastructure and debris sealing off all routes toward the stadium district.`,
   x: 8,
   y: -12,
   z: 0,

@@ -6,7 +6,7 @@ export const room = {
 
 The station served Amtrak's long-distance routes and Sound Transit's commuter service until the war ended rail travel. The Cascades corridor ran north to Vancouver and south to Portland; the Empire Builder crossed the mountains to Chicago. The corridors are silent now. The trains stand where they stopped, rusting on tracks no one maintains.
 
-The station's frontage shows the infrastructure of ground transportation that no longer operates: taxi queue signage faded to illegibility, rideshare pickup zones that contemporary stations required before rideshares ended. The plaza before the entrance is cracked and weedy. No arriving passengers need to orient themselves to a city that barely exists.`,
+The station's frontage shows the infrastructure of ground transportation that no longer operates: taxi queue signage faded to illegibility, rideshare pickup zones that contemporary stations required before rideshares ended. The plaza before the entrance is cracked and weedy. No arriving passengers need to orient themselves to a city that barely exists. The station and the stadium district beyond are cut off—collapsed infrastructure blocking all routes south.`,
   x: -6,
   y: -12,
   z: 0,

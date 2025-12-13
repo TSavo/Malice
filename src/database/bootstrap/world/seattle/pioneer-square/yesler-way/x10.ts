@@ -6,7 +6,7 @@ export const room = {
 
 A social services building occupies the north side, its reinforced doors sealed, its narrow windows dark. The building housed the programs that served this neighborhood's neediest residents—food stamps, housing assistance, the bureaucratic infrastructure that urban poverty requires. The services ended. The need persisted. The building remains, a monument to systems that failed.
 
-The streetscape mixes eras and styles: early twentieth-century brick beside mid-century concrete, all of it empty now, all of it waiting. Development pressure was transforming this corridor before the war. The transformation stopped. The pressure released. What remains is neither old nor new, just abandoned.`,
+The streetscape mixes eras and styles: early twentieth-century brick beside mid-century concrete, all of it empty now, all of it waiting. Development pressure was transforming this corridor before the war. The transformation stopped. The pressure released. What remains is neither old nor new, just abandoned. North is impassable—the debris wall that seals Pioneer Square from downtown visible at the end of every northward sightline.`,
   x: 10,
   y: 12,
   z: 0,

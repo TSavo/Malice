@@ -6,7 +6,7 @@ export const room = {
 
 The building opposite is four stories of brick, YESLER ARTIST LOFTS according to faded signage on the facade. The building was converted to live-work spaces during the neighborhood's gentrification, the creative-class development that preceded the war. The upper floors feature large windows that artists favored—north-facing light for studio work. The windows are dark now. The art is abandoned. The artists left or died like everyone else.
 
-The buildings along this stretch maintain the scale that historic preservation once enforced: three to five stories, brick facades, the vocabulary established after the Great Fire. Preservation guidelines stopped mattering when there was nothing left to preserve for.`,
+The buildings along this stretch maintain the scale that historic preservation once enforced: three to five stories, brick facades, the vocabulary established after the Great Fire. Preservation guidelines stopped mattering when there was nothing left to preserve for. The debris wall rises to the north, collapsed buildings sealing off downtown—Yesler Way marks Pioneer Square's northern boundary.`,
   x: -18,
   y: 12,
   z: 0,

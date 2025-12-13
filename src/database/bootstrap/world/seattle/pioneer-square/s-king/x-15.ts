@@ -6,7 +6,7 @@ export const room = {
 
 The buildings on this block are industrial—warehouses and storage facilities that served the waterfront trade. Their loading docks face the street, roll-up doors frozen in various positions, interiors dark and empty. Whatever they once held has been stripped away, leaving only echoing spaces and the smell of old concrete.
 
-The sinkhole's edge is visible to the north, its flooded depression a constant presence in this part of the neighborhood. The street itself is intact here, but the proximity to the collapse keeps traffic—what traffic there is—moving quickly through.`,
+The sinkhole's edge is visible to the north, its flooded depression a constant presence in this part of the neighborhood. The street itself is intact here, but the proximity to the collapse keeps traffic—what traffic there is—moving quickly through. South is blocked—the stadium district sealed behind collapsed overpasses and accumulated debris.`,
   x: -15,
   y: -12,
   z: 0,

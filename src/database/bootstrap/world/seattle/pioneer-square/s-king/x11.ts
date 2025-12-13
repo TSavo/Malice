@@ -6,7 +6,7 @@ export const room = {
 
 A pair of stone guardian lions flanks the temple entrance at the base of the stairs, the foo dogs that traditional architecture places at thresholds. The sculptures are substantial—carved granite, their poses formal and protective—the community investment visible in their quality. The lions face outward in traditional configuration, still guarding a threshold no one crosses. Their protection extended to nothing that mattered when the war came.
 
-The building's ground floor housed a gift shop selling temple supplies: incense, ceremonial paper for burning, prayer beads and devotional objects. The inventory is dust-covered behind grimy glass, the jade figurines and decorative items waiting for tourists who will never arrive. The souvenirs of Chinatown visits, unsold and forgotten.`,
+The building's ground floor housed a gift shop selling temple supplies: incense, ceremonial paper for burning, prayer beads and devotional objects. The inventory is dust-covered behind grimy glass, the jade figurines and decorative items waiting for tourists who will never arrive. The souvenirs of Chinatown visits, unsold and forgotten. South is blocked—collapsed overpasses and debris sealing off the stadium district beyond.`,
   x: 11,
   y: -12,
   z: 0,

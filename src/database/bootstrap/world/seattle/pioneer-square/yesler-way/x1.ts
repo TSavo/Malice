@@ -6,7 +6,7 @@ export const room = {
 
 A four-story office building occupies the south side, its aluminum-framed windows mostly shattered, aggregate panels stained with decades of rain and neglect. Ground-floor retail spaces are gutted, their contents looted in the early years when looting still seemed like a viable survival strategy. The storefronts gape open now, picked clean.
 
-Yesler Way continues its gentle slope toward the waterfront, following the grade that Henry Yesler's original skid road established. Logs once rolled down this hill to the sawmill at the water's edge. Nothing rolls downhill anymore except rain and debris.`,
+Yesler Way continues its gentle slope toward the waterfront, following the grade that Henry Yesler's original skid road established. Logs once rolled down this hill to the sawmill at the water's edge. Nothing rolls downhill anymore except rain and debris. North leads only to rubble—the debris wall that separates Pioneer Square from downtown visible beyond every northward alley.`,
   x: 1,
   y: 12,
   z: 0,

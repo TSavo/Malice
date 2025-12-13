@@ -2,11 +2,11 @@
 
 export const room = {
   name: '3rd Ave S & S. King St',
-  description: `Third Avenue intersects S. King Street at what was once the commercial heart of the International District, the intersection where foot traffic from multiple directions converged. The transit center is blocks away—not that transit runs anymore. The pedestrian flow that supported the retail density is fifty-five years gone. The density remains. The pedestrians don't.
+  description: `Third Avenue intersects S. King Street at Pioneer Square's southeastern corner—and another dead end heading south. The stadium district is blocked: collapsed structures and accumulated debris have sealed off all southbound routes. You can see the stadiums over the wreckage, their massive forms unchanged, but there's no passage through.
 
-Hing Hay Park is visible to the north, the neighborhood's central gathering space overgrown and silent. The park's pagoda pavilion—a gift from Taipei commemorating the sister-city relationship—rises above the surrounding rooflines, its curved eaves weathered, its red columns faded to rust-pink. The landmark that identified the International District still identifies it. The community it served is scattered or dead.
+The intersection sits at what was once the commercial heart of the International District, where foot traffic from multiple directions converged. The pedestrian flow that supported the retail density is fifty-five years gone. The density remains. The pedestrians don't.
 
-PACIFIC WIRELESS occupies the corner building, its windows smashed, its inventory long since looted. The mobile phone retailer served the neighborhood's communication needs—smartphones, prepaid plans, international calling cards that let immigrants call home. The window displays are empty now. The phones are gone. The networks they connected to are gone. Home, for most of these families, is gone too.`,
+PACIFIC WIRELESS occupies the corner building, its windows smashed, its inventory long since looted. The mobile phone retailer served the neighborhood's communication needs—international calling cards that let immigrants call home. The phones are gone. The networks are gone. Home, for most of these families, is gone too. King Street continues east and west. Third Avenue runs north. South is rubble.`,
   x: 7,
   y: -12,
   z: 0,

@@ -6,7 +6,7 @@ export const room = {
 
 A fountain occupies the plaza's center, its bronze waves dry and verdigrised, its spray patterns silent. The fountain incorporated maritime imagery that Seattle's public art often references—stylized waves evoking Puget Sound. The Sound is still there. The water stopped flowing through the fountain when the pumps failed.
 
-The plaza's edges show the utility hookups where mobile vendors once parked, the infrastructure that food truck operations required. The bollards still define the pedestrian zone. Pedestrians don't need protection from vehicle intrusion anymore.`,
+The plaza's edges show the utility hookups where mobile vendors once parked, the infrastructure that food truck operations required. The bollards still define the pedestrian zone. Pedestrians don't need protection from vehicle intrusion anymore. South leads only to rubble—the stadium district sealed behind collapsed overpasses and accumulated debris.`,
   x: -11,
   y: -12,
   z: 0,

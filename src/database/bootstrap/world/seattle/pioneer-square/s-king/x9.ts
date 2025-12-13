@@ -6,7 +6,7 @@ export const room = {
 
 The buildings along this stretch show the International District's characteristic architecture weathered by abandonment: early twentieth-century construction adapted over decades, then left to decay. The aluminum storefronts are dented and grimy, the upper floor windows broken or boarded. Fire escapes rust along exterior walls, their iron platforms that served as impromptu balconies now unsafe to stand on.
 
-A fire hydrant at the corner is painted in red and gold, the auspicious colors faded but still visible beneath the patina of age. The cultural expression outlasted the culture. The practical safety it provided is irrelevant now—nothing left here worth protecting from fire, no one to call if something burned.`,
+A fire hydrant at the corner is painted in red and gold, the auspicious colors faded but still visible beneath the patina of age. The cultural expression outlasted the culture. The practical safety it provided is irrelevant now—nothing left here worth protecting from fire, no one to call if something burned. The stadium district to the south is sealed off—collapsed overpasses and accumulated debris blocking all passage.`,
   x: 9,
   y: -12,
   z: 0,

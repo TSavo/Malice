@@ -6,7 +6,7 @@ export const room = {
 
 The store served the community's need for ingredients unavailable elsewhere—dried mushrooms, preserved vegetables, the sauces and seasonings that Chinese cooking requires. The live seafood tanks are dark and dry, the filtration systems silent. The supply chains that stretched across the Pacific broke when the war came. Hong Kong, Taiwan, mainland China—the import networks that sustained this place dissolved into the same chaos that took everything else.
 
-The building's upper floors hold residential units, their windows dark, their fire escapes rusted to a deep orange-brown. The iron platforms still cling to the exterior wall, the emergency egress that no one will ever need. Some of the windows are broken. Some are boarded. The residents who lived here are fifty-five years gone.`,
+The building's upper floors hold residential units, their windows dark, their fire escapes rusted to a deep orange-brown. To the south, the stadium district is sealed off by collapsed infrastructure—the debris wall visible at the end of every southbound sightline. King Street marks the edge. South is impassable.`,
   x: 3,
   y: -12,
   z: 0,

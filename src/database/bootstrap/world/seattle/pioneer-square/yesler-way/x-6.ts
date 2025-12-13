@@ -6,7 +6,7 @@ export const room = {
 
 VIA TRIBUNALI occupies the corner building, a pizzeria that was part of Pioneer Square's dining scene. Through the grimy window: the brick oven cold and dark, the marble counter cracked, the communal tables thick with dust. The evening crowds that filled this place are fifty-five years gone. The wood-fired smell of Neapolitan pizza is a memory no one alive remembers.
 
-The Pioneer Building is visible ahead, six stories of red brick that have weathered better than most. Elmer Fisher designed it to last. It has.`,
+The Pioneer Building is visible ahead, six stories of red brick that have weathered better than most. Elmer Fisher designed it to last. It has. North leads only to rubble—the debris wall that separates Pioneer Square from downtown rising beyond every northward alley.`,
   x: -6,
   y: 12,
   z: 0,

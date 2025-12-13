@@ -6,7 +6,7 @@ export const room = {
 
 The interior layout is still visible through the windows: exercise equipment along one wall gathering dust—stationary bikes with flat tires, balance aids toppled over. Folding tables and chairs remain configured for group activities that ended fifty-five years ago. The kitchen area in the back is dark, the meal programs that provided nutrition and social connection silent.
 
-Signage inside appears in multiple languages—Chinese, Vietnamese, Japanese, Tagalog—reflecting the diverse Asian communities that the International District encompassed. The multilingual welcome extends to no one. The community center that served as a gathering point for elderly residents gathers only silence now.`,
+Signage inside appears in multiple languages—Chinese, Vietnamese, Japanese, Tagalog—reflecting the diverse Asian communities that the International District encompassed. The multilingual welcome extends to no one. The community center that served as a gathering point for elderly residents gathers only silence now. South leads only to rubble—the stadium district blocked by collapsed infrastructure.`,
   x: 10,
   y: -12,
   z: 0,

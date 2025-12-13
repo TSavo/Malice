@@ -6,7 +6,7 @@ export const room = {
 
 ELYSIAN BREWING occupies the ground floor across the street, or did. The copper brewing tanks are visible through grimy windows, tarnished green-brown now, the beer long since drunk or evaporated or turned to something worse. The tap handles behind the bar are still there, pouring nothing.
 
-This intersection marks the eastern edge of Occidental Park, where the cobblestone plaza gives way to cracked asphalt. The buildings maintain their historic facades—brick and terra cotta don't care about the passage of time the way glass and steel do.`,
+This intersection marks the eastern edge of Occidental Park, where the cobblestone plaza gives way to cracked asphalt. The buildings maintain their historic facades—brick and terra cotta don't care about the passage of time the way glass and steel do. North is impassable—collapsed buildings and accumulated debris sealing off downtown beyond the historic district.`,
   x: -3,
   y: 12,
   z: 0,

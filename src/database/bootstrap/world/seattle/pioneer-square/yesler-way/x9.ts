@@ -6,7 +6,7 @@ export const room = {
 
 A convenience store occupies the corner, its security bars bent inward where someone forced entry long ago. The door hangs open on one hinge. Whatever was inside worth taking was taken in the first years after the war. The shelves are bare now, the coolers dark and silent.
 
-Fourth Avenue and the International District are visible ahead. Signs in Chinese, Vietnamese, and Korean still hang from buildings, their characters faded but legible—languages that outlasted the city that surrounded them. The transition between neighborhoods happens gradually, Pioneer Square's brick bleeding into Chinatown's red lanterns and ornate facades.`,
+Fourth Avenue and the International District are visible ahead. Signs in Chinese, Vietnamese, and Korean still hang from buildings, their characters faded but legible—languages that outlasted the city that surrounded them. The transition between neighborhoods happens gradually, Pioneer Square's brick bleeding into Chinatown's red lanterns and ornate facades. North is blocked—collapsed structures and accumulated debris forming the barrier that isolates Pioneer Square from downtown.`,
   x: 9,
   y: 12,
   z: 0,

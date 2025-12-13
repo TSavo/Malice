@@ -6,7 +6,7 @@ export const room = {
 
 KING STREET DELI occupies a ground-floor space in the adjacent building, the kind of establishment that served commuter traffic. Through the grimy window: counter service, limited seating, the configuration designed for speed. No one is in a hurry here anymore. The deli counter is dark, whatever was inside it long since spoiled and desiccated.
 
-The buildings along this stretch show varied construction spanning eras—early twentieth-century commercial structures beside mid-century concrete. The railroad money that once flowed through this district stopped flowing. The buildings remain, monuments to industries that died before the war and industries that died with it.`,
+The buildings along this stretch show varied construction spanning eras—early twentieth-century commercial structures beside mid-century concrete. The railroad money that once flowed through this district stopped flowing. The buildings remain, monuments to industries that died before the war and industries that died with it. South of here, the stadium district is unreachable—collapsed overpasses sealing off all passage.`,
   x: -5,
   y: -12,
   z: 0,

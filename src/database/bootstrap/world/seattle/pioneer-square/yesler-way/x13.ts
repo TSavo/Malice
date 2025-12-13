@@ -6,7 +6,7 @@ export const room = {
 
 The collapsed gate's carved dragons lie among the debris, their painted scales faded to grey, their wooden bodies splintered by the fall. The dragons were meant to welcome visitors to Chinatown. Now they guard nothing but their own remains.
 
-The light rail crater is visible to the west, its flooded depression marking the end of the street grid's coherence. Between the gate's rubble and the crater's water, Yesler Way becomes impassable to the north. The diagonal road that once connected neighborhoods now connects only ruins to ruins.`,
+The light rail crater is visible to the west, its flooded depression marking the end of the street grid's coherence. Between the gate's rubble and the crater's water, Yesler Way becomes impassable to the north. The diagonal road that once connected neighborhoods now connects only ruins to ruins. North is impassable—collapsed buildings and accumulated debris sealing off downtown beyond the historic district.`,
   x: 13,
   y: 12,
   z: 0,

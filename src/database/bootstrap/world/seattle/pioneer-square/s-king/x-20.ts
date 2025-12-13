@@ -6,7 +6,7 @@ export const room = {
 
 PUGET SOUND MARINE SERVICES occupies a large facility on the south side, its roll-up doors rusted shut, its dry dock filled with stagnant water. The ceiling heights that once accommodated cranes and hoists now shelter nothing but darkness and the nests of whatever birds have claimed the rafters.
 
-The street's grade increases as it climbs away from filled tideflats. The original shoreline was blocks to the east; everything between here and there is fill—sawdust and mill waste and construction debris that Seattle dumped to extend the usable land. The fill is settling now, without maintenance. The buildings tilt slightly, foundations shifting in unstable ground.`,
+The street's grade increases as it climbs away from filled tideflats. The original shoreline was blocks to the east; everything between here and there is fill—sawdust and mill waste and construction debris that Seattle dumped to extend the usable land. The fill is settling now, without maintenance. The buildings tilt slightly, foundations shifting in unstable ground. South of here, the stadium district is sealed off—collapsed overpasses and accumulated debris blocking all passage toward where the sports complexes still stand visible but unreachable.`,
   x: -20,
   y: -12,
   z: 0,

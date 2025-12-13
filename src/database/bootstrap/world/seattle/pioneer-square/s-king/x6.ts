@@ -6,7 +6,7 @@ export const room = {
 
 The light rail viaduct once crossed above this point, carrying trains between downtown and the airport. The viaduct collapsed during the burning, its elevated tracks crashing down onto the street below. The debris has been cleared, pushed to the sides to open a path, but the support pillars remain—concrete sentinels standing guard over nothing.
 
-The street dips slightly where it crosses the old rail alignment, a subtle depression marking where infrastructure once ran underground. The depression fills with water when it rains, creating a temporary pond that drains slowly through cracks in the pavement.`,
+The street dips slightly where it crosses the old rail alignment, a subtle depression marking where infrastructure once ran underground. The depression fills with water when it rains, creating a temporary pond that drains slowly through cracks in the pavement. South is blocked—the stadium district unreachable beyond walls of debris and collapsed overpasses.`,
   x: 6,
   y: -12,
   z: 0,

@@ -6,7 +6,7 @@ export const room = {
 
 A rail yard extends to the south, visible through gaps in industrial buildings. The yard's multiple sidings hold freight cars that were never moved, their cargo containers faded and weathered, holding goods that never reached their destinations. The logistics that kept goods moving through the transportation network stopped moving. Everything stopped.
 
-The buildings flanking the crossing show the wear of decades without maintenance—facades blackened by old diesel exhaust, windows broken or boarded. PACIFIC LOGISTICS, the signage reads on one structure, the freight forwarding company that coordinated handoffs between shipping modes. No freight. No modes. No coordination.`,
+The buildings flanking the crossing show the wear of decades without maintenance—facades blackened by old diesel exhaust, windows broken or boarded. PACIFIC LOGISTICS, the signage reads on one structure, the freight forwarding company that coordinated handoffs between shipping modes. No freight. No modes. No coordination. The rail yard extends south toward the stadium district, but the route is blocked—collapsed infrastructure and debris sealing off all passage in that direction.`,
   x: -19,
   y: -12,
   z: 0,

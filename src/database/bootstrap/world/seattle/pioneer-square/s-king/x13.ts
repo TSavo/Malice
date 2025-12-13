@@ -6,7 +6,7 @@ export const room = {
 
 The condemned block is visible to the north, its toxic perimeter marked by faded warning signs. The contamination's edge runs close to the street here, close enough that the pavement shows discoloration from whatever seeped out during the early years. People walk on the southern side, giving the stains a wide berth.
 
-A traditional Chinese gate once stood at this intersection, marking the entrance to Chinatown. The gate fell during the burning, its carved wood and painted pillars collapsing across the street. The debris has been partially cleared, enough to pass through, but the symbolism of the fallen gate remains.`,
+A traditional Chinese gate once stood at this intersection, marking the entrance to Chinatown. The gate fell during the burning, its carved wood and painted pillars collapsing across the street. The debris has been partially cleared, enough to pass through, but the symbolism of the fallen gate remains. South is blocked—collapsed overpasses and accumulated debris sealing off all routes toward the stadium district.`,
   x: 13,
   y: -12,
   z: 0,

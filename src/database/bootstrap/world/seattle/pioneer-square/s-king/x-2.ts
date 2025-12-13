@@ -6,7 +6,7 @@ export const room = {
 
 A Seattle Police Department substation occupies the corner building, the satellite facility that law enforcement maintained in the stadium district. The building's institutional design—minimal windows, secured entrance—is intact. The patrol vehicles are gone, the parking spaces empty, the law enforcement presence that deterred opportunistic crime no longer present. Opportunistic crime found other deterrents, eventually.
 
-A memorial plaque mounted on the building's facade commemorates officers who served in the stadium district. The brass is weathered green, the names still legible but softened by oxidation and decades of Seattle rain. The officers being honored are dead now, one way or another. So is everyone else.`,
+A memorial plaque mounted on the building's facade commemorates officers who served in the stadium district. The brass is weathered green, the names still legible but softened by oxidation and decades of Seattle rain. The officers being honored are dead now, one way or another. So is everyone else. The stadium district to the south is visible beyond the debris—collapsed overpasses and rubble blocking all passage in that direction.`,
   x: -2,
   y: -12,
   z: 0,

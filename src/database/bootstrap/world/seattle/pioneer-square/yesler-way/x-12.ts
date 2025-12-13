@@ -6,7 +6,7 @@ export const room = {
 
 ZEITGEIST COFFEE occupies a corner space, its windows dark, its espresso machines cold. Through the grimy glass: the counter seating where customers once watched baristas work, the exposed brick and industrial fixtures that third-wave coffee shops favored. Seattle's coffee culture ended with everything else. The beans rotted long ago. The machines stand ready to serve no one.
 
-ATLAS TATTOO shares the building, its windows still displaying the flash art that traditional shops maintain—anchors, roses, skulls and daggers faded behind dusty glass. Walk-in customers don't walk in anymore. The needles are still there, probably. The ink has dried.`,
+ATLAS TATTOO shares the building, its windows still displaying the flash art that traditional shops maintain—anchors, roses, skulls and daggers faded behind dusty glass. Walk-in customers don't walk in anymore. The needles are still there, probably. The ink has dried. North is blocked—collapsed structures and accumulated debris forming the barrier that isolates Pioneer Square from downtown.`,
   x: -12,
   y: 12,
   z: 0,

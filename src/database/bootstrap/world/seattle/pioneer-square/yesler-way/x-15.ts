@@ -6,7 +6,7 @@ export const room = {
 
 The diagonal cuts across the grid at an angle that confuses navigation, streets meeting at odd corners, lots assuming triangular shapes that architects struggled to fill. The confusion was built into the city's bones in 1853. It persists in the ruins.
 
-The debris pile that blocks passage to downtown is visible ahead, the collapsed building's rubble forming a wall across the intersection with First Avenue. The only way through is along the waterfront, through the gap in the seawall. Everything else ends here, at the barrier that geography and gravity created.`,
+The debris pile that blocks passage to downtown is visible ahead, the collapsed building's rubble forming a wall across the intersection with First Avenue. The only way through is along the waterfront, through the gap in the seawall. Everything else ends here, at the barrier that geography and gravity created. North is equally blocked—the debris wall that seals Pioneer Square from downtown rising across every northward route.`,
   x: -15,
   y: 12,
   z: 0,

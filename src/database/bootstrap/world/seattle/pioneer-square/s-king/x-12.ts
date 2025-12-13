@@ -6,7 +6,7 @@ export const room = {
 
 A pedestrian bridge spans the street at the third level, its windows cracked and clouded, connecting garages that serve no purpose now. The bridge sheltered pedestrians from Seattle's rain. The rain still falls. The pedestrians are gone.
 
-Rate signage near each entrance still lists pricing: EVENT RATES • MONTHLY PERMITS. The numbers seem quaint now, the revenue model that parking facilities relied upon. The revenue stopped. The structures remain, concrete monuments to the economics of entertainment.`,
+Rate signage near each entrance still lists pricing: EVENT RATES • MONTHLY PERMITS. The numbers seem quaint now, the revenue model that parking facilities relied upon. The revenue stopped. The structures remain, concrete monuments to the economics of entertainment. Beyond the garages to the south, the stadium district is sealed off by collapsed infrastructure—impassable from here.`,
   x: -12,
   y: -12,
   z: 0,

@@ -150,7 +150,7 @@ This is Continuum's flagship - ultra-modern, functional, depopulated. A showroom
       waterLevel: 0,
       outdoor: false,
       exits: {
-        north: { to: "yesler-way/x-12.ts", description: "Glass doors lead north to Yesler Way" },
+        north: { to: "yesler-way/x-12.ts", description: 'Glass doors open onto Yesler Way' },
         west: '%0',
         east: '%2',
         south: '%4',
@@ -217,7 +217,7 @@ The space is clean, bare, echoing. Modern but hollow. Functional but unwelcoming
       waterLevel: 0,
       outdoor: false,
       exits: {
-        west: { to: "1st-ave-s/y10.ts", description: "Glass doors lead west to 1st Ave S" },
+        west: { to: "1st-ave-s/y10.ts", description: 'Glass doors open onto 1st Ave S' },
         north: '%1',
         east: '%5',
         south: '%8',

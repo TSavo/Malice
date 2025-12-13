@@ -7,7 +7,7 @@ export const room = {
 
 The bronze doors at street level are tarnished green, the elaborate terra cotta ornament chipped and weathered. The building was too well-built to fall, too solid to fail. It stands like a tombstone, marking where Seattle's ambitions once reached toward the sky.
 
-Yesler Way and 1st Avenue intersect here at a point that represents Seattle's geographic origins—two survey teams, two street grids, a disagreement encoded in asphalt that still confuses what little navigation happens now. The intersection marks where Pioneer Square's grid meets downtown's, the historical boundary between one kind of ruin and another.`,
+Yesler Way and 1st Avenue intersect here at a point that represents Seattle's geographic origins—two survey teams, two street grids, a disagreement encoded in asphalt that still confuses what little navigation happens now. The intersection marks where Pioneer Square's grid meets downtown's, the historical boundary between one kind of ruin and another. North is impassable—collapsed buildings and debris sealing off downtown, the destruction that made Pioneer Square an island.`,
   x: -14,
   y: 12,
   z: 0,
