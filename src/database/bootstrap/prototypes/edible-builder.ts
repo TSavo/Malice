@@ -292,16 +292,18 @@ export class EdibleBuilder {
       if (!aggregated) {
         // Create new StomachContents for this food type
         const isSpoiled = (self.decayLevel || 0) >= 25 || self.spoiled;
-        contents = await $.recycler.create($.skeleton, {
-          name: 'skeleton of ' + (self.originalName || 'unknown'),
-          description: 'A skeleton that was once ' + (self.originalName || 'someone') + '.',
-          contents: self.contents || [],
-          owner: self.owner,
-          decayLevel: 100,
-          decayRate: 0,
-          decayCondition: 'none',
+        contents = await $.recycler.create($.stomachContents, {
+          sourceName: self.name || 'unknown food',
+          sourceProto: protoId,
+          sourceType: sourceType,
+          calories: biteCalories,
+          caloriesOriginal: biteCalories,
+          volume: biteVolume,
+          volumeOriginal: biteVolume,
+          quantity: 1,
+          spoiled: isSpoiled,
+          poisoned: self.poisoned || false,
         });
-
 
         // Add to stomach contents
         await contents.moveTo(stomach.id);
@@ -357,17 +359,19 @@ export class EdibleBuilder {
       if (!aggregated) {
         // Create new StomachContents
         const isSpoiled = (self.decayLevel || 0) >= 25 || self.spoiled;
-        contents = await $.recycler.create($.humanRemains, {
-          name: 'remains of ' + (self.originalName || 'unknown'),
-          description: 'The remains of ' + (self.originalName || 'someone') + '. Dried tissue clings to the bones.',
-          contents: self.contents || [],
-          owner: self.owner,
-          decayLevel: 70,
-          decayRate: 0.0005,
-          decayCondition: 'always',
-          decayStart: Date.now(),
+        const totalVolume = self.volume || self.weight || 100;
+        contents = await $.recycler.create($.stomachContents, {
+          sourceName: self.name || 'unknown food',
+          sourceProto: protoId,
+          sourceType: sourceType,
+          calories: self.calories || 0,
+          caloriesOriginal: self.calories || 0,
+          volume: totalVolume,
+          volumeOriginal: totalVolume,
+          quantity: 1,
+          spoiled: isSpoiled,
+          poisoned: self.poisoned || false,
         });
-
 
         // Add to stomach contents
         await contents.moveTo(stomach.id);

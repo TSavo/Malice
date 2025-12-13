@@ -5,27 +5,37 @@ import type { RuntimeObject } from '../../../../types/object.js';
  * Builds the StomachContents prototype
  * Created when food/drink is consumed, preserves metadata for autopsy
  *
+ * Inherits from $.stackable:
+ * - Uses stackType = 'stomach:' + sourceProto for aggregation
+ * - Inherits merge(), split(), add(), remove(), isEmpty()
+ * - Overrides canStackWith() to also check spoiled/poisoned status
+ *
  * StomachContents:
  * - Preserves original food name, type, and source prototype
  * - Aggregates similar items (3 apples = 1 contents with 3x calories)
  * - Tracks digestion progress
  * - Can be identified during autopsy
  *
- * Aggregation key: sourceProto (the prototype ID of the original food)
- * Two apple instances with same prototype = aggregate together
+ * Aggregation key: stackType based on sourceProto + spoiled/poisoned state
  */
 export class StomachContentsBuilder {
   constructor(private manager: ObjectManager) {}
 
-  async build(describableId: number): Promise<RuntimeObject> {
+  async build(stackableId: number): Promise<RuntimeObject> {
     const obj = await this.manager.create({
-      parent: describableId,
+      parent: stackableId,
       properties: {
         name: 'StomachContents',
         description: 'Digesting food matter',
+        // Stackable properties
+        // stackType is set dynamically: 'stomach:<sourceProto>:<spoiled>:<poisoned>'
+        stackType: null,
+        quantity: 1, // How many of this item were eaten (inherited from stackable)
+        unit: 'servings',
+        contraband: false,
         // Source tracking
         sourceName: '', // Original food name (e.g., "apple")
-        sourceProto: 0, // Original food prototype ID (for aggregation)
+        sourceProto: 0, // Original food prototype ID
         sourceType: '', // 'food', 'drink', 'pill', etc.
         // Nutrition to extract
         calories: 0, // Total calories remaining
@@ -33,8 +43,6 @@ export class StomachContentsBuilder {
         // Volume tracking (for stomach capacity)
         volume: 0, // ml - current volume in stomach
         volumeOriginal: 0, // ml - original volume consumed
-        // Aggregation
-        quantity: 1, // How many of this item were eaten
         // Status
         spoiled: false,
         poisoned: false,
@@ -42,9 +50,9 @@ export class StomachContentsBuilder {
       methods: {},
     });
 
-    // Check if this can aggregate with another StomachContents
-    // Returns true if they have the same sourceProto
-    obj.setMethod('canAggregateWith', `
+    // Override canStackWith to also check spoiled/poisoned status
+    // This extends the parent stackable's stackType check
+    obj.setMethod('canStackWith', `
       const other = args[0];
       if (!other) return false;
 
@@ -58,21 +66,48 @@ export class StomachContentsBuilder {
       return true;
     `);
 
-    // Aggregate another StomachContents into this one
-    obj.setMethod('aggregate', `
-      const other = args[0];
-      if (!other) return false;
+    // Alias for backward compatibility
+    obj.setMethod('canAggregateWith', `
+      return await self.canStackWith(args[0]);
+    `);
 
-      if (!await self.canAggregateWith(other)) return false;
+    // Override merge to also combine calories and volume
+    obj.setMethod('merge', `
+      const other = args[0];
+
+      if (!other) {
+        return { success: false, error: 'Nothing to merge.' };
+      }
+
+      if (!await self.canStackWith(other)) {
+        return { success: false, error: 'Cannot stack different food types or states.' };
+      }
+
+      const otherQty = other.quantity || 1;
 
       // Combine calories, volume, and quantity
       self.calories = (self.calories || 0) + (other.calories || 0);
       self.caloriesOriginal = (self.caloriesOriginal || 0) + (other.caloriesOriginal || 0);
       self.volume = (self.volume || 0) + (other.volume || 0);
       self.volumeOriginal = (self.volumeOriginal || 0) + (other.volumeOriginal || 0);
-      self.quantity = (self.quantity || 1) + (other.quantity || 1);
+      self.quantity = (self.quantity || 1) + otherQty;
 
-      return true;
+      // Recycle the other stack
+      const recycler = $.recycler;
+      if (recycler) {
+        await recycler.recycle(other);
+      }
+
+      return { success: true, quantity: self.quantity };
+    `);
+
+    // Alias for backward compatibility
+    obj.setMethod('aggregate', `
+      const other = args[0];
+      if (!other) return false;
+
+      const result = await self.merge(other);
+      return result.success;
     `);
 
     // Extract calories during digestion (one tick)

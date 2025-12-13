@@ -59,8 +59,8 @@ Objects inherit from prototypes:
 
 ```
 src/database/bootstrap/world/seattle/pioneer-square/buildings/smith-tower/
-├── z1.ts      # Floor 1 - The Bank
-├── z2.ts      # Floor 2 - Job Center
+├── z1.ts      # Floor 1 - Job Center (Employment Terminal)
+├── z2.ts      # Floor 2 - The Bank
 ├── z3.ts      # Floor 3 - CorpSec
 ├── z4.ts      # Floor 4 - Residential
 ├── ...
@@ -100,12 +100,43 @@ export const building = {
         // Elevator call methods (see Common Patterns)
       },
       elevatorId: '%E',
+
+      // Spawn objects inside this room
+      objects: [
+        {
+          prototype: 'jobBoard',  // Required: prototype alias name
+          name: 'Employment Terminal',
+          description: 'A terminal for job seekers.',
+          // Any other properties are passed to the created object
+        },
+      ],
     },
 
     // More rooms...
   },
 };
 ```
+
+### Room Objects Array
+
+Rooms can define an `objects` array to spawn objects inside them during world creation:
+
+```typescript
+objects: [
+  {
+    prototype: 'jobBoard',  // Required: name from $.aliases
+    name: 'Custom Name',
+    description: 'Custom description',
+    // ... any other properties
+  },
+],
+```
+
+**Key Points:**
+- `prototype` is required and must match an alias in `$.aliases`
+- All other properties are passed directly to the created object
+- Objects are automatically placed in the room (`location` is set)
+- Objects are added to the room's `contents` array via `addContent()`
 
 ---
 
@@ -114,11 +145,12 @@ export const building = {
 ### Current State (2110)
 
 **Continuum's Flagship Building:**
-- **Floor 1 (The Bank)**: Fully operational, automated banking
-- **Floor 2 (Job Center)**: Accessible, AI recruitment terminals
+- **Floor 1 (Job Center)**: Operational, Employment Terminal for AI recruitment
+- **Floor 2 (The Bank)**: Fully operational, automated banking (vault locked)
 - **Floor 3 (CorpSec)**: Infrastructure ready, awaiting personnel
 - **Floors 4-33**: Residential apartments, awaiting tenants
-- **Floor 34**: Premium residential - executive tier apartments- **Floor 35**: Executive amenities - lounge, fitness, meeting rooms
+- **Floor 34**: Premium residential - executive tier apartments
+- **Floor 35**: Executive amenities - lounge, fitness, meeting rooms
 - **Floors 36-37**: Retail shells, prepared for build-out
 - **Floor 38**: Observatory, accessible
 
@@ -127,9 +159,9 @@ export const building = {
 ### Access Control
 
 ```
-Floor 1:  ✅ Open (banking services)
+Floor 1:  ✅ Open (job applications, Employment Terminal)
+Floor 2:  ✅ Open (banking services)
           🔒 Vault locked (%LV)
-Floor 2:  ✅ Open (job applications)
 Floor 3:  🔒 Locked (%L1 - CorpSec clearance)
 Floors 4-35: 🔒 Locked (%LR - residential authorization)
 Floor 38: ✅ Open (observation deck)
@@ -441,9 +473,28 @@ export const building = {
 ### Job System Overview
 
 Players get jobs through:
-1. **Job Center terminals** (floor 2) - AI recruitment
+1. **Job Center terminals** (Floor 1) - AI recruitment via `jobBoard` objects
 2. **$.plot** - Event/story-driven jobs
 3. **$.jobBoard** - Posted opportunities
+
+**Floor 1 Job Center:**
+The Job Center room (`%G` in z1.ts) contains an Employment Terminal spawned via the `objects` array:
+
+```typescript
+'%G': {
+  name: 'Smith Tower - 1st Floor - Job Center',
+  // ... room properties ...
+  objects: [
+    {
+      prototype: 'jobBoard',
+      name: 'Employment Terminal',
+      description: 'A sleek terminal bolted to the floor. The screen glows pale blue with the Continuum logo.',
+    },
+  ],
+},
+```
+
+This terminal is an instance of the `$.jobBoard` prototype and provides job listings and applications.
 
 ### Granting Access via Jobs
 
@@ -585,6 +636,30 @@ exits: {
 }
 ```
 
+### Spawning Objects in Rooms
+
+```typescript
+'%JOB_CENTER': {
+  name: 'Job Center',
+  description: `The heart of Continuum's employment system...`,
+  // ... other room properties ...
+  objects: [
+    {
+      prototype: 'jobBoard',
+      name: 'Employment Terminal',
+      description: 'A sleek terminal with the Continuum logo.',
+    },
+    {
+      prototype: 'sign',
+      name: 'Job Listings Board',
+      content: 'Current openings: ...',
+    },
+  ],
+},
+```
+
+**Note:** Objects spawn once during world creation. The `location` property is set automatically, and the object is added to the room's `contents` via `addContent()`.
+
 ### Sittable Furniture
 
 ```typescript
@@ -713,11 +788,12 @@ outdoor: false,     // Indoor/outdoor flag
 
 | Floor | Name | Status | Access |
 |-------|------|--------|--------|
-| 1 | The Bank | Operational | Open (vault locked) |
-| 2 | Job Center | Operational | Open |
+| 1 | Job Center | Operational (Employment Terminal) | Open |
+| 2 | The Bank | Operational | Open (vault locked) |
 | 3 | CorpSec | Infrastructure ready | Locked (%L1) |
 | 4-33 | Residential | Awaiting tenants | Locked (%LR) |
-| 34 | Premium Residential | Executive tier units | Locked (%LR) || 35 | Executive Amenities | Lounge, fitness, meeting | Open |
+| 34 | Premium Residential | Executive tier units | Locked (%LR) |
+| 35 | Executive Amenities | Lounge, fitness, meeting | Open |
 | 36 | Retail Level 1 | Shells prepared | Open |
 | 37 | Retail Level 2 | Shells prepared | Open |
 | 38 | Observatory | Operational | Open |

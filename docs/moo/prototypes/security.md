@@ -275,6 +275,150 @@ Base prototype for access control systems. Can be attached to elevators, doors, 
 - `$.keycardLock`: Requires keycard item
 - `$.passwordLock`: Requires password
 - `$.timeLock`: Restricts by time
+- `$.rentableLock`: Bank-based rental access
+
+---
+
+# Rentable Lock Prototype
+
+Combines lock access control with bank-based rental/payment logic.
+
+## Properties
+
+```javascript
+{
+  name: 'Rentable Lock',
+  description: 'A lock that can be rented for a fee.',
+
+  // Rental configuration
+  price: 100,              // Rental price
+  duration: 3600000,       // Duration in ms (1 hour default)
+
+  // Payment
+  bank: null,              // Bank object reference
+  account: null,           // Account to receive payments
+
+  // Active renters
+  renters: {},             // { agentId: expirationTimestamp }
+
+  // Access code (generated on rental)
+  code: null,
+  linkedLockId: null,      // Paired lock for code sync
+
+  // Composable locks
+  locks: [],
+}
+```
+
+## Key Methods
+
+### canAccess(agent, target, inputCode)
+Checks rental status, code, and composable locks.
+
+```javascript
+const result = await rentableLock.canAccess(player, room, '1234ABCD');
+if (result === true) {
+  // Access granted
+} else {
+  // 'Access denied. Please rent to unlock.'
+  // 'Access denied. Incorrect code.'
+}
+```
+
+**Checks:**
+1. Agent has valid (non-expired) rental
+2. Input code matches lock code (if set)
+3. All composable locks pass
+
+### rent(agent, idempotencyKey)
+Process payment and grant access.
+
+```javascript
+const result = await rentableLock.rent(player, 'rental-' + Date.now());
+// {
+//   success: true,
+//   message: 'Access granted for 60 minutes. Code: 1234ABCD',
+//   code: '1234ABCD'
+// }
+```
+
+**What it does:**
+1. Find agent's bank account
+2. Transfer `price` to lock's `account`
+3. If already renting: extend duration, keep same code
+4. If new rental: generate new code, set expiration
+5. Sync code to linked lock (if configured)
+
+### revoke(agent)
+Remove agent's access.
+
+```javascript
+await rentableLock.revoke(player);
+```
+
+### isRenter(agent)
+Check if agent currently has access.
+
+```javascript
+const hasAccess = await rentableLock.isRenter(player);
+// true or false
+```
+
+### promptForCode(agent, target)
+Interactive code entry via $.prompt.
+
+```javascript
+const result = await rentableLock.promptForCode(player, room);
+// Prompts: 'Enter your access code:'
+// Returns canAccess result
+```
+
+### syncCode(code)
+Set code and sync to linked lock.
+
+```javascript
+await rentableLock.syncCode('NEWCODE1');
+// Updates self.code and linkedLock.code
+```
+
+## Linked Locks
+
+For bidirectional doors/exits, link two rentable locks:
+
+```javascript
+const lockA = await $.recycler.create($.rentableLock, { ... });
+const lockB = await $.recycler.create($.rentableLock, { ... });
+
+lockA.linkedLockId = lockB.id;
+lockB.linkedLockId = lockA.id;
+
+// Now when lockA.rent() generates a code, it syncs to lockB
+// Same code works on both sides
+```
+
+## Example: Rentable Storage Room
+
+```javascript
+const storageLock = await $.recycler.create($.rentableLock, {
+  name: 'Storage Room Lock',
+  price: 50,                      // 50 credits per rental
+  duration: 24 * 60 * 60 * 1000,  // 24 hours
+  bank: $.bank.id,
+  account: 'STORAGE-REVENUE-001',
+});
+
+// Attach to exit
+storageExit.locks = [storageLock.id];
+
+// Player rents access
+> rent storage
+'Access granted for 1440 minutes. Code: K7MX9P2L'
+
+// Player enters with code
+> enter storage
+'Enter your access code: K7MX9P2L'
+// Access granted
+```
 
 ---
 

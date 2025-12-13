@@ -202,6 +202,45 @@ Creates initial world geometry:
 - Sets up initial locations
 - Registers `startRoom` alias
 
+### BuildingBuilder
+
+Creates structured buildings from TypeScript definition files:
+
+```typescript
+// src/database/bootstrap/world/seattle/pioneer-square/buildings/smith-tower/z1.ts
+export const building = {
+  rooms: {
+    '%E': {
+      prototype: 'elevator',
+      exits: { out: '%LOBBY' },
+    },
+    '%LOBBY': {
+      name: 'Floor 1 Lobby',
+      description: `...`,
+      x: -4, y: 8, z: 1,
+      exits: { north: '%A', in: '%E' },
+
+      // Spawn objects inside rooms
+      objects: [
+        {
+          prototype: 'jobBoard',  // Must exist in $.aliases
+          name: 'Employment Terminal',
+          description: 'A job listing terminal.',
+        },
+      ],
+    },
+  },
+};
+```
+
+**Key features:**
+- Uses `%placeholder` system for cross-floor references
+- Shared objects (elevators, locks) use same placeholder across floors
+- Supports `objects` array to spawn items inside rooms
+- Objects get `location` set and are added to room's `contents` via `addContent()`
+
+See [SMITH-TOWER-BUILDERS-GUIDE.md](../../../SMITH-TOWER-BUILDERS-GUIDE.md) for detailed documentation.
+
 ## Creating a Custom Utility Builder
 
 ### Step 1: Create the Builder Class

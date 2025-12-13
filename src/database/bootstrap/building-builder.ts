@@ -26,11 +26,19 @@ import { pathToFileURL } from 'url';
  *         north: '%1',      // Connects to room %1
  *         east: '%2',       // Connects to room %2
  *         up: { room: '%3', locked: true, lockKey: '%4' }, // With exit properties
- *       }
+ *       },
+ *       objects: [
+ *         { prototype: 'jobBoard', name: 'Employment Terminal' },
+ *         { prototype: 'sign', name: 'Directory', text: 'Floor Guide...' },
+ *       ]
  *     },
  *     '%1': { ... },
  *   }
  * }
+ *
+ * Objects in rooms:
+ * - prototype: Required. Name of the prototype alias (e.g., 'jobBoard', 'sign')
+ * - All other properties are passed to the created object
  *
  * This allows precise control over building interiors where not every adjacent
  * coordinate should be connected (walls exist).
@@ -125,6 +133,7 @@ export class BuildingBuilder {
     postProcessors: Array<() => Promise<void>>
   ): Promise<void> {
     const $ = this.manager as any;
+    const objectManager = await this.manager.load(0);
     const recycler = $.recycler;
     const roomProto = $.room;
     const exitProto = $.exit;
@@ -155,10 +164,17 @@ export class BuildingBuilder {
       let parentProto = roomProto;
       if (def.prototype) {
         const protoName = def.prototype;
+        const aliases = (objectManager?.get('aliases') as Record<string, number>) || {};
         if (protoName === 'elevator' && elevatorProto) {
           parentProto = elevatorProto;
-        } else if ($.system?.aliases && $.system.aliases[protoName]) {
-          parentProto = $.system.aliases[protoName];
+        } else if (aliases[protoName]) {
+          // Load the prototype by ID from aliases
+          const loaded = await this.manager.load(aliases[protoName]);
+          if (loaded) {
+            parentProto = loaded;
+          } else {
+            console.warn(`    Warning: could not load prototype '${protoName}' (ID ${aliases[protoName]}) for ${placeholder}, defaulting to room.`);
+          }
         } else {
           console.warn(`    Warning: prototype alias '${protoName}' not found for ${placeholder}, defaulting to room.`);
         }
@@ -337,6 +353,46 @@ export class BuildingBuilder {
             room.set('floorRooms', mapped);
           }
         });
+      }
+
+      // Spawn objects inside the room
+      if (Array.isArray(def.objects)) {
+        const aliases = (objectManager?.get('aliases') as Record<string, number>) || {};
+        for (const objDef of def.objects) {
+          if (!objDef.prototype) {
+            console.warn(`    Warning: object in ${placeholder} missing prototype, skipping`);
+            continue;
+          }
+
+          const protoId = aliases[objDef.prototype];
+          if (!protoId) {
+            console.warn(`    Warning: prototype '${objDef.prototype}' not found for object in ${placeholder}`);
+            continue;
+          }
+
+          // Extract properties (everything except 'prototype')
+          const objProps = { ...objDef };
+          delete objProps.prototype;
+
+          // Create the object
+          const obj = await recycler.create({
+            parent: protoId,
+            properties: objProps,
+          });
+
+          // Move object into the room
+          obj.set('location', room.id);
+          if (room.call) {
+            await room.call('addContent', obj.id);
+          } else {
+            // Fallback: directly set contents
+            const contents = room.get('contents') || [];
+            if (Array.isArray(contents)) {
+              contents.push(obj.id);
+              room.set('contents', contents);
+            }
+          }
+        }
       }
     }
 

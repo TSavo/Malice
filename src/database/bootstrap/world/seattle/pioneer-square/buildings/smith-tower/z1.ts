@@ -207,6 +207,13 @@ export const building = {
         south: '%K',
         north: '%C',
       },
+      objects: [
+        {
+          prototype: 'jobBoard',
+          name: 'Employment Terminal',
+          description: 'A sleek terminal bolted to the floor. The screen glows pale blue with the Continuum logo. Touch to begin.',
+        },
+      ],
     },
 
     '%H': {

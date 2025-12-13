@@ -35,6 +35,7 @@ export class AdminBuilder {
     this.addEvalCommands(obj);
     this.addDoorCommands(obj);
     this.addElevatorCommands(obj);
+    this.addAiCommands(obj);
 
     return obj;
   }
@@ -1816,6 +1817,259 @@ export class AdminBuilder {
             await player.tell('  ' + line);
           }
         }
+      }
+    `);
+  }
+
+  /** AI-controlled human commands */
+  private addAiCommands(obj: RuntimeObject): void {
+    // @spawn - Create an AI-controlled human
+    obj.setMethod('@spawn', `
+      /** Create an AI-controlled human.
+       *  Usage: @spawn <role> [name]
+       *  Example: @spawn guard Marcus
+       *  Example: @spawn shopkeeper
+       *
+       *  Creates a human with the given role and optionally a name.
+       *  Prompts for appearance options.
+       */
+      const role = args[0];
+      const providedName = args[1];
+
+      if (!role) {
+        await player.tell('Usage: @spawn <role> [name]');
+        await player.tell('Example: @spawn guard Marcus');
+        await player.tell('Example: @spawn shopkeeper');
+        return;
+      }
+
+      const ai = await $.ai;
+      if (!ai) {
+        await player.tell('AI registry not available.');
+        return;
+      }
+
+      await player.tell('Creating AI-controlled human with role: ' + role);
+      await player.tell('');
+
+      // Get name
+      let name = providedName;
+      if (!name) {
+        name = await $.prompt.question(player, 'Name: ');
+        if (!name || !name.trim()) {
+          await player.tell('Cancelled.');
+          return;
+        }
+        name = name.trim();
+      }
+
+      // Get sex
+      const sexChoice = await $.prompt.choice(player, 'Sex:', {
+        male: 'Male',
+        female: 'Female',
+        'non-binary': 'Non-binary',
+      });
+      if (!sexChoice) {
+        await player.tell('Cancelled.');
+        return;
+      }
+
+      // Get age
+      let age = null;
+      while (!age) {
+        const ageInput = await $.prompt.question(player, 'Age (18-100): ');
+        if (!ageInput) {
+          await player.tell('Cancelled.');
+          return;
+        }
+        const parsed = parseInt(ageInput.trim(), 10);
+        if (isNaN(parsed) || parsed < 18 || parsed > 100) {
+          await player.tell('Please enter a valid age between 18 and 100.');
+        } else {
+          age = parsed;
+        }
+      }
+
+      // Quick or detailed appearance
+      const appearanceMode = await $.prompt.choice(player, 'Appearance:', {
+        quick: 'Quick - random appearance',
+        detailed: 'Detailed - full customization',
+      });
+
+      let appearance = {};
+      if (appearanceMode === 'detailed') {
+        // Full chargen-style appearance selection
+        const eyeColors = {
+          brown: 'Brown', blue: 'Blue', green: 'Green',
+          hazel: 'Hazel', gray: 'Gray', amber: 'Amber',
+        };
+        const eyeColor = await $.prompt.menu(player, 'Eye color:', eyeColors, 3);
+
+        const hairColors = {
+          black: 'Black', brown: 'Brown', blonde: 'Blonde',
+          red: 'Red', gray: 'Gray', white: 'White',
+        };
+        const hairColor = await $.prompt.menu(player, 'Hair color:', hairColors, 3);
+
+        const hairStyles = {
+          short: 'Short', long: 'Long', bald: 'Bald',
+          curly: 'Curly', straight: 'Straight',
+        };
+        const hairStyle = await $.prompt.menu(player, 'Hair style:', hairStyles, 3);
+
+        const skinTones = {
+          pale: 'Pale', fair: 'Fair', medium: 'Medium',
+          olive: 'Olive', tan: 'Tan', brown: 'Brown', dark: 'Dark',
+        };
+        const skinTone = await $.prompt.menu(player, 'Skin tone:', skinTones, 3);
+
+        const buildTypes = {
+          slim: 'Slim', athletic: 'Athletic', average: 'Average',
+          stocky: 'Stocky', muscular: 'Muscular', heavyset: 'Heavyset',
+        };
+        const buildType = await $.prompt.menu(player, 'Build:', buildTypes, 3);
+
+        appearance = {
+          eyeColor: eyeColor,
+          leftEyeColor: eyeColor,
+          rightEyeColor: eyeColor,
+          hairColor: hairColor,
+          hairStyle: hairStyle,
+          skinTone: skinTone,
+          buildType: buildType,
+        };
+      } else {
+        // Quick random appearance
+        const randomPick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+        appearance = {
+          eyeColor: randomPick(['brown', 'blue', 'green', 'hazel', 'gray']),
+          hairColor: randomPick(['black', 'brown', 'blonde', 'red', 'gray']),
+          hairStyle: randomPick(['short', 'long', 'curly', 'straight']),
+          skinTone: randomPick(['pale', 'fair', 'medium', 'olive', 'tan', 'brown']),
+          buildType: randomPick(['slim', 'athletic', 'average', 'stocky', 'muscular']),
+        };
+        appearance.leftEyeColor = appearance.eyeColor;
+        appearance.rightEyeColor = appearance.eyeColor;
+
+        await player.tell('Generated random appearance.');
+      }
+
+      // Get player's current location
+      const location = player.location;
+
+      // Spawn the human
+      await player.tell('');
+      await player.tell('Creating human...');
+
+      const human = await ai.spawn(role, {
+        name: name,
+        description: 'A ' + role + ' named ' + name + '.',
+        sex: sexChoice,
+        age: age,
+        height: 1.5 + Math.random() * 0.5, // 1.5-2.0m
+        weight: 50 + Math.random() * 50,    // 50-100kg
+        appearance: appearance,
+        location: location,
+        spawnedBy: player.id,
+      });
+
+      await player.tell('');
+      await player.tell('Created: ' + human.name + ' (#' + human.id + ') as ' + role);
+
+      const room = location ? await $.load(location) : null;
+      if (room) {
+        await player.tell('Placed in: ' + room.name);
+      }
+    `);
+
+    // @despawn - Remove an AI-controlled human
+    obj.setMethod('@despawn', `
+      /** Remove an AI-controlled human.
+       *  Usage: @despawn <id or name>
+       *  Example: @despawn 567
+       *  Example: @despawn Marcus
+       */
+      const target = args[0];
+
+      if (!target) {
+        await player.tell('Usage: @despawn <id or name>');
+        return;
+      }
+
+      const ai = await $.ai;
+      if (!ai) {
+        await player.tell('AI registry not available.');
+        return;
+      }
+
+      // Try to find by ID first
+      let humanId = parseInt(target, 10);
+
+      if (isNaN(humanId)) {
+        // Search by name
+        const allIds = await ai.getAll();
+        for (const id of allIds) {
+          const h = await $.load(id);
+          if (h && h.name && h.name.toLowerCase() === target.toLowerCase()) {
+            humanId = id;
+            break;
+          }
+        }
+      }
+
+      if (!humanId || isNaN(humanId)) {
+        await player.tell('Could not find AI-controlled human: ' + target);
+        return;
+      }
+
+      const isAi = await ai.isAiControlled(humanId);
+      if (!isAi) {
+        await player.tell('#' + humanId + ' is not AI-controlled.');
+        return;
+      }
+
+      const human = await $.load(humanId);
+      const name = human ? human.name : 'Unknown';
+
+      await ai.despawn(humanId, true);
+      await player.tell('Despawned: ' + name + ' (#' + humanId + ')');
+    `);
+
+    // @ai - List AI-controlled humans
+    obj.setMethod('@ai', `
+      /** List AI-controlled humans.
+       *  Usage: @ai
+       *  Usage: @ai <role>
+       */
+      const roleFilter = args[0];
+
+      const ai = await $.ai;
+      if (!ai) {
+        await player.tell('AI registry not available.');
+        return;
+      }
+
+      if (roleFilter) {
+        // Show specific role
+        const ids = await ai.getByRole(roleFilter);
+        if (ids.length === 0) {
+          await player.tell('No AI humans with role: ' + roleFilter);
+          return;
+        }
+
+        await player.tell('AI humans with role "' + roleFilter + '":');
+        for (const id of ids) {
+          const h = await $.load(id);
+          const name = h ? h.name : 'Unknown';
+          const loc = h && h.location ? await $.load(h.location) : null;
+          const locName = loc ? loc.name : 'nowhere';
+          await player.tell('  ' + name + ' (#' + id + ') - ' + locName);
+        }
+      } else {
+        // Show all
+        const desc = await ai.describe();
+        await player.tell(desc);
       }
     `);
   }
