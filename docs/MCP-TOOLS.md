@@ -4,6 +4,11 @@ The Malice MCP server exposes tools for AI assistants and automation to interact
 
 **Endpoint:** `http://localhost:3001/mcp`
 
+**Related Documentation:**
+- [BUILDERS-GUIDE.md](BUILDERS-GUIDE.md) - Creating prototypes and systems in code
+- [moo-programming.md](moo-programming.md) - MOO programming reference
+- [plot-jobs.md](plot-jobs.md) - Plot/job system for AI city management
+
 ## Object Management
 
 ### get_object

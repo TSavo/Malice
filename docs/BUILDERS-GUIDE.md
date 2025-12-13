@@ -2,6 +2,10 @@
 
 A comprehensive guide for creating new prototypes and systems in Malice.
 
+**Related Documentation:**
+- [MCP-TOOLS.md](MCP-TOOLS.md) - MCP tools for AI assistants and automation
+- [moo-programming.md](moo-programming.md) - MOO programming reference
+
 ## Directory Structure
 
 ```
