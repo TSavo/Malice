@@ -1611,6 +1611,687 @@ export class MaliceMCPServer {
       }
     );
 
+    // ═══════════════════════════════════════════════════════════════════════
+    // AI REGISTRY TOOLS
+    // ═══════════════════════════════════════════════════════════════════════
+
+    // Spawn AI-controlled human
+    this.server.tool(
+      'spawn_ai',
+      'Spawn a new AI-controlled human. Creates a full human with body, registers in $.ai by role.',
+      {
+        role: z.string().describe('Role for this AI (e.g., "guard", "shopkeeper", "bartender")'),
+        name: z.string().optional().describe('Name of the human'),
+        description: z.string().optional().describe('Description of the human'),
+        locationId: z.number().optional().describe('Room ID to place the human'),
+        sex: z.enum(['male', 'female', 'non-binary']).optional().describe('Sex (random if not specified)'),
+        age: z.number().optional().describe('Age in years (random 18-65 if not specified)'),
+      },
+      async ({ role, name, description, locationId, sex, age }) => {
+        const ai = await this.getAlias('ai');
+        if (!ai) {
+          return {
+            content: [{ type: 'text', text: 'AI registry not found - system not initialized' }],
+            isError: true,
+          };
+        }
+
+        try {
+          const options: any = {};
+          if (name) options.name = name;
+          if (description) options.description = description;
+          if (locationId !== undefined) options.location = locationId;
+          if (sex) options.sex = sex;
+          if (age !== undefined) options.age = age;
+
+          const human = await ai.call('spawn', role, options);
+          return {
+            content: [{ type: 'text', text: `Spawned AI human #${human.id} (${human.name}) as ${role}` }],
+          };
+        } catch (err) {
+          return {
+            content: [{ type: 'text', text: `Error spawning AI: ${err instanceof Error ? err.message : String(err)}` }],
+            isError: true,
+          };
+        }
+      }
+    );
+
+    // Despawn AI-controlled human
+    this.server.tool(
+      'despawn_ai',
+      'Remove an AI-controlled human. Unregisters from $.ai and optionally recycles the object.',
+      {
+        humanId: z.number().describe('Human object ID to despawn'),
+        recycle: z.boolean().optional().describe('Whether to recycle the object (default: true)'),
+      },
+      async ({ humanId, recycle }) => {
+        const ai = await this.getAlias('ai');
+        if (!ai) {
+          return {
+            content: [{ type: 'text', text: 'AI registry not found' }],
+            isError: true,
+          };
+        }
+
+        try {
+          await ai.call('despawn', humanId, recycle !== false);
+          return {
+            content: [{ type: 'text', text: `Despawned AI human #${humanId}` }],
+          };
+        } catch (err) {
+          return {
+            content: [{ type: 'text', text: `Error despawning AI: ${err instanceof Error ? err.message : String(err)}` }],
+            isError: true,
+          };
+        }
+      }
+    );
+
+    // List AI-controlled humans
+    this.server.tool(
+      'list_ai',
+      'List all AI-controlled humans, optionally filtered by role.',
+      {
+        role: z.string().optional().describe('Filter by role (e.g., "guard")'),
+      },
+      async ({ role }) => {
+        const ai = await this.getAlias('ai');
+        if (!ai) {
+          return {
+            content: [{ type: 'text', text: 'AI registry not found' }],
+            isError: true,
+          };
+        }
+
+        try {
+          let humanIds: number[];
+          if (role) {
+            humanIds = await ai.call('getByRole', role);
+          } else {
+            humanIds = await ai.call('getAll');
+          }
+
+          const results = [];
+          for (const id of humanIds || []) {
+            const human = await this.manager.load(id as ObjId);
+            const info = await ai.call('getInfo', id);
+            results.push({
+              id,
+              name: human ? (human as any).name : 'Unknown',
+              role: info?.role,
+              location: human ? (human as any).location : null,
+            });
+          }
+
+          return {
+            content: [{ type: 'text', text: JSON.stringify({ count: results.length, humans: results }, null, 2) }],
+          };
+        } catch (err) {
+          return {
+            content: [{ type: 'text', text: `Error listing AI: ${err instanceof Error ? err.message : String(err)}` }],
+            isError: true,
+          };
+        }
+      }
+    );
+
+    // Get AI human info
+    this.server.tool(
+      'get_ai_info',
+      'Get information about an AI-controlled human including role and spawn metadata.',
+      {
+        humanId: z.number().describe('Human object ID'),
+      },
+      async ({ humanId }) => {
+        const ai = await this.getAlias('ai');
+        if (!ai) {
+          return {
+            content: [{ type: 'text', text: 'AI registry not found' }],
+            isError: true,
+          };
+        }
+
+        try {
+          const isAi = await ai.call('isAiControlled', humanId);
+          if (!isAi) {
+            return {
+              content: [{ type: 'text', text: `Human #${humanId} is not AI-controlled` }],
+            };
+          }
+
+          const info = await ai.call('getInfo', humanId);
+          const human = await this.manager.load(humanId as ObjId);
+
+          return {
+            content: [{ type: 'text', text: JSON.stringify({
+              id: humanId,
+              name: human ? (human as any).name : 'Unknown',
+              ...info,
+            }, null, 2) }],
+          };
+        } catch (err) {
+          return {
+            content: [{ type: 'text', text: `Error getting AI info: ${err instanceof Error ? err.message : String(err)}` }],
+            isError: true,
+          };
+        }
+      }
+    );
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // PLOT MANAGEMENT TOOLS
+    // ═══════════════════════════════════════════════════════════════════════
+
+    // Create a new plot
+    this.server.tool(
+      'create_plot',
+      'Create a new plot (narrative container). Use for AI-initiated storylines.',
+      {
+        name: z.string().describe('Name of the plot'),
+        metadata: z.record(z.any()).optional().describe('Initial metadata (participants, status, etc.)'),
+      },
+      async ({ name, metadata }) => {
+        const plotDB = await this.getPlotDB();
+        const plotProto = await this.getAlias('plot');
+        const recycler = await this.getAlias('recycler');
+
+        if (!plotProto || !recycler) {
+          return {
+            content: [{ type: 'text', text: 'Plot system not initialized' }],
+            isError: true,
+          };
+        }
+
+        try {
+          // Create new plot instance
+          const newPlot = await recycler.call('create', {
+            parent: plotProto.id,
+            properties: {
+              name: name,
+              description: 'AI-created plot',
+              events: [],
+              metadata: {
+                ...(metadata || {}),
+                created: new Date().toISOString(),
+                needsAttentionAt: new Date().toISOString(),
+              },
+            },
+          });
+
+          // Register with plotDB
+          if (plotDB) {
+            await plotDB.call('register', newPlot);
+          }
+
+          return {
+            content: [{ type: 'text', text: `Created plot #${newPlot.id} "${name}"` }],
+          };
+        } catch (err) {
+          return {
+            content: [{ type: 'text', text: `Error creating plot: ${err instanceof Error ? err.message : String(err)}` }],
+            isError: true,
+          };
+        }
+      }
+    );
+
+    // Close/complete a plot
+    this.server.tool(
+      'close_plot',
+      'Close a plot by setting its status. Use "completed", "abandoned", or "failed".',
+      {
+        plotId: z.number().describe('Plot object ID'),
+        status: z.enum(['completed', 'abandoned', 'failed']).describe('Final status'),
+        reason: z.string().optional().describe('Reason for closing'),
+      },
+      async ({ plotId, status, reason }) => {
+        const plot = await this.manager.load(plotId as ObjId);
+        if (!plot) {
+          return {
+            content: [{ type: 'text', text: `Plot #${plotId} not found` }],
+            isError: true,
+          };
+        }
+
+        try {
+          await plot.call('setMetadata', 'status', status);
+          await plot.call('setMetadata', 'closedAt', new Date().toISOString());
+          if (reason) {
+            await plot.call('setMetadata', 'closeReason', reason);
+          }
+          await plot.call('addEvent', {
+            from: 'system',
+            message: `Plot ${status}: ${reason || 'No reason given'}`,
+          });
+
+          return {
+            content: [{ type: 'text', text: `Plot #${plotId} marked as ${status}` }],
+          };
+        } catch (err) {
+          return {
+            content: [{ type: 'text', text: `Error closing plot: ${err instanceof Error ? err.message : String(err)}` }],
+            isError: true,
+          };
+        }
+      }
+    );
+
+    // Get plot events
+    this.server.tool(
+      'get_plot_events',
+      'Get the event log for a plot. Returns all narrative events.',
+      {
+        plotId: z.number().describe('Plot object ID'),
+        limit: z.number().optional().describe('Limit to last N events'),
+      },
+      async ({ plotId, limit }) => {
+        const plot = await this.manager.load(plotId as ObjId);
+        if (!plot) {
+          return {
+            content: [{ type: 'text', text: `Plot #${plotId} not found` }],
+            isError: true,
+          };
+        }
+
+        try {
+          let events: any[] = await plot.call('getEventLog') as any[];
+          if (limit && events.length > limit) {
+            events = events.slice(-limit);
+          }
+
+          return {
+            content: [{ type: 'text', text: JSON.stringify({
+              plotId,
+              name: (plot as any).name,
+              eventCount: events.length,
+              events,
+            }, null, 2) }],
+          };
+        } catch (err) {
+          return {
+            content: [{ type: 'text', text: `Error getting events: ${err instanceof Error ? err.message : String(err)}` }],
+            isError: true,
+          };
+        }
+      }
+    );
+
+    // Add event to plot
+    this.server.tool(
+      'add_plot_event',
+      'Add an event to a plot\'s narrative log.',
+      {
+        plotId: z.number().describe('Plot object ID'),
+        message: z.string().describe('Event message'),
+        from: z.enum(['handler', 'system']).optional().describe('Event source (default: handler)'),
+      },
+      async ({ plotId, message, from }) => {
+        const plot = await this.manager.load(plotId as ObjId);
+        if (!plot) {
+          return {
+            content: [{ type: 'text', text: `Plot #${plotId} not found` }],
+            isError: true,
+          };
+        }
+
+        try {
+          await plot.call('addEvent', {
+            from: from || 'handler',
+            message,
+          });
+
+          return {
+            content: [{ type: 'text', text: `Added event to plot #${plotId}` }],
+          };
+        } catch (err) {
+          return {
+            content: [{ type: 'text', text: `Error adding event: ${err instanceof Error ? err.message : String(err)}` }],
+            isError: true,
+          };
+        }
+      }
+    );
+
+    // List all plots
+    this.server.tool(
+      'list_plots',
+      'List all plots with optional status filter.',
+      {
+        status: z.enum(['active', 'completed', 'abandoned', 'failed']).optional().describe('Filter by status'),
+        limit: z.number().optional().describe('Max results to return'),
+      },
+      async ({ status, limit }) => {
+        const plotDB = await this.getPlotDB();
+        if (!plotDB) {
+          return {
+            content: [{ type: 'text', text: 'PlotDB not found' }],
+            isError: true,
+          };
+        }
+
+        try {
+          let plots;
+          if (status) {
+            plots = await plotDB.call('byStatus', status);
+          } else {
+            plots = await plotDB.call('all');
+          }
+
+          const results = [];
+          for (const plot of plots || []) {
+            if (limit && results.length >= limit) break;
+            const meta = plot.metadata || {};
+            results.push({
+              id: plot.id,
+              name: plot.name,
+              status: meta.status || 'active',
+              participants: meta.participants || [],
+              eventCount: (plot.events || []).length,
+              created: meta.created,
+              needsAttentionAt: meta.needsAttentionAt,
+            });
+          }
+
+          return {
+            content: [{ type: 'text', text: JSON.stringify({ count: results.length, plots: results }, null, 2) }],
+          };
+        } catch (err) {
+          return {
+            content: [{ type: 'text', text: `Error listing plots: ${err instanceof Error ? err.message : String(err)}` }],
+            isError: true,
+          };
+        }
+      }
+    );
+
+    // Get plots by player
+    this.server.tool(
+      'plots_by_player',
+      'Get all plots involving a specific player.',
+      {
+        playerId: z.number().describe('Player object ID'),
+        activeOnly: z.boolean().optional().describe('Only return active plots'),
+      },
+      async ({ playerId, activeOnly }) => {
+        const plotDB = await this.getPlotDB();
+        if (!plotDB) {
+          return {
+            content: [{ type: 'text', text: 'PlotDB not found' }],
+            isError: true,
+          };
+        }
+
+        try {
+          const plots = await plotDB.call('byPlayer', playerId);
+          const results = [];
+
+          for (const plot of plots || []) {
+            const meta = plot.metadata || {};
+            const status = meta.status || 'active';
+
+            if (activeOnly && status !== 'active' && status !== 'in_progress') {
+              continue;
+            }
+
+            results.push({
+              id: plot.id,
+              name: plot.name,
+              status,
+              eventCount: (plot.events || []).length,
+              created: meta.created,
+            });
+          }
+
+          return {
+            content: [{ type: 'text', text: JSON.stringify({ playerId, count: results.length, plots: results }, null, 2) }],
+          };
+        } catch (err) {
+          return {
+            content: [{ type: 'text', text: `Error getting player plots: ${err instanceof Error ? err.message : String(err)}` }],
+            isError: true,
+          };
+        }
+      }
+    );
+
+    // Search plots
+    this.server.tool(
+      'search_plots',
+      'Search plot event logs for text. Returns plots with matching content.',
+      {
+        query: z.string().describe('Text to search for in plot events'),
+        limit: z.number().optional().describe('Max results to return'),
+      },
+      async ({ query, limit }) => {
+        const plotDB = await this.getPlotDB();
+        if (!plotDB) {
+          return {
+            content: [{ type: 'text', text: 'PlotDB not found' }],
+            isError: true,
+          };
+        }
+
+        try {
+          const plots = await plotDB.call('search', query);
+          const results = [];
+
+          for (const plot of plots || []) {
+            if (limit && results.length >= limit) break;
+            const meta = plot.metadata || {};
+            results.push({
+              id: plot.id,
+              name: plot.name,
+              status: meta.status || 'active',
+              eventCount: (plot.events || []).length,
+            });
+          }
+
+          return {
+            content: [{ type: 'text', text: JSON.stringify({ query, count: results.length, plots: results }, null, 2) }],
+          };
+        } catch (err) {
+          return {
+            content: [{ type: 'text', text: `Error searching plots: ${err instanceof Error ? err.message : String(err)}` }],
+            isError: true,
+          };
+        }
+      }
+    );
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // JOB MANAGEMENT TOOLS (within plots)
+    // ═══════════════════════════════════════════════════════════════════════
+
+    // Create a job within a plot
+    this.server.tool(
+      'create_job',
+      'Create a job (task) within a plot. Jobs can have hooks that watch for game events.',
+      {
+        plotId: z.number().describe('Plot object ID'),
+        jobId: z.string().describe('Unique job identifier within the plot'),
+        expiresAt: z.string().optional().describe('ISO timestamp when job expires'),
+        metadata: z.record(z.any()).optional().describe('Job-specific metadata'),
+      },
+      async ({ plotId, jobId, expiresAt, metadata }) => {
+        const plot = await this.manager.load(plotId as ObjId);
+        if (!plot) {
+          return {
+            content: [{ type: 'text', text: `Plot #${plotId} not found` }],
+            isError: true,
+          };
+        }
+
+        try {
+          const options: any = {};
+          if (expiresAt) options.expiresAt = expiresAt;
+          if (metadata) options.metadata = metadata;
+
+          await plot.call('createJob', jobId, options);
+
+          return {
+            content: [{ type: 'text', text: `Created job '${jobId}' in plot #${plotId}` }],
+          };
+        } catch (err) {
+          return {
+            content: [{ type: 'text', text: `Error creating job: ${err instanceof Error ? err.message : String(err)}` }],
+            isError: true,
+          };
+        }
+      }
+    );
+
+    // Complete a job
+    this.server.tool(
+      'complete_job',
+      'Mark a job as completed. Automatically unregisters all hooks for this job.',
+      {
+        plotId: z.number().describe('Plot object ID'),
+        jobId: z.string().describe('Job identifier'),
+        reason: z.string().optional().describe('Completion reason'),
+      },
+      async ({ plotId, jobId, reason }) => {
+        const plot = await this.manager.load(plotId as ObjId);
+        if (!plot) {
+          return {
+            content: [{ type: 'text', text: `Plot #${plotId} not found` }],
+            isError: true,
+          };
+        }
+
+        try {
+          const result = await plot.call('completeJob', jobId, reason || 'Completed') as { success: boolean; error?: string };
+          if (result.success) {
+            return {
+              content: [{ type: 'text', text: `Completed job '${jobId}' in plot #${plotId}` }],
+            };
+          } else {
+            return {
+              content: [{ type: 'text', text: `Could not complete job: ${result.error}` }],
+              isError: true,
+            };
+          }
+        } catch (err) {
+          return {
+            content: [{ type: 'text', text: `Error completing job: ${err instanceof Error ? err.message : String(err)}` }],
+            isError: true,
+          };
+        }
+      }
+    );
+
+    // Fail a job
+    this.server.tool(
+      'fail_job',
+      'Mark a job as failed. Automatically unregisters all hooks for this job.',
+      {
+        plotId: z.number().describe('Plot object ID'),
+        jobId: z.string().describe('Job identifier'),
+        reason: z.string().optional().describe('Failure reason'),
+      },
+      async ({ plotId, jobId, reason }) => {
+        const plot = await this.manager.load(plotId as ObjId);
+        if (!plot) {
+          return {
+            content: [{ type: 'text', text: `Plot #${plotId} not found` }],
+            isError: true,
+          };
+        }
+
+        try {
+          const result = await plot.call('failJob', jobId, reason || 'Failed') as { success: boolean; error?: string };
+          if (result.success) {
+            return {
+              content: [{ type: 'text', text: `Failed job '${jobId}' in plot #${plotId}` }],
+            };
+          } else {
+            return {
+              content: [{ type: 'text', text: `Could not fail job: ${result.error}` }],
+              isError: true,
+            };
+          }
+        } catch (err) {
+          return {
+            content: [{ type: 'text', text: `Error failing job: ${err instanceof Error ? err.message : String(err)}` }],
+            isError: true,
+          };
+        }
+      }
+    );
+
+    // Register a hook for a job
+    this.server.tool(
+      'register_job_hook',
+      'Register a hook to watch for events on a target object. When the event fires with matching filter, the job is notified.',
+      {
+        plotId: z.number().describe('Plot object ID'),
+        jobId: z.string().describe('Job identifier'),
+        targetId: z.number().describe('Object ID to watch'),
+        eventName: z.string().describe('Event name to watch for (e.g., "oneTimeCodeUsed", "itemDeposited")'),
+        filter: z.record(z.any()).optional().describe('Filter conditions - event must match all key/values'),
+      },
+      async ({ plotId, jobId, targetId, eventName, filter }) => {
+        const plot = await this.manager.load(plotId as ObjId);
+        if (!plot) {
+          return {
+            content: [{ type: 'text', text: `Plot #${plotId} not found` }],
+            isError: true,
+          };
+        }
+
+        try {
+          await plot.call('registerJobHook', jobId, targetId, eventName, filter || {});
+
+          return {
+            content: [{ type: 'text', text: `Registered hook: job '${jobId}' watching #${targetId} for '${eventName}'` }],
+          };
+        } catch (err) {
+          return {
+            content: [{ type: 'text', text: `Error registering hook: ${err instanceof Error ? err.message : String(err)}` }],
+            isError: true,
+          };
+        }
+      }
+    );
+
+    // Get job info
+    this.server.tool(
+      'get_job',
+      'Get information about a specific job within a plot.',
+      {
+        plotId: z.number().describe('Plot object ID'),
+        jobId: z.string().describe('Job identifier'),
+      },
+      async ({ plotId, jobId }) => {
+        const plot = await this.manager.load(plotId as ObjId);
+        if (!plot) {
+          return {
+            content: [{ type: 'text', text: `Plot #${plotId} not found` }],
+            isError: true,
+          };
+        }
+
+        try {
+          const job = await plot.call('getJob', jobId);
+          if (!job) {
+            return {
+              content: [{ type: 'text', text: `Job '${jobId}' not found in plot #${plotId}` }],
+              isError: true,
+            };
+          }
+
+          return {
+            content: [{ type: 'text', text: JSON.stringify({ plotId, jobId, ...job }, null, 2) }],
+          };
+        } catch (err) {
+          return {
+            content: [{ type: 'text', text: `Error getting job: ${err instanceof Error ? err.message : String(err)}` }],
+            isError: true,
+          };
+        }
+      }
+    );
+
   }
 
   /**

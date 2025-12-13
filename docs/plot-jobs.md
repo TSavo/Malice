@@ -2,6 +2,10 @@
 
 This document explains how to set up jobs within plots that can watch for events in the game world.
 
+**Related Documentation:**
+- [MCP-TOOLS.md](MCP-TOOLS.md) - MCP tools including plot/job management
+- [BUILDERS-GUIDE.md](BUILDERS-GUIDE.md) - Creating objects and prototypes
+
 ## Architecture
 
 ```
@@ -257,6 +261,29 @@ When using MCP tools like `get_object` and `get_property`, the server serializes
 - Nested objects with circular references show `[circular]`
 - Use `get_object` with the ID to load referenced objects
 
+## MCP Tools Reference
+
+Dedicated MCP tools for plot and job management:
+
+| Tool | Description |
+|------|-------------|
+| `get_next_job` | Get the next plot needing attention (FIFO queue) |
+| `respond_to_job` | Add event and update metadata |
+| `create_plot` | Create a new plot for AI-initiated storylines |
+| `close_plot` | Close a plot with status |
+| `get_plot_events` | Get plot event log |
+| `add_plot_event` | Add narrative event |
+| `list_plots` | List plots with optional status filter |
+| `plots_by_player` | Get all plots for a player |
+| `search_plots` | Search plot events for text |
+| `create_job` | Create a job within a plot |
+| `complete_job` | Mark job completed |
+| `fail_job` | Mark job failed |
+| `register_job_hook` | Watch for events on an object |
+| `get_job` | Get job details |
+
+See [MCP-TOOLS.md](MCP-TOOLS.md) for complete parameter documentation.
+
 ## MCP Workflow
 
 From Claude's perspective using MCP tools:
@@ -268,14 +295,14 @@ From Claude's perspective using MCP tools:
 2. respond_to_job (give instructions)
    → "Pick up package #55 from warehouse"
 
-3. call_method on plot
-   → createJob('deliver-package', {...})
+3. create_job
+   → Create 'deliver-package' job with metadata
 
 4. call_method on locker
-   → createOneTimeCode()
+   → createOneTimeCode() - returns code
 
-5. call_method on plot
-   → registerJobHook('deliver-package', lockerId, 'oneTimeCodeUsed', { code })
+5. register_job_hook
+   → Watch locker for 'oneTimeCodeUsed' with filter { code }
 
 6. respond_to_job (give code to player)
    → "Deliver to locker #100. Code: XYZ789"
@@ -285,14 +312,42 @@ From Claude's perspective using MCP tools:
 8. get_next_job
    → Returns same plot (hook triggered needsAttentionAt)
 
-9. [Check events, see delivery confirmed]
+9. get_plot_events
+   → See delivery confirmed in event log
 
-10. call_method on plot
-    → completeJob('deliver-package', 'Success')
+10. complete_job
+    → Mark 'deliver-package' as completed
 
 11. respond_to_job
     → "Payment transferred. Job complete."
+
+12. close_plot (optional)
+    → Mark plot as completed
 ```
+
+### Using Dedicated Tools vs call_method
+
+**Prefer dedicated tools** - cleaner, better error handling:
+
+```javascript
+// Better: Use dedicated tool
+mcp.create_job({
+  plotId: 54,
+  jobId: "deliver-package",
+  metadata: { lockerId: 100 }
+});
+
+// Also works: Generic call_method
+mcp.call_method({
+  objectId: 54,
+  name: "createJob",
+  args: ["deliver-package", { metadata: { lockerId: 100 } }]
+});
+```
+
+**When to use call_method:**
+- Calling methods not exposed as MCP tools
+- Custom methods on objects (e.g., locker.createOneTimeCode)
 
 ## Multiple Jobs Example
 
