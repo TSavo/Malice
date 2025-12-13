@@ -16,6 +16,7 @@ import { ExclusionsBuilder } from './exclusions-builder.js';
 import { MementoBuilder } from './memento-builder.js';
 import { FormatBuilder } from './format-builder.js';
 import { PlotBuilder } from './plot-builder.js';
+import { AiBuilder } from './ai-builder.js';
 
 /**
  * Orchestrates building all core system objects
@@ -39,6 +40,7 @@ import { PlotBuilder } from './plot-builder.js';
  * - Format ($.format): Text formatting for columns, tables, and layout
  * - Plot ($.plot): Narrative event log prototype
  * - PlotSpawner ($.plotSpawner): Base prototype for plot-generating entities
+ * - AI ($.ai): Registry for AI-controlled humans
  */
 export class CoreSystemBuilder {
   constructor(private manager: ObjectManager) {}
@@ -64,6 +66,7 @@ export class CoreSystemBuilder {
     const mementoBuilder = new MementoBuilder(this.manager);
     const formatBuilder = new FormatBuilder(this.manager);
     const plotBuilder = new PlotBuilder(this.manager);
+    const aiBuilder = new AiBuilder(this.manager);
 
     await authManagerBuilder.build();
     await charGenBuilder.build();
@@ -82,6 +85,7 @@ export class CoreSystemBuilder {
     await mementoBuilder.build();
     await formatBuilder.build();
     await plotBuilder.build();
+    await aiBuilder.build();
 
     // Register aliases
     await authManagerBuilder.registerAlias();
@@ -101,5 +105,6 @@ export class CoreSystemBuilder {
     await mementoBuilder.registerAlias();
     await formatBuilder.registerAlias();
     await plotBuilder.registerAliases();
+    await aiBuilder.registerAlias();
   }
 }

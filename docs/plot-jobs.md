@@ -234,6 +234,29 @@ const hooks = await plot.getJobHooks('deliver-package');
 // [{ targetId: 100, eventName: 'oneTimeCodeUsed' }]
 ```
 
+## MCP Serialization
+
+When using MCP tools like `get_object` and `get_property`, the server serializes object data to JSON. RuntimeObjects are converted to `#ID` format to avoid circular reference errors.
+
+**Example:**
+
+```javascript
+// Room object returned by get_object
+{
+  id: 1013,
+  name: 'Smith Tower - 1st Floor - Job Center',
+  contents: [1053],          // Array of object IDs
+  location: '#1009',         // Parent object as "#ID"
+  exits: ['#1014', '#1015'], // Exit objects as "#ID"
+}
+```
+
+**Key points:**
+- Object references are serialized as `#ID` strings (e.g., `#1053`)
+- Arrays of IDs remain as number arrays
+- Nested objects with circular references show `[circular]`
+- Use `get_object` with the ID to load referenced objects
+
 ## MCP Workflow
 
 From Claude's perspective using MCP tools:

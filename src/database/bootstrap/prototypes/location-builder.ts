@@ -43,22 +43,57 @@ export class LocationBuilder {
     `);
 
     obj.setMethod('addContent', `
-      const objId = args[0];
+      let input = args[0];
+      let objId;
+      let obj;
+
+      // Accept either ID (number) or RuntimeObject
+      if (typeof input === 'number') {
+        objId = input;
+        obj = await $.load(objId);
+      } else if (input && typeof input === 'object' && typeof input.id === 'number') {
+        obj = input;
+        objId = input.id;
+      } else {
+        return; // Invalid input
+      }
+
       const contents = self.contents || [];
       if (!contents.includes(objId)) {
         contents.push(objId);
         self.contents = contents;
+
+        // Set the object's location to this container
+        if (obj) {
+          obj.location = self.id;
         }
+
+        // Call arrival hook
+        if (self.onContentArrived) {
+          await self.onContentArrived(obj);
+        }
+      }
     `);
 
     obj.setMethod('removeContent', `
-      const objId = args[0];
+      let input = args[0];
+      let objId;
+
+      // Accept either ID (number) or RuntimeObject
+      if (typeof input === 'number') {
+        objId = input;
+      } else if (input && typeof input === 'object' && typeof input.id === 'number') {
+        objId = input.id;
+      } else {
+        return; // Invalid input
+      }
+
       const contents = self.contents || [];
       const index = contents.indexOf(objId);
       if (index !== -1) {
         contents.splice(index, 1);
         self.contents = contents;
-        }
+      }
     `);
 
     // Hook: called before an object leaves this location

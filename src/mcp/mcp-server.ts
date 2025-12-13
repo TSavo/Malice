@@ -49,6 +49,45 @@ export class MaliceMCPServer {
   }
 
   /**
+   * Serialize a value for JSON output, converting RuntimeObjects to "#ID" format
+   * This avoids circular reference issues with Proxy objects
+   */
+  private serializeValue(value: any, seen = new WeakSet()): any {
+    // Handle null/undefined
+    if (value === null || value === undefined) {
+      return value;
+    }
+
+    // Handle RuntimeObject (has .id property and is an object)
+    if (value && typeof value === 'object' && 'id' in value && typeof value.id === 'number') {
+      return `#${value.id}`;
+    }
+
+    // Handle arrays
+    if (Array.isArray(value)) {
+      return value.map(v => this.serializeValue(v, seen));
+    }
+
+    // Handle objects (but not primitives)
+    if (typeof value === 'object') {
+      // Detect circular references
+      if (seen.has(value)) {
+        return '[circular]';
+      }
+      seen.add(value);
+
+      const result: Record<string, any> = {};
+      for (const [k, v] of Object.entries(value)) {
+        result[k] = this.serializeValue(v, seen);
+      }
+      return result;
+    }
+
+    // Primitives pass through
+    return value;
+  }
+
+  /**
    * Register MCP tools (operations with side effects)
    */
   private registerTools(): void {
@@ -70,7 +109,7 @@ export class MaliceMCPServer {
         const result = {
           _id: raw._id,
           parent: raw.parent,
-          properties: obj.getOwnProperties(),
+          properties: this.serializeValue(obj.getOwnProperties()),
           methods: Object.keys(raw.methods || {}),
           created: raw.created,
           modified: raw.modified,
@@ -125,7 +164,7 @@ export class MaliceMCPServer {
           };
         }
 
-        const value = obj.get(name);
+        const value = this.serializeValue(obj.get(name));
         return {
           content: [{ type: 'text', text: JSON.stringify({ objectId, name, value }, null, 2) }],
         };

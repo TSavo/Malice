@@ -102,7 +102,8 @@ export class GameBootstrap {
     console.log('  ✅ Built Smith Tower and other buildings');
     // Register global building object aliases
     console.log("Registering global building aliases...");
-    const citySign = await this.manager.find(obj => obj.name === "City Announcement Board");
+    const citySigns = await this.manager.findByProperty('name', 'City Announcement Board');
+    const citySign = citySigns[0];
     if (citySign) {
       const objectManager = await this.manager.load(0);
       await objectManager?.call("addAlias", "cityAnnounce", citySign.id);

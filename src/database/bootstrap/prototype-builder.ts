@@ -28,6 +28,8 @@ import {
     BankTerminalBuilder,
     StackableBuilder,
     ElevatorBuilder,
+    DoorBuilder,
+    SignBuilder,
     LockBuilder,
     BiometricLockBuilder,
     RentableLockBuilder,
@@ -89,6 +91,8 @@ export class PrototypeBuilder {
     private stackableBuilder: StackableBuilder;
     private vendableBuilder: VendableBuilder;
     private elevatorBuilder: ElevatorBuilder;
+    private doorBuilder: DoorBuilder;
+    private signBuilder: SignBuilder;
     private lockBuilder: LockBuilder;
     private biometricLockBuilder: BiometricLockBuilder;
     private rentableLockBuilder: RentableLockBuilder;
@@ -130,6 +134,8 @@ export class PrototypeBuilder {
     this.stackableBuilder = new StackableBuilder(manager);
     this.vendableBuilder = new VendableBuilder(manager);
     this.elevatorBuilder = new ElevatorBuilder(manager);
+    this.doorBuilder = new DoorBuilder(manager);
+    this.signBuilder = new SignBuilder(manager);
     this.lockBuilder = new LockBuilder(manager);
     this.biometricLockBuilder = new BiometricLockBuilder(manager);
     this.rentableLockBuilder = new RentableLockBuilder(manager);
@@ -231,10 +237,6 @@ export class PrototypeBuilder {
       ? await this.manager.load(aliases.drink as number)
       : await this.drinkBuilder.build(edible!.id);
 
-    const stomachContents = aliases.stomachContents
-      ? await this.manager.load(aliases.stomachContents as number)
-      : await this.stomachContentsBuilder.build(describable!.id);
-
     // BodyPart inherits from Edible (severed parts can be eaten, decay over time)
     const bodyPart = aliases.bodyPart
       ? await this.manager.load(aliases.bodyPart as number)
@@ -288,14 +290,29 @@ export class PrototypeBuilder {
       ? await this.manager.load(aliases.stackable as number)
       : await this.stackableBuilder.build(describable!.id);
 
+    // StomachContents - digesting food in stomach (inherits from Stackable)
+    const stomachContents = aliases.stomachContents
+      ? await this.manager.load(aliases.stomachContents as number)
+      : await this.stomachContentsBuilder.build(stackable!.id);
+
     const vendable = aliases.vendable
       ? await this.manager.load(aliases.vendable as number)
       : await this.vendableBuilder.build(location!.id);
  
-    // Elevator - vertical transport system (inherits from Location)
+    // Elevator - vertical transport system (inherits from Room for addExit)
     const elevator = aliases.elevator
       ? await this.manager.load(aliases.elevator as number)
-      : await this.elevatorBuilder.build(location!.id);
+      : await this.elevatorBuilder.build(room!.id);
+
+    // Door - shared bidirectional access object (inherits from Describable)
+    const door = aliases.door
+      ? await this.manager.load(aliases.door as number)
+      : await this.doorBuilder.build(describable!.id);
+
+    // Sign - readable, bolted-down object (inherits from Describable)
+    const sign = aliases.sign
+      ? await this.manager.load(aliases.sign as number)
+      : await this.signBuilder.build(describable!.id);
 
     // Phones
     const phone = aliases.phone
@@ -362,6 +379,8 @@ export class PrototypeBuilder {
       stackable: stackable!.id,
       vendable: vendable!.id,
       elevator: elevator!.id,
+      door: door!.id,
+      sign: sign!.id,
       phone: phone!.id,
       wirelessPhone: wirelessPhone!.id,
       payphone: payphone!.id,
@@ -403,6 +422,8 @@ export class PrototypeBuilder {
      stackable: number;
      vendable: number;
      elevator: number;
+     door: number;
+     sign: number;
      phone: number;
      wirelessPhone: number;
      payphone: number;
@@ -445,6 +466,8 @@ export class PrototypeBuilder {
      await objectManager.call('addAlias', 'stackable', ids.stackable);
      await objectManager.call('addAlias', 'vendable', ids.vendable);
      await objectManager.call('addAlias', 'elevator', ids.elevator);
+     await objectManager.call('addAlias', 'door', ids.door);
+     await objectManager.call('addAlias', 'sign', ids.sign);
      await objectManager.call('addAlias', 'phone', ids.phone);
      await objectManager.call('addAlias', 'wirelessPhone', ids.wirelessPhone);
      await objectManager.call('addAlias', 'payphone', ids.payphone);

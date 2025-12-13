@@ -91,6 +91,39 @@ Rooms are locations with spatial coordinates, exits, crowd mechanics, and enviro
 
 ### Key Methods
 
+### Content Management (inherited from $.location)
+
+Rooms inherit content management methods from `$.location`:
+
+#### addContent(objOrId)
+Add an object to this location's contents. Accepts either an object ID (number) or a RuntimeObject.
+
+```javascript
+// By ID
+await room.addContent(itemId);
+
+// By object reference
+await room.addContent(itemObj);
+```
+
+**What it does:**
+- Adds the object's ID to `self.contents` array
+- Sets `obj.location` to this room's ID
+- Calls `onContentArrived(obj)` hook if defined
+
+#### removeContent(objOrId)
+Remove an object from this location's contents. Accepts either an object ID (number) or a RuntimeObject.
+
+```javascript
+// By ID
+await room.removeContent(itemId);
+
+// By object reference
+await room.removeContent(itemObj);
+```
+
+### Display Methods
+
 #### describe(viewer)
 Returns full room description including exits, contents, sittables, crowd/atmosphere.
 

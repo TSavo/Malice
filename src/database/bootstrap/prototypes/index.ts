@@ -52,8 +52,10 @@ export { WirelessPhoneBuilder } from './wireless-phone-builder.js';
 export { PayphoneBuilder } from './payphone-builder.js';
 export { PhoneDbBuilder } from './phone-db-builder.js';
 
-// Elevators and locks
+// Elevators, doors, signs and locks
 export { ElevatorBuilder } from './elevator-builder.js';
+export { DoorBuilder } from './door-builder.js';
+export { SignBuilder } from './sign-builder.js';
 export { LockBuilder } from './lock-builder.js';
 export { BiometricLockBuilder } from './biometric-lock-builder.js';
 export { RentableLockBuilder } from './rentable-lock-builder.js';

@@ -2496,11 +2496,18 @@ await item.moveTo(room, player);
 ### Additional Methods
 
 ```javascript
-// Add object to contents (called by moveTo)
-await container.addContent(objId);
+// Add object to contents - accepts ID or object
+await container.addContent(objId);    // By ID
+await container.addContent(itemObj);  // By object reference
 
-// Remove object from contents (called by moveTo)
-await container.removeContent(objId);
+// What addContent does:
+// - Adds object ID to self.contents array
+// - Sets obj.location = self.id
+// - Calls self.onContentArrived(obj) if defined
+
+// Remove object from contents - accepts ID or object
+await container.removeContent(objId);    // By ID
+await container.removeContent(itemObj);  // By object reference
 
 // Describe location (shows contents)
 const desc = await room.describe(viewer);  // Excludes viewer from "You see:"
