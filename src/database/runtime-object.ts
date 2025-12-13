@@ -78,6 +78,14 @@ export class RuntimeObjectImpl implements RuntimeObject {
       return { type: 'null', value: null };
     }
 
+    // Already a typed Value - return as-is to avoid double-wrapping
+    if (jsValue && typeof jsValue === 'object' && 'type' in jsValue && 'value' in jsValue) {
+      const validTypes = ['null', 'string', 'number', 'boolean', 'objref', 'array', 'object'];
+      if (validTypes.includes(jsValue.type)) {
+        return jsValue;
+      }
+    }
+
     // Handle RuntimeObject (store as objref)
     if (jsValue && typeof jsValue === 'object' && 'id' in jsValue && typeof jsValue.id === 'number') {
       return { type: 'objref', value: jsValue.id };
@@ -428,6 +436,7 @@ export class RuntimeObjectImpl implements RuntimeObject {
     const self = this.proxy;
 
     // Create a Proxy for $ that allows $[42] syntax (returns Promise)
+    // Also delegates unknown properties/methods to ObjectManager #0
     const manager = this.manager;
     const $proxy = new Proxy(manager, {
       get(target, prop) {
@@ -437,8 +446,25 @@ export class RuntimeObjectImpl implements RuntimeObject {
           // Return a Promise - caller must await: const obj = await $[42]
           return target.load(objId);
         }
-        // Otherwise return the manager's own properties/methods
-        return (target as any)[prop];
+        // Check manager's own properties/methods first
+        const managerProp = (target as any)[prop];
+        if (managerProp !== undefined) {
+          return managerProp;
+        }
+        // Delegate unknown properties to ObjectManager #0
+        // This allows $.clearAliasesForObject() to work
+        return async (...args: unknown[]) => {
+          const objectManager = await target.load(0);
+          if (!objectManager) {
+            throw new Error(`$: ObjectManager #0 not found`);
+          }
+          const method = (objectManager as any)[prop];
+          if (typeof method === 'function') {
+            return method.call(objectManager, ...args);
+          }
+          // Not a method, return property value
+          return (objectManager as any)[prop];
+        };
       },
     });
 

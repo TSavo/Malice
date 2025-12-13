@@ -121,30 +121,26 @@ export class RecyclerBuilder {
           }
 
           // Clear all aliases pointing to this object
-          $.clearAliasesForObject(objectId);
-
-          // Evict from cache
-          $.evictFromCache(objectId);
+          await $.clearAliasesForObject(objectId);
 
           // Move to recycle bin (soft delete)
           const bin = self.recycleBin || [];
           bin.push({
             id: objectId,
             deletedAt: new Date(),
-            deletedBy: caller ? caller.id : 0,
-            data: obj.properties
+            deletedBy: caller ? caller.id : 0
           });
           self.recycleBin = bin;
 
-          // Mark as deleted in database
-          await $.db.update(objectId, {
-            $set: {
-              'properties._deleted': true,
-              'properties._deletedAt': new Date()
-            }
-          });
+          // Mark as deleted on the object (persists via proxy)
+          obj.set('_deleted', true);
+          obj.set('_deletedAt', new Date().toISOString());
+
+          // Evict from cache AFTER saving
+          $.evictFromCache(objectId);
 
           console.log(\`Recycled object #\${objectId}\`);
+          return { recycled: objectId };
         `);
 
     this.recycler.setMethod('canRecycle', `
@@ -178,19 +174,22 @@ export class RecyclerBuilder {
             throw new Error('Object not in recycle bin');
           }
 
-          // Restore
-          await $.db.update(objectId, {
-            $unset: {
-              'properties._deleted': '',
-              'properties._deletedAt': ''
-            }
-          });
+          // Load and restore the object
+          const obj = await $.load(objectId);
+          if (!obj) {
+            throw new Error('Object not found in database');
+          }
+
+          // Remove deleted flags
+          obj.set('_deleted', false);
+          obj.set('_deletedAt', null);
 
           // Remove from bin
           bin.splice(index, 1);
           self.recycleBin = bin;
 
           console.log(\`Restored object #\${objectId}\`);
+          return { restored: objectId };
         `);
 
     // Recursively recycle an object and all nested parts (for body trees)
@@ -226,9 +225,10 @@ export class RecyclerBuilder {
             throw new Error('Only wizards can permanently delete objects');
           }
 
+          // Clear aliases pointing to this object
+          await $.clearAliasesForObject(objectId);
 
-          // Clear caches
-          $.clearAliasesForObject(objectId);
+          // Evict from cache
           $.evictFromCache(objectId);
 
           // Delete from database
@@ -243,6 +243,7 @@ export class RecyclerBuilder {
           }
 
           console.log(\`Purged object #\${objectId}\`);
+          return { purged: objectId };
         `);
   }
 
