@@ -2,11 +2,11 @@
 
 export const room = {
   name: '3rd Ave S',
-  description: `The collapsed building's rubble pile is visible to the east, a mountain of brick and concrete that once was a seven-story structure. The collapse happened during the burning—whether from direct strike, fire damage, or just accumulated neglect finally giving way. The rubble has been here long enough that vegetation grows from the pile, hardy shrubs finding purchase in the destruction.
+  description: `Third Avenue dead-ends here at a wall of rubble. The collapsed building's debris has completely buried the road to the south—a two-story mountain of brick, concrete, and twisted steel blocking all passage toward Washington Street. The seven-story structure pancaked during the burning and spread outward, swallowing this entire stretch of Third Avenue.
 
-Third Avenue passes close to the debris field here, the street narrowed by rubble that spilled beyond the building's original footprint. A cleared path keeps the route passable, the debris pushed aside by someone at some point to maintain passage. The maintenance was minimal—just enough to walk through, not enough to call it clean.
+To reach Washington or points south, you'll have to go around via Yesler Way and take 4th Avenue down. The detour adds blocks to any journey, but the alternative is climbing gear and questionable life choices.
 
-The smell of old fire lingers, decades of rain unable to wash away completely the char and ash that permeated the rubble. On hot days, the smell intensifies, released by sun-warmed concrete.`,
+The smell of old fire lingers in the debris, decades of rain unable to wash away completely the char and ash that permeated the rubble. Hardy shrubs have found purchase in the destruction, green life emerging from the grave of the building. Yesler Way lies just ahead to the north, still passable.`,
   x: 7,
   y: 9,
   z: 0,

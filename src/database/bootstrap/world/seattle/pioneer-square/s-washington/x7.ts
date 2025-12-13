@@ -2,11 +2,11 @@
 
 export const room = {
   name: '3rd Ave S & S. Washington St',
-  description: `Third Avenue intersects Washington here at the edge of the Collapsed Building's debris field. The rubble forms an impassable barrier to the east, forcing traffic—when there was traffic—to detour around the destruction. The intersection has become a de facto terminus, Washington Street effectively ending where the building came down.
+  description: `Third Avenue intersects Washington here, but north of this intersection Third Avenue is impassable. The collapsed building's rubble has completely buried the road—a mountain of brick, concrete, and twisted steel two stories high blocking all passage north toward Yesler. The debris field starts just past this corner.
 
-The northwest corner holds a building that survived, its brick facade cracked but intact. PACIFIC NORTHWEST TITLE COMPANY occupies the ground floor, the name etched in the glass transom above the entrance. Title companies handled the paperwork of property ownership, the searches and insurance that made real estate transactions possible. The filing cabinets inside hold the ownership histories of properties throughout King County, the chain of title going back to territorial days.
+Washington Street remains clear east and west, passable all the way to 4th Avenue. To continue north toward Yesler on this side of Pioneer Square, you'll have to detour east to 4th Ave and go around.
 
-A fire hydrant marks the corner, its red paint weathered to something closer to rust. The hydrant is canted slightly, knocked off true by debris that scattered when the building collapsed. Third Avenue stretches north toward the stadiums and south toward the International District, the cross-axis that connects Pioneer Square to the rest of the city.`,
+The northwest corner holds a building that survived, its brick facade cracked but intact. PACIFIC NORTHWEST TITLE COMPANY occupies the ground floor, the name etched in the glass transom above the entrance. A fire hydrant marks the corner, its red paint weathered to rust, knocked off true by debris that scattered when the building came down. South from here, Third Avenue remains passable toward the International District.`,
   x: 7,
   y: 6,
   z: 0,
