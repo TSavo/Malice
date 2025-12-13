@@ -2,13 +2,13 @@
 
 export const room = {
   name: '4th Ave S',
-  description: `A Buddhist temple occupies a converted storefront here, its modest facade giving no hint of the sanctuary within. Through the window, a golden Buddha statue is visible, still seated in meditation, still radiating calm into an empty room. Incense ash covers the altar. The offerings of oranges have mummified.
+  description: `Fourth Avenue marks Pioneer Square's eastern boundary here. To the east, the International District is visible but unreachable—the fallen Chinatown Gate and subsequent building collapses have blocked all passage. The debris wall runs continuously, an impassable barrier of brick, timber, and concrete.
 
-Next door, a Vietnamese sandwich shop displays its menu board, the bánh mì combinations still listed with their prices. The bread went stale months ago. The pickled vegetables fermented past edibility. The menu remains, a catalog of lunches that will never be eaten.
+A Buddhist temple occupies a converted storefront on the west side, its modest facade giving no hint of the sanctuary within. Through the window, a golden Buddha statue is visible, still seated in meditation, still radiating calm into an empty room. Incense ash covers the altar. The offerings of oranges have mummified.
 
-A newspaper box stands on the corner, still holding copies of the International Examiner, the community paper that served the district for decades. The headline announces something that mattered then. The paper is free now. No one takes it.
+A newspaper box stands on the corner, still holding copies of the International Examiner. The headline announces something that mattered then. The paper is free now. No one takes it.
 
-Jackson Street is visible to the south, the heart of the district.`,
+Jackson Street intersection is visible to the south. North and south along Fourth Avenue remain passable. East is a wall.`,
   x: 14,
   y: -5,
   z: 0,

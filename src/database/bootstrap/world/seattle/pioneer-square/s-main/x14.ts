@@ -2,11 +2,13 @@
 
 export const room = {
   name: '4th Ave S & S. Main St',
-  description: `Fourth Avenue and Main Street cross here at the gateway to the International District—the corner where Pioneer Square's Victorian brick gives way to Chinatown's particular blend of mid-century storefronts and cultural signifiers. The transition is marked by a traditional Chinese gate spanning the street to the east, red-painted timber with curved eaves and guardian lions, built in 2008 to announce WELCOME TO CHINATOWN-INTERNATIONAL DISTRICT in English and Chinese. The gate was always somewhat theatrical, a civic gesture toward authenticity. The theater continues. The audience is elsewhere.
+  description: `Fourth Avenue and Main Street cross here at what was once the gateway to the International District. The traditional Chinese gate that spanned the street lies collapsed across Main, red-painted timber shattered, curved eaves crushed flat, the guardian lions toppled and cracked. The gate fell during the chaos and no one has moved the debris. Main Street ends here in a wall of wreckage.
 
-The International District/Chinatown Station entrance descends into the earth at the corner, one of the Link Light Rail stops that connected this neighborhood to the airport and Capitol Hill and destinations that now feel impossibly distant. The escalators are frozen mid-step, their treads dusty, their handrails motionless. Below ground level: platforms where trains stopped every seven minutes during rush hour, tunnels that continue north toward Westlake and south toward the stadiums. The trains are down there somewhere, stopped wherever they stopped when the stopping happened. The platforms wait in darkness. The schedules posted on the walls are accurate only in the sense that they document a system that once existed.
+The International District/Chinatown Station entrance descends into the earth at the corner, one of the Link Light Rail stops that connected this neighborhood to the airport and Capitol Hill. The escalators are frozen mid-step, their treads dusty. Below ground level: platforms where trains stopped every seven minutes during rush hour, tunnels that continue into darkness. The trains are down there somewhere. The platforms wait in silence.
 
-This is where Main Street ends and the International District begins—different neighborhood, different history, different architecture, same silence. The paifang gate frames a view down the street, storefronts with signs in Chinese and Vietnamese, a heritage that outlasted the people who carried it. Pioneer Square is behind you now. Whatever's ahead is something else.`,
+Beyond the fallen gate, you can see the International District's empty storefronts—signs in Chinese and Vietnamese, a heritage that outlasted the people who carried it. But there's no way through. The gate's collapse brought down part of the building behind it, creating an impassable barricade of brick and timber.
+
+This is as far east as you can go on Main Street.`,
   x: 14,
   y: 0,
   z: 0,

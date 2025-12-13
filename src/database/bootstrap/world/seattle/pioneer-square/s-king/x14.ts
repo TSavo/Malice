@@ -2,11 +2,13 @@
 
 export const room = {
   name: '4th Ave S & S. King St',
-  description: `Fourth Avenue intersects S. King Street at the southeastern corner of Pioneer Square's grid. The Chinatown Gate is visible to the east, its traditional pagoda-style arch spanning the street—red columns faded to rust-pink, curved eaves weathered, the golden characters declaring welcome in Chinese to no one who can read them. The gate was built in the 1970s to announce the community's presence and attract visitors. The community is scattered. The visitors stopped coming fifty-five years ago.
+  description: `Fourth Avenue intersects S. King Street at the southeastern corner of Pioneer Square's grid—and the end of the line going east. The Chinatown Gate that once spanned King Street lies in ruins, its traditional pagoda-style arch collapsed across the road. Red columns splintered, curved eaves crushed flat, golden characters that declared welcome now half-buried in rubble. The gate was built in the 1970s to announce the community's presence. Now it blocks the way in.
 
-EAST WEST BANK occupies the corner building, its windows dark, its vault presumably still sealed. The bank's signage appears in English, Chinese, and Vietnamese—the multilingual communication fading but legible. Banks like this one processed remittances that immigrant families sent home, maintained savings that financed small businesses. The remittances stopped. The savings are meaningless numbers in computers that no longer run. Home, for most of these families, no longer exists.
+Beyond the fallen gate, King Street is impassable. Debris from the collapse and subsequent damage to adjacent buildings has created a solid wall of wreckage. The International District lies somewhere beyond, but you can't get there from here.
 
-The intersection provides views in multiple directions: north toward Pioneer Square's historic decay, west toward the silent stadiums, east into the International District's empty commercial heart. Fourth Avenue continues north from here, the transit corridor connecting nothing to nothing.`,
+EAST WEST BANK occupies the corner building, its windows dark, its vault presumably still sealed. The bank's signage appears in English, Chinese, and Vietnamese—the multilingual communication fading but legible.
+
+Fourth Avenue continues north from here. King Street continues west. East is a dead end.`,
   x: 14,
   y: -12,
   z: 0,

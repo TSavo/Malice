@@ -2,13 +2,13 @@
 
 export const room = {
   name: '4th Ave S',
-  description: `The International District proper begins here, the boundary with Pioneer Square now behind. The architecture shifts, the brick warehouses giving way to smaller buildings with ornate facades and bilingual signage. The style is different but the emptiness is the same.
+  description: `Fourth Avenue marks Pioneer Square's eastern edge. The International District lies beyond—its buildings visible, its bilingual signage still legible—but unreachable. The fallen Chinatown Gate and subsequent structural collapses have created an impassable debris wall blocking all eastward passage.
 
-A dumpling house sits on the corner, its hand-painted sign promising the best xiaolongbao in Seattle. The kitchen is dark. The steamers are cold. The soup inside the dumplings evaporated long ago, leaving behind dried husks of what was once sublime.
+Through gaps in the rubble, you can see a dumpling house with a hand-painted sign promising the best xiaolongbao in Seattle. The kitchen is dark. The steamers are cold. You can't get there from here.
 
-A community bulletin board stands on the sidewalk, still covered with flyers for events that never happened. ESL classes. Citizenship workshops. Lunar New Year celebrations. The paper has yellowed. The thumbtacks are rusting. The community has dispersed.
+A community bulletin board stands on the sidewalk, still covered with flyers for events that never happened. ESL classes. Citizenship workshops. Lunar New Year celebrations. The paper has yellowed. The thumbtacks are rusting.
 
-A red mailbox stands at the curb, its collection times still posted. The mail stopped. The box remains, waiting for letters that will never come.`,
+Fourth Avenue continues north toward Washington Street and south toward Main. East is blocked.`,
   x: 14,
   y: 1,
   z: 0,

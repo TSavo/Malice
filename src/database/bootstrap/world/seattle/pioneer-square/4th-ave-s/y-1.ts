@@ -2,11 +2,11 @@
 
 export const room = {
   name: '4th Ave S',
-  description: `Main Street is visible to the north, the intersection where Fourth Avenue crosses one of Pioneer Square's primary east-west axes. The Chinatown Gate stands at that intersection—or stood, before it fell across the road during the burning, blocking the route to downtown. The gate's remains are visible from here, carved stone and painted wood collapsed into rubble.
+  description: `Main Street intersection is visible to the north, where the collapsed Chinatown Gate blocks all eastward passage. The gate's remains—carved stone and painted wood—lie in a heap across the road. To the east, the International District is visible but unreachable, blocked by the debris wall that runs the length of Fourth Avenue.
 
-The blocked intersection funnels traffic away from this stretch of Fourth Avenue, making it quieter than the parallel routes. The quiet has a weight to it, the absence of sound as present as sound itself. Even footsteps seem muffled here.
+Fourth Avenue is Pioneer Square's eastern boundary, the last passable north-south route. The blocked eastward streets funnel all traffic along this corridor, though "traffic" is too generous a word for the handful of scavengers who still move through.
 
-Buildings on both sides show the mixed heritage of the transitional zone—Victorian brick next to 1950s concrete, Chinese signage next to English, the jumbled timeline of a city that was always building over itself.`,
+Buildings on the west side show Victorian brick and warehouse architecture. The east side is rubble and the impassable barrier that separates Pioneer Square from everything beyond.`,
   x: 14,
   y: -1,
   z: 0,
