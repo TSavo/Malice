@@ -2,13 +2,13 @@
 
 export const room = {
   name: '4th Ave S',
-  description: `The southern edge of the Condemned Block ends here, its fence turning west toward the interior of Pioneer Square. Whatever contaminated that area, the boundary is clear. On one side, decay. On the other, merely abandonment. There's a difference, though it's hard to articulate.
+  description: `Fourth Avenue runs along Pioneer Square's eastern edge here, the last passable north-south route before the debris wall. To the east, the International District's buildings are visible but unreachable—the fallen Chinatown Gate's collapse triggered a chain of structural failures that blocked all eastward streets. The wall of rubble is continuous and impassable.
 
-A convenience store occupies the corner, its windows boarded but its door intact. Someone has been inside recently—the boards over the door can be moved. Whether they found anything worth taking is unknown. Convenience stores were picked clean early.
+The southern edge of the Condemned Block ends nearby to the northwest, its fence marking the toxic zone. Whatever contaminated that area, the boundary is clear. On one side, toxic decay. On the other, merely abandonment.
 
-The International District continues to the east, its character shifting as it approaches the industrial areas near the stadiums. The stadiums are visible in the distance, their massive forms unchanged, their purpose obsolete.
+A convenience store occupies the corner, its windows boarded but its door intact. Someone has been inside recently—the boards can be moved. Convenience stores were picked clean early.
 
-S. King Street is visible to the south, marking the edge of Pioneer Square's grid.`,
+S. King Street intersection is visible to the south. Fourth Avenue continues north and south. East is a dead end.`,
   x: 14,
   y: -11,
   z: 0,

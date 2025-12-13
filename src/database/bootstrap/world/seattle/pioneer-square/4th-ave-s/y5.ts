@@ -2,11 +2,11 @@
 
 export const room = {
   name: '4th Ave S',
-  description: `Fourth Avenue climbs slightly here as it approaches Washington Street, following the natural grade of the land. The incline is barely perceptible—a few degrees at most—but legs feel what eyes miss. This was a hillside once, before streets were graded and buildings were built. The hill remembers, even if the city forgot.
+  description: `Fourth Avenue runs along Pioneer Square's eastern edge here, the boundary between the historic district and the International District—or what's left of it. The fallen Chinatown Gate has blocked all eastward passage since the burning, its debris and the subsequent building collapses creating an impassable wall that runs the length of this block.
 
-The collapsed building to the west dominates the view, its rubble pile rising higher than some of the intact structures nearby. The collapse created a permanent landmark, a monument to failure that everyone navigates around. The rubble has stabilized over the decades, no longer shifting, the physics of destruction having reached equilibrium.
+The collapsed building to the west also dominates the view, its rubble pile rising higher than some of the intact structures nearby. Between the two disaster zones, Fourth Avenue remains passable north-south, a corridor between destruction.
 
-The eastern side of the avenue shows life—or at least the infrastructure of life. A building has been partially cleared of debris, its lower floor swept, its windows patched with whatever materials were available. Someone is trying here.`,
+The avenue itself shows signs that someone has tried to maintain it—debris pushed to the sides, the worst obstacles cleared. The effort is minimal but consistent. Someone still uses this route.`,
   x: 14,
   y: 5,
   z: 0,
