@@ -283,8 +283,51 @@ export class BuildingBuilder {
           continue;
         }
 
-        const destRoom = resolvePlaceholder(destPlaceholder);
+        let destRoom = resolvePlaceholder(destPlaceholder);
         if (!destRoom) {
+          // Defer cross-floor exits - placeholder might exist on a later floor
+          if (destPlaceholder.startsWith('%')) {
+            postProcessors.push(async () => {
+              const deferredDest = sharedPlaceholders.get(destPlaceholder);
+              if (!deferredDest) {
+                console.warn(`    Warning: Room ${placeholder} exit ${direction} references unknown room ${destPlaceholder}`);
+                return;
+              }
+
+              const aliases = this.getDirectionAliases(direction);
+              const distance = exitProps.distance || this.calculateDistance(
+                (sourceRoom.get('x') as number) || 0, (sourceRoom.get('y') as number) || 0, (sourceRoom.get('z') as number) || 0,
+                (deferredDest.get('x') as number) || 0, (deferredDest.get('y') as number) || 0, (deferredDest.get('z') as number) || 0
+              );
+
+              const doorResolved = typeof exitProps.door === 'string' && exitProps.door.startsWith('%')
+                ? sharedPlaceholders.get(exitProps.door) : exitProps.door;
+              const locksResolved = Array.isArray(exitProps.locks)
+                ? exitProps.locks.map((l: string) => l.startsWith('%') ? sharedPlaceholders.get(l) : l).filter(Boolean)
+                : undefined;
+
+              const exit = await recycler.create({
+                parent: exitProto.id,
+                properties: {
+                  name: direction,
+                  aliases: aliases,
+                  destRoom: deferredDest,
+                  distance: distance,
+                  hidden: exitProps.hidden ?? false,
+                  locked: exitProps.locked ?? false,
+                  lockKey: exitProps.lockKey ?? null,
+                  door: doorResolved || undefined,
+                  locks: locksResolved || [],
+                  code: exitProps.code ?? undefined,
+                },
+              });
+
+              const exits = (sourceRoom.get('exits') as number[]) || [];
+              exits.push(exit.id);
+              sourceRoom.set('exits', exits);
+            });
+            continue;
+          }
           console.warn(`    Warning: Room ${placeholder} exit ${direction} references unknown room ${destPlaceholder}`);
           continue;
         }
