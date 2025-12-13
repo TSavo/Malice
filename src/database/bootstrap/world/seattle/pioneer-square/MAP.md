@@ -121,7 +121,7 @@ Street ─ sidewalk ─ Building (3 tall) ─ sidewalk ─ Street
 
 | Name | X Range | Y Range | Door Location | Notes |
 |------|---------|---------|---------------|-------|
-| Smith Tower | -13 to -10 | +9 to +11 | N: (-12, +11), W: (-13, +10) | 38 floors, historic landmark |
+| Smith Tower | -13 to -10 | +9 to +11 | N: (-12, +12), W: (-14, +10) | 38 floors, historic landmark |
 | Pioneer Building | +1 to +4 | +8 to +10 | (+5, +9) | 6 floors, offices |
 | Grand Central | -13 to -10 | +2 to +4 | (-9, +2) | 4 floors, arcade |
 | Corp Construction | 0 to +6 | +1 to +4 | (+6, +1) | Unknown, armed guards, blocks 2nd Ave |

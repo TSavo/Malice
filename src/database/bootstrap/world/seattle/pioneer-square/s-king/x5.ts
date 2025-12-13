@@ -6,7 +6,7 @@ export const room = {
 
 GOLDEN GATE BAKERY occupies a ground-floor space, its display cases empty and dark. The Chinese bakery specialized in pastries that dim sum restaurants served and families purchased for special occasions. The window display shows only dust now—no pineapple buns, no egg tarts, no barbecue pork buns. The glass shelving that showcased the day's production holds nothing. The ovens in back are cold. The last day's production was fifty-five years ago.
 
-A wedding photo studio occupies the second floor, HAPPY DAY PHOTOGRAPHY according to faded window signage. The studio specialized in the elaborate portrait sessions that Asian weddings traditionally include. Sample portraits still hang in the window—couples in elaborate gowns and suits, posed against backgrounds that promised prosperity. The photos have faded in the sun, the happy couples reduced to ghosts. The marriages they celebrated are over now, one way or another.`,
+A wedding photo studio occupies the second floor, HAPPY DAY PHOTOGRAPHY according to faded window signage. The studio specialized in the elaborate portrait sessions that Asian weddings traditionally include. Sample portraits still hang in the window—couples in elaborate gowns and suits, posed against backgrounds that promised prosperity. The photos have faded in the sun, the happy couples reduced to ghosts. The marriages they celebrated are over now, one way or another. The stadium district to the south is sealed off—rubble and collapsed infrastructure blocking all passage in that direction.`,
   x: 5,
   y: -12,
   z: 0,

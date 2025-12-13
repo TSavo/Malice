@@ -2,11 +2,11 @@
 
 export const room = {
   name: 'Occidental Ave S & S. King St',
-  description: `Occidental Avenue intersects S. King Street at the southern terminus of the pedestrian mall, cracked cobblestones ending where asphalt begins. King Street Station is visible to the east, its clock tower—modeled on the campanile of St. Mark's Basilica in Venice—rising above surrounding buildings. The clock stopped at some point in the last fifty-five years. No one has reset it. The station served Amtrak's Cascades corridor and Sounder commuter trains. The trains stopped running when the fuel ran out.
+  description: `Occidental Avenue intersects S. King Street at the southern terminus of the pedestrian mall—and the southern edge of Pioneer Square. Beyond this point, passage south is blocked. Collapsed infrastructure and debris from the stadium district have created an impassable barricade across all southbound routes.
 
-The streetscape transitions here: the intimate scale of Occidental's pedestrian mall giving way to broader streets that stadium traffic once required. The infrastructure shows competing demands that no longer compete—historic preservation and contemporary function both suspended in abandonment.
+King Street Station is visible to the east, its clock tower—modeled on the campanile of St. Mark's Basilica—rising above surrounding buildings. The clock stopped at some point in the last fifty-five years. The station served Amtrak and Sounder commuter trains. The trains stopped when the fuel ran out. The station is still there, but you can't reach it from this direction.
 
-The buildings at this corner bridge two districts: older structures adapted to serve stadium crowds that scattered decades ago. The ground floors are dark. The restaurants and shops closed when the customers stopped coming.`,
+The streetscape transitions here: Occidental's cracked cobblestones ending where asphalt and rubble begin. North leads back into Pioneer Square. East and west along King Street remain passable. South is a wall.`,
   x: -7,
   y: -12,
   z: 0,

@@ -6,7 +6,7 @@ export const room = {
 
 The PIONEER BUILDING anchors the corner ahead, six stories of red brick and terra cotta that somehow survived when so much else didn't. Elmer Fisher designed it after the Great Fire of 1889, and it outlasted another catastrophe. The Romanesque arches frame ground-floor retail spaces that have been dark for generations. A corner turret rises above the main facade, its decorative stonework stained with decades of rain and neglect.
 
-The buildings along the north side of the street look down at the park with dark windows and blank facades. They've seen what happened here. They're not saying.`,
+The buildings along the north side of the street look down at the park with dark windows and blank facades. They've seen what happened here. They're not saying. Beyond them to the north, collapsed structures and debris form an impassable barrier—downtown Seattle sealed off by the destruction.`,
   x: -5,
   y: 12,
   z: 0,

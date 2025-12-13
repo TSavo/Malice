@@ -6,7 +6,7 @@ export const room = {
 
 ZEITGEIST COFFEE occupies the corner, its windows dark, its espresso machines cold. Through the grimy glass: exposed brick walls, industrial lighting fixtures hanging dead from their cords. The morning crowds that once filled the outdoor tables are fifty-five years gone. The tables themselves were scavenged long ago.
 
-Beneath the street, the original city lies entombed—the ground floors that became basements when Seattle raised its streets after the Great Fire. The Underground Tour departed from nearby once, guiding tourists through buried passages. The passages are still down there, darker now, the tours long ended. A city built atop itself, layers of abandonment all the way down.`,
+Beneath the street, the original city lies entombed—the ground floors that became basements when Seattle raised its streets after the Great Fire. The Underground Tour departed from nearby once, guiding tourists through buried passages. The passages are still down there, darker now, the tours long ended. A city built atop itself, layers of abandonment all the way down. North is blocked—the debris wall that isolates Pioneer Square from downtown visible at the end of every northward sightline.`,
   x: -4,
   y: 12,
   z: 0,

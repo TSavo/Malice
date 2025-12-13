@@ -6,7 +6,7 @@ export const room = {
 
 A Metro bus stop marks this location, its shelter yellowed and cracked, its bench weathered grey. Route maps are still posted behind scratched plexiglass, showing connections to destinations that exist only in memory. The buses stopped running when the fuel ran out. The infrastructure remains, waiting for transit that will never come.
 
-The ground-floor retail along this stretch is shuttered and dark: a nail salon, a convenience store, small businesses that served local foot traffic. The foot traffic ended. The businesses closed. The buildings are mixed construction—early twentieth-century brick beside mid-century renovation—all of it empty now, the accumulated development of a neighborhood that grew incrementally and died all at once.`,
+The ground-floor retail along this stretch is shuttered and dark: a nail salon, a convenience store, small businesses that served local foot traffic. The foot traffic ended. The businesses closed. The buildings are mixed construction—early twentieth-century brick beside mid-century renovation—all of it empty now, the accumulated development of a neighborhood that grew incrementally and died all at once. North leads only to rubble—the debris wall that separates Pioneer Square from downtown blocking all passage in that direction.`,
   x: -20,
   y: 12,
   z: 0,

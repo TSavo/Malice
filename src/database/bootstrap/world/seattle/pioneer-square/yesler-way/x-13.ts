@@ -6,7 +6,7 @@ export const room = {
 
 PIONEER BOOKS occupies a corner space, an independent bookstore that served the neighborhood's literary community. Through the window: floor-to-ceiling shelves still packed with books—paperback fiction, academic volumes, philosophy and architecture. Looters don't take books. The inventory remains, organized by subject and author, appreciated by no one. The knowledge inside is patient. It can wait.
 
-A vacant lot opens across the street, chain-link fence surrounding the foundation of a building that was demolished before the war. A sign on the fence displays architectural renderings of the mixed-use development that was planned for the site—standard imagery of urban development marketing, promises of luxury units and ground-floor retail. The development never happened. The sign keeps promising.`,
+A vacant lot opens across the street, chain-link fence surrounding the foundation of a building that was demolished before the war. A sign on the fence displays architectural renderings of the mixed-use development that was planned for the site—standard imagery of urban development marketing, promises of luxury units and ground-floor retail. The development never happened. The sign keeps promising. North leads to rubble—the debris wall that separates Pioneer Square from downtown visible beyond every northward alley.`,
   x: -13,
   y: 12,
   z: 0,

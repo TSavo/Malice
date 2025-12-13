@@ -6,7 +6,7 @@ export const room = {
 
 The light rail tunnel entrance is visible ahead, or what remains of it. The tunnel collapsed during the burning, its structural supports failing, the ground above subsiding into a flooded crater. The collapse blocked one of the main routes between Pioneer Square and the districts to the north. The blockage became permanent when no one came to repair it.
 
-The street surface buckles and heaves where it approaches the crater's edge, the pavement cracked by the subsidence, tilting toward the water that fills the depression. The tilt is subtle but noticeable, a wrongness in the geometry that feet register before eyes.`,
+The street surface buckles and heaves where it approaches the crater's edge, the pavement cracked by the subsidence, tilting toward the water that fills the depression. The tilt is subtle but noticeable, a wrongness in the geometry that feet register before eyes. The sinkhole and debris beyond block all northward passage—Pioneer Square sealed off from downtown by the destruction.`,
   x: 6,
   y: 12,
   z: 0,

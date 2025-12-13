@@ -6,7 +6,7 @@ export const room = {
 
 A bronze statue stands at the plaza's center, a figure in work clothes holding a lunch pail. The plaque identifies him as representing "the workers who built Seattle." The workers are gone. The statue remains, lunch pail in hand, waiting for a shift that ended fifty-five years ago. Pigeons have claimed his shoulders and head, leaving white streaks down the bronze.
 
-A construction site dominates the south side, its fencing rusted, its black fabric torn and flapping. Through the gaps: crane arms reaching toward grey sky, the skeleton of a building that was never completed. Steel beams and concrete cores and nothing else. The project died mid-birth, another monument to interrupted ambitions.`,
+A construction site dominates the south side, its fencing rusted, its black fabric torn and flapping. Through the gaps: crane arms reaching toward grey sky, the skeleton of a building that was never completed. Steel beams and concrete cores and nothing else. The project died mid-birth, another monument to interrupted ambitions. North leads only to rubble—the debris wall that separates Pioneer Square from downtown rising across every northward route.`,
   x: 8,
   y: 12,
   z: 0,

@@ -6,7 +6,7 @@ export const room = {
 
 A Vietnamese restaurant occupies a ground-floor space, its awning faded and torn, still advertising pho and banh mi. Through the grimy window: the open kitchen layout that noodle shops favor, steam tables rusted, prep stations bare. The restaurant represented the culinary culture of this neighborhood's eastern edge. The food smells are gone now—garlic and ginger and frying oil replaced by dust and decay.
 
-Fourth Avenue is visible ahead. The ornate Chinatown gate stands a few blocks south, its dragons watching the empty street with faded eyes. The gate marked the boundary between communities. Boundaries mean less now.`,
+Fourth Avenue is visible ahead. The ornate Chinatown gate stands a few blocks south, its dragons watching the empty street with faded eyes. The gate marked the boundary between communities. Boundaries mean less now. North is blocked—the debris wall that isolates Pioneer Square from downtown sealing off all passage in that direction.`,
   x: 12,
   y: 12,
   z: 0,

@@ -6,7 +6,7 @@ export const room = {
 
 RALLY HOUSE occupies a retail space at this corner, its windows still displaying merchandise that sports fandom once generated: Mariners green and navy faded by sun, Seahawks blue and green dusty behind glass. The inventory arranged by team and sport commemorates allegiances that no longer matter. The teams are gone. The fans are scattered. The merchandise waits to be purchased by no one.
 
-The security infrastructure of the stadium complex is visible from here: fencing defining venue perimeters, turnstile arrays at entrance gates rusted shut, camera housings pointing at nothing. The surveillance evolved after 9/11. It didn't evolve for what came after the war.`,
+The security infrastructure of the stadium complex is visible beyond the debris that blocks all passage south. Fencing, turnstiles, camera housings—all still there, but sealed off by collapsed overpasses and accumulated wreckage. The stadium district is visible but unreachable. King Street is Pioneer Square's southern edge.`,
   x: -3,
   y: -12,
   z: 0,

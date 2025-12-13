@@ -6,7 +6,7 @@ export const room = {
 
 JADE HAPPINESS JEWELRY occupies a ground-floor retail space, its security gate pulled down and rusted shut. The jade pieces that Chinese communities traditionally valued are likely still inside—looters in the aftermath took electronics and food, not cultural artifacts. Through gaps in the gate: display cases dusty but intact, bangles and Buddha pendants and zodiac charms waiting behind glass. The protection and prosperity the stones promised protected and prospered nothing.
 
-A lantern shop shares the building, CHINATOWN LANTERNS according to faded signage. The store supplied paper lanterns for festival celebrations—red spheres for Lunar New Year, illuminated shapes for Moon Festival. Through the grimy window: lanterns of various sizes still suspended from the ceiling, faded and dusty, awaiting celebrations that will never come. The rhythm the International District once had is fifty-five years silent.`,
+A lantern shop shares the building, CHINATOWN LANTERNS according to faded signage. The store supplied paper lanterns for festival celebrations—red spheres for Lunar New Year, illuminated shapes for Moon Festival. Through the grimy window: lanterns of various sizes still suspended from the ceiling, faded and dusty, awaiting celebrations that will never come. The rhythm the International District once had is fifty-five years silent. South is impassable—the stadium district sealed behind walls of rubble and collapsed infrastructure.`,
   x: 12,
   y: -12,
   z: 0,

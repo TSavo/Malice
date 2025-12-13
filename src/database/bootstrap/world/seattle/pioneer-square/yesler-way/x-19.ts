@@ -6,7 +6,7 @@ export const room = {
 
 YESLER FURNITURE occupies the ground floor of a three-story building, its display window still showing the inventory: a dining set arranged as if in use, thick with dust, the staging that furniture stores employed to help customers envision pieces in their own homes. The customers stopped coming. The furniture remains, waiting for a household that will never claim it.
 
-The building opposite houses apartments on its upper floors, accessed through a street-level entrance that hangs open on broken hinges. The structure is early twentieth-century construction, solid brick that has outlasted its occupants. Fire escapes climb the exterior, iron platforms rusted brown, ladders missing rungs. The emergency egress leads to rooftops that no one occupies.`,
+The building opposite houses apartments on its upper floors, accessed through a street-level entrance that hangs open on broken hinges. The structure is early twentieth-century construction, solid brick that has outlasted its occupants. Fire escapes climb the exterior, iron platforms rusted brown, ladders missing rungs. The emergency egress leads to rooftops that no one occupies. North is blocked—collapsed structures and accumulated debris sealing off downtown, the barrier that defines Pioneer Square's northern edge.`,
   x: -19,
   y: 12,
   z: 0,

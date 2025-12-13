@@ -6,7 +6,7 @@ export const room = {
 
 The buildings along this stretch are industrial—concrete-block construction, windows broken or boarded. PIONEER BUILDING MATERIALS, faded signage reads, the kind of business that served the construction industry before construction stopped. The inventory is probably still inside. Building materials don't spoil. They just wait.
 
-The viaduct's former alignment is legible in the landscape: the spacing between buildings, the abandoned foundations where support columns once stood, vacant lots surrounded by chain-link fence that's rusted through in places. The investment never came. The real estate market died with everything else.`,
+The viaduct's former alignment is legible in the landscape: the spacing between buildings, the abandoned foundations where support columns once stood, vacant lots surrounded by chain-link fence that's rusted through in places. The investment never came. The real estate market died with everything else. To the south, the stadium district looms beyond a wall of rubble and collapsed overpasses—visible but completely inaccessible from here.`,
   x: -18,
   y: -12,
   z: 0,

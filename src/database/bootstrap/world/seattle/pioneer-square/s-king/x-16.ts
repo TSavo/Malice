@@ -6,7 +6,7 @@ export const room = {
 
 THE SHIPYARD TAVERN occupies a corner building, a dive bar that served waterfront workers who needed somewhere to drink after shift. Through the grimy window: pool tables visible in the dim interior, a long bar backed by bottles no one has poured from in decades. The neon beer signs are dark, their tubes dead. The building shows its age—original wood paneling, tin ceiling tiles that early twentieth-century construction favored, all of it covered in dust.
 
-The buildings along this stretch date to the 1920s and 1930s, brick facades replacing corrugated metal as Pioneer Square's southern boundary transitioned from pure industrial to commercial. The commercial development stopped. The bricks remain.`,
+The buildings along this stretch date to the 1920s and 1930s, brick facades replacing corrugated metal as Pioneer Square's southern boundary transitioned from pure industrial to commercial. The commercial development stopped. The bricks remain. Beyond King Street to the south, the stadium district is cut off by debris and collapsed overpasses—the sports complexes tantalizingly visible but unreachable.`,
   x: -16,
   y: -12,
   z: 0,

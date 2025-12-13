@@ -6,7 +6,7 @@ export const room = {
 
 A small urban park occupies the south side, more hardscape than landscape. The trees are dead, their bare branches stark against grey sky. The concrete benches remain, the drinking fountain dry and cracked. The park was a minimal amenity when it was built. It's less than that now.
 
-Fourth Avenue approaches, the boundary between Pioneer Square and the International District. The neighborhoods blur together in their emptiness—brick facades and Chinese characters and red lanterns all equally abandoned.`,
+Fourth Avenue approaches, the boundary between Pioneer Square and the International District. The neighborhoods blur together in their emptiness—brick facades and Chinese characters and red lanterns all equally abandoned. North of here, collapsed structures and debris form an impassable barrier—downtown Seattle sealed off by the destruction.`,
   x: 11,
   y: 12,
   z: 0,

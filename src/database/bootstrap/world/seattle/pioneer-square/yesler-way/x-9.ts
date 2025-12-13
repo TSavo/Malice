@@ -6,7 +6,7 @@ export const room = {
 
 YESLER LAUNDRY occupies a ground-floor space, a coin-operated laundromat that served the neighborhood's residential population. Through the grimy window: rows of front-loading washers and stacked dryers stand silent, their doors hanging open. The machines haven't run in fifty-five years. The last loads were never retrieved. Someone's clothes are still in there, rotted to fiber and stain.
 
-The buildings along this stretch maintain the scale that historic preservation required: brick facades, decorative cornices, the architectural vocabulary established after the Great Fire. The preservation stopped mattering when everyone left. The buildings stand anyway, too solid to fall on their own.`,
+The buildings along this stretch maintain the scale that historic preservation required: brick facades, decorative cornices, the architectural vocabulary established after the Great Fire. The preservation stopped mattering when everyone left. The buildings stand anyway, too solid to fall on their own. North of here, collapsed structures and debris form an impassable barrier—downtown Seattle sealed off beyond the destruction.`,
   x: -9,
   y: 12,
   z: 0,

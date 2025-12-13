@@ -6,7 +6,7 @@ export const room = {
 
 The intersection itself is a knot of angles, streets meeting at corners that seem wrong to eyes trained on ninety degrees. Buildings on the corners adapted, their facades angled to face both grids, their floor plans compromising between orientations. The compromises are visible in the architecture.
 
-The Pioneer Building rises to the east, its Romanesque bulk anchoring the intersection. The building was designed to be a landmark, visible from both grids, claiming the junction as its own. The claim was successful. The building still dominates views from every approach.`,
+The Pioneer Building rises to the east, its Romanesque bulk anchoring the intersection. The building was designed to be a landmark, visible from both grids, claiming the junction as its own. The claim was successful. The building still dominates views from every approach. North is blocked—the debris wall that isolates Pioneer Square from downtown sealing off all passage in that direction.`,
   x: -1,
   y: 12,
   z: 0,

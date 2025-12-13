@@ -6,7 +6,7 @@ export const room = {
 
 A surface parking lot takes up the north side, surrounded by chain link fence topped with razor wire that someone added after the war. The razor wire is thorough. Whatever was worth protecting here is long gone. Weeds have cracked the asphalt into islands, each hosting its own ecosystem of dead grass and debris.
 
-The Pioneer Building's fire escapes descend the rear facade in geometric zigzags, rusted solid in some places, collapsed entirely in others. The structure has stood since 1892. It will probably stand for another century. The people who built it understood permanence.`,
+The Pioneer Building's fire escapes descend the rear facade in geometric zigzags, rusted solid in some places, collapsed entirely in others. The structure has stood since 1892. It will probably stand for another century. The people who built it understood permanence. North of here, collapsed structures and debris form an impassable barrier—the destruction that sealed Pioneer Square off from downtown.`,
   x: -2,
   y: 12,
   z: 0,

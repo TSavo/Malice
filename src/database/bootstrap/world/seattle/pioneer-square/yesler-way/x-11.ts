@@ -6,7 +6,7 @@ export const room = {
 
 Through the cracked glass entry doors: a modest lobby with a reception desk, the layout that single-room-occupancy hotels maintain. The buildings provided housing for workers who needed central locations—maritime workers, railroad men, the transient labor force that port cities attracted. The workers are gone. The transience has become permanent. The rooms above are dark, their occupants long departed through doors they never meant to leave open.
 
-Occidental Park is visible ahead, dead maple trees rising above the surrounding rooflines like grave markers. The park's pergola creates a crooked silhouette against grey sky.`,
+Occidental Park is visible ahead, dead maple trees rising above the surrounding rooflines like grave markers. The park's pergola creates a crooked silhouette against grey sky. Beyond the park to the north, the debris wall rises—collapsed buildings sealing off downtown, the destruction that defines Pioneer Square's northern boundary.`,
   x: -11,
   y: 12,
   z: 0,

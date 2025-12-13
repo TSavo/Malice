@@ -6,7 +6,7 @@ export const room = {
 
 The streetscape shows the infrastructure of transit-oriented development that no longer orients toward transit: wide sidewalks accommodating no pedestrian flow, street furniture rusted and tilted. A utility cabinet on the corner has accumulated decades of stickers and graffiti, the surfaces serving as impromptu bulletin boards for announcements no one reads.
 
-The buildings flanking the station entrance represent different eras: early twentieth-century brick beside contemporary mixed-use construction. The ground-floor retail designed to capture transit traffic captures nothing. The traffic stopped. The retail closed. The buildings wait for customers who will never arrive.`,
+The buildings flanking the station entrance represent different eras: early twentieth-century brick beside contemporary mixed-use construction. The ground-floor retail designed to capture transit traffic captures nothing. The traffic stopped. The retail closed. The buildings wait for customers who will never arrive. South is blocked—debris and collapsed infrastructure sealing off passage toward the stadiums.`,
   x: -4,
   y: -12,
   z: 0,

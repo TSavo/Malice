@@ -6,7 +6,7 @@ export const room = {
 
 HOME PLATE BAR & GRILL occupies the ground floor of a building designed to capture game-day traffic. Through grimy windows: walls still covered with memorabilia from franchise history, jerseys and photographs faded behind dust-covered glass. The television screens are dark. The infrastructure of communal sports watching serves no community.
 
-The streetscape shows the stadium district's design priorities: wide sidewalks for crowd movement that no longer occurs, decorative paving cracked and heaved. The buildings along this block are newer construction, their architecture coordinated with stadium development that transformed this area in the 1990s. The transformation is frozen in place, a monument to entertainment that ended.`,
+The streetscape shows the stadium district's design priorities: wide sidewalks for crowd movement that no longer occurs, decorative paving cracked and heaved. The buildings along this block are newer construction, their architecture coordinated with stadium development that transformed this area in the 1990s. The transformation is frozen in place, a monument to entertainment that ended. The stadium is visible but unreachable—collapsed overpasses and debris blocking all southbound routes.`,
   x: -13,
   y: -12,
   z: 0,

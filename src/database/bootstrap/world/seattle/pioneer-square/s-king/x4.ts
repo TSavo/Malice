@@ -6,7 +6,7 @@ export const room = {
 
 The pharmacy's dual inventory reflected the community's approach to health—antibiotics beside herbal formulations, blood pressure medications beside roots and bark. The wooden drawers that line one wall still hold their labels, the dried ingredients long since taken or spoiled. The formulas refined over centuries required ingredients that no longer arrive from anywhere.
 
-The building's brick facade shows a century of weathering plus fifty-five years of abandonment. The corner location that once provided valuable visibility now provides visibility of nothing. A painted sign on the wall advertises services in Chinese and English, the bilingual communication fading but still legible. The services ended. The sign remains.`,
+The building's brick facade shows a century of weathering plus fifty-five years of abandonment. The corner location that once provided valuable visibility now provides visibility of nothing. A painted sign on the wall advertises services in Chinese and English, the bilingual communication fading but still legible. The services ended. The sign remains. South is impassable—collapsed overpasses and accumulated debris blocking all routes toward the stadium district.`,
   x: 4,
   y: -12,
   z: 0,

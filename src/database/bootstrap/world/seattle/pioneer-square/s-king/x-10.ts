@@ -6,7 +6,7 @@ export const room = {
 
 SEAHAWKS PRO SHOP occupies a corner retail space, its windows still displaying inventory: Action Green and College Navy arranged on mannequins faded by decades of sun. The jerseys commemorate players no one remembers. The fan base that supported Pacific Northwest football scattered or died or forgot that football ever mattered.
 
-A bronze statue stands outside the shop, a player captured mid-motion, frozen in a pose that sports sculpture favors. The statue commemorates a franchise legend. The plaque on the base bears career statistics—touchdowns, yards, the numerical achievements that justified commemoration when numbers meant something. The statue watches an empty street, waiting for crowds that will never come.`,
+A bronze statue stands outside the shop, a player captured mid-motion, frozen in a pose that sports sculpture favors. The statue watches the rubble that blocks passage south—collapsed overpasses and debris sealing off the stadium district. Lumen Field is visible beyond the barricade, tantalizingly close, absolutely unreachable.`,
   x: -10,
   y: -12,
   z: 0,

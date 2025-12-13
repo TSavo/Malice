@@ -7,7 +7,7 @@ export const room = {
 
 The street grid shifts at this intersection, a quirk of Seattle's founding visible in the misaligned blocks. North of Yesler Way, nothing quite lines up with what's south—two survey teams, two ideas of true north, a disagreement encoded in concrete and asphalt for two centuries and counting.
 
-The corner buildings lean into each other slightly, the settling of foundations over decades creating a subtle tilt that's easier to feel than see. Four and five stories of brick and terra cotta, their facades stained with rain and time. The intersection sits at what used to be a boundary. Boundaries mean less now than they did.`,
+The corner buildings lean into each other slightly, the settling of foundations over decades creating a subtle tilt that's easier to feel than see. Four and five stories of brick and terra cotta, their facades stained with rain and time. The intersection sits at what used to be a boundary. Boundaries mean less now than they did. North is impassable—collapsed buildings and debris sealing off downtown, the destruction that made Yesler Way Pioneer Square's northern edge.`,
   x: 0,
   y: 12,
   z: 0,

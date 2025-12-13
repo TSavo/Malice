@@ -6,7 +6,7 @@ export const room = {
 
 PIONEER PAWN & LOAN occupies the corner, the three golden balls above the door tarnished green with age. The security-barred windows still display their inventory—guitars, tools, electronics—fifty-five years of dust coating everything. The proprietor kept his inventory right up until the end. The inventory remains, worth nothing now.
 
-A dive bar occupies the opposite corner, its blacked-out windows and minimal signage unchanged from before the war. The neon sign just says "BAR"—no name, no pretense. The sign is dark now, the neon tubes dead, but the door stands slightly ajar, revealing only darkness within. Whatever song was playing on the jukebox when everything ended, it finished long ago.`,
+A dive bar occupies the opposite corner, its blacked-out windows and minimal signage unchanged from before the war. The neon sign just says "BAR"—no name, no pretense. The sign is dark now, the neon tubes dead, but the door stands slightly ajar, revealing only darkness within. Whatever song was playing on the jukebox when everything ended, it finished long ago. North is blocked—the debris wall that isolates Pioneer Square from downtown visible at the end of every northward sightline.`,
   x: 5,
   y: 12,
   z: 0,

@@ -6,7 +6,7 @@ export const room = {
 
 PYRAMID ALEHOUSE occupies the corner building, one of Seattle's craft breweries that established taprooms to capture event-day traffic. Through grimy windows: the fermentation tanks still standing, copper tarnished green, the serving bar backed by tap handles that pour nothing. The brewing equipment visible through large windows was meant to be production as performance. The performance ended. The equipment remains.
 
-The buildings at this corner represent the stadium district's architectural character: newer construction designed to serve event-day crowds that no longer exist. The scale is larger than Pioneer Square proper, the facades less ornate, the ground floors configured for high-volume hospitality that has been reduced to silence.`,
+The buildings at this corner represent the stadium district's architectural character: newer construction designed to serve event-day crowds that no longer exist. The scale is larger than Pioneer Square proper, the facades less ornate, the ground floors configured for high-volume hospitality that has been reduced to silence. The stadiums loom to the south, tantalizingly close, but collapsed infrastructure blocks all passage in that direction.`,
   x: -9,
   y: -12,
   z: 0,

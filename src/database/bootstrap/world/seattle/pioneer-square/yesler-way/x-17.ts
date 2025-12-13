@@ -6,7 +6,7 @@ export const room = {
 
 The buildings flanking the alley are four stories of brick and cast iron, their facades showing the ornamental detail that survived when so much else didn't. Carved stone faces peer down from the cornices—gargoyles and grotesques softened by a century of weathering, their features rounded by freeze-thaw cycles and acid rain. They've watched the city empty. They don't seem surprised.
 
-Smith Tower is visible ahead, its white terra cotta facade stained grey but still rising above the surrounding rooflines. The tower has dominated Pioneer Square's skyline since 1914. It continues to dominate, even now. A fire hydrant marks the corner, its yellow paint faded to something paler, the municipal infrastructure that no one maintains anymore.`,
+Smith Tower is visible ahead, its white terra cotta facade stained grey but still rising above the surrounding rooflines. The tower has dominated Pioneer Square's skyline since 1914. It continues to dominate, even now. A fire hydrant marks the corner, its yellow paint faded to something paler, the municipal infrastructure that no one maintains anymore. North is impassable—the debris wall that isolates Pioneer Square from downtown visible at the end of every northward sightline.`,
   x: -17,
   y: 12,
   z: 0,

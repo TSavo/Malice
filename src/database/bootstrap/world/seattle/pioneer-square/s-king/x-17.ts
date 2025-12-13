@@ -6,7 +6,7 @@ export const room = {
 
 The loading docks face the street, roll-up doors rusted shut. Safety signage still marks the work zones: HARD HAT AREA, FORKLIFT TRAFFIC. OSHA doesn't require anything anymore. The hard hats are probably still hanging on their hooks.
 
-SEATTLE PRECISION MACHINING occupies the building opposite, the kind of facility that fabricated custom parts for the industries the waterfront supported. The precision is frozen in place now—lathes and mills waiting for operators who'll never return, the patient machines holding their last calibrations.`,
+SEATTLE PRECISION MACHINING occupies the building opposite, the kind of facility that fabricated custom parts for the industries the waterfront supported. The precision is frozen in place now—lathes and mills waiting for operators who'll never return, the patient machines holding their last calibrations. South is impassable—the stadium district sealed off by collapsed infrastructure that blocks every southbound route along King Street.`,
   x: -17,
   y: -12,
   z: 0,

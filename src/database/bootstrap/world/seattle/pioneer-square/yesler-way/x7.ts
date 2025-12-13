@@ -9,7 +9,7 @@ The KING COUNTY ADMINISTRATION BUILDING occupies the northeast corner, its glass
 
 The southwest corner is wrapped in chain link and black fabric, a construction site that never finished. The fencing has held for fifty-five years, though the fabric is torn now, flapping in the wind, revealing glimpses of rebar and poured concrete foundations that never received their buildings. The cranes are gone. The workers are gone. The development died mid-birth.
 
-Third Avenue had a reputation before the war. It still does, though the nature of the trouble has changed.`,
+Third Avenue had a reputation before the war. It still does, though the nature of the trouble has changed. North is impassable—collapsed buildings and debris sealing off downtown, the destruction that made Yesler Way Pioneer Square's northern boundary.`,
   x: 7,
   y: 12,
   z: 0,
