@@ -227,6 +227,8 @@ export class BuildingBuilder {
 
       placeholderToRoom.set(placeholder, room);
       sharedPlaceholders.set(placeholder, room);
+      // Register globally for cross-building/world exit resolution
+      this.allPlaceholders.set(placeholder, room);
     }
 
     const resolvePlaceholder = (ph: string): RuntimeObject | undefined => {
@@ -557,6 +559,24 @@ export class BuildingBuilder {
         targetCoords.z
       );
 
+      // Resolve locks if specified (locks are placeholders like '%LOCK_NAME')
+      let resolvedLocks: number[] = [];
+      if (Array.isArray(exitProps.locks)) {
+        for (const lockRef of exitProps.locks) {
+          if (typeof lockRef === 'string' && lockRef.startsWith('%')) {
+            // Find the lock object by searching all buildings' shared placeholders
+            const lockObj = await this.findPlaceholderObject(lockRef);
+            if (lockObj) {
+              resolvedLocks.push(lockObj.id);
+            } else {
+              console.warn(`    Warning: Lock placeholder ${lockRef} not found for exit ${direction}`);
+            }
+          } else if (typeof lockRef === 'number') {
+            resolvedLocks.push(lockRef);
+          }
+        }
+      }
+
       // Create exit from building room to world room
       const exitToWorld = await recycler.create({
         parent: exitProto.id,
@@ -567,6 +587,7 @@ export class BuildingBuilder {
           distance: distance,
           hidden: exitProps.hidden ?? false,
           locked: exitProps.locked ?? false,
+          locks: resolvedLocks,
           description: description,
         },
       });
@@ -574,6 +595,7 @@ export class BuildingBuilder {
       await sourceRoom.call('addExit', exitToWorld);
 
       // Create reverse exit from world room back to building room
+      // Note: locks apply to both directions (same door)
       const reverseDirection = this.getOppositeDirection(direction);
       const exitToBuilding = await recycler.create({
         parent: exitProto.id,
@@ -584,6 +606,7 @@ export class BuildingBuilder {
           distance: distance,
           hidden: exitProps.hidden ?? false,
           locked: exitProps.locked ?? false,
+          locks: resolvedLocks,
           description: description ? description.replace(/lead[s]? (\w+) to/, `lead $1 into`) : undefined,
         },
       });
@@ -678,5 +701,24 @@ export class BuildingBuilder {
    */
   getBuildings(): Map<string, Map<string, RuntimeObject>> {
     return this.buildings;
+  }
+
+  /**
+   * Track all placeholder objects across buildings for cross-reference
+   */
+  private allPlaceholders: Map<string, RuntimeObject> = new Map();
+
+  /**
+   * Find a placeholder object by name across all buildings
+   */
+  private async findPlaceholderObject(placeholder: string): Promise<RuntimeObject | null> {
+    return this.allPlaceholders.get(placeholder) || null;
+  }
+
+  /**
+   * Register a placeholder for cross-building lookup
+   */
+  registerPlaceholder(placeholder: string, obj: RuntimeObject): void {
+    this.allPlaceholders.set(placeholder, obj);
   }
 }

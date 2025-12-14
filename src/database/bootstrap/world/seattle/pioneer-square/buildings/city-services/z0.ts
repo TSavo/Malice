@@ -24,6 +24,16 @@ export const building = {
       authorizedUsers: {},
     },
 
+    '%ALLEY_LOCK': {
+      prototype: 'biometricLock',
+      name: 'Rear Exit Scanner',
+      description: 'A fingerprint scanner beside a steel door, its surface grimy from years of use.',
+      scanners: [
+        { type: 'fingerprint', part: 'hand', message: 'Staff access only.' },
+      ],
+      authorizedUsers: {},
+    },
+
     // ═══════════════════════════════════════════════════════════════════
     // ELEVATOR
     // ═══════════════════════════════════════════════════════════════════
@@ -168,6 +178,7 @@ The room smells of industrial cleaner layered over older, more organic odors. Sa
       exits: {
         north: '%LOBBY',
         east: { room: '%INCINERATOR_BAY', locks: ['%INCINERATOR_LOCK'] },
+        west: { to: 'alley/y8.ts', locks: ['%ALLEY_LOCK'], description: 'A steel door leads to the alley' },
       },
     },
 

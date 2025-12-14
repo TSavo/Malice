@@ -34,6 +34,16 @@ export const building = {
       authorizedUsers: {},
     },
 
+    '%ALLEY_LOCK': {
+      prototype: 'biometricLock',
+      name: 'Back Exit Scanner',
+      description: 'A palm scanner beside a fire door, its paint chipped and peeling.',
+      scanners: [
+        { type: 'palm', part: 'hand', message: 'Staff access only.' },
+      ],
+      authorizedUsers: {},
+    },
+
     // ═══════════════════════════════════════════════════════════════════
     // GROUND FLOOR (z=0)
     // ═══════════════════════════════════════════════════════════════════
@@ -127,6 +137,7 @@ The room smells of old coffee and mildew. Whatever authority once operated from 
       exits: {
         south: '%SERVICES',
         up: { room: '%ROOF_NW', locks: ['%HATCH_LOCK'] },
+        west: { to: 'alley/y11.ts', locks: ['%ALLEY_LOCK'], description: 'A fire door leads to the alley' },
       },
     },
   },
