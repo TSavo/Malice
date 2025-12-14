@@ -544,6 +544,21 @@ export class CharGenBuilder {
       }
       await player.tell('');
 
+      // Set starting location - Immigration Services Entry Hall
+      // This is the default spawn point for new characters
+      const startingRoomId = $.charGen.startingRoom || 1353; // Immigration Services Entry Hall
+      const startingRoom = await $.load(startingRoomId);
+      if (startingRoom) {
+        player.set('location', startingRoomId);
+
+        // Add player to room contents
+        const contents = startingRoom.contents || [];
+        if (!contents.includes(player.id)) {
+          contents.push(player.id);
+          startingRoom.set('contents', contents);
+        }
+      }
+
       // Connect player to the game
       await player.connect(player._context);
     `);

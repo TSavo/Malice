@@ -1832,8 +1832,8 @@ export class MaliceMCPServer {
 
           if (match && match.handler && match.verbInfo) {
             // Execute the verb - pass null for context (no connection)
-            const result = await match.handler.call(
-              'callVerb',
+            // callVerb is a native RuntimeObject method, not a MOO method
+            const result = await match.handler.callVerb(
               match.verbInfo.method,
               null,       // context (null for AI)
               human,      // player/agent

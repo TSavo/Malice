@@ -34,12 +34,30 @@ export class RecyclerBuilder {
       methods: {},
     });
 
+    // Supports two calling conventions:
+    // 1. create({ parent: id, properties: {...} }, caller?) - new format
+    // 2. create(parentId, { name: ..., ... }, caller?) - legacy format
     this.recycler.setMethod('create', `
-          const params = args[0];
-          const caller = args[1]; // Optional - can be null for system-created objects
+          const arg0 = args[0];
+          const arg1 = args[1];
 
-          // Validate parameters
-          if (!params || typeof params !== 'object') {
+          let params;
+          let caller = null;
+
+          // Support two calling conventions
+          if (arg0 && typeof arg0 === 'object' && arg0.parent !== undefined) {
+            // New format: single params object
+            params = arg0;
+            caller = arg1;
+          } else if (arg0 !== undefined && arg1 && typeof arg1 === 'object') {
+            // Legacy format: parent as first arg, properties as second
+            const parentId = typeof arg0 === 'object' ? arg0.id : arg0;
+            params = {
+              parent: parentId,
+              properties: arg1,
+            };
+            caller = args[2];
+          } else {
             throw new Error('Invalid create parameters');
           }
 
@@ -56,12 +74,10 @@ export class RecyclerBuilder {
             const isWizard = caller.get('isWizard');
             const canBuild = caller.get('canBuild');
 
-
             if (!isWizard && !canBuild) {
               throw new Error('Permission denied: You do not have build privileges');
             }
           }
-
 
           // Set ownership if caller provided
           if (!params.properties) {
@@ -83,7 +99,6 @@ export class RecyclerBuilder {
 
           // Create the object through ObjectManager
           const newObject = await $.create(params);
-
 
           // Call onCreate hook if it exists
           if (newObject.hasMethod && newObject.hasMethod('onCreate')) {

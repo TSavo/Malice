@@ -307,6 +307,11 @@ export class AiBuilder {
       // Set body owner to the human
       body.set('owner', human.id);
 
+      // Initialize verbs so the AI can speak, look, etc.
+      if (human.initVerbs) {
+        await human.initVerbs();
+      }
+
       // Register in AI registry
       await self.register(human.id, role, {
         spawnedAt: new Date().toISOString(),

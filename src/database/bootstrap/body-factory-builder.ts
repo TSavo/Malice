@@ -37,6 +37,7 @@ export class BodyFactoryBuilder {
     });
 
     // Helper method to create a single body part
+    // Uses legacy recycler.create(parent, properties) format
     this.bodyFactory.setMethod('createPart', `
       const parentProto = args[0];
       const name = args[1];
@@ -46,22 +47,21 @@ export class BodyFactoryBuilder {
       const part = await $.recycler.create(parentProto, {
         name: name,
         description: 'A ' + name.toLowerCase(),
-          owner: ownerId,
-          parts: {},
-          bones: options.bones || [],
-          coverable: options.coverable ?? false,
-          removable: options.removable ?? false,
-          critical: options.critical ?? false,
-          aliases: options.aliases || [],
-          // Stats - set if specified in options
-          strength: options.strength,
-          dexterity: options.dexterity,
-          perception: options.perception,
-          iq: options.iq,
-          // Calories - for energy/endurance system
-          calories: options.calories,
-          maxCalories: options.maxCalories,
-        },
+        owner: ownerId,
+        parts: {},
+        bones: options.bones || [],
+        coverable: options.coverable ?? false,
+        removable: options.removable ?? false,
+        critical: options.critical ?? false,
+        aliases: options.aliases || [],
+        // Stats - set if specified in options
+        strength: options.strength,
+        dexterity: options.dexterity,
+        perception: options.perception,
+        iq: options.iq,
+        // Calories - for energy/endurance system
+        calories: options.calories,
+        maxCalories: options.maxCalories,
       });
       return part;
     `);
