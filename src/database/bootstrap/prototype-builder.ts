@@ -38,6 +38,8 @@ import {
     PhoneDbBuilder,
     VendableBuilder,
     PayphoneBuilder,
+    DisposalBuilder,
+    IncineratorBuilder,
   } from './prototypes/index.js';
 
 
@@ -100,6 +102,8 @@ export class PrototypeBuilder {
     private wirelessPhoneBuilder: WirelessPhoneBuilder;
     private payphoneBuilder: PayphoneBuilder;
     private phoneDbBuilder: PhoneDbBuilder;
+    private disposalBuilder: DisposalBuilder;
+    private incineratorBuilder: IncineratorBuilder;
 
 
    constructor(private manager: ObjectManager) {
@@ -143,6 +147,8 @@ export class PrototypeBuilder {
     this.wirelessPhoneBuilder = new WirelessPhoneBuilder(manager);
     this.payphoneBuilder = new PayphoneBuilder(manager);
     this.phoneDbBuilder = new PhoneDbBuilder(manager);
+    this.disposalBuilder = new DisposalBuilder(manager);
+    this.incineratorBuilder = new IncineratorBuilder(manager);
   }
 
 
@@ -345,7 +351,17 @@ export class PrototypeBuilder {
      const rentableLock = aliases.rentableLock
        ? await this.manager.load(aliases.rentableLock as number)
        : await this.rentableLockBuilder.build(lock!.id);
- 
+
+    // Disposal - base class for item destruction (inherits from Describable)
+    const disposal = aliases.disposal
+      ? await this.manager.load(aliases.disposal as number)
+      : await this.disposalBuilder.build(describable!.id);
+
+    // Incinerator - burns items (inherits from Disposal)
+    const incinerator = aliases.incinerator
+      ? await this.manager.load(aliases.incinerator as number)
+      : await this.incineratorBuilder.build(disposal!.id);
+
      // Register aliases in root.properties.aliases
      await this.registerAliases({
 
@@ -388,6 +404,8 @@ export class PrototypeBuilder {
       lock: lock!.id,
       biometricLock: biometricLock!.id,
       rentableLock: rentableLock!.id,
+      disposal: disposal!.id,
+      incinerator: incinerator!.id,
     });
   }
  
@@ -431,6 +449,8 @@ export class PrototypeBuilder {
      lock: number;
      biometricLock: number;
      rentableLock: number;
+     disposal: number;
+     incinerator: number;
    }): Promise<void> {
 
 
@@ -475,7 +495,9 @@ export class PrototypeBuilder {
      await objectManager.call('addAlias', 'lock', ids.lock);
      await objectManager.call('addAlias', 'biometricLock', ids.biometricLock);
      await objectManager.call('addAlias', 'rentableLock', ids.rentableLock);
- 
+     await objectManager.call('addAlias', 'disposal', ids.disposal);
+     await objectManager.call('addAlias', 'incinerator', ids.incinerator);
+
      // Store bodyParts object directly (addAlias only supports simple id values)
 
     const aliases = (objectManager.get('aliases') as Record<string, number | Record<string, number>>) || {};
