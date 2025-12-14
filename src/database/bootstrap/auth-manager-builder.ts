@@ -145,9 +145,11 @@ Login: `,
             }
 
             // Hand off to CharGen
-            const chargen = (await $).charGen;
+            const chargen = $.charGen;
             if (chargen) {
               await chargen.onNewUser(context, state.username, password);
+            } else {
+              context.send('Character creation system not available.\\r\\n');
             }
           }
         `);
