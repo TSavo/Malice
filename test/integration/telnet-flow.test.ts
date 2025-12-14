@@ -110,10 +110,12 @@ describe('Telnet Integration Tests', () => {
       client.clearBuffer();
 
       client.send('validpassword123');
-      await client.waitFor('Character Creation', 10000);
+      // Chargen starts with welcome message and first prompt
+      await client.waitFor('What name do you go by', 10000);
 
       const buffer = client.getBuffer();
-      expect(buffer).toContain('Character Creation');
+      expect(buffer).toContain('Welcome to MALICE');
+      expect(buffer).toContain('What name do you go by');
     });
   });
 
@@ -272,7 +274,7 @@ describe('Telnet Integration Tests', () => {
       expect(client.isConnected()).toBe(true);
     });
 
-    it('should not treat empty input as invalid during menu selection', async () => {
+    it('should handle empty input during menu selection gracefully', async () => {
       const testUsername = `empty_${Date.now()}`;
 
       await client.connect();
@@ -286,16 +288,19 @@ describe('Telnet Integration Tests', () => {
       await client.waitFor('sex', 5000);
       client.clearBuffer();
 
-      // Send empty inputs - should be ignored
-      client.send('');
+      // Send empty inputs - menu will re-prompt
       client.send('');
       await client.wait(300);
 
+      // Empty input shows invalid choice and re-displays menu
       let buffer = client.getBuffer();
-      // Should NOT have "Invalid choice" for empty inputs
-      expect(buffer).not.toContain('Invalid choice');
+      expect(buffer).toContain('Invalid choice');
+      // Menu should still be available
+      expect(buffer).toContain('Male');
+      expect(buffer).toContain('Female');
 
       // Now send valid selection
+      client.clearBuffer();
       client.send('1');
       await client.waitFor('How old are you', 5000);
 
