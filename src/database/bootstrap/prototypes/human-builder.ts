@@ -452,6 +452,197 @@ export class HumanBuilder {
       };
     `);
 
+    // Initialize basic verbs for AI-controlled humans
+    // Players get verbs in connect(), but AI humans need them set up explicitly
+    obj.setMethod('initVerbs', `
+      /** Initialize basic communication and interaction verbs for AI-controlled humans.
+       *  Call this after spawning an AI human so they can speak, emote, look, etc.
+       */
+      // Communication verbs
+      await self.registerVerb(['say %s', '"%s', "'" + "%s"], self, 'say');
+      await self.registerVerb(['emote %s', ':%s'], self, 'emote');
+
+      // Looking verbs
+      await self.registerVerb(['look', 'l'], self, 'look');
+      await self.registerVerb(['look %i', 'look at %i', 'l %i', 'examine %i', 'ex %i'], self, 'lookAt');
+
+      // Movement verbs - will be added by room when AI enters
+      // Pickup/drop verbs
+      await self.registerVerb(['get %i', 'take %i', 'pick up %i', 'grab %i'], self, 'get');
+      await self.registerVerb(['drop %i', 'put down %i', 'release %i'], self, 'drop');
+
+      // If we have a location, trigger onArrived to register room verbs
+      if (self.location && self.location !== 0) {
+        const location = await $.load(self.location);
+        if (location && self.onArrived) {
+          await self.onArrived(location, null, null);
+        }
+      }
+
+      return true;
+    `);
+
+    // Say method for AI humans (players have this in player-builder)
+    obj.setMethod('say', `
+      /** Say something out loud.
+       *  Usage: say <message>
+       *  Speaks to everyone in the current room.
+       */
+      const message = args[0]; // First captured %s from verb pattern
+
+      if (!message || !message.trim()) {
+        return 'Say what?';
+      }
+
+      // Get current location
+      const location = self.location ? await $.load(self.location) : null;
+      if (!location) {
+        return 'You have nowhere to speak.';
+      }
+
+      // Announce to room
+      const announcement = self.name + ' says, "' + message.trim() + '"';
+      if (location.announce) {
+        await location.announce(announcement, self);
+      }
+
+      return 'You say, "' + message.trim() + '"';
+    `);
+
+    // Emote method for AI humans
+    obj.setMethod('emote', `
+      /** Perform an emote/action.
+       *  Usage: emote <action>, :<action>
+       *  Shows your character performing an action.
+       */
+      const action = args[0]; // First captured %s from verb pattern
+
+      if (!action || !action.trim()) {
+        return 'Emote what?';
+      }
+
+      // Get current location
+      const location = self.location ? await $.load(self.location) : null;
+      if (!location) {
+        return;
+      }
+
+      // Announce to room (including self)
+      const announcement = self.name + ' ' + action.trim();
+      if (location.announce) {
+        await location.announce(announcement); // Don't exclude self for emotes
+      }
+    `);
+
+    // Look method for AI humans
+    obj.setMethod('look', `
+      /** Look at the current room.
+       *  Usage: look, l
+       *  Describes your surroundings.
+       */
+      const location = self.location ? await $.load(self.location) : null;
+      if (!location) {
+        return 'You are in a void.';
+      }
+
+      const desc = await location.describe(self);
+      return desc;
+    `);
+
+    // Look at specific item/person
+    obj.setMethod('lookAt', `
+      /** Look at something specific.
+       *  Usage: look <target>, examine <target>
+       */
+      const target = args[0]; // Resolved item from %i
+
+      if (!target) {
+        return 'Look at what?';
+      }
+
+      if (target.describe) {
+        return await target.describe(self);
+      }
+
+      return target.description || 'You see nothing special.';
+    `);
+
+    // Get method for AI humans
+    obj.setMethod('get', `
+      /** Pick up an item.
+       *  Usage: get <item>, take <item>
+       */
+      const item = args[0]; // Resolved item from %i
+
+      if (!item) {
+        return 'Get what?';
+      }
+
+      // Check if bolted down
+      if (item.boltedDown) {
+        return 'That is firmly attached and cannot be moved.';
+      }
+
+      // Simple pickup - add to inventory
+      const inventory = self.inventory || [];
+      inventory.push(item.id);
+      self.inventory = inventory;
+
+      // Update item location
+      item.set('location', self.id);
+
+      // Announce to room
+      const location = self.location ? await $.load(self.location) : null;
+      if (location && location.announce) {
+        await location.announce(self.name + ' picks up ' + item.name + '.', self);
+      }
+
+      return 'You pick up ' + item.name + '.';
+    `);
+
+    // Drop method for AI humans
+    obj.setMethod('drop', `
+      /** Drop an item.
+       *  Usage: drop <item>
+       */
+      const item = args[0]; // Resolved item from %i
+
+      if (!item) {
+        return 'Drop what?';
+      }
+
+      // Check if we have it
+      const inventory = self.inventory || [];
+      const idx = inventory.indexOf(item.id);
+      if (idx === -1) {
+        return 'You are not carrying ' + item.name + '.';
+      }
+
+      // Remove from inventory
+      inventory.splice(idx, 1);
+      self.inventory = inventory;
+
+      // Move to current location
+      const location = self.location ? await $.load(self.location) : null;
+      if (location) {
+        item.set('location', location.id);
+
+        // Add to room contents
+        const contents = location.contents || [];
+        if (!contents.includes(item.id)) {
+          contents.push(item.id);
+          location.set('contents', contents);
+        }
+
+        // Announce
+        if (location.announce) {
+          await location.announce(self.name + ' drops ' + item.name + '.', self);
+        }
+      }
+
+      return 'You drop ' + item.name + '.';
+    `);
+
     return obj;
   }
 }
