@@ -60,5 +60,9 @@ export { LockBuilder } from './lock-builder.js';
 export { BiometricLockBuilder } from './biometric-lock-builder.js';
 export { RentableLockBuilder } from './rentable-lock-builder.js';
 
+// Disposal systems
+export { DisposalBuilder } from './disposal-builder.js';
+export { IncineratorBuilder } from './incinerator-builder.js';
+
 // Appearance
 export * from './appearance-constants.js';
