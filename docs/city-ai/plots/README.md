@@ -6,6 +6,7 @@ Standard plots for common situations.
 
 ### Onboarding
 - [first-rations.md](first-rations.md) - First job: grants citizenship, collect rations from dispensary
+- [supply-delivery.md](supply-delivery.md) - Second job: pick up package from Supply Depot, deliver to destination
 
 ### Infrastructure
 - *(pipe-repair.md)* - Water main repair (coming soon)
