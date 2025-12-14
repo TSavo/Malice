@@ -669,6 +669,15 @@ plot.unregisterJobHook(jobId, targetId, eventName)
    └── Plot ready for next phase or closure
 ```
 
+## Plot Templates
+
+Reference implementations for common situations are in the [plots/](plots/) directory:
+
+- [first-rations.md](plots/first-rations.md) - Onboarding: grants citizenship, first job collecting rations
+- [supply-delivery.md](plots/supply-delivery.md) - Second job: pick up package, deliver to destination
+
+These templates show complete implementations with hooks, phases, and handler responses. Adapt them to specific circumstances.
+
 ## Remember
 
 Plots are stories. They unfold over time. They involve characters. They have beginnings, middles, and ends.
