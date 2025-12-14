@@ -2477,6 +2477,196 @@ export class MaliceMCPServer {
       }
     );
 
+    // ═══════════════════════════════════════════════════════════════════
+    // NOTES TOOLS
+    // ═══════════════════════════════════════════════════════════════════
+
+    // Get notes for an object
+    this.server.tool(
+      'get_notes',
+      'Get all notes attached to a MOO object.',
+      {
+        objectId: z.number().describe('Object ID to get notes for'),
+      },
+      async ({ objectId }) => {
+        const notes = await this.getAlias('notes');
+        if (!notes) {
+          return {
+            content: [{ type: 'text', text: 'Notes system not available' }],
+            isError: true,
+          };
+        }
+
+        try {
+          const result = await notes.call('get', objectId);
+          return {
+            content: [{ type: 'text', text: JSON.stringify({ objectId, count: result.length, notes: result }, null, 2) }],
+          };
+        } catch (err) {
+          return {
+            content: [{ type: 'text', text: `Error getting notes: ${err instanceof Error ? err.message : String(err)}` }],
+            isError: true,
+          };
+        }
+      }
+    );
+
+    // Add a note to an object
+    this.server.tool(
+      'add_note',
+      'Add a note to a MOO object.',
+      {
+        objectId: z.number().describe('Object ID to attach note to'),
+        text: z.string().describe('Note text content'),
+        author: z.string().optional().describe('Author name (default: "mcp")'),
+        tags: z.array(z.string()).optional().describe('Optional tags for categorization'),
+      },
+      async ({ objectId, text, author, tags }) => {
+        const notes = await this.getAlias('notes');
+        if (!notes) {
+          return {
+            content: [{ type: 'text', text: 'Notes system not available' }],
+            isError: true,
+          };
+        }
+
+        try {
+          const result = await notes.call('add', objectId, text, author || 'mcp', tags || []);
+          if (result.success) {
+            return {
+              content: [{ type: 'text', text: `Note added to #${objectId} (index ${result.index})` }],
+            };
+          } else {
+            return {
+              content: [{ type: 'text', text: `Error: ${result.error}` }],
+              isError: true,
+            };
+          }
+        } catch (err) {
+          return {
+            content: [{ type: 'text', text: `Error adding note: ${err instanceof Error ? err.message : String(err)}` }],
+            isError: true,
+          };
+        }
+      }
+    );
+
+    // Delete a note from an object
+    this.server.tool(
+      'delete_note',
+      'Delete a note from a MOO object by index.',
+      {
+        objectId: z.number().describe('Object ID'),
+        index: z.number().describe('Note index to delete'),
+      },
+      async ({ objectId, index }) => {
+        const notes = await this.getAlias('notes');
+        if (!notes) {
+          return {
+            content: [{ type: 'text', text: 'Notes system not available' }],
+            isError: true,
+          };
+        }
+
+        try {
+          const result = await notes.call('delete', objectId, index);
+          if (result.success) {
+            return {
+              content: [{ type: 'text', text: `Note ${index} deleted from #${objectId}` }],
+            };
+          } else {
+            return {
+              content: [{ type: 'text', text: `Error: ${result.error}` }],
+              isError: true,
+            };
+          }
+        } catch (err) {
+          return {
+            content: [{ type: 'text', text: `Error deleting note: ${err instanceof Error ? err.message : String(err)}` }],
+            isError: true,
+          };
+        }
+      }
+    );
+
+    // Search notes across all objects
+    this.server.tool(
+      'search_notes',
+      'Search notes across all objects by text or tag.',
+      {
+        query: z.string().optional().describe('Text to search for (empty for all)'),
+        tag: z.string().optional().describe('Filter by tag'),
+        author: z.string().optional().describe('Filter by author'),
+        limit: z.number().optional().describe('Max results (default 50)'),
+      },
+      async ({ query, tag, author, limit }) => {
+        const notes = await this.getAlias('notes');
+        if (!notes) {
+          return {
+            content: [{ type: 'text', text: 'Notes system not available' }],
+            isError: true,
+          };
+        }
+
+        try {
+          const options: Record<string, unknown> = {};
+          if (tag) options.tag = tag;
+          if (author) options.author = author;
+          if (limit) options.limit = limit;
+
+          const results = await notes.call('search', query || '', options);
+          return {
+            content: [{ type: 'text', text: JSON.stringify({ count: results.length, results }, null, 2) }],
+          };
+        } catch (err) {
+          return {
+            content: [{ type: 'text', text: `Error searching notes: ${err instanceof Error ? err.message : String(err)}` }],
+            isError: true,
+          };
+        }
+      }
+    );
+
+    // List objects with notes
+    this.server.tool(
+      'list_notes_objects',
+      'List all objects that have notes attached.',
+      {},
+      async () => {
+        const notes = await this.getAlias('notes');
+        if (!notes) {
+          return {
+            content: [{ type: 'text', text: 'Notes system not available' }],
+            isError: true,
+          };
+        }
+
+        try {
+          const objects = await notes.call('listObjects');
+
+          // Enrich with object names
+          const enriched = [];
+          for (const obj of objects) {
+            const loaded = await this.manager.load(obj.objectId as ObjId);
+            enriched.push({
+              objectId: obj.objectId,
+              name: loaded?.get('name') || 'Unknown',
+              noteCount: obj.count,
+            });
+          }
+
+          return {
+            content: [{ type: 'text', text: JSON.stringify({ count: enriched.length, objects: enriched }, null, 2) }],
+          };
+        } catch (err) {
+          return {
+            content: [{ type: 'text', text: `Error listing notes objects: ${err instanceof Error ? err.message : String(err)}` }],
+            isError: true,
+          };
+        }
+      }
+    );
+
   }
 
   /**
