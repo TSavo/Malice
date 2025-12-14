@@ -46,6 +46,9 @@ export { BankTerminalBuilder } from './bank-terminal-builder.js';
 // Stackables (physical commodities)
 export { StackableBuilder } from './stackable-builder.js';
 
+// Delivery items
+export { SealedBoxBuilder } from './sealed-box-builder.js';
+
 // Vendors
 export { VendableBuilder } from './vendable-builder.js';
 

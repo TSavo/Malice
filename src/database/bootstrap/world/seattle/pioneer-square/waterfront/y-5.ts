@@ -8,6 +8,8 @@ The bay stretches west to the horizon, grey water meeting grey sky. The seawall 
 
 Crab pots are stacked against the seawall, wire mesh rusted, buoys faded. The crabs are still down there, doing whatever crabs do. Waiting. Scavenging.
 
+To the east, a steel door is set into a windowless concrete building—the Supply Depot, marked only by a faded logo and a numeric code. The door looks newer than the building, recently reinforced.
+
 The port cranes stand silent to the south, monuments to commerce that no longer moves. The waterfront continues north and south. The bay continues west, grey and endless, offering nothing to those who cannot sail.`,
   x: -21,
   y: -5,
