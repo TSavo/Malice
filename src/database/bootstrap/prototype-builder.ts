@@ -3,6 +3,7 @@ import {
     DescribableBuilder,
     LocationBuilder,
     ExitBuilder,
+    GuardedExitBuilder,
     RoomBuilder,
     AgentBuilder,
     EmbodiedBuilder,
@@ -16,7 +17,9 @@ import {
     WoundBuilder,
     EdibleBuilder,
     FoodBuilder,
+    SustainBuilder,
     DrinkBuilder,
+    BottledWaterBuilder,
     StomachContentsBuilder,
     BodyPartBuilder,
     BodyPartsBuilder,
@@ -40,6 +43,7 @@ import {
     PayphoneBuilder,
     DisposalBuilder,
     IncineratorBuilder,
+    FactionBuilder,
   } from './prototypes/index.js';
 
 
@@ -67,6 +71,7 @@ export class PrototypeBuilder {
   private describableBuilder: DescribableBuilder;
   private locationBuilder: LocationBuilder;
   private exitBuilder: ExitBuilder;
+  private guardedExitBuilder: GuardedExitBuilder;
   private roomBuilder: RoomBuilder;
   private agentBuilder: AgentBuilder;
   private embodiedBuilder: EmbodiedBuilder;
@@ -80,7 +85,9 @@ export class PrototypeBuilder {
   private woundBuilder: WoundBuilder;
   private edibleBuilder: EdibleBuilder;
   private foodBuilder: FoodBuilder;
+  private sustainBuilder: SustainBuilder;
   private drinkBuilder: DrinkBuilder;
+  private bottledWaterBuilder: BottledWaterBuilder;
   private stomachContentsBuilder: StomachContentsBuilder;
   private bodyPartBuilder: BodyPartBuilder;
   private bodyPartsBuilder: BodyPartsBuilder;
@@ -104,6 +111,7 @@ export class PrototypeBuilder {
     private phoneDbBuilder: PhoneDbBuilder;
     private disposalBuilder: DisposalBuilder;
     private incineratorBuilder: IncineratorBuilder;
+    private factionBuilder: FactionBuilder;
 
 
    constructor(private manager: ObjectManager) {
@@ -112,6 +120,7 @@ export class PrototypeBuilder {
     this.locationBuilder = new LocationBuilder(manager);
 
     this.exitBuilder = new ExitBuilder(manager);
+    this.guardedExitBuilder = new GuardedExitBuilder(manager);
     this.roomBuilder = new RoomBuilder(manager);
     this.agentBuilder = new AgentBuilder(manager);
     this.embodiedBuilder = new EmbodiedBuilder(manager);
@@ -125,7 +134,9 @@ export class PrototypeBuilder {
     this.woundBuilder = new WoundBuilder(manager);
     this.edibleBuilder = new EdibleBuilder(manager);
     this.foodBuilder = new FoodBuilder(manager);
+    this.sustainBuilder = new SustainBuilder(manager);
     this.drinkBuilder = new DrinkBuilder(manager);
+    this.bottledWaterBuilder = new BottledWaterBuilder(manager);
     this.stomachContentsBuilder = new StomachContentsBuilder(manager);
     this.bodyPartBuilder = new BodyPartBuilder(manager);
     this.bodyPartsBuilder = new BodyPartsBuilder(manager);
@@ -149,6 +160,7 @@ export class PrototypeBuilder {
     this.phoneDbBuilder = new PhoneDbBuilder(manager);
     this.disposalBuilder = new DisposalBuilder(manager);
     this.incineratorBuilder = new IncineratorBuilder(manager);
+    this.factionBuilder = new FactionBuilder(manager);
   }
 
 
@@ -179,6 +191,11 @@ export class PrototypeBuilder {
     const exit = aliases.exit
       ? await this.manager.load(aliases.exit as number)
       : await this.exitBuilder.build(describable!.id);
+
+    // GuardedExit - faction-restricted exit (inherits from Exit)
+    const guardedExit = aliases.guardedExit
+      ? await this.manager.load(aliases.guardedExit as number)
+      : await this.guardedExitBuilder.build(exit!.id);
 
     const room = aliases.room
       ? await this.manager.load(aliases.room as number)
@@ -239,9 +256,17 @@ export class PrototypeBuilder {
       ? await this.manager.load(aliases.food as number)
       : await this.foodBuilder.build(edible!.id);
 
+    const sustain = aliases.sustain
+      ? await this.manager.load(aliases.sustain as number)
+      : await this.sustainBuilder.build(food!.id);
+
     const drink = aliases.drink
       ? await this.manager.load(aliases.drink as number)
       : await this.drinkBuilder.build(edible!.id);
+
+    const bottledWater = aliases.bottledWater
+      ? await this.manager.load(aliases.bottledWater as number)
+      : await this.bottledWaterBuilder.build(drink!.id);
 
     // BodyPart inherits from Edible (severed parts can be eaten, decay over time)
     const bodyPart = aliases.bodyPart
@@ -362,6 +387,11 @@ export class PrototypeBuilder {
       ? await this.manager.load(aliases.incinerator as number)
       : await this.incineratorBuilder.build(disposal!.id);
 
+    // Faction - manages faction memberships and relationships (inherits from Root)
+    const faction = aliases.faction
+      ? await this.manager.load(aliases.faction as number)
+      : await this.factionBuilder.build(1);
+
      // Register aliases in root.properties.aliases
      await this.registerAliases({
 
@@ -369,6 +399,7 @@ export class PrototypeBuilder {
       describable: describable!.id,
       location: location!.id,
       exit: exit!.id,
+      guardedExit: guardedExit!.id,
       room: room!.id,
       agent: agent!.id,
       embodied: embodied!.id,
@@ -382,7 +413,9 @@ export class PrototypeBuilder {
       wound: wound!.id,
       edible: edible!.id,
       food: food!.id,
+      sustain: sustain!.id,
       drink: drink!.id,
+      bottledWater: bottledWater!.id,
       stomachContents: stomachContents!.id,
       bodyPart: bodyPart!.id,
       bodyParts,
@@ -406,14 +439,16 @@ export class PrototypeBuilder {
       rentableLock: rentableLock!.id,
       disposal: disposal!.id,
       incinerator: incinerator!.id,
+      faction: faction!.id,
     });
   }
  
   private async registerAliases(ids: {
      describable: number;
- 
+
     location: number;
     exit: number;
+    guardedExit: number;
     room: number;
     agent: number;
     embodied: number;
@@ -427,7 +462,9 @@ export class PrototypeBuilder {
     wound: number;
     edible: number;
     food: number;
+    sustain: number;
     drink: number;
+    bottledWater: number;
     stomachContents: number;
     bodyPart: number;
     bodyParts: Record<string, number>;
@@ -451,6 +488,7 @@ export class PrototypeBuilder {
      rentableLock: number;
      disposal: number;
      incinerator: number;
+     faction: number;
    }): Promise<void> {
 
 
@@ -461,6 +499,7 @@ export class PrototypeBuilder {
     await objectManager.call('addAlias', 'describable', ids.describable);
     await objectManager.call('addAlias', 'location', ids.location);
     await objectManager.call('addAlias', 'exit', ids.exit);
+    await objectManager.call('addAlias', 'guardedExit', ids.guardedExit);
     await objectManager.call('addAlias', 'room', ids.room);
     await objectManager.call('addAlias', 'agent', ids.agent);
     await objectManager.call('addAlias', 'embodied', ids.embodied);
@@ -474,7 +513,9 @@ export class PrototypeBuilder {
     await objectManager.call('addAlias', 'wound', ids.wound);
     await objectManager.call('addAlias', 'edible', ids.edible);
     await objectManager.call('addAlias', 'food', ids.food);
+    await objectManager.call('addAlias', 'sustain', ids.sustain);
     await objectManager.call('addAlias', 'drink', ids.drink);
+    await objectManager.call('addAlias', 'bottledWater', ids.bottledWater);
     await objectManager.call('addAlias', 'stomachContents', ids.stomachContents);
     await objectManager.call('addAlias', 'bodyPart', ids.bodyPart);
     await objectManager.call('addAlias', 'wearable', ids.wearable);
@@ -497,6 +538,7 @@ export class PrototypeBuilder {
      await objectManager.call('addAlias', 'rentableLock', ids.rentableLock);
      await objectManager.call('addAlias', 'disposal', ids.disposal);
      await objectManager.call('addAlias', 'incinerator', ids.incinerator);
+     await objectManager.call('addAlias', 'faction', ids.faction);
 
      // Store bodyParts object directly (addAlias only supports simple id values)
 

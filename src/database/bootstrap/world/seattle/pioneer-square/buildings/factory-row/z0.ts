@@ -14,17 +14,6 @@ export const building = {
     // LOCKS
     // ═══════════════════════════════════════════════════════════════════
 
-    '%NUTRIENT_LOCK': {
-      prototype: 'biometricLock',
-      name: 'Dispensary Door Scanner',
-      description: 'A palm scanner mounted beside the reinforced door, its surface worn smooth by thousands of desperate hands.',
-      scanners: [
-        { type: 'palm', part: 'hand', message: 'Scanning... access granted.' },
-      ],
-      authorizedUsers: {},
-      defaultOpen: true,
-    },
-
     '%PAWN_LOCK': {
       prototype: 'biometricLock',
       name: 'Pawn Shop Door Scanner',
@@ -75,8 +64,35 @@ The space smells of nothing. The air is filtered, the surfaces sanitized. The fa
       waterLevel: 0,
       outdoor: false,
       exits: {
-        south: { to: 's-washington/x-20.ts', locks: ['%NUTRIENT_LOCK'], description: 'A reinforced door opens onto S. Washington St' },
+        south: {
+          to: 's-washington/x-20.ts',
+          prototype: 'guardedExit',
+          allowedFaction: 'Citizen',
+          denyMessage: 'A scanner beside the door flashes red. "Citizens only."',
+          description: 'A reinforced door opens onto S. Washington St',
+        },
       },
+      objects: [
+        {
+          prototype: 'vendable',
+          name: 'Nutrient Dispensing Station',
+          description: 'A row of automated kiosks along the back wall. Screens display nutritional information and prices. Payment is handled electronically—scan your account, make your selection, receive your ration. The Continuum logo pulses gently on each screen.',
+          bank: 'bank',
+          bankAccount: 'CONTINUUM-NUTRIENT',
+          spawnables: [
+            {
+              protoId: 'sustain',
+              name: 'Sustain Pill',
+              price: 2,
+            },
+            {
+              protoId: 'bottledWater',
+              name: 'Bottled Water (500ml)',
+              price: 1,
+            },
+          ],
+        },
+      ],
     },
 
     '%PAWN': {

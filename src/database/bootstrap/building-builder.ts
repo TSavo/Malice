@@ -526,6 +526,8 @@ export class BuildingBuilder {
     const $ = this.manager as any;
     const recycler = $.recycler;
     const exitProto = $.exit;
+    const objectManager = await this.manager.load(0);
+    const aliases = (objectManager?.get('aliases') as Record<string, number>) || {};
 
     console.log(`    Connecting ${this.deferredWorldExits.length} building-to-world exits...`);
 
@@ -577,9 +579,15 @@ export class BuildingBuilder {
         }
       }
 
+      // Determine exit prototype (default to $.exit, allow guardedExit etc.)
+      let exitParentId = exitProto.id;
+      if (exitProps.prototype && aliases[exitProps.prototype]) {
+        exitParentId = aliases[exitProps.prototype];
+      }
+
       // Create exit from building room to world room
       const exitToWorld = await recycler.create({
-        parent: exitProto.id,
+        parent: exitParentId,
         properties: {
           name: direction,
           aliases: this.getDirectionAliases(direction),
@@ -589,6 +597,9 @@ export class BuildingBuilder {
           locked: exitProps.locked ?? false,
           locks: resolvedLocks,
           description: description,
+          // GuardedExit properties
+          allowedFaction: exitProps.allowedFaction ?? null,
+          denyMessage: exitProps.denyMessage ?? null,
         },
       });
 
@@ -596,9 +607,10 @@ export class BuildingBuilder {
 
       // Create reverse exit from world room back to building room
       // Note: locks apply to both directions (same door)
+      // GuardedExit applies to entrance (reverse direction)
       const reverseDirection = this.getOppositeDirection(direction);
       const exitToBuilding = await recycler.create({
-        parent: exitProto.id,
+        parent: exitParentId,
         properties: {
           name: reverseDirection,
           aliases: this.getDirectionAliases(reverseDirection),
@@ -608,6 +620,9 @@ export class BuildingBuilder {
           locked: exitProps.locked ?? false,
           locks: resolvedLocks,
           description: description ? description.replace(/lead[s]? (\w+) to/, `lead $1 into`) : undefined,
+          // GuardedExit properties
+          allowedFaction: exitProps.allowedFaction ?? null,
+          denyMessage: exitProps.denyMessage ?? null,
         },
       });
 

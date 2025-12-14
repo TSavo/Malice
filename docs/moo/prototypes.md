@@ -10,11 +10,14 @@ Everything in Malice inherits from prototypes. Objects don't have "classes"—th
 
 ```
 $.root (#1)
+  ├─ $.faction (singleton - faction memberships & relationships)
+  │
   └─ $.describable
       ├─ $.location (containers)
       │   └─ $.room (rooms with exits)
       │
       ├─ $.exit (directional links)
+      │   └─ $.guardedExit (faction-restricted passage)
       │
       ├─ $.agent (autonomous entities)
       │   └─ $.embodied (physical bodies)
