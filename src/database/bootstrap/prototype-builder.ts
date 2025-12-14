@@ -30,6 +30,7 @@ import {
     BankBuilder,
     BankTerminalBuilder,
     StackableBuilder,
+    SealedBoxBuilder,
     ElevatorBuilder,
     DoorBuilder,
     SignBuilder,
@@ -98,6 +99,7 @@ export class PrototypeBuilder {
   private bankBuilder: BankBuilder;
   private bankTerminalBuilder: BankTerminalBuilder;
     private stackableBuilder: StackableBuilder;
+    private sealedBoxBuilder: SealedBoxBuilder;
     private vendableBuilder: VendableBuilder;
     private elevatorBuilder: ElevatorBuilder;
     private doorBuilder: DoorBuilder;
@@ -147,6 +149,7 @@ export class PrototypeBuilder {
     this.bankBuilder = new BankBuilder(manager);
     this.bankTerminalBuilder = new BankTerminalBuilder(manager);
     this.stackableBuilder = new StackableBuilder(manager);
+    this.sealedBoxBuilder = new SealedBoxBuilder(manager);
     this.vendableBuilder = new VendableBuilder(manager);
     this.elevatorBuilder = new ElevatorBuilder(manager);
     this.doorBuilder = new DoorBuilder(manager);
@@ -326,6 +329,11 @@ export class PrototypeBuilder {
       ? await this.manager.load(aliases.stomachContents as number)
       : await this.stomachContentsBuilder.build(stackable!.id);
 
+    // SealedBox - tamper-proof delivery containers (inherits from Describable)
+    const sealedBox = aliases.sealedBox
+      ? await this.manager.load(aliases.sealedBox as number)
+      : await this.sealedBoxBuilder.build(describable!.id);
+
     const vendable = aliases.vendable
       ? await this.manager.load(aliases.vendable as number)
       : await this.vendableBuilder.build(location!.id);
@@ -426,6 +434,7 @@ export class PrototypeBuilder {
       bank: bank!.id,
       bankTerminal: bankTerminal!.id,
       stackable: stackable!.id,
+      sealedBox: sealedBox!.id,
       vendable: vendable!.id,
       elevator: elevator!.id,
       door: door!.id,
@@ -475,6 +484,7 @@ export class PrototypeBuilder {
      bank: number;
      bankTerminal: number;
      stackable: number;
+     sealedBox: number;
      vendable: number;
      elevator: number;
      door: number;
@@ -525,6 +535,7 @@ export class PrototypeBuilder {
      await objectManager.call('addAlias', 'bank', ids.bank);
      await objectManager.call('addAlias', 'bankTerminal', ids.bankTerminal);
      await objectManager.call('addAlias', 'stackable', ids.stackable);
+     await objectManager.call('addAlias', 'sealedBox', ids.sealedBox);
      await objectManager.call('addAlias', 'vendable', ids.vendable);
      await objectManager.call('addAlias', 'elevator', ids.elevator);
      await objectManager.call('addAlias', 'door', ids.door);
