@@ -206,7 +206,8 @@ export class NotesBuilder {
 
       if (!objectId) return 'No object specified.';
 
-      const notes = await self.get(objectId);
+      const registry = self.registry || {};
+      const notes = registry[objectId] || [];
 
       if (notes.length === 0) {
         return 'No notes.';
@@ -217,7 +218,7 @@ export class NotesBuilder {
         const note = notes[i];
         const date = new Date(note.timestamp);
         const dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
-        const tags = note.tags.length > 0 ? ' [' + note.tags.join(', ') + ']' : '';
+        const tags = note.tags && note.tags.length > 0 ? ' [' + note.tags.join(', ') + ']' : '';
 
         output += '[' + i + '] ' + dateStr + ' by ' + note.author + tags + '\\r\\n';
         output += '    ' + note.text.replace(/\\n/g, '\\r\\n    ') + '\\r\\n';
