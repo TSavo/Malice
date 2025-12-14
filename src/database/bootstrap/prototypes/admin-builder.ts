@@ -36,6 +36,7 @@ export class AdminBuilder {
     this.addDoorCommands(obj);
     this.addElevatorCommands(obj);
     this.addAiCommands(obj);
+    this.addNotesCommands(obj);
 
     return obj;
   }
@@ -482,6 +483,7 @@ export class AdminBuilder {
       await self.registerVerb('@aliases', self);
       await self.registerVerb(['@alias %s'], self, '@alias');
       await self.registerVerb(['@unalias %s'], self, '@unalias');
+      await self.registerVerb(['@notes %s', '@notes'], self, '@notes');
 
       // Call parent's connect (Player -> registers player verbs, shows welcome, prompt)
       await pass(args[0]);
@@ -2070,6 +2072,212 @@ export class AdminBuilder {
         // Show all
         const desc = await ai.describe();
         await player.tell(desc);
+      }
+    `);
+  }
+
+  /** Note management commands */
+  private addNotesCommands(obj: RuntimeObject): void {
+    // @notes - Interactive note management for objects
+    obj.setMethod('@notes', `
+      /** Manage notes attached to objects.
+       *  Usage: @notes <#id | here | me>
+       *  Usage: @notes (defaults to here)
+       *
+       *  Provides menu-based interface for:
+       *  - Viewing notes
+       *  - Adding notes (multiline)
+       *  - Deleting notes
+       *  - Searching notes
+       */
+      const input = args[0] || 'here';
+
+      // Resolve target object
+      let target;
+      const lowerInput = input.toLowerCase().trim();
+
+      if (lowerInput === 'here') {
+        target = player.location ? await $.load(player.location) : null;
+      } else if (lowerInput === 'me') {
+        target = player;
+      } else {
+        const targetId = parseInt(input.replace('#', ''), 10);
+        if (!isNaN(targetId)) {
+          target = await $.load(targetId);
+        }
+      }
+
+      if (!target) {
+        await player.tell('Object not found.');
+        await player.tell('Usage: @notes <#id | here | me>');
+        return;
+      }
+
+      const notes = $.notes;
+      if (!notes) {
+        await player.tell('Notes system not available.');
+        return;
+      }
+
+      // Menu loop
+      let done = false;
+      while (!done) {
+        const currentNotes = await notes.get(target.id);
+        const noteCount = currentNotes.length;
+
+        await player.tell('');
+        await player.tell('=== Notes: ' + target.name + ' (#' + target.id + ') ===');
+        await player.tell('Notes attached: ' + noteCount);
+        await player.tell('');
+        await player.tell('[1] View notes');
+        await player.tell('[2] Add note');
+        await player.tell('[3] Delete note');
+        await player.tell('[4] Search all notes');
+        await player.tell('[0] Done');
+        await player.tell('');
+
+        const choice = await $.prompt.question(player, 'Choice: ');
+        if (choice === null) { done = true; break; }
+
+        switch (choice.trim()) {
+          case '1': {
+            // View notes
+            if (noteCount === 0) {
+              await player.tell('No notes on this object.');
+              break;
+            }
+            const formatted = await notes.format(target.id);
+            await player.tell('');
+            await player.tell(formatted);
+            break;
+          }
+
+          case '2': {
+            // Add note
+            await player.tell('');
+            await player.tell('Enter note text (end with . on its own line, @abort to cancel):');
+            await player.tell('---');
+
+            let text;
+            try {
+              text = await $.prompt.multiline(player, '');
+            } catch (err) {
+              if (err.message && err.message.includes('Aborted')) {
+                await player.tell('Aborted.');
+                break;
+              }
+              throw err;
+            }
+
+            if (!text || text.trim() === '') {
+              await player.tell('Cancelled (empty note).');
+              break;
+            }
+
+            // Ask for tags (optional)
+            const tagsInput = await $.prompt.question(player, 'Tags (comma-separated, or blank): ');
+            const tags = tagsInput
+              ? tagsInput.split(',').map(t => t.trim()).filter(t => t)
+              : [];
+
+            // Add the note
+            const result = await notes.add(target.id, text, player, tags);
+            if (result.success) {
+              await player.tell('Note added (index ' + result.index + ').');
+            } else {
+              await player.tell('Error: ' + (result.error || 'unknown'));
+            }
+            break;
+          }
+
+          case '3': {
+            // Delete note
+            if (noteCount === 0) {
+              await player.tell('No notes to delete.');
+              break;
+            }
+
+            // Show notes first
+            const formatted = await notes.format(target.id);
+            await player.tell('');
+            await player.tell(formatted);
+            await player.tell('');
+
+            const indexStr = await $.prompt.question(player, 'Note index to delete (or blank to cancel): ');
+            if (!indexStr || indexStr.trim() === '') {
+              await player.tell('Cancelled.');
+              break;
+            }
+
+            const index = parseInt(indexStr.trim(), 10);
+            if (isNaN(index) || index < 0 || index >= noteCount) {
+              await player.tell('Invalid index.');
+              break;
+            }
+
+            const confirmed = await $.prompt.yesorno(player, 'Delete note ' + index + '?');
+            if (!confirmed) {
+              await player.tell('Cancelled.');
+              break;
+            }
+
+            const result = await notes.delete(target.id, index);
+            if (result.success) {
+              await player.tell('Note deleted.');
+            } else {
+              await player.tell('Error: ' + (result.error || 'unknown'));
+            }
+            break;
+          }
+
+          case '4': {
+            // Search all notes
+            const query = await $.prompt.question(player, 'Search text (or blank for all): ');
+            const tagFilter = await $.prompt.question(player, 'Filter by tag (or blank): ');
+
+            const options = {};
+            if (tagFilter && tagFilter.trim()) {
+              options.tag = tagFilter.trim();
+            }
+
+            const results = await notes.search(query || '', options);
+
+            if (results.length === 0) {
+              await player.tell('No matching notes found.');
+              break;
+            }
+
+            await player.tell('');
+            await player.tell('Found ' + results.length + ' note(s):');
+            await player.tell('');
+
+            for (const r of results) {
+              const obj = await $.load(r.objectId);
+              const objName = obj ? obj.name : 'Unknown';
+              const n = r.note;
+              const date = new Date(n.timestamp);
+              const dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+              const tagStr = n.tags.length > 0 ? ' [' + n.tags.join(', ') + ']' : '';
+
+              await player.tell('#' + r.objectId + ' (' + objName + ') [' + r.index + ']:');
+              await player.tell('  ' + dateStr + ' by ' + n.author + tagStr);
+              // Show preview of text (first 60 chars)
+              const preview = n.text.length > 60
+                ? n.text.substring(0, 57).replace(/\\n/g, ' ') + '...'
+                : n.text.replace(/\\n/g, ' ');
+              await player.tell('  ' + preview);
+              await player.tell('');
+            }
+            break;
+          }
+
+          case '0':
+            done = true;
+            break;
+
+          default:
+            await player.tell('Invalid choice.');
+        }
       }
     `);
   }
