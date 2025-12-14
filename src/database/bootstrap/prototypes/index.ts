@@ -1,6 +1,7 @@
 export { DescribableBuilder } from './describable-builder.js';
 export { LocationBuilder } from './location-builder.js';
 export { ExitBuilder } from './exit-builder.js';
+export { GuardedExitBuilder } from './guarded-exit-builder.js';
 export { RoomBuilder } from './room-builder.js';
 export { AgentBuilder } from './agent-builder.js';
 export { EmbodiedBuilder } from './embodied-builder.js';
@@ -20,7 +21,9 @@ export { WoundBuilder } from './wound-builder.js';
 // Consumables
 export { EdibleBuilder } from './edible-builder.js';
 export { FoodBuilder } from './food-builder.js';
+export { SustainBuilder } from './sustain-builder.js';
 export { DrinkBuilder } from './drink-builder.js';
+export { BottledWaterBuilder } from './bottled-water-builder.js';
 export { StomachContentsBuilder } from './stomach-contents-builder.js';
 
 // Body system
@@ -63,6 +66,9 @@ export { RentableLockBuilder } from './rentable-lock-builder.js';
 // Disposal systems
 export { DisposalBuilder } from './disposal-builder.js';
 export { IncineratorBuilder } from './incinerator-builder.js';
+
+// Faction system
+export { FactionBuilder } from './faction-builder.js';
 
 // Appearance
 export * from './appearance-constants.js';

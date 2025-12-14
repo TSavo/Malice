@@ -78,7 +78,13 @@ The air smells of machine oil and ozone. Through the loading door, you can see t
       y: 11,
       z: 0,
       exits: {
-        west: { to: 'waterfront/y11.ts', description: 'A massive roll-up door opens onto the Waterfront' },
+        west: {
+          to: 'waterfront/y11.ts',
+          prototype: 'guardedExit',
+          allowedFaction: 'Citizen',
+          denyMessage: 'A security scanner beside the loading door flashes red. "Authorized personnel only."',
+          description: 'A massive roll-up door opens onto the Waterfront',
+        },
         east: '%WAREHOUSE',
       },
     },
@@ -131,7 +137,13 @@ The counter is unstaffed. A speaker grille handles customer inquiries. The AI's 
       y: 10,
       z: 0,
       exits: {
-        west: { to: 'waterfront/y10.ts', description: 'Glass doors open onto the Waterfront' },
+        west: {
+          to: 'waterfront/y10.ts',
+          prototype: 'guardedExit',
+          allowedFaction: 'Citizen',
+          denyMessage: 'The glass doors remain locked. A speaker crackles: "Citizens only."',
+          description: 'Glass doors open onto the Waterfront',
+        },
         east: '%ELEVATORS',
       },
     },

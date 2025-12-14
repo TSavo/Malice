@@ -326,6 +326,43 @@ exits: {
 }
 ```
 
+World exits (connecting to street rooms):
+```typescript
+exits: {
+  west: {
+    to: 'waterfront/y10.ts',  // Path to world room file
+    description: 'Glass doors open onto the Waterfront',
+  }
+}
+```
+
+Guarded exits (faction-restricted):
+```typescript
+exits: {
+  north: {
+    to: 's-washington/x-20.ts',
+    prototype: 'guardedExit',
+    allowedFaction: 'Citizen',
+    denyMessage: 'The scanner flashes red. "Citizens only."',
+    description: 'A reinforced door leads to the dispensary',
+  }
+}
+```
+
+Guarded exits with locks (faction + biometric):
+```typescript
+exits: {
+  east: {
+    to: 'alley/y10.ts',
+    prototype: 'guardedExit',
+    allowedFaction: 'Citizen',
+    denyMessage: 'Authorized personnel only.',
+    locks: ['%DOOR_LOCK'],  // Additional lock check
+    description: 'A steel emergency exit',
+  }
+}
+```
+
 ### Room Properties
 
 Full room definition:
@@ -636,6 +673,8 @@ for (const [floor, roomId] of Object.entries(elevator.floorRooms)) {
 ## See Also
 
 - [Room System](./rooms.md) - Room, Exit, Elevator prototypes
+- [Faction System](./faction.md) - Faction memberships and guarded exits
+- [Security System](./security.md) - Locks, biometrics, and access control
 - [Bootstrap](../advanced/bootstrap.md) - How bootstrap works
 - [Objects](../advanced/objects.md) - Creating and placing objects
 - [Architecture](../architecture.md) - Three-layer system overview

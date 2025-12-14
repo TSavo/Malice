@@ -126,6 +126,38 @@ mcp.list_ai({ role: "guard" });
 mcp.despawn_ai({ humanId: 567 });
 ```
 
+### Faction System Integration
+
+The $.faction singleton tracks faction memberships and inter-faction relationships:
+
+```javascript
+// Create a faction
+await $.faction.createFaction('Continuum', 'The AI-controlled corporate authority');
+await $.faction.createFaction('Scavengers', 'Survivors living outside the system');
+
+// Set an entity's faction
+await $.faction.setFaction(entity, 'Continuum');
+await $.faction.setFaction(npc, 'Scavengers');
+
+// Set relationships between factions
+await $.faction.setRelationship('Continuum', 'Scavengers', 'hostile');
+
+// Check relationships
+const friendly = await $.faction.isFriendly(entityA, entityB);
+const hostile = await $.faction.isHostile(entityA, entityB);
+
+// Get faction info
+const faction = await $.faction.getFaction(entity);  // returns 'Continuum'
+const members = await $.faction.getMembers('Continuum');  // returns [id, id, ...]
+const relationship = await $.faction.getRelationship('Continuum', 'Scavengers');  // 'hostile'
+
+// Leadership
+await $.faction.setLeader('Continuum', leaderId);
+const leader = await $.faction.getLeader('Continuum');
+```
+
+Relationship types: `'friendly'`, `'hostile'`, `'neutral'` (default)
+
 ### Plot/Job System Integration
 
 Create narratives and quests via MCP:
@@ -425,6 +457,7 @@ Root (#1)
 │   │   ├── LockerBank (#36)
 │   │   └── Vendable (#41)
 │   ├── Exit (#5)
+│   │   └── GuardedExit - faction-restricted passage
 │   ├── Agent (#7)
 │   │   └── Embodied (#8)
 │   │       └── Human (#9)
@@ -434,8 +467,10 @@ Root (#1)
 │   │   ├── Corpse (#13)
 │   │   ├── Edible (#17)
 │   │   │   ├── Food (#18)
-│   │   │   ├── Drink (#19)
-│   │   │   └── BodyPart (#21)
+│   │   │   │   └── Sustain (#19) - Continuum nutrient pills
+│   │   │   ├── Drink (#20)
+│   │   │   │   └── BottledWater (#21) - Sealed water bottles
+│   │   │   └── BodyPart (#22)
 │   │   └── ...
 │   ├── Lock (#??)
 │   │   ├── BiometricLock
@@ -450,6 +485,7 @@ Root (#1)
     ├── Bank
     ├── BodyFactory
     ├── AI
+    ├── Faction - tracks faction memberships and relationships
     └── ...
 ```
 

@@ -1,12 +1,13 @@
 # Security System
 
-Composable locks, biometric authentication, banks, and lockers in Malice.
+Composable locks, biometric authentication, faction access, banks, and lockers in Malice.
 
 ## Overview
 
 Security in Malice is built on composable lock objects. Locks can be attached to exits, elevators, containers, or any object needing restricted access. The system supports:
 - **$.lock** - Base lock interface
 - **$.biometricLock** - Fingerprint/retinal scan authentication
+- **$.guardedExit** - Faction-based access control for exits
 - **$.bank / $.bankTerminal** - Banking system, accounts, transactions
 - **$.locker / $.oneTimeLocker** - Storage containers with locks
 
@@ -84,6 +85,63 @@ Remove a user from the authorized list.
 ```javascript
 await biometricLock.deauthorize(player, 35);
 ```
+
+## $.guardedExit - Faction-Based Access Control
+
+Inherits from: **$.exit**
+
+### Purpose
+
+Restricts passage to members of a specific faction. Uses the $.faction singleton to check membership.
+
+### Properties
+
+```javascript
+{
+  allowedFaction: 'Citizen',  // Faction that can pass (null = unrestricted)
+  denyMessage: 'Citizens only.'  // Shown when access denied
+}
+```
+
+### Key Methods
+
+#### canUse(agent)
+Checks faction membership, then delegates to parent exit checks (doors, locks).
+
+```javascript
+const result = await guardedExit.canUse(player);
+if (result.allowed) {
+  // Player can pass
+} else {
+  await player.tell(result.reason); // 'Citizens only.'
+}
+```
+
+#### setAllowedFaction(factionName)
+Set which faction can use this exit.
+
+```javascript
+await guardedExit.setAllowedFaction('Citizen');
+await guardedExit.setAllowedFaction(null);  // Remove restriction
+```
+
+### Building Definition
+
+```javascript
+exits: {
+  north: {
+    to: 'waterfront/y10.ts',
+    prototype: 'guardedExit',
+    allowedFaction: 'Citizen',
+    denyMessage: 'The scanner flashes red. "Citizens only."',
+    description: 'Glass doors open onto the Waterfront',
+  },
+}
+```
+
+### See Also
+
+- [Faction System](./faction.md) - Full faction documentation
 
 ## Composing Locks
 
@@ -231,6 +289,7 @@ if (result === true) {
 
 ## See Also
 
+- [Faction System](./faction.md) - Faction memberships and relationships
 - [Room System](./rooms.md) - How locks integrate with rooms and elevators
 - [Bootstrap](../advanced/bootstrap.md) - Adding custom lock types
 - [Objects](../advanced/objects.md) - Creating and placing lockable objects
