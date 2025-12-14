@@ -98,6 +98,7 @@ export class WorldBuilder {
     // Avenue directories (north-south, files named y*.ts)
     const avenues = [
       { dir: 'waterfront', x: -15 },
+      { dir: 'alley', x: -17 },
       { dir: '1st-ave-s', x: -9 },
       { dir: 'occidental-ave-s', x: -3 },
       { dir: '2nd-ave-s', x: 3 },
