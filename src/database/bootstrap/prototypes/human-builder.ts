@@ -460,6 +460,7 @@ export class HumanBuilder {
        */
       // Communication verbs
       await self.registerVerb(['say %s', '"%s', "'" + "%s"], self, 'say');
+      await self.registerVerb(['to %s'], self, 'to');
       await self.registerVerb(['emote %s', ':%s'], self, 'emote');
 
       // Looking verbs
@@ -519,8 +520,16 @@ export class HumanBuilder {
        *  Usage: to <name> <message>
        *  Addresses a specific person, triggering their attention.
        */
-      const targetName = args[0];
-      const message = args[1];
+      // Handle single-arg case: "to janet hey there" comes as one string
+      let targetName = args[0];
+      let message = args[1];
+
+      // If message is undefined, split the first arg
+      if (!message && targetName) {
+        const parts = targetName.split(/\\s+/);
+        targetName = parts[0];
+        message = parts.slice(1).join(' ');
+      }
 
       if (!targetName) {
         return 'Speak to whom?';
@@ -529,21 +538,32 @@ export class HumanBuilder {
         return 'Say what to ' + targetName + '?';
       }
 
+      // Use player (from verb context) instead of self when method is on prototype
+      const speaker = player || self;
+
       // Get current location
-      const location = self.location ? await $.load(self.location) : null;
+      const location = speaker.location ? await $.load(speaker.location) : null;
       if (!location) {
         return 'You have nowhere to speak.';
       }
 
-      // Find target in location
+      // Find target in location - contents may be RuntimeObjects or refs
       const contents = location.contents || [];
       let target = null;
       for (const ref of contents) {
-        const contentId = typeof ref === 'object' ? ref.value : ref;
-        const obj = await $.load(contentId);
-        if (obj && obj.name && obj.name.toLowerCase().includes(targetName.toLowerCase())) {
-          target = obj;
+        // If ref is already a RuntimeObject with name, use it directly
+        if (ref && ref.name && ref.name.toLowerCase().includes(targetName.toLowerCase())) {
+          target = ref;
           break;
+        }
+        // Otherwise try to load it
+        const contentId = typeof ref === 'object' ? (ref.value || ref.id) : ref;
+        if (contentId) {
+          const obj = await $.load(contentId);
+          if (obj && obj.name && obj.name.toLowerCase().includes(targetName.toLowerCase())) {
+            target = obj;
+            break;
+          }
         }
       }
 
@@ -555,20 +575,21 @@ export class HumanBuilder {
 
       // Announce to room
       if (location.announce) {
-        await location.announce(self, target, {
+        await location.announce(speaker, target, {
           actor: 'You say to ' + target.name + ', "' + trimmedMessage + '"',
-          target: self.name + ' says to you, "' + trimmedMessage + '"',
-          others: self.name + ' says to ' + target.name + ', "' + trimmedMessage + '"'
+          target: speaker.name + ' says to you, "' + trimmedMessage + '"',
+          others: speaker.name + ' says to ' + target.name + ', "' + trimmedMessage + '"'
         });
       }
-
-      // Emit directed speech event for NPC agent service
+      // Emit game event for NPC agent service (fire-and-forget)
+      // NOT awaited: awaiting causes MCP response delivery issues when NPC agent
+      // makes concurrent requests during the response streaming phase
       if ($._emitGameEvent) {
-        await $._emitGameEvent({
+        $._emitGameEvent({
           type: 'directed_speech',
           data: {
-            speakerId: self.id,
-            speakerName: self.name,
+            speakerId: speaker.id,
+            speakerName: speaker.name,
             targetId: target.id,
             targetName: target.name,
             message: trimmedMessage,
@@ -576,6 +597,8 @@ export class HumanBuilder {
           },
           timestamp: new Date().toISOString(),
           processed: false,
+        }).catch((err: any) => {
+          console.error('[to] Game event emission failed:', err?.message || err);
         });
       }
 

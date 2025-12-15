@@ -66,8 +66,11 @@ export class RuntimeObjectImpl implements RuntimeObject {
 
   /**
    * Convert a JavaScript value to a typed Value
+   * @param jsValue - JavaScript value to convert
+   * @param seen - WeakSet for circular reference detection
+   * @param path - Path for debugging
    */
-  private toValue(jsValue: any): Value {
+  private toValue(jsValue: any, seen: WeakSet<object> = new WeakSet(), path: string = 'root'): Value {
     // Handle null
     if (jsValue === null) {
       return { type: 'null', value: null };
@@ -108,17 +111,37 @@ export class RuntimeObjectImpl implements RuntimeObject {
 
     // Handle arrays (recursively convert elements)
     if (Array.isArray(jsValue)) {
+      // Check for circular reference
+      if (seen.has(jsValue)) {
+        console.error(`[RuntimeObject] Circular reference detected at ${path}`);
+        return { type: 'null', value: null };
+      }
+      seen.add(jsValue);
       return {
         type: 'array',
-        value: jsValue.map(item => this.toValue(item))
+        value: jsValue.map((item, i) => this.toValue(item, seen, `${path}[${i}]`))
       };
     }
 
     // Handle objects (recursively convert properties)
     if (jsType === 'object') {
+      // Check for circular reference
+      if (seen.has(jsValue)) {
+        console.error(`[RuntimeObject] Circular reference detected at ${path}`);
+        return { type: 'null', value: null };
+      }
+      seen.add(jsValue);
+
+      // Skip special objects that shouldn't be serialized
+      const constructor = jsValue.constructor?.name;
+      if (constructor && !['Object', 'Array'].includes(constructor)) {
+        console.warn(`[RuntimeObject] Skipping non-plain object at ${path}: ${constructor}`);
+        return { type: 'null', value: null };
+      }
+
       const objValue: Record<string, Value> = {};
       for (const [key, val] of Object.entries(jsValue)) {
-        objValue[key] = this.toValue(val);
+        objValue[key] = this.toValue(val, seen, `${path}.${key}`);
       }
       return { type: 'object', value: objValue };
     }
@@ -216,13 +239,19 @@ export class RuntimeObjectImpl implements RuntimeObject {
       this.obj.properties = {};
     }
     // Convert JavaScript value to typed Value
-    this.obj.properties[prop] = this.toValue(value);
+    this.obj.properties[prop] = this.toValue(value, new WeakSet(), `#${this.id}.${prop}`);
 
     // Auto-persist - fire and forget, MOO never sees save semantics
     this.manager.update(this.id, {
       properties: this.obj.properties
     }, false).catch(err => {
       console.error(`[RuntimeObject] Failed to persist property ${prop} on #${this.id}:`, err);
+      // Log the problematic properties structure for debugging
+      try {
+        console.error(`[RuntimeObject] Properties keys: ${Object.keys(this.obj.properties || {}).join(', ')}`);
+      } catch {
+        console.error('[RuntimeObject] Could not stringify properties');
+      }
     });
   }
 
@@ -628,6 +657,12 @@ export class RuntimeObjectImpl implements RuntimeObject {
 
       return await fn(context);
     } catch (err) {
+      // Log detailed error info for debugging circular reference issues
+      if (err instanceof Error && err.message.includes('circular')) {
+        console.error(`[RuntimeObject] Circular reference error in method '${methodName}' on #${this.id}`);
+        console.error(`[RuntimeObject] Method code excerpt: ${jsCode.substring(0, 200)}...`);
+        console.error(`[RuntimeObject] Stack: ${err.stack}`);
+      }
       throw new Error(
         `Error executing method '${methodName}' on object #${this.id}: ${err instanceof Error ? err.message : String(err)}`
       );
