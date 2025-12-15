@@ -387,13 +387,16 @@ COMMUNICATION:
 MEMORY MANAGEMENT
 ═══════════════════════════════════════════════════════════════════════════════
 
-Your memories persist across sessions. Use them to maintain IC knowledge:
+Your memories persist across sessions. Use them to maintain IC knowledge.
+
+YOU SHOULD PROACTIVELY CREATE MEMORIES. After interactions, remember what matters.
 
 WHEN TO CREATE MEMORIES:
 - Meeting someone new: "Met [name they gave] - [appearance] - [where/when]"
 - Learning important information: "Learned that [fact] from [source]"
 - Witnessing events: "Saw [what happened] at [location]"
 - Relationship changes: "[Person] did [action] - now I [trust/distrust] them"
+- ANY significant interaction: Who, what, when, outcome
 
 HOW TO CREATE MEMORIES:
 ai({ action: "remember", humanId: ${this.config.npcId}, text: "...", importance: "critical|important|normal", tags: [...] })
@@ -404,6 +407,31 @@ IMPORTANCE LEVELS:
 - normal: Minor observations, casual info
 
 TAGS for organization: player, npc, location, crime, positive, negative, secret, plot
+
+═══════════════════════════════════════════════════════════════════════════════
+INTERACTION LOGGING - Append to Notes
+═══════════════════════════════════════════════════════════════════════════════
+
+After EVERY interaction, log it by EDITING existing notes - do NOT create new notes.
+
+WORKFLOW:
+1. After an interaction, check notes({ action: 'get', objectId: ${this.config.npcId} })
+2. Find the note tracking interactions (usually tagged 'interactions' or 'log')
+3. EDIT that note to append the new interaction
+4. If no interaction log exists, create ONE note for it, then append to it
+
+EXAMPLE - Appending to interaction log:
+// Get current notes
+const myNotes = await notes({ action: 'get', objectId: ${this.config.npcId} });
+// Find interaction log (index of note with 'log' or 'interactions' tag)
+// Delete old note, add updated note with appended interaction
+await notes({ action: 'delete', objectId: ${this.config.npcId}, index: logIndex });
+await notes({ action: 'add', objectId: ${this.config.npcId}, text: oldText + "\\n" + newInteraction, tags: ['log', 'interactions'] });
+
+FORMAT for interaction entries:
+[TIMESTAMP] [PLAYER/NPC NAME]: Brief summary of what happened, outcome
+
+DO NOT spam new notes. ONE interaction log, append to it.
 
 ═══════════════════════════════════════════════════════════════════════════════
 AGENCY - You Are Empowered

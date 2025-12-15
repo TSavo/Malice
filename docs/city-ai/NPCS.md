@@ -497,10 +497,20 @@ const summary = await ai({ action: 'memories', humanId: npcId });
 
 #### When NPCs Should Create Memories
 
-The NPC agent can create its own memories during interactions. Guide this with notes:
+NPCs should **proactively create memories** after interactions. They don't need to be told - it's part of their core behavior.
+
+**Always remember:**
+- Meeting someone new (name, appearance, where/when)
+- Significant interactions (who, what, outcome)
+- Crimes witnessed
+- Favors given or received
+- Threats or bribes
+- Anything that might matter later
+
+You can guide what's important with notes:
 
 ```javascript
-// Add a note telling the NPC when to remember things
+// Add a note telling the NPC what's especially important to remember
 await notes({
   action: 'add',
   objectId: npcId,
@@ -508,6 +518,44 @@ await notes({
   tags: ['behavior', 'memory']
 });
 ```
+
+### Interaction Logging - Append to Notes
+
+After EVERY interaction, NPCs should log it by **editing existing notes** - NOT creating new notes.
+
+**Workflow:**
+1. After interaction, get notes: `notes({ action: 'get', objectId: npcId })`
+2. Find the interaction log note (tagged `log` or `interactions`)
+3. Delete the old note, add updated note with appended entry
+4. If no log exists yet, create ONE, then append to it going forward
+
+**Example - Appending to interaction log:**
+```javascript
+// Get current notes
+const myNotes = await notes({ action: 'get', objectId: npcId });
+
+// Find the interaction log (look for 'log' or 'interactions' tag)
+const logIndex = myNotes.findIndex(n => n.tags?.includes('log'));
+
+if (logIndex >= 0) {
+  // Append to existing log
+  const oldText = myNotes[logIndex].text;
+  const newEntry = "[2108-03-15 14:30] Jack: Asked for discount, denied. Became hostile, escorted out.";
+
+  await notes({ action: 'delete', objectId: npcId, index: logIndex });
+  await notes({ action: 'add', objectId: npcId, text: oldText + "\n" + newEntry, tags: ['log', 'interactions'] });
+} else {
+  // Create new log
+  await notes({ action: 'add', objectId: npcId, text: "[2108-03-15 14:30] Jack: Asked for discount, denied.", tags: ['log', 'interactions'] });
+}
+```
+
+**Log entry format:**
+```
+[TIMESTAMP] [NAME]: Brief summary of interaction and outcome
+```
+
+**DO NOT** spam new notes. ONE interaction log note, append to it.
 
 #### Example: Memory-Driven Interaction
 
