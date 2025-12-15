@@ -68,6 +68,9 @@ export class NPCAgentManager extends EventEmitter {
     const name = String(npc.get('name') || `NPC #${npcId}`);
     const role = String(npc.get('aiRole') || options.role || 'generic');
 
+    // Load existing session ID from NPC object
+    const existingSessionId = npc.get('agentSessionId') as string | undefined;
+
     // Build agent config
     const agentConfig: NPCAgentConfig = {
       npcId,
@@ -78,10 +81,23 @@ export class NPCAgentManager extends EventEmitter {
       workingDirectory: this.config.workingDirectory,
       allowedTools: options.allowedTools || this.config.defaultAllowedTools,
       systemPromptAddition: options.systemPromptAddition,
+      resumeSessionId: existingSessionId,
+      onSessionCreated: async (sessionId: string) => {
+        // Persist session ID to NPC object in database
+        const npcObj = await this.manager.load(npcId);
+        if (npcObj) {
+          npcObj.set('agentSessionId', sessionId);
+          console.log(`[NPCAgentManager] Saved session ${sessionId} to NPC #${npcId}`);
+        }
+      },
     };
 
     // Create agent
     const agent = new NPCAgent(agentConfig);
+
+    if (existingSessionId) {
+      console.log(`[NPCAgentManager] Resuming session ${existingSessionId} for NPC #${npcId}`);
+    }
 
     // Set up event forwarding
     agent.on('tool_use', (data) => {

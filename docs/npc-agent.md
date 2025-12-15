@@ -2,6 +2,22 @@
 
 AI-powered NPCs using the Claude Agent SDK with full MCP tool access.
 
+## Quick Start (Docker)
+
+```bash
+# Start all services including NPC agent
+docker compose up -d
+
+# View NPC agent logs
+docker logs -f malice-npc-agent
+```
+
+The NPC agent service automatically:
+- Connects to the game's MCP server
+- Creates agents for all AI-controlled NPCs in the registry
+- Persists session IDs to MongoDB
+- Resumes sessions on restart
+
 ## Overview
 
 The NPC Agent module enables AI-controlled characters in the game world. Each NPC gets a Claude-powered agent that can:
@@ -358,6 +374,76 @@ const response = await guard.handleEvent('player_said', {
 // "Marcus relaxes slightly. 'Work, huh? Check the job board
 //  outside the Smith Tower. They're always hiring.'"
 ```
+
+## Docker Deployment
+
+The NPC agent runs as a separate Docker container for isolation and scalability.
+
+### Architecture
+
+```
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│   malice-game   │────▶│  malice-mongo   │◀────│ malice-npc-agent│
+│                 │     │                 │     │                 │
+│  - Game server  │     │  - MongoDB      │     │  - Claude SDK   │
+│  - MCP server   │◀────│  - Session IDs  │     │  - AI agents    │
+│  - Telnet/WS    │     │  - NPC data     │     │  - Session files│
+└─────────────────┘     └─────────────────┘     └─────────────────┘
+        ▲                                               │
+        │              HTTP (MCP Protocol)              │
+        └───────────────────────────────────────────────┘
+```
+
+### Volumes
+
+| Volume | Container | Purpose |
+|--------|-----------|---------|
+| `mongodb_data` | malice-mongo | Game database |
+| `npc_agent_sessions` | malice-npc-agent | Claude session files |
+
+### Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `MCP_HOST` | `malice-game` | Game MCP server hostname |
+| `MCP_PORT` | `3001` | Game MCP server port |
+| `POLL_INTERVAL` | `30000` | How often to sync with AI registry (ms) |
+
+### Session Persistence
+
+Session IDs are stored on NPC objects in MongoDB:
+
+```javascript
+// NPC object in MongoDB
+{
+  _id: 3028,
+  name: "Marcus Webb",
+  role: "guard",
+  agentSessionId: "cca3aea4-e755-4006-9d8b-e08b880963a0"  // Persisted here
+}
+```
+
+Session files are stored in the `npc_agent_sessions` Docker volume at `/app/.claude/`.
+
+On container restart:
+1. Service queries AI registry for NPCs
+2. Loads `agentSessionId` from each NPC object
+3. Resumes Claude sessions using stored IDs
+4. Full conversation history is restored
+
+### Scaling
+
+To run multiple NPC agent instances (for load balancing):
+
+```yaml
+# docker-compose.override.yml
+services:
+  npc-agent:
+    deploy:
+      replicas: 3
+```
+
+Each instance will manage a subset of NPCs based on which ones it syncs first.
 
 ## Troubleshooting
 

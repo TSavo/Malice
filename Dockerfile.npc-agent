@@ -1,0 +1,40 @@
+# NPC Agent Service
+# AI-powered NPCs using Claude Agent SDK
+#
+# Runs as a separate container with:
+# - Session files persisted in /app/.claude volume
+# - Connects to game MCP server over network
+# - Session IDs stored in MongoDB via MCP
+
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Install Claude Code CLI for SDK runtime
+RUN npm install -g @anthropic-ai/claude-code
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies
+RUN npm ci
+
+# Copy source
+COPY src ./src
+COPY types ./types
+COPY tsconfig.json ./
+
+# Create directory for Claude sessions
+RUN mkdir -p /app/.claude
+
+# Set Claude home for session storage
+ENV CLAUDE_CONFIG_DIR=/app/.claude
+
+# Default MCP server location (game container)
+ENV MCP_HOST=malice-game
+ENV MCP_PORT=3001
+
+# Entry point script
+COPY npc-agent-service.ts ./
+
+CMD ["npx", "tsx", "npc-agent-service.ts"]

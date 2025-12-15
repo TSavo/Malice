@@ -70,8 +70,27 @@ services:
     networks:
       - malice-network
 
+  npc-agent:
+    build:
+      context: .
+      dockerfile: Dockerfile.npc-agent
+    container_name: malice-npc-agent
+    restart: unless-stopped
+    environment:
+      - MCP_HOST=malice-game
+      - MCP_PORT=3001
+      - POLL_INTERVAL=30000
+    volumes:
+      - npc_agent_sessions:/app/.claude
+    depends_on:
+      - game
+    networks:
+      - malice-network
+
 volumes:
   mongodb_data:
+    driver: local
+  npc_agent_sessions:
     driver: local
 
 networks:
