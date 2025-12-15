@@ -14,6 +14,9 @@ COPY src ./src
 COPY types ./types
 COPY tsconfig.json ./
 
+# Copy city-ai documentation for MCP resources
+COPY docs/city-ai ./docs/city-ai
+
 # Expose ports
 EXPOSE 5555 8080
 
