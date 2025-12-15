@@ -107,23 +107,17 @@ await mcp.set_method({
 
 ### AI Registry Integration
 
-The $.ai registry tracks AI-controlled humans:
+The $.ai registry tracks AI-controlled humans (use the consolidated `ai` tool):
 
 ```javascript
 // Spawn an AI human
-mcp.spawn_ai({
-  role: "guard",
-  name: "Marcus",
-  locationId: 100,
-  sex: "male",
-  age: 35
-});
+ai({ action: "spawn", role: "guard", name: "Marcus", locationId: 100, sex: "male", age: 35 });
 
 // List all guards
-mcp.list_ai({ role: "guard" });
+ai({ action: "list", role: "guard" });
 
 // Remove when done
-mcp.despawn_ai({ humanId: 567 });
+ai({ action: "despawn", humanId: 567 });
 ```
 
 ### Faction System Integration
@@ -160,30 +154,17 @@ Relationship types: `'friendly'`, `'hostile'`, `'neutral'` (default)
 
 ### Plot/Job System Integration
 
-Create narratives and quests via MCP:
+Create narratives and quests via MCP (use the consolidated `plot` tool):
 
 ```javascript
 // Create a plot
-mcp.create_plot({
-  name: "Missing Jewels",
-  metadata: { participants: [100], type: "investigation" }
-});
+plot({ action: "create", name: "Missing Jewels", metadata: { participants: [100], type: "investigation" } });
 
 // Add a job with a hook
-mcp.create_job({
-  plotId: 500,
-  jobId: "find_jewels",
-  metadata: { reward: 100 }
-});
+plot({ action: "create_job", plotId: 500, jobId: "find_jewels", metadata: { reward: 100 } });
 
 // Watch for events
-mcp.register_job_hook({
-  plotId: 500,
-  jobId: "find_jewels",
-  targetId: 200,
-  eventName: "itemPickedUp",
-  filter: { itemName: "jewels" }
-});
+plot({ action: "register_hook", plotId: 500, jobId: "find_jewels", targetId: 200, eventName: "itemPickedUp", filter: { itemName: "jewels" } });
 ```
 
 See [MCP-TOOLS.md](MCP-TOOLS.md) for complete tool reference.

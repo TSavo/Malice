@@ -328,257 +328,254 @@ Close a telnet session.
 // Returns: Confirmation
 ```
 
-## AI Registry
+## AI Registry (Consolidated Tool)
 
-Tools for managing AI-controlled humans. AI humans are regular `$.human` instances tracked by role in the `$.ai` registry.
+The `ai` tool is a consolidated interface for managing AI-controlled humans. AI humans are regular `$.human` instances tracked by role in the `$.ai` registry.
 
-### spawn_ai
-Spawn a new AI-controlled human with a full body.
+### Actions
+
+- `spawn` - Create a new AI-controlled human (role, name?, description?, locationId?, sex?, age?)
+- `despawn` - Remove an AI human (humanId, recycle?)
+- `list` - List all AI humans (role?)
+- `info` - Get detailed AI human info (humanId)
+- `do` - Execute a command as AI human (humanId, command)
+- `look` - Get what AI human sees (humanId)
+
+### Examples
+
+```javascript
+// Spawn a guard
+ai({ action: "spawn", role: "guard", name: "Marcus", sex: "male", age: 35, locationId: 100 })
+// Returns: { id: 567, name: "Marcus", role: "guard" }
+
+// See what the guard sees
+ai({ action: "look", humanId: 567 })
+// Returns: { location: "Lobby", exits: ["north", "south"], people: [...], items: [...] }
+
+// Make the guard do things
+ai({ action: "do", humanId: 567, command: "say Halt! Who goes there?" })
+ai({ action: "do", humanId: 567, command: "north" })
+ai({ action: "do", humanId: 567, command: "get sword" })
+
+// List all guards
+ai({ action: "list", role: "guard" })
+// Returns: { count: 1, humans: [{ id: 567, name: "Marcus", role: "guard", location: 100 }] }
+
+// Get detailed info
+ai({ action: "info", humanId: 567 })
+// Returns: { id: 567, name: "Marcus", role: "guard", spawnedAt: "...", ... }
+
+// Remove the AI
+ai({ action: "despawn", humanId: 567, recycle: true })
+```
+
+## Notes (Consolidated Tool)
+
+The `notes` tool provides a consolidated interface for attaching notes to MOO objects. Notes support text content, authors, and tags for organization.
+
+### Actions
+
+- `get` - Get all notes on an object (objectId)
+- `add` - Add a note to an object (objectId, text, author?, tags?)
+- `delete` - Delete a note by index (objectId, index)
+- `search` - Search notes across objects (query?, tag?, author?, limit?)
+- `list_objects` - List all objects that have notes
+
+### Examples
+
+```javascript
+// Add a note to an object
+notes({ action: "add", objectId: 123, text: "This needs review", author: "Claude", tags: ["review", "important"] })
+// Returns: { added: true, index: 0 }
+
+// Get all notes on an object
+notes({ action: "get", objectId: 123 })
+// Returns: { notes: [{ text: "This needs review", author: "Claude", tags: [...], createdAt: "..." }] }
+
+// Search notes by tag
+notes({ action: "search", tag: "review" })
+// Returns: { results: [{ objectId: 123, noteIndex: 0, note: {...} }] }
+
+// Search notes by text
+notes({ action: "search", query: "needs review", limit: 10 })
+
+// List objects with notes
+notes({ action: "list_objects" })
+// Returns: { objects: [{ id: 123, name: "...", noteCount: 1 }] }
+
+// Delete a note
+notes({ action: "delete", objectId: 123, index: 0 })
+```
+
+## World Query (Consolidated Tool)
+
+The `world` tool provides SQL-like querying of MOO objects, translated to MongoDB queries for efficient execution.
+
+### Actions
+
+- `query` - Search objects with DSL query (q, limit?, offset?)
+- `validate` - Validate a query without executing (q)
+
+### Query Syntax
+
+```
+.property == value           # Equality
+.property != value           # Inequality
+.property > 5                # Numeric comparisons: >, <, >=, <=
+.property contains 'text'    # Substring match (case-insensitive)
+.property like 'foo*'        # Glob pattern (* = any, ? = single char)
+.property matches 'regex'    # Regex match
+.property exists             # Property is defined
+not .property exists         # Negation
+X and Y                      # Logical AND
+X or Y                       # Logical OR
+(X or Y) and Z               # Grouping
+```
+
+### Special Properties
+
+- `.id`, `.parent` - Direct document fields
+- `.name`, `.description`, etc. - Mapped to `properties.X`
+
+### Examples
+
+```javascript
+// Find all objects with "Tower" in name
+world({ action: "query", q: ".name contains 'Tower'" })
+
+// Find children of a specific parent
+world({ action: "query", q: ".parent == 10" })
+
+// Complex query with AND/OR
+world({ action: "query", q: "(.name contains 'sword' or .name contains 'dagger') and .location exists" })
+
+// Validate a query before running
+world({ action: "validate", q: ".parent == 10 and .name like 'Lock*'" })
+// Returns: { valid: true }
+
+// Paginated results
+world({ action: "query", q: ".parent == 7", limit: 20, offset: 40 })
+```
+
+### Query Response
 
 ```javascript
 {
-  role: "guard",              // Required: role for this AI
-  name: "Marcus",             // Optional: name
-  description: "A burly...",  // Optional: description
-  locationId: 100,            // Optional: room to place in
-  sex: "male",                // Optional: "male", "female", "non-binary"
-  age: 35                     // Optional: age in years
+  query: ".name contains 'Tower'",
+  mongoQuery: { "properties.name": { "$regex": "Tower", "$options": "i" } },
+  count: 15,
+  offset: 0,
+  results: [
+    { id: 1411, parent: 7, name: "Smith Tower - Ground Floor - Reception" },
+    // ...
+  ]
 }
-// Returns: Created human ID and name
 ```
 
-### despawn_ai
-Remove an AI-controlled human from the registry.
+## Plot System (Consolidated Tool)
 
-```javascript
-{
-  humanId: 567,
-  recycle: true  // Optional: whether to recycle the object (default: true)
-}
-// Returns: Confirmation
+The `plot` tool is a consolidated interface for managing plots, jobs, and phases. All plot operations use an `action` parameter.
+
+### Structure
+
+```
+Plot
+  ├── name, description, metadata
+  ├── events[]                    # Narrative log
+  ├── phases[]                    # Narrative stages with AI prompts
+  │     └── { id, name, description, prompt, metadata }
+  └── jobs{}                      # Player progression tracking
+        └── { status, currentPhase, phaseHistory[], hooks[], metadata }
 ```
 
-### list_ai
-List all AI-controlled humans.
+### Actions
+
+**Plot Management:**
+- `create` - Create a new plot (name, metadata?)
+- `get` - Get plot details (plotId)
+- `list` - List plots (status?: active|completed|abandoned|failed)
+- `search` - Search plot events (query, limit?)
+- `close` - Close a plot (plotId, status, reason?)
+- `set_metadata` - Set plot metadata (plotId, key, value)
+- `add_event` - Add event to log (plotId, message, from?)
+- `get_events` - Get event log (plotId, limit?)
+
+**Phase Management:**
+- `set_phases` - Define phases for a plot (plotId, phases[])
+- `get_phases` - Get phase definitions (plotId)
+
+**Job Management:**
+- `create_job` - Create job in plot (plotId, jobId, metadata?, expiresAt?)
+- `get_job` - Get job details (plotId, jobId)
+- `complete_job` - Complete a job (plotId, jobId, reason?)
+- `fail_job` - Fail a job (plotId, jobId, reason?)
+
+**Job Phase Tracking:**
+- `get_job_phase` - Get current phase for job (plotId, jobId)
+- `advance_phase` - Advance job to next phase (plotId, jobId)
+- `set_phase` - Set job to specific phase (plotId, jobId, phaseId)
+
+**Hooks:**
+- `register_hook` - Register job hook (plotId, jobId, targetId, eventName, filter?)
+
+**Queue:**
+- `next` - Get next plot needing attention (bumps timer 24h)
+- `active` - List all active plots with metadata
+
+### Examples
 
 ```javascript
-{ role: "guard" }  // Optional: filter by role
-// Returns: Array of { id, name, role, location }
-```
+// Create a plot
+plot({ action: "create", name: "Package Delivery", metadata: { type: "delivery" } })
+// Returns: { created: true, plotId: 500, name: "Package Delivery" }
 
-### get_ai_info
-Get detailed information about an AI-controlled human.
-
-```javascript
-{ humanId: 567 }
-// Returns: { id, name, role, spawnedAt, spawnedBy, ... }
-```
-
-### ai_do
-Execute a command as an AI-controlled human (like typing in the game).
-
-```javascript
-{
-  humanId: 567,
-  command: "say Hello everyone!"  // Any command: "north", "get sword", "look", etc.
-}
-// Returns: Command result/output
-```
-
-### ai_look
-Get what an AI-controlled human sees in their current location.
-
-```javascript
-{ humanId: 567 }
-// Returns: { location, description, exits, people, items }
-```
-
-## Plot Management
-
-Plots are narrative containers that track storylines, player requests, and AI-initiated events.
-
-### create_plot
-Create a new plot for AI-initiated storylines.
-
-```javascript
-{
-  name: "Guard Investigation",
-  metadata: {               // Optional initial metadata
-    participants: [100],
-    status: "active"
-  }
-}
-// Returns: Created plot ID
-```
-
-### close_plot
-Close a plot with a final status.
-
-```javascript
-{
+// Set phases (simple structure - just prompts for AI guidance)
+plot({
+  action: "set_phases",
   plotId: 500,
-  status: "completed",  // "completed", "abandoned", or "failed"
-  reason: "Mystery solved"  // Optional
-}
-// Returns: Confirmation
-```
+  phases: [
+    { id: "accept", name: "Accept Job", description: "Player accepts", prompt: "Guide player to accept the delivery job" },
+    { id: "pickup", name: "Pick Up", description: "Get the package", prompt: "Player needs to pick up the package from the warehouse" },
+    { id: "deliver", name: "Deliver", description: "Complete delivery", prompt: "Help player deliver to the destination" }
+  ]
+})
 
-### get_plot_events
-Get the event log for a plot.
+// Create a job (auto-starts on first phase)
+plot({ action: "create_job", plotId: 500, jobId: "player-42", metadata: { playerId: 42 } })
 
-```javascript
-{
+// Get current phase info
+plot({ action: "get_job_phase", plotId: 500, jobId: "player-42" })
+// Returns: { phaseId: "accept", phase: {...}, startedAt: "...", history: [] }
+
+// Advance to next phase
+plot({ action: "advance_phase", plotId: 500, jobId: "player-42" })
+// Returns: { advanced: true, newPhase: "pickup" }
+
+// Add narrative event
+plot({ action: "add_event", plotId: 500, message: "Player picked up the package" })
+
+// Register a hook
+plot({
+  action: "register_hook",
   plotId: 500,
-  limit: 10  // Optional: limit to last N events
-}
-// Returns: { plotId, name, eventCount, events: [...] }
-```
+  jobId: "player-42",
+  targetId: 100,
+  eventName: "itemDropped",
+  filter: { itemName: "package" }
+})
 
-### add_plot_event
-Add an event to a plot's narrative log.
+// Complete the job
+plot({ action: "complete_job", plotId: 500, jobId: "player-42", reason: "Delivered successfully" })
 
-```javascript
-{
-  plotId: 500,
-  message: "The guard arrived at the scene.",
-  from: "handler"  // Optional: "handler" or "system"
-}
-// Returns: Confirmation
-```
+// Close the plot
+plot({ action: "close", plotId: 500, status: "completed", reason: "Quest finished" })
 
-### list_plots
-List all plots with optional filtering.
+// Get next plot needing attention
+plot({ action: "next" })
+// Returns oldest plot needing attention, bumps timer by 24h
 
-```javascript
-{
-  status: "active",  // Optional: "active", "completed", "abandoned", "failed"
-  limit: 50          // Optional
-}
-// Returns: Array of plot summaries
-```
-
-### plots_by_player
-Get all plots involving a specific player.
-
-```javascript
-{
-  playerId: 100,
-  activeOnly: true  // Optional: filter to active plots only
-}
-// Returns: Array of plots involving the player
-```
-
-### search_plots
-Search plot event logs for text.
-
-```javascript
-{
-  query: "stolen jewels",
-  limit: 10  // Optional
-}
-// Returns: Plots with matching content
-```
-
-## Job System
-
-Jobs are tasks within plots that can watch for game events via hooks.
-
-### get_next_job
-Get the next plot/job needing attention from the FIFO queue.
-
-```javascript
-{}
-// Returns: Plot with event log and metadata, bumps attention timer by 24h
-```
-
-### respond_to_job
-Add an event to a plot as the city AI handler.
-
-```javascript
-{
-  plotId: 500,
-  message: "Guard dispatched to investigate",
-  metadata: { guardId: 123, status: "investigating" }
-}
-// Returns: Confirmation
-```
-
-### list_active_jobs
-List all active plots/jobs with metadata.
-
-```javascript
-{}
-// Returns: Array of active jobs
-```
-
-### set_job_metadata
-Set or update metadata on a plot/job.
-
-```javascript
-{ plotId: 500, key: "status", value: "resolved" }
-// Returns: Confirmation
-```
-
-### create_job
-Create a job (task) within a plot.
-
-```javascript
-{
-  plotId: 500,
-  jobId: "deliver_package",
-  expiresAt: "2024-12-15T00:00:00Z",  // Optional
-  metadata: { targetRoom: 100 }       // Optional
-}
-// Returns: Confirmation
-```
-
-### complete_job
-Mark a job as completed (unregisters all hooks).
-
-```javascript
-{
-  plotId: 500,
-  jobId: "deliver_package",
-  reason: "Package delivered"  // Optional
-}
-// Returns: Confirmation
-```
-
-### fail_job
-Mark a job as failed (unregisters all hooks).
-
-```javascript
-{
-  plotId: 500,
-  jobId: "deliver_package",
-  reason: "Package lost"  // Optional
-}
-// Returns: Confirmation
-```
-
-### register_job_hook
-Register a hook to watch for events on a target object.
-
-```javascript
-{
-  plotId: 500,
-  jobId: "deliver_package",
-  targetId: 100,           // Object to watch
-  eventName: "itemDeposited",
-  filter: { itemType: "package" }  // Optional filter
-}
-// Returns: Confirmation
-```
-
-### get_job
-Get information about a specific job.
-
-```javascript
-{
-  plotId: 500,
-  jobId: "deliver_package"
-}
-// Returns: Job details including hooks and metadata
+// List active plots
+plot({ action: "active" })
 ```
 
 ## Examples
@@ -642,17 +639,18 @@ Jobs are created by players (e.g., "I want to rent an apartment") and processed 
 **Typical workflow:**
 
 ```javascript
-// 1. Check for pending jobs
-const job = await get_next_job({});
-// Returns: { plotId, events, metadata, needsAttention, ... }
+// 1. Check for pending plots
+const result = await plot({ action: "next" });
+// Returns oldest plot needing attention, bumps timer by 24h
 
-if (!job) {
-  // No jobs need attention
+if (!result.plot) {
+  // No plots need attention
   return;
 }
 
 // 2. Read the event history to understand context
-// job.events contains the full narrative log:
+const events = await plot({ action: "get_events", plotId: result.plot.id, limit: 50 });
+// events contains the full narrative log:
 // - Player actions and requests
 // - Previous AI responses
 // - State changes
@@ -661,31 +659,30 @@ if (!job) {
 // Example: Player requested a delivery
 const item = await spawn_item({
   prototypeId: 40,  // $.stackable
-  locationId: job.metadata.targetRoomId,
+  locationId: result.plot.metadata.targetRoomId,
   properties: { name: "package", description: "A wrapped package" }
 });
 
-// 4. Respond to progress the narrative
-await respond_to_job({
-  plotId: job.plotId,
-  message: "A courier arrives and places a package on the table.",
-  metadata: {
-    deliveredItemId: item.objectId,
-    status: "delivered"
-  }
+// 4. Add narrative event
+await plot({
+  action: "add_event",
+  plotId: result.plot.id,
+  message: "A courier arrives and places a package on the table."
 });
 
-// 5. Or mark job as resolved
-await set_job_metadata({
-  plotId: job.plotId,
-  key: "resolved",
-  value: true
+// 5. Update metadata
+await plot({
+  action: "set_metadata",
+  plotId: result.plot.id,
+  key: "deliveredItemId",
+  value: item.objectId
 });
 ```
 
 **Key concepts:**
-- `get_next_job` returns the oldest job needing attention and bumps its timer by 24 hours
-- Use `respond_to_job` to add events visible to players and track state in metadata
+- `plot({ action: "next" })` returns the oldest plot needing attention and bumps its timer by 24 hours
+- Use `plot({ action: "add_event" })` to add events visible to players
+- Use `plot({ action: "set_metadata" })` to track state
 - Combine with other MCP tools to create objects, move items, spawn NPCs, etc.
 - See [plot-jobs.md](plot-jobs.md) for full documentation on the plot system
 
@@ -693,109 +690,68 @@ await set_job_metadata({
 
 ```javascript
 // 1. Spawn a guard
-const guard = await spawn_ai({
-  role: "guard",
-  name: "Marcus",
-  sex: "male",
-  age: 35,
-  locationId: 100  // Smith Tower Lobby
-});
+const guard = await ai({ action: "spawn", role: "guard", name: "Marcus", sex: "male", age: 35, locationId: 100 });
 // Returns: { id: 567, name: "Marcus" }
 
 // 2. See what the guard sees
-const view = await ai_look({ humanId: 567 });
+const view = await ai({ action: "look", humanId: 567 });
 // Returns: { location: "Lobby", exits: ["north", "south"], people: [...], items: [...] }
 
 // 3. Make the guard do things
-await ai_do({ humanId: 567, command: "say Halt! Who goes there?" });
-await ai_do({ humanId: 567, command: "north" });  // Walk north
-await ai_do({ humanId: 567, command: "get sword" });
+await ai({ action: "do", humanId: 567, command: "say Halt! Who goes there?" });
+await ai({ action: "do", humanId: 567, command: "north" });
+await ai({ action: "do", humanId: 567, command: "get sword" });
 
 // 4. List all guards
-const guards = await list_ai({ role: "guard" });
+const guards = await ai({ action: "list", role: "guard" });
 // Returns: { count: 1, humans: [{ id: 567, name: "Marcus", role: "guard", location: 100 }] }
 
 // 5. Get detailed info
-const info = await get_ai_info({ humanId: 567 });
+const info = await ai({ action: "info", humanId: 567 });
 // Returns: { id: 567, name: "Marcus", role: "guard", spawnedAt: "...", ... }
 
 // 6. When no longer needed
-await despawn_ai({ humanId: 567, recycle: true });
+await ai({ action: "despawn", humanId: 567, recycle: true });
 ```
 
 ### Creating AI-Driven Plot with Jobs
 
 ```javascript
 // 1. Create a plot for a delivery quest
-const plot = await create_plot({
-  name: "Package Delivery",
-  metadata: {
-    participants: [100],  // Player ID
-    type: "delivery"
-  }
-});
-// Returns: Created plot #500
+const result = await plot({ action: "create", name: "Package Delivery", metadata: { participants: [100], type: "delivery" } });
+// Returns: { created: true, plotId: 500, name: "Package Delivery" }
 
 // 2. Create a job within the plot
-await create_job({
-  plotId: 500,
-  jobId: "deliver_to_lobby",
-  metadata: { targetRoom: 50, item: "package" }
-});
+await plot({ action: "create_job", plotId: 500, jobId: "deliver_to_lobby", metadata: { targetRoom: 50, item: "package" } });
 
 // 3. Register a hook to watch for item drop
-await register_job_hook({
-  plotId: 500,
-  jobId: "deliver_to_lobby",
-  targetId: 50,          // Watch the lobby room
-  eventName: "itemDropped",
-  filter: { itemName: "package" }
-});
+await plot({ action: "register_hook", plotId: 500, jobId: "deliver_to_lobby", targetId: 50, eventName: "itemDropped", filter: { itemName: "package" } });
 
 // 4. Add narrative event
-await add_plot_event({
-  plotId: 500,
-  message: "Quest accepted: Deliver the package to the lobby."
-});
+await plot({ action: "add_event", plotId: 500, message: "Quest accepted: Deliver the package to the lobby." });
 
 // 5. When the hook fires, complete the job
-await complete_job({
-  plotId: 500,
-  jobId: "deliver_to_lobby",
-  reason: "Package delivered successfully"
-});
+await plot({ action: "complete_job", plotId: 500, jobId: "deliver_to_lobby", reason: "Package delivered successfully" });
 
 // 6. Close the plot
-await close_plot({
-  plotId: 500,
-  status: "completed",
-  reason: "Delivery completed"
-});
+await plot({ action: "close", plotId: 500, status: "completed", reason: "Delivery completed" });
 ```
 
 ### Searching and Monitoring Plots
 
 ```javascript
-// Find all plots involving a player
-const playerPlots = await plots_by_player({
-  playerId: 100,
-  activeOnly: true
-});
-
 // Search plot events
-const results = await search_plots({
-  query: "stolen jewels"
-});
+const results = await plot({ action: "search", query: "stolen jewels" });
 
 // List all active plots
-const active = await list_plots({
-  status: "active",
-  limit: 20
-});
+const active = await plot({ action: "list", status: "active" });
 
 // Get full event history
-const events = await get_plot_events({
-  plotId: 500,
-  limit: 50
-});
+const events = await plot({ action: "get_events", plotId: 500, limit: 50 });
+
+// Get next plot needing attention
+const next = await plot({ action: "next" });
+
+// List all active plots with metadata
+const allActive = await plot({ action: "active" });
 ```
