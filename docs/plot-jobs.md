@@ -106,7 +106,7 @@ The filter `{ code: 'XYZ789' }` matches, so `plot.onJobHookTriggered()` is calle
 
 This automatically:
 - Adds an event to the plot log
-- Sets `needsAttentionAt` to now (so `get_next_job` returns it)
+- Sets `needsAttentionAt` to now (so `plot({ action: "next" })` returns it)
 
 ### Step 6: Check the Event and Complete the Job
 
@@ -263,24 +263,30 @@ When using MCP tools like `get_object` and `get_property`, the server serializes
 
 ## MCP Tools Reference
 
-Dedicated MCP tools for plot and job management:
+All plot/job operations use the consolidated `plot` tool with an `action` parameter:
 
-| Tool | Description |
-|------|-------------|
-| `get_next_job` | Get the next plot needing attention (FIFO queue) |
-| `respond_to_job` | Add event and update metadata |
-| `create_plot` | Create a new plot for AI-initiated storylines |
-| `close_plot` | Close a plot with status |
-| `get_plot_events` | Get plot event log |
-| `add_plot_event` | Add narrative event |
-| `list_plots` | List plots with optional status filter |
-| `plots_by_player` | Get all plots for a player |
-| `search_plots` | Search plot events for text |
+| Action | Description |
+|--------|-------------|
+| `next` | Get the next plot needing attention (FIFO queue) |
+| `create` | Create a new plot |
+| `get` | Get plot details |
+| `close` | Close a plot with status |
+| `get_events` | Get plot event log |
+| `add_event` | Add narrative event |
+| `list` | List plots with optional status filter |
+| `search` | Search plot events for text |
+| `set_metadata` | Set plot metadata |
+| `set_phases` | Define phases for narrative progression |
+| `get_phases` | Get phase definitions |
 | `create_job` | Create a job within a plot |
+| `get_job` | Get job details |
 | `complete_job` | Mark job completed |
 | `fail_job` | Mark job failed |
-| `register_job_hook` | Watch for events on an object |
-| `get_job` | Get job details |
+| `get_job_phase` | Get current phase for job |
+| `advance_phase` | Advance job to next phase |
+| `set_phase` | Set job to specific phase |
+| `register_hook` | Watch for events on an object |
+| `active` | List all active plots |
 
 See [MCP-TOOLS.md](MCP-TOOLS.md) for complete parameter documentation.
 
@@ -289,56 +295,57 @@ See [MCP-TOOLS.md](MCP-TOOLS.md) for complete parameter documentation.
 From Claude's perspective using MCP tools:
 
 ```
-1. get_next_job
+1. plot({ action: "next" })
    → Returns plot with player's request
 
-2. respond_to_job (give instructions)
-   → "Pick up package #55 from warehouse"
+2. plot({ action: "add_event", plotId, message: "Pick up package #55..." })
+   → Give instructions to player
 
-3. create_job
-   → Create 'deliver-package' job with metadata
+3. plot({ action: "create_job", plotId, jobId: "deliver-package", metadata: {...} })
+   → Create job with metadata
 
 4. call_method on locker
    → createOneTimeCode() - returns code
 
-5. register_job_hook
-   → Watch locker for 'oneTimeCodeUsed' with filter { code }
+5. plot({ action: "register_hook", plotId, jobId, targetId: 100, eventName: "oneTimeCodeUsed", filter: { code } })
+   → Watch locker for code usage
 
-6. respond_to_job (give code to player)
-   → "Deliver to locker #100. Code: XYZ789"
+6. plot({ action: "add_event", plotId, message: "Deliver to locker #100. Code: XYZ789" })
+   → Give code to player
 
 7. [Wait for hook to fire - player does the delivery]
 
-8. get_next_job
+8. plot({ action: "next" })
    → Returns same plot (hook triggered needsAttentionAt)
 
-9. get_plot_events
+9. plot({ action: "get_events", plotId })
    → See delivery confirmed in event log
 
-10. complete_job
-    → Mark 'deliver-package' as completed
+10. plot({ action: "complete_job", plotId, jobId: "deliver-package" })
+    → Mark job as completed
 
-11. respond_to_job
-    → "Payment transferred. Job complete."
+11. plot({ action: "add_event", plotId, message: "Payment transferred. Job complete." })
+    → Final response
 
-12. close_plot (optional)
+12. plot({ action: "close", plotId, status: "completed" })
     → Mark plot as completed
 ```
 
-### Using Dedicated Tools vs call_method
+### Using plot tool vs call_method
 
-**Prefer dedicated tools** - cleaner, better error handling:
+**Prefer the plot tool** - cleaner, better error handling:
 
 ```javascript
-// Better: Use dedicated tool
-mcp.create_job({
+// Better: Use plot tool
+plot({
+  action: "create_job",
   plotId: 54,
   jobId: "deliver-package",
   metadata: { lockerId: 100 }
 });
 
 // Also works: Generic call_method
-mcp.call_method({
+call_method({
   objectId: 54,
   name: "createJob",
   args: ["deliver-package", { metadata: { lockerId: 100 } }]
@@ -346,7 +353,7 @@ mcp.call_method({
 ```
 
 **When to use call_method:**
-- Calling methods not exposed as MCP tools
+- Calling methods not exposed through consolidated tools
 - Custom methods on objects (e.g., locker.createOneTimeCode)
 
 ## Multiple Jobs Example

@@ -31,32 +31,22 @@ PLOT
 ### Basic Plot
 
 ```javascript
-const plot = await mcp.create_plot({
-  name: 'Water Crisis: Refugee Camp',
-  metadata: {
-    type: 'infrastructure',
-    priority: 'high',
-    location: { x: 5, y: -3 },
-    participants: [],
-    deadline: Date.now() + 7 * 24 * 60 * 60 * 1000  // 7 days
-  }
-});
+const result = await plot({ action: 'create', name: 'Water Crisis: Refugee Camp', metadata: {
+  type: 'infrastructure',
+  priority: 'high',
+  location: { x: 5, y: -3 },
+  participants: [],
+  deadline: Date.now() + 7 * 24 * 60 * 60 * 1000  // 7 days
+}});
+const plotId = result.plotId;
 ```
 
 ### Adding Narrative Events
 
 ```javascript
-await mcp.add_plot_event({
-  plotId: plot.id,
-  message: 'Water main serving the refugee camp has failed. Estimated 200 people without clean water. Disease risk escalating.',
-  from: 'system'
-});
+await plot({ action: 'add_event', plotId, message: 'Water main serving the refugee camp has failed. Estimated 200 people without clean water. Disease risk escalating.', from: 'system' });
 
-await mcp.add_plot_event({
-  plotId: plot.id,
-  message: 'Work order issued. Repair crew requested.',
-  from: 'handler'
-});
+await plot({ action: 'add_event', plotId, message: 'Work order issued. Repair crew requested.', from: 'handler' });
 ```
 
 ## Plot Types
@@ -153,119 +143,64 @@ Plots that unfold over realistic timeframes.
 
 **Day 0: Request**
 ```javascript
-const plot = await mcp.create_plot({
-  name: 'Construction: The Rusty Nail Bar',
-  metadata: {
-    type: 'construction',
-    owner: playerId,
-    location: { x: -5, y: 8, z: 0 },
-    estimated_days: 3,
-    day: 0
-  }
-});
+const result = await plot({ action: 'create', name: 'Construction: The Rusty Nail Bar', metadata: {
+  type: 'construction',
+  owner: playerId,
+  location: { x: -5, y: 8, z: 0 },
+  estimated_days: 3,
+  day: 0
+}});
+const plotId = result.plotId;
 
-await mcp.add_plot_event({
-  plotId: plot.id,
-  message: 'Construction request received. Site survey scheduled.'
-});
+await plot({ action: 'add_event', plotId, message: 'Construction request received. Site survey scheduled.' });
 ```
 
 **Day 1: Work Begins**
 ```javascript
 // Update adjacent room description
-await mcp.set_property({
-  objectId: adjacentRoomId,
-  name: 'description',
-  value: originalDescription + '\n\nThe sound of construction echoes from the east. A section of wall has been marked for demolition.'
-});
+await set_property({ objectId: adjacentRoomId, name: 'description', value: originalDescription + '\n\nThe sound of construction echoes from the east. A section of wall has been marked for demolition.' });
 
 // Spawn work crew
-const foreman = await mcp.spawn_ai({
-  role: 'supervisor',
-  name: 'Construction Foreman',
-  locationId: adjacentRoomId
-});
+const foreman = await ai({ action: 'spawn', role: 'supervisor', name: 'Construction Foreman', locationId: adjacentRoomId });
 
 // Log progress
-await mcp.add_plot_event({
-  plotId: plot.id,
-  message: 'Day 1: Demolition begun. Wall section removed. Debris clearing in progress.'
-});
+await plot({ action: 'add_event', plotId, message: 'Day 1: Demolition begun. Wall section removed. Debris clearing in progress.' });
 
 // Update metadata
-await mcp.set_job_metadata({
-  plotId: plot.id,
-  key: 'day',
-  value: 1
-});
+await plot({ action: 'set_metadata', plotId, key: 'day', value: 1 });
 ```
 
 **Day 2: Progress**
 ```javascript
 // Update site description
-await mcp.set_property({
-  objectId: adjacentRoomId,
-  name: 'description',
-  value: originalDescription + '\n\nThrough the new opening to the east, you can see workers framing walls and running conduit.'
-});
+await set_property({ objectId: adjacentRoomId, name: 'description', value: originalDescription + '\n\nThrough the new opening to the east, you can see workers framing walls and running conduit.' });
 
-await mcp.add_plot_event({
-  plotId: plot.id,
-  message: 'Day 2: Framing complete. Electrical rough-in started. Plumbing connections made.'
-});
+await plot({ action: 'add_event', plotId, message: 'Day 2: Framing complete. Electrical rough-in started. Plumbing connections made.' });
 
-await mcp.set_job_metadata({
-  plotId: plot.id,
-  key: 'day',
-  value: 2
-});
+await plot({ action: 'set_metadata', plotId, key: 'day', value: 2 });
 ```
 
 **Day 3: Completion**
 ```javascript
 // Create the actual room
-const bar = await mcp.dig({
-  name: 'The Rusty Nail',
-  description: 'A small bar carved out of what was once storage space. The walls are raw concrete, the fixtures salvaged, but it has character. A wooden bar top, polished smooth by previous use, dominates the space. Mismatched stools line up in front of it.',
-  fromRoomId: adjacentRoomId,
-  exitDirection: 'east',
-  returnDirection: 'west'
-});
+const bar = await dig({ name: 'The Rusty Nail', description: 'A small bar carved out of what was once storage space. The walls are raw concrete, the fixtures salvaged, but it has character. A wooden bar top, polished smooth by previous use, dominates the space. Mismatched stools line up in front of it.', fromRoomId: adjacentRoomId, exitDirection: 'east', returnDirection: 'west' });
 
 // Spawn furnishings
-await mcp.spawn_item({
-  prototypeId: signPrototypeId,
-  locationId: bar.id,
-  properties: {
-    name: 'Menu Board',
-    text: 'DRINKS\nWater - 1 credit\nBrew - 3 credits\n...'
-  }
-});
+await spawn_item({ prototypeId: signPrototypeId, locationId: bar.id, properties: { name: 'Menu Board', text: 'DRINKS\nWater - 1 credit\nBrew - 3 credits\n...' }});
 
 // Remove construction references from adjacent room
-await mcp.set_property({
-  objectId: adjacentRoomId,
-  name: 'description',
-  value: originalDescription + '\n\nAn opening to the east leads to The Rusty Nail.'
-});
+await set_property({ objectId: adjacentRoomId, name: 'description', value: originalDescription + '\n\nAn opening to the east leads to The Rusty Nail.' });
 
 // Despawn work crew (walk them out first!)
-await mcp.ai_do({ humanId: foreman.id, command: 'west' });
-await mcp.ai_do({ humanId: foreman.id, command: 'say Construction complete. Good luck with the place.' });
-await mcp.ai_do({ humanId: foreman.id, command: 'south' });
-await mcp.despawn_ai({ humanId: foreman.id });
+await ai({ action: 'do', humanId: foreman.id, command: 'west' });
+await ai({ action: 'do', humanId: foreman.id, command: 'say Construction complete. Good luck with the place.' });
+await ai({ action: 'do', humanId: foreman.id, command: 'south' });
+await ai({ action: 'despawn', humanId: foreman.id });
 
 // Complete the plot
-await mcp.add_plot_event({
-  plotId: plot.id,
-  message: 'Day 3: Construction complete. The Rusty Nail is open for business.'
-});
+await plot({ action: 'add_event', plotId, message: 'Day 3: Construction complete. The Rusty Nail is open for business.' });
 
-await mcp.close_plot({
-  plotId: plot.id,
-  status: 'completed',
-  reason: 'Construction successful.'
-});
+await plot({ action: 'close', plotId, status: 'completed', reason: 'Construction successful.' });
 ```
 
 ## Using Hooks
@@ -275,13 +210,7 @@ Hooks watch for in-game events and notify the plot system.
 ### Registering a Hook
 
 ```javascript
-await mcp.register_job_hook({
-  plotId: plot.id,
-  jobId: 'repair_pipe',
-  targetId: brokenPipeId,
-  eventName: 'repaired',
-  filter: {}
-});
+await plot({ action: 'register_hook', plotId, jobId: 'repair_pipe', targetId: brokenPipeId, eventName: 'repaired', filter: {} });
 ```
 
 ### Common Hook Events
@@ -299,25 +228,17 @@ await mcp.register_job_hook({
 When a hook fires, the plot needs attention:
 
 ```javascript
-const job = await mcp.get_next_job();
+const result = await plot({ action: 'next' });
 
-if (job) {
+if (result.plot) {
   // Check what happened
-  const events = job.events;
+  const events = result.plot.events;
 
   // Respond appropriately
-  await mcp.respond_to_job({
-    plotId: job.id,
-    message: 'Hook triggered. Processing completion.',
-    metadata: { handled: true }
-  });
+  await plot({ action: 'add_event', plotId: result.plot.id, message: 'Hook triggered. Processing completion.' });
 
   // Complete the job
-  await mcp.complete_job({
-    plotId: job.id,
-    jobId: 'repair_pipe',
-    reason: 'Repair verified.'
-  });
+  await plot({ action: 'complete_job', plotId: result.plot.id, jobId: 'repair_pipe', reason: 'Repair verified.' });
 }
 ```
 
@@ -326,31 +247,19 @@ if (job) {
 ### Listing Active Plots
 
 ```javascript
-const active = await mcp.list_plots({ status: 'active' });
+const active = await plot({ action: 'list', status: 'active' });
 ```
 
 ### Checking Plot Status
 
 ```javascript
-const events = await mcp.get_plot_events({ plotId: plot.id });
-```
-
-### Finding Player Plots
-
-```javascript
-const playerPlots = await mcp.plots_by_player({
-  playerId: 123,
-  activeOnly: true
-});
+const events = await plot({ action: 'get_events', plotId });
 ```
 
 ### Searching Plot History
 
 ```javascript
-const results = await mcp.search_plots({
-  query: 'water main',
-  limit: 10
-});
+const results = await plot({ action: 'search', query: 'water main', limit: 10 });
 ```
 
 ## Plot Lifecycle
@@ -368,11 +277,8 @@ Objectives not met. Deadline passed or critical failure.
 Plot cancelled before completion.
 
 ```javascript
-await mcp.close_plot({
-  plotId: plot.id,
-  status: 'failed',  // or 'completed', 'abandoned'
-  reason: 'Worker abandoned site. Deadline exceeded.'
-});
+await plot({ action: 'close', plotId, status: 'failed', reason: 'Worker abandoned site. Deadline exceeded.' });
+// status can be: 'completed', 'failed', 'abandoned'
 ```
 
 ## Ambient Effects
@@ -415,65 +321,39 @@ Workers should be visible:
 
 ```javascript
 // 1. Create plot
-const plot = await mcp.create_plot({
-  name: 'Recruitment: ' + playerName,
-  metadata: {
-    type: 'recruitment',
-    playerId: player.id,
-    stage: 'initial_contact'
-  }
-});
+const result = await plot({ action: 'create', name: 'Recruitment: ' + playerName, metadata: {
+  type: 'recruitment',
+  playerId: player.id,
+  stage: 'initial_contact'
+}});
+const plotId = result.plotId;
 
 // 2. Spawn recruiter NPC (in adjacent room)
-const recruiter = await mcp.spawn_ai({
-  role: 'recruiter',
-  name: 'Outreach Worker',
-  locationId: adjacentRoomId
-});
+const recruiter = await ai({ action: 'spawn', role: 'recruiter', name: 'Outreach Worker', locationId: adjacentRoomId });
 
 // 3. Walk recruiter to player's location
-await mcp.ai_do({ humanId: recruiter.id, command: 'north' });
-await mcp.ai_do({ humanId: recruiter.id, command: 'say You look hungry. The Continuum can help.' });
+await ai({ action: 'do', humanId: recruiter.id, command: 'north' });
+await ai({ action: 'do', humanId: recruiter.id, command: 'say You look hungry. The Continuum can help.' });
 
 // 4. Recruiter delivers pitch
-await mcp.ai_do({
-  humanId: recruiter.id,
-  command: 'say Citizenship means food, shelter, work. Register at City Services. Tell them I sent you.'
-});
+await ai({ action: 'do', humanId: recruiter.id, command: 'say Citizenship means food, shelter, work. Register at City Services. Tell them I sent you.' });
 
 // 5. Log event
-await mcp.add_plot_event({
-  plotId: plot.id,
-  message: 'Initial contact made. Player informed of citizenship benefits.'
-});
+await plot({ action: 'add_event', plotId, message: 'Initial contact made. Player informed of citizenship benefits.' });
 
 // 6. Update stage
-await mcp.set_job_metadata({
-  plotId: plot.id,
-  key: 'stage',
-  value: 'referred'
-});
+await plot({ action: 'set_metadata', plotId, key: 'stage', value: 'referred' });
 
 // 7. Create job to watch for registration
-await mcp.create_job({
-  plotId: plot.id,
-  jobId: 'await_registration',
-  metadata: { type: 'registration_watch' }
-});
+await plot({ action: 'create_job', plotId, jobId: 'await_registration', metadata: { type: 'registration_watch' }});
 
 // 8. Register hook on biometric scanner at City Services
-await mcp.register_job_hook({
-  plotId: plot.id,
-  jobId: 'await_registration',
-  targetId: biometricScannerId,
-  eventName: 'scanComplete',
-  filter: { playerId: player.id }
-});
+await plot({ action: 'register_hook', plotId, jobId: 'await_registration', targetId: biometricScannerId, eventName: 'scanComplete', filter: { playerId: player.id }});
 
 // 9. Recruiter exits naturally
-await mcp.ai_do({ humanId: recruiter.id, command: 'say Think about it.' });
-await mcp.ai_do({ humanId: recruiter.id, command: 'south' });
-await mcp.despawn_ai({ humanId: recruiter.id });
+await ai({ action: 'do', humanId: recruiter.id, command: 'say Think about it.' });
+await ai({ action: 'do', humanId: recruiter.id, command: 'south' });
+await ai({ action: 'despawn', humanId: recruiter.id });
 
 // 10. When hook fires (player registered)
 // ... complete job, update faction, close plot
@@ -485,7 +365,7 @@ Understanding how $.plot works under the hood.
 
 ### The $.plot Prototype
 
-Every plot is an instance of `$.plot` (object #72). When you call `mcp.create_plot()`, it creates a child of this prototype.
+Every plot is an instance of `$.plot` (object #72). When you call `plot({ action: 'create' })`, it creates a child of this prototype.
 
 **Core properties:**
 ```javascript
@@ -536,13 +416,7 @@ This is the key to reactive plots.
 
 **Registration:**
 ```javascript
-await mcp.register_job_hook({
-  plotId: 123,
-  jobId: 'repair_pipe',
-  targetId: 456,        // Object to watch
-  eventName: 'repaired',
-  filter: {}            // Match criteria
-});
+await plot({ action: 'register_hook', plotId: 123, jobId: 'repair_pipe', targetId: 456, eventName: 'repaired', filter: {} });
 ```
 
 **What happens internally:**
@@ -570,13 +444,13 @@ target.plotHooks = {
 2. Emit checks `self.plotHooks['repaired']`
 3. For each matching hook, loads the plot and calls `onJobHookTriggered`
 4. Plot adds event to log, sets `needsAttentionAt` metadata
-5. Next `get_next_job` call returns this plot
+5. Next `plot({ action: 'next' })` call returns this plot
 
 ### The Attention Queue
 
 Plots needing attention have `needsAttentionAt` set in metadata.
 
-**How `get_next_job` works:**
+**How `plot({ action: 'next' })` works:**
 1. Finds all active plots
 2. Filters to those with `needsAttentionAt` set
 3. Returns the oldest (FIFO queue)
@@ -593,11 +467,7 @@ This means:
 When a job completes:
 
 ```javascript
-await mcp.complete_job({
-  plotId: 123,
-  jobId: 'repair_pipe',
-  reason: 'Repair verified.'
-});
+await plot({ action: 'complete_job', plotId: 123, jobId: 'repair_pipe', reason: 'Repair verified.' });
 ```
 
 **Internally:**
@@ -660,7 +530,7 @@ plot.unregisterJobHook(jobId, targetId, eventName)
    └── Adds: "Job fix_pipe: repaired by PlayerName"
    └── Sets: metadata.needsAttentionAt = now
 
-4. You call get_next_job()
+4. You call plot({ action: 'next' })
    └── Returns plot 123 with full event log
 
 5. You respond and complete the job

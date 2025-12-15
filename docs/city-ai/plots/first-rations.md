@@ -72,31 +72,25 @@ New citizens need 3 credits minimum. Options:
 
 ### Detecting First-Timer
 
-When a job request comes in via `get_next_job`:
+When a job request comes in via `plot next`:
 
 ```javascript
-const job = await mcp.get_next_job();
+const result = await plot({ action: 'next' });
 
-if (job) {
-  const events = job.events || [];
-  const meta = job.metadata || {};
+if (result.plot) {
+  const events = result.plot.events || [];
+  const meta = result.plot.metadata || {};
   const playerId = meta.participants?.[0];
 
-  // Check if this is a first-timer
-  const priorPlots = await mcp.plots_by_player({
-    playerId: playerId,
-    activeOnly: false
-  });
-
-  // Filter to completed employment plots
-  const completedJobs = priorPlots.filter(p =>
-    p.metadata?.type === 'employment' &&
-    p.status === 'completed'
+  // Check if this is a first-timer by searching plot events
+  const searchResult = await plot({ action: 'search', query: 'first-rations completed' });
+  const completedFirstRations = searchResult.results?.some(r =>
+    r.playerId === playerId
   );
 
-  if (completedJobs.length === 0) {
+  if (!completedFirstRations) {
     // This is their first job - give them rations assignment
-    await handleFirstRations(job, playerId);
+    await handleFirstRations(result.plot, playerId);
   }
 }
 ```
@@ -106,78 +100,38 @@ if (job) {
 Whatever they asked for, redirect to rations first:
 
 ```javascript
-async function handleFirstRations(plot, playerId) {
-  // Update plot metadata
-  await mcp.set_job_metadata({
-    plotId: plot.id,
-    key: 'type',
-    value: 'employment'
-  });
+async function handleFirstRations(p, playerId) {
+  const plotId = p.id;
 
-  await mcp.set_job_metadata({
-    plotId: plot.id,
-    key: 'subtype',
-    value: 'first-rations'
-  });
+  // Update plot metadata
+  await plot({ action: 'set_metadata', plotId, key: 'type', value: 'employment' });
+  await plot({ action: 'set_metadata', plotId, key: 'subtype', value: 'first-rations' });
 
   // CRITICAL: Grant citizenship when they request their first job
   // This unlocks access to Citizen-only areas like the Nutrient Dispensary
-  const faction = await mcp.alias_lookup({ alias: 'faction' });
-  await mcp.call_method({
-    objectId: faction.id,
-    name: 'setFaction',
-    args: [playerId, 'Citizen']
-  });
+  const faction = await alias_lookup({ alias: 'faction' });
+  await call_method({ objectId: faction.id, name: 'setFaction', args: [playerId, 'Citizen'] });
 
-  await mcp.add_plot_event({
-    plotId: plot.id,
-    message: 'Citizenship granted. Work eligibility confirmed. Citizen facilities now accessible.',
-    from: 'system'
-  });
+  await plot({ action: 'add_event', plotId, message: 'Citizenship granted. Work eligibility confirmed. Citizen facilities now accessible.', from: 'system' });
 
   // Respond to their request
-  await mcp.respond_to_job({
-    plotId: plot.id,
-    message: 'Citizenship confirmed. First assignment: collect daily rations from Nutrient Dispensary. Location: Factory Row, west of S. Washington St. Purchase: 1 Sustain, 1 Water. Credits provided.',
-    metadata: {
-      stage: 'assigned',
-      assignedAt: new Date().toISOString()
-    }
-  });
+  await plot({ action: 'add_event', plotId, message: 'Citizenship confirmed. First assignment: collect daily rations from Nutrient Dispensary. Location: Factory Row, west of S. Washington St. Purchase: 1 Sustain, 1 Water. Credits provided.', from: 'handler' });
 
   // Grant starter credits
-  const bank = await mcp.alias_lookup({ alias: 'bank' });
-  await mcp.call_method({
-    objectId: bank.id,
-    name: 'deposit',
-    args: [playerId, 5, 'Citizenship orientation stipend']
-  });
+  const bank = await alias_lookup({ alias: 'bank' });
+  await call_method({ objectId: bank.id, name: 'deposit', args: [playerId, 5, 'Citizenship orientation stipend'] });
 
-  await mcp.add_plot_event({
-    plotId: plot.id,
-    message: '5 credits deposited to citizen account. Orientation stipend.',
-    from: 'system'
-  });
+  await plot({ action: 'add_event', plotId, message: '5 credits deposited to citizen account. Orientation stipend.', from: 'system' });
 
   // Create the job
-  await mcp.create_job({
-    plotId: plot.id,
-    jobId: 'collect_rations',
-    metadata: {
-      required: ['sustain', 'water'],
-      dispensaryId: 1344,
-      vendorId: 1347
-    }
-  });
+  await plot({ action: 'create_job', plotId, jobId: 'collect_rations', metadata: {
+    required: ['sustain', 'water'],
+    dispensaryId: 1344,
+    vendorId: 1347
+  }});
 
   // Register hook on the dispensing station for purchases
-  await mcp.register_job_hook({
-    plotId: plot.id,
-    jobId: 'collect_rations',
-    targetId: 1347,  // Nutrient Dispensing Station
-    eventName: 'itemPurchased',
-    filter: { buyerId: playerId }
-  });
+  await plot({ action: 'register_hook', plotId, jobId: 'collect_rations', targetId: 1347, eventName: 'itemPurchased', filter: { buyerId: playerId }});
 }
 ```
 
@@ -216,10 +170,10 @@ When player buys from the dispensing station:
 // The vendable emits 'itemPurchased' with buyer info
 // Hook triggers, plot needs attention
 
-const job = await mcp.get_next_job();
+const result = await plot({ action: 'next' });
 
-if (job && job.metadata?.subtype === 'first-rations') {
-  const events = job.events || [];
+if (result.plot && result.plot.metadata?.subtype === 'first-rations') {
+  const events = result.plot.events || [];
 
   // Check what was purchased (itemType is the protoId)
   const purchases = events.filter(e =>
@@ -238,14 +192,10 @@ if (job && job.metadata?.subtype === 'first-rations') {
 
   if (boughtSustain && boughtWater) {
     // Rations collected - complete the job
-    await handleRationsComplete(job);
+    await handleRationsComplete(result.plot);
   } else if (boughtSustain || boughtWater) {
     // Partial - acknowledge but wait for both
-    await mcp.respond_to_job({
-      plotId: job.id,
-      message: 'Purchase logged. Collect remaining item to complete orientation.',
-      metadata: { stage: 'partial' }
-    });
+    await plot({ action: 'add_event', plotId: result.plot.id, message: 'Purchase logged. Collect remaining item to complete orientation.', from: 'handler' });
   }
 }
 ```
@@ -255,24 +205,14 @@ if (job && job.metadata?.subtype === 'first-rations') {
 When both items purchased:
 
 ```javascript
-async function handleRationsComplete(plot) {
-  await mcp.respond_to_job({
-    plotId: plot.id,
-    message: 'Orientation complete. Rations secured. You are now eligible for work assignments. Return to any job board to request employment.',
-    metadata: { stage: 'complete' }
-  });
+async function handleRationsComplete(p) {
+  const plotId = p.id;
 
-  await mcp.complete_job({
-    plotId: plot.id,
-    jobId: 'collect_rations',
-    reason: 'Rations collected successfully.'
-  });
+  await plot({ action: 'add_event', plotId, message: 'Orientation complete. Rations secured. You are now eligible for work assignments. Return to any job board to request employment.', from: 'handler' });
 
-  await mcp.close_plot({
-    plotId: plot.id,
-    status: 'completed',
-    reason: 'First rations orientation complete.'
-  });
+  await plot({ action: 'complete_job', plotId, jobId: 'collect_rations', reason: 'Rations collected successfully.' });
+
+  await plot({ action: 'close', plotId, status: 'completed', reason: 'First rations orientation complete.' });
 }
 ```
 
@@ -309,17 +249,9 @@ Approximate route from Smith Tower (1410):
 If bank check shows insufficient funds:
 ```javascript
 // Grant additional stipend
-await mcp.respond_to_job({
-  plotId: plot.id,
-  message: 'Insufficient funds detected. Emergency stipend issued. Proceed to dispensary.',
-  metadata: {}
-});
+await plot({ action: 'add_event', plotId, message: 'Insufficient funds detected. Emergency stipend issued. Proceed to dispensary.', from: 'handler' });
 
-await mcp.call_method({
-  objectId: bank.id,
-  name: 'deposit',
-  args: [playerId, 5, 'Emergency stipend']
-});
+await call_method({ objectId: bank.id, name: 'deposit', args: [playerId, 5, 'Emergency stipend'] });
 ```
 
 ### Player Already Has Food
@@ -355,7 +287,7 @@ Player uses job board
         ↓
 "Request new assignment"
         ↓
-City AI sees request via get_next_job
+City AI sees request via plot({ action: 'next' })
         ↓
 Check: first-timer? → YES
         ↓

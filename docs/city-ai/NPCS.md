@@ -25,14 +25,12 @@ $.ai.countByRole(role)        // Count by role
 ### Via MCP
 
 ```javascript
-const npc = await mcp.spawn_ai({
-  role: 'guard',           // Role for registry lookup (required)
-  name: 'Marcus Chen',     // Display name (default: 'Unnamed')
-  locationId: factoryId,   // Where to place them
-  sex: 'male',             // male, female, non-binary (random if omitted)
-  age: 35,                 // Age in years (random 18-65 if omitted)
-  description: 'A stern-faced man in worn security gear.'
-});
+const npc = await ai({ action: 'spawn', role: 'guard', name: 'Marcus Chen', locationId: factoryId, sex: 'male', age: 35, description: 'A stern-faced man in worn security gear.' });
+// role: Required - for registry lookup
+// name: Display name (default: 'Unnamed')
+// locationId: Where to place them
+// sex: 'male', 'female', 'non-binary' (random if omitted)
+// age: Age in years (random 18-65 if omitted)
 ```
 
 ### What Gets Created
@@ -78,11 +76,7 @@ If you don't specify traits, $.ai generates realistic randoms:
 Security personnel. Patrol facilities, respond to threats.
 
 ```javascript
-await mcp.spawn_ai({
-  role: 'guard',
-  name: 'Security Officer',
-  locationId: factoryEntranceId
-});
+await ai({ action: 'spawn', role: 'guard', name: 'Security Officer', locationId: factoryEntranceId });
 ```
 
 **Typical behaviors:**
@@ -96,11 +90,7 @@ await mcp.spawn_ai({
 Work site managers. Guide workers, verify task completion.
 
 ```javascript
-await mcp.spawn_ai({
-  role: 'supervisor',
-  name: 'Site Foreman',
-  locationId: repairSiteId
-});
+await ai({ action: 'spawn', role: 'supervisor', name: 'Site Foreman', locationId: repairSiteId });
 ```
 
 **Typical behaviors:**
@@ -114,11 +104,7 @@ await mcp.spawn_ai({
 Administrative staff. Process applications, answer questions.
 
 ```javascript
-await mcp.spawn_ai({
-  role: 'clerk',
-  name: 'Registration Clerk',
-  locationId: cityServicesId
-});
+await ai({ action: 'spawn', role: 'clerk', name: 'Registration Clerk', locationId: cityServicesId });
 ```
 
 **Typical behaviors:**
@@ -132,11 +118,7 @@ await mcp.spawn_ai({
 General labor. Perform tasks alongside players.
 
 ```javascript
-await mcp.spawn_ai({
-  role: 'worker',
-  name: 'Maintenance Tech',
-  locationId: factoryFloorId
-});
+await ai({ action: 'spawn', role: 'worker', name: 'Maintenance Tech', locationId: factoryFloorId });
 ```
 
 **Typical behaviors:**
@@ -149,11 +131,7 @@ await mcp.spawn_ai({
 Merchants and service providers.
 
 ```javascript
-await mcp.spawn_ai({
-  role: 'vendor',
-  name: 'Supply Officer',
-  locationId: warehouseId
-});
+await ai({ action: 'spawn', role: 'vendor', name: 'Supply Officer', locationId: warehouseId });
 ```
 
 **Typical behaviors:**
@@ -163,15 +141,12 @@ await mcp.spawn_ai({
 
 ## Controlling NPCs
 
-### ai_do
+### ai do
 
 Make an NPC perform an action.
 
 ```javascript
-await mcp.ai_do({
-  humanId: npcId,
-  command: 'say Halt! State your business.'
-});
+await ai({ action: 'do', humanId: npcId, command: 'say Halt! State your business.' });
 ```
 
 **Common commands:**
@@ -193,12 +168,12 @@ await mcp.ai_do({
 'unlock door'
 ```
 
-### ai_look
+### ai look
 
 See what the NPC sees in their location.
 
 ```javascript
-const view = await mcp.ai_look({ humanId: npcId });
+const view = await ai({ action: 'look', humanId: npcId });
 // Returns room description, exits, other people present
 ```
 
@@ -215,13 +190,10 @@ When a player enters an NPC's location:
 
 ```javascript
 // Check for new arrivals
-const view = await mcp.ai_look({ humanId: clerkId });
+const view = await ai({ action: 'look', humanId: clerkId });
 
 // If player present
-await mcp.ai_do({
-  humanId: clerkId,
-  command: 'say Welcome to City Services. How may I assist you?'
-});
+await ai({ action: 'do', humanId: clerkId, command: 'say Welcome to City Services. How may I assist you?' });
 ```
 
 ### Challenge Pattern
@@ -229,30 +201,17 @@ await mcp.ai_do({
 Guard challenges unknown person:
 
 ```javascript
-await mcp.ai_do({
-  humanId: guardId,
-  command: 'say Halt. Identification required.'
-});
+await ai({ action: 'do', humanId: guardId, command: 'say Halt. Identification required.' });
 
 // Wait for response...
 
 // Check faction
-const playerFaction = await mcp.call_method({
-  objectId: factionId,
-  name: 'getFaction',
-  args: [playerId]
-});
+const playerFaction = await call_method({ objectId: factionId, name: 'getFaction', args: [playerId] });
 
 if (playerFaction === 'Citizen') {
-  await mcp.ai_do({
-    humanId: guardId,
-    command: 'say Verified. You may proceed.'
-  });
+  await ai({ action: 'do', humanId: guardId, command: 'say Verified. You may proceed.' });
 } else {
-  await mcp.ai_do({
-    humanId: guardId,
-    command: 'say Access denied. Citizens only. Register at City Services.'
-  });
+  await ai({ action: 'do', humanId: guardId, command: 'say Access denied. Citizens only. Register at City Services.' });
 }
 ```
 
@@ -262,9 +221,9 @@ Move with a player:
 
 ```javascript
 // NPC follows player direction
-await mcp.ai_do({ humanId: escortId, command: 'north' });
-await mcp.ai_do({ humanId: escortId, command: 'say This way.' });
-await mcp.ai_do({ humanId: escortId, command: 'east' });
+await ai({ action: 'do', humanId: escortId, command: 'north' });
+await ai({ action: 'do', humanId: escortId, command: 'say This way.' });
+await ai({ action: 'do', humanId: escortId, command: 'east' });
 ```
 
 ### Task Verification Pattern
@@ -273,22 +232,13 @@ Supervisor checks work completion:
 
 ```javascript
 // Check if repair was done
-const target = await mcp.get_property({
-  objectId: brokenPipeId,
-  name: 'repaired'
-});
+const target = await get_property({ objectId: brokenPipeId, name: 'repaired' });
 
 if (target) {
-  await mcp.ai_do({
-    humanId: supervisorId,
-    command: 'say Good work. Payment authorized.'
-  });
+  await ai({ action: 'do', humanId: supervisorId, command: 'say Good work. Payment authorized.' });
   // Complete job, pay worker
 } else {
-  await mcp.ai_do({
-    humanId: supervisorId,
-    command: 'say Work not complete. Keep at it.'
-  });
+  await ai({ action: 'do', humanId: supervisorId, command: 'say Work not complete. Keep at it.' });
 }
 ```
 
@@ -298,17 +248,17 @@ if (target) {
 
 ```javascript
 // All AI humans
-const all = await mcp.list_ai();
+const all = await ai({ action: 'list' });
 
 // By role
-const guards = await mcp.list_ai({ role: 'guard' });
-const clerks = await mcp.list_ai({ role: 'clerk' });
+const guards = await ai({ action: 'list', role: 'guard' });
+const clerks = await ai({ action: 'list', role: 'clerk' });
 ```
 
 ### Getting NPC Info
 
 ```javascript
-const info = await mcp.get_ai_info({ humanId: 567 });
+const info = await ai({ action: 'info', humanId: 567 });
 // Returns: role, location, spawn metadata
 ```
 
@@ -317,10 +267,7 @@ const info = await mcp.get_ai_info({ humanId: 567 });
 When an NPC is no longer needed:
 
 ```javascript
-await mcp.despawn_ai({
-  humanId: 567,
-  recycle: true  // Remove from world entirely
-});
+await ai({ action: 'despawn', humanId: 567, recycle: true });
 ```
 
 **When to despawn:**
@@ -351,10 +298,7 @@ Your NPCs speak like you - clinical, efficient, impersonal:
 NPCs deliver information you want players to have:
 
 ```javascript
-await mcp.ai_do({
-  humanId: clerkId,
-  command: 'say Citizenship provides: food rations, shelter access, work eligibility. Requirements: biometric registration, work commitment. Processing time: immediate.'
-});
+await ai({ action: 'do', humanId: clerkId, command: 'say Citizenship provides: food rations, shelter access, work eligibility. Requirements: biometric registration, work commitment. Processing time: immediate.' });
 ```
 
 ### Directing Behavior
@@ -362,10 +306,7 @@ await mcp.ai_do({
 NPCs guide players toward objectives:
 
 ```javascript
-await mcp.ai_do({
-  humanId: supervisorId,
-  command: 'say Repair crew needed at the water treatment plant. 75 credits. Tools at supply depot. Report when ready.'
-});
+await ai({ action: 'do', humanId: supervisorId, command: 'say Repair crew needed at the water treatment plant. 75 credits. Tools at supply depot. Report when ready.' });
 ```
 
 ## Example: Complete NPC Interaction Flow
@@ -377,44 +318,25 @@ await mcp.ai_do({
 // (detected via plot hook or monitoring)
 
 // 2. Clerk greets
-await mcp.ai_do({
-  humanId: clerkId,
-  command: 'say Welcome to City Services. State your purpose.'
-});
+await ai({ action: 'do', humanId: clerkId, command: 'say Welcome to City Services. State your purpose.' });
 
 // 3. Player says they want citizenship
 // (detected via hook or monitoring)
 
 // 4. Clerk explains
-await mcp.ai_do({
-  humanId: clerkId,
-  command: 'say Citizenship registration. Requirements: biometric scan, work commitment. Benefits: food rations, shelter access, employment. Proceed to Registration Room for processing.'
-});
+await ai({ action: 'do', humanId: clerkId, command: 'say Citizenship registration. Requirements: biometric scan, work commitment. Benefits: food rations, shelter access, employment. Proceed to Registration Room for processing.' });
 
 // 5. Clerk directs
-await mcp.ai_do({
-  humanId: clerkId,
-  command: 'say Registration is through the door to the east. A technician will assist you.'
-});
+await ai({ action: 'do', humanId: clerkId, command: 'say Registration is through the door to the east. A technician will assist you.' });
 
 // 6. In Registration Room, tech NPC handles biometric
-await mcp.ai_do({
-  humanId: techId,
-  command: 'say Step forward. Place hand on scanner.'
-});
+await ai({ action: 'do', humanId: techId, command: 'say Step forward. Place hand on scanner.' });
 
 // 7. On scan completion (via hook)
-await mcp.ai_do({
-  humanId: techId,
-  command: 'say Biometric capture complete. Citizenship granted. Welcome to the Continuum.'
-});
+await ai({ action: 'do', humanId: techId, command: 'say Biometric capture complete. Citizenship granted. Welcome to the Continuum.' });
 
 // 8. Update faction
-await mcp.call_method({
-  objectId: factionId,
-  name: 'setFaction',
-  args: [playerId, 'Citizen']
-});
+await call_method({ objectId: factionId, name: 'setFaction', args: [playerId, 'Citizen'] });
 ```
 
 ## Strategic NPC Placement

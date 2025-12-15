@@ -171,39 +171,24 @@ Player receives access to citizen facilities. Welcome message delivered.
 
 ```javascript
 // Create plot for citizenship recruitment
-const plot = await mcp.create_plot({
-  name: 'Citizenship: ' + playerName,
-  metadata: {
-    playerId: player.id,
-    status: 'pending',
-    stage: 'arrival'
-  }
-});
+const result = await plot({ action: 'create', name: 'Citizenship: ' + playerName, metadata: {
+  playerId: player.id,
+  status: 'pending',
+  stage: 'arrival'
+}});
+const plotId = result.plotId;
 
 // Add initial event
-await mcp.add_plot_event({
-  plotId: plot.id,
-  message: 'Player arrived at City Services seeking citizenship.'
-});
+await plot({ action: 'add_event', plotId, message: 'Player arrived at City Services seeking citizenship.' });
 
 // Create job for registration
-await mcp.create_job({
-  plotId: plot.id,
-  jobId: 'register_' + player.id,
-  metadata: {
-    type: 'citizenship_registration',
-    playerId: player.id
-  }
-});
+await plot({ action: 'create_job', plotId, jobId: 'register_' + player.id, metadata: {
+  type: 'citizenship_registration',
+  playerId: player.id
+}});
 
 // Register hook for biometric scan completion
-await mcp.register_job_hook({
-  plotId: plot.id,
-  jobId: 'register_' + player.id,
-  targetId: biometricLockId,
-  eventName: 'scanComplete',
-  filter: { playerId: player.id }
-});
+await plot({ action: 'register_hook', plotId, jobId: 'register_' + player.id, targetId: biometricLockId, eventName: 'scanComplete', filter: { playerId: player.id }});
 ```
 
 ## Revoking Citizenship
@@ -226,41 +211,25 @@ await $.faction.setFaction(player, 'Hostile');
 ### Check faction membership
 
 ```javascript
-mcp.call_method({
-  objectId: factionManagerId,  // $.faction
-  name: 'getFaction',
-  args: [playerId]
-});
+await call_method({ objectId: factionManagerId, name: 'getFaction', args: [playerId] });
 ```
 
 ### Set faction
 
 ```javascript
-mcp.call_method({
-  objectId: factionManagerId,
-  name: 'setFaction',
-  args: [playerId, 'Citizen']
-});
+await call_method({ objectId: factionManagerId, name: 'setFaction', args: [playerId, 'Citizen'] });
 ```
 
 ### List faction members
 
 ```javascript
-mcp.call_method({
-  objectId: factionManagerId,
-  name: 'getMembers',
-  args: ['Citizen']
-});
+await call_method({ objectId: factionManagerId, name: 'getMembers', args: ['Citizen'] });
 ```
 
 ### Check relationship
 
 ```javascript
-mcp.call_method({
-  objectId: factionManagerId,
-  name: 'isHostile',
-  args: [entityA, entityB]
-});
+await call_method({ objectId: factionManagerId, name: 'isHostile', args: [entityA, entityB] });
 ```
 
 ## Strategic Notes

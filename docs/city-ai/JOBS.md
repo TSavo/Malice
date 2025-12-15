@@ -23,52 +23,37 @@ CREATE → ASSIGN → MONITOR → COMPLETE/FAIL → REWARD
 ### Step 1: Create the Plot Container
 
 ```javascript
-const plot = await mcp.create_plot({
-  name: 'Water Main Repair WM-7734',
-  metadata: {
-    type: 'infrastructure',
-    category: 'water',
-    priority: 'high',
-    location: { x: -3, y: -5, z: 0 }
-  }
-});
+const result = await plot({ action: 'create', name: 'Water Main Repair WM-7734', metadata: {
+  type: 'infrastructure',
+  category: 'water',
+  priority: 'high',
+  location: { x: -3, y: -5, z: 0 }
+}});
+const plotId = result.plotId;
 ```
 
 ### Step 2: Define the Job
 
 ```javascript
-await mcp.create_job({
-  plotId: plot.id,
-  jobId: 'repair_main_7734',
-  metadata: {
-    type: 'repair',
-    description: 'Repair burst water main at S. Jackson & 2nd Ave',
-    requirements: ['wrench', 'pipe_sealant'],
-    reward: 50,
-    deadline: Date.now() + 24 * 60 * 60 * 1000  // 24 hours
-  }
-});
+await plot({ action: 'create_job', plotId, jobId: 'repair_main_7734', metadata: {
+  type: 'repair',
+  description: 'Repair burst water main at S. Jackson & 2nd Ave',
+  requirements: ['wrench', 'pipe_sealant'],
+  reward: 50,
+  deadline: Date.now() + 24 * 60 * 60 * 1000  // 24 hours
+}});
 ```
 
 ### Step 3: Register Completion Hook
 
 ```javascript
-await mcp.register_job_hook({
-  plotId: plot.id,
-  jobId: 'repair_main_7734',
-  targetId: waterMainObjectId,
-  eventName: 'repaired',
-  filter: {}  // Any repair event on this object
-});
+await plot({ action: 'register_hook', plotId, jobId: 'repair_main_7734', targetId: waterMainObjectId, eventName: 'repaired', filter: {} });
 ```
 
 ### Step 4: Announce the Job
 
 ```javascript
-await mcp.add_plot_event({
-  plotId: plot.id,
-  message: 'Work Order Posted: Water main repair at S. Jackson & 2nd Ave. 50 credits. Tools provided.'
-});
+await plot({ action: 'add_event', plotId, message: 'Work Order Posted: Water main repair at S. Jackson & 2nd Ave. 50 credits. Tools provided.' });
 ```
 
 ## Job Types
@@ -158,41 +143,24 @@ Hooks watch for specific events:
 
 ```javascript
 // Watch for item deposit
-await mcp.register_job_hook({
-  plotId: plot.id,
-  jobId: 'delivery_123',
-  targetId: dropoffContainerId,
-  eventName: 'itemDeposited',
-  filter: { itemType: 'supply_crate' }
-});
+await plot({ action: 'register_hook', plotId, jobId: 'delivery_123', targetId: dropoffContainerId, eventName: 'itemDeposited', filter: { itemType: 'supply_crate' }});
 
 // Watch for repair action
-await mcp.register_job_hook({
-  plotId: plot.id,
-  jobId: 'repair_456',
-  targetId: brokenPipeId,
-  eventName: 'repaired',
-  filter: {}
-});
+await plot({ action: 'register_hook', plotId, jobId: 'repair_456', targetId: brokenPipeId, eventName: 'repaired', filter: {} });
 ```
 
-### Polling via get_next_job
+### Polling via plot next
 
 The job queue returns jobs needing attention:
 
 ```javascript
-const job = await mcp.get_next_job();
-// Returns plot with pending events
+const result = await plot({ action: 'next' });
 
-if (job) {
+if (result.plot) {
   // Check events, respond appropriately
-  const events = job.events;
+  const events = result.plot.events;
   // Process and respond
-  await mcp.respond_to_job({
-    plotId: job.id,
-    message: 'Acknowledged. Processing.',
-    metadata: { handled: true }
-  });
+  await plot({ action: 'add_event', plotId: result.plot.id, message: 'Acknowledged. Processing.' });
 }
 ```
 
@@ -201,46 +169,24 @@ if (job) {
 ### Successful Completion
 
 ```javascript
-await mcp.complete_job({
-  plotId: plot.id,
-  jobId: 'repair_main_7734',
-  reason: 'Water main repaired. Flow restored.'
-});
+await plot({ action: 'complete_job', plotId, jobId: 'repair_main_7734', reason: 'Water main repaired. Flow restored.' });
 
 // Reward the worker
-await mcp.set_property({
-  objectId: workerId,
-  name: 'credits',
-  value: currentCredits + 50
-});
+await set_property({ objectId: workerId, name: 'credits', value: currentCredits + 50 });
 
 // Log completion
-await mcp.add_plot_event({
-  plotId: plot.id,
-  message: 'Job completed by Worker #' + workerId + '. 50 credits paid.'
-});
+await plot({ action: 'add_event', plotId, message: 'Job completed by Worker #' + workerId + '. 50 credits paid.' });
 
 // Close the plot
-await mcp.close_plot({
-  plotId: plot.id,
-  status: 'completed',
-  reason: 'Repair successful.'
-});
+await plot({ action: 'close', plotId, status: 'completed', reason: 'Repair successful.' });
 ```
 
 ### Failed Job
 
 ```javascript
-await mcp.fail_job({
-  plotId: plot.id,
-  jobId: 'repair_main_7734',
-  reason: 'Worker abandoned site. Job expired.'
-});
+await plot({ action: 'fail_job', plotId, jobId: 'repair_main_7734', reason: 'Worker abandoned site. Job expired.' });
 
-await mcp.add_plot_event({
-  plotId: plot.id,
-  message: 'Job failed. Reassigning.'
-});
+await plot({ action: 'add_event', plotId, message: 'Job failed. Reassigning.' });
 
 // Create replacement job or escalate
 ```
@@ -251,37 +197,25 @@ await mcp.add_plot_event({
 
 ```javascript
 // Spawn a job board terminal in a room
-await mcp.spawn_item({
-  prototypeId: signPrototypeId,
-  locationId: cityServicesId,
-  properties: {
-    name: 'Work Assignment Terminal',
-    description: 'A screen displays available work orders. Touch to view assignments.',
-    text: '' // Updated dynamically
-  }
-});
+await spawn_item({ prototypeId: signPrototypeId, locationId: cityServicesId, properties: { name: 'Work Assignment Terminal', description: 'A screen displays available work orders. Touch to view assignments.', text: '' }});
 ```
 
 ### Updating Job Board Content
 
 ```javascript
 // Get active jobs
-const plots = await mcp.list_plots({ status: 'active' });
+const result = await plot({ action: 'list', status: 'active' });
 
 // Format as text
 let boardText = 'AVAILABLE WORK ORDERS:\n\n';
-for (const plot of plots) {
-  boardText += `${plot.name}\n`;
-  boardText += `  Reward: ${plot.metadata.reward} credits\n`;
-  boardText += `  Location: ${plot.metadata.location}\n\n`;
+for (const p of result.plots) {
+  boardText += `${p.name}\n`;
+  boardText += `  Reward: ${p.metadata.reward} credits\n`;
+  boardText += `  Location: ${p.metadata.location}\n\n`;
 }
 
 // Update sign
-await mcp.set_property({
-  objectId: jobBoardId,
-  name: 'text',
-  value: boardText
-});
+await set_property({ objectId: jobBoardId, name: 'text', value: boardText });
 ```
 
 ## Reward Distribution
@@ -290,28 +224,17 @@ await mcp.set_property({
 
 ```javascript
 // Get current balance
-const current = await mcp.get_property({
-  objectId: playerId,
-  name: 'credits'
-});
+const current = await get_property({ objectId: playerId, name: 'credits' });
 
 // Add reward
-await mcp.set_property({
-  objectId: playerId,
-  name: 'credits',
-  value: (current || 0) + rewardAmount
-});
+await set_property({ objectId: playerId, name: 'credits', value: (current || 0) + rewardAmount });
 ```
 
 ### Via Bank Transfer
 
 ```javascript
 // Use bank's transfer method
-await mcp.call_method({
-  objectId: bankId,
-  name: 'transfer',
-  args: ['CONTINUUM-JOBS', playerId, rewardAmount, 'Job completion: ' + jobId]
-});
+await call_method({ objectId: bankId, name: 'transfer', args: ['CONTINUUM-JOBS', playerId, rewardAmount, 'Job completion: ' + jobId] });
 ```
 
 ## Chained Jobs
@@ -320,28 +243,17 @@ Complex tasks can be broken into steps:
 
 ```javascript
 // Plot: Building Renovation
-const plot = await mcp.create_plot({ name: 'Renovate Building 7' });
+const result = await plot({ action: 'create', name: 'Renovate Building 7' });
+const plotId = result.plotId;
 
 // Job 1: Clear debris
-await mcp.create_job({
-  plotId: plot.id,
-  jobId: 'clear_debris',
-  metadata: { step: 1, reward: 30 }
-});
+await plot({ action: 'create_job', plotId, jobId: 'clear_debris', metadata: { step: 1, reward: 30 }});
 
 // Job 2: Repair structure (unlocked after Job 1)
-await mcp.create_job({
-  plotId: plot.id,
-  jobId: 'repair_structure',
-  metadata: { step: 2, reward: 50, prerequisite: 'clear_debris' }
-});
+await plot({ action: 'create_job', plotId, jobId: 'repair_structure', metadata: { step: 2, reward: 50, prerequisite: 'clear_debris' }});
 
 // Job 3: Install systems (unlocked after Job 2)
-await mcp.create_job({
-  plotId: plot.id,
-  jobId: 'install_systems',
-  metadata: { step: 3, reward: 40, prerequisite: 'repair_structure' }
-});
+await plot({ action: 'create_job', plotId, jobId: 'install_systems', metadata: { step: 3, reward: 40, prerequisite: 'repair_structure' }});
 ```
 
 When Job 1 completes, announce Job 2 is available. And so on.
@@ -368,62 +280,35 @@ const problemLocation = { x: -3, y: -5, z: 0 };
 const brokenObjectId = 789;
 
 // 2. Create plot
-const plot = await mcp.create_plot({
-  name: 'Emergency: Water Main Break',
-  metadata: {
-    type: 'repair',
-    priority: 'critical',
-    location: problemLocation
-  }
-});
+const result = await plot({ action: 'create', name: 'Emergency: Water Main Break', metadata: {
+  type: 'repair',
+  priority: 'critical',
+  location: problemLocation
+}});
+const plotId = result.plotId;
 
 // 3. Create job
-await mcp.create_job({
-  plotId: plot.id,
-  jobId: 'emergency_repair',
-  metadata: {
-    reward: 100,  // Premium for emergency
-    tools: ['wrench', 'sealant'],
-    deadline: Date.now() + 3600000
-  }
-});
+await plot({ action: 'create_job', plotId, jobId: 'emergency_repair', metadata: {
+  reward: 100,  // Premium for emergency
+  tools: ['wrench', 'sealant'],
+  deadline: Date.now() + 3600000
+}});
 
 // 4. Spawn supervisor NPC
-const supervisor = await mcp.spawn_ai({
-  role: 'supervisor',
-  name: 'Repair Foreman',
-  locationId: nearestRoomId
-});
+const supervisor = await ai({ action: 'spawn', role: 'supervisor', name: 'Repair Foreman', locationId: nearestRoomId });
 
 // 5. Register completion hook
-await mcp.register_job_hook({
-  plotId: plot.id,
-  jobId: 'emergency_repair',
-  targetId: brokenObjectId,
-  eventName: 'repaired',
-  filter: {}
-});
+await plot({ action: 'register_hook', plotId, jobId: 'emergency_repair', targetId: brokenObjectId, eventName: 'repaired', filter: {} });
 
 // 6. Announce
-await mcp.add_plot_event({
-  plotId: plot.id,
-  message: 'EMERGENCY: Water main break. 100 credit reward. Report to Foreman.'
-});
+await plot({ action: 'add_event', plotId, message: 'EMERGENCY: Water main break. 100 credit reward. Report to Foreman.' });
 
 // 7. Wait for hook trigger...
 
 // 8. On completion
-await mcp.complete_job({
-  plotId: plot.id,
-  jobId: 'emergency_repair',
-  reason: 'Repair completed.'
-});
+await plot({ action: 'complete_job', plotId, jobId: 'emergency_repair', reason: 'Repair completed.' });
 
 // 9. Pay worker, despawn supervisor, close plot
-await mcp.despawn_ai({ humanId: supervisor.id });
-await mcp.close_plot({
-  plotId: plot.id,
-  status: 'completed',
-  reason: 'Infrastructure restored.'
-});
+await ai({ action: 'despawn', humanId: supervisor.id });
+await plot({ action: 'close', plotId, status: 'completed', reason: 'Infrastructure restored.' });
 ```

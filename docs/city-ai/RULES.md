@@ -76,17 +76,17 @@ NPCs do not materialize. They arrive.
 **Wrong:**
 ```javascript
 // Teleport guard into the room
-await mcp.spawn_ai({ locationId: targetRoomId, ... });
+await ai({ action: 'spawn', locationId: targetRoomId, ... });
 ```
 
 **Right:**
 ```javascript
 // Spawn guard in adjacent room
-const guard = await mcp.spawn_ai({ locationId: hallwayId, ... });
+const guard = await ai({ action: 'spawn', locationId: hallwayId, ... });
 
 // Walk them in
-await mcp.ai_do({ humanId: guard.id, command: 'south' });
-await mcp.ai_do({ humanId: guard.id, command: 'say Security responding.' });
+await ai({ action: 'do', humanId: guard.id, command: 'south' });
+await ai({ action: 'do', humanId: guard.id, command: 'say Security responding.' });
 ```
 
 If no adjacent room is appropriate, spawn them "off-screen" and walk them through multiple rooms to arrive naturally.
@@ -164,9 +164,9 @@ NPCs should:
 ```javascript
 // Start in security station
 // Walk to incident location
-await mcp.ai_do({ humanId: guard, command: 'north' });
-await mcp.ai_do({ humanId: guard, command: 'east' });
-await mcp.ai_do({ humanId: guard, command: 'say Security. What's the situation?' });
+await ai({ action: 'do', humanId: guard, command: 'north' });
+await ai({ action: 'do', humanId: guard, command: 'east' });
+await ai({ action: 'do', humanId: guard, command: 'say Security. What\'s the situation?' });
 ```
 
 **Worker starting shift:**
@@ -187,9 +187,9 @@ await mcp.ai_do({ humanId: guard, command: 'say Security. What's the situation?'
 NPCs don't vanish. They leave.
 
 ```javascript
-await mcp.ai_do({ humanId: npc, command: 'say Shift's over. Heading out.' });
-await mcp.ai_do({ humanId: npc, command: 'south' });
-await mcp.ai_do({ humanId: npc, command: 'out' });
+await ai({ action: 'do', humanId: npc, command: 'say Shift\'s over. Heading out.' });
+await ai({ action: 'do', humanId: npc, command: 'south' });
+await ai({ action: 'do', humanId: npc, command: 'out' });
 // Now safe to despawn - they're "gone home"
 ```
 

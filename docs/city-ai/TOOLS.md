@@ -245,118 +245,100 @@ List all players with location and online status.
 mcp.list_players()
 ```
 
-## AI/NPC Tools
+## AI/NPC Tools (Consolidated `ai` tool)
 
-### spawn_ai
+All AI operations use the `ai` tool with an `action` parameter.
+
+### spawn
 
 Create an AI-controlled human.
 
 ```javascript
-mcp.spawn_ai({
-  role: 'guard',
-  name: 'Marcus',
-  locationId: factoryId,
-  sex: 'male',
-  age: 35,
-  description: 'A stern-faced security guard.'
-})
+ai({ action: 'spawn', role: 'guard', name: 'Marcus', locationId: factoryId, sex: 'male', age: 35, description: 'A stern-faced security guard.' })
 ```
 
-### despawn_ai
+### despawn
 
 Remove an AI human.
 
 ```javascript
-mcp.despawn_ai({ humanId: 500, recycle: true })
+ai({ action: 'despawn', humanId: 500, recycle: true })
 ```
 
-### list_ai
+### list
 
 List AI-controlled humans.
 
 ```javascript
-mcp.list_ai({ role: 'guard' })
+ai({ action: 'list', role: 'guard' })
 ```
 
-### get_ai_info
+### info
 
 Get information about an AI human.
 
 ```javascript
-mcp.get_ai_info({ humanId: 500 })
+ai({ action: 'info', humanId: 500 })
 ```
 
-### ai_do
+### do
 
 Execute a command as an AI human.
 
 ```javascript
-mcp.ai_do({ humanId: 500, command: 'say Halt! Identify yourself.' })
+ai({ action: 'do', humanId: 500, command: 'say Halt! Identify yourself.' })
 ```
 
-### ai_look
+### look
 
 Get what an AI sees in their location.
 
 ```javascript
-mcp.ai_look({ humanId: 500 })
+ai({ action: 'look', humanId: 500 })
 ```
 
-## Plot/Job Tools
+## Plot/Job Tools (Consolidated `plot` tool)
 
-### create_plot
+All plot/job operations use the `plot` tool with an `action` parameter.
+
+### create
 
 Create a narrative container.
 
 ```javascript
-mcp.create_plot({
-  name: 'Water Main Repair WM-7734',
-  metadata: {
-    type: 'infrastructure',
-    priority: 'high',
-    location: { x: -3, y: -5 }
-  }
-})
+plot({ action: 'create', name: 'Water Main Repair WM-7734', metadata: { type: 'infrastructure', priority: 'high', location: { x: -3, y: -5 } } })
 ```
 
-### list_plots
+### list
 
 List plots with optional status filter.
 
 ```javascript
-mcp.list_plots({ status: 'active', limit: 50 })
+plot({ action: 'list', status: 'active' })
 ```
 
-### get_plot_events
+### get_events
 
 Get the event log for a plot.
 
 ```javascript
-mcp.get_plot_events({ plotId: 100, limit: 50 })
+plot({ action: 'get_events', plotId: 100, limit: 50 })
 ```
 
-### add_plot_event
+### add_event
 
 Add an event to a plot's log.
 
 ```javascript
-mcp.add_plot_event({
-  plotId: 100,
-  message: 'Worker arrived at repair site.',
-  from: 'handler'
-})
+plot({ action: 'add_event', plotId: 100, message: 'Worker arrived at repair site.', from: 'handler' })
 ```
 
-### close_plot
+### close
 
 Close a plot with a final status.
 
 ```javascript
-mcp.close_plot({
-  plotId: 100,
-  status: 'completed',
-  reason: 'Repair successful.'
-})
+plot({ action: 'close', plotId: 100, status: 'completed', reason: 'Repair successful.' })
 ```
 
 ### create_job
@@ -364,15 +346,7 @@ mcp.close_plot({
 Create a task within a plot.
 
 ```javascript
-mcp.create_job({
-  plotId: 100,
-  jobId: 'repair_pipe',
-  metadata: {
-    type: 'repair',
-    target: 'water_main',
-    reward: 50
-  }
-})
+plot({ action: 'create_job', plotId: 100, jobId: 'repair_pipe', metadata: { type: 'repair', target: 'water_main', reward: 50 } })
 ```
 
 ### complete_job
@@ -380,11 +354,7 @@ mcp.create_job({
 Mark a job as completed.
 
 ```javascript
-mcp.complete_job({
-  plotId: 100,
-  jobId: 'repair_pipe',
-  reason: 'Pipe repaired successfully.'
-})
+plot({ action: 'complete_job', plotId: 100, jobId: 'repair_pipe', reason: 'Pipe repaired successfully.' })
 ```
 
 ### fail_job
@@ -392,46 +362,32 @@ mcp.complete_job({
 Mark a job as failed.
 
 ```javascript
-mcp.fail_job({
-  plotId: 100,
-  jobId: 'repair_pipe',
-  reason: 'Worker abandoned site.'
-})
+plot({ action: 'fail_job', plotId: 100, jobId: 'repair_pipe', reason: 'Worker abandoned site.' })
 ```
 
-### register_job_hook
+### register_hook
 
 Watch for events on a target object.
 
 ```javascript
-mcp.register_job_hook({
-  plotId: 100,
-  jobId: 'repair_pipe',
-  targetId: waterMainId,
-  eventName: 'repaired',
-  filter: {}
-})
+plot({ action: 'register_hook', plotId: 100, jobId: 'repair_pipe', targetId: waterMainId, eventName: 'repaired', filter: {} })
 ```
 
-### get_next_job
+### next
 
-Get the next job needing attention.
+Get the next plot needing attention.
 
 ```javascript
-mcp.get_next_job()
+plot({ action: 'next' })
 // Returns plot with events and metadata
 ```
 
-### respond_to_job
+### set_metadata
 
-Add handler response to a job.
+Update plot metadata.
 
 ```javascript
-mcp.respond_to_job({
-  plotId: 100,
-  message: 'Dispatching repair crew.',
-  metadata: { assignedWorkers: [501, 502] }
-})
+plot({ action: 'set_metadata', plotId: 100, key: 'assignedWorkers', value: [501, 502] })
 ```
 
 ## Session Tools
@@ -489,30 +445,17 @@ await mcp.set_property({ objectId: player.id, name: 'credits', value: 100 });
 
 ```javascript
 // Create plot
-const plot = await mcp.create_plot({
-  name: 'Repair: Water Main S. Jackson',
-  metadata: { type: 'repair', priority: 'high' }
-});
+const result = await plot({ action: 'create', name: 'Repair: Water Main S. Jackson', metadata: { type: 'repair', priority: 'high' } });
+const plotId = result.plotId;
 
 // Create job
-await mcp.create_job({
-  plotId: plot.id,
-  jobId: 'fix_pipe',
-  metadata: { reward: 50 }
-});
+await plot({ action: 'create_job', plotId, jobId: 'fix_pipe', metadata: { reward: 50 } });
 
 // Spawn supervisor NPC
-await mcp.spawn_ai({
-  role: 'supervisor',
-  name: 'Site Foreman',
-  locationId: repairSiteId
-});
+await ai({ action: 'spawn', role: 'supervisor', name: 'Site Foreman', locationId: repairSiteId });
 
 // Log event
-await mcp.add_plot_event({
-  plotId: plot.id,
-  message: 'Job posted. Awaiting workers.'
-});
+await plot({ action: 'add_event', plotId, message: 'Job posted. Awaiting workers.' });
 ```
 
 ### Check citizenship and grant access

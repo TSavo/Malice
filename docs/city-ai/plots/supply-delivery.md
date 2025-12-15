@@ -71,34 +71,30 @@ Modifiers:
 
 ### Detecting Eligible Player
 
-When a job request comes in via `get_next_job`:
+When a job request comes in via `plot next`:
 
 ```javascript
-const job = await mcp.get_next_job();
+const result = await plot({ action: 'next' });
 
-if (job) {
-  const meta = job.metadata || {};
+if (result.plot) {
+  const meta = result.plot.metadata || {};
   const playerId = meta.participants?.[0];
 
   // Check if first-rations is complete
-  const priorPlots = await mcp.plots_by_player({
-    playerId: playerId,
-    activeOnly: false
-  });
-
-  const completedFirstRations = priorPlots.some(p =>
-    p.metadata?.subtype === 'first-rations' &&
-    p.status === 'completed'
+  const searchResult = await plot({ action: 'search', query: 'first-rations completed' });
+  const completedFirstRations = searchResult.results?.some(r =>
+    r.playerId === playerId
   );
 
   // Check they don't have an active job
-  const hasActiveJob = priorPlots.some(p =>
+  const activeResult = await plot({ action: 'list', status: 'active' });
+  const hasActiveJob = activeResult.plots?.some(p =>
     p.metadata?.type === 'employment' &&
-    p.status === 'active'
+    p.metadata?.participants?.includes(playerId)
   );
 
   if (completedFirstRations && !hasActiveJob) {
-    await assignDeliveryJob(job, playerId);
+    await assignDeliveryJob(result.plot, playerId);
   }
 }
 ```
@@ -106,7 +102,9 @@ if (job) {
 ### Phase 1: Assign Job
 
 ```javascript
-async function assignDeliveryJob(plot, playerId) {
+async function assignDeliveryJob(p, playerId) {
+  const plotId = p.id;
+
   // Select random destination
   const destinations = [
     { id: 1410, name: 'Smith Tower - Lobby', distance: 300 },
@@ -115,54 +113,25 @@ async function assignDeliveryJob(plot, playerId) {
   const dest = destinations[Math.floor(Math.random() * destinations.length)];
 
   // Update plot metadata
-  await mcp.set_job_metadata({
-    plotId: plot.id,
-    key: 'type',
-    value: 'employment'
-  });
-
-  await mcp.set_job_metadata({
-    plotId: plot.id,
-    key: 'subtype',
-    value: 'supply-delivery'
-  });
+  await plot({ action: 'set_metadata', plotId, key: 'type', value: 'employment' });
+  await plot({ action: 'set_metadata', plotId, key: 'subtype', value: 'supply-delivery' });
 
   // Generate package code
   const packageCode = 'PKG-' + Math.random().toString(36).substring(2, 8).toUpperCase();
 
   // Respond to player
-  await mcp.respond_to_job({
-    plotId: plot.id,
-    message: `Delivery assignment: Package ${packageCode}. Pickup: Supply Depot, Waterfront south of S. Main. Destination: ${dest.name}. Payment: 10 credits on verified delivery.`,
-    metadata: {
-      stage: 'assigned',
-      packageCode: packageCode,
-      destinationId: dest.id,
-      destinationName: dest.name,
-      assignedAt: new Date().toISOString()
-    }
-  });
+  await plot({ action: 'add_event', plotId, message: `Delivery assignment: Package ${packageCode}. Pickup: Supply Depot, Waterfront south of S. Main. Destination: ${dest.name}. Payment: 10 credits on verified delivery.`, from: 'handler' });
 
   // Create the job
-  await mcp.create_job({
-    plotId: plot.id,
-    jobId: 'deliver_package',
-    metadata: {
-      packageCode: packageCode,
-      destinationId: dest.id,
-      pickupLocationId: SUPPLY_DEPOT_RECEIVING_ID,
-      payment: 10
-    }
-  });
+  await plot({ action: 'create_job', plotId, jobId: 'deliver_package', metadata: {
+    packageCode: packageCode,
+    destinationId: dest.id,
+    pickupLocationId: SUPPLY_DEPOT_RECEIVING_ID,
+    payment: 10
+  }});
 
   // Register hook on destination for package arrival
-  await mcp.register_job_hook({
-    plotId: plot.id,
-    jobId: 'deliver_package',
-    targetId: dest.id,
-    eventName: 'packageArrivedAtDestination',
-    filter: { packageCode: packageCode }
-  });
+  await plot({ action: 'register_hook', plotId, jobId: 'deliver_package', targetId: dest.id, eventName: 'packageArrivedAtDestination', filter: { packageCode: packageCode }});
 }
 ```
 
@@ -174,17 +143,13 @@ The package dispenser at Supply Depot creates a SealedBox when the player intera
 // Dispenser checks player's active job assignment
 // If they have a delivery job, spawns the package:
 
-const pkg = await mcp.spawn_item({
-  prototypeId: SEALED_BOX_PROTO_ID,
-  locationId: playerId,  // Goes into player's inventory
-  properties: {
-    name: 'Sealed Package',
-    packageCode: jobMetadata.packageCode,
-    destinationId: jobMetadata.destinationId,
-    destinationName: jobMetadata.destinationName,
-    assignedTo: playerId
-  }
-});
+const pkg = await spawn_item({ prototypeId: SEALED_BOX_PROTO_ID, locationId: playerId, properties: {
+  name: 'Sealed Package',
+  packageCode: jobMetadata.packageCode,
+  destinationId: jobMetadata.destinationId,
+  destinationName: jobMetadata.destinationName,
+  assignedTo: playerId
+}});
 ```
 
 ### Phase 3: Delivery Hook Fires
@@ -192,19 +157,19 @@ const pkg = await mcp.spawn_item({
 When player enters destination room with package:
 
 ```javascript
-const job = await mcp.get_next_job();
+const result = await plot({ action: 'next' });
 
-if (job && job.metadata?.subtype === 'supply-delivery') {
-  const events = job.events || [];
+if (result.plot && result.plot.metadata?.subtype === 'supply-delivery') {
+  const events = result.plot.events || [];
 
   // Check for delivery event
   const delivered = events.some(e =>
     e.metadata?.hook === 'packageArrivedAtDestination' &&
-    e.metadata?.data?.packageCode === job.jobs?.deliver_package?.metadata?.packageCode
+    e.metadata?.data?.packageCode === result.plot.jobs?.deliver_package?.metadata?.packageCode
   );
 
   if (delivered) {
-    await handleDeliveryComplete(job);
+    await handleDeliveryComplete(result.plot);
   }
 }
 ```
@@ -212,44 +177,25 @@ if (job && job.metadata?.subtype === 'supply-delivery') {
 ### Phase 4: Completion
 
 ```javascript
-async function handleDeliveryComplete(plot) {
-  const playerId = plot.metadata?.participants?.[0];
-  const payment = plot.jobs?.deliver_package?.metadata?.payment || 10;
+async function handleDeliveryComplete(p) {
+  const plotId = p.id;
+  const playerId = p.metadata?.participants?.[0];
+  const payment = p.jobs?.deliver_package?.metadata?.payment || 10;
 
   // Pay the player
-  const bank = await mcp.alias_lookup({ alias: 'bank' });
-  await mcp.call_method({
-    objectId: bank.id,
-    name: 'deposit',
-    args: [playerId, payment, 'Delivery payment']
-  });
+  const bank = await alias_lookup({ alias: 'bank' });
+  await call_method({ objectId: bank.id, name: 'deposit', args: [playerId, payment, 'Delivery payment'] });
 
-  await mcp.add_plot_event({
-    plotId: plot.id,
-    message: `${payment} credits deposited. Delivery confirmed.`,
-    from: 'system'
-  });
+  await plot({ action: 'add_event', plotId, message: `${payment} credits deposited. Delivery confirmed.`, from: 'system' });
 
   // Respond to player
-  await mcp.respond_to_job({
-    plotId: plot.id,
-    message: `Delivery confirmed. ${payment} credits deposited to your account. Return to job board for additional assignments.`,
-    metadata: { stage: 'complete' }
-  });
+  await plot({ action: 'add_event', plotId, message: `Delivery confirmed. ${payment} credits deposited to your account. Return to job board for additional assignments.`, from: 'handler' });
 
   // Complete the job
-  await mcp.complete_job({
-    plotId: plot.id,
-    jobId: 'deliver_package',
-    reason: 'Package delivered successfully.'
-  });
+  await plot({ action: 'complete_job', plotId, jobId: 'deliver_package', reason: 'Package delivered successfully.' });
 
   // Close the plot
-  await mcp.close_plot({
-    plotId: plot.id,
-    status: 'completed',
-    reason: 'Delivery complete.'
-  });
+  await plot({ action: 'close', plotId, status: 'completed', reason: 'Delivery complete.' });
 }
 ```
 
@@ -300,23 +246,11 @@ Delivery fails. Player may face consequences.
 
 ```javascript
 // On packageTampered hook
-await mcp.respond_to_job({
-  plotId: plot.id,
-  message: 'Package seal compromised. Delivery voided. Assignment failed. This incident has been logged.',
-  metadata: { stage: 'failed' }
-});
+await plot({ action: 'add_event', plotId, message: 'Package seal compromised. Delivery voided. Assignment failed. This incident has been logged.', from: 'handler' });
 
-await mcp.fail_job({
-  plotId: plot.id,
-  jobId: 'deliver_package',
-  reason: 'Package tampered.'
-});
+await plot({ action: 'fail_job', plotId, jobId: 'deliver_package', reason: 'Package tampered.' });
 
-await mcp.close_plot({
-  plotId: plot.id,
-  status: 'failed',
-  reason: 'Tamper seal broken.'
-});
+await plot({ action: 'close', plotId, status: 'failed', reason: 'Tamper seal broken.' });
 ```
 
 ### Player Abandons Job
