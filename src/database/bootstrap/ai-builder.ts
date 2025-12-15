@@ -378,21 +378,31 @@ export class AiBuilder {
         throw new Error('Human ID and role are required');
       }
 
-      // Add to registry
+      // Load the actual human object to store as objref
+      const human = await $.load(humanId);
+      if (!human) {
+        throw new Error('Human #' + humanId + ' not found');
+      }
+
+      // Add to registry - store the object, not the ID
+      // toValue() will convert RuntimeObject to { type: 'objref', value: id }
       const registry = self.registry || {};
       registry[humanId] = {
+        human: human,  // Stored as objref
         role: role,
         ...metadata,
       };
       self.registry = registry;
 
-      // Add to roles mapping
+      // Add to roles mapping - store objects, not IDs
       const roles = self.roles || {};
       if (!roles[role]) {
         roles[role] = [];
       }
-      if (!roles[role].includes(humanId)) {
-        roles[role].push(humanId);
+      // Check if already in list (compare by id since objects may differ)
+      const alreadyInList = roles[role].some(h => h && h.id === humanId);
+      if (!alreadyInList) {
+        roles[role].push(human);
       }
       self.roles = roles;
 
@@ -415,10 +425,10 @@ export class AiBuilder {
       delete registry[humanId];
       self.registry = registry;
 
-      // Remove from roles mapping
+      // Remove from roles mapping - filter by id since we store objects
       const roles = self.roles || {};
       if (roles[role]) {
-        roles[role] = roles[role].filter(id => id !== humanId);
+        roles[role] = roles[role].filter(h => h && h.id !== humanId);
         if (roles[role].length === 0) {
           delete roles[role];
         }
@@ -440,21 +450,22 @@ export class AiBuilder {
       }
 
       const oldRole = entry.role;
+      const human = entry.human;  // Get the stored objref
 
-      // Remove from old role
+      // Remove from old role - filter by id
       const roles = self.roles || {};
       if (roles[oldRole]) {
-        roles[oldRole] = roles[oldRole].filter(id => id !== humanId);
+        roles[oldRole] = roles[oldRole].filter(h => h && h.id !== humanId);
         if (roles[oldRole].length === 0) {
           delete roles[oldRole];
         }
       }
 
-      // Add to new role
+      // Add to new role - store the object
       if (!roles[newRole]) {
         roles[newRole] = [];
       }
-      roles[newRole].push(humanId);
+      roles[newRole].push(human);
       self.roles = roles;
 
       // Update registry entry
@@ -478,6 +489,7 @@ export class AiBuilder {
     this.ai.setMethod('getByRole', `
       const role = args[0];
       const roles = self.roles || {};
+      // Returns array of human objects (stored as objrefs, resolved on read)
       return roles[role] || [];
     `);
 
@@ -488,13 +500,23 @@ export class AiBuilder {
 
     this.ai.setMethod('getAll', `
       const registry = self.registry || {};
-      return Object.keys(registry).map(id => parseInt(id, 10));
+      // Return array of human objects from registry entries
+      return Object.values(registry).map(entry => entry.human).filter(h => h);
     `);
 
     this.ai.setMethod('getInfo', `
       const humanId = args[0];
       const registry = self.registry || {};
-      return registry[humanId] || null;
+      const entry = registry[humanId];
+      if (!entry) return null;
+      // Return info including the human objref
+      return {
+        human: entry.human,
+        role: entry.role,
+        spawnedAt: entry.spawnedAt,
+        spawnedBy: entry.spawnedBy,
+        originalLocation: entry.originalLocation,
+      };
     `);
 
     this.ai.setMethod('count', `
@@ -528,12 +550,13 @@ export class AiBuilder {
 
       desc += 'By Role:\\r\\n';
       for (const role of Object.keys(roles).sort()) {
-        const ids = roles[role];
-        desc += '  ' + role + ': ' + ids.length + ' humans\\r\\n';
-        for (const id of ids) {
-          const human = await $.load(id);
-          const name = human ? human.name : 'Unknown';
-          desc += '    - ' + name + ' (#' + id + ')\\r\\n';
+        const humans = roles[role];  // Array of human objects (objrefs resolved)
+        desc += '  ' + role + ': ' + humans.length + ' humans\\r\\n';
+        for (const human of humans) {
+          if (human) {
+            const name = human.name || 'Unknown';
+            desc += '    - ' + name + ' (#' + human.id + ')\\r\\n';
+          }
         }
       }
 
