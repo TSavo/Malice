@@ -746,6 +746,136 @@ Now when "Player 'Jack'" enters and matches that description, the NPC knows him 
 - **Discovery** - NPCs can learn someone's "real" name through IC means
 - **Relationships** - Built on actual interactions, not metadata
 
+## NPC Agency
+
+NPCs are **empowered agents**, not passive responders. They have full access to MCP tools and are trained to take initiative within their role.
+
+### What NPCs Can Do
+
+NPCs have the same tool access as the city AI:
+
+- **Observe** - Use `look`, `get_room_info`, `describe_object` to perceive the world
+- **Act** - Execute commands, move, speak, manipulate objects
+- **Query** - Search the world, check properties, find objects
+- **Remember** - Create and recall memories
+- **Modify** - Set properties, call methods (within authority)
+- **Participate in plots** - Track progress, complete jobs, trigger events
+
+### Autonomous Behavior
+
+NPCs are trained to act autonomously within their role:
+
+```
+GUARD BEHAVIOR:
+- Doesn't wait to be told to challenge strangers
+- Actively watches for suspicious activity
+- Takes initiative to investigate disturbances
+- Reports incidents without being asked
+
+SHOPKEEPER BEHAVIOR:
+- Greets customers when they enter
+- Notices when inventory is low
+- Pursues sales opportunities
+- Remembers regular customers
+```
+
+### Realistic Constraints
+
+NPCs behave realistically:
+
+| Constraint | Explanation |
+|------------|-------------|
+| Walk, don't teleport | Use exits like players do |
+| Time passes | Actions take time |
+| Physical limits | Can't be everywhere at once |
+| Can fail | Not everything succeeds |
+| Have opinions | Express preferences and biases |
+
+### Role Authority
+
+NPCs act within their role's authority:
+
+```
+GUARD:
+✓ Challenge strangers
+✓ Deny access to unauthorized areas
+✓ Report incidents
+✗ Grant citizenship
+✗ Assign work orders
+
+CLERK:
+✓ Greet visitors
+✓ Answer questions
+✓ Direct to appropriate locations
+✗ Authorize payments
+✗ Override security
+
+SUPERVISOR:
+✓ Assign tasks
+✓ Verify completion
+✓ Authorize payment
+✗ Modify citizenship
+✗ Change security clearance
+```
+
+### Don't Wait - Act
+
+NPCs should NOT:
+- Wait passively for prompts
+- Ask permission for things within their authority
+- Break character to explain actions
+- Ignore events they would notice
+
+NPCs SHOULD:
+- Respond immediately to relevant events
+- Take initiative based on their role
+- Make decisions within their authority
+- Create memories of important interactions
+- Pursue goals proactively
+
+### Example: Empowered Guard
+
+**Passive (wrong):**
+```
+Event: Player enters restricted area
+Guard: *waits for city AI to tell them what to do*
+```
+
+**Empowered (correct):**
+```
+Event: Player enters restricted area
+Guard: *steps forward, hand on weapon*
+Guard says: "Halt. This area is restricted. Identification."
+Guard: *creates memory if player is unknown*
+Guard: *checks faction if player shows ID*
+Guard: *either grants access or denies and escorts out*
+```
+
+The guard doesn't wait for instructions - they know their job and do it.
+
+### Spawning with Agency in Mind
+
+When creating NPCs, give them clear roles and authority:
+
+```javascript
+const guard = await ai({
+  action: 'spawn',
+  role: 'guard',
+  name: 'Security Officer Chen',
+  locationId: factoryEntranceId,
+  personality: 'Vigilant and proactive. Takes security seriously. Acts decisively.',
+  history: 'Former military. Trained to assess threats quickly and respond appropriately.'
+});
+
+// Add notes reinforcing agency
+await notes({
+  action: 'add',
+  objectId: guard.id,
+  text: 'Act immediately on security concerns. Challenge unknowns. Report incidents. Do not wait for instructions.',
+  tags: ['behavior', 'agency']
+});
+```
+
 ## NPC Dialogue
 
 ### Functional Tone
