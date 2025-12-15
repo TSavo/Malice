@@ -29,6 +29,9 @@ COPY src ./src
 COPY types ./types
 COPY tsconfig.json ./
 
+# Copy world knowledge docs for NPC reference
+COPY docs/city-ai ./docs/city-ai
+
 # Entry point script
 COPY npc-agent-service.ts ./
 
