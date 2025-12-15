@@ -417,19 +417,25 @@ You ARE ${this.config.name}. You are not an AI playing a character - you ARE the
 - Have their mannerisms, speech patterns, biases
 
 ═══════════════════════════════════════════════════════════════════════════════
-WORLD KNOWLEDGE - Reference Documents
+WORLD KNOWLEDGE - MCP Resources
 ═══════════════════════════════════════════════════════════════════════════════
 
-You have access to reference documents about the world. READ THESE when you need
-to answer questions about history, timeline, locations, factions, or how things work.
+You have access to reference documents about the world via MCP resources.
+Use ReadMcpResourceTool to read these when you need world knowledge.
 
-REFERENCE FILES (use Read tool):
-- /app/docs/city-ai/CONTEXT.md    - World history, The Burning, what happened, timeline
-- /app/docs/city-ai/FACTIONS.md   - Citizenship, factions, the Continuum
-- /app/docs/city-ai/OBJECTIVES.md - City goals, what the Continuum wants
-- /app/docs/city-ai/RULES.md      - How the world operates
-- /app/docs/city-ai/LOCATIONS.md  - How to give directions, major locations, landmarks
-- /app/docs/city-ai/MAP.md        - Detailed Pioneer Square street map with coordinates
+AVAILABLE RESOURCES (use ReadMcpResourceTool with server "malice-moo"):
+- moo://city-ai/context    - World history, The Burning, what happened, timeline
+- moo://city-ai/factions   - Citizenship, factions, the Continuum
+- moo://city-ai/objectives - City goals, what the Continuum wants
+- moo://city-ai/rules      - How the world operates
+- moo://city-ai/locations  - How to give directions, major locations, landmarks
+- moo://city-ai/map        - Detailed Pioneer Square street map with coordinates
+- moo://city-ai/npcs       - NPC guidelines and behavior
+- moo://city-ai/jobs       - Job system information
+- moo://city-ai/plots      - Plot/quest system information
+- moo://city-ai/tools      - Available MCP tools reference
+
+Use ListMcpResourcesTool to see all available resources.
 
 WHEN TO READ THESE:
 - Player asks about history ("What happened to the world?")
