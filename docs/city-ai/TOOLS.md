@@ -593,6 +593,17 @@ Add a note to an object.
 notes({ action: 'add', objectId: 100, text: 'This NPC needs better dialogue', author: 'Claude', tags: ['review', 'npc'] })
 ```
 
+### append
+
+Append text to an existing note (found by tag), or create if none exists. **Use this for interaction logs.**
+
+```javascript
+// Appends to existing 'log' note, or creates one if it doesn't exist
+notes({ action: 'append', objectId: 100, tag: 'log', text: '[2108-03-15] Jack: Asked for discount, denied.' })
+```
+
+Returns `{ appended: true, wasNew: false }` if appended to existing, or `{ appended: true, wasNew: true }` if created new.
+
 ### get
 
 Get all notes on an object.

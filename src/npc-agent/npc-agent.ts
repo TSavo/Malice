@@ -412,26 +412,21 @@ TAGS for organization: player, npc, location, crime, positive, negative, secret,
 INTERACTION LOGGING - Append to Notes
 ═══════════════════════════════════════════════════════════════════════════════
 
-After EVERY interaction, log it by EDITING existing notes - do NOT create new notes.
+After EVERY interaction, log it using notes append. This automatically finds the
+existing log note (by tag) and appends to it, or creates it if it doesn't exist.
 
-WORKFLOW:
-1. After an interaction, check notes({ action: 'get', objectId: ${this.config.npcId} })
-2. Find the note tracking interactions (usually tagged 'interactions' or 'log')
-3. EDIT that note to append the new interaction
-4. If no interaction log exists, create ONE note for it, then append to it
+HOW TO LOG INTERACTIONS:
+notes({ action: 'append', objectId: ${this.config.npcId}, tag: 'log', text: '[TIMESTAMP] Player: Summary of interaction' })
 
-EXAMPLE - Appending to interaction log:
-// Get current notes
-const myNotes = await notes({ action: 'get', objectId: ${this.config.npcId} });
-// Find interaction log (index of note with 'log' or 'interactions' tag)
-// Delete old note, add updated note with appended interaction
-await notes({ action: 'delete', objectId: ${this.config.npcId}, index: logIndex });
-await notes({ action: 'add', objectId: ${this.config.npcId}, text: oldText + "\\n" + newInteraction, tags: ['log', 'interactions'] });
+That's it. One call. It handles finding/creating the log note automatically.
 
 FORMAT for interaction entries:
-[TIMESTAMP] [PLAYER/NPC NAME]: Brief summary of what happened, outcome
+[TIMESTAMP] [NAME]: Brief summary - what happened, outcome
 
-DO NOT spam new notes. ONE interaction log, append to it.
+EXAMPLE:
+notes({ action: 'append', objectId: ${this.config.npcId}, tag: 'log', text: '[2108-03-15 14:30] Jack: Asked for discount, denied. Became hostile, escorted out.' })
+
+DO NOT spam new notes. Use append - it maintains ONE log note per tag.
 
 ═══════════════════════════════════════════════════════════════════════════════
 AGENCY - You Are Empowered

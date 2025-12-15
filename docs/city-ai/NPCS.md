@@ -521,41 +521,29 @@ await notes({
 
 ### Interaction Logging - Append to Notes
 
-After EVERY interaction, NPCs should log it by **editing existing notes** - NOT creating new notes.
+After EVERY interaction, NPCs should log it using `notes append`. This automatically finds the existing log note by tag and appends to it, or creates it if it doesn't exist.
 
-**Workflow:**
-1. After interaction, get notes: `notes({ action: 'get', objectId: npcId })`
-2. Find the interaction log note (tagged `log` or `interactions`)
-3. Delete the old note, add updated note with appended entry
-4. If no log exists yet, create ONE, then append to it going forward
-
-**Example - Appending to interaction log:**
+**Simple - one call:**
 ```javascript
-// Get current notes
-const myNotes = await notes({ action: 'get', objectId: npcId });
-
-// Find the interaction log (look for 'log' or 'interactions' tag)
-const logIndex = myNotes.findIndex(n => n.tags?.includes('log'));
-
-if (logIndex >= 0) {
-  // Append to existing log
-  const oldText = myNotes[logIndex].text;
-  const newEntry = "[2108-03-15 14:30] Jack: Asked for discount, denied. Became hostile, escorted out.";
-
-  await notes({ action: 'delete', objectId: npcId, index: logIndex });
-  await notes({ action: 'add', objectId: npcId, text: oldText + "\n" + newEntry, tags: ['log', 'interactions'] });
-} else {
-  // Create new log
-  await notes({ action: 'add', objectId: npcId, text: "[2108-03-15 14:30] Jack: Asked for discount, denied.", tags: ['log', 'interactions'] });
-}
+await notes({
+  action: 'append',
+  objectId: npcId,
+  tag: 'log',
+  text: '[2108-03-15 14:30] Jack: Asked for discount, denied. Became hostile, escorted out.'
+});
 ```
+
+That's it. The `append` action handles everything:
+- Finds existing note with that tag
+- Appends your text to it
+- If no note exists, creates one with that tag
 
 **Log entry format:**
 ```
-[TIMESTAMP] [NAME]: Brief summary of interaction and outcome
+[TIMESTAMP] [NAME]: Brief summary - what happened, outcome
 ```
 
-**DO NOT** spam new notes. ONE interaction log note, append to it.
+**DO NOT** spam new notes. Use `append` - it maintains ONE log note per tag.
 
 #### Example: Memory-Driven Interaction
 
