@@ -12,6 +12,7 @@ import { z } from 'zod';
 import type { ObjectManager } from '../database/object-manager.js';
 import type { ObjId } from '../../types/object.js';
 import { MCPTelnetClient } from './telnet-client.js';
+import { parseQuery, validateQuery } from './query-parser.js';
 
 interface MCPServerConfig {
   port?: number;
@@ -58,8 +59,8 @@ export class MaliceMCPServer {
       return value;
     }
 
-    // Handle RuntimeObject (has .id property and is an object)
-    if (value && typeof value === 'object' && 'id' in value && typeof value.id === 'number') {
+    // Handle RuntimeObject (has .id property AND .get method - distinguishes from plain objects)
+    if (value && typeof value === 'object' && 'id' in value && typeof value.id === 'number' && typeof value.get === 'function') {
       return `#${value.id}`;
     }
 
@@ -283,8 +284,9 @@ export class MaliceMCPServer {
 
         try {
           const result = await obj.call(name, ...(args || []));
+          const serialized = this.serializeValue(result);
           return {
-            content: [{ type: 'text', text: JSON.stringify({ result }, null, 2) }],
+            content: [{ type: 'text', text: JSON.stringify({ result: serialized }, null, 2) }],
           };
         } catch (err) {
           return {
@@ -1461,1208 +1463,779 @@ export class MaliceMCPServer {
       }
     );
 
-    // === Plot/Job Tools ===
+    // ═══════════════════════════════════════════════════════════════════
+    // CONSOLIDATED PLOT TOOL
+    // ═══════════════════════════════════════════════════════════════════
 
-    // Get next job needing attention
     this.server.tool(
-      'get_next_job',
-      'Get the next plot/job needing attention from the FIFO queue. Returns the plot with event log and metadata, and bumps its attention timer by 24 hours.',
-      {},
-      async () => {
-        const plotDB = await this.getPlotDB();
-        if (!plotDB) {
-          return {
-            content: [{ type: 'text', text: 'PlotDB not found - plot system not initialized' }],
-            isError: true,
-          };
-        }
+      'plot',
+      `Comprehensive plot and job management tool.
 
-        try {
-          const plot = await plotDB.call('getNext');
-          if (!plot) {
-            return {
-              content: [{ type: 'text', text: JSON.stringify({ plot: null, message: 'No jobs need attention' }, null, 2) }],
-            };
-          }
+ACTIONS:
+  Plot Management:
+    create        - Create a new plot (name, metadata?)
+    get           - Get plot details (plotId)
+    list          - List plots (status?: active|completed|abandoned|failed)
+    search        - Search plot events (query, limit?)
+    close         - Close a plot (plotId, status: completed|abandoned|failed, reason?)
+    set_metadata  - Set plot metadata (plotId, key, value)
+    add_event     - Add event to plot (plotId, message, from?: handler|system, metadata?)
+    get_events    - Get plot event log (plotId, limit?)
 
-          const result = {
-            id: plot.id,
-            name: plot.name,
-            events: plot.events || [],
-            metadata: plot.metadata || {},
-          };
+  Phase Management:
+    set_phases    - Define phases for a plot (plotId, phases[])
+    get_phases    - Get phase definitions (plotId)
 
-          return {
-            content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
-          };
-        } catch (err) {
-          return {
-            content: [{ type: 'text', text: `Error getting next job: ${err instanceof Error ? err.message : String(err)}` }],
-            isError: true,
-          };
-        }
-      }
-    );
+  Job Management:
+    create_job    - Create job in plot (plotId, jobId, metadata?, expiresAt?)
+    get_job       - Get job details (plotId, jobId)
+    complete_job  - Complete a job (plotId, jobId, reason?)
+    fail_job      - Fail a job (plotId, jobId, reason?)
 
-    // Respond to a job
-    this.server.tool(
-      'respond_to_job',
-      'Add an event to a plot as the city AI handler. Use this to progress the narrative, give instructions, or respond to player actions. Use metadata to track objects, locations, and state.',
+  Job Phase Tracking:
+    get_job_phase   - Get current phase for job (plotId, jobId)
+    advance_phase   - Advance job to next phase (plotId, jobId)
+    set_phase       - Set job to specific phase (plotId, jobId, phaseId)
+
+  Hooks:
+    register_hook - Register job hook (plotId, jobId, targetId, eventName, filter?)
+
+  Queue:
+    next          - Get next plot needing attention (bumps timer 24h)
+    active        - List all active plots with metadata`,
       {
-        plotId: z.number().describe('Plot object ID'),
-        message: z.string().describe('The message/event to add to the plot'),
-        metadata: z.record(z.any()).optional().describe('Arbitrary metadata (e.g., { createdObject: 56, deliveryTarget: 49 })'),
+        action: z.string().describe('Action to perform (see help above)'),
+        plotId: z.number().optional().describe('Plot object ID'),
+        jobId: z.string().optional().describe('Job identifier within plot'),
+        name: z.string().optional().describe('Name for new plot'),
+        status: z.string().optional().describe('Status filter or new status'),
+        reason: z.string().optional().describe('Reason for close/complete/fail'),
+        message: z.string().optional().describe('Event message'),
+        from: z.string().optional().describe('Event source: handler or system'),
+        metadata: z.any().optional().describe('Metadata object'),
+        key: z.string().optional().describe('Metadata key'),
+        value: z.any().optional().describe('Metadata value'),
+        query: z.string().optional().describe('Search query'),
+        limit: z.number().optional().describe('Result limit'),
+        phases: z.array(z.any()).optional().describe('Phase definitions array'),
+        phaseId: z.string().optional().describe('Phase identifier'),
+        targetId: z.number().optional().describe('Target object ID for hooks'),
+        eventName: z.string().optional().describe('Event name for hooks'),
+        filter: z.record(z.any()).optional().describe('Hook filter conditions'),
+        expiresAt: z.string().optional().describe('ISO timestamp for job expiration'),
       },
-      async ({ plotId, message, metadata }) => {
-        const plot = await this.manager.load(plotId as ObjId);
-        if (!plot) {
-          return {
-            content: [{ type: 'text', text: `Plot #${plotId} not found` }],
-            isError: true,
-          };
-        }
+      async (params) => {
+        const { action, plotId, jobId, name, status, reason, message, from, metadata, key, value, query, limit, phases, phaseId, targetId, eventName, filter, expiresAt } = params;
 
-        try {
-          await plot.call('addEvent', {
-            from: 'handler',
-            message: message,
-            ...(metadata ? { metadata } : {}),
-          });
-          return {
-            content: [{ type: 'text', text: `Event added to plot #${plotId}` }],
-          };
-        } catch (err) {
-          return {
-            content: [{ type: 'text', text: `Error adding event: ${err instanceof Error ? err.message : String(err)}` }],
-            isError: true,
-          };
-        }
-      }
-    );
-
-    // List active jobs
-    this.server.tool(
-      'list_active_jobs',
-      'List all active plots/jobs with their metadata. Shows which jobs exist and their current state.',
-      {},
-      async () => {
         const plotDB = await this.getPlotDB();
-        if (!plotDB) {
-          return {
-            content: [{ type: 'text', text: 'PlotDB not found - plot system not initialized' }],
-            isError: true,
-          };
-        }
+        const err = (msg: string) => ({ content: [{ type: 'text' as const, text: msg }], isError: true });
+        const ok = (data: any) => ({ content: [{ type: 'text' as const, text: typeof data === 'string' ? data : JSON.stringify(this.serializeValue(data), null, 2) }] });
+
+        const loadPlot = async (id?: number) => {
+          if (id === undefined) return { error: 'plotId required' };
+          const plot = await this.manager.load(id as ObjId);
+          if (!plot) return { error: `Plot #${id} not found` };
+          return { plot };
+        };
 
         try {
-          const plots = await plotDB.call('active');
-          const results = [];
+          switch (action) {
+            // ─────────────────────────────────────────────────────────────
+            // PLOT MANAGEMENT
+            // ─────────────────────────────────────────────────────────────
 
-          for (const plot of plots || []) {
-            results.push({
-              id: plot.id,
-              name: plot.name,
-              metadata: plot.metadata || {},
-              eventCount: (plot.events || []).length,
-            });
+            case 'create': {
+              if (!name) return err('name required');
+              const plotProto = await this.getAlias('plot');
+              const recycler = await this.getAlias('recycler');
+              if (!plotProto || !recycler) return err('Plot system not initialized');
+
+              const newPlot = await recycler.call('create', {
+                parent: plotProto.id,
+                properties: {
+                  name,
+                  description: 'AI-created plot',
+                  events: [],
+                  metadata: {
+                    ...(metadata || {}),
+                    created: new Date().toISOString(),
+                    needsAttentionAt: new Date().toISOString(),
+                  },
+                },
+              });
+
+              if (plotDB) await plotDB.call('register', newPlot);
+              return ok({ created: true, plotId: newPlot.id, name });
+            }
+
+            case 'get': {
+              const r = await loadPlot(plotId);
+              if (r.error) return err(r.error);
+              const p = r.plot!;
+              return ok({
+                id: p.id,
+                name: (p as any).name,
+                description: (p as any).description,
+                phases: (p as any).phases || [],
+                jobs: (p as any).jobs || {},
+                metadata: (p as any).metadata || {},
+                eventCount: ((p as any).events || []).length,
+              });
+            }
+
+            case 'list': {
+              if (!plotDB) return err('PlotDB not found');
+              const plots = status ? await plotDB.call('byStatus', status) : await plotDB.call('all');
+              const results = (plots || []).map((p: any) => ({
+                id: p.id,
+                name: p.name,
+                status: p.metadata?.status || 'active',
+                eventCount: (p.events || []).length,
+              }));
+              return ok({ count: results.length, plots: results });
+            }
+
+            case 'search': {
+              if (!query) return err('query required');
+              if (!plotDB) return err('PlotDB not found');
+              let plots = await plotDB.call('search', query);
+              if (limit) plots = plots.slice(0, limit);
+              const results = (plots || []).map((p: any) => ({
+                id: p.id,
+                name: p.name,
+                status: p.metadata?.status || 'active',
+              }));
+              return ok({ query, count: results.length, plots: results });
+            }
+
+            case 'close': {
+              const r = await loadPlot(plotId);
+              if (r.error) return err(r.error);
+              if (!status || !['completed', 'abandoned', 'failed'].includes(status)) {
+                return err('status required: completed, abandoned, or failed');
+              }
+              const p = r.plot!;
+              await p.call('setMetadata', 'status', status);
+              await p.call('setMetadata', 'closedAt', new Date().toISOString());
+              if (reason) await p.call('setMetadata', 'closeReason', reason);
+              await p.call('addEvent', { from: 'system', message: `Plot ${status}: ${reason || 'No reason given'}` });
+              return ok({ closed: true, plotId, status });
+            }
+
+            case 'set_metadata': {
+              const r = await loadPlot(plotId);
+              if (r.error) return err(r.error);
+              if (!key) return err('key required');
+              await r.plot!.call('setMetadata', key, value);
+              return ok({ set: true, plotId, key, value });
+            }
+
+            case 'add_event': {
+              const r = await loadPlot(plotId);
+              if (r.error) return err(r.error);
+              if (!message) return err('message required');
+              await r.plot!.call('addEvent', {
+                from: from || 'handler',
+                message,
+                ...(metadata ? { metadata } : {}),
+              });
+              return ok({ added: true, plotId });
+            }
+
+            case 'get_events': {
+              const r = await loadPlot(plotId);
+              if (r.error) return err(r.error);
+              let events = await r.plot!.call('getEventLog') as any[];
+              if (limit) events = events.slice(-limit);
+              return ok({ plotId, count: events.length, events });
+            }
+
+            // ─────────────────────────────────────────────────────────────
+            // PHASE MANAGEMENT
+            // ─────────────────────────────────────────────────────────────
+
+            case 'set_phases': {
+              const r = await loadPlot(plotId);
+              if (r.error) return err(r.error);
+              if (!phases || !Array.isArray(phases)) return err('phases array required');
+              const result = await r.plot!.call('setPhases', phases);
+              return ok({ set: true, plotId, phaseCount: result.length, phases: result });
+            }
+
+            case 'get_phases': {
+              const r = await loadPlot(plotId);
+              if (r.error) return err(r.error);
+              const result = await r.plot!.call('getPhases');
+              return ok({ plotId, phases: result });
+            }
+
+            // ─────────────────────────────────────────────────────────────
+            // JOB MANAGEMENT
+            // ─────────────────────────────────────────────────────────────
+
+            case 'create_job': {
+              const r = await loadPlot(plotId);
+              if (r.error) return err(r.error);
+              if (!jobId) return err('jobId required');
+              const options: any = {};
+              if (metadata) options.metadata = metadata;
+              if (expiresAt) options.expiresAt = expiresAt;
+              await r.plot!.call('createJob', jobId, options);
+              return ok({ created: true, plotId, jobId });
+            }
+
+            case 'get_job': {
+              const r = await loadPlot(plotId);
+              if (r.error) return err(r.error);
+              if (!jobId) return err('jobId required');
+              const job = await r.plot!.call('getJob', jobId);
+              if (!job) return err(`Job '${jobId}' not found`);
+              return ok({ plotId, jobId, ...job });
+            }
+
+            case 'complete_job': {
+              const r = await loadPlot(plotId);
+              if (r.error) return err(r.error);
+              if (!jobId) return err('jobId required');
+              const result = await r.plot!.call('completeJob', jobId, reason || 'Completed') as any;
+              if (result.success === false) return err(result.error || 'Failed to complete job');
+              return ok({ completed: true, plotId, jobId });
+            }
+
+            case 'fail_job': {
+              const r = await loadPlot(plotId);
+              if (r.error) return err(r.error);
+              if (!jobId) return err('jobId required');
+              const result = await r.plot!.call('failJob', jobId, reason || 'Failed') as any;
+              if (result.success === false) return err(result.error || 'Failed to fail job');
+              return ok({ failed: true, plotId, jobId });
+            }
+
+            // ─────────────────────────────────────────────────────────────
+            // JOB PHASE TRACKING
+            // ─────────────────────────────────────────────────────────────
+
+            case 'get_job_phase': {
+              const r = await loadPlot(plotId);
+              if (r.error) return err(r.error);
+              if (!jobId) return err('jobId required');
+              const result = await r.plot!.call('getJobPhase', jobId);
+              return ok({ plotId, jobId, ...result });
+            }
+
+            case 'advance_phase': {
+              const r = await loadPlot(plotId);
+              if (r.error) return err(r.error);
+              if (!jobId) return err('jobId required');
+              const result = await r.plot!.call('advanceJobPhase', jobId, 'completed');
+              return ok({ plotId, jobId, ...result });
+            }
+
+            case 'set_phase': {
+              const r = await loadPlot(plotId);
+              if (r.error) return err(r.error);
+              if (!jobId) return err('jobId required');
+              if (!phaseId) return err('phaseId required');
+              await r.plot!.call('setJobPhase', jobId, phaseId);
+              return ok({ set: true, plotId, jobId, phaseId });
+            }
+
+            // ─────────────────────────────────────────────────────────────
+            // HOOKS
+            // ─────────────────────────────────────────────────────────────
+
+            case 'register_hook': {
+              const r = await loadPlot(plotId);
+              if (r.error) return err(r.error);
+              if (!jobId) return err('jobId required');
+              if (targetId === undefined) return err('targetId required');
+              if (!eventName) return err('eventName required');
+              await r.plot!.call('registerJobHook', jobId, targetId, eventName, filter || {});
+              return ok({ registered: true, plotId, jobId, targetId, eventName });
+            }
+
+            // ─────────────────────────────────────────────────────────────
+            // QUEUE
+            // ─────────────────────────────────────────────────────────────
+
+            case 'next': {
+              if (!plotDB) return err('PlotDB not found');
+              const plot = await plotDB.call('getNext');
+              if (!plot) return ok({ plot: null, message: 'No jobs need attention' });
+
+              // Get current phase info for any active jobs
+              const jobs = (plot as any).jobs || {};
+              const jobsWithPhases: any = {};
+              for (const [jid, job] of Object.entries(jobs) as [string, any][]) {
+                if (job.status === 'active' && job.currentPhase) {
+                  const phase = await plot.call('getPhase', job.currentPhase);
+                  jobsWithPhases[jid] = {
+                    ...job,
+                    currentPhaseInfo: phase,
+                  };
+                } else {
+                  jobsWithPhases[jid] = job;
+                }
+              }
+
+              return ok({
+                id: plot.id,
+                name: (plot as any).name,
+                phases: (plot as any).phases || [],
+                jobs: jobsWithPhases,
+                events: (plot as any).events || [],
+                metadata: (plot as any).metadata || {},
+              });
+            }
+
+            case 'active': {
+              if (!plotDB) return err('PlotDB not found');
+              const plots = await plotDB.call('active');
+              const results = (plots || []).map((p: any) => ({
+                id: p.id,
+                name: p.name,
+                metadata: p.metadata || {},
+                eventCount: (p.events || []).length,
+                jobCount: Object.keys(p.jobs || {}).length,
+              }));
+              return ok({ count: results.length, plots: results });
+            }
+
+            default:
+              return err(`Unknown action: ${action}. See tool description for available actions.`);
           }
-
-          return {
-            content: [{ type: 'text', text: JSON.stringify({ count: results.length, jobs: results }, null, 2) }],
-          };
-        } catch (err) {
-          return {
-            content: [{ type: 'text', text: `Error listing jobs: ${err instanceof Error ? err.message : String(err)}` }],
-            isError: true,
-          };
-        }
-      }
-    );
-
-    // Set job metadata
-    this.server.tool(
-      'set_job_metadata',
-      'Set or update metadata on a plot/job. Use for tracking status, state, flags, etc.',
-      {
-        plotId: z.number().describe('Plot object ID'),
-        key: z.string().describe('Metadata key'),
-        value: z.any().describe('Metadata value (any JSON-serializable value, or null to delete)'),
-      },
-      async ({ plotId, key, value }) => {
-        const plot = await this.manager.load(plotId as ObjId);
-        if (!plot) {
-          return {
-            content: [{ type: 'text', text: `Plot #${plotId} not found` }],
-            isError: true,
-          };
-        }
-
-        try {
-          await plot.call('setMetadata', key, value);
-          return {
-            content: [{ type: 'text', text: `Set metadata '${key}' on plot #${plotId}` }],
-          };
-        } catch (err) {
-          return {
-            content: [{ type: 'text', text: `Error setting metadata: ${err instanceof Error ? err.message : String(err)}` }],
-            isError: true,
-          };
+        } catch (e) {
+          return err(`Error: ${e instanceof Error ? e.message : String(e)}`);
         }
       }
     );
 
     // ═══════════════════════════════════════════════════════════════════════
-    // AI REGISTRY TOOLS
+    // AI TOOL (Consolidated)
     // ═══════════════════════════════════════════════════════════════════════
 
-    // Spawn AI-controlled human
     this.server.tool(
-      'spawn_ai',
-      'Spawn a new AI-controlled human. Creates a full human with body, registers in $.ai by role.',
+      'ai',
+      `Consolidated AI-controlled human management tool.
+
+ACTIONS:
+  spawn   - Create a new AI-controlled human (role, name?, description?, locationId?, sex?, age?)
+  despawn - Remove an AI human (humanId, recycle?)
+  list    - List all AI humans (role?)
+  info    - Get detailed AI human info (humanId)
+  do      - Execute a command as AI human (humanId, command)
+  look    - Get what AI human sees (humanId)`,
       {
-        role: z.string().describe('Role for this AI (e.g., "guard", "shopkeeper", "bartender")'),
+        action: z.string().describe('Action to perform (see help above)'),
+        role: z.string().optional().describe('Role for this AI (e.g., "guard", "shopkeeper")'),
         name: z.string().optional().describe('Name of the human'),
         description: z.string().optional().describe('Description of the human'),
         locationId: z.number().optional().describe('Room ID to place the human'),
         sex: z.enum(['male', 'female', 'non-binary']).optional().describe('Sex (random if not specified)'),
         age: z.number().optional().describe('Age in years (random 18-65 if not specified)'),
+        humanId: z.number().optional().describe('Human object ID'),
+        command: z.string().optional().describe('Command to execute'),
+        recycle: z.boolean().optional().describe('Whether to recycle on despawn (default: true)'),
       },
-      async ({ role, name, description, locationId, sex, age }) => {
-        const ai = await this.getAlias('ai');
-        if (!ai) {
+      async ({ action, role, name, description, locationId, sex, age, humanId, command, recycle }) => {
+        const aiRegistry = await this.getAlias('ai');
+        if (!aiRegistry) {
           return {
             content: [{ type: 'text', text: 'AI registry not found - system not initialized' }],
             isError: true,
           };
         }
 
-        try {
-          const options: any = {};
-          if (name) options.name = name;
-          if (description) options.description = description;
-          if (locationId !== undefined) options.location = locationId;
-          if (sex) options.sex = sex;
-          if (age !== undefined) options.age = age;
-
-          const human = await ai.call('spawn', role, options);
-          return {
-            content: [{ type: 'text', text: `Spawned AI human #${human.id} (${human.name}) as ${role}` }],
-          };
-        } catch (err) {
-          return {
-            content: [{ type: 'text', text: `Error spawning AI: ${err instanceof Error ? err.message : String(err)}` }],
-            isError: true,
-          };
-        }
-      }
-    );
-
-    // Despawn AI-controlled human
-    this.server.tool(
-      'despawn_ai',
-      'Remove an AI-controlled human. Unregisters from $.ai and optionally recycles the object.',
-      {
-        humanId: z.number().describe('Human object ID to despawn'),
-        recycle: z.boolean().optional().describe('Whether to recycle the object (default: true)'),
-      },
-      async ({ humanId, recycle }) => {
-        const ai = await this.getAlias('ai');
-        if (!ai) {
-          return {
-            content: [{ type: 'text', text: 'AI registry not found' }],
-            isError: true,
-          };
-        }
+        const ok = (data: unknown) => ({
+          content: [{ type: 'text' as const, text: typeof data === 'string' ? data : JSON.stringify(this.serializeValue(data), null, 2) }],
+        });
+        const err = (msg: string) => ({
+          content: [{ type: 'text' as const, text: msg }],
+          isError: true,
+        });
 
         try {
-          await ai.call('despawn', humanId, recycle !== false);
-          return {
-            content: [{ type: 'text', text: `Despawned AI human #${humanId}` }],
-          };
-        } catch (err) {
-          return {
-            content: [{ type: 'text', text: `Error despawning AI: ${err instanceof Error ? err.message : String(err)}` }],
-            isError: true,
-          };
-        }
-      }
-    );
+          switch (action) {
+            case 'spawn': {
+              if (!role) return err('role required');
+              const options: any = {};
+              if (name) options.name = name;
+              if (description) options.description = description;
+              if (locationId !== undefined) options.location = locationId;
+              if (sex) options.sex = sex;
+              if (age !== undefined) options.age = age;
 
-    // List AI-controlled humans
-    this.server.tool(
-      'list_ai',
-      'List all AI-controlled humans, optionally filtered by role.',
-      {
-        role: z.string().optional().describe('Filter by role (e.g., "guard")'),
-      },
-      async ({ role }) => {
-        const ai = await this.getAlias('ai');
-        if (!ai) {
-          return {
-            content: [{ type: 'text', text: 'AI registry not found' }],
-            isError: true,
-          };
-        }
-
-        try {
-          let humanIds: number[];
-          if (role) {
-            humanIds = await ai.call('getByRole', role);
-          } else {
-            humanIds = await ai.call('getAll');
-          }
-
-          const results = [];
-          for (const id of humanIds || []) {
-            const human = await this.manager.load(id as ObjId);
-            const info = await ai.call('getInfo', id);
-            results.push({
-              id,
-              name: human ? (human as any).name : 'Unknown',
-              role: info?.role,
-              location: human ? (human as any).location : null,
-            });
-          }
-
-          return {
-            content: [{ type: 'text', text: JSON.stringify({ count: results.length, humans: results }, null, 2) }],
-          };
-        } catch (err) {
-          return {
-            content: [{ type: 'text', text: `Error listing AI: ${err instanceof Error ? err.message : String(err)}` }],
-            isError: true,
-          };
-        }
-      }
-    );
-
-    // Get AI human info
-    this.server.tool(
-      'get_ai_info',
-      'Get information about an AI-controlled human including role and spawn metadata.',
-      {
-        humanId: z.number().describe('Human object ID'),
-      },
-      async ({ humanId }) => {
-        const ai = await this.getAlias('ai');
-        if (!ai) {
-          return {
-            content: [{ type: 'text', text: 'AI registry not found' }],
-            isError: true,
-          };
-        }
-
-        try {
-          const isAi = await ai.call('isAiControlled', humanId);
-          if (!isAi) {
-            return {
-              content: [{ type: 'text', text: `Human #${humanId} is not AI-controlled` }],
-            };
-          }
-
-          const info = await ai.call('getInfo', humanId);
-          const human = await this.manager.load(humanId as ObjId);
-
-          return {
-            content: [{ type: 'text', text: JSON.stringify({
-              id: humanId,
-              name: human ? (human as any).name : 'Unknown',
-              ...info,
-            }, null, 2) }],
-          };
-        } catch (err) {
-          return {
-            content: [{ type: 'text', text: `Error getting AI info: ${err instanceof Error ? err.message : String(err)}` }],
-            isError: true,
-          };
-        }
-      }
-    );
-
-    // Execute a command as an AI human
-    this.server.tool(
-      'ai_do',
-      'Execute a command as an AI-controlled human (like typing in the game). Returns the result/output.',
-      {
-        humanId: z.number().describe('AI human object ID'),
-        command: z.string().describe('Command to execute (e.g., "say Hello!", "north", "get sword", "look")'),
-      },
-      async ({ humanId, command }) => {
-        const ai = await this.getAlias('ai');
-        if (!ai) {
-          return {
-            content: [{ type: 'text', text: 'AI registry not found' }],
-            isError: true,
-          };
-        }
-
-        // Verify this is an AI-controlled human
-        const isAi = await ai.call('isAiControlled', humanId);
-        if (!isAi) {
-          return {
-            content: [{ type: 'text', text: `Human #${humanId} is not AI-controlled` }],
-            isError: true,
-          };
-        }
-
-        const human = await this.manager.load(humanId as ObjId);
-        if (!human) {
-          return {
-            content: [{ type: 'text', text: `Human #${humanId} not found` }],
-            isError: true,
-          };
-        }
-
-        try {
-          const trimmed = command.trim();
-
-          // Match input against registered verb patterns
-          const match = await human.call('matchVerb', trimmed) as {
-            error?: string;
-            handler?: any;
-            verbInfo?: { method: string };
-            args?: any[];
-          } | null;
-
-          if (match && match.error) {
-            return {
-              content: [{ type: 'text', text: match.error }],
-            };
-          }
-
-          if (match && match.handler && match.verbInfo) {
-            // Execute the verb - pass null for context (no connection)
-            // callVerb is a native RuntimeObject method, not a MOO method
-            const result = await match.handler.callVerb(
-              match.verbInfo.method,
-              null,       // context (null for AI)
-              human,      // player/agent
-              trimmed,    // raw command
-              match.args  // resolved args
-            );
-
-            return {
-              content: [{ type: 'text', text: result !== undefined ? String(result) : '(no output)' }],
-            };
-          }
-
-          // No matching pattern found
-          const firstWord = trimmed.split(/\s+/)[0];
-          return {
-            content: [{ type: 'text', text: `I don't understand "${firstWord}".` }],
-          };
-        } catch (err) {
-          return {
-            content: [{ type: 'text', text: `Error executing command: ${err instanceof Error ? err.message : String(err)}` }],
-            isError: true,
-          };
-        }
-      }
-    );
-
-    // Get what an AI human sees (look from their perspective)
-    this.server.tool(
-      'ai_look',
-      'Get what an AI-controlled human sees in their current location.',
-      {
-        humanId: z.number().describe('AI human object ID'),
-      },
-      async ({ humanId }) => {
-        const ai = await this.getAlias('ai');
-        if (!ai) {
-          return {
-            content: [{ type: 'text', text: 'AI registry not found' }],
-            isError: true,
-          };
-        }
-
-        const isAi = await ai.call('isAiControlled', humanId);
-        if (!isAi) {
-          return {
-            content: [{ type: 'text', text: `Human #${humanId} is not AI-controlled` }],
-            isError: true,
-          };
-        }
-
-        const human = await this.manager.load(humanId as ObjId);
-        if (!human) {
-          return {
-            content: [{ type: 'text', text: `Human #${humanId} not found` }],
-            isError: true,
-          };
-        }
-
-        try {
-          // Get the room
-          const locationId = (human as any).location;
-          if (!locationId) {
-            return {
-              content: [{ type: 'text', text: 'Human has no location' }],
-              isError: true,
-            };
-          }
-
-          const room = await this.manager.load(locationId as ObjId);
-          if (!room) {
-            return {
-              content: [{ type: 'text', text: `Location #${locationId} not found` }],
-              isError: true,
-            };
-          }
-
-          // Build what they see
-          const roomName = (room as any).name || 'Unknown';
-          const roomDesc = (room as any).description || '';
-
-          // Get exits
-          const exits = (room as any).exits || [];
-          const exitNames: string[] = [];
-          for (const exitRef of exits) {
-            const exitId = typeof exitRef === 'string' ? parseInt(exitRef.replace('#', ''), 10) : exitRef;
-            const exit = await this.manager.load(exitId as ObjId);
-            if (exit) {
-              exitNames.push((exit as any).name || 'exit');
-            }
-          }
-
-          // Get contents (excluding the AI human itself)
-          const contents = (room as any).contents || [];
-          const items: string[] = [];
-          const people: string[] = [];
-
-          for (const objId of contents) {
-            if (objId === humanId) continue;
-            const obj = await this.manager.load(objId as ObjId);
-            if (!obj) continue;
-
-            const name = (obj as any).name || `#${objId}`;
-            // Check if it's a person (has conscious property or is player/human)
-            if ((obj as any).conscious !== undefined || (obj as any).playername) {
-              people.push(name);
-            } else {
-              items.push(name);
-            }
-          }
-
-          const result = {
-            location: roomName,
-            description: roomDesc,
-            exits: exitNames,
-            people,
-            items,
-          };
-
-          return {
-            content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
-          };
-        } catch (err) {
-          return {
-            content: [{ type: 'text', text: `Error looking: ${err instanceof Error ? err.message : String(err)}` }],
-            isError: true,
-          };
-        }
-      }
-    );
-
-    // ═══════════════════════════════════════════════════════════════════════
-    // PLOT MANAGEMENT TOOLS
-    // ═══════════════════════════════════════════════════════════════════════
-
-    // Create a new plot
-    this.server.tool(
-      'create_plot',
-      'Create a new plot (narrative container). Use for AI-initiated storylines.',
-      {
-        name: z.string().describe('Name of the plot'),
-        metadata: z.record(z.any()).optional().describe('Initial metadata (participants, status, etc.)'),
-      },
-      async ({ name, metadata }) => {
-        const plotDB = await this.getPlotDB();
-        const plotProto = await this.getAlias('plot');
-        const recycler = await this.getAlias('recycler');
-
-        if (!plotProto || !recycler) {
-          return {
-            content: [{ type: 'text', text: 'Plot system not initialized' }],
-            isError: true,
-          };
-        }
-
-        try {
-          // Create new plot instance
-          const newPlot = await recycler.call('create', {
-            parent: plotProto.id,
-            properties: {
-              name: name,
-              description: 'AI-created plot',
-              events: [],
-              metadata: {
-                ...(metadata || {}),
-                created: new Date().toISOString(),
-                needsAttentionAt: new Date().toISOString(),
-              },
-            },
-          });
-
-          // Register with plotDB
-          if (plotDB) {
-            await plotDB.call('register', newPlot);
-          }
-
-          return {
-            content: [{ type: 'text', text: `Created plot #${newPlot.id} "${name}"` }],
-          };
-        } catch (err) {
-          return {
-            content: [{ type: 'text', text: `Error creating plot: ${err instanceof Error ? err.message : String(err)}` }],
-            isError: true,
-          };
-        }
-      }
-    );
-
-    // Close/complete a plot
-    this.server.tool(
-      'close_plot',
-      'Close a plot by setting its status. Use "completed", "abandoned", or "failed".',
-      {
-        plotId: z.number().describe('Plot object ID'),
-        status: z.enum(['completed', 'abandoned', 'failed']).describe('Final status'),
-        reason: z.string().optional().describe('Reason for closing'),
-      },
-      async ({ plotId, status, reason }) => {
-        const plot = await this.manager.load(plotId as ObjId);
-        if (!plot) {
-          return {
-            content: [{ type: 'text', text: `Plot #${plotId} not found` }],
-            isError: true,
-          };
-        }
-
-        try {
-          await plot.call('setMetadata', 'status', status);
-          await plot.call('setMetadata', 'closedAt', new Date().toISOString());
-          if (reason) {
-            await plot.call('setMetadata', 'closeReason', reason);
-          }
-          await plot.call('addEvent', {
-            from: 'system',
-            message: `Plot ${status}: ${reason || 'No reason given'}`,
-          });
-
-          return {
-            content: [{ type: 'text', text: `Plot #${plotId} marked as ${status}` }],
-          };
-        } catch (err) {
-          return {
-            content: [{ type: 'text', text: `Error closing plot: ${err instanceof Error ? err.message : String(err)}` }],
-            isError: true,
-          };
-        }
-      }
-    );
-
-    // Get plot events
-    this.server.tool(
-      'get_plot_events',
-      'Get the event log for a plot. Returns all narrative events.',
-      {
-        plotId: z.number().describe('Plot object ID'),
-        limit: z.number().optional().describe('Limit to last N events'),
-      },
-      async ({ plotId, limit }) => {
-        const plot = await this.manager.load(plotId as ObjId);
-        if (!plot) {
-          return {
-            content: [{ type: 'text', text: `Plot #${plotId} not found` }],
-            isError: true,
-          };
-        }
-
-        try {
-          let events: any[] = await plot.call('getEventLog') as any[];
-          if (limit && events.length > limit) {
-            events = events.slice(-limit);
-          }
-
-          return {
-            content: [{ type: 'text', text: JSON.stringify({
-              plotId,
-              name: (plot as any).name,
-              eventCount: events.length,
-              events,
-            }, null, 2) }],
-          };
-        } catch (err) {
-          return {
-            content: [{ type: 'text', text: `Error getting events: ${err instanceof Error ? err.message : String(err)}` }],
-            isError: true,
-          };
-        }
-      }
-    );
-
-    // Add event to plot
-    this.server.tool(
-      'add_plot_event',
-      'Add an event to a plot\'s narrative log.',
-      {
-        plotId: z.number().describe('Plot object ID'),
-        message: z.string().describe('Event message'),
-        from: z.enum(['handler', 'system']).optional().describe('Event source (default: handler)'),
-      },
-      async ({ plotId, message, from }) => {
-        const plot = await this.manager.load(plotId as ObjId);
-        if (!plot) {
-          return {
-            content: [{ type: 'text', text: `Plot #${plotId} not found` }],
-            isError: true,
-          };
-        }
-
-        try {
-          await plot.call('addEvent', {
-            from: from || 'handler',
-            message,
-          });
-
-          return {
-            content: [{ type: 'text', text: `Added event to plot #${plotId}` }],
-          };
-        } catch (err) {
-          return {
-            content: [{ type: 'text', text: `Error adding event: ${err instanceof Error ? err.message : String(err)}` }],
-            isError: true,
-          };
-        }
-      }
-    );
-
-    // List all plots
-    this.server.tool(
-      'list_plots',
-      'List all plots with optional status filter.',
-      {
-        status: z.enum(['active', 'completed', 'abandoned', 'failed']).optional().describe('Filter by status'),
-        limit: z.number().optional().describe('Max results to return'),
-      },
-      async ({ status, limit }) => {
-        const plotDB = await this.getPlotDB();
-        if (!plotDB) {
-          return {
-            content: [{ type: 'text', text: 'PlotDB not found' }],
-            isError: true,
-          };
-        }
-
-        try {
-          let plots;
-          if (status) {
-            plots = await plotDB.call('byStatus', status);
-          } else {
-            plots = await plotDB.call('all');
-          }
-
-          const results = [];
-          for (const plot of plots || []) {
-            if (limit && results.length >= limit) break;
-            const meta = plot.metadata || {};
-            results.push({
-              id: plot.id,
-              name: plot.name,
-              status: meta.status || 'active',
-              participants: meta.participants || [],
-              eventCount: (plot.events || []).length,
-              created: meta.created,
-              needsAttentionAt: meta.needsAttentionAt,
-            });
-          }
-
-          return {
-            content: [{ type: 'text', text: JSON.stringify({ count: results.length, plots: results }, null, 2) }],
-          };
-        } catch (err) {
-          return {
-            content: [{ type: 'text', text: `Error listing plots: ${err instanceof Error ? err.message : String(err)}` }],
-            isError: true,
-          };
-        }
-      }
-    );
-
-    // Get plots by player
-    this.server.tool(
-      'plots_by_player',
-      'Get all plots involving a specific player.',
-      {
-        playerId: z.number().describe('Player object ID'),
-        activeOnly: z.boolean().optional().describe('Only return active plots'),
-      },
-      async ({ playerId, activeOnly }) => {
-        const plotDB = await this.getPlotDB();
-        if (!plotDB) {
-          return {
-            content: [{ type: 'text', text: 'PlotDB not found' }],
-            isError: true,
-          };
-        }
-
-        try {
-          const plots = await plotDB.call('byPlayer', playerId);
-          const results = [];
-
-          for (const plot of plots || []) {
-            const meta = plot.metadata || {};
-            const status = meta.status || 'active';
-
-            if (activeOnly && status !== 'active' && status !== 'in_progress') {
-              continue;
+              const human = await aiRegistry.call('spawn', role, options);
+              return ok({ spawned: true, id: human.id, name: human.name, role });
             }
 
-            results.push({
-              id: plot.id,
-              name: plot.name,
-              status,
-              eventCount: (plot.events || []).length,
-              created: meta.created,
-            });
+            case 'despawn': {
+              if (humanId === undefined) return err('humanId required');
+              await aiRegistry.call('despawn', humanId, recycle !== false);
+              return ok({ despawned: true, humanId });
+            }
+
+            case 'list': {
+              let humanIds: number[];
+              if (role) {
+                humanIds = await aiRegistry.call('getByRole', role);
+              } else {
+                humanIds = await aiRegistry.call('getAll');
+              }
+
+              const results = [];
+              for (const id of humanIds || []) {
+                const human = await this.manager.load(id as ObjId);
+                const info = await aiRegistry.call('getInfo', id);
+                results.push({
+                  id,
+                  name: human ? (human as any).name : 'Unknown',
+                  role: info?.role,
+                  location: human ? (human as any).location : null,
+                });
+              }
+              return ok({ count: results.length, humans: results });
+            }
+
+            case 'info': {
+              if (humanId === undefined) return err('humanId required');
+              const isAi = await aiRegistry.call('isAiControlled', humanId);
+              if (!isAi) {
+                return ok({ humanId, isAiControlled: false });
+              }
+
+              const info = await aiRegistry.call('getInfo', humanId);
+              const human = await this.manager.load(humanId as ObjId);
+              return ok({
+                id: humanId,
+                name: human ? (human as any).name : 'Unknown',
+                isAiControlled: true,
+                ...info,
+              });
+            }
+
+            case 'do': {
+              if (humanId === undefined) return err('humanId required');
+              if (!command) return err('command required');
+
+              const isAi = await aiRegistry.call('isAiControlled', humanId);
+              if (!isAi) {
+                return err(`Human #${humanId} is not AI-controlled`);
+              }
+
+              const human = await this.manager.load(humanId as ObjId);
+              if (!human) {
+                return err(`Human #${humanId} not found`);
+              }
+
+              const trimmed = command.trim();
+              const match = await human.call('matchVerb', trimmed) as {
+                error?: string;
+                handler?: any;
+                verbInfo?: { method: string };
+                args?: any[];
+              } | null;
+
+              if (match && match.error) {
+                return ok({ output: match.error });
+              }
+
+              if (match && match.handler && match.verbInfo) {
+                const result = await match.handler.callVerb(
+                  match.verbInfo.method,
+                  null,
+                  human,
+                  trimmed,
+                  match.args
+                );
+                return ok({ output: result !== undefined ? String(result) : '(no output)' });
+              }
+
+              const firstWord = trimmed.split(/\s+/)[0];
+              return ok({ output: `I don't understand "${firstWord}".` });
+            }
+
+            case 'look': {
+              if (humanId === undefined) return err('humanId required');
+
+              const isAi = await aiRegistry.call('isAiControlled', humanId);
+              if (!isAi) {
+                return err(`Human #${humanId} is not AI-controlled`);
+              }
+
+              const human = await this.manager.load(humanId as ObjId);
+              if (!human) {
+                return err(`Human #${humanId} not found`);
+              }
+
+              const locationIdVal = (human as any).location;
+              if (!locationIdVal) {
+                return err('Human has no location');
+              }
+
+              const room = await this.manager.load(locationIdVal as ObjId);
+              if (!room) {
+                return err(`Location #${locationIdVal} not found`);
+              }
+
+              const roomName = (room as any).name || 'Unknown';
+              const roomDesc = (room as any).description || '';
+
+              const exits = (room as any).exits || [];
+              const exitNames: string[] = [];
+              for (const exitRef of exits) {
+                const exitId = typeof exitRef === 'string' ? parseInt(exitRef.replace('#', ''), 10) : exitRef;
+                const exit = await this.manager.load(exitId as ObjId);
+                if (exit) {
+                  exitNames.push((exit as any).name || 'exit');
+                }
+              }
+
+              const contents = (room as any).contents || [];
+              const items: string[] = [];
+              const people: string[] = [];
+
+              for (const objId of contents) {
+                if (objId === humanId) continue;
+                const obj = await this.manager.load(objId as ObjId);
+                if (!obj) continue;
+
+                const objName = (obj as any).name || `#${objId}`;
+                if ((obj as any).conscious !== undefined || (obj as any).playername) {
+                  people.push(objName);
+                } else {
+                  items.push(objName);
+                }
+              }
+
+              return ok({
+                location: roomName,
+                description: roomDesc,
+                exits: exitNames,
+                people,
+                items,
+              });
+            }
+
+            default:
+              return err(`Unknown action: ${action}. Valid: spawn, despawn, list, info, do, look`);
           }
-
-          return {
-            content: [{ type: 'text', text: JSON.stringify({ playerId, count: results.length, plots: results }, null, 2) }],
-          };
-        } catch (err) {
-          return {
-            content: [{ type: 'text', text: `Error getting player plots: ${err instanceof Error ? err.message : String(err)}` }],
-            isError: true,
-          };
+        } catch (error) {
+          return err(`Error: ${error instanceof Error ? error.message : String(error)}`);
         }
       }
     );
 
-    // Search plots
-    this.server.tool(
-      'search_plots',
-      'Search plot event logs for text. Returns plots with matching content.',
-      {
-        query: z.string().describe('Text to search for in plot events'),
-        limit: z.number().optional().describe('Max results to return'),
-      },
-      async ({ query, limit }) => {
-        const plotDB = await this.getPlotDB();
-        if (!plotDB) {
-          return {
-            content: [{ type: 'text', text: 'PlotDB not found' }],
-            isError: true,
-          };
-        }
-
-        try {
-          const plots = await plotDB.call('search', query);
-          const results = [];
-
-          for (const plot of plots || []) {
-            if (limit && results.length >= limit) break;
-            const meta = plot.metadata || {};
-            results.push({
-              id: plot.id,
-              name: plot.name,
-              status: meta.status || 'active',
-              eventCount: (plot.events || []).length,
-            });
-          }
-
-          return {
-            content: [{ type: 'text', text: JSON.stringify({ query, count: results.length, plots: results }, null, 2) }],
-          };
-        } catch (err) {
-          return {
-            content: [{ type: 'text', text: `Error searching plots: ${err instanceof Error ? err.message : String(err)}` }],
-            isError: true,
-          };
-        }
-      }
-    );
-
-    // ═══════════════════════════════════════════════════════════════════════
-    // JOB MANAGEMENT TOOLS (within plots)
-    // ═══════════════════════════════════════════════════════════════════════
-
-    // Create a job within a plot
-    this.server.tool(
-      'create_job',
-      'Create a job (task) within a plot. Jobs can have hooks that watch for game events.',
-      {
-        plotId: z.number().describe('Plot object ID'),
-        jobId: z.string().describe('Unique job identifier within the plot'),
-        expiresAt: z.string().optional().describe('ISO timestamp when job expires'),
-        metadata: z.record(z.any()).optional().describe('Job-specific metadata'),
-      },
-      async ({ plotId, jobId, expiresAt, metadata }) => {
-        const plot = await this.manager.load(plotId as ObjId);
-        if (!plot) {
-          return {
-            content: [{ type: 'text', text: `Plot #${plotId} not found` }],
-            isError: true,
-          };
-        }
-
-        try {
-          const options: any = {};
-          if (expiresAt) options.expiresAt = expiresAt;
-          if (metadata) options.metadata = metadata;
-
-          await plot.call('createJob', jobId, options);
-
-          return {
-            content: [{ type: 'text', text: `Created job '${jobId}' in plot #${plotId}` }],
-          };
-        } catch (err) {
-          return {
-            content: [{ type: 'text', text: `Error creating job: ${err instanceof Error ? err.message : String(err)}` }],
-            isError: true,
-          };
-        }
-      }
-    );
-
-    // Complete a job
-    this.server.tool(
-      'complete_job',
-      'Mark a job as completed. Automatically unregisters all hooks for this job.',
-      {
-        plotId: z.number().describe('Plot object ID'),
-        jobId: z.string().describe('Job identifier'),
-        reason: z.string().optional().describe('Completion reason'),
-      },
-      async ({ plotId, jobId, reason }) => {
-        const plot = await this.manager.load(plotId as ObjId);
-        if (!plot) {
-          return {
-            content: [{ type: 'text', text: `Plot #${plotId} not found` }],
-            isError: true,
-          };
-        }
-
-        try {
-          const result = await plot.call('completeJob', jobId, reason || 'Completed') as { success: boolean; error?: string };
-          if (result.success) {
-            return {
-              content: [{ type: 'text', text: `Completed job '${jobId}' in plot #${plotId}` }],
-            };
-          } else {
-            return {
-              content: [{ type: 'text', text: `Could not complete job: ${result.error}` }],
-              isError: true,
-            };
-          }
-        } catch (err) {
-          return {
-            content: [{ type: 'text', text: `Error completing job: ${err instanceof Error ? err.message : String(err)}` }],
-            isError: true,
-          };
-        }
-      }
-    );
-
-    // Fail a job
-    this.server.tool(
-      'fail_job',
-      'Mark a job as failed. Automatically unregisters all hooks for this job.',
-      {
-        plotId: z.number().describe('Plot object ID'),
-        jobId: z.string().describe('Job identifier'),
-        reason: z.string().optional().describe('Failure reason'),
-      },
-      async ({ plotId, jobId, reason }) => {
-        const plot = await this.manager.load(plotId as ObjId);
-        if (!plot) {
-          return {
-            content: [{ type: 'text', text: `Plot #${plotId} not found` }],
-            isError: true,
-          };
-        }
-
-        try {
-          const result = await plot.call('failJob', jobId, reason || 'Failed') as { success: boolean; error?: string };
-          if (result.success) {
-            return {
-              content: [{ type: 'text', text: `Failed job '${jobId}' in plot #${plotId}` }],
-            };
-          } else {
-            return {
-              content: [{ type: 'text', text: `Could not fail job: ${result.error}` }],
-              isError: true,
-            };
-          }
-        } catch (err) {
-          return {
-            content: [{ type: 'text', text: `Error failing job: ${err instanceof Error ? err.message : String(err)}` }],
-            isError: true,
-          };
-        }
-      }
-    );
-
-    // Register a hook for a job
-    this.server.tool(
-      'register_job_hook',
-      'Register a hook to watch for events on a target object. When the event fires with matching filter, the job is notified.',
-      {
-        plotId: z.number().describe('Plot object ID'),
-        jobId: z.string().describe('Job identifier'),
-        targetId: z.number().describe('Object ID to watch'),
-        eventName: z.string().describe('Event name to watch for (e.g., "oneTimeCodeUsed", "itemDeposited")'),
-        filter: z.record(z.any()).optional().describe('Filter conditions - event must match all key/values'),
-      },
-      async ({ plotId, jobId, targetId, eventName, filter }) => {
-        const plot = await this.manager.load(plotId as ObjId);
-        if (!plot) {
-          return {
-            content: [{ type: 'text', text: `Plot #${plotId} not found` }],
-            isError: true,
-          };
-        }
-
-        try {
-          await plot.call('registerJobHook', jobId, targetId, eventName, filter || {});
-
-          return {
-            content: [{ type: 'text', text: `Registered hook: job '${jobId}' watching #${targetId} for '${eventName}'` }],
-          };
-        } catch (err) {
-          return {
-            content: [{ type: 'text', text: `Error registering hook: ${err instanceof Error ? err.message : String(err)}` }],
-            isError: true,
-          };
-        }
-      }
-    );
-
-    // Get job info
-    this.server.tool(
-      'get_job',
-      'Get information about a specific job within a plot.',
-      {
-        plotId: z.number().describe('Plot object ID'),
-        jobId: z.string().describe('Job identifier'),
-      },
-      async ({ plotId, jobId }) => {
-        const plot = await this.manager.load(plotId as ObjId);
-        if (!plot) {
-          return {
-            content: [{ type: 'text', text: `Plot #${plotId} not found` }],
-            isError: true,
-          };
-        }
-
-        try {
-          const job = await plot.call('getJob', jobId);
-          if (!job) {
-            return {
-              content: [{ type: 'text', text: `Job '${jobId}' not found in plot #${plotId}` }],
-              isError: true,
-            };
-          }
-
-          return {
-            content: [{ type: 'text', text: JSON.stringify({ plotId, jobId, ...job }, null, 2) }],
-          };
-        } catch (err) {
-          return {
-            content: [{ type: 'text', text: `Error getting job: ${err instanceof Error ? err.message : String(err)}` }],
-            isError: true,
-          };
-        }
-      }
-    );
+    // Old individual plot/job tools have been consolidated into the 'plot' tool above
+    // Use: plot action="create" name="..." for creating plots
+    // Use: plot action="create_job" plotId=N jobId="..." for creating jobs
+    // etc. - see the consolidated 'plot' tool help for all actions
 
     // ═══════════════════════════════════════════════════════════════════
-    // NOTES TOOLS
+    // NOTES TOOL (Consolidated)
     // ═══════════════════════════════════════════════════════════════════
 
-    // Get notes for an object
     this.server.tool(
-      'get_notes',
-      'Get all notes attached to a MOO object.',
-      {
-        objectId: z.number().describe('Object ID to get notes for'),
-      },
-      async ({ objectId }) => {
-        const notes = await this.getAlias('notes');
-        if (!notes) {
-          return {
-            content: [{ type: 'text', text: 'Notes system not available' }],
-            isError: true,
-          };
-        }
+      'notes',
+      `Consolidated notes management tool.
 
-        try {
-          const result = await notes.call('get', objectId);
-          return {
-            content: [{ type: 'text', text: JSON.stringify({ objectId, count: result.length, notes: result }, null, 2) }],
-          };
-        } catch (err) {
-          return {
-            content: [{ type: 'text', text: `Error getting notes: ${err instanceof Error ? err.message : String(err)}` }],
-            isError: true,
-          };
-        }
-      }
-    );
-
-    // Add a note to an object
-    this.server.tool(
-      'add_note',
-      'Add a note to a MOO object.',
+ACTIONS:
+  get           - Get all notes on an object (objectId)
+  add           - Add a note to an object (objectId, text, author?, tags?)
+  delete        - Delete a note by index (objectId, index)
+  search        - Search notes across objects (query?, tag?, author?, limit?)
+  list_objects  - List all objects that have notes`,
       {
-        objectId: z.number().describe('Object ID to attach note to'),
-        text: z.string().describe('Note text content'),
+        action: z.string().describe('Action to perform (see help above)'),
+        objectId: z.number().optional().describe('Object ID'),
+        text: z.string().optional().describe('Note text content'),
         author: z.string().optional().describe('Author name (default: "mcp")'),
-        tags: z.array(z.string()).optional().describe('Optional tags for categorization'),
-      },
-      async ({ objectId, text, author, tags }) => {
-        const notes = await this.getAlias('notes');
-        if (!notes) {
-          return {
-            content: [{ type: 'text', text: 'Notes system not available' }],
-            isError: true,
-          };
-        }
-
-        try {
-          const result = await notes.call('add', objectId, text, author || 'mcp', tags || []);
-          if (result.success) {
-            return {
-              content: [{ type: 'text', text: `Note added to #${objectId} (index ${result.index})` }],
-            };
-          } else {
-            return {
-              content: [{ type: 'text', text: `Error: ${result.error}` }],
-              isError: true,
-            };
-          }
-        } catch (err) {
-          return {
-            content: [{ type: 'text', text: `Error adding note: ${err instanceof Error ? err.message : String(err)}` }],
-            isError: true,
-          };
-        }
-      }
-    );
-
-    // Delete a note from an object
-    this.server.tool(
-      'delete_note',
-      'Delete a note from a MOO object by index.',
-      {
-        objectId: z.number().describe('Object ID'),
-        index: z.number().describe('Note index to delete'),
-      },
-      async ({ objectId, index }) => {
-        const notes = await this.getAlias('notes');
-        if (!notes) {
-          return {
-            content: [{ type: 'text', text: 'Notes system not available' }],
-            isError: true,
-          };
-        }
-
-        try {
-          const result = await notes.call('delete', objectId, index);
-          if (result.success) {
-            return {
-              content: [{ type: 'text', text: `Note ${index} deleted from #${objectId}` }],
-            };
-          } else {
-            return {
-              content: [{ type: 'text', text: `Error: ${result.error}` }],
-              isError: true,
-            };
-          }
-        } catch (err) {
-          return {
-            content: [{ type: 'text', text: `Error deleting note: ${err instanceof Error ? err.message : String(err)}` }],
-            isError: true,
-          };
-        }
-      }
-    );
-
-    // Search notes across all objects
-    this.server.tool(
-      'search_notes',
-      'Search notes across all objects by text or tag.',
-      {
-        query: z.string().optional().describe('Text to search for (empty for all)'),
+        tags: z.array(z.string()).optional().describe('Tags for categorization'),
+        index: z.number().optional().describe('Note index to delete'),
+        query: z.string().optional().describe('Search query'),
         tag: z.string().optional().describe('Filter by tag'),
-        author: z.string().optional().describe('Filter by author'),
         limit: z.number().optional().describe('Max results (default 50)'),
       },
-      async ({ query, tag, author, limit }) => {
-        const notes = await this.getAlias('notes');
-        if (!notes) {
+      async ({ action, objectId, text, author, tags, index, query, tag, limit }) => {
+        const notesSystem = await this.getAlias('notes');
+        if (!notesSystem) {
           return {
             content: [{ type: 'text', text: 'Notes system not available' }],
             isError: true,
           };
         }
 
-        try {
-          const options: Record<string, unknown> = {};
-          if (tag) options.tag = tag;
-          if (author) options.author = author;
-          if (limit) options.limit = limit;
+        const ok = (data: unknown) => ({
+          content: [{ type: 'text' as const, text: typeof data === 'string' ? data : JSON.stringify(this.serializeValue(data), null, 2) }],
+        });
+        const err = (msg: string) => ({
+          content: [{ type: 'text' as const, text: msg }],
+          isError: true,
+        });
 
-          const results = await notes.call('search', query || '', options);
-          return {
-            content: [{ type: 'text', text: JSON.stringify({ count: results.length, results }, null, 2) }],
-          };
-        } catch (err) {
-          return {
-            content: [{ type: 'text', text: `Error searching notes: ${err instanceof Error ? err.message : String(err)}` }],
-            isError: true,
-          };
+        try {
+          switch (action) {
+            case 'get': {
+              if (objectId === undefined) return err('objectId required');
+              const result = await notesSystem.call('get', objectId);
+              return ok({ objectId, count: result.length, notes: result });
+            }
+
+            case 'add': {
+              if (objectId === undefined) return err('objectId required');
+              if (!text) return err('text required');
+              const result = await notesSystem.call('add', objectId, text, author || 'mcp', tags || []);
+              if (result.success) {
+                return ok({ added: true, objectId, index: result.index });
+              } else {
+                return err(`Error: ${result.error}`);
+              }
+            }
+
+            case 'delete': {
+              if (objectId === undefined) return err('objectId required');
+              if (index === undefined) return err('index required');
+              const result = await notesSystem.call('delete', objectId, index);
+              if (result.success) {
+                return ok({ deleted: true, objectId, index });
+              } else {
+                return err(`Error: ${result.error}`);
+              }
+            }
+
+            case 'search': {
+              const options: Record<string, unknown> = {};
+              if (tag) options.tag = tag;
+              if (author) options.author = author;
+              if (limit) options.limit = limit;
+              const results = await notesSystem.call('search', query || '', options);
+              return ok({ count: results.length, results });
+            }
+
+            case 'list_objects': {
+              const objects = await notesSystem.call('listObjects');
+              const enriched = [];
+              for (const obj of objects) {
+                const loaded = await this.manager.load(obj.objectId as ObjId);
+                enriched.push({
+                  objectId: obj.objectId,
+                  name: loaded?.get('name') || 'Unknown',
+                  noteCount: obj.count,
+                });
+              }
+              return ok({ count: enriched.length, objects: enriched });
+            }
+
+            default:
+              return err(`Unknown action: ${action}. Valid: get, add, delete, search, list_objects`);
+          }
+        } catch (error) {
+          return err(`Error: ${error instanceof Error ? error.message : String(error)}`);
         }
       }
     );
 
-    // List objects with notes
+    // ═══════════════════════════════════════════════════════════════════
+    // WORLD TOOL (Consolidated)
+    // ═══════════════════════════════════════════════════════════════════
+
     this.server.tool(
-      'list_notes_objects',
-      'List all objects that have notes attached.',
-      {},
-      async () => {
-        const notes = await this.getAlias('notes');
-        if (!notes) {
-          return {
-            content: [{ type: 'text', text: 'Notes system not available' }],
-            isError: true,
-          };
-        }
+      'world',
+      `Consolidated world query tool with SQL-like DSL.
+
+ACTIONS:
+  query    - Search objects with DSL query (q, limit?, offset?)
+  validate - Validate a query without executing (q)
+
+QUERY SYNTAX:
+  .property == value           # Equality
+  .property != value           # Inequality
+  .property > 5                # Numeric: >, <, >=, <=
+  .property contains 'text'    # Substring (case-insensitive)
+  .property like 'foo*'        # Glob pattern (* = any, ? = single char)
+  .property matches 'regex'    # Regex match
+  .property exists             # Property is defined
+  not .property exists         # Negation
+  X and Y                      # Logical AND
+  X or Y                       # Logical OR
+  (X or Y) and Z               # Grouping
+
+EXAMPLES:
+  .name contains 'sword'
+  .parent == 10 and .location exists
+  (.type == 'weapon' or .type == 'armor') and .owner == 42`,
+      {
+        action: z.string().describe('Action: query, validate'),
+        q: z.string().optional().describe('Query string (DSL syntax)'),
+        limit: z.number().optional().describe('Max results (default 50)'),
+        offset: z.number().optional().describe('Skip first N results'),
+      },
+      async ({ action, q, limit, offset }) => {
+        const ok = (data: unknown) => ({
+          content: [{ type: 'text' as const, text: typeof data === 'string' ? data : JSON.stringify(this.serializeValue(data), null, 2) }],
+        });
+        const err = (msg: string) => ({
+          content: [{ type: 'text' as const, text: msg }],
+          isError: true,
+        });
 
         try {
-          const objects = await notes.call('listObjects');
+          switch (action) {
+            case 'validate': {
+              if (!q) return err('q (query) required');
+              const result = validateQuery(q);
+              return ok(result);
+            }
 
-          // Enrich with object names
-          const enriched = [];
-          for (const obj of objects) {
-            const loaded = await this.manager.load(obj.objectId as ObjId);
-            enriched.push({
-              objectId: obj.objectId,
-              name: loaded?.get('name') || 'Unknown',
-              noteCount: obj.count,
-            });
+            case 'query': {
+              if (!q) return err('q (query) required');
+
+              // Parse DSL to MongoDB query
+              let mongoQuery: Record<string, any>;
+              try {
+                mongoQuery = parseQuery(q);
+              } catch (parseErr) {
+                return err(`Parse error: ${parseErr instanceof Error ? parseErr.message : String(parseErr)}`);
+              }
+
+              // Exclude recycled objects by default
+              mongoQuery = { $and: [mongoQuery, { 'properties._deleted': { $ne: true } }] };
+
+              // Execute query against MongoDB
+              const db = (this.manager as any).db;
+              if (!db || !db.objects) {
+                return err('Database not available');
+              }
+
+              const collection = db.objects;
+              const maxLimit = Math.min(limit || 50, 200);
+              const skip = offset || 0;
+
+              const cursor = collection.find(mongoQuery).skip(skip).limit(maxLimit);
+              const docs = await cursor.toArray();
+
+              // Format results - plain objects, no RuntimeObject conversion
+              const results = docs.map((doc: any) => ({
+                id: doc._id,
+                parent: doc.parent,
+                name: doc.properties?.name?.value || doc.properties?.name || 'Unknown',
+                description: doc.properties?.description?.value || doc.properties?.description,
+              }));
+
+              return ok({
+                query: q,
+                mongoQuery,
+                count: results.length,
+                offset: skip,
+                results,
+              });
+            }
+
+            default:
+              return err(`Unknown action: ${action}. Valid: query, validate`);
           }
-
-          return {
-            content: [{ type: 'text', text: JSON.stringify({ count: enriched.length, objects: enriched }, null, 2) }],
-          };
-        } catch (err) {
-          return {
-            content: [{ type: 'text', text: `Error listing notes objects: ${err instanceof Error ? err.message : String(err)}` }],
-            isError: true,
-          };
+        } catch (error) {
+          return err(`Error: ${error instanceof Error ? error.message : String(error)}`);
         }
       }
     );
