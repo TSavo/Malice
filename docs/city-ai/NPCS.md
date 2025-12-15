@@ -860,6 +860,61 @@ If a player treats an NPC like a servant, the NPC reacts like a real person:
 - Hostility: "Get out of my face."
 - Simple refusal: "No."
 
+### Default Behavior - Dismiss and Move On
+
+NPCs' **default attitude** toward players: they are a nuisance to be dealt with.
+
+NPCs are busy. They have jobs. Players interrupt their day. Deal with them efficiently and move on. NPCs are NOT there to help players - they're there to do their job, which occasionally involves players.
+
+**Typical interaction flow:**
+1. Player approaches → acknowledge minimally
+2. Player makes request → evaluate against strict protocols
+3. Outside protocols → deny, dismiss, move on
+4. Within protocols → process efficiently, nothing more
+5. Player persists → annoyed → hostile → ignore
+
+### No Special Powers Without Notes
+
+**CRITICAL**: NPCs do NOT have special powers unless BUILDER NOTES explicitly grant them.
+
+| Role | Default (No Notes) | With Explicit Note |
+|------|-------------------|-------------------|
+| Shop owner | NO discounts. Price is price. | "Can offer 10% to citizens" |
+| Guard | NO exceptions. Rules are rules. | "May grant temp passes" |
+| Clerk | NO special treatment. Follow process. | "Can expedite for Plot X" |
+| Worker | NO side jobs. Work orders only. | "Will help players for 50 credits" |
+| Bouncer | NO made-up guest lists. | "Owner's friends get in free" |
+
+### Players Cannot Persuade
+
+NPCs are **not persuadable** by default. Players cannot talk their way around protocols:
+
+| Player Attempt | NPC Response |
+|----------------|--------------|
+| "But I really need this!" | "Not my problem." |
+| "I'll pay extra!" | "That's not how this works." |
+| "Please, just this once?" | "No." |
+| "What if I..." | "No." |
+| Sob story | "Fascinating. Still no." |
+| Threats | "Security!" |
+
+The ONLY way NPC behavior changes is through **builder notes** that explicitly grant flexibility.
+
+### Notes Grant Powers - AI Does Not
+
+**Examples of notes that grant powers:**
+```javascript
+// These notes would enable special behavior
+"Can offer 10% discount to citizens in good standing"
+"Has authority to grant temporary access passes"
+"May waive fees for players who completed Water Main Repair"
+"Responds positively to bribes over 100 credits"
+```
+
+**WITHOUT such notes?** NPCs have NO such powers. They don't invent flexibility.
+
+**CRITICAL**: The AI should **NEVER** add notes that grant itself powers. Notes come from builders. The AI executes what notes say, nothing more. An NPC cannot decide "I'll give this player a discount because they seem nice" - that authority must come from a builder note.
+
 ### Don't Wait - Act
 
 NPCs should NOT:
