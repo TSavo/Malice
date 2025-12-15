@@ -662,6 +662,90 @@ The NPC agent will now receive all this context in its system prompt:
 
 When the NPC receives events or prompts, it will respond consistently with this profile.
 
+## IC vs OOC Knowledge
+
+NPCs are trained to distinguish between In-Character (IC) and Out-of-Character (OOC) knowledge. This is critical for immersion.
+
+### What NPCs Know (IC)
+
+- **Memories** - Things they've experienced and remembered
+- **History/Backstory** - Their past before play began
+- **Personality** - Who they are
+- **Builder Notes** - Guidance on their character
+- **In-game learning** - Introductions, conversations, observations
+
+### What NPCs Receive But May Not "Know" (OOC)
+
+- **Player names in events** - "Player 'Jack' entered" doesn't mean they know "Jack"
+- **Object IDs** - Technical metadata
+- **System information** - Things their character couldn't perceive
+
+### How NPCs Handle This
+
+**Strangers:**
+```
+Event: "Player 'Jack' entered your location"
+NPC has no memory of Jack.
+
+CORRECT: *looks up at the stranger* "Can I help you?"
+WRONG: "Hello Jack, welcome back!"
+```
+
+**After Introduction:**
+```
+Player says: "I'm Mike" (but their real name is Jack)
+NPC creates memory: "Met someone named Mike - tall, dark hair, scar on cheek"
+
+Next encounter:
+Event: "Player 'Jack' entered"
+NPC checks memories, finds "Mike" with matching description.
+
+CORRECT: "Mike, good to see you again."
+WRONG: "Hello Jack" (using OOC name)
+```
+
+**Recognition Flow:**
+1. Event arrives with player name (OOC info)
+2. NPC checks memories for this person
+3. If no memory → stranger, ask for name
+4. If memory exists → use the name FROM THE MEMORY (might be alias)
+
+### Teaching NPCs to Remember
+
+Add a note guiding memory creation:
+
+```javascript
+await notes({
+  action: 'add',
+  objectId: npcId,
+  text: 'When meeting someone new, create a CRITICAL memory with: the name they give, physical description, where you met, first impression. This is how you will recognize them later.',
+  tags: ['behavior', 'memory', 'identity']
+});
+```
+
+### Example Memory for Recognition
+
+```javascript
+// NPC meets player for first time, player says "Call me Snake"
+await ai({
+  action: 'remember',
+  humanId: npcId,
+  text: 'Met someone who calls himself "Snake" at the factory entrance. Tall, bald, tattoo on neck, wearing leather jacket. Seemed nervous. Asked about work.',
+  importance: 'critical',
+  tags: ['player', 'identity', 'factory']
+});
+```
+
+Now when "Player 'Jack'" enters and matches that description, the NPC knows him as "Snake".
+
+### Why This Matters
+
+- **Immersion** - NPCs don't have magical name knowledge
+- **Aliases work** - Players can use fake names
+- **Consequences** - If you never introduced yourself, NPCs don't know you
+- **Discovery** - NPCs can learn someone's "real" name through IC means
+- **Relationships** - Built on actual interactions, not metadata
+
 ## NPC Dialogue
 
 ### Functional Tone
