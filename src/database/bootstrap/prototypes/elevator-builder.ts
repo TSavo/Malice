@@ -162,8 +162,8 @@ export class ElevatorBuilder {
       const distance = Math.abs(floor - self.currentFloor);
       const travelTime = distance * (self.travelTimePerFloor || 2000);
 
-      // Announce departure
-      await self.announce('The elevator lurches and begins moving.');
+      // Announce departure with proper message structure
+      await self.announce(null, null, { others: 'The elevator lurches and begins moving.' });
 
       // Schedule arrival
       const jobName = 'elevator_' + self.id + '_arrive';
@@ -178,8 +178,8 @@ export class ElevatorBuilder {
       self.moving = false;
       self.destination = null;
 
-      // Announce arrival
-      await self.announce('The elevator stops smoothly. You have arrived at floor ' + floor + '.');
+      // Announce arrival with proper message structure
+      await self.announce(null, null, { others: 'The elevator stops smoothly. You have arrived at floor ' + floor + '.' });
 
       // Open doors
       await self.openDoors();
@@ -191,7 +191,7 @@ export class ElevatorBuilder {
       if (self.doorsOpen) return;
 
       self.doorsOpen = true;
-      await self.announce('The elevator doors slide open.');
+      await self.announce(null, null, { others: 'The elevator doors slide open.' });
     `);
 
     obj.setMethod('closeDoors', `
@@ -200,7 +200,7 @@ export class ElevatorBuilder {
       if (!self.doorsOpen) return;
 
       self.doorsOpen = false;
-      await self.announce('The elevator doors slide closed.');
+      await self.announce(null, null, { others: 'The elevator doors slide closed.' });
     `);
 
     // ═══════════════════════════════════════════════════════════════════

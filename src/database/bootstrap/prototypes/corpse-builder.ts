@@ -531,7 +531,7 @@ export class CorpseBuilder {
         await remains.moveTo(location);
         const room = await $.load(location);
         if (room && room.announce) {
-          await room.announce('The rotting corpse has dried into desiccated remains.');
+          await room.announce(null, null, { others: 'The rotting corpse has dried into desiccated remains.' });
         }
       }
 

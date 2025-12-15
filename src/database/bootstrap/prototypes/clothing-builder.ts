@@ -75,11 +75,11 @@ export class ClothingBuilder {
         await wearer.registerVerb(['remove ' + self.name, 'take off ' + self.name, 'remove %t', 'take off %t'], self, 'doRemove');
       }
 
-      // Announce to room
+      // Announce to room with proper message structure
       const location = wearer.location ? await $.load(wearer.location) : null;
       if (location && location.announce) {
-        const msg = await $.pronoun.sub('%N puts on %t.', wearer, null, null, self);
-        await location.announce(msg, wearer);
+        const othersMsg = await $.pronoun.sub('%N puts on %t.', wearer, null, null, self);
+        await location.announce(wearer, null, { others: othersMsg });
       }
 
       return result.message;
@@ -150,11 +150,11 @@ export class ClothingBuilder {
         await wearer.registerVerb(['wear ' + self.name, 'put on ' + self.name, 'wear %t', 'put on %t'], self, 'doWear');
       }
 
-      // Announce to room
+      // Announce to room with proper message structure
       const location = wearer.location ? await $.load(wearer.location) : null;
       if (location && location.announce) {
-        const msg = await $.pronoun.sub('%N takes off %t.', wearer, null, null, self);
-        await location.announce(msg, wearer);
+        const othersMsg = await $.pronoun.sub('%N takes off %t.', wearer, null, null, self);
+        await location.announce(wearer, null, { others: othersMsg });
       }
 
       return result.message;

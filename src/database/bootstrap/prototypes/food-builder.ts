@@ -160,13 +160,13 @@ export class FoodBuilder {
         msg += warnMsg;
       }
 
-      // Announce to room
+      // Announce to room with proper message structure
       const location = eater.location ? await $.load(eater.location) : null;
       if (location && location.announce) {
-        const eatMsg = result.fullyConsumed
+        const othersMsg = result.fullyConsumed
           ? await $.pronoun.sub('%N finishes eating %t.', eater, null, null, self)
           : await $.pronoun.sub('%N takes a bite of %t.', eater, null, null, self);
-        await location.announce(eatMsg, eater);
+        await location.announce(eater, null, { others: othersMsg });
       }
 
       return msg;
