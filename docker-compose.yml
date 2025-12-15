@@ -79,11 +79,15 @@ services:
     environment:
       - MCP_HOST=malice-game
       - MCP_PORT=3001
-      - POLL_INTERVAL=30000
+      - MONGO_URI=mongodb://mongodb:27017
+      - MONGO_DB=malice
     volumes:
       - npc_agent_sessions:/app/.claude
     depends_on:
-      - game
+      mongodb:
+        condition: service_healthy
+      game:
+        condition: service_started
     networks:
       - malice-network
 
