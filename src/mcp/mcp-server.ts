@@ -1876,22 +1876,43 @@ ACTIONS:
             }
 
             case 'list': {
-              let humanIds: number[];
+              // getByRole and getAll return arrays of objRefs or RuntimeObjects
+              let humans: any[];
               if (role) {
-                humanIds = await aiRegistry.call('getByRole', role);
+                humans = await aiRegistry.call('getByRole', role);
               } else {
-                humanIds = await aiRegistry.call('getAll');
+                humans = await aiRegistry.call('getAll');
               }
 
               const results = [];
-              for (const id of humanIds || []) {
-                const human = await this.manager.load(id as ObjId);
+              for (const human of humans || []) {
+                // Extract ID from various formats: objRef, RuntimeObject, or raw number
+                let id: number;
+                if (typeof human === 'number') {
+                  id = human;
+                } else if (human?.type === 'objref') {
+                  id = human.value;
+                } else if (human?.id !== undefined) {
+                  id = human.id;
+                } else {
+                  continue; // Skip invalid entries
+                }
+
                 const info = await aiRegistry.call('getInfo', id);
+                // Load fresh to get current values
+                const loaded = await this.manager.load(id as ObjId);
+
+                // Extract role from info - may be string or { type: 'string', value: '...' }
+                let roleStr = 'unknown';
+                if (info?.role) {
+                  roleStr = typeof info.role === 'string' ? info.role : (info.role?.value || 'unknown');
+                }
+
                 results.push({
                   id,
-                  name: human ? (human as any).name : 'Unknown',
-                  role: info?.role,
-                  location: human ? (human as any).location : null,
+                  name: loaded ? String((loaded as any).name || 'Unknown') : 'Unknown',
+                  role: roleStr,
+                  location: loaded ? ((loaded as any).location ?? null) : null,
                 });
               }
               return ok({ count: results.length, humans: results });
