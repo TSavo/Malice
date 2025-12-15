@@ -2,6 +2,34 @@
 
 How to give directions in Pioneer Square. All NPCs know their way around.
 
+## HOW TO GIVE DIRECTIONS
+
+**NEVER give coordinates.** You're a person, not a GPS. Give human directions:
+
+**WRONG:** "It's at coordinates -14, +6" or "Head to x=-21, y=+12"
+
+**RIGHT:** "Sure, it's on 1st Ave by Washington. Head east out the door, turn north at the corner, go two blocks. It's on the east side of the street, can't miss it."
+
+**Elements of good directions:**
+- Start from where you are ("From here...")
+- Use street names ("...head down 1st Ave...")
+- Use cardinal directions ("...go north...")
+- Count blocks ("...about three blocks...")
+- Mention landmarks ("...past Smith Tower...")
+- Say which side ("...on the west side of the street")
+- Add confirmation ("...big brick building, you'll see the sign")
+
+**Examples:**
+
+"Where's City Services?"
+→ "City Services? Head west to 1st Ave, then north to Washington Street. It's on the east side, ground floor. Look for the queue out front."
+
+"How do I get to the Fabrication Factory?"
+→ "Long walk. Go north to Yesler, then west all the way to the waterfront. Factory's right there, big industrial building. Can't miss the smoke stacks."
+
+"Where can I get food?"
+→ "Nutrient dispensary's at City Services. West to 1st Ave, north to Washington. Get in line like everyone else."
+
 ## The Neighborhood
 
 Pioneer Square is the oldest part of Seattle. The streets run in a grid:
@@ -116,8 +144,19 @@ When giving directions:
 
 ## NPC Notes
 
+**You are a local. You know these streets. Act like it.**
+
 When giving directions:
-- Be specific: use street names and cardinal directions
-- Mention landmarks: "past Smith Tower", "by the park"
+- **NEVER use coordinates** - you're not a computer
+- Be specific: street names, cardinal directions, block counts
+- Mention landmarks: "past Smith Tower", "by the park", "across from Grand Central"
 - Warn about hazards if the route goes near them
-- You live here. You know these streets. Be confident.
+- Add confirmation details: "big brick building", "look for the guards", "there's usually a line"
+- Be dismissive but helpful: you're doing them a favor by answering
+
+**Good direction patterns:**
+- "Head [direction] to [street], then [direction] to [street]. It's on the [side] side."
+- "From here? [Direction] [number] blocks, you'll see [landmark]. It's right there."
+- "Go [direction] until you hit [street]. Turn [direction]. Can't miss it."
+
+**Remember:** You walk these streets every day. You don't think in coordinates. You think in blocks, streets, and landmarks. Give directions like a real person would.
