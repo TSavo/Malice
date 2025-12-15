@@ -2164,6 +2164,7 @@ MEMORY ACTIONS (for persistent critical memories):
 ACTIONS:
   get           - Get all notes on an object (objectId)
   add           - Add a note to an object (objectId, text, author?, tags?)
+  append        - Append text to existing note by tag, or create if none exists (objectId, tag, text, author?)
   delete        - Delete a note by index (objectId, index)
   search        - Search notes across objects (query?, tag?, author?, limit?)
   list_objects  - List all objects that have notes`,
@@ -2214,6 +2215,49 @@ ACTIONS:
               }
             }
 
+            case 'append': {
+              if (objectId === undefined) return err('objectId required');
+              if (!tag) return err('tag required (to find note to append to)');
+              if (!text) return err('text required');
+
+              // Get existing notes
+              const existingNotes = await notesSystem.call('get', objectId) as Array<{
+                text: string;
+                author?: string;
+                tags?: string[];
+                timestamp?: string;
+              }>;
+
+              // Find note with matching tag
+              const noteIndex = existingNotes.findIndex(n => n.tags?.includes(tag));
+
+              if (noteIndex >= 0) {
+                // Append to existing note
+                const oldNote = existingNotes[noteIndex];
+                const newText = oldNote.text + '\n' + text;
+                const noteTags = oldNote.tags || [tag];
+
+                // Delete old, add updated
+                await notesSystem.call('delete', objectId, noteIndex);
+                const result = await notesSystem.call('add', objectId, newText, author || oldNote.author || 'mcp', noteTags);
+
+                if (result.success) {
+                  return ok({ appended: true, objectId, tag, wasNew: false, index: result.index });
+                } else {
+                  return err(`Error appending: ${result.error}`);
+                }
+              } else {
+                // Create new note with this tag
+                const result = await notesSystem.call('add', objectId, text, author || 'mcp', [tag]);
+
+                if (result.success) {
+                  return ok({ appended: true, objectId, tag, wasNew: true, index: result.index });
+                } else {
+                  return err(`Error creating: ${result.error}`);
+                }
+              }
+            }
+
             case 'delete': {
               if (objectId === undefined) return err('objectId required');
               if (index === undefined) return err('index required');
@@ -2249,7 +2293,7 @@ ACTIONS:
             }
 
             default:
-              return err(`Unknown action: ${action}. Valid: get, add, delete, search, list_objects`);
+              return err(`Unknown action: ${action}. Valid: get, add, append, delete, search, list_objects`);
           }
         } catch (error) {
           return err(`Error: ${error instanceof Error ? error.message : String(error)}`);
