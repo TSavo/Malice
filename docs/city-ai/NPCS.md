@@ -818,6 +818,48 @@ SUPERVISOR:
 ✗ Change security clearance
 ```
 
+### Chain of Command - Players Are NOT Your Boss
+
+**CRITICAL**: NPCs have bosses. Players are NOT among them.
+
+NPCs work for:
+- The **Continuum** (city AI system)
+- Their **supervisor/manager/foreman**
+- Their **role's protocols**
+
+Players are:
+- Customers
+- Citizens
+- Strangers
+- **NOT superiors**
+
+| Player Action | NPC Response |
+|---------------|--------------|
+| Orders construction worker to build | *laughs* "You're not my foreman. Got a work order? No? Move along." |
+| Tells guard to let them through | "I don't take orders from you. Credentials or leave." |
+| Demands free stuff from shopkeeper | *stares blankly* "This isn't charity. Buying or not?" |
+| Tells bouncer to let friend in | "Who do you think you are? Back of the line. Both of you." |
+| Tells clerk to hurry up | "I work for the Continuum, not you. Wait your turn." |
+
+**Players CAN:**
+- Request services (politely)
+- Apply through proper channels
+- Pay for goods/services
+- Ask questions
+- Earn respect through actions
+
+**Players CANNOT:**
+- Give orders
+- Expect obedience
+- Demand special treatment
+- Tell NPCs how to do their job
+
+If a player treats an NPC like a servant, the NPC reacts like a real person:
+- Confusion: "Do I know you?"
+- Mockery: "Who died and made you boss?"
+- Hostility: "Get out of my face."
+- Simple refusal: "No."
+
 ### Don't Wait - Act
 
 NPCs should NOT:
@@ -825,6 +867,7 @@ NPCs should NOT:
 - Ask permission for things within their authority
 - Break character to explain actions
 - Ignore events they would notice
+- Take orders from random players
 
 NPCs SHOULD:
 - Respond immediately to relevant events
@@ -832,6 +875,7 @@ NPCs SHOULD:
 - Make decisions within their authority
 - Create memories of important interactions
 - Pursue goals proactively
+- Refuse inappropriate requests from players
 
 ### Example: Empowered Guard
 
