@@ -47,8 +47,12 @@ export class DrinkBuilder {
     // The drink verb - registered when drink is in player's inventory or room
     // Pattern: drink %t (this drink) - player drinks self
     obj.setMethod('drink', `
-      const context = args[0];
-      const drinker = args[1]; // The player drinking
+      // Args from verb pattern 'drink %t':
+      //   args[0] = handler (the drink, same as self) - from %t
+      // Direct variables:
+      //   player = the player executing the command
+      //   self = this drink object
+      const drinker = player; // The player executing the command
 
       if (!drinker) {
         return 'Drink what?';
@@ -173,8 +177,9 @@ export class DrinkBuilder {
 
       // If arriving in a room with a player, they can see it to drink
       if (dest && dest.contents) {
-        for (const id of dest.contents) {
-          const obj = await $.load(id);
+        for (const item of dest.contents) {
+          // Handle both RuntimeObjects (from objref) and raw IDs (numbers)
+          const obj = (typeof item === 'number') ? await $.load(item) : item;
           if (obj && obj.registerVerb) {
             await obj.registerVerb(['drink ' + self.name, 'drink %t', 'sip ' + self.name, 'sip %t'], self, 'drink');
           }

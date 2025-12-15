@@ -87,6 +87,7 @@ export class PlayerBuilder {
       await self.registerVerb(['unwatch %i', 'stop watching %i'], self, 'unwatchCommand');
       await self.registerVerb('@fitness', self, 'fitness');
       await self.registerVerb(['health', 'hp', 'status'], self, 'health');
+      await self.registerVerb(['give %i to %i'], self, 'give');
 
       // If we have a location, move into it to trigger verb registration
       if (self.location && self.location !== 0) {
@@ -263,8 +264,7 @@ export class PlayerBuilder {
        *  Usage: get <item>, take <item>, grab <item>, pick up <item>
        *  For heavier items, use "lift" (two hands) or "drag".
        */
-      const context = args[0];
-      const item = args[1]; // Resolved item from %i
+      const item = args[0]; // Resolved item from %i
 
       if (!item) {
         return 'Get what?';
@@ -359,9 +359,11 @@ export class PlayerBuilder {
       /** Lift a heavy item using both hands.
        *  Usage: lift <item>, heft <item>
        *  Requires both hands free. For very heavy items, use "drag".
+       *
+       *  Args from verb pattern 'lift %i':
+       *    args[0] = item (resolved from %i)
        */
-      const context = args[0];
-      const item = args[1]; // Resolved item from %i
+      const item = args[0]; // Resolved item from %i
 
       if (!item) {
         return 'Lift what?';
@@ -448,9 +450,11 @@ export class PlayerBuilder {
       /** Drag a very heavy item along the ground.
        *  Usage: drag <item>
        *  For items too heavy to lift. Slower movement while dragging.
+       *
+       *  Args from verb pattern 'drag %i':
+       *    args[0] = item (resolved from %i)
        */
-      const context = args[0];
-      const item = args[1]; // Resolved item from %i
+      const item = args[0]; // Resolved item from %i
 
       if (!item) {
         return 'Drag what?';
@@ -538,9 +542,14 @@ export class PlayerBuilder {
       /** Drop an item you are holding.
        *  Usage: drop <item>, put down <item>, release <item>
        *  Places the item on the ground in your current location.
+       *
+       *  Args from verb pattern 'drop %i':
+       *    args[0] = item (resolved from %i)
+       *  Direct variables (not in args):
+       *    context = connection context
+       *    player = the player executing the command
        */
-      const context = args[0];
-      const item = args[1]; // Resolved item from %i
+      const item = args[0]; // Resolved item from %i
 
       if (!item) {
         return 'Drop what?';
@@ -553,7 +562,12 @@ export class PlayerBuilder {
       for (const hand of hands.both) {
         if (hand) {
           const contents = hand.contents || [];
-          if (contents.includes(item.id)) {
+          // Check if item is in this hand - handle RuntimeObjects, numbers, and objref strings
+          const found = contents.some(c => {
+            const cId = c?.id ?? (typeof c === 'string' && c.startsWith('#') ? parseInt(c.slice(1)) : c);
+            return cId === item.id;
+          });
+          if (found) {
             holdingHand = hand;
             break;
           }
@@ -602,9 +616,11 @@ export class PlayerBuilder {
        *  Usage: help, ?, help <command>, ? <command>
        *  Without arguments, lists all available commands.
        *  With a command name, shows detailed help for that command.
+       *
+       *  Args from verb patterns 'help' or 'help %s':
+       *    args[0] = topic (from %s, or undefined if no topic)
        */
-      const context = args[0];
-      const topic = args[1]; // Optional: verb to get help for
+      const topic = args[0]; // Optional: verb to get help for
 
       if (!topic) {
         // List all available verbs

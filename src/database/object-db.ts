@@ -176,6 +176,16 @@ export class ObjectDatabase {
   }
 
   /**
+   * Get a collection by name (for game_events, logs, etc.)
+   */
+  getCollection(name: string): Collection {
+    if (!this.connected) {
+      throw new Error('Database not connected');
+    }
+    return this.db.collection(name);
+  }
+
+  /**
    * Initialize database with root object #1 if it doesn't exist
    */
   async ensureRoot(): Promise<void> {

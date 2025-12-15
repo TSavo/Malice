@@ -10,3 +10,4 @@ shippable
 test-results.xml
 .idea
 *.js.map
+.env

@@ -47,12 +47,12 @@ export class ClothingBuilder {
     obj.setMethod('doWear', `
       /** Wear this clothing item.
        *  Called by the verb system when player types 'wear <item>'.
-       *  @param context - Command context
-       *  @param wearer - The player wearing this
-       *  @returns Result message
+       *  Args from verb pattern 'wear %t':
+       *    args[0] = handler (the clothing, same as self) - from %t
+       *  Direct variables:
+       *    player = the player executing the command
        */
-      const context = args[0];
-      const wearer = args[1];
+      const wearer = player;
 
       if (!wearer) {
         return 'Wear what?';
@@ -89,12 +89,12 @@ export class ClothingBuilder {
     obj.setMethod('doRemove', `
       /** Remove this clothing item.
        *  Called by the verb system when player types 'remove <item>'.
-       *  @param context - Command context
-       *  @param wearer - The player removing this
-       *  @returns Result message
+       *  Args from verb pattern 'remove %t':
+       *    args[0] = handler (the clothing, same as self) - from %t
+       *  Direct variables:
+       *    player = the player executing the command
        */
-      const context = args[0];
-      const wearer = args[1];
+      const wearer = player;
 
       if (!wearer) {
         return 'Remove what?';

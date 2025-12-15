@@ -39,6 +39,11 @@ export class AiBuilder {
         // Human ID → metadata mapping
         // { 123: { role: 'guard', spawnedAt: timestamp, spawnedBy: wizardId } }
         registry: {},
+
+        // Human ID → memories array mapping
+        // Critical memories that persist across session resets
+        // { 123: [{ text, importance, timestamp, tags }] }
+        memories: {},
       },
       methods: {},
     });
@@ -119,6 +124,10 @@ export class AiBuilder {
       const description = options.description || 'An AI-controlled human.';
       const location = options.location || null;
       const spawnedBy = options.spawnedBy || null;
+
+      // Personality and history for AI agent context
+      const personality = options.personality || null;  // string or { traits, quirks, values, fears }
+      const history = options.history || null;          // string or { backstory, events, secrets }
 
       // Generate random appearance if not provided
       let appearance = options.appearance || {};
@@ -301,6 +310,10 @@ export class AiBuilder {
           verbs: {},
           watchList: [],
           skills: {},
+
+          // AI-specific properties for agent context
+          aiPersonality: personality,
+          aiHistory: history,
         },
       }, null);
 
@@ -509,13 +522,134 @@ export class AiBuilder {
       const registry = self.registry || {};
       const entry = registry[humanId];
       if (!entry) return null;
-      // Return info including the human objref
+
+      // Load the human to get current properties
+      const human = entry.human;
+
+      // Return info including the human objref and AI properties
       return {
-        human: entry.human,
+        human: human,
         role: entry.role,
         spawnedAt: entry.spawnedAt,
         spawnedBy: entry.spawnedBy,
         originalLocation: entry.originalLocation,
+        // Include AI context properties
+        personality: human ? human.aiPersonality : null,
+        history: human ? human.aiHistory : null,
+        // Include basic info
+        name: human ? human.name : null,
+        description: human ? human.description : null,
+        location: human ? human.location : null,
+      };
+    `);
+
+    // ═══════════════════════════════════════════════════════════════════
+    // PROFILE MANAGEMENT
+    // Set/update personality and history for AI context
+    // ═══════════════════════════════════════════════════════════════════
+
+    this.ai.setMethod('setPersonality', `
+      /**
+       * Set or update the personality for an AI NPC
+       * @param humanId - The NPC's object ID
+       * @param personality - String description or { traits, quirks, values, fears, motivations }
+       */
+      const humanId = args[0];
+      const personality = args[1];
+
+      if (!humanId) {
+        return { success: false, error: 'Human ID is required' };
+      }
+
+      const registry = self.registry || {};
+      if (!registry[humanId]) {
+        return { success: false, error: 'Human #' + humanId + ' is not AI-controlled' };
+      }
+
+      const human = await $.load(humanId);
+      if (!human) {
+        return { success: false, error: 'Could not load human #' + humanId };
+      }
+
+      human.aiPersonality = personality;
+
+      return { success: true, humanId: humanId, personality: personality };
+    `);
+
+    this.ai.setMethod('setHistory', `
+      /**
+       * Set or update the history/backstory for an AI NPC
+       * @param humanId - The NPC's object ID
+       * @param history - String description or { backstory, events, secrets, relationships }
+       */
+      const humanId = args[0];
+      const history = args[1];
+
+      if (!humanId) {
+        return { success: false, error: 'Human ID is required' };
+      }
+
+      const registry = self.registry || {};
+      if (!registry[humanId]) {
+        return { success: false, error: 'Human #' + humanId + ' is not AI-controlled' };
+      }
+
+      const human = await $.load(humanId);
+      if (!human) {
+        return { success: false, error: 'Could not load human #' + humanId };
+      }
+
+      human.aiHistory = history;
+
+      return { success: true, humanId: humanId, history: history };
+    `);
+
+    this.ai.setMethod('getProfile', `
+      /**
+       * Get the full profile for an AI NPC (personality, history, notes)
+       * @param humanId - The NPC's object ID
+       */
+      const humanId = args[0];
+
+      if (!humanId) {
+        return { success: false, error: 'Human ID is required' };
+      }
+
+      const registry = self.registry || {};
+      if (!registry[humanId]) {
+        return { success: false, error: 'Human #' + humanId + ' is not AI-controlled' };
+      }
+
+      const human = await $.load(humanId);
+      if (!human) {
+        return { success: false, error: 'Could not load human #' + humanId };
+      }
+
+      // Get notes from $.notes
+      let notes = [];
+      const notesSystem = await $.notes;
+      if (notesSystem) {
+        try {
+          notes = await notesSystem.get(humanId);
+        } catch (e) {
+          // Notes may not exist
+        }
+      }
+
+      // Get memories
+      const memories = self.memories || {};
+      const npcMemories = memories[humanId] || [];
+
+      return {
+        success: true,
+        humanId: humanId,
+        role: registry[humanId].role,
+        name: human.name,
+        description: human.description,
+        personality: human.aiPersonality || null,
+        history: human.aiHistory || null,
+        notes: notes,
+        memories: npcMemories,
       };
     `);
 
@@ -528,6 +662,268 @@ export class AiBuilder {
       const role = args[0];
       const roles = self.roles || {};
       return (roles[role] || []).length;
+    `);
+
+    // ═══════════════════════════════════════════════════════════════════
+    // MEMORY MANAGEMENT
+    // Critical memories that persist across session resets
+    // ═══════════════════════════════════════════════════════════════════
+
+    this.ai.setMethod('remember', `
+      /**
+       * Store a critical memory for an NPC
+       * @param humanId - The NPC's object ID
+       * @param text - The memory text
+       * @param importance - 'critical' | 'important' | 'normal' (default: 'normal')
+       * @param tags - Array of tags for filtering (default: [])
+       */
+      const humanId = args[0];
+      const text = args[1];
+      const importance = args[2] || 'normal';
+      const tags = args[3] || [];
+
+      if (!humanId) {
+        return { success: false, error: 'Human ID is required' };
+      }
+      if (!text || typeof text !== 'string') {
+        return { success: false, error: 'Memory text is required' };
+      }
+
+      // Validate importance level
+      const validImportance = ['critical', 'important', 'normal'];
+      if (!validImportance.includes(importance)) {
+        return { success: false, error: 'Importance must be: critical, important, or normal' };
+      }
+
+      // Get or create memories for this NPC
+      const memories = self.memories || {};
+      if (!memories[humanId]) {
+        memories[humanId] = [];
+      }
+
+      // Create memory entry
+      const memory = {
+        text: text,
+        importance: importance,
+        timestamp: new Date().toISOString(),
+        tags: Array.isArray(tags) ? tags : [tags],
+      };
+
+      // Add to beginning (most recent first)
+      memories[humanId].unshift(memory);
+      self.memories = memories;
+
+      return {
+        success: true,
+        index: 0,
+        memory: memory,
+        totalMemories: memories[humanId].length
+      };
+    `);
+
+    this.ai.setMethod('recall', `
+      /**
+       * Retrieve memories for an NPC
+       * @param humanId - The NPC's object ID
+       * @param options - { importance?, tag?, limit? }
+       */
+      const humanId = args[0];
+      const options = args[1] || {};
+
+      if (!humanId) {
+        return { success: false, error: 'Human ID is required' };
+      }
+
+      const memories = self.memories || {};
+      let npcMemories = memories[humanId] || [];
+
+      // Filter by importance if specified
+      if (options.importance) {
+        npcMemories = npcMemories.filter(m => m.importance === options.importance);
+      }
+
+      // Filter by tag if specified
+      if (options.tag) {
+        npcMemories = npcMemories.filter(m =>
+          m.tags && m.tags.includes(options.tag)
+        );
+      }
+
+      // Limit results if specified
+      if (options.limit && options.limit > 0) {
+        npcMemories = npcMemories.slice(0, options.limit);
+      }
+
+      return {
+        success: true,
+        humanId: humanId,
+        memories: npcMemories,
+        count: npcMemories.length
+      };
+    `);
+
+    this.ai.setMethod('forget', `
+      /**
+       * Remove a memory from an NPC
+       * @param humanId - The NPC's object ID
+       * @param index - Index of memory to remove (0 = most recent)
+       */
+      const humanId = args[0];
+      const index = args[1];
+
+      if (!humanId) {
+        return { success: false, error: 'Human ID is required' };
+      }
+      if (index === undefined || index === null) {
+        return { success: false, error: 'Memory index is required' };
+      }
+
+      const memories = self.memories || {};
+      if (!memories[humanId] || memories[humanId].length === 0) {
+        return { success: false, error: 'No memories found for this NPC' };
+      }
+
+      if (index < 0 || index >= memories[humanId].length) {
+        return { success: false, error: 'Invalid memory index' };
+      }
+
+      // Remove the memory
+      const removed = memories[humanId].splice(index, 1)[0];
+      self.memories = memories;
+
+      return {
+        success: true,
+        removed: removed,
+        remainingMemories: memories[humanId].length
+      };
+    `);
+
+    this.ai.setMethod('forgetByText', `
+      /**
+       * Remove memories matching a text pattern
+       * @param humanId - The NPC's object ID
+       * @param pattern - Text to search for (case-insensitive substring)
+       */
+      const humanId = args[0];
+      const pattern = args[1];
+
+      if (!humanId) {
+        return { success: false, error: 'Human ID is required' };
+      }
+      if (!pattern) {
+        return { success: false, error: 'Search pattern is required' };
+      }
+
+      const memories = self.memories || {};
+      if (!memories[humanId]) {
+        return { success: false, error: 'No memories found for this NPC' };
+      }
+
+      const lowerPattern = pattern.toLowerCase();
+      const before = memories[humanId].length;
+
+      memories[humanId] = memories[humanId].filter(m =>
+        !m.text.toLowerCase().includes(lowerPattern)
+      );
+
+      const removed = before - memories[humanId].length;
+      self.memories = memories;
+
+      return {
+        success: true,
+        removed: removed,
+        remainingMemories: memories[humanId].length
+      };
+    `);
+
+    this.ai.setMethod('clearMemories', `
+      /**
+       * Clear all memories for an NPC
+       * @param humanId - The NPC's object ID
+       */
+      const humanId = args[0];
+
+      if (!humanId) {
+        return { success: false, error: 'Human ID is required' };
+      }
+
+      const memories = self.memories || {};
+      const count = memories[humanId] ? memories[humanId].length : 0;
+
+      delete memories[humanId];
+      self.memories = memories;
+
+      return {
+        success: true,
+        cleared: count
+      };
+    `);
+
+    this.ai.setMethod('getMemorySummary', `
+      /**
+       * Get a summary of memories for an NPC (for system prompt injection)
+       * @param humanId - The NPC's object ID
+       * @param options - { maxLength?, criticalOnly? }
+       */
+      const humanId = args[0];
+      const options = args[1] || {};
+
+      if (!humanId) {
+        return '';
+      }
+
+      const memories = self.memories || {};
+      let npcMemories = memories[humanId] || [];
+
+      if (npcMemories.length === 0) {
+        return '';
+      }
+
+      // Filter to critical only if requested
+      if (options.criticalOnly) {
+        npcMemories = npcMemories.filter(m => m.importance === 'critical');
+      }
+
+      if (npcMemories.length === 0) {
+        return '';
+      }
+
+      // Build summary grouped by importance
+      const critical = npcMemories.filter(m => m.importance === 'critical');
+      const important = npcMemories.filter(m => m.importance === 'important');
+      const normal = npcMemories.filter(m => m.importance === 'normal');
+
+      let summary = '';
+
+      if (critical.length > 0) {
+        summary += 'CRITICAL MEMORIES (never forget):\\n';
+        for (const m of critical) {
+          summary += '- ' + m.text + '\\n';
+        }
+        summary += '\\n';
+      }
+
+      if (important.length > 0 && !options.criticalOnly) {
+        summary += 'IMPORTANT MEMORIES:\\n';
+        for (const m of important) {
+          summary += '- ' + m.text + '\\n';
+        }
+        summary += '\\n';
+      }
+
+      if (normal.length > 0 && !options.criticalOnly) {
+        summary += 'OTHER MEMORIES:\\n';
+        for (const m of normal) {
+          summary += '- ' + m.text + '\\n';
+        }
+      }
+
+      // Truncate if too long
+      if (options.maxLength && summary.length > options.maxLength) {
+        summary = summary.substring(0, options.maxLength - 3) + '...';
+      }
+
+      return summary.trim();
     `);
 
     // ═══════════════════════════════════════════════════════════════════

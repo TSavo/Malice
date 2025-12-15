@@ -293,23 +293,47 @@ export class AgentBuilder {
 
     obj.setMethod('findMatches', `
       /** Find objects matching a name in a list of contents.
-       *  @param name - The name to search for
-       *  @param contents - Array of object IDs to search
+       *  @param name - The name to search for (partial match supported)
+       *  @param contents - Array of object IDs or RuntimeObjects to search
        *  @returns Array of matching RuntimeObjects
        */
       const name = args[0];
       const contents = args[1] || [];
 
       const matches = [];
-      for (const objId of contents) {
-        const obj = await $.load(objId);
+      for (const item of contents) {
+        // Handle RuntimeObjects, raw IDs (numbers), and objref strings ("#123")
+        let obj;
+        if (typeof item === 'object' && item.id !== undefined) {
+          obj = item; // Already a RuntimeObject
+        } else if (typeof item === 'string' && item.startsWith('#')) {
+          obj = await $.load(parseInt(item.slice(1))); // Objref string like "#3079"
+        } else {
+          obj = await $.load(item); // Raw number ID
+        }
         if (!obj) continue;
 
         const objName = (obj.name || '').toLowerCase();
         const aliases = (obj.aliases || []).map(a => a.toLowerCase());
 
+        // Check exact match first
         if (objName === name || aliases.includes(name)) {
           matches.push(obj);
+          continue;
+        }
+
+        // Check partial match (name starts with or contains search term)
+        if (objName.startsWith(name) || objName.includes(name)) {
+          matches.push(obj);
+          continue;
+        }
+
+        // Check aliases for partial match
+        for (const alias of aliases) {
+          if (alias.startsWith(name) || alias.includes(name)) {
+            matches.push(obj);
+            break;
+          }
         }
       }
       return matches;
@@ -325,8 +349,10 @@ export class AgentBuilder {
       // Parse ordinal
       const { ordinal, name } = await self.parseOrdinal(text);
 
-      // Get searchable contents: room + TODO: held items, etc.
+      // Get searchable contents: room + held items
       let allContents = [];
+
+      // Add room contents
       if (self.location && self.location !== 0) {
         const room = await $.load(self.location);
         if (room) {
@@ -334,24 +360,43 @@ export class AgentBuilder {
         }
       }
 
+      // Add items in hands
+      if (self.getHands) {
+        const hands = await self.getHands();
+        if (hands && hands.both) {
+          for (const handRef of hands.both) {
+            // Load hand if it's an objref string or number
+            let hand = handRef;
+            if (typeof handRef === 'string' && handRef.startsWith('#')) {
+              hand = await $.load(parseInt(handRef.slice(1)));
+            } else if (typeof handRef === 'number') {
+              hand = await $.load(handRef);
+            }
+            if (hand && hand.contents) {
+              allContents = allContents.concat(hand.contents);
+            }
+          }
+        }
+      }
+
       // Find all matches
       const matches = await self.findMatches(name, allContents);
 
       if (matches.length === 0) {
-        return { resolved: null, error: \`You don't see "\${name}" here.\` };
+        return { resolved: null, error: 'You don\\'t see "' + name + '" here.' };
       }
 
       if (ordinal === null && matches.length > 1) {
         // Ambiguous - need ordinal
-        const names = matches.map((m, i) => \`\${i + 1}. \${m.name}\`).join(', ');
-        return { resolved: null, error: \`Which \${name}? (\${names})\` };
+        const names = matches.map((m, i) => (i + 1) + '. ' + m.name).join(', ');
+        return { resolved: null, error: 'Which ' + name + '? (' + names + ')' };
       }
 
       // Select by ordinal
       let index = ordinal === null ? 0 : ordinal;
       if (ordinal === -1) index = matches.length - 1; // 'last'
       if (index < 0 || index >= matches.length) {
-        return { resolved: null, error: \`There isn't a \${text} here.\` };
+        return { resolved: null, error: 'There isn\\'t a ' + text + ' here.' };
       }
 
       return { resolved: matches[index], error: null };

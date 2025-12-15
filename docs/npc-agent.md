@@ -232,6 +232,7 @@ The `handleEvent()` method supports these event types:
 | `player_said` | `{ playerName, message }` | Player spoke |
 | `player_emoted` | `{ playerName, action }` | Player performed emote |
 | `item_dropped` | `{ playerName, itemName }` | Player dropped item |
+| `item_received` | `{ playerName, itemName }` | Player gave item to NPC |
 | `attacked` | `{ attackerName }` | NPC was attacked |
 | `time_passed` | `{}` | Periodic check for autonomous actions |
 | `plot_event` | `{ description }` | Plot-related event |
@@ -326,6 +327,160 @@ await agent.prompt('What did I just say?');
 // Reset to start fresh
 agent.reset();
 ```
+
+## NPC Profile Data
+
+Each AI NPC can have rich profile data that's automatically injected into their system prompt:
+
+### Personality
+
+Define how the NPC behaves and interacts. Can be a string or structured object:
+
+```javascript
+// Simple string personality
+ai({ action: 'setPersonality', humanId: 3028, personality: 'Gruff but fair. Suspicious of strangers. Loyal to those who earn his trust.' })
+
+// Structured personality
+ai({ action: 'setPersonality', humanId: 3028, personality: {
+  traits: ['suspicious', 'loyal', 'gruff'],
+  quirks: ['tugs at beard when thinking', 'never sits with back to door'],
+  values: ['duty', 'honor', 'family'],
+  motivations: ['protect the town', 'find his missing brother'],
+  fears: ['failing those who depend on him', 'the dark creatures from the north']
+}})
+```
+
+### History/Backstory
+
+Define the NPC's past and relationships:
+
+```javascript
+// Simple string history
+ai({ action: 'setHistory', humanId: 3028, history: 'Former soldier who retired after the Border Wars. Lost his brother during the final battle.' })
+
+// Structured history
+ai({ action: 'setHistory', humanId: 3028, history: {
+  backstory: 'Marcus served 20 years in the Royal Guard before retiring to Pioneer Square. He saw terrible things during the Border Wars.',
+  events: [
+    'Enlisted at age 18 after his village was raided',
+    'Rose to sergeant during the Border Wars',
+    'Lost his brother Thomas in the final battle',
+    'Retired to Pioneer Square five years ago'
+  ],
+  relationships: {
+    'Mayor Chen': 'Respects her leadership',
+    'Old Pete': 'Drinking buddy at the tavern',
+    'Thomas Webb': 'Missing brother - presumed dead'
+  },
+  secrets: [
+    'Saw something in the northern caves he never speaks of',
+    'Suspects his brother may still be alive'
+  ]
+}})
+```
+
+### Builder Notes
+
+Use the existing `$.notes` system to add notes to NPCs that guide their behavior:
+
+```javascript
+notes({ action: 'add', objectId: 3028, text: 'Should be hostile to players wearing gang colors', tags: ['behavior'] })
+notes({ action: 'add', objectId: 3028, text: 'Knows about the hidden passage in the library', tags: ['knowledge'] })
+```
+
+### Get Full Profile
+
+Retrieve all profile data for an NPC:
+
+```javascript
+ai({ action: 'profile', humanId: 3028 })
+// Returns: { personality, history, notes, memories, name, description, role }
+```
+
+### Setting Profile at Spawn
+
+You can set personality and history when spawning:
+
+```javascript
+ai({
+  action: 'spawn',
+  role: 'guard',
+  name: 'Marcus Webb',
+  locationId: 80,
+  personality: 'Gruff but fair. Suspicious of strangers.',
+  history: 'Former soldier who retired after the Border Wars.'
+})
+```
+
+## Persistent Memories
+
+Beyond session-based memory, NPCs can store critical memories that persist even when sessions are reset or context is summarized. This is ideal for information that must never be forgotten.
+
+### Memory Storage
+
+Memories are stored in `$.ai.memories[humanId]` and automatically injected into the NPC's system prompt before each interaction.
+
+```typescript
+// Memory structure
+interface Memory {
+  text: string;                              // The memory content
+  importance: 'critical' | 'important' | 'normal';  // Priority level
+  timestamp: string;                         // ISO timestamp
+  tags: string[];                            // Categorization tags
+}
+```
+
+### Using Memories via MCP
+
+NPCs can manage their own memories using the `ai` tool:
+
+```javascript
+// Store a critical memory
+ai({ action: 'remember', humanId: 3028, text: 'Player Jack is wanted for theft', importance: 'critical', tags: ['player', 'criminal'] })
+
+// Store an important memory
+ai({ action: 'remember', humanId: 3028, text: 'The merchant guild meeting is at noon', importance: 'important', tags: ['event', 'guild'] })
+
+// Recall all memories
+ai({ action: 'recall', humanId: 3028 })
+
+// Recall only critical memories
+ai({ action: 'recall', humanId: 3028, criticalOnly: true })
+
+// Recall by tag
+ai({ action: 'recall', humanId: 3028, tag: 'player' })
+
+// Forget a specific memory by index
+ai({ action: 'forget', humanId: 3028, index: 2 })
+
+// Get memory summary (count by importance)
+ai({ action: 'memories', humanId: 3028 })
+```
+
+### Memory Injection
+
+The NPCAgent automatically:
+1. Loads memories via MCP before each prompt
+2. Sorts memories by importance (critical → important → normal)
+3. Injects them into the system prompt with visual markers:
+
+```
+PERSISTENT MEMORIES:
+These are critical memories that persist across sessions. Reference them when relevant.
+
+⚠️ CRITICAL: Player Jack is wanted for theft [player, criminal]
+❗ IMPORTANT: The merchant guild meeting is at noon [event, guild]
+• The weather has been rainy lately [weather]
+```
+
+### Best Practices
+
+- **Critical memories**: Facts that must never be forgotten (crimes, alliances, player traits)
+- **Important memories**: Significant events, deadlines, quests in progress
+- **Normal memories**: Context that's useful but not essential
+- Use **tags** for categorization: `player`, `quest`, `location`, `event`, `item`, etc.
+- Memories persist across session resets, so use them for truly critical information
+- The agent can add/remove its own memories based on what it deems important
 
 ## Integration with $.ai Registry
 
@@ -479,3 +634,91 @@ Reset the session if needed:
 ```typescript
 agent.reset();
 ```
+
+## MCP `ai` Tool Integration
+
+The NPC Agent system integrates with the MCP `ai` tool, which provides a way to spawn and control AI-controlled humans from Claude Code or other MCP clients.
+
+### Workflow
+
+1. **Spawn via MCP**: Use the `ai` tool to spawn an AI human
+2. **Agent Created**: NPCAgentManager detects the new NPC and creates an agent
+3. **Events Trigger**: Game events (player enters, speaks, etc.) are sent to the agent
+4. **Agent Acts**: Agent uses MCP tools to respond and take actions
+
+### MCP `ai` Tool Actions
+
+```javascript
+// Spawn a new AI human (creates MOO object + registers with $.ai)
+ai({ action: 'spawn', role: 'guard', name: 'Marcus', locationId: 100 })
+
+// Execute a command as the AI human (verbs like get, drop, say, etc.)
+ai({ action: 'do', humanId: 567, command: 'say Hello there!' })
+
+// See what the AI human sees (room description, exits, contents)
+ai({ action: 'look', humanId: 567 })
+
+// Get detailed info about an AI human
+ai({ action: 'info', humanId: 567 })
+
+// List all AI humans (optionally by role)
+ai({ action: 'list', role: 'guard' })
+
+// Remove an AI human
+ai({ action: 'despawn', humanId: 567 })
+```
+
+### Testing with AI Humans
+
+AI humans are useful for testing game mechanics without needing a real player connection:
+
+```javascript
+// 1. Spawn a test human
+const result = await ai({ action: 'spawn', role: 'tester', name: 'TestBot', locationId: roomId });
+const testerId = result.id;
+
+// 2. Test picking up items
+await ai({ action: 'do', humanId: testerId, command: 'get apple' });
+
+// 3. Test dropping items
+await ai({ action: 'do', humanId: testerId, command: 'drop apple' });
+
+// 4. Check the room state
+const view = await ai({ action: 'look', humanId: testerId });
+
+// 5. Clean up
+await ai({ action: 'despawn', humanId: testerId });
+```
+
+### What AI Humans Can Do
+
+AI humans spawned via the `ai` tool have:
+
+- **Full verb registration** - get, drop, look, say, emote, and all registered verbs
+- **Physical body** - hands for holding items, standard human body parts
+- **Location** - placed in a room, can see and interact with contents
+- **Command execution** - any player command can be executed via `do`
+
+### Verb Argument Convention
+
+When writing verb handlers that AI humans (or players) will use, remember:
+
+- **`player`** is a direct variable, NOT in `args`
+- **`args`** only contains resolved pattern variables (`%i`, `%t`, `%s`)
+
+```javascript
+// CORRECT - for verb pattern 'drop %i'
+obj.setMethod('drop', `
+  const item = args[0];  // Resolved item from %i
+  // 'player' is available directly
+  await item.moveTo(player.location, player);
+`);
+
+// WRONG - player is not args[0]
+obj.setMethod('drop', `
+  const player = args[0];  // WRONG!
+  const item = args[1];    // WRONG!
+`);
+```
+
+See [verbs.md](moo/advanced/verbs.md) for complete documentation on verb argument conventions.

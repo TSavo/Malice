@@ -105,7 +105,12 @@ async function mcpCall(tool: string, args: Record<string, unknown>): Promise<any
   // Parse content from result
   const content = result.result?.content?.[0];
   if (content?.type === 'text') {
-    return JSON.parse(content.text);
+    // Try to parse as JSON, fall back to raw text
+    try {
+      return JSON.parse(content.text);
+    } catch {
+      return content.text;
+    }
   }
 
   return result.result;
@@ -286,6 +291,235 @@ async function watchAIRegistry(): Promise<void> {
 }
 
 /**
+ * Watch for game events (speech, etc.) and route to NPCs
+ */
+let eventStream: ChangeStream | null = null;
+
+async function watchGameEvents(): Promise<void> {
+  const db = mongoClient.db(MONGO_DB);
+  const events = db.collection('game_events');
+
+  // Create TTL index to auto-delete old events (1 hour)
+  try {
+    await events.createIndex({ createdAt: 1 }, { expireAfterSeconds: 3600 });
+  } catch {
+    // Index may already exist
+  }
+
+  // Watch for new events
+  eventStream = events.watch([
+    { $match: { operationType: 'insert' } }
+  ], { fullDocument: 'updateLookup' });
+
+  eventStream.on('change', async (change: ChangeStreamDocument) => {
+    if (change.operationType !== 'insert') return;
+
+    const doc = (change as any).fullDocument;
+    if (!doc || doc.processed) return;
+
+    const eventType = doc.type;
+    const eventData = doc.data?.value || doc.data;
+
+    if (eventType === 'speech') {
+      await handleSpeechEvent(eventData);
+    } else if (eventType === 'directed_speech') {
+      await handleDirectedSpeechEvent(eventData);
+    } else if (eventType === 'item_received') {
+      await handleItemReceivedEvent(eventData);
+    }
+
+    // Mark as processed
+    try {
+      await events.updateOne({ _id: doc._id }, { $set: { processed: true } });
+    } catch {
+      // Ignore - event may have expired
+    }
+  });
+
+  eventStream.on('error', (err) => {
+    console.error('[NPC-Agent] Game events stream error:', err);
+    setTimeout(watchGameEvents, 5000);
+  });
+
+  console.log('[NPC-Agent] Watching game events');
+}
+
+/**
+ * Handle a speech event - route to NPCs in the same location
+ */
+async function handleSpeechEvent(data: any): Promise<void> {
+  console.log(`[NPC-Agent] handleSpeechEvent called with:`, JSON.stringify(data).substring(0, 200));
+
+  // Extract data - handle typed MongoDB format
+  const speakerId = data.speakerId?.value ?? data.speakerId;
+  const speakerName = data.speakerName?.value ?? data.speakerName;
+  const message = data.message?.value ?? data.message;
+  const locationId = data.locationId?.value ?? data.locationId;
+
+  console.log(`[NPC-Agent] Extracted: speaker=${speakerId} (${speakerName}), loc=${locationId}`);
+
+  if (!locationId || !message) {
+    console.log(`[NPC-Agent] Missing locationId or message, skipping`);
+    return;
+  }
+
+  // Skip if speaker is an NPC (prevents feedback loops)
+  if (agents.has(speakerId)) {
+    console.log(`[NPC-Agent] Speaker ${speakerId} is an NPC, skipping to prevent loop`);
+    return;
+  }
+
+  console.log(`[NPC-Agent] Processing speech from player ${speakerName}`);
+
+
+  // Find NPCs in this location - process sequentially to avoid overwhelming MCP
+  const npcsToNotify: Array<{ npcId: number; managed: ManagedAgent }> = [];
+
+  for (const [npcId, managed] of agents) {
+    if (npcId === speakerId) continue;
+
+    try {
+      console.log(`[NPC-Agent] Checking location for ${managed.name} (#${npcId})...`);
+      const npcInfo = await mcpCall('get_object', { id: npcId });
+      const npcLocation = npcInfo?.properties?.location?.value ?? npcInfo?.properties?.location;
+      console.log(`[NPC-Agent] ${managed.name} is at location ${npcLocation}`);
+
+      if (npcLocation === locationId) {
+        npcsToNotify.push({ npcId, managed });
+      }
+    } catch (err) {
+      console.error(`[NPC-Agent] Error checking NPC location for ${managed.name}:`, err);
+    }
+  }
+
+  console.log(`[NPC-Agent] Found ${npcsToNotify.length} NPCs to notify`);
+
+  // Process each NPC sequentially
+  for (const { npcId, managed } of npcsToNotify) {
+    console.log(`[NPC-Agent] Routing speech to ${managed.name} (#${npcId}): "${message}"`);
+
+    try {
+      console.log(`[NPC-Agent] Calling agent.handleEvent for ${managed.name}...`);
+      const response = await managed.agent.handleEvent('player_said', {
+        playerName: speakerName,
+        message: message,
+      });
+      console.log(`[NPC-Agent] Got response from ${managed.name}`);
+
+      if (response) {
+        console.log(`[NPC-Agent] ${managed.name} responds: ${response.substring(0, 100)}...`);
+      }
+    } catch (err) {
+      console.error(`[NPC-Agent] Error handling speech for ${managed.name}:`, err);
+    }
+  }
+
+  console.log(`[NPC-Agent] handleSpeechEvent complete`);
+}
+
+/**
+ * Handle a directed speech event - only notify the targeted NPC
+ */
+async function handleDirectedSpeechEvent(data: any): Promise<void> {
+  console.log(`[NPC-Agent] handleDirectedSpeechEvent called with:`, JSON.stringify(data).substring(0, 200));
+
+  // Extract data - handle typed MongoDB format
+  const speakerId = data.speakerId?.value ?? data.speakerId;
+  const speakerName = data.speakerName?.value ?? data.speakerName;
+  const targetId = data.targetId?.value ?? data.targetId;
+  const targetName = data.targetName?.value ?? data.targetName;
+  const message = data.message?.value ?? data.message;
+
+  console.log(`[NPC-Agent] Directed speech: ${speakerName} -> ${targetName} (#${targetId}): "${message}"`);
+
+  if (!targetId || !message) {
+    console.log(`[NPC-Agent] Missing targetId or message, skipping`);
+    return;
+  }
+
+  // Skip if speaker is an NPC (prevents feedback loops)
+  if (agents.has(speakerId)) {
+    console.log(`[NPC-Agent] Speaker ${speakerId} is an NPC, skipping to prevent loop`);
+    return;
+  }
+
+  // Check if target is a managed NPC
+  const managed = agents.get(targetId);
+  if (!managed) {
+    console.log(`[NPC-Agent] Target ${targetId} is not a managed NPC, skipping`);
+    return;
+  }
+
+  console.log(`[NPC-Agent] Routing directed speech to ${managed.name} (#${targetId})`);
+
+  try {
+    const response = await managed.agent.handleEvent('player_said', {
+      playerName: speakerName,
+      message: message,
+    });
+
+    if (response) {
+      console.log(`[NPC-Agent] ${managed.name} responds: ${response.substring(0, 100)}...`);
+    }
+  } catch (err) {
+    console.error(`[NPC-Agent] Error handling directed speech for ${managed.name}:`, err);
+  }
+
+  console.log(`[NPC-Agent] handleDirectedSpeechEvent complete`);
+}
+
+/**
+ * Handle an item received event - notify the NPC that received the item
+ */
+async function handleItemReceivedEvent(data: any): Promise<void> {
+  console.log(`[NPC-Agent] handleItemReceivedEvent called with:`, JSON.stringify(data).substring(0, 200));
+
+  // Extract data - handle typed MongoDB format
+  const giverId = data.giverId?.value ?? data.giverId;
+  const giverName = data.giverName?.value ?? data.giverName;
+  const recipientId = data.recipientId?.value ?? data.recipientId;
+  const recipientName = data.recipientName?.value ?? data.recipientName;
+  const itemName = data.itemName?.value ?? data.itemName;
+
+  console.log(`[NPC-Agent] Item received: ${giverName} gave ${itemName} to ${recipientName} (#${recipientId})`);
+
+  if (!recipientId || !itemName) {
+    console.log(`[NPC-Agent] Missing recipientId or itemName, skipping`);
+    return;
+  }
+
+  // Skip if giver is an NPC (prevents feedback loops)
+  if (agents.has(giverId)) {
+    console.log(`[NPC-Agent] Giver ${giverId} is an NPC, skipping to prevent loop`);
+    return;
+  }
+
+  // Check if recipient is a managed NPC
+  const managed = agents.get(recipientId);
+  if (!managed) {
+    console.log(`[NPC-Agent] Recipient ${recipientId} is not a managed NPC, skipping`);
+    return;
+  }
+
+  console.log(`[NPC-Agent] Routing item_received to ${managed.name} (#${recipientId})`);
+
+  try {
+    const response = await managed.agent.handleEvent('item_received', {
+      playerName: giverName,
+      itemName: itemName,
+    });
+
+    if (response) {
+      console.log(`[NPC-Agent] ${managed.name} responds: ${response.substring(0, 100)}...`);
+    }
+  } catch (err) {
+    console.error(`[NPC-Agent] Error handling item_received for ${managed.name}:`, err);
+  }
+
+  console.log(`[NPC-Agent] handleItemReceivedEvent complete`);
+}
+
+/**
  * Wait for MCP server to be ready
  */
 async function waitForMCP(): Promise<boolean> {
@@ -332,6 +566,9 @@ async function main(): Promise<void> {
   // Watch for changes (event-driven, no polling)
   await watchAIRegistry();
 
+  // Watch for game events (speech, etc.)
+  await watchGameEvents();
+
   console.log('[NPC-Agent] Service running. Press Ctrl+C to stop.\n');
 }
 
@@ -340,6 +577,9 @@ async function shutdown(): Promise<void> {
   console.log('\n[NPC-Agent] Shutting down...');
   if (changeStream) {
     await changeStream.close();
+  }
+  if (eventStream) {
+    await eventStream.close();
   }
   if (mongoClient) {
     await mongoClient.close();

@@ -65,17 +65,19 @@ export class DescribableBuilder {
       const destination = args[0]; // ObjId or RuntimeObject
       const mover = args[1]; // Who/what is causing the move (optional)
 
-      const destId = typeof destination === 'number' ? destination : destination?.id;
-      if (destId === undefined || destId === null) {
+      // Load destination if passed as ID
+      let dest = destination;
+      if (typeof destination === 'number') {
+        dest = await $.load(destination);
+      }
+      if (!dest || dest.id === undefined) {
         throw new Error('Invalid destination');
       }
 
-      const sourceId = self.location;
-      const source = sourceId ? await $.load(sourceId) : null;
-      const dest = await $.load(destId);
-
-      if (!dest) {
-        throw new Error(\`Destination #\${destId} not found\`);
+      // Get source (current location) - could be object or need loading
+      let source = self.location;
+      if (typeof source === 'number') {
+        source = await $.load(source);
       }
 
       // Check if destination can contain us
@@ -92,11 +94,11 @@ export class DescribableBuilder {
 
       // Perform the actual move
       if (source && source.removeContent) {
-        await source.removeContent(self.id);
+        await source.removeContent(self);
       }
-      self.location = destId;
+      self.location = dest;
       if (dest.addContent) {
-        await dest.addContent(self.id);
+        await dest.addContent(self);
       }
 
       // Post-move hooks (for notifications, verb registration, etc.)
@@ -106,6 +108,45 @@ export class DescribableBuilder {
       await self.onArrived(dest, source, mover);
       if (dest.onContentArrived) {
         await dest.onContentArrived(self, source, mover);
+      }
+    `);
+
+    // Basic content management - can be overridden by Location for fancier behavior
+    obj.setMethod('addContent', `
+      let item = args[0];
+
+      // If passed an ID, load the object
+      if (typeof item === 'number') {
+        item = await $.load(item);
+      }
+      if (!item || typeof item.id !== 'number') {
+        return; // Invalid input
+      }
+
+      const contents = self.contents || [];
+      // Check if already present (by id since we store objects)
+      const alreadyPresent = contents.some(c => (c?.id || c) === item.id);
+      if (!alreadyPresent) {
+        contents.push(item);
+        self.contents = contents;
+        item.location = self;
+      }
+    `);
+
+    obj.setMethod('removeContent', `
+      let item = args[0];
+
+      // Get the id we're looking for
+      const targetId = typeof item === 'number' ? item : item?.id;
+      if (targetId === undefined) {
+        return; // Invalid input
+      }
+
+      const contents = self.contents || [];
+      const index = contents.findIndex(c => (c?.id || c) === targetId);
+      if (index !== -1) {
+        contents.splice(index, 1);
+        self.contents = contents;
       }
     `);
 

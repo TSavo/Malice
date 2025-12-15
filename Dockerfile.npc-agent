@@ -6,9 +6,14 @@
 # - Connects to game MCP server over network
 # - Session IDs stored in MongoDB via MCP
 
-FROM node:20-alpine
+FROM node:20
+
+# Use existing 'node' user (UID 1000) - matches typical host user
 
 WORKDIR /app
+
+# Match official Claude devcontainer setup
+ENV DEVCONTAINER=true
 
 # Install Claude Code CLI for SDK runtime
 RUN npm install -g @anthropic-ai/claude-code
@@ -24,17 +29,20 @@ COPY src ./src
 COPY types ./types
 COPY tsconfig.json ./
 
-# Create directory for Claude sessions
-RUN mkdir -p /app/.claude
+# Entry point script
+COPY npc-agent-service.ts ./
 
-# Set Claude home for session storage
-ENV CLAUDE_CONFIG_DIR=/app/.claude
+# Give node user ownership of app directory
+RUN chown -R node:node /app
+
+# Set Claude home for credentials (mounted from host)
+ENV CLAUDE_CONFIG_DIR=/home/node/.claude
 
 # Default MCP server location (game container)
 ENV MCP_HOST=malice-game
 ENV MCP_PORT=3001
 
-# Entry point script
-COPY npc-agent-service.ts ./
+# Switch to non-root user (UID 1000)
+USER node
 
 CMD ["npx", "tsx", "npc-agent-service.ts"]

@@ -75,8 +75,10 @@ export class BankTerminalBuilder {
 
     // doUse - main interaction, show menu
     obj.setMethod('doUse', `
-      const context = args[0];
-      const player = args[1];
+      // Args from verb pattern 'use terminal' (no %i/%t):
+      //   args = [] (empty, no pattern variables)
+      // Direct variables:
+      //   player = the player executing the command
 
       if (!player) return 'Use what?';
 
@@ -632,8 +634,10 @@ export class BankTerminalBuilder {
 
     // doBalance - shortcut for balance check
     obj.setMethod('doBalance', `
-      const context = args[0];
-      const player = args[1];
+      // Args from verb pattern 'check balance' (no %i/%t):
+      //   args = [] (empty, no pattern variables)
+      // Direct variables:
+      //   player = the player executing the command
 
       if (!player) return 'Check whose balance?';
 

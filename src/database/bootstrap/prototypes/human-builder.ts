@@ -470,6 +470,7 @@ export class HumanBuilder {
       // Pickup/drop verbs
       await self.registerVerb(['get %i', 'take %i', 'pick up %i', 'grab %i'], self, 'get');
       await self.registerVerb(['drop %i', 'put down %i', 'release %i'], self, 'drop');
+      await self.registerVerb(['give %i to %i'], self, 'give');
 
       // If we have a location, trigger onArrived to register room verbs
       if (self.location && self.location !== 0) {
@@ -510,6 +511,75 @@ export class HumanBuilder {
       }
 
       return ''; // Actor already received message via announce
+    `);
+
+    // Directed speech - "to <target> <message>" - triggers NPC reactions
+    obj.setMethod('to', `
+      /** Speak directly to someone.
+       *  Usage: to <name> <message>
+       *  Addresses a specific person, triggering their attention.
+       */
+      const targetName = args[0];
+      const message = args[1];
+
+      if (!targetName) {
+        return 'Speak to whom?';
+      }
+      if (!message || !message.trim()) {
+        return 'Say what to ' + targetName + '?';
+      }
+
+      // Get current location
+      const location = self.location ? await $.load(self.location) : null;
+      if (!location) {
+        return 'You have nowhere to speak.';
+      }
+
+      // Find target in location
+      const contents = location.contents || [];
+      let target = null;
+      for (const ref of contents) {
+        const contentId = typeof ref === 'object' ? ref.value : ref;
+        const obj = await $.load(contentId);
+        if (obj && obj.name && obj.name.toLowerCase().includes(targetName.toLowerCase())) {
+          target = obj;
+          break;
+        }
+      }
+
+      if (!target) {
+        return 'You don\\'t see anyone named "' + targetName + '" here.';
+      }
+
+      const trimmedMessage = message.trim();
+
+      // Announce to room
+      if (location.announce) {
+        await location.announce(self, target, {
+          actor: 'You say to ' + target.name + ', "' + trimmedMessage + '"',
+          target: self.name + ' says to you, "' + trimmedMessage + '"',
+          others: self.name + ' says to ' + target.name + ', "' + trimmedMessage + '"'
+        });
+      }
+
+      // Emit directed speech event for NPC agent service
+      if ($._emitGameEvent) {
+        await $._emitGameEvent({
+          type: 'directed_speech',
+          data: {
+            speakerId: self.id,
+            speakerName: self.name,
+            targetId: target.id,
+            targetName: target.name,
+            message: trimmedMessage,
+            locationId: location.id,
+          },
+          timestamp: new Date().toISOString(),
+          processed: false,
+        });
+      }
+
+      return '';
     `);
 
     // Emote method for AI humans
@@ -654,6 +724,102 @@ export class HumanBuilder {
       }
 
       return ''; // Actor already received message via announce
+    `);
+
+    // Give method - transfer item to someone using hands
+    obj.setMethod('give', `
+      /** Give an item to someone.
+       *  Usage: give <item> to <recipient>
+       *  Transfers an item from your hand to another person's hand.
+       */
+      const item = args[0];      // Resolved item from %i
+      const recipient = args[1]; // Resolved recipient from %i
+
+      if (!item) {
+        return 'Give what?';
+      }
+      if (!recipient) {
+        return 'Give ' + item.name + ' to whom?';
+      }
+      if (recipient.id === player.id) {
+        return 'You already have it.';
+      }
+
+      // Get our hands and check if we're holding the item
+      const ourHands = await player.getHands();
+      if (!ourHands || ourHands.both.length === 0) {
+        return 'You have no hands.';
+      }
+
+      let holdingHand = null;
+      for (const hand of ourHands.both) {
+        const contents = hand.contents || [];
+        if (contents.includes(item.id)) {
+          holdingHand = hand;
+          break;
+        }
+      }
+
+      if (!holdingHand) {
+        return 'You are not holding ' + item.name + '.';
+      }
+
+      // Get recipient's hands
+      const theirHands = await recipient.getHands();
+      if (!theirHands || theirHands.both.length === 0) {
+        return recipient.name + ' has no hands to receive with.';
+      }
+
+      // Find an empty hand on recipient (primary first)
+      let targetHand = null;
+      const body = await recipient.getBody();
+      const primaryHand = body?.primaryHand || 'right';
+
+      if (theirHands.primary && (theirHands.primary.contents || []).length === 0) {
+        targetHand = theirHands.primary;
+      } else if (theirHands.secondary && (theirHands.secondary.contents || []).length === 0) {
+        targetHand = theirHands.secondary;
+      }
+
+      if (!targetHand) {
+        return recipient.name + "'s hands are full.";
+      }
+
+      // Move item from our hand to their hand
+      const result = await item.moveTo(targetHand, recipient);
+      if (typeof result === 'string') {
+        return result; // Move was rejected
+      }
+
+      // Announce to room
+      const location = player.location ? await $.load(player.location) : null;
+      if (location && location.announce) {
+        await location.announce(player, recipient, {
+          actor: 'You give ' + item.name + ' to ' + recipient.name + '.',
+          target: player.name + ' gives you ' + item.name + '.',
+          others: player.name + ' gives ' + item.name + ' to ' + recipient.name + '.'
+        });
+      }
+
+      // Emit game event for NPC agent service
+      if ($._emitGameEvent) {
+        await $._emitGameEvent({
+          type: 'item_received',
+          data: {
+            giverId: player.id,
+            giverName: player.name,
+            recipientId: recipient.id,
+            recipientName: recipient.name,
+            itemId: item.id,
+            itemName: item.name,
+            locationId: location ? location.id : null,
+          },
+          timestamp: new Date().toISOString(),
+          processed: false,
+        });
+      }
+
+      return '';
     `);
 
     return obj;

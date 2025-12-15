@@ -66,8 +66,11 @@ export class SustainBuilder {
 
     // Override eat for single-pill consumption
     obj.setMethod('eat', `
-      const context = args[0];
-      const eater = args[1];
+      // Args from verb pattern 'eat %t':
+      //   args[0] = handler (the pill, same as self) - from %t
+      // Direct variables:
+      //   player = the player executing the command
+      const eater = player;
 
       if (!eater) {
         return 'Eat what?';

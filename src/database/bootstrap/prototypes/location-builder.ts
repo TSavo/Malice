@@ -27,11 +27,11 @@ export class LocationBuilder {
 
       // Show contents (if any), excluding the viewer
       const contents = self.contents || [];
-      const others = contents.filter(id => id !== viewer?.id);
+      const others = contents.filter(c => (c?.id || c) !== viewer?.id);
       if (others.length > 0) {
         output += '\\r\\nYou see:\\r\\n';
-        for (const objId of others) {
-          const obj = await $.load(objId);
+        for (const item of others) {
+          const obj = typeof item === 'number' ? await $.load(item) : item;
           if (obj) {
             const shortDesc = await obj.shortDesc();
             output += \`  - \${shortDesc}\\r\\n\`;
@@ -43,30 +43,25 @@ export class LocationBuilder {
     `);
 
     obj.setMethod('addContent', `
-      let input = args[0];
-      let objId;
-      let obj;
+      let obj = args[0];
 
-      // Accept either ID (number) or RuntimeObject
-      if (typeof input === 'number') {
-        objId = input;
-        obj = await $.load(objId);
-      } else if (input && typeof input === 'object' && typeof input.id === 'number') {
-        obj = input;
-        objId = input.id;
-      } else {
+      // If passed an ID, load the object
+      if (typeof obj === 'number') {
+        obj = await $.load(obj);
+      }
+      if (!obj || typeof obj.id !== 'number') {
         return; // Invalid input
       }
 
       const contents = self.contents || [];
-      if (!contents.includes(objId)) {
-        contents.push(objId);
+      // Check if already present (by id since we store objects)
+      const alreadyPresent = contents.some(c => (c?.id || c) === obj.id);
+      if (!alreadyPresent) {
+        contents.push(obj);
         self.contents = contents;
 
         // Set the object's location to this container
-        if (obj) {
-          obj.location = self.id;
-        }
+        obj.location = self;
 
         // Call arrival hook
         if (self.onContentArrived) {
@@ -76,20 +71,16 @@ export class LocationBuilder {
     `);
 
     obj.setMethod('removeContent', `
-      let input = args[0];
-      let objId;
+      let obj = args[0];
 
-      // Accept either ID (number) or RuntimeObject
-      if (typeof input === 'number') {
-        objId = input;
-      } else if (input && typeof input === 'object' && typeof input.id === 'number') {
-        objId = input.id;
-      } else {
+      // Get the id we're looking for
+      const targetId = typeof obj === 'number' ? obj : obj?.id;
+      if (targetId === undefined) {
         return; // Invalid input
       }
 
       const contents = self.contents || [];
-      const index = contents.indexOf(objId);
+      const index = contents.findIndex(c => (c?.id || c) === targetId);
       if (index !== -1) {
         contents.splice(index, 1);
         self.contents = contents;
@@ -138,8 +129,8 @@ export class LocationBuilder {
 
       const contents = self.contents || [];
 
-      for (const objId of contents) {
-        const viewer = await $.load(objId);
+      for (const item of contents) {
+        const viewer = typeof item === 'number' ? await $.load(item) : item;
         if (!viewer) continue;
 
         // Determine which message to send
@@ -235,8 +226,8 @@ export class LocationBuilder {
 
       const contents = self.contents || [];
 
-      for (const objId of contents) {
-        const listener = await $.load(objId);
+      for (const item of contents) {
+        const listener = typeof item === 'number' ? await $.load(item) : item;
         if (!listener || !listener.hear) continue;
 
         // Everyone hears the speech (understanding depends on their languages)
