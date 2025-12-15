@@ -1658,7 +1658,7 @@ ACTIONS:
               const r = await loadPlot(plotId);
               if (r.error) return err(r.error);
               if (!phases || !Array.isArray(phases)) return err('phases array required');
-              const result = await r.plot!.call('setPhases', phases);
+              const result = await r.plot!.call('setPhases', phases) as any[];
               return ok({ set: true, plotId, phaseCount: result.length, phases: result });
             }
 
@@ -1719,7 +1719,7 @@ ACTIONS:
               const r = await loadPlot(plotId);
               if (r.error) return err(r.error);
               if (!jobId) return err('jobId required');
-              const result = await r.plot!.call('getJobPhase', jobId);
+              const result = await r.plot!.call('getJobPhase', jobId) as Record<string, unknown>;
               return ok({ plotId, jobId, ...result });
             }
 
@@ -1727,7 +1727,7 @@ ACTIONS:
               const r = await loadPlot(plotId);
               if (r.error) return err(r.error);
               if (!jobId) return err('jobId required');
-              const result = await r.plot!.call('advanceJobPhase', jobId, 'completed');
+              const result = await r.plot!.call('advanceJobPhase', jobId, 'completed') as Record<string, unknown>;
               return ok({ plotId, jobId, ...result });
             }
 
