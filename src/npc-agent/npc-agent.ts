@@ -292,13 +292,49 @@ export class NPCAgent extends EventEmitter {
   }
 
   /**
+   * Get MOO Standard Time (Pacific time + 85 years)
+   * Returns formatted date/time string and whether it's MST or MDT
+   */
+  private getMooTime(): { datetime: string; timezone: string; year: number; month: string; day: number; hour: number; minute: number } {
+    // Get current Pacific time
+    const now = new Date();
+    const pacificTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
+
+    // Check if Pacific is in DST (MDT) or standard (MST)
+    const jan = new Date(now.getFullYear(), 0, 1);
+    const jul = new Date(now.getFullYear(), 6, 1);
+    const janOffset = new Date(jan.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' })).getTimezoneOffset();
+    const julOffset = new Date(jul.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' })).getTimezoneOffset();
+    const nowOffset = pacificTime.getTimezoneOffset();
+    const isDST = nowOffset < Math.max(janOffset, julOffset);
+    const timezone = isDST ? 'MDT' : 'MST';
+
+    // Add 85 years for MOO time
+    const mooYear = pacificTime.getFullYear() + 85;
+    const months = ['January', 'February', 'March', 'April', 'May', 'June',
+                    'July', 'August', 'September', 'October', 'November', 'December'];
+    const month = months[pacificTime.getMonth()];
+    const day = pacificTime.getDate();
+    const hour = pacificTime.getHours();
+    const minute = pacificTime.getMinutes();
+
+    const datetime = `${month} ${day}, ${mooYear} ${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')} ${timezone}`;
+
+    return { datetime, timezone, year: mooYear, month, day, hour, minute };
+  }
+
+  /**
    * Get the system prompt for this NPC
    */
   private getSystemPrompt(): string {
+    const mooTime = this.getMooTime();
+
     const basePrompt = `You are ${this.config.name}, a character in a text-based multiplayer online game (MOO/MUD).
 
 ROLE: ${this.config.role}
 OBJECT ID: #${this.config.npcId}
+
+CURRENT DATE/TIME: ${mooTime.datetime} (Moo ${mooTime.timezone === 'MDT' ? 'Daylight' : 'Standard'} Time)
 
 ═══════════════════════════════════════════════════════════════════════════════
 CRITICAL: IN-CHARACTER (IC) vs OUT-OF-CHARACTER (OOC) KNOWLEDGE
