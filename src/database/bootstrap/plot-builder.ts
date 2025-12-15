@@ -63,8 +63,11 @@ export class PlotBuilder {
         description: 'Narrative event log prototype',
         events: [],
         metadata: {},
+        // Phases define the plot's narrative structure
+        // Each phase: { id, name, description, prompt, metadata }
+        phases: [],
         // Jobs within this plot - keyed by jobId
-        // Each job: { status, expiresAt, completedAt, hooks: [], metadata: {} }
+        // Each job: { status, expiresAt, completedAt, hooks: [], metadata: {}, currentPhase, phaseStartedAt, phaseHistory[] }
         jobs: {},
       },
       methods: {},
@@ -221,11 +224,166 @@ Provide a summary that captures everything important:\`;
     `);
 
     // ═══════════════════════════════════════════════════════════════════
+    // PHASES - Structured narrative progression template
+    // ═══════════════════════════════════════════════════════════════════
+
+    // setPhases(phases[]) - Define the phase template for this plot
+    // Each phase: { id, name, description, prompt, metadata }
+    this.plotPrototype.setMethod('setPhases', `
+      const phases = args[0];
+      if (!Array.isArray(phases)) {
+        throw new Error('setPhases requires an array of phases');
+      }
+
+      // Validate each phase has required fields
+      for (const phase of phases) {
+        if (!phase.id || typeof phase.id !== 'string') {
+          throw new Error('Each phase must have a string id');
+        }
+        if (!phase.name || typeof phase.name !== 'string') {
+          throw new Error('Each phase must have a string name');
+        }
+      }
+
+      // Check for duplicate IDs
+      const ids = phases.map(p => p.id);
+      const uniqueIds = new Set(ids);
+      if (ids.length !== uniqueIds.size) {
+        throw new Error('Phase IDs must be unique');
+      }
+
+      // Normalize phases with defaults
+      const normalized = phases.map(p => ({
+        id: p.id,
+        name: p.name,
+        description: p.description || '',
+        prompt: p.prompt || '',
+        metadata: p.metadata || {},
+      }));
+
+      self.phases = normalized;
+      return normalized;
+    `);
+
+    // getPhases() - Get all phase definitions
+    this.plotPrototype.setMethod('getPhases', `
+      return self.phases || [];
+    `);
+
+    // getPhase(phaseId) - Get a specific phase by ID
+    this.plotPrototype.setMethod('getPhase', `
+      const phaseId = args[0];
+      const phases = self.phases || [];
+      return phases.find(p => p.id === phaseId) || null;
+    `);
+
+    // getPhaseIndex(phaseId) - Get the index of a phase
+    this.plotPrototype.setMethod('getPhaseIndex', `
+      const phaseId = args[0];
+      const phases = self.phases || [];
+      return phases.findIndex(p => p.id === phaseId);
+    `);
+
+    // getNextPhase(currentPhaseId) - Get the phase after the current one
+    this.plotPrototype.setMethod('getNextPhase', `
+      const currentPhaseId = args[0];
+      const phases = self.phases || [];
+      const currentIndex = phases.findIndex(p => p.id === currentPhaseId);
+
+      if (currentIndex === -1 || currentIndex >= phases.length - 1) {
+        return null; // No next phase
+      }
+
+      return phases[currentIndex + 1];
+    `);
+
+    // addPhase(phase, afterPhaseId?) - Add a phase at end or after specified phase
+    this.plotPrototype.setMethod('addPhase', `
+      const phase = args[0];
+      const afterPhaseId = args[1];
+
+      if (!phase || !phase.id || !phase.name) {
+        throw new Error('addPhase requires a phase with id and name');
+      }
+
+      const phases = self.phases || [];
+
+      // Check for duplicate ID
+      if (phases.find(p => p.id === phase.id)) {
+        throw new Error('Phase with id ' + phase.id + ' already exists');
+      }
+
+      // Normalize the phase
+      const normalized = {
+        id: phase.id,
+        name: phase.name,
+        description: phase.description || '',
+        prompt: phase.prompt || '',
+        metadata: phase.metadata || {},
+      };
+
+      if (afterPhaseId) {
+        const index = phases.findIndex(p => p.id === afterPhaseId);
+        if (index === -1) {
+          throw new Error('Phase ' + afterPhaseId + ' not found');
+        }
+        phases.splice(index + 1, 0, normalized);
+      } else {
+        phases.push(normalized);
+      }
+
+      self.phases = phases;
+      return normalized;
+    `);
+
+    // updatePhase(phaseId, updates) - Modify a phase definition
+    this.plotPrototype.setMethod('updatePhase', `
+      const phaseId = args[0];
+      const updates = args[1];
+
+      if (!phaseId || !updates) {
+        throw new Error('updatePhase requires phaseId and updates');
+      }
+
+      const phases = self.phases || [];
+      const index = phases.findIndex(p => p.id === phaseId);
+
+      if (index === -1) {
+        throw new Error('Phase ' + phaseId + ' not found');
+      }
+
+      // Apply updates (but don't allow changing id)
+      const phase = phases[index];
+      if (updates.name !== undefined) phase.name = updates.name;
+      if (updates.description !== undefined) phase.description = updates.description;
+      if (updates.prompt !== undefined) phase.prompt = updates.prompt;
+      if (updates.metadata !== undefined) phase.metadata = updates.metadata;
+
+      self.phases = phases;
+      return phase;
+    `);
+
+    // removePhase(phaseId) - Remove a phase
+    this.plotPrototype.setMethod('removePhase', `
+      const phaseId = args[0];
+      const phases = self.phases || [];
+      const index = phases.findIndex(p => p.id === phaseId);
+
+      if (index === -1) {
+        throw new Error('Phase ' + phaseId + ' not found');
+      }
+
+      phases.splice(index, 1);
+      self.phases = phases;
+      return true;
+    `);
+
+    // ═══════════════════════════════════════════════════════════════════
     // JOBS - Individual tasks within the plot
     // ═══════════════════════════════════════════════════════════════════
 
     // createJob(jobId, options) - create a new job within this plot
-    // options: { expiresAt?, metadata?, status? }
+    // options: { expiresAt?, metadata?, status?, startPhase? }
     this.plotPrototype.setMethod('createJob', `
       const jobId = args[0];
       const options = args[1] || {};
@@ -246,6 +404,10 @@ Provide a summary that captures everything important:\`;
         completedAt: null,
         hooks: [],
         metadata: options.metadata || {},
+        // Phase tracking
+        currentPhase: null,
+        phaseStartedAt: null,
+        phaseHistory: [],
       };
       self.jobs = jobs;
 
@@ -255,6 +417,16 @@ Provide a summary that captures everything important:\`;
         message: 'Job created: ' + jobId,
         metadata: { jobId, action: 'created' },
       });
+
+      // Start on first phase if startPhase specified or if phases exist
+      if (options.startPhase) {
+        await self.startJobPhase(jobId, options.startPhase);
+      } else {
+        const phases = self.phases || [];
+        if (phases.length > 0) {
+          await self.startJobPhase(jobId, phases[0].id);
+        }
+      }
 
       return jobs[jobId];
     `);
@@ -285,6 +457,234 @@ Provide a summary that captures everything important:\`;
       }
 
       return active;
+    `);
+
+    // ═══════════════════════════════════════════════════════════════════
+    // JOB PHASE TRACKING - Track player progression through phases
+    // ═══════════════════════════════════════════════════════════════════
+
+    // startJobPhase(jobId, phaseId) - Start a job on a specific phase
+    this.plotPrototype.setMethod('startJobPhase', `
+      const jobId = args[0];
+      const phaseId = args[1];
+
+      const jobs = self.jobs || {};
+      const job = jobs[jobId];
+      if (!job) {
+        throw new Error('Job ' + jobId + ' not found');
+      }
+
+      const phase = await self.getPhase(phaseId);
+      if (!phase) {
+        throw new Error('Phase ' + phaseId + ' not found');
+      }
+
+      // Record previous phase if there was one
+      if (job.currentPhase) {
+        job.phaseHistory = job.phaseHistory || [];
+        job.phaseHistory.push({
+          phaseId: job.currentPhase,
+          startedAt: job.phaseStartedAt,
+          completedAt: new Date().toISOString(),
+          outcome: 'skipped', // Skipped because we're jumping to a new phase
+        });
+      }
+
+      // Start new phase
+      job.currentPhase = phaseId;
+      job.phaseStartedAt = new Date().toISOString();
+      self.jobs = jobs;
+
+      // Add event
+      await self.addEvent({
+        from: 'system',
+        message: 'Phase started: ' + phase.name,
+        metadata: { jobId, phaseId, action: 'phaseStarted' },
+      });
+
+      // Call phase started handler
+      await self.onPhaseStarted(jobId, phaseId);
+
+      return job;
+    `);
+
+    // advanceJobPhase(jobId, outcome?) - Move job to next phase
+    // outcome: 'completed' (default) or 'skipped'
+    this.plotPrototype.setMethod('advanceJobPhase', `
+      const jobId = args[0];
+      const outcome = args[1] || 'completed';
+
+      const jobs = self.jobs || {};
+      const job = jobs[jobId];
+      if (!job) {
+        throw new Error('Job ' + jobId + ' not found');
+      }
+
+      if (!job.currentPhase) {
+        throw new Error('Job ' + jobId + ' has no current phase');
+      }
+
+      const currentPhase = await self.getPhase(job.currentPhase);
+      const nextPhase = await self.getNextPhase(job.currentPhase);
+
+      // Record completed phase
+      job.phaseHistory = job.phaseHistory || [];
+      job.phaseHistory.push({
+        phaseId: job.currentPhase,
+        startedAt: job.phaseStartedAt,
+        completedAt: new Date().toISOString(),
+        outcome: outcome,
+      });
+
+      // Handle phase completion
+      if (outcome === 'completed' && currentPhase) {
+        await self.onPhaseCompleted(jobId, job.currentPhase);
+      }
+
+      if (nextPhase) {
+        // Move to next phase
+        job.currentPhase = nextPhase.id;
+        job.phaseStartedAt = new Date().toISOString();
+        self.jobs = jobs;
+
+        // Add event
+        await self.addEvent({
+          from: 'system',
+          message: 'Phase started: ' + nextPhase.name,
+          metadata: { jobId, phaseId: nextPhase.id, action: 'phaseStarted' },
+        });
+
+        await self.onPhaseStarted(jobId, nextPhase.id);
+        return { advanced: true, newPhase: nextPhase.id };
+      } else {
+        // No more phases - job is done
+        job.currentPhase = null;
+        job.phaseStartedAt = null;
+        self.jobs = jobs;
+
+        // Add event
+        await self.addEvent({
+          from: 'system',
+          message: 'All phases completed',
+          metadata: { jobId, action: 'allPhasesCompleted' },
+        });
+
+        return { advanced: false, complete: true };
+      }
+    `);
+
+    // setJobPhase(jobId, phaseId, outcome?) - Jump to specific phase
+    this.plotPrototype.setMethod('setJobPhase', `
+      const jobId = args[0];
+      const phaseId = args[1];
+      const outcome = args[2] || 'skipped';
+
+      const jobs = self.jobs || {};
+      const job = jobs[jobId];
+      if (!job) {
+        throw new Error('Job ' + jobId + ' not found');
+      }
+
+      const phase = await self.getPhase(phaseId);
+      if (!phase) {
+        throw new Error('Phase ' + phaseId + ' not found');
+      }
+
+      // Record previous phase if there was one
+      if (job.currentPhase) {
+        job.phaseHistory = job.phaseHistory || [];
+        job.phaseHistory.push({
+          phaseId: job.currentPhase,
+          startedAt: job.phaseStartedAt,
+          completedAt: new Date().toISOString(),
+          outcome: outcome,
+        });
+      }
+
+      // Jump to new phase
+      job.currentPhase = phaseId;
+      job.phaseStartedAt = new Date().toISOString();
+      self.jobs = jobs;
+
+      // Add event
+      await self.addEvent({
+        from: 'system',
+        message: 'Phase set to: ' + phase.name,
+        metadata: { jobId, phaseId, action: 'phaseSet', outcome },
+      });
+
+      await self.onPhaseStarted(jobId, phaseId);
+      return job;
+    `);
+
+    // getJobPhase(jobId) - Get current phase info for a job
+    this.plotPrototype.setMethod('getJobPhase', `
+      const jobId = args[0];
+      const jobs = self.jobs || {};
+      const job = jobs[jobId];
+      if (!job) {
+        return null;
+      }
+
+      if (!job.currentPhase) {
+        return { phase: null, startedAt: null };
+      }
+
+      const phase = await self.getPhase(job.currentPhase);
+      return {
+        phase: phase,
+        phaseId: job.currentPhase,
+        startedAt: job.phaseStartedAt,
+        history: job.phaseHistory || [],
+      };
+    `);
+
+    // ═══════════════════════════════════════════════════════════════════
+    // PHASE EVENT HANDLERS - Called during phase transitions
+    // ═══════════════════════════════════════════════════════════════════
+
+    // onPhaseStarted(jobId, phaseId) - Called when a phase begins
+    // Override this method to add custom behavior
+    this.plotPrototype.setMethod('onPhaseStarted', `
+      const jobId = args[0];
+      const phaseId = args[1];
+      // Hook point for custom behavior when a phase starts
+      return true;
+    `);
+
+    // onPhaseCompleted(jobId, phaseId) - Called when phase is completed
+    this.plotPrototype.setMethod('onPhaseCompleted', `
+      const jobId = args[0];
+      const phaseId = args[1];
+
+      const phase = await self.getPhase(phaseId);
+
+      // Add event
+      await self.addEvent({
+        from: 'system',
+        message: 'Phase completed: ' + (phase?.name || phaseId),
+        metadata: { jobId, phaseId, action: 'phaseCompleted' },
+      });
+
+      return true;
+    `);
+
+    // onPhaseFailed(jobId, phaseId, reason?) - Called when phase fails
+    this.plotPrototype.setMethod('onPhaseFailed', `
+      const jobId = args[0];
+      const phaseId = args[1];
+      const reason = args[2] || 'Phase failed';
+
+      const phase = await self.getPhase(phaseId);
+
+      // Add event
+      await self.addEvent({
+        from: 'system',
+        message: 'Phase failed: ' + (phase?.name || phaseId) + ' - ' + reason,
+        metadata: { jobId, phaseId, action: 'phaseFailed', reason },
+      });
+
+      return true;
     `);
 
     // completeJob(jobId, reason) - mark job as completed, unregister its hooks
