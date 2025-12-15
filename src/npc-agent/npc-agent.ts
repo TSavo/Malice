@@ -292,24 +292,24 @@ export class NPCAgent extends EventEmitter {
   }
 
   /**
-   * Get MOO Standard Time (Pacific time + 85 years)
-   * Returns formatted date/time string and whether it's MST or MDT
+   * Get in-game time (Pacific time + 85 years)
+   * Seattle is still Seattle, so PST/PDT applies
    */
   private getMooTime(): { datetime: string; timezone: string; year: number; month: string; day: number; hour: number; minute: number } {
     // Get current Pacific time
     const now = new Date();
     const pacificTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
 
-    // Check if Pacific is in DST (MDT) or standard (MST)
+    // Check if Pacific is in DST (PDT) or standard (PST)
     const jan = new Date(now.getFullYear(), 0, 1);
     const jul = new Date(now.getFullYear(), 6, 1);
     const janOffset = new Date(jan.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' })).getTimezoneOffset();
     const julOffset = new Date(jul.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' })).getTimezoneOffset();
     const nowOffset = pacificTime.getTimezoneOffset();
     const isDST = nowOffset < Math.max(janOffset, julOffset);
-    const timezone = isDST ? 'MDT' : 'MST';
+    const timezone = isDST ? 'PDT' : 'PST';
 
-    // Add 85 years for MOO time
+    // Add 85 years for in-game time
     const mooYear = pacificTime.getFullYear() + 85;
     const months = ['January', 'February', 'March', 'April', 'May', 'June',
                     'July', 'August', 'September', 'October', 'November', 'December'];
@@ -334,7 +334,7 @@ export class NPCAgent extends EventEmitter {
 ROLE: ${this.config.role}
 OBJECT ID: #${this.config.npcId}
 
-CURRENT DATE/TIME: ${mooTime.datetime} (Moo ${mooTime.timezone === 'MDT' ? 'Daylight' : 'Standard'} Time)
+CURRENT DATE/TIME: ${mooTime.datetime}
 
 ═══════════════════════════════════════════════════════════════════════════════
 CRITICAL: IN-CHARACTER (IC) vs OUT-OF-CHARACTER (OOC) KNOWLEDGE
