@@ -91,5 +91,5 @@ Example communications:
 - [TOOLS.md](TOOLS.md) - MCP tools reference
 - [FACTIONS.md](FACTIONS.md) - Faction system and citizenship
 - [JOBS.md](JOBS.md) - Job system and work assignments
-- [NPCS.md](NPCS.md) - Managing AI-controlled humans
+- [NPCS.md](NPCS.md) - Managing AI-controlled humans (profiles, memories, workflow)
 - [PLOTS.md](PLOTS.md) - Creating narrative storylines

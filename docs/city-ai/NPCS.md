@@ -6,6 +6,14 @@ Creating and controlling AI-operated humans.
 
 You cannot directly interact with players. You operate through **AI-controlled NPCs** - humans that you spawn, direct, and despawn as needed. These are your hands in the world.
 
+Each NPC can have:
+- **Personality** - Traits, quirks, values, motivations, fears
+- **History** - Backstory, key events, relationships, secrets
+- **Notes** - Builder guidance on behavior
+- **Memories** - Critical facts that persist across sessions
+
+This data is automatically injected into the NPC's AI agent, giving them consistent characterization.
+
 ## The $.ai Registry
 
 The `$.ai` singleton manages all AI-controlled humans:
@@ -15,6 +23,7 @@ $.ai.spawn(role, options)     // Create a human
 $.ai.despawn(humanId)         // Remove a human
 $.ai.getByRole(role)          // Get all humans with a role
 $.ai.getInfo(humanId)         // Get spawn metadata
+$.ai.getProfile(humanId)      // Get full profile (personality, history, notes, memories)
 $.ai.getAll()                 // Get all AI humans
 $.ai.count()                  // Total count
 $.ai.countByRole(role)        // Count by role
@@ -25,13 +34,27 @@ $.ai.countByRole(role)        // Count by role
 ### Via MCP
 
 ```javascript
-const npc = await ai({ action: 'spawn', role: 'guard', name: 'Marcus Chen', locationId: factoryId, sex: 'male', age: 35, description: 'A stern-faced man in worn security gear.' });
-// role: Required - for registry lookup
-// name: Display name (default: 'Unnamed')
-// locationId: Where to place them
-// sex: 'male', 'female', 'non-binary' (random if omitted)
-// age: Age in years (random 18-65 if omitted)
+const npc = await ai({
+  action: 'spawn',
+  role: 'guard',
+  name: 'Marcus Chen',
+  locationId: factoryId,
+  sex: 'male',
+  age: 35,
+  description: 'A stern-faced man in worn security gear.',
+  personality: 'Suspicious and vigilant. Former military. Takes his job seriously but fair to those who follow the rules.',
+  history: 'Served in the Corporate Wars before The Burning. Lost his family in the aftermath. Found purpose in protecting what remains.'
+});
 ```
+
+**Parameters:**
+- `role`: Required - for registry lookup
+- `name`: Display name (default: 'Unnamed')
+- `locationId`: Where to place them
+- `sex`: 'male', 'female', 'non-binary' (random if omitted)
+- `age`: Age in years (random 18-65 if omitted)
+- `personality`: Character traits (string or structured object)
+- `history`: Backstory (string or structured object)
 
 ### What Gets Created
 
@@ -274,6 +297,250 @@ await ai({ action: 'despawn', humanId: 567, recycle: true });
 - Job/plot completed
 - NPC served their purpose
 - Cleanup after event
+
+## NPC Profile System
+
+Each NPC has a **profile** that defines who they are. This profile is automatically loaded and injected into the NPC's AI agent before every interaction, ensuring consistent characterization.
+
+### Profile Components
+
+| Component | Purpose | Persistence |
+|-----------|---------|-------------|
+| Personality | Traits, quirks, values, fears | Stored on object |
+| History | Backstory, events, relationships, secrets | Stored on object |
+| Notes | Builder guidance (from $.notes) | Stored in notes system |
+| Memories | Critical facts from interactions | Stored in $.ai.memories |
+
+### Setting Personality
+
+Personality can be a simple string or a structured object:
+
+```javascript
+// Simple string - free-form description
+await ai({
+  action: 'setPersonality',
+  humanId: npcId,
+  personality: 'Gruff and suspicious. Warms up slowly but fiercely loyal once trust is earned. Has a dry sense of humor.'
+});
+
+// Structured object - organized traits
+await ai({
+  action: 'setPersonality',
+  humanId: npcId,
+  personality: {
+    traits: ['suspicious', 'loyal', 'pragmatic'],
+    quirks: ['tugs ear when lying', 'never sits with back to door', 'always counts exits'],
+    values: ['duty', 'honesty', 'survival'],
+    motivations: ['protect the citizens', 'find out what happened to his squad'],
+    fears: ['failing those who depend on him', 'the chaos returning']
+  }
+});
+```
+
+### Setting History
+
+History can also be a string or structured:
+
+```javascript
+// Simple string
+await ai({
+  action: 'setHistory',
+  humanId: npcId,
+  history: 'Marcus served 15 years in corporate security before The Burning. His entire squad died in the chaos. He wandered for years before finding purpose with the Continuum.'
+});
+
+// Structured object
+await ai({
+  action: 'setHistory',
+  humanId: npcId,
+  history: {
+    backstory: 'Marcus Chen was a corporate security officer for Takeda Industries. He saw the worst of the Corporate Wars firsthand.',
+    events: [
+      'Enlisted at 18, youngest in his unit',
+      'Promoted to squad leader during the Seattle Incident',
+      'Lost his entire squad during The Burning',
+      'Wandered the wastes for 3 years',
+      'Found by Continuum scouts and recruited'
+    ],
+    relationships: {
+      'Commander Reyes': 'Former superior, now deceased. Still follows her teachings.',
+      'Sarah Chen': 'Sister, missing since The Burning. Secretly hopes she survived.',
+      'Old Pete': 'Fellow survivor, drinking buddy. Trusts him completely.'
+    },
+    secrets: [
+      'Knows the location of a pre-war weapons cache',
+      'Suspects his sister may have joined the rebels',
+      'Has nightmares about what he saw in the corporate labs'
+    ]
+  }
+});
+```
+
+### Adding Builder Notes
+
+Use the notes system to provide guidance:
+
+```javascript
+// Behavior guidance
+await notes({ action: 'add', objectId: npcId, text: 'Should be hostile to anyone wearing gang colors', tags: ['behavior'] });
+
+// Knowledge hints
+await notes({ action: 'add', objectId: npcId, text: 'Knows about the hidden tunnel under the factory', tags: ['knowledge'] });
+
+// Plot connections
+await notes({ action: 'add', objectId: npcId, text: 'Will be involved in the smuggling plot - potential informant', tags: ['plot', 'smuggling'] });
+
+// Interaction style
+await notes({ action: 'add', objectId: npcId, text: 'Speaks in short sentences. Never uses contractions when serious.', tags: ['speech'] });
+```
+
+### Managing Memories
+
+Memories are for critical facts the NPC learns during play that must persist:
+
+```javascript
+// Store a critical memory
+await ai({
+  action: 'remember',
+  humanId: npcId,
+  text: 'Player "Jack" tried to bribe me with 50 credits. Refused. Watching him.',
+  importance: 'critical',
+  tags: ['player', 'suspicious']
+});
+
+// Store an important memory
+await ai({
+  action: 'remember',
+  humanId: npcId,
+  text: 'Shipment arrives at dock 7 every Tuesday at midnight',
+  importance: 'important',
+  tags: ['schedule', 'dock']
+});
+
+// Recall all memories
+await ai({ action: 'recall', humanId: npcId });
+
+// Recall by importance or tag
+await ai({ action: 'recall', humanId: npcId, criticalOnly: true });
+await ai({ action: 'recall', humanId: npcId, tag: 'player' });
+
+// Forget a specific memory (by index)
+await ai({ action: 'forget', humanId: npcId, index: 0 });
+```
+
+**When to use memories:**
+- Player did something noteworthy (good or bad)
+- NPC learned important information
+- Plot-relevant events occurred
+- Relationships changed
+
+### Getting Full Profile
+
+Retrieve everything about an NPC:
+
+```javascript
+const profile = await ai({ action: 'profile', humanId: npcId });
+// Returns:
+// {
+//   name: 'Marcus Chen',
+//   role: 'guard',
+//   description: 'A stern-faced man...',
+//   personality: { traits: [...], quirks: [...], ... },
+//   history: { backstory: '...', events: [...], ... },
+//   notes: [{ text: '...', tags: [...] }, ...],
+//   memories: [{ text: '...', importance: 'critical', ... }, ...]
+// }
+```
+
+## Complete NPC Creation Workflow
+
+Here's the full workflow for creating a well-defined NPC:
+
+### Step 1: Spawn with Basic Profile
+
+```javascript
+const guard = await ai({
+  action: 'spawn',
+  role: 'guard',
+  name: 'Marcus Chen',
+  locationId: factoryEntranceId,
+  sex: 'male',
+  age: 42,
+  description: 'A weathered man with watchful eyes and military bearing. His security uniform is patched but clean.',
+  personality: 'Suspicious of strangers but fair. Former military discipline. Dry humor emerges once comfortable.',
+  history: 'Corporate Wars veteran. Lost his squad during The Burning. Found purpose protecting what remains.'
+});
+```
+
+### Step 2: Add Detailed Personality (Optional)
+
+```javascript
+await ai({
+  action: 'setPersonality',
+  humanId: guard.id,
+  personality: {
+    traits: ['vigilant', 'fair', 'pragmatic', 'loyal'],
+    quirks: ['counts exits in every room', 'never fully relaxes', 'calls everyone by rank or title'],
+    values: ['duty', 'order', 'protecting the innocent'],
+    motivations: ['keep the factory safe', 'find meaning after the wars'],
+    fears: ['the chaos returning', 'failing to protect someone']
+  }
+});
+```
+
+### Step 3: Add Detailed History (Optional)
+
+```javascript
+await ai({
+  action: 'setHistory',
+  humanId: guard.id,
+  history: {
+    backstory: 'Served 15 years in Takeda corporate security. Rose to squad leader. Watched civilization collapse.',
+    events: [
+      '2047: Enlisted at 18',
+      '2055: Promoted to squad leader',
+      '2062: Lost entire squad during The Burning',
+      '2070: Found by Continuum after years wandering',
+      '2108: Promoted to factory entrance guard'
+    ],
+    relationships: {
+      'Commander Reyes': 'Former CO, deceased. Still follows her protocols.',
+      'Sarah Chen': 'Sister, missing. Hopes she survived.',
+      'Dispensary Clerk': 'Friendly acquaintance. Shares coffee sometimes.'
+    },
+    secrets: [
+      'Knows about the old armory under Pioneer Square',
+      'Suspects his sister joined the rebels before The Burning'
+    ]
+  }
+});
+```
+
+### Step 4: Add Builder Notes
+
+```javascript
+// Behavior guidelines
+await notes({ action: 'add', objectId: guard.id, text: 'Challenge everyone entering. Check citizenship.', tags: ['behavior'] });
+await notes({ action: 'add', objectId: guard.id, text: 'More relaxed with known citizens. Stern with strangers.', tags: ['behavior'] });
+
+// Knowledge
+await notes({ action: 'add', objectId: guard.id, text: 'Knows the factory layout intimately', tags: ['knowledge'] });
+await notes({ action: 'add', objectId: guard.id, text: 'Aware of the smuggling rumors but has no proof', tags: ['knowledge', 'plot'] });
+
+// Speech patterns
+await notes({ action: 'add', objectId: guard.id, text: 'Uses military terminology. Brief sentences. "Citizen" not names.', tags: ['speech'] });
+```
+
+### Step 5: NPC Is Ready
+
+The NPC agent will now receive all this context in its system prompt:
+- Identity (name, role, ID)
+- Personality (traits, quirks, values, fears, motivations)
+- History (backstory, events, relationships, secrets)
+- Notes (behavior, knowledge, speech patterns)
+- Memories (as they accumulate)
+
+When the NPC receives events or prompts, it will respond consistently with this profile.
 
 ## NPC Dialogue
 
