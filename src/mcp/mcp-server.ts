@@ -5,7 +5,7 @@
  * Provides tools for querying and updating MOO objects in MongoDB
  */
 
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { McpServer, ResourceTemplate } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { createServer, IncomingMessage, ServerResponse } from 'http';
 import { z } from 'zod';
@@ -2323,20 +2323,362 @@ Core Objects:
     this.server.resource(
       'aliases',
       'moo://aliases',
+      { description: 'List all registered object aliases' },
       async () => {
-        const aliases = this.manager.getAliases?.() ?? {
-          system: 2,
-          authManager: 3,
-          charGen: 4,
-        };
+        const objectManager = await this.manager.load(0 as ObjId);
+        if (!objectManager) {
+          return {
+            contents: [{
+              uri: 'moo://aliases',
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: 'ObjectManager not found' }),
+            }],
+          };
+        }
+
+        const aliases = objectManager.get('aliases') as Record<string, number> | undefined;
+        const sorted: Record<string, number> = {};
+        if (aliases) {
+          for (const key of Object.keys(aliases).sort()) {
+            sorted[key] = aliases[key];
+          }
+        }
 
         return {
           contents: [{
             uri: 'moo://aliases',
             mimeType: 'application/json',
-            text: JSON.stringify(aliases, null, 2),
+            text: JSON.stringify(sorted, null, 2),
           }],
         };
+      }
+    );
+
+    // Object by ID resource template
+    this.server.resource(
+      'object',
+      new ResourceTemplate('moo://object/{id}', {
+        list: undefined, // Don't enumerate all objects
+        complete: {
+          id: async (value: string) => {
+            // Suggest some common object IDs for autocompletion
+            const suggestions = ['0', '1', '2', '3', '4', '5'];
+            return suggestions.filter(s => s.startsWith(value));
+          }
+        }
+      }),
+      { description: 'Get a MOO object by its ID' },
+      async (_uri: URL, variables: { id?: string | string[] }) => {
+        const idVar = variables.id;
+        const idStr = Array.isArray(idVar) ? idVar[0] : idVar;
+        const id = parseInt(idStr ?? '', 10);
+
+        if (isNaN(id)) {
+          return {
+            contents: [{
+              uri: `moo://object/${idStr}`,
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: 'Invalid object ID' }),
+            }],
+          };
+        }
+
+        const obj = await this.manager.load(id as ObjId);
+        if (!obj) {
+          return {
+            contents: [{
+              uri: `moo://object/${id}`,
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: `Object #${id} not found` }),
+            }],
+          };
+        }
+
+        // Serialize the RuntimeObject for JSON output
+        const raw = obj._getRaw();
+        return {
+          contents: [{
+            uri: `moo://object/${id}`,
+            mimeType: 'application/json',
+            text: JSON.stringify({
+              id: raw._id,
+              name: obj.get('name'),
+              parent: raw.parent,
+              description: obj.get('description'),
+              location: obj.get('location'),
+              properties: Object.keys(raw.properties || {}),
+              methods: Object.keys(raw.methods || {}),
+            }, null, 2),
+          }],
+        };
+      }
+    );
+
+    // Alias lookup resource template
+    this.server.resource(
+      'alias',
+      new ResourceTemplate('moo://alias/{name}', {
+        list: undefined, // Use moo://aliases to list all
+        complete: {
+          name: async (value: string) => {
+            const objectManager = await this.manager.load(0 as ObjId);
+            if (!objectManager) return [];
+            const aliases = objectManager.get('aliases') as Record<string, number> | undefined;
+            if (!aliases) return [];
+            return Object.keys(aliases).filter(a => a.toLowerCase().startsWith(value.toLowerCase()));
+          }
+        }
+      }),
+      { description: 'Look up an object by its alias name' },
+      async (_uri: URL, variables: { name?: string | string[] }) => {
+        const nameVar = variables.name;
+        const aliasName = Array.isArray(nameVar) ? nameVar[0] : nameVar;
+
+        if (!aliasName) {
+          return {
+            contents: [{
+              uri: 'moo://alias/',
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: 'Alias name required' }),
+            }],
+          };
+        }
+
+        const objectManager = await this.manager.load(0 as ObjId);
+        if (!objectManager) {
+          return {
+            contents: [{
+              uri: `moo://alias/${aliasName}`,
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: 'ObjectManager not found' }),
+            }],
+          };
+        }
+
+        const aliases = objectManager.get('aliases') as Record<string, number> | undefined;
+        if (!aliases) {
+          return {
+            contents: [{
+              uri: `moo://alias/${aliasName}`,
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: 'No aliases registered' }),
+            }],
+          };
+        }
+
+        const objectId = aliases[aliasName];
+        if (objectId === undefined) {
+          return {
+            contents: [{
+              uri: `moo://alias/${aliasName}`,
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: `Alias '${aliasName}' not found` }),
+            }],
+          };
+        }
+
+        const obj = await this.manager.load(objectId as ObjId);
+        if (!obj) {
+          return {
+            contents: [{
+              uri: `moo://alias/${aliasName}`,
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: `Object #${objectId} not found` }),
+            }],
+          };
+        }
+
+        return {
+          contents: [{
+            uri: `moo://alias/${aliasName}`,
+            mimeType: 'application/json',
+            text: JSON.stringify({
+              alias: aliasName,
+              objectId,
+              name: obj.get('name'),
+              parent: obj.getParent(),
+              description: obj.get('description'),
+            }, null, 2),
+          }],
+        };
+      }
+    );
+
+    // Players resource
+    this.server.resource(
+      'players',
+      'moo://players',
+      { description: 'List all player characters' },
+      async () => {
+        const allObjects = await this.manager.db.listAll(false);
+        const playerProto = allObjects.find(o => o.properties?.name?.value === 'Player');
+        if (!playerProto) {
+          return {
+            contents: [{
+              uri: 'moo://players',
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: 'Player prototype not found' }),
+            }],
+          };
+        }
+
+        const players = [];
+        for (const obj of allObjects) {
+          // Check if this object inherits from Player (with cycle protection)
+          let parentId = obj.parent;
+          let isPlayer = false;
+          const seen = new Set<number>();
+          while (parentId !== -1 && !seen.has(parentId)) {
+            seen.add(parentId);
+            if (parentId === playerProto._id) {
+              isPlayer = true;
+              break;
+            }
+            const parent = allObjects.find(o => o._id === parentId);
+            if (!parent) break;
+            parentId = parent.parent;
+          }
+
+          if (isPlayer) {
+            players.push({
+              id: obj._id,
+              name: obj.properties?.name?.value || '(unnamed)',
+              location: obj.properties?.location?.value,
+            });
+          }
+        }
+
+        return {
+          contents: [{
+            uri: 'moo://players',
+            mimeType: 'application/json',
+            text: JSON.stringify(players, null, 2),
+          }],
+        };
+      }
+    );
+
+    // Plots resource
+    this.server.resource(
+      'plots',
+      'moo://plots',
+      { description: 'List all active plots' },
+      async () => {
+        try {
+          const plotDB = await this.getPlotDB();
+          if (!plotDB) {
+            return {
+              contents: [{
+                uri: 'moo://plots',
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: 'PlotDB not found' }),
+              }],
+            };
+          }
+
+          // Get active plots from the PlotDB
+          const plots = await plotDB.call('active');
+          const results = (plots || []).map((p: { id: number; name: string; events?: unknown[]; jobs?: Record<string, unknown>; metadata?: Record<string, unknown> }) => ({
+            id: p.id,
+            name: p.name,
+            metadata: p.metadata || {},
+            eventCount: (p.events || []).length,
+            jobCount: Object.keys(p.jobs || {}).length,
+          }));
+
+          return {
+            contents: [{
+              uri: 'moo://plots',
+              mimeType: 'application/json',
+              text: JSON.stringify(results, null, 2),
+            }],
+          };
+        } catch (err) {
+          return {
+            contents: [{
+              uri: 'moo://plots',
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: String(err) }),
+            }],
+          };
+        }
+      }
+    );
+
+    // AI humans resource
+    this.server.resource(
+      'ai',
+      'moo://ai',
+      { description: 'List all AI-controlled humans' },
+      async () => {
+        const objectManager = await this.manager.load(0 as ObjId);
+        if (!objectManager) {
+          return {
+            contents: [{
+              uri: 'moo://ai',
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: 'ObjectManager not found' }),
+            }],
+          };
+        }
+
+        const aliases = objectManager.get('aliases') as Record<string, number> | undefined;
+        const aiId = aliases?.['ai'];
+        if (!aiId) {
+          return {
+            contents: [{
+              uri: 'moo://ai',
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: 'AI registry not found' }),
+            }],
+          };
+        }
+
+        try {
+          const aiRegistry = await this.manager.load(aiId as ObjId);
+          if (!aiRegistry) {
+            return {
+              contents: [{
+                uri: 'moo://ai',
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: 'AI registry object not found' }),
+              }],
+            };
+          }
+
+          // Get all AI humans (returns array of objects, objrefs resolved)
+          const humans = await aiRegistry.call('getAll') as Array<{ id: number; get: (prop: string) => unknown }>;
+
+          // Extract details from each human object, including role from registry
+          const aiHumans = await Promise.all(humans.map(async human => {
+            if (!human) return null;
+            // Get role from registry info
+            const info = await aiRegistry.call('getInfo', human.id) as { role?: string } | null;
+            return {
+              id: human.id,
+              name: human.get('name'),
+              role: info?.role,
+              location: human.get('location'),
+            };
+          }));
+          const filtered = aiHumans.filter(h => h !== null);
+
+          return {
+            contents: [{
+              uri: 'moo://ai',
+              mimeType: 'application/json',
+              text: JSON.stringify(filtered, null, 2),
+            }],
+          };
+        } catch (err) {
+          return {
+            contents: [{
+              uri: 'moo://ai',
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: String(err) }),
+            }],
+          };
+        }
       }
     );
   }
