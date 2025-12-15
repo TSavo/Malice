@@ -28,6 +28,10 @@ export interface NPCAgentConfig {
   workingDirectory?: string;
   /** Allowed built-in tools */
   allowedTools?: string[];
+  /** Session ID to resume from (loaded from database) */
+  resumeSessionId?: string;
+  /** Callback to persist session ID to database */
+  onSessionCreated?: (sessionId: string) => Promise<void>;
 }
 
 export interface NPCAgentState {
@@ -55,7 +59,7 @@ export class NPCAgent extends EventEmitter {
     };
 
     this.state = {
-      sessionId: null,
+      sessionId: config.resumeSessionId || null,
       lastActivity: new Date(),
       messageCount: 0,
       isProcessing: false,
@@ -186,9 +190,18 @@ IMPORTANT:
         this.emit('message', msg);
       }
 
-      // Update session ID
-      if (newSessionId) {
+      // Update session ID and persist if new
+      if (newSessionId && newSessionId !== this.state.sessionId) {
         this.state.sessionId = newSessionId;
+
+        // Persist to database via callback
+        if (this.config.onSessionCreated) {
+          try {
+            await this.config.onSessionCreated(newSessionId);
+          } catch (err) {
+            this.emit('error', new Error(`Failed to persist session ID: ${err}`));
+          }
+        }
       }
 
       return response || '(no response)';
