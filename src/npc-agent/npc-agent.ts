@@ -11,32 +11,45 @@
 import { query, type Options, type SDKMessage, type McpServerConfig } from '@anthropic-ai/claude-agent-sdk';
 import { EventEmitter } from 'events';
 
-// Simple HTTP client for MCP calls
-async function mcpCall(host: string, port: number, tool: string, args: Record<string, unknown>): Promise<unknown> {
+// Simple HTTP client for MCP calls with timeout
+async function mcpCall(host: string, port: number, tool: string, args: Record<string, unknown>, timeoutMs = 30000): Promise<unknown> {
   const url = `http://${host}:${port}/mcp`;
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      jsonrpc: '2.0',
-      id: Date.now(),
-      method: 'tools/call',
-      params: { name: tool, arguments: args },
-    }),
-  });
-  const data = await response.json() as { result?: { content?: Array<{ text?: string }> }; error?: { message: string } };
-  if (data.error) {
-    throw new Error(data.error.message);
-  }
-  const text = data.result?.content?.[0]?.text;
-  if (text) {
-    try {
-      return JSON.parse(text);
-    } catch {
-      return text;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: Date.now(),
+        method: 'tools/call',
+        params: { name: tool, arguments: args },
+      }),
+      signal: controller.signal,
+    });
+    clearTimeout(timeout);
+    const data = await response.json() as { result?: { content?: Array<{ text?: string }> }; error?: { message: string } };
+    if (data.error) {
+      throw new Error(data.error.message);
     }
+    const text = data.result?.content?.[0]?.text;
+    if (text) {
+      try {
+        return JSON.parse(text);
+      } catch {
+        return text;
+      }
+    }
+    return null;
+  } catch (err: any) {
+    clearTimeout(timeout);
+    if (err.name === 'AbortError') {
+      throw new Error(`MCP call to ${tool} timed out after ${timeoutMs}ms`);
+    }
+    throw err;
   }
-  return null;
 }
 
 export interface NPCAgentConfig {

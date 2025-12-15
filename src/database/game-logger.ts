@@ -16,6 +16,44 @@ import type {
 } from '../../types/log.js';
 
 /**
+ * Sanitize an object for MongoDB storage, removing circular references
+ */
+function sanitizeForMongo(value: any, seen: WeakSet<object> = new WeakSet(), path: string = 'root'): any {
+  if (value === null || value === undefined) {
+    return value;
+  }
+
+  const type = typeof value;
+  if (type !== 'object') {
+    return value;
+  }
+
+  // Check for circular reference
+  if (seen.has(value)) {
+    console.error(`[GameLogger] Circular reference detected at ${path}, replacing with null`);
+    return null;
+  }
+  seen.add(value);
+
+  // Handle arrays
+  if (Array.isArray(value)) {
+    return value.map((item, i) => sanitizeForMongo(item, seen, `${path}[${i}]`));
+  }
+
+  // Handle Date objects
+  if (value instanceof Date) {
+    return value;
+  }
+
+  // Handle plain objects
+  const result: Record<string, any> = {};
+  for (const [key, val] of Object.entries(value)) {
+    result[key] = sanitizeForMongo(val, seen, `${path}.${key}`);
+  }
+  return result;
+}
+
+/**
  * Session timing state for bot detection
  */
 interface SessionTiming {
@@ -145,8 +183,11 @@ export class GameLogger {
       ...options,
     };
 
+    // Sanitize entry before sending to MongoDB
+    const sanitized = sanitizeForMongo(entry, new WeakSet(), `log.${type}`);
+
     // Fire and forget - don't block game logic for logging
-    this.collection.insertOne(entry).catch((err) => {
+    this.collection.insertOne(sanitized).catch((err) => {
       // Silently fail - logging should never break the game
       console.error('[GameLogger] Failed to write log:', err.message);
     });

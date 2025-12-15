@@ -12,6 +12,44 @@ import type {
 } from '../../types/object.js';
 
 /**
+ * Sanitize an object for MongoDB storage, removing circular references
+ */
+function sanitizeForMongo(value: any, seen: WeakSet<object> = new WeakSet(), path: string = 'root'): any {
+  if (value === null || value === undefined) {
+    return value;
+  }
+
+  const type = typeof value;
+  if (type !== 'object') {
+    return value;
+  }
+
+  // Check for circular reference
+  if (seen.has(value)) {
+    console.error(`[ObjectManager] Circular reference detected at ${path}, replacing with null`);
+    return null;
+  }
+  seen.add(value);
+
+  // Handle arrays
+  if (Array.isArray(value)) {
+    return value.map((item, i) => sanitizeForMongo(item, seen, `${path}[${i}]`));
+  }
+
+  // Handle Date objects
+  if (value instanceof Date) {
+    return value;
+  }
+
+  // Handle plain objects
+  const result: Record<string, any> = {};
+  for (const [key, val] of Object.entries(value)) {
+    result[key] = sanitizeForMongo(val, seen, `${path}.${key}`);
+  }
+  return result;
+}
+
+/**
  * Object manager - coordinates ObjectDatabase and RuntimeObjects
  * Provides in-memory caching with change stream invalidation
  *
@@ -99,7 +137,13 @@ export class ObjectManager {
    * - load(-1) returns $.nothing - immutable null object reference
    * - load(0) returns the ObjectManager itself as a RuntimeObject
    */
-  async load(id: ObjId): Promise<RuntimeObject | null> {
+  async load(id: ObjId | RuntimeObject): Promise<RuntimeObject | null> {
+    // Handle RuntimeObject being passed - extract the ID
+    if (id && typeof id === 'object' && 'id' in id) {
+      // Already a RuntimeObject - just return it
+      return id as RuntimeObject;
+    }
+
     // Special case: #-1 is the null object reference ($.nothing)
     if (id === -1) {
       // Check if we've already created it
@@ -612,8 +656,10 @@ export class ObjectManager {
     processed: boolean;
   }): Promise<string> {
     const collection = this.db.getCollection('game_events');
+    // Sanitize event data to prevent circular reference errors
+    const sanitizedEvent = sanitizeForMongo(event, new WeakSet(), `event.${event.type}`);
     const result = await collection.insertOne({
-      ...event,
+      ...sanitizedEvent,
       createdAt: new Date(), // For TTL index
     });
     return result.insertedId.toString();

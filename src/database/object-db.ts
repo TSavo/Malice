@@ -2,6 +2,44 @@ import { MongoClient, Db, Collection, ChangeStream } from 'mongodb';
 import type { GameObject, ObjId } from '../../types/object.js';
 
 /**
+ * Sanitize an object for MongoDB storage, removing circular references
+ */
+function sanitizeForMongo(value: any, seen: WeakSet<object> = new WeakSet(), path: string = 'root'): any {
+  if (value === null || value === undefined) {
+    return value;
+  }
+
+  const type = typeof value;
+  if (type !== 'object') {
+    return value;
+  }
+
+  // Check for circular reference
+  if (seen.has(value)) {
+    console.error(`[ObjectDB] Circular reference detected at ${path}, replacing with null`);
+    return null;
+  }
+  seen.add(value);
+
+  // Handle arrays
+  if (Array.isArray(value)) {
+    return value.map((item, i) => sanitizeForMongo(item, seen, `${path}[${i}]`));
+  }
+
+  // Handle Date objects
+  if (value instanceof Date) {
+    return value;
+  }
+
+  // Handle plain objects
+  const result: Record<string, any> = {};
+  for (const [key, val] of Object.entries(value)) {
+    result[key] = sanitizeForMongo(val, seen, `${path}.${key}`);
+  }
+  return result;
+}
+
+/**
  * MongoDB persistence layer for game objects
  */
 export class ObjectDatabase {
@@ -57,25 +95,27 @@ export class ObjectDatabase {
    */
   async create(obj: Omit<GameObject, 'created' | 'modified'>): Promise<GameObject> {
     const now = new Date();
+    // Sanitize the object to prevent circular reference errors
+    const sanitizedObj = sanitizeForMongo(obj, new WeakSet(), `create#${obj._id}`) as typeof obj;
 
     // Check if we're reusing a recycled object
-    const existing = await this.objects.findOne({ _id: obj._id, recycled: true });
+    const existing = await this.objects.findOne({ _id: sanitizedObj._id, recycled: true });
 
     if (existing) {
       // Replace recycled object (keep original creation date)
       const newObj: GameObject = {
-        ...obj,
+        ...sanitizedObj,
         created: existing.created,
         modified: now,
         recycled: false, // Clear recycled flag
       };
 
-      await this.objects.replaceOne({ _id: obj._id }, newObj);
+      await this.objects.replaceOne({ _id: sanitizedObj._id }, newObj);
       return newObj;
     } else {
       // New object
       const newObj: GameObject = {
-        ...obj,
+        ...sanitizedObj,
         created: now,
         modified: now,
       };
@@ -92,11 +132,30 @@ export class ObjectDatabase {
     id: ObjId,
     updates: Partial<Omit<GameObject, '_id' | 'created'>>
   ): Promise<void> {
+    // Sanitize updates to prevent circular reference errors
+    const sanitized = sanitizeForMongo(updates, new WeakSet(), `#${id}`);
+
+    // Debug: try JSON.stringify to detect circular refs before BSON does
+    try {
+      JSON.stringify(sanitized);
+    } catch (jsonErr) {
+      console.error(`[ObjectDB] JSON.stringify failed for #${id}, trying to find circular ref`);
+      console.error(`[ObjectDB] Updates keys: ${Object.keys(updates).join(', ')}`);
+      // Try to identify the problematic key
+      for (const key of Object.keys(sanitized)) {
+        try {
+          JSON.stringify((sanitized as any)[key]);
+        } catch {
+          console.error(`[ObjectDB] Circular reference in key: ${key}`);
+        }
+      }
+    }
+
     await this.objects.updateOne(
       { _id: id },
       {
         $set: {
-          ...updates,
+          ...sanitized,
           modified: new Date(),
         },
       }

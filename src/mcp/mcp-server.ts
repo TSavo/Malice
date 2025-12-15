@@ -23,10 +23,18 @@ interface MCPServerConfig {
  * MCP Server for MOO object operations
  * Similar to DevTools but using MCP protocol over Streamable HTTP
  */
+/**
+ * Session state - each session gets its own McpServer and transport
+ * This is required because the MCP SDK only supports one transport per server
+ */
+interface SessionState {
+  server: McpServer;
+  transport: StreamableHTTPServerTransport;
+}
+
 export class MaliceMCPServer {
-  private server: McpServer;
   private httpServer: ReturnType<typeof createServer> | null = null;
-  private sessions = new Map<string, StreamableHTTPServerTransport>();
+  private sessions = new Map<string, SessionState>();
   private telnetClient: MCPTelnetClient;
   private port: number;
   private host: string;
@@ -38,15 +46,23 @@ export class MaliceMCPServer {
     this.port = config.port ?? 3001;
     this.host = config.host ?? '127.0.0.1';
     this.telnetClient = new MCPTelnetClient('localhost', 5555);
+  }
 
-    this.server = new McpServer({
+  /**
+   * Create a new McpServer instance with all tools/resources/prompts registered.
+   * Each session needs its own server because the MCP SDK only supports one transport per server.
+   */
+  private createSessionServer(): McpServer {
+    const server = new McpServer({
       name: 'malice-moo',
       version: '1.0.0',
     });
 
-    this.registerTools();
-    this.registerResources();
-    this.registerPrompts();
+    this.registerTools(server);
+    this.registerResources(server);
+    this.registerPrompts(server);
+
+    return server;
   }
 
   /**
@@ -91,9 +107,9 @@ export class MaliceMCPServer {
   /**
    * Register MCP tools (operations with side effects)
    */
-  private registerTools(): void {
+  private registerTools(server: McpServer): void {
     // Get object by ID
-    this.server.tool(
+    server.tool(
       'get_object',
       'Fetch a MOO object by its ID. Returns properties, methods, parent, and metadata.',
       { id: z.number().describe('Object ID (e.g., 0 for ObjectManager, 1 for Root)') },
@@ -124,7 +140,7 @@ export class MaliceMCPServer {
     );
 
     // List all objects
-    this.server.tool(
+    server.tool(
       'list_objects',
       'List all MOO objects in the database with summary info.',
       {
@@ -149,7 +165,7 @@ export class MaliceMCPServer {
     );
 
     // Get property value
-    this.server.tool(
+    server.tool(
       'get_property',
       'Get a specific property value from a MOO object (walks inheritance chain).',
       {
@@ -173,7 +189,7 @@ export class MaliceMCPServer {
     );
 
     // Set property value
-    this.server.tool(
+    server.tool(
       'set_property',
       'Set a property value on a MOO object.',
       {
@@ -198,7 +214,7 @@ export class MaliceMCPServer {
     );
 
     // Get method code
-    this.server.tool(
+    server.tool(
       'get_method',
       'Get the TypeScript code for a method on a MOO object.',
       {
@@ -238,7 +254,7 @@ export class MaliceMCPServer {
     );
 
     // Set method code
-    this.server.tool(
+    server.tool(
       'set_method',
       'Create or update a TypeScript method on a MOO object.',
       {
@@ -265,7 +281,7 @@ export class MaliceMCPServer {
     );
 
     // Call a method
-    this.server.tool(
+    server.tool(
       'call_method',
       'Execute a method on a MOO object and return the result.',
       {
@@ -298,7 +314,7 @@ export class MaliceMCPServer {
     );
 
     // Create new object
-    this.server.tool(
+    server.tool(
       'create_object',
       'Create a new MOO object with a specified parent.',
       {
@@ -319,7 +335,7 @@ export class MaliceMCPServer {
     );
 
     // Search objects by property
-    this.server.tool(
+    server.tool(
       'find_by_property',
       'Find MOO objects that have a specific property value.',
       {
@@ -340,7 +356,7 @@ export class MaliceMCPServer {
     );
 
     // Search objects by name pattern
-    this.server.tool(
+    server.tool(
       'search_objects',
       'Search MOO objects by name. Supports substring matching and regex patterns.',
       {
@@ -388,7 +404,7 @@ export class MaliceMCPServer {
     );
 
     // Find children/instances of a prototype
-    this.server.tool(
+    server.tool(
       'find_children',
       'Find all objects that inherit from a given parent (direct children only, or all descendants).',
       {
@@ -447,7 +463,7 @@ export class MaliceMCPServer {
     );
 
     // Find objects in a location
-    this.server.tool(
+    server.tool(
       'find_in_location',
       'Find all objects in a room or container.',
       {
@@ -496,7 +512,7 @@ export class MaliceMCPServer {
     );
 
     // Alias lookup
-    this.server.tool(
+    server.tool(
       'alias_lookup',
       'Look up an object by its alias (e.g., "lock", "recycler", "room"). Returns the object ID and basic info.',
       {
@@ -559,7 +575,7 @@ export class MaliceMCPServer {
     );
 
     // List all aliases
-    this.server.tool(
+    server.tool(
       'list_aliases',
       'List all registered object aliases ($.foo names).',
       {},
@@ -595,7 +611,7 @@ export class MaliceMCPServer {
     );
 
     // Get inheritance chain
-    this.server.tool(
+    server.tool(
       'get_inheritance_chain',
       'Get the full parent inheritance chain for a MOO object.',
       { id: z.number().describe('Object ID') },
@@ -619,7 +635,7 @@ export class MaliceMCPServer {
     );
 
     // Dig - create a new room with optional exits
-    this.server.tool(
+    server.tool(
       'dig',
       'Create a new room with optional bidirectional exits from an existing room.',
       {
@@ -708,7 +724,7 @@ export class MaliceMCPServer {
     );
 
     // List all rooms
-    this.server.tool(
+    server.tool(
       'list_rooms',
       'List all rooms in the world with their coordinates and exit counts.',
       {},
@@ -755,7 +771,7 @@ export class MaliceMCPServer {
     );
 
     // List all players
-    this.server.tool(
+    server.tool(
       'list_players',
       'List all player characters with their location and online status.',
       {},
@@ -800,7 +816,7 @@ export class MaliceMCPServer {
     );
 
     // Link two rooms with exits
-    this.server.tool(
+    server.tool(
       'link_rooms',
       'Create an exit from one room to another, optionally with a return exit.',
       {
@@ -869,7 +885,7 @@ export class MaliceMCPServer {
     );
 
     // Remove an exit
-    this.server.tool(
+    server.tool(
       'unlink',
       'Remove an exit from a room.',
       {
@@ -897,7 +913,7 @@ export class MaliceMCPServer {
     );
 
     // Move an object to a location
-    this.server.tool(
+    server.tool(
       'move_object',
       'Move an object to a new location (room or container).',
       {
@@ -930,7 +946,7 @@ export class MaliceMCPServer {
     );
 
     // Recycle (delete) an object
-    this.server.tool(
+    server.tool(
       'recycle_object',
       'Recycle (soft-delete) a MOO object. Removes it from the world and marks it for reuse.',
       {
@@ -969,7 +985,7 @@ export class MaliceMCPServer {
     );
 
     // Clone an object
-    this.server.tool(
+    server.tool(
       'clone_object',
       'Create a deep copy of an object with all its properties. Optionally place at a location.',
       {
@@ -1019,7 +1035,7 @@ export class MaliceMCPServer {
     );
 
     // Get exits from a room
-    this.server.tool(
+    server.tool(
       'get_exits',
       'List all exits from a room with their destinations and any attached doors.',
       {
@@ -1088,7 +1104,7 @@ export class MaliceMCPServer {
     );
 
     // Spawn an item at a location
-    this.server.tool(
+    server.tool(
       'spawn_item',
       'Create an instance of a prototype and place it at a location in one step.',
       {
@@ -1155,7 +1171,7 @@ export class MaliceMCPServer {
     );
 
     // Attach door to exit
-    this.server.tool(
+    server.tool(
       'set_exit_door',
       'Create and attach a door to an exit, or attach an existing door.',
       {
@@ -1221,7 +1237,7 @@ export class MaliceMCPServer {
     );
 
     // Get room contents with rich info
-    this.server.tool(
+    server.tool(
       'get_room_info',
       'Get comprehensive room information: exits, contents, players, and objects.',
       {
@@ -1321,7 +1337,7 @@ export class MaliceMCPServer {
     );
 
     // Describe object as player would see it
-    this.server.tool(
+    server.tool(
       'describe_object',
       'Get the runtime description of an object as a player would see it (calls describe() method).',
       {
@@ -1353,36 +1369,27 @@ export class MaliceMCPServer {
     // === Telnet Session Tools ===
 
     // Connect to MOO via telnet
-    this.server.tool(
+    server.tool(
       'session_connect',
       'Connect to the MOO via telnet. Returns a session ID and the welcome message. MOO output will be pushed via logging notifications.',
       {},
-      async (_args, extra) => {
+      async (_args, _extra) => {
         try {
-          const mcpSessionId = extra.sessionId;
+          // Push notifications were disabled during debugging but the actual issue was
+          // awaited game event emissions blocking MCP responses (fixed by fire-and-forget).
+          // TODO: Re-enable push notifications if real-time updates are needed
+          // const onData = (telnetSessionId: string, data: string) => {
+          //   const transport = mcpSessionId ? this.sessions.get(mcpSessionId) : undefined;
+          //   if (!transport) return;
+          //   const notification = {
+          //     jsonrpc: '2.0' as const,
+          //     method: 'notifications/message',
+          //     params: { level: 'info', logger: `moo:${telnetSessionId}`, data },
+          //   };
+          //   transport.send(notification).catch(() => {});
+          // };
 
-          // Callback to push MOO output as logging messages
-          // Send directly through the session's transport to support multi-client
-          const onData = (telnetSessionId: string, data: string) => {
-            const transport = mcpSessionId ? this.sessions.get(mcpSessionId) : undefined;
-            if (!transport) return;
-
-            const notification = {
-              jsonrpc: '2.0' as const,
-              method: 'notifications/message',
-              params: {
-                level: 'info',
-                logger: `moo:${telnetSessionId}`,
-                data: data,
-              },
-            };
-
-            transport.send(notification).catch(() => {
-              // Ignore send errors (client may have disconnected)
-            });
-          };
-
-          const { sessionId, output } = await this.telnetClient.connect(onData);
+          const { sessionId, output } = await this.telnetClient.connect(undefined);
           return {
             content: [{ type: 'text', text: JSON.stringify({ sessionId, output, push: true }, null, 2) }],
           };
@@ -1396,7 +1403,7 @@ export class MaliceMCPServer {
     );
 
     // Send command to session
-    this.server.tool(
+    server.tool(
       'session_send',
       'Send a command to an active telnet session. Returns the response output.',
       {
@@ -1419,7 +1426,7 @@ export class MaliceMCPServer {
     );
 
     // Get session log
-    this.server.tool(
+    server.tool(
       'session_log',
       'Get the session log (last N lines of output). Useful for seeing context.',
       {
@@ -1436,7 +1443,7 @@ export class MaliceMCPServer {
     );
 
     // List active sessions
-    this.server.tool(
+    server.tool(
       'session_list',
       'List all active telnet sessions.',
       {},
@@ -1449,7 +1456,7 @@ export class MaliceMCPServer {
     );
 
     // Close session
-    this.server.tool(
+    server.tool(
       'session_close',
       'Close a telnet session.',
       {
@@ -1467,7 +1474,7 @@ export class MaliceMCPServer {
     // CONSOLIDATED PLOT TOOL
     // ═══════════════════════════════════════════════════════════════════
 
-    this.server.tool(
+    server.tool(
       'plot',
       `Comprehensive plot and job management tool.
 
@@ -1814,7 +1821,7 @@ ACTIONS:
     // AI TOOL (Consolidated)
     // ═══════════════════════════════════════════════════════════════════════
 
-    this.server.tool(
+    server.tool(
       'ai',
       `Consolidated AI-controlled human management tool.
 
@@ -2157,7 +2164,7 @@ MEMORY ACTIONS (for persistent critical memories):
     // NOTES TOOL (Consolidated)
     // ═══════════════════════════════════════════════════════════════════
 
-    this.server.tool(
+    server.tool(
       'notes',
       `Consolidated notes management tool.
 
@@ -2305,7 +2312,7 @@ ACTIONS:
     // WORLD TOOL (Consolidated)
     // ═══════════════════════════════════════════════════════════════════
 
-    this.server.tool(
+    server.tool(
       'world',
       `Consolidated world query tool with SQL-like DSL.
 
@@ -2437,9 +2444,9 @@ EXAMPLES:
   /**
    * Register MCP resources (read-only data)
    */
-  private registerResources(): void {
+  private registerResources(server: McpServer): void {
     // Object schema documentation
-    this.server.resource(
+    server.resource(
       'schema',
       'moo://schema',
       async () => ({
@@ -2486,7 +2493,7 @@ Core Objects:
     );
 
     // Aliases resource
-    this.server.resource(
+    server.resource(
       'aliases',
       'moo://aliases',
       { description: 'List all registered object aliases' },
@@ -2521,7 +2528,7 @@ Core Objects:
     );
 
     // Object by ID resource template
-    this.server.resource(
+    server.resource(
       'object',
       new ResourceTemplate('moo://object/{id}', {
         list: undefined, // Don't enumerate all objects
@@ -2581,7 +2588,7 @@ Core Objects:
     );
 
     // Alias lookup resource template
-    this.server.resource(
+    server.resource(
       'alias',
       new ResourceTemplate('moo://alias/{name}', {
         list: undefined, // Use moo://aliases to list all
@@ -2671,7 +2678,7 @@ Core Objects:
     );
 
     // Players resource
-    this.server.resource(
+    server.resource(
       'players',
       'moo://players',
       { description: 'List all player characters' },
@@ -2725,7 +2732,7 @@ Core Objects:
     );
 
     // Plots resource
-    this.server.resource(
+    server.resource(
       'plots',
       'moo://plots',
       { description: 'List all active plots' },
@@ -2772,7 +2779,7 @@ Core Objects:
     );
 
     // AI humans resource
-    this.server.resource(
+    server.resource(
       'ai',
       'moo://ai',
       { description: 'List all AI-controlled humans' },
@@ -2852,8 +2859,8 @@ Core Objects:
   /**
    * Register MCP prompts (reusable templates)
    */
-  private registerPrompts(): void {
-    this.server.prompt(
+  private registerPrompts(server: McpServer): void {
+    server.prompt(
       'inspect-object',
       { id: z.string().describe('Object ID to inspect') },
       ({ id }) => ({
@@ -2871,7 +2878,7 @@ Core Objects:
       })
     );
 
-    this.server.prompt(
+    server.prompt(
       'create-prototype',
       { name: z.string(), parent: z.string().optional() },
       ({ name, parent }) => ({
@@ -2889,7 +2896,7 @@ Core Objects:
       })
     );
 
-    this.server.prompt(
+    server.prompt(
       'debug-method',
       { objectId: z.string(), methodName: z.string() },
       ({ objectId, methodName }) => ({
@@ -2964,35 +2971,38 @@ Core Objects:
     const message = JSON.parse(body);
 
     if (sessionId && this.sessions.has(sessionId)) {
-      // Existing session
-      const transport = this.sessions.get(sessionId)!;
-      await transport.handleRequest(req, res, message);
+      // Existing session - use the stored transport
+      const session = this.sessions.get(sessionId)!;
+      await session.transport.handleRequest(req, res, message);
     } else if (message.method === 'initialize') {
-      // New session - create transport
+      // New session - create a NEW server and transport for this session
+      // Each session needs its own McpServer because the SDK only supports one transport per server
+      const server = this.createSessionServer();
       const transport = new StreamableHTTPServerTransport({
         sessionIdGenerator: () => crypto.randomUUID(),
         onsessioninitialized: (newSessionId) => {
-          this.sessions.set(newSessionId, transport);
+          this.sessions.set(newSessionId, { server, transport });
         },
       });
 
-      // Connect server to transport
-      await this.server.connect(transport);
+      // Connect this session's server to its transport
+      await server.connect(transport);
 
       // Handle the initialize request
       await transport.handleRequest(req, res, message);
     } else if (sessionId && !this.sessions.has(sessionId)) {
       // Stale session - server restarted. Auto-recreate session with same ID.
       console.log(`[MCP] Recreating stale session ${sessionId}`);
+      const server = this.createSessionServer();
       const transport = new StreamableHTTPServerTransport({
         sessionIdGenerator: () => sessionId, // Reuse the same session ID
         onsessioninitialized: (newSessionId) => {
-          this.sessions.set(newSessionId, transport);
+          this.sessions.set(newSessionId, { server, transport });
         },
       });
 
-      // Connect server to transport
-      await this.server.connect(transport);
+      // Connect this session's server to its transport
+      await server.connect(transport);
 
       // Synthesize an initialize to set up the session properly
       const initMessage = {
@@ -3045,8 +3055,8 @@ Core Objects:
       return;
     }
 
-    const transport = this.sessions.get(sessionId)!;
-    await transport.handleRequest(req, res);
+    const session = this.sessions.get(sessionId)!;
+    await session.transport.handleRequest(req, res);
   }
 
   /**
@@ -3054,9 +3064,9 @@ Core Objects:
    */
   private handleDelete(res: ServerResponse, sessionId?: string): void {
     if (sessionId) {
-      const transport = this.sessions.get(sessionId);
-      if (transport) {
-        transport.close();
+      const session = this.sessions.get(sessionId);
+      if (session) {
+        session.transport.close();
         this.sessions.delete(sessionId);
       }
     }
@@ -3081,8 +3091,8 @@ Core Objects:
    */
   async stop(): Promise<void> {
     // Close all sessions
-    for (const [id, transport] of this.sessions) {
-      transport.close();
+    for (const [id, session] of this.sessions) {
+      session.transport.close();
       this.sessions.delete(id);
     }
 

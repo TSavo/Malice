@@ -73,6 +73,7 @@ export class PlayerBuilder {
       await self.registerVerb(['look %i', 'look at %i', 'l %i', 'examine %i', 'ex %i'], self, 'lookAt');
       await self.registerVerb(['look %i in %t', 'look at %i in %t', 'look %i on %t'], self, 'lookIn');
       await self.registerVerb(['say %s', '"%s', "'" + "%s"], self, 'say');
+      await self.registerVerb(['to %s'], self, 'to');
       await self.registerVerb(['emote %s', ':%s'], self, 'emote');
       await self.registerVerb('quit', self);
       await self.registerVerb(['@options', '@options %s', '@options %s %s'], self, 'options');

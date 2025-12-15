@@ -49,51 +49,100 @@ function parseSSEResponse(text: string): any {
   return JSON.parse(text);
 }
 
+// Reusable MCP session
+let sharedMcpSessionId: string | null = null;
+let sessionInitPromise: Promise<string> | null = null;
+
+async function getMcpSession(): Promise<string> {
+  if (sharedMcpSessionId) return sharedMcpSessionId;
+
+  // Prevent multiple concurrent initializations
+  if (sessionInitPromise) return sessionInitPromise;
+
+  sessionInitPromise = (async () => {
+    console.log('[NPC-Agent] Initializing MCP session...');
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000); // 10s timeout
+
+    try {
+      const initRes = await fetch(`http://${MCP_HOST}:${MCP_PORT}/mcp`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json, text/event-stream',
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          method: 'initialize',
+          id: 1,
+          params: {
+            protocolVersion: '2024-11-05',
+            capabilities: {},
+            clientInfo: { name: 'npc-agent-service', version: '1.0.0' },
+          },
+        }),
+        signal: controller.signal,
+      });
+
+      if (!initRes.ok) {
+        throw new Error(`MCP init failed: ${initRes.status}`);
+      }
+
+      const sessionId = initRes.headers.get('mcp-session-id') || '';
+      sharedMcpSessionId = sessionId;
+      console.log(`[NPC-Agent] MCP session initialized: ${sessionId}`);
+      return sessionId;
+    } finally {
+      clearTimeout(timeout);
+      sessionInitPromise = null;
+    }
+  })();
+
+  return sessionInitPromise;
+}
+
 async function mcpCall(tool: string, args: Record<string, unknown>): Promise<any> {
-  // Initialize session
-  const initRes = await fetch(`http://${MCP_HOST}:${MCP_PORT}/mcp`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json, text/event-stream',
-    },
-    body: JSON.stringify({
-      jsonrpc: '2.0',
-      method: 'initialize',
-      id: 1,
-      params: {
-        protocolVersion: '2024-11-05',
-        capabilities: {},
-        clientInfo: { name: 'npc-agent-service', version: '1.0.0' },
+  const mcpSessionId = await getMcpSession();
+
+  // Call tool with timeout
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 30000); // 30s timeout
+
+  try {
+    const toolRes = await fetch(`http://${MCP_HOST}:${MCP_PORT}/mcp`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json, text/event-stream',
+        'mcp-session-id': mcpSessionId,
       },
-    }),
-  });
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        method: 'tools/call',
+        id: Date.now(),
+        params: { name: tool, arguments: args },
+      }),
+      signal: controller.signal,
+    });
 
-  if (!initRes.ok) {
-    throw new Error(`MCP init failed: ${initRes.status}`);
+    if (!toolRes.ok) {
+      // Session may have expired, reset and retry once
+      if (toolRes.status === 400 || toolRes.status === 404) {
+        console.log('[NPC-Agent] MCP session expired, resetting...');
+        sharedMcpSessionId = null;
+        return mcpCall(tool, args); // Retry with new session
+      }
+      throw new Error(`MCP tool call failed: ${toolRes.status}`);
+    }
+
+    return toolRes;
+  } finally {
+    clearTimeout(timeout);
   }
+}
 
-  const mcpSessionId = initRes.headers.get('mcp-session-id');
-
-  // Call tool
-  const toolRes = await fetch(`http://${MCP_HOST}:${MCP_PORT}/mcp`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json, text/event-stream',
-      ...(mcpSessionId ? { 'mcp-session-id': mcpSessionId } : {}),
-    },
-    body: JSON.stringify({
-      jsonrpc: '2.0',
-      method: 'tools/call',
-      id: 2,
-      params: { name: tool, arguments: args },
-    }),
-  });
-
-  if (!toolRes.ok) {
-    throw new Error(`MCP tool call failed: ${toolRes.status}`);
-  }
+async function mcpCallWithParse(tool: string, args: Record<string, unknown>): Promise<any> {
+  const toolRes = await mcpCall(tool, args);
 
   const responseText = await toolRes.text();
   const result = parseSSEResponse(responseText);
@@ -120,7 +169,7 @@ async function mcpCall(tool: string, args: Record<string, unknown>): Promise<any
  * Set object property via MCP
  */
 async function setProperty(objectId: number, name: string, value: any): Promise<void> {
-  await mcpCall('set_property', { objectId, name, value });
+  await mcpCallWithParse('set_property', { objectId, name, value });
 }
 
 /**
@@ -380,7 +429,7 @@ async function handleSpeechEvent(data: any): Promise<void> {
 
     try {
       console.log(`[NPC-Agent] Checking location for ${managed.name} (#${npcId})...`);
-      const npcInfo = await mcpCall('get_object', { id: npcId });
+      const npcInfo = await mcpCallWithParse('get_object', { id: npcId });
       const npcLocation = npcInfo?.properties?.location?.value ?? npcInfo?.properties?.location;
       console.log(`[NPC-Agent] ${managed.name} is at location ${npcLocation}`);
 
@@ -526,7 +575,7 @@ async function waitForMCP(): Promise<boolean> {
   console.log('[NPC-Agent] Waiting for MCP server...');
   for (let i = 0; i < 30; i++) {
     try {
-      await mcpCall('list_objects', { limit: 1 });
+      await mcpCallWithParse('list_objects', { limit: 1 });
       return true;
     } catch {
       await new Promise(r => setTimeout(r, 2000));
