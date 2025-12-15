@@ -135,59 +135,133 @@ obj.setMethod('onArrived', `
 
 ## Verb Handlers
 
-### Handler Signature
+### Handler Context
 
-```javascript
-obj.setMethod('doWear', `
-  // args[0] = player who typed the command
-  // args[1...n] = resolved items from pattern
+When a verb handler is called via `callVerb()`, the method body has access to these **direct variables**:
 
-  const player = args[0];
-  const target = args[1];  // If pattern had %i
-  const text = args[1];    // If pattern had %s
-
-  // Return string to send to player
-  // Return nothing for silent success
-  return 'You wear the ' + self.name + '.';
-`);
-```
+| Variable | Description |
+|----------|-------------|
+| `self` | The handler object (the object providing the verb) |
+| `player` | The player who typed the command |
+| `command` | The raw command string (e.g., "drop apple") |
+| `context` | Connection context (telnet session info) |
+| `args` | **Only the resolved pattern variables** (see below) |
+| `$` | Object manager for loading objects |
 
 ### Pattern Argument Mapping
+
+The `args` array contains **only the resolved pattern variables** (`%i`, `%t`, `%s`), NOT the player or context:
 
 ```javascript
 // Pattern: 'eat %t'
 // Input: "eat apple"
-// Handler receives: args = [player]
-// (%t is self - the handler knows which object it is)
+// args = [food]         // The resolved food object from %t
+// player = <player>     // Direct variable, NOT in args
+
+// Pattern: 'drop %i'
+// Input: "drop sword"
+// args = [sword]        // The resolved item from %i
+// player = <player>     // Direct variable, NOT in args
 
 // Pattern: 'give %i to %i'
 // Input: "give sword to bob"
-// Handler receives: args = [player, sword, bob]
+// args = [sword, bob]   // Two resolved items from %i %i
+// player = <player>     // Direct variable, NOT in args
 
 // Pattern: 'say %s'
 // Input: 'say hello everyone'
-// Handler receives: args = [player, 'hello everyone']
+// args = ['hello everyone']  // The rest of the line from %s
+// player = <player>          // Direct variable, NOT in args
+
+// Pattern: 'look' (no pattern variables)
+// Input: "look"
+// args = []             // Empty - no pattern variables
+// player = <player>     // Direct variable
+```
+
+### Handler Signature
+
+```javascript
+obj.setMethod('doWear', `
+  // Direct variables (NOT in args):
+  //   player = the player who typed the command
+  //   context = connection context
+  //   self = this object (the handler)
+  //
+  // args = resolved pattern variables only:
+  //   args[0] = first %i, %t, or %s value
+  //   args[1] = second %i, %t, or %s value
+  //   etc.
+
+  // For pattern 'wear %t':
+  //   args[0] = the clothing item (same as self)
+  //   player = direct variable
+
+  // Use 'player' directly, not args[0]
+  const result = await self.wear(player);
+  if (!result.success) return result.error;
+
+  // Return string to send to player
+  return 'You wear the ' + self.name + '.';
+`);
 ```
 
 ### Example Handler
 
 ```javascript
 obj.setMethod('doWear', `
-  const wearer = args[0];
+  // Pattern: 'wear %t'
+  // args[0] = clothing (same as self, from %t)
+  // player = direct variable (the wearer)
 
   // 1. Call base method for state change
-  const result = await self.wear(wearer);
+  const result = await self.wear(player);
   if (!result.success) return result.error;
 
   // 2. Swap verbs: unregister 'wear', register 'remove'
-  await wearer.unregisterVerbsFrom(self);
-  await wearer.registerVerb(['remove %t', 'take off %t'], self, 'doRemove');
+  await player.unregisterVerbsFrom(self);
+  await player.registerVerb(['remove %t', 'take off %t'], self, 'doRemove');
 
   // 3. Announce to room
-  const room = await $.load(wearer.location);
-  await $.pronoun.announce(room, '%N puts on %d.', wearer, self);
+  const room = await $.load(player.location);
+  await $.pronoun.announce(room, '%N puts on %d.', player, self);
 
   return result.message;
+`);
+```
+
+### Common Pattern Examples
+
+```javascript
+// Pattern: 'drop %i' - args[0] is the item to drop
+obj.setMethod('drop', `
+  const item = args[0];  // Resolved item from %i
+  // player is a direct variable
+
+  if (!item) return 'Drop what?';
+
+  await item.moveTo(player.location, player);
+  return 'You drop ' + item.name + '.';
+`);
+
+// Pattern: 'help' or 'help %s' - args[0] is optional topic
+obj.setMethod('help', `
+  const topic = args[0];  // Optional topic from %s (or undefined)
+  // player is a direct variable
+
+  if (!topic) {
+    return 'Available commands: look, get, drop, ...';
+  }
+  return 'Help for ' + topic + ': ...';
+`);
+
+// Pattern: 'eat %t' - args[0] is self (the food)
+obj.setMethod('eat', `
+  // args[0] = self (from %t, redundant but present)
+  // player is a direct variable (the eater)
+
+  const result = await self.consume(player);
+  return result.success ? 'Delicious!' : result.error;
 `);
 ```
 
@@ -373,40 +447,58 @@ async connect() {
 ### Item Usage
 
 ```javascript
-// Food item
+// Food item - register verb when picked up
 obj.setMethod('onArrived', `
-  if (args[0]?.owner) {
-    const owner = await $.load(args[0].owner);
+  // onArrived is NOT a verb handler, it's a lifecycle hook
+  // args[0] = dest, args[1] = source, args[2] = mover
+  const dest = args[0];
+  if (dest?.owner) {
+    const owner = await $.load(dest.owner);
     await owner.registerVerb(['eat %t'], self, 'doEat');
   }
 `);
 
+// Verb handler - uses direct 'player' variable
 obj.setMethod('doEat', `
-  const eater = args[0];
-  
+  // Pattern: 'eat %t'
+  // args[0] = self (from %t, same as self)
+  // player = direct variable (the eater)
+
   // Consume food
-  const result = await self.consume(eater);
+  const result = await self.consume(player);
   if (!result.success) return result.error;
-  
+
   // Unregister verb (food is gone)
-  await eater.unregisterVerbsFrom(self);
-  
+  await player.unregisterVerbsFrom(self);
+
   // Recycle object
   await $.recycler.recycle(self);
-  
+
   return 'You eat the ' + self.name + '.';
 `);
 ```
 
 ## Best Practices
 
-1. **Register in onArrived, unregister in onLeaving** - Hooks handle the lifecycle
-2. **Use unregisterVerbsFrom(source)** - Removes ALL verbs from that source
-3. **Return strings from handlers** - They're sent to the player automatically
-4. **Use %t for "this object"** - Cleaner than %i when verb is item-specific
-5. **Include aliases** - `['eat %t', 'consume %t', 'devour %t']`
-6. **Swap verbs on state change** - wear/remove, open/close, lock/unlock
-7. **Check conditions in handlers** - Not at registration time
+1. **Use `player` directly in verb handlers** - It's a direct variable, NOT `args[0]`
+2. **`args` only contains pattern variables** - `%i`, `%t`, `%s` values, nothing else
+3. **Register in onArrived, unregister in onLeaving** - Hooks handle the lifecycle
+4. **Use unregisterVerbsFrom(source)** - Removes ALL verbs from that source
+5. **Return strings from handlers** - They're sent to the player automatically
+6. **Use %t for "this object"** - Cleaner than %i when verb is item-specific
+7. **Include aliases** - `['eat %t', 'consume %t', 'devour %t']`
+8. **Swap verbs on state change** - wear/remove, open/close, lock/unlock
+9. **Check conditions in handlers** - Not at registration time
+
+### Verb Handler vs Lifecycle Hook Args
+
+**IMPORTANT:** Verb handlers and lifecycle hooks use different argument conventions:
+
+| Method Type | args[0] | args[1] | args[2] | `player` variable |
+|-------------|---------|---------|---------|-------------------|
+| **Verb handler** (`doEat`, `drop`, etc.) | First %i/%t/%s | Second %i/%t/%s | Third... | ✓ Available |
+| **Lifecycle hook** (`onArrived`, etc.) | dest | source | mover | ✗ Not available |
+| **Direct call** (`moveTo`, etc.) | First arg passed | Second arg | Third... | ✗ Not available |
 
 ## Common Patterns
 

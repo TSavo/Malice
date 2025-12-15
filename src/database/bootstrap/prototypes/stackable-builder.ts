@@ -149,10 +149,12 @@ export class StackableBuilder {
       if (!dest || !dest.contents) return;
 
       // Look for other stacks of same type
-      for (const objId of dest.contents) {
-        if (objId === self.id) continue;  // Skip self
+      for (const item of dest.contents) {
+        // Handle both RuntimeObjects (from objref) and raw IDs (numbers)
+        const itemId = item?.id ?? item;
+        if (itemId === self.id) continue;  // Skip self
 
-        const other = await $.load(objId);
+        const other = (typeof item === 'number') ? await $.load(item) : item;
         if (!other) continue;
 
         // Check if it's a matching stack

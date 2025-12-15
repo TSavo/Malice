@@ -123,6 +123,8 @@ export class BodyFactoryBuilder {
         bones: ['radius', 'ulna'],
         coverable: true,
         removable: true,
+        calories: 75,
+        maxCalories: 100,
       });
       await forearm.addPart('hand', hand.id);
 
@@ -140,6 +142,8 @@ export class BodyFactoryBuilder {
         bones: ['clavicle', 'scapula'],
         coverable: true,
         removable: false,
+        calories: 150,
+        maxCalories: 200,
       });
       await shoulder.addPart('arm', arm.id);
 
@@ -159,6 +163,8 @@ export class BodyFactoryBuilder {
         coverable: true,
         removable: true,
         dexterity: 1,
+        calories: 50,
+        maxCalories: 75,
       });
 
       const leg = await self.createPart(bodyPartId, side + ' leg', ownerId, {
@@ -176,6 +182,8 @@ export class BodyFactoryBuilder {
         bones: ['patella'],
         coverable: true,
         removable: true,
+        calories: 100,
+        maxCalories: 150,
       });
       await knee.addPart('leg', leg.id);
 
@@ -183,6 +191,8 @@ export class BodyFactoryBuilder {
         bones: ['femur'],
         coverable: true,
         removable: true,
+        calories: 250,
+        maxCalories: 350,
       });
       await thigh.addPart('knee', knee.id);
 

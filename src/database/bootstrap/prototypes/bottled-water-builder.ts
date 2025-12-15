@@ -44,8 +44,11 @@ export class BottledWaterBuilder {
 
     // Override drink to handle sealed bottles
     obj.setMethod('drink', `
-      const context = args[0];
-      const drinker = args[1];
+      // Args from verb pattern 'drink %t':
+      //   args[0] = handler (the drink, same as self) - from %t
+      // Direct variables:
+      //   player = the player executing the command
+      const drinker = player;
 
       if (!drinker) {
         return 'Drink what?';
@@ -102,8 +105,11 @@ export class BottledWaterBuilder {
 
     // Open the bottle
     obj.setMethod('open', `
-      const context = args[0];
-      const opener = args[1];
+      // Args from verb pattern 'open %t':
+      //   args[0] = handler (the bottle, same as self) - from %t
+      // Direct variables:
+      //   player = the player executing the command
+      const opener = player;
 
       if (!self.sealed) {
         return 'The bottle is already open.';
@@ -141,8 +147,9 @@ export class BottledWaterBuilder {
 
       // If arriving in a room with players
       if (dest && dest.contents) {
-        for (const id of dest.contents) {
-          const obj = await $.load(id);
+        for (const item of dest.contents) {
+          // Handle both RuntimeObjects (from objref) and raw IDs (numbers)
+          const obj = (typeof item === 'number') ? await $.load(item) : item;
           if (obj && obj.registerVerb) {
             await obj.registerVerb(['drink ' + self.name, 'drink water', 'drink %t'], self, 'drink');
             if (self.sealed) {

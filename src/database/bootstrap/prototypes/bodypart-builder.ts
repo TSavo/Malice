@@ -1001,8 +1001,9 @@ export class BodyPartBuilder {
       const contents = self.contents || [];
       if (contents.length > 0) {
         const items = [];
-        for (const itemId of contents) {
-          const item = await $.load(itemId);
+        for (const itemRef of contents) {
+          // Handle both RuntimeObjects (from objref) and raw IDs (numbers)
+          const item = (typeof itemRef === 'number') ? await $.load(itemRef) : itemRef;
           if (item) {
             items.push(item.name || 'something');
           }

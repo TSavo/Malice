@@ -81,8 +81,10 @@ services:
       - MCP_PORT=3001
       - MONGO_URI=mongodb://mongodb:27017
       - MONGO_DB=malice
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
     volumes:
-      - npc_agent_sessions:/app/.claude
+      # Mount host's Claude credentials for Max subscription auth
+      - ${HOME}/.claude:/home/node/.claude
     depends_on:
       mongodb:
         condition: service_healthy
@@ -93,8 +95,6 @@ services:
 
 volumes:
   mongodb_data:
-    driver: local
-  npc_agent_sessions:
     driver: local
 
 networks:

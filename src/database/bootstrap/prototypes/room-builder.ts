@@ -118,11 +118,13 @@ export class RoomBuilder {
 
       // Show contents (agents/objects in room), excluding the viewer
       const contents = self.contents || [];
-      const others = contents.filter(id => id !== viewer?.id);
+      // Handle both RuntimeObjects (from objref) and raw IDs - extract ID for comparison
+      const others = contents.filter(item => (item?.id ?? item) !== viewer?.id);
       if (others.length > 0) {
         output += '\\r\\nYou see:\\r\\n';
-        for (const objId of others) {
-          const obj = await $.load(objId);
+        for (const item of others) {
+          // Handle both RuntimeObjects (from objref) and raw IDs (numbers)
+          const obj = (typeof item === 'number') ? await $.load(item) : item;
           if (obj) {
             const shortDesc = await obj.shortDesc();
             output += \`  - \${shortDesc}\\r\\n\`;
@@ -409,9 +411,11 @@ export class RoomBuilder {
       // Notify other agents in the room that this person left
       // They should remove them from watch lists, etc.
       const contents = self.contents || [];
-      for (const id of contents) {
-        if (id === obj.id) continue; // Skip the one who left
-        const other = await $.load(id);
+      for (const item of contents) {
+        // Handle both RuntimeObjects (from objref) and raw IDs (numbers)
+        const itemId = item?.id ?? item;
+        if (itemId === obj.id) continue; // Skip the one who left
+        const other = (typeof item === 'number') ? await $.load(item) : item;
         if (other && other.onOtherLeft) {
           await other.onOtherLeft(obj);
         }
@@ -438,8 +442,9 @@ export class RoomBuilder {
 
       // Count agents (objects with canSee/canHear methods)
       let agentCount = 0;
-      for (const id of contents) {
-        const obj = await $.load(id);
+      for (const item of contents) {
+        // Handle both RuntimeObjects (from objref) and raw IDs (numbers)
+        const obj = (typeof item === 'number') ? await $.load(item) : item;
         if (obj && (obj.canSee || obj.canHear)) {
           agentCount++;
         }
@@ -645,8 +650,9 @@ export class RoomBuilder {
 
       // If agents are present, register sit verb for them
       const contents = self.contents || [];
-      for (const objId of contents) {
-        const obj = await $.load(objId);
+      for (const item of contents) {
+        // Handle both RuntimeObjects (from objref) and raw IDs (numbers)
+        const obj = (typeof item === 'number') ? await $.load(item) : item;
         if (obj && obj.registerVerb) {
           await obj.registerVerb('sit', self, 'sit');
         }

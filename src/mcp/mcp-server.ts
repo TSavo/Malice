@@ -998,7 +998,7 @@ export class MaliceMCPServer {
 
         // Set location if provided
         if (locationId !== undefined) {
-          props.location = { type: 'number', value: locationId };
+          props.location = { type: 'objref', value: locationId };
         }
 
         const clone = await this.manager.create({
@@ -1115,7 +1115,7 @@ export class MaliceMCPServer {
 
         // Build properties with location
         const props: Record<string, any> = {
-          location: { type: 'number', value: locationId },
+          location: { type: 'objref', value: locationId },
         };
 
         // Add any override properties
@@ -1819,12 +1819,23 @@ ACTIONS:
       `Consolidated AI-controlled human management tool.
 
 ACTIONS:
-  spawn   - Create a new AI-controlled human (role, name?, description?, locationId?, sex?, age?)
+  spawn   - Create a new AI-controlled human (role, name?, description?, locationId?, sex?, age?, personality?, history?)
   despawn - Remove an AI human (humanId, recycle?)
   list    - List all AI humans (role?)
   info    - Get detailed AI human info (humanId)
   do      - Execute a command as AI human (humanId, command)
-  look    - Get what AI human sees (humanId)`,
+  look    - Get what AI human sees (humanId)
+
+PROFILE ACTIONS (for AI agent context):
+  profile        - Get full NPC profile (humanId) - returns personality, history, notes, memories
+  setPersonality - Set personality traits (humanId, personality)
+  setHistory     - Set backstory/history (humanId, history)
+
+MEMORY ACTIONS (for persistent critical memories):
+  remember - Store a critical memory (humanId, text, importance?, tags?)
+  recall   - Get memories for an NPC (humanId, importance?, tag?, limit?)
+  forget   - Remove a memory by index (humanId, index)
+  memories - Get formatted memory summary for an NPC (humanId, criticalOnly?)`,
       {
         action: z.string().describe('Action to perform (see help above)'),
         role: z.string().optional().describe('Role for this AI (e.g., "guard", "shopkeeper")'),
@@ -1836,8 +1847,30 @@ ACTIONS:
         humanId: z.number().optional().describe('Human object ID'),
         command: z.string().optional().describe('Command to execute'),
         recycle: z.boolean().optional().describe('Whether to recycle on despawn (default: true)'),
+        // Profile action parameters
+        personality: z.union([z.string(), z.object({
+          traits: z.array(z.string()).optional(),
+          quirks: z.array(z.string()).optional(),
+          values: z.array(z.string()).optional(),
+          fears: z.array(z.string()).optional(),
+          motivations: z.array(z.string()).optional(),
+        })]).optional().describe('Personality: string description or { traits, quirks, values, fears, motivations }'),
+        history: z.union([z.string(), z.object({
+          backstory: z.string().optional(),
+          events: z.array(z.string()).optional(),
+          secrets: z.array(z.string()).optional(),
+          relationships: z.record(z.string()).optional(),
+        })]).optional().describe('History: string description or { backstory, events, secrets, relationships }'),
+        // Memory action parameters
+        text: z.string().optional().describe('Memory text to store'),
+        importance: z.enum(['critical', 'important', 'normal']).optional().describe('Memory importance level'),
+        tags: z.array(z.string()).optional().describe('Tags for categorizing the memory'),
+        tag: z.string().optional().describe('Filter memories by tag'),
+        index: z.number().optional().describe('Memory index to remove (0 = most recent)'),
+        limit: z.number().optional().describe('Max memories to return'),
+        criticalOnly: z.boolean().optional().describe('Only return critical memories'),
       },
-      async ({ action, role, name, description, locationId, sex, age, humanId, command, recycle }) => {
+      async ({ action, role, name, description, locationId, sex, age, humanId, command, recycle, personality, history, text, importance, tags, tag, index, limit, criticalOnly }) => {
         const aiRegistry = await this.getAlias('ai');
         if (!aiRegistry) {
           return {
@@ -1864,6 +1897,8 @@ ACTIONS:
               if (locationId !== undefined) options.location = locationId;
               if (sex) options.sex = sex;
               if (age !== undefined) options.age = age;
+              if (personality) options.personality = personality;
+              if (history) options.history = history;
 
               const human = await aiRegistry.call('spawn', role, options);
               return ok({ spawned: true, id: human.id, name: human.name, role });
@@ -2038,8 +2073,74 @@ ACTIONS:
               });
             }
 
+            // ═══════════════════════════════════════════════════════════════
+            // PROFILE ACTIONS
+            // ═══════════════════════════════════════════════════════════════
+
+            case 'profile': {
+              if (humanId === undefined) return err('humanId required');
+              const result = await aiRegistry.call('getProfile', humanId);
+              return ok(result);
+            }
+
+            case 'setPersonality': {
+              if (humanId === undefined) return err('humanId required');
+              if (!personality) return err('personality required');
+              const result = await aiRegistry.call('setPersonality', humanId, personality);
+              return ok(result);
+            }
+
+            case 'setHistory': {
+              if (humanId === undefined) return err('humanId required');
+              if (!history) return err('history required');
+              const result = await aiRegistry.call('setHistory', humanId, history);
+              return ok(result);
+            }
+
+            // ═══════════════════════════════════════════════════════════════
+            // MEMORY ACTIONS
+            // ═══════════════════════════════════════════════════════════════
+
+            case 'remember': {
+              if (humanId === undefined) return err('humanId required');
+              if (!text) return err('text required');
+
+              const result = await aiRegistry.call('remember', humanId, text, importance || 'normal', tags || []);
+              return ok(result);
+            }
+
+            case 'recall': {
+              if (humanId === undefined) return err('humanId required');
+
+              const options: any = {};
+              if (importance) options.importance = importance;
+              if (tag) options.tag = tag;
+              if (limit) options.limit = limit;
+
+              const result = await aiRegistry.call('recall', humanId, options);
+              return ok(result);
+            }
+
+            case 'forget': {
+              if (humanId === undefined) return err('humanId required');
+              if (index === undefined) return err('index required');
+
+              const result = await aiRegistry.call('forget', humanId, index);
+              return ok(result);
+            }
+
+            case 'memories': {
+              if (humanId === undefined) return err('humanId required');
+
+              const options: any = {};
+              if (criticalOnly) options.criticalOnly = criticalOnly;
+
+              const summary = await aiRegistry.call('getMemorySummary', humanId, options);
+              return ok({ humanId, summary: summary || '(no memories)' });
+            }
+
             default:
-              return err(`Unknown action: ${action}. Valid: spawn, despawn, list, info, do, look`);
+              return err(`Unknown action: ${action}. Valid: spawn, despawn, list, info, do, look, profile, setPersonality, setHistory, remember, recall, forget, memories`);
           }
         } catch (error) {
           return err(`Error: ${error instanceof Error ? error.message : String(error)}`);

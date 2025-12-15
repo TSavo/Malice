@@ -600,6 +600,26 @@ export class ObjectManager {
   }
 
   /**
+   * Emit a game event to the game_events collection
+   * Used by $.events.emit() for NPC agent service and other external consumers
+   * @param event - Event object with type, data, timestamp
+   * @returns The inserted event's _id as string
+   */
+  async _emitGameEvent(event: {
+    type: string;
+    data: Record<string, unknown>;
+    timestamp: string;
+    processed: boolean;
+  }): Promise<string> {
+    const collection = this.db.getCollection('game_events');
+    const result = await collection.insertOne({
+      ...event,
+      createdAt: new Date(), // For TTL index
+    });
+    return result.insertedId.toString();
+  }
+
+  /**
    * Setup MongoDB change stream watcher
    * Invalidates cache when objects are modified by other servers/processes
    * Enables multi-server deployment with shared MongoDB

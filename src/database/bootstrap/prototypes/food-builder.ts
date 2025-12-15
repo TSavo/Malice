@@ -59,8 +59,12 @@ export class FoodBuilder {
     // The eat verb - registered when food is in player's inventory or room
     // Pattern: eat %t (this food) - player eats self
     obj.setMethod('eat', `
-      const context = args[0];
-      const eater = args[1]; // The player eating
+      // Args from verb pattern 'eat %t':
+      //   args[0] = handler (the food, same as self) - from %t
+      // Direct variables:
+      //   player = the player executing the command
+      //   self = this food object
+      const eater = player; // The player executing the command
 
       if (!eater) {
         return 'Eat what?';
@@ -188,8 +192,9 @@ export class FoodBuilder {
 
       // If arriving in a room with a player, they can see it to eat
       if (dest && dest.contents) {
-        for (const id of dest.contents) {
-          const obj = await $.load(id);
+        for (const item of dest.contents) {
+          // Handle both RuntimeObjects (from objref) and raw IDs (numbers)
+          const obj = (typeof item === 'number') ? await $.load(item) : item;
           if (obj && obj.registerVerb) {
             await obj.registerVerb(['eat ' + self.name, 'eat %t'], self, 'eat');
           }
