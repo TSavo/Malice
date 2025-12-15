@@ -3,24 +3,22 @@
  *
  * Standalone service that manages AI agents for NPCs.
  * Runs in its own Docker container, connects to game MCP server.
+ * Uses MongoDB change streams to react to NPC spawn/despawn events.
  *
  * Environment variables:
  * - MCP_HOST: Game MCP server host (default: malice-game)
  * - MCP_PORT: Game MCP server port (default: 3001)
- * - POLL_INTERVAL: How often to check for new NPCs (default: 30000ms)
+ * - MONGO_URI: MongoDB connection string (default: mongodb://mongodb:27017)
+ * - MONGO_DB: Database name (default: malice)
  */
 
+import { MongoClient, ChangeStream, ChangeStreamDocument } from 'mongodb';
 import { NPCAgent } from './src/npc-agent/npc-agent.js';
 
 const MCP_HOST = process.env.MCP_HOST || 'localhost';
 const MCP_PORT = parseInt(process.env.MCP_PORT || '3001', 10);
-const POLL_INTERVAL = parseInt(process.env.POLL_INTERVAL || '30000', 10);
-
-interface AIRegistration {
-  role: string;
-  human: { id: number } | number;
-  spawnedAt?: string;
-}
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://mongodb:27017';
+const MONGO_DB = process.env.MONGO_DB || 'malice';
 
 interface ManagedAgent {
   agent: NPCAgent;
@@ -30,13 +28,13 @@ interface ManagedAgent {
 }
 
 const agents = new Map<number, ManagedAgent>();
+let mongoClient: MongoClient;
+let changeStream: ChangeStream | null = null;
 
 /**
  * Call MCP tool via HTTP
  */
 async function mcpCall(tool: string, args: Record<string, unknown>): Promise<any> {
-  const sessionId = `npc-agent-service-${Date.now()}`;
-
   // Initialize session
   const initRes = await fetch(`http://${MCP_HOST}:${MCP_PORT}/mcp`, {
     method: 'POST',
@@ -97,13 +95,6 @@ async function mcpCall(tool: string, args: Record<string, unknown>): Promise<any
 }
 
 /**
- * Get object property via MCP
- */
-async function getProperty(objectId: number, name: string): Promise<any> {
-  return mcpCall('get_property', { objectId, name });
-}
-
-/**
  * Set object property via MCP
  */
 async function setProperty(objectId: number, name: string, value: any): Promise<void> {
@@ -111,24 +102,12 @@ async function setProperty(objectId: number, name: string, value: any): Promise<
 }
 
 /**
- * List AI-controlled NPCs via MCP
- */
-async function listAINpcs(): Promise<Array<{ id: number; name: string; role: string; sessionId?: string }>> {
-  const result = await mcpCall('ai', { action: 'list' });
-  return result.humans || [];
-}
-
-/**
  * Create agent for an NPC
  */
-async function createAgentForNpc(npcId: number, name: string, role: string): Promise<ManagedAgent> {
-  // Check for existing session ID
-  let existingSessionId: string | undefined;
-  try {
-    const prop = await getProperty(npcId, 'agentSessionId');
-    existingSessionId = prop?.value;
-  } catch {
-    // No existing session
+async function createAgentForNpc(npcId: number, name: string, role: string, existingSessionId?: string): Promise<ManagedAgent> {
+  // Skip if already exists
+  if (agents.has(npcId)) {
+    return agents.get(npcId)!;
   }
 
   const agent = new NPCAgent({
@@ -159,79 +138,187 @@ async function createAgentForNpc(npcId: number, name: string, role: string): Pro
   if (existingSessionId) {
     console.log(`[NPC-Agent] Resumed ${name} (#${npcId}) with session ${existingSessionId}`);
   } else {
-    console.log(`[NPC-Agent] Created new agent for ${name} (#${npcId})`);
+    console.log(`[NPC-Agent] Created agent for ${name} (#${npcId})`);
   }
 
   return managed;
 }
 
 /**
- * Sync agents with AI registry
+ * Remove agent for an NPC
  */
-async function syncAgents(): Promise<void> {
-  try {
-    const npcs = await listAINpcs();
-
-    for (const npc of npcs) {
-      if (!agents.has(npc.id)) {
-        await createAgentForNpc(npc.id, npc.name, npc.role);
-      }
-    }
-
-    // Remove agents for NPCs no longer in registry
-    const npcIds = new Set(npcs.map(n => n.id));
-    for (const [id, managed] of agents) {
-      if (!npcIds.has(id)) {
-        console.log(`[NPC-Agent] Removing agent for ${managed.name} (#${id})`);
-        agents.delete(id);
-      }
-    }
-  } catch (err) {
-    console.error('[NPC-Agent] Failed to sync agents:', err);
+function removeAgent(npcId: number): void {
+  const managed = agents.get(npcId);
+  if (managed) {
+    console.log(`[NPC-Agent] Removed agent for ${managed.name} (#${npcId})`);
+    agents.delete(npcId);
   }
 }
 
 /**
- * Main service loop
+ * Load existing AI NPCs from database
+ */
+async function loadExistingNpcs(): Promise<void> {
+  const db = mongoClient.db(MONGO_DB);
+  const objects = db.collection('objects');
+
+  // Find the $.ai registry object by looking for the AI object with registry property
+  const aiObj = await objects.findOne({
+    'properties.name': 'AI',
+    'properties.registry': { $exists: true },
+  });
+
+  if (!aiObj) {
+    console.log('[NPC-Agent] No AI registry found yet');
+    return;
+  }
+
+  const registry = aiObj.properties?.registry || {};
+
+  for (const [npcIdStr, entry] of Object.entries(registry)) {
+    const npcId = parseInt(npcIdStr, 10);
+    if (isNaN(npcId)) continue;
+
+    const reg = entry as { role: string; human?: { type: string; value: number } };
+
+    // Load NPC object to get name and session ID
+    const npcObj = await objects.findOne({ _id: npcId });
+    if (!npcObj) continue;
+
+    const name = npcObj.properties?.name || `NPC #${npcId}`;
+    const sessionId = npcObj.properties?.agentSessionId;
+
+    await createAgentForNpc(npcId, name, reg.role, sessionId);
+  }
+}
+
+/**
+ * Watch for changes to AI registry
+ */
+async function watchAIRegistry(): Promise<void> {
+  const db = mongoClient.db(MONGO_DB);
+  const objects = db.collection('objects');
+
+  // Find the AI registry object ID
+  const aiObj = await objects.findOne({
+    'properties.name': 'AI',
+    'properties.registry': { $exists: true },
+  });
+
+  const aiId = aiObj?._id;
+
+  // Watch for changes to the AI registry object
+  const pipeline = aiId
+    ? [{ $match: { 'documentKey._id': aiId } }]
+    : [{ $match: { 'fullDocument.properties.name': 'AI' } }];
+
+  changeStream = objects.watch(pipeline, { fullDocument: 'updateLookup' });
+
+  changeStream.on('change', async (change: ChangeStreamDocument) => {
+    if (change.operationType === 'update' || change.operationType === 'replace') {
+      const doc = (change as any).fullDocument;
+      if (!doc?.properties?.registry) return;
+
+      const registry = doc.properties.registry;
+      const currentNpcIds = new Set(Object.keys(registry).map(id => parseInt(id, 10)));
+
+      // Add new NPCs
+      for (const [npcIdStr, entry] of Object.entries(registry)) {
+        const npcId = parseInt(npcIdStr, 10);
+        if (isNaN(npcId) || agents.has(npcId)) continue;
+
+        const reg = entry as { role: string };
+
+        // Load NPC object to get name
+        const npcObj = await objects.findOne({ _id: npcId });
+        const name = npcObj?.properties?.name || `NPC #${npcId}`;
+        const sessionId = npcObj?.properties?.agentSessionId;
+
+        await createAgentForNpc(npcId, name, reg.role, sessionId);
+      }
+
+      // Remove deleted NPCs
+      for (const [npcId] of agents) {
+        if (!currentNpcIds.has(npcId)) {
+          removeAgent(npcId);
+        }
+      }
+    }
+  });
+
+  changeStream.on('error', (err) => {
+    console.error('[NPC-Agent] Change stream error:', err);
+    // Attempt to restart
+    setTimeout(watchAIRegistry, 5000);
+  });
+
+  console.log('[NPC-Agent] Watching AI registry for changes');
+}
+
+/**
+ * Wait for MCP server to be ready
+ */
+async function waitForMCP(): Promise<boolean> {
+  console.log('[NPC-Agent] Waiting for MCP server...');
+  for (let i = 0; i < 30; i++) {
+    try {
+      await mcpCall('list_objects', { limit: 1 });
+      return true;
+    } catch {
+      await new Promise(r => setTimeout(r, 2000));
+    }
+  }
+  return false;
+}
+
+/**
+ * Main service
  */
 async function main(): Promise<void> {
   console.log('═══════════════════════════════════════════════════════════');
   console.log('  NPC Agent Service');
   console.log('═══════════════════════════════════════════════════════════');
   console.log(`  MCP Server: http://${MCP_HOST}:${MCP_PORT}/mcp`);
-  console.log(`  Poll Interval: ${POLL_INTERVAL}ms`);
+  console.log(`  MongoDB: ${MONGO_URI}/${MONGO_DB}`);
   console.log('═══════════════════════════════════════════════════════════\n');
 
-  // Wait for MCP server to be ready
-  console.log('[NPC-Agent] Waiting for MCP server...');
-  let ready = false;
-  for (let i = 0; i < 30; i++) {
-    try {
-      await listAINpcs();
-      ready = true;
-      break;
-    } catch {
-      await new Promise(r => setTimeout(r, 2000));
-    }
-  }
+  // Connect to MongoDB
+  console.log('[NPC-Agent] Connecting to MongoDB...');
+  mongoClient = new MongoClient(MONGO_URI);
+  await mongoClient.connect();
+  console.log('[NPC-Agent] MongoDB connected');
 
-  if (!ready) {
+  // Wait for MCP server
+  if (!await waitForMCP()) {
     console.error('[NPC-Agent] MCP server not available after 60s, exiting');
     process.exit(1);
   }
-
   console.log('[NPC-Agent] MCP server ready\n');
 
-  // Initial sync
-  await syncAgents();
-  console.log(`[NPC-Agent] Managing ${agents.size} NPC agents\n`);
+  // Load existing NPCs
+  await loadExistingNpcs();
+  console.log(`[NPC-Agent] Loaded ${agents.size} existing NPC agents\n`);
 
-  // Periodic sync
-  setInterval(syncAgents, POLL_INTERVAL);
+  // Watch for changes (event-driven, no polling)
+  await watchAIRegistry();
 
-  // Keep running
   console.log('[NPC-Agent] Service running. Press Ctrl+C to stop.\n');
 }
+
+// Graceful shutdown
+async function shutdown(): Promise<void> {
+  console.log('\n[NPC-Agent] Shutting down...');
+  if (changeStream) {
+    await changeStream.close();
+  }
+  if (mongoClient) {
+    await mongoClient.close();
+  }
+  process.exit(0);
+}
+
+process.on('SIGINT', shutdown);
+process.on('SIGTERM', shutdown);
 
 main().catch((err) => {
   console.error('[NPC-Agent] Fatal error:', err);

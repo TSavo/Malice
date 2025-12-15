@@ -14,6 +14,7 @@ docker logs -f malice-npc-agent
 
 The NPC agent service automatically:
 - Connects to the game's MCP server
+- Uses MongoDB change streams to react to NPC spawn/despawn events (no polling)
 - Creates agents for all AI-controlled NPCs in the registry
 - Persists session IDs to MongoDB
 - Resumes sessions on restart
@@ -407,7 +408,8 @@ The NPC agent runs as a separate Docker container for isolation and scalability.
 |----------|---------|-------------|
 | `MCP_HOST` | `malice-game` | Game MCP server hostname |
 | `MCP_PORT` | `3001` | Game MCP server port |
-| `POLL_INTERVAL` | `30000` | How often to sync with AI registry (ms) |
+| `MONGO_URI` | `mongodb://mongodb:27017` | MongoDB connection string |
+| `MONGO_DB` | `malice` | Database name |
 
 ### Session Persistence
 
