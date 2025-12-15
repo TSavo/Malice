@@ -9,6 +9,8 @@ import { McpServer, ResourceTemplate } from '@modelcontextprotocol/sdk/server/mc
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { createServer, IncomingMessage, ServerResponse } from 'http';
 import { z } from 'zod';
+import * as fs from 'fs';
+import * as path from 'path';
 import type { ObjectManager } from '../database/object-manager.js';
 import type { ObjId } from '../../types/object.js';
 import { MCPTelnetClient } from './telnet-client.js';
@@ -2849,6 +2851,111 @@ Core Objects:
               uri: 'moo://ai',
               mimeType: 'application/json',
               text: JSON.stringify({ error: String(err) }),
+            }],
+          };
+        }
+      }
+    );
+
+    // City AI documentation resources - expose docs/city-ai/*.md files
+    const cityAiDir = path.join(process.cwd(), 'docs', 'city-ai');
+
+    // List all city-ai docs
+    server.resource(
+      'city-ai',
+      'moo://city-ai',
+      { description: 'List all city AI documentation files' },
+      async () => {
+        try {
+          const files = fs.readdirSync(cityAiDir)
+            .filter(f => f.endsWith('.md'))
+            .map(f => ({
+              name: f.replace('.md', ''),
+              uri: `moo://city-ai/${f.replace('.md', '').toLowerCase()}`
+            }));
+          return {
+            contents: [{
+              uri: 'moo://city-ai',
+              mimeType: 'application/json',
+              text: JSON.stringify({ files }, null, 2),
+            }],
+          };
+        } catch (err) {
+          return {
+            contents: [{
+              uri: 'moo://city-ai',
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: String(err) }),
+            }],
+          };
+        }
+      }
+    );
+
+    // Individual city-ai doc resources
+    server.resource(
+      'city-ai-doc',
+      new ResourceTemplate('moo://city-ai/{name}', {
+        list: async () => {
+          try {
+            const files = fs.readdirSync(cityAiDir).filter(f => f.endsWith('.md'));
+            return {
+              resources: files.map(f => ({
+                uri: `moo://city-ai/${f.replace('.md', '').toLowerCase()}`,
+                name: f.replace('.md', ''),
+                description: `City AI documentation: ${f.replace('.md', '')}`,
+              }))
+            };
+          } catch {
+            return { resources: [] };
+          }
+        },
+      }),
+      { description: 'Get a specific city AI documentation file' },
+      async (_uri: URL, variables: { name?: string | string[] }) => {
+        const nameVar = variables.name;
+        const name = Array.isArray(nameVar) ? nameVar[0] : nameVar;
+        if (!name) {
+          return {
+            contents: [{
+              uri: 'moo://city-ai/unknown',
+              mimeType: 'text/plain',
+              text: 'Error: No document name provided',
+            }],
+          };
+        }
+
+        try {
+          // Try exact match first, then case-insensitive
+          const files = fs.readdirSync(cityAiDir).filter(f => f.endsWith('.md'));
+          const match = files.find(f =>
+            f.replace('.md', '').toLowerCase() === name.toLowerCase()
+          );
+
+          if (!match) {
+            return {
+              contents: [{
+                uri: `moo://city-ai/${name}`,
+                mimeType: 'text/plain',
+                text: `Error: Document '${name}' not found. Available: ${files.map(f => f.replace('.md', '')).join(', ')}`,
+              }],
+            };
+          }
+
+          const content = fs.readFileSync(path.join(cityAiDir, match), 'utf-8');
+          return {
+            contents: [{
+              uri: `moo://city-ai/${name}`,
+              mimeType: 'text/markdown',
+              text: content,
+            }],
+          };
+        } catch (err) {
+          return {
+            contents: [{
+              uri: `moo://city-ai/${name}`,
+              mimeType: 'text/plain',
+              text: `Error reading document: ${String(err)}`,
             }],
           };
         }
