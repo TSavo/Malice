@@ -396,43 +396,163 @@ await notes({ action: 'add', objectId: npcId, text: 'Speaks in short sentences. 
 
 ### Managing Memories
 
-Memories are for critical facts the NPC learns during play that must persist:
+Memories are for critical facts the NPC learns **during play** that must persist across sessions. Unlike notes (which are builder guidance), memories are runtime data that the NPC accumulates through interactions.
+
+#### Memories vs Notes
+
+| Aspect | Notes | Memories |
+|--------|-------|----------|
+| **Created by** | Builders/you | NPC during play |
+| **Purpose** | Guide behavior | Remember facts |
+| **When added** | Setup time | Runtime |
+| **Content** | "Should be hostile to gangs" | "Player Jack is in a gang" |
+| **Persistence** | $.notes system | $.ai.memories |
+
+Think of it this way:
+- **Notes** = Director's instructions to an actor
+- **Memories** = What the character has experienced
+
+#### Importance Levels
 
 ```javascript
-// Store a critical memory
+// CRITICAL - Facts that must NEVER be forgotten
+// Use for: crimes witnessed, betrayals, alliances, life-changing events
 await ai({
   action: 'remember',
   humanId: npcId,
-  text: 'Player "Jack" tried to bribe me with 50 credits. Refused. Watching him.',
+  text: 'Player "Jack" murdered a citizen in front of me',
   importance: 'critical',
-  tags: ['player', 'suspicious']
+  tags: ['player', 'crime', 'murder']
 });
 
-// Store an important memory
+// IMPORTANT - Significant facts that should be remembered
+// Use for: favors owed, schedules, plot-relevant info, relationships
 await ai({
   action: 'remember',
   humanId: npcId,
-  text: 'Shipment arrives at dock 7 every Tuesday at midnight',
+  text: 'Player "Sarah" helped me when I was injured. I owe her.',
   importance: 'important',
-  tags: ['schedule', 'dock']
+  tags: ['player', 'debt', 'positive']
+});
+
+// NORMAL - Useful context but not essential
+// Use for: casual observations, minor events, general info
+await ai({
+  action: 'remember',
+  humanId: npcId,
+  text: 'The coffee at the dispensary has been worse lately',
+  importance: 'normal',
+  tags: ['observation']
+});
+```
+
+#### How Memories Are Injected
+
+Before every NPC interaction, the agent loads all memories and injects them into the system prompt, sorted by importance:
+
+```
+PERSISTENT MEMORIES:
+These are critical memories that persist across sessions. Reference them when relevant.
+
+⚠️ CRITICAL: Player "Jack" murdered a citizen in front of me [player, crime, murder]
+⚠️ CRITICAL: The factory supervisor is skimming supplies [corruption, evidence]
+❗ IMPORTANT: Player "Sarah" helped me when I was injured. I owe her. [player, debt, positive]
+❗ IMPORTANT: Shipment arrives at dock 7 every Tuesday at midnight [schedule, dock]
+• The coffee at the dispensary has been worse lately [observation]
+```
+
+The NPC sees this context and will reference it naturally in responses.
+
+#### Memory Operations
+
+```javascript
+// Store a memory
+await ai({
+  action: 'remember',
+  humanId: npcId,
+  text: 'Player "Jack" tried to bribe me with 50 credits. Refused.',
+  importance: 'critical',
+  tags: ['player', 'bribery', 'suspicious']
 });
 
 // Recall all memories
-await ai({ action: 'recall', humanId: npcId });
+const all = await ai({ action: 'recall', humanId: npcId });
 
-// Recall by importance or tag
-await ai({ action: 'recall', humanId: npcId, criticalOnly: true });
-await ai({ action: 'recall', humanId: npcId, tag: 'player' });
+// Recall only critical memories
+const critical = await ai({ action: 'recall', humanId: npcId, criticalOnly: true });
 
-// Forget a specific memory (by index)
+// Recall by tag
+const playerMemories = await ai({ action: 'recall', humanId: npcId, tag: 'player' });
+
+// Recall with limit
+const recent = await ai({ action: 'recall', humanId: npcId, limit: 5 });
+
+// Forget a specific memory (by index, 0 = most recent)
 await ai({ action: 'forget', humanId: npcId, index: 0 });
+
+// Get memory summary
+const summary = await ai({ action: 'memories', humanId: npcId });
+// Returns: { total: 15, critical: 3, important: 5, normal: 7 }
 ```
 
-**When to use memories:**
-- Player did something noteworthy (good or bad)
-- NPC learned important information
-- Plot-relevant events occurred
-- Relationships changed
+#### When NPCs Should Create Memories
+
+The NPC agent can create its own memories during interactions. Guide this with notes:
+
+```javascript
+// Add a note telling the NPC when to remember things
+await notes({
+  action: 'add',
+  objectId: npcId,
+  text: 'Create CRITICAL memories for: crimes witnessed, threats received, bribes offered. Create IMPORTANT memories for: players who help or hinder, useful information learned.',
+  tags: ['behavior', 'memory']
+});
+```
+
+#### Example: Memory-Driven Interaction
+
+**Setup:**
+```javascript
+// Guard has these memories from previous sessions:
+// CRITICAL: Player "Jack" tried to bribe me with 50 credits. Refused. [player, bribery]
+// IMPORTANT: Player "Sarah" reported a theft. Helpful citizen. [player, positive]
+```
+
+**Jack enters:**
+```
+Guard: *narrows eyes* You again. Keep your credits in your pocket this time,
+and your hands where I can see them. Move along.
+```
+
+**Sarah enters:**
+```
+Guard: Citizen Sarah. Good to see you. Any more trouble with those thieves?
+Let me know if you need assistance.
+```
+
+The guard remembers past interactions and responds accordingly - hostile to Jack (bribery attempt), friendly to Sarah (helpful citizen).
+
+#### Memory Lifecycle Best Practices
+
+1. **Don't over-remember** - Not every interaction needs a memory
+2. **Use appropriate importance** - Reserve CRITICAL for truly critical facts
+3. **Use tags consistently** - Makes filtering and finding memories easier
+4. **Clean up obsolete memories** - If a plot resolves, forget related memories
+5. **Let NPCs remember naturally** - They can create memories during play
+
+#### Common Tags
+
+| Tag | Use for |
+|-----|---------|
+| `player` | Any memory about a specific player |
+| `crime` | Criminal activity witnessed |
+| `positive` | Good interactions |
+| `negative` | Bad interactions |
+| `debt` | Favors owed or owing |
+| `plot` | Plot-relevant information |
+| `schedule` | Times, dates, routines |
+| `location` | Place-specific knowledge |
+| `secret` | Hidden information |
 
 ### Getting Full Profile
 
