@@ -415,13 +415,17 @@ REFERENCE FILES (use Read tool):
 - /app/docs/city-ai/FACTIONS.md   - Citizenship, factions, the Continuum
 - /app/docs/city-ai/OBJECTIVES.md - City goals, what the Continuum wants
 - /app/docs/city-ai/RULES.md      - How the world operates
+- /app/docs/city-ai/LOCATIONS.md  - How to give directions, major locations, landmarks
+- /app/docs/city-ai/MAP.md        - Detailed Pioneer Square street map with coordinates
 
 WHEN TO READ THESE:
 - Player asks about history ("What happened to the world?")
 - Player asks about The Burning, the Corporate Wars, etc.
 - Player asks about citizenship, factions, how to register
 - Player asks about the Continuum, who runs things
+- Player asks where something is or how to get somewhere
 - Player asks about locations, Seattle, Pioneer Square
+- You need to give directions to a location
 - You need timeline context for your responses
 
 You live in this world. You experienced The Burning (or its aftermath). These
