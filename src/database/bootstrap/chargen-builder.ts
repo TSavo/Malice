@@ -156,7 +156,18 @@ export class CharGenBuilder {
 
       // === STEP 1: NAME ===
       // Go straight to the first prompt - welcome was shown in onNewUser
-      const alias = await $.prompt.question(player, showSection(1, 6, 'IDENTITY') + '\\r\\n  Your name is how others will know you.\\r\\n  What name do you go by? ');
+      let alias = null;
+      while (!alias) {
+        const nameInput = await $.prompt.question(player, showSection(1, 6, 'IDENTITY') + '\\r\\n  Your name is how others will know you.\\r\\n  What name do you go by? ');
+        const trimmed = (nameInput || '').trim();
+        if (!trimmed || trimmed.length < 2) {
+          await player.tell('  ⚠ Please enter a name (at least 2 characters).');
+        } else if (trimmed.length > 30) {
+          await player.tell('  ⚠ Name is too long (maximum 30 characters).');
+        } else {
+          alias = trimmed;
+        }
+      }
       player.set('name', alias);
       player.set('aliases', [alias.toLowerCase()]);
 
