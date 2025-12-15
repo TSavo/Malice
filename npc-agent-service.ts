@@ -34,6 +34,21 @@ let changeStream: ChangeStream | null = null;
 /**
  * Call MCP tool via HTTP
  */
+/**
+ * Parse SSE response to extract JSON data
+ */
+function parseSSEResponse(text: string): any {
+  // SSE format: "event: message\ndata: {...}\n\n"
+  const lines = text.split('\n');
+  for (const line of lines) {
+    if (line.startsWith('data: ')) {
+      return JSON.parse(line.slice(6));
+    }
+  }
+  // Try parsing as raw JSON if no SSE format
+  return JSON.parse(text);
+}
+
 async function mcpCall(tool: string, args: Record<string, unknown>): Promise<any> {
   // Initialize session
   const initRes = await fetch(`http://${MCP_HOST}:${MCP_PORT}/mcp`, {
@@ -80,7 +95,9 @@ async function mcpCall(tool: string, args: Record<string, unknown>): Promise<any
     throw new Error(`MCP tool call failed: ${toolRes.status}`);
   }
 
-  const result = await toolRes.json();
+  const responseText = await toolRes.text();
+  const result = parseSSEResponse(responseText);
+
   if (result.error) {
     throw new Error(result.error.message);
   }
@@ -163,8 +180,9 @@ async function loadExistingNpcs(): Promise<void> {
   const objects = db.collection('objects');
 
   // Find the $.ai registry object by looking for the AI object with registry property
+  // Note: Properties are stored as { type: 'string', value: 'AI' } in MongoDB
   const aiObj = await objects.findOne({
-    'properties.name': 'AI',
+    'properties.name.value': 'AI',
     'properties.registry': { $exists: true },
   });
 
@@ -173,22 +191,28 @@ async function loadExistingNpcs(): Promise<void> {
     return;
   }
 
-  const registry = aiObj.properties?.registry || {};
+  // Registry is stored as { type: 'object', value: {...} }
+  const registryProp = aiObj.properties?.registry as { type: string; value: Record<string, any> } | undefined;
+  const registry = registryProp?.value || {};
 
   for (const [npcIdStr, entry] of Object.entries(registry)) {
     const npcId = parseInt(npcIdStr, 10);
     if (isNaN(npcId)) continue;
 
-    const reg = entry as { role: string; human?: { type: string; value: number } };
+    // Entry values are also typed: { type: 'object', value: { role: { type: 'string', value: '...' }, ... } }
+    const entryValue = (entry as any)?.value || entry;
+    const role = entryValue?.role?.value || entryValue?.role || 'generic';
 
     // Load NPC object to get name and session ID
     const npcObj = await objects.findOne({ _id: npcId });
     if (!npcObj) continue;
 
-    const name = npcObj.properties?.name || `NPC #${npcId}`;
-    const sessionId = npcObj.properties?.agentSessionId;
+    const nameProp = npcObj.properties?.name as { type: string; value: string } | undefined;
+    const name = nameProp?.value || `NPC #${npcId}`;
+    const sessionIdProp = npcObj.properties?.agentSessionId as { type: string; value: string } | undefined;
+    const sessionId = sessionIdProp?.value;
 
-    await createAgentForNpc(npcId, name, reg.role, sessionId);
+    await createAgentForNpc(npcId, name, role, sessionId);
   }
 }
 
@@ -201,7 +225,7 @@ async function watchAIRegistry(): Promise<void> {
 
   // Find the AI registry object ID
   const aiObj = await objects.findOne({
-    'properties.name': 'AI',
+    'properties.name.value': 'AI',
     'properties.registry': { $exists: true },
   });
 
@@ -210,7 +234,7 @@ async function watchAIRegistry(): Promise<void> {
   // Watch for changes to the AI registry object
   const pipeline = aiId
     ? [{ $match: { 'documentKey._id': aiId } }]
-    : [{ $match: { 'fullDocument.properties.name': 'AI' } }];
+    : [{ $match: { 'fullDocument.properties.name.value': 'AI' } }];
 
   changeStream = objects.watch(pipeline, { fullDocument: 'updateLookup' });
 
@@ -219,7 +243,9 @@ async function watchAIRegistry(): Promise<void> {
       const doc = (change as any).fullDocument;
       if (!doc?.properties?.registry) return;
 
-      const registry = doc.properties.registry;
+      // Registry is stored as { type: 'object', value: {...} }
+      const registryProp = doc.properties.registry as { type: string; value: Record<string, any> };
+      const registry = registryProp?.value || {};
       const currentNpcIds = new Set(Object.keys(registry).map(id => parseInt(id, 10)));
 
       // Add new NPCs
@@ -227,14 +253,18 @@ async function watchAIRegistry(): Promise<void> {
         const npcId = parseInt(npcIdStr, 10);
         if (isNaN(npcId) || agents.has(npcId)) continue;
 
-        const reg = entry as { role: string };
+        // Entry values are also typed
+        const entryValue = (entry as any)?.value || entry;
+        const role = entryValue?.role?.value || entryValue?.role || 'generic';
 
         // Load NPC object to get name
         const npcObj = await objects.findOne({ _id: npcId });
-        const name = npcObj?.properties?.name || `NPC #${npcId}`;
-        const sessionId = npcObj?.properties?.agentSessionId;
+        const nameProp = npcObj?.properties?.name as { type: string; value: string } | undefined;
+        const name = nameProp?.value || `NPC #${npcId}`;
+        const sessionIdProp = npcObj?.properties?.agentSessionId as { type: string; value: string } | undefined;
+        const sessionId = sessionIdProp?.value;
 
-        await createAgentForNpc(npcId, name, reg.role, sessionId);
+        await createAgentForNpc(npcId, name, role, sessionId);
       }
 
       // Remove deleted NPCs
