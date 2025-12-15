@@ -88,13 +88,13 @@ export class BottledWaterBuilder {
         msg = 'You finish the bottle of water.';
       }
 
-      // Announce to room
+      // Announce to room with proper message structure
       const location = drinker.location ? await $.load(drinker.location) : null;
       if (location && location.announce) {
-        const drinkMsg = result.fullyConsumed
+        const othersMsg = result.fullyConsumed
           ? await $.pronoun.sub('%N finishes a bottle of water.', drinker)
           : await $.pronoun.sub('%N drinks some water.', drinker);
-        await location.announce(drinkMsg, drinker);
+        await location.announce(drinker, null, { others: othersMsg });
       }
 
       return msg;
@@ -112,11 +112,11 @@ export class BottledWaterBuilder {
       self.sealed = false;
       self.decayRate = self.openedDecayRate || 0.003;
 
-      // Announce
+      // Announce with proper message structure
       const location = opener?.location ? await $.load(opener.location) : null;
       if (location && location.announce && opener) {
-        const openMsg = await $.pronoun.sub('%N opens a bottle of water.', opener);
-        await location.announce(openMsg, opener);
+        const othersMsg = await $.pronoun.sub('%N opens a bottle of water.', opener);
+        await location.announce(opener, null, { others: othersMsg });
       }
 
       return 'You twist off the cap. The seal breaks with a soft crack.';

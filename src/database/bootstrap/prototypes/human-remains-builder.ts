@@ -321,7 +321,7 @@ export class HumanRemainsBuilder {
         await skeleton.moveTo(location);
         const room = await $.load(location);
         if (room && room.announce) {
-          await room.announce('The dried remains crumble, leaving only bones behind.');
+          await room.announce(null, null, { others: 'The dried remains crumble, leaving only bones behind.' });
         }
       }
 

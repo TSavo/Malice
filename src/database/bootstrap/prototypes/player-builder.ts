@@ -341,14 +341,17 @@ export class PlayerBuilder {
       // Burn calories for the lift
       await player.burnCalories(armPath, check.liftCaloriesNeeded);
 
-      // Announce to room
+      // Announce to room with proper message structure
       const location = player.location ? await $.load(player.location) : null;
       if (location && location.announce) {
-        const msg = await $.pronoun.sub('%N picks up %t.', player, null, null, item);
-        await location.announce(msg, player);
+        const othersMsg = await $.pronoun.sub('%N picks up %t.', player, null, null, item);
+        await location.announce(player, null, {
+          actor: 'You pick up ' + item.name + '.',
+          others: othersMsg
+        });
       }
 
-      return 'You pick up ' + item.name + '.';
+      return ''; // Actor already received message via announce
     `);
 
     // Pattern: lift %i - two-handed lift for heavier items
@@ -427,14 +430,17 @@ export class PlayerBuilder {
       // Mark as two-hand carry
       player.twoHandCarry = item.id;
 
-      // Announce to room
+      // Announce to room with proper message structure
       const location = player.location ? await $.load(player.location) : null;
       if (location && location.announce) {
-        const msg = await $.pronoun.sub('%N lifts %t with both hands.', player, null, null, item);
-        await location.announce(msg, player);
+        const othersMsg = await $.pronoun.sub('%N lifts %t with both hands.', player, null, null, item);
+        await location.announce(player, null, {
+          actor: 'You lift ' + item.name + ' with both hands.',
+          others: othersMsg
+        });
       }
 
-      return 'You lift ' + item.name + ' with both hands.';
+      return ''; // Actor already received message via announce
     `);
 
     // Pattern: drag %i - drag very heavy items
@@ -514,14 +520,17 @@ export class PlayerBuilder {
       // Mark as dragging
       player.dragging = item.id;
 
-      // Announce to room
+      // Announce to room with proper message structure
       const location = player.location ? await $.load(player.location) : null;
       if (location && location.announce) {
-        const msg = await $.pronoun.sub('%N grabs %t and starts dragging it.', player, null, null, item);
-        await location.announce(msg, player);
+        const othersMsg = await $.pronoun.sub('%N grabs %t and starts dragging it.', player, null, null, item);
+        await location.announce(player, null, {
+          actor: 'You grab ' + item.name + ' and start dragging it.',
+          others: othersMsg
+        });
       }
 
-      return 'You grab ' + item.name + ' and start dragging it.';
+      return ''; // Actor already received message via announce
     `);
 
     // Pattern: drop %i - drops an item from your hand to the room
@@ -575,13 +584,16 @@ export class PlayerBuilder {
         player.twoHandCarry = null;
       }
 
-      // Announce to room
+      // Announce to room with proper message structure
       if (location.announce) {
-        const msg = await $.pronoun.sub('%N drops %t.', player, null, null, item);
-        await location.announce(msg, player);
+        const othersMsg = await $.pronoun.sub('%N drops %t.', player, null, null, item);
+        await location.announce(player, null, {
+          actor: 'You drop ' + item.name + '.',
+          others: othersMsg
+        });
       }
 
-      return 'You drop ' + item.name + '.';
+      return ''; // Actor already received message via announce
     `);
 
     // Pattern: help [verb] - shows help for a verb or lists all verbs

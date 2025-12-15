@@ -140,13 +140,13 @@ export class DrinkBuilder {
         msg += warnMsg;
       }
 
-      // Announce to room
+      // Announce to room with proper message structure
       const location = drinker.location ? await $.load(drinker.location) : null;
       if (location && location.announce) {
-        const drinkMsg = result.fullyConsumed
+        const othersMsg = result.fullyConsumed
           ? await $.pronoun.sub('%N finishes drinking %t.', drinker, null, null, self)
           : await $.pronoun.sub('%N takes a sip of %t.', drinker, null, null, self);
-        await location.announce(drinkMsg, drinker);
+        await location.announce(drinker, null, { others: othersMsg });
       }
 
       return msg;

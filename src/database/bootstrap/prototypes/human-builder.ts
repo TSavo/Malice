@@ -500,13 +500,16 @@ export class HumanBuilder {
         return 'You have nowhere to speak.';
       }
 
-      // Announce to room
-      const announcement = self.name + ' says, "' + message.trim() + '"';
+      // Announce to room with proper message structure
+      const trimmedMessage = message.trim();
       if (location.announce) {
-        await location.announce(announcement, self);
+        await location.announce(self, null, {
+          actor: 'You say, "' + trimmedMessage + '"',
+          others: self.name + ' says, "' + trimmedMessage + '"'
+        });
       }
 
-      return 'You say, "' + message.trim() + '"';
+      return ''; // Actor already received message via announce
     `);
 
     // Emote method for AI humans
@@ -527,10 +530,14 @@ export class HumanBuilder {
         return;
       }
 
-      // Announce to room (including self)
-      const announcement = self.name + ' ' + action.trim();
+      // Announce to room with proper message structure
+      const trimmedAction = action.trim();
+      const announcement = self.name + ' ' + trimmedAction;
       if (location.announce) {
-        await location.announce(announcement); // Don't exclude self for emotes
+        await location.announce(self, null, {
+          actor: announcement,
+          others: announcement
+        });
       }
     `);
 
@@ -591,13 +598,16 @@ export class HumanBuilder {
       // Update item location
       item.set('location', self.id);
 
-      // Announce to room
+      // Announce to room with proper message structure
       const location = self.location ? await $.load(self.location) : null;
       if (location && location.announce) {
-        await location.announce(self.name + ' picks up ' + item.name + '.', self);
+        await location.announce(self, null, {
+          actor: 'You pick up ' + item.name + '.',
+          others: self.name + ' picks up ' + item.name + '.'
+        });
       }
 
-      return 'You pick up ' + item.name + '.';
+      return ''; // Actor already received message via announce
     `);
 
     // Drop method for AI humans
@@ -634,13 +644,16 @@ export class HumanBuilder {
           location.set('contents', contents);
         }
 
-        // Announce
+        // Announce with proper message structure
         if (location.announce) {
-          await location.announce(self.name + ' drops ' + item.name + '.', self);
+          await location.announce(self, null, {
+            actor: 'You drop ' + item.name + '.',
+            others: self.name + ' drops ' + item.name + '.'
+          });
         }
       }
 
-      return 'You drop ' + item.name + '.';
+      return ''; // Actor already received message via announce
     `);
 
     return obj;

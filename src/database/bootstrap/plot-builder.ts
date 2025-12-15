@@ -1364,11 +1364,11 @@ When a player requests work, create a plot and give them their first objective.`
       if (await self.isAudioMode(player)) {
         // Others hear the terminal speaking to the player
         const msg = await $.pronoun.sub('%N %v{' + audioVerb + '} the terminal.', player);
-        await room.announce(msg, player);  // Exclude player - they get their own output
+        await room.announce(player, null, { others: msg });  // Exclude player - they get their own output
       } else {
         // Others see them using the terminal
         const msg = await $.pronoun.sub('%N %v{' + visualVerb + '} the terminal.', player);
-        await room.announce(msg, player);  // Exclude player
+        await room.announce(player, null, { others: msg });  // Exclude player
       }
     `);
 

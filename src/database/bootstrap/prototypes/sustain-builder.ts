@@ -108,11 +108,11 @@ export class SustainBuilder {
         msg += ' ' + flavorMsg;
       }
 
-      // Announce to room
+      // Announce to room with proper message structure
       const location = eater.location ? await $.load(eater.location) : null;
       if (location && location.announce) {
-        const eatMsg = await $.pronoun.sub('%N swallows a Sustain pill.', eater);
-        await location.announce(eatMsg, eater);
+        const othersMsg = await $.pronoun.sub('%N swallows a Sustain pill.', eater);
+        await location.announce(eater, null, { others: othersMsg });
       }
 
       return msg;
