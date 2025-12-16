@@ -144,6 +144,43 @@ Street ─ sidewalk ─ Building (3 tall) ─ sidewalk ─ Street
 |------|---------|---------|-------|
 | Occidental Park | -6 to -1 | +1 to +4 | Plaza, dead trees, ⊕ underground access |
 
+## Underground (z < 0)
+
+### Smith Tower Datacenter (SECRET)
+
+Hidden beneath Smith Tower, accessible only through the Digital Vault on z=0. This facility hosts the Continuum AI core - a pre-Burning datacenter that survived due to EMP shielding.
+
+**Access:** Hidden entrance in bank vault → separate datacenter elevator → basement levels
+**Authorization:** CorpSec Security Command controls access
+
+```
+z=-1 (Datacenter Level)
+      -13      -12       -11
+      ─────────────────────────
++11   │                       │
+      │        CORE           │
++10   │ POWER  AIRLOCK  COOL  │
+      │                       │
+ +9   │  NOC   CORRIDOR SERVR │
+      ─────────────────────────
+
+z=-2 (Utility Level)
+      -13      -12       -11
+      ─────────────────────────
+ +9   │ TUNNEL UTILITY  MAINT │
+      ─────────────────────────
+              ↓
+        (Future: Seattle Underground)
+```
+
+**Rooms:**
+| Floor | Rooms | Purpose |
+|-------|-------|---------|
+| z=-1 | 7 | The Core, Airlock, Corridor, Server Hall, NOC, Power, Cooling |
+| z=-2 | 3 | Utility Junction, Maintenance Bay, Escape Tunnel |
+
+**Note:** This facility is NOT on any public maps. Only the highest-level CorpSec personnel know it exists.
+
 ## Room Counts
 
 - **Total grid:** 36 x 25 = 900 coordinates
@@ -151,7 +188,7 @@ Street ─ sidewalk ─ Building (3 tall) ─ sidewalk ─ Street
 - **Blocked by hazards:** ~50 coordinates
 - **Walkable:** ~750 rooms at street level
 - **Building interiors (future):** +200 rooms when opened
-- **Underground (future):** +100 rooms
+- **Underground:** ~110 rooms (Datacenter: 10, Seattle Underground: ~100 future)
 
 ## Connections to Other Districts
 

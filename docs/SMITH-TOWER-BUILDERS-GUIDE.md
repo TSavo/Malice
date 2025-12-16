@@ -59,9 +59,12 @@ Objects inherit from prototypes:
 
 ```
 src/database/bootstrap/world/seattle/pioneer-square/buildings/smith-tower/
+├── z-2.ts     # Utility Level (escape tunnel, maintenance)
+├── z-1.ts     # Datacenter (The Core, servers, power)
+├── z0.ts      # Ground Floor (bank, lobby, Digital Vault)
 ├── z1.ts      # Floor 1 - Job Center (Employment Terminal)
-├── z2.ts      # Floor 2 - The Bank
-├── z3.ts      # Floor 3 - CorpSec
+├── z2.ts      # Floor 2 - CorpSec (Security Command)
+├── z3.ts      # Floor 3 - (future use)
 ├── z4.ts      # Floor 4 - Residential
 ├── ...
 ├── z36.ts     # Floor 36 - Retail Level 1
@@ -788,9 +791,12 @@ outdoor: false,     // Indoor/outdoor flag
 
 | Floor | Name | Status | Access |
 |-------|------|--------|--------|
+| -2 | Utility Level | Automated | Hidden (%LDC) |
+| -1 | Datacenter | Automated (The Core) | Hidden (%LDC) |
+| 0 | Ground Floor | Operational (bank, lobby) | Open (vault locked) |
 | 1 | Job Center | Operational (Employment Terminal) | Open |
-| 2 | The Bank | Operational | Open (vault locked) |
-| 3 | CorpSec | Infrastructure ready | Locked (%L1) |
+| 2 | CorpSec | Infrastructure ready | Locked (%L1) |
+| 3 | (Future use) | - | - |
 | 4-33 | Residential | Awaiting tenants | Locked (%LR) |
 | 34 | Premium Residential | Executive tier units | Locked (%LR) |
 | 35 | Executive Amenities | Lounge, fitness, meeting | Open |
@@ -798,9 +804,16 @@ outdoor: false,     // Indoor/outdoor flag
 | 37 | Retail Level 2 | Shells prepared | Open |
 | 38 | Observatory | Operational | Open |
 
+**Underground Levels (z=-1, z=-2):**
+- Accessed via hidden elevator in Digital Vault (%DC_ELEV)
+- Separate from main elevator system
+- Controlled by CorpSec terminal in Security Command (%M on z2)
+- Multi-factor biometric lock (%LDC): retinal + palm scan
+- No human personnel - fully automated AI facility
+
 ---
 
-**Last Updated:** 2025-12-12
+**Last Updated:** 2025-12-15
 **Game Timeline:** Seattle 2110 (48 years after The Burning)
 
 ---
@@ -862,7 +875,7 @@ Important: Players should be able to read these signs. Make sure:
 The building occupies these coordinates:
 - X-axis: -5 to -2 (West to East)
 - Y-axis: 7 to 9 (South to North)
-- Z-axis: 0 to 39 (Ground to Top)
+- Z-axis: -2 to 38 (Utility basement to Observatory)
 
 ### Standard Positions
 

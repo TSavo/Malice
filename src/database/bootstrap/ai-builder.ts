@@ -317,8 +317,24 @@ export class AiBuilder {
         },
       }, null);
 
-      // Set body owner to the human
+      // Set body owner to the human (body and all parts)
       body.set('owner', human.id);
+
+      // Also set owner on all body parts so clothing verb registration works
+      const setOwnerRecursive = async (obj: any) => {
+        obj.set('owner', human.id);
+        const parts = obj.parts || {};
+        for (const key of Object.keys(parts)) {
+          const partId = parts[key];
+          if (typeof partId === 'number') {
+            const part = await $.load(partId);
+            if (part) {
+              await setOwnerRecursive(part);
+            }
+          }
+        }
+      };
+      await setOwnerRecursive(body);
 
       // Move to location (this properly adds to room contents)
       if (location) {

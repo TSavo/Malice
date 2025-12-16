@@ -1615,12 +1615,13 @@ ACTIONS:
       `Consolidated AI-controlled human management tool.
 
 ACTIONS:
-  spawn   - Create a new AI-controlled human (role, name?, description?, locationId?, sex?, age?, personality?, history?)
+  spawn   - Create a new AI-controlled human (role, name?, description?, locationId?, sex?, age?, personality?, history?, clothed?)
   despawn - Remove an AI human (humanId, recycle?)
   list    - List all AI humans (role?)
   info    - Get detailed AI human info (humanId)
   do      - Execute a command as AI human (humanId, command)
   look    - Get what AI human sees (humanId)
+  tailor  - Dress an NPC using AI tailor agent (humanId, context?)
 
 PROFILE ACTIONS (for AI agent context):
   profile        - Get full NPC profile (humanId) - returns personality, history, notes, memories
@@ -1665,8 +1666,11 @@ MEMORY ACTIONS (for persistent critical memories):
         index: z.number().optional().describe('Memory index to remove (0 = most recent)'),
         limit: z.number().optional().describe('Max memories to return'),
         criticalOnly: z.boolean().optional().describe('Only return critical memories'),
+        // Tailor action parameters
+        context: z.string().optional().describe('Additional context for tailor (e.g., "shabby, recently fired")'),
+        clothed: z.boolean().optional().describe('Auto-dress on spawn using tailor'),
       },
-      async ({ action, role, name, description, locationId, sex, age, humanId, command, recycle, personality, history, text, importance, tags, tag, index, limit, criticalOnly }) => {
+      async ({ action, role, name, description, locationId, sex, age, humanId, command, recycle, personality, history, text, importance, tags, tag, index, limit, criticalOnly, context, clothed }) => {
         const aiRegistry = await this.getAlias('ai');
         if (!aiRegistry) {
           return {
@@ -1697,7 +1701,15 @@ MEMORY ACTIONS (for persistent critical memories):
               if (history) options.history = history;
 
               const human = await aiRegistry.call('spawn', role, options);
-              return ok({ spawned: true, id: human.id, name: human.name, role });
+
+              // Auto-dress if clothed parameter is true
+              if (clothed) {
+                const { tailorNPC } = await import('./tailor-agent.js');
+                const tailorContext = context || `Role: ${role}`;
+                await tailorNPC(human.id, 'localhost', this.port, tailorContext);
+              }
+
+              return ok({ spawned: true, id: human.id, name: human.name, role, clothed: !!clothed });
             }
 
             case 'despawn': {
@@ -1935,8 +1947,32 @@ MEMORY ACTIONS (for persistent critical memories):
               return ok({ humanId, summary: summary || '(no memories)' });
             }
 
+            // ═══════════════════════════════════════════════════════════════
+            // TAILOR ACTION
+            // ═══════════════════════════════════════════════════════════════
+
+            case 'tailor': {
+              if (humanId === undefined) return err('humanId required');
+
+              const isAi = await aiRegistry.call('isAiControlled', humanId);
+              if (!isAi) {
+                return err(`Human #${humanId} is not AI-controlled`);
+              }
+
+              const human = await this.manager.load(humanId as ObjId);
+              if (!human) {
+                return err(`Human #${humanId} not found`);
+              }
+
+              const { tailorNPC } = await import('./tailor-agent.js');
+              const tailorContext = context || `Role: ${(human as any).role || 'unknown'}`;
+              const result = await tailorNPC(humanId, 'localhost', this.port, tailorContext);
+
+              return ok(result);
+            }
+
             default:
-              return err(`Unknown action: ${action}. Valid: spawn, despawn, list, info, do, look, profile, setPersonality, setHistory, remember, recall, forget, memories`);
+              return err(`Unknown action: ${action}. Valid: spawn, despawn, list, info, do, look, tailor, profile, setPersonality, setHistory, remember, recall, forget, memories`);
           }
         } catch (error) {
           return err(`Error: ${error instanceof Error ? error.message : String(error)}`);
