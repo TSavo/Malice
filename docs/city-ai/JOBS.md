@@ -223,11 +223,12 @@ await set_property({ objectId: jobBoardId, name: 'text', value: boardText });
 ### Credit Payment
 
 ```javascript
-// Get current balance
-const current = await get_property({ objectId: playerId, name: 'credits' });
+// Get current balance (via resource)
+const playerInfo = await readResource(`moo://objects/${playerId}/prop/credits`);
+const current = playerInfo.value || 0;
 
 // Add reward
-await set_property({ objectId: playerId, name: 'credits', value: (current || 0) + rewardAmount });
+await set_property({ objectId: playerId, name: 'credits', value: current + rewardAmount });
 ```
 
 ### Via Bank Transfer

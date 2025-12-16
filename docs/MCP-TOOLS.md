@@ -1,6 +1,6 @@
-# Malice MCP Tools Reference
+# Malice MCP Tools & Resources Reference
 
-The Malice MCP server exposes tools for AI assistants and automation to interact with the MOO world.
+The Malice MCP server exposes tools and resources for AI assistants and automation to interact with the MOO world.
 
 **Endpoint:** `http://localhost:3001/mcp`
 
@@ -9,25 +9,92 @@ The Malice MCP server exposes tools for AI assistants and automation to interact
 - [moo-programming.md](moo-programming.md) - MOO programming reference
 - [plot-jobs.md](plot-jobs.md) - Plot/job system for AI city management
 
-## Object Management
+---
 
-### get_object
-Fetch a MOO object by its ID.
+## MCP Resources (Read-Only)
 
-```javascript
-{ id: 123 }
-// Returns: { _id, parent, properties, methods, created, modified }
+Resources provide read-only access to MOO data via URI patterns. Use these for inspection and queries.
+
+### Object Resources
+
+| Resource | Description |
+|----------|-------------|
+| `moo://objects/{id}` | Get object details (properties, methods, parent, timestamps) |
+| `moo://objects/{id}/prop/{name}` | Get a specific property value |
+| `moo://objects/{id}/method/{name}` | Get method code (walks inheritance chain, shows where defined) |
+| `moo://objects/list/{page}` | Paginated object list (100 per page) |
+
+**Examples:**
+```
+moo://objects/10              # Human prototype
+moo://objects/10/prop/name    # → "Human"
+moo://objects/3028/method/say # → { definedOn: { id: 10, name: "Human" }, inherited: true, code: "..." }
+moo://objects/list/1          # → { page: 1, totalPages: 31, total: 3079, objects: [...] }
 ```
 
-### list_objects
-List all MOO objects in the database.
+### Room Resources
 
-```javascript
-{ limit: 100, includeRecycled: false }
-// Returns: Array of object summaries
+| Resource | Description |
+|----------|-------------|
+| `moo://rooms/{id}` | Live room state (description, exits, players, contents) |
+
+**Example:**
+```
+moo://rooms/377  # → { name: "Occidental Park", exits: [...], players: [...], contents: [...] }
 ```
 
-### create_object
+### Player Resources
+
+| Resource | Description |
+|----------|-------------|
+| `moo://players` | List all player characters |
+| `moo://players/{id}` | Individual player details |
+
+### AI NPC Resources
+
+| Resource | Description |
+|----------|-------------|
+| `moo://ai` | List all AI-controlled NPCs |
+| `moo://ai/{id}` | Full NPC profile (personality, history, memories) |
+| `moo://ai/{id}/memories` | NPC memories only |
+| `moo://ai/{id}/notes` | NPC notes only |
+| `moo://npc-sessions` | List NPCs with conversation sessions |
+| `moo://npc-sessions/{id}` | NPC conversation history (Claude agent transcript) |
+
+### Plot Resources
+
+| Resource | Description |
+|----------|-------------|
+| `moo://plots` | List all plots |
+| `moo://plots/{id}` | Individual plot details |
+| `moo://plots/{id}/events` | Plot event log |
+
+### Documentation Resources
+
+| Resource | Description |
+|----------|-------------|
+| `moo://docs` | List all technical documentation files |
+| `moo://docs/{name}` | Get a specific doc (mcp-tools, plot-jobs, builders-guide, moo-programming, npc-agent, timeline, smith-tower-builders-guide) |
+| `moo://city-ai` | List all city AI documentation files |
+| `moo://city-ai/{name}` | Get a specific city AI doc (context, factions, jobs, locations, map, npcs, objectives, plots, readme, rules, tools) |
+
+### Other Resources
+
+| Resource | Description |
+|----------|-------------|
+| `moo://aliases` | List all registered object aliases |
+| `moo://events/recent` | Recent game events (last 100) |
+| `moo://schema` | Database schema |
+
+---
+
+## MCP Tools (Read-Write)
+
+Tools perform operations with side effects. Use these to modify the world.
+
+### Object Management
+
+#### create_object
 Create a new MOO object with a specified parent.
 
 ```javascript
@@ -38,7 +105,7 @@ Create a new MOO object with a specified parent.
 // Returns: Created object ID and info
 ```
 
-### clone_object
+#### clone_object
 Create a deep copy of an object with all its properties.
 
 ```javascript
@@ -46,7 +113,7 @@ Create a deep copy of an object with all its properties.
 // Returns: New object ID
 ```
 
-### recycle_object
+#### recycle_object
 Soft-delete a MOO object (marks as deleted, adds to recycle bin).
 
 ```javascript
@@ -54,7 +121,7 @@ Soft-delete a MOO object (marks as deleted, adds to recycle bin).
 // Returns: Confirmation message
 ```
 
-### move_object
+#### move_object
 Move an object to a new location.
 
 ```javascript
@@ -62,17 +129,9 @@ Move an object to a new location.
 // Returns: Confirmation message
 ```
 
-## Properties & Methods
+### Properties & Methods
 
-### get_property
-Get a specific property value from an object (walks inheritance chain).
-
-```javascript
-{ objectId: 123, name: "description" }
-// Returns: Property value
-```
-
-### set_property
+#### set_property
 Set a property value on an object.
 
 ```javascript
@@ -81,15 +140,7 @@ Set a property value on an object.
 // Returns: Confirmation
 ```
 
-### get_method
-Get the TypeScript code for a method on an object.
-
-```javascript
-{ objectId: 123, name: "attack" }
-// Returns: { name, code, help?, callable? }
-```
-
-### set_method
+#### set_method
 Create or update a TypeScript method on an object.
 
 ```javascript
@@ -103,7 +154,7 @@ Create or update a TypeScript method on an object.
 // Returns: Confirmation
 ```
 
-### call_method
+#### call_method
 Execute a method on an object and return the result.
 
 ```javascript
@@ -111,9 +162,9 @@ Execute a method on an object and return the result.
 // Returns: Method return value
 ```
 
-## Search & Discovery
+### Search & Discovery
 
-### search_objects
+#### search_objects
 Search MOO objects by name pattern (substring or regex).
 
 ```javascript
@@ -125,7 +176,7 @@ Search MOO objects by name pattern (substring or regex).
 // Returns: Array of matching objects
 ```
 
-### find_by_property
+#### find_by_property
 Find objects that have a specific property value.
 
 ```javascript
@@ -134,7 +185,7 @@ Find objects that have a specific property value.
 // Returns: Array of matching objects
 ```
 
-### find_children
+#### find_children
 Find all objects that inherit from a given parent.
 
 ```javascript
@@ -142,7 +193,7 @@ Find all objects that inherit from a given parent.
 // Returns: Array of child objects
 ```
 
-### find_in_location
+#### find_in_location
 Find all objects in a room or container.
 
 ```javascript
@@ -150,7 +201,7 @@ Find all objects in a room or container.
 // Returns: Array of objects in location
 ```
 
-### get_inheritance_chain
+#### get_inheritance_chain
 Get the full parent inheritance chain for an object.
 
 ```javascript
@@ -158,9 +209,9 @@ Get the full parent inheritance chain for an object.
 // Returns: Array of parent objects up to Root
 ```
 
-## Aliases
+### Aliases
 
-### alias_lookup
+#### alias_lookup
 Look up an object by its alias (e.g., "lock", "recycler", "room").
 
 ```javascript
@@ -168,7 +219,7 @@ Look up an object by its alias (e.g., "lock", "recycler", "room").
 // Returns: Object ID and basic info
 ```
 
-### list_aliases
+#### list_aliases
 List all registered object aliases.
 
 ```javascript
@@ -176,9 +227,9 @@ List all registered object aliases.
 // Returns: { aliasName: objectId, ... }
 ```
 
-## Rooms & World Building
+### Rooms & World Building
 
-### list_rooms
+#### list_rooms
 List all rooms in the world with coordinates and exit counts.
 
 ```javascript
@@ -186,7 +237,7 @@ List all rooms in the world with coordinates and exit counts.
 // Returns: Array of rooms with { id, name, x, y, z, exitCount }
 ```
 
-### dig
+#### dig
 Create a new room with optional bidirectional exits.
 
 ```javascript
@@ -201,7 +252,7 @@ Create a new room with optional bidirectional exits.
 // Returns: New room ID
 ```
 
-### link_rooms
+#### link_rooms
 Create an exit from one room to another.
 
 ```javascript
@@ -214,7 +265,7 @@ Create an exit from one room to another.
 // Returns: Exit IDs
 ```
 
-### unlink
+#### unlink
 Remove an exit from a room.
 
 ```javascript
@@ -222,7 +273,7 @@ Remove an exit from a room.
 // Returns: Confirmation
 ```
 
-### get_exits
+#### get_exits
 List all exits from a room with destinations and doors.
 
 ```javascript
@@ -230,17 +281,9 @@ List all exits from a room with destinations and doors.
 // Returns: Array of exits with door info
 ```
 
-### get_room_info
-Get comprehensive room information: exits, contents, players, objects.
+### Items & Spawning
 
-```javascript
-{ roomId: 100 }
-// Returns: { room, exits, contents, players, objects }
-```
-
-## Items & Spawning
-
-### spawn_item
+#### spawn_item
 Create an instance of a prototype and place it at a location.
 
 ```javascript
@@ -252,7 +295,7 @@ Create an instance of a prototype and place it at a location.
 // Returns: New object ID
 ```
 
-### set_exit_door
+#### set_exit_door
 Create and attach a door to an exit.
 
 ```javascript
@@ -266,7 +309,7 @@ Create and attach a door to an exit.
 // Returns: Door ID
 ```
 
-### describe_object
+#### describe_object
 Get the runtime description of an object as a player would see it.
 
 ```javascript
@@ -274,9 +317,9 @@ Get the runtime description of an object as a player would see it.
 // Returns: Description string from describe() method
 ```
 
-## Players
+### Players
 
-### list_players
+#### list_players
 List all player characters with location and online status.
 
 ```javascript
@@ -288,7 +331,7 @@ List all player characters with location and online status.
 
 Interactive telnet sessions for testing player experience.
 
-### session_connect
+#### session_connect
 Connect to the MOO via telnet.
 
 ```javascript
@@ -296,7 +339,7 @@ Connect to the MOO via telnet.
 // Returns: { sessionId, welcome message }
 ```
 
-### session_send
+#### session_send
 Send a command to an active session.
 
 ```javascript
@@ -304,7 +347,7 @@ Send a command to an active session.
 // Returns: Response output
 ```
 
-### session_log
+#### session_log
 Get the session log (last N lines).
 
 ```javascript
@@ -312,7 +355,7 @@ Get the session log (last N lines).
 // Returns: Log output
 ```
 
-### session_list
+#### session_list
 List all active telnet sessions.
 
 ```javascript
@@ -320,7 +363,7 @@ List all active telnet sessions.
 // Returns: Array of session IDs
 ```
 
-### session_close
+#### session_close
 Close a telnet session.
 
 ```javascript
@@ -340,6 +383,13 @@ The `ai` tool is a consolidated interface for managing AI-controlled humans. AI 
 - `info` - Get detailed AI human info (humanId)
 - `do` - Execute a command as AI human (humanId, command)
 - `look` - Get what AI human sees (humanId)
+- `profile` - Get full NPC profile (humanId)
+- `setPersonality` - Set personality traits (humanId, personality)
+- `setHistory` - Set backstory/history (humanId, history)
+- `remember` - Store a memory (humanId, text, importance?, tags?)
+- `recall` - Get memories (humanId, importance?, tag?, limit?)
+- `forget` - Remove a memory (humanId, index)
+- `memories` - Get formatted memory summary (humanId)
 
 ### Examples
 
@@ -355,15 +405,15 @@ ai({ action: "look", humanId: 567 })
 // Make the guard do things
 ai({ action: "do", humanId: 567, command: "say Halt! Who goes there?" })
 ai({ action: "do", humanId: 567, command: "north" })
-ai({ action: "do", humanId: 567, command: "get sword" })
+
+// Get profile (also available as resource moo://ai/567)
+ai({ action: "profile", humanId: 567 })
+
+// Store a memory
+ai({ action: "remember", humanId: 567, text: "Saw suspicious person near vault", importance: "important" })
 
 // List all guards
 ai({ action: "list", role: "guard" })
-// Returns: { count: 1, humans: [{ id: 567, name: "Marcus", role: "guard", location: 100 }] }
-
-// Get detailed info
-ai({ action: "info", humanId: 567 })
-// Returns: { id: 567, name: "Marcus", role: "guard", spawnedAt: "...", ... }
 
 // Remove the AI
 ai({ action: "despawn", humanId: 567, recycle: true })
@@ -377,6 +427,7 @@ The `notes` tool provides a consolidated interface for attaching notes to MOO ob
 
 - `get` - Get all notes on an object (objectId)
 - `add` - Add a note to an object (objectId, text, author?, tags?)
+- `append` - Append to existing note by tag (objectId, tag, text, author?)
 - `delete` - Delete a note by index (objectId, index)
 - `search` - Search notes across objects (query?, tag?, author?, limit?)
 - `list_objects` - List all objects that have notes
@@ -385,23 +436,13 @@ The `notes` tool provides a consolidated interface for attaching notes to MOO ob
 
 ```javascript
 // Add a note to an object
-notes({ action: "add", objectId: 123, text: "This needs review", author: "Claude", tags: ["review", "important"] })
-// Returns: { added: true, index: 0 }
+notes({ action: "add", objectId: 123, text: "This needs review", author: "Claude", tags: ["review"] })
 
 // Get all notes on an object
 notes({ action: "get", objectId: 123 })
-// Returns: { notes: [{ text: "This needs review", author: "Claude", tags: [...], createdAt: "..." }] }
 
 // Search notes by tag
 notes({ action: "search", tag: "review" })
-// Returns: { results: [{ objectId: 123, noteIndex: 0, note: {...} }] }
-
-// Search notes by text
-notes({ action: "search", query: "needs review", limit: 10 })
-
-// List objects with notes
-notes({ action: "list_objects" })
-// Returns: { objects: [{ id: 123, name: "...", noteCount: 1 }] }
 
 // Delete a note
 notes({ action: "delete", objectId: 123, index: 0 })
@@ -432,61 +473,22 @@ X or Y                       # Logical OR
 (X or Y) and Z               # Grouping
 ```
 
-### Special Properties
-
-- `.id`, `.parent` - Direct document fields
-- `.name`, `.description`, etc. - Mapped to `properties.X`
-
 ### Examples
 
 ```javascript
 // Find all objects with "Tower" in name
 world({ action: "query", q: ".name contains 'Tower'" })
 
-// Find children of a specific parent
-world({ action: "query", q: ".parent == 10" })
-
 // Complex query with AND/OR
 world({ action: "query", q: "(.name contains 'sword' or .name contains 'dagger') and .location exists" })
-
-// Validate a query before running
-world({ action: "validate", q: ".parent == 10 and .name like 'Lock*'" })
-// Returns: { valid: true }
 
 // Paginated results
 world({ action: "query", q: ".parent == 7", limit: 20, offset: 40 })
 ```
 
-### Query Response
-
-```javascript
-{
-  query: ".name contains 'Tower'",
-  mongoQuery: { "properties.name": { "$regex": "Tower", "$options": "i" } },
-  count: 15,
-  offset: 0,
-  results: [
-    { id: 1411, parent: 7, name: "Smith Tower - Ground Floor - Reception" },
-    // ...
-  ]
-}
-```
-
 ## Plot System (Consolidated Tool)
 
-The `plot` tool is a consolidated interface for managing plots, jobs, and phases. All plot operations use an `action` parameter.
-
-### Structure
-
-```
-Plot
-  ├── name, description, metadata
-  ├── events[]                    # Narrative log
-  ├── phases[]                    # Narrative stages with AI prompts
-  │     └── { id, name, description, prompt, metadata }
-  └── jobs{}                      # Player progression tracking
-        └── { status, currentPhase, phaseHistory[], hooks[], metadata }
-```
+The `plot` tool is a consolidated interface for managing plots, jobs, and phases.
 
 ### Actions
 
@@ -522,61 +524,7 @@ Plot
 - `next` - Get next plot needing attention (bumps timer 24h)
 - `active` - List all active plots with metadata
 
-### Examples
-
-```javascript
-// Create a plot
-plot({ action: "create", name: "Package Delivery", metadata: { type: "delivery" } })
-// Returns: { created: true, plotId: 500, name: "Package Delivery" }
-
-// Set phases (simple structure - just prompts for AI guidance)
-plot({
-  action: "set_phases",
-  plotId: 500,
-  phases: [
-    { id: "accept", name: "Accept Job", description: "Player accepts", prompt: "Guide player to accept the delivery job" },
-    { id: "pickup", name: "Pick Up", description: "Get the package", prompt: "Player needs to pick up the package from the warehouse" },
-    { id: "deliver", name: "Deliver", description: "Complete delivery", prompt: "Help player deliver to the destination" }
-  ]
-})
-
-// Create a job (auto-starts on first phase)
-plot({ action: "create_job", plotId: 500, jobId: "player-42", metadata: { playerId: 42 } })
-
-// Get current phase info
-plot({ action: "get_job_phase", plotId: 500, jobId: "player-42" })
-// Returns: { phaseId: "accept", phase: {...}, startedAt: "...", history: [] }
-
-// Advance to next phase
-plot({ action: "advance_phase", plotId: 500, jobId: "player-42" })
-// Returns: { advanced: true, newPhase: "pickup" }
-
-// Add narrative event
-plot({ action: "add_event", plotId: 500, message: "Player picked up the package" })
-
-// Register a hook
-plot({
-  action: "register_hook",
-  plotId: 500,
-  jobId: "player-42",
-  targetId: 100,
-  eventName: "itemDropped",
-  filter: { itemName: "package" }
-})
-
-// Complete the job
-plot({ action: "complete_job", plotId: 500, jobId: "player-42", reason: "Delivered successfully" })
-
-// Close the plot
-plot({ action: "close", plotId: 500, status: "completed", reason: "Quest finished" })
-
-// Get next plot needing attention
-plot({ action: "next" })
-// Returns oldest plot needing attention, bumps timer by 24h
-
-// List active plots
-plot({ action: "active" })
-```
+---
 
 ## Examples
 
@@ -595,7 +543,6 @@ const exit = await link_rooms({
 const door = await set_exit_door({
   exitId: exit.exitId,
   doorName: "iron door",
-  doorDescription: "A heavy iron door with a complex lock.",
   open: false
 });
 
@@ -614,144 +561,64 @@ await set_property({
 });
 ```
 
-### Find all items in a room
+### Find all items in a room (using resource)
 
 ```javascript
-const info = await get_room_info({ roomId: 100 });
-// info.objects contains all non-player objects
-// info.players contains all players
-// info.exits contains all exits with door info
+// Use the room resource
+const roomInfo = await readResource("moo://rooms/100");
+// roomInfo.contents contains all non-player objects
+// roomInfo.players contains all players
+// roomInfo.exits contains all exits
 ```
 
 ### Search for a prototype by name
 
 ```javascript
 const results = await search_objects({ pattern: "Lock", limit: 10 });
-// Find the base Lock prototype
 const lockProto = results.find(r => r.name === "Lock");
 ```
-
-### AI City Management with Plot Jobs
-
-The plot/job system enables AI assistants to handle ongoing narratives and player requests.
-Jobs are created by players (e.g., "I want to rent an apartment") and processed by AI handlers.
-
-**Typical workflow:**
-
-```javascript
-// 1. Check for pending plots
-const result = await plot({ action: "next" });
-// Returns oldest plot needing attention, bumps timer by 24h
-
-if (!result.plot) {
-  // No plots need attention
-  return;
-}
-
-// 2. Read the event history to understand context
-const events = await plot({ action: "get_events", plotId: result.plot.id, limit: 50 });
-// events contains the full narrative log:
-// - Player actions and requests
-// - Previous AI responses
-// - State changes
-
-// 3. Use other MCP tools to affect the world
-// Example: Player requested a delivery
-const item = await spawn_item({
-  prototypeId: 40,  // $.stackable
-  locationId: result.plot.metadata.targetRoomId,
-  properties: { name: "package", description: "A wrapped package" }
-});
-
-// 4. Add narrative event
-await plot({
-  action: "add_event",
-  plotId: result.plot.id,
-  message: "A courier arrives and places a package on the table."
-});
-
-// 5. Update metadata
-await plot({
-  action: "set_metadata",
-  plotId: result.plot.id,
-  key: "deliveredItemId",
-  value: item.objectId
-});
-```
-
-**Key concepts:**
-- `plot({ action: "next" })` returns the oldest plot needing attention and bumps its timer by 24 hours
-- Use `plot({ action: "add_event" })` to add events visible to players
-- Use `plot({ action: "set_metadata" })` to track state
-- Combine with other MCP tools to create objects, move items, spawn NPCs, etc.
-- See [plot-jobs.md](plot-jobs.md) for full documentation on the plot system
 
 ### Spawning and Controlling AI NPCs
 
 ```javascript
 // 1. Spawn a guard
-const guard = await ai({ action: "spawn", role: "guard", name: "Marcus", sex: "male", age: 35, locationId: 100 });
-// Returns: { id: 567, name: "Marcus" }
+const guard = await ai({ action: "spawn", role: "guard", name: "Marcus", locationId: 100 });
 
 // 2. See what the guard sees
-const view = await ai({ action: "look", humanId: 567 });
-// Returns: { location: "Lobby", exits: ["north", "south"], people: [...], items: [...] }
+const view = await ai({ action: "look", humanId: guard.id });
 
 // 3. Make the guard do things
-await ai({ action: "do", humanId: 567, command: "say Halt! Who goes there?" });
-await ai({ action: "do", humanId: 567, command: "north" });
-await ai({ action: "do", humanId: 567, command: "get sword" });
+await ai({ action: "do", humanId: guard.id, command: "say Halt!" });
 
-// 4. List all guards
-const guards = await ai({ action: "list", role: "guard" });
-// Returns: { count: 1, humans: [{ id: 567, name: "Marcus", role: "guard", location: 100 }] }
+// 4. Check the guard's profile (via resource)
+const profile = await readResource(`moo://ai/${guard.id}`);
 
-// 5. Get detailed info
-const info = await ai({ action: "info", humanId: 567 });
-// Returns: { id: 567, name: "Marcus", role: "guard", spawnedAt: "...", ... }
-
-// 6. When no longer needed
-await ai({ action: "despawn", humanId: 567, recycle: true });
+// 5. When no longer needed
+await ai({ action: "despawn", humanId: guard.id, recycle: true });
 ```
 
-### Creating AI-Driven Plot with Jobs
+### AI City Management with Plot Jobs
 
 ```javascript
-// 1. Create a plot for a delivery quest
-const result = await plot({ action: "create", name: "Package Delivery", metadata: { participants: [100], type: "delivery" } });
-// Returns: { created: true, plotId: 500, name: "Package Delivery" }
+// 1. Check for pending plots
+const result = await plot({ action: "next" });
 
-// 2. Create a job within the plot
-await plot({ action: "create_job", plotId: 500, jobId: "deliver_to_lobby", metadata: { targetRoom: 50, item: "package" } });
+if (result.plot) {
+  // 2. Read event history
+  const events = await plot({ action: "get_events", plotId: result.plot.id });
 
-// 3. Register a hook to watch for item drop
-await plot({ action: "register_hook", plotId: 500, jobId: "deliver_to_lobby", targetId: 50, eventName: "itemDropped", filter: { itemName: "package" } });
+  // 3. Use other MCP tools to affect the world
+  const item = await spawn_item({
+    prototypeId: 40,
+    locationId: result.plot.metadata.targetRoomId,
+    properties: { name: "package" }
+  });
 
-// 4. Add narrative event
-await plot({ action: "add_event", plotId: 500, message: "Quest accepted: Deliver the package to the lobby." });
-
-// 5. When the hook fires, complete the job
-await plot({ action: "complete_job", plotId: 500, jobId: "deliver_to_lobby", reason: "Package delivered successfully" });
-
-// 6. Close the plot
-await plot({ action: "close", plotId: 500, status: "completed", reason: "Delivery completed" });
-```
-
-### Searching and Monitoring Plots
-
-```javascript
-// Search plot events
-const results = await plot({ action: "search", query: "stolen jewels" });
-
-// List all active plots
-const active = await plot({ action: "list", status: "active" });
-
-// Get full event history
-const events = await plot({ action: "get_events", plotId: 500, limit: 50 });
-
-// Get next plot needing attention
-const next = await plot({ action: "next" });
-
-// List all active plots with metadata
-const allActive = await plot({ action: "active" });
+  // 4. Add narrative event
+  await plot({
+    action: "add_event",
+    plotId: result.plot.id,
+    message: "A courier arrives with a package."
+  });
+}
 ```

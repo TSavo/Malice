@@ -1,6 +1,9 @@
 # Use Node.js 20 Alpine for smaller image size
 FROM node:20-alpine
 
+# Install tools for healthcheck
+RUN apk add --no-cache netcat-openbsd
+
 WORKDIR /app
 
 # Copy package files

@@ -239,28 +239,40 @@ The `handleEvent()` method supports these event types:
 
 Custom events are also supported - they're formatted as generic prompts.
 
-## MCP Tools Available
+## MCP Tools & Resources Available
 
-NPCs have access to all MCP tools:
+NPCs have access to MCP tools and resources:
 
-### Object Manipulation
-- `get_object` - Fetch object by ID
+### Resources (Read-Only)
+
+**Live Game Data:**
+- `moo://objects/{id}` - Get object details
+- `moo://objects/{id}/prop/{name}` - Get property value
+- `moo://objects/{id}/method/{name}` - Get method code (walks inheritance)
+- `moo://rooms/{id}` - Room state (exits, contents, players)
+- `moo://ai/{id}` - NPC profile, memories, notes
+- `moo://plots/{id}` - Plot details
+- `moo://players` - List all players
+
+**Documentation:**
+- `moo://docs/{name}` - Technical docs (mcp-tools, plot-jobs, builders-guide, moo-programming, npc-agent, timeline)
+- `moo://city-ai/{name}` - World knowledge (context, factions, rules, locations, map, npcs, jobs, plots, tools)
+
+### Object Manipulation (Tools)
 - `set_property` - Set property value
-- `get_property` - Get property value
 - `call_method` - Execute method on object
 - `create_object` - Create new object
 - `clone_object` - Clone existing object
 - `recycle_object` - Delete object
 
-### World Queries
+### World Queries (Tools)
 - `world` - DSL-based world queries
 - `search_objects` - Search by name pattern
 - `find_by_property` - Find by property value
 - `find_children` - Find object descendants
 - `find_in_location` - Find objects in room
 
-### Room/Navigation
-- `get_room_info` - Full room details
+### Room/Navigation (Tools)
 - `get_exits` - List room exits
 - `list_rooms` - List all rooms
 - `move_object` - Move object to location
@@ -304,8 +316,9 @@ IDENTITY:
 - Your NPC object ID is #3028
 
 CAPABILITIES:
-You have access to MCP tools that let you:
-- Query and manipulate game objects (get_object, set_property, call_method, etc.)
+You have access to MCP resources and tools:
+- Read game state via resources (moo://objects/{id}, moo://rooms/{id}, etc.)
+- Manipulate objects (set_property, call_method, etc.)
 - Manage plots and quests (plot tool with phases, jobs, events)
 - Take notes on objects and situations (notes tool)
 ...

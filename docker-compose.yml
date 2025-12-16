@@ -62,6 +62,9 @@ services:
     environment:
       - MONGO_URI=mongodb://mongodb:27017
       - NODE_ENV=production
+    volumes:
+      # Mount Claude sessions so MCP can expose NPC conversations as resources
+      - ${HOME}/.claude:/home/node/.claude:ro
     depends_on:
       mongodb:
         condition: service_healthy
@@ -69,6 +72,12 @@ services:
         condition: service_completed_successfully
     networks:
       - malice-network
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 3001 || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 60s
 
   npc-agent:
     build:
@@ -89,7 +98,7 @@ services:
       mongodb:
         condition: service_healthy
       game:
-        condition: service_started
+        condition: service_healthy
     networks:
       - malice-network
 

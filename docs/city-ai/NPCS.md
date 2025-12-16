@@ -254,10 +254,11 @@ await ai({ action: 'do', humanId: escortId, command: 'east' });
 Supervisor checks work completion:
 
 ```javascript
-// Check if repair was done
-const target = await get_property({ objectId: brokenPipeId, name: 'repaired' });
+// Check if repair was done (via resource)
+const propInfo = await readResource(`moo://objects/${brokenPipeId}/prop/repaired`);
+const repaired = propInfo.value;
 
-if (target) {
+if (repaired) {
   await ai({ action: 'do', humanId: supervisorId, command: 'say Good work. Payment authorized.' });
   // Complete job, pay worker
 } else {
@@ -790,9 +791,9 @@ NPCs are **empowered agents**, not passive responders. They have full access to 
 
 NPCs have the same tool access as the city AI:
 
-- **Observe** - Use `look`, `get_room_info`, `describe_object` to perceive the world
+- **Observe** - Use `look`, resources (`moo://rooms/{id}`, `moo://objects/{id}`), `describe_object` to perceive the world
 - **Act** - Execute commands, move, speak, manipulate objects
-- **Query** - Search the world, check properties, find objects
+- **Query** - Search the world, read properties via resources, find objects
 - **Remember** - Create and recall memories
 - **Modify** - Set properties, call methods (within authority)
 - **Participate in plots** - Track progress, complete jobs, trigger events
