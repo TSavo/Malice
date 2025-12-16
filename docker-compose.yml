@@ -63,8 +63,8 @@ services:
       - MONGO_URI=mongodb://mongodb:27017
       - NODE_ENV=production
     volumes:
-      # Mount Claude sessions so MCP can expose NPC conversations as resources
-      - ${HOME}/.claude:/home/node/.claude:ro
+      # Mount Claude credentials for tailor agent (needs write access)
+      - ${HOME}/.claude:/home/node/.claude
     depends_on:
       mongodb:
         condition: service_healthy

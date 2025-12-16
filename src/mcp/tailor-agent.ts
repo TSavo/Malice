@@ -148,6 +148,8 @@ export async function tailorNPC(
     },
     allowedTools: ['*'],
     permissionMode: 'bypassPermissions',
+    allowDangerouslySkipPermissions: true,
+    cwd: process.env.HOME || '/home/node',
   };
 
   const prompt = `Dress NPC #${humanId}.${context ? ` Context: ${context}` : ''}
