@@ -69,6 +69,35 @@ The spawn system creates a **complete human**:
 - Registered in `$.ai` under the specified role
 - Placed at the specified location
 
+### Dressing NPCs
+
+NPCs spawn naked. Use the tailor to dress them appropriately:
+
+```javascript
+// After spawning
+const npc = await ai({ action: 'spawn', role: 'guard', locationId: factoryId });
+await ai({ action: 'tailor', humanId: npc.id });
+
+// Or auto-dress on spawn
+const npc = await ai({ action: 'spawn', role: 'guard', locationId: factoryId, clothed: true });
+
+// With context for customization
+await ai({ action: 'tailor', humanId: npc.id, context: 'shabby, down on luck' });
+```
+
+The tailor creates clothing based on the NPC's role:
+
+| Role | Outfit Level | Examples |
+|------|--------------|----------|
+| scavenger | Minimal | Ragged pants, torn shirt |
+| worker, guard | Basic | Underwear, pants, shirt, boots |
+| clerk, supervisor | Complete | Full outfit with socks, belt, proper shoes |
+| executive | Formal | 3-piece suit, silk, polished shoes |
+
+Clothing tells a story - condition reflects social status, materials reflect environment.
+
+See [TAILORING.md](../TAILORING.md) for full clothing system reference.
+
 ### Randomization Details
 
 If you don't specify traits, $.ai generates realistic randoms:

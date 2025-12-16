@@ -377,12 +377,13 @@ The `ai` tool is a consolidated interface for managing AI-controlled humans. AI 
 
 ### Actions
 
-- `spawn` - Create a new AI-controlled human (role, name?, description?, locationId?, sex?, age?)
+- `spawn` - Create a new AI-controlled human (role, name?, description?, locationId?, sex?, age?, clothed?)
 - `despawn` - Remove an AI human (humanId, recycle?)
 - `list` - List all AI humans (role?)
 - `info` - Get detailed AI human info (humanId)
 - `do` - Execute a command as AI human (humanId, command)
 - `look` - Get what AI human sees (humanId)
+- `tailor` - Dress an NPC with AI tailor (humanId, context?)
 - `profile` - Get full NPC profile (humanId)
 - `setPersonality` - Set personality traits (humanId, personality)
 - `setHistory` - Set backstory/history (humanId, history)
@@ -397,6 +398,14 @@ The `ai` tool is a consolidated interface for managing AI-controlled humans. AI 
 // Spawn a guard
 ai({ action: "spawn", role: "guard", name: "Marcus", sex: "male", age: 35, locationId: 100 })
 // Returns: { id: 567, name: "Marcus", role: "guard" }
+
+// Spawn with auto-dressing
+ai({ action: "spawn", role: "guard", name: "Marcus", locationId: 100, clothed: true })
+// Returns: { id: 567, name: "Marcus", role: "guard", clothed: true }
+
+// Dress an existing NPC
+ai({ action: "tailor", humanId: 567 })
+ai({ action: "tailor", humanId: 567, context: "shabby, recently demoted" })
 
 // See what the guard sees
 ai({ action: "look", humanId: 567 })
