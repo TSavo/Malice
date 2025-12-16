@@ -30,7 +30,7 @@ ai action=spawn role="guard" clothed=true
 | `material` | string | "cotton" | Fabric type |
 | `color` | string | "white" | Primary color |
 | `condition` | int 0-100 | 100 | Wear state |
-| `aliases` | string[] | [] | Item matching names (CRITICAL!) |
+| `aliases` | string[] | auto | Item matching names (auto-generated from name) |
 
 ### Body Slots (Valid `covers` Values)
 
@@ -262,10 +262,10 @@ covers: ["torso", "back"], layer: 4                          // vest jacket
      "protection": 10,
      "material": "leather",
      "color": "faded brown",
-     "condition": 55,
-     "aliases": ["jacket", "leather jacket"]
+     "condition": 55
    }
    -> Returns: Created object #<new_clothing_id>
+   -> Aliases auto-generated: ["worn", "leather", "jacket", "leather jacket", "worn leather jacket"]
    ```
 
 3. **Move to NPC's room:**
@@ -283,7 +283,8 @@ covers: ["torso", "back"], layer: 4                          // vest jacket
 
 - **Single create_object call!** Pass all properties at once - no separate set_property calls needed
 - **Order matters!** Create and equip layer 1 items before layer 2, etc.
-- **Use aliases!** The `aliases` array contains the names you use in get/wear commands
+- **Aliases are auto-generated!** From "worn leather jacket" you get ["worn", "leather", "jacket", "leather jacket", "worn leather jacket"]
+- Use any word from the name in get/wear commands (e.g., "get jacket", "wear jacket")
 - The "get" command triggers verb registration on the clothing
 - The "wear" command actually equips the item
 
