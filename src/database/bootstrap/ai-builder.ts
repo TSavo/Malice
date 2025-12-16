@@ -285,7 +285,7 @@ export class AiBuilder {
           name: name,
           description: description,
           aliases: [name.toLowerCase()],
-          location: location,
+          // Note: location set via moveTo call below, not directly
 
           // Link body
           body: body.id,
@@ -319,6 +319,11 @@ export class AiBuilder {
 
       // Set body owner to the human
       body.set('owner', human.id);
+
+      // Move to location (this properly adds to room contents)
+      if (location) {
+        await human.call('moveTo', location);
+      }
 
       // Initialize verbs so the AI can speak, look, etc.
       if (human.initVerbs) {

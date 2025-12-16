@@ -110,85 +110,12 @@ export class MaliceMCPServer {
    * Register MCP tools (operations with side effects)
    */
   private registerTools(server: McpServer): void {
-    // Get object by ID
-    server.tool(
-      'get_object',
-      'Fetch a MOO object by its ID. Returns properties, methods, parent, and metadata.',
-      { id: z.number().describe('Object ID (e.g., 0 for ObjectManager, 1 for Root)') },
-      async ({ id }) => {
-        const obj = await this.manager.load(id as ObjId);
-        if (!obj) {
-          return {
-            content: [{ type: 'text', text: `Object #${id} not found` }],
-            isError: true,
-          };
-        }
-
-        const raw = obj._getRaw();
-        const result = {
-          _id: raw._id,
-          parent: raw.parent,
-          properties: this.serializeValue(obj.getOwnProperties()),
-          methods: Object.keys(raw.methods || {}),
-          created: raw.created,
-          modified: raw.modified,
-          recycled: raw.recycled,
-        };
-
-        return {
-          content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
-        };
-      }
-    );
-
-    // List all objects
-    server.tool(
-      'list_objects',
-      'List all MOO objects in the database with summary info.',
-      {
-        includeRecycled: z.boolean().optional().describe('Include soft-deleted objects'),
-        limit: z.number().optional().describe('Max objects to return (default 100)'),
-      },
-      async ({ includeRecycled, limit }) => {
-        const allObjects = await this.manager.db.listAll(includeRecycled ?? false);
-        const objects = allObjects.slice(0, limit ?? 100).map(obj => ({
-          id: obj._id,
-          parent: obj.parent,
-          name: obj.properties?.name?.value,
-          propertyCount: Object.keys(obj.properties || {}).length,
-          methodCount: Object.keys(obj.methods || {}).length,
-          recycled: obj.recycled || false,
-        }));
-
-        return {
-          content: [{ type: 'text', text: JSON.stringify({ count: objects.length, objects }, null, 2) }],
-        };
-      }
-    );
-
-    // Get property value
-    server.tool(
-      'get_property',
-      'Get a specific property value from a MOO object (walks inheritance chain).',
-      {
-        objectId: z.number().describe('Object ID'),
-        name: z.string().describe('Property name'),
-      },
-      async ({ objectId, name }) => {
-        const obj = await this.manager.load(objectId as ObjId);
-        if (!obj) {
-          return {
-            content: [{ type: 'text', text: `Object #${objectId} not found` }],
-            isError: true,
-          };
-        }
-
-        const value = this.serializeValue(obj.get(name));
-        return {
-          content: [{ type: 'text', text: JSON.stringify({ objectId, name, value }, null, 2) }],
-        };
-      }
-    );
+    // NOTE: Read-only object inspection tools removed - use resources instead:
+    // - moo://objects/{id} - get object details
+    // - moo://objects/{id}/prop/{name} - get property
+    // - moo://objects/{id}/method/{name} - get method (walks inheritance)
+    // - moo://objects/list/{page} - paginated object list
+    // - moo://rooms/{id} - room info
 
     // Set property value
     server.tool(
@@ -211,46 +138,6 @@ export class MaliceMCPServer {
         obj.set(name, value);
         return {
           content: [{ type: 'text', text: `Set ${name} = ${JSON.stringify(value)} on #${objectId}` }],
-        };
-      }
-    );
-
-    // Get method code
-    server.tool(
-      'get_method',
-      'Get the TypeScript code for a method on a MOO object.',
-      {
-        objectId: z.number().describe('Object ID'),
-        name: z.string().describe('Method name'),
-      },
-      async ({ objectId, name }) => {
-        const obj = await this.manager.load(objectId as ObjId);
-        if (!obj) {
-          return {
-            content: [{ type: 'text', text: `Object #${objectId} not found` }],
-            isError: true,
-          };
-        }
-
-        const methods = obj.getOwnMethods();
-        if (!(name in methods)) {
-          return {
-            content: [{ type: 'text', text: `Method '${name}' not found on #${objectId}` }],
-            isError: true,
-          };
-        }
-
-        const method = methods[name];
-        const result = {
-          name,
-          code: typeof method === 'string' ? method : method.code,
-          callable: typeof method === 'object' ? method.callable : undefined,
-          aliases: typeof method === 'object' ? method.aliases : undefined,
-          help: typeof method === 'object' ? method.help : undefined,
-        };
-
-        return {
-          content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
         };
       }
     );
@@ -1233,106 +1120,6 @@ export class MaliceMCPServer {
             doorName: door.get('name'),
             open: door.get('open'),
             created: doorId === undefined,
-          }, null, 2) }],
-        };
-      }
-    );
-
-    // Get room contents with rich info
-    server.tool(
-      'get_room_info',
-      'Get comprehensive room information: exits, contents, players, and objects.',
-      {
-        roomId: z.number().describe('Room ID'),
-      },
-      async ({ roomId }) => {
-        const room = await this.manager.load(roomId as ObjId);
-        if (!room) {
-          return {
-            content: [{ type: 'text', text: `Room #${roomId} not found` }],
-            isError: true,
-          };
-        }
-
-        const allObjects = await this.manager.db.listAll(false);
-
-        // Find objects in this room
-        const contents: Array<{ id: number; name: string; type: string }> = [];
-        const players: Array<{ id: number; name: string; connected: boolean }> = [];
-
-        // Get player prototype for checking
-        const playerProto = allObjects.find(o => o.properties?.name?.value === 'Player');
-        const playerProtoId = playerProto?._id;
-
-        for (const obj of allObjects) {
-          const loc = obj.properties?.location?.value;
-          if (loc === roomId) {
-            // Check if it's a player
-            let isPlayer = false;
-            if (playerProtoId) {
-              let parentId = obj.parent;
-              const seen = new Set<number>();
-              while (parentId !== -1 && !seen.has(parentId)) {
-                seen.add(parentId);
-                if (parentId === playerProtoId) {
-                  isPlayer = true;
-                  break;
-                }
-                const parent = allObjects.find(o => o._id === parentId);
-                if (!parent) break;
-                parentId = parent.parent;
-              }
-            }
-
-            if (isPlayer) {
-              players.push({
-                id: obj._id,
-                name: obj.properties?.name?.value || '(unnamed)',
-                connected: obj.properties?.connected?.value ?? false,
-              });
-            } else {
-              // Determine type from parent chain
-              const parentObj = allObjects.find(o => o._id === obj.parent);
-              contents.push({
-                id: obj._id,
-                name: obj.properties?.name?.value || '(unnamed)',
-                type: parentObj?.properties?.name?.value || 'object',
-              });
-            }
-          }
-        }
-
-        // Get exits
-        const exitIds = (room as any).exits as number[] | undefined;
-        const exits: Array<{ direction: string; destId: number; destName: string }> = [];
-        if (exitIds) {
-          for (const exitId of exitIds) {
-            const exit = await this.manager.load(exitId as ObjId);
-            if (exit) {
-              const destId = (exit as any).destRoom as number;
-              const dest = destId ? await this.manager.load(destId as ObjId) : null;
-              exits.push({
-                direction: (exit as any).name as string,
-                destId,
-                destName: dest ? (dest as any).name as string : '(unknown)',
-              });
-            }
-          }
-        }
-
-        return {
-          content: [{ type: 'text', text: JSON.stringify({
-            id: roomId,
-            name: (room as any).name,
-            description: (room as any).description,
-            coordinates: {
-              x: (room as any).x ?? 0,
-              y: (room as any).y ?? 0,
-              z: (room as any).z ?? 0,
-            },
-            exits,
-            players,
-            contents,
           }, null, 2) }],
         };
       }
@@ -2956,6 +2743,1294 @@ Core Objects:
               uri: `moo://city-ai/${name}`,
               mimeType: 'text/plain',
               text: `Error reading document: ${String(err)}`,
+            }],
+          };
+        }
+      }
+    );
+
+    // Root docs resources - expose docs/*.md files (technical references)
+    const docsDir = path.join(process.cwd(), 'docs');
+    // Only expose these specific docs (not everything)
+    const exposedDocs = [
+      'MCP-TOOLS.md',
+      'plot-jobs.md',
+      'BUILDERS-GUIDE.md',
+      'moo-programming.md',
+      'npc-agent.md',
+      'TIMELINE.md',
+      'SMITH-TOWER-BUILDERS-GUIDE.md',
+    ];
+
+    // List all exposed docs
+    server.resource(
+      'docs',
+      'moo://docs',
+      { description: 'List all technical documentation files' },
+      async () => {
+        try {
+          const files = fs.readdirSync(docsDir)
+            .filter(f => exposedDocs.includes(f))
+            .map(f => ({
+              name: f.replace('.md', ''),
+              uri: `moo://docs/${f.replace('.md', '').toLowerCase()}`
+            }));
+          return {
+            contents: [{
+              uri: 'moo://docs',
+              mimeType: 'application/json',
+              text: JSON.stringify({ files }, null, 2),
+            }],
+          };
+        } catch (err) {
+          return {
+            contents: [{
+              uri: 'moo://docs',
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: String(err) }),
+            }],
+          };
+        }
+      }
+    );
+
+    // Individual doc resources
+    server.resource(
+      'doc',
+      new ResourceTemplate('moo://docs/{name}', {
+        list: async () => {
+          try {
+            const files = fs.readdirSync(docsDir).filter(f => exposedDocs.includes(f));
+            return {
+              resources: files.map(f => ({
+                uri: `moo://docs/${f.replace('.md', '').toLowerCase()}`,
+                name: f.replace('.md', ''),
+                description: `Documentation: ${f.replace('.md', '')}`,
+              }))
+            };
+          } catch {
+            return { resources: [] };
+          }
+        },
+      }),
+      { description: 'Get a specific documentation file' },
+      async (_uri: URL, variables: { name?: string | string[] }) => {
+        const nameVar = variables.name;
+        const name = Array.isArray(nameVar) ? nameVar[0] : nameVar;
+        if (!name) {
+          return {
+            contents: [{
+              uri: 'moo://docs/unknown',
+              mimeType: 'text/plain',
+              text: 'Error: No document name provided',
+            }],
+          };
+        }
+
+        try {
+          // Try exact match first, then case-insensitive
+          const files = fs.readdirSync(docsDir).filter(f => exposedDocs.includes(f));
+          const match = files.find(f =>
+            f.replace('.md', '').toLowerCase() === name.toLowerCase()
+          );
+
+          if (!match) {
+            return {
+              contents: [{
+                uri: `moo://docs/${name}`,
+                mimeType: 'text/plain',
+                text: `Error: Document '${name}' not found. Available: ${files.map(f => f.replace('.md', '')).join(', ')}`,
+              }],
+            };
+          }
+
+          const content = fs.readFileSync(path.join(docsDir, match), 'utf-8');
+          return {
+            contents: [{
+              uri: `moo://docs/${name}`,
+              mimeType: 'text/markdown',
+              text: content,
+            }],
+          };
+        } catch (err) {
+          return {
+            contents: [{
+              uri: `moo://docs/${name}`,
+              mimeType: 'text/plain',
+              text: `Error reading document: ${String(err)}`,
+            }],
+          };
+        }
+      }
+    );
+
+    // NPC Session resources - expose conversation history for AI NPCs
+    const sessionsDir = '/home/node/.claude/projects/-app';
+
+    // List all NPCs with sessions
+    server.resource(
+      'npc-sessions',
+      'moo://npc-sessions',
+      { description: 'List all AI NPCs with conversation sessions' },
+      async () => {
+        try {
+          // Get all AI NPCs from the registry
+          const aiRegistry = await this.getAlias('ai');
+          if (!aiRegistry) {
+            return {
+              contents: [{
+                uri: 'moo://npc-sessions',
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: 'AI registry not found' }),
+              }],
+            };
+          }
+
+          // Use the getAll method to list all registered NPCs
+          const humans = await aiRegistry.call('getAll') || [];
+          const npcs: Array<{ id: number; name: string; sessionId: string | null }> = [];
+
+          for (const human of humans) {
+            // Extract ID from various formats
+            let npcId: number;
+            if (typeof human === 'number') {
+              npcId = human;
+            } else if (human?.type === 'objref') {
+              npcId = human.value;
+            } else if (human?.id !== undefined) {
+              npcId = human.id;
+            } else {
+              continue;
+            }
+
+            const npc = await this.manager.load(npcId as ObjId);
+            if (npc) {
+              npcs.push({
+                id: npcId,
+                name: String(await npc.get('name')) || `NPC #${npcId}`,
+                sessionId: (await npc.get('agentSessionId') as string | null) || null,
+              });
+            }
+          }
+
+          return {
+            contents: [{
+              uri: 'moo://npc-sessions',
+              mimeType: 'application/json',
+              text: JSON.stringify({ npcs }, null, 2),
+            }],
+          };
+        } catch (err) {
+          return {
+            contents: [{
+              uri: 'moo://npc-sessions',
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: String(err) }),
+            }],
+          };
+        }
+      }
+    );
+
+    // Individual NPC session resource
+    server.resource(
+      'npc-session',
+      new ResourceTemplate('moo://npc-sessions/{npcId}', {
+        list: async () => {
+          try {
+            const aiRegistry = await this.getAlias('ai');
+            if (!aiRegistry) return { resources: [] };
+
+            const humans = await aiRegistry.call('getAll') || [];
+            const resources: Array<{ uri: string; name: string; description: string }> = [];
+
+            for (const human of humans) {
+              let npcId: number;
+              if (typeof human === 'number') {
+                npcId = human;
+              } else if (human?.type === 'objref') {
+                npcId = human.value;
+              } else if (human?.id !== undefined) {
+                npcId = human.id;
+              } else {
+                continue;
+              }
+
+              const npc = await this.manager.load(npcId as ObjId);
+              if (npc) {
+                const name = await npc.get('name') || `NPC #${npcId}`;
+                const sessionId = await npc.get('agentSessionId');
+                resources.push({
+                  uri: `moo://npc-sessions/${npcId}`,
+                  name: `${name} Session`,
+                  description: sessionId ? `Conversation history for ${name}` : `No session for ${name}`,
+                });
+              }
+            }
+
+            return { resources };
+          } catch {
+            return { resources: [] };
+          }
+        },
+      }),
+      { description: 'Get conversation history for a specific NPC' },
+      async (_uri: URL, variables: { npcId?: string | string[] }) => {
+        const npcIdVar = variables.npcId;
+        const npcIdStr = Array.isArray(npcIdVar) ? npcIdVar[0] : npcIdVar;
+        const npcId = npcIdStr ? parseInt(npcIdStr, 10) : NaN;
+
+        if (isNaN(npcId)) {
+          return {
+            contents: [{
+              uri: 'moo://npc-sessions/unknown',
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: 'Invalid NPC ID' }),
+            }],
+          };
+        }
+
+        try {
+          const npc = await this.manager.load(npcId as ObjId);
+          if (!npc) {
+            return {
+              contents: [{
+                uri: `moo://npc-sessions/${npcId}`,
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: `NPC #${npcId} not found` }),
+              }],
+            };
+          }
+
+          const name = await npc.get('name') || `NPC #${npcId}`;
+          const sessionId = await npc.get('agentSessionId');
+
+          if (!sessionId) {
+            return {
+              contents: [{
+                uri: `moo://npc-sessions/${npcId}`,
+                mimeType: 'application/json',
+                text: JSON.stringify({ npcId, name, error: 'No session found' }),
+              }],
+            };
+          }
+
+          const sessionFile = path.join(sessionsDir, `${sessionId}.jsonl`);
+
+          if (!fs.existsSync(sessionFile)) {
+            return {
+              contents: [{
+                uri: `moo://npc-sessions/${npcId}`,
+                mimeType: 'application/json',
+                text: JSON.stringify({ npcId, name, sessionId, error: 'Session file not found' }),
+              }],
+            };
+          }
+
+          // Read and parse JSONL file
+          const content = fs.readFileSync(sessionFile, 'utf-8');
+          const lines = content.trim().split('\n').filter(l => l.trim());
+          const messages: Array<{ type: string; timestamp?: string; content?: unknown }> = [];
+
+          for (const line of lines) {
+            try {
+              const parsed = JSON.parse(line);
+              // Extract key info from each message
+              if (parsed.type === 'user' && parsed.message?.content) {
+                messages.push({
+                  type: 'user',
+                  timestamp: parsed.timestamp,
+                  content: parsed.message.content,
+                });
+              } else if (parsed.type === 'assistant' && parsed.message?.content) {
+                messages.push({
+                  type: 'assistant',
+                  timestamp: parsed.timestamp,
+                  content: parsed.message.content,
+                });
+              }
+            } catch {
+              // Skip malformed lines
+            }
+          }
+
+          return {
+            contents: [{
+              uri: `moo://npc-sessions/${npcId}`,
+              mimeType: 'application/json',
+              text: JSON.stringify({
+                npcId,
+                name,
+                sessionId,
+                messageCount: messages.length,
+                messages,
+              }, null, 2),
+            }],
+          };
+        } catch (err) {
+          return {
+            contents: [{
+              uri: `moo://npc-sessions/${npcId}`,
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: String(err) }),
+            }],
+          };
+        }
+      }
+    );
+
+    // Individual AI profile resource - moo://ai/{id}
+    server.resource(
+      'ai-profile',
+      new ResourceTemplate('moo://ai/{id}', {
+        list: async () => {
+          try {
+            const aiRegistry = await this.getAlias('ai');
+            if (!aiRegistry) return { resources: [] };
+
+            const humans = await aiRegistry.call('getAll') || [];
+            const resources: Array<{ uri: string; name: string; description: string }> = [];
+
+            for (const human of humans) {
+              const npcId = typeof human === 'number' ? human : human?.id ?? human?.value;
+              if (!npcId) continue;
+
+              const npc = await this.manager.load(npcId as ObjId);
+              if (npc) {
+                const name = String(await npc.get('name') || `NPC #${npcId}`);
+                resources.push({
+                  uri: `moo://ai/${npcId}`,
+                  name: `${name} Profile`,
+                  description: `Full profile for ${name}`,
+                });
+              }
+            }
+            return { resources };
+          } catch {
+            return { resources: [] };
+          }
+        },
+      }),
+      { description: 'Get full profile for an AI NPC (personality, history, memories, notes)' },
+      async (_uri: URL, variables: { id?: string | string[] }) => {
+        const idVar = variables.id;
+        const idStr = Array.isArray(idVar) ? idVar[0] : idVar;
+        const npcId = idStr ? parseInt(idStr, 10) : NaN;
+
+        if (isNaN(npcId)) {
+          return {
+            contents: [{
+              uri: 'moo://ai/unknown',
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: 'Invalid NPC ID' }),
+            }],
+          };
+        }
+
+        try {
+          const aiRegistry = await this.getAlias('ai');
+          if (!aiRegistry) {
+            return {
+              contents: [{
+                uri: `moo://ai/${npcId}`,
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: 'AI registry not found' }),
+              }],
+            };
+          }
+
+          const profile = await aiRegistry.call('getProfile', npcId);
+          const memories = await aiRegistry.call('recall', npcId) as { memories?: unknown[] } | null;
+
+          return {
+            contents: [{
+              uri: `moo://ai/${npcId}`,
+              mimeType: 'application/json',
+              text: JSON.stringify({
+                ...profile,
+                memories: memories?.memories || [],
+              }, null, 2),
+            }],
+          };
+        } catch (err) {
+          return {
+            contents: [{
+              uri: `moo://ai/${npcId}`,
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: String(err) }),
+            }],
+          };
+        }
+      }
+    );
+
+    // AI memories resource - moo://ai/{id}/memories
+    server.resource(
+      'ai-memories',
+      new ResourceTemplate('moo://ai/{id}/memories', { list: undefined }),
+      { description: 'Get memories for an AI NPC' },
+      async (_uri: URL, variables: { id?: string | string[] }) => {
+        const idVar = variables.id;
+        const idStr = Array.isArray(idVar) ? idVar[0] : idVar;
+        const npcId = idStr ? parseInt(idStr, 10) : NaN;
+
+        if (isNaN(npcId)) {
+          return {
+            contents: [{
+              uri: 'moo://ai/unknown/memories',
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: 'Invalid NPC ID' }),
+            }],
+          };
+        }
+
+        try {
+          const aiRegistry = await this.getAlias('ai');
+          if (!aiRegistry) {
+            return {
+              contents: [{
+                uri: `moo://ai/${npcId}/memories`,
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: 'AI registry not found' }),
+              }],
+            };
+          }
+
+          const result = await aiRegistry.call('recall', npcId) as { memories?: unknown[] } | null;
+
+          return {
+            contents: [{
+              uri: `moo://ai/${npcId}/memories`,
+              mimeType: 'application/json',
+              text: JSON.stringify(result?.memories || [], null, 2),
+            }],
+          };
+        } catch (err) {
+          return {
+            contents: [{
+              uri: `moo://ai/${npcId}/memories`,
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: String(err) }),
+            }],
+          };
+        }
+      }
+    );
+
+    // AI notes resource - moo://ai/{id}/notes
+    server.resource(
+      'ai-notes',
+      new ResourceTemplate('moo://ai/{id}/notes', { list: undefined }),
+      { description: 'Get notes for an AI NPC' },
+      async (_uri: URL, variables: { id?: string | string[] }) => {
+        const idVar = variables.id;
+        const idStr = Array.isArray(idVar) ? idVar[0] : idVar;
+        const npcId = idStr ? parseInt(idStr, 10) : NaN;
+
+        if (isNaN(npcId)) {
+          return {
+            contents: [{
+              uri: 'moo://ai/unknown/notes',
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: 'Invalid NPC ID' }),
+            }],
+          };
+        }
+
+        try {
+          const notesSystem = await this.getAlias('notes');
+          if (!notesSystem) {
+            return {
+              contents: [{
+                uri: `moo://ai/${npcId}/notes`,
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: 'Notes system not found' }),
+              }],
+            };
+          }
+
+          const notes = await notesSystem.call('get', npcId);
+
+          return {
+            contents: [{
+              uri: `moo://ai/${npcId}/notes`,
+              mimeType: 'application/json',
+              text: JSON.stringify(notes || [], null, 2),
+            }],
+          };
+        } catch (err) {
+          return {
+            contents: [{
+              uri: `moo://ai/${npcId}/notes`,
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: String(err) }),
+            }],
+          };
+        }
+      }
+    );
+
+    // Individual plot resource - moo://plots/{id}
+    server.resource(
+      'plot-detail',
+      new ResourceTemplate('moo://plots/{id}', {
+        list: async () => {
+          try {
+            const plotDB = await this.getPlotDB();
+            if (!plotDB) return { resources: [] };
+
+            const plots = plotDB.getAll();
+            return {
+              resources: plots.map((p: { id: number; name: string; status: string }) => ({
+                uri: `moo://plots/${p.id}`,
+                name: p.name,
+                description: `Plot: ${p.name} (${p.status})`,
+              })),
+            };
+          } catch {
+            return { resources: [] };
+          }
+        },
+      }),
+      { description: 'Get details for a specific plot' },
+      async (_uri: URL, variables: { id?: string | string[] }) => {
+        const idVar = variables.id;
+        const idStr = Array.isArray(idVar) ? idVar[0] : idVar;
+        const plotId = idStr ? parseInt(idStr, 10) : NaN;
+
+        if (isNaN(plotId)) {
+          return {
+            contents: [{
+              uri: 'moo://plots/unknown',
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: 'Invalid plot ID' }),
+            }],
+          };
+        }
+
+        try {
+          const plotDB = await this.getPlotDB();
+          if (!plotDB) {
+            return {
+              contents: [{
+                uri: `moo://plots/${plotId}`,
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: 'PlotDB not found' }),
+              }],
+            };
+          }
+
+          const plot = plotDB.get(plotId);
+          if (!plot) {
+            return {
+              contents: [{
+                uri: `moo://plots/${plotId}`,
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: `Plot #${plotId} not found` }),
+              }],
+            };
+          }
+
+          return {
+            contents: [{
+              uri: `moo://plots/${plotId}`,
+              mimeType: 'application/json',
+              text: JSON.stringify(plot, null, 2),
+            }],
+          };
+        } catch (err) {
+          return {
+            contents: [{
+              uri: `moo://plots/${plotId}`,
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: String(err) }),
+            }],
+          };
+        }
+      }
+    );
+
+    // Plot events resource - moo://plots/{id}/events
+    server.resource(
+      'plot-events',
+      new ResourceTemplate('moo://plots/{id}/events', { list: undefined }),
+      { description: 'Get event log for a specific plot' },
+      async (_uri: URL, variables: { id?: string | string[] }) => {
+        const idVar = variables.id;
+        const idStr = Array.isArray(idVar) ? idVar[0] : idVar;
+        const plotId = idStr ? parseInt(idStr, 10) : NaN;
+
+        if (isNaN(plotId)) {
+          return {
+            contents: [{
+              uri: 'moo://plots/unknown/events',
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: 'Invalid plot ID' }),
+            }],
+          };
+        }
+
+        try {
+          const plotDB = await this.getPlotDB();
+          if (!plotDB) {
+            return {
+              contents: [{
+                uri: `moo://plots/${plotId}/events`,
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: 'PlotDB not found' }),
+              }],
+            };
+          }
+
+          const events = plotDB.getEvents(plotId);
+
+          return {
+            contents: [{
+              uri: `moo://plots/${plotId}/events`,
+              mimeType: 'application/json',
+              text: JSON.stringify(events || [], null, 2),
+            }],
+          };
+        } catch (err) {
+          return {
+            contents: [{
+              uri: `moo://plots/${plotId}/events`,
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: String(err) }),
+            }],
+          };
+        }
+      }
+    );
+
+    // Room state resource - moo://rooms/{id}
+    server.resource(
+      'room-state',
+      new ResourceTemplate('moo://rooms/{id}', {
+        list: async () => {
+          try {
+            // Find rooms by walking parent chain to $.room (id 7)
+            const allObjects = await this.manager.db.listAll(false);
+            const roomProtoId = 7;
+            const rooms: Array<{ id: number; name: string }> = [];
+
+            for (const obj of allObjects) {
+              let parentId = obj.parent;
+              let isRoom = obj._id === roomProtoId;
+              const seen = new Set<number>();
+              while (parentId !== -1 && !isRoom && !seen.has(parentId)) {
+                seen.add(parentId);
+                if (parentId === roomProtoId) {
+                  isRoom = true;
+                  break;
+                }
+                const parent = allObjects.find(o => o._id === parentId);
+                if (!parent) break;
+                parentId = parent.parent;
+              }
+
+              if (isRoom && obj._id !== roomProtoId) {
+                rooms.push({
+                  id: obj._id,
+                  name: obj.properties?.name?.value || `Room #${obj._id}`,
+                });
+              }
+              if (rooms.length >= 100) break;
+            }
+
+            return {
+              resources: rooms.map(r => ({
+                uri: `moo://rooms/${r.id}`,
+                name: r.name,
+                description: `Room: ${r.name}`,
+              })),
+            };
+          } catch {
+            return { resources: [] };
+          }
+        },
+      }),
+      { description: 'Get live state for a room (contents, players, exits)' },
+      async (_uri: URL, variables: { id?: string | string[] }) => {
+        const idVar = variables.id;
+        const idStr = Array.isArray(idVar) ? idVar[0] : idVar;
+        const roomId = idStr ? parseInt(idStr, 10) : NaN;
+
+        if (isNaN(roomId)) {
+          return {
+            contents: [{
+              uri: 'moo://rooms/unknown',
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: 'Invalid room ID' }),
+            }],
+          };
+        }
+
+        try {
+          const room = await this.manager.load(roomId as ObjId);
+          if (!room) {
+            return {
+              contents: [{
+                uri: `moo://rooms/${roomId}`,
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: `Room #${roomId} not found` }),
+              }],
+            };
+          }
+
+          const name = await room.get('name');
+          const description = await room.get('description');
+          const coordinates = await room.get('coordinates');
+
+          // Get contents
+          const contentIds = await room.get('contents') as Array<{ type: string; value: number }> | undefined;
+          const contents: Array<{ id: number; name: string; type: string }> = [];
+          const players: Array<{ id: number; name: string; connected: boolean }> = [];
+
+          if (contentIds) {
+            for (const ref of contentIds) {
+              const objId = ref?.value ?? ref;
+              if (typeof objId !== 'number') continue;
+
+              const obj = await this.manager.load(objId as ObjId);
+              if (!obj) continue;
+
+              const objName = String(await obj.get('name') || `#${objId}`);
+              const isPlayer = await obj.get('playername');
+
+              if (isPlayer) {
+                players.push({
+                  id: objId,
+                  name: objName,
+                  connected: !!(await obj.get('connection')),
+                });
+              } else {
+                const raw = obj._getRaw();
+                const parent = raw.parent as ObjId | undefined;
+                const parentObj = parent ? await this.manager.load(parent) : null;
+                const parentName = parentObj ? String(await parentObj.get('name') || 'Object') : 'Object';
+                contents.push({
+                  id: objId,
+                  name: objName,
+                  type: parentName,
+                });
+              }
+            }
+          }
+
+          // Get exits
+          const exitIds = await room.get('exits') as Array<{ type: string; value: number }> | undefined;
+          const exits: Array<{ direction: string; destId: number; destName: string }> = [];
+
+          if (exitIds) {
+            for (const ref of exitIds) {
+              const exitId = ref?.value ?? ref;
+              if (typeof exitId !== 'number') continue;
+
+              const exit = await this.manager.load(exitId as ObjId);
+              if (!exit) continue;
+
+              const direction = String(await exit.get('direction') || 'unknown');
+              const destRef = await exit.get('destination') as { value: number } | number | undefined;
+              const destId = typeof destRef === 'number' ? destRef : destRef?.value;
+
+              if (destId) {
+                const dest = await this.manager.load(destId as ObjId);
+                exits.push({
+                  direction,
+                  destId,
+                  destName: String(dest?.get('name') || `#${destId}`),
+                });
+              }
+            }
+          }
+
+          return {
+            contents: [{
+              uri: `moo://rooms/${roomId}`,
+              mimeType: 'application/json',
+              text: JSON.stringify({
+                id: roomId,
+                name,
+                description,
+                coordinates,
+                exits,
+                players,
+                contents,
+              }, null, 2),
+            }],
+          };
+        } catch (err) {
+          return {
+            contents: [{
+              uri: `moo://rooms/${roomId}`,
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: String(err) }),
+            }],
+          };
+        }
+      }
+    );
+
+    // Individual player resource - moo://players/{id}
+    server.resource(
+      'player-detail',
+      new ResourceTemplate('moo://players/{id}', {
+        list: async () => {
+          try {
+            // Query MongoDB for objects with playername property
+            const db = (this.manager as any).db;
+            if (!db || !db.objects) return { resources: [] };
+
+            const docs = await db.objects.find({
+              'properties.playername': { $exists: true },
+              'properties._deleted': { $ne: true },
+            }).toArray();
+
+            return {
+              resources: docs.map((doc: any) => {
+                // Handle name which may be stored as string or { type, value }
+                const nameVal = doc.properties?.name;
+                const name = typeof nameVal === 'string' ? nameVal : nameVal?.value || `Player #${doc._id}`;
+                return {
+                  uri: `moo://players/${doc._id}`,
+                  name: String(name),
+                  description: `Player: ${name}`,
+                };
+              }),
+            };
+          } catch {
+            return { resources: [] };
+          }
+        },
+      }),
+      { description: 'Get details for a specific player' },
+      async (_uri: URL, variables: { id?: string | string[] }) => {
+        const idVar = variables.id;
+        const idStr = Array.isArray(idVar) ? idVar[0] : idVar;
+        const playerId = idStr ? parseInt(idStr, 10) : NaN;
+
+        if (isNaN(playerId)) {
+          return {
+            contents: [{
+              uri: 'moo://players/unknown',
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: 'Invalid player ID' }),
+            }],
+          };
+        }
+
+        try {
+          const player = await this.manager.load(playerId as ObjId);
+          if (!player) {
+            return {
+              contents: [{
+                uri: `moo://players/${playerId}`,
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: `Player #${playerId} not found` }),
+              }],
+            };
+          }
+
+          const name = await player.get('name');
+          const playername = await player.get('playername');
+          if (!playername) {
+            return {
+              contents: [{
+                uri: `moo://players/${playerId}`,
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: `#${playerId} is not a player` }),
+              }],
+            };
+          }
+
+          const locationRef = await player.get('location') as { value: number } | number | undefined;
+          const locationId = typeof locationRef === 'number' ? locationRef : locationRef?.value;
+          let locationName = null;
+          if (locationId) {
+            const loc = await this.manager.load(locationId as ObjId);
+            locationName = loc ? String(await loc.get('name')) : null;
+          }
+
+          return {
+            contents: [{
+              uri: `moo://players/${playerId}`,
+              mimeType: 'application/json',
+              text: JSON.stringify({
+                id: playerId,
+                name,
+                playername,
+                connected: !!(await player.get('connection')),
+                location: locationId ? { id: locationId, name: locationName } : null,
+                wizard: await player.get('wizard') || false,
+                sex: await player.get('sex'),
+                age: await player.get('age'),
+                createdAt: await player.get('createdAt'),
+              }, null, 2),
+            }],
+          };
+        } catch (err) {
+          return {
+            contents: [{
+              uri: `moo://players/${playerId}`,
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: String(err) }),
+            }],
+          };
+        }
+      }
+    );
+
+    // Generic object resource - moo://objects/{id}
+    server.resource(
+      'object-detail',
+      new ResourceTemplate('moo://objects/{id}', { list: undefined }),
+      { description: 'Get details for any MOO object' },
+      async (_uri: URL, variables: { id?: string | string[] }) => {
+        const idVar = variables.id;
+        const idStr = Array.isArray(idVar) ? idVar[0] : idVar;
+        const objId = idStr ? parseInt(idStr, 10) : NaN;
+
+        if (isNaN(objId)) {
+          return {
+            contents: [{
+              uri: 'moo://objects/unknown',
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: 'Invalid object ID' }),
+            }],
+          };
+        }
+
+        try {
+          const obj = await this.manager.load(objId as ObjId);
+          if (!obj) {
+            return {
+              contents: [{
+                uri: `moo://objects/${objId}`,
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: `Object #${objId} not found` }),
+              }],
+            };
+          }
+
+          // Use same approach as get_object tool
+          const raw = obj._getRaw();
+          const result = {
+            _id: raw._id,
+            parent: raw.parent,
+            properties: this.serializeValue(obj.getOwnProperties()),
+            methods: Object.keys(raw.methods || {}),
+            created: raw.created,
+            modified: raw.modified,
+          };
+
+          return {
+            contents: [{
+              uri: `moo://objects/${objId}`,
+              mimeType: 'application/json',
+              text: JSON.stringify(result, null, 2),
+            }],
+          };
+        } catch (err) {
+          return {
+            contents: [{
+              uri: `moo://objects/${objId}`,
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: String(err) }),
+            }],
+          };
+        }
+      }
+    );
+
+    // Recent events resource - moo://events/recent
+    server.resource(
+      'recent-events',
+      'moo://events/recent',
+      { description: 'Get recent game events (last 100)' },
+      async () => {
+        try {
+          // Get events from MongoDB game_events collection
+          const db = (this.manager as any).db;
+          if (!db || !db.getCollection) {
+            return {
+              contents: [{
+                uri: 'moo://events/recent',
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: 'Database not available' }),
+              }],
+            };
+          }
+
+          const events = await db.getCollection('game_events')
+            .find({})
+            .sort({ timestamp: -1 })
+            .limit(100)
+            .toArray();
+
+          return {
+            contents: [{
+              uri: 'moo://events/recent',
+              mimeType: 'application/json',
+              text: JSON.stringify(events, null, 2),
+            }],
+          };
+        } catch (err) {
+          return {
+            contents: [{
+              uri: 'moo://events/recent',
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: String(err) }),
+            }],
+          };
+        }
+      }
+    );
+
+    // Object property resource - moo://objects/{id}/prop/{name}
+    server.resource(
+      'object-prop',
+      new ResourceTemplate('moo://objects/{id}/prop/{name}', { list: undefined }),
+      { description: 'Get a specific property from a MOO object' },
+      async (_uri: URL, variables: { id?: string | string[]; name?: string | string[] }) => {
+        const idVar = variables.id;
+        const nameVar = variables.name;
+        const idStr = Array.isArray(idVar) ? idVar[0] : idVar;
+        const propName = Array.isArray(nameVar) ? nameVar[0] : nameVar;
+        const objId = idStr ? parseInt(idStr, 10) : NaN;
+
+        if (isNaN(objId) || !propName) {
+          return {
+            contents: [{
+              uri: `moo://objects/${idStr}/prop/${propName}`,
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: 'Invalid object ID or property name' }),
+            }],
+          };
+        }
+
+        try {
+          const obj = await this.manager.load(objId as ObjId);
+          if (!obj) {
+            return {
+              contents: [{
+                uri: `moo://objects/${objId}/prop/${propName}`,
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: `Object #${objId} not found` }),
+              }],
+            };
+          }
+
+          const value = await obj.get(propName);
+
+          return {
+            contents: [{
+              uri: `moo://objects/${objId}/prop/${propName}`,
+              mimeType: 'application/json',
+              text: JSON.stringify({
+                objectId: objId,
+                property: propName,
+                value: this.serializeValue(value),
+              }, null, 2),
+            }],
+          };
+        } catch (err) {
+          return {
+            contents: [{
+              uri: `moo://objects/${objId}/prop/${propName}`,
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: String(err) }),
+            }],
+          };
+        }
+      }
+    );
+
+    // Object method resource - moo://objects/{id}/method/{name}
+    // Walks inheritance chain to find method
+    server.resource(
+      'object-method',
+      new ResourceTemplate('moo://objects/{id}/method/{name}', { list: undefined }),
+      { description: 'Get the TypeScript code for a method on a MOO object (walks inheritance chain)' },
+      async (_uri: URL, variables: { id?: string | string[]; name?: string | string[] }) => {
+        const idVar = variables.id;
+        const nameVar = variables.name;
+        const idStr = Array.isArray(idVar) ? idVar[0] : idVar;
+        const methodName = Array.isArray(nameVar) ? nameVar[0] : nameVar;
+        const objId = idStr ? parseInt(idStr, 10) : NaN;
+
+        if (isNaN(objId) || !methodName) {
+          return {
+            contents: [{
+              uri: `moo://objects/${idStr}/method/${methodName}`,
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: 'Invalid object ID or method name' }),
+            }],
+          };
+        }
+
+        try {
+          let currentObj = await this.manager.load(objId as ObjId);
+          if (!currentObj) {
+            return {
+              contents: [{
+                uri: `moo://objects/${objId}/method/${methodName}`,
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: `Object #${objId} not found` }),
+              }],
+            };
+          }
+
+          // Walk inheritance chain to find the method
+          let foundOn: number | null = null;
+          let foundOnName: string | null = null;
+          let method: { code?: string; help?: string; callable?: boolean } | null = null;
+          const visited = new Set<number>();
+
+          while (currentObj && !visited.has(currentObj.id)) {
+            visited.add(currentObj.id);
+            const raw = currentObj._getRaw();
+
+            if (raw.methods?.[methodName]) {
+              method = raw.methods[methodName];
+              foundOn = currentObj.id;
+              foundOnName = String(await currentObj.get('name') || `#${currentObj.id}`);
+              break;
+            }
+
+            // Move to parent
+            if (raw.parent && raw.parent !== currentObj.id) {
+              currentObj = await this.manager.load(raw.parent as ObjId);
+            } else {
+              break;
+            }
+          }
+
+          if (!method) {
+            return {
+              contents: [{
+                uri: `moo://objects/${objId}/method/${methodName}`,
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: `Method '${methodName}' not found on #${objId} or any parent` }),
+              }],
+            };
+          }
+
+          // Return JSON with metadata + code
+          return {
+            contents: [{
+              uri: `moo://objects/${objId}/method/${methodName}`,
+              mimeType: 'application/json',
+              text: JSON.stringify({
+                requestedObject: objId,
+                definedOn: {
+                  id: foundOn,
+                  name: foundOnName,
+                },
+                inherited: foundOn !== objId,
+                method: methodName,
+                help: method.help || null,
+                callable: method.callable ?? true,
+                code: method.code || '',
+              }, null, 2),
+            }],
+          };
+        } catch (err) {
+          return {
+            contents: [{
+              uri: `moo://objects/${objId}/method/${methodName}`,
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: String(err) }),
+            }],
+          };
+        }
+      }
+    );
+
+    // Object list with pagination - moo://objects/list/{page}
+    server.resource(
+      'object-list',
+      new ResourceTemplate('moo://objects/list/{page}', {
+        list: async () => {
+          return {
+            resources: [
+              { uri: 'moo://objects/list/1', name: 'Objects Page 1', description: 'First 100 objects' },
+              { uri: 'moo://objects/list/2', name: 'Objects Page 2', description: 'Objects 101-200' },
+              { uri: 'moo://objects/list/3', name: 'Objects Page 3', description: 'Objects 201-300' },
+            ],
+          };
+        },
+      }),
+      { description: 'List MOO objects with pagination (100 per page)' },
+      async (_uri: URL, variables: { page?: string | string[] }) => {
+        const pageVar = variables.page;
+        const pageStr = Array.isArray(pageVar) ? pageVar[0] : pageVar;
+        const page = pageStr ? parseInt(pageStr, 10) : 1;
+
+        if (isNaN(page) || page < 1) {
+          return {
+            contents: [{
+              uri: 'moo://objects/list/1',
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: 'Invalid page number' }),
+            }],
+          };
+        }
+
+        try {
+          const db = (this.manager as any).db;
+          if (!db || !db.objects) {
+            return {
+              contents: [{
+                uri: `moo://objects/list/${page}`,
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: 'Database not available' }),
+              }],
+            };
+          }
+
+          const limit = 100;
+          const skip = (page - 1) * limit;
+
+          const docs = await db.objects
+            .find({ 'properties._deleted': { $ne: true } })
+            .sort({ _id: 1 })
+            .skip(skip)
+            .limit(limit)
+            .toArray();
+
+          const total = await db.objects.countDocuments({ 'properties._deleted': { $ne: true } });
+          const totalPages = Math.ceil(total / limit);
+
+          const objects = docs.map((doc: any) => {
+            const nameVal = doc.properties?.name;
+            const name = typeof nameVal === 'string' ? nameVal : nameVal?.value || `#${doc._id}`;
+            return {
+              id: doc._id,
+              name,
+              parent: doc.parent,
+            };
+          });
+
+          return {
+            contents: [{
+              uri: `moo://objects/list/${page}`,
+              mimeType: 'application/json',
+              text: JSON.stringify({
+                page,
+                totalPages,
+                total,
+                limit,
+                objects,
+              }, null, 2),
+            }],
+          };
+        } catch (err) {
+          return {
+            contents: [{
+              uri: `moo://objects/list/${page}`,
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: String(err) }),
             }],
           };
         }

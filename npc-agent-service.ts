@@ -101,6 +101,16 @@ async function getMcpSession(): Promise<string> {
   return sessionInitPromise;
 }
 
+/**
+ * Reset the MCP session and get a new one (for when session expires)
+ */
+async function resetMcpSession(): Promise<string> {
+  console.log('[NPC-Agent] Resetting MCP session...');
+  sharedMcpSessionId = null;
+  sessionInitPromise = null;
+  return getMcpSession();
+}
+
 async function mcpCall(tool: string, args: Record<string, unknown>): Promise<any> {
   const mcpSessionId = await getMcpSession();
 
@@ -197,6 +207,8 @@ async function createAgentForNpc(npcId: number, name: string, role: string, exis
         console.error(`[NPC-Agent] Failed to save session for ${name}:`, err);
       }
     },
+    getMcpSessionId: async () => getMcpSession(),
+    resetMcpSession: async () => resetMcpSession(),
   });
 
   agent.on('error', (err) => {

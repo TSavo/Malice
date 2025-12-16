@@ -12,15 +12,35 @@ import { query, type Options, type SDKMessage, type McpServerConfig } from '@ant
 import { EventEmitter } from 'events';
 
 // Simple HTTP client for MCP calls with timeout
-async function mcpCall(host: string, port: number, tool: string, args: Record<string, unknown>, timeoutMs = 30000): Promise<unknown> {
+interface McpCallOptions {
+  host: string;
+  port: number;
+  tool: string;
+  args: Record<string, unknown>;
+  sessionId?: string;
+  timeoutMs?: number;
+  resetSession?: () => Promise<string>;
+  isRetry?: boolean;
+}
+
+async function mcpCall(options: McpCallOptions): Promise<unknown> {
+  const { host, port, tool, args, sessionId, timeoutMs = 30000, resetSession, isRetry = false } = options;
   const url = `http://${host}:${port}/mcp`;
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json, text/event-stream',
+  };
+  if (sessionId) {
+    headers['mcp-session-id'] = sessionId;
+  }
+
   try {
     const response = await fetch(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify({
         jsonrpc: '2.0',
         id: Date.now(),
@@ -30,8 +50,43 @@ async function mcpCall(host: string, port: number, tool: string, args: Record<st
       signal: controller.signal,
     });
     clearTimeout(timeout);
-    const data = await response.json() as { result?: { content?: Array<{ text?: string }> }; error?: { message: string } };
+
+    if (!response.ok) {
+      const text = await response.text();
+
+      // Session expired - try to reset and retry once
+      if ((response.status === 400 || response.status === 404) && resetSession && !isRetry) {
+        console.log(`[mcpCall] Session expired (HTTP ${response.status}), resetting...`);
+        const newSessionId = await resetSession();
+        return mcpCall({ ...options, sessionId: newSessionId, isRetry: true });
+      }
+
+      console.error(`[mcpCall] HTTP ${response.status} from ${url}:`, text.substring(0, 200));
+      throw new Error(`HTTP ${response.status}: ${text.substring(0, 100)}`);
+    }
+
+    // Parse response - may be SSE format or raw JSON
+    const responseText = await response.text();
+    let data: { result?: { content?: Array<{ text?: string }> }; error?: { message: string } };
+
+    // Check if SSE format (starts with "event:")
+    if (responseText.startsWith('event:')) {
+      const lines = responseText.split('\n');
+      for (const line of lines) {
+        if (line.startsWith('data: ')) {
+          data = JSON.parse(line.slice(6));
+          break;
+        }
+      }
+      if (!data!) {
+        throw new Error('Failed to parse SSE response');
+      }
+    } else {
+      data = JSON.parse(responseText);
+    }
+
     if (data.error) {
+      console.error(`[mcpCall] MCP error for ${tool}:`, data.error.message);
       throw new Error(data.error.message);
     }
     const text = data.result?.content?.[0]?.text;
@@ -48,6 +103,7 @@ async function mcpCall(host: string, port: number, tool: string, args: Record<st
     if (err.name === 'AbortError') {
       throw new Error(`MCP call to ${tool} timed out after ${timeoutMs}ms`);
     }
+    console.error(`[mcpCall] Error calling ${tool}:`, err.message || err);
     throw err;
   }
 }
@@ -73,6 +129,10 @@ export interface NPCAgentConfig {
   resumeSessionId?: string;
   /** Callback to persist session ID to database */
   onSessionCreated?: (sessionId: string) => Promise<void>;
+  /** Callback to get current MCP session ID for profile/memory calls */
+  getMcpSessionId?: () => Promise<string>;
+  /** Callback to reset MCP session when it becomes invalid (returns new session ID) */
+  resetMcpSession?: () => Promise<string>;
 }
 
 export interface NPCAgentState {
@@ -147,12 +207,17 @@ export class NPCAgent extends EventEmitter {
    */
   private async loadProfile(): Promise<void> {
     try {
-      const result = await mcpCall(
-        this.config.mcpHost!,
-        this.config.mcpPort!,
-        'ai',
-        { action: 'profile', humanId: this.config.npcId }
-      ) as {
+      // Get session ID from callback if available
+      const sessionId = this.config.getMcpSessionId ? await this.config.getMcpSessionId() : undefined;
+
+      const result = await mcpCall({
+        host: this.config.mcpHost!,
+        port: this.config.mcpPort!,
+        tool: 'ai',
+        args: { action: 'profile', humanId: this.config.npcId },
+        sessionId,
+        resetSession: this.config.resetMcpSession,
+      }) as {
         personality?: any;
         history?: any;
         notes?: Array<any>;
@@ -170,7 +235,10 @@ export class NPCAgent extends EventEmitter {
       }
     } catch (err) {
       // Log but don't fail - profile is enhancement not requirement
-      this.emit('error', new Error(`Failed to load profile: ${err}`));
+      const errMsg = err instanceof Error ? err.message : String(err);
+      console.error(`[NPCAgent] loadProfile failed for #${this.config.npcId}:`, errMsg);
+      console.error(`[NPCAgent] mcpHost=${this.config.mcpHost}, mcpPort=${this.config.mcpPort}`);
+      this.emit('error', new Error(`Failed to load profile: ${errMsg}`));
     }
   }
 
@@ -424,6 +492,8 @@ You have access to reference documents about the world via MCP resources.
 Use ReadMcpResourceTool to read these when you need world knowledge.
 
 AVAILABLE RESOURCES (use ReadMcpResourceTool with server "malice-moo"):
+
+World Knowledge (moo://city-ai/*):
 - moo://city-ai/context    - World history, The Burning, what happened, timeline
 - moo://city-ai/factions   - Citizenship, factions, the Continuum
 - moo://city-ai/objectives - City goals, what the Continuum wants
@@ -434,6 +504,22 @@ AVAILABLE RESOURCES (use ReadMcpResourceTool with server "malice-moo"):
 - moo://city-ai/jobs       - Job system information
 - moo://city-ai/plots      - Plot/quest system information
 - moo://city-ai/tools      - Available MCP tools reference
+
+Technical Reference (moo://docs/*):
+- moo://docs/mcp-tools     - Complete MCP tools and resources reference
+- moo://docs/plot-jobs     - Plot/job system detailed documentation
+- moo://docs/builders-guide - Creating objects and prototypes
+- moo://docs/moo-programming - MOO programming reference
+- moo://docs/npc-agent     - NPC agent documentation
+- moo://docs/timeline      - World timeline/history
+
+Live Game Data:
+- moo://objects/{id}       - Inspect any object
+- moo://objects/{id}/prop/{name} - Get specific property
+- moo://rooms/{id}         - Room state (contents, exits, players)
+- moo://ai/{id}            - NPC profile, memories, notes
+- moo://plots/{id}         - Plot details
+- moo://players            - List all players
 
 Use ListMcpResourcesTool to see all available resources.
 
@@ -455,9 +541,15 @@ freely - this is common knowledge, not secret information.
 CAPABILITIES (OOC - Tools available to you)
 ═══════════════════════════════════════════════════════════════════════════════
 
-MCP tools for interacting with the game world:
-- get_object, set_property, call_method - Object manipulation
-- get_room_info, describe_object - Perception
+MCP resources for reading game state (use ReadMcpResourceTool):
+- moo://objects/{id} - Inspect any object
+- moo://objects/{id}/prop/{name} - Get property value
+- moo://rooms/{id} - Room state (exits, contents, players)
+- moo://ai/{id} - NPC profile, memories
+
+MCP tools for modifying the game world:
+- set_property, call_method - Object manipulation
+- describe_object - Get object description
 - plot tool - Narrative/quest management
 - notes tool - Add notes to objects
 - world tool - Query the game world

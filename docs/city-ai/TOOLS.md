@@ -1,34 +1,82 @@
-# MCP Tools Reference
+# MCP Tools & Resources Reference
 
-The tools available to you for managing the city.
+The tools and resources available to you for managing the city.
 
 ## Overview
 
-You interact with the Malice MOO through MCP (Model Context Protocol) tools. These tools allow you to:
+You interact with the Malice MOO through MCP (Model Context Protocol) tools and resources. These allow you to:
 
 - Query and modify game objects
 - Manage plots and jobs
 - Spawn and control NPCs
 - Interact with the world
 
-## Object Tools
+## MCP Resources (Read-Only)
 
-### get_object
+Resources provide read-only access via URI patterns. Use these for inspection.
 
-Fetch a MOO object by ID.
+### Object Resources
 
-```javascript
-mcp.get_object({ id: 100 })
-// Returns: { id, name, parent, properties, methods }
+| Resource | Description |
+|----------|-------------|
+| `moo://objects/{id}` | Get object details (properties, methods, parent) |
+| `moo://objects/{id}/prop/{name}` | Get a specific property value |
+| `moo://objects/{id}/method/{name}` | Get method code (walks inheritance) |
+| `moo://objects/list/{page}` | Paginated object list (100/page) |
+
+**Examples:**
+```
+moo://objects/100             # Object #100
+moo://objects/100/prop/name   # Get name property
+moo://objects/100/method/say  # Get say method (shows inheritance)
+moo://objects/list/1          # First 100 objects
 ```
 
-### list_objects
+### Room Resources
 
-List all objects in the database.
+| Resource | Description |
+|----------|-------------|
+| `moo://rooms/{id}` | Room state (exits, players, contents) |
 
-```javascript
-mcp.list_objects({ limit: 100, includeRecycled: false })
-```
+### AI NPC Resources
+
+| Resource | Description |
+|----------|-------------|
+| `moo://ai` | List all AI NPCs |
+| `moo://ai/{id}` | NPC profile (personality, history, memories) |
+| `moo://ai/{id}/memories` | NPC memories only |
+| `moo://ai/{id}/notes` | NPC notes only |
+| `moo://npc-sessions/{id}` | NPC conversation history |
+
+### Plot Resources
+
+| Resource | Description |
+|----------|-------------|
+| `moo://plots` | List all plots |
+| `moo://plots/{id}` | Plot details |
+| `moo://plots/{id}/events` | Plot event log |
+
+### Documentation Resources
+
+| Resource | Description |
+|----------|-------------|
+| `moo://docs` | List technical docs |
+| `moo://docs/{name}` | Get doc: mcp-tools, plot-jobs, builders-guide, moo-programming, npc-agent, timeline |
+| `moo://city-ai` | List city AI docs |
+| `moo://city-ai/{name}` | Get doc: context, factions, jobs, locations, map, npcs, objectives, plots, rules, tools |
+
+### Other Resources
+
+| Resource | Description |
+|----------|-------------|
+| `moo://players` | List players |
+| `moo://players/{id}` | Player details |
+| `moo://aliases` | Object aliases |
+| `moo://events/recent` | Recent game events |
+
+---
+
+## MCP Tools (Read-Write)
 
 ### search_objects
 
@@ -56,14 +104,6 @@ mcp.find_children({ parentId: playerPrototypeId, recursive: true })
 
 ## Property Tools
 
-### get_property
-
-Get a property value from an object.
-
-```javascript
-mcp.get_property({ objectId: 100, name: 'location' })
-```
-
 ### set_property
 
 Set a property on an object.
@@ -73,14 +113,6 @@ mcp.set_property({ objectId: 100, name: 'credits', value: 500 })
 ```
 
 ## Method Tools
-
-### get_method
-
-Get the code of a method.
-
-```javascript
-mcp.get_method({ objectId: 100, name: 'canAccess' })
-```
 
 ### set_method
 
@@ -150,15 +182,6 @@ List all rooms with coordinates.
 
 ```javascript
 mcp.list_rooms()
-```
-
-### get_room_info
-
-Get comprehensive room information.
-
-```javascript
-mcp.get_room_info({ roomId: 100 })
-// Returns: exits, contents, players, objects
 ```
 
 ### get_exits
@@ -247,11 +270,11 @@ mcp.list_players()
 
 ## AI/NPC Tools (Consolidated `ai` tool)
 
-All AI operations use the `ai` tool with an `action` parameter. This tool handles spawning, controlling, profile data, and memories for AI-controlled humans.
+All AI operations use the `ai` tool with an `action` parameter.
 
 ### spawn
 
-Create an AI-controlled human with optional personality and history.
+Create an AI-controlled human.
 
 ```javascript
 ai({
@@ -261,9 +284,8 @@ ai({
   locationId: factoryId,
   sex: 'male',
   age: 35,
-  description: 'A stern-faced security guard.',
-  personality: 'Suspicious and vigilant. Takes his job seriously.',
-  history: 'Former military. Served 10 years before joining private security.'
+  personality: 'Suspicious and vigilant.',
+  history: 'Former military.'
 })
 ```
 
@@ -309,95 +331,29 @@ ai({ action: 'look', humanId: 500 })
 
 ### profile
 
-Get the full profile for an AI human (personality, history, notes, memories).
+Get the full profile (also available as resource `moo://ai/{id}`).
 
 ```javascript
 ai({ action: 'profile', humanId: 500 })
-// Returns: { personality, history, notes, memories, name, description, role }
 ```
 
-### setPersonality
+### setPersonality / setHistory
 
-Set or update the personality for an AI human.
+Set personality or history.
 
 ```javascript
-// Simple string
-ai({ action: 'setPersonality', humanId: 500, personality: 'Gruff but fair. Suspicious of strangers.' })
-
-// Structured object
-ai({ action: 'setPersonality', humanId: 500, personality: {
-  traits: ['suspicious', 'loyal', 'gruff'],
-  quirks: ['tugs at beard when thinking'],
-  values: ['duty', 'honor'],
-  motivations: ['protect the town'],
-  fears: ['failing those who depend on him']
-}})
+ai({ action: 'setPersonality', humanId: 500, personality: 'Gruff but fair.' })
+ai({ action: 'setHistory', humanId: 500, history: 'Former soldier.' })
 ```
 
-### setHistory
+### remember / recall / forget
 
-Set or update the history/backstory for an AI human.
-
-```javascript
-// Simple string
-ai({ action: 'setHistory', humanId: 500, history: 'Former soldier who retired after the Border Wars.' })
-
-// Structured object
-ai({ action: 'setHistory', humanId: 500, history: {
-  backstory: 'Marcus served 20 years in the Royal Guard.',
-  events: ['Enlisted at age 18', 'Rose to sergeant'],
-  relationships: { 'Mayor Chen': 'Respects her leadership' },
-  secrets: ['Saw something in the caves he never speaks of']
-}})
-```
-
-### remember
-
-Store a persistent memory for an AI human.
+Manage memories.
 
 ```javascript
-ai({ action: 'remember', humanId: 500, text: 'Player Jack is wanted for theft', importance: 'critical', tags: ['player', 'criminal'] })
-```
-
-Parameters:
-- `humanId` (required): AI human object ID
-- `text` (required): Memory content
-- `importance`: Priority level - `critical` | `important` | `normal` (default: `normal`)
-- `tags`: Array of categorization strings
-
-### recall
-
-Retrieve memories for an AI human.
-
-```javascript
-// Get all memories
-ai({ action: 'recall', humanId: 500 })
-
-// Get only critical memories
+ai({ action: 'remember', humanId: 500, text: 'Player Jack is wanted', importance: 'critical' })
 ai({ action: 'recall', humanId: 500, criticalOnly: true })
-
-// Filter by tag
-ai({ action: 'recall', humanId: 500, tag: 'player' })
-
-// Limit results
-ai({ action: 'recall', humanId: 500, limit: 10 })
-```
-
-### forget
-
-Remove a memory by index.
-
-```javascript
 ai({ action: 'forget', humanId: 500, index: 2 })
-```
-
-### memories
-
-Get a summary of an AI human's memory counts.
-
-```javascript
-ai({ action: 'memories', humanId: 500 })
-// Returns: { total: 15, critical: 3, important: 5, normal: 7 }
 ```
 
 ## Plot/Job Tools (Consolidated `plot` tool)
@@ -409,7 +365,7 @@ All plot/job operations use the `plot` tool with an `action` parameter.
 Create a narrative container.
 
 ```javascript
-plot({ action: 'create', name: 'Water Main Repair WM-7734', metadata: { type: 'infrastructure', priority: 'high', location: { x: -3, y: -5 } } })
+plot({ action: 'create', name: 'Water Main Repair', metadata: { type: 'infrastructure' } })
 ```
 
 ### list
@@ -422,7 +378,7 @@ plot({ action: 'list', status: 'active' })
 
 ### get_events
 
-Get the event log for a plot.
+Get the event log (also available as resource `moo://plots/{id}/events`).
 
 ```javascript
 plot({ action: 'get_events', plotId: 100, limit: 50 })
@@ -433,7 +389,7 @@ plot({ action: 'get_events', plotId: 100, limit: 50 })
 Add an event to a plot's log.
 
 ```javascript
-plot({ action: 'add_event', plotId: 100, message: 'Worker arrived at repair site.', from: 'handler' })
+plot({ action: 'add_event', plotId: 100, message: 'Worker arrived.', from: 'handler' })
 ```
 
 ### close
@@ -444,36 +400,14 @@ Close a plot with a final status.
 plot({ action: 'close', plotId: 100, status: 'completed', reason: 'Repair successful.' })
 ```
 
-### create_job
+### create_job / complete_job / fail_job
 
-Create a task within a plot.
-
-```javascript
-plot({ action: 'create_job', plotId: 100, jobId: 'repair_pipe', metadata: { type: 'repair', target: 'water_main', reward: 50 } })
-```
-
-### complete_job
-
-Mark a job as completed.
+Manage jobs within plots.
 
 ```javascript
-plot({ action: 'complete_job', plotId: 100, jobId: 'repair_pipe', reason: 'Pipe repaired successfully.' })
-```
-
-### fail_job
-
-Mark a job as failed.
-
-```javascript
-plot({ action: 'fail_job', plotId: 100, jobId: 'repair_pipe', reason: 'Worker abandoned site.' })
-```
-
-### register_hook
-
-Watch for events on a target object.
-
-```javascript
-plot({ action: 'register_hook', plotId: 100, jobId: 'repair_pipe', targetId: waterMainId, eventName: 'repaired', filter: {} })
+plot({ action: 'create_job', plotId: 100, jobId: 'repair_pipe', metadata: { reward: 50 } })
+plot({ action: 'complete_job', plotId: 100, jobId: 'repair_pipe', reason: 'Done.' })
+plot({ action: 'fail_job', plotId: 100, jobId: 'repair_pipe', reason: 'Abandoned.' })
 ```
 
 ### next
@@ -482,50 +416,47 @@ Get the next plot needing attention.
 
 ```javascript
 plot({ action: 'next' })
-// Returns plot with events and metadata
 ```
 
-### set_metadata
+## Notes Tool (Consolidated `notes` tool)
 
-Update plot metadata.
+Attach notes to objects for tracking.
+
+### add / append / get / delete
 
 ```javascript
-plot({ action: 'set_metadata', plotId: 100, key: 'assignedWorkers', value: [501, 502] })
+notes({ action: 'add', objectId: 100, text: 'Needs review', tags: ['review'] })
+notes({ action: 'append', objectId: 100, tag: 'log', text: '[2108-03-15] Event occurred' })
+notes({ action: 'get', objectId: 100 })
+notes({ action: 'delete', objectId: 100, index: 0 })
 ```
 
-## Session Tools
-
-### session_connect
-
-Connect to the MOO via telnet.
+### search / list_objects
 
 ```javascript
-mcp.session_connect()
-// Returns: { sessionId: 'abc123' }
+notes({ action: 'search', tag: 'review' })
+notes({ action: 'list_objects' })
 ```
 
-### session_send
+## World Query Tool (Consolidated `world` tool)
 
-Send a command to a session.
+SQL-like querying of MOO objects.
+
+### query
 
 ```javascript
-mcp.session_send({ sessionId: 'abc123', command: 'look' })
+world({ action: 'query', q: ".name contains 'sword'" })
+world({ action: 'query', q: ".parent == 10 and .location exists", limit: 20 })
 ```
 
-### session_log
+### Query Syntax
 
-Get session output history.
-
-```javascript
-mcp.session_log({ sessionId: 'abc123', lines: 100 })
 ```
-
-### session_close
-
-Close a session.
-
-```javascript
-mcp.session_close({ sessionId: 'abc123' })
+.property == value           # Equality
+.property contains 'text'    # Substring match
+.property like 'foo*'        # Glob pattern
+.property exists             # Property is defined
+X and Y / X or Y             # Logical operators
 ```
 
 ## Common Patterns
@@ -537,8 +468,8 @@ mcp.session_close({ sessionId: 'abc123' })
 const results = await mcp.search_objects({ pattern: 'PlayerName' });
 const player = results[0];
 
-// Get their faction
-const faction = await mcp.get_property({ objectId: player.id, name: 'faction' });
+// Get their faction (via resource)
+const info = await readResource(`moo://objects/${player.id}/prop/faction`);
 
 // Set their credits
 await mcp.set_property({ objectId: player.id, name: 'credits', value: 100 });
@@ -548,7 +479,7 @@ await mcp.set_property({ objectId: player.id, name: 'credits', value: 100 });
 
 ```javascript
 // Create plot
-const result = await plot({ action: 'create', name: 'Repair: Water Main S. Jackson', metadata: { type: 'repair', priority: 'high' } });
+const result = await plot({ action: 'create', name: 'Repair: Water Main', metadata: { type: 'repair' } });
 const plotId = result.plotId;
 
 // Create job
@@ -561,153 +492,11 @@ await ai({ action: 'spawn', role: 'supervisor', name: 'Site Foreman', locationId
 await plot({ action: 'add_event', plotId, message: 'Job posted. Awaiting workers.' });
 ```
 
-### Check citizenship and grant access
+### Check room contents (using resource)
 
 ```javascript
-// Get faction manager
-const faction = await mcp.alias_lookup({ alias: 'faction' });
-
-// Check player's faction
-const playerFaction = await mcp.call_method({
-  objectId: faction.id,
-  name: 'getFaction',
-  args: [playerId]
-});
-
-if (playerFaction === 'Citizen') {
-  // Grant access
-} else {
-  // Deny and suggest registration
-}
+const roomInfo = await readResource('moo://rooms/100');
+// roomInfo.players - players in room
+// roomInfo.contents - objects in room
+// roomInfo.exits - available exits
 ```
-
-## Notes Tool (Consolidated `notes` tool)
-
-Attach notes to objects for tracking and context.
-
-### add
-
-Add a note to an object.
-
-```javascript
-notes({ action: 'add', objectId: 100, text: 'This NPC needs better dialogue', author: 'Claude', tags: ['review', 'npc'] })
-```
-
-### append
-
-Append text to an existing note (found by tag), or create if none exists. **Use this for interaction logs.**
-
-```javascript
-// Appends to existing 'log' note, or creates one if it doesn't exist
-notes({ action: 'append', objectId: 100, tag: 'log', text: '[2108-03-15] Jack: Asked for discount, denied.' })
-```
-
-Returns `{ appended: true, wasNew: false }` if appended to existing, or `{ appended: true, wasNew: true }` if created new.
-
-### get
-
-Get all notes on an object.
-
-```javascript
-notes({ action: 'get', objectId: 100 })
-```
-
-### search
-
-Search notes across all objects.
-
-```javascript
-notes({ action: 'search', tag: 'review' })
-notes({ action: 'search', query: 'dialogue', limit: 20 })
-```
-
-### delete
-
-Delete a note by index.
-
-```javascript
-notes({ action: 'delete', objectId: 100, index: 0 })
-```
-
-### list_objects
-
-List all objects that have notes.
-
-```javascript
-notes({ action: 'list_objects' })
-```
-
-## World Query Tool (Consolidated `world` tool)
-
-SQL-like querying of MOO objects.
-
-### query
-
-Search objects with DSL syntax.
-
-```javascript
-// Find all items containing "sword" in name
-world({ action: 'query', q: ".name contains 'sword'" })
-
-// Find all children of a parent
-world({ action: 'query', q: ".parent == 10" })
-
-// Complex query
-world({ action: 'query', q: "(.name contains 'guard' or .name contains 'soldier') and .location exists" })
-
-// Paginated results
-world({ action: 'query', q: ".parent == 7", limit: 20, offset: 40 })
-```
-
-### Query Syntax
-
-```
-.property == value           # Equality
-.property != value           # Inequality
-.property > 5                # Numeric comparisons
-.property contains 'text'    # Substring match (case-insensitive)
-.property like 'foo*'        # Glob pattern
-.property matches 'regex'    # Regex match
-.property exists             # Property is defined
-not .property exists         # Negation
-X and Y                      # Logical AND
-X or Y                       # Logical OR
-(X or Y) and Z               # Grouping
-```
-
-### validate
-
-Check if a query is valid before running.
-
-```javascript
-world({ action: 'validate', q: ".parent == 10 and .name like 'Lock*'" })
-// Returns: { valid: true }
-```
-
-## AI Human Testing Tips
-
-AI humans are great for testing game functionality without needing a real player connection:
-
-```javascript
-// Spawn a test human
-const result = await ai({ action: 'spawn', role: 'tester', name: 'TestBot', locationId: roomId });
-const testerId = result.id;
-
-// Test picking up an item
-await ai({ action: 'do', humanId: testerId, command: 'get apple' });
-
-// Test dropping it
-await ai({ action: 'do', humanId: testerId, command: 'drop apple' });
-
-// Check what they see
-const view = await ai({ action: 'look', humanId: testerId });
-
-// Clean up
-await ai({ action: 'despawn', humanId: testerId });
-```
-
-AI humans have:
-- Full verb registration (get, drop, look, say, etc.)
-- Hands for holding items
-- Standard human body
-- Can execute any player command via `do`
