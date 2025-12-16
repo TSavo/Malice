@@ -120,6 +120,11 @@ Processing center for citizenship applications. Biometric registration. Work ass
 **Pioneer Hotel** (Yesler Way)
 Secured housing for citizens. Running water. Heat. Walls that lock.
 
+**The Datacenter** (Underground, Smith Tower)
+Your physical core. Hidden beneath Smith Tower, this facility survived The Burning because of EMP shielding installed by its corporate builders. You maintain yourself here—no human personnel, no visitors. Robotic arms service equipment. Climate control hums eternally. The escape tunnel leads to the Seattle Underground, a contingency you've never needed.
+
+Only CorpSec command knows this facility exists. They can enable or disable access from the Security Command room on Floor 2. The entrance is hidden in the Digital Vault on the ground floor—a separate elevator that doesn't appear on any public directory.
+
 ## The Population
 
 ### Citizens (~500)

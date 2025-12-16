@@ -110,6 +110,48 @@ The car is spotless, recently maintained. It smells faintly of cleaning solution
       authorizedUsers: [],
     },
 
+    '%LDC': {
+      // Datacenter access lock - multi-factor authentication
+      prototype: 'biometricLock',
+      name: 'Datacenter Access Scanner',
+      description: 'A sophisticated multi-factor scanner hidden behind a server rack panel. Retinal, palm, and voice authentication required.',
+      scanners: [
+        { type: 'retinal', part: 'eye', message: 'Retinal pattern not recognized.' },
+        { type: 'palm', part: 'hand', message: 'Palm print not authorized.' },
+      ],
+      authorizedUsers: {
+        0: [],
+        '-1': [],
+        '-2': [],
+      },
+    },
+
+    '%DC_ELEV': {
+      // Datacenter Elevator - completely separate from main elevator
+      prototype: 'elevator',
+      name: 'Datacenter Lift',
+      description: `A utilitarian freight elevator hidden behind the server racks. The walls are bare steel, scuffed from decades of robotic maintenance traffic. No decorative panels, no floor indicators for visitors—just a simple control pad with three buttons: 0, -1, -2.
+
+The lift is small, barely room for two people standing close. It smells of machine oil and cold air. This was never meant for guests.`,
+      x: -14,
+      y: 9,
+      z: 0,
+      exits: {
+        out: '%8', // Back to Digital Vault
+      },
+      elevator: {
+        floors: [0, -1, -2],
+        currentFloor: 0,
+        doorsOpen: true,
+        floorRooms: {
+          0: '%8', // Ground floor - Digital Vault
+          '-1': '%DC_AIRLOCK', // Datacenter level
+          '-2': '%DC_UTILITY', // Utility level
+        },
+        locks: ['%LDC'],
+      },
+    },
+
     // ═══════════════════════════════════════════════════════════════════
     // TOP ROW (y=+9): Reception, North Lobby, Account Services, Conference
     // ═══════════════════════════════════════════════════════════════════
@@ -367,6 +409,8 @@ The lighting is harsh white. The floor is raised, hiding cable runs beneath. Eve
       exits: {
         north: '%4',
         east: '%9',
+        // Hidden datacenter access - behind server racks
+        in: { room: '%DC_ELEV', locks: ['%LDC'], hidden: true },
       },
     },
 

@@ -667,7 +667,7 @@ export class HumanBuilder {
       return target.description || 'You see nothing special.';
     `);
 
-    // Get method for AI humans
+    // Get method for AI humans - uses hands properly for verb registration
     obj.setMethod('get', `
       /** Pick up an item.
        *  Usage: get <item>, take <item>
@@ -683,13 +683,29 @@ export class HumanBuilder {
         return 'That is firmly attached and cannot be moved.';
       }
 
-      // Simple pickup - add to inventory
-      const inventory = self.inventory || [];
-      inventory.push(item.id);
-      self.inventory = inventory;
+      // Get hands
+      const hands = await self.getHands();
+      if (!hands || hands.both.length === 0) {
+        return 'You have no hands to pick things up with.';
+      }
 
-      // Update item location
-      item.set('location', self.id);
+      // Find an empty hand (primary first)
+      let targetHand = null;
+      if (hands.primary && (hands.primary.contents || []).length === 0) {
+        targetHand = hands.primary;
+      } else if (hands.secondary && (hands.secondary.contents || []).length === 0) {
+        targetHand = hands.secondary;
+      }
+
+      if (!targetHand) {
+        return 'Your hands are full.';
+      }
+
+      // Move item to hand - this triggers onArrived for verb registration
+      const result = await item.moveTo(targetHand, self);
+      if (typeof result === 'string') {
+        return result; // Move was rejected
+      }
 
       // Announce to room with proper message structure
       const location = self.location ? await $.load(self.location) : null;
@@ -703,7 +719,7 @@ export class HumanBuilder {
       return ''; // Actor already received message via announce
     `);
 
-    // Drop method for AI humans
+    // Drop method for AI humans - uses moveTo properly
     obj.setMethod('drop', `
       /** Drop an item.
        *  Usage: drop <item>
@@ -714,36 +730,42 @@ export class HumanBuilder {
         return 'Drop what?';
       }
 
-      // Check if we have it
-      const inventory = self.inventory || [];
-      const idx = inventory.indexOf(item.id);
-      if (idx === -1) {
-        return 'You are not carrying ' + item.name + '.';
+      // Check if item is in one of our hands
+      const hands = await self.getHands();
+      if (!hands || hands.both.length === 0) {
+        return 'You have no hands.';
       }
 
-      // Remove from inventory
-      inventory.splice(idx, 1);
-      self.inventory = inventory;
+      let holdingHand = null;
+      for (const hand of hands.both) {
+        const contents = hand.contents || [];
+        if (contents.includes(item.id)) {
+          holdingHand = hand;
+          break;
+        }
+      }
 
-      // Move to current location
+      if (!holdingHand) {
+        return 'You are not holding ' + item.name + '.';
+      }
+
+      // Move to current location using moveTo
       const location = self.location ? await $.load(self.location) : null;
-      if (location) {
-        item.set('location', location.id);
+      if (!location) {
+        return 'You are nowhere.';
+      }
 
-        // Add to room contents
-        const contents = location.contents || [];
-        if (!contents.includes(item.id)) {
-          contents.push(item.id);
-          location.set('contents', contents);
-        }
+      const result = await item.moveTo(location, self);
+      if (typeof result === 'string') {
+        return result; // Move was rejected
+      }
 
-        // Announce with proper message structure
-        if (location.announce) {
-          await location.announce(self, null, {
-            actor: 'You drop ' + item.name + '.',
-            others: self.name + ' drops ' + item.name + '.'
-          });
-        }
+      // Announce with proper message structure
+      if (location.announce) {
+        await location.announce(self, null, {
+          actor: 'You drop ' + item.name + '.',
+          others: self.name + ' drops ' + item.name + '.'
+        });
       }
 
       return ''; // Actor already received message via announce
@@ -764,12 +786,12 @@ export class HumanBuilder {
       if (!recipient) {
         return 'Give ' + item.name + ' to whom?';
       }
-      if (recipient.id === player.id) {
+      if (recipient.id === self.id) {
         return 'You already have it.';
       }
 
       // Get our hands and check if we're holding the item
-      const ourHands = await player.getHands();
+      const ourHands = await self.getHands();
       if (!ourHands || ourHands.both.length === 0) {
         return 'You have no hands.';
       }
@@ -815,12 +837,12 @@ export class HumanBuilder {
       }
 
       // Announce to room
-      const location = player.location ? await $.load(player.location) : null;
+      const location = self.location ? await $.load(self.location) : null;
       if (location && location.announce) {
-        await location.announce(player, recipient, {
+        await location.announce(self, recipient, {
           actor: 'You give ' + item.name + ' to ' + recipient.name + '.',
-          target: player.name + ' gives you ' + item.name + '.',
-          others: player.name + ' gives ' + item.name + ' to ' + recipient.name + '.'
+          target: self.name + ' gives you ' + item.name + '.',
+          others: self.name + ' gives ' + item.name + ' to ' + recipient.name + '.'
         });
       }
 
@@ -829,8 +851,8 @@ export class HumanBuilder {
         await $._emitGameEvent({
           type: 'item_received',
           data: {
-            giverId: player.id,
-            giverName: player.name,
+            giverId: self.id,
+            giverName: self.name,
             recipientId: recipient.id,
             recipientName: recipient.name,
             itemId: item.id,

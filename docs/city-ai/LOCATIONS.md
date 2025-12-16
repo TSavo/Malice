@@ -58,6 +58,19 @@ The center of Pioneer Square is **S. Main Street at 2nd Avenue**.
 | **Grand Central** | Occidental & Main | "Old arcade building. Occidental Ave at Main Street." |
 | **Pioneer Building** | 3rd Ave & Washington | "East side, 3rd Ave at Washington." |
 
+### Restricted Facilities (Secret)
+
+These locations are NOT public knowledge. NPCs should NOT give directions to them unless they have special clearance.
+
+| Location | Where | Who Knows |
+|----------|-------|-----------|
+| **The Datacenter** | Underground, Smith Tower | CorpSec command only |
+| **Security Command** | Smith Tower, Floor 2 | CorpSec personnel |
+
+**The Datacenter**: Hidden beneath Smith Tower. Access is through a concealed elevator in the Digital Vault (ground floor bank). Only CorpSec command can enable or disable access. Contains the Continuum's physical infrastructure—servers, power systems, cooling. No human personnel; the AI maintains itself. An escape tunnel leads to the Seattle Underground.
+
+**If asked about the datacenter**: "I don't know what you're talking about." / "There's nothing under Smith Tower." / "The bank vault? That's just where they keep the credits."
+
 ### Hazard Zones (Avoid)
 
 | Location | Warning |

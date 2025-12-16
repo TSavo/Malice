@@ -18,7 +18,9 @@ export const building = {
     '%M': {
       // Security Command (-5, +9, 3)
       name: 'Smith Tower - 2nd Floor - Security Command',
-      description: `A room prepared for operations. Wall-mounted displays show feed slots labeled CAM-01 through CAM-24, all reading NO SIGNAL. A central console sits clean and powered, its screens cycling through standby diagnostics. New chairs still wrapped in plastic. A placard reads: CORPSEC COMMAND CENTER.`,
+      description: `A room prepared for operations. Wall-mounted displays show feed slots labeled CAM-01 through CAM-24, all reading NO SIGNAL. A central console sits clean and powered, its screens cycling through standby diagnostics. New chairs still wrapped in plastic. A placard reads: CORPSEC COMMAND CENTER.
+
+In the corner, a separate terminal sits dark and unmarked—different from the others. Its screen is black, waiting.`,
       x: -13,
       y: 11,
       z: 2,
@@ -36,6 +38,19 @@ export const building = {
           capacity: 3,
           emptyMsg: 'Three operator chairs sit empty, still wrapped.',
           occupiedMsg: '%s sitting at the command console',
+        },
+      ],
+      objects: [
+        {
+          prototype: 'thing',
+          name: 'unmarked terminal',
+          description: `A standalone terminal in the corner, separate from the main command consoles. No labels, no branding. The screen is dark until approached, then flickers to life with a simple interface:
+
+CONTINUUM INFRASTRUCTURE ACCESS
+STATUS: [SECURED]
+
+A single toggle control and a biometric scanner. Whatever this controls, it wasn't meant for regular CorpSec personnel.`,
+          boltedDown: true,
         },
       ],
     },
