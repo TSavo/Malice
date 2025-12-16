@@ -446,8 +446,39 @@ const armor = await $.recycler.create($.wearable, {
 });
 ```
 
+## AI Tailor System
+
+For dressing NPCs programmatically, use the AI tailor:
+
+```javascript
+// Dress an NPC using AI tailor
+ai({ action: 'tailor', humanId: npcId })
+ai({ action: 'tailor', humanId: npcId, context: 'shabby guard' })
+
+// Auto-dress on spawn
+ai({ action: 'spawn', role: 'guard', clothed: true })
+```
+
+The tailor creates complete outfits based on NPC role and context. See [TAILORING.md](../../TAILORING.md) for full reference.
+
+## Important: Aliases
+
+Clothing items need `aliases` for verb matching:
+
+```javascript
+const pants = await $.recycler.create($.clothing, {
+  name: 'worn work pants',
+  aliases: ['pants', 'work pants'],  // Required for "get pants", "wear pants"
+  covers: ['leftLeg', 'rightLeg', 'waist'],
+  layer: 2,
+});
+```
+
+Without aliases, commands like `get pants` won't match the item.
+
 ## See Also
 
 - [Body System](./body.md) - Body parts and worn arrays
 - [Agents](./agents.md) - Player interaction
 - [Items](./items.md) - General item handling
+- [TAILORING.md](../../TAILORING.md) - AI tailor system reference

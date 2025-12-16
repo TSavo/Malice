@@ -356,6 +356,38 @@ ai({ action: 'recall', humanId: 500, criticalOnly: true })
 ai({ action: 'forget', humanId: 500, index: 2 })
 ```
 
+### tailor
+
+Dress an NPC using the AI tailor agent. The tailor creates contextually appropriate clothing based on role, personality, and environment.
+
+```javascript
+ai({ action: 'tailor', humanId: 500 })
+ai({ action: 'tailor', humanId: 500, context: 'shabby, recently fired' })
+```
+
+The tailor automatically:
+- Loads the NPC's role and personality
+- Examines their environment
+- Creates clothing appropriate to their social tier
+- Equips items in proper layer order (underwear → base → mid → outer)
+
+**Social tier clothing:**
+- Scavengers: Minimal - just pants, maybe shirt, poor condition
+- Workers/Guards: Basic - underwear, pants, shirt, boots
+- Corporate: Complete - full outfit with socks, belt, proper shoes
+- Executives: Formal - 3-piece suit, silk underwear, polished shoes
+
+### spawn with clothed
+
+Auto-dress NPCs on spawn:
+
+```javascript
+ai({ action: 'spawn', role: 'guard', locationId: 100, clothed: true })
+ai({ action: 'spawn', role: 'executive', locationId: 200, clothed: true, context: 'CEO of major corp' })
+```
+
+See [TAILORING.md](../TAILORING.md) for full clothing system reference.
+
 ## Plot/Job Tools (Consolidated `plot` tool)
 
 All plot/job operations use the `plot` tool with an `action` parameter.
