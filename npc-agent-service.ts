@@ -456,7 +456,7 @@ async function handleSpeechEvent(data: any): Promise<void> {
       console.log(`[NPC-Agent] Got response from ${managed.name}`);
 
       if (response) {
-        console.log(`[NPC-Agent] ${managed.name} responds: ${response.substring(0, 100)}...`);
+        console.log(`[NPC-Agent] ${managed.name} responds: ${response}`);
       }
     } catch (err) {
       console.error(`[NPC-Agent] Error handling speech for ${managed.name}:`, err);
@@ -508,7 +508,7 @@ async function handleDirectedSpeechEvent(data: any): Promise<void> {
     });
 
     if (response) {
-      console.log(`[NPC-Agent] ${managed.name} responds: ${response.substring(0, 100)}...`);
+      console.log(`[NPC-Agent] ${managed.name} responds: ${response}`);
     }
   } catch (err) {
     console.error(`[NPC-Agent] Error handling directed speech for ${managed.name}:`, err);
@@ -559,7 +559,7 @@ async function handleItemReceivedEvent(data: any): Promise<void> {
     });
 
     if (response) {
-      console.log(`[NPC-Agent] ${managed.name} responds: ${response.substring(0, 100)}...`);
+      console.log(`[NPC-Agent] ${managed.name} responds: ${response}`);
     }
   } catch (err) {
     console.error(`[NPC-Agent] Error handling item_received for ${managed.name}:`, err);
