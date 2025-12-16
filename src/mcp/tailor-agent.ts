@@ -65,11 +65,10 @@ When calling create_object, pass ALL properties in the properties object:
    - 60-80 = good (minor wear, well maintained)
    - 80-100 = pristine/new (like new or actually new)
 
-10. aliases (string array, REQUIRED - CRITICAL for item matching!)
-   - Short names for the item that players/NPCs can use in commands
-   - MUST include at least one short alias for get/wear commands to work
-   - Example for "worn leather jacket": ["jacket", "leather jacket", "worn jacket"]
-   - Example for "gray cotton briefs": ["briefs", "underwear", "gray briefs"]
+10. aliases (string array, OPTIONAL - auto-generated from name)
+   - If not provided, aliases are auto-generated from the name
+   - Example: "worn leather jacket" auto-generates ["worn", "leather", "jacket", "leather jacket", "worn leather jacket"]
+   - Only provide if you want different aliases than the auto-generated ones
 
 WORLD CONTEXT:
 Seattle 2110, 48 years after The Burning (corporate wars). Most clothing is scavenged.
@@ -118,17 +117,18 @@ WORKFLOW:
 4. Sort items by layer (1 -> 2 -> 3 -> 4 -> 5)
 5. alias_lookup alias="clothing" to get $.clothing id (only need once)
 6. For each item IN LAYER ORDER:
-   a. create_object with parent=<clothing_id> and properties={name, description, covers, layer, warmth, protection, material, color, condition, aliases}
+   a. create_object with parent=<clothing_id> and properties={name, description, covers, layer, warmth, protection, material, color, condition}
    b. move_object objectId=<new_id> destinationId=<npc_room>
-   c. ai action=do humanId=<npc> command="get <item alias>"
-   d. ai action=do humanId=<npc> command="wear <item alias>"
+   c. ai action=do humanId=<npc> command="get <item name word>"
+   d. ai action=do humanId=<npc> command="wear <item name word>"
 
 IMPORTANT:
 - create_object accepts ALL properties at once - no need for separate set_property calls!
+- Aliases are AUTO-GENERATED from the name (e.g., "worn leather jacket" -> ["worn", "leather", "jacket", ...])
 - Must equip in layer order - underwear before pants!
 - The "get" command triggers verb registration
 - The "wear" command equips
-- Use an alias from the aliases array in the get/wear commands
+- Use a single word from the item name in get/wear commands (e.g., "get jacket", "wear jacket")
 
 Be creative with descriptions. Clothing tells a story about the wearer.`;
 

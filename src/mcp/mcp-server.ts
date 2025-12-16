@@ -202,7 +202,7 @@ export class MaliceMCPServer {
       }
     );
 
-    // Create new object
+    // Create new object (uses recycler for auto-aliases and hooks)
     server.tool(
       'create_object',
       'Create a new MOO object with a specified parent.',
@@ -211,6 +211,16 @@ export class MaliceMCPServer {
         properties: z.record(z.any()).optional().describe('Initial properties'),
       },
       async ({ parent, properties }) => {
+        // Use recycler for proper creation (auto-aliases, onCreate hooks, etc.)
+        const recycler = await this.getAlias('recycler');
+        if (recycler) {
+          const obj = await recycler.call('create', { parent, properties: properties || {} });
+          return {
+            content: [{ type: 'text', text: `Created object #${obj.id} with parent #${parent}` }],
+          };
+        }
+
+        // Fallback to direct creation if recycler not available
         const obj = await this.manager.create({
           parent: parent as ObjId,
           properties: properties || {},

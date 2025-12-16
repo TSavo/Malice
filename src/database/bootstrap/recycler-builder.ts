@@ -97,6 +97,35 @@ export class RecyclerBuilder {
             params.properties.createdBy = caller.id;
           }
 
+          // Auto-generate aliases from name if not provided
+          if (!params.properties.aliases && params.properties.name) {
+            const name = params.properties.name;
+            // Strip leading articles (a, an, the)
+            const strippedName = name.replace(/^(a|an|the)\\s+/i, '').trim();
+
+            // Split into words and filter out empty strings
+            const words = strippedName.toLowerCase().split(/\\s+/).filter(w => w.length > 0);
+
+            // Build aliases: each word + full stripped name
+            const aliasSet = new Set();
+            for (const word of words) {
+              aliasSet.add(word);
+            }
+            // Add full name (without article)
+            if (words.length > 1) {
+              aliasSet.add(words.join(' '));
+            }
+            // Add progressive combinations for multi-word names
+            // e.g., "brown ragged coat" -> "brown", "ragged", "coat", "ragged coat", "brown ragged coat"
+            if (words.length > 2) {
+              for (let i = 1; i < words.length; i++) {
+                aliasSet.add(words.slice(i).join(' '));
+              }
+            }
+
+            params.properties.aliases = Array.from(aliasSet);
+          }
+
           // Create the object through ObjectManager
           const newObject = await $.create(params);
 
