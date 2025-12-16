@@ -644,6 +644,80 @@ export class ObjectManager {
   }
 
   /**
+   * Query Claude AI with optional session resumption
+   * Provides full MCP tool access to the AI
+   *
+   * @param systemPrompt - System prompt defining AI behavior
+   * @param prompt - User prompt / query
+   * @param session - Optional session ID to resume conversation
+   * @returns { response: string, session: string }
+   *
+   * @example
+   * // First call - new session
+   * const { response, session } = await $.query(
+   *   "You are a guard. Be suspicious.",
+   *   "A stranger approaches."
+   * );
+   * self.agentSession = session;
+   *
+   * // Later - resume session
+   * const result = await $.query(systemPrompt, input, self.agentSession);
+   */
+  async query(
+    systemPrompt: string,
+    prompt: string,
+    session?: string
+  ): Promise<{ response: string; session: string }> {
+    // Dynamic import to avoid loading SDK at startup
+    const { query: sdkQuery } = await import('@anthropic-ai/claude-agent-sdk');
+
+    const options: Record<string, unknown> = {
+      systemPrompt,
+      mcpServers: {
+        'malice-moo': {
+          type: 'http',
+          url: 'http://localhost:3001/mcp',
+        },
+      },
+      allowedTools: ['*'],
+      permissionMode: 'bypassPermissions',
+      allowDangerouslySkipPermissions: true,
+      cwd: process.env.HOME || '/home/node',
+      persistSession: true,
+    };
+
+    if (session) {
+      options.resume = session;
+    }
+
+    let response = '';
+    let newSessionId: string | null = null;
+
+    for await (const message of sdkQuery({ prompt, options })) {
+      const msg = message as Record<string, unknown>;
+
+      // Capture session ID from init message
+      if (msg.type === 'system' && (msg as any).subtype === 'init') {
+        newSessionId = (msg as any).session_id || (msg as any).data?.session_id;
+      }
+
+      // Capture text responses from assistant messages
+      if (msg.type === 'assistant' && (msg as any).message?.content) {
+        for (const block of (msg as any).message.content) {
+          if (block.type === 'text') {
+            response += block.text;
+          }
+        }
+      }
+    }
+
+    return {
+      response,
+      session: newSessionId || session || '',
+    };
+  }
+
+  /**
    * Emit a game event to the game_events collection
    * Used by $.events.emit() for NPC agent service and other external consumers
    * @param event - Event object with type, data, timestamp
