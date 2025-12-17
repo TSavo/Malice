@@ -221,13 +221,16 @@ export class ObjectManager {
       return proxy;
     }
 
-    // Check cache first (always hit after first load)
+    // Check cache first (should always hit after loadAll at startup)
     const cached = this.cache.getObject(id);
     if (cached) {
       return cached;
     }
 
-    // Cache miss - load from database
+    // Cache miss - this should only happen for newly created objects
+    // or objects created after startup. Log a warning for debugging.
+    console.warn(`[ObjectManager] Cache miss for #${id} - loading from database`);
+
     const obj = await this.db.get(id);
     if (!obj) return null;
 
@@ -235,6 +238,7 @@ export class ObjectManager {
     const runtime = new RuntimeObjectImpl(obj, this);
     const proxy = runtime.getProxy();
     this.cache.setObject(id, proxy);
+
     return proxy;
   }
 
@@ -412,21 +416,19 @@ export class ObjectManager {
 
   /**
    * Get all children of an object
+   * Scans in-memory cache (all objects loaded at startup)
    */
   async getChildren(parentId: ObjId): Promise<RuntimeObject[]> {
-    const children = await this.db.getChildren(parentId);
-    const runtimes: RuntimeObject[] = [];
+    const results: RuntimeObject[] = [];
 
-    for (const child of children) {
-      let runtime = this.cache.get(child._id);
-      if (!runtime) {
-        runtime = new RuntimeObjectImpl(child, this);
-        this.cache.set(child._id, runtime);
+    // Scan cache - all objects are loaded at startup
+    for (const obj of this.cache.values()) {
+      if (obj.getParent() === parentId) {
+        results.push(obj);
       }
-      runtimes.push(runtime);
     }
 
-    return runtimes;
+    return results;
   }
 
   /**
@@ -478,6 +480,37 @@ export class ObjectManager {
   async preload(ids: ObjId[]): Promise<void> {
     await Promise.all(ids.map((id) => this.load(id)));
     ids.forEach(() => this.cache.markPreloaded());
+  }
+
+  /**
+   * Load ALL objects into memory at startup
+   * This ensures synchronous property access via getSync() always works
+   * Database is only accessed for: initial load, writes, change stream invalidation
+   */
+  async loadAll(): Promise<number> {
+    console.log('[ObjectManager] Loading all objects into memory...');
+    const start = Date.now();
+
+    const allObjects = await this.db.listAll(false); // exclude recycled
+    let count = 0;
+
+    for (const obj of allObjects) {
+      // Skip if already cached
+      if (this.cache.getObject(obj._id)) {
+        continue;
+      }
+
+      // Wrap in RuntimeObject and cache
+      const runtime = new RuntimeObjectImpl(obj, this);
+      const proxy = runtime.getProxy();
+      this.cache.setObject(obj._id, proxy);
+      count++;
+    }
+
+    const elapsed = Date.now() - start;
+    console.log(`[ObjectManager] Loaded ${count} objects in ${elapsed}ms (${allObjects.length} total in DB)`);
+
+    return count;
   }
 
   /**

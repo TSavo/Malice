@@ -172,8 +172,8 @@ export class CharGenBuilder {
           alias = trimmed;
         }
       }
-      player.set('name', alias);
-      player.set('aliases', [alias.toLowerCase()]);
+      player.name = alias;
+      player.aliases = [alias.toLowerCase()];
 
       // === SEX ===
       const sex = await $.prompt.choice(player, '  What is your sex?', {
@@ -188,8 +188,8 @@ export class CharGenBuilder {
         ? { subject: 'she', object: 'her', possessive: 'her' }
         : { subject: 'they', object: 'them', possessive: 'their' };
 
-      player.set('sex', sex);
-      player.set('pronouns', pronouns);
+      player.sex = sex;
+      player.pronouns = pronouns;
 
       // === STEP 2: PHYSICAL ===
       let age = null;
@@ -202,7 +202,7 @@ export class CharGenBuilder {
           age = parsed;
         }
       }
-      player.set('age', age);
+      player.age = age;
 
       // HEIGHT
       let height = null;
@@ -215,7 +215,7 @@ export class CharGenBuilder {
           height = Math.round(parsed * 100) / 100;
         }
       }
-      player.set('height', height);
+      player.height = height;
 
       // WEIGHT
       let weight = null;
@@ -228,7 +228,7 @@ export class CharGenBuilder {
           weight = parsed;
         }
       }
-      player.set('weight', weight);
+      player.weight = weight;
 
       // === STEP 3: EYES ===
       const eyeColors = {
@@ -436,7 +436,7 @@ export class CharGenBuilder {
         if (recycler && body) {
           await recycler.recycleTree(body.id);
         }
-        player.set('body', null);
+        player.body = null;
         // Recursive call to restart
         return await $.charGen.runCharGen(player, isFirstPlayer);
       }
@@ -533,11 +533,11 @@ export class CharGenBuilder {
           if (recycler) {
             await recycler.recycleTree(oldBody.id);
           }
-          player.set('body', null);
+          player.body = null;
         }
 
         // Reset stat points
-        player.set('statPointsRemaining', 20);
+        player.statPointsRemaining = 20;
         return await $.charGen.runCharGen(player, isFirstPlayer);
       }
 
@@ -600,7 +600,7 @@ export class CharGenBuilder {
       }
 
       // Deduct points
-      player.set('statPointsRemaining', remaining - cost);
+      player.statPointsRemaining = remaining - cost;
 
       // Get body
       const body = await player.getBody();
@@ -612,9 +612,9 @@ export class CharGenBuilder {
       const boostPart = (part) => {
         if (part) {
           const current = part.maxCalories || 100;
-          part.set('maxCalories', current + CALORIES_PER_POINT);
+          part.maxCalories = current + CALORIES_PER_POINT;
           // Also set current calories to match (start fully rested)
-          part.set('calories', part.maxCalories);
+          part.calories = part.maxCalories;
         }
       };
 

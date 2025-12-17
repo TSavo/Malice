@@ -150,7 +150,7 @@ export class StackableBuilder {
 
       // Look for other stacks of same type
       for (const item of dest.contents) {
-        if (!item || item.id === self.id) continue;  // Skip self
+        if (!item || item === self) continue;  // Skip self
 
         // Check if it's a matching stack
         if (await self.canStackWith(item)) {

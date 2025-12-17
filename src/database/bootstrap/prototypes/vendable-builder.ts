@@ -188,7 +188,7 @@ export class VendableBuilder {
         if (!Number.isInteger(pick) || pick < 1 || pick > items.length) return 'Invalid selection.';
         const itm = items[pick - 1];
         // remove from actor inventory
-        const newInv = inv.filter(obj => obj !== itm && obj?.id !== itm.id);
+        const newInv = inv.filter(obj => obj !== itm);
         actor.inventory = newInv;
         // add to vendor contents
         const newContents = Array.isArray(self.contents) ? [...self.contents] : [];

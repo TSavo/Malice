@@ -14,9 +14,9 @@ Provides perspective-aware message formatting. Automatically converts templates 
 async function attackMessage(attacker, target, damage, viewers) {
   for (const viewer of viewers) {
     let msg;
-    if (viewer.id === attacker.id) {
+    if (viewer === attacker) {
       msg = `You hit ${target.name} for ${damage} damage.`;
-    } else if (viewer.id === target.id) {
+    } else if (viewer === target) {
       msg = `${attacker.name} hits you for ${damage} damage.`;
     } else {
       msg = `${attacker.name} hits ${target.name} for ${damage} damage.`;

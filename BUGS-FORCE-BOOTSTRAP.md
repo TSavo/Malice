@@ -1,6 +1,6 @@
 # FORCE_BOOTSTRAP Bug Report
 
-Date: 2025-12-17
+Date: 2025-12-17 (Updated)
 
 ## Summary
 
@@ -39,8 +39,14 @@ if (!this.format) {
 
 ### 4. `location.describe is not a function`
 **Status**: FIXED
-**Cause**: Player's location property was a raw ID number instead of being properly resolved
-**Fix**: Used `moveTo()` to properly set player location
+**Cause**: Player's location property stored as objref, but when object not in cache, `fromValue()` returned raw number ID instead of RuntimeObject
+**Fix**: Modified player connect/disconnect methods to explicitly load location if it's a raw number:
+```typescript
+let location = self.location;
+if (typeof location === 'number') {
+  location = await $.load(location);
+}
+```
 
 ### 5. "#N" objref strings not converted
 **Status**: FIXED
@@ -53,32 +59,74 @@ if (/^#\d+$/.test(jsValue)) {
 }
 ```
 
+### 6. `body.getPart is not a function`
+**Status**: FIXED
+**Cause**: Multiple related issues:
+1. BodyPartBuilder not included in FORCE_BOOTSTRAP rebuild list
+2. `getBody()` method in embodied-builder returned raw ID when body not cached
+3. `getPart()` method in bodypart-builder returned raw ID when part not cached
+
+**Fixes Applied**:
+1. Modified BodyPartBuilder to accept `existingObj` parameter for rebuilding
+2. Added BodyPartBuilder to `rebuildMethods()` in prototype-builder.ts
+3. Fixed `getBody()` to explicitly load body if raw number:
+```typescript
+let body = self.body;
+if (!body) return null;
+if (typeof body === 'number') {
+  body = await $.load(body);
+}
+return body || null;
+```
+4. Fixed `getPart()` to explicitly load part if raw number:
+```typescript
+let part = parts[partName];
+if (!part) return null;
+if (typeof part === 'number') {
+  part = await $.load(part);
+}
+return part || null;
+```
+
+### 7. Architectural Fix: Load All Objects at Startup
+**Status**: FIXED
+**Cause**: The root issue was that `fromValue()` uses synchronous `getSync()` to resolve objrefs. When objects weren't cached, it returned raw number IDs instead of RuntimeObjects.
+
+**Original Problem**: Lazy loading + synchronous access = objects not in cache when needed.
+
+**Solution**: Load ALL objects into memory at startup. Database access now only happens for:
+1. Initial startup load
+2. Writes (persist changes)
+3. Change stream invalidation (replica set sync)
+
+**Implementation**:
+```typescript
+// In ObjectManager - new loadAll() method
+async loadAll(): Promise<number> {
+  const allObjects = await this.db.listAll(false);
+  for (const obj of allObjects) {
+    if (!this.cache.getObject(obj._id)) {
+      const runtime = new RuntimeObjectImpl(obj, this);
+      const proxy = runtime.getProxy();
+      this.cache.setObject(obj._id, proxy);
+    }
+  }
+  return count;
+}
+
+// Called at start of bootstrap
+await this.manager.loadAll();
+```
+
+**Result**: 3163 objects loaded in 529ms. No more defensive `typeof x === 'number'` checks needed.
+
 ---
 
-## OPEN Bugs
+## Root Cause Analysis
 
-### 6. `body.getPart is not a function`
-**Status**: OPEN
-**Location**: Player login flow -> connect() -> see() -> getEyes() -> getHead() -> getPart()
-**Error**:
-```
-Error executing method 'connect' on object #3068: Error executing method 'see' on object #3068:
-Error executing method 'getEyes' on object #3068: Error executing method 'getHead' on object #3068:
-body.getPart is not a function
-```
+The underlying issue was that `RuntimeObject.fromValue()` uses `manager.getSync()` to resolve objrefs synchronously. With lazy loading, objects not yet accessed weren't in cache, causing `getSync()` to return null and `fromValue()` to fall back to raw number IDs.
 
-**Cause**: The `getPart` method is defined in bodypart-builder.ts (line 614), but bodypart-builder.ts is NOT included in the FORCE_BOOTSTRAP rebuild list.
-
-**Investigation**:
-- Embodied prototype #8 does NOT have the getPart method
-- getPart is defined on the BodyPart prototype in bodypart-builder.ts
-- The player's body object and body parts are missing their methods
-
-**Fix Required**: Add BodyPartBuilder to rebuildMethods() in prototype-builder.ts or core-system-builder.ts
-
-**Affected Builders Not in Rebuild**:
-- bodypart-builder.ts (contains getPart, getHead, getEyes, etc.)
-- Possibly other prototype builders
+**Final Solution**: For a MOO system with finite objects that constantly reference each other, keeping ALL objects in memory is the correct architecture. This eliminates the lazy-loading vs synchronous-access conflict entirely.
 
 ---
 
@@ -86,6 +134,7 @@ body.getPart is not a function
 
 1. `df18450` - Add FORCE_BOOTSTRAP to rebuild prototype methods
 2. `efa6ae0` - Fix FORCE_BOOTSTRAP to properly rebuild existing objects
+3. (Pending) - Fix objref resolution in connect/getBody/getPart methods
 
 ---
 
@@ -93,21 +142,36 @@ body.getPart is not a function
 
 - src/index.ts
 - src/game/game-coordinator.ts
-- src/database/game-bootstrap.ts
-- src/database/object-manager.ts
+- src/database/game-bootstrap.ts (added loadAll() call)
+- src/database/object-manager.ts (added loadAll() method, removed preloadRelated)
+- src/database/runtime-object.ts (removed preloadRelated() method)
 - src/database/bootstrap/core-system-builder.ts
 - src/database/bootstrap/format-builder.ts
 - src/database/bootstrap/recycler-builder.ts
 - src/database/bootstrap/exclusions-builder.ts
 - src/database/bootstrap/pronoun-sub-builder.ts
 - src/database/bootstrap/emote-builder.ts
+- src/database/bootstrap/prompt-builder.ts
+- src/database/bootstrap/prototype-builder.ts
 - src/database/bootstrap/prototypes/room-builder.ts
+- src/database/bootstrap/prototypes/player-builder.ts
+- src/database/bootstrap/prototypes/embodied-builder.ts
+- src/database/bootstrap/prototypes/bodypart-builder.ts
 - docker-compose.yml
 
 ---
 
-## Next Steps
+## Testing Results
 
-1. Add BodyPartBuilder to FORCE_BOOTSTRAP rebuild list
-2. Check for other missing prototype builders
-3. Re-test player login and NPC AI interaction
+After all fixes:
+- Player login: **WORKING**
+- Room description on connect: **WORKING**
+- Look command: **WORKING**
+- Body/head/eyes resolution: **WORKING**
+
+---
+
+## Remaining Issues
+
+1. NPC Clara aliases may need to be set up properly for `to clara` command to work
+2. Some items showing as "something" in room description instead of proper names

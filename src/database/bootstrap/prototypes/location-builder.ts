@@ -134,9 +134,9 @@ export class LocationBuilder {
 
         // Determine which message to send
         let visualMsg = null;
-        if (viewer.id === actor?.id && messages.actor) {
+        if (viewer === actor && messages.actor) {
           visualMsg = messages.actor;
-        } else if (viewer.id === target?.id && messages.target) {
+        } else if (viewer === target && messages.target) {
           visualMsg = messages.target;
         } else if (messages.others) {
           visualMsg = messages.others;
@@ -187,8 +187,8 @@ export class LocationBuilder {
       const actorPronouns = getPronouns(actor);
       const targetPronouns = getPronouns(target);
 
-      const isActorViewer = viewer?.id === actor?.id;
-      const isTargetViewer = viewer?.id === target?.id;
+      const isActorViewer = viewer === actor;
+      const isTargetViewer = viewer === target;
 
       // Actor substitutions
       result = result.replace(/%A/g, isActorViewer ? 'You' : (actor?.name || 'Someone'));

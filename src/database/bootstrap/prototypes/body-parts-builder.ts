@@ -212,7 +212,7 @@ export class BodyPartsBuilder {
           }
         }
         // Remove from contents
-        const idx = (self.contents || []).findIndex(c => c?.id === item.id);
+        const idx = (self.contents || []).findIndex(c => c === item);
         if (idx >= 0) {
           self.contents.splice(idx, 1);
         }

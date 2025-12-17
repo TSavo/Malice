@@ -136,26 +136,26 @@ async findAndMove(container, itemName, dest, mover) {
 async createRoomPair(room1Data, room2Data, direction, oppositeDir) {
   const room1 = await $.recycler.create($.room, room1Data);
   const room2 = await $.recycler.create($.room, room2Data);
-  
-  // Create exits
+
+  // Create exits - store objects, not IDs
   const exit1 = await $.recycler.create($.exit, {
     direction,
-    destination: room2.id,
-    source: room1.id
+    destination: room2,    // Store object, not room2.id
+    source: room1          // Store object, not room1.id
   });
-  
+
   const exit2 = await $.recycler.create($.exit, {
     direction: oppositeDir,
-    destination: room1.id,
-    source: room2.id
+    destination: room1,    // Store object, not room1.id
+    source: room2          // Store object, not room2.id
   });
-  
+
   room1.exits = room1.exits || {};
-  room1.exits[direction] = exit1.id;
-  
+  room1.exits[direction] = exit1;  // Store object, not exit1.id
+
   room2.exits = room2.exits || {};
-  room2.exits[oppositeDir] = exit2.id;
-  
+  room2.exits[oppositeDir] = exit2;  // Store object, not exit2.id
+
   return { room1, room2, exit1, exit2 };
 }
 
@@ -172,12 +172,9 @@ const { room1, room2 } = await createRoomPair(
 
 ```javascript
 async announceToRoom(room, message, exclude = []) {
-  const excludeIds = exclude.map(obj => obj.id);
-  
-  for (const objId of room.contents || []) {
-    if (excludeIds.includes(objId)) continue;
-    
-    const obj = await $.load(objId);
+  for (const obj of room.contents || []) {
+    if (exclude.includes(obj)) continue;  // Use === identity
+
     if (obj?.tell) {
       await obj.tell(message);
     }
@@ -193,14 +190,13 @@ await announceToRoom(room, 'The ground shakes!', [player]);
 ```javascript
 async getPlayersInRoom(room) {
   const players = [];
-  
-  for (const objId of room.contents || []) {
-    const obj = await $.load(objId);
+
+  for (const obj of room.contents || []) {
     if (obj?.isPlayer) {
       players.push(obj);
     }
   }
-  
+
   return players;
 }
 ```
@@ -248,10 +244,9 @@ await swapVerbs(player, self,
 
 ```javascript
 async perspectiveAnnounce(room, actor, template, directObj, target) {
-  for (const objId of room.contents || []) {
-    const viewer = await $.load(objId);
+  for (const viewer of room.contents || []) {
     if (!viewer?.tell) continue;
-    
+
     const msg = await $.pronoun.sub(
       template,
       actor,
@@ -261,7 +256,7 @@ async perspectiveAnnounce(room, actor, template, directObj, target) {
       null,
       viewer
     );
-    
+
     await viewer.tell(msg);
   }
 }
@@ -281,10 +276,9 @@ await perspectiveAnnounce(room, attacker,
 
 ```javascript
 async sensoryAnnounce(room, sensoryData) {
-  for (const objId of room.contents || []) {
-    const obj = await $.load(objId);
+  for (const obj of room.contents || []) {
     if (!obj?.isPlayer) continue;
-    
+
     if (sensoryData.visual && obj.see) {
       await obj.see(sensoryData.visual);
     }
@@ -444,22 +438,13 @@ function fuzzyFind(container, searchTerm) {
 ### Filter by Type
 
 ```javascript
-async filterByType(container, typeName) {
-  const results = [];
-  
-  for (const objId of container.contents || []) {
-    const obj = await $.load(objId);
-    if (obj.type === typeName) {
-      results.push(obj);
-    }
-  }
-  
-  return results;
+function filterByType(container, typeName) {
+  return (container.contents || []).filter(obj => obj.type === typeName);
 }
 
 // Usage
-const weapons = await filterByType(room, 'weapon');
-const food = await filterByType(chest, 'food');
+const weapons = filterByType(room, 'weapon');
+const food = filterByType(chest, 'food');
 ```
 
 ## Timing & Scheduling

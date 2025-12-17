@@ -31,6 +31,11 @@ export class GameBootstrap {
   async bootstrap(): Promise<void> {
     console.log('🎮 Bootstrapping Malice...');
 
+    // Phase 0: Load ALL objects into memory
+    // This ensures synchronous property access (getSync/fromValue) always works
+    // Database is only accessed for: initial load, writes, change stream invalidation
+    await this.manager.loadAll();
+
     // Phase 1: Create minimal required objects
     const minimalBootstrap = new MinimalBootstrap(this.manager);
     await minimalBootstrap.bootstrap();

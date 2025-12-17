@@ -325,9 +325,9 @@ The first player created becomes an administrator:
 const isFirstPlayer = existingPlayers === 0;
 
 if (isFirstPlayer) {
-  player.set('canUseDevTools', true);
-  player.set('isWizard', true);
-  player.set('title', 'the Administrator');
+  player.canUseDevTools = true;
+  player.isWizard = true;
+  player.title = 'the Administrator';
 }
 ```
 
@@ -422,14 +422,14 @@ To use SSL client certificates:
 
 1. **Player Setup:**
 ```javascript
-player.set('sslFingerprint', 'AB:CD:EF:12:34:...');
+player.sslFingerprint = 'AB:CD:EF:12:34:...';
 // or
-player.set('email', 'bob@example.com'); // matches cert CN
+player.email = 'bob@example.com'; // matches cert CN
 ```
 
 2. **Permissions:**
 ```javascript
-player.set('canUseDevTools', true); // Required for SSL auth
+player.canUseDevTools = true; // Required for SSL auth
 ```
 
 3. **Connect:**
@@ -465,7 +465,7 @@ Passwords are hashed using `$.hashPassword()`:
 
 ```javascript
 const passwordHash = await $.hashPassword(password);
-player.set('passwordHash', passwordHash);
+player.passwordHash = passwordHash;
 
 // Verification
 const valid = await player.checkPassword(password);
@@ -518,8 +518,8 @@ const existingPlayers = await $.countPlayers();
 const isFirstPlayer = existingPlayers === 0;
 
 if (isFirstPlayer) {
-  player.set('canUseDevTools', true);
-  player.set('isWizard', true);
+  player.canUseDevTools = true;
+  player.isWizard = true;
 }
 ```
 
@@ -529,8 +529,8 @@ Existing players can be promoted:
 
 ```javascript
 // Via MCP or in-game wizard command
-player.set('isWizard', true);
-player.set('canUseDevTools', true);
+player.isWizard = true;
+player.canUseDevTools = true;
 ```
 
 ## See Also

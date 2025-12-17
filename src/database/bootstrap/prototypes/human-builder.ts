@@ -770,7 +770,7 @@ export class HumanBuilder {
       if (!recipient) {
         return 'Give ' + item.name + ' to whom?';
       }
-      if (recipient.id === self.id) {
+      if (recipient === self) {
         return 'You already have it.';
       }
 

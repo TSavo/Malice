@@ -422,10 +422,10 @@ export class BodyFactoryBuilder {
       await torso.addPart('back', back);
 
       // Store primary hand preference on torso
-      torso.set('primaryHand', primaryHand);
+      torso.primaryHand = primaryHand;
 
       // Store species on torso for autopsy identification
-      torso.set('species', 'human');
+      torso.species = 'human';
 
       // Apply appearance to body parts
       // Skin tone to all visible parts (not eyes)
@@ -433,7 +433,7 @@ export class BodyFactoryBuilder {
         if (!part) return;
         const partName = part.name || '';
         if (!excludeNames.some(n => partName.toLowerCase().includes(n))) {
-          part.set(prop, value);
+          part[prop] = value;
         }
         const parts = part.parts || {};
         for (const key of Object.keys(parts)) {
