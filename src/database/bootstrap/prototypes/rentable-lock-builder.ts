@@ -63,10 +63,8 @@ export class RentableLockBuilder {
       // Composable locks
       const locks = self.locks || [];
       for (const lock of locks) {
-        if (!lock) continue;
-        const lockObj = typeof lock === 'number' ? await $.load(lock) : lock;
-        if (!lockObj || !lockObj.canAccess) continue;
-        const result = await lockObj.canAccess(agent, target);
+        if (!lock || !lock.canAccess) continue;
+        const result = await lock.canAccess(agent, target);
         if (result !== true) {
           return result;
         }
@@ -80,7 +78,7 @@ export class RentableLockBuilder {
       const idempotencyKey = args[1];
       const price = self.price || 100;
       const duration = self.duration || 3600000;
-      const bank = self.bank ? await $.load(self.bank) : null;
+      const bank = self.bank || null;
       const account = self.account;
       if (!bank || !account) {
         return { success: false, error: 'Bank or account not configured.' };
@@ -127,9 +125,8 @@ export class RentableLockBuilder {
       /** Set code and sync with linked lock. */
       const code = args[0];
       self.code = code;
-      if (self.linkedLockId) {
-        const linkedLock = await $.load(self.linkedLockId);
-        if (linkedLock) linkedLock.code = code;
+      if (self.linkedLock) {
+        self.linkedLock.code = code;
       }
     `);
 

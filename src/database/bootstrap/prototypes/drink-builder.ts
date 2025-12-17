@@ -100,8 +100,7 @@ export class DrinkBuilder {
             if (stomach && stomach.contents) {
               // Reduce calories in stomach by 10-50%
               const lossPercent = 0.1 + (Math.random() * 0.4);
-              for (const itemId of stomach.contents) {
-                const item = await $.load(itemId);
+              for (const item of stomach.contents) {
                 if (item && item.calories !== undefined) {
                   const newCal = Math.floor(item.calories * (1 - lossPercent));
                   item.calories = newCal;
@@ -145,7 +144,7 @@ export class DrinkBuilder {
       }
 
       // Announce to room with proper message structure
-      const location = drinker.location ? await $.load(drinker.location) : null;
+      const location = drinker.location || null;
       if (location && location.announce) {
         const othersMsg = result.fullyConsumed
           ? await $.pronoun.sub('%N finishes drinking %t.', drinker, null, null, self)
@@ -169,7 +168,7 @@ export class DrinkBuilder {
 
       // If arriving in a player's hand, register the drink verb
       if (dest && dest.owner) {
-        const owner = await $.load(dest.owner);
+        const owner = dest.owner;
         if (owner && owner.registerVerb) {
           await owner.registerVerb(['drink ' + self.name, 'drink %t', 'sip ' + self.name, 'sip %t'], self, 'drink');
         }
@@ -178,8 +177,7 @@ export class DrinkBuilder {
       // If arriving in a room with a player, they can see it to drink
       if (dest && dest.contents) {
         for (const item of dest.contents) {
-          // Handle both RuntimeObjects (from objref) and raw IDs (numbers)
-          const obj = (typeof item === 'number') ? await $.load(item) : item;
+          const obj = item;
           if (obj && obj.registerVerb) {
             await obj.registerVerb(['drink ' + self.name, 'drink %t', 'sip ' + self.name, 'sip %t'], self, 'drink');
           }

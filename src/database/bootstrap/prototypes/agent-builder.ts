@@ -98,17 +98,17 @@ export class AgentBuilder {
        *  @param methodName - Method to call (derived from pattern if not specified)
        */
       const patterns = args[0];
-      const sourceObj = args[1]; // RuntimeObject or ObjId
+      const sourceObj = args[1]; // RuntimeObject
       const methodName = args[2];
 
-      const sourceId = typeof sourceObj === 'number' ? sourceObj : sourceObj.id;
+      if (!sourceObj || typeof sourceObj.id !== 'number') return;
       const patternList = Array.isArray(patterns) ? patterns : [patterns];
       const verbs = self.verbs || {};
 
       for (const pattern of patternList) {
         // Derive method name from first word if not specified
         const method = methodName || pattern.split(/\\s+/)[0].replace(/%[its]/g, '').trim();
-        verbs[pattern] = { obj: sourceId, method };
+        verbs[pattern] = { obj: sourceObj, method };
       }
 
       self.verbs = verbs;
@@ -129,11 +129,11 @@ export class AgentBuilder {
        *  @param sourceObj - The object whose verbs should be removed
        */
       const sourceObj = args[0];
-      const sourceId = typeof sourceObj === 'number' ? sourceObj : sourceObj.id;
+      const sourceId = typeof sourceObj === 'number' ? sourceObj : sourceObj?.id;
       const verbs = self.verbs || {};
 
       for (const [pattern, info] of Object.entries(verbs)) {
-        if (info.obj === sourceId) {
+        if (info.obj?.id === sourceId) {
           delete verbs[pattern];
         }
       }
@@ -168,7 +168,7 @@ export class AgentBuilder {
             pattern,
             verbInfo,
             args: result.args,
-            handler: await $.load(verbInfo.obj)
+            handler: verbInfo.obj
           };
         }
       }
@@ -216,7 +216,7 @@ export class AgentBuilder {
 
         } else if (part === '%t') {
           // Must match the source object's name/alias
-          const handler = await $.load(verbInfo.obj);
+          const handler = verbInfo.obj;
           if (!handler) return null;
 
           const nextLiteral = patternParts.slice(i + 1).find(p => !p.startsWith('%'));
@@ -294,7 +294,7 @@ export class AgentBuilder {
     obj.setMethod('findMatches', `
       /** Find objects matching a name in a list of contents.
        *  @param name - The name to search for (partial match supported)
-       *  @param contents - Array of object IDs or RuntimeObjects to search
+       *  @param contents - Array of RuntimeObjects to search
        *  @returns Array of matching RuntimeObjects
        */
       const name = args[0];
@@ -302,36 +302,27 @@ export class AgentBuilder {
 
       const matches = [];
       for (const item of contents) {
-        // Handle RuntimeObjects, raw IDs (numbers), and objref strings ("#123")
-        let obj;
-        if (typeof item === 'object' && item.id !== undefined) {
-          obj = item; // Already a RuntimeObject
-        } else if (typeof item === 'string' && item.startsWith('#')) {
-          obj = await $.load(parseInt(item.slice(1))); // Objref string like "#3079"
-        } else {
-          obj = await $.load(item); // Raw number ID
-        }
-        if (!obj) continue;
+        if (!item) continue;
 
-        const objName = (obj.name || '').toLowerCase();
-        const aliases = (obj.aliases || []).map(a => a.toLowerCase());
+        const objName = (item.name || '').toLowerCase();
+        const aliases = (item.aliases || []).map(a => a.toLowerCase());
 
         // Check exact match first
         if (objName === name || aliases.includes(name)) {
-          matches.push(obj);
+          matches.push(item);
           continue;
         }
 
         // Check partial match (name starts with or contains search term)
         if (objName.startsWith(name) || objName.includes(name)) {
-          matches.push(obj);
+          matches.push(item);
           continue;
         }
 
         // Check aliases for partial match
         for (const alias of aliases) {
           if (alias.startsWith(name) || alias.includes(name)) {
-            matches.push(obj);
+            matches.push(item);
             break;
           }
         }
@@ -354,7 +345,7 @@ export class AgentBuilder {
 
       // Add room contents
       if (self.location && self.location !== 0) {
-        const room = await $.load(self.location);
+        const room = self.location;
         if (room) {
           allContents = [...(room.contents || [])];
         }
@@ -364,14 +355,7 @@ export class AgentBuilder {
       if (self.getHands) {
         const hands = await self.getHands();
         if (hands && hands.both) {
-          for (const handRef of hands.both) {
-            // Load hand if it's an objref string or number
-            let hand = handRef;
-            if (typeof handRef === 'string' && handRef.startsWith('#')) {
-              hand = await $.load(parseInt(handRef.slice(1)));
-            } else if (typeof handRef === 'number') {
-              hand = await $.load(handRef);
-            }
+          for (const hand of hands.both) {
             if (hand && hand.contents) {
               allContents = allContents.concat(hand.contents);
             }
@@ -436,11 +420,9 @@ export class AgentBuilder {
        *  Usage: look, l
        *  Displays the description of your current location and any visible items.
        */
-      if (player.location && player.location !== 0) {
-        const location = await $.load(player.location);
-        if (location) {
-          return await location.describe(player);
-        }
+      const location = player.location;
+      if (location) {
+        return await location.describe(player);
       }
       return 'You are in a void.';
     `);
@@ -1132,20 +1114,19 @@ export class AgentBuilder {
       /** Add someone to your watch list.
        *  Watched people are easier to perceive in crowds (+50 clarity).
        *  Limited by maxWatchSlots - if full, oldest watch is silently dropped.
-       *  @param target - Object or ID to watch
+       *  @param target - Object to watch
        *  @param duration - Optional duration in ms (default: 5 minutes, 0 = permanent)
        *  @returns {success, message}
        */
       const target = args[0];
       const duration = args[1] !== undefined ? args[1] : 300000; // 5 min default
 
-      const targetId = typeof target === 'number' ? target : target?.id;
-      if (!targetId) {
+      if (!target?.id) {
         return { success: false, message: 'Watch who?' };
       }
 
       // Can't watch yourself
-      if (targetId === self.id) {
+      if (target.id === self.id) {
         return { success: false, message: 'You are always aware of yourself.' };
       }
 
@@ -1155,102 +1136,98 @@ export class AgentBuilder {
       // Get dynamic capacity based on perception (eyes/ears)
       const maxSlots = await self.getWatchCapacity();
 
-      // Add to watch list if not already there
-      if (!watchList.includes(targetId)) {
+      // Add to watch list if not already there (check by ID)
+      const alreadyWatching = watchList.some(t => t?.id === target.id);
+      if (!alreadyWatching) {
         // Check if at capacity - silently drop oldest (first in list)
         while (watchList.length >= maxSlots) {
-          const droppedId = watchList.shift(); // Remove oldest
-          delete watchExpiry[droppedId];
+          const dropped = watchList.shift(); // Remove oldest
+          if (dropped?.id) delete watchExpiry[dropped.id];
         }
-        watchList.push(targetId);
+        watchList.push(target);
         self.watchList = watchList;
       }
 
       // Set expiry if duration specified
       if (duration > 0) {
-        watchExpiry[targetId] = Date.now() + duration;
+        watchExpiry[target.id] = Date.now() + duration;
         self.watchExpiry = watchExpiry;
       } else {
         // Permanent - remove any expiry
-        delete watchExpiry[targetId];
+        delete watchExpiry[target.id];
         self.watchExpiry = watchExpiry;
       }
 
-      const targetObj = await $.load(targetId);
-      const name = targetObj?.name || '#' + targetId;
-      return { success: true, message: 'You are now watching ' + name + '.' };
+      return { success: true, message: 'You are now watching ' + target.name + '.' };
     `);
 
     // Unwatch someone (remove from watch list)
     obj.setMethod('unwatch', `
       /** Remove someone from your watch list.
-       *  @param target - Object or ID to stop watching
+       *  @param target - Object to stop watching
        *  @returns {success, message}
        */
       const target = args[0];
-      const targetId = typeof target === 'number' ? target : target?.id;
 
-      if (!targetId) {
+      if (!target?.id) {
         return { success: false, message: 'Unwatch who?' };
       }
 
       const watchList = self.watchList || [];
       const watchExpiry = self.watchExpiry || {};
 
-      const index = watchList.indexOf(targetId);
+      const index = watchList.findIndex(t => t?.id === target.id);
       if (index === -1) {
         return { success: false, message: 'You are not watching them.' };
       }
 
       watchList.splice(index, 1);
-      delete watchExpiry[targetId];
+      delete watchExpiry[target.id];
 
       self.watchList = watchList;
       self.watchExpiry = watchExpiry;
 
-      const targetObj = await $.load(targetId);
-      const name = targetObj?.name || '#' + targetId;
-      return { success: true, message: 'You stop watching ' + name + '.' };
+      return { success: true, message: 'You stop watching ' + target.name + '.' };
     `);
 
     // Check if watching someone
     obj.setMethod('isWatching', `
       /** Check if this agent is watching a target.
-       *  @param target - Object or ID to check
+       *  @param target - Object to check
        *  @returns true if watching
        */
       const target = args[0];
-      const targetId = typeof target === 'number' ? target : target?.id;
+      if (!target?.id) return false;
       const watchList = self.watchList || [];
-      return watchList.includes(targetId);
+      return watchList.some(t => t?.id === target.id);
     `);
 
     // Auto-watch (called when interacting with someone)
     obj.setMethod('autoWatch', `
       /** Automatically watch someone for a short duration.
        *  Called when emoting at or talking to someone.
-       *  @param target - Object or ID to auto-watch
+       *  @param target - Object to auto-watch
        *  @param duration - Duration in ms (default: 2 minutes)
        */
       const target = args[0];
       const duration = args[1] || 120000; // 2 min default for auto-watch
 
-      const targetId = typeof target === 'number' ? target : target?.id;
-      if (!targetId || targetId === self.id) return;
+      if (!target?.id || target.id === self.id) return;
 
       const watchList = self.watchList || [];
       const watchExpiry = self.watchExpiry || {};
 
-      // Add to watch list if not already there
-      if (!watchList.includes(targetId)) {
-        watchList.push(targetId);
+      // Add to watch list if not already there (check by ID)
+      const alreadyWatching = watchList.some(t => t?.id === target.id);
+      if (!alreadyWatching) {
+        watchList.push(target);
         self.watchList = watchList;
       }
 
       // Update expiry (only if not permanently watching)
-      const currentExpiry = watchExpiry[targetId];
+      const currentExpiry = watchExpiry[target.id];
       if (currentExpiry !== 0) { // 0 means permanent
-        watchExpiry[targetId] = Math.max(currentExpiry || 0, Date.now() + duration);
+        watchExpiry[target.id] = Math.max(currentExpiry || 0, Date.now() + duration);
         self.watchExpiry = watchExpiry;
       }
     `);
@@ -1267,14 +1244,15 @@ export class AgentBuilder {
       let removed = 0;
 
       const newWatchList = [];
-      for (const id of watchList) {
-        const expiry = watchExpiry[id];
+      for (const watched of watchList) {
+        if (!watched?.id) continue;
+        const expiry = watchExpiry[watched.id];
         if (expiry && expiry > 0 && now >= expiry) {
           // Expired - remove
-          delete watchExpiry[id];
+          delete watchExpiry[watched.id];
           removed++;
         } else {
-          newWatchList.push(id);
+          newWatchList.push(watched);
         }
       }
 
@@ -1296,15 +1274,15 @@ export class AgentBuilder {
       const now = Date.now();
       const result = [];
 
-      for (const id of watchList) {
-        const obj = await $.load(id);
-        const expiry = watchExpiry[id];
+      for (const watched of watchList) {
+        if (!watched?.id) continue;
+        const expiry = watchExpiry[watched.id];
         const permanent = !expiry || expiry === 0;
         const expiresIn = permanent ? null : Math.max(0, expiry - now);
 
         result.push({
-          id: id,
-          name: obj?.name || '#' + id,
+          id: watched.id,
+          name: watched.name || '#' + watched.id,
           permanent: permanent,
           expiresIn: expiresIn,
         });
@@ -1369,7 +1347,7 @@ export class AgentBuilder {
       // Get current room's contents
       let roomContents = [];
       if (self.location && self.location !== 0) {
-        const room = await $.load(self.location);
+        const room = self.location;
         if (room) {
           roomContents = room.contents || [];
         }
@@ -1722,12 +1700,13 @@ export class AgentBuilder {
        *  @param direction - Direction name for display
        *  @returns { success, message, timeMs }
        */
-      const destRoomArg = args[0];
+      const destRoom = args[0];
       const distance = args[1] || 10;
       const direction = args[2] || 'ahead';
 
-      // Accept either ID or RuntimeObject
-      const destRoom = typeof destRoomArg === 'number' ? destRoomArg : destRoomArg?.id;
+      if (!destRoom || typeof destRoom.id !== 'number') {
+        return { success: false, message: 'Invalid destination.' };
+      }
 
       // Check if already moving
       if (self.movementState) {
@@ -1820,12 +1799,9 @@ export class AgentBuilder {
       await self.moveTo(destRoom, self);
 
       // Notify arrival
-      if (self.tell) {
-        const dest = await $.load(destRoom);
-        if (dest) {
-          const desc = await dest.describe(self);
-          await self.tell('\\r\\nYou arrive ' + direction + '.\\r\\n' + desc);
-        }
+      if (self.tell && destRoom) {
+        const desc = await destRoom.describe(self);
+        await self.tell('\\r\\nYou arrive ' + direction + '.\\r\\n' + desc);
       }
 
       return { success: true, message: 'Arrived.' };

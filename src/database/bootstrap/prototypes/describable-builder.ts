@@ -62,23 +62,20 @@ export class DescribableBuilder {
     // THE primitive for all location changes
     // Everything that moves goes through this method
     obj.setMethod('moveTo', `
-      const destination = args[0]; // ObjId or RuntimeObject
+      let dest = args[0]; // RuntimeObject or ID destination
       const mover = args[1]; // Who/what is causing the move (optional)
 
-      // Load destination if passed as ID
-      let dest = destination;
-      if (typeof destination === 'number') {
-        dest = await $.load(destination);
+      // Accept either a RuntimeObject or an ID number
+      if (typeof dest === 'number') {
+        dest = await $.load(dest);
       }
+
       if (!dest || dest.id === undefined) {
         throw new Error('Invalid destination');
       }
 
-      // Get source (current location) - could be object or need loading
-      let source = self.location;
-      if (typeof source === 'number') {
-        source = await $.load(source);
-      }
+      // Get source (current location)
+      const source = self.location;
 
       // Check if destination can contain us
       const canContain = await dest.canContain(self);
@@ -113,12 +110,7 @@ export class DescribableBuilder {
 
     // Basic content management - can be overridden by Location for fancier behavior
     obj.setMethod('addContent', `
-      let item = args[0];
-
-      // If passed an ID, load the object
-      if (typeof item === 'number') {
-        item = await $.load(item);
-      }
+      const item = args[0];
       if (!item || typeof item.id !== 'number') {
         return; // Invalid input
       }
@@ -228,7 +220,11 @@ export class DescribableBuilder {
           continue; // Filter didn't match, skip this hook
         }
 
-        const plot = await $.load(hook.plotId);
+        // Get plot - may be auto-resolved objref or raw ID if not cached
+        let plot = hook.plot;
+        if (typeof plot === 'number') {
+          plot = await $.load(plot);
+        }
         if (!plot) {
           continue; // Plot no longer exists
         }
@@ -248,7 +244,7 @@ export class DescribableBuilder {
             }
           }
         } catch (e) {
-          console.error('Error triggering hook for plot #' + hook.plotId + ':', e.message);
+          console.error('Error triggering hook for plot #' + (plot?.id || plot) + ':', e.message);
         }
       }
 

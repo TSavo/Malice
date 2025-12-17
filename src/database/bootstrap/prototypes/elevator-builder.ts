@@ -65,23 +65,17 @@ export class ElevatorBuilder {
       }
 
         // If a door is present, delegate access check
-        if (self.door) {
-          const doorObj = typeof self.door === 'number' ? await $.load(self.door) : self.door;
-          if (doorObj && doorObj.canAccess) {
-            const result = await doorObj.canAccess(agent, self);
-            if (result !== true) {
-              return result;
-            }
+        if (self.door && self.door.canAccess) {
+          const result = await self.door.canAccess(agent, self);
+          if (result !== true) {
+            return result;
           }
         }
       // Check all locks
       const locks = self.locks || [];
       for (const lock of locks) {
-        if (!lock) continue;
-        const lockObj = typeof lock === 'number' ? await $.load(lock) : lock;
-        if (!lockObj || !lockObj.canAccess) continue;
-
-        const result = await lockObj.canAccess(agent, floor);
+        if (!lock || !lock.canAccess) continue;
+        const result = await lock.canAccess(agent, floor);
         if (result !== true) {
           return result; // Return rejection string
         }

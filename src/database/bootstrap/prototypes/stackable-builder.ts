@@ -150,17 +150,12 @@ export class StackableBuilder {
 
       // Look for other stacks of same type
       for (const item of dest.contents) {
-        // Handle both RuntimeObjects (from objref) and raw IDs (numbers)
-        const itemId = item?.id ?? item;
-        if (itemId === self.id) continue;  // Skip self
-
-        const other = (typeof item === 'number') ? await $.load(item) : item;
-        if (!other) continue;
+        if (!item || item.id === self.id) continue;  // Skip self
 
         // Check if it's a matching stack
-        if (await self.canStackWith(other)) {
-          // Merge into the existing stack (other absorbs us)
-          await other.merge(self);
+        if (await self.canStackWith(item)) {
+          // Merge into the existing stack (item absorbs us)
+          await item.merge(self);
           return;  // We've been recycled, stop
         }
       }

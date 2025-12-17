@@ -54,8 +54,7 @@ import type { RuntimeObject } from '../../../../types/object.js';
           const parts = agent.bodyParts || {};
           let matchedPart = null;
           for (const partName in parts) {
-            const partId = parts[partName];
-            const part = typeof partId === 'number' ? await $.load(partId) : partId;
+            const part = parts[partName];
             if (part && part.partType === requiredPart) {
               matchedPart = part;
               break;
@@ -71,10 +70,7 @@ import type { RuntimeObject } from '../../../../types/object.js';
           if (matchedPart.getWornItems) {
             wornItems = await matchedPart.getWornItems();
           } else if (Array.isArray(matchedPart.worn)) {
-            for (const id of matchedPart.worn) {
-              const item = await $.load(id);
-              if (item) wornItems.push(item);
-            }
+            wornItems = matchedPart.worn.filter(item => item);
           }
  
           if (wornItems.length > 0) {

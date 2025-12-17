@@ -304,8 +304,103 @@ if (isAi) {
 }
 ```
 
+## AI Response System
+
+AI-controlled humans respond to interactions via built-in handlers.
+
+### $.query(systemPrompt, userPrompt, session?)
+
+Query the Claude Agent SDK from MOO code:
+
+```javascript
+// Basic query
+const result = await $.query(systemPrompt, userPrompt);
+// result = { response: "...", session: "abc123" }
+
+// Resume a session for conversation continuity
+const result = await $.query(systemPrompt, userPrompt, previousSession);
+```
+
+The agent has access to all MCP tools and can:
+- Read game state via resources
+- Modify objects via tools
+- Execute commands via `ai({ action: "do", ... })`
+
+### onSpokenTo(speaker, message)
+
+Called when someone uses `to npc message`:
+
+```javascript
+// Automatically triggered by:
+// > to janet Hello there
+
+// Handler on $.human prototype:
+async onSpokenTo(speaker, message) {
+  const systemPrompt = await self.buildAgentPrompt();
+  if (!systemPrompt) return; // Not AI-controlled
+
+  const userPrompt = speaker.name + ' says: "' + message + '"';
+
+  $.query(systemPrompt, userPrompt, self.agentSession)
+    .then(result => {
+      self.agentSession = result.session;
+    });
+}
+```
+
+### onItemReceived(giver, item)
+
+Called when someone uses `give item to npc`:
+
+```javascript
+// Automatically triggered by:
+// > give apple to janet
+
+// Handler on $.human prototype:
+async onItemReceived(giver, item) {
+  const systemPrompt = await self.buildAgentPrompt();
+  if (!systemPrompt) return;
+
+  const userPrompt = giver.name + ' gave you ' + item.name;
+
+  $.query(systemPrompt, userPrompt, self.agentSession)
+    .then(result => {
+      self.agentSession = result.session;
+    });
+}
+```
+
+### buildAgentPrompt()
+
+Assembles the system prompt from NPC data:
+
+```javascript
+const prompt = await npc.buildAgentPrompt();
+// Returns null if not AI-controlled
+// Returns full system prompt with personality, history, memories, notes
+```
+
+### Per-NPC Properties
+
+Each AI human stores:
+
+| Property | Description |
+|----------|-------------|
+| `agentSystemPrompt` | Full system prompt template (from `$.ai.defaultAgentPrompt`) |
+| `agentSession` | Claude session ID for conversation continuity |
+
+### $.ai.defaultAgentPrompt
+
+The default system prompt template used for all AI NPCs. Contains:
+- IC vs OOC knowledge handling
+- Identity and role instructions
+- MCP tools documentation
+- Memory management instructions
+- Agency and behavioral guidelines
+
 ## See Also
 
 - [Human Prototype](./prototypes/agents.md) - The $.human prototype
 - [Body System](./prototypes/body.md) - Body creation
 - [Auth System](./auth.md) - Player character creation
+- [NPC Agent](../npc-agent.md) - Full NPC agent documentation

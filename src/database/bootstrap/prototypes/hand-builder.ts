@@ -50,10 +50,7 @@ export class HandBuilder {
     // Get what this hand is holding
     obj.setMethod('getHeld', `
       const contents = self.contents || [];
-      if (contents.length > 0) {
-        return await $.load(contents[0]);
-      }
-      return null;
+      return contents[0] || null;
     `);
 
     // Drop what's in this hand

@@ -42,8 +42,7 @@ export class SkeletalRemainsBuilder {
     // Get the body inside (skeletal now)
     obj.setMethod('getBody', `
       const contents = self.contents || [];
-      for (const id of contents) {
-        const obj = await $.load(id);
+      for (const obj of contents) {
         if (obj && (obj.torso !== undefined || obj.getPart)) {
           return obj;
         }
@@ -88,10 +87,9 @@ export class SkeletalRemainsBuilder {
 
         for (const hand of [leftHand, rightHand]) {
           if (hand && hand.contents) {
-            for (const itemId of hand.contents) {
-              const item = await $.load(itemId);
+            for (const item of hand.contents) {
               if (item) {
-                items.push({ id: itemId, name: item.name || 'something', location: 'bones' });
+                items.push({ id: item.id, name: item.name || 'something', location: 'bones' });
               }
             }
           }
@@ -100,10 +98,9 @@ export class SkeletalRemainsBuilder {
         // Check torso for items
         const torso = body.getPart ? await body.getPart('torso') : null;
         if (torso && torso.contents) {
-          for (const itemId of torso.contents) {
-            const item = await $.load(itemId);
+          for (const item of torso.contents) {
             if (item) {
-              items.push({ id: itemId, name: item.name || 'something', location: 'bones' });
+              items.push({ id: item.id, name: item.name || 'something', location: 'bones' });
             }
           }
         }
@@ -137,8 +134,7 @@ export class SkeletalRemainsBuilder {
       const searchParts = async (part) => {
         if (!part) return null;
         if (part.contents) {
-          for (const itemId of part.contents) {
-            const item = await $.load(itemId);
+          for (const item of part.contents) {
             if (!item) continue;
             const name = (item.name || '').toLowerCase();
             const aliases = (item.aliases || []).map(a => a.toLowerCase());
@@ -151,9 +147,8 @@ export class SkeletalRemainsBuilder {
         // Check child parts
         const parts = part.parts || {};
         for (const partName of Object.keys(parts)) {
-          const childId = parts[partName];
-          if (childId) {
-            const child = await $.load(childId);
+          const child = parts[partName];
+          if (child) {
             const found = await searchParts(child);
             if (found) return found;
           }

@@ -1278,4 +1278,218 @@ describe('RuntimeObject', () => {
       expect(reloaded?.get('c')).toBe(3);
     });
   });
+
+  describe('Object reference (objref) equality', () => {
+    it('should return same instance when loading same ID twice', async () => {
+      const first = await manager.load(testObj.id);
+      const second = await manager.load(testObj.id);
+
+      // Same cached instance
+      expect(first).toBe(second);
+      expect(first === second).toBe(true);
+    });
+
+    it('should store objref and return same instance on read', async () => {
+      // Create a target object
+      const target = await manager.create({
+        parent: 0,
+        properties: { name: 'Target' },
+        methods: {},
+      });
+
+      // Store it as a property (NOT the ID!)
+      (testObj as any).myTarget = target;
+
+      // Read it back
+      const retrieved = (testObj as any).myTarget;
+
+      // Should be the exact same instance
+      expect(retrieved).toBe(target);
+      expect(retrieved === target).toBe(true);
+      expect(retrieved.id).toBe(target.id);
+      expect(retrieved.name).toBe('Target');
+    });
+
+    it('should maintain objref identity in arrays', async () => {
+      const item1 = await manager.create({
+        parent: 0,
+        properties: { name: 'Item 1' },
+        methods: {},
+      });
+      const item2 = await manager.create({
+        parent: 0,
+        properties: { name: 'Item 2' },
+        methods: {},
+      });
+
+      // Store objects in array (NOT IDs!)
+      (testObj as any).items = [item1, item2];
+
+      // Read back
+      const items = (testObj as any).items;
+
+      // Should be same instances
+      expect(items[0]).toBe(item1);
+      expect(items[1]).toBe(item2);
+      expect(items[0] === item1).toBe(true);
+      expect(items[1] === item2).toBe(true);
+    });
+
+    it('should allow comparing objrefs with === for equality', async () => {
+      const obj1 = await manager.create({
+        parent: 0,
+        properties: { name: 'Object 1' },
+        methods: {},
+      });
+
+      // Store the object
+      (testObj as any).reference = obj1;
+
+      // Load the same object separately
+      const loaded = await manager.load(obj1.id);
+
+      // All should be the same instance
+      const stored = (testObj as any).reference;
+      expect(stored === obj1).toBe(true);
+      expect(stored === loaded).toBe(true);
+      expect(obj1 === loaded).toBe(true);
+    });
+
+    it('should convert "#N" string format to objref', async () => {
+      const target = await manager.create({
+        parent: 0,
+        properties: { name: 'Target' },
+        methods: {},
+      });
+
+      // Store using "#N" string format (simulates MCP input)
+      testObj.set('targetRef', `#${target.id}`);
+
+      // Read it back - should resolve to the object
+      const retrieved = (testObj as any).targetRef;
+
+      // Should be the same instance as the target
+      expect(retrieved).toBe(target);
+      expect(retrieved === target).toBe(true);
+      expect(retrieved.name).toBe('Target');
+    });
+
+    it('should handle nested objrefs in objects', async () => {
+      const owner = await manager.create({
+        parent: 0,
+        properties: { name: 'Owner' },
+        methods: {},
+      });
+      const location = await manager.create({
+        parent: 0,
+        properties: { name: 'Location' },
+        methods: {},
+      });
+
+      // Store nested structure with objrefs
+      (testObj as any).metadata = {
+        owner: owner,
+        location: location,
+        count: 42,
+      };
+
+      // Read back
+      const meta = (testObj as any).metadata;
+
+      expect(meta.owner).toBe(owner);
+      expect(meta.location).toBe(location);
+      expect(meta.owner === owner).toBe(true);
+      expect(meta.location === location).toBe(true);
+      expect(meta.count).toBe(42);
+    });
+
+    it('should work with filter/find using === comparison', async () => {
+      const target = await manager.create({
+        parent: 0,
+        properties: { name: 'Find Me' },
+        methods: {},
+      });
+      const other = await manager.create({
+        parent: 0,
+        properties: { name: 'Other' },
+        methods: {},
+      });
+
+      // Store array of objrefs
+      (testObj as any).list = [other, target, other];
+
+      // Find using === comparison
+      const list = (testObj as any).list as RuntimeObject[];
+      const found = list.find(item => item === target);
+      const index = list.findIndex(item => item === target);
+
+      expect(found).toBe(target);
+      expect(index).toBe(1);
+    });
+
+    it('should support checking if array includes an objref', async () => {
+      const member = await manager.create({
+        parent: 0,
+        properties: { name: 'Member' },
+        methods: {},
+      });
+      const nonMember = await manager.create({
+        parent: 0,
+        properties: { name: 'Non-Member' },
+        methods: {},
+      });
+
+      // Store array with member
+      (testObj as any).members = [member];
+
+      const members = (testObj as any).members as RuntimeObject[];
+
+      // Note: includes() won't work because it uses SameValueZero
+      // But we can use .some() with ===
+      expect(members.some(m => m === member)).toBe(true);
+      expect(members.some(m => m === nonMember)).toBe(false);
+    });
+
+    it('should persist objrefs across save/reload', async () => {
+      const target = await manager.create({
+        parent: 0,
+        properties: { name: 'Persistent Target' },
+        methods: {},
+      });
+
+      // Store objref
+      (testObj as any).persistedRef = target;
+      await testObj.save();
+
+      // Clear cache to force reload (simulate server restart)
+      // Note: In real use, cache persists, but this tests the serialization
+      const reloaded = await manager.load(testObj.id);
+
+      // The reference should still resolve to the same object
+      const retrievedRef = (reloaded as any).persistedRef;
+      expect(retrievedRef).toBe(target);
+      expect(retrievedRef.name).toBe('Persistent Target');
+    });
+
+    it('should handle objref in method execution context', async () => {
+      const target = await manager.create({
+        parent: 0,
+        properties: { name: 'Method Target' },
+        methods: {},
+      });
+
+      // Store objref
+      (testObj as any).target = target;
+
+      // Method that compares objrefs
+      testObj.setMethod('checkTarget', `
+        const t = self.target;
+        const loaded = await $.load(${target.id});
+        return t === loaded;
+      `);
+
+      const result = await testObj.call('checkTarget');
+      expect(result).toBe(true);
+    });
+  });
 });

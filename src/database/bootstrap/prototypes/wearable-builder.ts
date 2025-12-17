@@ -57,7 +57,7 @@ export class WearableBuilder {
 
       // Already worn by someone?
       if (self.wornBy !== null && self.wornBy !== wearer.id) {
-        const currentWearer = await $.load(self.wornBy);
+        const currentWearer = self.wornBy;
         return { success: false, error: 'That is already being worn by ' + (currentWearer?.name || 'someone') + '.' };
       }
 
@@ -173,15 +173,7 @@ export class WearableBuilder {
       }
 
       // Get worn items from this part
-      const wornIds = part.worn || [];
-      const worn = [];
-      for (const id of wornIds) {
-        const item = await $.load(id);
-        if (item) {
-          worn.push(item);
-        }
-      }
-
+      const worn = (part.worn || []).filter(item => item);
       return worn;
     `);
 
@@ -242,19 +234,11 @@ export class WearableBuilder {
       }
 
       // Update wearable state
-      self.wornBy = wearer.id;
-      self.wornOn = body.id;
+      self.wornBy = wearer;
+      self.wornOn = body;
 
-      // Remove from hands/ground if held
-      if (self.location) {
-        const loc = await $.load(self.location);
-        if (loc && loc.removeContent) {
-          await loc.removeContent(self.id);
-        }
-      }
-
-      // Move to wearer's worn container (or just update location)
-      self.location = wearer.id;
+      // Move to wearer (handles removal from old location)
+      await self.moveTo(wearer);
 
       return { success: true, message: 'You put on ' + self.name + '.' };
     `);
@@ -264,7 +248,7 @@ export class WearableBuilder {
        *  @param wearer - The player removing this (optional, defaults to wornBy)
        *  @returns { success: boolean, message: string }
        */
-      const wearer = args[0] || (self.wornBy ? await $.load(self.wornBy) : null);
+      const wearer = args[0] || (self.wornBy ? self.wornBy : null);
 
       if (!self.wornBy) {
         return { success: false, error: 'That is not being worn.' };
@@ -274,7 +258,7 @@ export class WearableBuilder {
         return { success: false, error: 'You are not wearing that.' };
       }
 
-      const actualWearer = await $.load(self.wornBy);
+      const actualWearer = self.wornBy;
       if (!actualWearer) {
         // Orphaned - just clear state
         self.wornBy = null;
@@ -379,7 +363,7 @@ export class WearableBuilder {
 
       // Show if worn
       if (self.wornBy) {
-        const wearer = await $.load(self.wornBy);
+        const wearer = self.wornBy;
         if (wearer) {
           desc += 'Currently worn by: ' + wearer.name + '\\r\\n';
         }

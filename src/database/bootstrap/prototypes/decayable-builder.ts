@@ -106,7 +106,7 @@ export class DecayableBuilder {
 
       // Check if we're in a container with storage properties
       if (self.location && self.location !== 0) {
-        const container = await $.load(self.location);
+        const container = self.location;
         if (container) {
           // Check for storage conditions
           if (container.refrigerated && sensitivity.refrigerated !== undefined) {
@@ -145,7 +145,7 @@ export class DecayableBuilder {
       const storageDamage = self.storageDamage || {};
 
       if (self.location && self.location !== 0) {
-        const container = await $.load(self.location);
+        const container = self.location;
         if (container) {
           if (container.frozen && storageDamage.frozen > 0) {
             return { damage: storageDamage.frozen, reason: 'freezing' };

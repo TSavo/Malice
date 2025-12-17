@@ -72,15 +72,16 @@ export class HumanBuilder {
 
       // Build speech object from args
       let speech;
+      let source = null;
       if (typeof messageOrSpeech === 'string') {
         // Called as hear(message, language?, source?)
         const language = typeof languageOrSource === 'string' ? languageOrSource : 'English';
-        const source = typeof languageOrSource === 'object' ? languageOrSource : sourceArg;
+        source = typeof languageOrSource === 'object' ? languageOrSource : sourceArg;
         speech = {
           type: 'speech',
           content: messageOrSpeech,
           language: language,
-          speaker: source?.id || null,
+          speaker: source || null,
         };
       } else {
         // Called with speech object directly
@@ -129,6 +130,11 @@ export class HumanBuilder {
         const options = self.options || {};
         const prefix = options.hearPrompt || '';
         await self.tell(prefix + result.content);
+      }
+
+      // Record to sensory history for AI awareness
+      if (self.recordSensory && result) {
+        await self.recordSensory('hear', result.content, source);
       }
 
       return result;
@@ -230,8 +236,7 @@ export class HumanBuilder {
         if (!hand) return [];
         const contents = hand.contents || [];
         const items = [];
-        for (const itemId of contents) {
-          const item = await $.load(itemId);
+        for (const item of contents) {
           if (item) {
             items.push({ name: item.name, side: side });
           }
@@ -475,7 +480,7 @@ export class HumanBuilder {
 
       // If we have a location, trigger onArrived to register room verbs
       if (self.location && self.location !== 0) {
-        const location = await $.load(self.location);
+        const location = self.location;
         if (location && self.onArrived) {
           await self.onArrived(location, null, null);
         }
@@ -497,7 +502,7 @@ export class HumanBuilder {
       }
 
       // Get current location
-      const location = self.location ? await $.load(self.location) : null;
+      const location = self.location || null;
       if (!location) {
         return 'You have nowhere to speak.';
       }
@@ -542,28 +547,18 @@ export class HumanBuilder {
       const speaker = player || self;
 
       // Get current location
-      const location = speaker.location ? await $.load(speaker.location) : null;
+      const location = speaker.location;
       if (!location) {
         return 'You have nowhere to speak.';
       }
 
-      // Find target in location - contents may be RuntimeObjects or refs
+      // Find target in location
       const contents = location.contents || [];
       let target = null;
-      for (const ref of contents) {
-        // If ref is already a RuntimeObject with name, use it directly
-        if (ref && ref.name && ref.name.toLowerCase().includes(targetName.toLowerCase())) {
-          target = ref;
+      for (const obj of contents) {
+        if (obj && obj.name && obj.name.toLowerCase().includes(targetName.toLowerCase())) {
+          target = obj;
           break;
-        }
-        // Otherwise try to load it
-        const contentId = typeof ref === 'object' ? (ref.value || ref.id) : ref;
-        if (contentId) {
-          const obj = await $.load(contentId);
-          if (obj && obj.name && obj.name.toLowerCase().includes(targetName.toLowerCase())) {
-            target = obj;
-            break;
-          }
         }
       }
 
@@ -581,25 +576,9 @@ export class HumanBuilder {
           others: speaker.name + ' says to ' + target.name + ', "' + trimmedMessage + '"'
         });
       }
-      // Emit game event for NPC agent service (fire-and-forget)
-      // NOT awaited: awaiting causes MCP response delivery issues when NPC agent
-      // makes concurrent requests during the response streaming phase
-      if ($._emitGameEvent) {
-        $._emitGameEvent({
-          type: 'directed_speech',
-          data: {
-            speakerId: speaker.id,
-            speakerName: speaker.name,
-            targetId: target.id,
-            targetName: target.name,
-            message: trimmedMessage,
-            locationId: location.id,
-          },
-          timestamp: new Date().toISOString(),
-          processed: false,
-        }).catch((err: any) => {
-          console.error('[to] Game event emission failed:', err?.message || err);
-        });
+      // Trigger AI response if target has onSpokenTo handler
+      if (target.onSpokenTo) {
+        target.onSpokenTo(speaker, trimmedMessage);
       }
 
       return '';
@@ -618,7 +597,7 @@ export class HumanBuilder {
       }
 
       // Get current location
-      const location = self.location ? await $.load(self.location) : null;
+      const location = self.location || null;
       if (!location) {
         return;
       }
@@ -640,7 +619,7 @@ export class HumanBuilder {
        *  Usage: look, l
        *  Describes your surroundings.
        */
-      const location = self.location ? await $.load(self.location) : null;
+      const location = self.location || null;
       if (!location) {
         return 'You are in a void.';
       }
@@ -708,7 +687,7 @@ export class HumanBuilder {
       }
 
       // Announce to room with proper message structure
-      const location = self.location ? await $.load(self.location) : null;
+      const location = self.location || null;
       if (location && location.announce) {
         await location.announce(self, null, {
           actor: 'You pick up ' + item.name + '.',
@@ -750,7 +729,7 @@ export class HumanBuilder {
       }
 
       // Move to current location using moveTo
-      const location = self.location ? await $.load(self.location) : null;
+      const location = self.location || null;
       if (!location) {
         return 'You are nowhere.';
       }
@@ -837,7 +816,7 @@ export class HumanBuilder {
       }
 
       // Announce to room
-      const location = self.location ? await $.load(self.location) : null;
+      const location = self.location || null;
       if (location && location.announce) {
         await location.announce(self, recipient, {
           actor: 'You give ' + item.name + ' to ' + recipient.name + '.',
@@ -846,25 +825,265 @@ export class HumanBuilder {
         });
       }
 
-      // Emit game event for NPC agent service
-      if ($._emitGameEvent) {
-        await $._emitGameEvent({
-          type: 'item_received',
-          data: {
-            giverId: self.id,
-            giverName: self.name,
-            recipientId: recipient.id,
-            recipientName: recipient.name,
-            itemId: item.id,
-            itemName: item.name,
-            locationId: location ? location.id : null,
-          },
-          timestamp: new Date().toISOString(),
-          processed: false,
-        });
+      // Trigger AI response if recipient has onItemReceived handler
+      if (recipient.onItemReceived) {
+        recipient.onItemReceived(self, item);
       }
 
       return '';
+    `);
+
+    // ═══════════════════════════════════════════════════════════════════
+    // AI AGENT METHODS
+    // These enable AI-controlled NPCs to respond to interactions
+    // ═══════════════════════════════════════════════════════════════════
+
+    // Format personality for system prompt
+    obj.setMethod('formatPersonality', `
+      /** Format personality object/string for system prompt injection. */
+      const personality = args[0];
+      if (!personality) return '';
+
+      const lines = ['\\nPERSONALITY:'];
+
+      if (typeof personality === 'string') {
+        lines.push(personality);
+      } else {
+        if (personality.traits && personality.traits.length > 0) {
+          lines.push('Traits: ' + personality.traits.join(', '));
+        }
+        if (personality.quirks && personality.quirks.length > 0) {
+          lines.push('Quirks: ' + personality.quirks.join(', '));
+        }
+        if (personality.values && personality.values.length > 0) {
+          lines.push('Values: ' + personality.values.join(', '));
+        }
+        if (personality.motivations && personality.motivations.length > 0) {
+          lines.push('Motivations: ' + personality.motivations.join(', '));
+        }
+        if (personality.fears && personality.fears.length > 0) {
+          lines.push('Fears: ' + personality.fears.join(', '));
+        }
+      }
+
+      return lines.join('\\n');
+    `);
+
+    // Format history for system prompt
+    obj.setMethod('formatHistory', `
+      /** Format history object/string for system prompt injection. */
+      const history = args[0];
+      if (!history) return '';
+
+      const lines = ['\\nHISTORY/BACKSTORY:'];
+
+      if (typeof history === 'string') {
+        lines.push(history);
+      } else {
+        if (history.backstory) {
+          lines.push(history.backstory);
+        }
+        if (history.events && history.events.length > 0) {
+          lines.push('\\nKey Events:');
+          for (const event of history.events) {
+            lines.push('- ' + event);
+          }
+        }
+        if (history.relationships && Object.keys(history.relationships).length > 0) {
+          lines.push('\\nRelationships:');
+          for (const [person, relation] of Object.entries(history.relationships)) {
+            lines.push('- ' + person + ': ' + relation);
+          }
+        }
+        if (history.secrets && history.secrets.length > 0) {
+          lines.push('\\nSecrets (do not reveal unless dramatically appropriate):');
+          for (const secret of history.secrets) {
+            lines.push('- ' + secret);
+          }
+        }
+      }
+
+      return lines.join('\\n');
+    `);
+
+    // Format memories for system prompt
+    obj.setMethod('formatMemories', `
+      /** Format memories array for system prompt injection. */
+      const memories = args[0];
+      if (!memories || memories.length === 0) return '';
+
+      // Sort by importance: critical first, then important, then normal
+      const sorted = [...memories].sort((a, b) => {
+        const order = { critical: 0, important: 1, normal: 2 };
+        return (order[a.importance] || 2) - (order[b.importance] || 2);
+      });
+
+      const lines = ['\\nPERSISTENT MEMORIES:'];
+      lines.push('These are critical memories that persist across sessions. Reference them when relevant.\\n');
+
+      for (const memory of sorted) {
+        const prefix = memory.importance === 'critical' ? '⚠️ CRITICAL: '
+          : memory.importance === 'important' ? '❗ IMPORTANT: '
+          : '• ';
+        const tags = memory.tags && memory.tags.length > 0 ? ' [' + memory.tags.join(', ') + ']' : '';
+        lines.push(prefix + memory.text + tags);
+      }
+
+      return lines.join('\\n');
+    `);
+
+    // Format notes for system prompt
+    obj.setMethod('formatNotes', `
+      /** Format notes array for system prompt injection. */
+      const notes = args[0];
+      if (!notes || notes.length === 0) return '';
+
+      const lines = ['\\nBUILDER NOTES:'];
+      lines.push('These notes are from the game builders about your character:\\n');
+
+      for (const note of notes) {
+        const author = note.author ? ' (' + note.author + ')' : '';
+        const tags = note.tags && note.tags.length > 0 ? ' [' + note.tags.join(', ') + ']' : '';
+        lines.push('• ' + note.text + author + tags);
+      }
+
+      return lines.join('\\n');
+    `);
+
+    // Format sensory history for system prompt
+    obj.setMethod('formatSensoryHistory', `
+      /** Format sensory history for AI system prompt. */
+      const history = self.sensoryHistory || [];
+      if (history.length === 0) return '';
+
+      const lines = ['\\nRECENT OBSERVATIONS:'];
+      lines.push('Things you recently saw and heard. Use as context.\\n');
+
+      // Show most recent 20 events
+      const recent = history.slice(-20);
+
+      for (const event of recent) {
+        const ago = Math.round((Date.now() - event.timestamp) / 1000);
+        const timeStr = ago < 60 ? ago + 's ago' : Math.round(ago/60) + 'm ago';
+        const sourceName = event.source?.name || null;
+
+        if (event.type === 'hear' && sourceName) {
+          lines.push('[' + timeStr + '] ' + sourceName + ': "' + event.content + '"');
+        } else if (event.type === 'hear') {
+          lines.push('[' + timeStr + '] Heard: ' + event.content);
+        } else {
+          lines.push('[' + timeStr + '] ' + event.content);
+        }
+      }
+
+      return lines.join('\\n');
+    `);
+
+    // Build the full system prompt from template
+    obj.setMethod('buildAgentPrompt', `
+      /** Build the system prompt for AI agent from this NPC's template.
+       *  @returns Full system prompt string, or null if not AI-controlled
+       */
+      // Check if AI-controlled
+      const ai = await $.ai;
+      if (!ai || !ai.isAiControlled) return null;
+
+      const isAI = await ai.isAiControlled(self.id);
+      if (!isAI) return null;
+
+      // Get template from this NPC's property
+      const template = self.agentSystemPrompt;
+      if (!template) return null;
+
+      // Get profile from $.ai
+      const profile = await ai.getProfile(self.id);
+      if (!profile || !profile.success) return null;
+
+      // Get in-game datetime (Pacific time + 85 years)
+      const now = new Date();
+      const pacificTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
+      const mooYear = pacificTime.getFullYear() + 85;
+      const months = ['January', 'February', 'March', 'April', 'May', 'June',
+                      'July', 'August', 'September', 'October', 'November', 'December'];
+      const datetime = months[pacificTime.getMonth()] + ' ' + pacificTime.getDate() + ', ' + mooYear;
+
+      // Format profile sections
+      const personalitySection = profile.personality ? await self.formatPersonality(profile.personality) : '';
+      const historySection = profile.history ? await self.formatHistory(profile.history) : '';
+      const memoriesSection = profile.memories && profile.memories.length > 0 ? await self.formatMemories(profile.memories) : '';
+      const notesSection = profile.notes && profile.notes.length > 0 ? await self.formatNotes(profile.notes) : '';
+      const sensorySection = await self.formatSensoryHistory();
+
+      // Substitute template variables
+      let prompt = template;
+      prompt = prompt.replace(/\\{\\{name\\}\\}/g, self.name);
+      prompt = prompt.replace(/\\{\\{role\\}\\}/g, profile.role || 'generic');
+      prompt = prompt.replace(/\\{\\{id\\}\\}/g, String(self.id));
+      prompt = prompt.replace(/\\{\\{datetime\\}\\}/g, datetime);
+      prompt = prompt.replace(/\\{\\{personality\\}\\}/g, personalitySection);
+      prompt = prompt.replace(/\\{\\{history\\}\\}/g, historySection);
+      prompt = prompt.replace(/\\{\\{memories\\}\\}/g, memoriesSection);
+      prompt = prompt.replace(/\\{\\{notes\\}\\}/g, notesSection);
+      prompt = prompt.replace(/\\{\\{sensoryHistory\\}\\}/g, sensorySection);
+
+      return prompt;
+    `);
+
+    // Called when someone speaks directly to this NPC (via "to" verb)
+    obj.setMethod('onSpokenTo', `
+      /** Handle being spoken to directly.
+       *  @param speaker - The RuntimeObject speaking to us
+       *  @param message - What they said
+       */
+      const speaker = args[0];
+      const message = args[1];
+
+      if (!speaker || !message) return;
+
+      // Build system prompt (returns null if not AI-controlled)
+      const systemPrompt = await self.buildAgentPrompt();
+      if (!systemPrompt) return; // Not AI-controlled, do nothing
+
+      // Build user prompt
+      const userPrompt = speaker.name + ' says to you: "' + message + '"\\n\\nRespond in character.';
+
+      // Fire-and-forget query - NPC will use MCP tools to speak/emote
+      $.query(systemPrompt, userPrompt, self.agentSession)
+        .then(async (result) => {
+          // Save session for continuity
+          self.agentSession = result.session;
+        })
+        .catch((err) => {
+          console.error('[onSpokenTo] AI error for #' + self.id + ':', err?.message || err);
+        });
+    `);
+
+    // Called when someone gives an item to this NPC
+    obj.setMethod('onItemReceived', `
+      /** Handle receiving an item from someone.
+       *  @param giver - The RuntimeObject giving us the item
+       *  @param item - The item being given
+       */
+      const giver = args[0];
+      const item = args[1];
+
+      if (!giver || !item) return;
+
+      // Build system prompt (returns null if not AI-controlled)
+      const systemPrompt = await self.buildAgentPrompt();
+      if (!systemPrompt) return; // Not AI-controlled, do nothing
+
+      // Build user prompt
+      const userPrompt = giver.name + ' just gave you ' + item.name + '.\\n\\nReact appropriately - thank them, examine the item, or respond based on your role.';
+
+      // Fire-and-forget query
+      $.query(systemPrompt, userPrompt, self.agentSession)
+        .then(async (result) => {
+          self.agentSession = result.session;
+        })
+        .catch((err) => {
+          console.error('[onItemReceived] AI error for #' + self.id + ':', err?.message || err);
+        });
     `);
 
     return obj;

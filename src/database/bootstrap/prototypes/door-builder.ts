@@ -61,10 +61,8 @@ export class DoorBuilder {
         // Composable locks
         const locks = self.locks || [];
         for (const lock of locks) {
-          if (!lock) continue;
-          const lockObj = typeof lock === 'number' ? await $.load(lock) : lock;
-          if (!lockObj || !lockObj.canAccess) continue;
-          const result = await lockObj.canAccess(agent, target);
+          if (!lock || !lock.canAccess) continue;
+          const result = await lock.canAccess(agent, target);
           if (result !== true) {
             return result;
           }
@@ -110,10 +108,8 @@ export class DoorBuilder {
       // Composable locks
       const locks = self.locks || [];
       for (const lock of locks) {
-        if (!lock) continue;
-        const lockObj = typeof lock === 'number' ? await $.load(lock) : lock;
-        if (!lockObj || !lockObj.canAccess) continue;
-        const result = await lockObj.canAccess(agent, self);
+        if (!lock || !lock.canAccess) continue;
+        const result = await lock.canAccess(agent, self);
         if (result !== true) {
           return result;
         }

@@ -253,8 +253,7 @@ export class LockerBuilder {
 
       // Recycle all contents
       const contents = comp.contents || [];
-      for (const itemRef of contents) {
-        const item = typeof itemRef === 'object' ? itemRef : await $.load(itemRef);
+      for (const item of contents) {
         if (item && recycler) {
           await recycler.recycle(item);
           recycledItems.push(item.name || 'item');
@@ -601,7 +600,7 @@ export class LockerBuilder {
       // Trigger plot hooks
       await self.triggerPlotHooks('itemDeposited', {
         compartment: id,
-        item: item.id,
+        item: item,
         itemName: item.name,
       });
 
@@ -709,8 +708,7 @@ export class LockerBuilder {
         const contents = comp.contents || [];
         if (contents.length > 0) {
           desc += '\\r\\nContents:\\r\\n';
-          for (const itemRef of contents) {
-            const item = typeof itemRef === 'object' ? itemRef : await $.load(itemRef);
+          for (const item of contents) {
             if (item) {
               desc += '  - ' + (item.name || 'something') + '\\r\\n';
             }

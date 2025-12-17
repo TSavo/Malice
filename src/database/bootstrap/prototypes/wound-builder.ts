@@ -217,7 +217,7 @@ export class WoundBuilder {
 
       // === BLEEDING ===
       if (self.bleeding > 0) {
-        const bodyPart = self.bodyPart ? await $.load(self.bodyPart) : null;
+        const bodyPart = self.bodyPart || null;
         if (bodyPart) {
           // Blood loss drains both hydration AND calories
           // Blood carries water and nutrients/energy
@@ -247,9 +247,9 @@ export class WoundBuilder {
 
       // === PAIN ===
       if (self.painLevel > 0) {
-        const bodyPart = self.bodyPart ? await $.load(self.bodyPart) : null;
+        const bodyPart = self.bodyPart || null;
         if (bodyPart) {
-          const owner = bodyPart.owner ? await $.load(bodyPart.owner) : null;
+          const owner = bodyPart.owner || null;
           if (owner && owner.feel) {
             // Pain pulses periodically, not every tick
             const tick = $.tick || 0;
@@ -316,11 +316,11 @@ export class WoundBuilder {
         if (self.infectionSeverity > 80 && self.infectionType !== 'septic') {
           self.infectionType = 'septic';
           // Sepsis affects the whole body - notify owner
-          const bodyPart = self.bodyPart ? await $.load(self.bodyPart) : null;
+          const bodyPart = self.bodyPart;
           if (bodyPart) {
-            const owner = bodyPart.owner ? await $.load(bodyPart.owner) : null;
+            const owner = bodyPart.owner;
             if (owner && owner.addStatusEffect) {
-              await owner.addStatusEffect('sepsis', 100, { source: self.id });
+              await owner.addStatusEffect('sepsis', 100, { source: self });
             }
           }
         }

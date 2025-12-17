@@ -30,8 +30,7 @@ export class LocationBuilder {
       const others = contents.filter(c => (c?.id || c) !== viewer?.id);
       if (others.length > 0) {
         output += '\\r\\nYou see:\\r\\n';
-        for (const item of others) {
-          const obj = typeof item === 'number' ? await $.load(item) : item;
+        for (const obj of others) {
           if (obj) {
             const shortDesc = await obj.shortDesc();
             output += \`  - \${shortDesc}\\r\\n\`;
@@ -43,12 +42,7 @@ export class LocationBuilder {
     `);
 
     obj.setMethod('addContent', `
-      let obj = args[0];
-
-      // If passed an ID, load the object
-      if (typeof obj === 'number') {
-        obj = await $.load(obj);
-      }
+      const obj = args[0];
       if (!obj || typeof obj.id !== 'number') {
         return; // Invalid input
       }
@@ -129,8 +123,7 @@ export class LocationBuilder {
 
       const contents = self.contents || [];
 
-      for (const item of contents) {
-        const viewer = typeof item === 'number' ? await $.load(item) : item;
+      for (const viewer of contents) {
         if (!viewer) continue;
 
         // Determine which message to send
@@ -226,8 +219,7 @@ export class LocationBuilder {
 
       const contents = self.contents || [];
 
-      for (const item of contents) {
-        const listener = typeof item === 'number' ? await $.load(item) : item;
+      for (const listener of contents) {
         if (!listener || !listener.hear) continue;
 
         // Everyone hears the speech (understanding depends on their languages)

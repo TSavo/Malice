@@ -269,8 +269,7 @@ export class EdibleBuilder {
       let aggregated = false;
       let contents = null;
 
-      for (const id of existingContents) {
-        const existing = await $.load(id);
+      for (const existing of existingContents) {
         if (!existing) continue;
 
         // Aggregate if same food prototype and same spoiled/poisoned state
@@ -337,8 +336,7 @@ export class EdibleBuilder {
       let aggregated = false;
       let contents = null;
 
-      for (const id of existingContents) {
-        const existing = await $.load(id);
+      for (const existing of existingContents) {
         if (!existing) continue;
 
         // Check if same source prototype and compatible

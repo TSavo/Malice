@@ -64,10 +64,7 @@ export class BodyPartBuilder {
       /** Get the player/agent who owns this body part.
        *  @returns The owner RuntimeObject or null
        */
-      if (self.owner) {
-        return await $.load(self.owner);
-      }
-      return null;
+      return self.owner || null;
     `);
 
     obj.setMethod('setOwner', `
@@ -75,17 +72,14 @@ export class BodyPartBuilder {
        *  @param ownerId - Owner ID or RuntimeObject
        */
       const ownerId = args[0];
-      self.owner = typeof ownerId === 'number' ? ownerId : ownerId?.id;
+      self.owner = ownerId;
 
       // Set owner on all child parts
       const parts = self.parts || {};
       for (const partName of Object.keys(parts)) {
-        const partId = parts[partName];
-        if (partId) {
-          const part = await $.load(partId);
-          if (part && part.setOwner) {
-            await part.setOwner(self.owner);
-          }
+        const part = parts[partName];
+        if (part && part.setOwner) {
+          await part.setOwner(self.owner);
         }
       }
     `);
@@ -110,13 +104,10 @@ export class BodyPartBuilder {
       // Search child parts
       const parts = self.parts || {};
       for (const partName of Object.keys(parts)) {
-        const partId = parts[partName];
-        if (partId) {
-          const part = await $.load(partId);
-          if (part && part.findPart) {
-            const found = await part.findPart(name);
-            if (found) return found;
-          }
+        const part = parts[partName];
+        if (part && part.findPart) {
+          const found = await part.findPart(name);
+          if (found) return found;
         }
       }
 
@@ -132,12 +123,9 @@ export class BodyPartBuilder {
       if (partNames.length === 0) return self;
 
       const randomName = partNames[Math.floor(Math.random() * partNames.length)];
-      const partId = parts[randomName];
-      if (partId) {
-        const part = await $.load(partId);
-        if (part && part.randomPart) {
-          return await part.randomPart();
-        }
+      const part = parts[randomName];
+      if (part && part.randomPart) {
+        return await part.randomPart();
       }
       return self;
     `);
@@ -150,13 +138,10 @@ export class BodyPartBuilder {
 
       const parts = self.parts || {};
       for (const partName of Object.keys(parts)) {
-        const partId = parts[partName];
-        if (partId) {
-          const part = await $.load(partId);
-          if (part && part.resolveAllContents) {
-            const partContents = await part.resolveAllContents();
-            allContents = allContents.concat(partContents);
-          }
+        const part = parts[partName];
+        if (part && part.resolveAllContents) {
+          const partContents = await part.resolveAllContents();
+          allContents = allContents.concat(partContents);
         }
       }
 
@@ -176,12 +161,9 @@ export class BodyPartBuilder {
 
       const parts = self.parts || {};
       for (const partName of Object.keys(parts)) {
-        const partId = parts[partName];
-        if (partId) {
-          const part = await $.load(partId);
-          if (part && part.coverageMap) {
-            await part.coverageMap(map);
-          }
+        const part = parts[partName];
+        if (part && part.coverageMap) {
+          await part.coverageMap(map);
         }
       }
 
@@ -203,14 +185,13 @@ export class BodyPartBuilder {
       }
 
       // Check worn items - get the outermost layer
-      const wornIds = self.worn || [];
-      if (wornIds.length > 0) {
+      const worn = self.worn || [];
+      if (worn.length > 0) {
         // Find the item with the highest layer value (outermost)
         let outermostItem = null;
         let highestLayer = -1;
 
-        for (const itemId of wornIds) {
-          const item = await $.load(itemId);
+        for (const item of worn) {
           if (item) {
             const layer = item.layer || 0;
             if (layer > highestLayer) {
@@ -242,15 +223,8 @@ export class BodyPartBuilder {
       /** Get all items worn on this body part, sorted by layer (innermost first).
        *  @returns Array of worn item RuntimeObjects
        */
-      const wornIds = self.worn || [];
-      const items = [];
-
-      for (const itemId of wornIds) {
-        const item = await $.load(itemId);
-        if (item) {
-          items.push(item);
-        }
-      }
+      const worn = self.worn || [];
+      const items = worn.filter(item => item);
 
       // Sort by layer (innermost/lowest layer first)
       items.sort((a, b) => (a.layer || 0) - (b.layer || 0));
@@ -285,7 +259,7 @@ export class BodyPartBuilder {
 
       // Create sensation report for owner
       const report = {
-        part: self.id,
+        part: self,
         partName: self.name,
         ...sensation,
       };
@@ -337,13 +311,13 @@ export class BodyPartBuilder {
       await wound.initialize(damageType, severity, {
         depth,
         cause,
-        attacker: attacker?.id,
-        bodyPart: self.id,
+        attacker: attacker || null,
+        bodyPart: self,
       });
 
       // Add wound to this body part's wounds list
       const wounds = self.wounds || [];
-      wounds.push(wound.id);
+      wounds.push(wound);
       self.wounds = wounds;
 
       let resultDesc = damage.description || await wound.describe();
@@ -400,14 +374,13 @@ export class BodyPartBuilder {
         totalBled: 0,
         woundsHealed: 0,
         woundsInfected: 0,
-        fullyHealedIds: [],
+        fullyHealed: [],
       };
 
-      const woundIds = self.wounds || [];
+      const wounds = self.wounds || [];
       const activeWounds = [];
 
-      for (const woundId of woundIds) {
-        const wound = await $.load(woundId);
+      for (const wound of wounds) {
         if (!wound) continue;
 
         const tickResult = await wound.tick();
@@ -417,13 +390,13 @@ export class BodyPartBuilder {
         if (tickResult.infected) results.woundsInfected++;
 
         if (tickResult.fullyHealed) {
-          results.fullyHealedIds.push(woundId);
+          results.fullyHealed.push(wound);
           // Optionally recycle the wound object
           if ($.recycler) {
             await $.recycler.recycle(wound);
           }
         } else {
-          activeWounds.push(woundId);
+          activeWounds.push(wound);
         }
       }
 
@@ -438,13 +411,7 @@ export class BodyPartBuilder {
       /** Get all wound objects on this body part.
        *  @returns Array of wound RuntimeObjects
        */
-      const woundIds = self.wounds || [];
-      const wounds = [];
-      for (const id of woundIds) {
-        const wound = await $.load(id);
-        if (wound) wounds.push(wound);
-      }
-      return wounds;
+      return (self.wounds || []).filter(w => w);
     `);
 
     // Check if actively bleeding
@@ -490,14 +457,11 @@ export class BodyPartBuilder {
             healed.push({ type: wound.type, wound });
           }
         }
-      } else if (typeof target === 'number') {
-        // Heal specific wound by ID
-        const wound = await $.load(target);
-        if (wound && wound.healingProgress !== undefined) {
-          wound.healingProgress = Math.min(100, (wound.healingProgress || 0) + amount);
-          if (wound.healingProgress >= 100) {
-            healed.push({ type: wound.type, wound });
-          }
+      } else if (typeof target === 'object' && target.healingProgress !== undefined) {
+        // Heal specific wound object
+        target.healingProgress = Math.min(100, (target.healingProgress || 0) + amount);
+        if (target.healingProgress >= 100) {
+          healed.push({ type: target.type, wound: target });
         }
       } else {
         // Heal first wound of given type
@@ -611,13 +575,10 @@ export class BodyPartBuilder {
       // Check child parts recursively
       const parts = self.parts || {};
       for (const partName of Object.keys(parts)) {
-        const partId = parts[partName];
-        if (partId) {
-          const part = await $.load(partId);
-          if (part && part.getAllBleedingParts) {
-            const childResults = await part.getAllBleedingParts();
-            results.push(...childResults);
-          }
+        const part = parts[partName];
+        if (part && part.getAllBleedingParts) {
+          const childResults = await part.getAllBleedingParts();
+          results.push(...childResults);
         }
       }
 
@@ -634,20 +595,19 @@ export class BodyPartBuilder {
     obj.setMethod('addPart', `
       /** Add a child part to this body part.
        *  @param partName - Slot name for the part
-       *  @param partId - ID or RuntimeObject of the part
+       *  @param part - RuntimeObject of the part
        */
       const partName = args[0];
-      const partId = args[1];
+      const part = args[1];
+      if (!part) return;
+
       const parts = self.parts || {};
-      parts[partName] = typeof partId === 'number' ? partId : partId?.id;
+      parts[partName] = part;
       self.parts = parts;
 
       // Set owner on the new part
-      if (self.owner) {
-        const part = await $.load(parts[partName]);
-        if (part && part.setOwner) {
-          await part.setOwner(self.owner);
-        }
+      if (self.owner && part.setOwner) {
+        await part.setOwner(self.owner);
       }
     `);
 
@@ -658,25 +618,21 @@ export class BodyPartBuilder {
        */
       const partName = args[0];
       const parts = self.parts || {};
-      const partId = parts[partName];
-      if (partId) {
-        return await $.load(partId);
-      }
-      return null;
+      return parts[partName] || null;
     `);
 
     obj.setMethod('removePart', `
       /** Remove a child part by name (internal, doesn't handle consequences).
        *  @param partName - Name of the part slot
-       *  @returns The removed part ID or null
+       *  @returns The removed part or null
        */
       const partName = args[0];
       const parts = self.parts || {};
-      const partId = parts[partName];
-      if (partId) {
+      const part = parts[partName];
+      if (part) {
         delete parts[partName];
         self.parts = parts;
-        return partId;
+        return part;
       }
       return null;
     `);
@@ -692,15 +648,10 @@ export class BodyPartBuilder {
       const amputator = args[1]; // Who/what is doing the amputation
 
       const parts = self.parts || {};
-      const partId = parts[partName];
+      const part = parts[partName];
 
-      if (!partId) {
-        return { error: 'No such part: ' + partName };
-      }
-
-      const part = await $.load(partId);
       if (!part) {
-        return { error: 'Part not found.' };
+        return { error: 'No such part: ' + partName };
       }
 
       // Check if part can be removed
@@ -710,10 +661,7 @@ export class BodyPartBuilder {
 
       // Get owner and their location before we sever
       const owner = await self.getOwner();
-      let dropLocation = null;
-      if (owner && owner.location) {
-        dropLocation = await $.load(owner.location);
-      }
+      let dropLocation = owner?.location || null;
 
       // Remove from parent's parts list
       delete parts[partName];
@@ -726,7 +674,7 @@ export class BodyPartBuilder {
         partName: partName,
         partDesc: part.name || partName,
         timestamp: Date.now(),
-        amputator: amputator?.id || null,
+        amputator: amputator || null,
       });
       self.severedPoints = severedPoints;
 
@@ -742,8 +690,8 @@ export class BodyPartBuilder {
       }
 
       // Drop the severed part to the ground (move to owner's location)
-      if (dropLocation && dropLocation.addContent) {
-        await dropLocation.addContent(part.id);
+      if (dropLocation && part.moveTo) {
+        await part.moveTo(dropLocation);
       }
 
       // === DESTROY WORN CLOTHING ===
@@ -755,20 +703,19 @@ export class BodyPartBuilder {
         if (!bodyPart) return;
 
         // Destroy worn items on this part
-        const wornIds = bodyPart.worn || [];
-        for (const wornId of wornIds) {
-          const worn = await $.load(wornId);
-          if (worn) {
-            destroyedClothing.push(worn.name || 'clothing');
+        const worn = bodyPart.worn || [];
+        for (const wornItem of worn) {
+          if (wornItem) {
+            destroyedClothing.push(wornItem.name || 'clothing');
 
             // Unregister verbs from owner
             if (owner && owner.unregisterVerbsFrom) {
-              await owner.unregisterVerbsFrom(wornId);
+              await owner.unregisterVerbsFrom(wornItem.id);
             }
 
             // Recycle the destroyed clothing
             if ($.recycler) {
-              await $.recycler.recycle(worn);
+              await $.recycler.recycle(wornItem);
             }
           }
         }
@@ -778,9 +725,8 @@ export class BodyPartBuilder {
         // Recursively handle child parts
         const childParts = bodyPart.parts || {};
         for (const childName of Object.keys(childParts)) {
-          const childId = childParts[childName];
-          if (childId) {
-            const child = await $.load(childId);
+          const child = childParts[childName];
+          if (child) {
             await destroyWornOnPart(child);
           }
         }
@@ -863,8 +809,8 @@ export class BodyPartBuilder {
         return { error: 'There is already a part attached there.' };
       }
 
-      // Attach the part
-      parts[partName] = part.id;
+      // Attach the part (store object, not ID - proxy handles objref serialization)
+      parts[partName] = part;
       self.parts = parts;
 
       // Clear severed condition
@@ -923,7 +869,7 @@ export class BodyPartBuilder {
     obj.setMethod('describe', `
       const viewer = args[0]; // Who is looking (for pronouns)
       const condition = self.condition || {};
-      const owner = self.owner ? await $.load(self.owner) : null;
+      const owner = self.owner || null;
 
       // Get possessive pronoun for owner ("Her head", "His arm", "Your leg")
       let partName = self.name;
@@ -1001,9 +947,7 @@ export class BodyPartBuilder {
       const contents = self.contents || [];
       if (contents.length > 0) {
         const items = [];
-        for (const itemRef of contents) {
-          // Handle both RuntimeObjects (from objref) and raw IDs (numbers)
-          const item = (typeof itemRef === 'number') ? await $.load(itemRef) : itemRef;
+        for (const item of contents) {
           if (item) {
             items.push(item.name || 'something');
           }
@@ -1122,7 +1066,7 @@ export class BodyPartBuilder {
       }
 
       // Cyanosis (blue tinge from oxygen deprivation) - suffocation/drowning
-      const owner = self.owner ? await $.load(self.owner) : null;
+      const owner = self.owner || null;
       if (owner && canSeeDetail(50)) {
         const causeOfDeath = owner.causeOfDeath || '';
         if (causeOfDeath.includes('drown') || causeOfDeath.includes('suffoc') || causeOfDeath.includes('strangle')) {
@@ -1409,14 +1353,11 @@ export class BodyPartBuilder {
       // Get findings for child parts
       const parts = self.parts || {};
       for (const partName of Object.keys(parts)) {
-        const partId = parts[partName];
-        if (partId) {
-          const part = await $.load(partId);
-          if (part && part.getFullAutopsyFindings) {
-            const childFindings = await part.getFullAutopsyFindings(examinerSkill);
-            for (const [name, findings] of Object.entries(childFindings)) {
-              allFindings[name] = findings;
-            }
+        const part = parts[partName];
+        if (part && part.getFullAutopsyFindings) {
+          const childFindings = await part.getFullAutopsyFindings(examinerSkill);
+          for (const [name, findings] of Object.entries(childFindings)) {
+            allFindings[name] = findings;
           }
         }
       }

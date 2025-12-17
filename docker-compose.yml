@@ -63,8 +63,8 @@ services:
       - MONGO_URI=mongodb://mongodb:27017
       - NODE_ENV=production
     volumes:
-      # Mount Claude credentials for tailor agent (needs write access)
-      - ${HOME}/.claude:/home/node/.claude
+      # Named volume for Claude SDK sessions (AI NPC conversation history)
+      - claude_sessions:/home/node/.claude
     depends_on:
       mongodb:
         condition: service_healthy
@@ -79,31 +79,10 @@ services:
       retries: 30
       start_period: 60s
 
-  npc-agent:
-    build:
-      context: .
-      dockerfile: Dockerfile.npc-agent
-    container_name: malice-npc-agent
-    restart: unless-stopped
-    environment:
-      - MCP_HOST=malice-game
-      - MCP_PORT=3001
-      - MONGO_URI=mongodb://mongodb:27017
-      - MONGO_DB=malice
-      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
-    volumes:
-      # Mount host's Claude credentials for Max subscription auth
-      - ${HOME}/.claude:/home/node/.claude
-    depends_on:
-      mongodb:
-        condition: service_healthy
-      game:
-        condition: service_healthy
-    networks:
-      - malice-network
-
 volumes:
   mongodb_data:
+    driver: local
+  claude_sessions:
     driver: local
 
 networks:

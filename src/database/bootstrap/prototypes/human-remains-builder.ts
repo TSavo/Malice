@@ -43,8 +43,7 @@ export class HumanRemainsBuilder {
     // Get the body inside
     obj.setMethod('getBody', `
       const contents = self.contents || [];
-      for (const id of contents) {
-        const obj = await $.load(id);
+      for (const obj of contents) {
         if (obj && (obj.torso !== undefined || obj.getPart)) {
           return obj;
         }
@@ -92,10 +91,9 @@ export class HumanRemainsBuilder {
 
         for (const hand of [leftHand, rightHand]) {
           if (hand && hand.contents) {
-            for (const itemId of hand.contents) {
-              const item = await $.load(itemId);
+            for (const item of hand.contents) {
               if (item) {
-                items.push({ id: itemId, name: item.name || 'something', location: 'remains' });
+                items.push({ id: item.id, name: item.name || 'something', location: 'remains' });
               }
             }
           }
@@ -103,10 +101,9 @@ export class HumanRemainsBuilder {
 
         const torso = body.getPart ? await body.getPart('torso') : null;
         if (torso && torso.contents) {
-          for (const itemId of torso.contents) {
-            const item = await $.load(itemId);
+          for (const item of torso.contents) {
             if (item) {
-              items.push({ id: itemId, name: item.name || 'something', location: 'remains' });
+              items.push({ id: item.id, name: item.name || 'something', location: 'remains' });
             }
           }
         }
@@ -139,8 +136,7 @@ export class HumanRemainsBuilder {
       const searchParts = async (part) => {
         if (!part) return null;
         if (part.contents) {
-          for (const itemId of part.contents) {
-            const item = await $.load(itemId);
+          for (const item of part.contents) {
             if (!item) continue;
             const name = (item.name || '').toLowerCase();
             const aliases = (item.aliases || []).map(a => a.toLowerCase());
@@ -152,9 +148,8 @@ export class HumanRemainsBuilder {
         }
         const parts = part.parts || {};
         for (const partName of Object.keys(parts)) {
-          const childId = parts[partName];
-          if (childId) {
-            const child = await $.load(childId);
+          const child = parts[partName];
+          if (child) {
             const found = await searchParts(child);
             if (found) return found;
           }
@@ -319,9 +314,8 @@ export class HumanRemainsBuilder {
       // Move skeleton to our location
       if (location) {
         await skeleton.moveTo(location);
-        const room = await $.load(location);
-        if (room && room.announce) {
-          await room.announce(null, null, { others: 'The dried remains crumble, leaving only bones behind.' });
+        if (location.announce) {
+          await location.announce(null, null, { others: 'The dried remains crumble, leaving only bones behind.' });
         }
       }
 
