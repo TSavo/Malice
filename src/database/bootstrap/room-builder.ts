@@ -107,10 +107,10 @@ export class RoomBuilder {
 
         // Pick appropriate templates based on viewer
         let seeTemplate, hearTemplate;
-        if (viewer.id === actor?.id) {
+        if (viewer === actor) {
           seeTemplate = seeTemplates.actor || defaultSee;
           hearTemplate = hearTemplates.actor || defaultHear;
-        } else if (viewer.id === target?.id) {
+        } else if (viewer === target) {
           seeTemplate = seeTemplates.target || defaultSee;
           hearTemplate = hearTemplates.target || defaultHear;
         } else {

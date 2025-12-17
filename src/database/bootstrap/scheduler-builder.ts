@@ -96,7 +96,7 @@ export class SchedulerBuilder {
         args: jobArgs,
         enabled: true,
       };
-      self.set('jobs', jobs);
+      self.jobs = jobs;
 
       return { success: true, name: name, nextRun: now + delay, interval: interval };
     `);
@@ -111,7 +111,7 @@ export class SchedulerBuilder {
       }
 
       delete jobs[name];
-      self.set('jobs', jobs);
+      self.jobs = jobs;
 
       return { success: true, name: name };
     `);
@@ -127,7 +127,7 @@ export class SchedulerBuilder {
       }
 
       jobs[name].enabled = enabled;
-      self.set('jobs', jobs);
+      self.jobs = jobs;
 
       return { success: true, name: name, enabled: enabled };
     `);
@@ -200,7 +200,7 @@ export class SchedulerBuilder {
       }
 
       if (modified) {
-        self.set('jobs', jobs);
+        self.jobs = jobs;
       }
 
       return results;
@@ -231,7 +231,7 @@ export class SchedulerBuilder {
         } else {
           job.nextRun = now + job.interval;
         }
-        self.set('jobs', jobs);
+        self.jobs = jobs;
 
         return { success: true, result: result };
       } catch (err) {

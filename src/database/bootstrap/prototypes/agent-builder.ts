@@ -133,7 +133,7 @@ export class AgentBuilder {
       const verbs = self.verbs || {};
 
       for (const [pattern, info] of Object.entries(verbs)) {
-        if (info.obj?.id === sourceId) {
+        if (info.obj === sourceObj || info.obj?.id === sourceId) {
           delete verbs[pattern];
         }
       }
@@ -437,7 +437,7 @@ export class AgentBuilder {
       const target = args[3];
 
       // Special case: looking at self
-      if (target.id === player.id) {
+      if (target === player) {
         return await player.describe(player);
       }
 
@@ -1126,7 +1126,7 @@ export class AgentBuilder {
       }
 
       // Can't watch yourself
-      if (target.id === self.id) {
+      if (target === self) {
         return { success: false, message: 'You are always aware of yourself.' };
       }
 
@@ -1137,7 +1137,7 @@ export class AgentBuilder {
       const maxSlots = await self.getWatchCapacity();
 
       // Add to watch list if not already there (check by ID)
-      const alreadyWatching = watchList.some(t => t?.id === target.id);
+      const alreadyWatching = watchList.some(t => t === target);
       if (!alreadyWatching) {
         // Check if at capacity - silently drop oldest (first in list)
         while (watchList.length >= maxSlots) {
@@ -1176,7 +1176,7 @@ export class AgentBuilder {
       const watchList = self.watchList || [];
       const watchExpiry = self.watchExpiry || {};
 
-      const index = watchList.findIndex(t => t?.id === target.id);
+      const index = watchList.findIndex(t => t === target);
       if (index === -1) {
         return { success: false, message: 'You are not watching them.' };
       }
@@ -1199,7 +1199,7 @@ export class AgentBuilder {
       const target = args[0];
       if (!target?.id) return false;
       const watchList = self.watchList || [];
-      return watchList.some(t => t?.id === target.id);
+      return watchList.some(t => t === target);
     `);
 
     // Auto-watch (called when interacting with someone)
@@ -1212,13 +1212,13 @@ export class AgentBuilder {
       const target = args[0];
       const duration = args[1] || 120000; // 2 min default for auto-watch
 
-      if (!target?.id || target.id === self.id) return;
+      if (!target || target === self) return;
 
       const watchList = self.watchList || [];
       const watchExpiry = self.watchExpiry || {};
 
       // Add to watch list if not already there (check by ID)
-      const alreadyWatching = watchList.some(t => t?.id === target.id);
+      const alreadyWatching = watchList.some(t => t === target);
       if (!alreadyWatching) {
         watchList.push(target);
         self.watchList = watchList;

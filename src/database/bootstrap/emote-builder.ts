@@ -194,7 +194,7 @@ export class EmoteBuilder {
 
       if (!emoteStr || !actor || !viewer) return '';
 
-      const isActor = viewer.id === actor.id;
+      const isActor = viewer === actor;
 
       // Remove leading dot if present
       let text = emoteStr.startsWith('.') ? emoteStr.slice(1) : emoteStr;
@@ -248,7 +248,7 @@ export class EmoteBuilder {
         return { visual: '', audible: '', olfactory: '', gustatory: '', visualDeaf: '', combined: '' };
       }
 
-      const isActor = viewer.id === actor.id;
+      const isActor = viewer === actor;
 
       // Remove leading dot if present
       let text = emoteStr.startsWith('.') ? emoteStr.slice(1) : emoteStr;
@@ -328,7 +328,7 @@ export class EmoteBuilder {
       const viewer = args[2];
       const knownNames = args[3];
 
-      const isActor = viewer.id === actor.id;
+      const isActor = viewer === actor;
       const segments = [];
       let currentTarget = actor;
       let i = 0;
@@ -469,9 +469,9 @@ export class EmoteBuilder {
                 if (knownNames[lower]) {
                   const named = knownNames[lower];
                   currentTarget = named;
-                  if (named.id === viewer.id) {
+                  if (named === viewer) {
                     processedPhrase += 'you';
-                  } else if (named.id === actor.id && isActor) {
+                  } else if (named === actor && isActor) {
                     processedPhrase += 'yourself';
                   } else {
                     processedPhrase += named.name;
@@ -479,17 +479,17 @@ export class EmoteBuilder {
                 } else if (lower === 'my') {
                   processedPhrase += isActor ? 'your' : await self.getPossessive(actor);
                 } else if (self.objectPronouns.includes(lower)) {
-                  if (currentTarget.id === viewer.id) {
+                  if (currentTarget === viewer) {
                     processedPhrase += 'you';
-                  } else if (currentTarget.id === actor.id && isActor) {
+                  } else if (currentTarget === actor && isActor) {
                     processedPhrase += 'yourself';
                   } else {
                     processedPhrase += await self.getObjectPronoun(currentTarget);
                   }
                 } else if (self.possessivePronouns.includes(lower)) {
-                  if (currentTarget.id === viewer.id) {
+                  if (currentTarget === viewer) {
                     processedPhrase += 'your';
-                  } else if (currentTarget.id === actor.id && isActor) {
+                  } else if (currentTarget === actor && isActor) {
                     processedPhrase += 'your';
                   } else {
                     processedPhrase += await self.getPossessive(currentTarget);
@@ -564,9 +564,9 @@ export class EmoteBuilder {
                 if (knownNames[lower]) {
                   const named = knownNames[lower];
                   currentTarget = named;
-                  if (named.id === viewer.id) {
+                  if (named === viewer) {
                     processedPhrase += 'you';
-                  } else if (named.id === actor.id && isActor) {
+                  } else if (named === actor && isActor) {
                     processedPhrase += 'yourself';
                   } else {
                     processedPhrase += named.name;
@@ -574,17 +574,17 @@ export class EmoteBuilder {
                 } else if (lower === 'my') {
                   processedPhrase += isActor ? 'your' : await self.getPossessive(actor);
                 } else if (self.objectPronouns.includes(lower)) {
-                  if (currentTarget.id === viewer.id) {
+                  if (currentTarget === viewer) {
                     processedPhrase += 'you';
-                  } else if (currentTarget.id === actor.id && isActor) {
+                  } else if (currentTarget === actor && isActor) {
                     processedPhrase += 'yourself';
                   } else {
                     processedPhrase += await self.getObjectPronoun(currentTarget);
                   }
                 } else if (self.possessivePronouns.includes(lower)) {
-                  if (currentTarget.id === viewer.id) {
+                  if (currentTarget === viewer) {
                     processedPhrase += 'your';
-                  } else if (currentTarget.id === actor.id && isActor) {
+                  } else if (currentTarget === actor && isActor) {
                     processedPhrase += 'your';
                   } else {
                     processedPhrase += await self.getPossessive(currentTarget);
@@ -658,9 +658,9 @@ export class EmoteBuilder {
                 if (knownNames[lower]) {
                   const named = knownNames[lower];
                   currentTarget = named;
-                  if (named.id === viewer.id) {
+                  if (named === viewer) {
                     processedPhrase += 'you';
-                  } else if (named.id === actor.id && isActor) {
+                  } else if (named === actor && isActor) {
                     processedPhrase += 'yourself';
                   } else {
                     processedPhrase += named.name;
@@ -668,17 +668,17 @@ export class EmoteBuilder {
                 } else if (lower === 'my') {
                   processedPhrase += isActor ? 'your' : await self.getPossessive(actor);
                 } else if (self.objectPronouns.includes(lower)) {
-                  if (currentTarget.id === viewer.id) {
+                  if (currentTarget === viewer) {
                     processedPhrase += 'you';
-                  } else if (currentTarget.id === actor.id && isActor) {
+                  } else if (currentTarget === actor && isActor) {
                     processedPhrase += 'yourself';
                   } else {
                     processedPhrase += await self.getObjectPronoun(currentTarget);
                   }
                 } else if (self.possessivePronouns.includes(lower)) {
-                  if (currentTarget.id === viewer.id) {
+                  if (currentTarget === viewer) {
                     processedPhrase += 'your';
-                  } else if (currentTarget.id === actor.id && isActor) {
+                  } else if (currentTarget === actor && isActor) {
                     processedPhrase += 'your';
                   } else {
                     processedPhrase += await self.getPossessive(currentTarget);
@@ -727,9 +727,9 @@ export class EmoteBuilder {
             const named = knownNames[lower];
             currentTarget = named;
 
-            if (named.id === viewer.id) {
+            if (named === viewer) {
               currentSegment.text += 'you';
-            } else if (named.id === actor.id && isActor) {
+            } else if (named === actor && isActor) {
               currentSegment.text += 'yourself';
             } else {
               currentSegment.text += named.name;
@@ -759,9 +759,9 @@ export class EmoteBuilder {
 
           // Object pronouns
           if (self.objectPronouns.includes(lower)) {
-            if (currentTarget.id === viewer.id) {
+            if (currentTarget === viewer) {
               currentSegment.text += 'you';
-            } else if (currentTarget.id === actor.id && isActor) {
+            } else if (currentTarget === actor && isActor) {
               currentSegment.text += 'yourself';
             } else {
               currentSegment.text += await self.getObjectPronoun(currentTarget);
@@ -771,9 +771,9 @@ export class EmoteBuilder {
 
           // Possessive pronouns
           if (self.possessivePronouns.includes(lower)) {
-            if (currentTarget.id === viewer.id) {
+            if (currentTarget === viewer) {
               currentSegment.text += 'your';
-            } else if (currentTarget.id === actor.id && isActor) {
+            } else if (currentTarget === actor && isActor) {
               currentSegment.text += 'your';
             } else {
               currentSegment.text += await self.getPossessive(currentTarget);
@@ -814,7 +814,7 @@ export class EmoteBuilder {
       let currentTarget = args[3];
       const knownNames = args[4];
 
-      const isActor = viewer.id === actor.id;
+      const isActor = viewer === actor;
       let result = '';
       let i = 0;
 
@@ -872,9 +872,9 @@ export class EmoteBuilder {
             currentTarget = named; // Shift target
 
             // Substitute appropriately
-            if (named.id === viewer.id) {
+            if (named === viewer) {
               result += 'you';
-            } else if (named.id === actor.id && isActor) {
+            } else if (named === actor && isActor) {
               result += 'yourself';
             } else {
               result += named.name;
@@ -906,9 +906,9 @@ export class EmoteBuilder {
 
           // Check for object pronouns (him/her/them) - refer to currentTarget
           if (self.objectPronouns.includes(lower)) {
-            if (currentTarget.id === viewer.id) {
+            if (currentTarget === viewer) {
               result += 'you';
-            } else if (currentTarget.id === actor.id && isActor) {
+            } else if (currentTarget === actor && isActor) {
               result += 'yourself';
             } else {
               result += await self.getObjectPronoun(currentTarget);
@@ -918,9 +918,9 @@ export class EmoteBuilder {
 
           // Check for possessive pronouns (his/her/their) - refer to currentTarget
           if (self.possessivePronouns.includes(lower)) {
-            if (currentTarget.id === viewer.id) {
+            if (currentTarget === viewer) {
               result += 'your';
-            } else if (currentTarget.id === actor.id && isActor) {
+            } else if (currentTarget === actor && isActor) {
               result += 'your';
             } else {
               result += await self.getPossessive(currentTarget);
@@ -1026,7 +1026,7 @@ export class EmoteBuilder {
         if (!viewer) continue;
 
         // Skip if viewer is the actor (they always see their own emote)
-        const isSelf = viewer.id === actor.id;
+        const isSelf = viewer === actor;
 
         // Check crowd perception if room supports it
         let perception = { canSee: true, canHear: true, visualClarity: 100, audioClarity: 100 };
@@ -1148,7 +1148,7 @@ export class EmoteBuilder {
         }
 
         // Only auto-watch if THIS viewer was specifically mentioned in the emote
-        const isTarget = targets.some(t => t && t.id === viewer.id);
+        const isTarget = targets.some(t => t === viewer);
         if (isTarget && !isSelf && viewer.autoWatch) {
           // I was mentioned - auto-watch the actor back
           await viewer.autoWatch(actor);
@@ -1158,7 +1158,7 @@ export class EmoteBuilder {
       // Actor auto-watches anyone they specifically addressed
       if (actor.autoWatch) {
         for (const target of targets) {
-          if (target && target.id !== actor.id) {
+          if (target && target !== actor) {
             await actor.autoWatch(target);
           }
         }

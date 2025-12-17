@@ -2,6 +2,15 @@
 
 Essential concepts for working with Malice's object system.
 
+## The In-Memory Architecture
+
+**All objects live in memory.** At startup, every object is loaded from MongoDB into the cache. This means:
+
+- Object references (`objref`) **always** resolve to RuntimeObjects
+- Object identity (`===`) just works
+- No "cache miss" scenarios
+- Database is only accessed for: startup load, writes, and replica set sync
+
 ## Property Access
 
 **NEVER use `.get()`, `.set()`, or `.call()` directly.** The Proxy handles everything.
@@ -20,18 +29,74 @@ const n = self.get('name');  // NO!
 
 The `RuntimeObject` Proxy automatically converts between JavaScript and MOO value types. When you set a property, it calls `.set()` internally. When you read it, it calls `.get()`. **You never need to do this yourself.**
 
-### Why the Proxy Exists
+### Natural JavaScript
 
 ```javascript
-// Without Proxy - verbose and error-prone
-await obj.set('location', { type: 'objref', value: room.id });
-const loc = await obj.get('location');
-const locObj = typeof loc === 'number' ? await $.load(loc) : loc;
+// Properties work like regular JavaScript
+self.location = room;
+const loc = self.location;  // Returns RuntimeObject, always
+await loc.announce('Hello!');
 
-// With Proxy - natural JavaScript
-obj.location = room;
-const loc = await $.load(obj.location); // Always safe
+// Arrays work naturally too
+self.contents = [item1, item2, item3];
+const items = self.contents;  // Array of RuntimeObjects
 ```
+
+## Object References
+
+### Store Objects, Not IDs
+
+**Always store RuntimeObjects directly. Never use `.id` for storage.**
+
+```javascript
+// DO: Store RuntimeObjects directly
+self.location = room;
+self.owner = player;
+self.target = enemy;
+self.contents = [item1, item2];
+
+// DON'T: Never store IDs
+self.location = room.id;      // NO! Loses type information
+self.owner = player.id;       // NO! Becomes number, not objref
+```
+
+When you store a RuntimeObject, the system automatically creates an `objref`:
+```javascript
+self.owner = player;  // Stored as: { type: 'objref', value: 42 }
+```
+
+When you read it back, you get the RuntimeObject:
+```javascript
+const owner = self.owner;  // Returns RuntimeObject for #42
+await owner.tell('Hello!');  // Just works
+```
+
+### Object Identity with `===`
+
+**Use `===` for object comparison. Never compare `.id` values.**
+
+```javascript
+// DO: Use === for identity comparison
+if (self.location === otherPlayer.location) {
+  // We're in the same room
+}
+
+if (item.owner === self) {
+  // I own this item
+}
+
+// Skip self in loops
+for (const obj of room.contents) {
+  if (obj === self) continue;  // Skip myself
+  await obj.tell('Hello!');
+}
+
+// DON'T: Never compare IDs
+if (self.location.id === otherPlayer.location.id) { }  // NO! Pointless
+if (item.owner.id === self.id) { }  // NO! Use ===
+```
+
+**Why `===` works:** All objects are singleton proxies in the cache. Two references to the same object are literally the same JavaScript object.
 
 ## Property Types
 
@@ -44,111 +109,58 @@ All properties are stored as typed values in MongoDB:
 | `boolean` | `{ type: 'boolean', value: true }` | `true` |
 | `array` | `{ type: 'array', value: [...] }` | `[...]` (recursive) |
 | `object` | `{ type: 'object', value: {...} }` | `{...}` (recursive) |
-| `objref` | `{ type: 'objref', value: 42 }` | RuntimeObject (if cached) or ID |
+| `objref` | `{ type: 'objref', value: 42 }` | RuntimeObject |
 
-### Object References (`objref`)
-
-**Object references are stored as IDs but resolved to RuntimeObjects when read.**
-
-```javascript
-// WRITING: RuntimeObject → stored as objref
-self.owner = player;  // player is a RuntimeObject
-// Stored as: { type: 'objref', value: 42 }  (where 42 is player.id)
-
-// READING: objref → RuntimeObject (if in cache)
-const owner = self.owner;
-// If #42 is cached: returns RuntimeObject (can call owner.tell())
-// If #42 not cached: returns raw ID (42)
-```
-
-### The Caching Gotcha
-
-Object references only resolve to RuntimeObjects if the target is **already in the cache**:
-
-```javascript
-// UNSAFE: Object might not be cached
-const owner = self.owner;  // Might be RuntimeObject OR raw ID!
-if (typeof owner === 'number') {
-  owner = await $.load(owner);
-}
-
-// SAFE: Always use $.load() for object refs you need to call
-const owner = await $.load(self.owner);  // Always returns RuntimeObject
-await owner.tell('Hello!');  // Safe to call methods
-```
-
-### Never Use `.id` for Storage
-
-```javascript
-// DO: Store RuntimeObjects directly
-self.location = room;
-self.owner = player;
-self.contents = [item1, item2];
-
-// DON'T: Never use .id - it's pointless
-self.location = room.id;      // NO! Why would you do this?
-self.owner = player.id;       // NO! Just use player!
-```
-
-**The system stores objrefs automatically.** When you write `self.location = room`, it stores `{ type: 'objref', value: 42 }` for you. Using `.id` is:
-- **Pointless** - the system extracts IDs automatically
-- **Harmful** - you lose type information (becomes `number` not `objref`)
-
-**Exception: Comparison is fine.**
-```javascript
-if (viewer.id === actor.id) continue;  // ✓ Comparing IDs
-if (viewer === actor) continue;        // ✓ Also works (same cache instance)
-```
-
-## Loading Objects
-
-### $.load() - Always Safe
-
-```javascript
-// SAFE: $.load() always returns RuntimeObject (loads if needed)
-const loc = await $.load(self.location);
-await loc.announce('Hello!');  // Always works
-
-// Works whether self.location is objref OR number
-// $.load() handles both cases
-```
-
-### Why $.load() Works Either Way
-
-```javascript
-// If self.location resolved to RuntimeObject:
-const loc = await $.load(self.location);  // Returns it immediately
-
-// If self.location resolved to number:
-const loc = await $.load(self.location);  // Loads #42 from database
-```
-
-### $[id] Shorthand
-
-```javascript
-// Load by numeric ID
-const obj = await $[42];
-const obj = await $.load(42);  // Equivalent
-```
-
-## Arrays and Objects with References
+### Arrays and Nested Objects
 
 References are resolved **recursively** in arrays and nested objects:
 
 ```javascript
 // Setting an array with RuntimeObjects
 self.bodyParts = [head, torso, leftArm, rightArm];
-// Stored as: { type: 'array', value: [
-//   { type: 'objref', value: 10 },
-//   { type: 'objref', value: 11 },
-//   { type: 'objref', value: 12 },
-//   { type: 'objref', value: 13 }
-// ]}
+// Stored as array of objrefs
 
-// Reading resolves each element
+// Reading returns array of RuntimeObjects
 const parts = self.bodyParts;
-// Returns: [RuntimeObject, RuntimeObject, RuntimeObject, RuntimeObject]
-// (if all are cached)
+for (const part of parts) {
+  await part.describe();  // Each is a RuntimeObject
+}
+
+// Nested objects work too
+self.relationships = {
+  mother: momObj,
+  father: dadObj,
+  friends: [friend1, friend2]
+};
+```
+
+## Loading Objects
+
+### When You Need `$.load()`
+
+Since all objects are in memory, you rarely need `$.load()`. Use it when:
+
+1. **Loading by numeric ID** (from external input):
+```javascript
+const obj = await $.load(42);  // Load object #42
+const obj = await $[42];       // Shorthand
+```
+
+2. **Loading from a string** (user input, database ID):
+```javascript
+const targetId = parseInt(args[0]);
+const target = await $.load(targetId);
+```
+
+### You Don't Need `$.load()` For Properties
+
+```javascript
+// Since all objects are in memory:
+const owner = self.owner;        // Already a RuntimeObject
+await owner.tell('Hello!');      // Just works
+
+// You DON'T need to do this:
+const owner = await $.load(self.owner);  // Unnecessary!
 ```
 
 ## How `$` Works
@@ -182,30 +194,8 @@ return obj;                       // Return the RuntimeObject
 So `$.english.plural('cat')` is really:
 1. Get `$.aliases` property (from #0)
 2. Find `english` -> `5`
-3. Load object #5
+3. Return object #5 (already in memory)
 4. Call its `plural` method
-
-### The Alias Registry
-
-All aliases live in `$.aliases`:
-
-```javascript
-{
-  nothing: -1,           // Special: null reference
-  object_manager: 0,     // #0 itself
-  root: 1,               // Base prototype for all objects
-  system: 2,             // Connection router, player management
-
-  // Utilities (dynamically assigned IDs)
-  english: 5,
-  pronoun: 6,
-  format: 7,
-  recycler: 8,
-  // ... etc
-}
-```
-
-IDs above 2 are **dynamic**—they're assigned at bootstrap time and may differ between databases. That's why you use `$.english` instead of hardcoded IDs.
 
 ### Why Use Aliases?
 
@@ -246,17 +236,36 @@ These four aliases are protected and cannot be removed:
 
 ## Quick Reference
 
-| Operation | Use |
-|-----------|-----|
-| Store reference | `self.owner = player` |
-| Read (safe) | `await $.load(self.owner)` |
-| Read (if cached) | `self.owner` |
+| Operation | Syntax |
+|-----------|--------|
+| Set property | `self.owner = player` |
+| Get property | `const owner = self.owner` |
+| Compare objects | `if (a === b)` |
+| Store in array | `self.items = [item1, item2]` |
 | Load by ID | `await $.load(42)` or `await $[42]` |
 | Access utility | `$.english` or `$.format` |
 | Add alias | `await $.addAlias('name', obj)` |
 
+## Anti-Patterns to Avoid
+
+```javascript
+// WRONG: Using .get()/.set()
+self.set('name', 'Bob');
+const n = self.get('name');
+
+// WRONG: Storing IDs instead of objects
+self.owner = player.id;
+
+// WRONG: Comparing IDs
+if (a.id === b.id) { }
+
+// WRONG: Unnecessary $.load()
+const loc = await $.load(self.location);  // location is already RuntimeObject
+```
+
 ## See Also
 
-- [Architecture](./architecture.md) - Three-layer system
+- [Architecture](./architecture.md) - In-memory object system
 - [Best Practices](./best-practices.md) - Composition over duplication
+- [Anti-Patterns](./reference/anti-patterns.md) - Common mistakes
 - [Utilities](./utilities/) - Available utility objects

@@ -77,7 +77,7 @@ Login: `,
 
             // Check if user exists via alias lookup
             const objectManager = await $.load(0);
-            const aliases = objectManager.get('aliases') || {};
+            const aliases = objectManager.aliases || {};
             const playerPrototypeId = aliases.player;
 
             // Find player with this username
@@ -112,7 +112,7 @@ Login: `,
             const player = await context.$.load(state.userId);
 
             // Check if suspended
-            if (player.get('isSuspended')) {
+            if (player.isSuspended) {
               context.send('Your account has been suspended\\r\\n');
               context.close();
               return;

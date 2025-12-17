@@ -83,8 +83,8 @@ export class PreAuthHandlerBuilder {
           context.send(\`Fingerprint: \${cert.fingerprint}\\\\r\\\\n\`);
 
           // Get Player prototype via alias
-          const root = await $.load(1);
-          const aliases = objectManager.get('aliases') || {};
+          const objectManager = await $.load(0);
+          const aliases = objectManager.aliases || {};
           const playerPrototypeId = aliases.player;
 
           // Find Player by SSL fingerprint or email
@@ -106,14 +106,14 @@ export class PreAuthHandlerBuilder {
           const player = await context.$.load(playerDoc._id);
 
           // Check if suspended
-          if (player.get('isSuspended')) {
+          if (player.isSuspended) {
             context.send('Your account has been suspended\\\\r\\\\n');
             context.close();
             return;
           }
 
           // Check if user has DevTools permission
-          const canUseDevTools = player.get('canUseDevTools') === true;
+          const canUseDevTools = player.canUseDevTools === true;
           if (!canUseDevTools) {
             context.send('Your account does not have DevTools access.\\\\r\\\\n');
             context.close();
@@ -132,8 +132,8 @@ export class PreAuthHandlerBuilder {
           context.send(\`Authenticating user: \${basic.username}\\\\r\\\\n\`);
 
           // Get Player prototype via alias
-          const root = await $.load(1);
-          const aliases = objectManager.get('aliases') || {};
+          const objectManager = await $.load(0);
+          const aliases = objectManager.aliases || {};
           const playerPrototypeId = aliases.player;
 
           // Find Player by playername
@@ -156,7 +156,7 @@ export class PreAuthHandlerBuilder {
           const player = await context.$.load(userDoc._id);
 
           // Check if suspended
-          if (player.get('isSuspended')) {
+          if (player.isSuspended) {
             context.send('Your account has been suspended\\\\r\\\\n');
             context.close();
             return;

@@ -72,9 +72,9 @@ export class RecyclerBuilder {
           // - No caller (system creation like CharGen)
           // - Caller is wizard
           // - Caller has canBuild flag
-          if (caller && caller.get) {
-            const isWizard = caller.get('isWizard');
-            const canBuild = caller.get('canBuild');
+          if (caller) {
+            const isWizard = caller.isWizard;
+            const canBuild = caller.canBuild;
 
             if (!isWizard && !canBuild) {
               throw new Error('Permission denied: You do not have build privileges');
@@ -179,8 +179,8 @@ export class RecyclerBuilder {
           self.recycleBin = bin;
 
           // Mark as deleted on the object (persists via proxy)
-          obj.set('_deleted', true);
-          obj.set('_deletedAt', new Date().toISOString());
+          obj._deleted = true;
+          obj._deletedAt = new Date().toISOString();
 
           // Evict from cache AFTER saving
           $.evictFromCache(objectId);
@@ -194,15 +194,13 @@ export class RecyclerBuilder {
           const obj = args[1];
 
           // Wizards can recycle anything
-          if (caller && caller.get('isWizard')) return true;
-
+          if (caller?.isWizard) return true;
 
           // Can't recycle core system objects
           if (obj.id < 20) return false;
 
           // Owner can recycle their own objects
-          const owner = obj.get('owner');
-          if (caller && owner === caller.id) return true;
+          if (caller && obj.owner === caller) return true;
 
 
 
@@ -227,8 +225,8 @@ export class RecyclerBuilder {
           }
 
           // Remove deleted flags
-          obj.set('_deleted', false);
-          obj.set('_deletedAt', null);
+          obj._deleted = false;
+          obj._deletedAt = null;
 
           // Remove from bin
           bin.splice(index, 1);
@@ -267,7 +265,7 @@ export class RecyclerBuilder {
           const caller = args[1];
 
           // Only wizards can purge
-          if (!caller || !caller.get('isWizard')) {
+          if (!caller?.isWizard) {
             throw new Error('Only wizards can permanently delete objects');
           }
 

@@ -2,6 +2,80 @@
 
 Common mistakes to avoid when programming in Malice MOO.
 
+## Object References & Identity
+
+### ❌ Using .id for Comparison
+
+```javascript
+// WRONG - comparing IDs
+if (player.id === owner.id) { }
+if (self.location.id === room.id) { }
+
+// RIGHT - use === for identity
+if (player === owner) { }
+if (self.location === room) { }
+```
+
+**Why it's bad:**
+- All objects are in memory as singleton proxies
+- `===` works directly for object identity
+- Using `.id` is pointless extra code
+- `.id` only needed when serializing or logging
+
+### ❌ Storing IDs Instead of Objects
+
+```javascript
+// WRONG - storing IDs loses type information
+self.owner = player.id;       // Becomes { type: 'number' }
+self.target = enemy.id;       // Becomes { type: 'number' }
+
+// RIGHT - store objects directly
+self.owner = player;          // Becomes { type: 'objref' }
+self.target = enemy;          // Becomes { type: 'objref' }
+```
+
+**Why it's bad:**
+- Stored as `number` instead of `objref`
+- Reading returns a number, not a RuntimeObject
+- Have to manually `$.load()` every time you use it
+- Breaks `===` identity comparison
+
+### ❌ Unnecessary $.load() Calls
+
+```javascript
+// WRONG - objects are already in memory
+const owner = await $.load(self.owner);
+const loc = await $.load(player.location);
+
+// RIGHT - just use properties directly
+const owner = self.owner;
+const loc = player.location;
+```
+
+**Why it's bad:**
+- All objects are loaded at startup
+- Property access returns RuntimeObject directly
+- `$.load()` only needed for numeric IDs from external input
+- Adds unnecessary async/await
+
+### ❌ Using .get() and .set()
+
+```javascript
+// WRONG - manual method calls
+self.set('name', 'Bob');
+const n = self.get('name');
+
+// RIGHT - use property syntax
+self.name = 'Bob';
+const n = self.name;
+```
+
+**Why it's bad:**
+- Proxy handles this automatically
+- Verbose and harder to read
+- No benefit over property syntax
+- Violates the "natural JavaScript" philosophy
+
 ## Object Creation & Destruction
 
 ### ❌ Bypassing $.recycler
@@ -143,9 +217,9 @@ async doWear() {
 
 // RIGHT - unregister in hooks
 obj.setMethod('onLeaving', `
-  if (args[1]?.owner) {
-    const owner = await $.load(args[1].owner);
-    await owner.unregisterVerbsFrom(self);
+  const oldLoc = args[0];
+  if (oldLoc?.owner) {
+    await oldLoc.owner.unregisterVerbsFrom(self);
   }
 `);
 ```
@@ -595,7 +669,7 @@ async doDelete(player, obj) {
 
 // RIGHT
 async doDelete(player, obj) {
-  if (!player.isAdmin && obj.owner !== player.id) {
+  if (!player.isAdmin && obj.owner !== player) {
     return 'Permission denied.';
   }
   await $.recycler.recycle(obj);
@@ -609,16 +683,23 @@ async doDelete(player, obj) {
 
 ## Summary: Golden Rules
 
-1. ✅ **Always use $.recycler** for object creation/destruction
-2. ✅ **Always use moveTo()** for object movement
-3. ✅ **Always use utilities** ($.english, $.format, $.pronoun)
-4. ✅ **Always await async calls** when you need the result
-5. ✅ **Always unregister verbs** in onLeaving hooks
-6. ✅ **Always use appropriate senses** (see/hear/smell/taste/feel)
-7. ✅ **Always validate input** before using it
-8. ✅ **Always handle errors** explicitly
-9. ✅ **Always use pass()** when extending parent methods
-10. ✅ **Always load in parallel** when possible
+### Object References
+1. ✅ **Store objects, not IDs** - `self.owner = player` not `player.id`
+2. ✅ **Use === for comparison** - `if (a === b)` not `a.id === b.id`
+3. ✅ **Use property syntax** - `self.name = x` not `self.set('name', x)`
+4. ✅ **Skip $.load() for properties** - `self.owner` is already a RuntimeObject
+
+### System Operations
+5. ✅ **Always use $.recycler** for object creation/destruction
+6. ✅ **Always use moveTo()** for object movement
+7. ✅ **Always use utilities** ($.english, $.format, $.pronoun)
+8. ✅ **Always await async calls** when you need the result
+9. ✅ **Always unregister verbs** in onLeaving hooks
+10. ✅ **Always use appropriate senses** (see/hear/smell/taste/feel)
+11. ✅ **Always validate input** before using it
+12. ✅ **Always handle errors** explicitly
+13. ✅ **Always use pass()** when extending parent methods
+14. ✅ **Always load in parallel** when possible
 
 ## See Also
 

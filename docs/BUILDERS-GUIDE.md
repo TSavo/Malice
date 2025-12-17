@@ -409,18 +409,21 @@ const newObj = await recycler.create({
 }, locationId);
 
 // Call a method on another object
-await obj.call('methodName', arg1, arg2);
+await obj.methodName(arg1, arg2);
 
-// Get/set properties
+// Get/set properties (never use .get()/.set())
 const value = self.propertyName;
-self.set('propertyName', newValue);
+self.propertyName = newValue;
 
-// Work with arrays (must re-set to persist)
+// Compare objects with ===
+if (self.location === room) { }
+
+// Work with arrays (must re-assign to persist)
 const arr = self.items || [];
 arr.push(newItem);
-self.items = arr;  // or self.set('items', arr);
+self.items = arr;
 
-// Work with objects (must re-set to persist)
+// Work with objects (must re-assign to persist)
 const map = self.registry || {};
 map[key] = value;
 self.registry = map;

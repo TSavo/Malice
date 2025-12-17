@@ -50,7 +50,13 @@ export class EmbodiedBuilder {
       /** Get the body (torso root) of this embodied agent.
        *  @returns The torso RuntimeObject or null if no body
        */
-      return self.body || null;
+      let body = self.body;
+      if (!body) return null;
+      // Ensure body is loaded as RuntimeObject (might be raw ID if not cached)
+      if (typeof body === 'number') {
+        body = await $.load(body);
+      }
+      return body || null;
     `);
 
     obj.setMethod('getTorso', `

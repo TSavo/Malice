@@ -121,7 +121,7 @@ export class RoomBuilder {
 
       // Show contents (agents/objects in room), excluding the viewer
       const contents = self.contents || [];
-      const others = contents.filter(item => item?.id !== viewer?.id);
+      const others = contents.filter(item => item !== viewer);
       if (others.length > 0) {
         output += '\\r\\nYou see:\\r\\n';
         for (const obj of others) {
@@ -149,7 +149,7 @@ export class RoomBuilder {
       if (!exit) return;
 
       const exits = self.exits || [];
-      const alreadyPresent = exits.some(e => e?.id === exit.id);
+      const alreadyPresent = exits.some(e => e === exit);
       if (!alreadyPresent) {
         exits.push(exit);
         self.exits = exits;
@@ -176,7 +176,7 @@ export class RoomBuilder {
       } else {
         // Remove by object
         const exitId = exitArg?.id;
-        const idx = exits.findIndex(e => e?.id === exitId);
+        const idx = exits.findIndex(e => e === exitArg);
         if (idx >= 0) {
           exits.splice(idx, 1);
           self.exits = exits;
@@ -398,7 +398,7 @@ export class RoomBuilder {
       // They should remove them from watch lists, etc.
       const contents = self.contents || [];
       for (const other of contents) {
-        if (!other || other.id === obj.id) continue; // Skip the one who left
+        if (!other || other === obj) continue; // Skip the one who left
         if (other.onOtherLeft) {
           await other.onOtherLeft(obj);
         }
@@ -484,7 +484,7 @@ export class RoomBuilder {
 
       // Check if viewer is watching target
       const watchList = viewer.watchList || [];
-      const isWatching = watchList.includes(target.id);
+      const isWatching = watchList.some(w => w === target);
 
       // Base clarity starts at 100, reduced by crowd/noise/darkness
       // Watching someone gives +50 clarity bonus
@@ -652,7 +652,7 @@ export class RoomBuilder {
           // Make anyone sitting here stand up
           const sittable = sittables[nameOrIndex];
           for (const agent of sittable.occupied || []) {
-            if (agent && agent.sitting?.id === self.id) {
+            if (agent && agent.sitting === self) {
               agent.sitting = null;
               agent.sittingOn = null;
             }
@@ -667,7 +667,7 @@ export class RoomBuilder {
           // Make anyone sitting here stand up
           const sittable = sittables[idx];
           for (const agent of sittable.occupied || []) {
-            if (agent && agent.sitting?.id === self.id) {
+            if (agent && agent.sitting === self) {
               agent.sitting = null;
               agent.sittingOn = null;
             }
@@ -760,7 +760,7 @@ export class RoomBuilder {
     // The 'stand' verb - stand up from sitting
     obj.setMethod('stand', `
       /** Stand up from a sitting position. */
-      if (!player.sitting || player.sitting?.id !== self.id) {
+      if (!player.sitting || player.sitting !== self) {
         return 'You are not sitting.';
       }
 
@@ -769,7 +769,7 @@ export class RoomBuilder {
 
       // Find and remove from sittable
       for (const sittable of sittables) {
-        const idx = (sittable.occupied || []).findIndex(p => p?.id === player.id);
+        const idx = (sittable.occupied || []).findIndex(p => p === player);
         if (idx >= 0) {
           sittable.occupied.splice(idx, 1);
           break;

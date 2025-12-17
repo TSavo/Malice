@@ -166,8 +166,7 @@ await $.recycler.recycleTree(chest);  // Chest + all items recycled
 // WRONG - breaks verb registration and hooks
 room.contents.push(item);                           // NO!
 room.contents = [...room.contents, item];           // NO!
-item.location = room;                               // NO!
-item.set('location', room);                         // NO!
+item.location = room;                               // NO! Bypasses hooks
 
 // RIGHT - uses moveTo()
 await item.moveTo(room);                            // Handles everything
@@ -353,14 +352,14 @@ const sword = room.contents.find(obj => obj.name === 'sword');
 ```javascript
 // Is item in this container?
 const isHere = container.contents.some(obj => obj === item);
-const isHere2 = item.location === container;  // Also works
+const isHere = item.location === container;  // Use === for identity
 
 // Recursive containment check
-async isInside(item, container) {
-  let loc = await $.load(item.location);
+function isInside(item, container) {
+  let loc = item.location;
   while (loc) {
-    if (loc.id === container.id) return true;
-    loc = await $.load(loc.location);
+    if (loc === container) return true;  // Use === for identity
+    loc = loc.location;
   }
   return false;
 }

@@ -208,8 +208,8 @@ export class PronounSubBuilder {
         return template;
       }
 
-      const isActorViewer = viewer?.id === actor?.id;
-      const isTargetViewer = viewer?.id === target?.id;
+      const isActorViewer = viewer === actor;
+      const isTargetViewer = viewer === target;
 
       // Get pronouns
       const getPronouns = (obj) => {
@@ -322,9 +322,9 @@ export class PronounSubBuilder {
 
         // Pick appropriate message template
         let template;
-        if (viewer.id === actor?.id) {
+        if (viewer === actor) {
           template = messages.actor || defaultMsg;
-        } else if (viewer.id === target?.id) {
+        } else if (viewer === target) {
           template = messages.target || defaultMsg;
         } else {
           template = messages.others || defaultMsg;

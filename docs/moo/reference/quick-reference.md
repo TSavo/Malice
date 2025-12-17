@@ -24,25 +24,47 @@ await obj.moveTo(destination, mover);       // With context
 
 ### Load Object
 ```javascript
-const obj = await $.load(id);               // By ID
-const obj = await $.load(42);
+const obj = await $.load(id);               // By ID (from external input)
 const obj = await $[42];                    // Shorthand
 const obj = $.aliasName;                    // By alias
+```
+
+**Note:** All objects are in memory. Property access returns RuntimeObjects directly:
+```javascript
+const owner = self.owner;                   // Already a RuntimeObject
+const loc = player.location;                // Already a RuntimeObject
+// No $.load() needed for object properties!
+```
+
+## Object References
+
+### Store Objects, Not IDs
+```javascript
+self.owner = player;                        // ✅ Stored as objref
+self.target = enemy;                        // ✅ Stored as objref
+self.owner = player.id;                     // ❌ WRONG - stored as number
+```
+
+### Compare with ===
+```javascript
+if (a === b) { }                            // ✅ Identity comparison
+if (self.location === room) { }             // ✅ Same room check
+if (a.id === b.id) { }                      // ❌ WRONG - use ===
 ```
 
 ## Properties
 
 ### Get Property
 ```javascript
-const value = obj.property;                 // Direct access
-const value = obj.get('property');          // Via get()
+const value = obj.property;                 // Just use property access
 ```
 
 ### Set Property
 ```javascript
-obj.property = value;                       // Direct (creates shadow)
-obj.set('property', value);                 // Via set()
+obj.property = value;                       // Just assign directly
 ```
+
+**Never use `.get()` or `.set()` - the Proxy handles everything.**
 
 ### Check Property
 ```javascript

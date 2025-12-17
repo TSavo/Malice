@@ -52,7 +52,7 @@ async function announcePickup(actor, items, room) {
   const verb = items.length === 1 ? 'picks' : 'pick';
 
   for (const viewer of room.contents) {
-    if (viewer.id === actor.id) {
+    if (viewer === actor) {  // Use === for identity
       await viewer.tell('You ' + (items.length === 1 ? 'pick' : 'pick') + ' up ' + itemList + '.');
     } else {
       await viewer.tell(actor.name + ' ' + verb + ' up ' + itemList + '.');
@@ -296,11 +296,12 @@ Using `.id` for storage is:
 - **Pointless** - the system extracts IDs automatically
 - **Harmful** - you lose type information (becomes `number` not `objref`)
 
-**Exception: Comparison is fine.** Use `.id` when comparing objects:
+**For comparison, use `===` directly:**
 ```javascript
-if (viewer.id === actor.id) continue;  // ✓ Comparing IDs
-if (viewer === actor) continue;        // ✓ Also works (same cache instance)
+if (viewer === actor) continue;  // ✓ Use === for identity comparison
 ```
+
+All objects are singleton proxies in the cache, so `===` works for identity. Don't use `.id` for comparison - it's unnecessary.
 
 ### Reading Object References
 

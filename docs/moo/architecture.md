@@ -2,6 +2,26 @@
 
 Malice uses a three-layer architecture that maximizes flexibility and hot-reloadability.
 
+## In-Memory Object System
+
+**All objects live in memory.** At startup, every object is loaded from MongoDB into the cache. This enables:
+
+- **Object identity with `===`** - Two references to the same object are the same JavaScript object
+- **Instant property access** - No async needed when reading properties
+- **No cache misses** - All objrefs resolve to RuntimeObjects, always
+- **Natural JavaScript** - `self.location === room` just works
+
+**Database access only happens for:**
+1. **Initial load** - All objects loaded at startup
+2. **Writes** - Persist changes to MongoDB
+3. **Change stream** - Sync updates from replica set
+
+This is the correct architecture for a MOO because:
+- MOOs have finite objects (thousands, not millions)
+- Objects constantly reference each other
+- Synchronous property access is natural
+- Object identity comparison is essential
+
 ## The Three Layers
 
 ```

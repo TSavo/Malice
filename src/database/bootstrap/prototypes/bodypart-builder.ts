@@ -618,7 +618,13 @@ export class BodyPartBuilder {
        */
       const partName = args[0];
       const parts = self.parts || {};
-      return parts[partName] || null;
+      let part = parts[partName];
+      if (!part) return null;
+      // Ensure part is loaded as RuntimeObject (might be raw ID if not cached)
+      if (typeof part === 'number') {
+        part = await $.load(part);
+      }
+      return part || null;
     `);
 
     obj.setMethod('removePart', `

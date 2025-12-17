@@ -1,5 +1,31 @@
 # Best Practices
 
+## Object References
+
+**Store Objects, Compare with ===**
+
+Since all objects live in memory, object identity just works:
+
+```javascript
+// Store objects, not IDs
+self.owner = player;           // ✅ Stored as objref
+self.target = enemy;           // ✅ Stored as objref
+self.owner = player.id;        // ❌ WRONG - stored as number
+
+// Compare with ===
+if (a === b) { }               // ✅ Identity comparison
+if (self.location === room) { }// ✅ Same room check
+if (a.id === b.id) { }         // ❌ WRONG - use ===
+
+// Direct property access
+const owner = self.owner;      // ✅ Already a RuntimeObject
+const owner = await $.load(self.owner); // ❌ Unnecessary
+
+// Property syntax
+self.name = 'Bob';             // ✅ Just assign
+self.set('name', 'Bob');       // ❌ Never use .set()
+```
+
 ## The Golden Rule
 
 **Combine Utilities, Never Duplicate Logic**
