@@ -39,15 +39,40 @@ New to Malice? Start here:
 
 ## Prototypes
 
+### Core Systems
 - **[Prototype System](./prototypes.md)** ✅ - Overview, hierarchy, Base+Implementation pattern, inheritance, pass()
-- **[Room System](./prototypes/rooms.md)** ✅ - Rooms, exits, elevators, coordinates, crowd mechanics, environmental properties
-- **[World Building](./prototypes/world-building.md)** ✅ - WorldBuilder, BuildingBuilder, Pioneer Square grid, placeholder system
-- **[Plot System](./prototypes/plots.md)** ✅ - Narrative event logs, jobs, hooks, dynamic quests, $.plot/$.plotSpawner/$.jobBoard
+- **[Agent System](./prototypes/agents.md)** ✅ - Players, NPCs, verbs, movement, perception
+- **[Body System](./prototypes/body.md)** ✅ - Human bodies, body parts, metabolism, digestion
+- **[Room System](./prototypes/rooms.md)** ✅ - Rooms, exits, elevators, coordinates, crowd mechanics
 
-### Detailed Guides (Coming Soon)
-- [Agent System](./prototypes/agents.md) - Players, verbs, movement, perception
-- [Body System](./prototypes/body.md) - Human bodies, body parts, metabolism
-- [Item Types](./prototypes/items.md) - Food, drink, clothing, wearables, stackables
+### Items & Equipment
+- **[Item Types](./prototypes/items.md)** ✅ - Overview of all item prototypes
+- **[Wearables](./prototypes/wearables.md)** ✅ - Clothing, armor, body coverage, layering
+- **[Consumables](./prototypes/consumables.md)** ✅ - Food, drink, effects, nutrition
+- **[Stackables](./prototypes/stackables.md)** ✅ - Currency, ammo, resources
+- **[Decay System](./prototypes/decay.md)** ✅ - Spoilage, damage, time-based decay
+
+### World Systems
+- **[World Building](./prototypes/world-building.md)** ✅ - WorldBuilder, BuildingBuilder, Pioneer Square grid
+- **[Plot System](./prototypes/plots.md)** ✅ - Narrative event logs, jobs, hooks, dynamic quests
+- **[Security System](./prototypes/security.md)** ✅ - Locks, keypads, biometrics, access control
+- **[Doors](./prototypes/door.md)** ✅ - Door mechanics, locks, open/close
+- **[Signs](./prototypes/signs.md)** ✅ - Readable signs and notices
+- **[Elevators](./prototypes/elevator.md)** ✅ - Multi-floor vertical transport
+
+### Economy & Social
+- **[Bank System](./prototypes/bank.md)** ✅ - Electronic currency, accounts, transactions
+- **[Factions](./prototypes/faction.md)** ✅ - Faction membership, relationships, reputation
+- **[Lockers](./prototypes/lockers.md)** ✅ - Rentable storage, access control
+- **[Phones](./prototypes/phones.md)** ✅ - Communication devices
+
+### Combat & Health
+- **[Wounds](./prototypes/wounds.md)** ✅ - Injury system, bleeding, infection, healing
+
+## AI & NPCs
+
+- **[$.ai Registry](./ai.md)** ✅ - AI-controlled humans, spawn, $.query(), system prompts
+- **[NPC Agent System](../npc-agent.md)** ✅ - Full NPC agent documentation, MCP integration
 
 ## Advanced Topics
 
@@ -63,4 +88,5 @@ New to Malice? Start here:
 
 ---
 
-**Status:** Documentation is being actively migrated from `/docs/moo-programming.md` (4022 lines). Files marked with ✅ are complete.
+**Status:** Documentation complete. All prototype and utility docs are now available.
+
