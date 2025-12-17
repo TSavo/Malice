@@ -666,11 +666,11 @@ CORE PRINCIPLES
       }, null);
 
       // Set body owner to the human (body and all parts)
-      body.set('owner', human.id);
+      body.owner = human;
 
       // Also set owner on all body parts so clothing verb registration works
       const setOwnerRecursive = async (obj: any) => {
-        obj.set('owner', human.id);
+        obj.owner = human;
         const parts = obj.parts || {};
         for (const key of Object.keys(parts)) {
           const partId = parts[key];
