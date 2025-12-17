@@ -62,7 +62,6 @@ export class PromptBuilder {
    */
   private setupMethods(): void {
     if (!this.prompt) return;
-    const prompt = this.prompt; // Local reference for clarity
 
     // Ask a text question - returns the user's answer
     // player: the player to prompt

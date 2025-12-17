@@ -92,8 +92,12 @@ export class PlayerBuilder {
 
       // If we have a location, move into it to trigger verb registration
       if (self.location && self.location !== 0) {
-        const location = self.location;
-        if (location) {
+        // Ensure location is loaded as RuntimeObject (might be raw ID if not cached)
+        let location = self.location;
+        if (typeof location === 'number') {
+          location = await $.load(location);
+        }
+        if (location && location.describe) {
           // Trigger onArrived to register room verbs
           await self.onArrived(location, null, null);
           // Show room description (visual - uses see)
@@ -113,7 +117,11 @@ export class PlayerBuilder {
     obj.setMethod('disconnect', `
       // Unregister all verbs from current location
       if (self.location && self.location !== 0) {
-        const location = self.location;
+        // Ensure location is loaded as RuntimeObject (might be raw ID if not cached)
+        let location = self.location;
+        if (typeof location === 'number') {
+          location = await $.load(location);
+        }
         if (location) {
           await self.unregisterVerbsFrom(location.id);
         }
