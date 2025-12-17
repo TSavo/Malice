@@ -71,8 +71,9 @@ New to Malice? Start here:
 
 ## AI & NPCs
 
-- **[$.ai Registry](./ai.md)** ✅ - AI-controlled humans, spawn, $.query(), system prompts
-- **[NPC Agent System](../npc-agent.md)** ✅ - Full NPC agent documentation, MCP integration
+- **[Building Great NPCs](./npc-guide.md)** ✅ - Practical guide: spawn, personality, memories, system prompts
+- **[$.ai Registry](./ai.md)** ✅ - AI-controlled humans, spawn, $.query(), API reference
+- **[NPC Agent System](../npc-agent.md)** ✅ - Technical architecture, MCP integration
 
 ## Advanced Topics
 
