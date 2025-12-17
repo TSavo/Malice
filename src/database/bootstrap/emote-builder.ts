@@ -54,7 +54,7 @@ export class EmoteBuilder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(): Promise<void> {
+  async build(forceRebuild = false): Promise<void> {
     // Check if already exists via alias
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
@@ -63,24 +63,26 @@ export class EmoteBuilder {
 
     if (aliases.emote) {
       this.emote = await this.manager.load(aliases.emote);
-      if (this.emote) return; // Already exists
+      if (this.emote && !forceRebuild) return; // Already exists
     }
 
-    // Create new Emote
-    this.emote = await this.manager.create({
-      parent: 1,
-      properties: {
-        name: 'Emote',
-        description: 'Freeform emote parsing and formatting',
-        // Object pronouns
-        objectPronouns: ['him', 'her', 'them', 'it'],
-        // Possessive pronouns
-        possessivePronouns: ['his', 'her', 'their', 'its'],
-        // Reflexive pronouns
-        reflexivePronouns: ['himself', 'herself', 'themselves', 'itself', 'myself', 'yourself', 'yourselves', 'ourselves'],
-      },
-      methods: {},
-    });
+    // Create new Emote only if it doesn't exist
+    if (!this.emote) {
+      this.emote = await this.manager.create({
+        parent: 1,
+        properties: {
+          name: 'Emote',
+          description: 'Freeform emote parsing and formatting',
+          // Object pronouns
+          objectPronouns: ['him', 'her', 'them', 'it'],
+          // Possessive pronouns
+          possessivePronouns: ['his', 'her', 'their', 'its'],
+          // Reflexive pronouns
+          reflexivePronouns: ['himself', 'herself', 'themselves', 'itself', 'myself', 'yourself', 'yourselves', 'ourselves'],
+        },
+        methods: {},
+      });
+    }
 
     // Main parse method - parses emote string and returns structured sensory data
     this.emote.setMethod('parse', `

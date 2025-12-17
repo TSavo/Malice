@@ -26,7 +26,7 @@ export class FormatBuilder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(): Promise<void> {
+  async build(forceRebuild = false): Promise<void> {
     // Check if already exists via alias
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
@@ -35,19 +35,21 @@ export class FormatBuilder {
 
     if (aliases.format) {
       this.format = await this.manager.load(aliases.format);
-      if (this.format) return; // Already exists
+      if (this.format && !forceRebuild) return; // Already exists
     }
 
-    // Create new Format utility
-    this.format = await this.manager.create({
-      parent: 1,
-      properties: {
-        name: 'Format',
-        description: 'Text formatting utilities for columns, tables, and layout',
-        defaultWidth: 78,
-      },
-      methods: {},
-    });
+    // Create new Format utility only if it doesn't exist
+    if (!this.format) {
+      this.format = await this.manager.create({
+        parent: 1,
+        properties: {
+          name: 'Format',
+          description: 'Text formatting utilities for columns, tables, and layout',
+          defaultWidth: 78,
+        },
+        methods: {},
+      });
+    }
 
     // Pad string on the right to reach target width
     this.format.setMethod('padRight', `

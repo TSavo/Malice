@@ -32,7 +32,7 @@ export class ExclusionsBuilder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(): Promise<void> {
+  async build(forceRebuild = false): Promise<void> {
     // Check if already exists via alias
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
@@ -41,42 +41,44 @@ export class ExclusionsBuilder {
 
     if (aliases.exclusions) {
       this.exclusions = await this.manager.load(aliases.exclusions);
-      if (this.exclusions) return; // Already exists
+      if (this.exclusions && !forceRebuild) return; // Already exists
     }
 
-    // Create new Exclusions utility
-    this.exclusions = await this.manager.create({
-      parent: 1,
-      properties: {
-        name: 'Exclusions',
-        description: 'Action exclusion system using mutexes to prevent incompatible simultaneous actions',
-        // Map of action -> array of actions it excludes
-        // Each action implicitly excludes itself
-        rules: {
-          // Movement exclusions
-          walk: ['sit', 'sleep', 'crafting', 'operating'],
-          run: ['sit', 'sleep', 'crafting', 'operating'],
-          crawl: ['sit', 'sleep', 'crafting', 'operating'],
-          swim: ['sit', 'sleep', 'crafting', 'operating'],
+    // Create new Exclusions utility only if it doesn't exist
+    if (!this.exclusions) {
+      this.exclusions = await this.manager.create({
+        parent: 1,
+        properties: {
+          name: 'Exclusions',
+          description: 'Action exclusion system using mutexes to prevent incompatible simultaneous actions',
+          // Map of action -> array of actions it excludes
+          // Each action implicitly excludes itself
+          rules: {
+            // Movement exclusions
+            walk: ['sit', 'sleep', 'crafting', 'operating'],
+            run: ['sit', 'sleep', 'crafting', 'operating'],
+            crawl: ['sit', 'sleep', 'crafting', 'operating'],
+            swim: ['sit', 'sleep', 'crafting', 'operating'],
 
-          // Positional exclusions
-          sit: ['walk', 'run', 'crawl', 'swim', 'sleep', 'operating'],
-          sleep: ['walk', 'run', 'crawl', 'swim', 'sit', 'crafting', 'operating'],
-          
-          // Activity exclusions
-          crafting: ['walk', 'run', 'swim', 'sleep', 'fighting', 'operating'],
-          fighting: ['crafting', 'sleep', 'operating'],
-          operating: ['walk', 'run', 'swim', 'sit', 'sleep', 'crafting', 'fighting'], // Using terminals/machines
-          
-          // Less restrictive activities (can do while sitting/standing)
-          eating: ['sleep'],
-          drinking: ['sleep'],
-          talking: [], // Can talk while doing almost anything
-          watching: [], // Can watch while doing anything
+            // Positional exclusions
+            sit: ['walk', 'run', 'crawl', 'swim', 'sleep', 'operating'],
+            sleep: ['walk', 'run', 'crawl', 'swim', 'sit', 'crafting', 'operating'],
+
+            // Activity exclusions
+            crafting: ['walk', 'run', 'swim', 'sleep', 'fighting', 'operating'],
+            fighting: ['crafting', 'sleep', 'operating'],
+            operating: ['walk', 'run', 'swim', 'sit', 'sleep', 'crafting', 'fighting'], // Using terminals/machines
+
+            // Less restrictive activities (can do while sitting/standing)
+            eating: ['sleep'],
+            drinking: ['sleep'],
+            talking: [], // Can talk while doing almost anything
+            watching: [], // Can watch while doing anything
+          },
         },
-      },
-      methods: {},
-    });
+        methods: {},
+      });
+    }
 
     // Check if an action is blocked by current exclusions
     // Returns false if not blocked, or the blocking message string if blocked

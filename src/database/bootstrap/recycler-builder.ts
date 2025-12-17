@@ -10,7 +10,7 @@ export class RecyclerBuilder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(): Promise<void> {
+  async build(forceRebuild = false): Promise<void> {
     // Check if already exists via alias
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
@@ -20,19 +20,21 @@ export class RecyclerBuilder {
 
     if (aliases.recycler) {
       this.recycler = await this.manager.load(aliases.recycler);
-      if (this.recycler) return; // Already exists
+      if (this.recycler && !forceRebuild) return; // Already exists
     }
 
-    // Create new Recycler
-    this.recycler = await this.manager.create({
-      parent: 1,
-      properties: {
-        name: 'Recycler',
-        description: 'Object deletion and recovery system',
-        recycleBin: [],
-      },
-      methods: {},
-    });
+    // Create new Recycler only if it doesn't exist
+    if (!this.recycler) {
+      this.recycler = await this.manager.create({
+        parent: 1,
+        properties: {
+          name: 'Recycler',
+          description: 'Object deletion and recovery system',
+          recycleBin: [],
+        },
+        methods: {},
+      });
+    }
 
     // Supports two calling conventions:
     // 1. create({ parent: id, properties: {...} }, caller?) - new format
