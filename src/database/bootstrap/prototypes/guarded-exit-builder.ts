@@ -56,13 +56,10 @@ export class GuardedExitBuilder {
 
       // If faction check passed, check door/locks via parent behavior
       // Replicate parent canUse logic for doors and locks
-      if (self.door) {
-        const doorObj = typeof self.door === 'number' ? await $.load(self.door) : self.door;
-        if (doorObj && doorObj.canAccess) {
-          const result = await doorObj.canAccess(agent, self);
-          if (result !== true) {
-            return { allowed: false, reason: result };
-          }
+      if (self.door && self.door.canAccess) {
+        const result = await self.door.canAccess(agent, self);
+        if (result !== true) {
+          return { allowed: false, reason: result };
         }
       }
 
@@ -74,10 +71,8 @@ export class GuardedExitBuilder {
       // Composable locks
       const locks = self.locks || [];
       for (const lock of locks) {
-        if (!lock) continue;
-        const lockObj = typeof lock === 'number' ? await $.load(lock) : lock;
-        if (!lockObj || !lockObj.canAccess) continue;
-        const result = await lockObj.canAccess(agent, self);
+        if (!lock || !lock.canAccess) continue;
+        const result = await lock.canAccess(agent, self);
         if (result !== true) {
           return { allowed: false, reason: result };
         }

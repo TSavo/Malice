@@ -98,6 +98,12 @@ export class RuntimeObjectImpl implements RuntimeObject {
     const jsType = typeof jsValue;
 
     if (jsType === 'string') {
+      // Check for objref string format "#N" (e.g., "#5", "#123")
+      // This allows MCP and external systems to pass objrefs as strings
+      if (/^#\d+$/.test(jsValue)) {
+        const objId = parseInt(jsValue.slice(1), 10);
+        return { type: 'objref', value: objId };
+      }
       return { type: 'string', value: jsValue };
     }
 

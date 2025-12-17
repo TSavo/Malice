@@ -81,7 +81,7 @@ export class BodyFactoryBuilder {
           removable: true,
         });
         const fingerKey = finger.replace(' ', '');
-        await handPart.addPart(fingerKey, fingerPart.id);
+        await handPart.addPart(fingerKey, fingerPart);
       }
     `);
 
@@ -126,7 +126,7 @@ export class BodyFactoryBuilder {
         calories: 75,
         maxCalories: 100,
       });
-      await forearm.addPart('hand', hand.id);
+      await forearm.addPart('hand', hand);
 
       const arm = await self.createPart(bodyPartId, side + ' arm', ownerId, {
         bones: ['humerus'],
@@ -136,7 +136,7 @@ export class BodyFactoryBuilder {
         calories: 100,
         maxCalories: 150,
       });
-      await arm.addPart('forearm', forearm.id);
+      await arm.addPart('forearm', forearm);
 
       const shoulder = await self.createPart(bodyPartId, side + ' shoulder', ownerId, {
         bones: ['clavicle', 'scapula'],
@@ -145,7 +145,7 @@ export class BodyFactoryBuilder {
         calories: 150,
         maxCalories: 200,
       });
-      await shoulder.addPart('arm', arm.id);
+      await shoulder.addPart('arm', arm);
 
       return shoulder;
     `);
@@ -176,7 +176,7 @@ export class BodyFactoryBuilder {
         calories: 200,
         maxCalories: 300,
       });
-      await leg.addPart('foot', foot.id);
+      await leg.addPart('foot', foot);
 
       const knee = await self.createPart(bodyPartId, side + ' knee', ownerId, {
         bones: ['patella'],
@@ -185,7 +185,7 @@ export class BodyFactoryBuilder {
         calories: 100,
         maxCalories: 150,
       });
-      await knee.addPart('leg', leg.id);
+      await knee.addPart('leg', leg);
 
       const thigh = await self.createPart(bodyPartId, side + ' thigh', ownerId, {
         bones: ['femur'],
@@ -194,7 +194,7 @@ export class BodyFactoryBuilder {
         calories: 250,
         maxCalories: 350,
       });
-      await thigh.addPart('knee', knee.id);
+      await thigh.addPart('knee', knee);
 
       return thigh;
     `);
@@ -244,18 +244,18 @@ export class BodyFactoryBuilder {
       const mouth = await self.createPart(mouthId || bodyPartId, 'mouth', ownerId, {
         coverable: true,
       });
-      await mouth.addPart('tongue', tongue.id);
+      await mouth.addPart('tongue', tongue);
 
       // Face
       const face = await self.createPart(bodyPartId, 'face', ownerId, {
         coverable: true,
       });
-      await face.addPart('leftEye', leftEye.id);
-      await face.addPart('rightEye', rightEye.id);
-      await face.addPart('leftEar', leftEar.id);
-      await face.addPart('rightEar', rightEar.id);
-      await face.addPart('nose', nose.id);
-      await face.addPart('mouth', mouth.id);
+      await face.addPart('leftEye', leftEye);
+      await face.addPart('rightEye', rightEye);
+      await face.addPart('leftEar', leftEar);
+      await face.addPart('rightEar', rightEar);
+      await face.addPart('nose', nose);
+      await face.addPart('mouth', mouth);
 
       // Throat/Neck
       const throat = await self.createPart(bodyPartId, 'throat', ownerId, {
@@ -268,7 +268,7 @@ export class BodyFactoryBuilder {
         coverable: true,
         critical: true,
       });
-      await neck.addPart('throat', throat.id);
+      await neck.addPart('throat', throat);
 
       // Scalp (with hair) - hair details set later via appearance
       const scalp = await self.createPart(bodyPartId, 'scalp', ownerId, {
@@ -283,9 +283,9 @@ export class BodyFactoryBuilder {
         critical: true,
         iq: 1,
       });
-      await head.addPart('scalp', scalp.id);
-      await head.addPart('neck', neck.id);
-      await head.addPart('face', face.id);
+      await head.addPart('scalp', scalp);
+      await head.addPart('neck', neck);
+      await head.addPart('face', face);
 
       return head;
     `);
@@ -313,12 +313,12 @@ export class BodyFactoryBuilder {
         const rightTesticle = await self.createPart(bodyPartId, 'right testicle', ownerId, {
           removable: true,
         });
-        await groin.addPart('penis', penis.id);
-        await groin.addPart('leftTesticle', leftTesticle.id);
-        await groin.addPart('rightTesticle', rightTesticle.id);
+        await groin.addPart('penis', penis);
+        await groin.addPart('leftTesticle', leftTesticle);
+        await groin.addPart('rightTesticle', rightTesticle);
       } else if (sex === 'female') {
         const vagina = await self.createPart(bodyPartId, 'vagina', ownerId, {});
-        await groin.addPart('vagina', vagina.id);
+        await groin.addPart('vagina', vagina);
       }
       // neuter/non-binary = no additional parts
 
@@ -406,17 +406,17 @@ export class BodyFactoryBuilder {
         maxHydration: 100,
       });
 
-      await torso.addPart('head', head.id);
-      await torso.addPart('rightShoulder', rightShoulder.id);
-      await torso.addPart('leftShoulder', leftShoulder.id);
-      await torso.addPart('rightThigh', rightThigh.id);
-      await torso.addPart('leftThigh', leftThigh.id);
-      await torso.addPart('groin', groin.id);
-      await torso.addPart('leftChest', leftChest.id);
-      await torso.addPart('rightChest', rightChest.id);
-      await torso.addPart('abdomen', abdomen.id);
-      await torso.addPart('digestiveStomach', digestiveStomach.id);
-      await torso.addPart('back', back.id);
+      await torso.addPart('head', head);
+      await torso.addPart('rightShoulder', rightShoulder);
+      await torso.addPart('leftShoulder', leftShoulder);
+      await torso.addPart('rightThigh', rightThigh);
+      await torso.addPart('leftThigh', leftThigh);
+      await torso.addPart('groin', groin);
+      await torso.addPart('leftChest', leftChest);
+      await torso.addPart('rightChest', rightChest);
+      await torso.addPart('abdomen', abdomen);
+      await torso.addPart('digestiveStomach', digestiveStomach);
+      await torso.addPart('back', back);
 
       // Store primary hand preference on torso
       torso.set('primaryHand', primaryHand);

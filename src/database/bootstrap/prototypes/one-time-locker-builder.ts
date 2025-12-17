@@ -71,7 +71,7 @@ export class OneTimeLockerBuilder {
       }
 
       // Announce
-      const location = player.location ? await $.load(player.location) : null;
+      const location = player.location;
       if (location && location.announce) {
         await location.announce(player, null, {
           actor: 'You rent locker ' + compId + '.',
@@ -115,7 +115,7 @@ export class OneTimeLockerBuilder {
       }
 
       // Announce
-      const location = player.location ? await $.load(player.location) : null;
+      const location = player.location;
       if (location && location.announce) {
         await location.announce(player, null, {
           actor: 'You unlock and open locker ' + compId + '.',
@@ -126,7 +126,7 @@ export class OneTimeLockerBuilder {
       // Trigger plot hooks
       await self.triggerPlotHooks('opened', {
         compartment: compId,
-        player: player.id,
+        player: player,
         playerName: player.name,
         usedOneTimeCode: result.usedOneTime || false,
         code: result.codeUsed || null,
@@ -135,7 +135,7 @@ export class OneTimeLockerBuilder {
       if (result.usedOneTime) {
         await self.triggerPlotHooks('oneTimeCodeUsed', {
           compartment: compId,
-          player: player.id,
+          player: player,
           playerName: player.name,
           code: result.codeUsed,
         });
@@ -168,7 +168,7 @@ export class OneTimeLockerBuilder {
       }
 
       // Announce
-      const location = player.location ? await $.load(player.location) : null;
+      const location = player.location;
       if (location && location.announce) {
         await location.announce(player, null, {
           actor: 'You close and lock locker ' + compId + '.',
@@ -179,7 +179,7 @@ export class OneTimeLockerBuilder {
       // Trigger plot hooks
       await self.triggerPlotHooks('closed', {
         compartment: compId,
-        player: player.id,
+        player: player,
         playerName: player.name,
       });
 
@@ -376,7 +376,7 @@ export class OneTimeLockerBuilder {
       item.location = self.id;
 
       // Announce
-      const location = player.location ? await $.load(player.location) : null;
+      const location = player.location;
       if (location && location.announce) {
         await location.announce(player, null, {
           actor: 'You put ' + item.name + ' in locker ' + compId + '.',
@@ -408,8 +408,7 @@ export class OneTimeLockerBuilder {
       // Find item by name
       const contents = comp.contents || [];
       let foundItem = null;
-      for (const itemRef of contents) {
-        const item = typeof itemRef === 'object' ? itemRef : await $.load(itemRef);
+      for (const item of contents) {
         if (item && item.name && item.name.toLowerCase().includes(itemName.toLowerCase())) {
           foundItem = item;
           break;
@@ -430,7 +429,7 @@ export class OneTimeLockerBuilder {
       foundItem.location = player.id;
 
       // Announce
-      const location = player.location ? await $.load(player.location) : null;
+      const location = player.location;
       if (location && location.announce) {
         await location.announce(player, null, {
           actor: 'You take ' + foundItem.name + ' from locker ' + compId + '.',
@@ -476,8 +475,7 @@ export class OneTimeLockerBuilder {
       const mover = args[2];
 
       if (dest && dest.contents) {
-        for (const objId of dest.contents) {
-          const obj = await $.load(objId);
+        for (const obj of dest.contents) {
           if (obj && obj.isPlayer && obj.registerVerb) {
             await self.registerVerbsFor(obj);
           }
@@ -492,8 +490,7 @@ export class OneTimeLockerBuilder {
       const mover = args[2];
 
       if (source && source.contents) {
-        for (const objId of source.contents) {
-          const obj = await $.load(objId);
+        for (const obj of source.contents) {
           if (obj && obj.isPlayer && obj.unregisterVerbsFrom) {
             await obj.unregisterVerbsFrom(self.id);
           }

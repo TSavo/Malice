@@ -414,7 +414,7 @@ export class BankTerminalBuilder {
       await player.tell('═══════════════════════════════════════');
 
       // Announce
-      const location = player.location ? await $.load(player.location) : null;
+      const location = player.location;
       if (location && location.announce) {
         await location.announce(player, null, {
           actor: '',
@@ -471,8 +471,7 @@ export class BankTerminalBuilder {
       const contents = player.contents || [];
       const credchips = [];
 
-      for (const itemRef of contents) {
-        const item = typeof itemRef === 'object' ? itemRef : await $.load(itemRef);
+      for (const item of contents) {
         if (item && item.isCredchip && !item.consumed) {
           credchips.push(item);
         }
@@ -654,8 +653,7 @@ export class BankTerminalBuilder {
       const dest = args[0];
 
       if (dest && dest.contents) {
-        for (const objId of dest.contents) {
-          const obj = await $.load(objId);
+        for (const obj of dest.contents) {
           if (obj && obj.isPlayer && obj.registerVerb) {
             await self.registerVerbsFor(obj);
           }
@@ -668,8 +666,7 @@ export class BankTerminalBuilder {
       const source = args[0];
 
       if (source && source.contents) {
-        for (const objId of source.contents) {
-          const obj = await $.load(objId);
+        for (const obj of source.contents) {
           if (obj && obj.isPlayer && obj.unregisterVerbsFrom) {
             await obj.unregisterVerbsFrom(self.id);
           }

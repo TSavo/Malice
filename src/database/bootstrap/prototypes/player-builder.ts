@@ -92,7 +92,7 @@ export class PlayerBuilder {
 
       // If we have a location, move into it to trigger verb registration
       if (self.location && self.location !== 0) {
-        const location = await $.load(self.location);
+        const location = self.location;
         if (location) {
           // Trigger onArrived to register room verbs
           await self.onArrived(location, null, null);
@@ -113,7 +113,7 @@ export class PlayerBuilder {
     obj.setMethod('disconnect', `
       // Unregister all verbs from current location
       if (self.location && self.location !== 0) {
-        const location = await $.load(self.location);
+        const location = self.location;
         if (location) {
           await self.unregisterVerbsFrom(location.id);
         }
@@ -343,7 +343,7 @@ export class PlayerBuilder {
       await player.burnCalories(armPath, check.liftCaloriesNeeded);
 
       // Announce to room with proper message structure
-      const location = player.location ? await $.load(player.location) : null;
+      const location = player.location;
       if (location && location.announce) {
         const othersMsg = await $.pronoun.sub('%N picks up %t.', player, null, null, item);
         await location.announce(player, null, {
@@ -434,7 +434,7 @@ export class PlayerBuilder {
       player.twoHandCarry = item.id;
 
       // Announce to room with proper message structure
-      const location = player.location ? await $.load(player.location) : null;
+      const location = player.location;
       if (location && location.announce) {
         const othersMsg = await $.pronoun.sub('%N lifts %t with both hands.', player, null, null, item);
         await location.announce(player, null, {
@@ -526,7 +526,7 @@ export class PlayerBuilder {
       player.dragging = item.id;
 
       // Announce to room with proper message structure
-      const location = player.location ? await $.load(player.location) : null;
+      const location = player.location;
       if (location && location.announce) {
         const othersMsg = await $.pronoun.sub('%N grabs %t and starts dragging it.', player, null, null, item);
         await location.announce(player, null, {
@@ -580,7 +580,7 @@ export class PlayerBuilder {
       }
 
       // Get current location
-      const location = player.location ? await $.load(player.location) : null;
+      const location = player.location;
       if (!location) {
         return 'You have nowhere to drop that.';
       }
@@ -662,7 +662,7 @@ export class PlayerBuilder {
       }
 
       // Get the method source
-      const handler = await $.load(foundVerb.handler);
+      const handler = foundVerb.obj;
       if (!handler) {
         return 'No help available for "' + topic + '".';
       }
@@ -910,8 +910,7 @@ export class PlayerBuilder {
             if (torso) {
               const stomach = torso.getPart ? await torso.getPart('digestiveStomach') : null;
               if (stomach && stomach.contents) {
-                for (const itemId of [...stomach.contents]) {
-                  const item = await $.load(itemId);
+                for (const item of [...stomach.contents]) {
                   if (item && $.recycler) {
                     await $.recycler.recycle(item);
                   }
@@ -1384,7 +1383,7 @@ export class PlayerBuilder {
 
       // Disconnect from old location
       if (self.location) {
-        const location = await $.load(self.location);
+        const location = self.location;
         if (location && location.removeContent) {
           await location.removeContent(self.id);
         }

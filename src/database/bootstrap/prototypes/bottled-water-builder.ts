@@ -92,7 +92,7 @@ export class BottledWaterBuilder {
       }
 
       // Announce to room with proper message structure
-      const location = drinker.location ? await $.load(drinker.location) : null;
+      const location = drinker.location || null;
       if (location && location.announce) {
         const othersMsg = result.fullyConsumed
           ? await $.pronoun.sub('%N finishes a bottle of water.', drinker)
@@ -119,7 +119,7 @@ export class BottledWaterBuilder {
       self.decayRate = self.openedDecayRate || 0.003;
 
       // Announce with proper message structure
-      const location = opener?.location ? await $.load(opener.location) : null;
+      const location = opener?.location || null;
       if (location && location.announce && opener) {
         const othersMsg = await $.pronoun.sub('%N opens a bottle of water.', opener);
         await location.announce(opener, null, { others: othersMsg });
@@ -136,7 +136,7 @@ export class BottledWaterBuilder {
 
       // Register verbs with the owner
       if (dest && dest.owner) {
-        const owner = await $.load(dest.owner);
+        const owner = dest.owner;
         if (owner && owner.registerVerb) {
           await owner.registerVerb(['drink ' + self.name, 'drink water', 'drink %t'], self, 'drink');
           if (self.sealed) {
@@ -148,8 +148,7 @@ export class BottledWaterBuilder {
       // If arriving in a room with players
       if (dest && dest.contents) {
         for (const item of dest.contents) {
-          // Handle both RuntimeObjects (from objref) and raw IDs (numbers)
-          const obj = (typeof item === 'number') ? await $.load(item) : item;
+          const obj = item;
           if (obj && obj.registerVerb) {
             await obj.registerVerb(['drink ' + self.name, 'drink water', 'drink %t'], self, 'drink');
             if (self.sealed) {

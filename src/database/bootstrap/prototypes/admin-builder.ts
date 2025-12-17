@@ -88,7 +88,7 @@ export class AdminBuilder {
             if (isNaN(eid)) { await self.tell('Invalid id.'); break; }
             const elev = await $.load(eid);
             if (!elev) { await self.tell('Elevator not found.'); break; }
-            const currentRoom = self.location ? await $.load(self.location) : null;
+            const currentRoom = self.location || null;
             if (!currentRoom) { await self.tell('You are nowhere.'); break; }
             // Attach in/out exits to this room (avoid duplicates)
             const exitProto = aliases.exit;
@@ -290,7 +290,7 @@ export class AdminBuilder {
         return;
       }
 
-      const currentRoom = self.location ? await $.load(self.location) : null;
+      const currentRoom = self.location || null;
       if (!currentRoom) {
         await self.tell('You are nowhere.');
         return;
@@ -303,14 +303,13 @@ export class AdminBuilder {
         return;
       }
 
-       const exitObj = typeof exit === 'number' ? await $.load(exit) : exit;
-       if (!exitObj) {
+       if (!exit) {
          await self.tell('Exit not found.');
          return;
        }
 
        // Resolve or create the door
-       let door = exitObj.door ? await $.load(exitObj.door) : null;
+       let door = exit.door || null;
        const aliases = $.system.aliases || {};
        const doorProto = aliases.door;
        if (!door && !doorProto) {
@@ -319,23 +318,20 @@ export class AdminBuilder {
        }
 
        if (!door) {
-         const name = (exitObj.name || 'Exit') + ' Door';
+         const name = (exit.name || 'Exit') + ' Door';
          if (!$.recycler) { await self.tell('Recycler unavailable.'); return; }
          door = await $.recycler.create({
            parent: doorProto,
            properties: { name }
          }, self);
-         exitObj.door = door.id;
+         exit.door = door;
 
 
         // Attach to reverse exit if present
-        const dest = exitObj.destRoom ? await $.load(exitObj.destRoom) : null;
+        const dest = exit.destRoom || null;
         if (dest && dest.exits) {
-          const rev = dest.exits.find(ex => ex && ex.matches && ex.matches(exitObj.getReverseDirection ? exitObj.getReverseDirection() : ''));
-          if (rev) {
-            const revObj = typeof rev === 'number' ? await $.load(rev) : rev;
-            if (revObj) revObj.door = door.id;
-          }
+          const rev = dest.exits.find(ex => ex && ex.matches && ex.matches(exit.getReverseDirection ? exit.getReverseDirection() : ''));
+          if (rev) rev.door = door;
         }
       }
 
@@ -347,10 +343,9 @@ export class AdminBuilder {
         const stateLocked = doorObj.locked ? 'locked' : 'unlocked';
         const stateOpen = doorObj.open ? 'open' : 'closed';
         const locksDetailed = [];
-        for (const l of doorObj.locks || []) {
-          const obj = typeof l === 'number' ? await $.load(l) : l;
-          const id = typeof l === 'number' ? l : l.id;
-          locksDetailed.push('#' + id + (obj?.name ? ' ' + obj.name : ''));
+        for (const lock of doorObj.locks || []) {
+          if (!lock) continue;
+          locksDetailed.push('#' + lock.id + (lock.name ? ' ' + lock.name : ''));
         }
         const locks = locksDetailed.join(', ') || 'none';
         const code = doorObj.code ? '(set)' : '(none)';
@@ -500,7 +495,7 @@ export class AdminBuilder {
       /** Create a new room with interactive prompts.
        *  Gathers: name, description, coordinates, exit back to current room.
        */
-      const currentRoom = self.location ? await $.load(self.location) : null;
+      const currentRoom = self.location || null;
 
       await self.tell('=== @dig: Create New Room ===\\r\\n');
 
@@ -650,7 +645,7 @@ export class AdminBuilder {
       /** Create an exit from current room to another room.
        *  Usage: @link
        */
-      const currentRoom = self.location ? await $.load(self.location) : null;
+      const currentRoom = self.location || null;
       if (!currentRoom) {
         await self.tell('You must be in a room to create an exit.');
         return;
@@ -745,7 +740,7 @@ export class AdminBuilder {
         return;
       }
 
-      const currentRoom = self.location ? await $.load(self.location) : null;
+      const currentRoom = self.location || null;
       if (!currentRoom) {
         await self.tell('You must be in a room.');
         return;
@@ -790,7 +785,7 @@ export class AdminBuilder {
       // Resolve target
       let target;
       if (targetRef === 'here') {
-        target = self.location ? await $.load(self.location) : null;
+        target = self.location || null;
       } else if (targetRef === 'me') {
         target = self;
       } else {
@@ -1168,14 +1163,9 @@ export class AdminBuilder {
         return;
       }
 
-      if (!targetPlayer.location) {
-        await self.tell(targetPlayer.name + ' is not in a room.');
-        return;
-      }
-
-      const destRoom = await $.load(targetPlayer.location);
+      const destRoom = targetPlayer.location;
       if (!destRoom) {
-        await self.tell('Could not load ' + targetPlayer.name + "'s location.");
+        await self.tell(targetPlayer.name + ' is not in a room.');
         return;
       }
 
@@ -1199,7 +1189,7 @@ export class AdminBuilder {
         return;
       }
 
-      const currentRoom = self.location ? await $.load(self.location) : null;
+      const currentRoom = self.location || null;
       if (!currentRoom) {
         await self.tell('You must be in a room to summon someone.');
         return;
@@ -1243,7 +1233,7 @@ export class AdminBuilder {
       const lowerInput = input.toLowerCase();
 
       if (lowerInput === 'here') {
-        target = self.location ? await $.load(self.location) : null;
+        target = self.location || null;
       } else if (lowerInput === 'me') {
         target = self;
       } else {
@@ -1339,7 +1329,7 @@ export class AdminBuilder {
       /** Show current room coordinates.
        *  Usage: @where
        */
-      const currentRoom = self.location ? await $.load(self.location) : null;
+      const currentRoom = self.location || null;
       if (!currentRoom) {
         await self.tell('You are not in a room.');
         return;
@@ -1374,7 +1364,7 @@ export class AdminBuilder {
       // Resolve target
       let target;
       if (targetRef === 'here') {
-        target = self.location ? await $.load(self.location) : null;
+        target = self.location || null;
       } else if (targetRef === 'me') {
         target = self;
       } else {
@@ -1433,7 +1423,7 @@ export class AdminBuilder {
       const lowerInput = input.toLowerCase();
 
       if (lowerInput === 'here') {
-        target = self.location ? await $.load(self.location) : null;
+        target = self.location || null;
       } else if (lowerInput === 'me') {
         target = self;
       } else {
@@ -1485,7 +1475,7 @@ export class AdminBuilder {
       // Resolve target
       let target;
       if (targetRef === 'here') {
-        target = self.location ? await $.load(self.location) : null;
+        target = self.location || null;
       } else if (targetRef === 'me') {
         target = self;
       } else {
@@ -1973,15 +1963,14 @@ export class AdminBuilder {
         weight: 50 + Math.random() * 50,    // 50-100kg
         appearance: appearance,
         location: location,
-        spawnedBy: player.id,
+        spawnedBy: player,
       });
 
       await player.tell('');
       await player.tell('Created: ' + human.name + ' (#' + human.id + ') as ' + role);
 
-      const room = location ? await $.load(location) : null;
-      if (room) {
-        await player.tell('Placed in: ' + room.name);
+      if (location) {
+        await player.tell('Placed in: ' + location.name);
       }
     `);
 
@@ -2064,7 +2053,7 @@ export class AdminBuilder {
         for (const id of ids) {
           const h = await $.load(id);
           const name = h ? h.name : 'Unknown';
-          const loc = h && h.location ? await $.load(h.location) : null;
+          const loc = h?.location || null;
           const locName = loc ? loc.name : 'nowhere';
           await player.tell('  ' + name + ' (#' + id + ') - ' + locName);
         }
@@ -2097,7 +2086,7 @@ export class AdminBuilder {
       const lowerInput = input.toLowerCase().trim();
 
       if (lowerInput === 'here') {
-        target = player.location ? await $.load(player.location) : null;
+        target = player.location || null;
       } else if (lowerInput === 'me') {
         target = player;
       } else {

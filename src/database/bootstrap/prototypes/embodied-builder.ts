@@ -32,6 +32,8 @@ export class EmbodiedBuilder {
         // Breath/air tracking for drowning
         breath: 100, // Current breath 0-100 (100 = full lungs)
         maxBreath: 100, // Max breath capacity (trained swimmers have more)
+        // Sensory history for AI awareness (last 50 things seen/heard)
+        sensoryHistory: [],
       },
       methods: {},
     });
@@ -48,10 +50,7 @@ export class EmbodiedBuilder {
       /** Get the body (torso root) of this embodied agent.
        *  @returns The torso RuntimeObject or null if no body
        */
-      if (self.body) {
-        return await $.load(self.body);
-      }
-      return null;
+      return self.body || null;
     `);
 
     obj.setMethod('getTorso', `
@@ -163,7 +162,7 @@ export class EmbodiedBuilder {
 
       // Add location contents for searching
       if (self.location) {
-        const location = await $.load(self.location);
+        const location = self.location;
         if (location) {
           allContents = allContents.concat(location.contents || []);
         }
@@ -184,8 +183,7 @@ export class EmbodiedBuilder {
       for (const hand of hands.both) {
         if (hand) {
           const contents = hand.contents || [];
-          for (const itemId of contents) {
-            const item = await $.load(itemId);
+          for (const item of contents) {
             if (item) {
               // Weight in grams, default to 100g if not specified
               totalWeight += item.weight || 100;
@@ -211,8 +209,7 @@ export class EmbodiedBuilder {
 
           if (part) {
             const worn = part.worn || [];
-            for (const itemId of worn) {
-              const item = await $.load(itemId);
+            for (const item of worn) {
               if (item) {
                 totalWeight += item.weight || 100;
               }
@@ -223,14 +220,12 @@ export class EmbodiedBuilder {
 
       // Check direct contents (backpack, etc.)
       const directContents = self.contents || [];
-      for (const itemId of directContents) {
-        const item = await $.load(itemId);
+      for (const item of directContents) {
         if (item) {
           // If item has its own contents (container), add those too
           let itemWeight = item.weight || 100;
           if (item.contents && item.contents.length > 0) {
-            for (const subItemId of item.contents) {
-              const subItem = await $.load(subItemId);
+            for (const subItem of item.contents) {
               if (subItem) {
                 itemWeight += subItem.weight || 100;
               }
@@ -245,6 +240,36 @@ export class EmbodiedBuilder {
   }
 
   private addSensoryMethods(obj: RuntimeObject): void {
+    // Record sensory events for AI awareness
+    obj.setMethod('recordSensory', `
+      /** Record a sensory event to the history buffer.
+       *  @param type - 'see' | 'hear'
+       *  @param content - The message/content
+       *  @param source - Optional source object (speaker, actor)
+       */
+      const type = args[0];
+      const content = args[1];
+      const source = args[2];
+
+      if (!self.sensoryHistory) self.sensoryHistory = [];
+      if (!content || !content.trim()) return;
+
+      // Skip our own actions (avoid "You say..." in buffer)
+      if (content.startsWith('You ')) return;
+
+      const event = {
+        timestamp: Date.now(),
+        type: type,
+        content: content.trim(),
+        source: source || null
+      };
+
+      self.sensoryHistory.push(event);
+      if (self.sensoryHistory.length > 50) {
+        self.sensoryHistory = self.sensoryHistory.slice(-50);
+      }
+    `);
+
     obj.setMethod('speak', `
       /** Speak a message through the mouth.
        *  Routes through mouth body part and broadcasts to room.
@@ -272,7 +297,7 @@ export class EmbodiedBuilder {
       // Broadcast speech to location
       // The room/location will distribute to nearby players
       if (self.location) {
-        const location = await $.load(self.location);
+        const location = self.location;
         if (location && location.broadcastSpeech) {
           await location.broadcastSpeech(speech, self);
         }
@@ -299,15 +324,16 @@ export class EmbodiedBuilder {
 
       // Build speech object from args
       let speech;
+      let source = null;
       if (typeof messageOrSpeech === 'string') {
         // Called as hear(message, language?, source?)
         const language = typeof languageOrSource === 'string' ? languageOrSource : 'English';
-        const source = typeof languageOrSource === 'object' ? languageOrSource : sourceArg;
+        source = typeof languageOrSource === 'object' ? languageOrSource : sourceArg;
         speech = {
           type: 'speech',
           content: messageOrSpeech,
           language: language,
-          speaker: source?.id || null,
+          speaker: source || null,
         };
       } else {
         // Called with speech object directly
@@ -348,6 +374,11 @@ export class EmbodiedBuilder {
         await self.tell(prefix + heard.content);
       }
 
+      // Record to sensory history for AI awareness
+      if (self.recordSensory && heard) {
+        await self.recordSensory('hear', heard.content, source);
+      }
+
       return heard;
     `);
 
@@ -385,6 +416,11 @@ export class EmbodiedBuilder {
               const options = self.options || {};
               const prefix = options.seePrompt || '';
               await self.tell(prefix + message);
+            }
+
+            // Record to sensory history for AI awareness
+            if (self.recordSensory) {
+              await self.recordSensory('see', message, source);
             }
             return true;
           }
@@ -895,9 +931,8 @@ export class EmbodiedBuilder {
         if (!part) return;
 
         // Check wounds on this part
-        const woundIds = part.wounds || [];
-        for (const woundId of woundIds) {
-          const wound = await $.load(woundId);
+        const wounds = part.wounds || [];
+        for (const wound of wounds) {
           if (wound && wound.infected) {
             totalInfectionSeverity += (wound.infectionSeverity || 10);
           }
@@ -906,9 +941,8 @@ export class EmbodiedBuilder {
         // Recurse to child parts
         const parts = part.parts || {};
         for (const partName of Object.keys(parts)) {
-          const childId = parts[partName];
-          if (childId) {
-            const child = await $.load(childId);
+          const child = parts[partName];
+          if (child) {
             await countInfections(child);
           }
         }
@@ -1022,9 +1056,8 @@ export class EmbodiedBuilder {
         // Process child parts
         const parts = part.parts || {};
         for (const partName of Object.keys(parts)) {
-          const childId = parts[partName];
-          if (childId) {
-            const child = await $.load(childId);
+          const child = parts[partName];
+          if (child) {
             await processPartWounds(child);
           }
         }
@@ -1082,7 +1115,7 @@ export class EmbodiedBuilder {
         return { isUnderwater: false, breath: self.breath, maxBreath: self.maxBreath, drowning: false, messages: [] };
       }
 
-      const location = await $.load(self.location);
+      const location = self.location;
       if (!location) {
         return { isUnderwater: false, breath: self.breath, maxBreath: self.maxBreath, drowning: false, messages: [] };
       }
@@ -1187,8 +1220,7 @@ export class EmbodiedBuilder {
 
       const contents = stomach.contents || [];
       const items = [];
-      for (const itemId of contents) {
-        const item = await $.load(itemId);
+      for (const item of contents) {
         if (item) {
           items.push(item);
         }

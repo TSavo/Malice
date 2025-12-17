@@ -23,7 +23,7 @@ export class PayphoneBuilder {
 
     obj.setMethod('dial', `
       const targetNumber = args[0];
-      const bank = self.bank ? await $.load(self.bank) : ($.bank || null);
+      const bank = self.bank || $.bank || null;
       const account = self.account;
       if (!bank || !account) return 'This payphone is out of service (no bank hookup).';
       const caller = args[1] || null;

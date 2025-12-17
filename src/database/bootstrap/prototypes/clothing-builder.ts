@@ -76,7 +76,7 @@ export class ClothingBuilder {
       }
 
       // Announce to room with proper message structure
-      const location = wearer.location ? await $.load(wearer.location) : null;
+      const location = wearer.location || null;
       if (location && location.announce) {
         const othersMsg = await $.pronoun.sub('%N puts on %t.', wearer, null, null, self);
         await location.announce(wearer, null, { others: othersMsg });
@@ -120,8 +120,7 @@ export class ClothingBuilder {
       if (hands.primary && hands.primary.addContent) {
         const canHold = await hands.primary.canContain(self);
         if (canHold !== false) {
-          await hands.primary.addContent(self.id);
-          self.location = hands.primary.id;
+          await self.moveTo(hands.primary);
           placed = true;
         }
       }
@@ -130,18 +129,16 @@ export class ClothingBuilder {
       if (!placed && hands.secondary && hands.secondary.addContent) {
         const canHold = await hands.secondary.canContain(self);
         if (canHold !== false) {
-          await hands.secondary.addContent(self.id);
-          self.location = hands.secondary.id;
+          await self.moveTo(hands.secondary);
           placed = true;
         }
       }
 
       // Drop to ground if hands are full
       if (!placed && wearer.location) {
-        const room = await $.load(wearer.location);
-        if (room && room.addContent) {
-          await room.addContent(self.id);
-          self.location = room.id;
+        const room = wearer.location;
+        if (room) {
+          await self.moveTo(room);
         }
       }
 
@@ -151,10 +148,10 @@ export class ClothingBuilder {
       }
 
       // Announce to room with proper message structure
-      const location = wearer.location ? await $.load(wearer.location) : null;
-      if (location && location.announce) {
+      const loc = wearer.location || null;
+      if (loc && loc.announce) {
         const othersMsg = await $.pronoun.sub('%N takes off %t.', wearer, null, null, self);
-        await location.announce(wearer, null, { others: othersMsg });
+        await loc.announce(wearer, null, { others: othersMsg });
       }
 
       return result.message;
@@ -171,7 +168,7 @@ export class ClothingBuilder {
 
       // If arriving in a body part (hand) that has an owner
       if (dest && dest.owner) {
-        const owner = await $.load(dest.owner);
+        const owner = dest.owner;
         if (owner && owner.registerVerb) {
           // Only register wear if not already worn
           if (!self.wornBy) {
@@ -195,7 +192,7 @@ export class ClothingBuilder {
 
       // If leaving a body part that has an owner
       if (source && source.owner) {
-        const owner = await $.load(source.owner);
+        const owner = source.owner;
         if (owner && owner.unregisterVerbsFrom) {
           await owner.unregisterVerbsFrom(self.id);
         }
@@ -244,10 +241,7 @@ export class ClothingBuilder {
 
       // Show if worn
       if (self.wornBy) {
-        const wearer = await $.load(self.wornBy);
-        if (wearer) {
-          desc += 'Currently worn by: ' + wearer.name + '\\r\\n';
-        }
+        desc += 'Currently worn by: ' + self.wornBy.name + '\\r\\n';
       }
 
       return desc.trim();

@@ -53,8 +53,7 @@ export class CorpseBuilder {
     // Get the body object inside this corpse
     obj.setMethod('getBody', `
       const contents = self.contents || [];
-      for (const id of contents) {
-        const obj = await $.load(id);
+      for (const obj of contents) {
         // Body has torso, head, etc - check for body-like properties
         if (obj && (obj.torso !== undefined || obj.getPart)) {
           return obj;
@@ -126,10 +125,9 @@ export class CorpseBuilder {
 
         for (const hand of [leftHand, rightHand]) {
           if (hand && hand.contents) {
-            for (const itemId of hand.contents) {
-              const item = await $.load(itemId);
+            for (const item of hand.contents) {
               if (item) {
-                items.push({ id: itemId, name: item.name || 'something', location: 'hand' });
+                items.push({ id: item.id, name: item.name || 'something', location: 'hand' });
               }
             }
           }
@@ -138,10 +136,9 @@ export class CorpseBuilder {
         // Check torso for worn/carried items
         const torso = body.getPart ? await body.getPart('torso') : null;
         if (torso && torso.contents) {
-          for (const itemId of torso.contents) {
-            const item = await $.load(itemId);
+          for (const item of torso.contents) {
             if (item) {
-              items.push({ id: itemId, name: item.name || 'something', location: 'torso' });
+              items.push({ id: item.id, name: item.name || 'something', location: 'torso' });
             }
           }
         }
@@ -186,8 +183,7 @@ export class CorpseBuilder {
 
       for (const hand of [leftHand, rightHand]) {
         if (hand && hand.contents) {
-          for (const itemId of hand.contents) {
-            const item = await $.load(itemId);
+          for (const item of hand.contents) {
             if (!item) continue;
 
             const name = (item.name || '').toLowerCase();
@@ -208,8 +204,7 @@ export class CorpseBuilder {
       // Search torso
       const torso = body.getPart ? await body.getPart('torso') : null;
       if (torso && torso.contents) {
-        for (const itemId of torso.contents) {
-          const item = await $.load(itemId);
+        for (const item of torso.contents) {
           if (!item) continue;
 
           const name = (item.name || '').toLowerCase();
@@ -407,8 +402,7 @@ export class CorpseBuilder {
           if (contents.length === 0) {
             report.stomachContents.push('The stomach is empty.');
           } else {
-            for (const itemId of contents) {
-              const item = await $.load(itemId);
+            for (const item of contents) {
               if (item) {
                 // Describe stomach contents narratively
                 const sourceName = item.sourceName || 'unknown substance';
@@ -529,9 +523,8 @@ export class CorpseBuilder {
       // Move remains to corpse's location
       if (location) {
         await remains.moveTo(location);
-        const room = await $.load(location);
-        if (room && room.announce) {
-          await room.announce(null, null, { others: 'The rotting corpse has dried into desiccated remains.' });
+        if (location.announce) {
+          await location.announce(null, null, { others: 'The rotting corpse has dried into desiccated remains.' });
         }
       }
 

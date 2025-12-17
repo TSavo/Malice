@@ -33,7 +33,7 @@ export class VendableBuilder {
       if (!contents.length) return 'This vendor is empty.';
       let out = 'Available items:\n';
       for (let i = 0; i < contents.length; i++) {
-        const item = await $.load(contents[i]);
+        const item = contents[i];
         if (!item) continue;
         const price = item.price ?? self.defaultPrice ?? 0;
         out += \`  \${i + 1}) \${item.name || 'Item'} - \${price}\n\`;
@@ -45,7 +45,7 @@ export class VendableBuilder {
       const buyer = args[0];
       if (!buyer) return 'No buyer specified.';
 
-      const bank = self.bank ? await $.load(self.bank) : ($.bank || null);
+      const bank = self.bank || $.bank || null;
       const account = self.bankAccount;
       if (!bank || !account) return 'Vendor is not configured for payments.';
 
@@ -57,7 +57,7 @@ export class VendableBuilder {
       let menu = 'What do you want to buy?\n';
       const saleItems = [];
       for (let i = 0; i < contents.length; i++) {
-        const item = await $.load(contents[i]);
+        const item = contents[i];
         if (!item) continue;
         const price = item.price ?? self.defaultPrice ?? 0;
         saleItems.push({ type: 'existing', item, price, index: i });
@@ -120,12 +120,12 @@ export class VendableBuilder {
 
         // Auto-assign phone number if requested
         if (spawn.autoNumber && self.phoneDb) {
-          const db = await $.load(self.phoneDb);
+          const db = self.phoneDb;
           if (!db || !db.register) return 'Phone directory unavailable.';
           const prefix = spawn.numberPrefix || '';
           const number = prefix + Math.floor(Math.random() * 1_000_000_000).toString().padStart(9, '0');
           properties.number = number;
-          properties.phoneDb = db.id;
+          properties.phoneDb = db;
           const obj = await $.recycler.create({ parent: protoId, properties }, buyer);
           await db.register(number, obj);
           deliveredItem = obj;
@@ -137,9 +137,9 @@ export class VendableBuilder {
       if (!deliveredItem) return 'Delivery failed.';
 
       const inv = Array.isArray(buyer.inventory) ? [...buyer.inventory] : [];
-      inv.push(deliveredItem.id);
+      inv.push(deliveredItem);
       buyer.inventory = inv;
-      deliveredItem.location = buyer.id;
+      await deliveredItem.moveTo(buyer);
 
       return \`You buy \${deliveredItem.name || 'the item'} for \${price}.\`;
     `);
@@ -153,10 +153,8 @@ export class VendableBuilder {
       // Enforce composable locks before allowing management (ownership is handled by locks)
       const locks = Array.isArray(self.locks) ? self.locks : [];
       for (const lock of locks) {
-        if (!lock) continue;
-        const lockObj = typeof lock === 'number' ? await $.load(lock) : lock;
-        if (!lockObj || !lockObj.canAccess) continue;
-        const result = await lockObj.canAccess(actor, self);
+        if (!lock || !lock.canAccess) continue;
+        const result = await lock.canAccess(actor, self);
         if (result !== true) return result;
       }
 
@@ -179,7 +177,7 @@ export class VendableBuilder {
         let invMenu = 'Pick item to stock:\n';
         const items = [];
         for (let i = 0; i < inv.length; i++) {
-          const itm = await $.load(inv[i]);
+          const itm = inv[i];
           if (!itm) continue;
           items.push(itm);
           invMenu += \`  \${items.length}) \${itm.name || 'Item'}\n\`;
@@ -190,13 +188,13 @@ export class VendableBuilder {
         if (!Number.isInteger(pick) || pick < 1 || pick > items.length) return 'Invalid selection.';
         const itm = items[pick - 1];
         // remove from actor inventory
-        const newInv = inv.filter(id => id !== itm.id);
+        const newInv = inv.filter(obj => obj !== itm && obj?.id !== itm.id);
         actor.inventory = newInv;
         // add to vendor contents
         const newContents = Array.isArray(self.contents) ? [...self.contents] : [];
-        newContents.push(itm.id);
+        newContents.push(itm);
         self.contents = newContents;
-        itm.location = self.id;
+        await itm.moveTo(self);
         return \`\${itm.name || 'Item'} stocked.\`;
       }
 
@@ -206,7 +204,7 @@ export class VendableBuilder {
         let m = 'Pick item to price:\n';
         const loaded = [];
         for (let i = 0; i < items.length; i++) {
-          const itm = await $.load(items[i]);
+          const itm = items[i];
           if (!itm) continue;
           loaded.push(itm);
           m += \`  \${loaded.length}) \${itm.name || 'Item'} (current: \${itm.price ?? 'unset'})\n\`;

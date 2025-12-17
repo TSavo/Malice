@@ -24,11 +24,11 @@ export class PhoneBuilder {
     obj.setMethod('dial', `
       const targetNumber = args[0];
       if (!targetNumber) return 'No number specified.';
-      const db = self.phoneDb ? await $.load(self.phoneDb) : null;
+      const db = self.phoneDb || null;
       if (!db || !db.findPhoneByNumber) return 'No phone database configured.';
       const target = await db.findPhoneByNumber(targetNumber);
       if (!target) return 'Number not found.';
-      self.connectedTo = target.id;
+      self.connectedTo = target;
       if (target.onIncomingCall) {
         await target.onIncomingCall(self);
       }
@@ -36,11 +36,10 @@ export class PhoneBuilder {
     `);
 
     obj.setMethod('hangup', `
-      const otherId = self.connectedTo;
+      const other = self.connectedTo;
       self.connectedTo = null;
-      if (otherId) {
-        const other = await $.load(otherId);
-        if (other && other.onHangup) await other.onHangup(self);
+      if (other && other.onHangup) {
+        await other.onHangup(self);
       }
       return 'Call ended.';
     `);
@@ -50,7 +49,7 @@ export class PhoneBuilder {
       const message = args[1];
       if (!targetNumber) return 'No number specified.';
       if (!message) return 'No message provided.';
-      const db = self.phoneDb ? await $.load(self.phoneDb) : null;
+      const db = self.phoneDb || null;
       if (!db || !db.findPhoneByNumber) return 'No phone database configured.';
       const target = await db.findPhoneByNumber(targetNumber);
       if (!target) return 'Number not found.';

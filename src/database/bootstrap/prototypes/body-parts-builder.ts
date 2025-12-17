@@ -114,8 +114,7 @@ export class BodyPartsBuilder {
     obj.setMethod('getCurrentVolume', `
       const contents = self.contents || [];
       let total = 0;
-      for (const itemId of contents) {
-        const item = await $.load(itemId);
+      for (const item of contents) {
         if (item) {
           total += (item.volume || 0);
         }
@@ -171,10 +170,8 @@ export class BodyPartsBuilder {
       const toRemove = [];
       const digestionRate = self.digestionRate || 50;
 
-      for (const itemId of contents) {
-        const item = await $.load(itemId);
+      for (const item of contents) {
         if (!item) {
-          toRemove.push(itemId);
           continue;
         }
 
@@ -187,7 +184,7 @@ export class BodyPartsBuilder {
 
           // Check if fully digested
           if (item.isFullyDigested && await item.isFullyDigested()) {
-            toRemove.push(itemId);
+            toRemove.push(item);
           }
         } else {
           // Fallback for old-style items (direct edibles)
@@ -201,14 +198,13 @@ export class BodyPartsBuilder {
           }
 
           if ((item.bitesRemaining || 0) <= 0) {
-            toRemove.push(itemId);
+            toRemove.push(item);
           }
         }
       }
 
       // Remove fully digested items - recycle them
-      for (const itemId of toRemove) {
-        const item = await $.load(itemId);
+      for (const item of toRemove) {
         if (item) {
           // Move to recycler
           if ($.recycler && $.recycler.recycle) {
@@ -216,7 +212,7 @@ export class BodyPartsBuilder {
           }
         }
         // Remove from contents
-        const idx = (self.contents || []).indexOf(itemId);
+        const idx = (self.contents || []).findIndex(c => c?.id === item.id);
         if (idx >= 0) {
           self.contents.splice(idx, 1);
         }
@@ -234,8 +230,7 @@ export class BodyPartsBuilder {
         desc += '\\r\\nIt is empty.';
       } else {
         const items = [];
-        for (const itemId of contents) {
-          const item = await $.load(itemId);
+        for (const item of contents) {
           if (item) {
             // Use StomachContents describe if available
             if (item.describe) {
@@ -298,7 +293,7 @@ export class BodyPartsBuilder {
       const parts = self.parts || {};
 
       for (const partName of Object.keys(parts)) {
-        const part = await $.load(parts[partName]);
+        const part = parts[partName];
         if (part && part.shortDesc) {
           features.push(await part.shortDesc());
         }
@@ -571,8 +566,7 @@ export class BodyPartsBuilder {
       const maxWeight = self.maxWeight || Math.floor(effectiveCapacity * 133);
 
       let currentWeight = 0;
-      for (const itemId of contents) {
-        const item = await $.load(itemId);
+      for (const item of contents) {
         if (item) {
           currentWeight += item.weight || 0;
         }
@@ -591,8 +585,7 @@ export class BodyPartsBuilder {
 
       if (contents.length > 0) {
         const items = [];
-        for (const itemId of contents) {
-          const item = await $.load(itemId);
+        for (const item of contents) {
           if (item) {
             items.push(item.name || 'something');
           }
@@ -606,14 +599,7 @@ export class BodyPartsBuilder {
     // Get items held by this hand
     obj.setMethod('getHeld', `
       const contents = self.contents || [];
-      const items = [];
-      for (const itemId of contents) {
-        const item = await $.load(itemId);
-        if (item) {
-          items.push(item);
-        }
-      }
-      return items;
+      return contents.filter(item => item);
     `);
 
     return obj;

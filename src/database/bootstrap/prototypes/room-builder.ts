@@ -86,8 +86,7 @@ export class RoomBuilder {
           } else {
             // Get names of people sitting
             const sitters = [];
-            for (const sitterId of occupied) {
-              const sitter = await $.load(sitterId);
+            for (const sitter of occupied) {
               if (sitter) {
                 sitters.push(sitter.name);
               }
@@ -101,10 +100,9 @@ export class RoomBuilder {
       }
 
       // Show exits (only non-hidden ones)
-      const exitIds = self.exits || [];
+      const exits = self.exits || [];
       const visibleExits = [];
-      for (const exitId of exitIds) {
-        const exit = await $.load(exitId);
+      for (const exit of exits) {
         if (exit && !exit.hidden) {
           const desc = exit.describe ? await exit.describe() : exit.name;
           visibleExits.push(desc);
@@ -118,13 +116,10 @@ export class RoomBuilder {
 
       // Show contents (agents/objects in room), excluding the viewer
       const contents = self.contents || [];
-      // Handle both RuntimeObjects (from objref) and raw IDs - extract ID for comparison
-      const others = contents.filter(item => (item?.id ?? item) !== viewer?.id);
+      const others = contents.filter(item => item?.id !== viewer?.id);
       if (others.length > 0) {
         output += '\\r\\nYou see:\\r\\n';
-        for (const item of others) {
-          // Handle both RuntimeObjects (from objref) and raw IDs (numbers)
-          const obj = (typeof item === 'number') ? await $.load(item) : item;
+        for (const obj of others) {
           if (obj) {
             const shortDesc = await obj.shortDesc();
             output += \`  - \${shortDesc}\\r\\n\`;
@@ -137,23 +132,22 @@ export class RoomBuilder {
 
     obj.setMethod('addExit', `
       /** Add an exit to this room.
-       *  @param exit - Exit object (ID or RuntimeObject)
+       *  @param exit - Exit object
        */
-      const exitArg = args[0];
-      const exitId = typeof exitArg === 'number' ? exitArg : exitArg?.id;
-
-      if (!exitId) return;
+      const exit = args[0];
+      if (!exit) return;
 
       const exits = self.exits || [];
-      if (!exits.includes(exitId)) {
-        exits.push(exitId);
+      const alreadyPresent = exits.some(e => e?.id === exit.id);
+      if (!alreadyPresent) {
+        exits.push(exit);
         self.exits = exits;
       }
     `);
 
     obj.setMethod('removeExit', `
       /** Remove an exit from this room.
-       *  @param exit - Exit object (ID or RuntimeObject) or direction name
+       *  @param exit - Exit object or direction name
        */
       const exitArg = args[0];
       const exits = self.exits || [];
@@ -161,7 +155,7 @@ export class RoomBuilder {
       if (typeof exitArg === 'string') {
         // Find exit by direction name
         for (let i = 0; i < exits.length; i++) {
-          const exit = await $.load(exits[i]);
+          const exit = exits[i];
           if (exit && exit.matches && await exit.matches(exitArg)) {
             exits.splice(i, 1);
             self.exits = exits;
@@ -169,9 +163,9 @@ export class RoomBuilder {
           }
         }
       } else {
-        // Remove by ID
-        const exitId = typeof exitArg === 'number' ? exitArg : exitArg?.id;
-        const idx = exits.indexOf(exitId);
+        // Remove by object
+        const exitId = exitArg?.id;
+        const idx = exits.findIndex(e => e?.id === exitId);
         if (idx >= 0) {
           exits.splice(idx, 1);
           self.exits = exits;
@@ -188,8 +182,7 @@ export class RoomBuilder {
       if (!direction) return null;
 
       const exits = self.exits || [];
-      for (const exitId of exits) {
-        const exit = await $.load(exitId);
+      for (const exit of exits) {
         if (exit && exit.matches && await exit.matches(direction)) {
           return exit;
         }
@@ -201,13 +194,7 @@ export class RoomBuilder {
       /** Get all exit objects.
        *  @returns Array of Exit RuntimeObjects
        */
-      const exitIds = self.exits || [];
-      const exits = [];
-      for (const exitId of exitIds) {
-        const exit = await $.load(exitId);
-        if (exit) exits.push(exit);
-      }
-      return exits;
+      return (self.exits || []).filter(e => e);
     `);
 
     // Coordinate methods
@@ -240,15 +227,10 @@ export class RoomBuilder {
 
     obj.setMethod('distanceTo', `
       /** Calculate 3D distance to another room.
-       *  @param otherRoom - Room ID or RuntimeObject
+       *  @param otherRoom - Room RuntimeObject
        *  @returns Distance in meters (integer), or null if room not found
        */
-      const otherRoomArg = args[0];
-      const otherId = typeof otherRoomArg === 'number' ? otherRoomArg : otherRoomArg?.id;
-
-      if (!otherId) return null;
-
-      const other = typeof otherRoomArg === 'number' ? await $.load(otherId) : otherRoomArg;
+      const other = args[0];
       if (!other) return null;
 
       const dx = (other.x || 0) - (self.x || 0);
@@ -261,15 +243,10 @@ export class RoomBuilder {
 
     obj.setMethod('directionTo', `
       /** Get compass direction to another room.
-       *  @param otherRoom - Room ID or RuntimeObject
+       *  @param otherRoom - Room RuntimeObject
        *  @returns Direction string (n, s, e, w, ne, nw, se, sw, up, down) or null
        */
-      const otherRoomArg = args[0];
-      const otherId = typeof otherRoomArg === 'number' ? otherRoomArg : otherRoomArg?.id;
-
-      if (!otherId) return null;
-
-      const other = typeof otherRoomArg === 'number' ? await $.load(otherId) : otherRoomArg;
+      const other = args[0];
       if (!other) return null;
 
       const dx = (other.x || 0) - (self.x || 0);
@@ -356,9 +333,8 @@ export class RoomBuilder {
 
       // Fallback: instant movement if no queue system
       await player.moveTo(destRoom, player);
-      const dest = await $.load(destRoom);
-      if (dest) {
-        return await dest.describe(player);
+      if (destRoom) {
+        return await destRoom.describe(player);
       }
     `);
 
@@ -372,9 +348,8 @@ export class RoomBuilder {
       if (!obj.registerVerb) return;
 
       // Register each exit's name and aliases as verbs
-      const exitIds = self.exits || [];
-      for (const exitId of exitIds) {
-        const exit = await $.load(exitId);
+      const exits = self.exits || [];
+      for (const exit of exits) {
         if (!exit) continue;
 
         // Register primary name
@@ -411,12 +386,9 @@ export class RoomBuilder {
       // Notify other agents in the room that this person left
       // They should remove them from watch lists, etc.
       const contents = self.contents || [];
-      for (const item of contents) {
-        // Handle both RuntimeObjects (from objref) and raw IDs (numbers)
-        const itemId = item?.id ?? item;
-        if (itemId === obj.id) continue; // Skip the one who left
-        const other = (typeof item === 'number') ? await $.load(item) : item;
-        if (other && other.onOtherLeft) {
+      for (const other of contents) {
+        if (!other || other.id === obj.id) continue; // Skip the one who left
+        if (other.onOtherLeft) {
           await other.onOtherLeft(obj);
         }
       }
@@ -442,9 +414,7 @@ export class RoomBuilder {
 
       // Count agents (objects with canSee/canHear methods)
       let agentCount = 0;
-      for (const item of contents) {
-        // Handle both RuntimeObjects (from objref) and raw IDs (numbers)
-        const obj = (typeof item === 'number') ? await $.load(item) : item;
+      for (const obj of contents) {
         if (obj && (obj.canSee || obj.canHear)) {
           agentCount++;
         }
@@ -650,9 +620,7 @@ export class RoomBuilder {
 
       // If agents are present, register sit verb for them
       const contents = self.contents || [];
-      for (const item of contents) {
-        // Handle both RuntimeObjects (from objref) and raw IDs (numbers)
-        const obj = (typeof item === 'number') ? await $.load(item) : item;
+      for (const obj of contents) {
         if (obj && obj.registerVerb) {
           await obj.registerVerb('sit', self, 'sit');
         }
@@ -672,9 +640,8 @@ export class RoomBuilder {
         if (nameOrIndex >= 0 && nameOrIndex < sittables.length) {
           // Make anyone sitting here stand up
           const sittable = sittables[nameOrIndex];
-          for (const agentId of sittable.occupied || []) {
-            const agent = await $.load(agentId);
-            if (agent && agent.sitting === self.id) {
+          for (const agent of sittable.occupied || []) {
+            if (agent && agent.sitting?.id === self.id) {
               agent.sitting = null;
               agent.sittingOn = null;
             }
@@ -688,9 +655,8 @@ export class RoomBuilder {
         if (idx >= 0) {
           // Make anyone sitting here stand up
           const sittable = sittables[idx];
-          for (const agentId of sittable.occupied || []) {
-            const agent = await $.load(agentId);
-            if (agent && agent.sitting === self.id) {
+          for (const agent of sittable.occupied || []) {
+            if (agent && agent.sitting?.id === self.id) {
               agent.sitting = null;
               agent.sittingOn = null;
             }
@@ -761,8 +727,8 @@ export class RoomBuilder {
 
       // Sit down
       sittable.occupied = sittable.occupied || [];
-      sittable.occupied.push(player.id);
-      player.sitting = self.id;
+      sittable.occupied.push(player);
+      player.sitting = self;
       player.sittingOn = sittable.name;
 
       // Start 'sit' exclusion (blocks walking, etc.)
@@ -783,7 +749,7 @@ export class RoomBuilder {
     // The 'stand' verb - stand up from sitting
     obj.setMethod('stand', `
       /** Stand up from a sitting position. */
-      if (!player.sitting || player.sitting !== self.id) {
+      if (!player.sitting || player.sitting?.id !== self.id) {
         return 'You are not sitting.';
       }
 
@@ -792,7 +758,7 @@ export class RoomBuilder {
 
       // Find and remove from sittable
       for (const sittable of sittables) {
-        const idx = (sittable.occupied || []).indexOf(player.id);
+        const idx = (sittable.occupied || []).findIndex(p => p?.id === player.id);
         if (idx >= 0) {
           sittable.occupied.splice(idx, 1);
           break;

@@ -23,7 +23,7 @@ export class PhoneDbBuilder {
       const phone = args[1];
       if (!number || !phone) return 'number and phone required';
       const reg = self.registry || {};
-      reg[number] = typeof phone === 'number' ? phone : phone.id;
+      reg[number] = phone;
       self.registry = reg;
     `);
 
@@ -39,9 +39,7 @@ export class PhoneDbBuilder {
       const number = args[0];
       if (!number) return null;
       const reg = self.registry || {};
-      const id = reg[number];
-      if (!id) return null;
-      return await $.load(id);
+      return reg[number] || null;
     `);
 
     return obj;

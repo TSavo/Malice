@@ -709,7 +709,7 @@ Provide a summary that captures everything important:\`;
           const plotHooks = target.plotHooks || {};
           if (plotHooks[hook.eventName]) {
             plotHooks[hook.eventName] = plotHooks[hook.eventName].filter(
-              h => !(h.plotId === self.id && h.jobId === jobId)
+              h => !((h.plot?.id ?? h.plot) === self.id && h.jobId === jobId)
             );
             if (plotHooks[hook.eventName].length === 0) {
               delete plotHooks[hook.eventName];
@@ -757,7 +757,7 @@ Provide a summary that captures everything important:\`;
           const plotHooks = target.plotHooks || {};
           if (plotHooks[hook.eventName]) {
             plotHooks[hook.eventName] = plotHooks[hook.eventName].filter(
-              h => !(h.plotId === self.id && h.jobId === jobId)
+              h => !((h.plot?.id ?? h.plot) === self.id && h.jobId === jobId)
             );
             if (plotHooks[hook.eventName].length === 0) {
               delete plotHooks[hook.eventName];
@@ -805,7 +805,7 @@ Provide a summary that captures everything important:\`;
           const plotHooks = target.plotHooks || {};
           if (plotHooks[hook.eventName]) {
             plotHooks[hook.eventName] = plotHooks[hook.eventName].filter(
-              h => !(h.plotId === self.id && h.jobId === jobId)
+              h => !((h.plot?.id ?? h.plot) === self.id && h.jobId === jobId)
             );
             if (plotHooks[hook.eventName].length === 0) {
               delete plotHooks[hook.eventName];
@@ -892,7 +892,7 @@ Provide a summary that captures everything important:\`;
 
       // Check if this job already has a hook for this event
       const existing = plotHooks[eventName].find(
-        h => h.plotId === self.id && h.jobId === jobId
+        h => (h.plot?.id ?? h.plot) === self.id && h.jobId === jobId
       );
       if (existing) {
         // Update filter
@@ -901,7 +901,7 @@ Provide a summary that captures everything important:\`;
       } else {
         // Add new hook
         plotHooks[eventName].push({
-          plotId: self.id,
+          plot: self,
           jobId: jobId,
           filter: filter,
           createdAt: new Date().toISOString(),
@@ -941,7 +941,7 @@ Provide a summary that captures everything important:\`;
         const plotHooks = target.plotHooks || {};
         if (plotHooks[eventName]) {
           plotHooks[eventName] = plotHooks[eventName].filter(
-            h => !(h.plotId === self.id && h.jobId === jobId)
+            h => !((h.plot?.id ?? h.plot) === self.id && h.jobId === jobId)
           );
           if (plotHooks[eventName].length === 0) {
             delete plotHooks[eventName];
@@ -1036,13 +1036,13 @@ Provide a summary that captures everything important:\`;
         plotHooks[eventName] = [];
       }
 
-      const existing = plotHooks[eventName].find(h => h.plotId === self.id && !h.jobId);
+      const existing = plotHooks[eventName].find(h => (h.plot?.id ?? h.plot) === self.id && !h.jobId);
       if (existing) {
         existing.filter = hookMetadata;
         existing.updatedAt = new Date().toISOString();
       } else {
         plotHooks[eventName].push({
-          plotId: self.id,
+          plot: self,
           jobId: null,
           filter: hookMetadata,
           createdAt: new Date().toISOString(),
@@ -1070,7 +1070,7 @@ Provide a summary that captures everything important:\`;
           const plotHooks = target.plotHooks || {};
           if (plotHooks[hookRef.eventName]) {
             plotHooks[hookRef.eventName] = plotHooks[hookRef.eventName].filter(
-              h => !(h.plotId === self.id && !h.jobId)
+              h => !((h.plot?.id ?? h.plot) === self.id && !h.jobId)
             );
             if (plotHooks[hookRef.eventName].length === 0) {
               delete plotHooks[hookRef.eventName];

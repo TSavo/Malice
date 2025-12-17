@@ -50,6 +50,8 @@ services:
       - ./tsconfig.json:/app/tsconfig.json:ro
       # Use named volume for node_modules to avoid conflicts
       - node_modules:/app/node_modules
+      # Named volume for Claude SDK sessions (AI NPC conversation history)
+      - claude_sessions:/home/node/.claude
     ports:
       - "5555:5555"
       - "8080:8080"
@@ -72,3 +74,4 @@ networks:
 volumes:
   mongodb-data:
   node_modules:
+  claude_sessions:
