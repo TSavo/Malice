@@ -856,6 +856,295 @@ export class CharGenBuilder {
       await showStats();
       await player.tell('Stat allocation complete!');
     `);
+
+    // ========================================
+    // INTERVIEW METHODS (for MCP CharGen API)
+    // ========================================
+
+    // Initialize interviewState property if not exists
+    if (!this.charGen.get('interviewState')) {
+      this.charGen.set('interviewState', []);
+    }
+
+    // Get all chargen questions with their suggestions
+    this.charGen.setMethod('getQuestions', `
+      return [
+        { id: 'name', prompt: 'What is your name?', type: 'text', suggestions: null },
+        { id: 'sex', prompt: 'What is your sex?', type: 'text', suggestions: ['male', 'female', 'non-binary'] },
+        { id: 'age', prompt: 'How old are you?', type: 'text', suggestions: null },
+        { id: 'height', prompt: 'How tall are you?', type: 'text', suggestions: null },
+        { id: 'weight', prompt: 'What is your weight?', type: 'text', suggestions: null },
+        { id: 'eyeColor', prompt: 'What color are your eyes?', type: 'text',
+          suggestions: ['brown', 'dark brown', 'light brown', 'amber', 'hazel', 'green', 'emerald', 'blue', 'sky blue', 'steel blue', 'gray', 'blue-gray', 'violet', 'black', 'heterochromia'] },
+        { id: 'eyeShape', prompt: 'What shape are your eyes?', type: 'text',
+          suggestions: ['almond', 'round', 'hooded', 'monolid', 'upturned', 'downturned', 'deep-set', 'prominent', 'close-set', 'wide-set'] },
+        { id: 'hairColor', prompt: 'What color is your hair?', type: 'text',
+          suggestions: ['black', 'dark brown', 'brown', 'chestnut', 'auburn', 'red', 'ginger', 'strawberry blonde', 'copper', 'blonde', 'golden blonde', 'platinum', 'sandy blonde', 'ash blonde', 'gray', 'silver', 'white', 'salt & pepper', 'purple', 'blue', 'green', 'pink', 'multicolored'] },
+        { id: 'hairStyle', prompt: 'What style is your hair?', type: 'text',
+          suggestions: ['straight', 'wavy', 'curly', 'coily', 'bald', 'shaved', 'buzz cut', 'cropped short', 'shoulder length', 'long', 'very long'] },
+        { id: 'hairTexture', prompt: 'What texture is your hair?', type: 'text',
+          suggestions: ['fine', 'medium', 'thick', 'coarse', 'silky', 'wiry'] },
+        { id: 'skinTone', prompt: 'What is your skin tone?', type: 'text',
+          suggestions: ['porcelain', 'ivory', 'pale', 'fair', 'light', 'cream', 'peach', 'beige', 'sand', 'medium', 'olive', 'golden', 'tan', 'caramel', 'honey', 'bronze', 'almond', 'chestnut', 'brown', 'umber', 'espresso', 'mahogany', 'ebony', 'obsidian'] },
+        { id: 'buildType', prompt: 'What is your build?', type: 'text',
+          suggestions: ['petite', 'slim', 'lean', 'athletic', 'average', 'toned', 'muscular', 'stocky', 'heavyset', 'curvy', 'broad-shouldered', 'lanky'] },
+        { id: 'faceShape', prompt: 'What is your face shape?', type: 'text',
+          suggestions: ['oval', 'round', 'square', 'rectangular', 'heart', 'diamond', 'oblong', 'triangular'] },
+        { id: 'noseShape', prompt: 'What shape is your nose?', type: 'text',
+          suggestions: ['straight', 'roman', 'aquiline', 'button', 'upturned', 'hawk', 'wide', 'narrow', 'flat', 'bulbous', 'snub'] },
+        { id: 'lipShape', prompt: 'What shape are your lips?', type: 'text',
+          suggestions: ['full', 'thin', 'medium', 'bow-shaped', 'wide', 'narrow', 'heart-shaped', 'pouty'] },
+        { id: 'freckles', prompt: 'Do you have freckles?', type: 'text',
+          suggestions: ['none', 'light freckling', 'moderate freckling', 'heavy freckling'] },
+        { id: 'distinguishingMark', prompt: 'Any distinguishing marks?', type: 'text',
+          suggestions: ['none', 'dimples on cheeks', 'dimple on chin', 'beauty mark', 'birthmark', 'cleft chin'] },
+        { id: 'facialHair', prompt: 'Do you have facial hair?', type: 'text',
+          suggestions: ['none', 'clean-shaven', 'stubble', 'light beard', 'full beard', 'long beard', 'goatee', 'van dyke', 'mustache', 'handlebar mustache', 'soul patch', 'sideburns', 'mutton chops'] },
+        { id: 'statAllocation', prompt: 'How do you want to allocate your 20 stat points?', type: 'stats',
+          constraints: { totalPoints: 20, parts: { head: 1, torso: 1, arms: 2, hands: 2, legs: 2, feet: 2, eyes: 2, ears: 2 } } },
+      ];
+    `);
+
+    // Start a new interview for a player
+    this.charGen.setMethod('startInterview', `
+      const playerId = args[0];
+      const state = self.interviewState || [];
+
+      // Check if already exists
+      let interview = state.find(s => s.playerId === playerId);
+      if (!interview) {
+        interview = { playerId, answers: {} };
+        state.push(interview);
+        self.interviewState = state;
+      }
+
+      const questions = await self.getQuestions();
+      return {
+        playerId,
+        questions,
+        answeredCount: Object.keys(interview.answers).length,
+        totalQuestions: questions.length,
+      };
+    `);
+
+    // Get all questions and current answers for a player
+    this.charGen.setMethod('getQuestionsAndAnswers', `
+      const playerId = args[0];
+      const state = self.interviewState || [];
+      const interview = state.find(s => s.playerId === playerId);
+
+      if (!interview) {
+        return { error: 'No interview found for player ' + playerId };
+      }
+
+      const questions = await self.getQuestions();
+      const qAndA = questions.map(q => ({
+        ...q,
+        answer: interview.answers[q.id],
+        answered: interview.answers[q.id] !== undefined,
+      }));
+
+      return {
+        playerId,
+        questions: qAndA,
+        answeredCount: Object.keys(interview.answers).length,
+        totalQuestions: questions.length,
+      };
+    `);
+
+    // Get the next unanswered question
+    this.charGen.setMethod('getNextQuestionNeedingAnswer', `
+      const playerId = args[0];
+      const state = self.interviewState || [];
+      const interview = state.find(s => s.playerId === playerId);
+
+      if (!interview) {
+        return { error: 'No interview found for player ' + playerId };
+      }
+
+      const questions = await self.getQuestions();
+      for (const q of questions) {
+        if (interview.answers[q.id] === undefined) {
+          return q;
+        }
+      }
+
+      // All questions answered
+      return null;
+    `);
+
+    // Set an answer for a question
+    this.charGen.setMethod('setAnswer', `
+      const playerId = args[0];
+      const questionId = args[1];
+      const answer = args[2];
+
+      const state = self.interviewState || [];
+      const interview = state.find(s => s.playerId === playerId);
+
+      if (!interview) {
+        return { error: 'No interview found for player ' + playerId };
+      }
+
+      // Validate question exists
+      const questions = await self.getQuestions();
+      const question = questions.find(q => q.id === questionId);
+      if (!question) {
+        return { error: 'Unknown question: ' + questionId };
+      }
+
+      // For stat allocation, validate constraints
+      if (questionId === 'statAllocation' && question.constraints) {
+        const totalPoints = question.constraints.totalPoints;
+        const partCosts = question.constraints.parts;
+
+        // Answer should be an object like { head: 2, torso: 3, ... }
+        if (typeof answer !== 'object') {
+          return { error: 'statAllocation answer must be an object with part allocations' };
+        }
+
+        let usedPoints = 0;
+        for (const [part, points] of Object.entries(answer)) {
+          if (!partCosts[part]) {
+            return { error: 'Unknown body part: ' + part };
+          }
+          if (typeof points !== 'number' || points < 0) {
+            return { error: 'Invalid points for ' + part };
+          }
+          usedPoints += points * partCosts[part];
+        }
+
+        if (usedPoints > totalPoints) {
+          return { error: 'Too many points allocated. Used ' + usedPoints + ' but only have ' + totalPoints };
+        }
+      }
+
+      interview.answers[questionId] = answer;
+      self.interviewState = state;
+
+      // Get next question
+      const next = await self.getNextQuestionNeedingAnswer(playerId);
+
+      return {
+        success: true,
+        questionId,
+        answer,
+        nextQuestion: next,
+        answeredCount: Object.keys(interview.answers).length,
+        totalQuestions: questions.length,
+      };
+    `);
+
+    // Get suggestions for a question
+    this.charGen.setMethod('getSuggestions', `
+      const questionId = args[0];
+      const questions = await self.getQuestions();
+      const question = questions.find(q => q.id === questionId);
+
+      if (!question) {
+        return { error: 'Unknown question: ' + questionId };
+      }
+
+      return {
+        questionId,
+        suggestions: question.suggestions || null,
+        constraints: question.constraints || null,
+      };
+    `);
+
+    // Finish the interview and create the character
+    this.charGen.setMethod('finishInterview', `
+      const playerId = args[0];
+      const state = self.interviewState || [];
+      const interview = state.find(s => s.playerId === playerId);
+
+      if (!interview) {
+        return { error: 'No interview found for player ' + playerId };
+      }
+
+      // Validate all required answers present (except stat allocation which is optional)
+      const questions = await self.getQuestions();
+      const requiredQuestions = questions.filter(q => q.id !== 'statAllocation');
+
+      for (const q of requiredQuestions) {
+        if (interview.answers[q.id] === undefined) {
+          return { error: 'Missing answer for: ' + q.id };
+        }
+      }
+
+      // Load the player
+      const player = await $.load(playerId);
+      if (!player) {
+        return { error: 'Player not found: ' + playerId };
+      }
+
+      const answers = interview.answers;
+
+      // Set player properties
+      player.name = answers.name;
+      player.sex = answers.sex;
+      player.age = answers.age;
+      player.height = answers.height;
+      player.weight = answers.weight;
+
+      // Generate pronouns from sex
+      const sexLower = (answers.sex || '').toLowerCase();
+      let pronouns;
+      if (sexLower === 'male' || sexLower === 'm') {
+        pronouns = { subject: 'he', object: 'him', possessive: 'his' };
+      } else if (sexLower === 'female' || sexLower === 'f') {
+        pronouns = { subject: 'she', object: 'her', possessive: 'her' };
+      } else {
+        pronouns = { subject: 'they', object: 'them', possessive: 'their' };
+      }
+      player.pronouns = pronouns;
+
+      // Build appearance object
+      const appearance = {
+        eyeColor: answers.eyeColor,
+        eyeStyle: answers.eyeShape,
+        hairColor: answers.hairColor,
+        hairStyle: answers.hairStyle,
+        hairTexture: answers.hairTexture,
+        skinTone: answers.skinTone,
+        buildType: answers.buildType,
+        faceShape: answers.faceShape,
+        noseShape: answers.noseShape,
+        lipShape: answers.lipShape,
+        freckles: answers.freckles,
+        distinguishingMark: answers.distinguishingMark,
+        facialHair: answers.facialHair,
+      };
+
+      // Create body via BodyFactory
+      const body = await $.bodyFactory.createHumanBody(player, answers.sex, appearance);
+      player.body = body;
+
+      // Apply stat allocation if provided
+      if (answers.statAllocation) {
+        player.statPointsRemaining = 20;
+        for (const [part, points] of Object.entries(answers.statAllocation)) {
+          for (let i = 0; i < points; i++) {
+            await $.charGen.allocateStat(player, part);
+          }
+        }
+      }
+
+      // Remove from interviewState
+      const idx = state.findIndex(s => s.playerId === playerId);
+      if (idx >= 0) {
+        state.splice(idx, 1);
+        self.interviewState = state;
+      }
+
+      return {
+        success: true,
+        playerId,
+        bodyId: body.id,
+        name: answers.name,
+        sex: answers.sex,
+      };
+    `);
   }
 
   async registerAlias(): Promise<void> {

@@ -16,6 +16,7 @@ import { GameCoordinator } from './game/index.js';
 import { LSPApiServer } from './lsp/api-server.js';
 import { DevToolsServer } from './devtools/index.js';
 import { createMCPServer } from './mcp/index.js';
+import { createCharGenMCPServer } from './mcp/chargen-mcp-server.js';
 
 async function main() {
   console.log('🎮 Malice v2 - Modern TypeScript MUD\n');
@@ -56,6 +57,12 @@ async function main() {
   // Start MCP Server for Claude Code (Streamable HTTP)
   await createMCPServer(game.getObjectManager(), {
     port: 3001,
+    host: '0.0.0.0', // Allow Docker host access
+  });
+
+  // Start CharGen MCP Server for AI-driven character creation
+  await createCharGenMCPServer(game.getObjectManager(), {
+    port: 3002,
     host: '0.0.0.0', // Allow Docker host access
   });
 

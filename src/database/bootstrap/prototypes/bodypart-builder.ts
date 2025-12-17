@@ -23,8 +23,8 @@ import type { RuntimeObject } from '../../../../types/object.js';
 export class BodyPartBuilder {
   constructor(private manager: ObjectManager) {}
 
-  async build(edibleId: number): Promise<RuntimeObject> {
-    const obj = await this.manager.create({
+  async build(edibleId: number, existingObj?: RuntimeObject): Promise<RuntimeObject> {
+    const obj = existingObj || await this.manager.create({
       parent: edibleId,
       properties: {
         name: 'BodyPart',

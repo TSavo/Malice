@@ -642,6 +642,15 @@ export class PrototypeBuilder {
       }
     }
 
+    // Rebuild BodyPart methods
+    if (aliases.bodyPart) {
+      const bodyPart = await this.manager.load(aliases.bodyPart as number);
+      if (bodyPart) {
+        console.log('  Rebuilding BodyPart methods...');
+        await this.bodyPartBuilder.build(0, bodyPart);
+      }
+    }
+
     console.log('  ✅ Prototype methods rebuilt');
   }
 }
