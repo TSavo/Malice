@@ -36,7 +36,7 @@ export class CharGenBuilder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(): Promise<void> {
+  async build(forceRebuild = false): Promise<void> {
     // Check if already exists via alias
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
@@ -45,18 +45,22 @@ export class CharGenBuilder {
 
     if (aliases.charGen) {
       this.charGen = await this.manager.load(aliases.charGen);
-      if (this.charGen) return; // Already exists
+      if (this.charGen && !forceRebuild) return; // Already exists and not forcing rebuild
     }
 
-    // Create new CharGen
-    this.charGen = await this.manager.create({
-      parent: 1,
-      properties: {
-        name: 'CharGen',
-        description: 'Character creation system',
-      },
-      methods: {},
-    });
+    if (!this.charGen) {
+      // Create new CharGen only if it doesn't exist
+      this.charGen = await this.manager.create({
+        parent: 1,
+        properties: {
+          name: 'CharGen',
+          description: 'Character creation system',
+        },
+        methods: {},
+      });
+    }
+
+    // Setup methods (runs on both create and force rebuild)
 
     // Main entry point for new users
     this.charGen.setMethod('onNewUser', `

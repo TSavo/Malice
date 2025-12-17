@@ -1,6 +1,10 @@
 import { ObjectManager } from './object-manager.js';
 import { MinimalBootstrap, AliasLoader } from './bootstrap/index.js';
 
+export interface GameBootstrapOptions {
+  forceBootstrap?: boolean;
+}
+
 /**
  * Main bootstrap coordinator
  * Delegates to specialized bootstrap modules
@@ -15,7 +19,11 @@ import { MinimalBootstrap, AliasLoader } from './bootstrap/index.js';
  * Everything else is created by Programmer.buildWorld() via DevTools
  */
 export class GameBootstrap {
-  constructor(private manager: ObjectManager) {}
+  private options: GameBootstrapOptions;
+
+  constructor(private manager: ObjectManager, options: GameBootstrapOptions = {}) {
+    this.options = options;
+  }
 
   /**
    * Bootstrap the game system
@@ -58,9 +66,43 @@ export class GameBootstrap {
       console.log('');
       console.log('✅ World built successfully!');
       console.log('');
+    } else if (this.options.forceBootstrap) {
+      // World exists but force rebuild methods
+      console.log('');
+      console.log('═══════════════════════════════════════════════════════════');
+      console.log('  🔄 Force rebuilding prototype methods...');
+      console.log('═══════════════════════════════════════════════════════════');
+      console.log('');
+
+      await this.rebuildPrototypeMethods();
+
+      console.log('');
+      console.log('✅ Prototype methods rebuilt!');
+      console.log('');
     } else {
       console.log('✅ World is built and ready for connections');
     }
+  }
+
+  /**
+   * Rebuild methods on existing prototypes (called when FORCE_BOOTSTRAP=true)
+   */
+  private async rebuildPrototypeMethods(): Promise<void> {
+    const { PrototypeBuilder } = await import('./bootstrap/prototype-builder.js');
+    const { CoreSystemBuilder } = await import('./bootstrap/core-system-builder.js');
+
+    const prototypeBuilder = new PrototypeBuilder(this.manager);
+    const coreSystemBuilder = new CoreSystemBuilder(this.manager);
+
+    // Rebuild prototype methods
+    console.log('Rebuilding object prototype methods...');
+    await prototypeBuilder.rebuildMethods();
+    console.log('  ✅ Rebuilt Describable, Agent, Human, Player prototype methods');
+
+    // Rebuild core system methods
+    console.log('Rebuilding core system methods...');
+    await coreSystemBuilder.rebuildMethods();
+    console.log('  ✅ Rebuilt AuthManager, CharGen, Prompt, etc. methods');
   }
 
   /**

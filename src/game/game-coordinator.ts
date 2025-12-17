@@ -5,6 +5,10 @@ import { ConnectionContext } from './connection-context.js';
 import { initGameLogger } from '../database/game-logger.js';
 import type { Connection } from '../connection/connection.js';
 
+export interface GameCoordinatorOptions {
+  forceBootstrap?: boolean;
+}
+
 /**
  * Game coordinator - ties together object system and connection layer
  */
@@ -14,11 +18,13 @@ export class GameCoordinator {
   private connections: ConnectionManager;
   private contexts = new Map<string, ConnectionContext>();
   private schedulerInterval: ReturnType<typeof setInterval> | null = null;
+  private options: GameCoordinatorOptions;
 
-  constructor(mongoUri: string, dbName = 'malice') {
-    this.db = new ObjectDatabase(mongoUri, dbName);
+  constructor(mongoUri: string, options: GameCoordinatorOptions = {}) {
+    this.db = new ObjectDatabase(mongoUri, 'malice');
     this.manager = new ObjectManager(this.db);
     this.connections = new ConnectionManager();
+    this.options = options;
   }
 
   /**
@@ -36,7 +42,7 @@ export class GameCoordinator {
     console.log('✅ Game logger initialized');
 
     // Bootstrap core game objects (MinimalBootstrap handles Root creation)
-    const bootstrap = new GameBootstrap(this.manager);
+    const bootstrap = new GameBootstrap(this.manager, { forceBootstrap: this.options.forceBootstrap });
     await bootstrap.bootstrap();
     console.log('✅ Core objects bootstrapped');
 

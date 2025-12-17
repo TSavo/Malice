@@ -20,8 +20,8 @@ import type { RuntimeObject } from '../../../../types/object.js';
 export class AgentBuilder {
   constructor(private manager: ObjectManager) {}
 
-  async build(describableId: number): Promise<RuntimeObject> {
-    const obj = await this.manager.create({
+  async build(describableId: number, existingObj?: RuntimeObject): Promise<RuntimeObject> {
+    const obj = existingObj || await this.manager.create({
       parent: describableId,
       properties: {
         name: 'Agent',
@@ -2362,10 +2362,9 @@ export class AgentBuilder {
       // Move the actual body into the corpse (with all its parts, hands, items)
       if (body) {
         // Detach body from player
-        self.bodyId = null;
-        // Move body into corpse
-        body.location = corpse.id;
-        corpse.contents = [body.id];
+        self.body = null;
+        // Move body into corpse using proper moveTo
+        await body.moveTo(corpse);
         // Mark body as dead (stops any body processes)
         body.isDead = true;
       }

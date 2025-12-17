@@ -10,7 +10,7 @@ export class AuthManagerBuilder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(): Promise<void> {
+  async build(forceRebuild = false): Promise<void> {
     // Check if already exists via alias
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
@@ -19,11 +19,12 @@ export class AuthManagerBuilder {
 
     if (aliases.authManager) {
       this.authManager = await this.manager.load(aliases.authManager);
-      if (this.authManager) return; // Already exists
+      if (this.authManager && !forceRebuild) return; // Already exists and not forcing rebuild
     }
 
-    // Create new AuthManager
-    this.authManager = await this.manager.create({
+    if (!this.authManager) {
+      // Create new AuthManager only if it doesn't exist
+      this.authManager = await this.manager.create({
       parent: 1,
       properties: {
         name: 'AuthManager',
@@ -48,7 +49,9 @@ Login: `,
       },
       methods: {},
     });
+    }
 
+    // Setup methods (runs on both create and force rebuild)
     this.authManager.setMethod('onConnect', `
           const context = args[0];
           const welcome = self.welcomeMessage;

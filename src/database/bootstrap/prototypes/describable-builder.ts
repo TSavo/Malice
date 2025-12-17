@@ -8,8 +8,8 @@ import type { RuntimeObject } from '../../../../types/object.js';
 export class DescribableBuilder {
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: number): Promise<RuntimeObject> {
-    const obj = await this.manager.create({
+  async build(parentId: number, existingObj?: RuntimeObject): Promise<RuntimeObject> {
+    const obj = existingObj || await this.manager.create({
       parent: parentId,
       properties: {
         name: 'Describable',

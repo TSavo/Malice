@@ -112,4 +112,32 @@ export class CoreSystemBuilder {
     await aiBuilder.registerAlias();
     await notesBuilder.registerAlias();
   }
+
+  /**
+   * Rebuild methods on existing core system objects
+   * Called when FORCE_BOOTSTRAP=true to update methods without recreating objects
+   */
+  async rebuildMethods(): Promise<void> {
+    // Rebuild Prompt methods (critical for chargen)
+    console.log('  Rebuilding Prompt methods...');
+    const promptBuilder = new PromptBuilder(this.manager);
+    await promptBuilder.build(true); // true = force rebuild
+
+    // Rebuild CharGen methods
+    console.log('  Rebuilding CharGen methods...');
+    const charGenBuilder = new CharGenBuilder(this.manager);
+    await charGenBuilder.build(true);
+
+    // Rebuild AuthManager methods
+    console.log('  Rebuilding AuthManager methods...');
+    const authManagerBuilder = new AuthManagerBuilder(this.manager);
+    await authManagerBuilder.build(true);
+
+    // Rebuild BodyFactory methods
+    console.log('  Rebuilding BodyFactory methods...');
+    const bodyFactoryBuilder = new BodyFactoryBuilder(this.manager);
+    await bodyFactoryBuilder.build(true);
+
+    console.log('  ✅ Core system methods rebuilt');
+  }
 }

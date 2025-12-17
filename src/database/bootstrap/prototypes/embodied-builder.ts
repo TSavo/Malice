@@ -19,8 +19,8 @@ import type { RuntimeObject } from '../../../../types/object.js';
 export class EmbodiedBuilder {
   constructor(private manager: ObjectManager) {}
 
-  async build(agentId: number): Promise<RuntimeObject> {
-    const obj = await this.manager.create({
+  async build(agentId: number, existingObj?: RuntimeObject): Promise<RuntimeObject> {
+    const obj = existingObj || await this.manager.create({
       parent: agentId,
       properties: {
         name: 'Embodied',

@@ -62,6 +62,7 @@ services:
     environment:
       - MONGO_URI=mongodb://mongodb:27017
       - NODE_ENV=production
+      - FORCE_BOOTSTRAP=${FORCE_BOOTSTRAP:-false}
     volumes:
       # Named volume for Claude SDK sessions (AI NPC conversation history)
       - claude_sessions:/home/node/.claude

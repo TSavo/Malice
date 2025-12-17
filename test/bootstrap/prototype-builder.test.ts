@@ -23,8 +23,14 @@ describe('PrototypeBuilder', () => {
       _id: 0,
       parent: 0,
       properties: {
-        name: 'ObjectManager',
-        aliases: { object_manager: 0, root: 1 }
+        name: { type: 'string', value: 'ObjectManager' },
+        aliases: {
+          type: 'object',
+          value: {
+            object_manager: { type: 'number', value: 0 },
+            root: { type: 'number', value: 1 },
+          },
+        },
       },
       methods: {},
     });
@@ -32,7 +38,7 @@ describe('PrototypeBuilder', () => {
     await db.create({
       _id: 1,
       parent: 0,
-      properties: { name: 'Root' },
+      properties: { name: { type: 'string', value: 'Root' } },
       methods: {},
     });
 
