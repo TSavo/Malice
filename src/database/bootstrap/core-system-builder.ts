@@ -138,6 +138,31 @@ export class CoreSystemBuilder {
     const bodyFactoryBuilder = new BodyFactoryBuilder(this.manager);
     await bodyFactoryBuilder.build(true);
 
+    // Rebuild Format methods
+    console.log('  Rebuilding Format methods...');
+    const formatBuilder = new FormatBuilder(this.manager);
+    await formatBuilder.build(true);
+
+    // Rebuild Recycler methods
+    console.log('  Rebuilding Recycler methods...');
+    const recyclerBuilder = new RecyclerBuilder(this.manager);
+    await recyclerBuilder.build(true);
+
+    // Rebuild PronounSub methods
+    console.log('  Rebuilding PronounSub methods...');
+    const pronounSubBuilder = new PronounSubBuilder(this.manager);
+    await pronounSubBuilder.build(true);
+
+    // Rebuild Exclusions methods
+    console.log('  Rebuilding Exclusions methods...');
+    const exclusionsBuilder = new ExclusionsBuilder(this.manager);
+    await exclusionsBuilder.build(true);
+
+    // Rebuild Emote methods
+    console.log('  Rebuilding Emote methods...');
+    const emoteBuilder = new EmoteBuilder(this.manager);
+    await emoteBuilder.build(true);
+
     console.log('  ✅ Core system methods rebuilt');
   }
 }

@@ -28,7 +28,7 @@ export class PronounSubBuilder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(): Promise<void> {
+  async build(forceRebuild = false): Promise<void> {
     // Check if already exists via alias
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
@@ -37,18 +37,20 @@ export class PronounSubBuilder {
 
     if (aliases.pronoun) {
       this.pronounSub = await this.manager.load(aliases.pronoun);
-      if (this.pronounSub) return; // Already exists
+      if (this.pronounSub && !forceRebuild) return; // Already exists
     }
 
-    // Create new PronounSub
-    this.pronounSub = await this.manager.create({
-      parent: 1,
-      properties: {
-        name: 'PronounSub',
-        description: 'Pronoun and name substitution system',
-      },
-      methods: {},
-    });
+    // Create new PronounSub only if it doesn't exist
+    if (!this.pronounSub) {
+      this.pronounSub = await this.manager.create({
+        parent: 1,
+        properties: {
+          name: 'PronounSub',
+          description: 'Pronoun and name substitution system',
+        },
+        methods: {},
+      });
+    }
 
     // Main substitution method
     // sub(template, actor, directObj?, indirectObj?, item?)
