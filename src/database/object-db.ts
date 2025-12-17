@@ -48,6 +48,9 @@ export class ObjectDatabase {
   private objects!: Collection<GameObject>;
   private connected = false;
   private changeStream?: ChangeStream;
+  private shuttingDown = false;
+  private watchRetryTimer?: ReturnType<typeof setTimeout>;
+
 
   constructor(private uri: string, private dbName: string = 'malice') {}
 
@@ -73,10 +76,21 @@ export class ObjectDatabase {
    * Disconnect from MongoDB
    */
   async disconnect(): Promise<void> {
-    if (this.changeStream) {
-      await this.changeStream.close();
-      this.changeStream = undefined;
+    this.shuttingDown = true;
+
+    if (this.watchRetryTimer) {
+      clearTimeout(this.watchRetryTimer);
+      this.watchRetryTimer = undefined;
     }
+
+    if (this.changeStream) {
+      try {
+        await this.changeStream.close();
+      } finally {
+        this.changeStream = undefined;
+      }
+    }
+
     if (!this.connected) return;
     await this.client.close();
     this.connected = false;
@@ -264,6 +278,10 @@ export class ObjectDatabase {
    * Enables multiple game servers / DevTools to share one MongoDB and stay in sync
    */
   watch(callback: (change: any) => void): void {
+    if (this.shuttingDown) {
+      return;
+    }
+
     if (this.changeStream) {
       console.warn('[ObjectDatabase] Already watching for changes');
       return;
@@ -273,6 +291,8 @@ export class ObjectDatabase {
 
     // Use setImmediate to avoid blocking the constructor
     setImmediate(() => {
+      if (this.shuttingDown) return;
+
       try {
         this.changeStream = this.objects.watch([], {
           fullDocument: 'updateLookup', // Include full document on updates
@@ -283,25 +303,39 @@ export class ObjectDatabase {
         });
 
         this.changeStream.on('error', (err) => {
+          // Ignore errors during shutdown.
+          if (this.shuttingDown) return;
+
           console.error('[ObjectDatabase] Change stream error:', err);
-          // Attempt to reconnect
           this.changeStream = undefined;
-          setTimeout(() => {
-            if (!this.changeStream) {
+
+          if (this.watchRetryTimer) {
+            clearTimeout(this.watchRetryTimer);
+          }
+
+          this.watchRetryTimer = setTimeout(() => {
+            this.watchRetryTimer = undefined;
+            if (!this.changeStream && !this.shuttingDown) {
               this.watch(callback);
             }
           }, 5000);
         });
 
-        // Handle the 'close' event
         this.changeStream.on('close', () => {
           console.log('[ObjectDatabase] Change stream closed');
         });
       } catch (err) {
+        if (this.shuttingDown) return;
+
         console.error('[ObjectDatabase] Failed to start change stream:', err);
-        // Retry after a delay
-        setTimeout(() => {
-          if (!this.changeStream) {
+
+        if (this.watchRetryTimer) {
+          clearTimeout(this.watchRetryTimer);
+        }
+
+        this.watchRetryTimer = setTimeout(() => {
+          this.watchRetryTimer = undefined;
+          if (!this.changeStream && !this.shuttingDown) {
             this.watch(callback);
           }
         }, 5000);

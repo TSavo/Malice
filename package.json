@@ -9,10 +9,14 @@
     "dev": "bun --watch src/index.ts",
     "start": "node --import tsx src/index.ts",
     "build": "tsc",
-    "test": "vitest",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
+    "bootstrap:apply": "node --import tsx src/scripts/bootstrap-apply.ts",
+    "bootstrap:force": "node --import tsx src/scripts/bootstrap-apply.ts --force",
+    "bootstrap:e2e": "node --import tsx src/scripts/bootstrap-e2e.ts",
     "docker:rebuild": "docker compose down && docker volume rm malice_mongodb_data malice_mongodb-data 2>/dev/null; docker compose build --no-cache game && docker compose up -d"
   },
   "dependencies": {
