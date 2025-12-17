@@ -26,8 +26,13 @@ import type { RuntimeObject } from '../../../../types/object.js';
 export class RoomBuilder {
   constructor(private manager: ObjectManager) {}
 
-  async build(locationId: number): Promise<RuntimeObject> {
-    const obj = await this.manager.create({
+  /**
+   * Build the Room prototype or rebuild methods on existing object
+   * @param locationId - Parent location ID (only used when creating new)
+   * @param existingObj - Optional existing object to rebuild methods on
+   */
+  async build(locationId: number, existingObj?: RuntimeObject): Promise<RuntimeObject> {
+    const obj = existingObj || await this.manager.create({
       parent: locationId,
       properties: {
         name: 'Room',
@@ -121,7 +126,13 @@ export class RoomBuilder {
         output += '\\r\\nYou see:\\r\\n';
         for (const obj of others) {
           if (obj) {
-            const shortDesc = await obj.shortDesc();
+            // Handle both RuntimeObjects and legacy raw IDs
+            let shortDesc;
+            if (typeof obj.shortDesc === 'function') {
+              shortDesc = await obj.shortDesc();
+            } else {
+              shortDesc = obj.name || 'something';
+            }
             output += \`  - \${shortDesc}\\r\\n\`;
           }
         }
@@ -350,7 +361,7 @@ export class RoomBuilder {
       // Register each exit's name and aliases as verbs
       const exits = self.exits || [];
       for (const exit of exits) {
-        if (!exit) continue;
+        if (!exit || !exit.name) continue;
 
         // Register primary name
         await obj.registerVerb(exit.name.toLowerCase(), self, 'go');

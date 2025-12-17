@@ -20,8 +20,13 @@ import type { RuntimeObject } from '../../../../types/object.js';
 export class HumanBuilder {
   constructor(private manager: ObjectManager) {}
 
-  async build(embodiedId: number): Promise<RuntimeObject> {
-    const obj = await this.manager.create({
+  /**
+   * Build the Human prototype or rebuild methods on existing object
+   * @param embodiedId - Parent embodied ID (only used when creating new)
+   * @param existingObj - Optional existing object to rebuild methods on
+   */
+  async build(embodiedId: number, existingObj?: RuntimeObject): Promise<RuntimeObject> {
+    const obj = existingObj || await this.manager.create({
       parent: embodiedId,
       properties: {
         name: 'Human',

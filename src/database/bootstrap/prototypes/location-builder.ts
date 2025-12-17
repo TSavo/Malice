@@ -8,8 +8,8 @@ import type { RuntimeObject } from '../../../../types/object.js';
 export class LocationBuilder {
   constructor(private manager: ObjectManager) {}
 
-  async build(describableId: number): Promise<RuntimeObject> {
-    const obj = await this.manager.create({
+  async build(describableId: number, existingObj?: RuntimeObject): Promise<RuntimeObject> {
+    const obj = existingObj || await this.manager.create({
       parent: describableId,
       properties: {
         name: 'Location',
@@ -32,7 +32,13 @@ export class LocationBuilder {
         output += '\\r\\nYou see:\\r\\n';
         for (const obj of others) {
           if (obj) {
-            const shortDesc = await obj.shortDesc();
+            // Handle both RuntimeObjects and raw IDs
+            let shortDesc;
+            if (typeof obj.shortDesc === 'function') {
+              shortDesc = await obj.shortDesc();
+            } else {
+              shortDesc = obj.name || 'something';
+            }
             output += \`  - \${shortDesc}\\r\\n\`;
           }
         }

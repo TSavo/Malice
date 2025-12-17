@@ -14,7 +14,7 @@ export class BodyFactoryBuilder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(): Promise<void> {
+  async build(forceRebuild = false): Promise<void> {
     // Check if already exists via alias
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
@@ -23,19 +23,22 @@ export class BodyFactoryBuilder {
 
     if (aliases.bodyFactory) {
       this.bodyFactory = await this.manager.load(aliases.bodyFactory);
-      if (this.bodyFactory) return; // Already exists
+      if (this.bodyFactory && !forceRebuild) return; // Already exists and not forcing rebuild
     }
 
-    // Create new BodyFactory
-    this.bodyFactory = await this.manager.create({
-      parent: 1,
-      properties: {
-        name: 'BodyFactory',
-        description: 'Factory for creating human body object trees',
-      },
-      methods: {},
-    });
+    if (!this.bodyFactory) {
+      // Create new BodyFactory only if it doesn't exist
+      this.bodyFactory = await this.manager.create({
+        parent: 1,
+        properties: {
+          name: 'BodyFactory',
+          description: 'Factory for creating human body object trees',
+        },
+        methods: {},
+      });
+    }
 
+    // Setup methods (runs on both create and force rebuild)
     // Helper method to create a single body part
     // Uses legacy recycler.create(parent, properties) format
     this.bodyFactory.setMethod('createPart', `

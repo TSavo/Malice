@@ -24,7 +24,11 @@ export class PromptBuilder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(): Promise<void> {
+  /**
+   * Build the Prompt utility or rebuild methods on existing object
+   * @param forceRebuild - If true, rebuild methods even if object exists
+   */
+  async build(forceRebuild = false): Promise<void> {
     // Check if already exists via alias
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
@@ -33,18 +37,32 @@ export class PromptBuilder {
 
     if (aliases.prompt) {
       this.prompt = await this.manager.load(aliases.prompt);
-      if (this.prompt) return; // Already exists
+      if (this.prompt && !forceRebuild) return; // Already exists and not forcing rebuild
     }
 
-    // Create new Prompt utility
-    this.prompt = await this.manager.create({
-      parent: 1,
-      properties: {
-        name: 'Prompt',
-        description: 'Interactive prompt utility',
-      },
-      methods: {},
-    });
+    if (!this.prompt) {
+      // Create new Prompt utility
+      this.prompt = await this.manager.create({
+        parent: 1,
+        properties: {
+          name: 'Prompt',
+          description: 'Interactive prompt utility',
+        },
+        methods: {},
+      });
+    }
+
+    // Setup methods (runs on both create and rebuild)
+    this.setupMethods();
+  }
+
+  /**
+   * Setup all methods on the prompt object
+   * Called both during initial build and when force rebuilding
+   */
+  private setupMethods(): void {
+    if (!this.prompt) return;
+    const prompt = this.prompt; // Local reference for clarity
 
     // Ask a text question - returns the user's answer
     // player: the player to prompt

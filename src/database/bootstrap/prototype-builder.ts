@@ -569,4 +569,79 @@ export class PrototypeBuilder {
     );
     console.log(`✅ Registered body part prototypes: ${partNames}`);
   }
+
+  /**
+   * Rebuild methods on existing prototypes
+   * Called when FORCE_BOOTSTRAP=true to update methods without recreating objects
+   */
+  async rebuildMethods(): Promise<void> {
+    const objectManager = await this.manager.load(0);
+    if (!objectManager) throw new Error('Root object not found');
+    const aliases = (objectManager.get('aliases') as Record<string, number | Record<string, number>>) || {};
+
+    // Rebuild Room methods
+    if (aliases.room) {
+      const room = await this.manager.load(aliases.room as number);
+      if (room) {
+        console.log('  Rebuilding Room methods...');
+        await this.roomBuilder.build(0, room); // 0 is unused when existingObj provided
+      }
+    }
+
+    // Rebuild Human methods
+    if (aliases.human) {
+      const human = await this.manager.load(aliases.human as number);
+      if (human) {
+        console.log('  Rebuilding Human methods...');
+        await this.humanBuilder.build(0, human);
+      }
+    }
+
+    // Rebuild Player methods
+    if (aliases.player) {
+      const player = await this.manager.load(aliases.player as number);
+      if (player) {
+        console.log('  Rebuilding Player methods...');
+        await this.playerBuilder.build(0, player);
+      }
+    }
+
+    // Rebuild Agent methods
+    if (aliases.agent) {
+      const agent = await this.manager.load(aliases.agent as number);
+      if (agent) {
+        console.log('  Rebuilding Agent methods...');
+        await this.agentBuilder.build(0, agent);
+      }
+    }
+
+    // Rebuild Embodied methods
+    if (aliases.embodied) {
+      const embodied = await this.manager.load(aliases.embodied as number);
+      if (embodied) {
+        console.log('  Rebuilding Embodied methods...');
+        await this.embodiedBuilder.build(0, embodied);
+      }
+    }
+
+    // Rebuild Location methods
+    if (aliases.location) {
+      const location = await this.manager.load(aliases.location as number);
+      if (location) {
+        console.log('  Rebuilding Location methods...');
+        await this.locationBuilder.build(0, location);
+      }
+    }
+
+    // Rebuild Describable methods
+    if (aliases.describable) {
+      const describable = await this.manager.load(aliases.describable as number);
+      if (describable) {
+        console.log('  Rebuilding Describable methods...');
+        await this.describableBuilder.build(0, describable);
+      }
+    }
+
+    console.log('  ✅ Prototype methods rebuilt');
+  }
 }

@@ -8,8 +8,8 @@ import type { RuntimeObject } from '../../../../types/object.js';
 export class PlayerBuilder {
   constructor(private manager: ObjectManager) {}
 
-  async build(humanId: number): Promise<RuntimeObject> {
-    const obj = await this.manager.create({
+  async build(humanId: number, existingObj?: RuntimeObject): Promise<RuntimeObject> {
+    const obj = existingObj || await this.manager.create({
       parent: humanId,
       properties: {
         name: 'Player',
