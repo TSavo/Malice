@@ -459,17 +459,7 @@ export class BuildingBuilder {
           });
 
           // Move object into the room
-          obj.set('location', room.id);
-          if (room.call) {
-            await room.call('addContent', obj.id);
-          } else {
-            // Fallback: directly set contents
-            const contents = room.get('contents') || [];
-            if (Array.isArray(contents)) {
-              contents.push(obj.id);
-              room.set('contents', contents);
-            }
-          }
+          await obj.moveTo(room);
         }
       }
     }

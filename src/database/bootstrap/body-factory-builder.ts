@@ -41,13 +41,13 @@ export class BodyFactoryBuilder {
     this.bodyFactory.setMethod('createPart', `
       const parentProto = args[0];
       const name = args[1];
-      const ownerId = args[2];
+      const owner = args[2];
       const options = args[3] || {};
 
       const part = await $.recycler.create(parentProto, {
         name: name,
         description: 'A ' + name.toLowerCase(),
-        owner: ownerId,
+        owner: owner,
         parts: {},
         bones: options.bones || [],
         coverable: options.coverable ?? false,
@@ -71,11 +71,11 @@ export class BodyFactoryBuilder {
       const bodyPartId = args[0];
       const side = args[1];
       const handPart = args[2];
-      const ownerId = args[3];
+      const owner = args[3];
 
       const fingers = ['thumb', 'index finger', 'middle finger', 'ring finger', 'pinky'];
       for (const finger of fingers) {
-        const fingerPart = await self.createPart(bodyPartId, side + ' ' + finger, ownerId, {
+        const fingerPart = await self.createPart(bodyPartId, side + ' ' + finger, owner, {
           bones: ['metacarpals', 'phalanges'],
           coverable: true,
           removable: true,
@@ -90,10 +90,10 @@ export class BodyFactoryBuilder {
       const handProtoId = args[0];
       const bodyPartId = args[1];
       const side = args[2];
-      const ownerId = args[3];
+      const owner = args[3];
       const primaryHand = args[4];
 
-      const hand = await self.createPart(handProtoId || bodyPartId, side + ' hand', ownerId, {
+      const hand = await self.createPart(handProtoId || bodyPartId, side + ' hand', owner, {
         bones: ['wrist', 'metacarpals'],
         coverable: true,
         removable: true,
@@ -103,7 +103,7 @@ export class BodyFactoryBuilder {
         calories: 50,
         maxCalories: 75,
       });
-      await self.createFingers(bodyPartId, side, hand, ownerId);
+      await self.createFingers(bodyPartId, side, hand, owner);
       return hand;
     `);
 
@@ -111,15 +111,15 @@ export class BodyFactoryBuilder {
     this.bodyFactory.setMethod('createArm', `
       const aliases = args[0];
       const side = args[1];
-      const ownerId = args[2];
+      const owner = args[2];
       const primaryHand = args[3];
 
       const bodyPartId = aliases.bodyPart;
       const handId = aliases.hand;
 
-      const hand = await self.createHand(handId, bodyPartId, side, ownerId, primaryHand);
+      const hand = await self.createHand(handId, bodyPartId, side, owner, primaryHand);
 
-      const forearm = await self.createPart(bodyPartId, side + ' forearm', ownerId, {
+      const forearm = await self.createPart(bodyPartId, side + ' forearm', owner, {
         bones: ['radius', 'ulna'],
         coverable: true,
         removable: true,
@@ -128,7 +128,7 @@ export class BodyFactoryBuilder {
       });
       await forearm.addPart('hand', hand);
 
-      const arm = await self.createPart(bodyPartId, side + ' arm', ownerId, {
+      const arm = await self.createPart(bodyPartId, side + ' arm', owner, {
         bones: ['humerus'],
         coverable: true,
         removable: true,
@@ -138,7 +138,7 @@ export class BodyFactoryBuilder {
       });
       await arm.addPart('forearm', forearm);
 
-      const shoulder = await self.createPart(bodyPartId, side + ' shoulder', ownerId, {
+      const shoulder = await self.createPart(bodyPartId, side + ' shoulder', owner, {
         bones: ['clavicle', 'scapula'],
         coverable: true,
         removable: false,
@@ -154,11 +154,11 @@ export class BodyFactoryBuilder {
     this.bodyFactory.setMethod('createLeg', `
       const aliases = args[0];
       const side = args[1];
-      const ownerId = args[2];
+      const owner = args[2];
 
       const bodyPartId = aliases.bodyPart;
 
-      const foot = await self.createPart(bodyPartId, side + ' foot', ownerId, {
+      const foot = await self.createPart(bodyPartId, side + ' foot', owner, {
         bones: ['metatarsus', 'phalanges'],
         coverable: true,
         removable: true,
@@ -167,7 +167,7 @@ export class BodyFactoryBuilder {
         maxCalories: 75,
       });
 
-      const leg = await self.createPart(bodyPartId, side + ' leg', ownerId, {
+      const leg = await self.createPart(bodyPartId, side + ' leg', owner, {
         bones: ['tibia', 'fibula'],
         coverable: true,
         removable: true,
@@ -178,7 +178,7 @@ export class BodyFactoryBuilder {
       });
       await leg.addPart('foot', foot);
 
-      const knee = await self.createPart(bodyPartId, side + ' knee', ownerId, {
+      const knee = await self.createPart(bodyPartId, side + ' knee', owner, {
         bones: ['patella'],
         coverable: true,
         removable: true,
@@ -187,7 +187,7 @@ export class BodyFactoryBuilder {
       });
       await knee.addPart('leg', leg);
 
-      const thigh = await self.createPart(bodyPartId, side + ' thigh', ownerId, {
+      const thigh = await self.createPart(bodyPartId, side + ' thigh', owner, {
         bones: ['femur'],
         coverable: true,
         removable: true,
@@ -202,7 +202,7 @@ export class BodyFactoryBuilder {
     // Create head with face, sensory organs, etc.
     this.bodyFactory.setMethod('createHead', `
       const aliases = args[0];
-      const ownerId = args[1];
+      const owner = args[1];
 
       const bodyPartId = aliases.bodyPart;
       const headId = aliases.head;
@@ -212,42 +212,42 @@ export class BodyFactoryBuilder {
       const noseId = aliases.nose;
 
       // Sensory organs
-      const leftEye = await self.createPart(eyeId || bodyPartId, 'left eye', ownerId, {
+      const leftEye = await self.createPart(eyeId || bodyPartId, 'left eye', owner, {
         coverable: true,
         removable: true,
         perception: 1,
       });
-      const rightEye = await self.createPart(eyeId || bodyPartId, 'right eye', ownerId, {
+      const rightEye = await self.createPart(eyeId || bodyPartId, 'right eye', owner, {
         coverable: true,
         removable: true,
         perception: 1,
       });
-      const leftEar = await self.createPart(earId || bodyPartId, 'left ear', ownerId, {
+      const leftEar = await self.createPart(earId || bodyPartId, 'left ear', owner, {
         coverable: true,
         removable: true,
         perception: 1,
       });
-      const rightEar = await self.createPart(earId || bodyPartId, 'right ear', ownerId, {
+      const rightEar = await self.createPart(earId || bodyPartId, 'right ear', owner, {
         coverable: true,
         removable: true,
         perception: 1,
       });
-      const nose = await self.createPart(noseId || bodyPartId, 'nose', ownerId, {
+      const nose = await self.createPart(noseId || bodyPartId, 'nose', owner, {
         coverable: true,
         removable: true,
       });
-      const tongue = await self.createPart(bodyPartId, 'tongue', ownerId, {
+      const tongue = await self.createPart(bodyPartId, 'tongue', owner, {
         removable: true,
       });
 
       // Mouth
-      const mouth = await self.createPart(mouthId || bodyPartId, 'mouth', ownerId, {
+      const mouth = await self.createPart(mouthId || bodyPartId, 'mouth', owner, {
         coverable: true,
       });
       await mouth.addPart('tongue', tongue);
 
       // Face
-      const face = await self.createPart(bodyPartId, 'face', ownerId, {
+      const face = await self.createPart(bodyPartId, 'face', owner, {
         coverable: true,
       });
       await face.addPart('leftEye', leftEye);
@@ -258,12 +258,12 @@ export class BodyFactoryBuilder {
       await face.addPart('mouth', mouth);
 
       // Throat/Neck
-      const throat = await self.createPart(bodyPartId, 'throat', ownerId, {
+      const throat = await self.createPart(bodyPartId, 'throat', owner, {
         bones: ['larynx'],
         coverable: true,
         critical: true,
       });
-      const neck = await self.createPart(bodyPartId, 'neck', ownerId, {
+      const neck = await self.createPart(bodyPartId, 'neck', owner, {
         bones: ['cervical vertebrae'],
         coverable: true,
         critical: true,
@@ -271,12 +271,12 @@ export class BodyFactoryBuilder {
       await neck.addPart('throat', throat);
 
       // Scalp (with hair) - hair details set later via appearance
-      const scalp = await self.createPart(bodyPartId, 'scalp', ownerId, {
+      const scalp = await self.createPart(bodyPartId, 'scalp', owner, {
         coverable: true,
       });
 
       // Head
-      const head = await self.createPart(headId || bodyPartId, 'head', ownerId, {
+      const head = await self.createPart(headId || bodyPartId, 'head', owner, {
         bones: ['skull', 'jaw'],
         coverable: true,
         removable: true,
@@ -293,31 +293,31 @@ export class BodyFactoryBuilder {
     // Create groin with sex-specific parts
     this.bodyFactory.setMethod('createGroin', `
       const aliases = args[0];
-      const ownerId = args[1];
+      const owner = args[1];
       const sex = args[2];
 
       const bodyPartId = aliases.bodyPart;
 
-      const groin = await self.createPart(bodyPartId, 'groin', ownerId, {
+      const groin = await self.createPart(bodyPartId, 'groin', owner, {
         bones: ['pelvis'],
         coverable: true,
       });
 
       if (sex === 'male') {
-        const penis = await self.createPart(bodyPartId, 'penis', ownerId, {
+        const penis = await self.createPart(bodyPartId, 'penis', owner, {
           removable: true,
         });
-        const leftTesticle = await self.createPart(bodyPartId, 'left testicle', ownerId, {
+        const leftTesticle = await self.createPart(bodyPartId, 'left testicle', owner, {
           removable: true,
         });
-        const rightTesticle = await self.createPart(bodyPartId, 'right testicle', ownerId, {
+        const rightTesticle = await self.createPart(bodyPartId, 'right testicle', owner, {
           removable: true,
         });
         await groin.addPart('penis', penis);
         await groin.addPart('leftTesticle', leftTesticle);
         await groin.addPart('rightTesticle', rightTesticle);
       } else if (sex === 'female') {
-        const vagina = await self.createPart(bodyPartId, 'vagina', ownerId, {});
+        const vagina = await self.createPart(bodyPartId, 'vagina', owner, {});
         await groin.addPart('vagina', vagina);
       }
       // neuter/non-binary = no additional parts
@@ -327,7 +327,7 @@ export class BodyFactoryBuilder {
 
     // Main method: create a complete human body
     this.bodyFactory.setMethod('createHumanBody', `
-      const ownerId = args[0];
+      const owner = args[0];
       const sex = args[1] || 'non-binary';
       const appearance = args[2] || {};
       const primaryHand = args[3] || (Math.random() > 0.5 ? 'right' : 'left');
@@ -358,41 +358,41 @@ export class BodyFactoryBuilder {
       }
 
       // Create all parts
-      const head = await self.createHead(aliases, ownerId);
-      const rightShoulder = await self.createArm(aliases, 'right', ownerId, primaryHand);
-      const leftShoulder = await self.createArm(aliases, 'left', ownerId, primaryHand);
-      const rightThigh = await self.createLeg(aliases, 'right', ownerId);
-      const leftThigh = await self.createLeg(aliases, 'left', ownerId);
-      const groin = await self.createGroin(aliases, ownerId, sex);
+      const head = await self.createHead(aliases, owner);
+      const rightShoulder = await self.createArm(aliases, 'right', owner, primaryHand);
+      const leftShoulder = await self.createArm(aliases, 'left', owner, primaryHand);
+      const rightThigh = await self.createLeg(aliases, 'right', owner);
+      const leftThigh = await self.createLeg(aliases, 'left', owner);
+      const groin = await self.createGroin(aliases, owner, sex);
 
-      const leftChest = await self.createPart(bodyPartId, 'left chest', ownerId, {
+      const leftChest = await self.createPart(bodyPartId, 'left chest', owner, {
         bones: ['ribs'],
         coverable: true,
       });
-      const rightChest = await self.createPart(bodyPartId, 'right chest', ownerId, {
+      const rightChest = await self.createPart(bodyPartId, 'right chest', owner, {
         bones: ['ribs'],
         coverable: true,
       });
-      const abdomen = await self.createPart(bodyPartId, 'abdomen', ownerId, {
+      const abdomen = await self.createPart(bodyPartId, 'abdomen', owner, {
         coverable: true,
       });
 
       // Internal digestive stomach (using Stomach prototype if available)
       const stomachProtoId = aliases.stomach;
-      const digestiveStomach = await self.createPart(stomachProtoId || bodyPartId, 'digestive stomach', ownerId, {
+      const digestiveStomach = await self.createPart(stomachProtoId || bodyPartId, 'digestive stomach', owner, {
         internal: true,
         maxContents: 10,
         maxVolume: 1000,
         digestionRate: 50,
       });
-      const back = await self.createPart(bodyPartId, 'back', ownerId, {
+      const back = await self.createPart(bodyPartId, 'back', owner, {
         bones: ['spine'],
         coverable: true,
         critical: true,
       });
 
       // Create torso and link everything
-      const torso = await self.createPart(bodyPartId, 'torso', ownerId, {
+      const torso = await self.createPart(bodyPartId, 'torso', owner, {
         bones: ['ribs', 'spine'],
         coverable: true,
         critical: true,

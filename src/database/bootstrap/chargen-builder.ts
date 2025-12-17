@@ -370,8 +370,8 @@ export class CharGenBuilder {
       await player.tell('  Weaving flesh and bone...');
 
       const bodyFactory = await $.bodyFactory;
-      const body = await bodyFactory.createHumanBody(player.id, sex, appearance);
-      player.set('body', body.id);
+      const body = await bodyFactory.createHumanBody(player, sex, appearance);
+      player.body = body;
 
       await player.tell('  ' + await format.bar(4, 4, 30, { filled: '▓', empty: '░' }));
       await player.tell('  ✓ Your body has been formed!');
@@ -560,14 +560,7 @@ export class CharGenBuilder {
       const startingRoomId = $.charGen.startingRoom || 1353; // Immigration Services Entry Hall
       const startingRoom = await $.load(startingRoomId);
       if (startingRoom) {
-        player.set('location', startingRoomId);
-
-        // Add player to room contents
-        const contents = startingRoom.contents || [];
-        if (!contents.includes(player.id)) {
-          contents.push(player.id);
-          startingRoom.set('contents', contents);
-        }
+        await player.moveTo(startingRoom, player);
       }
 
       // Connect player to the game
