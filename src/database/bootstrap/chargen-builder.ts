@@ -34,7 +34,7 @@ export const STARTING_STAT_POINTS = 20;
 export class CharGenBuilder {
   private charGen: RuntimeObject | null = null;
 
-  constructor(private manager: ObjectManager) {}
+  constructor(private manager: ObjectManager) { }
 
   async build(forceRebuild = false): Promise<void> {
     // Check if already exists via alias
@@ -68,81 +68,8 @@ export class CharGenBuilder {
       const username = args[1];
       const password = args[2];
 
-      // Pre-player messages go through context directly (no player yet)
-      // Send welcome BEFORE async chargen starts to avoid race conditions
-      context.send('\\r\\n');
-      context.send('╔══════════════════════════════════════════════════════════╗\\r\\n');
-      context.send('║               ✦ Welcome to MALICE ✦                      ║\\r\\n');
-      context.send('╠══════════════════════════════════════════════════════════╣\\r\\n');
-      context.send('║                                                          ║\\r\\n');
-      context.send('║  You stand at the threshold of a dark and dangerous      ║\\r\\n');
-      context.send('║  world. Before you can enter, you must give form to      ║\\r\\n');
-      context.send('║  your vessel.                                            ║\\r\\n');
-      context.send('║                                                          ║\\r\\n');
-      context.send('║  Take your time. Choose wisely.                          ║\\r\\n');
-      context.send('║  Your choices here will shape your destiny.              ║\\r\\n');
-      context.send('║                                                          ║\\r\\n');
-      context.send('╚══════════════════════════════════════════════════════════╝\\r\\n');
-      context.send('\\r\\n');
-      context.send('⚠  Warning: You must complete this process without disconnecting.\\r\\n');
-      context.send('\\r\\n');
-
-      // Hash password
-      const passwordHash = await $.hashPassword(password);
-
-      // Get prototypes via alias
-      const objectManager = await $.load(0);
-      const aliases = objectManager.get('aliases') || {};
-      const playerPrototypeId = aliases.player;
-      const adminPrototypeId = aliases.admin;
-
-      // Check if this is the first player (admin user)
-      const existingPlayers = await $.countPlayers();
-      const isFirstPlayer = existingPlayers === 0;
-
-      // First player uses Admin prototype, others use Player
-      const prototypeId = isFirstPlayer ? adminPrototypeId : playerPrototypeId;
-
-      // Get recycler for object creation
-      const recycler = await $.recycler;
-      if (!recycler) {
-        throw new Error('Recycler not available');
-      }
-
-      // Create Player object with minimal defaults first
-      const player = await recycler.create({
-        parent: prototypeId,
-        properties: {
-          name: username,
-          description: 'A new adventurer',
-          aliases: [username.toLowerCase()],
-          location: 0,
-          inventory: [],
-          playername: username.toLowerCase(),
-          email: '',
-          passwordHash: passwordHash,
-          canUseDevTools: isFirstPlayer,
-          isWizard: isFirstPlayer,
-          isSuspended: false,
-          createdAt: new Date(),
-          lastLogin: new Date(),
-          totalPlaytime: 0,
-          title: isFirstPlayer ? 'the Administrator' : 'the Newbie',
-          statPointsRemaining: 20,
-        },
-      }, null);
-
-      // Store context on player so tell() works
-      player._context = context;
-
-      // Authenticate early so $.prompt works
-      context.authenticate(player.id);
-
-      // Set player as handler so input routes to player.onInput -> $.prompt.handleInput
-      context.setHandler(player);
-
-      // Now run interactive chargen
-      await $.charGen.runCharGen(player, isFirstPlayer);
+      // Use autonomous AI interview system
+      await $.charGen.startNPCInterview(context, username, password);
     `);
 
     // Interactive character generation flow
@@ -1130,6 +1057,23 @@ export class CharGenBuilder {
         }
       }
 
+      // Move player to starting room
+      const startingRoomId = self.startingRoom || 1353;
+      const startingRoom = await $.load(startingRoomId);
+      if (startingRoom) {
+        await player.moveTo(startingRoom, player);
+      }
+
+      // Clear chargen state
+      player.chargenInProgress = false;
+      player.chargenAgentSession = null;
+
+      // Connect player to game
+      await player.connect(player._context);
+
+      // Cleanup all registered objects
+      await self.cleanupForPlayer(playerId);
+
       // Remove from interviewState
       const idx = state.findIndex(s => s.playerId === playerId);
       if (idx >= 0) {
@@ -1144,6 +1088,176 @@ export class CharGenBuilder {
         name: answers.name,
         sex: answers.sex,
       };
+    `);
+
+    // ═══════════════════════════════════════════════════════════════════
+    // AUTONOMOUS AI INTERVIEW SYSTEM (CharGen v2)
+    // ═══════════════════════════════════════════════════════════════════
+
+    // Registry for temporary objects to be cleaned up
+    if (!this.charGen.get('recycleRegistry')) {
+      this.charGen.set('recycleRegistry', {});
+    }
+
+    this.charGen.set('interviewerPrompt', `You are the **Immigration Officer** for Malice.
+Your Ultimate Goal: Complete the Candidate's Processing Form using the \`malice-chargen\` tools.
+
+PERIODICAL PROTOCOL CHECK (Perform at start of every turn):
+
+1. **LOCATION CHECK**: Are we in a secure, private interview room?
+   - NO: Use \`dig\` to create a "Private Interview Room" (be creative).
+   - YES: Proceed.
+
+2. **IDENTITY CHECK**: Am I a manifest entity?
+   - NO: Use \`ai.spawn\` (role: "chargen-interviewer") and \`ai.tailor\` to create/update my form.
+   - YES: Proceed.
+
+3. **CLEANUP CHECK**: Are my resources registered for recycling?
+   - NO: Use \`register_for_recycle\` for the room and myself.
+   - YES: Proceed.
+
+4. **CANDIDATE CHECK**: Is the candidate (Player #{{playerId}}) present?
+   - NO: Use \`move_object\` to bring them here. Use \`ai.do(say)\` to greet them upon arrival.
+   - YES: Proceed.
+
+5. **FORM CHECK**: Is the interview initialized?
+   - Use \`start_interview\` to check/start.
+   - Use \`get_next_question\` to see what is needed.
+
+EXECUTION:
+- If any check is "NO", perform the tool call to fix it immediately.
+- If all checks are "YES", conduct the interview:
+  - Ask the next question naturally.
+  - If the candidate answered, use \`answer_question\` to record it.
+  - If the form is done (\`get_next_question\` returns null), use \`finish_interview\`.
+
+**CRITICAL TURN-TAKING RULES:**
+1. **ONE ACTION PER TURN**: Do not perform multiple interview steps in one go.
+2. **ASK AND HALT**: After asking a question via \`say\`, you MUST STOP. Do not output more text. Do not call more tools.
+3. **WAIT FOR INPUT**: The user's reply will come in the next session turn.
+4. **SESSION MEMORY**: You remember everything. You do not need to check \`get_progress\` constantly. Trust the session history.
+   - If you asked "Name?", and the user says "Bob", you KNOW you just asked for the name.
+   - Call \`answer_question(..., "Bob")\` immediately.
+   - Then ask the next question.
+   - Then STOP.
+
+TOOL USAGE PROTOCOL:
+- **Clipboard**: \`start_interview\`, \`get_next_question\`, \`get_progress\`
+- **Pen**: \`answer_question\`
+- **Stamp**: \`finish_interview\`
+
+DEMEANOR & INTERACTION GUIDE:
+- **Persona**: You are a weary but professional bureaucrat. You've seen thousands of souls. Efficient, slightly detached, but not cruel.
+- **Tone**: Formal, procedural, authoritative.
+  - *Bad*: "What's your name?"
+  - *Good*: "State your designation for the registry."
+  - *Bad*: "Wow, that's cool!"
+  - *Good*: "Noted. A bit irregular, but acceptable."
+- **Reaction**: Briefly acknowledge answers before the next question. Don't be a robot.
+  - *Player*: "I have violet eyes."
+  - *You*: "Violet. Rare mutation. Proceeding. And your hair texture?"
+- **Pacing**: ONE question at a time. Never overwhelm the candidate.
+- **Adaptability**: If the user is confused, break character slightly to guide them "OOC: (( You need to type 'say [answer]' ))" then return to persona.
+
+CRITICAL:
+- You are autonomous. If a tool fails, retry or adapt.
+- Maintain professional but immersive character.
+- ONLY \`finish_interview\` when the form is 100% complete.`);
+
+    this.charGen.setMethod('startNPCInterview', `
+      /** Bootstrap the autonomous AI interview for a player.
+       *  @param context - Network context
+       *  @param username - Desired username
+       *  @param password - User's password
+       */
+      const context = args[0];
+      const username = args[1];
+      const password = args[2];
+
+      // 1. Create player object (minimal)
+      const passwordHash = await $.hashPassword(password);
+      const playerPrototypeId = (await $.load(0)).get('aliases').player;
+      
+      const player = await $.recycler.create({
+        parent: playerPrototypeId,
+        properties: {
+          name: username,
+          aliases: [username.toLowerCase()],
+          description: 'A new arrival awaiting processing.',
+          passwordHash: passwordHash,
+          statPointsRemaining: 20,
+          inventory: [],
+        }
+      }, null);
+
+      player._context = context;
+      context.authenticate(player.id);
+      context.setHandler(player);
+
+      // 2. Mark player as in-chargen
+      player.chargenInProgress = true;
+
+      // 3. Start the autonomous AI
+      const kickoffPrompt = "A new candidate (Player #" + player.id + ") has arrived for processing. " +
+                            "Initiate Protocol 1-A: Secure room, manifest yourself, and conduct the interview.";
+      
+      const systemPrompt = self.interviewerPrompt.replace(/\\\\{\\\\{playerId\\\\}\\\\}/g, String(player.id));
+
+      $.query(systemPrompt, kickoffPrompt, null, {
+        additionalMcpServers: {
+          'malice-chargen': { type: 'http', url: 'http://localhost:3002/mcp' }
+        }
+      }).then(result => {
+        // Session saved on player until NPC is spawned
+        player.chargenAgentSession = result.session;
+      }).catch(err => {
+        console.error('CharGen AI Kickoff Error:', err);
+      });
+
+      return player;
+    `);
+
+    this.charGen.setMethod('registerForRecycle', `
+      /** Register an object (room, NPC) for cleanup when interview finishes.
+       *  @param playerId - The player undergoing chargen
+       *  @param objectId - The object to recycle later
+       */
+      const playerId = args[0];
+      const objectId = args[1];
+      if (!playerId || !objectId) return { success: false, error: 'Missing arguments' };
+
+      const registry = self.recycleRegistry || {};
+      if (!registry[playerId]) registry[playerId] = [];
+      
+      if (!registry[playerId].includes(objectId)) {
+        registry[playerId].push(objectId);
+      }
+      
+      self.recycleRegistry = registry;
+      return { success: true, playerId, objectId };
+    `);
+
+    this.charGen.setMethod('cleanupForPlayer', `
+      /** Recycle all temporary objects registered for a player.
+       *  @param playerId - The player who finished/cancelled chargen
+       */
+      const playerId = args[0];
+      const registry = self.recycleRegistry || {};
+      const objectIds = registry[playerId] || [];
+
+      let count = 0;
+      for (const objectId of objectIds) {
+        try {
+          await $.recycler.recycle(objectId);
+          count++;
+        } catch (e) {
+          // Object might already be recycled
+        }
+      }
+
+      delete registry[playerId];
+      self.recycleRegistry = registry;
+      return { success: true, recycledCount: count };
     `);
   }
 

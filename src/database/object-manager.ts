@@ -689,6 +689,7 @@ export class ObjectManager {
    * @param systemPrompt - System prompt defining AI behavior
    * @param prompt - User prompt / query
    * @param session - Optional session ID to resume conversation
+   * @param options - Optional configuration including additional MCP servers
    * @returns { response: string, session: string }
    *
    * @example
@@ -705,19 +706,26 @@ export class ObjectManager {
   async query(
     systemPrompt: string,
     prompt: string,
-    session?: string
+    session?: string,
+    options?: { additionalMcpServers?: Record<string, { type: string; url: string }> }
   ): Promise<{ response: string; session: string }> {
     // Dynamic import to avoid loading SDK at startup
     const { query: sdkQuery } = await import('@anthropic-ai/claude-agent-sdk');
 
-    const options: Record<string, unknown> = {
-      systemPrompt,
-      mcpServers: {
-        'malice-moo': {
-          type: 'http',
-          url: 'http://localhost:3001/mcp',
-        },
+    const mcpServers: Record<string, { type: string; url: string }> = {
+      'malice-moo': {
+        type: 'http',
+        url: 'http://localhost:3001/mcp',
       },
+    };
+
+    if (options?.additionalMcpServers) {
+      Object.assign(mcpServers, options.additionalMcpServers);
+    }
+
+    const queryOptions: Record<string, unknown> = {
+      systemPrompt,
+      mcpServers,
       allowedTools: ['*'],
       permissionMode: 'bypassPermissions',
       allowDangerouslySkipPermissions: true,
@@ -726,13 +734,13 @@ export class ObjectManager {
     };
 
     if (session) {
-      options.resume = session;
+      queryOptions.resume = session;
     }
 
     let response = '';
     let newSessionId: string | null = null;
 
-    for await (const message of sdkQuery({ prompt, options })) {
+    for await (const message of sdkQuery({ prompt, options: queryOptions })) {
       const msg = message as Record<string, unknown>;
 
       // Capture session ID from init message

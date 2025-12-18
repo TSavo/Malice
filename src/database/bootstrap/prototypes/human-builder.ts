@@ -18,7 +18,7 @@ import type { RuntimeObject } from '../../../../types/object.js';
  * - Appearance description
  */
 export class HumanBuilder {
-  constructor(private manager: ObjectManager) {}
+  constructor(private manager: ObjectManager) { }
 
   /**
    * Build the Human prototype or rebuild methods on existing object
@@ -1052,8 +1052,18 @@ export class HumanBuilder {
       // Build user prompt
       const userPrompt = speaker.name + ' says to you: "' + message + '"\\n\\nRespond in character.';
 
+      // Check if this is a chargen interviewer to add additional MCP servers
+      const ai = await $.ai;
+      const profile = await ai.getProfile(self.id);
+      const options = {};
+      if (profile && profile.role === 'chargen-interviewer') {
+        options.additionalMcpServers = {
+          'malice-chargen': { type: 'http', url: 'http://localhost:3002/mcp' }
+        };
+      }
+
       // Fire-and-forget query - NPC will use MCP tools to speak/emote
-      $.query(systemPrompt, userPrompt, self.agentSession)
+      $.query(systemPrompt, userPrompt, self.agentSession, options)
         .then(async (result) => {
           // Save session for continuity
           self.agentSession = result.session;
