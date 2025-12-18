@@ -105,11 +105,25 @@ export class ObjectManager {
         return undefined;
       },
       set: (target, prop: string | symbol, value: any) => {
-        if (typeof prop === 'symbol' || prop in target) {
+        // Protect internal properties from being overwritten via proxy
+        if (typeof prop === 'symbol') {
           (target as any)[prop] = value;
           return true;
         }
 
+        // Block overwriting internal properties
+        const internalProps = ['db', 'cache', 'aliases', 'pendingUpdateOperations'];
+        if (internalProps.includes(prop)) {
+          return false;
+        }
+
+        // Allow setting other existing properties
+        if (prop in target) {
+          (target as any)[prop] = value;
+          return true;
+        }
+
+        // Allow registering aliases (objects with id property)
         if (value && typeof value === 'object' && 'id' in value) {
           target.aliases.set(prop, value as RuntimeObject);
           return true;

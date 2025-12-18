@@ -81,7 +81,9 @@ describe('ObjectCache', () => {
   });
 
   describe('Cache Invalidation', () => {
-    it('should invalidate object cache', () => {
+    it('should NOT remove object from cache (Stable Proxy Pattern)', () => {
+      // With stable proxy architecture, invalidate() only clears transient caches
+      // The object proxy itself is never removed
       const mockObj = { id: 1 } as RuntimeObject;
       cache.setObject(1, mockObj);
 
@@ -89,7 +91,8 @@ describe('ObjectCache', () => {
 
       cache.invalidate(1);
 
-      expect(cache.hasObject(1)).toBe(false);
+      // Object should STILL be in cache (stable proxy)
+      expect(cache.hasObject(1)).toBe(true);
     });
 
     it('should invalidate all compiled methods for object', () => {
@@ -140,11 +143,11 @@ describe('ObjectCache', () => {
 
       cache.invalidate(1);
 
-      // Object 1 invalidated
-      expect(cache.hasObject(1)).toBe(false);
+      // Object 1 still in cache (stable proxy), but compiled methods cleared
+      expect(cache.hasObject(1)).toBe(true);
       expect(cache.getCompiledMethod(1, 'greet')).toBeUndefined();
 
-      // Object 2 still cached
+      // Object 2 still cached with its methods
       expect(cache.hasObject(2)).toBe(true);
       expect(cache.getCompiledMethod(2, 'greet')).toBe('code2');
     });
@@ -227,16 +230,21 @@ describe('ObjectCache', () => {
     });
   });
 
-  describe('Cache Clear', () => {
-    it('should clear all caches', () => {
+  describe('Stable Proxy Pattern', () => {
+    it('should never evict objects from cache', () => {
+      // With stable proxy architecture, objects are never removed from cache
+      // There is no clear() method - memory is the source of truth
       cache.setObject(1, { id: 1 } as RuntimeObject);
       cache.setCompiledMethod(1, 'greet', 'code1');
       cache.setParentChain(1, [2, 3]);
 
-      cache.clear();
+      // Objects persist forever
+      expect(cache.hasObject(1)).toBe(true);
+      expect(cache.getObject(1)).toBeDefined();
 
-      expect(cache.size()).toBe(0);
-      expect(cache.getObject(1)).toBeUndefined();
+      // invalidate() only clears transient data, not the object
+      cache.invalidate(1);
+      expect(cache.hasObject(1)).toBe(true);
       expect(cache.getCompiledMethod(1, 'greet')).toBeUndefined();
       expect(cache.getParentChain(1)).toBeUndefined();
     });

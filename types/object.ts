@@ -171,6 +171,9 @@ export interface RuntimeObject {
 
   /** Push current memory state to database */
   push(): Promise<void>;
+
+  /** Legacy alias for push() - forces save to database */
+  save(): Promise<void>;
 }
 
 /**
