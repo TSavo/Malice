@@ -48,7 +48,13 @@ export class LocationBuilder {
     `);
 
     obj.setMethod('addContent', `
-      const obj = args[0];
+      let obj = args[0];
+
+      // Accept either a RuntimeObject or an ID number
+      if (typeof obj === 'number') {
+        obj = await $.load(obj);
+      }
+
       if (!obj || typeof obj.id !== 'number') {
         return; // Invalid input
       }

@@ -18,13 +18,14 @@ describe('$.memento', () => {
     await db['objects'].deleteMany({});
 
     manager = new ObjectManager(db);
-    const bootstrap = new GameBootstrap(manager);
+    const bootstrap = new GameBootstrap(manager, { worldBuildMode: 'systems', disableDefaultJobs: true });
     await bootstrap.bootstrap();
 
     $ = manager as any;
   }, 30000);
 
   afterAll(async () => {
+    await manager.flushWrites();
     await db.disconnect();
   });
 

@@ -16,9 +16,11 @@ Verb patterns consist of literal words and placeholders:
 
 | Placeholder | Meaning | Resolution |
 |-------------|---------|------------|
-| `%i` | Item | Resolves to a RuntimeObject from room/hands |
-| `%t` | Target | Must match the handler object's name/aliases |
+| `%i` | Item | Resolves to a `RuntimeObject` from room contents + held items |
+| `%t` | This handler | Input must match the handler object's `name` or `aliases`; pushes the handler object |
 | `%s` | String | Captures remaining input as a string |
+
+Only `%i`, `%t`, and `%s` are currently implemented in the matcher.
 
 ### Pattern Examples
 
@@ -45,6 +47,32 @@ Verb patterns consist of literal words and placeholders:
 ```
 
 ## Registering Verbs
+
+## How Verb Registration Works (Internal Model)
+
+At runtime, verbs are stored on the *agent* (player/NPC) in `self.verbs` as a map keyed by the verb pattern:
+
+```javascript
+self.verbs = {
+  'look': { obj: playerObject, method: 'look' },
+  'get %i': { obj: playerObject, method: 'get' },
+  'eat %t': { obj: appleObject, method: 'eat' },
+};
+```
+
+- The map key is the **exact pattern string** you registered.
+- The value contains:
+  - `obj`: the **handler object** (a `RuntimeObject`) to dispatch to
+  - `method`: the **method name** to invoke on `obj`
+
+### `registerVerb(patterns, sourceObj, methodName?)`
+
+`registerVerb` takes a pattern (or array of patterns) and stores each pattern in `self.verbs`.
+
+If `methodName` is omitted, it is derived from the *first word of the pattern*.
+
+Important: derivation also strips `%i`, `%t`, `%s` from the first word, so unusual patterns can produce surprising method names.
+
 
 Verbs are registered on an Agent (Player/NPC) using `registerVerb()`:
 
@@ -140,6 +168,17 @@ obj.setMethod('doWear', `
 
 ## Item Resolution
 
+### Resolution Rules (What `%i` actually does)
+
+The `%i` placeholder calls `resolveItem(text)` on the agent.
+
+- Search scope is **room contents + held items** (hands)
+- Matching is case-insensitive and supports:
+  - exact match against `name` and `aliases`
+  - partial match (`startsWith` or `includes`) against `name` and `aliases`
+- If multiple matches are found and no ordinal is provided, resolution fails with a disambiguation prompt like `Which sword? (1. rusty sword, 2. silver sword)`.
+
+
 The `%i` placeholder resolves item names to RuntimeObjects:
 
 ### Search Scope
@@ -178,6 +217,18 @@ The verb returns an error prompting the player to specify.
 
 ## Pattern Matching
 
+### Matching Algorithm
+
+Internally, `matchVerb(input)`:
+
+1. Collects all registered patterns: `Object.keys(self.verbs)`
+2. Sorts them by **specificity** (more whitespace-separated parts first)
+3. Tries each pattern in order via `tryMatchPattern(input, pattern, verbInfo)`
+4. Returns the first successful match
+
+A key detail: if a pattern *matches structurally* but item resolution fails (not found / ambiguous), the matcher returns that error immediately instead of trying less-specific patterns.
+
+
 ### Match Priority
 
 Patterns are sorted by specificity (more parts = higher priority):
@@ -212,9 +263,44 @@ The `%t` placeholder must match the handler object:
 // No match: "eat banana" (wrong handler)
 ```
 
+## Dispatch and Handler Context
+
+When `player.onInput()` matches a verb, it dispatches like this:
+
+```ts
+const result = await match.handler.callVerb(
+  match.verbInfo.method,
+  context,
+  player,
+  trimmed,
+  match.args
+);
+```
+
+Inside the handler method (the code string you set with `setMethod()`), these are available as **direct variables**:
+
+- `self`: the handler object (the object you registered as `sourceObj`)
+- `player`: the object that typed the command
+- `context`: the connection/session context
+- `command`: the raw input line
+- `$`: object manager / helpers
+- `args`: **only** the resolved pattern variables, in placeholder order
+- `pass(...)`: call parent implementation
+
+### `args` mapping
+
+`args` contains the resolved values for `%i`, `%t`, `%s` in the order they appear in the pattern. It does **not** include `player` or `context`.
+
+Examples:
+
+- Pattern: `look` → `args = []`
+- Pattern: `say %s` → `args = ["hello there"]`
+- Pattern: `give %i to %i` → `args = [itemObject, targetObject]`
+- Pattern: `eat %t` → `args = [self]`
+
 ## Handler Method Signature
 
-When a verb is matched, the handler method receives:
+When a verb is matched, the handler method runs with these direct variables:
 
 ```javascript
 obj.setMethod('eat', `
@@ -251,6 +337,11 @@ Arguments are passed in the order placeholders appear in the pattern:
 
 ## Default Player Verbs
 
+### Note: Where defaults come from
+
+Default player verbs are registered in `src/database/bootstrap/prototypes/player-builder.ts` via `connect()`.
+
+
 Players automatically get these verbs on connect:
 
 | Pattern | Method | Description |
@@ -266,6 +357,15 @@ Players automatically get these verbs on connect:
 | `@options` | `options` | Open options menu |
 
 ## Implementation Details
+
+### Important limitation: ONLY `%i`, `%t`, `%s`
+
+The core command matcher currently special-cases only `%i`, `%t`, and `%s`. Any other placeholder token will be treated as a literal word and will not match player input.
+
+This does **not** refer to the pronoun/template formatter (used by `$.pronoun.*`), which has its own formatting codes like `%d`, `%tN`, etc.
+
+If you need additional verb placeholder types, the right fix is to extend `tryMatchPattern` in `src/database/bootstrap/prototypes/agent-builder.ts`.
+
 
 ### Verb Storage
 

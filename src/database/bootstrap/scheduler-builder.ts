@@ -33,7 +33,10 @@ import type { RuntimeObject } from '../../../types/object.js';
 export class SchedulerBuilder {
   private scheduler: RuntimeObject | null = null;
 
-  constructor(private manager: ObjectManager) {}
+  constructor(
+    private manager: ObjectManager,
+    private options: { disableDefaultJobs?: boolean } = {}
+  ) {}
 
   async build(): Promise<void> {
     // Check if already exists via alias
@@ -323,6 +326,10 @@ export class SchedulerBuilder {
 
     await objectManager.call('addAlias', 'scheduler', this.scheduler.id);
     console.log(`✅ Registered scheduler alias -> #${this.scheduler.id}`);
+
+    if (this.options.disableDefaultJobs) {
+      return;
+    }
 
     // Register default jobs
     await this.registerDefaultJobs(objectManager);
