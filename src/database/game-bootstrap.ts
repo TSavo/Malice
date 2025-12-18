@@ -1,8 +1,22 @@
 import { ObjectManager } from './object-manager.js';
 import { MinimalBootstrap, AliasLoader } from './bootstrap/index.js';
 
+export type WorldBuildMode = 'full' | 'systems' | 'skip';
+
 export interface GameBootstrapOptions {
   forceBootstrap?: boolean;
+  /**
+   * Controls what gets built when we detect a missing world.
+   * - `full`: build prototypes + core systems + world geometry and buildings (default)
+   * - `systems`: build prototypes + core systems only (fast; good for unit tests)
+   * - `skip`: never auto-build anything beyond minimal bootstrap
+   */
+  worldBuildMode?: WorldBuildMode;
+  /**
+   * Skip registering built-in scheduler jobs like `playerHeartbeat` and `decayTick`.
+   * Useful for tests where background jobs cause persistent writes.
+   */
+  disableDefaultJobs?: boolean;
 }
 
 /**
@@ -22,7 +36,11 @@ export class GameBootstrap {
   private options: GameBootstrapOptions;
 
   constructor(private manager: ObjectManager, options: GameBootstrapOptions = {}) {
-    this.options = options;
+    this.options = {
+      worldBuildMode: 'full',
+      disableDefaultJobs: false,
+      ...options,
+    };
   }
 
   /**
@@ -60,13 +78,22 @@ export class GameBootstrap {
     const authManager = $.authManager;
 
     if (!describable || !player || !authManager) {
+      if (this.options.worldBuildMode === 'skip') {
+        console.log('⚠️ World not built (skipped by options.worldBuildMode=skip)');
+        return;
+      }
+
       console.log('');
       console.log('═══════════════════════════════════════════════════════════');
       console.log('  🏗️  Building World...');
       console.log('═══════════════════════════════════════════════════════════');
       console.log('');
 
-      await this.buildWorld();
+      if (this.options.worldBuildMode === 'systems') {
+        await this.buildSystemsOnly();
+      } else {
+        await this.buildWorld();
+      }
 
       console.log('');
       console.log('✅ World built successfully!');
@@ -111,19 +138,49 @@ export class GameBootstrap {
   }
 
   /**
-   * Build the complete world (prototypes + core systems)
+   * Build prototypes + core systems only (no world geometry).
+   * This is useful for unit tests that only need `$.recycler`, prototypes, and core utilities.
+   */
+  private async buildSystemsOnly(): Promise<void> {
+    const { PrototypeBuilder } = await import('./bootstrap/prototype-builder.js');
+    const { CoreSystemBuilder } = await import('./bootstrap/core-system-builder.js');
+
+    const prototypeBuilder = new PrototypeBuilder(this.manager);
+    const coreSystemBuilder = new CoreSystemBuilder(this.manager, {
+      disableDefaultJobs: this.options.disableDefaultJobs,
+    });
+
+    console.log('Creating object prototypes...');
+    await prototypeBuilder.buildPrototypes();
+    console.log('  ✅ Created Describable, Agent, Human, Player prototypes');
+
+    console.log('Creating core systems...');
+    await coreSystemBuilder.buildCoreSystems();
+    console.log('  ✅ Created AuthManager, CharGen, PreAuthHandler, Recycler');
+    console.log('  ✅ Created $.pronoun, $.proportional, $.room, $.bodyFactory');
+
+    // Reload aliases so everything is addressable via `manager as any`.
+    const aliasLoader = new AliasLoader(this.manager);
+    await aliasLoader.loadAliases();
+    console.log('  ✅ Loaded all aliases');
+  }
+
+  /**
+   * Build the complete world (prototypes + core systems + world geometry/buildings)
    */
   private async buildWorld(): Promise<void> {
     const { PrototypeBuilder } = await import('./bootstrap/prototype-builder.js');
     const { CoreSystemBuilder } = await import('./bootstrap/core-system-builder.js');
     const { WorldBuilder } = await import('./bootstrap/world-builder.js');
-
     const { BuildingBuilder } = await import('./bootstrap/building-builder.js');
-    const prototypeBuilder = new PrototypeBuilder(this.manager);
-    const coreSystemBuilder = new CoreSystemBuilder(this.manager);
-    const worldBuilder = new WorldBuilder(this.manager);
 
+    const prototypeBuilder = new PrototypeBuilder(this.manager);
+    const coreSystemBuilder = new CoreSystemBuilder(this.manager, {
+      disableDefaultJobs: this.options.disableDefaultJobs,
+    });
+    const worldBuilder = new WorldBuilder(this.manager);
     const buildingBuilder = new BuildingBuilder(this.manager);
+
     // Build prototypes
     console.log('Creating object prototypes...');
     await prototypeBuilder.buildPrototypes();
@@ -143,20 +200,22 @@ export class GameBootstrap {
     // Build world geometry (rooms and exits)
     console.log('Creating world geometry...');
     await worldBuilder.build();
+
     // Build buildings (multi-floor structures)
     console.log('Creating buildings...');
     await buildingBuilder.build();
     console.log('  ✅ Built Smith Tower and other buildings');
+
     // Register global building object aliases
-    console.log("Registering global building aliases...");
+    console.log('Registering global building aliases...');
     const citySigns = await this.manager.findByProperty('name', 'City Announcement Board');
     const citySign = citySigns[0];
     if (citySign) {
       const objectManager = await this.manager.load(0);
-      await objectManager?.call("addAlias", "cityAnnounce", citySign.id);
-      console.log("  ✅ Registered $.cityAnnounce");
+      await objectManager?.call('addAlias', 'cityAnnounce', citySign.id);
+      console.log('  ✅ Registered $.cityAnnounce');
     } else {
-      console.warn("  ⚠️  City Announcement Board not found");
+      console.warn('  ⚠️  City Announcement Board not found');
     }
 
     // Reload aliases again to include startRoom

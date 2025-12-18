@@ -45,7 +45,11 @@ import { NotesBuilder } from './notes-builder.js';
  * - Notes ($.notes): Object note attachment system
  */
 export class CoreSystemBuilder {
-  constructor(private manager: ObjectManager) {}
+  constructor(
+    private manager: ObjectManager,
+    private options: { disableDefaultJobs?: boolean } = {}
+  ) {}
+
 
   /**
    * Build all core system objects
@@ -61,7 +65,10 @@ export class CoreSystemBuilder {
     const roomBuilder = new RoomBuilder(this.manager);
     const bodyFactoryBuilder = new BodyFactoryBuilder(this.manager);
     const promptBuilder = new PromptBuilder(this.manager);
-    const schedulerBuilder = new SchedulerBuilder(this.manager);
+    const schedulerBuilder = new SchedulerBuilder(this.manager, {
+      disableDefaultJobs: this.options.disableDefaultJobs,
+    });
+
     const emoteBuilder = new EmoteBuilder(this.manager);
     const mutexBuilder = new MutexBuilder(this.manager);
     const exclusionsBuilder = new ExclusionsBuilder(this.manager);

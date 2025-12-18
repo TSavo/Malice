@@ -110,7 +110,13 @@ export class DescribableBuilder {
 
     // Basic content management - can be overridden by Location for fancier behavior
     obj.setMethod('addContent', `
-      const item = args[0];
+      let item = args[0];
+
+      // Accept either a RuntimeObject or an ID number
+      if (typeof item === 'number') {
+        item = await $.load(item);
+      }
+
       if (!item || typeof item.id !== 'number') {
         return; // Invalid input
       }

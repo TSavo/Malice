@@ -294,20 +294,27 @@ export class ObjectDatabase {
       if (this.shuttingDown) return;
 
       try {
-        this.changeStream = this.objects.watch([], {
+        const stream = this.objects.watch([], {
           fullDocument: 'updateLookup', // Include full document on updates
         });
+        this.changeStream = stream;
 
-        this.changeStream.on('change', (change) => {
+        stream.on('change', (change) => {
           callback(change);
         });
 
-        this.changeStream.on('error', (err) => {
+        stream.on('error', (err) => {
           // Ignore errors during shutdown.
           if (this.shuttingDown) return;
 
           console.error('[ObjectDatabase] Change stream error:', err);
-          this.changeStream = undefined;
+
+          // Ensure the underlying stream is actually closed; otherwise we can
+          // leak sockets/handles while also losing our reference to it.
+          if (this.changeStream === stream) {
+            this.changeStream = undefined;
+          }
+          stream.close().catch(() => undefined);
 
           if (this.watchRetryTimer) {
             clearTimeout(this.watchRetryTimer);
@@ -319,9 +326,13 @@ export class ObjectDatabase {
               this.watch(callback);
             }
           }, 5000);
+          this.watchRetryTimer.unref?.();
         });
 
-        this.changeStream.on('close', () => {
+        stream.on('close', () => {
+          if (this.changeStream === stream) {
+            this.changeStream = undefined;
+          }
           console.log('[ObjectDatabase] Change stream closed');
         });
       } catch (err) {
@@ -339,6 +350,7 @@ export class ObjectDatabase {
             this.watch(callback);
           }
         }, 5000);
+        this.watchRetryTimer.unref?.();
       }
     });
   }

@@ -76,6 +76,9 @@ export class ObjectManager {
   // Track our own writes to avoid invalidating cache for them
   private pendingWrites = new Map<ObjId, NodeJS.Timeout>();
 
+  // Track in-flight update operations (fire-and-forget writes from RuntimeObject)
+  private pendingUpdateOperations = new Set<Promise<void>>();
+
   constructor(db: ObjectDatabase) {
     this.db = db;
     this.cache = new ObjectCache();
@@ -362,7 +365,14 @@ export class ObjectManager {
     // Track this write as ours so change stream doesn't invalidate it
     this.trackWrite(id);
 
-    await this.db.update(id, updates);
+    // Track in-flight writes so tests can flush them before teardown.
+    const updatePromise = this.db.update(id, updates);
+    this.pendingUpdateOperations.add(updatePromise);
+    try {
+      await updatePromise;
+    } finally {
+      this.pendingUpdateOperations.delete(updatePromise);
+    }
 
     if (invalidateCache) {
       this.cache.invalidate(id);
@@ -383,6 +393,7 @@ export class ObjectManager {
     const timeout = setTimeout(() => {
       this.pendingWrites.delete(id);
     }, 2000);
+    timeout.unref?.();
 
     this.pendingWrites.set(id, timeout);
   }
@@ -436,6 +447,21 @@ export class ObjectManager {
    */
   clearCache(): void {
     this.cache.clear();
+  }
+
+   /**
+    * Wait for all in-flight RuntimeObject auto-persist writes to complete.
+    *
+    * This is primarily intended for tests, to avoid disconnecting Mongo while
+    * fire-and-forget writes are still pending.
+    */
+
+  async flushWrites(): Promise<void> {
+    // Drain in waves in case awaiting one write triggers others.
+    while (this.pendingUpdateOperations.size > 0) {
+      const pending = Array.from(this.pendingUpdateOperations);
+      await Promise.allSettled(pending);
+    }
   }
 
   /**

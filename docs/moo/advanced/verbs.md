@@ -54,13 +54,15 @@ await player.registerVerb(
 
 ### Pattern Syntax
 
-| Pattern | Meaning | Example Input | Args to Handler |
-|---------|---------|---------------|-----------------|
-| `look` | Exact match | "look" | `[player]` |
-| `look %s` | Rest of line | "look around here" | `[player, "around here"]` |
-| `give %i to %i` | Two items | "give sword to bob" | `[player, sword, bob]` |
-| `wear %t` | This object | "wear shirt" | `[player]` |
-| `eat %t` | This object | "eat apple" | `[player]` |
+| Pattern | Meaning | Example Input | `args` in Handler |
+|---------|---------|---------------|------------------|
+| `look` | Exact match | "look" | `[]` |
+| `look %s` | Rest of line | "look around here" | `["around here"]` |
+| `give %i to %i` | Two items | "give sword to bob" | `[sword, bob]` |
+| `wear %t` | This object | "wear shirt" | `[shirt]` |
+| `eat %t` | This object | "eat apple" | `[apple]` |
+
+`player`, `context`, and `command` are **direct variables** in verb handlers (provided by `callVerb()`), not elements inside `args`.
 
 **Pattern codes:**
 - `%s` - Rest of line as string
@@ -86,6 +88,15 @@ obj.setMethod('onArrived', `
 ```
 
 ## Verb Lifecycle
+
+### Note on pattern codes
+
+Only the following placeholder codes are currently implemented in the command matcher:
+- `%i` (resolve an item from room contents + held items)
+- `%t` (match the *handler object* name/aliases and pass the handler as an argument)
+- `%s` (consume the rest of input as a string)
+
+This is separate from the pronoun/template formatter used by `$.pronoun.*` (which has its own formatting codes like `%d`, `%tN`, etc.).
 
 ### Complete Flow
 
@@ -134,6 +145,12 @@ obj.setMethod('onArrived', `
 ```
 
 ## Verb Handlers
+
+### Important: `args` does not include `player`
+
+Verb handlers receive **only pattern variables** in `args` (`%i`, `%t`, `%s`). The `player` who typed the command (and `context` + `command`) are available as direct variables.
+
+If you see older examples that do things like `const player = args[0];`, those are from an earlier calling convention and are no longer correct.
 
 ### Handler Context
 
@@ -197,7 +214,7 @@ obj.setMethod('doWear', `
   //   args[0] = the clothing item (same as self)
   //   player = direct variable
 
-  // Use 'player' directly, not args[0]
+  // Use 'player' directly, NOT args[0]
   const result = await self.wear(player);
   if (!result.success) return result.error;
 
