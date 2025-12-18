@@ -165,6 +165,12 @@ export interface RuntimeObject {
 
   /** Get the raw GameObject (for internal use) */
   _getRaw(): GameObject;
+
+  /** Pull fresh data from database into memory (in-place) */
+  pull(): Promise<void>;
+
+  /** Push current memory state to database */
+  push(): Promise<void>;
 }
 
 /**

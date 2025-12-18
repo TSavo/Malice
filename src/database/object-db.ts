@@ -1,4 +1,4 @@
-import { MongoClient, Db, Collection, ChangeStream } from 'mongodb';
+import { MongoClient, Db, Collection } from 'mongodb';
 import type { GameObject, ObjId } from '../../types/object.js';
 
 /**
@@ -47,12 +47,9 @@ export class ObjectDatabase {
   private db!: Db;
   private objects!: Collection<GameObject>;
   private connected = false;
-  private changeStream?: ChangeStream;
-  private shuttingDown = false;
-  private watchRetryTimer?: ReturnType<typeof setTimeout>;
 
 
-  constructor(private uri: string, private dbName: string = 'malice') {}
+  constructor(private uri: string, private dbName: string = 'malice') { }
 
   /**
    * Connect to MongoDB
@@ -76,24 +73,8 @@ export class ObjectDatabase {
    * Disconnect from MongoDB
    */
   async disconnect(): Promise<void> {
-    this.shuttingDown = true;
-
-    if (this.watchRetryTimer) {
-      clearTimeout(this.watchRetryTimer);
-      this.watchRetryTimer = undefined;
-    }
-
-    if (this.changeStream) {
-      try {
-        await this.changeStream.close();
-      } finally {
-        this.changeStream = undefined;
-      }
-    }
-
-    if (!this.connected) return;
     await this.client.close();
-    this.connected = false;
+    console.log('[ObjectDatabase] Disconnected from MongoDB');
   }
 
   /**
@@ -174,13 +155,6 @@ export class ObjectDatabase {
         },
       }
     );
-  }
-
-  /**
-   * Delete object
-   */
-  async delete(id: ObjId): Promise<void> {
-    await this.objects.deleteOne({ _id: id });
   }
 
   /**
@@ -271,76 +245,6 @@ export class ObjectDatabase {
         methods: {},
       });
     }
-  }
-
-  /**
-   * Watch for changes to objects (for cache invalidation across servers)
-   * Enables multiple game servers / DevTools to share one MongoDB and stay in sync
-   */
-  watch(callback: (change: any) => void): void {
-    if (this.shuttingDown) {
-      return;
-    }
-
-    if (this.changeStream) {
-      console.warn('[ObjectDatabase] Already watching for changes');
-      return;
-    }
-
-    console.log('[ObjectDatabase] Watching for changes (multi-server cache sync enabled)');
-
-    // Use setImmediate to avoid blocking the constructor
-    setImmediate(() => {
-      if (this.shuttingDown) return;
-
-      try {
-        this.changeStream = this.objects.watch([], {
-          fullDocument: 'updateLookup', // Include full document on updates
-        });
-
-        this.changeStream.on('change', (change) => {
-          callback(change);
-        });
-
-        this.changeStream.on('error', (err) => {
-          // Ignore errors during shutdown.
-          if (this.shuttingDown) return;
-
-          console.error('[ObjectDatabase] Change stream error:', err);
-          this.changeStream = undefined;
-
-          if (this.watchRetryTimer) {
-            clearTimeout(this.watchRetryTimer);
-          }
-
-          this.watchRetryTimer = setTimeout(() => {
-            this.watchRetryTimer = undefined;
-            if (!this.changeStream && !this.shuttingDown) {
-              this.watch(callback);
-            }
-          }, 5000);
-        });
-
-        this.changeStream.on('close', () => {
-          console.log('[ObjectDatabase] Change stream closed');
-        });
-      } catch (err) {
-        if (this.shuttingDown) return;
-
-        console.error('[ObjectDatabase] Failed to start change stream:', err);
-
-        if (this.watchRetryTimer) {
-          clearTimeout(this.watchRetryTimer);
-        }
-
-        this.watchRetryTimer = setTimeout(() => {
-          this.watchRetryTimer = undefined;
-          if (!this.changeStream && !this.shuttingDown) {
-            this.watch(callback);
-          }
-        }, 5000);
-      }
-    });
   }
 
   /**

@@ -1,4 +1,7 @@
-# MongoDB Change Streams for Multi-Server Cache Invalidation
+# LEGACY: MongoDB Change Streams
+> **⚠️ NOTICE: Multi-server synchronization via Change Streams was REMOVED in December 2025.**
+> 
+> Malice v2 has transitioned to a **Single-Server In-Memory Model** where the entire database is loaded into memory at startup. This documentation is preserved for historical context only.
 
 ## Overview
 

@@ -51,40 +51,41 @@ function sanitizeForMongo(value: any, seen: WeakSet<object> = new WeakSet(), pat
 
 /**
  * Object manager - coordinates ObjectDatabase and RuntimeObjects
- * Provides in-memory caching with change stream invalidation
+ * Provides in-memory source of truth with database persistence
  *
- * Caching Strategy:
- * - Cache everything in memory, never evict
- * - Rely 100% on MongoDB change streams for invalidation
- * - Cache compiled method code to avoid repeated TypeScript compilation
- * - Cache parent chains for fast inheritance lookups
- * - Preload critical objects (prototypes, system) on startup
+ * Caching Strategy (Stable Proxy Architecture):
+ * - Full Warmup: The entire database is loaded into memory at startup (loadAll)
+ * - Array-Backed: O(1) access for positive IDs using a dense array
+ * - Stable Proxies: References never change and are never evicted
+ * - Async Write-Through: Memory is primary, DB is persisted in background
+ * - Method Caching: Compiled code and parent chains are cached for performance
  *
  * Dynamic Alias System:
  * - Core objects ($.system, $.authManager, etc.) are registered during bootstrap
  * - Custom aliases can be set: $.myAlias = object
  * - All aliases are loaded from MongoDB, not hardcoded in TypeScript
  * - Aliases can be configured via MOO code for maximum flexibility
- *
- * Watches MongoDB change streams for multi-server cache invalidation
  */
 export class ObjectManager {
   private cache: ObjectCache;
   private aliases = new Map<string, RuntimeObject>();
   public readonly db: ObjectDatabase; // Expose for DevTools direct access
 
-  // Track our own writes to avoid invalidating cache for them
-  private pendingWrites = new Map<ObjId, NodeJS.Timeout>();
 
   constructor(db: ObjectDatabase) {
     this.db = db;
     this.cache = new ObjectCache();
 
-    // Watch for changes from other servers/processes
-    this.setupChangeStreamWatcher();
     // Return a Proxy to enable dynamic property access
     return new Proxy(this, {
       get: (target, prop: string | symbol) => {
+        if (typeof prop === 'string' && prop.startsWith('$') && prop.length > 1) {
+          const id = parseInt(prop.slice(1), 10);
+          if (!isNaN(id)) {
+            return target.load(id);
+          }
+        }
+
         if (typeof prop === 'symbol' || prop in target) {
           return (target as any)[prop];
         }
@@ -95,31 +96,18 @@ export class ObjectManager {
         }
 
         // Check if it's a registered alias
-        if (target.aliases.has(prop)) {
-          return target.aliases.get(prop);
+        if (target.aliases.has(prop as string)) {
+          return target.aliases.get(prop as string);
         }
 
         return undefined;
       },
-
       set: (target, prop: string | symbol, value: any) => {
-        if (typeof prop === 'symbol') {
+        if (typeof prop === 'symbol' || prop in target) {
           (target as any)[prop] = value;
           return true;
         }
 
-        // Block reserved infrastructure aliases
-        if (RESERVED_ALIASES.has(prop)) {
-          console.warn(`[ObjectManager] Cannot overwrite reserved alias: ${prop}`);
-          return false;
-        }
-
-        // Don't allow overwriting internal properties
-        if (prop in target) {
-          return false;
-        }
-
-        // Register as an alias
         if (value && typeof value === 'object' && 'id' in value) {
           target.aliases.set(prop, value as RuntimeObject);
           return true;
@@ -128,6 +116,20 @@ export class ObjectManager {
         return false;
       }
     }) as any;
+  }
+
+  /**
+   * Get the underlying database
+   */
+  getDatabase(): ObjectDatabase {
+    return this.db;
+  }
+
+  /**
+   * Clear the object cache (for testing)
+   */
+  clearCache(): void {
+    this.cache.resetEverything();
   }
 
 
@@ -350,18 +352,13 @@ export class ObjectManager {
 
   /**
    * Update object in database
-   * @param invalidateCache - Whether to invalidate cache after update (default: true)
-   *   Set to false when called by RuntimeObject's auto-persist (in-memory is source of truth)
-   *   Set to true for external updates (DevTools, tests, etc)
+   * @param invalidateCache - Whether to invalidate transient caches (methods/parents)
    */
   async update(
     id: ObjId,
     updates: Partial<Omit<GameObject, '_id' | 'created'>>,
     invalidateCache = true
   ): Promise<void> {
-    // Track this write as ours so change stream doesn't invalidate it
-    this.trackWrite(id);
-
     await this.db.update(id, updates);
 
     if (invalidateCache) {
@@ -370,41 +367,12 @@ export class ObjectManager {
   }
 
   /**
-   * Track a write as belonging to this session
-   * Change stream will ignore changes to tracked writes
-   */
-  private trackWrite(id: ObjId): void {
-    // Clear existing timeout if present
-    if (this.pendingWrites.has(id)) {
-      clearTimeout(this.pendingWrites.get(id)!);
-    }
-
-    // Track this write for 2 seconds (change streams are usually fast)
-    const timeout = setTimeout(() => {
-      this.pendingWrites.delete(id);
-    }, 2000);
-
-    this.pendingWrites.set(id, timeout);
-  }
-
-  /**
-   * Delete object
-   */
-  async delete(id: ObjId): Promise<void> {
-    await this.db.delete(id);
-
-    // Invalidate everything related to this object
-    this.cache.invalidate(id);
-  }
-
-  /**
    * Find object by property value
    */
   async findByProperty(prop: string, value: PropertyValue): Promise<RuntimeObject[]> {
-    // This is inefficient for now - we'd need proper indexing in MongoDB
-    // For MVP, just scan all objects in memory
     const results: RuntimeObject[] = [];
 
+    // Scan cache - all objects are loaded at startup
     for (const obj of this.cache.values()) {
       if (obj.get(prop) === value) {
         results.push(obj);
@@ -429,13 +397,6 @@ export class ObjectManager {
     }
 
     return results;
-  }
-
-  /**
-   * Clear cache (force reload from DB)
-   */
-  clearCache(): void {
-    this.cache.clear();
   }
 
   /**
@@ -474,6 +435,36 @@ export class ObjectManager {
   }
 
   /**
+   * Invalidate transient caches (compiled methods, parent chains)
+   * Does NOT remove the object proxy (Stable Proxy Pattern)
+   */
+  invalidateTransientCache(id: ObjId): void {
+    this.cache.invalidate(id);
+  }
+
+  /**
+   * Pull fresh data from database for an object (updates in-place)
+   * Used to sync memory when DB is modified externally
+   */
+  async pull(id: ObjId): Promise<void> {
+    const obj = this.cache.getObject(id);
+    if (obj) {
+      await obj.pull();
+    }
+  }
+
+  /**
+   * Push current memory state to database for an object
+   * Forces a write of the in-memory object data
+   */
+  async push(id: ObjId): Promise<void> {
+    const obj = this.cache.getObject(id);
+    if (obj) {
+      await obj.push();
+    }
+  }
+
+  /**
    * Preload objects into cache
    * Marks them as preloaded for statistics
    */
@@ -490,6 +481,10 @@ export class ObjectManager {
   async loadAll(): Promise<number> {
     console.log('[ObjectManager] Loading all objects into memory...');
     const start = Date.now();
+
+    // Ensure core infrastructure objects are loaded first (special logic)
+    await this.load(-1); // $.nothing
+    await this.load(0);  // $ (ObjectManager)
 
     const allObjects = await this.db.listAll(false); // exclude recycled
     let count = 0;
@@ -626,26 +621,6 @@ export class ObjectManager {
     }
   }
 
-  /**
-   * Invalidate cache for a specific object
-   * Forces reload from database on next access
-   * Used by DevTools when external changes are made
-   * Invalidates object, compiled methods, and parent chains
-   */
-  invalidate(id: ObjId): void {
-    if (this.cache.hasObject(id)) {
-      console.log(`[ObjectManager] Invalidating cache for object #${id}`);
-    }
-    this.cache.invalidate(id);
-  }
-
-  /**
-   * Evict object from cache (for recycler to use)
-   * Does not reload - just removes from cache
-   */
-  evictFromCache(id: ObjId): void {
-    this.cache.invalidate(id);
-  }
 
   // ==========================================================================
   // MOO Helper Methods
@@ -786,44 +761,4 @@ export class ObjectManager {
     return result.insertedId.toString();
   }
 
-  /**
-   * Setup MongoDB change stream watcher
-   * Invalidates cache when objects are modified by other servers/processes
-   * Enables multi-server deployment with shared MongoDB
-   */
-  private setupChangeStreamWatcher(): void {
-    this.db.watch((change) => {
-      const operationType = change.operationType;
-
-      if (operationType === 'update' || operationType === 'replace') {
-        const id = change.documentKey._id as ObjId;
-
-        // Ignore our own writes (tracked by manager.update())
-        if (this.pendingWrites.has(id)) {
-          // This is our own write - don't invalidate cache
-          return;
-        }
-
-        // This is an external change (from another server/process)
-        if (this.cache.hasObject(id)) {
-          console.log(
-            `[ObjectManager] External change detected for object #${id} - invalidating cache`
-          );
-        }
-        this.cache.invalidate(id);
-      } else if (operationType === 'delete') {
-        const id = change.documentKey._id as ObjId;
-
-        // Invalidate everything related to this object
-        this.cache.invalidate(id);
-
-        // Remove from aliases
-        for (const [name, obj] of this.aliases) {
-          if (obj.id === id) {
-            this.aliases.delete(name);
-          }
-        }
-      }
-    });
-  }
 }

@@ -4,7 +4,8 @@
  * Features:
  * - Telnet transport with full RFC854 protocol support
  * - WebSocket transport for modern web clients
- * - Reactive architecture using RxJS
+ * - Stable Proxy Architecture with O(1) array cache
+ * - In-memory source of truth (full database warmup)
  * - LambdaMOO-style object database with MongoDB
  * - Prototype-based inheritance
  * - Dynamic method execution

@@ -8,7 +8,7 @@ import type { RuntimeObject } from '../../../types/object.js';
 export class RecyclerBuilder {
   private recycler: RuntimeObject | null = null;
 
-  constructor(private manager: ObjectManager) {}
+  constructor(private manager: ObjectManager) { }
 
   async build(forceRebuild = false): Promise<void> {
     // Check if already exists via alias
@@ -182,9 +182,6 @@ export class RecyclerBuilder {
           obj._deleted = true;
           obj._deletedAt = new Date().toISOString();
 
-          // Evict from cache AFTER saving
-          $.evictFromCache(objectId);
-
           console.log(\`Recycled object #\${objectId}\`);
           return { recycled: objectId };
         `);
@@ -259,36 +256,6 @@ export class RecyclerBuilder {
       // Now recycle this object
       await self.recycle(objectId, caller);
     `);
-
-    this.recycler.setMethod('purge', `
-          const objectId = args[0];
-          const caller = args[1];
-
-          // Only wizards can purge
-          if (!caller?.isWizard) {
-            throw new Error('Only wizards can permanently delete objects');
-          }
-
-          // Clear aliases pointing to this object
-          await $.clearAliasesForObject(objectId);
-
-          // Evict from cache
-          $.evictFromCache(objectId);
-
-          // Delete from database
-          await $.db.delete(objectId);
-
-          // Remove from recycle bin
-          const bin = self.recycleBin || [];
-          const index = bin.findIndex(item => item.id === objectId);
-          if (index !== -1) {
-            bin.splice(index, 1);
-            self.recycleBin = bin;
-          }
-
-          console.log(\`Purged object #\${objectId}\`);
-          return { purged: objectId };
-        `);
   }
 
   async registerAlias(): Promise<void> {
@@ -298,6 +265,6 @@ export class RecyclerBuilder {
     if (!objectManager) return;
 
     await objectManager.call('addAlias', 'recycler', this.recycler.id);
-    console.log(`✅ Registered recycler alias -> #${this.recycler.id}`);
+    console.log(`✅ Registered recycler alias -> #${this.recycler.id} `);
   }
 }

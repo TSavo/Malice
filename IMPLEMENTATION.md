@@ -36,9 +36,9 @@ A complete, modern, reactive TMMO engine with a LambdaMOO-style object system, b
                              │
 ┌────────────────────────────┴────────────────────────────────┐
 │                      MongoDB                                │
-│  - Game objects (properties + methods as TypeScript)        │
-│  - Change streams (multi-server cache sync)                 │
-│  - Replica set (required for change streams)                │
+│  - Durable backing store                                   │
+│  - Loaded entirely into memory at startup                  │
+│  - Asynchronous persistence                                 │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -314,8 +314,9 @@ await $.4.describe();
 const sys = $.system;
 const auth = $.authManager;
 
-// Async load
-const obj = await $.load(someId);
+// Explicit Sync
+await obj.push(); // Push memory to DB
+await obj.pull(); // Pull DB to memory
 ```
 
 ## Testing
@@ -357,11 +358,11 @@ npm run typecheck
 
 ## Performance
 
-- **Object caching**: RuntimeObjects cached in memory
-- **Change streams**: Automatic cache invalidation across servers
-- **Compiled methods**: TypeScript compiled once, cached
-- **Lazy loading**: Objects loaded on-demand
-- **Prototype sharing**: Methods inherited, not duplicated
+- **O(1) Array Cache**: Direct array access for all positive object IDs.
+- **In-Memory Model**: Entire world state loaded at startup. Zero DB reads during gameplay.
+- **Stable Proxy Pattern**: Object references never change. Zero eviction overhead.
+- **Asynchronous IO**: Persistence to MongoDB happens in the background.
+- **Compiled methods**: TypeScript compiled once, cached in memory.
 
 ## Security Notes
 
