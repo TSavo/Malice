@@ -30,9 +30,9 @@ Complete architectural overview of the DevTools system.
 │                             ↓                               │
 │  ┌──────────────────────────────────────────────────────┐   │
 │  │           ObjectManager (Shared)                     │   │
-│  │  - Cache: Map<ObjId, RuntimeObject>                  │   │
-│  │  - Change Stream Watcher                             │   │
-│  │  - Cache Invalidation                                │   │
+│  │  - Stable Proxy Cache: Map<ObjId, RuntimeObject>     │   │
+│  │  - In-memory state = source of truth                 │   │
+│  │  - Background persistence to MongoDB                 │   │
 │  └────────────────────┬─────────────────────────────────┘   │
 │                       │                                     │
 │  ┌────────────────────┴─────────────────────────────────┐   │
@@ -51,14 +51,33 @@ Complete architectural overview of the DevTools system.
           │  ┌────────────────────────┐  │
           │  │  objects collection    │  │
           │  │  - GameObject docs     │  │
-          │  │  - Change stream       │  │
+          │  │  - Persistence only    │  │
           │  └────────────────────────┘  │
           └──────────────────────────────┘
 ```
 
+## Core Architecture: Stable Proxy Pattern
+
+**There is one source of truth: in-memory state.**
+
+### Key Principles
+
+1. **On startup, `loadAll()` loads everything from MongoDB into memory as stable proxies**
+2. **Any change to in-memory state persists immediately to DB in the background**
+3. **There is NO multi-server setup** - single server architecture
+4. **There are NO external changes coming from the DB**
+5. **Stable Proxy Pattern**: Once a proxy is created, it's never evicted, never recreated
+6. **`load()` is effectively a synchronous in-memory lookup after startup**
+
+### Why No Change Streams?
+
+- Single server = no need for cross-server invalidation
+- In-memory state IS the truth, DB is just persistence
+- Simpler, faster, no MongoDB replica set requirement
+
 ## Data Flow
 
-### 1. Reading an Object (VS Code → MongoDB)
+### 1. Reading an Object (VS Code → In-Memory)
 
 ```
 VS Code Extension
@@ -66,57 +85,48 @@ VS Code Extension
 DevToolsServer.handle({ method: "object.get", params: { id: 3 } })
   ↓ (thin wrapper)
 ObjectManager.load(3)
-  ↓ (check cache)
-Cache hit? → Return cached RuntimeObject
-Cache miss? → Query MongoDB
-  ↓
-MongoDB.findOne({ _id: 3 })
-  ↓
-RuntimeObject created & cached
+  ↓ (in-memory lookup - always a cache hit after startup)
+Return stable RuntimeObject proxy
   ↓ (return)
 VS Code receives GameObject JSON
 ```
 
-### 2. Writing an Object (VS Code → MongoDB → Other Servers)
+After `loadAll()` on startup, `load()` is essentially synchronous - it just returns the cached proxy.
+
+### 2. Writing an Object (VS Code → In-Memory → MongoDB)
 
 ```
 VS Code Extension (save method)
   ↓ (send JSON-RPC request)
 DevToolsServer.handle({ method: "method.set", params: { objectId: 3, name: "onInput", code: "..." } })
   ↓ (thin wrapper)
-ObjectDatabase.update(3, { methods.onInput: "..." })
+RuntimeObject.setMethod("onInput", { code: "..." })
+  ↓ (in-memory update)
+Proxy state updated immediately
+  ↓ (background persistence)
+ObjectDatabase.update(3, { ... }) → MongoDB
   ↓
-MongoDB.updateOne({ _id: 3 }, { $set: { ... } })
-  ↓ (write complete)
-ObjectManager.invalidate(3) ← Clear local cache
-  ↓
-MongoDB Change Stream fires
-  ↓ (broadcasts to all watchers)
-  ├─→ Game Server 1: ObjectManager.invalidate(3)
-  ├─→ Game Server 2: ObjectManager.invalidate(3)
-  └─→ DevTools Server 2: ObjectManager.invalidate(3)
-      ↓
-  All servers' caches cleared
-      ↓
-  Next load(3) reads fresh data from MongoDB ✓
+Write complete ✓
 ```
 
-### 3. Type Generation (MongoDB → VS Code)
+The key insight: changes are visible immediately in-memory. MongoDB persistence happens in the background.
+
+### 3. Type Generation (In-Memory → VS Code)
 
 ```
-ObjectManager detects change (via change stream)
+DevTools client requests types
   ↓
 TypeGenerator.generate()
-  ↓ (queries MongoDB)
-ObjectManager.db.listAll() → All GameObjects
+  ↓ (iterates in-memory cache)
+ObjectManager.cache → All RuntimeObjects
   ↓ (for each object)
 Generate TypeScript interface
   ↓ (combine all)
 Complete .d.ts file
-  ↓ (send to all clients)
-DevToolsServer.broadcast({ method: "types.updated", params: { definitions: "..." } })
+  ↓ (send to client)
+DevToolsServer sends response
   ↓ (WebSocket)
-VS Code Extension receives notification
+VS Code Extension receives types
   ↓ (write file)
 .malice/generated.d.ts written
   ↓ (TypeScript engine reloads)
@@ -148,17 +158,17 @@ class DevToolsServer {
   // Thin wrappers around ObjectManager:
   private listObjects()                           // → manager.db.listAll()
   private getObject(id)                           // → manager.load(id)
-  private setMethod(id, name, code)               // → manager.db.update()
+  private setMethod(id, name, code)               // → obj.setMethod()
   // ... etc
 }
 ```
 
 ### TypeGenerator (`src/devtools/type-generator.ts`)
 
-**Purpose:** Generate TypeScript definitions from MongoDB
+**Purpose:** Generate TypeScript definitions from in-memory objects
 
 **Responsibilities:**
-- ✅ Query ObjectManager for all objects
+- ✅ Query ObjectManager cache for all objects
 - ✅ Infer TypeScript types from property values
 - ✅ Generate interface per object
 - ✅ Generate ObjectManager interface with aliases
@@ -206,48 +216,42 @@ class MaliceLSP {
 
 ### ObjectManager (`src/database/object-manager.ts`)
 
-**Purpose:** Single source of truth for game objects
+**Purpose:** Single source of truth for game objects (in-memory)
 
 **Responsibilities:**
-- ✅ Load objects from MongoDB
-- ✅ Cache RuntimeObjects in memory
-- ✅ Watch MongoDB change streams
-- ✅ Invalidate cache on external changes
-- ✅ Manage aliases ($.system, $.authManager, etc.)
+- ✅ Load all objects into memory on startup via `loadAll()`
+- ✅ Maintain stable proxy cache (proxies never evicted)
+- ✅ Provide synchronous access via `getSync(id)`
+- ✅ Background persistence to MongoDB
+- ✅ Manage aliases ($.system, $.recycler, etc.)
 - ✅ Expose `db` property for DevTools direct access
 
 **Key Properties:**
 ```typescript
 class ObjectManager {
-  public readonly db: ObjectDatabase      // DevTools uses this
-  private cache: Map<ObjId, RuntimeObject> // Performance cache
-  private aliases: Map<string, RuntimeObject> // Dynamic aliases
+  public readonly db: ObjectDatabase              // For DevTools/bootstrap
+  private cache: ObjectCache                      // Stable proxy cache
+  private aliases: Map<string, RuntimeObject>     // Dynamic aliases
 
-  async load(id: ObjId): Promise<RuntimeObject>
-  invalidate(id: ObjId): void              // Clear cache for object
-  private setupChangeStreamWatcher(): void  // Auto-invalidate
+  async loadAll(): Promise<void>                  // Load everything on startup
+  async load(id: ObjId): Promise<RuntimeObject>   // Get proxy (cache hit after loadAll)
+  getSync(id: ObjId): RuntimeObject | null        // Synchronous lookup
+  invalidate(id: ObjId): void                     // Clear transient caches only
 }
 ```
 
-**Change Stream Flow:**
+**Stable Proxy Pattern:**
 ```typescript
-// On construction:
-constructor(db: ObjectDatabase) {
-  this.db = db;
-  this.setupChangeStreamWatcher(); // ← Starts watching
-}
+// After loadAll(), this is essentially synchronous:
+const obj = await manager.load(42);  // Returns cached proxy
 
-private setupChangeStreamWatcher() {
-  this.db.watch((change) => {
-    if (change.operationType === 'update') {
-      const id = change.documentKey._id;
-      if (this.cache.has(id)) {
-        console.log(`External change for #${id} - invalidating`);
-        this.cache.delete(id); // ← Cache invalidated
-      }
-    }
-  });
-}
+// The same proxy is always returned:
+const obj1 = await manager.load(42);
+const obj2 = await manager.load(42);
+obj1 === obj2  // true - same proxy reference
+
+// Proxies are never evicted:
+// Old references remain valid forever
 ```
 
 ### ObjectDatabase (`src/database/object-db.ts`)
@@ -257,9 +261,9 @@ private setupChangeStreamWatcher() {
 **Responsibilities:**
 - ✅ Connect to MongoDB
 - ✅ CRUD operations on `objects` collection
-- ✅ Watch change streams
-- ✅ Expose callback for change events
+- ✅ Sequential ID allocation via `getNextId()`
 - ❌ NO caching (that's ObjectManager's job)
+- ❌ NO change streams (single server, in-memory is truth)
 
 **Key Methods:**
 ```typescript
@@ -268,58 +272,23 @@ class ObjectDatabase {
   async get(id: ObjId): Promise<GameObject | null>
   async update(id: ObjId, updates: Partial<GameObject>): Promise<void>
   async listAll(): Promise<GameObject[]>
-
-  watch(callback: (change: ChangeStreamDocument) => void): void
+  async getNextId(): Promise<ObjId>               // Sequential allocation
 }
 ```
 
-## Multi-Server Synchronization
+### Object Lifecycle: $.recycler
 
-### Scenario: Two Game Servers + DevTools
+**All object creation and destruction goes through `$.recycler`:**
 
-```
-┌──────────────┐  ┌──────────────┐  ┌──────────────┐
-│ Game Server 1│  │ Game Server 2│  │ DevTools     │
-├──────────────┤  ├──────────────┤  ├──────────────┤
-│ObjectManager │  │ObjectManager │  │ObjectManager │
-│  cache: {    │  │  cache: {    │  │  cache: {}   │
-│    #3: obj   │  │    #3: obj   │  │              │
-│  }           │  │  }           │  │              │
-└──────┬───────┘  └──────┬───────┘  └──────┬───────┘
-       │                 │                 │
-       └─────────────────┴─────────────────┘
-                         ↓
-              ┌──────────────────┐
-              │    MongoDB       │
-              │  Change Stream   │
-              └──────────────────┘
+```typescript
+// Creating objects:
+const newObj = await $.recycler.allocate(parentId);
+
+// Recycling objects (soft delete, ID can be reused):
+await $.recycler.recycle(objectId);
 ```
 
-**Timeline:**
-
-1. **DevTools modifies object #3**
-   ```
-   DevTools → MongoDB.update({ _id: 3 })
-   DevTools → ObjectManager.invalidate(3)
-   ```
-
-2. **MongoDB broadcasts change event**
-   ```
-   MongoDB Change Stream → { operationType: 'update', documentKey: { _id: 3 } }
-   ```
-
-3. **All servers receive event**
-   ```
-   Game Server 1: ObjectManager receives event → cache.delete(3)
-   Game Server 2: ObjectManager receives event → cache.delete(3)
-   DevTools: (already invalidated in step 1)
-   ```
-
-4. **Next read loads fresh data**
-   ```
-   Game Server 1: load(3) → cache miss → MongoDB.findOne() → fresh data ✓
-   Game Server 2: load(3) → cache miss → MongoDB.findOne() → fresh data ✓
-   ```
+The database layer does NOT have recycle methods - all lifecycle management is handled by the in-game `$.recycler` object.
 
 ## Security Boundaries
 
@@ -357,88 +326,71 @@ class ObjectDatabase {
 
 | Component | Memory Footprint |
 |-----------|-----------------|
-| ObjectManager cache | O(n) objects cached |
-| Change stream | ~1MB overhead |
+| ObjectManager cache | O(n) objects - ALL objects loaded |
 | TypeGenerator | O(n) during generation, 0 after |
 | DevToolsServer | O(m) connected clients |
 
-**Total:** Minimal overhead (~5-10MB for typical usage)
-
-### Network Traffic
-
-| Operation | Size | Frequency |
-|-----------|------|-----------|
-| Change stream event | ~100 bytes | On every DB write |
-| Type generation | ~100KB for 1000 objects | Debounced (500ms) |
-| JSON-RPC request | ~500 bytes | User-initiated |
-| JSON-RPC response | ~5KB average | Per request |
-
-**Total bandwidth:** <1MB/min typical usage
+**Total:** All objects in memory (~10-50MB for typical game)
 
 ### Latency
 
 | Operation | Latency |
 |-----------|---------|
-| Cache hit | <1ms |
-| Cache miss (MongoDB) | ~5-10ms |
-| Change stream propagation | ~10-50ms |
+| load() after startup | <0.1ms (in-memory lookup) |
+| getSync() | <0.1ms (synchronous) |
+| Property/method access | <0.1ms (in-memory) |
+| MongoDB persistence | ~5-10ms (background, non-blocking) |
 | Type generation | ~100ms for 1000 objects |
+
+### Why This Is Fast
+
+- **No cache misses after startup** - everything is loaded
+- **No MongoDB queries during gameplay** - only background writes
+- **Stable proxies** - no object recreation overhead
+- **Synchronous access** - `getSync()` for hot paths
 
 ## Failure Modes
 
-### Change Stream Disconnection
-
-**Symptom:** Cache not invalidating across servers
-
-**Detection:**
-```typescript
-this.changeStream.on('error', (err) => {
-  console.error('[ObjectDatabase] Change stream error:', err);
-});
-```
-
-**Recovery:** Automatic reconnection after 5 seconds
-
-**Impact:** Temporary stale reads (eventual consistency)
-
 ### MongoDB Connection Loss
 
-**Symptom:** All DB operations fail
+**Symptom:** Background persistence fails
 
 **Detection:** MongoDB driver throws connection errors
 
-**Recovery:** Application-level reconnection logic (future enhancement)
+**Impact:** 
+- Game continues running (in-memory state is fine)
+- Changes not persisted until reconnection
+- Recovery: reconnect and flush pending writes
 
-**Impact:** DevTools unavailable until reconnection
+### Stale Data Suspicion
 
-### Cache Corruption
+**Symptom:** Data seems incorrect
 
-**Symptom:** Stale data returned even after invalidation
+**Detection:** Compare in-memory state with MongoDB
 
-**Detection:** Compare cache version with MongoDB timestamp
-
-**Recovery:**
+**Recovery:** With stable proxy pattern, this should not occur.
+If suspected, use surgical invalidation:
 ```typescript
-objectManager.clearCache(); // Nuclear option
+objectManager.invalidate(id); // Invalidates compiled methods and parent chains
 ```
 
-**Impact:** Performance hit on next load (all cache misses)
+**Impact:** Minimal - only clears transient caches for one object
 
 ## Testing Strategy
 
 ### Unit Tests
 
-- `ObjectDatabase.watch()` calls callback on changes
-- `ObjectManager.invalidate()` clears cache
+- `ObjectManager.load()` returns cached proxy
+- `ObjectManager.getSync()` returns synchronous lookup
+- `ObjectManager.invalidate()` clears transient caches
 - `TypeGenerator.generate()` produces valid TypeScript
 - `DevToolsServer.handle()` routes to correct methods
 
 ### Integration Tests
 
-- Two ObjectManagers + one MongoDB
-- Server 1 writes → Server 2 cache invalidates
-- DevTools edits → Game server sees changes
-- Concurrent writes to different objects
+- Full bootstrap → all objects loaded
+- DevTools edits → changes visible immediately
+- Concurrent property updates
 
 ### End-to-End Tests
 
@@ -454,15 +406,11 @@ objectManager.clearCache(); // Nuclear option
 
 ```typescript
 // Cache statistics
-objectManager.getCacheSize()           // Current cache size
-cacheHitRate = hits / (hits + misses)  // Cache effectiveness
-
-// Change stream statistics
-changeStreamEventsReceived             // Total events
-cacheInvalidationsTriggered            // Actual invalidations
+objectManager.getCacheSize()           // Should equal total object count
 
 // Performance
-avgLoadLatency                         // Load time (cached vs uncached)
+avgLoadLatency                         // Should be <1ms after startup
+pendingWritesCount                     // Background writes queued
 typeGenerationDuration                 // Time to regenerate .d.ts
 ```
 
@@ -470,10 +418,8 @@ typeGenerationDuration                 // Time to regenerate .d.ts
 
 ```typescript
 // ObjectManager
-console.log(`[ObjectManager] External change for #${id} - invalidating cache`);
-
-// ObjectDatabase
-console.log(`[ObjectDatabase] Watching for changes (multi-server sync enabled)`);
+console.log(`[ObjectManager] Loaded ${count} objects`);
+console.log(`[ObjectManager] Invalidating transient caches for #${id}`);
 
 // DevToolsServer
 console.log(`[DevTools] Client connected`);
@@ -486,7 +432,7 @@ console.log(`[DevTools] method.set: object #${id}.${methodName}`);
 
 ```
 Laptop
-  ├─ MongoDB (Docker)
+  ├─ MongoDB (Docker or local)
   ├─ Malice Server (bun run dev)
   │   ├─ Game (port 5555)
   │   └─ DevTools (port 9999)
@@ -504,17 +450,14 @@ Dev Server                      Developer's Laptop
   │                           ssh -L 9999:localhost:9999
 ```
 
-### Production (Multi-Server)
+### Production (Single Server)
 
 ```
-Load Balancer
-  ↓
-  ├─→ Game Server 1 (no DevTools)
-  ├─→ Game Server 2 (no DevTools)
-  └─→ Game Server 3 (no DevTools)
-        ↓
-    MongoDB Cluster
-    (authenticated, TLS)
+Production Server
+  ├─ MongoDB (localhost, authenticated)
+  └─ Malice Server
+      └─ Game (port 5555)
+      (NO DevTools in production)
 ```
 
 **Note:** DevTools disabled in production (`NODE_ENV=production`)
@@ -523,30 +466,38 @@ Load Balancer
 
 **Key Architectural Principles:**
 
-1. **MongoDB = Single Source of Truth**
-   - All state persisted immediately
-   - Cache is performance optimization only
+1. **In-Memory = Single Source of Truth**
+   - All objects loaded on startup via `loadAll()`
+   - MongoDB is persistence layer only
+   - No external changes to watch for
 
-2. **Change Streams = Multi-Server Sync**
-   - Automatic cache invalidation
-   - No polling required
-   - Event-driven architecture
+2. **Stable Proxy Pattern**
+   - Proxies never evicted, never recreated
+   - Old references remain valid forever
+   - `load()` is synchronous after startup
 
-3. **ObjectManager = Shared Layer**
-   - Game and DevTools use same instance
-   - One cache, one connection, one source of truth
+3. **Single Server Architecture**
+   - No multi-server sync needed
+   - No change streams
+   - Simpler, faster, more reliable
 
-4. **DevTools = Thin Transport**
+4. **$.recycler = Object Lifecycle**
+   - All creation via `$.recycler.allocate()`
+   - All destruction via `$.recycler.recycle()`
+   - No lifecycle methods in DB/Manager layer
+
+5. **DevTools = Thin Transport**
    - No business logic
    - Just JSON-RPC ↔ ObjectManager translation
 
-5. **Security = Network Isolation**
+6. **Security = Network Isolation**
    - Localhost-only by default
    - SSH tunneling for remote access
    - Disabled in production
 
 **This architecture enables:**
-✅ Live editing without restarts
-✅ Multiple servers sharing one database
-✅ Real-time IntelliSense from live data
-✅ Zero-copy deployment (edits are permanent)
+- ✅ Live editing without restarts
+- ✅ Sub-millisecond object access
+- ✅ Real-time IntelliSense from live data
+- ✅ Zero-copy deployment (edits are permanent)
+- ✅ Simple single-server deployment

@@ -64,8 +64,8 @@ describe.sequential('DevToolsServer', () => {
     await db['objects'].deleteMany({});
     await db.ensureRoot();
 
-    // Clear manager's cache
-    manager.clearCache();
+    // Load root object fresh (stable proxy pattern - no cache clearing)
+    await manager.loadAll();
   });
 
   /**
@@ -333,7 +333,8 @@ describe.sequential('DevToolsServer', () => {
       await connectClient();
 
       const obj1 = await manager.create({ parent: 1, properties: {}, methods: {} });
-      await manager.delete(obj1.id); // Recycle it
+      // Mark as recycled via raw MongoDB (recycling is handled by $.recycler in game)
+      await db['objects'].updateOne({ _id: obj1.id }, { $set: { recycled: true } });
 
       const result = await sendRequest('objects.list');
 
@@ -347,12 +348,8 @@ describe.sequential('DevToolsServer', () => {
 
       const obj1 = await manager.create({ parent: 1, properties: {}, methods: {} });
 
-      // Use devtools API to delete (recycle) the object
-      await sendRequest('object.delete', { id: obj1.id });
-
-      // Wait for change stream to process and invalidate cache
-      await new Promise(resolve => setTimeout(resolve, 100));
-      manager.clearCache();
+      // Mark as recycled via raw MongoDB (recycling is handled by $.recycler in game)
+      await db['objects'].updateOne({ _id: obj1.id }, { $set: { recycled: true } });
 
       const result = await sendRequest('objects.list', { includeRecycled: true });
 
@@ -447,42 +444,6 @@ describe.sequential('DevToolsServer', () => {
     });
   });
 
-  describe('object.delete', () => {
-    it('should delete object', async () => {
-      await connectClient();
-
-      const obj = await manager.create({ parent: 1, properties: {}, methods: {} });
-
-      const result = await sendRequest('object.delete', { id: obj.id });
-
-      expect(result.success).toBe(true);
-
-      // Wait for change stream to process and invalidate cache
-      await new Promise(resolve => setTimeout(resolve, 100));
-      manager.clearCache();
-
-      // Verify object was recycled
-      const loaded = await manager.load(obj.id);
-      expect(loaded!._getRaw().recycled).toBe(true);
-    });
-
-    // Skip: Multi-client broadcast tests are flaky in test environment due to timing
-    it('should broadcast object.deleted notification', async () => {
-      await connectClient();
-      const obj = await manager.create({ parent: 1, properties: {}, methods: {} });
-      const { waitForNotification, cleanup } = await setupNotificationClient();
-
-      try {
-        await sendRequest('object.delete', { id: obj.id });
-
-        const notification: any = await waitForNotification();
-        expect(notification.method).toBe('object.deleted');
-        expect(notification.params.id).toBe(obj.id);
-      } finally {
-        cleanup();
-      }
-    });
-  });
 
   describe('method.get', () => {
     it('should get method code', async () => {
@@ -582,9 +543,8 @@ describe.sequential('DevToolsServer', () => {
 
       await sendRequest('method.delete', { objectId: obj.id, name: 'test' });
 
-      // Wait for change stream to process and invalidate cache
+      // Wait for DB write to complete - stable proxy reflects changes immediately
       await new Promise(resolve => setTimeout(resolve, 100));
-      manager.clearCache();
 
       const loaded = await manager.load(obj.id);
       expect(loaded!.getOwnMethods().test).toBeUndefined();
@@ -640,9 +600,8 @@ describe.sequential('DevToolsServer', () => {
         value: 'newValue',
       });
 
-      // Wait for change stream to process and invalidate cache
+      // Wait for DB write to complete - stable proxy reflects changes immediately
       await new Promise(resolve => setTimeout(resolve, 100));
-      manager.clearCache();
 
       const loaded = await manager.load(obj.id);
       expect(loaded!.get('newProp')).toBe('newValue');

@@ -58,11 +58,11 @@ describe('LSP API Server', () => {
   }, 15000);
 
   beforeEach(async () => {
-    // Clean up test objects (except root)
+    // Clean up test objects (except root) - mark as recycled via raw MongoDB
     const allObjects = await db.listAll();
     for (const obj of allObjects) {
       if (obj._id > 1) {
-        await db.delete(obj._id);
+        await db['objects'].updateOne({ _id: obj._id }, { $set: { recycled: true } });
       }
     }
   });

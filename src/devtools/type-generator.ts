@@ -302,8 +302,6 @@ interface ObjectManager {
   /** Create new object */
   create(data: { parent: number; properties?: Record<string, any>; methods?: Record<string, any> }): Promise<RuntimeObject>;
 
-  /** Delete (recycle) object */
-  delete(id: number): Promise<void>;
 
   /** Get all aliases */
   getAliases(): Map<string, RuntimeObject>;

@@ -51,7 +51,7 @@ export class GameBootstrap {
 
     // Phase 0: Load ALL objects into memory
     // This ensures synchronous property access (getSync/fromValue) always works
-    // Database is only accessed for: initial load, writes, change stream invalidation
+    // In-memory state is the single source of truth; DB is only for persistence.
     await this.manager.loadAll();
 
     // Phase 1: Create minimal required objects

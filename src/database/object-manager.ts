@@ -71,7 +71,6 @@ export class ObjectManager {
   private aliases = new Map<string, RuntimeObject>();
   public readonly db: ObjectDatabase; // Expose for DevTools direct access
 
-
   // Track in-flight update operations (fire-and-forget writes from RuntimeObject)
   private pendingUpdateOperations = new Set<Promise<void>>();
 
@@ -127,14 +126,6 @@ export class ObjectManager {
   getDatabase(): ObjectDatabase {
     return this.db;
   }
-
-  /**
-   * Clear the object cache (for testing)
-   */
-  clearCache(): void {
-    this.cache.resetEverything();
-  }
-
 
   /**
    * Load object from database (with caching)
@@ -379,10 +370,6 @@ export class ObjectManager {
   /**
    * Find object by property value
    */
-
-  /**
-   * Find object by property value
-   */
   async findByProperty(prop: string, value: PropertyValue): Promise<RuntimeObject[]> {
     const results: RuntimeObject[] = [];
 
@@ -472,6 +459,15 @@ export class ObjectManager {
   }
 
   /**
+   * Legacy alias for invalidating transient caches.
+   *
+   * Older tests and tooling call `manager.invalidate(id)`.
+   */
+  invalidate(id: ObjId): void {
+    this.invalidateTransientCache(id);
+  }
+
+  /**
    * Pull fresh data from database for an object (updates in-place)
    * Used to sync memory when DB is modified externally
    */
@@ -505,7 +501,7 @@ export class ObjectManager {
   /**
    * Load ALL objects into memory at startup
    * This ensures synchronous property access via getSync() always works
-   * Database is only accessed for initial load and writes.
+   * In-memory state is the single source of truth; DB is only for persistence.
    */
   async loadAll(): Promise<number> {
     console.log('[ObjectManager] Loading all objects into memory...');
@@ -629,26 +625,7 @@ export class ObjectManager {
     return new Map(this.aliases);
   }
 
-  /**
-   * Recycle an object (soft delete, ID can be reused)
-   * LambdaMOO-style recycling: marks object as deleted but keeps ID for reuse
-   */
-  async recycle(objOrId: RuntimeObject | ObjId): Promise<void> {
-    const id = typeof objOrId === 'number' ? objOrId : objOrId.id;
 
-    // Mark as recycled in database
-    await this.db.recycle(id);
-
-    // Invalidate cache (object, methods, parent chains)
-    this.cache.invalidate(id);
-
-    // Remove from aliases
-    for (const [name, obj] of this.aliases) {
-      if (obj.id === id) {
-        this.aliases.delete(name);
-      }
-    }
-  }
 
 
   // ==========================================================================

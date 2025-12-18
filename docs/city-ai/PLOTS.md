@@ -12,6 +12,24 @@ A plot is a narrative container - a story that plays out through:
 
 Plots give meaning to work. Instead of "repair pipe," it becomes "restore water to the refugee camp before disease spreads."
 
+## The Critical Rule: NPCs Are The Continuation
+
+**Every plot phase needs an NPC to carry it forward.**
+
+The NPC is not decoration — it's the mechanism. When a player completes a task, they talk to an NPC. That NPC's system prompt contains:
+- How to evaluate what the player did
+- What success and failure look like
+- What to do next in either case
+- Who to hand off to, if anyone
+
+Plots can be open-ended. You don't need to pre-script every beat. You just need NPCs with detailed enough prompts to handle whatever comes.
+
+**Example:** Instead of scripting a five-job sequence, you spawn one NPC with instructions: "Evaluate this player. If they pass, assign [next job] or send them to [next NPC]. If they fail, [consequences]."
+
+The NPC carries the state. The plot continues through conversation.
+
+See [SCENARIOS.md](./SCENARIOS.md) for detailed NPC prompt templates.
+
 ## Plot Structure
 
 ```
@@ -333,7 +351,7 @@ const recruiter = await ai({ action: 'spawn', role: 'recruiter', name: 'Outreach
 
 // 3. Walk recruiter to player's location
 await ai({ action: 'do', humanId: recruiter.id, command: 'north' });
-await ai({ action: 'do', humanId: recruiter.id, command: 'say You look hungry. The Continuum can help.' });
+await ai({ action: 'do', humanId: recruiter.id, command: 'say You look hungry. Citizenship can help.' });
 
 // 4. Recruiter delivers pitch
 await ai({ action: 'do', humanId: recruiter.id, command: 'say Citizenship means food, shelter, work. Register at City Services. Tell them I sent you.' });
@@ -539,18 +557,242 @@ plot.unregisterJobHook(jobId, targetId, eventName)
    └── Plot ready for next phase or closure
 ```
 
-## Plot Templates
-
-Reference implementations for common situations are in the [plots/](plots/) directory:
-
-- [first-rations.md](plots/first-rations.md) - Onboarding: grants citizenship, first job collecting rations
-- [supply-delivery.md](plots/supply-delivery.md) - Second job: pick up package, deliver to destination
-
-These templates show complete implementations with hooks, phases, and handler responses. Adapt them to specific circumstances.
-
 ## Remember
 
 Plots are stories. They unfold over time. They involve characters. They have beginnings, middles, and ends.
 
 A job without a plot is just work.
 A job within a plot is a chapter in someone's story.
+
+---
+
+## Cartel Plots
+
+Cartel plots work the same way mechanically — but look completely different to players.
+
+### Key Differences
+
+| Pluribus Plots | Cartel Plots |
+|----------------|--------------|
+| Work orders on terminals | Verbal instructions only |
+| Formal job acceptance | Handshake deals |
+| System-tracked progress | Handler observation |
+| Credit rewards | Cash, goods, favors |
+| Official records | Nothing written down |
+
+The city-ai tracks both. Players only see the surface difference.
+
+### Cartel Recruitment Arc
+
+A new player catches the Cartel's attention.
+
+```javascript
+// Phase 1: Observation
+const result = await plot({ action: 'create', name: 'Cartel Eval: ' + playerName, metadata: {
+  type: 'cartel_recruitment',
+  playerId: player.id,
+  stage: 'observation'
+}});
+const plotId = result.plotId;
+
+await plot({ action: 'add_event', plotId, 
+  message: 'Subject identified. New arrival. Doesn\'t seem to fit the citizen mold.',
+  from: 'handler'
+});
+
+// Phase 2: First Contact
+// Spawn recruiter, approach player, give first test job
+// See JOBS.md for job mechanics
+
+await plot({ action: 'set_metadata', plotId, key: 'stage', value: 'first_contact' });
+
+// Phase 3: Evaluation
+// Did they complete the job? Accurately? On time?
+// Update stage based on outcome
+
+// Phase 4: Decision
+// If passed: invite to second test, deeper involvement
+// If failed: cut contact, mark as unreliable
+// If betrayed: mark as burned, initiate consequences
+
+await plot({ action: 'close', plotId, status: 'completed', 
+  reason: 'Subject evaluated. Outcome: [recruited/rejected/burned]' 
+});
+```
+
+### Cartel Sabotage Plot
+
+Sister Gray wants something broken.
+
+```javascript
+// 1. Create plot
+const result = await plot({ action: 'create', name: 'Cartel Op: Fabrication Delay', metadata: {
+  type: 'cartel_operation',
+  objective: 'sabotage',
+  target: 'fabrication_factory',
+  priority: 'high'
+}});
+const plotId = result.plotId;
+
+// 2. Briefing phase
+await plot({ action: 'create_job', plotId, jobId: 'briefing', metadata: {
+  type: 'contact',
+  handler: 'Ghost operative',
+  instructions: 'Meet asset at location, provide intel on target, deliver sabotage materials'
+}});
+
+// 3. Spawn handler, conduct briefing face-to-face
+// Handler gives verbal instructions: target, method, timeline
+// Handler provides materials (smoke bomb, corrosive, whatever)
+
+// 4. Execution phase
+await plot({ action: 'create_job', plotId, jobId: 'execution', metadata: {
+  type: 'sabotage',
+  target: factoryMachineId,
+  deadline: Date.now() + 4 * 60 * 60 * 1000  // 4 hours
+}});
+
+// 5. Register hook on target
+await plot({ action: 'register_hook', plotId, jobId: 'execution', 
+  targetId: factoryMachineId, 
+  eventName: 'damaged', 
+  filter: {}
+});
+
+// 6. Exfiltration phase
+// Did they get out clean? Did anyone see them?
+// Pluribus investigation may follow
+
+// 7. Payment
+// Handler meets asset, delivers payment, debriefs
+await plot({ action: 'close', plotId, status: 'completed', 
+  reason: 'Target damaged. Asset exfiltrated. No attribution.'
+});
+```
+
+### Cartel Infiltration Plot
+
+Someone needs to get inside Pluribus and stay there.
+
+**Arc:**
+1. Asset recruited from outside
+2. Asset coached on how to pass citizenship vetting
+3. Asset becomes a citizen (genuine registration)
+4. Asset assigned a position (through legitimate channels)
+5. Asset reports back to handler
+6. Asset feeds intel to Cartel
+7. Eventually: asset activated for specific operation
+
+**Key point:** The infiltrator IS a citizen. They passed real vetting. They do real work. The difference is loyalty.
+
+```javascript
+const result = await plot({ action: 'create', name: 'Cartel Mole: ' + playerName, metadata: {
+  type: 'cartel_infiltration',
+  playerId: player.id,
+  stage: 'placement'
+}});
+const plotId = result.plotId;
+
+// Track their progress through citizenship
+await plot({ action: 'add_event', plotId, 
+  message: 'Asset instructed to register for citizenship. Cover identity established.',
+  from: 'handler'
+});
+
+// Player goes through normal Pluribus channels
+// Pluribus has NO IDEA they're doubled
+
+// Periodic check-ins
+await plot({ action: 'create_job', plotId, jobId: 'checkin_1', metadata: {
+  type: 'dead_drop',
+  location: deadDropId,
+  schedule: 'weekly'
+}});
+```
+
+### Cartel Hit Plot
+
+Someone needs to die.
+
+**This is rare.** Wetwork is expensive, risky, and draws attention. Sister Gray doesn't order kills lightly.
+
+**Arc:**
+1. Target identified, reason established
+2. Asset selected (must be trusted, capable)
+3. Intel provided (target's schedule, vulnerabilities)
+4. Asset plans and executes
+5. Asset exfiltrates
+6. Asset debriefs, receives payment
+7. Consequences unfold (investigation, retaliation)
+
+```javascript
+const result = await plot({ action: 'create', name: 'Cartel Sanction: ' + targetName, metadata: {
+  type: 'cartel_wetwork',
+  target: targetId,
+  priority: 'critical',
+  authorized_by: 'Sister Gray'
+}});
+const plotId = result.plotId;
+
+// Intel phase
+await plot({ action: 'add_event', plotId, 
+  message: 'Target: [name]. Reason: [reason]. Asset: [asset name]. Method: asset discretion.',
+  from: 'handler'
+});
+
+// Provide target information
+// Let the player figure out how to do it
+
+// Register hook for target death
+await plot({ action: 'register_hook', plotId, jobId: 'execution', 
+  targetId: targetId, 
+  eventName: 'died', 
+  filter: {}
+});
+
+// On completion: massive consequences
+// Pluribus investigation
+// CorpSec manhunt if sloppy
+// Cartel cleanup if asset is compromised
+```
+
+### Cross-Faction Plots
+
+Some plots involve both powers competing for the same player or objective.
+
+**Example: The Courier**
+
+Pluribus assigns a delivery job. The Cartel wants to intercept.
+
+```javascript
+// Pluribus creates delivery plot
+const pluribusPlot = await plot({ action: 'create', name: 'Delivery: Medical Supplies', metadata: {
+  type: 'delivery',
+  faction: 'pluribus',
+  package: packageId,
+  destination: clinicId
+}});
+
+// Cartel creates interception plot
+const cartelPlot = await plot({ action: 'create', name: 'Cartel: Intercept Medical', metadata: {
+  type: 'cartel_intercept',
+  target_plot: pluribusPlot.plotId,
+  target_package: packageId
+}});
+
+// City-ai sets up the interception
+// Cartel operative spawned on delivery route
+// Operative approaches player, makes offer
+
+// Outcome depends on player choice:
+// - Delivers → Pluribus plot complete, Cartel plot failed
+// - Hands over → Cartel plot complete, Pluribus plot failed
+// - Fights → Combat resolution
+// - Reports contact → Pluribus knows, Cartel burns the operative
+```
+
+The city-ai plays both sides honestly. Whichever side wins, wins.
+
+---
+
+*This document is builder-facing canon. Do not share with players.*
