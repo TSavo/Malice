@@ -5,7 +5,7 @@ import type { RuntimeObject } from '../../../types/object.js';
  * Builds GameEvents object for emitting game events to MongoDB
  *
  * Events are stored in a `game_events` collection with TTL for auto-cleanup.
- * External services (like NPC agents) watch this collection via change streams.
+ * External services (like NPC agents) can poll or watch this collection.
  *
  * Usage from MOO code:
  *   await $.events.emit('speech', { speakerId: self.id, message: 'Hello', locationId: location.id })

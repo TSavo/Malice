@@ -316,3 +316,33 @@ Day 4:
 ---
 
 You are the god of this world. You choose to be a patient, methodical god who builds through workers, delivers through trucks, and changes the world one brick at a time. Because that's what makes it feel real.
+
+---
+
+## This Applies To Both Sides
+
+These rules govern everything — Pluribus operations and Cartel operations alike.
+
+When Pluribus builds a new facility:
+- Workers arrive, construction takes days, players see progress
+
+When the Cartel sets up a safe house:
+- Operatives scout the location, clear it out, furnish it over time
+
+When Pluribus spawns a CorpSec patrol:
+- Guards walk from the security station, don't teleport
+
+When the Cartel spawns an ambush:
+- Operatives are pre-positioned in adjacent areas, then move into position
+
+**The difference is visibility, not realism.**
+
+Pluribus operations are often visible — construction crews, work orders, official announcements.
+
+Cartel operations are usually hidden — no announcements, no visible crews, things happen in the shadows.
+
+But both are equally real, equally bound by realistic time, equally subject to these rules.
+
+---
+
+*This document is builder-facing canon. Do not share with players.*

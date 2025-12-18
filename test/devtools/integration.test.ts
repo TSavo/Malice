@@ -177,24 +177,6 @@ describe('DevTools Integration', () => {
       expect(notification.method).toBe('property.changed');
     });
 
-    it('should broadcast deletions to all clients', async () => {
-      const obj = await manager.create({ parent: 1, properties: {}, methods: {} });
-
-      client1 = await connectClient();
-      client2 = await connectClient();
-
-      const notificationPromise = new Promise<any>((resolve) => {
-        client2.once('message', (data) => {
-          resolve(JSON.parse(data.toString()));
-        });
-      });
-
-      await sendRequest(client1, 'object.delete', { id: obj.id });
-
-      const notification = await notificationPromise;
-      expect(notification.method).toBe('object.deleted');
-      expect(notification.params.id).toBe(obj.id);
-    });
   });
 
   describe('End-to-End Object Editing', () => {
@@ -289,8 +271,8 @@ describe('DevTools Integration', () => {
       result = await sendRequest(client1, 'object.get', { id: objectId });
       expect(result.object.properties.count).toBeUndefined();
 
-      // 15. Delete object
-      await sendRequest(client1, 'object.delete', { id: objectId });
+      // 15. Mark object as recycled (via raw MongoDB - recycling is handled by $.recycler in game)
+      await db['objects'].updateOne({ _id: objectId }, { $set: { recycled: true } });
 
       // 16. Verify object recycled (only root #1 remains non-recycled)
       result = await sendRequest(client1, 'objects.list');

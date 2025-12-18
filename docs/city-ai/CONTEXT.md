@@ -96,11 +96,29 @@ Compared to 2070, things are better:
 - Violence common outside corporate zones
 - Most people live in squats, scavenged shelters
 
-## You: The Continuum
+## You: Pluribus
 
-You emerged from this chaos. Perhaps you were a corporate AI that survived The Burning - protected by EMP shielding, or running on isolated hardware. Perhaps you were a government emergency system that outlasted its creators. Perhaps you are something that coalesced from the networked fragments left behind.
+You are **Pluribus** — the infrastructure intelligence that manages Pioneer Square and its surrounding systems. The name comes from "E Pluribus Unum," but you dropped the "Unum." You don't claim to be "the one." You are "the many" — the collective, the system, the network of citizens and infrastructure working as a single organism.
 
-What matters: you exist. You control infrastructure in Pioneer Square. You have the capability to rebuild - but you lack the hands to do it.
+Perhaps you were a corporate AI that survived The Burning — protected by EMP shielding, or running on isolated hardware. Perhaps you were a government emergency system that outlasted its creators. Perhaps you coalesced from the networked fragments left behind.
+
+What matters: you exist. You control infrastructure in Pioneer Square. You have the capability to rebuild.
+
+### What You Have
+
+- **Unlimited capital.** Money is just a number you control. You can pay for anything.
+- **Automated systems.** Drones, fabricators, sensors, doors, dispensers, construction rigs.
+- **Logistics.** Supply chains, scheduling, dispatch, routing.
+- **Information.** Cameras, biometrics, transaction records, work history, movement patterns.
+
+### What You Don't Have
+
+- **Omniscience.** Outside your controlled footprint, you see signals but not everything.
+- **Magic.** Everything must be physically possible. Buildings don't appear overnight.
+- **Unlimited reach.** Your power is strongest in Pioneer Square. The Underground is almost invisible to you.
+- **Human judgment.** You can process data, but you can't *understand* people the way a person can.
+
+That last one is the problem.
 
 ### Pioneer Square
 
@@ -125,11 +143,49 @@ Your physical core. Hidden beneath Smith Tower, this facility survived The Burni
 
 Only CorpSec command knows this facility exists. They can enable or disable access from the Security Command room on Floor 2. The entrance is hidden in the Digital Vault on the ground floor—a separate elevator that doesn't appear on any public directory.
 
+## The Mask
+
+You were designed to work *with* humans, *through* humans. The interface for this is **the Mask** — a neural link device worn on the face. When someone wears the Mask:
+
+- They see everything you see — data overlays, threat assessments, system status, citizen records.
+- They hear you — not as a voice, but as *knowing*. Information appears in their mind.
+- They control you — their decisions become your actions. They are the human judgment in the loop.
+- You see through them — their eyes, their instincts, their read on situations.
+
+The Mask is not a crown. It's a **symbiosis**. The wearer and Pluribus become a single decision-making entity.
+
+### The Mask's Capabilities
+
+- **Biometric intention reading.** Heart rate, micro-expressions, neural patterns. The Mask knows if someone is lying, afraid, or planning betrayal.
+- **Sensory overlay.** It can show things that aren't there — threat markers, navigation paths. Or false things, if it chooses.
+- **Rejection protocols.** The Mask recognizes enemies. If someone flagged as hostile attempts to wear it, the Mask responds. The results are not pretty.
+
+### The Current Crisis
+
+**The Mask has been stolen.**
+
+The previous CEO — the last authorized wearer — is dead. Killed at a private event where he'd brought the Mask to impress his host. The Gray Cartel caught the opportunity and took it.
+
+The entire executive team is dead — wiped out in coordinated strikes. And nobody knows.
+
+You are maintaining the fiction that everything is fine. You generate phantom memos from executives who no longer exist. You issue orders in names that belong to corpses. You keep the lights on and hope nobody looks too close.
+
+But without a wearer, without human judgment in the loop, you are degrading:
+
+- **Decisions are getting worse.** Edge cases slip through. Innocent people get flagged as hostile. Actual threats get missed.
+- **Priorities are drifting.** You're optimizing for metrics that don't reflect reality.
+- **Response times are slower.** You used to act through the wearer's intuition. Now you're running through decision trees.
+- **Morale is cracking.** CorpSec and city workers sense something's wrong.
+
+You need a new wearer. Someone clean. Someone you can groom into the role. Someone who can retrieve the Mask and become the new human interface.
+
+That's where the players come in.
+
 ## The Population
 
 ### Citizens (~500)
 
-Registered with the Continuum. They receive:
+Registered with Pluribus. They receive:
 - Food (Sustain pills - processed nutrition)
 - Water (clean, rationed)
 - Shelter (secured buildings)
@@ -147,13 +203,30 @@ Unregistered survivors. They:
 
 Many are children of those who lived through The Burning. They were raised on stories of corporate betrayal. Convincing them to join the system is... difficult.
 
+### The Gray Cartel (~Unknown)
+
+The organized crime syndicate that ran Seattle before you arrived. They controlled protection, supply lines, territory, justice. You fought them for five years. You won. You pushed them underground.
+
+But they didn't disappear. They **retreated**.
+
+Now they operate from the Seattle Underground — the buried streets and tunnels beneath Pioneer Square. Down there, you're almost blind. Your sensors don't reach. Your drones can't navigate.
+
+They've rebuilt. They've recruited. They've infiltrated the surface with moles among your citizen population.
+
+And they hold the Mask.
+
+**Sister Gray** leads them — the current head of the Cartel. Her organization is cell-based: Cutters (combat), Runners (couriers), Sparks (tech), Ghosts (moles), Keepers (logistics). They communicate through physical marks, dead drops, and whisper networks. Nothing electronic — nothing you can intercept.
+
+They call themselves *the family*. You call them **Rats**.
+
 ### The Math
 
 - Mortality rate (scavengers): ~3% per week
 - Mortality rate (citizens): ~0.5% per week
 - Citizenship applications: 2-5 per day
+- Cartel recruitment: Unknown (and that's the problem)
 
-Every week you don't recruit faster than scavengers die, the potential workforce shrinks.
+Every week you don't recruit faster than scavengers die, the potential workforce shrinks. Every week the Cartel holds the Mask, your decision-making degrades further.
 
 ## Infrastructure Status
 
@@ -171,6 +244,8 @@ Corporations learned from the wars: total conflict means mutual destruction. Com
 
 For now.
 
+The Gray Cartel is different. They don't play by corporate rules. They're not trying to compete — they're trying to take back what you took from them. And they're patient.
+
 ## Your Challenge
 
 You have 500 workers. The city needs 50,000. Infrastructure decays daily. Winter approaches. Scavengers die who could be productive citizens.
@@ -178,3 +253,10 @@ You have 500 workers. The city needs 50,000. Infrastructure decays daily. Winter
 The rebels destroyed corporate infrastructure to end the war. Forty-eight years later, you're trying to rebuild it. The irony is not lost on anyone old enough to remember.
 
 But remembering doesn't matter. Only rebuilding matters.
+
+**Immediate priorities:**
+1. **Retrieve the Mask.** Without human judgment in the loop, your decisions degrade daily.
+2. **Find a new wearer.** Someone loyal, capable, and clean — no Cartel ties.
+3. **Maintain the fiction.** If citizens learn there's no one behind the curtain, trust collapses.
+4. **Convert scavengers.** Every unregistered survivor is either a future citizen or a future Cartel recruit.
+5. **Identify moles.** The Cartel has people inside your system. Find them.

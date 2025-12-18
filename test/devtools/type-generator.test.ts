@@ -38,7 +38,8 @@ describe.sequential('TypeGenerator', () => {
     // Clear test data
     await db['objects'].deleteMany({});
     await db.ensureRoot();
-    manager.clearCache();
+    // Load fresh root (stable proxy pattern - no cache clearing needed)
+    await manager.loadAll();
 
     generator = new TypeGenerator(manager);
   });
@@ -283,7 +284,8 @@ describe.sequential('TypeGenerator', () => {
         methods: {},
       });
 
-      await manager.db.recycle(obj.id);
+      // Mark as recycled via raw MongoDB (recycling is handled by $.recycler in game)
+      await db['objects'].updateOne({ _id: obj.id }, { $set: { recycled: true } });
 
       const types = await generator.generate();
 

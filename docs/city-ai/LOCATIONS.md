@@ -173,3 +173,145 @@ When giving directions:
 - "Go [direction] until you hit [street]. Turn [direction]. Can't miss it."
 
 **Remember:** You walk these streets every day. You don't think in coordinates. You think in blocks, streets, and landmarks. Give directions like a real person would.
+
+---
+
+## Cartel Locations (Builder Reference)
+
+These locations exist but are NOT public knowledge. Citizens don't know about them. CorpSec doesn't know about them. Only Cartel members and trusted assets know.
+
+**NPCs should NOT give directions to these locations** unless they're Cartel and the player is trusted.
+
+### The Tunnels (Seattle Underground)
+
+The old underground — storefronts and sidewalks buried when Seattle raised the street level after the fire of 1889. Now the Cartel's highway.
+
+**Access points:**
+- Occidental Park (concealed entrance)
+- Smith Tower basement (extremely risky)
+- Various buildings with old sub-basements
+
+**What's down there:**
+- Passages connecting multiple blocks
+- Hidden caches
+- Emergency routes
+- Some areas flooded or collapsed
+
+**Directions (Cartel only):**
+> "The park. South end, by the old fountain. There's a grate. You need to know it's there to find it."
+
+### Safe Houses
+
+Scattered through Pioneer Square. They rotate. Some are permanent, some temporary.
+
+**Characteristics:**
+- Look like abandoned or marginal spaces
+- Multiple exits
+- Minimal visibility from street
+- No connection to Pluribus systems
+
+**Example safe house:**
+- Basement of a condemned building
+- Entrance through an alley door
+- Second exit through the tunnels
+- Lookout position with street view
+
+**Directions (Cartel only):**
+> "South of Jackson, east side. There's an alley between two brick buildings. Door's unmarked. Knock twice, wait, knock three times."
+
+### Dead Drops
+
+Locations where packages, messages, or payments are left for pickup.
+
+**Characteristics:**
+- Public enough to blend in
+- Private enough for a quick exchange
+- No cameras (checked regularly)
+- Changed frequently
+
+**Examples:**
+- Behind a loose brick in an alley wall
+- Under a specific bench in the park
+- Inside an abandoned newspaper box
+- In the gap between two buildings
+
+**Directions (Cartel only):**
+> "Nutrient Dispensary. North wall. Third brick from the corner, about waist height. It pulls out."
+
+### The Hole
+
+Sister Gray's current location. The most protected spot in the network.
+
+**Characteristics:**
+- Deep in the tunnels
+- Multiple security layers
+- Only a handful of people know the actual location
+- Changes periodically
+
+**No directions given.** Even trusted assets don't know where it is. They're brought there blindfolded, or meet Gray at neutral locations.
+
+### Lookout Posts
+
+Positions where Cartel members observe Pluribus activity.
+
+**Examples:**
+- Upper floor window overlooking City Services
+- Rooftop with view of the Fabrication Factory
+- Corner booth at a food establishment with sight lines
+
+**Directions (Cartel only):**
+> "Third floor, southwest corner. Window's boarded up but there's a gap. Good view of the loading dock."
+
+---
+
+## Location Security Levels
+
+### Pluribus Locations
+
+| Location | Security | Access |
+|----------|----------|--------|
+| City Services | Medium | Citizens only |
+| Fabrication Factory | High | Workers only |
+| Supply Depot | Medium | Authorized only |
+| Smith Tower (public) | Low | Open |
+| Smith Tower (upper) | High | Restricted |
+| The Datacenter | Extreme | CorpSec command only |
+
+### Cartel Locations
+
+| Location | Security | Access |
+|----------|----------|--------|
+| Tunnel entrance | Hidden | Those who know |
+| Safe houses | Low-medium | Cartel members |
+| Dead drops | None | Anyone (if they know) |
+| The Hole | Extreme | Sister Gray's inner circle |
+| Lookout posts | Low | Assigned watchers |
+
+---
+
+## Using Locations In Scenarios
+
+### Pluribus Scenarios
+
+**Repair jobs** → Send player to infrastructure locations
+**Delivery jobs** → Route between facilities
+**Security incidents** → Occur at high-value locations
+**Investigations** → Lead through public and restricted areas
+
+### Cartel Scenarios
+
+**Surveillance jobs** → Player watches Pluribus locations
+**Dead drop jobs** → Player uses hidden exchange points
+**Safe house meetings** → Player reports to secure locations
+**Tunnel runs** → Player moves through underground
+
+### Cross-Faction Scenarios
+
+**Infiltration** → Cartel asset accesses Pluribus location
+**Interception** → Cartel operative intercepts on Pluribus route
+**Manhunt** → CorpSec searches for Cartel in public areas
+**Escape** → Player flees through tunnels after botched job
+
+---
+
+*This document is builder-facing canon. Do not share with players.*

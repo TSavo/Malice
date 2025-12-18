@@ -130,10 +130,6 @@ export class DevToolsServer {
           result = await this.createObject(params);
           break;
 
-        case 'object.delete':
-          result = await this.deleteObject(params);
-          break;
-
         case 'method.get':
           result = await this.getMethod(params);
           break;
@@ -278,22 +274,6 @@ export class DevToolsServer {
   private async pushObject(params: { id: ObjId }): Promise<any> {
     const { id } = params;
     await this.manager.push(id);
-    return { success: true };
-  }
-
-  /**
-   * Delete (recycle) object - soft delete for safety
-   */
-  private async deleteObject(params: { id: ObjId }): Promise<any> {
-    const { id } = params;
-    await this.manager.db.recycle(id);
-
-    // Invalidate cache
-    this.manager.clearCache();
-
-    // Notify all clients
-    this.broadcast('object.deleted', { id });
-
     return { success: true };
   }
 

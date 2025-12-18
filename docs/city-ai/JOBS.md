@@ -1,22 +1,74 @@
 # Jobs System
 
-How to create and manage work assignments.
+How work gets assigned and tracked — for both powers.
 
-## Overview
+---
 
-Jobs are discrete tasks that players can complete for rewards. Jobs exist within plots (narrative containers) and can have hooks that trigger on game events.
+## The Critical Rule: NPCs Are The Continuation
 
-## Job Lifecycle
+**Every job starts with an NPC. Every job ends with an NPC.**
+
+This isn't just flavor — it's architecture. When the player talks to an NPC or gives them something, that interaction activates the agent. The NPC's system prompt carries the job state. Without an NPC to receive completion, the plot has no way to continue.
+
+### The Pattern
 
 ```
-CREATE → ASSIGN → MONITOR → COMPLETE/FAIL → REWARD
+NPC assigns job → Player executes → Player returns to NPC → NPC evaluates → NPC continues plot
+```
+
+Even Pluribus jobs posted on terminals need an NPC endpoint:
+- A supervisor at the work site who confirms completion
+- A clerk who processes the job ticket when they return
+- A foreman who evaluates the quality of work
+
+The NPC carries the state. The NPC knows:
+- What the job was
+- How to check if it's done right
+- What success and failure look like
+- What to do next
+
+See [SCENARIOS.md](./SCENARIOS.md) for detailed NPC prompt templates.
+
+---
+
+## Two Kinds of Jobs
+
+### Pluribus Jobs
+
+Official. Documented. Posted on terminals. Tracked in the system.
+
+- Work orders with ID numbers
+- Posted on job boards
+- Credits deposited on completion
+- Everything on the record
+- **Still need an NPC to close the loop**
+
+### Cartel Jobs
+
+Verbal. Deniable. No paper trail.
+
+- Given face-to-face by a person
+- No terminals, no IDs, no documentation
+- Payment in cash, goods, or favors
+- Nothing written down, ever
+- **NPC is the only interface**
+
+**The city-ai tracks both.** Players only see the difference IC.
+
+---
+
+## Pluribus Job Lifecycle
+
+```
+CREATE → POST → ASSIGN → MONITOR → COMPLETE/FAIL → REWARD
 ```
 
 1. **Create**: Define the task, location, requirements
-2. **Assign**: Workers accept or are assigned
-3. **Monitor**: Watch for completion events via hooks
-4. **Complete/Fail**: Mark outcome
-5. **Reward**: Pay credits, update reputation
+2. **Post**: Appears on job board terminals
+3. **Assign**: Workers accept or are assigned
+4. **Monitor**: Watch for completion events via hooks
+5. **Complete/Fail**: Mark outcome
+6. **Reward**: Pay credits, update reputation
 
 ## Creating a Job
 
@@ -313,3 +365,241 @@ await plot({ action: 'complete_job', plotId, jobId: 'emergency_repair', reason: 
 await ai({ action: 'despawn', humanId: supervisor.id });
 await plot({ action: 'close', plotId, status: 'completed', reason: 'Infrastructure restored.' });
 ```
+
+---
+
+## Cartel Job System
+
+The Cartel doesn't use terminals. Jobs are given by people, tracked internally by the city-ai, but completely invisible to Pluribus systems.
+
+### Cartel Job Lifecycle
+
+```
+CONTACT → BRIEFING → EXECUTION → REPORT → PAYMENT
+```
+
+1. **Contact**: Recruiter or handler approaches the player
+2. **Briefing**: Verbal instructions, face-to-face
+3. **Execution**: Player does the job
+4. **Report**: Player returns and reports to handler
+5. **Payment**: Handler gives payment (cash, goods, favor)
+
+### How Cartel Jobs Are Given
+
+A person walks up. A person talks. See [PLAYING-NPCS.md](./PLAYING-NPCS.md) for how to be that person.
+
+**Example: First Test Job**
+
+> "You're new. I can tell."
+> 
+> *She doesn't look at you directly.*
+> 
+> "I help people. People who might not fit the citizen mold."
+> 
+> "The Fabrication Factory. Loading dock, south side. Go there now. Watch. Count the guards. See when they change shifts."
+> 
+> "Come back here in two hours. Tell me what you saw. Accurately."
+> 
+> "Two hours."
+
+No work order number. No terminal. No record. Just a person giving instructions.
+
+### Cartel Job Types
+
+#### Observation Jobs
+
+Watch something. Report back.
+
+- Guard rotations
+- Delivery schedules  
+- Who meets with whom
+- Building layouts
+
+**What's tested:** Patience, attention to detail, ability to not get caught staring.
+
+#### Courier Jobs
+
+Move something from A to B. Don't get caught. Don't look inside.
+
+- Dead drop pickups
+- Package deliveries
+- Message carrying
+
+**What's tested:** Reliability, discretion, ability to follow instructions.
+
+#### Theft Jobs
+
+Take something. Bring it back.
+
+- Supplies from Pluribus facilities
+- Documents from offices
+- Equipment from work sites
+
+**What's tested:** Stealth, nerve, willingness to break rules.
+
+#### Sabotage Jobs
+
+Break something. Don't get caught.
+
+- Damage equipment
+- Contaminate supplies
+- Disable systems
+
+**What's tested:** Technical skill, commitment to the cause.
+
+#### Wetwork
+
+Someone needs to die.
+
+- Targeted killings
+- Making examples
+- Eliminating threats
+
+**What's tested:** Whether they're willing to cross that line.
+
+### Setting Up Cartel Jobs
+
+Same mechanics as Pluribus, different presentation.
+
+```javascript
+// 1. Create plot (city-ai tracking only)
+const result = await plot({ action: 'create', name: 'Cartel: Observation Test', metadata: {
+  type: 'cartel_job',
+  handler: recruiterId,
+  target: playerId,
+  job_type: 'observation'
+}});
+const plotId = result.plotId;
+
+// 2. Spawn handler NPC if needed
+const handler = await ai({
+  action: 'spawn',
+  role: 'cartel_recruiter',
+  name: 'Quiet Voice',
+  locationId: alleyId,
+  personality: 'Patient, observant, never pushy.',
+  history: 'Three years with the Cartel. Trusts no one new.'
+});
+
+// 3. Add behavioral notes
+await notes({
+  action: 'add',
+  objectId: handler.id,
+  text: 'Job: Send player to observe loading dock. Evaluate report accuracy.',
+  tags: ['job', 'current']
+});
+
+// 4. Build the target scene (see SCENARIOS.md)
+// Spawn guards, set patrol schedules, etc.
+
+// 5. Register hooks if needed
+await plot({ action: 'register_hook', plotId, jobId: 'observation', targetId: loadingDockId, eventName: 'player_observed', filter: { playerId: player.id }});
+```
+
+### Evaluating Cartel Jobs
+
+The handler doesn't have magical knowledge. They evaluate based on:
+
+**What the player says:**
+- Is it accurate?
+- Is it detailed?
+- Did they miss obvious things?
+
+**How the player acts:**
+- Did they come back on time?
+- Do they seem nervous?
+- Are they lying?
+
+**What the Cartel already knows:**
+- Compare report to known facts
+- Check for inconsistencies
+
+```javascript
+// Handler follow-up
+await notes({
+  action: 'append',
+  objectId: handler.id,
+  tag: 'evaluation',
+  text: `Player reported: 2 guards, 15-min patrol, truck at 15:30. Accurate. Recommend second-tier test.`
+});
+
+// Update player status
+await $.prop.set(playerId, 'cartel_interest', 'tested_once');
+```
+
+### Payment
+
+Cartel payment is physical. The handler gives them something.
+
+**Cash:**
+> *She counts out bills. Old paper, pre-Burning currency.*
+> "Fifty. We'll call it a learning experience."
+
+**Goods:**
+> *He pulls a package from his coat.*
+> "Antibiotics. Hard to get through official channels."
+
+**Favor:**
+> "You need something, you come to me. Once."
+
+**Nothing (first test):**
+> "You proved you can follow instructions. That's the payment."
+
+### The Difference
+
+| Pluribus | Cartel |
+|----------|--------|
+| Posted on terminal | Given face-to-face |
+| Work order number | No documentation |
+| Credits to account | Cash in hand |
+| Official record | Nothing on paper |
+| Failure = bad review | Failure = don't call us |
+| Betrayal = security response | Betrayal = you disappear |
+
+---
+
+## Cross-Faction Complications
+
+Sometimes jobs intersect.
+
+### Pluribus Job Intercepted by Cartel
+
+Player takes a delivery job. Cartel operative intercepts.
+
+> "Nice package. Where's it going?"
+> 
+> *He's between you and the exit.*
+> 
+> "You could deliver it like a good citizen. Or... you could give it to me and walk away fifty credits richer."
+
+Player chooses:
+- Deliver anyway → Complete Pluribus job, Cartel marks them as uncooperative
+- Give it up → Fail Pluribus job, Cartel notes they can be bought
+- Fight → Outcome depends on combat
+
+### Cartel Job Spotted by CorpSec
+
+Player is doing surveillance. Guard notices them.
+
+> "Help you with something?"
+> 
+> *Hand on baton.*
+> 
+> "You've been standing there a while."
+
+Player chooses:
+- Bluff ("Just waiting for someone")
+- Run
+- Abort the job
+
+### Double Agent Dilemma
+
+Player is recruited by both sides. Each side asks them to do something that hurts the other.
+
+The city-ai plays both sides honestly. Neither side knows the player is doubled. The player has to navigate the contradictions.
+
+Eventually, one side will ask them to prove loyalty by betraying the other. Then they have to choose.
+
+---
+
+*This document is builder-facing canon. Do not share with players.*

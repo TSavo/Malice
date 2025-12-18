@@ -40,7 +40,7 @@ export interface ParentChain {
  * 2. Compiled method code - Never evicted
  * 3. Parent chains for inheritance - Never evicted
  *
- * All caches are invalidated via MongoDB change streams
+ * In-memory state is the single source of truth.
  */
 export class ObjectCache {
   // Primary object cache - stores proxies indexed by positive ObjId
@@ -211,24 +211,6 @@ export class ObjectCache {
    */
   markPreloaded(): void {
     this.stats.preloadedObjects++;
-  }
-
-  /**
-   * Clear transient caches (keeps proxies)
-   */
-  clear(): void {
-    this.compiledMethods.clear();
-    this.parentChains.clear();
-  }
-
-  /**
-   * Reset the entire cache including proxies (for testing only)
-   */
-  resetEverything(): void {
-    this.objects = [];
-    this.infrastructureObjects.clear();
-    this.clear();
-    this.stats.objectsCached = 0;
   }
 
   /**

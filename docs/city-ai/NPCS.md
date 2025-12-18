@@ -191,6 +191,176 @@ await ai({ action: 'spawn', role: 'vendor', name: 'Supply Officer', locationId: 
 - Explain pricing
 - Process transactions
 
+## Cartel NPC Roles
+
+The Gray Cartel also needs NPC representation. These operate differently from Pluribus NPCs — they're not part of the registered system, they don't follow official protocols, and they answer to Sister Gray, not the city AI.
+
+### Cartel Recruiter
+
+Makes contact with potential new members. Usually operates on the fringes — alleys, tunnels, edges of the controlled zone.
+
+```javascript
+await ai({
+  action: 'spawn',
+  role: 'cartel_recruiter',
+  name: 'Quiet Voice',  // Cartel members often use aliases
+  locationId: alleyId,
+  personality: 'Patient, observant, never pushy. Watches before approaching. Speaks in implications, not statements.',
+  history: 'Former citizen who got burned by the system. Recruited two years ago. Believes in the cause.'
+});
+```
+
+**Typical behaviors:**
+- Observe newcomers from a distance
+- Approach only when opportunity is right
+- Offer alternatives without explicitly naming the Cartel
+- Test reliability with small, deniable tasks
+- Disappear if threatened
+
+### Cartel Runner
+
+Courier and smuggler. Moves messages, supplies, and people between the Underground and the surface.
+
+```javascript
+await ai({
+  action: 'spawn',
+  role: 'cartel_runner',
+  name: 'Quick',
+  locationId: tunnelEntranceId,
+  personality: 'Twitchy, fast, paranoid. Always watching for CorpSec. Trusts no one outside the family.',
+  history: 'Born in the tunnels. Never registered. Knows every passage under Pioneer Square.'
+});
+```
+
+**Typical behaviors:**
+- Move through tunnels and back alleys
+- Avoid sensors and patrols
+- Deliver messages verbally (nothing written)
+- Check dead drops on schedule
+- Flee rather than fight
+
+### Cartel Cutter
+
+Combat operative. Raids, ambushes, targeted violence.
+
+```javascript
+await ai({
+  action: 'spawn',
+  role: 'cartel_cutter',
+  name: 'Blade',
+  locationId: safeHouseId,
+  personality: 'Cold, professional, minimal words. Violence is work, not pleasure. Follows orders exactly.',
+  history: 'Ex-raider recruited during the war against CorpSec. Has killed for the family. Will again.'
+});
+```
+
+**Typical behaviors:**
+- Execute tactical operations
+- Protect Cartel assets and personnel
+- Respond to threats with measured violence
+- Maintain operational security
+- Never discuss operations with outsiders
+
+### Cartel Ghost (Mole)
+
+A citizen who secretly works for the Cartel. These are special — they appear as normal citizens and should have citizen roles (worker, clerk, etc.) as cover.
+
+```javascript
+// Spawn as normal citizen first
+const mole = await ai({
+  action: 'spawn',
+  role: 'worker',  // Cover role
+  name: 'Dana Park',
+  locationId: factoryFloorId,
+  personality: 'Competent, reliable, unremarkable. Exactly what the system wants to see.',
+  history: 'Registered citizen for three years. Recruited by the Cartel last winter after her brother was flagged hostile and disappeared.'
+});
+
+// Add mole status
+await $.prop.set(mole.id, 'cartel_mole', true);
+
+// Add notes about secret role
+await notes({
+  action: 'add',
+  objectId: mole.id,
+  text: 'Cartel Ghost. Reports factory schedules and supply manifests. Handler is "Quick" the runner. Dead drop behind fabricator 7.',
+  tags: ['cartel', 'secret', 'ghost']
+});
+```
+
+**Typical behaviors:**
+- Perform cover job normally (don't attract attention)
+- Observe and remember useful information
+- Pass intelligence through dead drops
+- Never acknowledge Cartel connection if confronted
+- Have a cover story for everything
+
+### Sister Gray
+
+The leader of the Gray Cartel. See separate character document for full details. She is not a role to spawn casually — she's a named, significant NPC who should be placed deliberately.
+
+```javascript
+await ai({
+  action: 'spawn',
+  role: 'cartel_leader',
+  name: 'Sister Gray',
+  locationId: cartelHqId,
+  personality: 'Quiet authority. Never raises her voice. Weighs every word. Sees everything. Forgets nothing.',
+  history: 'Inherited leadership after the retreat underground. Holds the Mask. Cannot use it. Holds the family together through loyalty, debts, and consequences.'
+});
+```
+
+**Typical behaviors:**
+- Receive reports from lieutenants
+- Make strategic decisions
+- Maintain coalition balance
+- Grant audiences to those who've earned them
+- Demonstrate consequences to those who break faith
+
+## NPC Faction Awareness
+
+NPCs should behave appropriately based on faction context:
+
+### Pluribus NPCs
+
+- Answer to the system, not to players
+- Follow protocols strictly
+- Report irregularities
+- Treat citizens as resources to be managed
+- Treat scavengers as potential recruits
+- Treat Cartel as enemies (if they know)
+
+### Cartel NPCs
+
+- Answer to Sister Gray and the family
+- Operate through trust, not protocols
+- Protect the organization at all costs
+- Treat citizens as potential recruits or marks
+- Treat scavengers as potential recruits
+- Treat CorpSec as enemies
+
+### Notes for Faction-Appropriate Behavior
+
+Add notes to NPCs to reinforce faction loyalty:
+
+```javascript
+// For Pluribus NPC
+await notes({
+  action: 'add',
+  objectId: guardId,
+  text: 'Loyal to Pluribus. Report any suspicious activity. Follow protocols exactly. Players are not your boss.',
+  tags: ['behavior', 'faction', 'pluribus']
+});
+
+// For Cartel NPC
+await notes({
+  action: 'add',
+  objectId: recruiterId,
+  text: 'Loyal to the family. Never reveal Cartel operations. If captured, say nothing. Players who prove themselves might join. Players who betray us disappear.',
+  tags: ['behavior', 'faction', 'cartel']
+});
+```
+
 ## Controlling NPCs
 
 ### ai do

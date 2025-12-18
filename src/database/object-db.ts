@@ -48,7 +48,6 @@ export class ObjectDatabase {
   private objects!: Collection<GameObject>;
   private connected = false;
 
-
   constructor(private uri: string, private dbName: string = 'malice') { }
 
   /**
@@ -73,7 +72,12 @@ export class ObjectDatabase {
    * Disconnect from MongoDB
    */
   async disconnect(): Promise<void> {
+    if (!this.connected) {
+      return;
+    }
+
     await this.client.close();
+    this.connected = false;
     console.log('[ObjectDatabase] Disconnected from MongoDB');
   }
 
@@ -165,36 +169,10 @@ export class ObjectDatabase {
   }
 
   /**
-   * Mark object as recycled (soft delete)
-   */
-  async recycle(id: ObjId): Promise<void> {
-    await this.objects.updateOne(
-      { _id: id },
-      {
-        $set: {
-          recycled: true,
-          modified: new Date(),
-        },
-      }
-    );
-  }
-
-  /**
-   * Get next available object ID
-   * Prioritizes recycled objects for reuse
+   * Get next available object ID (sequential allocation)
+   * Note: ID reuse for recycled objects is handled by $.recycler
    */
   async getNextId(): Promise<ObjId> {
-    // First check for recycled objects
-    const recycled = await this.objects.findOne(
-      { recycled: true },
-      { sort: { _id: 1 } }
-    );
-
-    if (recycled) {
-      return recycled._id;
-    }
-
-    // Otherwise get next sequential ID
     const result = await this.objects
       .find({})
       .sort({ _id: -1 })
@@ -246,7 +224,6 @@ export class ObjectDatabase {
       });
     }
   }
-
 
   /**
    * Count the number of player objects in the database
