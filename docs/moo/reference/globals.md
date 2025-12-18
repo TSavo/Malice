@@ -486,4 +486,4 @@ const id = await $[0].getAlias('myUtil');
 
 - [Prototypes Reference](./prototypes.md) - Object types and inheritance
 - [Verb System](./verbs.md) - Player command handling
-- [Method Sandbox](./sandbox.md) - How methods execute
+- [Architecture](../architecture.md) - How methods execute

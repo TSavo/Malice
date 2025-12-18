@@ -537,4 +537,4 @@ player.canUseDevTools = true;
 
 - [Player Prototype](./prototypes/agents.md) - Player properties and methods
 - [Body System](./prototypes/body.md) - Body creation from chargen
-- [Prompt System](./prototypes/prompt.md) - Interactive prompts used in chargen
+- [Prompt System](./utilities/prompt.md) - Interactive prompts used in chargen

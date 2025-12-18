@@ -8,6 +8,18 @@ Comprehensive guides for programming in Malice's MOO layer.
 - **[Common Patterns](./reference/patterns.md)** ✅ - Reusable code patterns
 - **[Anti-Patterns](./reference/anti-patterns.md)** ✅ - What NOT to do
 
+### System References
+
+- **[$ Globals](./reference/globals.md)** ✅ - Core aliases and global services
+- **[Prototypes](./reference/prototypes.md)** ✅ - Complete prototype hierarchy and API tables
+- **[Verb System](./reference/verbs.md)** ✅ - Patterns, registration, dispatch, best practices
+- **[Prompt System](./reference/prompts.md)** ✅ - Menus, prompts, and interaction flow
+- **[Event Hooks](./reference/hooks.md)** ✅ - Hook points, conventions, lifecycle patterns
+- **[Plot System](./reference/plots.md)** ✅ - Plot logs, jobs, triggers, story plumbing
+- **[Body System](./reference/body-system.md)** ✅ - Bodies, parts, metabolism helpers
+- **[Exclusions System](./reference/exclusions.md)** ✅ - Mutual exclusion rules and action conflicts
+- **[AI/NPC System](./reference/ai-npc.md)** ✅ - NPC architecture, prompts, fixtures
+
 ## Getting Started
 
 New to Malice? Start here:
@@ -83,11 +95,11 @@ New to Malice? Start here:
 - **[Bootstrap System](./advanced/bootstrap.md)** ✅ - Three-phase bootstrap, creating custom utilities, builder pattern
 
 ### Additional Topics (Coming Soon)
-- [Admin Commands](./advanced/admin-commands.md) - @dig, @create, @set, @eval
-- [Change Streams](./advanced/change-streams.md) - Reactive data flow
-- [Hot Reloading](./advanced/hot-reloading.md) - Update code without restarts
+- [Admin Commands](./reference/prototypes.md) - @dig, @create, @set, @eval
+- [Change Streams](../../CHANGE-STREAMS.md) - Reactive data flow and cache invalidation
+- [Hot Reloading](./architecture.md) - What is hot-reloadable (and what isn’t)
 
 ---
 
-**Status:** Documentation complete. All prototype and utility docs are now available.
+**Status:** Core docs complete; some advanced topics are still pending.
 
