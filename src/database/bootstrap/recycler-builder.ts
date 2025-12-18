@@ -30,7 +30,7 @@ export class RecyclerBuilder {
         properties: {
           name: 'Recycler',
           description: 'Object deletion and recovery system',
-          recycleBin: [],
+          recycledObjects: [],
         },
         methods: {},
       });
@@ -128,19 +128,45 @@ export class RecyclerBuilder {
             params.properties.aliases = Array.from(aliasSet);
           }
 
-          // Create the object through ObjectManager
-          const newObject = await $.create(params);
+          // Try to reuse a recycled object from the pool
+          const pool = self.recycledObjects || [];
+          let obj;
+
+          if (pool.length > 0) {
+            // Pop an object from the pool and reuse it
+            obj = pool.pop();
+            self.recycledObjects = pool;
+
+            // Clear recycled state
+            obj.recycled = false;
+            obj.recycledAt = null;
+            obj.recycledBy = null;
+
+            // Set new parent
+            obj.setParent(params.parent);
+
+            // Set all properties
+            for (const [key, value] of Object.entries(params.properties)) {
+              obj[key] = value;
+            }
+
+            console.log(\`[Recycler] Reused object #\${obj.id}\`);
+          } else {
+            // Pool empty - create fresh object
+            obj = await $.create(params);
+            console.log(\`[Recycler] Created new object #\${obj.id}\`);
+          }
 
           // Call onCreate hook if it exists
-          if (newObject.hasMethod && newObject.hasMethod('onCreate')) {
-            await newObject.onCreate(caller);
+          if (obj.hasMethod && obj.hasMethod('onCreate')) {
+            await obj.onCreate(caller);
           }
 
           // Log creation
           const ownerInfo = params.properties.owner ? \`owner: #\${params.properties.owner}\` : 'system';
-          console.log(\`[Recycler] Created object #\${newObject.id} (\${ownerInfo})\`);
+          console.log(\`[Recycler] Object #\${obj.id} ready (\${ownerInfo})\`);
 
-          return newObject;
+          return obj;
         `);
 
     this.recycler.setMethod('recycle', `
@@ -169,18 +195,31 @@ export class RecyclerBuilder {
           // Clear all aliases pointing to this object
           await $.clearAliasesForObject(objectId);
 
-          // Move to recycle bin (soft delete)
-          const bin = self.recycleBin || [];
-          bin.push({
-            id: objectId,
-            deletedAt: new Date(),
-            deletedBy: caller ? caller.id : 0
-          });
-          self.recycleBin = bin;
+          // Reset the object to a blank slate
+          // 1. Clear all properties
+          const allProps = obj.getPropertyNames ? obj.getPropertyNames() : [];
+          for (const prop of allProps) {
+            obj[prop] = null;
+          }
 
-          // Mark as deleted on the object (persists via proxy)
-          obj._deleted = true;
-          obj._deletedAt = new Date().toISOString();
+          // 2. Clear all methods
+          const allMethods = obj.getMethodNames ? obj.getMethodNames() : [];
+          for (const method of allMethods) {
+            obj.deleteMethod(method);
+          }
+
+          // 3. Reparent to $.nothing (#-1)
+          obj.setParent(-1);
+
+          // 4. Mark as recycled
+          obj.recycled = true;
+          obj.recycledAt = new Date().toISOString();
+          obj.recycledBy = caller ? caller.id : 0;
+
+          // 5. Add to recycled objects pool (stores object references, not IDs)
+          const pool = self.recycledObjects || [];
+          pool.push(obj);
+          self.recycledObjects = pool;
 
           console.log(\`Recycled object #\${objectId}\`);
           return { recycled: objectId };
@@ -205,32 +244,33 @@ export class RecyclerBuilder {
         `);
 
     this.recycler.setMethod('unrecycle', `
-          const objectId = args[0];
+          const objectOrId = args[0];
 
-          // Find in recycle bin
-          const bin = self.recycleBin || [];
-          const index = bin.findIndex(item => item.id === objectId);
+          // Accept either object or ID
+          const objectId = typeof objectOrId === 'number' ? objectOrId : objectOrId.id;
+
+          // Find in recycled objects pool
+          const pool = self.recycledObjects || [];
+          const index = pool.findIndex(obj => obj.id === objectId);
 
           if (index === -1) {
-            throw new Error('Object not in recycle bin');
+            throw new Error('Object not in recycle pool');
           }
 
-          // Load and restore the object
-          const obj = await $.load(objectId);
-          if (!obj) {
-            throw new Error('Object not found in database');
-          }
+          // Get the object from the pool
+          const obj = pool[index];
 
-          // Remove deleted flags
-          obj._deleted = false;
-          obj._deletedAt = null;
+          // Remove recycled flags
+          obj.recycled = false;
+          obj.recycledAt = null;
+          obj.recycledBy = null;
 
-          // Remove from bin
-          bin.splice(index, 1);
-          self.recycleBin = bin;
+          // Remove from pool
+          pool.splice(index, 1);
+          self.recycledObjects = pool;
 
           console.log(\`Restored object #\${objectId}\`);
-          return { restored: objectId };
+          return obj;
         `);
 
     // Recursively recycle an object and all nested parts (for body trees)

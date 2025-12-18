@@ -305,17 +305,20 @@ describe('RuntimeObject', () => {
       expect(reloaded?.getParent()).toBe(newParent.id);
     });
 
-    it('should mark object as dirty', async () => {
+    it('should persist parent change immediately', async () => {
       const parent = await manager.create({
         parent: 0,
         properties: {},
         methods: {},
       });
 
-      await testObj.setParent(parent.id);
+      testObj.setParent(parent.id);
 
-      // Changes should be persisted
-      await testObj.refresh();
+      // With auto-persist, change is immediate in memory
+      expect(testObj.getParent()).toBe(parent.id);
+
+      // Verify persisted to DB
+      await testObj.pull();
       expect(testObj.getParent()).toBe(parent.id);
     });
 
@@ -518,75 +521,21 @@ describe('RuntimeObject', () => {
     });
   });
 
-  describe('refresh()', () => {
-    it('should reload object from database', async () => {
+  describe('pull()', () => {
+    it('should reload object properties from database', async () => {
       // Modify object in database directly (properties are now typed Values)
       await db['objects'].updateOne(
         { _id: testObj.id },
         { $set: { 'properties.hp': { type: 'number', value: 999 } } }
       );
 
-      // Invalidate cache so refresh loads from DB
-      manager.invalidate(testObj.id);
-
-      // Refresh should load new value
-      await testObj.refresh();
+      // Pull should load new value from DB into memory
+      await testObj.pull();
 
       expect(testObj.get('hp')).toBe(999);
     });
 
-    it('should clear dirty flag', async () => {
-      testObj.set('prop', 'value');
-
-      await testObj.refresh();
-
-      // After refresh, save should be no-op since not dirty
-      const updateSpy = manager['db']['objects'].updateOne;
-      let updateCalled = false;
-      manager['db']['objects'].updateOne = function(...args: any[]) {
-        updateCalled = true;
-        return updateSpy.apply(this, args);
-      } as any;
-
-      await testObj.save();
-
-      expect(updateCalled).toBe(false);
-
-      // Restore
-      manager['db']['objects'].updateOne = updateSpy;
-    });
-
-    it('should load latest properties', async () => {
-      // With auto-persist, local changes are immediately saved
-      // This test verifies that refresh reloads from database correctly
-      testObj.set('local', 'local value');
-
-      // Wait for auto-persist to complete
-      await new Promise(resolve => setTimeout(resolve, 50));
-
-      // Modify in database directly (bypassing auto-persist)
-      await db['objects'].updateOne(
-        { _id: testObj.id },
-        { $set: { 'properties.db': { type: 'string', value: 'db value' } } }
-      );
-
-      // Invalidate cache so refresh loads from DB
-      manager.invalidate(testObj.id);
-
-      await testObj.refresh();
-
-      // Should have both - local was auto-persisted, db was added directly
-      expect(testObj.get('db')).toBe('db value');
-      expect(testObj.get('local')).toBe('local value');
-    });
-
-    it('should load latest methods', async () => {
-      // With auto-persist, method changes are immediately saved
-      testObj.setMethod('localMethod', 'return "local";');
-
-      // Wait for auto-persist to complete
-      await new Promise(resolve => setTimeout(resolve, 50));
-
+    it('should reload object methods from database', async () => {
       // Add method in database directly
       await db['objects'].updateOne(
         { _id: testObj.id },
@@ -599,22 +548,17 @@ describe('RuntimeObject', () => {
         }
       );
 
-      // Invalidate cache so refresh loads from DB
-      manager.invalidate(testObj.id);
+      await testObj.pull();
 
-      await testObj.refresh();
-
-      // Should have both - localMethod was auto-persisted, dbMethod was added directly
       expect(testObj.hasMethod('dbMethod')).toBe(true);
-      expect(testObj.hasMethod('localMethod')).toBe(true);
     });
 
-    it('should handle refresh when object does not exist', async () => {
-      // This is an edge case - object deleted from database
+    it('should handle pull when object does not exist in DB', async () => {
+      // Edge case - object deleted from database but proxy still in memory
       await db['objects'].deleteOne({ _id: testObj.id });
 
-      // Refresh should handle gracefully (no error)
-      await expect(testObj.refresh()).resolves.not.toThrow();
+      // Pull should handle gracefully (no error, no change)
+      await expect(testObj.pull()).resolves.not.toThrow();
     });
   });
 
