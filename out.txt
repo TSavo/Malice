@@ -1,0 +1,46 @@
+
+> malice-v2@2.0.0 bootstrap:apply
+> node --import tsx src/scripts/bootstrap-apply.ts
+
+bootstrap-apply failed: MongoServerSelectionError: getaddrinfo ENOTFOUND mongodb
+    at Topology.selectServer (C:\Users\evilg\projects\Malice\node_modules\mongodb\src\sdam\topology.ts:630:30)
+    at Topology._connect (C:\Users\evilg\projects\Malice\node_modules\mongodb\src\sdam\topology.ts:462:22)
+    at Topology.connect (C:\Users\evilg\projects\Malice\node_modules\mongodb\src\sdam\topology.ts:399:7)
+    at topologyConnect (C:\Users\evilg\projects\Malice\node_modules\mongodb\src\mongo_client.ts:662:9)
+    at MongoClient._connect (C:\Users\evilg\projects\Malice\node_modules\mongodb\src\mongo_client.ts:674:7)
+    at MongoClient.connect (C:\Users\evilg\projects\Malice\node_modules\mongodb\src\mongo_client.ts:586:7)
+    at ObjectDatabase.connect (c:\Users\evilg\projects\Malice\src\database\object-db.ts:64:5)
+    at main (c:\Users\evilg\projects\Malice\src\scripts\bootstrap-apply.ts:75:3) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(1) { 'mongodb:27017' => [ServerDescription] },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'rs0',
+    maxElectionId: new ObjectId('7fffffff000000000000000c'),
+    maxSetVersion: 1,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: getaddrinfo ENOTFOUND mongodb
+      at Socket.<anonymous> (C:\Users\evilg\projects\Malice\node_modules\mongodb\src\cmap\connect.ts:395:16)
+      at Object.onceWrapper (node:events:634:26)
+      at Socket.emit (node:events:519:28)
+      at emitErrorNT (node:internal/streams/destroy:169:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:128:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: getaddrinfo ENOTFOUND mongodb
+        at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:118:26) {
+      errno: -3008,
+      code: 'ENOTFOUND',
+      syscall: 'getaddrinfo',
+      hostname: 'mongodb'
+    }
+  }
+}

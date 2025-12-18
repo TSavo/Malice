@@ -46,9 +46,9 @@ export class GameCoordinator {
     await bootstrap.bootstrap();
     console.log('✅ Core objects bootstrapped');
 
-    // Preload critical objects into cache
-    await this.manager.preload([1, 2, 3, 4]); // Root, System, Auth, CharGen
-    console.log('✅ Core objects cached');
+    // Load all objects into memory (Memory is the source of truth)
+    const loadedCount = await this.manager.loadAll();
+    console.log(`✅ Loaded ${loadedCount} objects into cache`);
 
     // Start scheduler tick loop (every second)
     this.startScheduler();

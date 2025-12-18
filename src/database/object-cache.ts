@@ -2,17 +2,17 @@
  * Object caching for ObjectManager
  *
  * Design Philosophy:
- * - Cache everything in memory, never evict
- * - Rely 100% on MongoDB change streams for invalidation
- * - Cache compiled TypeScript → JavaScript for methods
- * - Cache inheritance chain lookups
- * - Preload critical objects (prototypes, system objects)
+ * - Cache everything in memory using a high-performance array (O(1) access)
+ * - Stable Proxy Pattern: References stay constant, never evicted
+ * - Single Source of Truth: In-memory state is the authoritative record
+ * - Async Persistence: Changes pushed to MongoDB in background
+ * - Full Warmup: Complete database loaded into memory at startup
  *
  * This is designed for a MOO where:
  * - Object count is manageable (thousands to tens of thousands)
  * - Read:Write ratio is heavily skewed toward reads
- * - Multiple game servers share a single MongoDB instance
- * - Low-latency access is critical (no DB hits after warmup)
+ * - Single-server architecture eliminates sync overhead
+ * - Zero-latency access is critical (no DB hits after warmup)
  */
 
 import type { ObjId, RuntimeObject } from '../../types/object.js';
@@ -43,8 +43,11 @@ export interface ParentChain {
  * All caches are invalidated via MongoDB change streams
  */
 export class ObjectCache {
-  // Primary object cache - stores proxies
-  private objects = new Map<ObjId, RuntimeObject>();
+  // Primary object cache - stores proxies indexed by positive ObjId
+  private objects: RuntimeObject[] = [];
+
+  // Infrastructure objects cache (for negative IDs like #-1)
+  private infrastructureObjects = new Map<number, RuntimeObject>();
 
   // Compiled method cache - key: "objId:methodName"
   private compiledMethods = new Map<string, string>();
@@ -67,7 +70,7 @@ export class ObjectCache {
    * Get object from cache
    */
   getObject(id: ObjId): RuntimeObject | undefined {
-    const obj = this.objects.get(id);
+    const obj = id >= 0 ? this.objects[id] : this.infrastructureObjects.get(id);
     if (obj) {
       this.stats.cacheHits++;
     } else {
@@ -80,17 +83,24 @@ export class ObjectCache {
    * Store object in cache (never evicts)
    */
   setObject(id: ObjId, obj: RuntimeObject): void {
-    if (!this.objects.has(id)) {
-      this.stats.objectsCached++;
+    if (id >= 0) {
+      if (this.objects[id] === undefined) {
+        this.stats.objectsCached++;
+      }
+      this.objects[id] = obj;
+    } else {
+      if (!this.infrastructureObjects.has(id)) {
+        this.stats.objectsCached++;
+      }
+      this.infrastructureObjects.set(id, obj);
     }
-    this.objects.set(id, obj);
   }
 
   /**
    * Check if object is cached
    */
   hasObject(id: ObjId): boolean {
-    return this.objects.has(id);
+    return id >= 0 ? this.objects[id] !== undefined : this.infrastructureObjects.has(id);
   }
 
   /**
@@ -156,14 +166,11 @@ export class ObjectCache {
   }
 
   /**
-   * Invalidate all caches for an object
-   * Called when MongoDB change stream detects a modification
+   * Invalidate transient caches for an object
+   * Does NOT remove the object proxy (Stable Proxy Pattern)
    */
   invalidate(objId: ObjId): void {
     this.stats.invalidations++;
-
-    // Remove object from cache
-    this.objects.delete(objId);
 
     // Remove all compiled methods for this object
     const methodPrefix = `${objId}:`;
@@ -196,7 +203,7 @@ export class ObjectCache {
    * Get cache size (number of objects)
    */
   size(): number {
-    return this.objects.size;
+    return this.stats.objectsCached;
   }
 
   /**
@@ -207,12 +214,21 @@ export class ObjectCache {
   }
 
   /**
-   * Clear all caches (for testing)
+   * Clear transient caches (keeps proxies)
    */
   clear(): void {
-    this.objects.clear();
     this.compiledMethods.clear();
     this.parentChains.clear();
+  }
+
+  /**
+   * Reset the entire cache including proxies (for testing only)
+   */
+  resetEverything(): void {
+    this.objects = [];
+    this.infrastructureObjects.clear();
+    this.clear();
+    this.stats.objectsCached = 0;
   }
 
   /**
@@ -227,18 +243,23 @@ export class ObjectCache {
    * Iterate over all cached objects
    */
   *values(): IterableIterator<RuntimeObject> {
-    yield* this.objects.values();
+    for (const obj of this.objects) {
+      if (obj !== undefined) yield obj;
+    }
+    for (const obj of this.infrastructureObjects.values()) {
+      yield obj;
+    }
   }
 
   /**
-   * Get a cached object directly (used by getChildren)
+   * Get a cached object directly
    */
   get(id: ObjId): RuntimeObject | undefined {
-    return this.objects.get(id);
+    return this.getObject(id);
   }
 
   /**
-   * Set a cached object directly (used by getChildren)
+   * Set a cached object directly
    */
   set(id: ObjId, obj: RuntimeObject): void {
     this.setObject(id, obj);

@@ -162,6 +162,14 @@ export class DevToolsServer {
           result = await this.generateTypes(params);
           break;
 
+        case 'object.pull':
+          result = await this.pullObject(params);
+          break;
+
+        case 'object.push':
+          result = await this.pushObject(params);
+          break;
+
         default:
           return {
             jsonrpc: '2.0',
@@ -252,6 +260,25 @@ export class DevToolsServer {
     this.broadcast('object.created', { id: obj.id });
 
     return { id: obj.id };
+  }
+
+  /**
+   * Pull fresh data from database for an object (updates in-place)
+   */
+  private async pullObject(params: { id: ObjId }): Promise<any> {
+    const { id } = params;
+    await this.manager.pull(id);
+    this.broadcast('object.changed', { id });
+    return { success: true };
+  }
+
+  /**
+   * Push current state to database for an object
+   */
+  private async pushObject(params: { id: ObjId }): Promise<any> {
+    const { id } = params;
+    await this.manager.push(id);
+    return { success: true };
   }
 
   /**
@@ -460,13 +487,13 @@ export class DevToolsServer {
   /**
    * Watch for MongoDB changes and notify clients
    */
+  /**
+   * Watch for changes and notify clients
+   */
   private watchForChanges(): void {
-    // Hook into ObjectManager's change stream watcher
-    // When objects change, notify all connected clients
-
-    // We'll need to expose a way to hook into change events
-    // For now, we rely on the invalidate() method being called
-    // which happens via the change stream watcher in ObjectManager
+    // In the single-server model, changes made through this server
+    // update the in-memory cache directly.
+    // If external DB changes occur, they must be manually pulled via 'object.pull'.
   }
 
   /**

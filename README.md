@@ -5,13 +5,12 @@ A modern, reactive Text-based Massively Multiplayer Online (TMMO) game engine bu
 ## Features
 
 - ✅ **LambdaMOO-style object system** - Prototype-based inheritance with executable methods
-- ✅ **Multi-transport support** - Telnet, WebSocket, and TLS
-- ✅ **Reactive architecture** - RxJS Observables throughout
-- ✅ **Multi-server capable** - MongoDB change streams for cache synchronization
+- ✅ **Multi-transport support** - Telnet and WebSocket
+- ✅ **High-Performance Caching** - O(1) array-backed cache with Stable Proxy Pattern
+- ✅ **Stable Architecture** - Single-server focus with in-memory source of truth
 - ✅ **Full authentication system** - Interactive login, SSL certs, HTTP Basic Auth
 - ✅ **Agent-based model** - Everything that acts is an Agent
 - ✅ **In-database programming** - All game logic stored as methods in MongoDB
-- ✅ **Comprehensive testing** - 72 passing tests with Vitest
 
 ## Quick Start
 
@@ -125,9 +124,9 @@ openssl s_client -connect localhost:5556 \
                  ▼
 ┌─────────────────────────────────────────────────────────┐
 │                    MongoDB                              │
-│  - Game objects (properties + methods)                 │
-│  - Change streams (multi-server sync)                  │
-│  - Replica set (for change streams)                    │
+│  - Durable backing store                               │
+│  - Loaded entirely into memory at startup              │
+│  - Asynchronous persistence for all changes            │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -196,6 +195,10 @@ const name = self.name;      // Get property
 // Call methods:
 await self.call('describe');
 await target.moveTo(room);
+
+// Explicit DB sync (rarely needed due to auto-persistence):
+await self.push();           // Memory -> DB
+await self.pull();           // DB -> Memory (syncs external changes)
 ```
 
 Example method stored in MongoDB:
@@ -213,15 +216,14 @@ Example method stored in MongoDB:
 
 See [**MOO-PROGRAMMING.md**](./MOO-PROGRAMMING.md) for the complete guide.
 
-#### 4. Multi-Server Architecture
+#### 4. Stable Proxy Architecture
 
-Multiple game servers can share one MongoDB with automatic cache synchronization:
-
-```
-Server 1                    MongoDB                    Server 2
-  Cache ─────Update───────► Objects ─────Change─────► Cache
-                           (Change Streams)
-```
+Malice uses a high-performance in-memory model:
+- **Full Warmup**: The entire database is loaded into memory at startup.
+- **O(1) Cache**: Objects are stored in a dense array for instant access.
+- **Stable Proxies**: Object references stay constant in memory even when data changes.
+- **Durable Writes**: Changes are immediately persisted to MongoDB for durability (`push`).
+- **External Sync**: Explicitly refresh objects from the database if modified externally (`pull`).
 
 ## Project Structure
 
@@ -250,11 +252,10 @@ v2/
 │   │   ├── connection-context.ts
 │   │   └── game-coordinator.ts
 │   └── index.ts                # Server entry point
-├── test/                       # Test suite (72 tests)
+├── test/                       # Test suite
 │   ├── telnet-protocol-parser.test.ts
 │   ├── telnet-command-builder.test.ts
-│   ├── connection-manager.test.ts
-│   └── change-stream.test.ts
+│   └── connection-manager.test.ts
 ├── types/                      # TypeScript types
 │   ├── object.ts
 │   ├── transport.ts
@@ -293,9 +294,6 @@ npm run test:coverage
 
 # Run with UI
 npm run test:ui
-
-# Run specific test file
-npm test -- change-stream.test.ts
 ```
 
 ### Type Checking
@@ -386,8 +384,6 @@ merchant.setMethod('greet', `
   const player = args[0];
   await player.tell('Welcome to my shop!');
 `);
-
-
 ```
 
 ## Example: Creating a Character
@@ -424,32 +420,6 @@ const merchant = await $.create({
 - `WS_PORT` - WebSocket server port (default: `8080`)
 - `TLS_PORT` - TLS server port (default: `5556`)
 
-### MongoDB Replica Set
-
-Change streams require MongoDB running in replica set mode:
-
-```bash
-# docker-compose.yml handles this automatically
-
-# Or manually:
-docker run -d --name malice-mongo -p 27017:27017 \
-  mongo:7.0 --replSet rs0
-
-docker exec malice-mongo mongosh --eval '
-rs.initiate({
-  _id: "rs0",
-  members: [{ _id: 0, host: "localhost:27017" }]
-})'
-```
-
-## Performance
-
-- **Object caching**: RuntimeObjects are cached in memory
-- **Change streams**: Automatic cache invalidation across servers
-- **Connection pooling**: Efficient connection management
-- **Lazy loading**: Objects loaded on-demand
-- **Prototype sharing**: Methods inherited, not duplicated
-
 ## Security
 
 ### Current Security Model
@@ -480,7 +450,8 @@ See [AUTH-ARCHITECTURE.md](./AUTH-ARCHITECTURE.md) for details.
 - [x] Prototype inheritance
 - [x] Method execution
 - [x] Authentication system
-- [x] Change streams
+- [x] High-performance O(1) cache
+- [x] Stable Proxy Pattern
 - [x] Bootstrap system
 
 ### Phase 2: Game Mechanics 🚧

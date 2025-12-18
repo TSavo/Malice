@@ -81,10 +81,9 @@ const hp = self.hp;
 const maxHp = self.maxHp;
 self.hp = newHp;  // Auto-saves in background!
 
-// Or via methods (still works)
-const hp = self.get('hp');
-self.set('hp', newHp);
-await self.save();
+// Manual sync control
+await self.push(); // Force immediate persistence
+await self.pull(); // Refresh from DB (e.g. if modified externally)
 ```
 
 ### Object Manager (`$`) Shortcuts
@@ -293,7 +292,6 @@ const newObj = await $.create({
 - ID generation and uniqueness
 
 ### RuntimeObject (`src/database/runtime-object.ts`)
-- Wraps GameObject with executable interface
 - Method execution via Function constructor
 - Property resolution walks prototype chain
 - Typed Value conversion (objrefs resolved to RuntimeObjects)
@@ -301,8 +299,10 @@ const newObj = await $.create({
 
 ### ObjectManager (`src/database/object-manager.ts`)
 - Coordinates ObjectDatabase and RuntimeObjects
-- In-memory caching with change stream invalidation
-- `$N` syntax for direct object access
+- **In-memory source of truth**: The entire database is loaded at startup.
+- **O(1) Array Cache**: Uses a dense array for instant lookups by positive object ID.
+- **Stable Proxy Pattern**: Object references remain constant in memory; there is no eviction.
+- **$N syntax** for direct object access
 - Alias registration and resolution
 
 ### Bootstrap (`src/database/bootstrap/`)

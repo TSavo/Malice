@@ -1,0 +1,6 @@
+Benchmarking 50000 objects over 1000 iterations...
+
+Map.get():    5024.08ms
+Array[index]: 482.47ms
+
+Array is ~10.41x faster than Map for sequential IDs.

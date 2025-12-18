@@ -563,7 +563,7 @@ export class RuntimeObjectImpl implements RuntimeObject {
           RegExp, Error, Promise, console, parseInt, parseFloat, isNaN, isFinite,
         };
 
-        const AsyncFn = async function () {}.constructor as FunctionConstructor;
+        const AsyncFn = async function () { }.constructor as FunctionConstructor;
         const parentFn = new AsyncFn('ctx', `
           const self = ctx.self;
           const $ = ctx.$;
@@ -631,7 +631,7 @@ export class RuntimeObjectImpl implements RuntimeObject {
       // Wrap code in async function for execution
       // Don't destructure $ so we can use $2, $3, etc. via Proxy
       // eslint-disable-next-line @typescript-eslint/no-implied-eval
-      const AsyncFn = async function () {}.constructor as FunctionConstructor;
+      const AsyncFn = async function () { }.constructor as FunctionConstructor;
       const fn = new AsyncFn('ctx', `
         const self = ctx.self;
         const $ = ctx.$;
@@ -718,10 +718,20 @@ export class RuntimeObjectImpl implements RuntimeObject {
   /**
    * Save changes to database
    */
+  /**
+   * Save changes to database (alias for push)
+   */
   async save(): Promise<void> {
+    await this.push();
+  }
+
+  /**
+   * Push current state to database
+   */
+  async push(): Promise<void> {
     if (!this.dirty) return;
 
-    // Don't invalidate cache - we're the source of truth
+    // Don't invalidate transient caches - we're the source of truth
     await this.manager.update(this.id, {
       parent: this.obj.parent,
       properties: this.obj.properties,
@@ -732,16 +742,18 @@ export class RuntimeObjectImpl implements RuntimeObject {
   }
 
   /**
-   * Refresh from database
+   * Pull fresh data from database (in-place)
    */
-  async refresh(): Promise<void> {
-    const updated = await this.manager.load(this.id);
-    if (updated) {
-      // Use _getRaw() to get the underlying GameObject from the loaded object
-      this.obj = updated._getRaw();
+  async pull(): Promise<void> {
+    const fresh = await this.manager.getDatabase().get(this.id);
+    if (fresh) {
+      this.obj = fresh;
       this.dirty = false;
+      // Invalidate transient caches (methods, parent chains) because they might be stale
+      this.manager.invalidateTransientCache(this.id);
     }
   }
+
 
   /**
    * Add a method to this object
