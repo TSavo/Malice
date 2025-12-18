@@ -39,6 +39,7 @@ export class RecyclerBuilder {
     // Supports two calling conventions:
     // 1. create({ parent: id, properties: {...} }, caller?) - new format
     // 2. create(parentId, { name: ..., ... }, caller?) - legacy format
+    // Parent can be a number (ID) or an object with .id property (e.g., $.dollar)
     this.recycler.setMethod('create', `
           const arg0 = args[0];
           const arg1 = args[1];
@@ -66,6 +67,18 @@ export class RecyclerBuilder {
           if (params.parent === undefined) {
             throw new Error('Parent must be specified');
           }
+
+          // Resolve parent to ID if it's an object (e.g., $.dollar -> $.dollar.id)
+          const parentId = typeof params.parent === 'object' && params.parent !== null
+            ? params.parent.id
+            : params.parent;
+
+          if (typeof parentId !== 'number') {
+            throw new Error('Parent must be a number or object with .id property');
+          }
+
+          // Update params with resolved ID
+          params.parent = parentId;
 
           // Check if caller has permission to create objects
           // Allow creation if:

@@ -30,6 +30,7 @@ import {
     BankBuilder,
     BankTerminalBuilder,
     StackableBuilder,
+    DollarBuilder,
     SealedBoxBuilder,
     ElevatorBuilder,
     DoorBuilder,
@@ -99,6 +100,7 @@ export class PrototypeBuilder {
   private bankBuilder: BankBuilder;
   private bankTerminalBuilder: BankTerminalBuilder;
     private stackableBuilder: StackableBuilder;
+    private dollarBuilder: DollarBuilder;
     private sealedBoxBuilder: SealedBoxBuilder;
     private vendableBuilder: VendableBuilder;
     private elevatorBuilder: ElevatorBuilder;
@@ -149,6 +151,7 @@ export class PrototypeBuilder {
     this.bankBuilder = new BankBuilder(manager);
     this.bankTerminalBuilder = new BankTerminalBuilder(manager);
     this.stackableBuilder = new StackableBuilder(manager);
+    this.dollarBuilder = new DollarBuilder(manager);
     this.sealedBoxBuilder = new SealedBoxBuilder(manager);
     this.vendableBuilder = new VendableBuilder(manager);
     this.elevatorBuilder = new ElevatorBuilder(manager);
@@ -324,6 +327,11 @@ export class PrototypeBuilder {
       ? await this.manager.load(aliases.stackable as number)
       : await this.stackableBuilder.build(describable!.id);
 
+    // Dollar - physical US currency, contraband (inherits from Stackable)
+    const dollar = aliases.dollar
+      ? await this.manager.load(aliases.dollar as number)
+      : await this.dollarBuilder.build(stackable!.id);
+
     // StomachContents - digesting food in stomach (inherits from Stackable)
     const stomachContents = aliases.stomachContents
       ? await this.manager.load(aliases.stomachContents as number)
@@ -434,6 +442,7 @@ export class PrototypeBuilder {
       bank: bank!.id,
       bankTerminal: bankTerminal!.id,
       stackable: stackable!.id,
+      dollar: dollar!.id,
       sealedBox: sealedBox!.id,
       vendable: vendable!.id,
       elevator: elevator!.id,
@@ -484,6 +493,7 @@ export class PrototypeBuilder {
      bank: number;
      bankTerminal: number;
      stackable: number;
+     dollar: number;
      sealedBox: number;
      vendable: number;
      elevator: number;
@@ -538,6 +548,7 @@ export class PrototypeBuilder {
     aliases.bank = ids.bank;
     aliases.bankTerminal = ids.bankTerminal;
     aliases.stackable = ids.stackable;
+    aliases.dollar = ids.dollar;
     aliases.sealedBox = ids.sealedBox;
     aliases.vendable = ids.vendable;
     aliases.elevator = ids.elevator;
