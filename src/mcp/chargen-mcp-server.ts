@@ -235,6 +235,30 @@ export class CharGenMCPServer {
         }
       }
     );
+
+    // Register an object for recycling
+    server.tool(
+      'register_for_recycle',
+      'Register an object (room, NPC) to be recycled when interview finishes.',
+      {
+        playerId: z.number().describe('Player object ID'),
+        objectId: z.number().describe('Object ID to recycle on completion'),
+      },
+      async ({ playerId, objectId }) => {
+        try {
+          const chargen = await this.getCharGen();
+          const result = await chargen.registerForRecycle(playerId, objectId);
+          return {
+            content: [{ type: 'text', text: JSON.stringify(this.serializeValue(result), null, 2) }],
+          };
+        } catch (err) {
+          return {
+            content: [{ type: 'text', text: `Error: ${err}` }],
+            isError: true,
+          };
+        }
+      }
+    );
   }
 
   /**
@@ -331,11 +355,11 @@ export class CharGenMCPServer {
       };
 
       const fakeRes = {
-        writeHead: () => {},
-        end: () => {},
-        setHeader: () => {},
+        writeHead: () => { },
+        end: () => { },
+        setHeader: () => { },
         write: () => true,
-        on: () => {},
+        on: () => { },
       } as unknown as ServerResponse;
 
       await transport.handleRequest(req, fakeRes, initMessage);

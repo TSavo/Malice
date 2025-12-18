@@ -6,7 +6,7 @@ import type { RuntimeObject } from '../../../../types/object.js';
  * Base prototype for player characters with authentication and command handling
  */
 export class PlayerBuilder {
-  constructor(private manager: ObjectManager) {}
+  constructor(private manager: ObjectManager) { }
 
   async build(humanId: number, existingObj?: RuntimeObject): Promise<RuntimeObject> {
     const obj = existingObj || await this.manager.create({
@@ -49,6 +49,7 @@ export class PlayerBuilder {
     this.addInputMethods(obj);
     this.addAuthMethods(obj);
     this.addActionMethods(obj);
+    this.addInventoryMethods(obj);
     this.addFitnessMethods(obj);
 
     return obj;
@@ -89,7 +90,9 @@ export class PlayerBuilder {
       await self.registerVerb('@fitness', self, 'fitness');
       await self.registerVerb(['health', 'hp', 'status'], self, 'health');
       await self.registerVerb(['give %i to %i'], self, 'give');
+      await self.registerVerb(['inventory', 'i'], self, 'inventory');
 
+      // If we have a location, move into it to trigger verb registration
       // If we have a location, move into it to trigger verb registration
       if (self.location && self.location !== 0) {
         // Ensure location is loaded as RuntimeObject (might be raw ID if not cached)
@@ -101,9 +104,11 @@ export class PlayerBuilder {
           // Trigger onArrived to register room verbs
           await self.onArrived(location, null, null);
           // Show room description (visual - uses see)
-          const desc = await location.describe(self);
-          await self.tell('');
-          await self.see(desc);
+          if (location.describe) {
+            const desc = await location.describe(self);
+            await self.tell('');
+            await self.see(desc);
+          }
         }
       }
 
@@ -1752,6 +1757,162 @@ export class PlayerBuilder {
 
       const newCapacity = await self.getFitnessCapacity(part);
       return { success: true, newCapacity };
+    `);
+  }
+
+  private addInventoryMethods(obj: RuntimeObject): void {
+    // Helper to get all worn items
+    obj.setMethod('getWornItems', `
+      /** Get all items currently worn by the player.
+       *  Traverses body parts to find worn items.
+       *  @returns Array of { item: RuntimeObject, part: string }
+       */
+      const body = await self.getBody();
+      if (!body) return [];
+
+      const worn = [];
+      const checkedParts = new Set(); // Avoid cycles
+
+      // Recursive helper to traverse body parts
+      const checkPart = async (part) => {
+        if (!part || checkedParts.has(part.id)) return;
+        checkedParts.add(part.id);
+
+        // Check worn items on this part
+        if (part.worn && part.worn.length > 0) {
+          for (const itemId of part.worn) {
+            const item = await $.load(itemId);
+            if (item) {
+              worn.push({ item, part: part.name });
+            }
+          }
+        }
+
+        // Recursively check sub-parts
+        const subPartNames = [
+          'head', 'face', 'neck',
+          'rightShoulder', 'leftShoulder',
+          'arm', 'forearm', 'hand',
+          'rightThigh', 'leftThigh',
+          'knee', 'leg', 'foot'
+        ];
+
+        for (const name of subPartNames) {
+          // Use getPart to safely access sub-parts
+          if (part.getPart) {
+            const subPart = await part.getPart(name);
+            if (subPart) {
+              await checkPart(subPart);
+            }
+          }
+        }
+      };
+
+      await checkPart(body);
+      return worn;
+    `);
+
+    // Pattern: inventory, i - show held and worn items
+    obj.setMethod('inventory', `
+      /** Show inventory (held and worn items).
+       *  Usage: inventory, i
+       *  Displays a natural language description of what you are holding and wearing.
+       */
+      
+      // 1. COLLECT HELD ITEMS
+      const hands = await self.getHands();
+      const body = await self.getBody();
+      const primaryHand = body?.primaryHand || 'right';
+      
+      const holdingClauses = [];
+      let holdingCount = 0;
+
+      // Helper to process a hand
+      const checkHand = async (hand, side) => {
+        if (!hand) return;
+        const contents = hand.contents || [];
+        if (contents.length > 0) {
+          // Get names of items in this hand
+          const itemNames = [];
+          for (const c of contents) {
+            // content can be ID or object
+            const item = typeof c === 'object' ? c : await $.load(c);
+            if (item) itemNames.push(item.name);
+          }
+          if (itemNames.length > 0) {
+            const list = await $.format.prose(itemNames);
+            holdingClauses.push('you are holding ' + list + ' in your ' + side + ' hand');
+            holdingCount += itemNames.length;
+          } else {
+            holdingClauses.push('your ' + side + ' hand is empty');
+          }
+        } else {
+          holdingClauses.push('your ' + side + ' hand is empty');
+        }
+      };
+
+      // Check primary then secondary
+      const secondaryHand = primaryHand === 'right' ? 'left' : 'right';
+      
+      if (hands.primary) await checkHand(hands.primary, primaryHand);
+      if (hands.secondary) await checkHand(hands.secondary, secondaryHand);
+
+      // Simplify if both hands are empty
+      if (holdingCount === 0) {
+        holdingClauses.length = 0; // Clear
+        holdingClauses.push('your hands are empty');
+      }
+
+      // 2. COLLECT WORN ITEMS
+      const wornItems = await self.getWornItems(); // Array of { item, part }
+      const wearingClauses = [];
+
+      if (wornItems.length > 0) {
+        // Dedup items and aggregate parts
+        const uniqueItems = new Map(); // id -> { name, parts: [] }
+        
+        for (const { item, part } of wornItems) {
+          if (!uniqueItems.has(item.id)) {
+            uniqueItems.set(item.id, { name: item.name, parts: new Set() });
+          }
+          uniqueItems.get(item.id).parts.add(part);
+        }
+
+        const descriptions = [];
+        for (const [id, data] of uniqueItems) {
+          // Convert parts set to list
+          const partList = Array.from(data.parts);
+          const partDesc = await $.format.prose(partList);
+          descriptions.push(data.name + ' on your ' + partDesc);
+        }
+        
+        const wornList = await $.format.prose(descriptions);
+        wearingClauses.push('you are wearing ' + wornList);
+      }
+
+      // 3. ASSEMBLE NARRATIVE
+      let text = '';
+      
+      if (holdingClauses.length > 0) {
+        const joinedHolding = await $.format.prose(holdingClauses);
+        text += joinedHolding;
+      }
+      
+      if (wearingClauses.length > 0) {
+        if (text) text += ', and ';
+        text += wearingClauses.join(', ');
+      } else {
+        if (text) text += ', and ';
+        text += 'you are not wearing anything';
+      }
+      
+      if (text) {
+        // Capitalize sentence start
+        text = text.charAt(0).toUpperCase() + text.slice(1) + '.';
+        await self.tell(text);
+      } else {
+        await self.tell('You represent a metaphysical void.');
+      }
     `);
   }
 }
