@@ -377,32 +377,8 @@ export class ObjectManager {
   }
 
   /**
-   * Track a write as belonging to this session
-   * Change stream will ignore changes to tracked writes
+   * Find object by property value
    */
-  private trackWrite(id: ObjId): void {
-    // Clear existing timeout if present
-    if (this.pendingWrites.has(id)) {
-      clearTimeout(this.pendingWrites.get(id)!);
-    }
-
-    // Track this write for 2 seconds (change streams are usually fast)
-    const timeout = setTimeout(() => {
-      this.pendingWrites.delete(id);
-    }, 2000);
-
-    this.pendingWrites.set(id, timeout);
-  }
-
-  /**
-   * Delete object
-   */
-  async delete(id: ObjId): Promise<void> {
-    await this.db.delete(id);
-
-    // Invalidate everything related to this object
-    this.cache.invalidate(id);
-  }
 
   /**
    * Find object by property value
@@ -529,7 +505,7 @@ export class ObjectManager {
   /**
    * Load ALL objects into memory at startup
    * This ensures synchronous property access via getSync() always works
-   * Database is only accessed for: initial load, writes, change stream invalidation
+   * Database is only accessed for initial load and writes.
    */
   async loadAll(): Promise<number> {
     console.log('[ObjectManager] Loading all objects into memory...');
