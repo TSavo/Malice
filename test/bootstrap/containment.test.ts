@@ -10,17 +10,31 @@ describe('Containment System', () => {
   let manager: ObjectManager;
   let $: any;
 
+  const toId = (value: any): number | null => {
+    if (value === null || value === undefined) return null;
+    if (typeof value === 'number') return value;
+    if (typeof value === 'object' && typeof value.id === 'number') return value.id;
+    return null;
+  };
+
+  const contentsIds = (container: any): number[] => {
+    const contents = container?.contents || [];
+    return contents.map((c: any) => toId(c)).filter((id: number | null): id is number => typeof id === 'number');
+  };
+
   beforeAll(async () => {
+
     db = new ObjectDatabase(MONGO_URI, 'malice_test_containment');
     await db.connect();
     await db['objects'].deleteMany({});
     manager = new ObjectManager(db);
-    const bootstrap = new GameBootstrap(manager);
+    const bootstrap = new GameBootstrap(manager, { worldBuildMode: 'systems', disableDefaultJobs: true });
     await bootstrap.bootstrap();
     $ = manager as any;
   }, 30000);
 
   afterAll(async () => {
+    await manager.flushWrites();
     await db.disconnect();
   });
 
@@ -38,8 +52,8 @@ describe('Containment System', () => {
 
       await item.moveTo(room);
 
-      expect(item.location).toBe(room.id);
-      expect(room.contents).toContain(item.id);
+      expect(toId(item.location)).toBe(room.id);
+      expect(contentsIds(room)).toContain(item.id);
     });
 
     it('should update source contents when moving', async () => {
@@ -59,12 +73,12 @@ describe('Containment System', () => {
       }, null);
 
       await item.moveTo(room1);
-      expect(room1.contents).toContain(item.id);
+      expect(contentsIds(room1)).toContain(item.id);
 
       await item.moveTo(room2);
-      expect(room1.contents).not.toContain(item.id);
-      expect(room2.contents).toContain(item.id);
-      expect(item.location).toBe(room2.id);
+      expect(contentsIds(room1)).not.toContain(item.id);
+      expect(contentsIds(room2)).toContain(item.id);
+      expect(toId(item.location)).toBe(room2.id);
     });
 
     it('should accept object ID as destination', async () => {
@@ -80,7 +94,7 @@ describe('Containment System', () => {
 
       await item.moveTo(room.id);
 
-      expect(item.location).toBe(room.id);
+      expect(toId(item.location)).toBe(room.id);
     });
 
     it('should throw on invalid destination', async () => {
@@ -98,7 +112,7 @@ describe('Containment System', () => {
         properties: { name: 'Non-existent Dest Item' },
       }, null);
 
-      await expect(item.moveTo(99999)).rejects.toThrow('not found');
+      await expect(item.moveTo(99999)).rejects.toThrow('Invalid destination');
     });
   });
 
@@ -312,10 +326,10 @@ describe('Containment System', () => {
       await box.moveTo(room);
       await item.moveTo(box);
 
-      expect(box.location).toBe(room.id);
-      expect(item.location).toBe(box.id);
-      expect(room.contents).toContain(box.id);
-      expect(box.contents).toContain(item.id);
+      expect(toId(box.location)).toBe(room.id);
+      expect(toId(item.location)).toBe(box.id);
+      expect(contentsIds(room)).toContain(box.id);
+      expect(contentsIds(box)).toContain(item.id);
     });
   });
 
@@ -333,7 +347,7 @@ describe('Containment System', () => {
 
       await room.addContent(item.id);
 
-      expect(room.contents).toContain(item.id);
+      expect(contentsIds(room)).toContain(item.id);
     });
 
     it('should remove content via removeContent', async () => {
@@ -350,7 +364,7 @@ describe('Containment System', () => {
       await room.addContent(item.id);
       await room.removeContent(item.id);
 
-      expect(room.contents).not.toContain(item.id);
+      expect(contentsIds(room)).not.toContain(item.id);
     });
 
     it('should not duplicate content on multiple adds', async () => {
@@ -368,7 +382,7 @@ describe('Containment System', () => {
       await room.addContent(item.id);
       await room.addContent(item.id);
 
-      const count = room.contents.filter((id: number) => id === item.id).length;
+      const count = contentsIds(room).filter((id: number) => id === item.id).length;
       expect(count).toBe(1);
     });
   });

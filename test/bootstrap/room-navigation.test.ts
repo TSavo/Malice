@@ -3,7 +3,23 @@ import { ObjectDatabase } from '../../src/database/object-db.js';
 import { ObjectManager } from '../../src/database/object-manager.js';
 import { GameBootstrap } from '../../src/database/game-bootstrap.js';
 
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/?replicaSet=rs0&directConnection=true';
+const MONGO_URI =
+  process.env.MONGO_URI ||
+  'mongodb://localhost:27017/?replicaSet=rs0&directConnection=true';
+
+type MaybeId = number | { id: number } | null | undefined;
+
+const toId = (value: MaybeId): number | null => {
+  if (value == null) return null;
+  if (typeof value === 'number') return value;
+  if (typeof value === 'object' && typeof value.id === 'number') return value.id;
+  return null;
+};
+
+const idsOf = (values: MaybeId[] | null | undefined): number[] =>
+  (values ?? [])
+    .map(toId)
+    .filter((id): id is number => typeof id === 'number');
 
 describe('Room Navigation', () => {
   let db: ObjectDatabase;
@@ -15,12 +31,13 @@ describe('Room Navigation', () => {
     await db.connect();
     await db['objects'].deleteMany({});
     manager = new ObjectManager(db);
-    const bootstrap = new GameBootstrap(manager);
+    const bootstrap = new GameBootstrap(manager, { worldBuildMode: 'systems', disableDefaultJobs: true });
     await bootstrap.bootstrap();
     $ = manager as any;
   }, 30000);
 
   afterAll(async () => {
+    await manager.flushWrites();
     await db.disconnect();
   });
 
@@ -76,7 +93,7 @@ describe('Room Navigation', () => {
 
       await room1.addExit(exit);
 
-      expect(room1.exits).toContain(exit.id);
+       expect(idsOf(room1.exits)).toContain(exit.id);
       expect(exit.destRoom).toBe(room2.id);
     });
 
@@ -138,10 +155,10 @@ describe('Room Navigation', () => {
       }, null);
 
       await room.addExit(exit);
-      expect(room.exits).toContain(exit.id);
+       expect(idsOf(room.exits)).toContain(exit.id);
 
       await room.removeExit('west');
-      expect(room.exits).not.toContain(exit.id);
+       expect(idsOf(room.exits)).not.toContain(exit.id);
     });
 
     it('should get all exits as objects', async () => {
@@ -497,7 +514,7 @@ describe('Room Navigation', () => {
 
       await room.addContent(item.id);
 
-      expect(room.contents).toContain(item.id);
+       expect(idsOf(room.contents)).toContain(item.id);
     });
 
     it('should remove content from room', async () => {
@@ -514,7 +531,7 @@ describe('Room Navigation', () => {
       await room.addContent(item.id);
       await room.removeContent(item.id);
 
-      expect(room.contents).not.toContain(item.id);
+       expect(idsOf(room.contents)).not.toContain(item.id);
     });
 
     it('should not add duplicate content', async () => {
@@ -532,7 +549,7 @@ describe('Room Navigation', () => {
       await room.addContent(item.id);
       await room.addContent(item.id);
 
-      expect(room.contents.filter((id: number) => id === item.id)).toHaveLength(1);
+       expect(idsOf(room.contents).filter((id) => id === item.id)).toHaveLength(1);
     });
   });
 });

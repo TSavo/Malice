@@ -47,6 +47,7 @@ describe('PrototypeBuilder', () => {
   });
 
   afterEach(async () => {
+    await manager.flushWrites();
     await db.disconnect();
   });
 

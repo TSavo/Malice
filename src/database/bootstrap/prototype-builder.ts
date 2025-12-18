@@ -505,63 +505,64 @@ export class PrototypeBuilder {
     const objectManager = await this.manager.load(0);
     if (!objectManager) return;
 
-    // Register all prototype aliases using addAlias
-    await objectManager.call('addAlias', 'describable', ids.describable);
-    await objectManager.call('addAlias', 'location', ids.location);
-    await objectManager.call('addAlias', 'exit', ids.exit);
-    await objectManager.call('addAlias', 'guardedExit', ids.guardedExit);
-    await objectManager.call('addAlias', 'room', ids.room);
-    await objectManager.call('addAlias', 'agent', ids.agent);
-    await objectManager.call('addAlias', 'embodied', ids.embodied);
-    await objectManager.call('addAlias', 'human', ids.human);
-    await objectManager.call('addAlias', 'player', ids.player);
-    await objectManager.call('addAlias', 'admin', ids.admin);
-    await objectManager.call('addAlias', 'decayable', ids.decayable);
-    await objectManager.call('addAlias', 'corpse', ids.corpse);
-    await objectManager.call('addAlias', 'humanRemains', ids.humanRemains);
-    await objectManager.call('addAlias', 'skeletalRemains', ids.skeletalRemains);
-    await objectManager.call('addAlias', 'wound', ids.wound);
-    await objectManager.call('addAlias', 'edible', ids.edible);
-    await objectManager.call('addAlias', 'food', ids.food);
-    await objectManager.call('addAlias', 'sustain', ids.sustain);
-    await objectManager.call('addAlias', 'drink', ids.drink);
-    await objectManager.call('addAlias', 'bottledWater', ids.bottledWater);
-    await objectManager.call('addAlias', 'stomachContents', ids.stomachContents);
-    await objectManager.call('addAlias', 'bodyPart', ids.bodyPart);
-    await objectManager.call('addAlias', 'wearable', ids.wearable);
-    await objectManager.call('addAlias', 'clothing', ids.clothing);
-    await objectManager.call('addAlias', 'locker', ids.locker);
-     await objectManager.call('addAlias', 'oneTimeLocker', ids.oneTimeLocker);
-     await objectManager.call('addAlias', 'bank', ids.bank);
-     await objectManager.call('addAlias', 'bankTerminal', ids.bankTerminal);
-     await objectManager.call('addAlias', 'stackable', ids.stackable);
-     await objectManager.call('addAlias', 'sealedBox', ids.sealedBox);
-     await objectManager.call('addAlias', 'vendable', ids.vendable);
-     await objectManager.call('addAlias', 'elevator', ids.elevator);
-     await objectManager.call('addAlias', 'door', ids.door);
-     await objectManager.call('addAlias', 'sign', ids.sign);
-     await objectManager.call('addAlias', 'phone', ids.phone);
-     await objectManager.call('addAlias', 'wirelessPhone', ids.wirelessPhone);
-     await objectManager.call('addAlias', 'payphone', ids.payphone);
-     await objectManager.call('addAlias', 'phoneDb', ids.phoneDb);
-     await objectManager.call('addAlias', 'lock', ids.lock);
-     await objectManager.call('addAlias', 'biometricLock', ids.biometricLock);
-     await objectManager.call('addAlias', 'rentableLock', ids.rentableLock);
-     await objectManager.call('addAlias', 'disposal', ids.disposal);
-     await objectManager.call('addAlias', 'incinerator', ids.incinerator);
-     await objectManager.call('addAlias', 'faction', ids.faction);
-
-     // Store bodyParts object directly (addAlias only supports simple id values)
-
     const aliases = (objectManager.get('aliases') as Record<string, number | Record<string, number>>) || {};
+
+    // Register all prototype aliases directly in #0.properties.aliases
+    // (do not depend on #0 having an `addAlias` method)
+    aliases.describable = ids.describable;
+    aliases.location = ids.location;
+    aliases.exit = ids.exit;
+    aliases.guardedExit = ids.guardedExit;
+    aliases.room = ids.room;
+    aliases.agent = ids.agent;
+    aliases.embodied = ids.embodied;
+    aliases.human = ids.human;
+    aliases.player = ids.player;
+    aliases.admin = ids.admin;
+    aliases.decayable = ids.decayable;
+    aliases.corpse = ids.corpse;
+    aliases.humanRemains = ids.humanRemains;
+    aliases.skeletalRemains = ids.skeletalRemains;
+    aliases.wound = ids.wound;
+    aliases.edible = ids.edible;
+    aliases.food = ids.food;
+    aliases.sustain = ids.sustain;
+    aliases.drink = ids.drink;
+    aliases.bottledWater = ids.bottledWater;
+    aliases.stomachContents = ids.stomachContents;
+    aliases.bodyPart = ids.bodyPart;
+    aliases.wearable = ids.wearable;
+    aliases.clothing = ids.clothing;
+    aliases.locker = ids.locker;
+    aliases.oneTimeLocker = ids.oneTimeLocker;
+    aliases.bank = ids.bank;
+    aliases.bankTerminal = ids.bankTerminal;
+    aliases.stackable = ids.stackable;
+    aliases.sealedBox = ids.sealedBox;
+    aliases.vendable = ids.vendable;
+    aliases.elevator = ids.elevator;
+    aliases.door = ids.door;
+    aliases.sign = ids.sign;
+    aliases.phone = ids.phone;
+    aliases.wirelessPhone = ids.wirelessPhone;
+    aliases.payphone = ids.payphone;
+    aliases.phoneDb = ids.phoneDb;
+    aliases.lock = ids.lock;
+    aliases.biometricLock = ids.biometricLock;
+    aliases.rentableLock = ids.rentableLock;
+    aliases.disposal = ids.disposal;
+    aliases.incinerator = ids.incinerator;
+    aliases.faction = ids.faction;
+
+    // Store bodyParts object directly (not a runtime alias, used as a namespace)
     aliases.bodyParts = ids.bodyParts;
-    objectManager.set('aliases', aliases);
 
-
-    // Also expose individual body part prototypes at top level for BodyFactory
+    // Also expose individual body part prototypes at top-level for BodyFactory
     for (const [name, id] of Object.entries(ids.bodyParts)) {
-      await objectManager.call('addAlias', name, id);
+      aliases[name] = id;
     }
+
+    objectManager.set('aliases', aliases);
 
     const partNames = Object.keys(ids.bodyParts).join(', ');
     console.log(

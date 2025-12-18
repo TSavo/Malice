@@ -269,3 +269,15 @@ const loc = await $.load(self.location);  // location is already RuntimeObject
 - [Best Practices](./best-practices.md) - Composition over duplication
 - [Anti-Patterns](./reference/anti-patterns.md) - Common mistakes
 - [Utilities](./utilities/) - Available utility objects
+
+### System References
+
+- [$ Globals](./reference/globals.md) - Core aliases and global services
+- [Prototypes](./reference/prototypes.md) - Complete prototype hierarchy and API tables
+- [Verb System](./reference/verbs.md) - Patterns, registration, dispatch
+- [Prompt System](./reference/prompts.md) - Interactive prompts and menus
+- [Event Hooks](./reference/hooks.md) - Hook points and conventions
+- [Exclusions System](./reference/exclusions.md) - Mutual exclusion rules
+- [Plot System](./reference/plots.md) - Plot logs and jobs
+- [Body System](./reference/body-system.md) - Bodies and metabolism
+- [AI/NPC System](./reference/ai-npc.md) - NPC architecture and prompting
