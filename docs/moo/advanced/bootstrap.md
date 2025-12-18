@@ -239,7 +239,7 @@ export const building = {
 - Supports `objects` array to spawn items inside rooms
 - Objects get `location` set and are added to room's `contents` via `addContent()`
 
-See [SMITH-TOWER-BUILDERS-GUIDE.md](../../../SMITH-TOWER-BUILDERS-GUIDE.md) for detailed documentation.
+See [SMITH-TOWER-BUILDERS-GUIDE.md](../../SMITH-TOWER-BUILDERS-GUIDE.md) for detailed documentation.
 
 ## Creating a Custom Utility Builder
 
@@ -604,6 +604,6 @@ Add to PrototypeBuilder instead of CoreSystemBuilder.
 ## See Also
 
 - [Architecture](../architecture.md) - Three-layer system overview
-- [Creating Utilities](./utilities.md) - When to create utilities vs prototypes (coming soon)
+- [Best Practices](../best-practices.md) - When to create utilities vs prototypes
 - [Prototypes](../prototypes.md) - Prototype system and inheritance
 - [Core Concepts](../core-concepts.md) - Objects and the $ system

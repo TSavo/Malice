@@ -248,6 +248,88 @@ export class ObjectDatabase {
   }
 
   /**
+   * Watch for changes to objects (for cache invalidation across servers)
+   * Enables multiple game servers / DevTools to share one MongoDB and stay in sync
+   */
+  watch(callback: (change: any) => void): void {
+    if (this.shuttingDown) {
+      return;
+    }
+
+    if (this.changeStream) {
+      console.warn('[ObjectDatabase] Already watching for changes');
+      return;
+    }
+
+    console.log('[ObjectDatabase] Watching for changes (multi-server cache sync enabled)');
+
+    // Use setImmediate to avoid blocking the constructor
+    setImmediate(() => {
+      if (this.shuttingDown) return;
+
+      try {
+        const stream = this.objects.watch([], {
+          fullDocument: 'updateLookup', // Include full document on updates
+        });
+        this.changeStream = stream;
+
+        stream.on('change', (change) => {
+          callback(change);
+        });
+
+        stream.on('error', (err) => {
+          // Ignore errors during shutdown.
+          if (this.shuttingDown) return;
+
+          console.error('[ObjectDatabase] Change stream error:', err);
+
+          // Ensure the underlying stream is actually closed; otherwise we can
+          // leak sockets/handles while also losing our reference to it.
+          if (this.changeStream === stream) {
+            this.changeStream = undefined;
+          }
+          stream.close().catch(() => undefined);
+
+          if (this.watchRetryTimer) {
+            clearTimeout(this.watchRetryTimer);
+          }
+
+          this.watchRetryTimer = setTimeout(() => {
+            this.watchRetryTimer = undefined;
+            if (!this.changeStream && !this.shuttingDown) {
+              this.watch(callback);
+            }
+          }, 5000);
+          this.watchRetryTimer.unref?.();
+        });
+
+        stream.on('close', () => {
+          if (this.changeStream === stream) {
+            this.changeStream = undefined;
+          }
+          console.log('[ObjectDatabase] Change stream closed');
+        });
+      } catch (err) {
+        if (this.shuttingDown) return;
+
+        console.error('[ObjectDatabase] Failed to start change stream:', err);
+
+        if (this.watchRetryTimer) {
+          clearTimeout(this.watchRetryTimer);
+        }
+
+        this.watchRetryTimer = setTimeout(() => {
+          this.watchRetryTimer = undefined;
+          if (!this.changeStream && !this.shuttingDown) {
+            this.watch(callback);
+          }
+        }, 5000);
+        this.watchRetryTimer.unref?.();
+      }
+    });
+  }
+
+  /**
    * Count the number of player objects in the database
    * Used by CharGen to determine if this is the first player (admin)
    * Searches for objects that have a non-empty playername property

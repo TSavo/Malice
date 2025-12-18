@@ -72,6 +72,9 @@ export class ObjectManager {
   public readonly db: ObjectDatabase; // Expose for DevTools direct access
 
 
+  // Track in-flight update operations (fire-and-forget writes from RuntimeObject)
+  private pendingUpdateOperations = new Set<Promise<void>>();
+
   constructor(db: ObjectDatabase) {
     this.db = db;
     this.cache = new ObjectCache();
@@ -359,11 +362,46 @@ export class ObjectManager {
     updates: Partial<Omit<GameObject, '_id' | 'created'>>,
     invalidateCache = true
   ): Promise<void> {
-    await this.db.update(id, updates);
+    // Track in-flight writes so tests can flush them before teardown.
+    const updatePromise = this.db.update(id, updates);
+    this.pendingUpdateOperations.add(updatePromise);
+    try {
+      await updatePromise;
+    } finally {
+      this.pendingUpdateOperations.delete(updatePromise);
+    }
 
     if (invalidateCache) {
       this.cache.invalidate(id);
     }
+  }
+
+  /**
+   * Track a write as belonging to this session
+   * Change stream will ignore changes to tracked writes
+   */
+  private trackWrite(id: ObjId): void {
+    // Clear existing timeout if present
+    if (this.pendingWrites.has(id)) {
+      clearTimeout(this.pendingWrites.get(id)!);
+    }
+
+    // Track this write for 2 seconds (change streams are usually fast)
+    const timeout = setTimeout(() => {
+      this.pendingWrites.delete(id);
+    }, 2000);
+
+    this.pendingWrites.set(id, timeout);
+  }
+
+  /**
+   * Delete object
+   */
+  async delete(id: ObjId): Promise<void> {
+    await this.db.delete(id);
+
+    // Invalidate everything related to this object
+    this.cache.invalidate(id);
   }
 
   /**
@@ -397,6 +435,21 @@ export class ObjectManager {
     }
 
     return results;
+  }
+
+  /**
+   * Wait for all in-flight RuntimeObject auto-persist writes to complete.
+   *
+   * This is primarily intended for tests, to avoid disconnecting Mongo while
+   * fire-and-forget writes are still pending.
+   */
+
+  async flushWrites(): Promise<void> {
+    // Drain in waves in case awaiting one write triggers others.
+    while (this.pendingUpdateOperations.size > 0) {
+      const pending = Array.from(this.pendingUpdateOperations);
+      await Promise.allSettled(pending);
+    }
   }
 
   /**

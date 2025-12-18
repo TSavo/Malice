@@ -18,10 +18,14 @@ describe('GameBootstrap', () => {
     await db['objects'].deleteMany({});
 
     manager = new ObjectManager(db);
-    bootstrap = new GameBootstrap(manager);
+    bootstrap = new GameBootstrap(manager, {
+      worldBuildMode: 'systems',
+      disableDefaultJobs: true,
+    });
   });
 
   afterEach(async () => {
+    await manager.flushWrites();
     await db.disconnect();
   });
 
@@ -188,10 +192,13 @@ describe('GameBootstrap', () => {
       const config = root!.get('config') as any;
       config.customSetting = 'test value';
       root!.set('config', config);
-      await objectManager!.save();
+      await manager.flushWrites();
 
       // Re-bootstrap
-      const bootstrap2 = new GameBootstrap(manager);
+      const bootstrap2 = new GameBootstrap(manager, {
+        worldBuildMode: 'systems',
+        disableDefaultJobs: true,
+      });
       await bootstrap2.bootstrap();
 
       // Check custom data preserved
@@ -209,10 +216,13 @@ describe('GameBootstrap', () => {
       const aliases = objectManager!.get('aliases') as Record<string, number>;
       aliases.myCustomAlias = 999;
       objectManager!.set('aliases', aliases);
-      await objectManager!.save();
+      await manager.flushWrites();
 
       // Re-bootstrap
-      const bootstrap2 = new GameBootstrap(manager);
+      const bootstrap2 = new GameBootstrap(manager, {
+        worldBuildMode: 'systems',
+        disableDefaultJobs: true,
+      });
       await bootstrap2.bootstrap();
 
       // Check custom alias preserved

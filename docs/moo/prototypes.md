@@ -412,6 +412,6 @@ await $.addAlias('weapon', weapon);
 
 ## See Also
 
-- [Core Concepts](../core-concepts.md) - Object references and properties
-- [Best Practices](../best-practices.md) - Composition patterns
-- [Architecture](../architecture.md) - Where prototypes go (Bootstrap layer)
+- [Core Concepts](./core-concepts.md) - Object references and properties
+- [Best Practices](./best-practices.md) - Composition patterns
+- [Architecture](./architecture.md) - Where prototypes go (Bootstrap layer)

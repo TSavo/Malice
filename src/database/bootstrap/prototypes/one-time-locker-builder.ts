@@ -14,6 +14,8 @@ import type { RuntimeObject } from '../../../../types/object.js';
  * - "set code on locker A1" - set master code (owner only)
  * - "check locker A1" - view status (owner only)
  * - "release locker A1" - give up ownership
+ * - "put <item> in locker A1" - store an item
+ * - "get from locker A1" - then choose item to take
  */
 export class OneTimeLockerBuilder {
   constructor(private manager: ObjectManager) {}
@@ -36,10 +38,8 @@ export class OneTimeLockerBuilder {
 
     // doRent - rent an available compartment
     obj.setMethod('doRent', `
-      const context = args[0];
-      const player = args[1];
-
       if (!player) return 'Rent what?';
+
 
       const available = await self.listAvailable();
 
@@ -84,9 +84,8 @@ export class OneTimeLockerBuilder {
 
     // doOpen - open a compartment
     obj.setMethod('doOpen', `
-      const context = args[0];
-      const player = args[1];
-      const compId = args[2];  // Compartment ID from verb parsing
+      const compId = (args[0] || '').trim();
+
 
       if (!player) return 'Open what?';
       if (!compId) return 'Which compartment? Try: open locker [number]';
@@ -146,9 +145,8 @@ export class OneTimeLockerBuilder {
 
     // doClose - close and lock a compartment
     obj.setMethod('doClose', `
-      const context = args[0];
-      const player = args[1];
-      const compId = args[2];
+      const compId = ((args[0] || '').trim().split(/\s+/)[0]) || '';
+
 
       if (!player) return 'Close what?';
       if (!compId) return 'Which compartment? Try: close locker [number]';
@@ -188,9 +186,8 @@ export class OneTimeLockerBuilder {
 
     // doSetCode - set master code (owner only)
     obj.setMethod('doSetCode', `
-      const context = args[0];
-      const player = args[1];
-      const compId = args[2];
+      const compId = ((args[0] || '').trim().split(/\s+/)[0]) || '';
+
 
       if (!player) return 'Set code on what?';
       if (!compId) return 'Which compartment? Try: set code on locker [number]';
@@ -217,9 +214,8 @@ export class OneTimeLockerBuilder {
 
     // doGetCode - generate one-time code (owner only)
     obj.setMethod('doGetCode', `
-      const context = args[0];
-      const player = args[1];
-      const compId = args[2];
+      const compId = ((args[0] || '').trim().split(/\s+/)[0]) || '';
+
 
       if (!player) return 'Get code from what?';
       if (!compId) return 'Which compartment? Try: get code from locker [number]';
@@ -249,9 +245,8 @@ export class OneTimeLockerBuilder {
 
     // doCheck - view status (owner only)
     obj.setMethod('doCheck', `
-      const context = args[0];
-      const player = args[1];
-      const compId = args[2];
+      const compId = ((args[0] || '').trim().split(/\s+/)[0]) || '';
+
 
       if (!player) return 'Check what?';
       if (!compId) return 'Which compartment? Try: check locker [number]';
@@ -288,9 +283,8 @@ export class OneTimeLockerBuilder {
 
     // doRelease - give up ownership
     obj.setMethod('doRelease', `
-      const context = args[0];
-      const player = args[1];
-      const compId = args[2];
+      const compId = ((args[0] || '').trim().split(/\s+/)[0]) || '';
+
 
       if (!player) return 'Release what?';
       if (!compId) return 'Which compartment? Try: release locker [number]';
@@ -316,9 +310,8 @@ export class OneTimeLockerBuilder {
 
     // doRenew - extend rental period
     obj.setMethod('doRenew', `
-      const context = args[0];
-      const player = args[1];
-      const compId = args[2];
+      const compId = ((args[0] || '').trim().split(/\s+/)[0]) || '';
+
 
       if (!player) return 'Renew what?';
       if (!compId) return 'Which compartment? Try: renew locker [number]';
@@ -339,9 +332,8 @@ export class OneTimeLockerBuilder {
 
     // doLook - look at locker bank or specific compartment
     obj.setMethod('doLook', `
-      const context = args[0];
-      const player = args[1];
-      const compId = args[2];
+      const compId = ((args[0] || '').trim().split(/\s+/)[0]) || '';
+
 
       if (compId) {
         return await self.describeCompartment(compId, player);
@@ -352,10 +344,13 @@ export class OneTimeLockerBuilder {
 
     // doPut - put item in compartment
     obj.setMethod('doPut', `
-      const context = args[0];
-      const player = args[1];
-      const item = args[2];
-      const compId = args[3];
+      /** Store an item in a locker compartment.
+       *  Usage: put <item> in locker <compartment>
+       *  Example: put apple in locker A1
+       */
+      const item = args[0];
+      const compId = ((args[1] || '').trim().split(/\s+/)[0]) || '';
+
 
       if (!player) return 'Put what where?';
       if (!item) return 'Put what in the locker?';
@@ -387,15 +382,16 @@ export class OneTimeLockerBuilder {
       return 'You put ' + item.name + ' in compartment ' + compId + '.';
     `);
 
-    // doGet - get item from compartment
+    // doGet - take an item from a compartment
     obj.setMethod('doGet', `
-      const context = args[0];
-      const player = args[1];
-      const itemName = args[2];
-      const compId = args[3];
+      /** Take something out of a locker compartment.
+       *  Usage: get from locker <compartment>
+       *  Notes:
+       *  - If multiple items are inside, you'll be prompted to choose.
+       */
+      const compId = ((args[0] || '').trim().split(/\s+/)[0]) || '';
 
       if (!player) return 'Get what?';
-      if (!itemName) return 'Get what from the locker?';
       if (!compId) return 'Which compartment?';
 
       const comp = await self.getCompartment(compId);
@@ -405,19 +401,38 @@ export class OneTimeLockerBuilder {
         return 'Compartment ' + compId + ' is locked.';
       }
 
-      // Find item by name
       const contents = comp.contents || [];
+      if (contents.length === 0) {
+        return 'Compartment ' + compId + ' is empty.';
+      }
+
       let foundItem = null;
-      for (const item of contents) {
-        if (item && item.name && item.name.toLowerCase().includes(itemName.toLowerCase())) {
-          foundItem = item;
-          break;
+      if (contents.length === 1) {
+        foundItem = contents[0];
+      } else {
+        if (!$.prompt) {
+          const list = contents.map((it, i) => (i + 1) + '. ' + (it?.name || 'unknown')).join(', ');
+          return 'Which item? (' + list + ')';
         }
+
+        const options = {};
+        const byKey = {};
+        for (let i = 0; i < contents.slice(0, 10).length; i++) {
+          const it = contents[i];
+          const key = String(i + 1);
+          options[key] = it?.name || 'unknown';
+          byKey[key] = it;
+        }
+
+        const choice = await $.prompt.choice(player, 'Take which item?', options);
+        if (!choice) return 'Cancelled.';
+        foundItem = byKey[choice] || null;
       }
 
       if (!foundItem) {
-        return 'No ' + itemName + ' in compartment ' + compId + '.';
+        return 'Nothing to take.';
       }
+
 
       // Remove from compartment
       const result = await self.removeContent(compId, foundItem);
@@ -453,19 +468,22 @@ export class OneTimeLockerBuilder {
       await player.registerVerb(['rent locker', 'rent compartment'], self, 'doRent');
       await player.registerVerb(['look at locker', 'examine locker', 'look locker'], self, 'doLook');
 
-      // Compartment-specific verbs (ID captured as args[2])
-      await player.registerVerb(['open locker %w', 'unlock locker %w'], self, 'doOpen');
-      await player.registerVerb(['close locker %w', 'lock locker %w'], self, 'doClose');
-      await player.registerVerb(['set code on locker %w', 'change code on locker %w'], self, 'doSetCode');
-      await player.registerVerb(['get code from locker %w', 'generate code for locker %w'], self, 'doGetCode');
-      await player.registerVerb(['check locker %w', 'status locker %w'], self, 'doCheck');
-      await player.registerVerb(['release locker %w', 'abandon locker %w'], self, 'doRelease');
-      await player.registerVerb(['renew locker %w', 'extend locker %w'], self, 'doRenew');
-      await player.registerVerb(['look at locker %w', 'examine locker %w', 'look locker %w'], self, 'doLook');
+      // Compartment-specific verbs (compartment ID captured as args[0] via %s)
+      await player.registerVerb(['open locker %s', 'unlock locker %s'], self, 'doOpen');
+      await player.registerVerb(['close locker %s', 'lock locker %s'], self, 'doClose');
+      await player.registerVerb(['set code on locker %s', 'change code on locker %s'], self, 'doSetCode');
+      await player.registerVerb(['get code from locker %s', 'generate code for locker %s'], self, 'doGetCode');
+      await player.registerVerb(['check locker %s', 'status locker %s'], self, 'doCheck');
+      await player.registerVerb(['release locker %s', 'abandon locker %s'], self, 'doRelease');
+      await player.registerVerb(['renew locker %s', 'extend locker %s'], self, 'doRenew');
+      await player.registerVerb(['look at locker %s', 'examine locker %s', 'look locker %s'], self, 'doLook');
 
       // Put/get verbs
-      await player.registerVerb(['put %d in locker %w', 'place %d in locker %w'], self, 'doPut');
-      await player.registerVerb(['get %w from locker %w', 'take %w from locker %w'], self, 'doGet');
+      // Note: %s must be the last token, so "get <thing> from locker <id>" is not currently expressible.
+      // Instead we prompt you to pick an item after identifying the compartment.
+      await player.registerVerb(['put %i in locker %s', 'place %i in locker %s'], self, 'doPut');
+      await player.registerVerb(['get from locker %s', 'take from locker %s'], self, 'doGet');
+
     `);
 
     // onArrived - register verbs when placed in room
