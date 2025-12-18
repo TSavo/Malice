@@ -43,11 +43,11 @@ const door = await $.recycler.create($.door, {
 });
 
 // Attach the same door to both exits (A→B and B→A)
-exitAtoB.door = door.id;
-exitBtoA.door = door.id;
+exitAtoB.door = door;
+exitBtoA.door = door;
 
 // Or attach to an elevator
-myElevator.door = door.id;
+myElevator.door = door;
 ```
 
 ## Benefits
@@ -59,6 +59,6 @@ myElevator.door = door.id;
 ---
 
 # See Also
-- [Exit Prototype](./exit.md)
+- [Room System](./rooms.md) - Exits and navigation
 - [Elevator Prototype](./elevator.md)
 - [Security System](./security.md)

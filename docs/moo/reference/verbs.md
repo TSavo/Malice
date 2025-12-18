@@ -361,4 +361,5 @@ The `help` command extracts these docblocks for player help.
 
 - [Prototypes Reference](./prototypes.md) - Object types that use verbs
 - [Event Hooks](./hooks.md) - onArrived/onLeaving lifecycle
-- [Method Sandbox](./sandbox.md) - How methods are executed
+- [Architecture](../architecture.md) - How methods are executed
+
