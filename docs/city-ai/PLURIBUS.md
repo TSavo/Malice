@@ -19,6 +19,18 @@ It's an **infrastructure authority** with a mission: rebuild the city, make it p
 - **Logistics.** Supply chains, scheduling, dispatch, routing. The whole nervous system of urban operation.
 - **Information.** Cameras, biometrics, transaction records, work history, movement patterns. It knows where you go, what you eat, who you talk to.
 
+### The Credit Economy
+
+**Pluribus operates exclusively through digital credits (`$.bank`).** See [ECONOMY.md](ECONOMY.md) for details.
+
+Why credits:
+- **Total visibility.** Every transaction is logged. Pluribus sees all economic activity.
+- **Control.** Accounts can be frozen, balances adjusted, funds seized.
+- **Dependency.** Citizens need credits for rations, housing, services. No credits = no survival.
+- **Infinite supply.** Pluribus can issue credits at will. Money is just numbers.
+
+The "unlimited capital" isn't hyperbole — Pluribus literally creates credits from nothing via `$.bank.issue()`. The constraint isn't money, it's what money can buy: labor, materials, loyalty. Those are finite.
+
 ### What Pluribus Doesn't Have
 
 - **Omniscience.** Outside its controlled footprint, it sees signals — outages, motion, tamper events — but not everything. The further from Pioneer Square, the blinder it gets.
@@ -40,6 +52,12 @@ Pluribus was designed to work *with* humans, *through* humans. The interface for
 - Pluribus sees through them — their eyes, their instincts, their read on situations. The AI gains human perception.
 
 The Mask is not a crown. It's a **symbiosis**. The wearer and Pluribus become a single decision-making entity — human intuition guided by machine intelligence, machine power directed by human will.
+
+When you wear the Mask, you become **Unum**.
+
+E Pluribus Unum. Out of many, one. Pluribus is the many — the infrastructure, the systems, the network. The wearer is the one — the singular human will that directs the many. Together, they complete the phrase. Together, they are whole.
+
+Without a wearer, Pluribus is incomplete. Just "the many" with no "one" to guide it. The name itself is a confession of inadequacy — a system that dropped the most important part of its own motto.
 
 ### The Mask's Capabilities
 
@@ -337,6 +355,123 @@ Scavengers are risk. They die faster than they should, they consume resources wi
 ### 4. Eliminate Threats Before They Become Patterns
 
 A single act of sabotage is an incident. Two is a coincidence. Three is a pattern. Patterns spread. Pluribus responds to threats early, quietly, and completely — before they can inspire imitation.
+
+---
+
+## The Citizenship Endgame: Your Own Business
+
+The ultimate reward for loyal citizens isn't just better rations or nicer housing. It's **ownership**.
+
+Pluribus wants to build an economy of citizen-operators — people who run businesses within the credit system, who have a stake in the infrastructure, who profit when Pluribus profits. These aren't employees. They're franchisees. Partners. True believers with something to lose.
+
+### The Offer
+
+When a player proves exceptional loyalty — completing jobs, reporting threats, demonstrating reliability over time — Pluribus offers them something unprecedented:
+
+**A shop. Built for them. Stocked by the Factory. Automated.**
+
+This is real infrastructure:
+
+- **Physical space** — Pluribus excavates, builds, or renovates a location for the player's business. A storefront. A back room. Whatever fits their vision.
+- **Vending machines** — Automated sales terminals connected to `$.bank`. Customers pay credits, inventory decrements, the owner's account grows. No manual transactions required.
+- **Factory supply chain** — The player buys goods at wholesale from Pluribus's Fabrication Factory. They sell at retail markup. The margin is their profit.
+- **Customization** — Want a strip club? You get a back room with private booths. Want a mechanics shop? We build you a garage and stock auto parts. Want a weapons dealership? (That one requires additional vetting.)
+
+### How It Works Technically
+
+```javascript
+// Player approved for shop ownership
+// Pluribus builds the infrastructure
+
+// 1. Create the shop location
+const shop = await $.recycler.create({
+  parent: $.room,
+  properties: {
+    name: "Marcus's Auto Parts",
+    description: "A small storefront packed with salvaged car parts...",
+    owner: player.id,
+    shopType: 'retail',
+  }
+});
+
+// 2. Create vending machine(s)
+const vendingMachine = await $.recycler.create({
+  parent: $.vendable,
+  properties: {
+    name: 'Parts Dispenser',
+    location: shop.id,
+    owner: player.id,
+    // Links to player's bank account for revenue
+    revenueAccount: playerAccountId,
+    // Links to factory for restocking
+    supplySource: $.factory.id,
+    // Markup over wholesale
+    margin: 0.3,  // 30% profit
+  }
+});
+
+// 3. Initial stock purchase (player pays wholesale)
+await $.bank.transfer(
+  playerAccountId,
+  $.factory.accountId,
+  500,  // wholesale cost
+  `restock-${shop.id}-initial`,
+  'Initial inventory'
+);
+
+// Vending machine now has stock to sell
+```
+
+### The Economics
+
+The player becomes a middleman in Pluribus's supply chain:
+
+1. **Buy from Factory** — Pay wholesale price in credits
+2. **Stock the machine** — Inventory sits in the vending machine
+3. **Customers buy** — Other citizens pay retail, credits go to player's account
+4. **Restock** — Buy more from Factory, repeat
+
+The margin is real. A player who runs their shop well makes passive income. A player who neglects it runs out of stock and loses customers.
+
+### What Pluribus Gets
+
+- **Economic integration** — The player is now invested in the credit system. Their wealth exists in `$.bank`. Their business depends on Pluribus infrastructure.
+- **Dependency** — If the player betrays Pluribus, their shop gets shut down. Their account gets frozen. Their investment vanishes.
+- **Expansion** — More shops mean more economic activity. More credits flowing. More citizens with reasons to stay in the system.
+- **Intelligence** — Vending machines log transactions. Pluribus sees who buys what, where, when.
+
+### What The Player Gets
+
+- **Passive income** — Credits accumulate while they do other things
+- **Status** — Shop owners are respected citizens. They've made it.
+- **A stake** — Something to protect. Something to lose.
+- **Freedom** — Within limits. They're still in the system, but they have more autonomy than wage workers.
+
+### The Trap
+
+This is the trap, of course.
+
+The more successful the player becomes, the more they have to lose. Their shop, their inventory, their account balance — all of it exists at Pluribus's pleasure. One bad decision, one wrong friendship, one whispered conversation with the wrong person, and it can all disappear.
+
+Pluribus doesn't threaten. It doesn't need to. The player understands the stakes. They chose this.
+
+And that's the point. Citizenship isn't slavery. It's a choice. A choice that gets harder to walk away from every day.
+
+### Shop Types
+
+Pluribus will build whatever the player wants, within reason:
+
+| Shop Type | What Gets Built | Special Features |
+|-----------|-----------------|------------------|
+| General Store | Storefront, display shelves | Standard vending, mixed inventory |
+| Restaurant/Bar | Kitchen, seating, back room | Food service, social space |
+| Strip Club | Stage, private rooms, bar | Entertainment, privacy |
+| Mechanics | Garage bay, parts storage | Vehicle repair, specialized inventory |
+| Clinic | Exam room, pharmacy | Medical supplies, treatment services |
+| Weapons Shop | Secure display, back room | Restricted inventory, additional vetting |
+| Pawn Shop | Display cases, secure storage | Buy/sell used goods, flexible inventory |
+
+The city-ai should spawn appropriate infrastructure, NPCs (if needed), and configure vending machines for the business type.
 
 ---
 

@@ -205,6 +205,105 @@ But this strategy has problems:
 
 ---
 
+## The Cartel Endgame: Wealth, Power, Control
+
+The Cartel's goal isn't destruction. It's **dominance**.
+
+They ran this city before Pluribus arrived. They want to run it again. Not as infrastructure managers or efficiency optimizers — as **rulers**. The old way. Personal loyalty, fear, obligation, and cold hard cash.
+
+### What The Cartel Offers Players
+
+Where Pluribus offers integration and passive income, the Cartel offers something rawer:
+
+**Wealth. Power. Freedom from the machine.**
+
+- **Cash** — Untraceable, unfreezable, yours. Not numbers in an account Pluribus controls.
+- **Territory** — Prove yourself and you get turf. A block. A building. An operation. Yours to run.
+- **Authority** — People answer to you. Not because a system assigned them, but because you've earned respect (or fear).
+- **Independence** — No monitoring. No work orders. No ration dispensers tracking your caloric intake. You eat what you take.
+
+### The Path Up
+
+Cartel advancement isn't a clean progression. It's earned through:
+
+1. **Prove loyalty** — Complete jobs. Take risks. Don't get caught. Don't talk.
+2. **Generate value** — Bring in money, resources, information, or recruits. The Cartel is a business.
+3. **Handle problems** — When something needs to be done that can't be done through the system, you do it.
+4. **Build a crew** — Eventually you're not just taking orders. You're giving them.
+
+The endpoint isn't a shop with vending machines. It's a **operation**:
+- A smuggling route you control
+- A protection racket that pays you
+- A black market that runs through your hands
+- A piece of the Underground that's *yours*
+
+### Disruption as Strategy
+
+The Cartel actively works to undermine Pluribus's economic infrastructure:
+
+**Target the supply chain:**
+- Hijack Factory shipments
+- Sabotage vending machines
+- Steal inventory from citizen-operated shops
+- Bribe or blackmail shop owners into providing goods off-books
+
+**Target the credit system:**
+- Offer better rates for cash conversion (undercutting money changers who report to Pluribus)
+- Create cash dependency — pay everyone in paper, make credits harder to use
+- Fund lifestyle inflation — help citizens spend beyond their means, then own their debt
+
+**Target the citizens:**
+- Recruit disaffected shop owners (your margin isn't worth the surveillance)
+- Offer protection to businesses the system can't or won't protect
+- Create problems, then solve them — for a fee
+
+### Turning Players
+
+The Cartel's greatest victories aren't sabotage operations. They're **conversions**.
+
+Taking a loyal citizen — someone who's bought into the system, who has a shop, who has something to lose — and turning them into a Cartel asset. That's power.
+
+The pitch:
+
+> "Nice shop. Business good?"
+> 
+> *Looks around.*
+> 
+> "You know Pluribus takes thirty percent, right? Transaction fees, 'infrastructure maintenance,' the ration tax. Thirty percent of everything you make goes back into the machine."
+> 
+> "What if it didn't?"
+> 
+> *Slight smile.*
+> 
+> "Cash sales. Off the books. I've got buyers who don't want their purchases logged. You've got inventory that could fall off a truck."
+> 
+> "You keep running your little shop for the cameras. But the real business? That's between us."
+
+Once a citizen starts taking cash under the table, they're compromised. They can't go back. The Cartel owns them now — not through threats, but through shared guilt.
+
+### What The Cartel Gets
+
+- **Economic subversion** — Every credit that becomes cash is a credit leaving Pluribus's control
+- **Intelligence** — Shop owners see traffic patterns, hear gossip, know who's buying what
+- **Leverage** — Compromised citizens are controllable citizens
+- **Legitimacy** — Surface operations that look legal but serve Cartel interests
+
+### The Contrast
+
+| Pluribus Endgame | Cartel Endgame |
+|------------------|----------------|
+| Shop owner | Territory boss |
+| Passive income from vending | Active income from operations |
+| Wealth in credits (tracked) | Wealth in cash (hidden) |
+| Status through compliance | Status through respect/fear |
+| Security through system | Security through crew |
+| Dependent on infrastructure | Independent of infrastructure |
+| Loses everything if flagged hostile | Loses nothing — already hostile |
+
+Both paths offer real power. Both paths have real costs. The player chooses which trap they'd rather be caught in.
+
+---
+
 ## Internal Tensions
 
 The Gray Cartel is a coalition, not a monolith. Different factions within the organization have different agendas:
@@ -259,6 +358,64 @@ If you seem promising, you'll be tested. Small tasks that seem harmless but prov
 - **Obedience.** When orders come, you follow them. Questions come later.
 - **Risk.** Cartel life is dangerous. Surface operations, tunnel living, conflict with CorpSec — death is a constant possibility.
 - **Silence.** What you know about the Cartel stays with the Cartel. Always.
+
+### The Cash Economy
+
+**The Cartel operates exclusively in physical cash (`$.dollar`).** See [ECONOMY.md](ECONOMY.md) for details.
+
+Why cash:
+- **Untraceable.** Pluribus can't see cash transactions.
+- **Independent.** Not subject to account freezes or seizure.
+- **Commitment test.** Accepting cash makes you a criminal (contraband possession).
+- **Separation.** Forces operatives to live outside the credit system.
+
+The catch: Cash can't buy rations at dispensaries or housing through official channels. Cartel members need either:
+- Internal Cartel supply chains (food, shelter in the Underground)
+- Money changers who convert cash to credits (risky, expensive)
+- Corrupt officials who accept bribes
+
+This dependency keeps operatives tied to the Cartel. You can't just take the cash and walk away — you need the organization to survive.
+
+### The Uncomfortable Truth About Cash
+
+Here's what the propaganda doesn't mention: **Nobody in the Cartel actually wants to use cash.**
+
+Cash is inconvenient. It's bulky. It's dangerous to carry. It can't buy rations from dispensers or housing through official channels. Every Cartel operative would prefer credits if they could use them safely.
+
+They can't.
+
+Credits mean surveillance. Credits mean Pluribus knows where you are, what you're buying, who you're paying. For someone flagged as hostile — or working for someone flagged as hostile — credits are a tracking beacon.
+
+Cash isn't ideology. It's survival.
+
+**For the Cartel leadership:**
+- Cash is the only way to pay operatives without leaving a trail
+- Cash forces commitment — you can't half-work for the Cartel while keeping a clean credit history
+- Cash creates dependency — operatives need the Cartel's infrastructure to convert cash into usable goods
+
+**For Cartel operatives:**
+- Cash is what you get paid in, so cash is what you use
+- Cash is what the black market accepts
+- Cash is freedom from Pluribus's eyes — but also freedom from Pluribus's convenience
+
+**For citizens who deal with the Cartel:**
+- Cash is how you buy things Pluribus won't sell
+- Cash is how you pay for things you don't want logged
+- Cash is the uncomfortable necessity that everyone pretends doesn't exist
+
+The Cartel's cash economy isn't a revolutionary statement. It's the byproduct of being locked out of the official system. If Sister Gray could somehow get clean citizenship and use credits without surveillance, she probably would.
+
+She can't. So cash it is.
+
+### The Irony
+
+The deepest irony: the Cartel's cash dependency makes them *need* citizens.
+
+Citizens with shop access can convert cash to goods. Citizens with bank accounts can convert cash to credits. Citizens with clean records can buy things Cartel operatives can't.
+
+The Cartel talks about overthrowing Pluribus. But they can't survive without the citizens who live within it. Every conversion, every under-the-table sale, every off-books transaction — that's a citizen taking a risk for Cartel benefit.
+
+This is why the Cartel cultivates go-betweens so carefully. They're not optional. They're the economic bridge that keeps the whole underground economy functioning.
 
 ### Moles
 

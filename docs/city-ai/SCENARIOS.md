@@ -1084,6 +1084,17 @@ The player has limited time to act:
 
 ## Scenario Design Principles
 
+### Payment Type Matters
+
+**See [ECONOMY.md](ECONOMY.md) for the full two-economy system.**
+
+The short version:
+- **Pluribus pays credits** - Digital, tracked, official. Use `$.bank.issue()`.
+- **Cartel pays cash** - Physical `$.dollar` objects. Contraband. Untraceable.
+- **Exchange rates are IC** - No hardcoded conversion. Players negotiate.
+
+Payment type signals faction alignment. A job that pays credits is a Pluribus job. A job that pays cash is a Cartel job. Mixed payments mean mixed loyalties.
+
 ### Immediacy
 
 When a job is given, build the scenario NOW. Not tomorrow. The player should be able to walk to the target location immediately and find a living scene.
