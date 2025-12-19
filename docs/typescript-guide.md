@@ -190,10 +190,10 @@ const result = await $.system.parseCommand(args[0] as string);
 ### Option 2: Prototype Chain (Object Inheritance)
 
 ```javascript
-// Object #3: BaseMob (parent: 1)
+// Object #3: BaseMob (parent: #1)
 // Methods: attack(), defend(), takeDamage()
 
-// Object #10: Goblin (parent: 3)
+// Object #10: Goblin (parent: #3)
 // Inherits all BaseMob methods
 ```
 
@@ -243,12 +243,12 @@ return parentDamage + sneakBonus;
 // method: describe
 return "A thing";
 
-// Parent (#3 BaseMob, parent: 1)
+// Parent (#3 BaseMob, parent: #1)
 // method: describe (overrides Root)
 const base = await pass();  // Gets "A thing"
 return base + " that moves";
 
-// Child (#10 Goblin, parent: 3)
+// Child (#10 Goblin, parent: #3)
 // method: describe (overrides BaseMob)
 const base = await pass();  // Gets "A thing that moves"
 return base + " and attacks";

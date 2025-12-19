@@ -33,7 +33,7 @@ MCP tools allow you to create and modify objects without rebuilding. This is the
 ```javascript
 // Create a new object
 mcp.create_object({
-  parent: 49,  // $.lock prototype
+  parent: "#49",  // $.lock prototype
   properties: {
     name: "Combination Lock",
     description: "A lock with a dial combination.",
@@ -68,7 +68,7 @@ mcp.call_method({
 ```javascript
 // 1. Create base prototype
 const base = await mcp.create_object({
-  parent: 3,  // $.describable
+  parent: "#3",  // $.describable
   properties: { name: "Container", description: "Something that holds things.", contents: [] }
 });
 
@@ -213,9 +213,9 @@ import type { RuntimeObject } from '../../../../types/object.js';
 export class [Name]Builder {
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: number): Promise<RuntimeObject> {
+  async build(parent: RuntimeObject): Promise<RuntimeObject> {
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parent,
       properties: {
         name: '[Name]',
         description: 'Default description.',
@@ -270,8 +270,9 @@ const ids = {
 3. Instantiate and build:
 ```typescript
 const [name]Builder = new [Name]Builder(this.manager);
-// Build after its parent exists!
-ids.[name] = (await [name]Builder.build(ids.parentPrototype)).id;
+// Build after its parent exists - load the parent object first!
+const parentObj = await this.manager.load(ids.parentPrototype);
+ids.[name] = (await [name]Builder.build(parentObj!)).id;
 ```
 
 4. Register alias (if needed):
@@ -315,8 +316,11 @@ export class [Name]Builder {
     }
 
     // Create new singleton (parent is Root #1)
+    const root = await this.manager.load(1);
+    if (!root) throw new Error('Root object #1 not found');
+
     this.[name] = await this.manager.create({
-      parent: 1,
+      parent: root,
       properties: {
         name: '[Name]',
         description: 'Description here',
@@ -497,7 +501,7 @@ You can create new lock prototypes entirely via MCP without touching code:
 ```javascript
 // 1. Create the prototype (parent is $.lock #49)
 mcp.create_object({
-  parent: 49,
+  parent: "#49",
   properties: {
     name: "Latch Lock",
     description: "A simple latch that can only be locked or unlocked from one side.",
@@ -579,9 +583,9 @@ mcp.call_method({
 export class [Name]LockBuilder {
   constructor(private manager: ObjectManager) {}
 
-  async build(lockId: number): Promise<RuntimeObject> {
+  async build(lockPrototype: RuntimeObject): Promise<RuntimeObject> {
     const obj = await this.manager.create({
-      parent: lockId,  // Parent is $.lock
+      parent: lockPrototype,  // Parent is $.lock
       properties: {
         name: '[Name] Lock',
         description: 'Description',
@@ -613,7 +617,7 @@ export class [Name]LockBuilder {
 ```javascript
 // Create an instance of latchLock for a specific door
 mcp.create_object({
-  parent: 2491,  // $.latchLock prototype
+  parent: "#2491",  // $.latchLock prototype
   properties: {
     name: "bathroom latch",
     description: "A simple sliding latch, tarnished brass.",

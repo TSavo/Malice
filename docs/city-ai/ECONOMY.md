@@ -251,8 +251,9 @@ Cash doesn't spawn from nothing. It exists in the world:
 
 ```javascript
 // Create cash for a Cartel payment
+const dollarPrototype = await $.dollar;
 const payment = await $.recycler.create({
-  parent: $.dollar,
+  parent: dollarPrototype,
   properties: {
     quantity: 50,
     location: handler.id  // Handler is holding it
@@ -528,8 +529,9 @@ const history = await $.bank.getAccountHistory(accountId);
 
 ```javascript
 // Create cash
+const dollarPrototype = await $.dollar;
 const cash = await $.recycler.create({
-  parent: $.dollar,
+  parent: dollarPrototype,
   properties: { quantity: 100 }
 });
 

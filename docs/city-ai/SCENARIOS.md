@@ -354,22 +354,24 @@ await $.scheduler.schedule({
 
 ```javascript
 // The truck (if scenario includes a shipment)
-const truck = await create_object({
-  name: 'Supply Truck',
-  parent: vehiclePrototypeId,
-  location: loadingDockId,
-  props: {
+const vehiclePrototype = await manager.load(vehiclePrototypeId);
+const truck = await manager.create({
+  parent: vehiclePrototype!,
+  properties: {
+    name: 'Supply Truck',
+    location: loadingDockId,
     description: 'A battered cargo truck with Continuum markings. The bed is covered with a tarp.',
     arrival_time: '15:30'
   }
 });
 
 // Crates being unloaded
-const crates = await create_object({
-  name: 'cargo crates',
-  parent: containerPrototypeId,
-  location: loadingDockId,
-  props: {
+const containerPrototype = await manager.load(containerPrototypeId);
+const crates = await manager.create({
+  parent: containerPrototype!,
+  properties: {
+    name: 'cargo crates',
+    location: loadingDockId,
     description: 'Standard shipping crates. Stenciled with inventory codes. Contents unknown.',
     visible_after: '15:30'
   }
@@ -611,11 +613,12 @@ await notes({
 At the Supply Depot, the player picks up a sealed medical crate.
 
 ```javascript
-const package = await create_object({
-  name: 'Sealed Medical Crate',
-  parent: containerPrototypeId,
-  location: supplyDepotId,
-  props: {
+const containerPrototype = await manager.load(containerPrototypeId);
+const package = await manager.create({
+  parent: containerPrototype!,
+  properties: {
+    name: 'Sealed Medical Crate',
+    location: supplyDepotId,
     description: 'A sealed plastic crate with MEDICAL - PERISHABLE stenciled on the side. Addressed to Dr. Chen, Pioneer Square Clinic.',
     sealed: true,
     contents: ['antibiotics', 'surgical supplies'],
@@ -867,11 +870,12 @@ await $.scheduler.schedule({
 });
 
 // The target
-const pump = await create_object({
-  name: 'Water Treatment Pump',
-  parent: machinePrototypeId,
-  location: pumpRoomId,
-  props: {
+const machinePrototype = await manager.load(machinePrototypeId);
+const pump = await manager.create({
+  parent: machinePrototype!,
+  properties: {
+    name: 'Water Treatment Pump',
+    location: pumpRoomId,
     description: 'A large industrial pump, pipes feeding in and out. Intake valve visible on top. Humming steadily.',
     operational: true,
     intake_accessible: true

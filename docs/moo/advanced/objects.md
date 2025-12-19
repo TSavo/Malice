@@ -10,7 +10,8 @@ Essential patterns for creating, destroying, and moving objects in Malice.
 
 ```javascript
 // WRONG - breaks pooling system
-const obj = await manager.create({ parent: 1 });  // NO!
+const root = await manager.load(1);
+const obj = await manager.create({ parent: root! });  // NO!
 const obj = await $.recycler.create($.item);  // NO!
 
 // RIGHT - uses recycler
