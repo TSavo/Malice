@@ -39,6 +39,8 @@ export class ClothingBuilder {
         material: 'cotton', // fabric type
         color: 'white',
         condition: 100, // 0-100, degrades with wear
+        // Pockets - array of $.pocket ObjRefs (empty by default)
+        pockets: [],
       },
       methods: {},
     });
@@ -245,6 +247,68 @@ export class ClothingBuilder {
       }
 
       return desc.trim();
+    `);
+
+    // ═══════════════════════════════════════════════════════════════════
+    // POCKET ACCESS
+    // ═══════════════════════════════════════════════════════════════════
+
+    obj.setMethod('getPocket', `
+      /** Find a pocket by name (case-insensitive partial match).
+       *  @param name - The pocket name to search for (e.g., "left", "right pocket")
+       *  @returns The pocket object, or null if not found
+       */
+      const searchName = (args[0] || '').toLowerCase().trim();
+      const pockets = self.pockets || [];
+
+      if (pockets.length === 0) return null;
+
+      // Try exact match first
+      for (const pocket of pockets) {
+        if (pocket && pocket.name && pocket.name.toLowerCase() === searchName) {
+          return pocket;
+        }
+      }
+
+      // Try partial match (contains)
+      for (const pocket of pockets) {
+        if (pocket && pocket.name && pocket.name.toLowerCase().includes(searchName)) {
+          return pocket;
+        }
+      }
+
+      // Try matching just "left" or "right"
+      for (const pocket of pockets) {
+        if (pocket && pocket.name) {
+          const pocketName = pocket.name.toLowerCase();
+          if (searchName.includes('left') && pocketName.includes('left')) {
+            return pocket;
+          }
+          if (searchName.includes('right') && pocketName.includes('right')) {
+            return pocket;
+          }
+        }
+      }
+
+      return null;
+    `);
+
+    obj.setMethod('listPockets', `
+      /** Get descriptions of all pockets.
+       *  @returns Array of pocket descriptions
+       */
+      const pockets = self.pockets || [];
+      const descriptions = [];
+
+      for (const pocket of pockets) {
+        if (pocket && pocket.describe) {
+          descriptions.push(await pocket.describe());
+        } else if (pocket && pocket.name) {
+          descriptions.push(pocket.name);
+        }
+      }
+
+      return descriptions;
     `);
 
     return obj;

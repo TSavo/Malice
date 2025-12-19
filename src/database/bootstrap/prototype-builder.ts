@@ -46,7 +46,12 @@ import {
     DisposalBuilder,
     IncineratorBuilder,
     FactionBuilder,
+    CloneTankBuilder,
+    CloneRecordingStudioBuilder,
+    PocketBuilder,
   } from './prototypes/index.js';
+
+import { CashBuilder } from './cash-builder.js';
 
 
 
@@ -116,6 +121,10 @@ export class PrototypeBuilder {
     private disposalBuilder: DisposalBuilder;
     private incineratorBuilder: IncineratorBuilder;
     private factionBuilder: FactionBuilder;
+    private cloneTankBuilder: CloneTankBuilder;
+    private cloneRecordingStudioBuilder: CloneRecordingStudioBuilder;
+    private pocketBuilder: PocketBuilder;
+    private cashBuilder: CashBuilder;
 
 
    constructor(private manager: ObjectManager) {
@@ -167,6 +176,10 @@ export class PrototypeBuilder {
     this.disposalBuilder = new DisposalBuilder(manager);
     this.incineratorBuilder = new IncineratorBuilder(manager);
     this.factionBuilder = new FactionBuilder(manager);
+    this.cloneTankBuilder = new CloneTankBuilder(manager);
+    this.cloneRecordingStudioBuilder = new CloneRecordingStudioBuilder(manager);
+    this.pocketBuilder = new PocketBuilder(manager);
+    this.cashBuilder = new CashBuilder(manager);
   }
 
 
@@ -408,6 +421,26 @@ export class PrototypeBuilder {
       ? await this.manager.load(aliases.faction as number)
       : await this.factionBuilder.build(1);
 
+    // CloneTank - stores clone backup data and handles resurrection (inherits from Describable)
+    const cloneTank = aliases.cloneTank
+      ? await this.manager.load(aliases.cloneTank as number)
+      : await this.cloneTankBuilder.build(describable!.id);
+
+    // CloneRecordingStudio - captures body data for backup (inherits from Describable)
+    const cloneRecordingStudio = aliases.cloneRecordingStudio
+      ? await this.manager.load(aliases.cloneRecordingStudio as number)
+      : await this.cloneRecordingStudioBuilder.build(describable!.id);
+
+    // Pocket - container for pockets in clothing (inherits from Describable)
+    const pocket = aliases.pocket
+      ? await this.manager.load(aliases.pocket as number)
+      : await this.pocketBuilder.build(describable!.id);
+
+    // Cash - utility object for cash operations (inherits from Root)
+    const cash = aliases.cash
+      ? await this.manager.load(aliases.cash as number)
+      : await this.cashBuilder.build();
+
      // Register aliases in root.properties.aliases
      await this.registerAliases({
 
@@ -458,6 +491,10 @@ export class PrototypeBuilder {
       disposal: disposal!.id,
       incinerator: incinerator!.id,
       faction: faction!.id,
+      cloneTank: cloneTank!.id,
+      cloneRecordingStudio: cloneRecordingStudio!.id,
+      pocket: pocket!.id,
+      cash: cash!.id,
     });
   }
  
@@ -509,6 +546,10 @@ export class PrototypeBuilder {
      disposal: number;
      incinerator: number;
      faction: number;
+     cloneTank: number;
+     cloneRecordingStudio: number;
+     pocket: number;
+     cash: number;
    }): Promise<void> {
 
 
@@ -564,6 +605,10 @@ export class PrototypeBuilder {
     aliases.disposal = ids.disposal;
     aliases.incinerator = ids.incinerator;
     aliases.faction = ids.faction;
+    aliases.cloneTank = ids.cloneTank;
+    aliases.cloneRecordingStudio = ids.cloneRecordingStudio;
+    aliases.pocket = ids.pocket;
+    aliases.cash = ids.cash;
 
     // Store bodyParts object directly (not a runtime alias, used as a namespace)
     aliases.bodyParts = ids.bodyParts;

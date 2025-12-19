@@ -34,6 +34,7 @@ export { BodyFactory } from './body-factory.js';
 // Wearables
 export { WearableBuilder } from './wearable-builder.js';
 export { ClothingBuilder } from './clothing-builder.js';
+export { PocketBuilder } from './pocket-builder.js';
 
 // Lockers
 export { LockerBuilder } from './locker-builder.js';
@@ -73,6 +74,10 @@ export { IncineratorBuilder } from './incinerator-builder.js';
 
 // Faction system
 export { FactionBuilder } from './faction-builder.js';
+
+// Clone system
+export { CloneTankBuilder } from './clone-tank-builder.js';
+export { CloneRecordingStudioBuilder } from './clone-recording-studio-builder.js';
 
 // Appearance
 export * from './appearance-constants.js';

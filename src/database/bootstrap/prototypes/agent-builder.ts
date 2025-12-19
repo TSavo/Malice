@@ -363,6 +363,19 @@ export class AgentBuilder {
         }
       }
 
+      // Add items in pockets (from worn clothing)
+      if (self.getWornItems) {
+        const wornItems = await self.getWornItems();
+        for (const { item: worn } of wornItems) {
+          const pockets = worn.pockets || [];
+          for (const pocket of pockets) {
+            if (pocket && pocket.contents) {
+              allContents = allContents.concat(pocket.contents);
+            }
+          }
+        }
+      }
+
       // Find all matches
       const matches = await self.findMatches(name, allContents);
 

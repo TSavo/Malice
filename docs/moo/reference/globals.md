@@ -409,6 +409,40 @@ Blind: Alice says, "Hey!"
 Deaf: Alice falls on her knees and says something to Bob.
 ```
 
+### $.cash - Physical Cash Operations
+
+Utility for finding, taking, and giving physical cash ($.dollar stacks) across a player's hands and pockets.
+
+```javascript
+// Find all cash on a player
+const found = await $.cash.find(player);
+// { total: 500, stacks: [{ item, location, quantity }, ...] }
+
+// Check if player has enough
+const hasEnough = await $.cash.has(player, 100);
+// true/false
+
+// Take cash from player (modifies stacks, recycles empties)
+const result = await $.cash.take(player, 100);
+// { success: true, taken: 100, message: 'Took $100.' }
+// { success: false, taken: 0, message: 'Insufficient cash...' }
+
+// Give cash to player (adds to existing or creates new)
+const result = await $.cash.give(player, 100);
+// { success: true, location: pocket, message: 'Added $100...' }
+
+// Transfer between players (atomic with refund on failure)
+const result = await $.cash.transfer(fromPlayer, toPlayer, 100);
+// { success: true, message: 'Transferred $100.' }
+```
+
+**Search order:** Primary hand → Secondary hand → Worn clothing pockets
+
+**Used by:**
+- `$.vendable` (when `currency: 'cash'`)
+- `$.cloneRecordingStudio` (when `currency: 'cash'`)
+- Any system needing physical cash transactions
+
 ## Prototype Aliases
 
 Quick access to prototype objects for inheritance:
@@ -427,9 +461,11 @@ Quick access to prototype objects for inheritance:
 | `$.food` | Edible items |
 | `$.drink` | Drinkable items |
 | `$.clothing` | Wearable items |
+| `$.pocket` | Container attached to clothing |
 | `$.door` | Door prototype |
 | `$.lock` | Lock prototype |
 | `$.stackable` | Stackable commodities |
+| `$.dollar` | Physical cash (stackable) |
 
 ## System Aliases
 
@@ -439,7 +475,8 @@ Quick access to prototype objects for inheritance:
 | `$.charGen` | Character creation |
 | `$.preAuthHandler` | Pre-authenticated connections |
 | `$.bodyFactory` | Creates human bodies |
-| `$.bank` | Banking system |
+| `$.bank` | Banking system (credits) |
+| `$.cash` | Cash utility (physical money operations) |
 | `$.phoneDb` | Phone directory |
 | `$.startRoom` | Default spawn location |
 

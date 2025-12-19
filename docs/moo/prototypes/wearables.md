@@ -482,3 +482,145 @@ Without aliases, commands like `get pants` won't match the item.
 - [Agents](./agents.md) - Player interaction
 - [Items](./items.md) - General item handling
 - [TAILORING.md](../../TAILORING.md) - AI tailor system reference
+
+## Pockets System
+
+Clothing can have pockets attached for storing small items.
+
+### $.pocket - Container on Clothing
+
+Pockets are `$.pocket` instances attached to clothing. They inherit from `$.describable` and function as small containers.
+
+### Pocket Properties
+
+```javascript
+{
+  name: 'left pocket',           // Pocket name
+  maxWeight: 500,                // Max weight in grams (default 500g)
+  maxVolume: 500,                // Max volume in cc (default 500cc)
+  attachedTo: null,              // ObjRef to parent clothing
+  contents: [],                  // Inherited from describable
+}
+```
+
+### Pocket Methods
+
+```javascript
+// Check if item can fit
+const result = await pocket.canContain(item);
+// true or 'Too heavy for this pocket.'
+
+// Get remaining capacity
+const capacity = await pocket.getRemainingCapacity();
+// { weight: 350, volume: 400 }
+
+// Get description
+const desc = await pocket.describe();
+// "left pocket containing a knife, some cash"
+
+// Short description
+const short = await pocket.shortDesc();
+// "left pocket (2 items)"
+```
+
+### Clothing Pocket Integration
+
+Clothing items have a `pockets` array containing pocket references:
+
+```javascript
+{
+  name: 'cargo pants',
+  covers: ['leftLeg', 'rightLeg', 'waist'],
+  layer: 2,
+  pockets: ['#1234', '#1235'],   // ObjRefs to $.pocket instances
+}
+```
+
+### Pocket Methods on Clothing
+
+```javascript
+// Find pocket by name (case-insensitive partial match)
+const pocket = await pants.getPocket('left');
+// Returns the left pocket, or null
+
+// List all pockets with contents
+const list = await pants.listPockets();
+// "left pocket (2 items), right pocket (empty)"
+```
+
+### Player Pocket Verbs
+
+Players have verbs for managing pocket contents:
+
+```
+pocket knife              → Put held knife into first available pocket
+pocket knife in pants     → Put held knife into pants pocket
+stash knife in left       → Put held knife into left pocket
+
+hold knife                → Take knife from pocket into hand
+draw knife                → Same as hold
+unholster knife           → Same as hold
+```
+
+### Item Resolution Includes Pockets
+
+The `%i` pattern resolver searches pockets, so commands like `hold knife` work when the knife is in a pocket.
+
+Search order for items:
+1. Room contents
+2. Hand contents  
+3. Pocket contents (from worn clothing)
+
+### Creating Clothing with Pockets
+
+```javascript
+// Create the clothing
+const pants = await $.recycler.create({
+  parent: $.clothing,
+  properties: {
+    name: 'cargo pants',
+    covers: ['leftLeg', 'rightLeg', 'waist'],
+    layer: 2,
+    pockets: [],  // Will be populated
+  }
+});
+
+// Create pockets
+const leftPocket = await $.recycler.create({
+  parent: $.pocket,
+  properties: {
+    name: 'left cargo pocket',
+    maxWeight: 800,     // Cargo pockets are bigger
+    maxVolume: 1000,
+    attachedTo: pants,
+  }
+});
+
+const rightPocket = await $.recycler.create({
+  parent: $.pocket,
+  properties: {
+    name: 'right cargo pocket',
+    maxWeight: 800,
+    maxVolume: 1000,
+    attachedTo: pants,
+  }
+});
+
+// Attach pockets to clothing
+pants.pockets = [leftPocket, rightPocket];
+```
+
+### Cash and Pockets
+
+The `$.cash` utility automatically searches pockets when finding/taking cash:
+
+```javascript
+// Finds cash in hands AND pockets
+const found = await $.cash.find(player);
+
+// Takes from hands first, then pockets
+await $.cash.take(player, 50);
+
+// Gives to existing stack, or creates in hand, or creates in pocket
+await $.cash.give(player, 100);
+```

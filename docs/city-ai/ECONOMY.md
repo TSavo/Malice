@@ -552,10 +552,49 @@ const desc = await cash.describe();
 // "$150 in banded stacks. [CONTRABAND]"
 ```
 
-### Finding Someone's Cash
+### $.cash Utility - The Easy Way
+
+The `$.cash` utility provides high-level operations for cash across a player's hands and pockets:
 
 ```javascript
-// Cash is a physical object in their inventory
+// Find all cash on a player (hands + pockets)
+const found = await $.cash.find(player);
+// { total: 500, stacks: [{ item, location, quantity }, ...] }
+
+// Check if player has enough
+const hasEnough = await $.cash.has(player, 100);
+// true/false
+
+// Take cash from player (modifies stacks, recycles empties)
+const result = await $.cash.take(player, 100);
+// { success: true, taken: 100, message: 'Took $100.' }
+// { success: false, taken: 0, message: 'Insufficient cash. Need $100, have $50.' }
+
+// Give cash to player (adds to existing stack or creates new)
+const result = await $.cash.give(player, 100);
+// { success: true, location: pocket, message: 'Added $100 to existing cash.' }
+// { success: true, location: hand, message: 'Placed $100 in right hand.' }
+// { success: false, message: 'No place to put the cash (hands full, no pockets).' }
+
+// Transfer between players (atomic - refunds on failure)
+const result = await $.cash.transfer(fromPlayer, toPlayer, 100);
+// { success: true, message: 'Transferred $100.' }
+```
+
+**Search order:** Primary hand → Secondary hand → Worn clothing pockets
+
+**Use $.cash for:**
+- Vending machines accepting cash
+- NPC transactions (shops, dealers)
+- Clone recording studios
+- Any system that needs to charge or pay players in physical cash
+
+### Finding Someone's Cash (Manual)
+
+If you need to search manually instead of using `$.cash`:
+
+```javascript
+// Cash is a physical object in hands or pockets
 const inventory = player.contents || [];
 for (const item of inventory) {
   const obj = await $.load(item);
