@@ -55,19 +55,23 @@ export class ExclusionsBuilder {
           // Each action implicitly excludes itself
           rules: {
             // Movement exclusions
-            walk: ['sit', 'sleep', 'crafting', 'operating'],
-            run: ['sit', 'sleep', 'crafting', 'operating'],
-            crawl: ['sit', 'sleep', 'crafting', 'operating'],
-            swim: ['sit', 'sleep', 'crafting', 'operating'],
+            walk: ['sit', 'sleep', 'crafting', 'operating', 'fighting'],
+            run: ['sit', 'sleep', 'crafting', 'operating', 'fighting'],
+            crawl: ['sit', 'sleep', 'crafting', 'operating', 'fighting'],
+            swim: ['sit', 'sleep', 'crafting', 'operating', 'fighting'],
 
             // Positional exclusions
             sit: ['walk', 'run', 'crawl', 'swim', 'sleep', 'operating'],
-            sleep: ['walk', 'run', 'crawl', 'swim', 'sit', 'crafting', 'operating'],
+            sleep: ['walk', 'run', 'crawl', 'swim', 'sit', 'crafting', 'operating', 'fighting'],
 
             // Activity exclusions
             crafting: ['walk', 'run', 'swim', 'sleep', 'fighting', 'operating'],
-            fighting: ['crafting', 'sleep', 'operating'],
+            fighting: ['walk', 'run', 'crawl', 'swim', 'crafting', 'sleep', 'operating'], // Combat blocks movement
+            start_fighting: ['walk', 'run', 'crawl', 'swim', 'sit', 'sleep', 'crafting', 'operating', 'fighting', 'cuffed'], // Must be free to initiate
             operating: ['walk', 'run', 'swim', 'sit', 'sleep', 'crafting', 'fighting'], // Using terminals/machines
+
+            // Restraint exclusions
+            cuffed: ['walk', 'run', 'crawl', 'swim', 'crafting', 'fighting', 'start_fighting'],
 
             // Less restrictive activities (can do while sitting/standing)
             eating: ['sleep'],

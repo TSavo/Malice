@@ -31,6 +31,8 @@ import {
     BankTerminalBuilder,
     StackableBuilder,
     DollarBuilder,
+    WeaponBuilder,
+    WeaponPrototypesBuilder,
     SealedBoxBuilder,
     ElevatorBuilder,
     DoorBuilder,
@@ -49,6 +51,10 @@ import {
     CloneTankBuilder,
     CloneRecordingStudioBuilder,
     PocketBuilder,
+    AmmoBuilder,
+    AmmoPrototypesBuilder,
+    MagazineBuilder,
+    MagazinePrototypesBuilder,
   } from './prototypes/index.js';
 
 import { CashBuilder } from './cash-builder.js';
@@ -125,6 +131,12 @@ export class PrototypeBuilder {
     private cloneRecordingStudioBuilder: CloneRecordingStudioBuilder;
     private pocketBuilder: PocketBuilder;
     private cashBuilder: CashBuilder;
+    private weaponBuilder: WeaponBuilder;
+    private weaponPrototypesBuilder: WeaponPrototypesBuilder;
+    private ammoBuilder: AmmoBuilder;
+    private ammoPrototypesBuilder: AmmoPrototypesBuilder;
+    private magazineBuilder: MagazineBuilder;
+    private magazinePrototypesBuilder: MagazinePrototypesBuilder;
 
 
    constructor(private manager: ObjectManager) {
@@ -180,6 +192,12 @@ export class PrototypeBuilder {
     this.cloneRecordingStudioBuilder = new CloneRecordingStudioBuilder(manager);
     this.pocketBuilder = new PocketBuilder(manager);
     this.cashBuilder = new CashBuilder(manager);
+    this.weaponBuilder = new WeaponBuilder(manager);
+    this.weaponPrototypesBuilder = new WeaponPrototypesBuilder(manager);
+    this.ammoBuilder = new AmmoBuilder(manager);
+    this.ammoPrototypesBuilder = new AmmoPrototypesBuilder(manager);
+    this.magazineBuilder = new MagazineBuilder(manager);
+    this.magazinePrototypesBuilder = new MagazinePrototypesBuilder(manager);
   }
 
 
@@ -350,6 +368,60 @@ export class PrototypeBuilder {
       ? await this.manager.load(aliases.stomachContents as number)
       : await this.stomachContentsBuilder.build(stackable!.id);
 
+    // Weapon - base for all weapons (inherits from Describable)
+    const weapon = aliases.weapon
+      ? await this.manager.load(aliases.weapon as number)
+      : await this.weaponBuilder.build(describable!.id);
+
+    // Build weapon sub-prototypes (inherit from weapon)
+    // Store under weapons.* namespace in aliases
+    let weapons = (aliases.weapons as Record<string, number>) || {};
+    const needsWeapons = !weapons.blade; // Check if any weapon prototypes exist
+
+    if (needsWeapons) {
+      const builtWeapons = await this.weaponPrototypesBuilder.buildAll(weapon!.id);
+      weapons = {};
+      for (const [name, weaponObj] of Object.entries(builtWeapons)) {
+        weapons[name] = weaponObj.id;
+      }
+    }
+
+    // Ammo - base for all ammunition (inherits from Stackable)
+    const ammo = aliases.ammo
+      ? await this.manager.load(aliases.ammo as number)
+      : await this.ammoBuilder.build(stackable!.id);
+
+    // Build ammo sub-prototypes (inherit from ammo)
+    // Store under ammoTypes.* namespace in aliases
+    let ammoTypes = (aliases.ammoTypes as Record<string, number>) || {};
+    const needsAmmo = !ammoTypes.ammo9mm; // Check if any ammo prototypes exist
+
+    if (needsAmmo) {
+      const builtAmmo = await this.ammoPrototypesBuilder.buildAll(ammo!.id);
+      ammoTypes = {};
+      for (const [name, ammoObj] of Object.entries(builtAmmo)) {
+        ammoTypes[name] = ammoObj.id;
+      }
+    }
+
+    // Magazine - base for all magazines (inherits from Describable)
+    const magazine = aliases.magazine
+      ? await this.manager.load(aliases.magazine as number)
+      : await this.magazineBuilder.build(describable!.id);
+
+    // Build magazine sub-prototypes (inherit from magazine)
+    // Store under magazines.* namespace in aliases
+    let magazines = (aliases.magazines as Record<string, number>) || {};
+    const needsMagazines = !magazines.pistolMagazine; // Check if any magazine prototypes exist
+
+    if (needsMagazines) {
+      const builtMagazines = await this.magazinePrototypesBuilder.buildAll(magazine!.id);
+      magazines = {};
+      for (const [name, magazineObj] of Object.entries(builtMagazines)) {
+        magazines[name] = magazineObj.id;
+      }
+    }
+
     // SealedBox - tamper-proof delivery containers (inherits from Describable)
     const sealedBox = aliases.sealedBox
       ? await this.manager.load(aliases.sealedBox as number)
@@ -476,6 +548,12 @@ export class PrototypeBuilder {
       bankTerminal: bankTerminal!.id,
       stackable: stackable!.id,
       dollar: dollar!.id,
+      weapon: weapon!.id,
+      weapons,
+      ammo: ammo!.id,
+      ammoTypes,
+      magazine: magazine!.id,
+      magazines,
       sealedBox: sealedBox!.id,
       vendable: vendable!.id,
       elevator: elevator!.id,
@@ -531,6 +609,12 @@ export class PrototypeBuilder {
      bankTerminal: number;
      stackable: number;
      dollar: number;
+     weapon: number;
+     weapons: Record<string, number>;
+     ammo: number;
+     ammoTypes: Record<string, number>;
+     magazine: number;
+     magazines: Record<string, number>;
      sealedBox: number;
      vendable: number;
      elevator: number;
@@ -618,13 +702,45 @@ export class PrototypeBuilder {
       aliases[name] = id;
     }
 
+    // Store weapons object directly (namespace for weapon prototypes)
+    aliases.weapons = ids.weapons;
+
+    // Also expose individual weapon prototypes at top-level
+    for (const [name, id] of Object.entries(ids.weapons)) {
+      aliases[name] = id;
+    }
+
+    // Store ammo base and ammoTypes namespace
+    aliases.ammo = ids.ammo;
+    aliases.ammoTypes = ids.ammoTypes;
+
+    // Also expose individual ammo prototypes at top-level
+    for (const [name, id] of Object.entries(ids.ammoTypes)) {
+      aliases[name] = id;
+    }
+
+    // Store magazine base and magazines namespace
+    aliases.magazine = ids.magazine;
+    aliases.magazines = ids.magazines;
+
+    // Also expose individual magazine prototypes at top-level
+    for (const [name, id] of Object.entries(ids.magazines)) {
+      aliases[name] = id;
+    }
+
     objectManager.set('aliases', aliases);
 
     const partNames = Object.keys(ids.bodyParts).join(', ');
+    const weaponNames = Object.keys(ids.weapons).join(', ');
+    const ammoNames = Object.keys(ids.ammoTypes).join(', ');
+    const magazineNames = Object.keys(ids.magazines).join(', ');
     console.log(
       `✅ Registered prototype aliases: describable=#${ids.describable}, location=#${ids.location}, exit=#${ids.exit}, room=#${ids.room}, agent=#${ids.agent}, embodied=#${ids.embodied}, human=#${ids.human}, player=#${ids.player}, admin=#${ids.admin}, decayable=#${ids.decayable}, bodyPart=#${ids.bodyPart}, wearable=#${ids.wearable}, clothing=#${ids.clothing}, locker=#${ids.locker}, oneTimeLocker=#${ids.oneTimeLocker}`,
     );
     console.log(`✅ Registered body part prototypes: ${partNames}`);
+    console.log(`✅ Registered weapon prototypes: ${weaponNames}`);
+    console.log(`✅ Registered ammo prototypes: ${ammoNames}`);
+    console.log(`✅ Registered magazine prototypes: ${magazineNames}`);
   }
 
   /**

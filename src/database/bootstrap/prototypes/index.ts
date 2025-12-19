@@ -48,6 +48,20 @@ export { BankTerminalBuilder } from './bank-terminal-builder.js';
 export { StackableBuilder } from './stackable-builder.js';
 export { DollarBuilder } from './dollar-builder.js';
 
+// Weapons
+export { WeaponBuilder } from './weapon-builder.js';
+export { WeaponPrototypesBuilder } from './weapon-prototypes-builder.js';
+export * from './bladed-weapon-builders.js';
+export * from './blunt-weapon-builders.js';
+export * from './firearm-builders.js';
+export * from './improvised-weapon-builders.js';
+
+// Ammunition
+export * from './ammo-builder.js';
+
+// Magazines
+export * from './magazine-builder.js';
+
 // Delivery items
 export { SealedBoxBuilder } from './sealed-box-builder.js';
 

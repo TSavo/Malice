@@ -100,6 +100,10 @@ export class PlayerBuilder {
       await self.registerVerb(['pocket %i in %t', 'put %i in %t', 'stash %i in %t'], self, 'pocketIn');
       await self.registerVerb(['hold %i', 'unholster %i', 'draw %i'], self, 'hold');
 
+      // Combat commands
+      await self.registerVerb(['attack %i', 'fight %i'], self, 'attack');
+      await self.registerVerb(['action %s'], self, 'combatAction');
+
       // If we have a location, move into it to trigger verb registration
       // If we have a location, move into it to trigger verb registration
       if (self.location && self.location !== 0) {
@@ -2089,7 +2093,7 @@ export class PlayerBuilder {
        *  Usage: pocket <item>, stash <item>, put <item> in pocket
        *  Finds the first pocket with space and puts the item there.
        */
-      const item = args[3]; // resolved from %i
+      const item = args[0]; // resolved from %i
 
       if (!item) {
         return 'Pocket what?';
@@ -2139,8 +2143,8 @@ export class PlayerBuilder {
        *  Usage: pocket <item> in <pocket>, put <item> in <pocket>
        *  The pocket can be referenced by name or the clothing item.
        */
-      const item = args[3]; // resolved from %i
-      const target = args[4]; // resolved from %t
+      const item = args[0]; // resolved from %i
+      const target = args[1]; // resolved from %t
 
       if (!item) {
         return 'Pocket what?';
@@ -2211,7 +2215,7 @@ export class PlayerBuilder {
        *  Usage: hold <item>, draw <item>, unholster <item>
        *  Finds the item in your pockets and moves it to a free hand.
        */
-      const item = args[3]; // resolved from %i
+      const item = args[0]; // resolved from %i
 
       if (!item) {
         return 'Hold what?';
@@ -2276,6 +2280,84 @@ export class PlayerBuilder {
 
       await item.moveTo(targetHand);
       return 'You draw ' + item.name + ' from your ' + foundInPocket.name + '.';
+    `);
+
+    // ═══════════════════════════════════════════════════════════════════
+    // COMBAT COMMANDS
+    // ═══════════════════════════════════════════════════════════════════
+
+    // attack X / fight X - initiate or join combat
+    obj.setMethod('attack', `
+      /** Attack another character, initiating combat.
+       *  Usage: attack <target>, fight <target>
+       *  If the target is already in combat, you join that combat.
+       */
+      const target = args[0]; // resolved from %i
+
+      if (!target) {
+        return 'Attack who?';
+      }
+
+      if (target.id === self.id) {
+        return 'You cannot attack yourself.';
+      }
+
+      // Check if target is attackable (has a body, is conscious, etc.)
+      if (!target.getBody) {
+        return 'You cannot attack ' + target.name + '.';
+      }
+
+      // Check if we're already in combat
+      const ourCombat = await $.combat.getCombatByParticipant(self);
+      if (ourCombat) {
+        return 'You are already in combat! Use "action <what you do>" to act.';
+      }
+
+      // Check if target is already in combat - if so, join
+      const theirCombat = await $.combat.getCombatByParticipant(target);
+      if (theirCombat) {
+        const result = await $.combat.join(theirCombat.id, self);
+        if (result.error) {
+          return result.error;
+        }
+        return null; // Combat system handles messaging
+      }
+
+      // Start new combat
+      const result = await $.combat.initiate(self, target);
+      if (result.error) {
+        return result.error;
+      }
+
+      return null; // Combat system handles messaging
+    `);
+
+    // action <text> - submit combat action
+    obj.setMethod('combatAction', `
+      /** Submit your action for the current combat round.
+       *  Usage: action <what you do>
+       *  Example: action I swing my knife at his throat
+       *  Example: action I dodge to the left and kick at his knee
+       */
+      const actionText = args[0]; // from %s
+
+      if (!actionText) {
+        return 'What do you do? Usage: action <description of your action>';
+      }
+
+      // Check if we're in combat
+      const combat = await $.combat.getCombatByParticipant(self);
+      if (!combat) {
+        return 'You are not in combat.';
+      }
+
+      // Submit the action
+      const result = await $.combat.submitAction(combat.id, self, actionText);
+      if (result.error) {
+        return result.error;
+      }
+
+      return null; // submitAction handles messaging
     `);
   }
 }

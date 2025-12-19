@@ -2144,6 +2144,182 @@ ACTIONS:
     );
 
     // ═══════════════════════════════════════════════════════════════════
+    // COMBAT TOOL (Consolidated)
+    // ═══════════════════════════════════════════════════════════════════
+
+    server.tool(
+      'combat',
+      `Consolidated combat resolution tool. Used by AI during combat resolution.
+
+ACTIONS:
+  status     - Get current combat state (combatId)
+  context    - Get full combat context for resolution (combatId)
+  check      - Perform skill check (combatId, combatantId, skillName, opposingLevel?)
+  damage     - Apply damage to combatant (combatId, targetId, bodyPart, damageType, severity, cause?)
+  emote      - Narrate combat action to room (combatId, text)
+  effect     - Apply status effect (combatId, targetId, effect, intensity, duration?)
+  end        - End combat (combatId, reason, winnerId?)
+  next_round - Advance to next round (combatId)
+  list       - List all active combats
+
+DAMAGE TYPES: cut, bruise, puncture, burn, laceration, abrasion
+BODY PARTS: head, torso, leftShoulder, rightShoulder, leftThigh, rightThigh (or specific part names)
+END REASONS: death, flee, surrender, knockout, intervention
+EFFECTS: stunned, knockedDown, disarmed, winded`,
+      {
+        action: z.string().describe('Action to perform (see help above)'),
+        combatId: z.string().optional().describe('Combat ID'),
+        combatantId: z.number().optional().describe('Combatant object ID (for check)'),
+        targetId: z.number().optional().describe('Target object ID (for damage, effect)'),
+        skillName: z.string().optional().describe('Skill to check (e.g., "brawling", "knife-fighting")'),
+        opposingLevel: z.number().optional().describe('Opposing skill level (default: 50)'),
+        bodyPart: z.string().optional().describe('Body part to damage'),
+        damageType: z.string().optional().describe('Type of damage (cut, bruise, puncture, etc.)'),
+        severity: z.number().optional().describe('Damage severity 0-100'),
+        cause: z.string().optional().describe('What caused the damage (blade, fist, etc.)'),
+        text: z.string().optional().describe('Narration text'),
+        effect: z.string().optional().describe('Status effect name'),
+        intensity: z.number().optional().describe('Effect intensity 0-100'),
+        duration: z.number().optional().describe('Effect duration in ms'),
+        reason: z.string().optional().describe('End reason (death, flee, surrender, knockout, intervention)'),
+        winnerId: z.number().optional().describe('Winner object ID'),
+      },
+      async ({ action, combatId, combatantId, targetId, skillName, opposingLevel, bodyPart, damageType, severity, cause, text, effect, intensity, duration, reason, winnerId }) => {
+        const combatSystem = await this.getAlias('combat');
+        if (!combatSystem) {
+          return {
+            content: [{ type: 'text', text: 'Combat system not available' }],
+            isError: true,
+          };
+        }
+
+        const ok = (data: unknown) => ({
+          content: [{ type: 'text' as const, text: typeof data === 'string' ? data : JSON.stringify(this.serializeValue(data), null, 2) }],
+        });
+        const err = (msg: string) => ({
+          content: [{ type: 'text' as const, text: msg }],
+          isError: true,
+        });
+
+        try {
+          switch (action) {
+            case 'status': {
+              if (!combatId) return err('combatId required');
+              const combat = await combatSystem.call('getCombat', combatId);
+              if (!combat) return err('Combat not found: ' + combatId);
+              return ok({
+                id: combat.id,
+                round: combat.round,
+                status: combat.status,
+                combatants: combat.combatants?.map((c: any) => c ? { id: c.id, name: c.name } : null),
+                actions: Object.keys(combat.actions || {}).length,
+              });
+            }
+
+            case 'context': {
+              if (!combatId) return err('combatId required');
+              const context = await combatSystem.call('gatherContext', combatId);
+              if (context.error) return err(context.error);
+              return ok(context);
+            }
+
+            case 'check': {
+              if (!combatId) return err('combatId required');
+              if (combatantId === undefined) return err('combatantId required');
+              if (!skillName) return err('skillName required');
+              
+              const combatant = await this.manager.load(combatantId as ObjId);
+              if (!combatant) return err('Combatant not found: #' + combatantId);
+              
+              const result = await combatSystem.call('skillCheck', combatId, combatant, skillName, opposingLevel || 50);
+              if (result.error) return err(result.error);
+              return ok(result);
+            }
+
+            case 'damage': {
+              if (!combatId) return err('combatId required');
+              if (targetId === undefined) return err('targetId required');
+              if (!bodyPart) return err('bodyPart required');
+              
+              const target = await this.manager.load(targetId as ObjId);
+              if (!target) return err('Target not found: #' + targetId);
+              
+              const result = await combatSystem.call('applyDamage', combatId, target, bodyPart, damageType || 'bruise', severity || 30, cause);
+              if (result.error) return err(result.error);
+              return ok(result);
+            }
+
+            case 'emote': {
+              if (!combatId) return err('combatId required');
+              if (!text) return err('text required');
+              
+              const result = await combatSystem.call('emote', combatId, text);
+              if (result.error) return err(result.error);
+              return ok(result);
+            }
+
+            case 'effect': {
+              if (!combatId) return err('combatId required');
+              if (targetId === undefined) return err('targetId required');
+              if (!effect) return err('effect required');
+              
+              const target = await this.manager.load(targetId as ObjId);
+              if (!target) return err('Target not found: #' + targetId);
+              
+              const result = await combatSystem.call('applyEffect', combatId, target, effect, intensity || 50, duration || 30000);
+              if (result.error) return err(result.error);
+              return ok(result);
+            }
+
+            case 'end': {
+              if (!combatId) return err('combatId required');
+              
+              let winner = null;
+              if (winnerId !== undefined) {
+                winner = await this.manager.load(winnerId as ObjId);
+                if (!winner) return err('Winner not found: #' + winnerId);
+              }
+              
+              const result = await combatSystem.call('endCombat', combatId, reason || 'ended', winner);
+              if (result.error) return err(result.error);
+              return ok(result);
+            }
+
+            case 'next_round': {
+              if (!combatId) return err('combatId required');
+              
+              const result = await combatSystem.call('nextRound', combatId);
+              if (result.error) return err(result.error);
+              return ok(result);
+            }
+
+            case 'list': {
+              const activeCombats = combatSystem.get('activeCombats') || {};
+              const combats = [];
+              for (const id of Object.keys(activeCombats)) {
+                const combat = activeCombats[id];
+                if (combat.status !== 'ended') {
+                  combats.push({
+                    id: combat.id,
+                    round: combat.round,
+                    status: combat.status,
+                    combatants: combat.combatants?.map((c: any) => c ? { id: c.id, name: c.name } : null),
+                  });
+                }
+              }
+              return ok({ count: combats.length, combats });
+            }
+
+            default:
+              return err(`Unknown action: ${action}. Valid: status, context, check, damage, emote, effect, end, next_round, list`);
+          }
+        } catch (error) {
+          return err(`Error: ${error instanceof Error ? error.message : String(error)}`);
+        }
+      }
+    );
+
+    // ═══════════════════════════════════════════════════════════════════
     // WORLD TOOL (Consolidated)
     // ═══════════════════════════════════════════════════════════════════
 
