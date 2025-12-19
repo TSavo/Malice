@@ -36,7 +36,7 @@ The NPC Agent system enables AI-controlled characters that respond intelligently
 ┌─────────────────────────────────────────────────────────────┐
 │                    onSpokenTo Handler                        │
 │  1. buildAgentPrompt() - assembles system prompt             │
-│  2. $.query(systemPrompt, userPrompt, session)               │
+│  2. $query(systemPrompt, userPrompt, session)               │
 │  3. Agent uses MCP tools to respond                          │
 │  4. Session saved for continuity                             │
 └─────────────────────────────────────────────────────────────┘
@@ -61,7 +61,7 @@ NPCs respond to two types of events:
 Player: to janet What's your name?
 → to verb finds Janet in room
 → calls janet.onSpokenTo(player, "What's your name?")
-→ Janet responds via $.query()
+→ Janet responds via $query()
 ```
 
 **Item Gifts** (`give item to npc`):
@@ -69,7 +69,7 @@ Player: to janet What's your name?
 Player: give apple to janet
 → give verb transfers item
 → calls janet.onItemReceived(player, apple)
-→ Janet responds via $.query()
+→ Janet responds via $query()
 ```
 
 ### 2. System Prompt Assembly
@@ -93,14 +93,14 @@ Template variables:
 ### 3. AI Query
 
 ```javascript
-$.query(systemPrompt, userPrompt, session)
+$query(systemPrompt, userPrompt, session)
   .then(result => {
     // Save session for continuity
     self.agentSession = result.session;
   });
 ```
 
-The `$.query()` method:
+The `$query()` method:
 - Calls the Claude Agent SDK
 - Provides access to all MCP tools
 - Returns `{ response, session }` for continuity
@@ -304,7 +304,7 @@ The previous architecture used:
 - `NPCAgentManager` and `NPCAgent` classes
 
 The new architecture:
-- In-process `$.query()` calls
+- In-process `$query()` calls
 - Direct verb handler calls (`onSpokenTo`, `onItemReceived`)
 - Per-NPC prompt and session storage
 - No separate container or event system

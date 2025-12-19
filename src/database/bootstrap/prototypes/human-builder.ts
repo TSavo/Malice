@@ -1064,7 +1064,7 @@ export class HumanBuilder {
       }
 
       // Fire-and-forget query - NPC will use MCP tools to speak/emote
-      $.query(systemPrompt, userPrompt, self.agentSession, options)
+      $query(systemPrompt, userPrompt, self.agentSession, options)
         .then(async (result) => {
           // Save session for continuity
           self.agentSession = result.session;
@@ -1093,7 +1093,7 @@ export class HumanBuilder {
       const userPrompt = giver.name + ' just gave you ' + item.name + '.\\n\\nReact appropriately - thank them, examine the item, or respond based on your role.';
 
       // Fire-and-forget query
-      $.query(systemPrompt, userPrompt, self.agentSession)
+      $query(systemPrompt, userPrompt, self.agentSession)
         .then(async (result) => {
           self.agentSession = result.session;
         })

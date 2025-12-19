@@ -756,7 +756,7 @@ ENDING COMBAT:
 
       // Call AI with session for continuity
       try {
-        const result = await $.query(systemPrompt, userPrompt, combat.session || null);
+        const result = await $query(systemPrompt, userPrompt, combat.session || null);
 
         // Save session for next round
         combat.session = result.session;

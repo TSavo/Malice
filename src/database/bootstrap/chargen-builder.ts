@@ -1204,7 +1204,7 @@ CRITICAL:
       
       const systemPrompt = self.interviewerPrompt.replace(/\\\\{\\\\{playerId\\\\}\\\\}/g, String(player.id));
 
-      $.query(systemPrompt, kickoffPrompt, null, {
+      $query(systemPrompt, kickoffPrompt, null, {
         additionalMcpServers: {
           'malice-chargen': { type: 'http', url: 'http://localhost:3002/mcp' }
         }
