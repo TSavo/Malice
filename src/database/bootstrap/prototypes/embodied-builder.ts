@@ -55,7 +55,7 @@ export class EmbodiedBuilder {
       if (!body) return null;
       // Ensure body is loaded as RuntimeObject (might be raw ID if not cached)
       if (typeof body === 'number') {
-        body = await $.load(body);
+        body = await $load(body);
       }
       return body || null;
     `);

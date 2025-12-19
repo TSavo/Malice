@@ -6,14 +6,14 @@ Fast lookup for common MOO programming tasks.
 
 ### Create Object
 ```javascript
-const obj = await $.recycler.create(prototype, properties);
+const obj = await $recycler.create(prototype, properties);
 ```
 
 ### Delete Object
 ```javascript
-await $.recycler.recycle(obj);              // Soft delete (preferred)
-await $.recycler.recycleTree(obj);          // Delete with contents
-await $.recycler.purge(obj);                // Hard delete (rare)
+await $recycler.recycle(obj);              // Soft delete (preferred)
+await $recycler.recycleTree(obj);          // Delete with contents
+await $recycler.purge(obj);                // Hard delete (rare)
 ```
 
 ### Move Object
@@ -26,7 +26,7 @@ await obj.moveTo(destination, mover);       // With context
 ```javascript
 const obj = await $.load(id);               // By ID (from external input)
 const obj = await $[42];                    // Shorthand
-const obj = $.aliasName;                    // By alias
+const obj = $aliasName;                    // By alias
 ```
 
 **Note:** All objects are in memory. Property access returns RuntimeObjects directly:
@@ -140,50 +140,50 @@ await player.feel(message);                 // Tactile
 ### Perspective-Aware
 ```javascript
 // Single viewer
-const msg = await $.pronoun.sub(
+const msg = await $pronoun.sub(
   '%N %v{pick} up %d.',
   actor, directObj, target, indirectObj, location, viewer
 );
 
 // Announce to room
-await $.pronoun.announce(room, '%N %v{pick} up %d.', actor, item);
+await $pronoun.announce(room, '%N %v{pick} up %d.', actor, item);
 ```
 
 ### Emotes
 ```javascript
-await $.emote.broadcast('.wave and "Hello!"', actor, room);
+await $emote.broadcast('.wave and "Hello!"', actor, room);
 ```
 
 ## Grammar & Formatting
 
 ### Articles
 ```javascript
-await $.english.article('apple');           // "an"
-await $.english.article('sword');           // "a"
+await $english.article('apple');           // "an"
+await $english.article('sword');           // "a"
 ```
 
 ### Plurals
 ```javascript
-await $.english.plural('cat');              // "cats"
-await $.english.plural('mouse');            // "mice"
+await $english.plural('cat');              // "cats"
+await $english.plural('mouse');            // "mice"
 ```
 
 ### Verb Conjugation
 ```javascript
-await $.english.conjugate('fall', 3);       // "falls" (3rd person)
-await $.format.verb('fall', 1);             // "falls" (count=1)
-await $.format.verb('fall', 2);             // "fall" (count=2)
+await $english.conjugate('fall', 3);       // "falls" (3rd person)
+await $format.verb('fall', 1);             // "falls" (count=1)
+await $format.verb('fall', 2);             // "fall" (count=2)
 ```
 
 ### Lists
 ```javascript
-await $.format.prose(['a', 'b', 'c']);      // "a, b, and c"
-await $.format.prose(['a', 'b'], 'or');     // "a or b"
+await $format.prose(['a', 'b', 'c']);      // "a, b, and c"
+await $format.prose(['a', 'b'], 'or');     // "a or b"
 ```
 
 ### Templates with Lists
 ```javascript
-await $.format.compose('%T %v{fall}.', items);
+await $format.compose('%T %v{fall}.', items);
 // 1 item: "The sword falls."
 // 2 items: "The sword and shield fall."
 ```
@@ -192,7 +192,7 @@ await $.format.compose('%T %v{fall}.', items);
 
 ### Value-Based Selection
 ```javascript
-const msg = await $.proportional.sub(
+const msg = await $proportional.sub(
   ['dead', 'critical', 'hurt', 'healthy'],
   hp, maxHp
 );
@@ -200,7 +200,7 @@ const msg = await $.proportional.sub(
 
 ### Percentage-Based
 ```javascript
-const msg = await $.proportional.fromPercent(
+const msg = await $proportional.fromPercent(
   ['empty', 'half', 'full'],
   50
 );
@@ -210,17 +210,17 @@ const msg = await $.proportional.fromPercent(
 
 ### Text Question
 ```javascript
-const answer = await $.prompt.question(player, 'Name? ');
+const answer = await $prompt.question(player, 'Name? ');
 ```
 
 ### Yes/No
 ```javascript
-const yes = await $.prompt.yesorno(player, 'Continue?');
+const yes = await $prompt.yesorno(player, 'Continue?');
 ```
 
 ### Choice Menu
 ```javascript
-const choice = await $.prompt.choice(player, 'Pick:', {
+const choice = await $prompt.choice(player, 'Pick:', {
   option1: 'Description 1',
   option2: 'Description 2'
 });
@@ -228,14 +228,14 @@ const choice = await $.prompt.choice(player, 'Pick:', {
 
 ### Multiline Input
 ```javascript
-const text = await $.prompt.multiline(player, 'Enter text:');
+const text = await $prompt.multiline(player, 'Enter text:');
 ```
 
 ## Scheduling
 
 ### Schedule Job
 ```javascript
-await $.scheduler.schedule(
+await $scheduler.schedule(
   'jobName',                                // Unique name
   delayMs,                                  // Initial delay
   intervalMs,                               // Repeat interval (0=once)
@@ -247,16 +247,16 @@ await $.scheduler.schedule(
 
 ### Manage Jobs
 ```javascript
-await $.scheduler.unschedule('jobName');    // Remove
-await $.scheduler.setEnabled('jobName', false); // Disable
-await $.scheduler.runNow('jobName');        // Force run
+await $scheduler.unschedule('jobName');    // Remove
+await $scheduler.setEnabled('jobName', false); // Disable
+await $scheduler.runNow('jobName');        // Force run
 ```
 
 ## Locks (Mutex)
 
 ### Acquire Lock
 ```javascript
-const lock = await $.mutex.acquire(obj, 'lockName', timeoutMs);
+const lock = await $mutex.acquire(obj, 'lockName', timeoutMs);
 if (!lock) {
   // Failed to acquire
 }
@@ -264,48 +264,48 @@ if (!lock) {
 
 ### Release Lock
 ```javascript
-await $.mutex.release(obj, 'lockName');
+await $mutex.release(obj, 'lockName');
 ```
 
 ### With Data
 ```javascript
-await $.mutex.acquire(obj, 'lock', 5000, { userId: 123 });
-const data = await $.mutex.getData(obj, 'lock');
+await $mutex.acquire(obj, 'lock', 5000, { userId: 123 });
+const data = await $mutex.getData(obj, 'lock');
 ```
 
 ## Cloning
 
 ### Clone Object
 ```javascript
-const clone = await $.memento.clone(original);
+const clone = await $memento.clone(original);
 ```
 
 ### Clone Tree
 ```javascript
-const clone = await $.memento.cloneTree(original);
+const clone = await $memento.cloneTree(original);
 ```
 
 ### Capture State
 ```javascript
-const snapshot = await $.memento.capture(obj);
+const snapshot = await $memento.capture(obj);
 ```
 
 ### Restore State
 ```javascript
-await $.memento.restore(obj, snapshot);
+await $memento.restore(obj, snapshot);
 ```
 
 ## Action Exclusions
 
 ### Prevent Simultaneous Actions
 ```javascript
-if (!await $.exclusions.canAct(player, 'eating')) {
+if (!await $exclusions.canAct(player, 'eating')) {
   return 'You are already eating.';
 }
 
-await $.exclusions.startAction(player, 'eating');
+await $exclusions.startAction(player, 'eating');
 // ... do action ...
-await $.exclusions.endAction(player, 'eating');
+await $exclusions.endAction(player, 'eating');
 ```
 
 ## Contents & Search
@@ -335,47 +335,47 @@ const items = room.contents.filter(obj => !obj.isPlayer);
 
 ### Register Alias
 ```javascript
-await $.addAlias('aliasName', object);
+await $addAlias('aliasName', object);
 ```
 
 ### Use Alias
 ```javascript
-const obj = $.aliasName;
-const obj = await $.load($.getAlias('aliasName'));
+const obj = $aliasName;
+const obj = await $.load($getAlias('aliasName'));
 ```
 
 ### List Aliases
 ```javascript
-const aliases = $.aliases;
+const aliases = $aliases;
 // { nothing: -1, root: 1, ... }
 ```
 
 ## Common Prototypes
 
 ```javascript
-$.root              // Base of everything
-$.describable       // Has name, description, location
-$.location          // Can contain objects
-$.room              // Room with exits
-$.exit              // Directional link
-$.agent             // Can act (has verbs)
-$.embodied          // Has body, HP
-$.human             // Human-type body
-$.player            // Player character
-$.admin             // Admin player
+$root              // Base of everything
+$describable       // Has name, description, location
+$location          // Can contain objects
+$room              // Room with exits
+$exit              // Directional link
+$agent             // Can act (has verbs)
+$embodied          // Has body, HP
+$human             // Human-type body
+$player            // Player character
+$admin             // Admin player
 
-$.wearable          // Can be worn (base)
-$.clothing          // Wearable clothing (implementation)
-$.edible            // Can be consumed (base)
-$.food              // Edible food (implementation)
-$.drink             // Edible drink (implementation)
-$.decayable         // Decays over time
-$.bodyPart          // Body part
+$wearable          // Can be worn (base)
+$clothing          // Wearable clothing (implementation)
+$edible            // Can be consumed (base)
+$food              // Edible food (implementation)
+$drink             // Edible drink (implementation)
+$decayable         // Decays over time
+$bodyPart          // Body part
 ```
 
 ## Pronoun Codes
 
-In templates like `$.pronoun.sub()` and `$.format.compose()`:
+In templates like `$pronoun.sub()` and `$format.compose()`:
 
 | Code | Actor | Target | Example |
 |------|-------|--------|---------|

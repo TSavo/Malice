@@ -1,6 +1,6 @@
-# $.recycler - Object Lifecycle
+# $recycler - Object Lifecycle
 
-**Always use `$.recycler` for creating and destroying objects. There is NO other correct way.**
+**Always use `$recycler` for creating and destroying objects. There is NO other correct way.**
 
 ## Purpose
 
@@ -16,7 +16,7 @@ delete objects[sword.id];                                  // Orphans references
 await manager.delete(sword.id);                            // Bypasses cleanup hooks
 ```
 
-**Problems with bypassing $.recycler:**
+**Problems with bypassing $recycler:**
 - ❌ No object pooling (memory bloat over time)
 - ❌ No recycled object reuse (wasted allocations)
 - ❌ Parent chain not validated
@@ -29,11 +29,11 @@ await manager.delete(sword.id);                            // Bypasses cleanup h
 
 **CORRECT:**
 ```javascript
-const sword = await $.recycler.create($.weapon, { name: 'Iron Sword', damage: 10 });
-await $.recycler.recycle(sword);  // Proper cleanup, available for reuse
+const sword = await $recycler.create($.weapon, { name: 'Iron Sword', damage: 10 });
+await $recycler.recycle(sword);  // Proper cleanup, available for reuse
 ```
 
-## What $.recycler Handles
+## What $recycler Handles
 
 - ✅ Object pooling (reuses recycled objects of same parent type)
 - ✅ Location cleanup (removes from container's contents)
@@ -47,7 +47,7 @@ await $.recycler.recycle(sword);  // Proper cleanup, available for reuse
 ### create() - Create New Object
 
 ```javascript
-await $.recycler.create(parent, properties?)
+await $recycler.create(parent, properties?)
 ```
 
 Creates a new object (or reuses a recycled one of the same type).
@@ -69,17 +69,17 @@ Creates a new object (or reuses a recycled one of the same type).
 **Examples:**
 ```javascript
 // Create from prototype
-const sword = await $.recycler.create($.weapon, {
+const sword = await $recycler.create($.weapon, {
   name: 'Iron Sword',
   damage: 10,
   durability: 100
 });
 
 // Create with no custom properties
-const room = await $.recycler.create($.room);
+const room = await $recycler.create($.room);
 
 // Create complex nested structure
-const body = await $.recycler.create($.body, {
+const body = await $recycler.create($.body, {
   hp: 100,
   maxHp: 100
 });
@@ -88,7 +88,7 @@ const body = await $.recycler.create($.body, {
 ### recycle() - Soft Delete
 
 ```javascript
-await $.recycler.recycle(obj, removeContents = true)
+await $recycler.recycle(obj, removeContents = true)
 ```
 
 Marks object as recyclable and cleans up references.
@@ -108,16 +108,16 @@ Marks object as recyclable and cleans up references.
 **Examples:**
 ```javascript
 // Simple recycle
-await $.recycler.recycle(sword);
+await $recycler.recycle(sword);
 
 // Recycle but preserve contents (rare)
-await $.recycler.recycle(container, false);
+await $recycler.recycle(container, false);
 ```
 
 ### purge() - Hard Delete
 
 ```javascript
-await $.recycler.purge(obj)
+await $recycler.purge(obj)
 ```
 
 Permanently deletes object from database. **Use only when absolutely necessary.**
@@ -125,13 +125,13 @@ Permanently deletes object from database. **Use only when absolutely necessary.*
 **Examples:**
 ```javascript
 // Permanent removal (rare - usually recycle instead)
-await $.recycler.purge(brokenObject);
+await $recycler.purge(brokenObject);
 ```
 
 ### recycleTree() - Recursive Delete
 
 ```javascript
-await $.recycler.recycleTree(obj)
+await $recycler.recycleTree(obj)
 ```
 
 Recursively recycles object and all its contents.
@@ -139,24 +139,24 @@ Recursively recycles object and all its contents.
 **Examples:**
 ```javascript
 // Delete room and everything in it
-await $.recycler.recycleTree(abandonedRoom);
+await $recycler.recycleTree(abandonedRoom);
 
 // Delete container and all items inside
-await $.recycler.recycleTree(destroyedChest);
+await $recycler.recycleTree(destroyedChest);
 ```
 
 ### canRecycle() - Check Before Recycling
 
 ```javascript
-await $.recycler.canRecycle(obj)
+await $recycler.canRecycle(obj)
 ```
 
 Returns `true` if object can be safely recycled.
 
 **Examples:**
 ```javascript
-if (await $.recycler.canRecycle(obj)) {
-  await $.recycler.recycle(obj);
+if (await $recycler.canRecycle(obj)) {
+  await $recycler.recycle(obj);
 } else {
   await player.tell('Cannot destroy that.');
 }
@@ -165,7 +165,7 @@ if (await $.recycler.canRecycle(obj)) {
 ### unrecycle() - Restore Object
 
 ```javascript
-await $.recycler.unrecycle(obj)
+await $recycler.unrecycle(obj)
 ```
 
 Brings recycled object back to life.
@@ -173,7 +173,7 @@ Brings recycled object back to life.
 **Examples:**
 ```javascript
 // Undo delete
-await $.recycler.unrecycle(deletedItem);
+await $recycler.unrecycle(deletedItem);
 item.recycled = false;
 item.location = room;
 ```
@@ -185,9 +185,9 @@ item.location = room;
 ```javascript
 async spawnLoot() {
   const items = [
-    await $.recycler.create($.weapon, { name: 'rusty sword', damage: 5 }),
-    await $.recycler.create($.armor, { name: 'leather vest', defense: 3 }),
-    await $.recycler.create($.food, { name: 'stale bread', calories: 200 })
+    await $recycler.create($.weapon, { name: 'rusty sword', damage: 5 }),
+    await $recycler.create($.armor, { name: 'leather vest', defense: 3 }),
+    await $recycler.create($.food, { name: 'stale bread', calories: 200 })
   ];
   
   for (const item of items) {
@@ -204,14 +204,14 @@ async decay() {
   this.durability--;
   
   if (this.durability <= 0) {
-    await $.pronoun.announce(
+    await $pronoun.announce(
       await $.load(this.location),
       '%d crumbles to dust.',
       null,
       this
     );
     
-    await $.recycler.recycle(this);
+    await $recycler.recycle(this);
   }
 }
 ```
@@ -228,7 +228,7 @@ async resetDungeon() {
     // Recycle all items in room (but not players)
     const items = room.contents.filter(c => c.type === 'item');
     for (const item of items) {
-      await $.recycler.recycle(item);
+      await $recycler.recycle(item);
     }
   }
   
@@ -242,7 +242,7 @@ async resetDungeon() {
 ```javascript
 async die() {
   // Create corpse from body
-  const corpse = await $.recycler.create($.corpse, {
+  const corpse = await $recycler.create($.corpse, {
     name: `corpse of ${this.name}`,
     description: `The lifeless body of ${this.name}.`,
     originalBody: this.id
@@ -267,7 +267,7 @@ async die() {
 ```javascript
 async castFireball(target) {
   // Create temporary effect object
-  const fireball = await $.recycler.create($.effect, {
+  const fireball = await $recycler.create($.effect, {
     name: 'fireball',
     damage: 50,
     duration: 0  // Instant
@@ -276,7 +276,7 @@ async castFireball(target) {
   await fireball.apply(target);
   
   // Clean up immediately
-  await $.recycler.recycle(fireball);
+  await $recycler.recycle(fireball);
 }
 ```
 
@@ -296,9 +296,9 @@ async castFireball(target) {
 
 ```javascript
 // Temporary object pattern
-const temp = await $.recycler.create($.temp, { data: value });
+const temp = await $recycler.create($.temp, { data: value });
 await temp.process();
-await $.recycler.recycle(temp);
+await $recycler.recycle(temp);
 ```
 
 ### Pool Management
@@ -307,7 +307,7 @@ await $.recycler.recycle(temp);
 // Reuse pattern - create() automatically pools
 const items = [];
 for (let i = 0; i < 100; i++) {
-  items.push(await $.recycler.create($.item)); // Reuses recycled ones
+  items.push(await $recycler.create($.item)); // Reuses recycled ones
 }
 ```
 
@@ -320,17 +320,17 @@ async safeDestroy(obj) {
     return 'Cannot destroy protected object.';
   }
   
-  if (!await $.recycler.canRecycle(obj)) {
+  if (!await $recycler.canRecycle(obj)) {
     return 'Object cannot be recycled.';
   }
   
-  await $.recycler.recycle(obj);
+  await $recycler.recycle(obj);
   return 'Destroyed.';
 }
 ```
 
 ## See Also
 
-- [$.memento](./memento.md) - Cloning object trees
+- [$memento](./memento.md) - Cloning object trees
 - [Core Concepts](../core-concepts.md) - Object references
 - [Architecture](../architecture.md) - Why pooling matters

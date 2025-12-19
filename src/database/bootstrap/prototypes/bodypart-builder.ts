@@ -303,7 +303,7 @@ export class BodyPartBuilder {
         return { success: false, message: 'Wound system not initialized.' };
       }
 
-      const wound = await $.create({
+      const wound = await $create({
         parent: woundProto,
         properties: {},
       });
@@ -623,7 +623,7 @@ export class BodyPartBuilder {
       if (!part) return null;
       // Ensure part is loaded as RuntimeObject (might be raw ID if not cached)
       if (typeof part === 'number') {
-        part = await $.load(part);
+        part = await $load(part);
       }
       return part || null;
     `);

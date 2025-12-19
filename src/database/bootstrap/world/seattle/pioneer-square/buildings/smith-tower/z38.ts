@@ -79,7 +79,7 @@ export const building = {
             return 'The call button clicks uselessly. No power.';
           }
 
-          const elevator = await $.load(elevatorId);
+          const elevator = await $load(elevatorId);
           if (!elevator) {
             return 'Nothing answers the button press.';
           }

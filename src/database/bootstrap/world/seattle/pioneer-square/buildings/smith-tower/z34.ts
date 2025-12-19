@@ -49,7 +49,7 @@ Six unit doors line the hallway, each marked with clean metal numbers. The space
             return 'The call button clicks uselessly. No power.';
           }
 
-          const elevator = await $.load(elevatorId);
+          const elevator = await $load(elevatorId);
           if (!elevator) {
             return 'Nothing answers the button press.';
           }

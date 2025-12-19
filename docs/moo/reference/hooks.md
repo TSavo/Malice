@@ -243,8 +243,8 @@ obj.setMethod('onInput', `
   const input = args[0];
 
   // Check for prompt state first
-  if ($.prompt && await $.prompt.isActive(self)) {
-    return await $.prompt.handleInput(self, input);
+  if ($prompt && await $prompt.isActive(self)) {
+    return await $prompt.handleInput(self, input);
   }
 
   // Parse and handle command
@@ -436,7 +436,7 @@ obj.setMethod('onMessage', `
 
 ### onCreate(creator)
 
-Called immediately after an object is created via `$.recycler.create()`.
+Called immediately after an object is created via `$recycler.create()`.
 
 ```javascript
 obj.setMethod('onCreate', `
@@ -469,8 +469,8 @@ Called when a **Decayable** object reaches 0% condition.
 ```javascript
 obj.setMethod('onFullyDecayed', `
   // Default behavior: recycle the object
-  if ($.recycler) {
-    await $.recycler.recycle(self);
+  if ($recycler) {
+    await $recycler.recycle(self);
   }
 `);
 ```
@@ -593,7 +593,7 @@ obj.setMethod('onArrived', `
 
 // GOOD - schedule for later
 obj.setMethod('onArrived', `
-  $.scheduler.schedule('delayed-' + self.id, 100, 0, self, 'slowOperation');
+  $scheduler.schedule('delayed-' + self.id, 100, 0, self, 'slowOperation');
 `);
 ```
 

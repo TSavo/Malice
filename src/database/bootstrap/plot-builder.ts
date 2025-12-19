@@ -705,7 +705,7 @@ Provide a summary that captures everything important:\`;
 
       // Unregister all hooks for this job
       for (const hook of (job.hooks || [])) {
-        const target = await $.load(hook.targetId);
+        const target = await $load(hook.targetId);
         if (target) {
           const plotHooks = target.plotHooks || {};
           if (plotHooks[hook.eventName]) {
@@ -753,7 +753,7 @@ Provide a summary that captures everything important:\`;
 
       // Unregister all hooks for this job
       for (const hook of (job.hooks || [])) {
-        const target = await $.load(hook.targetId);
+        const target = await $load(hook.targetId);
         if (target) {
           const plotHooks = target.plotHooks || {};
           if (plotHooks[hook.eventName]) {
@@ -801,7 +801,7 @@ Provide a summary that captures everything important:\`;
 
       // Unregister all hooks for this job
       for (const hook of (job.hooks || [])) {
-        const target = await $.load(hook.targetId);
+        const target = await $load(hook.targetId);
         if (target) {
           const plotHooks = target.plotHooks || {};
           if (plotHooks[hook.eventName]) {
@@ -880,7 +880,7 @@ Provide a summary that captures everything important:\`;
       }
 
       // Load the target object
-      const target = await $.load(targetId);
+      const target = await $load(targetId);
       if (!target) {
         throw new Error('Target object #' + targetId + ' not found');
       }
@@ -936,7 +936,7 @@ Provide a summary that captures everything important:\`;
       const job = jobs[jobId];
 
       // Load the target object
-      const target = await $.load(targetId);
+      const target = await $load(targetId);
       if (target) {
         // Remove from target's plotHooks
         const plotHooks = target.plotHooks || {};
@@ -1027,7 +1027,7 @@ Provide a summary that captures everything important:\`;
         throw new Error('registerHook requires targetId and eventName');
       }
 
-      const target = await $.load(targetId);
+      const target = await $load(targetId);
       if (!target) {
         throw new Error('Target object #' + targetId + ' not found');
       }
@@ -1066,7 +1066,7 @@ Provide a summary that captures everything important:\`;
       const myHooks = self.registeredHooks || [];
 
       for (const hookRef of myHooks) {
-        const target = await $.load(hookRef.targetId);
+        const target = await $load(hookRef.targetId);
         if (target) {
           const plotHooks = target.plotHooks || {};
           if (plotHooks[hookRef.eventName]) {
@@ -1196,7 +1196,7 @@ Be terse. Be cold. Be corporate.`,
         throw new Error('getPlot requires a plot ID');
       }
 
-      return await $.load(plotId);
+      return await $load(plotId);
     `);
 
     // getPlots() - get all plots managed by this spawner
@@ -1205,7 +1205,7 @@ Be terse. Be cold. Be corporate.`,
       const plots = [];
 
       for (const id of plotIds) {
-        const plot = await $.load(id);
+        const plot = await $load(id);
         if (plot) {
           plots.push(plot);
         }
@@ -1360,7 +1360,7 @@ When a player requests work, create a plot and give them their first objective.`
       const player = args[0];
       const visualVerb = args[1];
       const audioVerb = args[2] || visualVerb;
-      const room = await $.load(player.location);
+      const room = await $load(player.location);
       if (!room) return;
 
       if (await self.isAudioMode(player)) {
@@ -1690,7 +1690,7 @@ When a player requests work, create a plot and give them their first objective.`
       const plots = [];
 
       for (const id of Object.keys(index)) {
-        const plot = await $.load(parseInt(id));
+        const plot = await $load(parseInt(id));
         if (plot) {
           plots.push(plot);
         } else {

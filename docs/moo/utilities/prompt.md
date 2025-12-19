@@ -107,7 +107,7 @@ Asks a yes/no question.
 
 **Examples:**
 ```javascript
-const confirmed = await $.prompt.yesorno(player, 'Are you sure?');
+const confirmed = await $prompt.yesorno(player, 'Are you sure?');
 if (confirmed) {
   await player.tell('Proceeding...');
 } else {
@@ -116,13 +116,13 @@ if (confirmed) {
 
 // In a method
 async deleteItem(player, item) {
-  const confirm = await $.prompt.yesorno(
+  const confirm = await $prompt.yesorno(
     player,
     `Really delete ${item.name}? This cannot be undone.`
   );
   
   if (confirm) {
-    await $.recycler.recycle(item);
+    await $recycler.recycle(item);
     await player.tell('Item deleted.');
   }
 }
@@ -131,7 +131,7 @@ async deleteItem(player, item) {
 ### choice() - Simple Choice Menu
 
 ```javascript
-await $.prompt.choice(player, prompt, choices)
+await $prompt.choice(player, prompt, choices)
 ```
 
 Presents numbered choices and returns the selected key.
@@ -146,7 +146,7 @@ Presents numbered choices and returns the selected key.
 
 **Examples:**
 ```javascript
-const choice = await $.prompt.choice(player, 'Pick a class:', {
+const choice = await $prompt.choice(player, 'Pick a class:', {
   warrior: 'Warrior - Strong melee fighter',
   mage: 'Mage - Powerful spellcaster',
   rogue: 'Rogue - Stealthy assassin',
@@ -167,7 +167,7 @@ if (choice === 'warrior') {
 ### menu() - Columnar Menu
 
 ```javascript
-await $.prompt.menu(player, prompt, choices, columns?)
+await $prompt.menu(player, prompt, choices, columns?)
 ```
 
 Presents choices in columns (better for many options).
@@ -176,7 +176,7 @@ Presents choices in columns (better for many options).
 
 **Examples:**
 ```javascript
-const race = await $.prompt.menu(player, 'Choose your race:', {
+const race = await $prompt.menu(player, 'Choose your race:', {
   human: 'Human',
   elf: 'Elf',
   dwarf: 'Dwarf',
@@ -194,7 +194,7 @@ const race = await $.prompt.menu(player, 'Choose your race:', {
 ### multiline() - Multi-Line Input
 
 ```javascript
-await $.prompt.multiline(player, prompt)
+await $prompt.multiline(player, prompt)
 ```
 
 Collects multiple lines of text (ends with '.' on its own line).
@@ -205,7 +205,7 @@ Collects multiple lines of text (ends with '.' on its own line).
 
 **Examples:**
 ```javascript
-const description = await $.prompt.multiline(
+const description = await $prompt.multiline(
   player,
   'Enter your character description (end with . on its own line):'
 );
@@ -224,7 +224,7 @@ async editDescription(player, obj) {
   await player.tell(obj.description);
   await player.tell('');
   
-  const newDesc = await $.prompt.multiline(
+  const newDesc = await $prompt.multiline(
     player,
     'Enter new description (. to finish, @abort to cancel):'
   );
@@ -239,21 +239,21 @@ async editDescription(player, obj) {
 ### isActive() - Check Prompt State
 
 ```javascript
-await $.prompt.isActive(player)
+await $prompt.isActive(player)
 ```
 
 Returns `true` if player is currently in a prompt.
 
 **Examples:**
 ```javascript
-if (await $.prompt.isActive(player)) {
+if (await $prompt.isActive(player)) {
   await player.tell('Please answer the current question first.');
   return;
 }
 
 // Before starting another prompt
 async startChargen(player) {
-  if (await $.prompt.isActive(player)) {
+  if (await $prompt.isActive(player)) {
     return 'You are already in a prompt.';
   }
   
@@ -265,7 +265,7 @@ async startChargen(player) {
 ### cancel() - Cancel Prompt
 
 ```javascript
-await $.prompt.cancel(player)
+await $prompt.cancel(player)
 ```
 
 Cancels current prompt (resolves with null).
@@ -274,8 +274,8 @@ Cancels current prompt (resolves with null).
 ```javascript
 // Admin command to break stuck prompts
 async cancelPrompt(admin, targetPlayer) {
-  if (await $.prompt.isActive(targetPlayer)) {
-    await $.prompt.cancel(targetPlayer);
+  if (await $prompt.isActive(targetPlayer)) {
+    await $prompt.cancel(targetPlayer);
     await admin.tell('Prompt cancelled for ' + targetPlayer.name);
   } else {
     await admin.tell('Player is not in a prompt.');
@@ -292,7 +292,7 @@ async createCharacter(player) {
   await player.tell('=== Character Creation ===');
   
   // Get name
-  const name = await $.prompt.question(player, 'Character name: ', (input) => {
+  const name = await $prompt.question(player, 'Character name: ', (input) => {
     if (input.length < 3) return 'Name must be at least 3 characters.';
     if (input.length > 20) return 'Name must be 20 characters or less.';
     if (!/^[a-zA-Z]+$/.test(input)) return 'Name must contain only letters.';
@@ -302,7 +302,7 @@ async createCharacter(player) {
   if (!name) return; // Aborted
   
   // Choose race
-  const race = await $.prompt.menu(player, 'Choose your race:', {
+  const race = await $prompt.menu(player, 'Choose your race:', {
     human: 'Human - Versatile and adaptable',
     elf: 'Elf - Graceful and long-lived',
     dwarf: 'Dwarf - Hardy and strong',
@@ -312,7 +312,7 @@ async createCharacter(player) {
   if (!race) return;
   
   // Choose class
-  const charClass = await $.prompt.choice(player, 'Choose your class:', {
+  const charClass = await $prompt.choice(player, 'Choose your class:', {
     warrior: 'Warrior - Master of melee combat',
     mage: 'Mage - Wielder of arcane magic',
     rogue: 'Rogue - Stealthy and cunning',
@@ -322,7 +322,7 @@ async createCharacter(player) {
   if (!charClass) return;
   
   // Confirm
-  const confirm = await $.prompt.yesorno(
+  const confirm = await $prompt.yesorno(
     player,
     `Create ${name} the ${race} ${charClass}?`
   );
@@ -338,7 +338,7 @@ async createCharacter(player) {
 ```javascript
 async editRoom(builder, room) {
   while (true) {
-    const action = await $.prompt.choice(builder, 'Edit room:', {
+    const action = await $prompt.choice(builder, 'Edit room:', {
       name: 'Edit name',
       desc: 'Edit description',
       exits: 'Edit exits',
@@ -349,12 +349,12 @@ async editRoom(builder, room) {
     
     switch (action) {
       case 'name':
-        const name = await $.prompt.question(builder, 'New name: ');
+        const name = await $prompt.question(builder, 'New name: ');
         if (name) room.name = name;
         break;
         
       case 'desc':
-        const desc = await $.prompt.multiline(builder, 'New description:');
+        const desc = await $prompt.multiline(builder, 'New description:');
         if (desc) room.description = desc;
         break;
         
@@ -370,7 +370,7 @@ async editRoom(builder, room) {
 
 ```javascript
 async dangerousAction(player, target) {
-  const confirm = await $.prompt.yesorno(
+  const confirm = await $prompt.yesorno(
     player,
     `⚠️  WARNING: This will permanently delete ${target.name}. Continue?`
   );
@@ -379,7 +379,7 @@ async dangerousAction(player, target) {
     return 'Action cancelled.';
   }
   
-  const doubleCheck = await $.prompt.question(
+  const doubleCheck = await $prompt.question(
     player,
     `Type "${target.name}" to confirm: `,
     (input) => {
@@ -392,7 +392,7 @@ async dangerousAction(player, target) {
     return 'Action cancelled.';
   }
   
-  await $.recycler.recycle(target);
+  await $recycler.recycle(target);
   return 'Deleted.';
 }
 ```
@@ -403,7 +403,7 @@ async dangerousAction(player, target) {
 async interviewWizard(player) {
   const answers = {};
   
-  answers.experience = await $.prompt.question(
+  answers.experience = await $prompt.question(
     player,
     'Years of MUD admin experience: ',
     (input) => {
@@ -413,18 +413,18 @@ async interviewWizard(player) {
     }
   );
   
-  answers.reason = await $.prompt.multiline(
+  answers.reason = await $prompt.multiline(
     player,
     'Why do you want to be a wizard?'
   );
   
-  answers.availability = await $.prompt.choice(player, 'Availability:', {
+  answers.availability = await $prompt.choice(player, 'Availability:', {
     full: 'Full-time (20+ hours/week)',
     part: 'Part-time (10-20 hours/week)',
     casual: 'Casual (< 10 hours/week)',
   });
   
-  answers.skills = await $.prompt.menu(player, 'Primary skills:', {
+  answers.skills = await $prompt.menu(player, 'Primary skills:', {
     building: 'World building',
     coding: 'MOO programming',
     plot: 'Plot/RP management',
@@ -451,7 +451,7 @@ async interviewWizard(player) {
 ### Input with Validation
 
 ```javascript
-const value = await $.prompt.question(player, 'Enter value: ', (input) => {
+const value = await $prompt.question(player, 'Enter value: ', (input) => {
   if (/* invalid */) return 'Error message';
   return null;
 });
@@ -460,10 +460,10 @@ const value = await $.prompt.question(player, 'Enter value: ', (input) => {
 ### Sequential Prompts
 
 ```javascript
-const name = await $.prompt.question(player, 'Name: ');
+const name = await $prompt.question(player, 'Name: ');
 if (!name) return;
 
-const age = await $.prompt.question(player, 'Age: ');
+const age = await $prompt.question(player, 'Age: ');
 if (!age) return;
 
 // Continue...
@@ -472,7 +472,7 @@ if (!age) return;
 ### Confirmation Pattern
 
 ```javascript
-const confirm = await $.prompt.yesorno(player, 'Are you sure?');
+const confirm = await $prompt.yesorno(player, 'Are you sure?');
 if (!confirm) return 'Cancelled.';
 
 // Proceed with action
@@ -482,7 +482,7 @@ if (!confirm) return 'Cancelled.';
 
 ```javascript
 while (true) {
-  const choice = await $.prompt.choice(player, 'Menu:', choices);
+  const choice = await $prompt.choice(player, 'Menu:', choices);
   if (!choice || choice === 'quit') break;
   
   await this.handleChoice(choice);
@@ -491,6 +491,6 @@ while (true) {
 
 ## See Also
 
-- [$.format](./format.md) - Format prompt text
-- [$.english](./english.md) - Grammar for prompts
+- [$format](./format.md) - Format prompt text
+- [$english](./english.md) - Grammar for prompts
 - [Best Practices](../best-practices.md) - User interaction patterns

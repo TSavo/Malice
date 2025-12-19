@@ -618,6 +618,16 @@ export class RuntimeObjectImpl implements RuntimeObject {
           const parseFloat = ctx.parseFloat;
           const isNaN = ctx.isNaN;
           const isFinite = ctx.isFinite;
+          const $load = $.load.bind($);
+          const $create = $.create.bind($);
+          const $addAlias = $.addAlias.bind($);
+          const $removeAlias = $.removeAlias.bind($);
+          const $getAlias = $.getAlias.bind($);
+          const $clearAliasesForObject = $.clearAliasesForObject.bind($);
+          const $aliases = $.aliases;
+          const $db = $.db;
+          const $evictFromCache = $.evictFromCache.bind($);
+          const $getInheritanceChain = $.getInheritanceChain.bind($);
           ${aliasDeclarations}
           return (async () => {
             ${parentJsCode}
@@ -688,6 +698,16 @@ export class RuntimeObjectImpl implements RuntimeObject {
         const parseFloat = ctx.parseFloat;
         const isNaN = ctx.isNaN;
         const isFinite = ctx.isFinite;
+        const $load = $.load.bind($);
+        const $create = $.create.bind($);
+        const $addAlias = $.addAlias.bind($);
+        const $removeAlias = $.removeAlias.bind($);
+        const $getAlias = $.getAlias.bind($);
+        const $clearAliasesForObject = $.clearAliasesForObject.bind($);
+        const $aliases = $.aliases;
+        const $db = $.db;
+        const $evictFromCache = $.evictFromCache.bind($);
+        const $getInheritanceChain = $.getInheritanceChain.bind($);
         ${aliasDeclarations}
         return (async () => {
           ${jsCode}

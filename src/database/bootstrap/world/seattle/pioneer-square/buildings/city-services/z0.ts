@@ -108,7 +108,7 @@ An elevator stands in the corner, its doors industrial steel rather than the bra
             return 'The call button clicks uselessly. No power.';
           }
 
-          const elevator = await $.load(elevatorId);
+          const elevator = await $load(elevatorId);
           if (!elevator) {
             return 'Nothing answers the button press.';
           }

@@ -167,7 +167,7 @@ export class RecyclerBuilder {
             console.log(\`[Recycler] Reused object #\${obj.id}\`);
           } else {
             // Pool empty - create fresh object
-            obj = await $.create(params);
+            obj = await $create(params);
             console.log(\`[Recycler] Created new object #\${obj.id}\`);
           }
 
@@ -191,7 +191,7 @@ export class RecyclerBuilder {
           const objectId = typeof objectOrId === 'number' ? objectOrId : objectOrId.id;
 
           // Load the object
-          const obj = typeof objectOrId === 'number' ? await $.load(objectId) : objectOrId;
+          const obj = typeof objectOrId === 'number' ? await $load(objectId) : objectOrId;
           if (!obj) {
             throw new Error('Object not found');
           }
@@ -207,7 +207,7 @@ export class RecyclerBuilder {
           }
 
           // Clear all aliases pointing to this object
-          await $.clearAliasesForObject(objectId);
+          await $clearAliasesForObject(objectId);
 
           // Reset the object to a blank slate
           // 1. Clear all properties
@@ -292,7 +292,7 @@ export class RecyclerBuilder {
       const objectId = args[0];
       const caller = args[1];
 
-      const obj = await $.load(objectId);
+      const obj = await $load(objectId);
       if (!obj) return;
 
       // Recursively delete all parts first

@@ -105,7 +105,7 @@ export class EmoteBuilder {
       const viewers = [];
       if (room && room.contents) {
         for (const id of room.contents) {
-          const obj = await $.load(id);
+          const obj = await $load(id);
           if (obj && obj.isPlayer) {
             viewers.push(obj);
           }
@@ -121,7 +121,7 @@ export class EmoteBuilder {
       const knownNames = {};
       if (room && room.contents) {
         for (const id of room.contents) {
-          const obj = await $.load(id);
+          const obj = await $load(id);
           if (obj && obj.name) {
             knownNames[obj.name.toLowerCase()] = obj;
           }
@@ -155,7 +155,7 @@ export class EmoteBuilder {
       const knownNames = {};
       if (room.contents) {
         for (const id of room.contents) {
-          const obj = await $.load(id);
+          const obj = await $load(id);
           if (obj && obj.name) {
             knownNames[obj.name.toLowerCase()] = obj;
           }
@@ -207,7 +207,7 @@ export class EmoteBuilder {
       const knownNames = {};
       if (room && room.contents) {
         for (const id of room.contents) {
-          const obj = await $.load(id);
+          const obj = await $load(id);
           if (obj && obj.name) {
             knownNames[obj.name.toLowerCase()] = obj;
           }
@@ -1023,7 +1023,7 @@ export class EmoteBuilder {
       const parsed = await self.parse(emoteStr, actor, room);
 
       for (const [viewerId, sensory] of Object.entries(parsed)) {
-        const viewer = await $.load(parseInt(viewerId));
+        const viewer = await $load(parseInt(viewerId));
         if (!viewer) continue;
 
         // Skip if viewer is the actor (they always see their own emote)

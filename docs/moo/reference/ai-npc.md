@@ -320,7 +320,7 @@ const info = await $ai.getInfo(npcId);
 ### Change Role
 
 ```javascript
-await $.ai.setRole(npcId, 'supervisor');
+await $ai.setRole(npcId, 'supervisor');
 // Moves NPC from old role to new role in registry
 ```
 
@@ -356,7 +356,7 @@ The prompt uses `{{variable}}` syntax for templating:
 
 ```javascript
 // Get default prompt
-const defaultPrompt = $.ai.defaultAgentPrompt;
+const defaultPrompt = $ai.defaultAgentPrompt;
 
 // Set custom prompt for specific NPC
 npc.agentSystemPrompt = customPrompt;
@@ -368,10 +368,10 @@ The `tailor` action uses an AI agent to dress NPCs appropriately:
 
 ```javascript
 // Dress NPC based on role/context
-await $.ai.tailor(npcId);
+await $ai.tailor(npcId);
 
 // With context hint
-await $.ai.tailor(npcId, 'shabby, recently fired, down on luck');
+await $ai.tailor(npcId, 'shabby, recently fired, down on luck');
 ```
 
 ## Event Hooks
@@ -411,7 +411,7 @@ Builder notes provide guidance for NPC behavior:
 
 ```javascript
 // Add a note
-await $.notes.add(npcId,
+await $notes.add(npcId,
   'Can offer 10% discount to citizens in good standing',
   'builder',
   ['powers', 'pricing']
@@ -440,17 +440,17 @@ ai({ action: 'profile', humanId: 456 })
 
 ```javascript
 // Good - specific role
-await $.ai.spawn('checkpoint-guard');
+await $ai.spawn('checkpoint-guard');
 
 // Less useful - too generic
-await $.ai.spawn('npc');
+await $ai.spawn('npc');
 ```
 
 ### 2. Create Memories for Recognition
 
 ```javascript
 // NPCs should remember who they've met
-await $.ai.remember(npcId,
+await $ai.remember(npcId,
   'Met [name they gave] - [physical description] - [when/where]',
   'critical',
   ['player', 'introduction']
@@ -463,7 +463,7 @@ NPCs have no special powers by default. Use builder notes to grant them:
 
 ```javascript
 // In builder code, not in NPC code
-await $.notes.add(npcId,
+await $notes.add(npcId,
   'Has authority to issue temporary passes',
   'builder',
   ['powers']
@@ -474,7 +474,7 @@ await $.notes.add(npcId,
 
 ```javascript
 // NPCs should log interactions for continuity
-await $.notes.append(npcId, 'log',
+await $notes.append(npcId, 'log',
   '[timestamp] [name]: Summary of what happened'
 );
 ```
@@ -491,5 +491,5 @@ NPCs work for the Continuum, not players. They:
 
 - [Prototypes Reference](./prototypes.md) - Human prototype
 - [Body System](./body-system.md) - NPC bodies
-- [$ Globals Reference](./globals.md) - $.ai
+- [$ Globals Reference](./globals.md) - $ai
 - [Plot System](./plots.md) - NPC involvement in plots

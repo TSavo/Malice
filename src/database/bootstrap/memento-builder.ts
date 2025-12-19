@@ -63,7 +63,7 @@ export class MementoBuilder {
       for (let i = 0; i < objects.length; i++) {
         let obj = objects[i];
         if (typeof obj === 'number') {
-          obj = await $.load(obj);
+          obj = await $load(obj);
         }
         if (!obj) continue;
 
@@ -221,7 +221,7 @@ export class MementoBuilder {
         if (typeof value === 'object') {
           // External objref marker -> load the existing object
           if ('_objref' in value && Object.keys(value).length === 1) {
-            return await $.load(value._objref);
+            return await $load(value._objref);
           }
 
           // Regular object - recurse into properties

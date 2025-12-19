@@ -68,7 +68,7 @@ export class DescribableBuilder {
 
       // Accept either a RuntimeObject or an ID number
       if (typeof dest === 'number') {
-        dest = await $.load(dest);
+        dest = await $load(dest);
       }
 
       if (!dest || dest.id === undefined) {
@@ -115,7 +115,7 @@ export class DescribableBuilder {
 
       // Accept either a RuntimeObject or an ID number
       if (typeof item === 'number') {
-        item = await $.load(item);
+        item = await $load(item);
       }
 
       if (!item || typeof item.id !== 'number') {
@@ -230,7 +230,7 @@ export class DescribableBuilder {
         // Get plot - may be auto-resolved objref or raw ID if not cached
         let plot = hook.plot;
         if (typeof plot === 'number') {
-          plot = await $.load(plot);
+          plot = await $load(plot);
         }
         if (!plot) {
           continue; // Plot no longer exists

@@ -676,7 +676,7 @@ CORE PRINCIPLES
         for (const key of Object.keys(parts)) {
           const partId = parts[key];
           if (typeof partId === 'number') {
-            const part = await $.load(partId);
+            const part = await $load(partId);
             if (part) {
               await setOwnerRecursive(part);
             }
@@ -734,7 +734,7 @@ CORE PRINCIPLES
       // Optionally recycle the human and body
       if (recycle) {
         const recycler = await $.recycler;
-        const human = await $.load(humanId);
+        const human = await $load(humanId);
 
         if (human && recycler) {
           // Recycle body tree first
@@ -765,7 +765,7 @@ CORE PRINCIPLES
       }
 
       // Load the actual human object to store as objref
-      const human = await $.load(humanId);
+      const human = await $load(humanId);
       if (!human) {
         throw new Error('Human #' + humanId + ' not found');
       }
@@ -939,7 +939,7 @@ CORE PRINCIPLES
         return { success: false, error: 'Human #' + humanId + ' is not AI-controlled' };
       }
 
-      const human = await $.load(humanId);
+      const human = await $load(humanId);
       if (!human) {
         return { success: false, error: 'Could not load human #' + humanId };
       }
@@ -967,7 +967,7 @@ CORE PRINCIPLES
         return { success: false, error: 'Human #' + humanId + ' is not AI-controlled' };
       }
 
-      const human = await $.load(humanId);
+      const human = await $load(humanId);
       if (!human) {
         return { success: false, error: 'Could not load human #' + humanId };
       }
@@ -993,7 +993,7 @@ CORE PRINCIPLES
         return { success: false, error: 'Human #' + humanId + ' is not AI-controlled' };
       }
 
-      const human = await $.load(humanId);
+      const human = await $load(humanId);
       if (!human) {
         return { success: false, error: 'Could not load human #' + humanId };
       }

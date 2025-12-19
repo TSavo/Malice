@@ -2360,7 +2360,7 @@ export class AgentBuilder {
       const bodyWeight = body ? (body.weight || 70000) : 70000;
 
       // Create corpse object - sex/species determined from body anatomy during autopsy
-      const corpse = await $.create({
+      const corpse = await $create({
         parent: corpseProto,
         properties: {
           name: 'corpse of ' + (self.name || 'someone'),

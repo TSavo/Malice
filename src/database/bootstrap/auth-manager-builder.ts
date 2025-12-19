@@ -77,7 +77,7 @@ Login: `,
             }
 
             // Check if user exists via alias lookup
-            const objectManager = await $.load(0);
+            const objectManager = await $load(0);
             const aliases = objectManager.aliases || {};
             const playerPrototypeId = aliases.player;
 

@@ -177,7 +177,7 @@ export class SchedulerBuilder {
         if (now >= job.nextRun) {
           // Time to run this job
           try {
-            const target = await $.load(job.targetId);
+            const target = await $load(job.targetId);
             if (target && target[job.method]) {
               const result = await target[job.method](...(job.args || []));
               results.push({ job: name, success: true, result: result });
@@ -221,7 +221,7 @@ export class SchedulerBuilder {
       }
 
       try {
-        const target = await $.load(job.targetId);
+        const target = await $load(job.targetId);
         if (!target || !target[job.method]) {
           return { error: 'Target or method not found' };
         }
@@ -267,7 +267,7 @@ export class SchedulerBuilder {
       const allIds = await $.objectManager.getAllIds();
 
       for (const id of allIds) {
-        const obj = await $.load(id);
+        const obj = await $load(id);
         if (!obj) continue;
 
         // Check if object has decayTick method (inherits from Decayable)

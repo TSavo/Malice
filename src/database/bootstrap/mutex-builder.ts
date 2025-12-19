@@ -105,7 +105,7 @@ export class MutexBuilder {
 
       // Load object if ID was passed
       if (typeof obj === 'number') {
-        obj = await $.load(obj);
+        obj = await $load(obj);
       }
 
       if (!obj) {

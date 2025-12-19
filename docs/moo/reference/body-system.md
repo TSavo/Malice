@@ -53,17 +53,17 @@ torso (root)
 
 ## Creating Bodies
 
-Use `$.bodyFactory` to create complete human bodies:
+Use `$bodyFactory` to create complete human bodies:
 
 ```javascript
 // Create a human body with default appearance
-const body = await $.bodyFactory.createHumanBody(owner);
+const body = await $bodyFactory.createHumanBody(owner);
 
 // Create with specific sex
-const body = await $.bodyFactory.createHumanBody(owner, 'female');
+const body = await $bodyFactory.createHumanBody(owner, 'female');
 
 // Create with detailed appearance
-const body = await $.bodyFactory.createHumanBody(owner, 'male', {
+const body = await $bodyFactory.createHumanBody(owner, 'male', {
   skinTone: 'olive',
   eyeColor: 'green',
   leftEyeColor: 'green',     // Supports heterochromia
@@ -82,7 +82,7 @@ const body = await $.bodyFactory.createHumanBody(owner, 'male', {
 });
 
 // Specify primary hand
-const body = await $.bodyFactory.createHumanBody(owner, 'female', {}, 'left');
+const body = await $bodyFactory.createHumanBody(owner, 'female', {}, 'left');
 ```
 
 ## Body Part Properties
@@ -526,4 +526,4 @@ if (!mouth) {
 
 - [Prototypes Reference](./prototypes.md) - Body part prototypes
 - [Event Hooks](./hooks.md) - onSensation, onCriticalDamage
-- [$ Globals Reference](./globals.md) - $.bodyFactory
+- [$ Globals Reference](./globals.md) - $bodyFactory

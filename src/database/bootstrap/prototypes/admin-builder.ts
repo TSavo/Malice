@@ -87,7 +87,7 @@ export class AdminBuilder {
             const elevIdStr = await $.prompt.question(self, 'Elevator id to attach: ');
             const eid = elevIdStr ? parseInt(elevIdStr, 10) : NaN;
             if (isNaN(eid)) { await self.tell('Invalid id.'); break; }
-            const elev = await $.load(eid);
+            const elev = await $load(eid);
             if (!elev) { await self.tell('Elevator not found.'); break; }
             const currentRoom = self.location || null;
             if (!currentRoom) { await self.tell('You are nowhere.'); break; }
@@ -155,7 +155,7 @@ export class AdminBuilder {
             const elevIdStr = await $.prompt.question(self, 'Elevator id to configure: ');
             const eid = elevIdStr ? parseInt(elevIdStr, 10) : NaN;
             if (isNaN(eid)) { await self.tell('Invalid id.'); break; }
-            const elev = await $.load(eid);
+            const elev = await $load(eid);
             if (!elev) { await self.tell('Elevator not found.'); break; }
             await self.tell('Elevator #' + eid + ' (' + (elev.name || '') + ')');
             let cfgDone = false;
@@ -163,7 +163,7 @@ export class AdminBuilder {
               const floors = elev.floors || [];
               const locksDetailed = [];
               for (const l of elev.locks || []) {
-                const obj = typeof l === 'number' ? await $.load(l) : l;
+                const obj = typeof l === 'number' ? await $load(l) : l;
                 const id = typeof l === 'number' ? l : l.id;
                 locksDetailed.push('#' + id + (obj?.name ? ' ' + obj.name : ''));
               }
@@ -436,7 +436,7 @@ export class AdminBuilder {
             const elevIdStr = await $.prompt.question(self, 'Elevator object id to attach this door to: ');
             const eid = elevIdStr ? parseInt(elevIdStr, 10) : NaN;
             if (isNaN(eid)) { await self.tell('Invalid id.'); break; }
-            const elev = await $.load(eid);
+            const elev = await $load(eid);
             if (!elev) { await self.tell('Elevator not found.'); break; }
             elev.door = doorObj.id;
             await self.tell('Door #' + doorObj.id + ' attached to elevator #' + eid + '.');
@@ -666,7 +666,7 @@ export class AdminBuilder {
         return;
       }
 
-      const destRoom = await $.load(destId);
+      const destRoom = await $load(destId);
       if (!destRoom) {
         await self.tell('Room #' + destId + ' not found.');
         return;
@@ -791,7 +791,7 @@ export class AdminBuilder {
         target = self;
       } else {
         const targetId = parseInt(targetRef.replace('#', ''), 10);
-        target = await $.load(targetId);
+        target = await $load(targetId);
       }
 
       if (!target) {
@@ -1050,7 +1050,7 @@ export class AdminBuilder {
         return;
       }
 
-      const target = await $.load(targetId);
+      const target = await $load(targetId);
       if (!target) {
         await self.tell('Object #' + targetId + ' not found.');
         return;
@@ -1116,7 +1116,7 @@ export class AdminBuilder {
         return;
       }
 
-      destRoom = await $.load(destId);
+      destRoom = await $load(destId);
       if (!destRoom) {
         await self.tell('Room #' + destId + ' not found.');
         return;
@@ -1152,7 +1152,7 @@ export class AdminBuilder {
       }
 
       // Find player by name
-      const authMgr = await $.load($.system.aliases.authManager);
+      const authMgr = await $load($.system.aliases.authManager);
       if (!authMgr || !authMgr.findPlayerByName) {
         await self.tell('Cannot search for players.');
         return;
@@ -1197,7 +1197,7 @@ export class AdminBuilder {
       }
 
       // Find player by name
-      const authMgr = await $.load($.system.aliases.authManager);
+      const authMgr = await $load($.system.aliases.authManager);
       if (!authMgr || !authMgr.findPlayerByName) {
         await self.tell('Cannot search for players.');
         return;
@@ -1240,7 +1240,7 @@ export class AdminBuilder {
       } else {
         const targetId = parseInt(input.replace('#', ''), 10);
         if (!isNaN(targetId)) {
-          target = await $.load(targetId);
+          target = await $load(targetId);
         }
       }
 
@@ -1370,7 +1370,7 @@ export class AdminBuilder {
         target = self;
       } else {
         const targetId = parseInt(targetRef.replace('#', ''), 10);
-        target = await $.load(targetId);
+        target = await $load(targetId);
       }
 
       if (!target) {
@@ -1430,7 +1430,7 @@ export class AdminBuilder {
       } else {
         const targetId = parseInt(input.replace('#', ''), 10);
         if (!isNaN(targetId)) {
-          target = await $.load(targetId);
+          target = await $load(targetId);
         }
       }
 
@@ -1481,7 +1481,7 @@ export class AdminBuilder {
         target = self;
       } else {
         const targetId = parseInt(targetRef.replace('#', ''), 10);
-        target = await $.load(targetId);
+        target = await $load(targetId);
       }
 
       if (!target) {
@@ -1545,7 +1545,7 @@ export class AdminBuilder {
       if (utilities.length > 0) {
         await self.tell('\\r\\n--- Utilities ---');
         for (const [name, id] of utilities.sort((a, b) => a[0].localeCompare(b[0]))) {
-          const obj = await $.load(id);
+          const obj = await $load(id);
           const desc = obj ? obj.name || '(no name)' : '(not found)';
           await self.tell('  $.' + name + ' -> #' + id + ' (' + desc + ')');
         }
@@ -1629,7 +1629,7 @@ export class AdminBuilder {
         }
 
         // Verify object exists
-        const obj = await $.load(objId);
+        const obj = await $load(objId);
         if (!obj) {
           await self.tell('Object #' + objId + ' not found.');
           return;
@@ -1664,7 +1664,7 @@ export class AdminBuilder {
           }
           await self.tell('}');
         } else {
-          const obj = await $.load(objId);
+          const obj = await $load(objId);
           await self.tell('$.' + name + ' -> #' + objId + ' (' + (obj?.name || 'not found') + ')');
         }
       }
@@ -1708,7 +1708,7 @@ export class AdminBuilder {
       /** Execute arbitrary MOO code.
        *  Usage: @eval <code>
        *  Example: @eval self.name = "Test"
-       *  Example: @eval await $.load(42).describe()
+       *  Example: @eval await $load(42).describe()
        *
        *  Available variables: self, $, player, context
        */
@@ -1718,7 +1718,7 @@ export class AdminBuilder {
       if (!code) {
         await player.tell('Usage: @eval <code>');
         await player.tell('Example: @eval self.name');
-        await player.tell('Example: @eval await $.load(42).describe()');
+        await player.tell('Example: @eval await $load(42).describe()');
         return;
       }
 
@@ -2002,7 +2002,7 @@ export class AdminBuilder {
         // Search by name
         const allIds = await ai.getAll();
         for (const id of allIds) {
-          const h = await $.load(id);
+          const h = await $load(id);
           if (h && h.name && h.name.toLowerCase() === target.toLowerCase()) {
             humanId = id;
             break;
@@ -2021,7 +2021,7 @@ export class AdminBuilder {
         return;
       }
 
-      const human = await $.load(humanId);
+      const human = await $load(humanId);
       const name = human ? human.name : 'Unknown';
 
       await ai.despawn(humanId, true);
@@ -2052,7 +2052,7 @@ export class AdminBuilder {
 
         await player.tell('AI humans with role "' + roleFilter + '":');
         for (const id of ids) {
-          const h = await $.load(id);
+          const h = await $load(id);
           const name = h ? h.name : 'Unknown';
           const loc = h?.location || null;
           const locName = loc ? loc.name : 'nowhere';
@@ -2093,7 +2093,7 @@ export class AdminBuilder {
       } else {
         const targetId = parseInt(input.replace('#', ''), 10);
         if (!isNaN(targetId)) {
-          target = await $.load(targetId);
+          target = await $load(targetId);
         }
       }
 
@@ -2242,7 +2242,7 @@ export class AdminBuilder {
             await player.tell('');
 
             for (const r of results) {
-              const obj = await $.load(r.objectId);
+              const obj = await $load(r.objectId);
               const objName = obj ? obj.name : 'Unknown';
               const n = r.note;
               const date = new Date(n.timestamp);
