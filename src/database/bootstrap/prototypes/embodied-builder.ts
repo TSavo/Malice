@@ -178,7 +178,7 @@ export class EmbodiedBuilder {
     `);
 
     obj.setMethod('getCarriedWeight', `
-      /** Get total weight of items being carried (in hands, worn, etc).
+      /** Get total weight of items being carried (in hands, worn, pockets, etc).
        *  Used for movement calorie cost calculations.
        *  @returns Total weight in grams
        */
@@ -215,9 +215,24 @@ export class EmbodiedBuilder {
 
           if (part) {
             const worn = part.worn || [];
-            for (const item of worn) {
-              if (item) {
-                totalWeight += item.weight || 100;
+            for (const wornItem of worn) {
+              if (wornItem) {
+                totalWeight += wornItem.weight || 100;
+                
+                // Add pocket contents weight (clothing with pockets)
+                const pockets = wornItem.pockets || [];
+                for (const pocket of pockets) {
+                  if (!pocket) continue;
+                  const pocketContents = pocket.contents || [];
+                  for (const pItem of pocketContents) {
+                    if (pItem) {
+                      // For stackables, weight scales with quantity
+                      const qty = pItem.quantity || 1;
+                      const unitWeight = pItem.weight || 100;
+                      totalWeight += unitWeight * qty;
+                    }
+                  }
+                }
               }
             }
           }
