@@ -64,7 +64,7 @@ export class RelationshipCache {
   invalidateObject(objectId: number): void {
     const keysToDelete: string[] = [];
     
-    for (const [key] of this.cache.keys()) {
+    for (const key of this.cache.keys()) {
       if (key.startsWith(`${objectId}:`)) {
         keysToDelete.push(key);
       }
