@@ -9,19 +9,25 @@ describe('TypeScript Compilation', () => {
   let db: ObjectDatabase;
   let manager: ObjectManager;
   let testObj: RuntimeObject;
+  let root: RuntimeObject;
 
   beforeEach(async () => {
     db = new ObjectDatabase(MONGO_URI, 'malice_test_typescript_compilation');
     await db.connect();
 
-    // Clean database
+    // Clean database and create root objects
     await db['objects'].deleteMany({});
+    await db.ensureRoot();
 
     manager = new ObjectManager(db);
+    await manager.loadAll();
+
+    // Get root object for parent reference
+    root = (await manager.load(1))!;
 
     // Create a test object
     testObj = await manager.create({
-      parent: 0,
+      parent: root!,
       properties: {
         name: 'Test Object',
         hp: 100,
@@ -514,7 +520,7 @@ describe('TypeScript Compilation', () => {
 
     it('should load other objects via $.load()', async () => {
       const otherObj = await manager.create({
-        parent: 0,
+        parent: root,
         properties: { name: 'Other Object', value: 42 },
         methods: {},
       });
@@ -530,7 +536,7 @@ describe('TypeScript Compilation', () => {
 
     it('should call methods on other objects via $', async () => {
       const otherObj = await manager.create({
-        parent: 0,
+        parent: root,
         properties: { multiplier: 5 },
         methods: {},
       });
@@ -792,7 +798,7 @@ describe('TypeScript Compilation', () => {
 
     it('should combine self, $, and args in complex logic', async () => {
       const target = await manager.create({
-        parent: 0,
+        parent: root,
         properties: { defense: 20 },
         methods: {},
       });

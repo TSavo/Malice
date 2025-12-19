@@ -13,6 +13,7 @@ describe('LSP API Server', () => {
   let server: LSPApiServer;
   let httpServer: Server;
   let baseUrl: string;
+  let root: any;
 
   beforeAll(async () => {
     // Setup database
@@ -22,6 +23,8 @@ describe('LSP API Server', () => {
     await db.ensureRoot();
 
     manager = new ObjectManager(db);
+    await manager.loadAll();
+    root = await manager.load(1);
 
     // Start API server on test port
     server = new LSPApiServer(manager, TEST_PORT);
@@ -79,7 +82,7 @@ describe('LSP API Server', () => {
     it('should set CORS headers on POST requests', async () => {
       // Create a test object first
       const obj = await manager.create({
-        parent: 1,
+        parent: root,
         properties: {},
         methods: {},
       });
@@ -114,12 +117,12 @@ describe('LSP API Server', () => {
     it('should list all objects as directories', async () => {
       // Create some test objects
       await manager.create({
-        parent: 1,
+        parent: root,
         properties: { name: 'Object A' },
         methods: {},
       });
       await manager.create({
-        parent: 1,
+        parent: root,
         properties: { name: 'Object B' },
         methods: {},
       });
@@ -152,7 +155,7 @@ describe('LSP API Server', () => {
 
     it('should include correct URIs in object list', async () => {
       const obj = await manager.create({
-        parent: 1,
+        parent: root,
         properties: {},
         methods: {},
       });
@@ -169,7 +172,7 @@ describe('LSP API Server', () => {
   describe('GET /api/lsp/list/objects/{id}/', () => {
     it('should list methods and properties for an object', async () => {
       const obj = await manager.create({
-        parent: 1,
+        parent: root,
         properties: {
           hp: 100,
           name: 'Test Object',
@@ -208,7 +211,7 @@ describe('LSP API Server', () => {
 
     it('should return empty array for object with no methods or properties', async () => {
       const obj = await manager.create({
-        parent: 1,
+        parent: root,
         properties: {},
         methods: {},
       });
@@ -234,7 +237,7 @@ describe('LSP API Server', () => {
   describe('GET /api/lsp/read/objects/{id}/{name}.ts', () => {
     it('should read method content with TypeScript context', async () => {
       const obj = await manager.create({
-        parent: 1,
+        parent: root,
         properties: {},
         methods: {},
       });
@@ -260,7 +263,7 @@ describe('LSP API Server', () => {
 
     it('should return 404 for non-existent method', async () => {
       const obj = await manager.create({
-        parent: 1,
+        parent: root,
         properties: {},
         methods: {},
       });
@@ -279,7 +282,7 @@ describe('LSP API Server', () => {
 
     it('should include correct prototype type in context', async () => {
       const obj = await manager.create({
-        parent: 1,
+        parent: root,
         properties: {},
         methods: {},
       });
@@ -297,7 +300,7 @@ describe('LSP API Server', () => {
   describe('GET /api/lsp/read/objects/{id}/{name}.json', () => {
     it('should read property content as JSON', async () => {
       const obj = await manager.create({
-        parent: 1,
+        parent: root,
         properties: {
           hp: 100,
           name: 'Test Player',
@@ -326,7 +329,7 @@ describe('LSP API Server', () => {
 
     it('should return 404 for non-existent property', async () => {
       const obj = await manager.create({
-        parent: 1,
+        parent: root,
         properties: {},
         methods: {},
       });
@@ -337,7 +340,7 @@ describe('LSP API Server', () => {
 
     it('should format JSON with indentation', async () => {
       const obj = await manager.create({
-        parent: 1,
+        parent: root,
         properties: {
           data: { a: 1, b: 2, c: 3 },
         },
@@ -356,7 +359,7 @@ describe('LSP API Server', () => {
   describe('POST /api/lsp/write/objects/{id}/{name}.ts', () => {
     it('should write method content to MongoDB', async () => {
       const obj = await manager.create({
-        parent: 1,
+        parent: root,
         properties: {},
         methods: {},
       });
@@ -393,7 +396,7 @@ describe('LSP API Server', () => {
 
     it('should create new method if it does not exist', async () => {
       const obj = await manager.create({
-        parent: 1,
+        parent: root,
         properties: {},
         methods: {},
       });
@@ -421,7 +424,7 @@ describe('LSP API Server', () => {
 
     it('should handle method with TypeScript syntax', async () => {
       const obj = await manager.create({
-        parent: 1,
+        parent: root,
         properties: { value: 10 },
         methods: {},
       });
@@ -454,7 +457,7 @@ describe('LSP API Server', () => {
 
     it('should invalidate cache after writing', async () => {
       const obj = await manager.create({
-        parent: 1,
+        parent: root,
         properties: {},
         methods: {},
       });
@@ -606,7 +609,7 @@ describe('LSP API Server', () => {
     it('should support complete CRUD workflow', async () => {
       // Create object
       const obj = await manager.create({
-        parent: 1,
+        parent: root,
         properties: { counter: 0 },
         methods: {},
       });
@@ -655,7 +658,7 @@ describe('LSP API Server', () => {
 
     it('should handle concurrent requests', async () => {
       const obj = await manager.create({
-        parent: 1,
+        parent: root,
         properties: {},
         methods: {},
       });
@@ -697,7 +700,7 @@ describe('LSP API Server', () => {
 
     it('should work with objects that have many methods', async () => {
       const obj = await manager.create({
-        parent: 1,
+        parent: root,
         properties: {},
         methods: {},
       });
@@ -760,7 +763,7 @@ describe('LSP API Server', () => {
   describe('Edge Cases', () => {
     it('should handle methods with special characters in names', async () => {
       const obj = await manager.create({
-        parent: 1,
+        parent: root,
         properties: {},
         methods: {},
       });
@@ -777,7 +780,7 @@ describe('LSP API Server', () => {
 
     it('should handle empty method code', async () => {
       const obj = await manager.create({
-        parent: 1,
+        parent: root,
         properties: {},
         methods: {},
       });
@@ -805,7 +808,7 @@ describe('LSP API Server', () => {
 
     it('should handle very large method code', async () => {
       const obj = await manager.create({
-        parent: 1,
+        parent: root,
         properties: {},
         methods: {},
       });
@@ -837,7 +840,7 @@ describe('LSP API Server', () => {
 
     it('should handle properties with null values', async () => {
       const obj = await manager.create({
-        parent: 1,
+        parent: root,
         properties: {
           nullProp: null,
         },
@@ -853,7 +856,7 @@ describe('LSP API Server', () => {
 
     it('should handle properties with array values', async () => {
       const obj = await manager.create({
-        parent: 1,
+        parent: root,
         properties: {
           items: ['sword', 'shield', 'potion'],
         },

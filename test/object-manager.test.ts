@@ -9,6 +9,7 @@ const TEST_DB_NAME = 'malice_test_object_manager';
 describe('ObjectManager', () => {
   let db: ObjectDatabase;
   let manager: ObjectManager;
+  let root: RuntimeObject;
 
   beforeAll(async () => {
     db = new ObjectDatabase(MONGO_URI, TEST_DB_NAME);
@@ -23,6 +24,9 @@ describe('ObjectManager', () => {
     // Create ObjectManager and load all objects
     manager = new ObjectManager(db);
     await manager.loadAll();
+
+    // Load root object for use as parent
+    root = (await manager.load(0))!;
   }, 15000);
 
   afterAll(async () => {
@@ -34,17 +38,17 @@ describe('ObjectManager', () => {
     it('should find objects by property value', async () => {
       // Create test objects
       const obj1 = await manager.create({
-        parent: 1,
+        parent: root,
         properties: { name: 'Alice', role: 'admin' },
       });
 
       const obj2 = await manager.create({
-        parent: 1,
+        parent: root,
         properties: { name: 'Bob', role: 'admin' },
       });
 
       const obj3 = await manager.create({
-        parent: 1,
+        parent: root,
         properties: { name: 'Charlie', role: 'user' },
       });
 
@@ -67,17 +71,17 @@ describe('ObjectManager', () => {
       const uniqueLevel = 999888;
       
       await manager.create({
-        parent: 1,
+        parent: root,
         properties: { level: uniqueLevel },
       });
 
       await manager.create({
-        parent: 1,
+        parent: root,
         properties: { level: uniqueLevel },
       });
 
       await manager.create({
-        parent: 1,
+        parent: root,
         properties: { level: uniqueLevel + 1 },
       });
 
@@ -92,23 +96,23 @@ describe('ObjectManager', () => {
     it('should get all children of a parent object', async () => {
       // Create parent
       const parent = await manager.create({
-        parent: 1,
+        parent: root,
         properties: { name: 'ParentForChildren' },
       });
 
       // Create children
       await manager.create({
-        parent: parent.id,
+        parent: parent,
         properties: { name: 'Child1' },
       });
 
       await manager.create({
-        parent: parent.id,
+        parent: parent,
         properties: { name: 'Child2' },
       });
 
       await manager.create({
-        parent: parent.id,
+        parent: parent,
         properties: { name: 'Child3' },
       });
 
@@ -121,7 +125,7 @@ describe('ObjectManager', () => {
 
     it('should return empty array for objects with no children', async () => {
       const obj = await manager.create({
-        parent: 1,
+        parent: root,
         properties: { name: 'Lonely' },
       });
 
@@ -133,12 +137,12 @@ describe('ObjectManager', () => {
     it('should return cached children', async () => {
       // Create parent and child
       const parent = await manager.create({
-        parent: 1,
+        parent: root,
         properties: { name: 'ParentCached' },
       });
 
       const child = await manager.create({
-        parent: parent.id,
+        parent: parent,
         properties: { name: 'ChildCached' },
       });
 
@@ -157,8 +161,8 @@ describe('ObjectManager', () => {
   describe('getCacheStats()', () => {
     it('should return cache statistics', async () => {
       // Create some objects
-      await manager.create({ parent: 1, properties: { name: 'StatsObj1' } });
-      await manager.create({ parent: 1, properties: { name: 'StatsObj2' } });
+      await manager.create({ parent: root, properties: { name: 'StatsObj1' } });
+      await manager.create({ parent: root, properties: { name: 'StatsObj2' } });
 
       const stats = manager.getCacheStats();
 
@@ -171,7 +175,7 @@ describe('ObjectManager', () => {
 
     it('should track cache hits', async () => {
       const obj = await manager.create({
-        parent: 1,
+        parent: root,
         properties: { name: 'CacheHitTest' },
       });
 
@@ -230,9 +234,9 @@ describe('ObjectManager', () => {
   describe('preload()', () => {
     it('should preload multiple objects into cache', async () => {
       // Create objects
-      const obj1 = await manager.create({ parent: 1, properties: { name: 'PreloadObj1' } });
-      const obj2 = await manager.create({ parent: 1, properties: { name: 'PreloadObj2' } });
-      const obj3 = await manager.create({ parent: 1, properties: { name: 'PreloadObj3' } });
+      const obj1 = await manager.create({ parent: root, properties: { name: 'PreloadObj1' } });
+      const obj2 = await manager.create({ parent: root, properties: { name: 'PreloadObj2' } });
+      const obj3 = await manager.create({ parent: root, properties: { name: 'PreloadObj3' } });
 
       // Preload (they're already cached from create, but this tests the method)
       await manager.preload([obj1.id, obj2.id, obj3.id]);
@@ -261,7 +265,7 @@ describe('ObjectManager', () => {
   describe('registerAlias() / removeAlias() / getAliases()', () => {
     it('should register an alias for an object', async () => {
       const obj = await manager.create({
-        parent: 1,
+        parent: root,
         properties: { name: 'TestObjectAlias' },
       });
 
@@ -274,7 +278,7 @@ describe('ObjectManager', () => {
 
     it('should remove an alias', async () => {
       const obj = await manager.create({
-        parent: 1,
+        parent: root,
         properties: { name: 'TestObjectRemove' },
       });
 
@@ -286,8 +290,8 @@ describe('ObjectManager', () => {
     });
 
     it('should get all aliases', async () => {
-      const obj1 = await manager.create({ parent: 1, properties: { name: 'AliasObj1' } });
-      const obj2 = await manager.create({ parent: 1, properties: { name: 'AliasObj2' } });
+      const obj1 = await manager.create({ parent: root, properties: { name: 'AliasObj1' } });
+      const obj2 = await manager.create({ parent: root, properties: { name: 'AliasObj2' } });
 
       manager.registerAlias('aliasGetAll1', obj1);
       manager.registerAlias('aliasGetAll2', obj2);
@@ -300,7 +304,7 @@ describe('ObjectManager', () => {
     });
 
     it('should return a copy of aliases map', async () => {
-      const obj = await manager.create({ parent: 1, properties: { name: 'AliasCopy' } });
+      const obj = await manager.create({ parent: root, properties: { name: 'AliasCopy' } });
 
       manager.registerAlias('originalAlias', obj);
 
@@ -313,8 +317,8 @@ describe('ObjectManager', () => {
     });
 
     it('should overwrite existing alias with same name', async () => {
-      const obj1 = await manager.create({ parent: 1, properties: { name: 'First' } });
-      const obj2 = await manager.create({ parent: 1, properties: { name: 'Second' } });
+      const obj1 = await manager.create({ parent: root, properties: { name: 'First' } });
+      const obj2 = await manager.create({ parent: root, properties: { name: 'Second' } });
 
       manager.registerAlias('sharedAlias', obj1);
       expect(manager.getAliases().get('sharedAlias')).toBe(obj1);
@@ -327,7 +331,7 @@ describe('ObjectManager', () => {
   describe('Proxy behavior', () => {
     it('should allow dynamic alias access via proxy get', async () => {
       const obj = await manager.create({
-        parent: 1,
+        parent: root,
         properties: { name: 'DynamicAccessProxy' },
       });
 
@@ -343,7 +347,7 @@ describe('ObjectManager', () => {
 
     it('should allow dynamic alias registration via proxy set', async () => {
       const obj = await manager.create({
-        parent: 1,
+        parent: root,
         properties: { name: 'ProxySetTest' },
       });
 
@@ -357,7 +361,7 @@ describe('ObjectManager', () => {
 
     it('should prevent overwriting internal properties via proxy', async () => {
       const obj = await manager.create({
-        parent: 1,
+        parent: root,
         properties: { name: 'TestInternal' },
       });
 
@@ -390,7 +394,7 @@ describe('ObjectManager', () => {
   describe('invalidate() method', () => {
     it('should invalidate transient caches for specific object', async () => {
       const obj = await manager.create({
-        parent: 1,
+        parent: root,
         properties: { name: 'InvalidateTest' },
         methods: { greet: { code: 'return "hello";' } },
       });
@@ -415,7 +419,7 @@ describe('ObjectManager', () => {
   describe('registerAliasById()', () => {
     it('should register alias by loading object ID', async () => {
       const obj = await manager.create({
-        parent: 1,
+        parent: root,
         properties: { name: 'AliasTestById' },
       });
 
@@ -437,7 +441,7 @@ describe('ObjectManager', () => {
   describe('Stable Proxy Pattern', () => {
     it('should return same proxy reference on multiple loads', async () => {
       const obj = await manager.create({
-        parent: 1,
+        parent: root,
         properties: { name: 'StableProxy' },
       });
 
@@ -451,7 +455,7 @@ describe('ObjectManager', () => {
 
     it('should reflect property changes on existing proxy', async () => {
       const obj = await manager.create({
-        parent: 1,
+        parent: root,
         properties: { value: 'original' },
       });
 
@@ -502,13 +506,13 @@ describe('ObjectManager', () => {
       
       // Create parent with property
       const parent = await manager.create({
-        parent: 1,
+        parent: root,
         properties: { inheritedProp: uniqueValue },
       });
 
       // Create child that inherits
       const child = await manager.create({
-        parent: parent.id,
+        parent: parent,
         properties: { own: 'data' },
       });
 
@@ -526,17 +530,17 @@ describe('ObjectManager', () => {
       
       // Create objects with various property types
       await manager.create({
-        parent: 1,
+        parent: root,
         properties: { type: uniqueType, damage: 10 },
       });
 
       await manager.create({
-        parent: 1,
+        parent: root,
         properties: { type: uniqueType, damage: 15 },
       });
 
       await manager.create({
-        parent: 1,
+        parent: root,
         properties: { type: 'armor_' + Date.now(), defense: 5 },
       });
 

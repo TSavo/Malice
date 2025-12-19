@@ -93,8 +93,9 @@ describe('GameBootstrap', () => {
       const $ = manager as any;
 
       // Check parent relationships
-      expect($.root.getParent()).toBe(0);
-      expect($.system.getParent()).toBe($.root.id);
+      // $.root is parented to #0 (ObjectManager), which is self-parented so getParent returns null
+      expect($.root.getParent()?.id).toBe(0);
+      expect($.system.getParent()?.id).toBe($.root.id);
     });
 
     it('should set up aliases correctly', async () => {
@@ -132,16 +133,17 @@ describe('GameBootstrap', () => {
 
     it('should detect built world', async () => {
       await bootstrap.bootstrap();
+      const root = await manager.load(1);
 
       // Simulate built world by creating required objects
       await manager.create({
-        parent: 1,
+        parent: root!,
         properties: { name: 'Describable' },
         methods: {},
       }); // #10 (might be #4)
 
       await manager.create({
-        parent: 1,
+        parent: root!,
         properties: { name: 'AuthManager' },
         methods: {},
       }); // #4 or #11
@@ -149,7 +151,7 @@ describe('GameBootstrap', () => {
       // Create more objects to reach #13
       for (let i = 0; i < 10; i++) {
         await manager.create({
-          parent: 1,
+          parent: root!,
           properties: { name: `Object ${i}` },
           methods: {},
         });
@@ -172,7 +174,7 @@ describe('GameBootstrap', () => {
       // Create corrupt root
       await db.create({
         _id: 1,
-        parent: 0,
+        parent: { type: 'objref', value: 0 },
         properties: null as any, // Corrupt
         methods: {},
       });

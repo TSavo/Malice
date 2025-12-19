@@ -10,6 +10,7 @@ describe('RuntimeObject', () => {
   let db: ObjectDatabase;
   let manager: ObjectManager;
   let testObj: RuntimeObject;
+  let root: RuntimeObject;
 
   beforeEach(async () => {
     db = new ObjectDatabase(MONGO_URI, 'malice_test_runtime_object');
@@ -20,9 +21,12 @@ describe('RuntimeObject', () => {
 
     manager = new ObjectManager(db);
 
+    // Load root object (will be created if doesn't exist)
+    root = (await manager.load(0))!;
+
     // Create a test object
     testObj = await manager.create({
-      parent: 0,
+      parent: root,
       properties: {
         name: 'Test Object',
         hp: 100,
@@ -70,7 +74,7 @@ describe('RuntimeObject', () => {
     it('should get methods from parent via proxy', async () => {
       // Create parent with a method
       const parent = await manager.create({
-        parent: 0,
+        parent: root,
         properties: {},
         methods: {},
       });
@@ -79,7 +83,7 @@ describe('RuntimeObject', () => {
 
       // Create child inheriting from parent
       const child = await manager.create({
-        parent: parent.id,
+        parent: parent,
         properties: {},
         methods: {},
       });
@@ -261,76 +265,79 @@ describe('RuntimeObject', () => {
   });
 
   describe('getParent()', () => {
-    it('should return parent object ID', () => {
-      expect(testObj.getParent()).toBe(0);
+    it('should return parent object', () => {
+      expect(testObj.getParent()?.id).toBe(root.id);
     });
 
     it('should return correct parent after setting', async () => {
       const parent = await manager.create({
-        parent: 0,
+        parent: root,
         properties: {},
         methods: {},
       });
 
-      await testObj.setParent(parent.id);
+      testObj.setParent(parent);
 
-      expect(testObj.getParent()).toBe(parent.id);
+      expect(testObj.getParent()?.id).toBe(parent.id);
     });
 
-    it('should return 0 for objects with no parent', async () => {
+    it('should return root for objects parented to root', async () => {
       const rootObj = await manager.create({
-        parent: 0,
+        parent: root,
         properties: {},
         methods: {},
       });
 
-      expect(rootObj.getParent()).toBe(0);
+      expect(rootObj.getParent()?.id).toBe(root.id);
     });
   });
 
   describe('setParent()', () => {
     it('should set parent and save', async () => {
       const newParent = await manager.create({
-        parent: 0,
+        parent: root,
         properties: {},
         methods: {},
       });
 
-      await testObj.setParent(newParent.id);
+      testObj.setParent(newParent);
 
-      expect(testObj.getParent()).toBe(newParent.id);
+      expect(testObj.getParent()?.id).toBe(newParent.id);
 
       // Verify it was saved to database
       const reloaded = await manager.load(testObj.id);
-      expect(reloaded?.getParent()).toBe(newParent.id);
+      expect(reloaded?.getParent()?.id).toBe(newParent.id);
     });
 
-    it('should persist parent change immediately', async () => {
+    it('should persist parent change via auto-persist', async () => {
       const parent = await manager.create({
-        parent: 0,
+        parent: root,
         properties: {},
         methods: {},
       });
 
-      testObj.setParent(parent.id);
+      testObj.setParent(parent);
 
-      // With auto-persist, change is immediate in memory
-      expect(testObj.getParent()).toBe(parent.id);
+      // Change is immediate in memory
+      expect(testObj.getParent()?.id).toBe(parent.id);
+
+      // Give async auto-persist time to complete
+      await new Promise(resolve => setTimeout(resolve, 100));
 
       // Verify persisted to DB
       await testObj.pull();
-      expect(testObj.getParent()).toBe(parent.id);
+      expect(testObj.getParent()?.id).toBe(parent.id);
     });
 
     it('should allow changing parent multiple times', async () => {
-      const parent1 = await manager.create({ parent: 0, properties: {}, methods: {} });
-      const parent2 = await manager.create({ parent: 0, properties: {}, methods: {} });
+      const parent1 = await manager.create({ parent: root, properties: {}, methods: {} });
+      const parent2 = await manager.create({ parent: root, properties: {}, methods: {} });
 
-      await testObj.setParent(parent1.id);
-      expect(testObj.getParent()).toBe(parent1.id);
+      testObj.setParent(parent1);
+      expect(testObj.getParent()?.id).toBe(parent1.id);
 
-      await testObj.setParent(parent2.id);
-      expect(testObj.getParent()).toBe(parent2.id);
+      testObj.setParent(parent2);
+      expect(testObj.getParent()?.id).toBe(parent2.id);
     });
   });
 
@@ -348,7 +355,7 @@ describe('RuntimeObject', () => {
     it('should not include inherited properties', async () => {
       // Create parent with properties
       const parent = await manager.create({
-        parent: 0,
+        parent: root,
         properties: {
           parentProp: 'from parent',
         },
@@ -357,7 +364,7 @@ describe('RuntimeObject', () => {
 
       // Create child with its own properties
       const child = await manager.create({
-        parent: parent.id,
+        parent: parent,
         properties: {
           childProp: 'from child',
         },
@@ -382,7 +389,7 @@ describe('RuntimeObject', () => {
 
     it('should return empty object if no properties', async () => {
       const emptyObj = await manager.create({
-        parent: 0,
+        parent: root,
         properties: {},
         methods: {},
       });
@@ -407,7 +414,7 @@ describe('RuntimeObject', () => {
     it('should not include inherited methods', async () => {
       // Create parent with method
       const parent = await manager.create({
-        parent: 0,
+        parent: root,
         properties: {},
         methods: {},
       });
@@ -416,7 +423,7 @@ describe('RuntimeObject', () => {
 
       // Create child with its own method
       const child = await manager.create({
-        parent: parent.id,
+        parent: parent,
         properties: {},
         methods: {},
       });
@@ -440,7 +447,7 @@ describe('RuntimeObject', () => {
 
     it('should return empty object if no methods', async () => {
       const emptyObj = await manager.create({
-        parent: 0,
+        parent: root,
         properties: {},
         methods: {},
       });
@@ -635,7 +642,7 @@ describe('RuntimeObject', () => {
     it('should only remove from current object, not parent', async () => {
       // Create parent with method
       const parent = await manager.create({
-        parent: 0,
+        parent: root,
         properties: {},
         methods: {},
       });
@@ -644,7 +651,7 @@ describe('RuntimeObject', () => {
 
       // Create child inheriting parent's method
       const child = await manager.create({
-        parent: parent.id,
+        parent: parent,
         properties: {},
         methods: {},
       });
@@ -690,7 +697,8 @@ describe('RuntimeObject', () => {
         mana: 50,
       });
       expect(raw.methods).toBeDefined();
-      expect(raw.parent).toBe(0);
+      // Parent is now stored as ObjRefValue
+      expect(raw.parent).toEqual({ type: 'objref', value: root.id });
     });
 
     it('should reflect current state', () => {
@@ -704,7 +712,7 @@ describe('RuntimeObject', () => {
   describe('Property inheritance', () => {
     it('should inherit properties from parent', async () => {
       const parent = await manager.create({
-        parent: 0,
+        parent: root,
         properties: {
           parentProp: 'inherited',
         },
@@ -712,7 +720,7 @@ describe('RuntimeObject', () => {
       });
 
       const child = await manager.create({
-        parent: parent.id,
+        parent: parent,
         properties: {
           childProp: 'own',
         },
@@ -725,7 +733,7 @@ describe('RuntimeObject', () => {
 
     it('should override parent properties', async () => {
       const parent = await manager.create({
-        parent: 0,
+        parent: root,
         properties: {
           prop: 'parent value',
         },
@@ -733,7 +741,7 @@ describe('RuntimeObject', () => {
       });
 
       const child = await manager.create({
-        parent: parent.id,
+        parent: parent,
         properties: {
           prop: 'child value',
         },
@@ -748,7 +756,7 @@ describe('RuntimeObject', () => {
   describe('Method inheritance', () => {
     it('should inherit methods from parent', async () => {
       const parent = await manager.create({
-        parent: 0,
+        parent: root,
         properties: {},
         methods: {},
       });
@@ -756,7 +764,7 @@ describe('RuntimeObject', () => {
       await parent.save();
 
       const child = await manager.create({
-        parent: parent.id,
+        parent: parent,
         properties: {},
         methods: {},
       });
@@ -769,7 +777,7 @@ describe('RuntimeObject', () => {
 
     it('should override parent methods', async () => {
       const parent = await manager.create({
-        parent: 0,
+        parent: root,
         properties: {},
         methods: {},
       });
@@ -777,7 +785,7 @@ describe('RuntimeObject', () => {
       await parent.save();
 
       const child = await manager.create({
-        parent: parent.id,
+        parent: parent,
         properties: {},
         methods: {},
       });
@@ -824,7 +832,7 @@ describe('RuntimeObject', () => {
 
     it('should handle empty properties object', async () => {
       const obj = await manager.create({
-        parent: 0,
+        parent: root,
         properties: {},
         methods: {},
       });
@@ -834,7 +842,7 @@ describe('RuntimeObject', () => {
 
     it('should handle empty methods object', async () => {
       const obj = await manager.create({
-        parent: 0,
+        parent: root,
         properties: {},
         methods: {},
       });
@@ -844,7 +852,7 @@ describe('RuntimeObject', () => {
 
     it('should handle parent = 0 (no parent)', async () => {
       const obj = await manager.create({
-        parent: 0,
+        parent: root,
         properties: { prop: 'value' },
         methods: {},
       });
@@ -857,7 +865,7 @@ describe('RuntimeObject', () => {
       // Create object with undefined properties
       const raw: GameObject = {
         _id: 9999,
-        parent: 0,
+        parent: root,
         properties: {} as any,
         methods: {},
         created: new Date(),
@@ -876,7 +884,7 @@ describe('RuntimeObject', () => {
       // Create object with undefined methods
       const raw: GameObject = {
         _id: 9998,
-        parent: 0,
+        parent: root,
         properties: {},
         methods: {} as any,
         created: new Date(),
@@ -896,7 +904,7 @@ describe('RuntimeObject', () => {
     it('should call parent method with pass()', async () => {
       // Create parent with a method
       const parent = await manager.create({
-        parent: 0,
+        parent: root,
         properties: {},
         methods: {},
       });
@@ -905,7 +913,7 @@ describe('RuntimeObject', () => {
 
       // Create child that overrides and calls pass()
       const child = await manager.create({
-        parent: parent.id,
+        parent: parent,
         properties: {},
         methods: {},
       });
@@ -920,7 +928,7 @@ describe('RuntimeObject', () => {
 
     it('should pass arguments through pass()', async () => {
       const parent = await manager.create({
-        parent: 0,
+        parent: root,
         properties: {},
         methods: {},
       });
@@ -928,7 +936,7 @@ describe('RuntimeObject', () => {
       await parent.save();
 
       const child = await manager.create({
-        parent: parent.id,
+        parent: parent,
         properties: {},
         methods: {},
       });
@@ -943,7 +951,7 @@ describe('RuntimeObject', () => {
 
     it('should pass original args when pass() called with no arguments', async () => {
       const parent = await manager.create({
-        parent: 0,
+        parent: root,
         properties: {},
         methods: {},
       });
@@ -951,7 +959,7 @@ describe('RuntimeObject', () => {
       await parent.save();
 
       const child = await manager.create({
-        parent: parent.id,
+        parent: parent,
         properties: {},
         methods: {},
       });
@@ -966,7 +974,7 @@ describe('RuntimeObject', () => {
 
     it('should maintain self binding in parent method', async () => {
       const parent = await manager.create({
-        parent: 0,
+        parent: root,
         properties: { name: 'Parent' },
         methods: {},
       });
@@ -974,7 +982,7 @@ describe('RuntimeObject', () => {
       await parent.save();
 
       const child = await manager.create({
-        parent: parent.id,
+        parent: parent,
         properties: { name: 'Child' },
         methods: {},
       });
@@ -991,7 +999,7 @@ describe('RuntimeObject', () => {
     it('should work with grandchild calling pass() through chain', async () => {
       // grandparent -> parent -> child
       const grandparent = await manager.create({
-        parent: 0,
+        parent: root,
         properties: {},
         methods: {},
       });
@@ -999,7 +1007,7 @@ describe('RuntimeObject', () => {
       await grandparent.save();
 
       const parent = await manager.create({
-        parent: grandparent.id,
+        parent: grandparent,
         properties: {},
         methods: {},
       });
@@ -1010,7 +1018,7 @@ describe('RuntimeObject', () => {
       await parent.save();
 
       const child = await manager.create({
-        parent: parent.id,
+        parent: parent,
         properties: {},
         methods: {},
       });
@@ -1025,7 +1033,7 @@ describe('RuntimeObject', () => {
 
     it('should throw when pass() called with no parent method', async () => {
       const obj = await manager.create({
-        parent: 0,
+        parent: root,
         properties: {},
         methods: {},
       });
@@ -1040,7 +1048,7 @@ describe('RuntimeObject', () => {
     it('should work when method defined on ancestor is called on descendant', async () => {
       // grandparent defines method, parent overrides with pass(), child inherits
       const grandparent = await manager.create({
-        parent: 0,
+        parent: root,
         properties: {},
         methods: {},
       });
@@ -1048,7 +1056,7 @@ describe('RuntimeObject', () => {
       await grandparent.save();
 
       const parent = await manager.create({
-        parent: grandparent.id,
+        parent: grandparent,
         properties: {},
         methods: {},
       });
@@ -1060,7 +1068,7 @@ describe('RuntimeObject', () => {
 
       // Child doesn't override, just inherits parent's method
       const child = await manager.create({
-        parent: parent.id,
+        parent: parent,
         properties: {},
         methods: {},
       });
@@ -1074,7 +1082,7 @@ describe('RuntimeObject', () => {
       // This tests the core fix: pass() should search from where method is DEFINED,
       // not from where it's CALLED ON
       const grandparent = await manager.create({
-        parent: 0,
+        parent: root,
         properties: {},
         methods: {},
       });
@@ -1082,7 +1090,7 @@ describe('RuntimeObject', () => {
       await grandparent.save();
 
       const parent = await manager.create({
-        parent: grandparent.id,
+        parent: grandparent,
         properties: {},
         methods: {},
       });
@@ -1094,7 +1102,7 @@ describe('RuntimeObject', () => {
       await parent.save();
 
       const child = await manager.create({
-        parent: parent.id,
+        parent: parent,
         properties: {},
         methods: {},
       });
@@ -1109,7 +1117,7 @@ describe('RuntimeObject', () => {
 
     it('should allow pass() with different arguments than original', async () => {
       const parent = await manager.create({
-        parent: 0,
+        parent: root,
         properties: {},
         methods: {},
       });
@@ -1117,7 +1125,7 @@ describe('RuntimeObject', () => {
       await parent.save();
 
       const child = await manager.create({
-        parent: parent.id,
+        parent: parent,
         properties: {},
         methods: {},
       });
@@ -1133,7 +1141,7 @@ describe('RuntimeObject', () => {
 
     it('should work with async parent methods', async () => {
       const parent = await manager.create({
-        parent: 0,
+        parent: root,
         properties: {},
         methods: {},
       });
@@ -1144,7 +1152,7 @@ describe('RuntimeObject', () => {
       await parent.save();
 
       const child = await manager.create({
-        parent: parent.id,
+        parent: parent,
         properties: {},
         methods: {},
       });
@@ -1162,7 +1170,7 @@ describe('RuntimeObject', () => {
     it('should handle deep inheritance chains', async () => {
       // Create chain: grandparent -> parent -> child
       const grandparent = await manager.create({
-        parent: 0,
+        parent: root,
         properties: { level: 'grandparent' },
         methods: {},
       });
@@ -1170,7 +1178,7 @@ describe('RuntimeObject', () => {
       await grandparent.save();
 
       const parent = await manager.create({
-        parent: grandparent.id,
+        parent: grandparent,
         properties: { level: 'parent' },
         methods: {},
       });
@@ -1178,7 +1186,7 @@ describe('RuntimeObject', () => {
       await parent.save();
 
       const child = await manager.create({
-        parent: parent.id,
+        parent: parent,
         properties: { level: 'child' },
         methods: {},
       });
@@ -1236,7 +1244,7 @@ describe('RuntimeObject', () => {
     it('should store objref and return same instance on read', async () => {
       // Create a target object
       const target = await manager.create({
-        parent: 0,
+        parent: root,
         properties: { name: 'Target' },
         methods: {},
       });
@@ -1256,12 +1264,12 @@ describe('RuntimeObject', () => {
 
     it('should maintain objref identity in arrays', async () => {
       const item1 = await manager.create({
-        parent: 0,
+        parent: root,
         properties: { name: 'Item 1' },
         methods: {},
       });
       const item2 = await manager.create({
-        parent: 0,
+        parent: root,
         properties: { name: 'Item 2' },
         methods: {},
       });
@@ -1281,7 +1289,7 @@ describe('RuntimeObject', () => {
 
     it('should allow comparing objrefs with === for equality', async () => {
       const obj1 = await manager.create({
-        parent: 0,
+        parent: root,
         properties: { name: 'Object 1' },
         methods: {},
       });
@@ -1301,7 +1309,7 @@ describe('RuntimeObject', () => {
 
     it('should convert "#N" string format to objref', async () => {
       const target = await manager.create({
-        parent: 0,
+        parent: root,
         properties: { name: 'Target' },
         methods: {},
       });
@@ -1320,12 +1328,12 @@ describe('RuntimeObject', () => {
 
     it('should handle nested objrefs in objects', async () => {
       const owner = await manager.create({
-        parent: 0,
+        parent: root,
         properties: { name: 'Owner' },
         methods: {},
       });
       const location = await manager.create({
-        parent: 0,
+        parent: root,
         properties: { name: 'Location' },
         methods: {},
       });
@@ -1349,12 +1357,12 @@ describe('RuntimeObject', () => {
 
     it('should work with filter/find using === comparison', async () => {
       const target = await manager.create({
-        parent: 0,
+        parent: root,
         properties: { name: 'Find Me' },
         methods: {},
       });
       const other = await manager.create({
-        parent: 0,
+        parent: root,
         properties: { name: 'Other' },
         methods: {},
       });
@@ -1373,12 +1381,12 @@ describe('RuntimeObject', () => {
 
     it('should support checking if array includes an objref', async () => {
       const member = await manager.create({
-        parent: 0,
+        parent: root,
         properties: { name: 'Member' },
         methods: {},
       });
       const nonMember = await manager.create({
-        parent: 0,
+        parent: root,
         properties: { name: 'Non-Member' },
         methods: {},
       });
@@ -1396,7 +1404,7 @@ describe('RuntimeObject', () => {
 
     it('should persist objrefs across save/reload', async () => {
       const target = await manager.create({
-        parent: 0,
+        parent: root,
         properties: { name: 'Persistent Target' },
         methods: {},
       });
@@ -1417,7 +1425,7 @@ describe('RuntimeObject', () => {
 
     it('should handle objref in method execution context', async () => {
       const target = await manager.create({
-        parent: 0,
+        parent: root,
         properties: { name: 'Method Target' },
         methods: {},
       });

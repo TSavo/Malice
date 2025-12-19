@@ -34,7 +34,7 @@ describe('MinimalBootstrap', () => {
       expect(root).toBeTruthy();
       expect(root!.id).toBe(1);
       expect(root!.get('name')).toBe('Root');
-      expect(root!.getParent()).toBe(0);
+      expect(root!.getParent()?.id).toBe(0); // Parent is ObjectManager #0
     });
 
     it('should create System object (#2)', async () => {
@@ -49,7 +49,7 @@ describe('MinimalBootstrap', () => {
       expect($.system).toBeTruthy();
       expect($.system.id).toBe(2);
       expect($.system.get('name')).toBe('System');
-      expect($.system.getParent()).toBe($.root.id);
+      expect($.system.getParent()).toBe($.root);
     });
 
 
@@ -92,7 +92,7 @@ describe('MinimalBootstrap', () => {
       const doc = root!['_getRaw']();
 
       expect(doc._id).toBe(1);
-      expect(doc.parent).toBe(0);
+      expect(doc.parent).toEqual({ type: 'objref', value: 0 });
       expect(doc.properties).toBeTruthy();
       expect(doc.methods).toBeTruthy();
       expect(doc.created).toBeInstanceOf(Date);

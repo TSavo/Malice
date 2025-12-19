@@ -202,7 +202,7 @@ describe('$.scheduler', () => {
     it('should run jobs whose time has come', async () => {
       // Create a test object with a method that sets a flag
       const testObj = await $.recycler.create({
-        parent: $.root.id,
+        parent: $.root,
         properties: { name: 'TickTest', wasRun: false },
       }, null);
 
@@ -226,7 +226,7 @@ describe('$.scheduler', () => {
 
     it('should delete one-shot jobs after execution', async () => {
       const testObj = await $.recycler.create({
-        parent: $.root.id,
+        parent: $.root,
         properties: { name: 'OneShotTest' },
       }, null);
 
@@ -241,7 +241,7 @@ describe('$.scheduler', () => {
 
     it('should reschedule repeating jobs', async () => {
       const testObj = await $.recycler.create({
-        parent: $.root.id,
+        parent: $.root,
         properties: { name: 'RepeatTest' },
       }, null);
 
@@ -258,7 +258,7 @@ describe('$.scheduler', () => {
 
     it('should not run disabled jobs', async () => {
       const testObj = await $.recycler.create({
-        parent: $.root.id,
+        parent: $.root,
         properties: { name: 'DisabledTest', wasRun: false },
       }, null);
 
@@ -275,7 +275,7 @@ describe('$.scheduler', () => {
 
     it('should not run jobs whose time has not come', async () => {
       const testObj = await $.recycler.create({
-        parent: $.root.id,
+        parent: $.root,
         properties: { name: 'FutureTest', wasRun: false },
       }, null);
 
@@ -291,7 +291,7 @@ describe('$.scheduler', () => {
 
     it('should handle errors gracefully', async () => {
       const testObj = await $.recycler.create({
-        parent: $.root.id,
+        parent: $.root,
         properties: { name: 'ErrorTest' },
       }, null);
 
@@ -310,7 +310,7 @@ describe('$.scheduler', () => {
 
     it('should pass arguments to job method', async () => {
       const testObj = await $.recycler.create({
-        parent: $.root.id,
+        parent: $.root,
         properties: { name: 'ArgsTest', receivedArgs: null },
       }, null);
 
@@ -329,7 +329,7 @@ describe('$.scheduler', () => {
   describe('runNow()', () => {
     it('should run job immediately', async () => {
       const testObj = await $.recycler.create({
-        parent: $.root.id,
+        parent: $.root,
         properties: { name: 'RunNowTest', wasRun: false },
       }, null);
 
@@ -351,7 +351,7 @@ describe('$.scheduler', () => {
 
     it('should delete one-shot after runNow', async () => {
       const testObj = await $.recycler.create({
-        parent: $.root.id,
+        parent: $.root,
         properties: { name: 'RunNowDelete' },
       }, null);
 
@@ -366,7 +366,7 @@ describe('$.scheduler', () => {
 
     it('should reschedule repeating job after runNow', async () => {
       const testObj = await $.recycler.create({
-        parent: $.root.id,
+        parent: $.root,
         properties: { name: 'RunNowRepeat' },
       }, null);
 

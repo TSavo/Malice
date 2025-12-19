@@ -28,7 +28,7 @@ describe('$.mutex', () => {
   describe('acquire()', () => {
     it('should acquire a lock and return false', async () => {
       const testObj = await $.recycler.create({
-        parent: $.root.id,
+        parent: $.root,
         properties: { name: 'Test Object' },
       }, null);
 
@@ -38,7 +38,7 @@ describe('$.mutex', () => {
 
     it('should return lock data when already locked', async () => {
       const testObj = await $.recycler.create({
-        parent: $.root.id,
+        parent: $.root,
         properties: { name: 'Test Object' },
       }, null);
 
@@ -50,7 +50,7 @@ describe('$.mutex', () => {
 
     it('should allow different lock names on same object', async () => {
       const testObj = await $.recycler.create({
-        parent: $.root.id,
+        parent: $.root,
         properties: { name: 'Test Object' },
       }, null);
 
@@ -63,7 +63,7 @@ describe('$.mutex', () => {
 
     it('should store lock in object _mutexes property', async () => {
       const testObj = await $.recycler.create({
-        parent: $.root.id,
+        parent: $.root,
         properties: { name: 'Test Object' },
       }, null);
 
@@ -82,7 +82,7 @@ describe('$.mutex', () => {
 
     it('should throw on missing or invalid name', async () => {
       const testObj = await $.recycler.create({
-        parent: $.root.id,
+        parent: $.root,
         properties: { name: 'Test Object' },
       }, null);
 
@@ -92,7 +92,7 @@ describe('$.mutex', () => {
 
     it('should use true as default data if none provided', async () => {
       const testObj = await $.recycler.create({
-        parent: $.root.id,
+        parent: $.root,
         properties: { name: 'Test Object' },
       }, null);
 
@@ -106,7 +106,7 @@ describe('$.mutex', () => {
   describe('release()', () => {
     it('should release an existing lock', async () => {
       const testObj = await $.recycler.create({
-        parent: $.root.id,
+        parent: $.root,
         properties: { name: 'Test Object' },
       }, null);
 
@@ -119,7 +119,7 @@ describe('$.mutex', () => {
 
     it('should return false when releasing non-existent lock', async () => {
       const testObj = await $.recycler.create({
-        parent: $.root.id,
+        parent: $.root,
         properties: { name: 'Test Object' },
       }, null);
 
@@ -129,7 +129,7 @@ describe('$.mutex', () => {
 
     it('should allow re-acquiring after release', async () => {
       const testObj = await $.recycler.create({
-        parent: $.root.id,
+        parent: $.root,
         properties: { name: 'Test Object' },
       }, null);
 
@@ -143,7 +143,7 @@ describe('$.mutex', () => {
 
     it('should work with object ID instead of object', async () => {
       const testObj = await $.recycler.create({
-        parent: $.root.id,
+        parent: $.root,
         properties: { name: 'Test Object' },
       }, null);
 
@@ -157,7 +157,7 @@ describe('$.mutex', () => {
   describe('check()', () => {
     it('should return false for unlocked mutex', async () => {
       const testObj = await $.recycler.create({
-        parent: $.root.id,
+        parent: $.root,
         properties: { name: 'Test Object' },
       }, null);
 
@@ -167,7 +167,7 @@ describe('$.mutex', () => {
 
     it('should return lock data for locked mutex', async () => {
       const testObj = await $.recycler.create({
-        parent: $.root.id,
+        parent: $.root,
         properties: { name: 'Test Object' },
       }, null);
 
@@ -179,7 +179,7 @@ describe('$.mutex', () => {
 
     it('should not modify lock state', async () => {
       const testObj = await $.recycler.create({
-        parent: $.root.id,
+        parent: $.root,
         properties: { name: 'Test Object' },
       }, null);
 
@@ -194,7 +194,7 @@ describe('$.mutex', () => {
   describe('update()', () => {
     it('should update data on existing lock', async () => {
       const testObj = await $.recycler.create({
-        parent: $.root.id,
+        parent: $.root,
         properties: { name: 'Test Object' },
       }, null);
 
@@ -207,7 +207,7 @@ describe('$.mutex', () => {
 
     it('should return false for non-existent lock', async () => {
       const testObj = await $.recycler.create({
-        parent: $.root.id,
+        parent: $.root,
         properties: { name: 'Test Object' },
       }, null);
 
@@ -217,7 +217,7 @@ describe('$.mutex', () => {
 
     it('should preserve acquiredAt timestamp', async () => {
       const testObj = await $.recycler.create({
-        parent: $.root.id,
+        parent: $.root,
         properties: { name: 'Test Object' },
       }, null);
 
@@ -234,7 +234,7 @@ describe('$.mutex', () => {
   describe('list()', () => {
     it('should return empty object when no locks', async () => {
       const testObj = await $.recycler.create({
-        parent: $.root.id,
+        parent: $.root,
         properties: { name: 'Test Object' },
       }, null);
 
@@ -244,7 +244,7 @@ describe('$.mutex', () => {
 
     it('should return all locks on object', async () => {
       const testObj = await $.recycler.create({
-        parent: $.root.id,
+        parent: $.root,
         properties: { name: 'Test Object' },
       }, null);
 
@@ -264,7 +264,7 @@ describe('$.mutex', () => {
   describe('releaseAll()', () => {
     it('should release all locks on object', async () => {
       const testObj = await $.recycler.create({
-        parent: $.root.id,
+        parent: $.root,
         properties: { name: 'Test Object' },
       }, null);
 
@@ -280,7 +280,7 @@ describe('$.mutex', () => {
 
     it('should return 0 when no locks exist', async () => {
       const testObj = await $.recycler.create({
-        parent: $.root.id,
+        parent: $.root,
         properties: { name: 'Test Object' },
       }, null);
 
@@ -292,7 +292,7 @@ describe('$.mutex', () => {
   describe('forceRelease()', () => {
     it('should work same as release', async () => {
       const testObj = await $.recycler.create({
-        parent: $.root.id,
+        parent: $.root,
         properties: { name: 'Test Object' },
       }, null);
 
@@ -307,7 +307,7 @@ describe('$.mutex', () => {
   describe('timed locks with scheduler', () => {
     it('should schedule auto-release when timeout specified', async () => {
       const testObj = await $.recycler.create({
-        parent: $.root.id,
+        parent: $.root,
         properties: { name: 'Test Object' },
       }, null);
 
@@ -323,7 +323,7 @@ describe('$.mutex', () => {
 
     it('should cancel scheduled release on manual release', async () => {
       const testObj = await $.recycler.create({
-        parent: $.root.id,
+        parent: $.root,
         properties: { name: 'Test Object' },
       }, null);
 
@@ -340,7 +340,7 @@ describe('$.mutex', () => {
   describe('extend()', () => {
     it('should extend timeout on existing lock', async () => {
       const testObj = await $.recycler.create({
-        parent: $.root.id,
+        parent: $.root,
         properties: { name: 'Test Object' },
       }, null);
 
@@ -356,7 +356,7 @@ describe('$.mutex', () => {
 
     it('should return false for non-existent lock', async () => {
       const testObj = await $.recycler.create({
-        parent: $.root.id,
+        parent: $.root,
         properties: { name: 'Test Object' },
       }, null);
 
@@ -368,7 +368,7 @@ describe('$.mutex', () => {
   describe('persistence', () => {
     it('should persist locks across object reload', async () => {
       const testObj = await $.recycler.create({
-        parent: $.root.id,
+        parent: $.root,
         properties: { name: 'Test Object' },
       }, null);
       const testId = testObj.id;

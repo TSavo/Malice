@@ -48,6 +48,7 @@ describe('Character Creation and Look Flow Integration', () => {
   });
 
   afterEach(async () => {
+    await manager.flushWrites();
     await db.disconnect();
   });
 
@@ -60,19 +61,19 @@ describe('Character Creation and Look Flow Integration', () => {
 
       // Create exits first
       const northExit = await manager.create({
-        parent: $.exit.id,
+        parent: $.exit,
         properties: { name: 'north', destRoom: null },
         methods: {},
       });
       const westExit = await manager.create({
-        parent: $.exit.id,
+        parent: $.exit,
         properties: { name: 'west', destRoom: null },
         methods: {},
       });
 
       // Create room with exits
       room = await manager.create({
-        parent: $.room.id,
+        parent: $.room,
         properties: {
           name: 'Tavern',
           description: 'A cozy tavern with wooden tables and a roaring fireplace.',
@@ -84,7 +85,7 @@ describe('Character Creation and Look Flow Integration', () => {
 
       // Create player
       player = await manager.create({
-        parent: $.player.id,
+        parent: $.player,
         properties: {
           playername: 'Diana',
           name: 'Diana the Bold',
@@ -122,7 +123,7 @@ describe('Character Creation and Look Flow Integration', () => {
 
       // Create another player in the same room
       const otherPlayer = await manager.create({
-        parent: $.player.id,
+        parent: $.player,
         properties: {
           playername: 'Eve',
           name: 'Eve the Clever',
@@ -151,29 +152,29 @@ describe('Character Creation and Look Flow Integration', () => {
 
       // Create exits first
       const northExit = await manager.create({
-        parent: $.exit.id,
+        parent: $.exit,
         properties: { name: 'north', destRoom: null },
         methods: {},
       });
       const southExit = await manager.create({
-        parent: $.exit.id,
+        parent: $.exit,
         properties: { name: 'south', destRoom: null },
         methods: {},
       });
       const eastExit = await manager.create({
-        parent: $.exit.id,
+        parent: $.exit,
         properties: { name: 'east', destRoom: null },
         methods: {},
       });
       const westExit = await manager.create({
-        parent: $.exit.id,
+        parent: $.exit,
         properties: { name: 'west', destRoom: null },
         methods: {},
       });
 
       // Step 1: Create starting room with exits
       const startRoom = await manager.create({
-        parent: $.room.id,
+        parent: $.room,
         properties: {
           name: 'Newbie Landing',
           description: 'A safe haven for new adventurers. A signpost points to various destinations.',
@@ -185,7 +186,7 @@ describe('Character Creation and Look Flow Integration', () => {
 
       // Step 2: Create new player character
       const newPlayer = await manager.create({
-        parent: $.player.id,
+        parent: $.player,
         properties: {
           playername: 'henry',
           name: 'Henry',

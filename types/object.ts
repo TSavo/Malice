@@ -142,6 +142,9 @@ export interface RuntimeObject {
   /** Remove a method from this object */
   removeMethod(name: string): void;
 
+  /** Delete a property from this object */
+  deleteProperty(prop: string): void;
+
   /** Call method (walks inheritance chain, executes in context) */
   call(method: string, ...args: unknown[]): Promise<unknown>;
 
@@ -151,8 +154,8 @@ export interface RuntimeObject {
   /** Check if method exists (async - loads parents if needed) */
   hasMethodAsync(method: string): Promise<boolean>;
 
-  /** Get parent object (resolves objref to RuntimeObject, null if self-parented) */
-  getParent(): RuntimeObject | null;
+  /** Get parent object (resolves objref to RuntimeObject, self-parented returns self) */
+  getParent(): RuntimeObject;
 
   /** Set parent object */
   setParent(parent: RuntimeObject): void;

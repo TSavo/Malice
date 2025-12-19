@@ -69,17 +69,10 @@ export class RecyclerBuilder {
             throw new Error('Parent must be specified');
           }
 
-          // Resolve parent to ID if it's an object (e.g., $.dollar -> $.dollar.id)
-          const parentId = typeof params.parent === 'object' && params.parent !== null
-            ? params.parent.id
-            : params.parent;
-
-          if (typeof parentId !== 'number') {
-            throw new Error('Parent must be a number or object with .id property');
+          // Parent must be a RuntimeObject
+          if (!params.parent || typeof params.parent !== 'object' || typeof params.parent.id !== 'number') {
+            throw new Error('Parent must be a RuntimeObject');
           }
-
-          // Update params with resolved ID
-          params.parent = parentId;
 
           // Check if caller has permission to create objects
           // Allow creation if:
@@ -223,7 +216,8 @@ export class RecyclerBuilder {
           }
 
           // 3. Reparent to $.nothing (#-1)
-          obj.setParent(-1);
+          const nothing = await $load(-1);
+          obj.setParent(nothing);
 
           // 4. Mark as recycled
           obj.recycled = true;

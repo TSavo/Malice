@@ -6,7 +6,19 @@
       "Bash(npm install)",
       "Bash(npm test:*)",
       "Bash(git add:*)",
-      "Bash(wc:*)"
+      "Bash(wc:*)",
+      "Bash(grep:*)",
+      "Bash(wait)",
+      "Bash(cat:*)",
+      "Bash(find:*)",
+      "Bash(tee:*)",
+      "Bash(lsof:*)",
+      "Bash(xargs:*)",
+      "Bash(timeout 60 npm test -- --run test/devtools/integration.test.ts)",
+      "Bash(echo:*)",
+      "Bash(timeout 120 npm test:*)",
+      "Bash(timeout 180 npm test:*)",
+      "Bash(npx tsc:*)"
     ],
     "deny": [],
     "ask": []

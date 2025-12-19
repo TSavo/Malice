@@ -30,7 +30,7 @@ describe('Method Call Performance', () => {
 
   it('should measure direct method call (self.b)', async () => {
     const testObj = await $.recycler.create({
-      parent: $.root.id,
+      parent: $.root,
       properties: { name: 'Perf Test Object' },
     }, null);
 
@@ -73,12 +73,12 @@ describe('Method Call Performance', () => {
   it('should measure property lookup + method call (self.target.method)', async () => {
     // Create two objects: A holds reference to B, A calls B.method()
     const objA = await $.recycler.create({
-      parent: $.root.id,
+      parent: $.root,
       properties: { name: 'Object A' },
     }, null);
 
     const objB = await $.recycler.create({
-      parent: $.root.id,
+      parent: $.root,
       properties: { name: 'Object B' },
     }, null);
 
@@ -123,17 +123,17 @@ describe('Method Call Performance', () => {
   it('should measure chained property lookup + method call (self.a.b.method)', async () => {
     // Create three objects: A -> middle -> target
     const objA = await $.recycler.create({
-      parent: $.root.id,
+      parent: $.root,
       properties: { name: 'Object A' },
     }, null);
 
     const middle = await $.recycler.create({
-      parent: $.root.id,
+      parent: $.root,
       properties: { name: 'Middle Object' },
     }, null);
 
     const target = await $.recycler.create({
-      parent: $.root.id,
+      parent: $.root,
       properties: { name: 'Target Object' },
     }, null);
 

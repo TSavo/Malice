@@ -7,8 +7,10 @@
 
 import { WebSocketServer, WebSocket } from 'ws';
 import type { ObjectManager } from '../database/object-manager.js';
-import type { ObjId, Method, Value } from '../../types/object.js';
+import type { ObjId, Method } from '../../types/object.js';
 import { TypeGenerator } from './type-generator.js';
+import { MethodTemplateGenerator } from './method-templates.js';
+import { RelationshipAnalyzer } from '../lsp/relationship-analyzer.js';
 
 interface JsonRpcRequest {
   jsonrpc: '2.0';
@@ -44,67 +46,76 @@ export class DevToolsServer {
 
   constructor(
     private manager: ObjectManager,
-    private port = 9999
+    port = 9999
   ) {
     this.wss = new WebSocketServer({
       port,
-      host: '127.0.0.1' // localhost only for security
     });
 
-    this.setupServer();
-    this.watchForChanges();
+    this.wss.on('connection', (ws) => {
+      this.handleConnection(ws);
+    });
+
+    // Initialize relationship components
+    this.templateGenerator = new MethodTemplateGenerator();
+    this.relationshipAnalyzer = new RelationshipAnalyzer();
+  }
+
+  private templateGenerator: MethodTemplateGenerator;
+  private relationshipAnalyzer: RelationshipAnalyzer;
+
+  /**
+   * Convert string to title case
+   */
+  private toTitleCase(str: string): string {
+    return str.charAt(0).toUpperCase() + str.slice(1);
   }
 
   /**
-   * Setup WebSocket server
+   * Handle new WebSocket connection
    */
-  private setupServer(): void {
-    this.wss.on('connection', (ws: WebSocket) => {
-      console.log('🔌 DevTools client connected');
-      this.clients.add(ws);
+  private handleConnection(ws: WebSocket): void {
+    console.log('🔌 DevTools client connected');
+    this.clients.add(ws);
 
-      // Send hello message with capabilities
-      this.sendNotification(ws, 'server.hello', {
-        version: '1.0.0',
-        capabilities: {
-          objectCRUD: true,
-          typeGeneration: true,
-          changeWatch: true,
-          lsp: false, // TODO: implement
-        },
-      });
-
-      ws.on('message', async (data: Buffer) => {
-        try {
-          const request = JSON.parse(data.toString()) as JsonRpcRequest;
-          const response = await this.handleRequest(request);
-          ws.send(JSON.stringify(response));
-        } catch (err) {
-          const error: JsonRpcResponse = {
-            jsonrpc: '2.0',
-            error: {
-              code: -32700,
-              message: 'Parse error',
-              data: err instanceof Error ? err.message : String(err),
-            },
-            id: null,
-          };
-          ws.send(JSON.stringify(error));
-        }
-      });
-
-      ws.on('close', () => {
-        console.log('🔌 DevTools client disconnected');
-        this.clients.delete(ws);
-      });
-
-      ws.on('error', (err) => {
-        console.error('WebSocket error:', err);
-      });
+    // Send hello message with capabilities
+    this.sendNotification(ws, 'server.hello', {
+      version: '1.0.0',
+      capabilities: {
+        objectCRUD: true,
+        typeGeneration: true,
+        changeWatch: true,
+        lsp: false,
+      },
     });
 
-    this.wss.on('listening', () => {
-      console.log(`🛠️  DevTools server listening on ws://localhost:${this.port}`);
+    ws.on('message', async (data: Buffer) => {
+      try {
+        const request = JSON.parse(data.toString()) as JsonRpcRequest;
+        const response = await this.handleRequest(request);
+        ws.send(JSON.stringify(response));
+      } catch (err) {
+        console.error('[DevTools] Failed to parse message:', err);
+        const error: JsonRpcResponse = {
+          jsonrpc: '2.0',
+          error: {
+            code: -32700,
+            message: 'Parse error',
+            data: err instanceof Error ? err.message : String(err),
+          },
+          id: null,
+        };
+        ws.send(JSON.stringify(error));
+      }
+    });
+
+    ws.on('close', () => {
+      console.log('🔌 DevTools client disconnected');
+      this.clients.delete(ws);
+    });
+
+    ws.on('error', (err) => {
+      console.error('WebSocket error:', err);
     });
   }
 
@@ -162,6 +173,38 @@ export class DevToolsServer {
           result = await this.pullObject(params);
           break;
 
+        case 'templates.list':
+          result = await this.listTemplates(params);
+          break;
+
+        case 'templates.get':
+          result = await this.getTemplate(params);
+          break;
+
+        case 'templates.generate':
+          result = await this.generateTemplate(params);
+          break;
+
+        case 'relationships.analyze':
+          result = await this.analyzeMethodRelationships(params);
+          break;
+
+        case 'relationships.callgraph':
+          result = await this.getCallGraph(params);
+          break;
+
+        case 'relationships.findCallers':
+          result = await this.findMethodCallers(params);
+          break;
+
+        case 'relationships.findOverrides':
+          result = await this.findMethodOverrides(params);
+          break;
+
+        case 'relationships.getRelated':
+          result = await this.getRelatedMethods(params);
+          break;
+
         case 'object.push':
           result = await this.pushObject(params);
           break;
@@ -203,7 +246,7 @@ export class DevToolsServer {
 
     const objects = allObjects.map(obj => ({
       id: obj._id,
-      parent: obj.parent,
+      parent: obj.parent?.value ?? obj.parent, // Extract ID from ObjRefValue
       properties: Object.keys(obj.properties || {}),
       methods: Object.keys(obj.methods || {}),
       recycled: obj.recycled || false,
@@ -228,7 +271,7 @@ export class DevToolsServer {
     return {
       object: {
         _id: raw._id,
-        parent: raw.parent,
+        parent: raw.parent?.value ?? raw.parent, // Extract ID from ObjRefValue
         properties: obj.getOwnProperties(), // Return resolved values, not typed Values
         methods: raw.methods,
         created: raw.created,
@@ -405,10 +448,11 @@ export class DevToolsServer {
       throw new Error(`Object #${objectId} not found`);
     }
 
-    const properties = obj.getOwnProperties();
-    delete properties[name];
+    // Delete property (use method from object)
+    obj.deleteProperty(name);
 
-    await this.manager.update(objectId, { properties: properties as unknown as Record<string, Value> });
+    // Wait for auto-persist to complete
+    await this.manager.flushWrites();
 
     // Notify all clients
     this.broadcast('property.deleted', { objectId, name });
@@ -433,6 +477,139 @@ export class DevToolsServer {
     }
 
     return { definitions };
+  }
+
+  /**
+   * Analyze method relationships for a specific method
+   */
+  private async analyzeMethodRelationships(params: { objectId: ObjId; methodName: string }): Promise<any> {
+    const { objectId, methodName } = params;
+    
+    try {
+      const relationship = await this.relationshipAnalyzer.analyzeMethodRelationships(objectId, methodName);
+      
+      return {
+        objectId,
+        methodName,
+        relationship: {
+          overrides: relationship.overrides,
+          overriddenBy: relationship.overriddenBy,
+          callers: relationship.callers,
+          callees: relationship.callees,
+          related: relationship.related,
+          parentChain: relationship.parentChain,
+          complexity: relationship.complexity,
+          callFrequency: relationship.callFrequency,
+          fanOut: relationship.fanOut,
+          fanIn: relationship.fanIn,
+          testCoverage: relationship.testCoverage
+        }
+      };
+    } catch (error) {
+      return {
+        error: `Failed to analyze relationships: ${error instanceof Error ? error.message : 'Unknown error'}`
+      };
+    }
+  }
+
+  /**
+   * Get complete call graph for all methods
+   */
+  private async getCallGraph(_params: { includeStats?: boolean } = {}): Promise<any> {
+    try {
+      await this.relationshipAnalyzer.buildCallGraph();
+      
+      const stats = this.relationshipAnalyzer.getStats();
+      
+      return {
+        callGraph: {
+          totalNodes: stats.totalNodes,
+          totalEdges: stats.totalEdges,
+          avgComplexity: stats.avgComplexity,
+          mostCalled: stats.mostCalled,
+          leastCalled: stats.leastCalled
+        }
+      };
+    } catch (error) {
+      return {
+        error: `Failed to build call graph: ${error instanceof Error ? error.message : 'Unknown error'}`
+      };
+    }
+  }
+
+  /**
+   * Find all objects that call a specific method
+   */
+  private async findMethodCallers(params: { objectId: ObjId; methodName: string }): Promise<any> {
+    const { objectId, methodName } = params;
+    
+    try {
+      const callers = await this.relationshipAnalyzer.getCallers(objectId, methodName);
+      
+      return {
+        objectId,
+        methodName,
+        callers: callers.map(caller => ({
+          objectId: caller.objectId,
+          methodName: caller.context,
+          frequency: caller.frequency
+        }))
+      };
+    } catch (error) {
+      return {
+        error: `Failed to find method callers: ${error instanceof Error ? error.message : 'Unknown error'}`
+      };
+    }
+  }
+
+  /**
+   * Find all method overrides for a specific method
+   */
+  private async findMethodOverrides(params: { objectId: ObjId; methodName: string }): Promise<any> {
+    const { objectId, methodName } = params;
+    
+    try {
+      const overrides = await this.relationshipAnalyzer.analyzeOverriddenBy(objectId, methodName);
+      
+      return {
+        objectId,
+        methodName,
+        overrides: overrides.map(override => ({
+          objectId: override.objectId,
+          methodName: override.methodName
+        }))
+      };
+    } catch (error) {
+      return {
+        error: `Failed to find method overrides: ${error instanceof Error ? error.message : 'Unknown error'}`
+      };
+    }
+  }
+
+  /**
+   * Get related methods for a specific method
+   */
+  private async getRelatedMethods(params: { objectId: ObjId; methodName: string }): Promise<any> {
+    const { objectId, methodName } = params;
+    
+    try {
+      const related = await this.relationshipAnalyzer.findRelatedMethods(objectId, methodName);
+      
+      return {
+        objectId,
+        methodName,
+        related: related.map(rel => ({
+          objectId: rel.objectId,
+          methodName: rel.methodName,
+          type: rel.type,
+          strength: rel.strength
+        }))
+      };
+    } catch (error) {
+      return {
+        error: `Failed to find related methods: ${error instanceof Error ? error.message : 'Unknown error'}`
+      };
+    }
   }
 
   /**
@@ -466,19 +643,94 @@ export class DevToolsServer {
   }
 
   /**
-   * Watch for MongoDB changes and notify clients
+   * List available method templates
    */
-  /**
-   * Watch for changes and notify clients
-   */
-  private watchForChanges(): void {
-    // In the single-server model, changes made through this server
-    // update the in-memory cache directly.
-    // If external DB changes occur, they must be manually pulled via 'object.pull'.
+  private async listTemplates(params: { category?: string } = {}): Promise<any> {
+    const category = params.category;
+    
+    if (category) {
+      return {
+        templates: this.templateGenerator.getCategoryTemplates(category),
+        category
+      };
+    }
+    
+    return {
+      categories: this.templateGenerator.getCategories().map(cat => ({
+        id: cat,
+        name: this.toTitleCase(cat),
+        templates: this.templateGenerator.getCategoryTemplates(cat).length
+      }))
+    };
   }
 
   /**
-   * Close the server
+   * Get specific method template
+   */
+  private async getTemplate(params: { category: string; methodName?: string }): Promise<any> {
+    const { category, methodName } = params;
+    
+    if (methodName) {
+      const template = this.templateGenerator.getTemplate(category, methodName);
+      if (!template) {
+        throw new Error(`Template not found: ${category}.${methodName}`);
+      }
+      
+      return {
+        template,
+        usage: `await obj.setMethod('${methodName}', template.template);`
+      };
+    }
+    
+    const template = this.templateGenerator.getTemplate(category);
+    if (!template) {
+      throw new Error(`Category not found: ${category}`);
+    }
+    
+    return {
+      template,
+      usage: `// Use this as a template for creating ${category} methods`
+    };
+  }
+
+  /**
+   * Generate method from template
+   */
+  private async generateTemplate(params: {
+    objectId: ObjId;
+    category: string;
+    pattern: 'getter' | 'setter' | 'validator' | 'handler';
+    methodName: string;
+  }): Promise<any> {
+    const { objectId, category, pattern, methodName } = params;
+    
+    const obj = await this.manager.load(objectId);
+    if (!obj) {
+      throw new Error(`Object #${objectId} not found`);
+    }
+
+    const template = this.templateGenerator.generateTemplate(category, methodName, pattern);
+    if (!template) {
+      throw new Error(`Cannot generate template: ${category}.${methodName} (${pattern})`);
+    }
+
+    // Apply template to object
+    obj.setMethod(methodName, template.template);
+
+    // Notify clients
+    this.broadcast('method.created', { objectId, name: methodName });
+
+    return {
+      success: true,
+      method: methodName,
+      category,
+      template: template.template,
+      usage: `await obj.setMethod('${methodName}', template.template);`
+    };
+  }
+
+  /**
+   * Close WebSocket server
    */
   close(): Promise<void> {
     return new Promise((resolve, reject) => {

@@ -41,12 +41,12 @@ describe('Containment System', () => {
   describe('moveTo()', () => {
     it('should move object to a room', async () => {
       const room = await $.recycler.create({
-        parent: $.room.id,
+        parent: $.room,
         properties: { name: 'Target Room' },
       }, null);
 
       const item = await $.recycler.create({
-        parent: $.describable.id,
+        parent: $.describable,
         properties: { name: 'Test Item' },
       }, null);
 
@@ -58,17 +58,17 @@ describe('Containment System', () => {
 
     it('should update source contents when moving', async () => {
       const room1 = await $.recycler.create({
-        parent: $.room.id,
+        parent: $.room,
         properties: { name: 'Source Room' },
       }, null);
 
       const room2 = await $.recycler.create({
-        parent: $.room.id,
+        parent: $.room,
         properties: { name: 'Dest Room' },
       }, null);
 
       const item = await $.recycler.create({
-        parent: $.describable.id,
+        parent: $.describable,
         properties: { name: 'Moving Item' },
       }, null);
 
@@ -83,12 +83,12 @@ describe('Containment System', () => {
 
     it('should accept object ID as destination', async () => {
       const room = await $.recycler.create({
-        parent: $.room.id,
+        parent: $.room,
         properties: { name: 'ID Target Room' },
       }, null);
 
       const item = await $.recycler.create({
-        parent: $.describable.id,
+        parent: $.describable,
         properties: { name: 'ID Test Item' },
       }, null);
 
@@ -99,7 +99,7 @@ describe('Containment System', () => {
 
     it('should throw on invalid destination', async () => {
       const item = await $.recycler.create({
-        parent: $.describable.id,
+        parent: $.describable,
         properties: { name: 'Invalid Dest Item' },
       }, null);
 
@@ -108,7 +108,7 @@ describe('Containment System', () => {
 
     it('should throw on non-existent destination', async () => {
       const item = await $.recycler.create({
-        parent: $.describable.id,
+        parent: $.describable,
         properties: { name: 'Non-existent Dest Item' },
       }, null);
 
@@ -119,12 +119,12 @@ describe('Containment System', () => {
   describe('canContain()', () => {
     it('should allow rooms to contain anything', async () => {
       const room = await $.recycler.create({
-        parent: $.room.id,
+        parent: $.room,
         properties: { name: 'Accepting Room' },
       }, null);
 
       const item = await $.recycler.create({
-        parent: $.describable.id,
+        parent: $.describable,
         properties: { name: 'Test Item' },
       }, null);
 
@@ -134,12 +134,12 @@ describe('Containment System', () => {
 
     it('should prevent basic describable from containing', async () => {
       const container = await $.recycler.create({
-        parent: $.describable.id,
+        parent: $.describable,
         properties: { name: 'Not a Container' },
       }, null);
 
       const item = await $.recycler.create({
-        parent: $.describable.id,
+        parent: $.describable,
         properties: { name: 'Test Item' },
       }, null);
 
@@ -150,7 +150,7 @@ describe('Containment System', () => {
 
     it('should respect custom canContain overrides', async () => {
       const container = await $.recycler.create({
-        parent: $.describable.id,
+        parent: $.describable,
         properties: { name: 'Custom Container' },
       }, null);
 
@@ -161,12 +161,12 @@ describe('Containment System', () => {
       `);
 
       const allowed = await $.recycler.create({
-        parent: $.describable.id,
+        parent: $.describable,
         properties: { name: 'Allowed Item' },
       }, null);
 
       const forbidden = await $.recycler.create({
-        parent: $.describable.id,
+        parent: $.describable,
         properties: { name: 'Forbidden Item' },
       }, null);
 
@@ -178,17 +178,17 @@ describe('Containment System', () => {
   describe('Location hooks', () => {
     it('should call onLeaving before move', async () => {
       const room1 = await $.recycler.create({
-        parent: $.room.id,
+        parent: $.room,
         properties: { name: 'Hook Source Room' },
       }, null);
 
       const room2 = await $.recycler.create({
-        parent: $.room.id,
+        parent: $.room,
         properties: { name: 'Hook Dest Room' },
       }, null);
 
       const item = await $.recycler.create({
-        parent: $.describable.id,
+        parent: $.describable,
         properties: { name: 'Hook Item', leavingCalled: false },
       }, null);
 
@@ -204,12 +204,12 @@ describe('Containment System', () => {
 
     it('should call onArrived after move', async () => {
       const room = await $.recycler.create({
-        parent: $.room.id,
+        parent: $.room,
         properties: { name: 'Arrival Room' },
       }, null);
 
       const item = await $.recycler.create({
-        parent: $.describable.id,
+        parent: $.describable,
         properties: { name: 'Arriving Item', arrivedCalled: false },
       }, null);
 
@@ -224,7 +224,7 @@ describe('Containment System', () => {
 
     it('should call onContentLeft on source', async () => {
       const room1 = await $.recycler.create({
-        parent: $.room.id,
+        parent: $.room,
         properties: { name: 'Content Left Room', contentLeftCalled: false },
       }, null);
 
@@ -233,12 +233,12 @@ describe('Containment System', () => {
       `);
 
       const room2 = await $.recycler.create({
-        parent: $.room.id,
+        parent: $.room,
         properties: { name: 'Dest Room' },
       }, null);
 
       const item = await $.recycler.create({
-        parent: $.describable.id,
+        parent: $.describable,
         properties: { name: 'Leaving Item' },
       }, null);
 
@@ -250,7 +250,7 @@ describe('Containment System', () => {
 
     it('should call onContentArrived on destination', async () => {
       const room = await $.recycler.create({
-        parent: $.room.id,
+        parent: $.room,
         properties: { name: 'Content Arrived Room', contentArrivedCalled: false },
       }, null);
 
@@ -259,7 +259,7 @@ describe('Containment System', () => {
       `);
 
       const item = await $.recycler.create({
-        parent: $.describable.id,
+        parent: $.describable,
         properties: { name: 'Arriving Item' },
       }, null);
 
@@ -270,12 +270,12 @@ describe('Containment System', () => {
 
     it('should pass mover argument to hooks', async () => {
       const room1 = await $.recycler.create({
-        parent: $.room.id,
+        parent: $.room,
         properties: { name: 'Mover Test Source' },
       }, null);
 
       const room2 = await $.recycler.create({
-        parent: $.room.id,
+        parent: $.room,
         properties: { name: 'Mover Test Dest', receivedMover: null },
       }, null);
 
@@ -287,12 +287,12 @@ describe('Containment System', () => {
       `);
 
       const item = await $.recycler.create({
-        parent: $.describable.id,
+        parent: $.describable,
         properties: { name: 'Moved Item' },
       }, null);
 
       const mover = await $.recycler.create({
-        parent: $.describable.id,
+        parent: $.describable,
         properties: { name: 'The Mover' },
       }, null);
 
@@ -306,12 +306,12 @@ describe('Containment System', () => {
   describe('Containment chain', () => {
     it('should track nested containment', async () => {
       const room = await $.recycler.create({
-        parent: $.room.id,
+        parent: $.room,
         properties: { name: 'Outer Room' },
       }, null);
 
       const box = await $.recycler.create({
-        parent: $.location.id,
+        parent: $.location,
         properties: { name: 'Box' },
       }, null);
 
@@ -319,7 +319,7 @@ describe('Containment System', () => {
       box.setMethod('canContain', `return true;`);
 
       const item = await $.recycler.create({
-        parent: $.describable.id,
+        parent: $.describable,
         properties: { name: 'Small Item' },
       }, null);
 
@@ -336,12 +336,12 @@ describe('Containment System', () => {
   describe('Location addContent/removeContent', () => {
     it('should add content via addContent', async () => {
       const room = await $.recycler.create({
-        parent: $.room.id,
+        parent: $.room,
         properties: { name: 'Add Content Room' },
       }, null);
 
       const item = await $.recycler.create({
-        parent: $.describable.id,
+        parent: $.describable,
         properties: { name: 'Added Item' },
       }, null);
 
@@ -352,12 +352,12 @@ describe('Containment System', () => {
 
     it('should remove content via removeContent', async () => {
       const room = await $.recycler.create({
-        parent: $.room.id,
+        parent: $.room,
         properties: { name: 'Remove Content Room' },
       }, null);
 
       const item = await $.recycler.create({
-        parent: $.describable.id,
+        parent: $.describable,
         properties: { name: 'Removed Item' },
       }, null);
 
@@ -369,12 +369,12 @@ describe('Containment System', () => {
 
     it('should not duplicate content on multiple adds', async () => {
       const room = await $.recycler.create({
-        parent: $.room.id,
+        parent: $.room,
         properties: { name: 'No Dup Content Room' },
       }, null);
 
       const item = await $.recycler.create({
-        parent: $.describable.id,
+        parent: $.describable,
         properties: { name: 'Single Item' },
       }, null);
 
@@ -390,7 +390,7 @@ describe('Containment System', () => {
   describe('Physical dimensions', () => {
     it('should calculate volume', async () => {
       const item = await $.recycler.create({
-        parent: $.describable.id,
+        parent: $.describable,
         properties: { name: 'Volume Item', width: 10, height: 20, depth: 5 },
       }, null);
 
@@ -400,7 +400,7 @@ describe('Containment System', () => {
 
     it('should return 0 volume for unset dimensions', async () => {
       const item = await $.recycler.create({
-        parent: $.describable.id,
+        parent: $.describable,
         properties: { name: 'No Dims Item' },
       }, null);
 
@@ -412,17 +412,17 @@ describe('Containment System', () => {
   describe('Dimension-based containment', () => {
     it('should check if object fits in container', async () => {
       const container = await $.recycler.create({
-        parent: $.describable.id,
+        parent: $.describable,
         properties: { name: 'Big Container', width: 100, height: 100, depth: 100 },
       }, null);
 
       const smallItem = await $.recycler.create({
-        parent: $.describable.id,
+        parent: $.describable,
         properties: { name: 'Small Item', width: 10, height: 10, depth: 10 },
       }, null);
 
       const bigItem = await $.recycler.create({
-        parent: $.describable.id,
+        parent: $.describable,
         properties: { name: 'Big Item', width: 200, height: 200, depth: 200 },
       }, null);
 

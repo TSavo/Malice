@@ -10,6 +10,7 @@ export class RuntimeObjectImpl implements RuntimeObject {
   private obj: GameObject;
   private dirty = false;
   private proxy: RuntimeObject;
+  private _cachedParent: RuntimeObject | undefined = undefined; // undefined = not cached
 
   constructor(
     obj: GameObject,
@@ -260,6 +261,23 @@ export class RuntimeObjectImpl implements RuntimeObject {
         console.error('[RuntimeObject] Could not stringify properties');
       }
     });
+  }
+
+  /**
+   * Delete a property from this object
+   * Auto-persists to database
+   */
+  deleteProperty(prop: string): void {
+    if (this.obj.properties && prop in this.obj.properties) {
+      delete this.obj.properties[prop];
+
+      // Auto-persist
+      this.manager.update(this.id, {
+        properties: this.obj.properties
+      }, false).catch(err => {
+        console.error(`[RuntimeObject] Failed to delete property ${prop} on #${this.id}:`, err);
+      });
+    }
   }
 
   /**
@@ -732,19 +750,40 @@ export class RuntimeObjectImpl implements RuntimeObject {
 
   /**
    * Get parent object (resolves objref to RuntimeObject)
-   * Returns null if self-parented (root object)
+   * Self-parented objects return themselves
    */
-  getParent(): RuntimeObject | null {
+  getParent(): RuntimeObject {
+    // Use cached parent if available
+    if (this._cachedParent !== undefined) {
+      return this._cachedParent;
+    }
+
     const parentId = this.obj.parent.value;
-    if (parentId === this.obj._id) return null; // Self-parented means no parent
-    return this.manager.getSync(parentId);
+    if (parentId === this.obj._id) {
+      this._cachedParent = this.proxy; // Self-parented returns self
+      return this.proxy;
+    }
+
+    // Look up and cache (coalesce null to undefined)
+    this._cachedParent = this.manager.getSync(parentId) ?? undefined;
+    return this._cachedParent!;
   }
 
   /**
    * Set parent object
    */
   setParent(parent: RuntimeObject): void {
+    // Validate that we received an actual RuntimeObject, not an ID
+    if (!parent || typeof parent !== 'object' || typeof parent.id !== 'number') {
+      throw new Error(`setParent requires a RuntimeObject, got: ${typeof parent === 'object' ? JSON.stringify(parent) : parent}`);
+    }
+
+    // Cache the parent reference (reuse existing RuntimeObject)
+    this._cachedParent = parent;
+
+    // Store ID for database persistence
     this.obj.parent = { type: 'objref', value: parent.id } as ObjRefValue;
+    this.dirty = true;
 
     // Auto-persist
     this.manager.update(this.id, {
@@ -807,6 +846,8 @@ export class RuntimeObjectImpl implements RuntimeObject {
     if (fresh) {
       this.obj = fresh;
       this.dirty = false;
+      // Invalidate cached parent (might have changed in DB)
+      this._cachedParent = undefined;
       // Invalidate transient caches (methods, parent chains) because they might be stale
       this.manager.invalidateTransientCache(this.id);
     }
