@@ -2,7 +2,7 @@
 
 ## Overview
 
-Redesign character generation to be fully AI-driven. The AI agent has access to BOTH main MCP tools AND CharGen MCP tools. When a new player joins, a single `$.query` call kicks off an autonomous agent that:
+Redesign character generation to be fully AI-driven. The AI agent has access to BOTH main MCP tools AND CharGen MCP tools. When a new player joins, a single `$query` call kicks off an autonomous agent that:
 1. Creates a private interview room (with creative description)
 2. Spawns an NPC interviewer
 3. Tailors the NPC
@@ -11,7 +11,7 @@ Redesign character generation to be fully AI-driven. The AI agent has access to 
 6. On completion, cleans up and sends player to starting room
 
 **Key Architecture**:
-- `$.query` modified to accept additional MCP servers as parameter
+- `$query` modified to accept additional MCP servers as parameter
 - The AI agent uses main MCP tools (dig, ai.spawn, ai.tailor, move_object) for setup
 - The AI agent uses CharGen MCP tools for recording answers
 - Player speech triggers `onSpokenTo` → resumes the Claude session
@@ -21,7 +21,7 @@ Redesign character generation to be fully AI-driven. The AI agent has access to 
 ```
 1. AuthManager.onNewUser() → $.charGen.startNPCInterview(context, username, password)
 2. Create player object (minimal, no body yet)
-3. Call $.query with chargen system prompt + CharGen MCP server
+3. Call $query with chargen system prompt + CharGen MCP server
 4. AI agent autonomously:
    a. Creates interview room (using dig tool - creative description)
    b. Spawns NPC interviewer (using ai.spawn)
@@ -32,7 +32,7 @@ Redesign character generation to be fully AI-driven. The AI agent has access to 
 5. AI turn ends
    ↓
 6. Player types response
-7. NPC.onSpokenTo → $.query(systemPrompt, playerMessage, agentSession, {additionalMcpServers})
+7. NPC.onSpokenTo → $query(systemPrompt, playerMessage, agentSession, {additionalMcpServers})
 8. AI interprets answer, calls answer_question via CharGen MCP
 9. AI asks next question (via ai.do "say ...")
 10. AI turn ends
@@ -48,7 +48,7 @@ Redesign character generation to be fully AI-driven. The AI agent has access to 
 
 | File | Changes |
 |------|---------|
-| `src/database/object-manager.ts` | Modify `$.query` to accept additional MCP servers parameter |
+| `src/database/object-manager.ts` | Modify `$query` to accept additional MCP servers parameter |
 | `src/database/bootstrap/chargen-builder.ts` | Add `startNPCInterview()`, `interviewerPrompt`, `registerForRecycle()`, `cleanupForPlayer()`, update `finishInterview()` |
 | `src/mcp/chargen-mcp-server.ts` | Add `register_for_recycle` tool |
 | `src/database/bootstrap/prototypes/human-builder.ts` | Update `onSpokenTo` to pass additionalMcpServers for chargen-interviewer role |
@@ -56,7 +56,7 @@ Redesign character generation to be fully AI-driven. The AI agent has access to 
 
 ## Implementation Details
 
-### 0. Update `$.query` to accept additional MCP servers (object-manager.ts)
+### 0. Update `$query` to accept additional MCP servers (object-manager.ts)
 
 Modify the `query()` method signature to accept optional additional MCP servers:
 
@@ -134,7 +134,7 @@ Your task:
 Remember: After asking a question, STOP and wait for their response.\`;
 
   // Call with CharGen MCP server added
-  $.query(self.interviewerPrompt, kickoffPrompt, null, {
+  $query(self.interviewerPrompt, kickoffPrompt, null, {
     additionalMcpServers: {
       'malice-chargen': { type: 'http', url: 'http://localhost:3002/mcp' }
     }
@@ -304,11 +304,11 @@ The NPC's `onSpokenTo` needs to pass the additional MCP servers when continuing:
 
 ```typescript
 // In human-builder.ts onSpokenTo, or in the chargen interviewer specifically:
-// When building the prompt and calling $.query, include additionalMcpServers
+// When building the prompt and calling $query, include additionalMcpServers
 
 // Option: Check if this is a chargen NPC and add chargen MCP
 if (self.role === 'chargen-interviewer') {
-  $.query(systemPrompt, userPrompt, self.agentSession, {
+  $query(systemPrompt, userPrompt, self.agentSession, {
     additionalMcpServers: {
       'malice-chargen': { type: 'http', url: 'http://localhost:3002/mcp' }
     }
@@ -331,5 +331,5 @@ The MCP server on port 3002 is already created with these tools:
 1. **Room per player**: Create fresh room, recycle when done
 2. **Auto-move on finish**: `finishInterview` moves player to starting room
 3. **Recycle NPC**: Despawn interviewer after each interview
-4. **Session-based conversation**: NPC uses `$.query` with `agentSession` for multi-turn dialogue
+4. **Session-based conversation**: NPC uses `$query` with `agentSession` for multi-turn dialogue
 5. **Player speech triggers continuation**: `onSpokenTo` resumes the Claude session

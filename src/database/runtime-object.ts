@@ -620,6 +620,7 @@ export class RuntimeObjectImpl implements RuntimeObject {
           const isFinite = ctx.isFinite;
           const $load = $.load.bind($);
           const $create = $.create.bind($);
+          const $query = $.query.bind($);
           const $addAlias = $.addAlias.bind($);
           const $removeAlias = $.removeAlias.bind($);
           const $getAlias = $.getAlias.bind($);
@@ -700,6 +701,7 @@ export class RuntimeObjectImpl implements RuntimeObject {
         const isFinite = ctx.isFinite;
         const $load = $.load.bind($);
         const $create = $.create.bind($);
+        const $query = $.query.bind($);
         const $addAlias = $.addAlias.bind($);
         const $removeAlias = $.removeAlias.bind($);
         const $getAlias = $.getAlias.bind($);

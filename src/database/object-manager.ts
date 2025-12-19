@@ -693,14 +693,14 @@ export class ObjectManager {
    *
    * @example
    * // First call - new session
-   * const { response, session } = await $.query(
+   * const { response, session } = await $query(
    *   "You are a guard. Be suspicious.",
    *   "A stranger approaches."
    * );
    * self.agentSession = session;
    *
    * // Later - resume session
-   * const result = await $.query(systemPrompt, input, self.agentSession);
+   * const result = await $query(systemPrompt, input, self.agentSession);
    */
   async query(
     systemPrompt: string,
