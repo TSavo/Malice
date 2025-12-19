@@ -303,7 +303,7 @@ export class BodyPartBuilder {
         return { success: false, message: 'Wound system not initialized.' };
       }
 
-      const wound = await $create({
+      const wound = await $recycler.create({
         parent: woundProto,
         properties: {},
       });
