@@ -136,23 +136,23 @@ self.relationships = {
 
 ## Loading Objects
 
-### When You Need `$.load()`
+### When You Need `$load()`
 
-Since all objects are in memory, you rarely need `$.load()`. Use it when:
+Since all objects are in memory, you rarely need `$load()`. Use it when:
 
 1. **Loading by numeric ID** (from external input):
 ```javascript
-const obj = await $.load(42);  // Load object #42
+const obj = await $load(42);  // Load object #42
 const obj = await $[42];       // Shorthand
 ```
 
 2. **Loading from a string** (user input, database ID):
 ```javascript
 const targetId = parseInt(args[0]);
-const target = await $.load(targetId);
+const target = await $load(targetId);
 ```
 
-### You Don't Need `$.load()` For Properties
+### You Don't Need `$load()` For Properties
 
 ```javascript
 // Since all objects are in memory:
@@ -160,7 +160,7 @@ const owner = self.owner;        // Already a RuntimeObject
 await owner.tell('Hello!');      // Just works
 
 // You DON'T need to do this:
-const owner = await $.load(self.owner);  // Unnecessary!
+const owner = await $load(self.owner);  // Unnecessary!
 ```
 
 ## How `$` Works
@@ -172,7 +172,7 @@ The `$` variable is a **Proxy** to the ObjectManager (#0).
 ```javascript
 // $ IS #0 - these are all the same object
 $                    // The ObjectManager
-await $.load(0)      // Load #0
+await $load(0)      // Load #0
 await $[0]           // Load #0 by index
 
 // $ has an 'aliases' property - a simple { name: id } map
@@ -187,7 +187,7 @@ When you write `$english`, the Proxy does this:
 ```javascript
 // $english internally does:
 const id = $.aliases['english'];  // Look up 'english' in $.aliases -> 5
-const obj = await $.load(id);     // Load object #5
+const obj = await $load(id);     // Load object #5
 return obj;                       // Return the RuntimeObject
 ```
 
@@ -211,13 +211,13 @@ const english = $english;   // Always works
 
 ```javascript
 // Add an alias (makes $myUtils work)
-await $.addAlias('myUtils', obj);  // Pass object, not .id
+await $addAlias('myUtils', obj);  // Pass object, not .id
 
 // Remove an alias
-await $.removeAlias('myUtils');  // Returns true if removed
+await $removeAlias('myUtils');  // Returns true if removed
 
 // Look up an alias
-const id = await $.getAlias('myUtils');  // Returns ID or undefined
+const id = await $getAlias('myUtils');  // Returns ID or undefined
 
 // Direct access to the map (read-only preferred)
 const allAliases = $.aliases;
@@ -242,9 +242,9 @@ These four aliases are protected and cannot be removed:
 | Get property | `const owner = self.owner` |
 | Compare objects | `if (a === b)` |
 | Store in array | `self.items = [item1, item2]` |
-| Load by ID | `await $.load(42)` or `await $[42]` |
+| Load by ID | `await $load(42)` or `await $[42]` |
 | Access utility | `$english` or `$format` |
-| Add alias | `await $.addAlias('name', obj)` |
+| Add alias | `await $addAlias('name', obj)` |
 
 ## Anti-Patterns to Avoid
 
@@ -259,8 +259,8 @@ self.owner = player.id;
 // WRONG: Comparing IDs
 if (a.id === b.id) { }
 
-// WRONG: Unnecessary $.load()
-const loc = await $.load(self.location);  // location is already RuntimeObject
+// WRONG: Unnecessary $load()
+const loc = await $load(self.location);  // location is already RuntimeObject
 ```
 
 ## See Also

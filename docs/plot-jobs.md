@@ -34,7 +34,7 @@ A player requests work. The handler creates a delivery job: pick up a package an
 
 ```javascript
 // Assume we have plot #54
-const plot = await $.load(54);
+const plot = await $load(54);
 
 // Create a job within the plot
 await plot.createJob('deliver-package', {
@@ -50,7 +50,7 @@ await plot.createJob('deliver-package', {
 ### Step 2: Create a One-Time Code on the Locker
 
 ```javascript
-const locker = await $.load(100);
+const locker = await $load(100);
 
 // Generate a one-time code
 const result = await locker.createOneTimeCode();

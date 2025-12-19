@@ -76,7 +76,7 @@ await player.registerVerb(
 obj.setMethod('onArrived', `
   const dest = args[0];
   if (dest?.owner) {
-    const owner = await $.load(dest.owner);
+    const owner = await $load(dest.owner);
     // Register multiple patterns for same verb
     await owner.registerVerb(
       ['wear %t', 'put on %t', 'don %t'],
@@ -240,7 +240,7 @@ obj.setMethod('doWear', `
   await player.registerVerb(['remove %t', 'take off %t'], self, 'doRemove');
 
   // 3. Announce to room
-  const room = await $.load(player.location);
+  const room = await $load(player.location);
   await $pronoun.announce(room, '%N puts on %d.', player, self);
 
   return result.message;
@@ -307,7 +307,7 @@ obj.setMethod('onLeaving', `
 
   // If leaving a hand, unregister from owner
   if (source?.owner) {
-    const owner = await $.load(source.owner);
+    const owner = await $load(source.owner);
     await owner.unregisterVerbsFrom(self);
   }
 `);
@@ -329,7 +329,7 @@ async onContentLeaving(obj, dest, mover) {
   if (obj.isPlayer) {
     // Remove exit verbs when player leaves
     for (const exitId of self.exits || []) {
-      const exit = await $.load(exitId);
+      const exit = await $load(exitId);
       await obj.unregisterVerbsFrom(exit);
     }
   }
@@ -366,7 +366,7 @@ obj.setMethod('onArrived', `
 
   // If arriving in a hand, register with owner
   if (dest?.owner) {
-    const owner = await $.load(dest.owner);
+    const owner = await $load(dest.owner);
     if (!self.wornBy) {  // Only if not already worn
       await owner.registerVerb(['wear %t'], self, 'doWear');
     }
@@ -386,7 +386,7 @@ obj.setMethod('onLeaving', `
 
   // If leaving a hand, unregister from owner
   if (source?.owner) {
-    const owner = await $.load(source.owner);
+    const owner = await $load(source.owner);
     await owner.unregisterVerbsFrom(self);
   }
 `);
@@ -402,7 +402,7 @@ async onContentArrived(obj, source, mover) {
   if (obj.isPlayer) {
     // Register exit verbs with player
     for (const [dir, exitId] of Object.entries(self.exits || {})) {
-      const exit = await $.load(exitId);
+      const exit = await $load(exitId);
       await obj.registerVerb([dir], exit, 'traverse');
     }
   }
@@ -440,7 +440,7 @@ async connect() {
   await self.registerVerb(['quit', '@quit'], self, 'quit');
 
   // Move to starting location, trigger room hooks
-  const startRoom = await $.load(self.location);
+  const startRoom = await $load(self.location);
   await startRoom.onContentArrived(self, null, self);
 }
 ```
@@ -470,7 +470,7 @@ obj.setMethod('onArrived', `
   // args[0] = dest, args[1] = source, args[2] = mover
   const dest = args[0];
   if (dest?.owner) {
-    const owner = await $.load(dest.owner);
+    const owner = await $load(dest.owner);
     await owner.registerVerb(['eat %t'], self, 'doEat');
   }
 `);

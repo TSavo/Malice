@@ -609,7 +609,7 @@ removeFlag(player, 'invisible');
 
 ```javascript
 async loadMultiple(ids) {
-  return await Promise.all(ids.map(id => $.load(id)));
+  return await Promise.all(ids.map(id => $load(id)));
 }
 
 // Usage

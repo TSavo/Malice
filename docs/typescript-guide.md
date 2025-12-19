@@ -376,8 +376,8 @@ const cmd = await $.system.parseCommand(args[0] as string);
 
 if (cmd.verb === 'look') {
   const target = cmd.target
-    ? await $.load(parseInt(cmd.target))
-    : await $.load(self.location);
+    ? await $load(parseInt(cmd.target))
+    : await $load(self.location);
 
   // ...
 }

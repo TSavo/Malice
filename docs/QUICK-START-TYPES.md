@@ -110,7 +110,7 @@ declare global {
 
 ```typescript
 // Run this once in the bootstrap
-await $.addAlias('system', systemObject);
+await $addAlias('system', systemObject);
 ```
 
 **Step 5:** Use from ANY method:
@@ -222,7 +222,7 @@ declare global {
 const playerId = args[0] as number;
 const message = args[1] as string;
 
-const player = await $.load(playerId);
+const player = await $load(playerId);
 // TODO: Actually send the message via connection
 console.log(`To ${playerId}: ${message}`);
 ```
@@ -236,8 +236,8 @@ return Math.floor(Math.random() * sides) + 1;
 **4. Register alias (bootstrap):**
 
 ```typescript
-const systemObj = await $.load(2);
-await $.addAlias('system', systemObj);
+const systemObj = await $load(2);
+await $addAlias('system', systemObj);
 ```
 
 ### Use (In Any Method)

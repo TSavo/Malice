@@ -163,10 +163,10 @@ await room.call('announce', 'Bob enters.'); // NO!
 
 ```javascript
 // Load by ID
-const room = await $.load(42);
-const player = await $.load(self.location);
+const room = await $load(42);
+const player = await $load(self.location);
 
-// Shorthand (equivalent to $.load())
+// Shorthand (equivalent to $load())
 const obj = await $[42];
 ```
 
@@ -221,18 +221,18 @@ Object references only resolve to RuntimeObjects if the target is **already in t
 
 ```javascript
 // SAFE: Object is definitely loaded
-const room = await $.load(self.location);  // Loads into cache
+const room = await $load(self.location);  // Loads into cache
 const exits = room.exits;  // Returns RuntimeObjects (they're cached from room load)
 
 // UNSAFE: Object might not be cached
 const owner = self.owner;  // Might be RuntimeObject OR raw ID!
 if (typeof owner === 'number') {
   // Oops, it's just the ID - need to load it
-  owner = await $.load(owner);
+  owner = await $load(owner);
 }
 
-// BEST PRACTICE: Always use $.load() for object refs you need to call
-const owner = await $.load(self.owner);  // Always returns RuntimeObject
+// BEST PRACTICE: Always use $load() for object refs you need to call
+const owner = await $load(self.owner);  // Always returns RuntimeObject
 await owner.tell('Hello!');  // Safe to call methods
 ```
 
@@ -317,33 +317,33 @@ const loc = self.location;  // Returns the raw ID (number)
 await loc.announce('...');  // CRASH - number has no methods!
 ```
 
-**The safe pattern - always use $.load():**
+**The safe pattern - always use $load():**
 
 ```javascript
-// SAFE: $.load() always returns RuntimeObject (loads if needed)
-const loc = await $.load(self.location);
+// SAFE: $load() always returns RuntimeObject (loads if needed)
+const loc = await $load(self.location);
 await loc.announce('Hello!');  // Always works
 
 // SAFE: Works whether self.location is objref OR number
-// $.load() handles both cases
+// $load() handles both cases
 ```
 
-### Why $.load() Works Either Way
+### Why $load() Works Either Way
 
 ```javascript
 // If self.location resolved to RuntimeObject:
-const loc = await $.load(self.location);  // $.load(RuntimeObject) -> returns it
+const loc = await $load(self.location);  // $load(RuntimeObject) -> returns it
 // If self.location resolved to number:
-const loc = await $.load(self.location);  // $.load(42) -> loads #42
+const loc = await $load(self.location);  // $load(42) -> loads #42
 
-// $.load() is smart - it accepts both!
+// $load() is smart - it accepts both!
 ```
 
 ### Why This Design?
 
 1. **Type preservation** - objrefs know they're object references
 2. **Auto-resolution** - Cached objects resolve automatically
-3. **Lazy loading** - Uncached objects load on demand via `$.load()`
+3. **Lazy loading** - Uncached objects load on demand via `$load()`
 4. **Cache coherence** - You always get the live, in-memory object
 
 ### Quick Reference
@@ -351,9 +351,9 @@ const loc = await $.load(self.location);  // $.load(42) -> loads #42
 | Operation | Use |
 |-----------|-----|
 | Store reference | `self.owner = player` |
-| Read (safe) | `await $.load(self.owner)` |
+| Read (safe) | `await $load(self.owner)` |
 | Read (if cached) | `self.owner` |
-| Load by ID | `await $.load(42)` or `await $[42]` |
+| Load by ID | `await $load(42)` or `await $[42]` |
 
 **Never use `.id` for storage. Just store the object.**
 
@@ -1041,7 +1041,7 @@ async function cloneBody(body) {
 
   const newParts = {};
   for (const partId of body.parts) {
-    const part = await $.load(partId);
+    const part = await $load(partId);
     const newPart = await $recycler.create(part.parent);
     newPart.name = part.name;
     newPart.owner = newBody.id;  // Update reference
@@ -1621,7 +1621,7 @@ The `$` variable in MOO code is a **Proxy** that provides convenient access to t
 ```javascript
 // $ IS #0 - these are all the same object
 $                    // The ObjectManager
-await $.load(0)      // Load #0
+await $load(0)      // Load #0
 await $[0]           // Load #0 by index
 
 // $ has an 'aliases' property - a simple { name: id } map
@@ -1636,7 +1636,7 @@ When you write `$english`, the Proxy does this:
 ```javascript
 // $english internally does:
 const id = $.aliases['english'];  // Look up 'english' in $.aliases -> 5
-const obj = await $.load(id);     // Load object #5
+const obj = await $load(id);     // Load object #5
 return obj;                       // Return the RuntimeObject
 ```
 
@@ -1684,13 +1684,13 @@ Since `$` is the ObjectManager, it has methods for alias management:
 
 ```javascript
 // Add an alias (makes $myUtils work)
-await $.addAlias('myUtils', obj);  // Pass object, not .id
+await $addAlias('myUtils', obj);  // Pass object, not .id
 
 // Remove an alias
-await $.removeAlias('myUtils');  // Returns true if removed
+await $removeAlias('myUtils');  // Returns true if removed
 
 // Look up an alias
-const id = await $.getAlias('myUtils');  // Returns ID or undefined
+const id = await $getAlias('myUtils');  // Returns ID or undefined
 
 // Direct access to the map (read-only preferred)
 const allAliases = $.aliases;
@@ -1712,7 +1712,7 @@ These four aliases are protected and cannot be removed:
 ```javascript
 // Load by numeric ID (when you have the ID)
 const obj = await $[42];
-const obj = await $.load(42);  // Equivalent
+const obj = await $load(42);  // Equivalent
 
 // Load by alias (when you want a well-known utility)
 const english = $english;
@@ -1737,7 +1737,7 @@ myUtils.setMethod('hello', `
 `);
 
 // 3. Register the alias ($ is the ObjectManager)
-await $.addAlias('myUtils', myUtils);  // Pass object, not .id
+await $addAlias('myUtils', myUtils);  // Pass object, not .id
 
 // 4. Now it's available everywhere as $myUtils
 await $myUtils.hello('Bob');  // "Hello, Bob!"
@@ -1774,7 +1774,7 @@ Then add methods to it:
 
 Now callable as `await $myUtils.greet()` from anywhere.
 
-### 2. MOO Code: $.addAlias()
+### 2. MOO Code: $addAlias()
 
 From within MOO code, use `$` (the ObjectManager) directly:
 
@@ -1785,7 +1785,7 @@ utils.setMethod('greet', `
   return 'Hello, ' + (args[0] || 'stranger') + '!';
 `);
 
-await $.addAlias('myUtils', utils);  // Pass object, not .id
+await $addAlias('myUtils', utils);  // Pass object, not .id
 // Now $myUtils.greet('Bob') works from anywhere
 ```
 
@@ -2216,7 +2216,7 @@ async connect() {
   await self.registerVerb(['quit', '@quit'], self, 'quit');
 
   // Move to starting location, trigger room announcements
-  const startRoom = await $.load(self.location);
+  const startRoom = await $load(self.location);
   await startRoom.onContentArrived(self, null, self);
 }
 
@@ -2259,7 +2259,7 @@ async describe(viewer) {
   const visible = [];
   for (const id of self.contents || []) {
     if (id === viewer?.id) continue;
-    const obj = await $.load(id);
+    const obj = await $load(id);
     if (obj) visible.push(obj.name);
   }
 
@@ -2299,7 +2299,7 @@ room.setMethod('describe', `
 
   // Add book count
   const books = (self.contents || []).filter(async id => {
-    const obj = await $.load(id);
+    const obj = await $load(id);
     return obj?.isBook;
   });
   if (books.length > 0) {
@@ -2660,7 +2660,7 @@ async connect() {
 async onArrived(dest, source, mover) {
   // dest = the hand that now holds this item
   if (dest && dest.owner) {
-    const owner = await $.load(dest.owner);
+    const owner = await $load(dest.owner);
 
     // Register 'wear' verb with the player (not the hand)
     await owner.registerVerb(['wear %t', 'put on %t'], self, 'doWear');
@@ -2675,7 +2675,7 @@ async onContentArrived(obj, source, mover) {
   // If a player just entered, register exit verbs
   if (obj.isPlayer) {
     for (const exitId of self.exits || []) {
-      const exit = await $.load(exitId);
+      const exit = await $load(exitId);
       const dirs = exit.directions || [];  // ['north', 'n']
       await obj.registerVerb(dirs, exit, 'go');
     }
@@ -2701,7 +2701,7 @@ await player.unregisterVerbsFrom(itemId);
 ```javascript
 async onLeaving(source, dest, mover) {
   if (source && source.owner) {
-    const owner = await $.load(source.owner);
+    const owner = await $load(source.owner);
     // Remove all verbs this item registered
     await owner.unregisterVerbsFrom(self);  // Pass object, not .id
   }
@@ -2960,7 +2960,7 @@ obj.setMethod('doWear', `
   await wearer.registerVerb(['remove ' + self.name], self, 'doRemove');
 
   // 3. Announce to room using utilities
-  const room = await $.load(wearer.location);
+  const room = await $load(wearer.location);
   const msg = await $pronoun.sub('%N puts on %t.', wearer, null, null, self);
   await room.announce(msg, wearer);
 
@@ -2999,7 +2999,7 @@ obj.setMethod('onArrived', `
   const dest = args[0];
 
   if (dest && dest.owner) {
-    const owner = await $.load(dest.owner);
+    const owner = await $load(dest.owner);
     if (owner && !self.wornBy) {
       // Register 'wear' verb with the player
       await owner.registerVerb(['wear ' + self.name], self, 'doWear');
@@ -3012,7 +3012,7 @@ obj.setMethod('onLeaving', `
   const source = args[0];
 
   if (source && source.owner) {
-    const owner = await $.load(source.owner);
+    const owner = await $load(source.owner);
     // Unregister all verbs from this item
     await owner.unregisterVerbsFrom(self);
   }
@@ -3159,7 +3159,7 @@ obj.setMethod('eat', `
 // Register 'eat' verb when arriving in hand
 obj.setMethod('onArrived', `
   if (dest && dest.owner) {
-    const owner = await $.load(dest.owner);
+    const owner = await $load(dest.owner);
     await owner.registerVerb(['eat ' + self.name], self, 'eat');
   }
 `);
@@ -3196,7 +3196,7 @@ obj.setMethod('sip', `
 // Register 'drink' and 'sip' verbs
 obj.setMethod('onArrived', `
   if (dest && dest.owner) {
-    const owner = await $.load(dest.owner);
+    const owner = await $load(dest.owner);
     await owner.registerVerb(['drink ' + self.name, 'sip ' + self.name], self, 'drink');
   }
 `);
@@ -3251,9 +3251,9 @@ $clothing.setMethod('wear', `
 
 | Task | Use |
 |------|-----|
-| Register a system alias | `$.addAlias()` |
-| Remove a system alias | `$.removeAlias()` |
-| Lookup an alias | `$.getAlias()` |
+| Register a system alias | `$addAlias()` |
+| Remove a system alias | `$removeAlias()` |
+| Lookup an alias | `$getAlias()` |
 | Pluralize a noun | `$english.plural()` |
 | Conjugate a verb (person) | `$english.conjugate()` |
 | Conjugate by count | `$format.verb()` |
@@ -3381,15 +3381,15 @@ Almost all MOO operations are async:
 
 ```javascript
 // Loading objects
-const room = await $.load(42);
-const player = await $.load(playerId);
+const room = await $load(42);
+const player = await $load(playerId);
 
 // Calling methods
 const result = await item.describe();
 await player.moveTo(room);
 
 // Property access through objects loaded async
-const loc = await $.load(self.location);  // If location is just an ID
+const loc = await $load(self.location);  // If location is just an ID
 const locName = loc.name;
 ```
 
@@ -3397,11 +3397,11 @@ const locName = loc.name;
 
 ```javascript
 // WRONG: Forgot to await
-const room = $.load(42);  // room is a Promise, not a RuntimeObject!
+const room = $load(42);  // room is a Promise, not a RuntimeObject!
 room.name;  // undefined - Promises don't have .name
 
 // RIGHT: Await the load
-const room = await $.load(42);
+const room = await $load(42);
 room.name;  // "Town Square"
 ```
 
@@ -3411,15 +3411,15 @@ When loading multiple independent objects, load them in parallel:
 
 ```javascript
 // SLOW: Sequential loading
-const room = await $.load(roomId);
-const player = await $.load(playerId);
-const item = await $.load(itemId);
+const room = await $load(roomId);
+const player = await $load(playerId);
+const item = await $load(itemId);
 
 // FAST: Parallel loading
 const [room, player, item] = await Promise.all([
-  $.load(roomId),
-  $.load(playerId),
-  $.load(itemId)
+  $load(roomId),
+  $load(playerId),
+  $load(itemId)
 ]);
 ```
 
@@ -3967,7 +3967,7 @@ magicFood.setMethod('onEat', `
   await player.tell('You feel magical energy coursing through you!');
   player.mana = (player.mana || 0) + 50;
 `);
-await $.addAlias('magicFood', magicFood);
+await $addAlias('magicFood', magicFood);
 
 // Now create instances of the new prototype
 const manaPotion = await $recycler.create($magicFood, {

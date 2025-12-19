@@ -98,13 +98,13 @@ MinimalBootstrap adds three methods to #0 (ObjectManager):
 
 ```javascript
 // Register a new alias
-await $.addAlias('myUtil', obj);
+await $addAlias('myUtil', obj);
 
 // Remove an alias (protected: nothing, object_manager, root, system)
-await $.removeAlias('myUtil');
+await $removeAlias('myUtil');
 
 // Look up an alias
-const id = await $.getAlias('myUtil');
+const id = await $getAlias('myUtil');
 ```
 
 ## Phase 2: AliasLoader

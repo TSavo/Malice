@@ -186,11 +186,11 @@ Use body parts for localized sensations:
 await player.feel('Pain shoots through your body.');
 
 // Localized to body part
-const leftLeg = await $.load(player.bodyParts.leftLeg);
+const leftLeg = await $load(player.bodyParts.leftLeg);
 await leftLeg.feel('Searing pain erupts in your left leg!');
 
 // Temperature through body part
-const rightHand = await $.load(player.bodyParts.rightHand);
+const rightHand = await $load(player.bodyParts.rightHand);
 await rightHand.feel('The door handle is scorching hot!');
 ```
 
@@ -255,9 +255,9 @@ Iterate through room contents:
 
 ```javascript
 // Get all players in room
-const room = await $.load(player.location);
+const room = await $load(player.location);
 for (const objId of room.contents || []) {
-  const obj = await $.load(objId);
+  const obj = await $load(objId);
   if (obj.isPlayer) {
     await obj.hear('The building shakes with a tremendous explosion!');
     await obj.feel('The floor vibrates beneath your feet.');
@@ -289,9 +289,9 @@ obj.setMethod('doOpen', `
   await opener.see('You open the ' + self.name + '.');
   
   // Audio - creaking hinges
-  const room = await $.load(opener.location);
+  const room = await $load(opener.location);
   for (const objId of room.contents || []) {
-    const obj = await $.load(objId);
+    const obj = await $load(objId);
     if (obj.isPlayer && obj.id !== opener.id) {
       await obj.hear('CREEEEEAK.');
     }
@@ -306,7 +306,7 @@ obj.setMethod('doEat', `
   const eater = args[0];
   
   // Visual - others see you eat
-  const room = await $.load(eater.location);
+  const room = await $load(eater.location);
   await $pronoun.announce(room, '%N eats %d.', eater, self);
   
   // Taste - only eater experiences this
@@ -356,9 +356,9 @@ async attack(target) {
   await target.see(`${self.name} slashes you with a blade!`);
   
   // Audio - impact sound
-  const room = await $.load(self.location);
+  const room = await $load(self.location);
   for (const objId of room.contents || []) {
-    const obj = await $.load(objId);
+    const obj = await $load(objId);
     if (obj.isPlayer && obj.id !== self.id && obj.id !== target.id) {
       await obj.hear('SHLICK! The sound of tearing flesh.');
     }
@@ -415,7 +415,7 @@ await player.see('A figure appears, shouting silently.');  // Still works!
 // Periodic atmospheric updates
 room.setMethod('ambientTick', `
   for (const objId of self.contents || []) {
-    const obj = await $.load(objId);
+    const obj = await $load(objId);
     if (obj.isPlayer && Math.random() < 0.3) {  // 30% chance
       const sounds = [
         'Distant machinery clanks and hisses.',

@@ -245,7 +245,7 @@ obj.setMethod('onArrived', `
   // Register 'wear' verb when picked up
   const dest = args[0];
   if (dest?.owner) {
-    const owner = await $.load(dest.owner);
+    const owner = await $load(dest.owner);
     await owner.registerVerb(['wear %t'], self, 'doWear');
   }
 `);
@@ -386,7 +386,7 @@ weapon.setMethod('doAttack', `
   
   // Announce
   await $pronoun.announce(
-    await $.load(attacker.location),
+    await $load(attacker.location),
     '%N attacks %tN with %d!',
     attacker,
     self,
@@ -397,7 +397,7 @@ weapon.setMethod('doAttack', `
 weapon.setMethod('onArrived', `
   const dest = args[0];
   if (dest?.owner) {
-    const owner = await $.load(dest.owner);
+    const owner = await $load(dest.owner);
     await owner.registerVerb(['attack %i with %t'], self, 'doAttack');
   }
 `);

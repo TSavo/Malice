@@ -599,7 +599,7 @@ If you need to search manually instead of using `$.cash`:
 // Cash is a physical object in hands or pockets
 const inventory = player.contents || [];
 for (const item of inventory) {
-  const obj = await $.load(item);
+  const obj = await $load(item);
   if (obj?.stackType === 'cash:usd') {
     const amount = obj.quantity;
     // Found their cash

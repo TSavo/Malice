@@ -205,7 +205,7 @@ async decay() {
   
   if (this.durability <= 0) {
     await $pronoun.announce(
-      await $.load(this.location),
+      await $load(this.location),
       '%d crumbles to dust.',
       null,
       this
@@ -223,7 +223,7 @@ async resetDungeon() {
   const rooms = this.rooms; // Array of room IDs
   
   for (const roomId of rooms) {
-    const room = await $.load(roomId);
+    const room = await $load(roomId);
     
     // Recycle all items in room (but not players)
     const items = room.contents.filter(c => c.type === 'item');
@@ -258,7 +258,7 @@ async die() {
   this.location.contents.push(corpse);
   
   // Move player to void
-  this.location = await $.load(-1); // $.nothing
+  this.location = await $load(-1); // $.nothing
 }
 ```
 

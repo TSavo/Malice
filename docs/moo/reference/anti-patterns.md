@@ -37,15 +37,15 @@ self.target = enemy;          // Becomes { type: 'objref' }
 **Why it's bad:**
 - Stored as `number` instead of `objref`
 - Reading returns a number, not a RuntimeObject
-- Have to manually `$.load()` every time you use it
+- Have to manually `$load()` every time you use it
 - Breaks `===` identity comparison
 
-### ❌ Unnecessary $.load() Calls
+### ❌ Unnecessary $load() Calls
 
 ```javascript
 // WRONG - objects are already in memory
-const owner = await $.load(self.owner);
-const loc = await $.load(player.location);
+const owner = await $load(self.owner);
+const loc = await $load(player.location);
 
 // RIGHT - just use properties directly
 const owner = self.owner;
@@ -55,7 +55,7 @@ const loc = player.location;
 **Why it's bad:**
 - All objects are loaded at startup
 - Property access returns RuntimeObject directly
-- `$.load()` only needed for numeric IDs from external input
+- `$load()` only needed for numeric IDs from external input
 - Adds unnecessary async/await
 
 ### ❌ Using .get() and .set()
@@ -82,7 +82,7 @@ const n = self.name;
 
 ```javascript
 // WRONG - breaks pooling
-const parent = await $.load(1);
+const parent = await $load(1);
 const obj = await manager.create({ parent: parent });
 
 // RIGHT
@@ -361,11 +361,11 @@ room.occupants = [player1, player2];  // Just this room
 
 ```javascript
 // WRONG - room is a Promise, not an object
-const room = $.load(42);
+const room = $load(42);
 room.name;  // undefined!
 
 // RIGHT
-const room = await $.load(42);
+const room = await $load(42);
 room.name;  // "Town Square"
 ```
 
@@ -378,15 +378,15 @@ room.name;  // "Town Square"
 
 ```javascript
 // WRONG - slow, loads one at a time
-const room = await $.load(roomId);
-const player = await $.load(playerId);
-const item = await $.load(itemId);
+const room = await $load(roomId);
+const player = await $load(playerId);
+const item = await $load(itemId);
 
 // RIGHT - fast, loads in parallel
 const [room, player, item] = await Promise.all([
-  $.load(roomId),
-  $.load(playerId),
-  $.load(itemId)
+  $load(roomId),
+  $load(playerId),
+  $load(itemId)
 ]);
 ```
 
@@ -484,12 +484,12 @@ combat.combatants = [];
 ```javascript
 // WRONG - loads same object many times
 for (let i = 0; i < 100; i++) {
-  const room = await $.load(roomId);  // Loads 100 times!
+  const room = await $load(roomId);  // Loads 100 times!
   await room.doSomething();
 }
 
 // RIGHT - load once
-const room = await $.load(roomId);
+const room = await $load(roomId);
 for (let i = 0; i < 100; i++) {
   await room.doSomething();
 }
@@ -507,7 +507,7 @@ for (let i = 0; i < 100; i++) {
 const obj = await manager.getFromDatabase(id);
 
 // RIGHT - uses cache
-const obj = await $.load(id);
+const obj = await $load(id);
 ```
 
 **Why it's bad:**
@@ -688,7 +688,7 @@ async doDelete(player, obj) {
 1. ✅ **Store objects, not IDs** - `self.owner = player` not `player.id`
 2. ✅ **Use === for comparison** - `if (a === b)` not `a.id === b.id`
 3. ✅ **Use property syntax** - `self.name = x` not `self.set('name', x)`
-4. ✅ **Skip $.load() for properties** - `self.owner` is already a RuntimeObject
+4. ✅ **Skip $load() for properties** - `self.owner` is already a RuntimeObject
 
 ### System Operations
 5. ✅ **Always use $recycler** for object creation/destruction
