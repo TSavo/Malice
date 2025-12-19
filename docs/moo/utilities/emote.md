@@ -1,6 +1,6 @@
-# $.emote - Sensory-Aware Emotes
+# $emote - Sensory-Aware Emotes
 
-Use `$.emote` for freeform roleplaying actions with sensory routing. Different viewers perceive different parts based on their senses (sight, hearing, smell, taste).
+Use `$emote` for freeform roleplaying actions with sensory routing. Different viewers perceive different parts based on their senses (sight, hearing, smell, taste).
 
 ## Purpose
 
@@ -18,7 +18,7 @@ await room.announce(`${actor.name} smiles and says, "Hello!"`);
 
 **Good: Sensory routing**
 ```javascript
-await $.emote.broadcast('.smile and "Hello!"', actor, room);
+await $emote.broadcast('.smile and "Hello!"', actor, room);
 // Sighted+Hearing: "Bob smiles and says, 'Hello!'"
 // Blind only:      "Bob says, 'Hello!'"
 // Deaf only:       "Bob smiles and says something."
@@ -55,7 +55,7 @@ myself/yourself       - Reflexive pronouns refer to actor
 ### broadcast() - Send to Room
 
 ```javascript
-await $.emote.broadcast(emoteString, actor, room)
+await $emote.broadcast(emoteString, actor, room)
 ```
 
 Main entry point—parses emote and broadcasts to all in room with sensory filtering.
@@ -69,17 +69,17 @@ Main entry point—parses emote and broadcasts to all in room with sensory filte
 **Examples:**
 ```javascript
 // Visual action
-await $.emote.broadcast('.smile', actor, room);
+await $emote.broadcast('.smile', actor, room);
 // Sighted: "Bob smiles."
 // Blind: (nothing)
 
 // Audio action
-await $.emote.broadcast(',growl menacingly', actor, room);
+await $emote.broadcast(',growl menacingly', actor, room);
 // Hearing: "Bob growls menacingly."
 // Deaf: (nothing)
 
 // Combined actions
-await $.emote.broadcast('.smile and "Hello!"', actor, room);
+await $emote.broadcast('.smile and "Hello!"', actor, room);
 // Full senses: "Bob smiles and says, 'Hello!'"
 // Blind: "Bob says, 'Hello!'"
 // Deaf: "Bob smiles and says something."
@@ -88,53 +88,53 @@ await $.emote.broadcast('.smile and "Hello!"', actor, room);
 ### parseSegments() - Parse Emote
 
 ```javascript
-await $.emote.parseSegments(emoteString, actor, isFirstPerson)
+await $emote.parseSegments(emoteString, actor, isFirstPerson)
 ```
 
 Parses emote into segments for inspection or custom processing.
 
 **Examples:**
 ```javascript
-const segments = await $.emote.parseSegments('.fall and ,groan', actor, false);
+const segments = await $emote.parseSegments('.fall and ,groan', actor, false);
 // Returns array of segment objects with type, text, sensory requirements
 ```
 
 ### format() - Format for Viewer
 
 ```javascript
-await $.emote.format(segments, viewer)
+await $emote.format(segments, viewer)
 ```
 
 Formats parsed segments for specific viewer based on their senses.
 
 **Examples:**
 ```javascript
-const segments = await $.emote.parseSegments('.wave', actor, false);
-const text = await $.emote.format(segments, viewer);
+const segments = await $emote.parseSegments('.wave', actor, false);
+const text = await $emote.format(segments, viewer);
 // Returns personalized view based on viewer's senses
 ```
 
 ### processEmote() - Single Viewer
 
 ```javascript
-await $.emote.processEmote(emoteString, actor, viewer)
+await $emote.processEmote(emoteString, actor, viewer)
 ```
 
 Process emote for one specific viewer (combines parse and format).
 
 **Examples:**
 ```javascript
-const result = await $.emote.processEmote('.wave', actor, viewer);
+const result = await $emote.processEmote('.wave', actor, viewer);
 await viewer.tell(result);
 ```
 
 ### Pronoun Helpers
 
 ```javascript
-await $.emote.getObjectPronoun(obj)      // "him"/"her"/"them"
-await $.emote.getPossessive(obj)         // "his"/"her"/"their"
-await $.emote.getReflexive(obj)          // "himself"/"herself"/"themselves"
-await $.emote.getSubjectPronoun(obj)     // "he"/"she"/"they"
+await $emote.getObjectPronoun(obj)      // "him"/"her"/"them"
+await $emote.getPossessive(obj)         // "his"/"her"/"their"
+await $emote.getReflexive(obj)          // "himself"/"herself"/"themselves"
+await $emote.getSubjectPronoun(obj)     // "he"/"she"/"they"
 ```
 
 ## Real-World Examples
@@ -143,19 +143,19 @@ await $.emote.getSubjectPronoun(obj)     // "he"/"she"/"they"
 
 ```javascript
 // Simple visual
-await $.emote.broadcast('.wave', actor, room);
+await $emote.broadcast('.wave', actor, room);
 // "Bob waves."
 
 // Visual with target
-await $.emote.broadcast('.wave to Alice', actor, room);
+await $emote.broadcast('.wave to Alice', actor, room);
 // "Bob waves to Alice."
 
 // Audio action
-await $.emote.broadcast(',clear his throat', actor, room);
+await $emote.broadcast(',clear his throat', actor, room);
 // "Bob clears his throat."
 
 // Smell action
-await $.emote.broadcast('~reek of cheap cologne', actor, room);
+await $emote.broadcast('~reek of cheap cologne', actor, room);
 // "Bob reeks of cheap cologne."
 ```
 
@@ -163,15 +163,15 @@ await $.emote.broadcast('~reek of cheap cologne', actor, room);
 
 ```javascript
 // Direct speech
-await $.emote.broadcast('"Hello, everyone!"', actor, room);
+await $emote.broadcast('"Hello, everyone!"', actor, room);
 // "Bob says, 'Hello, everyone!'"
 
 // Speech with action
-await $.emote.broadcast('.wave and "Hello!"', actor, room);
+await $emote.broadcast('.wave and "Hello!"', actor, room);
 // "Bob waves and says, 'Hello!'"
 
 // Custom verb
-await $.emote.broadcast('.say loudly "Listen up!"', actor, room);
+await $emote.broadcast('.say loudly "Listen up!"', actor, room);
 // "Bob says loudly, 'Listen up!'"
 ```
 
@@ -179,17 +179,17 @@ await $.emote.broadcast('.say loudly "Listen up!"', actor, room);
 
 ```javascript
 // Multiple actions
-await $.emote.broadcast('.stand up, ,sigh heavily, and .walk to the door', actor, room);
+await $emote.broadcast('.stand up, ,sigh heavily, and .walk to the door', actor, room);
 // Sighted+Hearing: "Bob stands up, sighs heavily, and walks to the door."
 // Blind only: "Bob sighs heavily." (only hears the sigh)
 // Deaf only: "Bob stands up and walks to the door." (only sees movement)
 
 // With target pronouns
-await $.emote.broadcast('.look at Alice and .smile at her', actor, room);
+await $emote.broadcast('.look at Alice and .smile at her', actor, room);
 // "Bob looks at Alice and smiles at her."
 
 // Reflexive
-await $.emote.broadcast('.hurt himself', actor, room);
+await $emote.broadcast('.hurt himself', actor, room);
 // Actor sees: "You hurt yourself."
 // Others see: "Bob hurts himself."
 ```
@@ -198,14 +198,14 @@ await $.emote.broadcast('.hurt himself', actor, room);
 
 ```javascript
 // Visual + audio
-await $.emote.broadcast('.raise his hand and ,clear his throat', actor, room);
+await $emote.broadcast('.raise his hand and ,clear his throat', actor, room);
 // Full senses: "Bob raises his hand and clears his throat."
 // Blind: "Bob clears his throat."
 // Deaf: "Bob raises his hand."
 // Blind+Deaf: (nothing)
 
 // Smell + visual
-await $.emote.broadcast('.enter the room, ~reeking of smoke', actor, room);
+await $emote.broadcast('.enter the room, ~reeking of smoke', actor, room);
 // Sighted+Smell: "Bob enters the room, reeking of smoke."
 // Blind+Smell: "Bob reeks of smoke."
 // Sighted only: "Bob enters the room."
@@ -215,7 +215,7 @@ await $.emote.broadcast('.enter the room, ~reeking of smoke', actor, room);
 
 ```javascript
 // Attack with sensory details
-await $.emote.broadcast(
+await $emote.broadcast(
   '.swing his sword at Alice, ,grunting with effort',
   actor,
   room
@@ -223,7 +223,7 @@ await $.emote.broadcast(
 // "Bob swings his sword at Alice, grunting with effort."
 
 // Injury description
-await $.emote.broadcast(
+await $emote.broadcast(
   '.clutch his bleeding wound and ,cry out in pain',
   victim,
   room
@@ -235,7 +235,7 @@ await $.emote.broadcast(
 
 ```javascript
 // Room effect (no actor)
-await $.emote.broadcast(
+await $emote.broadcast(
   ',creak ominously and ~smell of decay',
   null,
   room
@@ -243,7 +243,7 @@ await $.emote.broadcast(
 // "The room creaks ominously and smells of decay."
 
 // Weather effect
-await $.emote.broadcast(
+await $emote.broadcast(
   ',thunder rumbles in the distance and .lightning flashes',
   null,
   room
@@ -257,12 +257,12 @@ await $.emote.broadcast(
 
 ```javascript
 // Quiet action (audio reduced)
-await $.emote.broadcast('.sneak quietly to the door', actor, room);
+await $emote.broadcast('.sneak quietly to the door', actor, room);
 // Sighted: "Bob sneaks quietly to the door."
 // Others might not perceive if perception check fails
 
 // Silent visual
-await $.emote.broadcast('.gesture silently to Alice', actor, room);
+await $emote.broadcast('.gesture silently to Alice', actor, room);
 // Sighted: "Bob gestures silently to Alice."
 // Blind/Deaf: (nothing)
 ```
@@ -305,20 +305,20 @@ await $.emote.broadcast('.gesture silently to Alice', actor, room);
 
 ```javascript
 // Greeting
-await $.emote.broadcast('.wave and "Hey there!"', actor, room);
+await $emote.broadcast('.wave and "Hey there!"', actor, room);
 
 // Farewell
-await $.emote.broadcast('.wave goodbye and .leave', actor, room);
+await $emote.broadcast('.wave goodbye and .leave', actor, room);
 
 // Attention getting
-await $.emote.broadcast(',clear his throat and .look around', actor, room);
+await $emote.broadcast(',clear his throat and .look around', actor, room);
 ```
 
 ### Atmospheric Description
 
 ```javascript
 // Multiple senses
-await $.emote.broadcast(
+await $emote.broadcast(
   '.notice the flickering torches, ,hear water dripping, and ~smell mildew',
   actor,
   room
@@ -329,20 +329,20 @@ await $.emote.broadcast(
 
 ```javascript
 // Attack with sound
-await $.emote.broadcast('.strike with his sword, ,yelling', attacker, room);
+await $emote.broadcast('.strike with his sword, ,yelling', attacker, room);
 
 // Defensive
-await $.emote.broadcast('.dodge and .roll aside', defender, room);
+await $emote.broadcast('.dodge and .roll aside', defender, room);
 ```
 
 ### Stealth/Sneaking
 
 ```javascript
 // Quiet movement
-await $.emote.broadcast('.creep silently toward the door', actor, room);
+await $emote.broadcast('.creep silently toward the door', actor, room);
 
 // Hidden action
-await $.emote.broadcast('.signal silently to Alice', actor, room);
+await $emote.broadcast('.signal silently to Alice', actor, room);
 ```
 
 ## Integration with Senses
@@ -379,6 +379,6 @@ async taste(event) {
 
 ## See Also
 
-- [$.pronoun](./pronoun.md) - Perspective-aware messaging (used internally)
-- [$.english](./english.md) - Verb conjugation (used for emote verbs)
+- [$pronoun](./pronoun.md) - Perspective-aware messaging (used internally)
+- [$english](./english.md) - Verb conjugation (used for emote verbs)
 - [Best Practices](../best-practices.md) - Immersive RP patterns

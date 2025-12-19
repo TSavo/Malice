@@ -13,14 +13,14 @@ The phone system provides communication infrastructure:
 
 **Prototype Hierarchy:**
 ```
-$.describable
-├── $.phoneDb          ← Phone directory
-└── $.phone            ← Base phone
-    ├── $.wirelessPhone ← Mobile phones
-    └── $.payphone     ← Public pay phones
+$describable
+├── $phoneDb          ← Phone directory
+└── $phone            ← Base phone
+    ├── $wirelessPhone ← Mobile phones
+    └── $payphone     ← Public pay phones
 ```
 
-## $.phoneDb - Phone Directory
+## $phoneDb - Phone Directory
 
 Registry mapping phone numbers to phone objects.
 
@@ -66,7 +66,7 @@ const phone = await phoneDb.findPhoneByNumber('2061234567');
 // Returns phone object or null
 ```
 
-## $.phone - Base Phone
+## $phone - Base Phone
 
 Common functionality for all phone types.
 
@@ -149,9 +149,9 @@ Called when receiving a text message.
 'Message from 2061234567: Hello!'
 ```
 
-## $.wirelessPhone - Mobile Phones
+## $wirelessPhone - Mobile Phones
 
-Extends $.phone with battery, signal, and ringtone.
+Extends $phone with battery, signal, and ringtone.
 
 ### Properties
 
@@ -160,7 +160,7 @@ Extends $.phone with battery, signal, and ringtone.
   name: 'Wireless Phone',
   description: 'A wireless phone handset.',
 
-  // Inherited from $.phone
+  // Inherited from $phone
   number: null,
   phoneDb: null,
   connectedTo: null,
@@ -207,9 +207,9 @@ Includes ringtone in notification.
 // 'Incoming call from 2061234567 [ring]'
 ```
 
-## $.payphone - Public Pay Phones
+## $payphone - Public Pay Phones
 
-Extends $.phone with bank payment and bolted-down restriction.
+Extends $phone with bank payment and bolted-down restriction.
 
 ### Properties
 
@@ -218,7 +218,7 @@ Extends $.phone with bank payment and bolted-down restriction.
   name: 'Payphone',
   description: 'A bolted-down public phone.',
 
-  // Inherited from $.phone
+  // Inherited from $phone
   number: null,
   phoneDb: null,
   connectedTo: null,
@@ -253,18 +253,18 @@ const result = await payphone.dial('2061234567', player);
 ### Phone Directory
 
 ```javascript
-const phoneDb = await $.recycler.create($.phoneDb, {
+const phoneDb = await $recycler.create($phoneDb, {
   name: 'City Phone Network',
 });
 
 // Register as global alias
-await $.aliases.set('phoneDb', phoneDb.id);
+await $aliases.set('phoneDb', phoneDb.id);
 ```
 
 ### Wireless Phone
 
 ```javascript
-const phone = await $.recycler.create($.wirelessPhone, {
+const phone = await $recycler.create($wirelessPhone, {
   name: 'a smartphone',
   description: 'A sleek black smartphone.',
   number: '2061234567',
@@ -281,13 +281,13 @@ await phoneDb.register('2061234567', phone);
 ### Payphone
 
 ```javascript
-const payphone = await $.recycler.create($.payphone, {
+const payphone = await $recycler.create($payphone, {
   name: 'a payphone',
   description: 'A battered public phone booth.',
   number: '2069999999',
   phoneDb: phoneDb.id,
   pricePerCall: 2,
-  bank: $.bank.id,
+  bank: $bank.id,
   account: 'PAYPHONE-REVENUE-001',
 });
 
@@ -355,12 +355,12 @@ await phoneDb.register('2069999999', payphone);
 Phones can be sold from vending machines with auto-assigned numbers:
 
 ```javascript
-const phoneKiosk = await $.recycler.create($.vendable, {
+const phoneKiosk = await $recycler.create($vendable, {
   name: 'Phone Kiosk',
   phoneDb: phoneDb.id,
   spawnables: [
     {
-      protoId: $.wirelessPhone.id,
+      protoId: $wirelessPhone.id,
       name: 'Burner Phone',
       price: 25,
       autoNumber: true,        // Auto-assign number
@@ -381,12 +381,12 @@ const phoneKiosk = await $.recycler.create($.vendable, {
 Rooms can affect phone signal:
 
 ```javascript
-const basement = await $.recycler.create($.room, {
+const basement = await $recycler.create($room, {
   name: 'Underground Bunker',
   phoneSignal: 0,             // No signal
 });
 
-const streetCorner = await $.recycler.create($.room, {
+const streetCorner = await $recycler.create($room, {
   name: 'Street Corner',
   phoneSignal: 5,             // Full signal
 });

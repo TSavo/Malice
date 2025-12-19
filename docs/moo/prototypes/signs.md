@@ -10,7 +10,7 @@ Signs are bolted-down objects that display text. Used for:
 - Notices and warnings
 - Dynamic information displays
 
-## $.sign
+## $sign
 
 ### Properties
 
@@ -84,7 +84,7 @@ Signs declare room-centric verbs:
 ### Static Information Sign
 
 ```javascript
-const sign = await $.recycler.create($.sign, {
+const sign = await $recycler.create($sign, {
   name: 'Building Directory',
   description: 'A large wall-mounted directory.',
   text: `SMITH TOWER
@@ -99,7 +99,7 @@ Floor Directory:
 ### Dynamic Notice Board
 
 ```javascript
-const notice = await $.recycler.create($.sign, {
+const notice = await $recycler.create($sign, {
   name: 'Notice Board',
   description: 'A cork board with pinned notices.',
   text: 'No current notices.',
@@ -113,7 +113,7 @@ await notice.updateText(player, 'Meeting at noon in the lobby.');
 ### Authorized-Only Sign
 
 ```javascript
-const statusBoard = await $.recycler.create($.sign, {
+const statusBoard = await $recycler.create($sign, {
   name: 'Status Board',
   description: 'An electronic status display.',
   text: 'SYSTEM STATUS: OPERATIONAL',

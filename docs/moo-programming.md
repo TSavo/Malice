@@ -1,6 +1,6 @@
 # MOO Programming Best Practices
 
-This guide covers MOO code conventions and the utility objects available via `$.*`.
+This guide covers MOO code conventions and the utility objects available via `$*`.
 
 > **For game rules and player documentation, see [PLAYER-GUIDE.md](./PLAYER-GUIDE.md)**
 
@@ -67,7 +67,7 @@ async function announcePickup(actor, items, room) {
 // DO THIS - Let utilities handle everything
 async function announcePickup(actor, items, room) {
   const names = items.map(i => i.name);
-  await $.format.compose('%N %v{pick} up %t.', names, { actor, room });
+  await $format.compose('%N %v{pick} up %t.', names, { actor, room });
 }
 ```
 
@@ -100,7 +100,7 @@ async function announceDamage(attacker, victim, damage, room) {
 
 // DO: 2 lines
 async function announceDamage(attacker, victim, wounds, room) {
-  await $.format.compose('%N %v{inflict} %a on %tN!', wounds, { actor: attacker, target: victim, room });
+  await $format.compose('%N %v{inflict} %a on %tN!', wounds, { actor: attacker, target: victim, room });
 }
 ```
 
@@ -108,11 +108,11 @@ async function announceDamage(attacker, victim, wounds, room) {
 
 | Combination | What It Gives You |
 |-------------|-------------------|
-| `$.format.compose()` + actor | Pronoun substitution + list formatting + verb conjugation |
-| `$.pronoun.announce()` + room | Perspective-correct messages to all room occupants |
-| `$.proportional.sub()` + value/max | Condition descriptions without if/else chains |
-| `$.prompt.choice()` + validation | Complete input flow without manual parsing |
-| `$.memento.clone()` + object tree | Deep copy with ID remapping, zero manual work |
+| `$format.compose()` + actor | Pronoun substitution + list formatting + verb conjugation |
+| `$pronoun.announce()` + room | Perspective-correct messages to all room occupants |
+| `$proportional.sub()` + value/max | Condition descriptions without if/else chains |
+| `$prompt.choice()` + validation | Complete input flow without manual parsing |
+| `$memento.clone()` + object tree | Deep copy with ID remapping, zero manual work |
 
 **If you're writing more than 5 lines for any of these tasks, you're doing it wrong.**
 
@@ -362,82 +362,82 @@ const loc = await $.load(self.location);  // $.load(42) -> loads #42
 | Alias | Purpose |
 |-------|---------|
 | `$` | ObjectManager (#0): alias management, object ID allocation |
-| `$.english` | Grammar: articles, plurals, conjugation, ordinals |
-| `$.pronoun` | Pronoun substitution, perspective-aware messaging |
-| `$.format` | Text layout: columns, tables, lists, templates |
-| `$.proportional` | Proportional message selection (health bars, etc.) |
-| `$.prompt` | Interactive prompts (question, choice, menu, multiline) |
-| `$.recycler` | Object lifecycle: create, recycle, unrecycle |
-| `$.memento` | Object graph serialization and cloning |
-| `$.exclusions` | Action exclusion system (sitting/walking conflicts) |
-| `$.mutex` | Object-based mutex locks with timeouts |
-| `$.scheduler` | Periodic job scheduling (heartbeats, decay) |
-| `$.emote` | Sensory-aware emotes with `.verb` syntax |
+| `$english` | Grammar: articles, plurals, conjugation, ordinals |
+| `$pronoun` | Pronoun substitution, perspective-aware messaging |
+| `$format` | Text layout: columns, tables, lists, templates |
+| `$proportional` | Proportional message selection (health bars, etc.) |
+| `$prompt` | Interactive prompts (question, choice, menu, multiline) |
+| `$recycler` | Object lifecycle: create, recycle, unrecycle |
+| `$memento` | Object graph serialization and cloning |
+| `$exclusions` | Action exclusion system (sitting/walking conflicts) |
+| `$mutex` | Object-based mutex locks with timeouts |
+| `$scheduler` | Periodic job scheduling (heartbeats, decay) |
+| `$emote` | Sensory-aware emotes with `.verb` syntax |
 
-## $.english - Grammar Utilities
+## $english - Grammar Utilities
 
-Use `$.english` for all grammar operations. Never duplicate conjugation/pluralization logic.
+Use `$english` for all grammar operations. Never duplicate conjugation/pluralization logic.
 
 ### Verb Conjugation
 
 ```javascript
 // Third person singular
-await $.english.conjugate('walk', 3)   // "walks"
-await $.english.conjugate('kiss', 3)   // "kisses"
-await $.english.conjugate('cry', 3)    // "cries"
-await $.english.conjugate('be', 3)     // "is"
-await $.english.conjugate('have', 3)   // "has"
+await $english.conjugate('walk', 3)   // "walks"
+await $english.conjugate('kiss', 3)   // "kisses"
+await $english.conjugate('cry', 3)    // "cries"
+await $english.conjugate('be', 3)     // "is"
+await $english.conjugate('have', 3)   // "has"
 
 // Past tense
-await $.english.pastTense('walk')      // "walked"
-await $.english.pastTense('run')       // "ran"
-await $.english.pastTense('cut')       // "cut"
+await $english.pastTense('walk')      // "walked"
+await $english.pastTense('run')       // "ran"
+await $english.pastTense('cut')       // "cut"
 
 // Present participle (-ing)
-await $.english.presentParticiple('walk')  // "walking"
-await $.english.presentParticiple('run')   // "running"
+await $english.presentParticiple('walk')  // "walking"
+await $english.presentParticiple('run')   // "running"
 ```
 
 ### Pluralization
 
 ```javascript
-await $.english.plural('sword')        // "swords"
-await $.english.plural('wolf')         // "wolves"
-await $.english.plural('child')        // "children"
-await $.english.plural('sheep')        // "sheep"
+await $english.plural('sword')        // "swords"
+await $english.plural('wolf')         // "wolves"
+await $english.plural('child')        // "children"
+await $english.plural('sheep')        // "sheep"
 
 // With count
-await $.english.count(3, 'apple')      // "3 apples"
-await $.english.count(1, 'apple')      // "1 apple"
-await $.english.count(0, 'apple')      // "0 apples"
+await $english.count(3, 'apple')      // "3 apples"
+await $english.count(1, 'apple')      // "1 apple"
+await $english.count(0, 'apple')      // "0 apples"
 ```
 
 ### Articles
 
 ```javascript
-await $.english.article('apple')       // "an apple"
-await $.english.article('sword')       // "a sword"
-await $.english.article('hour')        // "an hour"
+await $english.article('apple')       // "an apple"
+await $english.article('sword')       // "a sword"
+await $english.article('hour')        // "an hour"
 ```
 
 ### Other
 
 ```javascript
-await $.english.ordinal(1)             // "1st"
-await $.english.ordinal(22)            // "22nd"
-await $.english.possessive('Bob')      // "Bob's"
-await $.english.possessive('boss')     // "boss'"
-await $.english.capitalize('hello')    // "Hello"
-await $.english.titleCase('the old man') // "The Old Man"
-await $.english.numberWord(42)         // "forty-two"
+await $english.ordinal(1)             // "1st"
+await $english.ordinal(22)            // "22nd"
+await $english.possessive('Bob')      // "Bob's"
+await $english.possessive('boss')     // "boss'"
+await $english.capitalize('hello')    // "Hello"
+await $english.titleCase('the old man') // "The Old Man"
+await $english.numberWord(42)         // "forty-two"
 
 // Lists with Oxford comma
-await $.english.list(['a', 'b', 'c'])  // "a, b, and c"
+await $english.list(['a', 'b', 'c'])  // "a, b, and c"
 ```
 
-## $.pronoun - Perspective-Aware Text
+## $pronoun - Perspective-Aware Text
 
-Use `$.pronoun.sub()` for text that varies by viewer (second vs third person). This is essential for immersive messaging where the actor sees "You" while others see the actor's name.
+Use `$pronoun.sub()` for text that varies by viewer (second vs third person). This is essential for immersive messaging where the actor sees "You" while others see the actor's name.
 
 ### Template Codes
 
@@ -483,18 +483,18 @@ Use `$.pronoun.sub()` for text that varies by viewer (second vs third person). T
 // sub(template, actor, directObj?, target?, indirectObj?, location?)
 
 // Simple action
-const msg = await $.pronoun.sub('%N %v{pick} up %d.', actor, sword);
+const msg = await $pronoun.sub('%N %v{pick} up %d.', actor, sword);
 // Actor sees: "You pick up the sword."
 // Others see: "Bob picks up the sword."
 
 // Action with target
-const msg = await $.pronoun.sub('%N %v{give} %d to %tN.', giver, sword, receiver);
+const msg = await $pronoun.sub('%N %v{give} %d to %tN.', giver, sword, receiver);
 // Giver sees:    "You give the sword to Jim."
 // Receiver sees: "Bob gives the sword to you."
 // Others see:    "Bob gives the sword to Jim."
 
 // Complex interaction
-const msg = await $.pronoun.sub(
+const msg = await $pronoun.sub(
   '%N %v{punch} %tN in %tp face, breaking %tr nose!',
   attacker, null, victim
 );
@@ -507,12 +507,12 @@ const msg = await $.pronoun.sub(
 
 ```javascript
 // Possessive pronoun (adjective form)
-await $.pronoun.sub('%N %v{take} %p sword.', actor);
+await $pronoun.sub('%N %v{take} %p sword.', actor);
 // Actor: "You take your sword."
 // Others: "Bob takes his sword."
 
 // Possessive noun (standalone form)
-await $.pronoun.sub('The victory is %q!', actor);
+await $pronoun.sub('The victory is %q!', actor);
 // Actor: "The victory is yours!"
 // Others: "The victory is his!"
 ```
@@ -523,27 +523,27 @@ The main way to send perspective-correct messages to a room:
 
 ```javascript
 // Everyone in the room gets the appropriate perspective
-await $.pronoun.announce(room, '%N %v{enter} from the north.', actor);
+await $pronoun.announce(room, '%N %v{enter} from the north.', actor);
 
 // With objects
-await $.pronoun.announce(room, '%N %v{drop} %d.', actor, item);
+await $pronoun.announce(room, '%N %v{drop} %d.', actor, item);
 
 // With targets
-await $.pronoun.announce(room, '%N %v{wave} at %tN.', actor, null, target);
+await $pronoun.announce(room, '%N %v{wave} at %tN.', actor, null, target);
 
 // Full signature
-await $.pronoun.announce(room, template, actor, directObj, target, indirectObj, location);
+await $pronoun.announce(room, template, actor, directObj, target, indirectObj, location);
 ```
 
 ### tell() vs announce()
 
 ```javascript
 // tell() - Send to one specific person
-await $.pronoun.tell(player, '%N %v{feel} dizzy.', player);
+await $pronoun.tell(player, '%N %v{feel} dizzy.', player);
 // Player sees: "You feel dizzy."
 
 // announce() - Send to everyone in a room
-await $.pronoun.announce(room, '%N %v{collapse}.', actor);
+await $pronoun.announce(room, '%N %v{collapse}.', actor);
 // Actor sees: "You collapse."
 // Others see: "Bob collapses."
 ```
@@ -552,22 +552,22 @@ await $.pronoun.announce(room, '%N %v{collapse}.', actor);
 
 ```javascript
 // Format for a specific viewer (not the actor)
-const msg = await $.pronoun.sub('%N %v{smile} at %tN.', actor, null, target, null, null, viewer);
+const msg = await $pronoun.sub('%N %v{smile} at %tN.', actor, null, target, null, null, viewer);
 // If viewer is actor: "You smile at Bob."
 // If viewer is target: "Jim smiles at you."
 // If viewer is neither: "Jim smiles at Bob."
 ```
 
-## $.format - Text Formatting
+## $format - Text Formatting
 
 ### Natural Language Lists
 
 ```javascript
 // Oxford comma list
-await $.format.prose(['sword'])                    // "sword"
-await $.format.prose(['sword', 'shield'])          // "sword and shield"
-await $.format.prose(['sword', 'shield', 'helm'])  // "sword, shield, and helm"
-await $.format.prose(['red', 'blue'], 'or')        // "red or blue"
+await $format.prose(['sword'])                    // "sword"
+await $format.prose(['sword', 'shield'])          // "sword and shield"
+await $format.prose(['sword', 'shield', 'helm'])  // "sword, shield, and helm"
+await $format.prose(['red', 'blue'], 'or')        // "red or blue"
 ```
 
 ### compose() - Template Composition
@@ -584,21 +584,21 @@ The most powerful formatting tool - combines list formatting, count-based verb c
 | `%a` | List with "a/an" | "a sword" | "a sword and shield" |
 | `%v{verb}` | Verb conjugated by list count | "falls" | "fall" |
 
-**Plus all `$.pronoun` codes** (`%N`, `%s`, `%p`, `%tN`, etc.) when you pass an actor.
+**Plus all `$pronoun` codes** (`%N`, `%s`, `%p`, `%tN`, etc.) when you pass an actor.
 
 ### Basic List Formatting
 
 ```javascript
 // Single item
-await $.format.compose('%T %v{fall} to the ground.', ['sword'])
+await $format.compose('%T %v{fall} to the ground.', ['sword'])
 // "The sword falls to the ground."
 
 // Multiple items
-await $.format.compose('%T %v{fall} to the ground.', ['sword', 'shield'])
+await $format.compose('%T %v{fall} to the ground.', ['sword', 'shield'])
 // "The sword and shield fall to the ground."
 
 // Three+ items (Oxford comma)
-await $.format.compose('%T %v{clatter} noisily.', ['sword', 'shield', 'helm'])
+await $format.compose('%T %v{clatter} noisily.', ['sword', 'shield', 'helm'])
 // "The sword, shield, and helm clatter noisily."
 ```
 
@@ -609,7 +609,7 @@ await $.format.compose('%T %v{clatter} noisily.', ['sword', 'shield', 'helm'])
 // options: { actor, directObj, target, indirectObj, location, viewer }
 
 // Actor watching items fall
-await $.format.compose(
+await $format.compose(
   '%N %v{watch} as %t %v{tumble} to the ground.',
   ['coins'],
   { actor: player }
@@ -618,7 +618,7 @@ await $.format.compose(
 // Others see:  "Bob watches as the coins tumble to the ground."
 
 // Actor dropping multiple items
-await $.format.compose(
+await $format.compose(
   '%N %v{drop} %t.',
   ['sword', 'shield'],
   { actor: player }
@@ -627,7 +627,7 @@ await $.format.compose(
 // Others see:  "Bob drops the sword and shield."
 
 // Full interaction with target
-await $.format.compose(
+await $format.compose(
   '%N %v{throw} %t at %tN!',
   ['dagger', 'rock'],
   { actor: attacker, target: victim }
@@ -645,17 +645,17 @@ The `%v{verb}` in compose uses the **list count** for conjugation:
 // 1 item = singular verb (falls, is, has)
 // 2+ items = plural verb (fall, are, have)
 
-await $.format.compose('%T %v{is} broken.', ['sword'])
+await $format.compose('%T %v{is} broken.', ['sword'])
 // "The sword is broken."
 
-await $.format.compose('%T %v{is} broken.', ['sword', 'shield'])
+await $format.compose('%T %v{is} broken.', ['sword', 'shield'])
 // "The sword and shield are broken."
 
 // Works with irregular verbs
-await $.format.compose('%T %v{have} been destroyed.', ['sword'])
+await $format.compose('%T %v{have} been destroyed.', ['sword'])
 // "The sword has been destroyed."
 
-await $.format.compose('%T %v{have} been destroyed.', ['sword', 'armor'])
+await $format.compose('%T %v{have} been destroyed.', ['sword', 'armor'])
 // "The sword and armor have been destroyed."
 ```
 
@@ -664,17 +664,17 @@ await $.format.compose('%T %v{have} been destroyed.', ['sword', 'armor'])
 ```javascript
 // Inventory pickup
 const items = ['rusty sword', 'torn cloak', 'gold coin'];
-await $.format.compose('%N %v{pick} up %t.', items, { actor: player });
+await $format.compose('%N %v{pick} up %t.', items, { actor: player });
 // "You pick up the rusty sword, torn cloak, and gold coin."
 
 // Clothing destruction (decay system)
 const destroyed = ['shirt', 'pants'];
-await $.format.compose('%p %T %v{fall} away in tatters.', destroyed, { actor: corpse });
+await $format.compose('%p %T %v{fall} away in tatters.', destroyed, { actor: corpse });
 // "His shirt and pants fall away in tatters."
 
 // Combat hit
 const wounds = ['deep gash', 'bruise'];
-await $.format.compose('%N %v{inflict} %a on %tN!', wounds, { actor: attacker, target: victim });
+await $format.compose('%N %v{inflict} %a on %tN!', wounds, { actor: attacker, target: victim });
 // "You inflict a deep gash and bruise on Bob!"
 ```
 
@@ -682,53 +682,53 @@ await $.format.compose('%N %v{inflict} %a on %tN!', wounds, { actor: attacker, t
 
 ```javascript
 // When you have a count but not a list
-await $.format.verb('fall', 1)   // "falls"
-await $.format.verb('fall', 3)   // "fall"
-await $.format.verb('are', 1)    // "is"
+await $format.verb('fall', 1)   // "falls"
+await $format.verb('fall', 3)   // "fall"
+await $format.verb('are', 1)    // "is"
 ```
 
 ### Layout Utilities
 
 ```javascript
 // Columns
-await $.format.columns(['a','b','c','d','e'], 2)
+await $format.columns(['a','b','c','d','e'], 2)
 // ["a    b", "c    d", "e"]
 
 // Table with headers
-await $.format.table([
+await $format.table([
   ['Name', 'HP', 'Status'],
   ['Goblin', '10', 'Alive'],
   ['Orc', '25', 'Dead']
 ])
 
 // Progress bar
-await $.format.bar(75, 100, 20, {showPct: true})
+await $format.bar(75, 100, 20, {showPct: true})
 // "[===============     ] 75%"
 
 // Bulleted list
-await $.format.list(['sword', 'shield'], {style: 'bullet'})
+await $format.list(['sword', 'shield'], {style: 'bullet'})
 // ["  • sword", "  • shield"]
 
 // Key-value alignment
-await $.format.keyValue({Name: 'Bob', HP: 100, Status: 'Alive'})
+await $format.keyValue({Name: 'Bob', HP: 100, Status: 'Alive'})
 // ["Name:   Bob", "HP:     100", "Status: Alive"]
 
 // Box drawing
-await $.format.box('Hello!', {style: 'single'})
+await $format.box('Hello!', {style: 'single'})
 // ["┌────────┐", "│ Hello! │", "└────────┘"]
 
 // Text wrapping
-await $.format.wrap('Long text here...', 40)
+await $format.wrap('Long text here...', 40)
 
 // Padding
-await $.format.padRight('hi', 10)   // "hi        "
-await $.format.padLeft('42', 5)     // "   42"
-await $.format.center('hi', 10)     // "    hi    "
+await $format.padRight('hi', 10)   // "hi        "
+await $format.padLeft('42', 5)     // "   42"
+await $format.center('hi', 10)     // "    hi    "
 ```
 
-## $.recycler - Object Lifecycle
+## $recycler - Object Lifecycle
 
-**Always use `$.recycler` for creating and destroying objects. There is NO other correct way.**
+**Always use `$recycler` for creating and destroying objects. There is NO other correct way.**
 
 ### Why This Is Non-Negotiable
 
@@ -754,12 +754,12 @@ await manager.delete(sword.id);     // Bypasses all cleanup hooks
 // - No cascade to child objects
 // - Database inconsistency
 
-// DO: Always use $.recycler
-const sword = await $.recycler.create($.weapon, { name: 'Iron Sword', damage: 10 });
-await $.recycler.recycle(sword);  // Proper cleanup, available for reuse
+// DO: Always use $recycler
+const sword = await $recycler.create($weapon, { name: 'Iron Sword', damage: 10 });
+await $recycler.recycle(sword);  // Proper cleanup, available for reuse
 ```
 
-$.recycler handles:
+$recycler handles:
 - ✅ Object pooling (reuses recycled objects of same parent type)
 - ✅ Location cleanup (removes from container's contents)
 - ✅ Contents cascade (optionally recycles everything inside)
@@ -767,13 +767,13 @@ $.recycler handles:
 - ✅ Memory efficiency (recycle + reuse vs create + delete)
 - ✅ Undo support (unrecycle brings objects back)
 
-**If you bypass $.recycler, you WILL cause database corruption.**
+**If you bypass $recycler, you WILL cause database corruption.**
 
 ### Creating Objects
 
 ```javascript
 // Create from prototype
-const sword = await $.recycler.create($.weapon, {
+const sword = await $recycler.create($weapon, {
   name: 'Iron Sword',
   damage: 10
 });
@@ -788,20 +788,20 @@ const sword = await $.recycler.create($.weapon, {
 
 ```javascript
 // Soft delete - marks for reuse
-await $.recycler.recycle(sword);
+await $recycler.recycle(sword);
 
 // Hard delete - permanent removal
-await $.recycler.purge(sword);
+await $recycler.purge(sword);
 
 // Recursive delete - object and all contents
-await $.recycler.recycleTree(container);
+await $recycler.recycleTree(container);
 ```
 
 ### Check Before Recycling
 
 ```javascript
-if (await $.recycler.canRecycle(obj)) {
-  await $.recycler.recycle(obj);
+if (await $recycler.canRecycle(obj)) {
+  await $recycler.recycle(obj);
 }
 ```
 
@@ -809,12 +809,12 @@ if (await $.recycler.canRecycle(obj)) {
 
 ```javascript
 // Bring back from the dead
-await $.recycler.unrecycle(obj);
+await $recycler.unrecycle(obj);
 ```
 
-## $.proportional - Proportional Message Selection
+## $proportional - Proportional Message Selection
 
-Use `$.proportional` to select messages based on a value within a range. Perfect for health bars, hunger, thirst, capacity indicators, etc.
+Use `$proportional` to select messages based on a value within a range. Perfect for health bars, hunger, thirst, capacity indicators, etc.
 
 ### Why Not If/Else Chains?
 
@@ -833,13 +833,13 @@ function getHealthStatus(hp, maxHp) {
 }
 
 // DO: 1 line with mathematically correct distribution
-const status = await $.proportional.sub(
+const status = await $proportional.sub(
   ['dead', 'near death', 'critical', 'wounded', 'hurt', 'scratched', 'healthy'],
   hp, maxHp
 );
 ```
 
-$.proportional handles:
+$proportional handles:
 - ✅ First message only at exactly 0
 - ✅ Last message only at exactly max
 - ✅ Even distribution of middle messages
@@ -855,7 +855,7 @@ $.proportional handles:
 
 ```javascript
 // Select message based on current/max value
-const healthMsg = await $.proportional.sub(
+const healthMsg = await $proportional.sub(
   ['dead', 'critical', 'wounded', 'hurt', 'healthy'],
   player.hp,      // current value
   player.maxHp    // maximum value
@@ -874,7 +874,7 @@ const healthMsg = await $.proportional.sub(
 
 ```javascript
 // Get which message index (0-based) would be selected
-const idx = await $.proportional.index(['empty', 'low', 'half', 'full'], 50, 100);
+const idx = await $proportional.index(['empty', 'low', 'half', 'full'], 50, 100);
 // idx = 2 (would select 'half')
 ```
 
@@ -882,7 +882,7 @@ const idx = await $.proportional.index(['empty', 'low', 'half', 'full'], 50, 100
 
 ```javascript
 // Use percentage directly (0-100 scale)
-const msg = await $.proportional.fromPercent(
+const msg = await $proportional.fromPercent(
   ['empty', 'quarter', 'half', 'three-quarters', 'full'],
   75
 );
@@ -893,27 +893,27 @@ const msg = await $.proportional.fromPercent(
 
 ```javascript
 // Hunger system
-const hunger = await $.proportional.sub(
+const hunger = await $proportional.sub(
   ['starving', 'famished', 'hungry', 'peckish', 'satisfied', 'full', 'stuffed'],
   player.food, player.maxFood
 );
 
 // Container capacity
-const capacity = await $.proportional.sub(
+const capacity = await $proportional.sub(
   ['empty', 'nearly empty', 'partially filled', 'mostly full', 'full'],
   container.contents.length, container.capacity
 );
 
 // Weapon durability
-const condition = await $.proportional.sub(
+const condition = await $proportional.sub(
   ['broken', 'badly damaged', 'damaged', 'worn', 'good', 'pristine'],
   weapon.durability, weapon.maxDurability
 );
 ```
 
-## $.prompt - Interactive Prompts
+## $prompt - Interactive Prompts
 
-Use `$.prompt` for gathering input from players. All prompts return Promises that resolve when the player responds.
+Use `$prompt` for gathering input from players. All prompts return Promises that resolve when the player responds.
 
 ### Why Not Manual Input Handling?
 
@@ -938,10 +938,10 @@ async function getPlayerChoice(player, options) {
 }
 
 // DO: 1 line that handles everything
-const choice = await $.prompt.choice(player, 'Choose:', { opt1: 'Option 1', opt2: 'Option 2' });
+const choice = await $prompt.choice(player, 'Choose:', { opt1: 'Option 1', opt2: 'Option 2' });
 ```
 
-$.prompt handles:
+$prompt handles:
 - ✅ Display formatting
 - ✅ Input validation and retry
 - ✅ Nested prompt prevention
@@ -952,11 +952,11 @@ $.prompt handles:
 
 ```javascript
 // Simple text question
-const name = await $.prompt.question(player, 'What is your name? ');
+const name = await $prompt.question(player, 'What is your name? ');
 await player.tell('Hello, ' + name + '!');
 
 // With validation
-const age = await $.prompt.question(player, 'Enter your age: ', (input) => {
+const age = await $prompt.question(player, 'Enter your age: ', (input) => {
   const num = parseInt(input, 10);
   if (isNaN(num) || num < 1 || num > 150) {
     return 'Please enter a valid age (1-150).';
@@ -968,7 +968,7 @@ const age = await $.prompt.question(player, 'Enter your age: ', (input) => {
 ### Yes/No Questions
 
 ```javascript
-const confirmed = await $.prompt.yesorno(player, 'Are you sure?');
+const confirmed = await $prompt.yesorno(player, 'Are you sure?');
 if (confirmed) {
   await player.tell('Proceeding...');
 } else {
@@ -981,7 +981,7 @@ if (confirmed) {
 
 ```javascript
 // Simple numbered choice
-const choice = await $.prompt.choice(player, 'Pick a class:', {
+const choice = await $prompt.choice(player, 'Pick a class:', {
   warrior: 'Warrior - Strong melee fighter',
   mage: 'Mage - Powerful spellcaster',
   rogue: 'Rogue - Stealthy assassin',
@@ -989,7 +989,7 @@ const choice = await $.prompt.choice(player, 'Pick a class:', {
 await player.tell('You chose: ' + choice); // Returns key: 'warrior', 'mage', or 'rogue'
 
 // Columnar menu (better for many options)
-const race = await $.prompt.menu(player, 'Choose your race:', {
+const race = await $prompt.menu(player, 'Choose your race:', {
   human: 'Human',
   elf: 'Elf',
   dwarf: 'Dwarf',
@@ -1004,7 +1004,7 @@ const race = await $.prompt.menu(player, 'Choose your race:', {
 
 ```javascript
 // Collect multiple lines (ends with '.' on its own line)
-const description = await $.prompt.multiline(player, 'Enter your description:');
+const description = await $prompt.multiline(player, 'Enter your description:');
 // Player types multiple lines, ends with just "."
 // User can type @abort to cancel (throws Error)
 
@@ -1016,25 +1016,25 @@ await player.tell('Description set!');
 
 ```javascript
 // Check if player is in a prompt
-if (await $.prompt.isActive(player)) {
+if (await $prompt.isActive(player)) {
   await player.tell('Please answer the current question first.');
   return;
 }
 
 // Cancel current prompt (resolves with null)
-await $.prompt.cancel(player);
+await $prompt.cancel(player);
 ```
 
-## $.memento - Object Cloning
+## $memento - Object Cloning
 
-Use `$.memento` to serialize object graphs and create clones with new IDs. Perfect for body templates, equipment sets, or any object tree that needs duplication.
+Use `$memento` to serialize object graphs and create clones with new IDs. Perfect for body templates, equipment sets, or any object tree that needs duplication.
 
 ### Why Not Manual Cloning?
 
 ```javascript
 // DON'T: 30+ lines of error-prone manual cloning
 async function cloneBody(body) {
-  const newBody = await $.recycler.create(body.parent);
+  const newBody = await $recycler.create(body.parent);
   newBody.name = body.name;
   newBody.hp = body.hp;
   // ... copy 20 more properties ...
@@ -1042,7 +1042,7 @@ async function cloneBody(body) {
   const newParts = {};
   for (const partId of body.parts) {
     const part = await $.load(partId);
-    const newPart = await $.recycler.create(part.parent);
+    const newPart = await $recycler.create(part.parent);
     newPart.name = part.name;
     newPart.owner = newBody.id;  // Update reference
     // ... copy properties ...
@@ -1059,12 +1059,12 @@ async function cloneBody(body) {
 
 // DO: 2 lines that handle the entire object graph
 async function cloneBody(body, ...allParts) {
-  const clones = await $.memento.clone([body, ...allParts]);
+  const clones = await $memento.clone([body, ...allParts]);
   return clones['%0']; // New body with all internal refs updated
 }
 ```
 
-$.memento handles:
+$memento handles:
 - ✅ Deep object graph traversal
 - ✅ Internal reference remapping (part.owner -> new body ID)
 - ✅ External reference preservation (prototype stays same)
@@ -1081,11 +1081,11 @@ $.memento handles:
 
 ```javascript
 // Clone a single object
-const clone = await $.memento.clone([original]);
+const clone = await $memento.clone([original]);
 const newObj = clone['%0']; // %0 is first object
 
 // Clone a connected tree (body with parts)
-const clones = await $.memento.clone([body, head, leftArm, rightArm]);
+const clones = await $memento.clone([body, head, leftArm, rightArm]);
 // clones['%0'] = new body, clones['%1'] = new head, etc.
 // Internal references are updated to point to new objects
 ```
@@ -1094,14 +1094,14 @@ const clones = await $.memento.clone([body, head, leftArm, rightArm]);
 
 ```javascript
 // Capture to JSON (for storage/templates)
-const template = await $.memento.capture([body, head, leftArm, rightArm]);
+const template = await $memento.capture([body, head, leftArm, rightArm]);
 // template is a JSON string
 
 // Store the template
 prototype.bodyTemplate = template;
 
 // Later: create instances from template
-const newParts = await $.memento.rehydrate(prototype.bodyTemplate);
+const newParts = await $memento.rehydrate(prototype.bodyTemplate);
 const newBody = newParts['%0'];
 ```
 
@@ -1111,14 +1111,14 @@ const newBody = newParts['%0'];
 // Objects in the array = "in-graph" -> get new IDs
 // References to other objects = "external" -> stay as existing IDs
 
-const parts = await $.memento.clone([body, arm]);
+const parts = await $memento.clone([body, arm]);
 // body.owner = #123 (external) -> stays #123
 // arm.parent = body (in-graph) -> updated to new body's ID
 ```
 
-## $.exclusions - Action Exclusion System
+## $exclusions - Action Exclusion System
 
-Use `$.exclusions` to prevent incompatible simultaneous actions (sitting while walking, crafting while fighting, etc.). Built on top of `$.mutex` with predefined rules for common actions.
+Use `$exclusions` to prevent incompatible simultaneous actions (sitting while walking, crafting while fighting, etc.). Built on top of `$mutex` with predefined rules for common actions.
 
 ### Why Use Exclusions?
 
@@ -1151,15 +1151,15 @@ async function sit(player) {
 
 // DO: Centralized exclusion system
 async function startWalking(player) {
-  const blocked = await $.exclusions.check(player, 'walk');
+  const blocked = await $exclusions.check(player, 'walk');
   if (blocked) return blocked; // Returns the message string
   
-  await $.exclusions.start(player, 'walk', "You'll need to stop moving first.");
+  await $exclusions.start(player, 'walk', "You'll need to stop moving first.");
   // ... do walking
 }
 
 async function sit(player) {
-  const blocked = await $.exclusions.start(player, 'sit', "You'll need to stand up first.");
+  const blocked = await $exclusions.start(player, 'sit', "You'll need to stand up first.");
   if (blocked) return blocked;
   
   // ... sitting succeeds
@@ -1177,7 +1177,7 @@ async function sit(player) {
 
 ```javascript
 // Start an action (returns false on success, or blocking message string)
-const result = await $.exclusions.start(player, 'sit', "You'll need to stand up first.");
+const result = await $exclusions.start(player, 'sit', "You'll need to stand up first.");
 if (result) {
   return result; // "You'll need to stop moving first." (if walking)
 }
@@ -1186,14 +1186,14 @@ if (result) {
 player.sitting = true;
 
 // End the action
-await $.exclusions.end(player, 'sit');
+await $exclusions.end(player, 'sit');
 ```
 
 ### Check Before Starting
 
 ```javascript
 // Just check without acquiring
-const blocked = await $.exclusions.check(player, 'walk');
+const blocked = await $exclusions.check(player, 'walk');
 if (blocked) {
   return blocked; // Returns the message string
 }
@@ -1221,21 +1221,21 @@ The system comes with common exclusions:
 
 ```javascript
 // Define new action and what it excludes
-await $.exclusions.define('fly', ['walk', 'sit', 'swim']);
+await $exclusions.define('fly', ['walk', 'sit', 'swim']);
 
 // Now flying excludes those actions
-const result = await $.exclusions.start(player, 'fly', "You'll need to land first.");
+const result = await $exclusions.start(player, 'fly', "You'll need to land first.");
 ```
 
 ### Advanced: Get Current Actions
 
 ```javascript
 // See what actions are currently active
-const actions = await $.exclusions.current(player);
+const actions = await $exclusions.current(player);
 // [{ action: 'sit', data: "You'll need to stand up first.", acquiredAt: 1234567890 }]
 
 // Check specific exclusions for an action
-const exclusions = await $.exclusions.get('walk');
+const exclusions = await $exclusions.get('walk');
 // ['sit', 'sleep', 'crafting', 'operating']
 ```
 
@@ -1249,7 +1249,7 @@ obj.setMethod('sit', `
   }
 
   // Check if blocked by other actions (walking, fighting, etc.)
-  const blocked = await $.exclusions.check(player, 'sit');
+  const blocked = await $exclusions.check(player, 'sit');
   if (blocked) return blocked; // "You'll need to stop moving first."
 
   // Find available seat
@@ -1259,12 +1259,12 @@ obj.setMethod('sit', `
   // Sit down and acquire exclusion
   sittable.occupied.push(player.id);
   player.sitting = self.id;
-  await $.exclusions.start(player, 'sit', "You'll need to stand up first.");
+  await $exclusions.start(player, 'sit', "You'll need to stand up first.");
 
   // Now walking is blocked until they stand
   await self.announce(player, null, {
     actor: 'You sit down on ' + sittable.name + '.',
-    others: await $.pronoun.sub('%N sits down on ' + sittable.name + '.', player),
+    others: await $pronoun.sub('%N sits down on ' + sittable.name + '.', player),
   });
 `);
 ```
@@ -1275,10 +1275,10 @@ Walking while already walking **doesn't block** - it queues the next movement. T
 
 ```javascript
 // Check only non-movement exclusions
-const currentActions = await $.exclusions.current(player);
+const currentActions = await $exclusions.current(player);
 for (const actionInfo of currentActions) {
   if (actionInfo.action !== 'walk' && actionInfo.action !== 'run') {
-    const exclusions = await $.exclusions.get(actionInfo.action);
+    const exclusions = await $exclusions.get(actionInfo.action);
     if (exclusions.includes('walk')) {
       return actionInfo.data; // Return the blocking message
     }
@@ -1287,11 +1287,11 @@ for (const actionInfo of currentActions) {
 // Walking while walking is OK - queues movement
 ```
 
-## $.mutex - Object Locks
+## $mutex - Object Locks
 
-Use `$.mutex` for preventing race conditions on objects. Locks are stored on the objects themselves and can auto-expire.
+Use `$mutex` for preventing race conditions on objects. Locks are stored on the objects themselves and can auto-expire.
 
-**Note:** For preventing incompatible actions (sitting/walking), use `$.exclusions` instead - it's built on top of mutex with better semantics.
+**Note:** For preventing incompatible actions (sitting/walking), use `$exclusions` instead - it's built on top of mutex with better semantics.
 
 ### Why Not Manual Lock Tracking?
 
@@ -1319,15 +1319,15 @@ async function startCrafting(player, item) {
 
 // DO: 4 lines with automatic timeout and data storage
 async function startCrafting(player, item) {
-  const blocked = await $.mutex.acquire(item, 'craft', { player: player.id }, 60000);
+  const blocked = await $mutex.acquire(item, 'craft', { player: player.id }, 60000);
   if (blocked) return player.tell('Being crafted by #' + blocked.player);
 
   await doCrafting(item);
-  await $.mutex.release(item, 'craft');
+  await $mutex.release(item, 'craft');
 }
 ```
 
-$.mutex handles:
+$mutex handles:
 - ✅ Lock state persisted on the object itself
 - ✅ Automatic timeout/expiry
 - ✅ Arbitrary data storage with lock
@@ -1338,7 +1338,7 @@ $.mutex handles:
 
 ```javascript
 // Try to acquire a lock
-const blocked = await $.mutex.acquire(room, 'movement');
+const blocked = await $mutex.acquire(room, 'movement');
 
 if (blocked) {
   // Lock already held - blocked contains the stored data
@@ -1350,14 +1350,14 @@ if (blocked) {
 await movePlayer(player, room);
 
 // Release when done
-await $.mutex.release(room, 'movement');
+await $mutex.release(room, 'movement');
 ```
 
 ### Locks with Data
 
 ```javascript
 // Store data with the lock (who/what is holding it)
-const blocked = await $.mutex.acquire(room, 'combat', {
+const blocked = await $mutex.acquire(room, 'combat', {
   attacker: player.id,
   startedAt: Date.now()
 });
@@ -1373,12 +1373,12 @@ if (blocked) {
 
 ```javascript
 // Lock with timeout (auto-releases after 30 seconds)
-await $.mutex.acquire(player, 'crafting', { item: 'sword' }, 30000);
+await $mutex.acquire(player, 'crafting', { item: 'sword' }, 30000);
 
 // Do long operation...
 
 // Release manually (cancels auto-release)
-await $.mutex.release(player, 'crafting');
+await $mutex.release(player, 'crafting');
 
 // Or let it auto-release if player disconnects/times out
 ```
@@ -1387,28 +1387,28 @@ await $.mutex.release(player, 'crafting');
 
 ```javascript
 // Check without acquiring
-const holder = await $.mutex.check(obj, 'lockName');
+const holder = await $mutex.check(obj, 'lockName');
 if (holder) {
   // Lock is held, holder contains the data
 }
 
 // Update data on existing lock
-await $.mutex.update(obj, 'lockName', { newData: true });
+await $mutex.update(obj, 'lockName', { newData: true });
 
 // Extend timeout on existing lock
-await $.mutex.extend(obj, 'lockName', 60000); // Another 60s
+await $mutex.extend(obj, 'lockName', 60000); // Another 60s
 
 // List all locks on object (debugging)
-const locks = await $.mutex.list(obj);
+const locks = await $mutex.list(obj);
 // { lockName: { data: {...}, acquiredAt: 1234567890 }, ... }
 
 // Release all locks on object
-await $.mutex.releaseAll(obj);
+await $mutex.releaseAll(obj);
 ```
 
-## $.scheduler - Periodic Jobs
+## $scheduler - Periodic Jobs
 
-Use `$.scheduler` for recurring tasks like heartbeats, decay processing, and timed events.
+Use `$scheduler` for recurring tasks like heartbeats, decay processing, and timed events.
 
 ### Why Not setInterval/setTimeout?
 
@@ -1435,11 +1435,11 @@ function startDecayJob() {
 // Enable/disable? More code.
 
 // DO: 1 line, persistent, manageable
-await $.scheduler.schedule('decayTick', 0, 60000, $.system, 'processDecay');
+await $scheduler.schedule('decayTick', 0, 60000, $system, 'processDecay');
 // Survives restarts, can pause/resume, can runNow for testing
 ```
 
-$.scheduler handles:
+$scheduler handles:
 - ✅ Persistence across server restarts
 - ✅ Enable/disable without losing config
 - ✅ Manual trigger for testing (`runNow`)
@@ -1452,15 +1452,15 @@ $.scheduler handles:
 // schedule(name, delay, interval, target, method, ...args)
 
 // One-shot: runs once after delay, then deleted
-await $.scheduler.schedule('reminder', 60000, 0, player, 'tell', 'Remember to save!');
+await $scheduler.schedule('reminder', 60000, 0, player, 'tell', 'Remember to save!');
 // Runs in 60 seconds, then job is removed
 
 // Repeating: runs every interval after initial delay
-await $.scheduler.schedule('heartbeat', 0, 60000, $.system, 'tick');
+await $scheduler.schedule('heartbeat', 0, 60000, $system, 'tick');
 // First run immediately (delay=0), then every 60 seconds
 
 // Delayed start repeating
-await $.scheduler.schedule('warmup', 10000, 60000, $.system, 'tick');
+await $scheduler.schedule('warmup', 10000, 60000, $system, 'tick');
 // First run in 10s, then every 60s thereafter
 ```
 
@@ -1479,22 +1479,22 @@ await $.scheduler.schedule('warmup', 10000, 60000, $.system, 'tick');
 
 ```javascript
 // Remove a job
-await $.scheduler.unschedule('jobName');
+await $scheduler.unschedule('jobName');
 
 // Enable/disable without removing
-await $.scheduler.setEnabled('jobName', false);
-await $.scheduler.setEnabled('jobName', true);
+await $scheduler.setEnabled('jobName', false);
+await $scheduler.setEnabled('jobName', true);
 
 // Get job info
-const job = await $.scheduler.getJob('jobName');
+const job = await $scheduler.getJob('jobName');
 // { interval, nextRun, targetId, method, args, enabled }
 
 // List all job names
-const names = await $.scheduler.listJobs();
+const names = await $scheduler.listJobs();
 // ['heartbeat', 'decayTick', ...]
 
 // Force immediate run (for testing)
-await $.scheduler.runNow('jobName');
+await $scheduler.runNow('jobName');
 ```
 
 ### Built-in Jobs
@@ -1503,23 +1503,23 @@ The system registers these jobs automatically:
 
 | Job | Interval | Purpose |
 |-----|----------|---------|
-| `playerHeartbeat` | 60s | Calls `$.system.tickAllPlayers()` |
+| `playerHeartbeat` | 60s | Calls `$system.tickAllPlayers()` |
 | `decayTick` | 60s | Processes decay on all decayable objects |
 
 ### Custom Recurring Tasks
 
 ```javascript
 // Example: save all players every 5 minutes
-await $.scheduler.schedule('autosave', 0, 300000, $.system, 'saveAllPlayers');
+await $scheduler.schedule('autosave', 0, 300000, $system, 'saveAllPlayers');
 
 // Example: respawn enemies every 10 minutes
-await $.scheduler.schedule('respawn', 0, 600000, spawner, 'respawnAll');
+await $scheduler.schedule('respawn', 0, 600000, spawner, 'respawnAll');
 
 // Example: clean up expired sessions hourly
-await $.scheduler.schedule('cleanup', 0, 3600000, $.authManager, 'cleanupSessions');
+await $scheduler.schedule('cleanup', 0, 3600000, $authManager, 'cleanupSessions');
 ```
 
-## $.emote - Sensory Emotes
+## $emote - Sensory Emotes
 
 Freeform emote parsing with sensory awareness. Different viewers perceive different parts based on their senses.
 
@@ -1551,16 +1551,16 @@ myself/yourself       - Reflexive pronouns refer to actor
 
 ```javascript
 // Parse and broadcast to room (main entry point)
-await $.emote.broadcast('.smile at Bob and "Hello!"', actor, room);
+await $emote.broadcast('.smile at Bob and "Hello!"', actor, room);
 
 // Parse emote into segments (for inspection)
-const segments = await $.emote.parseSegments('.fall and ,groan', actor, false);
+const segments = await $emote.parseSegments('.fall and ,groan', actor, false);
 
 // Format for a specific viewer
-const text = await $.emote.format(segments, viewer);
+const text = await $emote.format(segments, viewer);
 
 // Process emote string for a single viewer
-const result = await $.emote.processEmote('.wave', actor, viewer);
+const result = await $emote.processEmote('.wave', actor, viewer);
 ```
 
 ### Sensory Routing Examples
@@ -1600,10 +1600,10 @@ const result = await $.emote.processEmote('.wave', actor, viewer);
 
 ```javascript
 // Get appropriate pronoun for an object
-await $.emote.getObjectPronoun(player)     // "him"/"her"/"them"
-await $.emote.getPossessive(player)        // "his"/"her"/"their"
-await $.emote.getReflexive(player)         // "himself"/"herself"/"themselves"
-await $.emote.getSubjectPronoun(player)    // "he"/"she"/"they"
+await $emote.getObjectPronoun(player)     // "him"/"her"/"them"
+await $emote.getPossessive(player)        // "his"/"her"/"their"
+await $emote.getReflexive(player)         // "himself"/"herself"/"themselves"
+await $emote.getSubjectPronoun(player)    // "he"/"she"/"they"
 ```
 
 ## How `$` Works: ObjectManager and Aliases
@@ -1629,18 +1629,18 @@ $.aliases
 // { nothing: -1, root: 1, system: 2, english: 5, format: 6, ... }
 ```
 
-### How `$.alias` Syntax Works
+### How `$alias` Syntax Works
 
-When you write `$.english`, the Proxy does this:
+When you write `$english`, the Proxy does this:
 
 ```javascript
-// $.english internally does:
+// $english internally does:
 const id = $.aliases['english'];  // Look up 'english' in $.aliases -> 5
 const obj = await $.load(id);     // Load object #5
 return obj;                       // Return the RuntimeObject
 ```
 
-So `$.english.plural('cat')` is really:
+So `$english.plural('cat')` is really:
 1. Get `$.aliases` property
 2. Find `english` -> `5`
 3. Load object #5
@@ -1666,7 +1666,7 @@ All aliases live in `$.aliases` (which is `$.properties.aliases`):
 }
 ```
 
-IDs above 2 are **dynamic**—they're assigned at bootstrap time and may differ between databases. That's why you use `$.english` instead of `$[5]`.
+IDs above 2 are **dynamic**—they're assigned at bootstrap time and may differ between databases. That's why you use `$english` instead of `$[5]`.
 
 ### Why Use Aliases?
 
@@ -1675,7 +1675,7 @@ IDs above 2 are **dynamic**—they're assigned at bootstrap time and may differ 
 const english = await $[5];  // What if english is #7 in this DB?
 
 // DO: Aliases are stable across databases
-const english = $.english;   // Always works
+const english = $english;   // Always works
 ```
 
 ### Managing Aliases
@@ -1683,7 +1683,7 @@ const english = $.english;   // Always works
 Since `$` is the ObjectManager, it has methods for alias management:
 
 ```javascript
-// Add an alias (makes $.myUtils work)
+// Add an alias (makes $myUtils work)
 await $.addAlias('myUtils', obj);  // Pass object, not .id
 
 // Remove an alias
@@ -1707,7 +1707,7 @@ These four aliases are protected and cannot be removed:
 | `root` | #1 | Base prototype for all objects |
 | `system` | #2 | Connection router, player tracking |
 
-### `$[id]` vs `$.alias`
+### `$[id]` vs `$alias`
 
 ```javascript
 // Load by numeric ID (when you have the ID)
@@ -1715,8 +1715,8 @@ const obj = await $[42];
 const obj = await $.load(42);  // Equivalent
 
 // Load by alias (when you want a well-known utility)
-const english = $.english;
-const format = $.format;
+const english = $english;
+const format = $format;
 
 // $ itself is #0, so these are redundant but valid:
 const om = await $[0];  // Same as just using $
@@ -1726,7 +1726,7 @@ const om = await $[0];  // Same as just using $
 
 ```javascript
 // 1. Create the object
-const myUtils = await $.recycler.create($.root, {
+const myUtils = await $recycler.create($root, {
   name: 'MyUtils',
   description: 'Custom utility functions'
 });
@@ -1739,13 +1739,13 @@ myUtils.setMethod('hello', `
 // 3. Register the alias ($ is the ObjectManager)
 await $.addAlias('myUtils', myUtils);  // Pass object, not .id
 
-// 4. Now it's available everywhere as $.myUtils
-await $.myUtils.hello('Bob');  // "Hello, Bob!"
+// 4. Now it's available everywhere as $myUtils
+await $myUtils.hello('Bob');  // "Hello, Bob!"
 ```
 
 ## Creating New Utility Objects
 
-There are two ways to create new `$.aliased` objects:
+There are two ways to create new `$aliased` objects:
 
 ### 1. Runtime: @alias Command (Admins)
 
@@ -1756,7 +1756,7 @@ Create utilities in-game without restarting:
   Parent: 1
   Name: MyUtils
 
-@alias myUtils=#42          ; Register as $.myUtils
+@alias myUtils=#42          ; Register as $myUtils
 
 @aliases                    ; List all aliases
 @alias myUtils              ; Show specific alias
@@ -1768,11 +1768,11 @@ Then add methods to it:
 ```
 @setVerb #42 greet
   Enter code (end with . on its own line):
-  await player.tell('Hello from $.myUtils!');
+  await player.tell('Hello from $myUtils!');
   .
 ```
 
-Now callable as `await $.myUtils.greet()` from anywhere.
+Now callable as `await $myUtils.greet()` from anywhere.
 
 ### 2. MOO Code: $.addAlias()
 
@@ -1780,13 +1780,13 @@ From within MOO code, use `$` (the ObjectManager) directly:
 
 ```javascript
 // Create an object and register it as an alias
-const utils = await $.recycler.create($.root, { name: 'MyUtils' });
+const utils = await $recycler.create($root, { name: 'MyUtils' });
 utils.setMethod('greet', `
   return 'Hello, ' + (args[0] || 'stranger') + '!';
 `);
 
 await $.addAlias('myUtils', utils);  // Pass object, not .id
-// Now $.myUtils.greet('Bob') works from anywhere
+// Now $myUtils.greet('Bob') works from anywhere
 ```
 
 ### 3. Bootstrap: Builder Pattern (Developers)
@@ -1850,7 +1850,7 @@ Then integrate into the bootstrap process.
 1. **Check idempotency** - Always check if the alias already exists before creating
 2. **Use parent #1** (Root) - Utilities don't need complex inheritance
 3. **Document methods** - Add JSDoc comments in method code
-4. **Delegate to existing utilities** - Don't duplicate logic from `$.english`, `$.format`, etc.
+4. **Delegate to existing utilities** - Don't duplicate logic from `$english`, `$format`, etc.
 5. **Register alias last** - Create object and methods before registering the alias
 
 ## Common Patterns
@@ -1862,8 +1862,8 @@ Then integrate into the bootstrap process.
 const msg = actor.name + ' picks up the ' + item.name + '.';
 room.announce(msg);
 
-// DO: Use $.pronoun.announce for perspective-correct messages
-await $.pronoun.announce(room, '%N %v{pick} up %d.', actor, item);
+// DO: Use $pronoun.announce for perspective-correct messages
+await $pronoun.announce(room, '%N %v{pick} up %d.', actor, item);
 ```
 
 ### Listing Items with Proper Grammar
@@ -1872,8 +1872,8 @@ await $.pronoun.announce(room, '%N %v{pick} up %d.', actor, item);
 // DON'T: Manual join
 const msg = items.join(', ');
 
-// DO: Use $.format.prose for Oxford comma
-const msg = await $.format.prose(items.map(i => i.name));
+// DO: Use $format.prose for Oxford comma
+const msg = await $format.prose(items.map(i => i.name));
 // "sword, shield, and helm"
 ```
 
@@ -1883,10 +1883,10 @@ const msg = await $.format.prose(items.map(i => i.name));
 // DON'T: Inline conjugation logic
 const verb = count === 1 ? 'falls' : 'fall';
 
-// DO: Use $.english.conjugate or $.format.verb
-const verb = await $.format.verb('fall', count);
+// DO: Use $english.conjugate or $format.verb
+const verb = await $format.verb('fall', count);
 // Or for non-count contexts:
-const verb = await $.english.conjugate('fall', 3);
+const verb = await $english.conjugate('fall', 3);
 ```
 
 ### Destroying Objects
@@ -1896,7 +1896,7 @@ const verb = await $.english.conjugate('fall', 3);
 item.set('location', null);
 
 // DO: Properly recycle for reuse
-await $.recycler.recycle(item);
+await $recycler.recycle(item);
 ```
 
 ### Multi-Item Messages
@@ -1910,8 +1910,8 @@ if (items.length === 1) {
   msg = 'The ' + items.join(' and ') + ' fall.';
 }
 
-// DO: Use $.format.compose
-const msg = await $.format.compose('%T %v{fall}.', items.map(i => i.name));
+// DO: Use $format.compose
+const msg = await $format.compose('%T %v{fall}.', items.map(i => i.name));
 ```
 
 ## Prototype Hierarchy
@@ -1920,22 +1920,22 @@ When creating new object types, inherit from the appropriate prototype:
 
 | Prototype | Inherits From | Use For |
 |-----------|---------------|---------|
-| `$.describable` | `$.root` | **Foundation** - anything that exists in the world |
-| `$.location` | `$.describable` | Containers (holds contents) |
-| `$.room` | `$.location` | Rooms with exits |
-| `$.exit` | `$.describable` | Directional links between rooms |
-| `$.agent` | `$.describable` | Things that can act (autonomous entities) |
-| `$.embodied` | `$.agent` | Agents with physical bodies |
-| `$.human` | `$.embodied` | Human-type embodied agents |
-| `$.player` | `$.human` | Player characters |
-| `$.admin` | `$.player` | Wizard/admin players |
-| `$.decayable` | `$.describable` | Things that decay over time |
-| `$.edible` | `$.decayable` | Consumable items |
-| `$.food` | `$.edible` | Solid food |
-| `$.drink` | `$.edible` | Liquids |
-| `$.bodyPart` | `$.edible` | Body parts (yes, they're edible!) |
-| `$.wearable` | `$.describable` | Items that can be worn |
-| `$.clothing` | `$.wearable` | Wearable clothing items |
+| `$describable` | `$root` | **Foundation** - anything that exists in the world |
+| `$location` | `$describable` | Containers (holds contents) |
+| `$room` | `$location` | Rooms with exits |
+| `$exit` | `$describable` | Directional links between rooms |
+| `$agent` | `$describable` | Things that can act (autonomous entities) |
+| `$embodied` | `$agent` | Agents with physical bodies |
+| `$human` | `$embodied` | Human-type embodied agents |
+| `$player` | `$human` | Player characters |
+| `$admin` | `$player` | Wizard/admin players |
+| `$decayable` | `$describable` | Things that decay over time |
+| `$edible` | `$decayable` | Consumable items |
+| `$food` | `$edible` | Solid food |
+| `$drink` | `$edible` | Liquids |
+| `$bodyPart` | `$edible` | Body parts (yes, they're edible!) |
+| `$wearable` | `$describable` | Items that can be worn |
+| `$clothing` | `$wearable` | Wearable clothing items |
 
 ## Inheritance, Shadowing, and pass()
 
@@ -1946,11 +1946,11 @@ Objects inherit properties and methods from their parent chain. Understanding ho
 When you read a property, the system walks up the parent chain until it finds a value:
 
 ```javascript
-// Player #100 (parent: $.player)
-// $.player (parent: $.human)
-// $.human has: maxHp = 100
+// Player #100 (parent: $player)
+// $player (parent: $human)
+// $human has: maxHp = 100
 
-const hp = player.maxHp;  // Found on $.human -> returns 100
+const hp = player.maxHp;  // Found on $human -> returns 100
 ```
 
 ### Property Shadowing
@@ -1958,25 +1958,25 @@ const hp = player.maxHp;  // Found on $.human -> returns 100
 When you **set** a property, it's ALWAYS set on the object itself, creating a shadow:
 
 ```javascript
-// $.human has: maxHp = 100
+// $human has: maxHp = 100
 
-player.maxHp = 150;  // Sets on player #100, NOT on $.human
+player.maxHp = 150;  // Sets on player #100, NOT on $human
 
 // Now:
 // - player.maxHp = 150 (own property, shadows parent)
-// - $.human.maxHp = 100 (unchanged)
-// - Other players still inherit 100 from $.human
+// - $human.maxHp = 100 (unchanged)
+// - Other players still inherit 100 from $human
 ```
 
 **This is how instances customize inherited defaults:**
 
 ```javascript
-// All players inherit maxHp=100 from $.human
+// All players inherit maxHp=100 from $human
 // But a specific player can override:
 player.maxHp = 200;  // This player is special
 
 // Another player still gets the default:
-otherPlayer.maxHp;  // 100 (inherited from $.human)
+otherPlayer.maxHp;  // 100 (inherited from $human)
 ```
 
 ### Method Inheritance
@@ -1985,13 +1985,13 @@ Methods work the same way - the system searches up the parent chain:
 
 ```javascript
 // Player #100 doesn't have 'describe' method
-// $.player doesn't have it
-// $.human doesn't have it
-// $.embodied doesn't have it
-// $.agent doesn't have it
-// $.describable HAS it!
+// $player doesn't have it
+// $human doesn't have it
+// $embodied doesn't have it
+// $agent doesn't have it
+// $describable HAS it!
 
-await player.describe();  // Executes $.describable's describe method
+await player.describe();  // Executes $describable's describe method
                           // But 'self' is player #100
 ```
 
@@ -2000,7 +2000,7 @@ await player.describe();  // Executes $.describable's describe method
 Define a method on your object to shadow the parent's version:
 
 ```javascript
-// $.describable has: describe() -> returns name + description
+// $describable has: describe() -> returns name + description
 
 // Override on a specific room:
 room.setMethod('describe', `
@@ -2011,7 +2011,7 @@ room.setMethod('describe', `
 `);
 
 // Now room.describe() uses the custom version
-// Other rooms still use $.describable's version
+// Other rooms still use $describable's version
 ```
 
 ### The pass() Function - Calling Parent Methods
@@ -2019,8 +2019,8 @@ room.setMethod('describe', `
 `pass()` calls the **parent's version** of the current method. Essential for extending rather than replacing behavior.
 
 ```javascript
-// In $.admin.connect():
-// We want to add admin verbs, then do everything $.player.connect() does
+// In $admin.connect():
+// We want to add admin verbs, then do everything $player.connect() does
 
 async connect() {
   // Register admin-specific verbs FIRST
@@ -2029,7 +2029,7 @@ async connect() {
   await self.registerVerb(['@teleport %i to %i'], self, 'teleport');
 
   // NOW call parent's connect() to get all player verbs
-  await pass();  // Calls $.player.connect()
+  await pass();  // Calls $player.connect()
 }
 ```
 
@@ -2059,15 +2059,15 @@ async damage(amount) {
 `pass()` always searches from where the **current method is defined**, not from `self`:
 
 ```javascript
-// Hierarchy: $.admin -> $.player -> $.human -> ...
-// $.player has connect()
-// $.admin has connect() that calls pass()
+// Hierarchy: $admin -> $player -> $human -> ...
+// $player has connect()
+// $admin has connect() that calls pass()
 
 // When admin player connects:
-// 1. $.admin.connect() runs (self = admin player)
-// 2. pass() searches from $.admin's parent ($.player)
-// 3. $.player.connect() runs (self still = admin player)
-// 4. If $.player.connect() also called pass(), it would search from $.player's parent
+// 1. $admin.connect() runs (self = admin player)
+// 2. pass() searches from $admin's parent ($player)
+// 3. $player.connect() runs (self still = admin player)
+// 4. If $player.connect() also called pass(), it would search from $player's parent
 ```
 
 ### Common pass() Patterns
@@ -2135,11 +2135,11 @@ async onArrived(dest, source, mover) {
 
 ### Real-World Example: The Clothing Hierarchy
 
-This shows how `$.wearable` → `$.clothing` → specific item uses shadowing and pass():
+This shows how `$wearable` → `$clothing` → specific item uses shadowing and pass():
 
 ```javascript
 // ═══════════════════════════════════════════════════════════
-// $.wearable - Base prototype (defines core properties)
+// $wearable - Base prototype (defines core properties)
 // ═══════════════════════════════════════════════════════════
 // Properties defined here:
 //   covers: ['torso']     - body slots this covers
@@ -2158,7 +2158,7 @@ async wear(wearer) {
 }
 
 // ═══════════════════════════════════════════════════════════
-// $.clothing - Inherits from $.wearable (adds verbs + messaging)
+// $clothing - Inherits from $wearable (adds verbs + messaging)
 // ═══════════════════════════════════════════════════════════
 // Properties ADDED here (shadows nothing):
 //   material: 'cotton'
@@ -2168,7 +2168,7 @@ async wear(wearer) {
 async doWear() {
   const wearer = args[1];
 
-  // Call the BASE method (on $.wearable) for state change
+  // Call the BASE method (on $wearable) for state change
   const result = await self.wear(wearer);  // NOT pass() - different method!
   if (!result.success) return result.error;
 
@@ -2177,33 +2177,33 @@ async doWear() {
   await wearer.registerVerb(['remove %t'], self, 'doRemove');
 
   // Announce
-  await $.pronoun.announce(room, '%N puts on %d.', wearer, self);
+  await $pronoun.announce(room, '%N puts on %d.', wearer, self);
   return result.message;
 }
 
 // ═══════════════════════════════════════════════════════════
-// Warm Wool Cloak (instance, parent: $.clothing)
+// Warm Wool Cloak (instance, parent: $clothing)
 // ═══════════════════════════════════════════════════════════
 // Properties that SHADOW parent defaults:
-//   name: 'warm wool cloak'     - shadows $.describable default
-//   warmth: 40                  - shadows $.wearable's 0
-//   covers: ['shoulders']       - shadows $.wearable's ['torso']
-//   material: 'wool'            - shadows $.clothing's 'cotton'
-//   color: 'gray'               - shadows $.clothing's 'white'
+//   name: 'warm wool cloak'     - shadows $describable default
+//   warmth: 40                  - shadows $wearable's 0
+//   covers: ['shoulders']       - shadows $wearable's ['torso']
+//   material: 'wool'            - shadows $clothing's 'cotton'
+//   color: 'gray'               - shadows $clothing's 'white'
 
-// NO methods defined - inherits doWear from $.clothing
+// NO methods defined - inherits doWear from $clothing
 // When player types "wear cloak":
-//   1. cloak.doWear() found on $.clothing
+//   1. cloak.doWear() found on $clothing
 //   2. Executes with self = this specific cloak
 //   3. self.warmth = 40 (own property)
-//   4. self.wear() calls $.wearable.wear() with self = cloak
+//   4. self.wear() calls $wearable.wear() with self = cloak
 ```
 
 ### Real-World Example: Admin Extends Player
 
 ```javascript
 // ═══════════════════════════════════════════════════════════
-// $.player.connect() - registers base commands
+// $player.connect() - registers base commands
 // ═══════════════════════════════════════════════════════════
 async connect() {
   // Register player verbs
@@ -2221,7 +2221,7 @@ async connect() {
 }
 
 // ═══════════════════════════════════════════════════════════
-// $.admin.connect() - adds admin commands, then calls parent
+// $admin.connect() - adds admin commands, then calls parent
 // ═══════════════════════════════════════════════════════════
 async connect() {
   // FIRST: Register admin-only verbs
@@ -2243,14 +2243,14 @@ async connect() {
 
 ```javascript
 // ═══════════════════════════════════════════════════════════
-// $.describable.describe() - base description
+// $describable.describe() - base description
 // ═══════════════════════════════════════════════════════════
 async describe(viewer) {
   return self.name + '\n' + self.description;
 }
 
 // ═══════════════════════════════════════════════════════════
-// $.location.describe() - adds contents listing
+// $location.describe() - adds contents listing
 // ═══════════════════════════════════════════════════════════
 async describe(viewer) {
   let text = await pass(viewer);  // Get base description
@@ -2270,7 +2270,7 @@ async describe(viewer) {
 }
 
 // ═══════════════════════════════════════════════════════════
-// $.room.describe() - adds exits
+// $room.describe() - adds exits
 // ═══════════════════════════════════════════════════════════
 async describe(viewer) {
   let text = await pass(viewer);  // Get location description (includes contents)
@@ -2326,7 +2326,7 @@ room.setMethod('describe', `
 
 ```javascript
 // ═══════════════════════════════════════════════════════════
-// $.embodied.takeDamage() - base damage handling
+// $embodied.takeDamage() - base damage handling
 // ═══════════════════════════════════════════════════════════
 async takeDamage(amount, type, source) {
   self.hp = Math.max(0, self.hp - amount);
@@ -2339,7 +2339,7 @@ async takeDamage(amount, type, source) {
 }
 
 // ═══════════════════════════════════════════════════════════
-// $.human.takeDamage() - adds armor reduction
+// $human.takeDamage() - adds armor reduction
 // ═══════════════════════════════════════════════════════════
 async takeDamage(amount, type, source) {
   // Calculate armor reduction
@@ -2352,14 +2352,14 @@ async takeDamage(amount, type, source) {
 }
 
 // ═══════════════════════════════════════════════════════════
-// $.player.takeDamage() - adds pain messages
+// $player.takeDamage() - adds pain messages
 // ═══════════════════════════════════════════════════════════
 async takeDamage(amount, type, source) {
   // Let parent chain handle the actual damage
   const actualDamage = await pass(amount, type, source);
 
   // Add player feedback
-  const severity = await $.proportional.sub(
+  const severity = await $proportional.sub(
     ['a scratch', 'painful', 'serious', 'devastating'],
     actualDamage, 50
   );
@@ -2369,17 +2369,17 @@ async takeDamage(amount, type, source) {
 }
 
 // When a player takes 30 slashing damage:
-// 1. $.player.takeDamage(30, 'slashing', enemy) called
-// 2. pass(30, ...) → $.human.takeDamage(30, 'slashing', enemy)
-// 3. Armor reduces to 22, pass(22, ...) → $.embodied.takeDamage(22, ...)
+// 1. $player.takeDamage(30, 'slashing', enemy) called
+// 2. pass(30, ...) → $human.takeDamage(30, 'slashing', enemy)
+// 3. Armor reduces to 22, pass(22, ...) → $embodied.takeDamage(22, ...)
 // 4. HP reduced by 22, returns 22
-// 5. Back in $.human, returns 22
-// 6. Back in $.player, shows "You take serious damage!", returns 22
+// 5. Back in $human, returns 22
+// 6. Back in $player, shows "You take serious damage!", returns 22
 ```
 
-## $.describable - The Foundation
+## $describable - The Foundation
 
-**Everything that exists in the world inherits from `$.describable`.** It provides:
+**Everything that exists in the world inherits from `$describable`.** It provides:
 
 ### Properties
 
@@ -2471,7 +2471,7 @@ container.setMethod('onContentLeft', `
 container.setMethod('onContentArrived', `
   const [obj, source, mover] = args;
   // Called AFTER obj arrived - announcements
-  await $.pronoun.announce(self, '%N %v{arrive}.', obj);
+  await $pronoun.announce(self, '%N %v{arrive}.', obj);
 `);
 ```
 
@@ -2492,9 +2492,9 @@ await item.moveTo(room, player);
 // Handles everything correctly
 ```
 
-## $.location - Containers
+## $location - Containers
 
-`$.location` extends `$.describable` to support containing other objects.
+`$location` extends `$describable` to support containing other objects.
 
 ### Additional Methods
 
@@ -2628,7 +2628,7 @@ await player.registerVerb(['north', 'n'], exit, 'go');
 
 **Player Login:**
 ```javascript
-// In $.player.connect():
+// In $player.connect():
 async connect() {
   // Register base commands
   await self.registerVerb(['look', 'l'], self, 'look');
@@ -2641,7 +2641,7 @@ async connect() {
 
 **Admin Extends Player:**
 ```javascript
-// In $.admin.connect():
+// In $admin.connect():
 async connect() {
   // Register admin commands BEFORE calling parent
   await self.registerVerb(['@dig %s'], self, 'dig');
@@ -2656,7 +2656,7 @@ async connect() {
 
 **Item Pickup:**
 ```javascript
-// In $.clothing.onArrived():
+// In $clothing.onArrived():
 async onArrived(dest, source, mover) {
   // dest = the hand that now holds this item
   if (dest && dest.owner) {
@@ -2670,7 +2670,7 @@ async onArrived(dest, source, mover) {
 
 **Room Entry:**
 ```javascript
-// In $.room.onContentArrived():
+// In $room.onContentArrived():
 async onContentArrived(obj, source, mover) {
   // If a player just entered, register exit verbs
   if (obj.isPlayer) {
@@ -2697,7 +2697,7 @@ await player.unregisterVerbsFrom(itemId);
 // - Room's onContentLeaving() for exit verbs
 ```
 
-**In $.clothing.onLeaving():**
+**In $clothing.onLeaving():**
 ```javascript
 async onLeaving(source, dest, mover) {
   if (source && source.owner) {
@@ -2708,7 +2708,7 @@ async onLeaving(source, dest, mover) {
 }
 ```
 
-**In $.room.onContentLeaving():**
+**In $room.onContentLeaving():**
 ```javascript
 async onContentLeaving(obj, dest, mover) {
   if (obj.isPlayer) {
@@ -2891,9 +2891,9 @@ obj.setMethod('wear', `
 // Result: Clean, extensible, testable
 ```
 
-### Example: $.wearable (Base) + $.clothing (Implementation)
+### Example: $wearable (Base) + $clothing (Implementation)
 
-#### $.wearable - The Base Prototype
+#### $wearable - The Base Prototype
 
 Handles **metadata** and **state manipulation**. No verbs. No messaging.
 
@@ -2932,9 +2932,9 @@ const desc = await item.getWornDescription();
 
 **Notice:** No `doWear`, no `doRemove`, no room announcements, no verb registration. Just pure state management.
 
-#### $.clothing - The Implementation Prototype
+#### $clothing - The Implementation Prototype
 
-Inherits from `$.wearable`. Adds **verbs**, **messaging**, and **hooks**.
+Inherits from `$wearable`. Adds **verbs**, **messaging**, and **hooks**.
 
 **Additional Properties:**
 ```javascript
@@ -2961,7 +2961,7 @@ obj.setMethod('doWear', `
 
   // 3. Announce to room using utilities
   const room = await $.load(wearer.location);
-  const msg = await $.pronoun.sub('%N puts on %t.', wearer, null, null, self);
+  const msg = await $pronoun.sub('%N puts on %t.', wearer, null, null, self);
   await room.announce(msg, wearer);
 
   return result.message;
@@ -2985,7 +2985,7 @@ obj.setMethod('doRemove', `
   }
 
   // 4. Announce
-  const msg = await $.pronoun.sub('%N takes off %t.', wearer, null, null, self);
+  const msg = await $pronoun.sub('%N takes off %t.', wearer, null, null, self);
   await room.announce(msg, wearer);
 
   return result.message;
@@ -3041,14 +3041,14 @@ obj.setMethod('onLeaving', `
 
 | Layer | Responsibility | Changes When |
 |-------|----------------|--------------|
-| Base ($.wearable) | State, validation | Core mechanics change |
-| Impl ($.clothing) | Verbs, messaging | UI/UX changes |
+| Base ($wearable) | State, validation | Core mechanics change |
+| Impl ($clothing) | Verbs, messaging | UI/UX changes |
 | Hooks | Registration timing | Movement system changes |
 
 **Benefits:**
 - Base can be tested without verb system
 - Messaging can be changed without touching state logic
-- New implementations ($.armor, $.jewelry) reuse base methods
+- New implementations ($armor, $jewelry) reuse base methods
 - Hooks are the ONLY connection to movement - clean interface
 
 ### Creating Your Own Object Types
@@ -3056,29 +3056,29 @@ obj.setMethod('onLeaving', `
 Follow this pattern for every new object type:
 
 ```javascript
-// 1. BASE: $.consumable - handles state
+// 1. BASE: $consumable - handles state
 //    Properties: calories, hydration, spoilage, consumed
 //    Methods: canConsume(), consume(), getCalories()
 //    NO verbs, NO messaging
 
-// 2. IMPL: $.food - handles verbs + messaging
+// 2. IMPL: $food - handles verbs + messaging
 //    doEat() - calls consume(), announces, registers 'eat more' or removes verb
 //    onArrived() - registers 'eat' verb when in hand
 //    onLeaving() - unregisters verbs
 
-// 3. IMPL: $.drink - different verbs, same base
+// 3. IMPL: $drink - different verbs, same base
 //    doDrink() - calls consume(), announces differently
 //    onArrived() - registers 'drink' verb
 
-// Both $.food and $.drink reuse $.consumable's state logic
+// Both $food and $drink reuse $consumable's state logic
 // They just differ in verbs and messaging
 ```
 
-### Second Example: $.edible (Base) + $.food/$.drink (Implementations)
+### Second Example: $edible (Base) + $food/$drink (Implementations)
 
 Same pattern, different domain. One base, multiple implementations sharing the same state logic.
 
-#### $.edible - The Base Prototype
+#### $edible - The Base Prototype
 
 Handles consumption state. No verbs. No "eat" or "drink".
 
@@ -3120,7 +3120,7 @@ const hasMore = await food.hasRemaining();
 
 **Notice:** `consume()` does ALL the work but sends NO messages. It returns data for the caller to format.
 
-#### $.food - Implementation for Solid Food
+#### $food - Implementation for Solid Food
 
 Adds `eat` verb, handles presentation:
 
@@ -3149,8 +3149,8 @@ obj.setMethod('eat', `
     ? 'You finish eating ' + self.name + '.'
     : 'You take a bite of ' + self.name + '.';
 
-  // 5. Announce to room using $.pronoun
-  const eatMsg = await $.pronoun.sub('%N takes a bite of %t.', eater, null, null, self);
+  // 5. Announce to room using $pronoun
+  const eatMsg = await $pronoun.sub('%N takes a bite of %t.', eater, null, null, self);
   await location.announce(eatMsg, eater);
 
   return msg + warnMsg;
@@ -3165,7 +3165,7 @@ obj.setMethod('onArrived', `
 `);
 ```
 
-#### $.drink - Implementation for Liquids
+#### $drink - Implementation for Liquids
 
 Same base, different verb and messaging:
 
@@ -3182,7 +3182,7 @@ obj.setMethod('drink', `
     ? 'You finish drinking ' + self.name + '.'
     : 'You take a sip of ' + self.name + '.';
 
-  const drinkMsg = await $.pronoun.sub('%N takes a sip of %t.', drinker, null, null, self);
+  const drinkMsg = await $pronoun.sub('%N takes a sip of %t.', drinker, null, null, self);
   await location.announce(drinkMsg, drinker);
 
   return msg;
@@ -3204,15 +3204,15 @@ obj.setMethod('onArrived', `
 
 #### The Pattern in Action
 
-| What | $.edible (Base) | $.food (Impl) | $.drink (Impl) |
+| What | $edible (Base) | $food (Impl) | $drink (Impl) |
 |------|-----------------|---------------|----------------|
 | State change | `consume()` | calls it | calls it |
 | Verb | none | `eat` | `drink`, `sip` |
 | Message | none | "take a bite" | "take a sip" |
-| Announce | none | $.pronoun.sub | $.pronoun.sub |
+| Announce | none | $pronoun.sub | $pronoun.sub |
 | Hook | none | onArrived | onArrived |
 
-**Both implementations share 100% of the state logic in $.edible.**
+**Both implementations share 100% of the state logic in $edible.**
 
 ### Anti-Patterns to Avoid
 
@@ -3220,23 +3220,23 @@ obj.setMethod('onArrived', `
 // BAD: Putting verbs in base prototype
 // Now every wearable has doWear - armor, jewelry, everything
 // Can't customize messaging per subtype
-$.wearable.setMethod('doWear', ...);  // NO!
+$wearable.setMethod('doWear', ...);  // NO!
 
 // BAD: Putting state logic in implementation
-// Now you duplicate wear logic in $.clothing, $.armor, $.jewelry
-$.clothing.setMethod('wear', `
+// Now you duplicate wear logic in $clothing, $armor, $jewelry
+$clothing.setMethod('wear', `
   // 100 lines of state logic that should be in base
 `);  // NO!
 
 // BAD: Hardcoding messages in base
-$.wearable.setMethod('wear', `
+$wearable.setMethod('wear', `
   // ...
   await room.announce(player.name + ' puts on the ' + self.name);  // NO!
   // This should be in the implementation
 `);
 
 // BAD: Not using hooks
-$.clothing.setMethod('wear', `
+$clothing.setMethod('wear', `
   // Manually register verbs
   await wearer.registerVerb(['remove'], self, 'doRemove');
   // What if player drops it? Verb is still registered!
@@ -3254,33 +3254,33 @@ $.clothing.setMethod('wear', `
 | Register a system alias | `$.addAlias()` |
 | Remove a system alias | `$.removeAlias()` |
 | Lookup an alias | `$.getAlias()` |
-| Pluralize a noun | `$.english.plural()` |
-| Conjugate a verb (person) | `$.english.conjugate()` |
-| Conjugate by count | `$.format.verb()` |
-| Past tense | `$.english.pastTense()` |
-| Add article (a/an) | `$.english.article()` |
-| List with Oxford comma | `$.format.prose()` |
-| Template with list + verb | `$.format.compose()` |
-| Perspective-aware text | `$.pronoun.sub()` |
-| Room announcements | `$.pronoun.announce()` |
-| Create objects | `$.recycler.create()` |
-| Destroy objects | `$.recycler.recycle()` |
-| Proportional message | `$.proportional.sub()` |
-| Percentage message | `$.proportional.fromPercent()` |
-| Ask text question | `$.prompt.question()` |
-| Ask yes/no | `$.prompt.yesorno()` |
-| Show choice menu | `$.prompt.choice()`, `$.prompt.menu()` |
-| Multiline input | `$.prompt.multiline()` |
-| Clone object tree | `$.memento.clone()` |
-| Serialize objects | `$.memento.capture()` |
-| Acquire lock | `$.mutex.acquire()` |
-| Release lock | `$.mutex.release()` |
-| Schedule job | `$.scheduler.schedule()` |
-| Remove job | `$.scheduler.unschedule()` |
-| Format tables/columns | `$.format.table()`, `$.format.columns()` |
-| Sensory-aware emotes | `$.emote.broadcast()` |
-| Parse emote to segments | `$.emote.parseSegments()` |
-| Get pronouns for object | `$.emote.getObjectPronoun()` |
+| Pluralize a noun | `$english.plural()` |
+| Conjugate a verb (person) | `$english.conjugate()` |
+| Conjugate by count | `$format.verb()` |
+| Past tense | `$english.pastTense()` |
+| Add article (a/an) | `$english.article()` |
+| List with Oxford comma | `$format.prose()` |
+| Template with list + verb | `$format.compose()` |
+| Perspective-aware text | `$pronoun.sub()` |
+| Room announcements | `$pronoun.announce()` |
+| Create objects | `$recycler.create()` |
+| Destroy objects | `$recycler.recycle()` |
+| Proportional message | `$proportional.sub()` |
+| Percentage message | `$proportional.fromPercent()` |
+| Ask text question | `$prompt.question()` |
+| Ask yes/no | `$prompt.yesorno()` |
+| Show choice menu | `$prompt.choice()`, `$prompt.menu()` |
+| Multiline input | `$prompt.multiline()` |
+| Clone object tree | `$memento.clone()` |
+| Serialize objects | `$memento.capture()` |
+| Acquire lock | `$mutex.acquire()` |
+| Release lock | `$mutex.release()` |
+| Schedule job | `$scheduler.schedule()` |
+| Remove job | `$scheduler.unschedule()` |
+| Format tables/columns | `$format.table()`, `$format.columns()` |
+| Sensory-aware emotes | `$emote.broadcast()` |
+| Parse emote to segments | `$emote.parseSegments()` |
+| Get pronouns for object | `$emote.getObjectPronoun()` |
 
 ## Error Handling
 
@@ -3460,10 +3460,10 @@ Only skip await when:
 
 ```javascript
 // OK: Background logging that handles its own errors
-$.logger.logAsync('Player connected');  // Handles errors internally
+$logger.logAsync('Player connected');  // Handles errors internally
 
 // OK: Scheduling something for later
-$.scheduler.schedule(60000, self, 'decay');  // Returns immediately
+$scheduler.schedule(60000, self, 'decay');  // Returns immediately
 ```
 
 ## Context and Output
@@ -3622,18 +3622,18 @@ async see(message, source) {
 
 **Key point:** Sensory events can wake a sleeping player! A loud noise (`hear`) has higher stimulus intensity than a faint smell. Strong enough stimulus transitions sleep state.
 
-### The Emote System: $.emote.broadcast()
+### The Emote System: $emote.broadcast()
 
-For complex actions involving multiple senses, use `$.emote.broadcast()`:
+For complex actions involving multiple senses, use `$emote.broadcast()`:
 
 ```javascript
 // Simple usage
-await $.emote.broadcast('.wave', player, room);
+await $emote.broadcast('.wave', player, room);
 // Sighted see: "Bob waves."
 // Blind see: (nothing)
 
 // With speech
-await $.emote.broadcast('.smile and .say "Hello!"', player, room);
+await $emote.broadcast('.smile and .say "Hello!"', player, room);
 // Sighted+hearing: "Bob smiles and says, 'Hello!'"
 // Blind but hearing: "Bob says, 'Hello!'"
 // Deaf but sighted: "Bob smiles and says something."
@@ -3657,23 +3657,23 @@ Different markers route to different senses:
 
 ```javascript
 // Visual + speech
-await $.emote.broadcast('.fall to my knees and .say "Help me!"', player, room);
+await $emote.broadcast('.fall to my knees and .say "Help me!"', player, room);
 // Sighted+hearing: "Bob falls to his knees and says, 'Help me!'"
 // Blind: "Bob says, 'Help me!'"
 // Deaf: "Bob falls to his knees and says something."
 
 // Audible non-speech (footsteps, growls)
-await $.emote.broadcast(',stomp loudly', player, room);
+await $emote.broadcast(',stomp loudly', player, room);
 // Hearing: "Bob stomps loudly."
 // Deaf: (nothing - stomping is audible, not visual)
 
 // Olfactory
-await $.emote.broadcast('~emanate a powerful stench', player, room);
+await $emote.broadcast('~emanate a powerful stench', player, room);
 // Can smell: "Bob emanates a powerful stench."
 // Anosmic: (nothing)
 
 // Combined
-await $.emote.broadcast('.grin and ,chuckle softly', player, room);
+await $emote.broadcast('.grin and ,chuckle softly', player, room);
 // Sighted+hearing: "Bob grins and chuckles softly."
 // Blind: "Bob chuckles softly."
 // Deaf: "Bob grins."
@@ -3684,7 +3684,7 @@ await $.emote.broadcast('.grin and ,chuckle softly', player, room);
 Names shift pronoun targets. `my` always refers to actor:
 
 ```javascript
-await $.emote.broadcast('.wave at Alice and .smile at her', bob, room);
+await $emote.broadcast('.wave at Alice and .smile at her', bob, room);
 // Alice sees: "Bob waves at you and smiles at you."
 // Others see: "Bob waves at Alice and smiles at her."
 // Bob sees: "You wave at Alice and smile at her."
@@ -3702,12 +3702,12 @@ await room.announce('The ground shakes violently!');
 await room.announce('Bob picks up a sword.', bob);
 ```
 
-### Perspective-Aware with $.pronoun
+### Perspective-Aware with $pronoun
 
 For perspective substitution without full emote parsing:
 
 ```javascript
-await $.pronoun.announce(room, '%N picks up %t.', player, sword);
+await $pronoun.announce(room, '%N picks up %t.', player, sword);
 // Actor: "You pick up the sword."
 // Others: "Bob picks up the sword."
 ```
@@ -3724,7 +3724,7 @@ async doPickUp(player, item) {
 
   // Others perceive via their senses
   const room = player.location;
-  await $.emote.broadcast('.pick up ' + item.name, player, room);
+  await $emote.broadcast('.pick up ' + item.name, player, room);
 }
 ```
 
@@ -3859,8 +3859,8 @@ for (const obj of room.contents) {
 }
 
 // Filter contents
-const items = room.contents.filter(obj => obj.getParent() === $.item.id);
-const players = room.contents.filter(obj => obj.getParent() === $.player.id);
+const items = room.contents.filter(obj => obj.getParent() === $item.id);
+const players = room.contents.filter(obj => obj.getParent() === $player.id);
 
 // Find specific item
 const sword = room.contents.find(obj => obj.name === 'sword');
@@ -3899,16 +3899,16 @@ async transferAll(from, to, mover) {
 
 ## Object Creation
 
-### Always Use $.recycler.create()
+### Always Use $recycler.create()
 
 ```javascript
 // WRONG: Never create objects any other way
-const obj = await $.recycler.create($.agent, {});  // NO!
+const obj = await $recycler.create($agent, {});  // NO!
 
 
 // RIGHT: Use the recycler
-const obj = await $.recycler.create($.item);  // Reuses IDs properly
-const obj2 = await $.recycler.create($.room, { name: 'New Room' });
+const obj = await $recycler.create($item);  // Reuses IDs properly
+const obj2 = await $recycler.create($room, { name: 'New Room' });
 ```
 
 ### Choosing the Right Parent
@@ -3917,26 +3917,26 @@ Pick the most specific prototype that matches what your object IS:
 
 ```javascript
 // Creating a room
-const room = await $.recycler.create($.room, {
+const room = await $recycler.create($room, {
   name: 'Dark Cave',
   description: 'A damp, dark cave.'
 });
 
 // Creating a player
-const player = await $.recycler.create($.player, {
+const player = await $recycler.create($player, {
   name: 'Alice',
   playername: 'alice'
 });
 
 // Creating clothing
-const shirt = await $.recycler.create($.clothing, {
+const shirt = await $recycler.create($clothing, {
   name: 'red shirt',
   warmth: 5,
   slots: ['torso']
 });
 
 // Creating food
-const apple = await $.recycler.create($.food, {
+const apple = await $recycler.create($food, {
   name: 'apple',
   calories: 50,
   bites: 3
@@ -3949,7 +3949,7 @@ Most objects are **instances** - they inherit from a prototype but have their ow
 
 ```javascript
 // Instance: A specific apple in the game
-const apple = await $.recycler.create($.food, { name: 'apple' });
+const apple = await $recycler.create($food, { name: 'apple' });
 
 // Prototype: Define once, many instances inherit
 // Only create new prototypes when you need new BEHAVIOR, not just new data
@@ -3961,7 +3961,7 @@ Create a new prototype when you need **new methods or different behavior**:
 
 ```javascript
 // New prototype: Magical food with special effects
-const magicFood = await $.recycler.create($.food, { name: 'MagicFood' });
+const magicFood = await $recycler.create($food, { name: 'MagicFood' });
 magicFood.setMethod('onEat', `
   await pass();  // Normal eating
   await player.tell('You feel magical energy coursing through you!');
@@ -3970,7 +3970,7 @@ magicFood.setMethod('onEat', `
 await $.addAlias('magicFood', magicFood);
 
 // Now create instances of the new prototype
-const manaPotion = await $.recycler.create($.magicFood, {
+const manaPotion = await $recycler.create($magicFood, {
   name: 'mana potion',
   calories: 10
 });
@@ -3979,7 +3979,7 @@ const manaPotion = await $.recycler.create($.magicFood, {
 ### Setting Properties After Creation
 
 ```javascript
-const sword = await $.recycler.create($.item, { name: 'sword' });
+const sword = await $recycler.create($item, { name: 'sword' });
 
 // Set additional properties
 sword.description = 'A sharp steel sword.';
@@ -3997,10 +3997,10 @@ Always use `moveTo()` for initial placement:
 
 ```javascript
 // Create and place
-const chest = await $.recycler.create($.container, { name: 'chest' });
+const chest = await $recycler.create($container, { name: 'chest' });
 await chest.moveTo(room);  // Place in room
 
-const gold = await $.recycler.create($.item, { name: 'gold coins' });
+const gold = await $recycler.create($item, { name: 'gold coins' });
 await gold.moveTo(chest);  // Place in chest
 ```
 
@@ -4009,7 +4009,7 @@ await gold.moveTo(chest);  // Place in chest
 ```javascript
 // Create a room with contents
 async createShop() {
-  const shop = await $.recycler.create($.room, {
+  const shop = await $recycler.create($room, {
     name: 'General Store',
     description: 'A cluttered shop full of goods.'
   });
@@ -4017,12 +4017,12 @@ async createShop() {
   // Create items and place them
   const items = ['rope', 'torch', 'rations'];
   for (const name of items) {
-    const item = await $.recycler.create($.item, { name });
+    const item = await $recycler.create($item, { name });
     await item.moveTo(shop);
   }
 
   // Create the shopkeeper (a character - may be human or AI controlled)
-  const keeper = await $.recycler.create($.player, {
+  const keeper = await $recycler.create($player, {
     name: 'shopkeeper',
     description: 'A friendly merchant.'
   });

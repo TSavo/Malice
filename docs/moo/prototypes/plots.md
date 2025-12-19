@@ -6,36 +6,36 @@ Narrative event logging, job tracking, and dynamic quest system for Malice.
 
 The plot system provides tools for creating dynamic, reactive narratives:
 
-- **$.plot** - Narrative event log with metadata (pure data store)
-- **$.plotSpawner** - Base for plot-generating entities (state management, no verbs)
-- **$.jobBoard** - Physical implementation (verbs + movement hooks)
-- **$.plotDB** - Global plot index for external systems (Claude polling)
+- **$plot** - Narrative event log with metadata (pure data store)
+- **$plotSpawner** - Base for plot-generating entities (state management, no verbs)
+- **$jobBoard** - Physical implementation (verbs + movement hooks)
+- **$plotDB** - Global plot index for external systems (Claude polling)
 
 Together, these enable emergent storytelling where NPCs, items, and locations can spawn quests that players discover and complete.
 
 ## Architecture
 
-### Data Layer: $.plot
+### Data Layer: $plot
 
 Pure data object storing narrative history and job state.
 
-### Logic Layer: $.plotSpawner
+### Logic Layer: $plotSpawner
 
 Base prototype providing plot/job management. NO player interaction verbs.
 
-### Implementation Layer: $.jobBoard
+### Implementation Layer: $jobBoard
 
-Physical object players interact with. Inherits from $.plotSpawner, adds:
+Physical object players interact with. Inherits from $plotSpawner, adds:
 - Movement hooks (register/unregister verbs)
 - Player-facing verbs (doUse, doCheck)
 
-### Index Layer: $.plotDB
+### Index Layer: $plotDB
 
 Global registry tracking all plots for external polling.
 
-## $.plot - Narrative Event Log
+## $plot - Narrative Event Log
 
-Inherits from: **$.root**
+Inherits from: **$root**
 
 ### Purpose
 
@@ -299,7 +299,7 @@ await plot.registerJobHook(
 // Watch for item being dropped anywhere
 await plot.registerJobHook(
   'find-evidence',
-  $.system,                 // Global watch
+  $system,                 // Global watch
   'onDropped',
   { itemType: 'evidence' }
 );
@@ -358,7 +358,7 @@ plot.setMethod('onJobHookTriggered', `
     await self.completeJob(jobId, 'Package delivered successfully');
     
     // Reward the player
-    const player = await $.load(data.giverId);
+    const player = await $load(data.giverId);
     if (player) {
       player.credits = (player.credits || 0) + job.metadata.reward;
       await player.tell('You earned ' + job.metadata.reward + ' credits!');
@@ -386,9 +386,9 @@ const hooks = await plot.getJobHooks('deliver-package');
 // [{ targetId: 123, eventName: 'onReceive' }, ...]
 ```
 
-## $.plotSpawner - Plot Generator
+## $plotSpawner - Plot Generator
 
-Inherits from: **$.root**
+Inherits from: **$root**
 
 ### Purpose
 
@@ -436,13 +436,13 @@ Get plots with active jobs.
 const active = await spawner.getActivePlots();
 ```
 
-## $.jobBoard - Physical Implementation
+## $jobBoard - Physical Implementation
 
-Inherits from: **$.plotSpawner → $.describable**
+Inherits from: **$plotSpawner → $describable**
 
 ### Purpose
 
-Physical object players can interact with. Adds movement hooks and player-facing verbs to $.plotSpawner's state management.
+Physical object players can interact with. Adds movement hooks and player-facing verbs to $plotSpawner's state management.
 
 ### Movement Hooks
 
@@ -482,7 +482,7 @@ Player checks their active jobs from this board.
 ### Creating a Job Board
 
 ```javascript
-const board = await $.recycler.create($.jobBoard, {
+const board = await $recycler.create($jobBoard, {
   name: 'wooden job board',
   description: 'A weathered board with posted jobs.',
   systemPrompt: 'Generate delivery jobs for Pioneer Square couriers.',
@@ -495,7 +495,7 @@ await board.moveTo(room);
 // - "check board" to see their active jobs
 ```
 
-## $.plotDB - Global Plot Index
+## $plotDB - Global Plot Index
 
 ### Purpose
 
@@ -507,14 +507,14 @@ Tracks all plots globally for external systems (Claude API) to poll for updates.
 Add plot to global index.
 
 ```javascript
-await $.plotDB.register(plot);
+await $plotDB.register(plot);
 ```
 
 #### getLatest(since)
 Get plots modified since timestamp (for polling).
 
 ```javascript
-const recent = await $.plotDB.getLatest('2025-12-11T10:00:00.000Z');
+const recent = await $plotDB.getLatest('2025-12-11T10:00:00.000Z');
 // Returns plots that need attention
 ```
 
@@ -523,7 +523,7 @@ const recent = await $.plotDB.getLatest('2025-12-11T10:00:00.000Z');
 ### Setup: Create Job Board
 
 ```javascript
-const board = await $.recycler.create($.jobBoard, {
+const board = await $recycler.create($jobBoard, {
   name: 'courier board',
   description: 'A digital board listing delivery jobs.',
 });
@@ -542,7 +542,7 @@ const plot = await board.createPlot(
 );
 
 // Create package item
-const package = await $.recycler.create($.item, {
+const package = await $recycler.create($item, {
   name: 'sealed package',
   description: 'A brown package sealed with tape.',
 });
@@ -632,7 +632,7 @@ plot.setMethod('onJobHookTriggered', `
     await self.completeJob(jobId, 'Package delivered to Bob');
     
     // Reward the player
-    const player = await $.load(data.giverId);
+    const player = await $load(data.giverId);
     if (player) {
       const reward = job.metadata.reward || 0;
       player.credits = (player.credits || 0) + reward;
@@ -697,7 +697,7 @@ plot.setMethod('onJobHookTriggered', `
     await self.setJobMetadata(jobId, 'stage', 2);
     await self.setJobMetadata(jobId, 'stages', stages);
     
-    const player = await $.load(data.playerId);
+    const player = await $load(data.playerId);
     await player.tell('Stage 1 complete! Next: Find evidence.');
   }
   // ... handle other stages ...
@@ -721,7 +721,7 @@ plot.setMethod('onJobHookTriggered', `
 6. **Use metadata liberally** - Store any contextual data
 7. **Override onJobHookTriggered** - Custom logic per plot
 8. **Summarize long event logs** - Keep context manageable
-9. **$.jobBoard for physical presence** - $.plotSpawner for logic only
+9. **$jobBoard for physical presence** - $plotSpawner for logic only
 10. **Register hooks early** - Before player can trigger them
 
 ## Common Patterns

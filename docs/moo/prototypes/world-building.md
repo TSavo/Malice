@@ -9,7 +9,7 @@ Malice provides two world-building systems:
 1. **WorldBuilder** - Street-level outdoor world (grids, coordinates, automatic connections)
 2. **BuildingBuilder** - Indoor building interiors (explicit connections, placeholders, multi-floor)
 
-Both work with the same **coordinate system** and **$.room / $.exit** prototypes.
+Both work with the same **coordinate system** and **$room / $exit** prototypes.
 
 ## Coordinate System
 
@@ -116,7 +116,7 @@ export const room = {
 1. **Load** - Scans directories, imports all `.ts` files
 2. **Create** - Creates room objects with coordinates
 3. **Connect** - Automatically creates exits between adjacent rooms
-4. **Register** - Sets `$.startRoom` alias
+4. **Register** - Sets `$startRoom` alias
 
 **Automatic Exit Creation:**
 - Rooms at (x, y+1) get 'north'/'south' exits
@@ -546,16 +546,16 @@ export const building = {
 Or connect explicitly after bootstrap:
 
 ```javascript
-const street = await $.startRoom;  // Or find street room
-const building = await $.load(buildingEntranceId);
+const street = await $startRoom;  // Or find street room
+const building = await $load(buildingEntranceId);
 
-const exitIn = await $.recycler.create($.exit, {
+const exitIn = await $recycler.create($exit, {
   name: 'door',
   aliases: ['d', 'in'],
   destRoom: building.id,
 });
 
-const exitOut = await $.recycler.create($.exit, {
+const exitOut = await $recycler.create($exit, {
   name: 'out',
   aliases: ['o'],
   destRoom: street.id,
@@ -631,7 +631,7 @@ Security: Biometric locks on floors 35, 42
 
 ```javascript
 // Check if room exists at coordinates
-const room = await $.load(await $.getAlias('startRoom'));
+const room = await $load(await $getAlias('startRoom'));
 console.log(room.x, room.y, room.z);
 ```
 
@@ -641,7 +641,7 @@ console.log(room.x, room.y, room.z);
 // List room's exits
 const exits = room.exits || [];
 for (const exitId of exits) {
-  const exit = await $.load(exitId);
+  const exit = await $load(exitId);
   console.log(exit.name, '->', exit.destRoom);
 }
 ```
@@ -665,7 +665,7 @@ console.log('Floor rooms:', elevator.floorRooms);
 
 // Verify floor rooms exist
 for (const [floor, roomId] of Object.entries(elevator.floorRooms)) {
-  const room = await $.load(roomId);
+  const room = await $load(roomId);
   console.log(`Floor ${floor}:`, room?.name || 'NOT FOUND');
 }
 ```

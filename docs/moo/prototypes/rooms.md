@@ -6,15 +6,15 @@ Understanding rooms, exits, elevators, and spatial coordinates in Malice.
 
 The room system provides the spatial foundation for the game world. Three key prototypes work together:
 
-- **$.room** - Locations with coordinates, exits, and environmental properties
-- **$.exit** - Directional connections between rooms with locks and aliases
-- **$.elevator** - Vertical transport between floors with composable security
+- **$room** - Locations with coordinates, exits, and environmental properties
+- **$exit** - Directional connections between rooms with locks and aliases
+- **$elevator** - Vertical transport between floors with composable security
 
 All rooms exist in a 3D coordinate grid (x, y, z) and connect via exits.
 
-## $.room - Room Prototype
+## $room - Room Prototype
 
-Inherits from: **$.location**
+Inherits from: **$location**
 
 ### Purpose
 
@@ -91,9 +91,9 @@ Rooms are locations with spatial coordinates, exits, crowd mechanics, and enviro
 
 ### Key Methods
 
-### Content Management (inherited from $.location)
+### Content Management (inherited from $location)
 
-Rooms inherit content management methods from `$.location`:
+Rooms inherit content management methods from `$location`:
 
 #### addContent(objOrId)
 Add an object to this location's contents. Accepts either an object ID (number) or a RuntimeObject.
@@ -204,9 +204,9 @@ Have player stand up from furniture.
 await room.stand(player);
 ```
 
-## $.exit - Exit Prototype
+## $exit - Exit Prototype
 
-Inherits from: **$.describable**
+Inherits from: **$describable**
 
 ### Purpose
 
@@ -276,9 +276,9 @@ if (result.success) {
 }
 ```
 
-## $.elevator - Elevator Prototype
+## $elevator - Elevator Prototype
 
-Inherits from: **$.location**
+Inherits from: **$location**
 
 ### Purpose
 
@@ -312,19 +312,19 @@ Elevators can have multiple locks that all must approve access:
 
 ```javascript
 // Add biometric scanner
-const bioLock = await $.recycler.create($.biometricLock, {
+const bioLock = await $recycler.create($biometricLock, {
   authorizedFingerprints: ['alice-fp', 'bob-fp']
 });
 await elevator.addLock(bioLock);
 
 // Add keycard reader
-const cardLock = await $.recycler.create($.keycardLock, {
+const cardLock = await $recycler.create($keycardLock, {
   authorizedCards: [cardId1, cardId2]
 });
 await elevator.addLock(cardLock);
 
 // Add floor restriction lock
-const floorLock = await $.recycler.create($.floorLock, {
+const floorLock = await $recycler.create($floorLock, {
   restrictedFloors: [35, 42],  // Only certain people can access
   authorizedAgents: [adminId]
 });
@@ -399,7 +399,7 @@ await elevator.closeDoors();
 ### Basic Room
 
 ```javascript
-const room = await $.recycler.create($.room, {
+const room = await $recycler.create($room, {
   name: 'Coffee Shop',
   description: 'A cozy coffee shop with the aroma of fresh brew.',
   x: 5,
@@ -416,7 +416,7 @@ const room = await $.recycler.create($.room, {
 
 ```javascript
 // Create exit to another room
-const exitNorth = await $.recycler.create($.exit, {
+const exitNorth = await $recycler.create($exit, {
   name: 'north',
   aliases: ['n'],
   destRoom: northRoomId,
@@ -450,7 +450,7 @@ await room.addSittable(
 ### Basic Elevator
 
 ```javascript
-const elevator = await $.recycler.create($.elevator, {
+const elevator = await $recycler.create($elevator, {
   name: 'Smith Tower Elevator',
   description: 'An art deco elevator car with polished brass.',
   currentFloor: 1,
@@ -473,7 +473,7 @@ elevator.floorRooms = {
 
 ```javascript
 // Restrict top floors to VIPs
-const vipLock = await $.recycler.create($.floorLock, {
+const vipLock = await $recycler.create($floorLock, {
   restrictedFloors: [35, 42],
   authorizedAgents: [vipId1, vipId2]
 });
@@ -488,7 +488,7 @@ await elevator.addLock(vipLock);
 ```javascript
 async function connectRooms(room1, room2, dir1, dir2, distance) {
   // Exit from room1 to room2
-  const exit1 = await $.recycler.create($.exit, {
+  const exit1 = await $recycler.create($exit, {
     name: dir1,
     aliases: [dir1[0]],  // First letter as alias
     destRoom: room2.id,
@@ -497,7 +497,7 @@ async function connectRooms(room1, room2, dir1, dir2, distance) {
   await room1.addExit(exit1);
 
   // Exit from room2 to room1
-  const exit2 = await $.recycler.create($.exit, {
+  const exit2 = await $recycler.create($exit, {
     name: dir2,
     aliases: [dir2[0]],
     destRoom: room1.id,
@@ -513,7 +513,7 @@ await connectRooms(lobby, hallway, 'north', 'south', 15);
 ### Locked Exit
 
 ```javascript
-const lockedDoor = await $.recycler.create($.exit, {
+const lockedDoor = await $recycler.create($exit, {
   name: 'door',
   aliases: ['d'],
   destRoom: secretRoomId,
@@ -528,7 +528,7 @@ await room.addExit(lockedDoor);
 ### Hidden Exit
 
 ```javascript
-const secretPassage = await $.recycler.create($.exit, {
+const secretPassage = await $recycler.create($exit, {
   name: 'passage',
   aliases: ['p'],
   destRoom: hiddenRoomId,
@@ -591,7 +591,7 @@ room.outdoor = false;   // Indoor, artificial light/climate
 ### Street Intersection
 
 ```javascript
-const intersection = await $.recycler.create($.room, {
+const intersection = await $recycler.create($room, {
   name: 'S. Main St & 2nd Ave',
   description: 'A busy intersection in Pioneer Square. Traffic lights ' +
                'cycle through their routine as pedestrians hurry past.',
@@ -608,7 +608,7 @@ const intersection = await $.recycler.create($.room, {
 ### Underground Tunnel
 
 ```javascript
-const tunnel = await $.recycler.create($.room, {
+const tunnel = await $recycler.create($room, {
   name: 'Underground Passage',
   description: 'A damp brick tunnel beneath the city. Water drips ' +
                'from the ceiling and puddles on the cracked floor.',
@@ -626,7 +626,7 @@ const tunnel = await $.recycler.create($.room, {
 ### Office Building Lobby
 
 ```javascript
-const lobby = await $.recycler.create($.room, {
+const lobby = await $recycler.create($room, {
   name: 'Smith Tower Lobby',
   description: 'An art deco lobby with marble floors and brass fixtures.',
   x: -5,
@@ -647,7 +647,7 @@ await lobby.addSittable(
 );
 
 // Add elevator
-const elevator = await $.recycler.create($.elevator, {
+const elevator = await $recycler.create($elevator, {
   name: 'elevator',
   currentFloor: 0,
   floors: [0, 1, 2, 11, 35, 42],

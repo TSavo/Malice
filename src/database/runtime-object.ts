@@ -472,8 +472,32 @@ export class RuntimeObjectImpl implements RuntimeObject {
     // - $: the object manager (for finding other objects)
     // - args: method arguments
     // - $N: direct object references ($2, $3, etc.) via Proxy
+    // - $alias: pre-resolved aliases (e.g., $exit, $room, $recycler)
 
     const self = this.proxy;
+
+    // Pre-load all aliases as RuntimeObjects for direct access as $alias variables
+    // This allows MOO code to use $exit, $room, $recycler directly
+    const objectManager = await this.manager.load(0);
+    const aliasIds = (objectManager?.get('aliases') as Record<string, number | Record<string, number>>) || {};
+    const resolvedAliases: Record<string, RuntimeObject> = {};
+    const aliasNames: string[] = [];
+    
+    for (const [name, value] of Object.entries(aliasIds)) {
+      // Skip nested objects (like bodyParts, weapons, ammoTypes, magazines)
+      if (typeof value === 'number') {
+        const obj = this.manager.getSync(value);
+        if (obj) {
+          resolvedAliases[name] = obj;
+          aliasNames.push(name);
+        }
+      }
+    }
+
+    // Generate variable declarations for all aliases (e.g., "const $exit = ctx._aliases['exit'];")
+    const aliasDeclarations = aliasNames
+      .map(name => `const $${name} = ctx._aliases['${name}'];`)
+      .join('\n        ');
 
     // Create a Proxy for $ that allows $[42] syntax (returns Promise)
     // Also delegates unknown properties/methods to ObjectManager #0
@@ -563,6 +587,7 @@ export class RuntimeObjectImpl implements RuntimeObject {
           command: verbCommand || '',
           pass: chainedPass, // New pass that searches from parent's parent
           methodName,
+          _aliases: resolvedAliases, // Pre-resolved alias objects for $alias variable injection
           // Standard JavaScript globals
           Object, Array, Math, JSON, Date, String, Number, Boolean,
           RegExp, Error, Promise, console, parseInt, parseFloat, isNaN, isFinite,
@@ -593,6 +618,7 @@ export class RuntimeObjectImpl implements RuntimeObject {
           const parseFloat = ctx.parseFloat;
           const isNaN = ctx.isNaN;
           const isFinite = ctx.isFinite;
+          ${aliasDeclarations}
           return (async () => {
             ${parentJsCode}
           })();
@@ -613,6 +639,7 @@ export class RuntimeObjectImpl implements RuntimeObject {
       command: verbCommand || '', // Raw command string from verb dispatch
       pass, // MOO-style pass() to call parent's method
       methodName, // Current method name (useful for debugging/reflection)
+      _aliases: resolvedAliases, // Pre-resolved alias objects for $alias variable injection
       // Standard JavaScript globals for @eval and general use
       Object,
       Array,
@@ -661,6 +688,7 @@ export class RuntimeObjectImpl implements RuntimeObject {
         const parseFloat = ctx.parseFloat;
         const isNaN = ctx.isNaN;
         const isFinite = ctx.isFinite;
+        ${aliasDeclarations}
         return (async () => {
           ${jsCode}
         })();

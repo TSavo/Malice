@@ -4,11 +4,11 @@ The prompt system handles interactive player input including questions, menus, y
 
 ## Overview
 
-When you need to get input from a player during method execution, use `$.prompt`. It suspends the method until the player responds, then returns their input.
+When you need to get input from a player during method execution, use `$prompt`. It suspends the method until the player responds, then returns their input.
 
 ```javascript
 // Ask a question and wait for answer
-const name = await $.prompt.question(player, "What is your name? ");
+const name = await $prompt.question(player, "What is your name? ");
 await player.tell("Hello, " + name + "!");
 ```
 
@@ -19,10 +19,10 @@ await player.tell("Hello, " + name + "!");
 Ask for free-form text input.
 
 ```javascript
-const answer = await $.prompt.question(player, "Enter your password: ");
+const answer = await $prompt.question(player, "Enter your password: ");
 
 // With validation
-const answer = await $.prompt.question(player, "Enter a number: ", (input) => {
+const answer = await $prompt.question(player, "Enter a number: ", (input) => {
   const num = parseInt(input);
   if (isNaN(num)) return "Please enter a valid number.";
   if (num < 0) return "Number must be positive.";
@@ -42,7 +42,7 @@ const answer = await $.prompt.question(player, "Enter a number: ", (input) => {
 Present numbered options and return the selected key.
 
 ```javascript
-const result = await $.prompt.choice(player, "Choose your class:", {
+const result = await $prompt.choice(player, "Choose your class:", {
   warrior: "Warrior - Strong melee fighter",
   mage: "Mage - Powerful spellcaster",
   rogue: "Rogue - Stealthy assassin",
@@ -75,7 +75,7 @@ Enter choice: _
 Ask a yes/no question.
 
 ```javascript
-const confirmed = await $.prompt.yesorno(player, "Delete all items?");
+const confirmed = await $prompt.yesorno(player, "Delete all items?");
 if (confirmed) {
   // Delete items
   await player.tell("Items deleted.");
@@ -102,7 +102,7 @@ Delete all items? (yes/no): _
 Present options in a multi-column layout.
 
 ```javascript
-const direction = await $.prompt.menu(player, "Where do you want to go?", {
+const direction = await $prompt.menu(player, "Where do you want to go?", {
   north: "Go North",
   south: "Go South",
   east: "Go East",
@@ -139,7 +139,7 @@ Enter number or name: _
 Collect multiple lines of text, ending with `.` on its own line.
 
 ```javascript
-const description = await $.prompt.multiline(player, "Enter room description:");
+const description = await $prompt.multiline(player, "Enter room description:");
 await player.tell("You entered:\n" + description);
 ```
 
@@ -168,7 +168,7 @@ Enter room description:
 ### isActive - Check for Active Prompt
 
 ```javascript
-if (await $.prompt.isActive(player)) {
+if (await $prompt.isActive(player)) {
   // Player is answering a prompt - don't send other output
 }
 ```
@@ -177,7 +177,7 @@ if (await $.prompt.isActive(player)) {
 
 ```javascript
 // Cancel current prompt (resolves with null)
-await $.prompt.cancel(player);
+await $prompt.cancel(player);
 ```
 
 ### handleInput - Process Player Input
@@ -186,8 +186,8 @@ This is called automatically by the player's input handler:
 
 ```javascript
 // In player.onInput:
-if ($.prompt && await $.prompt.isActive(self)) {
-  const handled = await $.prompt.handleInput(self, input);
+if ($prompt && await $prompt.isActive(self)) {
+  const handled = await $prompt.handleInput(self, input);
   if (handled) return;  // Prompt handled the input
 }
 ```
@@ -221,7 +221,7 @@ player._promptState = {
 ```javascript
 async function createCharacter(player) {
   // Get name
-  const name = await $.prompt.question(player, "Enter character name: ", (input) => {
+  const name = await $prompt.question(player, "Enter character name: ", (input) => {
     if (input.length < 2) return "Name must be at least 2 characters.";
     if (input.length > 20) return "Name must be at most 20 characters.";
     if (!/^[a-zA-Z]+$/.test(input)) return "Name must contain only letters.";
@@ -229,21 +229,21 @@ async function createCharacter(player) {
   });
 
   // Choose class
-  const charClass = await $.prompt.choice(player, "Choose your class:", {
+  const charClass = await $prompt.choice(player, "Choose your class:", {
     warrior: "Warrior - High strength, heavy armor",
     mage: "Mage - Powerful magic, low defense",
     rogue: "Rogue - Fast and stealthy",
   });
 
   // Choose sex
-  const sex = await $.prompt.choice(player, "Choose your sex:", {
+  const sex = await $prompt.choice(player, "Choose your sex:", {
     male: "Male",
     female: "Female",
     'non-binary': "Non-binary",
   });
 
   // Confirm
-  const confirmed = await $.prompt.yesorno(player,
+  const confirmed = await $prompt.yesorno(player,
     "Create " + name + " the " + charClass + "?"
   );
 
@@ -277,13 +277,13 @@ async function vend(player, machine) {
   }
 
   // Let player choose
-  const choice = await $.prompt.menu(player, "Select an item:", options, 2);
+  const choice = await $prompt.menu(player, "Select an item:", options, 2);
   const selectedIndex = parseInt(choice);
   const selected = items[selectedIndex];
   const price = selected.price || machine.defaultPrice || 0;
 
   // Confirm purchase
-  const confirmed = await $.prompt.yesorno(player,
+  const confirmed = await $prompt.yesorno(player,
     "Buy " + selected.name + " for $" + price + "?"
   );
 
@@ -304,13 +304,13 @@ async function editRoomDescription(admin, room) {
   await admin.tell(room.description);
   await admin.tell("");
 
-  const proceed = await $.prompt.yesorno(admin, "Edit this description?");
+  const proceed = await $prompt.yesorno(admin, "Edit this description?");
   if (!proceed) {
     return "Cancelled.";
   }
 
   try {
-    const newDesc = await $.prompt.multiline(admin,
+    const newDesc = await $prompt.multiline(admin,
       "Enter new description (end with . on its own line, @abort to cancel):"
     );
 
@@ -331,7 +331,7 @@ async function editRoomDescription(admin, room) {
 ```javascript
 async function atmMenu(player, terminal) {
   while (true) {
-    const action = await $.prompt.choice(player, "ATM Menu:", {
+    const action = await $prompt.choice(player, "ATM Menu:", {
       balance: "Check Balance",
       deposit: "Deposit",
       withdraw: "Withdraw",
@@ -346,7 +346,7 @@ async function atmMenu(player, terminal) {
         break;
 
       case 'deposit':
-        const depositAmt = await $.prompt.question(player, "Amount to deposit: $", (input) => {
+        const depositAmt = await $prompt.question(player, "Amount to deposit: $", (input) => {
           const num = parseFloat(input);
           if (isNaN(num) || num <= 0) return "Enter a positive amount.";
           return null;
@@ -356,7 +356,7 @@ async function atmMenu(player, terminal) {
         break;
 
       case 'withdraw':
-        const withdrawAmt = await $.prompt.question(player, "Amount to withdraw: $", (input) => {
+        const withdrawAmt = await $prompt.question(player, "Amount to withdraw: $", (input) => {
           const num = parseFloat(input);
           if (isNaN(num) || num <= 0) return "Enter a positive amount.";
           return null;
@@ -370,8 +370,8 @@ async function atmMenu(player, terminal) {
         break;
 
       case 'transfer':
-        const recipient = await $.prompt.question(player, "Recipient account: ");
-        const transferAmt = await $.prompt.question(player, "Amount: $");
+        const recipient = await $prompt.question(player, "Recipient account: ");
+        const transferAmt = await $prompt.question(player, "Amount: $");
         await doTransfer(player, recipient, parseFloat(transferAmt));
         break;
 
@@ -389,7 +389,7 @@ Prompts don't automatically acquire exclusions, but you may want to:
 
 ```javascript
 // Start operating a terminal
-const blocked = await $.exclusions.start(player, 'operating', { terminal: self });
+const blocked = await $exclusions.start(player, 'operating', { terminal: self });
 if (blocked) return blocked;
 
 try {
@@ -397,7 +397,7 @@ try {
   await atmMenu(player, self);
 } finally {
   // Always end the exclusion
-  await $.exclusions.end(player, 'operating');
+  await $exclusions.end(player, 'operating');
 }
 ```
 
@@ -406,7 +406,7 @@ try {
 ### 1. Always Handle Cancelled Prompts
 
 ```javascript
-const answer = await $.prompt.question(player, "Enter value: ");
+const answer = await $prompt.question(player, "Enter value: ");
 if (!answer) {
   // Prompt was cancelled or empty
   return "Cancelled.";
@@ -417,7 +417,7 @@ if (!answer) {
 
 ```javascript
 // Validate as you go, not after
-const age = await $.prompt.question(player, "Enter age: ", (input) => {
+const age = await $prompt.question(player, "Enter age: ", (input) => {
   const num = parseInt(input);
   if (isNaN(num)) return "Please enter a number.";
   if (num < 0 || num > 150) return "Please enter a realistic age.";
@@ -429,17 +429,17 @@ const age = await $.prompt.question(player, "Enter age: ", (input) => {
 
 ```javascript
 // Good - tells user what to expect
-await $.prompt.question(player, "Enter your 4-digit PIN: ");
+await $prompt.question(player, "Enter your 4-digit PIN: ");
 
 // Less clear
-await $.prompt.question(player, "PIN: ");
+await $prompt.question(player, "PIN: ");
 ```
 
 ### 4. Handle multiline Abort
 
 ```javascript
 try {
-  const text = await $.prompt.multiline(player, "Enter text:");
+  const text = await $prompt.multiline(player, "Enter text:");
   // Use text
 } catch (e) {
   if (e.message === 'Aborted by user') {
@@ -454,13 +454,13 @@ try {
 
 ```javascript
 // Don't spam output during prompts
-if (!await $.prompt.isActive(player)) {
+if (!await $prompt.isActive(player)) {
   await player.tell("Something happened!");
 }
 ```
 
 ## See Also
 
-- [$ Globals Reference](./globals.md) - $.prompt
+- [$ Globals Reference](./globals.md) - $prompt
 - [Verb System](./verbs.md) - Command handling that triggers prompts
 - [Exclusions System](./exclusions.md) - Blocking actions during prompts

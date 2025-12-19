@@ -5,13 +5,13 @@ Composable locks, biometric authentication, faction access, banks, and lockers i
 ## Overview
 
 Security in Malice is built on composable lock objects. Locks can be attached to exits, elevators, containers, or any object needing restricted access. The system supports:
-- **$.lock** - Base lock interface
-- **$.biometricLock** - Fingerprint/retinal scan authentication
-- **$.guardedExit** - Faction-based access control for exits
-- **$.bank / $.bankTerminal** - Banking system, accounts, transactions
-- **$.locker / $.oneTimeLocker** - Storage containers with locks
+- **$lock** - Base lock interface
+- **$biometricLock** - Fingerprint/retinal scan authentication
+- **$guardedExit** - Faction-based access control for exits
+- **$bank / $bankTerminal** - Banking system, accounts, transactions
+- **$locker / $oneTimeLocker** - Storage containers with locks
 
-## $.lock - Base Lock Prototype
+## $lock - Base Lock Prototype
 
 ### Purpose
 
@@ -31,9 +31,9 @@ if (result === true) {
 }
 ```
 
-## $.biometricLock - Biometric Authentication
+## $biometricLock - Biometric Authentication
 
-Inherits from: **$.lock**
+Inherits from: **$lock**
 
 ### Purpose
 
@@ -86,13 +86,13 @@ Remove a user from the authorized list.
 await biometricLock.deauthorize(player, 35);
 ```
 
-## $.guardedExit - Faction-Based Access Control
+## $guardedExit - Faction-Based Access Control
 
-Inherits from: **$.exit**
+Inherits from: **$exit**
 
 ### Purpose
 
-Restricts passage to members of a specific faction. Uses the $.faction singleton to check membership.
+Restricts passage to members of a specific faction. Uses the $faction singleton to check membership.
 
 ### Properties
 
@@ -148,7 +148,7 @@ exits: {
 Locks can be stacked for multi-factor security:
 
 ```javascript
-const bioLock = await $.recycler.create($.biometricLock, {
+const bioLock = await $recycler.create($biometricLock, {
   scanners: [
     { type: 'retinal', part: 'eye' },
     { type: 'fingerprint', part: 'hand' }
@@ -156,7 +156,7 @@ const bioLock = await $.recycler.create($.biometricLock, {
   authorizedUsers: { 35: [adminId] }
 });
 
-const codeLock = await $.recycler.create($.lock, {
+const codeLock = await $recycler.create($lock, {
   code: '1234',
   // ...
 });
@@ -166,7 +166,7 @@ await elevator.addLock(bioLock);
 await elevator.addLock(codeLock);
 ```
 
-## $.bank / $.bankTerminal - Banking System
+## $bank / $bankTerminal - Banking System
 
 ### Purpose
 
@@ -217,7 +217,7 @@ Check account balance.
 const balance = await bank.getBalance(player);
 ```
 
-## $.locker / $.oneTimeLocker - Storage Containers
+## $locker / $oneTimeLocker - Storage Containers
 
 ### Purpose
 
@@ -258,7 +258,7 @@ await locker.close(player);
 
 ```javascript
 // Create biometric lock for elevator
-const bioLock = await $.recycler.create($.biometricLock, {
+const bioLock = await $recycler.create($biometricLock, {
   scanners: [
     { type: 'retinal', part: 'eye' },
     { type: 'fingerprint', part: 'hand' }
@@ -330,11 +330,11 @@ Base prototype for access control systems. Can be attached to elevators, doors, 
 - `canAccess(agent, target)`: Returns true or rejection string (base lock allows all access)
 
 ## Subclasses
-- `$.biometricLock`: Scans body parts
-- `$.keycardLock`: Requires keycard item
-- `$.passwordLock`: Requires password
-- `$.timeLock`: Restricts by time
-- `$.rentableLock`: Bank-based rental access
+- `$biometricLock`: Scans body parts
+- `$keycardLock`: Requires keycard item
+- `$passwordLock`: Requires password
+- `$timeLock`: Restricts by time
+- `$rentableLock`: Bank-based rental access
 
 ---
 
@@ -424,7 +424,7 @@ const hasAccess = await rentableLock.isRenter(player);
 ```
 
 ### promptForCode(agent, target)
-Interactive code entry via $.prompt.
+Interactive code entry via $prompt.
 
 ```javascript
 const result = await rentableLock.promptForCode(player, room);
@@ -445,8 +445,8 @@ await rentableLock.syncCode('NEWCODE1');
 For bidirectional doors/exits, link two rentable locks:
 
 ```javascript
-const lockA = await $.recycler.create($.rentableLock, { ... });
-const lockB = await $.recycler.create($.rentableLock, { ... });
+const lockA = await $recycler.create($rentableLock, { ... });
+const lockB = await $recycler.create($rentableLock, { ... });
 
 lockA.linkedLockId = lockB.id;
 lockB.linkedLockId = lockA.id;
@@ -458,11 +458,11 @@ lockB.linkedLockId = lockA.id;
 ## Example: Rentable Storage Room
 
 ```javascript
-const storageLock = await $.recycler.create($.rentableLock, {
+const storageLock = await $recycler.create($rentableLock, {
   name: 'Storage Room Lock',
   price: 50,                      // 50 credits per rental
   duration: 24 * 60 * 60 * 1000,  // 24 hours
-  bank: $.bank.id,
+  bank: $bank.id,
   account: 'STORAGE-REVENUE-001',
 });
 
@@ -504,12 +504,12 @@ Scans body parts for authorization. Inherits from Lock.
 
 ```javascript
 // Create elevator with biometric lock
-const elevator = await $.recycler.create($.elevator, {
+const elevator = await $recycler.create($elevator, {
   floors: [1, 2, 35, 42],
   floorRooms: { 1: lobbyId, 35: vipLoungeId, 42: penthouseId },
 });
 
-const bioLock = await $.recycler.create($.biometricLock, {
+const bioLock = await $recycler.create($biometricLock, {
   scanners: [
     { type: 'retinal', part: 'eye', message: 'Retinal scan failed.' },
     { type: 'fingerprint', part: 'hand', message: 'Fingerprint scan failed.' }
@@ -537,12 +537,12 @@ if (result === true) {
 
 ## Door Integration
 
-Exits now support a `door` property. If present, all access checks are delegated to the referenced `$.door` object. This enables unified, bidirectional access control, lock state, and messaging for doors and exits.
+Exits now support a `door` property. If present, all access checks are delegated to the referenced `$door` object. This enables unified, bidirectional access control, lock state, and messaging for doors and exits.
 
 **Example:**
 ```javascript
 // Create a door object
-const door = await $.recycler.create($.door, { ... });
+const door = await $recycler.create($door, { ... });
 // Attach to both exits
 exitAtoB.door = door.id;
 exitBtoA.door = door.id;

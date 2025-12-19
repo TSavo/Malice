@@ -5,7 +5,7 @@ Understanding Malice's bootstrap process and how to create custom system builder
 ## Purpose
 
 The bootstrap system initializes a fresh Malice database, creating the minimal object hierarchy and all core utilities. Understanding this process is essential for:
-- Adding new utility systems (like custom `$.myUtility`)
+- Adding new utility systems (like custom `$myUtility`)
 - Understanding startup sequence
 - Debugging initialization issues
 - Creating custom world content
@@ -25,8 +25,8 @@ Phase 2: AliasLoader
 └─ Loads all aliases from MongoDB (root.properties.aliases)
 
 Phase 3: World Building (if needed)
-├─ PrototypeBuilder: Creates $.describable, $.agent, $.player, etc.
-├─ CoreSystemBuilder: Creates all utilities ($.english, $.format, etc.)
+├─ PrototypeBuilder: Creates $describable, $agent, $player, etc.
+├─ CoreSystemBuilder: Creates all utilities ($english, $format, etc.)
 ├─ WorldBuilder: Creates initial rooms and world geometry
 └─ AliasLoader (again): Reloads to include new aliases
 ```
@@ -132,33 +132,33 @@ Loads aliases from MongoDB's `root.properties.aliases`:
 - Can add/remove aliases without code changes
 - Persists across restarts
 
-After loading, these become available as `$.english`, `$.format`, etc.
+After loading, these become available as `$english`, `$format`, etc.
 
 ## Phase 3: World Building
 
-Only runs if the world hasn't been built yet (checks for `$.player` existence).
+Only runs if the world hasn't been built yet (checks for `$player` existence).
 
 ### PrototypeBuilder
 
 Creates the object hierarchy:
 
 ```
-$.root (#1)
-└─ $.describable
-    ├─ $.location
-    │   └─ $.room
-    ├─ $.exit
-    ├─ $.agent
-    │   └─ $.embodied
-    │       └─ $.human
-    │           └─ $.player
-    │               └─ $.admin
-    ├─ $.wearable
-    │   └─ $.clothing
-    └─ $.edible
-        ├─ $.food
-        ├─ $.drink
-        └─ $.bodyPart
+$root (#1)
+└─ $describable
+    ├─ $location
+    │   └─ $room
+    ├─ $exit
+    ├─ $agent
+    │   └─ $embodied
+    │       └─ $human
+    │           └─ $player
+    │               └─ $admin
+    ├─ $wearable
+    │   └─ $clothing
+    └─ $edible
+        ├─ $food
+        ├─ $drink
+        └─ $bodyPart
 ```
 
 Each prototype is created with:
@@ -172,22 +172,22 @@ Creates all utility systems (dynamic IDs):
 
 | Builder | Alias | Purpose |
 |---------|-------|---------|
-| AuthManagerBuilder | `authManager` | Login system |
-| CharGenBuilder | `charGen` | Character creation |
-| RecyclerBuilder | `recycler` | Object lifecycle |
-| EnglishBuilder | `english` | Grammar utilities |
-| PronounSubBuilder | `pronoun` | Perspective messaging |
-| FormatBuilder | `format` | Text formatting |
-| ProportionalBuilder | `proportional` | Value-based messages |
-| PromptBuilder | `prompt` | Interactive input |
-| EmoteBuilder | `emote` | Sensory emotes |
-| SchedulerBuilder | `scheduler` | Job scheduling |
-| MutexBuilder | `mutex` | Object locks |
-| ExclusionsBuilder | `exclusions` | Action exclusions |
-| MementoBuilder | `memento` | Object cloning |
-| PlotBuilder | `plot` | Narrative logging |
-| RoomBuilder | `room` | Room utilities |
-| BodyFactoryBuilder | `bodyFactory` | Body creation |
+| AuthManagerBuilder | `$authManager` | Login system |
+| CharGenBuilder | `$charGen` | Character creation |
+| RecyclerBuilder | `$recycler` | Object lifecycle |
+| EnglishBuilder | `$english` | Grammar utilities |
+| PronounSubBuilder | `$pronoun` | Perspective messaging |
+| FormatBuilder | `$format` | Text formatting |
+| ProportionalBuilder | `$proportional` | Value-based messages |
+| PromptBuilder | `$prompt` | Interactive input |
+| EmoteBuilder | `$emote` | Sensory emotes |
+| SchedulerBuilder | `$scheduler` | Job scheduling |
+| MutexBuilder | `$mutex` | Object locks |
+| ExclusionsBuilder | `$exclusions` | Action exclusions |
+| MementoBuilder | `$memento` | Object cloning |
+| PlotBuilder | `$plot` | Narrative logging |
+| RoomBuilder | `$room` | Room utilities |
+| BodyFactoryBuilder | `$bodyFactory` | Body creation |
 
 **Process:**
 1. Instantiate all builders
@@ -223,7 +223,7 @@ export const building = {
       // Spawn objects inside rooms
       objects: [
         {
-          prototype: 'jobBoard',  // Must exist in $.aliases
+          prototype: 'jobBoard',  // Must exist in $aliases
           name: 'Employment Terminal',
           description: 'A job listing terminal.',
         },
@@ -297,7 +297,7 @@ export class MyUtilsBuilder {
     const objectManager = await this.manager.load(0);
     if (!objectManager) return;
 
-    // Register as $.myUtils
+    // Register as $myUtils
     await objectManager.call('addAlias', 'myUtils', this.myUtils.id);
   }
 }
@@ -340,10 +340,10 @@ After restart, your utility is available:
 
 ```javascript
 // In any MOO code:
-const greeting = await $.myUtils.greet('Alice');
+const greeting = await $myUtils.greet('Alice');
 // "Hello, Alice!"
 
-const sum = await $.myUtils.calculate(5, 3);
+const sum = await $myUtils.calculate(5, 3);
 // 8
 ```
 
@@ -417,15 +417,15 @@ this.myUtils.setMethod('greet', `
 Don't duplicate logic:
 
 ```typescript
-// BAD - duplicates $.english.plural
+// BAD - duplicates $english.plural
 this.myUtils.setMethod('makePlural', `
   return word.endsWith('s') ? word : word + 's';
 `);
 
-// GOOD - delegates to $.english
+// GOOD - delegates to $english
 this.myUtils.setMethod('formatList', `
   const items = args[0];
-  return await $.english.list(items);
+  return await $english.list(items);
 `);
 ```
 
@@ -433,8 +433,8 @@ this.myUtils.setMethod('formatList', `
 
 | Use Case | Create As | Parent | Example |
 |----------|-----------|--------|---------|
-| **Utility** | Single object | #1 (Root) | $.english, $.format |
-| **Prototype** | Prototype object | Existing prototype | $.weapon → $.describable |
+| **Utility** | Single object | #1 (Root) | $english, $format |
+| **Prototype** | Prototype object | Existing prototype | $weapon → $describable |
 
 **Utilities:**
 - Stateless helpers
@@ -444,7 +444,7 @@ this.myUtils.setMethod('formatList', `
 
 **Prototypes:**
 - Base for creating instances
-- Have many instances (clone via $.recycler)
+- Have many instances (clone via $recycler)
 - Define default properties/methods
 - Methods operate on `self`
 
@@ -479,7 +479,7 @@ Creating core systems...
 
 Connect and try:
 ```javascript
-await $.myUtils.greet('Bob');
+await $myUtils.greet('Bob');
 ```
 
 ## Debugging Bootstrap Issues
@@ -548,7 +548,7 @@ export class WeaponBuilder {
     if (!describable) throw new Error('Describable not found');
 
     this.weapon = await this.manager.create({
-      parent: describable,  // Inherit from $.describable
+      parent: describable,  // Inherit from $describable
       properties: {
         name: 'Weapon',
         description: 'A base weapon prototype',
@@ -592,7 +592,7 @@ Add to PrototypeBuilder instead of CoreSystemBuilder.
 1. **Server starts** → `game-bootstrap.ts`
 2. **Phase 1: MinimalBootstrap** → Creates #0, #1, #2
 3. **Phase 2: AliasLoader** → Loads existing aliases
-4. **Check world** → Does `$.player` exist?
+4. **Check world** → Does `$player` exist?
    - **Yes** → Skip to step 8
    - **No** → Continue to step 5
 5. **Phase 3a: PrototypeBuilder** → Creates object hierarchy

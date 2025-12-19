@@ -198,10 +198,10 @@ Body parts inherit from the player, so sensations route correctly.
 
 ## Emote Integration
 
-The `$.emote` system automatically routes to appropriate senses:
+The `$emote` system automatically routes to appropriate senses:
 
 ```javascript
-await $.emote.broadcast(
+await $emote.broadcast(
   room,
   player,
   {
@@ -225,7 +225,7 @@ See [emote.md](../utilities/emote.md) for full details on sensory emotes.
 Use in room hooks for atmospheric effects:
 
 ```javascript
-// In $.room.onContentArrived()
+// In $room.onContentArrived()
 async onContentArrived(obj, source, mover) {
   if (obj.isPlayer) {
     // Visual description
@@ -265,11 +265,11 @@ for (const objId of room.contents || []) {
 }
 ```
 
-Or use `$.pronoun.announce()` for visual events:
+Or use `$pronoun.announce()` for visual events:
 
 ```javascript
 // Combines visual output with perspective-aware grammar
-await $.pronoun.announce(room, '%N opens %d.', player, door);
+await $pronoun.announce(room, '%N opens %d.', player, door);
 // Others see: "Alice opens the metal door."
 // Player sees: "You open the metal door."
 ```
@@ -307,7 +307,7 @@ obj.setMethod('doEat', `
   
   // Visual - others see you eat
   const room = await $.load(eater.location);
-  await $.pronoun.announce(room, '%N eats %d.', eater, self);
+  await $pronoun.announce(room, '%N eats %d.', eater, self);
   
   // Taste - only eater experiences this
   await eater.taste('The synth-burger is greasy but satisfying.');
@@ -316,7 +316,7 @@ obj.setMethod('doEat', `
   await eater.feel('It\\'s still warm.');
   
   // Consume the food
-  await $.recycler.recycle(self);
+  await $recycler.recycle(self);
 `);
 ```
 
@@ -324,7 +324,7 @@ obj.setMethod('doEat', `
 
 ```javascript
 // Heavy industrial area
-const room = await $.recycler.create($.room, someLocation);
+const room = await $recycler.create($room, someLocation);
 room.name = 'Factory Floor';
 room.description = 'Massive machines line the walls, their pistons pumping rhythmically.';
 room.ambientSound = 'CHUNK-HISS. CHUNK-HISS. The machines never stop.';
@@ -381,7 +381,7 @@ async attack(target) {
 5. **Consciousness is automatic** - Don't check `isConscious` yourself
 6. **Consider intensity** - Capitalize LOUD sounds, use ellipses for soft ones...
 7. **Body parts for localized sensation** - Pain in specific limbs
-8. **Use $.emote for complex broadcasts** - Automatically routes to appropriate senses
+8. **Use $emote for complex broadcasts** - Automatically routes to appropriate senses
 
 ## Common Patterns
 
@@ -428,7 +428,7 @@ room.setMethod('ambientTick', `
 `);
 
 // Schedule periodic ticks
-await $.scheduler.schedule('ambientTick', room.id, 'ambientTick', [], 60000, true);
+await $scheduler.schedule('ambientTick', room.id, 'ambientTick', [], 60000, true);
 ```
 
 ## Debugging Sensory Output

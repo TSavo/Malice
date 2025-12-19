@@ -33,7 +33,7 @@ MCP tools allow you to create and modify objects without rebuilding. This is the
 ```javascript
 // Create a new object
 mcp.create_object({
-  parent: "#49",  // $.lock prototype
+  parent: "#49",  // $lock prototype
   properties: {
     name: "Combination Lock",
     description: "A lock with a dial combination.",
@@ -68,7 +68,7 @@ mcp.call_method({
 ```javascript
 // 1. Create base prototype
 const base = await mcp.create_object({
-  parent: "#3",  // $.describable
+  parent: "#3",  // $describable
   properties: { name: "Container", description: "Something that holds things.", contents: [] }
 });
 
@@ -107,7 +107,7 @@ await mcp.set_method({
 
 ### AI Registry Integration
 
-The $.ai registry tracks AI-controlled humans (use the consolidated `ai` tool):
+The $ai registry tracks AI-controlled humans (use the consolidated `ai` tool):
 
 ```javascript
 // Spawn an AI human
@@ -122,32 +122,32 @@ ai({ action: "despawn", humanId: 567 });
 
 ### Faction System Integration
 
-The $.faction singleton tracks faction memberships and inter-faction relationships:
+The $faction singleton tracks faction memberships and inter-faction relationships:
 
 ```javascript
 // Create a faction
-await $.faction.createFaction('Continuum', 'The AI-controlled corporate authority');
-await $.faction.createFaction('Scavengers', 'Survivors living outside the system');
+await $faction.createFaction('Continuum', 'The AI-controlled corporate authority');
+await $faction.createFaction('Scavengers', 'Survivors living outside the system');
 
 // Set an entity's faction
-await $.faction.setFaction(entity, 'Continuum');
-await $.faction.setFaction(npc, 'Scavengers');
+await $faction.setFaction(entity, 'Continuum');
+await $faction.setFaction(npc, 'Scavengers');
 
 // Set relationships between factions
-await $.faction.setRelationship('Continuum', 'Scavengers', 'hostile');
+await $faction.setRelationship('Continuum', 'Scavengers', 'hostile');
 
 // Check relationships
-const friendly = await $.faction.isFriendly(entityA, entityB);
-const hostile = await $.faction.isHostile(entityA, entityB);
+const friendly = await $faction.isFriendly(entityA, entityB);
+const hostile = await $faction.isHostile(entityA, entityB);
 
 // Get faction info
-const faction = await $.faction.getFaction(entity);  // returns 'Continuum'
-const members = await $.faction.getMembers('Continuum');  // returns [id, id, ...]
-const relationship = await $.faction.getRelationship('Continuum', 'Scavengers');  // 'hostile'
+const faction = await $faction.getFaction(entity);  // returns 'Continuum'
+const members = await $faction.getMembers('Continuum');  // returns [id, id, ...]
+const relationship = await $faction.getRelationship('Continuum', 'Scavengers');  // 'hostile'
 
 // Leadership
-await $.faction.setLeader('Continuum', leaderId);
-const leader = await $.faction.getLeader('Continuum');
+await $faction.setLeader('Continuum', leaderId);
+const leader = await $faction.getLeader('Continuum');
 ```
 
 Relationship types: `'friendly'`, `'hostile'`, `'neutral'` (default)
@@ -230,7 +230,7 @@ export class [Name]Builder {
       // Available globals: self, args, $, caller
       // self = this object
       // args = array of arguments
-      // $ = alias resolver (await $.recycler, await $.load(id))
+      // $ = alias resolver (await $recycler, await $.load(id))
       // caller = the agent who invoked this (if applicable)
 
       const param1 = args[0];
@@ -284,7 +284,7 @@ await objectManager.call('addAlias', '[name]', ids.[name]);
 
 ## Creating a Singleton Utility
 
-Singletons like `$.recycler`, `$.bank`, `$.ai` are system objects, not prototypes.
+Singletons like `$recycler`, `$bank`, `$ai` are system objects, not prototypes.
 
 ### Step 1: Create Builder in bootstrap/ (not prototypes/)
 
@@ -378,8 +378,8 @@ The `$` object provides several capabilities:
 
 ```javascript
 // 1. Access registered aliases (singletons)
-const recycler = await $.recycler;
-const bank = await $.bank;
+const recycler = await $recycler;
+const bank = await $bank;
 
 // 2. Load objects by ID
 const obj = await $.load(123);
@@ -400,8 +400,8 @@ $.evictFromCache(id)  // Cache management
 
 ```javascript
 // Get another singleton
-const recycler = await $.recycler;
-const bank = await $.bank;
+const recycler = await $recycler;
+const bank = await $bank;
 
 // Load an object by ID
 const obj = await $.load(123);
@@ -489,17 +489,17 @@ Locks are objects that implement `canAccess(agent, target)`.
 
 | Lock | Alias | Description |
 |------|-------|-------------|
-| Lock | `$.lock` (#49) | Base lock, always allows access |
-| Biometric Lock | `$.biometricLock` | Scans body parts for authorization |
-| Rentable Lock | `$.rentableLock` | Rental system for apartments |
-| Latch Lock | `$.latchLock` (#2491) | One-sided privacy lock |
+| Lock | `$lock` (#49) | Base lock, always allows access |
+| Biometric Lock | `$biometricLock` | Scans body parts for authorization |
+| Rentable Lock | `$rentableLock` | Rental system for apartments |
+| Latch Lock | `$latchLock` (#2491) | One-sided privacy lock |
 
 ### Creating a New Lock Type via MCP (Runtime)
 
 You can create new lock prototypes entirely via MCP without touching code:
 
 ```javascript
-// 1. Create the prototype (parent is $.lock #49)
+// 1. Create the prototype (parent is $lock #49)
 mcp.create_object({
   parent: "#49",
   properties: {
@@ -585,7 +585,7 @@ export class [Name]LockBuilder {
 
   async build(lockPrototype: RuntimeObject): Promise<RuntimeObject> {
     const obj = await this.manager.create({
-      parent: lockPrototype,  // Parent is $.lock
+      parent: lockPrototype,  // Parent is $lock
       properties: {
         name: '[Name] Lock',
         description: 'Description',
@@ -617,7 +617,7 @@ export class [Name]LockBuilder {
 ```javascript
 // Create an instance of latchLock for a specific door
 mcp.create_object({
-  parent: "#2491",  // $.latchLock prototype
+  parent: "#2491",  // $latchLock prototype
   properties: {
     name: "bathroom latch",
     description: "A simple sliding latch, tarnished brass.",
@@ -749,10 +749,10 @@ npm test
 
 1. **Build order**: Prototypes must be built after their parents exist
 2. **Array/object mutation**: Must re-set the property after modifying
-3. **Async**: All method code is async - use `await` for `$.load`, `$.recycler`, etc.
+3. **Async**: All method code is async - use `await` for `$.load`, `$recycler`, etc.
 4. **String methods**: Methods are strings, escape special characters properly
 5. **Objrefs**: Use `"#123"` format for object references in properties
-6. **Aliases**: Register aliases after building so `$.name` resolution works
+6. **Aliases**: Register aliases after building so `$name` resolution works
 
 ## Documentation
 

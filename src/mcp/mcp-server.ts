@@ -16,6 +16,13 @@ import type { ObjId, RuntimeObject } from '../../types/object.js';
 import { MCPTelnetClient } from './telnet-client.js';
 import { parseQuery, validateQuery } from './query-parser.js';
 
+/**
+ * Regex pattern for object references in MCP tools.
+ * Accepts: #id (e.g., #100, #-1), $alias (e.g., $room), $.alias (e.g., $.recycler)
+ */
+const OBJREF_PATTERN = /^(#-?\d+|\$\.?[a-zA-Z_][a-zA-Z0-9_]*)$/;
+const OBJREF_DESCRIPTION = 'Object reference: #id (e.g., "#100"), $alias (e.g., "$room"), or $.alias (e.g., "$.recycler")';
+
 interface MCPServerConfig {
   port?: number;
   host?: string;
@@ -107,7 +114,53 @@ export class MaliceMCPServer {
   }
 
   /**
-   * Deserialize a value from JSON input, converting "#id" strings to RuntimeObjects
+   * Check if a string is an object reference format (#id, $alias, or $.alias)
+   */
+  private isObjectRef(value: string): boolean {
+    // #id format (e.g., #100, #-1)
+    if (/^#-?\d+$/.test(value)) return true;
+    // $alias or $.alias format (e.g., $room, $.recycler)
+    if (/^\$\.?[a-zA-Z_][a-zA-Z0-9_]*$/.test(value)) return true;
+    return false;
+  }
+
+  /**
+   * Resolve an object reference string to a RuntimeObject
+   * Supports: #id (e.g., #100), $alias (e.g., $room), $.alias (e.g., $.recycler)
+   * Throws if the object cannot be resolved
+   */
+  private async resolveObjectRef(ref: string): Promise<RuntimeObject> {
+    // #id format
+    if (/^#-?\d+$/.test(ref)) {
+      const id = parseInt(ref.slice(1), 10);
+      const obj = await this.manager.load(id as ObjId);
+      if (!obj) {
+        throw new Error(`Object ${ref} not found`);
+      }
+      return obj;
+    }
+
+    // $alias or $.alias format
+    if (/^\$\.?[a-zA-Z_][a-zA-Z0-9_]*$/.test(ref)) {
+      // Extract alias name: $foo -> foo, $.foo -> foo
+      let alias = ref.slice(1); // Remove leading $
+      if (alias.startsWith('.')) {
+        alias = alias.slice(1); // Remove leading . if present
+      }
+
+      const obj = await this.getAlias(alias);
+      if (!obj) {
+        throw new Error(`Alias '${alias}' not found (from ${ref})`);
+      }
+      return obj;
+    }
+
+    throw new Error(`Invalid object reference format: ${ref}. Use #id, $alias, or $.alias`);
+  }
+
+  /**
+   * Deserialize a value from JSON input, converting object references to RuntimeObjects
+   * Supports: #id (e.g., #100), $alias (e.g., $room), $.alias (e.g., $.recycler)
    * This is the inverse of serializeValue - allows passing object references in args
    * Throws if an object reference cannot be resolved
    */
@@ -117,14 +170,9 @@ export class MaliceMCPServer {
       return value;
     }
 
-    // Handle "#id" format strings - convert to RuntimeObject
-    if (typeof value === 'string' && /^#-?\d+$/.test(value)) {
-      const id = parseInt(value.slice(1), 10);
-      const obj = await this.manager.load(id as ObjId);
-      if (!obj) {
-        throw new Error(`Object ${value} not found`);
-      }
-      return obj;
+    // Handle object reference format strings - convert to RuntimeObject
+    if (typeof value === 'string' && this.isObjectRef(value)) {
+      return this.resolveObjectRef(value);
     }
 
     // Handle arrays - recursively deserialize elements
@@ -165,7 +213,7 @@ export class MaliceMCPServer {
       'set_property',
       'Set a property value on a MOO object.',
       {
-        objectId: z.string().regex(/^#-?\d+$/).describe('Object ID in "#id" format'),
+        objectId: z.string().regex(OBJREF_PATTERN).describe(OBJREF_DESCRIPTION),
         name: z.string().describe('Property name'),
         value: z.any().describe('Property value (string, number, boolean, array, object, or objref like "#5")'),
       },
@@ -191,7 +239,7 @@ export class MaliceMCPServer {
       'set_method',
       'Create or update a TypeScript method on a MOO object.',
       {
-        objectId: z.string().regex(/^#-?\d+$/).describe('Object ID in "#id" format'),
+        objectId: z.string().regex(OBJREF_PATTERN).describe(OBJREF_DESCRIPTION),
         name: z.string().describe('Method name'),
         code: z.string().describe('TypeScript code for the method body'),
         callable: z.boolean().optional().describe('Whether players can call this method directly'),
@@ -218,7 +266,7 @@ export class MaliceMCPServer {
       'call_method',
       'Execute a method on a MOO object and return the result. Use "#id" format in args to pass object references.',
       {
-        objectId: z.string().regex(/^#-?\d+$/).describe('Object ID in "#id" format'),
+        objectId: z.string().regex(OBJREF_PATTERN).describe(OBJREF_DESCRIPTION),
         name: z.string().describe('Method name'),
         args: z.array(z.any()).optional().describe('Arguments to pass to the method. Use "#ID" format for object references.'),
       },
@@ -246,7 +294,7 @@ export class MaliceMCPServer {
       'create_object',
       'Create a new MOO object with a specified parent.',
       {
-        parent: z.string().regex(/^#-?\d+$/).describe('Parent object ID in "#id" format'),
+        parent: z.string().regex(OBJREF_PATTERN).describe(OBJREF_DESCRIPTION),
         properties: z.record(z.any()).optional().describe('Initial properties (use "#id" format for object references)'),
       },
       async ({ parent, properties }) => {
@@ -357,7 +405,7 @@ export class MaliceMCPServer {
       'get_inheritance',
       'Get inheritance info for an object: its ancestor chain (what it inherits from) and optionally its descendants (what inherits from it).',
       {
-        objectId: z.string().regex(/^#-?\d+$/).describe('Object ID in "#id" format'),
+        objectId: z.string().regex(OBJREF_PATTERN).describe(OBJREF_DESCRIPTION),
         descendants: z.boolean().optional().describe('Include descendants (default: false)'),
         recursive: z.boolean().optional().describe('Include all descendants recursively, not just direct children (default: false)'),
         limit: z.number().optional().describe('Max descendants to return (default 100)'),
@@ -457,7 +505,7 @@ export class MaliceMCPServer {
       'find_in_location',
       'Find all objects in a room or container.',
       {
-        locationId: z.string().regex(/^#-?\d+$/).describe('Room or container ID in "#id" format'),
+        locationId: z.string().regex(OBJREF_PATTERN).describe(OBJREF_DESCRIPTION),
         recursive: z.boolean().optional().describe('Include contents of containers within (default: false)'),
       },
       async ({ locationId: rawLocId, recursive }) => {
@@ -620,7 +668,7 @@ export class MaliceMCPServer {
         x: z.number().optional().describe('X coordinate (default 0)'),
         y: z.number().optional().describe('Y coordinate (default 0)'),
         z: z.number().optional().describe('Z coordinate (default 0)'),
-        fromRoomId: z.string().regex(/^#-?\d+$/).optional().describe('Room ID to create exit from in "#id" format'),
+        fromRoomId: z.string().regex(OBJREF_PATTERN).optional().describe(OBJREF_DESCRIPTION),
         exitDirection: z.string().optional().describe('Exit direction (e.g., "north", "east", "up")'),
         returnDirection: z.string().optional().describe('Return exit direction (e.g., "south", "west", "down")'),
       },
@@ -808,8 +856,8 @@ export class MaliceMCPServer {
       'link_rooms',
       'Create an exit from one room to another, optionally with a return exit.',
       {
-        fromRoomId: z.string().regex(/^#-?\d+$/).describe('Source room ID in "#id" format'),
-        toRoomId: z.string().regex(/^#-?\d+$/).describe('Destination room ID in "#id" format'),
+        fromRoomId: z.string().regex(OBJREF_PATTERN).describe(OBJREF_DESCRIPTION),
+        toRoomId: z.string().regex(OBJREF_PATTERN).describe(OBJREF_DESCRIPTION),
         exitDirection: z.string().describe('Exit direction (e.g., "north", "east", "up")'),
         returnDirection: z.string().optional().describe('Return exit direction (e.g., "south", "west", "down")'),
       },
@@ -876,8 +924,8 @@ export class MaliceMCPServer {
       'unlink',
       'Remove an exit from a room.',
       {
-        roomId: z.string().regex(/^#-?\d+$/).describe('Room ID containing the exit in "#id" format'),
-        exitId: z.string().regex(/^#-?\d+$/).describe('Exit object ID to remove in "#id" format'),
+        roomId: z.string().regex(OBJREF_PATTERN).describe(OBJREF_DESCRIPTION),
+        exitId: z.string().regex(OBJREF_PATTERN).describe(OBJREF_DESCRIPTION),
       },
       async ({ roomId: rawRoomId, exitId: rawExitId }) => {
         try {
@@ -902,8 +950,8 @@ export class MaliceMCPServer {
       'move_object',
       'Move an object to a new location (room or container).',
       {
-        objectId: z.string().regex(/^#-?\d+$/).describe('Object ID to move in "#id" format'),
-        destinationId: z.string().regex(/^#-?\d+$/).describe('Destination room or container ID in "#id" format'),
+        objectId: z.string().regex(OBJREF_PATTERN).describe(OBJREF_DESCRIPTION),
+        destinationId: z.string().regex(OBJREF_PATTERN).describe(OBJREF_DESCRIPTION),
       },
       async ({ objectId, destinationId }) => {
         try {
@@ -928,7 +976,7 @@ export class MaliceMCPServer {
       'recycle_object',
       'Recycle (soft-delete) a MOO object. Removes it from the world and marks it for reuse.',
       {
-        objectId: z.string().regex(/^#-?\d+$/).describe('Object ID to recycle in "#id" format'),
+        objectId: z.string().regex(OBJREF_PATTERN).describe(OBJREF_DESCRIPTION),
       },
       async ({ objectId }) => {
         try {
@@ -960,8 +1008,8 @@ export class MaliceMCPServer {
       'clone_object',
       'Create a deep copy of an object with all its properties. Optionally place at a location.',
       {
-        objectId: z.string().regex(/^#-?\d+$/).describe('Object ID to clone in "#id" format'),
-        locationId: z.string().regex(/^#-?\d+$/).optional().describe('Location to place the clone in "#id" format'),
+        objectId: z.string().regex(OBJREF_PATTERN).describe(OBJREF_DESCRIPTION),
+        locationId: z.string().regex(OBJREF_PATTERN).optional().describe(OBJREF_DESCRIPTION),
       },
       async ({ objectId, locationId }) => {
         try {
@@ -1016,7 +1064,7 @@ export class MaliceMCPServer {
       'get_exits',
       'List all exits from a room with their destinations and any attached doors.',
       {
-        roomId: z.string().regex(/^#-?\d+$/).describe('Room ID in "#id" format'),
+        roomId: z.string().regex(OBJREF_PATTERN).describe(OBJREF_DESCRIPTION),
       },
       async ({ roomId: rawRoomId }) => {
         try {
@@ -1086,8 +1134,8 @@ export class MaliceMCPServer {
       'spawn_item',
       'Create an instance of a prototype and place it at a location in one step.',
       {
-        prototypeId: z.string().regex(/^#-?\d+$/).describe('Prototype object ID in "#id" format'),
-        locationId: z.string().regex(/^#-?\d+$/).describe('Room or container ID in "#id" format'),
+        prototypeId: z.string().regex(OBJREF_PATTERN).describe(OBJREF_DESCRIPTION),
+        locationId: z.string().regex(OBJREF_PATTERN).describe(OBJREF_DESCRIPTION),
         properties: z.record(z.any()).optional().describe('Override properties (use "#id" format for object references)'),
       },
       async ({ prototypeId: rawProtoId, locationId: rawLocId, properties }) => {
@@ -1151,8 +1199,8 @@ export class MaliceMCPServer {
       'set_exit_door',
       'Create and attach a door to an exit, or attach an existing door.',
       {
-        exitId: z.string().regex(/^#-?\d+$/).describe('Exit object ID in "#id" format'),
-        doorId: z.string().regex(/^#-?\d+$/).optional().describe('Existing door ID in "#id" format (if omitted, creates new door)'),
+        exitId: z.string().regex(OBJREF_PATTERN).describe(OBJREF_DESCRIPTION),
+        doorId: z.string().regex(OBJREF_PATTERN).optional().describe(OBJREF_DESCRIPTION),
         doorName: z.string().optional().describe('Name for new door (default: "door")'),
         doorDescription: z.string().optional().describe('Description for new door'),
         open: z.boolean().optional().describe('Whether door starts open (default: true)'),
@@ -1212,7 +1260,7 @@ export class MaliceMCPServer {
       'describe_object',
       'Get the runtime description of an object as a player would see it (calls describe() method).',
       {
-        objectId: z.string().regex(/^#-?\d+$/).describe('Object ID in "#id" format (e.g., "#100")'),
+        objectId: z.string().regex(OBJREF_PATTERN).describe(OBJREF_DESCRIPTION),
       },
       async ({ objectId }) => {
         try {
@@ -2085,7 +2133,7 @@ ACTIONS:
   list_objects  - List all objects that have notes`,
       {
         action: z.string().describe('Action to perform (see help above)'),
-        objectId: z.string().regex(/^#-?\d+$/).optional().describe('Object ID in "#id" format (e.g., "#100")'),
+        objectId: z.string().regex(OBJREF_PATTERN).optional().describe(OBJREF_DESCRIPTION),
         text: z.string().optional().describe('Note text content'),
         author: z.string().optional().describe('Author name (default: "mcp")'),
         tags: z.array(z.string()).optional().describe('Tags for categorization'),

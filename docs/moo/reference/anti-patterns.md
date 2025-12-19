@@ -78,7 +78,7 @@ const n = self.name;
 
 ## Object Creation & Destruction
 
-### ❌ Bypassing $.recycler
+### ❌ Bypassing $recycler
 
 ```javascript
 // WRONG - breaks pooling
@@ -86,7 +86,7 @@ const parent = await $.load(1);
 const obj = await manager.create({ parent: parent });
 
 // RIGHT
-const obj = await $.recycler.create($.item);
+const obj = await $recycler.create($item);
 ```
 
 **Why it's bad:**
@@ -104,7 +104,7 @@ obj.location = null;
 room.contents = room.contents.filter(o => o !== obj);
 
 // RIGHT
-await $.recycler.recycle(obj);
+await $recycler.recycle(obj);
 ```
 
 **Why it's bad:**
@@ -118,10 +118,10 @@ await $.recycler.recycle(obj);
 
 ```javascript
 // WRONG - prevents ID reuse
-await $.recycler.purge(obj);
+await $recycler.purge(obj);
 
 // RIGHT - enables pooling
-await $.recycler.recycle(obj);
+await $recycler.recycle(obj);
 ```
 
 **Why it's bad:**
@@ -255,7 +255,7 @@ const msg = actor.name + ' pick up the ' + item.name + '.';
 room.announce(msg);
 
 // RIGHT
-await $.pronoun.announce(room, '%N %v{pick} up %d.', actor, item);
+await $pronoun.announce(room, '%N %v{pick} up %d.', actor, item);
 ```
 
 **Why it's bad:**
@@ -285,15 +285,15 @@ await player.hear('BANG!');
 ### ❌ Inline Grammar Logic
 
 ```javascript
-// WRONG - duplicates $.english
+// WRONG - duplicates $english
 const verb = count === 1 ? 'falls' : 'fall';
 const article = /^[aeiou]/i.test(name) ? 'an' : 'a';
 const plural = name.endsWith('s') ? name : name + 's';
 
 // RIGHT
-const verb = await $.format.verb('fall', count);
-const article = await $.english.article(name);
-const plural = await $.english.plural(name);
+const verb = await $format.verb('fall', count);
+const article = await $english.article(name);
+const plural = await $english.plural(name);
 ```
 
 **Why it's bad:**
@@ -308,13 +308,13 @@ const plural = await $.english.plural(name);
 
 ```javascript
 // WRONG - completely replaces parent behavior
-$.admin.setMethod('connect', `
+$admin.setMethod('connect', `
   await self.registerVerb(['@dig'], self, 'dig');
   // Forgot to call parent - player verbs never registered!
 `);
 
 // RIGHT
-$.admin.setMethod('connect', `
+$admin.setMethod('connect', `
   await self.registerVerb(['@dig'], self, 'dig');
   await pass();  // Get all parent verbs too
 `);
@@ -329,7 +329,7 @@ $.admin.setMethod('connect', `
 
 ```javascript
 // WRONG - affects all objects
-$.human.maxHp = 200;  // Now ALL humans have 200 HP!
+$human.maxHp = 200;  // Now ALL humans have 200 HP!
 
 // RIGHT - shadow on instance
 player.maxHp = 200;  // Only this player has 200 HP
@@ -344,7 +344,7 @@ player.maxHp = 200;  // Only this player has 200 HP
 
 ```javascript
 // WRONG - storing instance data on prototype
-$.room.occupants = [player1, player2];  // Shared by ALL rooms!
+$room.occupants = [player1, player2];  // Shared by ALL rooms!
 
 // RIGHT - each instance has own data
 room.occupants = [player1, player2];  // Just this room
@@ -425,7 +425,7 @@ else if (hp < 75) status = 'scratched';
 else status = 'healthy';
 
 // RIGHT
-const status = await $.proportional.sub(
+const status = await $proportional.sub(
   ['dead', 'critical', 'wounded', 'hurt', 'scratched', 'healthy'],
   hp, maxHp
 );
@@ -691,9 +691,9 @@ async doDelete(player, obj) {
 4. ✅ **Skip $.load() for properties** - `self.owner` is already a RuntimeObject
 
 ### System Operations
-5. ✅ **Always use $.recycler** for object creation/destruction
+5. ✅ **Always use $recycler** for object creation/destruction
 6. ✅ **Always use moveTo()** for object movement
-7. ✅ **Always use utilities** ($.english, $.format, $.pronoun)
+7. ✅ **Always use utilities** ($english, $format, $pronoun)
 8. ✅ **Always await async calls** when you need the result
 9. ✅ **Always unregister verbs** in onLeaving hooks
 10. ✅ **Always use appropriate senses** (see/hear/smell/taste/feel)

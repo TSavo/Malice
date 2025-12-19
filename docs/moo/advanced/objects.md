@@ -4,7 +4,7 @@ Essential patterns for creating, destroying, and moving objects in Malice.
 
 ## Object Creation
 
-### Always Use $.recycler.create()
+### Always Use $recycler.create()
 
 **Never create objects any other way.**
 
@@ -12,17 +12,17 @@ Essential patterns for creating, destroying, and moving objects in Malice.
 // WRONG - breaks pooling system
 const root = await manager.load(1);
 const obj = await manager.create({ parent: root! });  // NO!
-const obj = await $.recycler.create($.item);  // NO!
+const obj = await $recycler.create($item);  // NO!
 
 // RIGHT - uses recycler
-const obj = await $.recycler.create($.item);  // Reuses recycled IDs
-const obj2 = await $.recycler.create($.room, {
+const obj = await $recycler.create($item);  // Reuses recycled IDs
+const obj2 = await $recycler.create($room, {
   name: 'New Room',
   description: 'A freshly created room.'
 });
 ```
 
-### Why $.recycler Matters
+### Why $recycler Matters
 
 The recycler provides:
 - **Object pooling** - reuses deleted object IDs
@@ -36,27 +36,27 @@ Pick the most specific prototype that matches what your object **IS**:
 
 ```javascript
 // Creating a room
-const room = await $.recycler.create($.room, {
+const room = await $recycler.create($room, {
   name: 'Dark Cave',
   description: 'A damp, dark cave.',
   exits: {}
 });
 
 // Creating a player character
-const player = await $.recycler.create($.player, {
+const player = await $recycler.create($player, {
   name: 'Alice',
   playername: 'alice'
 });
 
 // Creating clothing
-const shirt = await $.recycler.create($.clothing, {
+const shirt = await $recycler.create($clothing, {
   name: 'red shirt',
   warmth: 5,
   covers: ['torso']
 });
 
 // Creating food
-const apple = await $.recycler.create($.food, {
+const apple = await $recycler.create($food, {
   name: 'apple',
   calories: 50,
   bites: 3
@@ -66,7 +66,7 @@ const apple = await $.recycler.create($.food, {
 ### Setting Properties After Creation
 
 ```javascript
-const sword = await $.recycler.create($.item, { name: 'sword' });
+const sword = await $recycler.create($item, { name: 'sword' });
 
 // Set additional properties
 sword.description = 'A sharp steel sword.';
@@ -84,7 +84,7 @@ await sword.moveTo(room);
 ```javascript
 async createShop() {
   // Create the shop room
-  const shop = await $.recycler.create($.room, {
+  const shop = await $recycler.create($room, {
     name: 'General Store',
     description: 'A cluttered shop full of goods.'
   });
@@ -97,12 +97,12 @@ async createShop() {
   ];
   
   for (const data of items) {
-    const item = await $.recycler.create($.item, data);
+    const item = await $recycler.create($item, data);
     await item.moveTo(shop);
   }
 
   // Create the shopkeeper
-  const keeper = await $.recycler.create($.agent, {
+  const keeper = await $recycler.create($agent, {
     name: 'Merchant',
     description: 'A friendly merchant with a ready smile.'
   });
@@ -114,7 +114,7 @@ async createShop() {
 
 ## Object Destruction
 
-### Always Use $.recycler.recycle()
+### Always Use $recycler.recycle()
 
 **Never manipulate location/contents directly.**
 
@@ -125,22 +125,22 @@ obj.location = null;                 // NO!
 room.contents = room.contents.filter(o => o !== obj);  // NO!
 
 // RIGHT - uses recycler
-await $.recycler.recycle(obj);       // Proper cleanup + pooling
-await $.recycler.recycleTree(obj);   // Recursively recycle contents too
+await $recycler.recycle(obj);       // Proper cleanup + pooling
+await $recycler.recycleTree(obj);   // Recursively recycle contents too
 ```
 
 ### recycle() vs purge()
 
 ```javascript
 // Soft delete - marks for reuse (PREFERRED)
-await $.recycler.recycle(obj);
+await $recycler.recycle(obj);
 // - Sets recycled flag
 // - Removes from location
 // - Available for reuse
 // - Can be unrecycled
 
 // Hard delete - permanent removal (RARE)
-await $.recycler.purge(obj);
+await $recycler.purge(obj);
 // - Completely removes from database
 // - Cannot be recovered
 // - Use only for cleanup/migration
@@ -150,11 +150,11 @@ await $.recycler.purge(obj);
 
 ```javascript
 // Delete object and all its contents
-await $.recycler.recycleTree(container);
+await $recycler.recycleTree(container);
 
 // Example: destroy chest with all items inside
 const chest = await $.load(chestId);
-await $.recycler.recycleTree(chest);  // Chest + all items recycled
+await $recycler.recycleTree(chest);  // Chest + all items recycled
 ```
 
 ## Object Movement
@@ -293,7 +293,7 @@ obj.setMethod('onArrived', `
 Called on the source container before content leaves:
 
 ```javascript
-// In $.room.onContentLeaving()
+// In $room.onContentLeaving()
 async onContentLeaving(obj, dest, mover) {
   if (obj.isPlayer) {
     // Remove exit verbs when player leaves
@@ -314,7 +314,7 @@ async onContentLeaving(obj, dest, mover) {
 Called on the destination container after content arrives:
 
 ```javascript
-// In $.room.onContentArrived()
+// In $room.onContentArrived()
 async onContentArrived(obj, source, mover) {
   if (obj.isPlayer) {
     // Register exit verbs with player
@@ -422,7 +422,7 @@ async doGet(player, itemName) {
     await player.tell('You pick up ' + item.name + '.');
     
     // Others see it
-    await $.pronoun.announce(room, '%N picks up %d.', player, item);
+    await $pronoun.announce(room, '%N picks up %d.', player, item);
   } catch (error) {
     return error.message;
   }
@@ -441,7 +441,7 @@ async doDrop(player, item) {
     await player.tell('You drop ' + item.name + '.');
     
     // Others see it
-    await $.pronoun.announce(room, '%N drops %d.', player, item);
+    await $pronoun.announce(room, '%N drops %d.', player, item);
   } catch (error) {
     return error.message;
   }
@@ -454,14 +454,14 @@ async doDrop(player, item) {
 async createStarterEquipment(player) {
   // Create basic gear
   const items = [
-    { proto: $.clothing, props: { name: 'cloth tunic', warmth: 5 } },
-    { proto: $.clothing, props: { name: 'cloth pants', warmth: 5 } },
-    { proto: $.weapon, props: { name: 'rusty dagger', damage: 3 } },
-    { proto: $.food, props: { name: 'stale bread', calories: 100 } }
+    { proto: $clothing, props: { name: 'cloth tunic', warmth: 5 } },
+    { proto: $clothing, props: { name: 'cloth pants', warmth: 5 } },
+    { proto: $weapon, props: { name: 'rusty dagger', damage: 3 } },
+    { proto: $food, props: { name: 'stale bread', calories: 100 } }
   ];
   
   for (const { proto, props } of items) {
-    const item = await $.recycler.create(proto, props);
+    const item = await $recycler.create(proto, props);
     
     // Place in player's inventory
     const hand = await player.getHand();
@@ -483,7 +483,7 @@ async resetRoom() {
   const items = [...self.contents].filter(obj => !obj.isPlayer);
   
   for (const item of items) {
-    await $.recycler.recycle(item);
+    await $recycler.recycle(item);
   }
   
   // Spawn fresh items
@@ -492,13 +492,13 @@ async resetRoom() {
 
 async spawnDefaultContents() {
   const spawns = [
-    { proto: $.weapon, props: { name: 'iron sword' } },
-    { proto: $.armor, props: { name: 'leather vest' } },
-    { proto: $.food, props: { name: 'apple' } }
+    { proto: $weapon, props: { name: 'iron sword' } },
+    { proto: $armor, props: { name: 'leather vest' } },
+    { proto: $food, props: { name: 'apple' } }
   ];
   
   for (const { proto, props } of spawns) {
-    const item = await $.recycler.create(proto, props);
+    const item = await $recycler.create(proto, props);
     await item.moveTo(self);  // 'self' is the room
   }
 }
@@ -506,7 +506,7 @@ async spawnDefaultContents() {
 
 ## Best Practices
 
-1. **Always use $.recycler.create()** - Never create objects directly
+1. **Always use $recycler.create()** - Never create objects directly
 2. **Always use moveTo()** - Never manipulate location/contents manually
 3. **Use try/catch for movement** - Hooks can throw to cancel
 4. **Copy arrays before iterating** - If modifying during iteration
@@ -571,6 +571,6 @@ async emptyContainer(container, dest, mover) {
 
 ## See Also
 
-- [$.recycler](../utilities/recycler.md) - Object lifecycle management
+- [$recycler](../utilities/recycler.md) - Object lifecycle management
 - [Verbs](./verbs.md) - Verb registration in movement hooks
 - [Prototypes](../prototypes.md) - Object hierarchy and inheritance

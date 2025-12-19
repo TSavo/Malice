@@ -2,9 +2,9 @@
 
 Detachable ammunition magazines for firearms. Magazines hold ammo and can be loaded into/ejected from guns.
 
-## Base Magazine (`$.magazine`)
+## Base Magazine (`$magazine`)
 
-Inherits from `$.describable`.
+Inherits from `$describable`.
 
 ### Properties
 
@@ -31,13 +31,13 @@ Inherits from `$.describable`.
 
 | Prototype | ammoType | Capacity | Description |
 |-----------|----------|----------|-------------|
-| `$.pistolMagazine` | `9mm` | 17 | Standard 9mm pistol magazine |
-| `$.extendedMagazine` | `9mm` | 30 | High-capacity extended magazine |
-| `$.m1911Magazine` | `.45` | 7 | Single-stack 1911 magazine |
-| `$.rifleMagazine` | `.308` | 10 | Detachable rifle magazine |
-| `$.smgMagazine` | `9mm` | 32 | Submachine gun magazine |
-| `$.mac10Magazine` | `.45` | 30 | MAC-10 specific magazine |
-| `$.speedloader` | `.38` | 6 | Revolver speedloader (loads all at once) |
+| `$pistolMagazine` | `9mm` | 17 | Standard 9mm pistol magazine |
+| `$extendedMagazine` | `9mm` | 30 | High-capacity extended magazine |
+| `$m1911Magazine` | `.45` | 7 | Single-stack 1911 magazine |
+| `$rifleMagazine` | `.308` | 10 | Detachable rifle magazine |
+| `$smgMagazine` | `9mm` | 32 | Submachine gun magazine |
+| `$mac10Magazine` | `.45` | 30 | MAC-10 specific magazine |
+| `$speedloader` | `.38` | 6 | Revolver speedloader (loads all at once) |
 
 ---
 
@@ -45,7 +45,7 @@ Inherits from `$.describable`.
 
 ```javascript
 // Create a magazine
-const mag = await $.recycler.create($.pistolMagazine, {
+const mag = await $recycler.create($pistolMagazine, {
   name: 'Glock magazine',
   description: 'A polymer pistol magazine.',
 });
@@ -136,7 +136,7 @@ const result = await pistol.unload(player);
 For world-building, create pre-loaded magazines:
 
 ```javascript
-const loadedMag = await $.recycler.create($.pistolMagazine, {
+const loadedMag = await $recycler.create($pistolMagazine, {
   name: 'loaded Glock magazine',
   description: 'A full magazine.',
   ammo: 17,  // Pre-loaded

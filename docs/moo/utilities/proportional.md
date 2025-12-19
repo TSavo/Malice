@@ -1,6 +1,6 @@
-# $.proportional - Value-Based Message Selection
+# $proportional - Value-Based Message Selection
 
-Use `$.proportional` to select messages based on a value within a range. Perfect for health bars, hunger, thirst, capacity indicators, damage levels, etc.
+Use `$proportional` to select messages based on a value within a range. Perfect for health bars, hunger, thirst, capacity indicators, damage levels, etc.
 
 ## Purpose
 
@@ -25,14 +25,14 @@ function getHealthStatus(hp, maxHp) {
 
 **Good: Mathematical distribution**
 ```javascript
-const status = await $.proportional.sub(
+const status = await $proportional.sub(
   ['dead', 'near death', 'critical', 'wounded', 'hurt', 'scratched', 'healthy'],
   hp, maxHp
 );
 // First message only at 0, last only at max, rest evenly distributed
 ```
 
-## What $.proportional Handles
+## What $proportional Handles
 
 - ✅ First message only at exactly 0
 - ✅ Last message only at exactly max
@@ -51,7 +51,7 @@ const status = await $.proportional.sub(
 ### sub() - Select Message
 
 ```javascript
-await $.proportional.sub(messages, amount, total)
+await $proportional.sub(messages, amount, total)
 ```
 
 Returns message based on amount/total ratio.
@@ -66,7 +66,7 @@ Returns message based on amount/total ratio.
 
 **Examples:**
 ```javascript
-const healthMsg = await $.proportional.sub(
+const healthMsg = await $proportional.sub(
   ['dead', 'critical', 'wounded', 'hurt', 'healthy'],
   player.hp,
   player.maxHp
@@ -84,28 +84,28 @@ const healthMsg = await $.proportional.sub(
 ### index() - Get Index
 
 ```javascript
-await $.proportional.index(messages, amount, total)
+await $proportional.index(messages, amount, total)
 ```
 
 Returns which message index (0-based) would be selected.
 
 **Examples:**
 ```javascript
-const idx = await $.proportional.index(['empty', 'low', 'half', 'full'], 50, 100);
+const idx = await $proportional.index(['empty', 'low', 'half', 'full'], 50, 100);
 // idx = 2 (would select 'half')
 ```
 
 ### fromPercent() - Use Percentage
 
 ```javascript
-await $.proportional.fromPercent(messages, percentage)
+await $proportional.fromPercent(messages, percentage)
 ```
 
 Use percentage directly (0-100 scale) instead of amount/total.
 
 **Examples:**
 ```javascript
-const msg = await $.proportional.fromPercent(
+const msg = await $proportional.fromPercent(
   ['empty', 'quarter', 'half', 'three-quarters', 'full'],
   75
 );
@@ -118,7 +118,7 @@ const msg = await $.proportional.fromPercent(
 
 ```javascript
 async showHealth(player, target) {
-  const status = await $.proportional.sub(
+  const status = await $proportional.sub(
     ['dead', 'near death', 'critical', 'wounded', 'hurt', 'scratched', 'healthy'],
     target.hp,
     target.maxHp
@@ -134,7 +134,7 @@ async showHealth(player, target) {
 async tickHunger(player) {
   player.food = Math.max(0, player.food - 1);
   
-  const status = await $.proportional.sub(
+  const status = await $proportional.sub(
     ['starving', 'famished', 'hungry', 'peckish', 'satisfied', 'full', 'stuffed'],
     player.food,
     player.maxFood
@@ -153,7 +153,7 @@ async tickHunger(player) {
 
 ```javascript
 async describeContainer(container) {
-  const capacity = await $.proportional.sub(
+  const capacity = await $proportional.sub(
     ['empty', 'nearly empty', 'partially filled', 'mostly full', 'full'],
     container.contents.length,
     container.capacity
@@ -167,7 +167,7 @@ async describeContainer(container) {
 
 ```javascript
 async showWeaponCondition(weapon) {
-  const condition = await $.proportional.sub(
+  const condition = await $proportional.sub(
     ['broken', 'badly damaged', 'damaged', 'worn', 'good', 'pristine'],
     weapon.durability,
     weapon.maxDurability
@@ -184,7 +184,7 @@ async showWeaponCondition(weapon) {
 
 ```javascript
 async checkThirst(player) {
-  const thirstLevel = await $.proportional.sub(
+  const thirstLevel = await $proportional.sub(
     ['parched', 'very thirsty', 'thirsty', 'hydrated'],
     player.water,
     player.maxWater
@@ -205,7 +205,7 @@ async checkThirst(player) {
 async getRoomDensity(room) {
   const people = room.contents.filter(c => c.type === 'agent');
   
-  const crowding = await $.proportional.sub(
+  const crowding = await $proportional.sub(
     ['empty', 'quiet', 'occupied', 'busy', 'crowded', 'packed'],
     people.length,
     room.capacity || 10
@@ -219,7 +219,7 @@ async getRoomDensity(room) {
 
 ```javascript
 async showCraftingProgress(player, recipe) {
-  const progress = await $.proportional.sub(
+  const progress = await $proportional.sub(
     ['just started', 'making progress', 'halfway done', 'almost finished', 'complete'],
     player.craftingProgress,
     recipe.duration
@@ -233,7 +233,7 @@ async showCraftingProgress(player, recipe) {
 
 ```javascript
 async describeLighting(room) {
-  const lighting = await $.proportional.sub(
+  const lighting = await $proportional.sub(
     ['pitch black', 'very dark', 'dim', 'well-lit', 'brightly lit'],
     room.lightLevel,
     room.maxLight
@@ -247,14 +247,14 @@ async describeLighting(room) {
 
 ```javascript
 async checkItemDecay(item) {
-  const state = await $.proportional.sub(
+  const state = await $proportional.sub(
     ['destroyed', 'ruined', 'badly damaged', 'damaged', 'worn', 'good', 'pristine'],
     item.condition,
     item.maxCondition
   );
   
   if (state === 'destroyed') {
-    await $.recycler.recycle(item);
+    await $recycler.recycle(item);
     return 'The item crumbles to dust.';
   }
   
@@ -289,14 +289,14 @@ With 5 messages `['a', 'b', 'c', 'd', 'e']` and max=100:
 ### Status Display
 
 ```javascript
-const status = await $.proportional.sub(messages, current, max);
+const status = await $proportional.sub(messages, current, max);
 await player.tell(`Status: ${status}`);
 ```
 
 ### Conditional Actions
 
 ```javascript
-const status = await $.proportional.sub(messages, amount, total);
+const status = await $proportional.sub(messages, amount, total);
 if (status === messages[0]) {
   // Handle empty/dead case
 } else if (status === messages[messages.length - 1]) {
@@ -308,8 +308,8 @@ if (status === messages[0]) {
 
 ```javascript
 // Show message only when crossing thresholds
-const oldIdx = await $.proportional.index(messages, oldAmount, total);
-const newIdx = await $.proportional.index(messages, newAmount, total);
+const oldIdx = await $proportional.index(messages, oldAmount, total);
+const newIdx = await $proportional.index(messages, newAmount, total);
 
 if (newIdx !== oldIdx) {
   const status = messages[newIdx];
@@ -319,6 +319,6 @@ if (newIdx !== oldIdx) {
 
 ## See Also
 
-- [$.format](./format.md) - Text formatting and layout
-- [$.english](./english.md) - Grammar utilities
+- [$format](./format.md) - Text formatting and layout
+- [$english](./english.md) - Grammar utilities
 - [Best Practices](../best-practices.md) - Use utilities, don't reinvent

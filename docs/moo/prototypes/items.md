@@ -5,12 +5,12 @@ Wearables, consumables, stackables, and decayable items in Malice.
 ## Overview
 
 Malice supports a rich item system with multiple prototypes:
-- **$.wearable / $.clothing** - Items that can be worn (clothing, armor)
-- **$.edible / $.food / $.drink** - Items that can be consumed (food, drink)
-- **$.decayable** - Items that degrade over time (spoilage, wear)
-- **$.stackable** - Items that can be stacked (currency, ammo, resources)
+- **$wearable / $clothing** - Items that can be worn (clothing, armor)
+- **$edible / $food / $drink** - Items that can be consumed (food, drink)
+- **$decayable** - Items that degrade over time (spoilage, wear)
+- **$stackable** - Items that can be stacked (currency, ammo, resources)
 
-## $.wearable / $.clothing - Clothing System
+## $wearable / $clothing - Clothing System
 
 ### Purpose
 
@@ -49,7 +49,7 @@ Player removes the item.
 await jacket.doRemove(player);
 ```
 
-## $.edible / $.food / $.drink - Consumables
+## $edible / $food / $drink - Consumables
 
 ### Purpose
 
@@ -91,7 +91,7 @@ Player drinks from the item.
 const result = await waterBottle.doDrink(player);
 ```
 
-## $.decayable - Time-Based Decay
+## $decayable - Time-Based Decay
 
 ### Purpose
 
@@ -119,7 +119,7 @@ if (item.spoiled) {
 }
 ```
 
-## $.stackable - Stackable Items
+## $stackable - Stackable Items
 
 ### Purpose
 
@@ -155,7 +155,7 @@ await coins.removeFromStack(3);
 ### Clothing
 
 ```javascript
-const jacket = await $.recycler.create($.clothing, {
+const jacket = await $recycler.create($clothing, {
   name: 'leather jacket',
   warmth: 20,
   coverage: ['torso', 'arms'],
@@ -169,7 +169,7 @@ await jacket.doWear(player);
 ### Food
 
 ```javascript
-const apple = await $.recycler.create($.food, {
+const apple = await $recycler.create($food, {
   name: 'apple',
   bites: 3,
   calories: 95,
@@ -182,7 +182,7 @@ await apple.doEat(player);
 ### Stackable Currency
 
 ```javascript
-const coins = await $.recycler.create($.stackable, {
+const coins = await $recycler.create($stackable, {
   name: 'credit chip',
   count: 10,
   maxStack: 100
@@ -194,7 +194,7 @@ await coins.removeFromStack(3);
 ### Decayable Food
 
 ```javascript
-const bread = await $.recycler.create($.decayable, {
+const bread = await $recycler.create($decayable, {
   name: 'bread',
   decayRate: 0.02,
   decayType: 'spoilage'

@@ -14,7 +14,7 @@ ai action=spawn role="guard" clothed=true
 ## The Clothing Object Model
 
 ### Prototype Hierarchy
-- `$.thing` -> `$.wearable` -> `$.clothing`
+- `$thing` -> `$wearable` -> `$clothing`
 - Source: `src/database/bootstrap/prototypes/clothing-builder.ts`
 
 ### Required Properties (ALL MUST BE SET)

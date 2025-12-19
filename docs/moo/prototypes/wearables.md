@@ -14,12 +14,12 @@ The wearables system allows items to be worn on body parts:
 
 **Prototype Hierarchy:**
 ```
-$.describable
-└── $.wearable         ← Base wearable
-    └── $.clothing     ← Everyday clothing (wear/remove verbs)
+$describable
+└── $wearable         ← Base wearable
+    └── $clothing     ← Everyday clothing (wear/remove verbs)
 ```
 
-## $.wearable - Base Wearable
+## $wearable - Base Wearable
 
 Foundation for all wearable items.
 
@@ -127,7 +127,7 @@ const result = await shirt.remove(player);
 Get all items worn on a specific slot.
 
 ```javascript
-const items = await $.wearable.getWornOnSlot(player, 'torso');
+const items = await $wearable.getWornOnSlot(player, 'torso');
 // [undershirt, shirt, jacket]
 ```
 
@@ -139,9 +139,9 @@ const desc = await shirt.getWornDescription();
 // "a crisp white shirt" or item name if wornDescription not set
 ```
 
-## $.clothing - Everyday Clothing
+## $clothing - Everyday Clothing
 
-Inherits from $.wearable, adds verb registration.
+Inherits from $wearable, adds verb registration.
 
 ### Properties
 
@@ -274,7 +274,7 @@ Slot: torso
 Warmth protects against cold environments:
 
 ```javascript
-const jacket = await $.recycler.create($.clothing, {
+const jacket = await $recycler.create($clothing, {
   name: 'a winter jacket',
   covers: ['torso', 'leftArm', 'rightArm'],
   layer: 5,
@@ -290,7 +290,7 @@ Total warmth is sum of all worn items affecting a body part.
 ### Basic Shirt
 
 ```javascript
-const shirt = await $.recycler.create($.clothing, {
+const shirt = await $recycler.create($clothing, {
   name: 'a cotton t-shirt',
   description: 'A comfortable everyday shirt.',
   covers: ['torso'],
@@ -305,7 +305,7 @@ const shirt = await $.recycler.create($.clothing, {
 
 ```javascript
 // Pants (covers both legs)
-const pants = await $.recycler.create($.clothing, {
+const pants = await $recycler.create($clothing, {
   name: 'jeans',
   covers: ['leftLeg', 'rightLeg', 'waist'],
   layer: 2,
@@ -315,7 +315,7 @@ const pants = await $.recycler.create($.clothing, {
 });
 
 // Shoes (covers both feet)
-const shoes = await $.recycler.create($.clothing, {
+const shoes = await $recycler.create($clothing, {
   name: 'sneakers',
   covers: ['feet'],
   layer: 2,
@@ -325,7 +325,7 @@ const shoes = await $.recycler.create($.clothing, {
 });
 
 // Hat
-const hat = await $.recycler.create($.clothing, {
+const hat = await $recycler.create($clothing, {
   name: 'a baseball cap',
   covers: ['head'],
   layer: 2,
@@ -339,7 +339,7 @@ const hat = await $.recycler.create($.clothing, {
 
 ```javascript
 // Underwear (layer 1)
-const underwear = await $.recycler.create($.clothing, {
+const underwear = await $recycler.create($clothing, {
   name: 'boxer shorts',
   covers: ['waist', 'leftLeg', 'rightLeg'],
   layer: 1,
@@ -347,7 +347,7 @@ const underwear = await $.recycler.create($.clothing, {
 });
 
 // T-shirt (layer 2)
-const tshirt = await $.recycler.create($.clothing, {
+const tshirt = await $recycler.create($clothing, {
   name: 'a white t-shirt',
   covers: ['torso'],
   layer: 2,
@@ -355,7 +355,7 @@ const tshirt = await $.recycler.create($.clothing, {
 });
 
 // Hoodie (layer 3)
-const hoodie = await $.recycler.create($.clothing, {
+const hoodie = await $recycler.create($clothing, {
   name: 'a gray hoodie',
   covers: ['torso', 'leftArm', 'rightArm', 'head'],
   layer: 3,
@@ -363,7 +363,7 @@ const hoodie = await $.recycler.create($.clothing, {
 });
 
 // Jacket (layer 4)
-const jacket = await $.recycler.create($.clothing, {
+const jacket = await $recycler.create($clothing, {
   name: 'a leather jacket',
   covers: ['torso', 'leftArm', 'rightArm'],
   layer: 4,
@@ -437,7 +437,7 @@ You are carrying:
 The wearables system supports armor (not yet implemented):
 
 ```javascript
-const armor = await $.recycler.create($.wearable, {
+const armor = await $recycler.create($wearable, {
   name: 'a kevlar vest',
   covers: ['torso'],
   layer: 4,
@@ -466,7 +466,7 @@ The tailor creates complete outfits based on NPC role and context. See [TAILORIN
 Clothing items need `aliases` for verb matching:
 
 ```javascript
-const pants = await $.recycler.create($.clothing, {
+const pants = await $recycler.create($clothing, {
   name: 'worn work pants',
   aliases: ['pants', 'work pants'],  // Required for "get pants", "wear pants"
   covers: ['leftLeg', 'rightLeg', 'waist'],
@@ -487,9 +487,9 @@ Without aliases, commands like `get pants` won't match the item.
 
 Clothing can have pockets attached for storing small items.
 
-### $.pocket - Container on Clothing
+### $pocket - Container on Clothing
 
-Pockets are `$.pocket` instances attached to clothing. They inherit from `$.describable` and function as small containers.
+Pockets are `$pocket` instances attached to clothing. They inherit from `$describable` and function as small containers.
 
 ### Pocket Properties
 
@@ -532,7 +532,7 @@ Clothing items have a `pockets` array containing pocket references:
   name: 'cargo pants',
   covers: ['leftLeg', 'rightLeg', 'waist'],
   layer: 2,
-  pockets: ['#1234', '#1235'],   // ObjRefs to $.pocket instances
+  pockets: ['#1234', '#1235'],   // ObjRefs to $pocket instances
 }
 ```
 
@@ -575,8 +575,8 @@ Search order for items:
 
 ```javascript
 // Create the clothing
-const pants = await $.recycler.create({
-  parent: $.clothing,
+const pants = await $recycler.create({
+  parent: $clothing,
   properties: {
     name: 'cargo pants',
     covers: ['leftLeg', 'rightLeg', 'waist'],
@@ -586,8 +586,8 @@ const pants = await $.recycler.create({
 });
 
 // Create pockets
-const leftPocket = await $.recycler.create({
-  parent: $.pocket,
+const leftPocket = await $recycler.create({
+  parent: $pocket,
   properties: {
     name: 'left cargo pocket',
     maxWeight: 800,     // Cargo pockets are bigger
@@ -596,8 +596,8 @@ const leftPocket = await $.recycler.create({
   }
 });
 
-const rightPocket = await $.recycler.create({
-  parent: $.pocket,
+const rightPocket = await $recycler.create({
+  parent: $pocket,
   properties: {
     name: 'right cargo pocket',
     maxWeight: 800,
@@ -612,15 +612,15 @@ pants.pockets = [leftPocket, rightPocket];
 
 ### Cash and Pockets
 
-The `$.cash` utility automatically searches pockets when finding/taking cash:
+The `$cash` utility automatically searches pockets when finding/taking cash:
 
 ```javascript
 // Finds cash in hands AND pockets
-const found = await $.cash.find(player);
+const found = await $cash.find(player);
 
 // Takes from hands first, then pockets
-await $.cash.take(player, 50);
+await $cash.take(player, 50);
 
 // Gives to existing stack, or creates in hand, or creates in pocket
-await $.cash.give(player, 100);
+await $cash.give(player, 100);
 ```

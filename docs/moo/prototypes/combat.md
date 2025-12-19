@@ -14,7 +14,7 @@ Combat in Malice is designed for dramatic, dangerous encounters. Both combatants
 
 Combat is **forced** - you don't need consent to attack someone. This is Malice.
 
-## $.combat - Combat Manager
+## $combat - Combat Manager
 
 ### Properties
 
@@ -61,7 +61,7 @@ Each active combat is tracked with:
 ```
 1. INITIATE
    Player A: "attack B"
-   → $.combat.initiate(A, B)
+   → $combat.initiate(A, B)
    → Both get 'fighting' exclusion
    → Room notified
    → Timeout scheduled
@@ -75,9 +75,9 @@ Each active combat is tracked with:
    → Actions stored, players can only submit once per round
 
 3. RESOLUTION (triggered when all actions in, or timeout)
-   → $.combat.resolve(combatId)
+   → $combat.resolve(combatId)
    → gatherContext() collects all relevant info
-   → $.query() calls AI with combat MCP tool access
+   → $query() calls AI with combat MCP tool access
    → AI performs skill checks, applies damage, narrates
    → AI calls next_round or end
 
@@ -148,7 +148,7 @@ This prevents combat from stalling indefinitely.
 Start combat between two combatants.
 
 ```javascript
-const result = await $.combat.initiate(player, target);
+const result = await $combat.initiate(player, target);
 // { combatId: 'combat-...', combat: {...} }
 // or { error: 'Already in combat' }
 ```
@@ -164,7 +164,7 @@ const result = await $.combat.initiate(player, target);
 Join an existing combat.
 
 ```javascript
-const result = await $.combat.join(combatId, player);
+const result = await $combat.join(combatId, player);
 // { combatId, combat }
 ```
 
@@ -178,7 +178,7 @@ const result = await $.combat.join(combatId, player);
 Submit an action for the current round.
 
 ```javascript
-const result = await $.combat.submitAction(combatId, player, 'I lunge with my knife');
+const result = await $combat.submitAction(combatId, player, 'I lunge with my knife');
 // { success: true }
 // or { error: 'Already submitted action' }
 ```
@@ -192,7 +192,7 @@ const result = await $.combat.submitAction(combatId, player, 'I lunge with my kn
 Resolve the current round via AI.
 
 ```javascript
-await $.combat.resolve(combatId);
+await $combat.resolve(combatId);
 ```
 
 This is called automatically when all actions are in or timeout expires.
@@ -200,7 +200,7 @@ This is called automatically when all actions are in or timeout expires.
 **Resolution process:**
 1. Set status to 'resolving'
 2. Gather context (stats, wounds, weapons, actions)
-3. Call $.query with combat system prompt
+3. Call $query with combat system prompt
 4. AI uses MCP combat tool to apply results
 5. AI calls next_round or end
 
@@ -209,7 +209,7 @@ This is called automatically when all actions are in or timeout expires.
 Apply damage to a combatant's body part.
 
 ```javascript
-const result = await $.combat.applyDamage(
+const result = await $combat.applyDamage(
   combatId,
   victim,
   'torso',
@@ -235,7 +235,7 @@ Called by AI during resolution.
 Perform a skill check for a combatant.
 
 ```javascript
-const result = await $.combat.skillCheck(
+const result = await $combat.skillCheck(
   combatId,
   attacker,
   'knife-fighting',
@@ -265,7 +265,7 @@ const result = await $.combat.skillCheck(
 Narrate combat action to the room.
 
 ```javascript
-await $.combat.emote(combatId, 
+await $combat.emote(combatId, 
   "Jack's blade arcs toward Marcus. Marcus throws up an arm, the knife slicing across his forearm. Blood wells from the cut."
 );
 ```
@@ -277,7 +277,7 @@ All combatants and room occupants see the narration.
 Apply a status effect to a combatant.
 
 ```javascript
-await $.combat.applyEffect(combatId, victim, 'stunned', 60, 30000);
+await $combat.applyEffect(combatId, victim, 'stunned', 60, 30000);
 ```
 
 **Effects:**
@@ -291,7 +291,7 @@ await $.combat.applyEffect(combatId, victim, 'stunned', 60, 30000);
 Advance to the next round.
 
 ```javascript
-await $.combat.nextRound(combatId);
+await $combat.nextRound(combatId);
 ```
 
 **Effects:**
@@ -306,7 +306,7 @@ await $.combat.nextRound(combatId);
 End the combat.
 
 ```javascript
-await $.combat.endCombat(combatId, 'death', winner);
+await $combat.endCombat(combatId, 'death', winner);
 ```
 
 **Reasons:**
@@ -326,16 +326,16 @@ await $.combat.endCombat(combatId, 'death', winner);
 
 ```javascript
 // Get combat by ID
-const combat = await $.combat.getCombat(combatId);
+const combat = await $combat.getCombat(combatId);
 
 // Get combat a person is in
-const combat = await $.combat.getCombatByParticipant(player);
+const combat = await $combat.getCombatByParticipant(player);
 
 // Check if someone is in combat
-const inCombat = await $.combat.isInCombat(player);
+const inCombat = await $combat.isInCombat(player);
 
 // Get combat log
-const log = await $.combat.getLog(combatId);
+const log = await $combat.getLog(combatId);
 ```
 
 ## Context Gathering
@@ -486,21 +486,21 @@ Valid targets for damage:
 
 ### With Scheduler
 
-Combat uses `$.scheduler` for action timeouts:
+Combat uses `$scheduler` for action timeouts:
 
 ```javascript
 // Schedule timeout
-await $.scheduler.schedule(
+await $scheduler.schedule(
   'combat-timeout-' + combatId,
   60000,  // 60 seconds
   0,      // no repeat
-  $.combat,
+  $combat,
   'onTimeout',
   combatId
 );
 
 // Cancel on early resolution
-await $.scheduler.unschedule('combat-timeout-' + combatId);
+await $scheduler.unschedule('combat-timeout-' + combatId);
 ```
 
 ### With Body System

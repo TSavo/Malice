@@ -1,6 +1,6 @@
-# $.prompt - Interactive Prompts
+# $prompt - Interactive Prompts
 
-Use `$.prompt` for gathering input from players. All prompts return Promises that resolve when the player responds.
+Use `$prompt` for gathering input from players. All prompts return Promises that resolve when the player responds.
 
 ## Purpose
 
@@ -37,14 +37,14 @@ async function getPlayerChoice(player, options) {
 
 **Good: Robust prompt system**
 ```javascript
-const choice = await $.prompt.choice(player, 'Choose:', {
+const choice = await $prompt.choice(player, 'Choose:', {
   opt1: 'Option 1',
   opt2: 'Option 2'
 });
 // Handles everything: display, validation, retry, abort, disconnects
 ```
 
-## What $.prompt Handles
+## What $prompt Handles
 
 - ✅ Display formatting (numbered lists, columns)
 - ✅ Input validation and retry loops
@@ -58,7 +58,7 @@ const choice = await $.prompt.choice(player, 'Choose:', {
 ### question() - Text Input
 
 ```javascript
-await $.prompt.question(player, prompt, validator?)
+await $prompt.question(player, prompt, validator?)
 ```
 
 Asks a question and returns the answer.
@@ -74,11 +74,11 @@ Asks a question and returns the answer.
 **Examples:**
 ```javascript
 // Simple text question
-const name = await $.prompt.question(player, 'What is your name? ');
+const name = await $prompt.question(player, 'What is your name? ');
 await player.tell('Hello, ' + name + '!');
 
 // With validation
-const age = await $.prompt.question(player, 'Enter your age: ', (input) => {
+const age = await $prompt.question(player, 'Enter your age: ', (input) => {
   const num = parseInt(input, 10);
   if (isNaN(num) || num < 1 || num > 150) {
     return 'Please enter a valid age (1-150).';
@@ -87,7 +87,7 @@ const age = await $.prompt.question(player, 'Enter your age: ', (input) => {
 });
 
 // Validator returns error message or null
-const email = await $.prompt.question(player, 'Email: ', (input) => {
+const email = await $prompt.question(player, 'Email: ', (input) => {
   if (!input.includes('@')) return 'Invalid email address.';
   return null;
 });
@@ -96,7 +96,7 @@ const email = await $.prompt.question(player, 'Email: ', (input) => {
 ### yesorno() - Yes/No Question
 
 ```javascript
-await $.prompt.yesorno(player, prompt)
+await $prompt.yesorno(player, prompt)
 ```
 
 Asks a yes/no question.

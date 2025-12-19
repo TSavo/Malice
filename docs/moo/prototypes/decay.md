@@ -8,13 +8,13 @@ The decay system models organic decomposition. Items like food, body parts, and 
 
 **Prototype Hierarchy:**
 ```
-$.describable
-└── $.decayable          ← Base decay mechanics
-    └── $.corpse         ← Dead bodies (→ humanRemains)
+$describable
+└── $decayable          ← Base decay mechanics
+    └── $corpse         ← Dead bodies (→ humanRemains)
 
-$.describable
-├── $.humanRemains       ← Dried remains (→ skeletalRemains)
-└── $.skeletalRemains    ← Bones (permanent)
+$describable
+├── $humanRemains       ← Dried remains (→ skeletalRemains)
+└── $skeletalRemains    ← Bones (permanent)
 ```
 
 **Decay Timeline Example (Corpse):**
@@ -28,7 +28,7 @@ Human Remains (100%) → Skeletal Remains
 Skeletal Remains persist indefinitely
 ```
 
-## $.decayable - Base Prototype
+## $decayable - Base Prototype
 
 The foundation for anything that decays over time.
 
@@ -154,7 +154,7 @@ Called when decay reaches 100%. Override to handle destruction.
 
 ```javascript
 // Default: marks as destroyed
-// Corpse: transforms into $.humanRemains
+// Corpse: transforms into $humanRemains
 // Food: could spawn flies, emit smell
 ```
 
@@ -165,7 +165,7 @@ Called when storage is damaging the item.
 // Called when frozen organs take damage, etc.
 ```
 
-## $.corpse - Dead Bodies
+## $corpse - Dead Bodies
 
 Created when a player dies. Contains their body and inventory.
 
@@ -268,12 +268,12 @@ const report = await corpse.performAutopsy(doctor, 75);
 
 ### Transformation
 
-At 100% decay, corpse transforms into `$.humanRemains`:
+At 100% decay, corpse transforms into `$humanRemains`:
 - Corpse shell is recycled
 - Body is moved to new remains object
 - Room is notified of transformation
 
-## $.humanRemains - Dried Remains
+## $humanRemains - Dried Remains
 
 Intermediate stage between corpse and skeleton.
 
@@ -305,9 +305,9 @@ Same as corpse: `getBody()`, `search()`, `loot()`, `performAutopsy()`
 
 ### Transformation
 
-At 100% decay, transforms into `$.skeletalRemains`.
+At 100% decay, transforms into `$skeletalRemains`.
 
-## $.skeletalRemains - Bones
+## $skeletalRemains - Bones
 
 Final stage. Bones persist indefinitely.
 
@@ -375,7 +375,7 @@ await meat.preserve('salt');
 ### Basic Decayable
 
 ```javascript
-const apple = await $.recycler.create($.decayable, {
+const apple = await $recycler.create($decayable, {
   name: 'an apple',
   description: 'A fresh red apple.',
   decayRate: 2,           // Decays 2% per tick
@@ -418,7 +418,7 @@ for (const obj of decayingObjects) {
 ```
 Player dies
   ↓
-$.corpse created with player's body + inventory
+$corpse created with player's body + inventory
   ↓ 0-10 days
 Still identifiable, can determine cause of death
   ↓ 10-30 days
@@ -426,9 +426,9 @@ Bloating, identity obscured, smell attracts attention
   ↓ 30-60 days
 Advanced decay, limited autopsy possible
   ↓ ~60 days
-Transforms to $.humanRemains
+Transforms to $humanRemains
   ↓ ~6 months
-Transforms to $.skeletalRemains
+Transforms to $skeletalRemains
   ↓ forever
 Bones remain as grim landmark
 ```
@@ -436,7 +436,7 @@ Bones remain as grim landmark
 ### Food Decay
 
 ```javascript
-const bread = await $.recycler.create($.food, {
+const bread = await $recycler.create($food, {
   name: 'a loaf of bread',
   decayRate: 0.5,         // Slower than produce
   decayCondition: null,   // Always decaying

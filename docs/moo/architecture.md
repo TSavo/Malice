@@ -88,7 +88,7 @@ This is the correct architecture for a MOO because:
 - Food/drink/clothing prototypes
 - Combat system basics
 - Movement mechanics
-- $.english, $.format, $.pronoun utilities
+- $english, $format, $pronoun utilities
 
 **Common knowledge that's safe to share:**
 - How rooms work
@@ -125,7 +125,7 @@ This is the correct architecture for a MOO because:
 ### Layer 2 (Bootstrap)
 ```javascript
 // Food prototype - how food works in general
-$.food = await $.recycler.create($.thing, {
+$food = await $recycler.create($thing, {
   properties: {
     calories: 0,
     portions: 1,
@@ -138,7 +138,7 @@ $.food = await $.recycler.create($.thing, {
       await eater.addCalories(this.calories);
       await room.announce(eater, null, {
         actor: this.consumedMessage,
-        others: await $.pronoun.sub('%N eats %t.', eater, null, null, this),
+        others: await $pronoun.sub('%N eats %t.', eater, null, null, this),
       });
     },
   },
@@ -148,7 +148,7 @@ $.food = await $.recycler.create($.thing, {
 ### Layer 3 (Database)
 ```javascript
 // Specific food item - secret effect
-const mysteryMeat = await $.recycler.create($.food, {
+const mysteryMeat = await $recycler.create($food, {
   properties: {
     name: 'mystery meat',
     description: 'Smells... questionable.',

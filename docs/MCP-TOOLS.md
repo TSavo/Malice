@@ -288,7 +288,7 @@ Create an instance of a prototype and place it at a location.
 
 ```javascript
 {
-  prototypeId: 49,  // e.g., $.lock
+  prototypeId: 49,  // e.g., $lock
   locationId: 100,
   properties: { name: "rusty lock" }  // Optional overrides
 }
@@ -373,7 +373,7 @@ Close a telnet session.
 
 ## AI Registry (Consolidated Tool)
 
-The `ai` tool is a consolidated interface for managing AI-controlled humans. AI humans are regular `$.human` instances tracked by role in the `$.ai` registry.
+The `ai` tool is a consolidated interface for managing AI-controlled humans. AI humans are regular `$human` instances tracked by role in the `$ai` registry.
 
 ### Actions
 
@@ -557,7 +557,7 @@ const door = await set_exit_door({
 
 // 3. Create a lock instance
 const lock = await spawn_item({
-  prototypeId: 49,  // $.lock
+  prototypeId: 49,  // $lock
   locationId: 100,
   properties: { name: "iron lock" }
 });
