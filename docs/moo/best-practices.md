@@ -19,7 +19,7 @@ if (a.id === b.id) { }         // ❌ WRONG - use ===
 
 // Direct property access
 const owner = self.owner;      // ✅ Already a RuntimeObject
-const owner = await $.load(self.owner); // ❌ Unnecessary
+const owner = await $load(self.owner); // ❌ Unnecessary
 
 // Property syntax
 self.name = 'Bob';             // ✅ Just assign

@@ -24,7 +24,7 @@ await obj.moveTo(destination, mover);       // With context
 
 ### Load Object
 ```javascript
-const obj = await $.load(id);               // By ID (from external input)
+const obj = await $load(id);               // By ID (from external input)
 const obj = await $[42];                    // Shorthand
 const obj = $aliasName;                    // By alias
 ```
@@ -33,7 +33,7 @@ const obj = $aliasName;                    // By alias
 ```javascript
 const owner = self.owner;                   // Already a RuntimeObject
 const loc = player.location;                // Already a RuntimeObject
-// No $.load() needed for object properties!
+// No $load() needed for object properties!
 ```
 
 ## Object References
@@ -341,7 +341,7 @@ await $addAlias('aliasName', object);
 ### Use Alias
 ```javascript
 const obj = $aliasName;
-const obj = await $.load($getAlias('aliasName'));
+const obj = await $load($getAlias('aliasName'));
 ```
 
 ### List Aliases
@@ -470,9 +470,9 @@ async onContentLeaving(obj, dest, mover) {
 ### Load Multiple
 ```javascript
 const [a, b, c] = await Promise.all([
-  $.load(idA),
-  $.load(idB),
-  $.load(idC)
+  $load(idA),
+  $load(idB),
+  $load(idC)
 ]);
 ```
 
@@ -495,7 +495,7 @@ for (const item of items) {
 1. **Load in parallel** when possible with `Promise.all()`
 2. **Copy arrays** before modifying during iteration
 3. **Cache loaded objects** instead of reloading
-4. **Use $.load()** instead of direct database access
+4. **Use $load()** instead of direct database access
 5. **Batch operations** when processing many items
 6. **Profile hot paths** to find bottlenecks
 

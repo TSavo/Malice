@@ -153,7 +153,7 @@ await $recycler.purge(obj);
 await $recycler.recycleTree(container);
 
 // Example: destroy chest with all items inside
-const chest = await $.load(chestId);
+const chest = await $load(chestId);
 await $recycler.recycleTree(chest);  // Chest + all items recycled
 ```
 
@@ -256,7 +256,7 @@ obj.setMethod('onLeaving', `
 
   // Cleanup verbs if leaving a player's hand
   if (source?.owner) {
-    const owner = await $.load(source.owner);
+    const owner = await $load(source.owner);
     await owner.unregisterVerbsFrom(self);
   }
   
@@ -277,7 +277,7 @@ obj.setMethod('onArrived', `
 
   // Register verbs if arriving in a player's hand
   if (dest?.owner) {
-    const owner = await $.load(dest.owner);
+    const owner = await $load(dest.owner);
     await owner.registerVerb(['use %t'], self, 'doUse');
   }
   
@@ -298,7 +298,7 @@ async onContentLeaving(obj, dest, mover) {
   if (obj.isPlayer) {
     // Remove exit verbs when player leaves
     for (const exitId of Object.values(self.exits || {})) {
-      await obj.unregisterVerbsFrom(await $.load(exitId));
+      await obj.unregisterVerbsFrom(await $load(exitId));
     }
   }
   
@@ -319,7 +319,7 @@ async onContentArrived(obj, source, mover) {
   if (obj.isPlayer) {
     // Register exit verbs with player
     for (const [dir, exitId] of Object.entries(self.exits || {})) {
-      const exit = await $.load(exitId);
+      const exit = await $load(exitId);
       await obj.registerVerb([dir], exit, 'traverse');
     }
     
@@ -395,7 +395,7 @@ async moveMatchingItems(from, to, predicate, mover) {
 
 ```javascript
 async doGet(player, itemName) {
-  const room = await $.load(player.location);
+  const room = await $load(player.location);
   
   // Find item in room
   const item = room.contents.find(obj => 
@@ -433,7 +433,7 @@ async doGet(player, itemName) {
 
 ```javascript
 async doDrop(player, item) {
-  const room = await $.load(player.location);
+  const room = await $load(player.location);
   
   // Move from hand to room
   try {
@@ -469,7 +469,7 @@ async createStarterEquipment(player) {
       await item.moveTo(hand, player);
     } else {
       // Fallback to location if no hands
-      await item.moveTo(await $.load(player.location), player);
+      await item.moveTo(await $load(player.location), player);
     }
   }
 }

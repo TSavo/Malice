@@ -266,7 +266,7 @@ await $ai.register(human.id, 'guard');
 
 ```javascript
 // Spawn multiple guards for a building
-const lobby = await $.load(lobbyRoomId);
+const lobby = await $load(lobbyRoomId);
 
 for (let i = 0; i < 3; i++) {
   await $ai.spawn('guard', {
@@ -285,7 +285,7 @@ for (let i = 0; i < 3; i++) {
 const guardIds = await $ai.getByRole('guard');
 
 for (const id of guardIds) {
-  const guard = await $.load(id);
+  const guard = await $load(id);
   if (guard && guard.location === alarmRoomId) {
     await guard.speak('Intruder alert!');
   }

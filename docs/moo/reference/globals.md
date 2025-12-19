@@ -9,7 +9,7 @@ Aliases are stored in `#0.properties.aliases` (the ObjectManager). When you acce
 ```javascript
 // In MOO method code:
 const recycler = $recycler;  // Resolves alias 'recycler' to the Recycler object
-const player = await $.load(playerId);  // Load any object by ID
+const player = await $load(playerId);  // Load any object by ID
 ```
 
 ## Core Aliases
@@ -486,11 +486,11 @@ In addition to aliases, `$` provides direct access to ObjectManager methods:
 
 ```javascript
 // Load any object by ID
-const obj = await $.load(123);
+const obj = await $load(123);
 
 // Create object (low-level, prefer $recycler.create)
-const parent = await $.load(1);
-const obj = await $.create({ parent: parent, properties: {...} });
+const parent = await $load(1);
+const obj = await $create({ parent: parent, properties: {...} });
 
 // Get all aliases
 const aliases = $.aliases;
@@ -499,7 +499,7 @@ const aliases = $.aliases;
 $.evictFromCache(objectId);
 
 // Clear aliases for an object
-await $.clearAliasesForObject(objectId);
+await $clearAliasesForObject(objectId);
 ```
 
 ## Adding Custom Aliases

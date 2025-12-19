@@ -70,7 +70,7 @@ Example:
 
 ```ts
 async moveTo(self: any, $: any, pass: any, dest: any, mover?: any) {
-  if (typeof dest === 'number') dest = await $.load(dest);
+  if (typeof dest === 'number') dest = await $load(dest);
   ...
 }
 ```

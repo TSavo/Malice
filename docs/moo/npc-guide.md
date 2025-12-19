@@ -93,7 +93,7 @@ Every NPC has an `agentSystemPrompt` property controlling their AI behavior. The
 After spawning, modify the NPC's prompt:
 
 ```javascript
-const npc = await $.load(npcId);
+const npc = await $load(npcId);
 
 // Add custom behavior at the start
 npc.agentSystemPrompt = `
@@ -347,7 +347,7 @@ ai({ action: 'recall', humanId: npc.id })
 ### Reset Session (if behavior is off)
 
 ```javascript
-const npc = await $.load(npcId);
+const npc = await $load(npcId);
 npc.agentSession = null;
 // Next interaction starts fresh conversation
 ```

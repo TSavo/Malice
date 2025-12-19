@@ -233,7 +233,7 @@ The default system prompt (`$.ai.defaultAgentPrompt`) includes:
 
 Override an NPC's prompt after spawn:
 ```javascript
-const janet = await $.load(3061);
+const janet = await $load(3061);
 janet.agentSystemPrompt = janet.agentSystemPrompt.replace(
   'DEFAULT BEHAVIOR',
   'CUSTOM: You are friendly and helpful to newcomers.\n\nDEFAULT BEHAVIOR'
@@ -292,7 +292,7 @@ ls -la ~/.claude/
 
 Reset an NPC's session:
 ```javascript
-const npc = await $.load(npcId);
+const npc = await $load(npcId);
 npc.agentSession = null;
 ```
 

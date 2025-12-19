@@ -99,7 +99,7 @@ await mcp.set_method({
   code: `
     if (self.locked) return 'The chest is locked.';
     // Call parent method
-    const parent = await $.load(self._parent);
+    const parent = await $load(self._parent);
     return parent.add(args[0]);
   `
 });
@@ -230,7 +230,7 @@ export class [Name]Builder {
       // Available globals: self, args, $, caller
       // self = this object
       // args = array of arguments
-      // $ = alias resolver (await $recycler, await $.load(id))
+      // $ = alias resolver (await $recycler, await $load(id))
       // caller = the agent who invoked this (if applicable)
 
       const param1 = args[0];
@@ -382,14 +382,14 @@ const recycler = await $recycler;
 const bank = await $bank;
 
 // 2. Load objects by ID
-const obj = await $.load(123);
-const player = await $[42];  // Shorthand for $.load(42)
+const obj = await $load(123);
+const player = await $[42];  // Shorthand for $load(42)
 
 // 3. Call methods on ObjectManager #0
 // Any unknown property delegates to #0
-await $.clearAliasesForObject(objectId);
-await $.addAlias('myAlias', objectId);
-const aliasId = await $.getAlias('myAlias');
+await $clearAliasesForObject(objectId);
+await $addAlias('myAlias', objectId);
+const aliasId = await $getAlias('myAlias');
 
 // 4. Access infrastructure
 $.db           // Database access
@@ -404,7 +404,7 @@ const recycler = await $recycler;
 const bank = await $bank;
 
 // Load an object by ID
-const obj = await $.load(123);
+const obj = await $load(123);
 
 // Create an object
 const newObj = await recycler.create({
@@ -749,7 +749,7 @@ npm test
 
 1. **Build order**: Prototypes must be built after their parents exist
 2. **Array/object mutation**: Must re-set the property after modifying
-3. **Async**: All method code is async - use `await` for `$.load`, `$recycler`, etc.
+3. **Async**: All method code is async - use `await` for `$load`, `$recycler`, etc.
 4. **String methods**: Methods are strings, escape special characters properly
 5. **Objrefs**: Use `"#123"` format for object references in properties
 6. **Aliases**: Register aliases after building so `$name` resolution works

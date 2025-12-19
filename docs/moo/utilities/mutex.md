@@ -202,8 +202,8 @@ async startCrafting(player, recipe) {
 }
 
 async completeCrafting(playerId, recipeId) {
-  const player = await $.load(playerId);
-  const recipe = await $.load(recipeId);
+  const player = await $load(playerId);
+  const recipe = await $load(recipeId);
   
   // Create item
   const item = await $recycler.create(recipe.result);
@@ -245,7 +245,7 @@ async gather(player, resource) {
   }, 5000);
   
   if (blocked) {
-    return `${await $.load(blocked.gatherer).name} is already gathering this.`;
+    return `${await $load(blocked.gatherer).name} is already gathering this.`;
   }
   
   await player.tell('You begin gathering...');

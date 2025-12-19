@@ -18,7 +18,7 @@ async function cloneBody(body) {
 
   const newParts = {};
   for (const partId of body.parts) {
-    const part = await $.load(partId);
+    const part = await $load(partId);
     const newPart = await $recycler.create(part.parent);
     newPart.name = part.name;
     newPart.owner = newBody.id;  // Update reference!
@@ -189,7 +189,7 @@ async createPlayerBody(player) {
 async duplicateEquipmentSet(originalSet) {
   const items = [];
   for (const itemId of originalSet.items) {
-    items.push(await $.load(itemId));
+    items.push(await $load(itemId));
   }
   
   // Clone all items at once
@@ -269,7 +269,7 @@ async spawnNPCs(template, count) {
 // Clone spell effect with all components
 async castClone(caster, target) {
   // Clone caster's item
-  const original = await $.load(caster.equipment.weapon);
+  const original = await $load(caster.equipment.weapon);
   const clones = await $memento.clone([original]);
   const duplicate = clones['%0'];
   
@@ -278,7 +278,7 @@ async castClone(caster, target) {
   target.inventory.push(duplicate);
   
   await $pronoun.announce(
-    await $.load(caster.location),
+    await $load(caster.location),
     '%N creates a duplicate of %d for %tN!',
     caster,
     original,

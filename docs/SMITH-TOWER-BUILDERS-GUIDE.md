@@ -287,7 +287,7 @@ revoke(playerObject, target)
 **In a job completion handler:**
 ```typescript
 // Get the lock object
-const residentialLock = await $.load('%LR');
+const residentialLock = await $load('%LR');
 
 // Authorize player for floor 5
 await residentialLock.authorize(player, 5);
@@ -302,7 +302,7 @@ methods: {
     const player = args[0];
     const assignedFloor = 7;  // Assign floor 7
 
-    const lock = await $.load('%LR');
+    const lock = await $load('%LR');
     await lock.authorize(player, assignedFloor);
 
     return 'Housing assigned: Smith Tower, Floor ' + assignedFloor;
@@ -362,7 +362,7 @@ methods: {
         return 'The call button clicks uselessly. No power.';
       }
 
-      const elevator = await $.load(elevatorId);
+      const elevator = await $load(elevatorId);
       if (!elevator) {
         return 'Nothing answers the button press.';
       }
@@ -511,11 +511,11 @@ This terminal is an instance of the `$jobBoard` prototype and provides job listi
     const job = args[1];
 
     // Assign apartment on floor 7
-    const residentialLock = await $.load('%LR');
+    const residentialLock = await $load('%LR');
     await residentialLock.authorize(player, 7);
 
     // Maybe also give them a key item
-    const key = await $.create({
+    const key = await $create({
       parent: '$item',
       name: 'Smith Tower Apartment Key - 7F',
     });
@@ -534,7 +534,7 @@ This terminal is an instance of the `$jobBoard` prototype and provides job listi
     const player = args[0];
 
     // Grant CorpSec floor access
-    const corpsecLock = await $.load('%L1');
+    const corpsecLock = await $load('%L1');
     await corpsecLock.authorize(player, 3);
 
     return 'CorpSec clearance granted. You may now access Floor 3.';
@@ -554,7 +554,7 @@ This terminal is an instance of the `$jobBoard` prototype and provides job listi
 lock.authorizedUsers = { 5: [123, 456] };
 
 // Don't look up by ID manually
-const player = await $.load(123);
+const player = await $load(123);
 ```
 
 **✅ RIGHT:**

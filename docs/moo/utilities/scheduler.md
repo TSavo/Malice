@@ -269,8 +269,8 @@ async startCrafting(player, recipe) {
 }
 
 async completeCrafting(playerId, recipeId) {
-  const player = await $.load(playerId);
-  const recipe = await $.load(recipeId);
+  const player = await $load(playerId);
+  const recipe = await $load(recipeId);
   
   const item = await $recycler.create(recipe.result);
   item.location = player;
