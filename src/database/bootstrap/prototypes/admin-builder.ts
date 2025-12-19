@@ -1065,14 +1065,14 @@ export class AdminBuilder {
       await self.tell('Object: #' + target.id + ' ' + target.name);
       await self.tell('Description: ' + (target.description || '(none)'));
 
-      const confirmed = await $.prompt.yesorno(self, '\\r\\nDestroy this object? This cannot be undone!');
+      const confirmed = await $prompt.yesorno(self, '\\r\\nRecycle this object? ');
       if (!confirmed) {
         await self.tell('Cancelled.');
         return;
       }
 
-      await $.destroy(targetId);
-      await self.tell('Destroyed object #' + targetId + '.');
+      await $recycler.recycle(target, self);
+      await self.tell('Recycled object #' + targetId + '.');
     `);
   }
 
