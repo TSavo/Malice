@@ -41,6 +41,9 @@ export class PlayerBuilder {
         fitnessPlaytime: 0, // Minutes played toward next XP (resets at 180)
         fitnessXPToday: 0, // XP earned today (max 3)
         fitnessLastDay: null, // Date string of last XP day (for reset)
+        
+        // Clone system
+        cloneBackupTank: null, // ObjRef to tank holding our backup (or null)
       },
       methods: {},
     });
@@ -91,6 +94,11 @@ export class PlayerBuilder {
       await self.registerVerb(['health', 'hp', 'status'], self, 'health');
       await self.registerVerb(['give %i to %i'], self, 'give');
       await self.registerVerb(['inventory', 'i'], self, 'inventory');
+
+      // Pocket commands
+      await self.registerVerb(['pocket %i', 'put %i in pocket', 'stash %i'], self, 'pocket');
+      await self.registerVerb(['pocket %i in %t', 'put %i in %t', 'stash %i in %t'], self, 'pocketIn');
+      await self.registerVerb(['hold %i', 'unholster %i', 'draw %i'], self, 'hold');
 
       // If we have a location, move into it to trigger verb registration
       // If we have a location, move into it to trigger verb registration
@@ -1410,15 +1418,137 @@ export class PlayerBuilder {
       self.sleepDebt = 0;
       self.statusEffects = {};
 
+      // Check for clone backup
+      const cloneTank = self.cloneBackupTank;
+      const hasBackup = cloneTank && await cloneTank.hasBackup(self);
+      
+      if (hasBackup) {
+        // Get backup info for display
+        const backup = await cloneTank.getBackup(self);
+        const backupDate = backup?.backupTimestamp 
+          ? new Date(backup.backupTimestamp).toLocaleString()
+          : 'unknown';
+        
+        // Enter death funnel with clone option
+        self._deathFunnelState = 'choosing';
+        self._deathFunnelCorpse = corpse;
+        
+        await self.tell('=== DEATH OPTIONS ===');
+        await self.tell('');
+        await self.tell('1. RESURRECT FROM CLONE');
+        await self.tell('   Tank: ' + (cloneTank.name || 'Clone Tank'));
+        await self.tell('   Last backup: ' + backupDate);
+        await self.tell('   WARNING: You will only have memories up to this backup.');
+        await self.tell('   Everything after that moment is permanently lost.');
+        await self.tell('');
+        await self.tell('2. CREATE NEW CHARACTER');
+        await self.tell('   Start fresh with a new identity.');
+        await self.tell('   Your backup data will remain for later use.');
+        await self.tell('');
+        await self.tell('Type CLONE or NEW to choose.');
+        
+        // Register death funnel verbs
+        await self.registerVerb(['clone', 'resurrect', '1'], self, 'deathFunnelClone');
+        await self.registerVerb(['new', 'new character', '2'], self, 'deathFunnelNew');
+        
+      } else {
+        // No backup - go straight to chargen
+        await self.tell('You have no clone backup. Your story ends here.');
+        await self.tell('');
+        
+        // Send to chargen for new character
+        if (self._context && $.charGen) {
+          await self.tell('Creating a new character...');
+          await self.tell('');
+          await $.charGen.start(self._context, self);
+        } else if (self._context) {
+          await self.tell('Please reconnect to create a new character.');
+          self._context.close();
+        }
+      }
+    `);
+    
+    // Death funnel: player chose to resurrect from clone
+    obj.setMethod('deathFunnelClone', `
+      /** Handle player choosing to resurrect from clone. */
+      if (self._deathFunnelState !== 'choosing') {
+        await self.tell('You are not at the death screen.');
+        return;
+      }
+      
+      const cloneTank = self.cloneBackupTank;
+      if (!cloneTank) {
+        await self.tell('Error: No clone tank found. Proceeding to new character...');
+        await self.deathFunnelNew();
+        return;
+      }
+      
+      // Clear death funnel state
+      self._deathFunnelState = null;
+      self._deathFunnelCorpse = null;
+      
+      // Unregister death funnel verbs
+      await self.unregisterVerb('clone');
+      await self.unregisterVerb('resurrect');
+      await self.unregisterVerb('1');
+      await self.unregisterVerb('new');
+      await self.unregisterVerb('new character');
+      await self.unregisterVerb('2');
+      
+      await self.tell('');
+      await self.tell('Initiating resurrection sequence...');
+      await self.tell('');
+      
+      // Begin resurrection (this sets up the timer)
+      const result = await cloneTank.beginResurrection(self);
+      
+      if (!result.success) {
+        await self.tell('Resurrection failed: ' + result.message);
+        await self.tell('Proceeding to new character...');
+        await self.deathFunnelNew();
+        return;
+      }
+      
+      await self.tell('Clone growth initiated.');
+      await self.tell('Estimated time: ' + (result.estimatedTime || 5) + ' minutes.');
+      await self.tell('');
+      await self.tell('Your consciousness drifts in darkness...');
+      await self.tell('Fragments of memory reassemble...');
+      await self.tell('');
+      await self.tell('You will awaken when the process completes.');
+      
+      // The tank's tick() will call completeResurrection() when ready
+      // which will place the player in the tank's room with a new body
+    `);
+    
+    // Death funnel: player chose to create new character
+    obj.setMethod('deathFunnelNew', `
+      /** Handle player choosing to create a new character instead of cloning. */
+      if (self._deathFunnelState === 'choosing') {
+        // Clear death funnel state
+        self._deathFunnelState = null;
+        self._deathFunnelCorpse = null;
+        
+        // Unregister death funnel verbs
+        await self.unregisterVerb('clone');
+        await self.unregisterVerb('resurrect');
+        await self.unregisterVerb('1');
+        await self.unregisterVerb('new');
+        await self.unregisterVerb('new character');
+        await self.unregisterVerb('2');
+      }
+      
+      await self.tell('');
+      await self.tell('You release your hold on this life.');
+      await self.tell('Your backup remains stored, awaiting a future that will never come.');
+      await self.tell('');
+      
       // Send to chargen for new character
       if (self._context && $.charGen) {
         await self.tell('Creating a new character...');
         await self.tell('');
-
-        // Hand off to chargen
         await $.charGen.start(self._context, self);
       } else if (self._context) {
-        // Fallback: just show message
         await self.tell('Please reconnect to create a new character.');
         self._context.close();
       }
@@ -1913,6 +2043,205 @@ export class PlayerBuilder {
       } else {
         await self.tell('You represent a metaphysical void.');
       }
+    `);
+
+    // ═══════════════════════════════════════════════════════════════════
+    // POCKET COMMANDS
+    // ═══════════════════════════════════════════════════════════════════
+
+    // pocket X - put held item into first available pocket
+    obj.setMethod('pocket', `
+      /** Put an item from your hand into a pocket.
+       *  Usage: pocket <item>, stash <item>, put <item> in pocket
+       *  Finds the first pocket with space and puts the item there.
+       */
+      const item = args[3]; // resolved from %i
+
+      if (!item) {
+        return 'Pocket what?';
+      }
+
+      // Check item is in hand
+      const hands = await self.getHands();
+      let foundInHand = null;
+
+      for (const hand of hands.both || []) {
+        if (!hand) continue;
+        const contents = hand.contents || [];
+        for (const c of contents) {
+          if (c && c.id === item.id) {
+            foundInHand = hand;
+            break;
+          }
+        }
+        if (foundInHand) break;
+      }
+
+      if (!foundInHand) {
+        return 'You are not holding ' + item.name + '.';
+      }
+
+      // Find a pocket with space
+      const wornItems = await self.getWornItems();
+
+      for (const { item: worn } of wornItems) {
+        const pockets = worn.pockets || [];
+        for (const pocket of pockets) {
+          if (!pocket) continue;
+          const canContain = await pocket.canContain(item);
+          if (canContain === true) {
+            await item.moveTo(pocket);
+            return 'You slip ' + item.name + ' into your ' + pocket.name + '.';
+          }
+        }
+      }
+
+      return 'You have no pocket that can hold ' + item.name + '.';
+    `);
+
+    // pocket X in Y - put held item into specific pocket
+    obj.setMethod('pocketIn', `
+      /** Put an item from your hand into a specific pocket.
+       *  Usage: pocket <item> in <pocket>, put <item> in <pocket>
+       *  The pocket can be referenced by name or the clothing item.
+       */
+      const item = args[3]; // resolved from %i
+      const target = args[4]; // resolved from %t
+
+      if (!item) {
+        return 'Pocket what?';
+      }
+
+      if (!target) {
+        return 'Put it in what?';
+      }
+
+      // Check item is in hand
+      const hands = await self.getHands();
+      let foundInHand = null;
+
+      for (const hand of hands.both || []) {
+        if (!hand) continue;
+        const contents = hand.contents || [];
+        for (const c of contents) {
+          if (c && c.id === item.id) {
+            foundInHand = hand;
+            break;
+          }
+        }
+        if (foundInHand) break;
+      }
+
+      if (!foundInHand) {
+        return 'You are not holding ' + item.name + '.';
+      }
+
+      // Target could be a pocket directly, or clothing with pockets
+      let targetPocket = null;
+
+      // Check if target is a pocket
+      if (target.maxWeight !== undefined && target.maxVolume !== undefined) {
+        // Looks like a pocket
+        targetPocket = target;
+      } else if (target.pockets && target.pockets.length > 0) {
+        // It's clothing - find first available pocket
+        for (const pocket of target.pockets) {
+          if (pocket) {
+            const canContain = await pocket.canContain(item);
+            if (canContain === true) {
+              targetPocket = pocket;
+              break;
+            }
+          }
+        }
+        if (!targetPocket) {
+          return target.name + ' has no pocket that can hold ' + item.name + '.';
+        }
+      } else {
+        return target.name + ' has no pockets.';
+      }
+
+      // Check if pocket can hold the item
+      const canContain = await targetPocket.canContain(item);
+      if (canContain !== true) {
+        return canContain; // Return the error message
+      }
+
+      await item.moveTo(targetPocket);
+      return 'You slip ' + item.name + ' into your ' + targetPocket.name + '.';
+    `);
+
+    // hold X - take item from pocket into hand
+    obj.setMethod('hold', `
+      /** Take an item from your pocket into your hand.
+       *  Usage: hold <item>, draw <item>, unholster <item>
+       *  Finds the item in your pockets and moves it to a free hand.
+       */
+      const item = args[3]; // resolved from %i
+
+      if (!item) {
+        return 'Hold what?';
+      }
+
+      // Find item in pockets
+      let foundInPocket = null;
+      const wornItems = await self.getWornItems();
+
+      for (const { item: worn } of wornItems) {
+        const pockets = worn.pockets || [];
+        for (const pocket of pockets) {
+          if (!pocket) continue;
+          const contents = pocket.contents || [];
+          for (const c of contents) {
+            if (c && c.id === item.id) {
+              foundInPocket = pocket;
+              break;
+            }
+          }
+          if (foundInPocket) break;
+        }
+        if (foundInPocket) break;
+      }
+
+      if (!foundInPocket) {
+        // Maybe it's already in hand or somewhere else
+        const hands = await self.getHands();
+        for (const hand of hands.both || []) {
+          if (!hand) continue;
+          const contents = hand.contents || [];
+          for (const c of contents) {
+            if (c && c.id === item.id) {
+              return 'You are already holding ' + item.name + '.';
+            }
+          }
+        }
+        return item.name + ' is not in your pockets.';
+      }
+
+      // Find free hand
+      const hands = await self.getHands();
+      let targetHand = null;
+
+      if (hands.primary) {
+        const canContain = await hands.primary.canContain(item);
+        if (canContain === true) {
+          targetHand = hands.primary;
+        }
+      }
+
+      if (!targetHand && hands.secondary) {
+        const canContain = await hands.secondary.canContain(item);
+        if (canContain === true) {
+          targetHand = hands.secondary;
+        }
+      }
+
+      if (!targetHand) {
+        return 'Your hands are full.';
+      }
+
+      await item.moveTo(targetHand);
+      return 'You draw ' + item.name + ' from your ' + foundInPocket.name + '.';
     `);
   }
 }

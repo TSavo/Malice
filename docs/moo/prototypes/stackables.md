@@ -169,7 +169,7 @@ copper wire
 
 ## $.vendable - Vending Machines
 
-Containers that sell items using bank payment.
+Containers that sell items using bank credits OR physical cash.
 
 ### Properties
 
@@ -179,8 +179,10 @@ Containers that sell items using bank payment.
   description: 'A vending container that sells the items it holds.',
 
   // Payment configuration
-  bankAccount: null,      // Account ID to receive funds
+  currency: 'credits',    // 'credits' or 'cash'
+  bankAccount: null,      // Account ID for credits (required if currency='credits')
   bank: null,             // Bank object id/alias
+  operator: null,         // Who receives cash payments (ObjRef, for currency='cash')
   defaultPrice: 0,        // Default price if item has no price
 
   // Access control
@@ -195,6 +197,20 @@ Containers that sell items using bank payment.
   // Phone integration
   phoneDb: null,          // Phone directory for auto-numbering
 }
+```
+
+### Payment Modes
+
+**Credits Mode** (`currency: 'credits'`):
+- Requires `bankAccount` and optionally `bank`
+- Uses `$.bank.transfer()` for payment
+- Transaction is logged and traceable
+
+**Cash Mode** (`currency: 'cash'`):
+- Uses `$.cash.take()` to collect payment
+- If `operator` is set, uses `$.cash.give()` to pay them
+- If no operator, cash is burned (machine keeps it)
+- No transaction log - anonymous payment
 ```
 
 ### Two Sale Modes
@@ -368,23 +384,28 @@ You buy synth-bar for 5.
 
 ```
 > manage machine
+=== CURRENT CONFIG ===
+Currency: CASH
+Cash goes to: Bob
+Default price: 50
+Items stocked: 3
+
 Manage vending machine:
   1) Stock from inventory
   2) Set price for item
   3) Set default price
-  4) Set bank account
-  5) Configure spawnables
-  6) Exit
-Choose: 2
+  4) Set currency (cash/credits)
+  5) Set payment destination
+  6) Configure spawnables
+  7) Exit
+Choose: 4
 
-Pick item to price:
-  1) synth-bar (current: 5)
-  2) water bottle (current: 3)
-Enter number: 1
+Select payment method (current: cash):
+  1) Cash (physical dollars)
+  2) Credits (bank transfer)
+Choose: 1
 
-Enter new price: 7
-
-synth-bar priced at 7.
+Currency set to CASH. Customers pay with physical dollars.
 ```
 
 ## Use Cases

@@ -462,11 +462,15 @@ Root (#1)
 │   │   └── ...
 │   ├── Door (#43)
 │   ├── Wearable (#34)
+│   │   └── Clothing
+│   ├── Pocket - container attached to clothing
 │   ├── Stackable (#40)
+│   │   └── Dollar - physical cash
 │   └── ...
 └── Singletons (parent: Root)
     ├── Recycler
-    ├── Bank
+    ├── Bank - credit operations
+    ├── Cash - physical cash operations
     ├── BodyFactory
     ├── AI
     ├── Faction - tracks faction memberships and relationships

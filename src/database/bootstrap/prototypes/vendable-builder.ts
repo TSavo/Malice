@@ -14,8 +14,10 @@ export class VendableBuilder {
       properties: {
          name: 'Vendable',
          description: 'A vending container that sells the items it holds.',
-         bankAccount: null, // target account ID to receive funds
+         bankAccount: null, // target account ID to receive funds (for credits mode)
          bank: null, // bank object id/alias
+         currency: 'credits', // 'cash' or 'credits' - payment method
+         operator: null, // who receives cash payments (if currency='cash')
          defaultPrice: 0,
          owner: null, // agent id that can manage stock/prices
          locks: [], // optional composable locks controlling manage access
@@ -30,13 +32,15 @@ export class VendableBuilder {
     obj.setMethod('listItems', `
       const viewer = args[0];
       const contents = self.contents || [];
+      const currency = self.currency || 'credits';
       if (!contents.length) return 'This vendor is empty.';
-      let out = 'Available items:\n';
+      let out = 'Available items:\\n';
       for (let i = 0; i < contents.length; i++) {
         const item = contents[i];
         if (!item) continue;
         const price = item.price ?? self.defaultPrice ?? 0;
-        out += \`  \${i + 1}) \${item.name || 'Item'} - \${price}\n\`;
+        const priceStr = currency === 'cash' ? '$' + price : price + ' cr';
+        out += \`  \${i + 1}) \${item.name || 'Item'} - \${priceStr}\\n\`;
       }
       return out.trim();
     `);
@@ -45,35 +49,43 @@ export class VendableBuilder {
       const buyer = args[0];
       if (!buyer) return 'No buyer specified.';
 
+      const currency = self.currency || 'credits';
       const bank = self.bank || $.bank || null;
       const account = self.bankAccount;
-      if (!bank || !account) return 'Vendor is not configured for payments.';
+      
+      // Validate payment configuration
+      if (currency === 'credits') {
+        if (!bank || !account) return 'Vendor is not configured for credit payments.';
+      }
+      // Cash mode doesn't require bank config
 
       const contents = self.contents || [];
       const spawnables = self.spawnables || [];
       if (!contents.length && !spawnables.length) return 'Out of stock.';
 
       // Build menu across physical contents and spawnables
-      let menu = 'What do you want to buy?\n';
+      let menu = 'What do you want to buy?\\n';
       const saleItems = [];
       for (let i = 0; i < contents.length; i++) {
         const item = contents[i];
         if (!item) continue;
         const price = item.price ?? self.defaultPrice ?? 0;
+        const priceStr = currency === 'cash' ? '$' + price : price + ' cr';
         saleItems.push({ type: 'existing', item, price, index: i });
-        menu += \`  \${saleItems.length}) \${item.name || 'Item'} - \${price}\n\`;
+        menu += \`  \${saleItems.length}) \${item.name || 'Item'} - \${priceStr}\\n\`;
       }
       for (let i = 0; i < spawnables.length; i++) {
         const spawn = spawnables[i];
         const price = spawn.price ?? self.defaultPrice ?? 0;
+        const priceStr = currency === 'cash' ? '$' + price : price + ' cr';
         const name = spawn.name || 'Spawned Item';
         saleItems.push({ type: 'spawn', spawn, price, index: i });
-        menu += \`  \${saleItems.length}) \${name} - \${price}\n\`;
+        menu += \`  \${saleItems.length}) \${name} - \${priceStr}\\n\`;
       }
       if (!saleItems.length) return 'Nothing for sale.';
 
       // Prompt selection
-      const choiceRaw = await $.prompt(buyer, menu.trim() + '\nEnter number:');
+      const choiceRaw = await $.prompt(buyer, menu.trim() + '\\nEnter number:');
       const choice = Number(choiceRaw);
       if (!Number.isInteger(choice) || choice < 1 || choice > saleItems.length) {
         return 'Invalid selection.';
@@ -82,16 +94,33 @@ export class VendableBuilder {
       const selected = saleItems[choice - 1];
       const price = selected.price;
       const label = selected.type === 'spawn' ? (selected.spawn.name || 'item') : (selected.item.name || 'item');
-      const confirm = await $.prompt(buyer, \`Buy \${label} for \${price}? (y/n)\`);
+      const priceStr = currency === 'cash' ? '$' + price : price + ' credits';
+      const confirm = await $.prompt(buyer, \`Buy \${label} for \${priceStr}? (y/n)\`);
       if ((confirm || '').toLowerCase()[0] !== 'y') return 'Cancelled.';
 
-      // Locate buyer account
-      const buyerAccounts = await bank.getAccountByOwner(buyer);
-      if (!buyerAccounts || !buyerAccounts.length) return 'You have no bank account.';
-      const buyerAccountId = buyerAccounts[0].accountId;
+      // Process payment based on currency mode
+      if (currency === 'credits') {
+        // Bank transfer
+        const buyerAccounts = await bank.getAccountByOwner(buyer);
+        if (!buyerAccounts || !buyerAccounts.length) return 'You have no bank account.';
+        const buyerAccountId = buyerAccounts[0].accountId;
 
-      const tx = await bank.transfer(buyerAccountId, account, price, \`vend-${Date.now()}\`, 'Vending purchase');
-      if (!tx?.success) return tx?.error || 'Payment failed.';
+        const tx = await bank.transfer(buyerAccountId, account, price, \`vend-\${Date.now()}\`, 'Vending purchase');
+        if (!tx?.success) return tx?.error || 'Payment failed.';
+      } else {
+        // Cash payment via $.cash utility
+        if (!$.cash) return 'Cash system unavailable.';
+        
+        const takeResult = await $.cash.take(buyer, price);
+        if (!takeResult.success) return takeResult.message;
+        
+        // Give cash to operator if configured
+        const operator = self.operator;
+        if (operator) {
+          await $.cash.give(operator, price);
+        }
+        // If no operator, cash is burned (machine keeps it)
+      }
 
       let deliveredItem = null;
 
@@ -141,7 +170,7 @@ export class VendableBuilder {
       buyer.inventory = inv;
       await deliveredItem.moveTo(buyer);
 
-      return \`You buy \${deliveredItem.name || 'the item'} for \${price}.\`;
+      return \`You buy \${deliveredItem.name || 'the item'} for \${priceStr}.\`;
     `);
 
 
@@ -159,14 +188,29 @@ export class VendableBuilder {
       }
 
       const contents = self.contents || [];
-      const menu = 'Manage vending machine:\n' +
-        '  1) Stock from inventory\n' +
-        '  2) Set price for item\n' +
-        '  3) Set default price\n' +
-        '  4) Set bank account\n' +
-        '  5) Configure spawnables\n' +
-        '  6) Exit';
-      const choiceRaw = await $.prompt(actor, menu + '\nChoose:');
+      const currency = self.currency || 'credits';
+      const operator = self.operator;
+      
+      // Build current status
+      let status = '=== CURRENT CONFIG ===\\n';
+      status += 'Currency: ' + (currency === 'cash' ? 'CASH' : 'CREDITS') + '\\n';
+      if (currency === 'cash') {
+        status += 'Cash goes to: ' + (operator ? (operator.name || 'someone') : '(machine keeps it)') + '\\n';
+      } else {
+        status += 'Bank account: ' + (self.bankAccount || '(not set)') + '\\n';
+      }
+      status += 'Default price: ' + (self.defaultPrice ?? 0) + '\\n';
+      status += 'Items stocked: ' + contents.length + '\\n';
+      
+      const menu = status + '\\nManage vending machine:\\n' +
+        '  1) Stock from inventory\\n' +
+        '  2) Set price for item\\n' +
+        '  3) Set default price\\n' +
+        '  4) Set currency (cash/credits)\\n' +
+        '  5) Set payment destination\\n' +
+        '  6) Configure spawnables\\n' +
+        '  7) Exit';
+      const choiceRaw = await $.prompt(actor, menu + '\\nChoose:');
       const choice = Number(choiceRaw);
 
 
@@ -230,16 +274,73 @@ export class VendableBuilder {
       }
 
       if (choice === 4) {
-        const acct = await $.prompt(actor, 'Enter bank account id to receive funds:');
-        if (!acct) return 'No account provided.';
-        self.bankAccount = acct;
-        // allow updating bank reference too
-        const bankRef = await $.prompt(actor, 'Enter bank object id/alias (blank to keep current):');
-        if (bankRef) self.bank = bankRef;
-        return 'Bank payout updated.';
+        // Set currency type
+        const currentCurrency = self.currency || 'credits';
+        const currMenu = 'Select payment method (current: ' + currentCurrency + '):\\n' +
+          '  1) Cash (physical dollars)\\n' +
+          '  2) Credits (bank transfer)';
+        
+        const currRaw = await $.prompt(actor, currMenu + '\\nChoose:');
+        const currChoice = Number(currRaw);
+        
+        if (currChoice === 1) {
+          self.currency = 'cash';
+          return 'Currency set to CASH. Customers pay with physical dollars.';
+        } else if (currChoice === 2) {
+          self.currency = 'credits';
+          return 'Currency set to CREDITS. Customers pay via bank transfer.';
+        } else {
+          return 'Cancelled.';
+        }
       }
 
       if (choice === 5) {
+        // Set payment destination (operator for cash, bank account for credits)
+        const currencyMode = self.currency || 'credits';
+        
+        if (currencyMode === 'cash') {
+          // Set cash operator
+          const currentOp = self.operator;
+          let prompt = 'Who should receive cash payments?\\n';
+          prompt += '  1) Me (' + actor.name + ')\\n';
+          prompt += '  2) No one (machine keeps it)';
+          if (currentOp) {
+            prompt += '\\n\\nCurrently: ' + (currentOp.name || 'someone');
+          }
+          
+          const opRaw = await $.prompt(actor, prompt + '\\nChoose:');
+          const opChoice = Number(opRaw);
+          
+          if (opChoice === 1) {
+            self.operator = actor;
+            return 'You will now receive cash payments.';
+          } else if (opChoice === 2) {
+            self.operator = null;
+            return 'Machine will keep cash payments.';
+          } else {
+            return 'Cancelled.';
+          }
+        } else {
+          // Set bank account for credits
+          const currentAcct = self.bankAccount;
+          await actor.tell('Current bank account: ' + (currentAcct || '(not set)'));
+          
+          const acct = await $.prompt(actor, 'Enter bank account ID to receive credits:');
+          if (!acct || acct.trim() === '') return 'Cancelled.';
+          
+          self.bankAccount = acct.trim();
+          
+          // Optionally update bank reference
+          const bankRef = await $.prompt(actor, 'Bank object alias (blank to use default $.bank):');
+          if (bankRef && bankRef.trim() !== '') {
+            self.bank = bankRef.trim();
+          }
+          
+          return 'Bank account set to ' + acct.trim() + '.';
+        }
+      }
+
+      if (choice === 6) {
         const isBuilder = !!(actor.isWizard || actor.canBuild);
         if (!isBuilder) return 'Only builders/admins can configure spawnables.';
 
