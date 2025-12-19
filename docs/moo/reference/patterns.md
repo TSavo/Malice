@@ -8,13 +8,13 @@ Reusable code patterns for common tasks in Malice MOO programming.
 
 ```javascript
 async createAndPlace(proto, props, location) {
-  const obj = await $.recycler.create(proto, props);
+  const obj = await $recycler.create(proto, props);
   await obj.moveTo(location);
   return obj;
 }
 
 // Usage
-const sword = await createAndPlace($.weapon, 
+const sword = await createAndPlace($weapon, 
   { name: 'iron sword', damage: 10 },
   room
 );
@@ -27,7 +27,7 @@ async createItemSet(itemDefs, location) {
   const created = [];
   
   for (const def of itemDefs) {
-    const item = await $.recycler.create(def.proto, def.props);
+    const item = await $recycler.create(def.proto, def.props);
     await item.moveTo(location);
     created.push(item);
   }
@@ -37,9 +37,9 @@ async createItemSet(itemDefs, location) {
 
 // Usage
 const items = await createItemSet([
-  { proto: $.weapon, props: { name: 'sword' } },
-  { proto: $.armor, props: { name: 'shield' } },
-  { proto: $.food, props: { name: 'bread' } }
+  { proto: $weapon, props: { name: 'sword' } },
+  { proto: $armor, props: { name: 'shield' } },
+  { proto: $food, props: { name: 'bread' } }
 ], room);
 ```
 
@@ -51,7 +51,7 @@ async spawnLoot(lootTable, location) {
   
   for (const entry of lootTable) {
     if (Math.random() < entry.chance) {
-      const item = await $.recycler.create(entry.proto, entry.props);
+      const item = await $recycler.create(entry.proto, entry.props);
       await item.moveTo(location);
       spawned.push(item);
     }
@@ -62,9 +62,9 @@ async spawnLoot(lootTable, location) {
 
 // Usage
 const loot = await spawnLoot([
-  { proto: $.weapon, props: { name: 'rusty sword' }, chance: 0.5 },
-  { proto: $.gold, props: { amount: 10 }, chance: 0.8 },
-  { proto: $.potion, props: { name: 'health potion' }, chance: 0.3 }
+  { proto: $weapon, props: { name: 'rusty sword' }, chance: 0.5 },
+  { proto: $gold, props: { amount: 10 }, chance: 0.8 },
+  { proto: $potion, props: { name: 'health potion' }, chance: 0.3 }
 ], chest);
 ```
 
@@ -134,17 +134,17 @@ async findAndMove(container, itemName, dest, mover) {
 
 ```javascript
 async createRoomPair(room1Data, room2Data, direction, oppositeDir) {
-  const room1 = await $.recycler.create($.room, room1Data);
-  const room2 = await $.recycler.create($.room, room2Data);
+  const room1 = await $recycler.create($room, room1Data);
+  const room2 = await $recycler.create($room, room2Data);
 
   // Create exits - store objects, not IDs
-  const exit1 = await $.recycler.create($.exit, {
+  const exit1 = await $recycler.create($exit, {
     direction,
     destination: room2,    // Store object, not room2.id
     source: room1          // Store object, not room1.id
   });
 
-  const exit2 = await $.recycler.create($.exit, {
+  const exit2 = await $recycler.create($exit, {
     direction: oppositeDir,
     destination: room1,    // Store object, not room1.id
     source: room2          // Store object, not room2.id
@@ -247,7 +247,7 @@ async perspectiveAnnounce(room, actor, template, directObj, target) {
   for (const viewer of room.contents || []) {
     if (!viewer?.tell) continue;
 
-    const msg = await $.pronoun.sub(
+    const msg = await $pronoun.sub(
       template,
       actor,
       directObj,
@@ -316,13 +316,13 @@ async formatItemList(items, includeCount = false) {
     
     const entries = Object.entries(counts).map(([name, count]) => {
       if (count === 1) return name;
-      return `${count} ${await $.english.plural(name)}`;
+      return `${count} ${await $english.plural(name)}`;
     });
     
-    return await $.format.prose(entries);
+    return await $format.prose(entries);
   }
   
-  return await $.format.prose(names);
+  return await $format.prose(names);
 }
 
 // Usage
@@ -455,7 +455,7 @@ const food = filterByType(chest, 'food');
 async doAfterDelay(delayMs, target, method, ...args) {
   const jobName = `delayed_${Date.now()}_${Math.random()}`;
   
-  await $.scheduler.schedule(
+  await $scheduler.schedule(
     jobName,
     delayMs,
     0,  // One-shot
@@ -481,11 +481,11 @@ async repeatWhile(intervalMs, target, method, conditionMethod) {
     if (await self.${conditionMethod}()) {
       await self.${method}();
     } else {
-      await $.scheduler.unschedule('${jobName}');
+      await $scheduler.unschedule('${jobName}');
     }
   `);
   
-  await $.scheduler.schedule(
+  await $scheduler.schedule(
     jobName,
     0,
     intervalMs,

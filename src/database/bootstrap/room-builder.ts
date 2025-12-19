@@ -68,7 +68,7 @@ export class RoomBuilder {
       const contents = room.contents || [];
 
       for (const objId of contents) {
-        const viewer = await $.load(objId);
+        const viewer = await $load(objId);
         if (!viewer) continue;
 
         // Format and send visual message
@@ -103,7 +103,7 @@ export class RoomBuilder {
       const defaultHear = hearTemplates.others || hearTemplates.actor || '';
 
       for (const objId of contents) {
-        const viewer = await $.load(objId);
+        const viewer = await $load(objId);
         if (!viewer) continue;
 
         // Pick appropriate templates based on viewer

@@ -16,7 +16,7 @@ Exclusions work through a rule system that defines which actions block which oth
 
 ```javascript
 // Check if player can walk
-const blocked = await $.exclusions.check(player, 'walk');
+const blocked = await $exclusions.check(player, 'walk');
 if (blocked) {
   return blocked;  // "You can't do that while sitting."
 }
@@ -28,7 +28,7 @@ if (blocked) {
 
 ```javascript
 // Start sitting (returns false on success, message string if blocked)
-const result = await $.exclusions.start(player, 'sit', "You'll need to stand up first.");
+const result = await $exclusions.start(player, 'sit', "You'll need to stand up first.");
 if (result) {
   return result;  // Was blocked by something
 }
@@ -41,7 +41,7 @@ await player.tell("You sit down.");
 
 ```javascript
 // Stop sitting (stand up)
-await $.exclusions.end(player, 'sit');
+await $exclusions.end(player, 'sit');
 await player.tell("You stand up.");
 ```
 
@@ -87,7 +87,7 @@ The system comes with these predefined rules:
 Every action implicitly excludes itself. You can't start walking if you're already walking.
 
 ```javascript
-const blocked = await $.exclusions.check(player, 'walk');
+const blocked = await $exclusions.check(player, 'walk');
 // If player is already walking: "You're already walking."
 ```
 
@@ -106,7 +106,7 @@ Check if an action is blocked by current exclusions.
 - String message explaining why blocked
 
 ```javascript
-const blocked = await $.exclusions.check(player, 'run');
+const blocked = await $exclusions.check(player, 'run');
 if (blocked) {
   await player.tell(blocked);  // "You can't do that while sitting."
   return;
@@ -129,10 +129,10 @@ Start an action (acquire exclusion mutex).
 
 ```javascript
 // Start with custom blocking message
-const result = await $.exclusions.start(player, 'sit', "You'll need to stand up first.");
+const result = await $exclusions.start(player, 'sit', "You'll need to stand up first.");
 
 // Start with timeout (auto-ends after 60 seconds)
-const result = await $.exclusions.start(player, 'crafting', craftingData, 60000);
+const result = await $exclusions.start(player, 'crafting', craftingData, 60000);
 ```
 
 ### end(obj, action)
@@ -148,7 +148,7 @@ End an action (release exclusion mutex).
 - `false` if action wasn't active
 
 ```javascript
-await $.exclusions.end(player, 'sit');
+await $exclusions.end(player, 'sit');
 ```
 
 ### update(obj, action, data)
@@ -166,7 +166,7 @@ Update data on an active action without ending it.
 
 ```javascript
 // Update crafting progress
-await $.exclusions.update(player, 'crafting', { progress: 50 });
+await $exclusions.update(player, 'crafting', { progress: 50 });
 ```
 
 ### extend(obj, action, timeout)
@@ -184,7 +184,7 @@ Extend/reset the timeout on an active action.
 
 ```javascript
 // Keep crafting going another 60 seconds
-await $.exclusions.extend(player, 'crafting', 60000);
+await $exclusions.extend(player, 'crafting', 60000);
 ```
 
 ### current(obj)
@@ -198,7 +198,7 @@ Get all active actions for an object.
 - Array of `{ action, data, acquiredAt }` objects
 
 ```javascript
-const actions = await $.exclusions.current(player);
+const actions = await $exclusions.current(player);
 // [{ action: 'sit', data: "You'll need to stand up first.", acquiredAt: 1234567890 }]
 
 for (const { action } of actions) {
@@ -216,7 +216,7 @@ Define or update exclusion rules for an action.
 
 ```javascript
 // Define custom "meditate" action
-await $.exclusions.define('meditate', ['walk', 'run', 'fighting', 'talking']);
+await $exclusions.define('meditate', ['walk', 'run', 'fighting', 'talking']);
 ```
 
 ### get(action)
@@ -230,7 +230,7 @@ Get exclusion rules for an action.
 - Array of action names that this action excludes
 
 ```javascript
-const excludes = await $.exclusions.get('sit');
+const excludes = await $exclusions.get('sit');
 // ['walk', 'run', 'crawl', 'swim', 'sleep', 'operating']
 ```
 
@@ -246,7 +246,7 @@ Remove exclusion rules for an action.
 - `false` if didn't exist
 
 ```javascript
-await $.exclusions.undefine('meditate');
+await $exclusions.undefine('meditate');
 ```
 
 ### list()
@@ -257,7 +257,7 @@ List all defined exclusion rules.
 - Object with `{ action: [excludes...] }` for all actions
 
 ```javascript
-const allRules = await $.exclusions.list();
+const allRules = await $exclusions.list();
 // { walk: ['sit', 'sleep', ...], sit: ['walk', 'run', ...], ... }
 ```
 
@@ -272,7 +272,7 @@ Force end all actions on an object (admin use).
 - Number of actions ended
 
 ```javascript
-const count = await $.exclusions.clearAll(player);
+const count = await $exclusions.clearAll(player);
 await player.tell("Cleared " + count + " actions.");
 ```
 
@@ -283,7 +283,7 @@ await player.tell("Cleared " + count + " actions.");
 ```javascript
 obj.setMethod('doSit', `
   // Check if we can sit
-  const blocked = await $.exclusions.start(self, 'sit', "You'll need to stand up first.");
+  const blocked = await $exclusions.start(self, 'sit', "You'll need to stand up first.");
   if (blocked) {
     return blocked;
   }
@@ -302,7 +302,7 @@ obj.setMethod('doSit', `
 
 obj.setMethod('doStand', `
   // End sitting
-  const wasSitting = await $.exclusions.end(self, 'sit');
+  const wasSitting = await $exclusions.end(self, 'sit');
   if (!wasSitting) {
     return "You're not sitting.";
   }
@@ -328,7 +328,7 @@ obj.setMethod('startCrafting', `
   const duration = args[1] || 30000;  // 30 seconds default
 
   // Start crafting with timeout
-  const blocked = await $.exclusions.start(self, 'crafting', {
+  const blocked = await $exclusions.start(self, 'crafting', {
     recipe: recipe,
     progress: 0,
     startedAt: Date.now(),
@@ -341,7 +341,7 @@ obj.setMethod('startCrafting', `
   await self.tell("You begin crafting " + recipe.name + "...");
 
   // Schedule completion check
-  await $.scheduler.schedule(
+  await $scheduler.schedule(
     'craft-' + self.id,
     duration,
     0,  // One-shot
@@ -353,13 +353,13 @@ obj.setMethod('startCrafting', `
 `);
 
 obj.setMethod('cancelCrafting', `
-  const wasCrafting = await $.exclusions.end(self, 'crafting');
+  const wasCrafting = await $exclusions.end(self, 'crafting');
   if (!wasCrafting) {
     return "You're not crafting anything.";
   }
 
   // Cancel the scheduled completion
-  await $.scheduler.unschedule('craft-' + self.id);
+  await $scheduler.unschedule('craft-' + self.id);
 
   await self.tell("You stop crafting.");
   return true;
@@ -373,7 +373,7 @@ obj.setMethod('startCombat', `
   const target = args[0];
 
   // Enter combat mode
-  const blocked = await $.exclusions.start(self, 'fighting', {
+  const blocked = await $exclusions.start(self, 'fighting', {
     target: target,
     startedAt: Date.now(),
   });
@@ -391,7 +391,7 @@ obj.setMethod('startCombat', `
 `);
 
 obj.setMethod('endCombat', `
-  const wasFighting = await $.exclusions.end(self, 'fighting');
+  const wasFighting = await $exclusions.end(self, 'fighting');
   if (!wasFighting) {
     return;  // Not in combat
   }
@@ -411,7 +411,7 @@ obj.setMethod('useTerminal', `
   const terminal = args[0];
 
   // Start operating the terminal
-  const blocked = await $.exclusions.start(self, 'operating', {
+  const blocked = await $exclusions.start(self, 'operating', {
     terminal: terminal,
     mode: 'main-menu',
   });
@@ -432,21 +432,21 @@ obj.setMethod('useTerminal', `
 
 ## Underlying Mutex System
 
-Exclusions use `$.mutex` with `action:` prefixed lock names:
+Exclusions use `$mutex` with `action:` prefixed lock names:
 
 ```javascript
 // These are equivalent:
-await $.exclusions.start(player, 'sit', data);
-await $.mutex.acquire(player, 'action:sit', data);
+await $exclusions.start(player, 'sit', data);
+await $mutex.acquire(player, 'action:sit', data);
 
-await $.exclusions.end(player, 'sit');
-await $.mutex.release(player, 'action:sit');
+await $exclusions.end(player, 'sit');
+await $mutex.release(player, 'action:sit');
 
-await $.exclusions.check(player, 'sit');
-await $.mutex.check(player, 'action:sit');
+await $exclusions.check(player, 'sit');
+await $mutex.check(player, 'action:sit');
 ```
 
-For non-action exclusions (like resource locks), use `$.mutex` directly.
+For non-action exclusions (like resource locks), use `$mutex` directly.
 
 ## Best Practices
 
@@ -454,10 +454,10 @@ For non-action exclusions (like resource locks), use `$.mutex` directly.
 
 ```javascript
 // Good - explains what to do
-await $.exclusions.start(player, 'sit', "You'll need to stand up first.");
+await $exclusions.start(player, 'sit', "You'll need to stand up first.");
 
 // Less helpful
-await $.exclusions.start(player, 'sit', true);
+await $exclusions.start(player, 'sit', true);
 // Results in: "You can't do that while sit."
 ```
 
@@ -465,13 +465,13 @@ await $.exclusions.start(player, 'sit', true);
 
 ```javascript
 // If an action fails after starting, end it
-const blocked = await $.exclusions.start(player, 'crafting', data);
+const blocked = await $exclusions.start(player, 'crafting', data);
 if (blocked) return blocked;
 
 try {
   await doCrafting();
 } catch (error) {
-  await $.exclusions.end(player, 'crafting');  // Clean up
+  await $exclusions.end(player, 'crafting');  // Clean up
   throw error;
 }
 ```
@@ -480,14 +480,14 @@ try {
 
 ```javascript
 // Crafting auto-ends after 60 seconds if not completed
-await $.exclusions.start(player, 'crafting', data, 60000);
+await $exclusions.start(player, 'crafting', data, 60000);
 ```
 
 ### 4. Check Before Expensive Operations
 
 ```javascript
 // Check first, then do expensive setup
-const blocked = await $.exclusions.check(player, 'crafting');
+const blocked = await $exclusions.check(player, 'crafting');
 if (blocked) return blocked;
 
 // Now do expensive material checks, etc.
@@ -495,11 +495,11 @@ const materials = await gatherMaterials();
 if (!materials) return "Missing materials.";
 
 // Finally start the action
-await $.exclusions.start(player, 'crafting', { materials });
+await $exclusions.start(player, 'crafting', { materials });
 ```
 
 ## See Also
 
-- [$ Globals Reference](./globals.md) - $.exclusions, $.mutex
+- [$ Globals Reference](./globals.md) - $exclusions, $mutex
 - [Verb System](./verbs.md) - Registering verbs for actions
 - [Event Hooks](./hooks.md) - Action-related hooks

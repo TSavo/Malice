@@ -181,7 +181,7 @@ A single toggle control and a biometric scanner. Whatever this controls, it wasn
             return 'The call button clicks uselessly. No power.';
           }
 
-          const elevator = await $.load(elevatorId);
+          const elevator = await $load(elevatorId);
           if (!elevator) {
             return 'Nothing answers the button press.';
           }

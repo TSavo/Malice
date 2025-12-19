@@ -49,7 +49,7 @@ The space echoes with emptiness. The air circulation hums steadily. Waiting for 
             return 'The call button clicks uselessly. No power.';
           }
 
-          const elevator = await $.load(elevatorId);
+          const elevator = await $load(elevatorId);
           if (!elevator) {
             return 'Nothing answers the button press.';
           }

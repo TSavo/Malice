@@ -84,7 +84,7 @@ export class PreAuthHandlerBuilder {
           context.send(\`Fingerprint: \${cert.fingerprint}\\\\r\\\\n\`);
 
           // Get Player prototype via alias
-          const objectManager = await $.load(0);
+          const objectManager = await $load(0);
           const aliases = objectManager.aliases || {};
           const playerPrototypeId = aliases.player;
 
@@ -133,7 +133,7 @@ export class PreAuthHandlerBuilder {
           context.send(\`Authenticating user: \${basic.username}\\\\r\\\\n\`);
 
           // Get Player prototype via alias
-          const objectManager = await $.load(0);
+          const objectManager = await $load(0);
           const aliases = objectManager.aliases || {};
           const playerPrototypeId = aliases.player;
 

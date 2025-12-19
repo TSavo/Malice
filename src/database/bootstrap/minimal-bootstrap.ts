@@ -258,7 +258,7 @@ export class MinimalBootstrap {
         const results = [];
 
         for (const playerId of onlinePlayers) {
-          const player = await $.load(playerId);
+          const player = await $load(playerId);
           if (player && player.heartbeat) {
             try {
               await player.heartbeat();

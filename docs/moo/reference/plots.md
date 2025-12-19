@@ -6,12 +6,12 @@ The plot system provides narrative management for quests, missions, and storylin
 
 The plot system has these key components:
 
-- **Plot** (`$.plot`) - A narrative event log with metadata
+- **Plot** (`$plot`) - A narrative event log with metadata
 - **Job** - A specific task within a plot (e.g., delivery, mission)
 - **Phase** - A stage of progression within a job
 - **Hook** - Event watchers that trigger when things happen in the world
-- **PlotDB** (`$.plotDB`) - Global index of all plots
-- **JobBoard** (`$.jobBoard`) - Physical object players interact with
+- **PlotDB** (`$plotDB`) - Global index of all plots
+- **JobBoard** (`$jobBoard`) - Physical object players interact with
 
 ## Creating Plots
 
@@ -19,7 +19,7 @@ The plot system has these key components:
 
 ```javascript
 // Create a new plot
-const plot = await $.plot.create({ name: 'Delivery Mission' });
+const plot = await $plot.create({ name: 'Delivery Mission' });
 
 // Create via MCP tool
 plot({ action: 'create', name: 'Escort Mission', metadata: { difficulty: 'hard' } })
@@ -378,27 +378,27 @@ await plot.unregisterJobHook('delivery-001', locker.id, 'itemDeposited');
 
 ```javascript
 // Mark as completed
-await $.plotDB.closePlot(plot.id, 'completed', 'All jobs finished');
+await $plotDB.closePlot(plot.id, 'completed', 'All jobs finished');
 
 // Mark as abandoned
-await $.plotDB.closePlot(plot.id, 'abandoned', 'No participants left');
+await $plotDB.closePlot(plot.id, 'abandoned', 'No participants left');
 
 // Mark as failed
-await $.plotDB.closePlot(plot.id, 'failed', 'Critical failure');
+await $plotDB.closePlot(plot.id, 'failed', 'Critical failure');
 ```
 
 ### Querying Plots
 
 ```javascript
 // List all plots by status
-const activePlots = await $.plotDB.list('active');
-const completedPlots = await $.plotDB.list('completed');
+const activePlots = await $plotDB.list('active');
+const completedPlots = await $plotDB.list('completed');
 
 // Get plots needing attention (bumps attention timer)
-const nextPlot = await $.plotDB.next();
+const nextPlot = await $plotDB.next();
 
 // Search plot events
-const results = await $.plotDB.search('package');
+const results = await $plotDB.search('package');
 ```
 
 ## MCP Tool Integration
@@ -446,8 +446,8 @@ The JobBoard is a physical object players interact with to get jobs:
 
 ```javascript
 // Create a job board instance
-const board = await $.recycler.create({
-  parent: $.jobBoard.id,
+const board = await $recycler.create({
+  parent: $jobBoard.id,
   properties: {
     name: 'City Jobs Board',
     description: 'A bulletin board listing available work.',
@@ -548,7 +548,7 @@ Jobs auto-clean hooks on completion/failure, but for plot-level resources:
 // In onPhaseCompleted for final phase
 if (phaseId === 'done') {
   // Recycle any created objects
-  await $.recycler.recycle(tempPackageId);
+  await $recycler.recycle(tempPackageId);
   // Remove any room modifications
 }
 ```
@@ -557,4 +557,4 @@ if (phaseId === 'done') {
 
 - [Event Hooks](./hooks.md) - triggerPlotHooks
 - [AI/NPC System](./ai-npc.md) - AI handling of plots
-- [$ Globals Reference](./globals.md) - $.plot, $.plotDB
+- [$ Globals Reference](./globals.md) - $plot, $plotDB

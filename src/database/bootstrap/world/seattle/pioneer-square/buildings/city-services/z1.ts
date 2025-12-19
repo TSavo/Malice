@@ -48,7 +48,7 @@ Windows along the east wall look out over 1st Ave S, grey light filtering throug
             return 'The call button clicks uselessly. No power.';
           }
 
-          const elevator = await $.load(elevatorId);
+          const elevator = await $load(elevatorId);
           if (!elevator) {
             return 'Nothing answers the button press.';
           }

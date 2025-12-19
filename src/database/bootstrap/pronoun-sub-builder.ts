@@ -100,7 +100,7 @@ export class PronounSubBuilder {
       // Get location
       let locationName = 'somewhere';
       if (actor?.location) {
-        const loc = await $.load(actor.location);
+        const loc = await $load(actor.location);
         if (loc) locationName = loc.name || 'somewhere';
       }
 
@@ -235,7 +235,7 @@ export class PronounSubBuilder {
       // Get location
       let locationName = 'somewhere';
       if (actor?.location) {
-        const loc = await $.load(actor.location);
+        const loc = await $load(actor.location);
         if (loc) locationName = loc.name || 'somewhere';
       }
 
@@ -318,7 +318,7 @@ export class PronounSubBuilder {
       const defaultMsg = messages.others || messages.actor || '';
 
       for (const objId of contents) {
-        const viewer = await $.load(objId);
+        const viewer = await $load(objId);
         if (!viewer) continue;
 
         // Pick appropriate message template

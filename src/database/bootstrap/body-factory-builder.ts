@@ -353,7 +353,7 @@ export class BodyFactoryBuilder {
       const facialHair = appearance.facialHair || 'none';
 
       // Get prototype IDs from aliases
-      const objectManager = await $.load(0);
+      const objectManager = await $load(0);
       const aliases = objectManager.get('aliases') || {};
 
       const bodyPartId = aliases.bodyPart;
@@ -438,7 +438,7 @@ export class BodyFactoryBuilder {
         }
         const parts = part.parts || {};
         for (const key of Object.keys(parts)) {
-          const childPart = await $.load(parts[key]);
+          const childPart = await $load(parts[key]);
           await applyToAllParts(childPart, prop, value, excludeNames);
         }
       };

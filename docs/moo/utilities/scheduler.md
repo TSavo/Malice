@@ -1,6 +1,6 @@
-# $.scheduler - Periodic Jobs
+# $scheduler - Periodic Jobs
 
-Use `$.scheduler` for recurring tasks like heartbeats, decay processing, and timed events.
+Use `$scheduler` for recurring tasks like heartbeats, decay processing, and timed events.
 
 ## Purpose
 
@@ -32,11 +32,11 @@ function startDecayJob() {
 
 **Good: Persistent scheduler**
 ```javascript
-await $.scheduler.schedule('decayTick', 0, 60000, $.system, 'processDecay');
+await $scheduler.schedule('decayTick', 0, 60000, $.system, 'processDecay');
 // Survives restarts, can pause/resume, can runNow() for testing
 ```
 
-## What $.scheduler Handles
+## What $scheduler Handles
 
 - ✅ Persistence across server restarts
 - ✅ Enable/disable without losing config
@@ -49,7 +49,7 @@ await $.scheduler.schedule('decayTick', 0, 60000, $.system, 'processDecay');
 ### schedule() - Create Job
 
 ```javascript
-await $.scheduler.schedule(name, delay, interval, target, method, ...args)
+await $scheduler.schedule(name, delay, interval, target, method, ...args)
 ```
 
 Creates or updates a scheduled job.
@@ -70,74 +70,74 @@ Creates or updates a scheduled job.
 **Examples:**
 ```javascript
 // One-shot: runs once after 60s, then removed
-await $.scheduler.schedule('reminder', 60000, 0, player, 'tell', 'Remember to save!');
+await $scheduler.schedule('reminder', 60000, 0, player, 'tell', 'Remember to save!');
 
 // Repeating: immediate start, then every 60s
-await $.scheduler.schedule('heartbeat', 0, 60000, $.system, 'tick');
+await $scheduler.schedule('heartbeat', 0, 60000, $.system, 'tick');
 
 // Delayed start repeating: first run in 10s, then every 60s
-await $.scheduler.schedule('warmup', 10000, 60000, $.system, 'tick');
+await $scheduler.schedule('warmup', 10000, 60000, $.system, 'tick');
 ```
 
 ### unschedule() - Remove Job
 
 ```javascript
-await $.scheduler.unschedule(jobName)
+await $scheduler.unschedule(jobName)
 ```
 
 Permanently removes a job.
 
 **Examples:**
 ```javascript
-await $.scheduler.unschedule('oldJob');
+await $scheduler.unschedule('oldJob');
 ```
 
 ### setEnabled() - Enable/Disable
 
 ```javascript
-await $.scheduler.setEnabled(jobName, enabled)
+await $scheduler.setEnabled(jobName, enabled)
 ```
 
 Pauses or resumes a job without removing it.
 
 **Examples:**
 ```javascript
-await $.scheduler.setEnabled('decayTick', false);  // Pause
-await $.scheduler.setEnabled('decayTick', true);   // Resume
+await $scheduler.setEnabled('decayTick', false);  // Pause
+await $scheduler.setEnabled('decayTick', true);   // Resume
 ```
 
 ### getJob() - Query Job
 
 ```javascript
-await $.scheduler.getJob(jobName)
+await $scheduler.getJob(jobName)
 ```
 
 Returns job configuration.
 
 **Examples:**
 ```javascript
-const job = await $.scheduler.getJob('heartbeat');
+const job = await $scheduler.getJob('heartbeat');
 // { interval, nextRun, targetId, method, args, enabled }
 ```
 
 ### listJobs() - List All Jobs
 
 ```javascript
-await $.scheduler.listJobs()
+await $scheduler.listJobs()
 ```
 
 Returns array of all job names.
 
 **Examples:**
 ```javascript
-const names = await $.scheduler.listJobs();
+const names = await $scheduler.listJobs();
 // ['heartbeat', 'decayTick', 'autosave', ...]
 ```
 
 ### runNow() - Manual Trigger
 
 ```javascript
-await $.scheduler.runNow(jobName)
+await $scheduler.runNow(jobName)
 ```
 
 Immediately executes a job (for testing/debugging).
@@ -145,7 +145,7 @@ Immediately executes a job (for testing/debugging).
 **Examples:**
 ```javascript
 // Test decay without waiting
-await $.scheduler.runNow('decayTick');
+await $scheduler.runNow('decayTick');
 ```
 
 ## Built-in Jobs
@@ -163,7 +163,7 @@ The system registers these jobs automatically:
 
 ```javascript
 // Save all players every 5 minutes
-await $.scheduler.schedule('autosave', 0, 300000, $.system, 'saveAllPlayers');
+await $scheduler.schedule('autosave', 0, 300000, $.system, 'saveAllPlayers');
 
 // System method
 async saveAllPlayers() {
@@ -178,13 +178,13 @@ async saveAllPlayers() {
 
 ```javascript
 // Respawn enemies every 10 minutes
-await $.scheduler.schedule('respawn', 0, 600000, spawner, 'respawnAll');
+await $scheduler.schedule('respawn', 0, 600000, spawner, 'respawnAll');
 
 // Spawner method
 async respawnAll() {
   for (const spawnPoint of this.spawnPoints) {
     if (spawnPoint.current === null) {
-      const enemy = await $.recycler.create(spawnPoint.enemyType);
+      const enemy = await $recycler.create(spawnPoint.enemyType);
       enemy.location = spawnPoint.room;
       spawnPoint.current = enemy.id;
     }
@@ -196,7 +196,7 @@ async respawnAll() {
 
 ```javascript
 // Clean up expired sessions hourly
-await $.scheduler.schedule('cleanup', 0, 3600000, $.authManager, 'cleanupSessions');
+await $scheduler.schedule('cleanup', 0, 3600000, $.authManager, 'cleanupSessions');
 
 // Auth manager method
 async cleanupSessions() {
@@ -213,7 +213,7 @@ async cleanupSessions() {
 
 ```javascript
 // Tick hunger every minute
-await $.scheduler.schedule('hungerTick', 0, 60000, $.system, 'tickHunger');
+await $scheduler.schedule('hungerTick', 0, 60000, $.system, 'tickHunger');
 
 async tickHunger() {
   const players = await this.getOnlinePlayers();
@@ -233,7 +233,7 @@ async tickHunger() {
 
 ```javascript
 // Change weather every 30 minutes
-await $.scheduler.schedule('weatherChange', 0, 1800000, $.world, 'changeWeather');
+await $scheduler.schedule('weatherChange', 0, 1800000, $.world, 'changeWeather');
 
 async changeWeather() {
   const conditions = ['clear', 'cloudy', 'rainy', 'stormy'];
@@ -255,7 +255,7 @@ async changeWeather() {
 // One-shot job for crafting completion
 async startCrafting(player, recipe) {
   const jobName = 'craft_' + player.id;
-  await $.scheduler.schedule(
+  await $scheduler.schedule(
     jobName,
     recipe.duration,
     0,  // One-shot
@@ -272,7 +272,7 @@ async completeCrafting(playerId, recipeId) {
   const player = await $.load(playerId);
   const recipe = await $.load(recipeId);
   
-  const item = await $.recycler.create(recipe.result);
+  const item = await $recycler.create(recipe.result);
   item.location = player;
   
   await player.tell('You finish crafting ' + item.name + '!');
@@ -295,7 +295,7 @@ async completeCrafting(playerId, recipeId) {
 
 ```javascript
 // Create a job specific to an object
-await $.scheduler.schedule(
+await $scheduler.schedule(
   'effect_' + player.id,
   5000,
   0,
@@ -309,7 +309,7 @@ await $.scheduler.schedule(
 
 ```javascript
 // Execute something after a delay
-await $.scheduler.schedule(
+await $scheduler.schedule(
   'delayed_' + Date.now(),
   10000,
   0,
@@ -330,11 +330,11 @@ async periodicCheck() {
   // Else: skip this tick, check again next tick
 }
 
-await $.scheduler.schedule('check', 0, 60000, obj, 'periodicCheck');
+await $scheduler.schedule('check', 0, 60000, obj, 'periodicCheck');
 ```
 
 ## See Also
 
-- [$.mutex](./mutex.md) - Lock objects during jobs
-- [$.exclusions](./exclusions.md) - Prevent conflicting jobs
+- [$mutex](./mutex.md) - Lock objects during jobs
+- [$exclusions](./exclusions.md) - Prevent conflicting jobs
 - [Core Concepts](../core-concepts.md) - Object persistence

@@ -490,7 +490,7 @@ export class CharGenBuilder {
       // Set starting location - Immigration Services Entry Hall
       // This is the default spawn point for new characters
       const startingRoomId = $.charGen.startingRoom || 1353; // Immigration Services Entry Hall
-      const startingRoom = await $.load(startingRoomId);
+      const startingRoom = await $load(startingRoomId);
       if (startingRoom) {
         await player.moveTo(startingRoom, player);
       }
@@ -1001,7 +1001,7 @@ export class CharGenBuilder {
       }
 
       // Load the player
-      const player = await $.load(playerId);
+      const player = await $load(playerId);
       if (!player) {
         return { error: 'Player not found: ' + playerId };
       }
@@ -1060,7 +1060,7 @@ export class CharGenBuilder {
 
       // Move player to starting room
       const startingRoomId = self.startingRoom || 1353;
-      const startingRoom = await $.load(startingRoomId);
+      const startingRoom = await $load(startingRoomId);
       if (startingRoom) {
         await player.moveTo(startingRoom, player);
       }
@@ -1177,7 +1177,7 @@ CRITICAL:
 
       // 1. Create player object (minimal)
       const passwordHash = await $.hashPassword(password);
-      const playerPrototypeId = (await $.load(0)).get('aliases').player;
+      const playerPrototypeId = (await $load(0)).get('aliases').player;
       
       const player = await $.recycler.create({
         parent: playerPrototypeId,

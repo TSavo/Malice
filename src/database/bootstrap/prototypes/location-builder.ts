@@ -53,7 +53,7 @@ export class LocationBuilder {
 
       // Accept either a RuntimeObject or an ID number
       if (typeof obj === 'number') {
-        obj = await $.load(obj);
+        obj = await $load(obj);
       }
 
       if (!obj || typeof obj.id !== 'number') {

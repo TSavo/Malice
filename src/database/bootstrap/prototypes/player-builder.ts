@@ -111,7 +111,7 @@ export class PlayerBuilder {
         // Ensure location is loaded as RuntimeObject (might be raw ID if not cached)
         let location = self.location;
         if (typeof location === 'number') {
-          location = await $.load(location);
+          location = await $load(location);
         }
         if (location && location.describe) {
           // Trigger onArrived to register room verbs
@@ -138,7 +138,7 @@ export class PlayerBuilder {
         // Ensure location is loaded as RuntimeObject (might be raw ID if not cached)
         let location = self.location;
         if (typeof location === 'number') {
-          location = await $.load(location);
+          location = await $load(location);
         }
         if (location) {
           await self.unregisterVerbsFrom(location.id);
@@ -1916,7 +1916,7 @@ export class PlayerBuilder {
         // Check worn items on this part
         if (part.worn && part.worn.length > 0) {
           for (const itemId of part.worn) {
-            const item = await $.load(itemId);
+            const item = await $load(itemId);
             if (item) {
               worn.push({ item, part: part.name });
             }
@@ -1971,7 +1971,7 @@ export class PlayerBuilder {
           const itemNames = [];
           for (const c of contents) {
             // content can be ID or object
-            const item = typeof c === 'object' ? c : await $.load(c);
+            const item = typeof c === 'object' ? c : await $load(c);
             if (item) itemNames.push(item.name);
           }
           if (itemNames.length > 0) {
@@ -2036,7 +2036,7 @@ export class PlayerBuilder {
           if (contents.length > 0) {
             const itemNames = [];
             for (const c of contents) {
-              const pItem = typeof c === 'object' ? c : await $.load(c);
+              const pItem = typeof c === 'object' ? c : await $load(c);
               if (pItem) {
                 // Use shortDesc if available (for stackables like cash)
                 const desc = pItem.shortDesc ? await pItem.shortDesc() : pItem.name;

@@ -320,7 +320,7 @@ The floor is polished marble. The walls are white composite with Continuum brand
             return 'The call button clicks uselessly. No power.';
           }
 
-          const elevator = await $.load(elevatorId);
+          const elevator = await $load(elevatorId);
           if (!elevator) {
             return 'Nothing answers the button press.';
           }
