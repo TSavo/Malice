@@ -2020,7 +2020,35 @@ export class PlayerBuilder {
         wearingClauses.push('you are wearing ' + wornList);
       }
 
-      // 3. ASSEMBLE NARRATIVE
+      // 3. COLLECT POCKET CONTENTS
+      const pocketClauses = [];
+      
+      for (const { item: worn } of wornItems) {
+        const pockets = worn.pockets || [];
+        for (const pocket of pockets) {
+          if (!pocket) continue;
+          const contents = pocket.contents || [];
+          if (contents.length > 0) {
+            const itemNames = [];
+            for (const c of contents) {
+              const pItem = typeof c === 'object' ? c : await $.load(c);
+              if (pItem) {
+                // Use shortDesc if available (for stackables like cash)
+                const desc = pItem.shortDesc ? await pItem.shortDesc() : pItem.name;
+                itemNames.push(desc);
+              }
+            }
+            if (itemNames.length > 0) {
+              const list = await $.format.prose(itemNames);
+              const pocketName = pocket.name || 'pocket';
+              const garmentName = worn.name || 'clothing';
+              pocketClauses.push(list + ' in your ' + garmentName + ' ' + pocketName.toLowerCase());
+            }
+          }
+        }
+      }
+
+      // 4. ASSEMBLE NARRATIVE
       let text = '';
       
       if (holdingClauses.length > 0) {
@@ -2042,6 +2070,12 @@ export class PlayerBuilder {
         await self.tell(text);
       } else {
         await self.tell('You represent a metaphysical void.');
+      }
+      
+      // Show pocket contents separately (cleaner than cramming into one sentence)
+      if (pocketClauses.length > 0) {
+        await self.tell('');
+        await self.tell('Pocketed: ' + pocketClauses.join('; ') + '.');
       }
     `);
 
