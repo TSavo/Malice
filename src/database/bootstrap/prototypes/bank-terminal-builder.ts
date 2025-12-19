@@ -21,8 +21,9 @@ export class BankTerminalBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: 'Bank Terminal',
         description: 'A sleek banking kiosk with a touchscreen interface. The corporate logo pulses softly.',
@@ -444,7 +445,7 @@ export class BankTerminalBuilder {
                      Math.random().toString(36).substring(2, 6).toUpperCase();
 
       const chip = await $.recycler.create({
-        parent: credchipProto.id,
+        parent: credchipProto,
         properties: {
           name: '¤' + amount.toLocaleString() + ' credchip',
           description: 'A small plastic chip with embedded circuitry. Serial: ' + serial,

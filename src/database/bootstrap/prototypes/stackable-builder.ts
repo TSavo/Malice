@@ -21,8 +21,9 @@ export class StackableBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: 'Stackable',
         description: 'A quantity of something.',
@@ -114,7 +115,7 @@ export class StackableBuilder {
       }
 
       const newStack = await recycler.create({
-        parent: self.id,  // Inherit from same prototype chain
+        parent: self,  // Inherit from same prototype chain
         properties: {
           name: self.name,
           description: self.description,

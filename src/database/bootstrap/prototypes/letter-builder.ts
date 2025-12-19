@@ -24,9 +24,10 @@ export class LetterBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(parentId);
     // Inherit from Writable
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: 'Letter',
         description: 'A piece of paper for writing messages.',

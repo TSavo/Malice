@@ -9,8 +9,9 @@ export class LocationBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(describableId: number, existingObj?: RuntimeObject): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(describableId);
     const obj = existingObj || await this.manager.create({
-      parent: describableId,
+      parent: parentObj!,
       properties: {
         name: 'Location',
         description: 'Base prototype for locations (things that can contain other things)',

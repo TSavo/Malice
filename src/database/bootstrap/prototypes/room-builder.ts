@@ -32,8 +32,9 @@ export class RoomBuilder {
    * @param existingObj - Optional existing object to rebuild methods on
    */
   async build(locationId: number, existingObj?: RuntimeObject): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(locationId);
     const obj = existingObj || await this.manager.create({
-      parent: locationId,
+      parent: parentObj!,
       properties: {
         name: 'Room',
         description: 'Base prototype for rooms',

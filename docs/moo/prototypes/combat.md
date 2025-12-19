@@ -361,8 +361,19 @@ When resolution triggers, `gatherContext` collects:
       calories: { current: 1800, max: 2000, status: 'satisfied' },
       inHands: {
         leftHand: null,
-        rightHand: { id: 500, name: 'combat knife', description: '...' }
+        rightHand: {
+          id: 500,
+          name: 'combat knife',
+          description: '...',
+          skill: 'knife',
+          damage: 18,
+          damageType: 'cut',
+          twoHanded: false,
+          ranged: false,
+          ammo: null
+        }
       },
+      hasFreeHand: true,  // Left hand empty, so true
       skills: { 'knife-fighting': 35, 'dodging': 20 },
       action: {
         text: 'I lunge at his chest',
@@ -386,6 +397,47 @@ When resolution triggers, `gatherContext` collects:
   ],
   log: ['[Round 1] Combat initiated...', '[Round 1] Jack knife-fighting check: 2 successes']
 }
+```
+
+### Weapon Context Fields
+
+When a combatant holds a weapon, the context includes:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `skill` | string | Skill used for this weapon (e.g., "knife", "pistol") |
+| `damage` | number | Weapon's base damage modifier |
+| `damageType` | string | Type of damage (cut, bruise, puncture) |
+| `twoHanded` | boolean | Whether weapon needs two hands for effective use |
+| `ranged` | boolean | Whether it's a firearm |
+| `ammo` | number/null | Current rounds (firearms only, via `getAmmoCount()`) |
+
+### hasFreeHand
+
+The `hasFreeHand` field is computed:
+
+```javascript
+hasFreeHand = !inHands.leftHand || !inHands.rightHand
+```
+
+This is critical for **two-handed weapon penalties**. If a combatant is using a `twoHanded: true` weapon but `hasFreeHand: false`, they suffer:
+- Severe accuracy penalty
+- Risk of self-injury (recoil, loss of control)
+- Reduced damage
+
+### Status Display
+
+Each round, combatants see their status:
+
+```
+Your status: Left hand: Glock 17 [12 rounds], Right hand: empty
+```
+
+Two-handed weapons show `(2H)`:
+
+```
+Your status: Left hand: Pump Shotgun [5 rounds] (2H), Right hand: empty
+```
 ```
 
 ## NPC Combatants

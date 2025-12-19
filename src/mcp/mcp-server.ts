@@ -12,7 +12,7 @@ import { z } from 'zod';
 import * as fs from 'fs';
 import * as path from 'path';
 import type { ObjectManager } from '../database/object-manager.js';
-import type { ObjId } from '../../types/object.js';
+import type { ObjId, RuntimeObject } from '../../types/object.js';
 import { MCPTelnetClient } from './telnet-client.js';
 import { parseQuery, validateQuery } from './query-parser.js';
 
@@ -107,6 +107,49 @@ export class MaliceMCPServer {
   }
 
   /**
+   * Deserialize a value from JSON input, converting "#id" strings to RuntimeObjects
+   * This is the inverse of serializeValue - allows passing object references in args
+   * Throws if an object reference cannot be resolved
+   */
+  private async deserializeValue(value: any): Promise<any> {
+    // Handle null/undefined
+    if (value === null || value === undefined) {
+      return value;
+    }
+
+    // Handle "#id" format strings - convert to RuntimeObject
+    if (typeof value === 'string' && /^#-?\d+$/.test(value)) {
+      const id = parseInt(value.slice(1), 10);
+      const obj = await this.manager.load(id as ObjId);
+      if (!obj) {
+        throw new Error(`Object ${value} not found`);
+      }
+      return obj;
+    }
+
+    // Handle arrays - recursively deserialize elements
+    if (Array.isArray(value)) {
+      const result = [];
+      for (const item of value) {
+        result.push(await this.deserializeValue(item));
+      }
+      return result;
+    }
+
+    // Handle objects - recursively deserialize values
+    if (typeof value === 'object') {
+      const result: Record<string, any> = {};
+      for (const [k, v] of Object.entries(value)) {
+        result[k] = await this.deserializeValue(v);
+      }
+      return result;
+    }
+
+    // Primitives pass through
+    return value;
+  }
+
+  /**
    * Register MCP tools (operations with side effects)
    */
   private registerTools(server: McpServer): void {
@@ -122,23 +165,24 @@ export class MaliceMCPServer {
       'set_property',
       'Set a property value on a MOO object.',
       {
-        objectId: z.number().describe('Object ID'),
+        objectId: z.string().regex(/^#-?\d+$/).describe('Object ID in "#id" format'),
         name: z.string().describe('Property name'),
         value: z.any().describe('Property value (string, number, boolean, array, object, or objref like "#5")'),
       },
       async ({ objectId, name, value }) => {
-        const obj = await this.manager.load(objectId as ObjId);
-        if (!obj) {
+        try {
+          const obj = await this.deserializeValue(objectId) as RuntimeObject;
+          const deserializedValue = await this.deserializeValue(value);
+          obj.set(name, deserializedValue);
           return {
-            content: [{ type: 'text', text: `Object #${objectId} not found` }],
+            content: [{ type: 'text', text: `Set ${name} = ${JSON.stringify(this.serializeValue(deserializedValue))} on ${objectId}` }],
+          };
+        } catch (err) {
+          return {
+            content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }],
             isError: true,
           };
         }
-
-        obj.set(name, value);
-        return {
-          content: [{ type: 'text', text: `Set ${name} = ${JSON.stringify(value)} on #${objectId}` }],
-        };
       }
     );
 
@@ -147,48 +191,43 @@ export class MaliceMCPServer {
       'set_method',
       'Create or update a TypeScript method on a MOO object.',
       {
-        objectId: z.number().describe('Object ID'),
+        objectId: z.string().regex(/^#-?\d+$/).describe('Object ID in "#id" format'),
         name: z.string().describe('Method name'),
         code: z.string().describe('TypeScript code for the method body'),
         callable: z.boolean().optional().describe('Whether players can call this method directly'),
         help: z.string().optional().describe('Help text for the method'),
       },
       async ({ objectId, name, code, callable, help }) => {
-        const obj = await this.manager.load(objectId as ObjId);
-        if (!obj) {
+        try {
+          const obj = await this.deserializeValue(objectId) as RuntimeObject;
+          obj.setMethod(name, code, { callable, help });
           return {
-            content: [{ type: 'text', text: `Object #${objectId} not found` }],
+            content: [{ type: 'text', text: `Method '${name}' saved on ${objectId}` }],
+          };
+        } catch (err) {
+          return {
+            content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }],
             isError: true,
           };
         }
-
-        obj.setMethod(name, code, { callable, help });
-        return {
-          content: [{ type: 'text', text: `Method '${name}' saved on #${objectId}` }],
-        };
       }
     );
 
     // Call a method
     server.tool(
       'call_method',
-      'Execute a method on a MOO object and return the result.',
+      'Execute a method on a MOO object and return the result. Use "#id" format in args to pass object references.',
       {
-        objectId: z.number().describe('Object ID'),
+        objectId: z.string().regex(/^#-?\d+$/).describe('Object ID in "#id" format'),
         name: z.string().describe('Method name'),
-        args: z.array(z.any()).optional().describe('Arguments to pass to the method'),
+        args: z.array(z.any()).optional().describe('Arguments to pass to the method. Use "#ID" format for object references.'),
       },
       async ({ objectId, name, args }) => {
-        const obj = await this.manager.load(objectId as ObjId);
-        if (!obj) {
-          return {
-            content: [{ type: 'text', text: `Object #${objectId} not found` }],
-            isError: true,
-          };
-        }
-
         try {
-          const result = await obj.call(name, ...(args || []));
+          const obj = await this.deserializeValue(objectId) as RuntimeObject;
+          // Deserialize args - converts "#ID" strings to RuntimeObjects
+          const deserializedArgs = args ? await this.deserializeValue(args) : [];
+          const result = await obj.call(name, ...deserializedArgs);
           const serialized = this.serializeValue(result);
           return {
             content: [{ type: 'text', text: JSON.stringify({ result: serialized }, null, 2) }],
@@ -207,29 +246,39 @@ export class MaliceMCPServer {
       'create_object',
       'Create a new MOO object with a specified parent.',
       {
-        parent: z.number().describe('Parent object ID for inheritance'),
-        properties: z.record(z.any()).optional().describe('Initial properties'),
+        parent: z.string().regex(/^#-?\d+$/).describe('Parent object ID in "#id" format'),
+        properties: z.record(z.any()).optional().describe('Initial properties (use "#id" format for object references)'),
       },
       async ({ parent, properties }) => {
-        // Use recycler for proper creation (auto-aliases, onCreate hooks, etc.)
-        const recycler = await this.getAlias('recycler');
-        if (recycler) {
-          const obj = await recycler.call('create', { parent, properties: properties || {} });
+        try {
+          const parentObj = await this.deserializeValue(parent) as RuntimeObject;
+          const deserializedProps = properties ? await this.deserializeValue(properties) : {};
+
+          // Use recycler for proper creation (auto-aliases, onCreate hooks, etc.)
+          const recycler = await this.getAlias('recycler');
+          if (recycler) {
+            const obj = await recycler.call('create', { parent: parentObj, properties: deserializedProps || {} });
+            return {
+              content: [{ type: 'text', text: `Created object #${obj.id} with parent ${parent}` }],
+            };
+          }
+
+          // Fallback to direct creation if recycler not available
+          const obj = await this.manager.create({
+            parent: parentObj,
+            properties: deserializedProps || {},
+            methods: {},
+          });
+
           return {
-            content: [{ type: 'text', text: `Created object #${obj.id} with parent #${parent}` }],
+            content: [{ type: 'text', text: `Created object #${obj.id} with parent ${parent}` }],
+          };
+        } catch (err) {
+          return {
+            content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }],
+            isError: true,
           };
         }
-
-        // Fallback to direct creation if recycler not available
-        const obj = await this.manager.create({
-          parent: parent as ObjId,
-          properties: properties || {},
-          methods: {},
-        });
-
-        return {
-          content: [{ type: 'text', text: `Created object #${obj.id} with parent #${parent}` }],
-        };
       }
     );
 
@@ -239,13 +288,14 @@ export class MaliceMCPServer {
       'Find MOO objects that have a specific property value.',
       {
         name: z.string().describe('Property name to search'),
-        value: z.any().optional().describe('Property value to match (omit to find all objects with this property)'),
+        value: z.any().optional().describe('Property value to match (use "#id" format for object references, omit to find all objects with this property)'),
       },
       async ({ name, value }) => {
-        const objects = await this.manager.findByProperty(name, value);
+        const deserializedValue = value !== undefined ? await this.deserializeValue(value) : undefined;
+        const objects = await this.manager.findByProperty(name, deserializedValue);
         const results = objects.map(obj => ({
-          id: obj.id,
-          parent: obj._getRaw().parent,
+          id: `#${obj.id}`,
+          parent: `#${obj._getRaw().parent.value}`,
         }));
 
         return {
@@ -290,7 +340,7 @@ export class MaliceMCPServer {
             results.push({
               id: obj._id,
               name,
-              parent: obj.parent,
+              parent: obj.parent.value,
             });
             if (results.length >= maxResults) break;
           }
@@ -302,62 +352,103 @@ export class MaliceMCPServer {
       }
     );
 
-    // Find children/instances of a prototype
+    // Get inheritance info for an object (ancestors and optionally descendants)
     server.tool(
-      'find_children',
-      'Find all objects that inherit from a given parent (direct children only, or all descendants).',
+      'get_inheritance',
+      'Get inheritance info for an object: its ancestor chain (what it inherits from) and optionally its descendants (what inherits from it).',
       {
-        parentId: z.number().describe('Parent object ID to find children of'),
-        recursive: z.boolean().optional().describe('Include all descendants, not just direct children (default: false)'),
-        limit: z.number().optional().describe('Max results to return (default 100)'),
+        objectId: z.string().regex(/^#-?\d+$/).describe('Object ID in "#id" format'),
+        descendants: z.boolean().optional().describe('Include descendants (default: false)'),
+        recursive: z.boolean().optional().describe('Include all descendants recursively, not just direct children (default: false)'),
+        limit: z.number().optional().describe('Max descendants to return (default 100)'),
       },
-      async ({ parentId, recursive, limit }) => {
-        const allObjects = await this.manager.db.listAll(false);
-        const maxResults = limit ?? 100;
-        const results: Array<{ id: number; name: string; parent: number }> = [];
+      async ({ objectId, descendants, recursive, limit }) => {
+        try {
+          const obj = await this.deserializeValue(objectId) as RuntimeObject;
+          const id = obj.id;
 
-        if (recursive) {
-          // Build set of all descendant parent IDs
-          const validParents = new Set<number>([parentId]);
-          let changed = true;
-          while (changed) {
-            changed = false;
-            for (const obj of allObjects) {
-              if (validParents.has(obj.parent) && !validParents.has(obj._id)) {
-                validParents.add(obj._id);
-                changed = true;
+          // Build ancestor chain
+          const ancestors: Array<{ id: string; name: string }> = [];
+          let currentObj = obj.getParent();
+          let prevId: ObjId = id as ObjId;
+
+          while (currentObj !== null && currentObj.id !== prevId) {
+            ancestors.push({
+              id: `#${currentObj.id}`,
+              name: currentObj.get('name') as string || '(unnamed)',
+            });
+            prevId = currentObj.id;
+            currentObj = currentObj.getParent();
+          }
+
+          const parentObj = obj.getParent();
+          const result: any = {
+            objectId,
+            name: obj.get('name') || '(unnamed)',
+            parent: parentObj !== null ? `#${parentObj.id}` : null,
+            ancestors,
+          };
+
+          // Optionally get descendants
+          if (descendants) {
+            const allObjects = await this.manager.db.listAll(false);
+            const maxResults = limit ?? 100;
+            const descendantList: Array<{ id: string; name: string; parent: string }> = [];
+
+            if (recursive) {
+              // Build set of all descendant parent IDs
+              const validParents = new Set<number>([id]);
+              let changed = true;
+              while (changed) {
+                changed = false;
+                for (const o of allObjects) {
+                  if (validParents.has(o.parent.value) && !validParents.has(o._id)) {
+                    validParents.add(o._id);
+                    changed = true;
+                  }
+                }
+              }
+              validParents.delete(id); // Don't include the object itself
+
+              for (const o of allObjects) {
+                if (validParents.has(o._id) || o.parent.value === id) {
+                  descendantList.push({
+                    id: `#${o._id}`,
+                    name: o.properties?.name?.value || '(unnamed)',
+                    parent: `#${o.parent.value}`,
+                  });
+                  if (descendantList.length >= maxResults) break;
+                }
+              }
+            } else {
+              // Direct children only
+              for (const o of allObjects) {
+                if (o.parent.value === id) {
+                  descendantList.push({
+                    id: `#${o._id}`,
+                    name: o.properties?.name?.value || '(unnamed)',
+                    parent: `#${o.parent}`,
+                  });
+                  if (descendantList.length >= maxResults) break;
+                }
               }
             }
-          }
-          validParents.delete(parentId); // Don't include the parent itself
 
-          for (const obj of allObjects) {
-            if (validParents.has(obj._id) || obj.parent === parentId) {
-              results.push({
-                id: obj._id,
-                name: obj.properties?.name?.value || '(unnamed)',
-                parent: obj.parent,
-              });
-              if (results.length >= maxResults) break;
-            }
+            result.descendants = {
+              count: descendantList.length,
+              objects: descendantList,
+            };
           }
-        } else {
-          // Direct children only
-          for (const obj of allObjects) {
-            if (obj.parent === parentId) {
-              results.push({
-                id: obj._id,
-                name: obj.properties?.name?.value || '(unnamed)',
-                parent: obj.parent,
-              });
-              if (results.length >= maxResults) break;
-            }
-          }
+
+          return {
+            content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
+          };
+        } catch (err) {
+          return {
+            content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }],
+            isError: true,
+          };
         }
-
-        return {
-          content: [{ type: 'text', text: JSON.stringify({ count: results.length, objects: results }, null, 2) }],
-        };
       }
     );
 
@@ -366,47 +457,57 @@ export class MaliceMCPServer {
       'find_in_location',
       'Find all objects in a room or container.',
       {
-        locationId: z.number().describe('Room or container ID to search in'),
+        locationId: z.string().regex(/^#-?\d+$/).describe('Room or container ID in "#id" format'),
         recursive: z.boolean().optional().describe('Include contents of containers within (default: false)'),
       },
-      async ({ locationId, recursive }) => {
-        const allObjects = await this.manager.db.listAll(false);
-        const results: Array<{ id: number; name: string; parent: number; location: number }> = [];
+      async ({ locationId: rawLocId, recursive }) => {
+        try {
+          const locationObj = await this.deserializeValue(rawLocId) as RuntimeObject;
+          const locationId = locationObj.id;
 
-        const locationsToSearch = new Set<number>([locationId]);
+          const allObjects = await this.manager.db.listAll(false);
+          const results: Array<{ id: string; name: string; parent: string; location: string }> = [];
 
-        if (recursive) {
-          // Keep expanding until no new containers found
-          let changed = true;
-          while (changed) {
-            changed = false;
-            for (const obj of allObjects) {
-              const loc = obj.properties?.location?.value;
-              if (typeof loc === 'number' && locationsToSearch.has(loc) && !locationsToSearch.has(obj._id)) {
-                // This object is in a location we're searching - add it as a potential container
-                locationsToSearch.add(obj._id);
-                changed = true;
+          const locationsToSearch = new Set<number>([locationId]);
+
+          if (recursive) {
+            // Keep expanding until no new containers found
+            let changed = true;
+            while (changed) {
+              changed = false;
+              for (const obj of allObjects) {
+                const loc = obj.properties?.location?.value;
+                if (typeof loc === 'number' && locationsToSearch.has(loc) && !locationsToSearch.has(obj._id)) {
+                  // This object is in a location we're searching - add it as a potential container
+                  locationsToSearch.add(obj._id);
+                  changed = true;
+                }
               }
             }
+            locationsToSearch.delete(locationId); // We want contents, not the location itself
           }
-          locationsToSearch.delete(locationId); // We want contents, not the location itself
-        }
 
-        for (const obj of allObjects) {
-          const loc = obj.properties?.location?.value;
-          if (typeof loc === 'number' && (loc === locationId || (recursive && locationsToSearch.has(loc)))) {
-            results.push({
-              id: obj._id,
-              name: obj.properties?.name?.value || '(unnamed)',
-              parent: obj.parent,
-              location: loc,
-            });
+          for (const obj of allObjects) {
+            const loc = obj.properties?.location?.value;
+            if (typeof loc === 'number' && (loc === locationId || (recursive && locationsToSearch.has(loc)))) {
+              results.push({
+                id: `#${obj._id}`,
+                name: obj.properties?.name?.value || '(unnamed)',
+                parent: `#${obj.parent}`,
+                location: `#${loc}`,
+              });
+            }
           }
-        }
 
-        return {
-          content: [{ type: 'text', text: JSON.stringify({ count: results.length, objects: results }, null, 2) }],
-        };
+          return {
+            content: [{ type: 'text', text: JSON.stringify({ count: results.length, objects: results }, null, 2) }],
+          };
+        } catch (err) {
+          return {
+            content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }],
+            isError: true,
+          };
+        }
       }
     );
 
@@ -509,30 +610,6 @@ export class MaliceMCPServer {
       }
     );
 
-    // Get inheritance chain
-    server.tool(
-      'get_inheritance_chain',
-      'Get the full parent inheritance chain for a MOO object.',
-      { id: z.number().describe('Object ID') },
-      async ({ id }) => {
-        const chain: number[] = [];
-        let currentId = id as ObjId;
-        let prevId: ObjId = -1;
-
-        while (currentId !== -1 && currentId !== prevId) {
-          chain.push(currentId);
-          const obj = await this.manager.load(currentId);
-          if (!obj) break;
-          prevId = currentId;
-          currentId = obj.getParent();
-        }
-
-        return {
-          content: [{ type: 'text', text: JSON.stringify({ chain: chain.map(id => `#${id}`) }, null, 2) }],
-        };
-      }
-    );
-
     // Dig - create a new room with optional exits
     server.tool(
       'dig',
@@ -543,52 +620,59 @@ export class MaliceMCPServer {
         x: z.number().optional().describe('X coordinate (default 0)'),
         y: z.number().optional().describe('Y coordinate (default 0)'),
         z: z.number().optional().describe('Z coordinate (default 0)'),
-        fromRoomId: z.number().optional().describe('Room ID to create exit from'),
+        fromRoomId: z.string().regex(/^#-?\d+$/).optional().describe('Room ID to create exit from in "#id" format'),
         exitDirection: z.string().optional().describe('Exit direction (e.g., "north", "east", "up")'),
         returnDirection: z.string().optional().describe('Return exit direction (e.g., "south", "west", "down")'),
       },
-      async ({ name, description, x, y, z: zCoord, fromRoomId, exitDirection, returnDirection }) => {
-        // Direction alias map
-        const aliasMap: Record<string, string[]> = {
-          north: ['n'], south: ['s'], east: ['e'], west: ['w'],
-          northeast: ['ne'], northwest: ['nw'], southeast: ['se'], southwest: ['sw'],
-          up: ['u'], down: ['d', 'dn'], in: ['i'], out: ['o'],
-        };
+      async ({ name, description, x, y, z: zCoord, fromRoomId: rawFromRoomId, exitDirection, returnDirection }) => {
+        try {
+          // Direction alias map
+          const aliasMap: Record<string, string[]> = {
+            north: ['n'], south: ['s'], east: ['e'], west: ['w'],
+            northeast: ['ne'], northwest: ['nw'], southeast: ['se'], southwest: ['sw'],
+            up: ['u'], down: ['d', 'dn'], in: ['i'], out: ['o'],
+          };
 
-        // Find Room and Exit prototypes
-        const allObjects = await this.manager.db.listAll(false);
-        const roomProto = allObjects.find(o => o.properties?.name?.value === 'Room');
-        const exitProto = allObjects.find(o => o.properties?.name?.value === 'Exit');
+          // Get fromRoom if provided
+          let fromRoom: RuntimeObject | undefined;
+          if (rawFromRoomId !== undefined) {
+            fromRoom = await this.deserializeValue(rawFromRoomId) as RuntimeObject;
+          }
 
-        if (!roomProto) {
-          return { content: [{ type: 'text', text: 'Error: Room prototype not found' }], isError: true };
-        }
+          // Find Room and Exit prototypes
+          const allObjects = await this.manager.db.listAll(false);
+          const roomProto = allObjects.find(o => o.properties?.name?.value === 'Room');
+          const exitProto = allObjects.find(o => o.properties?.name?.value === 'Exit');
 
-        // Create the room
-        const newRoom = await this.manager.create({
-          parent: roomProto._id as ObjId,
-          properties: {
-            name: { type: 'string', value: name },
-            description: { type: 'string', value: description },
-            x: { type: 'number', value: x ?? 0 },
-            y: { type: 'number', value: y ?? 0 },
-            z: { type: 'number', value: zCoord ?? 0 },
-          },
-          methods: {},
-        });
+          if (!roomProto) {
+            return { content: [{ type: 'text', text: 'Error: Room prototype not found' }], isError: true };
+          }
 
-        const result: any = {
-          room: { id: newRoom.id, name, coordinates: [x ?? 0, y ?? 0, zCoord ?? 0] },
-          exits: [],
-        };
+          // Create the room
+          const roomProtoObj = await this.manager.load(roomProto._id as ObjId);
+          const newRoom = await this.manager.create({
+            parent: roomProtoObj!,
+            properties: {
+              name: { type: 'string', value: name },
+              description: { type: 'string', value: description },
+              x: { type: 'number', value: x ?? 0 },
+              y: { type: 'number', value: y ?? 0 },
+              z: { type: 'number', value: zCoord ?? 0 },
+            },
+            methods: {},
+          });
 
-        // Create exits if requested
-        if (fromRoomId !== undefined && exitDirection && exitProto) {
-          const fromRoom = await this.manager.load(fromRoomId as ObjId);
-          if (fromRoom) {
+          const result: any = {
+            room: { id: `#${newRoom.id}`, name, coordinates: [x ?? 0, y ?? 0, zCoord ?? 0] },
+            exits: [],
+          };
+
+          // Create exits if requested
+          if (fromRoom && exitDirection && exitProto) {
             // Exit from source to new room
+            const exitProtoObj = await this.manager.load(exitProto._id as ObjId);
             const exitToNew = await this.manager.create({
-              parent: exitProto._id as ObjId,
+              parent: exitProtoObj!,
               properties: {
                 name: { type: 'string', value: exitDirection },
                 aliases: { type: 'array', value: aliasMap[exitDirection.toLowerCase()] || [] },
@@ -597,28 +681,33 @@ export class MaliceMCPServer {
               methods: {},
             });
             await fromRoom.call('addExit', exitToNew);
-            result.exits.push({ id: exitToNew.id, direction: exitDirection, from: fromRoomId, to: newRoom.id });
+            result.exits.push({ id: `#${exitToNew.id}`, direction: exitDirection, from: `#${fromRoom.id}`, to: `#${newRoom.id}` });
 
             // Return exit from new room to source
             if (returnDirection) {
               const exitBack = await this.manager.create({
-                parent: exitProto._id as ObjId,
+                parent: exitProtoObj!,
                 properties: {
                   name: { type: 'string', value: returnDirection },
                   aliases: { type: 'array', value: aliasMap[returnDirection.toLowerCase()] || [] },
-                  destRoom: { type: 'objref', value: fromRoomId },
+                  destRoom: { type: 'objref', value: fromRoom.id },
                 },
                 methods: {},
               });
               await newRoom.call('addExit', exitBack);
-              result.exits.push({ id: exitBack.id, direction: returnDirection, from: newRoom.id, to: fromRoomId });
+              result.exits.push({ id: `#${exitBack.id}`, direction: returnDirection, from: `#${newRoom.id}`, to: `#${fromRoom.id}` });
             }
           }
-        }
 
-        return {
-          content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
-        };
+          return {
+            content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
+          };
+        } catch (err) {
+          return {
+            content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }],
+            isError: true,
+          };
+        }
       }
     );
 
@@ -637,7 +726,7 @@ export class MaliceMCPServer {
         const rooms = [];
         for (const obj of allObjects) {
           // Check if this object inherits from Room (with cycle protection)
-          let parentId = obj.parent;
+          let parentId = obj.parent.value;
           let isRoom = obj._id === roomProto._id;
           const seen = new Set<number>();
           while (parentId !== -1 && !isRoom && !seen.has(parentId)) {
@@ -648,7 +737,7 @@ export class MaliceMCPServer {
             }
             const parent = allObjects.find(o => o._id === parentId);
             if (!parent) break;
-            parentId = parent.parent;
+            parentId = parent.parent.value;
           }
 
           if (isRoom && obj._id !== roomProto._id) {
@@ -684,7 +773,7 @@ export class MaliceMCPServer {
         const players = [];
         for (const obj of allObjects) {
           // Check if this object inherits from Player (with cycle protection)
-          let parentId = obj.parent;
+          let parentId = obj.parent.value;
           let isPlayer = false;
           const seen = new Set<number>();
           while (parentId !== -1 && !seen.has(parentId)) {
@@ -695,7 +784,7 @@ export class MaliceMCPServer {
             }
             const parent = allObjects.find(o => o._id === parentId);
             if (!parent) break;
-            parentId = parent.parent;
+            parentId = parent.parent.value;
           }
 
           if (isPlayer) {
@@ -719,67 +808,66 @@ export class MaliceMCPServer {
       'link_rooms',
       'Create an exit from one room to another, optionally with a return exit.',
       {
-        fromRoomId: z.number().describe('Source room ID'),
-        toRoomId: z.number().describe('Destination room ID'),
+        fromRoomId: z.string().regex(/^#-?\d+$/).describe('Source room ID in "#id" format'),
+        toRoomId: z.string().regex(/^#-?\d+$/).describe('Destination room ID in "#id" format'),
         exitDirection: z.string().describe('Exit direction (e.g., "north", "east", "up")'),
         returnDirection: z.string().optional().describe('Return exit direction (e.g., "south", "west", "down")'),
       },
-      async ({ fromRoomId, toRoomId, exitDirection, returnDirection }) => {
-        const aliasMap: Record<string, string[]> = {
-          north: ['n'], south: ['s'], east: ['e'], west: ['w'],
-          northeast: ['ne'], northwest: ['nw'], southeast: ['se'], southwest: ['sw'],
-          up: ['u'], down: ['d', 'dn'], in: ['i'], out: ['o'],
-        };
+      async ({ fromRoomId: rawFromId, toRoomId: rawToId, exitDirection, returnDirection }) => {
+        try {
+          const fromRoom = await this.deserializeValue(rawFromId) as RuntimeObject;
+          const toRoom = await this.deserializeValue(rawToId) as RuntimeObject;
 
-        const fromRoom = await this.manager.load(fromRoomId as ObjId);
-        const toRoom = await this.manager.load(toRoomId as ObjId);
+          const aliasMap: Record<string, string[]> = {
+            north: ['n'], south: ['s'], east: ['e'], west: ['w'],
+            northeast: ['ne'], northwest: ['nw'], southeast: ['se'], southwest: ['sw'],
+            up: ['u'], down: ['d', 'dn'], in: ['i'], out: ['o'],
+          };
 
-        if (!fromRoom) {
-          return { content: [{ type: 'text', text: `Source room #${fromRoomId} not found` }], isError: true };
-        }
-        if (!toRoom) {
-          return { content: [{ type: 'text', text: `Destination room #${toRoomId} not found` }], isError: true };
-        }
+          const exitProto = await this.getAlias('exit');
+          if (!exitProto) {
+            return { content: [{ type: 'text', text: 'Exit prototype not found' }], isError: true };
+          }
 
-        const allObjects = await this.manager.db.listAll(false);
-        const exitProto = allObjects.find(o => o.properties?.name?.value === 'Exit');
-        if (!exitProto) {
-          return { content: [{ type: 'text', text: 'Exit prototype not found' }], isError: true };
-        }
+          const result: any = { exits: [] };
 
-        const result: any = { exits: [] };
-
-        // Create exit from source to destination
-        const exitTo = await this.manager.create({
-          parent: exitProto._id as ObjId,
-          properties: {
-            name: { type: 'string', value: exitDirection },
-            aliases: { type: 'array', value: aliasMap[exitDirection.toLowerCase()] || [] },
-            destRoom: { type: 'objref', value: toRoomId },
-          },
-          methods: {},
-        });
-        await fromRoom.call('addExit', exitTo);
-        result.exits.push({ id: exitTo.id, direction: exitDirection, from: fromRoomId, to: toRoomId });
-
-        // Create return exit if requested
-        if (returnDirection) {
-          const exitBack = await this.manager.create({
-            parent: exitProto._id as ObjId,
+          // Create exit from source to destination
+          const exitTo = await this.manager.create({
+            parent: exitProto,
             properties: {
-              name: { type: 'string', value: returnDirection },
-              aliases: { type: 'array', value: aliasMap[returnDirection.toLowerCase()] || [] },
-              destRoom: { type: 'objref', value: fromRoomId },
+              name: { type: 'string', value: exitDirection },
+              aliases: { type: 'array', value: aliasMap[exitDirection.toLowerCase()] || [] },
+              destRoom: { type: 'objref', value: toRoom.id },
             },
             methods: {},
           });
-          await toRoom.call('addExit', exitBack);
-          result.exits.push({ id: exitBack.id, direction: returnDirection, from: toRoomId, to: fromRoomId });
-        }
+          await fromRoom.call('addExit', exitTo);
+          result.exits.push({ id: `#${exitTo.id}`, direction: exitDirection, from: `#${fromRoom.id}`, to: `#${toRoom.id}` });
 
-        return {
-          content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
-        };
+          // Create return exit if requested
+          if (returnDirection) {
+            const exitBack = await this.manager.create({
+              parent: exitProto,
+              properties: {
+                name: { type: 'string', value: returnDirection },
+                aliases: { type: 'array', value: aliasMap[returnDirection.toLowerCase()] || [] },
+                destRoom: { type: 'objref', value: fromRoom.id },
+              },
+              methods: {},
+            });
+            await toRoom.call('addExit', exitBack);
+            result.exits.push({ id: `#${exitBack.id}`, direction: returnDirection, from: `#${toRoom.id}`, to: `#${fromRoom.id}` });
+          }
+
+          return {
+            content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
+          };
+        } catch (err) {
+          return {
+            content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }],
+            isError: true,
+          };
+        }
       }
     );
 
@@ -788,23 +876,21 @@ export class MaliceMCPServer {
       'unlink',
       'Remove an exit from a room.',
       {
-        roomId: z.number().describe('Room ID containing the exit'),
-        exitId: z.number().describe('Exit object ID to remove'),
+        roomId: z.string().regex(/^#-?\d+$/).describe('Room ID containing the exit in "#id" format'),
+        exitId: z.string().regex(/^#-?\d+$/).describe('Exit object ID to remove in "#id" format'),
       },
-      async ({ roomId, exitId }) => {
-        const room = await this.manager.load(roomId as ObjId);
-        if (!room) {
-          return { content: [{ type: 'text', text: `Room #${roomId} not found` }], isError: true };
-        }
-
+      async ({ roomId: rawRoomId, exitId: rawExitId }) => {
         try {
-          await room.call('removeExit', exitId);
+          const room = await this.deserializeValue(rawRoomId) as RuntimeObject;
+          const exit = await this.deserializeValue(rawExitId) as RuntimeObject;
+
+          await room.call('removeExit', exit);
           return {
-            content: [{ type: 'text', text: `Exit #${exitId} removed from room #${roomId}` }],
+            content: [{ type: 'text', text: `Exit #${exit.id} removed from room #${room.id}` }],
           };
         } catch (err) {
           return {
-            content: [{ type: 'text', text: `Error removing exit: ${err instanceof Error ? err.message : String(err)}` }],
+            content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }],
             isError: true,
           };
         }
@@ -816,28 +902,21 @@ export class MaliceMCPServer {
       'move_object',
       'Move an object to a new location (room or container).',
       {
-        objectId: z.number().describe('Object ID to move'),
-        destinationId: z.number().describe('Destination room or container ID'),
+        objectId: z.string().regex(/^#-?\d+$/).describe('Object ID to move in "#id" format'),
+        destinationId: z.string().regex(/^#-?\d+$/).describe('Destination room or container ID in "#id" format'),
       },
       async ({ objectId, destinationId }) => {
-        const obj = await this.manager.load(objectId as ObjId);
-        const dest = await this.manager.load(destinationId as ObjId);
-
-        if (!obj) {
-          return { content: [{ type: 'text', text: `Object #${objectId} not found` }], isError: true };
-        }
-        if (!dest) {
-          return { content: [{ type: 'text', text: `Destination #${destinationId} not found` }], isError: true };
-        }
-
         try {
+          const obj = await this.deserializeValue(objectId) as RuntimeObject;
+          const dest = await this.deserializeValue(destinationId) as RuntimeObject;
+
           await obj.call('moveTo', dest);
           return {
-            content: [{ type: 'text', text: `Moved #${objectId} (${obj.get('name')}) to #${destinationId} (${dest.get('name')})` }],
+            content: [{ type: 'text', text: `Moved #${obj.id} (${obj.get('name')}) to #${dest.id} (${dest.get('name')})` }],
           };
         } catch (err) {
           return {
-            content: [{ type: 'text', text: `Error moving object: ${err instanceof Error ? err.message : String(err)}` }],
+            content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }],
             isError: true,
           };
         }
@@ -849,34 +928,27 @@ export class MaliceMCPServer {
       'recycle_object',
       'Recycle (soft-delete) a MOO object. Removes it from the world and marks it for reuse.',
       {
-        objectId: z.number().describe('Object ID to recycle'),
+        objectId: z.string().regex(/^#-?\d+$/).describe('Object ID to recycle in "#id" format'),
       },
       async ({ objectId }) => {
-        const recycler = await this.getAlias('recycler');
-        if (!recycler) {
-          return {
-            content: [{ type: 'text', text: 'Recycler not found' }],
-            isError: true,
-          };
-        }
-
-        const obj = await this.manager.load(objectId as ObjId);
-        if (!obj) {
-          return {
-            content: [{ type: 'text', text: `Object #${objectId} not found` }],
-            isError: true,
-          };
-        }
-
-        const name = obj.get('name');
         try {
+          const obj = await this.deserializeValue(objectId) as RuntimeObject;
+          const recycler = await this.getAlias('recycler');
+          if (!recycler) {
+            return {
+              content: [{ type: 'text', text: 'Recycler not found' }],
+              isError: true,
+            };
+          }
+
+          const name = obj.get('name');
           await recycler.call('recycle', obj);
           return {
-            content: [{ type: 'text', text: `Recycled #${objectId} (${name})` }],
+            content: [{ type: 'text', text: `Recycled #${obj.id} (${name})` }],
           };
         } catch (err) {
           return {
-            content: [{ type: 'text', text: `Error recycling: ${err instanceof Error ? err.message : String(err)}` }],
+            content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }],
             isError: true,
           };
         }
@@ -888,48 +960,54 @@ export class MaliceMCPServer {
       'clone_object',
       'Create a deep copy of an object with all its properties. Optionally place at a location.',
       {
-        objectId: z.number().describe('Object ID to clone'),
-        locationId: z.number().optional().describe('Location to place the clone'),
+        objectId: z.string().regex(/^#-?\d+$/).describe('Object ID to clone in "#id" format'),
+        locationId: z.string().regex(/^#-?\d+$/).optional().describe('Location to place the clone in "#id" format'),
       },
       async ({ objectId, locationId }) => {
-        const obj = await this.manager.load(objectId as ObjId);
-        if (!obj) {
+        try {
+          const obj = await this.deserializeValue(objectId) as RuntimeObject;
+          let location: RuntimeObject | undefined;
+          if (locationId !== undefined) {
+            location = await this.deserializeValue(locationId) as RuntimeObject;
+          }
+
+          // Get raw data and create new object with same parent
+          const raw = obj._getRaw();
+          const props: Record<string, any> = {};
+
+          // Copy own properties (not inherited)
+          for (const [key, val] of Object.entries(raw.properties || {})) {
+            if (key !== 'location') {
+              props[key] = val;
+            }
+          }
+
+          // Set location if provided
+          if (location) {
+            props.location = { type: 'objref', value: location.id };
+          }
+
+          const cloneParent = await this.manager.load(raw.parent.value);
+          const clone = await this.manager.create({
+            parent: cloneParent!,
+            properties: props,
+            methods: raw.methods || {},
+          });
+
           return {
-            content: [{ type: 'text', text: `Object #${objectId} not found` }],
+            content: [{ type: 'text', text: JSON.stringify({
+              cloned: `#${obj.id}`,
+              newId: `#${clone.id}`,
+              name: clone.get('name'),
+              location: location ? `#${location.id}` : null,
+            }, null, 2) }],
+          };
+        } catch (err) {
+          return {
+            content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }],
             isError: true,
           };
         }
-
-        // Get raw data and create new object with same parent
-        const raw = obj._getRaw();
-        const props: Record<string, any> = {};
-
-        // Copy own properties (not inherited)
-        for (const [key, val] of Object.entries(raw.properties || {})) {
-          if (key !== 'location') {
-            props[key] = val;
-          }
-        }
-
-        // Set location if provided
-        if (locationId !== undefined) {
-          props.location = { type: 'objref', value: locationId };
-        }
-
-        const clone = await this.manager.create({
-          parent: raw.parent as ObjId,
-          properties: props,
-          methods: raw.methods || {},
-        });
-
-        return {
-          content: [{ type: 'text', text: JSON.stringify({
-            cloned: objectId,
-            newId: clone.id,
-            name: clone.get('name'),
-            location: locationId ?? null,
-          }, null, 2) }],
-        };
       }
     );
 
@@ -938,67 +1016,68 @@ export class MaliceMCPServer {
       'get_exits',
       'List all exits from a room with their destinations and any attached doors.',
       {
-        roomId: z.number().describe('Room ID to get exits from'),
+        roomId: z.string().regex(/^#-?\d+$/).describe('Room ID in "#id" format'),
       },
-      async ({ roomId }) => {
-        const room = await this.manager.load(roomId as ObjId);
-        if (!room) {
+      async ({ roomId: rawRoomId }) => {
+        try {
+          const room = await this.deserializeValue(rawRoomId) as RuntimeObject;
+
+          // exits property should be an array of RuntimeObjects or IDs
+          const exitRefs = room.get('exits') as any[] | undefined;
+          if (!exitRefs || exitRefs.length === 0) {
+            return {
+              content: [{ type: 'text', text: JSON.stringify({ roomId: `#${room.id}`, roomName: room.get('name'), exits: [] }, null, 2) }],
+            };
+          }
+
+          const exits = [];
+          for (const exitRef of exitRefs) {
+            // exitRef could be a RuntimeObject or a number (legacy)
+            const exit = typeof exitRef === 'number' 
+              ? await this.manager.load(exitRef as ObjId)
+              : exitRef;
+            
+            if (exit) {
+              const destRoom = exit.get('destRoom');
+              const destName = destRoom && typeof destRoom === 'object' && 'get' in destRoom
+                ? destRoom.get('name')
+                : null;
+
+              const door = exit.get('door');
+              let doorInfo = null;
+              if (door && typeof door === 'object' && 'get' in door) {
+                doorInfo = {
+                  id: `#${door.id}`,
+                  name: door.get('name'),
+                  open: door.get('open'),
+                  locks: door.get('locks') || [],
+                };
+              }
+
+              exits.push({
+                id: `#${exit.id}`,
+                direction: exit.get('name'),
+                aliases: exit.get('aliases') || [],
+                destRoom: destRoom ? `#${typeof destRoom === 'object' ? destRoom.id : destRoom}` : null,
+                destName,
+                door: doorInfo,
+              });
+            }
+          }
+
           return {
-            content: [{ type: 'text', text: `Room #${roomId} not found` }],
+            content: [{ type: 'text', text: JSON.stringify({
+              roomId: `#${room.id}`,
+              roomName: room.get('name'),
+              exits,
+            }, null, 2) }],
+          };
+        } catch (err) {
+          return {
+            content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }],
             isError: true,
           };
         }
-
-        const exitIds = (room as any).exits as number[] | undefined;
-        if (!exitIds || exitIds.length === 0) {
-          return {
-            content: [{ type: 'text', text: JSON.stringify({ roomId, roomName: (room as any).name, exits: [] }, null, 2) }],
-          };
-        }
-
-        const exits = [];
-        for (const exitId of exitIds) {
-          const exit = await this.manager.load(exitId as ObjId);
-          if (exit) {
-            const destId = (exit as any).destRoom as number | undefined;
-            let destName = null;
-            if (typeof destId === 'number') {
-              const dest = await this.manager.load(destId as ObjId);
-              destName = dest ? (dest as any).name : null;
-            }
-
-            const doorId = (exit as any).door as number | undefined;
-            let doorInfo = null;
-            if (typeof doorId === 'number') {
-              const door = await this.manager.load(doorId as ObjId);
-              if (door) {
-                doorInfo = {
-                  id: doorId,
-                  name: (door as any).name,
-                  open: (door as any).open,
-                  locks: (door as any).locks || [],
-                };
-              }
-            }
-
-            exits.push({
-              id: exitId,
-              direction: (exit as any).name,
-              aliases: (exit as any).aliases || [],
-              destRoom: destId,
-              destName,
-              door: doorInfo,
-            });
-          }
-        }
-
-        return {
-          content: [{ type: 'text', text: JSON.stringify({
-            roomId,
-            roomName: (room as any).name,
-            exits,
-          }, null, 2) }],
-        };
       }
     );
 
@@ -1007,35 +1086,25 @@ export class MaliceMCPServer {
       'spawn_item',
       'Create an instance of a prototype and place it at a location in one step.',
       {
-        prototypeId: z.number().describe('Prototype object ID (or use alias with alias_lookup first)'),
-        locationId: z.number().describe('Room or container ID to place the item'),
-        properties: z.record(z.any()).optional().describe('Override properties (name, description, etc.)'),
+        prototypeId: z.string().regex(/^#-?\d+$/).describe('Prototype object ID in "#id" format'),
+        locationId: z.string().regex(/^#-?\d+$/).describe('Room or container ID in "#id" format'),
+        properties: z.record(z.any()).optional().describe('Override properties (use "#id" format for object references)'),
       },
-      async ({ prototypeId, locationId, properties }) => {
-        const proto = await this.manager.load(prototypeId as ObjId);
-        if (!proto) {
-          return {
-            content: [{ type: 'text', text: `Prototype #${prototypeId} not found` }],
-            isError: true,
+      async ({ prototypeId: rawProtoId, locationId: rawLocId, properties }) => {
+        try {
+          const proto = await this.deserializeValue(rawProtoId) as RuntimeObject;
+          const location = await this.deserializeValue(rawLocId) as RuntimeObject;
+
+          // Deserialize properties if provided
+          const deserializedProps = properties ? await this.deserializeValue(properties) as Record<string, any> : {};
+
+          // Build properties with location
+          const props: Record<string, any> = {
+            location: { type: 'objref', value: location.id },
           };
-        }
 
-        const location = await this.manager.load(locationId as ObjId);
-        if (!location) {
-          return {
-            content: [{ type: 'text', text: `Location #${locationId} not found` }],
-            isError: true,
-          };
-        }
-
-        // Build properties with location
-        const props: Record<string, any> = {
-          location: { type: 'objref', value: locationId },
-        };
-
-        // Add any override properties
-        if (properties) {
-          for (const [key, value] of Object.entries(properties)) {
+          // Add any override properties
+          for (const [key, value] of Object.entries(deserializedProps)) {
             if (typeof value === 'string') {
               props[key] = { type: 'string', value };
             } else if (typeof value === 'number') {
@@ -1044,28 +1113,36 @@ export class MaliceMCPServer {
               props[key] = { type: 'boolean', value };
             } else if (Array.isArray(value)) {
               props[key] = { type: 'array', value };
+            } else if (value && typeof value === 'object' && 'id' in value) {
+              // RuntimeObject - store as objref
+              props[key] = { type: 'objref', value: value.id };
             } else if (value && typeof value === 'object') {
               props[key] = { type: 'object', value };
             }
           }
+
+          const item = await this.manager.create({
+            parent: proto,
+            properties: props,
+            methods: {},
+          });
+
+          return {
+            content: [{ type: 'text', text: JSON.stringify({
+              created: `#${item.id}`,
+              prototype: `#${proto.id}`,
+              prototypeName: proto.get('name'),
+              name: item.get('name'),
+              location: `#${location.id}`,
+              locationName: location.get('name'),
+            }, null, 2) }],
+          };
+        } catch (err) {
+          return {
+            content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }],
+            isError: true,
+          };
         }
-
-        const item = await this.manager.create({
-          parent: prototypeId as ObjId,
-          properties: props,
-          methods: {},
-        });
-
-        return {
-          content: [{ type: 'text', text: JSON.stringify({
-            created: item.id,
-            prototype: prototypeId,
-            prototypeName: proto.get('name'),
-            name: item.get('name'),
-            location: locationId,
-            locationName: location.get('name'),
-          }, null, 2) }],
-        };
       }
     );
 
@@ -1074,64 +1151,59 @@ export class MaliceMCPServer {
       'set_exit_door',
       'Create and attach a door to an exit, or attach an existing door.',
       {
-        exitId: z.number().describe('Exit object ID'),
-        doorId: z.number().optional().describe('Existing door ID (if omitted, creates new door)'),
+        exitId: z.string().regex(/^#-?\d+$/).describe('Exit object ID in "#id" format'),
+        doorId: z.string().regex(/^#-?\d+$/).optional().describe('Existing door ID in "#id" format (if omitted, creates new door)'),
         doorName: z.string().optional().describe('Name for new door (default: "door")'),
         doorDescription: z.string().optional().describe('Description for new door'),
         open: z.boolean().optional().describe('Whether door starts open (default: true)'),
       },
-      async ({ exitId, doorId, doorName, doorDescription, open }) => {
-        const exit = await this.manager.load(exitId as ObjId);
-        if (!exit) {
+      async ({ exitId: rawExitId, doorId: rawDoorId, doorName, doorDescription, open }) => {
+        try {
+          const exit = await this.deserializeValue(rawExitId) as RuntimeObject;
+
+          let door: RuntimeObject;
+          if (rawDoorId !== undefined) {
+            door = await this.deserializeValue(rawDoorId) as RuntimeObject;
+          } else {
+            // Create new door
+            const doorProto = await this.getAlias('door');
+            if (!doorProto) {
+              return {
+                content: [{ type: 'text', text: 'Door prototype not found' }],
+                isError: true,
+              };
+            }
+
+            door = await this.manager.create({
+              parent: doorProto,
+              properties: {
+                name: { type: 'string', value: doorName ?? 'door' },
+                description: { type: 'string', value: doorDescription ?? 'A door.' },
+                open: { type: 'boolean', value: open ?? true },
+              },
+              methods: {},
+            });
+          }
+
+          // Attach door to exit (store the RuntimeObject reference)
+          exit.set('door', door);
+
           return {
-            content: [{ type: 'text', text: `Exit #${exitId} not found` }],
+            content: [{ type: 'text', text: JSON.stringify({
+              exitId: `#${exit.id}`,
+              exitName: exit.get('name'),
+              doorId: `#${door.id}`,
+              doorName: door.get('name'),
+              open: door.get('open'),
+              created: rawDoorId === undefined,
+            }, null, 2) }],
+          };
+        } catch (err) {
+          return {
+            content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }],
             isError: true,
           };
         }
-
-        let door;
-        if (doorId !== undefined) {
-          door = await this.manager.load(doorId as ObjId);
-          if (!door) {
-            return {
-              content: [{ type: 'text', text: `Door #${doorId} not found` }],
-              isError: true,
-            };
-          }
-        } else {
-          // Create new door
-          const doorProto = await this.getAlias('door');
-          if (!doorProto) {
-            return {
-              content: [{ type: 'text', text: 'Door prototype not found' }],
-              isError: true,
-            };
-          }
-
-          door = await this.manager.create({
-            parent: doorProto.id as ObjId,
-            properties: {
-              name: { type: 'string', value: doorName ?? 'door' },
-              description: { type: 'string', value: doorDescription ?? 'A door.' },
-              open: { type: 'boolean', value: open ?? true },
-            },
-            methods: {},
-          });
-        }
-
-        // Attach door to exit
-        exit.set('door', door.id);
-
-        return {
-          content: [{ type: 'text', text: JSON.stringify({
-            exitId,
-            exitName: exit.get('name'),
-            doorId: door.id,
-            doorName: door.get('name'),
-            open: door.get('open'),
-            created: doorId === undefined,
-          }, null, 2) }],
-        };
       }
     );
 
@@ -1140,26 +1212,27 @@ export class MaliceMCPServer {
       'describe_object',
       'Get the runtime description of an object as a player would see it (calls describe() method).',
       {
-        objectId: z.number().describe('Object ID'),
+        objectId: z.string().regex(/^#-?\d+$/).describe('Object ID in "#id" format (e.g., "#100")'),
       },
       async ({ objectId }) => {
-        const obj = await this.manager.load(objectId as ObjId);
-        if (!obj) {
-          return {
-            content: [{ type: 'text', text: `Object #${objectId} not found` }],
-            isError: true,
-          };
-        }
-
         try {
-          const description = await obj.call('describe');
-          return {
-            content: [{ type: 'text', text: typeof description === 'string' ? description : JSON.stringify(description, null, 2) }],
-          };
+          const obj = await this.deserializeValue(objectId) as RuntimeObject;
+
+          try {
+            const description = await obj.call('describe');
+            return {
+              content: [{ type: 'text', text: typeof description === 'string' ? description : JSON.stringify(description, null, 2) }],
+            };
+          } catch {
+            // Fall back to basic description property
+            return {
+              content: [{ type: 'text', text: `${obj.get('name')}\n${obj.get('description') || 'You see nothing special.'}` }],
+            };
+          }
         } catch (err) {
-          // Fall back to basic description property
           return {
-            content: [{ type: 'text', text: `${obj.get('name')}\n${obj.get('description') || 'You see nothing special.'}` }],
+            content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }],
+            isError: true,
           };
         }
       }
@@ -1357,7 +1430,7 @@ ACTIONS:
               if (!plotProto || !recycler) return err('Plot system not initialized');
 
               const newPlot = await recycler.call('create', {
-                parent: plotProto.id,
+                parent: plotProto,
                 properties: {
                   name,
                   description: 'AI-created plot',
@@ -2012,7 +2085,7 @@ ACTIONS:
   list_objects  - List all objects that have notes`,
       {
         action: z.string().describe('Action to perform (see help above)'),
-        objectId: z.number().optional().describe('Object ID'),
+        objectId: z.string().regex(/^#-?\d+$/).optional().describe('Object ID in "#id" format (e.g., "#100")'),
         text: z.string().optional().describe('Note text content'),
         author: z.string().optional().describe('Author name (default: "mcp")'),
         tags: z.array(z.string()).optional().describe('Tags for categorization'),
@@ -2021,13 +2094,26 @@ ACTIONS:
         tag: z.string().optional().describe('Filter by tag'),
         limit: z.number().optional().describe('Max results (default 50)'),
       },
-      async ({ action, objectId, text, author, tags, index, query, tag, limit }) => {
+      async ({ action, objectId: rawObjectId, text, author, tags, index, query, tag, limit }) => {
         const notesSystem = await this.getAlias('notes');
         if (!notesSystem) {
           return {
             content: [{ type: 'text', text: 'Notes system not available' }],
             isError: true,
           };
+        }
+
+        // Deserialize objectId if provided - get RuntimeObject
+        let targetObj: RuntimeObject | undefined;
+        if (rawObjectId !== undefined) {
+          try {
+            targetObj = await this.deserializeValue(rawObjectId) as RuntimeObject;
+          } catch (err) {
+            return {
+              content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }],
+              isError: true,
+            };
+          }
         }
 
         const ok = (data: unknown) => ({
@@ -2041,29 +2127,29 @@ ACTIONS:
         try {
           switch (action) {
             case 'get': {
-              if (objectId === undefined) return err('objectId required');
-              const result = await notesSystem.call('get', objectId);
-              return ok({ objectId, count: result.length, notes: result });
+              if (!targetObj) return err('objectId required');
+              const result = await notesSystem.call('get', targetObj);
+              return ok({ objectId: `#${targetObj.id}`, count: result.length, notes: result });
             }
 
             case 'add': {
-              if (objectId === undefined) return err('objectId required');
+              if (!targetObj) return err('objectId required');
               if (!text) return err('text required');
-              const result = await notesSystem.call('add', objectId, text, author || 'mcp', tags || []);
+              const result = await notesSystem.call('add', targetObj, text, author || 'mcp', tags || []);
               if (result.success) {
-                return ok({ added: true, objectId, index: result.index });
+                return ok({ added: true, objectId: `#${targetObj.id}`, index: result.index });
               } else {
                 return err(`Error: ${result.error}`);
               }
             }
 
             case 'append': {
-              if (objectId === undefined) return err('objectId required');
+              if (!targetObj) return err('objectId required');
               if (!tag) return err('tag required (to find note to append to)');
               if (!text) return err('text required');
 
               // Get existing notes
-              const existingNotes = await notesSystem.call('get', objectId) as Array<{
+              const existingNotes = await notesSystem.call('get', targetObj) as Array<{
                 text: string;
                 author?: string;
                 tags?: string[];
@@ -2080,20 +2166,20 @@ ACTIONS:
                 const noteTags = oldNote.tags || [tag];
 
                 // Delete old, add updated
-                await notesSystem.call('delete', objectId, noteIndex);
-                const result = await notesSystem.call('add', objectId, newText, author || oldNote.author || 'mcp', noteTags);
+                await notesSystem.call('delete', targetObj, noteIndex);
+                const result = await notesSystem.call('add', targetObj, newText, author || oldNote.author || 'mcp', noteTags);
 
                 if (result.success) {
-                  return ok({ appended: true, objectId, tag, wasNew: false, index: result.index });
+                  return ok({ appended: true, objectId: `#${targetObj.id}`, tag, wasNew: false, index: result.index });
                 } else {
                   return err(`Error appending: ${result.error}`);
                 }
               } else {
                 // Create new note with this tag
-                const result = await notesSystem.call('add', objectId, text, author || 'mcp', [tag]);
+                const result = await notesSystem.call('add', targetObj, text, author || 'mcp', [tag]);
 
                 if (result.success) {
-                  return ok({ appended: true, objectId, tag, wasNew: true, index: result.index });
+                  return ok({ appended: true, objectId: `#${targetObj.id}`, tag, wasNew: true, index: result.index });
                 } else {
                   return err(`Error creating: ${result.error}`);
                 }
@@ -2101,11 +2187,11 @@ ACTIONS:
             }
 
             case 'delete': {
-              if (objectId === undefined) return err('objectId required');
+              if (!targetObj) return err('objectId required');
               if (index === undefined) return err('index required');
-              const result = await notesSystem.call('delete', objectId, index);
+              const result = await notesSystem.call('delete', targetObj, index);
               if (result.success) {
-                return ok({ deleted: true, objectId, index });
+                return ok({ deleted: true, objectId: `#${targetObj.id}`, index });
               } else {
                 return err(`Error: ${result.error}`);
               }
@@ -2124,9 +2210,11 @@ ACTIONS:
               const objects = await notesSystem.call('listObjects');
               const enriched = [];
               for (const obj of objects) {
-                const loaded = await this.manager.load(obj.objectId as ObjId);
+                // obj.objectId could be a number or RuntimeObject depending on notes system
+                const objId = typeof obj.objectId === 'number' ? obj.objectId : obj.objectId?.id;
+                const loaded = await this.manager.load(objId as ObjId);
                 enriched.push({
-                  objectId: obj.objectId,
+                  objectId: `#${objId}`,
                   name: loaded?.get('name') || 'Unknown',
                   noteCount: obj.count,
                 });
@@ -2587,7 +2675,7 @@ Core Objects:
             text: JSON.stringify({
               id: raw._id,
               name: obj.get('name'),
-              parent: raw.parent,
+              parent: `#${raw.parent.value}`,
               description: obj.get('description'),
               location: obj.get('location'),
               properties: Object.keys(raw.properties || {}),
@@ -2709,7 +2797,7 @@ Core Objects:
         const players = [];
         for (const obj of allObjects) {
           // Check if this object inherits from Player (with cycle protection)
-          let parentId = obj.parent;
+          let parentId = obj.parent.value;
           let isPlayer = false;
           const seen = new Set<number>();
           while (parentId !== -1 && !seen.has(parentId)) {
@@ -2720,7 +2808,7 @@ Core Objects:
             }
             const parent = allObjects.find(o => o._id === parentId);
             if (!parent) break;
-            parentId = parent.parent;
+            parentId = parent.parent.value;
           }
 
           if (isPlayer) {
@@ -3637,7 +3725,7 @@ Core Objects:
             const rooms: Array<{ id: number; name: string }> = [];
 
             for (const obj of allObjects) {
-              let parentId = obj.parent;
+              let parentId = obj.parent.value;
               let isRoom = obj._id === roomProtoId;
               const seen = new Set<number>();
               while (parentId !== -1 && !isRoom && !seen.has(parentId)) {
@@ -3648,7 +3736,7 @@ Core Objects:
                 }
                 const parent = allObjects.find(o => o._id === parentId);
                 if (!parent) break;
-                parentId = parent.parent;
+                parentId = parent.parent.value;
               }
 
               if (isRoom && obj._id !== roomProtoId) {
@@ -3728,8 +3816,8 @@ Core Objects:
                 });
               } else {
                 const raw = obj._getRaw();
-                const parent = raw.parent as ObjId | undefined;
-                const parentObj = parent ? await this.manager.load(parent) : null;
+                const parentId = raw.parent?.value;
+                const parentObj = parentId !== undefined ? await this.manager.load(parentId) : null;
                 const parentName = parentObj ? String(await parentObj.get('name') || 'Object') : 'Object';
                 contents.push({
                   id: objId,
@@ -3939,7 +4027,7 @@ Core Objects:
           const raw = obj._getRaw();
           const result = {
             _id: raw._id,
-            parent: raw.parent,
+            parent: `#${raw.parent.value}`,
             properties: this.serializeValue(obj.getOwnProperties()),
             methods: Object.keys(raw.methods || {}),
             created: raw.created,
@@ -4121,8 +4209,8 @@ Core Objects:
             }
 
             // Move to parent
-            if (raw.parent && raw.parent !== currentObj.id) {
-              currentObj = await this.manager.load(raw.parent as ObjId);
+            if (raw.parent && raw.parent.value !== currentObj.id) {
+              currentObj = await this.manager.load(raw.parent.value);
             } else {
               break;
             }

@@ -22,8 +22,9 @@ export class LockerBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(locationId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(locationId);
     const obj = await this.manager.create({
-      parent: locationId,
+      parent: parentObj!,
       properties: {
         name: 'Locker Bank',
         description: 'A wall of storage lockers.',

@@ -102,8 +102,8 @@ export interface GameObject {
   /** The object ID (#1, #2, etc) */
   _id: ObjId;
 
-  /** Parent object for inheritance (#0 = no parent) */
-  parent: ObjId;
+  /** Parent object for inheritance (stored as objref, self-parented for root) */
+  parent: ObjRefValue;
 
   /** Properties defined on this object (typed values) */
   properties: Record<string, Value>;
@@ -151,11 +151,11 @@ export interface RuntimeObject {
   /** Check if method exists (async - loads parents if needed) */
   hasMethodAsync(method: string): Promise<boolean>;
 
-  /** Get parent object ID */
-  getParent(): ObjId;
+  /** Get parent object (resolves objref to RuntimeObject, null if self-parented) */
+  getParent(): RuntimeObject | null;
 
-  /** Set parent object ID (auto-persists) */
-  setParent(parent: ObjId): void;
+  /** Set parent object */
+  setParent(parent: RuntimeObject): void;
 
   /** Get all own properties (resolved to JavaScript values, objrefs become RuntimeObjects) */
   getOwnProperties(): Record<string, PropertyValue>;
@@ -181,7 +181,7 @@ export interface RuntimeObject {
  */
 export interface CreateObjectParams {
   /** Parent object to inherit from */
-  parent: ObjId;
+  parent: RuntimeObject;
 
   /** Initial properties (will be auto-converted to typed Values) */
   properties?: Record<string, PropertyValue>;

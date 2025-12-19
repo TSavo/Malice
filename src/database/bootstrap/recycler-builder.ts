@@ -25,8 +25,9 @@ export class RecyclerBuilder {
 
     // Create new Recycler only if it doesn't exist
     if (!this.recycler) {
+      const root = await this.manager.load(1);
       this.recycler = await this.manager.create({
-        parent: 1,
+        parent: root!,
         properties: {
           name: 'Recycler',
           description: 'Object deletion and recovery system',

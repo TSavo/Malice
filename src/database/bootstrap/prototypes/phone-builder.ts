@@ -9,8 +9,9 @@ export class PhoneBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(describableId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(describableId);
     const obj = await this.manager.create({
-      parent: describableId,
+      parent: parentObj!,
       properties: {
         name: 'Phone',
         description: 'A generic phone handset.',

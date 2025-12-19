@@ -23,8 +23,9 @@ export class CorpseBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(decayableId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(decayableId);
     const obj = await this.manager.create({
-      parent: decayableId,
+      parent: parentObj!,
       properties: {
 
         name: 'Corpse',

@@ -19,6 +19,7 @@ async function main() {
 
         const chargenId = aliases.charGen;
         const chargen = await $.load(chargenId as ObjId);
+        if (!chargen) throw new Error('CharGen not found');
 
         console.log('--- CharGen v2 Verification ---');
         console.log(`CharGen Object: #${chargenId}`);
@@ -29,7 +30,7 @@ async function main() {
 
         const prompt = chargen.get('interviewerPrompt');
         console.log('Interviewer Prompt set:', !!prompt);
-        if (prompt) {
+        if (prompt && typeof prompt === 'string') {
             console.log('Prompt length:', prompt.length);
         }
 
@@ -49,8 +50,9 @@ async function main() {
         console.log('\n--- Human Prototype Verification ---');
         const humanId = aliases.Human;
         const human = await $.load(humanId as ObjId);
+        if (!human) throw new Error('Human prototype not found');
         const humanMethods = human.getOwnMethods();
-        console.log('Human.onSpokenTo updated:', humanMethods.onSpokenTo?.includes('malice-chargen') ? '✅' : '❌');
+        console.log('Human.onSpokenTo updated:', humanMethods.onSpokenTo?.code?.includes('malice-chargen') ? '✅' : '❌');
 
         console.log('\nVerification Complete.');
     } finally {

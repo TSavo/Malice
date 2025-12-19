@@ -17,8 +17,9 @@ export class AdminBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(playerId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(playerId);
     const obj = await this.manager.create({
-      parent: playerId,
+      parent: parentObj!,
       properties: {
         name: 'Admin',
         description: 'Base prototype for admin characters with building powers',

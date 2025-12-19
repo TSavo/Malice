@@ -29,8 +29,9 @@ export class NotesBuilder {
       if (this.notes) return;
     }
 
+    const root = await this.manager.load(1);
     this.notes = await this.manager.create({
-      parent: 1,
+      parent: root!,
       properties: {
         name: 'Notes',
         description: 'Note attachment system',

@@ -23,8 +23,9 @@ export class MagazineBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: 'Magazine',
         description: 'A detachable ammunition magazine.',
@@ -172,8 +173,9 @@ export class PistolMagazineBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(parentId);
     return await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: 'Pistol Magazine',
         description: 'A standard pistol magazine.',
@@ -190,8 +192,9 @@ export class ExtendedMagazineBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(parentId);
     return await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: 'Extended Magazine',
         description: 'A high-capacity extended magazine.',
@@ -208,8 +211,9 @@ export class M1911MagazineBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(parentId);
     return await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: '1911 Magazine',
         description: 'A single-stack .45 magazine.',
@@ -226,8 +230,9 @@ export class RifleMagazineBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(parentId);
     return await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: 'Rifle Magazine',
         description: 'A detachable rifle magazine.',
@@ -244,8 +249,9 @@ export class SmgMagazineBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(parentId);
     return await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: 'SMG Magazine',
         description: 'A submachine gun magazine.',
@@ -262,8 +268,9 @@ export class Mac10MagazineBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(parentId);
     return await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: 'MAC-10 Magazine',
         description: 'A boxy .45 magazine for the MAC-10.',
@@ -280,8 +287,9 @@ export class SpeedloaderBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: 'Speedloader',
         description: 'A revolver speedloader. Loads all chambers at once.',

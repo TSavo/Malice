@@ -37,8 +37,9 @@ export class BluntBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: 'Blunt Weapon',
         description: 'A weapon for bludgeoning.',
@@ -60,8 +61,9 @@ export class ClubBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: 'Club',
         description: 'A simple bludgeon. Humanity\'s oldest weapon.',
@@ -79,8 +81,9 @@ export class BaseballBatBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: 'Baseball Bat',
         description: 'A wooden or aluminum bat. America\'s favorite melee weapon.',
@@ -98,8 +101,9 @@ export class BatonBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: 'Baton',
         description: 'A short club. Designed for control rather than killing.',
@@ -117,8 +121,9 @@ export class NightstickBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: 'Nightstick',
         description: 'A police-issue side-handle baton. Versatile striking tool.',
@@ -136,8 +141,9 @@ export class TonfaBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: 'Tonfa',
         description: 'An Okinawan side-handle baton. Also good for blocking.',
@@ -155,8 +161,9 @@ export class BlackjackBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: 'Blackjack',
         description: 'A leather-wrapped lead weight on a spring handle. Silent and effective.',
@@ -174,8 +181,9 @@ export class TireIronBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: 'Tire Iron',
         description: 'A heavy metal bar from a car toolkit. Dual purpose.',
@@ -197,8 +205,9 @@ export class PipeBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: 'Pipe',
         description: 'A length of metal pipe. Simple and brutal.',
@@ -216,8 +225,9 @@ export class LeadPipeBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: 'Lead Pipe',
         description: 'A heavy lead pipe. Classic murder weapon.',
@@ -235,8 +245,9 @@ export class MetalPipeBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: 'Metal Pipe',
         description: 'A steel pipe section. Industrial debris repurposed.',
@@ -254,8 +265,9 @@ export class CrowbarBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: 'Crowbar',
         description: 'A heavy iron pry bar. Good for opening things. And people.',
@@ -277,8 +289,9 @@ export class HammerBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: 'Hammer',
         description: 'A basic hammer. The head does the work.',
@@ -296,8 +309,9 @@ export class ClawHammerBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: 'Claw Hammer',
         description: 'A carpenter\'s hammer with a nail-pulling claw.',
@@ -315,8 +329,9 @@ export class SledgehammerBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: 'Sledgehammer',
         description: 'A massive two-handed hammer. Demolition tool.',
@@ -335,8 +350,9 @@ export class BallPeenHammerBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: 'Ball Peen Hammer',
         description: 'A machinist\'s hammer with a rounded head.',
@@ -354,8 +370,9 @@ export class MalletBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: 'Mallet',
         description: 'A wooden or rubber mallet. Less lethal but still hurts.',
@@ -377,8 +394,9 @@ export class StaffBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: 'Staff',
         description: 'A long wooden pole. Simple but effective with training.',
@@ -397,8 +415,9 @@ export class BoStaffBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: 'Bo Staff',
         description: 'A six-foot Okinawan staff. Martial arts weapon.',
@@ -417,8 +436,9 @@ export class WalkingStickBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: 'Walking Stick',
         description: 'A sturdy cane or walking stick. Innocuous until swung.',
@@ -436,8 +456,9 @@ export class PoolCueBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: 'Pool Cue',
         description: 'A bar pool cue. Breaks easily but good for a quick jab.',
@@ -459,8 +480,9 @@ export class MaceBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: 'Mace',
         description: 'A weighted striking head on a handle. Armor-crushing.',
@@ -478,8 +500,9 @@ export class MorningstarBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: 'Morningstar',
         description: 'A spiked ball on a handle. Medieval brutality.',
@@ -501,8 +524,9 @@ export class BrassKnucklesBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: 'Brass Knuckles',
         description: 'Metal rings worn over the fingers. Adds weight to punches.',
@@ -520,8 +544,9 @@ export class SapGlovesBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: 'Sap Gloves',
         description: 'Leather gloves with powdered lead in the knuckles. Discrete.',
@@ -539,8 +564,9 @@ export class PushDaggerBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: 'Push Dagger',
         description: 'A T-shaped blade gripped in the fist. Punching stabs.',
@@ -562,8 +588,9 @@ export class ChainBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: 'Chain',
         description: 'A heavy metal chain. Swung or wrapped for strikes.',
@@ -581,8 +608,9 @@ export class BikeChainBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: 'Bike Chain',
         description: 'A bicycle chain with a padlock on the end. Street classic.',
@@ -600,8 +628,9 @@ export class NunchakuBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: 'Nunchaku',
         description: 'Two short sticks connected by a chain. Martial arts weapon.',
@@ -619,8 +648,9 @@ export class FlailBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: 'Flail',
         description: 'A spiked ball on a chain attached to a handle. Medieval.',

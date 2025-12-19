@@ -26,8 +26,9 @@ export class RentableLockBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(lockId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(lockId);
     const obj = await this.manager.create({
-      parent: lockId,
+      parent: parentObj!,
       properties: {
         name: 'Rentable Lock',
         description: 'A lock that can be rented for a fee.',

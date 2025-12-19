@@ -40,8 +40,9 @@ export class FormatBuilder {
 
     // Create new Format utility only if it doesn't exist
     if (!this.format) {
+      const root = await this.manager.load(1);
       this.format = await this.manager.create({
-        parent: 1,
+        parent: root!,
         properties: {
           name: 'Format',
           description: 'Text formatting utilities for columns, tables, and layout',

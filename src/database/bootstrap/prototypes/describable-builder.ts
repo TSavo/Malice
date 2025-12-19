@@ -9,8 +9,9 @@ export class DescribableBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number, existingObj?: RuntimeObject): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(parentId);
     const obj = existingObj || await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: 'Describable',
         description: 'Base prototype for things that exist in the world',

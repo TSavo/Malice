@@ -63,7 +63,7 @@ export class ObjectDatabase {
     this.objects = this.db.collection<GameObject>('objects');
 
     // Ensure indexes (_id is unique by default, no need to specify)
-    await this.objects.createIndex({ parent: 1 });
+    await this.objects.createIndex({ 'parent.value': 1 });
 
     this.connected = true;
   }
@@ -165,7 +165,8 @@ export class ObjectDatabase {
    * Get all children of an object
    */
   async getChildren(parentId: ObjId): Promise<GameObject[]> {
-    return await this.objects.find({ parent: parentId }).toArray();
+    // Query using dot notation for nested ObjRefValue
+    return await this.objects.find({ 'parent.value': parentId } as any).toArray();
   }
 
   /**
@@ -218,7 +219,7 @@ export class ObjectDatabase {
     if (!exists) {
       await this.create({
         _id: 1,
-        parent: 0, // Root has no parent
+        parent: { type: 'objref', value: 0 }, // Root's parent is #0 (ObjectManager)
         properties: {},
         methods: {},
       });

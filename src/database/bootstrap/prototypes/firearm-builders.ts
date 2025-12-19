@@ -34,8 +34,9 @@ export class GunBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parent = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parent!,
       properties: {
         name: 'Gun',
         description: 'A firearm.',
@@ -322,8 +323,9 @@ export class PistolBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parent = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parent!,
       properties: {
         name: 'Pistol',
         description: 'A handgun.',
@@ -346,8 +348,9 @@ export class RevolverBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parent = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parent!,
       properties: {
         name: 'Revolver',
         description: 'A six-shot wheel gun. Reliable and powerful.',
@@ -371,8 +374,9 @@ export class MagnumBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parent = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parent!,
       properties: {
         name: 'Magnum Revolver',
         description: 'A large-bore revolver. Hand cannon.',
@@ -396,8 +400,9 @@ export class SemiAutoPistolBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parent = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parent!,
       properties: {
         name: 'Semi-Auto Pistol',
         description: 'A magazine-fed automatic handgun. Standard issue.',
@@ -420,8 +425,9 @@ export class CompactPistolBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parent = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parent!,
       properties: {
         name: 'Compact Pistol',
         description: 'A small concealed-carry pistol. Easy to hide.',
@@ -444,8 +450,9 @@ export class DerringerBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parent = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parent!,
       properties: {
         name: 'Derringer',
         description: 'A tiny two-shot pistol. Pocket backup gun.',
@@ -469,8 +476,9 @@ export class M1911Builder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parent = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parent!,
       properties: {
         name: 'M1911',
         description: 'The classic .45 ACP semi-automatic. American military icon.',
@@ -497,8 +505,9 @@ export class RifleBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parent = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parent!,
       properties: {
         name: 'Rifle',
         description: 'A long-barreled firearm for accurate shooting.',
@@ -523,8 +532,9 @@ export class BoltActionRifleBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parent = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parent!,
       properties: {
         name: 'Bolt Action Rifle',
         description: 'A manually-cycled rifle. Slow but accurate.',
@@ -549,8 +559,9 @@ export class LeverActionRifleBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parent = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parent!,
       properties: {
         name: 'Lever Action Rifle',
         description: 'A cowboy rifle. Tubular magazine, lever cycling.',
@@ -575,8 +586,9 @@ export class HuntingRifleBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parent = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parent!,
       properties: {
         name: 'Hunting Rifle',
         description: 'A civilian sporting rifle. Wood stock, scope mount.',
@@ -601,8 +613,9 @@ export class Rifle22Builder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parent = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parent!,
       properties: {
         name: '.22 Rifle',
         description: 'A small-caliber plinking rifle. Cheap ammo, low power.',
@@ -631,8 +644,9 @@ export class ShotgunBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parent = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parent!,
       properties: {
         name: 'Shotgun',
         description: 'A smoothbore long gun firing shot shells. Devastating up close.',
@@ -657,8 +671,9 @@ export class PumpShotgunBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parent = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parent!,
       properties: {
         name: 'Pump Shotgun',
         description: 'A pump-action shotgun. The iconic rack sound.',
@@ -683,8 +698,9 @@ export class SawnOffShotgunBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parent = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parent!,
       properties: {
         name: 'Sawn-Off Shotgun',
         description: 'A shotgun with the barrel cut down. Concealable, brutal spread.',
@@ -708,8 +724,9 @@ export class DoubleBarrelBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parent = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parent!,
       properties: {
         name: 'Double Barrel Shotgun',
         description: 'A break-action two-barrel shotgun. Two shots, then reload.',
@@ -734,8 +751,9 @@ export class CoachGunBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parent = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parent!,
       properties: {
         name: 'Coach Gun',
         description: 'A short double-barrel shotgun. Western classic.',
@@ -764,8 +782,9 @@ export class SmgBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parent = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parent!,
       properties: {
         name: 'Submachine Gun',
         description: 'A compact automatic weapon. High rate of fire.',
@@ -788,8 +807,9 @@ export class MachinePistolBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parent = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parent!,
       properties: {
         name: 'Machine Pistol',
         description: 'A fully-automatic pistol. Sprays bullets.',
@@ -812,8 +832,9 @@ export class UziBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parent = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parent!,
       properties: {
         name: 'Uzi',
         description: 'An iconic Israeli submachine gun. Compact and reliable.',
@@ -836,8 +857,9 @@ export class Mac10Builder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parent = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parent!,
       properties: {
         name: 'MAC-10',
         description: 'A cheap, boxy machine pistol. Street favorite.',
@@ -860,8 +882,9 @@ export class TecBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parent = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parent!,
       properties: {
         name: 'TEC-9',
         description: 'A semi-auto pistol easily converted to full-auto. Gang gun.',

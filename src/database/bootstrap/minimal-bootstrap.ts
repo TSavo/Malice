@@ -158,7 +158,7 @@ export class MinimalBootstrap {
       // Create directly in database with explicit ID (bootstrap-only pattern)
       await this.manager.db.create({
         _id: 1,
-        parent: 0,
+        parent: { type: 'objref', value: 0 },
         properties: {
           name: { type: 'string', value: 'Root' },
           description: { type: 'string', value: 'Base of all objects' },
@@ -194,7 +194,7 @@ export class MinimalBootstrap {
       // Normal objects should be created via $.recycler
       await this.manager.db.create({
         _id: 2,
-        parent: 1,
+        parent: { type: 'objref', value: 1 },
         properties: {
           name: { type: 'string', value: 'System' },
           description: { type: 'string', value: 'Connection router and system coordinator' },

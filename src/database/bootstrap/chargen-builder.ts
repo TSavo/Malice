@@ -50,8 +50,9 @@ export class CharGenBuilder {
 
     if (!this.charGen) {
       // Create new CharGen only if it doesn't exist
+      const root = await this.manager.load(1);
       this.charGen = await this.manager.create({
-        parent: 1,
+        parent: root!,
         properties: {
           name: 'CharGen',
           description: 'Character creation system',

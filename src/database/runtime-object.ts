@@ -1,4 +1,4 @@
-import type { GameObject, ObjId, PropertyValue, MethodCode, Method, RuntimeObject, Value } from '../../types/object.js';
+import type { GameObject, ObjId, PropertyValue, MethodCode, Method, RuntimeObject, Value, ObjRefValue } from '../../types/object.js';
 import type { ObjectManager } from './object-manager.js';
 import * as ts from 'typescript';
 
@@ -224,9 +224,10 @@ export class RuntimeObjectImpl implements RuntimeObject {
     }
 
     // Walk up parent chain
-    // Stop at root (parent=0) or self-parented objects (parent=self) like #-1 and #0
-    if (this.obj.parent !== 0 && this.obj.parent !== this.obj._id) {
-      const parent = this.manager.getSync(this.obj.parent);
+    // Stop at self-parented objects (parent.value === self._id) like #-1 and #0
+    const parentId = this.obj.parent.value;
+    if (parentId !== this.obj._id) {
+      const parent = this.manager.getSync(parentId);
       if (parent) {
         return parent.get(prop);
       }
@@ -350,12 +351,13 @@ export class RuntimeObjectImpl implements RuntimeObject {
     }
 
     // Walk up parent chain (sync - uses cache only)
-    // Stop at root (parent=0) or self-parented objects (parent=self) like #-1 and #0
-    if (this.obj.parent !== 0 && this.obj.parent !== this.obj._id) {
-      const parent = this.manager.getSync(this.obj.parent);
+    // Stop at self-parented objects (parent.value === self._id) like #-1 and #0
+    const parentId = this.obj.parent.value;
+    if (parentId !== this.obj._id) {
+      const parent = this.manager.getSync(parentId);
       if (parent) {
         // Directly call findMethod on the impl to avoid hasMethod->findMethod loop
-        const parentImpl = parent as RuntimeObjectImpl;
+        const parentImpl = parent as unknown as RuntimeObjectImpl;
         return parentImpl.findMethod(method);
       }
     }
@@ -375,11 +377,12 @@ export class RuntimeObjectImpl implements RuntimeObject {
     }
 
     // Walk up parent chain (async - loads from DB if not cached)
-    // Stop at root (parent=0) or self-parented objects (parent=self) like #-1 and #0
-    if (this.obj.parent !== 0 && this.obj.parent !== this.obj._id) {
-      const parent = await this.manager.load(this.obj.parent);
+    // Stop at self-parented objects (parent.value === self._id) like #-1 and #0
+    const parentId = this.obj.parent.value;
+    if (parentId !== this.obj._id) {
+      const parent = await this.manager.load(parentId);
       if (parent) {
-        return (parent as RuntimeObjectImpl).findMethodAsync(method);
+        return (parent as unknown as RuntimeObjectImpl).findMethodAsync(method);
       }
     }
 
@@ -392,15 +395,17 @@ export class RuntimeObjectImpl implements RuntimeObject {
    */
   async findParentMethod(method: string): Promise<{ code: MethodCode; objectId: number } | null> {
     // Start from parent, not self
-    if (this.obj.parent === 0 || this.obj.parent === this.obj._id) {
+    // Self-parented objects have no parent to search
+    const parentId = this.obj.parent.value;
+    if (parentId === this.obj._id) {
       return null; // No parent to search
     }
 
-    const parent = await this.manager.load(this.obj.parent);
+    const parent = await this.manager.load(parentId);
     if (!parent) return null;
 
     // Check if parent has the method directly
-    const parentImpl = parent as RuntimeObjectImpl;
+    const parentImpl = parent as unknown as RuntimeObjectImpl;
     if (method in parentImpl.obj.methods) {
       return { code: parentImpl.obj.methods[method].code, objectId: parent.id };
     }
@@ -676,17 +681,20 @@ export class RuntimeObjectImpl implements RuntimeObject {
   }
 
   /**
-   * Get parent object ID
+   * Get parent object (resolves objref to RuntimeObject)
+   * Returns null if self-parented (root object)
    */
-  getParent(): ObjId {
-    return this.obj.parent;
+  getParent(): RuntimeObject | null {
+    const parentId = this.obj.parent.value;
+    if (parentId === this.obj._id) return null; // Self-parented means no parent
+    return this.manager.getSync(parentId);
   }
 
   /**
-   * Set parent object ID
+   * Set parent object
    */
-  setParent(parent: ObjId): void {
-    this.obj.parent = parent;
+  setParent(parent: RuntimeObject): void {
+    this.obj.parent = { type: 'objref', value: parent.id } as ObjRefValue;
 
     // Auto-persist
     this.manager.update(this.id, {

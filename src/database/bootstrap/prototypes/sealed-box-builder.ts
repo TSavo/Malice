@@ -16,8 +16,9 @@ export class SealedBoxBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: 'Sealed Box',
         description: 'A white plastic case with black tamper strips and a barcode label. The seal is intact.',

@@ -18,8 +18,9 @@ export class FactionBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(rootId: number): Promise<RuntimeObject> {
+    const parent = await this.manager.load(rootId);
     const obj = await this.manager.create({
-      parent: rootId,
+      parent: parent!,
       properties: {
         name: 'Faction Manager',
         description: 'Manages faction memberships and inter-faction relationships.',

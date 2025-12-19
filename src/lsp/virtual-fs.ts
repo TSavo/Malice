@@ -273,9 +273,9 @@ export class VirtualFileSystem {
         return prototypeMap[current.id];
       }
 
-      const parentId = current.getParent();
-      if (parentId === 0) break;
-      current = await this.manager.load(parentId);
+      const parent = current.getParent();
+      if (parent === null) break;
+      current = await this.manager.load(parent.id);
     }
 
     return 'RuntimeObject'; // Fallback

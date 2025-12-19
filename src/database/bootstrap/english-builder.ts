@@ -30,8 +30,9 @@ export class EnglishBuilder {
     }
 
     // Create new English
+    const root = await this.manager.load(1);
     this.english = await this.manager.create({
-      parent: 1,
+      parent: root!,
       properties: {
         name: 'English',
         description: 'English text formatting utilities',

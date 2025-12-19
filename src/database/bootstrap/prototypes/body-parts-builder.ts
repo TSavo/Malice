@@ -47,8 +47,9 @@ export class BodyPartsBuilder {
   }
 
   async buildTorso(bodyPartId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(bodyPartId);
     const obj = await this.manager.create({
-      parent: bodyPartId,
+      parent: parentObj!,
       properties: {
         name: 'Torso',
         description: 'The central body trunk',
@@ -88,8 +89,9 @@ export class BodyPartsBuilder {
   }
 
   async buildStomach(bodyPartId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(bodyPartId);
     const obj = await this.manager.create({
-      parent: bodyPartId,
+      parent: parentObj!,
       properties: {
         name: 'Stomach',
         description: 'The stomach',
@@ -267,8 +269,9 @@ export class BodyPartsBuilder {
   }
 
   async buildHead(bodyPartId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(bodyPartId);
     const obj = await this.manager.create({
-      parent: bodyPartId,
+      parent: parentObj!,
       properties: {
         name: 'Head',
         description: 'The head',
@@ -310,8 +313,9 @@ export class BodyPartsBuilder {
   }
 
   async buildEye(bodyPartId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(bodyPartId);
     const obj = await this.manager.create({
-      parent: bodyPartId,
+      parent: parentObj!,
       properties: {
         name: 'Eye',
         description: 'An eye',
@@ -342,8 +346,9 @@ export class BodyPartsBuilder {
   }
 
   async buildEar(bodyPartId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(bodyPartId);
     const obj = await this.manager.create({
-      parent: bodyPartId,
+      parent: parentObj!,
       properties: {
         name: 'Ear',
         description: 'An ear',
@@ -394,8 +399,9 @@ export class BodyPartsBuilder {
   }
 
   async buildNose(bodyPartId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(bodyPartId);
     const obj = await this.manager.create({
-      parent: bodyPartId,
+      parent: parentObj!,
       properties: {
         name: 'Nose',
         description: 'A nose',
@@ -418,8 +424,9 @@ export class BodyPartsBuilder {
   }
 
   async buildMouth(bodyPartId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(bodyPartId);
     const obj = await this.manager.create({
-      parent: bodyPartId,
+      parent: parentObj!,
       properties: {
         name: 'Mouth',
         description: 'A mouth',
@@ -484,8 +491,9 @@ export class BodyPartsBuilder {
   }
 
   async buildArm(bodyPartId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(bodyPartId);
     const obj = await this.manager.create({
-      parent: bodyPartId,
+      parent: parentObj!,
       properties: {
         name: 'Arm',
         description: 'An arm',
@@ -519,8 +527,9 @@ export class BodyPartsBuilder {
   }
 
   async buildHand(bodyPartId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(bodyPartId);
     const obj = await this.manager.create({
-      parent: bodyPartId,
+      parent: parentObj!,
       properties: {
         name: 'Hand',
         description: 'A hand',
@@ -606,8 +615,9 @@ export class BodyPartsBuilder {
   }
 
   async buildFinger(bodyPartId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(bodyPartId);
     const obj = await this.manager.create({
-      parent: bodyPartId,
+      parent: parentObj!,
       properties: {
         name: 'Finger',
         description: 'A finger',
@@ -626,8 +636,9 @@ export class BodyPartsBuilder {
   }
 
   async buildLeg(bodyPartId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(bodyPartId);
     const obj = await this.manager.create({
-      parent: bodyPartId,
+      parent: parentObj!,
       properties: {
         name: 'Leg',
         description: 'A leg',
@@ -649,8 +660,9 @@ export class BodyPartsBuilder {
   }
 
   async buildFoot(bodyPartId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(bodyPartId);
     const obj = await this.manager.create({
-      parent: bodyPartId,
+      parent: parentObj!,
       properties: {
         name: 'Foot',
         description: 'A foot',

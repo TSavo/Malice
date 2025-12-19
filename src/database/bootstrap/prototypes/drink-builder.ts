@@ -19,8 +19,9 @@ export class DrinkBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(edibleId: number): Promise<RuntimeObject> {
+    const parent = await this.manager.load(edibleId);
     const obj = await this.manager.create({
-      parent: edibleId,
+      parent: parent!,
       properties: {
         name: 'Drink',
         description: 'Base prototype for liquid consumables',

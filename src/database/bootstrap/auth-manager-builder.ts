@@ -24,8 +24,9 @@ export class AuthManagerBuilder {
 
     if (!this.authManager) {
       // Create new AuthManager only if it doesn't exist
+      const root = await this.manager.load(1);
       this.authManager = await this.manager.create({
-      parent: 1,
+      parent: root!,
       properties: {
         name: 'AuthManager',
         description: 'Interactive login and authentication',

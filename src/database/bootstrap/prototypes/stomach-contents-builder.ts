@@ -22,8 +22,9 @@ export class StomachContentsBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(stackableId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(stackableId);
     const obj = await this.manager.create({
-      parent: stackableId,
+      parent: parentObj!,
       properties: {
         name: 'StomachContents',
         description: 'Digesting food matter',

@@ -246,8 +246,9 @@ export class DevToolsServer {
     properties?: Record<string, any>;
     methods?: Record<string, string>;
   }): Promise<any> {
+    const parentObj = await this.manager.load(params.parent);
     const obj = await this.manager.create({
-      parent: params.parent,
+      parent: parentObj!,
       properties: params.properties || {},
       methods: (params.methods || {}) as unknown as Record<string, Method>,
     });

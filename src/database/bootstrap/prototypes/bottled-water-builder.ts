@@ -13,8 +13,9 @@ export class BottledWaterBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(drinkId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(drinkId);
     const obj = await this.manager.create({
-      parent: drinkId,
+      parent: parentObj!,
       properties: {
         name: 'Bottled Water',
         description: 'A clear plastic bottle of purified water. The Continuum logo is embossed on the cap. 500ml of municipal tap, filtered and sealed.',

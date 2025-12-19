@@ -26,8 +26,9 @@ export class DisposalBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parent = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parent!,
       properties: {
         name: 'Disposal',
         description: 'A generic disposal unit.',
