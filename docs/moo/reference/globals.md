@@ -489,7 +489,8 @@ In addition to aliases, `$` provides direct access to ObjectManager methods:
 const obj = await $.load(123);
 
 // Create object (low-level, prefer $.recycler.create)
-const obj = await $.create({ parent: 1, properties: {...} });
+const parent = await $.load(1);
+const obj = await $.create({ parent: parent, properties: {...} });
 
 // Get all aliases
 const aliases = $.aliases;

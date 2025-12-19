@@ -99,7 +99,7 @@ Create a new MOO object with a specified parent.
 
 ```javascript
 {
-  parent: 1,  // Parent object ID
+  parent: "#1",  // Parent object reference
   properties: { name: "My Object", description: "..." }
 }
 // Returns: Created object ID and info

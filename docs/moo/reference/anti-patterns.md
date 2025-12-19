@@ -82,7 +82,8 @@ const n = self.name;
 
 ```javascript
 // WRONG - breaks pooling
-const obj = await manager.create({ parent: 1 });
+const parent = await $.load(1);
+const obj = await manager.create({ parent: parent });
 
 // RIGHT
 const obj = await $.recycler.create($.item);

@@ -384,8 +384,9 @@ This is real infrastructure:
 // Pluribus builds the infrastructure
 
 // 1. Create the shop location
-const shop = await $.recycler.create({
-  parent: $.room,
+const roomPrototype = await manager.load($.room);
+const shop = await manager.create({
+  parent: roomPrototype!,
   properties: {
     name: "Marcus's Auto Parts",
     description: "A small storefront packed with salvaged car parts...",
@@ -395,8 +396,9 @@ const shop = await $.recycler.create({
 });
 
 // 2. Create vending machine(s)
-const vendingMachine = await $.recycler.create({
-  parent: $.vendable,
+const vendablePrototype = await manager.load($.vendable);
+const vendingMachine = await manager.create({
+  parent: vendablePrototype!,
   properties: {
     name: 'Parts Dispenser',
     location: shop.id,

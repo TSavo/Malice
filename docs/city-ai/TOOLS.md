@@ -145,17 +145,21 @@ mcp.call_method({
 
 ### create_object
 
-Create a new object.
+Create a new object. The `parent` must be a RuntimeObject, not a number.
 
 ```javascript
-mcp.create_object({
-  parent: roomPrototypeId,
+// First load the parent prototype
+const roomPrototype = await manager.load(roomPrototypeId);
+
+// Then create the object with the loaded parent
+const result = await manager.create({
+  parent: roomPrototype!,
   properties: {
     name: 'New Room',
     description: 'A freshly created room.'
   }
-})
-// Returns: { objectId: 2500 }
+});
+// Returns: RuntimeObject
 ```
 
 ### clone_object

@@ -734,7 +734,8 @@ await $.format.center('hi', 10)     // "    hi    "
 
 ```javascript
 // DON'T: Direct object creation - BROKEN
-const sword = await manager.create({ parent: weaponId, properties: { name: 'Sword' } });
+const weapon = await manager.load(weaponId);
+const sword = await manager.create({ parent: weapon!, properties: { name: 'Sword' } });
 // Problems:
 // - No object pooling (memory bloat over time)
 // - No recycled object reuse (wasted allocations)
@@ -1813,8 +1814,9 @@ export class MyUtilsBuilder {
     }
 
     // Create the utility object
+    const root = await this.manager.load(1);
     this.myUtils = await this.manager.create({
-      parent: 1,
+      parent: root!,
       properties: {
         name: 'MyUtils',
         description: 'My custom utilities',

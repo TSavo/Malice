@@ -52,7 +52,7 @@ Creates the absolute essentials needed before any other code can run.
 ```typescript
 {
   _id: 1,
-  parent: 0,
+  parent: { type: 'objref', value: 0 },
   properties: {
     name: 'Root',
     description: 'Base of all objects',
@@ -75,7 +75,7 @@ Creates the absolute essentials needed before any other code can run.
 ```typescript
 {
   _id: 2,
-  parent: 1,
+  parent: { type: 'objref', value: 1 },
   properties: {
     name: 'System',
     description: 'Connection router and system coordinator'
@@ -265,9 +265,10 @@ export class MyUtilsBuilder {
       if (this.myUtils) return; // Already built
     }
 
-    // 2. Create the utility object
+    // 2. Create the utility object - load parent first
+    const root = await this.manager.load(1);
     this.myUtils = await this.manager.create({
-      parent: 1,  // Inherit from Root
+      parent: root!,  // Inherit from Root (RuntimeObject)
       properties: {
         name: 'MyUtils',
         description: 'My custom utilities',
@@ -373,8 +374,9 @@ async build(): Promise<void> {
 Utilities should inherit from Root:
 
 ```typescript
+const root = await this.manager.load(1);
 this.myUtils = await this.manager.create({
-  parent: 1,  // Root
+  parent: root!,  // Root (RuntimeObject, not number)
   properties: { ... }
 });
 ```
@@ -546,7 +548,7 @@ export class WeaponBuilder {
     if (!describable) throw new Error('Describable not found');
 
     this.weapon = await this.manager.create({
-      parent: describable.id,  // Inherit from $.describable
+      parent: describable,  // Inherit from $.describable
       properties: {
         name: 'Weapon',
         description: 'A base weapon prototype',
