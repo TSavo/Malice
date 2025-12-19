@@ -470,6 +470,114 @@ notes({ action: 'search', tag: 'review' })
 notes({ action: 'list_objects' })
 ```
 
+## Combat Tool (Consolidated `combat` tool)
+
+All combat resolution operations use the `combat` tool with an `action` parameter.
+
+See [COMBAT.md](./COMBAT.md) for full combat resolution guide.
+
+### status
+
+Get current combat state.
+
+```javascript
+combat({ action: 'status', combatId: 'combat-abc123' })
+```
+
+### context
+
+Get full context for AI resolution (combatants, actions, stats, wounds, weapons).
+
+```javascript
+combat({ action: 'context', combatId: 'combat-abc123' })
+```
+
+### check
+
+Perform a skill check. Skills are emergent - any skill name is valid.
+
+```javascript
+combat({ 
+  action: 'check', 
+  combatId: 'combat-abc123',
+  combatantId: 100,
+  skillName: 'knife-fighting',
+  opposingLevel: 50  // optional, default 50
+})
+```
+
+### damage
+
+Apply damage to a combatant's body part.
+
+```javascript
+combat({
+  action: 'damage',
+  combatId: 'combat-abc123',
+  targetId: 200,
+  bodyPart: 'torso',
+  damageType: 'cut',  // cut, bruise, puncture, laceration, abrasion, burn
+  severity: 45,       // 0-100
+  cause: 'blade'      // optional: blade, fist, blunt, boot, claw
+})
+```
+
+### emote
+
+Narrate combat action to the room.
+
+```javascript
+combat({
+  action: 'emote',
+  combatId: 'combat-abc123',
+  text: "Jack's blade arcs toward Marcus. Marcus throws up an arm, the knife slicing across his forearm."
+})
+```
+
+### effect
+
+Apply a status effect.
+
+```javascript
+combat({
+  action: 'effect',
+  combatId: 'combat-abc123',
+  targetId: 200,
+  effect: 'stunned',  // stunned, knockedDown, disarmed, winded
+  intensity: 60,
+  duration: 30000     // optional, ms
+})
+```
+
+### end
+
+End the combat.
+
+```javascript
+combat({
+  action: 'end',
+  combatId: 'combat-abc123',
+  reason: 'death',    // death, flee, surrender, knockout, intervention
+  winnerId: 100       // optional
+})
+```
+
+### next_round
+
+Advance to the next round.
+
+```javascript
+combat({ action: 'next_round', combatId: 'combat-abc123' })
+```
+
+### list
+
+List all active combats.
+
+```javascript
+combat({ action: 'list' })
+```
+
 ## World Query Tool (Consolidated `world` tool)
 
 SQL-like querying of MOO objects.

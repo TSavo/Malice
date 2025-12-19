@@ -18,6 +18,7 @@ import { FormatBuilder } from './format-builder.js';
 import { PlotBuilder } from './plot-builder.js';
 import { AiBuilder } from './ai-builder.js';
 import { NotesBuilder } from './notes-builder.js';
+import { CombatBuilder } from './combat-builder.js';
 
 /**
  * Orchestrates building all core system objects
@@ -43,6 +44,7 @@ import { NotesBuilder } from './notes-builder.js';
  * - PlotSpawner ($.plotSpawner): Base prototype for plot-generating entities
  * - AI ($.ai): Registry for AI-controlled humans
  * - Notes ($.notes): Object note attachment system
+ * - Combat ($.combat): Combat system manager
  */
 export class CoreSystemBuilder {
   constructor(
@@ -77,6 +79,7 @@ export class CoreSystemBuilder {
     const plotBuilder = new PlotBuilder(this.manager);
     const aiBuilder = new AiBuilder(this.manager);
     const notesBuilder = new NotesBuilder(this.manager);
+    const combatBuilder = new CombatBuilder(this.manager);
 
     await authManagerBuilder.build();
     await charGenBuilder.build();
@@ -97,6 +100,7 @@ export class CoreSystemBuilder {
     await plotBuilder.build();
     await aiBuilder.build();
     await notesBuilder.build();
+    await combatBuilder.build();
 
     // Register aliases
     await authManagerBuilder.registerAlias();
@@ -118,6 +122,7 @@ export class CoreSystemBuilder {
     await plotBuilder.registerAliases();
     await aiBuilder.registerAlias();
     await notesBuilder.registerAlias();
+    await combatBuilder.registerAlias();
   }
 
   /**

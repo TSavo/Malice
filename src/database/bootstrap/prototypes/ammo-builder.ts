@@ -1,0 +1,283 @@
+import { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object.js';
+
+/**
+ * Builds the Ammo prototype
+ * 
+ * Ammunition is a stackable commodity. When loaded into a gun (directly or via clip),
+ * the ammo is recycled - it doesn't exist as a separate object while loaded.
+ * 
+ * Ammo types must match the gun's ammoType property:
+ * - 9mm, .38, .44, .45, .380, .22
+ * - .308, .30-30
+ * - 12gauge, 20gauge
+ * - etc.
+ * 
+ * Inherits from $.stackable for quantity management.
+ */
+export class AmmoBuilder {
+  constructor(private manager: ObjectManager) {}
+
+  async build(parentId: number): Promise<RuntimeObject> {
+    const obj = await this.manager.create({
+      parent: parentId,
+      properties: {
+        name: 'Ammunition',
+        description: 'A quantity of ammunition.',
+        
+        // What type of ammo (must match gun.ammoType)
+        ammoType: 'generic',
+        
+        // Inherits quantity from stackable
+        // quantity: 0,
+        
+        // Display unit
+        unit: 'rounds',
+        
+        // Ammo is often contraband
+        contraband: false,
+      },
+      methods: {},
+    });
+
+    // Override stackType to use ammoType for stacking
+    obj.setMethod('canStackWith', `
+      const other = args[0];
+      if (!other) return false;
+      if (!self.ammoType || !other.ammoType) return false;
+      return self.ammoType === other.ammoType;
+    `);
+
+    // Override shortDesc for ammo display
+    obj.setMethod('shortDesc', `
+      const qty = self.quantity || 0;
+      const type = self.ammoType || 'generic';
+      return qty + ' rounds of ' + type;
+    `);
+
+    // describe - show ammo details
+    obj.setMethod('describe', `
+      const qty = self.quantity || 0;
+      const type = self.ammoType || 'generic';
+      
+      let desc = self.name || 'Ammunition';
+      desc += '\\r\\n' + qty + ' rounds of ' + type + ' ammunition.';
+      
+      if (self.description && self.description !== 'A quantity of ammunition.') {
+        desc += '\\r\\n' + self.description;
+      }
+      
+      if (self.contraband) {
+        desc += '\\r\\n[CONTRABAND]';
+      }
+      
+      return desc;
+    `);
+
+    return obj;
+  }
+}
+
+/**
+ * Specific ammo type builders
+ */
+
+export class Ammo9mmBuilder {
+  constructor(private manager: ObjectManager) {}
+
+  async build(parentId: number): Promise<RuntimeObject> {
+    return await this.manager.create({
+      parent: parentId,
+      properties: {
+        name: '9mm Ammunition',
+        description: 'Standard 9x19mm Parabellum cartridges.',
+        ammoType: '9mm',
+        unit: 'rounds',
+      },
+      methods: {},
+    });
+  }
+}
+
+export class Ammo38Builder {
+  constructor(private manager: ObjectManager) {}
+
+  async build(parentId: number): Promise<RuntimeObject> {
+    return await this.manager.create({
+      parent: parentId,
+      properties: {
+        name: '.38 Special Ammunition',
+        description: 'Revolver cartridges.',
+        ammoType: '.38',
+        unit: 'rounds',
+      },
+      methods: {},
+    });
+  }
+}
+
+export class Ammo44Builder {
+  constructor(private manager: ObjectManager) {}
+
+  async build(parentId: number): Promise<RuntimeObject> {
+    return await this.manager.create({
+      parent: parentId,
+      properties: {
+        name: '.44 Magnum Ammunition',
+        description: 'Large-bore revolver cartridges.',
+        ammoType: '.44',
+        unit: 'rounds',
+      },
+      methods: {},
+    });
+  }
+}
+
+export class Ammo45Builder {
+  constructor(private manager: ObjectManager) {}
+
+  async build(parentId: number): Promise<RuntimeObject> {
+    return await this.manager.create({
+      parent: parentId,
+      properties: {
+        name: '.45 ACP Ammunition',
+        description: 'Heavy pistol cartridges.',
+        ammoType: '.45',
+        unit: 'rounds',
+      },
+      methods: {},
+    });
+  }
+}
+
+export class Ammo22Builder {
+  constructor(private manager: ObjectManager) {}
+
+  async build(parentId: number): Promise<RuntimeObject> {
+    return await this.manager.create({
+      parent: parentId,
+      properties: {
+        name: '.22 LR Ammunition',
+        description: 'Small-caliber rimfire cartridges.',
+        ammoType: '.22',
+        unit: 'rounds',
+      },
+      methods: {},
+    });
+  }
+}
+
+export class Ammo380Builder {
+  constructor(private manager: ObjectManager) {}
+
+  async build(parentId: number): Promise<RuntimeObject> {
+    return await this.manager.create({
+      parent: parentId,
+      properties: {
+        name: '.380 ACP Ammunition',
+        description: 'Compact pistol cartridges.',
+        ammoType: '.380',
+        unit: 'rounds',
+      },
+      methods: {},
+    });
+  }
+}
+
+export class Ammo308Builder {
+  constructor(private manager: ObjectManager) {}
+
+  async build(parentId: number): Promise<RuntimeObject> {
+    return await this.manager.create({
+      parent: parentId,
+      properties: {
+        name: '.308 Winchester Ammunition',
+        description: 'Full-power rifle cartridges.',
+        ammoType: '.308',
+        unit: 'rounds',
+      },
+      methods: {},
+    });
+  }
+}
+
+export class Ammo3030Builder {
+  constructor(private manager: ObjectManager) {}
+
+  async build(parentId: number): Promise<RuntimeObject> {
+    return await this.manager.create({
+      parent: parentId,
+      properties: {
+        name: '.30-30 Winchester Ammunition',
+        description: 'Lever-action rifle cartridges.',
+        ammoType: '.30-30',
+        unit: 'rounds',
+      },
+      methods: {},
+    });
+  }
+}
+
+export class Ammo12GaugeBuilder {
+  constructor(private manager: ObjectManager) {}
+
+  async build(parentId: number): Promise<RuntimeObject> {
+    return await this.manager.create({
+      parent: parentId,
+      properties: {
+        name: '12 Gauge Shells',
+        description: 'Shotgun shells.',
+        ammoType: '12gauge',
+        unit: 'shells',
+      },
+      methods: {},
+    });
+  }
+}
+
+/**
+ * Builds all ammo sub-prototypes
+ *
+ * This creates a hierarchy of ammo prototypes under $.ammo:
+ *
+ * $.ammo (base - inherits from $.stackable)
+ *   $.ammo9mm
+ *   $.ammo38
+ *   $.ammo44
+ *   $.ammo45
+ *   $.ammo22
+ *   $.ammo380
+ *   $.ammo308
+ *   $.ammo3030
+ *   $.ammo12gauge
+ */
+export class AmmoPrototypesBuilder {
+  constructor(private manager: ObjectManager) {}
+
+  /**
+   * Build all ammo sub-prototypes
+   * @param ammoId - ID of the base $.ammo prototype
+   * @returns Record of ammo name -> RuntimeObject
+   */
+  async buildAll(ammoId: number): Promise<Record<string, RuntimeObject>> {
+    const ammoTypes: Record<string, RuntimeObject> = {};
+
+    // Pistol calibers
+    ammoTypes.ammo9mm = await new Ammo9mmBuilder(this.manager).build(ammoId);
+    ammoTypes.ammo38 = await new Ammo38Builder(this.manager).build(ammoId);
+    ammoTypes.ammo44 = await new Ammo44Builder(this.manager).build(ammoId);
+    ammoTypes.ammo45 = await new Ammo45Builder(this.manager).build(ammoId);
+    ammoTypes.ammo22 = await new Ammo22Builder(this.manager).build(ammoId);
+    ammoTypes.ammo380 = await new Ammo380Builder(this.manager).build(ammoId);
+
+    // Rifle calibers
+    ammoTypes.ammo308 = await new Ammo308Builder(this.manager).build(ammoId);
+    ammoTypes.ammo3030 = await new Ammo3030Builder(this.manager).build(ammoId);
+
+    // Shotgun
+    ammoTypes.ammo12gauge = await new Ammo12GaugeBuilder(this.manager).build(ammoId);
+
+    console.log(`✅ Built ${Object.keys(ammoTypes).length} ammo prototypes`);
+    return ammoTypes;
+  }
+}
