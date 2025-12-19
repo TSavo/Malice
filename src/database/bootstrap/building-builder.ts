@@ -208,7 +208,7 @@ export class BuildingBuilder {
       delete extraProps.elevator;
 
       const room = await recycler.create({
-        parent: parentProto.id ? parentProto.id : parentProto,
+        parent: parentProto,
         properties: {
           name: def.name || 'Unnamed Room',
           description: def.description || 'An empty room.',
@@ -309,7 +309,7 @@ export class BuildingBuilder {
                 : undefined;
 
               const exit = await recycler.create({
-                parent: exitProto.id,
+                parent: exitProto,
                 properties: {
                   name: direction,
                   aliases: aliases,
@@ -350,7 +350,7 @@ export class BuildingBuilder {
 
         // Create exit
         const exit = await recycler.create({
-          parent: exitProto.id,
+          parent: exitProto,
           properties: {
             name: direction,
             aliases: aliases,
@@ -581,7 +581,7 @@ export class BuildingBuilder {
         properties: {
           name: direction,
           aliases: this.getDirectionAliases(direction),
-          destRoom: worldRoom.id,
+          destRoom: worldRoom,
           distance: distance,
           hidden: exitProps.hidden ?? false,
           locked: exitProps.locked ?? false,
@@ -604,7 +604,7 @@ export class BuildingBuilder {
         properties: {
           name: reverseDirection,
           aliases: this.getDirectionAliases(reverseDirection),
-          destRoom: sourceRoom.id,
+          destRoom: sourceRoom,
           distance: distance,
           hidden: exitProps.hidden ?? false,
           locked: exitProps.locked ?? false,
