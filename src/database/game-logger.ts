@@ -408,11 +408,11 @@ export class GameLogger {
       }
     }
 
-    // Check for simultaneous login patterns
+    // Check for simultaneous login patterns (use 'auth' events since 'connect' has actor=-1)
     const connectLogs = await Promise.all(
       players.map((p) =>
         this.query({
-          types: ['connect'],
+          types: ['auth'],
           actor: p,
           from,
           to,
@@ -525,7 +525,8 @@ export class GameLogger {
           }
           break;
         }
-        case 'connect':
+        case 'auth':
+          // Count successful logins (logConnect uses actor=-1, logAuth has actual actor)
           connections++;
           break;
       }
