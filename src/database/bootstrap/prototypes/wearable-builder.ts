@@ -21,8 +21,9 @@ export class WearableBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(describableId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(describableId);
     const obj = await this.manager.create({
-      parent: describableId,
+      parent: parentObj!,
       properties: {
         name: 'Wearable',
         description: 'Something that can be worn',

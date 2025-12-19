@@ -42,8 +42,9 @@ export class PromptBuilder {
 
     if (!this.prompt) {
       // Create new Prompt utility
+      const root = await this.manager.load(1);
       this.prompt = await this.manager.create({
-        parent: 1,
+        parent: root!,
         properties: {
           name: 'Prompt',
           description: 'Interactive prompt utility',

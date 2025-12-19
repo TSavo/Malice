@@ -21,8 +21,9 @@ export class AgentBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(describableId: number, existingObj?: RuntimeObject): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(describableId);
     const obj = existingObj || await this.manager.create({
-      parent: describableId,
+      parent: parentObj!,
       properties: {
         name: 'Agent',
         description: 'Base prototype for things that can act',

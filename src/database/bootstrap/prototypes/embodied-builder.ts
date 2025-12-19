@@ -20,8 +20,9 @@ export class EmbodiedBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(agentId: number, existingObj?: RuntimeObject): Promise<RuntimeObject> {
+    const parent = await this.manager.load(agentId);
     const obj = existingObj || await this.manager.create({
-      parent: agentId,
+      parent: parent!,
       properties: {
         name: 'Embodied',
         description: 'Base prototype for agents with physical bodies',

@@ -24,8 +24,9 @@ export class BodyPartBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(edibleId: number, existingObj?: RuntimeObject): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(edibleId);
     const obj = existingObj || await this.manager.create({
-      parent: edibleId,
+      parent: parentObj!,
       properties: {
         name: 'BodyPart',
         description: 'A body part',

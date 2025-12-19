@@ -35,8 +35,9 @@ export class WeaponBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: 'Weapon',
         description: 'Base prototype for weapons',

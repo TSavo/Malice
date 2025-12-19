@@ -168,7 +168,7 @@ export class ObjectManager {
         // Create #-1 as immutable null object with empty properties
         obj = await this.db.create({
           _id: -1,
-          parent: -1, // Self-parented
+          parent: { type: 'objref', value: -1 }, // Self-parented
           properties: {},
           methods: {},
         });
@@ -206,7 +206,7 @@ export class ObjectManager {
         // Create #0 on first access with empty properties
         obj = await this.db.create({
           _id: 0,
-          parent: 0, // Self-parented
+          parent: { type: 'objref', value: 0 }, // Self-parented
           properties: {},
           methods: {},
         });
@@ -265,6 +265,9 @@ export class ObjectManager {
   async create(params: CreateObjectParams): Promise<RuntimeObject> {
     const id = await this.db.getNextId();
 
+    // Extract parent ID from RuntimeObject and store as ObjRefValue
+    const parentId = params.parent.id as ObjId;
+
     // Convert properties to typed Values upfront
     const typedProperties: Record<string, any> = {};
     if (params.properties) {
@@ -276,7 +279,7 @@ export class ObjectManager {
     // Create object with all properties in one atomic operation
     const obj = await this.db.create({
       _id: id,
-      parent: params.parent,
+      parent: { type: 'objref', value: parentId },
       properties: typedProperties,
       methods: params.methods || {},
     });
@@ -406,7 +409,8 @@ export class ObjectManager {
 
     // Scan cache - all objects are loaded at startup
     for (const obj of this.cache.values()) {
-      if (obj.getParent() === parentId) {
+      const parent = obj.getParent();
+      if (parent && parent.id === parentId) {
         results.push(obj);
       }
     }

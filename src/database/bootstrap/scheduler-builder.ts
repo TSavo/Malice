@@ -51,8 +51,9 @@ export class SchedulerBuilder {
     }
 
     // Create new Scheduler
+    const root = await this.manager.load(1);
     this.scheduler = await this.manager.create({
-      parent: 1,
+      parent: root!,
       properties: {
         name: 'Scheduler',
         description: 'Global job scheduler for periodic tasks',

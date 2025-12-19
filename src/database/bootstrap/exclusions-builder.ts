@@ -46,8 +46,9 @@ export class ExclusionsBuilder {
 
     // Create new Exclusions utility only if it doesn't exist
     if (!this.exclusions) {
+      const root = await this.manager.load(1);
       this.exclusions = await this.manager.create({
-        parent: 1,
+        parent: root!,
         properties: {
           name: 'Exclusions',
           description: 'Action exclusion system using mutexes to prevent incompatible simultaneous actions',

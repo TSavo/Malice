@@ -41,8 +41,9 @@ export class MutexBuilder {
     }
 
     // Create new Mutex utility
+    const root = await this.manager.load(1);
     this.mutex = await this.manager.create({
-      parent: 1,
+      parent: root!,
       properties: {
         name: 'Mutex',
         description: 'Object-based mutex lock system with data storage and timed expiration',

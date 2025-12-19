@@ -27,8 +27,9 @@ export class ElevatorBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(locationId: number): Promise<RuntimeObject> {
+    const parent = await this.manager.load(locationId);
     const obj = await this.manager.create({
-      parent: locationId,
+      parent: parent!,
       properties: {
         name: 'Elevator',
         description: 'A metal elevator car with a control panel.',

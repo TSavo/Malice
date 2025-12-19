@@ -29,8 +29,9 @@ export class DecayableBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(describableId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(describableId);
     const obj = await this.manager.create({
-      parent: describableId,
+      parent: parentObj!,
       properties: {
         name: 'Decayable',
         description: 'Base prototype for objects that decay over time',

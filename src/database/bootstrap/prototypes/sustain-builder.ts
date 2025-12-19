@@ -20,8 +20,9 @@ export class SustainBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(foodId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(foodId);
     const obj = await this.manager.create({
-      parent: foodId,
+      parent: parentObj!,
       properties: {
         name: 'Sustain',
         description: 'A small oblong pill, pale gray with a faint chemical sheen. The Continuum logo is pressed into one side. Nutritionally complete. Best not to think about the source material.',

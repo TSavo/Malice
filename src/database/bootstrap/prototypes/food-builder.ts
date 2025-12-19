@@ -14,8 +14,9 @@ export class FoodBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(edibleId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(edibleId);
     const obj = await this.manager.create({
-      parent: edibleId,
+      parent: parentObj!,
       properties: {
         name: 'Food',
         description: 'Base prototype for solid food items',

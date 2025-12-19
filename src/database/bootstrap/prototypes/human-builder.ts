@@ -26,8 +26,9 @@ export class HumanBuilder {
    * @param existingObj - Optional existing object to rebuild methods on
    */
   async build(embodiedId: number, existingObj?: RuntimeObject): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(embodiedId);
     const obj = existingObj || await this.manager.create({
-      parent: embodiedId,
+      parent: parentObj!,
       properties: {
         name: 'Human',
         description: 'Base prototype for human-like agents',

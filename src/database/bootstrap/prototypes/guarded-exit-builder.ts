@@ -19,8 +19,9 @@ export class GuardedExitBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(exitId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(exitId);
     const obj = await this.manager.create({
-      parent: exitId,
+      parent: parentObj!,
       properties: {
         name: 'Guarded Exit',
         description: 'A passage restricted to faction members.',

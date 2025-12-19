@@ -35,8 +35,9 @@ export class CombatBuilder {
     }
 
     // Create new Combat object
+    const root = await this.manager.load(1);
     this.combat = await this.manager.create({
-      parent: 1,
+      parent: root!,
       properties: {
         name: 'Combat',
         description: 'Combat system manager',
@@ -530,7 +531,7 @@ ENDING COMBAT:
                       ammoCount = await item.getAmmoCount();
                     }
                     inHands.leftHand = {
-                      id: item.id,
+                      id: '#' + item.id,  // Use #id format for MCP consistency
                       name: item.name,
                       description: item.description,
                       // Weapon properties if present
@@ -563,7 +564,7 @@ ENDING COMBAT:
                       ammoCount = await item.getAmmoCount();
                     }
                     inHands.rightHand = {
-                      id: item.id,
+                      id: '#' + item.id,  // Use #id format for MCP consistency
                       name: item.name,
                       description: item.description,
                       // Weapon properties if present
@@ -605,7 +606,7 @@ ENDING COMBAT:
         }
 
         combatantContexts.push({
-          id: combatant.id,
+          id: '#' + combatant.id,  // Use #id format for MCP consistency
           name: combatant.name,
           description: combatant.description,
           isNPC: isNPC,
@@ -620,16 +621,21 @@ ENDING COMBAT:
         });
       }
 
-      // Get location description
+      // Get location info
+      let locationId = null;
       let locationDesc = '';
-      if (combat.location && combat.location.description) {
-        locationDesc = combat.location.description;
+      if (combat.location) {
+        locationId = '#' + combat.location.id;  // Use #id format for MCP consistency
+        if (combat.location.description) {
+          locationDesc = combat.location.description;
+        }
       }
 
       return {
         combatId: combat.id,
         round: combat.round,
         status: combat.status,
+        locationId: locationId,
         location: locationDesc,
         combatants: combatantContexts,
         log: combat.log,

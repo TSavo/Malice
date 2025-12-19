@@ -19,8 +19,9 @@ export class AmmoBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(parentId);
     const obj = await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: 'Ammunition',
         description: 'A quantity of ammunition.',
@@ -86,8 +87,9 @@ export class Ammo9mmBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(parentId);
     return await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: '9mm Ammunition',
         description: 'Standard 9x19mm Parabellum cartridges.',
@@ -103,8 +105,9 @@ export class Ammo38Builder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(parentId);
     return await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: '.38 Special Ammunition',
         description: 'Revolver cartridges.',
@@ -120,8 +123,9 @@ export class Ammo44Builder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(parentId);
     return await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: '.44 Magnum Ammunition',
         description: 'Large-bore revolver cartridges.',
@@ -137,8 +141,9 @@ export class Ammo45Builder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(parentId);
     return await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: '.45 ACP Ammunition',
         description: 'Heavy pistol cartridges.',
@@ -154,8 +159,9 @@ export class Ammo22Builder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(parentId);
     return await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: '.22 LR Ammunition',
         description: 'Small-caliber rimfire cartridges.',
@@ -171,8 +177,9 @@ export class Ammo380Builder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(parentId);
     return await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: '.380 ACP Ammunition',
         description: 'Compact pistol cartridges.',
@@ -188,8 +195,9 @@ export class Ammo308Builder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(parentId);
     return await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: '.308 Winchester Ammunition',
         description: 'Full-power rifle cartridges.',
@@ -205,8 +213,9 @@ export class Ammo3030Builder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(parentId);
     return await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: '.30-30 Winchester Ammunition',
         description: 'Lever-action rifle cartridges.',
@@ -222,8 +231,9 @@ export class Ammo12GaugeBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(parentId);
     return await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: '12 Gauge Shells',
         description: 'Shotgun shells.',

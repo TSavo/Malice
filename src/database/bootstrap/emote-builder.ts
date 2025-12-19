@@ -68,8 +68,9 @@ export class EmoteBuilder {
 
     // Create new Emote only if it doesn't exist
     if (!this.emote) {
+      const root = await this.manager.load(1);
       this.emote = await this.manager.create({
-        parent: 1,
+        parent: root!,
         properties: {
           name: 'Emote',
           description: 'Freeform emote parsing and formatting',

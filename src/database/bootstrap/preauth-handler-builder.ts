@@ -23,8 +23,9 @@ export class PreAuthHandlerBuilder {
     }
 
     // Create new PreAuthHandler
+    const root = await this.manager.load(1);
     this.preAuthHandler = await this.manager.create({
-      parent: 1,
+      parent: root!,
       properties: {
         name: 'PreAuthHandler',
         description: 'Pre-authenticated connection handler (SSL, HTTP auth, OAuth)',

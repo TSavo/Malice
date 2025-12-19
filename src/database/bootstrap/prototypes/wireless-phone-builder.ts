@@ -8,8 +8,9 @@ export class WirelessPhoneBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(phoneId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(phoneId);
     const obj = await this.manager.create({
-      parent: phoneId,
+      parent: parentObj!,
       properties: {
         name: 'Wireless Phone',
         description: 'A wireless phone handset.',

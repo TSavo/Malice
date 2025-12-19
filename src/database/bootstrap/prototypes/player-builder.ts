@@ -9,8 +9,9 @@ export class PlayerBuilder {
   constructor(private manager: ObjectManager) { }
 
   async build(humanId: number, existingObj?: RuntimeObject): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(humanId);
     const obj = existingObj || await this.manager.create({
-      parent: humanId,
+      parent: parentObj!,
       properties: {
         name: 'Player',
         description: 'Base prototype for player characters',

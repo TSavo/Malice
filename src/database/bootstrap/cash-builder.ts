@@ -28,8 +28,9 @@ export class CashBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(): Promise<RuntimeObject> {
+    const root = await this.manager.load(1);
     const obj = await this.manager.create({
-      parent: 1, // Root object
+      parent: root!, // Root object
       properties: {
         name: 'Cash Utility',
         description: 'Utility object for cash operations',

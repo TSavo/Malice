@@ -42,8 +42,9 @@ export class PronounSubBuilder {
 
     // Create new PronounSub only if it doesn't exist
     if (!this.pronounSub) {
+      const root = await this.manager.load(1);
       this.pronounSub = await this.manager.create({
-        parent: 1,
+        parent: root!,
         properties: {
           name: 'PronounSub',
           description: 'Pronoun and name substitution system',

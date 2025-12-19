@@ -26,8 +26,9 @@ export class AiBuilder {
     }
 
     // Create new AI registry
+    const root = await this.manager.load(1);
     this.ai = await this.manager.create({
-      parent: 1,
+      parent: root!,
       properties: {
         name: 'AI',
         description: 'Registry for AI-controlled humans',
@@ -628,7 +629,7 @@ CORE PRINCIPLES
 
       // Create the human
       const human = await recycler.create({
-        parent: humanProto.id,
+        parent: humanProto,
         properties: {
           name: name,
           description: description,

@@ -21,8 +21,9 @@ export class OneTimeLockerBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(lockerId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(lockerId);
     const obj = await this.manager.create({
-      parent: lockerId,
+      parent: parentObj!,
       properties: {
         name: 'One-Time Locker Bank',
         description: 'A bank of storage lockers that support one-time access codes for couriers.',

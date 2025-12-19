@@ -36,8 +36,9 @@ export class MementoBuilder {
     }
 
     // Create new Memento utility
+    const root = await this.manager.load(1);
     this.memento = await this.manager.create({
-      parent: 1,
+      parent: root!,
       properties: {
         name: 'Memento',
         description: 'Object graph serialization with ID replacement',

@@ -80,6 +80,46 @@ export class CharGenMCPServer {
   }
 
   /**
+   * Parse object ID from "#id" string format only
+   */
+  private parseObjectId(value: string): number | null {
+    if (typeof value === 'string' && /^#-?\d+$/.test(value)) {
+      return parseInt(value.slice(1), 10);
+    }
+    return null;
+  }
+
+  /**
+   * Recursively deserialize "#id" strings to RuntimeObjects in args
+   */
+  private async deserializeValue(value: unknown): Promise<unknown> {
+    if (value === null || value === undefined) return value;
+
+    // Handle "#id" string format - convert to RuntimeObject
+    if (typeof value === 'string' && /^#-?\d+$/.test(value)) {
+      const id = parseInt(value.slice(1), 10);
+      const obj = await this.manager.load(id as ObjId);
+      return obj ?? value; // Return original string if object not found
+    }
+
+    // Recursively handle arrays
+    if (Array.isArray(value)) {
+      return Promise.all(value.map(v => this.deserializeValue(v)));
+    }
+
+    // Recursively handle objects
+    if (typeof value === 'object') {
+      const result: Record<string, unknown> = {};
+      for (const [k, v] of Object.entries(value)) {
+        result[k] = await this.deserializeValue(v);
+      }
+      return result;
+    }
+
+    return value;
+  }
+
+  /**
    * Create a new McpServer instance with chargen tools registered
    */
   private createSessionServer(): McpServer {
@@ -101,10 +141,17 @@ export class CharGenMCPServer {
       'start_interview',
       'Start character creation interview for a player. Returns the list of questions.',
       {
-        playerId: z.number().describe('Player object ID'),
+        playerId: z.string().regex(/^#-?\d+$/).describe('Player object ID in "#id" format'),
       },
-      async ({ playerId }) => {
+      async ({ playerId: rawPlayerId }) => {
         try {
+          const playerId = this.parseObjectId(rawPlayerId);
+          if (playerId === null) {
+            return {
+              content: [{ type: 'text', text: `Invalid player ID format: ${rawPlayerId}` }],
+              isError: true,
+            };
+          }
           const chargen = await this.getCharGen();
           const result = await chargen.startInterview(playerId);
           return {
@@ -124,10 +171,17 @@ export class CharGenMCPServer {
       'get_next_question',
       'Get the next unanswered question for a player. Returns null when all questions are answered.',
       {
-        playerId: z.number().describe('Player object ID'),
+        playerId: z.string().regex(/^#-?\d+$/).describe('Player object ID in "#id" format'),
       },
-      async ({ playerId }) => {
+      async ({ playerId: rawPlayerId }) => {
         try {
+          const playerId = this.parseObjectId(rawPlayerId);
+          if (playerId === null) {
+            return {
+              content: [{ type: 'text', text: `Invalid player ID format: ${rawPlayerId}` }],
+              isError: true,
+            };
+          }
           const chargen = await this.getCharGen();
           const result = await chargen.getNextQuestionNeedingAnswer(playerId);
           return {
@@ -147,12 +201,19 @@ export class CharGenMCPServer {
       'answer_question',
       'Record an answer to a chargen question. Answers are open-ended text (except stat allocation).',
       {
-        playerId: z.number().describe('Player object ID'),
+        playerId: z.string().regex(/^#-?\d+$/).describe('Player object ID in "#id" format'),
         questionId: z.string().describe('Question ID (e.g., "name", "age", "eyeColor")'),
         answer: z.any().describe('The answer value (string for most questions, object for statAllocation)'),
       },
-      async ({ playerId, questionId, answer }) => {
+      async ({ playerId: rawPlayerId, questionId, answer }) => {
         try {
+          const playerId = this.parseObjectId(rawPlayerId);
+          if (playerId === null) {
+            return {
+              content: [{ type: 'text', text: `Invalid player ID format: ${rawPlayerId}` }],
+              isError: true,
+            };
+          }
           const chargen = await this.getCharGen();
           const result = await chargen.setAnswer(playerId, questionId, answer);
           return {
@@ -172,10 +233,17 @@ export class CharGenMCPServer {
       'get_progress',
       'Get all questions and current answers for a player interview.',
       {
-        playerId: z.number().describe('Player object ID'),
+        playerId: z.string().regex(/^#-?\d+$/).describe('Player object ID in "#id" format'),
       },
-      async ({ playerId }) => {
+      async ({ playerId: rawPlayerId }) => {
         try {
+          const playerId = this.parseObjectId(rawPlayerId);
+          if (playerId === null) {
+            return {
+              content: [{ type: 'text', text: `Invalid player ID format: ${rawPlayerId}` }],
+              isError: true,
+            };
+          }
           const chargen = await this.getCharGen();
           const result = await chargen.getQuestionsAndAnswers(playerId);
           return {
@@ -195,10 +263,17 @@ export class CharGenMCPServer {
       'finish_interview',
       'Complete the interview and create the character body. All questions must be answered.',
       {
-        playerId: z.number().describe('Player object ID'),
+        playerId: z.string().regex(/^#-?\d+$/).describe('Player object ID in "#id" format'),
       },
-      async ({ playerId }) => {
+      async ({ playerId: rawPlayerId }) => {
         try {
+          const playerId = this.parseObjectId(rawPlayerId);
+          if (playerId === null) {
+            return {
+              content: [{ type: 'text', text: `Invalid player ID format: ${rawPlayerId}` }],
+              isError: true,
+            };
+          }
           const chargen = await this.getCharGen();
           const result = await chargen.finishInterview(playerId);
           return {
@@ -241,11 +316,25 @@ export class CharGenMCPServer {
       'register_for_recycle',
       'Register an object (room, NPC) to be recycled when interview finishes.',
       {
-        playerId: z.number().describe('Player object ID'),
-        objectId: z.number().describe('Object ID to recycle on completion'),
+        playerId: z.string().regex(/^#-?\d+$/).describe('Player object ID in "#id" format'),
+        objectId: z.string().regex(/^#-?\d+$/).describe('Object ID to recycle on completion in "#id" format'),
       },
-      async ({ playerId, objectId }) => {
+      async ({ playerId: rawPlayerId, objectId: rawObjectId }) => {
         try {
+          const playerId = this.parseObjectId(rawPlayerId);
+          if (playerId === null) {
+            return {
+              content: [{ type: 'text', text: `Invalid player ID format: ${rawPlayerId}` }],
+              isError: true,
+            };
+          }
+          const objectId = this.parseObjectId(rawObjectId);
+          if (objectId === null) {
+            return {
+              content: [{ type: 'text', text: `Invalid object ID format: ${rawObjectId}` }],
+              isError: true,
+            };
+          }
           const chargen = await this.getCharGen();
           const result = await chargen.registerForRecycle(playerId, objectId);
           return {

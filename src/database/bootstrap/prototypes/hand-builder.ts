@@ -9,8 +9,9 @@ export class HandBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(bodyPartId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(bodyPartId);
     const obj = await this.manager.create({
-      parent: bodyPartId,
+      parent: parentObj!,
       properties: {
         name: 'Hand',
         description: 'A hand',

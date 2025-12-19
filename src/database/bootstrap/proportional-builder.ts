@@ -40,8 +40,9 @@ export class ProportionalBuilder {
     }
 
     // Create new Proportional
+    const root = await this.manager.load(1);
     this.proportional = await this.manager.create({
-      parent: 1,
+      parent: root!,
       properties: {
         name: 'Proportional',
         description: 'Proportional message selection system',

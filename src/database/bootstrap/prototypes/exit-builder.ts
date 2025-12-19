@@ -26,8 +26,9 @@ export class ExitBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(describableId: number): Promise<RuntimeObject> {
+    const parent = await this.manager.load(describableId);
     const obj = await this.manager.create({
-      parent: describableId,
+      parent: parent!,
       properties: {
         name: 'Exit',
         description: 'A passage to another location',

@@ -13,11 +13,13 @@ All weapons inherit from `$.weapon`, which inherits from `$.describable`.
 | `skill` | string | `'improvised'` | Combat skill used (e.g., "knife", "pistol", "katana") |
 | `damage` | number | `0` | Base damage modifier (0-100, added to severity) |
 | `damageType` | string | `'bruise'` | Type of damage: cut, bruise, puncture, laceration, burn |
+| `twoHanded` | boolean | `false` | Whether effective use requires two hands |
 | `ranged` | boolean | `false` | Whether this is a ranged weapon |
 | `range` | number | `0` | Effective range in meters (ranged weapons only) |
-| `ammo` | number | `0` | Current ammo count (ranged weapons only) |
-| `maxAmmo` | number | `0` | Maximum ammo capacity (ranged weapons only) |
+| `ammo` | number | `0` | Current ammo count (direct-load guns only) |
+| `maxAmmo` | number | `0` | Maximum ammo capacity |
 | `ammoType` | string | `null` | Required ammo type for reloading |
+| `usesMagazine` | boolean | `false` | Whether this firearm requires a magazine (guns only) |
 
 ### Methods
 
@@ -26,9 +28,14 @@ All weapons inherit from `$.weapon`, which inherits from `$.describable`.
 | `getSkill()` | none | string | Returns the combat skill name |
 | `getDamage()` | none | number | Returns base damage modifier |
 | `getDamageType()` | none | string | Returns damage type |
+| `isTwoHanded()` | none | boolean | Returns whether weapon needs two hands |
 | `canFire()` | none | `{success, reason?}` | Check if ranged weapon can fire |
 | `fire()` | none | `{success, ammoRemaining?}` | Expend one round of ammo |
 | `reload(ammoSource)` | ammo object | `{success, loaded?, ammoRemaining?}` | Reload from ammo source |
+| `getAmmoCount()` | none | number | Get current ammo (works for magazine-fed guns too) |
+| `getLoadedMagazine()` | none | magazine or null | Get magazine in a magazine-fed gun |
+| `load(item)` | magazine or ammo | `{success, ...}` | Load magazine or ammo into gun |
+| `unload(caller)` | who's unloading | `{success, ...}` | Eject magazine or unload ammo |
 
 ### Damage Scale
 
@@ -40,6 +47,23 @@ All weapons inherit from `$.weapon`, which inherits from `$.describable`.
 | 35-50 | Large weapons | Sword, baseball bat, fire axe |
 | 40-60 | Firearms | Pistol, rifle, shotgun |
 | 60+ | Heavy weapons | Sledgehammer, magnum revolver |
+
+### Two-Handed Weapons
+
+Weapons with `twoHanded: true` require **both hands free** for effective use. You can HOLD a two-handed weapon in one hand, but using it without a free second hand causes:
+
+- **Severe accuracy penalty** - reduce skill check successes by 1-2
+- **Risk of self-injury** - recoil, loss of control (especially firearms)
+- **Reduced damage** - halve the weapon's damage bonus
+
+**Two-handed weapons include:**
+- **Firearms:** Rifle, Bolt Action Rifle, Lever Action Rifle, Hunting Rifle, .22 Rifle, Shotgun, Pump Shotgun, Double Barrel, Coach Gun
+- **Blades:** Katana, Longsword, Fire Axe
+- **Blunt:** Sledgehammer, Staff, Bo Staff, Flail
+
+**NOT two-handed:** Sawn-Off Shotgun (specifically designed for one-handed use)
+
+The combat system checks `twoHanded` and `hasFreeHand` in combatant context to determine penalties.
 
 ---
 
@@ -63,14 +87,15 @@ $.weapon (base)
 │   │   ├── $.wakizashi (25 dmg)
 │   │   ├── $.tanto (16 dmg, puncture)
 │   │   └── $.ninjato (28 dmg)
+│   │   └── [katana is twoHanded]
 │   ├── $.sword (skill: sword)
-│   │   ├── $.longsword (38 dmg)
+│   │   ├── $.longsword (38 dmg) [twoHanded]
 │   │   ├── $.shortsword (22 dmg)
 │   │   ├── $.rapier (24 dmg, puncture)
 │   │   └── $.cutlass (26 dmg)
 │   └── $.axe (skill: axe)
 │       ├── $.hatchet (22 dmg)
-│       ├── $.fireAxe (38 dmg)
+│       ├── $.fireAxe (38 dmg) [twoHanded]
 │       └── $.tomahawk (20 dmg)
 │
 ├── $.blunt (bruise damage)
@@ -87,10 +112,10 @@ $.weapon (base)
 │   │   └── $.crowbar (26 dmg)
 │   ├── $.hammer (skill: hammer)
 │   │   ├── $.clawHammer (18 dmg)
-│   │   ├── $.sledgehammer (40 dmg)
+│   │   ├── $.sledgehammer (40 dmg) [twoHanded]
 │   │   ├── $.ballPeenHammer (16 dmg)
 │   │   └── $.mallet (12 dmg)
-│   ├── $.staff (skill: staff)
+│   ├── $.staff (skill: staff) [all twoHanded]
 │   │   ├── $.boStaff (18 dmg)
 │   │   ├── $.walkingStick (12 dmg)
 │   │   └── $.poolCue (10 dmg)
@@ -102,27 +127,27 @@ $.weapon (base)
 │   └── $.chain (skill: chain)
 │       ├── $.bikeChain (16 dmg)
 │       ├── $.nunchaku (14 dmg)
-│       └── $.flail (28 dmg)
+│       └── $.flail (28 dmg) [twoHanded]
 │
 ├── $.gun (ranged, puncture damage)
-│   ├── $.pistol (skill: pistol)
-│   │   ├── $.revolver (40 dmg, 6 rounds, .38)
-│   │   ├── $.magnum (55 dmg, 6 rounds, .44)
+│   ├── $.pistol (skill: pistol) [usesMagazine: true]
+│   │   ├── $.revolver (40 dmg, 6 rounds, .38) [usesMagazine: false]
+│   │   ├── $.magnum (55 dmg, 6 rounds, .44) [usesMagazine: false]
 │   │   ├── $.semiAutoPistol (35 dmg, 17 rounds, 9mm)
 │   │   ├── $.compactPistol (28 dmg, 7 rounds, .380)
-│   │   ├── $.derringer (25 dmg, 2 rounds, .22)
+│   │   ├── $.derringer (25 dmg, 2 rounds, .22) [usesMagazine: false]
 │   │   └── $.m1911 (42 dmg, 7 rounds, .45)
-│   ├── $.rifle (skill: rifle)
+│   ├── $.rifle (skill: rifle) [twoHanded, usesMagazine: false]
 │   │   ├── $.boltActionRifle (55 dmg, 5 rounds, .308)
 │   │   ├── $.leverActionRifle (45 dmg, 10 rounds, .30-30)
 │   │   ├── $.huntingRifle (50 dmg, 4 rounds, .308)
 │   │   └── $.rifle22 (25 dmg, 10 rounds, .22)
-│   ├── $.shotgun (skill: shotgun)
+│   ├── $.shotgun (skill: shotgun) [twoHanded, usesMagazine: false]
 │   │   ├── $.pumpShotgun (55 dmg, 8 rounds, 12gauge)
-│   │   ├── $.sawnOffShotgun (50 dmg, 2 rounds, 12gauge)
+│   │   ├── $.sawnOffShotgun (50 dmg, 2 rounds, 12gauge) [NOT twoHanded]
 │   │   ├── $.doubleBarrel (55 dmg, 2 rounds, 12gauge)
 │   │   └── $.coachGun (52 dmg, 2 rounds, 12gauge)
-│   └── $.smg (skill: smg)
+│   └── $.smg (skill: smg) [usesMagazine: true]
 │       ├── $.machinePistol (28 dmg, 20 rounds, 9mm)
 │       ├── $.uzi (30 dmg, 32 rounds, 9mm)
 │       ├── $.mac10 (28 dmg, 30 rounds, .45)
@@ -280,3 +305,62 @@ Firearms use specific ammo types:
 | `pepper-spray` | Pepper Spray |
 
 Ammo is implemented as `$.stackable` objects with matching `ammoType` property.
+
+---
+
+## Magazine System
+
+Firearms use two loading mechanisms:
+
+### Magazine-Fed Guns (`usesMagazine: true`)
+
+Pistols, SMGs, and some rifles use detachable magazines:
+
+- Magazine must be loaded via `gun.load(magazine)`
+- Magazine is stored inside the gun via containment (`magazine.location = gun.id`)
+- `getAmmoCount()` checks the loaded magazine's ammo
+- `unload(caller)` ejects the magazine to hand or ground
+
+```javascript
+// Load a magazine
+await pistol.load(magazine);  // Magazine moves into pistol
+
+// Check ammo
+const rounds = await pistol.getAmmoCount();  // Reads magazine.ammo
+
+// Eject magazine
+const result = await pistol.unload(player);  // Magazine goes to free hand or ground
+// { success: true, ejected: 'magazine', magazine: mag, rounds: 12 }
+```
+
+### Direct-Load Guns (`usesMagazine: false`)
+
+Revolvers, shotguns, and lever-action rifles load loose ammo directly:
+
+- Ammo is loaded via `gun.load(ammoStack)`
+- Ammo object is recycled, rounds stored in `gun.ammo`
+- `getAmmoCount()` returns `gun.ammo` directly
+- `unload(caller)` creates new ammo object from gun's internal ammo
+
+```javascript
+// Load shells into shotgun
+await shotgun.load(shells);  // Shells recycled, shotgun.ammo increases
+
+// Unload
+const result = await shotgun.unload(player);
+// { success: true, unloaded: 5, ammo: newAmmoObject }
+```
+
+### Magazine Types
+
+| Prototype | Ammo Type | Capacity | Notes |
+|-----------|-----------|----------|-------|
+| `$.pistolMagazine` | 9mm | 17 | Standard pistol mag |
+| `$.extendedMagazine` | 9mm | 30 | High-capacity |
+| `$.m1911Magazine` | .45 | 7 | 1911 single-stack |
+| `$.rifleMagazine` | .308 | 10 | Detachable rifle mag |
+| `$.smgMagazine` | 9mm | 32 | SMG extended |
+| `$.mac10Magazine` | .45 | 30 | MAC-10 specific |
+| `$.speedloader` | .38 | 6 | Revolver quick-load |
+
+See [Magazines](./magazines.md) and [Ammo](./ammo.md) for full documentation.

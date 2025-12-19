@@ -41,8 +41,9 @@ export class RoomBuilder {
     }
 
     // Create new Room utility
+    const root = await this.manager.load(1);
     this.room = await this.manager.create({
-      parent: 1,
+      parent: root!,
       properties: {
         name: 'Room',
         description: 'Room utility for announcements',

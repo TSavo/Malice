@@ -65,8 +65,9 @@ export class BodyFactory {
         aliases?: string[];
       } = {}
     ): Promise<RuntimeObject> => {
+      const parentObj = await this.manager.load(parentProto);
       const part = await this.manager.create({
-        parent: parentProto,
+        parent: parentObj!,
         properties: {
           name,
           description: `A ${name.toLowerCase()}`,

@@ -56,8 +56,9 @@ export class PlotBuilder {
     }
 
     // Create Plot prototype
+    const root = await this.manager.load(1);
     this.plotPrototype = await this.manager.create({
-      parent: 1,
+      parent: root!,
       properties: {
         name: 'Plot',
         description: 'Narrative event log prototype',
@@ -1128,10 +1129,11 @@ Provide a summary that captures everything important:\`;
 
     // Get describable as parent (or root if not available)
     const parentId = aliases.describable || 1;
+    const parentObj = await this.manager.load(parentId);
 
     // Create PlotSpawner prototype
     this.plotSpawner = await this.manager.create({
-      parent: parentId,
+      parent: parentObj!,
       properties: {
         name: 'PlotSpawner',
         description: 'Base prototype for plot-generating entities',
@@ -1162,7 +1164,7 @@ Be terse. Be cold. Be corporate.`,
       }
 
       const newPlot = await recycler.create({
-        parent: plotProto.id,
+        parent: plotProto,
         properties: {
           name: name,
           description: 'A plot created by ' + self.name,
@@ -1266,7 +1268,7 @@ Be terse. Be cold. Be corporate.`,
     if (!this.plotSpawner) throw new Error('PlotSpawner must be built first');
 
     this.jobBoard = await this.manager.create({
-      parent: this.plotSpawner.id,
+      parent: this.plotSpawner!,
       properties: {
         name: 'JobBoard',
         description: 'A public terminal for finding work. The screen flickers with job listings. A small switch on the side is labeled "AUDIO MODE".',
@@ -1638,8 +1640,9 @@ When a player requests work, create a plot and give them their first objective.`
     }
 
     // Create PlotDB
+    const root2 = await this.manager.load(1);
     this.plotDB = await this.manager.create({
-      parent: 1,
+      parent: root2!,
       properties: {
         name: 'PlotDB',
         description: 'Global plot index and query system',

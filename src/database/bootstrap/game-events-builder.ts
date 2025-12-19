@@ -28,8 +28,9 @@ export class GameEventsBuilder {
     }
 
     // Create new GameEvents object
+    const root = await this.manager.load(1);
     this.events = await this.manager.create({
-      parent: 1,
+      parent: root!,
       properties: {
         name: 'GameEvents',
         description: 'Game event emission system for external services',
