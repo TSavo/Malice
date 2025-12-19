@@ -219,7 +219,7 @@ export class WorldBuilder {
       }
 
       const room = await recycler.create({
-        parent: roomProto.id,
+        parent: roomProto,
         properties: {
           name: data.name,
           description: data.description,
@@ -267,11 +267,11 @@ export class WorldBuilder {
 
           // Create exit
           const exit = await recycler.create({
-            parent: exitProto.id,
+            parent: exitProto,
             properties: {
               name: dir.name,
               aliases: dir.aliases,
-              destRoom: neighbor.id,
+              destRoom: neighbor,
               distance: distance,
               hidden: false,
               locked: false,

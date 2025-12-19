@@ -103,7 +103,7 @@ export class AdminBuilder {
               return exObj && exObj.destRoom === elev.id;
             });
             if (!inExit) {
-               inExit = $.recycler ? await $.recycler.create($.exit, { name: 'in', aliases: ['in','i'], destRoom: elev.id }, self) : null;
+               inExit = $.recycler ? await $.recycler.create($.exit, { name: 'in', aliases: ['in','i'], destRoom: elev }, self) : null;
 
               if (!inExit) { await self.tell('Recycler unavailable.'); break; }
               await currentRoom.addExit(inExit);
@@ -115,7 +115,7 @@ export class AdminBuilder {
               return exObj && exObj.destRoom === currentRoom.id;
             });
             if (!outExit) {
-               outExit = $.recycler ? await $.recycler.create($.exit, { name: 'out', aliases: ['out','o'], destRoom: currentRoom.id }, self) : null;
+               outExit = $.recycler ? await $.recycler.create($.exit, { name: 'out', aliases: ['out','o'], destRoom: currentRoom }, self) : null;
 
               if (!outExit) { await self.tell('Recycler unavailable.'); break; }
               await elev.addExit(outExit);
@@ -600,7 +600,7 @@ export class AdminBuilder {
           const exitToNew = await $.recycler.create($.exit, {
             name: exitDirection,
             aliases: self.getExitAliases(exitDirection),
-            destRoom: newRoom.id,
+            destRoom: newRoom,
           }, self);
           await currentRoom.addExit(exitToNew);
           await self.tell('Created exit ' + exitDirection + ' (#' + exitToNew.id + ')');
@@ -610,7 +610,7 @@ export class AdminBuilder {
             const exitToCurrent = await $.recycler.create($.exit, {
               name: returnDirection,
               aliases: self.getExitAliases(returnDirection),
-              destRoom: currentRoom.id,
+              destRoom: currentRoom,
             }, self);
             await newRoom.addExit(exitToCurrent);
             await self.tell('Created exit ' + returnDirection + ' (#' + exitToCurrent.id + ')');
@@ -712,7 +712,7 @@ export class AdminBuilder {
       const exitToNew = await $.recycler.create($.exit, {
         name: exitDirection,
         aliases: self.getExitAliases(exitDirection),
-        destRoom: destRoom.id,
+        destRoom: destRoom,
       }, self);
       await currentRoom.addExit(exitToNew);
       await self.tell('Created exit ' + exitDirection + ' (#' + exitToNew.id + ')');
@@ -721,7 +721,7 @@ export class AdminBuilder {
         const exitToCurrent = await $.recycler.create($.exit, {
           name: returnDirection,
           aliases: self.getExitAliases(returnDirection),
-          destRoom: currentRoom.id,
+          destRoom: currentRoom,
         }, self);
         await destRoom.addExit(exitToCurrent);
         await self.tell('Created exit ' + returnDirection + ' (#' + exitToCurrent.id + ')');
@@ -984,7 +984,7 @@ export class AdminBuilder {
         const number = await $.prompt.question(self, 'Phone number: ');
         if (!number) { await self.tell('Cancelled.'); return; }
         const phoneDb = $.phoneDb ? $.phoneDb : null;
-        const phone = await recycler.create({ parent: $.phone, properties: { name, description: description || '', number, phoneDb: phoneDb ? phoneDb.id : null } }, self);
+        const phone = await recycler.create({ parent: $.phone, properties: { name, description: description || '', number, phoneDb: phoneDb ? phoneDb : null } }, self);
         if (phoneDb && phoneDb.register) await phoneDb.register(number, phone);
         await self.tell('Created phone #' + phone.id + ' number ' + number + '.');
         return;
@@ -994,7 +994,7 @@ export class AdminBuilder {
         const number = await $.prompt.question(self, 'Phone number: ');
         if (!number) { await self.tell('Cancelled.'); return; }
         const phoneDb = $.phoneDb ? $.phoneDb : null;
-        const phone = await recycler.create({ parent: $.wirelessPhone, properties: { name, description: description || '', number, phoneDb: phoneDb ? phoneDb.id : null } }, self);
+        const phone = await recycler.create({ parent: $.wirelessPhone, properties: { name, description: description || '', number, phoneDb: phoneDb ? phoneDb : null } }, self);
         if (phoneDb && phoneDb.register) await phoneDb.register(number, phone);
         await self.tell('Created wireless phone #' + phone.id + ' number ' + number + '.');
         return;
@@ -1018,7 +1018,7 @@ export class AdminBuilder {
             name,
             description: description || '',
             number,
-            phoneDb: phoneDb ? phoneDb.id : null,
+            phoneDb: phoneDb ? phoneDb : null,
             bank: bankRef,
             account: payout,
             pricePerCall: callPrice,
