@@ -4,15 +4,15 @@ Group membership and inter-faction relationships in Malice.
 
 ## Overview
 
-The **$.faction** singleton manages faction memberships and relationships between factions. Use it to:
+The **$faction** singleton manages faction memberships and relationships between factions. Use it to:
 - Assign entities (players, NPCs) to factions
 - Define relationships between factions (friendly, hostile, neutral)
 - Query whether two entities are friendly or hostile
 - Restrict access to areas based on faction membership
 
-## $.faction - Faction Manager
+## $faction - Faction Manager
 
-**Type:** Singleton (inherits from $.root)
+**Type:** Singleton (inherits from $root)
 
 ### Properties
 
@@ -46,7 +46,7 @@ The **$.faction** singleton manages faction memberships and relationships betwee
 Create a new faction.
 
 ```javascript
-await $.faction.createFaction('Citizen', 'Registered citizens of the Continuum');
+await $faction.createFaction('Citizen', 'Registered citizens of the Continuum');
 // { success: true, faction: 'Citizen' }
 ```
 
@@ -54,18 +54,18 @@ await $.faction.createFaction('Citizen', 'Registered citizens of the Continuum')
 Assign an entity to a faction. Removes from previous faction if any.
 
 ```javascript
-await $.faction.setFaction(player, 'Citizen');
+await $faction.setFaction(player, 'Citizen');
 // { success: true, faction: 'Citizen' }
 
 // Remove from all factions
-await $.faction.setFaction(player, null);
+await $faction.setFaction(player, null);
 ```
 
 #### getFaction(entity)
 Get an entity's current faction.
 
 ```javascript
-const faction = await $.faction.getFaction(player);
+const faction = await $faction.getFaction(player);
 // 'Citizen' or null
 ```
 
@@ -73,9 +73,9 @@ const faction = await $.faction.getFaction(player);
 Set the relationship between two factions.
 
 ```javascript
-await $.faction.setRelationship('Citizen', 'Scavenger', 'hostile');
-await $.faction.setRelationship('Citizen', 'Corporate', 'friendly');
-await $.faction.setRelationship('Citizen', 'Neutral', 'neutral');
+await $faction.setRelationship('Citizen', 'Scavenger', 'hostile');
+await $faction.setRelationship('Citizen', 'Corporate', 'friendly');
+await $faction.setRelationship('Citizen', 'Neutral', 'neutral');
 // { success: true, relationship: 'hostile' }
 ```
 
@@ -88,7 +88,7 @@ await $.faction.setRelationship('Citizen', 'Neutral', 'neutral');
 Get the relationship between two factions.
 
 ```javascript
-const rel = await $.faction.getRelationship('Citizen', 'Scavenger');
+const rel = await $faction.getRelationship('Citizen', 'Scavenger');
 // 'hostile', 'friendly', or 'neutral'
 ```
 
@@ -96,7 +96,7 @@ const rel = await $.faction.getRelationship('Citizen', 'Scavenger');
 Check if two entities are friendly (same faction or allied factions).
 
 ```javascript
-const friendly = await $.faction.isFriendly(player, npc);
+const friendly = await $faction.isFriendly(player, npc);
 // true if same faction or factions are 'friendly'
 ```
 
@@ -104,7 +104,7 @@ const friendly = await $.faction.isFriendly(player, npc);
 Check if two entities are hostile (enemy factions).
 
 ```javascript
-const hostile = await $.faction.isHostile(player, npc);
+const hostile = await $faction.isHostile(player, npc);
 // true if factions are 'hostile'
 ```
 
@@ -112,7 +112,7 @@ const hostile = await $.faction.isHostile(player, npc);
 Get all members of a faction.
 
 ```javascript
-const members = await $.faction.getMembers('Citizen');
+const members = await $faction.getMembers('Citizen');
 // [playerId1, playerId2, npcId3, ...]
 ```
 
@@ -120,14 +120,14 @@ const members = await $.faction.getMembers('Citizen');
 Set the leader of a faction.
 
 ```javascript
-await $.faction.setLeader('Citizen', adminPlayer);
+await $faction.setLeader('Citizen', adminPlayer);
 ```
 
 #### getLeader(factionName)
 Get the leader of a faction.
 
 ```javascript
-const leader = await $.faction.getLeader('Citizen');
+const leader = await $faction.getLeader('Citizen');
 // entity ID or null
 ```
 
@@ -135,7 +135,7 @@ const leader = await $.faction.getLeader('Citizen');
 Get all faction names.
 
 ```javascript
-const factions = await $.faction.listFactions();
+const factions = await $faction.listFactions();
 // ['Citizen', 'Scavenger', 'Corporate', ...]
 ```
 
@@ -143,13 +143,13 @@ const factions = await $.faction.listFactions();
 Get detailed info about a faction.
 
 ```javascript
-const info = await $.faction.getFactionInfo('Citizen');
+const info = await $faction.getFactionInfo('Citizen');
 // { members: [...], description: '...', leader: null, created: ... }
 ```
 
-## $.guardedExit - Faction-Restricted Passage
+## $guardedExit - Faction-Restricted Passage
 
-**Inherits from:** $.exit
+**Inherits from:** $exit
 
 An exit that only allows passage for members of a specific faction.
 
@@ -207,20 +207,20 @@ exits: {
 
 ```javascript
 // Create factions
-await $.faction.createFaction('Citizen', 'Registered citizens');
-await $.faction.createFaction('Scavenger', 'Outcasts and survivors');
-await $.faction.setRelationship('Citizen', 'Scavenger', 'hostile');
+await $faction.createFaction('Citizen', 'Registered citizens');
+await $faction.createFaction('Scavenger', 'Outcasts and survivors');
+await $faction.setRelationship('Citizen', 'Scavenger', 'hostile');
 
 // Assign players to factions
-await $.faction.setFaction(player1, 'Citizen');
-await $.faction.setFaction(player2, 'Scavenger');
+await $faction.setFaction(player1, 'Citizen');
+await $faction.setFaction(player2, 'Scavenger');
 
 // Check relationships
-await $.faction.isFriendly(player1, player2);  // false
-await $.faction.isHostile(player1, player2);   // true
+await $faction.isFriendly(player1, player2);  // false
+await $faction.isHostile(player1, player2);   // true
 
 // Create guarded exit
-const guardedExit = await $.recycler.create($.guardedExit, {
+const guardedExit = await $recycler.create($guardedExit, {
   name: 'north',
   destRoom: nutrientDispensary.id,
   allowedFaction: 'Citizen',
@@ -242,7 +242,7 @@ Faction members only can enter certain buildings (e.g., Continuum facilities).
 ### 2. NPC Behavior
 NPCs can check faction relationships to determine hostility:
 ```javascript
-if (await $.faction.isHostile(npc, player)) {
+if (await $faction.isHostile(npc, player)) {
   await npc.attack(player);
 }
 ```
@@ -250,7 +250,7 @@ if (await $.faction.isHostile(npc, player)) {
 ### 3. Quest Eligibility
 Certain quests only available to faction members:
 ```javascript
-const faction = await $.faction.getFaction(player);
+const faction = await $faction.getFaction(player);
 if (faction !== 'Citizen') {
   return 'You must be a Citizen to accept this job.';
 }
@@ -259,7 +259,7 @@ if (faction !== 'Citizen') {
 ### 4. Pricing/Services
 Different prices or services based on faction:
 ```javascript
-const faction = await $.faction.getFaction(player);
+const faction = await $faction.getFaction(player);
 const price = faction === 'Citizen' ? 2 : 5;  // Citizens get discount
 ```
 

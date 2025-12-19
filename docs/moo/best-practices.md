@@ -36,7 +36,7 @@ Every utility method in Malice should do ONE thing well. Complex behaviors come 
 
 **Before (Wrong):**
 ```javascript
-$.english.listWithPronouns(items, viewer) {
+$english.listWithPronouns(items, viewer) {
   // 100 lines doing both list formatting AND pronoun substitution
 }
 ```
@@ -45,20 +45,20 @@ $.english.listWithPronouns(items, viewer) {
 ```javascript
 // Each utility does ONE thing
 const names = items.map(i => i.name);
-const list = $.english.list(names); // List formatting
-const text = await $.pronoun.sub(list, viewer); // Pronoun substitution
+const list = $english.list(names); // List formatting
+const text = await $pronoun.sub(list, viewer); // Pronoun substitution
 ```
 
-When you need "list formatting with pronoun substitution," you COMBINE `$.english.list()` and `$.pronoun.sub()`. You don't create a hybrid utility.
+When you need "list formatting with pronoun substitution," you COMBINE `$english.list()` and `$pronoun.sub()`. You don't create a hybrid utility.
 
 ## Composition Table
 
 | Task | Utilities | Pattern |
 |------|-----------|---------|
-| Format a list with pronouns | $.english.list + $.pronoun.sub | List first, substitute after |
-| Format message with quantity | $.english.quantity + $.format.interpolate | Quantity first, interpolate after |
-| Delayed action with exclusion | $.exclusions.start + $.scheduler.in | Check exclusion, then schedule |
-| Format plural possessive | $.english.pluralize + $.english.possessive | Pluralize first, possessive after |
+| Format a list with pronouns | $english.list + $pronoun.sub | List first, substitute after |
+| Format message with quantity | $english.quantity + $format.interpolate | Quantity first, interpolate after |
+| Delayed action with exclusion | $exclusions.start + $scheduler.in | Check exclusion, then schedule |
+| Format plural possessive | $english.pluralize + $english.possessive | Pluralize first, possessive after |
 
 ## Real Examples
 
@@ -80,13 +80,13 @@ describe() {
   const people = this.contents.filter(c => c.type === 'agent');
   
   // Each utility does ONE thing
-  const itemList = $.english.list(items.map(i => i.name));
-  const peopleList = $.english.list(people.map(p => p.name));
+  const itemList = $english.list(items.map(i => i.name));
+  const peopleList = $english.list(people.map(p => p.name));
   
   return [
     this.description,
     items.length ? `You see ${itemList} here.` : null,
-    people.length ? `${peopleList} ${$.english.pluralize('is', people.length)} here.` : null,
+    people.length ? `${peopleList} ${$english.pluralize('is', people.length)} here.` : null,
   ].filter(Boolean).join('\n\n');
 }
 ```
@@ -116,8 +116,8 @@ async attack(target, weapon) {
   
   // Step 3: Format message (composing utilities)
   const weaponName = weapon.name;
-  const message = await $.pronoun.sub(
-    `%N ${$.english.pluralize('hits', 1)} %t with ${weaponName} for ${damage} damage.`,
+  const message = await $pronoun.sub(
+    `%N ${$english.pluralize('hits', 1)} %t with ${weaponName} for ${damage} damage.`,
     this,
     target
   );
@@ -150,23 +150,23 @@ async attack(target, weapon) {
 ### Pattern 1: Transform Data
 ```javascript
 // Utilities that transform input to output
-$.english.pluralize(word, count)
-$.format.capitalize(text)
-$.english.article(word)
+$english.pluralize(word, count)
+$format.capitalize(text)
+$english.article(word)
 ```
 
 ### Pattern 2: Query State
 ```javascript
 // Utilities that check conditions
-$.exclusions.check(obj, action)
-await $.mutex.isLocked(lockName)
+$exclusions.check(obj, action)
+await $mutex.isLocked(lockName)
 ```
 
 ### Pattern 3: Orchestrate Actions
 ```javascript
 // Utilities that coordinate other utilities
-await $.scheduler.in(5, callback) // Uses mutex + timer
-await $.exclusions.start(obj, 'walk', msg) // Uses mutex + rules
+await $scheduler.in(5, callback) // Uses mutex + timer
+await $exclusions.start(obj, 'walk', msg) // Uses mutex + rules
 ```
 
 ## Common Anti-Patterns
@@ -175,7 +175,7 @@ await $.exclusions.start(obj, 'walk', msg) // Uses mutex + rules
 
 **Wrong:**
 ```javascript
-$.message.sendToRoom(room, actor, target, message, options) {
+$message.sendToRoom(room, actor, target, message, options) {
   // Handles pronouns
   // Handles list formatting
   // Handles visibility
@@ -192,7 +192,7 @@ async announceToRoom(room, actor, target, messages) {
   
   for (const observer of visible) {
     const message = this.selectMessage(observer, actor, target, messages);
-    const formatted = await $.pronoun.sub(message, actor, target, observer);
+    const formatted = await $pronoun.sub(message, actor, target, observer);
     await observer.showMessage(formatted);
   }
 }
@@ -217,11 +217,11 @@ listItems() {
 ```javascript
 // Both use the same utility
 describeContents() {
-  return $.english.list(this.contents.map(c => c.name));
+  return $english.list(this.contents.map(c => c.name));
 }
 
 listItems() {
-  return $.english.list(this.items.map(i => i.name));
+  return $english.list(this.items.map(i => i.name));
 }
 ```
 
@@ -230,13 +230,13 @@ listItems() {
 **Wrong:**
 ```javascript
 // Exposing internal details
-$.mutex.lock(obj, `action:${action}`, timeout) // User has to know prefix
+$mutex.lock(obj, `action:${action}`, timeout) // User has to know prefix
 ```
 
 **Right:**
 ```javascript
 // Hide implementation details
-$.exclusions.start(obj, action, message, timeout) // Manages prefix internally
+$exclusions.start(obj, action, message, timeout) // Manages prefix internally
 ```
 
 ## Testing Composition
@@ -244,16 +244,16 @@ $.exclusions.start(obj, action, message, timeout) // Manages prefix internally
 Good utilities are easy to test in isolation:
 
 ```javascript
-// Test $.english.list alone
-expect($.english.list(['a', 'b', 'c'])).toBe('a, b, and c');
+// Test $english.list alone
+expect($english.list(['a', 'b', 'c'])).toBe('a, b, and c');
 
-// Test $.pronoun.sub alone
-expect(await $.pronoun.sub('%N attacks.', actor)).toBe('Bob attacks.');
+// Test $pronoun.sub alone
+expect(await $pronoun.sub('%N attacks.', actor)).toBe('Bob attacks.');
 
 // Test them composed
 const items = ['sword', 'shield', 'potion'];
-const list = $.english.list(items);
-const message = await $.pronoun.sub(`%N ${$.english.pluralize('has', 1)} ${list}.`, actor);
+const list = $english.list(items);
+const message = await $pronoun.sub(`%N ${$english.pluralize('has', 1)} ${list}.`, actor);
 expect(message).toBe('Bob has sword, shield, and potion.');
 ```
 

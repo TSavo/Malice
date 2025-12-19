@@ -31,7 +31,7 @@ export class Describable { ... }
 
 Where:
 
-- `alias`: string; the key stored in `#0.properties.aliases` (`$.describable`).
+- `alias`: string; the key stored in `#0.properties.aliases` (`$describable`).
 - `parent`: string; alias of the parent prototype (`root`, `describable`, etc.).
 
 ### Defaults

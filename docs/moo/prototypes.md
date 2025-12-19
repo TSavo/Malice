@@ -9,43 +9,43 @@ Everything in Malice inherits from prototypes. Objects don't have "classes"—th
 ## The Prototype Hierarchy
 
 ```
-$.root (#1)
-  ├─ $.faction (singleton - faction memberships & relationships)
+$root (#1)
+  ├─ $faction (singleton - faction memberships & relationships)
   │
-  └─ $.describable
-      ├─ $.location (containers)
-      │   └─ $.room (rooms with exits)
+  └─ $describable
+      ├─ $location (containers)
+      │   └─ $room (rooms with exits)
       │
-      ├─ $.exit (directional links)
-      │   └─ $.guardedExit (faction-restricted passage)
+      ├─ $exit (directional links)
+      │   └─ $guardedExit (faction-restricted passage)
       │
-      ├─ $.agent (autonomous entities)
-      │   └─ $.embodied (physical bodies)
-      │       └─ $.human (human-type agents)
-      │           └─ $.player (player characters)
-      │               └─ $.admin (wizard/admin)
+      ├─ $agent (autonomous entities)
+      │   └─ $embodied (physical bodies)
+      │       └─ $human (human-type agents)
+      │           └─ $player (player characters)
+      │               └─ $admin (wizard/admin)
       │
-      ├─ $.decayable (time-based decay)
-      │   └─ $.edible (consumable items)
-      │       ├─ $.food (solid food)
-      │       ├─ $.drink (liquids)
-      │       └─ $.bodyPart (body parts)
+      ├─ $decayable (time-based decay)
+      │   └─ $edible (consumable items)
+      │       ├─ $food (solid food)
+      │       ├─ $drink (liquids)
+      │       └─ $bodyPart (body parts)
       │
-      └─ $.wearable (items that can be worn)
-          └─ $.clothing (wearable clothing)
+      └─ $wearable (items that can be worn)
+          └─ $clothing (wearable clothing)
 ```
 
 ## Core Prototypes
 
-### $.root (#1)
+### $root (#1)
 **The foundation for all objects.**
 
-All objects inherit from `$.root`. Provides minimal base functionality.
+All objects inherit from `$root`. Provides minimal base functionality.
 
-### $.describable
+### $describable
 **Foundation for anything that exists in the world.**
 
-Inherits from: `$.root`
+Inherits from: `$root`
 
 **Properties:**
 - `name` - Display name
@@ -62,10 +62,10 @@ Inherits from: `$.root`
 - `getLocation()` - Returns location RuntimeObject
 - `getContents()` - Returns contents as RuntimeObjects
 
-### $.location
+### $location
 **Objects that can contain other objects.**
 
-Inherits from: `$.describable`
+Inherits from: `$describable`
 
 **Properties:**
 - `capacity` - Maximum number of contained objects
@@ -80,10 +80,10 @@ Inherits from: `$.describable`
 - `onContentArrived(obj, source, mover)` - When object arrives
 - `onContentLeaving(obj, dest, mover)` - When object leaves
 
-### $.room
+### $room
 **Rooms with exits and navigation.**
 
-Inherits from: `$.location`
+Inherits from: `$location`
 
 **Properties:**
 - `exits` - Object mapping directions to exit IDs
@@ -103,10 +103,10 @@ Inherits from: `$.location`
 - `onContentArrived()` - Registers exit verbs with player
 - `onContentLeaving()` - Unregisters exit verbs
 
-### $.agent
+### $agent
 **Autonomous entities that can act.**
 
-Inherits from: `$.describable`
+Inherits from: `$describable`
 
 **Properties:**
 - `isPlayer` - Boolean flag
@@ -122,10 +122,10 @@ Inherits from: `$.describable`
 - `completeMovement()` - Finish movement
 - `stopMovement()` - Cancel movement
 
-### $.embodied
+### $embodied
 **Agents with physical bodies.**
 
-Inherits from: `$.agent`
+Inherits from: `$agent`
 
 **Properties:**
 - `hp`, `maxHp` - Hit points
@@ -138,10 +138,10 @@ Inherits from: `$.agent`
 - `die(killer)` - Handle death
 - `getBodyPart(name)` - Find specific body part
 
-### $.human
+### $human
 **Human-type embodied agents.**
 
-Inherits from: `$.embodied`
+Inherits from: `$embodied`
 
 **Properties:**
 - `strength`, `intelligence`, `dexterity` - Attributes
@@ -152,10 +152,10 @@ Inherits from: `$.embodied`
 - `getArmorValue(damageType)` - Calculate armor reduction
 - `getCarryCapacity()` - Based on strength
 
-### $.player
+### $player
 **Player characters.**
 
-Inherits from: `$.human`
+Inherits from: `$human`
 
 **Properties:**
 - `account` - Account ID
@@ -169,10 +169,10 @@ Inherits from: `$.human`
 **Hooks:**
 - `connect()` - Registers: look, inventory, say, go, get, drop, quit
 
-### $.admin
+### $admin
 **Wizard/admin players.**
 
-Inherits from: `$.player`
+Inherits from: `$player`
 
 **Methods:**
 - `connect()` - Registers admin verbs then calls `pass()`
@@ -191,7 +191,7 @@ Every object type should be split into two layers:
 Handles **metadata** and **state manipulation**. No verbs. No messaging.
 
 ```javascript
-// $.wearable - Base prototype
+// $wearable - Base prototype
 {
   // Properties (metadata)
   covers: ['torso'],
@@ -221,8 +221,8 @@ Handles **metadata** and **state manipulation**. No verbs. No messaging.
 Inherits from base. Adds **verbs**, **messaging**, and **hooks**.
 
 ```javascript
-// $.clothing - Implementation prototype
-// Inherits from: $.wearable
+// $clothing - Implementation prototype
+// Inherits from: $wearable
 
 obj.setMethod('doWear', `
   const wearer = args[1];
@@ -236,7 +236,7 @@ obj.setMethod('doWear', `
   await wearer.registerVerb(['remove %t'], self, 'doRemove');
   
   // 3. Announce to room
-  await $.pronoun.announce(room, '%N puts on %d.', wearer, self);
+  await $pronoun.announce(room, '%N puts on %d.', wearer, self);
   
   return result.message;
 `);
@@ -271,13 +271,13 @@ obj.setMethod('onArrived', `
 Setting a property creates a shadow on the object itself:
 
 ```javascript
-// $.human has: maxHp = 100
+// $human has: maxHp = 100
 
 player.maxHp = 150;  // Creates shadow on player
 
 // Now:
 // - player.maxHp = 150 (own property)
-// - $.human.maxHp = 100 (unchanged)
+// - $human.maxHp = 100 (unchanged)
 // - Other players still inherit 100
 ```
 
@@ -286,7 +286,7 @@ player.maxHp = 150;  // Creates shadow on player
 Define a method to override parent's version:
 
 ```javascript
-// $.describable has: describe() -> name + description
+// $describable has: describe() -> name + description
 
 room.setMethod('describe', `
   let text = await pass(args[0]);  // Get parent's version
@@ -300,14 +300,14 @@ room.setMethod('describe', `
 Calls the **parent's version** of the current method:
 
 ```javascript
-// $.admin.connect() extends $.player.connect()
+// $admin.connect() extends $player.connect()
 async connect() {
   // Register admin verbs first
   await self.registerVerb(['@dig %s'], self, 'dig');
   await self.registerVerb(['@create'], self, 'create');
   
   // Then get all player verbs
-  await pass();  // Calls $.player.connect()
+  await pass();  // Calls $player.connect()
 }
 ```
 
@@ -327,9 +327,9 @@ async takeDamage(amount, type, source) {
 Pick the closest existing prototype:
 
 ```javascript
-// For a weapon: inherit from $.describable
-// For a food: inherit from $.edible
-// For a custom container: inherit from $.location
+// For a weapon: inherit from $describable
+// For a food: inherit from $edible
+// For a custom container: inherit from $location
 ```
 
 ### 2. Create Base (if needed)
@@ -337,7 +337,7 @@ Pick the closest existing prototype:
 Define state and validation:
 
 ```javascript
-const weaponBase = await $.recycler.create($.describable, {
+const weaponBase = await $recycler.create($describable, {
   name: 'Weapon Base',
   damage: 0,
   damageType: 'slashing',
@@ -369,7 +369,7 @@ weaponBase.setMethod('attack', `
 Add verbs and messaging:
 
 ```javascript
-const weapon = await $.recycler.create(weaponBase, {
+const weapon = await $recycler.create(weaponBase, {
   name: 'Weapon'
 });
 
@@ -385,7 +385,7 @@ weapon.setMethod('doAttack', `
   await target.takeDamage(result.damage, self.damageType, attacker);
   
   // Announce
-  await $.pronoun.announce(
+  await $pronoun.announce(
     await $.load(attacker.location),
     '%N attacks %tN with %d!',
     attacker,
@@ -406,8 +406,8 @@ weapon.setMethod('onArrived', `
 ### 4. Register as Prototype
 
 ```javascript
-await $.addAlias('weapon', weapon);
-// Now other objects can inherit: parent: $.weapon
+await $addAlias('weapon', weapon);
+// Now other objects can inherit: parent: $weapon
 ```
 
 ## See Also

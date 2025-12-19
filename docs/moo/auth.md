@@ -6,23 +6,23 @@ Interactive login, character creation, and pre-authenticated connections.
 
 The authentication system handles user login and character creation:
 
-- **$.authManager** - Interactive username/password login
-- **$.charGen** - New character creation wizard
-- **$.preAuthHandler** - Pre-authenticated connections (SSL, HTTP, OAuth)
+- **$authManager** - Interactive username/password login
+- **$charGen** - New character creation wizard
+- **$preAuthHandler** - Pre-authenticated connections (SSL, HTTP, OAuth)
 
 **Connection Flow:**
 ```
 Connection
     │
-    ├── Pre-authenticated? ──────► $.preAuthHandler
+    ├── Pre-authenticated? ──────► $preAuthHandler
     │                                    │
     │                                    ▼
-    │                              SSL/HTTP/OAuth
-    │                                    │
-    │                                    ▼
-    │                              Player.connect()
-    │
-    └── Interactive ─────────────► $.authManager
+     │                              SSL/HTTP/OAuth
+     │                                    │
+     │                                    ▼
+     │                              Player.connect()
+     │
+     └── Interactive ─────────────► $authManager
                                         │
                                         ▼
                                   Username prompt
@@ -32,7 +32,7 @@ Connection
                     Existing user               New user
                          │                             │
                          ▼                             ▼
-                   Password check              $.charGen.onNewUser()
+                    Password check              $charGen.onNewUser()
                          │                             │
                          ▼                             ▼
                   Player.connect()              Character wizard
@@ -41,7 +41,7 @@ Connection
                                                 Player.connect()
 ```
 
-## $.authManager - Interactive Login
+## $authManager - Interactive Login
 
 Handles traditional username/password login via telnet/terminal.
 
@@ -127,7 +127,7 @@ if (player.get('isSuspended')) {
 }
 ```
 
-## $.charGen - Character Creation
+## $charGen - Character Creation
 
 Interactive character creation wizard for new players.
 
@@ -213,7 +213,7 @@ Interactive character creation flow.
 - Facial hair (12 options)
 
 **Body Creation**
-- Creates body via `$.bodyFactory.createHumanBody()`
+- Creates body via `$bodyFactory.createHumanBody()`
 - Links body to player
 
 **Stat Allocation**
@@ -331,7 +331,7 @@ if (isFirstPlayer) {
 }
 ```
 
-## $.preAuthHandler - Pre-Authenticated Connections
+## $preAuthHandler - Pre-Authenticated Connections
 
 Handles connections that arrive already authenticated via SSL certs, HTTP Basic Auth, or OAuth.
 
@@ -461,10 +461,10 @@ authInfo = {
 
 ### Password Hashing
 
-Passwords are hashed using `$.hashPassword()`:
+Passwords are hashed using `$hashPassword()`:
 
 ```javascript
-const passwordHash = await $.hashPassword(password);
+const passwordHash = await $hashPassword(password);
 player.passwordHash = passwordHash;
 
 // Verification
@@ -514,7 +514,7 @@ if (!canUseDevTools) {
 The first player is automatically an admin:
 
 ```javascript
-const existingPlayers = await $.countPlayers();
+const existingPlayers = await $countPlayers();
 const isFirstPlayer = existingPlayers === 0;
 
 if (isFirstPlayer) {

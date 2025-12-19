@@ -1,6 +1,6 @@
-# $.pronoun - Perspective-Aware Messaging
+# $pronoun - Perspective-Aware Messaging
 
-Use `$.pronoun.sub()` for text that varies by viewer (second vs third person). Essential for immersive messaging where the actor sees "You" while others see the actor's name.
+Use `$pronoun.sub()` for text that varies by viewer (second vs third person). Essential for immersive messaging where the actor sees "You" while others see the actor's name.
 
 ## Purpose
 
@@ -28,7 +28,7 @@ async function attackMessage(attacker, target, damage, viewers) {
 
 **Good: One template, all perspectives**
 ```javascript
-await $.pronoun.announce(
+await $pronoun.announce(
   room,
   '%N %v{hit} %tN for ' + damage + ' damage.',
   attacker,
@@ -85,7 +85,7 @@ Prefix with `%t`:
 ### sub() - Format for One Viewer
 
 ```javascript
-await $.pronoun.sub(template, actor, directObj?, target?, indirectObj?, location?, viewer?)
+await $pronoun.sub(template, actor, directObj?, target?, indirectObj?, location?, viewer?)
 ```
 
 Returns formatted string from template for specific viewer.
@@ -103,18 +103,18 @@ Returns formatted string from template for specific viewer.
 **Examples:**
 ```javascript
 // Simple action
-const msg = await $.pronoun.sub('%N %v{pick} up %d.', actor, sword);
+const msg = await $pronoun.sub('%N %v{pick} up %d.', actor, sword);
 // Actor sees: "You pick up the sword."
 // Others see: "Bob picks up the sword."
 
 // Action with target
-const msg = await $.pronoun.sub('%N %v{give} %d to %tN.', giver, sword, receiver);
+const msg = await $pronoun.sub('%N %v{give} %d to %tN.', giver, sword, receiver);
 // Giver sees:    "You give the sword to Jim."
 // Receiver sees: "Bob gives the sword to you."
 // Others see:    "Bob gives the sword to Jim."
 
 // Complex interaction
-const msg = await $.pronoun.sub(
+const msg = await $pronoun.sub(
   '%N %v{punch} %tN in %tp face, breaking %tr nose!',
   attacker, null, victim
 );
@@ -126,7 +126,7 @@ const msg = await $.pronoun.sub(
 ### announce() - Broadcast to Room
 
 ```javascript
-await $.pronoun.announce(room, template, actor, directObj?, target?, indirectObj?, location?)
+await $pronoun.announce(room, template, actor, directObj?, target?, indirectObj?, location?)
 ```
 
 Broadcasts perspective-aware message to everyone in a room.
@@ -134,19 +134,19 @@ Broadcasts perspective-aware message to everyone in a room.
 **Examples:**
 ```javascript
 // Everyone in the room gets the appropriate perspective
-await $.pronoun.announce(room, '%N %v{enter} from the north.', actor);
+await $pronoun.announce(room, '%N %v{enter} from the north.', actor);
 
 // With objects
-await $.pronoun.announce(room, '%N %v{drop} %d.', actor, item);
+await $pronoun.announce(room, '%N %v{drop} %d.', actor, item);
 
 // With targets
-await $.pronoun.announce(room, '%N %v{wave} at %tN.', actor, null, target);
+await $pronoun.announce(room, '%N %v{wave} at %tN.', actor, null, target);
 ```
 
 ### tell() - Send to One Person
 
 ```javascript
-await $.pronoun.tell(player, template, actor, directObj?, target?, indirectObj?, location?)
+await $pronoun.tell(player, template, actor, directObj?, target?, indirectObj?, location?)
 ```
 
 Sends perspective-aware message to one specific person.
@@ -154,11 +154,11 @@ Sends perspective-aware message to one specific person.
 **Examples:**
 ```javascript
 // tell() - Send to one specific person
-await $.pronoun.tell(player, '%N %v{feel} dizzy.', player);
+await $pronoun.tell(player, '%N %v{feel} dizzy.', player);
 // Player sees: "You feel dizzy."
 
 // Send message about another actor to a player
-await $.pronoun.tell(observer, '%N %v{collapse}.', actor);
+await $pronoun.tell(observer, '%N %v{collapse}.', actor);
 // If observer is actor: "You collapse."
 // If observer is not actor: "Bob collapses."
 ```
@@ -169,7 +169,7 @@ await $.pronoun.tell(observer, '%N %v{collapse}.', actor);
 
 ```javascript
 // One template, all perspectives handled
-await $.pronoun.announce(
+await $pronoun.announce(
   room,
   '%N %v{swing} %d at %tN, striking %to in the chest!',
   attacker,
@@ -184,7 +184,7 @@ await $.pronoun.announce(
 ### Picking Up Items
 
 ```javascript
-await $.pronoun.announce(
+await $pronoun.announce(
   room,
   '%N %v{pick} up %d.',
   player,
@@ -198,7 +198,7 @@ await $.pronoun.announce(
 
 ```javascript
 // Possessive pronoun (adjective form)
-await $.pronoun.announce(
+await $pronoun.announce(
   room,
   '%N %v{take} %p sword.',
   actor
@@ -207,7 +207,7 @@ await $.pronoun.announce(
 // Others: "Bob takes his sword."
 
 // Possessive noun (standalone form)
-await $.pronoun.announce(
+await $pronoun.announce(
   room,
   'The victory is %q!',
   actor
@@ -219,7 +219,7 @@ await $.pronoun.announce(
 ### Reflexive Actions
 
 ```javascript
-await $.pronoun.announce(
+await $pronoun.announce(
   room,
   '%N %v{hurt} %r!',
   actor
@@ -231,7 +231,7 @@ await $.pronoun.announce(
 ### Social Interaction
 
 ```javascript
-await $.pronoun.announce(
+await $pronoun.announce(
   room,
   '%N %v{smile} warmly at %tN.',
   actor,
@@ -243,14 +243,14 @@ await $.pronoun.announce(
 // Others: "Bob smiles warmly at Jim."
 ```
 
-## Combining with $.english
+## Combining with $english
 
 ```javascript
-// Use $.english for list formatting, $.pronoun for perspective
+// Use $english for list formatting, $pronoun for perspective
 const items = ['sword', 'shield', 'helm'];
-const itemList = await $.english.list(items);
+const itemList = await $english.list(items);
 
-await $.pronoun.announce(
+await $pronoun.announce(
   room,
   `%N %v{drop} ${itemList}.`,
   player
@@ -263,7 +263,7 @@ await $.pronoun.announce(
 
 1. **Use announce() for room messages** - Handles all viewers automatically
 2. **Use tell() for private messages** - Send to one person
-3. **Combine with $.english** - Format lists/counts, then apply pronouns
+3. **Combine with $english** - Format lists/counts, then apply pronouns
 4. **Test all perspectives** - Verify actor, target, and observer views
 5. **Cache templates** - Complex templates can be stored and reused
 
@@ -273,7 +273,7 @@ await $.pronoun.announce(
 
 ```javascript
 // Actor gives item to target
-await $.pronoun.announce(
+await $pronoun.announce(
   room,
   '%N %v{hand} %d to %tN.',
   giver,
@@ -286,7 +286,7 @@ await $.pronoun.announce(
 
 ```javascript
 // Actor examines themselves
-await $.pronoun.tell(
+await $pronoun.tell(
   player,
   '%N %v{examine} %r carefully.',
   player
@@ -297,7 +297,7 @@ await $.pronoun.tell(
 
 ```javascript
 // Location-based message
-await $.pronoun.announce(
+await $pronoun.announce(
   room,
   '%N %v{feel} the heat from %l.',
   player,
@@ -310,6 +310,6 @@ await $.pronoun.announce(
 
 ## See Also
 
-- [$.english](./english.md) - Grammar and pluralization
-- [$.format](./format.md) - Text layout and compose()
+- [$english](./english.md) - Grammar and pluralization
+- [$format](./format.md) - Text layout and compose()
 - [Best Practices](../best-practices.md) - Composition patterns

@@ -1,6 +1,6 @@
-# $.memento - Object Cloning
+# $memento - Object Cloning
 
-Use `$.memento` to serialize object graphs and create clones with new IDs. Perfect for body templates, equipment sets, or any object tree that needs duplication.
+Use `$memento` to serialize object graphs and create clones with new IDs. Perfect for body templates, equipment sets, or any object tree that needs duplication.
 
 ## Purpose
 
@@ -11,7 +11,7 @@ Provides deep cloning of object graphs with automatic reference remapping. Seria
 **Bad: Manual cloning nightmare**
 ```javascript
 async function cloneBody(body) {
-  const newBody = await $.recycler.create(body.parent);
+  const newBody = await $recycler.create(body.parent);
   newBody.name = body.name;
   newBody.hp = body.hp;
   // ... copy 20 more properties ...
@@ -19,7 +19,7 @@ async function cloneBody(body) {
   const newParts = {};
   for (const partId of body.parts) {
     const part = await $.load(partId);
-    const newPart = await $.recycler.create(part.parent);
+    const newPart = await $recycler.create(part.parent);
     newPart.name = part.name;
     newPart.owner = newBody.id;  // Update reference!
     // ... copy properties ...
@@ -38,12 +38,12 @@ async function cloneBody(body) {
 **Good: Automatic graph cloning**
 ```javascript
 async function cloneBody(body, ...allParts) {
-  const clones = await $.memento.clone([body, ...allParts]);
+  const clones = await $memento.clone([body, ...allParts]);
   return clones['%0']; // New body with all internal refs updated
 }
 ```
 
-## What $.memento Handles
+## What $memento Handles
 
 - ✅ Deep object graph traversal
 - ✅ Internal reference remapping (part.owner -> new body ID)
@@ -63,7 +63,7 @@ async function cloneBody(body, ...allParts) {
 ### clone() - One-Step Cloning
 
 ```javascript
-await $.memento.clone(objects)
+await $memento.clone(objects)
 ```
 
 Clones all objects in array with fresh IDs.
@@ -77,11 +77,11 @@ Clones all objects in array with fresh IDs.
 **Examples:**
 ```javascript
 // Clone a single object
-const clone = await $.memento.clone([original]);
+const clone = await $memento.clone([original]);
 const newObj = clone['%0']; // %0 is first object
 
 // Clone a connected tree (body with parts)
-const clones = await $.memento.clone([body, head, leftArm, rightArm]);
+const clones = await $memento.clone([body, head, leftArm, rightArm]);
 // clones['%0'] = new body, clones['%1'] = new head, etc.
 // Internal references updated to point to new objects
 ```
@@ -89,7 +89,7 @@ const clones = await $.memento.clone([body, head, leftArm, rightArm]);
 ### capture() - Serialize to JSON
 
 ```javascript
-await $.memento.capture(objects)
+await $memento.capture(objects)
 ```
 
 Serializes objects to JSON string (for templates/storage).
@@ -97,7 +97,7 @@ Serializes objects to JSON string (for templates/storage).
 **Examples:**
 ```javascript
 // Capture to JSON
-const template = await $.memento.capture([body, head, leftArm, rightArm]);
+const template = await $memento.capture([body, head, leftArm, rightArm]);
 // template is a JSON string
 
 // Store the template
@@ -107,7 +107,7 @@ prototype.bodyTemplate = template;
 ### rehydrate() - Create from JSON
 
 ```javascript
-await $.memento.rehydrate(jsonString)
+await $memento.rehydrate(jsonString)
 ```
 
 Creates new objects from captured JSON.
@@ -115,7 +115,7 @@ Creates new objects from captured JSON.
 **Examples:**
 ```javascript
 // Later: create instances from template
-const newParts = await $.memento.rehydrate(prototype.bodyTemplate);
+const newParts = await $memento.rehydrate(prototype.bodyTemplate);
 const newBody = newParts['%0'];
 ```
 
@@ -126,13 +126,13 @@ const newBody = newParts['%0'];
 ```javascript
 // Create a human body template once
 async createHumanTemplate() {
-  const body = await $.recycler.create($.body, {
+  const body = await $recycler.create($.body, {
     name: 'human body',
     hp: 100,
     maxHp: 100
   });
   
-  const head = await $.recycler.create($.bodypart, {
+  const head = await $recycler.create($.bodypart, {
     name: 'head',
     owner: body,
     canEat: true,
@@ -140,19 +140,19 @@ async createHumanTemplate() {
     canHear: true
   });
   
-  const torso = await $.recycler.create($.bodypart, {
+  const torso = await $recycler.create($.bodypart, {
     name: 'torso',
     owner: body,
     canBreathe: true
   });
   
-  const leftArm = await $.recycler.create($.bodypart, {
+  const leftArm = await $recycler.create($.bodypart, {
     name: 'left arm',
     owner: body,
     canGrasp: true
   });
   
-  const rightArm = await $.recycler.create($.bodypart, {
+  const rightArm = await $recycler.create($.bodypart, {
     name: 'right arm',
     owner: body,
     canGrasp: true
@@ -161,16 +161,16 @@ async createHumanTemplate() {
   body.parts = [head.id, torso.id, leftArm.id, rightArm.id];
   
   // Capture as template
-  const template = await $.memento.capture([body, head, torso, leftArm, rightArm]);
+  const template = await $memento.capture([body, head, torso, leftArm, rightArm]);
   $.human.bodyTemplate = template;
   
   // Clean up originals
-  await $.recycler.recycle(body);
+  await $recycler.recycle(body);
 }
 
 // Create a new player body from template
 async createPlayerBody(player) {
-  const clones = await $.memento.rehydrate($.human.bodyTemplate);
+  const clones = await $memento.rehydrate($.human.bodyTemplate);
   const body = clones['%0'];
   
   // Customize for this player
@@ -193,10 +193,10 @@ async duplicateEquipmentSet(originalSet) {
   }
   
   // Clone all items at once
-  const clones = await $.memento.clone(items);
+  const clones = await $memento.clone(items);
   
   // Create new set with cloned items
-  const newSet = await $.recycler.create($.equipmentSet, {
+  const newSet = await $recycler.create($.equipmentSet, {
     name: originalSet.name + ' (copy)',
     items: Object.values(clones).map(c => c.id)
   });
@@ -210,27 +210,27 @@ async duplicateEquipmentSet(originalSet) {
 ```javascript
 // Create room prefab with furniture
 async createRoomPrefab(name, description, furnitureList) {
-  const room = await $.recycler.create($.room, { name, description });
+  const room = await $recycler.create($.room, { name, description });
   const furniture = [];
   
   for (const item of furnitureList) {
-    const obj = await $.recycler.create($.furniture, item);
+    const obj = await $recycler.create($.furniture, item);
     obj.location = room;
     room.contents.push(obj);
     furniture.push(obj);
   }
   
   // Save as prefab
-  const prefab = await $.memento.capture([room, ...furniture]);
+  const prefab = await $memento.capture([room, ...furniture]);
   $.prefabs[name] = prefab;
   
   // Clean up originals
-  await $.recycler.recycleTree(room);
+  await $recycler.recycleTree(room);
 }
 
 // Spawn room from prefab
 async spawnRoom(prefabName, coordinates) {
-  const clones = await $.memento.rehydrate($.prefabs[prefabName]);
+  const clones = await $memento.rehydrate($.prefabs[prefabName]);
   const room = clones['%0'];
   
   room.x = coordinates.x;
@@ -249,7 +249,7 @@ async spawnNPCs(template, count) {
   const npcs = [];
   
   for (let i = 0; i < count; i++) {
-    const clones = await $.memento.rehydrate(template);
+    const clones = await $memento.rehydrate(template);
     const npc = clones['%0'];
     
     // Randomize attributes
@@ -270,14 +270,14 @@ async spawnNPCs(template, count) {
 async castClone(caster, target) {
   // Clone caster's item
   const original = await $.load(caster.equipment.weapon);
-  const clones = await $.memento.clone([original]);
+  const clones = await $memento.clone([original]);
   const duplicate = clones['%0'];
   
   // Give to target
   duplicate.location = target;
   target.inventory.push(duplicate);
   
-  await $.pronoun.announce(
+  await $pronoun.announce(
     await $.load(caster.location),
     '%N creates a duplicate of %d for %tN!',
     caster,
@@ -291,7 +291,7 @@ async castClone(caster, target) {
 
 ```javascript
 // Objects in the array = "in-graph" -> get new IDs
-const clones = await $.memento.clone([body, arm]);
+const clones = await $memento.clone([body, arm]);
 // body.owner = #123 (external) -> stays #123
 // arm.owner = body (in-graph) -> updated to new body's ID
 ```
@@ -319,18 +319,18 @@ const clones = await $.memento.clone([body, arm]);
 
 ```javascript
 // Create template
-const template = await $.memento.capture([obj1, obj2]);
+const template = await $memento.capture([obj1, obj2]);
 $.templates.myTemplate = template;
 
 // Use template
-const clones = await $.memento.rehydrate($.templates.myTemplate);
+const clones = await $memento.rehydrate($.templates.myTemplate);
 ```
 
 ### One-Time Clone
 
 ```javascript
 // Quick clone without storing
-const clones = await $.memento.clone([original]);
+const clones = await $memento.clone([original]);
 const copy = clones['%0'];
 ```
 
@@ -339,13 +339,13 @@ const copy = clones['%0'];
 ```javascript
 // Spawn many from one template
 for (let i = 0; i < 10; i++) {
-  const clones = await $.memento.rehydrate(template);
+  const clones = await $memento.rehydrate(template);
   // Customize each clone...
 }
 ```
 
 ## See Also
 
-- [$.recycler](./recycler.md) - Object creation and lifecycle
+- [$recycler](./recycler.md) - Object creation and lifecycle
 - [Core Concepts](../core-concepts.md) - Object references
 - [Architecture](../architecture.md) - Template systems

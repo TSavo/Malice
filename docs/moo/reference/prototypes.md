@@ -6,69 +6,69 @@ Complete reference for all object prototypes available in Malice.
 
 ```
 Root (#1)
-├── Describable ($.describable)
-│   ├── Location ($.location)
-│   │   ├── Room ($.room)
-│   │   │   └── Elevator ($.elevator)
-│   │   ├── Locker ($.locker)
-│   │   │   └── OneTimeLocker ($.oneTimeLocker)
-│   │   └── Vendable ($.vendable)
+├── Describable ($describable)
+│   ├── Location ($location)
+│   │   ├── Room ($room)
+│   │   │   └── Elevator ($elevator)
+│   │   ├── Locker ($locker)
+│   │   │   └── OneTimeLocker ($oneTimeLocker)
+│   │   └── Vendable ($vendable)
 │   │
-│   ├── Exit ($.exit)
-│   │   └── GuardedExit ($.guardedExit)
+│   ├── Exit ($exit)
+│   │   └── GuardedExit ($guardedExit)
 │   │
-│   ├── Agent ($.agent)
-│   │   └── Embodied ($.embodied)
-│   │       └── Human ($.human)
-│   │           └── Player ($.player)
-│   │               └── Admin ($.admin)
+│   ├── Agent ($agent)
+│   │   └── Embodied ($embodied)
+│   │       └── Human ($human)
+│   │           └── Player ($player)
+│   │               └── Admin ($admin)
 │   │
-│   ├── Decayable ($.decayable)
-│   │   ├── Corpse ($.corpse)
-│   │   └── Edible ($.edible)
-│   │       ├── Food ($.food)
-│   │       │   └── Sustain ($.sustain)
-│   │       ├── Drink ($.drink)
-│   │       │   └── BottledWater ($.bottledWater)
-│   │       └── BodyPart ($.bodyPart)
-│   │           └── [Specialized parts in $.bodyParts.*]
+│   ├── Decayable ($decayable)
+│   │   ├── Corpse ($corpse)
+│   │   └── Edible ($edible)
+│   │       ├── Food ($food)
+│   │       │   └── Sustain ($sustain)
+│   │       ├── Drink ($drink)
+│   │       │   └── BottledWater ($bottledWater)
+│   │       └── BodyPart ($bodyPart)
+│   │           └── [Specialized parts in $bodyParts.*]
 │   │
-│   ├── Wearable ($.wearable)
-│   │   └── Clothing ($.clothing)
+│   ├── Wearable ($wearable)
+│   │   └── Clothing ($clothing)
 │   │
-│   ├── Stackable ($.stackable)
-│   │   └── StomachContents ($.stomachContents)
+│   ├── Stackable ($stackable)
+│   │   └── StomachContents ($stomachContents)
 │   │
-│   ├── Door ($.door)
-│   ├── Sign ($.sign)
-│   ├── SealedBox ($.sealedBox)
-│   ├── Wound ($.wound)
-│   ├── HumanRemains ($.humanRemains)
-│   ├── SkeletalRemains ($.skeletalRemains)
+│   ├── Door ($door)
+│   ├── Sign ($sign)
+│   ├── SealedBox ($sealedBox)
+│   ├── Wound ($wound)
+│   ├── HumanRemains ($humanRemains)
+│   ├── SkeletalRemains ($skeletalRemains)
 │   │
-│   ├── Lock ($.lock)
-│   │   ├── BiometricLock ($.biometricLock)
-│   │   └── RentableLock ($.rentableLock)
+│   ├── Lock ($lock)
+│   │   ├── BiometricLock ($biometricLock)
+│   │   └── RentableLock ($rentableLock)
 │   │
-│   ├── Phone ($.phone)
-│   │   ├── WirelessPhone ($.wirelessPhone)
-│   │   └── Payphone ($.payphone)
+│   ├── Phone ($phone)
+│   │   ├── WirelessPhone ($wirelessPhone)
+│   │   └── Payphone ($payphone)
 │   │
-│   ├── PhoneDb ($.phoneDb)
-│   ├── BankTerminal ($.bankTerminal)
+│   ├── PhoneDb ($phoneDb)
+│   ├── BankTerminal ($bankTerminal)
 │   │
-│   └── Disposal ($.disposal)
-│       └── Incinerator ($.incinerator)
+│   └── Disposal ($disposal)
+│       └── Incinerator ($incinerator)
 │
-├── Bank ($.bank)
-└── Faction ($.faction)
+├── Bank ($bank)
+└── Faction ($faction)
 ```
 
 ---
 
 ## Core Prototypes
 
-### $.describable
+### $describable
 
 Base prototype for all things that exist in the world.
 
@@ -106,11 +106,11 @@ Base prototype for all things that exist in the world.
 
 ---
 
-### $.location
+### $location
 
 Container behavior for objects that hold other objects.
 
-**Inherits from:** `$.describable`
+**Inherits from:** `$describable`
 
 **Additional Methods:**
 | Method | Arguments | Returns | Description |
@@ -127,11 +127,11 @@ Container behavior for objects that hold other objects.
 
 ---
 
-### $.room
+### $room
 
 Rooms with exits and spatial coordinates.
 
-**Inherits from:** `$.location`
+**Inherits from:** `$location`
 
 **Additional Properties:**
 | Property | Type | Default | Description |
@@ -170,11 +170,11 @@ Rooms with exits and spatial coordinates.
 
 ---
 
-### $.exit
+### $exit
 
 Connections between rooms.
 
-**Inherits from:** `$.describable`
+**Inherits from:** `$describable`
 
 **Additional Properties:**
 | Property | Type | Default | Description |
@@ -193,11 +193,11 @@ Connections between rooms.
 
 ---
 
-### $.guardedExit
+### $guardedExit
 
 Faction-restricted exit.
 
-**Inherits from:** `$.exit`
+**Inherits from:** `$exit`
 
 **Additional Properties:**
 | Property | Type | Default | Description |
@@ -209,11 +209,11 @@ Faction-restricted exit.
 
 ## Agent Prototypes
 
-### $.agent
+### $agent
 
 Base for entities that can act in the world.
 
-**Inherits from:** `$.describable`
+**Inherits from:** `$describable`
 
 **Additional Properties:**
 | Property | Type | Default | Description |
@@ -235,11 +235,11 @@ Base for entities that can act in the world.
 
 ---
 
-### $.embodied
+### $embodied
 
 Agents with physical bodies.
 
-**Inherits from:** `$.agent`
+**Inherits from:** `$agent`
 
 **Additional Properties:**
 | Property | Type | Default | Description |
@@ -260,11 +260,11 @@ Agents with physical bodies.
 
 ---
 
-### $.human
+### $human
 
 Humans with sex, pronouns, and social capabilities.
 
-**Inherits from:** `$.embodied`
+**Inherits from:** `$embodied`
 
 **Additional Properties:**
 | Property | Type | Default | Description |
@@ -291,11 +291,11 @@ Humans with sex, pronouns, and social capabilities.
 
 ---
 
-### $.player
+### $player
 
 Authenticated player characters.
 
-**Inherits from:** `$.human`
+**Inherits from:** `$human`
 
 **Additional Properties:**
 | Property | Type | Default | Description |
@@ -319,11 +319,11 @@ Authenticated player characters.
 
 ---
 
-### $.admin
+### $admin
 
 Players with building commands.
 
-**Inherits from:** `$.player`
+**Inherits from:** `$player`
 
 **Additional Verbs:**
 - `@dig <direction> to <room>` - Create room and exit
@@ -339,11 +339,11 @@ Players with building commands.
 
 ## Item Prototypes
 
-### $.decayable
+### $decayable
 
 Objects that decay over time.
 
-**Inherits from:** `$.describable`
+**Inherits from:** `$describable`
 
 **Additional Properties:**
 | Property | Type | Default | Description |
@@ -363,11 +363,11 @@ Objects that decay over time.
 
 ---
 
-### $.edible
+### $edible
 
 Things that can be consumed (eaten/drunk).
 
-**Inherits from:** `$.decayable`
+**Inherits from:** `$decayable`
 
 **Additional Properties:**
 | Property | Type | Default | Description |
@@ -386,11 +386,11 @@ Things that can be consumed (eaten/drunk).
 
 ---
 
-### $.food
+### $food
 
 Solid food items with the `eat` verb.
 
-**Inherits from:** `$.edible`
+**Inherits from:** `$edible`
 
 **Additional Properties:**
 | Property | Type | Default | Description |
@@ -402,11 +402,11 @@ Solid food items with the `eat` verb.
 
 ---
 
-### $.drink
+### $drink
 
 Liquid drinks with the `drink` verb.
 
-**Inherits from:** `$.edible`
+**Inherits from:** `$edible`
 
 **Additional Properties:**
 | Property | Type | Default | Description |
@@ -418,11 +418,11 @@ Liquid drinks with the `drink` verb.
 
 ---
 
-### $.clothing
+### $clothing
 
 Wearable clothing items.
 
-**Inherits from:** `$.wearable`
+**Inherits from:** `$wearable`
 
 **Additional Properties:**
 | Property | Type | Default | Description |
@@ -442,11 +442,11 @@ Wearable clothing items.
 
 ---
 
-### $.stackable
+### $stackable
 
 Items that stack together (currency, ammunition, etc.).
 
-**Inherits from:** `$.describable`
+**Inherits from:** `$describable`
 
 **Additional Properties:**
 | Property | Type | Default | Description |
@@ -466,11 +466,11 @@ Items that stack together (currency, ammunition, etc.).
 
 ## Utility Prototypes
 
-### $.lock
+### $lock
 
 Access control locks.
 
-**Inherits from:** `$.describable`
+**Inherits from:** `$describable`
 
 **Additional Properties:**
 | Property | Type | Default | Description |
@@ -490,11 +490,11 @@ Access control locks.
 
 ---
 
-### $.door
+### $door
 
 Bidirectional doors shared between exits.
 
-**Inherits from:** `$.describable`
+**Inherits from:** `$describable`
 
 **Additional Properties:**
 | Property | Type | Default | Description |
@@ -511,11 +511,11 @@ Bidirectional doors shared between exits.
 
 ---
 
-### $.locker
+### $locker
 
 Lockable storage containers.
 
-**Inherits from:** `$.location`
+**Inherits from:** `$location`
 
 **Additional Properties:**
 | Property | Type | Default | Description |
@@ -530,11 +530,11 @@ Lockable storage containers.
 
 ---
 
-### $.sign
+### $sign
 
 Readable, immovable signs.
 
-**Inherits from:** `$.describable`
+**Inherits from:** `$describable`
 
 **Additional Properties:**
 | Property | Type | Default | Description |
@@ -548,11 +548,11 @@ Readable, immovable signs.
 
 ---
 
-### $.phone
+### $phone
 
 Communication devices.
 
-**Inherits from:** `$.describable`
+**Inherits from:** `$describable`
 
 **Additional Properties:**
 | Property | Type | Default | Description |
@@ -570,11 +570,11 @@ Communication devices.
 
 ## Creating Objects
 
-### Using $.recycler.create()
+### Using $recycler.create()
 
 ```javascript
 // Create food
-const apple = await $.recycler.create($.food, {
+const apple = await $recycler.create($food, {
   name: 'apple',
   description: 'A crisp red apple.',
   calories: 95,
@@ -584,7 +584,7 @@ const apple = await $.recycler.create($.food, {
 await apple.moveTo(room);
 
 // Create clothing
-const shirt = await $.recycler.create($.clothing, {
+const shirt = await $recycler.create($clothing, {
   name: 'blue shirt',
   description: 'A comfortable cotton shirt.',
   color: 'blue',
@@ -595,7 +595,7 @@ const shirt = await $.recycler.create($.clothing, {
 await shirt.moveTo(player.getPrimaryHand());
 
 // Create room
-const room = await $.recycler.create($.room, {
+const room = await $recycler.create($room, {
   name: 'Storage Room',
   description: 'A dusty storage room filled with crates.',
   x: 10,
@@ -610,15 +610,15 @@ Pick the most specific prototype:
 
 | Want to create... | Use prototype |
 |-------------------|---------------|
-| Generic item | `$.describable` |
-| Container | `$.location` |
-| Room | `$.room` |
-| Food | `$.food` |
-| Drink | `$.drink` |
-| Clothing | `$.clothing` |
-| Lock | `$.lock` |
-| NPC | `$.human` |
-| Player character | `$.player` |
+| Generic item | `$describable` |
+| Container | `$location` |
+| Room | `$room` |
+| Food | `$food` |
+| Drink | `$drink` |
+| Clothing | `$clothing` |
+| Lock | `$lock` |
+| NPC | `$human` |
+| Player character | `$player` |
 
 ---
 

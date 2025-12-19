@@ -44,12 +44,12 @@ await lock.authorize(playerObject, 5);  // Object reference
 ### Prototypes
 
 Objects inherit from prototypes:
-- `$.describable` - Base for all visible objects
-- `$.room` - Locations players can be in
-- `$.exit` - Connections between rooms
-- `$.lock` - Base access control
-- `$.biometricLock` - Scans body parts for authorization
-- `$.elevator` - Multi-floor transportation
+- `$describable` - Base for all visible objects
+- `$room` - Locations players can be in
+- `$exit` - Connections between rooms
+- `$lock` - Base access control
+- `$biometricLock` - Scans body parts for authorization
+- `$elevator` - Multi-floor transportation
 
 ---
 
@@ -477,8 +477,8 @@ export const building = {
 
 Players get jobs through:
 1. **Job Center terminals** (Floor 1) - AI recruitment via `jobBoard` objects
-2. **$.plot** - Event/story-driven jobs
-3. **$.jobBoard** - Posted opportunities
+2. **$plot** - Event/story-driven jobs
+3. **$jobBoard** - Posted opportunities
 
 **Floor 1 Job Center:**
 The Job Center room (`%G` in z1.ts) contains an Employment Terminal spawned via the `objects` array:
@@ -497,7 +497,7 @@ The Job Center room (`%G` in z1.ts) contains an Employment Terminal spawned via 
 },
 ```
 
-This terminal is an instance of the `$.jobBoard` prototype and provides job listings and applications.
+This terminal is an instance of the `$jobBoard` prototype and provides job listings and applications.
 
 ### Granting Access via Jobs
 
@@ -516,7 +516,7 @@ This terminal is an instance of the `$.jobBoard` prototype and provides job list
 
     // Maybe also give them a key item
     const key = await $.create({
-      parent: '$.item',
+      parent: '$item',
       name: 'Smith Tower Apartment Key - 7F',
     });
     await player.addToInventory(key);
@@ -689,7 +689,7 @@ methods: {
     await player.tell('1. Check Status');
     await player.tell('2. Request Access');
 
-    const choice = await $.prompt.question(player, 'Select option: ');
+    const choice = await $prompt.question(player, 'Select option: ');
 
     if (choice === '1') {
       return 'SYSTEM STATUS: NOMINAL';
@@ -847,7 +847,7 @@ const citySign = await this.manager.find(obj => obj.name === "City Announcement 
 if (citySign) {
   const objectManager = await this.manager.load(0);
   await objectManager?.call("addAlias", "cityAnnounce", citySign.id);
-  console.log("  ✅ Registered $.cityAnnounce");
+  console.log("  ✅ Registered $cityAnnounce");
 } else {
   console.warn("  ⚠️  City Announcement Board not found");
 }
@@ -855,10 +855,10 @@ if (citySign) {
 
 ### Why This Matters
 
-Global objects like $.cityAnnounce allow NPCs and systems to interact with building features from anywhere in the game.
+Global objects like $cityAnnounce allow NPCs and systems to interact with building features from anywhere in the game.
 
 City AI can now update the sign:
-- await $.cityAnnounce.setProperty('content', 'New announcement...');
+- await $cityAnnounce.setProperty('content', 'New announcement...');
 
 Important: Players should be able to read these signs. Make sure:
 - The sign is visible in room descriptions
@@ -986,7 +986,7 @@ Fix: Ensure exit directions match coordinates:
 
 ### Issue: Global object not accessible
 
-Symptom: Defined object as $.name but BuildingBuilder does not create it
+Symptom: Defined object as $name but BuildingBuilder does not create it
 
 Diagnosis: BuildingBuilder only handles % placeholders
 
@@ -1011,7 +1011,7 @@ Fix: Verify against building footprint:
 
 Added: City Announcement Board
 - Object: %CITY_ANNOUNCE in building file
-- Global alias: $.cityAnnounce registered in bootstrap
+- Global alias: $cityAnnounce registered in bootstrap
 - Purpose: City AI posts announcements for all players
 - Location: Elevator Bank lobby
 
@@ -1039,17 +1039,17 @@ Confirmed: BuildingBuilder properly integrated
 
 ## City Announcement Sign - Usage Guide
 
-The City Announcement Board ($.cityAnnounce) is designed for the city AI to communicate with players.
+The City Announcement Board ($cityAnnounce) is designed for the city AI to communicate with players.
 
 ### Accessing the Sign
 
 From anywhere in the game:
-const sign = await $.cityAnnounce;
+const sign = await $cityAnnounce;
 
 ### Updating Content
 
 City AI updates the sign:
-await $.cityAnnounce.setProperty('content', '--- CITY ANNOUNCEMENTS ---\n\nNOTICE: Maintenance scheduled for Sector 7.\nTIME: 2100 hours.\n\nStay informed. Stay compliant.\n\n- Continuum City Systems');
+await $cityAnnounce.setProperty('content', '--- CITY ANNOUNCEMENTS ---\n\nNOTICE: Maintenance scheduled for Sector 7.\nTIME: 2100 hours.\n\nStay informed. Stay compliant.\n\n- Continuum City Systems');
 
 ### Best Practices
 

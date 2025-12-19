@@ -4,11 +4,11 @@ Registry for AI-controlled humans.
 
 ## Overview
 
-The `$.ai` object is a registry that tracks AI-controlled humans. These are **indistinguishable from player characters** - they are regular `$.human` instances, just tracked here by role.
+The `$ai` object is a registry that tracks AI-controlled humans. These are **indistinguishable from player characters** - they are regular `$human` instances, just tracked here by role.
 
 Key principles:
 - **Not NPCs** - They're "agent-controlled players" using the same prototype as human players
-- **Registry only** - $.ai just tracks mappings, doesn't manage behavior
+- **Registry only** - $ai just tracks mappings, doesn't manage behavior
 - **Role-based** - Humans are organized by role (guard, shopkeeper, etc.)
 
 ## Properties
@@ -44,7 +44,7 @@ Key principles:
 Create a new AI-controlled human with body.
 
 ```javascript
-const human = await $.ai.spawn('guard', {
+const human = await $ai.spawn('guard', {
   name: 'Marcus',
   description: 'A grizzled guard',
   sex: 'male',
@@ -61,7 +61,7 @@ const human = await $.ai.spawn('guard', {
   location: roomId,
   spawnedBy: wizardId,
 });
-// Returns the created $.human instance
+// Returns the created $human instance
 ```
 
 **Options:**
@@ -78,8 +78,8 @@ const human = await $.ai.spawn('guard', {
 | `spawnedBy` | number | null | ID of wizard who spawned |
 
 **What spawn() does:**
-1. Creates a full body via `$.bodyFactory.createHumanBody()`
-2. Creates a `$.human` instance with all properties
+1. Creates a full body via `$bodyFactory.createHumanBody()`
+2. Creates a `$human` instance with all properties
 3. Links body to human
 4. Registers in AI registry with role and metadata
 5. Returns the human object
@@ -89,8 +89,8 @@ const human = await $.ai.spawn('guard', {
 Remove an AI-controlled human.
 
 ```javascript
-await $.ai.despawn(567);        // Remove and recycle
-await $.ai.despawn(567, false); // Remove from registry only
+await $ai.despawn(567);        // Remove and recycle
+await $ai.despawn(567, false); // Remove from registry only
 ```
 
 When `recycle` is true (default):
@@ -103,7 +103,7 @@ When `recycle` is true (default):
 Add an existing human to the AI registry.
 
 ```javascript
-await $.ai.register(existingHumanId, 'merchant', {
+await $ai.register(existingHumanId, 'merchant', {
   spawnedAt: new Date().toISOString(),
   faction: 'traders-guild',
 });
@@ -114,7 +114,7 @@ await $.ai.register(existingHumanId, 'merchant', {
 Remove from registry without recycling.
 
 ```javascript
-await $.ai.unregister(567);
+await $ai.unregister(567);
 // Human still exists but is no longer tracked
 ```
 
@@ -123,7 +123,7 @@ await $.ai.unregister(567);
 Change a human's role.
 
 ```javascript
-await $.ai.setRole(567, 'captain');
+await $ai.setRole(567, 'captain');
 // Moves from old role to new role in mappings
 ```
 
@@ -131,24 +131,24 @@ await $.ai.setRole(567, 'captain');
 
 ```javascript
 // Check if AI-controlled
-await $.ai.isAiControlled(567);  // true or false
+await $ai.isAiControlled(567);  // true or false
 
 // Get all humans with a role
-await $.ai.getByRole('guard');   // [123, 456]
+await $ai.getByRole('guard');   // [123, 456]
 
 // List all roles
-await $.ai.getRoles();           // ['guard', 'shopkeeper']
+await $ai.getRoles();           // ['guard', 'shopkeeper']
 
 // Get all AI-controlled human IDs
-await $.ai.getAll();             // [123, 456, 789]
+await $ai.getAll();             // [123, 456, 789]
 
 // Get metadata for a human
-await $.ai.getInfo(567);
+await $ai.getInfo(567);
 // { role: 'guard', spawnedAt: '...', spawnedBy: 100 }
 
 // Count
-await $.ai.count();              // 3
-await $.ai.countByRole('guard'); // 2
+await $ai.count();              // 3
+await $ai.countByRole('guard'); // 2
 ```
 
 ### describe()
@@ -156,7 +156,7 @@ await $.ai.countByRole('guard'); // 2
 Get a formatted summary.
 
 ```javascript
-const desc = await $.ai.describe();
+const desc = await $ai.describe();
 // "AI Registry
 //  ===========
 //  Total AI-controlled humans: 3
@@ -247,8 +247,8 @@ AI humans with role "guard":
 AI-controlled humans can also be created via MCP tools:
 
 ```javascript
-// Using MCP call_method on $.ai
-await $.ai.spawn('guard', {
+// Using MCP call_method on $ai
+await $ai.spawn('guard', {
   name: 'Marcus',
   sex: 'male',
   age: 35,
@@ -256,8 +256,8 @@ await $.ai.spawn('guard', {
 });
 
 // Or create manually and register
-const human = await $.recycler.create($.human, { ... });
-await $.ai.register(human.id, 'guard');
+const human = await $recycler.create($human, { ... });
+await $ai.register(human.id, 'guard');
 ```
 
 ## Use Cases
@@ -269,7 +269,7 @@ await $.ai.register(human.id, 'guard');
 const lobby = await $.load(lobbyRoomId);
 
 for (let i = 0; i < 3; i++) {
-  await $.ai.spawn('guard', {
+  await $ai.spawn('guard', {
     name: 'Guard ' + (i + 1),
     sex: Math.random() > 0.5 ? 'male' : 'female',
     age: 25 + Math.floor(Math.random() * 20),
@@ -282,7 +282,7 @@ for (let i = 0; i < 3; i++) {
 
 ```javascript
 // Alert all guards in a building
-const guardIds = await $.ai.getByRole('guard');
+const guardIds = await $ai.getByRole('guard');
 
 for (const id of guardIds) {
   const guard = await $.load(id);
@@ -296,7 +296,7 @@ for (const id of guardIds) {
 
 ```javascript
 // In a plot or interaction
-const isAi = await $.ai.isAiControlled(target.id);
+const isAi = await $ai.isAiControlled(target.id);
 if (isAi) {
   // AI-controlled - use scripted response
 } else {
@@ -308,17 +308,17 @@ if (isAi) {
 
 AI-controlled humans respond to interactions via built-in handlers.
 
-### $.query(systemPrompt, userPrompt, session?)
+### $query(systemPrompt, userPrompt, session?)
 
 Query the Claude Agent SDK from MOO code:
 
 ```javascript
 // Basic query
-const result = await $.query(systemPrompt, userPrompt);
+const result = await $query(systemPrompt, userPrompt);
 // result = { response: "...", session: "abc123" }
 
 // Resume a session for conversation continuity
-const result = await $.query(systemPrompt, userPrompt, previousSession);
+const result = await $query(systemPrompt, userPrompt, previousSession);
 ```
 
 The agent has access to all MCP tools and can:
@@ -334,14 +334,14 @@ Called when someone uses `to npc message`:
 // Automatically triggered by:
 // > to janet Hello there
 
-// Handler on $.human prototype:
+// Handler on $human prototype:
 async onSpokenTo(speaker, message) {
   const systemPrompt = await self.buildAgentPrompt();
   if (!systemPrompt) return; // Not AI-controlled
 
   const userPrompt = speaker.name + ' says: "' + message + '"';
 
-  $.query(systemPrompt, userPrompt, self.agentSession)
+  $query(systemPrompt, userPrompt, self.agentSession)
     .then(result => {
       self.agentSession = result.session;
     });
@@ -356,14 +356,14 @@ Called when someone uses `give item to npc`:
 // Automatically triggered by:
 // > give apple to janet
 
-// Handler on $.human prototype:
+// Handler on $human prototype:
 async onItemReceived(giver, item) {
   const systemPrompt = await self.buildAgentPrompt();
   if (!systemPrompt) return;
 
   const userPrompt = giver.name + ' gave you ' + item.name;
 
-  $.query(systemPrompt, userPrompt, self.agentSession)
+  $query(systemPrompt, userPrompt, self.agentSession)
     .then(result => {
       self.agentSession = result.session;
     });
@@ -386,10 +386,10 @@ Each AI human stores:
 
 | Property | Description |
 |----------|-------------|
-| `agentSystemPrompt` | Full system prompt template (from `$.ai.defaultAgentPrompt`) |
+| `agentSystemPrompt` | Full system prompt template (from `$ai.defaultAgentPrompt`) |
 | `agentSession` | Claude session ID for conversation continuity |
 
-### $.ai.defaultAgentPrompt
+### $ai.defaultAgentPrompt
 
 The default system prompt template used for all AI NPCs. Contains:
 - IC vs OOC knowledge handling
@@ -400,7 +400,7 @@ The default system prompt template used for all AI NPCs. Contains:
 
 ## See Also
 
-- [Human Prototype](./prototypes/agents.md) - The $.human prototype
+- [Human Prototype](./prototypes/agents.md) - The $human prototype
 - [Body System](./prototypes/body.md) - Body creation
 - [Auth System](./auth.md) - Player character creation
 - [NPC Agent](../npc-agent.md) - Full NPC agent documentation

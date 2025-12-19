@@ -23,12 +23,12 @@ Vertical transport system with composable lock security.
 ## Example Usage
 ```javascript
 // Create elevator with biometric lock
-const elevator = await $.recycler.create($.elevator, {
+const elevator = await $recycler.create($elevator, {
   floors: [1, 2, 35, 42],
   floorRooms: { 1: lobbyId, 35: vipLoungeId, 42: penthouseId },
 });
 
-const bioLock = await $.recycler.create($.biometricLock, {
+const bioLock = await $recycler.create($biometricLock, {
   scanners: [
     { type: 'retinal', part: 'eye', message: 'Retinal scan failed.' },
     { type: 'fingerprint', part: 'hand', message: 'Fingerprint scan failed.' }
@@ -49,12 +49,12 @@ if (result === true) {
 
 ## Door Integration
 
-Both `$.exit` and `$.elevator` now support a `door` property. If present, all access checks are delegated to the referenced `$.door` object. This enables unified, bidirectional access control, lock state, and messaging for doors, exits, and elevators.
+Both `$exit` and `$elevator` now support a `door` property. If present, all access checks are delegated to the referenced `$door` object. This enables unified, bidirectional access control, lock state, and messaging for doors, exits, and elevators.
 
 **Example:**
 ```javascript
 // Create a door object
-const door = await $.recycler.create($.door, { ... });
+const door = await $recycler.create($door, { ... });
 // Attach to both exits
 exitAtoB.door = door.id;
 exitBtoA.door = door.id;

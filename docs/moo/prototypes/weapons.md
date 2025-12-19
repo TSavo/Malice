@@ -2,9 +2,9 @@
 
 Weapons are objects that can be used in combat. They define skill, damage, and damage type properties that are used by the combat system.
 
-## Base Weapon (`$.weapon`)
+## Base Weapon (`$weapon`)
 
-All weapons inherit from `$.weapon`, which inherits from `$.describable`.
+All weapons inherit from `$weapon`, which inherits from `$describable`.
 
 ### Properties
 
@@ -70,119 +70,119 @@ The combat system checks `twoHanded` and `hasFreeHand` in combatant context to d
 ## Weapon Hierarchy
 
 ```
-$.weapon (base)
-├── $.blade (cut damage, various blade skills)
-│   ├── $.knife (skill: knife)
-│   │   ├── $.pocketKnife (8 dmg)
-│   │   ├── $.combatKnife (18 dmg)
-│   │   ├── $.switchblade (10 dmg, puncture)
-│   │   ├── $.boxCutter (6 dmg)
-│   │   ├── $.butterflyKnife (10 dmg)
-│   │   ├── $.stiletto (14 dmg, puncture)
-│   │   └── $.shiv (8 dmg, puncture)
-│   ├── $.machete (skill: machete)
-│   │   ├── $.cleaver (25 dmg)
-│   │   └── $.kukri (30 dmg)
-│   ├── $.katana (skill: katana)
-│   │   ├── $.wakizashi (25 dmg)
-│   │   ├── $.tanto (16 dmg, puncture)
-│   │   └── $.ninjato (28 dmg)
+$weapon (base)
+├── $blade (cut damage, various blade skills)
+│   ├── $knife (skill: knife)
+│   │   ├── $pocketKnife (8 dmg)
+│   │   ├── $combatKnife (18 dmg)
+│   │   ├── $switchblade (10 dmg, puncture)
+│   │   ├── $boxCutter (6 dmg)
+│   │   ├── $butterflyKnife (10 dmg)
+│   │   ├── $stiletto (14 dmg, puncture)
+│   │   └── $shiv (8 dmg, puncture)
+│   ├── $machete (skill: machete)
+│   │   ├── $cleaver (25 dmg)
+│   │   └── $kukri (30 dmg)
+│   ├── $katana (skill: katana)
+│   │   ├── $wakizashi (25 dmg)
+│   │   ├── $tanto (16 dmg, puncture)
+│   │   └── $ninjato (28 dmg)
 │   │   └── [katana is twoHanded]
-│   ├── $.sword (skill: sword)
-│   │   ├── $.longsword (38 dmg) [twoHanded]
-│   │   ├── $.shortsword (22 dmg)
-│   │   ├── $.rapier (24 dmg, puncture)
-│   │   └── $.cutlass (26 dmg)
-│   └── $.axe (skill: axe)
-│       ├── $.hatchet (22 dmg)
-│       ├── $.fireAxe (38 dmg) [twoHanded]
-│       └── $.tomahawk (20 dmg)
+│   ├── $sword (skill: sword)
+│   │   ├── $longsword (38 dmg) [twoHanded]
+│   │   ├── $shortsword (22 dmg)
+│   │   ├── $rapier (24 dmg, puncture)
+│   │   └── $cutlass (26 dmg)
+│   └── $axe (skill: axe)
+│       ├── $hatchet (22 dmg)
+│       ├── $fireAxe (38 dmg) [twoHanded]
+│       └── $tomahawk (20 dmg)
 │
-├── $.blunt (bruise damage)
-│   ├── $.club (skill: club)
-│   │   ├── $.baseballBat (25 dmg)
-│   │   ├── $.baton (15 dmg)
-│   │   ├── $.nightstick (18 dmg)
-│   │   ├── $.tonfa (16 dmg)
-│   │   ├── $.blackjack (14 dmg)
-│   │   └── $.tireIron (22 dmg)
-│   ├── $.pipe (skill: club)
-│   │   ├── $.leadPipe (24 dmg)
-│   │   ├── $.metalPipe (20 dmg)
-│   │   └── $.crowbar (26 dmg)
-│   ├── $.hammer (skill: hammer)
-│   │   ├── $.clawHammer (18 dmg)
-│   │   ├── $.sledgehammer (40 dmg) [twoHanded]
-│   │   ├── $.ballPeenHammer (16 dmg)
-│   │   └── $.mallet (12 dmg)
-│   ├── $.staff (skill: staff) [all twoHanded]
-│   │   ├── $.boStaff (18 dmg)
-│   │   ├── $.walkingStick (12 dmg)
-│   │   └── $.poolCue (10 dmg)
-│   ├── $.mace (skill: mace)
-│   │   └── $.morningstar (35 dmg, puncture)
-│   ├── $.brassKnuckles (12 dmg, skill: brawling)
-│   ├── $.sapGloves (10 dmg, skill: brawling)
-│   ├── $.pushDagger (14 dmg, puncture, skill: brawling)
-│   └── $.chain (skill: chain)
-│       ├── $.bikeChain (16 dmg)
-│       ├── $.nunchaku (14 dmg)
-│       └── $.flail (28 dmg) [twoHanded]
+├── $blunt (bruise damage)
+│   ├── $club (skill: club)
+│   │   ├── $baseballBat (25 dmg)
+│   │   ├── $baton (15 dmg)
+│   │   ├── $nightstick (18 dmg)
+│   │   ├── $tonfa (16 dmg)
+│   │   ├── $blackjack (14 dmg)
+│   │   └── $tireIron (22 dmg)
+│   ├── $pipe (skill: club)
+│   │   ├── $leadPipe (24 dmg)
+│   │   ├── $metalPipe (20 dmg)
+│   │   └── $crowbar (26 dmg)
+│   ├── $hammer (skill: hammer)
+│   │   ├── $clawHammer (18 dmg)
+│   │   ├── $sledgehammer (40 dmg) [twoHanded]
+│   │   ├── $ballPeenHammer (16 dmg)
+│   │   └── $mallet (12 dmg)
+│   ├── $staff (skill: staff) [all twoHanded]
+│   │   ├── $boStaff (18 dmg)
+│   │   ├── $walkingStick (12 dmg)
+│   │   └── $poolCue (10 dmg)
+│   ├── $mace (skill: mace)
+│   │   └── $morningstar (35 dmg, puncture)
+│   ├── $brassKnuckles (12 dmg, skill: brawling)
+│   ├── $sapGloves (10 dmg, skill: brawling)
+│   ├── $pushDagger (14 dmg, puncture, skill: brawling)
+│   └── $chain (skill: chain)
+│       ├── $bikeChain (16 dmg)
+│       ├── $nunchaku (14 dmg)
+│       └── $flail (28 dmg) [twoHanded]
 │
-├── $.gun (ranged, puncture damage)
-│   ├── $.pistol (skill: pistol) [usesMagazine: true]
-│   │   ├── $.revolver (40 dmg, 6 rounds, .38) [usesMagazine: false]
-│   │   ├── $.magnum (55 dmg, 6 rounds, .44) [usesMagazine: false]
-│   │   ├── $.semiAutoPistol (35 dmg, 17 rounds, 9mm)
-│   │   ├── $.compactPistol (28 dmg, 7 rounds, .380)
-│   │   ├── $.derringer (25 dmg, 2 rounds, .22) [usesMagazine: false]
-│   │   └── $.m1911 (42 dmg, 7 rounds, .45)
-│   ├── $.rifle (skill: rifle) [twoHanded, usesMagazine: false]
-│   │   ├── $.boltActionRifle (55 dmg, 5 rounds, .308)
-│   │   ├── $.leverActionRifle (45 dmg, 10 rounds, .30-30)
-│   │   ├── $.huntingRifle (50 dmg, 4 rounds, .308)
-│   │   └── $.rifle22 (25 dmg, 10 rounds, .22)
-│   ├── $.shotgun (skill: shotgun) [twoHanded, usesMagazine: false]
-│   │   ├── $.pumpShotgun (55 dmg, 8 rounds, 12gauge)
-│   │   ├── $.sawnOffShotgun (50 dmg, 2 rounds, 12gauge) [NOT twoHanded]
-│   │   ├── $.doubleBarrel (55 dmg, 2 rounds, 12gauge)
-│   │   └── $.coachGun (52 dmg, 2 rounds, 12gauge)
-│   └── $.smg (skill: smg) [usesMagazine: true]
-│       ├── $.machinePistol (28 dmg, 20 rounds, 9mm)
-│       ├── $.uzi (30 dmg, 32 rounds, 9mm)
-│       ├── $.mac10 (28 dmg, 30 rounds, .45)
-│       └── $.tec9 (30 dmg, 32 rounds, 9mm)
+├── $gun (ranged, puncture damage)
+│   ├── $pistol (skill: pistol) [usesMagazine: true]
+│   │   ├── $revolver (40 dmg, 6 rounds, .38) [usesMagazine: false]
+│   │   ├── $magnum (55 dmg, 6 rounds, .44) [usesMagazine: false]
+│   │   ├── $semiAutoPistol (35 dmg, 17 rounds, 9mm)
+│   │   ├── $compactPistol (28 dmg, 7 rounds, .380)
+│   │   ├── $derringer (25 dmg, 2 rounds, .22) [usesMagazine: false]
+│   │   └── $m1911 (42 dmg, 7 rounds, .45)
+│   ├── $rifle (skill: rifle) [twoHanded, usesMagazine: false]
+│   │   ├── $boltActionRifle (55 dmg, 5 rounds, .308)
+│   │   ├── $leverActionRifle (45 dmg, 10 rounds, .30-30)
+│   │   ├── $huntingRifle (50 dmg, 4 rounds, .308)
+│   │   └── $rifle22 (25 dmg, 10 rounds, .22)
+│   ├── $shotgun (skill: shotgun) [twoHanded, usesMagazine: false]
+│   │   ├── $pumpShotgun (55 dmg, 8 rounds, 12gauge)
+│   │   ├── $sawnOffShotgun (50 dmg, 2 rounds, 12gauge) [NOT twoHanded]
+│   │   ├── $doubleBarrel (55 dmg, 2 rounds, 12gauge)
+│   │   └── $coachGun (52 dmg, 2 rounds, 12gauge)
+│   └── $smg (skill: smg) [usesMagazine: true]
+│       ├── $machinePistol (28 dmg, 20 rounds, 9mm)
+│       ├── $uzi (30 dmg, 32 rounds, 9mm)
+│       ├── $mac10 (28 dmg, 30 rounds, .45)
+│       └── $tec9 (30 dmg, 32 rounds, 9mm)
 │
-└── $.improvised (skill: improvised, various damage types)
-    ├── $.bottle (10 dmg, cut)
-    │   ├── $.brokenBottle (14 dmg, cut)
-    │   └── $.beerBottle (12 dmg, bruise)
-    ├── $.brick (15 dmg, bruise)
-    ├── $.rock (10 dmg, bruise, ranged/thrown)
-    ├── $.cinderBlock (25 dmg, bruise)
-    ├── $.screwdriver (12 dmg, puncture)
-    ├── $.icepick (16 dmg, puncture)
-    ├── $.awl (10 dmg, puncture)
-    ├── $.wrench (18 dmg, bruise)
-    ├── $.prybar (14 dmg, bruise)
-    ├── $.hammerImprovised (16 dmg, bruise)
-    ├── $.kitchenKnife (12 dmg, cut)
-    ├── $.butcherKnife (18 dmg, cut)
-    ├── $.skillet (20 dmg, bruise)
-    ├── $.rollingPin (12 dmg, bruise)
-    ├── $.throwingKnife (15 dmg, puncture, ranged)
-    ├── $.throwingStar (10 dmg, cut, ranged)
-    ├── $.dart (8 dmg, puncture, ranged)
-    ├── $.garrote (30 dmg, cut, skill: garrote)
-    ├── $.whip (12 dmg, cut, skill: whip)
-    ├── $.cattleProd (10 dmg, burn, skill: taser)
-    ├── $.stunGun (8 dmg, burn, skill: taser)
-    ├── $.taser (10 dmg, burn, ranged, skill: taser)
-    ├── $.pepperSpray (5 dmg, burn, ranged)
-    ├── $.golfClub (18 dmg, bruise)
-    ├── $.hockeyStick (12 dmg, bruise)
-    ├── $.lacrosseStick (14 dmg, bruise)
-    └── $.cricketBat (22 dmg, bruise, skill: club)
+└── $improvised (skill: improvised, various damage types)
+    ├── $bottle (10 dmg, cut)
+    │   ├── $brokenBottle (14 dmg, cut)
+    │   └── $beerBottle (12 dmg, bruise)
+    ├── $brick (15 dmg, bruise)
+    ├── $rock (10 dmg, bruise, ranged/thrown)
+    ├── $cinderBlock (25 dmg, bruise)
+    ├── $screwdriver (12 dmg, puncture)
+    ├── $icepick (16 dmg, puncture)
+    ├── $awl (10 dmg, puncture)
+    ├── $wrench (18 dmg, bruise)
+    ├── $prybar (14 dmg, bruise)
+    ├── $hammerImprovised (16 dmg, bruise)
+    ├── $kitchenKnife (12 dmg, cut)
+    ├── $butcherKnife (18 dmg, cut)
+    ├── $skillet (20 dmg, bruise)
+    ├── $rollingPin (12 dmg, bruise)
+    ├── $throwingKnife (15 dmg, puncture, ranged)
+    ├── $throwingStar (10 dmg, cut, ranged)
+    ├── $dart (8 dmg, puncture, ranged)
+    ├── $garrote (30 dmg, cut, skill: garrote)
+    ├── $whip (12 dmg, cut, skill: whip)
+    ├── $cattleProd (10 dmg, burn, skill: taser)
+    ├── $stunGun (8 dmg, burn, skill: taser)
+    ├── $taser (10 dmg, burn, ranged, skill: taser)
+    ├── $pepperSpray (5 dmg, burn, ranged)
+    ├── $golfClub (18 dmg, bruise)
+    ├── $hockeyStick (12 dmg, bruise)
+    ├── $lacrosseStick (14 dmg, bruise)
+    └── $cricketBat (22 dmg, bruise, skill: club)
 ```
 
 ---
@@ -227,8 +227,8 @@ To create a weapon instance:
 
 ```javascript
 // Create from prototype
-const knife = await $.recycler.create({
-  parent: $.combatKnife,
+const knife = await $recycler.create({
+  parent: $combatKnife,
   properties: {
     name: 'serrated combat knife',
     description: 'A wicked-looking blade with serrated teeth along the spine.',
@@ -244,8 +244,8 @@ knife.location = someRoom.id;
 You can override damage on instances:
 
 ```javascript
-const superKnife = await $.recycler.create({
-  parent: $.combatKnife,
+const superKnife = await $recycler.create({
+  parent: $combatKnife,
   properties: {
     name: 'masterwork knife',
     description: 'An exceptionally well-crafted blade.',
@@ -259,8 +259,8 @@ const superKnife = await $.recycler.create({
 Create a firearm with ammo:
 
 ```javascript
-const loadedPistol = await $.recycler.create({
-  parent: $.revolver,
+const loadedPistol = await $recycler.create({
+  parent: $revolver,
   properties: {
     name: 'rusty revolver',
     description: 'An old six-shooter with worn grips.',
@@ -304,7 +304,7 @@ Firearms use specific ammo types:
 | `taser-cartridge` | Taser |
 | `pepper-spray` | Pepper Spray |
 
-Ammo is implemented as `$.stackable` objects with matching `ammoType` property.
+Ammo is implemented as `$stackable` objects with matching `ammoType` property.
 
 ---
 
@@ -355,12 +355,12 @@ const result = await shotgun.unload(player);
 
 | Prototype | Ammo Type | Capacity | Notes |
 |-----------|-----------|----------|-------|
-| `$.pistolMagazine` | 9mm | 17 | Standard pistol mag |
-| `$.extendedMagazine` | 9mm | 30 | High-capacity |
-| `$.m1911Magazine` | .45 | 7 | 1911 single-stack |
-| `$.rifleMagazine` | .308 | 10 | Detachable rifle mag |
-| `$.smgMagazine` | 9mm | 32 | SMG extended |
-| `$.mac10Magazine` | .45 | 30 | MAC-10 specific |
-| `$.speedloader` | .38 | 6 | Revolver quick-load |
+| `$pistolMagazine` | 9mm | 17 | Standard pistol mag |
+| `$extendedMagazine` | 9mm | 30 | High-capacity |
+| `$m1911Magazine` | .45 | 7 | 1911 single-stack |
+| `$rifleMagazine` | .308 | 10 | Detachable rifle mag |
+| `$smgMagazine` | 9mm | 32 | SMG extended |
+| `$mac10Magazine` | .45 | 30 | MAC-10 specific |
+| `$speedloader` | .38 | 6 | Revolver quick-load |
 
 See [Magazines](./magazines.md) and [Ammo](./ammo.md) for full documentation.

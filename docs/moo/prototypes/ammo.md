@@ -2,9 +2,9 @@
 
 Ammunition for firearms. Ammo is stackable - multiple rounds merge into a single object with a quantity.
 
-## Base Ammo (`$.ammo`)
+## Base Ammo (`$ammo`)
 
-Inherits from `$.stackable`.
+Inherits from `$stackable`.
 
 ### Properties
 
@@ -42,15 +42,15 @@ Only ammo with matching `ammoType` will stack.
 
 | Prototype | ammoType | Description | Used By |
 |-----------|----------|-------------|---------|
-| `$.ammo9mm` | `9mm` | 9x19mm Parabellum | Pistols, SMGs |
-| `$.ammo38` | `.38` | .38 Special | Revolvers |
-| `$.ammo44` | `.44` | .44 Magnum | Magnum revolvers |
-| `$.ammo45` | `.45` | .45 ACP | 1911, MAC-10 |
-| `$.ammo22` | `.22` | .22 LR rimfire | Derringer, .22 Rifle |
-| `$.ammo380` | `.380` | .380 ACP | Compact pistols |
-| `$.ammo308` | `.308` | .308 Winchester | Rifles |
-| `$.ammo3030` | `.30-30` | .30-30 Winchester | Lever-action rifles |
-| `$.ammo12gauge` | `12gauge` | 12 gauge shells | Shotguns |
+| `$ammo9mm` | `9mm` | 9x19mm Parabellum | Pistols, SMGs |
+| `$ammo38` | `.38` | .38 Special | Revolvers |
+| `$ammo44` | `.44` | .44 Magnum | Magnum revolvers |
+| `$ammo45` | `.45` | .45 ACP | 1911, MAC-10 |
+| `$ammo22` | `.22` | .22 LR rimfire | Derringer, .22 Rifle |
+| `$ammo380` | `.380` | .380 ACP | Compact pistols |
+| `$ammo308` | `.308` | .308 Winchester | Rifles |
+| `$ammo3030` | `.30-30` | .30-30 Winchester | Lever-action rifles |
+| `$ammo12gauge` | `12gauge` | 12 gauge shells | Shotguns |
 
 ---
 
@@ -58,7 +58,7 @@ Only ammo with matching `ammoType` will stack.
 
 ```javascript
 // Create loose ammo from prototype
-const ammo = await $.recycler.create($.ammo9mm, {
+const ammo = await $recycler.create($ammo9mm, {
   quantity: 50,
   name: 'box of 9mm',
   description: 'A cardboard box of ammunition.',
@@ -72,7 +72,7 @@ await ammo.moveTo(someRoom);
 
 ```javascript
 // Hollow points (higher damage potential - flavor only)
-const hollowPoints = await $.recycler.create($.ammo9mm, {
+const hollowPoints = await $recycler.create($ammo9mm, {
   quantity: 20,
   name: '9mm hollow points',
   description: 'Expanding ammunition. Nasty.',

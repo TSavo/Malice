@@ -20,7 +20,7 @@
                           .malice/types/*.d.ts (your custom types)
                                                     ↓
 5. You get IntelliSense:  self.█ ← shows all RuntimeObject methods
-                          $.system.█ ← shows all system methods
+                          $system.█ ← shows all system methods
                                                     ↓
 6. On save:               Extension strips type reference
                                                     ↓
@@ -118,7 +118,7 @@ await $.addAlias('system', systemObject);
 ```typescript
 /// <reference path="../.malice/types/system.d.ts" />
 
-const cmd = await $.system.parseCommand(args[0] as string);
+const cmd = await $system.parseCommand(args[0] as string);
 
 if (cmd.verb === 'attack') {
   // ...
@@ -178,7 +178,7 @@ return chunks;
 
 ```typescript
 // Use it:
-const chunks = await $.system.chunk([1, 2, 3, 4, 5, 6], 2);
+const chunks = await $system.chunk([1, 2, 3, 4, 5, 6], 2);
 // Returns: [[1, 2], [3, 4], [5, 6]]
 ```
 
@@ -261,8 +261,8 @@ player.stats = {
 player.location = 1;
 
 // Use system utilities
-const startingGold = await $.system.rollDice(100);
-await $.system.sendMessage(player, `You start with ${startingGold} gold!`);
+const startingGold = await $system.rollDice(100);
+await $system.sendMessage(player, `You start with ${startingGold} gold!`);
 
 // Save
 await player.save();
@@ -294,7 +294,7 @@ return date.toLocaleString();
 
 ```typescript
 // Use anywhere:
-const timeStr = await $.system.formatTime(Date.now());
+const timeStr = await $system.formatTime(Date.now());
 ```
 
 ### Pattern 3: Prototype Methods
@@ -352,7 +352,7 @@ v2/
 1. Read `.malice/types/README.md`
 2. Look at `.malice/examples/example-onCreate-method.ts`
 3. Create Object #2 and add utility methods
-4. Register it as `$.system`
+4. Register it as `$system`
 5. Start using types in your methods!
 
 ## Questions?

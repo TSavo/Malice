@@ -4,11 +4,11 @@ The `$` object provides access to global utility objects and system services fro
 
 ## How $ Works
 
-Aliases are stored in `#0.properties.aliases` (the ObjectManager). When you access `$.foo` in method code, it looks up the alias and returns the corresponding RuntimeObject.
+Aliases are stored in `#0.properties.aliases` (the ObjectManager). When you access `$foo` in method code, it looks up the alias and returns the corresponding RuntimeObject.
 
 ```javascript
 // In MOO method code:
-const recycler = $.recycler;  // Resolves alias 'recycler' to the Recycler object
+const recycler = $recycler;  // Resolves alias 'recycler' to the Recycler object
 const player = await $.load(playerId);  // Load any object by ID
 ```
 
@@ -16,21 +16,21 @@ const player = await $.load(playerId);  // Load any object by ID
 
 | Alias | Description |
 |-------|-------------|
-| `$.nothing` | Special null object (#-1) |
-| `$.object_manager` | The ObjectManager (#0) |
-| `$.root` | Root object (#1) - base of all objects |
-| `$.system` | System object (#2) - connection router |
+| `$nothing` | Special null object (#-1) |
+| `$object_manager` | The ObjectManager (#0) |
+| `$root` | Root object (#1) - base of all objects |
+| `$system` | System object (#2) - connection router |
 
 ## System Services
 
-### $.recycler - Object Lifecycle
+### $recycler - Object Lifecycle
 
 Creates and deletes objects with permission checks and lifecycle hooks.
 
 ```javascript
 // Create a new object
-const item = await $.recycler.create({
-  parent: $.describable.id,
+const item = await $recycler.create({
+  parent: $describable.id,
   properties: {
     name: 'Magic Sword',
     description: 'A gleaming blade.',
@@ -38,19 +38,19 @@ const item = await $.recycler.create({
 });
 
 // Create with legacy syntax
-const item = await $.recycler.create(parentId, { name: 'Sword' });
+const item = await $recycler.create(parentId, { name: 'Sword' });
 
 // Delete an object (soft delete)
-await $.recycler.recycle(item);
+await $recycler.recycle(item);
 
 // Restore from recycle bin
-await $.recycler.unrecycle(objectId);
+await $recycler.unrecycle(objectId);
 
 // Permanently delete (wizard only)
-await $.recycler.purge(objectId, wizard);
+await $recycler.purge(objectId, wizard);
 
 // Recursively delete object and all parts
-await $.recycler.recycleTree(objectId);
+await $recycler.recycleTree(objectId);
 ```
 
 **Methods:**
@@ -61,31 +61,31 @@ await $.recycler.recycleTree(objectId);
 - `recycleTree(objectId, caller?)` - Delete object and nested parts
 - `canRecycle(caller, obj)` - Check permissions
 
-### $.scheduler - Job Scheduling
+### $scheduler - Job Scheduling
 
 Schedules periodic or one-shot tasks.
 
 ```javascript
 // Schedule a repeating job (every 60s, starting immediately)
-await $.scheduler.schedule('heartbeat', 0, 60000, $.system, 'tickAllPlayers');
+await $scheduler.schedule('heartbeat', 0, 60000, $system, 'tickAllPlayers');
 
 // Schedule a one-shot job (runs once after 5s delay)
-await $.scheduler.schedule('delayed-msg', 5000, 0, player, 'tell', 'Time passed!');
+await $scheduler.schedule('delayed-msg', 5000, 0, player, 'tell', 'Time passed!');
 
 // Schedule with initial delay then repeat
-await $.scheduler.schedule('warmup', 10000, 60000, target, 'method');
+await $scheduler.schedule('warmup', 10000, 60000, target, 'method');
 
 // Unschedule a job
-await $.scheduler.unschedule('heartbeat');
+await $scheduler.unschedule('heartbeat');
 
 // Enable/disable without removing
-await $.scheduler.setEnabled('heartbeat', false);
+await $scheduler.setEnabled('heartbeat', false);
 
 // Force immediate execution
-await $.scheduler.runNow('heartbeat');
+await $scheduler.runNow('heartbeat');
 
 // List all jobs
-const jobs = await $.scheduler.listJobs();
+const jobs = await $scheduler.listJobs();
 ```
 
 **Parameters:**
@@ -96,26 +96,26 @@ const jobs = await $.scheduler.listJobs();
 - `method` - Method name
 - `...args` - Arguments to pass
 
-### $.prompt - Interactive Input
+### $prompt - Interactive Input
 
 Handles interactive prompts with players.
 
 ```javascript
 // Text question
-const name = await $.prompt.question(player, 'What is your name? ');
+const name = await $prompt.question(player, 'What is your name? ');
 
 // Multiple choice (returns selected key)
-const choice = await $.prompt.choice(player, 'Pick a class:', {
+const choice = await $prompt.choice(player, 'Pick a class:', {
   warrior: 'Warrior - Strong melee fighter',
   mage: 'Mage - Powerful spellcaster',
   rogue: 'Rogue - Stealthy assassin',
 });
 
 // Yes/no question (returns true/false)
-const confirmed = await $.prompt.yesorno(player, 'Delete all items?');
+const confirmed = await $prompt.yesorno(player, 'Delete all items?');
 
 // Menu with columns (returns selected key)
-const option = await $.prompt.menu(player, 'Select option:', {
+const option = await $prompt.menu(player, 'Select option:', {
   north: 'Go North',
   south: 'Go South',
   east: 'Go East',
@@ -123,44 +123,44 @@ const option = await $.prompt.menu(player, 'Select option:', {
 }, 2); // 2 columns
 
 // Multiline text input (ends with '.' on own line)
-const text = await $.prompt.multiline(player, 'Enter description:');
+const text = await $prompt.multiline(player, 'Enter description:');
 
 // Check if player is in prompt state
-const active = await $.prompt.isActive(player);
+const active = await $prompt.isActive(player);
 
 // Cancel current prompt
-await $.prompt.cancel(player);
+await $prompt.cancel(player);
 ```
 
-### $.exclusions - Action Conflicts
+### $exclusions - Action Conflicts
 
 Prevents incompatible simultaneous actions using mutex locks.
 
 ```javascript
 // Check if action is blocked
-const blocked = await $.exclusions.check(player, 'walk');
+const blocked = await $exclusions.check(player, 'walk');
 if (blocked) {
   return blocked; // Returns message like "You'll need to stand up first."
 }
 
 // Start an action (acquires lock)
-const result = await $.exclusions.start(player, 'sit', "You're sitting.");
+const result = await $exclusions.start(player, 'sit', "You're sitting.");
 if (result) {
   return result; // Was blocked
 }
 
 // End an action (releases lock)
-await $.exclusions.end(player, 'sit');
+await $exclusions.end(player, 'sit');
 
 // Get current actions
-const actions = await $.exclusions.current(player);
+const actions = await $exclusions.current(player);
 // [{action: 'sit', data: "You're sitting.", acquiredAt: ...}]
 
 // Define custom exclusion rules
-await $.exclusions.define('meditate', ['walk', 'run', 'fighting']);
+await $exclusions.define('meditate', ['walk', 'run', 'fighting']);
 
 // Clear all actions (admin)
-await $.exclusions.clearAll(player);
+await $exclusions.clearAll(player);
 ```
 
 **Default Exclusion Rules:**
@@ -171,39 +171,39 @@ await $.exclusions.clearAll(player);
 - `fighting` excludes `crafting`, `sleep`, `operating`
 - `eating/drinking` excludes `sleep`
 
-### $.mutex - Generic Locks
+### $mutex - Generic Locks
 
 Low-level mutex system used by exclusions and other systems.
 
 ```javascript
 // Acquire a lock
-await $.mutex.acquire(obj, 'lockName', optionalData, timeoutMs);
+await $mutex.acquire(obj, 'lockName', optionalData, timeoutMs);
 
 // Check if locked (returns data or false)
-const data = await $.mutex.check(obj, 'lockName');
+const data = await $mutex.check(obj, 'lockName');
 
 // Release a lock
-await $.mutex.release(obj, 'lockName');
+await $mutex.release(obj, 'lockName');
 
 // Update lock data
-await $.mutex.update(obj, 'lockName', newData);
+await $mutex.update(obj, 'lockName', newData);
 
 // Extend timeout
-await $.mutex.extend(obj, 'lockName', newTimeoutMs);
+await $mutex.extend(obj, 'lockName', newTimeoutMs);
 
 // List all locks on object
-const locks = await $.mutex.list(obj);
+const locks = await $mutex.list(obj);
 ```
 
 ## Text Formatting
 
-### $.pronoun - Pronoun Substitution
+### $pronoun - Pronoun Substitution
 
 Handles pronoun and name substitution in message templates.
 
 ```javascript
 // Basic substitution
-const msg = await $.pronoun.sub(
+const msg = await $pronoun.sub(
   "%N picks up %t and puts it in %p pocket.",
   actor,      // %N, %s, %o, %p, %r
   null,       // direct object (%d)
@@ -213,7 +213,7 @@ const msg = await $.pronoun.sub(
 // "Bob picks up the sword and puts it in his pocket."
 
 // Perspective-aware (handles "you" for viewers)
-const msg = await $.pronoun.perspective(
+const msg = await $pronoun.perspective(
   "%A %v{pick} up %t.",
   actor,
   target,
@@ -224,7 +224,7 @@ const msg = await $.pronoun.perspective(
 // Others see: "Bob picks up the sword."
 
 // Announce to room with different messages per viewer
-await $.pronoun.announce(room, actor, target, {
+await $pronoun.announce(room, actor, target, {
   actor: "You hit %t!",
   target: "%A hits you!",
   others: "%A hits %t!",
@@ -248,75 +248,75 @@ await $.pronoun.announce(room, actor, target, {
 
 Capitalize code for capitalized output: `%N`, `%S`, etc.
 
-### $.english - English Utilities
+### $english - English Utilities
 
 Text formatting for proper English.
 
 ```javascript
 // List with Oxford comma
-$.english.list(['a', 'b', 'c']); // "a, b, and c"
-$.english.list(['x', 'y'], 'or'); // "x or y"
+$english.list(['a', 'b', 'c']); // "a, b, and c"
+$english.list(['x', 'y'], 'or'); // "x or y"
 
 // Pluralization
-$.english.plural(3, 'wolf'); // "wolves"
-$.english.plural(1, 'child'); // "child"
-$.english.plural(2, 'child'); // "children"
+$english.plural(3, 'wolf'); // "wolves"
+$english.plural(1, 'child'); // "child"
+$english.plural(2, 'child'); // "children"
 
 // Count with words
-$.english.count(5, 'bruise'); // "five bruises"
-$.english.count(1, 'cat'); // "a cat"
-$.english.count(0, 'item'); // "no items"
-$.english.count(0, 'wound', 'free of %i'); // "free of wounds"
+$english.count(5, 'bruise'); // "five bruises"
+$english.count(1, 'cat'); // "a cat"
+$english.count(0, 'item'); // "no items"
+$english.count(0, 'wound', 'free of %i'); // "free of wounds"
 
 // Articles
-$.english.article('apple'); // "an apple"
-$.english.article('banana'); // "a banana"
+$english.article('apple'); // "an apple"
+$english.article('banana'); // "a banana"
 
 // Ordinals
-$.english.ordinal(1); // "first"
-$.english.ordinal(23); // "23rd"
+$english.ordinal(1); // "first"
+$english.ordinal(23); // "23rd"
 
 // Number words
-$.english.numberWord(5); // "five"
-$.english.numberWord(42); // "42"
+$english.numberWord(5); // "five"
+$english.numberWord(42); // "42"
 
 // Possessive
-$.english.possessive('Bob'); // "Bob's"
-$.english.possessive('James'); // "James'"
+$english.possessive('Bob'); // "Bob's"
+$english.possessive('James'); // "James'"
 
 // Capitalization
-$.english.capitalize('hello world'); // "Hello world"
-$.english.titleCase('the lord of the rings'); // "The Lord of the Rings"
+$english.capitalize('hello world'); // "Hello world"
+$english.titleCase('the lord of the rings'); // "The Lord of the Rings"
 
 // Verb conjugation
-$.english.conjugate('walk', 3); // "walks"
-$.english.conjugate('have', 3); // "has"
-$.english.pastTense('walk'); // "walked"
-$.english.pastTense('go'); // "went"
-$.english.presentParticiple('run'); // "running"
+$english.conjugate('walk', 3); // "walks"
+$english.conjugate('have', 3); // "has"
+$english.pastTense('walk'); // "walked"
+$english.pastTense('go'); // "went"
+$english.presentParticiple('run'); // "running"
 
 // Garble for audio degradation
-$.english.garble('Hello there friend', 30); // "Hello dere frien"
-$.english.garble('Hello there friend', 70); // "...lo ...ere ..."
+$english.garble('Hello there friend', 30); // "Hello dere frien"
+$english.garble('Hello there friend', 70); // "...lo ...ere ..."
 ```
 
-### $.format - Layout Utilities
+### $format - Layout Utilities
 
 Text layout for columns, tables, and boxes.
 
 ```javascript
 // Padding
-$.format.padRight('hi', 10); // "hi        "
-$.format.padLeft('42', 5, '0'); // "00042"
-$.format.center('hi', 10); // "    hi    "
-$.format.truncate('Hello World', 8); // "Hello..."
+$format.padRight('hi', 10); // "hi        "
+$format.padLeft('42', 5, '0'); // "00042"
+$format.center('hi', 10); // "    hi    "
+$format.truncate('Hello World', 8); // "Hello..."
 
 // Columns
-const lines = await $.format.columns(['a','b','c','d','e'], 2);
+const lines = await $format.columns(['a','b','c','d','e'], 2);
 // ['a    b', 'c    d', 'e']
 
 // Tables
-const table = await $.format.table([
+const table = await $format.table([
   ['Name', 'HP', 'Status'],
   ['Goblin', '10', 'Alive'],
   ['Orc', '25', 'Dead'],
@@ -324,40 +324,40 @@ const table = await $.format.table([
 // ['Name    HP  Status', '------  --  ------', 'Goblin  10  Alive', 'Orc     25  Dead']
 
 // Word wrap
-const wrapped = await $.format.wrap('Long text here...', 40);
+const wrapped = await $format.wrap('Long text here...', 40);
 
 // Box drawing
-const box = await $.format.box('Hello!', { style: 'single', title: 'Message' });
+const box = await $format.box('Hello!', { style: 'single', title: 'Message' });
 // ['┌─ Message ─┐', '│ Hello!    │', '└───────────┘']
 
 // Progress bar
-$.format.bar(75, 100, 20, { showPct: true }); // "[===============     ] 75%"
+$format.bar(75, 100, 20, { showPct: true }); // "[===============     ] 75%"
 
 // Lists
-const list = await $.format.list(['one', 'two'], { style: 'number' });
+const list = await $format.list(['one', 'two'], { style: 'number' });
 // ['  1. one', '  2. two']
 
 // Key-value alignment
-const kv = await $.format.keyValue({ Name: 'Bob', HP: 100 });
+const kv = await $format.keyValue({ Name: 'Bob', HP: 100 });
 // ['Name: Bob', 'HP:   100']
 
 // Prose list
-$.format.prose(['sword', 'shield', 'dagger']); // "sword, shield, and dagger"
+$format.prose(['sword', 'shield', 'dagger']); // "sword, shield, and dagger"
 
 // Compose with verb conjugation
-await $.format.compose('%T %v{fall} away.', ['pants']);
+await $format.compose('%T %v{fall} away.', ['pants']);
 // "The pants falls away."
-await $.format.compose('%T %v{fall} away.', ['shirt', 'pants']);
+await $format.compose('%T %v{fall} away.', ['shirt', 'pants']);
 // "The shirt and pants fall away."
 ```
 
-### $.proportional - Value-Based Messages
+### $proportional - Value-Based Messages
 
 Selects messages based on a value within a range.
 
 ```javascript
 // Select message based on current/max
-const msg = await $.proportional.sub(
+const msg = await $proportional.sub(
   ['empty', 'almost empty', 'half full', 'mostly full', 'full'],
   currentAmount,
   maxAmount
@@ -368,25 +368,25 @@ const msg = await $.proportional.sub(
 // Middle messages distributed evenly across 1 to max-1
 
 // From percentage
-const msg = await $.proportional.fromPercent(messages, 75);
+const msg = await $proportional.fromPercent(messages, 75);
 
 // Get index instead of message
-const idx = await $.proportional.index(messages, current, max);
+const idx = await $proportional.index(messages, current, max);
 ```
 
-### $.emote - Freeform Emotes
+### $emote - Freeform Emotes
 
 Parses and broadcasts emotes with sensory awareness.
 
 ```javascript
 // Broadcast to room
-await $.emote.broadcast('.smile and .say "Hello!"', actor, room);
+await $emote.broadcast('.smile and .say "Hello!"', actor, room);
 
 // Parse for specific viewer
-const formatted = await $.emote.format('.wave at Bob', actor, viewer, room);
+const formatted = await $emote.format('.wave at Bob', actor, viewer, room);
 
 // Get sensory breakdown
-const sensory = await $.emote.formatSensory(emoteStr, actor, viewer, knownNames);
+const sensory = await $emote.formatSensory(emoteStr, actor, viewer, knownNames);
 // { visual, audible, olfactory, gustatory, visualDeaf, combined }
 ```
 
@@ -409,38 +409,38 @@ Blind: Alice says, "Hey!"
 Deaf: Alice falls on her knees and says something to Bob.
 ```
 
-### $.cash - Physical Cash Operations
+### $cash - Physical Cash Operations
 
-Utility for finding, taking, and giving physical cash ($.dollar stacks) across a player's hands and pockets.
+Utility for finding, taking, and giving physical cash ($dollar stacks) across a player's hands and pockets.
 
 ```javascript
 // Find all cash on a player
-const found = await $.cash.find(player);
+const found = await $cash.find(player);
 // { total: 500, stacks: [{ item, location, quantity }, ...] }
 
 // Check if player has enough
-const hasEnough = await $.cash.has(player, 100);
+const hasEnough = await $cash.has(player, 100);
 // true/false
 
 // Take cash from player (modifies stacks, recycles empties)
-const result = await $.cash.take(player, 100);
+const result = await $cash.take(player, 100);
 // { success: true, taken: 100, message: 'Took $100.' }
 // { success: false, taken: 0, message: 'Insufficient cash...' }
 
 // Give cash to player (adds to existing or creates new)
-const result = await $.cash.give(player, 100);
+const result = await $cash.give(player, 100);
 // { success: true, location: pocket, message: 'Added $100...' }
 
 // Transfer between players (atomic with refund on failure)
-const result = await $.cash.transfer(fromPlayer, toPlayer, 100);
+const result = await $cash.transfer(fromPlayer, toPlayer, 100);
 // { success: true, message: 'Transferred $100.' }
 ```
 
 **Search order:** Primary hand → Secondary hand → Worn clothing pockets
 
 **Used by:**
-- `$.vendable` (when `currency: 'cash'`)
-- `$.cloneRecordingStudio` (when `currency: 'cash'`)
+- `$vendable` (when `currency: 'cash'`)
+- `$cloneRecordingStudio` (when `currency: 'cash'`)
 - Any system needing physical cash transactions
 
 ## Prototype Aliases
@@ -449,36 +449,36 @@ Quick access to prototype objects for inheritance:
 
 | Alias | Description |
 |-------|-------------|
-| `$.describable` | Base for all world objects |
-| `$.location` | Container prototype |
-| `$.room` | Room prototype |
-| `$.exit` | Exit prototype |
-| `$.agent` | Actors with verbs |
-| `$.embodied` | Agents with bodies |
-| `$.human` | Human NPC prototype |
-| `$.player` | Player prototype |
-| `$.admin` | Admin player prototype |
-| `$.food` | Edible items |
-| `$.drink` | Drinkable items |
-| `$.clothing` | Wearable items |
-| `$.pocket` | Container attached to clothing |
-| `$.door` | Door prototype |
-| `$.lock` | Lock prototype |
-| `$.stackable` | Stackable commodities |
-| `$.dollar` | Physical cash (stackable) |
+| `$describable` | Base for all world objects |
+| `$location` | Container prototype |
+| `$room` | Room prototype |
+| `$exit` | Exit prototype |
+| `$agent` | Actors with verbs |
+| `$embodied` | Agents with bodies |
+| `$human` | Human NPC prototype |
+| `$player` | Player prototype |
+| `$admin` | Admin player prototype |
+| `$food` | Edible items |
+| `$drink` | Drinkable items |
+| `$clothing` | Wearable items |
+| `$pocket` | Container attached to clothing |
+| `$door` | Door prototype |
+| `$lock` | Lock prototype |
+| `$stackable` | Stackable commodities |
+| `$dollar` | Physical cash (stackable) |
 
 ## System Aliases
 
 | Alias | Description |
 |-------|-------------|
-| `$.authManager` | Handles login/authentication |
-| `$.charGen` | Character creation |
-| `$.preAuthHandler` | Pre-authenticated connections |
-| `$.bodyFactory` | Creates human bodies |
-| `$.bank` | Banking system (credits) |
-| `$.cash` | Cash utility (physical money operations) |
-| `$.phoneDb` | Phone directory |
-| `$.startRoom` | Default spawn location |
+| `$authManager` | Handles login/authentication |
+| `$charGen` | Character creation |
+| `$preAuthHandler` | Pre-authenticated connections |
+| `$bodyFactory` | Creates human bodies |
+| `$bank` | Banking system (credits) |
+| `$cash` | Cash utility (physical money operations) |
+| `$phoneDb` | Phone directory |
+| `$startRoom` | Default spawn location |
 
 ## Special Properties on $
 
@@ -488,7 +488,7 @@ In addition to aliases, `$` provides direct access to ObjectManager methods:
 // Load any object by ID
 const obj = await $.load(123);
 
-// Create object (low-level, prefer $.recycler.create)
+// Create object (low-level, prefer $recycler.create)
 const parent = await $.load(1);
 const obj = await $.create({ parent: parent, properties: {...} });
 

@@ -14,7 +14,7 @@ Physical commodities and vending machines.
 - Sell physical items or spawn new ones
 - Configurable prices
 
-## $.stackable - Physical Commodities
+## $stackable - Physical Commodities
 
 Physical goods that can be combined and split. Enables commodity-based value transfer outside the banking system.
 
@@ -103,7 +103,7 @@ Check if stack should be recycled.
 
 ```javascript
 if (await stack.isEmpty()) {
-  await $.recycler.recycle(stack);
+  await $recycler.recycle(stack);
 }
 ```
 
@@ -127,7 +127,7 @@ The `onArrived` hook handles this:
 
 ```javascript
 // Physical cash
-const cash = await $.recycler.create($.stackable, {
+const cash = await $recycler.create($stackable, {
   name: 'US Dollars',
   stackType: 'cash:usd',
   quantity: 500,
@@ -136,7 +136,7 @@ const cash = await $.recycler.create($.stackable, {
 });
 
 // Ammunition
-const ammo = await $.recycler.create($.stackable, {
+const ammo = await $recycler.create($stackable, {
   name: '9mm rounds',
   stackType: 'ammo:9mm',
   quantity: 30,
@@ -145,7 +145,7 @@ const ammo = await $.recycler.create($.stackable, {
 });
 
 // Legal scrap
-const copper = await $.recycler.create($.stackable, {
+const copper = await $recycler.create($stackable, {
   name: 'copper wire',
   stackType: 'scrap:copper',
   quantity: 500,
@@ -167,7 +167,7 @@ copper wire
 500 g
 ```
 
-## $.vendable - Vending Machines
+## $vendable - Vending Machines
 
 Containers that sell items using bank credits OR physical cash.
 
@@ -203,12 +203,12 @@ Containers that sell items using bank credits OR physical cash.
 
 **Credits Mode** (`currency: 'credits'`):
 - Requires `bankAccount` and optionally `bank`
-- Uses `$.bank.transfer()` for payment
+- Uses `$bank.transfer()` for payment
 - Transaction is logged and traceable
 
 **Cash Mode** (`currency: 'cash'`):
-- Uses `$.cash.take()` to collect payment
-- If `operator` is set, uses `$.cash.give()` to pay them
+- Uses `$cash.take()` to collect payment
+- If `operator` is set, uses `$cash.give()` to pay them
 - If no operator, cash is burned (machine keeps it)
 - No transaction log - anonymous payment
 ```
@@ -274,7 +274,7 @@ For items that spawn on demand (infinite stock):
 ```javascript
 spawnables: [
   {
-    protoId: $.phone.id,           // Prototype to create
+    protoId: $phone.id,           // Prototype to create
     name: 'Basic Phone',           // Display name
     price: 50,                     // Price
     properties: {                  // Properties to set
@@ -292,12 +292,12 @@ When `autoNumber` is true and `phoneDb` is set:
 
 ```javascript
 // Vendor configured with phoneDb
-const vendor = await $.recycler.create($.vendable, {
+const vendor = await $recycler.create($vendable, {
   name: 'Phone Store',
   phoneDb: phoneDirectory.id,
   spawnables: [
     {
-      protoId: $.wirelessPhone.id,
+      protoId: $wirelessPhone.id,
       name: 'Mobile Phone',
       price: 100,
       autoNumber: true,
@@ -317,7 +317,7 @@ const vendor = await $.recycler.create($.vendable, {
 #### Basic Snack Machine
 
 ```javascript
-const snackMachine = await $.recycler.create($.vendable, {
+const snackMachine = await $recycler.create($vendable, {
   name: 'Snack Machine',
   description: 'A battered vending machine.',
   bankAccount: 'CORP-SNACKS-001',
@@ -325,7 +325,7 @@ const snackMachine = await $.recycler.create($.vendable, {
 });
 
 // Stock items
-const snack1 = await $.recycler.create($.food, {
+const snack1 = await $recycler.create($food, {
   name: 'synth-bar',
   calories: 150,
   price: 5,
@@ -336,14 +336,14 @@ await snackMachine.addContent(snack1.id);
 #### Phone Kiosk
 
 ```javascript
-const phoneKiosk = await $.recycler.create($.vendable, {
+const phoneKiosk = await $recycler.create($vendable, {
   name: 'Phone Kiosk',
   description: 'Buy prepaid phones here.',
   bankAccount: 'CORP-PHONES-001',
   phoneDb: phoneDb.id,
   spawnables: [
     {
-      protoId: $.wirelessPhone.id,
+      protoId: $wirelessPhone.id,
       name: 'Burner Phone',
       price: 25,
       autoNumber: true,
@@ -351,7 +351,7 @@ const phoneKiosk = await $.recycler.create($.vendable, {
       properties: { minutes: 100 },
     },
     {
-      protoId: $.wirelessPhone.id,
+      protoId: $wirelessPhone.id,
       name: 'Premium Phone',
       price: 150,
       autoNumber: true,
@@ -416,7 +416,7 @@ Stackables enable an underground economy outside the banking system:
 
 ```javascript
 // Drug dealer creates product
-const drugs = await $.recycler.create($.stackable, {
+const drugs = await $recycler.create($stackable, {
   name: 'synth',
   stackType: 'drug:synth',
   quantity: 100,
@@ -425,7 +425,7 @@ const drugs = await $.recycler.create($.stackable, {
 });
 
 // Player pays with physical cash
-const payment = await $.recycler.create($.stackable, {
+const payment = await $recycler.create($stackable, {
   name: 'cash',
   stackType: 'cash:usd',
   quantity: 500,
@@ -451,7 +451,7 @@ if (result.success) {
 }
 
 if (result.empty) {
-  await $.recycler.recycle(ammoStack);
+  await $recycler.recycle(ammoStack);
 }
 ```
 
@@ -464,12 +464,12 @@ if (result.empty) {
 
 const vendorTemplate = {
   bankAccount: 'CONTINUUM-RETAIL-001',
-  bank: $.bank.id,
+  bank: $bank.id,
   defaultPrice: 5,
   spawnables: [
-    { protoId: $.food.id, name: 'NutriBar', price: 3 },
-    { protoId: $.drink.id, name: 'Aqua', price: 2 },
-    { protoId: $.wirelessPhone.id, name: 'Burner', price: 25, autoNumber: true },
+    { protoId: $food.id, name: 'NutriBar', price: 3 },
+    { protoId: $drink.id, name: 'Aqua', price: 2 },
+    { protoId: $wirelessPhone.id, name: 'Burner', price: 25, autoNumber: true },
   ],
 };
 ```

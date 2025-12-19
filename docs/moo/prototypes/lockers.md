@@ -14,12 +14,12 @@ The locker system provides secure storage for players:
 
 **Prototype Hierarchy:**
 ```
-$.location
-└── $.locker            ← Base locker bank (state only)
-    └── $.oneTimeLocker ← With verbs and messaging
+$location
+└── $locker            ← Base locker bank (state only)
+    └── $oneTimeLocker ← With verbs and messaging
 ```
 
-## $.locker - Base Locker Bank
+## $locker - Base Locker Bank
 
 A bank of compartments (like at a train station or gym). Handles state and validation only - no verbs.
 
@@ -235,9 +235,9 @@ await locker.removeContent('A1', package);
 
 Both trigger plot hooks (`itemDeposited`, `itemRemoved`).
 
-## $.oneTimeLocker - Courier-Friendly Lockers
+## $oneTimeLocker - Courier-Friendly Lockers
 
-Inherits from $.locker, adds player-facing verbs and 24-hour default rental.
+Inherits from $locker, adds player-facing verbs and 24-hour default rental.
 
 ### Verb Commands
 
@@ -372,7 +372,7 @@ Contents:
 ### Basic Locker Bank
 
 ```javascript
-const lockerBank = await $.recycler.create($.oneTimeLocker, {
+const lockerBank = await $recycler.create($oneTimeLocker, {
   name: 'Transit Station Lockers',
   description: 'A row of battered metal lockers.',
   compartmentPrefix: 'T',
@@ -389,7 +389,7 @@ for (let i = 1; i <= 20; i++) {
 ### Premium Lockers (Longer Rental)
 
 ```javascript
-const premiumLockers = await $.recycler.create($.oneTimeLocker, {
+const premiumLockers = await $recycler.create($oneTimeLocker, {
   name: 'Premium Storage Units',
   description: 'Large, climate-controlled storage compartments.',
   compartmentPrefix: 'P',

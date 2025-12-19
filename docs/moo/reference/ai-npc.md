@@ -1,6 +1,6 @@
 # AI/NPC System Reference
 
-The AI system manages AI-controlled human characters (NPCs) that are indistinguishable from player characters. NPCs are regular `$.human` instances tracked by role with personality, history, and persistent memories.
+The AI system manages AI-controlled human characters (NPCs) that are indistinguishable from player characters. NPCs are regular `$human` instances tracked by role with personality, history, and persistent memories.
 
 ## Overview
 
@@ -17,10 +17,10 @@ AI-controlled NPCs:
 
 ```javascript
 // Basic spawn with just a role
-const npc = await $.ai.spawn('guard');
+const npc = await $ai.spawn('guard');
 
 // Full spawn with options
-const npc = await $.ai.spawn('shopkeeper', {
+const npc = await $ai.spawn('shopkeeper', {
   name: 'Marcus',
   description: 'A gruff middle-aged merchant.',
   sex: 'male',
@@ -89,33 +89,33 @@ appearance: {
 
 ```javascript
 // Remove NPC and recycle all objects
-await $.ai.despawn(npcId);
+await $ai.despawn(npcId);
 
 // Remove from registry but keep the object
-await $.ai.despawn(npcId, false);
+await $ai.despawn(npcId, false);
 ```
 
 ### do - Execute Commands as NPC
 
 ```javascript
 // Make NPC speak
-await $.ai.do(npcId, 'say Hello there!');
+await $ai.do(npcId, 'say Hello there!');
 
 // Make NPC emote
-await $.ai.do(npcId, ':waves dismissively');
+await $ai.do(npcId, ':waves dismissively');
 
 // Make NPC look around
-await $.ai.do(npcId, 'look');
+await $ai.do(npcId, 'look');
 
 // Make NPC move
-await $.ai.do(npcId, 'north');
+await $ai.do(npcId, 'north');
 ```
 
 ### look - Get NPC's View
 
 ```javascript
 // Get what the NPC can see
-const view = await $.ai.look(npcId);
+const view = await $ai.look(npcId);
 // Returns room description, exits, contents, etc.
 ```
 
@@ -125,10 +125,10 @@ const view = await $.ai.look(npcId);
 
 ```javascript
 // String form
-await $.ai.setPersonality(npcId, 'A grumpy but fair guard who has seen too much.');
+await $ai.setPersonality(npcId, 'A grumpy but fair guard who has seen too much.');
 
 // Structured form
-await $.ai.setPersonality(npcId, {
+await $ai.setPersonality(npcId, {
   traits: ['loyal', 'disciplined', 'cynical'],
   quirks: ['cracks knuckles when nervous'],
   values: ['duty', 'order'],
@@ -141,10 +141,10 @@ await $.ai.setPersonality(npcId, {
 
 ```javascript
 // String form
-await $.ai.setHistory(npcId, 'Former soldier who joined the guard after The Burning.');
+await $ai.setHistory(npcId, 'Former soldier who joined the guard after The Burning.');
 
 // Structured form
-await $.ai.setHistory(npcId, {
+await $ai.setHistory(npcId, {
   backstory: 'Born in the lower levels, clawed his way up.',
   events: [
     'Witnessed the Corporate Riots of 2095',
@@ -165,7 +165,7 @@ await $.ai.setHistory(npcId, {
 ### Getting Full Profile
 
 ```javascript
-const profile = await $.ai.getProfile(npcId);
+const profile = await $ai.getProfile(npcId);
 // {
 //   success: true,
 //   humanId: 123,
@@ -187,21 +187,21 @@ NPCs have persistent memories that survive session resets. Use memories to build
 
 ```javascript
 // Remember meeting someone
-await $.ai.remember(npcId,
+await $ai.remember(npcId,
   'Met Jack - tall, scar on cheek, said he works maintenance',
   'critical',
   ['player', 'introduction']
 );
 
 // Remember an event
-await $.ai.remember(npcId,
+await $ai.remember(npcId,
   'Witnessed fight in the market square between two gangs',
   'important',
   ['crime', 'location']
 );
 
 // Remember casual info
-await $.ai.remember(npcId,
+await $ai.remember(npcId,
   'The coffee at the corner shop is terrible',
   'normal',
   ['location']
@@ -232,40 +232,40 @@ Common tags for organization:
 
 ```javascript
 // Get all memories
-const result = await $.ai.recall(npcId);
+const result = await $ai.recall(npcId);
 // { success: true, memories: [...], count: N }
 
 // Filter by importance
-const critical = await $.ai.recall(npcId, { importance: 'critical' });
+const critical = await $ai.recall(npcId, { importance: 'critical' });
 
 // Filter by tag
-const playerMems = await $.ai.recall(npcId, { tag: 'player' });
+const playerMems = await $ai.recall(npcId, { tag: 'player' });
 
 // Limit results
-const recent = await $.ai.recall(npcId, { limit: 10 });
+const recent = await $ai.recall(npcId, { limit: 10 });
 ```
 
 ### Removing Memories
 
 ```javascript
 // Remove by index (0 = most recent)
-await $.ai.forget(npcId, 0);
+await $ai.forget(npcId, 0);
 
 // Remove by text pattern
-await $.ai.forgetByText(npcId, 'Jack');
+await $ai.forgetByText(npcId, 'Jack');
 
 // Clear all memories
-await $.ai.clearMemories(npcId);
+await $ai.clearMemories(npcId);
 ```
 
 ### Memory Summary for AI Context
 
 ```javascript
 // Get formatted summary for system prompt
-const summary = await $.ai.getMemorySummary(npcId);
+const summary = await $ai.getMemorySummary(npcId);
 
 // With options
-const summary = await $.ai.getMemorySummary(npcId, {
+const summary = await $ai.getMemorySummary(npcId, {
   maxLength: 2000,
   criticalOnly: true,
 });
@@ -276,7 +276,7 @@ const summary = await $.ai.getMemorySummary(npcId, {
 ### Check if AI-Controlled
 
 ```javascript
-const isAI = await $.ai.isAiControlled(humanId);
+const isAI = await $ai.isAiControlled(humanId);
 // true or false
 ```
 
@@ -284,26 +284,26 @@ const isAI = await $.ai.isAiControlled(humanId);
 
 ```javascript
 // Get all NPCs
-const all = await $.ai.getAll();
+const all = await $ai.getAll();
 // Array of Human RuntimeObjects
 
 // Get NPCs by role
-const guards = await $.ai.getByRole('guard');
+const guards = await $ai.getByRole('guard');
 // Array of Human RuntimeObjects
 
 // Get all roles
-const roles = await $.ai.getRoles();
+const roles = await $ai.getRoles();
 // ['guard', 'shopkeeper', 'clerk', ...]
 
 // Get counts
-const total = await $.ai.count();
-const guardCount = await $.ai.countByRole('guard');
+const total = await $ai.count();
+const guardCount = await $ai.countByRole('guard');
 ```
 
 ### Get NPC Info
 
 ```javascript
-const info = await $.ai.getInfo(npcId);
+const info = await $ai.getInfo(npcId);
 // {
 //   human: RuntimeObject,
 //   role: 'guard',

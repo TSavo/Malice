@@ -17,17 +17,17 @@ A shared object for bidirectional access between rooms, used by both exits and e
 - `closeDoor(agent)`: Closes the door
 - `lockDoor(agent)`: Locks the door
 - `unlockDoor(agent, code?)`: Unlocks the door (checks code/locks)
-- `promptForCode(agent)`: Uses $.prompt and messages.prompt
+- `promptForCode(agent)`: Uses $prompt and messages.prompt
 
 ## Integration with Exits and Elevators
-- Both `$.exit` and `$.elevator` now support a `door` property.
-- If present, all access checks (`canUse` for exit, `canAccessFloor` for elevator) are delegated to the referenced `$.door` object.
+- Both `$exit` and `$elevator` now support a `door` property.
+- If present, all access checks (`canUse` for exit, `canAccessFloor` for elevator) are delegated to the referenced `$door` object.
 - This enables unified, bidirectional access control, lock state, and messaging for doors, exits, and elevators.
 
 ## Example Usage
 ```javascript
 // Create a door object
-const door = await $.recycler.create($.door, {
+const door = await $recycler.create($door, {
   name: 'Suite 1 Door',
   description: 'A heavy, secure door.',
   locked: true,

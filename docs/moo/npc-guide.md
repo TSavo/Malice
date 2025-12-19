@@ -6,7 +6,7 @@ A practical guide to creating compelling AI-controlled characters in Malice.
 
 ```javascript
 // Spawn a guard NPC at your location
-const guard = await $.ai.spawn('guard', {
+const guard = await $ai.spawn('guard', {
   name: 'Marcus Webb',
   sex: 'male',
   age: 35,
@@ -15,7 +15,7 @@ const guard = await $.ai.spawn('guard', {
 });
 
 // Set personality
-await $.ai.setPersonality(guard.id, {
+await $ai.setPersonality(guard.id, {
   traits: ['suspicious', 'loyal', 'gruff'],
   quirks: ['tugs at beard when thinking'],
   values: ['duty', 'honor'],
@@ -24,7 +24,7 @@ await $.ai.setPersonality(guard.id, {
 });
 
 // Set history
-await $.ai.setHistory(guard.id, {
+await $ai.setHistory(guard.id, {
   backstory: 'Former soldier who retired after the Border Wars.',
   events: ['Enlisted at age 18', 'Rose to sergeant', 'Lost squad in an ambush'],
   relationships: { 'Building Manager': 'Respects her leadership' },
@@ -54,7 +54,7 @@ Placed in: Smith Tower Lobby
 ### Programmatic Spawn
 
 ```javascript
-const npc = await $.ai.spawn('shopkeeper', {
+const npc = await $ai.spawn('shopkeeper', {
   name: 'Wong Chen',
   description: 'A sharp-eyed merchant in traditional clothing.',
   sex: 'male',
@@ -132,7 +132,7 @@ You have access to MCP tools. Use:
 ### Personality Structure
 
 ```javascript
-await $.ai.setPersonality(npcId, {
+await $ai.setPersonality(npcId, {
   // Core character traits (3-5 recommended)
   traits: ['paranoid', 'intelligent', 'resourceful'],
   
@@ -163,7 +163,7 @@ await $.ai.setPersonality(npcId, {
 ### History Structure
 
 ```javascript
-await $.ai.setHistory(npcId, {
+await $ai.setHistory(npcId, {
   // The big picture - who are they?
   backstory: 'Former corporate investigator who discovered too much. ' +
              'Went underground three years ago. Lives off the grid.',
@@ -217,7 +217,7 @@ ai({
 });
 
 // Or directly in code
-await $.ai.addMemory(npcId, {
+await $ai.addMemory(npcId, {
   text: 'The building went into lockdown. Something happened on floor 33.',
   importance: 'important',
   tags: ['event', 'lockdown']
@@ -230,13 +230,13 @@ Give NPCs context before players interact:
 
 ```javascript
 // After spawn
-await $.ai.addMemory(npc.id, {
+await $ai.addMemory(npc.id, {
   text: 'Started work here three months ago. The night shift is quiet but eerie.',
   importance: 'normal',
   tags: ['job', 'background']
 });
 
-await $.ai.addMemory(npc.id, {
+await $ai.addMemory(npc.id, {
   text: 'Heard strange sounds from floor 15 last week. Nobody else seems concerned.',
   importance: 'important',
   tags: ['mystery', 'floor-15']
@@ -269,9 +269,9 @@ notes({
 ### The Guard
 
 ```javascript
-const guard = await $.ai.spawn('guard', { name: 'Elena', sex: 'female' });
+const guard = await $ai.spawn('guard', { name: 'Elena', sex: 'female' });
 
-await $.ai.setPersonality(guard.id, {
+await $ai.setPersonality(guard.id, {
   traits: ['vigilant', 'by-the-book', 'protective'],
   quirks: ['taps badge when nervous', 'stands with hands clasped'],
   values: ['order', 'safety', 'procedure'],
@@ -287,9 +287,9 @@ notes({ action: 'add', objectId: guard.id,
 ### The Merchant
 
 ```javascript
-const merchant = await $.ai.spawn('shopkeeper', { name: 'Raj' });
+const merchant = await $ai.spawn('shopkeeper', { name: 'Raj' });
 
-await $.ai.setPersonality(merchant.id, {
+await $ai.setPersonality(merchant.id, {
   traits: ['shrewd', 'friendly', 'gossip'],
   quirks: ['always offers tea', 'names prices then pauses dramatically'],
   values: ['profit', 'reputation', 'connections'],
@@ -305,9 +305,9 @@ notes({ action: 'add', objectId: merchant.id,
 ### The Information Broker
 
 ```javascript
-const broker = await $.ai.spawn('fixer', { name: 'Ghost' });
+const broker = await $ai.spawn('fixer', { name: 'Ghost' });
 
-await $.ai.setPersonality(broker.id, {
+await $ai.setPersonality(broker.id, {
   traits: ['mysterious', 'connected', 'transactional'],
   quirks: ['never gives a straight answer', 'speaks in riddles'],
   values: ['information', 'neutrality', 'discretion'],
@@ -365,6 +365,6 @@ npc.agentSession = null;
 
 ## See Also
 
-- [$.ai Registry](./ai.md) - Full API reference
+- [$ai Registry](./ai.md) - Full API reference
 - [NPC Agent System](../npc-agent.md) - Technical architecture
-- [$.query](./ai.md#aiquery) - How AI queries work
+- [$query](./ai.md#aiquery) - How AI queries work

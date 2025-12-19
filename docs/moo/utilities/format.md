@@ -1,6 +1,6 @@
-# $.format - Text Formatting
+# $format - Text Formatting
 
-Use `$.format` for text layout, list formatting, and combining items with pronouns.
+Use `$format` for text layout, list formatting, and combining items with pronouns.
 
 ## Purpose
 
@@ -25,7 +25,7 @@ function formatList2(items) {
 
 **Good: Consistent formatting**
 ```javascript
-await $.format.prose(['sword', 'shield', 'helm'])
+await $format.prose(['sword', 'shield', 'helm'])
 // "sword, shield, and helm" - Always correct
 ```
 
@@ -34,7 +34,7 @@ await $.format.prose(['sword', 'shield', 'helm'])
 ### prose() - Natural Language Lists
 
 ```javascript
-await $.format.prose(items, conjunction = 'and')
+await $format.prose(items, conjunction = 'and')
 ```
 
 Formats array as grammatical list with Oxford comma.
@@ -46,16 +46,16 @@ Formats array as grammatical list with Oxford comma.
 
 **Examples:**
 ```javascript
-await $.format.prose(['sword'])                      // "sword"
-await $.format.prose(['sword', 'shield'])            // "sword and shield"
-await $.format.prose(['sword', 'shield', 'helm'])    // "sword, shield, and helm"
-await $.format.prose(['red', 'blue'], 'or')          // "red or blue"
+await $format.prose(['sword'])                      // "sword"
+await $format.prose(['sword', 'shield'])            // "sword and shield"
+await $format.prose(['sword', 'shield', 'helm'])    // "sword, shield, and helm"
+await $format.prose(['red', 'blue'], 'or')          // "red or blue"
 ```
 
 ### compose() - Template with List + Pronouns
 
 ```javascript
-await $.format.compose(template, items, options?)
+await $format.compose(template, items, options?)
 ```
 
 The most powerful formatting tool—combines list formatting, count-based verb conjugation, and pronoun substitution in one call.
@@ -76,29 +76,29 @@ The most powerful formatting tool—combines list formatting, count-based verb c
 | `%a` | List with "a/an" | "a sword" | "a sword and shield" |
 | `%v{verb}` | Verb conjugated by count | "falls" | "fall" |
 
-**Plus all `$.pronoun` codes** (`%N`, `%s`, `%p`, `%tN`, etc.) when you pass an actor.
+**Plus all `$pronoun` codes** (`%N`, `%s`, `%p`, `%tN`, etc.) when you pass an actor.
 
 **Examples:**
 
 **Basic list formatting:**
 ```javascript
 // Single item
-await $.format.compose('%T %v{fall} to the ground.', ['sword'])
+await $format.compose('%T %v{fall} to the ground.', ['sword'])
 // "The sword falls to the ground."
 
 // Multiple items
-await $.format.compose('%T %v{fall} to the ground.', ['sword', 'shield'])
+await $format.compose('%T %v{fall} to the ground.', ['sword', 'shield'])
 // "The sword and shield fall to the ground."
 
 // Three+ items (Oxford comma)
-await $.format.compose('%T %v{clatter} noisily.', ['sword', 'shield', 'helm'])
+await $format.compose('%T %v{clatter} noisily.', ['sword', 'shield', 'helm'])
 // "The sword, shield, and helm clatter noisily."
 ```
 
 **Combining with pronouns:**
 ```javascript
 // Actor watching items fall
-await $.format.compose(
+await $format.compose(
   '%N %v{watch} as %t %v{tumble} to the ground.',
   ['coins'],
   { actor: player }
@@ -107,7 +107,7 @@ await $.format.compose(
 // Others: "Bob watches as the coins tumble to the ground."
 
 // Actor dropping multiple items
-await $.format.compose(
+await $format.compose(
   '%N %v{drop} %t.',
   ['sword', 'shield'],
   { actor: player }
@@ -116,7 +116,7 @@ await $.format.compose(
 // Others: "Bob drops the sword and shield."
 
 // Full interaction with target
-await $.format.compose(
+await $format.compose(
   '%N %v{throw} %t at %tN!',
   ['dagger', 'rock'],
   { actor: attacker, target: victim }
@@ -131,47 +131,47 @@ await $.format.compose(
 // 1 item = singular verb (falls, is, has)
 // 2+ items = plural verb (fall, are, have)
 
-await $.format.compose('%T %v{is} broken.', ['sword'])
+await $format.compose('%T %v{is} broken.', ['sword'])
 // "The sword is broken."
 
-await $.format.compose('%T %v{is} broken.', ['sword', 'shield'])
+await $format.compose('%T %v{is} broken.', ['sword', 'shield'])
 // "The sword and shield are broken."
 
 // Works with irregular verbs
-await $.format.compose('%T %v{have} been destroyed.', ['sword'])
+await $format.compose('%T %v{have} been destroyed.', ['sword'])
 // "The sword has been destroyed."
 
-await $.format.compose('%T %v{have} been destroyed.', ['sword', 'armor'])
+await $format.compose('%T %v{have} been destroyed.', ['sword', 'armor'])
 // "The sword and armor have been destroyed."
 ```
 
 ### verb() - Count-Based Conjugation
 
 ```javascript
-await $.format.verb(verb, count)
+await $format.verb(verb, count)
 ```
 
 Conjugates verb based on count (for use outside compose).
 
 **Examples:**
 ```javascript
-await $.format.verb('fall', 1)   // "falls"
-await $.format.verb('fall', 3)   // "fall"
-await $.format.verb('are', 1)    // "is"
-await $.format.verb('have', 1)   // "has"
+await $format.verb('fall', 1)   // "falls"
+await $format.verb('fall', 3)   // "fall"
+await $format.verb('are', 1)    // "is"
+await $format.verb('have', 1)   // "has"
 ```
 
 ### Layout Utilities
 
 #### columns()
 ```javascript
-await $.format.columns(items, columnCount)
+await $format.columns(items, columnCount)
 // ["a    b", "c    d", "e"]
 ```
 
 #### table()
 ```javascript
-await $.format.table([
+await $format.table([
   ['Name', 'HP', 'Status'],
   ['Goblin', '10', 'Alive'],
   ['Orc', '25', 'Dead']
@@ -180,34 +180,34 @@ await $.format.table([
 
 #### bar()
 ```javascript
-await $.format.bar(current, max, width, options?)
+await $format.bar(current, max, width, options?)
 // "[===============     ] 75%"
 ```
 
 #### list()
 ```javascript
-await $.format.list(items, { style: 'bullet' })
+await $format.list(items, { style: 'bullet' })
 // ["  • sword", "  • shield"]
 ```
 
 #### keyValue()
 ```javascript
-await $.format.keyValue({ Name: 'Bob', HP: 100, Status: 'Alive' })
+await $format.keyValue({ Name: 'Bob', HP: 100, Status: 'Alive' })
 // ["Name:   Bob", "HP:     100", "Status: Alive"]
 ```
 
 #### box()
 ```javascript
-await $.format.box('Hello!', { style: 'single' })
+await $format.box('Hello!', { style: 'single' })
 // ["┌────────┐", "│ Hello! │", "└────────┘"]
 ```
 
 #### Text Manipulation
 ```javascript
-await $.format.wrap(text, width)       // Word wrap
-await $.format.padRight(text, width)   // "hi        "
-await $.format.padLeft(text, width)    // "   42"
-await $.format.center(text, width)     // "    hi    "
+await $format.wrap(text, width)       // Word wrap
+await $format.padRight(text, width)   // "hi        "
+await $format.padLeft(text, width)    // "   42"
+await $format.center(text, width)     // "    hi    "
 ```
 
 ## Real-World Examples
@@ -216,7 +216,7 @@ await $.format.center(text, width)     // "    hi    "
 
 ```javascript
 const items = ['rusty sword', 'torn cloak', 'gold coin'];
-await $.format.compose('%N %v{pick} up %t.', items, { actor: player });
+await $format.compose('%N %v{pick} up %t.', items, { actor: player });
 // "You pick up the rusty sword, torn cloak, and gold coin."
 ```
 
@@ -224,7 +224,7 @@ await $.format.compose('%N %v{pick} up %t.', items, { actor: player });
 
 ```javascript
 const destroyed = ['shirt', 'pants'];
-await $.format.compose('%p %T %v{fall} away in tatters.', destroyed, { actor: corpse });
+await $format.compose('%p %T %v{fall} away in tatters.', destroyed, { actor: corpse });
 // "His shirt and pants fall away in tatters."
 ```
 
@@ -232,7 +232,7 @@ await $.format.compose('%p %T %v{fall} away in tatters.', destroyed, { actor: co
 
 ```javascript
 const wounds = ['deep gash', 'bruise'];
-await $.format.compose('%N %v{inflict} %a on %tN!', wounds, { actor: attacker, target: victim });
+await $format.compose('%N %v{inflict} %a on %tN!', wounds, { actor: attacker, target: victim });
 // "You inflict a deep gash and bruise on Bob!"
 ```
 
@@ -241,7 +241,7 @@ await $.format.compose('%N %v{inflict} %a on %tN!', wounds, { actor: attacker, t
 ```javascript
 const items = room.contents.filter(c => c.type === 'item').map(i => i.name);
 if (items.length > 0) {
-  const msg = await $.format.compose('%T %v{is} here.', items);
+  const msg = await $format.compose('%T %v{is} here.', items);
   await player.tell(msg);
 }
 // "The sword, shield, and helm are here."
@@ -253,7 +253,7 @@ if (items.length > 0) {
 async dropMultiple(player, itemNames) {
   const items = itemNames.map(name => this.findItem(player, name));
   
-  await $.format.compose(
+  await $format.compose(
     '%N %v{drop} %t.',
     items.map(i => i.name),
     { actor: player }
@@ -271,7 +271,7 @@ async dropMultiple(player, itemNames) {
 1. **Use compose() for multi-item messages** - Handles lists + pronouns in one call
 2. **Use prose() for simple lists** - When you don't need pronouns
 3. **Verb conjugation is automatic** - compose() uses list count
-4. **Combine with $.pronoun** - compose() accepts all pronoun codes
+4. **Combine with $pronoun** - compose() accepts all pronoun codes
 5. **Test with 1, 2, and 3+ items** - Verify singular/plural and Oxford comma
 
 ## Common Patterns
@@ -280,14 +280,14 @@ async dropMultiple(player, itemNames) {
 
 ```javascript
 // Format items with proper perspective
-await $.format.compose('%N %v{see} %t.', itemNames, { actor: player });
+await $format.compose('%N %v{see} %t.', itemNames, { actor: player });
 ```
 
 ### Conditional Verbs
 
 ```javascript
 // Verb changes based on count
-await $.format.compose('%T %v{is} damaged.', items);
+await $format.compose('%T %v{is} damaged.', items);
 // 1 item:  "The sword is damaged."
 // 2 items: "The sword and shield are damaged."
 ```
@@ -296,12 +296,12 @@ await $.format.compose('%T %v{is} damaged.', items);
 
 ```javascript
 // Use pronoun codes with lists
-await $.format.compose('%p %t %v{break}.', items, { actor: player });
+await $format.compose('%p %t %v{break}.', items, { actor: player });
 // "Your sword and shield break."
 ```
 
 ## See Also
 
-- [$.english](./english.md) - Grammar and pluralization (used internally)
-- [$.pronoun](./pronoun.md) - Perspective-aware messaging (used in compose)
+- [$english](./english.md) - Grammar and pluralization (used internally)
+- [$pronoun](./pronoun.md) - Perspective-aware messaging (used in compose)
 - [Best Practices](../best-practices.md) - Composition patterns

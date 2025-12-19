@@ -31,23 +31,23 @@ New to Malice? Start here:
 ## Utility Libraries
 
 ### Text & Formatting
-- **[$.english](./utilities/english.md)** ✅ - Grammar: articles, plurals, conjugation, ordinals, lists
-- **[$.pronoun](./utilities/pronoun.md)** ✅ - Perspective-aware messaging (you vs Bob)
-- **[$.format](./utilities/format.md)** ✅ - Text layout: columns, tables, templates, compose()
-- **[$.proportional](./utilities/proportional.md)** ✅ - Proportional message selection (health bars, hunger, etc.)
+- **[$english](./utilities/english.md)** ✅ - Grammar: articles, plurals, conjugation, ordinals, lists
+- **[$pronoun](./utilities/pronoun.md)** ✅ - Perspective-aware messaging (you vs Bob)
+- **[$format](./utilities/format.md)** ✅ - Text layout: columns, tables, templates, compose()
+- **[$proportional](./utilities/proportional.md)** ✅ - Proportional message selection (health bars, hunger, etc.)
 
 ### Object Management
-- **[$.recycler](./utilities/recycler.md)** ✅ - Object lifecycle: create, destroy, recycle, pooling
-- **[$.memento](./utilities/memento.md)** ✅ - Object cloning and serialization (templates)
+- **[$recycler](./utilities/recycler.md)** ✅ - Object lifecycle: create, destroy, recycle, pooling
+- **[$memento](./utilities/memento.md)** ✅ - Object cloning and serialization (templates)
 
 ### Concurrency & Actions
-- **[$.exclusions](./utilities/exclusions.md)** ✅ - Action exclusion system (sitting/walking conflicts)
-- **[$.mutex](./utilities/mutex.md)** ✅ - Object-based locks with timeouts
-- **[$.scheduler](./utilities/scheduler.md)** ✅ - Persistent job scheduling (heartbeats, decay, timed events)
+- **[$exclusions](./utilities/exclusions.md)** ✅ - Action exclusion system (sitting/walking conflicts)
+- **[$mutex](./utilities/mutex.md)** ✅ - Object-based locks with timeouts
+- **[$scheduler](./utilities/scheduler.md)** ✅ - Persistent job scheduling (heartbeats, decay, timed events)
 
 ### Interactive Systems
-- **[$.prompt](./utilities/prompt.md)** ✅ - Interactive prompts and menus (question, yesorno, choice, multiline)
-- **[$.emote](./utilities/emote.md)** ✅ - Sensory-aware emotes (visual, audio, smell, taste)
+- **[$prompt](./utilities/prompt.md)** ✅ - Interactive prompts and menus (question, yesorno, choice, multiline)
+- **[$emote](./utilities/emote.md)** ✅ - Sensory-aware emotes (visual, audio, smell, taste)
 
 ## Prototypes
 
@@ -84,14 +84,14 @@ New to Malice? Start here:
 ## AI & NPCs
 
 - **[Building Great NPCs](./npc-guide.md)** ✅ - Practical guide: spawn, personality, memories, system prompts
-- **[$.ai Registry](./ai.md)** ✅ - AI-controlled humans, spawn, $.query(), API reference
+- **[$ai Registry](./ai.md)** ✅ - AI-controlled humans, spawn, $query(), API reference
 - **[NPC Agent System](../npc-agent.md)** ✅ - Technical architecture, MCP integration
 
 ## Advanced Topics
 
 - **[Verb System](./advanced/verbs.md)** ✅ - Dynamic per-player verb registration, hooks, patterns
 - **[Sensory System](./advanced/sensory-system.md)** ✅ - Five senses (see, hear, smell, taste, feel), tell() vs sensory methods
-- **[Object Creation & Movement](./advanced/objects.md)** ✅ - $.recycler, moveTo(), hooks, best practices
+- **[Object Creation & Movement](./advanced/objects.md)** ✅ - $recycler, moveTo(), hooks, best practices
 - **[Bootstrap System](./advanced/bootstrap.md)** ✅ - Three-phase bootstrap, creating custom utilities, builder pattern
 
 ### Additional Topics (Coming Soon)

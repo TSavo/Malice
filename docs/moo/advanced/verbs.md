@@ -96,7 +96,7 @@ Only the following placeholder codes are currently implemented in the command ma
 - `%t` (match the *handler object* name/aliases and pass the handler as an argument)
 - `%s` (consume the rest of input as a string)
 
-This is separate from the pronoun/template formatter used by `$.pronoun.*` (which has its own formatting codes like `%d`, `%tN`, etc.).
+This is separate from the pronoun/template formatter used by `$pronoun.*` (which has its own formatting codes like `%d`, `%tN`, etc.).
 
 ### Complete Flow
 
@@ -241,7 +241,7 @@ obj.setMethod('doWear', `
 
   // 3. Announce to room
   const room = await $.load(player.location);
-  await $.pronoun.announce(room, '%N puts on %d.', player, self);
+  await $pronoun.announce(room, '%N puts on %d.', player, self);
 
   return result.message;
 `);
@@ -397,7 +397,7 @@ obj.setMethod('onLeaving', `
 Called on container when something arrives:
 
 ```javascript
-// $.room.onContentArrived() - register exit verbs
+// $room.onContentArrived() - register exit verbs
 async onContentArrived(obj, source, mover) {
   if (obj.isPlayer) {
     // Register exit verbs with player
@@ -429,7 +429,7 @@ async onContentLeaving(obj, dest, mover) {
 ### Player Connection
 
 ```javascript
-// $.player.connect() - registers base commands
+// $player.connect() - registers base commands
 async connect() {
   await self.registerVerb(['look', 'l'], self, 'look');
   await self.registerVerb(['inventory', 'i'], self, 'inventory');
@@ -448,7 +448,7 @@ async connect() {
 ### Admin Extension
 
 ```javascript
-// $.admin.connect() - adds admin commands, then calls parent
+// $admin.connect() - adds admin commands, then calls parent
 async connect() {
   // Register admin-only verbs FIRST
   await self.registerVerb(['@dig %s'], self, 'dig');
@@ -489,7 +489,7 @@ obj.setMethod('doEat', `
   await player.unregisterVerbsFrom(self);
 
   // Recycle object
-  await $.recycler.recycle(self);
+  await $recycler.recycle(self);
 
   return 'You eat the ' + self.name + '.';
 `);

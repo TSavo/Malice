@@ -6,7 +6,7 @@ Food, drink, and digestion mechanics.
 
 The consumables system models eating, drinking, and digestion:
 
-- **Edibles** decay over time (inherit from $.decayable)
+- **Edibles** decay over time (inherit from $decayable)
 - **Consumption** sends food to stomach
 - **Digestion** extracts calories over time
 - **Effects** can apply status effects (sedation, nausea, etc.)
@@ -14,16 +14,16 @@ The consumables system models eating, drinking, and digestion:
 
 **Prototype Hierarchy:**
 ```
-$.decayable
-└── $.edible           ← Base consumable
-    ├── $.food         ← Solid food (eat verb)
-    └── $.drink        ← Liquids (drink verb)
+$decayable
+└── $edible           ← Base consumable
+    ├── $food         ← Solid food (eat verb)
+    └── $drink        ← Liquids (drink verb)
 
-$.stackable
-└── $.stomachContents  ← Digesting food in stomach (aggregates like stackables)
+$stackable
+└── $stomachContents  ← Digesting food in stomach (aggregates like stackables)
 ```
 
-## $.edible - Base Consumable
+## $edible - Base Consumable
 
 Foundation for all consumable items.
 
@@ -54,7 +54,7 @@ Foundation for all consumable items.
   weight: 100,            // grams
   volume: 100,            // ml
 
-  // Decay (inherits from $.decayable)
+  // Decay (inherits from $decayable)
   decayCondition: 'harvested',
   decayRate: 0.01,        // ~7 days to fully rot
   harvested: false,
@@ -129,9 +129,9 @@ if (await food.hasRemaining()) {
 }
 ```
 
-## $.food - Solid Food
+## $food - Solid Food
 
-Inherits from $.edible, provides `eat` verb.
+Inherits from $edible, provides `eat` verb.
 
 ### Properties
 
@@ -195,9 +195,9 @@ Food auto-registers `eat` verb when:
 // > eat %t
 ```
 
-## $.drink - Liquids
+## $drink - Liquids
 
-Inherits from $.edible, provides `drink` verb.
+Inherits from $edible, provides `drink` verb.
 
 ### Properties
 
@@ -245,9 +245,9 @@ const desc = await drink.describe();
 
 Levels: empty, almost empty, half full, mostly full, full
 
-## $.stomachContents - Digesting Food
+## $stomachContents - Digesting Food
 
-Inherits from: **$.stackable**
+Inherits from: **$stackable**
 
 Created when food is consumed. Tracks digestion progress. Inherits stackable's merge/split capabilities for aggregation.
 
@@ -255,7 +255,7 @@ Created when food is consumed. Tracks digestion progress. Inherits stackable's m
 
 ```javascript
 {
-  // Inherited from $.stackable
+  // Inherited from $stackable
   stackType: null,        // Set dynamically based on sourceProto
   quantity: 1,            // How many consumed (inherited)
   unit: 'servings',
@@ -282,7 +282,7 @@ Created when food is consumed. Tracks digestion progress. Inherits stackable's m
 
 ### Aggregation (via Stackable)
 
-StomachContents inherits from $.stackable, enabling automatic aggregation:
+StomachContents inherits from $stackable, enabling automatic aggregation:
 
 ```javascript
 // Eating 3 apples:
@@ -300,7 +300,7 @@ stomachContents = {
 - Same `spoiled` state
 - Same `poisoned` state
 
-### Inherited Methods (from $.stackable)
+### Inherited Methods (from $stackable)
 
 - `merge(other)` - Combine two stomach contents (also merges calories/volume)
 - `split(amount)` - Split off a portion (inherited, rarely used)
@@ -394,7 +394,7 @@ If fully digested: remove from stomach
 Consumables can apply status effects:
 
 ```javascript
-const druggedDrink = await $.recycler.create($.drink, {
+const druggedDrink = await $recycler.create($drink, {
   name: 'drugged cocktail',
   effects: {
     sedation: { intensity: 30, decay: 0.5 },
@@ -419,7 +419,7 @@ const druggedDrink = await $.recycler.create($.drink, {
 ### Basic Food
 
 ```javascript
-const apple = await $.recycler.create($.food, {
+const apple = await $recycler.create($food, {
   name: 'an apple',
   description: 'A crisp red apple.',
   calories: 95,
@@ -437,7 +437,7 @@ const apple = await $.recycler.create($.food, {
 ### Alcoholic Drink
 
 ```javascript
-const beer = await $.recycler.create($.drink, {
+const beer = await $recycler.create($drink, {
   name: 'a beer',
   description: 'A cold lager.',
   calories: 150,
@@ -456,7 +456,7 @@ const beer = await $.recycler.create($.drink, {
 ### Poisoned Food
 
 ```javascript
-const poisonedMeat = await $.recycler.create($.food, {
+const poisonedMeat = await $recycler.create($food, {
   name: 'suspicious meat',
   description: 'Something smells off.',
   calories: 200,
@@ -473,7 +473,7 @@ Store food in refrigerated containers:
 
 ```javascript
 // Create a fridge
-const fridge = await $.recycler.create($.location, {
+const fridge = await $recycler.create($location, {
   name: 'refrigerator',
   refrigerated: true,
 });

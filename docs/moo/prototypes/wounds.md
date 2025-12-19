@@ -12,7 +12,7 @@ Wounds are complex objects that exist on body parts. They model injury progressi
 - **Healing** progresses with proper treatment
 - **Forensics** for autopsy examination
 
-## $.wound - Wound Prototype
+## $wound - Wound Prototype
 
 ### Properties
 
@@ -370,7 +370,7 @@ await bodyPart.addWound({
 ### Direct Creation
 
 ```javascript
-const wound = await $.recycler.create($.wound, {});
+const wound = await $recycler.create($wound, {});
 await wound.initialize('puncture', 60, {
   depth: 'penetrating',
   cause: 'bite',
@@ -435,7 +435,7 @@ await bodyPart.tick();  // Calls wound.tick() for each wound
 // Wound removal when healed
 if (wound.healingProgress >= 100) {
   await bodyPart.removeWound(wound);
-  await $.recycler.recycle(wound);
+  await $recycler.recycle(wound);
 }
 ```
 

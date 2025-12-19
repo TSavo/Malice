@@ -5,13 +5,13 @@ Players, NPCs, and embodied entities in Malice.
 ## Overview
 
 The agent system models all entities that can act, perceive, and interact:
-- **$.agent** - Base for acting entities
-- **$.embodied** - Has a body (body parts, health)
-- **$.human** - Human-type body structure
-- **$.player** - Player character
-- **$.admin** - Admin player with extra commands
+- **$agent** - Base for acting entities
+- **$embodied** - Has a body (body parts, health)
+- **$human** - Human-type body structure
+- **$player** - Player character
+- **$admin** - Admin player with extra commands
 
-## $.agent - Base Prototype
+## $agent - Base Prototype
 
 ### Purpose
 
@@ -52,7 +52,7 @@ Move agent to a new location.
 await agent.moveTo(room);
 ```
 
-## $.embodied - Entities with Bodies
+## $embodied - Entities with Bodies
 
 ### Purpose
 
@@ -95,7 +95,7 @@ Heal a body part.
 await player.heal(5, 'head');
 ```
 
-## $.human - Human-Type Body
+## $human - Human-Type Body
 
 ### Purpose
 
@@ -124,11 +124,11 @@ Defines standard human anatomy and stats.
 }
 ```
 
-## $.player - Player Character
+## $player - Player Character
 
 ### Purpose
 
-Represents a human-controlled character. Inherits from $.human.
+Represents a human-controlled character. Inherits from $human.
 
 ### Properties
 
@@ -168,7 +168,7 @@ Send an audio message (respects deafness).
 await player.hear('You hear footsteps.');
 ```
 
-## $.admin - Admin Player
+## $admin - Admin Player
 
 ### Purpose
 
@@ -195,12 +195,12 @@ await admin.doAdminCommand('@dig Lobby');
 ## Real-World Example: Player Creation
 
 ```javascript
-const body = await $.recycler.create($.human, {
+const body = await $recycler.create($human, {
   gender: 'female',
   age: 30
 });
 
-const player = await $.recycler.create($.player, {
+const player = await $recycler.create($player, {
   name: 'Alice',
   body: body.id,
   location: startRoom.id,

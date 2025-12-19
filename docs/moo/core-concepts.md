@@ -180,18 +180,18 @@ $.aliases
 // { nothing: -1, root: 1, system: 2, english: 5, format: 6, ... }
 ```
 
-### How `$.alias` Syntax Works
+### How `$alias` Syntax Works
 
-When you write `$.english`, the Proxy does this:
+When you write `$english`, the Proxy does this:
 
 ```javascript
-// $.english internally does:
+// $english internally does:
 const id = $.aliases['english'];  // Look up 'english' in $.aliases -> 5
 const obj = await $.load(id);     // Load object #5
 return obj;                       // Return the RuntimeObject
 ```
 
-So `$.english.plural('cat')` is really:
+So `$english.plural('cat')` is really:
 1. Get `$.aliases` property (from #0)
 2. Find `english` -> `5`
 3. Return object #5 (already in memory)
@@ -204,13 +204,13 @@ So `$.english.plural('cat')` is really:
 const english = await $[5];  // What if english is #7 in this DB?
 
 // DO: Aliases are stable across databases
-const english = $.english;   // Always works
+const english = $english;   // Always works
 ```
 
 ### Managing Aliases
 
 ```javascript
-// Add an alias (makes $.myUtils work)
+// Add an alias (makes $myUtils work)
 await $.addAlias('myUtils', obj);  // Pass object, not .id
 
 // Remove an alias
@@ -243,7 +243,7 @@ These four aliases are protected and cannot be removed:
 | Compare objects | `if (a === b)` |
 | Store in array | `self.items = [item1, item2]` |
 | Load by ID | `await $.load(42)` or `await $[42]` |
-| Access utility | `$.english` or `$.format` |
+| Access utility | `$english` or `$format` |
 | Add alias | `await $.addAlias('name', obj)` |
 
 ## Anti-Patterns to Avoid

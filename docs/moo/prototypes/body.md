@@ -5,12 +5,12 @@ Body parts, wounds, metabolism, and death states in Malice.
 ## Overview
 
 The body system models player and NPC anatomy, health, and injury:
-- **$.bodyPart** - Base for all body parts
-- **$.hand / $.head / $.stomach** - Specific body parts
-- **$.wound** - Injury system
-- **$.corpse / $.humanRemains / $.skeletalRemains** - Death/decay states
+- **$bodyPart** - Base for all body parts
+- **$hand / $head / $stomach** - Specific body parts
+- **$wound** - Injury system
+- **$corpse / $humanRemains / $skeletalRemains** - Death/decay states
 
-## $.bodyPart - Base Prototype
+## $bodyPart - Base Prototype
 
 ### Purpose
 
@@ -53,10 +53,10 @@ await hand.addWound(woundObj);
 
 ## Specific Body Parts
 
-### $.hand
+### $hand
 
 ```javascript
-const hand = await $.recycler.create($.hand, {
+const hand = await $recycler.create($hand, {
   name: 'right hand',
   partType: 'hand',
   health: 100,
@@ -64,10 +64,10 @@ const hand = await $.recycler.create($.hand, {
 });
 ```
 
-### $.head
+### $head
 
 ```javascript
-const head = await $.recycler.create($.head, {
+const head = await $recycler.create($head, {
   name: 'head',
   partType: 'head',
   health: 100,
@@ -75,10 +75,10 @@ const head = await $.recycler.create($.head, {
 });
 ```
 
-### $.stomach
+### $stomach
 
 ```javascript
-const stomach = await $.recycler.create($.stomach, {
+const stomach = await $recycler.create($stomach, {
   name: 'stomach',
   partType: 'stomach',
   health: 100,
@@ -86,7 +86,7 @@ const stomach = await $.recycler.create($.stomach, {
 });
 ```
 
-## $.wound - Injury System
+## $wound - Injury System
 
 ### Purpose
 
@@ -122,34 +122,34 @@ await wound.infect();
 
 ## Death & Decay States
 
-### $.corpse
+### $corpse
 
 Represents a dead body. Can decay into remains.
 
 ```javascript
-const corpse = await $.recycler.create($.corpse, {
+const corpse = await $recycler.create($corpse, {
   name: 'corpse of Alice',
   decayRate: 0.05
 });
 ```
 
-### $.humanRemains
+### $humanRemains
 
 Represents decomposed remains.
 
 ```javascript
-const remains = await $.recycler.create($.humanRemains, {
+const remains = await $recycler.create($humanRemains, {
   name: 'human remains',
   decayRate: 0.1
 });
 ```
 
-### $.skeletalRemains
+### $skeletalRemains
 
 Represents skeletonized remains.
 
 ```javascript
-const skeleton = await $.recycler.create($.skeletalRemains, {
+const skeleton = await $recycler.create($skeletalRemains, {
   name: 'skeletal remains',
   decayRate: 0.2
 });
@@ -192,7 +192,7 @@ const calories = await stomach.digest(); // Extracts calories per tick
   - Starvation/death logic: If body decay > 50%, triggers death
 
 **Scheduler Integration:**
-- `$.scheduler.tick()` runs every second (see `game-coordinator.ts`)
+- `$scheduler.tick()` runs every second (see `game-coordinator.ts`)
 - Triggers digestion/metabolism jobs for all embodied agents
 
 ### Food Items
@@ -201,7 +201,7 @@ const calories = await stomach.digest(); // Extracts calories per tick
 
 **Example:**
 ```javascript
-const apple = await $.recycler.create($.food, { calories: 95, bites: 3 });
+const apple = await $recycler.create($food, { calories: 95, bites: 3 });
 await stomach.canContain(apple);
 await stomach.digest(); // Extracts calories
 ```
@@ -224,12 +224,12 @@ await stomach.digest(); // Extracts calories
 
 ## Tips & Best Practices
 
-1. **Model all body parts** - Use $.bodyPart for hands, head, stomach, etc.
+1. **Model all body parts** - Use $bodyPart for hands, head, stomach, etc.
 2. **Track wounds per part** - Each part can have multiple wounds
 3. **Use decay for corpses** - Dead bodies should decay over time
 4. **Metabolism affects healing** - Nutrition speeds recovery
 5. **Infection risk for wounds** - Add infection logic for realism
-6. **Custom parts for non-humans** - Extend $.bodyPart for animals, robots
+6. **Custom parts for non-humans** - Extend $bodyPart for animals, robots
 7. **Test injury and healing** - Simulate combat and recovery
 
 ## See Also
