@@ -3,12 +3,12 @@ import type { RuntimeObject } from '../../../../types/object.js';
 
 /**
  * Builds the Admin prototype
- * Extends Player with world-building commands like @dig, @create, @destroy
+ * Extends Player with world-building commands like @dig, @create, @recycle
  *
  * Admin commands use @ prefix and $.prompt for interactive input:
  * - @dig: Create a new room with exits
  * - @create: Create objects
- * - @destroy: Remove objects
+ * - @recycle: Recycle objects
  * - @teleport: Move to any room
  * - @set: Set properties on objects
  * - @examine: Deep inspect objects
@@ -464,7 +464,7 @@ export class AdminBuilder {
       await self.registerVerb(['@set %s', '@set %s %s'], self, '@set');
       await self.registerVerb(['@create', '@create %s'], self, '@create');
       await self.registerVerb(['@create-object', '@create-object %s'], self, '@create-object');
-      await self.registerVerb(['@destroy %s'], self, '@destroy');
+      await self.registerVerb(['@recycle %s'], self, '@recycle');
       await self.registerVerb(['@teleport %s', '@tp %s'], self, '@teleport');
       await self.registerVerb(['@goto %s'], self, '@goto');
       await self.registerVerb(['@summon %s'], self, '@summon');
@@ -486,7 +486,7 @@ export class AdminBuilder {
 
       // Show admin commands after welcome but before we're done
       // Note: prompt was already shown by parent, so this appears after
-      await self.tell('[Admin commands: @dig, @link, @teleport, @examine, @set, @create, @destroy, @eval, @evalm]');
+      await self.tell('[Admin commands: @dig, @link, @teleport, @examine, @set, @create, @recycle, @eval, @evalm]');
     `);
   }
 
@@ -1037,16 +1037,16 @@ export class AdminBuilder {
     `);
 
 
-    // @destroy - Destroy an object
-    obj.setMethod('@destroy', `
-      /** Destroy an object.
-       *  Usage: @destroy #123
+    // @recycle - Recycle an object
+    obj.setMethod('@recycle', `
+      /** Recycle an object.
+       *  Usage: @recycle #123
        */
-      const input = command.replace('@destroy', '').trim();
+      const input = command.replace('@recycle', '').trim();
       const targetId = parseInt(input.replace('#', ''), 10);
 
       if (isNaN(targetId)) {
-        await self.tell('Usage: @destroy #123');
+        await self.tell('Usage: @recycle #123');
         return;
       }
 
@@ -1058,7 +1058,7 @@ export class AdminBuilder {
 
       // Safety checks
       if (targetId < 10) {
-        await self.tell('Cannot destroy system objects (ID < 10).');
+        await self.tell('Cannot recycle system objects (ID < 10).');
         return;
       }
 
