@@ -265,6 +265,14 @@ export class ObjectManager {
   async create(params: CreateObjectParams): Promise<RuntimeObject> {
     const id = await this.db.getNextId();
 
+    // Validate parent is a RuntimeObject, not a number
+    if (typeof params.parent === 'number') {
+      throw new Error('Parent must be a RuntimeObject, not a number. Use manager.load(id) to get the parent object.');
+    }
+    if (!params.parent || typeof params.parent.id !== 'number') {
+      throw new Error('Parent must be a RuntimeObject with a valid id property.');
+    }
+
     // Extract parent ID from RuntimeObject and store as ObjRefValue
     const parentId = params.parent.id as ObjId;
 

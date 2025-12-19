@@ -8,12 +8,15 @@ import { DevToolsServer } from '../../src/devtools/devtools-server.js';
 import { ObjectManager } from '../../src/database/object-manager.js';
 import { ObjectDatabase } from '../../src/database/object-db.js';
 
+import type { RuntimeObject } from '../../types/object.js';
+
 // Use sequential to ensure test order for shared server
 describe.sequential('DevToolsServer', () => {
   let server: DevToolsServer;
   let manager: ObjectManager;
   let db: ObjectDatabase;
   let client: WebSocket | null = null;
+  let root: RuntimeObject;
 
   const TEST_PORT = 9998;
   const SERVER_URL = `ws://localhost:${TEST_PORT}`;
@@ -66,6 +69,7 @@ describe.sequential('DevToolsServer', () => {
 
     // Load root object fresh (stable proxy pattern - no cache clearing)
     await manager.loadAll();
+    root = (await manager.load(1))!;
   });
 
   /**
@@ -291,7 +295,7 @@ describe.sequential('DevToolsServer', () => {
       await connectClient();
 
       // Create a test object first
-      await manager.create({ parent: 1, properties: {}, methods: {} });
+      await manager.create({ parent: root, properties: {}, methods: {} });
 
       const id = 123;
       const request = {
@@ -317,8 +321,8 @@ describe.sequential('DevToolsServer', () => {
       await connectClient();
 
       // Create test objects
-      const obj1 = await manager.create({ parent: 1, properties: {}, methods: {} });
-      const obj2 = await manager.create({ parent: 1, properties: {}, methods: {} });
+      const obj1 = await manager.create({ parent: root, properties: {}, methods: {} });
+      const obj2 = await manager.create({ parent: root, properties: {}, methods: {} });
 
       const result = await sendRequest('objects.list');
 
@@ -332,7 +336,7 @@ describe.sequential('DevToolsServer', () => {
     it('should exclude recycled objects by default', async () => {
       await connectClient();
 
-      const obj1 = await manager.create({ parent: 1, properties: {}, methods: {} });
+      const obj1 = await manager.create({ parent: root, properties: {}, methods: {} });
       // Mark as recycled via raw MongoDB (recycling is handled by $.recycler in game)
       await db['objects'].updateOne({ _id: obj1.id }, { $set: { recycled: true } });
 
@@ -346,7 +350,7 @@ describe.sequential('DevToolsServer', () => {
     it('should include recycled objects when requested', async () => {
       await connectClient();
 
-      const obj1 = await manager.create({ parent: 1, properties: {}, methods: {} });
+      const obj1 = await manager.create({ parent: root, properties: {}, methods: {} });
 
       // Mark as recycled via raw MongoDB (recycling is handled by $.recycler in game)
       await db['objects'].updateOne({ _id: obj1.id }, { $set: { recycled: true } });
@@ -363,7 +367,7 @@ describe.sequential('DevToolsServer', () => {
       await connectClient();
 
       const obj = await manager.create({
-        parent: 1,
+        parent: root,
         properties: { name: 'Test' },
         methods: { doSomething: { code: 'return 42;' } },
       });
@@ -387,7 +391,7 @@ describe.sequential('DevToolsServer', () => {
       await connectClient();
 
       const obj = await manager.create({
-        parent: 1,
+        parent: root,
         properties: { name: 'Test' },
         methods: { test: { code: 'return 1;' } },
       });
@@ -450,7 +454,7 @@ describe.sequential('DevToolsServer', () => {
       await connectClient();
 
       const obj = await manager.create({
-        parent: 1,
+        parent: root,
         properties: {},
         methods: { test: { code: 'return 42;' } },
       });
@@ -464,7 +468,7 @@ describe.sequential('DevToolsServer', () => {
     it('should return error for non-existent method', async () => {
       await connectClient();
 
-      const obj = await manager.create({ parent: 1, properties: {}, methods: {} });
+      const obj = await manager.create({ parent: root, properties: {}, methods: {} });
 
       await expect(
         sendRequest('method.get', { objectId: obj.id, name: 'unknown' })
@@ -476,7 +480,7 @@ describe.sequential('DevToolsServer', () => {
     it('should set method code', async () => {
       await connectClient();
 
-      const obj = await manager.create({ parent: 1, properties: {}, methods: {} });
+      const obj = await manager.create({ parent: root, properties: {}, methods: {} });
 
       await sendRequest('method.set', {
         objectId: obj.id,
@@ -493,7 +497,7 @@ describe.sequential('DevToolsServer', () => {
       await connectClient();
 
       const obj = await manager.create({
-        parent: 1,
+        parent: root,
         properties: {},
         methods: { test: { code: 'return 1;' } },
       });
@@ -511,7 +515,7 @@ describe.sequential('DevToolsServer', () => {
     // Skip: Multi-client broadcast tests are flaky in test environment due to timing
     it('should broadcast method.changed notification', async () => {
       await connectClient();
-      const obj = await manager.create({ parent: 1, properties: {}, methods: {} });
+      const obj = await manager.create({ parent: root, properties: {}, methods: {} });
       const { waitForNotification, cleanup } = await setupNotificationClient();
 
       try {
@@ -536,7 +540,7 @@ describe.sequential('DevToolsServer', () => {
       await connectClient();
 
       const obj = await manager.create({
-        parent: 1,
+        parent: root,
         properties: {},
         methods: { test: { code: 'return 1;' } },
       });
@@ -554,7 +558,7 @@ describe.sequential('DevToolsServer', () => {
     it('should broadcast method.deleted notification', async () => {
       await connectClient();
       const obj = await manager.create({
-        parent: 1,
+        parent: root,
         properties: {},
         methods: { test: { code: 'return 1;' } },
       });
@@ -576,7 +580,7 @@ describe.sequential('DevToolsServer', () => {
       await connectClient();
 
       const obj = await manager.create({
-        parent: 1,
+        parent: root,
         properties: { name: 'Test', count: 42 },
         methods: {},
       });
@@ -592,7 +596,7 @@ describe.sequential('DevToolsServer', () => {
     it('should set property value', async () => {
       await connectClient();
 
-      const obj = await manager.create({ parent: 1, properties: {}, methods: {} });
+      const obj = await manager.create({ parent: root, properties: {}, methods: {} });
 
       await sendRequest('property.set', {
         objectId: obj.id,
@@ -610,7 +614,7 @@ describe.sequential('DevToolsServer', () => {
     // Skip: Multi-client broadcast tests are flaky in test environment due to timing
     it('should broadcast property.changed notification', async () => {
       await connectClient();
-      const obj = await manager.create({ parent: 1, properties: {}, methods: {} });
+      const obj = await manager.create({ parent: root, properties: {}, methods: {} });
       const { waitForNotification, cleanup } = await setupNotificationClient();
 
       try {
@@ -633,22 +637,25 @@ describe.sequential('DevToolsServer', () => {
       await connectClient();
 
       const obj = await manager.create({
-        parent: 1,
+        parent: root,
         properties: { name: 'Test' },
         methods: {},
       });
 
       await sendRequest('property.delete', { objectId: obj.id, name: 'name' });
 
+      // Pull fresh data from DB to see the deletion
+      await manager.pull(obj.id);
       const loaded = await manager.load(obj.id);
-      expect(loaded!.get('name')).toBeUndefined();
+      // Check own properties directly, not inherited values
+      expect(loaded!.getOwnProperties().name).toBeUndefined();
     });
 
     // Skip: Multi-client broadcast tests are flaky in test environment due to timing
     it('should broadcast property.deleted notification', async () => {
       await connectClient();
       const obj = await manager.create({
-        parent: 1,
+        parent: root,
         properties: { name: 'Test' },
         methods: {},
       });

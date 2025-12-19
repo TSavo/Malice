@@ -108,7 +108,12 @@ export class RoomBuilder {
       // Show exits (only non-hidden ones)
       const exits = self.exits || [];
       const visibleExits = [];
-      for (const exit of exits) {
+      for (let exitId of exits) {
+        // Load exit object if it's just an ID
+        let exit = exitId;
+        if (typeof exitId === 'number') {
+          exit = await $load(exitId);
+        }
         if (exit && !exit.hidden) {
           const desc = exit.describe ? await exit.describe() : exit.name;
           visibleExits.push(desc);

@@ -26,9 +26,12 @@ export class Recycler {
       caller = arg1;
     } else if (arg0 !== undefined && arg1 && typeof arg1 === 'object') {
       // Legacy format: parent as first arg, properties as second
-      const parentId = typeof arg0 === 'object' ? arg0.id : arg0;
+      // Parent must be a RuntimeObject
+      if (!arg0 || typeof arg0 !== 'object' || typeof arg0.id !== 'number') {
+        throw new Error('Parent must be a RuntimeObject');
+      }
       params = {
-        parent: parentId,
+        parent: arg0,
         properties: arg1,
       };
       caller = arg2;
@@ -38,6 +41,11 @@ export class Recycler {
 
     if (params.parent === undefined) {
       throw new Error('Parent must be specified');
+    }
+
+    // Validate parent is a RuntimeObject
+    if (!params.parent || typeof params.parent !== 'object' || typeof params.parent.id !== 'number') {
+      throw new Error('Parent must be a RuntimeObject');
     }
 
     // Check if caller has permission to create objects
@@ -182,7 +190,8 @@ export class Recycler {
     }
 
     // 3. Reparent to $.nothing (#-1)
-    obj.setParent(-1);
+    const nothing = await $.load(-1);
+    obj.setParent(nothing);
 
     // 4. Mark as recycled
     obj.set('recycled', true);

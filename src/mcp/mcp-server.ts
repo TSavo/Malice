@@ -475,7 +475,7 @@ export class MaliceMCPServer {
                   descendantList.push({
                     id: `#${o._id}`,
                     name: o.properties?.name?.value || '(unnamed)',
-                    parent: `#${o.parent}`,
+                    parent: `#${o.parent.value}`,
                   });
                   if (descendantList.length >= maxResults) break;
                 }
@@ -541,7 +541,7 @@ export class MaliceMCPServer {
               results.push({
                 id: `#${obj._id}`,
                 name: obj.properties?.name?.value || '(unnamed)',
-                parent: `#${obj.parent}`,
+                parent: `#${obj.parent.value}`,
                 location: `#${loc}`,
               });
             }

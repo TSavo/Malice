@@ -21,7 +21,7 @@ describe('PrototypeBuilder', () => {
     // Create ObjectManager #0 and Root #1
     await db.create({
       _id: 0,
-      parent: 0,
+      parent: { type: 'objref', value: 0 },
       properties: {
         name: { type: 'string', value: 'ObjectManager' },
         aliases: {
@@ -37,7 +37,7 @@ describe('PrototypeBuilder', () => {
 
     await db.create({
       _id: 1,
-      parent: 0,
+      parent: { type: 'objref', value: 0 },
       properties: { name: { type: 'string', value: 'Root' } },
       methods: {},
     });
@@ -85,11 +85,11 @@ describe('PrototypeBuilder', () => {
       const playerParent = $.player.getParent();
 
       // Inheritance chain: Root -> Describable -> Agent -> Embodied -> Human -> Player
-      expect(describableParent).toBe($.root.id);
-      expect(agentParent).toBe($.describable.id);
-      expect(embodiedParent).toBe($.agent.id);
-      expect(humanParent).toBe($.embodied.id);
-      expect(playerParent).toBe($.human.id);
+      expect(describableParent?.id).toBe($.root.id);
+      expect(agentParent?.id).toBe($.describable.id);
+      expect(embodiedParent?.id).toBe($.agent.id);
+      expect(humanParent?.id).toBe($.embodied.id);
+      expect(playerParent?.id).toBe($.human.id);
     });
 
     it('should register aliases in root', async () => {
@@ -181,7 +181,7 @@ describe('PrototypeBuilder', () => {
 
     it('should inherit from Describable', async () => {
       const $ = manager as any;
-      expect($.agent.getParent()).toBe($.describable.id);
+      expect($.agent.getParent()?.id).toBe($.describable.id);
     });
   });
 
@@ -218,7 +218,7 @@ describe('PrototypeBuilder', () => {
 
     it('should inherit from Embodied', async () => {
       const $ = manager as any;
-      expect($.human.getParent()).toBe($.embodied.id);
+      expect($.human.getParent()?.id).toBe($.embodied.id);
     });
   });
 
@@ -283,7 +283,7 @@ describe('PrototypeBuilder', () => {
 
       expect(player).toBeTruthy();
       expect(human).toBeTruthy();
-      expect(player.getParent()).toBe(human.id);
+      expect(player.getParent()?.id).toBe(human.id);
     });
   });
 
@@ -298,11 +298,11 @@ describe('PrototypeBuilder', () => {
       const $ = manager as any;
 
       // Player -> Human -> Embodied -> Agent -> Describable -> Root
-      expect($.player.getParent()).toBe($.human.id);
-      expect($.human.getParent()).toBe($.embodied.id);
-      expect($.embodied.getParent()).toBe($.agent.id);
-      expect($.agent.getParent()).toBe($.describable.id);
-      expect($.describable.getParent()).toBe($.root.id);
+      expect($.player.getParent()?.id).toBe($.human.id);
+      expect($.human.getParent()?.id).toBe($.embodied.id);
+      expect($.embodied.getParent()?.id).toBe($.agent.id);
+      expect($.agent.getParent()?.id).toBe($.describable.id);
+      expect($.describable.getParent()?.id).toBe($.root.id);
     });
   });
 });

@@ -15,6 +15,7 @@ describe.sequential('TypeGenerator', () => {
   let db: ObjectDatabase;
   let manager: ObjectManager;
   let generator: TypeGenerator;
+  let root: any;
 
   beforeAll(async () => {
     const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/?replicaSet=rs0&directConnection=true';
@@ -40,6 +41,7 @@ describe.sequential('TypeGenerator', () => {
     await db.ensureRoot();
     // Load fresh root (stable proxy pattern - no cache clearing needed)
     await manager.loadAll();
+    root = await manager.load(1);
 
     generator = new TypeGenerator(manager);
   });
@@ -67,7 +69,7 @@ describe.sequential('TypeGenerator', () => {
   describe('Property Type Inference', () => {
     it('should infer string type', async () => {
       await manager.create({
-        parent: 1,
+        parent: root,
         properties: { name: 'TestObject' },
         methods: {},
       });
@@ -79,7 +81,7 @@ describe.sequential('TypeGenerator', () => {
 
     it('should infer number type', async () => {
       await manager.create({
-        parent: 1,
+        parent: root,
         properties: { count: 42 },
         methods: {},
       });
@@ -91,7 +93,7 @@ describe.sequential('TypeGenerator', () => {
 
     it('should infer boolean type', async () => {
       await manager.create({
-        parent: 1,
+        parent: root,
         properties: { enabled: true },
         methods: {},
       });
@@ -103,7 +105,7 @@ describe.sequential('TypeGenerator', () => {
 
     it('should infer null type', async () => {
       await manager.create({
-        parent: 1,
+        parent: root,
         properties: { value: null },
         methods: {},
       });
@@ -115,7 +117,7 @@ describe.sequential('TypeGenerator', () => {
 
     it('should infer array type', async () => {
       await manager.create({
-        parent: 1,
+        parent: root,
         properties: { items: [1, 2, 3] },
         methods: {},
       });
@@ -127,7 +129,7 @@ describe.sequential('TypeGenerator', () => {
 
     it('should infer generic array for mixed types', async () => {
       await manager.create({
-        parent: 1,
+        parent: root,
         properties: { mixed: [1, 'two', true] },
         methods: {},
       });
@@ -139,7 +141,7 @@ describe.sequential('TypeGenerator', () => {
 
     it('should infer empty array as any[]', async () => {
       await manager.create({
-        parent: 1,
+        parent: root,
         properties: { empty: [] },
         methods: {},
       });
@@ -151,7 +153,7 @@ describe.sequential('TypeGenerator', () => {
 
     it('should infer object type as Record<string, any>', async () => {
       await manager.create({
-        parent: 1,
+        parent: root,
         properties: { config: { timeout: 5000 } },
         methods: {},
       });
@@ -163,7 +165,7 @@ describe.sequential('TypeGenerator', () => {
 
     it('should handle undefined as null (MongoDB converts undefined to null)', async () => {
       await manager.create({
-        parent: 1,
+        parent: root,
         properties: { undef: undefined },
         methods: {},
       });
@@ -176,7 +178,7 @@ describe.sequential('TypeGenerator', () => {
 
     it('should handle multiple properties', async () => {
       await manager.create({
-        parent: 1,
+        parent: root,
         properties: {
           name: 'Test',
           count: 10,
@@ -198,7 +200,7 @@ describe.sequential('TypeGenerator', () => {
   describe('Method Type Generation', () => {
     it('should generate method signatures', async () => {
       await manager.create({
-        parent: 1,
+        parent: root,
         properties: {},
         methods: { onInput: { code: 'return 42;' } },
       });
@@ -210,7 +212,7 @@ describe.sequential('TypeGenerator', () => {
 
     it('should generate multiple method signatures', async () => {
       await manager.create({
-        parent: 1,
+        parent: root,
         properties: {},
         methods: {
           onCreate: { code: 'console.log("created");' },
@@ -230,7 +232,7 @@ describe.sequential('TypeGenerator', () => {
   describe('Object Interface Generation', () => {
     it('should generate interface for each object', async () => {
       const obj = await manager.create({
-        parent: 1,
+        parent: root,
         properties: { name: 'Test' },
         methods: { test: { code: 'return 1;' } },
       });
@@ -245,7 +247,7 @@ describe.sequential('TypeGenerator', () => {
 
     it('should sort properties and methods alphabetically', async () => {
       await manager.create({
-        parent: 1,
+        parent: root,
         properties: {
           zebra: 1,
           alpha: 2,
@@ -279,7 +281,7 @@ describe.sequential('TypeGenerator', () => {
 
     it('should skip recycled objects', async () => {
       const obj = await manager.create({
-        parent: 1,
+        parent: root,
         properties: { name: 'ToDelete' },
         methods: {},
       });
@@ -305,7 +307,7 @@ describe.sequential('TypeGenerator', () => {
 
     it('should include registered aliases', async () => {
       const system = await manager.create({
-        parent: 1,
+        parent: root,
         properties: { name: 'System' },
         methods: {},
       });
@@ -319,8 +321,8 @@ describe.sequential('TypeGenerator', () => {
     });
 
     it('should include multiple aliases', async () => {
-      const system = await manager.create({ parent: 1, properties: {}, methods: {} });
-      const auth = await manager.create({ parent: 1, properties: {}, methods: {} });
+      const system = await manager.create({ parent: root, properties: {}, methods: {} });
+      const auth = await manager.create({ parent: root, properties: {}, methods: {} });
 
       manager.registerAlias('system', system);
       manager.registerAlias('authManager', auth);
@@ -335,7 +337,7 @@ describe.sequential('TypeGenerator', () => {
   describe('Object-Specific Generation', () => {
     it('should generate enhanced types for specific object', async () => {
       const obj = await manager.create({
-        parent: 1,
+        parent: root,
         properties: { name: 'Test' },
         methods: { test: { code: 'return 1;' } },
       });
@@ -358,7 +360,7 @@ describe.sequential('TypeGenerator', () => {
   describe('Edge Cases', () => {
     it('should escape invalid property names', async () => {
       await manager.create({
-        parent: 1,
+        parent: root,
         properties: {
           'valid-name': 1,
           '123-starts-with-number': 2,
@@ -378,7 +380,7 @@ describe.sequential('TypeGenerator', () => {
 
     it('should handle objects with no properties or methods', async () => {
       const obj = await manager.create({
-        parent: 1,
+        parent: root,
         properties: {},
         methods: {},
       });
@@ -394,7 +396,7 @@ describe.sequential('TypeGenerator', () => {
       // Create 10 objects
       for (let i = 0; i < 10; i++) {
         await manager.create({
-          parent: 1,
+          parent: root,
           properties: { index: i },
           methods: { test: { code: 'return 1;' } },
         });
@@ -412,7 +414,7 @@ describe.sequential('TypeGenerator', () => {
   describe('TypeScript Syntax Validity', () => {
     it('should generate syntactically valid TypeScript', async () => {
       await manager.create({
-        parent: 1,
+        parent: root,
         properties: {
           name: 'Test',
           count: 42,

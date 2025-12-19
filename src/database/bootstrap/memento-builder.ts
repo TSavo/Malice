@@ -118,13 +118,16 @@ export class MementoBuilder {
         const placeholder = idToPlaceholder.get(obj.id);
 
         // Get parent - replace if in-graph, otherwise store as objref
-        // Note: parent is accessed via getParent() method, not .parent property
-        let parentId = obj.getParent ? obj.getParent() : obj.parent;
+        // Note: getParent() returns RuntimeObject, extract ID for serialization
+        const parentObj = obj.getParent ? obj.getParent() : null;
+        const parentId = parentObj ? parentObj.id : (obj.parent ? obj.parent.value : null);
         let parent;
-        if (idToPlaceholder.has(parentId)) {
+        if (parentId !== null && idToPlaceholder.has(parentId)) {
           parent = idToPlaceholder.get(parentId);
-        } else {
+        } else if (parentId !== null) {
           parent = { _objref: parentId };
+        } else {
+          parent = null;
         }
 
         // Get all own properties and replace refs
@@ -178,15 +181,22 @@ export class MementoBuilder {
         const data = memento.objects[placeholder];
 
         // Determine initial parent - use external ID or temporary
-        let initialParent = data.parent;
-        if (typeof initialParent === 'string' && initialParent.startsWith('%')) {
-          // Parent is in-graph, use root (1) temporarily
-          initialParent = 1;
+        // Parent must be a RuntimeObject
+        let parentObj;
+        if (typeof data.parent === 'string' && data.parent.startsWith('%')) {
+          // Parent is in-graph, use root temporarily (will be fixed in second pass)
+          parentObj = await $load(1);
+        } else if (data.parent && typeof data.parent === 'object' && '_objref' in data.parent) {
+          // External parent - load it
+          parentObj = await $load(data.parent._objref);
+        } else {
+          // Fallback to root
+          parentObj = await $load(1);
         }
 
         // Create object with empty properties first
         const newObj = await recycler.create({
-          parent: initialParent,
+          parent: parentObj,
           properties: {},
         }, null);
 
@@ -245,14 +255,17 @@ export class MementoBuilder {
         // Note: parent is set via setParent() method, not .parent property
         const parentData = data.parent;
         if (typeof parentData === 'string' && parentData.startsWith('%')) {
-          // In-graph parent - use new ID
-          const newParentId = placeholderToId.get(parentData);
-          if (newParentId !== undefined) {
-            newObj.setParent(newParentId);
+          // In-graph parent - get the new RuntimeObject
+          const newParent = placeholderToObj[parentData];
+          if (newParent) {
+            newObj.setParent(newParent);
           }
         } else if (parentData && typeof parentData === 'object' && '_objref' in parentData) {
-          // External parent - use existing ID
-          newObj.setParent(parentData._objref);
+          // External parent - load the RuntimeObject
+          const parent = await $load(parentData._objref);
+          if (parent) {
+            newObj.setParent(parent);
+          }
         }
 
         // Set properties with placeholders replaced

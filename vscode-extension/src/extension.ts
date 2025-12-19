@@ -11,6 +11,13 @@ import { TypeDefinitionManager } from './type-manager.js';
 let client: DevToolsClient;
 let treeView: vscode.TreeView<vscode.TreeItem>;
 let typeManager: TypeDefinitionManager;
+let statusBar: vscode.StatusBarItem;
+
+/**
+ * Current view mode for tree display
+ */
+type ViewMode = 'flat' | 'categorized' | 'by-complexity';
+let currentViewMode: ViewMode = 'categorized';
 
 /**
  * Extension activation
@@ -60,10 +67,44 @@ export async function activate(context: vscode.ExtensionContext) {
     treeView.onDidCollapseElement(e => treeProvider.onDidCollapseElement(e.element))
   );
 
+  // Create status bar item for view mode
+  statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
+  statusBar.text = `$(folder) ${currentViewMode}`;
+  statusBar.tooltip = 'Click to change view mode';
+  statusBar.command = 'malice.switchView';
+  context.subscriptions.push(statusBar);
+
   // Register commands
   context.subscriptions.push(
     vscode.commands.registerCommand('malice.refresh', () => {
       treeProvider.refresh();
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('malice.switchView', async () => {
+      const options: vscode.QuickPickItem[] = [
+        { label: '📁 Categorized', description: 'Group methods by functionality', value: 'categorized' },
+        { label: '📄 Flat', description: 'Show all methods in single list', value: 'flat' },
+        { label: '⚡ By Complexity', description: 'Sort by method complexity', value: 'by-complexity' }
+      ];
+
+      const selected = await vscode.window.showQuickPick(options, {
+        placeHolder: `Current view: ${currentViewMode}`
+      });
+
+      if (selected && selected.value !== currentViewMode) {
+        currentViewMode = selected.value as ViewMode;
+        statusBar.text = `$(folder) ${currentViewMode}`;
+        
+        // Update tree provider if it supports view switching
+        if ('setViewMode' in treeProvider) {
+          (treeProvider as any).setViewMode(currentViewMode);
+        } else {
+          // Fallback: refresh tree
+          treeProvider.refresh();
+        }
+      }
     })
   );
 

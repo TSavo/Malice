@@ -350,7 +350,7 @@ describe('Bootstrap Builders Idempotency', () => {
     it('should handle recycled objects via $.recycler', async () => {
       // With stable proxy architecture, objects are recycled via $.recycler
       // Direct DB deletion is not supported - memory is the source of truth
-      
+
       // Create a test object via recycler
       const recycler = (manager as any).aliases.get('recycler');
       if (!recycler) {
@@ -358,10 +358,11 @@ describe('Bootstrap Builders Idempotency', () => {
         return;
       }
 
+      const root = await manager.load(1);
       const testObj = await recycler.create({
-        parent: 1,
+        parent: root,
         properties: { name: 'TestRecyclable', testProp: 'value' }
-      });
+      }, null);
 
       expect(testObj).toBeTruthy();
       expect(testObj.get('name')).toBe('TestRecyclable');
