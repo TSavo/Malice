@@ -144,6 +144,17 @@ export class RoomBuilder {
         }
       }
 
+      // Apply viewer's perception filters
+      if (viewer && viewer.perceptionFilters) {
+        const filters = viewer.perceptionFilters || [];
+        for (const entry of filters) {
+          const filter = entry.filter;
+          if (filter && filter.modifyRoomDescription) {
+            output = await filter.modifyRoomDescription(output, self, viewer);
+          }
+        }
+      }
+
       return output;
     `);
 

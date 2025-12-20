@@ -255,7 +255,7 @@ export class WearableBuilder {
         return { success: false, error: 'That is not being worn.' };
       }
 
-      if (wearer && self.wornBy !== wearer.id) {
+      if (wearer && self.wornBy !== wearer) {
         return { success: false, error: 'You are not wearing that.' };
       }
 

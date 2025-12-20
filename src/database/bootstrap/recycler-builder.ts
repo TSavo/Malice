@@ -55,9 +55,9 @@ export class RecyclerBuilder {
             caller = arg1;
           } else if (arg0 !== undefined && arg1 && typeof arg1 === 'object') {
             // Legacy format: parent as first arg, properties as second
-            const parentId = typeof arg0 === 'object' ? arg0.id : arg0;
+            // Keep the RuntimeObject, don't extract just the ID
             params = {
-              parent: parentId,
+              parent: arg0,
               properties: arg1,
             };
             caller = args[2];

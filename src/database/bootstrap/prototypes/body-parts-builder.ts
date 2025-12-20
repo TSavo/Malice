@@ -37,6 +37,7 @@ export class BodyPartsBuilder {
     parts.ear = await this.buildEar(bodyPartId);
     parts.nose = await this.buildNose(bodyPartId);
     parts.mouth = await this.buildMouth(bodyPartId);
+    parts.tongue = await this.buildTongue(bodyPartId);
     parts.arm = await this.buildArm(bodyPartId);
     parts.hand = await this.buildHand(bodyPartId);
     parts.finger = await this.buildFinger(bodyPartId);
@@ -309,6 +310,42 @@ export class BodyPartsBuilder {
       return desc;
     `);
 
+    // Check if can smell (needs working nose in face)
+    obj.setMethod('canSmell', `
+      const face = await self.getPart('face');
+      if (!face) return false;
+
+      const nose = await face.getPart('nose');
+      if (!nose || !nose.canSmell) return false;
+
+      return await nose.canSmell();
+    `);
+
+    // Check if can taste (needs tongue in mouth in face)
+    obj.setMethod('canTaste', `
+      const face = await self.getPart('face');
+      if (!face) return false;
+
+      const mouth = await face.getPart('mouth');
+      if (!mouth || !mouth.canTaste) return false;
+
+      return await mouth.canTaste();
+    `);
+
+    // Check if can hear (needs working ears in face)
+    obj.setMethod('canHear', `
+      const face = await self.getPart('face');
+      if (!face) return false;
+
+      const leftEar = await face.getPart('leftEar');
+      const rightEar = await face.getPart('rightEar');
+
+      // Can hear if at least one ear works
+      if (leftEar && leftEar.hear) return true;
+      if (rightEar && rightEar.hear) return true;
+      return false;
+    `);
+
     return obj;
   }
 
@@ -420,6 +457,20 @@ export class BodyPartsBuilder {
       return 'a ' + self.shape + ' nose';
     `);
 
+    // Can smell if nose exists and not blocked
+    obj.setMethod('canSmell', `
+      const condition = self.condition || {};
+      if (condition.destroyed || condition.missing || condition.stuffed) {
+        return false;
+      }
+      // Can't smell if something is shoved up there
+      const contents = self.contents || [];
+      if (contents.length > 0) {
+        return false;
+      }
+      return true;
+    `);
+
     return obj;
   }
 
@@ -485,6 +536,56 @@ export class BodyPartsBuilder {
     obj.setMethod('setLanguage', `
       const lang = args[0];
       self.language = lang;
+    `);
+
+    // Can taste if tongue is present and functional
+    obj.setMethod('canTaste', `
+      const tongue = await self.getPart('tongue');
+      if (!tongue) return false;
+      if (tongue.canTaste) {
+        return await tongue.canTaste();
+      }
+      // Default to true if tongue exists but has no canTaste method
+      return true;
+    `);
+
+    return obj;
+  }
+
+  async buildTongue(bodyPartId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(bodyPartId);
+    const obj = await this.manager.create({
+      parent: parentObj!,
+      properties: {
+        name: 'Tongue',
+        description: 'A tongue',
+        aliases: [],
+        size: 'tiny',
+        weight: 0.07, // ~70g
+        coverable: false,
+        removable: true,
+        critical: false,
+        canSense: ['taste'],
+      },
+      methods: {},
+    });
+
+    // Can speak if tongue exists and not damaged
+    obj.setMethod('canSpeak', `
+      const condition = self.condition || {};
+      if (condition.destroyed || condition.missing || condition.mute) {
+        return false;
+      }
+      return true;
+    `);
+
+    // Can taste if tongue exists
+    obj.setMethod('canTaste', `
+      const condition = self.condition || {};
+      if (condition.destroyed || condition.missing) {
+        return false;
+      }
+      return true;
     `);
 
     return obj;

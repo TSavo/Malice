@@ -143,6 +143,15 @@ export class HumanBuilder {
         await self.recordSensory('hear', result.content, source);
       }
 
+      // Call perception filter onHear hooks
+      const filters = self.perceptionFilters || [];
+      for (const entry of filters) {
+        const filter = entry.filter;
+        if (filter && filter.onHear) {
+          await filter.onHear(result.content, source);
+        }
+      }
+
       return result;
     `);
 
@@ -525,70 +534,7 @@ export class HumanBuilder {
       return ''; // Actor already received message via announce
     `);
 
-    // Directed speech - "to <target> <message>" - triggers NPC reactions
-    obj.setMethod('to', `
-      /** Speak directly to someone.
-       *  Usage: to <name> <message>
-       *  Addresses a specific person, triggering their attention.
-       */
-      // Handle single-arg case: "to janet hey there" comes as one string
-      let targetName = args[0];
-      let message = args[1];
-
-      // If message is undefined, split the first arg
-      if (!message && targetName) {
-        const parts = targetName.split(/\\s+/);
-        targetName = parts[0];
-        message = parts.slice(1).join(' ');
-      }
-
-      if (!targetName) {
-        return 'Speak to whom?';
-      }
-      if (!message || !message.trim()) {
-        return 'Say what to ' + targetName + '?';
-      }
-
-      // Use player (from verb context) instead of self when method is on prototype
-      const speaker = player || self;
-
-      // Get current location
-      const location = speaker.location;
-      if (!location) {
-        return 'You have nowhere to speak.';
-      }
-
-      // Find target in location
-      const contents = location.contents || [];
-      let target = null;
-      for (const obj of contents) {
-        if (obj && obj.name && obj.name.toLowerCase().includes(targetName.toLowerCase())) {
-          target = obj;
-          break;
-        }
-      }
-
-      if (!target) {
-        return 'You don\\'t see anyone named "' + targetName + '" here.';
-      }
-
-      const trimmedMessage = message.trim();
-
-      // Announce to room
-      if (location.announce) {
-        await location.announce(speaker, target, {
-          actor: 'You say to ' + target.name + ', "' + trimmedMessage + '"',
-          target: speaker.name + ' says to you, "' + trimmedMessage + '"',
-          others: speaker.name + ' says to ' + target.name + ', "' + trimmedMessage + '"'
-        });
-      }
-      // Trigger AI response if target has onSpokenTo handler
-      if (target.onSpokenTo) {
-        target.onSpokenTo(speaker, trimmedMessage);
-      }
-
-      return '';
-    `);
+    // NOTE: 'to' verb moved to agent-builder.ts (includes perception filter support)
 
     // Emote method for AI humans
     obj.setMethod('emote', `

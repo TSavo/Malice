@@ -18,7 +18,12 @@
       "Bash(echo:*)",
       "Bash(timeout 120 npm test:*)",
       "Bash(timeout 180 npm test:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(git commit:*)",
+      "Bash(git push)",
+      "Bash(git log:*)",
+      "Bash(timeout 60 npm test -- --run test/mcp/query-parser.test.ts)",
+      "Bash(timeout 60 npm test:*)"
     ],
     "deny": [],
     "ask": []

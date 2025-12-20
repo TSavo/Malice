@@ -401,6 +401,15 @@ export class EmbodiedBuilder {
         await self.recordSensory('hear', heard.content, source);
       }
 
+      // Call perception filter onHear hooks
+      const filters = self.perceptionFilters || [];
+      for (const entry of filters) {
+        const filter = entry.filter;
+        if (filter && filter.onHear) {
+          await filter.onHear(heard.content, source);
+        }
+      }
+
       return heard;
     `);
 
@@ -444,6 +453,16 @@ export class EmbodiedBuilder {
             if (self.recordSensory) {
               await self.recordSensory('see', message, source);
             }
+
+            // Call perception filter onSee hooks
+            const filters = self.perceptionFilters || [];
+            for (const entry of filters) {
+              const filter = entry.filter;
+              if (filter && filter.onSee) {
+                await filter.onSee(message, source);
+              }
+            }
+
             return true;
           }
         }
@@ -518,6 +537,16 @@ export class EmbodiedBuilder {
         const prefix = options.smellPrompt || '';
         await self.tell(prefix + message);
       }
+
+      // Call perception filter onSmell hooks
+      const filters = self.perceptionFilters || [];
+      for (const entry of filters) {
+        const filter = entry.filter;
+        if (filter && filter.onSmell) {
+          await filter.onSmell(message, source);
+        }
+      }
+
       return true;
     `);
 
@@ -557,6 +586,54 @@ export class EmbodiedBuilder {
         const prefix = options.tastePrompt || '';
         await self.tell(prefix + message);
       }
+
+      // Call perception filter onTaste hooks
+      const filters = self.perceptionFilters || [];
+      for (const entry of filters) {
+        const filter = entry.filter;
+        if (filter && filter.onTaste) {
+          await filter.onTaste(message, source);
+        }
+      }
+
+      return true;
+    `);
+
+    obj.setMethod('feel', `
+      /** Feel a tactile sensation.
+       *  If can feel, sends message via tell() and returns true.
+       *  @param message - The tactile description
+       *  @param source - Optional source of the sensation
+       *  @returns true if felt, false if unconscious
+       */
+      const message = args[0];
+      const source = args[1];
+
+      if (!self.conscious) {
+        return false;
+      }
+
+      // Tactile is moderate stimulus
+      if (self.receiveStimulus) {
+        await self.receiveStimulus(5); // 50% wake chance
+      }
+
+      // Can feel - send the message
+      if (self.tell) {
+        const options = self.options || {};
+        const prefix = options.feelPrompt || '';
+        await self.tell(prefix + message);
+      }
+
+      // Call perception filter onFeel hooks
+      const filters = self.perceptionFilters || [];
+      for (const entry of filters) {
+        const filter = entry.filter;
+        if (filter && filter.onFeel) {
+          await filter.onFeel(message, source);
+        }
+      }
+
       return true;
     `);
 
