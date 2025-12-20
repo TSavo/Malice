@@ -3188,7 +3188,7 @@ Core Objects:
     // Individual doc resources
     server.resource(
       'doc',
-      new ResourceTemplate('moo://docs/{name}', {
+      new ResourceTemplate('moo://docs/{+name}', {
         list: async () => {
           try {
             const docs = getAllDocs();
