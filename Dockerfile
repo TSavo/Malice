@@ -23,8 +23,8 @@ COPY src ./src
 COPY types ./types
 COPY tsconfig.json ./
 
-# Copy city-ai documentation for MCP resources
-COPY docs/city-ai ./docs/city-ai
+# Copy all documentation for MCP resources
+COPY docs ./docs
 
 # Give node user ownership of app directory
 RUN chown -R node:node /app
