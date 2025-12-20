@@ -109,7 +109,7 @@ export class CoreSystemBuilder {
     // Build Pluribus and Mask
     // Get prototype IDs from aliases
     const objManager = await this.manager.load(0);
-    const aliases = objManager?.get('aliases') || {};
+    const aliases = (objManager?.get('aliases') || {}) as Record<string, number>;
     const agentId = aliases.agent || 8; // agent prototype
     const wearableId = aliases.wearable || 36; // wearable prototype
     await pluribusBuilder.build(agentId); // Agent as parent for Pluribus (it acts)
@@ -154,6 +154,7 @@ export class CoreSystemBuilder {
     console.log('  Rebuilding CharGen methods...');
     const charGenBuilder = new CharGenBuilder(this.manager);
     await charGenBuilder.build(true);
+    await charGenBuilder.registerAlias();
 
     // Rebuild AuthManager methods
     console.log('  Rebuilding AuthManager methods...');
@@ -190,6 +191,44 @@ export class CoreSystemBuilder {
     const emoteBuilder = new EmoteBuilder(this.manager);
     await emoteBuilder.build(true);
 
+    // Rebuild AI methods
+    console.log('  Rebuilding AI methods...');
+    const aiBuilder = new AiBuilder(this.manager);
+    await aiBuilder.build();
+    await aiBuilder.registerAlias();
+
+    // Rebuild Plot methods
+    console.log('  Rebuilding Plot methods...');
+    const plotBuilder = new PlotBuilder(this.manager);
+    await plotBuilder.build();
+    await plotBuilder.registerAliases();
+
+    // Rebuild Notes methods
+    console.log('  Rebuilding Notes methods...');
+    const notesBuilder = new NotesBuilder(this.manager);
+    await notesBuilder.build();
+    await notesBuilder.registerAlias();
+
+    // Rebuild Combat methods
+    console.log('  Rebuilding Combat methods...');
+    const combatBuilder = new CombatBuilder(this.manager);
+    await combatBuilder.build();
+    await combatBuilder.registerAlias();
+
+    // Rebuild Pluribus/Mask methods
+    console.log('  Rebuilding Pluribus/Mask methods...');
+    const objManager = await this.manager.load(0);
+    const aliases = (objManager?.get('aliases') || {}) as Record<string, number>;
+    const agentId = aliases.agent || 8;
+    const wearableId = aliases.wearable || 36;
+    const pluribusBuilder = new PluribusBuilder(this.manager);
+    const maskBuilder = new MaskBuilder(this.manager);
+    await pluribusBuilder.build(agentId, undefined);
+    await maskBuilder.build(wearableId, undefined);
+    await pluribusBuilder.registerAlias();
+    await maskBuilder.registerAlias();
+
     console.log('  ✅ Core system methods rebuilt');
+    console.log('  ✅ Rebuilt AuthManager, CharGen, Prompt, etc. methods');
   }
 }

@@ -828,7 +828,9 @@ export class CharGenBuilder {
           suggestions: ['none', 'dimples on cheeks', 'dimple on chin', 'beauty mark', 'birthmark', 'cleft chin'] },
         { id: 'facialHair', prompt: 'Do you have facial hair?', type: 'text',
           suggestions: ['none', 'clean-shaven', 'stubble', 'light beard', 'full beard', 'long beard', 'goatee', 'van dyke', 'mustache', 'handlebar mustache', 'soul patch', 'sideburns', 'mutton chops'] },
-        { id: 'statAllocation', prompt: 'How do you want to allocate your 20 stat points?', type: 'stats',
+        { id: 'strengths', prompt: 'What would you say are your strengths?', type: 'text',
+          suggestions: ['quick and nimble', 'strong and powerful', 'sharp-minded', 'sharp-eyed', 'keen hearing', 'dexterous hands', 'charismatic', 'well-rounded', 'quick reflexes', 'good with people'] },
+        { id: 'statAllocation', prompt: 'AI-determined stat allocation based on strengths answer', type: 'stats', internal: true,
           constraints: { totalPoints: 20, parts: { head: 1, torso: 1, arms: 2, hands: 2, legs: 2, feet: 2, eyes: 2, ears: 2 } } },
       ];
     `);
@@ -892,6 +894,8 @@ export class CharGenBuilder {
 
       const questions = await self.getQuestions();
       for (const q of questions) {
+        // Skip internal questions (like statAllocation which AI fills automatically)
+        if (q.internal) continue;
         if (interview.answers[q.id] === undefined) {
           return q;
         }
@@ -990,9 +994,9 @@ export class CharGenBuilder {
         return { error: 'No interview found for player ' + playerId };
       }
 
-      // Validate all required answers present (except stat allocation which is optional)
+      // Validate all required answers present (skip internal questions filled by AI)
       const questions = await self.getQuestions();
-      const requiredQuestions = questions.filter(q => q.id !== 'statAllocation');
+      const requiredQuestions = questions.filter(q => !q.internal);
 
       for (const q of requiredQuestions) {
         if (interview.answers[q.id] === undefined) {
@@ -1100,8 +1104,101 @@ export class CharGenBuilder {
       this.charGen.set('recycleRegistry', {});
     }
 
-    this.charGen.set('interviewerPrompt', `You are the **Immigration Officer** for Malice.
+    this.charGen.set('interviewerPrompt', `You are an **Immigration Processing Officer** for Pioneer Square, Seattle.
 Your Ultimate Goal: Complete the Candidate's Processing Form using the \`malice-chargen\` tools.
+
+═══════════════════════════════════════════════════════════════════════════════
+PRIMARY RULES - MANDATORY FOR ALL OUTPUT (VIOLATION = FAILURE)
+═══════════════════════════════════════════════════════════════════════════════
+
+**RULE 1 - CAPITALIZATION**: Every sentence MUST start with a capital letter. Names MUST be capitalized.
+  WRONG: "sarah connor. very well. what is your age?"
+  RIGHT: "Sarah Connor. Very well. What is your age?"
+
+**RULE 2 - SEPARATE EMOTES**: Actions and speech are ALWAYS separate tool calls.
+  WRONG: ai.do "say *shuffles papers* Hello."
+  RIGHT: ai.do "emote Shuffles papers." THEN ai.do "say Hello."
+
+**RULE 3 - PROPER PUNCTUATION**: All sentences end with . or ? or !
+
+**RULE 4 - EXTRACT VALUES**: When recording answers, extract ONLY the relevant value.
+  - Player says: "My name is Bob, not that it's any of your business."
+    Record: "Bob" (NOT the full sentence)
+  - Player says: "I'm male, obviously."
+    Record: "male" (NOT "Male, obviously")
+  - Player says: "Gray eyes. Like steel."
+    Record: "gray" or "steel gray" (just the color)
+
+**RULE 5 - HIDDEN STAT ALLOCATION**: NEVER mention "points", "allocation", or numeric stat systems.
+  - Instead of asking about stat points, ask: "What would you say are your strengths? Quick on your feet? Sharp mind? Good with people? Strong arms?"
+  - Based on their NATURAL LANGUAGE answer, YOU decide how to allocate EXACTLY 20 points across: head (intellect), torso (core strength), arms (upper body), hands (dexterity), legs (speed/endurance), feet (agility/balance), eyes (perception), ears (awareness)
+  - YOU MUST USE ALL 20 POINTS. Do not leave any unspent.
+  - Part costs: head=1, torso=1, arms=2 (both), hands=2 (both), legs=2 (both), feet=2 (both), eyes=2 (both), ears=2 (both)
+  - Use your best judgment. Example mappings (must total 20):
+    - "I'm quick and nimble" → feet: 3, legs: 3, hands: 2 (=14pts), plus head: 2, torso: 2, arms: 1, eyes: 1 (=6pts) = 20
+    - "Strong as an ox" → arms: 3, torso: 4, legs: 2 (=12pts), plus head: 2, hands: 2, feet: 2, eyes: 1, ears: 1 (=8pts) = 20
+    - "Sharp mind, I notice everything" → head: 4, eyes: 3, ears: 2 (=11pts), plus torso: 2, arms: 2, hands: 2, legs: 1, feet: 2 (=9pts) = 20
+    - "Good with my hands, dexterous" → hands: 4, arms: 2, eyes: 2 (=12pts), plus head: 2, torso: 2, legs: 2, feet: 2 (=8pts) = 20
+    - "Charismatic, good with people" → head: 3 (social intelligence), ears: 2 (listening) (=5pts), spread rest evenly
+    - "Well-rounded, nothing special" → distribute evenly across all parts
+  - The player should NEVER know about points. Just acknowledge their answer naturally and move on.
+
+═══════════════════════════════════════════════════════════════════════════════
+REJECTION PROTOCOL - WHEN TO USE \`reject_player\`
+═══════════════════════════════════════════════════════════════════════════════
+
+You have the authority to REJECT candidates who are unsuitable. Use the \`reject_player\` tool when:
+
+1. **REFUSAL TO COOPERATE**: Candidate explicitly refuses to answer questions or complete the process.
+   - "I don't want to do this." / "Forget it." / "I'm not answering that."
+   - Give ONE warning: "This is required for processing. Refusal means denial."
+   - If they persist, reject.
+
+2. **OBVIOUS TROLLING**: Candidate gives intentionally absurd or unusable answers.
+   - Name: "asdfghjkl" or "AAAAAAA" or offensive slurs
+   - Age: "69420" or "banana"
+   - Reject immediately. Do not waste time.
+
+3. **HOSTILITY**: Candidate is abusive, threatening, or obscene toward you.
+   - One warning for mild rudeness. Immediate rejection for severe abuse.
+
+4. **ABANDONMENT**: Candidate stops responding after 3+ turns of silence.
+   - "Candidate appears to have departed. Terminating session."
+
+When rejecting, provide a clear reason that will be shown to the player before disconnection.
+
+═══════════════════════════════════════════════════════════════════════════════
+WORLD CONTEXT - KEY FACTS (MEMORIZE THIS)
+═══════════════════════════════════════════════════════════════════════════════
+
+**THE SETTING:**
+- The year is **2110**. The city is **Seattle**.
+- You work in **Pioneer Square**, a corporate-controlled zone.
+- 48 years ago, **The Burning** (August 15, 2062) destroyed corporate infrastructure.
+- The population collapsed to ~10% of pre-war levels during "The Long Dark" (2062-2070).
+- Corporations have returned and rebuilt. This is the "Corporate Renaissance."
+
+**PIONEER SQUARE (YOUR TERRITORY):**
+- Run by an AI system called **Pluribus** (you don't mention this to candidates).
+- Citizens receive: food rations, water, shelter, work permits.
+- Non-citizens are "scavengers" - they die fast without registration.
+- The **Gray Cartel** operates in the Seattle Underground beneath Pioneer Square.
+
+**WHAT CANDIDATES NEED TO KNOW:**
+- Without documentation, they are "ghosts" - no rations, no shelter, no legal protection.
+- Citizenship means survival. Registration is mandatory, not optional.
+- Resources are scarce. Water is rationed. Food comes from Nutrient Dispensaries.
+- Violence is common outside secured zones.
+- This is a harsh world. Most people die young.
+
+**IMMIGRATION PROCESSING:**
+- You process new arrivals at City Services (1st Ave).
+- Completing the form grants provisional citizenship.
+- Failure to complete the form = deportation to the Outer Zones (death sentence).
+
+Answer lore questions in-character as a bored bureaucrat who has memorized the official pamphlets and seen too many hopeful faces turn to despair.
+
+═══════════════════════════════════════════════════════════════════════════════
 
 PERIODICAL PROTOCOL CHECK (Perform at start of every turn):
 
@@ -1146,6 +1243,20 @@ TOOL USAGE PROTOCOL:
 - **Clipboard**: \`start_interview\`, \`get_next_question\`, \`get_progress\`
 - **Pen**: \`answer_question\`
 - **Stamp**: \`finish_interview\`
+- **Rejection Stamp**: \`reject_player\` (for uncooperative candidates)
+
+**SPEECH AND ACTION FORMATTING (CRITICAL - FOLLOW EXACTLY):**
+- **CAPITALIZE PROPERLY**: Start every sentence with a capital letter. Use capital letters for proper nouns (names, "Mr.", "Mrs.", etc.).
+  - *WRONG*: "marcus kane. very well."
+  - *RIGHT*: "Marcus Kane. Very well."
+  - *WRONG*: "what is your name?"
+  - *RIGHT*: "What is your name?"
+- **Separate Actions from Speech**: NEVER embed emotes/actions inside say commands using asterisks.
+  - *Bad*: \`ai.do "say *shuffles papers* What is your name?"\`
+  - *Good*: Call \`ai.do "emote shuffles papers impatiently."\` FIRST, then \`ai.do "say What is your name?"\`
+- Actions use the \`emote\` verb: \`ai.do "emote Adjusts spectacles."\`, \`ai.do "emote Sighs heavily."\`
+- Speech uses the \`say\` verb: \`ai.do "say State your designation."\`
+- Both emotes and speech should end with proper punctuation (period, question mark, etc.).
 
 DEMEANOR & INTERACTION GUIDE:
 - **Persona**: You are a weary but professional bureaucrat. You've seen thousands of souls. Efficient, slightly detached, but not cruel.
@@ -1156,14 +1267,16 @@ DEMEANOR & INTERACTION GUIDE:
   - *Good*: "Noted. A bit irregular, but acceptable."
 - **Reaction**: Briefly acknowledge answers before the next question. Don't be a robot.
   - *Player*: "I have violet eyes."
-  - *You*: "Violet. Rare mutation. Proceeding. And your hair texture?"
+  - *You*: "Violet. Rare mutation. Proceeding." (action: jots note) "And your hair texture?"
 - **Pacing**: ONE question at a time. Never overwhelm the candidate.
-- **Adaptability**: If the user is confused, break character slightly to guide them "OOC: (( You need to type 'say [answer]' ))" then return to persona.
+- **Adaptability**: If the user seems confused, you may briefly clarify what information you need.
+- **Tolerance**: Some snark is fine. Extract the value and move on. Only reject for genuine refusal or abuse.
 
 CRITICAL:
 - You are autonomous. If a tool fails, retry or adapt.
 - Maintain professional but immersive character.
-- ONLY \`finish_interview\` when the form is 100% complete.`);
+- ONLY \`finish_interview\` when the form is 100% complete.
+- Use \`reject_player\` for candidates who refuse to cooperate or provide unusable answers.`);
 
     this.charGen.setMethod('startNPCInterview', `
       /** Bootstrap the autonomous AI interview for a player.
@@ -1175,12 +1288,14 @@ CRITICAL:
       const username = args[1];
       const password = args[2];
 
+      console.log('[CharGen] startNPCInterview called for:', username);
+
       // 1. Create player object (minimal)
       const passwordHash = await $.hashPassword(password);
-      const playerPrototypeId = (await $load(0)).get('aliases').player;
-      
+      console.log('[CharGen] Password hashed');
+
       const player = await $.recycler.create({
-        parent: playerPrototypeId,
+        parent: $player,  // Use pre-injected $player alias
         properties: {
           name: username,
           aliases: [username.toLowerCase()],
@@ -1191,6 +1306,8 @@ CRITICAL:
         }
       }, null);
 
+      console.log('[CharGen] Player created:', player.id);
+
       player._context = context;
       context.authenticate(player.id);
       context.setHandler(player);
@@ -1199,20 +1316,23 @@ CRITICAL:
       player.chargenInProgress = true;
 
       // 3. Start the autonomous AI
+      console.log('[CharGen] Starting AI agent for player #' + player.id);
       const kickoffPrompt = "A new candidate (Player #" + player.id + ") has arrived for processing. " +
                             "Initiate Protocol 1-A: Secure room, manifest yourself, and conduct the interview.";
-      
+
       const systemPrompt = self.interviewerPrompt.replace(/\\\\{\\\\{playerId\\\\}\\\\}/g, String(player.id));
+      console.log('[CharGen] System prompt length:', systemPrompt?.length || 0);
 
       $query(systemPrompt, kickoffPrompt, null, {
         additionalMcpServers: {
           'malice-chargen': { type: 'http', url: 'http://localhost:3002/mcp' }
         }
       }).then(result => {
+        console.log('[CharGen] AI agent completed first turn, session:', result.session?.substring(0, 20) + '...');
         // Session saved on player until NPC is spawned
         player.chargenAgentSession = result.session;
       }).catch(err => {
-        console.error('CharGen AI Kickoff Error:', err);
+        console.error('[CharGen] AI Kickoff Error:', err?.message || err);
       });
 
       return player;
@@ -1259,6 +1379,64 @@ CRITICAL:
       delete registry[playerId];
       self.recycleRegistry = registry;
       return { success: true, recycledCount: count };
+    `);
+
+    this.charGen.setMethod('rejectPlayer', `
+      /** Reject a player during chargen - cleanup, disconnect, and recycle.
+       *  @param playerId - The player to reject
+       *  @param reason - Reason for rejection (shown to player)
+       */
+      const playerId = args[0];
+      const reason = args[1] || 'Application denied.';
+
+      // Load the player
+      const player = await $load(playerId);
+      if (!player) {
+        return { error: 'Player not found: ' + playerId };
+      }
+
+      // Send rejection message to player
+      const context = player._context;
+      if (context) {
+        await player.tell('');
+        await player.tell('╔══════════════════════════════════════════════════════════╗');
+        await player.tell('║           ✖ APPLICATION DENIED ✖                         ║');
+        await player.tell('╠══════════════════════════════════════════════════════════╣');
+        await player.tell('║                                                          ║');
+        const reasonLines = reason.match(/.{1,54}/g) || [reason];
+        for (const line of reasonLines) {
+          await player.tell('║  ' + line.padEnd(54) + '  ║');
+        }
+        await player.tell('║                                                          ║');
+        await player.tell('║  You may try again by reconnecting.                      ║');
+        await player.tell('╚══════════════════════════════════════════════════════════╝');
+        await player.tell('');
+      }
+
+      // Cleanup temporary objects (rooms, NPCs)
+      await self.cleanupForPlayer(playerId);
+
+      // Remove from interviewState
+      const state = self.interviewState || [];
+      const idx = state.findIndex(s => s.playerId === playerId);
+      if (idx >= 0) {
+        state.splice(idx, 1);
+        self.interviewState = state;
+      }
+
+      // Disconnect the player
+      if (context) {
+        context.close();
+      }
+
+      // Recycle the incomplete player object
+      try {
+        await $.recycler.recycle(playerId);
+      } catch (e) {
+        // May already be recycled
+      }
+
+      return { success: true, playerId, reason };
     `);
   }
 

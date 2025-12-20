@@ -46,9 +46,9 @@ export class CharGenMCPServer {
     if (!root) throw new Error('Root object not found');
 
     const aliases = root.get('aliases') as Record<string, number> | undefined;
-    if (!aliases?.chargen) throw new Error('$.chargen alias not found');
+    if (!aliases?.charGen) throw new Error('$.charGen alias not found');
 
-    return await this.manager.load(aliases.chargen as ObjId);
+    return await this.manager.load(aliases.charGen as ObjId);
   }
 
   /**
@@ -337,6 +337,37 @@ export class CharGenMCPServer {
           }
           const chargen = await this.getCharGen();
           const result = await chargen.registerForRecycle(playerId, objectId);
+          return {
+            content: [{ type: 'text', text: JSON.stringify(this.serializeValue(result), null, 2) }],
+          };
+        } catch (err) {
+          return {
+            content: [{ type: 'text', text: `Error: ${err}` }],
+            isError: true,
+          };
+        }
+      }
+    );
+
+    // Reject a player - end interview without creating character
+    server.tool(
+      'reject_player',
+      'Reject a player and end chargen. Use when player is uncooperative, refuses to complete the process, or provides unusable answers. Cleans up temp objects, disconnects player, and recycles the incomplete player object.',
+      {
+        playerId: z.string().regex(/^#-?\d+$/).describe('Player object ID in "#id" format'),
+        reason: z.string().describe('Reason for rejection (shown to player before disconnect)'),
+      },
+      async ({ playerId: rawPlayerId, reason }) => {
+        try {
+          const playerId = this.parseObjectId(rawPlayerId);
+          if (playerId === null) {
+            return {
+              content: [{ type: 'text', text: `Invalid player ID format: ${rawPlayerId}` }],
+              isError: true,
+            };
+          }
+          const chargen = await this.getCharGen();
+          const result = await chargen.rejectPlayer(playerId, reason);
           return {
             content: [{ type: 'text', text: JSON.stringify(this.serializeValue(result), null, 2) }],
           };
