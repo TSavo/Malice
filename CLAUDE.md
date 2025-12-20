@@ -145,6 +145,51 @@ Methods/properties are looked up by walking the parent chain:
 return await pass(...args);
 ```
 
+### Perception Filter System
+
+Agents can have **perception filters** that modify what they perceive and provide virtual addressable entities. Used for neural interfaces, hallucinations, augmented reality, etc.
+
+```typescript
+// Add a perception filter to an agent
+await agent.addPerceptionFilter(source, filter);
+
+// Filter can provide:
+// - modifyRoomDescription(output, room, viewer) - Inject content into room descriptions
+// - getAddressableEntities() - Return array of names that can be addressed via "to" verb
+// - onAddressed(speaker, targetName, message) - Handle when player says "to <entity> <message>"
+// - onSee/onHear/onSmell/onTaste/onFeel(message, source) - Sensory hooks
+```
+
+**Example: The Mask** - A neural interface wearable that:
+- When worn, adds Pluribus (the city AI) as an addressable entity
+- Forwards sensory input to Pluribus for AI awareness
+- Injects Pluribus's presence into room descriptions
+- Registers `think <message>` verb for silent communication
+
+### Body Parts and Sensory System
+
+Human bodies have a hierarchical part structure with sensory capabilities:
+
+```
+torso (root)
+  ├─ head ($head prototype)
+  │   ├─ face
+  │   │   ├─ leftEye, rightEye ($eye - canSee)
+  │   │   ├─ leftEar, rightEar ($ear - hear method)
+  │   │   ├─ nose ($nose - canSmell)
+  │   │   └─ mouth ($mouth - canTaste, delegates to tongue)
+  │   │       └─ tongue ($tongue - canTaste, canSpeak)
+  │   ├─ neck, scalp
+  ├─ shoulders → arms → forearms → hands → fingers
+  ├─ thighs → knees → legs → feet
+  └─ groin, chest, abdomen, back
+```
+
+Each sensory organ has capability methods that propagate up:
+- `head.canSmell()` → `face.nose.canSmell()`
+- `head.canTaste()` → `face.mouth.canTaste()` → `mouth.tongue.canTaste()`
+- `embodied.smell(message)` checks `head.canSmell()` before processing
+
 ## MCP Integration
 
 The MCP server at port 3001 provides tools for Claude Code to interact with the MOO world:

@@ -52,6 +52,26 @@ Move agent to a new location.
 await agent.moveTo(room);
 ```
 
+### Perception Filters
+
+Agents can have perception filters that modify their view of the world. See [Perception Filters](./perception-filters.md) for full details.
+
+```javascript
+// Add a filter
+await agent.addPerceptionFilter(source, filter);
+
+// Remove a filter
+await agent.removePerceptionFilter(source);
+
+// Access current filters
+const filters = agent.perceptionFilters; // Array of { source, filter }
+```
+
+Filters can:
+- Modify room descriptions (augmented reality overlays)
+- Provide addressable entities (virtual NPCs)
+- Receive sensory hooks (onSee, onHear, onSmell, onTaste, onFeel)
+
 ## $embodied - Entities with Bodies
 
 ### Purpose
