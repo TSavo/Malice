@@ -3107,18 +3107,56 @@ Core Objects:
       }
     );
 
-    // Root docs resources - expose docs/*.md files (technical references)
+    // Root docs resources - expose all docs/*.md files recursively
     const docsDir = path.join(process.cwd(), 'docs');
-    // Only expose these specific docs (not everything)
-    const exposedDocs = [
-      'MCP-TOOLS.md',
-      'plot-jobs.md',
-      'BUILDERS-GUIDE.md',
-      'moo-programming.md',
-      'npc-agent.md',
-      'TIMELINE.md',
-      'SMITH-TOWER-BUILDERS-GUIDE.md',
-    ];
+
+    // Recursively scan directory for .md files
+    const scanDocsDir = (dir: string, prefix = ''): Array<{ name: string; relativePath: string; fullPath: string }> => {
+      const results: Array<{ name: string; relativePath: string; fullPath: string }> = [];
+      try {
+        const entries = fs.readdirSync(dir, { withFileTypes: true });
+        for (const entry of entries) {
+          const fullPath = path.join(dir, entry.name);
+          const relativePath = prefix ? `${prefix}/${entry.name}` : entry.name;
+
+          if (entry.isDirectory()) {
+            // Skip city-ai directory (has its own moo://city-ai/* resources)
+            if (entry.name !== 'city-ai') {
+              results.push(...scanDocsDir(fullPath, relativePath));
+            }
+          } else if (entry.name.endsWith('.md')) {
+            // Convert path to resource name: docs/moo/prototypes/agents.md -> moo/prototypes/agents
+            const name = relativePath.replace(/\.md$/, '').toLowerCase();
+            results.push({ name, relativePath, fullPath });
+          }
+        }
+      } catch { /* ignore missing directories */ }
+      return results;
+    };
+
+    // Helper to get all doc entries
+    const getAllDocs = (): Array<{ name: string; uri: string; relativePath: string }> => {
+      return scanDocsDir(docsDir).map(d => ({
+        name: d.name,
+        uri: `moo://docs/${d.name}`,
+        relativePath: d.relativePath,
+      }));
+    };
+
+    // Helper to find and read a doc by name
+    const findDoc = (name: string): { content: string; path: string } | null => {
+      const allDocs = scanDocsDir(docsDir);
+      const match = allDocs.find(d => d.name === name.toLowerCase());
+      if (match) {
+        try {
+          return {
+            content: fs.readFileSync(match.fullPath, 'utf-8'),
+            path: match.relativePath,
+          };
+        } catch { /* ignore */ }
+      }
+      return null;
+    };
 
     // List all exposed docs
     server.resource(
@@ -3127,17 +3165,12 @@ Core Objects:
       { description: 'List all technical documentation files' },
       async () => {
         try {
-          const files = fs.readdirSync(docsDir)
-            .filter(f => exposedDocs.includes(f))
-            .map(f => ({
-              name: f.replace('.md', ''),
-              uri: `moo://docs/${f.replace('.md', '').toLowerCase()}`
-            }));
+          const docs = getAllDocs();
           return {
             contents: [{
               uri: 'moo://docs',
               mimeType: 'application/json',
-              text: JSON.stringify({ files }, null, 2),
+              text: JSON.stringify({ files: docs }, null, 2),
             }],
           };
         } catch (err) {
@@ -3158,12 +3191,12 @@ Core Objects:
       new ResourceTemplate('moo://docs/{name}', {
         list: async () => {
           try {
-            const files = fs.readdirSync(docsDir).filter(f => exposedDocs.includes(f));
+            const docs = getAllDocs();
             return {
-              resources: files.map(f => ({
-                uri: `moo://docs/${f.replace('.md', '').toLowerCase()}`,
-                name: f.replace('.md', ''),
-                description: `Documentation: ${f.replace('.md', '')}`,
+              resources: docs.map(d => ({
+                uri: d.uri,
+                name: d.name,
+                description: `Documentation: ${d.relativePath}`,
               }))
             };
           } catch {
@@ -3185,40 +3218,25 @@ Core Objects:
           };
         }
 
-        try {
-          // Try exact match first, then case-insensitive
-          const files = fs.readdirSync(docsDir).filter(f => exposedDocs.includes(f));
-          const match = files.find(f =>
-            f.replace('.md', '').toLowerCase() === name.toLowerCase()
-          );
-
-          if (!match) {
-            return {
-              contents: [{
-                uri: `moo://docs/${name}`,
-                mimeType: 'text/plain',
-                text: `Error: Document '${name}' not found. Available: ${files.map(f => f.replace('.md', '')).join(', ')}`,
-              }],
-            };
-          }
-
-          const content = fs.readFileSync(path.join(docsDir, match), 'utf-8');
-          return {
-            contents: [{
-              uri: `moo://docs/${name}`,
-              mimeType: 'text/markdown',
-              text: content,
-            }],
-          };
-        } catch (err) {
+        const doc = findDoc(name);
+        if (!doc) {
+          const allDocs = getAllDocs();
           return {
             contents: [{
               uri: `moo://docs/${name}`,
               mimeType: 'text/plain',
-              text: `Error reading document: ${String(err)}`,
+              text: `Error: Document '${name}' not found. Available: ${allDocs.map(d => d.name).join(', ')}`,
             }],
           };
         }
+
+        return {
+          contents: [{
+            uri: `moo://docs/${name}`,
+            mimeType: 'text/markdown',
+            text: doc.content,
+          }],
+        };
       }
     );
 
