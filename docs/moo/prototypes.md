@@ -19,8 +19,8 @@ $root (#1)
       ├─ $exit (directional links)
       │   └─ $guardedExit (faction-restricted passage)
       │
-      ├─ $agent (autonomous entities)
-      │   └─ $embodied (physical bodies)
+      ├─ $agent (autonomous entities, perception filters)
+      │   └─ $embodied (physical bodies, sensory methods)
       │       └─ $human (human-type agents)
       │           └─ $player (player characters)
       │               └─ $admin (wizard/admin)
@@ -30,9 +30,25 @@ $root (#1)
       │       ├─ $food (solid food)
       │       ├─ $drink (liquids)
       │       └─ $bodyPart (body parts)
+      │           ├─ $torso, $stomach
+      │           ├─ $head (canSmell, canTaste, canHear delegation)
+      │           ├─ $eye (canSee)
+      │           ├─ $ear (hear method)
+      │           ├─ $nose (canSmell)
+      │           ├─ $mouth (canTaste → tongue)
+      │           ├─ $tongue (canTaste, canSpeak)
+      │           ├─ $arm, $hand, $finger
+      │           └─ $leg, $foot
       │
       └─ $wearable (items that can be worn)
-          └─ $clothing (wearable clothing)
+          ├─ $clothing (wearable clothing)
+          └─ $.theMask (neural interface, perception filter)
+
+Special Singletons:
+  $.pluribus - City AI consciousness
+  $.theMask - The neural interface device
+  $.bodyFactory - Creates human body hierarchies
+  $.recycler - Object creation and recycling
 ```
 
 ## Core Prototypes

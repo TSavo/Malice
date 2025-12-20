@@ -1,12 +1,14 @@
 # Body System
 
-Body parts, wounds, metabolism, and death states in Malice.
+Body parts, wounds, metabolism, sensory organs, and death states in Malice.
 
 ## Overview
 
-The body system models player and NPC anatomy, health, and injury:
+The body system models player and NPC anatomy, health, sensory perception, and injury:
 - **$bodyPart** - Base for all body parts
-- **$hand / $head / $stomach** - Specific body parts
+- **$head / $torso / $stomach** - Core body parts
+- **$eye / $ear / $nose / $mouth / $tongue** - Sensory organs
+- **$arm / $hand / $finger / $leg / $foot** - Limbs
 - **$wound** - Injury system
 - **$corpse / $humanRemains / $skeletalRemains** - Death/decay states
 
@@ -53,23 +55,37 @@ await hand.addWound(woundObj);
 
 ## Specific Body Parts
 
+### $head
+
+The head contains sensory organs and delegates sensory capability checks to them.
+
+```javascript
+const head = await $recycler.create($head, {
+  name: 'head',
+  partType: 'head',
+  health: 100,
+  maxHealth: 100
+});
+```
+
+**Sensory Delegation Methods:**
+```javascript
+// Check if agent can smell (delegates to nose)
+await head.canSmell();  // → face.nose.canSmell()
+
+// Check if agent can taste (delegates to mouth → tongue)
+await head.canTaste();  // → face.mouth.canTaste() → tongue.canTaste()
+
+// Check if agent can hear (delegates to ears)
+await head.canHear();   // → true if either ear exists
+```
+
 ### $hand
 
 ```javascript
 const hand = await $recycler.create($hand, {
   name: 'right hand',
   partType: 'hand',
-  health: 100,
-  maxHealth: 100
-});
-```
-
-### $head
-
-```javascript
-const head = await $recycler.create($head, {
-  name: 'head',
-  partType: 'head',
   health: 100,
   maxHealth: 100
 });
@@ -85,6 +101,159 @@ const stomach = await $recycler.create($stomach, {
   maxHealth: 100
 });
 ```
+
+## Sensory Organs
+
+Sensory organs determine what an agent can perceive. Each has a `can<Sense>()` method that returns false if the organ is damaged, missing, or blocked.
+
+### $eye
+
+Controls visual perception via `canSee()`.
+
+```javascript
+const eye = await $recycler.create($eye, {
+  name: 'left eye',
+  partType: 'eye',
+  health: 100,
+  maxHealth: 100
+});
+
+// Check if eye can see
+await eye.canSee();  // false if destroyed, missing, or blindfolded
+```
+
+**Conditions affecting sight:**
+- `condition.destroyed` - Eye destroyed
+- `condition.missing` - Eye removed
+- `condition.blindfolded` - Vision blocked
+
+### $ear
+
+Controls auditory perception via `hear()`.
+
+```javascript
+const ear = await $recycler.create($ear, {
+  name: 'left ear',
+  partType: 'ear',
+  health: 100,
+  maxHealth: 100
+});
+
+// Listen for sounds
+await ear.hear(message, source);  // Calls owner.hear() if functional
+```
+
+**Conditions affecting hearing:**
+- `condition.destroyed` - Ear destroyed
+- `condition.missing` - Ear removed
+- `condition.plugged` - Hearing blocked
+
+### $nose
+
+Controls olfactory perception via `canSmell()`.
+
+```javascript
+const nose = await $recycler.create($nose, {
+  name: 'nose',
+  partType: 'nose',
+  health: 100,
+  maxHealth: 100
+});
+
+// Check if nose can smell
+await nose.canSmell();  // false if destroyed, missing, stuffed, or blocked
+```
+
+**Conditions affecting smell:**
+- `condition.destroyed` - Nose destroyed
+- `condition.missing` - Nose removed
+- `condition.stuffed` - Congested/blocked
+- `contents.length > 0` - Something in nose
+
+### $mouth
+
+Controls tasting (via tongue) and speaking.
+
+```javascript
+const mouth = await $recycler.create($mouth, {
+  name: 'mouth',
+  partType: 'mouth',
+  health: 100,
+  maxHealth: 100
+});
+
+// Check if mouth can taste (delegates to tongue)
+await mouth.canTaste();  // → tongue.canTaste()
+```
+
+### $tongue
+
+Controls gustatory perception via `canTaste()` and speech via `canSpeak()`.
+
+```javascript
+const tongue = await $recycler.create($tongue, {
+  name: 'tongue',
+  partType: 'tongue',
+  health: 100,
+  maxHealth: 100
+});
+
+// Check if tongue can taste
+await tongue.canTaste();  // false if destroyed, missing, or numb
+
+// Check if tongue can speak
+await tongue.canSpeak();  // false if destroyed or missing
+```
+
+**Conditions affecting taste:**
+- `condition.destroyed` - Tongue destroyed
+- `condition.missing` - Tongue removed
+- `condition.numb` - Anesthetized
+
+## Sensory Delegation Chain
+
+The head provides high-level sensory methods that delegate down the hierarchy:
+
+```
+head.canSmell()
+  └─> face.getPart('nose')
+      └─> nose.canSmell()
+
+head.canTaste()
+  └─> face.getPart('mouth')
+      └─> mouth.canTaste()
+          └─> mouth.getPart('tongue')
+              └─> tongue.canTaste()
+
+head.canHear()
+  └─> face.getPart('left ear') || face.getPart('right ear')
+      └─> ear exists? → true
+```
+
+### Usage with Perception Filters
+
+When an agent has perception filters (like The Mask), sensory hooks are called:
+
+```javascript
+// In agent.see() - only fires if canSee() returns true
+if (await self.canSee()) {
+  await self.tell(message);
+  // Notify perception filters
+  for (const { filter } of self.perceptionFilters) {
+    if (filter.onSee) await filter.onSee(message, source);
+  }
+}
+
+// In agent.smell() - only fires if canSmell() returns true
+if (await self.canSmell()) {
+  await self.tell(message);
+  for (const { filter } of self.perceptionFilters) {
+    if (filter.onSmell) await filter.onSmell(message, source);
+  }
+}
+```
+
+See [Perception Filters](./perception-filters.md) for full details on sensory hooks.
 
 ## $wound - Injury System
 
@@ -235,5 +404,7 @@ await stomach.digest(); // Extracts calories
 ## See Also
 
 - [Agents](./agents.md) - Players and NPCs that have bodies
+- [Perception Filters](./perception-filters.md) - Sensory hooks and perception modification
+- [The Mask & Pluribus](./mask-pluribus.md) - Neural interface that uses sensory hooks
 - [Wounds](./wounds.md) - Detailed wound system
 - [Items](./items.md) - Food and consumables that affect metabolism
