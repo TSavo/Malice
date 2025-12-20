@@ -284,12 +284,25 @@ export class ObjectManager {
       }
     }
 
+    // Convert methods to proper format ({ code: string })
+    // Methods may be passed as plain strings or as { code: string, ... } objects
+    const wrappedMethods: Record<string, any> = {};
+    if (params.methods) {
+      for (const [name, method] of Object.entries(params.methods)) {
+        if (typeof method === 'string') {
+          wrappedMethods[name] = { code: method };
+        } else {
+          wrappedMethods[name] = method;
+        }
+      }
+    }
+
     // Create object with all properties in one atomic operation
     const obj = await this.db.create({
       _id: id,
       parent: { type: 'objref', value: parentId },
       properties: typedProperties,
-      methods: params.methods || {},
+      methods: wrappedMethods,
     });
 
     const runtime = new RuntimeObjectImpl(obj, this);

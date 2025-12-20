@@ -14,3 +14,5 @@ export { EnglishBuilder } from './english-builder.js';
 export { EmoteBuilder } from './emote-builder.js';
 export { FormatBuilder } from './format-builder.js';
 export { NotesBuilder } from './notes-builder.js';
+export { PluribusBuilder } from './pluribus-builder.js';
+export { MaskBuilder } from './mask-builder.js';

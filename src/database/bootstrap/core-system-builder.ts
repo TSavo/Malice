@@ -19,6 +19,8 @@ import { PlotBuilder } from './plot-builder.js';
 import { AiBuilder } from './ai-builder.js';
 import { NotesBuilder } from './notes-builder.js';
 import { CombatBuilder } from './combat-builder.js';
+import { PluribusBuilder } from './pluribus-builder.js';
+import { MaskBuilder } from './mask-builder.js';
 
 /**
  * Orchestrates building all core system objects
@@ -80,6 +82,8 @@ export class CoreSystemBuilder {
     const aiBuilder = new AiBuilder(this.manager);
     const notesBuilder = new NotesBuilder(this.manager);
     const combatBuilder = new CombatBuilder(this.manager);
+    const pluribusBuilder = new PluribusBuilder(this.manager);
+    const maskBuilder = new MaskBuilder(this.manager);
 
     await authManagerBuilder.build();
     await charGenBuilder.build();
@@ -102,6 +106,15 @@ export class CoreSystemBuilder {
     await notesBuilder.build();
     await combatBuilder.build();
 
+    // Build Pluribus and Mask
+    // Get prototype IDs from aliases
+    const objManager = await this.manager.load(0);
+    const aliases = objManager?.get('aliases') || {};
+    const agentId = aliases.agent || 8; // agent prototype
+    const wearableId = aliases.wearable || 36; // wearable prototype
+    await pluribusBuilder.build(agentId); // Agent as parent for Pluribus (it acts)
+    await maskBuilder.build(wearableId); // Wearable prototype as parent for Mask
+
     // Register aliases
     await authManagerBuilder.registerAlias();
     await charGenBuilder.registerAlias();
@@ -123,6 +136,8 @@ export class CoreSystemBuilder {
     await aiBuilder.registerAlias();
     await notesBuilder.registerAlias();
     await combatBuilder.registerAlias();
+    await pluribusBuilder.registerAlias();
+    await maskBuilder.registerAlias();
   }
 
   /**

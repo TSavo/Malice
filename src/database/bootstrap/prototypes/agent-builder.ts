@@ -73,6 +73,11 @@ export class AgentBuilder {
         movementState: null,
         // Movement job name (for cancellation)
         movementJob: null,
+        // Perception filters - modify what this agent perceives
+        // Each filter: { source: objref, filter: objref }
+        // Filter methods: modifyRoomDescription, getAddressableEntities, onAddressed
+        // Sensory hooks: onSee, onHear, onSmell, onTaste, onFeel
+        perceptionFilters: [],
       },
       methods: {},
     });
@@ -87,6 +92,7 @@ export class AgentBuilder {
     this.addMovementMethods(obj);
     this.addStatusEffectMethods(obj);
     this.addDyingMethods(obj);
+    this.addPerceptionFilterMethods(obj);
 
     return obj;
   }
@@ -2422,6 +2428,151 @@ export class AgentBuilder {
       const progress = self.dyingProgress || 0;
       const remaining = 100 - progress;
       return Math.ceil(remaining / 6.67);
+    `);
+  }
+
+  private addPerceptionFilterMethods(obj: RuntimeObject): void {
+    // Add a perception filter
+    obj.setMethod('addPerceptionFilter', `
+      /** Add a perception filter to this agent.
+       *  Filters can modify room descriptions, provide addressable entities,
+       *  and receive sensory hooks (onSee, onHear, onSmell, onTaste, onFeel).
+       *  @param source - The source object (e.g., the Mask)
+       *  @param filter - The filter object (may be same as source)
+       *  @returns { success, message }
+       */
+      const source = args[0];
+      const filter = args[1] || source;
+
+      if (!source || typeof source.id !== 'number') {
+        return { success: false, message: 'Invalid source.' };
+      }
+
+      const filters = self.perceptionFilters || [];
+
+      // Check if already have filter from this source
+      const existing = filters.find(f => f.source === source);
+      if (existing) {
+        return { success: false, message: 'Filter already active from this source.' };
+      }
+
+      filters.push({ source, filter });
+      self.perceptionFilters = filters;
+
+      return { success: true, message: 'Filter added.' };
+    `);
+
+    // Remove a perception filter by source
+    obj.setMethod('removePerceptionFilter', `
+      /** Remove a perception filter by its source object.
+       *  @param source - The source object to remove
+       *  @returns { success, message }
+       */
+      const source = args[0];
+
+      if (!source) {
+        return { success: false, message: 'No source specified.' };
+      }
+
+      const filters = self.perceptionFilters || [];
+      const index = filters.findIndex(f => f.source === source);
+
+      if (index === -1) {
+        return { success: false, message: 'No filter from this source.' };
+      }
+
+      filters.splice(index, 1);
+      self.perceptionFilters = filters;
+
+      return { success: true, message: 'Filter removed.' };
+    `);
+
+    // Get all active perception filters
+    obj.setMethod('getPerceptionFilters', `
+      /** Get all active perception filters.
+       *  @returns Array of { source, filter }
+       */
+      return self.perceptionFilters || [];
+    `);
+
+    // The 'to' verb - speak to someone (checks perception filters first)
+    obj.setMethod('to', `
+      /** Speak directly to someone.
+       *  Usage: to <name> <message>
+       *  Addresses a specific person, triggering their attention.
+       *  Checks perception filters for addressable entities before room lookup.
+       */
+      // Parse target and message from command
+      const cmdParts = command.trim().split(/\\s+/);
+      cmdParts.shift(); // Remove 'to'
+      if (cmdParts.length < 2) {
+        return 'Usage: to <name> <message>';
+      }
+
+      // First word is target, rest is message
+      const targetName = cmdParts.shift().toLowerCase();
+      const message = cmdParts.join(' ');
+
+      if (!message.trim()) {
+        return 'What do you want to say?';
+      }
+
+      // Check perception filters for addressable entities
+      const filters = self.perceptionFilters || [];
+      for (const entry of filters) {
+        const filter = entry.filter;
+        if (filter && filter.getAddressableEntities) {
+          const entities = await filter.getAddressableEntities();
+          if (entities && entities.some(e => e.toLowerCase() === targetName)) {
+            // Filter claims this target
+            if (filter.onAddressed) {
+              return await filter.onAddressed(self, targetName, message);
+            }
+          }
+        }
+      }
+
+      // Normal room lookup
+      const location = self.location;
+      if (!location) {
+        return 'You are nowhere.';
+      }
+
+      const contents = location.contents || [];
+      let target = null;
+
+      for (const obj of contents) {
+        if (!obj || obj === self) continue;
+
+        const objName = (obj.name || '').toLowerCase();
+        const aliases = (obj.aliases || []).map(a => a.toLowerCase());
+
+        if (objName === targetName || aliases.includes(targetName) ||
+            objName.startsWith(targetName) || aliases.some(a => a.startsWith(targetName))) {
+          target = obj;
+          break;
+        }
+      }
+
+      if (!target) {
+        return 'You don\\'t see "' + targetName + '" here.';
+      }
+
+      // Announce to room
+      if (location.announce) {
+        await location.announce(self, target, {
+          actor: 'You say to ' + target.name + ', "' + message + '"',
+          target: self.name + ' says to you, "' + message + '"',
+          others: self.name + ' says to ' + target.name + ', "' + message + '"'
+        });
+      }
+
+      // Trigger AI response if target has onSpokenTo handler
+      if (target.onSpokenTo) {
+        await target.onSpokenTo(self, message);
+      }
+
+      return '';
     `);
   }
 }

@@ -500,7 +500,7 @@ export class RuntimeObjectImpl implements RuntimeObject {
     const aliasIds = (objectManager?.get('aliases') as Record<string, number | Record<string, number>>) || {};
     const resolvedAliases: Record<string, RuntimeObject> = {};
     const aliasNames: string[] = [];
-    
+
     for (const [name, value] of Object.entries(aliasIds)) {
       // Skip nested objects (like bodyParts, weapons, ammoTypes, magazines)
       if (typeof value === 'number') {
