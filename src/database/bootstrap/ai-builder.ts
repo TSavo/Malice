@@ -1510,6 +1510,266 @@ CORE PRINCIPLES
     `);
 
     // ═══════════════════════════════════════════════════════════════════
+    // PATHFINDING - A* algorithm for room-to-room navigation
+    // ═══════════════════════════════════════════════════════════════════
+
+    this.ai.setMethod('path', `
+      /**
+       * Find shortest path between two rooms using A* algorithm
+       * @param fromRoom - Starting room (object or ID)
+       * @param toRoom - Destination room (object or ID)
+       * @param options - { ignoreLocks?: boolean, maxSteps?: number }
+       * @returns { success, path, totalDistance, error? }
+       */
+      const fromRoomArg = args[0];
+      const toRoomArg = args[1];
+      const options = args[2] || {};
+
+      // Load rooms if IDs were passed
+      let fromRoom = fromRoomArg;
+      let toRoom = toRoomArg;
+
+      if (typeof fromRoomArg === 'number') {
+        fromRoom = await $load(fromRoomArg);
+        if (!fromRoom) {
+          return { success: false, error: 'Could not load fromRoom #' + fromRoomArg };
+        }
+      }
+      if (typeof toRoomArg === 'number') {
+        toRoom = await $load(toRoomArg);
+        if (!toRoom) {
+          return { success: false, error: 'Could not load toRoom #' + toRoomArg };
+        }
+      }
+
+      // Verify both are rooms (have exits property)
+      if (!fromRoom.exits) {
+        return { success: false, error: 'fromRoom #' + fromRoom.id + ' is not a room (no exits)' };
+      }
+      if (!toRoom.exits) {
+        return { success: false, error: 'toRoom #' + toRoom.id + ' is not a room (no exits)' };
+      }
+
+      // Same room?
+      if (fromRoom.id === toRoom.id) {
+        return { success: true, path: [], totalDistance: 0 };
+      }
+
+      const maxSteps = options.maxSteps || 1000;
+      const ignoreLocks = options.ignoreLocks || false;
+
+      // A* algorithm
+      // openSet: array of { roomId, f, g } sorted by f-cost (lowest first)
+      // gScore: roomId -> cost from start
+      // cameFrom: roomId -> { prevRoomId, direction, distance, exitId }
+
+      const openSet = [{ roomId: fromRoom.id, f: 0, g: 0 }];
+      const gScore = {};
+      gScore[fromRoom.id] = 0;
+      const cameFrom = {};
+      const visited = {};
+
+      let steps = 0;
+
+      while (openSet.length > 0 && steps < maxSteps) {
+        steps++;
+
+        // Pop lowest f-cost
+        const current = openSet.shift();
+        const currentId = current.roomId;
+
+        // Already visited?
+        if (visited[currentId]) continue;
+        visited[currentId] = true;
+
+        // Goal reached?
+        if (currentId === toRoom.id) {
+          // Reconstruct path
+          const path = [];
+          let totalDistance = 0;
+          let nodeId = toRoom.id;
+
+          while (cameFrom[nodeId]) {
+            const step = cameFrom[nodeId];
+            path.unshift({
+              direction: step.direction,
+              roomId: nodeId,
+              distance: step.distance,
+            });
+            totalDistance += step.distance;
+            nodeId = step.prevRoomId;
+          }
+
+          return { success: true, path, totalDistance };
+        }
+
+        // Load current room
+        const currentRoom = await $load(currentId);
+        if (!currentRoom) continue;
+
+        const exits = currentRoom.exits || [];
+
+        for (const exit of exits) {
+          if (!exit) continue;
+
+          // Check if exit is passable
+          if (!ignoreLocks) {
+            try {
+              const canUse = await exit.canUse(null);
+              if (!canUse) continue;
+            } catch (e) {
+              // If canUse fails, assume locked
+              continue;
+            }
+          }
+
+          // Get destination
+          const destRoom = exit.destRoom;
+          if (!destRoom) continue;
+
+          const neighborId = typeof destRoom === 'number' ? destRoom : destRoom.id;
+          if (visited[neighborId]) continue;
+
+          const exitDistance = exit.distance || 10;
+          const tentativeG = gScore[currentId] + exitDistance;
+
+          if (gScore[neighborId] === undefined || tentativeG < gScore[neighborId]) {
+            gScore[neighborId] = tentativeG;
+            cameFrom[neighborId] = {
+              prevRoomId: currentId,
+              direction: exit.name,
+              distance: exitDistance,
+            };
+
+            // Heuristic: Euclidean distance to goal
+            let h = 0;
+            try {
+              const neighborRoom = await $load(neighborId);
+              if (neighborRoom && neighborRoom.distanceTo) {
+                h = await neighborRoom.distanceTo(toRoom);
+              }
+            } catch (e) {
+              // If distanceTo fails, use 0 heuristic (Dijkstra fallback)
+            }
+
+            const f = tentativeG + h;
+
+            // Insert sorted by f-cost
+            let inserted = false;
+            for (let i = 0; i < openSet.length; i++) {
+              if (f < openSet[i].f) {
+                openSet.splice(i, 0, { roomId: neighborId, f, g: tentativeG });
+                inserted = true;
+                break;
+              }
+            }
+            if (!inserted) {
+              openSet.push({ roomId: neighborId, f, g: tentativeG });
+            }
+          }
+        }
+      }
+
+      if (steps >= maxSteps) {
+        return { success: false, error: 'Max steps (' + maxSteps + ') exceeded' };
+      }
+
+      return { success: false, error: 'No path found' };
+    `);
+
+    this.ai.setMethod('walkPath', `
+      /**
+       * Walk an AI human along a path returned by path()
+       * @param humanId - The AI human's object ID
+       * @param path - Array of { direction, roomId, distance } from path()
+       * @returns { success, stepsCompleted, error? }
+       */
+      const humanId = args[0];
+      const path = args[1];
+
+      if (!humanId) {
+        return { success: false, stepsCompleted: 0, error: 'Human ID is required' };
+      }
+      if (!path || !Array.isArray(path)) {
+        return { success: false, stepsCompleted: 0, error: 'Path array is required' };
+      }
+      if (path.length === 0) {
+        return { success: true, stepsCompleted: 0 }; // Already there
+      }
+
+      const human = await $load(humanId);
+      if (!human) {
+        return { success: false, stepsCompleted: 0, error: 'Could not load human #' + humanId };
+      }
+
+      const location = human.location;
+      if (!location) {
+        return { success: false, stepsCompleted: 0, error: 'Human has no location' };
+      }
+
+      let stepsCompleted = 0;
+
+      for (const step of path) {
+        // Get current location
+        const currentRoom = human.location;
+        if (!currentRoom) {
+          return { success: false, stepsCompleted, error: 'Human lost location at step ' + stepsCompleted };
+        }
+
+        // Find the exit
+        const exits = currentRoom.exits || [];
+        let targetExit = null;
+
+        for (const exit of exits) {
+          if (exit && exit.name === step.direction) {
+            targetExit = exit;
+            break;
+          }
+        }
+
+        if (!targetExit) {
+          return { success: false, stepsCompleted, error: 'Exit "' + step.direction + '" not found at step ' + stepsCompleted };
+        }
+
+        // Start movement
+        const destRoom = targetExit.destRoom;
+        const distance = targetExit.distance || step.distance || 10;
+
+        try {
+          const result = await human.startMovement(destRoom, distance, step.direction);
+          if (!result.success) {
+            return { success: false, stepsCompleted, error: result.message || 'Movement failed at step ' + stepsCompleted };
+          }
+        } catch (e) {
+          return { success: false, stepsCompleted, error: 'Movement error at step ' + stepsCompleted + ': ' + (e.message || e) };
+        }
+
+        // Wait for movement to complete
+        // Poll isMoving() with delay
+        const maxWait = 60000; // 60 seconds max per step
+        const pollInterval = 100; // 100ms
+        let waited = 0;
+
+        while (waited < maxWait) {
+          const isMoving = await human.isMoving();
+          if (!isMoving) break;
+
+          // Sleep for pollInterval
+          await new Promise(resolve => setTimeout(resolve, pollInterval));
+          waited += pollInterval;
+        }
+
+        if (waited >= maxWait) {
+          return { success: false, stepsCompleted, error: 'Movement timeout at step ' + stepsCompleted };
+        }
+
+        stepsCompleted++;
+      }
+
+      return { success: true, stepsCompleted };
+    `);
+
+    // ═══════════════════════════════════════════════════════════════════
     // DESCRIBE
     // ═══════════════════════════════════════════════════════════════════
 
@@ -1658,7 +1918,125 @@ CORE PRINCIPLES
       return { success: true, prompted: true };
     `);
 
-    console.log('[AiBuilder] Session and expectation methods rebuilt');
+    // Pathfinding methods
+    this.ai.setMethod('path', `
+      const fromRoomArg = args[0];
+      const toRoomArg = args[1];
+      const options = args[2] || {};
+      let fromRoom = fromRoomArg;
+      let toRoom = toRoomArg;
+      if (typeof fromRoomArg === 'number') {
+        fromRoom = await $load(fromRoomArg);
+        if (!fromRoom) return { success: false, error: 'Could not load fromRoom #' + fromRoomArg };
+      }
+      if (typeof toRoomArg === 'number') {
+        toRoom = await $load(toRoomArg);
+        if (!toRoom) return { success: false, error: 'Could not load toRoom #' + toRoomArg };
+      }
+      if (!fromRoom.exits) return { success: false, error: 'fromRoom #' + fromRoom.id + ' is not a room' };
+      if (!toRoom.exits) return { success: false, error: 'toRoom #' + toRoom.id + ' is not a room' };
+      if (fromRoom.id === toRoom.id) return { success: true, path: [], totalDistance: 0 };
+      const maxSteps = options.maxSteps || 1000;
+      const ignoreLocks = options.ignoreLocks || false;
+      const openSet = [{ roomId: fromRoom.id, f: 0, g: 0 }];
+      const gScore = {}; gScore[fromRoom.id] = 0;
+      const cameFrom = {};
+      const visited = {};
+      let steps = 0;
+      while (openSet.length > 0 && steps < maxSteps) {
+        steps++;
+        const current = openSet.shift();
+        const currentId = current.roomId;
+        if (visited[currentId]) continue;
+        visited[currentId] = true;
+        if (currentId === toRoom.id) {
+          const path = [];
+          let totalDistance = 0;
+          let nodeId = toRoom.id;
+          while (cameFrom[nodeId]) {
+            const step = cameFrom[nodeId];
+            path.unshift({ direction: step.direction, roomId: nodeId, distance: step.distance });
+            totalDistance += step.distance;
+            nodeId = step.prevRoomId;
+          }
+          return { success: true, path, totalDistance };
+        }
+        const currentRoom = await $load(currentId);
+        if (!currentRoom) continue;
+        const exits = currentRoom.exits || [];
+        for (const exit of exits) {
+          if (!exit) continue;
+          if (!ignoreLocks) {
+            try { const canUse = await exit.canUse(null); if (!canUse) continue; } catch (e) { continue; }
+          }
+          const destRoom = exit.destRoom;
+          if (!destRoom) continue;
+          const neighborId = typeof destRoom === 'number' ? destRoom : destRoom.id;
+          if (visited[neighborId]) continue;
+          const exitDistance = exit.distance || 10;
+          const tentativeG = gScore[currentId] + exitDistance;
+          if (gScore[neighborId] === undefined || tentativeG < gScore[neighborId]) {
+            gScore[neighborId] = tentativeG;
+            cameFrom[neighborId] = { prevRoomId: currentId, direction: exit.name, distance: exitDistance };
+            let h = 0;
+            try {
+              const neighborRoom = await $load(neighborId);
+              if (neighborRoom && neighborRoom.distanceTo) h = await neighborRoom.distanceTo(toRoom);
+            } catch (e) {}
+            const f = tentativeG + h;
+            let inserted = false;
+            for (let i = 0; i < openSet.length; i++) {
+              if (f < openSet[i].f) { openSet.splice(i, 0, { roomId: neighborId, f, g: tentativeG }); inserted = true; break; }
+            }
+            if (!inserted) openSet.push({ roomId: neighborId, f, g: tentativeG });
+          }
+        }
+      }
+      if (steps >= maxSteps) return { success: false, error: 'Max steps exceeded' };
+      return { success: false, error: 'No path found' };
+    `);
+
+    this.ai.setMethod('walkPath', `
+      const humanId = args[0];
+      const path = args[1];
+      if (!humanId) return { success: false, stepsCompleted: 0, error: 'Human ID required' };
+      if (!path || !Array.isArray(path)) return { success: false, stepsCompleted: 0, error: 'Path array required' };
+      if (path.length === 0) return { success: true, stepsCompleted: 0 };
+      const human = await $load(humanId);
+      if (!human) return { success: false, stepsCompleted: 0, error: 'Could not load human' };
+      if (!human.location) return { success: false, stepsCompleted: 0, error: 'Human has no location' };
+      let stepsCompleted = 0;
+      for (const step of path) {
+        const currentRoom = human.location;
+        if (!currentRoom) return { success: false, stepsCompleted, error: 'Human lost location' };
+        const exits = currentRoom.exits || [];
+        let targetExit = null;
+        for (const exit of exits) {
+          if (exit && exit.name === step.direction) { targetExit = exit; break; }
+        }
+        if (!targetExit) return { success: false, stepsCompleted, error: 'Exit not found: ' + step.direction };
+        const destRoom = targetExit.destRoom;
+        const distance = targetExit.distance || step.distance || 10;
+        try {
+          const result = await human.startMovement(destRoom, distance, step.direction);
+          if (!result.success) return { success: false, stepsCompleted, error: result.message || 'Movement failed' };
+        } catch (e) { return { success: false, stepsCompleted, error: 'Movement error: ' + (e.message || e) }; }
+        const maxWait = 60000;
+        const pollInterval = 100;
+        let waited = 0;
+        while (waited < maxWait) {
+          const isMoving = await human.isMoving();
+          if (!isMoving) break;
+          await new Promise(resolve => setTimeout(resolve, pollInterval));
+          waited += pollInterval;
+        }
+        if (waited >= maxWait) return { success: false, stepsCompleted, error: 'Movement timeout' };
+        stepsCompleted++;
+      }
+      return { success: true, stepsCompleted };
+    `);
+
+    console.log('[AiBuilder] Session, expectation, and pathfinding methods rebuilt');
   }
 
   async registerAlias(): Promise<void> {
