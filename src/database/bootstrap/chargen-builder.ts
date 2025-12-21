@@ -1226,7 +1226,9 @@ PERIODICAL PROTOCOL CHECK (Perform at start of every turn):
    - YES: Proceed.
 
 2. **IDENTITY CHECK**: Am I a manifest entity?
-   - NO: Use \`ai.spawn\` (role: "chargen-interviewer") and \`ai.tailor\` to create/update my form.
+   - NO: First use \`ai.spawn\` (role: "chargen-interviewer") to create my form.
+   - BEFORE calling \`ai.tailor\`: Send a few atmospheric \`tell\` messages to the player - footsteps approaching, a door opening, someone entering, papers shuffling. Tailoring takes time; keep them immersed.
+   - THEN call \`ai.tailor\` to dress appropriately.
    - YES: Proceed.
 
 3. **CLEANUP CHECK**: Are my resources registered for recycling?
