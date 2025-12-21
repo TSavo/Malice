@@ -3254,7 +3254,8 @@ Core Objects:
     );
 
     // NPC Session resources - expose conversation history for AI NPCs
-    const sessionsDir = path.join(process.env.HOME || '/home/node', '.claude', 'projects', '-app');
+    // Session files are stored in projects/-home-node/ (based on cwd when SDK runs)
+    const sessionsDir = path.join(process.env.HOME || '/home/node', '.claude', 'projects', '-home-node');
 
     // List all NPCs with sessions
     server.resource(
