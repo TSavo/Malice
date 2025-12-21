@@ -42,7 +42,7 @@ In the corner, a separate terminal sits dark and unmarked—different from the o
       ],
       objects: [
         {
-          prototype: 'thing',
+          prototype: 'describable',
           name: 'unmarked terminal',
           description: `A standalone terminal in the corner, separate from the main command consoles. No labels, no branding. The screen is dark until approached, then flickers to life with a simple interface:
 

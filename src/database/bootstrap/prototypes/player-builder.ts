@@ -312,6 +312,12 @@ export class PlayerBuilder {
     obj.setMethod('_processChargenMessage', `
       const message = args[0];
 
+      console.log('[CharGen] _processChargenMessage for player #' + self.id + ': "' + message.substring(0, 50) + '..."');
+
+      // Cancel any pending inactivity timeout - player is speaking
+      console.log('[CharGen] Cancelling timeout before processing...');
+      await $.charGen.cancelPlayerTimeout(self.id);
+
       const session = self.chargenAgentSession;
       const promptTemplate = $.charGen.interviewerPrompt || '';
       const systemPrompt = promptTemplate.replace('{{playerId}}', String(self.id));
@@ -324,6 +330,15 @@ export class PlayerBuilder {
           }
         });
         self.chargenAgentSession = result.session;
+
+        // Register session with $ai for persistence (survives player logout)
+        if (result.session && $ai) {
+          await $ai.registerSession(result.session, self.id, self.name + ' (chargen)', 'chargen-session');
+        }
+
+        // Reschedule inactivity timeout - AI has responded, waiting for player
+        console.log('[CharGen] Rescheduling timeout after AI response...');
+        await $.charGen.schedulePlayerTimeout(self.id);
       } catch (err) {
         console.error('[CharGen] AI session error:', err?.message || err);
       }

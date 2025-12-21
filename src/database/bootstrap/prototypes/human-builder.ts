@@ -1009,12 +1009,13 @@ export class HumanBuilder {
         return;
       }
 
-      // We got the lock - process this message
-      await self._processSpokenMessage(speaker.id, speaker.name, message, systemPrompt);
+      // We got the lock - process this message (fire-and-forget, don't block input)
+      self._processSpokenMessage(speaker.id, speaker.name, message, systemPrompt);
     `);
 
     // Internal method to process spoken message(s)
     // After processing, checks queue and batches any pending messages into one
+    // Fire-and-forget - does not block caller
     obj.setMethod('_processSpokenMessage', `
       const speakerId = args[0];
       const speakerName = args[1];
@@ -1034,135 +1035,47 @@ export class HumanBuilder {
         };
       }
 
-      try {
-        // Run the query (awaited, not fire-and-forget)
-        const result = await $query(systemPrompt, userPrompt, self.agentSession, options);
-        self.agentSession = result.session;
-      } catch (err) {
-        console.error('[onSpokenTo] AI error for #' + self.id + ':', err?.message || err);
-      }
+      const role = profile?.role || 'npc';
 
-      // Check if there are queued messages - batch them all into one
-      const pending = await $mutex.check(self, 'query');
-      if (pending && pending.length > 0) {
-        // Group messages by speaker and combine
-        // Format: "Speaker1 says: msg1" Then "Speaker2 says: msg2"
-        const parts = pending.map(p => p.speakerName + ' says: "' + p.message + '"');
-        const combined = parts.join('" Then ');
-        // Clear the queue
-        await $mutex.update(self, 'query', []);
+      // Fire-and-forget query - don't block the input prompt
+      $query(systemPrompt, userPrompt, self.agentSession, options)
+        .then(async (result) => {
+          self.agentSession = result.session;
 
-        // Get fresh system prompt (in case NPC state changed)
-        const freshPrompt = await self.buildAgentPrompt();
-        if (freshPrompt) {
-          // Process combined messages - use first speaker's info for the wrapper
-          await self._processSpokenMessage(pending[0].speakerId, 'Multiple speakers', combined, freshPrompt);
-        } else {
-          // NPC is no longer AI-controlled, release lock
+          // Register session with $ai for persistence
+          if (result.session && ai) {
+            await ai.registerSession(result.session, self.id, self.name, role);
+          }
+
+          // Check if there are queued messages - batch them all into one
+          const pending = await $mutex.check(self, 'query');
+          if (pending && pending.length > 0) {
+            // Group messages by speaker and combine
+            const parts = pending.map(p => p.speakerName + ' says: "' + p.message + '"');
+            const combined = parts.join('" Then ');
+            // Clear the queue
+            await $mutex.update(self, 'query', []);
+
+            // Get fresh system prompt (in case NPC state changed)
+            const freshPrompt = await self.buildAgentPrompt();
+            if (freshPrompt) {
+              // Process combined messages recursively
+              self._processSpokenMessage(pending[0].speakerId, 'Multiple speakers', combined, freshPrompt);
+            } else {
+              // NPC is no longer AI-controlled, release lock
+              await $mutex.release(self, 'query');
+            }
+          } else {
+            // Queue is empty, release the lock
+            await $mutex.release(self, 'query');
+          }
+        })
+        .catch(async (err) => {
+          console.error('[onSpokenTo] AI error for #' + self.id + ':', err?.message || err);
+          // Release the lock on error
           await $mutex.release(self, 'query');
-        }
-      } else {
-        // Queue is empty, release the lock
-        await $mutex.release(self, 'query');
-      }
+        });
     `);
-
-    // Action queue system - meters out say/emote actions with timing delays
-    // Timing constants per action type
-    obj.set('_actionTimings', {
-      say: { baseDelay: 1500, msPerChar: 120 },     // Speech is slow, deliberate
-      emote: { baseDelay: 800, msPerChar: 80 },     // Physical actions faster
-      default: { baseDelay: 1000, msPerChar: 120 }  // Fallback
-    });
-    obj.set('_actionVariance', 5000); // Random 0-5000ms added
-
-    // Queue an action for metered execution
-    obj.setMethod('queueAction', `
-      /** Queue a say/emote action for metered execution.
-       *  @param command - The full command string (e.g., "say Hello")
-       */
-      const command = args[0];
-      if (!command) return;
-
-      // Initialize queue if needed
-      const queue = self._actionQueue || [];
-      queue.push({ command, queuedAt: Date.now() });
-      self._actionQueue = queue;
-
-      // If not already processing, start the queue processor
-      if (!self._actionProcessing) {
-        await self._processActionQueue();
-      }
-    `);
-
-    // Process the action queue - executes one action, schedules next
-    obj.setMethod('_processActionQueue', `
-      const queue = self._actionQueue || [];
-
-      if (queue.length === 0) {
-        self._actionProcessing = false;
-        return;
-      }
-
-      self._actionProcessing = true;
-
-      // Pop first action
-      const action = queue.shift();
-      self._actionQueue = queue;
-
-      // Execute the action
-      try {
-        const match = await self.matchVerb(action.command);
-        if (match && match.handler) {
-          await match.handler.callVerb(
-            match.verbInfo.method,
-            null,      // context
-            self,      // player (the NPC)
-            action.command,
-            match.args
-          );
-        }
-      } catch (err) {
-        console.error('[ActionQueue] Error executing action:', err?.message || err);
-      }
-
-      // Calculate delay for next action based on type
-      const verb = action.command.split(/\\s+/)[0].toLowerCase();
-      const timings = self._actionTimings || {};
-      let timing = timings.default || { baseDelay: 1000, msPerChar: 120 };
-
-      // Map verb shortcuts to their types
-      if (verb === 'say' || verb === '"' || verb === "'") {
-        timing = timings.say || timing;
-      } else if (verb === 'emote' || verb === ':') {
-        timing = timings.emote || timing;
-      }
-
-      // Calculate delay: base + (length * msPerChar) + random variance
-      const textLength = action.command.length;
-      const variance = self._actionVariance || 500;
-      const delay = timing.baseDelay + (textLength * timing.msPerChar) + Math.floor(Math.random() * variance);
-
-      // If more actions in queue, schedule next processing
-      if (self._actionQueue && self._actionQueue.length > 0) {
-        const jobName = 'actionQueue_' + self.id + '_' + Date.now();
-        await $.scheduler.schedule(jobName, delay, 0, self, '_processActionQueue');
-      } else {
-        self._actionProcessing = false;
-      }
-    `);
-
-    // Get current queue length (for MCP response)
-    obj.setMethod('getActionQueueLength', `
-      return (self._actionQueue || []).length;
-    `);
-
-    // Clear the action queue (admin/emergency use)
-    obj.setMethod('clearActionQueue', `
-      self._actionQueue = [];
-      self._actionProcessing = false;
-    `);
-
     // Called when someone gives an item to this NPC
     obj.setMethod('onItemReceived', `
       /** Handle receiving an item from someone.
@@ -1185,6 +1098,13 @@ export class HumanBuilder {
       $query(systemPrompt, userPrompt, self.agentSession)
         .then(async (result) => {
           self.agentSession = result.session;
+
+          // Register session with $ai for persistence (survives NPC recycling)
+          if (result.session && $ai) {
+            const profile = $ai ? await $ai.get(self.id) : null;
+            const role = profile?.role || 'npc';
+            await $ai.registerSession(result.session, self.id, self.name, role);
+          }
         })
         .catch((err) => {
           console.error('[onItemReceived] AI error for #' + self.id + ':', err?.message || err);

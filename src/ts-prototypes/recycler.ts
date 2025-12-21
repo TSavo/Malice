@@ -134,21 +134,15 @@ export class Recycler {
         obj.set(key, value);
       }
 
-      console.log(`[Recycler] Reused object #${obj.id}`);
     } else {
       // Pool empty - create fresh object
       obj = await $.create(params);
-      console.log(`[Recycler] Created new object #${obj.id}`);
     }
 
     // Call onCreate hook if it exists
     if (obj.hasMethod && obj.hasMethod('onCreate')) {
       await obj.onCreate(caller);
     }
-
-    // Log creation
-    const ownerInfo = params.properties.owner ? `owner: #${params.properties.owner}` : 'system';
-    console.log(`[Recycler] Object #${obj.id} ready (${ownerInfo})`);
 
     return obj;
   }

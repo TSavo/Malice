@@ -150,6 +150,13 @@ export class CoreSystemBuilder {
     const promptBuilder = new PromptBuilder(this.manager);
     await promptBuilder.build(true); // true = force rebuild
 
+    // Rebuild Scheduler methods (critical for timeouts)
+    console.log('  Rebuilding Scheduler methods...');
+    const schedulerBuilder = new SchedulerBuilder(this.manager, {
+      disableDefaultJobs: true, // Don't re-register default jobs
+    });
+    await schedulerBuilder.build(true);
+
     // Rebuild CharGen methods
     console.log('  Rebuilding CharGen methods...');
     const charGenBuilder = new CharGenBuilder(this.manager);
@@ -194,7 +201,7 @@ export class CoreSystemBuilder {
     // Rebuild AI methods
     console.log('  Rebuilding AI methods...');
     const aiBuilder = new AiBuilder(this.manager);
-    await aiBuilder.build();
+    await aiBuilder.build(true);
     await aiBuilder.registerAlias();
 
     // Rebuild Plot methods

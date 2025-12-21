@@ -38,7 +38,7 @@ export class SchedulerBuilder {
     private options: { disableDefaultJobs?: boolean } = {}
   ) {}
 
-  async build(): Promise<void> {
+  async build(forceRebuild = false): Promise<void> {
     // Check if already exists via alias
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
@@ -47,21 +47,23 @@ export class SchedulerBuilder {
 
     if (aliases.scheduler) {
       this.scheduler = await this.manager.load(aliases.scheduler);
-      if (this.scheduler) return; // Already exists
+      if (this.scheduler && !forceRebuild) return; // Already exists and not forcing rebuild
     }
 
-    // Create new Scheduler
-    const root = await this.manager.load(1);
-    this.scheduler = await this.manager.create({
-      parent: root!,
-      properties: {
-        name: 'Scheduler',
-        description: 'Global job scheduler for periodic tasks',
-        // Jobs stored by name
-        jobs: {},
-      },
-      methods: {},
-    });
+    if (!this.scheduler) {
+      // Create new Scheduler only if it doesn't exist
+      const root = await this.manager.load(1);
+      this.scheduler = await this.manager.create({
+        parent: root!,
+        properties: {
+          name: 'Scheduler',
+          description: 'Global job scheduler for periodic tasks',
+          // Jobs stored by name
+          jobs: {},
+        },
+        methods: {},
+      });
+    }
 
     // Schedule a new job
     // schedule(name, delay, interval, target, method, ...args)
@@ -168,43 +170,48 @@ export class SchedulerBuilder {
       const jobs = self.jobs || {};
       const results = [];
       let modified = false;
-      const toDelete = [];
+      const toRun = [];
 
+      // First pass: collect jobs to run and update their state IMMEDIATELY
+      // This prevents duplicate firing during async execution
       for (const name of Object.keys(jobs)) {
         const job = jobs[name];
         if (!job.enabled) continue;
 
         if (now >= job.nextRun) {
-          // Time to run this job
-          try {
-            const target = await $load(job.targetId);
-            if (target && target[job.method]) {
-              const result = await target[job.method](...(job.args || []));
-              results.push({ job: name, success: true, result: result });
-            } else {
-              results.push({ job: name, success: false, error: 'Target or method not found' });
-            }
-          } catch (err) {
-            results.push({ job: name, success: false, error: String(err) });
-          }
+          // Collect job info for execution
+          toRun.push({ name, job: { ...job } });
 
-          // One-shot (interval=0) gets deleted, recurring jobs schedule next run
+          // Update state BEFORE execution to prevent duplicate fires
           if (job.interval === 0) {
-            toDelete.push(name);
+            // One-shot: delete immediately
+            delete jobs[name];
           } else {
+            // Recurring: schedule next run immediately
             job.nextRun = now + job.interval;
           }
           modified = true;
         }
       }
 
-      // Delete one-shot jobs that ran
-      for (const name of toDelete) {
-        delete jobs[name];
-      }
-
+      // Persist state changes before running jobs
       if (modified) {
         self.jobs = jobs;
+      }
+
+      // Second pass: execute the jobs (async, but state already updated)
+      for (const { name, job } of toRun) {
+        try {
+          const target = await $load(job.targetId);
+          if (target && target[job.method]) {
+            const result = await target[job.method](...(job.args || []));
+            results.push({ job: name, success: true, result: result });
+          } else {
+            results.push({ job: name, success: false, error: 'Target or method not found' });
+          }
+        } catch (err) {
+          results.push({ job: name, success: false, error: String(err) });
+        }
       }
 
       return results;

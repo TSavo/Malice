@@ -56,7 +56,6 @@ export const building = {
         east: '%ODB',
         south: '%PHL',
         in: '%E',
-        down: '%ZSTAIR',
       },
       methods: {
         onContentArrived: `

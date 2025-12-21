@@ -1763,7 +1763,19 @@ MEMORY ACTIONS (for persistent critical memories):
   remember - Store a critical memory (humanId, text, importance?, tags?)
   recall   - Get memories for an NPC (humanId, importance?, tag?, limit?)
   forget   - Remove a memory by index (humanId, index)
-  memories - Get formatted memory summary for an NPC (humanId, criticalOnly?)`,
+  memories - Get formatted memory summary for an NPC (humanId, criticalOnly?)
+
+EXPECTATION ACTIONS (response timeout management):
+  expect       - Set up timeout waiting for response from target (humanId, targetId, timeout?, prompt?, recurring?)
+                 USE THIS when in time-sensitive conversations or situations to handle:
+                 - Player walking away mid-conversation
+                 - Player going idle or AFK
+                 - Player logging off without saying goodbye
+                 When timeout fires, you'll get a prompt to re-engage or move on.
+                 Auto-cancels when target speaks to you (no manual cancel needed).
+                 Default: 5 min timeout, recurring (keeps prompting until cancelled).
+  cancelExpect - Manually cancel a pending expectation (humanId, targetId)
+                 Rarely needed - auto-cancels when target speaks to you.`,
       {
         action: z.string().describe('Action to perform (see help above)'),
         role: z.string().optional().describe('Role for this AI (e.g., "guard", "shopkeeper")'),
@@ -1800,8 +1812,13 @@ MEMORY ACTIONS (for persistent critical memories):
         // Tailor action parameters
         context: z.string().optional().describe('Additional context for tailor (e.g., "shabby, recently fired")'),
         clothed: z.boolean().optional().describe('Auto-dress on spawn using tailor'),
+        // Expectation action parameters
+        targetId: z.number().optional().describe('Object ID to expect response from'),
+        timeout: z.number().optional().describe('Timeout in ms (for expect action, default 300000 = 5 min)'),
+        prompt: z.string().optional().describe('Custom timeout prompt (for expect action)'),
+        recurring: z.boolean().optional().describe('Whether to auto-reschedule after timeout (for expect action, default true)'),
       },
-      async ({ action, role, name, description, locationId, sex, age, humanId, command, recycle, personality, history, text, importance, tags, tag, index, limit, criticalOnly, context, clothed }) => {
+      async ({ action, role, name, description, locationId, sex, age, humanId, command, recycle, personality, history, text, importance, tags, tag, index, limit, criticalOnly, context, clothed, targetId, timeout, prompt, recurring }) => {
         const aiRegistry = await this.getAlias('ai');
         if (!aiRegistry) {
           return {
@@ -2115,8 +2132,33 @@ MEMORY ACTIONS (for persistent critical memories):
               return ok(result);
             }
 
+            // ═══════════════════════════════════════════════════════════════
+            // RESPONSE EXPECTATION ACTIONS
+            // ═══════════════════════════════════════════════════════════════
+
+            case 'expect': {
+              if (humanId === undefined) return err('humanId required');
+              if (targetId === undefined) return err('targetId required');
+
+              const options: any = { humanId };
+              if (timeout !== undefined) options.timeout = timeout;
+              if (prompt) options.prompt = prompt;
+              if (recurring !== undefined) options.recurring = recurring;
+
+              const result = await aiRegistry.call('expectResponseFrom', targetId, options);
+              return ok(result);
+            }
+
+            case 'cancelExpect': {
+              if (humanId === undefined) return err('humanId required');
+              if (targetId === undefined) return err('targetId required');
+
+              const result = await aiRegistry.call('cancelExpectation', targetId, humanId);
+              return ok(result);
+            }
+
             default:
-              return err(`Unknown action: ${action}. Valid: spawn, despawn, list, info, do, look, tailor, profile, setPersonality, setHistory, remember, recall, forget, memories`);
+              return err(`Unknown action: ${action}. Valid: spawn, despawn, list, info, do, look, tailor, profile, setPersonality, setHistory, remember, recall, forget, memories, expect, cancelExpect`);
           }
         } catch (error) {
           return err(`Error: ${error instanceof Error ? error.message : String(error)}`);
@@ -3257,14 +3299,13 @@ Core Objects:
     // Session files are stored in projects/-home-node/ (based on cwd when SDK runs)
     const sessionsDir = path.join(process.env.HOME || '/home/node', '.claude', 'projects', '-home-node');
 
-    // List all NPCs with sessions
+    // List all sessions (persisted on $ai even after NPCs are recycled)
     server.resource(
       'npc-sessions',
       'moo://npc-sessions',
-      { description: 'List all AI NPCs with conversation sessions' },
+      { description: 'List all AI NPC conversation sessions' },
       async () => {
         try {
-          // Get all AI NPCs from the registry
           const aiRegistry = await this.getAlias('ai');
           if (!aiRegistry) {
             return {
@@ -3276,38 +3317,14 @@ Core Objects:
             };
           }
 
-          // Use the getAll method to list all registered NPCs
-          const humans = await aiRegistry.call('getAll') || [];
-          const npcs: Array<{ id: number; name: string; sessionId: string | null }> = [];
-
-          for (const human of humans) {
-            // Extract ID from various formats
-            let npcId: number;
-            if (typeof human === 'number') {
-              npcId = human;
-            } else if (human?.type === 'objref') {
-              npcId = human.value;
-            } else if (human?.id !== undefined) {
-              npcId = human.id;
-            } else {
-              continue;
-            }
-
-            const npc = await this.manager.load(npcId as ObjId);
-            if (npc) {
-              npcs.push({
-                id: npcId,
-                name: String(await npc.get('name')) || `NPC #${npcId}`,
-                sessionId: (await npc.get('agentSessionId') as string | null) || null,
-              });
-            }
-          }
+          // Get sessions from $ai.listSessions() - persists after NPC recycling
+          const sessions = await aiRegistry.call('listSessions') || [];
 
           return {
             contents: [{
               uri: 'moo://npc-sessions',
               mimeType: 'application/json',
-              text: JSON.stringify({ npcs }, null, 2),
+              text: JSON.stringify({ sessions }, null, 2),
             }],
           };
         } catch (err) {
@@ -3322,40 +3339,25 @@ Core Objects:
       }
     );
 
-    // Individual NPC session resource
+    // Individual NPC session resource - keyed by sessionId (persists after NPC recycling)
     server.resource(
       'npc-session',
-      new ResourceTemplate('moo://npc-sessions/{npcId}', {
+      new ResourceTemplate('moo://npc-sessions/{sessionId}', {
         list: async () => {
           try {
             const aiRegistry = await this.getAlias('ai');
             if (!aiRegistry) return { resources: [] };
 
-            const humans = await aiRegistry.call('getAll') || [];
+            // Get sessions from $ai registry (persists after NPC recycling)
+            const sessions = await aiRegistry.call('listSessions') || [];
             const resources: Array<{ uri: string; name: string; description: string }> = [];
 
-            for (const human of humans) {
-              let npcId: number;
-              if (typeof human === 'number') {
-                npcId = human;
-              } else if (human?.type === 'objref') {
-                npcId = human.value;
-              } else if (human?.id !== undefined) {
-                npcId = human.id;
-              } else {
-                continue;
-              }
-
-              const npc = await this.manager.load(npcId as ObjId);
-              if (npc) {
-                const name = await npc.get('name') || `NPC #${npcId}`;
-                const sessionId = await npc.get('agentSessionId');
-                resources.push({
-                  uri: `moo://npc-sessions/${npcId}`,
-                  name: `${name} Session`,
-                  description: sessionId ? `Conversation history for ${name}` : `No session for ${name}`,
-                });
-              }
+            for (const session of sessions) {
+              resources.push({
+                uri: `moo://npc-sessions/${session.sessionId}`,
+                name: `${session.npcName || 'Unknown'} Session`,
+                description: `${session.role || 'NPC'} conversation - started ${new Date(session.startTime).toLocaleString()}`,
+              });
             }
 
             return { resources };
@@ -3364,55 +3366,38 @@ Core Objects:
           }
         },
       }),
-      { description: 'Get conversation history for a specific NPC' },
-      async (_uri: URL, variables: { npcId?: string | string[] }) => {
-        const npcIdVar = variables.npcId;
-        const npcIdStr = Array.isArray(npcIdVar) ? npcIdVar[0] : npcIdVar;
-        const npcId = npcIdStr ? parseInt(npcIdStr, 10) : NaN;
+      { description: 'Get conversation history for a specific NPC session' },
+      async (_uri: URL, variables: { sessionId?: string | string[] }) => {
+        const sessionIdVar = variables.sessionId;
+        const sessionId = Array.isArray(sessionIdVar) ? sessionIdVar[0] : sessionIdVar;
 
-        if (isNaN(npcId)) {
+        if (!sessionId) {
           return {
             contents: [{
               uri: 'moo://npc-sessions/unknown',
               mimeType: 'application/json',
-              text: JSON.stringify({ error: 'Invalid NPC ID' }),
+              text: JSON.stringify({ error: 'Missing session ID' }),
             }],
           };
         }
 
         try {
-          const npc = await this.manager.load(npcId as ObjId);
-          if (!npc) {
-            return {
-              contents: [{
-                uri: `moo://npc-sessions/${npcId}`,
-                mimeType: 'application/json',
-                text: JSON.stringify({ error: `NPC #${npcId} not found` }),
-              }],
-            };
-          }
-
-          const name = await npc.get('name') || `NPC #${npcId}`;
-          const sessionId = await npc.get('agentSessionId');
-
-          if (!sessionId) {
-            return {
-              contents: [{
-                uri: `moo://npc-sessions/${npcId}`,
-                mimeType: 'application/json',
-                text: JSON.stringify({ npcId, name, error: 'No session found' }),
-              }],
-            };
-          }
+          // Get session metadata from $ai registry
+          const aiRegistry = await this.getAlias('ai');
+          const sessionInfo = aiRegistry ? await aiRegistry.call('getSession', sessionId) : null;
 
           const sessionFile = path.join(sessionsDir, `${sessionId}.jsonl`);
 
           if (!fs.existsSync(sessionFile)) {
             return {
               contents: [{
-                uri: `moo://npc-sessions/${npcId}`,
+                uri: `moo://npc-sessions/${sessionId}`,
                 mimeType: 'application/json',
-                text: JSON.stringify({ npcId, name, sessionId, error: 'Session file not found' }),
+                text: JSON.stringify({
+                  sessionId,
+                  ...(sessionInfo || {}),
+                  error: 'Session file not found',
+                }),
               }],
             };
           }
@@ -3446,12 +3431,15 @@ Core Objects:
 
           return {
             contents: [{
-              uri: `moo://npc-sessions/${npcId}`,
+              uri: `moo://npc-sessions/${sessionId}`,
               mimeType: 'application/json',
               text: JSON.stringify({
-                npcId,
-                name,
                 sessionId,
+                npcId: sessionInfo?.npcId,
+                npcName: sessionInfo?.npcName,
+                role: sessionInfo?.role,
+                startTime: sessionInfo?.startTime,
+                lastActive: sessionInfo?.lastActive,
                 messageCount: messages.length,
                 messages,
               }, null, 2),
@@ -3460,7 +3448,7 @@ Core Objects:
         } catch (err) {
           return {
             contents: [{
-              uri: `moo://npc-sessions/${npcId}`,
+              uri: `moo://npc-sessions/${sessionId}`,
               mimeType: 'application/json',
               text: JSON.stringify({ error: String(err) }),
             }],

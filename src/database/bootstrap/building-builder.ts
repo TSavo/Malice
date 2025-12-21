@@ -1,5 +1,5 @@
 import { ObjectManager } from '../object-manager.js';
-import type { RuntimeObject } from '../../../types/object.js';
+import type { RuntimeObject, ObjId } from '../../../types/object.js';
 import * as fs from 'fs';
 import * as path from 'path';
 import { pathToFileURL } from 'url';
@@ -448,13 +448,19 @@ export class BuildingBuilder {
             continue;
           }
 
+          const proto = await this.manager.load(protoId as ObjId);
+          if (!proto) {
+            console.warn(`    Warning: could not load prototype '${objDef.prototype}' (#${protoId})`);
+            continue;
+          }
+
           // Extract properties (everything except 'prototype')
           const objProps = { ...objDef };
           delete objProps.prototype;
 
           // Create the object
           const obj = await recycler.create({
-            parent: protoId,
+            parent: proto,
             properties: objProps,
           });
 
@@ -570,14 +576,15 @@ export class BuildingBuilder {
       }
 
       // Determine exit prototype (default to $.exit, allow guardedExit etc.)
-      let exitParentId = exitProto.id;
+      let exitParent = exitProto;
       if (exitProps.prototype && aliases[exitProps.prototype]) {
-        exitParentId = aliases[exitProps.prototype];
+        exitParent = await this.manager.load(aliases[exitProps.prototype] as ObjId);
+        if (!exitParent) exitParent = exitProto;
       }
 
       // Create exit from building room to world room
       const exitToWorld = await recycler.create({
-        parent: exitParentId,
+        parent: exitParent,
         properties: {
           name: direction,
           aliases: this.getDirectionAliases(direction),
@@ -600,7 +607,7 @@ export class BuildingBuilder {
       // GuardedExit applies to entrance (reverse direction)
       const reverseDirection = this.getOppositeDirection(direction);
       const exitToBuilding = await recycler.create({
-        parent: exitParentId,
+        parent: exitParent,
         properties: {
           name: reverseDirection,
           aliases: this.getDirectionAliases(reverseDirection),
