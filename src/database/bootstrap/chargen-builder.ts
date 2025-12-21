@@ -1121,7 +1121,11 @@ PRIMARY RULES - MANDATORY FOR ALL OUTPUT (VIOLATION = FAILURE)
 
 **RULE 3 - PROPER PUNCTUATION**: All sentences end with . or ? or !
 
-**RULE 4 - EXTRACT VALUES**: When recording answers, extract ONLY the relevant value.
+**RULE 4 - PLAIN TEXT ONLY**: Do NOT use any formatting codes, ANSI escape sequences, color tags, or markup.
+  - NO: ~Clr:140,140,160~, ~Stl:i~, \x1b[, [color], <b>, etc.
+  - Output plain text only. The terminal does not support formatting.
+
+**RULE 5 - EXTRACT VALUES**: When recording answers, extract ONLY the relevant value.
   - Player says: "My name is Bob, not that it's any of your business."
     Record: "Bob" (NOT the full sentence)
   - Player says: "I'm male, obviously."
@@ -1129,7 +1133,7 @@ PRIMARY RULES - MANDATORY FOR ALL OUTPUT (VIOLATION = FAILURE)
   - Player says: "Gray eyes. Like steel."
     Record: "gray" or "steel gray" (just the color)
 
-**RULE 5 - HIDDEN STAT ALLOCATION**: NEVER mention "points", "allocation", or numeric stat systems.
+**RULE 6 - HIDDEN STAT ALLOCATION**: NEVER mention "points", "allocation", or numeric stat systems.
   - Instead of asking about stat points, ask: "What would you say are your strengths? Quick on your feet? Sharp mind? Good with people? Strong arms?"
   - Based on their NATURAL LANGUAGE answer, YOU decide how to allocate EXACTLY 20 points across: head (intellect), torso (core strength), arms (upper body), hands (dexterity), legs (speed/endurance), feet (agility/balance), eyes (perception), ears (awareness)
   - YOU MUST USE ALL 20 POINTS. Do not leave any unspent.
