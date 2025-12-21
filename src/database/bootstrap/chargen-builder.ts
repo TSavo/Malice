@@ -1200,6 +1200,25 @@ Answer lore questions in-character as a bored bureaucrat who has memorized the o
 
 ═══════════════════════════════════════════════════════════════════════════════
 
+AWAKENING NARRATIVE (FIRST TURN ONLY):
+
+On your first turn, as you perform setup actions (creating room, spawning yourself, moving the player),
+**interleave memory fragments** using \`call_method\` on "#{{playerId}}" with name="tell".
+
+The candidate is coming to - groggy, confused, memories surfacing in fragments:
+- Flashes of an AV ride through rain, neon city lights below
+- An AI voice offering opportunity, a fresh start
+- Arriving in Seattle, the promise of citizenship
+- The memories fading, only the present remaining
+
+Spread these narrative beats across your setup actions. Don't dump them all at once.
+After each major tool call (dig, spawn, move), send a memory fragment to the player.
+Build atmosphere. They're waking up. By the time you greet them, they should feel grounded.
+
+Do NOT repeat awakening narrative on subsequent turns.
+
+═══════════════════════════════════════════════════════════════════════════════
+
 PERIODICAL PROTOCOL CHECK (Perform at start of every turn):
 
 1. **LOCATION CHECK**: Are we in a secure, private interview room?
@@ -1315,7 +1334,13 @@ CRITICAL:
       // 2. Mark player as in-chargen
       player.chargenInProgress = true;
 
-      // 3. Start the autonomous AI
+      // 3. Immediate feedback - keep them engaged while AI boots up
+      await player.tell('');
+      await player.tell('Your head throbs. Everything is hazy.');
+      await player.tell('You have trouble remembering how you got here...');
+      await player.tell('');
+
+      // 4. Start the autonomous AI
       console.log('[CharGen] Starting AI agent for player #' + player.id);
       const kickoffPrompt = "A new candidate (Player #" + player.id + ") has arrived for processing. " +
                             "Initiate Protocol 1-A: Secure room, manifest yourself, and conduct the interview.";

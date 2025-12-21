@@ -97,27 +97,16 @@ export class TelnetTransport extends BaseTransport {
         // Line mode: buffer until we get a complete line
         this.lineBuffer += text;
 
-        // Normalize \r\n to \n (must do this before handling lone \r)
-        this.lineBuffer = this.lineBuffer.replace(/\r\n/g, '\n');
-
-        // Check for complete lines (delimited by \n)
-        // But DON'T process trailing \r yet - it might be followed by \n in next packet
-        let processUpTo = this.lineBuffer.length;
-        if (this.lineBuffer.endsWith('\r')) {
-          processUpTo = this.lineBuffer.length - 1; // Leave trailing \r for next packet
-        }
-
-        const toProcess = this.lineBuffer.substring(0, processUpTo);
-        this.lineBuffer = this.lineBuffer.substring(processUpTo);
-
-        // Now convert any remaining \r to \n (these are standalone \r line endings)
-        const normalized = toProcess.replace(/\r/g, '\n');
+        // Normalize all line endings to \n
+        // \r\n -> \n (Windows/telnet standard)
+        // \r -> \n (old Mac / some terminals)
+        // \n -> \n (Unix)
+        this.lineBuffer = this.lineBuffer.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
 
         // Split and emit complete lines
-        const lines = normalized.split('\n');
-        // Last element might be incomplete (no trailing \n) - put back in buffer
-        const incomplete = lines.pop() || '';
-        this.lineBuffer = incomplete + this.lineBuffer;
+        const lines = this.lineBuffer.split('\n');
+        // Last element might be incomplete (no trailing \n) - keep in buffer
+        this.lineBuffer = lines.pop() || '';
 
         // Emit complete lines
         for (const line of lines) {

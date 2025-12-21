@@ -238,6 +238,42 @@ export class PlayerBuilder {
         }
       }
 
+      // Check if in chargen - forward input to AI interview session
+      if (self.chargenInProgress && self.chargenAgentSession) {
+        // Player is in AI-driven chargen interview
+        // Player must use "to <target> <message>" to speak to the NPC
+        const toMatch = trimmed.match(/^to\\s+(\\S+)\\s+(.+)$/i);
+        if (!toMatch) {
+          // Not a "to" command - tell them how to communicate
+          await self.tell('(Use "to <name> <message>" to speak to someone. Example: to clerk My name is John.)');
+          await self.print('> ');
+          return;
+        }
+
+        const message = toMatch[2].trim();
+        if (!message) {
+          await self.tell('Say what?');
+          await self.print('> ');
+          return;
+        }
+
+        // Use mutex to serialize queries - prevent race conditions
+        const pending = await $mutex.acquire(self, 'chargenQuery', []);
+
+        if (pending !== false) {
+          // Query already in progress - queue this message
+          pending.push(message);
+          await $mutex.update(self, 'chargenQuery', pending);
+          await self.print('> ');
+          return;
+        }
+
+        // We got the lock - process this message
+        await self._processChargenMessage(message);
+        await self.print('> ');
+        return;
+      }
+
       try {
         // Match input against registered verb patterns
         const match = await self.matchVerb(trimmed);
@@ -268,6 +304,43 @@ export class PlayerBuilder {
       } catch (err) {
         await self.tell('Error: ' + err.message);
         await self.print('> ');
+      }
+    `);
+
+    // Internal method to process chargen message(s)
+    // After processing, checks queue and batches any pending messages into one
+    obj.setMethod('_processChargenMessage', `
+      const message = args[0];
+
+      const session = self.chargenAgentSession;
+      const promptTemplate = $.charGen.interviewerPrompt || '';
+      const systemPrompt = promptTemplate.replace('{{playerId}}', String(self.id));
+
+      try {
+        // Run the query (awaited, not fire-and-forget)
+        const result = await $query(systemPrompt, 'The candidate says: "' + message + '"', session, {
+          additionalMcpServers: {
+            'malice-chargen': { type: 'http', url: 'http://localhost:3002/mcp' }
+          }
+        });
+        self.chargenAgentSession = result.session;
+      } catch (err) {
+        console.error('[CharGen] AI session error:', err?.message || err);
+      }
+
+      // Check if there are queued messages - batch them all into one
+      const pending = await $mutex.check(self, 'chargenQuery');
+      if (pending && pending.length > 0) {
+        // Combine all pending messages into one
+        const combined = pending.join('" Then they add: "');
+        // Clear the queue
+        await $mutex.update(self, 'chargenQuery', []);
+
+        // Process combined message
+        await self._processChargenMessage(combined);
+      } else {
+        // Queue is empty, release the lock
+        await $mutex.release(self, 'chargenQuery');
       }
     `);
   }

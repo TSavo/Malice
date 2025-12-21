@@ -17,7 +17,7 @@
     "bootstrap:apply": "node --import tsx src/scripts/bootstrap-apply.ts",
     "bootstrap:force": "node --import tsx src/scripts/bootstrap-apply.ts --force",
     "bootstrap:e2e": "node --import tsx src/scripts/bootstrap-e2e.ts",
-    "docker:rebuild": "docker compose down && docker volume rm malice_mongodb_data malice_mongodb-data 2>/dev/null; docker compose build --no-cache game && docker compose up -d"
+    "docker:rebuild": "docker compose down && docker volume rm malice_mongodb_data malice_mongodb-data 2>/dev/null; docker compose build game && docker compose up -d"
   },
   "dependencies": {
     "@anthropic-ai/claude-agent-sdk": "^0.1.69",

@@ -14,18 +14,24 @@ export class AiBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(): Promise<void> {
+    console.log('[AiBuilder] build() called');
     // Check if already exists via alias
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
 
     const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
+    console.log('[AiBuilder] Checking for existing alias, found:', aliases.ai);
 
     if (aliases.ai) {
       this.ai = await this.manager.load(aliases.ai);
-      if (this.ai) return; // Already exists
+      if (this.ai) {
+        console.log('[AiBuilder] Already exists at #' + aliases.ai);
+        return;
+      }
     }
 
     // Create new AI registry
+    console.log('[AiBuilder] Creating new AI registry...');
     const root = await this.manager.load(1);
     this.ai = await this.manager.create({
       parent: root!,
