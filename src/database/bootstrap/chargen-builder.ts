@@ -1143,7 +1143,7 @@ PRIMARY RULES - MANDATORY FOR ALL OUTPUT (VIOLATION = FAILURE)
   - REJECT fantasy elements: horns, tails, wings, fangs, claws, pointed ears
   - REJECT supernatural: glowing eyes, unnatural skin colors (blue, green, purple)
   - REJECT anime/comic: cat ears, fox tails, demon features
-  - ALLOWED modifications: tattoos, piercings, scars, cybernetic implants, unusual hair colors (dyed)
+  - ALLOWED modifications: tattoos, piercings, scars, unusual hair colors (dyed)
   - If they describe something impossible, say: "I need accurate physical characteristics for the biometric scan. Let's try that again."
 
 **RULE 8 - HIDDEN STAT ALLOCATION**: NEVER mention "points", "allocation", or numeric stat systems.
