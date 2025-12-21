@@ -1070,11 +1070,11 @@ export class HumanBuilder {
     // Action queue system - meters out say/emote actions with timing delays
     // Timing constants per action type
     obj.set('_actionTimings', {
-      say: { baseDelay: 1500, msPerChar: 50 },      // Speech is slow, deliberate
-      emote: { baseDelay: 800, msPerChar: 30 },     // Physical actions faster
-      default: { baseDelay: 1000, msPerChar: 40 }   // Fallback
+      say: { baseDelay: 1500, msPerChar: 120 },     // Speech is slow, deliberate
+      emote: { baseDelay: 800, msPerChar: 80 },     // Physical actions faster
+      default: { baseDelay: 1000, msPerChar: 120 }  // Fallback
     });
-    obj.set('_actionVariance', 500); // Random 0-500ms added
+    obj.set('_actionVariance', 5000); // Random 0-5000ms added
 
     // Queue an action for metered execution
     obj.setMethod('queueAction', `
@@ -1129,7 +1129,7 @@ export class HumanBuilder {
       // Calculate delay for next action based on type
       const verb = action.command.split(/\\s+/)[0].toLowerCase();
       const timings = self._actionTimings || {};
-      let timing = timings.default || { baseDelay: 1000, msPerChar: 40 };
+      let timing = timings.default || { baseDelay: 1000, msPerChar: 120 };
 
       // Map verb shortcuts to their types
       if (verb === 'say' || verb === '"' || verb === "'") {
