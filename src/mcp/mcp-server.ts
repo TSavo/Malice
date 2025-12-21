@@ -4397,6 +4397,79 @@ Core Objects:
       }
     );
 
+    // Object verbs - moo://objects/{id}/verbs
+    server.resource(
+      'object-verbs',
+      new ResourceTemplate('moo://objects/{id}/verbs', { list: undefined }),
+      { description: 'Get all verbs registered on an agent object' },
+      async (_uri: URL, variables: { id?: string | string[] }) => {
+        const idVar = variables.id;
+        const idStr = Array.isArray(idVar) ? idVar[0] : idVar;
+        const objId = idStr ? parseInt(idStr, 10) : NaN;
+
+        if (isNaN(objId)) {
+          return {
+            contents: [{
+              uri: `moo://objects/${idStr}/verbs`,
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: 'Invalid object ID' }),
+            }],
+          };
+        }
+
+        try {
+          const obj = await this.manager.load(objId as ObjId);
+          if (!obj) {
+            return {
+              contents: [{
+                uri: `moo://objects/${objId}/verbs`,
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: `Object #${objId} not found` }),
+              }],
+            };
+          }
+
+          const verbs = obj.get('verbs') as Record<string, unknown> | undefined;
+
+          // Format verbs for display - verbs is { pattern: { target: #id, method: 'name' }, ... }
+          const verbList: Array<{ pattern: string; target: string; method: string }> = [];
+          if (verbs && typeof verbs === 'object') {
+            for (const [pattern, handler] of Object.entries(verbs)) {
+              if (handler && typeof handler === 'object') {
+                const h = handler as { target?: { id?: number }; method?: string };
+                verbList.push({
+                  pattern,
+                  target: h.target?.id !== undefined ? `#${h.target.id}` : 'unknown',
+                  method: h.method || 'unknown',
+                });
+              }
+            }
+          }
+
+          return {
+            contents: [{
+              uri: `moo://objects/${objId}/verbs`,
+              mimeType: 'application/json',
+              text: JSON.stringify({
+                objectId: objId,
+                name: obj.get('name'),
+                verbCount: verbList.length,
+                verbs: verbList,
+              }, null, 2),
+            }],
+          };
+        } catch (err) {
+          return {
+            contents: [{
+              uri: `moo://objects/${objId}/verbs`,
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: String(err) }),
+            }],
+          };
+        }
+      }
+    );
+
     // Object list with pagination - moo://objects/list/{page}
     server.resource(
       'object-list',
