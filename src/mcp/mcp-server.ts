@@ -1924,6 +1924,19 @@ MEMORY ACTIONS (for persistent critical memories):
               }
 
               const trimmed = command.trim();
+
+              // Check if this is a say/emote verb that should be queued for metered execution
+              const verb = trimmed.split(/\s+/)[0].toLowerCase();
+              const QUEUED_VERBS = ['say', 'emote', '"', "'", ':'];
+
+              if (QUEUED_VERBS.includes(verb)) {
+                // Queue for metered execution
+                await human.call('queueAction', trimmed);
+                const queueLength = await human.call('getActionQueueLength') as number;
+                return ok({ queued: true, queueLength: queueLength + 1, command: trimmed });
+              }
+
+              // Execute non-queued verbs immediately
               const match = await human.call('matchVerb', trimmed) as {
                 error?: string;
                 handler?: any;
