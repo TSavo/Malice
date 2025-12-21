@@ -429,6 +429,12 @@ export class EmbodiedBuilder {
 
       const eyes = await self.getEyes();
       if (eyes.length === 0) {
+        // No eyes - fall back to tell() for players in chargen
+        // (they don't have a body yet but still need to receive messages)
+        if (self.tell) {
+          await self.tell(message);
+          return true;
+        }
         return false;
       }
 

@@ -729,8 +729,10 @@ export class ObjectManager {
     session?: string,
     options?: { additionalMcpServers?: Record<string, { type: string; url: string }> }
   ): Promise<{ response: string; session: string }> {
+    console.log('[ObjectManager.$query] Importing SDK...');
     // Dynamic import to avoid loading SDK at startup
     const { query: sdkQuery } = await import('@anthropic-ai/claude-agent-sdk');
+    console.log('[ObjectManager.$query] SDK imported successfully');
 
     const mcpServers: Record<string, { type: string; url: string }> = {
       'malice-moo': {
@@ -742,6 +744,7 @@ export class ObjectManager {
     if (options?.additionalMcpServers) {
       Object.assign(mcpServers, options.additionalMcpServers);
     }
+    console.log('[ObjectManager.$query] MCP servers:', Object.keys(mcpServers).join(', '));
 
     const queryOptions: Record<string, unknown> = {
       systemPrompt,
@@ -755,29 +758,40 @@ export class ObjectManager {
 
     if (session) {
       queryOptions.resume = session;
+      console.log('[ObjectManager.$query] Resuming session:', session.substring(0, 20) + '...');
     }
 
     let response = '';
     let newSessionId: string | null = null;
 
-    for await (const message of sdkQuery({ prompt, options: queryOptions })) {
-      const msg = message as Record<string, unknown>;
+    console.log('[ObjectManager.$query] Calling sdkQuery with prompt length:', prompt.length);
+    try {
+      for await (const message of sdkQuery({ prompt, options: queryOptions })) {
+        const msg = message as Record<string, unknown>;
+        console.log('[ObjectManager.$query] Message type:', msg.type, (msg as any).subtype || '');
 
-      // Capture session ID from init message
-      if (msg.type === 'system' && (msg as any).subtype === 'init') {
-        newSessionId = (msg as any).session_id || (msg as any).data?.session_id;
-      }
+        // Capture session ID from init message
+        if (msg.type === 'system' && (msg as any).subtype === 'init') {
+          newSessionId = (msg as any).session_id || (msg as any).data?.session_id;
+          console.log('[ObjectManager.$query] Got session:', newSessionId?.substring(0, 20) + '...');
+        }
 
-      // Capture text responses from assistant messages
-      if (msg.type === 'assistant' && (msg as any).message?.content) {
-        for (const block of (msg as any).message.content) {
-          if (block.type === 'text') {
-            response += block.text;
+        // Capture text responses from assistant messages
+        if (msg.type === 'assistant' && (msg as any).message?.content) {
+          for (const block of (msg as any).message.content) {
+            if (block.type === 'text') {
+              response += block.text;
+            }
           }
         }
       }
+    } catch (err: unknown) {
+      const error = err as Error;
+      console.error('[ObjectManager.$query] Error:', error?.message || err);
+      throw err;
     }
 
+    console.log('[ObjectManager.$query] Completed, response length:', response.length);
     return {
       response,
       session: newSessionId || session || '',

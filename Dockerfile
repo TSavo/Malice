@@ -13,21 +13,18 @@ ENV DEVCONTAINER=true
 RUN npm install -g @anthropic-ai/claude-code
 
 # Copy package files
-COPY package*.json ./
+COPY --chown=node:node package*.json ./
 
 # Install dependencies (including tsx)
 RUN npm ci
 
 # Copy source code and types
-COPY src ./src
-COPY types ./types
-COPY tsconfig.json ./
+COPY --chown=node:node src ./src
+COPY --chown=node:node types ./types
+COPY --chown=node:node tsconfig.json ./
 
 # Copy all documentation for MCP resources
-COPY docs ./docs
-
-# Give node user ownership of app directory
-RUN chown -R node:node /app
+COPY --chown=node:node docs ./docs
 
 # Set Claude home for credentials (mounted from host)
 ENV CLAUDE_CONFIG_DIR=/home/node/.claude

@@ -982,6 +982,7 @@ export class HumanBuilder {
     `);
 
     // Called when someone speaks directly to this NPC (via "to" verb)
+    // Uses mutex to serialize queries and queue incoming messages
     obj.setMethod('onSpokenTo', `
       /** Handle being spoken to directly.
        *  @param speaker - The RuntimeObject speaking to us
@@ -996,8 +997,32 @@ export class HumanBuilder {
       const systemPrompt = await self.buildAgentPrompt();
       if (!systemPrompt) return; // Not AI-controlled, do nothing
 
+      // Try to acquire the query mutex on this NPC
+      // If acquired (returns false), we process immediately
+      // If blocked (returns pending queue), add our message to the queue
+      const pending = await $mutex.acquire(self, 'query', []);
+
+      if (pending !== false) {
+        // Query already in progress - queue this message
+        pending.push({ speakerId: speaker.id, speakerName: speaker.name, message: message });
+        await $mutex.update(self, 'query', pending);
+        return;
+      }
+
+      // We got the lock - process this message
+      await self._processSpokenMessage(speaker.id, speaker.name, message, systemPrompt);
+    `);
+
+    // Internal method to process spoken message(s)
+    // After processing, checks queue and batches any pending messages into one
+    obj.setMethod('_processSpokenMessage', `
+      const speakerId = args[0];
+      const speakerName = args[1];
+      const message = args[2];
+      const systemPrompt = args[3];
+
       // Build user prompt
-      const userPrompt = speaker.name + ' says to you: "' + message + '"\\n\\nRespond in character.';
+      const userPrompt = speakerName + ' says to you: "' + message + '"\\n\\nRespond in character.';
 
       // Check if this is a chargen interviewer to add additional MCP servers
       const ai = await $.ai;
@@ -1009,15 +1034,37 @@ export class HumanBuilder {
         };
       }
 
-      // Fire-and-forget query - NPC will use MCP tools to speak/emote
-      $query(systemPrompt, userPrompt, self.agentSession, options)
-        .then(async (result) => {
-          // Save session for continuity
-          self.agentSession = result.session;
-        })
-        .catch((err) => {
-          console.error('[onSpokenTo] AI error for #' + self.id + ':', err?.message || err);
-        });
+      try {
+        // Run the query (awaited, not fire-and-forget)
+        const result = await $query(systemPrompt, userPrompt, self.agentSession, options);
+        self.agentSession = result.session;
+      } catch (err) {
+        console.error('[onSpokenTo] AI error for #' + self.id + ':', err?.message || err);
+      }
+
+      // Check if there are queued messages - batch them all into one
+      const pending = await $mutex.check(self, 'query');
+      if (pending && pending.length > 0) {
+        // Group messages by speaker and combine
+        // Format: "Speaker1 says: msg1" Then "Speaker2 says: msg2"
+        const parts = pending.map(p => p.speakerName + ' says: "' + p.message + '"');
+        const combined = parts.join('" Then ');
+        // Clear the queue
+        await $mutex.update(self, 'query', []);
+
+        // Get fresh system prompt (in case NPC state changed)
+        const freshPrompt = await self.buildAgentPrompt();
+        if (freshPrompt) {
+          // Process combined messages - use first speaker's info for the wrapper
+          await self._processSpokenMessage(pending[0].speakerId, 'Multiple speakers', combined, freshPrompt);
+        } else {
+          // NPC is no longer AI-controlled, release lock
+          await $mutex.release(self, 'query');
+        }
+      } else {
+        // Queue is empty, release the lock
+        await $mutex.release(self, 'query');
+      }
     `);
 
     // Called when someone gives an item to this NPC

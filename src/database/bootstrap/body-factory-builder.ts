@@ -470,8 +470,10 @@ export class BodyFactoryBuilder {
       // Build type on torso
       torso.buildType = buildType;
 
-      // Attach body to owner so getBody() works
-      owner.body = torso;
+      // Attach body to owner so getBody() works (if owner provided)
+      if (owner) {
+        owner.body = torso;
+      }
 
       return torso;
     `);

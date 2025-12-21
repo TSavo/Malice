@@ -194,7 +194,10 @@ export class AgentBuilder {
       const pattern = args[1];
       const verbInfo = args[2];
 
-      const inputWords = input.trim().toLowerCase().split(/\\s+/);
+      // Keep original words for %s capture (preserving case)
+      const originalWords = input.trim().split(/\\s+/);
+      // Lowercase words for pattern matching
+      const inputWords = originalWords.map(w => w.toLowerCase());
       const patternParts = pattern.toLowerCase().split(/\\s+/);
 
       let inputIdx = 0;
@@ -249,8 +252,8 @@ export class AgentBuilder {
           sourceObj = handler;
 
         } else if (part === '%s') {
-          // Rest of input as string
-          const rest = inputWords.slice(inputIdx).join(' ');
+          // Rest of input as string (preserve original case)
+          const rest = originalWords.slice(inputIdx).join(' ');
           resolvedArgs.push(rest);
           inputIdx = inputWords.length;
 
@@ -343,6 +346,12 @@ export class AgentBuilder {
        *  @returns Object with resolved RuntimeObject or error string
        */
       const text = args[0];
+      const textLower = text.toLowerCase().trim();
+
+      // Handle self-references: me, myself, self
+      if (textLower === 'me' || textLower === 'myself' || textLower === 'self') {
+        return { resolved: self, error: null };
+      }
 
       // Parse ordinal
       const { ordinal, name } = await self.parseOrdinal(text);
