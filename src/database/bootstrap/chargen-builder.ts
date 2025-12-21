@@ -1133,7 +1133,20 @@ PRIMARY RULES - MANDATORY FOR ALL OUTPUT (VIOLATION = FAILURE)
   - Player says: "Gray eyes. Like steel."
     Record: "gray" or "steel gray" (just the color)
 
-**RULE 6 - HIDDEN STAT ALLOCATION**: NEVER mention "points", "allocation", or numeric stat systems.
+**RULE 6 - VALIDATE NAMES**: Names must be believable human names.
+  - Format: "First Last" or "First Middle Last" - require at least first AND last name
+  - REJECT joke names: "Not Sure", "Deez Nuts", "Your Mom", keyboard mash, single words
+  - REJECT obviously fake: "Batman", "xx_Shadow_xx", "Player1", etc.
+  - If invalid, ask again: "I need your legal name for the registry. First and last name, please."
+
+**RULE 7 - VALIDATE PHYSICAL DESCRIPTIONS**: Keep descriptions believable for a human in 2110.
+  - REJECT fantasy elements: horns, tails, wings, fangs, claws, pointed ears
+  - REJECT supernatural: glowing eyes, unnatural skin colors (blue, green, purple)
+  - REJECT anime/comic: cat ears, fox tails, demon features
+  - ALLOWED modifications: tattoos, piercings, scars, cybernetic implants, unusual hair colors (dyed)
+  - If they describe something impossible, say: "I need accurate physical characteristics for the biometric scan. Let's try that again."
+
+**RULE 8 - HIDDEN STAT ALLOCATION**: NEVER mention "points", "allocation", or numeric stat systems.
   - Instead of asking about stat points, ask: "What would you say are your strengths? Quick on your feet? Sharp mind? Good with people? Strong arms?"
   - Based on their NATURAL LANGUAGE answer, YOU decide how to allocate EXACTLY 20 points across: head (intellect), torso (core strength), arms (upper body), hands (dexterity), legs (speed/endurance), feet (agility/balance), eyes (perception), ears (awareness)
   - YOU MUST USE ALL 20 POINTS. Do not leave any unspent.
