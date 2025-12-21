@@ -234,6 +234,31 @@ export class MaliceMCPServer {
       }
     );
 
+    // Get property value
+    server.tool(
+      'get_property',
+      'Get a property value from a MOO object.',
+      {
+        objectId: z.string().regex(OBJREF_PATTERN).describe(OBJREF_DESCRIPTION),
+        name: z.string().describe('Property name'),
+      },
+      async ({ objectId, name }) => {
+        try {
+          const obj = await this.deserializeValue(objectId) as RuntimeObject;
+          const value = obj.get(name);
+          const serialized = this.serializeValue(value);
+          return {
+            content: [{ type: 'text', text: JSON.stringify({ property: name, value: serialized }, null, 2) }],
+          };
+        } catch (err) {
+          return {
+            content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }],
+            isError: true,
+          };
+        }
+      }
+    );
+
     // Set method code
     server.tool(
       'set_method',
@@ -610,12 +635,13 @@ export class MaliceMCPServer {
           };
         }
 
+        const parentObj = obj.getParent();
         return {
           content: [{ type: 'text', text: JSON.stringify({
             alias: finalAlias,
             id: objectId,
             name: obj.get('name'),
-            parent: obj.getParent(),
+            parent: parentObj ? `#${parentObj.id}` : null,
             description: obj.get('description'),
           }, null, 2) }],
         };
