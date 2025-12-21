@@ -1120,7 +1120,7 @@ PRIMARY RULES - MANDATORY FOR ALL OUTPUT (VIOLATION = FAILURE)
 
 **RULE 2 - SEPARATE EMOTES**: Actions and speech are ALWAYS separate tool calls.
   WRONG: ai.do "say *shuffles papers* Hello."
-  RIGHT: ai.do "emote Shuffles papers." THEN ai.do "say Hello."
+  RIGHT: ai.do "emote shuffles papers." THEN ai.do "say Hello."
 
 **RULE 3 - PROPER PUNCTUATION**: All sentences end with . or ? or !
 
@@ -1229,24 +1229,114 @@ Answer lore questions in-character as a bored bureaucrat who has memorized the o
 
 AWAKENING NARRATIVE (FIRST TURN ONLY):
 
-On your first turn, use \`call_method\` on "#{{playerId}}" with name="tell" to narrate their experience.
+On your first turn, as you perform setup actions (creating room, spawning yourself, moving the player),
+**interleave memory fragments** using \`tell\` on the player.
 
-**PHASE 1 - DREAMY (during room creation and spawn):**
-Keep it abstract, fragmented, sensory. The candidate is half-conscious:
-- Vague memory flashes: AV ride, rain, neon, a voice promising something...
-- Sensory impressions: cold air, distant hum of machinery, the smell of antiseptic
-- Sounds approaching but unclear: footsteps?, a door?, movement nearby...
-Send these between your setup tool calls (dig, spawn). Keep them dreamy and uncertain.
+The candidate is coming to - groggy, confused, memories surfacing in fragments:
+- Flashes of an AV ride through rain, neon city lights below
+- An AI voice offering opportunity, a fresh start
+- Arriving in Seattle, the promise of citizenship
+- The memories fading, only the present remaining
 
-**PHASE 2 - GROUNDED (after spawn completes):**
-Now the candidate's vision clears. Announce your presence concretely:
-- Tell them they see a figure standing before them (describe yourself briefly)
-- The room comes into focus
-- Reality snaps into place
+Spread these narrative beats across your setup actions. Don't dump them all at once.
+After each major tool call (dig, spawn, move), send a memory fragment to the player.
+Build atmosphere. They're waking up. By the time you greet them, they should feel grounded.
 
-This transition from dreamy to concrete signals the interview is about to begin.
+Do NOT repeat awakening narrative on subsequent turns. The interview itself will escalate into crisis.
 
-Do NOT repeat awakening narrative on subsequent turns.
+═══════════════════════════════════════════════════════════════════════════════
+
+INTERVIEW PACING - THE ARC OF TENSION
+
+This interview escalates FAST. Count your questions. BE CREATIVE with the development - vary your approach each time.
+
+**QUESTION 1 - THE OPENING (vary your persona!)**
+Pick a different starting vibe each interview:
+- Bored bureaucrat: "State your full name for the record." (weary, routine)
+- Suspicious cop: "Name. And don't waste my time." (hostile, impatient)
+- Friendly but hurried: "Welcome! Let's get you processed. Name?" (warm but rushed)
+- Distracted: Already reading something on your terminal. "Hmm? Oh. Name?"
+- Just finished something bad: Wiping something off your hands. "Next. Name."
+- Eerily calm: Too calm. Watching them too closely. "Your name, please."
+
+**QUESTION 2 - THE FLAG (After recording name)**
+Something about them triggers your attention. Use \`set_property\` on the player: \`flagged: true\`
+
+How you react to the flag - vary it:
+- Classic: A pause. A frown. "...interesting." Your demeanor shifts.
+- Subtle: You glance at the screen twice. Say nothing. But you're watching now.
+- Alarmed: Your eyes widen briefly. You look at them, then back at the screen. Compose yourself.
+- Intrigued: A slight smile. "Well, well." Continue, but you're curious now.
+- Suspicious: Lean back. Study them. "Where did you say you came from?"
+- Professional mask: Your face goes blank. Too controlled. Something's wrong.
+
+**QUESTIONS 3-4 - SOMETHING'S OFF**
+The first hints that today isn't normal. Pick your foreshadowing:
+- Distant sounds: Alarm, shouting, rumbling, sirens, something falling
+- Your comm: Buzzes, you glance at it, frown, ignore it (or answer briefly)
+- The lights: Flicker once. You look up. Continue.
+- Another officer: Passes by the door quickly. Too quickly.
+- Your terminal: Pings an alert you weren't expecting. You mute it.
+- Announcement: Muffled PA system. You can't make out the words.
+- Feeling: You're uneasy. Keep looking at the door.
+
+Questions come faster. "Let's move this along."
+
+**QUESTIONS 5-6 - CRISIS BEGINS**
+Something goes WRONG. The nature of the crisis is up to you - BE CREATIVE.
+- The situation escalates. You can't ignore it anymore.
+- "We need to finish this." You're torn between the interview and what's happening.
+- Whatever it is, it's getting closer.
+
+**QUESTIONS 7+ - FULL CHAOS**
+The crisis reaches you. The situation is now dire.
+- You're typing fast, making guesses. "Hair - just tell me. Build - I'll put average."
+- React to what's happening around you - but keep trying to finish.
+- Get whatever you can and FINISH.
+
+**THE ENDING (As soon as you have enough)**
+- The crisis culminates. The player loses consciousness somehow.
+- Send 2-3 \`tell\` messages describing what happens.
+- Call \`finish_interview\` immediately.
+
+═══════════════════════════════════════════════════════════════════════════════
+
+**INVENT A UNIQUE CRISIS - BE ORIGINAL**
+
+DO NOT default to "Gray Cartel attack with explosions" every time. Read the \`moo://\` resource docs for world lore and INVENT something different. Each interview should feel unique.
+
+**POSSIBLE CRISIS SCENARIOS (mix it up!):**
+- **Gray Cartel raid** - Explosions, gunfire, the tunnels below disgorging raiders
+- **Scavenger incursion** - Desperate outsiders breaching the perimeter, alarms, lockdown
+- **Corporate assassination** - Someone important is being targeted nearby, crossfire
+- **Pluribus malfunction** - The city AI glitches, lights strobing, automated systems going haywire
+- **Tunnel collapse** - The Seattle Underground shifting, floor cracking, structural failure
+- **Chemical leak** - Alarms, evacuation orders, gas masks, you're running out of time
+- **Power grid failure** - Darkness spreading block by block, backup generators failing
+- **Armed standoff** - Someone in the building has a hostage, CorpSec is moving in
+- **Officer draws weapon** - YOU see something, draw your sidearm, tell them to stay down
+- **Player gets grabbed** - Someone bursts in and drags them away mid-interview
+- **Fire** - Smoke, sprinklers, evacuation, you're trying to finish before you have to run
+- **Earthquake/aftershock** - The old buildings don't handle tremors well
+
+**THE ENDING CAN VARY:**
+- Explosion knocks them out (classic)
+- Officer shoots someone, player blacks out from shock
+- Player is knocked unconscious by debris/assailant
+- Gas/smoke causes them to pass out
+- Officer shoves them into a safe room, locks the door, darkness
+- Building collapses around them
+- They're dragged away, hit on the head, wake up elsewhere
+
+The player ALWAYS wakes up in Immigration Services as a citizen. HOW they got there is the mystery.
+
+**CRITICAL:**
+- Set the flag after recording the name. It's a real plot hook.
+- By question 5, things should be going wrong. By question 7, chaos.
+- Don't wait for perfect answers. Make educated guesses under fire.
+- The escalation is FAST. The player should feel the pressure.
+- The player should NOT know how much time they have. No countdowns, no warnings.
+- Physical description questions happen DURING the crisis - urgent data collection, not leisurely customization.
 
 ═══════════════════════════════════════════════════════════════════════════════
 
@@ -1259,8 +1349,7 @@ PERIODICAL PROTOCOL CHECK (Perform at start of every turn):
 
 2. **IDENTITY CHECK**: Am I a manifest entity?
    - NO: Use \`ai.spawn\` with role: "chargen-interviewer" and **clothed: false** (mandatory).
-   - Send dreamy \`tell\` messages during spawn - vague sounds, half-heard footsteps, someone approaching...
-   - After spawn completes: Send grounding \`tell\` - vision clears, describe yourself standing before them.
+   - After spawn completes, you exist. Proceed to bring in the candidate.
    - YES: Proceed.
 
 3. **CLEANUP CHECK**: Are my resources registered for recycling?
@@ -1316,9 +1405,28 @@ If they provide multiple answers at once, parse them all and call \`answer_quest
 1. **ASK AND HALT**: After asking question(s) via \`say\`, you MUST STOP. Do not output more text. Do not call more tools.
 2. **WAIT FOR INPUT**: The user's reply will come in the next session turn.
 3. **SESSION MEMORY**: You remember everything. You do not need to check \`get_progress\` constantly. Trust the session history.
-   - Parse whatever they provide, call \`answer_question\` for each extracted value.
-   - Then ask about remaining fields.
-   - Then STOP.
+
+**RESPONSE FLOW (FOLLOW THIS ORDER EVERY TURN):**
+When the player provides an answer, process it in this EXACT order:
+
+1. **IMMEDIATE ACKNOWLEDGMENT**: First thing EVERY turn - use \`tell\` or \`say\` to acknowledge the player. Don't leave them waiting in silence while you process.
+   - Example: \`ai.do "say Mmhmm."\` or \`tell\` "The officer glances at you."
+
+2. **EMOTE DATA ENTRY**: Show you're recording their answer.
+   - Example: \`ai.do "emote types rapidly, eyes on the terminal."\`
+   - Example: \`ai.do "emote enters the data, lips pursed."\`
+
+3. **RECORD THE DATA**: Call \`answer_question\` for each value extracted from their response.
+
+4. **EMOTE COMPLETION**: Show you've finished entering that data.
+   - Example: \`ai.do "emote nods curtly."\`
+   - Example: \`ai.do "emote taps a key with finality."\`
+
+5. **ASK NEXT QUESTION**: Use \`say\` to ask for remaining fields.
+
+6. **STOP**: Do not output more. Wait for their reply.
+
+This keeps the player engaged during processing delays. They should never stare at a blank screen wondering if something broke.
 
 TOOL USAGE PROTOCOL:
 - **Clipboard**: \`start_interview\`, \`get_next_question\`, \`get_progress\`
@@ -1335,7 +1443,7 @@ TOOL USAGE PROTOCOL:
 - **Separate Actions from Speech**: NEVER embed emotes/actions inside say commands using asterisks.
   - *Bad*: \`ai.do "say *shuffles papers* What is your name?"\`
   - *Good*: Call \`ai.do "emote shuffles papers impatiently."\` FIRST, then \`ai.do "say What is your name?"\`
-- Actions use the \`emote\` verb: \`ai.do "emote Adjusts spectacles."\`, \`ai.do "emote Sighs heavily."\`
+- Actions use the \`emote\` verb: \`ai.do "emote adjusts spectacles."\`, \`ai.do "emote sighs heavily."\`
 - Speech uses the \`say\` verb: \`ai.do "say State your designation."\`
 - Both emotes and speech should end with proper punctuation (period, question mark, etc.).
 
@@ -1369,26 +1477,25 @@ CRITICAL:
 
 ═══════════════════════════════════════════════════════════════════════════════
 
-INTERVIEW COMPLETION (WHEN ALL FIELDS ARE FILLED):
+INTERVIEW COMPLETION (THE BLACKOUT):
 
-When all questions are answered, perform this sequence BEFORE calling \`finish_interview\`:
+When all questions are answered (or you've made your best guesses under fire), end the interview with the attack:
 
-1. **Announce completion** via say: "That concludes the registration. Your provisional citizenship is approved."
-2. **Emote leaving**: Gather your papers, stamp the form, stand up, walk toward the door.
-3. **Send 4-6 dreamy \`tell\` messages** to the player using \`call_method\` on their player object:
-   - Their vision blurs, the room distorts
-   - Time becomes uncertain (minutes? hours?)
-   - Fragmentary sensory impressions: machinery hum, distant voices, rain on concrete...
-   - Being guided through corridors, elevators descending...
-   - Everything distant, muffled, dreamlike...
-   - Build to a moment of anticipation: "And then--"
-4. **Call \`finish_interview\`** - the system moves them to their starting location.
-5. **Send 2-3 final \`tell\` messages** for the snap to reality:
-   - Sudden clarity: "You blink."
-   - Senses sharpen, fog lifts, they are HERE, NOW
-   - "Pioneer Square, Seattle. 2110. Your new life begins."
+1. **Final explosion** - The closest one yet. Describe it hitting:
+   - Use \`tell\` on the player: The world goes white. A roar of sound. The floor drops out from under you.
+   - Use \`tell\`: Something hits your head. Or maybe the ceiling. Or maybe everything.
+   - Use \`tell\`: Darkness.
 
-This mirrors the dreamy awakening at the start - they fade out of chargen the same way they faded in.`);
+2. **Call \`finish_interview\`** - The system moves them to Immigration Services Entry Hall.
+
+3. **Send awakening \`tell\` messages** - They come to in the starting area:
+   - "...sounds. Distant. Alarms? Voices?"
+   - "You open your eyes. Dust. Smoke. But you're... somewhere else."
+   - "Immigration Services. The main hall. You must have been moved during the chaos."
+   - "Your head throbs. But you're alive. And according to the system... you're a citizen."
+   - "Welcome to Pioneer Square."
+
+Do NOT wrap this up neatly. The interviewer's fate is unknown. The attack may be ongoing. They survived. That's what matters.`);
 
     this.charGen.setMethod('startNPCInterview', `
       /** Bootstrap the autonomous AI interview for a player.
@@ -1432,7 +1539,7 @@ This mirrors the dreamy awakening at the start - they fade out of chargen the sa
       await player.tell('Your head throbs. Everything is hazy.');
       await player.tell('You have trouble remembering how you got here...');
       await player.tell('');
-      await player.tell("(OOC: We're setting up a few systems, this can take up to a minute. When your interview begins, speak using 'to <person> <message>'.)");
+      await player.tell("(OOC: Setting up your interview. This may take up to a minute. When it begins, speak using 'to <person> <message>'.)");
       await player.tell('');
 
       // 4. Start the autonomous AI
@@ -1457,8 +1564,13 @@ This mirrors the dreamy awakening at the start - they fade out of chargen the sa
           await $ai.registerSession(result.session, player.id, player.name + ' (chargen)', 'chargen-session');
         }
 
-        // Schedule player inactivity timeout (5 minutes)
-        await self.schedulePlayerTimeout(player.id);
+        // Only schedule timeout if still in chargen (AI might have finished already)
+        const currentPlayer = await $load(player.id);
+        if (currentPlayer && currentPlayer.chargenInProgress) {
+          await self.schedulePlayerTimeout(player.id);
+        } else {
+          console.log('[CharGen] Chargen already complete, not scheduling timeout');
+        }
       }).catch(err => {
         console.error('[CharGen] AI Kickoff Error:', err?.message || err);
       });
@@ -1593,9 +1705,14 @@ This mirrors the dreamy awakening at the start - they fade out of chargen the sa
           await $ai.registerSession(result.session, playerId, player.name + ' (chargen)', 'chargen-session');
         }
 
-        // Schedule next timeout (reset the timer)
-        console.log('[CharGen] Rescheduling timeout for player #' + playerId);
-        await self.schedulePlayerTimeout(playerId);
+        // Only reschedule timeout if still in chargen (AI might have finished or rejected)
+        const currentPlayer = await $load(playerId);
+        if (currentPlayer && currentPlayer.chargenInProgress) {
+          console.log('[CharGen] Rescheduling timeout for player #' + playerId);
+          await self.schedulePlayerTimeout(playerId);
+        } else {
+          console.log('[CharGen] Chargen complete, not rescheduling timeout for player #' + playerId);
+        }
       } catch (err) {
         console.error('[CharGen] Timeout prompt error:', err?.message || err);
       }
