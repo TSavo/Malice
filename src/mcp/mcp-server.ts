@@ -2771,6 +2771,11 @@ Core Objects:
 
         // Serialize the RuntimeObject for JSON output
         const raw = obj._getRaw();
+        // Handle location - it may be a RuntimeObject proxy, so extract just the ID
+        const locationObj = obj.get('location');
+        const locationRef = locationObj && typeof locationObj === 'object' && 'id' in locationObj
+          ? `#${locationObj.id}`
+          : null;
         return {
           contents: [{
             uri: `moo://object/${id}`,
@@ -2780,7 +2785,7 @@ Core Objects:
               name: obj.get('name'),
               parent: `#${raw.parent.value}`,
               description: obj.get('description'),
-              location: obj.get('location'),
+              location: locationRef,
               properties: Object.keys(raw.properties || {}),
               methods: Object.keys(raw.methods || {}),
             }, null, 2),

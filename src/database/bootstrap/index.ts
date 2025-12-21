@@ -16,3 +16,4 @@ export { FormatBuilder } from './format-builder.js';
 export { NotesBuilder } from './notes-builder.js';
 export { PluribusBuilder } from './pluribus-builder.js';
 export { MaskBuilder } from './mask-builder.js';
+export { SisterGrayBuilder } from './sister-gray-builder.js';
