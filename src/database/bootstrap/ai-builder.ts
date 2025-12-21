@@ -13,8 +13,8 @@ export class AiBuilder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(): Promise<void> {
-    console.log('[AiBuilder] build() called');
+  async build(force = false): Promise<void> {
+    console.log('[AiBuilder] build() called, force=' + force);
     // Check if already exists via alias
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
@@ -26,6 +26,14 @@ export class AiBuilder {
       this.ai = await this.manager.load(aliases.ai);
       if (this.ai) {
         console.log('[AiBuilder] Already exists at #' + aliases.ai);
+        if (!force) return;
+        // Force rebuild - continue to rebuild methods
+        console.log('[AiBuilder] Force rebuilding methods...');
+        // Ensure sessionLogs property exists
+        if (!this.ai.get('sessionLogs')) {
+          this.ai.set('sessionLogs', {});
+        }
+        await this.rebuildMethods();
         return;
       }
     }
@@ -51,6 +59,14 @@ export class AiBuilder {
         // Critical memories that persist across session resets
         // { 123: [{ text, importance, timestamp, tags }] }
         memories: {},
+
+        // Session logs - persist even after NPCs are recycled
+        // { sessionId: { npcId, npcName, role, startTime, lastActive } }
+        sessionLogs: {},
+
+        // Response expectations - track when AI is waiting for response
+        // { 'ai-expect-humanId-targetId': { targetId, humanId, prompt, recurring, timeout } }
+        expectations: {},
 
         // Default system prompt template for AI NPCs
         // Copied to each NPC's agentSystemPrompt on spawn
@@ -923,6 +939,194 @@ CORE PRINCIPLES
     `);
 
     // ═══════════════════════════════════════════════════════════════════
+    // SESSION LOG MANAGEMENT
+    // Persist session info even after NPCs are recycled
+    // ═══════════════════════════════════════════════════════════════════
+
+    this.ai.setMethod('registerSession', `
+      /**
+       * Register a session for an NPC (called when AI query runs)
+       * @param sessionId - The Claude session ID
+       * @param npcId - The NPC's object ID
+       * @param npcName - The NPC's name at time of session
+       * @param role - The NPC's role
+       */
+      const sessionId = args[0];
+      const npcId = args[1];
+      const npcName = args[2];
+      const role = args[3] || 'unknown';
+
+      if (!sessionId) return { success: false, error: 'Session ID required' };
+
+      const logs = self.sessionLogs || {};
+      const now = Date.now();
+
+      if (logs[sessionId]) {
+        // Update existing session
+        logs[sessionId].lastActive = now;
+      } else {
+        // New session
+        logs[sessionId] = {
+          npcId,
+          npcName,
+          role,
+          startTime: now,
+          lastActive: now,
+        };
+      }
+
+      self.sessionLogs = logs;
+      return { success: true, sessionId };
+    `);
+
+    this.ai.setMethod('listSessions', `
+      /** List all registered sessions */
+      const logs = self.sessionLogs || {};
+      return Object.entries(logs).map(([sessionId, info]) => ({
+        sessionId,
+        ...info,
+      }));
+    `);
+
+    this.ai.setMethod('getSession', `
+      /** Get session info by ID */
+      const sessionId = args[0];
+      const logs = self.sessionLogs || {};
+      return logs[sessionId] || null;
+    `);
+
+    // ═══════════════════════════════════════════════════════════════════
+    // RESPONSE EXPECTATIONS
+    // Schedule timeouts when AI is waiting for a response
+    // ═══════════════════════════════════════════════════════════════════
+
+    this.ai.setMethod('expectResponseFrom', `
+      /**
+       * Set up a timeout expectation for a response from a target
+       * @param targetId - The object we're waiting for a response from
+       * @param options - { timeout, humanId, prompt, recurring }
+       */
+      const targetId = args[0];
+      const options = args[1] || {};
+
+      if (!targetId) {
+        return { success: false, error: 'Target ID is required' };
+      }
+
+      const timeout = options.timeout || 5 * 60 * 1000; // 5 min default
+      const humanId = options.humanId;
+      if (!humanId) {
+        return { success: false, error: 'humanId is required in options' };
+      }
+
+      const prompt = options.prompt || 'The person you are speaking with has been silent for ' + Math.round(timeout / 60000) + ' minutes. Try re-engaging them or move on.';
+      const recurring = options.recurring !== false; // default true
+
+      const jobName = 'ai-expect-' + humanId + '-' + targetId;
+
+      console.log('[AI] Setting up expectation: ' + jobName + ' timeout=' + timeout + 'ms');
+
+      // Cancel existing expectation first
+      await $.scheduler.unschedule(jobName);
+
+      // Store expectation metadata for the handler
+      const expectations = self.expectations || {};
+      expectations[jobName] = { targetId, humanId, prompt, recurring, timeout };
+      self.expectations = expectations;
+
+      // Schedule the timeout
+      await $.scheduler.schedule(jobName, timeout, 0, self, 'onExpectationTimeout', jobName);
+
+      return { success: true, jobName, timeout };
+    `);
+
+    this.ai.setMethod('cancelExpectation', `
+      /**
+       * Cancel a pending response expectation
+       * @param targetId - The object we were waiting for
+       * @param humanId - The AI human that was waiting
+       */
+      const targetId = args[0];
+      const humanId = args[1];
+
+      if (!targetId || !humanId) {
+        return { success: false, error: 'targetId and humanId are required' };
+      }
+
+      const jobName = 'ai-expect-' + humanId + '-' + targetId;
+
+      console.log('[AI] Cancelling expectation: ' + jobName);
+
+      await $.scheduler.unschedule(jobName);
+
+      // Clean up metadata
+      const expectations = self.expectations || {};
+      delete expectations[jobName];
+      self.expectations = expectations;
+
+      return { success: true, jobName };
+    `);
+
+    this.ai.setMethod('onExpectationTimeout', `
+      /**
+       * Internal handler called when timeout fires
+       * @param jobName - The job name that fired
+       */
+      const jobName = args[0];
+
+      console.log('[AI] Expectation timeout fired: ' + jobName);
+
+      const expectations = self.expectations || {};
+      const exp = expectations[jobName];
+
+      if (!exp) {
+        console.log('[AI] Expectation not found, may have been cancelled');
+        return { success: false, error: 'Expectation not found' };
+      }
+
+      const human = await $load(exp.humanId);
+      if (!human) {
+        console.log('[AI] Human #' + exp.humanId + ' not found, cleaning up expectation');
+        delete expectations[jobName];
+        self.expectations = expectations;
+        return { success: false, error: 'Human not found' };
+      }
+
+      // Get session from human
+      const session = human.agentSession;
+      if (!session) {
+        console.log('[AI] No session for human #' + exp.humanId);
+        return { success: false, error: 'No session for human' };
+      }
+
+      console.log('[AI] Sending timeout prompt to AI for human #' + exp.humanId);
+
+      // Send timeout prompt to AI
+      const systemPrompt = human.agentSystemPrompt || '';
+      try {
+        const result = await $query(systemPrompt, exp.prompt, session, {});
+        human.agentSession = result.session;
+
+        // Register session for persistence
+        await self.registerSession(result.session, exp.humanId, human.name, 'expectation-timeout');
+      } catch (err) {
+        console.error('[AI] Expectation timeout prompt error:', err?.message || err);
+      }
+
+      // Reschedule if recurring
+      if (exp.recurring) {
+        console.log('[AI] Rescheduling expectation: ' + jobName);
+        await $.scheduler.schedule(jobName, exp.timeout, 0, self, 'onExpectationTimeout', jobName);
+      } else {
+        // One-shot: clean up
+        delete expectations[jobName];
+        self.expectations = expectations;
+      }
+
+      return { success: true, prompted: true };
+    `);
+
+    // ═══════════════════════════════════════════════════════════════════
     // PROFILE MANAGEMENT
     // Set/update personality and history for AI context
     // ═══════════════════════════════════════════════════════════════════
@@ -1337,6 +1541,124 @@ CORE PRINCIPLES
 
       return desc;
     `);
+  }
+
+  /**
+   * Rebuild methods on existing $ai object
+   * Called when force=true to update methods without recreating object
+   */
+  async rebuildMethods(): Promise<void> {
+    if (!this.ai) return;
+
+    // Session management methods
+    this.ai.setMethod('registerSession', `
+      const sessionId = args[0];
+      const npcId = args[1];
+      const npcName = args[2];
+      const role = args[3] || 'unknown';
+      if (!sessionId) return { success: false, error: 'Session ID required' };
+      const logs = self.sessionLogs || {};
+      const now = Date.now();
+      if (logs[sessionId]) {
+        logs[sessionId].lastActive = now;
+      } else {
+        logs[sessionId] = { npcId, npcName, role, startTime: now, lastActive: now };
+      }
+      self.sessionLogs = logs;
+      return { success: true, sessionId };
+    `);
+
+    this.ai.setMethod('listSessions', `
+      const logs = self.sessionLogs || {};
+      return Object.entries(logs).map(([sessionId, info]) => ({ sessionId, ...info }));
+    `);
+
+    this.ai.setMethod('getSession', `
+      const sessionId = args[0];
+      const logs = self.sessionLogs || {};
+      return logs[sessionId] || null;
+    `);
+
+    // Response expectation methods
+    this.ai.setMethod('expectResponseFrom', `
+      const targetId = args[0];
+      const options = args[1] || {};
+      if (!targetId) {
+        return { success: false, error: 'Target ID is required' };
+      }
+      const timeout = options.timeout || 5 * 60 * 1000;
+      const humanId = options.humanId;
+      if (!humanId) {
+        return { success: false, error: 'humanId is required in options' };
+      }
+      const prompt = options.prompt || 'The person you are speaking with has been silent for ' + Math.round(timeout / 60000) + ' minutes. Try re-engaging them or move on.';
+      const recurring = options.recurring !== false;
+      const jobName = 'ai-expect-' + humanId + '-' + targetId;
+      console.log('[AI] Setting up expectation: ' + jobName + ' timeout=' + timeout + 'ms');
+      await $.scheduler.unschedule(jobName);
+      const expectations = self.expectations || {};
+      expectations[jobName] = { targetId, humanId, prompt, recurring, timeout };
+      self.expectations = expectations;
+      await $.scheduler.schedule(jobName, timeout, 0, self, 'onExpectationTimeout', jobName);
+      return { success: true, jobName, timeout };
+    `);
+
+    this.ai.setMethod('cancelExpectation', `
+      const targetId = args[0];
+      const humanId = args[1];
+      if (!targetId || !humanId) {
+        return { success: false, error: 'targetId and humanId are required' };
+      }
+      const jobName = 'ai-expect-' + humanId + '-' + targetId;
+      console.log('[AI] Cancelling expectation: ' + jobName);
+      await $.scheduler.unschedule(jobName);
+      const expectations = self.expectations || {};
+      delete expectations[jobName];
+      self.expectations = expectations;
+      return { success: true, jobName };
+    `);
+
+    this.ai.setMethod('onExpectationTimeout', `
+      const jobName = args[0];
+      console.log('[AI] Expectation timeout fired: ' + jobName);
+      const expectations = self.expectations || {};
+      const exp = expectations[jobName];
+      if (!exp) {
+        console.log('[AI] Expectation not found, may have been cancelled');
+        return { success: false, error: 'Expectation not found' };
+      }
+      const human = await $load(exp.humanId);
+      if (!human) {
+        console.log('[AI] Human #' + exp.humanId + ' not found, cleaning up expectation');
+        delete expectations[jobName];
+        self.expectations = expectations;
+        return { success: false, error: 'Human not found' };
+      }
+      const session = human.agentSession;
+      if (!session) {
+        console.log('[AI] No session for human #' + exp.humanId);
+        return { success: false, error: 'No session for human' };
+      }
+      console.log('[AI] Sending timeout prompt to AI for human #' + exp.humanId);
+      const systemPrompt = human.agentSystemPrompt || '';
+      try {
+        const result = await $query(systemPrompt, exp.prompt, session, {});
+        human.agentSession = result.session;
+        await self.registerSession(result.session, exp.humanId, human.name, 'expectation-timeout');
+      } catch (err) {
+        console.error('[AI] Expectation timeout prompt error:', err?.message || err);
+      }
+      if (exp.recurring) {
+        console.log('[AI] Rescheduling expectation: ' + jobName);
+        await $.scheduler.schedule(jobName, exp.timeout, 0, self, 'onExpectationTimeout', jobName);
+      } else {
+        delete expectations[jobName];
+        self.expectations = expectations;
+      }
+      return { success: true, prompted: true };
+    `);
+
+    console.log('[AiBuilder] Session and expectation methods rebuilt');
   }
 
   async registerAlias(): Promise<void> {

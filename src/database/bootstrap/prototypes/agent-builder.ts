@@ -442,6 +442,106 @@ export class AgentBuilder {
       return \`\${player.name} \${action}\`;
     `);
 
+    // ═══════════════════════════════════════════════════════════════════
+    // ACTION QUEUE SYSTEM
+    // Meters out say/emote actions with timing delays for AI agents
+    // ═══════════════════════════════════════════════════════════════════
+
+    // Timing constants per action type
+    obj.set('_actionTimings', {
+      say: { baseDelay: 1500, msPerChar: 120 },     // Speech is slow, deliberate
+      emote: { baseDelay: 800, msPerChar: 80 },     // Physical actions faster
+      default: { baseDelay: 1000, msPerChar: 120 }  // Fallback
+    });
+    obj.set('_actionVariance', 5000); // Random 0-5000ms added
+
+    // Queue an action for metered execution
+    obj.setMethod('queueAction', `
+      /** Queue a say/emote action for metered execution.
+       *  @param command - The full command string (e.g., "say Hello")
+       */
+      const command = args[0];
+      if (!command) return;
+
+      // Initialize queue if needed
+      const queue = self._actionQueue || [];
+      queue.push({ command, queuedAt: Date.now() });
+      self._actionQueue = queue;
+
+      // If not already processing, start the queue processor
+      if (!self._actionProcessing) {
+        await self._processActionQueue();
+      }
+    `);
+
+    // Process the action queue - executes one action, schedules next
+    obj.setMethod('_processActionQueue', `
+      const queue = self._actionQueue || [];
+
+      if (queue.length === 0) {
+        self._actionProcessing = false;
+        return;
+      }
+
+      self._actionProcessing = true;
+
+      // Pop first action
+      const action = queue.shift();
+      self._actionQueue = queue;
+
+      // Execute the action
+      try {
+        const match = await self.matchVerb(action.command);
+        if (match && match.handler) {
+          await match.handler.callVerb(
+            match.verbInfo.method,
+            null,      // context
+            self,      // player (the NPC)
+            action.command,
+            match.args
+          );
+        }
+      } catch (err) {
+        console.error('[ActionQueue] Error executing action:', err?.message || err);
+      }
+
+      // Calculate delay for next action based on type
+      const verb = action.command.split(/\\s+/)[0].toLowerCase();
+      const timings = self._actionTimings || {};
+      let timing = timings.default || { baseDelay: 1000, msPerChar: 120 };
+
+      // Map verb shortcuts to their types
+      if (verb === 'say' || verb === '"' || verb === "'") {
+        timing = timings.say || timing;
+      } else if (verb === 'emote' || verb === ':') {
+        timing = timings.emote || timing;
+      }
+
+      // Calculate delay: base + (length * msPerChar) + random variance
+      const textLength = action.command.length;
+      const variance = self._actionVariance || 500;
+      const delay = timing.baseDelay + (textLength * timing.msPerChar) + Math.floor(Math.random() * variance);
+
+      // If more actions in queue, schedule next processing
+      if (self._actionQueue && self._actionQueue.length > 0) {
+        const jobName = 'actionQueue_' + self.id + '_' + Date.now();
+        await $.scheduler.schedule(jobName, delay, 0, self, '_processActionQueue');
+      } else {
+        self._actionProcessing = false;
+      }
+    `);
+
+    // Get current queue length (for MCP response)
+    obj.setMethod('getActionQueueLength', `
+      return (self._actionQueue || []).length;
+    `);
+
+    // Clear the action queue (admin/emergency use)
+    obj.setMethod('clearActionQueue', `
+      self._actionQueue = [];
+      self._actionProcessing = false;
+    `);
+
     // Pattern: look (no args)
     // Look at current location
     obj.setMethod('look', `
@@ -2574,6 +2674,16 @@ export class AgentBuilder {
           target: self.name + ' says to you, "' + message + '"',
           others: self.name + ' says to ' + target.name + ', "' + message + '"'
         });
+      }
+
+      // Auto-cancel any response expectation the NPC had for this speaker
+      // This happens before triggering AI response so the timeout doesn't fire
+      if ($.ai && $.ai.cancelExpectation) {
+        try {
+          await $.ai.cancelExpectation(self.id, target.id);
+        } catch (e) {
+          // Ignore - expectation may not exist
+        }
       }
 
       // Trigger AI response if target has onSpokenTo handler

@@ -1073,6 +1073,9 @@ export class CharGenBuilder {
       player.chargenInProgress = false;
       player.chargenAgentSession = null;
 
+      // Cancel any pending timeout
+      await self.cancelPlayerTimeout(playerId);
+
       // Connect player to game
       await player.connect(player._context);
 
@@ -1186,6 +1189,8 @@ You have the authority to REJECT candidates who are unsuitable. Use the \`reject
 
 4. **ABANDONMENT**: Candidate stops responding after 3+ turns of silence.
    - "Candidate appears to have departed. Terminating session."
+   - NOTE: You don't need to track silence yourself. The system will prompt you
+     automatically if the candidate goes idle. Just respond naturally when prompted.
 
 When rejecting, provide a clear reason that will be shown to the player before disconnection.
 
@@ -1442,10 +1447,18 @@ This mirrors the dreamy awakening at the start - they fade out of chargen the sa
         additionalMcpServers: {
           'malice-chargen': { type: 'http', url: 'http://localhost:3002/mcp' }
         }
-      }).then(result => {
+      }).then(async (result) => {
         console.log('[CharGen] AI agent completed first turn, session:', result.session?.substring(0, 20) + '...');
         // Session saved on player until NPC is spawned
         player.chargenAgentSession = result.session;
+
+        // Register session with $ai for persistence
+        if (result.session && $ai) {
+          await $ai.registerSession(result.session, player.id, player.name + ' (chargen)', 'chargen-session');
+        }
+
+        // Schedule player inactivity timeout (5 minutes)
+        await self.schedulePlayerTimeout(player.id);
       }).catch(err => {
         console.error('[CharGen] AI Kickoff Error:', err?.message || err);
       });
@@ -1496,6 +1509,98 @@ This mirrors the dreamy awakening at the start - they fade out of chargen the sa
       return { success: true, recycledCount: count };
     `);
 
+    // ═══════════════════════════════════════════════════════════════════
+    // PLAYER TIMEOUT SYSTEM
+    // Prompts AI when player hasn't responded for 5 minutes
+    // ═══════════════════════════════════════════════════════════════════
+
+    this.charGen.setMethod('schedulePlayerTimeout', `
+      /** Schedule a timeout for player inactivity.
+       *  @param playerId - The player in chargen
+       */
+      const playerId = args[0];
+      const timeout = 5 * 60 * 1000; // 5 minutes
+      const jobName = 'chargen-timeout-' + playerId;
+
+      console.log('[CharGen] Scheduling player timeout for #' + playerId + ' in ' + (timeout/1000) + 's, job=' + jobName);
+
+      // Cancel any existing timeout first
+      await $.scheduler.unschedule(jobName);
+
+      // Schedule new timeout
+      const result = await $.scheduler.schedule(jobName, timeout, 0, self, 'onPlayerTimeout', playerId);
+      console.log('[CharGen] Schedule result:', result);
+      return { scheduled: true, playerId, timeoutMs: timeout };
+    `);
+
+    this.charGen.setMethod('cancelPlayerTimeout', `
+      /** Cancel the timeout for a player (called when they speak).
+       *  @param playerId - The player in chargen
+       */
+      const playerId = args[0];
+      const jobName = 'chargen-timeout-' + playerId;
+      console.log('[CharGen] Cancelling player timeout for #' + playerId + ', job=' + jobName);
+      const result = await $.scheduler.unschedule(jobName);
+      console.log('[CharGen] Unschedule result:', result);
+      return { cancelled: true, playerId };
+    `);
+
+    this.charGen.setMethod('onPlayerTimeout', `
+      /** Called when player hasn't responded for 5 minutes.
+       *  Sends a prompt to the AI to handle the silence.
+       *  @param playerId - The player who timed out
+       */
+      const playerId = args[0];
+      console.log('[CharGen] onPlayerTimeout FIRED for #' + playerId);
+
+      // Check if player is still in chargen
+      const player = await $load(playerId);
+      if (!player) {
+        console.log('[CharGen] Player #' + playerId + ' not found, aborting timeout');
+        return;
+      }
+
+      if (!player.chargenInProgress) {
+        console.log('[CharGen] Player #' + playerId + ' no longer in chargen, aborting timeout');
+        return;
+      }
+
+      const session = player.chargenAgentSession;
+      if (!session) {
+        console.log('[CharGen] No session for timed out player #' + playerId);
+        return;
+      }
+
+      console.log('[CharGen] Sending timeout prompt to AI for player #' + playerId);
+
+      // Send timeout prompt to AI
+      const promptTemplate = self.interviewerPrompt.replace(/\\{\\{playerId\\}\\}/g, String(playerId));
+      const timeoutPrompt = 'The candidate has been silent for 5 minutes. They have not responded to your last question. ' +
+        'Prompt them again, ask if they need help, or if they seem unresponsive after multiple attempts, ' +
+        'consider using reject_player if they appear to have abandoned the process.';
+
+      try {
+        const result = await $query(promptTemplate, timeoutPrompt, session, {
+          additionalMcpServers: {
+            'malice-chargen': { type: 'http', url: 'http://localhost:3002/mcp' }
+          }
+        });
+        console.log('[CharGen] AI responded to timeout prompt for player #' + playerId);
+        player.chargenAgentSession = result.session;
+
+        // Register session with $ai for persistence
+        if (result.session && $ai) {
+          await $ai.registerSession(result.session, playerId, player.name + ' (chargen)', 'chargen-session');
+        }
+
+        // Schedule next timeout (reset the timer)
+        console.log('[CharGen] Rescheduling timeout for player #' + playerId);
+        await self.schedulePlayerTimeout(playerId);
+      } catch (err) {
+        console.error('[CharGen] Timeout prompt error:', err?.message || err);
+      }
+    `);
+
     this.charGen.setMethod('rejectPlayer', `
       /** Reject a player during chargen - cleanup, disconnect, and recycle.
        *  @param playerId - The player to reject
@@ -1527,6 +1632,9 @@ This mirrors the dreamy awakening at the start - they fade out of chargen the sa
         await player.tell('╚══════════════════════════════════════════════════════════╝');
         await player.tell('');
       }
+
+      // Cancel any pending timeout
+      await self.cancelPlayerTimeout(playerId);
 
       // Cleanup temporary objects (rooms, NPCs)
       await self.cleanupForPlayer(playerId);

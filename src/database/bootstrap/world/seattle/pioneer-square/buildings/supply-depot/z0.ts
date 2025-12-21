@@ -53,24 +53,18 @@ SUPPLY DEPOT PROTOCOLS
 PACKAGES ARE TRACKED. YOU ARE TRACKED.`,
         },
         {
-          prototype: 'dispenser',
+          prototype: 'describable',
           name: 'package dispenser',
-          alias: 'supplyDispenser',
           description: `An automated dispensing system built into the wall—a grid of numbered compartments behind reinforced glass doors. Each compartment is sized for a standard supply box. A touchscreen interface glows beside it, showing available pickups.
 
 The system cross-references citizen work assignments with package availability. No assignment, no package. The Continuum doesn't waste resources on speculation.`,
-          dispenserType: 'package',
-          requiresAssignment: true,
         },
         {
-          prototype: 'container',
+          prototype: 'describable',
           name: 'delivery intake chute',
-          alias: 'supplyIntake',
           description: `A metal chute built into the counter, angled down into the processing area below. Packages deposited here slide into the sorting system. A scanner above the opening reads package codes as they pass.
 
 A sign reads: INCOMING DELIVERIES ONLY. The chute is sized for standard supply boxes—nothing larger would fit.`,
-          capacity: 10,
-          acceptsOnly: ['sealedBox'],
         },
       ],
     },
