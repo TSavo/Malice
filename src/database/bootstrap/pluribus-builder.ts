@@ -24,6 +24,7 @@ export class PluribusBuilder {
       properties: {
         name: 'Pluribus',
         description: 'The city infrastructure AI. E Pluribus... without the Unum.',
+        boltedDown: true, // Infrastructure AI cannot be moved
         // What Pluribus has seen/heard through the Mask
         sensoryHistory: [],
         historyLimit: 100,

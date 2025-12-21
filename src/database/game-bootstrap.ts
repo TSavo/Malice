@@ -208,25 +208,63 @@ export class GameBootstrap {
 
     // Register global building object aliases
     console.log('Registering global building aliases...');
+    const objectManager = await this.manager.load(0);
+
     const citySigns = await this.manager.findByProperty('name', 'City Announcement Board');
-    const citySign = citySigns[0];
-    if (citySign) {
-      const objectManager = await this.manager.load(0);
-      await objectManager?.call('addAlias', 'cityAnnounce', citySign.id);
+    if (citySigns[0]) {
+      await objectManager?.call('addAlias', 'cityAnnounce', citySigns[0].id);
       console.log('  ✅ Registered $.cityAnnounce');
     } else {
       console.warn('  ⚠️  City Announcement Board not found');
     }
 
-    // Place Sister Gray in her quarters (she's created before the world is built)
-    const objMgr = await this.manager.load(0);
-    const aliases = (objMgr?.get('aliases') || {}) as Record<string, number>;
+    const theCoreRooms = await this.manager.findByProperty('name', 'The Core');
+    if (theCoreRooms[0]) {
+      await objectManager?.call('addAlias', 'theCore', theCoreRooms[0].id);
+      console.log('  ✅ Registered $.theCore');
+    } else {
+      console.warn('  ⚠️  The Core not found');
+    }
+
+    const theBlindRooms = await this.manager.findByProperty('name', 'The Blind');
+    if (theBlindRooms[0]) {
+      await objectManager?.call('addAlias', 'theBlind', theBlindRooms[0].id);
+      console.log('  ✅ Registered $.theBlind');
+    } else {
+      console.warn('  ⚠️  The Blind not found');
+    }
+
+    // Place special objects (created before the world is built)
+    // Reload aliases to include the new room aliases
+    const aliases = (objectManager?.get('aliases') || {}) as Record<string, number>;
+
+    // Sister Gray → Sister's Quarters (z=-5)
     if (aliases.sisterGray) {
       const sisterGray = await this.manager.load(aliases.sisterGray);
       const sistersQuarters = await this.manager.findByProperty('name', "Sister's Quarters");
       if (sisterGray && sistersQuarters.length > 0) {
         await sisterGray.call('moveTo', sistersQuarters[0]);
         console.log(`  ✅ Placed Sister Gray in Sister's Quarters (#${sistersQuarters[0].id})`);
+      }
+    }
+
+    // Pluribus → The Core (z=-1, Smith Tower datacenter)
+    if (aliases.pluribus && aliases.theCore) {
+      const pluribus = await this.manager.load(aliases.pluribus);
+      const theCore = await this.manager.load(aliases.theCore);
+      if (pluribus && theCore) {
+        await pluribus.call('moveTo', theCore);
+        console.log(`  ✅ Placed Pluribus in The Core (#${theCore.id})`);
+      }
+    }
+
+    // The Mask → The Blind (z=-6, underground complex)
+    if (aliases.theMask && aliases.theBlind) {
+      const theMask = await this.manager.load(aliases.theMask);
+      const theBlind = await this.manager.load(aliases.theBlind);
+      if (theMask && theBlind) {
+        await theMask.call('moveTo', theBlind);
+        console.log(`  ✅ Placed The Mask in The Blind (#${theBlind.id})`);
       }
     }
 
