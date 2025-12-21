@@ -218,6 +218,18 @@ export class GameBootstrap {
       console.warn('  ⚠️  City Announcement Board not found');
     }
 
+    // Place Sister Gray in her quarters (she's created before the world is built)
+    const objMgr = await this.manager.load(0);
+    const aliases = (objMgr?.get('aliases') || {}) as Record<string, number>;
+    if (aliases.sisterGray) {
+      const sisterGray = await this.manager.load(aliases.sisterGray);
+      const sistersQuarters = await this.manager.findByProperty('name', "Sister's Quarters");
+      if (sisterGray && sistersQuarters.length > 0) {
+        await sisterGray.call('moveTo', sistersQuarters[0]);
+        console.log(`  ✅ Placed Sister Gray in Sister's Quarters (#${sistersQuarters[0].id})`);
+      }
+    }
+
     // Reload aliases again to include startRoom
     await aliasLoader.loadAliases();
   }

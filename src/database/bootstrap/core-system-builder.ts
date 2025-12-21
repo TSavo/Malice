@@ -21,6 +21,7 @@ import { NotesBuilder } from './notes-builder.js';
 import { CombatBuilder } from './combat-builder.js';
 import { PluribusBuilder } from './pluribus-builder.js';
 import { MaskBuilder } from './mask-builder.js';
+import { SisterGrayBuilder } from './sister-gray-builder.js';
 
 /**
  * Orchestrates building all core system objects
@@ -84,6 +85,7 @@ export class CoreSystemBuilder {
     const combatBuilder = new CombatBuilder(this.manager);
     const pluribusBuilder = new PluribusBuilder(this.manager);
     const maskBuilder = new MaskBuilder(this.manager);
+    const sisterGrayBuilder = new SisterGrayBuilder(this.manager);
 
     await authManagerBuilder.build();
     await charGenBuilder.build();
@@ -112,8 +114,10 @@ export class CoreSystemBuilder {
     const aliases = (objManager?.get('aliases') || {}) as Record<string, number>;
     const agentId = aliases.agent || 8; // agent prototype
     const wearableId = aliases.wearable || 36; // wearable prototype
+    const humanId = aliases.human || 9; // human prototype
     await pluribusBuilder.build(agentId); // Agent as parent for Pluribus (it acts)
     await maskBuilder.build(wearableId); // Wearable prototype as parent for Mask
+    await sisterGrayBuilder.build(humanId); // Human as parent for Sister Gray
 
     // Register aliases
     await authManagerBuilder.registerAlias();
@@ -138,6 +142,7 @@ export class CoreSystemBuilder {
     await combatBuilder.registerAlias();
     await pluribusBuilder.registerAlias();
     await maskBuilder.registerAlias();
+    await sisterGrayBuilder.registerAlias();
   }
 
   /**
@@ -228,12 +233,16 @@ export class CoreSystemBuilder {
     const aliases = (objManager?.get('aliases') || {}) as Record<string, number>;
     const agentId = aliases.agent || 8;
     const wearableId = aliases.wearable || 36;
+    const humanId = aliases.human || 9;
     const pluribusBuilder = new PluribusBuilder(this.manager);
     const maskBuilder = new MaskBuilder(this.manager);
+    const sisterGrayBuilder = new SisterGrayBuilder(this.manager);
     await pluribusBuilder.build(agentId, undefined);
     await maskBuilder.build(wearableId, undefined);
+    await sisterGrayBuilder.build(humanId, undefined);
     await pluribusBuilder.registerAlias();
     await maskBuilder.registerAlias();
+    await sisterGrayBuilder.registerAlias();
 
     console.log('  ✅ Core system methods rebuilt');
     console.log('  ✅ Rebuilt AuthManager, CharGen, Prompt, etc. methods');

@@ -4,6 +4,17 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { pathToFileURL } from 'url';
 
+interface ExitData {
+  to?: string; // Target file path (for building connections, ignored by world-builder)
+  room?: string; // Target placeholder (for building connections, ignored by world-builder)
+  prototype?: string; // Exit prototype name (e.g., 'guardedExit')
+  allowedFaction?: string; // For guardedExit
+  denyMessage?: string; // For guardedExit
+  description?: string; // Exit description
+  hidden?: boolean;
+  locked?: boolean;
+}
+
 interface RoomData {
   name: string;
   description: string;
@@ -12,6 +23,7 @@ interface RoomData {
   z: number;
   intersection?: string[];
   blocked?: boolean;
+  exits?: Record<string, ExitData | string>; // Custom exit definitions
 }
 
 interface StreetConfig {
@@ -203,6 +215,35 @@ export class WorldBuilder {
         }
       }
     }
+
+    // Load Underground rooms (all *.ts files in underground subdirectories)
+    const undergroundDir = path.join(worldDir, 'underground');
+    if (fs.existsSync(undergroundDir)) {
+      const subdirs = fs.readdirSync(undergroundDir, { withFileTypes: true })
+        .filter(d => d.isDirectory())
+        .map(d => d.name);
+
+      for (const subdir of subdirs) {
+        const dir = path.join(undergroundDir, subdir);
+        const files = fs.readdirSync(dir).filter(f => f.endsWith('.ts'));
+
+        for (const file of files) {
+          try {
+            const filePath = path.join(dir, file);
+            const fileUrl = pathToFileURL(filePath).href;
+            const module = await import(fileUrl);
+            const roomDef = module.room as RoomData;
+
+            if (roomDef && typeof roomDef.x === 'number') {
+              const key = this.coordKey(roomDef.x, roomDef.y, roomDef.z || 0);
+              this.roomData.set(key, roomDef);
+            }
+          } catch (err) {
+            console.warn(`    Warning: Could not load underground ${subdir}/${file}: ${err}`);
+          }
+        }
+      }
+    }
   }
 
   /**
@@ -236,16 +277,19 @@ export class WorldBuilder {
 
   /**
    * Connect rooms with exits based on adjacency
+   * Supports custom exit definitions with prototypes (e.g., guardedExit)
    */
   private async connectRooms(): Promise<void> {
     const $ = this.manager as any;
     const recycler = $.recycler;
     const exitProto = $.exit;
+    const guardedExitProto = $.guardedExit;
 
     let exitCount = 0;
 
     for (const [key, room] of this.rooms) {
       const [x, y, z] = this.parseKey(key);
+      const data = this.roomData.get(key);
 
       // Check each cardinal direction
       const directions: Array<{ dx: number; dy: number; dz: number; name: string; aliases: string[] }> = [
@@ -262,20 +306,44 @@ export class WorldBuilder {
         const neighbor = this.rooms.get(neighborKey);
 
         if (neighbor) {
+          // Check for custom exit definition
+          const customExit = data?.exits?.[dir.name];
+          const exitData: ExitData | undefined = typeof customExit === 'object' ? customExit : undefined;
+
+          // Determine exit prototype
+          let parent = exitProto;
+          if (exitData?.prototype === 'guardedExit' && guardedExitProto) {
+            parent = guardedExitProto;
+          }
+
           // Calculate distance between rooms
           const distance = this.calculateDistance(x, y, z, x + dir.dx, y + dir.dy, z + dir.dz);
 
+          // Build exit properties
+          const properties: Record<string, unknown> = {
+            name: dir.name,
+            aliases: dir.aliases,
+            destRoom: neighbor,
+            distance: distance,
+            hidden: exitData?.hidden ?? false,
+            locked: exitData?.locked ?? false,
+          };
+
+          // Add custom properties from exit definition
+          if (exitData?.description) {
+            properties.description = exitData.description;
+          }
+          if (exitData?.allowedFaction) {
+            properties.allowedFaction = exitData.allowedFaction;
+          }
+          if (exitData?.denyMessage) {
+            properties.denyMessage = exitData.denyMessage;
+          }
+
           // Create exit
           const exit = await recycler.create({
-            parent: exitProto,
-            properties: {
-              name: dir.name,
-              aliases: dir.aliases,
-              destRoom: neighbor,
-              distance: distance,
-              hidden: false,
-              locked: false,
-            },
+            parent,
+            properties,
           });
 
           // Add exit to room
