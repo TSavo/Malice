@@ -946,8 +946,8 @@ export class CharGenBuilder {
           usedPoints += points * partCosts[part];
         }
 
-        if (usedPoints > totalPoints) {
-          return { error: 'Too many points allocated. Used ' + usedPoints + ' but only have ' + totalPoints };
+        if (usedPoints !== totalPoints) {
+          return { error: 'Must allocate exactly ' + totalPoints + ' points. Used ' + usedPoints };
         }
       }
 
