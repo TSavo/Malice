@@ -1775,7 +1775,14 @@ EXPECTATION ACTIONS (response timeout management):
                  Auto-cancels when target speaks to you (no manual cancel needed).
                  Default: 5 min timeout, recurring (keeps prompting until cancelled).
   cancelExpect - Manually cancel a pending expectation (humanId, targetId)
-                 Rarely needed - auto-cancels when target speaks to you.`,
+                 Rarely needed - auto-cancels when target speaks to you.
+
+PATHFINDING ACTIONS:
+  path     - Find shortest path between two rooms using A* (fromRoomId, toRoomId, ignoreLocks?, maxSteps?)
+             Returns { success, path: [{direction, roomId, distance}], totalDistance }
+             Skips locked/guarded exits by default. Use ignoreLocks=true for theoretical paths.
+  walkPath - Walk an AI human along a path (humanId, path)
+             Takes path array from 'path' action. Waits for each step to complete.`,
       {
         action: z.string().describe('Action to perform (see help above)'),
         role: z.string().optional().describe('Role for this AI (e.g., "guard", "shopkeeper")'),
@@ -1817,8 +1824,18 @@ EXPECTATION ACTIONS (response timeout management):
         timeout: z.number().optional().describe('Timeout in ms (for expect action, default 300000 = 5 min)'),
         prompt: z.string().optional().describe('Custom timeout prompt (for expect action)'),
         recurring: z.boolean().optional().describe('Whether to auto-reschedule after timeout (for expect action, default true)'),
+        // Pathfinding action parameters
+        fromRoomId: z.number().optional().describe('Starting room ID (for path action)'),
+        toRoomId: z.number().optional().describe('Destination room ID (for path action)'),
+        ignoreLocks: z.boolean().optional().describe('Include locked/guarded exits in pathfinding (default false)'),
+        maxSteps: z.number().optional().describe('Max A* iterations (default 1000)'),
+        path: z.array(z.object({
+          direction: z.string(),
+          roomId: z.number(),
+          distance: z.number(),
+        })).optional().describe('Path array from path action (for walkPath)'),
       },
-      async ({ action, role, name, description, locationId, sex, age, humanId, command, recycle, personality, history, text, importance, tags, tag, index, limit, criticalOnly, context, clothed, targetId, timeout, prompt, recurring }) => {
+      async ({ action, role, name, description, locationId, sex, age, humanId, command, recycle, personality, history, text, importance, tags, tag, index, limit, criticalOnly, context, clothed, targetId, timeout, prompt, recurring, fromRoomId, toRoomId, ignoreLocks, maxSteps, path }) => {
         const aiRegistry = await this.getAlias('ai');
         if (!aiRegistry) {
           return {
@@ -2157,8 +2174,32 @@ EXPECTATION ACTIONS (response timeout management):
               return ok(result);
             }
 
+            // ═══════════════════════════════════════════════════════════════
+            // PATHFINDING ACTIONS
+            // ═══════════════════════════════════════════════════════════════
+
+            case 'path': {
+              if (fromRoomId === undefined) return err('fromRoomId required');
+              if (toRoomId === undefined) return err('toRoomId required');
+
+              const options: Record<string, unknown> = {};
+              if (ignoreLocks !== undefined) options.ignoreLocks = ignoreLocks;
+              if (maxSteps !== undefined) options.maxSteps = maxSteps;
+
+              const result = await aiRegistry.call('path', fromRoomId, toRoomId, options);
+              return ok(result);
+            }
+
+            case 'walkPath': {
+              if (humanId === undefined) return err('humanId required');
+              if (!path) return err('path array required');
+
+              const result = await aiRegistry.call('walkPath', humanId, path);
+              return ok(result);
+            }
+
             default:
-              return err(`Unknown action: ${action}. Valid: spawn, despawn, list, info, do, look, tailor, profile, setPersonality, setHistory, remember, recall, forget, memories, expect, cancelExpect`);
+              return err(`Unknown action: ${action}. Valid: spawn, despawn, list, info, do, look, tailor, profile, setPersonality, setHistory, remember, recall, forget, memories, expect, cancelExpect, path, walkPath`);
           }
         } catch (error) {
           return err(`Error: ${error instanceof Error ? error.message : String(error)}`);
