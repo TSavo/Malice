@@ -1038,13 +1038,13 @@ export class HumanBuilder {
       const role = profile?.role || 'npc';
 
       // Fire-and-forget query - don't block the input prompt
-      $query(systemPrompt, userPrompt, self.agentSession, options)
+      $query(systemPrompt, userPrompt, self.interactionSession, options)
         .then(async (result) => {
-          self.agentSession = result.session;
+          self.interactionSession = result.session;
 
           // Register session with $ai for persistence
           if (result.session && ai) {
-            await ai.registerSession(result.session, self.id, self.name, role);
+            await ai.registerSession(result.session, self.id, self.name, role, 'interaction');
           }
 
           // Check if there are queued messages - batch them all into one
@@ -1095,15 +1095,15 @@ export class HumanBuilder {
       const userPrompt = giver.name + ' just gave you ' + item.name + '.\\n\\nReact appropriately - thank them, examine the item, or respond based on your role.';
 
       // Fire-and-forget query
-      $query(systemPrompt, userPrompt, self.agentSession)
+      $query(systemPrompt, userPrompt, self.interactionSession)
         .then(async (result) => {
-          self.agentSession = result.session;
+          self.interactionSession = result.session;
 
           // Register session with $ai for persistence (survives NPC recycling)
           if (result.session && $ai) {
             const profile = $ai ? await $ai.get(self.id) : null;
             const role = profile?.role || 'npc';
-            await $ai.registerSession(result.session, self.id, self.name, role);
+            await $ai.registerSession(result.session, self.id, self.name, role, 'interaction');
           }
         })
         .catch((err) => {

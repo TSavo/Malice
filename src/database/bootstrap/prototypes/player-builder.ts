@@ -333,7 +333,7 @@ export class PlayerBuilder {
 
         // Register session with $ai for persistence (survives player logout)
         if (result.session && $ai) {
-          await $ai.registerSession(result.session, self.id, self.name + ' (chargen)', 'chargen-session');
+          await $ai.registerSession(result.session, self.id, self.name + ' (chargen)', 'chargen-session', 'interaction');
         }
 
         // Reschedule inactivity timeout - AI has responded, waiting for player

@@ -206,6 +206,7 @@ export class BuildingBuilder {
       delete extraProps.methods;
       delete extraProps.prototype;
       delete extraProps.elevator;
+      delete extraProps.alias;
 
       const room = await recycler.create({
         parent: parentProto,
@@ -229,6 +230,12 @@ export class BuildingBuilder {
       sharedPlaceholders.set(placeholder, room);
       // Register globally for cross-building/world exit resolution
       this.allPlaceholders.set(placeholder, room);
+
+      // Register alias if specified (e.g., alias: 'immigrationServices' -> $immigrationServices)
+      if (def.alias && objectManager) {
+        await objectManager.call('addAlias', def.alias, room.id);
+        console.log(`    Registered $.${def.alias} = #${room.id} (${room.get('name')})`);
+      }
     }
 
     const resolvePlaceholder = (ph: string): RuntimeObject | undefined => {

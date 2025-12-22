@@ -29,7 +29,7 @@ export class PluribusBuilder {
         sensoryHistory: [],
         historyLimit: 100,
         // The system prompt for AI interactions
-        systemPrompt: this.getSystemPrompt(),
+        agentSystemPrompt: this.getSystemPrompt(),
       },
       methods: {},
     });
@@ -446,7 +446,7 @@ YOUR MISSION
       /** Hourly wake-up call. Scan the world and act.
        *  Called by $.scheduler every hour.
        */
-      const systemPrompt = self.systemPrompt;
+      const systemPrompt = self.agentSystemPrompt;
 
       // Gather current world state for context
       const onlinePlayerIds = $.authManager?.onlinePlayers || [];
@@ -470,11 +470,16 @@ YOUR MISSION
         'Use MCP tools to act. Read moo://city-ai/tools if you need reference.';
 
       // Invoke the AI
-      const session = self.session || null;
+      const session = self.wakeSession || null;
       const result = await $query(systemPrompt, prompt, session);
 
       // Store session for continuity
-      self.session = result.session;
+      self.wakeSession = result.session;
+
+      // Register wake session with $ai
+      if (result.session && $ai) {
+        await $ai.registerSession(result.session, self.id, self.name, 'city_ai', 'wake');
+      }
 
       console.log('[Pluribus] Wake-up complete');
       return { invoked: true, response: result.response };

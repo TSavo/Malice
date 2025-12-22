@@ -29,7 +29,7 @@ export class SisterGrayBuilder {
         // Her location in the world
         location: null, // Will be set to Sister's Quarters
         // The system prompt for AI interactions
-        systemPrompt: this.getSystemPrompt(),
+        agentSystemPrompt: this.getSystemPrompt(),
       },
       methods: {},
     });
@@ -447,7 +447,7 @@ You would never admit any of this. The mask of calm authority is as important as
       /** Hourly wake-up call. Scan the world and act.
        *  Called by $.scheduler every hour (on the half-hour).
        */
-      const systemPrompt = self.systemPrompt;
+      const systemPrompt = self.agentSystemPrompt;
 
       // Gather current world state for context
       const onlinePlayerIds = $.authManager?.onlinePlayers || [];
@@ -471,11 +471,16 @@ You would never admit any of this. The mask of calm authority is as important as
         'Use MCP tools to act. Read moo://city-ai/tools if you need reference.';
 
       // Invoke the AI
-      const session = self.session || null;
+      const session = self.wakeSession || null;
       const result = await $query(systemPrompt, prompt, session);
 
       // Store session for continuity
-      self.session = result.session;
+      self.wakeSession = result.session;
+
+      // Register wake session with $ai
+      if (result.session && $ai) {
+        await $ai.registerSession(result.session, self.id, self.name, 'faction_leader', 'wake');
+      }
 
       console.log('[SisterGray] Wake-up complete');
       return { invoked: true, response: result.response };
@@ -490,6 +495,16 @@ You would never admit any of this. The mask of calm authority is as important as
 
     await objectManager.call('addAlias', 'sisterGray', this.sisterGray.id);
     console.log(`✅ Registered sisterGray alias -> #${this.sisterGray.id}`);
+
+    // Register with $ai so she responds to player speech
+    const aliases = objectManager.get('aliases') as Record<string, number> | undefined;
+    if (aliases?.ai) {
+      const ai = await this.manager.load(aliases.ai);
+      if (ai) {
+        await ai.call('register', this.sisterGray, 'faction_leader');
+        console.log(`✅ Registered Sister Gray with $ai as faction_leader`);
+      }
+    }
   }
 
   async setLocation(roomId: number): Promise<void> {
