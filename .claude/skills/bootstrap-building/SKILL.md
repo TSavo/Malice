@@ -317,6 +317,25 @@ $bank.deposit(player, 100);
 
 View all aliases: `moo://aliases` resource or `list_aliases` tool
 
+### Registering New Aliases
+
+In bootstrap code, register aliases on `#0` (ObjectManager):
+
+```typescript
+// In builder's registerAlias() method
+async registerAlias(): Promise<void> {
+  const objectManager = await this.manager.load(0);
+  await objectManager?.call('addAlias', 'myThing', this.myThing.id);
+}
+
+// In method code strings
+await $[0].addAlias('myThing', obj.id);
+// or
+await $.addAlias('myThing', obj.id);
+```
+
+After registration, `$myThing` is available in all method code.
+
 ## Critical Anti-Patterns to Avoid
 
 Read `moo://docs/moo/reference/anti-patterns`:
