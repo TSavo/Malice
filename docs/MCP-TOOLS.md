@@ -228,11 +228,11 @@ List all registered object aliases.
 ```
 
 #### add_alias
-Register a global alias for an object. Makes it accessible as `$.name`.
+Register a global alias for an object. Makes it accessible as `$name`.
 
 ```javascript
 { alias: "securityCamera", objectId: "#1234" }
-// Returns: "Registered $.securityCamera -> #1234"
+// Returns: "Registered $securityCamera -> #1234"
 ```
 
 ### Rooms & World Building
