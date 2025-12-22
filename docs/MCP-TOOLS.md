@@ -58,6 +58,7 @@ moo://rooms/377  # → { name: "Occidental Park", exits: [...], players: [...], 
 | `moo://ai/{id}` | Full NPC profile (personality, history, memories) |
 | `moo://ai/{id}/memories` | NPC memories only |
 | `moo://ai/{id}/notes` | NPC notes only |
+| `moo://ai/worldLog` | World log - AI activity and events across the game |
 | `moo://npc-sessions` | List NPCs with conversation sessions |
 | `moo://npc-sessions/{id}` | NPC conversation history (Claude agent transcript) |
 
@@ -140,6 +141,14 @@ Set a property value on an object.
 // Returns: Confirmation
 ```
 
+#### get_property
+Get a property value from an object.
+
+```javascript
+{ objectId: "#123", name: "health" }
+// Returns: { property: "health", value: 100 }
+```
+
 #### set_method
 Create or update a TypeScript method on an object.
 
@@ -185,14 +194,6 @@ Find objects that have a specific property value.
 // Returns: Array of matching objects
 ```
 
-#### find_children
-Find all objects that inherit from a given parent.
-
-```javascript
-{ parentId: 10, recursive: false, limit: 100 }
-// Returns: Array of child objects
-```
-
 #### find_in_location
 Find all objects in a room or container.
 
@@ -201,12 +202,12 @@ Find all objects in a room or container.
 // Returns: Array of objects in location
 ```
 
-#### get_inheritance_chain
-Get the full parent inheritance chain for an object.
+#### get_inheritance
+Get inheritance info: ancestor chain (what it inherits from) and optionally descendants.
 
 ```javascript
-{ id: 123 }
-// Returns: Array of parent objects up to Root
+{ objectId: "#123", descendants: false, recursive: false, limit: 100 }
+// Returns: { objectId, name, parent, ancestors: [...], descendants?: [...] }
 ```
 
 ### Aliases
@@ -385,20 +386,34 @@ The `ai` tool is a consolidated interface for managing AI-controlled humans. AI 
 
 ### Actions
 
-- `spawn` - Create a new AI-controlled human (role, name?, description?, locationId?, sex?, age?, clothed?)
+**Spawning & Management:**
+- `spawn` - Create a new AI-controlled human (role, name?, description?, locationId?, sex?, age?, personality?, history?, clothed?)
 - `despawn` - Remove an AI human (humanId, recycle?)
 - `list` - List all AI humans (role?)
 - `info` - Get detailed AI human info (humanId)
 - `do` - Execute a command as AI human (humanId, command)
 - `look` - Get what AI human sees (humanId)
 - `tailor` - Dress an NPC with AI tailor (humanId, context?)
+
+**Profile & Memory:**
 - `profile` - Get full NPC profile (humanId)
 - `setPersonality` - Set personality traits (humanId, personality)
 - `setHistory` - Set backstory/history (humanId, history)
-- `remember` - Store a memory (humanId, text, importance?, tags?)
+- `remember` - Store a critical memory (humanId, text, importance?, tags?)
 - `recall` - Get memories (humanId, importance?, tag?, limit?)
-- `forget` - Remove a memory (humanId, index)
-- `memories` - Get formatted memory summary (humanId)
+- `forget` - Remove a memory by index (humanId, index)
+- `memories` - Get formatted memory summary (humanId, criticalOnly?)
+
+**Response Expectations:**
+- `expect` - Set timeout waiting for response from target (humanId, targetId, timeout?, prompt?, recurring?)
+- `cancelExpect` - Cancel a pending expectation (humanId, targetId)
+
+**Pathfinding:**
+- `path` - A* pathfinding between rooms (fromRoomId, toRoomId, ignoreLocks?, maxSteps?)
+- `walkPath` - Walk AI human along a path (humanId, path)
+
+**World Log:**
+- `worldLog` - Get world log entries (limit?)
 
 ### Examples
 
@@ -431,6 +446,22 @@ ai({ action: "remember", humanId: 567, text: "Saw suspicious person near vault",
 
 // List all guards
 ai({ action: "list", role: "guard" })
+
+// Set up response timeout (NPC expects player to respond within 5 minutes)
+ai({ action: "expect", humanId: 567, targetId: 11, timeout: 300000, prompt: "Player walked away" })
+
+// Cancel expectation
+ai({ action: "cancelExpect", humanId: 567, targetId: 11 })
+
+// Find path between rooms
+ai({ action: "path", fromRoomId: 100, toRoomId: 200 })
+// Returns: { success: true, path: [{direction: "north", roomId: 150, distance: 1}, ...], totalDistance: 3 }
+
+// Walk NPC along a path
+ai({ action: "walkPath", humanId: 567, path: [{direction: "north", roomId: 150, distance: 1}] })
+
+// Get world log (AI activity)
+ai({ action: "worldLog", limit: 50 })
 
 // Remove the AI
 ai({ action: "despawn", humanId: 567, recycle: true })
@@ -540,6 +571,70 @@ The `plot` tool is a consolidated interface for managing plots, jobs, and phases
 **Queue:**
 - `next` - Get next plot needing attention (bumps timer 24h)
 - `active` - List all active plots with metadata
+
+## Combat Resolution (Consolidated Tool)
+
+The `combat` tool is used by AI during combat resolution to manage fights between characters.
+
+### Actions
+
+- `status` - Get current combat state (combatId)
+- `context` - Get full combat context for AI resolution (combatId)
+- `check` - Perform skill check (combatId, combatantId, skillName, opposingLevel?)
+- `damage` - Apply damage to combatant (combatId, targetId, bodyPart, damageType, severity, cause?)
+- `emote` - Narrate combat action to room (combatId, text)
+- `effect` - Apply status effect (combatId, targetId, effect, intensity, duration?)
+- `end` - End combat (combatId, reason, winnerId?)
+- `next_round` - Advance to next round (combatId)
+- `list` - List all active combats
+
+### Damage Types
+`cut`, `bruise`, `puncture`, `burn`, `laceration`, `abrasion`
+
+### Body Parts
+`head`, `torso`, `leftShoulder`, `rightShoulder`, `leftThigh`, `rightThigh` (or specific part names)
+
+### End Reasons
+`death`, `flee`, `surrender`, `knockout`, `intervention`
+
+### Status Effects
+`stunned`, `knockedDown`, `disarmed`, `winded`
+
+### Example
+
+```javascript
+// Get combat context for AI
+const ctx = await combat({ action: "context", combatId: "combat-123" });
+
+// Perform a skill check
+const result = await combat({
+  action: "check",
+  combatId: "combat-123",
+  combatantId: 567,
+  skillName: "brawling",
+  opposingLevel: 50
+});
+
+// Apply damage if hit
+if (result.success) {
+  await combat({
+    action: "damage",
+    combatId: "combat-123",
+    targetId: 568,
+    bodyPart: "torso",
+    damageType: "bruise",
+    severity: 30,
+    cause: "fist"
+  });
+}
+
+// Narrate the action
+await combat({
+  action: "emote",
+  combatId: "combat-123",
+  text: "Marcus lands a solid punch to his opponent's chest!"
+});
+```
 
 ---
 
