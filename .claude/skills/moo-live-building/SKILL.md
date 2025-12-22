@@ -300,10 +300,31 @@ mcp__malice__spawn_item({
 |--------|-------------|
 | `self` | The object the method is on |
 | `args` | Array of method arguments |
-| `$aliasName` | Pre-resolved aliases (`$recycler`, `$bank`, etc.) |
-| `$load(id)` | Load object by ID |
-| `pass()` | Call parent's version of this method |
 | `player` | The player who triggered this (for verbs) |
+| `pass()` | Call parent's version of this method |
+| `$load(id)` | Load object by ID |
+
+### $Alias Injection
+
+**All registered aliases are pre-resolved and injected** into method execution context. Use them directly - no `await` or `$load()` needed:
+
+```javascript
+// These are already RuntimeObjects!
+$recycler.create($item, { name: 'sword' });
+$scheduler.schedule('job', 1000, 0, self, 'tick');
+$english.list(['a', 'b', 'c']);
+$format.columns(items, 3);
+$bank.deposit(player, 100);
+
+// Common aliases:
+// $recycler, $scheduler, $prompt, $exclusions, $mutex
+// $pronoun, $english, $format, $proportional, $emote, $cash
+// $bank, $phoneDb, $bodyFactory, $authManager
+// $describable, $room, $exit, $agent, $human, $player
+// $food, $drink, $clothing, $door, $lock, $stackable
+```
+
+View all aliases: `moo://aliases` resource or `list_aliases` tool
 
 ## Critical Anti-Patterns to Avoid
 
