@@ -379,6 +379,126 @@ Phase 3: World Building (if needed)
 └─ AliasLoader (again)
 ```
 
+## World Building (Streets & Avenues)
+
+The `WorldBuilder` loads room definitions from `src/database/bootstrap/world/seattle/pioneer-square/`.
+
+### Room File Format
+
+Streets use `x*.ts` files (east-west), avenues use `y*.ts` files (north-south):
+
+```typescript
+// src/database/bootstrap/world/seattle/pioneer-square/s-main/x0.ts
+export const room = {
+  name: '2nd Ave S & S. Main St',
+  description: `Description here...`,
+  x: 0,        // Grid coordinate
+  y: 0,        // Grid coordinate
+  z: 0,        // Vertical (0=street, negative=underground)
+  intersection: ['2nd Ave S', 'S. Main St'],  // Optional
+  // Environmental properties
+  population: 0,
+  ambientNoise: 0,
+  lighting: 100,
+  waterLevel: 0,
+  outdoor: true,
+  // Custom exits (optional - cardinal directions auto-connect)
+  exits: {
+    down: { room: '%UNDERGROUND', prototype: 'guardedExit', allowedFaction: 'gray' }
+  }
+};
+```
+
+Adjacent rooms (±1 on any axis) are auto-connected with cardinal direction exits.
+
+### Directory Structure
+
+```
+world/seattle/pioneer-square/
+├── yesler-way/          # y=10, x*.ts files
+├── s-washington/        # y=5, x*.ts files
+├── s-main/              # y=0, x*.ts files
+├── s-jackson/           # y=-5, x*.ts files
+├── s-king/              # y=-10, x*.ts files
+├── 1st-ave-s/           # x=-9, y*.ts files
+├── 2nd-ave-s/           # x=3, y*.ts files
+├── 3rd-ave-s/           # x=9, y*.ts files
+├── 4th-ave-s/           # x=15, y*.ts files
+├── occidental-park/     # Park area, x-y-*.ts files
+├── underground/         # z<0 rooms
+└── buildings/           # See BuildingBuilder below
+```
+
+## Building Builder (Interior Structures)
+
+The `BuildingBuilder` uses a placeholder system for explicit room connections (walls exist!).
+
+### Building File Format
+
+Each floor is a `z*.ts` file in `buildings/{name}/`:
+
+```typescript
+// src/database/bootstrap/world/.../buildings/smith-tower/z0.ts
+export const building = {
+  alias: 'smithTower',  // Optional - register as $smithTower
+  rooms: {
+    '%0': {
+      name: 'Lobby',
+      description: 'Grand marble lobby...',
+      x: -12, y: 10, z: 0,
+      exits: {
+        north: '%1',           // Connect to placeholder %1
+        east: '%2',
+        up: { room: '%3', locked: true },  // With properties
+        west: { to: '2nd-ave-s/y10.ts' },  // Connect to world room
+      },
+      objects: [
+        { prototype: 'sign', name: 'Directory', text: 'Floor Guide...' },
+      ]
+    },
+    '%1': {
+      name: 'Security Checkpoint',
+      // ...
+    },
+    '%E': {
+      prototype: 'elevator',  // Use elevator prototype
+      name: 'Elevator Car',
+      elevator: {
+        floors: [0, 1, 2, 3],
+        currentFloor: 0,
+        floorRooms: { 0: '%0', 1: '%FLOOR1', 2: '%FLOOR2' },
+        locks: ['%LOCK1'],
+      },
+    },
+  }
+};
+```
+
+### Placeholder System
+
+- `%0`, `%1`, `%LOBBY` - Room placeholders within the building
+- Cross-floor references work: `z0.ts` can reference `%FLOOR2` defined in `z2.ts`
+- World connections: `{ to: 'path/to/room.ts' }` creates bidirectional exits
+
+### Exit Types
+
+| Type | Example | Description |
+|------|---------|-------------|
+| Simple | `north: '%1'` | Connect to placeholder |
+| With props | `{ room: '%1', locked: true }` | Placeholder with properties |
+| World ref | `{ to: '2nd-ave-s/y10.ts' }` | Connect to world room file |
+| Guarded | `{ prototype: 'guardedExit', allowedFaction: 'gray' }` | Faction-restricted |
+
+### Objects in Rooms
+
+```typescript
+objects: [
+  { prototype: 'jobBoard', name: 'Employment Terminal' },
+  { prototype: 'sign', name: 'Notice', text: 'Welcome...' },
+  { prototype: 'locker', locked: true },
+]
+```
+
 ## Testing
 
 ```bash
