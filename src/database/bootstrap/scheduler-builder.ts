@@ -382,6 +382,74 @@ export class SchedulerBuilder {
       console.log('✅ Registered decayTick job (every 60s)');
     }
 
+    // Note: Wake jobs for Pluribus/SisterGray are registered separately
+    // via registerWakeJobs() after their aliases exist
+
+    if (modified) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      this.scheduler.set('jobs', jobs as any);
+    }
+  }
+
+  /**
+   * Register wake jobs for Pluribus and Sister Gray
+   * Called separately after their aliases are registered
+   */
+  async registerWakeJobs(): Promise<void> {
+    if (!this.scheduler) return;
+
+    const objectManager = await this.manager.load(0);
+    if (!objectManager) return;
+
+    const jobs = (this.scheduler.get('jobs') as Record<string, unknown>) || {};
+    let modified = false;
+
+    // Pluribus hourly wake-up - on the hour
+    const pluribusId = (await objectManager.call('getAlias', 'pluribus') as number | undefined);
+    if (pluribusId && !jobs.pluribusWake) {
+      // Calculate ms until next hour
+      const now = Date.now();
+      const msPerHour = 3600000;
+      const msSinceHour = now % msPerHour;
+      const msUntilNextHour = msPerHour - msSinceHour;
+
+      (jobs as Record<string, unknown>).pluribusWake = {
+        interval: msPerHour, // every hour
+        nextRun: now + msUntilNextHour, // aligned to next hour
+        targetId: pluribusId,
+        method: 'wake',
+        args: [],
+        enabled: true,
+      };
+      modified = true;
+      console.log('✅ Registered pluribusWake job (hourly, on the hour)');
+    }
+
+    // Sister Gray hourly wake-up - on the half-hour
+    const sisterGrayId = (await objectManager.call('getAlias', 'sisterGray') as number | undefined);
+    if (sisterGrayId && !jobs.sisterGrayWake) {
+      // Calculate ms until next half-hour
+      const now = Date.now();
+      const msPerHour = 3600000;
+      const msPerHalfHour = 1800000;
+      const msSinceHour = now % msPerHour;
+      // Time until next half-hour mark (either :30 or :00 + 30min)
+      const msUntilNextHalfHour = msSinceHour < msPerHalfHour
+        ? msPerHalfHour - msSinceHour
+        : msPerHour - msSinceHour + msPerHalfHour;
+
+      (jobs as Record<string, unknown>).sisterGrayWake = {
+        interval: msPerHour, // every hour
+        nextRun: now + msUntilNextHalfHour, // aligned to next half-hour
+        targetId: sisterGrayId,
+        method: 'wake',
+        args: [],
+        enabled: true,
+      };
+      modified = true;
+      console.log('✅ Registered sisterGrayWake job (hourly, on the half-hour)');
+    }
+
     if (modified) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       this.scheduler.set('jobs', jobs as any);

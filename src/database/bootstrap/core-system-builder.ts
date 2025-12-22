@@ -143,6 +143,9 @@ export class CoreSystemBuilder {
     await pluribusBuilder.registerAlias();
     await maskBuilder.registerAlias();
     await sisterGrayBuilder.registerAlias();
+
+    // Register wake jobs now that Pluribus/SisterGray aliases exist
+    await schedulerBuilder.registerWakeJobs();
   }
 
   /**
