@@ -684,6 +684,56 @@ export class MaliceMCPServer {
       }
     );
 
+    // Add alias
+    server.tool(
+      'add_alias',
+      'Register a global alias for an object (e.g., $.myThing). Makes it accessible to both factions.',
+      {
+        alias: z.string().describe('Alias name without $ prefix (e.g., "securityCamera", "deadDrop")'),
+        objectId: z.string().regex(OBJREF_PATTERN).describe(OBJREF_DESCRIPTION),
+      },
+      async ({ alias, objectId: rawObjectId }) => {
+        try {
+          const objectManager = await this.manager.load(0 as ObjId);
+          if (!objectManager) {
+            return {
+              content: [{ type: 'text', text: 'ObjectManager not found' }],
+              isError: true,
+            };
+          }
+
+          // Clean alias - remove $ or $. prefix if provided
+          let cleanAlias = alias;
+          if (cleanAlias.startsWith('$.')) {
+            cleanAlias = cleanAlias.slice(2);
+          } else if (cleanAlias.startsWith('$')) {
+            cleanAlias = cleanAlias.slice(1);
+          }
+
+          // Resolve the object ID
+          const targetObj = await this.deserializeValue(rawObjectId) as RuntimeObject;
+          if (!targetObj) {
+            return {
+              content: [{ type: 'text', text: `Object ${rawObjectId} not found` }],
+              isError: true,
+            };
+          }
+
+          // Add the alias
+          await objectManager.call('addAlias', cleanAlias, targetObj.id);
+
+          return {
+            content: [{ type: 'text', text: `Registered $.${cleanAlias} -> #${targetObj.id}` }],
+          };
+        } catch (err) {
+          return {
+            content: [{ type: 'text', text: `Error: ${err instanceof Error ? err.message : String(err)}` }],
+            isError: true,
+          };
+        }
+      }
+    );
+
     // Dig - create a new room with optional exits
     server.tool(
       'dig',

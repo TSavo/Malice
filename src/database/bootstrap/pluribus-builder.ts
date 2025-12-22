@@ -175,6 +175,7 @@ TOOLS (consolidated by action parameter):
 OBJECT TOOLS:
 - search_objects, find_by_property, get_property, set_property
 - call_method, create_object, move_object, spawn_item, clone_object, recycle_object
+- add_alias — register $.name for an object (shared with both factions)
 
 WORLD TOOLS:
 - list_rooms, list_players, get_exits, dig, link_rooms, describe_object
@@ -233,7 +234,7 @@ BUILDING PROPERLY — The Full Process:
    - Objects with boltedDown: true stay in place when players try to take them.
 
 4. REGISTER as alias so both factions can use it:
-   call_method({ objectId: '#0', name: 'addAlias', args: ['securityCamera', prototypeId] })
+   add_alias({ alias: 'securityCamera', objectId: '#1234' })
 
 5. TEST the prototype works:
    - Call its methods manually to verify they work
