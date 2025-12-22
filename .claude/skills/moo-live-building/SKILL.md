@@ -326,6 +326,26 @@ $bank.deposit(player, 100);
 
 View all aliases: `moo://aliases` resource or `list_aliases` tool
 
+### Registering New Aliases
+
+Use MCP or method code to register aliases on `#0` (ObjectManager):
+
+```javascript
+// Via MCP tool
+mcp__malice__call_method({
+  objectId: "#0",
+  name: "addAlias",
+  args: ["myThing", 1234]  // alias name, object ID
+})
+
+// In method code
+await $[0].addAlias('myThing', obj.id);
+// or
+await $.addAlias('myThing', obj.id);
+```
+
+After registration, `$myThing` is available in all method code.
+
 ## Critical Anti-Patterns to Avoid
 
 Read `moo://docs/moo/reference/anti-patterns` for the full list:
