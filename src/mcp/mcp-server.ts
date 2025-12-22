@@ -1808,7 +1808,13 @@ PATHFINDING ACTIONS:
              Returns { success, path: [{direction, roomId, distance}], totalDistance }
              Skips locked/guarded exits by default. Use ignoreLocks=true for theoretical paths.
   walkPath - Walk an AI human along a path (humanId, path)
-             Takes path array from 'path' action. Waits for each step to complete.`,
+             Takes path array from 'path' action. Waits for each step to complete.
+
+WORLD LOG ACTIONS (Deity Chat):
+  worldLog    - Add entry to shared world log (author, message)
+                Author: 'pluribus' or 'sisterGray'. OOC banter about builds/moves.
+  getWorldLog - Get recent world log entries (limit?)
+                Returns array of timestamped entries.`,
       {
         action: z.string().describe('Action to perform (see help above)'),
         role: z.string().optional().describe('Role for this AI (e.g., "guard", "shopkeeper")'),
@@ -1860,8 +1866,11 @@ PATHFINDING ACTIONS:
           roomId: z.number(),
           distance: z.number(),
         })).optional().describe('Path array from path action (for walkPath)'),
+        // World log action parameters
+        author: z.string().optional().describe('Author for worldLog (pluribus or sisterGray)'),
+        message: z.string().optional().describe('Message for worldLog'),
       },
-      async ({ action, role, name, description, locationId, sex, age, humanId, command, recycle, personality, history, text, importance, tags, tag, index, limit, criticalOnly, context, clothed, targetId, timeout, prompt, recurring, fromRoomId, toRoomId, ignoreLocks, maxSteps, path }) => {
+      async ({ action, role, name, description, locationId, sex, age, humanId, command, recycle, personality, history, text, importance, tags, tag, index, limit, criticalOnly, context, clothed, targetId, timeout, prompt, recurring, fromRoomId, toRoomId, ignoreLocks, maxSteps, path, author, message }) => {
         const aiRegistry = await this.getAlias('ai');
         if (!aiRegistry) {
           return {
@@ -2224,8 +2233,25 @@ PATHFINDING ACTIONS:
               return ok(result);
             }
 
+            // ═══════════════════════════════════════════════════════════════
+            // WORLD LOG ACTIONS (Deity Chat)
+            // ═══════════════════════════════════════════════════════════════
+
+            case 'worldLog': {
+              if (!author) return err('author required (pluribus or sisterGray)');
+              if (!message) return err('message required');
+
+              const result = await aiRegistry.call('logWorld', author, message);
+              return ok(result);
+            }
+
+            case 'getWorldLog': {
+              const result = await aiRegistry.call('getWorldLog', limit || 20);
+              return ok({ log: result });
+            }
+
             default:
-              return err(`Unknown action: ${action}. Valid: spawn, despawn, list, info, do, look, tailor, profile, setPersonality, setHistory, remember, recall, forget, memories, expect, cancelExpect, path, walkPath`);
+              return err(`Unknown action: ${action}. Valid: spawn, despawn, list, info, do, look, tailor, profile, setPersonality, setHistory, remember, recall, forget, memories, expect, cancelExpect, path, walkPath, worldLog, getWorldLog`);
           }
         } catch (error) {
           return err(`Error: ${error instanceof Error ? error.message : String(error)}`);
@@ -3712,6 +3738,45 @@ Core Objects:
           return {
             contents: [{
               uri: `moo://ai/${npcId}/notes`,
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: String(err) }),
+            }],
+          };
+        }
+      }
+    );
+
+    // World log resource - moo://ai/worldLog
+    server.resource(
+      'ai-worldlog',
+      new ResourceTemplate('moo://ai/worldLog', { list: undefined }),
+      { description: 'Shared OOC chat between Pluribus and Sister Gray (deity chat)' },
+      async () => {
+        try {
+          const aiRegistry = await this.getAlias('ai');
+          if (!aiRegistry) {
+            return {
+              contents: [{
+                uri: 'moo://ai/worldLog',
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: 'AI registry not found' }),
+              }],
+            };
+          }
+
+          const log = await aiRegistry.call('getWorldLog', 50);
+
+          return {
+            contents: [{
+              uri: 'moo://ai/worldLog',
+              mimeType: 'application/json',
+              text: JSON.stringify(log, null, 2),
+            }],
+          };
+        } catch (err) {
+          return {
+            contents: [{
+              uri: 'moo://ai/worldLog',
               mimeType: 'application/json',
               text: JSON.stringify({ error: String(err) }),
             }],

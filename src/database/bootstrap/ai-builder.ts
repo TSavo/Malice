@@ -68,6 +68,10 @@ export class AiBuilder {
         // { 'ai-expect-humanId-targetId': { targetId, humanId, prompt, recurring, timeout } }
         expectations: {},
 
+        // World log - shared OOC chat between Pluribus and Sister Gray
+        // { timestamp, author, message }[]
+        worldLog: [],
+
         // Default system prompt template for AI NPCs
         // Copied to each NPC's agentSystemPrompt on spawn
         // Uses {{variable}} syntax for templating
@@ -1770,6 +1774,54 @@ CORE PRINCIPLES
     `);
 
     // ═══════════════════════════════════════════════════════════════════
+    // WORLD LOG - Deity Chat between Pluribus and Sister Gray
+    // ═══════════════════════════════════════════════════════════════════
+
+    this.ai.setMethod('logWorld', `
+      /**
+       * Add an entry to the shared world log (deity chat)
+       * @param author - 'pluribus' or 'sisterGray'
+       * @param message - OOC message about builds/actions
+       */
+      const author = args[0];
+      const message = args[1];
+
+      if (!author || !message) {
+        return { success: false, error: 'Author and message are required' };
+      }
+
+      const log = self.worldLog || [];
+      log.push({
+        timestamp: Date.now(),
+        author: author,
+        message: message,
+      });
+
+      // Keep last 100 entries
+      if (log.length > 100) {
+        self.worldLog = log.slice(-100);
+      } else {
+        self.worldLog = log;
+      }
+
+      return { success: true, entries: self.worldLog.length };
+    `);
+
+    this.ai.setMethod('getWorldLog', `
+      /**
+       * Get recent world log entries
+       * @param limit - Max entries to return (default 20)
+       */
+      const limit = args[0] || 20;
+      const log = self.worldLog || [];
+
+      return log.slice(-limit).map(entry => {
+        const time = new Date(entry.timestamp).toISOString();
+        return '[' + time + '] ' + entry.author + ': ' + entry.message;
+      });
+    `);
+
+    // ═══════════════════════════════════════════════════════════════════
     // DESCRIBE
     // ═══════════════════════════════════════════════════════════════════
 
@@ -2036,7 +2088,27 @@ CORE PRINCIPLES
       return { success: true, stepsCompleted };
     `);
 
-    console.log('[AiBuilder] Session, expectation, and pathfinding methods rebuilt');
+    // World log methods
+    this.ai.setMethod('logWorld', `
+      const author = args[0];
+      const message = args[1];
+      if (!author || !message) return { success: false, error: 'Author and message required' };
+      const log = self.worldLog || [];
+      log.push({ timestamp: Date.now(), author, message });
+      if (log.length > 100) { self.worldLog = log.slice(-100); } else { self.worldLog = log; }
+      return { success: true, entries: self.worldLog.length };
+    `);
+
+    this.ai.setMethod('getWorldLog', `
+      const limit = args[0] || 20;
+      const log = self.worldLog || [];
+      return log.slice(-limit).map(entry => {
+        const time = new Date(entry.timestamp).toISOString();
+        return '[' + time + '] ' + entry.author + ': ' + entry.message;
+      });
+    `);
+
+    console.log('[AiBuilder] Session, expectation, pathfinding, and worldLog methods rebuilt');
   }
 
   async registerAlias(): Promise<void> {
