@@ -723,7 +723,7 @@ export class MaliceMCPServer {
           await objectManager.call('addAlias', cleanAlias, targetObj.id);
 
           return {
-            content: [{ type: 'text', text: `Registered $.${cleanAlias} -> #${targetObj.id}` }],
+            content: [{ type: 'text', text: `Registered $${cleanAlias} -> #${targetObj.id}` }],
           };
         } catch (err) {
           return {

@@ -264,11 +264,11 @@ mcp.list_aliases()
 
 ### add_alias
 
-Register a global alias for an object. Makes it accessible as `$.name` to both factions.
+Register a global alias for an object. Makes it accessible as `$name` to both factions.
 
 ```javascript
 mcp.add_alias({ alias: 'securityCamera', objectId: '#1234' })
-// Returns: "Registered $.securityCamera -> #1234"
+// Returns: "Registered $securityCamera -> #1234"
 ```
 
 **Important:** All new technology prototypes should be registered as aliases so both factions can use them. This is a core rule of the game — you build the toy, everyone can play with it.
