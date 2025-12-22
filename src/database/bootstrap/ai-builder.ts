@@ -954,49 +954,72 @@ CORE PRINCIPLES
        * @param npcId - The NPC's object ID
        * @param npcName - The NPC's name at time of session
        * @param role - The NPC's role
+       * @param sessionType - 'wake' or 'interaction'
        */
       const sessionId = args[0];
       const npcId = args[1];
       const npcName = args[2];
       const role = args[3] || 'unknown';
+      const sessionType = args[4] || 'interaction';
 
       if (!sessionId) return { success: false, error: 'Session ID required' };
+      if (!npcId) return { success: false, error: 'NPC ID required' };
 
       const logs = self.sessionLogs || {};
       const now = Date.now();
+      const npcKey = String(npcId);
 
-      if (logs[sessionId]) {
-        // Update existing session
-        logs[sessionId].lastActive = now;
-      } else {
-        // New session
-        logs[sessionId] = {
-          npcId,
+      // Initialize NPC entry if not exists
+      if (!logs[npcKey]) {
+        logs[npcKey] = {
           npcName,
           role,
-          startTime: now,
+        };
+      } else {
+        // Update name/role in case they changed
+        logs[npcKey].npcName = npcName;
+        logs[npcKey].role = role;
+      }
+
+      // Store session under the appropriate type
+      if (sessionType === 'wake') {
+        logs[npcKey].wakeSession = {
+          sessionId,
+          startTime: logs[npcKey].wakeSession?.startTime || now,
+          lastActive: now,
+        };
+      } else {
+        logs[npcKey].interactionSession = {
+          sessionId,
+          startTime: logs[npcKey].interactionSession?.startTime || now,
           lastActive: now,
         };
       }
 
       self.sessionLogs = logs;
-      return { success: true, sessionId };
+      return { success: true, npcId, sessionType, sessionId };
     `);
 
     this.ai.setMethod('listSessions', `
-      /** List all registered sessions */
+      /** List all registered sessions by NPC */
       const logs = self.sessionLogs || {};
-      return Object.entries(logs).map(([sessionId, info]) => ({
-        sessionId,
+      return Object.entries(logs).map(([npcId, info]) => ({
+        npcId: parseInt(npcId, 10),
         ...info,
       }));
     `);
 
     this.ai.setMethod('getSession', `
-      /** Get session info by ID */
-      const sessionId = args[0];
+      /** Get session info by NPC ID and optionally session type */
+      const npcId = args[0];
+      const sessionType = args[1]; // optional: 'wake' or 'interaction'
       const logs = self.sessionLogs || {};
-      return logs[sessionId] || null;
+      const npcKey = String(npcId);
+      const entry = logs[npcKey];
+      if (!entry) return null;
+      if (sessionType === 'wake') return entry.wakeSession || null;
+      if (sessionType === 'interaction') return entry.interactionSession || null;
+      return entry; // Return full entry if no type specified
     `);
 
     // ═══════════════════════════════════════════════════════════════════
@@ -1097,7 +1120,7 @@ CORE PRINCIPLES
       }
 
       // Get session from human
-      const session = human.agentSession;
+      const session = human.interactionSession;
       if (!session) {
         console.log('[AI] No session for human #' + exp.humanId);
         return { success: false, error: 'No session for human' };
@@ -1109,10 +1132,10 @@ CORE PRINCIPLES
       const systemPrompt = human.agentSystemPrompt || '';
       try {
         const result = await $query(systemPrompt, exp.prompt, session, {});
-        human.agentSession = result.session;
+        human.interactionSession = result.session;
 
         // Register session for persistence
-        await self.registerSession(result.session, exp.humanId, human.name, 'expectation-timeout');
+        await self.registerSession(result.session, exp.humanId, human.name, 'expectation-timeout', 'interaction');
       } catch (err) {
         console.error('[AI] Expectation timeout prompt error:', err?.message || err);
       }
@@ -1868,27 +1891,42 @@ CORE PRINCIPLES
       const npcId = args[1];
       const npcName = args[2];
       const role = args[3] || 'unknown';
+      const sessionType = args[4] || 'interaction';
       if (!sessionId) return { success: false, error: 'Session ID required' };
+      if (!npcId) return { success: false, error: 'NPC ID required' };
       const logs = self.sessionLogs || {};
       const now = Date.now();
-      if (logs[sessionId]) {
-        logs[sessionId].lastActive = now;
+      const npcKey = String(npcId);
+      if (!logs[npcKey]) {
+        logs[npcKey] = { npcName, role };
       } else {
-        logs[sessionId] = { npcId, npcName, role, startTime: now, lastActive: now };
+        logs[npcKey].npcName = npcName;
+        logs[npcKey].role = role;
+      }
+      if (sessionType === 'wake') {
+        logs[npcKey].wakeSession = { sessionId, startTime: logs[npcKey].wakeSession?.startTime || now, lastActive: now };
+      } else {
+        logs[npcKey].interactionSession = { sessionId, startTime: logs[npcKey].interactionSession?.startTime || now, lastActive: now };
       }
       self.sessionLogs = logs;
-      return { success: true, sessionId };
+      return { success: true, npcId, sessionType, sessionId };
     `);
 
     this.ai.setMethod('listSessions', `
       const logs = self.sessionLogs || {};
-      return Object.entries(logs).map(([sessionId, info]) => ({ sessionId, ...info }));
+      return Object.entries(logs).map(([npcId, info]) => ({ npcId: parseInt(npcId, 10), ...info }));
     `);
 
     this.ai.setMethod('getSession', `
-      const sessionId = args[0];
+      const npcId = args[0];
+      const sessionType = args[1];
       const logs = self.sessionLogs || {};
-      return logs[sessionId] || null;
+      const npcKey = String(npcId);
+      const entry = logs[npcKey];
+      if (!entry) return null;
+      if (sessionType === 'wake') return entry.wakeSession || null;
+      if (sessionType === 'interaction') return entry.interactionSession || null;
+      return entry;
     `);
 
     // Response expectation methods
@@ -1946,7 +1984,7 @@ CORE PRINCIPLES
         self.expectations = expectations;
         return { success: false, error: 'Human not found' };
       }
-      const session = human.agentSession;
+      const session = human.interactionSession;
       if (!session) {
         console.log('[AI] No session for human #' + exp.humanId);
         return { success: false, error: 'No session for human' };
@@ -1955,8 +1993,8 @@ CORE PRINCIPLES
       const systemPrompt = human.agentSystemPrompt || '';
       try {
         const result = await $query(systemPrompt, exp.prompt, session, {});
-        human.agentSession = result.session;
-        await self.registerSession(result.session, exp.humanId, human.name, 'expectation-timeout');
+        human.interactionSession = result.session;
+        await self.registerSession(result.session, exp.humanId, human.name, 'expectation-timeout', 'interaction');
       } catch (err) {
         console.error('[AI] Expectation timeout prompt error:', err?.message || err);
       }

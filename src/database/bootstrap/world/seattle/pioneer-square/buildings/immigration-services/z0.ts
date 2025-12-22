@@ -49,6 +49,7 @@ export const building = {
     // ═══════════════════════════════════════════════════════════════════
 
     '%ENTRY': {
+      alias: 'immigrationServices',  // Register as $immigrationServices for chargen spawn point
       name: 'Immigration Services - Entry Hall',
       description: `The entry hall retains the bones of federal architecture—high ceilings, terrazzo floors worn smooth by a century of footsteps, brass fixtures tarnished to brown. The building served as Seattle's immigration processing station in the early 1900s, funneling arrivals from Pacific crossings into the bureaucratic machinery of citizenship and exclusion.
 

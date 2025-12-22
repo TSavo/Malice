@@ -1063,10 +1063,11 @@ export class CharGenBuilder {
       }
 
       // Move player to starting room
-      const startingRoomId = self.startingRoom || 1353;
-      const startingRoom = await $load(startingRoomId);
+      const startingRoom = $immigrationServices;
       if (startingRoom) {
         await player.moveTo(startingRoom, player);
+      } else {
+        console.error('[CharGen] $immigrationServices alias not found!');
       }
 
       // Clear chargen state
@@ -1561,7 +1562,7 @@ Do NOT wrap this up neatly. The interviewer's fate is unknown. The attack may be
 
         // Register session with $ai for persistence
         if (result.session && $ai) {
-          await $ai.registerSession(result.session, player.id, player.name + ' (chargen)', 'chargen-session');
+          await $ai.registerSession(result.session, player.id, player.name + ' (chargen)', 'chargen-session', 'interaction');
         }
 
         // Only schedule timeout if still in chargen (AI might have finished already)
@@ -1702,7 +1703,7 @@ Do NOT wrap this up neatly. The interviewer's fate is unknown. The attack may be
 
         // Register session with $ai for persistence
         if (result.session && $ai) {
-          await $ai.registerSession(result.session, playerId, player.name + ' (chargen)', 'chargen-session');
+          await $ai.registerSession(result.session, playerId, player.name + ' (chargen)', 'chargen-session', 'interaction');
         }
 
         // Only reschedule timeout if still in chargen (AI might have finished or rejected)

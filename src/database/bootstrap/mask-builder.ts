@@ -35,7 +35,7 @@ export class MaskBuilder {
         // The current wearer (RuntimeObject reference)
         wearer: null,
         // AI session for continuity
-        agentSession: null,
+        interactionSession: null,
         // Bond state: 'inactive', 'bonded', 'rejected'
         bondState: 'inactive',
       },
@@ -96,7 +96,7 @@ export class MaskBuilder {
       }
 
       // Clear any previous session for fresh start
-      self.agentSession = null;
+      self.interactionSession = null;
 
       // The bonding experience
       const bondMessage = 'As the Mask settles against your face, the world shifts. ' +
@@ -145,7 +145,7 @@ export class MaskBuilder {
       // Clear our state regardless
       self.wearer = null;
       self.bondState = 'inactive';
-      // Keep agentSession for potential re-bonding continuity
+      // Keep interactionSession for potential re-bonding continuity
 
       // The unbonding experience
       const unbondMessage = 'The Mask releases. The overlays fade. The presence withdraws. ' +
@@ -240,11 +240,11 @@ export class MaskBuilder {
 
       // Fire the AI query
       try {
-        const result = await $query(fullPrompt, userPrompt, self.agentSession);
+        const result = await $query(fullPrompt, userPrompt, self.interactionSession);
 
         // Store session for continuity
         if (result && result.session) {
-          self.agentSession = result.session;
+          self.interactionSession = result.session;
         }
 
         // The response will be delivered via MCP tools (the AI uses 'tell' or similar)
@@ -291,11 +291,11 @@ export class MaskBuilder {
 
       // Fire the AI query
       try {
-        const result = await $query(fullPrompt, userPrompt, self.agentSession);
+        const result = await $query(fullPrompt, userPrompt, self.interactionSession);
 
         // Store session for continuity
         if (result && result.session) {
-          self.agentSession = result.session;
+          self.interactionSession = result.session;
         }
 
         return '';
