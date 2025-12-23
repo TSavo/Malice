@@ -25,6 +25,7 @@ interface SessionMCPServerConfig {
 interface SessionState {
   server: McpServer;
   transport: StreamableHTTPServerTransport;
+  telnetSessionId: string; // Associated telnet session for this MCP session
 }
 
 export class SessionMCPServer {
@@ -106,7 +107,7 @@ export class SessionMCPServer {
 
       // GET or POST without session = new session
       if (!sessionId || !this.sessions.has(sessionId)) {
-        const newSession = this.createSession();
+        const newSession = await this.createSession();
         const newSessionId = `session-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
         this.sessions.set(newSessionId, newSession);
         res.setHeader('mcp-session-id', newSessionId);
@@ -128,7 +129,17 @@ export class SessionMCPServer {
   }
 
   async stop(): Promise<void> {
+    const $session = this.getSession();
+
     for (const [, session] of this.sessions) {
+      // Close associated telnet session
+      if ($session) {
+        try {
+          await $session.call('close', session.telnetSessionId);
+        } catch (err) {
+          console.error('[SessionMCP] Error closing telnet session:', err);
+        }
+      }
       await session.transport.close();
     }
     this.sessions.clear();
@@ -144,13 +155,22 @@ export class SessionMCPServer {
     }
   }
 
-  private createSession(): SessionState {
+  private async createSession(): Promise<SessionState> {
+    // Create telnet session for this MCP session
+    const $session = this.getSession();
+    if (!$session) {
+      throw new Error('$.session not bootstrapped');
+    }
+
+    const telnetResult = await $session.call('connect') as { sessionId: string; output: string; message: string };
+    const telnetSessionId = telnetResult.sessionId;
+
     const server = new McpServer({
       name: 'malice-session',
       version: '2.0.0',
     });
 
-    this.registerTools(server);
+    this.registerTools(server, telnetSessionId);
 
     const transport = new StreamableHTTPServerTransport({
       sessionIdGenerator: () => `mcp-${Date.now()}`,
@@ -158,37 +178,35 @@ export class SessionMCPServer {
 
     server.connect(transport).catch(console.error);
 
-    return { server, transport };
+    return { server, transport, telnetSessionId };
   }
 
   getPort(): number {
     return this.port;
   }
 
-  private registerTools(server: McpServer): void {
-    // Sandboxed executor: ONLY $.session is available
+  private registerTools(server: McpServer, telnetSessionId: string): void {
+    // Sandboxed executor: ONLY $.session is available (with sessionId pre-bound)
     server.tool(
       'execute_session_code',
       `Execute session management code with access to $.session.
 
 SANDBOXED: This executor ONLY provides $.session - no access to $, $load, $create, $query, or other MOO internals.
 
+SECURITY: Your sessionId is automatically bound - you can ONLY access your own telnet session.
+
 The code runs with access to:
-- $.session.connect() - Connect to MOO via telnet
-- $.session.send(sessionId, command) - Send command to session
-- $.session.getLog(sessionId, lines?) - Get session log
-- $.session.list() - List all active sessions
-- $.session.close(sessionId) - Close session
-- $.session.getStatus(sessionId) - Get session status
-- $.session.addKey(sessionId, key) - Add SSH key
-- $.session.listKeys(sessionId) - List SSH keys
-- $.session.removeKey(sessionId, keyId) - Remove SSH key
+- $.session.send(command) - Send command to YOUR session
+- $.session.getLog(lines?) - Get YOUR session log
+- $.session.getStatus() - Get YOUR session status
+- $.session.addKey(key) - Add SSH key to YOUR account
+- $.session.listKeys() - List YOUR SSH keys
+- $.session.removeKey(keyId) - Remove SSH key from YOUR account
 
 Example:
-  // Connect and send commands
-  const { sessionId } = await $.session.connect();
-  await $.session.send(sessionId, "connect admin password");
-  const log = await $.session.getLog(sessionId);
+  // Send commands (sessionId automatically bound)
+  await $.session.send("connect admin password");
+  const log = await $.session.getLog();
   return log;`,
       {
         code: z.string().describe('Session management code to execute'),
@@ -203,10 +221,33 @@ Example:
             };
           }
 
-          // Create sandboxed context with ONLY $.session
+          // Create curried/bound version of $.session with sessionId pre-filled
+          const boundSession = {
+            // Curried methods - sessionId is pre-bound, player can't change it
+            send: async (command: string) => {
+              return await $session.call('send', telnetSessionId, command);
+            },
+            getLog: async (lines?: number) => {
+              return await $session.call('getLog', telnetSessionId, lines);
+            },
+            getStatus: async () => {
+              return await $session.call('getStatus', telnetSessionId);
+            },
+            addKey: async (key: string) => {
+              return await $session.call('addKey', telnetSessionId, key);
+            },
+            listKeys: async () => {
+              return await $session.call('listKeys', telnetSessionId);
+            },
+            removeKey: async (keyId: string) => {
+              return await $session.call('removeKey', telnetSessionId, keyId);
+            },
+          };
+
+          // Create sandboxed context with ONLY bound $.session
           const sandboxContext = {
             $: {
-              session: $session,
+              session: boundSession,
             },
             // Standard JavaScript globals
             Object, Array, Math, JSON, Date, String, Number, Boolean,
