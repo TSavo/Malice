@@ -514,25 +514,31 @@ export class MCPBuilder {
       execute: `
         const { limit } = args[0] || {};
         const rooms = [];
+        const roomProtoId = $room?.id;
 
-        // Get all objects and filter for rooms
-        const allIds = await $.objectManager.getAllIds();
-        for (const id of allIds) {
-          const obj = await $load(id);
-          if (!obj) continue;
+        // Iterate over all cached objects
+        for (const obj of $.cache.values()) {
+          if (!obj || obj.id === roomProtoId) continue;
 
-          // Check if it inherits from $room
-          let current = obj;
+          // Check if it inherits from $room by walking parent chain via objref
+          let currentId = obj.obj.parent?.value;
           let isRoom = false;
-          while (current) {
-            if (current.id === $room?.id) {
+          const seen = new Set();
+
+          while (currentId !== undefined && currentId !== null && !seen.has(currentId)) {
+            seen.add(currentId);
+            if (currentId === roomProtoId) {
               isRoom = true;
               break;
             }
-            current = current.parent;
+            const parent = $.cache.getObject(currentId);
+            if (!parent) break;
+            currentId = parent.obj.parent?.value;
+            // Break on self-parented (root)
+            if (currentId === parent.id) break;
           }
 
-          if (isRoom && obj.id !== $room?.id) {
+          if (isRoom) {
             rooms.push({
               id: obj.id,
               name: obj.name,
@@ -600,33 +606,23 @@ export class MCPBuilder {
       execute: `
         const { prototypeId, roomId, properties } = args[0];
 
-        // Resolve prototypeId: '#123', '$alias', or object
-        let proto;
-        if (typeof prototypeId === 'string') {
-          if (prototypeId.startsWith('#')) {
-            proto = await $load(parseInt(prototypeId.slice(1)));
-          } else if (prototypeId.startsWith('$')) {
-            proto = await $getAlias(prototypeId.slice(1));
-          } else {
-            proto = await $load(prototypeId);
-          }
-        } else {
-          proto = prototypeId;
-        }
+        // Resolve prototypeId: '#123' or '$alias'
+        const proto = typeof prototypeId === 'string'
+          ? prototypeId.startsWith('#')
+            ? await $load(parseInt(prototypeId.slice(1)))
+            : prototypeId.startsWith('$')
+              ? $[prototypeId.slice(1)]
+              : prototypeId
+          : prototypeId;
 
-        // Resolve roomId
-        let room;
-        if (typeof roomId === 'string') {
-          if (roomId.startsWith('#')) {
-            room = await $load(parseInt(roomId.slice(1)));
-          } else if (roomId.startsWith('$')) {
-            room = await $getAlias(roomId.slice(1));
-          } else {
-            room = await $load(roomId);
-          }
-        } else {
-          room = roomId;
-        }
+        // Resolve roomId: '#123' or '$alias'
+        const room = typeof roomId === 'string'
+          ? roomId.startsWith('#')
+            ? await $load(parseInt(roomId.slice(1)))
+            : roomId.startsWith('$')
+              ? $[roomId.slice(1)]
+              : roomId
+          : roomId;
 
         if (!proto) throw new Error('Prototype not found: ' + prototypeId);
         if (!room) throw new Error('Room not found: ' + roomId);
@@ -729,6 +725,693 @@ export class MCPBuilder {
         await objectManager.addAlias(name, obj.id);
 
         return { success: true, message: 'Added alias $' + name + ' -> #' + obj.id };
+      `,
+    }, forceRebuild);
+
+    // Plot tool
+    await this.buildTool('plot', {
+      description: 'Plot and job management - delegates to $plot and $plotDB',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          action: { type: 'string', description: 'Action: create, get, list, search, close, set_metadata, add_event, get_events, set_phases, get_phases, create_job, get_job, complete_job, fail_job, get_job_phase, advance_phase, set_phase, register_hook, next, active' },
+          plotId: { type: 'number', description: 'Plot object ID' },
+          jobId: { type: 'string', description: 'Job identifier' },
+          name: { type: 'string', description: 'Plot name' },
+          status: { type: 'string', description: 'Plot status: active, completed, abandoned, failed' },
+          reason: { type: 'string', description: 'Reason for action' },
+          message: { type: 'string', description: 'Event message' },
+          from: { type: 'string', description: 'Event source: handler, system' },
+          metadata: { type: 'object', description: 'Metadata object' },
+          key: { type: 'string', description: 'Metadata key' },
+          value: { description: 'Metadata value' },
+          query: { type: 'string', description: 'Search query' },
+          limit: { type: 'number', description: 'Result limit' },
+          phases: { type: 'array', description: 'Phase definitions' },
+          phaseId: { type: 'string', description: 'Phase identifier' },
+          targetId: { type: 'number', description: 'Hook target object ID' },
+          eventName: { type: 'string', description: 'Hook event name' },
+          filter: { type: 'object', description: 'Hook filter' },
+          expiresAt: { type: 'number', description: 'Job expiration timestamp' },
+        },
+        required: ['action'],
+      },
+      execute: `
+        const { action, plotId, jobId, name, status, reason, message, from, metadata, key, value, query, limit, phases, phaseId, targetId, eventName, filter, expiresAt } = args[0];
+
+        if (!$plot || !$plotDB) throw new Error('Plot system not available');
+
+        const loadPlot = async (id) => {
+          if (id === undefined) throw new Error('plotId required');
+          const plot = await $load(id);
+          if (!plot) throw new Error('Plot #' + id + ' not found');
+          return plot;
+        };
+
+        switch (action) {
+          case 'create': {
+            if (!name) throw new Error('name required');
+            const newPlot = await $recycler.create({
+              parent: $plot,
+              properties: { name, description: 'AI-created plot', status: 'active', metadata: metadata || {}, events: [], jobs: {} }
+            });
+            await $plotDB.call('register', newPlot);
+            return { created: true, plotId: newPlot.id, name };
+          }
+
+          case 'get': {
+            const plot = await loadPlot(plotId);
+            return { id: plot.id, name: plot.name, status: plot.status, events: plot.events, jobs: plot.jobs, metadata: plot.metadata };
+          }
+
+          case 'list': {
+            const plots = status ? await $plotDB.call('byStatus', status) : await $plotDB.call('all');
+            return { count: plots.length, plots: plots.map(p => ({ id: p.id, name: p.name, status: p.status })) };
+          }
+
+          case 'search': {
+            let plots = await $plotDB.call('search', query || '');
+            if (limit) plots = plots.slice(0, limit);
+            return { query, count: plots.length, plots };
+          }
+
+          case 'close': {
+            const plot = await loadPlot(plotId);
+            plot.status = status || 'completed';
+            await plot.call('addEvent', { from: 'system', message: 'Plot ' + status + ': ' + (reason || 'No reason given') });
+            return { closed: true, plotId, status: plot.status };
+          }
+
+          case 'set_metadata': {
+            const plot = await loadPlot(plotId);
+            await plot.call('setMetadata', key, value);
+            return { set: true, plotId, key, value };
+          }
+
+          case 'add_event': {
+            const plot = await loadPlot(plotId);
+            await plot.call('addEvent', { from: from || 'system', message, metadata: metadata || {} });
+            return { added: true, plotId };
+          }
+
+          case 'get_events': {
+            const plot = await loadPlot(plotId);
+            let events = await plot.call('getEventLog');
+            if (limit) events = events.slice(0, limit);
+            return { plotId, count: events.length, events };
+          }
+
+          case 'set_phases': {
+            const plot = await loadPlot(plotId);
+            const result = await plot.call('setPhases', phases);
+            return { set: true, plotId, phaseCount: result.length, phases: result };
+          }
+
+          case 'get_phases': {
+            const plot = await loadPlot(plotId);
+            const result = await plot.call('getPhases');
+            return { plotId, phases: result };
+          }
+
+          case 'create_job': {
+            const plot = await loadPlot(plotId);
+            if (!jobId) throw new Error('jobId required');
+            const options = metadata ? { metadata } : {};
+            if (expiresAt) options.expiresAt = expiresAt;
+            await plot.call('createJob', jobId, options);
+            return { created: true, plotId, jobId };
+          }
+
+          case 'get_job': {
+            const plot = await loadPlot(plotId);
+            if (!jobId) throw new Error('jobId required');
+            const job = await plot.call('getJob', jobId);
+            if (!job) throw new Error('Job not found: ' + jobId);
+            return { plotId, jobId, ...job };
+          }
+
+          case 'complete_job': {
+            const plot = await loadPlot(plotId);
+            if (!jobId) throw new Error('jobId required');
+            await plot.call('completeJob', jobId, reason || 'Completed');
+            return { completed: true, plotId, jobId };
+          }
+
+          case 'fail_job': {
+            const plot = await loadPlot(plotId);
+            if (!jobId) throw new Error('jobId required');
+            await plot.call('failJob', jobId, reason || 'Failed');
+            return { failed: true, plotId, jobId };
+          }
+
+          case 'get_job_phase': {
+            const plot = await loadPlot(plotId);
+            if (!jobId) throw new Error('jobId required');
+            const result = await plot.call('getJobPhase', jobId);
+            return { plotId, jobId, ...result };
+          }
+
+          case 'advance_phase': {
+            const plot = await loadPlot(plotId);
+            if (!jobId) throw new Error('jobId required');
+            const result = await plot.call('advanceJobPhase', jobId, 'completed');
+            return { plotId, jobId, ...result };
+          }
+
+          case 'set_phase': {
+            const plot = await loadPlot(plotId);
+            if (!jobId || !phaseId) throw new Error('jobId and phaseId required');
+            await plot.call('setJobPhase', jobId, phaseId);
+            return { set: true, plotId, jobId, phaseId };
+          }
+
+          case 'register_hook': {
+            const plot = await loadPlot(plotId);
+            if (!jobId || targetId === undefined || !eventName) throw new Error('jobId, targetId, and eventName required');
+            await plot.call('registerJobHook', jobId, targetId, eventName, filter || {});
+            return { registered: true, plotId, jobId, targetId, eventName };
+          }
+
+          case 'next': {
+            const plot = await $plotDB.call('getNext');
+            if (!plot) return { plot: null, message: 'No jobs need attention' };
+            const jobs = plot.jobs || {};
+            return {
+              id: plot.id,
+              name: plot.name,
+              phases: plot.phases || [],
+              jobs: Object.entries(jobs).map(([id, job]) => ({ id, ...job })),
+              events: plot.events || [],
+              metadata: plot.metadata || {},
+            };
+          }
+
+          case 'active': {
+            const plots = await $plotDB.call('active');
+            return { count: plots.length, plots: plots.map(p => ({ id: p.id, name: p.name, metadata: p.metadata })) };
+          }
+
+          default:
+            throw new Error('Unknown action: ' + action);
+        }
+      `,
+    }, forceRebuild);
+
+    // Notes tool
+    await this.buildTool('notes', {
+      description: 'Notes management - get, add, append, delete, search notes on objects',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          action: { type: 'string', description: 'Action: get, add, append, delete, search, list_objects' },
+          objectId: { type: 'string', description: 'Target object (#id or $alias)' },
+          text: { type: 'string', description: 'Note text' },
+          author: { type: 'string', description: 'Note author' },
+          tags: { type: 'array', items: { type: 'string' }, description: 'Note tags' },
+          tag: { type: 'string', description: 'Tag to filter/append by' },
+          index: { type: 'number', description: 'Note index for delete' },
+          query: { type: 'string', description: 'Search query' },
+          limit: { type: 'number', description: 'Max results' },
+        },
+        required: ['action'],
+      },
+      execute: `
+        const { action, objectId, text, author, tags, tag, index, query, limit } = args[0];
+
+        if (!$notes) throw new Error('Notes system not available');
+
+        const resolveObj = async (id) => {
+          if (!id) return null;
+          if (typeof id === 'string') {
+            return id.startsWith('#') ? await $load(parseInt(id.slice(1))) : $[id.slice(1)];
+          }
+          return id;
+        };
+
+        switch (action) {
+          case 'get': {
+            const obj = await resolveObj(objectId);
+            if (!obj) throw new Error('objectId required');
+            const result = await $notes.call('get', obj);
+            return { objectId: '#' + obj.id, count: result.length, notes: result };
+          }
+
+          case 'add': {
+            const obj = await resolveObj(objectId);
+            if (!obj) throw new Error('objectId required');
+            if (!text) throw new Error('text required');
+            const result = await $notes.call('add', obj, text, author || 'mcp', tags || []);
+            return { added: true, objectId: '#' + obj.id, index: result };
+          }
+
+          case 'append': {
+            const obj = await resolveObj(objectId);
+            if (!obj || !tag || !text) throw new Error('objectId, tag, and text required');
+
+            const existingNotes = await $notes.call('get', obj);
+            const noteIndex = existingNotes.findIndex(n => n.tags?.includes(tag));
+
+            if (noteIndex >= 0) {
+              const oldNote = existingNotes[noteIndex];
+              const newText = oldNote.text + '\\n' + text;
+              await $notes.call('delete', obj, noteIndex);
+              const result = await $notes.call('add', obj, newText, author || oldNote.author || 'mcp', oldNote.tags || [tag]);
+              return { appended: true, objectId: '#' + obj.id, newIndex: result };
+            } else {
+              const result = await $notes.call('add', obj, text, author || 'mcp', [tag]);
+              return { created: true, objectId: '#' + obj.id, index: result };
+            }
+          }
+
+          case 'delete': {
+            const obj = await resolveObj(objectId);
+            if (!obj || index === undefined) throw new Error('objectId and index required');
+            await $notes.call('delete', obj, index);
+            return { deleted: true, objectId: '#' + obj.id, index };
+          }
+
+          case 'search': {
+            const options = {};
+            if (tag) options.tag = tag;
+            if (author) options.author = author;
+            if (limit) options.limit = limit;
+            const results = await $notes.call('search', query || '', options);
+            return { query: query || '', count: results.length, results };
+          }
+
+          case 'list_objects': {
+            const objects = await $notes.call('listObjects');
+            return {
+              count: objects.length,
+              objects: objects.map(obj => ({ objectId: '#' + (obj.objectId?.id || obj.objectId), noteCount: obj.count }))
+            };
+          }
+
+          default:
+            throw new Error('Unknown action: ' + action);
+        }
+      `,
+    }, forceRebuild);
+
+    // AI tool
+    await this.buildTool('ai', {
+      description: 'AI-controlled human management - spawn, list, pathfinding, memory, etc',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          action: { type: 'string', description: 'Action: spawn, despawn, list, info, do, look, tailor, profile, setPersonality, setHistory, remember, recall, forget, memories, expect, cancelExpect, path, walkPath, worldLog, getWorldLog' },
+          role: { type: 'string', description: 'AI role (for spawn)' },
+          name: { type: 'string', description: 'Human name' },
+          description: { type: 'string', description: 'Human description' },
+          locationId: { type: 'number', description: 'Room ID' },
+          sex: { type: 'string', enum: ['male', 'female', 'non-binary'], description: 'Sex' },
+          age: { type: 'number', description: 'Age in years' },
+          humanId: { type: 'number', description: 'Human object ID' },
+          command: { type: 'string', description: 'Command to execute' },
+          recycle: { type: 'boolean', description: 'Recycle on despawn' },
+          personality: { description: 'Personality string or object' },
+          history: { description: 'History string or object' },
+          text: { type: 'string', description: 'Memory/note text' },
+          importance: { type: 'string', enum: ['critical', 'important', 'normal'], description: 'Memory importance' },
+          tags: { type: 'array', items: { type: 'string' }, description: 'Tags' },
+          tag: { type: 'string', description: 'Filter tag' },
+          index: { type: 'number', description: 'Memory index' },
+          limit: { type: 'number', description: 'Result limit' },
+          criticalOnly: { type: 'boolean', description: 'Critical memories only' },
+          context: { type: 'string', description: 'Tailor context' },
+          clothed: { type: 'boolean', description: 'Auto-dress on spawn' },
+          targetId: { type: 'number', description: 'Target object ID' },
+          timeout: { type: 'number', description: 'Timeout in ms' },
+          prompt: { type: 'string', description: 'Custom timeout prompt' },
+          recurring: { type: 'boolean', description: 'Recurring timeout' },
+          fromRoomId: { type: 'number', description: 'Starting room ID' },
+          toRoomId: { type: 'number', description: 'Destination room ID' },
+          ignoreLocks: { type: 'boolean', description: 'Ignore locked exits' },
+          maxSteps: { type: 'number', description: 'Max pathfinding steps' },
+          path: { type: 'array', description: 'Path array for walkPath' },
+          author: { type: 'string', description: 'WorldLog author' },
+          message: { type: 'string', description: 'WorldLog message' },
+        },
+        required: ['action'],
+      },
+      execute: `
+        const { action, role, name, description, locationId, sex, age, humanId, command, recycle, personality, history, text, importance, tags, tag, index, limit, criticalOnly, context, clothed, targetId, timeout, prompt, recurring, fromRoomId, toRoomId, ignoreLocks, maxSteps, path, author, message } = args[0];
+
+        if (!$ai) throw new Error('AI registry not available');
+
+        switch (action) {
+          case 'spawn': {
+            if (!role) throw new Error('role required');
+            const options = {};
+            if (name) options.name = name;
+            if (description) options.description = description;
+            if (locationId !== undefined) options.location = locationId;
+            if (sex) options.sex = sex;
+            if (age !== undefined) options.age = age;
+            if (personality) options.personality = personality;
+            if (history) options.history = history;
+            const human = await $ai.call('spawn', role, options);
+            return { spawned: true, id: human.id, name: human.name, role, clothed: !!clothed };
+          }
+
+          case 'despawn': {
+            if (humanId === undefined) throw new Error('humanId required');
+            await $ai.call('despawn', humanId, recycle !== false);
+            return { despawned: true, humanId };
+          }
+
+          case 'list': {
+            const humans = role ? await $ai.call('getByRole', role) : await $ai.call('getAll');
+            const results = [];
+            for (const human of humans || []) {
+              const id = typeof human === 'number' ? human : human?.id || human?.value;
+              if (!id) continue;
+              const info = await $ai.call('getInfo', id);
+              const loaded = await $load(id);
+              results.push({
+                id,
+                name: loaded ? loaded.name || 'Unknown' : 'Unknown',
+                role: info?.role || 'unknown',
+                location: loaded?.location || null
+              });
+            }
+            return { count: results.length, humans: results };
+          }
+
+          case 'info': {
+            if (humanId === undefined) throw new Error('humanId required');
+            const isAi = await $ai.call('isAiControlled', humanId);
+            if (!isAi) return { humanId, isAiControlled: false };
+            const info = await $ai.call('getInfo', humanId);
+            return { humanId, isAiControlled: true, ...info };
+          }
+
+          case 'do': {
+            if (humanId === undefined || !command) throw new Error('humanId and command required');
+            const human = await $load(humanId);
+            if (!human) throw new Error('Human not found: #' + humanId);
+            await human.call('doCommand', command);
+            return { executed: true, humanId, command };
+          }
+
+          case 'look': {
+            if (humanId === undefined) throw new Error('humanId required');
+            const human = await $load(humanId);
+            if (!human || !human.location) throw new Error('Human not found or not in a location');
+            const output = await human.location.call('describeFor', human);
+            return { humanId, locationId: human.location.id, output };
+          }
+
+          case 'profile': {
+            if (humanId === undefined) throw new Error('humanId required');
+            const human = await $load(humanId);
+            return {
+              humanId,
+              personality: human.personality,
+              history: human.history,
+              memories: human.memories || []
+            };
+          }
+
+          case 'setPersonality': {
+            if (humanId === undefined || !personality) throw new Error('humanId and personality required');
+            const human = await $load(humanId);
+            human.personality = personality;
+            return { set: true, humanId };
+          }
+
+          case 'setHistory': {
+            if (humanId === undefined || !history) throw new Error('humanId and history required');
+            const human = await $load(humanId);
+            human.history = history;
+            return { set: true, humanId };
+          }
+
+          case 'remember': {
+            if (humanId === undefined || !text) throw new Error('humanId and text required');
+            const human = await $load(humanId);
+            const memories = human.memories || [];
+            memories.unshift({ text, importance: importance || 'normal', tags: tags || [], timestamp: Date.now() });
+            human.memories = memories;
+            return { remembered: true, humanId, index: 0 };
+          }
+
+          case 'recall': {
+            if (humanId === undefined) throw new Error('humanId required');
+            const human = await $load(humanId);
+            let memories = human.memories || [];
+            if (importance) memories = memories.filter(m => m.importance === importance);
+            if (tag) memories = memories.filter(m => m.tags?.includes(tag));
+            if (limit) memories = memories.slice(0, limit);
+            return { humanId, count: memories.length, memories };
+          }
+
+          case 'forget': {
+            if (humanId === undefined || index === undefined) throw new Error('humanId and index required');
+            const human = await $load(humanId);
+            const memories = human.memories || [];
+            memories.splice(index, 1);
+            human.memories = memories;
+            return { forgotten: true, humanId, index };
+          }
+
+          case 'memories': {
+            if (humanId === undefined) throw new Error('humanId required');
+            const human = await $load(humanId);
+            let memories = human.memories || [];
+            if (criticalOnly) memories = memories.filter(m => m.importance === 'critical');
+            return { humanId, count: memories.length, summary: memories.map(m => m.text).join('\\n') };
+          }
+
+          case 'expect': {
+            if (humanId === undefined || targetId === undefined) throw new Error('humanId and targetId required');
+            const human = await $load(humanId);
+            await human.call('expectResponse', targetId, timeout || 300000, prompt, recurring !== false);
+            return { expecting: true, humanId, targetId, timeout: timeout || 300000 };
+          }
+
+          case 'cancelExpect': {
+            if (humanId === undefined || targetId === undefined) throw new Error('humanId and targetId required');
+            const human = await $load(humanId);
+            await human.call('cancelExpectation', targetId);
+            return { cancelled: true, humanId, targetId };
+          }
+
+          case 'path': {
+            if (fromRoomId === undefined || toRoomId === undefined) throw new Error('fromRoomId and toRoomId required');
+            const result = await $ai.call('findPath', fromRoomId, toRoomId, ignoreLocks || false, maxSteps || 1000);
+            return result;
+          }
+
+          case 'walkPath': {
+            if (humanId === undefined || !path) throw new Error('humanId and path required');
+            const human = await $load(humanId);
+            for (const step of path) {
+              await human.call('doCommand', step.direction);
+              await new Promise(resolve => setTimeout(resolve, 500));
+            }
+            return { walked: true, humanId, steps: path.length };
+          }
+
+          case 'worldLog': {
+            if (!author || !message) throw new Error('author and message required');
+            const worldLog = $worldLog || await $load(0);
+            const log = worldLog.worldLog || [];
+            log.push({ author, message, timestamp: Date.now() });
+            worldLog.worldLog = log;
+            return { logged: true, author, message };
+          }
+
+          case 'getWorldLog': {
+            const worldLog = $worldLog || await $load(0);
+            let log = worldLog.worldLog || [];
+            if (limit) log = log.slice(-limit);
+            return { count: log.length, log };
+          }
+
+          default:
+            throw new Error('Unknown action: ' + action);
+        }
+      `,
+    }, forceRebuild);
+
+    // Combat tool
+    await this.buildTool('combat', {
+      description: 'Combat resolution - status, check, damage, effects',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          action: { type: 'string', description: 'Action: status, context, check, damage, emote, effect, end, next_round, list' },
+          combatId: { type: 'string', description: 'Combat ID' },
+          combatantId: { type: 'number', description: 'Combatant object ID' },
+          targetId: { type: 'number', description: 'Target object ID' },
+          skillName: { type: 'string', description: 'Skill name' },
+          opposingLevel: { type: 'number', description: 'Opposing skill level' },
+          bodyPart: { type: 'string', description: 'Body part to damage' },
+          damageType: { type: 'string', description: 'Damage type: cut, bruise, puncture, burn, laceration, abrasion' },
+          severity: { type: 'number', description: 'Damage severity 0-100' },
+          cause: { type: 'string', description: 'Damage cause' },
+          text: { type: 'string', description: 'Narration text' },
+          effect: { type: 'string', description: 'Status effect: stunned, knockedDown, disarmed, winded' },
+          intensity: { type: 'number', description: 'Effect intensity 0-100' },
+          duration: { type: 'number', description: 'Effect duration in ms' },
+          reason: { type: 'string', description: 'End reason: death, flee, surrender, knockout, intervention' },
+          winnerId: { type: 'number', description: 'Winner object ID' },
+        },
+        required: ['action'],
+      },
+      execute: `
+        const { action, combatId, combatantId, targetId, skillName, opposingLevel, bodyPart, damageType, severity, cause, text, effect, intensity, duration, reason, winnerId } = args[0];
+
+        if (!$combat) throw new Error('Combat system not available');
+
+        switch (action) {
+          case 'status': {
+            if (!combatId) throw new Error('combatId required');
+            const combat = await $combat.call('getCombat', combatId);
+            if (!combat) throw new Error('Combat not found: ' + combatId);
+            return {
+              id: combat.id,
+              round: combat.round,
+              status: combat.status,
+              combatants: combat.combatants?.map(c => c ? { id: c.id, name: c.name } : null),
+              actions: Object.keys(combat.actions || {}).length
+            };
+          }
+
+          case 'context': {
+            if (!combatId) throw new Error('combatId required');
+            const context = await $combat.call('gatherContext', combatId);
+            if (context.error) throw new Error(context.error);
+            return context;
+          }
+
+          case 'check': {
+            if (!combatId || combatantId === undefined || !skillName) throw new Error('combatId, combatantId, and skillName required');
+            const combatant = await $load(combatantId);
+            if (!combatant) throw new Error('Combatant not found: #' + combatantId);
+            const result = await $combat.call('skillCheck', combatId, combatant, skillName, opposingLevel || 50);
+            if (result.error) throw new Error(result.error);
+            return result;
+          }
+
+          case 'damage': {
+            if (!combatId || targetId === undefined || !bodyPart) throw new Error('combatId, targetId, and bodyPart required');
+            const target = await $load(targetId);
+            if (!target) throw new Error('Target not found: #' + targetId);
+            const result = await $combat.call('applyDamage', combatId, target, bodyPart, damageType || 'bruise', severity || 30, cause);
+            if (result.error) throw new Error(result.error);
+            return result;
+          }
+
+          case 'emote': {
+            if (!combatId || !text) throw new Error('combatId and text required');
+            const result = await $combat.call('emote', combatId, text);
+            return { emoted: true, combatId, text };
+          }
+
+          case 'effect': {
+            if (!combatId || targetId === undefined || !effect) throw new Error('combatId, targetId, and effect required');
+            const target = await $load(targetId);
+            if (!target) throw new Error('Target not found: #' + targetId);
+            const result = await $combat.call('applyEffect', combatId, target, effect, intensity || 50, duration);
+            if (result.error) throw new Error(result.error);
+            return result;
+          }
+
+          case 'end': {
+            if (!combatId || !reason) throw new Error('combatId and reason required');
+            const winner = winnerId !== undefined ? await $load(winnerId) : null;
+            await $combat.call('endCombat', combatId, reason, winner);
+            return { ended: true, combatId, reason, winnerId };
+          }
+
+          case 'next_round': {
+            if (!combatId) throw new Error('combatId required');
+            await $combat.call('nextRound', combatId);
+            return { advanced: true, combatId };
+          }
+
+          case 'list': {
+            const combats = await $combat.call('listActive');
+            return { count: combats.length, combats };
+          }
+
+          default:
+            throw new Error('Unknown action: ' + action);
+        }
+      `,
+    }, forceRebuild);
+
+    // World query tool
+    await this.buildTool('world', {
+      description: 'Query objects with SQL-like DSL syntax',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          action: { type: 'string', description: 'Action: query, validate' },
+          q: { type: 'string', description: 'Query string (DSL syntax)' },
+          limit: { type: 'number', description: 'Max results (default 50)' },
+          offset: { type: 'number', description: 'Skip first N results' },
+        },
+        required: ['action'],
+      },
+      execute: `
+        const { action, q, limit, offset } = args[0];
+
+        // Import query parser
+        const { parseQuery, validateQuery } = await import('/app/src/mcp/query-parser.js');
+
+        switch (action) {
+          case 'validate': {
+            if (!q) throw new Error('q (query) required');
+            const result = validateQuery(q);
+            return result;
+          }
+
+          case 'query': {
+            if (!q) throw new Error('q (query) required');
+
+            let mongoQuery;
+            try {
+              mongoQuery = parseQuery(q);
+            } catch (parseErr) {
+              throw new Error('Parse error: ' + (parseErr.message || parseErr));
+            }
+
+            // Exclude recycled objects by default
+            mongoQuery = { $and: [mongoQuery, { 'properties._deleted': { $ne: true } }] };
+
+            // Execute query against MongoDB
+            const db = $.db;
+            if (!db || !db.objects) throw new Error('Database not available');
+
+            const collection = db.objects;
+            const maxLimit = Math.min(limit || 50, 200);
+            const skip = offset || 0;
+
+            const cursor = collection.find(mongoQuery).skip(skip).limit(maxLimit);
+            const docs = await cursor.toArray();
+
+            const results = docs.map(doc => ({
+              id: doc._id,
+              parent: doc.parent,
+              name: doc.properties?.name?.value || doc.properties?.name || 'Unknown',
+              description: doc.properties?.description?.value || doc.properties?.description
+            }));
+
+            return {
+              query: q,
+              mongoQuery,
+              count: results.length,
+              offset: skip,
+              results
+            };
+          }
+
+          default:
+            throw new Error('Unknown action: ' + action + '. Valid: query, validate');
+        }
       `,
     }, forceRebuild);
   }
