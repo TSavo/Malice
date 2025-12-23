@@ -58,20 +58,21 @@ async function main() {
   console.log('🛠️  DevTools ready for VS Code extension');
 
   // Start MCP Server for Claude Code (Streamable HTTP)
+  // Use port 3010 to avoid conflicts with Claude Code's Chrome MCP mode (3001-3003)
   await createMCPServer(game.getObjectManager(), {
-    port: 3001,
+    port: 3010,
     host: '0.0.0.0', // Allow Docker host access
   });
 
   // Start CharGen MCP Server for AI-driven character creation
   await createCharGenMCPServer(game.getObjectManager(), {
-    port: 3002,
+    port: 3011,
     host: '0.0.0.0', // Allow Docker host access
   });
 
   // Start Session MCP Server for telnet session management
   await createSessionMCPServer({
-    port: 3003,
+    port: 3012,
     host: '0.0.0.0', // Allow Docker host access
   });
 

@@ -18,3 +18,4 @@ export { PluribusBuilder } from './pluribus-builder.js';
 export { MaskBuilder } from './mask-builder.js';
 export { SisterGrayBuilder } from './sister-gray-builder.js';
 export { WebsiteBuilder } from './website-builder.js';
+export { MCPBuilder } from './mcp-builder.js';
