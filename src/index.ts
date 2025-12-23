@@ -19,6 +19,7 @@ import { LSPApiServer } from './lsp/api-server.js';
 import { DevToolsServer } from './devtools/index.js';
 import { createMCPServer, createSessionMCPServer } from './mcp/index.js';
 import { createCharGenMCPServer } from './mcp/chargen-mcp-server.js';
+import { createWebServer } from './web/index.js';
 
 async function main() {
   console.log('🎮 Malice v2 - Modern TypeScript MUD\n');
@@ -72,6 +73,12 @@ async function main() {
   await createSessionMCPServer({
     port: 3003,
     host: '0.0.0.0', // Allow Docker host access
+  });
+
+  // Start Website Server (serves from MOO objects)
+  await createWebServer(game.getObjectManager(), {
+    port: 80,
+    host: '0.0.0.0',
   });
 
   // Create telnet server (port 5555)

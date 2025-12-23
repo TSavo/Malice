@@ -22,6 +22,7 @@ import { CombatBuilder } from './combat-builder.js';
 import { PluribusBuilder } from './pluribus-builder.js';
 import { MaskBuilder } from './mask-builder.js';
 import { SisterGrayBuilder } from './sister-gray-builder.js';
+import { WebsiteBuilder } from './website-builder.js';
 
 /**
  * Orchestrates building all core system objects
@@ -86,6 +87,7 @@ export class CoreSystemBuilder {
     const pluribusBuilder = new PluribusBuilder(this.manager);
     const maskBuilder = new MaskBuilder(this.manager);
     const sisterGrayBuilder = new SisterGrayBuilder(this.manager);
+    const websiteBuilder = new WebsiteBuilder(this.manager);
 
     await authManagerBuilder.build();
     await charGenBuilder.build();
@@ -118,6 +120,7 @@ export class CoreSystemBuilder {
     await pluribusBuilder.build(agentId); // Agent as parent for Pluribus (it acts)
     await maskBuilder.build(wearableId); // Wearable prototype as parent for Mask
     await sisterGrayBuilder.build(humanId); // Human as parent for Sister Gray
+    await websiteBuilder.build(); // Website objects
 
     // Register aliases
     await authManagerBuilder.registerAlias();
@@ -143,6 +146,7 @@ export class CoreSystemBuilder {
     await pluribusBuilder.registerAlias();
     await maskBuilder.registerAlias();
     await sisterGrayBuilder.registerAlias();
+    await websiteBuilder.registerAliases();
 
     // Register wake jobs now that Pluribus/SisterGray aliases exist
     await schedulerBuilder.registerWakeJobs();
@@ -246,6 +250,12 @@ export class CoreSystemBuilder {
     await pluribusBuilder.registerAlias();
     await maskBuilder.registerAlias();
     await sisterGrayBuilder.registerAlias();
+
+    // Rebuild Website methods
+    console.log('  Rebuilding Website methods...');
+    const websiteBuilder = new WebsiteBuilder(this.manager);
+    await websiteBuilder.build(true);
+    await websiteBuilder.registerAliases();
 
     console.log('  ✅ Core system methods rebuilt');
     console.log('  ✅ Rebuilt AuthManager, CharGen, Prompt, etc. methods');
