@@ -222,7 +222,7 @@ export class AdminBuilder {
                   if (!protoId) { await self.tell('Unknown lock prototype alias.'); break; }
                   const newLock = await $.recycler.create(protoId, {});
                   const existing = elev.locks || [];
-                  existing.push(newLock.id);
+                  existing.push(newLock);
                   elev.locks = existing;
                   await self.tell('Created and added lock #' + newLock.id + ' (' + (newLock.name || lockType) + ').');
                   break;
@@ -403,7 +403,7 @@ export class AdminBuilder {
             if (!protoId) { await self.tell('Unknown lock prototype alias.'); break; }
             const newLock = await $.recycler.create(protoId, {});
             const existing = doorObj.locks || [];
-            existing.push(newLock.id);
+            existing.push(newLock);
             doorObj.locks = existing;
             await self.tell('Created and added lock #' + newLock.id + ' (' + (newLock.name || lockType) + ').');
             break;
