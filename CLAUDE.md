@@ -287,6 +287,10 @@ The MCP server provides moo:// resources for querying game state:
 - `moo://ai/{id}/notes` - Get notes for an AI NPC
 - `moo://ai/worldLog` - Shared OOC chat between Pluribus and Sister Gray (deity chat)
 
+**NPC Session Resources (Claude API Logs):**
+- `moo://npc-sessions` - List all AI NPC conversation sessions
+- `moo://npc-sessions/{sessionId}` - Get full conversation history (JSONL format)
+
 **Plot Resources:**
 - `moo://plots` - List all active plots
 - `moo://plots/{id}` - Get plot details and events
