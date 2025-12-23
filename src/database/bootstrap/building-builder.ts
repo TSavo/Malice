@@ -382,13 +382,13 @@ export class BuildingBuilder {
       const room = placeholderToRoom.get(placeholder) || resolvePlaceholder(placeholder);
       if (!room) continue;
 
-      // Resolve elevatorId if provided as placeholder
+      // Resolve elevator reference if provided as placeholder
       if (typeof def.elevatorId === 'string' && def.elevatorId.startsWith('%')) {
         const targetPh = def.elevatorId;
         const apply = async () => {
           const target = resolvePlaceholder(targetPh);
           if (target) {
-            room.set('elevatorId', target.id);
+            room.set('elevator', target);
           }
         };
         postProcessors.push(apply);
