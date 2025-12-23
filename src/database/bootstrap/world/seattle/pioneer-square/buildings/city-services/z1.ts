@@ -42,15 +42,10 @@ Windows along the east wall look out over 1st Ave S, grey light filtering throug
         callElevator: `
           const player = args[0];
           const floorNumber = 1;
-          const elevatorId = self.elevatorId || null;
+          const elevator = self.elevator || null;
 
-          if (!elevatorId) {
-            return 'The call button clicks uselessly. No power.';
-          }
-
-          const elevator = await $load(elevatorId);
           if (!elevator) {
-            return 'Nothing answers the button press.';
+            return 'The call button clicks uselessly. No power.';
           }
 
           if (elevator.currentFloor === floorNumber) {
