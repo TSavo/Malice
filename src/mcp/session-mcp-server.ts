@@ -1,13 +1,14 @@
 /**
- * Session MCP Server for Malice MOO (Code-First)
+ * Session MCP Server for Malice MOO
  *
- * Provides sandboxed access to telnet session management via $.session.
+ * Provides secure access to telnet session management.
  * Port: 3012
  *
  * Architecture:
- * - Single tool: execute_session_code
- * - Sandboxed execution: ONLY $.session is injected (no $, $load, $create, etc.)
- * - $.session wraps $.telnet native methods (player-safe)
+ * - Simple action-based tool (not code-first)
+ * - Each MCP session auto-creates its own telnet session
+ * - sessionId is curried/bound - players can ONLY access their own session
+ * - No JavaScript execution - just simple action dispatch
  */
 
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
@@ -47,34 +48,6 @@ export class SessionMCPServer {
    */
   private getSession(): RuntimeObject | undefined {
     return this.manager.getAliases().get('session');
-  }
-
-  /**
-   * Serialize value for JSON output (handles RuntimeObjects)
-   */
-  private serializeValue(value: any, seen = new WeakSet()): any {
-    if (value === null || value === undefined) return value;
-
-    // RuntimeObject -> #ID
-    if (value && typeof value === 'object' && 'id' in value && typeof value.id === 'number' && typeof value.get === 'function') {
-      return `#${value.id}`;
-    }
-
-    if (Array.isArray(value)) {
-      return value.map(v => this.serializeValue(v, seen));
-    }
-
-    if (typeof value === 'object') {
-      if (seen.has(value)) return '[circular]';
-      seen.add(value);
-      const result: Record<string, any> = {};
-      for (const [k, v] of Object.entries(value)) {
-        result[k] = this.serializeValue(v, seen);
-      }
-      return result;
-    }
-
-    return value;
   }
 
   async start(): Promise<void> {
@@ -186,110 +159,97 @@ export class SessionMCPServer {
   }
 
   private registerTools(server: McpServer, telnetSessionId: string): void {
-    // Sandboxed executor: ONLY $.session is available (with sessionId pre-bound)
+    // Simple action-based session tool
+    // sessionId is curried - player can ONLY access their own telnet session
     server.tool(
-      'execute_session_code',
-      `Execute session management code with access to $.session.
+      'session',
+      `Manage your telnet session to the MOO.
 
-SANDBOXED: This executor ONLY provides $.session - no access to $, $load, $create, $query, or other MOO internals.
+SECURITY: You can ONLY access your own telnet session - sessionId is automatically bound.
 
-SECURITY: Your sessionId is automatically bound - you can ONLY access your own telnet session.
+ACTIONS:
+  send      - Send a command to your session (command)
+  getLog    - Get your session log (lines?)
+  getStatus - Get your session status
+  addKey    - Add SSH public key to your account (key)
+  listKeys  - List your registered SSH keys
+  removeKey - Remove an SSH key from your account (keyId)
 
-The code runs with access to:
-- $.session.send(command) - Send command to YOUR session
-- $.session.getLog(lines?) - Get YOUR session log
-- $.session.getStatus() - Get YOUR session status
-- $.session.addKey(key) - Add SSH key to YOUR account
-- $.session.listKeys() - List YOUR SSH keys
-- $.session.removeKey(keyId) - Remove SSH key from YOUR account
-
-Example:
-  // Send commands (sessionId automatically bound)
-  await $.session.send("connect admin password");
-  const log = await $.session.getLog();
-  return log;`,
+EXAMPLES:
+  session(action="send", command="connect admin password")
+  session(action="getLog", lines=50)
+  session(action="addKey", key="ssh-rsa AAAA...")
+  session(action="listKeys")
+  session(action="removeKey", keyId="1")`,
       {
-        code: z.string().describe('Session management code to execute'),
+        action: z.enum(['send', 'getLog', 'getStatus', 'addKey', 'listKeys', 'removeKey'])
+          .describe('Action to perform'),
+        command: z.string().optional()
+          .describe('Command to send (required for send action)'),
+        lines: z.number().optional()
+          .describe('Number of log lines to return (default: all, max 1000)'),
+        key: z.string().optional()
+          .describe('SSH public key (required for addKey action)'),
+        keyId: z.string().optional()
+          .describe('Key number or fingerprint (required for removeKey action)'),
       },
-      async ({ code }) => {
-        try {
-          const $session = this.getSession();
-          if (!$session) {
-            return {
-              content: [{ type: 'text', text: JSON.stringify({ error: '$.session not bootstrapped. Run FORCE_BOOTSTRAP=true npm start' }) }],
-              isError: true,
-            };
-          }
-
-          // Create curried/bound version of $.session with sessionId pre-filled
-          const boundSession = {
-            // Curried methods - sessionId is pre-bound, player can't change it
-            send: async (command: string) => {
-              return await $session.call('send', telnetSessionId, command);
-            },
-            getLog: async (lines?: number) => {
-              return await $session.call('getLog', telnetSessionId, lines);
-            },
-            getStatus: async () => {
-              return await $session.call('getStatus', telnetSessionId);
-            },
-            addKey: async (key: string) => {
-              return await $session.call('addKey', telnetSessionId, key);
-            },
-            listKeys: async () => {
-              return await $session.call('listKeys', telnetSessionId);
-            },
-            removeKey: async (keyId: string) => {
-              return await $session.call('removeKey', telnetSessionId, keyId);
-            },
-          };
-
-          // Create sandboxed context with ONLY bound $.session
-          const sandboxContext = {
-            $: {
-              session: boundSession,
-            },
-            // Standard JavaScript globals
-            Object, Array, Math, JSON, Date, String, Number, Boolean,
-            RegExp, Error, Promise, console, parseInt, parseFloat, isNaN, isFinite,
-          };
-
-          // Execute code in sandboxed context
-          const AsyncFn = async function () { }.constructor as FunctionConstructor;
-          const fn = new AsyncFn('ctx', `
-            const $ = ctx.$;
-            const Object = ctx.Object;
-            const Array = ctx.Array;
-            const Math = ctx.Math;
-            const JSON = ctx.JSON;
-            const Date = ctx.Date;
-            const String = ctx.String;
-            const Number = ctx.Number;
-            const Boolean = ctx.Boolean;
-            const RegExp = ctx.RegExp;
-            const Error = ctx.Error;
-            const Promise = ctx.Promise;
-            const console = ctx.console;
-            const parseInt = ctx.parseInt;
-            const parseFloat = ctx.parseFloat;
-            const isNaN = ctx.isNaN;
-            const isFinite = ctx.isFinite;
-            return (async () => {
-              ${code}
-            })();
-          `);
-
-          const result = await fn(sandboxContext);
-          const serialized = this.serializeValue(result);
-
+      async ({ action, command, lines, key, keyId }) => {
+        const $session = this.getSession();
+        if (!$session) {
           return {
-            content: [{ type: 'text', text: JSON.stringify(serialized, null, 2) }],
-          };
-        } catch (err) {
-          return {
-            content: [{ type: 'text', text: JSON.stringify({ error: err instanceof Error ? err.message : String(err) }) }],
+            content: [{ type: 'text', text: JSON.stringify({ error: '$.session not bootstrapped' }) }],
             isError: true,
           };
+        }
+
+        const ok = (data: unknown) => ({
+          content: [{ type: 'text' as const, text: typeof data === 'string' ? data : JSON.stringify(data, null, 2) }],
+        });
+        const err = (msg: string) => ({
+          content: [{ type: 'text' as const, text: JSON.stringify({ error: msg }) }],
+          isError: true,
+        });
+
+        try {
+          switch (action) {
+            case 'send': {
+              if (!command) return err('command required for send action');
+              const result = await $session.call('send', telnetSessionId, command);
+              return ok(result);
+            }
+
+            case 'getLog': {
+              const result = await $session.call('getLog', telnetSessionId, lines);
+              return ok(result);
+            }
+
+            case 'getStatus': {
+              const result = await $session.call('getStatus', telnetSessionId);
+              return ok(result);
+            }
+
+            case 'addKey': {
+              if (!key) return err('key required for addKey action');
+              const result = await $session.call('addKey', telnetSessionId, key);
+              return ok(result);
+            }
+
+            case 'listKeys': {
+              const result = await $session.call('listKeys', telnetSessionId);
+              return ok(result);
+            }
+
+            case 'removeKey': {
+              if (!keyId) return err('keyId required for removeKey action');
+              const result = await $session.call('removeKey', telnetSessionId, keyId);
+              return ok(result);
+            }
+
+            default:
+              return err(`Unknown action: ${action}`);
+          }
+        } catch (error) {
+          return err(`Error: ${error instanceof Error ? error.message : String(error)}`);
         }
       }
     );
@@ -305,6 +265,6 @@ export async function createSessionMCPServer(
 ): Promise<SessionMCPServer> {
   const server = new SessionMCPServer(manager, config);
   await server.start();
-  console.log(`🔌 Session MCP server (code-first) ready on port ${server.getPort()}`);
+  console.log(`🔌 Session MCP server ready on port ${server.getPort()}`);
   return server;
 }
