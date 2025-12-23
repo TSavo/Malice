@@ -101,300 +101,308 @@ moo://objects/list/1          # First 100 objects
 
 ---
 
-## MCP Tools (Read-Write)
+## Direct MOO Code Reference
 
-### search_objects
+The following shows how to use native MOO objects and methods. All code runs via `execute_moo_code` with full access to the MOO environment.
 
-Find objects by name pattern.
+### Object Queries
 
+**Search by name:**
 ```javascript
-mcp.search_objects({ pattern: 'Factory', limit: 50 })
+const objects = await $.db.listAll(false);
+const factories = objects.filter(doc =>
+  (doc.properties.name?.value ?? doc.properties.name)?.includes('Factory')
+);
 ```
 
-### find_by_property
-
-Find objects with a specific property value.
-
+**Find by property:**
 ```javascript
-mcp.find_by_property({ name: 'faction', value: 'Citizen' })
-```
-
-### find_children
-
-Find objects that inherit from a parent.
-
-```javascript
-mcp.find_children({ parentId: playerPrototypeId, recursive: true })
-```
-
-## Property Tools
-
-### set_property
-
-Set a property on an object.
-
-```javascript
-mcp.set_property({ objectId: 100, name: 'credits', value: 500 })
-```
-
-## Method Tools
-
-### set_method
-
-Create or update a method.
-
-```javascript
-mcp.set_method({
-  objectId: 100,
-  name: 'greet',
-  code: `
-    const visitor = args[0];
-    return 'Welcome, ' + visitor.name + '.';
-  `
-})
-```
-
-### call_method
-
-Execute a method on an object.
-
-```javascript
-mcp.call_method({
-  objectId: 100,
-  name: 'greet',
-  args: [playerId]
-})
-```
-
-## Creation Tools
-
-### create_object
-
-Create a new object. The `parent` must be a RuntimeObject, not a number.
-
-```javascript
-// First load the parent prototype
-const roomPrototype = await manager.load(roomPrototypeId);
-
-// Then create the object with the loaded parent
-const result = await manager.create({
-  parent: roomPrototype!,
-  properties: {
-    name: 'New Room',
-    description: 'A freshly created room.'
-  }
+const citizens = objects.filter(doc => {
+  const faction = doc.properties.faction?.value ?? doc.properties.faction;
+  return faction === 'Citizen';
 });
-// Returns: RuntimeObject
 ```
 
-### clone_object
-
-Deep copy an object.
-
+**Find children (inheritance):**
 ```javascript
-mcp.clone_object({ objectId: 100, locationId: roomId })
+const players = objects.filter(doc => {
+  const parent = doc.parent?.value ?? doc.parent;
+  return parent === $player.id;
+});
 ```
 
-### recycle_object
+### Properties and Methods
 
-Soft-delete an object.
-
+**Set properties:**
 ```javascript
-mcp.recycle_object({ objectId: 100 })
+const obj = await $load(100);
+obj.credits = 500;
+obj.faction = 'Citizen';
 ```
 
-## World Tools
-
-### list_rooms
-
-List all rooms with coordinates.
-
+**Create/update methods:**
 ```javascript
-mcp.list_rooms()
+const obj = await $load(100);
+obj.setMethod('greet', `
+  const visitor = args[0];
+  return 'Welcome, ' + visitor.name + '.';
+`);
 ```
 
-### get_exits
-
-List exits from a room.
-
+**Call methods:**
 ```javascript
-mcp.get_exits({ roomId: 100 })
+const obj = await $load(100);
+const result = await obj.greet(player);
 ```
 
-### dig
+### Object Creation
 
-Create a new room with exits.
-
+**Using $recycler:**
 ```javascript
-mcp.dig({
+// Create a room
+const room = await $recycler.create($room, {
   name: 'Storage Room',
   description: 'A dusty storage area.',
-  fromRoomId: 100,
-  exitDirection: 'north',
-  returnDirection: 'south'
-})
+  x: 0, y: 1, z: 0
+});
+
+// Create an item
+const item = await $recycler.create($item, {
+  name: 'Sustain Pill',
+  description: 'A nutrition supplement.'
+});
+
+// Move item to room
+await item.moveTo(room, player);
 ```
 
-### link_rooms
-
-Create exits between rooms.
-
+**Clone objects:**
 ```javascript
-mcp.link_rooms({
-  fromRoomId: 100,
-  toRoomId: 200,
-  exitDirection: 'east',
-  returnDirection: 'west'
-})
+const original = await $load(100);
+const clone = await $recycler.clone(original);
+await clone.moveTo(room, player);
 ```
 
-### move_object
-
-Move an object to a new location.
-
+**Recycle objects:**
 ```javascript
-mcp.move_object({ objectId: 100, destinationId: 200 })
+await $recycler.recycle(100);
+// Or with object reference
+await $recycler.recycle(obj);
 ```
 
-### spawn_item
+### Rooms and Exits
 
-Create an instance of a prototype at a location.
-
+**List rooms:**
 ```javascript
-mcp.spawn_item({
-  prototypeId: sustainPrototypeId,
-  locationId: dispensaryId,
-  properties: { name: 'Sustain Pill' }
-})
+const allObjects = await $.db.listAll(false);
+const rooms = allObjects.filter(doc => {
+  const parent = doc.parent?.value ?? doc.parent;
+  return parent === $room.id;
+});
 ```
 
-## Alias Tools
-
-### alias_lookup
-
-Look up an object by its alias.
-
+**Get exits:**
 ```javascript
-mcp.alias_lookup({ alias: 'faction' })
-// Returns: { alias: 'faction', id: 50, name: 'Faction Manager' }
+const room = await $load(100);
+const exits = room.exits || {};
+// { north: 150, south: 75, ... }
 ```
 
-### list_aliases
-
-List all registered aliases.
-
+**Create room with exits:**
 ```javascript
-mcp.list_aliases()
+const fromRoom = await $load(100);
+const toRoom = await $recycler.create($room, {
+  name: 'Hallway',
+  description: 'A long hallway.',
+  x: 0, y: 1, z: 0
+});
+
+// Link them
+fromRoom.exits = fromRoom.exits || {};
+fromRoom.exits.north = toRoom.id;
+toRoom.exits = toRoom.exits || {};
+toRoom.exits.south = fromRoom.id;
 ```
 
-### add_alias
-
-Register a global alias for an object. Makes it accessible as `$name` to both factions.
-
+**Move objects:**
 ```javascript
-mcp.add_alias({ alias: 'securityCamera', objectId: '#1234' })
-// Returns: "Registered $securityCamera -> #1234"
+const obj = await $load(100);
+const destination = await $load(200);
+await obj.moveTo(destination, player);
 ```
 
-**Important:** All new technology prototypes should be registered as aliases so both factions can use them. This is a core rule of the game — you build the toy, everyone can play with it.
+### Aliases
 
-## Player Tools
-
-### list_players
-
-List all players with location and online status.
-
+**Look up alias:**
 ```javascript
-mcp.list_players()
+const factionManager = $faction;  // Direct access
+// Or via $ object
+const aliases = $.getAliases();
+const id = aliases.get('faction');
 ```
 
-## AI/NPC Tools (Consolidated `ai` tool)
+**Register alias:**
+```javascript
+const camera = await $recycler.create($item, {...});
+await $.addAlias('securityCamera', camera.id);
+// Now accessible as $securityCamera
+```
 
-All AI operations use the `ai` tool with an `action` parameter.
+**List all aliases:**
+```javascript
+const aliases = $.getAliases();
+// Map of alias -> id
+```
+
+### Players
+
+**List all players:**
+```javascript
+const allObjects = await $.db.listAll(false);
+const players = allObjects.filter(doc => {
+  const parent = doc.parent?.value ?? doc.parent;
+  return parent === $player.id;
+});
+```
+
+**Get player details:**
+```javascript
+const player = await $load(playerId);
+const location = player.location;  // RuntimeObject
+const credits = player.credits;
+const faction = player.faction;
+```
+
+## AI/NPC System ($ai)
+
+Manage AI-controlled NPCs using the `$ai` registry.
 
 ### spawn
 
-Create an AI-controlled human.
+Create an AI-controlled human:
 
 ```javascript
-ai({
-  action: 'spawn',
+const npc = await $ai.spawn({
   role: 'guard',
   name: 'Marcus',
-  locationId: factoryId,
+  location: await $load(factoryId),
   sex: 'male',
   age: 35,
   personality: 'Suspicious and vigilant.',
   history: 'Former military.'
-})
+});
+// Returns: RuntimeObject (Human)
 ```
 
 ### despawn
 
-Remove an AI human.
+Remove an AI human:
 
 ```javascript
-ai({ action: 'despawn', humanId: 500, recycle: true })
+await $ai.despawn(npcId);  // Recycles object
+await $ai.despawn(npcId, false);  // Keep object, remove from registry
 ```
 
 ### list
 
-List AI-controlled humans.
+List AI-controlled humans:
 
 ```javascript
-ai({ action: 'list', role: 'guard' })
+// All NPCs
+const all = await $ai.getAll();
+// Array of RuntimeObjects
+
+// By role
+const guards = await $ai.getByRole('guard');
+
+// Get all roles
+const roles = await $ai.getRoles();
+// ['guard', 'shopkeeper', 'clerk', ...]
 ```
 
 ### info
 
-Get information about an AI human.
+Get information about an AI human:
 
 ```javascript
-ai({ action: 'info', humanId: 500 })
+const info = await $ai.getInfo(npcId);
+// {
+//   human: RuntimeObject,
+//   role: 'guard',
+//   spawnedAt: '2024-01-15T10:30:00Z',
+//   spawnedBy: wizardId,
+//   ...
+// }
 ```
 
 ### do
 
-Execute a command as an AI human.
+Execute a command as an AI human:
 
 ```javascript
-ai({ action: 'do', humanId: 500, command: 'say Halt! Identify yourself.' })
+await $ai.do(npcId, 'say Halt! Identify yourself.');
+await $ai.do(npcId, 'north');
+await $ai.do(npcId, 'look');
 ```
 
 ### look
 
-Get what an AI sees in their location.
+Get what an AI sees in their location:
 
 ```javascript
-ai({ action: 'look', humanId: 500 })
+const view = await $ai.look(npcId);
+// Returns room description from NPC's perspective
 ```
 
 ### profile
 
-Get the full profile (also available as resource `moo://ai/{id}`).
+Get the full profile (also available as resource `moo://ai/{id}`):
 
 ```javascript
-ai({ action: 'profile', humanId: 500 })
+const profile = await $ai.getProfile(npcId);
+// {
+//   success: true,
+//   humanId: 500,
+//   role: 'guard',
+//   name: 'Marcus',
+//   personality: {...},
+//   history: {...},
+//   memories: [...],
+//   notes: [...]
+// }
 ```
 
 ### setPersonality / setHistory
 
-Set personality or history.
+Set personality or history:
 
 ```javascript
-ai({ action: 'setPersonality', humanId: 500, personality: 'Gruff but fair.' })
-ai({ action: 'setHistory', humanId: 500, history: 'Former soldier.' })
+await $ai.setPersonality(npcId, 'Gruff but fair.');
+
+await $ai.setHistory(npcId, {
+  backstory: 'Former soldier.',
+  events: ['Survived the Corporate Wars'],
+  secrets: ['Has PTSD']
+});
 ```
 
 ### remember / recall / forget
 
-Manage memories.
+Manage memories:
 
 ```javascript
-ai({ action: 'remember', humanId: 500, text: 'Player Jack is wanted', importance: 'critical' })
-ai({ action: 'recall', humanId: 500, criticalOnly: true })
-ai({ action: 'forget', humanId: 500, index: 2 })
+// Add memory
+await $ai.remember(npcId, 'Player Jack is wanted', 'critical', ['player', 'crime']);
+
+// Retrieve memories
+const memories = await $ai.recall(npcId);
+const critical = await $ai.recall(npcId, { importance: 'critical' });
+
+// Remove memory
+await $ai.forget(npcId, 0);  // By index
 ```
+
+See [AI/NPC Reference](../moo/reference/ai-npc.md) for full documentation.
 
 ### Dressing NPCs ($tailor)
 
@@ -451,87 +459,163 @@ await $ai.spawn({
 
 See [TAILORING.md](../TAILORING.md) for full clothing system reference.
 
-## Plot/Job Tools (Consolidated `plot` tool)
+## Plot/Job System ($plot)
 
-All plot/job operations use the `plot` tool with an `action` parameter.
+Manage narrative arcs and missions using the plot system.
 
 ### create
 
-Create a narrative container.
+Create a narrative container:
 
 ```javascript
-plot({ action: 'create', name: 'Water Main Repair', metadata: { type: 'infrastructure' } })
+const plotId = await $plot.create('Water Main Repair', {
+  type: 'infrastructure',
+  priority: 'high'
+});
+// Returns: plot ID (number)
 ```
 
 ### list
 
-List plots with optional status filter.
+List plots with optional status filter:
 
 ```javascript
-plot({ action: 'list', status: 'active' })
+// All active plots
+const active = await $plotDB.getByStatus('active');
+
+// All plots
+const all = await $plotDB.getAll();
 ```
 
 ### get_events
 
-Get the event log (also available as resource `moo://plots/{id}/events`).
+Get the event log (also available as resource `moo://plots/{id}/events`):
 
 ```javascript
-plot({ action: 'get_events', plotId: 100, limit: 50 })
+const plot = await $load(plotId);
+const events = await plot.getEventLog();
+const text = await plot.getEventLogAsText();
+// Formatted text for prompts
 ```
 
 ### add_event
 
-Add an event to a plot's log.
+Add an event to a plot's log:
 
 ```javascript
-plot({ action: 'add_event', plotId: 100, message: 'Worker arrived.', from: 'handler' })
+const plot = await $load(plotId);
+await plot.addEvent({
+  from: 'handler',  // 'player', 'handler', 'system'
+  message: 'Worker arrived.',
+  playerId: player.id,
+  metadata: { timestamp: Date.now() }
+});
 ```
 
 ### close
 
-Close a plot with a final status.
+Close a plot with a final status:
 
 ```javascript
-plot({ action: 'close', plotId: 100, status: 'completed', reason: 'Repair successful.' })
+const plot = await $load(plotId);
+await plot.close('completed', 'Repair successful.');
+// status: 'completed', 'abandoned', 'failed'
 ```
 
 ### create_job / complete_job / fail_job
 
-Manage jobs within plots.
+Manage jobs within plots:
 
 ```javascript
-plot({ action: 'create_job', plotId: 100, jobId: 'repair_pipe', metadata: { reward: 50 } })
-plot({ action: 'complete_job', plotId: 100, jobId: 'repair_pipe', reason: 'Done.' })
-plot({ action: 'fail_job', plotId: 100, jobId: 'repair_pipe', reason: 'Abandoned.' })
+const plot = await $load(plotId);
+
+// Create job
+await plot.createJob('repair_pipe', {
+  expiresAt: new Date(Date.now() + 24*60*60*1000).toISOString(),
+  reward: 50
+});
+
+// Complete job
+await plot.completeJob('repair_pipe', 'Done.');
+
+// Fail job
+await plot.failJob('repair_pipe', 'Abandoned.');
 ```
 
-### next
+### Hooks and Filters
 
-Get the next plot needing attention.
+Register event hooks to watch for game events:
 
 ```javascript
-plot({ action: 'next' })
+const plot = await $load(plotId);
+
+// Watch for a specific code being used
+await plot.registerJobHook(
+  'deliver-package',      // jobId
+  lockerId,               // targetId
+  'oneTimeCodeUsed',      // eventName
+  { code: 'XYZ789' }      // filter
+);
 ```
 
-## Notes Tool (Consolidated `notes` tool)
+See [Plot System Reference](../moo/reference/plots.md) and [Plot Jobs Guide](../plot-jobs.md) for full documentation.
 
-Attach notes to objects for tracking.
+## Notes System ($notes)
 
-### add / append / get / delete
+Attach metadata and tracking information to any object.
+
+### add / get / delete
+
+Add notes to objects:
 
 ```javascript
-notes({ action: 'add', objectId: 100, text: 'Needs review', tags: ['review'] })
-notes({ action: 'append', objectId: 100, tag: 'log', text: '[2108-03-15] Event occurred' })
-notes({ action: 'get', objectId: 100 })
-notes({ action: 'delete', objectId: 100, index: 0 })
+// Simple note
+await $notes.add(object, 'Needs review', player, ['review']);
+
+// Get all notes
+const notes = await $notes.get(object);
+// [{ text: '...', author: 'player', timestamp: '...', tags: [...] }]
+
+// Get one note
+const note = await $notes.getOne(object, 0);
+
+// Delete note
+await $notes.delete(object, 0);  // By index
+
+// Clear all notes
+await $notes.clear(object);
 ```
 
 ### search / list_objects
 
+Search and find notes:
+
 ```javascript
-notes({ action: 'search', tag: 'review' })
-notes({ action: 'list_objects' })
+// Search by text
+const results = await $notes.search('weapon');
+
+// Search by tag
+const todos = await $notes.search('', { tag: 'todo' });
+
+// Search by author
+const builderNotes = await $notes.search('', { author: 'builder' });
+
+// List all objects with notes
+const objects = await $notes.listObjects();
+// [{ objectId: 100, count: 3 }, ...]
 ```
+
+### Formatting
+
+Format notes for display:
+
+```javascript
+const formatted = await $notes.format(object);
+// [0] 1/15/2024 10:30:00 AM by builder [todo]
+//     This needs review
+```
+
+See [Notes System Reference](../moo/reference/notes.md) for full documentation.
 
 ## Combat Tool (Consolidated `combat` tool)
 
