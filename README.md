@@ -308,6 +308,76 @@ npm run typecheck
 npm run build
 ```
 
+## MCP Integration
+
+Malice provides a **code-first MCP server** for Claude Code integration, implementing Anthropic's "code execution with MCP" pattern.
+
+### Code-First Architecture
+
+Claude writes native MOO code that executes in the game context:
+
+```typescript
+// ✅ Direct MOO code
+execute_moo_code({
+  code: `
+    // Use $recycler to create objects
+    const room = await $recycler.create($room, {
+      name: "Hall",
+      x: 0, y: 0, z: 0
+    });
+
+    // Create and move item
+    const torch = await $recycler.create($item, {name: "torch"});
+    await torch.moveTo(room, player);
+
+    return {roomId: room.id, torchId: torch.id};
+  `
+})
+```
+
+### Benefits
+
+- **No wrapper layer** - just pure MOO code
+- **Composable** - loops, conditionals, multi-step operations
+- **Full game context** - $, $load(), $recycler, all $aliases
+- **Single execution** - no round-trips between steps
+- **Player authentication** - HTTP Basic Auth provides `player` variable
+
+### MCP Servers
+
+| Port | Server | Purpose |
+|------|--------|---------|
+| 3010 | Code-First MCP | Admin/builder access with `execute_moo_code` |
+| 3012 | Session MCP | Player-specific actions (not yet implemented) |
+
+### Authentication
+
+Connect with HTTP Basic Auth to access your player context:
+
+```bash
+# Authenticated access (player variable available)
+curl -u username:password http://localhost:3010/mcp
+
+# Unauthenticated access (admin/builder tasks)
+curl http://localhost:3010/mcp
+```
+
+### MCP Resources
+
+The server provides `moo://` resources for querying game state:
+
+- `moo://objects/{id}` - Object details
+- `moo://rooms/{id}` - Room state with exits/contents
+- `moo://players` - All players
+- `moo://ai` - AI NPCs
+- `moo://ai/{id}` - NPC profile with personality/memories
+- `moo://npc-sessions/{id}` - Claude API conversation logs
+- `moo://plots` - Active plots/quests
+- `moo://docs/{name}` - Documentation files
+- `moo://city-ai/{name}` - City AI documentation
+
+See `docs/MCP-TOOLS.md` for complete reference.
+
 ## Core Objects
 
 The system bootstraps with these core objects:

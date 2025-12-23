@@ -719,8 +719,10 @@ You play the game. Through text. Like everyone else.
 ### Server Location
 
 ```
-http://localhost:3001/mcp
+http://localhost:3012/mcp
 ```
+
+**Note**: The session MCP server (port 3012) provides player-scoped tools. The main MCP server (port 3010) is for admin/builder access and is NOT available to agents playing the game.
 
 ### Session Tools
 

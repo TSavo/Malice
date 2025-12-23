@@ -8,8 +8,18 @@ AI-powered NPCs using in-process Claude Agent SDK integration.
 # Start the game (NPCs are built-in, no separate container needed)
 docker compose up -d
 
-# Spawn an AI NPC via MCP
-ai({ action: 'spawn', role: 'guard', name: 'Janet', locationId: 173, clothed: true })
+# Spawn an AI NPC via MCP (code-first)
+execute_moo_code({
+  code: `
+    await $mcp.ai({
+      action: 'spawn',
+      role: 'guard',
+      name: 'Janet',
+      locationId: 173,
+      clothed: true
+    });
+  `
+})
 
 # Talk to them in-game
 to janet Hello there!
@@ -44,9 +54,9 @@ The NPC Agent system enables AI-controlled characters that respond intelligently
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
 │                    MCP Server (HTTP)                         │
-│  - ai({ action: "do", command: "say ..." })                  │
-│  - plot, notes, world, object manipulation                   │
-│  - localhost:3001/mcp                                        │
+│  - Code-first: execute_moo_code with $mcp object            │
+│  - All tools via $mcp.ai(), $mcp.plot(), etc.               │
+│  - localhost:3010/mcp                                        │
 └─────────────────────────────────────────────────────────────┘
 ```
 

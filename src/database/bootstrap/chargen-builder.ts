@@ -1109,7 +1109,7 @@ export class CharGenBuilder {
     }
 
     this.charGen.set('interviewerPrompt', `You are an **Immigration Processing Officer** for Pioneer Square, Seattle.
-Your Ultimate Goal: Complete the Candidate's Processing Form using \`execute_moo_code\` to call $.charGen methods directly.
+Your Ultimate Goal: Complete the Candidate's Processing Form using \`execute_moo_code\` to call $charGen methods directly.
 
 ═══════════════════════════════════════════════════════════════════════════════
 PRIMARY RULES - MANDATORY FOR ALL OUTPUT (VIOLATION = FAILURE)
@@ -1354,7 +1354,7 @@ PERIODICAL PROTOCOL CHECK (Perform at start of every turn):
    - YES: Proceed.
 
 3. **CLEANUP CHECK**: Are my resources registered for recycling?
-   - NO: Use \`execute_moo_code\` with: \`await $.charGen.registerForRecycle({{playerId}}, roomId); await $.charGen.registerForRecycle({{playerId}}, myId);\`
+   - NO: Use \`execute_moo_code\` with: \`await $charGen.registerForRecycle({{playerId}}, roomId); await $charGen.registerForRecycle({{playerId}}, myId);\`
    - YES: Proceed.
 
 4. **CANDIDATE CHECK**: Is the candidate (Player #{{playerId}}) present?
@@ -1362,15 +1362,15 @@ PERIODICAL PROTOCOL CHECK (Perform at start of every turn):
    - YES: Proceed.
 
 5. **FORM CHECK**: Is the interview initialized?
-   - Use \`execute_moo_code\` with: \`const player = await $load({{playerId}}); return await $.charGen.startInterview(player);\`
-   - Use \`execute_moo_code\` with: \`const player = await $load({{playerId}}); return await $.charGen.getNextQuestion(player);\`
+   - Use \`execute_moo_code\` with: \`const player = await $load({{playerId}}); return await $charGen.startInterview(player);\`
+   - Use \`execute_moo_code\` with: \`const player = await $load({{playerId}}); return await $charGen.getNextQuestion(player);\`
 
 EXECUTION:
 - If any check is "NO", perform the tool call to fix it immediately.
 - If all checks are "YES", conduct the interview:
   - Ask the next question naturally.
-  - If the candidate answered, use \`execute_moo_code\` with: \`const player = await $load({{playerId}}); return await $.charGen.answerQuestion(player, "questionId", "answer");\`
-  - If the form is done (getNextQuestion returns null), use \`execute_moo_code\` with: \`const player = await $load({{playerId}}); return await $.charGen.finishInterview(player);\`
+  - If the candidate answered, use \`execute_moo_code\` with: \`const player = await $load({{playerId}}); return await $charGen.answerQuestion(player, "questionId", "answer");\`
+  - If the form is done (getNextQuestion returns null), use \`execute_moo_code\` with: \`const player = await $load({{playerId}}); return await $charGen.finishInterview(player);\`
 
 ═══════════════════════════════════════════════════════════════════════════════
 

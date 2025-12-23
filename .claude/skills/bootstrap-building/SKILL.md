@@ -7,6 +7,41 @@ description: Update TypeScript bootstrap files for world building at server star
 
 Create prototypes and utilities that exist at server startup via TypeScript builders.
 
+## Direct MOO Code for Inspection
+
+**IMPORTANT**: Write native MOO code using `execute_moo_code` to inspect and test the game. Use MOO's built-in capabilities directly.
+
+```typescript
+// ✅ Direct MOO code
+execute_moo_code({
+  code: `
+    // Direct access to objects
+    const room = await $load(50);
+    const exits = room.exits || {};
+
+    // Query database directly
+    const allObjs = await $.db.listAll(false);
+    const contents = allObjs.filter(doc => {
+      const loc = doc.properties.location?.value ?? doc.properties.location;
+      return loc === 50;
+    });
+
+    return {
+      room: {id: room.id, name: room.name},
+      exits,
+      contents: contents.map(o => ({id: o._id, name: o.properties.name?.value}))
+    };
+  `
+})
+```
+
+**Why Direct MOO?**:
+- No wrapper abstractions
+- Complex queries with full JavaScript capabilities
+- Direct database access via $.db
+- Inspect multiple objects in one execution
+- If authenticated (HTTP Basic Auth), access to `player` variable
+
 ## READ THE REFERENCE
 
 Before writing builder code, **READ** the appropriate documentation using `ReadMcpResourceTool`:
@@ -116,6 +151,8 @@ Use `ReadMcpResourceTool` to inspect the **running game**:
 | NPCs | `moo://city-ai/npcs` |
 
 ## MCP Tools for Inspection
+
+**Note**: Prefer using `execute_moo_code` for inspection (see above). Individual tool calls listed below are still available for simple, standalone operations.
 
 Use these tools to inspect live objects when designing bootstrap code:
 

@@ -19,6 +19,8 @@ docker compose -f docker-compose.dev.yml down
 - **No Rebuild Required**: Changes are reflected immediately without rebuilding Docker images.
 - **Persistent Database**: MongoDB data is stored in a Docker volume, so your data persists between restarts.
 - **Development Database**: Uses `malice_dev` database instead of `malice`.
+- **MCP Server**: Code-first MCP server runs on port 3010 for Claude Code integration (`execute_moo_code`).
+- **Session MCP**: Player-specific MCP server on port 3012 (not yet implemented).
 
 ## File Watching
 
