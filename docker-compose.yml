@@ -29,8 +29,7 @@ services:
       - "5555:5555"  # Telnet
       - "5556:5556"  # SSH
       - "8080:8080"  # WebSocket
-      - "3010:3010"  # MCP (code-first)
-      - "3011:3011"  # CharGen MCP
+      - "3010:3010"  # MCP (code-first - includes all tools)
       - "3012:3012"  # Session MCP
     environment:
       - MONGO_URI=mongodb://mongodb:27017/

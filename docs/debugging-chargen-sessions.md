@@ -13,13 +13,12 @@ This guide covers debugging the AI-autonomous character generation (chargen v2) 
    - Creates an interview room
    - Moves player and NPC to that room
 4. AI conducts interview through in-game speech
-5. AI uses chargen MCP tools to record answers
-6. `finish_interview` creates the player's body
+5. AI uses execute_moo_code to call $.charGen methods (answerQuestion, finishInterview, etc.)
+6. $.charGen.finishInterview() creates the player's body
 
 ### Key Components
-- **Port 3001**: Main MCP server (`malice-moo` tools)
-- **Port 3002**: CharGen MCP server (interview-specific tools)
-- **`$.charGen`**: CharGen object with methods
+- **Port 3010**: Code-first MCP server (all tools including chargen via execute_moo_code)
+- **`$.charGen`**: CharGen object with methods (startInterview, answerQuestion, finishInterview, etc.)
 - **`$.ai`**: AI human registry for tracking NPCs
 
 ## Session Logging
@@ -185,7 +184,8 @@ docker compose logs game --tail 100 | grep DEBUG
 
 | File | Purpose |
 |------|---------|
-| `src/mcp/chargen-mcp-server.ts` | CharGen MCP tools |
+| `src/mcp/mcp-server-codefirst.ts` | Code-first MCP server (port 3010) |
+| `src/database/bootstrap/mcp-builder.ts` | MCP tool objects builder |
 | `src/database/bootstrap/chargen-builder.ts` | CharGen object methods |
 | `src/database/bootstrap/ai-builder.ts` | AI human spawning |
 | `src/database/bootstrap/body-factory-builder.ts` | Body creation |
