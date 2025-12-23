@@ -23,6 +23,7 @@ import { PluribusBuilder } from './pluribus-builder.js';
 import { MaskBuilder } from './mask-builder.js';
 import { SisterGrayBuilder } from './sister-gray-builder.js';
 import { WebsiteBuilder } from './website-builder.js';
+import { MCPBuilder } from './mcp-builder.js';
 
 /**
  * Orchestrates building all core system objects
@@ -88,6 +89,7 @@ export class CoreSystemBuilder {
     const maskBuilder = new MaskBuilder(this.manager);
     const sisterGrayBuilder = new SisterGrayBuilder(this.manager);
     const websiteBuilder = new WebsiteBuilder(this.manager);
+    const mcpBuilder = new MCPBuilder(this.manager);
 
     await authManagerBuilder.build();
     await charGenBuilder.build();
@@ -121,6 +123,7 @@ export class CoreSystemBuilder {
     await maskBuilder.build(wearableId); // Wearable prototype as parent for Mask
     await sisterGrayBuilder.build(humanId); // Human as parent for Sister Gray
     await websiteBuilder.build(); // Website objects
+    await mcpBuilder.build(); // MCP code-first tools
 
     // Register aliases
     await authManagerBuilder.registerAlias();
@@ -147,6 +150,7 @@ export class CoreSystemBuilder {
     await maskBuilder.registerAlias();
     await sisterGrayBuilder.registerAlias();
     await websiteBuilder.registerAliases();
+    await mcpBuilder.registerAliases();
 
     // Register wake jobs now that Pluribus/SisterGray aliases exist
     await schedulerBuilder.registerWakeJobs();
@@ -256,6 +260,12 @@ export class CoreSystemBuilder {
     const websiteBuilder = new WebsiteBuilder(this.manager);
     await websiteBuilder.build(true);
     await websiteBuilder.registerAliases();
+
+    // Rebuild MCP methods
+    console.log('  Rebuilding MCP methods...');
+    const mcpBuilder = new MCPBuilder(this.manager);
+    await mcpBuilder.build(true);
+    await mcpBuilder.registerAliases();
 
     console.log('  ✅ Core system methods rebuilt');
     console.log('  ✅ Rebuilt AuthManager, CharGen, Prompt, etc. methods');
