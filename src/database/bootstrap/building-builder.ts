@@ -406,11 +406,10 @@ export class BuildingBuilder {
       // Resolve door/lock placeholders on rooms if present
       if (def.door) {
         const resolvedDoor = resolveValue(def.door);
-        if (resolvedDoor && resolvedDoor.id) room.set('door', resolvedDoor.id);
-        else if (resolvedDoor) room.set('door', resolvedDoor);
+        if (resolvedDoor) room.set('door', resolvedDoor);
       }
       if (Array.isArray(def.locks)) {
-        const resolvedLocks = def.locks.map((l: string | number) => resolveValue(l)).filter(Boolean).map((l: any) => (l.id ? l.id : l));
+        const resolvedLocks = def.locks.map((l: string | number) => resolveValue(l)).filter(Boolean);
         room.set('locks', resolvedLocks);
       }
 
@@ -563,19 +562,20 @@ export class BuildingBuilder {
       );
 
       // Resolve locks if specified (locks are placeholders like '%LOCK_NAME')
-      let resolvedLocks: number[] = [];
+      const resolvedLocks: RuntimeObject[] = [];
       if (Array.isArray(exitProps.locks)) {
         for (const lockRef of exitProps.locks) {
           if (typeof lockRef === 'string' && lockRef.startsWith('%')) {
             // Find the lock object by searching all buildings' shared placeholders
             const lockObj = await this.findPlaceholderObject(lockRef);
             if (lockObj) {
-              resolvedLocks.push(lockObj.id);
+              resolvedLocks.push(lockObj);
             } else {
               console.warn(`    Warning: Lock placeholder ${lockRef} not found for exit ${direction}`);
             }
           } else if (typeof lockRef === 'number') {
-            resolvedLocks.push(lockRef);
+            const lockObj = await this.manager.load(lockRef);
+            if (lockObj) resolvedLocks.push(lockObj);
           }
         }
       }

@@ -377,11 +377,7 @@ export class RoomBuilder {
 
       // Register each exit's name and aliases as verbs
       const exits = self.exits || [];
-      for (let exit of exits) {
-        // Resolve ID to object if needed (defensive for legacy data)
-        if (typeof exit === 'number') {
-          exit = await $load(exit);
-        }
+      for (const exit of exits) {
         if (!exit || !exit.name) continue;
 
         // Register primary name
