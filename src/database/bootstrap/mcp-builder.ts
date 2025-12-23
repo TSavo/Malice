@@ -113,6 +113,7 @@ export class MCPBuilder {
     // We set the code as a temporary method and call it to get full MOO context
     this.mcp.setMethod('execute', `
       const code = args[0];
+      const playerId = args[1]; // Optional: authenticated player ID
       if (typeof code !== 'string') {
         throw new Error('execute() requires a code string');
       }
@@ -136,14 +137,20 @@ export class MCPBuilder {
         }
       });
 
-      // Set user code as a temporary method with $mcp in scope
+      // Load authenticated player if provided
+      let player = undefined;
+      if (typeof playerId === 'number') {
+        player = await $load(playerId);
+      }
+
+      // Set user code as a temporary method with $mcp and player in scope
       const tempMethodName = '_mcp_exec_' + Date.now();
-      const wrappedCode = 'const $mcp = args[0]; ' + code;
+      const wrappedCode = 'const $mcp = args[0]; const player = args[1]; ' + code;
       self.setMethod(tempMethodName, wrappedCode);
 
       try {
-        // Call the method with $mcp proxy
-        const result = await self.call(tempMethodName, $mcp);
+        // Call the method with $mcp proxy and player object
+        const result = await self.call(tempMethodName, $mcp, player);
         return result;
       } catch (err) {
         return { error: err.message || String(err), stack: err.stack };

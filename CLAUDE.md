@@ -194,13 +194,66 @@ Each sensory organ has capability methods that propagate up:
 
 ## MCP Integration
 
-The MCP server at port 3001 provides tools for Claude Code to interact with the MOO world:
-- Object CRUD operations
-- Room/exit management
-- Player/NPC management
-- AI human spawning
-- Plot/job management
-- Notes system
-- World queries with DSL
+The MCP server at port 3010 provides a code-first interface for Claude Code to interact with the MOO world.
+
+### Architecture
+
+- **Port 3010** - Main MCP server (admin/builder access, code-first)
+- **Port 3012** - Session MCP server (player access, action-based)
+
+### Authentication
+
+The main MCP server (3010) supports HTTP Basic Auth to tie into the MOO's user database:
+
+```bash
+# Connect with authentication
+curl -u username:password http://localhost:3010/mcp
+```
+
+When authenticated:
+- Your player ID is stored in the MCP session
+- The `player` variable is injected into `execute_moo_code` execution context
+- You can access your player object: `player.playername`, `player.location`, etc.
+
+Without authentication:
+- The `player` variable is `undefined`
+- You still have full access to all MCP tools
+- Use this for world building and administrative tasks
+
+### Code-First Execution
+
+Instead of calling individual tools, write MOO code that uses all available tools:
+
+```typescript
+// Authenticated - access your player
+const myRoom = player.location;
+console.log(`You are in: ${myRoom.name}`);
+
+// Create a room and link it
+const room = await $mcp.dig({
+  name: 'Hallway',
+  description: 'A long hallway',
+  x: 0, y: 1, z: 0
+});
+
+// Spawn items
+await $mcp.spawn_item({
+  prototypeId: '$torch',
+  roomId: '#' + room.room.id
+});
+
+// List available tools
+const tools = await $mcp.listTools();
+```
+
+### Available in Execution Context
+
+- `$mcp.toolName(params)` - Call any MCP tool (dig, spawn_item, set_property, etc.)
+- `$mcp.listTools()` - List all available tools
+- `$` - Object manager
+- `$load(id)` - Load object by ID
+- `$create({parent, properties})` - Create new object
+- `$alias` shortcuts - `$room`, `$player`, `$exit`, etc.
+- `player` - Your authenticated player object (if HTTP Basic Auth provided)
 
 Use `mcp__malice__*` tools to interact with the running game server.
