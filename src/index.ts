@@ -19,6 +19,7 @@ import { LSPApiServer } from './lsp/api-server.js';
 import { DevToolsServer } from './devtools/index.js';
 import { createMCPServer, createSessionMCPServer } from './mcp/index.js';
 import { createWebServer } from './web/index.js';
+import { MCPTelnetClient } from './mcp/telnet-client.js';
 
 async function main() {
   console.log('🎮 Malice v2 - Modern TypeScript MUD\n');
@@ -45,8 +46,14 @@ async function main() {
     process.exit(1);
   }
 
-  // Get connection manager
+  // Get connection manager and object manager
   const connectionManager = game.getConnectionManager();
+  const objectManager = game.getObjectManager();
+
+  // Create shared telnet client for session management
+  // Used by both $.telnet (native methods) and Session MCP server
+  const telnetClient = new MCPTelnetClient('localhost', 5555);
+  objectManager.setTelnetClient(telnetClient);
 
   // Start LSP API Server for VS Code extension (HTTP REST)
   const lspApi = new LSPApiServer(game.getObjectManager(), 3000);
@@ -59,13 +66,13 @@ async function main() {
   // Start MCP Server for Claude Code (Streamable HTTP)
   // Uses code-first architecture - AI writes MOO code instead of calling individual tools
   // Includes all tools: basic CRUD, plot, ai, notes, combat, world
-  await createMCPServer(game.getObjectManager(), {
+  await createMCPServer(objectManager, {
     port: 3010,
     host: '0.0.0.0', // Allow Docker host access
   });
 
   // Start Session MCP Server for telnet session management
-  await createSessionMCPServer({
+  await createSessionMCPServer(objectManager, {
     port: 3012,
     host: '0.0.0.0', // Allow Docker host access
   });

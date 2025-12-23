@@ -24,6 +24,7 @@ import { MaskBuilder } from './mask-builder.js';
 import { SisterGrayBuilder } from './sister-gray-builder.js';
 import { WebsiteBuilder } from './website-builder.js';
 import { MCPBuilder } from './mcp-builder.js';
+import { SessionBuilder } from './session-builder.js';
 
 /**
  * Orchestrates building all core system objects
@@ -90,6 +91,7 @@ export class CoreSystemBuilder {
     const sisterGrayBuilder = new SisterGrayBuilder(this.manager);
     const websiteBuilder = new WebsiteBuilder(this.manager);
     const mcpBuilder = new MCPBuilder(this.manager);
+    const sessionBuilder = new SessionBuilder(this.manager);
 
     await authManagerBuilder.build();
     await charGenBuilder.build();
@@ -124,6 +126,7 @@ export class CoreSystemBuilder {
     await sisterGrayBuilder.build(humanId); // Human as parent for Sister Gray
     await websiteBuilder.build(); // Website objects
     await mcpBuilder.build(); // MCP code-first tools
+    await sessionBuilder.build(); // Session management wrapper
 
     // Register aliases
     await authManagerBuilder.registerAlias();
@@ -266,6 +269,11 @@ export class CoreSystemBuilder {
     const mcpBuilder = new MCPBuilder(this.manager);
     await mcpBuilder.build(true);
     await mcpBuilder.registerAliases();
+
+    // Rebuild Session methods
+    console.log('  Rebuilding Session methods...');
+    const sessionBuilder = new SessionBuilder(this.manager);
+    await sessionBuilder.build(true);
 
     console.log('  ✅ Core system methods rebuilt');
     console.log('  ✅ Rebuilt AuthManager, CharGen, Prompt, etc. methods');
