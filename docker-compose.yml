@@ -25,6 +25,7 @@ services:
     container_name: malice-game
     restart: unless-stopped
     ports:
+      - "80:80"      # Website
       - "5555:5555"  # Telnet
       - "5556:5556"  # SSH
       - "8080:8080"  # WebSocket
