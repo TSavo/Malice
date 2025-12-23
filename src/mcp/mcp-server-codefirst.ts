@@ -25,6 +25,7 @@ interface MCPServerConfig {
 interface SessionState {
   server: McpServer;
   transport: StreamableHTTPServerTransport;
+  playerId?: number; // Authenticated player ID (undefined = unauthenticated)
 }
 
 /**
@@ -50,6 +51,63 @@ export class MaliceMCPServer {
    */
   private getMCP(): RuntimeObject | undefined {
     return this.manager.getAliases().get('mcp');
+  }
+
+  /**
+   * Authenticate user via HTTP Basic Auth
+   * Returns player ID if valid, undefined if invalid
+   */
+  private async authenticate(authHeader: string | undefined): Promise<number | undefined> {
+    if (!authHeader || !authHeader.startsWith('Basic ')) {
+      return undefined;
+    }
+
+    try {
+      // Decode Basic Auth: "Basic base64(username:password)"
+      const base64Creds = authHeader.slice(6);
+      const credentials = Buffer.from(base64Creds, 'base64').toString('utf-8');
+      const [username, password] = credentials.split(':');
+
+      if (!username || !password) {
+        return undefined;
+      }
+
+      // Look up player by username
+      const objectManager = await this.manager.load(0);
+      const aliases = (objectManager?.get('aliases') as Record<string, number>) || {};
+      const playerPrototypeId = aliases.player;
+      const adminPrototypeId = aliases.admin;
+
+      const users = await this.manager.db.listAll(false);
+      const getValue = (v: any) => v && typeof v === 'object' && 'type' in v ? v.value : v;
+
+      const userDoc = users.find(u => {
+        const parentId = getValue(u.parent);
+        return (parentId === playerPrototypeId || parentId === adminPrototypeId) &&
+          getValue(u.properties.playername) === username.toLowerCase();
+      });
+
+      if (!userDoc) {
+        return undefined;
+      }
+
+      // Load player and verify password
+      const player = await this.manager.load(userDoc._id);
+      if (!player) {
+        return undefined;
+      }
+
+      // Check password using player's checkPassword method
+      const valid = await player.call('checkPassword', password) as boolean;
+      if (!valid) {
+        return undefined;
+      }
+
+      return player.id;
+    } catch (err) {
+      console.error('[MCP] Authentication error:', err);
+      return undefined;
+    }
   }
 
   /**
@@ -83,13 +141,13 @@ export class MaliceMCPServer {
   /**
    * Create MCP server with code-first tools
    */
-  private createSessionServer(): McpServer {
+  private createSessionServer(playerId?: number): McpServer {
     const server = new McpServer({
       name: 'malice-moo',
       version: '2.0.0',
     });
 
-    this.registerTools(server);
+    this.registerTools(server, playerId);
     this.registerResources(server);
 
     return server;
@@ -98,7 +156,7 @@ export class MaliceMCPServer {
   /**
    * Register code-first tools
    */
-  private registerTools(server: McpServer): void {
+  private registerTools(server: McpServer, playerId?: number): void {
     // Primary tool: Execute MOO code
     server.tool(
       'execute_moo_code',
@@ -111,8 +169,17 @@ The code runs in the MOO execution context with access to:
 - $load(id) - Load object by ID
 - $create({parent, properties}) - Create new object
 - $alias shortcuts - $room, $player, $exit, etc.
+- player - Your authenticated player object (if HTTP Basic Auth provided)
 
-Example:
+AUTHENTICATION:
+- Provide HTTP Basic Auth header: Authorization: Basic base64(username:password)
+- If authenticated, 'player' variable will be set to your player object
+- If not authenticated, 'player' will be undefined
+
+Example (authenticated):
+  // Access your player properties
+  console.log(\`Logged in as: \${player?.playername}\`);
+
   // Create a room and link it
   const room = await $mcp.dig({name: 'Hallway', description: 'A long hallway', x: 0, y: 1, z: 0});
   await $mcp.spawn_item({prototypeId: '$torch', roomId: '#' + room.room.id});
@@ -132,7 +199,8 @@ Write composable code - loops, conditionals, multi-step operations all work.`,
             };
           }
 
-          const result = await $mcp.call('execute', code);
+          // Pass playerId to execute() so it can inject 'player' into execution context
+          const result = await $mcp.call('execute', code, playerId);
           const serialized = this.serializeValue(result);
 
           return {
@@ -338,23 +406,37 @@ Write composable code - loops, conditionals, multi-step operations all work.`,
       const session = this.sessions.get(sessionId)!;
       await session.transport.handleRequest(req, res, message);
     } else if (message.method === 'initialize') {
-      const server = this.createSessionServer();
+      // Authenticate user via HTTP Basic Auth
+      const authHeader = req.headers.authorization;
+      const playerId = await this.authenticate(authHeader);
+
+      const server = this.createSessionServer(playerId);
       const transport = new StreamableHTTPServerTransport({
         sessionIdGenerator: () => crypto.randomUUID(),
         onsessioninitialized: (newSessionId) => {
-          this.sessions.set(newSessionId, { server, transport });
+          this.sessions.set(newSessionId, { server, transport, playerId });
+          if (playerId) {
+            console.log(`[MCP] Authenticated session ${newSessionId} as player #${playerId}`);
+          } else {
+            console.log(`[MCP] Unauthenticated session ${newSessionId} (no credentials provided)`);
+          }
         },
       });
       await server.connect(transport);
       await transport.handleRequest(req, res, message);
     } else if (sessionId && !this.sessions.has(sessionId)) {
-      // Stale session - recreate
+      // Stale session - recreate with authentication
       console.log(`[MCP] Recreating stale session ${sessionId}`);
-      const server = this.createSessionServer();
+
+      // Authenticate user via HTTP Basic Auth
+      const authHeader = req.headers.authorization;
+      const playerId = await this.authenticate(authHeader);
+
+      const server = this.createSessionServer(playerId);
       const transport = new StreamableHTTPServerTransport({
         sessionIdGenerator: () => sessionId,
         onsessioninitialized: (newSessionId) => {
-          this.sessions.set(newSessionId, { server, transport });
+          this.sessions.set(newSessionId, { server, transport, playerId });
         },
       });
       await server.connect(transport);
