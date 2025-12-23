@@ -35,7 +35,7 @@ export type SSHPasswordVerify = (username: string, password: string) => Promise<
  * Supports public key and password (keyboard-interactive) authentication
  */
 export class SSHServer {
-  private server: SSH2Server;
+  private server: InstanceType<typeof SSH2Server>;
   private hostKey: string | Buffer;
   private readonly destroyed$ = new Subject<void>();
 
@@ -349,7 +349,7 @@ export class SSHServer {
       this.connection$.complete();
       this.error$.complete();
 
-      this.server.close((err) => {
+      this.server.close((err: Error | undefined) => {
         if (err) {
           reject(err);
         } else {
