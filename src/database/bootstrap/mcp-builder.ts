@@ -110,49 +110,45 @@ export class MCPBuilder {
 
     // execute(code) - Run MOO code with access to tools
     // This is the core of the code-first approach
+    // We set the code as a temporary method and call it to get full MOO context
     this.mcp.setMethod('execute', `
       const code = args[0];
       if (typeof code !== 'string') {
         throw new Error('execute() requires a code string');
       }
 
-      // The code runs in MOO context with access to:
-      // - All $aliases ($room, $player, etc.)
-      // - $load, $create, $query
-      // - self.$mcp.tools.* for tool access
-
-      // We use AsyncFunction to allow await in the code
-      const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
-
-      // Build the execution context
-      // Tools are accessible as $mcp.toolName(params)
+      // Build $mcp proxy that provides tool access
+      // Tools are accessible as $mcp.dig(), $mcp.spawn_item(), etc.
       const tools = self.tools || {};
-      const toolFns = {};
-      for (const [name, tool] of Object.entries(tools)) {
-        if (tool && tool.execute) {
-          toolFns[name] = async (params) => await tool.execute(params);
-        }
-      }
-
-      // Create a $mcp proxy that allows $mcp.dig(params) syntax
-      const $mcpProxy = new Proxy(toolFns, {
+      const $mcp = new Proxy({}, {
         get: (target, prop) => {
-          if (prop in target) return target[prop];
+          // Special methods
           if (prop === 'listTools') return async () => await self.listTools();
           if (prop === 'getToolSchema') return async (name) => await self.getToolSchema(name);
+
+          // Tool access
+          const tool = tools[prop];
+          if (tool && tool.call) {
+            return async (params) => await tool.call('execute', params);
+          }
+
           throw new Error('Unknown MCP tool: ' + String(prop));
         }
       });
 
+      // Set user code as a temporary method with $mcp in scope
+      const tempMethodName = '_mcp_exec_' + Date.now();
+      const wrappedCode = 'const $mcp = args[0]; ' + code;
+      self.setMethod(tempMethodName, wrappedCode);
+
       try {
-        // Execute the code with $mcp available
-        // Note: The code already has access to $, $load, $create, $aliases via method context
-        const fn = new AsyncFunction('$mcp', code);
-        const result = await fn.call(null, $mcpProxy);
+        // Call the method with $mcp proxy
+        const result = await self.call(tempMethodName, $mcp);
         return result;
       } catch (err) {
-        return { error: err.message || String(err) };
+        return { error: err.message || String(err), stack: err.stack };
       }
+      // Note: temp method isn't persisted, so no cleanup needed
     `);
 
     // listTools() - Return all tool definitions for discovery
