@@ -93,10 +93,12 @@ $<alias>     // Pre-resolved aliases: $room, $exit, $player, $recycler, etc.
 ### Servers and Ports
 
 - **5555** - Telnet server (player connections)
+- **5556** - SSH server (secure player connections with key auth)
 - **8080** - WebSocket server (web clients)
 - **3000** - LSP REST API (VS Code extension)
 - **3001** - MCP server for Claude Code (`malice-moo` tools)
 - **3002** - CharGen MCP server (AI character creation)
+- **3003** - Session MCP server (telnet session + SSH key management)
 - **9999** - DevTools WebSocket (VS Code extension)
 
 ## Code Style

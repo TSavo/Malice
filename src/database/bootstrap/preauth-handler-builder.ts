@@ -55,6 +55,10 @@ export class PreAuthHandlerBuilder {
                 await self.handleOAuth(context, authInfo.oauth);
                 break;
 
+              case 'ssh-key':
+                await self.handleSSHKey(context, authInfo.sshKey);
+                break;
+
               case 'custom':
                 await self.handleCustom(context, authInfo.custom);
                 break;
@@ -168,6 +172,60 @@ export class PreAuthHandlerBuilder {
 
           if (!valid) {
             context.send('Invalid username or password\\\\r\\\\n');
+            context.close();
+            return;
+          }
+
+          // Authenticate and connect
+          context.authenticate(player.id);
+          await player.connect(context);
+        `);
+
+    this.preAuthHandler.setMethod('handleSSHKey', `
+          const context = args[0];
+          const sshKey = args[1];
+
+          context.send(\`SSH key authentication\\\\r\\\\n\`);
+          context.send(\`Key fingerprint: \${sshKey.fingerprint}\\\\r\\\\n\`);
+
+          // Get Player prototype via alias
+          const objectManager = await $load(0);
+          const aliases = objectManager.aliases || {};
+          const playerPrototypeId = aliases.player;
+          const adminPrototypeId = aliases.admin;
+
+          // Helper to extract value from typed Value or raw value
+          const getValue = (v) => v && typeof v === 'object' && 'type' in v ? v.value : v;
+
+          // Find Player by SSH key fingerprint
+          const users = await context.$.db.listAll();
+          const playerDoc = users.find(u => {
+            if (u.parent !== playerPrototypeId && u.parent !== adminPrototypeId) return false;
+            const keys = getValue(u.properties.sshPublicKeys) || [];
+            if (!Array.isArray(keys)) return false;
+            // Check if any stored key matches the fingerprint
+            return keys.some(storedKey => {
+              // Compare by matching the key data
+              const storedParts = storedKey.trim().split(/\\\\s+/);
+              const authParts = sshKey.publicKey.trim().split(/\\\\s+/);
+              return storedParts.length >= 2 && authParts.length >= 2 &&
+                     storedParts[0] === authParts[0] && storedParts[1] === authParts[1];
+            });
+          });
+
+          if (!playerDoc) {
+            context.send(\`No player found for SSH key: \${sshKey.fingerprint}\\\\r\\\\n\`);
+            context.send('Use addkey command after logging in with password to register your key.\\\\r\\\\n');
+            context.close();
+            return;
+          }
+
+          // Load as RuntimeObject
+          const player = await context.$.load(playerDoc._id);
+
+          // Check if suspended
+          if (player.isSuspended) {
+            context.send('Your account has been suspended\\\\r\\\\n');
             context.close();
             return;
           }

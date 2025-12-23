@@ -13,10 +13,11 @@
 
 import { TelnetServer } from './transport/telnet/index.js';
 import { WebSocketServer } from './transport/websocket/index.js';
+import { SSHServer } from './transport/ssh/index.js';
 import { GameCoordinator } from './game/index.js';
 import { LSPApiServer } from './lsp/api-server.js';
 import { DevToolsServer } from './devtools/index.js';
-import { createMCPServer } from './mcp/index.js';
+import { createMCPServer, createSessionMCPServer } from './mcp/index.js';
 import { createCharGenMCPServer } from './mcp/chargen-mcp-server.js';
 
 async function main() {
@@ -67,6 +68,12 @@ async function main() {
     host: '0.0.0.0', // Allow Docker host access
   });
 
+  // Start Session MCP Server for telnet session management
+  await createSessionMCPServer({
+    port: 3003,
+    host: '0.0.0.0', // Allow Docker host access
+  });
+
   // Create telnet server (port 5555)
   const telnetServer = new TelnetServer({
     port: 5555,
@@ -78,6 +85,78 @@ async function main() {
     port: 8080,
     debug: false,
   });
+
+  // Create SSH server (port 5556)
+  const manager = game.getObjectManager();
+  const systemObj = await manager.load(2); // System object
+
+  // Get or generate SSH host key
+  let sshHostKey = systemObj?.get('sshHostKey') as string | undefined;
+
+  const sshServer = new SSHServer({
+    port: 5556,
+    hostKey: sshHostKey,
+    debug: false,
+  });
+
+  // Store generated host key if it was auto-generated
+  if (!sshHostKey && systemObj) {
+    sshHostKey = sshServer.getHostKey();
+    systemObj.set('sshHostKey', sshHostKey);
+    console.log('🔑 Generated new SSH host key (stored in $.system)');
+  }
+
+  // Set up SSH key lookup - find player by their stored public keys
+  sshServer.keyLookup = async (username: string): Promise<string[] | null> => {
+    const objectManager = await manager.load(0);
+    const aliases = (objectManager?.get('aliases') as Record<string, number>) || {};
+    const playerPrototypeId = aliases.player;
+    const adminPrototypeId = aliases.admin;
+
+    // Find player by username
+    const users = await manager.db.listAll(false);
+    const getValue = (v: any) => v && typeof v === 'object' && 'type' in v ? v.value : v;
+
+    const userDoc = users.find(u => {
+      const parentId = getValue(u.parent);
+      return (parentId === playerPrototypeId || parentId === adminPrototypeId) &&
+        getValue(u.properties.playername) === username.toLowerCase();
+    });
+
+    if (!userDoc) return null;
+
+    const keys = getValue(userDoc.properties.sshPublicKeys);
+    return Array.isArray(keys) ? keys : null;
+  };
+
+  // Set up password verification for fallback auth
+  sshServer.passwordVerify = async (username: string, password: string): Promise<boolean> => {
+    const objectManager = await manager.load(0);
+    const aliases = (objectManager?.get('aliases') as Record<string, number>) || {};
+    const playerPrototypeId = aliases.player;
+    const adminPrototypeId = aliases.admin;
+
+    const users = await manager.db.listAll(false);
+    const getValue = (v: any) => v && typeof v === 'object' && 'type' in v ? v.value : v;
+
+    const userDoc = users.find(u => {
+      const parentId = getValue(u.parent);
+      return (parentId === playerPrototypeId || parentId === adminPrototypeId) &&
+        getValue(u.properties.playername) === username.toLowerCase();
+    });
+
+    if (!userDoc) return false;
+
+    const player = await manager.load(userDoc._id);
+    if (!player) return false;
+
+    // Use player's checkPassword method
+    try {
+      return await player.call('checkPassword', password) as boolean;
+    } catch {
+      return false;
+    }
+  };
 
   // Handle new connections from both servers
   telnetServer.connection$.subscribe(async (transport) => {
@@ -97,17 +176,28 @@ async function main() {
     await game.handleConnection(connection);
   });
 
+  // SSH server emits Connection objects (with SSH key auth or password auth)
+  sshServer.connection$.subscribe(async (connection) => {
+    connectionManager.add(connection);
+    console.log(`✅ New ${connection.transport.type} connection: ${connection.id}`);
+
+    // Hand connection to game coordinator
+    await game.handleConnection(connection);
+  });
+
   // Log connection stats
   connectionManager.connections$.subscribe((connections) => {
     console.log(`📊 Active connections: ${connections.length}`);
   });
 
-  // Start telnet server (WebSocket already listening from constructor)
+  // Start telnet and SSH servers (WebSocket already listening from constructor)
   try {
     await telnetServer.listen();
+    await sshServer.listen();
     console.log('\n🚀 Servers started successfully!\n');
     console.log('Connect via:');
     console.log('  Telnet:    telnet localhost 5555');
+    console.log('  SSH:       ssh <username>@localhost -p 5556');
     console.log('  WebSocket: ws://localhost:8080\n');
   } catch (err) {
     console.error('❌ Failed to start servers:', err);
@@ -119,6 +209,7 @@ async function main() {
   const shutdown = async () => {
     console.log('\n\n🛑 Shutting down...');
     await telnetServer.close();
+    await sshServer.close();
     await wsServer.close();
     await game.shutdown();
     console.log('✅ Shutdown complete');

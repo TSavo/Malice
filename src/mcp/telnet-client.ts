@@ -4,6 +4,7 @@
  */
 
 import { Socket } from 'net';
+import { randomBytes } from 'crypto';
 
 export interface TelnetSession {
   socket: Socket;
@@ -19,7 +20,6 @@ export interface TelnetSession {
  */
 export class MCPTelnetClient {
   private sessions = new Map<string, TelnetSession>();
-  private sessionCounter = 0;
 
   constructor(
     private host: string = 'localhost',
@@ -32,7 +32,8 @@ export class MCPTelnetClient {
    * @param onData Optional callback for push notifications when data arrives
    */
   async connect(onData?: (sessionId: string, data: string) => void): Promise<{ sessionId: string; output: string }> {
-    const sessionId = `mcp-telnet-${++this.sessionCounter}`;
+    // Cryptographically random session ID (32 bytes = 64 hex chars)
+    const sessionId = randomBytes(32).toString('hex');
 
     return new Promise((resolve, reject) => {
       const socket = new Socket();

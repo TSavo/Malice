@@ -6,3 +6,4 @@
  */
 
 export { MaliceMCPServer, createMCPServer } from './mcp-server.js';
+export { SessionMCPServer, createSessionMCPServer } from './session-mcp-server.js';

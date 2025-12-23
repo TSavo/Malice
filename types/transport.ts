@@ -3,7 +3,7 @@ import type { Observable, Subject } from 'rxjs';
 /**
  * Type of transport protocol
  */
-export type TransportType = 'telnet' | 'websocket';
+export type TransportType = 'telnet' | 'websocket' | 'ssh';
 
 /**
  * Terminal capabilities
