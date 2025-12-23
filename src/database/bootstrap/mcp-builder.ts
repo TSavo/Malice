@@ -600,12 +600,33 @@ export class MCPBuilder {
       execute: `
         const { prototypeId, roomId, properties } = args[0];
 
-        const proto = typeof prototypeId === 'string' && prototypeId.startsWith('#')
-          ? await $load(parseInt(prototypeId.slice(1)))
-          : prototypeId.startsWith('$') ? $[prototypeId.slice(1)] : await $load(prototypeId);
-        const room = typeof roomId === 'string' && roomId.startsWith('#')
-          ? await $load(parseInt(roomId.slice(1)))
-          : roomId.startsWith('$') ? $[roomId.slice(1)] : await $load(roomId);
+        // Resolve prototypeId: '#123', '$alias', or object
+        let proto;
+        if (typeof prototypeId === 'string') {
+          if (prototypeId.startsWith('#')) {
+            proto = await $load(parseInt(prototypeId.slice(1)));
+          } else if (prototypeId.startsWith('$')) {
+            proto = await $getAlias(prototypeId.slice(1));
+          } else {
+            proto = await $load(prototypeId);
+          }
+        } else {
+          proto = prototypeId;
+        }
+
+        // Resolve roomId
+        let room;
+        if (typeof roomId === 'string') {
+          if (roomId.startsWith('#')) {
+            room = await $load(parseInt(roomId.slice(1)));
+          } else if (roomId.startsWith('$')) {
+            room = await $getAlias(roomId.slice(1));
+          } else {
+            room = await $load(roomId);
+          }
+        } else {
+          room = roomId;
+        }
 
         if (!proto) throw new Error('Prototype not found: ' + prototypeId);
         if (!room) throw new Error('Room not found: ' + roomId);
