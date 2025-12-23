@@ -227,8 +227,8 @@ export class WearableBuilder {
 
         if (part) {
           const worn = part.worn || [];
-          if (!worn.includes(self.id)) {
-            worn.push(self.id);
+          if (!worn.some(w => w && w.id === self.id)) {
+            worn.push(self);
             part.worn = worn;
           }
         }
@@ -304,7 +304,7 @@ export class WearableBuilder {
 
           if (part) {
             const worn = part.worn || [];
-            const idx = worn.indexOf(self.id);
+            const idx = worn.findIndex(w => w && w.id === self.id);
             if (idx !== -1) {
               worn.splice(idx, 1);
               part.worn = worn;

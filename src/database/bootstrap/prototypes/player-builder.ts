@@ -2156,8 +2156,7 @@ export class PlayerBuilder {
 
         // Check worn items on this part
         if (part.worn && part.worn.length > 0) {
-          for (const itemId of part.worn) {
-            const item = await $load(itemId);
+          for (const item of part.worn) {
             if (item) {
               worn.push({ item, part: part.name });
             }
