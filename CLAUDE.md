@@ -273,13 +273,27 @@ The MCP server provides moo:// resources for querying game state:
 
 **Player Resources:**
 - `moo://players` - List all player characters
+- `moo://players/{id}` - Get individual player details
 
 **AI/NPC Resources:**
 - `moo://ai` - List all AI-controlled NPCs
 - `moo://ai/{id}` - Get AI NPC profile with personality and memories
+- `moo://ai/{id}/memories` - Get memories for an AI NPC
+- `moo://ai/{id}/notes` - Get notes for an AI NPC
+- `moo://ai/worldLog` - Shared OOC chat between Pluribus and Sister Gray (deity chat)
 
 **Plot Resources:**
 - `moo://plots` - List all active plots
 - `moo://plots/{id}` - Get plot details and events
+- `moo://plots/{id}/events` - Get event log for a specific plot
+
+**Event Resources:**
+- `moo://events/recent` - Get 50 most recent game events
+
+**Documentation Resources:**
+- `moo://docs` - List all documentation files
+- `moo://docs/{name}` - Get documentation file (e.g., moo://docs/builders-guide)
+- `moo://city-ai` - List all city AI documentation files
+- `moo://city-ai/{name}` - Get city AI doc (e.g., moo://city-ai/context)
 
 Use `mcp__malice__*` tools to interact with the running game server.

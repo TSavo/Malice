@@ -14,6 +14,8 @@ import { McpServer, ResourceTemplate } from '@modelcontextprotocol/sdk/server/mc
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { createServer, IncomingMessage, ServerResponse } from 'http';
 import { z } from 'zod';
+import { readdir, readFile } from 'fs/promises';
+import { join } from 'path';
 import type { ObjectManager } from '../database/object-manager.js';
 import type { RuntimeObject } from '../../types/object.js';
 
@@ -845,6 +847,503 @@ Write composable code - loops, conditionals, multi-step operations all work.`,
               uri: uriStr,
               mimeType: 'application/json',
               text: JSON.stringify(plot, null, 2),
+            }],
+          };
+        } catch (err) {
+          return {
+            contents: [{
+              uri: uri.toString(),
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: String(err) }),
+            }],
+          };
+        }
+      }
+    );
+
+    // Docs list - moo://docs
+    server.resource(
+      'docs',
+      'moo://docs',
+      { description: 'List all documentation files' },
+      async () => {
+        try {
+          const docsDir = join(process.cwd(), 'docs');
+          const files = await readdir(docsDir);
+          const mdFiles = files
+            .filter(f => f.endsWith('.md'))
+            .map(f => ({
+              uri: `moo://docs/${f.replace('.md', '').toLowerCase()}`,
+              name: f.replace('.md', ''),
+              description: `Documentation: ${f.replace('.md', '').replace(/-/g, ' ')}`,
+            }));
+
+          return {
+            contents: [{
+              uri: 'moo://docs',
+              mimeType: 'application/json',
+              text: JSON.stringify(mdFiles, null, 2),
+            }],
+          };
+        } catch (err) {
+          return {
+            contents: [{
+              uri: 'moo://docs',
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: String(err) }),
+            }],
+          };
+        }
+      }
+    );
+
+    // Docs by name - moo://docs/{name}
+    server.resource(
+      'docs/{name}',
+      new ResourceTemplate('moo://docs/{+name}', { list: undefined }),
+      { description: 'Get documentation file by name' },
+      async (uri: URL) => {
+        try {
+          const uriStr = uri.toString();
+          const match = uriStr.match(/moo:\/\/docs\/(.+)/);
+          if (!match) {
+            return {
+              contents: [{
+                uri: uriStr,
+                mimeType: 'text/markdown',
+                text: 'Invalid URI format',
+              }],
+            };
+          }
+
+          const name = match[1];
+          const docsDir = join(process.cwd(), 'docs');
+
+          // Support both direct filename and paths (e.g., city-ai/combat)
+          let filePath: string;
+          if (name.includes('/')) {
+            // Path like city-ai/combat -> docs/city-ai/COMBAT.md
+            const parts = name.split('/');
+            const fileName = parts[parts.length - 1].toUpperCase() + '.md';
+            const dirPath = parts.slice(0, -1).join('/');
+            filePath = join(docsDir, dirPath, fileName);
+          } else {
+            // Direct filename like builders-guide -> docs/BUILDERS-GUIDE.md
+            filePath = join(docsDir, name.toUpperCase() + '.md');
+          }
+
+          const content = await readFile(filePath, 'utf-8');
+          return {
+            contents: [{
+              uri: uriStr,
+              mimeType: 'text/markdown',
+              text: content,
+            }],
+          };
+        } catch (err) {
+          return {
+            contents: [{
+              uri: uri.toString(),
+              mimeType: 'text/markdown',
+              text: `Error: ${String(err)}`,
+            }],
+          };
+        }
+      }
+    );
+
+    // City AI docs list - moo://city-ai
+    server.resource(
+      'city-ai',
+      'moo://city-ai',
+      { description: 'List all city AI documentation files' },
+      async () => {
+        try {
+          const cityAiDir = join(process.cwd(), 'docs', 'city-ai');
+          const files = await readdir(cityAiDir);
+          const mdFiles = files
+            .filter(f => f.endsWith('.md'))
+            .map(f => ({
+              uri: `moo://city-ai/${f.replace('.md', '').toLowerCase()}`,
+              name: f.replace('.md', ''),
+              description: `City AI: ${f.replace('.md', '').replace(/-/g, ' ')}`,
+            }));
+
+          return {
+            contents: [{
+              uri: 'moo://city-ai',
+              mimeType: 'application/json',
+              text: JSON.stringify(mdFiles, null, 2),
+            }],
+          };
+        } catch (err) {
+          return {
+            contents: [{
+              uri: 'moo://city-ai',
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: String(err) }),
+            }],
+          };
+        }
+      }
+    );
+
+    // City AI doc by name - moo://city-ai/{name}
+    server.resource(
+      'city-ai/{name}',
+      new ResourceTemplate('moo://city-ai/{name}', { list: undefined }),
+      { description: 'Get city AI documentation file by name' },
+      async (uri: URL) => {
+        try {
+          const uriStr = uri.toString();
+          const match = uriStr.match(/moo:\/\/city-ai\/(.+)/);
+          if (!match) {
+            return {
+              contents: [{
+                uri: uriStr,
+                mimeType: 'text/markdown',
+                text: 'Invalid URI format',
+              }],
+            };
+          }
+
+          const name = match[1];
+          const cityAiDir = join(process.cwd(), 'docs', 'city-ai');
+          const filePath = join(cityAiDir, name.toUpperCase() + '.md');
+
+          const content = await readFile(filePath, 'utf-8');
+          return {
+            contents: [{
+              uri: uriStr,
+              mimeType: 'text/markdown',
+              text: content,
+            }],
+          };
+        } catch (err) {
+          return {
+            contents: [{
+              uri: uri.toString(),
+              mimeType: 'text/markdown',
+              text: `Error: ${String(err)}`,
+            }],
+          };
+        }
+      }
+    );
+
+    // AI World Log - moo://ai/worldLog
+    server.resource(
+      'ai/worldLog',
+      new ResourceTemplate('moo://ai/worldLog', { list: undefined }),
+      { description: 'Shared OOC chat between Pluribus and Sister Gray (deity chat)' },
+      async () => {
+        try {
+          const $ai = this.manager.getAliases().get('ai');
+          if (!$ai) {
+            return {
+              contents: [{
+                uri: 'moo://ai/worldLog',
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: '$.ai not bootstrapped' }),
+              }],
+            };
+          }
+
+          const worldLog = $ai.get('worldLog') || [];
+          return {
+            contents: [{
+              uri: 'moo://ai/worldLog',
+              mimeType: 'application/json',
+              text: JSON.stringify(worldLog, null, 2),
+            }],
+          };
+        } catch (err) {
+          return {
+            contents: [{
+              uri: 'moo://ai/worldLog',
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: String(err) }),
+            }],
+          };
+        }
+      }
+    );
+
+    // AI NPC memories - moo://ai/{id}/memories
+    server.resource(
+      'ai/{id}/memories',
+      new ResourceTemplate('moo://ai/{id}/memories', { list: undefined }),
+      { description: 'Get memories for an AI NPC' },
+      async (uri: URL) => {
+        try {
+          const uriStr = uri.toString();
+          const match = uriStr.match(/moo:\/\/ai\/(.+)\/memories/);
+          if (!match) {
+            return {
+              contents: [{
+                uri: uriStr,
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: 'Invalid URI format' }),
+              }],
+            };
+          }
+
+          const idStr = match[1];
+          const npcId = idStr.startsWith('#') ? parseInt(idStr.slice(1)) : parseInt(idStr);
+
+          const npc = await this.manager.load(npcId);
+          if (!npc) {
+            return {
+              contents: [{
+                uri: uriStr,
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: `NPC #${npcId} not found` }),
+              }],
+            };
+          }
+
+          const memories = npc.get('memories') || [];
+          return {
+            contents: [{
+              uri: uriStr,
+              mimeType: 'application/json',
+              text: JSON.stringify(memories, null, 2),
+            }],
+          };
+        } catch (err) {
+          return {
+            contents: [{
+              uri: uri.toString(),
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: String(err) }),
+            }],
+          };
+        }
+      }
+    );
+
+    // AI NPC notes - moo://ai/{id}/notes
+    server.resource(
+      'ai/{id}/notes',
+      new ResourceTemplate('moo://ai/{id}/notes', { list: undefined }),
+      { description: 'Get notes for an AI NPC' },
+      async (uri: URL) => {
+        try {
+          const uriStr = uri.toString();
+          const match = uriStr.match(/moo:\/\/ai\/(.+)\/notes/);
+          if (!match) {
+            return {
+              contents: [{
+                uri: uriStr,
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: 'Invalid URI format' }),
+              }],
+            };
+          }
+
+          const idStr = match[1];
+          const npcId = idStr.startsWith('#') ? parseInt(idStr.slice(1)) : parseInt(idStr);
+
+          const npc = await this.manager.load(npcId);
+          if (!npc) {
+            return {
+              contents: [{
+                uri: uriStr,
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: `NPC #${npcId} not found` }),
+              }],
+            };
+          }
+
+          const notes = npc.get('notes') || {};
+          return {
+            contents: [{
+              uri: uriStr,
+              mimeType: 'application/json',
+              text: JSON.stringify(notes, null, 2),
+            }],
+          };
+        } catch (err) {
+          return {
+            contents: [{
+              uri: uri.toString(),
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: String(err) }),
+            }],
+          };
+        }
+      }
+    );
+
+    // Plot events - moo://plots/{id}/events
+    server.resource(
+      'plots/{id}/events',
+      new ResourceTemplate('moo://plots/{id}/events', { list: undefined }),
+      { description: 'Get event log for a specific plot' },
+      async (uri: URL) => {
+        try {
+          const uriStr = uri.toString();
+          const match = uriStr.match(/moo:\/\/plots\/(.+)\/events/);
+          if (!match) {
+            return {
+              contents: [{
+                uri: uriStr,
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: 'Invalid URI format' }),
+              }],
+            };
+          }
+
+          const plotId = match[1];
+          const $plot = this.manager.getAliases().get('plot');
+          if (!$plot) {
+            return {
+              contents: [{
+                uri: uriStr,
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: '$.plot not bootstrapped' }),
+              }],
+            };
+          }
+
+          const plots = await $plot.call('listPlots') as any[];
+          const plot = plots.find(p => p.id === plotId);
+
+          if (!plot) {
+            return {
+              contents: [{
+                uri: uriStr,
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: `Plot '${plotId}' not found` }),
+              }],
+            };
+          }
+
+          const events = plot.events || [];
+          return {
+            contents: [{
+              uri: uriStr,
+              mimeType: 'application/json',
+              text: JSON.stringify(events, null, 2),
+            }],
+          };
+        } catch (err) {
+          return {
+            contents: [{
+              uri: uri.toString(),
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: String(err) }),
+            }],
+          };
+        }
+      }
+    );
+
+    // Recent events - moo://events/recent
+    server.resource(
+      'events/recent',
+      'moo://events/recent',
+      { description: 'Get recent game events' },
+      async () => {
+        try {
+          const $plot = this.manager.getAliases().get('plot');
+          if (!$plot) {
+            return {
+              contents: [{
+                uri: 'moo://events/recent',
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: '$.plot not bootstrapped' }),
+              }],
+            };
+          }
+
+          const plots = await $plot.call('listPlots') as any[];
+          const allEvents: any[] = [];
+
+          for (const plot of plots) {
+            if (plot.events && Array.isArray(plot.events)) {
+              for (const event of plot.events) {
+                allEvents.push({
+                  ...event,
+                  plotId: plot.id,
+                  plotTitle: plot.title,
+                });
+              }
+            }
+          }
+
+          // Sort by timestamp descending, take last 50
+          allEvents.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+          const recent = allEvents.slice(0, 50);
+
+          return {
+            contents: [{
+              uri: 'moo://events/recent',
+              mimeType: 'application/json',
+              text: JSON.stringify(recent, null, 2),
+            }],
+          };
+        } catch (err) {
+          return {
+            contents: [{
+              uri: 'moo://events/recent',
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: String(err) }),
+            }],
+          };
+        }
+      }
+    );
+
+    // Individual player - moo://players/{id}
+    server.resource(
+      'players/{id}',
+      new ResourceTemplate('moo://players/{id}', { list: undefined }),
+      { description: 'Get individual player details' },
+      async (uri: URL) => {
+        try {
+          const uriStr = uri.toString();
+          const match = uriStr.match(/moo:\/\/players\/(.+)/);
+          if (!match) {
+            return {
+              contents: [{
+                uri: uriStr,
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: 'Invalid URI format' }),
+              }],
+            };
+          }
+
+          const idStr = match[1];
+          const playerId = idStr.startsWith('#') ? parseInt(idStr.slice(1)) : parseInt(idStr);
+
+          const player = await this.manager.load(playerId);
+          if (!player) {
+            return {
+              contents: [{
+                uri: uriStr,
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: `Player #${playerId} not found` }),
+              }],
+            };
+          }
+
+          const serialized = this.serializeValue({
+            id: player.id,
+            playername: player.get('playername'),
+            name: player.get('name'),
+            description: player.get('description'),
+            location: player.get('location'),
+            isConnected: player.get('isConnected') || false,
+            stats: player.get('stats'),
+            inventory: player.get('inventory'),
+          });
+
+          return {
+            contents: [{
+              uri: uriStr,
+              mimeType: 'application/json',
+              text: JSON.stringify(serialized, null, 2),
             }],
           };
         } catch (err) {
