@@ -13,7 +13,6 @@ import * as fs from 'fs';
 import * as path from 'path';
 import type { ObjectManager } from '../database/object-manager.js';
 import type { ObjId, RuntimeObject } from '../../types/object.js';
-import { MCPTelnetClient } from './telnet-client.js';
 import { parseQuery, validateQuery } from './query-parser.js';
 
 /**
@@ -44,7 +43,6 @@ interface SessionState {
 export class MaliceMCPServer {
   private httpServer: ReturnType<typeof createServer> | null = null;
   private sessions = new Map<string, SessionState>();
-  private telnetClient: MCPTelnetClient;
   private port: number;
   private host: string;
 
@@ -54,7 +52,6 @@ export class MaliceMCPServer {
   ) {
     this.port = config.port ?? 3001;
     this.host = config.host ?? '127.0.0.1';
-    this.telnetClient = new MCPTelnetClient('localhost', 5555);
   }
 
   /**
@@ -355,76 +352,6 @@ export class MaliceMCPServer {
       }
     );
 
-    // Search objects by property
-    server.tool(
-      'find_by_property',
-      'Find MOO objects that have a specific property value.',
-      {
-        name: z.string().describe('Property name to search'),
-        value: z.any().optional().describe('Property value to match (use "#id" format for object references, omit to find all objects with this property)'),
-      },
-      async ({ name, value }) => {
-        const deserializedValue = value !== undefined ? await this.deserializeValue(value) : undefined;
-        const objects = await this.manager.findByProperty(name, deserializedValue);
-        const results = objects.map(obj => ({
-          id: `#${obj.id}`,
-          parent: `#${obj._getRaw().parent.value}`,
-        }));
-
-        return {
-          content: [{ type: 'text', text: JSON.stringify({ count: results.length, objects: results }, null, 2) }],
-        };
-      }
-    );
-
-    // Search objects by name pattern
-    server.tool(
-      'search_objects',
-      'Search MOO objects by name. Supports substring matching and regex patterns.',
-      {
-        pattern: z.string().describe('Search pattern - substring or regex (e.g., "Tower", "^Smith", "Lock$")'),
-        regex: z.boolean().optional().describe('Treat pattern as regex (default: substring match)'),
-        limit: z.number().optional().describe('Max results to return (default 50)'),
-      },
-      async ({ pattern, regex, limit }) => {
-        const allObjects = await this.manager.db.listAll(false);
-        const maxResults = limit ?? 50;
-        const results: Array<{ id: number; name: string; parent: number }> = [];
-
-        let matcher: (name: string) => boolean;
-        if (regex) {
-          try {
-            const re = new RegExp(pattern, 'i');
-            matcher = (name: string) => re.test(name);
-          } catch {
-            return {
-              content: [{ type: 'text', text: `Invalid regex pattern: ${pattern}` }],
-              isError: true,
-            };
-          }
-        } else {
-          const lower = pattern.toLowerCase();
-          matcher = (name: string) => name.toLowerCase().includes(lower);
-        }
-
-        for (const obj of allObjects) {
-          const name = obj.properties?.name?.value;
-          if (typeof name === 'string' && matcher(name)) {
-            results.push({
-              id: obj._id,
-              name,
-              parent: obj.parent.value,
-            });
-            if (results.length >= maxResults) break;
-          }
-        }
-
-        return {
-          content: [{ type: 'text', text: JSON.stringify({ count: results.length, objects: results }, null, 2) }],
-        };
-      }
-    );
-
     // Get inheritance info for an object (ancestors and optionally descendants)
     server.tool(
       'get_inheritance',
@@ -515,65 +442,6 @@ export class MaliceMCPServer {
 
           return {
             content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
-          };
-        } catch (err) {
-          return {
-            content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }],
-            isError: true,
-          };
-        }
-      }
-    );
-
-    // Find objects in a location
-    server.tool(
-      'find_in_location',
-      'Find all objects in a room or container.',
-      {
-        locationId: z.string().regex(OBJREF_PATTERN).describe(OBJREF_DESCRIPTION),
-        recursive: z.boolean().optional().describe('Include contents of containers within (default: false)'),
-      },
-      async ({ locationId: rawLocId, recursive }) => {
-        try {
-          const locationObj = await this.deserializeValue(rawLocId) as RuntimeObject;
-          const locationId = locationObj.id;
-
-          const allObjects = await this.manager.db.listAll(false);
-          const results: Array<{ id: string; name: string; parent: string; location: string }> = [];
-
-          const locationsToSearch = new Set<number>([locationId]);
-
-          if (recursive) {
-            // Keep expanding until no new containers found
-            let changed = true;
-            while (changed) {
-              changed = false;
-              for (const obj of allObjects) {
-                const loc = obj.properties?.location?.value;
-                if (typeof loc === 'number' && locationsToSearch.has(loc) && !locationsToSearch.has(obj._id)) {
-                  // This object is in a location we're searching - add it as a potential container
-                  locationsToSearch.add(obj._id);
-                  changed = true;
-                }
-              }
-            }
-            locationsToSearch.delete(locationId); // We want contents, not the location itself
-          }
-
-          for (const obj of allObjects) {
-            const loc = obj.properties?.location?.value;
-            if (typeof loc === 'number' && (loc === locationId || (recursive && locationsToSearch.has(loc)))) {
-              results.push({
-                id: `#${obj._id}`,
-                name: obj.properties?.name?.value || '(unnamed)',
-                parent: `#${obj.parent.value}`,
-                location: `#${loc}`,
-              });
-            }
-          }
-
-          return {
-            content: [{ type: 'text', text: JSON.stringify({ count: results.length, objects: results }, null, 2) }],
           };
         } catch (err) {
           return {
@@ -1359,110 +1227,6 @@ export class MaliceMCPServer {
             isError: true,
           };
         }
-      }
-    );
-
-    // === Telnet Session Tools ===
-
-    // Connect to MOO via telnet
-    server.tool(
-      'session_connect',
-      'Connect to the MOO via telnet. Returns a session ID and the welcome message. MOO output will be pushed via logging notifications.',
-      {},
-      async (_args, _extra) => {
-        try {
-          // Push notifications were disabled during debugging but the actual issue was
-          // awaited game event emissions blocking MCP responses (fixed by fire-and-forget).
-          // TODO: Re-enable push notifications if real-time updates are needed
-          // const onData = (telnetSessionId: string, data: string) => {
-          //   const transport = mcpSessionId ? this.sessions.get(mcpSessionId) : undefined;
-          //   if (!transport) return;
-          //   const notification = {
-          //     jsonrpc: '2.0' as const,
-          //     method: 'notifications/message',
-          //     params: { level: 'info', logger: `moo:${telnetSessionId}`, data },
-          //   };
-          //   transport.send(notification).catch(() => {});
-          // };
-
-          const { sessionId, output } = await this.telnetClient.connect(undefined);
-          return {
-            content: [{ type: 'text', text: JSON.stringify({ sessionId, output, push: true }, null, 2) }],
-          };
-        } catch (err) {
-          return {
-            content: [{ type: 'text', text: `Connection failed: ${err instanceof Error ? err.message : String(err)}` }],
-            isError: true,
-          };
-        }
-      }
-    );
-
-    // Send command to session
-    server.tool(
-      'session_send',
-      'Send a command to an active telnet session. Returns the response output.',
-      {
-        sessionId: z.string().describe('Session ID from session_connect'),
-        command: z.string().describe('Command to send (e.g., username, password, or game command)'),
-      },
-      async ({ sessionId, command }) => {
-        try {
-          const { output, closed } = await this.telnetClient.send(sessionId, command);
-          return {
-            content: [{ type: 'text', text: JSON.stringify({ output, closed }, null, 2) }],
-          };
-        } catch (err) {
-          return {
-            content: [{ type: 'text', text: `Send failed: ${err instanceof Error ? err.message : String(err)}` }],
-            isError: true,
-          };
-        }
-      }
-    );
-
-    // Get session log
-    server.tool(
-      'session_log',
-      'Get the session log (last N lines of output). Useful for seeing context.',
-      {
-        sessionId: z.string().describe('Session ID'),
-        lines: z.number().optional().describe('Number of lines to return (default: all, max 1000)'),
-      },
-      async ({ sessionId, lines }) => {
-        const log = this.telnetClient.getLog(sessionId, lines);
-        const status = this.telnetClient.getStatus(sessionId);
-        return {
-          content: [{ type: 'text', text: JSON.stringify({ ...status, log }, null, 2) }],
-        };
-      }
-    );
-
-    // List active sessions
-    server.tool(
-      'session_list',
-      'List all active telnet sessions.',
-      {},
-      async () => {
-        const sessions = this.telnetClient.listSessions();
-        return {
-          content: [{ type: 'text', text: JSON.stringify({ sessions, count: sessions.length }, null, 2) }],
-        };
-      }
-    );
-
-    // Close session
-    server.tool(
-      'session_close',
-      'Close a telnet session.',
-      {
-        sessionId: z.string().describe('Session ID to close'),
-      },
-      async ({ sessionId }) => {
-        this.telnetClient.close(sessionId);
-        return {
-          content: [{ type: 'text', text: `Session ${sessionId} closed` }],
-        };
       }
     );
 

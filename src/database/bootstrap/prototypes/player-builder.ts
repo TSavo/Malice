@@ -21,6 +21,7 @@ export class PlayerBuilder {
         email: '',
         passwordHash: '',
         sslFingerprint: '',
+        sshPublicKeys: [],  // Array of OpenSSH format public keys
         oauthSubject: '',
 
         // Permissions
@@ -95,6 +96,11 @@ export class PlayerBuilder {
       await self.registerVerb(['health', 'hp', 'status'], self, 'health');
       await self.registerVerb(['give %i to %i'], self, 'give');
       await self.registerVerb(['inventory', 'i'], self, 'inventory');
+
+      // SSH key management
+      await self.registerVerb(['addkey %s'], self, 'addkey');
+      await self.registerVerb('listkeys', self);
+      await self.registerVerb(['removekey %s'], self, 'removekey');
 
       // Pocket commands
       await self.registerVerb(['pocket %i', 'put %i in pocket', 'stash %i'], self, 'pocket');
@@ -370,6 +376,151 @@ export class PlayerBuilder {
       const password = args[0];
       self.passwordHash = await $.hashPassword(password);
     `);
+
+    // SSH key management
+    obj.setMethod('addkey', `
+      /**
+       * Add an SSH public key to your account
+       * Usage: addkey ssh-rsa AAAA... comment
+       */
+      const keyStr = args[0];
+      if (!keyStr) {
+        return 'Usage: addkey <paste your full SSH public key>';
+      }
+
+      // Validate key format (should be: algorithm base64data [comment])
+      const parts = keyStr.trim().split(/\\s+/);
+      if (parts.length < 2) {
+        return 'Invalid SSH key format. Expected: ssh-rsa AAAA... [comment]';
+      }
+
+      const algo = parts[0];
+      const validAlgos = ['ssh-rsa', 'ssh-ed25519', 'ecdsa-sha2-nistp256', 'ecdsa-sha2-nistp384', 'ecdsa-sha2-nistp521'];
+      if (!validAlgos.includes(algo)) {
+        return 'Unsupported key type: ' + algo + '. Supported: ' + validAlgos.join(', ');
+      }
+
+      // Validate base64 data
+      try {
+        const decoded = Buffer.from(parts[1], 'base64');
+        if (decoded.length < 16) {
+          return 'Invalid key data';
+        }
+      } catch (e) {
+        return 'Invalid base64 key data';
+      }
+
+      // Get current keys
+      const keys = self.sshPublicKeys || [];
+
+      // Check for duplicate
+      const keyData = parts[1];
+      const isDuplicate = keys.some(k => {
+        const kParts = k.trim().split(/\\s+/);
+        return kParts.length >= 2 && kParts[1] === keyData;
+      });
+
+      if (isDuplicate) {
+        return 'This key is already registered to your account.';
+      }
+
+      // Add the key
+      keys.push(keyStr.trim());
+      self.sshPublicKeys = keys;
+
+      // Calculate fingerprint for display
+      const crypto = require('crypto');
+      const hash = crypto.createHash('sha256').update(Buffer.from(parts[1], 'base64')).digest('base64');
+      const fingerprint = 'SHA256:' + hash.replace(/=+$/, '');
+
+      return 'SSH key added successfully.\\nFingerprint: ' + fingerprint + '\\nYou now have ' + keys.length + ' key(s) registered.';
+    `, { callable: true, help: 'Add an SSH public key to your account' });
+
+    obj.setMethod('listkeys', `
+      /**
+       * List your registered SSH public keys
+       */
+      const keys = self.sshPublicKeys || [];
+
+      if (keys.length === 0) {
+        return 'No SSH keys registered. Use "addkey <key>" to add one.';
+      }
+
+      const crypto = require('crypto');
+      let output = 'Your SSH keys (' + keys.length + '):\\n';
+
+      keys.forEach((key, idx) => {
+        const parts = key.trim().split(/\\s+/);
+        const algo = parts[0] || 'unknown';
+        const comment = parts.slice(2).join(' ') || '(no comment)';
+
+        // Calculate fingerprint
+        let fingerprint = 'unknown';
+        if (parts.length >= 2) {
+          try {
+            const hash = crypto.createHash('sha256').update(Buffer.from(parts[1], 'base64')).digest('base64');
+            fingerprint = 'SHA256:' + hash.replace(/=+$/, '');
+          } catch (e) {}
+        }
+
+        output += '  ' + (idx + 1) + '. ' + algo + ' ' + fingerprint + ' ' + comment + '\\n';
+      });
+
+      return output.trim();
+    `, { callable: true, help: 'List your registered SSH public keys' });
+
+    obj.setMethod('removekey', `
+      /**
+       * Remove an SSH public key from your account
+       * Usage: removekey <number or fingerprint>
+       */
+      const arg = args[0];
+      if (!arg) {
+        return 'Usage: removekey <key number or fingerprint>\\nUse "listkeys" to see your keys.';
+      }
+
+      const keys = self.sshPublicKeys || [];
+      if (keys.length === 0) {
+        return 'No SSH keys registered.';
+      }
+
+      let indexToRemove = -1;
+      const crypto = require('crypto');
+
+      // Check if it's a number
+      const num = parseInt(arg, 10);
+      if (!isNaN(num) && num >= 1 && num <= keys.length) {
+        indexToRemove = num - 1;
+      } else {
+        // Search by fingerprint
+        for (let i = 0; i < keys.length; i++) {
+          const parts = keys[i].trim().split(/\\s+/);
+          if (parts.length >= 2) {
+            try {
+              const hash = crypto.createHash('sha256').update(Buffer.from(parts[1], 'base64')).digest('base64');
+              const fingerprint = 'SHA256:' + hash.replace(/=+$/, '');
+              if (fingerprint === arg || fingerprint.includes(arg)) {
+                indexToRemove = i;
+                break;
+              }
+            } catch (e) {}
+          }
+        }
+      }
+
+      if (indexToRemove === -1) {
+        return 'Key not found. Use "listkeys" to see your keys.';
+      }
+
+      // Remove the key
+      const removedKey = keys.splice(indexToRemove, 1)[0];
+      self.sshPublicKeys = keys;
+
+      const parts = removedKey.trim().split(/\\s+/);
+      const comment = parts.slice(2).join(' ') || '(no comment)';
+
+      return 'Removed key: ' + parts[0] + ' ' + comment + '\\nYou now have ' + keys.length + ' key(s) registered.';
+    `, { callable: true, help: 'Remove an SSH public key from your account' });
   }
 
   private addActionMethods(obj: RuntimeObject): void {
