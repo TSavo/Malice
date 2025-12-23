@@ -26,9 +26,11 @@ services:
     restart: unless-stopped
     ports:
       - "5555:5555"  # Telnet
+      - "5556:5556"  # SSH
       - "8080:8080"  # WebSocket
       - "3001:3001"  # MCP
       - "3002:3002"  # CharGen MCP
+      - "3003:3003"  # Session MCP
     environment:
       - MONGO_URI=mongodb://mongodb:27017/
       - DB_NAME=malice
