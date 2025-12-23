@@ -1357,6 +1357,302 @@ Write composable code - loops, conditionals, multi-step operations all work.`,
         }
       }
     );
+
+    // Schema - moo://schema
+    server.resource(
+      'schema',
+      'moo://schema',
+      { description: 'MOO object schema documentation' },
+      async () => ({
+        contents: [{
+          uri: 'moo://schema',
+          mimeType: 'text/plain',
+          text: `MOO Object Schema:
+
+GameObject {
+  _id: number          // Unique object ID (e.g., 0, 1, 2...)
+  parent: number       // Parent object ID for inheritance (-1 for none)
+  properties: {        // Key-value property storage
+    [name]: {
+      type: 'string' | 'number' | 'boolean' | 'null' | 'objref' | 'array' | 'object'
+      value: any
+    }
+  }
+  methods: {           // TypeScript method code
+    [name]: {
+      code: string     // TypeScript function body
+      callable?: boolean  // Can players call this directly?
+      aliases?: string[]  // Alternative command names
+      help?: string       // Help documentation
+    }
+  }
+  created: Date
+  modified: Date
+  recycled?: boolean   // Soft-deleted flag
+}
+
+Object References:
+- Use "#N" format in properties to reference other objects
+- Example: { location: "#5" } references object #5
+
+Core Objects:
+- #-1: Nothing (null reference)
+- #0: ObjectManager (system root)
+- #1: Root (base for inheritance)
+- #2: System (connection handlers)`,
+        }],
+      })
+    );
+
+    // Object property - moo://objects/{id}/prop/{name}
+    server.resource(
+      'objects/{id}/prop/{name}',
+      new ResourceTemplate('moo://objects/{id}/prop/{name}', { list: undefined }),
+      { description: 'Get a specific property from a MOO object' },
+      async (uri: URL) => {
+        try {
+          const uriStr = uri.toString();
+          const match = uriStr.match(/moo:\/\/objects\/(.+)\/prop\/(.+)/);
+          if (!match) {
+            return {
+              contents: [{
+                uri: uriStr,
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: 'Invalid URI format' }),
+              }],
+            };
+          }
+
+          const [, idStr, propName] = match;
+          const objId = idStr.startsWith('#') ? parseInt(idStr.slice(1)) : parseInt(idStr);
+
+          const obj = await this.manager.load(objId);
+          if (!obj) {
+            return {
+              contents: [{
+                uri: uriStr,
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: `Object #${objId} not found` }),
+              }],
+            };
+          }
+
+          const value = obj.get(propName);
+          const serialized = this.serializeValue({ [propName]: value });
+
+          return {
+            contents: [{
+              uri: uriStr,
+              mimeType: 'application/json',
+              text: JSON.stringify(serialized, null, 2),
+            }],
+          };
+        } catch (err) {
+          return {
+            contents: [{
+              uri: uri.toString(),
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: String(err) }),
+            }],
+          };
+        }
+      }
+    );
+
+    // Object method - moo://objects/{id}/method/{name}
+    server.resource(
+      'objects/{id}/method/{name}',
+      new ResourceTemplate('moo://objects/{id}/method/{name}', { list: undefined }),
+      { description: 'Get the TypeScript code for a method on a MOO object (walks inheritance chain)' },
+      async (uri: URL) => {
+        try {
+          const uriStr = uri.toString();
+          const match = uriStr.match(/moo:\/\/objects\/(.+)\/method\/(.+)/);
+          if (!match) {
+            return {
+              contents: [{
+                uri: uriStr,
+                mimeType: 'text/typescript',
+                text: '// Invalid URI format',
+              }],
+            };
+          }
+
+          const [, idStr, methodName] = match;
+          const objId = idStr.startsWith('#') ? parseInt(idStr.slice(1)) : parseInt(idStr);
+
+          const obj = await this.manager.load(objId);
+          if (!obj) {
+            return {
+              contents: [{
+                uri: uriStr,
+                mimeType: 'text/typescript',
+                text: `// Object #${objId} not found`,
+              }],
+            };
+          }
+
+          // Walk inheritance chain to find method
+          let current: any = obj;
+          let methodCode: string | undefined;
+          let foundInId: number | undefined;
+
+          while (current) {
+            const methods = current.getOwnMethods();
+            if (methods[methodName]) {
+              methodCode = methods[methodName].code;
+              foundInId = current.id;
+              break;
+            }
+            const parent = current.get('parent');
+            current = parent && typeof parent === 'object' && 'id' in parent ? parent : undefined;
+          }
+
+          if (!methodCode) {
+            return {
+              contents: [{
+                uri: uriStr,
+                mimeType: 'text/typescript',
+                text: `// Method '${methodName}' not found on #${objId} or its parents`,
+              }],
+            };
+          }
+
+          const header = foundInId !== objId
+            ? `// Method '${methodName}' inherited from #${foundInId}\n\n`
+            : `// Method '${methodName}' on #${objId}\n\n`;
+
+          return {
+            contents: [{
+              uri: uriStr,
+              mimeType: 'text/typescript',
+              text: header + methodCode,
+            }],
+          };
+        } catch (err) {
+          return {
+            contents: [{
+              uri: uri.toString(),
+              mimeType: 'text/typescript',
+              text: `// Error: ${String(err)}`,
+            }],
+          };
+        }
+      }
+    );
+
+    // Object verbs - moo://objects/{id}/verbs
+    server.resource(
+      'objects/{id}/verbs',
+      new ResourceTemplate('moo://objects/{id}/verbs', { list: undefined }),
+      { description: 'Get all verbs registered on an agent object' },
+      async (uri: URL) => {
+        try {
+          const uriStr = uri.toString();
+          const match = uriStr.match(/moo:\/\/objects\/(.+)\/verbs/);
+          if (!match) {
+            return {
+              contents: [{
+                uri: uriStr,
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: 'Invalid URI format' }),
+              }],
+            };
+          }
+
+          const idStr = match[1];
+          const objId = idStr.startsWith('#') ? parseInt(idStr.slice(1)) : parseInt(idStr);
+
+          const obj = await this.manager.load(objId);
+          if (!obj) {
+            return {
+              contents: [{
+                uri: uriStr,
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: `Object #${objId} not found` }),
+              }],
+            };
+          }
+
+          const verbs = obj.get('verbs') || {};
+          return {
+            contents: [{
+              uri: uriStr,
+              mimeType: 'application/json',
+              text: JSON.stringify(verbs, null, 2),
+            }],
+          };
+        } catch (err) {
+          return {
+            contents: [{
+              uri: uri.toString(),
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: String(err) }),
+            }],
+          };
+        }
+      }
+    );
+
+    // Paginated object list - moo://objects/list/{page}
+    server.resource(
+      'objects/list/{page}',
+      new ResourceTemplate('moo://objects/list/{page}', { list: undefined }),
+      { description: 'Get paginated list of all objects' },
+      async (uri: URL) => {
+        try {
+          const uriStr = uri.toString();
+          const match = uriStr.match(/moo:\/\/objects\/list\/(\d+)/);
+          if (!match) {
+            return {
+              contents: [{
+                uri: uriStr,
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: 'Invalid URI format' }),
+              }],
+            };
+          }
+
+          const page = parseInt(match[1]);
+          const pageSize = 100;
+          const skip = (page - 1) * pageSize;
+
+          const allObjs = await this.manager.db.listAll(false);
+          const total = allObjs.length;
+          const totalPages = Math.ceil(total / pageSize);
+
+          const pageObjs = allObjs
+            .slice(skip, skip + pageSize)
+            .map(doc => ({
+              id: doc._id,
+              parent: this.getValue(doc.parent),
+              name: this.getValue(doc.properties.name),
+            }));
+
+          return {
+            contents: [{
+              uri: uriStr,
+              mimeType: 'application/json',
+              text: JSON.stringify({
+                page,
+                pageSize,
+                total,
+                totalPages,
+                objects: pageObjs,
+              }, null, 2),
+            }],
+          };
+        } catch (err) {
+          return {
+            contents: [{
+              uri: uri.toString(),
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: String(err) }),
+            }],
+          };
+        }
+      }
+    );
   }
 
   /**

@@ -263,9 +263,14 @@ The MCP server provides moo:// resources for querying game state:
 **Meta Resources:**
 - `moo://tools` - List all available MCP tools
 - `moo://aliases` - List all object aliases
+- `moo://schema` - MOO object schema documentation
 
 **Object Resources:**
 - `moo://objects/{id}` - Get object details (#42 or 42)
+- `moo://objects/{id}/prop/{name}` - Get specific property value
+- `moo://objects/{id}/method/{name}` - Get method source code (walks inheritance)
+- `moo://objects/{id}/verbs` - Get all verbs registered on an agent
+- `moo://objects/list/{page}` - Paginated object list (100 per page)
 - `moo://alias/{name}` - Get object by alias (e.g., moo://alias/player)
 
 **Room Resources:**
