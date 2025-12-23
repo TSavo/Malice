@@ -29,9 +29,9 @@ services:
       - "5555:5555"  # Telnet
       - "5556:5556"  # SSH
       - "8080:8080"  # WebSocket
-      - "3001:3001"  # MCP
-      - "3002:3002"  # CharGen MCP
-      - "3003:3003"  # Session MCP
+      - "3010:3010"  # MCP (code-first)
+      - "3011:3011"  # CharGen MCP
+      - "3012:3012"  # Session MCP
     environment:
       - MONGO_URI=mongodb://mongodb:27017/
       - DB_NAME=malice
@@ -46,7 +46,7 @@ services:
     networks:
       - malice-network
     healthcheck:
-      test: ["CMD-SHELL", "nc -z localhost 3001 || exit 1"]
+      test: ["CMD-SHELL", "nc -z localhost 3010 || exit 1"]
       interval: 5s
       timeout: 5s
       retries: 30
