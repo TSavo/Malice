@@ -227,6 +227,15 @@ v2/
 - ✅ Property inspection
 - ✅ Virtual filesystem (`malice://objects/2/onConnection.ts`)
 
+### Code-First MCP
+- ✅ Single `execute_moo_code` tool for Claude integration
+- ✅ $mcp MOO object with all tools as methods
+- ✅ HTTP Basic Auth for authenticated player access
+- ✅ 98% reduction in token usage vs traditional MCP
+- ✅ Comprehensive moo:// resources (objects, rooms, AI, plots, docs)
+- ✅ NPC session transcripts (Claude API conversation logs)
+- ✅ $mcp builder creates tool objects dynamically
+
 ## Connection Flow
 
 ```
@@ -337,24 +346,38 @@ npm run typecheck
 
 ## What's Next
 
-### Phase 2: Game Mechanics (In Progress)
-- [ ] Inventory system (get, drop, put)
-- [ ] Look at objects
-- [ ] Communication (say, emote, whisper)
-- [ ] Help system
+### Phase 2: Game Mechanics (COMPLETED ✅)
+- [x] Inventory system (get, drop, put)
+- [x] Look at objects
+- [x] Communication (say, emote, whisper, tell)
+- [x] Help system
+- [x] Perception filter system
+- [x] Body parts and sensory system
+- [x] Wearables and clothing system
+- [x] Food and drink consumption
+- [x] Combat system (basic)
 
-### Phase 3: World Building
-- [ ] MOO commands (@create, @dig, @property, @method)
-- [ ] In-game programming
-- [ ] Room builder
-- [ ] Object editor
+### Phase 3: World Building (COMPLETED ✅)
+- [x] Code-first MCP server with execute_moo_code
+- [x] All MCP tools accessible via $mcp object
+- [x] HTTP Basic Auth for authenticated player access
+- [x] Comprehensive moo:// resources
+- [x] Street/avenue grid system with auto-connecting exits
+- [x] Building builder with placeholder system
+- [x] Room and object spawning tools
+- [x] In-game property and method editing
 
-### Phase 4: Advanced Features
-- [ ] Combat system
-- [ ] Skills/abilities
-- [ ] AI agent integration
-- [ ] Quest system
-- [ ] Economy
+### Phase 4: Advanced Features (IN PROGRESS)
+- [x] AI agent integration ($query, $ai utility)
+- [x] AI NPC system with personalities and memories
+- [x] Plot/job system for quests and storylines
+- [x] Skills/abilities system
+- [x] Factions and reputation
+- [x] Phone system with directory
+- [x] Locker system with security
+- [ ] Economy refinements
+- [ ] Enhanced combat mechanics
+- [ ] More quest content
 
 ## Performance
 

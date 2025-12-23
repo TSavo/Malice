@@ -25,6 +25,7 @@ import { SisterGrayBuilder } from './sister-gray-builder.js';
 import { WebsiteBuilder } from './website-builder.js';
 import { MCPBuilder } from './mcp-builder.js';
 import { SessionBuilder } from './session-builder.js';
+import { TailorBuilder } from './tailor-builder.js';
 
 /**
  * Orchestrates building all core system objects
@@ -92,6 +93,7 @@ export class CoreSystemBuilder {
     const websiteBuilder = new WebsiteBuilder(this.manager);
     const mcpBuilder = new MCPBuilder(this.manager);
     const sessionBuilder = new SessionBuilder(this.manager);
+    const tailorBuilder = new TailorBuilder(this.manager);
 
     await authManagerBuilder.build();
     await charGenBuilder.build();
@@ -127,6 +129,7 @@ export class CoreSystemBuilder {
     await websiteBuilder.build(); // Website objects
     await mcpBuilder.build(); // MCP code-first tools
     await sessionBuilder.build(); // Session management wrapper
+    await tailorBuilder.build(); // AI costume designer
 
     // Register aliases
     await authManagerBuilder.registerAlias();
@@ -154,6 +157,7 @@ export class CoreSystemBuilder {
     await sisterGrayBuilder.registerAlias();
     await websiteBuilder.registerAliases();
     await mcpBuilder.registerAliases();
+    await tailorBuilder.registerAlias();
 
     // Register wake jobs now that Pluribus/SisterGray aliases exist
     await schedulerBuilder.registerWakeJobs();
@@ -274,6 +278,12 @@ export class CoreSystemBuilder {
     console.log('  Rebuilding Session methods...');
     const sessionBuilder = new SessionBuilder(this.manager);
     await sessionBuilder.build(true);
+
+    // Rebuild Tailor methods
+    console.log('  Rebuilding Tailor methods...');
+    const tailorBuilder = new TailorBuilder(this.manager);
+    await tailorBuilder.build(true);
+    await tailorBuilder.registerAlias();
 
     console.log('  ✅ Core system methods rebuilt');
     console.log('  ✅ Rebuilt AuthManager, CharGen, Prompt, etc. methods');

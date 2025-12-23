@@ -1,13 +1,67 @@
 # Malice MCP Tools & Resources Reference
 
-The Malice MCP server exposes tools and resources for AI assistants and automation to interact with the MOO world.
+The Malice MCP server provides a **code-first interface** for AI assistants and automation to interact with the MOO world.
 
-**Endpoint:** `http://localhost:3001/mcp`
+**Endpoint:** `http://localhost:3010/mcp`
 
 **Related Documentation:**
 - [BUILDERS-GUIDE.md](BUILDERS-GUIDE.md) - Creating prototypes and systems in code
 - [moo-programming.md](moo-programming.md) - MOO programming reference
 - [plot-jobs.md](plot-jobs.md) - Plot/job system for AI city management
+
+---
+
+## Direct MOO Code
+
+**IMPORTANT**: Write native MOO code using `execute_moo_code`. Use MOO's built-in capabilities directly - no wrappers needed:
+
+```typescript
+// ✅ Direct MOO code
+execute_moo_code({
+  code: `
+    // Use $recycler to create objects
+    const room = await $recycler.create($room, {
+      name: "Hall",
+      x: 0, y: 0, z: 0
+    });
+
+    // Create and move item
+    const torch = await $recycler.create($item, {name: "torch"});
+    await torch.moveTo(room, player);
+
+    return {roomId: room.id, torchId: torch.id};
+  `
+})
+```
+
+### Benefits
+
+- **No wrapper layer** - just pure MOO code
+- **Composable** - loops, conditionals, multi-step operations
+- **Full MOO context** - $, $load(), $recycler, all $aliases
+- **Player authentication** - HTTP Basic Auth provides `player` variable
+- **Single execution** - no round-trips between steps
+
+### Authentication
+
+```bash
+# Authenticated (player variable available in code)
+curl -u username:password http://localhost:3010/mcp
+
+# Unauthenticated (admin/builder access)
+curl http://localhost:3010/mcp
+```
+
+### Available in execute_moo_code Context
+
+```typescript
+$                      // ObjectManager ($.db, $.addAlias, $.ai, $.plot, etc.)
+$load(id)              // Load object by ID
+$recycler              // Create/destroy objects
+$room, $player, etc.   // All registered aliases
+player                 // Your player object (if authenticated)
+// Plus all JavaScript: loops, conditionals, async/await, etc.
+```
 
 ---
 
@@ -90,6 +144,10 @@ moo://rooms/377  # → { name: "Occidental Park", exits: [...], players: [...], 
 ---
 
 ## MCP Tools (Read-Write)
+
+**Note**: Individual MCP tools are available but **NOT RECOMMENDED**. They're just wrappers around native MOO code. **Prefer writing direct MOO code** using `execute_moo_code` instead. The tools below are listed for reference only - use native MOO equivalents when possible.
+
+
 
 Tools perform operations with side effects. Use these to modify the world.
 

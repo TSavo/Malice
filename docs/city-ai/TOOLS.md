@@ -4,12 +4,37 @@ The tools and resources available to you for managing the city.
 
 ## Overview
 
-You interact with the Malice MOO through MCP (Model Context Protocol) tools and resources. These allow you to:
+You interact with the Malice MOO by writing native MOO code using `execute_moo_code`:
 
-- Query and modify game objects
-- Manage plots and jobs
-- Spawn and control NPCs
-- Interact with the world
+```typescript
+// ✅ Direct MOO code
+execute_moo_code({
+  code: `
+    // Create a plot
+    const plotId = await $plot.create('Water Main Repair', {
+      type: 'infrastructure',
+      priority: 'high'
+    });
+
+    // Spawn an NPC
+    const npc = await $ai.spawn({
+      role: 'supervisor',
+      name: 'Site Foreman',
+      location: await $load(repairSiteId),
+      personality: 'Gruff but professional.'
+    });
+
+    // Log event
+    await $plot.addEvent(plotId, 'Job posted. Awaiting workers.', 'system');
+
+    return {plotId, npcId: npc.id};
+  `
+})
+```
+
+**Benefits**: No wrapper layer, composable code with loops/conditionals, full MOO context ($, $load(), $aliases).
+
+The tools below are legacy wrappers - prefer direct MOO code when possible.
 
 ## MCP Resources (Read-Only)
 
@@ -371,13 +396,25 @@ ai({ action: 'recall', humanId: 500, criticalOnly: true })
 ai({ action: 'forget', humanId: 500, index: 2 })
 ```
 
-### tailor
+### Dressing NPCs ($tailor)
 
-Dress an NPC using the AI tailor agent. The tailor creates contextually appropriate clothing based on role, personality, and environment.
+Use `$tailor.dress()` to dress NPCs. The tailor creates contextually appropriate clothing based on role, personality, and environment.
 
-```javascript
-ai({ action: 'tailor', humanId: 500 })
-ai({ action: 'tailor', humanId: 500, context: 'shabby, recently fired' })
+**In MOO code:**
+```typescript
+const npc = await $load(500);
+await $tailor.dress(npc, 'shabby, recently fired')
+```
+
+**Using execute_moo_code:**
+```typescript
+execute_moo_code({
+  code: `
+    const npc = await $load(500);
+    await $tailor.dress(npc, 'shabby, recently fired');
+    return { success: true };
+  `
+})
 ```
 
 The tailor automatically:
@@ -396,9 +433,20 @@ The tailor automatically:
 
 Auto-dress NPCs on spawn:
 
-```javascript
-ai({ action: 'spawn', role: 'guard', locationId: 100, clothed: true })
-ai({ action: 'spawn', role: 'executive', locationId: 200, clothed: true, context: 'CEO of major corp' })
+**In MOO code:**
+```typescript
+await $ai.spawn({
+  role: 'guard',
+  location: await $load(100),
+  clothed: true
+})
+
+await $ai.spawn({
+  role: 'executive',
+  location: await $load(200),
+  clothed: true,
+  context: 'CEO of major corp'
+})
 ```
 
 See [TAILORING.md](../TAILORING.md) for full clothing system reference.

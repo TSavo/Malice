@@ -2,6 +2,35 @@
 
 Comprehensive guides for programming in Malice's MOO layer.
 
+## MCP Integration (Direct MOO Code)
+
+**NEW**: Malice uses direct MOO code execution via `execute_moo_code`. No wrappers - just native MOO:
+
+```typescript
+execute_moo_code({
+  code: `
+    // Use $recycler to create objects
+    const room = await $recycler.create($room, {
+      name: "Hall",
+      x: 0, y: 0, z: 0
+    });
+
+    // Create and move item
+    const torch = await $recycler.create($item, {name: "torch"});
+    await torch.moveTo(room, player);
+
+    return {roomId: room.id, torchId: torch.id};
+  `
+})
+```
+
+**Benefits**: No wrapper layer, composable code, full MOO context ($, $load(), $recycler, $aliases), HTTP Basic Auth for player variable.
+
+See:
+- **[Direct MOO Manipulation Skill](../../.claude/skills/moo-manipulation/SKILL.md)** - Canonical guide
+- **[MCP Tools Reference](../MCP-TOOLS.md)** - Legacy tool reference
+- **[CLAUDE.md](../../CLAUDE.md#mcp-integration)** - Direct MOO philosophy
+
 ## Reference
 
 - **[Quick Reference](./reference/quick-reference.md)** ✅ - Fast lookup for common tasks

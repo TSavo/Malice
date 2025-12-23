@@ -7,6 +7,38 @@ description: Create new MOO prototypes and objects at runtime using MCP tools. U
 
 Create prototypes and objects at runtime without server restart.
 
+## Direct MOO Code: No Wrappers, Just MOO
+
+**IMPORTANT**: Write native MOO code using `execute_moo_code`. Use MOO's built-in capabilities directly - `$recycler`, `$load()`, object methods, property access.
+
+```typescript
+// ✅ Direct MOO code (the right way)
+execute_moo_code({
+  code: `
+    // Use $recycler to create objects
+    const room = await $recycler.create($room, {
+      name: "Hall",
+      x: 0, y: 0, z: 0
+    });
+
+    // Create and move item
+    const torch = await $recycler.create($item, {
+      name: "torch"
+    });
+    await torch.moveTo(room, player);
+
+    return {roomId: room.id, torchId: torch.id};
+  `
+})
+```
+
+**Why Direct MOO?**:
+- No wrapper layer - just pure MOO
+- Composable code with loops, conditionals, functions
+- Full access to: $, $load(), $recycler, all $aliases
+- If authenticated (HTTP Basic Auth), access to `player` variable
+- Follows "everything is MOO code" philosophy
+
 ## READ THE REFERENCE
 
 Before writing methods, **READ** the appropriate documentation using `ReadMcpResourceTool`:
@@ -95,6 +127,8 @@ Use `ReadMcpResourceTool` with these URIs for **live game data**:
 | Plot events | `moo://plots/{id}/events` |
 
 ## MCP Tools Reference
+
+**Note**: While individual MCP tools (listed below) are still available, prefer using `execute_moo_code` with `$mcp.toolName()` for better composability and token efficiency. Use individual tool calls only when you need to make a single, standalone operation.
 
 ### Object Manipulation
 

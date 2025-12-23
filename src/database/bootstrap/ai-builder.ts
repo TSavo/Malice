@@ -499,6 +499,8 @@ CORE PRINCIPLES
       const description = options.description || 'An AI-controlled human.';
       const location = options.location || null;
       const spawnedBy = options.spawnedBy || null;
+      const clothed = options.clothed || false;         // Auto-dress with $tailor
+      const tailorContext = options.context || '';      // Additional context for tailor
 
       // Personality and history for AI agent context
       const personality = options.personality || null;  // string or { traits, quirks, values, fears }
@@ -732,6 +734,23 @@ CORE PRINCIPLES
       human.agentSystemPrompt = self.defaultAgentPrompt;
 
       console.log('[AI] Spawned ' + name + ' (#' + human.id + ') as ' + role);
+
+      // Auto-dress if clothed parameter is true
+      if (clothed) {
+        const tailor = $tailor;
+        if (tailor) {
+          try {
+            const context = tailorContext || \`Role: \${role}\`;
+            await tailor.dress(human, context);
+            console.log('[AI] Dressed ' + name + ' (#' + human.id + ')');
+          } catch (err) {
+            console.error('[AI] Tailor error for #' + human.id + ':', err);
+            // Don't fail spawn if tailor fails
+          }
+        } else {
+          console.warn('[AI] $tailor not available for dressing #' + human.id);
+        }
+      }
 
       return human;
     `);

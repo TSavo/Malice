@@ -194,12 +194,44 @@ Each sensory organ has capability methods that propagate up:
 
 ## MCP Integration
 
-The MCP server at port 3010 provides a code-first interface for Claude Code to interact with the MOO world.
+The MCP server at port 3010 provides a **code-first interface** for Claude Code to interact with the MOO world.
 
 ### Architecture
 
 - **Port 3010** - Main MCP server (admin/builder access, code-first)
 - **Port 3012** - Session MCP server (player access, action-based)
+
+### Code-First Philosophy
+
+**IMPORTANT**: This project uses direct MOO code execution:
+
+```typescript
+// ✅ Direct MOO code (the right way)
+execute_moo_code({
+  code: `
+    // Use $recycler to create objects
+    const room = await $recycler.create($room, {
+      name: "Hall",
+      x: 0, y: 0, z: 0
+    });
+
+    // Create and move item
+    const torch = await $recycler.create($item, {
+      name: "torch"
+    });
+    await torch.moveTo(room, player);
+
+    return {roomId: room.id, torchId: torch.id};
+  `
+})
+```
+
+**Benefits**:
+- **No wrapper layer** - just pure MOO code
+- **Composable** - loops, conditionals, multi-step operations
+- **Full MOO context** - $, $load(), $recycler, all $aliases
+- **Single execution** - no round-trips between steps
+- **Player context** - if authenticated, access `player` variable
 
 ### Authentication
 
@@ -220,41 +252,47 @@ Without authentication:
 - You still have full access to all MCP tools
 - Use this for world building and administrative tasks
 
-### Code-First Execution
+### Direct MOO Code Execution
 
-Instead of calling individual tools, write MOO code that uses all available tools:
+Write native MOO code using `execute_moo_code`. No wrappers - just pure MOO:
 
 ```typescript
 // Authenticated - access your player
-const myRoom = player.location;
-console.log(`You are in: ${myRoom.name}`);
+const myRoom = player?.location;
+console.log(`You are in: ${myRoom?.name || 'nowhere'}`);
 
-// Create a room and link it
-const room = await $mcp.dig({
+// Create a room
+const room = await $recycler.create($room, {
   name: 'Hallway',
   description: 'A long hallway',
   x: 0, y: 1, z: 0
 });
 
-// Spawn items
-await $mcp.spawn_item({
-  prototypeId: '$torch',
-  roomId: '#' + room.room.id
+// Create and place an item
+const torch = await $recycler.create($item, {
+  name: 'torch',
+  description: 'A flickering torch'
 });
+await torch.moveTo(room, player);
 
-// List available tools
-const tools = await $mcp.listTools();
+// Link rooms with exits
+const fromRoom = await $load(100);
+fromRoom.exits = fromRoom.exits || {};
+fromRoom.exits.north = room.id;
+room.exits = room.exits || {};
+room.exits.south = fromRoom.id;
+
+return {roomId: room.id, torchId: torch.id};
 ```
 
 ### Available in Execution Context
 
-- `$mcp.toolName(params)` - Call any MCP tool (dig, spawn_item, set_property, etc.)
-- `$mcp.listTools()` - List all available tools
-- `$` - Object manager
+- `$` - ObjectManager ($.db, $.addAlias, etc.)
 - `$load(id)` - Load object by ID
-- `$create({parent, properties})` - Create new object
-- `$alias` shortcuts - `$room`, `$player`, `$exit`, etc.
+- `$recycler` - Create/destroy objects
+- All `$aliases` - `$room`, `$player`, `$exit`, `$ai`, `$plot`, etc.
 - `player` - Your authenticated player object (if HTTP Basic Auth provided)
+- Full JavaScript - loops, conditionals, async/await, etc.
 
 ### MCP Resources
 
@@ -305,4 +343,14 @@ The MCP server provides moo:// resources for querying game state:
 - `moo://city-ai` - List all city AI documentation files
 - `moo://city-ai/{name}` - Get city AI doc (e.g., moo://city-ai/context)
 
-Use `mcp__malice__*` tools to interact with the running game server.
+### Using MCP
+
+**Prefer direct MOO code**:
+- Use `execute_moo_code` with native MOO capabilities
+- Access `$recycler`, `$load()`, `$ai`, `$plot`, and all other $aliases directly
+- Write composable code with full JavaScript capabilities
+
+**Individual MCP tools** (legacy, avoid):
+- `mcp__malice__*` tools are available but not recommended
+- They're just wrappers around MOO code - use the MOO code directly instead
+- See `docs/MCP-TOOLS.md` if you need the tool reference

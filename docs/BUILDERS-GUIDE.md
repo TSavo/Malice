@@ -28,7 +28,45 @@ Malice supports two building approaches:
 
 MCP tools allow you to create and modify objects without rebuilding. This is the preferred approach for content creation and AI integration.
 
-### Creating Objects via MCP
+### Direct MOO Code Approach
+
+**IMPORTANT**: Write native MOO code using `execute_moo_code`. Use MOO's built-in capabilities directly:
+
+```typescript
+// ✅ Direct MOO code
+execute_moo_code({
+  code: `
+    // Create object using $recycler
+    const lock = await $recycler.create($lock, {
+      name: "Combination Lock",
+      description: "A lock with a dial combination.",
+      combination: "12-34-56"
+    });
+
+    // Add method directly
+    lock.setMethod("canAccess", \\\`
+      const agent = args[0];
+      const input = args[1];
+      if (!self.combination) return true;
+      if (input === self.combination) return true;
+      return 'Wrong combination.';
+    \\\`);
+
+    // Register alias
+    await $.addAlias("combinationLock", lock.id);
+
+    return {id: lock.id, name: lock.name};
+  `
+})
+```
+
+**Why Direct MOO?**:
+- No wrapper layer - just pure MOO
+- Composable code with full JavaScript
+- Access to $, $load(), $recycler, all $aliases
+- If authenticated (HTTP Basic Auth), access to `player` variable
+
+### Creating Objects via MCP (Legacy Examples)
 
 ```javascript
 // Create a new object
