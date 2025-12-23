@@ -462,6 +462,16 @@ export class BuildingBuilder {
           const objProps = { ...objDef };
           delete objProps.prototype;
 
+          // Resolve alias strings to objects (e.g., bank: 'bank' -> bank: $bank)
+          for (const [key, value] of Object.entries(objProps)) {
+            if (typeof value === 'string' && aliases[value]) {
+              const resolved = await this.manager.load(aliases[value] as ObjId);
+              if (resolved) {
+                objProps[key] = resolved;
+              }
+            }
+          }
+
           // Create the object
           const obj = await recycler.create({
             parent: proto,
