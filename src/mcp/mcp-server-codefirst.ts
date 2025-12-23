@@ -16,6 +16,7 @@ import { createServer, IncomingMessage, ServerResponse } from 'http';
 import { z } from 'zod';
 import { readdir, readFile } from 'fs/promises';
 import { join } from 'path';
+import { existsSync, readFileSync } from 'fs';
 import type { ObjectManager } from '../database/object-manager.js';
 import type { RuntimeObject } from '../../types/object.js';
 
@@ -1646,6 +1647,144 @@ Core Objects:
           return {
             contents: [{
               uri: uri.toString(),
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: String(err) }),
+            }],
+          };
+        }
+      }
+    );
+
+    // NPC Sessions list - moo://npc-sessions
+    server.resource(
+      'npc-sessions',
+      'moo://npc-sessions',
+      { description: 'List all AI NPC conversation sessions' },
+      async () => {
+        try {
+          const $ai = this.manager.getAliases().get('ai');
+          if (!$ai) {
+            return {
+              contents: [{
+                uri: 'moo://npc-sessions',
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: '$.ai not bootstrapped' }),
+              }],
+            };
+          }
+
+          // Get sessions from $ai.listSessions() - persists after NPC recycling
+          const sessions = await $ai.call('listSessions') || [];
+
+          return {
+            contents: [{
+              uri: 'moo://npc-sessions',
+              mimeType: 'application/json',
+              text: JSON.stringify({ sessions }, null, 2),
+            }],
+          };
+        } catch (err) {
+          return {
+            contents: [{
+              uri: 'moo://npc-sessions',
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: String(err) }),
+            }],
+          };
+        }
+      }
+    );
+
+    // Individual NPC session - moo://npc-sessions/{sessionId}
+    server.resource(
+      'npc-sessions/{sessionId}',
+      new ResourceTemplate('moo://npc-sessions/{sessionId}', { list: undefined }),
+      { description: 'Get conversation history for a specific NPC session' },
+      async (_uri: URL, variables: { sessionId?: string | string[] }) => {
+        const sessionIdVar = variables.sessionId;
+        const sessionId = Array.isArray(sessionIdVar) ? sessionIdVar[0] : sessionIdVar;
+
+        if (!sessionId) {
+          return {
+            contents: [{
+              uri: 'moo://npc-sessions/unknown',
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: 'Missing session ID' }),
+            }],
+          };
+        }
+
+        try {
+          // Get session metadata from $ai registry
+          const $ai = this.manager.getAliases().get('ai');
+          const sessionInfo = $ai ? await $ai.call('getSession', sessionId) : null;
+
+          // JSONL session files are stored in ~/.claude/projects/-home-node/
+          const sessionsDir = join(process.env.HOME || '/home/node', '.claude', 'projects', '-home-node');
+          const sessionFile = join(sessionsDir, `${sessionId}.jsonl`);
+
+          if (!existsSync(sessionFile)) {
+            return {
+              contents: [{
+                uri: `moo://npc-sessions/${sessionId}`,
+                mimeType: 'application/json',
+                text: JSON.stringify({
+                  sessionId,
+                  ...(sessionInfo as any || {}),
+                  error: 'Session file not found',
+                }),
+              }],
+            };
+          }
+
+          // Read and parse JSONL file
+          const content = readFileSync(sessionFile, 'utf-8');
+          const lines = content.trim().split('\n').filter(l => l.trim());
+          const messages: Array<{ type: string; timestamp?: string; content?: unknown }> = [];
+
+          for (const line of lines) {
+            try {
+              const parsed = JSON.parse(line);
+              // Extract key info from each message
+              if (parsed.type === 'user' && parsed.message?.content) {
+                messages.push({
+                  type: 'user',
+                  timestamp: parsed.timestamp,
+                  content: parsed.message.content,
+                });
+              } else if (parsed.type === 'assistant' && parsed.message?.content) {
+                messages.push({
+                  type: 'assistant',
+                  timestamp: parsed.timestamp,
+                  content: parsed.message.content,
+                });
+              }
+            } catch {
+              // Skip malformed lines
+            }
+          }
+
+          const sessionInfoObj = sessionInfo as any || {};
+          return {
+            contents: [{
+              uri: `moo://npc-sessions/${sessionId}`,
+              mimeType: 'application/json',
+              text: JSON.stringify({
+                sessionId,
+                npcId: sessionInfoObj.npcId,
+                npcName: sessionInfoObj.npcName,
+                role: sessionInfoObj.role,
+                startTime: sessionInfoObj.startTime,
+                lastActive: sessionInfoObj.lastActive,
+                messageCount: messages.length,
+                messages,
+              }, null, 2),
+            }],
+          };
+        } catch (err) {
+          return {
+            contents: [{
+              uri: `moo://npc-sessions/${sessionId}`,
               mimeType: 'application/json',
               text: JSON.stringify({ error: String(err) }),
             }],
