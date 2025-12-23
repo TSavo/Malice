@@ -462,12 +462,15 @@ export class BuildingBuilder {
           const objProps = { ...objDef };
           delete objProps.prototype;
 
-          // Resolve alias strings to objects (e.g., bank: 'bank' -> bank: $bank)
+          // Resolve $alias strings to objects (e.g., bank: '$bank' -> bank: $bank object)
           for (const [key, value] of Object.entries(objProps)) {
-            if (typeof value === 'string' && aliases[value]) {
-              const resolved = await this.manager.load(aliases[value] as ObjId);
-              if (resolved) {
-                objProps[key] = resolved;
+            if (typeof value === 'string' && value.startsWith('$')) {
+              const aliasName = value.slice(1); // Remove $ prefix
+              if (aliases[aliasName]) {
+                const resolved = await this.manager.load(aliases[aliasName] as ObjId);
+                if (resolved) {
+                  objProps[key] = resolved;
+                }
               }
             }
           }
