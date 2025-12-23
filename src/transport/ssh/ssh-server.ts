@@ -73,8 +73,8 @@ export class SSHServer {
     }
     const { privateKey } = generateKeyPairSync('rsa', {
       modulusLength: 4096,
-      privateKeyEncoding: { type: 'pkcs8', format: 'pem' },
-      publicKeyEncoding: { type: 'spki', format: 'pem' },
+      privateKeyEncoding: { type: 'pkcs1', format: 'pem' },
+      publicKeyEncoding: { type: 'pkcs1', format: 'pem' },
     });
     return privateKey;
   }
