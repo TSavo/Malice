@@ -256,4 +256,30 @@ const tools = await $mcp.listTools();
 - `$alias` shortcuts - `$room`, `$player`, `$exit`, etc.
 - `player` - Your authenticated player object (if HTTP Basic Auth provided)
 
+### MCP Resources
+
+The MCP server provides moo:// resources for querying game state:
+
+**Meta Resources:**
+- `moo://tools` - List all available MCP tools
+- `moo://aliases` - List all object aliases
+
+**Object Resources:**
+- `moo://objects/{id}` - Get object details (#42 or 42)
+- `moo://alias/{name}` - Get object by alias (e.g., moo://alias/player)
+
+**Room Resources:**
+- `moo://rooms/{id}` - Get room state with exits, contents, and players
+
+**Player Resources:**
+- `moo://players` - List all player characters
+
+**AI/NPC Resources:**
+- `moo://ai` - List all AI-controlled NPCs
+- `moo://ai/{id}` - Get AI NPC profile with personality and memories
+
+**Plot Resources:**
+- `moo://plots` - List all active plots
+- `moo://plots/{id}` - Get plot details and events
+
 Use `mcp__malice__*` tools to interact with the running game server.
