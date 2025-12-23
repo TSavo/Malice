@@ -177,31 +177,48 @@ export class SSHServer {
         return ctx.reject(['keyboard-interactive', 'password']);
       }
 
+      if (ctx.method === 'none') {
+        // Allow anonymous/guest connections - game will handle authentication
+        if (this.config.debug) {
+          console.log(`[SSHServer] Anonymous connection: ${username}`);
+        }
+        authenticatedUsername = username;
+        authInfo = null; // No pre-auth, game handles login
+        return ctx.accept();
+      }
+
       if (ctx.method === 'keyboard-interactive') {
-        // Keyboard-interactive (password prompt)
+        // Keyboard-interactive - try password first, fall back to guest access
         return (ctx as any).prompt([
-          { prompt: 'Password: ', echo: false }
+          { prompt: 'Password (or press Enter for guest): ', echo: false }
         ], '', async (responses: string[]) => {
           const password = responses[0];
-          const valid = await this.passwordVerify(username, password);
-          if (valid) {
-            authenticatedUsername = username;
-            authInfo = null; // Password auth goes through normal game auth flow
-            if (this.config.debug) {
-              console.log(`[SSHServer] Password auth success: ${username}`);
+
+          // If password provided, try to authenticate
+          if (password && password.length > 0) {
+            const valid = await this.passwordVerify(username, password);
+            if (valid) {
+              authenticatedUsername = username;
+              authInfo = null; // Password auth goes through normal game auth flow
+              if (this.config.debug) {
+                console.log(`[SSHServer] Password auth success: ${username}`);
+              }
+              return ctx.accept();
             }
-            ctx.accept();
-          } else {
-            if (this.config.debug) {
-              console.log(`[SSHServer] Password auth failed: ${username}`);
-            }
-            ctx.reject();
           }
+
+          // No password or invalid password - allow as guest, game handles auth
+          authenticatedUsername = username;
+          authInfo = null;
+          if (this.config.debug) {
+            console.log(`[SSHServer] Guest access: ${username}`);
+          }
+          ctx.accept();
         });
       }
 
       if (ctx.method === 'password') {
-        // Direct password authentication
+        // Direct password authentication - try to verify, allow guest if fails
         const valid = await this.passwordVerify(username, ctx.password);
         if (valid) {
           authenticatedUsername = username;
@@ -211,11 +228,17 @@ export class SSHServer {
           }
           return ctx.accept();
         }
-        return ctx.reject();
+        // Allow as guest - game will handle authentication
+        authenticatedUsername = username;
+        authInfo = null;
+        if (this.config.debug) {
+          console.log(`[SSHServer] Guest access (password failed): ${username}`);
+        }
+        return ctx.accept();
       }
 
-      // Unknown method
-      return ctx.reject(['publickey', 'keyboard-interactive', 'password']);
+      // Unknown method - suggest available methods
+      return ctx.reject(['publickey', 'keyboard-interactive', 'password', 'none']);
     });
 
     // Handle session (shell) request
