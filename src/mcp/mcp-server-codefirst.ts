@@ -10,7 +10,7 @@
  * This is a thin transport layer - all logic lives in MOO objects.
  */
 
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { McpServer, ResourceTemplate } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { createServer, IncomingMessage, ServerResponse } from 'http';
 import { z } from 'zod';
@@ -275,6 +275,13 @@ Write composable code - loops, conditionals, multi-step operations all work.`,
   }
 
   /**
+   * Helper to get value from typed property or raw value
+   */
+  private getValue(v: any): any {
+    return v && typeof v === 'object' && 'type' in v ? v.value : v;
+  }
+
+  /**
    * Register resources for tool discovery
    */
   private registerResources(server: McpServer): void {
@@ -342,6 +349,508 @@ Write composable code - loops, conditionals, multi-step operations all work.`,
           return {
             contents: [{
               uri: 'moo://aliases',
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: String(err) }),
+            }],
+          };
+        }
+      }
+    );
+
+    // Object by ID - moo://objects/{id}
+    server.resource(
+      'objects/{id}',
+      new ResourceTemplate('moo://objects/{id}', { list: undefined }),
+      { description: 'Get object details by ID' },
+      async (uri: URL) => {
+        try {
+          const uriStr = uri.toString();
+          const match = uriStr.match(/moo:\/\/objects\/(.+)/);
+          if (!match) {
+            return {
+              contents: [{
+                uri: uriStr,
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: 'Invalid URI format' }),
+              }],
+            };
+          }
+
+          const idStr = match[1];
+          const objId = idStr.startsWith('#') ? parseInt(idStr.slice(1)) : parseInt(idStr);
+
+          const obj = await this.manager.load(objId);
+          if (!obj) {
+            return {
+              contents: [{
+                uri: uriStr,
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: `Object #${objId} not found` }),
+              }],
+            };
+          }
+
+          const parent = obj.get('parent') as RuntimeObject | undefined;
+          const serialized = this.serializeValue({
+            id: obj.id,
+            parent: parent?.id,
+            name: obj.get('name'),
+            description: obj.get('description'),
+            location: obj.get('location'),
+            methods: Object.keys(obj.getOwnMethods()),
+          });
+
+          return {
+            contents: [{
+              uri: uriStr,
+              mimeType: 'application/json',
+              text: JSON.stringify(serialized, null, 2),
+            }],
+          };
+        } catch (err) {
+          return {
+            contents: [{
+              uri: uri.toString(),
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: String(err) }),
+            }],
+          };
+        }
+      }
+    );
+
+    // Object by alias - moo://alias/{name}
+    server.resource(
+      'alias/{name}',
+      new ResourceTemplate('moo://alias/{name}', { list: undefined }),
+      { description: 'Get object by alias name' },
+      async (uri: URL) => {
+        try {
+          const uriStr = uri.toString();
+          const match = uriStr.match(/moo:\/\/alias\/(.+)/);
+          if (!match) {
+            return {
+              contents: [{
+                uri: uriStr,
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: 'Invalid URI format' }),
+              }],
+            };
+          }
+
+          const aliasName = match[1];
+          const objectManager = await this.manager.load(0);
+          const aliases = (objectManager?.get('aliases') as Record<string, number>) || {};
+          const objId = aliases[aliasName];
+
+          if (objId === undefined) {
+            return {
+              contents: [{
+                uri: uriStr,
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: `Alias '${aliasName}' not found` }),
+              }],
+            };
+          }
+
+          const obj = await this.manager.load(objId);
+          if (!obj) {
+            return {
+              contents: [{
+                uri: uriStr,
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: `Object #${objId} not found for alias '${aliasName}'` }),
+              }],
+            };
+          }
+
+          const parent = obj.get('parent') as RuntimeObject | undefined;
+          const serialized = this.serializeValue({
+            alias: aliasName,
+            id: obj.id,
+            parent: parent?.id,
+            name: obj.get('name'),
+            description: obj.get('description'),
+            methods: Object.keys(obj.getOwnMethods()),
+          });
+
+          return {
+            contents: [{
+              uri: uriStr,
+              mimeType: 'application/json',
+              text: JSON.stringify(serialized, null, 2),
+            }],
+          };
+        } catch (err) {
+          return {
+            contents: [{
+              uri: uri.toString(),
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: String(err) }),
+            }],
+          };
+        }
+      }
+    );
+
+    // Room state - moo://rooms/{id}
+    server.resource(
+      'rooms/{id}',
+      new ResourceTemplate('moo://rooms/{id}', { list: undefined }),
+      { description: 'Get room state with exits, contents, and players' },
+      async (uri: URL) => {
+        try {
+          const uriStr = uri.toString();
+          const match = uriStr.match(/moo:\/\/rooms\/(.+)/);
+          if (!match) {
+            return {
+              contents: [{
+                uri: uriStr,
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: 'Invalid URI format' }),
+              }],
+            };
+          }
+
+          const idStr = match[1];
+          const roomId = idStr.startsWith('#') ? parseInt(idStr.slice(1)) : parseInt(idStr);
+
+          const room = await this.manager.load(roomId);
+          if (!room) {
+            return {
+              contents: [{
+                uri: uriStr,
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: `Room #${roomId} not found` }),
+              }],
+            };
+          }
+
+          // Get room contents
+          const allObjs = await this.manager.db.listAll(false);
+          const contents = allObjs
+            .filter(doc => this.getValue(doc.properties.location) === roomId)
+            .map(doc => ({
+              id: doc._id,
+              name: this.getValue(doc.properties.name),
+            }));
+
+          // Get exits
+          const exits = room.get('exits') || {};
+          const exitDetails: any = {};
+          for (const [dir, destId] of Object.entries(exits)) {
+            if (typeof destId === 'number') {
+              const dest = await this.manager.load(destId);
+              exitDetails[dir] = {
+                id: destId,
+                name: dest?.get('name') || 'Unknown',
+              };
+            }
+          }
+
+          const serialized = this.serializeValue({
+            id: room.id,
+            name: room.get('name'),
+            description: room.get('description'),
+            exits: exitDetails,
+            contents,
+            coordinates: {
+              x: room.get('x'),
+              y: room.get('y'),
+              z: room.get('z'),
+            },
+          });
+
+          return {
+            contents: [{
+              uri: uriStr,
+              mimeType: 'application/json',
+              text: JSON.stringify(serialized, null, 2),
+            }],
+          };
+        } catch (err) {
+          return {
+            contents: [{
+              uri: uri.toString(),
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: String(err) }),
+            }],
+          };
+        }
+      }
+    );
+
+    // Players list - moo://players
+    server.resource(
+      'players',
+      'moo://players',
+      { description: 'List all player characters' },
+      async () => {
+        try {
+          const objectManager = await this.manager.load(0);
+          const aliases = (objectManager?.get('aliases') as Record<string, number>) || {};
+          const playerPrototypeId = aliases.player;
+          const adminPrototypeId = aliases.admin;
+
+          const allObjs = await this.manager.db.listAll(false);
+          const players = allObjs
+            .filter(doc => {
+              const parentId = this.getValue(doc.parent);
+              return parentId === playerPrototypeId || parentId === adminPrototypeId;
+            })
+            .map(doc => ({
+              id: doc._id,
+              playername: this.getValue(doc.properties.playername),
+              name: this.getValue(doc.properties.name),
+              location: this.getValue(doc.properties.location),
+              isConnected: this.getValue(doc.properties.isConnected) || false,
+            }));
+
+          return {
+            contents: [{
+              uri: 'moo://players',
+              mimeType: 'application/json',
+              text: JSON.stringify(players, null, 2),
+            }],
+          };
+        } catch (err) {
+          return {
+            contents: [{
+              uri: 'moo://players',
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: String(err) }),
+            }],
+          };
+        }
+      }
+    );
+
+    // AI NPCs list - moo://ai
+    server.resource(
+      'ai',
+      'moo://ai',
+      { description: 'List all AI-controlled NPCs' },
+      async () => {
+        try {
+          const $ai = this.manager.getAliases().get('ai');
+          if (!$ai) {
+            return {
+              contents: [{
+                uri: 'moo://ai',
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: '$.ai not bootstrapped' }),
+              }],
+            };
+          }
+
+          const registry = $ai.get('registry') || {};
+          const npcs = [];
+
+          for (const [npcIdStr, agentData] of Object.entries(registry)) {
+            const npcId = parseInt(npcIdStr);
+            const npc = await this.manager.load(npcId);
+            if (npc) {
+              npcs.push({
+                id: npcId,
+                name: npc.get('name'),
+                location: npc.get('location'),
+                personality: (agentData as any).personality,
+                isActive: (agentData as any).active || false,
+              });
+            }
+          }
+
+          return {
+            contents: [{
+              uri: 'moo://ai',
+              mimeType: 'application/json',
+              text: JSON.stringify(npcs, null, 2),
+            }],
+          };
+        } catch (err) {
+          return {
+            contents: [{
+              uri: 'moo://ai',
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: String(err) }),
+            }],
+          };
+        }
+      }
+    );
+
+    // AI NPC details - moo://ai/{id}
+    server.resource(
+      'ai/{id}',
+      new ResourceTemplate('moo://ai/{id}', { list: undefined }),
+      { description: 'Get AI NPC profile with personality and memories' },
+      async (uri: URL) => {
+        try {
+          const uriStr = uri.toString();
+          const match = uriStr.match(/moo:\/\/ai\/(.+)/);
+          if (!match) {
+            return {
+              contents: [{
+                uri: uriStr,
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: 'Invalid URI format' }),
+              }],
+            };
+          }
+
+          const idStr = match[1];
+          const npcId = idStr.startsWith('#') ? parseInt(idStr.slice(1)) : parseInt(idStr);
+
+          const $ai = this.manager.getAliases().get('ai');
+          if (!$ai) {
+            return {
+              contents: [{
+                uri: uriStr,
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: '$.ai not bootstrapped' }),
+              }],
+            };
+          }
+
+          const npc = await this.manager.load(npcId);
+          if (!npc) {
+            return {
+              contents: [{
+                uri: uriStr,
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: `NPC #${npcId} not found` }),
+              }],
+            };
+          }
+
+          const registry = ($ai.get('registry') || {}) as Record<string, any>;
+          const agentData = registry[String(npcId)] || {};
+
+          const serialized = this.serializeValue({
+            id: npcId,
+            name: npc.get('name'),
+            description: npc.get('description'),
+            location: npc.get('location'),
+            personality: agentData.personality,
+            systemPrompt: agentData.systemPrompt,
+            sessionId: agentData.sessionId,
+            active: agentData.active || false,
+            memories: npc.get('memories') || [],
+            notes: npc.get('notes') || {},
+          });
+
+          return {
+            contents: [{
+              uri: uriStr,
+              mimeType: 'application/json',
+              text: JSON.stringify(serialized, null, 2),
+            }],
+          };
+        } catch (err) {
+          return {
+            contents: [{
+              uri: uri.toString(),
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: String(err) }),
+            }],
+          };
+        }
+      }
+    );
+
+    // Plots list - moo://plots
+    server.resource(
+      'plots',
+      'moo://plots',
+      { description: 'List all active plots' },
+      async () => {
+        try {
+          const $plot = this.manager.getAliases().get('plot');
+          if (!$plot) {
+            return {
+              contents: [{
+                uri: 'moo://plots',
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: '$.plot not bootstrapped' }),
+              }],
+            };
+          }
+
+          const plots = await $plot.call('listPlots');
+          return {
+            contents: [{
+              uri: 'moo://plots',
+              mimeType: 'application/json',
+              text: JSON.stringify(plots, null, 2),
+            }],
+          };
+        } catch (err) {
+          return {
+            contents: [{
+              uri: 'moo://plots',
+              mimeType: 'application/json',
+              text: JSON.stringify({ error: String(err) }),
+            }],
+          };
+        }
+      }
+    );
+
+    // Plot details - moo://plots/{id}
+    server.resource(
+      'plots/{id}',
+      new ResourceTemplate('moo://plots/{id}', { list: undefined }),
+      { description: 'Get plot details and events' },
+      async (uri: URL) => {
+        try {
+          const uriStr = uri.toString();
+          const match = uriStr.match(/moo:\/\/plots\/(.+)/);
+          if (!match) {
+            return {
+              contents: [{
+                uri: uriStr,
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: 'Invalid URI format' }),
+              }],
+            };
+          }
+
+          const plotId = match[1];
+          const $plot = this.manager.getAliases().get('plot');
+          if (!$plot) {
+            return {
+              contents: [{
+                uri: uriStr,
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: '$.plot not bootstrapped' }),
+              }],
+            };
+          }
+
+          const plots = await $plot.call('listPlots') as any[];
+          const plot = plots.find(p => p.id === plotId);
+
+          if (!plot) {
+            return {
+              contents: [{
+                uri: uriStr,
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: `Plot '${plotId}' not found` }),
+              }],
+            };
+          }
+
+          return {
+            contents: [{
+              uri: uriStr,
+              mimeType: 'application/json',
+              text: JSON.stringify(plot, null, 2),
+            }],
+          };
+        } catch (err) {
+          return {
+            contents: [{
+              uri: uri.toString(),
               mimeType: 'application/json',
               text: JSON.stringify({ error: String(err) }),
             }],
