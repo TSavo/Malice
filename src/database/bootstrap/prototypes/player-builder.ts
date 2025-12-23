@@ -120,8 +120,10 @@ export class PlayerBuilder {
           location = await $load(location);
         }
         if (location && location.describe) {
-          // Trigger onArrived to register room verbs
-          await self.onArrived(location, null, null);
+          // Trigger room's onContentArrived to register exit verbs
+          if (location.onContentArrived) {
+            await location.onContentArrived(self, null, null);
+          }
           // Show room description (visual - uses see)
           if (location.describe) {
             const desc = await location.describe(self);

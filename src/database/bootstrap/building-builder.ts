@@ -331,9 +331,7 @@ export class BuildingBuilder {
                 },
               });
 
-              const exits = (sourceRoom.get('exits') as number[]) || [];
-              exits.push(exit.id);
-              sourceRoom.set('exits', exits);
+              await sourceRoom.call('addExit', exit);
             });
             continue;
           }
