@@ -3,6 +3,7 @@ import { RuntimeObjectImpl } from './runtime-object.js';
 import { ObjectCache } from './object-cache.js';
 import { getLoggerFacade, RESERVED_ALIASES } from './logger-facade.js';
 import * as bcrypt from 'bcrypt';
+import type { MCPTelnetClient } from '../mcp/telnet-client.js';
 import type {
   GameObject,
   ObjId,
@@ -70,6 +71,7 @@ export class ObjectManager {
   private cache: ObjectCache;
   private aliases = new Map<string, RuntimeObject>();
   public readonly db: ObjectDatabase; // Expose for DevTools direct access
+  private telnetClient?: MCPTelnetClient; // For $.session native methods
 
   // Track in-flight update operations (fire-and-forget writes from RuntimeObject)
   private pendingUpdateOperations = new Set<Promise<void>>();
@@ -818,6 +820,63 @@ export class ObjectManager {
       createdAt: new Date(), // For TTL index
     });
     return result.insertedId.toString();
+  }
+
+  /**
+   * Set the telnet client for session management
+   * Called by index.ts during server startup
+   */
+  setTelnetClient(client: MCPTelnetClient): void {
+    this.telnetClient = client;
+  }
+
+  /**
+   * Get telnet API object
+   * Exposed as $.telnet in MOO code
+   */
+  get telnet() {
+    const client = this.telnetClient;
+    if (!client) throw new Error('Telnet client not initialized');
+
+    return {
+      connect: async () => {
+        const result = await client.connect(undefined);
+        return {
+          sessionId: result.sessionId,
+          output: result.output,
+          message: 'Connected to MOO. Use this sessionId for subsequent commands.',
+        };
+      },
+
+      send: async (sessionId: string, command: string) => {
+        if (!sessionId) throw new Error('sessionId required');
+        if (!command) throw new Error('command required');
+        return await client.send(sessionId, command);
+      },
+
+      getLog: async (sessionId: string, lines?: number) => {
+        if (!sessionId) throw new Error('sessionId required');
+        const log = client.getLog(sessionId, lines);
+        const status = client.getStatus(sessionId);
+        return { ...status, log };
+      },
+
+      list: async () => {
+        const sessions = client.listSessions();
+        return { sessions, count: sessions.length };
+      },
+
+      close: async (sessionId: string) => {
+        if (!sessionId) throw new Error('sessionId required');
+        client.close(sessionId);
+        return { message: `Session ${sessionId} closed` };
+      },
+
+      getStatus: async (sessionId: string) => {
+        if (!sessionId) throw new Error('sessionId required');
+        return client.getStatus(sessionId);
+      },
+    };
   }
 
 }

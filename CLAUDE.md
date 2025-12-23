@@ -76,7 +76,8 @@ pass()       // Call parent's version of this method (MOO-style super)
 $load(id)    // Load object by ID
 $create({parent, properties, methods})  // Create new object
 $query(system, prompt, session?)        // Query Claude AI with MCP tools
-$<alias>     // Pre-resolved aliases: $room, $exit, $player, $recycler, etc.
+$.telnet     // Native telnet session management (admin use)
+$<alias>     // Pre-resolved aliases: $room, $exit, $player, $recycler, $session, etc.
 ```
 
 ### Key Directories
@@ -96,9 +97,8 @@ $<alias>     // Pre-resolved aliases: $room, $exit, $player, $recycler, etc.
 - **5556** - SSH server (secure player connections with key auth)
 - **8080** - WebSocket server (web clients)
 - **3000** - LSP REST API (VS Code extension)
-- **3001** - MCP server for Claude Code (`malice-moo` tools)
-- **3002** - CharGen MCP server (AI character creation)
-- **3003** - Session MCP server (telnet session + SSH key management)
+- **3010** - MCP server for Claude Code (code-first: execute_moo_code, admin access)
+- **3012** - Session MCP server (code-first: execute_session_code, sandboxed player access)
 - **9999** - DevTools WebSocket (VS Code extension)
 
 ## Code Style
