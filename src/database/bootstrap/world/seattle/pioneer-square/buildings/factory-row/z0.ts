@@ -77,7 +77,7 @@ The space smells of nothing. The air is filtered, the surfaces sanitized. The fa
           prototype: 'vendable',
           name: 'Nutrient Dispensing Station',
           description: 'A row of automated kiosks along the back wall. Screens display nutritional information and prices. Payment is handled electronically—scan your account, make your selection, receive your ration. The Continuum logo pulses gently on each screen.',
-          bank: 'bank',
+          bank: '$bank',
           bankAccount: 'CONTINUUM-NUTRIENT',
           spawnables: [
             {
