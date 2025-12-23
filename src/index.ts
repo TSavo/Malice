@@ -18,7 +18,6 @@ import { GameCoordinator } from './game/index.js';
 import { LSPApiServer } from './lsp/api-server.js';
 import { DevToolsServer } from './devtools/index.js';
 import { createMCPServer, createSessionMCPServer } from './mcp/index.js';
-import { createCharGenMCPServer } from './mcp/chargen-mcp-server.js';
 import { createWebServer } from './web/index.js';
 
 async function main() {
@@ -58,15 +57,10 @@ async function main() {
   console.log('🛠️  DevTools ready for VS Code extension');
 
   // Start MCP Server for Claude Code (Streamable HTTP)
-  // Use port 3010 to avoid conflicts with Claude Code's Chrome MCP mode (3001-3003)
+  // Uses code-first architecture - AI writes MOO code instead of calling individual tools
+  // Includes all tools: basic CRUD, plot, ai, notes, combat, world
   await createMCPServer(game.getObjectManager(), {
     port: 3010,
-    host: '0.0.0.0', // Allow Docker host access
-  });
-
-  // Start CharGen MCP Server for AI-driven character creation
-  await createCharGenMCPServer(game.getObjectManager(), {
-    port: 3011,
     host: '0.0.0.0', // Allow Docker host access
   });
 

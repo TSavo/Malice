@@ -2,7 +2,7 @@
 
 ## Overview
 
-Redesign character generation to be fully AI-driven. The AI agent has access to BOTH main MCP tools AND CharGen MCP tools. When a new player joins, a single `$query` call kicks off an autonomous agent that:
+Redesign character generation to be fully AI-driven using **code-first MCP**. The AI agent uses `execute_moo_code` to call MOO methods directly. When a new player joins, a single `$query` call kicks off an autonomous agent that:
 1. Creates a private interview room (with creative description)
 2. Spawns an NPC interviewer
 3. Tailors the NPC
@@ -11,9 +11,9 @@ Redesign character generation to be fully AI-driven. The AI agent has access to 
 6. On completion, cleans up and sends player to starting room
 
 **Key Architecture**:
-- `$query` modified to accept additional MCP servers as parameter
-- The AI agent uses main MCP tools (dig, ai.spawn, ai.tailor, move_object) for setup
-- The AI agent uses CharGen MCP tools for recording answers
+- Single code-first MCP server on port 3010 with all tools
+- The AI uses `execute_moo_code` to call $.charGen methods directly
+- The AI uses standard MCP tools (dig, ai, move_object) for setup
 - Player speech triggers `onSpokenTo` → resumes the Claude session
 
 ## Event Flow
@@ -21,25 +21,25 @@ Redesign character generation to be fully AI-driven. The AI agent has access to 
 ```
 1. AuthManager.onNewUser() → $.charGen.startNPCInterview(context, username, password)
 2. Create player object (minimal, no body yet)
-3. Call $query with chargen system prompt + CharGen MCP server
+3. Call $query with chargen system prompt
 4. AI agent autonomously:
    a. Creates interview room (using dig tool - creative description)
-   b. Spawns NPC interviewer (using ai.spawn)
-   c. Tailors NPC (using ai.tailor)
+   b. Spawns NPC interviewer (using ai tool)
+   c. Tailors NPC (using ai tool)
    d. Moves player into room (using move_object)
    e. Has NPC greet player and ask first question
-   f. Calls start_interview via CharGen MCP
+   f. Calls $.charGen.startInterview() via execute_moo_code
 5. AI turn ends
    ↓
 6. Player types response
-7. NPC.onSpokenTo → $query(systemPrompt, playerMessage, agentSession, {additionalMcpServers})
-8. AI interprets answer, calls answer_question via CharGen MCP
-9. AI asks next question (via ai.do "say ...")
+7. NPC.onSpokenTo → $query(systemPrompt, playerMessage, agentSession)
+8. AI interprets answer, calls $.charGen.answerQuestion() via execute_moo_code
+9. AI asks next question (via ai tool)
 10. AI turn ends
    ↓
 [Repeat 6-10 until all questions answered]
    ↓
-11. AI calls finish_interview (CharGen MCP)
+11. AI calls $.charGen.finishInterview() via execute_moo_code
 12. finishInterview creates body, moves player to starting room, cleans up room/NPC
 13. Player enters game world
 ```
@@ -48,48 +48,42 @@ Redesign character generation to be fully AI-driven. The AI agent has access to 
 
 | File | Changes |
 |------|---------|
-| `src/database/object-manager.ts` | Modify `$query` to accept additional MCP servers parameter |
-| `src/database/bootstrap/chargen-builder.ts` | Add `startNPCInterview()`, `interviewerPrompt`, `registerForRecycle()`, `cleanupForPlayer()`, update `finishInterview()` |
-| `src/mcp/chargen-mcp-server.ts` | Add `register_for_recycle` tool |
-| `src/database/bootstrap/prototypes/human-builder.ts` | Update `onSpokenTo` to pass additionalMcpServers for chargen-interviewer role |
-| `src/index.ts` | Already done - starts CharGen MCP on port 3002 |
+| `src/database/bootstrap/chargen-builder.ts` | ✅ DONE: `startNPCInterview()`, `interviewerPrompt`, `registerForRecycle()`, `cleanupForPlayer()`, `finishInterview()` |
+| `src/database/bootstrap/mcp-builder.ts` | ✅ DONE: Code-first MCP with all tools (no separate chargen server needed) |
+| `src/database/bootstrap/prototypes/human-builder.ts` | ✅ DONE: Removed additionalMcpServers parameter |
+| `src/database/bootstrap/prototypes/player-builder.ts` | ✅ DONE: Removed additionalMcpServers parameter |
+| `src/index.ts` | ✅ DONE: Single MCP server on port 3010 |
 
 ## Implementation Details
 
-### 0. Update `$query` to accept additional MCP servers (object-manager.ts)
+### Code-First MCP Architecture
 
-Modify the `query()` method signature to accept optional additional MCP servers:
+All CharGen functionality now uses the single code-first MCP server on port 3010. The AI writes MOO code using `execute_moo_code` to call $.charGen methods directly:
 
-```typescript
-async query(
-  systemPrompt: string,
-  prompt: string,
-  session?: string,
-  options?: { additionalMcpServers?: Record<string, { type: string; url: string }> }
-): Promise<{ response: string; session: string }> {
-  const { query: sdkQuery } = await import('@anthropic-ai/claude-agent-sdk');
+```javascript
+// Example: Start interview
+execute_moo_code({
+  code: `
+    const player = await $load(12345);
+    return await $.charGen.startInterview(player);
+  `
+})
 
-  // Base MCP servers
-  const mcpServers: Record<string, { type: string; url: string }> = {
-    'malice-moo': {
-      type: 'http',
-      url: 'http://localhost:3001/mcp',
-    },
-  };
+// Example: Answer question
+execute_moo_code({
+  code: `
+    const player = await $load(12345);
+    return await $.charGen.answerQuestion(player, "name", "John Smith");
+  `
+})
 
-  // Add any additional MCP servers
-  if (options?.additionalMcpServers) {
-    Object.assign(mcpServers, options.additionalMcpServers);
-  }
-
-  const queryOptions: Record<string, unknown> = {
-    systemPrompt,
-    mcpServers,
-    allowedTools: ['*'],
-    // ... rest unchanged
-  };
-  // ...
-}
+// Example: Finish interview
+execute_moo_code({
+  code: `
+    const player = await $load(12345);
+    return await $.charGen.finishInterview(player);
+  `
+})
 ```
 
 ### 1. New Method: `startNPCInterview(context, username, password)`
@@ -124,21 +118,17 @@ chargen.setMethod('startNPCInterview', `
 
 Your task:
 1. Create a private interview room using the dig tool (be creative with the description)
-2. Spawn yourself as an NPC interviewer using ai.spawn (role: "chargen-interviewer")
-3. Tailor yourself appropriately using ai.tailor
+2. Spawn yourself as an NPC interviewer using ai tool (role: "chargen-interviewer")
+3. Tailor yourself appropriately using ai tool
 4. Move the player into your room using move_object
 5. Greet them warmly and begin the character creation interview
-6. Call start_interview with their player ID
+6. Call $.charGen.startInterview() using execute_moo_code with their player ID
 7. Ask the first question
 
 Remember: After asking a question, STOP and wait for their response.\`;
 
-  // Call with CharGen MCP server added
-  $query(self.interviewerPrompt, kickoffPrompt, null, {
-    additionalMcpServers: {
-      'malice-chargen': { type: 'http', url: 'http://localhost:3002/mcp' }
-    }
-  }).then(result => {
+  // Call $query with interviewer prompt
+  $query(self.interviewerPrompt, kickoffPrompt, null).then(result => {
     // Store session on player for continuation (NPC doesn't exist yet)
     player.chargenAgentSession = result.session;
   });
@@ -161,17 +151,17 @@ Use the main MCP tools to set up the interview:
 5. **Greet the player** using ai(action="do", humanId=<your id>, command="say ...")
 
 ## Phase 2: Interview
-Use the CharGen MCP tools (malice-chargen server):
-- start_interview(playerId) - Call this first to get the question list
-- answer_question(playerId, questionId, answer) - Record each answer
-- get_next_question(playerId) - See what's left to ask
-- get_progress(playerId) - Review all answers
-- finish_interview(playerId) - Complete when all questions answered
+Use execute_moo_code to call $.charGen methods directly:
+- `await $.charGen.startInterview(player)` - Call this first to get the question list
+- `await $.charGen.answerQuestion(player, questionId, answer)` - Record each answer
+- `await $.charGen.getNextQuestion(player)` - See what's left to ask
+- `await $.charGen.getProgress(player)` - Review all answers
+- `await $.charGen.finishInterview(player)` - Complete when all questions answered
 
 ## How to Speak/Act
-Use ai(action="do", humanId=YOUR_ID, command="..."):
-- "say Hello, welcome!" - speak to the player
-- "emote smiles warmly" - perform an action
+Use ai tool with action="do":
+- `ai(action="do", humanId=YOUR_ID, command="say Hello, welcome!")` - speak to the player
+- `ai(action="do", humanId=YOUR_ID, command="emote smiles warmly")` - perform an action
 
 ## Interview Questions
 Guide the player through:
@@ -193,9 +183,9 @@ Guide the player through:
 ## CRITICAL RULES
 1. After asking a question, STOP and wait for the player's response
 2. Do NOT continue asking questions without player input
-3. Register objects for cleanup using register_for_recycle (CharGen MCP):
-   - register_for_recycle(playerId=<player id>, objectId=<room id>)
-   - register_for_recycle(playerId=<player id>, objectId=<your npc id>)
+3. Register objects for cleanup using execute_moo_code:
+   - `await $.charGen.registerForRecycle(playerId, roomId)`
+   - `await $.charGen.registerForRecycle(playerId, myId)`
 ```
 
 ### 3. Update `onNewUser()` - Route to NPC Interview
@@ -256,21 +246,17 @@ chargen.setMethod('cleanupForPlayer', `
 `);
 ```
 
-**Add MCP Tool (chargen-mcp-server.ts):**
-```typescript
-server.tool(
-  'register_for_recycle',
-  'Register an object (room, NPC) to be recycled when interview finishes.',
-  {
-    playerId: z.number().describe('Player object ID'),
-    objectId: z.number().describe('Object ID to recycle on completion'),
-  },
-  async ({ playerId, objectId }) => {
-    const chargen = await this.getCharGen();
-    const result = await chargen.registerForRecycle(playerId, objectId);
-    return { content: [{ type: 'text', text: JSON.stringify(result) }] };
-  }
-);
+**AI Usage (via execute_moo_code):**
+```javascript
+// Register room for recycling
+execute_moo_code({
+  code: `await $.charGen.registerForRecycle(${playerId}, ${roomId});`
+})
+
+// Register NPC for recycling
+execute_moo_code({
+  code: `await $.charGen.registerForRecycle(${playerId}, ${npcId});`
+})
 ```
 
 ### 5. Update `finishInterview()` - Use cleanupForPlayer
@@ -300,31 +286,25 @@ chargen.setMethod('finishInterview', `
 
 ### 6. Handle Continued Conversation (onSpokenTo)
 
-The NPC's `onSpokenTo` needs to pass the additional MCP servers when continuing:
+✅ DONE: The NPC's `onSpokenTo` now uses the single code-first MCP server:
 
 ```typescript
-// In human-builder.ts onSpokenTo, or in the chargen interviewer specifically:
-// When building the prompt and calling $query, include additionalMcpServers
-
-// Option: Check if this is a chargen NPC and add chargen MCP
-if (self.role === 'chargen-interviewer') {
-  $query(systemPrompt, userPrompt, self.agentSession, {
-    additionalMcpServers: {
-      'malice-chargen': { type: 'http', url: 'http://localhost:3002/mcp' }
-    }
-  }).then(result => { self.agentSession = result.session; });
-}
+// In human-builder.ts onSpokenTo - simplified
+$query(systemPrompt, userPrompt, self.interactionSession)
+  .then(result => {
+    self.interactionSession = result.session;
+  });
 ```
 
-## CharGen MCP Server (Already Implemented)
-
-The MCP server on port 3002 is already created with these tools:
-- `start_interview` - Initialize interview for a player
-- `get_next_question` - Get next unanswered question
-- `answer_question` - Record an answer
-- `get_progress` - Get all questions and answers
-- `finish_interview` - Complete chargen, create body
-- `get_suggestions` - Get suggestions for a question
+The AI interviewer has access to all $.charGen methods via `execute_moo_code`:
+- `await $.charGen.startInterview(player)` - Initialize interview for a player
+- `await $.charGen.getNextQuestion(player)` - Get next unanswered question
+- `await $.charGen.answerQuestion(player, questionId, answer)` - Record an answer
+- `await $.charGen.getProgress(player)` - Get all questions and answers
+- `await $.charGen.finishInterview(player)` - Complete chargen, create body
+- `await $.charGen.getSuggestions(questionId)` - Get suggestions for a question
+- `await $.charGen.registerForRecycle(playerId, objectId)` - Register object for cleanup
+- `await $.charGen.rejectPlayer(player, reason)` - Reject and disconnect player
 
 ## Key Design Decisions
 

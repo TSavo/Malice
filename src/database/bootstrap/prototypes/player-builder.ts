@@ -332,11 +332,7 @@ export class PlayerBuilder {
 
       try {
         // Run the query (awaited, not fire-and-forget)
-        const result = await $query(systemPrompt, 'The candidate says: "' + message + '"', session, {
-          additionalMcpServers: {
-            'malice-chargen': { type: 'http', url: 'http://localhost:3002/mcp' }
-          }
-        });
+        const result = await $query(systemPrompt, 'The candidate says: "' + message + '"', session);
         self.chargenAgentSession = result.session;
 
         // Register session with $ai for persistence (survives player logout)

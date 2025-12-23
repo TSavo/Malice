@@ -1025,20 +1025,12 @@ export class HumanBuilder {
       // Build user prompt
       const userPrompt = speakerName + ' says to you: "' + message + '"\\n\\nRespond in character.';
 
-      // Check if this is a chargen interviewer to add additional MCP servers
       const ai = await $.ai;
       const profile = await ai.getProfile(self.id);
-      const options = {};
-      if (profile && profile.role === 'chargen-interviewer') {
-        options.additionalMcpServers = {
-          'malice-chargen': { type: 'http', url: 'http://localhost:3002/mcp' }
-        };
-      }
-
       const role = profile?.role || 'npc';
 
       // Fire-and-forget query - don't block the input prompt
-      $query(systemPrompt, userPrompt, self.interactionSession, options)
+      $query(systemPrompt, userPrompt, self.interactionSession)
         .then(async (result) => {
           self.interactionSession = result.session;
 
