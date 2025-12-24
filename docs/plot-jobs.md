@@ -106,7 +106,7 @@ The filter `{ code: 'XYZ789' }` matches, so `plot.onJobHookTriggered()` is calle
 
 This automatically:
 - Adds an event to the plot log
-- Sets `needsAttentionAt` to now (so `plot({ action: "next" })` returns it)
+- Sets `needsAttentionAt` to now (so `$plotDB.getNext()` returns it)
 
 ### Step 6: Check the Event and Complete the Job
 
@@ -295,10 +295,10 @@ See [MCP-TOOLS.md](MCP-TOOLS.md) for complete parameter documentation.
 From Claude's perspective using MCP tools:
 
 ```
-1. plot({ action: "next" })
+1. $plotDB.getNext()
    → Returns plot with player's request
 
-2. plot({ action: "add_event", plotId, message: "Pick up package #55..." })
+2. const plot = await $load(plotId); await plot.addEvent({from: 'handler', message: "Pick up package #55..."})
    → Give instructions to player
 
 3. plot({ action: "create_job", plotId, jobId: "deliver-package", metadata: {...} })
@@ -310,24 +310,24 @@ From Claude's perspective using MCP tools:
 5. plot({ action: "register_hook", plotId, jobId, targetId: 100, eventName: "oneTimeCodeUsed", filter: { code } })
    → Watch locker for code usage
 
-6. plot({ action: "add_event", plotId, message: "Deliver to locker #100. Code: XYZ789" })
+6. const plot = await $load(plotId); await plot.addEvent({from: 'handler', message: "Deliver to locker #100. Code: XYZ789"})
    → Give code to player
 
 7. [Wait for hook to fire - player does the delivery]
 
-8. plot({ action: "next" })
+8. $plotDB.getNext()
    → Returns same plot (hook triggered needsAttentionAt)
 
-9. plot({ action: "get_events", plotId })
+9. const plot = await $load(plotId); const events = await plot.getEventLog()
    → See delivery confirmed in event log
 
-10. plot({ action: "complete_job", plotId, jobId: "deliver-package" })
+10. const plot = await $load(plotId); await plot.completeJob("deliver-package")
     → Mark job as completed
 
-11. plot({ action: "add_event", plotId, message: "Payment transferred. Job complete." })
+11. const plot = await $load(plotId); await plot.addEvent({from: 'handler', message: "Payment transferred. Job complete."})
     → Final response
 
-12. plot({ action: "close", plotId, status: "completed" })
+12. const plot = await $load(plotId); await plot.close("completed")
     → Mark plot as completed
 ```
 

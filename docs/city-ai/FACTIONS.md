@@ -243,7 +243,7 @@ Good citizens advance. Problem citizens get watched. Suspected Cartel sympathize
 
 ```javascript
 // Create plot for citizenship recruitment
-const result = await plot({ action: 'create', name: 'Citizenship: ' + playerName, metadata: {
+const result = await await $plotSpawner.createPlot( name: 'Citizenship: ' + playerName, metadata: {
   playerId: player.id,
   status: 'pending',
   stage: 'arrival'
