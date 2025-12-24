@@ -1814,9 +1814,23 @@ export class WebsiteBuilder {
   }
 
   private async registerRoutes(): Promise<void> {
-    const webRouter = this.manager.getAliases().get('webRouter');
+    // Load ObjectManager to get aliases
+    const objectManager = await this.manager.load(0);
+    if (!objectManager) {
+      console.log('⚠️ ObjectManager not found, routes not registered');
+      return;
+    }
+
+    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
+    const webRouterId = aliases.webRouter;
+    if (!webRouterId) {
+      console.log('⚠️ webRouter alias not found, routes not registered');
+      return;
+    }
+
+    const webRouter = await this.manager.load(webRouterId);
     if (!webRouter) {
-      console.log('⚠️ webRouter not found, routes not registered');
+      console.log('⚠️ webRouter object not found, routes not registered');
       return;
     }
 
