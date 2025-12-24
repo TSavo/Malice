@@ -410,34 +410,34 @@ The MCP server provides the `plot` tool:
 $plot.create( name: 'Mission', metadata: { type: 'delivery' } })
 
 // Get plot details
-plot({ action: 'get', plotId: 123 })
+await $load(123)
 
 // List plots
-plot({ action: 'list', status: 'active' })
+$plot.getByStatus('active')
 
 // Add event
 plot.addEvent({ plotId: 123, message: 'Something happened', from: 'handler' })
 
 // Set metadata
-plot({ action: 'set_metadata', plotId: 123, key: 'reward', value: 500 })
+const plot = await $load(123); await plot.setMetadata('reward', 500)
 
 // Create job
 plot.createJob( plotId: 123, jobId: 'delivery-1', expiresAt: '...' })
 
 // Set phases
-plot({ action: 'set_phases', plotId: 123, phases: [...] })
+const plot = await $load(123); await plot.setPhases([...])
 
 // Advance phase
-plot({ action: 'advance_phase', plotId: 123, jobId: 'delivery-1' })
+const plot = await $load(123); await plot.advancePhase('delivery-1')
 
 // Register hook
-plot({ action: 'register_hook', plotId: 123, jobId: 'delivery-1', targetId: 456, eventName: 'itemDeposited' })
+const plot = await $load(123); await plot.registerJobHook('delivery-1', 456, 'itemDeposited', {})
 
 // Complete job
 plot.completeJob( plotId: 123, jobId: 'delivery-1', reason: 'Success' })
 
 // Get next plot needing attention
-plot({ action: 'next' })
+$plot.next()
 ```
 
 ## Job Board
