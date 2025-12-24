@@ -438,121 +438,138 @@ Close a telnet session.
 // Returns: Confirmation
 ```
 
-## AI Registry (Consolidated Tool)
+## AI Registry ($ai)
 
-The `ai` tool is a consolidated interface for managing AI-controlled humans. AI humans are regular `$human` instances tracked by role in the `$ai` registry.
+Manage AI-controlled NPCs using the `$ai` object. AI humans are regular `$human` instances tracked by role.
 
-### Actions
-
-**Spawning & Management:**
-- `spawn` - Create a new AI-controlled human (role, name?, description?, locationId?, sex?, age?, personality?, history?, clothed?)
-- `despawn` - Remove an AI human (humanId, recycle?)
-- `list` - List all AI humans (role?)
-- `info` - Get detailed AI human info (humanId)
-- `do` - Execute a command as AI human (humanId, command)
-- `look` - Get what AI human sees (humanId)
-- `tailor` - Dress an NPC with AI tailor (humanId, context?)
-
-**Profile & Memory:**
-- `profile` - Get full NPC profile (humanId)
-- `setPersonality` - Set personality traits (humanId, personality)
-- `setHistory` - Set backstory/history (humanId, history)
-- `remember` - Store a critical memory (humanId, text, importance?, tags?)
-- `recall` - Get memories (humanId, importance?, tag?, limit?)
-- `forget` - Remove a memory by index (humanId, index)
-- `memories` - Get formatted memory summary (humanId, criticalOnly?)
-
-**Response Expectations:**
-- `expect` - Set timeout waiting for response from target (humanId, targetId, timeout?, prompt?, recurring?)
-- `cancelExpect` - Cancel a pending expectation (humanId, targetId)
-
-**Pathfinding:**
-- `path` - A* pathfinding between rooms (fromRoomId, toRoomId, ignoreLocks?, maxSteps?)
-- `walkPath` - Walk AI human along a path (humanId, path)
-
-**World Log:**
-- `worldLog` - Get world log entries (limit?)
-
-### Examples
+### Spawning & Management
 
 ```javascript
 // Spawn a guard
-ai({ action: "spawn", role: "guard", name: "Marcus", sex: "male", age: 35, locationId: 100 })
-// Returns: { id: 567, name: "Marcus", role: "guard" }
+const npc = await $ai.spawn({
+  role: "guard",
+  name: "Marcus",
+  sex: "male",
+  age: 35,
+  location: await $load(100)
+});
+// Returns: RuntimeObject (Human)
 
 // Spawn with auto-dressing
-ai({ action: "spawn", role: "guard", name: "Marcus", locationId: 100, clothed: true })
-// Returns: { id: 567, name: "Marcus", role: "guard", clothed: true }
+const dressed = await $ai.spawn({
+  role: "guard",
+  name: "Marcus",
+  location: await $load(100),
+  clothed: true
+});
 
 // Dress an existing NPC
-ai({ action: "tailor", humanId: 567 })
-ai({ action: "tailor", humanId: 567, context: "shabby, recently demoted" })
+await $tailor.dress(npc, "shabby, recently demoted");
 
 // See what the guard sees
-ai({ action: "look", humanId: 567 })
-// Returns: { location: "Lobby", exits: ["north", "south"], people: [...], items: [...] }
+const view = await $ai.look(npc.id);
 
 // Make the guard do things
-ai({ action: "do", humanId: 567, command: "say Halt! Who goes there?" })
-ai({ action: "do", humanId: 567, command: "north" })
+await $ai.do(npc.id, "say Halt! Who goes there?");
+await $ai.do(npc.id, "north");
 
-// Get profile (also available as resource moo://ai/567)
-ai({ action: "profile", humanId: 567 })
-
-// Store a memory
-ai({ action: "remember", humanId: 567, text: "Saw suspicious person near vault", importance: "important" })
+// Get info
+const info = await $ai.getInfo(npc.id);
 
 // List all guards
-ai({ action: "list", role: "guard" })
+const guards = await $ai.getByRole("guard");
 
+// Remove the AI
+await $ai.despawn(npc.id);  // Recycles by default
+await $ai.despawn(npc.id, false);  // Keep object
+```
+
+### Profile & Memory
+
+```javascript
+// Get full profile (also available as resource moo://ai/{id})
+const profile = await $ai.getProfile(npc.id);
+
+// Set personality/history
+await $ai.setPersonality(npc.id, "Gruff but fair.");
+await $ai.setHistory(npc.id, {
+  backstory: "Former soldier",
+  events: ["Survived the Burning"],
+  secrets: ["Has PTSD"]
+});
+
+// Store a memory
+await $ai.remember(npc.id, "Saw suspicious person near vault", "important", ["security"]);
+
+// Retrieve memories
+const memories = await $ai.recall(npc.id);
+const critical = await $ai.recall(npc.id, { importance: "critical" });
+
+// Remove memory
+await $ai.forget(npc.id, 0);  // By index
+```
+
+### Response Expectations
+
+```javascript
 // Set up response timeout (NPC expects player to respond within 5 minutes)
-ai({ action: "expect", humanId: 567, targetId: 11, timeout: 300000, prompt: "Player walked away" })
+await $ai.expectResponseFrom(npc.id, playerId, 300000, "Player walked away");
 
 // Cancel expectation
-ai({ action: "cancelExpect", humanId: 567, targetId: 11 })
+await $ai.cancelExpectation(npc.id, playerId);
+```
 
+### Pathfinding
+
+```javascript
 // Find path between rooms
-ai({ action: "path", fromRoomId: 100, toRoomId: 200 })
+const path = await $ai.path(100, 200);
 // Returns: { success: true, path: [{direction: "north", roomId: 150, distance: 1}, ...], totalDistance: 3 }
 
 // Walk NPC along a path
-ai({ action: "walkPath", humanId: 567, path: [{direction: "north", roomId: 150, distance: 1}] })
-
-// Get world log (AI activity)
-ai({ action: "worldLog", limit: 50 })
-
-// Remove the AI
-ai({ action: "despawn", humanId: 567, recycle: true })
+await $ai.walkPath(npc.id, path.path);
 ```
 
-## Notes (Consolidated Tool)
+### World Log
 
-The `notes` tool provides a consolidated interface for attaching notes to MOO objects. Notes support text content, authors, and tags for organization.
+```javascript
+// Get world log (AI activity log for deity NPCs)
+const log = await $ai.getWorldLog(50);  // Last 50 entries
+```
 
-### Actions
+See [AI/NPC Reference](./moo/reference/ai-npc.md) for full documentation.
 
-- `get` - Get all notes on an object (objectId)
-- `add` - Add a note to an object (objectId, text, author?, tags?)
-- `append` - Append to existing note by tag (objectId, tag, text, author?)
-- `delete` - Delete a note by index (objectId, index)
-- `search` - Search notes across objects (query?, tag?, author?, limit?)
-- `list_objects` - List all objects that have notes
+## Notes System ($notes)
+
+Attach metadata and tracking information to any object.
 
 ### Examples
 
 ```javascript
 // Add a note to an object
-notes({ action: "add", objectId: 123, text: "This needs review", author: "Claude", tags: ["review"] })
+const obj = await $load(123);
+await $notes.add(obj, "This needs review", player, ["review"]);
 
 // Get all notes on an object
-notes({ action: "get", objectId: 123 })
+const notes = await $notes.get(obj);
+// [{ text: "...", author: "player", timestamp: "...", tags: [...] }]
 
 // Search notes by tag
-notes({ action: "search", tag: "review" })
+const todos = await $notes.search("", { tag: "review" });
 
 // Delete a note
-notes({ action: "delete", objectId: 123, index: 0 })
+await $notes.delete(obj, 0);  // By index
+
+// Format for display
+const formatted = await $notes.format(obj);
+// [0] 1/15/2024 10:30:00 AM by player [review]
+//     This needs review
+
+// List all objects with notes
+const objects = await $notes.listObjects();
 ```
+
+See [Notes Reference](./moo/reference/notes.md) for full documentation.
 
 ## World Query (Consolidated Tool)
 
@@ -592,107 +609,127 @@ world({ action: "query", q: "(.name contains 'sword' or .name contains 'dagger')
 world({ action: "query", q: ".parent == 7", limit: 20, offset: 40 })
 ```
 
-## Plot System (Consolidated Tool)
+## Plot System ($plot)
 
-The `plot` tool is a consolidated interface for managing plots, jobs, and phases.
+Manage narrative arcs, missions, and jobs.
 
-### Actions
+### Plot Management
 
-**Plot Management:**
-- `create` - Create a new plot (name, metadata?)
-- `get` - Get plot details (plotId)
-- `list` - List plots (status?: active|completed|abandoned|failed)
-- `search` - Search plot events (query, limit?)
-- `close` - Close a plot (plotId, status, reason?)
-- `set_metadata` - Set plot metadata (plotId, key, value)
-- `add_event` - Add event to log (plotId, message, from?)
-- `get_events` - Get event log (plotId, limit?)
+```javascript
+// Create a new plot
+const plotId = await $plot.create("Water Main Repair", {
+  type: "infrastructure",
+  priority: "high"
+});
 
-**Phase Management:**
-- `set_phases` - Define phases for a plot (plotId, phases[])
-- `get_phases` - Get phase definitions (plotId)
+// Load and work with plot
+const plot = await $load(plotId);
 
-**Job Management:**
-- `create_job` - Create job in plot (plotId, jobId, metadata?, expiresAt?)
-- `get_job` - Get job details (plotId, jobId)
-- `complete_job` - Complete a job (plotId, jobId, reason?)
-- `fail_job` - Fail a job (plotId, jobId, reason?)
+// Add event to log
+await plot.addEvent({
+  from: "handler",
+  message: "Job posted. Awaiting workers.",
+  playerId: player.id
+});
 
-**Job Phase Tracking:**
-- `get_job_phase` - Get current phase for job (plotId, jobId)
-- `advance_phase` - Advance job to next phase (plotId, jobId)
-- `set_phase` - Set job to specific phase (plotId, jobId, phaseId)
+// Get event log
+const events = await plot.getEventLog();
+const text = await plot.getEventLogAsText();
 
-**Hooks:**
-- `register_hook` - Register job hook (plotId, jobId, targetId, eventName, filter?)
+// Set metadata
+await plot.setMetadata("priority", "critical");
 
-**Queue:**
-- `next` - Get next plot needing attention (bumps timer 24h)
-- `active` - List all active plots with metadata
+// Close plot
+await plot.close("completed", "Repair successful.");
+```
 
-## Combat Resolution (Consolidated Tool)
+### Job Management
 
-The `combat` tool is used by AI during combat resolution to manage fights between characters.
+```javascript
+const plot = await $load(plotId);
 
-### Actions
+// Create job
+await plot.createJob("repair_pipe", {
+  expiresAt: new Date(Date.now() + 24*60*60*1000).toISOString(),
+  reward: 50
+});
 
-- `status` - Get current combat state (combatId)
-- `context` - Get full combat context for AI resolution (combatId)
-- `check` - Perform skill check (combatId, combatantId, skillName, opposingLevel?)
-- `damage` - Apply damage to combatant (combatId, targetId, bodyPart, damageType, severity, cause?)
-- `emote` - Narrate combat action to room (combatId, text)
-- `effect` - Apply status effect (combatId, targetId, effect, intensity, duration?)
-- `end` - End combat (combatId, reason, winnerId?)
-- `next_round` - Advance to next round (combatId)
-- `list` - List all active combats
+// Get job details
+const job = await plot.getJob("repair_pipe");
 
-### Damage Types
-`cut`, `bruise`, `puncture`, `burn`, `laceration`, `abrasion`
+// Complete or fail job
+await plot.completeJob("repair_pipe", "Done.");
+await plot.failJob("repair_pipe", "Abandoned.");
+```
 
-### Body Parts
-`head`, `torso`, `leftShoulder`, `rightShoulder`, `leftThigh`, `rightThigh` (or specific part names)
+### Phases and Hooks
 
-### End Reasons
-`death`, `flee`, `surrender`, `knockout`, `intervention`
+```javascript
+const plot = await $load(plotId);
 
-### Status Effects
-`stunned`, `knockedDown`, `disarmed`, `winded`
+// Set phases
+await plot.setPhases([
+  { id: "start", name: "Initial Contact" },
+  { id: "travel", name: "En Route" },
+  { id: "complete", name: "Delivery" }
+]);
+
+// Track job phase
+const phase = await plot.getJobPhase("delivery_job");
+await plot.advancePhase("delivery_job");
+
+// Register hook
+await plot.registerJobHook(
+  "delivery_job",
+  lockerId,
+  "oneTimeCodeUsed",
+  { code: "XYZ789" }
+);
+```
+
+### Queue Management
+
+```javascript
+// Get next plot needing attention (bumps timer 24h)
+const next = await $plotDB.next();
+
+// List all active plots
+const active = await $plotDB.getByStatus("active");
+```
+
+See [Plot System Reference](./moo/reference/plots.md) for full documentation.
+
+## Combat Resolution ($combat)
+
+Combat management for AI-driven fight resolution.
 
 ### Example
 
 ```javascript
 // Get combat context for AI
-const ctx = await combat({ action: "context", combatId: "combat-123" });
+const ctx = await $combat.getContext("combat-123");
 
 // Perform a skill check
-const result = await combat({
-  action: "check",
-  combatId: "combat-123",
-  combatantId: 567,
-  skillName: "brawling",
-  opposingLevel: 50
-});
+const result = await $combat.check("combat-123", 567, "brawling", 50);
 
 // Apply damage if hit
 if (result.success) {
-  await combat({
-    action: "damage",
-    combatId: "combat-123",
-    targetId: 568,
-    bodyPart: "torso",
-    damageType: "bruise",
-    severity: 30,
-    cause: "fist"
-  });
+  await $combat.damage("combat-123", 568, "torso", "bruise", 30, "fist");
 }
 
 // Narrate the action
-await combat({
-  action: "emote",
-  combatId: "combat-123",
-  text: "Marcus lands a solid punch to his opponent's chest!"
-});
+await $combat.emote("combat-123", "Marcus lands a solid punch to his opponent's chest!");
+
+// End combat
+await $combat.end("combat-123", "knockout", 567);
 ```
+
+**Damage Types:** `cut`, `bruise`, `puncture`, `burn`, `laceration`, `abrasion`
+**Body Parts:** `head`, `torso`, `leftShoulder`, `rightShoulder`, `leftThigh`, `rightThigh`, etc.
+**End Reasons:** `death`, `flee`, `surrender`, `knockout`, `intervention`
+**Status Effects:** `stunned`, `knockedDown`, `disarmed`, `winded`
+
+See [Combat Guide](./city-ai/COMBAT.md) for full documentation.
 
 ---
 
@@ -752,42 +789,47 @@ const lockProto = results.find(r => r.name === "Lock");
 
 ```javascript
 // 1. Spawn a guard
-const guard = await ai({ action: "spawn", role: "guard", name: "Marcus", locationId: 100 });
+const guard = await $ai.spawn({
+  role: "guard",
+  name: "Marcus",
+  location: await $load(100)
+});
 
 // 2. See what the guard sees
-const view = await ai({ action: "look", humanId: guard.id });
+const view = await $ai.look(guard.id);
 
 // 3. Make the guard do things
-await ai({ action: "do", humanId: guard.id, command: "say Halt!" });
+await $ai.do(guard.id, "say Halt!");
 
 // 4. Check the guard's profile (via resource)
 const profile = await readResource(`moo://ai/${guard.id}`);
 
 // 5. When no longer needed
-await ai({ action: "despawn", humanId: guard.id, recycle: true });
+await $ai.despawn(guard.id);
 ```
 
 ### AI City Management with Plot Jobs
 
 ```javascript
 // 1. Check for pending plots
-const result = await plot({ action: "next" });
+const next = await $plotDB.next();
 
-if (result.plot) {
+if (next.plot) {
+  const plot = await $load(next.plot.id);
+
   // 2. Read event history
-  const events = await plot({ action: "get_events", plotId: result.plot.id });
+  const events = await plot.getEventLog();
 
-  // 3. Use other MCP tools to affect the world
-  const item = await spawn_item({
-    prototypeId: 40,
-    locationId: result.plot.metadata.targetRoomId,
-    properties: { name: "package" }
+  // 3. Create items in the world
+  const item = await $recycler.create($item, {
+    name: "package"
   });
+  const targetRoom = await $load(plot.metadata.targetRoomId);
+  await item.moveTo(targetRoom, player);
 
   // 4. Add narrative event
-  await plot({
-    action: "add_event",
-    plotId: result.plot.id,
+  await plot.addEvent({
+    from: "handler",
     message: "A courier arrives with a package."
   });
 }
