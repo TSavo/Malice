@@ -169,15 +169,15 @@ $ai.do(ID, ":waves")
 
 ### Memory Management
 ```javascript
-ai({ action: "remember", humanId: ID, text: "...", importance: "critical" })
-ai({ action: "recall", humanId: ID })
+$ai.remember(ID, "...", "critical")
+$ai.recall(ID)
 ```
 
 ### World Interaction
 ```javascript
 $ai.do(ID, "get sword")
 $ai.do(ID, "go north")
-ai({ action: "look", humanId: ID })
+$ai.look(ID)
 ```
 
 ### Resources (Read-Only)
@@ -191,7 +191,7 @@ ai({ action: "look", humanId: ID })
 ### Personality
 
 ```javascript
-ai({ action: 'setPersonality', humanId: 3028, personality: {
+$ai.setPersonality(3028, {
   traits: ['suspicious', 'loyal', 'gruff'],
   quirks: ['tugs at beard when thinking'],
   values: ['duty', 'honor'],
@@ -203,7 +203,7 @@ ai({ action: 'setPersonality', humanId: 3028, personality: {
 ### History
 
 ```javascript
-ai({ action: 'setHistory', humanId: 3028, history: {
+$ai.setHistory(3028, {
   backstory: 'Former soldier who retired after the Border Wars.',
   events: ['Enlisted at age 18', 'Rose to sergeant'],
   relationships: { 'Mayor Chen': 'Respects her leadership' },
@@ -215,7 +215,7 @@ ai({ action: 'setHistory', humanId: 3028, history: {
 
 ```javascript
 // NPCs can create their own memories
-ai({ action: 'remember', humanId: 3028,
+$ai.remember(3028,
   text: 'Met Jack - tall, scar on cheek, claims to be a trader',
   importance: 'critical',
   tags: ['player', 'met']
@@ -254,7 +254,7 @@ janet.agentSystemPrompt = janet.agentSystemPrompt.replace(
 
 Add behavioral guidance via notes:
 ```javascript
-notes({ action: 'add', objectId: 3028,
+$notes.add(await $load(3028),
   text: 'Can offer 10% discount to citizens in good standing',
   tags: ['power', 'discount']
 })

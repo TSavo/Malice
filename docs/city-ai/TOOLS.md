@@ -767,17 +767,24 @@ await mcp.set_property({ objectId: player.id, name: 'credits', value: 100 });
 
 ```javascript
 // Create plot
-const result = await plot({ action: 'create', name: 'Repair: Water Main', metadata: { type: 'repair' } });
-const plotId = result.plotId;
+const plot = await $plotSpawner.createPlot('Repair: Water Main');
+await plot.setMetadata('type', 'repair');
 
 // Create job
-await plot({ action: 'create_job', plotId, jobId: 'fix_pipe', metadata: { reward: 50 } });
+await plot.createJob('fix_pipe', { reward: 50 });
 
 // Spawn supervisor NPC
-await ai({ action: 'spawn', role: 'supervisor', name: 'Site Foreman', locationId: repairSiteId });
+const supervisor = await $ai.spawn({
+  role: 'supervisor',
+  name: 'Site Foreman',
+  location: await $load(repairSiteId)
+});
 
 // Log event
-await plot({ action: 'add_event', plotId, message: 'Job posted. Awaiting workers.' });
+await plot.addEvent({
+  from: 'system',
+  message: 'Job posted. Awaiting workers.'
+});
 ```
 
 ### Check room contents (using resource)
