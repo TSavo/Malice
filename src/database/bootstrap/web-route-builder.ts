@@ -62,8 +62,14 @@ export class WebRouteBuilder {
     if (!this.webRoute) return;
 
     this.webRoute.setMethod('match', `
-      const requestPath = args[0];
+      let requestPath = args[0];
       const requestMethod = args[1];
+
+      // Strip query string before matching
+      const queryIndex = requestPath.indexOf('?');
+      if (queryIndex !== -1) {
+        requestPath = requestPath.substring(0, queryIndex);
+      }
 
       // Check method match
       const methods = Array.isArray(self.methods) ? self.methods : [self.methods];

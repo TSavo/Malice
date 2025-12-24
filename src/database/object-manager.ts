@@ -443,6 +443,28 @@ export class ObjectManager {
   }
 
   /**
+   * Get all object IDs from the cache
+   * Returns an array of all object IDs (used by MOO code for iteration)
+   */
+  getAllIds(): ObjId[] {
+    const ids: ObjId[] = [];
+
+    // Get all positive IDs from the array cache
+    for (let i = 0; i < this.cache['objects'].length; i++) {
+      if (this.cache['objects'][i] !== undefined) {
+        ids.push(i);
+      }
+    }
+
+    // Get all infrastructure object IDs (negative IDs)
+    for (const id of this.cache['infrastructureObjects'].keys()) {
+      ids.push(id);
+    }
+
+    return ids;
+  }
+
+  /**
    * Wait for all in-flight RuntimeObject auto-persist writes to complete.
    *
    * This is primarily intended for tests, to avoid disconnecting Mongo while
