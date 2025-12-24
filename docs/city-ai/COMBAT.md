@@ -246,7 +246,7 @@ call_method({
 For NPCs, use `ai do` to execute commands:
 
 ```javascript
-ai({ action: 'do', npcId: 200, command: 'emote staggers backward, blood welling from the new cut across his forearm' })
+$ai.do(200, 'emote staggers backward, blood welling from the new cut across his forearm')
 ```
 
 **Mix and match.** A complex exchange might use all three:
@@ -512,7 +512,7 @@ call_method({
 })
 
 // Marcus reacts via ai do
-ai({ action: 'do', npcId: 200, command: 'emote howls, stumbling back - but he\\'s grinning. His other hand is already coming up with Jack\\'s dropped wallet.' })
+$ai.do(200, 'emote howls, stumbling back - but he\\'s grinning. His other hand is already coming up with Jack\\'s dropped wallet.')
 ```
 
 Use this for:
@@ -674,7 +674,7 @@ call_method({
 })
 
 // NPC sees the opening - use ai do
-ai({ action: 'do', npcId: 200, command: 'emote sees his chance and lunges forward' })
+$ai.do(200, 'emote sees his chance and lunges forward')
 
 // The actual reload happens via the gun's load() method
 // Find the fresh magazine in their inventory, then:
@@ -762,11 +762,11 @@ If an NPC or player wants to grab a dropped weapon, use `ai do` for NPCs or `mov
 
 ```javascript
 // Marcus (NPC, id: 200) goes for the dropped knife
-ai({ action: 'do', npcId: 200, command: 'get knife' })
+$ai.do(200, 'get knife')
 
 // This physically moves the knife to Marcus's hands
 // Have him emote it too
-ai({ action: 'do', npcId: 200, command: 'emote dives for the fallen knife, fingers closing around the handle. He comes up grinning, armed again.' })
+$ai.do(200, 'emote dives for the fallen knife, fingers closing around the handle. He comes up grinning, armed again.')
 ```
 
 **Player retrieves weapon:**

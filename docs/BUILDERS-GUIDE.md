@@ -152,10 +152,10 @@ The $ai registry tracks AI-controlled humans (use the consolidated `ai` tool):
 $ai.spawn({ role: "guard", name: "Marcus", location: await $load(100), sex: "male", age: 35 });
 
 // List all guards
-ai({ action: "list", role: "guard" });
+$ai.getByRole("guard");
 
 // Remove when done
-ai({ action: "despawn", humanId: 567 });
+$ai.despawn(567);
 ```
 
 ### Faction System Integration
