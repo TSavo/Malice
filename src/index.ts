@@ -55,6 +55,9 @@ async function main() {
   const telnetClient = new MCPTelnetClient('localhost', 5555);
   objectManager.setTelnetClient(telnetClient);
 
+  // Store game coordinator so MOO code can access connections
+  objectManager.setGameCoordinator(game);
+
   // Start LSP API Server for VS Code extension (HTTP REST)
   const lspApi = new LSPApiServer(game.getObjectManager(), 3000);
   lspApi.start();
