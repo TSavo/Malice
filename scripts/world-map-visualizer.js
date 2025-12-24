@@ -4,14 +4,8 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-// Directories to scan for world coordinates
-const WORLD_DIRS = [
-  '../src/database/bootstrap/world/seattle/pioneer-square/yesler-way',
-  '../src/database/bootstrap/world/seattle/pioneer-square/occidental-park',
-  '../src/database/bootstrap/world/seattle/pioneer-square/1st-ave-s',
-  '../src/database/bootstrap/world/seattle/pioneer-square/buildings/smith-tower',
-  '../src/database/bootstrap/world/seattle/pioneer-square/buildings/underground-complex',
-];
+// Root directory for world files
+const WORLD_ROOT = path.join(__dirname, '../src/database/bootstrap/world');
 
 function extractCoordsFromFile(filePath) {
   const content = fs.readFileSync(filePath, 'utf8');
@@ -19,24 +13,30 @@ function extractCoordsFromFile(filePath) {
   const matches = [];
   let match;
   while ((match = regex.exec(content))) {
+    const relativePath = path.relative(WORLD_ROOT, filePath);
     matches.push({
       x: parseInt(match[1]),
       y: parseInt(match[2]),
       z: parseInt(match[3]),
       file: path.basename(filePath),
+      path: relativePath,
     });
   }
   return matches;
 }
 
-function collectCoords(dirs) {
+function scanDirectory(dir) {
   let coords = [];
-  for (const dir of dirs) {
-    const absDir = path.join(__dirname, dir);
-    if (!fs.existsSync(absDir)) continue;
-    const files = fs.readdirSync(absDir).filter(f => f.endsWith('.ts'));
-    for (const file of files) {
-      coords = coords.concat(extractCoordsFromFile(path.join(absDir, file)));
+  if (!fs.existsSync(dir)) return coords;
+
+  const entries = fs.readdirSync(dir, { withFileTypes: true });
+  for (const entry of entries) {
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      // Recurse into subdirectories
+      coords = coords.concat(scanDirectory(fullPath));
+    } else if (entry.isFile() && entry.name.endsWith('.ts')) {
+      coords = coords.concat(extractCoordsFromFile(fullPath));
     }
   }
   return coords;
@@ -76,12 +76,29 @@ function printMap(map, zLevel) {
   console.log('x:', xs.join(' '));
 }
 
-const allCoords = collectCoords(WORLD_DIRS);
+console.log(`Scanning world directory: ${WORLD_ROOT}\n`);
+const allCoords = scanDirectory(WORLD_ROOT);
+console.log(`Found ${allCoords.length} coordinate entries\n`);
 const map = buildMap(allCoords);
 
-// Print a few example levels
-printMap(map, 10); // Smith Tower floor 10
-printMap(map, -4); // Underground z=-4
-printMap(map, 0);  // Surface (if any rooms at z=0)
+// Show available z-levels
+const zLevels = Object.keys(map).map(Number).sort((a, b) => b - a);
+console.log(`Available z-levels: ${zLevels.join(', ')}`);
+console.log(`Range: ${Math.min(...zLevels)} to ${Math.max(...zLevels)}\n`);
+
+// Print statistics for each level
+console.log('=== Level Statistics ===');
+for (const z of zLevels) {
+  const roomCount = Object.values(map[z]).reduce((sum, row) => sum + Object.keys(row).length, 0);
+  console.log(`z=${z.toString().padStart(3)}: ${roomCount.toString().padStart(4)} rooms`);
+}
+console.log();
+
+// Print maps for key levels
+printMap(map, 0);   // Surface
+printMap(map, -1);  // Underground level 1
+printMap(map, -4);  // Underground level 4
+printMap(map, 1);   // Smith Tower floor 1
+printMap(map, 10);  // Smith Tower floor 10
 
 // To print other levels, call printMap(map, zLevel);
