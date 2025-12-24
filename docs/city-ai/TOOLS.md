@@ -11,10 +11,9 @@ You interact with the Malice MOO by writing native MOO code using `execute_moo_c
 execute_moo_code({
   code: `
     // Create a plot
-    const plotId = await $plot.create('Water Main Repair', {
-      type: 'infrastructure',
-      priority: 'high'
-    });
+    const plot = await $plotSpawner.createPlot('Water Main Repair');
+    await plot.setMetadata('type', 'infrastructure');
+    await plot.setMetadata('priority', 'high');
 
     // Spawn an NPC
     const npc = await $ai.spawn({
@@ -25,9 +24,12 @@ execute_moo_code({
     });
 
     // Log event
-    await $plot.addEvent(plotId, 'Job posted. Awaiting workers.', 'system');
+    await plot.addEvent({
+      from: 'system',
+      message: 'Job posted. Awaiting workers.'
+    });
 
-    return {plotId, npcId: npc.id};
+    return {plotId: plot.id, npcId: npc.id};
   `
 })
 ```
@@ -468,11 +470,10 @@ Manage narrative arcs and missions using the plot system.
 Create a narrative container:
 
 ```javascript
-const plotId = await $plot.create('Water Main Repair', {
-  type: 'infrastructure',
-  priority: 'high'
-});
-// Returns: plot ID (number)
+const plot = await $plotSpawner.createPlot('Water Main Repair');
+await plot.setMetadata('type', 'infrastructure');
+await plot.setMetadata('priority', 'high');
+// Returns: RuntimeObject (Plot instance)
 ```
 
 ### list

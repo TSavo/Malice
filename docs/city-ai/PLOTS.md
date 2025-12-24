@@ -49,7 +49,7 @@ PLOT
 ### Basic Plot
 
 ```javascript
-const result = await $plot.create( name: 'Water Crisis: Refugee Camp', metadata: {
+const result = await $plotSpawner.createPlot( name: 'Water Crisis: Refugee Camp', metadata: {
   type: 'infrastructure',
   priority: 'high',
   location: { x: 5, y: -3 },
@@ -161,7 +161,7 @@ Plots that unfold over realistic timeframes.
 
 **Day 0: Request**
 ```javascript
-const result = await $plot.create( name: 'Construction: The Rusty Nail Bar', metadata: {
+const result = await $plotSpawner.createPlot( name: 'Construction: The Rusty Nail Bar', metadata: {
   type: 'construction',
   owner: playerId,
   location: { x: -5, y: 8, z: 0 },
@@ -246,7 +246,7 @@ await plot.registerJobHook('repair_pipe', brokenPipeId, 'repaired', {});
 When a hook fires, the plot needs attention:
 
 ```javascript
-const result = await $plot.next();
+const result = await $plotDB.getNext();
 
 if (result.plot) {
   // Check what happened
@@ -265,7 +265,7 @@ if (result.plot) {
 ### Listing Active Plots
 
 ```javascript
-const active = await $plot.getByStatus('active');
+const active = await $plotDB.byStatus('active');
 ```
 
 ### Checking Plot Status
@@ -340,7 +340,7 @@ Workers should be visible:
 
 ```javascript
 // 1. Create plot
-const result = await $plot.create( name: 'Recruitment: ' + playerName, metadata: {
+const result = await $plotSpawner.createPlot( name: 'Recruitment: ' + playerName, metadata: {
   type: 'recruitment',
   playerId: player.id,
   stage: 'initial_contact'
@@ -385,7 +385,7 @@ Understanding how $.plot works under the hood.
 
 ### The $.plot Prototype
 
-Every plot is an instance of `$.plot` (object #72). When you call `$plot.create()`, it creates a child of this prototype.
+Every plot is an instance of `$.plot` (object #72). When you call `$plotSpawner.createPlot()`, it creates a child of this prototype.
 
 **Core properties:**
 ```javascript
@@ -464,13 +464,13 @@ target.plotHooks = {
 2. Emit checks `self.plotHooks['repaired']`
 3. For each matching hook, loads the plot and calls `onJobHookTriggered`
 4. Plot adds event to log, sets `needsAttentionAt` metadata
-5. Next `$plot.next()` call returns this plot
+5. Next `$plotDB.getNext()` call returns this plot
 
 ### The Attention Queue
 
 Plots needing attention have `needsAttentionAt` set in metadata.
 
-**How `$plot.next()` works:**
+**How `$plotDB.getNext()` works:**
 1. Finds all active plots
 2. Filters to those with `needsAttentionAt` set
 3. Returns the oldest (FIFO queue)
@@ -550,7 +550,7 @@ plot.unregisterJobHook(jobId, targetId, eventName)
    └── Adds: "Job fix_pipe: repaired by PlayerName"
    └── Sets: metadata.needsAttentionAt = now
 
-4. You call $plot.next()
+4. You call $plotDB.getNext()
    └── Returns plot 123 with full event log
 
 5. You respond and complete the job
@@ -590,7 +590,7 @@ A new player catches the Cartel's attention.
 
 ```javascript
 // Phase 1: Observation
-const result = await $plot.create( name: 'Cartel Eval: ' + playerName, metadata: {
+const result = await $plotSpawner.createPlot( name: 'Cartel Eval: ' + playerName, metadata: {
   type: 'cartel_recruitment',
   playerId: player.id,
   stage: 'observation'
@@ -627,7 +627,7 @@ Sister Gray wants something broken.
 
 ```javascript
 // 1. Create plot
-const result = await $plot.create( name: 'Cartel Op: Fabrication Delay', metadata: {
+const result = await $plotSpawner.createPlot( name: 'Cartel Op: Fabrication Delay', metadata: {
   type: 'cartel_operation',
   objective: 'sabotage',
   target: 'fabrication_factory',
@@ -683,7 +683,7 @@ Someone needs to get inside Pluribus and stay there.
 **Key point:** The infiltrator IS a citizen. They passed real vetting. They do real work. The difference is loyalty.
 
 ```javascript
-const result = await $plot.create( name: 'Cartel Mole: ' + playerName, metadata: {
+const result = await $plotSpawner.createPlot( name: 'Cartel Mole: ' + playerName, metadata: {
   type: 'cartel_infiltration',
   playerId: player.id,
   stage: 'placement'
@@ -723,7 +723,7 @@ Someone needs to die.
 7. Consequences unfold (investigation, retaliation)
 
 ```javascript
-const result = await $plot.create( name: 'Cartel Sanction: ' + targetName, metadata: {
+const result = await $plotSpawner.createPlot( name: 'Cartel Sanction: ' + targetName, metadata: {
   type: 'cartel_wetwork',
   target: targetId,
   priority: 'critical',
@@ -760,7 +760,7 @@ Pluribus assigns a delivery job. The Cartel wants to intercept.
 
 ```javascript
 // Pluribus creates delivery plot
-const pluribusPlot = await $plot.create( name: 'Delivery: Medical Supplies', metadata: {
+const pluribusPlot = await $plotSpawner.createPlot( name: 'Delivery: Medical Supplies', metadata: {
   type: 'delivery',
   faction: 'pluribus',
   package: packageId,
@@ -768,7 +768,7 @@ const pluribusPlot = await $plot.create( name: 'Delivery: Medical Supplies', met
 }});
 
 // Cartel creates interception plot
-const cartelPlot = await $plot.create( name: 'Cartel: Intercept Medical', metadata: {
+const cartelPlot = await $plotSpawner.createPlot( name: 'Cartel: Intercept Medical', metadata: {
   type: 'cartel_intercept',
   target_plot: pluribusPlot.plotId,
   target_package: packageId

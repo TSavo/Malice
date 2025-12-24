@@ -196,7 +196,7 @@ Create narratives and quests via MCP (use the consolidated `plot` tool):
 
 ```javascript
 // Create a plot
-$plot.create( name: "Missing Jewels", metadata: { participants: [100], type: "investigation" } });
+$plotSpawner.createPlot( name: "Missing Jewels", metadata: { participants: [100], type: "investigation" } });
 
 // Add a job with a hook
 plot({ action: "create_job", plotId: 500, jobId: "find_jewels", metadata: { reward: 100 } });

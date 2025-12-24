@@ -19,10 +19,10 @@ The plot system has these key components:
 
 ```javascript
 // Create a new plot
-const plot = await $plot.create({ name: 'Delivery Mission' });
+const plot = await $plotSpawner.createPlot({ name: 'Delivery Mission' });
 
 // Create via MCP tool
-$plot.create( name: 'Escort Mission', metadata: { difficulty: 'hard' } })
+$plotSpawner.createPlot( name: 'Escort Mission', metadata: { difficulty: 'hard' } })
 ```
 
 ### Plot Properties
@@ -395,7 +395,7 @@ const activePlots = await $plotDB.list('active');
 const completedPlots = await $plotDB.list('completed');
 
 // Get plots needing attention (bumps attention timer)
-const nextPlot = await $plotDB.next();
+const nextPlot = await $plotDB.getNext();
 
 // Search plot events
 const results = await $plotDB.search('package');
@@ -407,13 +407,13 @@ The MCP server provides the `plot` tool:
 
 ```javascript
 // Create plot
-$plot.create( name: 'Mission', metadata: { type: 'delivery' } })
+$plotSpawner.createPlot( name: 'Mission', metadata: { type: 'delivery' } })
 
 // Get plot details
 await $load(123)
 
 // List plots
-$plot.getByStatus('active')
+$plotDB.byStatus('active')
 
 // Add event
 plot.addEvent({ plotId: 123, message: 'Something happened', from: 'handler' })
@@ -437,7 +437,7 @@ const plot = await $load(123); await plot.registerJobHook('delivery-1', 456, 'it
 plot.completeJob( plotId: 123, jobId: 'delivery-1', reason: 'Success' })
 
 // Get next plot needing attention
-$plot.next()
+$plotDB.getNext()
 ```
 
 ## Job Board
