@@ -185,7 +185,7 @@ const foreman = await $ai.spawn({ role: 'supervisor', name: 'Construction Forema
 await plot.addEvent({ plotId, message: 'Day 1: Demolition begun. Wall section removed. Debris clearing in progress.' });
 
 // Update metadata
-await plot({ action: 'set_metadata', plotId, key: 'day', value: 1 });
+await plot.setMetadata('day', 1);
 ```
 
 **Day 2: Progress**
@@ -195,7 +195,7 @@ await set_property({ objectId: adjacentRoomId, name: 'description', value: origi
 
 await plot.addEvent({ plotId, message: 'Day 2: Framing complete. Electrical rough-in started. Plumbing connections made.' });
 
-await plot({ action: 'set_metadata', plotId, key: 'day', value: 2 });
+await plot.setMetadata('day', 2);
 ```
 
 **Day 3: Completion**
@@ -218,7 +218,7 @@ await $ai.despawn(foreman.id );
 // Complete the plot
 await plot.addEvent({ plotId, message: 'Day 3: Construction complete. The Rusty Nail is open for business.' });
 
-await plot({ action: 'close', plotId, status: 'completed', reason: 'Construction successful.' });
+await plot.close('completed', 'Construction successful.');
 ```
 
 ## Using Hooks
@@ -228,7 +228,7 @@ Hooks watch for in-game events and notify the plot system.
 ### Registering a Hook
 
 ```javascript
-await plot({ action: 'register_hook', plotId, jobId: 'repair_pipe', targetId: brokenPipeId, eventName: 'repaired', filter: {} });
+await plot.registerJobHook('repair_pipe', brokenPipeId, 'repaired', {});
 ```
 
 ### Common Hook Events
@@ -246,7 +246,7 @@ await plot({ action: 'register_hook', plotId, jobId: 'repair_pipe', targetId: br
 When a hook fires, the plot needs attention:
 
 ```javascript
-const result = await plot({ action: 'next' });
+const result = await $plot.next();
 
 if (result.plot) {
   // Check what happened
@@ -265,19 +265,20 @@ if (result.plot) {
 ### Listing Active Plots
 
 ```javascript
-const active = await plot({ action: 'list', status: 'active' });
+const active = await $plot.getByStatus('active');
 ```
 
 ### Checking Plot Status
 
 ```javascript
-const events = await plot({ action: 'get_events', plotId });
+const events = await plot.getEventLog();
 ```
 
 ### Searching Plot History
 
 ```javascript
-const results = await plot({ action: 'search', query: 'water main', limit: 10 });
+// Note: Search by text not available directly - use getEventLog() and filter
+const results = []; // TODO: implement search
 ```
 
 ## Plot Lifecycle
@@ -295,7 +296,7 @@ Objectives not met. Deadline passed or critical failure.
 Plot cancelled before completion.
 
 ```javascript
-await plot({ action: 'close', plotId, status: 'failed', reason: 'Worker abandoned site. Deadline exceeded.' });
+await plot.close('failed', 'Worker abandoned site. Deadline exceeded.');
 // status can be: 'completed', 'failed', 'abandoned'
 ```
 
@@ -360,13 +361,14 @@ await $ai.do(recruiter.id, 'say Citizenship means food, shelter, work. Register 
 await plot.addEvent({ plotId, message: 'Initial contact made. Player informed of citizenship benefits.' });
 
 // 6. Update stage
-await plot({ action: 'set_metadata', plotId, key: 'stage', value: 'referred' });
+await plot.setMetadata('stage', 'referred');
 
 // 7. Create job to watch for registration
 await plot.createJob( plotId, jobId: 'await_registration', metadata: { type: 'registration_watch' }});
 
 // 8. Register hook on biometric scanner at City Services
-await plot({ action: 'register_hook', plotId, jobId: 'await_registration', targetId: biometricScannerId, eventName: 'scanComplete', filter: { playerId: player.id }});
+const plot = await $load(plotId);
+await plot.registerJobHook('await_registration', biometricScannerId, 'scanComplete', { playerId: player.id });
 
 // 9. Recruiter exits naturally
 await $ai.do(recruiter.id, 'say Think about it.');
@@ -383,7 +385,7 @@ Understanding how $.plot works under the hood.
 
 ### The $.plot Prototype
 
-Every plot is an instance of `$.plot` (object #72). When you call `plot({ action: 'create' })`, it creates a child of this prototype.
+Every plot is an instance of `$.plot` (object #72). When you call `$plot.create()`, it creates a child of this prototype.
 
 **Core properties:**
 ```javascript
@@ -434,7 +436,7 @@ This is the key to reactive plots.
 
 **Registration:**
 ```javascript
-await plot({ action: 'register_hook', plotId: 123, jobId: 'repair_pipe', targetId: 456, eventName: 'repaired', filter: {} });
+const plot = await $load(123); await plot.registerJobHook('repair_pipe', 456, 'repaired', {});
 ```
 
 **What happens internally:**
@@ -462,13 +464,13 @@ target.plotHooks = {
 2. Emit checks `self.plotHooks['repaired']`
 3. For each matching hook, loads the plot and calls `onJobHookTriggered`
 4. Plot adds event to log, sets `needsAttentionAt` metadata
-5. Next `plot({ action: 'next' })` call returns this plot
+5. Next `$plot.next()` call returns this plot
 
 ### The Attention Queue
 
 Plots needing attention have `needsAttentionAt` set in metadata.
 
-**How `plot({ action: 'next' })` works:**
+**How `$plot.next()` works:**
 1. Finds all active plots
 2. Filters to those with `needsAttentionAt` set
 3. Returns the oldest (FIFO queue)
@@ -548,7 +550,7 @@ plot.unregisterJobHook(jobId, targetId, eventName)
    └── Adds: "Job fix_pipe: repaired by PlayerName"
    └── Sets: metadata.needsAttentionAt = now
 
-4. You call plot({ action: 'next' })
+4. You call $plot.next()
    └── Returns plot 123 with full event log
 
 5. You respond and complete the job
@@ -604,7 +606,7 @@ await plot.addEvent({ plotId,
 // Spawn recruiter, approach player, give first test job
 // See JOBS.md for job mechanics
 
-await plot({ action: 'set_metadata', plotId, key: 'stage', value: 'first_contact' });
+await plot.setMetadata('stage', 'first_contact');
 
 // Phase 3: Evaluation
 // Did they complete the job? Accurately? On time?
@@ -615,9 +617,8 @@ await plot({ action: 'set_metadata', plotId, key: 'stage', value: 'first_contact
 // If failed: cut contact, mark as unreliable
 // If betrayed: mark as burned, initiate consequences
 
-await plot({ action: 'close', plotId, status: 'completed', 
-  reason: 'Subject evaluated. Outcome: [recruited/rejected/burned]' 
-});
+const plot = await $load(plotId);
+await plot.close('completed', 'Subject evaluated. Outcome: [recruited/rejected/burned]');
 ```
 
 ### Cartel Sabotage Plot
@@ -653,11 +654,8 @@ await plot.createJob( plotId, jobId: 'execution', metadata: {
 }});
 
 // 5. Register hook on target
-await plot({ action: 'register_hook', plotId, jobId: 'execution', 
-  targetId: factoryMachineId, 
-  eventName: 'damaged', 
-  filter: {}
-});
+const plot = await $load(plotId);
+await plot.registerJobHook('execution', factoryMachineId, 'damaged', {});
 
 // 6. Exfiltration phase
 // Did they get out clean? Did anyone see them?
@@ -665,9 +663,8 @@ await plot({ action: 'register_hook', plotId, jobId: 'execution',
 
 // 7. Payment
 // Handler meets asset, delivers payment, debriefs
-await plot({ action: 'close', plotId, status: 'completed', 
-  reason: 'Target damaged. Asset exfiltrated. No attribution.'
-});
+const plot = await $load(plotId);
+await plot.close('completed', 'Target damaged. Asset exfiltrated. No attribution.');
 ```
 
 ### Cartel Infiltration Plot
@@ -744,11 +741,8 @@ await plot.addEvent({ plotId,
 // Let the player figure out how to do it
 
 // Register hook for target death
-await plot({ action: 'register_hook', plotId, jobId: 'execution', 
-  targetId: targetId, 
-  eventName: 'died', 
-  filter: {}
-});
+const plot = await $load(plotId);
+await plot.registerJobHook('execution', targetId, 'died', {});
 
 // On completion: massive consequences
 // Pluribus investigation

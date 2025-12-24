@@ -99,7 +99,7 @@ await plot.createJob( plotId, jobId: 'repair_main_7734', metadata: {
 ### Step 3: Register Completion Hook
 
 ```javascript
-await plot({ action: 'register_hook', plotId, jobId: 'repair_main_7734', targetId: waterMainObjectId, eventName: 'repaired', filter: {} });
+const plot = await $load(plotId); await plot.registerJobHook('repair_main_7734', waterMainObjectId, 'repaired', {});
 ```
 
 ### Step 4: Announce the Job
@@ -195,10 +195,10 @@ Hooks watch for specific events:
 
 ```javascript
 // Watch for item deposit
-await plot({ action: 'register_hook', plotId, jobId: 'delivery_123', targetId: dropoffContainerId, eventName: 'itemDeposited', filter: { itemType: 'supply_crate' }});
+const plot = await $load(plotId); await plot.registerJobHook('delivery_123', dropoffContainerId, 'itemDeposited', { itemType: 'supply_crate' });
 
 // Watch for repair action
-await plot({ action: 'register_hook', plotId, jobId: 'repair_456', targetId: brokenPipeId, eventName: 'repaired', filter: {} });
+const plot = await $load(plotId); await plot.registerJobHook('repair_456', brokenPipeId, 'repaired', {});
 ```
 
 ### Polling via plot next
@@ -206,7 +206,7 @@ await plot({ action: 'register_hook', plotId, jobId: 'repair_456', targetId: bro
 The job queue returns jobs needing attention:
 
 ```javascript
-const result = await plot({ action: 'next' });
+const result = await $plot.next();
 
 if (result.plot) {
   // Check events, respond appropriately
@@ -230,7 +230,7 @@ await set_property({ objectId: workerId, name: 'credits', value: currentCredits 
 await plot.addEvent({ plotId, message: 'Job completed by Worker #' + workerId + '. 50 credits paid.' });
 
 // Close the plot
-await plot({ action: 'close', plotId, status: 'completed', reason: 'Repair successful.' });
+const plot = await $load(plotId); await plot.close('completed', 'Repair successful.');
 ```
 
 ### Failed Job
@@ -256,7 +256,7 @@ await spawn_item({ prototypeId: signPrototypeId, location: await $load(cityServi
 
 ```javascript
 // Get active jobs
-const result = await plot({ action: 'list', status: 'active' });
+const result = await $plot.getByStatus('active');
 
 // Format as text
 let boardText = 'AVAILABLE WORK ORDERS:\n\n';
@@ -351,7 +351,7 @@ await plot.createJob( plotId, jobId: 'emergency_repair', metadata: {
 const supervisor = await $ai.spawn({ role: 'supervisor', name: 'Repair Foreman', location: await $load(nearestRoomId) });
 
 // 5. Register completion hook
-await plot({ action: 'register_hook', plotId, jobId: 'emergency_repair', targetId: brokenObjectId, eventName: 'repaired', filter: {} });
+const plot = await $load(plotId); await plot.registerJobHook('emergency_repair', brokenObjectId, 'repaired', {});
 
 // 6. Announce
 await plot.addEvent({ plotId, message: 'EMERGENCY: Water main break. 100 credit reward. Report to Foreman.' });
@@ -363,7 +363,7 @@ await plot.completeJob( plotId, jobId: 'emergency_repair', reason: 'Repair compl
 
 // 9. Pay worker, despawn supervisor, close plot
 await $ai.despawn(supervisor.id );
-await plot({ action: 'close', plotId, status: 'completed', reason: 'Infrastructure restored.' });
+const plot = await $load(plotId); await plot.close('completed', 'Infrastructure restored.');
 ```
 
 ---
@@ -493,7 +493,7 @@ await notes({
 // Spawn guards, set patrol schedules, etc.
 
 // 5. Register hooks if needed
-await plot({ action: 'register_hook', plotId, jobId: 'observation', targetId: loadingDockId, eventName: 'player_observed', filter: { playerId: player.id }});
+const plot = await $load(plotId); await plot.registerJobHook('observation', loadingDockId, 'player_observed', { playerId: player.id });
 ```
 
 ### Evaluating Cartel Jobs
