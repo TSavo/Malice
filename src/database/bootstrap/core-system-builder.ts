@@ -26,6 +26,8 @@ import { WebsiteBuilder } from './website-builder.js';
 import { MCPBuilder } from './mcp-builder.js';
 import { SessionBuilder } from './session-builder.js';
 import { TailorBuilder } from './tailor-builder.js';
+import { WebRouteBuilder } from './web-route-builder.js';
+import { WebRouterBuilder } from './web-router-builder.js';
 
 /**
  * Orchestrates building all core system objects
@@ -90,10 +92,12 @@ export class CoreSystemBuilder {
     const pluribusBuilder = new PluribusBuilder(this.manager);
     const maskBuilder = new MaskBuilder(this.manager);
     const sisterGrayBuilder = new SisterGrayBuilder(this.manager);
-    const websiteBuilder = new WebsiteBuilder(this.manager);
     const mcpBuilder = new MCPBuilder(this.manager);
     const sessionBuilder = new SessionBuilder(this.manager);
     const tailorBuilder = new TailorBuilder(this.manager);
+    const webRouteBuilder = new WebRouteBuilder(this.manager);
+    const webRouterBuilder = new WebRouterBuilder(this.manager);
+    const websiteBuilder = new WebsiteBuilder(this.manager);
 
     await authManagerBuilder.build();
     await charGenBuilder.build();
@@ -126,7 +130,9 @@ export class CoreSystemBuilder {
     await pluribusBuilder.build(agentId); // Agent as parent for Pluribus (it acts)
     await maskBuilder.build(wearableId); // Wearable prototype as parent for Mask
     await sisterGrayBuilder.build(humanId); // Human as parent for Sister Gray
-    await websiteBuilder.build(); // Website objects
+    await webRouteBuilder.build(); // Web route prototype
+    await webRouterBuilder.build(); // Web router object
+    await websiteBuilder.build(); // Website objects (includes API routes)
     await mcpBuilder.build(); // MCP code-first tools
     await sessionBuilder.build(); // Session management wrapper
     await tailorBuilder.build(); // AI costume designer
@@ -155,6 +161,8 @@ export class CoreSystemBuilder {
     await pluribusBuilder.registerAlias();
     await maskBuilder.registerAlias();
     await sisterGrayBuilder.registerAlias();
+    await webRouteBuilder.registerAlias();
+    await webRouterBuilder.registerAlias();
     await websiteBuilder.registerAliases();
     await mcpBuilder.registerAliases();
     await tailorBuilder.registerAlias();
@@ -261,6 +269,18 @@ export class CoreSystemBuilder {
     await pluribusBuilder.registerAlias();
     await maskBuilder.registerAlias();
     await sisterGrayBuilder.registerAlias();
+
+    // Rebuild WebRoute methods
+    console.log('  Rebuilding WebRoute methods...');
+    const webRouteBuilder = new WebRouteBuilder(this.manager);
+    await webRouteBuilder.build(true);
+    await webRouteBuilder.registerAlias();
+
+    // Rebuild WebRouter methods
+    console.log('  Rebuilding WebRouter methods...');
+    const webRouterBuilder = new WebRouterBuilder(this.manager);
+    await webRouterBuilder.build(true);
+    await webRouterBuilder.registerAlias();
 
     // Rebuild Website methods
     console.log('  Rebuilding Website methods...');
