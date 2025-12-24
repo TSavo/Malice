@@ -123,7 +123,7 @@ OBJECT ID: #${npc.id}
 You have access to MCP tools. Use:
 - $ai.do(${npc.id}, "say ...") to speak
 - $ai.do(${npc.id}, ":...") to emote
-- ai({ action: "remember", ... }) to save important information
+- $ai.remember(npcId, text, importance) to save important information
 `;
 ```
 
@@ -279,7 +279,7 @@ await $ai.setPersonality(guard.id, {
   fears: ['something happening on her watch']
 });
 
-notes({ action: 'add', objectId: guard.id,
+$notes.add(await $load(guard.id),
   text: 'Can be convinced to look the other way with VERY good reason or high bribe'
 });
 ```
@@ -297,7 +297,7 @@ await $ai.setPersonality(merchant.id, {
   fears: ['losing customers to competition']
 });
 
-notes({ action: 'add', objectId: merchant.id,
+$notes.add(await $load(merchant.id),
   text: 'Has connections to black market. Will trade info for info.'
 });
 ```

@@ -324,7 +324,7 @@ const result = await $query(systemPrompt, userPrompt, previousSession);
 The agent has access to all MCP tools and can:
 - Read game state via resources
 - Modify objects via tools
-- Execute commands via `ai({ action: "do", ... })`
+- Execute commands via `$ai.do(npcId, command)`
 
 ### onSpokenTo(speaker, message)
 

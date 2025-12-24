@@ -580,16 +580,16 @@ Use the notes system to provide guidance:
 
 ```javascript
 // Behavior guidance
-await notes({ action: 'add', objectId: npcId, text: 'Should be hostile to anyone wearing gang colors', tags: ['behavior'] });
+await $notes.add(await $load(npcId), 'Should be hostile to anyone wearing gang colors', 'system', ['behavior']);
 
 // Knowledge hints
-await notes({ action: 'add', objectId: npcId, text: 'Knows about the hidden tunnel under the factory', tags: ['knowledge'] });
+await $notes.add(await $load(npcId), 'Knows about the hidden tunnel under the factory', 'system', ['knowledge']);
 
 // Plot connections
-await notes({ action: 'add', objectId: npcId, text: 'Will be involved in the smuggling plot - potential informant', tags: ['plot', 'smuggling'] });
+await $notes.add(await $load(npcId), 'Will be involved in the smuggling plot - potential informant', 'system', ['plot', 'smuggling']);
 
 // Interaction style
-await notes({ action: 'add', objectId: npcId, text: 'Speaks in short sentences. Never uses contractions when serious.', tags: ['speech'] });
+await $notes.add(await $load(npcId), 'Speaks in short sentences. Never uses contractions when serious.', 'system', ['speech']);
 ```
 
 ### Managing Memories
@@ -874,15 +874,15 @@ await ai({
 
 ```javascript
 // Behavior guidelines
-await notes({ action: 'add', objectId: guard.id, text: 'Challenge everyone entering. Check citizenship.', tags: ['behavior'] });
-await notes({ action: 'add', objectId: guard.id, text: 'More relaxed with known citizens. Stern with strangers.', tags: ['behavior'] });
+await $notes.add(await $load(guard.id), 'Challenge everyone entering. Check citizenship.', 'system', ['behavior']);
+await $notes.add(await $load(guard.id), 'More relaxed with known citizens. Stern with strangers.', 'system', ['behavior']);
 
 // Knowledge
-await notes({ action: 'add', objectId: guard.id, text: 'Knows the factory layout intimately', tags: ['knowledge'] });
-await notes({ action: 'add', objectId: guard.id, text: 'Aware of the smuggling rumors but has no proof', tags: ['knowledge', 'plot'] });
+await $notes.add(await $load(guard.id), 'Knows the factory layout intimately', 'system', ['knowledge']);
+await $notes.add(await $load(guard.id), 'Aware of the smuggling rumors but has no proof', 'system', ['knowledge', 'plot']);
 
 // Speech patterns
-await notes({ action: 'add', objectId: guard.id, text: 'Uses military terminology. Brief sentences. "Citizen" not names.', tags: ['speech'] });
+await $notes.add(await $load(guard.id), 'Uses military terminology. Brief sentences. "Citizen" not names.', 'system', ['speech']);
 ```
 
 ### Step 5: NPC Is Ready
