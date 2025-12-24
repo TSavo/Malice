@@ -15,40 +15,61 @@ import type { RuntimeObject } from '../../../../types/object.js';
  *     { type: 'retinal', part: 'eye', message: 'Retinal scan failed.' },
  *     { type: 'fingerprint', part: 'hand', message: 'Fingerprint scan failed.' }
  *   ]
+ * - allowedFaction: string - Faction name that can access this lock (null = no faction restriction)
+ * - factionDenyMessage: string - Custom message shown when faction check fails
  * - legacy fields (scannerType, requiredBodyPart) are still supported for single-scan configs
  *
  * Methods:
- * - canAccess(agent, target): Checks required scans and authorization
+ * - canAccess(agent, target): Checks faction, then required scans and authorization
  */
  export class BiometricLockBuilder {
    constructor(private manager: ObjectManager) {}
  
    async build(lockId: number): Promise<RuntimeObject> {
      const parentObj = await this.manager.load(lockId);
-     const obj = await this.manager.create({
-       parent: parentObj!,
-       properties: {
-         name: 'Biometric Lock',
-         description: 'A biometric scanner with a red LED.',
-         authorizedUsers: {}, // { target: [player objects] }
-         scannerType: 'retinal', // legacy single-scan type
-         requiredBodyPart: 'eye', // legacy single-scan part
-         scanners: [], // preferred multi-scan config: [{ type, part, message? }]
-       },
-       methods: {},
-     });
+      const obj = await this.manager.create({
+        parent: parentObj!,
+        properties: {
+          name: 'Biometric Lock',
+          description: 'A biometric scanner with a red LED.',
+          authorizedUsers: {}, // { target: [player objects] }
+          scannerType: 'retinal', // legacy single-scan type
+          requiredBodyPart: 'eye', // legacy single-scan part
+          scanners: [], // preferred multi-scan config: [{ type, part, message? }]
+          allowedFaction: null, // Faction name that can access this lock (null = no faction restriction)
+          factionDenyMessage: null, // Custom message shown when faction check fails
+        },
+        methods: {},
+      });
  
-     obj.setMethod('canAccess', `
-       /** Check if agent can access target via biometric scan.
-        *  @param agent - The agent requesting access
-        *  @param target - The target (floor number, room, etc.)
-        *  @returns true to allow, or rejection string to deny
-        */
-       const agent = args[0];
-       const target = args[1];
- 
-        // Helper: check a single scan requirement (including coverage)
-        const runScan = async (scan) => {
+      obj.setMethod('canAccess', `
+        /** Check if agent can access target via faction check, then biometric scan.
+         *  @param agent - The agent requesting access
+         *  @param target - The target (floor number, room, etc.)
+         *  @returns true to allow, or rejection string to deny
+         */
+        const agent = args[0];
+        const target = args[1];
+
+        // Check faction restriction first (runs before biometric scans)
+        const allowedFaction = self.allowedFaction;
+        if (allowedFaction) {
+          const faction = await $.faction;
+          if (!faction) {
+            return 'Access control unavailable.';
+          }
+
+          const agentFaction = await faction.getFaction(agent);
+          if (agentFaction !== allowedFaction) {
+            return self.factionDenyMessage || ('Access denied. ' + allowedFaction + ' personnel only.');
+          }
+
+          // If faction matches, still run biometric scans (security layering)
+          // Falls through to scan checks below
+        }
+
+         // Helper: check a single scan requirement (including coverage)
+         const runScan = async (scan) => {
           const requiredPart = scan?.part || self.requiredBodyPart;
           if (!requiredPart) return true;
  

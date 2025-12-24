@@ -68,17 +68,19 @@ The car is spotless, recently maintained. It smells faintly of cleaning solution
           37: '%PROMENADE',
           38: "%ODL", // Floor 38 observation deck
         },
-        locks: ['%L1', '%LR'],
+        locks: ['%L_CORP', '%LR'],
       },
     },
 
-    '%L1': {
-      // Elevator biometric lock
+    '%L_CORP': {
+      // Corporate elevator lock for floor 3
       prototype: 'biometricLock',
-      name: 'Elevator Retina Scanner',
-      description: 'A recessed retinal scanner with a steady red glow.',
+      name: 'Corporate Access Scanner',
+      description: 'A sleek retinal scanner with a corporate emblem. The indicator glows blue when active.',
+      allowedFaction: 'Corporate',
+      factionDenyMessage: 'Corporate clearance required. Your faction is not authorized for this floor.',
       scanners: [
-        { type: 'retinal', part: 'eye', message: 'Retinal scan failed.' },
+        { type: 'retinal', part: 'eye', message: 'Biometric scan failed.' },
       ],
       authorizedUsers: {
         3: [],

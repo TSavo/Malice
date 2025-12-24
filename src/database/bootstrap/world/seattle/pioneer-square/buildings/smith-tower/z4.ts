@@ -67,9 +67,9 @@ export const building = {
       description: 'A compact landing with scuffed brass trim and a single call panel.',
       x: -12, y: 10, z: 4,
       exits: {
-        north: { room: '%A2_z4', door: '%D_A2_z4' },
+        south: { room: '%A2_z4', door: '%D_A2_z4' },
         east: { room: '%B2_z4', door: '%D_B2_z4' },
-        south: { room: '%C3_z4', door: '%D_C3_z4' },
+        north: { room: '%C3_z4', door: '%D_C3_z4' },
         in: '%E',
       },
       methods: {

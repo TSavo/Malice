@@ -1138,6 +1138,642 @@ export class WebsiteBuilder {
         };
       `);
     }
+
+    // 4. MapRoute - /map (public HTML page)
+    if (aliases.mapRoute) {
+      this._mapRoute = await this.manager.load(aliases.mapRoute);
+    }
+    if (!this._mapRoute) {
+      this._mapRoute = await this.manager.create({
+        parent: webRoute,
+        properties: {
+          name: 'Map Page Route',
+          description: 'Public 3D map view (above-ground only)',
+          path: '/map',
+          methods: ['GET'],
+          contentType: 'text/html',
+          requiresAuth: false,
+        },
+        methods: {},
+      });
+    }
+
+    if (this._mapRoute) {
+      this._mapRoute.setMethod('handleRequest', `
+        // Generate HTML for public map view
+        const html = \`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Malice World Map</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      font-family: monospace;
+      background: #000;
+      color: #0f0;
+    }
+    #info {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(0, 0, 0, 0.9);
+      padding: 15px;
+      border: 1px solid #0f0;
+      max-width: 300px;
+      z-index: 100;
+    }
+    #info h2 {
+      margin: 0 0 10px 0;
+      color: #0ff;
+    }
+    #controls {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      background: rgba(0, 0, 0, 0.9);
+      padding: 10px;
+      border: 1px solid #0f0;
+    }
+    button {
+      background: #000;
+      color: #0f0;
+      border: 1px solid #0f0;
+      padding: 5px 10px;
+      margin: 2px;
+      cursor: pointer;
+      font-family: monospace;
+    }
+    button:hover {
+      background: #0f0;
+      color: #000;
+    }
+    #tooltip {
+      position: absolute;
+      background: rgba(0, 0, 0, 0.9);
+      padding: 8px;
+      border: 1px solid #0ff;
+      pointer-events: none;
+      display: none;
+      z-index: 100;
+    }
+  </style>
+</head>
+<body>
+  <div id="info">
+    <h2>World Map (Public)</h2>
+    <div id="stats">Loading...</div>
+  </div>
+  <div id="tooltip"></div>
+  <div id="controls">
+    <button onclick="viewTop()">Top View</button>
+    <button onclick="viewSide()">Side View</button>
+    <button onclick="resetView()">Reset</button>
+  </div>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+    // Scene setup
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x000000);
+    scene.fog = new THREE.Fog(0x000000, 50, 200);
+
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 80, 0);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+
+    // Lighting
+    const ambientLight = new THREE.AmbientLight(0x404040, 1);
+    scene.add(ambientLight);
+
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+    directionalLight.position.set(50, 100, 50);
+    scene.add(directionalLight);
+
+    // Grid helper
+    const gridHelper = new THREE.GridHelper(200, 50, 0x00ff00, 0x003300);
+    scene.add(gridHelper);
+
+    // Raycaster for hover
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+    const tooltip = document.getElementById('tooltip');
+
+    // Load rooms and render
+    async function loadMap() {
+      try {
+        // Fetch rooms (above ground only)
+        const roomsRes = await fetch('/api/map/rooms?z_min=0');
+        const roomsData = await roomsRes.json();
+        const rooms = roomsData.rooms;
+
+        // Fetch population heat map
+        const playersRes = await fetch('/api/map/players');
+        const playersData = await playersRes.json();
+        const heatmap = playersData.heatmap;
+
+        // Render rooms
+        const roomGeometry = new THREE.BoxGeometry(1.8, 1.8, 1.8);
+        for (const room of rooms) {
+          const material = new THREE.MeshPhongMaterial({
+            color: 0x004400,
+            transparent: true,
+            opacity: 0.3,
+          });
+          const cube = new THREE.Mesh(roomGeometry, material);
+          cube.position.set(room.x * 2, room.z * 2, -room.y * 2);
+          cube.userData = { type: 'room', ...room };
+          scene.add(cube);
+        }
+
+        // Render heat map cubes
+        const heatGeometry = new THREE.BoxGeometry(10, 2, 10); // 5x5 grid
+        for (const cell of heatmap) {
+          const intensity = Math.min(cell.count / 6, 1);
+          let color;
+          if (cell.count <= 2) color = 0xffff00; // Yellow
+          else if (cell.count <= 5) color = 0xff8800; // Orange
+          else color = 0xff0000; // Red
+
+          const material = new THREE.MeshPhongMaterial({
+            color,
+            transparent: true,
+            opacity: 0.6 * intensity,
+            emissive: color,
+            emissiveIntensity: 0.3,
+          });
+          const cube = new THREE.Mesh(heatGeometry, material);
+          cube.position.set(cell.x * 2, cell.z * 2 + 5, -cell.y * 2);
+          cube.userData = { type: 'heat', count: cell.count };
+          scene.add(cube);
+        }
+
+        // Update stats
+        const stats = document.getElementById('stats');
+        stats.innerHTML = \\\`
+          <strong>Rooms:</strong> \\\${rooms.length}<br>
+          <strong>Population:</strong> \\\${heatmap.reduce((s, c) => s + c.count, 0)}<br>
+          <strong>Updated:</strong> \\\${new Date(playersData.timestamp).toLocaleTimeString()}<br>
+          <br>
+          <em>5x5 grid aggregation</em><br>
+          <em>Updates every 30s</em>
+        \\\`;
+
+      } catch (err) {
+        console.error('Error loading map:', err);
+        document.getElementById('stats').innerHTML = '<strong style="color: red;">Error loading map</strong>';
+      }
+    }
+
+    // View presets
+    window.viewTop = () => {
+      camera.position.set(0, 80, 0);
+      camera.lookAt(0, 0, 0);
+      controls.target.set(0, 0, 0);
+    };
+
+    window.viewSide = () => {
+      camera.position.set(100, 40, 0);
+      camera.lookAt(0, 0, 0);
+      controls.target.set(0, 0, 0);
+    };
+
+    window.resetView = () => {
+      camera.position.set(0, 80, 0);
+      camera.lookAt(0, 0, 0);
+      controls.target.set(0, 0, 0);
+    };
+
+    // Mouse hover
+    function onMouseMove(event) {
+      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects(scene.children.filter(c => c.userData.type));
+
+      if (intersects.length > 0) {
+        const obj = intersects[0].object;
+        const data = obj.userData;
+
+        if (data.type === 'room' && data.name) {
+          tooltip.innerHTML = \\\`<strong>\\\${data.name}</strong><br>(\\\${data.x}, \\\${data.y}, \\\${data.z})\\\`;
+          tooltip.style.display = 'block';
+          tooltip.style.left = (event.clientX + 15) + 'px';
+          tooltip.style.top = (event.clientY + 15) + 'px';
+        } else if (data.type === 'heat') {
+          tooltip.innerHTML = \\\`<strong>Population: \\\${data.count}</strong>\\\`;
+          tooltip.style.display = 'block';
+          tooltip.style.left = (event.clientX + 15) + 'px';
+          tooltip.style.top = (event.clientY + 15) + 'px';
+        }
+      } else {
+        tooltip.style.display = 'none';
+      }
+    }
+
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // Animation loop
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+    }
+
+    // Initial load
+    loadMap();
+    animate();
+
+    // Reload every 30s
+    setInterval(() => {
+      // Clear scene and reload
+      while(scene.children.length > 0) {
+        scene.remove(scene.children[0]);
+      }
+      scene.add(ambientLight);
+      scene.add(directionalLight);
+      scene.add(gridHelper);
+      loadMap();
+    }, 30000);
+  </script>
+</body>
+</html>
+\`;
+
+        return {
+          status: 200,
+          contentType: 'text/html',
+          body: html
+        };
+      `);
+    }
+
+    // 5. MapAdminRoute - /map/admin (admin HTML page)
+    if (aliases.mapAdminRoute) {
+      this._mapAdminRoute = await this.manager.load(aliases.mapAdminRoute);
+    }
+    if (!this._mapAdminRoute) {
+      this._mapAdminRoute = await this.manager.create({
+        parent: webRoute,
+        properties: {
+          name: 'Map Admin Page Route',
+          description: 'Admin 3D map view (all z-levels)',
+          path: '/map/admin',
+          methods: ['GET'],
+          contentType: 'text/html',
+          requiresAuth: 'admin',
+        },
+        methods: {},
+      });
+    }
+
+    if (this._mapAdminRoute) {
+      this._mapAdminRoute.setMethod('handleRequest', `
+        // Use the existing 3D visualizer HTML from world-map-3d.html but fetch data from APIs
+        const html = \`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Malice World Map - Admin</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      font-family: monospace;
+      background: #000;
+      color: #0f0;
+    }
+    #info {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(0, 0, 0, 0.9);
+      padding: 15px;
+      border: 1px solid #0f0;
+      max-width: 350px;
+      z-index: 100;
+    }
+    #info h2 {
+      margin: 0 0 10px 0;
+      color: #ff0000;
+    }
+    .live-indicator {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      background: #f00;
+      border-radius: 50%;
+      margin-right: 5px;
+      animation: pulse 1s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+    #controls {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      background: rgba(0, 0, 0, 0.9);
+      padding: 10px;
+      border: 1px solid #0f0;
+    }
+    button {
+      background: #000;
+      color: #0f0;
+      border: 1px solid #0f0;
+      padding: 5px 10px;
+      margin: 2px;
+      cursor: pointer;
+      font-family: monospace;
+    }
+    button:hover {
+      background: #0f0;
+      color: #000;
+    }
+    #tooltip {
+      position: absolute;
+      background: rgba(0, 0, 0, 0.95);
+      padding: 10px;
+      border: 1px solid #0ff;
+      pointer-events: none;
+      display: none;
+      z-index: 100;
+      max-width: 400px;
+    }
+  </style>
+</head>
+<body>
+  <div id="info">
+    <h2><span class="live-indicator"></span>Admin Map (LIVE)</h2>
+    <div id="stats">Loading...</div>
+  </div>
+  <div id="tooltip"></div>
+  <div id="controls">
+    <button onclick="viewSurface()">Surface</button>
+    <button onclick="viewUnderground()">Underground</button>
+    <button onclick="viewTower()">Tower</button>
+    <button onclick="viewAll()">View All</button>
+  </div>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+    // Scene setup
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x000000);
+    scene.fog = new THREE.Fog(0x000000, 50, 300);
+
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 50, 100);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+
+    // Lighting
+    const ambientLight = new THREE.AmbientLight(0x404040, 1);
+    scene.add(ambientLight);
+
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+    directionalLight.position.set(50, 100, 50);
+    scene.add(directionalLight);
+
+    // Grid helper
+    const gridHelper = new THREE.GridHelper(200, 50, 0x00ff00, 0x003300);
+    scene.add(gridHelper);
+
+    // Raycaster
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+    const tooltip = document.getElementById('tooltip');
+
+    // Agent markers group
+    const agentGroup = new THREE.Group();
+    scene.add(agentGroup);
+
+    // Color function for rooms
+    function getColorForZ(z) {
+      if (z < 0) {
+        const depth = Math.abs(z);
+        const hue = 0.65 - depth * 0.05;
+        const lightness = Math.max(0.15, 0.5 - depth * 0.05);
+        return new THREE.Color().setHSL(hue, 0.9, lightness);
+      } else if (z === 0) {
+        return new THREE.Color(0x00ff00);
+      } else {
+        return new THREE.Color().setHSL(0.15 - z * 0.003, 0.9, 0.5);
+      }
+    }
+
+    // Load rooms and agents
+    async function loadMap() {
+      try {
+        // Fetch all rooms
+        const roomsRes = await fetch('/api/map/rooms');
+        const roomsData = await roomsRes.json();
+        const rooms = roomsData.rooms;
+
+        // Render rooms (if not already rendered)
+        if (scene.children.filter(c => c.userData.type === 'room').length === 0) {
+          const roomGeometry = new THREE.BoxGeometry(1.8, 1.8, 1.8);
+          for (const room of rooms) {
+            const color = getColorForZ(room.z);
+            const material = new THREE.MeshPhongMaterial({
+              color,
+              transparent: true,
+              opacity: room.z < 0 ? 0.9 : 0.8,
+              emissive: color,
+              emissiveIntensity: room.z < 0 ? 0.3 : 0.2,
+            });
+            const cube = new THREE.Mesh(roomGeometry, material);
+            cube.position.set(room.x * 2, room.z * 2, -room.y * 2);
+            cube.userData = { type: 'room', ...room };
+            scene.add(cube);
+          }
+        }
+
+        // Fetch agent positions
+        const agentsRes = await fetch('/api/map/players/admin');
+        const agentsData = await agentsRes.json();
+        const agents = agentsData.agents;
+
+        // Clear old agent markers
+        while (agentGroup.children.length > 0) {
+          agentGroup.remove(agentGroup.children[0]);
+        }
+
+        // Render agent markers
+        const agentGeometry = new THREE.SphereGeometry(1.5, 16, 16);
+        for (const agent of agents) {
+          const color = agent.isNPC ? 0x0066ff : 0x00ff00; // Blue for NPCs, Green for players
+          const material = new THREE.MeshPhongMaterial({
+            color,
+            emissive: color,
+            emissiveIntensity: 0.5,
+          });
+          const sphere = new THREE.Mesh(agentGeometry, material);
+          sphere.position.set(agent.x * 2, agent.z * 2 + 3, -agent.y * 2);
+          sphere.userData = { type: 'agent', ...agent };
+          agentGroup.add(sphere);
+        }
+
+        // Update stats
+        const players = agents.filter(a => !a.isNPC);
+        const npcs = agents.filter(a => a.isNPC);
+        const stats = document.getElementById('stats');
+        stats.innerHTML = \\\`
+          <strong>Total Rooms:</strong> \\\${rooms.length}<br>
+          <strong>Players:</strong> \\\${players.length}<br>
+          <strong>NPCs:</strong> \\\${npcs.length}<br>
+          <strong>Total Agents:</strong> \\\${agents.length}<br>
+          <br>
+          <em style="color: #0f0;">● = Player</em><br>
+          <em style="color: #06f;">● = NPC</em><br>
+          <br>
+          <em>Updates every 3s</em>
+        \\\`;
+
+      } catch (err) {
+        console.error('Error loading map:', err);
+        document.getElementById('stats').innerHTML = '<strong style="color: red;">Error loading map</strong>';
+      }
+    }
+
+    // View presets
+    window.viewSurface = () => {
+      camera.position.set(0, 80, 0);
+      camera.lookAt(0, 0, 0);
+      controls.target.set(0, 0, 0);
+    };
+
+    window.viewUnderground = () => {
+      camera.position.set(-20, -10, 40);
+      camera.lookAt(-10, -8, 0);
+      controls.target.set(-10, -8, 0);
+    };
+
+    window.viewTower = () => {
+      camera.position.set(-25, 40, 30);
+      camera.lookAt(-12, 20, -10);
+      controls.target.set(-12, 20, -10);
+    };
+
+    window.viewAll = () => {
+      camera.position.set(0, 50, 100);
+      camera.lookAt(0, 0, 0);
+      controls.target.set(0, 0, 0);
+    };
+
+    // Mouse hover
+    function onMouseMove(event) {
+      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects([
+        ...scene.children.filter(c => c.userData.type === 'room'),
+        ...agentGroup.children
+      ]);
+
+      if (intersects.length > 0) {
+        const obj = intersects[0].object;
+        const data = obj.userData;
+
+        if (data.type === 'room') {
+          tooltip.innerHTML = \\\`<strong>\\\${data.name || 'Room'}</strong><br>(\\\${data.x}, \\\${data.y}, \\\${data.z})\\\`;
+          tooltip.style.display = 'block';
+          tooltip.style.left = (event.clientX + 15) + 'px';
+          tooltip.style.top = (event.clientY + 15) + 'px';
+        } else if (data.type === 'agent') {
+          tooltip.innerHTML = \\\`
+            <strong>\\\${data.name}</strong> <em>(\\\${data.isNPC ? 'NPC' : 'Player'})</em><br>
+            <strong>Position:</strong> (\\\${data.x}, \\\${data.y}, \\\${data.z})<br>
+            <strong>Room:</strong> \\\${data.roomName}<br>
+            <strong>ID:</strong> #\\\${data.id}
+          \\\`;
+          tooltip.style.display = 'block';
+          tooltip.style.left = (event.clientX + 15) + 'px';
+          tooltip.style.top = (event.clientY + 15) + 'px';
+        }
+      } else {
+        tooltip.style.display = 'none';
+      }
+    }
+
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // Animation loop
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+    }
+
+    // Initial load
+    loadMap();
+    animate();
+
+    // Reload agents every 3s (real-time tracking)
+    setInterval(loadMap, 3000);
+  </script>
+</body>
+</html>
+\`;
+
+        return {
+          status: 200,
+          contentType: 'text/html',
+          body: html
+        };
+      `);
+    }
   }
 
   async registerAliases(): Promise<void> {
@@ -1170,6 +1806,8 @@ export class WebsiteBuilder {
     await register('mapRoomsRoute', this._mapRoomsRoute);
     await register('mapPlayersRoute', this._mapPlayersRoute);
     await register('mapPlayersAdminRoute', this._mapPlayersAdminRoute);
+    await register('mapRoute', this._mapRoute);
+    await register('mapAdminRoute', this._mapAdminRoute);
 
     // Register routes with the router (must happen after aliases are registered)
     await this.registerRoutes();
@@ -1199,6 +1837,16 @@ export class WebsiteBuilder {
     if (this._mapPlayersAdminRoute) {
       await webRouter.call('register', this._mapPlayersAdminRoute);
       console.log('✅ Registered mapPlayersAdminRoute with webRouter');
+    }
+
+    // Register map HTML routes
+    if (this._mapRoute) {
+      await webRouter.call('register', this._mapRoute);
+      console.log('✅ Registered mapRoute with webRouter');
+    }
+    if (this._mapAdminRoute) {
+      await webRouter.call('register', this._mapAdminRoute);
+      console.log('✅ Registered mapAdminRoute with webRouter');
     }
   }
 }

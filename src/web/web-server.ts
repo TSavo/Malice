@@ -28,6 +28,60 @@ export async function createWebServer(
     logger: false,
   });
 
+  // Authenticate HTTP Basic Auth
+  async function authenticate(request: any): Promise<{ player: any; isAdmin: boolean }> {
+    const authHeader = request.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith('Basic ')) {
+      return { player: null, isAdmin: false };
+    }
+
+    try {
+      const base64Creds = authHeader.slice(6);
+      const credentials = Buffer.from(base64Creds, 'base64').toString('utf-8');
+      const [username, password] = credentials.split(':', 2);
+
+      if (!username || !password) {
+        return { player: null, isAdmin: false };
+      }
+
+      const objectManager = await manager.load(0);
+      const aliases = (objectManager?.get('aliases') as Record<string, number>) || {};
+      const playerPrototypeId = aliases.player;
+      const adminPrototypeId = aliases.admin;
+
+      const users = await manager.db.listAll(false);
+      const getValue = (v: any) => v && typeof v === 'object' && 'type' in v ? v.value : v;
+
+      const userDoc = users.find(u => {
+        const parentId = getValue(u.parent);
+        return (parentId === playerPrototypeId || parentId === adminPrototypeId) &&
+          getValue(u.properties.playername) === username.toLowerCase();
+      });
+
+      if (!userDoc) {
+        return { player: null, isAdmin: false };
+      }
+
+      const player = await manager.load(userDoc._id);
+      if (!player) {
+        return { player: null, isAdmin: false };
+      }
+
+      const valid = await player.call('checkPassword', password) as boolean;
+      if (!valid) {
+        return { player: null, isAdmin: false };
+      }
+
+      const isAdmin = player.get('isAdmin') === true || player.get('isWizard') === true;
+
+      return { player, isAdmin };
+    } catch (err) {
+      console.error('[WebServer] Auth error:', err);
+      return { player: null, isAdmin: false };
+    }
+  }
+
   // All requests go to $webSite.handleRequest
   app.all('*', async (request, reply) => {
     try {
@@ -49,12 +103,17 @@ export async function createWebServer(
         return;
       }
 
+      // Authenticate the request (HTTP Basic Auth)
+      const auth = await authenticate(request);
+
       // Call the MOO handleRequest method
       const result = await webSite.call('handleRequest', request.url, request.method, {
         headers: Object.fromEntries(
           Object.entries(request.headers).filter(([_, v]) => typeof v === 'string')
         ),
         query: request.query,
+        player: auth.player,
+        isAdmin: auth.isAdmin,
       });
 
       // Handle the response
