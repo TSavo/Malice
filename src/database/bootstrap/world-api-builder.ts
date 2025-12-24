@@ -44,7 +44,7 @@ export class WorldApiBuilder {
 
     this.world.setMethod('getAllRooms', `
       // Get all rooms that have coordinates (x, y, z properties)
-      const allIds = await $.objectManager.getAllIds();
+      const allIds = $.getAllIds();
       const rooms = [];
 
       for (const id of allIds) {
@@ -77,7 +77,7 @@ export class WorldApiBuilder {
 
     this.world.setMethod('getAuthenticatedConnections', `
       // Get authenticated connections from the game coordinator
-      const gameCoordinator = $.objectManager.getGameCoordinator();
+      const gameCoordinator = $.getGameCoordinator();
       if (!gameCoordinator) {
         console.error('[World] GameCoordinator not available');
         return [];

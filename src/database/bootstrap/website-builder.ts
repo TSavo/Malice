@@ -45,8 +45,7 @@ export class WebsiteBuilder {
     // Build page instances
     await this.buildPageInstances(forceRebuild);
 
-    // Build and register routes with the router
-    await this.buildRoutes(aliases, forceRebuild);
+    // Note: Routes are built in registerAliases() after webRoute/webRouter aliases exist
   }
 
   private async buildWebTemplate(
@@ -216,7 +215,7 @@ export class WebsiteBuilder {
       if (!webPageId) return null;
 
       // Query for pages with matching path
-      const allObjects = await $.objectManager.getAllIds();
+      const allObjects = $.getAllIds();
       for (const id of allObjects) {
         const obj = await $load(id);
         if (!obj) continue;
@@ -736,8 +735,11 @@ export class WebsiteBuilder {
     aliases: Record<string, number>,
     _forceRebuild: boolean
   ): Promise<void> {
+    console.log('[WebsiteBuilder] buildRoutes() called');
+
     // Get webRoute prototype
     const webRouteId = aliases.webRoute;
+    console.log(`[WebsiteBuilder] webRoute alias: ${webRouteId}`);
     if (!webRouteId) {
       console.log('⚠️ webRoute alias not found, skipping route registration');
       return;
@@ -747,12 +749,16 @@ export class WebsiteBuilder {
       console.log('⚠️ webRoute prototype not found, skipping route registration');
       return;
     }
+    console.log(`[WebsiteBuilder] webRoute loaded: #${webRoute.id}`);
 
     // Build docs route
+    console.log('[WebsiteBuilder] Checking docsRoute...');
     if (aliases.docsRoute) {
+      console.log(`[WebsiteBuilder] docsRoute alias exists: ${aliases.docsRoute}, loading...`);
       this._docsRoute = await this.manager.load(aliases.docsRoute);
     }
     if (!this._docsRoute) {
+      console.log('[WebsiteBuilder] Creating docsRoute...');
       this._docsRoute = await this.manager.create({
         parent: webRoute,
         properties: {
@@ -765,9 +771,13 @@ export class WebsiteBuilder {
         },
         methods: {},
       });
+      console.log(`[WebsiteBuilder] docsRoute created: #${this._docsRoute?.id}`);
+    } else {
+      console.log(`[WebsiteBuilder] docsRoute already exists: #${this._docsRoute?.id}`);
     }
 
     // Set the handler for docs route
+    console.log('[WebsiteBuilder] Setting docsRoute handler...');
     if (this._docsRoute) {
       this._docsRoute.setMethod('handleRequest', `
         const params = args[0] || {};
@@ -837,22 +847,30 @@ export class WebsiteBuilder {
           };
         }
       `);
-
+      console.log('[WebsiteBuilder] docsRoute handler set');
     }
 
     // Build map API routes
+    console.log('[WebsiteBuilder] Calling buildMapRoutes...');
     await this.buildMapRoutes(aliases, webRoute);
+    console.log('[WebsiteBuilder] buildRoutes() complete');
   }
 
   private async buildMapRoutes(
     aliases: Record<string, number>,
     webRoute: RuntimeObject
   ): Promise<void> {
+    console.log('[WebsiteBuilder] buildMapRoutes() called');
+    console.log(`[WebsiteBuilder] webRoute parent: #${webRoute.id}`);
+
     // 1. RoomsRoute - /api/map/rooms
+    console.log('[WebsiteBuilder] Building mapRoomsRoute...');
     if (aliases.mapRoomsRoute) {
+      console.log(`[WebsiteBuilder] mapRoomsRoute alias exists: ${aliases.mapRoomsRoute}`);
       this._mapRoomsRoute = await this.manager.load(aliases.mapRoomsRoute);
     }
     if (!this._mapRoomsRoute) {
+      console.log('[WebsiteBuilder] Creating mapRoomsRoute...');
       this._mapRoomsRoute = await this.manager.create({
         parent: webRoute,
         properties: {
@@ -865,9 +883,13 @@ export class WebsiteBuilder {
         },
         methods: {},
       });
+      console.log(`[WebsiteBuilder] mapRoomsRoute created: #${this._mapRoomsRoute?.id}`);
+    } else {
+      console.log(`[WebsiteBuilder] mapRoomsRoute already exists: #${this._mapRoomsRoute?.id}`);
     }
 
     if (this._mapRoomsRoute) {
+      console.log('[WebsiteBuilder] Setting mapRoomsRoute handler...');
       this._mapRoomsRoute.setMethod('handleRequest', `
         const params = args[0] || {};
         const meta = args[1] || {};
@@ -900,13 +922,17 @@ export class WebsiteBuilder {
           body: JSON.stringify({ rooms: filteredRooms })
         };
       `);
+      console.log('[WebsiteBuilder] mapRoomsRoute handler set');
     }
 
     // 2. PlayersRoute - /api/map/players (public, aggregated)
+    console.log('[WebsiteBuilder] Building mapPlayersRoute...');
     if (aliases.mapPlayersRoute) {
+      console.log(`[WebsiteBuilder] mapPlayersRoute alias exists: ${aliases.mapPlayersRoute}`);
       this._mapPlayersRoute = await this.manager.load(aliases.mapPlayersRoute);
     }
     if (!this._mapPlayersRoute) {
+      console.log('[WebsiteBuilder] Creating mapPlayersRoute...');
       this._mapPlayersRoute = await this.manager.create({
         parent: webRoute,
         properties: {
@@ -921,9 +947,13 @@ export class WebsiteBuilder {
         },
         methods: {},
       });
+      console.log(`[WebsiteBuilder] mapPlayersRoute created: #${this._mapPlayersRoute?.id}`);
+    } else {
+      console.log(`[WebsiteBuilder] mapPlayersRoute already exists: #${this._mapPlayersRoute?.id}`);
     }
 
     if (this._mapPlayersRoute) {
+      console.log('[WebsiteBuilder] Setting mapPlayersRoute handler...');
       this._mapPlayersRoute.setMethod('handleRequest', `
         const params = args[0] || {};
         const meta = args[1] || {};
@@ -1039,13 +1069,17 @@ export class WebsiteBuilder {
           })
         };
       `);
+      console.log('[WebsiteBuilder] mapPlayersRoute handler set');
     }
 
     // 3. PlayersAdminRoute - /api/map/players/admin (admin only, exact positions)
+    console.log('[WebsiteBuilder] Building mapPlayersAdminRoute...');
     if (aliases.mapPlayersAdminRoute) {
+      console.log(`[WebsiteBuilder] mapPlayersAdminRoute alias exists: ${aliases.mapPlayersAdminRoute}`);
       this._mapPlayersAdminRoute = await this.manager.load(aliases.mapPlayersAdminRoute);
     }
     if (!this._mapPlayersAdminRoute) {
+      console.log('[WebsiteBuilder] Creating mapPlayersAdminRoute...');
       this._mapPlayersAdminRoute = await this.manager.create({
         parent: webRoute,
         properties: {
@@ -1058,9 +1092,13 @@ export class WebsiteBuilder {
         },
         methods: {},
       });
+      console.log(`[WebsiteBuilder] mapPlayersAdminRoute created: #${this._mapPlayersAdminRoute?.id}`);
+    } else {
+      console.log(`[WebsiteBuilder] mapPlayersAdminRoute already exists: #${this._mapPlayersAdminRoute?.id}`);
     }
 
     if (this._mapPlayersAdminRoute) {
+      console.log('[WebsiteBuilder] Setting mapPlayersAdminRoute handler...');
       this._mapPlayersAdminRoute.setMethod('handleRequest', `
         const params = args[0] || {};
         const meta = args[1] || {};
@@ -1137,13 +1175,17 @@ export class WebsiteBuilder {
           body: JSON.stringify({ agents })
         };
       `);
+      console.log('[WebsiteBuilder] mapPlayersAdminRoute handler set');
     }
 
     // 4. MapRoute - /map (public HTML page)
+    console.log('[WebsiteBuilder] Building mapRoute...');
     if (aliases.mapRoute) {
+      console.log(`[WebsiteBuilder] mapRoute alias exists: ${aliases.mapRoute}`);
       this._mapRoute = await this.manager.load(aliases.mapRoute);
     }
     if (!this._mapRoute) {
+      console.log('[WebsiteBuilder] Creating mapRoute...');
       this._mapRoute = await this.manager.create({
         parent: webRoute,
         properties: {
@@ -1153,13 +1195,42 @@ export class WebsiteBuilder {
           methods: ['GET'],
           contentType: 'text/html',
           requiresAuth: false,
+          // Visual config - tweak via MOO code
+          roomColor: 0x00ff44,       // Bright green
+          roomOpacity: 0.7,          // More visible
+          roomEmissive: 0.4,         // Glow intensity
+          blockSize: 1.8,            // Cube size
+          ambientIntensity: 1.5,     // Ambient light
+          directionalIntensity: 0.8, // Directional light
+          gridColor: 0x00ff00,       // Grid main color
+          gridFade: 0x003300,        // Grid fade color
+          fogNear: 80,               // Fog start
+          fogFar: 300,               // Fog end
         },
         methods: {},
       });
+      console.log(`[WebsiteBuilder] mapRoute created: #${this._mapRoute?.id}`);
+    } else {
+      console.log(`[WebsiteBuilder] mapRoute already exists: #${this._mapRoute?.id}`);
     }
 
     if (this._mapRoute) {
+      console.log('[WebsiteBuilder] Setting mapRoute handler...');
       this._mapRoute.setMethod('handleRequest', `
+        // Read visual config from route props
+        const config = {
+          roomColor: self.roomColor || 0x00ff44,
+          roomOpacity: self.roomOpacity || 0.7,
+          roomEmissive: self.roomEmissive || 0.4,
+          blockSize: self.blockSize || 1.8,
+          ambientIntensity: self.ambientIntensity || 1.5,
+          directionalIntensity: self.directionalIntensity || 0.8,
+          gridColor: self.gridColor || 0x00ff00,
+          gridFade: self.gridFade || 0x003300,
+          fogNear: self.fogNear || 80,
+          fogFar: self.fogFar || 300,
+        };
+
         // Generate HTML for public map view
         const html = \`<!DOCTYPE html>
 <html lang="en">
@@ -1246,10 +1317,24 @@ export class WebsiteBuilder {
     import * as THREE from 'three';
     import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
+    // Visual config (injected from route props)
+    const CFG = {
+      roomColor: \${config.roomColor},
+      roomOpacity: \${config.roomOpacity},
+      roomEmissive: \${config.roomEmissive},
+      blockSize: \${config.blockSize},
+      ambientIntensity: \${config.ambientIntensity},
+      directionalIntensity: \${config.directionalIntensity},
+      gridColor: \${config.gridColor},
+      gridFade: \${config.gridFade},
+      fogNear: \${config.fogNear},
+      fogFar: \${config.fogFar},
+    };
+
     // Scene setup
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x000000);
-    scene.fog = new THREE.Fog(0x000000, 50, 200);
+    scene.fog = new THREE.Fog(0x000000, CFG.fogNear, CFG.fogFar);
 
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.set(0, 80, 0);
@@ -1263,25 +1348,48 @@ export class WebsiteBuilder {
     controls.dampingFactor = 0.05;
 
     // Lighting
-    const ambientLight = new THREE.AmbientLight(0x404040, 1);
+    const ambientLight = new THREE.AmbientLight(0x404040, CFG.ambientIntensity);
     scene.add(ambientLight);
 
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, CFG.directionalIntensity);
     directionalLight.position.set(50, 100, 50);
     scene.add(directionalLight);
 
     // Grid helper
-    const gridHelper = new THREE.GridHelper(200, 50, 0x00ff00, 0x003300);
+    const gridHelper = new THREE.GridHelper(200, 50, CFG.gridColor, CFG.gridFade);
     scene.add(gridHelper);
+
+    // Dynamic content group (rooms, heatmap) - cleared on reload
+    const dynamicGroup = new THREE.Group();
+    scene.add(dynamicGroup);
 
     // Raycaster for hover
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
     const tooltip = document.getElementById('tooltip');
 
+    // Height gradient function - varies color by z-level
+    function getColorForZ(z) {
+      if (z === 0) {
+        return CFG.roomColor; // Base color at ground level
+      } else {
+        // Higher = warmer tint (towards orange/yellow)
+        const heightFactor = Math.min(z / 30, 1);
+        const r = Math.floor(0x00 + heightFactor * 0xff);
+        const g = Math.floor(0xff - heightFactor * 0x44);
+        const b = Math.floor(0x44 - heightFactor * 0x44);
+        return (r << 16) | (g << 8) | b;
+      }
+    }
+
     // Load rooms and render
     async function loadMap() {
       try {
+        // Clear previous dynamic content
+        while (dynamicGroup.children.length > 0) {
+          dynamicGroup.remove(dynamicGroup.children[0]);
+        }
+
         // Fetch rooms (above ground only)
         const roomsRes = await fetch('/api/map/rooms?z_min=0');
         const roomsData = await roomsRes.json();
@@ -1292,18 +1400,21 @@ export class WebsiteBuilder {
         const playersData = await playersRes.json();
         const heatmap = playersData.heatmap;
 
-        // Render rooms
-        const roomGeometry = new THREE.BoxGeometry(1.8, 1.8, 1.8);
+        // Render rooms with height gradient
+        const roomGeometry = new THREE.BoxGeometry(CFG.blockSize, CFG.blockSize, CFG.blockSize);
         for (const room of rooms) {
+          const zColor = getColorForZ(room.z);
           const material = new THREE.MeshPhongMaterial({
-            color: 0x004400,
+            color: zColor,
             transparent: true,
-            opacity: 0.3,
+            opacity: CFG.roomOpacity,
+            emissive: zColor,
+            emissiveIntensity: CFG.roomEmissive,
           });
           const cube = new THREE.Mesh(roomGeometry, material);
           cube.position.set(room.x * 2, room.z * 2, -room.y * 2);
           cube.userData = { type: 'room', ...room };
-          scene.add(cube);
+          dynamicGroup.add(cube);
         }
 
         // Render heat map cubes
@@ -1325,7 +1436,7 @@ export class WebsiteBuilder {
           const cube = new THREE.Mesh(heatGeometry, material);
           cube.position.set(cell.x * 2, cell.z * 2 + 5, -cell.y * 2);
           cube.userData = { type: 'heat', count: cell.count };
-          scene.add(cube);
+          dynamicGroup.add(cube);
         }
 
         // Update stats
@@ -1370,7 +1481,7 @@ export class WebsiteBuilder {
       mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
       raycaster.setFromCamera(mouse, camera);
-      const intersects = raycaster.intersectObjects(scene.children.filter(c => c.userData.type));
+      const intersects = raycaster.intersectObjects(dynamicGroup.children);
 
       if (intersects.length > 0) {
         const obj = intersects[0].object;
@@ -1410,17 +1521,8 @@ export class WebsiteBuilder {
     loadMap();
     animate();
 
-    // Reload every 30s
-    setInterval(() => {
-      // Clear scene and reload
-      while(scene.children.length > 0) {
-        scene.remove(scene.children[0]);
-      }
-      scene.add(ambientLight);
-      scene.add(directionalLight);
-      scene.add(gridHelper);
-      loadMap();
-    }, 30000);
+    // Reload every 30s (loadMap clears dynamicGroup internally)
+    setInterval(loadMap, 30000);
   </script>
 </body>
 </html>
@@ -1432,13 +1534,17 @@ export class WebsiteBuilder {
           body: html
         };
       `);
+      console.log('[WebsiteBuilder] mapRoute handler set');
     }
 
     // 5. MapAdminRoute - /map/admin (admin HTML page)
+    console.log('[WebsiteBuilder] Building mapAdminRoute...');
     if (aliases.mapAdminRoute) {
+      console.log(`[WebsiteBuilder] mapAdminRoute alias exists: ${aliases.mapAdminRoute}`);
       this._mapAdminRoute = await this.manager.load(aliases.mapAdminRoute);
     }
     if (!this._mapAdminRoute) {
+      console.log('[WebsiteBuilder] Creating mapAdminRoute...');
       this._mapAdminRoute = await this.manager.create({
         parent: webRoute,
         properties: {
@@ -1451,9 +1557,13 @@ export class WebsiteBuilder {
         },
         methods: {},
       });
+      console.log(`[WebsiteBuilder] mapAdminRoute created: #${this._mapAdminRoute?.id}`);
+    } else {
+      console.log(`[WebsiteBuilder] mapAdminRoute already exists: #${this._mapAdminRoute?.id}`);
     }
 
     if (this._mapAdminRoute) {
+      console.log('[WebsiteBuilder] Setting mapAdminRoute handler...');
       this._mapAdminRoute.setMethod('handleRequest', `
         // Use the existing 3D visualizer HTML from world-map-3d.html but fetch data from APIs
         const html = \`<!DOCTYPE html>
@@ -1773,12 +1883,22 @@ export class WebsiteBuilder {
           body: html
         };
       `);
+      console.log('[WebsiteBuilder] mapAdminRoute handler set');
     }
+
+    console.log('[WebsiteBuilder] buildMapRoutes() complete');
   }
 
   async registerAliases(): Promise<void> {
     const objectManager = await this.manager.load(0);
     if (!objectManager) return;
+
+    // Get current aliases (webRoute/webRouter should exist now)
+    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
+
+    // Build routes NOW that webRoute/webRouter aliases exist
+    console.log('[WebsiteBuilder] registerAliases() - building routes now');
+    await this.buildRoutes(aliases, false);
 
     const register = async (alias: string, obj: RuntimeObject | null) => {
       if (obj) {

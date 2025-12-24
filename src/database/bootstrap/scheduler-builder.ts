@@ -269,9 +269,9 @@ export class SchedulerBuilder {
         return { error: 'Decayable prototype not found in aliases' };
       }
 
-      // Iterate all objects - use $.objectManager to iterate
+      // Iterate all objects - use $ to iterate
       // This is expensive, so we rely on shouldDecay() to skip most objects
-      const allIds = await $.objectManager.getAllIds();
+      const allIds = $.getAllIds();
 
       for (const id of allIds) {
         const obj = await $load(id);
