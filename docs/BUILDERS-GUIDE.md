@@ -199,10 +199,10 @@ Create narratives and quests via MCP (use the consolidated `plot` tool):
 $plotSpawner.createPlot( name: "Missing Jewels", metadata: { participants: [100], type: "investigation" } });
 
 // Add a job with a hook
-plot({ action: "create_job", plotId: 500, jobId: "find_jewels", metadata: { reward: 100 } });
+const plot = await $load(500); await plot.createJob("find_jewels", { reward: 100 });
 
 // Watch for events
-plot({ action: "register_hook", plotId: 500, jobId: "find_jewels", targetId: 200, eventName: "itemPickedUp", filter: { itemName: "jewels" } });
+await plot.registerJobHook("find_jewels", 200, "itemPickedUp", { itemName: "jewels" });
 ```
 
 See [MCP-TOOLS.md](MCP-TOOLS.md) for complete tool reference.

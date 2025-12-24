@@ -251,16 +251,20 @@ const result = await await $plotSpawner.createPlot( name: 'Citizenship: ' + play
 const plotId = result.plotId;
 
 // Add initial event
-await plot({ action: 'add_event', plotId, message: 'Player arrived at City Services seeking citizenship.' });
+const plot = await $load(plotId);
+await plot.addEvent({
+  from: 'system',
+  message: 'Player arrived at City Services seeking citizenship.'
+});
 
 // Create job for registration
-await plot({ action: 'create_job', plotId, jobId: 'register_' + player.id, metadata: {
+await plot.createJob('register_' + player.id, {
   type: 'citizenship_registration',
   playerId: player.id
-}});
+});
 
 // Register hook for biometric scan completion
-await plot({ action: 'register_hook', plotId, jobId: 'register_' + player.id, targetId: biometricLockId, eventName: 'scanComplete', filter: { playerId: player.id }});
+await plot.registerJobHook('register_' + player.id, biometricLockId, 'scanComplete', { playerId: player.id });
 ```
 
 ## Revoking Citizenship

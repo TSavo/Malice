@@ -301,13 +301,13 @@ From Claude's perspective using MCP tools:
 2. const plot = await $load(plotId); await plot.addEvent({from: 'handler', message: "Pick up package #55..."})
    → Give instructions to player
 
-3. plot({ action: "create_job", plotId, jobId: "deliver-package", metadata: {...} })
+3. const plot = await $load(plotId); await plot.createJob("deliver-package", {...})
    → Create job with metadata
 
 4. call_method on locker
    → createOneTimeCode() - returns code
 
-5. plot({ action: "register_hook", plotId, jobId, targetId: 100, eventName: "oneTimeCodeUsed", filter: { code } })
+5. const plot = await $load(plotId); await plot.registerJobHook(jobId, 100, "oneTimeCodeUsed", { code })
    → Watch locker for code usage
 
 6. const plot = await $load(plotId); await plot.addEvent({from: 'handler', message: "Deliver to locker #100. Code: XYZ789"})
