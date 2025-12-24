@@ -44,6 +44,9 @@ export class WebsiteBuilder {
 
     // Build page instances
     await this.buildPageInstances(forceRebuild);
+
+    // Build and register routes with the router
+    await this.buildRoutes(aliases, forceRebuild);
   }
 
   private async buildWebTemplate(
@@ -175,29 +178,33 @@ export class WebsiteBuilder {
     }
 
     // handleRequest(path, method, meta) - Main entry point
+    // Delegates to $webRouter for registered routes, then falls back to page lookup
     this.webSite.setMethod('handleRequest', `
       const path = args[0] || '/';
       const method = args[1] || 'GET';
-      // const meta = args[2] || {};
+      const meta = args[2] || {};
 
-      // Find page by path
+      // First, try the router for registered routes (API, docs, etc.)
+      if ($.webRouter) {
+        const routerResult = await $.webRouter.dispatch(path, method, meta);
+        if (routerResult) {
+          return routerResult;
+        }
+      }
+
+      // Fall back to page lookup for content pages
       const page = await self.getPage(path);
 
       if (page) {
         if (!page.published) {
-          return { status: 404, body: await self.render404(path) };
+          return { status: 404, contentType: 'text/html', body: await self.render404(path) };
         }
         const html = await page.render();
         return { status: 200, contentType: 'text/html', body: html };
       }
 
-      // Check for /docs/* paths - serve from docs folder
-      if (path.startsWith('/docs')) {
-        return await self.handleDocsRequest(path);
-      }
-
       // 404
-      return { status: 404, body: await self.render404(path) };
+      return { status: 404, contentType: 'text/html', body: await self.render404(path) };
     `);
 
     // getPage(path) - Find page by path
@@ -718,6 +725,116 @@ export class WebsiteBuilder {
 
   private _homepage: RuntimeObject | null = null;
   private _playPage: RuntimeObject | null = null;
+  private _docsRoute: RuntimeObject | null = null;
+
+  private async buildRoutes(
+    aliases: Record<string, number>,
+    _forceRebuild: boolean
+  ): Promise<void> {
+    // Get webRoute prototype
+    const webRouteId = aliases.webRoute;
+    if (!webRouteId) {
+      console.log('⚠️ webRoute alias not found, skipping route registration');
+      return;
+    }
+    const webRoute = await this.manager.load(webRouteId);
+    if (!webRoute) {
+      console.log('⚠️ webRoute prototype not found, skipping route registration');
+      return;
+    }
+
+    // Build docs route
+    if (aliases.docsRoute) {
+      this._docsRoute = await this.manager.load(aliases.docsRoute);
+    }
+    if (!this._docsRoute) {
+      this._docsRoute = await this.manager.create({
+        parent: webRoute,
+        properties: {
+          name: 'Docs Route',
+          description: 'Serves documentation from /docs/*',
+          path: '/docs/*',
+          methods: ['GET'],
+          contentType: 'text/html',
+          requiresAuth: false,
+        },
+        methods: {},
+      });
+    }
+
+    // Set the handler for docs route
+    if (this._docsRoute) {
+      this._docsRoute.setMethod('handleRequest', `
+        const params = args[0] || {};
+        // const meta = args[1] || {};
+
+        const fs = await import('fs');
+
+        // Get the wildcard path (everything after /docs/)
+        const docPath = params['*'] || '';
+
+        // Map URL to file path
+        let filePath = './docs/' + docPath;
+        if (!docPath || docPath === '') {
+          filePath = './docs/WHAT-IS-MALICE.md';
+        } else if (!filePath.endsWith('.md')) {
+          filePath = filePath + '.md';
+        }
+
+        try {
+          if (!fs.existsSync(filePath)) {
+            return {
+              status: 404,
+              contentType: 'text/html',
+              body: '<h1>Documentation not found</h1><p>File: ' + filePath + '</p>'
+            };
+          }
+
+          const markdown = fs.readFileSync(filePath, 'utf-8');
+
+          // Convert markdown to HTML (basic)
+          let html = markdown
+            .replace(/^### (.+)$/gm, '<h3 class="text-xl font-bold mt-6 mb-2">$1</h3>')
+            .replace(/^## (.+)$/gm, '<h2 class="text-2xl font-bold mt-8 mb-3">$1</h2>')
+            .replace(/^# (.+)$/gm, '<h1 class="text-3xl font-bold mt-8 mb-4">$1</h1>')
+            .replace(/\\\`\\\`\\\`(\\w*)([\\s\\S]*?)\\\`\\\`\\\`/g, '<pre class="bg-malice-surface p-4 rounded my-4 overflow-x-auto"><code>$2</code></pre>')
+            .replace(/\\\`([^\\\`]+)\\\`/g, '<code class="bg-malice-surface px-1 rounded">$1</code>')
+            .replace(/\\*\\*(.+?)\\*\\*/g, '<strong>$1</strong>')
+            .replace(/\\*(.+?)\\*/g, '<em>$1</em>')
+            .replace(/\\[([^\\]]+)\\]\\(([^)]+)\\)/g, '<a href="$2" class="text-malice-accent hover:underline">$1</a>')
+            .replace(/^- (.+)$/gm, '<li class="ml-4">$1</li>')
+            .replace(/(<li.*<\\/li>\\n?)+/g, '<ul class="list-disc my-4">$&</ul>')
+            .replace(/\\n\\n/g, '</p><p class="my-4">')
+            .replace(/\\n/g, '<br>');
+
+          // Wrap in paragraph if needed
+          if (!html.startsWith('<')) {
+            html = '<p class="my-4">' + html + '</p>';
+          }
+
+          // Get doc template
+          const docTemplate = $.docTemplate;
+          if (docTemplate) {
+            const title = markdown.match(/^# (.+)$/m)?.[1] || 'Documentation';
+            const fullHtml = await docTemplate.render({
+              title: title + ' - Malice',
+              content: '<article class="prose prose-invert max-w-none">' + html + '</article>',
+            });
+            return { status: 200, contentType: 'text/html', body: fullHtml };
+          }
+
+          return { status: 200, contentType: 'text/html', body: html };
+        } catch (err) {
+          return {
+            status: 500,
+            contentType: 'text/html',
+            body: 'Error loading documentation: ' + String(err)
+          };
+        }
+      `);
+
+    }
+  }
 
   async registerAliases(): Promise<void> {
     const objectManager = await this.manager.load(0);
@@ -743,5 +860,24 @@ export class WebsiteBuilder {
     // Page instances
     await register('homepage', this._homepage);
     await register('playPage', this._playPage);
+
+    // Route instances
+    await register('docsRoute', this._docsRoute);
+
+    // Register routes with the router (must happen after aliases are registered)
+    await this.registerRoutes();
+  }
+
+  private async registerRoutes(): Promise<void> {
+    const webRouter = this.manager.getAliases().get('webRouter');
+    if (!webRouter) {
+      console.log('⚠️ webRouter not found, routes not registered');
+      return;
+    }
+
+    if (this._docsRoute) {
+      await webRouter.call('register', this._docsRoute);
+      console.log('✅ Registered docsRoute with webRouter');
+    }
   }
 }
