@@ -72,6 +72,7 @@ export class ObjectManager {
   private aliases = new Map<string, RuntimeObject>();
   public readonly db: ObjectDatabase; // Expose for DevTools direct access
   private telnetClient?: MCPTelnetClient; // For $.session native methods
+  private gameCoordinator?: any; // For $world methods (getAuthenticatedConnections)
 
   // Track in-flight update operations (fire-and-forget writes from RuntimeObject)
   private pendingUpdateOperations = new Set<Promise<void>>();
@@ -828,6 +829,22 @@ export class ObjectManager {
    */
   setTelnetClient(client: MCPTelnetClient): void {
     this.telnetClient = client;
+  }
+
+  /**
+   * Set the game coordinator for accessing connections
+   * Called by index.ts during server startup
+   */
+  setGameCoordinator(coordinator: any): void {
+    this.gameCoordinator = coordinator;
+  }
+
+  /**
+   * Get game coordinator
+   * Used by $world MOO object to access authenticated connections
+   */
+  getGameCoordinator(): any {
+    return this.gameCoordinator;
   }
 
   /**

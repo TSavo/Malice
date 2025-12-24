@@ -28,6 +28,7 @@ import { SessionBuilder } from './session-builder.js';
 import { TailorBuilder } from './tailor-builder.js';
 import { WebRouteBuilder } from './web-route-builder.js';
 import { WebRouterBuilder } from './web-router-builder.js';
+import { WorldApiBuilder } from './world-api-builder.js';
 
 /**
  * Orchestrates building all core system objects
@@ -97,6 +98,7 @@ export class CoreSystemBuilder {
     const tailorBuilder = new TailorBuilder(this.manager);
     const webRouteBuilder = new WebRouteBuilder(this.manager);
     const webRouterBuilder = new WebRouterBuilder(this.manager);
+    const worldApiBuilder = new WorldApiBuilder(this.manager);
     const websiteBuilder = new WebsiteBuilder(this.manager);
 
     await authManagerBuilder.build();
@@ -132,6 +134,7 @@ export class CoreSystemBuilder {
     await sisterGrayBuilder.build(humanId); // Human as parent for Sister Gray
     await webRouteBuilder.build(); // Web route prototype
     await webRouterBuilder.build(); // Web router object
+    await worldApiBuilder.build(); // World API for map routes
     await websiteBuilder.build(); // Website objects (includes API routes)
     await mcpBuilder.build(); // MCP code-first tools
     await sessionBuilder.build(); // Session management wrapper
@@ -163,6 +166,7 @@ export class CoreSystemBuilder {
     await sisterGrayBuilder.registerAlias();
     await webRouteBuilder.registerAlias();
     await webRouterBuilder.registerAlias();
+    await worldApiBuilder.registerAlias();
     await websiteBuilder.registerAliases();
     await mcpBuilder.registerAliases();
     await tailorBuilder.registerAlias();

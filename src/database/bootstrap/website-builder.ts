@@ -726,6 +726,11 @@ export class WebsiteBuilder {
   private _homepage: RuntimeObject | null = null;
   private _playPage: RuntimeObject | null = null;
   private _docsRoute: RuntimeObject | null = null;
+  private _mapRoute: RuntimeObject | null = null;
+  private _mapAdminRoute: RuntimeObject | null = null;
+  private _mapRoomsRoute: RuntimeObject | null = null;
+  private _mapPlayersRoute: RuntimeObject | null = null;
+  private _mapPlayersAdminRoute: RuntimeObject | null = null;
 
   private async buildRoutes(
     aliases: Record<string, number>,
@@ -834,6 +839,305 @@ export class WebsiteBuilder {
       `);
 
     }
+
+    // Build map API routes
+    await this.buildMapRoutes(aliases, webRoute);
+  }
+
+  private async buildMapRoutes(
+    aliases: Record<string, number>,
+    webRoute: RuntimeObject
+  ): Promise<void> {
+    // 1. RoomsRoute - /api/map/rooms
+    if (aliases.mapRoomsRoute) {
+      this._mapRoomsRoute = await this.manager.load(aliases.mapRoomsRoute);
+    }
+    if (!this._mapRoomsRoute) {
+      this._mapRoomsRoute = await this.manager.create({
+        parent: webRoute,
+        properties: {
+          name: 'Map Rooms API Route',
+          description: 'Returns room coordinates for map visualization',
+          path: '/api/map/rooms',
+          methods: ['GET'],
+          contentType: 'application/json',
+          requiresAuth: false,
+        },
+        methods: {},
+      });
+    }
+
+    if (this._mapRoomsRoute) {
+      this._mapRoomsRoute.setMethod('handleRequest', `
+        const params = args[0] || {};
+        const meta = args[1] || {};
+
+        // Get all rooms from $world
+        const allRooms = await $world.getAllRooms();
+
+        // Filter by z_min if provided
+        const zMin = meta.query?.z_min;
+        let rooms = allRooms;
+        if (zMin !== undefined) {
+          const zMinNum = parseInt(zMin);
+          if (!isNaN(zMinNum)) {
+            rooms = rooms.filter(r => r.z >= zMinNum);
+          }
+        }
+
+        // Filter names based on auth status
+        const isAdmin = meta.isAdmin || false;
+        const filteredRooms = rooms.map(r => ({
+          x: r.x,
+          y: r.y,
+          z: r.z,
+          name: (isAdmin || r.outdoor) ? r.name : ''
+        }));
+
+        return {
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ rooms: filteredRooms })
+        };
+      `);
+    }
+
+    // 2. PlayersRoute - /api/map/players (public, aggregated)
+    if (aliases.mapPlayersRoute) {
+      this._mapPlayersRoute = await this.manager.load(aliases.mapPlayersRoute);
+    }
+    if (!this._mapPlayersRoute) {
+      this._mapPlayersRoute = await this.manager.create({
+        parent: webRoute,
+        properties: {
+          name: 'Map Players API Route',
+          description: 'Returns aggregated player/NPC population heat map',
+          path: '/api/map/players',
+          methods: ['GET'],
+          contentType: 'application/json',
+          requiresAuth: false,
+          cachedHeatmap: null,
+          cacheTimestamp: 0,
+        },
+        methods: {},
+      });
+    }
+
+    if (this._mapPlayersRoute) {
+      this._mapPlayersRoute.setMethod('handleRequest', `
+        const params = args[0] || {};
+        const meta = args[1] || {};
+
+        // Check cache (30 seconds)
+        const now = Date.now();
+        const cacheAge = now - (self.cacheTimestamp || 0);
+        if (cacheAge < 30000 && self.cachedHeatmap) {
+          return {
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({
+              heatmap: self.cachedHeatmap,
+              timestamp: self.cacheTimestamp,
+              cached: true
+            })
+          };
+        }
+
+        // Get all connected players
+        const connections = await $world.getAuthenticatedConnections();
+
+        // Get all AI NPCs
+        const npcIds = await $ai.getAll();
+
+        // Collect positions
+        const positions = [];
+
+        // Add player positions
+        for (const conn of connections) {
+          try {
+            const player = conn.player;
+            if (!player || !player.location) continue;
+
+            const loc = player.location;
+            if (!loc) continue;
+
+            const x = loc.x;
+            const y = loc.y;
+            const z = loc.z;
+
+            if (typeof x === 'number' && typeof y === 'number' && typeof z === 'number') {
+              // Filter to z >= 0 only (above ground)
+              if (z >= 0) {
+                positions.push({ x, y, z });
+              }
+            }
+          } catch (err) {
+            console.error('[MapPlayers] Error getting player position:', err);
+          }
+        }
+
+        // Add NPC positions
+        for (const npcId of npcIds) {
+          try {
+            const npc = await $load(npcId);
+            if (!npc || !npc.location) continue;
+
+            const loc = npc.location;
+            if (!loc) continue;
+
+            const x = loc.x;
+            const y = loc.y;
+            const z = loc.z;
+
+            if (typeof x === 'number' && typeof y === 'number' && typeof z === 'number') {
+              // Filter to z >= 0 only
+              if (z >= 0) {
+                positions.push({ x, y, z });
+              }
+            }
+          } catch (err) {
+            console.error('[MapPlayers] Error getting NPC position:', err);
+          }
+        }
+
+        // Aggregate to 5x5 grid
+        const gridSize = 5;
+        const gridCounts = {};
+
+        for (const pos of positions) {
+          const gridX = Math.floor(pos.x / gridSize) * gridSize;
+          const gridY = Math.floor(pos.y / gridSize) * gridSize;
+          const gridZ = pos.z;
+          const key = gridX + ',' + gridY + ',' + gridZ;
+
+          gridCounts[key] = (gridCounts[key] || 0) + 1;
+        }
+
+        // Convert to array
+        const heatmap = [];
+        for (const [key, count] of Object.entries(gridCounts)) {
+          const parts = key.split(',');
+          heatmap.push({
+            x: parseInt(parts[0]),
+            y: parseInt(parts[1]),
+            z: parseInt(parts[2]),
+            count: count
+          });
+        }
+
+        // Cache the result
+        self.cachedHeatmap = heatmap;
+        self.cacheTimestamp = now;
+
+        return {
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            heatmap,
+            timestamp: now,
+            cached: false
+          })
+        };
+      `);
+    }
+
+    // 3. PlayersAdminRoute - /api/map/players/admin (admin only, exact positions)
+    if (aliases.mapPlayersAdminRoute) {
+      this._mapPlayersAdminRoute = await this.manager.load(aliases.mapPlayersAdminRoute);
+    }
+    if (!this._mapPlayersAdminRoute) {
+      this._mapPlayersAdminRoute = await this.manager.create({
+        parent: webRoute,
+        properties: {
+          name: 'Map Players Admin API Route',
+          description: 'Returns exact player/NPC positions (admin only)',
+          path: '/api/map/players/admin',
+          methods: ['GET'],
+          contentType: 'application/json',
+          requiresAuth: 'admin',
+        },
+        methods: {},
+      });
+    }
+
+    if (this._mapPlayersAdminRoute) {
+      this._mapPlayersAdminRoute.setMethod('handleRequest', `
+        const params = args[0] || {};
+        const meta = args[1] || {};
+
+        // Get all connected players
+        const connections = await $world.getAuthenticatedConnections();
+
+        // Get all AI NPCs
+        const npcIds = await $ai.getAll();
+
+        const agents = [];
+
+        // Add players
+        for (const conn of connections) {
+          try {
+            const player = conn.player;
+            if (!player || !player.location) continue;
+
+            const loc = player.location;
+            if (!loc) continue;
+
+            const x = loc.x;
+            const y = loc.y;
+            const z = loc.z;
+
+            if (typeof x === 'number' && typeof y === 'number' && typeof z === 'number') {
+              agents.push({
+                id: player.id,
+                name: player.name || 'Unknown',
+                x,
+                y,
+                z,
+                roomName: loc.name || '',
+                isNPC: false
+              });
+            }
+          } catch (err) {
+            console.error('[MapPlayersAdmin] Error getting player position:', err);
+          }
+        }
+
+        // Add NPCs
+        for (const npcId of npcIds) {
+          try {
+            const npc = await $load(npcId);
+            if (!npc || !npc.location) continue;
+
+            const loc = npc.location;
+            if (!loc) continue;
+
+            const x = loc.x;
+            const y = loc.y;
+            const z = loc.z;
+
+            if (typeof x === 'number' && typeof y === 'number' && typeof z === 'number') {
+              agents.push({
+                id: npc.id,
+                name: npc.name || 'NPC',
+                x,
+                y,
+                z,
+                roomName: loc.name || '',
+                isNPC: true
+              });
+            }
+          } catch (err) {
+            console.error('[MapPlayersAdmin] Error getting NPC position:', err);
+          }
+        }
+
+        return {
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ agents })
+        };
+      `);
+    }
   }
 
   async registerAliases(): Promise<void> {
@@ -863,6 +1167,9 @@ export class WebsiteBuilder {
 
     // Route instances
     await register('docsRoute', this._docsRoute);
+    await register('mapRoomsRoute', this._mapRoomsRoute);
+    await register('mapPlayersRoute', this._mapPlayersRoute);
+    await register('mapPlayersAdminRoute', this._mapPlayersAdminRoute);
 
     // Register routes with the router (must happen after aliases are registered)
     await this.registerRoutes();
@@ -878,6 +1185,20 @@ export class WebsiteBuilder {
     if (this._docsRoute) {
       await webRouter.call('register', this._docsRoute);
       console.log('✅ Registered docsRoute with webRouter');
+    }
+
+    // Register map API routes
+    if (this._mapRoomsRoute) {
+      await webRouter.call('register', this._mapRoomsRoute);
+      console.log('✅ Registered mapRoomsRoute with webRouter');
+    }
+    if (this._mapPlayersRoute) {
+      await webRouter.call('register', this._mapPlayersRoute);
+      console.log('✅ Registered mapPlayersRoute with webRouter');
+    }
+    if (this._mapPlayersAdminRoute) {
+      await webRouter.call('register', this._mapPlayersAdminRoute);
+      console.log('✅ Registered mapPlayersAdminRoute with webRouter');
     }
   }
 }
