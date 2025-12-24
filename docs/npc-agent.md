@@ -15,7 +15,7 @@ execute_moo_code({
       action: 'spawn',
       role: 'guard',
       name: 'Janet',
-      locationId: 173,
+      location: await $load(173),
       clothed: true
     });
   `
@@ -120,8 +120,8 @@ The `$query()` method:
 
 The agent responds by calling MCP tools:
 ```javascript
-ai({ action: "do", humanId: 3061, command: "say Hello there!" })
-ai({ action: "do", humanId: 3061, command: ":waves politely" })
+$ai.do(3061, "say Hello there!")
+$ai.do(3061, ":waves politely")
 ```
 
 ## Per-NPC Storage
@@ -163,8 +163,8 @@ NPCs have full access to MCP tools:
 
 ### Communication
 ```javascript
-ai({ action: "do", humanId: ID, command: "say Hello!" })
-ai({ action: "do", humanId: ID, command: ":waves" })
+$ai.do(ID, "say Hello!")
+$ai.do(ID, ":waves")
 ```
 
 ### Memory Management
@@ -175,8 +175,8 @@ ai({ action: "recall", humanId: ID })
 
 ### World Interaction
 ```javascript
-ai({ action: "do", humanId: ID, command: "get sword" })
-ai({ action: "do", humanId: ID, command: "go north" })
+$ai.do(ID, "get sword")
+$ai.do(ID, "go north")
 ai({ action: "look", humanId: ID })
 ```
 
@@ -268,7 +268,7 @@ const result = await $.ai.spawn('guard', {
   name: 'Marcus Webb',
   sex: 'male',
   age: 35,
-  locationId: lobbyId,
+  location: await $load(lobbyId),
   clothed: true,
   personality: 'Gruff but fair. Suspicious of strangers.',
   history: 'Former soldier, 20 years in the Royal Guard.'
@@ -286,7 +286,7 @@ const result = await $.ai.spawn('guard', {
 
 ### NPC not responding
 
-1. Check NPC is AI-controlled: `ai({ action: 'info', humanId: ID })`
+1. Check NPC is AI-controlled: `$ai.getInfo(ID)`
 2. Verify `agentSystemPrompt` exists on NPC
 3. Check Docker logs: `docker logs malice-game`
 

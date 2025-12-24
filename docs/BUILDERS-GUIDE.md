@@ -149,7 +149,7 @@ The $ai registry tracks AI-controlled humans (use the consolidated `ai` tool):
 
 ```javascript
 // Spawn an AI human
-ai({ action: "spawn", role: "guard", name: "Marcus", locationId: 100, sex: "male", age: 35 });
+$ai.spawn({ role: "guard", name: "Marcus", location: await $load(100), sex: "male", age: 35 });
 
 // List all guards
 ai({ action: "list", role: "guard" });
@@ -196,7 +196,7 @@ Create narratives and quests via MCP (use the consolidated `plot` tool):
 
 ```javascript
 // Create a plot
-plot({ action: "create", name: "Missing Jewels", metadata: { participants: [100], type: "investigation" } });
+$plot.create( name: "Missing Jewels", metadata: { participants: [100], type: "investigation" } });
 
 // Add a job with a hook
 plot({ action: "create_job", plotId: 500, jobId: "find_jewels", metadata: { reward: 100 } });

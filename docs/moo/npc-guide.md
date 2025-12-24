@@ -121,8 +121,8 @@ BEHAVIOR:
 OBJECT ID: #${npc.id}
 
 You have access to MCP tools. Use:
-- ai({ action: "do", humanId: ${npc.id}, command: "say ..." }) to speak
-- ai({ action: "do", humanId: ${npc.id}, command: ":..." }) to emote
+- $ai.do(${npc.id}, "say ...") to speak
+- $ai.do(${npc.id}, ":...") to emote
 - ai({ action: "remember", ... }) to save important information
 `;
 ```
@@ -337,10 +337,10 @@ Marcus shakes his head slowly. "Basement's off-limits. Building manager's orders
 
 ```javascript
 // Via MCP
-ai({ action: 'info', humanId: npc.id })
+$ai.getInfo(npc.id)
 // Returns: role, personality, history, memories, notes
 
-ai({ action: 'recall', humanId: npc.id })
+$ai.recall(npc.id)
 // Returns: all memories
 ```
 

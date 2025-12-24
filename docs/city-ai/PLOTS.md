@@ -49,7 +49,7 @@ PLOT
 ### Basic Plot
 
 ```javascript
-const result = await plot({ action: 'create', name: 'Water Crisis: Refugee Camp', metadata: {
+const result = await $plot.create( name: 'Water Crisis: Refugee Camp', metadata: {
   type: 'infrastructure',
   priority: 'high',
   location: { x: 5, y: -3 },
@@ -62,9 +62,9 @@ const plotId = result.plotId;
 ### Adding Narrative Events
 
 ```javascript
-await plot({ action: 'add_event', plotId, message: 'Water main serving the refugee camp has failed. Estimated 200 people without clean water. Disease risk escalating.', from: 'system' });
+await plot.addEvent({ plotId, message: 'Water main serving the refugee camp has failed. Estimated 200 people without clean water. Disease risk escalating.', from: 'system' });
 
-await plot({ action: 'add_event', plotId, message: 'Work order issued. Repair crew requested.', from: 'handler' });
+await plot.addEvent({ plotId, message: 'Work order issued. Repair crew requested.', from: 'handler' });
 ```
 
 ## Plot Types
@@ -161,7 +161,7 @@ Plots that unfold over realistic timeframes.
 
 **Day 0: Request**
 ```javascript
-const result = await plot({ action: 'create', name: 'Construction: The Rusty Nail Bar', metadata: {
+const result = await $plot.create( name: 'Construction: The Rusty Nail Bar', metadata: {
   type: 'construction',
   owner: playerId,
   location: { x: -5, y: 8, z: 0 },
@@ -170,7 +170,7 @@ const result = await plot({ action: 'create', name: 'Construction: The Rusty Nai
 }});
 const plotId = result.plotId;
 
-await plot({ action: 'add_event', plotId, message: 'Construction request received. Site survey scheduled.' });
+await plot.addEvent({ plotId, message: 'Construction request received. Site survey scheduled.' });
 ```
 
 **Day 1: Work Begins**
@@ -179,10 +179,10 @@ await plot({ action: 'add_event', plotId, message: 'Construction request receive
 await set_property({ objectId: adjacentRoomId, name: 'description', value: originalDescription + '\n\nThe sound of construction echoes from the east. A section of wall has been marked for demolition.' });
 
 // Spawn work crew
-const foreman = await ai({ action: 'spawn', role: 'supervisor', name: 'Construction Foreman', locationId: adjacentRoomId });
+const foreman = await $ai.spawn({ role: 'supervisor', name: 'Construction Foreman', location: await $load(adjacentRoomId) });
 
 // Log progress
-await plot({ action: 'add_event', plotId, message: 'Day 1: Demolition begun. Wall section removed. Debris clearing in progress.' });
+await plot.addEvent({ plotId, message: 'Day 1: Demolition begun. Wall section removed. Debris clearing in progress.' });
 
 // Update metadata
 await plot({ action: 'set_metadata', plotId, key: 'day', value: 1 });
@@ -193,7 +193,7 @@ await plot({ action: 'set_metadata', plotId, key: 'day', value: 1 });
 // Update site description
 await set_property({ objectId: adjacentRoomId, name: 'description', value: originalDescription + '\n\nThrough the new opening to the east, you can see workers framing walls and running conduit.' });
 
-await plot({ action: 'add_event', plotId, message: 'Day 2: Framing complete. Electrical rough-in started. Plumbing connections made.' });
+await plot.addEvent({ plotId, message: 'Day 2: Framing complete. Electrical rough-in started. Plumbing connections made.' });
 
 await plot({ action: 'set_metadata', plotId, key: 'day', value: 2 });
 ```
@@ -204,19 +204,19 @@ await plot({ action: 'set_metadata', plotId, key: 'day', value: 2 });
 const bar = await dig({ name: 'The Rusty Nail', description: 'A small bar carved out of what was once storage space. The walls are raw concrete, the fixtures salvaged, but it has character. A wooden bar top, polished smooth by previous use, dominates the space. Mismatched stools line up in front of it.', fromRoomId: adjacentRoomId, exitDirection: 'east', returnDirection: 'west' });
 
 // Spawn furnishings
-await spawn_item({ prototypeId: signPrototypeId, locationId: bar.id, properties: { name: 'Menu Board', text: 'DRINKS\nWater - 1 credit\nBrew - 3 credits\n...' }});
+await spawn_item({ prototypeId: signPrototypeId, location: await $load(bar).id, properties: { name: 'Menu Board', text: 'DRINKS\nWater - 1 credit\nBrew - 3 credits\n...' }});
 
 // Remove construction references from adjacent room
 await set_property({ objectId: adjacentRoomId, name: 'description', value: originalDescription + '\n\nAn opening to the east leads to The Rusty Nail.' });
 
 // Despawn work crew (walk them out first!)
-await ai({ action: 'do', humanId: foreman.id, command: 'west' });
-await ai({ action: 'do', humanId: foreman.id, command: 'say Construction complete. Good luck with the place.' });
-await ai({ action: 'do', humanId: foreman.id, command: 'south' });
-await ai({ action: 'despawn', humanId: foreman.id });
+await $ai.do(foreman.id, 'west');
+await $ai.do(foreman.id, 'say Construction complete. Good luck with the place.');
+await $ai.do(foreman.id, 'south');
+await $ai.despawn(foreman.id );
 
 // Complete the plot
-await plot({ action: 'add_event', plotId, message: 'Day 3: Construction complete. The Rusty Nail is open for business.' });
+await plot.addEvent({ plotId, message: 'Day 3: Construction complete. The Rusty Nail is open for business.' });
 
 await plot({ action: 'close', plotId, status: 'completed', reason: 'Construction successful.' });
 ```
@@ -253,10 +253,10 @@ if (result.plot) {
   const events = result.plot.events;
 
   // Respond appropriately
-  await plot({ action: 'add_event', plotId: result.plot.id, message: 'Hook triggered. Processing completion.' });
+  await plot.addEvent({ plotId: result.plot.id, message: 'Hook triggered. Processing completion.' });
 
   // Complete the job
-  await plot({ action: 'complete_job', plotId: result.plot.id, jobId: 'repair_pipe', reason: 'Repair verified.' });
+  await plot.completeJob( plotId: result.plot.id, jobId: 'repair_pipe', reason: 'Repair verified.' });
 }
 ```
 
@@ -339,7 +339,7 @@ Workers should be visible:
 
 ```javascript
 // 1. Create plot
-const result = await plot({ action: 'create', name: 'Recruitment: ' + playerName, metadata: {
+const result = await $plot.create( name: 'Recruitment: ' + playerName, metadata: {
   type: 'recruitment',
   playerId: player.id,
   stage: 'initial_contact'
@@ -347,31 +347,31 @@ const result = await plot({ action: 'create', name: 'Recruitment: ' + playerName
 const plotId = result.plotId;
 
 // 2. Spawn recruiter NPC (in adjacent room)
-const recruiter = await ai({ action: 'spawn', role: 'recruiter', name: 'Outreach Worker', locationId: adjacentRoomId });
+const recruiter = await $ai.spawn({ role: 'recruiter', name: 'Outreach Worker', location: await $load(adjacentRoomId) });
 
 // 3. Walk recruiter to player's location
-await ai({ action: 'do', humanId: recruiter.id, command: 'north' });
-await ai({ action: 'do', humanId: recruiter.id, command: 'say You look hungry. Citizenship can help.' });
+await $ai.do(recruiter.id, 'north');
+await $ai.do(recruiter.id, 'say You look hungry. Citizenship can help.');
 
 // 4. Recruiter delivers pitch
-await ai({ action: 'do', humanId: recruiter.id, command: 'say Citizenship means food, shelter, work. Register at City Services. Tell them I sent you.' });
+await $ai.do(recruiter.id, 'say Citizenship means food, shelter, work. Register at City Services. Tell them I sent you.');
 
 // 5. Log event
-await plot({ action: 'add_event', plotId, message: 'Initial contact made. Player informed of citizenship benefits.' });
+await plot.addEvent({ plotId, message: 'Initial contact made. Player informed of citizenship benefits.' });
 
 // 6. Update stage
 await plot({ action: 'set_metadata', plotId, key: 'stage', value: 'referred' });
 
 // 7. Create job to watch for registration
-await plot({ action: 'create_job', plotId, jobId: 'await_registration', metadata: { type: 'registration_watch' }});
+await plot.createJob( plotId, jobId: 'await_registration', metadata: { type: 'registration_watch' }});
 
 // 8. Register hook on biometric scanner at City Services
 await plot({ action: 'register_hook', plotId, jobId: 'await_registration', targetId: biometricScannerId, eventName: 'scanComplete', filter: { playerId: player.id }});
 
 // 9. Recruiter exits naturally
-await ai({ action: 'do', humanId: recruiter.id, command: 'say Think about it.' });
-await ai({ action: 'do', humanId: recruiter.id, command: 'south' });
-await ai({ action: 'despawn', humanId: recruiter.id });
+await $ai.do(recruiter.id, 'say Think about it.');
+await $ai.do(recruiter.id, 'south');
+await $ai.despawn(recruiter.id );
 
 // 10. When hook fires (player registered)
 // ... complete job, update faction, close plot
@@ -485,7 +485,7 @@ This means:
 When a job completes:
 
 ```javascript
-await plot({ action: 'complete_job', plotId: 123, jobId: 'repair_pipe', reason: 'Repair verified.' });
+await plot.completeJob( plotId: 123, jobId: 'repair_pipe', reason: 'Repair verified.' });
 ```
 
 **Internally:**
@@ -588,14 +588,14 @@ A new player catches the Cartel's attention.
 
 ```javascript
 // Phase 1: Observation
-const result = await plot({ action: 'create', name: 'Cartel Eval: ' + playerName, metadata: {
+const result = await $plot.create( name: 'Cartel Eval: ' + playerName, metadata: {
   type: 'cartel_recruitment',
   playerId: player.id,
   stage: 'observation'
 }});
 const plotId = result.plotId;
 
-await plot({ action: 'add_event', plotId, 
+await plot.addEvent({ plotId, 
   message: 'Subject identified. New arrival. Doesn\'t seem to fit the citizen mold.',
   from: 'handler'
 });
@@ -626,7 +626,7 @@ Sister Gray wants something broken.
 
 ```javascript
 // 1. Create plot
-const result = await plot({ action: 'create', name: 'Cartel Op: Fabrication Delay', metadata: {
+const result = await $plot.create( name: 'Cartel Op: Fabrication Delay', metadata: {
   type: 'cartel_operation',
   objective: 'sabotage',
   target: 'fabrication_factory',
@@ -635,7 +635,7 @@ const result = await plot({ action: 'create', name: 'Cartel Op: Fabrication Dela
 const plotId = result.plotId;
 
 // 2. Briefing phase
-await plot({ action: 'create_job', plotId, jobId: 'briefing', metadata: {
+await plot.createJob( plotId, jobId: 'briefing', metadata: {
   type: 'contact',
   handler: 'Ghost operative',
   instructions: 'Meet asset at location, provide intel on target, deliver sabotage materials'
@@ -646,7 +646,7 @@ await plot({ action: 'create_job', plotId, jobId: 'briefing', metadata: {
 // Handler provides materials (smoke bomb, corrosive, whatever)
 
 // 4. Execution phase
-await plot({ action: 'create_job', plotId, jobId: 'execution', metadata: {
+await plot.createJob( plotId, jobId: 'execution', metadata: {
   type: 'sabotage',
   target: factoryMachineId,
   deadline: Date.now() + 4 * 60 * 60 * 1000  // 4 hours
@@ -686,7 +686,7 @@ Someone needs to get inside Pluribus and stay there.
 **Key point:** The infiltrator IS a citizen. They passed real vetting. They do real work. The difference is loyalty.
 
 ```javascript
-const result = await plot({ action: 'create', name: 'Cartel Mole: ' + playerName, metadata: {
+const result = await $plot.create( name: 'Cartel Mole: ' + playerName, metadata: {
   type: 'cartel_infiltration',
   playerId: player.id,
   stage: 'placement'
@@ -694,7 +694,7 @@ const result = await plot({ action: 'create', name: 'Cartel Mole: ' + playerName
 const plotId = result.plotId;
 
 // Track their progress through citizenship
-await plot({ action: 'add_event', plotId, 
+await plot.addEvent({ plotId, 
   message: 'Asset instructed to register for citizenship. Cover identity established.',
   from: 'handler'
 });
@@ -703,7 +703,7 @@ await plot({ action: 'add_event', plotId,
 // Pluribus has NO IDEA they're doubled
 
 // Periodic check-ins
-await plot({ action: 'create_job', plotId, jobId: 'checkin_1', metadata: {
+await plot.createJob( plotId, jobId: 'checkin_1', metadata: {
   type: 'dead_drop',
   location: deadDropId,
   schedule: 'weekly'
@@ -726,7 +726,7 @@ Someone needs to die.
 7. Consequences unfold (investigation, retaliation)
 
 ```javascript
-const result = await plot({ action: 'create', name: 'Cartel Sanction: ' + targetName, metadata: {
+const result = await $plot.create( name: 'Cartel Sanction: ' + targetName, metadata: {
   type: 'cartel_wetwork',
   target: targetId,
   priority: 'critical',
@@ -735,7 +735,7 @@ const result = await plot({ action: 'create', name: 'Cartel Sanction: ' + target
 const plotId = result.plotId;
 
 // Intel phase
-await plot({ action: 'add_event', plotId, 
+await plot.addEvent({ plotId, 
   message: 'Target: [name]. Reason: [reason]. Asset: [asset name]. Method: asset discretion.',
   from: 'handler'
 });
@@ -766,7 +766,7 @@ Pluribus assigns a delivery job. The Cartel wants to intercept.
 
 ```javascript
 // Pluribus creates delivery plot
-const pluribusPlot = await plot({ action: 'create', name: 'Delivery: Medical Supplies', metadata: {
+const pluribusPlot = await $plot.create( name: 'Delivery: Medical Supplies', metadata: {
   type: 'delivery',
   faction: 'pluribus',
   package: packageId,
@@ -774,7 +774,7 @@ const pluribusPlot = await plot({ action: 'create', name: 'Delivery: Medical Sup
 }});
 
 // Cartel creates interception plot
-const cartelPlot = await plot({ action: 'create', name: 'Cartel: Intercept Medical', metadata: {
+const cartelPlot = await $plot.create( name: 'Cartel: Intercept Medical', metadata: {
   type: 'cartel_intercept',
   target_plot: pluribusPlot.plotId,
   target_package: packageId

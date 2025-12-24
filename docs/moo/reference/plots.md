@@ -22,7 +22,7 @@ The plot system has these key components:
 const plot = await $plot.create({ name: 'Delivery Mission' });
 
 // Create via MCP tool
-plot({ action: 'create', name: 'Escort Mission', metadata: { difficulty: 'hard' } })
+$plot.create( name: 'Escort Mission', metadata: { difficulty: 'hard' } })
 ```
 
 ### Plot Properties
@@ -407,7 +407,7 @@ The MCP server provides the `plot` tool:
 
 ```javascript
 // Create plot
-plot({ action: 'create', name: 'Mission', metadata: { type: 'delivery' } })
+$plot.create( name: 'Mission', metadata: { type: 'delivery' } })
 
 // Get plot details
 plot({ action: 'get', plotId: 123 })
@@ -416,13 +416,13 @@ plot({ action: 'get', plotId: 123 })
 plot({ action: 'list', status: 'active' })
 
 // Add event
-plot({ action: 'add_event', plotId: 123, message: 'Something happened', from: 'handler' })
+plot.addEvent({ plotId: 123, message: 'Something happened', from: 'handler' })
 
 // Set metadata
 plot({ action: 'set_metadata', plotId: 123, key: 'reward', value: 500 })
 
 // Create job
-plot({ action: 'create_job', plotId: 123, jobId: 'delivery-1', expiresAt: '...' })
+plot.createJob( plotId: 123, jobId: 'delivery-1', expiresAt: '...' })
 
 // Set phases
 plot({ action: 'set_phases', plotId: 123, phases: [...] })
@@ -434,7 +434,7 @@ plot({ action: 'advance_phase', plotId: 123, jobId: 'delivery-1' })
 plot({ action: 'register_hook', plotId: 123, jobId: 'delivery-1', targetId: 456, eventName: 'itemDeposited' })
 
 // Complete job
-plot({ action: 'complete_job', plotId: 123, jobId: 'delivery-1', reason: 'Success' })
+plot.completeJob( plotId: 123, jobId: 'delivery-1', reason: 'Success' })
 
 // Get next plot needing attention
 plot({ action: 'next' })
