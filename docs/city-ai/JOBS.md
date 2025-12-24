@@ -75,7 +75,7 @@ CREATE → POST → ASSIGN → MONITOR → COMPLETE/FAIL → REWARD
 ### Step 1: Create the Plot Container
 
 ```javascript
-const result = await plot({ action: 'create', name: 'Water Main Repair WM-7734', metadata: {
+const result = await $plot.create( name: 'Water Main Repair WM-7734', metadata: {
   type: 'infrastructure',
   category: 'water',
   priority: 'high',
@@ -87,7 +87,7 @@ const plotId = result.plotId;
 ### Step 2: Define the Job
 
 ```javascript
-await plot({ action: 'create_job', plotId, jobId: 'repair_main_7734', metadata: {
+await plot.createJob( plotId, jobId: 'repair_main_7734', metadata: {
   type: 'repair',
   description: 'Repair burst water main at S. Jackson & 2nd Ave',
   requirements: ['wrench', 'pipe_sealant'],
@@ -105,7 +105,7 @@ await plot({ action: 'register_hook', plotId, jobId: 'repair_main_7734', targetI
 ### Step 4: Announce the Job
 
 ```javascript
-await plot({ action: 'add_event', plotId, message: 'Work Order Posted: Water main repair at S. Jackson & 2nd Ave. 50 credits. Tools provided.' });
+await plot.addEvent({ plotId, message: 'Work Order Posted: Water main repair at S. Jackson & 2nd Ave. 50 credits. Tools provided.' });
 ```
 
 ## Job Types
@@ -212,7 +212,7 @@ if (result.plot) {
   // Check events, respond appropriately
   const events = result.plot.events;
   // Process and respond
-  await plot({ action: 'add_event', plotId: result.plot.id, message: 'Acknowledged. Processing.' });
+  await plot.addEvent({ plotId: result.plot.id, message: 'Acknowledged. Processing.' });
 }
 ```
 
@@ -221,13 +221,13 @@ if (result.plot) {
 ### Successful Completion
 
 ```javascript
-await plot({ action: 'complete_job', plotId, jobId: 'repair_main_7734', reason: 'Water main repaired. Flow restored.' });
+await plot.completeJob( plotId, jobId: 'repair_main_7734', reason: 'Water main repaired. Flow restored.' });
 
 // Reward the worker
 await set_property({ objectId: workerId, name: 'credits', value: currentCredits + 50 });
 
 // Log completion
-await plot({ action: 'add_event', plotId, message: 'Job completed by Worker #' + workerId + '. 50 credits paid.' });
+await plot.addEvent({ plotId, message: 'Job completed by Worker #' + workerId + '. 50 credits paid.' });
 
 // Close the plot
 await plot({ action: 'close', plotId, status: 'completed', reason: 'Repair successful.' });
@@ -236,9 +236,9 @@ await plot({ action: 'close', plotId, status: 'completed', reason: 'Repair succe
 ### Failed Job
 
 ```javascript
-await plot({ action: 'fail_job', plotId, jobId: 'repair_main_7734', reason: 'Worker abandoned site. Job expired.' });
+await plot.failJob( plotId, jobId: 'repair_main_7734', reason: 'Worker abandoned site. Job expired.' });
 
-await plot({ action: 'add_event', plotId, message: 'Job failed. Reassigning.' });
+await plot.addEvent({ plotId, message: 'Job failed. Reassigning.' });
 
 // Create replacement job or escalate
 ```
@@ -249,7 +249,7 @@ await plot({ action: 'add_event', plotId, message: 'Job failed. Reassigning.' })
 
 ```javascript
 // Spawn a job board terminal in a room
-await spawn_item({ prototypeId: signPrototypeId, locationId: cityServicesId, properties: { name: 'Work Assignment Terminal', description: 'A screen displays available work orders. Touch to view assignments.', text: '' }});
+await spawn_item({ prototypeId: signPrototypeId, location: await $load(cityServicesId), properties: { name: 'Work Assignment Terminal', description: 'A screen displays available work orders. Touch to view assignments.', text: '' }});
 ```
 
 ### Updating Job Board Content
@@ -296,17 +296,17 @@ Complex tasks can be broken into steps:
 
 ```javascript
 // Plot: Building Renovation
-const result = await plot({ action: 'create', name: 'Renovate Building 7' });
+const result = await $plot.create( name: 'Renovate Building 7' });
 const plotId = result.plotId;
 
 // Job 1: Clear debris
-await plot({ action: 'create_job', plotId, jobId: 'clear_debris', metadata: { step: 1, reward: 30 }});
+await plot.createJob( plotId, jobId: 'clear_debris', metadata: { step: 1, reward: 30 }});
 
 // Job 2: Repair structure (unlocked after Job 1)
-await plot({ action: 'create_job', plotId, jobId: 'repair_structure', metadata: { step: 2, reward: 50, prerequisite: 'clear_debris' }});
+await plot.createJob( plotId, jobId: 'repair_structure', metadata: { step: 2, reward: 50, prerequisite: 'clear_debris' }});
 
 // Job 3: Install systems (unlocked after Job 2)
-await plot({ action: 'create_job', plotId, jobId: 'install_systems', metadata: { step: 3, reward: 40, prerequisite: 'repair_structure' }});
+await plot.createJob( plotId, jobId: 'install_systems', metadata: { step: 3, reward: 40, prerequisite: 'repair_structure' }});
 ```
 
 When Job 1 completes, announce Job 2 is available. And so on.
@@ -333,7 +333,7 @@ const problemLocation = { x: -3, y: -5, z: 0 };
 const brokenObjectId = 789;
 
 // 2. Create plot
-const result = await plot({ action: 'create', name: 'Emergency: Water Main Break', metadata: {
+const result = await $plot.create( name: 'Emergency: Water Main Break', metadata: {
   type: 'repair',
   priority: 'critical',
   location: problemLocation
@@ -341,28 +341,28 @@ const result = await plot({ action: 'create', name: 'Emergency: Water Main Break
 const plotId = result.plotId;
 
 // 3. Create job
-await plot({ action: 'create_job', plotId, jobId: 'emergency_repair', metadata: {
+await plot.createJob( plotId, jobId: 'emergency_repair', metadata: {
   reward: 100,  // Premium for emergency
   tools: ['wrench', 'sealant'],
   deadline: Date.now() + 3600000
 }});
 
 // 4. Spawn supervisor NPC
-const supervisor = await ai({ action: 'spawn', role: 'supervisor', name: 'Repair Foreman', locationId: nearestRoomId });
+const supervisor = await $ai.spawn({ role: 'supervisor', name: 'Repair Foreman', location: await $load(nearestRoomId) });
 
 // 5. Register completion hook
 await plot({ action: 'register_hook', plotId, jobId: 'emergency_repair', targetId: brokenObjectId, eventName: 'repaired', filter: {} });
 
 // 6. Announce
-await plot({ action: 'add_event', plotId, message: 'EMERGENCY: Water main break. 100 credit reward. Report to Foreman.' });
+await plot.addEvent({ plotId, message: 'EMERGENCY: Water main break. 100 credit reward. Report to Foreman.' });
 
 // 7. Wait for hook trigger...
 
 // 8. On completion
-await plot({ action: 'complete_job', plotId, jobId: 'emergency_repair', reason: 'Repair completed.' });
+await plot.completeJob( plotId, jobId: 'emergency_repair', reason: 'Repair completed.' });
 
 // 9. Pay worker, despawn supervisor, close plot
-await ai({ action: 'despawn', humanId: supervisor.id });
+await $ai.despawn(supervisor.id );
 await plot({ action: 'close', plotId, status: 'completed', reason: 'Infrastructure restored.' });
 ```
 
@@ -463,7 +463,7 @@ Same mechanics as Pluribus, different presentation.
 
 ```javascript
 // 1. Create plot (city-ai tracking only)
-const result = await plot({ action: 'create', name: 'Cartel: Observation Test', metadata: {
+const result = await $plot.create( name: 'Cartel: Observation Test', metadata: {
   type: 'cartel_job',
   handler: recruiterId,
   target: playerId,
@@ -476,7 +476,7 @@ const handler = await ai({
   action: 'spawn',
   role: 'cartel_recruiter',
   name: 'Quiet Voice',
-  locationId: alleyId,
+  location: await $load(alleyId),
   personality: 'Patient, observant, never pushy.',
   history: 'Three years with the Cartel. Trusts no one new.'
 });

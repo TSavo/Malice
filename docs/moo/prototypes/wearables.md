@@ -452,11 +452,11 @@ For dressing NPCs programmatically, use the AI tailor:
 
 ```javascript
 // Dress an NPC using AI tailor
-ai({ action: 'tailor', humanId: npcId })
-ai({ action: 'tailor', humanId: npcId, context: 'shabby guard' })
+$tailor.dress(await $load(npcId ))
+$tailor.dress(await $load(npcId), context: 'shabby guard' )
 
 // Auto-dress on spawn
-ai({ action: 'spawn', role: 'guard', clothed: true })
+$ai.spawn({ role: 'guard', clothed: true })
 ```
 
 The tailor creates complete outfits based on NPC role and context. See [TAILORING.md](../../TAILORING.md) for full reference.

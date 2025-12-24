@@ -25,7 +25,7 @@ const npc = await $ai.spawn('shopkeeper', {
   description: 'A gruff middle-aged merchant.',
   sex: 'male',
   age: 45,
-  locationId: storeRoom.id,
+  location: await $load(storeRoom).id,
   personality: {
     traits: ['greedy', 'suspicious', 'cunning'],
     quirks: ['counts coins obsessively'],
@@ -427,11 +427,11 @@ The MCP server provides tools for managing NPCs:
 
 ```javascript
 // Via MCP ai tool
-ai({ action: 'spawn', role: 'guard', name: 'Bob', locationId: 123 })
-ai({ action: 'despawn', humanId: 456 })
-ai({ action: 'do', humanId: 456, command: 'say Hello!' })
-ai({ action: 'remember', humanId: 456, text: 'Met Jack', importance: 'critical' })
-ai({ action: 'profile', humanId: 456 })
+$ai.spawn({ role: 'guard', name: 'Bob', location: await $load(123) })
+$ai.despawn(456 )
+$ai.do(456, 'say Hello!')
+$ai.remember(456, 'Met Jack', 'critical')
+$ai.getProfile(456)
 ```
 
 ## Best Practices

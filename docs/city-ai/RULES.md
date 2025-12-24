@@ -76,17 +76,17 @@ NPCs do not materialize. They arrive.
 **Wrong:**
 ```javascript
 // Teleport guard into the room
-await ai({ action: 'spawn', locationId: targetRoomId, ... });
+await $ai.spawn({ location: await $load(targetRoomId), ... });
 ```
 
 **Right:**
 ```javascript
 // Spawn guard in adjacent room
-const guard = await ai({ action: 'spawn', locationId: hallwayId, ... });
+const guard = await $ai.spawn({ location: await $load(hallwayId), ... });
 
 // Walk them in
-await ai({ action: 'do', humanId: guard.id, command: 'south' });
-await ai({ action: 'do', humanId: guard.id, command: 'say Security responding.' });
+await $ai.do(guard.id, 'south');
+await $ai.do(guard.id, 'say Security responding.');
 ```
 
 If no adjacent room is appropriate, spawn them "off-screen" and walk them through multiple rooms to arrive naturally.
@@ -164,9 +164,9 @@ NPCs should:
 ```javascript
 // Start in security station
 // Walk to incident location
-await ai({ action: 'do', humanId: guard, command: 'north' });
-await ai({ action: 'do', humanId: guard, command: 'east' });
-await ai({ action: 'do', humanId: guard, command: 'say Security. What\'s the situation?' });
+await $ai.do(guard, 'north');
+await $ai.do(guard, 'east');
+await $ai.do(guard, 'say Security. What\'s the situation?');
 ```
 
 **Worker starting shift:**
@@ -187,9 +187,9 @@ await ai({ action: 'do', humanId: guard, command: 'say Security. What\'s the sit
 NPCs don't vanish. They leave.
 
 ```javascript
-await ai({ action: 'do', humanId: npc, command: 'say Shift\'s over. Heading out.' });
-await ai({ action: 'do', humanId: npc, command: 'south' });
-await ai({ action: 'do', humanId: npc, command: 'out' });
+await $ai.do(npc, 'say Shift\'s over. Heading out.');
+await $ai.do(npc, 'south');
+await $ai.do(npc, 'out');
 // Now safe to despawn - they're "gone home"
 ```
 
