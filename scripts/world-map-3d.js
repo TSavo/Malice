@@ -74,6 +74,20 @@ const html = `<!DOCTYPE html>
       margin: 0 0 10px 0;
       color: #0ff;
     }
+    #tooltip {
+      position: absolute;
+      background: rgba(0, 0, 0, 0.9);
+      padding: 10px;
+      border: 1px solid #0ff;
+      pointer-events: none;
+      display: none;
+      max-width: 400px;
+      z-index: 100;
+    }
+    #tooltip h3 {
+      margin: 0 0 5px 0;
+      color: #0ff;
+    }
     #controls {
       position: absolute;
       bottom: 10px;
@@ -101,6 +115,10 @@ const html = `<!DOCTYPE html>
   <div id="info">
     <h2>Malice World Map</h2>
     <div id="stats"></div>
+  </div>
+  <div id="tooltip">
+    <h3 id="tooltip-title"></h3>
+    <div id="tooltip-content"></div>
   </div>
   <div id="controls">
     <button onclick="viewSurface()">Surface (z=0)</button>
@@ -156,16 +174,27 @@ const html = `<!DOCTYPE html>
     // Create materials for different z-levels
     function getColorForZ(z) {
       if (z < 0) {
-        // Underground - blue to purple gradient
+        // Underground - darker blue to deep purple gradient
         const depth = Math.abs(z);
-        return new THREE.Color().setHSL(0.6 - depth * 0.02, 0.8, 0.4);
+        // Deeper = darker and more purple
+        const hue = 0.65 - depth * 0.05; // Blue (0.65) to purple (0.8)
+        const lightness = Math.max(0.15, 0.5 - depth * 0.05); // Gets darker with depth
+        return new THREE.Color().setHSL(hue, 0.9, lightness);
       } else if (z === 0) {
-        // Surface - green
+        // Surface - bright green
         return new THREE.Color(0x00ff00);
       } else {
         // Above ground - yellow to red gradient
         return new THREE.Color().setHSL(0.15 - z * 0.003, 0.9, 0.5);
       }
+    }
+
+    function getMaterialOpacity(z) {
+      if (z < 0) {
+        // Underground more opaque/darker
+        return 0.9;
+      }
+      return 0.8;
     }
 
     // Create room cubes
@@ -174,12 +203,14 @@ const html = `<!DOCTYPE html>
     const geometry = new THREE.BoxGeometry(roomSize, roomSize, roomSize);
 
     worldData.forEach(room => {
+      const color = getColorForZ(room.z);
       const material = new THREE.MeshPhongMaterial({
-        color: getColorForZ(room.z),
+        color: color,
         transparent: true,
-        opacity: 0.8,
-        emissive: getColorForZ(room.z),
-        emissiveIntensity: 0.2,
+        opacity: getMaterialOpacity(room.z),
+        emissive: color,
+        emissiveIntensity: room.z < 0 ? 0.3 : 0.2, // Underground glows more
+        shininess: room.z < 0 ? 10 : 30, // Underground less shiny
       });
 
       const cube = new THREE.Mesh(geometry, material);
@@ -208,10 +239,13 @@ const html = `<!DOCTYPE html>
       'Scroll: Zoom<br>' +
       '<br>' +
       '<strong>Colors:</strong><br>' +
-      '<span style="color: #6666ff">Blue/Purple</span>: Underground<br>' +
+      '<span style="color: #4444aa">Dark Blue</span>: Deep underground<br>' +
+      '<span style="color: #6666ff">Light Blue</span>: Shallow underground<br>' +
       '<span style="color: #00ff00">Green</span>: Surface (z=0)<br>' +
       '<span style="color: #ffaa00">Yellow/Orange</span>: Buildings<br>' +
-      '<span style="color: #ff6600">Red</span>: High floors<br>';
+      '<span style="color: #ff6600">Red</span>: High floors<br>' +
+      '<br>' +
+      '<em>Hover over rooms for details</em>';
 
     // View presets
     window.viewSurface = () => {
@@ -238,10 +272,20 @@ const html = `<!DOCTYPE html>
       controls.target.set(0, 0, 0);
     };
 
-    // Raycaster for hover effects
+    // Raycaster for hover effects and tooltips
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
     let hoveredObject = null;
+    const tooltip = document.getElementById('tooltip');
+    const tooltipTitle = document.getElementById('tooltip-title');
+    const tooltipContent = document.getElementById('tooltip-content');
+
+    function getLevelName(z) {
+      if (z < 0) return 'Underground Level ' + Math.abs(z);
+      if (z === 0) return 'Surface';
+      if (z <= 5) return 'Ground Floor + ' + z;
+      return 'Floor ' + z;
+    }
 
     function onMouseMove(event) {
       mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
@@ -250,14 +294,31 @@ const html = `<!DOCTYPE html>
       raycaster.setFromCamera(mouse, camera);
       const intersects = raycaster.intersectObjects(roomGroup.children);
 
+      // Reset previous hover
       if (hoveredObject) {
-        hoveredObject.material.emissiveIntensity = 0.2;
+        const wasUnderground = hoveredObject.userData.z < 0;
+        hoveredObject.material.emissiveIntensity = wasUnderground ? 0.3 : 0.2;
         hoveredObject = null;
       }
 
+      // Hide tooltip by default
+      tooltip.style.display = 'none';
+
       if (intersects.length > 0) {
         hoveredObject = intersects[0].object;
-        hoveredObject.material.emissiveIntensity = 0.5;
+        hoveredObject.material.emissiveIntensity = 0.7;
+
+        // Show tooltip
+        const room = hoveredObject.userData;
+        tooltipTitle.textContent = room.file;
+        tooltipContent.innerHTML =
+          '<strong>Coordinates:</strong> (' + room.x + ', ' + room.y + ', ' + room.z + ')<br>' +
+          '<strong>Level:</strong> ' + getLevelName(room.z) + '<br>' +
+          '<strong>Path:</strong> ' + room.path.replace(/\\\\/g, '/');
+
+        tooltip.style.display = 'block';
+        tooltip.style.left = (event.clientX + 15) + 'px';
+        tooltip.style.top = (event.clientY + 15) + 'px';
       }
     }
 
