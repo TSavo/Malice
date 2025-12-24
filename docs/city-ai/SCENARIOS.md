@@ -47,7 +47,7 @@ const contact = await ai({
   action: 'spawn',
   role: 'handler',
   name: 'The Mechanic',
-  locationId: garageId,
+  location: await $load(garageId),
   personality: 'Gruff, practical, judges by actions not words.',
   history: 'Runs a repair shop. Front for Cartel logistics.'
 });
@@ -231,7 +231,7 @@ const recruiter = await ai({
   action: 'spawn',
   role: 'cartel_recruiter',
   name: 'Quiet Voice',
-  locationId: alleyId,
+  location: await $load(alleyId),
   sex: 'female',
   age: 28,
   personality: 'Patient, observant, never pushy. Watches before approaching. Speaks in implications, not statements. Tests people constantly.',
@@ -284,7 +284,7 @@ const guard1 = await ai({
   action: 'spawn',
   role: 'guard',
   name: 'CorpSec Officer Vance',
-  locationId: loadingDockId,
+  location: await $load(loadingDockId),
   sex: 'male',
   age: 34,
   personality: 'Bored but professional. This is routine duty. Alert enough to notice something wrong, not paranoid enough to see threats everywhere.',
@@ -310,7 +310,7 @@ const guard2 = await ai({
   action: 'spawn',
   role: 'guard',
   name: 'CorpSec Officer Tanaka',
-  locationId: loadingDockId,
+  location: await $load(loadingDockId),
   sex: 'female',
   age: 29,
   personality: 'More alert than her partner. Takes the job seriously. Notices details.',
@@ -344,7 +344,7 @@ await $.scheduler.schedule({
   time: '15:30',
   event: 'truck_arrival',
   data: {
-    locationId: loadingDockId,
+    location: await $load(loadingDockId),
     description: 'Supply truck pulls in. Two workers begin unloading crates. Takes about 20 minutes.'
   }
 });
@@ -577,7 +577,7 @@ const clerk = await ai({
   action: 'spawn',
   role: 'clerk',
   name: 'Registration Clerk Vasquez',
-  locationId: cityServicesId,
+  location: await $load(cityServicesId),
   sex: 'female',
   age: 45,
   personality: 'Efficient, tired, seen it all. Not unkind but not warm either. This is her job.',
@@ -649,7 +649,7 @@ const operative = await ai({
   action: 'spawn',
   role: 'cartel_operative',
   name: 'Lean Man',
-  locationId: alleyOnRouteId,
+  location: await $load(alleyOnRouteId),
   sex: 'male',
   age: 30,
   personality: 'Calm, confident, slightly amused. Not threatening unless he needs to be. Makes offers, not demands.',
@@ -764,15 +764,15 @@ Regardless of outcome, update records:
 ```javascript
 // If player delivered
 await $.prop.set(playerId, 'pluribus_reliability', 'tested_once_passed');
-await plot({ action: 'complete_job', plotId, jobId: 'first_delivery', reason: 'Delivered successfully.' });
+await plot.completeJob('first_delivery', 'Delivered successfully.');
 
 // If player took the money
 await $.prop.set(playerId, 'pluribus_reliability', 'tested_once_failed');
 await $.prop.set(playerId, 'cartel_interest', 'potential_recruit');
-await plot({ action: 'fail_job', plotId, jobId: 'first_delivery', reason: 'Package stolen (allegedly).' });
+await plot.failJob('first_delivery', 'Package stolen (allegedly).');
 
 // Despawn operative (walked away)
-await ai({ action: 'despawn', humanId: operative.id });
+await $ai.despawn(operative.id);
 ```
 
 ---
@@ -791,7 +791,7 @@ const handler = await ai({
   action: 'spawn',
   role: 'cartel_handler',
   name: 'Quiet Voice', // Same recruiter from earlier
-  locationId: safeHouseId,
+  location: await $load(safeHouseId),
   sex: 'female',
   age: 28,
   personality: 'More open now. Trusts this asset (somewhat). Still careful.',
@@ -838,7 +838,7 @@ const nightGuard = await ai({
   action: 'spawn',
   role: 'guard',
   name: 'CorpSec Officer Huang',
-  locationId: factoryEntranceId,
+  location: await $load(factoryEntranceId),
   sex: 'male',
   age: 52,
   personality: 'Tired. This is a boring post. Mostly walks the perimeter, checks doors. Not expecting trouble.',
@@ -996,7 +996,7 @@ const target = await ai({
   action: 'spawn',
   role: 'cartel_mole',
   name: 'Jess Moreno',
-  locationId: targetWorkplaceId,
+  location: await $load(targetWorkplaceId),
   sex: 'female',
   age: 26,
   personality: 'Scared but trying not to show it. Knows something is wrong. Looking for an exit.',
@@ -1017,7 +1017,7 @@ const leadAgent = await ai({
   action: 'spawn',
   role: 'corpsec_investigator',
   name: 'Investigator Park',
-  locationId: securityOfficeId,
+  location: await $load(securityOfficeId),
   sex: 'male',
   age: 40,
   personality: 'Professional, methodical, experienced. Not cruel but not soft. Gets results.',
