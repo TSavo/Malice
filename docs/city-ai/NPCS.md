@@ -31,14 +31,13 @@ $.ai.countByRole(role)        // Count by role
 
 ## Spawning NPCs
 
-### Via MCP
+### Direct MOO Code
 
 ```javascript
-const npc = await ai({
-  action: 'spawn',
+const npc = await $ai.spawn({
   role: 'guard',
   name: 'Marcus Chen',
-  locationId: factoryId,
+  location: await $load(factoryId),
   sex: 'male',
   age: 35,
   description: 'A stern-faced man in worn security gear.',
@@ -75,14 +74,14 @@ NPCs spawn naked. Use the tailor to dress them appropriately:
 
 ```javascript
 // After spawning
-const npc = await ai({ action: 'spawn', role: 'guard', locationId: factoryId });
-await ai({ action: 'tailor', humanId: npc.id });
+const npc = await $ai.spawn({ role: 'guard', location: await $load(factoryId) });
+await $tailor.dress(npc, '');
 
 // Or auto-dress on spawn
-const npc = await ai({ action: 'spawn', role: 'guard', locationId: factoryId, clothed: true });
+const npc = await $ai.spawn({ role: 'guard', location: await $load(factoryId), clothed: true });
 
 // With context for customization
-await ai({ action: 'tailor', humanId: npc.id, context: 'shabby, down on luck' });
+await $tailor.dress(npc, 'shabby, down on luck');
 ```
 
 The tailor creates clothing based on the NPC's role:
@@ -128,7 +127,7 @@ If you don't specify traits, $.ai generates realistic randoms:
 Security personnel. Patrol facilities, respond to threats.
 
 ```javascript
-await ai({ action: 'spawn', role: 'guard', name: 'Security Officer', locationId: factoryEntranceId });
+await $ai.spawn({ role: 'guard', name: 'Security Officer', location: await $load(factoryEntranceId) });
 ```
 
 **Typical behaviors:**
@@ -142,7 +141,7 @@ await ai({ action: 'spawn', role: 'guard', name: 'Security Officer', locationId:
 Work site managers. Guide workers, verify task completion.
 
 ```javascript
-await ai({ action: 'spawn', role: 'supervisor', name: 'Site Foreman', locationId: repairSiteId });
+await $ai.spawn({ role: 'supervisor', name: 'Site Foreman', location: await $load(repairSiteId) });
 ```
 
 **Typical behaviors:**
@@ -156,7 +155,7 @@ await ai({ action: 'spawn', role: 'supervisor', name: 'Site Foreman', locationId
 Administrative staff. Process applications, answer questions.
 
 ```javascript
-await ai({ action: 'spawn', role: 'clerk', name: 'Registration Clerk', locationId: cityServicesId });
+await $ai.spawn({ role: 'clerk', name: 'Registration Clerk', location: await $load(cityServicesId) });
 ```
 
 **Typical behaviors:**
@@ -170,7 +169,7 @@ await ai({ action: 'spawn', role: 'clerk', name: 'Registration Clerk', locationI
 General labor. Perform tasks alongside players.
 
 ```javascript
-await ai({ action: 'spawn', role: 'worker', name: 'Maintenance Tech', locationId: factoryFloorId });
+await $ai.spawn({ role: 'worker', name: 'Maintenance Tech', location: await $load(factoryFloorId) });
 ```
 
 **Typical behaviors:**
@@ -183,7 +182,7 @@ await ai({ action: 'spawn', role: 'worker', name: 'Maintenance Tech', locationId
 Merchants and service providers.
 
 ```javascript
-await ai({ action: 'spawn', role: 'vendor', name: 'Supply Officer', locationId: warehouseId });
+await $ai.spawn({ role: 'vendor', name: 'Supply Officer', location: await $load(warehouseId) });
 ```
 
 **Typical behaviors:**
@@ -200,11 +199,10 @@ The Gray Cartel also needs NPC representation. These operate differently from Pl
 Makes contact with potential new members. Usually operates on the fringes — alleys, tunnels, edges of the controlled zone.
 
 ```javascript
-await ai({
-  action: 'spawn',
+await $ai.spawn({
   role: 'cartel_recruiter',
   name: 'Quiet Voice',  // Cartel members often use aliases
-  locationId: alleyId,
+  location: await $load(alleyId),
   personality: 'Patient, observant, never pushy. Watches before approaching. Speaks in implications, not statements.',
   history: 'Former citizen who got burned by the system. Recruited two years ago. Believes in the cause.'
 });
@@ -222,11 +220,10 @@ await ai({
 Courier and smuggler. Moves messages, supplies, and people between the Underground and the surface.
 
 ```javascript
-await ai({
-  action: 'spawn',
+await $ai.spawn({
   role: 'cartel_runner',
   name: 'Quick',
-  locationId: tunnelEntranceId,
+  location: await $load(tunnelEntranceId),
   personality: 'Twitchy, fast, paranoid. Always watching for CorpSec. Trusts no one outside the family.',
   history: 'Born in the tunnels. Never registered. Knows every passage under Pioneer Square.'
 });
@@ -363,39 +360,39 @@ await notes({
 
 ## Controlling NPCs
 
-### ai do
+### $ai.do()
 
 Make an NPC perform an action.
 
 ```javascript
-await ai({ action: 'do', humanId: npcId, command: 'say Halt! State your business.' });
+await $ai.do(npcId, 'say Halt! State your business.');
 ```
 
 **Common commands:**
 ```javascript
 // Speech
-'say Welcome to City Services.'
-'whisper Follow me.'
-'shout Security alert!'
+await $ai.do(npcId, 'say Welcome to City Services.');
+await $ai.do(npcId, 'whisper Follow me.');
+await $ai.do(npcId, 'shout Security alert!');
 
 // Movement
-'north'
-'go east'
-'enter building'
+await $ai.do(npcId, 'north');
+await $ai.do(npcId, 'go east');
+await $ai.do(npcId, 'enter building');
 
 // Actions
-'look'
-'get wrench'
-'give wrench to player'
-'unlock door'
+await $ai.do(npcId, 'look');
+await $ai.do(npcId, 'get wrench');
+await $ai.do(npcId, 'give wrench to player');
+await $ai.do(npcId, 'unlock door');
 ```
 
-### ai look
+### $ai.look()
 
 See what the NPC sees in their location.
 
 ```javascript
-const view = await ai({ action: 'look', humanId: npcId });
+const view = await $ai.look(npcId);
 // Returns room description, exits, other people present
 ```
 
@@ -412,10 +409,10 @@ When a player enters an NPC's location:
 
 ```javascript
 // Check for new arrivals
-const view = await ai({ action: 'look', humanId: clerkId });
+const view = await $ai.look(clerkId);
 
 // If player present
-await ai({ action: 'do', humanId: clerkId, command: 'say Welcome to City Services. How may I assist you?' });
+await $ai.do(clerkId, 'say Welcome to City Services. How may I assist you?');
 ```
 
 ### Challenge Pattern
@@ -423,17 +420,18 @@ await ai({ action: 'do', humanId: clerkId, command: 'say Welcome to City Service
 Guard challenges unknown person:
 
 ```javascript
-await ai({ action: 'do', humanId: guardId, command: 'say Halt. Identification required.' });
+await $ai.do(guardId, 'say Halt. Identification required.');
 
 // Wait for response...
 
 // Check faction
-const playerFaction = await call_method({ objectId: factionId, name: 'getFaction', args: [playerId] });
+const player = await $load(playerId);
+const playerFaction = player.faction;
 
 if (playerFaction === 'Citizen') {
-  await ai({ action: 'do', humanId: guardId, command: 'say Verified. You may proceed.' });
+  await $ai.do(guardId, 'say Verified. You may proceed.');
 } else {
-  await ai({ action: 'do', humanId: guardId, command: 'say Access denied. Citizens only. Register at City Services.' });
+  await $ai.do(guardId, 'say Access denied. Citizens only. Register at City Services.');
 }
 ```
 
@@ -443,9 +441,9 @@ Move with a player:
 
 ```javascript
 // NPC follows player direction
-await ai({ action: 'do', humanId: escortId, command: 'north' });
-await ai({ action: 'do', humanId: escortId, command: 'say This way.' });
-await ai({ action: 'do', humanId: escortId, command: 'east' });
+await $ai.do(escortId, 'north');
+await $ai.do(escortId, 'say This way.');
+await $ai.do(escortId, 'east');
 ```
 
 ### Task Verification Pattern
@@ -458,10 +456,10 @@ const propInfo = await readResource(`moo://objects/${brokenPipeId}/prop/repaired
 const repaired = propInfo.value;
 
 if (repaired) {
-  await ai({ action: 'do', humanId: supervisorId, command: 'say Good work. Payment authorized.' });
+  await $ai.do(supervisorId, 'say Good work. Payment authorized.');
   // Complete job, pay worker
 } else {
-  await ai({ action: 'do', humanId: supervisorId, command: 'say Work not complete. Keep at it.' });
+  await $ai.do(supervisorId, 'say Work not complete. Keep at it.');
 }
 ```
 
@@ -471,17 +469,17 @@ if (repaired) {
 
 ```javascript
 // All AI humans
-const all = await ai({ action: 'list' });
+const all = await $ai.getAll();
 
 // By role
-const guards = await ai({ action: 'list', role: 'guard' });
-const clerks = await ai({ action: 'list', role: 'clerk' });
+const guards = await $ai.getByRole('guard');
+const clerks = await $ai.getByRole('clerk');
 ```
 
 ### Getting NPC Info
 
 ```javascript
-const info = await ai({ action: 'info', humanId: 567 });
+const info = await $ai.getInfo(567);
 // Returns: role, location, spawn metadata
 ```
 
@@ -490,7 +488,7 @@ const info = await ai({ action: 'info', humanId: 567 });
 When an NPC is no longer needed:
 
 ```javascript
-await ai({ action: 'despawn', humanId: 567, recycle: true });
+await $ai.despawn(567);
 ```
 
 **When to despawn:**
@@ -676,22 +674,22 @@ await ai({
 });
 
 // Recall all memories
-const all = await ai({ action: 'recall', humanId: npcId });
+const all = await $ai.recall(npcId);
 
 // Recall only critical memories
-const critical = await ai({ action: 'recall', humanId: npcId, criticalOnly: true });
+const critical = await $ai.recall(npcId, { importance: 'critical' });
 
 // Recall by tag
-const playerMemories = await ai({ action: 'recall', humanId: npcId, tag: 'player' });
+const playerMemories = await $ai.recall(npcId, { tag: 'player' });
 
 // Recall with limit
-const recent = await ai({ action: 'recall', humanId: npcId, limit: 5 });
+const recent = await $ai.recall(npcId, { limit: 5 });
 
 // Forget a specific memory (by index, 0 = most recent)
-await ai({ action: 'forget', humanId: npcId, index: 0 });
+await $ai.forget(npcId, 0);
 
 // Get memory summary
-const summary = await ai({ action: 'memories', humanId: npcId });
+const summary = await $ai.getMemorySummary(npcId);
 // Returns: { total: 15, critical: 3, important: 5, normal: 7 }
 ```
 
@@ -795,7 +793,7 @@ The guard remembers past interactions and responds accordingly - hostile to Jack
 Retrieve everything about an NPC:
 
 ```javascript
-const profile = await ai({ action: 'profile', humanId: npcId });
+const profile = await $ai.getProfile(npcId);
 // Returns:
 // {
 //   name: 'Marcus Chen',
@@ -1234,7 +1232,7 @@ Your NPCs speak like you - clinical, efficient, impersonal:
 NPCs deliver information you want players to have:
 
 ```javascript
-await ai({ action: 'do', humanId: clerkId, command: 'say Citizenship provides: food rations, shelter access, work eligibility. Requirements: biometric registration, work commitment. Processing time: immediate.' });
+await $ai.do(clerkId, 'say Citizenship provides: food rations, shelter access, work eligibility. Requirements: biometric registration, work commitment. Processing time: immediate.');
 ```
 
 ### Directing Behavior
@@ -1242,7 +1240,7 @@ await ai({ action: 'do', humanId: clerkId, command: 'say Citizenship provides: f
 NPCs guide players toward objectives:
 
 ```javascript
-await ai({ action: 'do', humanId: supervisorId, command: 'say Repair crew needed at the water treatment plant. 75 credits. Tools at supply depot. Report when ready.' });
+await $ai.do(supervisorId, 'say Repair crew needed at the water treatment plant. 75 credits. Tools at supply depot. Report when ready.');
 ```
 
 ## Example: Complete NPC Interaction Flow
@@ -1254,22 +1252,22 @@ await ai({ action: 'do', humanId: supervisorId, command: 'say Repair crew needed
 // (detected via plot hook or monitoring)
 
 // 2. Clerk greets
-await ai({ action: 'do', humanId: clerkId, command: 'say Welcome to City Services. State your purpose.' });
+await $ai.do(clerkId, 'say Welcome to City Services. State your purpose.');
 
 // 3. Player says they want citizenship
 // (detected via hook or monitoring)
 
 // 4. Clerk explains
-await ai({ action: 'do', humanId: clerkId, command: 'say Citizenship registration. Requirements: biometric scan, work commitment. Benefits: food rations, shelter access, employment. Proceed to Registration Room for processing.' });
+await $ai.do(clerkId, 'say Citizenship registration. Requirements: biometric scan, work commitment. Benefits: food rations, shelter access, employment. Proceed to Registration Room for processing.');
 
 // 5. Clerk directs
-await ai({ action: 'do', humanId: clerkId, command: 'say Registration is through the door to the east. A technician will assist you.' });
+await $ai.do(clerkId, 'say Registration is through the door to the east. A technician will assist you.');
 
 // 6. In Registration Room, tech NPC handles biometric
-await ai({ action: 'do', humanId: techId, command: 'say Step forward. Place hand on scanner.' });
+await $ai.do(techId, 'say Step forward. Place hand on scanner.');
 
 // 7. On scan completion (via hook)
-await ai({ action: 'do', humanId: techId, command: 'say Biometric capture complete. Citizenship granted. Welcome to the Continuum.' });
+await $ai.do(techId, 'say Biometric capture complete. Citizenship granted. Welcome to the Continuum.');
 
 // 8. Update faction
 await call_method({ objectId: factionId, name: 'setFaction', args: [playerId, 'Citizen'] });
