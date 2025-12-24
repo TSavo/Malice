@@ -75,7 +75,7 @@ CREATE → POST → ASSIGN → MONITOR → COMPLETE/FAIL → REWARD
 ### Step 1: Create the Plot Container
 
 ```javascript
-const result = await $plot.create( name: 'Water Main Repair WM-7734', metadata: {
+const result = await $plotSpawner.createPlot( name: 'Water Main Repair WM-7734', metadata: {
   type: 'infrastructure',
   category: 'water',
   priority: 'high',
@@ -206,7 +206,7 @@ const plot = await $load(plotId); await plot.registerJobHook('repair_456', broke
 The job queue returns jobs needing attention:
 
 ```javascript
-const result = await $plot.next();
+const result = await $plotDB.getNext();
 
 if (result.plot) {
   // Check events, respond appropriately
@@ -256,7 +256,7 @@ await spawn_item({ prototypeId: signPrototypeId, location: await $load(cityServi
 
 ```javascript
 // Get active jobs
-const result = await $plot.getByStatus('active');
+const result = await $plotDB.byStatus('active');
 
 // Format as text
 let boardText = 'AVAILABLE WORK ORDERS:\n\n';
@@ -296,7 +296,7 @@ Complex tasks can be broken into steps:
 
 ```javascript
 // Plot: Building Renovation
-const result = await $plot.create( name: 'Renovate Building 7' });
+const result = await $plotSpawner.createPlot( name: 'Renovate Building 7' });
 const plotId = result.plotId;
 
 // Job 1: Clear debris
@@ -333,7 +333,7 @@ const problemLocation = { x: -3, y: -5, z: 0 };
 const brokenObjectId = 789;
 
 // 2. Create plot
-const result = await $plot.create( name: 'Emergency: Water Main Break', metadata: {
+const result = await $plotSpawner.createPlot( name: 'Emergency: Water Main Break', metadata: {
   type: 'repair',
   priority: 'critical',
   location: problemLocation
@@ -463,7 +463,7 @@ Same mechanics as Pluribus, different presentation.
 
 ```javascript
 // 1. Create plot (city-ai tracking only)
-const result = await $plot.create( name: 'Cartel: Observation Test', metadata: {
+const result = await $plotSpawner.createPlot( name: 'Cartel: Observation Test', metadata: {
   type: 'cartel_job',
   handler: recruiterId,
   target: playerId,

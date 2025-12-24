@@ -617,7 +617,7 @@ Manage narrative arcs, missions, and jobs.
 
 ```javascript
 // Create a new plot
-const plotId = await $plot.create("Water Main Repair", {
+const plotId = await $plotSpawner.createPlot("Water Main Repair", {
   type: "infrastructure",
   priority: "high"
 });
@@ -691,7 +691,7 @@ await plot.registerJobHook(
 
 ```javascript
 // Get next plot needing attention (bumps timer 24h)
-const next = await $plotDB.next();
+const next = await $plotDB.getNext();
 
 // List all active plots
 const active = await $plotDB.getByStatus("active");
@@ -812,7 +812,7 @@ await $ai.despawn(guard.id);
 
 ```javascript
 // 1. Check for pending plots
-const next = await $plotDB.next();
+const next = await $plotDB.getNext();
 
 if (next.plot) {
   const plot = await $load(next.plot.id);
