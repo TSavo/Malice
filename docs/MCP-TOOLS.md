@@ -63,6 +63,37 @@ player                 // Your player object (if authenticated)
 // Plus all JavaScript: loops, conditionals, async/await, etc.
 ```
 
+### Method Management
+
+Objects have built-in methods for managing their code:
+
+```typescript
+// Set a method (replaces entire code)
+obj.setMethod('greet', `
+  return 'Hello, ' + (args[0] || 'World') + '!';
+`);
+
+// Edit a method with find/replace (like file editing)
+const result = obj.editMethod('greet', 'Hello', 'Greetings');
+// Returns: { success: true, code: '...' } or { success: false, error: '...' }
+
+// Replace all occurrences
+obj.editMethod('greet', 'foo', 'bar', { replaceAll: true });
+
+// Get method source (local only - not inherited)
+const code = obj.getMethod('greet');
+
+// Get method source (walks inheritance chain)
+const inherited = await obj.getMethodCode('greet');
+// Returns: { code: '...', objectId: 123 } or null
+```
+
+**editMethod rules:**
+- Only edits methods on the object itself (not inherited)
+- Fails if `oldString` not found
+- Fails if `oldString` appears multiple times (unless `replaceAll: true`)
+- Returns current code on error for debugging
+
 ---
 
 ## MCP Resources (Read-Only)

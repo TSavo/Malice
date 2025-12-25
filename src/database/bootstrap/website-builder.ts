@@ -1447,6 +1447,9 @@ export class WebsiteBuilder {
         const playersData = await playersRes.json();
         const heatmap = playersData.heatmap;
 
+        // Spacing multiplier - increase for more gap between rooms
+        const spacing = 3;
+
         // Render rooms with height gradient
         const roomGeometry = new THREE.BoxGeometry(CFG.blockSize, CFG.blockSize, CFG.blockSize);
         for (const room of rooms) {
@@ -1459,7 +1462,7 @@ export class WebsiteBuilder {
             emissiveIntensity: CFG.roomEmissive,
           });
           const cube = new THREE.Mesh(roomGeometry, material);
-          cube.position.set(room.x * 2, room.z * 2, -room.y * 2);
+          cube.position.set(room.x * spacing, room.z * spacing, -room.y * spacing);
           cube.userData = { type: 'room', ...room };
           dynamicGroup.add(cube);
         }
@@ -1473,8 +1476,8 @@ export class WebsiteBuilder {
         });
         for (const exit of exits) {
           // Position tubes slightly below room centers so they're visible
-          const fromVec = new THREE.Vector3(exit.from.x * 2, exit.from.z * 2 - 0.5, -exit.from.y * 2);
-          const toVec = new THREE.Vector3(exit.to.x * 2, exit.to.z * 2 - 0.5, -exit.to.y * 2);
+          const fromVec = new THREE.Vector3(exit.from.x * spacing, exit.from.z * spacing - 0.5, -exit.from.y * spacing);
+          const toVec = new THREE.Vector3(exit.to.x * spacing, exit.to.z * spacing - 0.5, -exit.to.y * spacing);
 
           // Create cylinder between points
           const direction = new THREE.Vector3().subVectors(toVec, fromVec);
@@ -1497,7 +1500,7 @@ export class WebsiteBuilder {
         }
 
         // Render heat map cubes
-        const heatGeometry = new THREE.BoxGeometry(10, 2, 10); // 5x5 grid
+        const heatGeometry = new THREE.BoxGeometry(15, 3, 15); // 5x5 grid scaled
         for (const cell of heatmap) {
           const intensity = Math.min(cell.count / 6, 1);
           let color;
@@ -1513,7 +1516,7 @@ export class WebsiteBuilder {
             emissiveIntensity: 0.3,
           });
           const cube = new THREE.Mesh(heatGeometry, material);
-          cube.position.set(cell.x * 2, cell.z * 2 + 5, -cell.y * 2);
+          cube.position.set(cell.x * spacing, cell.z * spacing + 8, -cell.y * spacing);
           cube.userData = { type: 'heat', count: cell.count };
           dynamicGroup.add(cube);
         }
@@ -1807,6 +1810,7 @@ export class WebsiteBuilder {
 
         // Render rooms and exits (if not already rendered)
         if (scene.children.filter(c => c.userData.type === 'room').length === 0) {
+          const spacing = 3; // Match public map spacing
           const roomGeometry = new THREE.BoxGeometry(1.8, 1.8, 1.8);
           for (const room of rooms) {
             const color = getColorForZ(room.z);
@@ -1818,7 +1822,7 @@ export class WebsiteBuilder {
               emissiveIntensity: room.z < 0 ? 0.3 : 0.2,
             });
             const cube = new THREE.Mesh(roomGeometry, material);
-            cube.position.set(room.x * 2, room.z * 2, -room.y * 2);
+            cube.position.set(room.x * spacing, room.z * spacing, -room.y * spacing);
             cube.userData = { type: 'room', ...room };
             scene.add(cube);
           }
@@ -1832,8 +1836,8 @@ export class WebsiteBuilder {
           });
           for (const exit of exits) {
             // Position tubes slightly below room centers so they're visible
-            const fromVec = new THREE.Vector3(exit.from.x * 2, exit.from.z * 2 - 0.5, -exit.from.y * 2);
-            const toVec = new THREE.Vector3(exit.to.x * 2, exit.to.z * 2 - 0.5, -exit.to.y * 2);
+            const fromVec = new THREE.Vector3(exit.from.x * spacing, exit.from.z * spacing - 0.5, -exit.from.y * spacing);
+            const toVec = new THREE.Vector3(exit.to.x * spacing, exit.to.z * spacing - 0.5, -exit.to.y * spacing);
 
             // Create cylinder between points
             const direction = new THREE.Vector3().subVectors(toVec, fromVec);
@@ -1862,6 +1866,7 @@ export class WebsiteBuilder {
         }
 
         // Render agent markers
+        const agentSpacing = 3; // Match room spacing
         const agentGeometry = new THREE.SphereGeometry(1.5, 16, 16);
         for (const agent of agents) {
           const color = agent.isNPC ? 0x0066ff : 0x00ff00; // Blue for NPCs, Green for players
@@ -1871,7 +1876,7 @@ export class WebsiteBuilder {
             emissiveIntensity: 0.5,
           });
           const sphere = new THREE.Mesh(agentGeometry, material);
-          sphere.position.set(agent.x * 2, agent.z * 2 + 3, -agent.y * 2);
+          sphere.position.set(agent.x * agentSpacing, agent.z * agentSpacing + 3, -agent.y * agentSpacing);
           sphere.userData = { type: 'agent', ...agent };
           agentGroup.add(sphere);
         }

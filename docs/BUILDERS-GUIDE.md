@@ -52,6 +52,13 @@ execute_moo_code({
       return 'Wrong combination.';
     \\\`);
 
+    // Edit method with find/replace (like file editing)
+    lock.editMethod("canAccess", "Wrong combination", "Try again");
+    // Returns: { success: true, code: '...' }
+
+    // Get method source
+    const code = lock.getMethod("canAccess");
+
     // Register alias
     await $.addAlias("combinationLock", lock.id);
 
@@ -274,6 +281,17 @@ export class [Name]Builder {
       const param1 = args[0];
       return result;
     `);
+
+    // Edit existing methods (like file editing - find/replace)
+    obj.editMethod('methodName', 'old code', 'new code');
+    // Returns: { success: true, code: '...' } or { success: false, error: '...' }
+
+    // Replace all occurrences
+    obj.editMethod('methodName', 'foo', 'bar', { replaceAll: true });
+
+    // Get method source
+    const code = obj.getMethod('methodName');  // local only
+    const inherited = await obj.getMethodCode('methodName');  // walks chain
 
     return obj;
   }
