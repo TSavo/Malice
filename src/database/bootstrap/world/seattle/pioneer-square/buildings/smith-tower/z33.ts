@@ -70,6 +70,7 @@ export const building = {
         north: { room: '%A2_z33', door: '%D_A2_z33' },
         east: { room: '%B2_z33', door: '%D_B2_z33' },
         south: { room: '%C3_z33', door: '%D_C3_z33' },
+        west: '%C1_z33',
         in: '%E',
       },
       methods: {
@@ -178,7 +179,7 @@ export const building = {
       name: 'Smith Tower - 33rd Floor - South Suite - Alcove',
       description: 'A snug unit tucked behind the shaft, with one frosted window.',
       x: -13, y: 10, z: 33,
-      exits: {"south":"%C2_z33"},
+      exits: {"south":"%C2_z33","east":"%EL_z33"},
       methods: {
         onContentArrived: "const obj = args[0];\nif (!obj?.registerVerb) return;\nawait obj.registerVerb(['look out window', 'look through window', 'gaze out window', 'look down'], self, 'lookOutWindow');",
         onContentLeaving: "const obj = args[0];\nif (obj?.unregisterVerbsFrom) {\n  await obj.unregisterVerbsFrom(self.id);\n}",
@@ -241,7 +242,7 @@ export const building = {
       name: 'Smith Tower - 33rd Floor - South Suite - Living Room',
       description: 'A corner unit with western exposure and aged carpeting.',
       x: -13, y: 9, z: 33,
-      exits: {"east":"%C3_z33"},
+      exits: {"north":"%C1_z33","east":"%C3_z33"},
       methods: {
         onContentArrived: "const obj = args[0];\nif (!obj?.registerVerb) return;\nawait obj.registerVerb(['look out window', 'look through window', 'gaze out window', 'look down'], self, 'lookOutWindow');",
         onContentLeaving: "const obj = args[0];\nif (obj?.unregisterVerbsFrom) {\n  await obj.unregisterVerbsFrom(self.id);\n}",

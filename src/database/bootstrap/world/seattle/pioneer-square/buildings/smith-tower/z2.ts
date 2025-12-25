@@ -215,6 +215,7 @@ A single toggle control and a biometric scanner. Whatever this controls, it wasn
         west: '%P',
         east: '%T',
         north: '%O',
+        south: '%W',
       },
     },
 
@@ -233,7 +234,7 @@ A single toggle control and a biometric scanner. Whatever this controls, it wasn
       exits: {
         west: '%S',
         north: '%Q',
-        south: '%W',
+        south: '%X',
       },
       sittables: [
         {
@@ -246,7 +247,7 @@ A single toggle control and a biometric scanner. Whatever this controls, it wasn
     },
 
     // ═══════════════════════════════════════════════════════════════════
-    // BOTTOM ROW (y=+7): Locker Room, Stairwell, Equipment
+    // BOTTOM ROW (y=+9): Locker Room, Stairwell, Equipment, Holding
     // ═══════════════════════════════════════════════════════════════════
 
     '%U': {
@@ -307,9 +308,38 @@ A single toggle control and a biometric scanner. Whatever this controls, it wasn
       waterLevel: 0,
       outdoor: false,
       exits: {
-        north: '%T',
+        north: '%S',
+        east: '%X',
         west: '%V',
       },
+    },
+
+    '%X': {
+      // Holding Area (-10, 9, 2)
+      name: 'Smith Tower - 2nd Floor - Holding Area',
+      description: `A stark room with reinforced walls and a single observation window. Two holding cells with heavy doors stand empty, their biometric locks showing green standby. A processing desk with restraint anchors sits unused. A monitor displays: DETENTION SYSTEM ONLINE - NO CURRENT DETAINEES.
+
+The walls are sound-dampened. A small camera dome in the ceiling blinks red, recording nothing.`,
+      x: -10,
+      y: 9,
+      z: 2,
+      population: 0,
+      ambientNoise: 2,
+      lighting: 75,
+      waterLevel: 0,
+      outdoor: false,
+      exits: {
+        north: '%T',
+        west: '%W',
+      },
+      sittables: [
+        {
+          name: 'a processing bench',
+          capacity: 2,
+          emptyMsg: 'A metal bench is bolted to the floor near the processing desk.',
+          occupiedMsg: '%s seated on the processing bench',
+        },
+      ],
     },
   },
 };
