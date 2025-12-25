@@ -9,19 +9,41 @@ const WORLD_ROOT = path.join(__dirname, '../src/database/bootstrap/world');
 
 function extractCoordsFromFile(filePath) {
   const content = fs.readFileSync(filePath, 'utf8');
-  const regex = /x:\s*(-?\d+),\s*y:\s*(-?\d+),\s*z:\s*(-?\d+)/g;
+  const relativePath = path.relative(WORLD_ROOT, filePath);
   const matches = [];
+
+  // Find all room blocks with their names and coordinates
+  // Match room definitions like '%ROOM': { name: '...', ... x: N, y: N, z: N }
+  const roomBlockRegex = /'%([^']+)':\s*\{[^}]*?name:\s*['"`]([^'"`]+)['"`][^}]*?x:\s*(-?\d+),\s*y:\s*(-?\d+),\s*z:\s*(-?\d+)/gs;
   let match;
-  while ((match = regex.exec(content))) {
-    const relativePath = path.relative(WORLD_ROOT, filePath);
+  while ((match = roomBlockRegex.exec(content))) {
     matches.push({
-      x: parseInt(match[1]),
-      y: parseInt(match[2]),
-      z: parseInt(match[3]),
+      id: match[1],
+      name: match[2],
+      x: parseInt(match[3]),
+      y: parseInt(match[4]),
+      z: parseInt(match[5]),
       file: path.basename(filePath),
       path: relativePath,
     });
   }
+
+  // Also try to find inline coordinate definitions (for simpler formats)
+  if (matches.length === 0) {
+    const simpleRegex = /x:\s*(-?\d+),\s*y:\s*(-?\d+),\s*z:\s*(-?\d+)/g;
+    while ((match = simpleRegex.exec(content))) {
+      matches.push({
+        id: path.basename(filePath, '.ts'),
+        name: path.basename(filePath, '.ts'),
+        x: parseInt(match[1]),
+        y: parseInt(match[2]),
+        z: parseInt(match[3]),
+        file: path.basename(filePath),
+        path: relativePath,
+      });
+    }
+  }
+
   return matches;
 }
 

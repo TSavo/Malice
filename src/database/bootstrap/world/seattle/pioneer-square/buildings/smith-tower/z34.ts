@@ -84,6 +84,8 @@ Six unit doors line the hallway, each marked with clean metal numbers. The space
       outdoor: false,
       exits: {
         south: '%EL_z34',
+        east: '%B1_VIEW',
+        west: '%C2',
       },
     },
 
@@ -100,6 +102,8 @@ Six unit doors line the hallway, each marked with clean metal numbers. The space
       outdoor: false,
       exits: {
         north: '%EL_z34',
+        east: '%B1_STUDY',
+        west: '%C1_VIEW',
       },
     },
 
@@ -121,11 +125,13 @@ Six unit doors line the hallway, each marked with clean metal numbers. The space
       exits: {
         west: '%EL_z34',
         north: '%B1_VIEW',
+        east: '%B2',
+        south: '%B1_STUDY',
       },
     },
 
     '%B1_VIEW': {
-      name: 'Smith Tower - 34th Floor - East Viewing Alcove',
+      name: 'Smith Tower - 34th Floor - Northeast Viewing Alcove',
       description: `A small windowed alcove with views of the grey city sprawl. The glass is clean, recently installed. A bench built into the wall sits empty. The lighting is soft, the space quiet.`,
       x: -11,
       y: 11,
@@ -137,6 +143,8 @@ Six unit doors line the hallway, each marked with clean metal numbers. The space
       outdoor: false,
       exits: {
         south: '%B1',
+        east: '%B2_VIEW',
+        west: '%A1',
       },
       sittables: [
         {
@@ -161,7 +169,85 @@ Six unit doors line the hallway, each marked with clean metal numbers. The space
       outdoor: false,
       exits: {
         west: '%B1',
+        north: '%B2_VIEW',
+        south: '%B2_LOUNGE',
       },
+    },
+
+    '%B2_VIEW': {
+      name: 'Smith Tower - 34th Floor - East Corner Alcove',
+      description: `A corner alcove with panoramic windows offering sweeping views east and north. The glass wraps around two walls, floor to ceiling. Built-in seating follows the window line. The space is bright, quiet, untouched.`,
+      x: -10,
+      y: 11,
+      z: 34,
+      population: 0,
+      ambientNoise: 1,
+      lighting: 70,
+      waterLevel: 0,
+      outdoor: false,
+      exits: {
+        south: '%B2',
+        west: '%B1_VIEW',
+      },
+      sittables: [
+        {
+          name: 'corner window seating',
+          capacity: 4,
+          emptyMsg: 'Built-in seating wraps the corner windows.',
+          occupiedMsg: '%s sitting at the corner windows',
+        },
+      ],
+    },
+
+    '%B1_STUDY': {
+      name: 'Smith Tower - 34th Floor - Executive Study',
+      description: `A quiet study with built-in bookshelves and a compact desk station. The shelves are empty, awaiting occupant preference. A terminal sits dark on the desk. The lighting is warm, the space designed for focus and concentration.`,
+      x: -11,
+      y: 9,
+      z: 34,
+      population: 0,
+      ambientNoise: 1,
+      lighting: 65,
+      waterLevel: 0,
+      outdoor: false,
+      exits: {
+        north: '%B1',
+        east: '%B2_LOUNGE',
+        west: '%A2',
+      },
+      sittables: [
+        {
+          name: 'a study desk',
+          capacity: 1,
+          emptyMsg: 'A desk waits for someone to work.',
+          occupiedMsg: '%s working at the study desk',
+        },
+      ],
+    },
+
+    '%B2_LOUNGE': {
+      name: 'Smith Tower - 34th Floor - Southeast Lounge',
+      description: `A small lounge with comfortable seating and a beverage station. The dispenser is installed but not stocked. Floor-to-ceiling windows offer views south and east. A terminal displays: AMENITY SERVICE - CONFIGURATION PENDING.`,
+      x: -10,
+      y: 9,
+      z: 34,
+      population: 0,
+      ambientNoise: 2,
+      lighting: 65,
+      waterLevel: 0,
+      outdoor: false,
+      exits: {
+        north: '%B2',
+        west: '%B1_STUDY',
+      },
+      sittables: [
+        {
+          name: 'a lounge chair',
+          capacity: 3,
+          emptyMsg: 'Comfortable chairs wait unused.',
+          occupiedMsg: '%s relaxing in the lounge',
+        },
+      ],
     },
 
     // ═══════════════════════════════════════════════════════════════════
@@ -181,6 +267,7 @@ Six unit doors line the hallway, each marked with clean metal numbers. The space
       outdoor: false,
       exits: {
         east: '%EL_z34',
+        north: '%C2',
         south: '%C1_VIEW',
       },
     },
@@ -198,6 +285,7 @@ Six unit doors line the hallway, each marked with clean metal numbers. The space
       outdoor: false,
       exits: {
         north: '%C1',
+        east: '%A2',
       },
       sittables: [
         {
@@ -222,6 +310,7 @@ Six unit doors line the hallway, each marked with clean metal numbers. The space
       outdoor: false,
       exits: {
         south: '%C1',
+        east: '%A1',
       },
     },
   },

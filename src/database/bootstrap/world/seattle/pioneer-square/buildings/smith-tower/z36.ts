@@ -47,6 +47,8 @@ export const building = {
       outdoor: false,
       exits: {
         south: '%CONCOURSE',
+        east: '%NOODLE',
+        west: '%HARDWARE',
       },
     },
 
@@ -63,6 +65,7 @@ export const building = {
       outdoor: false,
       exits: {
         north: '%CONCOURSE',
+        east: '%COFFEE',
       },
     },
 
@@ -81,6 +84,7 @@ export const building = {
         west: '%CONCOURSE',
         north: '%NOODLE',
         south: '%COFFEE',
+        east: '%GENERAL',
       },
       sittables: [
         {
@@ -105,6 +109,8 @@ export const building = {
       outdoor: false,
       exits: {
         south: '%FOOD_COURT',
+        west: '%TECH',
+        east: '%BAKERY',
       },
     },
 
@@ -121,6 +127,8 @@ export const building = {
       outdoor: false,
       exits: {
         north: '%FOOD_COURT',
+        west: '%FASHION',
+        east: '%CONVENIENCE',
       },
     },
 
@@ -138,6 +146,7 @@ export const building = {
       exits: {
         east: '%CONCOURSE',
         south: '%WELLNESS',
+        north: '%HARDWARE',
       },
     },
 
@@ -154,6 +163,79 @@ export const building = {
       outdoor: false,
       exits: {
         north: '%PHARMACY',
+      },
+    },
+
+    // ═══════════════════════════════════════════════════════════════════
+    // EAST WING - General Retail
+    // ═══════════════════════════════════════════════════════════════════
+
+    '%HARDWARE': {
+      name: 'Smith Tower - 36th Floor - Hardware Kiosk',
+      description: `A small hardware outlet with wall-mounted tool racks - all empty. Display cases for power tools sit with blank price tags. A vending terminal reads: HARDWARE SUPPLIES - INVENTORY LOADING REQUIRED. The floor is clean concrete, ready for heavy foot traffic.`,
+      x: -13,
+      y: 11,
+      z: 36,
+      population: 0,
+      ambientNoise: 3,
+      lighting: 75,
+      waterLevel: 0,
+      outdoor: false,
+      exits: {
+        south: '%PHARMACY',
+        east: '%TECH',
+      },
+    },
+
+    '%BAKERY': {
+      name: 'Smith Tower - 36th Floor - Bakery',
+      description: `A bakery counter with empty display cases and dormant ovens. The scent of cleaning solution lingers where bread should be. A terminal displays: BAKERY SERVICES - SUPPLIES REQUIRED - BAKING SCHEDULE NOT CONFIGURED. Trays sit stacked and unused.`,
+      x: -10,
+      y: 11,
+      z: 36,
+      population: 0,
+      ambientNoise: 3,
+      lighting: 75,
+      waterLevel: 0,
+      outdoor: false,
+      exits: {
+        south: '%GENERAL',
+        west: '%NOODLE',
+      },
+    },
+
+    '%GENERAL': {
+      name: 'Smith Tower - 36th Floor - General Store',
+      description: `A general merchandise outlet with empty shelving units arranged in neat rows. Barcode scanners wait at checkout stations. A screen reads: GENERAL RETAIL - INVENTORY UPLOAD PENDING. The space is bright, organized, and completely unstocked.`,
+      x: -10,
+      y: 10,
+      z: 36,
+      population: 0,
+      ambientNoise: 4,
+      lighting: 75,
+      waterLevel: 0,
+      outdoor: false,
+      exits: {
+        north: '%BAKERY',
+        south: '%CONVENIENCE',
+        west: '%FOOD_COURT',
+      },
+    },
+
+    '%CONVENIENCE': {
+      name: 'Smith Tower - 36th Floor - Quick-Stop',
+      description: `A small convenience store with refrigerated wall units humming empty. Snack racks stand bare. A self-checkout kiosk displays: QUICK-STOP SERVICES - PRODUCT DATABASE NOT LOADED. The lighting is bright, the floor is clean, the shelves are waiting.`,
+      x: -10,
+      y: 9,
+      z: 36,
+      population: 0,
+      ambientNoise: 3,
+      lighting: 80,
+      waterLevel: 0,
+      outdoor: false,
+      exits: {
+        north: '%GENERAL',
+        west: '%COFFEE',
       },
     },
   },

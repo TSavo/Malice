@@ -47,6 +47,8 @@ export const building = {
       outdoor: false,
       exits: {
         south: '%PROMENADE',
+        west: '%LAUNDRY',
+        east: '%SHOWER',
       },
       sittables: [
         {
@@ -71,6 +73,8 @@ export const building = {
       outdoor: false,
       exits: {
         north: '%PROMENADE',
+        west: '%STORAGE',
+        east: '%SAUNA',
       },
     },
 
@@ -88,6 +92,8 @@ export const building = {
       exits: {
         west: '%PROMENADE',
         north: '%SHOWER',
+        south: '%SAUNA',
+        east: '%RECREATION',
       },
       sittables: [
         {
@@ -112,6 +118,8 @@ export const building = {
       outdoor: false,
       exits: {
         south: '%GYM',
+        west: '%SALON',
+        east: '%LOCKERS',
       },
     },
 
@@ -129,6 +137,7 @@ export const building = {
       exits: {
         east: '%PROMENADE',
         south: '%STORAGE',
+        north: '%LAUNDRY',
       },
     },
 
@@ -145,7 +154,123 @@ export const building = {
       outdoor: false,
       exits: {
         north: '%GROCERY',
+        east: '%PET',
       },
+    },
+
+    // ═══════════════════════════════════════════════════════════════════
+    // CORNER SERVICES
+    // ═══════════════════════════════════════════════════════════════════
+
+    '%LAUNDRY': {
+      name: 'Smith Tower - 37th Floor - Laundry Center',
+      description: `A self-service laundry with rows of industrial washers and dryers - all new, all silent. Folding tables line one wall. A payment terminal displays: LAUNDRY SERVICES - WATER CONNECTION PENDING - PAYMENT SYSTEM NOT CONFIGURED. Detergent dispensers sit empty.`,
+      x: -13,
+      y: 11,
+      z: 37,
+      population: 0,
+      ambientNoise: 2,
+      lighting: 75,
+      waterLevel: 0,
+      outdoor: false,
+      exits: {
+        south: '%GROCERY',
+        east: '%SALON',
+      },
+    },
+
+    '%LOCKERS': {
+      name: 'Smith Tower - 37th Floor - Personal Storage',
+      description: `A wall of smart lockers with biometric readers. Each unit displays: AVAILABLE - REGISTRATION REQUIRED. The space smells of new metal and plastic. A kiosk reads: LOCKER SERVICES - ENROLLMENT SYSTEM NOT ACTIVE.`,
+      x: -10,
+      y: 11,
+      z: 37,
+      population: 0,
+      ambientNoise: 2,
+      lighting: 75,
+      waterLevel: 0,
+      outdoor: false,
+      exits: {
+        south: '%RECREATION',
+        west: '%SHOWER',
+      },
+    },
+
+    '%RECREATION': {
+      name: 'Smith Tower - 37th Floor - Recreation Room',
+      description: `A leisure space with gaming tables covered in plastic and wall-mounted screens still in boxes. Comfortable seating arranged in clusters. A terminal reads: RECREATION SERVICES - ENTERTAINMENT SYSTEM CONFIGURATION REQUIRED. The space is bright, modern, waiting.`,
+      x: -10,
+      y: 10,
+      z: 37,
+      population: 0,
+      ambientNoise: 3,
+      lighting: 70,
+      waterLevel: 0,
+      outdoor: false,
+      exits: {
+        north: '%LOCKERS',
+        south: '%CHANGING',
+        west: '%GYM',
+      },
+      sittables: [
+        {
+          name: 'a gaming chair',
+          capacity: 4,
+          emptyMsg: 'Gaming chairs wait unused.',
+          occupiedMsg: '%s relaxing in the recreation room',
+        },
+      ],
+    },
+
+    '%SAUNA': {
+      name: 'Smith Tower - 37th Floor - Dry Sauna',
+      description: `A cedar-lined sauna chamber with tiered benches. The heating elements are installed but cold. A thermometer reads room temperature. A sign states: SAUNA SERVICES - HEATING SYSTEM TEST REQUIRED - DO NOT OPERATE.`,
+      x: -11,
+      y: 9,
+      z: 37,
+      population: 0,
+      ambientNoise: 1,
+      lighting: 55,
+      waterLevel: 0,
+      outdoor: false,
+      exits: {
+        north: '%GYM',
+        west: '%PET',
+        east: '%CHANGING',
+      },
+      sittables: [
+        {
+          name: 'a sauna bench',
+          capacity: 4,
+          emptyMsg: 'Wooden benches line the walls.',
+          occupiedMsg: '%s sitting in the sauna',
+        },
+      ],
+    },
+
+    '%CHANGING': {
+      name: 'Smith Tower - 37th Floor - Changing Room',
+      description: `A private changing area with individual stalls and benches. Mirrors are clean and new. Towel hooks are empty. A dispenser reads: AMENITY SUPPLIES NOT LOADED. The space is quiet, bright, and unused.`,
+      x: -10,
+      y: 9,
+      z: 37,
+      population: 0,
+      ambientNoise: 1,
+      lighting: 75,
+      waterLevel: 0,
+      outdoor: false,
+      exits: {
+        north: '%RECREATION',
+        west: '%SAUNA',
+      },
+      sittables: [
+        {
+          name: 'a changing bench',
+          capacity: 2,
+          emptyMsg: 'Benches wait in the stalls.',
+          occupiedMsg: '%s using a changing stall',
+        },
+      ],
     },
   },
 };

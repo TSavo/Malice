@@ -62,6 +62,7 @@ export const building = {
       exits: {
         west: '%RH2',
         south: '%RH6',
+        east: '%RH10',
       },
     },
 
@@ -118,6 +119,7 @@ export const building = {
         north: '%RH3',
         west: '%RH5',
         south: '%RH9',
+        east: '%RH11',
       },
     },
 
@@ -170,6 +172,63 @@ export const building = {
       exits: {
         north: '%RH6',
         west: '%RH8',
+        east: '%RH12',
+      },
+    },
+
+    // ═══════════════════════════════════════════════════════════════════
+    // FAR EAST EDGE
+    // ═══════════════════════════════════════════════════════════════════
+
+    '%RH10': {
+      name: 'Smith Tower - Roof - Far Northeast Edge',
+      description: `The outermost edge of the roof, where the parapet drops away to a sheer fall. The view here is unobstructed - ferries crossing the grey sound, container ships at anchor, the distant Olympics lost in haze. Wind howls up the building face.`,
+      x: -10,
+      y: 11,
+      z: 39,
+      population: 0,
+      ambientNoise: 16,
+      lighting: 100,
+      waterLevel: 0,
+      outdoor: true,
+      exits: {
+        west: '%RH3',
+        south: '%RH11',
+      },
+    },
+
+    '%RH11': {
+      name: 'Smith Tower - Roof - East Ledge',
+      description: `A precarious strip along the building's eastern face. The parapet here is barely knee-high, eroded by weather. Pigeon droppings coat the stone. The wind is relentless, pulling at loose clothing.`,
+      x: -10,
+      y: 10,
+      z: 39,
+      population: 0,
+      ambientNoise: 15,
+      lighting: 100,
+      waterLevel: 0,
+      outdoor: true,
+      exits: {
+        north: '%RH10',
+        west: '%RH6',
+        south: '%RH12',
+      },
+    },
+
+    '%RH12': {
+      name: 'Smith Tower - Roof - Far Southeast Edge',
+      description: `The extreme southeastern corner of the roof. From here you can see the stadium roofs, the rail yards, and the grey industrial sprawl stretching south. A rusted maintenance ladder is bolted to the parapet, leading nowhere - its lower rungs long since removed.`,
+      x: -10,
+      y: 9,
+      z: 39,
+      population: 0,
+      ambientNoise: 14,
+      lighting: 100,
+      waterLevel: 0,
+      outdoor: true,
+      exits: {
+        north: '%RH11',
+        west: '%RH9',
       },
     },
   },

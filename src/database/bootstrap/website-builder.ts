@@ -907,13 +907,12 @@ export class WebsiteBuilder {
           }
         }
 
-        // Filter names based on auth status
-        const isAdmin = meta.isAdmin || false;
+        // Return all rooms with names
         const filteredRooms = rooms.map(r => ({
           x: r.x,
           y: r.y,
           z: r.z,
-          name: (isAdmin || r.outdoor) ? r.name : ''
+          name: r.name
         }));
 
         return {

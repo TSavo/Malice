@@ -227,6 +227,7 @@ A display reads: EXECUTIVE CONFERENCE - AWAITING SCHEDULE. The room is functiona
       exits: {
         north: { room: '%EXEC_A', door: '%D_EXEC_A' },
         west: '%LOBBY',
+        south: '%MEETING',
       },
       sittables: [
         {
@@ -254,6 +255,7 @@ A display reads: EXECUTIVE SUPPORT - PERSONNEL PENDING. The desks are clean, org
       exits: {
         north: { room: '%EXEC_B', door: '%D_EXEC_B' },
         west: '%STAFF',
+        south: '%LOUNGE',
       },
       sittables: [
         {
@@ -280,9 +282,8 @@ A display reads: STAFF FACILITIES - STANDBY. The seating is comfortable, modern.
       outdoor: false,
       exits: {
         north: '%LOBBY',
-        east: '%RECEPTION',
-        west: '%ARCHIVE',
-        south: { room: '%ARCHIVE', door: '%D_ARCHIVE' },
+        east: '%MEETING',
+        west: { room: '%ARCHIVE', door: '%D_ARCHIVE' },
       },
       sittables: [
         {
@@ -430,7 +431,7 @@ A display reads: EXECUTIVE SUITE B - UNASSIGNED. The office is pristine, silent.
     },
 
     // ═════════════════════════════════════════════════════════════════
-    // BOTTOM ROW (y=+9): Secure Archive
+    // BOTTOM ROW (y=+9): Archive, Staff, Meeting, Lounge
     // ═════════════════════════════════════════════════════════════════
 
     '%ARCHIVE': {
@@ -455,6 +456,73 @@ A display reads: ARCHIVE STORAGE - RESTRICTED ACCESS. Filing cabinets line walls
           capacity: 2,
           emptyMsg: 'The review table is empty.',
           occupiedMsg: '%s working at the review table.',
+        },
+      ],
+    },
+
+    '%MEETING': {
+      name: 'Smith Tower - 3rd Floor - Private Meeting Room',
+      description: `A smaller meeting room designed for confidential discussions. Frosted glass walls provide visual privacy while allowing ambient light. A round table seats six, promoting collaborative discussion.
+
+A display reads: PRIVATE MEETING - AVAILABLE. Soundproofing panels line the walls. A small credenza holds refreshment supplies, currently empty. The lighting is warm, adjustable.`,
+      x: -11,
+      y: 9,
+      z: 3,
+      population: 0,
+      ambientNoise: 2,
+      lighting: 70,
+      waterLevel: 0,
+      outdoor: false,
+      exits: {
+        north: '%CONF',
+        west: '%STAFF',
+        east: '%LOUNGE',
+      },
+      sittables: [
+        {
+          name: 'the round table',
+          capacity: 6,
+          emptyMsg: 'The round table sits empty.',
+          occupiedMsg: '%s seated at the round table.',
+        },
+      ],
+    },
+
+    '%LOUNGE': {
+      name: 'Smith Tower - 3rd Floor - Executive Lounge',
+      description: `A comfortable lounge space for executives to relax between meetings. Deep leather couches and armchairs are arranged around a low coffee table. A small bar area stands against the east wall, bottles empty, glasses polished.
+
+Floor-to-ceiling windows offer views of the city. A display reads: EXECUTIVE LOUNGE - COMPLIMENTARY REFRESHMENTS PENDING. The space is quiet, plush, waiting for the bustle of corporate life.`,
+      x: -10,
+      y: 9,
+      z: 3,
+      population: 0,
+      ambientNoise: 2,
+      lighting: 65,
+      waterLevel: 0,
+      outdoor: false,
+      exits: {
+        north: '%SUPPORT',
+        west: '%MEETING',
+      },
+      sittables: [
+        {
+          name: 'a leather couch',
+          capacity: 3,
+          emptyMsg: 'The leather couch waits invitingly.',
+          occupiedMsg: '%s relaxing on the couch.',
+        },
+        {
+          name: 'an armchair',
+          capacity: 2,
+          emptyMsg: 'Armchairs flank the coffee table.',
+          occupiedMsg: '%s seated in an armchair.',
+        },
+        {
+          name: 'a bar stool',
+          capacity: 3,
+          emptyMsg: 'Bar stools line the counter.',
+          occupiedMsg: '%s perched at the bar.',
         },
       ],
     },

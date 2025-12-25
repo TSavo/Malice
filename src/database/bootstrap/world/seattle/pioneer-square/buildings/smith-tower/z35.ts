@@ -5,10 +5,10 @@ export const building = {
   rooms: {
     '%E': {
       prototype: 'elevator',
-      exits: { out: '%LOBBY' },
+      exits: { out: '%LOBBY_35' },
     },
 
-    '%LOBBY': {
+    '%LOBBY_35': {
       name: 'Smith Tower - 35th Floor - Amenities Lobby',
       description: `A high-floor landing with polished floors and soft lighting. Wall panels display: EXECUTIVE AMENITIES - FLOOR 35. Direction signs point to the fitness center, lounge, and meeting rooms. Everything is clean, modern, unmanned.
 
@@ -22,7 +22,7 @@ The space echoes with emptiness. The air circulation hums steadily. Waiting for 
       waterLevel: 0,
       outdoor: false,
       exits: {
-        north: '%LOUNGE',
+        north: '%LOUNGE_35',
         south: '%FITNESS',
         east: '%MEETING1',
         west: '%VIEW_DECK',
@@ -71,7 +71,7 @@ The space echoes with emptiness. The air circulation hums steadily. Waiting for 
     // NORTH - Executive Lounge
     // ═══════════════════════════════════════════════════════════════════
 
-    '%LOUNGE': {
+    '%LOUNGE_35': {
       name: 'Smith Tower - 35th Floor - Executive Lounge',
       description: `A spacious lounge with floor-to-ceiling windows overlooking the grey city. Modern seating arranged in conversational clusters - clean lines, minimalist design. A beverage station stands ready but unstocked, its display reading: INVENTORY PENDING.
 
@@ -85,8 +85,9 @@ No one sits in the chairs. The lighting is warm but the space feels cold. A show
       waterLevel: 0,
       outdoor: false,
       exits: {
-        south: '%LOBBY',
+        south: '%LOBBY_35',
         west: '%LIBRARY',
+        east: '%MEETING2',
       },
       sittables: [
         {
@@ -112,7 +113,8 @@ The lighting is soft, conducive to reading. The air is silent. No one studies he
       waterLevel: 0,
       outdoor: false,
       exits: {
-        east: '%LOUNGE',
+        east: '%LOUNGE_35',
+        south: '%VIEW_DECK',
       },
       sittables: [
         {
@@ -142,14 +144,15 @@ The air smells of new rubber and cleaning solution. The floor is pristine. No on
       waterLevel: 0,
       outdoor: false,
       exits: {
-        north: '%LOBBY',
+        north: '%LOBBY_35',
         west: '%YOGA',
+        east: '%SPA',
       },
     },
 
     '%YOGA': {
       name: 'Smith Tower - 35th Floor - Wellness Studio',
-      description: `An empty studio with polished wood floors and one mirrored wall. Rolled exercise mats stacked in the corner, still in packaging. A sound system bracket on the wall - no equipment installed. The lighting is adjustable, currently set to soft daylight simulation.
+      description: `An empty studio with polished wood floors and one mirrored wall. Rolled exercise mats stacked in the corner, still in packaging. A sound system bracket on the wall - no equipment installed. Floor-to-ceiling windows offer views south toward the waterfront.
 
 The space echoes. Everything ready, nothing used.`,
       x: -13,
@@ -161,8 +164,17 @@ The space echoes. Everything ready, nothing used.`,
       waterLevel: 0,
       outdoor: false,
       exits: {
+        north: '%VIEW_DECK',
         east: '%FITNESS',
       },
+      sittables: [
+        {
+          name: 'window seating',
+          capacity: 4,
+          emptyMsg: 'Built-in benches line the windows.',
+          occupiedMsg: '%s sitting at the window',
+        },
+      ],
     },
 
     // ═══════════════════════════════════════════════════════════════════
@@ -173,7 +185,7 @@ The space echoes. Everything ready, nothing used.`,
       name: 'Smith Tower - 35th Floor - Conference Room A',
       description: `A glass-walled meeting room with a long table and modern chairs. Wall-mounted displays show: ROOM AVAILABLE - NO RESERVATIONS. Presentation equipment installed but idle. The table surface is spotless.
 
-The room has never been used. The chairs have never been sat in. Waiting for meetings that haven't been scheduled.`,
+The room has never been used. The chairs have never been sat in. Waiting for meetings that hasn't been scheduled.`,
       x: -11,
       y: 10,
       z: 35,
@@ -183,8 +195,10 @@ The room has never been used. The chairs have never been sat in. Waiting for mee
       waterLevel: 0,
       outdoor: false,
       exits: {
-        west: '%LOBBY',
+        west: '%LOBBY_35',
         north: '%MEETING2',
+        south: '%SPA',
+        east: '%BREAKROOM',
       },
       sittables: [
         {
@@ -212,6 +226,7 @@ Clean, modern, empty. A space for decisions that haven't been made.`,
       exits: {
         south: '%MEETING1',
         east: '%PRIVATE',
+        west: '%LOUNGE_35',
       },
       sittables: [
         {
@@ -238,6 +253,7 @@ A space for an executive who hasn't been hired.`,
       outdoor: false,
       exits: {
         west: '%MEETING2',
+        south: '%BREAKROOM',
       },
       sittables: [
         {
@@ -245,6 +261,93 @@ A space for an executive who hasn't been hired.`,
           capacity: 1,
           emptyMsg: 'An empty desk waits.',
           occupiedMsg: '%s sitting at the desk',
+        },
+      ],
+    },
+
+    // ═══════════════════════════════════════════════════════════════════
+    // SOUTHEAST - Spa & Wellness
+    // ═══════════════════════════════════════════════════════════════════
+
+    '%BREAKROOM': {
+      name: 'Smith Tower - 35th Floor - Executive Break Room',
+      description: `A small lounge with comfortable seating and a beverage station. The dispenser is installed but not stocked, its display reading: INVENTORY PENDING. A window offers eastern views of the grey city. Charging ports are built into every surface.
+
+Clean, modern, empty. A break room with no one to take breaks.`,
+      x: -10,
+      y: 10,
+      z: 35,
+      population: 0,
+      ambientNoise: 2,
+      lighting: 75,
+      waterLevel: 0,
+      outdoor: false,
+      exits: {
+        north: '%PRIVATE',
+        west: '%MEETING1',
+        south: '%STEAM',
+      },
+      sittables: [
+        {
+          name: 'a lounge chair',
+          capacity: 4,
+          emptyMsg: 'Comfortable chairs wait unused.',
+          occupiedMsg: '%s relaxing in the break room',
+        },
+      ],
+    },
+
+    '%SPA': {
+      name: 'Smith Tower - 35th Floor - Spa Treatment Room',
+      description: `A treatment room with a massage table and wall-mounted equipment still in packaging. Soft lighting is pre-set. Aromatherapy dispensers are installed but empty. A terminal reads: SPA SERVICES - AWAITING STAFF CERTIFICATION.
+
+The air is clean, neutral. The table has never been used.`,
+      x: -11,
+      y: 9,
+      z: 35,
+      population: 0,
+      ambientNoise: 1,
+      lighting: 65,
+      waterLevel: 0,
+      outdoor: false,
+      exits: {
+        north: '%MEETING1',
+        west: '%FITNESS',
+        east: '%STEAM',
+      },
+      sittables: [
+        {
+          name: 'a treatment table',
+          capacity: 1,
+          emptyMsg: 'The treatment table waits.',
+          occupiedMsg: '%s lying on the treatment table',
+        },
+      ],
+    },
+
+    '%STEAM': {
+      name: 'Smith Tower - 35th Floor - Steam Room',
+      description: `A tiled steam chamber with wooden benches. The steam generator is installed but dormant, its control panel dark. The space is clean and dry, smelling faintly of cedar. A sign reads: STEAM SERVICE - SYSTEM INITIALIZATION REQUIRED.
+
+Ready for relaxation that hasn't begun.`,
+      x: -10,
+      y: 9,
+      z: 35,
+      population: 0,
+      ambientNoise: 1,
+      lighting: 55,
+      waterLevel: 0,
+      outdoor: false,
+      exits: {
+        north: '%BREAKROOM',
+        west: '%SPA',
+      },
+      sittables: [
+        {
+          name: 'a cedar bench',
+          capacity: 4,
+          emptyMsg: 'Wooden benches line the walls.',
+          occupiedMsg: '%s sitting on a cedar bench',
         },
       ],
     },
@@ -267,39 +370,14 @@ A peaceful space. Entirely empty. The city visible but distant below.`,
       waterLevel: 0,
       outdoor: false,
       exits: {
-        east: '%LOBBY',
-        south: '%VIEW_SOUTH',
+        east: '%LOBBY_35',
+        south: '%YOGA',
+        north: '%LIBRARY',
       },
       sittables: [
         {
           name: 'window seating',
           capacity: 8,
-          emptyMsg: 'Built-in benches line the windows.',
-          occupiedMsg: '%s sitting at the window',
-        },
-      ],
-    },
-
-    '%VIEW_SOUTH': {
-      name: 'Smith Tower - 35th Floor - South Terrace',
-      description: `The southern section of the observation terrace. Windows show the industrial waterfront and distant hills. The view is grey, muted, real. A small plant - artificial - sits in a corner planter.
-
-Quiet. Empty. Waiting.`,
-      x: -13,
-      y: 9,
-      z: 35,
-      population: 0,
-      ambientNoise: 2,
-      lighting: 60,
-      waterLevel: 0,
-      outdoor: false,
-      exits: {
-        north: '%VIEW_DECK',
-      },
-      sittables: [
-        {
-          name: 'window seating',
-          capacity: 4,
           emptyMsg: 'Built-in benches line the windows.',
           occupiedMsg: '%s sitting at the window',
         },
