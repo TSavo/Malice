@@ -1,24 +1,22 @@
-// 1st Ave S alley section
-// Darker mid-section
+// Sidewalk between 1st Ave S and Occidental Ave S
+// East of Grand Central Arcade entrance
 
 export const room = {
-  name: '1st Ave S',
-  description: `This section of First Avenue feels more like a back alley than a street. The buildings to either side lean close, blocking direct sunlight except at midday. The architecture here is purely functional—brick walls without ornament, doors marked DELIVERIES ONLY, windows high and small.
+  name: '1st Ave S Sidewalk',
+  description: `A narrow strip of sidewalk wedged between Grand Central's ornate facade and the empty lots to the east. The sandstone arch of the arcade's entrance dominates the view west—carved eagles watching from the capitals, the broken letters spelling GRAND ENTRAL above weathered oak doors.
 
-A loading dock juts from the eastern wall, its concrete platform cracked and listing. Above it, a faded sign reads EMPLOYEES PARKING IN REAR, pointing to a space that no longer exists or was never accessible from here.
+The sidewalk itself is buckled, tree roots and settling foundations having lifted the original hexagonal paving stones into a treacherous terrain. A dead locust tree stands in a cast-iron grate, its branches bare and grey, bark peeling in strips.
 
-The western buildings show their service sides—metal doors with peeling paint, exhaust vents crusted with years of grime, electrical conduits running exposed along the brick. These are the parts of buildings that were never meant to be seen, the infrastructural necessities hidden from the proper streets.
+To the east, the view opens toward Occidental Park, though the sightline is broken by debris and the remains of temporary structures that became permanent and then became ruins themselves.
 
-Water has pooled in a depression in the pavement, dark and still. The pool hasn't dried since the last rain, suggesting something seeps up from below or condenses perpetually in this shadowed space.
-
-The avenue continues north and south between the buildings.`,
-  x: -14,
+The building's upper floors rise overhead—the iron framework of the partially collapsed roof visible against the sky, the clock tower at the corner with its frozen faces. Pigeons roost in the broken windows, cooing from somewhere inside.`,
+  x: -9,
   y: 2,
   z: 0,
   // Environmental properties
   population: 0, // Empty (post-Event)
-  ambientNoise: 3, // Very quiet, sounds muffled
-  lighting: 35, // Dark (narrowest/most shadowed section)
-  waterLevel: 0, // Dry (pooled water is shallow)
-  outdoor: true, // Open to sky but deeply shadowed
+  ambientNoise: 8, // Some sound from the arcade
+  lighting: 75, // Outdoor, partially shaded
+  waterLevel: 0, // Dry
+  outdoor: true, // Street level
 };

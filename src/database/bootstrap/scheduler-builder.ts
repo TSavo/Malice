@@ -60,6 +60,8 @@ export class SchedulerBuilder {
           description: 'Global job scheduler for periodic tasks',
           // Jobs stored by name
           jobs: {},
+          // Start paused - call resume() to start processing
+          paused: true,
         },
         methods: {},
       });
@@ -138,6 +140,23 @@ export class SchedulerBuilder {
       return { success: true, name: name, enabled: enabled };
     `);
 
+    // Pause the scheduler - tick() will skip processing
+    this.scheduler.setMethod('pause', `
+      self.paused = true;
+      return { success: true, paused: true };
+    `);
+
+    // Resume the scheduler - tick() will process jobs again
+    this.scheduler.setMethod('resume', `
+      self.paused = false;
+      return { success: true, paused: false };
+    `);
+
+    // Check if scheduler is paused
+    this.scheduler.setMethod('isPaused', `
+      return self.paused === true;
+    `);
+
     // Get info about a job
     this.scheduler.setMethod('getJob', `
       const name = args[0];
@@ -166,6 +185,11 @@ export class SchedulerBuilder {
     // Main tick - called by server periodically
     // Returns array of job results
     this.scheduler.setMethod('tick', `
+      // Skip processing if paused
+      if (self.paused) {
+        return [];
+      }
+
       const now = Date.now();
       const jobs = self.jobs || {};
       const results = [];
@@ -302,13 +326,14 @@ export class SchedulerBuilder {
     this.scheduler.setMethod('describe', `
       const jobs = self.jobs || {};
       const jobNames = Object.keys(jobs);
+      const pausedStr = self.paused ? ' [PAUSED]' : '';
 
       if (jobNames.length === 0) {
-        return 'Scheduler: No jobs scheduled.';
+        return 'Scheduler' + pausedStr + ': No jobs scheduled.';
       }
 
       const now = Date.now();
-      const lines = ['Scheduler: ' + jobNames.length + ' job(s)'];
+      const lines = ['Scheduler' + pausedStr + ': ' + jobNames.length + ' job(s)'];
 
       for (const name of jobNames) {
         const job = jobs[name];
