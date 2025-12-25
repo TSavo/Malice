@@ -147,6 +147,38 @@ Methods/properties are looked up by walking the parent chain:
 return await pass(...args);
 ```
 
+### Method Management
+
+RuntimeObjects have methods for managing their code:
+
+```typescript
+// Set a method (replaces entire code)
+obj.setMethod('greet', `
+  const name = args[0] || 'World';
+  return 'Hello, ' + name + '!';
+`);
+
+// Edit a method with string replacement (like file editing)
+const result = obj.editMethod('greet', 'Hello', 'Greetings');
+// Returns: { success: true, code: '...' } or { success: false, error: '...' }
+
+// Replace all occurrences
+obj.editMethod('greet', 'foo', 'bar', { replaceAll: true });
+
+// Get method source (local only)
+const code = obj.getMethod('greet');
+
+// Get method source walking inheritance chain
+const inherited = await obj.getMethodCode('greet');
+// Returns: { code: '...', objectId: 123 } or null
+```
+
+**editMethod behavior:**
+- Only edits methods defined directly on the object (not inherited)
+- Fails if `oldString` not found in code
+- Fails if `oldString` appears multiple times (unless `replaceAll: true`)
+- Returns current code on error for debugging
+
 ### Perception Filter System
 
 Agents can have **perception filters** that modify what they perceive and provide virtual addressable entities. Used for neural interfaces, hallucinations, augmented reality, etc.
@@ -354,3 +386,69 @@ The MCP server provides moo:// resources for querying game state:
 - `mcp__malice__*` tools are available but not recommended
 - They're just wrappers around MOO code - use the MOO code directly instead
 - See `docs/MCP-TOOLS.md` if you need the tool reference
+
+## Scheduler
+
+The `$scheduler` object manages periodic jobs. It starts **paused** by default.
+
+```typescript
+// Resume scheduler (required after server start)
+await $scheduler.resume();
+
+// Pause scheduler
+await $scheduler.pause();
+
+// Check if paused
+const isPaused = await $scheduler.isPaused();
+
+// Schedule a job
+await $scheduler.schedule('jobName', delay, interval, target, 'methodName', ...args);
+// delay: ms until first run (0 = next tick)
+// interval: ms between runs (0 = one-shot, deleted after first run)
+
+// Unschedule a job
+await $scheduler.unschedule('jobName');
+
+// Enable/disable a job without removing it
+await $scheduler.setEnabled('jobName', false);
+
+// List all jobs
+const jobs = await $scheduler.listJobs();
+
+// Get job info
+const job = await $scheduler.getJob('jobName');
+
+// Force run a job immediately
+await $scheduler.runNow('jobName');
+
+// Get scheduler status
+const status = await $scheduler.describe();
+// Returns: "Scheduler [PAUSED]: 3 job(s)\n  playerHeartbeat: every 60s, next in 45s\n  ..."
+```
+
+**Default jobs** (registered at startup):
+- `playerHeartbeat` - Ticks all players every 60s
+- `decayTick` - Processes decayable objects every 60s
+- `pluribusWake` - Wakes Pluribus AI every hour (on the hour)
+- `sisterGrayWake` - Wakes Sister Gray AI every hour (on the half-hour)
+
+## Web Map Visualizer
+
+The server provides 3D map visualization at:
+
+- **`/map`** - Public map (above-ground rooms, population heatmap)
+- **`/map/admin`** - Admin map (all rooms including underground, individual agents)
+
+**Features:**
+- Rooms rendered as 3D cubes with height-based coloring
+- Exit connections shown as red tubes between rooms
+- Population heatmap (5x5 grid aggregation)
+- Agent markers (green = player, blue = NPC)
+- View controls: Top, Side, Reset
+- Auto-refresh: 30s (public), 3s (admin)
+
+**API Endpoints:**
+- `GET /api/map/rooms` - Room coordinates and exits
+- `GET /api/map/rooms?z_min=0` - Filter by minimum z-level
+- `GET /api/map/players` - Aggregated population heatmap
+- `GET /api/map/players/admin` - Individual agent positions (auth required)

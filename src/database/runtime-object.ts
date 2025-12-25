@@ -305,6 +305,109 @@ export class RuntimeObjectImpl implements RuntimeObject {
   }
 
   /**
+   * Edit a method on this object using string replacement (like file editing)
+   * Only works on methods defined directly on this object, not inherited ones.
+   *
+   * @param name - Method name to edit
+   * @param oldString - String to find in the method code
+   * @param newString - String to replace it with
+   * @param options - Optional: replaceAll (default false) to replace all occurrences
+   * @returns Object with success/error info and the updated code
+   */
+  editMethod(name: string, oldString: string, newString: string, options?: { replaceAll?: boolean }): { success: boolean; error?: string; code?: string } {
+    // Check if method exists on this object directly
+    if (!this.obj.methods || !(name in this.obj.methods)) {
+      return {
+        success: false,
+        error: `Method '${name}' not found on this object. Use setMethod() to create it, or editMethod() on the object where it's defined.`
+      };
+    }
+
+    const methodDef = this.obj.methods[name];
+    const currentCode = methodDef.code;
+
+    // Check if oldString exists in the code
+    if (!currentCode.includes(oldString)) {
+      return {
+        success: false,
+        error: `String not found in method '${name}'. The old_string must match exactly.`,
+        code: currentCode
+      };
+    }
+
+    // Check for uniqueness if not replaceAll
+    if (!options?.replaceAll) {
+      const occurrences = currentCode.split(oldString).length - 1;
+      if (occurrences > 1) {
+        return {
+          success: false,
+          error: `String appears ${occurrences} times in method '${name}'. Use replaceAll: true to replace all, or provide more context to make it unique.`,
+          code: currentCode
+        };
+      }
+    }
+
+    // Perform the replacement
+    const newCode = options?.replaceAll
+      ? currentCode.split(oldString).join(newString)
+      : currentCode.replace(oldString, newString);
+
+    // Check if anything changed
+    if (newCode === currentCode) {
+      return {
+        success: false,
+        error: `No changes made - old_string and new_string result in identical code.`,
+        code: currentCode
+      };
+    }
+
+    // Use setMethod to apply the change (preserves options like callable, aliases)
+    this.obj.methods[name] = {
+      ...methodDef,
+      code: newCode,
+    };
+
+    // Invalidate compiled method cache
+    this.manager.invalidateCompiledMethod(this.id, name);
+
+    // Auto-persist
+    this.manager.update(this.id, {
+      methods: this.obj.methods
+    }, false).catch(err => {
+      console.error(`[RuntimeObject] Failed to persist edited method ${name} on #${this.id}:`, err);
+    });
+
+    return { success: true, code: newCode };
+  }
+
+  /**
+   * Get the source code of a method on this object
+   * Only returns methods defined directly on this object, not inherited ones.
+   * Use getMethodCode() for inherited method lookup.
+   *
+   * @param name - Method name
+   * @returns The method code or null if not found on this object
+   */
+  getMethod(name: string): string | null {
+    if (!this.obj.methods || !(name in this.obj.methods)) {
+      return null;
+    }
+    return this.obj.methods[name].code;
+  }
+
+  /**
+   * Get the source code of a method, walking the inheritance chain
+   *
+   * @param name - Method name
+   * @returns Object with code and the objectId where it was found, or null
+   */
+  async getMethodCode(name: string): Promise<{ code: string; objectId: number } | null> {
+    const found = await this.findMethodAsync(name);
+    if (!found) return null;
+    return { code: found.code, objectId: found.objectId };
+  }
+
+  /**
    * Call method - walks inheritance chain, executes in context
    * @param method - Method name to call
    * @param args - Method arguments
