@@ -1437,8 +1437,8 @@ export class WebsiteBuilder {
           dynamicGroup.remove(dynamicGroup.children[0]);
         }
 
-        // Fetch rooms (above ground only)
-        const roomsRes = await fetch('/api/map/rooms?z_min=0');
+        // Fetch all rooms (including underground)
+        const roomsRes = await fetch('/api/map/rooms');
         const roomsData = await roomsRes.json();
         const rooms = roomsData.rooms;
 
