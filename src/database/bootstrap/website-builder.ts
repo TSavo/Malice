@@ -1593,9 +1593,72 @@ export class WebsiteBuilder {
       renderer.setSize(window.innerWidth, window.innerHeight);
     });
 
+    // Keyboard controls
+    const keys = {};
+    const panSpeed = 2;
+    const zoomSpeed = 3;
+
+    window.addEventListener('keydown', (e) => {
+      keys[e.key.toLowerCase()] = true;
+      if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(e.key.toLowerCase())) {
+        e.preventDefault();
+      }
+    });
+
+    window.addEventListener('keyup', (e) => {
+      keys[e.key.toLowerCase()] = false;
+    });
+
+    function handleKeyboardInput() {
+      const forward = new THREE.Vector3();
+      camera.getWorldDirection(forward);
+      forward.y = 0;
+      forward.normalize();
+
+      const right = new THREE.Vector3();
+      right.crossVectors(forward, new THREE.Vector3(0, 1, 0));
+
+      // WASD / Arrow keys = pan
+      if (keys['w'] || keys['arrowup']) {
+        camera.position.add(forward.clone().multiplyScalar(panSpeed));
+        controls.target.add(forward.clone().multiplyScalar(panSpeed));
+      }
+      if (keys['s'] || keys['arrowdown']) {
+        camera.position.add(forward.clone().multiplyScalar(-panSpeed));
+        controls.target.add(forward.clone().multiplyScalar(-panSpeed));
+      }
+      if (keys['a'] || keys['arrowleft']) {
+        camera.position.add(right.clone().multiplyScalar(-panSpeed));
+        controls.target.add(right.clone().multiplyScalar(-panSpeed));
+      }
+      if (keys['d'] || keys['arrowright']) {
+        camera.position.add(right.clone().multiplyScalar(panSpeed));
+        controls.target.add(right.clone().multiplyScalar(panSpeed));
+      }
+
+      // Q/E or +/- = zoom
+      if (keys['q'] || keys['-']) {
+        camera.position.y += zoomSpeed;
+      }
+      if (keys['e'] || keys['=']) {
+        camera.position.y = Math.max(10, camera.position.y - zoomSpeed);
+      }
+
+      // R/F = vertical pan
+      if (keys['r']) {
+        camera.position.y += panSpeed;
+        controls.target.y += panSpeed;
+      }
+      if (keys['f']) {
+        camera.position.y -= panSpeed;
+        controls.target.y -= panSpeed;
+      }
+    }
+
     // Animation loop
     function animate() {
       requestAnimationFrame(animate);
+      handleKeyboardInput();
       controls.update();
       renderer.render(scene, camera);
     }
@@ -1974,9 +2037,72 @@ export class WebsiteBuilder {
       renderer.setSize(window.innerWidth, window.innerHeight);
     });
 
+    // Keyboard controls
+    const keys = {};
+    const panSpeed = 2;
+    const zoomSpeed = 3;
+
+    window.addEventListener('keydown', (e) => {
+      keys[e.key.toLowerCase()] = true;
+      if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(e.key.toLowerCase())) {
+        e.preventDefault();
+      }
+    });
+
+    window.addEventListener('keyup', (e) => {
+      keys[e.key.toLowerCase()] = false;
+    });
+
+    function handleKeyboardInput() {
+      const forward = new THREE.Vector3();
+      camera.getWorldDirection(forward);
+      forward.y = 0;
+      forward.normalize();
+
+      const right = new THREE.Vector3();
+      right.crossVectors(forward, new THREE.Vector3(0, 1, 0));
+
+      // WASD / Arrow keys = pan
+      if (keys['w'] || keys['arrowup']) {
+        camera.position.add(forward.clone().multiplyScalar(panSpeed));
+        controls.target.add(forward.clone().multiplyScalar(panSpeed));
+      }
+      if (keys['s'] || keys['arrowdown']) {
+        camera.position.add(forward.clone().multiplyScalar(-panSpeed));
+        controls.target.add(forward.clone().multiplyScalar(-panSpeed));
+      }
+      if (keys['a'] || keys['arrowleft']) {
+        camera.position.add(right.clone().multiplyScalar(-panSpeed));
+        controls.target.add(right.clone().multiplyScalar(-panSpeed));
+      }
+      if (keys['d'] || keys['arrowright']) {
+        camera.position.add(right.clone().multiplyScalar(panSpeed));
+        controls.target.add(right.clone().multiplyScalar(panSpeed));
+      }
+
+      // Q/E or +/- = zoom
+      if (keys['q'] || keys['-']) {
+        camera.position.y += zoomSpeed;
+      }
+      if (keys['e'] || keys['=']) {
+        camera.position.y = Math.max(10, camera.position.y - zoomSpeed);
+      }
+
+      // R/F = vertical pan
+      if (keys['r']) {
+        camera.position.y += panSpeed;
+        controls.target.y += panSpeed;
+      }
+      if (keys['f']) {
+        camera.position.y -= panSpeed;
+        controls.target.y -= panSpeed;
+      }
+    }
+
     // Animation loop
     function animate() {
       requestAnimationFrame(animate);
+      handleKeyboardInput();
       controls.update();
       renderer.render(scene, camera);
     }
