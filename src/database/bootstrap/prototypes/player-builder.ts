@@ -53,6 +53,7 @@ export class PlayerBuilder {
     this.addConnectionMethods(obj);
     this.addInputMethods(obj);
     this.addAuthMethods(obj);
+    this.addAIMethods(obj);
     this.addActionMethods(obj);
     this.addInventoryMethods(obj);
     this.addFitnessMethods(obj);
@@ -303,9 +304,15 @@ export class PlayerBuilder {
             await self.tell(result);
           }
         } else {
-          // No matching pattern found
-          const firstWord = trimmed.split(/\\s+/)[0];
-          await self.tell('I don\\'t understand "' + firstWord + '".');
+          // No matching verb found - queue for AI narrator
+          self.aiQueue = self.aiQueue || [];
+          self.aiQueue.push(trimmed);
+
+          // If not already querying AI, start processing
+          if (!self.aiQueryActive) {
+            await self.processAIQueue(context);
+          }
+          return; // processAIQueue handles the prompt
         }
 
         await self.print('> ');
@@ -519,6 +526,154 @@ export class PlayerBuilder {
 
       return 'Removed key: ' + parts[0] + ' ' + comment + '\\nYou now have ' + keys.length + ' key(s) registered.';
     `, { callable: true, help: 'Remove an SSH public key from your account' });
+  }
+
+  private addAIMethods(obj: RuntimeObject): void {
+    // ═══════════════════════════════════════════════════════════════════
+    // AI NARRATOR - Intent-based interaction fallback
+    // When no verb matches, player input goes to their AI narrator
+    // ═══════════════════════════════════════════════════════════════════
+
+    // Build world context for AI
+    obj.setMethod('buildWorldContext', `
+      const body = self.body;
+      const room = body?.location;
+
+      // Get room contents with abilities
+      const roomContents = [];
+      for (const obj of (room?.contents || [])) {
+        if (obj.id !== body?.id) { // Don't include player's own body
+          roomContents.push({
+            id: obj.id,
+            name: obj.name,
+            description: obj.description,
+            abilities: obj.abilities || await obj.getAbilities?.() || null,
+          });
+        }
+      }
+
+      // Get inventory with abilities
+      const inventory = [];
+      for (const obj of (body?.contents || [])) {
+        inventory.push({
+          id: obj.id,
+          name: obj.name,
+          abilities: obj.abilities || await obj.getAbilities?.() || null,
+        });
+      }
+
+      // Get recent events (if available)
+      const recentEvents = [];
+      // TODO: Pull from event log when implemented
+
+      return {
+        player: {
+          id: self.id,
+          name: self.name,
+          bodyId: body?.id,
+        },
+        room: room ? {
+          id: room.id,
+          name: room.name,
+          description: room.description,
+          abilities: room.abilities || await room.getAbilities?.() || null,
+          exits: room.exits || {},
+        } : null,
+        roomContents,
+        inventory,
+        recentEvents,
+        timestamp: new Date().toISOString(),
+      };
+    `);
+
+    // Process queued AI inputs
+    obj.setMethod('processAIQueue', `
+      const context = args[0];
+
+      self.aiQueryActive = true;
+
+      // Grab all queued inputs
+      const inputs = self.aiQueue || [];
+      self.aiQueue = [];
+
+      if (inputs.length === 0) {
+        self.aiQueryActive = false;
+        await self.print('> ');
+        return;
+      }
+
+      // Build world context
+      const worldContext = await self.buildWorldContext();
+
+      // Build system prompt for narrator
+      const systemPrompt = \`You are a narrator for {{name}}, a player in Malice, a cyberpunk noir MUD.
+
+The player expresses intent in natural language. You interpret their intent, consider what's possible given the world state, and narrate what happens.
+
+You have access to MCP tools to:
+- Read and modify object properties
+- Call mechanical methods on objects (moveTo, damage, etc.)
+- Update prototype abilities when players discover new interactions
+- Write events to the shared log
+
+CURRENT CONTEXT:
+Room: \${worldContext.room?.name || 'Unknown'} - \${worldContext.room?.description || 'No description'}
+Room abilities: \${worldContext.room?.abilities || 'None documented'}
+
+Objects here:
+\${worldContext.roomContents.map(o => '- ' + o.name + (o.abilities ? ' [' + o.abilities + ']' : '')).join('\\n') || 'Nothing notable'}
+
+Player inventory:
+\${worldContext.inventory.map(o => '- ' + o.name + (o.abilities ? ' [' + o.abilities + ']' : '')).join('\\n') || 'Empty'}
+
+RULES:
+1. Interpret player intent generously - they're expressing what they want, not exact commands
+2. Use object abilities to know what's possible and how to do it
+3. If something new is discovered (creative use of an object), document it by updating the prototype's abilities
+4. Keep responses concise but evocative - this is noir fiction
+5. Use MCP tools to actually change the world state, don't just narrate
+6. If you can't do something, explain why in-character
+
+Respond with narrative text that will be shown to the player.
+\`.replace('{{name}}', self.name);
+
+      const userPrompt = inputs.length === 1
+        ? inputs[0]
+        : 'Player intends: ' + inputs.join('. Then: ');
+
+      try {
+        // Use existing narrator session or create new one
+        const session = self.narratorSession || null;
+
+        const result = await $query(systemPrompt, userPrompt, session);
+
+        // Store session for continuity
+        self.narratorSession = result.session;
+
+        // Register session with $ai for persistence
+        if (result.session && $ai) {
+          await $ai.registerSession(result.session, self.id, self.name + ' (narrator)', 'player-narrator', 'interaction');
+        }
+
+        // Send narrative to player
+        if (result.response) {
+          await self.tell('');
+          await self.tell(result.response);
+        }
+      } catch (err) {
+        console.error('[Narrator] AI error for player #' + self.id + ':', err?.message || err);
+        await self.tell('(The narrator seems distracted... try again.)');
+      }
+
+      self.aiQueryActive = false;
+
+      // Check if more inputs queued while we were busy
+      if (self.aiQueue?.length > 0) {
+        await self.processAIQueue(context);
+      } else {
+        await self.print('> ');
+      }
+    `);
   }
 
   private addActionMethods(obj: RuntimeObject): void {

@@ -25,6 +25,9 @@ export class DescribableBuilder {
         weight: 0, // grams
         // Movement restrictions
         boltedDown: false, // If true, cannot be moved at all
+        // AI-readable abilities - natural language mechanics documentation
+        // Describes what this object can do, how to use it, rules/formulas
+        abilities: null, // string - grows as players discover new interactions
       },
       methods: {},
     });
@@ -269,6 +272,52 @@ export class DescribableBuilder {
       const plotHooks = self.plotHooks || {};
       const hooks = plotHooks[eventName] || [];
       return hooks.length > 0;
+    `);
+
+    // ═══════════════════════════════════════════════════════════════════
+    // ABILITIES - Natural language mechanics documentation for AI
+    // ═══════════════════════════════════════════════════════════════════
+
+    // getAbilities() - Get abilities, walking inheritance chain if needed
+    obj.setMethod('getAbilities', `
+      // Check self first
+      if (self.abilities) {
+        return self.abilities;
+      }
+      // Walk up inheritance chain
+      const parent = self.getParent ? self.getParent() : null;
+      if (parent && parent.id !== self.id && parent.getAbilities) {
+        return await parent.getAbilities();
+      }
+      return null;
+    `);
+
+    // updateAbilities(newText) - Append new abilities text to this object's abilities
+    // This is how the AI documents newly discovered mechanics
+    obj.setMethod('updateAbilities', `
+      const newText = args[0];
+      if (!newText) return self.abilities;
+
+      const current = self.abilities || '';
+      if (current) {
+        self.abilities = current.trim() + '\\n' + newText.trim();
+      } else {
+        self.abilities = newText.trim();
+      }
+      return self.abilities;
+    `);
+
+    // getFullContext() - Get object info for AI context
+    // Returns name, description, abilities, and key properties
+    obj.setMethod('getFullContext', `
+      return {
+        id: self.id,
+        name: self.name,
+        description: self.description,
+        abilities: await self.getAbilities(),
+        location: self.location?.id,
+        contents: (self.contents || []).map(c => ({ id: c.id, name: c.name })),
+      };
     `);
 
     return obj;
