@@ -73,7 +73,14 @@ export class GameCoordinator {
       }
     }, 1000);
 
-    console.log('✅ Scheduler tick loop started (1s interval)');
+    // Check if scheduler is paused
+    const scheduler = (this.manager as any).scheduler;
+    const isPaused = scheduler?.paused === true;
+    if (isPaused) {
+      console.log('⏸️  Scheduler tick loop started (1s interval) - PAUSED (call $.scheduler.resume() to start)');
+    } else {
+      console.log('✅ Scheduler tick loop started (1s interval)');
+    }
   }
 
   /**

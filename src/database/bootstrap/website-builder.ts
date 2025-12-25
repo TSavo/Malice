@@ -907,7 +907,55 @@ export class WebsiteBuilder {
           }
         }
 
-        // Return all rooms with names
+        // Build a coordinate lookup for filtered rooms
+        const coordLookup = new Map();
+        for (const r of rooms) {
+          coordLookup.set(r.x + ',' + r.y + ',' + r.z, true);
+        }
+
+        // Collect all exits (connections between rooms)
+        const exits = [];
+        const seenConnections = new Set();
+
+        for (const room of rooms) {
+          // Load the actual room object to get exits
+          const roomObj = await $load(room.id);
+          if (!roomObj || !roomObj.exits) continue;
+
+          const roomExits = roomObj.exits;
+          if (!Array.isArray(roomExits)) continue;
+
+          for (const exit of roomExits) {
+            if (!exit || !exit.destRoom) continue;
+
+            const dest = exit.destRoom;
+            if (!dest) continue;
+
+            const destX = dest.x;
+            const destY = dest.y;
+            const destZ = dest.z;
+
+            // Only include if destination is in our filtered set
+            const destKey = destX + ',' + destY + ',' + destZ;
+            if (!coordLookup.has(destKey)) continue;
+
+            // Dedupe bidirectional connections
+            const connKey = [
+              room.x + ',' + room.y + ',' + room.z,
+              destKey
+            ].sort().join('|');
+
+            if (seenConnections.has(connKey)) continue;
+            seenConnections.add(connKey);
+
+            exits.push({
+              from: { x: room.x, y: room.y, z: room.z },
+              to: { x: destX, y: destY, z: destZ }
+            });
+          }
+        }
+
+        // Return rooms and exits
         const filteredRooms = rooms.map(r => ({
           x: r.x,
           y: r.y,
@@ -918,7 +966,7 @@ export class WebsiteBuilder {
         return {
           status: 200,
           contentType: 'application/json',
-          body: JSON.stringify({ rooms: filteredRooms })
+          body: JSON.stringify({ rooms: filteredRooms, exits })
         };
       `);
       console.log('[WebsiteBuilder] mapRoomsRoute handler set');
@@ -1416,6 +1464,38 @@ export class WebsiteBuilder {
           dynamicGroup.add(cube);
         }
 
+        // Render exit connections as red tubes between room centers
+        const exits = roomsData.exits || [];
+        const tubeMaterial = new THREE.MeshBasicMaterial({
+          color: 0xff3333,
+          transparent: true,
+          opacity: 0.6
+        });
+        for (const exit of exits) {
+          // Position tubes slightly below room centers so they're visible
+          const fromVec = new THREE.Vector3(exit.from.x * 2, exit.from.z * 2 - 0.5, -exit.from.y * 2);
+          const toVec = new THREE.Vector3(exit.to.x * 2, exit.to.z * 2 - 0.5, -exit.to.y * 2);
+
+          // Create cylinder between points
+          const direction = new THREE.Vector3().subVectors(toVec, fromVec);
+          const length = direction.length();
+          const tubeRadius = 0.15;
+
+          const geometry = new THREE.CylinderGeometry(tubeRadius, tubeRadius, length, 6);
+          geometry.rotateX(Math.PI / 2); // Align with Z axis initially
+
+          const tube = new THREE.Mesh(geometry, tubeMaterial);
+
+          // Position at midpoint
+          tube.position.copy(fromVec).add(toVec).multiplyScalar(0.5);
+
+          // Orient toward destination
+          tube.lookAt(toVec);
+
+          tube.userData = { type: 'exit' };
+          dynamicGroup.add(tube);
+        }
+
         // Render heat map cubes
         const heatGeometry = new THREE.BoxGeometry(10, 2, 10); // 5x5 grid
         for (const cell of heatmap) {
@@ -1442,6 +1522,7 @@ export class WebsiteBuilder {
         const stats = document.getElementById('stats');
         stats.innerHTML = \\\`
           <strong>Rooms:</strong> \\\${rooms.length}<br>
+          <strong>Exits:</strong> \\\${exits.length}<br>
           <strong>Population:</strong> \\\${heatmap.reduce((s, c) => s + c.count, 0)}<br>
           <strong>Updated:</strong> \\\${new Date(playersData.timestamp).toLocaleTimeString()}<br>
           <br>
@@ -1724,7 +1805,7 @@ export class WebsiteBuilder {
         const roomsData = await roomsRes.json();
         const rooms = roomsData.rooms;
 
-        // Render rooms (if not already rendered)
+        // Render rooms and exits (if not already rendered)
         if (scene.children.filter(c => c.userData.type === 'room').length === 0) {
           const roomGeometry = new THREE.BoxGeometry(1.8, 1.8, 1.8);
           for (const room of rooms) {
@@ -1740,6 +1821,33 @@ export class WebsiteBuilder {
             cube.position.set(room.x * 2, room.z * 2, -room.y * 2);
             cube.userData = { type: 'room', ...room };
             scene.add(cube);
+          }
+
+          // Render exit connections as red tubes between room centers
+          const exits = roomsData.exits || [];
+          const tubeMaterial = new THREE.MeshBasicMaterial({
+            color: 0xff3333,
+            transparent: true,
+            opacity: 0.5
+          });
+          for (const exit of exits) {
+            // Position tubes slightly below room centers so they're visible
+            const fromVec = new THREE.Vector3(exit.from.x * 2, exit.from.z * 2 - 0.5, -exit.from.y * 2);
+            const toVec = new THREE.Vector3(exit.to.x * 2, exit.to.z * 2 - 0.5, -exit.to.y * 2);
+
+            // Create cylinder between points
+            const direction = new THREE.Vector3().subVectors(toVec, fromVec);
+            const length = direction.length();
+            const tubeRadius = 0.15;
+
+            const geometry = new THREE.CylinderGeometry(tubeRadius, tubeRadius, length, 6);
+            geometry.rotateX(Math.PI / 2);
+
+            const tube = new THREE.Mesh(geometry, tubeMaterial);
+            tube.position.copy(fromVec).add(toVec).multiplyScalar(0.5);
+            tube.lookAt(toVec);
+            tube.userData = { type: 'exit' };
+            scene.add(tube);
           }
         }
 
@@ -1771,15 +1879,18 @@ export class WebsiteBuilder {
         // Update stats
         const players = agents.filter(a => !a.isNPC);
         const npcs = agents.filter(a => a.isNPC);
+        const exits = roomsData.exits || [];
         const stats = document.getElementById('stats');
         stats.innerHTML = \\\`
           <strong>Total Rooms:</strong> \\\${rooms.length}<br>
+          <strong>Exits:</strong> \\\${exits.length}<br>
           <strong>Players:</strong> \\\${players.length}<br>
           <strong>NPCs:</strong> \\\${npcs.length}<br>
           <strong>Total Agents:</strong> \\\${agents.length}<br>
           <br>
           <em style="color: #0f0;">● = Player</em><br>
           <em style="color: #06f;">● = NPC</em><br>
+          <em style="color: #f33;">─ = Exit</em><br>
           <br>
           <em>Updates every 3s</em>
         \\\`;
