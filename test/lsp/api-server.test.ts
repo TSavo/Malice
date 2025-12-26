@@ -225,7 +225,7 @@ describe('LSP API Server', () => {
       const greetFile = tsFiles.find((e: any) => e.name === 'greet.ts');
       expect(greetFile).toBeDefined();
       expect(greetFile.type).toBe('file');
-      expect(greetFile.uri).toBe(`malice://objects/${obj.id}/greet.ts`);
+      expect(greetFile.uri).toBe(`malice://objects/${obj.id}/public/greet.ts`);
 
       // Check property files
       const hpFile = jsonFiles.find((e: any) => e.name === 'hp.json');

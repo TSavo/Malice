@@ -69,9 +69,9 @@ describe('ObjectDatabase', () => {
       const testDb = new ObjectDatabase(MONGO_URI, `${TEST_DB_NAME}_indexes`);
       await testDb.connect();
 
-      // Verify parent index exists
+      // Verify parent.value index exists
       const indexes = await testDb.objects.indexes();
-      const parentIndex = indexes.find((idx) => idx.key.parent === 1);
+      const parentIndex = indexes.find((idx) => idx.key['parent.value'] === 1);
       expect(parentIndex).toBeDefined();
 
       await testDb.objects.deleteMany({});
