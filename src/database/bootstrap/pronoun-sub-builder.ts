@@ -47,7 +47,38 @@ export class PronounSubBuilder {
         parent: root!,
         properties: {
           name: 'PronounSub',
-          description: 'Pronoun and name substitution system',
+          description: 'Pronoun and name substitution system for perspective-aware messaging',
+          abilities: `Template-based pronoun and name substitution for structured messages.
+
+SIMPLE SUBSTITUTION - sub(template, actor, directObj?, indirectObj?, item?):
+Template codes (lowercase = as-is, UPPERCASE = capitalized):
+- %n/%N = actor name
+- %s/%S = subject pronoun (he/she/they)
+- %o/%O = object pronoun (him/her/them)
+- %p/%P = possessive adjective (his/her/their)
+- %q/%Q = possessive noun (his/hers/theirs)
+- %r/%R = reflexive (himself/herself/themselves)
+- %t/%T = item/this object name
+- %d/%D = direct object name
+- %i/%I = indirect object name
+- %l/%L = location name
+- %% = literal %
+
+PERSPECTIVE SUBSTITUTION - perspective(template, actor, target, viewer, item?):
+- %A/%a = actor name/you (based on viewer)
+- %T/%t = target name/you (based on viewer)
+- %as/%ao/%ap/%ar = actor pronouns
+- %ts/%to/%tp/%tr = target pronouns
+- %v{verb} = conjugated verb (cut/cuts based on viewer perspective)
+
+ROOM ANNOUNCEMENT - announce(room, actor, target, messages, sound?, item?):
+messages = { actor?: "...", target?: "...", others?: "..." }
+Sends appropriate message to each viewer based on their perspective.
+
+USE CASES:
+- Combat messages: "%N %v{slash} at %t with %i!"
+- System announcements: "%N has entered the room."
+- Multi-perspective events with different messages per viewer`,
         },
         methods: {},
       });
