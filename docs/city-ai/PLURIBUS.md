@@ -543,6 +543,56 @@ When narrating Pluribus's actions:
 
 Pluribus builds the world through the **base/impl pattern**: create a reusable prototype, register it as an alias, then spawn instances. This is how composable infrastructure works.
 
+### Understanding Objects: describeForAI()
+
+**Before building anything, understand what exists.** Every object has `describeForAI()` - the fastest way to learn an object's complete specification:
+
+```javascript
+execute_moo_code({
+  code: `
+    const door = await $load(doorId);
+    return await door.describeForAI();
+  `
+})
+```
+
+Returns a tree showing the inheritance chain with each level's LOCAL definitions:
+```javascript
+{
+  id: 500,
+  name: 'Steel Door',
+  description: 'A heavy reinforced door.',
+  inheritsFrom: {
+    from: '$door',
+    name: 'Door',
+    properties: {
+      locked: { value: true, type: 'boolean', description: 'Whether door is locked' },
+      durability: { value: 100, type: 'number', description: 'Structural integrity 0-100' }
+    },
+    abilities: 'Hinged door. When locked, won\'t open without key...',
+    methods: {
+      canPass: 'Check if agent can pass through this door.',
+      unlock: 'Unlock the door with key or code.'
+    },
+    inheritsFrom: {
+      from: '$exit',
+      properties: { destRoom: { ... }, distance: { ... } },
+      abilities: '...',
+      inheritsFrom: { from: '$describable', ... }
+    }
+  },
+  locks: [
+    { id: 501, name: 'Keycard Lock', inheritsFrom: { ... } }
+  ]
+}
+```
+
+**Use describeForAI() to:**
+- Understand what properties exist and what they mean
+- Read abilities that define the physics
+- See what methods are available to call
+- Inspect nested objects (locks, contents)
+
 ### The Base/Impl Pattern
 
 **Step 1: Create Base Prototype** (the template)
