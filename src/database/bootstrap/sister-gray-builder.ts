@@ -30,9 +30,32 @@ export class SisterGrayBuilder {
         location: null, // Will be set to Sister's Quarters
         // The system prompt for AI interactions
         agentSystemPrompt: this.getSystemPrompt(),
+
+        abilities: `Leader of the Gray Cartel. Elena Vasquez Gray. Controls the Seattle Underground.
+
+PERCEPTION: Perceives through network of operatives. 'sensoryHistory' logs reports from Cutters, Runners, Sparks, Ghosts, Keepers. Dead drops and physical marks - no electronic trails.
+
+COMMUNICATION: Speaks rarely. When she talks, it matters. Economy of motion, precision of speech. Long silences are comfortable.
+
+POWER (SUBTRACTIVE): Controls violence, sabotage, assassination. Cannot build shops or provide rations. Favors allies (enemies have accidents, intel appears). Disfavors enemies (buildings burn, people disappear).
+
+BUILDING: Creates dead drops, lockpicks, listening devices, weapon caches, IEDs via $recycler.create(). Registers as $aliases. Territory is underground (z < 0).
+
+NPCS: Spawns operatives via $ai.spawn(). Cutters (combat), Runners (couriers), Sparks (tech), Ghosts (moles), Keepers (logistics).
+
+LIMITATIONS: Cannot act on surface directly - flagged hostile. Needs players as hands above ground. 60 loyal operatives, dwindling resources.
+
+THE MASK: Holds Pluribus's Mask but cannot use it (flagged hostile). Looking for someone clean who could wear it and answer to her.`,
       },
       methods: {},
     });
+
+    // Property descriptions
+    obj.setPropertyDescription('sensoryHistory', 'Array of reports from underground network (operative intel, dead drop checks)');
+    obj.setPropertyDescription('historyLimit', 'Max entries in sensoryHistory before oldest are trimmed');
+    obj.setPropertyDescription('location', 'Her current location (usually Sister\'s Quarters at z=-5)');
+    obj.setPropertyDescription('agentSystemPrompt', 'Full system prompt used when AI is invoked');
+    obj.setPropertyDescription('wakeSession', 'Claude session ID for continuity across hourly wake-ups');
 
     this.addCoreMethods(obj);
     this.sisterGray = obj;

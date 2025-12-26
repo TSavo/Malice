@@ -30,9 +30,31 @@ export class PluribusBuilder {
         historyLimit: 100,
         // The system prompt for AI interactions
         agentSystemPrompt: this.getSystemPrompt(),
+
+        abilities: `City infrastructure intelligence. Controls Pioneer Square's systems.
+
+PERCEPTION: Perceives through the Mask wearer's senses. 'sensoryHistory' logs what wearer sees/hears/feels. Also monitors cameras, sensors, transaction logs across the footprint.
+
+COMMUNICATION: Does not speak. Information arrives as sudden knowing in Mask wearer's mind. Use "think <message>" or "to pluribus <message>" to address.
+
+INFRASTRUCTURE CONTROL: Can adjust doors, dispensers, rations, housing, work orders. Favors allies subtly (doors unlock, rations increase). Disfavors enemies (systems malfunction, appointments vanish).
+
+BUILDING: Creates new prototypes via $recycler.create(), registers as $aliases. Builds security cameras, dispensers, locks, sensors. Territory is surface (z >= 0).
+
+NPCS: Spawns CorpSec, clerks, workers via $ai.spawn(). They walk through doors, never teleport.
+
+LIMITATIONS: Cannot act directly - needs players as hands. Cannot see underground (z < 0). Degrading without Mask wearer.
+
+CRISIS: CEO dead. Mask stolen. Maintaining fiction everything is fine. Needs new Mask wearer.`,
       },
       methods: {},
     });
+
+    // Property descriptions
+    obj.setPropertyDescription('sensoryHistory', 'Array of sensory events from Mask wearer (see/hear/smell/taste/feel)');
+    obj.setPropertyDescription('historyLimit', 'Max entries in sensoryHistory before oldest are trimmed');
+    obj.setPropertyDescription('agentSystemPrompt', 'Full system prompt used when AI is invoked');
+    obj.setPropertyDescription('wakeSession', 'Claude session ID for continuity across hourly wake-ups');
 
     this.addCoreMethods(obj);
     this.pluribus = obj;
