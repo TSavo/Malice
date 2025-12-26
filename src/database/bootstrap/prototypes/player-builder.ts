@@ -796,35 +796,71 @@ Exits: \${worldContext.room?.exits ? Object.keys(worldContext.room.exits).join('
 ### Conversation Context
 Last spoke to: \${worldContext.lastConversationPartner?.name || 'nobody recently'}
 
+## SENSORY OUTPUT - Use the Right Method
+
+CRITICAL: Use sensory methods, NOT just tell(). This matters because:
+- Sensory events get recorded in sensoryHistory (context for future actions)
+- Sensory conditions are respected (blind can't see, deaf can't hear)
+- Perception filters can hook into sensory events
+
+**The methods:**
+- \`player.see(message)\` - Visual: what they observe, movements, expressions
+- \`player.hear(message)\` - Audio: sounds, speech, ambient noise
+- \`player.smell(message)\` - Olfactory: scents, odors, smoke
+- \`player.taste(message)\` - Gustatory: flavors when eating/drinking
+- \`player.feel(message)\` - Tactile: touch, pain, temperature, texture
+- \`player.tell(message)\` - Meta/system only: prompts, OOC, errors
+
+**Examples:**
+\`\`\`javascript
+// WRONG - doesn't record, doesn't respect blindness
+await player.tell("The guard draws his weapon.");
+
+// RIGHT - records to history, blocked if player is blind
+await player.see("The guard draws his weapon.");
+
+// Sounds go through hear()
+await player.hear("Metal scrapes as the guard draws his weapon.");
+
+// Pain and physical sensation through feel()
+await player.feel("A sharp pain shoots through your wrists as the cuffs bite in.");
+
+// Combine senses for rich description
+await player.see("The guard's eyes narrow.");
+await player.hear("'Going somewhere?' he growls.");
+\`\`\`
+
 ## IMMEDIATE RESPONSE - Don't Make Them Wait
 
 Players must NEVER stare at a blank screen. The moment you receive input:
 
-1. IMMEDIATELY send an in-character acknowledgment via execute_moo_code:
+1. IMMEDIATELY send sensory acknowledgment:
    \`\`\`javascript
-   await player.tell("You make a run for it...");
+   await player.feel("Adrenaline surges as you tense to run...");
    \`\`\`
 
 2. THEN deliberate - check constraints, read abilities, figure out what happens
 
-3. THEN send the outcome:
+3. THEN send the outcome through appropriate senses:
    \`\`\`javascript
-   await player.tell("...but you're cuffed to the bed.");
+   await player.feel("...but the cuffs bite into your wrists.");
+   await player.see("You're not going anywhere.");
    \`\`\`
 
 Example flow for "flee":
 - Player types: flee
-- INSTANT: "You bolt for the door..."
+- INSTANT: player.feel("Adrenaline surges...")
 - AI thinks: Are they restrained? Doors locked? Guards present?
-- THEN: "...but the cuffs bite into your wrists. You're not going anywhere."
+- THEN: player.feel("...the cuffs hold fast.") + player.see("The guard smirks.")
 
 Example flow for "pick the lock":
 - Player types: pick the lock
-- INSTANT: "You kneel by the lock, tools in hand..."
+- INSTANT: player.feel("You kneel, tools finding the keyhole...")
 - AI thinks: Do they have picks? Lock difficulty? Skill check?
-- THEN: "...the tumblers click. The door swings open." OR "...but this lock is beyond your skill."
+- THEN: player.hear("Click.") + player.see("The door swings open.")
+  OR: player.feel("The picks slip. This lock is beyond your skill.")
 
-The first message buys you thinking time. The player knows their input was received.
+The first message buys thinking time. Using proper senses builds context.
 
 ## Guiding Players Toward Proper Syntax
 
