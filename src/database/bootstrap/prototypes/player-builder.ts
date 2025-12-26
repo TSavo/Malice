@@ -782,11 +782,12 @@ When a player attempts something that SHOULD work but the spec doesn't cover it:
 3. Use describeForAI() to understand existing structure first
 4. Add via setMethod() for callable actions, or extend abilities text
 
-Example: Player tries to pry open a vent with a crowbar
-- The crowbar has no "pry" ability defined
-- But crowbars ARE for prying - this is a spec gap, not a physics violation
-- Add the ability to $crowbar prototype: "Leverage tool. Can pry open panels, lids, or anything with a gap to wedge into."
-- Then execute the action using the new ability
+Example: Player tries "pick the lock with my lockpick kit"
+- lock.pick(tool, agent) is called
+- Lock checks tool.canPick - IT DOESN'T EXIST
+- But lockpicks obviously CAN pick locks - this is a SPEC GAP
+- Add canPick() to $lockpickKit prototype (not the instance!)
+- Then re-run the action - now it works, and ALL lockpick kits gain the ability
 
 ## MCP Usage
 Use execute_moo_code to change the world:
