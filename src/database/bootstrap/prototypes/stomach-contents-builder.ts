@@ -28,6 +28,19 @@ export class StomachContentsBuilder {
       properties: {
         name: 'StomachContents',
         description: 'Digesting food matter',
+        abilities: `Represents consumed food/drink in stomach, preserves metadata for autopsy.
+
+DIGESTION: digestTick(rate) extracts calories over time. Volume decreases
+proportionally. isFullyDigested() returns true when calories exhausted.
+
+STACKING: Similar items aggregate - 3 apples become 1 contents with 3x calories.
+canStackWith() checks sourceProto + spoiled/poisoned status match.
+
+AUTOPSY: describe() reveals food name, digestion %, spoiled/poisoned status.
+Forensic evidence of poisoning survives in stomach contents.
+
+POISONING: 'spoiled' causes food poisoning. 'poisoned' is deliberate toxin.
+Both flags preserved through digestion for evidence.`,
         // Stackable properties
         // stackType is set dynamically: 'stomach:<sourceProto>:<spoiled>:<poisoned>'
         stackType: null,

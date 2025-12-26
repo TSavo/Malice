@@ -26,6 +26,20 @@ export class SustainBuilder {
       properties: {
         name: 'Sustain',
         description: 'A small oblong pill, pale gray with a faint chemical sheen. The Continuum logo is pressed into one side. Nutritionally complete. Best not to think about the source material.',
+        abilities: `Continuum's nutritionally complete ration pill. Manufactured at Fabrication
+Factory biofarm from processed organic waste. Cheap, efficient, ubiquitous.
+
+CONSUMPTION: Single-portion pill. Swallow whole. eat() consumes entirely.
+No bites or portions - one pill, one meal equivalent.
+
+NUTRITION: 400 calories, minimal hydration (10). Keeps you alive.
+Won't satisfy cravings. Won't taste good. Will prevent starvation.
+
+FLAVOR: Chalky, chemical, faintly metallic. tasteBite() returns random
+flavor text. Nobody eats these for pleasure.
+
+DECAY: Very slow (0.1 rate). Pills last months in storage.
+Subsidized price (2 credits). Everyone can afford to survive.`,
         aliases: ['pill', 'nutrient pill', 'ration'],
         // Nutritional properties - one pill = one meal equivalent
         calories: 400,

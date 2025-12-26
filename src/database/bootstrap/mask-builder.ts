@@ -28,6 +28,25 @@ export class MaskBuilder {
                      'Its surface shifts between matte black and iridescent patterns that seem to respond ' +
                      'to nearby movement. Looking at it too long creates the unsettling sense that it is ' +
                      'looking back.',
+        abilities: `Neural interface connecting wearer to Pluribus, the city infrastructure AI.
+
+BONDING: wear() creates symbiotic link. Wearer becomes "Unum" - the one who
+completes "the many." remove() severs the connection. bondState tracks status.
+
+PERCEPTION FILTER: When bonded, modifyRoomDescription() injects Pluribus's
+presence. Wearer sees data overlays, threat assessments, infrastructure status.
+
+COMMUNICATION: 'to pluribus <message>' for spoken (others hear gibberish).
+'think <message>' for silent neural communication (private).
+
+SENSORY SHARING: onSee/onHear/onSmell/onTaste/onFeel forward wearer's
+perceptions to Pluribus. The city sees through your eyes.
+
+REJECTION: Hostile entities may suffer consequences when attempting to wear.
+TODO: Implement rejection protocols based on Pluribus authorization.
+
+SESSIONS: interactionSession maintains AI conversation continuity across
+multiple interactions. Pluribus remembers the conversation.`,
         aliases: ['mask', 'neural interface', 'interface'],
         // Wearable properties
         covers: ['face'],

@@ -46,7 +46,29 @@ export class RoomBuilder {
       parent: root!,
       properties: {
         name: 'Room',
-        description: 'Room utility for announcements',
+        description: 'Room utility for multi-perspective announcements',
+        abilities: `Utility for broadcasting sensory events to room contents.
+
+announce({ room, actor, target?, see?, hear?, item? }):
+Single template for all viewers. Templates use $.pronoun.perspective()
+for automatic you/they substitution per viewer.
+
+announceMulti({ room, actor, target?, see: {actor?, target?, others}, hear: {...}, item? }):
+Different messages for actor/target/others. Use when perspectives differ
+significantly (e.g., "You stab them" vs "They stab you" vs "A stabs B").
+
+ROUTING:
+- see template → viewer.see() (visual, requires sight)
+- hear template → viewer.hear() (auditory, requires hearing)
+
+TEMPLATES use $.pronoun.perspective() codes:
+- %A/%a = actor name/you
+- %T/%t = target name/you
+- %v{verb} = conjugated verb
+- %ap/%tp = possessive (your/their)
+
+CRITICAL: Use these for ANY action others could perceive.
+Direct player.see() only reaches ONE person.`,
       },
       methods: {},
     });
