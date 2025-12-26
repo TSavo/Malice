@@ -73,7 +73,35 @@ export class EmoteBuilder {
         parent: root!,
         properties: {
           name: 'Emote',
-          description: 'Freeform emote parsing and formatting',
+          description: 'Freeform emote parsing and formatting with sensory awareness',
+          abilities: `Sensory-aware emote system for broadcasting actions to rooms.
+
+SYNTAX PREFIXES:
+- .verb = Visual action (routed through viewer.see())
+- ,verb = Audible non-speech (routed through viewer.hear())
+- ~verb = Olfactory (routed through viewer.smell())
+- ^verb = Gustatory (routed through viewer.taste())
+- "text" = Speech (routed through viewer.hear())
+
+PERSPECTIVE HANDLING:
+- Verbs auto-conjugate: "you fall" vs "Bob falls"
+- Pronouns resolve per-viewer: "his" becomes "your" for actor
+- Names shift target for following pronouns
+
+SENSORY GATING:
+- Blind viewers: miss visual, hear speech/amotes
+- Deaf viewers: see visual, speech shows as "*inaudible*"
+- Anosmic viewers: miss smotes (~)
+- Tongueless viewers: miss tmotes (^)
+
+CRITICAL: Use broadcast() for ANY action others could perceive.
+Direct player.see() only reaches ONE person - everyone else is blind to it.
+
+METHODS:
+- broadcast(emoteString, actor, room) - Parse and send to all in room
+- parseSegments(emoteString, actor, isFirstPerson) - Parse into segments
+- format(segments, viewer) - Format for specific viewer
+- processEmote(emoteString, actor, viewer) - Single viewer processing`,
           // Object pronouns
           objectPronouns: ['him', 'her', 'them', 'it'],
           // Possessive pronouns
@@ -1165,6 +1193,11 @@ export class EmoteBuilder {
         }
       }
     `);
+
+    // Property descriptions
+    this.emote.setPropertyDescription('objectPronouns', 'Object pronouns (him/her/them/it) that reference the current target in emotes.');
+    this.emote.setPropertyDescription('possessivePronouns', 'Possessive pronouns (his/her/their/its) that reference the current target.');
+    this.emote.setPropertyDescription('reflexivePronouns', 'Reflexive pronouns (himself/herself/myself) that refer back to actor or target.');
   }
 
   async registerAlias(): Promise<void> {
