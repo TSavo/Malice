@@ -1,10 +1,9 @@
 import { readdir, readFile } from 'node:fs/promises';
 import { extname, join } from 'node:path';
-
+import { applyExtractedPrototypeSpec } from '../database/bootstrap/prototype-ts/apply.js';
+import { extractPrototypeSpecFromSourceText } from '../database/bootstrap/prototype-ts/extract.js';
 import { ObjectDatabase } from '../database/object-db.js';
 import { ObjectManager } from '../database/object-manager.js';
-import { extractPrototypeSpecFromSourceText } from '../database/bootstrap/prototype-ts/extract.js';
-import { applyExtractedPrototypeSpec } from '../database/bootstrap/prototype-ts/apply.js';
 
 type CliOptions = {
   force: boolean;
@@ -23,8 +22,10 @@ function parseArgs(argv: string[]): CliOptions {
 
   for (const arg of argv) {
     if (arg === '--force') opts.force = true;
-    else if (arg.startsWith('--mongoUri=')) opts.mongoUri = arg.slice('--mongoUri='.length);
-    else if (arg.startsWith('--dbName=')) opts.dbName = arg.slice('--dbName='.length);
+    else if (arg.startsWith('--mongoUri='))
+      opts.mongoUri = arg.slice('--mongoUri='.length);
+    else if (arg.startsWith('--dbName='))
+      opts.dbName = arg.slice('--dbName='.length);
     else if (arg.startsWith('--dir=')) opts.dir = arg.slice('--dir='.length);
     else if (arg === '--help' || arg === '-h') {
       throw new Error('help');
@@ -37,7 +38,9 @@ function parseArgs(argv: string[]): CliOptions {
 }
 
 function printHelp(): void {
-  console.log('Usage: node --import tsx src/scripts/bootstrap-apply.ts [--force] [--dir=src/ts-prototypes]');
+  console.log(
+    'Usage: node --import tsx src/scripts/bootstrap-apply.ts [--force] [--dir=src/ts-prototypes]',
+  );
   console.log('');
   console.log('Environment:');
   console.log('  MONGO_URI  MongoDB URI (default: mongodb://localhost:27017)');
@@ -45,7 +48,9 @@ function printHelp(): void {
   console.log('  DB_NAME    (dev compose) Database name');
   console.log('');
   console.log('Options:');
-  console.log('  --force          Overwrite existing methods + properties (and parent)');
+  console.log(
+    '  --force          Overwrite existing methods + properties (and parent)',
+  );
   console.log('  --dir=PATH       Directory to scan for .ts prototype files');
   console.log('  --mongoUri=URI   Override Mongo connection URI');
   console.log('  --dbName=NAME    Override Mongo database name');
@@ -83,26 +88,38 @@ async function main() {
     return;
   }
 
-  console.log(`Applying ${files.length} TS prototype file(s) from ${opts.dir}...`);
+  console.log(
+    `Applying ${files.length} TS prototype file(s) from ${opts.dir}...`,
+  );
   console.log(`Mode: ${opts.force ? 'force' : 'apply (non-destructive)'}`);
 
   for (const file of files) {
     const sourceText = await readFile(file, 'utf8');
     const spec = extractPrototypeSpecFromSourceText(sourceText, file);
 
-    const result = await applyExtractedPrototypeSpec(manager, spec, { force: opts.force });
+    const result = await applyExtractedPrototypeSpec(manager, spec, {
+      force: opts.force,
+    });
 
     const updated = [
       result.updatedParent ? 'parent' : null,
-      result.updatedProperties.length ? `props:${result.updatedProperties.length}` : null,
-      result.updatedMethods.length ? `methods:${result.updatedMethods.length}` : null,
+      result.updatedProperties.length
+        ? `props:${result.updatedProperties.length}`
+        : null,
+      result.updatedMethods.length
+        ? `methods:${result.updatedMethods.length}`
+        : null,
     ]
       .filter(Boolean)
       .join(', ');
 
     const skipped = [
-      result.skippedProperties.length ? `props:${result.skippedProperties.length}` : null,
-      result.skippedMethods.length ? `methods:${result.skippedMethods.length}` : null,
+      result.skippedProperties.length
+        ? `props:${result.skippedProperties.length}`
+        : null,
+      result.skippedMethods.length
+        ? `methods:${result.skippedMethods.length}`
+        : null,
     ]
       .filter(Boolean)
       .join(', ');

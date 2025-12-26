@@ -1,4 +1,8 @@
-import { TELNET_COMMANDS, TELNET_OPTIONS, TELNET_SUB } from '../../../types/telnet.js';
+import {
+  TELNET_COMMANDS,
+  TELNET_OPTIONS,
+  TELNET_SUB,
+} from '../../../types/telnet.js';
 
 /**
  * Builder for telnet protocol commands
@@ -20,28 +24,28 @@ export class TelnetCommandBuilder {
    * Send WILL command
    */
   static will(option: number): Buffer {
-    return this.buildSimple(TELNET_COMMANDS.WILL, option);
+    return TelnetCommandBuilder.buildSimple(TELNET_COMMANDS.WILL, option);
   }
 
   /**
    * Send WONT command
    */
   static wont(option: number): Buffer {
-    return this.buildSimple(TELNET_COMMANDS.WONT, option);
+    return TelnetCommandBuilder.buildSimple(TELNET_COMMANDS.WONT, option);
   }
 
   /**
    * Send DO command
    */
   static do(option: number): Buffer {
-    return this.buildSimple(TELNET_COMMANDS.DO, option);
+    return TelnetCommandBuilder.buildSimple(TELNET_COMMANDS.DO, option);
   }
 
   /**
    * Send DONT command
    */
   static dont(option: number): Buffer {
-    return this.buildSimple(TELNET_COMMANDS.DONT, option);
+    return TelnetCommandBuilder.buildSimple(TELNET_COMMANDS.DONT, option);
   }
 
   /**
@@ -49,7 +53,7 @@ export class TelnetCommandBuilder {
    */
   static requestTerminalType(): Buffer[] {
     return [
-      this.do(TELNET_OPTIONS.TERMINAL_TYPE),
+      TelnetCommandBuilder.do(TELNET_OPTIONS.TERMINAL_TYPE),
       Buffer.from([
         TELNET_COMMANDS.IAC,
         TELNET_COMMANDS.SB,
@@ -65,42 +69,42 @@ export class TelnetCommandBuilder {
    * Request window size
    */
   static requestWindowSize(): Buffer {
-    return this.do(TELNET_OPTIONS.NAWS);
+    return TelnetCommandBuilder.do(TELNET_OPTIONS.NAWS);
   }
 
   /**
    * Request environment variables
    */
   static requestEnvironment(): Buffer {
-    return this.do(TELNET_OPTIONS.NEW_ENVIRON);
+    return TelnetCommandBuilder.do(TELNET_OPTIONS.NEW_ENVIRON);
   }
 
   /**
    * Enable binary transmission
    */
   static enableBinary(): Buffer {
-    return this.do(TELNET_OPTIONS.TRANSMIT_BINARY);
+    return TelnetCommandBuilder.do(TELNET_OPTIONS.TRANSMIT_BINARY);
   }
 
   /**
    * Enable echo mode
    */
   static enableEcho(): Buffer {
-    return this.will(TELNET_OPTIONS.ECHO);
+    return TelnetCommandBuilder.will(TELNET_OPTIONS.ECHO);
   }
 
   /**
    * Disable echo mode
    */
   static disableEcho(): Buffer {
-    return this.wont(TELNET_OPTIONS.ECHO);
+    return TelnetCommandBuilder.wont(TELNET_OPTIONS.ECHO);
   }
 
   /**
    * Enable suppress go-ahead
    */
   static enableSuppressGoAhead(): Buffer {
-    return this.will(TELNET_OPTIONS.SUPPRESS_GO_AHEAD);
+    return TelnetCommandBuilder.will(TELNET_OPTIONS.SUPPRESS_GO_AHEAD);
   }
 
   /**
@@ -108,10 +112,10 @@ export class TelnetCommandBuilder {
    */
   static negotiateTTY(): Buffer[] {
     return [
-      this.do(TELNET_OPTIONS.TRANSMIT_BINARY),
-      this.do(TELNET_OPTIONS.TERMINAL_TYPE),
-      this.do(TELNET_OPTIONS.NAWS),
-      this.do(TELNET_OPTIONS.NEW_ENVIRON),
+      TelnetCommandBuilder.do(TELNET_OPTIONS.TRANSMIT_BINARY),
+      TelnetCommandBuilder.do(TELNET_OPTIONS.TERMINAL_TYPE),
+      TelnetCommandBuilder.do(TELNET_OPTIONS.NAWS),
+      TelnetCommandBuilder.do(TELNET_OPTIONS.NEW_ENVIRON),
     ];
   }
 
@@ -120,9 +124,9 @@ export class TelnetCommandBuilder {
    */
   static enterRawMode(): Buffer[] {
     return [
-      this.do(TELNET_OPTIONS.SUPPRESS_GO_AHEAD),
-      this.will(TELNET_OPTIONS.SUPPRESS_GO_AHEAD),
-      this.will(TELNET_OPTIONS.ECHO),
+      TelnetCommandBuilder.do(TELNET_OPTIONS.SUPPRESS_GO_AHEAD),
+      TelnetCommandBuilder.will(TELNET_OPTIONS.SUPPRESS_GO_AHEAD),
+      TelnetCommandBuilder.will(TELNET_OPTIONS.ECHO),
     ];
   }
 
@@ -131,9 +135,9 @@ export class TelnetCommandBuilder {
    */
   static exitRawMode(): Buffer[] {
     return [
-      this.dont(TELNET_OPTIONS.SUPPRESS_GO_AHEAD),
-      this.wont(TELNET_OPTIONS.SUPPRESS_GO_AHEAD),
-      this.wont(TELNET_OPTIONS.ECHO),
+      TelnetCommandBuilder.dont(TELNET_OPTIONS.SUPPRESS_GO_AHEAD),
+      TelnetCommandBuilder.wont(TELNET_OPTIONS.SUPPRESS_GO_AHEAD),
+      TelnetCommandBuilder.wont(TELNET_OPTIONS.ECHO),
     ];
   }
 }

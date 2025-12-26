@@ -41,7 +41,9 @@ export async function activate(context: vscode.ExtensionContext) {
     await typeManager.initialize(context);
     context.subscriptions.push(typeManager);
   } catch (err) {
-    vscode.window.showErrorMessage(`Failed to connect to DevTools server: ${err}`);
+    vscode.window.showErrorMessage(
+      `Failed to connect to DevTools server: ${err}`,
+    );
     console.error('[Malice] Connection failed:', err);
   }
 
@@ -50,7 +52,7 @@ export async function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.workspace.registerFileSystemProvider('malice', fileSystemProvider, {
       isCaseSensitive: true,
-    })
+    }),
   );
 
   // Create tree view provider
@@ -61,14 +63,21 @@ export async function activate(context: vscode.ExtensionContext) {
 
   // Track expand/collapse
   context.subscriptions.push(
-    treeView.onDidExpandElement(e => treeProvider.onDidExpandElement(e.element))
+    treeView.onDidExpandElement((e) =>
+      treeProvider.onDidExpandElement(e.element),
+    ),
   );
   context.subscriptions.push(
-    treeView.onDidCollapseElement(e => treeProvider.onDidCollapseElement(e.element))
+    treeView.onDidCollapseElement((e) =>
+      treeProvider.onDidCollapseElement(e.element),
+    ),
   );
 
   // Create status bar item for view mode
-  statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
+  statusBar = vscode.window.createStatusBarItem(
+    vscode.StatusBarAlignment.Right,
+    100,
+  );
   statusBar.text = `$(folder) ${currentViewMode}`;
   statusBar.tooltip = 'Click to change view mode';
   statusBar.command = 'malice.switchView';
@@ -78,25 +87,37 @@ export async function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.commands.registerCommand('malice.refresh', () => {
       treeProvider.refresh();
-    })
+    }),
   );
 
   context.subscriptions.push(
     vscode.commands.registerCommand('malice.switchView', async () => {
       const options: vscode.QuickPickItem[] = [
-        { label: '📁 Categorized', description: 'Group methods by functionality', value: 'categorized' },
-        { label: '📄 Flat', description: 'Show all methods in single list', value: 'flat' },
-        { label: '⚡ By Complexity', description: 'Sort by method complexity', value: 'by-complexity' }
+        {
+          label: '📁 Categorized',
+          description: 'Group methods by functionality',
+          value: 'categorized',
+        },
+        {
+          label: '📄 Flat',
+          description: 'Show all methods in single list',
+          value: 'flat',
+        },
+        {
+          label: '⚡ By Complexity',
+          description: 'Sort by method complexity',
+          value: 'by-complexity',
+        },
       ];
 
       const selected = await vscode.window.showQuickPick(options, {
-        placeHolder: `Current view: ${currentViewMode}`
+        placeHolder: `Current view: ${currentViewMode}`,
       });
 
       if (selected && selected.value !== currentViewMode) {
         currentViewMode = selected.value as ViewMode;
         statusBar.text = `$(folder) ${currentViewMode}`;
-        
+
         // Update tree provider if it supports view switching
         if ('setViewMode' in treeProvider) {
           (treeProvider as any).setViewMode(currentViewMode);
@@ -105,62 +126,93 @@ export async function activate(context: vscode.ExtensionContext) {
           treeProvider.refresh();
         }
       }
-    })
+    }),
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand('malice.openObject', async (objectId?: number) => {
-      if (!objectId) {
-        const input = await vscode.window.showInputBox({
-          prompt: 'Enter object ID',
-          placeHolder: '5',
-        });
+    vscode.commands.registerCommand(
+      'malice.openObject',
+      async (objectId?: number) => {
+        if (!objectId) {
+          const input = await vscode.window.showInputBox({
+            prompt: 'Enter object ID',
+            placeHolder: '5',
+          });
 
-        if (!input) return;
-        objectId = parseInt(input, 10);
-      }
-
-      try {
-        const obj = await client.getObject(objectId);
-        const methods = Object.keys(obj.methods || {});
-        const properties = Object.keys(obj.properties || {});
-
-        const items = [
-          ...methods.map(m => ({ label: `📝 ${m}`, type: 'method', name: m })),
-          ...properties.map(p => ({ label: `🔧 ${p}`, type: 'property', name: p })),
-        ];
-
-        const selected = await vscode.window.showQuickPick(items, {
-          placeHolder: 'Select method or property to edit',
-        });
-
-        if (selected) {
-          if (selected.type === 'method') {
-            await vscode.commands.executeCommand('malice.openMethod', objectId, selected.name);
-          } else {
-            await vscode.commands.executeCommand('malice.openProperty', objectId, selected.name);
-          }
+          if (!input) return;
+          objectId = parseInt(input, 10);
         }
-      } catch (err) {
-        vscode.window.showErrorMessage(`Failed to load object #${objectId}: ${err}`);
-      }
-    })
+
+        try {
+          const obj = await client.getObject(objectId);
+          const methods = Object.keys(obj.methods || {});
+          const properties = Object.keys(obj.properties || {});
+
+          const items = [
+            ...methods.map((m) => ({
+              label: `📝 ${m}`,
+              type: 'method',
+              name: m,
+            })),
+            ...properties.map((p) => ({
+              label: `🔧 ${p}`,
+              type: 'property',
+              name: p,
+            })),
+          ];
+
+          const selected = await vscode.window.showQuickPick(items, {
+            placeHolder: 'Select method or property to edit',
+          });
+
+          if (selected) {
+            if (selected.type === 'method') {
+              await vscode.commands.executeCommand(
+                'malice.openMethod',
+                objectId,
+                selected.name,
+              );
+            } else {
+              await vscode.commands.executeCommand(
+                'malice.openProperty',
+                objectId,
+                selected.name,
+              );
+            }
+          }
+        } catch (err) {
+          vscode.window.showErrorMessage(
+            `Failed to load object #${objectId}: ${err}`,
+          );
+        }
+      },
+    ),
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand('malice.openMethod', async (objectId: number, methodName: string) => {
-      const uri = vscode.Uri.parse(`malice://objects/${objectId}/${methodName}.ts`);
-      const doc = await vscode.workspace.openTextDocument(uri);
-      await vscode.window.showTextDocument(doc);
-    })
+    vscode.commands.registerCommand(
+      'malice.openMethod',
+      async (objectId: number, methodName: string) => {
+        const uri = vscode.Uri.parse(
+          `malice://objects/${objectId}/${methodName}.ts`,
+        );
+        const doc = await vscode.workspace.openTextDocument(uri);
+        await vscode.window.showTextDocument(doc);
+      },
+    ),
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand('malice.openProperty', async (objectId: number, propertyName: string) => {
-      const uri = vscode.Uri.parse(`malice://objects/${objectId}/${propertyName}.json`);
-      const doc = await vscode.workspace.openTextDocument(uri);
-      await vscode.window.showTextDocument(doc);
-    })
+    vscode.commands.registerCommand(
+      'malice.openProperty',
+      async (objectId: number, propertyName: string) => {
+        const uri = vscode.Uri.parse(
+          `malice://objects/${objectId}/${propertyName}.json`,
+        );
+        const doc = await vscode.workspace.openTextDocument(uri);
+        await vscode.window.showTextDocument(doc);
+      },
+    ),
   );
 
   context.subscriptions.push(
@@ -178,12 +230,15 @@ export async function activate(context: vscode.ExtensionContext) {
         });
 
         if (selected) {
-          await vscode.commands.executeCommand('malice.openObject', selected.id);
+          await vscode.commands.executeCommand(
+            'malice.openObject',
+            selected.id,
+          );
         }
       } catch (err) {
         vscode.window.showErrorMessage(`Failed to browse objects: ${err}`);
       }
-    })
+    }),
   );
 
   context.subscriptions.push(treeView);
@@ -204,7 +259,8 @@ export function deactivate(): void {
  */
 class MaliceFileSystemProvider implements vscode.FileSystemProvider {
   private _emitter = new vscode.EventEmitter<vscode.FileChangeEvent[]>();
-  readonly onDidChangeFile: vscode.Event<vscode.FileChangeEvent[]> = this._emitter.event;
+  readonly onDidChangeFile: vscode.Event<vscode.FileChangeEvent[]> =
+    this._emitter.event;
 
   constructor(private client: DevToolsClient) {
     // Listen for change notifications from server
@@ -212,18 +268,20 @@ class MaliceFileSystemProvider implements vscode.FileSystemProvider {
       if (method === 'method.changed' || method === 'property.changed') {
         const { objectId, name } = params;
         const ext = method === 'method.changed' ? 'ts' : 'json';
-        const uri = vscode.Uri.parse(`malice://objects/${objectId}/${name}.${ext}`);
+        const uri = vscode.Uri.parse(
+          `malice://objects/${objectId}/${name}.${ext}`,
+        );
         this._emitter.fire([{ type: vscode.FileChangeType.Changed, uri }]);
       }
     });
   }
 
-  watch(uri: vscode.Uri): vscode.Disposable {
+  watch(_uri: vscode.Uri): vscode.Disposable {
     // Real-time updates handled via WebSocket notifications
     return new vscode.Disposable(() => {});
   }
 
-  async stat(uri: vscode.Uri): Promise<vscode.FileStat> {
+  async stat(_uri: vscode.Uri): Promise<vscode.FileStat> {
     // All files are virtual, just return basic stats
     return {
       type: vscode.FileType.File,
@@ -233,7 +291,7 @@ class MaliceFileSystemProvider implements vscode.FileSystemProvider {
     };
   }
 
-  readDirectory(uri: vscode.Uri): Promise<[string, vscode.FileType][]> {
+  readDirectory(_uri: vscode.Uri): Promise<[string, vscode.FileType][]> {
     // Not used (tree view handles directory browsing)
     return Promise.resolve([]);
   }
@@ -257,7 +315,8 @@ class MaliceFileSystemProvider implements vscode.FileSystemProvider {
 
         // Inject type reference at the top of the file
         // This makes VS Code's TypeScript language service aware of generated types
-        const typeReference = '/// <reference path="../.malice/malice.d.ts" />\n\n';
+        const typeReference =
+          '/// <reference path="../.malice/malice.d.ts" />\n\n';
         const code = typeReference + method.code;
 
         return Buffer.from(code, 'utf-8');
@@ -277,7 +336,7 @@ class MaliceFileSystemProvider implements vscode.FileSystemProvider {
   async writeFile(
     uri: vscode.Uri,
     content: Uint8Array,
-    options: { create: boolean; overwrite: boolean }
+    _options: { create: boolean; overwrite: boolean },
   ): Promise<void> {
     try {
       const parts = uri.path.split('/').filter(Boolean);
@@ -320,6 +379,8 @@ class MaliceFileSystemProvider implements vscode.FileSystemProvider {
   }
 
   createDirectory(): void {
-    throw vscode.FileSystemError.NoPermissions('Create directory not supported');
+    throw vscode.FileSystemError.NoPermissions(
+      'Create directory not supported',
+    );
   }
 }

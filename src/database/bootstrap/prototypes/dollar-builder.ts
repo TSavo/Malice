@@ -1,5 +1,5 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Builds the Dollar prototype
@@ -51,9 +51,18 @@ ANONYMITY: Cash cannot be traced. Unlike bank credits, no transaction history ex
     });
 
     // Add property descriptions
-    obj.setPropertyDescription('quantity', "Dollar amount in this stack. Integer only.");
-    obj.setPropertyDescription('contraband', "True = illegal to possess. Police will confiscate.");
-    obj.setPropertyDescription('stackType', "Identifies this as cash for auto-stacking.");
+    obj.setPropertyDescription(
+      'quantity',
+      'Dollar amount in this stack. Integer only.',
+    );
+    obj.setPropertyDescription(
+      'contraband',
+      'True = illegal to possess. Police will confiscate.',
+    );
+    obj.setPropertyDescription(
+      'stackType',
+      'Identifies this as cash for auto-stacking.',
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // DISPLAY OVERRIDES

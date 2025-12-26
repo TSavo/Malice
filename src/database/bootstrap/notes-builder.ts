@@ -1,5 +1,5 @@
-import { ObjectManager } from '../object-manager.js';
 import type { RuntimeObject } from '../../../types/object.js';
+import type { ObjectManager } from '../object-manager.js';
 
 /**
  * Builds Notes utility object ($.notes)
@@ -22,7 +22,8 @@ export class NotesBuilder {
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
 
-    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
+    const aliases =
+      (objectManager.get('aliases') as Record<string, number>) || {};
 
     if (aliases.notes) {
       this.notes = await this.manager.load(aliases.notes);
@@ -46,7 +47,9 @@ export class NotesBuilder {
     // ═══════════════════════════════════════════════════════════════════
 
     // add(objectId, text, author?, tags?) - add a note to an object
-    this.notes.setMethod('add', `
+    this.notes.setMethod(
+      'add',
+      `
       const objectId = typeof args[0] === 'object' ? args[0].id : args[0];
       const text = args[1];
       const author = args[2] || 'system';
@@ -73,20 +76,26 @@ export class NotesBuilder {
       self.registry = registry;
 
       return { success: true, index: registry[objectId].length - 1 };
-    `);
+    `,
+    );
 
     // get(objectId) - get all notes for an object
-    this.notes.setMethod('get', `
+    this.notes.setMethod(
+      'get',
+      `
       const objectId = typeof args[0] === 'object' ? args[0].id : args[0];
 
       if (!objectId) return [];
 
       const registry = self.registry || {};
       return registry[objectId] || [];
-    `);
+    `,
+    );
 
     // getOne(objectId, index) - get a single note
-    this.notes.setMethod('getOne', `
+    this.notes.setMethod(
+      'getOne',
+      `
       const objectId = typeof args[0] === 'object' ? args[0].id : args[0];
       const index = args[1];
 
@@ -96,10 +105,13 @@ export class NotesBuilder {
       const notes = registry[objectId] || [];
 
       return notes[index] || null;
-    `);
+    `,
+    );
 
     // delete(objectId, index) - delete a note by index
-    this.notes.setMethod('delete', `
+    this.notes.setMethod(
+      'delete',
+      `
       const objectId = typeof args[0] === 'object' ? args[0].id : args[0];
       const index = args[1];
 
@@ -118,10 +130,13 @@ export class NotesBuilder {
       self.registry = registry;
 
       return { success: true, deleted: deleted };
-    `);
+    `,
+    );
 
     // clear(objectId) - delete all notes for an object
-    this.notes.setMethod('clear', `
+    this.notes.setMethod(
+      'clear',
+      `
       const objectId = typeof args[0] === 'object' ? args[0].id : args[0];
 
       if (!objectId) {
@@ -134,21 +149,27 @@ export class NotesBuilder {
       self.registry = registry;
 
       return { success: true, deleted: count };
-    `);
+    `,
+    );
 
     // count(objectId) - count notes for an object
-    this.notes.setMethod('count', `
+    this.notes.setMethod(
+      'count',
+      `
       const objectId = typeof args[0] === 'object' ? args[0].id : args[0];
 
       if (!objectId) return 0;
 
       const registry = self.registry || {};
       return (registry[objectId] || []).length;
-    `);
+    `,
+    );
 
     // search(query, options?) - search notes by text or tag
     // options: { tag, author, limit }
-    this.notes.setMethod('search', `
+    this.notes.setMethod(
+      'search',
+      `
       const query = args[0] || '';
       const options = args[1] || {};
 
@@ -182,10 +203,13 @@ export class NotesBuilder {
       }
 
       return results;
-    `);
+    `,
+    );
 
     // listObjects() - list all objects that have notes
-    this.notes.setMethod('listObjects', `
+    this.notes.setMethod(
+      'listObjects',
+      `
       const registry = self.registry || {};
       const objects = [];
 
@@ -199,10 +223,13 @@ export class NotesBuilder {
       }
 
       return objects;
-    `);
+    `,
+    );
 
     // format(objectId) - format notes for display
-    this.notes.setMethod('format', `
+    this.notes.setMethod(
+      'format',
+      `
       const objectId = typeof args[0] === 'object' ? args[0].id : args[0];
 
       if (!objectId) return 'No object specified.';
@@ -226,7 +253,8 @@ export class NotesBuilder {
       }
 
       return output.trim();
-    `);
+    `,
+    );
   }
 
   async registerAlias(): Promise<void> {

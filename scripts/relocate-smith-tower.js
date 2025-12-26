@@ -19,30 +19,33 @@
  * The building gains a new ground floor row at y=+9 for the 1st Ave entrance.
  */
 
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const SMITH_TOWER_DIR = path.join(__dirname, '../src/database/bootstrap/world/seattle/pioneer-square/buildings/smith-tower');
+const SMITH_TOWER_DIR = path.join(
+  __dirname,
+  '../src/database/bootstrap/world/seattle/pioneer-square/buildings/smith-tower',
+);
 
 function updateFile(filePath) {
   let content = fs.readFileSync(filePath, 'utf8');
   let changes = 0;
 
   // Shift all X coordinates by -7 (move west)
-  content = content.replace(/(\bx:\s*)(-?\d+)/g, (match, prefix, num) => {
-    const oldX = parseInt(num);
+  content = content.replace(/(\bx:\s*)(-?\d+)/g, (_match, prefix, num) => {
+    const oldX = parseInt(num, 10);
     const newX = oldX - 7;
     changes++;
     return `${prefix}${newX}`;
   });
 
   // Shift all Y coordinates by +2 (move north, adding space for entrance row)
-  content = content.replace(/(\by:\s*)(-?\d+)/g, (match, prefix, num) => {
-    const oldY = parseInt(num);
+  content = content.replace(/(\by:\s*)(-?\d+)/g, (_match, prefix, num) => {
+    const oldY = parseInt(num, 10);
     const newY = oldY + 2;
     changes++;
     return `${prefix}${newY}`;
@@ -55,14 +58,17 @@ function updateFile(filePath) {
 console.log('🏗️  Relocating Smith Tower...');
 console.log('');
 console.log('Old position: x=-6 to -3, y=+8 to +10 (near Occidental)');
-console.log('New position: x=-13 to -10, y=+10 to +12 (touching 1st Ave & Yesler)');
+console.log(
+  'New position: x=-13 to -10, y=+10 to +12 (touching 1st Ave & Yesler)',
+);
 console.log('');
 console.log('Transform: x -= 7, y += 2');
 console.log('');
 
-const files = fs.readdirSync(SMITH_TOWER_DIR)
-  .filter(f => f.endsWith('.ts') && !f.includes('backup'))
-  .map(f => path.join(SMITH_TOWER_DIR, f));
+const files = fs
+  .readdirSync(SMITH_TOWER_DIR)
+  .filter((f) => f.endsWith('.ts') && !f.includes('backup'))
+  .map((f) => path.join(SMITH_TOWER_DIR, f));
 
 let totalChanges = 0;
 for (const file of files) {
@@ -72,7 +78,9 @@ for (const file of files) {
 }
 
 console.log('');
-console.log(`✅ Updated ${files.length} files with ${totalChanges} total coordinate changes`);
+console.log(
+  `✅ Updated ${files.length} files with ${totalChanges} total coordinate changes`,
+);
 console.log('');
 console.log('New footprint: x=-13 to -10, y=+10 to +12');
 console.log('West entrance (1st Ave): x=-14, y=+11');

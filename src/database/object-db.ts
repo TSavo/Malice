@@ -1,10 +1,14 @@
-import { MongoClient, Db, Collection } from 'mongodb';
+import { type Collection, type Db, MongoClient } from 'mongodb';
 import type { GameObject, ObjId } from '../../types/object.js';
 
 /**
  * Sanitize an object for MongoDB storage, removing circular references
  */
-function sanitizeForMongo(value: any, seen: WeakSet<object> = new WeakSet(), path: string = 'root'): any {
+function sanitizeForMongo(
+  value: any,
+  seen: WeakSet<object> = new WeakSet(),
+  path: string = 'root',
+): any {
   if (value === null || value === undefined) {
     return value;
   }
@@ -16,14 +20,18 @@ function sanitizeForMongo(value: any, seen: WeakSet<object> = new WeakSet(), pat
 
   // Check for circular reference
   if (seen.has(value)) {
-    console.error(`[ObjectDB] Circular reference detected at ${path}, replacing with null`);
+    console.error(
+      `[ObjectDB] Circular reference detected at ${path}, replacing with null`,
+    );
     return null;
   }
   seen.add(value);
 
   // Handle arrays
   if (Array.isArray(value)) {
-    return value.map((item, i) => sanitizeForMongo(item, seen, `${path}[${i}]`));
+    return value.map((item, i) =>
+      sanitizeForMongo(item, seen, `${path}[${i}]`),
+    );
   }
 
   // Handle Date objects
@@ -48,7 +56,10 @@ export class ObjectDatabase {
   private objects!: Collection<GameObject>;
   private connected = false;
 
-  constructor(private uri: string, private dbName: string = 'malice') { }
+  constructor(
+    private uri: string,
+    private dbName: string = 'malice',
+  ) {}
 
   /**
    * Connect to MongoDB
@@ -92,13 +103,22 @@ export class ObjectDatabase {
    * Create new object
    * If reusing a recycled ID, replaces the recycled object
    */
-  async create(obj: Omit<GameObject, 'created' | 'modified'>): Promise<GameObject> {
+  async create(
+    obj: Omit<GameObject, 'created' | 'modified'>,
+  ): Promise<GameObject> {
     const now = new Date();
     // Sanitize the object to prevent circular reference errors
-    const sanitizedObj = sanitizeForMongo(obj, new WeakSet(), `create#${obj._id}`) as typeof obj;
+    const sanitizedObj = sanitizeForMongo(
+      obj,
+      new WeakSet(),
+      `create#${obj._id}`,
+    ) as typeof obj;
 
     // Check if we're reusing a recycled object
-    const existing = await this.objects.findOne({ _id: sanitizedObj._id, recycled: true });
+    const existing = await this.objects.findOne({
+      _id: sanitizedObj._id,
+      recycled: true,
+    });
 
     if (existing) {
       // Replace recycled object (keep original creation date)
@@ -129,7 +149,7 @@ export class ObjectDatabase {
    */
   async update(
     id: ObjId,
-    updates: Partial<Omit<GameObject, '_id' | 'created'>>
+    updates: Partial<Omit<GameObject, '_id' | 'created'>>,
   ): Promise<void> {
     // Sanitize updates to prevent circular reference errors
     const sanitized = sanitizeForMongo(updates, new WeakSet(), `#${id}`);
@@ -137,9 +157,13 @@ export class ObjectDatabase {
     // Debug: try JSON.stringify to detect circular refs before BSON does
     try {
       JSON.stringify(sanitized);
-    } catch (jsonErr) {
-      console.error(`[ObjectDB] JSON.stringify failed for #${id}, trying to find circular ref`);
-      console.error(`[ObjectDB] Updates keys: ${Object.keys(updates).join(', ')}`);
+    } catch (_jsonErr) {
+      console.error(
+        `[ObjectDB] JSON.stringify failed for #${id}, trying to find circular ref`,
+      );
+      console.error(
+        `[ObjectDB] Updates keys: ${Object.keys(updates).join(', ')}`,
+      );
       // Try to identify the problematic key
       for (const key of Object.keys(sanitized)) {
         try {
@@ -157,7 +181,7 @@ export class ObjectDatabase {
           ...sanitized,
           modified: new Date(),
         },
-      }
+      },
     );
   }
 
@@ -166,7 +190,9 @@ export class ObjectDatabase {
    */
   async getChildren(parentId: ObjId): Promise<GameObject[]> {
     // Query using dot notation for nested ObjRefValue
-    return await this.objects.find({ 'parent.value': parentId } as any).toArray();
+    return await this.objects
+      .find({ 'parent.value': parentId } as any)
+      .toArray();
   }
 
   /**

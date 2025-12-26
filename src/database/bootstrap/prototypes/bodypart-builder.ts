@@ -1,5 +1,5 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Builds the BodyPart prototype
@@ -23,33 +23,38 @@ import type { RuntimeObject } from '../../../../types/object.js';
 export class BodyPartBuilder {
   constructor(private manager: ObjectManager) {}
 
-  async build(edibleId: number, existingObj?: RuntimeObject): Promise<RuntimeObject> {
+  async build(
+    edibleId: number,
+    existingObj?: RuntimeObject,
+  ): Promise<RuntimeObject> {
     const parentObj = await this.manager.load(edibleId);
-    const obj = existingObj || await this.manager.create({
-      parent: parentObj!,
-      properties: {
-        name: 'BodyPart',
-        description: 'A body part',
-        owner: null, // ObjRef to the player/agent who owns this body
-        parts: {}, // { partName: ObjId } - child body parts
-        bones: [], // string[] - bones in this part (for damage)
-        wounds: [], // ObjRef[] - wound objects on this body part
-        coverable: false, // Can wear clothing on this part
-        removable: false, // Can be severed/detached
-        critical: false, // Death if destroyed
-        condition: {}, // { conditionName: severity } - injuries/status
-        // Wearable system - for coverable body parts
-        nakedDescription: null, // Description shown when this part is bare (set by specific parts)
-        worn: [], // Array of wearable IDs currently covering this part
-        // Decay overrides - body parts decay when severed
-        decayCondition: 'severed', // Only decay when severed
-        decayRate: 2, // Faster decay than preserved food (2% per tick)
-        // Edible overrides - meat is ~2 kcal/gram, set by weight
-        // calories will be calculated from weight in getCaloriesPerPortion override
-        portions: 4, // A body part is multiple portions
+    const obj =
+      existingObj ||
+      (await this.manager.create({
+        parent: parentObj!,
+        properties: {
+          name: 'BodyPart',
+          description: 'A body part',
+          owner: null, // ObjRef to the player/agent who owns this body
+          parts: {}, // { partName: ObjId } - child body parts
+          bones: [], // string[] - bones in this part (for damage)
+          wounds: [], // ObjRef[] - wound objects on this body part
+          coverable: false, // Can wear clothing on this part
+          removable: false, // Can be severed/detached
+          critical: false, // Death if destroyed
+          condition: {}, // { conditionName: severity } - injuries/status
+          // Wearable system - for coverable body parts
+          nakedDescription: null, // Description shown when this part is bare (set by specific parts)
+          worn: [], // Array of wearable IDs currently covering this part
+          // Decay overrides - body parts decay when severed
+          decayCondition: 'severed', // Only decay when severed
+          decayRate: 2, // Faster decay than preserved food (2% per tick)
+          // Edible overrides - meat is ~2 kcal/gram, set by weight
+          // calories will be calculated from weight in getCaloriesPerPortion override
+          portions: 4, // A body part is multiple portions
 
-        // Abilities - physics for AI interpretation
-        abilities: `Organic tissue attached to a living body.
+          // Abilities - physics for AI interpretation
+          abilities: `Organic tissue attached to a living body.
 
 HIERARCHY: Body parts form a tree. 'parts' contains child parts (arm→forearm→hand→fingers). 'owner' is the agent whose body this belongs to. All actions on body parts affect the owner.
 
@@ -64,23 +69,55 @@ SENSATION: Can feel pain, touch, temperature via feel(). Reports to owner. Numb/
 CRITICAL: If 'critical' is true, destruction kills the owner.
 
 DECAY: Attached parts don't decay (maintained by living body). Severed parts decay rapidly. Decayed parts provide fewer calories when consumed.`,
-      },
-      methods: {},
-    });
+        },
+        methods: {},
+      }));
 
     // Property descriptions
-    obj.setPropertyDescription('owner', "The agent (player/NPC) whose body this part belongs to.");
-    obj.setPropertyDescription('parts', "Child body parts: { slotName: partObj }. Forms hierarchy (arm→forearm→hand).");
-    obj.setPropertyDescription('bones', "Bones in this part that can break under force (e.g., ['femur', 'tibia']).");
-    obj.setPropertyDescription('wounds', "Active wound objects on this body part. Wounds bleed, infect, heal.");
-    obj.setPropertyDescription('coverable', "If true, clothing can be worn on this part.");
-    obj.setPropertyDescription('removable', "If true, this part can be amputated/severed.");
-    obj.setPropertyDescription('critical', "If true, destroying this part kills the owner.");
-    obj.setPropertyDescription('condition', "Status conditions: { severed, numb, destroyed, brokenBones: [...] }.");
-    obj.setPropertyDescription('nakedDescription', "Text shown when examining this uncovered body part.");
-    obj.setPropertyDescription('worn', "Array of wearable objects currently covering this part, by layer.");
+    obj.setPropertyDescription(
+      'owner',
+      'The agent (player/NPC) whose body this part belongs to.',
+    );
+    obj.setPropertyDescription(
+      'parts',
+      'Child body parts: { slotName: partObj }. Forms hierarchy (arm→forearm→hand).',
+    );
+    obj.setPropertyDescription(
+      'bones',
+      "Bones in this part that can break under force (e.g., ['femur', 'tibia']).",
+    );
+    obj.setPropertyDescription(
+      'wounds',
+      'Active wound objects on this body part. Wounds bleed, infect, heal.',
+    );
+    obj.setPropertyDescription(
+      'coverable',
+      'If true, clothing can be worn on this part.',
+    );
+    obj.setPropertyDescription(
+      'removable',
+      'If true, this part can be amputated/severed.',
+    );
+    obj.setPropertyDescription(
+      'critical',
+      'If true, destroying this part kills the owner.',
+    );
+    obj.setPropertyDescription(
+      'condition',
+      'Status conditions: { severed, numb, destroyed, brokenBones: [...] }.',
+    );
+    obj.setPropertyDescription(
+      'nakedDescription',
+      'Text shown when examining this uncovered body part.',
+    );
+    obj.setPropertyDescription(
+      'worn',
+      'Array of wearable objects currently covering this part, by layer.',
+    );
 
-    obj.setMethod('canContain', `
+    obj.setMethod(
+      'canContain',
+      `
       /** Check if this body part can contain items.
        *  Override in specific parts (e.g., Hand has limited capacity).
        *  @returns true if can contain
@@ -88,16 +125,22 @@ DECAY: Attached parts don't decay (maintained by living body). Severed parts dec
       // By default, body parts can contain things
       // Override in specific parts (e.g., Hand has limited capacity)
       return true;
-    `);
+    `,
+    );
 
-    obj.setMethod('getOwner', `
+    obj.setMethod(
+      'getOwner',
+      `
       /** Get the player/agent who owns this body part.
        *  @returns The owner RuntimeObject or null
        */
       return self.owner || null;
-    `);
+    `,
+    );
 
-    obj.setMethod('setOwner', `
+    obj.setMethod(
+      'setOwner',
+      `
       /** Set owner recursively for all child parts.
        *  @param ownerId - Owner ID or RuntimeObject
        */
@@ -112,9 +155,12 @@ DECAY: Attached parts don't decay (maintained by living body). Severed parts dec
           await part.setOwner(self.owner);
         }
       }
-    `);
+    `,
+    );
 
-    obj.setMethod('findPart', `
+    obj.setMethod(
+      'findPart',
+      `
       /** Find a part by name (recursive search).
        *  @param name - Part name to find
        *  @returns The found part or null
@@ -142,9 +188,12 @@ DECAY: Attached parts don't decay (maintained by living body). Severed parts dec
       }
 
       return null;
-    `);
+    `,
+    );
 
-    obj.setMethod('randomPart', `
+    obj.setMethod(
+      'randomPart',
+      `
       /** Get a random part (for random targeting).
        *  @returns Random child part or self
        */
@@ -158,9 +207,12 @@ DECAY: Attached parts don't decay (maintained by living body). Severed parts dec
         return await part.randomPart();
       }
       return self;
-    `);
+    `,
+    );
 
-    obj.setMethod('resolveAllContents', `
+    obj.setMethod(
+      'resolveAllContents',
+      `
       /** Get all contents recursively (this part + all child parts).
        *  @returns Array of all object IDs
        */
@@ -176,9 +228,12 @@ DECAY: Attached parts don't decay (maintained by living body). Severed parts dec
       }
 
       return allContents;
-    `);
+    `,
+    );
 
-    obj.setMethod('coverageMap', `
+    obj.setMethod(
+      'coverageMap',
+      `
       /** Build a map of all coverable parts (for clothing).
        *  @param map - Accumulator map (optional)
        *  @returns Map of partName -> part
@@ -198,9 +253,12 @@ DECAY: Attached parts don't decay (maintained by living body). Severed parts dec
       }
 
       return map;
-    `);
+    `,
+    );
 
-    obj.setMethod('getVisibleDescription', `
+    obj.setMethod(
+      'getVisibleDescription',
+      `
       /** Get the visible description of this body part.
        *  If covered by wearables, shows the outermost wearable's description.
        *  If bare, shows nakedDescription or defaults.
@@ -247,9 +305,12 @@ DECAY: Attached parts don't decay (maintained by living body). Severed parts dec
 
       // Default naked description for body parts
       return 'bare ' + self.name.toLowerCase();
-    `);
+    `,
+    );
 
-    obj.setMethod('getWornItems', `
+    obj.setMethod(
+      'getWornItems',
+      `
       /** Get all items worn on this body part, sorted by layer (innermost first).
        *  @returns Array of worn item RuntimeObjects
        */
@@ -259,9 +320,12 @@ DECAY: Attached parts don't decay (maintained by living body). Severed parts dec
       // Sort by layer (innermost/lowest layer first)
       items.sort((a, b) => (a.layer || 0) - (b.layer || 0));
       return items;
-    `);
+    `,
+    );
 
-    obj.setMethod('canFeel', `
+    obj.setMethod(
+      'canFeel',
+      `
       /** Check if this part can feel (tactile sense).
        *  @returns true if can feel (not numb, destroyed, or severed)
        */
@@ -272,9 +336,12 @@ DECAY: Attached parts don't decay (maintained by living body). Severed parts dec
         return false;
       }
       return true;
-    `);
+    `,
+    );
 
-    obj.setMethod('feel', `
+    obj.setMethod(
+      'feel',
+      `
       /** Process tactile input (touch, pain, temperature).
        *  Reports sensation to owner.
        *  @param sensation - Object with type, intensity, source
@@ -301,9 +368,12 @@ DECAY: Attached parts don't decay (maintained by living body). Severed parts dec
       }
 
       return report;
-    `);
+    `,
+    );
 
-    obj.setMethod('takeDamage', `
+    obj.setMethod(
+      'takeDamage',
+      `
       /** Receive and process damage to this body part.
        *  Creates a $.wound object and attaches it to this part.
        *  @param damage - Object with type, severity (0-100), depth, cause, force, breakChance
@@ -393,10 +463,13 @@ DECAY: Attached parts don't decay (maintained by living body). Severed parts dec
         bonesBroken,
         description: resultDesc,
       };
-    `);
+    `,
+    );
 
     // Process all wounds on this body part (called each tick)
-    obj.setMethod('tickWounds', `
+    obj.setMethod(
+      'tickWounds',
+      `
       /** Process all wounds on this body part for one tick.
        *  @returns { totalBled, healed, infected, fullyHealed }
        */
@@ -434,18 +507,24 @@ DECAY: Attached parts don't decay (maintained by living body). Severed parts dec
       self.wounds = activeWounds;
 
       return results;
-    `);
+    `,
+    );
 
     // Get all wound objects on this part
-    obj.setMethod('getWounds', `
+    obj.setMethod(
+      'getWounds',
+      `
       /** Get all wound objects on this body part.
        *  @returns Array of wound RuntimeObjects
        */
       return (self.wounds || []).filter(w => w);
-    `);
+    `,
+    );
 
     // Check if actively bleeding
-    obj.setMethod('isBleeding', `
+    obj.setMethod(
+      'isBleeding',
+      `
       /** Check if any wounds are bleeding.
        *  @returns Total bleeding rate (0-100+)
        */
@@ -455,9 +534,12 @@ DECAY: Attached parts don't decay (maintained by living body). Severed parts dec
         totalBleeding += wound.bleeding || 0;
       }
       return totalBleeding;
-    `);
+    `,
+    );
 
-    obj.setMethod('heal', `
+    obj.setMethod(
+      'heal',
+      `
       /** Heal a wound or a set bone.
        *  @param target - 'bone' for bones, or wound ID, or 'all' for all wounds
        *  @param amount - Healing amount (0-100), default 10
@@ -512,9 +594,12 @@ DECAY: Attached parts don't decay (maintained by living body). Severed parts dec
         healed,
         message: healed.length > 0 ? 'Wounds have been treated.' : 'No wounds to heal.',
       };
-    `);
+    `,
+    );
 
-    obj.setMethod('setBone', `
+    obj.setMethod(
+      'setBone',
+      `
       /** Set a broken bone (required before healing).
        *  @param boneName - Optional specific bone to set
        *  @returns Object with success, bone, message
@@ -543,9 +628,12 @@ DECAY: Attached parts don't decay (maintained by living body). Severed parts dec
       }
 
       return { success: false, message: 'No broken bone to set.' };
-    `);
+    `,
+    );
 
-    obj.setMethod('stopBleeding', `
+    obj.setMethod(
+      'stopBleeding',
+      `
       /** Stop bleeding on all wounds (apply pressure/bandage).
        *  @param effectiveness - How effective the treatment is (0-100)
        *  @returns Object with stopped count and message
@@ -572,9 +660,12 @@ DECAY: Attached parts don't decay (maintained by living body). Severed parts dec
         stopped,
         message: stopped > 0 ? 'The bleeding has been stopped.' : 'No bleeding to stop.',
       };
-    `);
+    `,
+    );
 
-    obj.setMethod('getBleedingCount', `
+    obj.setMethod(
+      'getBleedingCount',
+      `
       /** Count bleeding wounds on this part only (not children).
        *  @returns Number of actively bleeding wounds
        */
@@ -588,9 +679,12 @@ DECAY: Attached parts don't decay (maintained by living body). Severed parts dec
       }
 
       return count;
-    `);
+    `,
+    );
 
-    obj.setMethod('getAllBleedingParts', `
+    obj.setMethod(
+      'getAllBleedingParts',
+      `
       /** Get all parts (including children) that are bleeding.
        *  @returns Array of { part, count } for parts with bleeding wounds
        */
@@ -613,16 +707,22 @@ DECAY: Attached parts don't decay (maintained by living body). Severed parts dec
       }
 
       return results;
-    `);
+    `,
+    );
 
-    obj.setMethod('isEmpty', `
+    obj.setMethod(
+      'isEmpty',
+      `
       /** Check if this part is empty (no contents).
        *  @returns true if empty
        */
       return (self.contents || []).length === 0;
-    `);
+    `,
+    );
 
-    obj.setMethod('addPart', `
+    obj.setMethod(
+      'addPart',
+      `
       /** Add a child part to this body part.
        *  @param partName - Slot name for the part
        *  @param part - RuntimeObject of the part
@@ -639,9 +739,12 @@ DECAY: Attached parts don't decay (maintained by living body). Severed parts dec
       if (self.owner && part.setOwner) {
         await part.setOwner(self.owner);
       }
-    `);
+    `,
+    );
 
-    obj.setMethod('getPart', `
+    obj.setMethod(
+      'getPart',
+      `
       /** Get a specific child part by name.
        *  @param partName - Name of the part slot
        *  @returns The part RuntimeObject or null
@@ -655,9 +758,12 @@ DECAY: Attached parts don't decay (maintained by living body). Severed parts dec
         part = await $load(part);
       }
       return part || null;
-    `);
+    `,
+    );
 
-    obj.setMethod('removePart', `
+    obj.setMethod(
+      'removePart',
+      `
       /** Remove a child part by name (internal, doesn't handle consequences).
        *  @param partName - Name of the part slot
        *  @returns The removed part or null
@@ -671,9 +777,12 @@ DECAY: Attached parts don't decay (maintained by living body). Severed parts dec
         return part;
       }
       return null;
-    `);
+    `,
+    );
 
-    obj.setMethod('amputate', `
+    obj.setMethod(
+      'amputate',
+      `
       /** Amputate a child part - severs it from this body part.
        *  The severed part drops to the ground.
        *  @param partName - Name of the part to amputate
@@ -818,9 +927,12 @@ DECAY: Attached parts don't decay (maintained by living body). Severed parts dec
         victim: owner,
         amputator: amputator,
       };
-    `);
+    `,
+    );
 
-    obj.setMethod('reattach', `
+    obj.setMethod(
+      'reattach',
+      `
       /** Reattach a previously severed part.
        *  @param part - The part RuntimeObject to reattach
        *  @param partName - The slot name (e.g., 'leftArm')
@@ -862,9 +974,12 @@ DECAY: Attached parts don't decay (maintained by living body). Severed parts dec
         part: part,
         message: 'The ' + part.name + ' has been reattached.',
       };
-    `);
+    `,
+    );
 
-    obj.setMethod('onContentArrived', `
+    obj.setMethod(
+      'onContentArrived',
+      `
       /** Called when something arrives in this body part.
        *  @param obj - The arriving object
        *  @param source - Where it came from
@@ -874,10 +989,13 @@ DECAY: Attached parts don't decay (maintained by living body). Severed parts dec
       const source = args[1];
       const mover = args[2];
       // No verb registration - AI handles object interactions directly via abilities
-    `);
+    `,
+    );
 
     // When something leaves this body part
-    obj.setMethod('onContentLeft', `
+    obj.setMethod(
+      'onContentLeft',
+      `
       /** Called when something leaves this body part.
        *  @param obj - The leaving object
        *  @param dest - Where it's going
@@ -887,12 +1005,15 @@ DECAY: Attached parts don't decay (maintained by living body). Severed parts dec
       const dest = args[1];
       const mover = args[2];
       // No verb unregistration - AI handles object interactions directly via abilities
-    `);
+    `,
+    );
 
     // Describe this body part with damage
     // Uses $.pronoun for "Her head", $.proportional for wound count descriptions
     // Output example: "Her head is covered in severe bruises, has a few minor cuts, and is missing an eye."
-    obj.setMethod('describe', `
+    obj.setMethod(
+      'describe',
+      `
       const viewer = args[0]; // Who is looking (for pronouns)
       const condition = self.condition || {};
       const owner = self.owner || null;
@@ -984,11 +1105,14 @@ DECAY: Attached parts don't decay (maintained by living body). Severed parts dec
       }
 
       return desc;
-    `);
+    `,
+    );
 
     // Override getCaloriesPerPortion - body parts calculate calories from weight
     // Meat is approximately 2 kcal/gram (accounting for bones, non-edible parts)
-    obj.setMethod('getCaloriesPerPortion', `
+    obj.setMethod(
+      'getCaloriesPerPortion',
+      `
       /** Calculate calories per portion based on body part weight.
        *  Uses meat calorie density (~2 kcal/g) adjusted for decay.
        *  Body parts are only edible when severed.
@@ -1009,23 +1133,29 @@ DECAY: Attached parts don't decay (maintained by living body). Severed parts dec
       const decayLevel = self.decayLevel || 0;
       const decayMultiplier = 1 - (decayLevel / 50);
       return Math.round(baseCal * decayMultiplier);
-    `);
+    `,
+    );
 
     // Override shouldDecay - only decay when severed from owner
-    obj.setMethod('shouldDecay', `
+    obj.setMethod(
+      'shouldDecay',
+      `
       /** Body parts only decay when severed.
        *  Attached body parts don't decay (maintained by living body).
        */
       const condition = self.condition || {};
       return condition.severed === true || self.owner === null || self.owner === 0;
-    `);
+    `,
+    );
 
     // === AUTOPSY HOOKS ===
     // These methods return narrative descriptions without exposing raw numbers.
     // Decay level obscures findings - the more decayed, the less you can determine.
 
     // Get autopsy findings for this body part
-    obj.setMethod('getAutopsyFindings', `
+    obj.setMethod(
+      'getAutopsyFindings',
+      `
       /** Get narrative autopsy findings for this body part.
        *  @param examinerSkill - 0-100, higher reveals more detail
        *  @returns Array of finding strings
@@ -1359,10 +1489,13 @@ DECAY: Attached parts don't decay (maintained by living body). Severed parts dec
       }
 
       return findings;
-    `);
+    `,
+    );
 
     // Get autopsy findings for child parts recursively
-    obj.setMethod('getFullAutopsyFindings', `
+    obj.setMethod(
+      'getFullAutopsyFindings',
+      `
       /** Get autopsy findings for this part and all children.
        *  @param examinerSkill - 0-100
        *  @returns Object mapping part names to finding arrays
@@ -1389,7 +1522,8 @@ DECAY: Attached parts don't decay (maintained by living body). Severed parts dec
       }
 
       return allFindings;
-    `);
+    `,
+    );
 
     return obj;
   }

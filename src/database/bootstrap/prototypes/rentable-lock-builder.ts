@@ -1,5 +1,5 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Builds the RentableLock prototype
@@ -62,7 +62,9 @@ COMPOSABLE: 'locks' array can contain additional lock objects (biometric, keycar
       methods: {},
     });
 
-    obj.setMethod('canAccess', `
+    obj.setMethod(
+      'canAccess',
+      `
       /** Check if agent can access via rental, code, and lock system. */
       const agent = args[0];
       const target = args[1];
@@ -88,9 +90,12 @@ COMPOSABLE: 'locks' array can contain additional lock objects (biometric, keycar
         }
       }
       return true;
-    `);
+    `,
+    );
 
-    obj.setMethod('rent', `
+    obj.setMethod(
+      'rent',
+      `
       /** Rent the lock for duration by paying price to account via bank. Extends rental if active, keeps code. Uses $.format for messages. */
       const agent = args[0];
       const idempotencyKey = args[1];
@@ -129,26 +134,35 @@ COMPOSABLE: 'locks' array can contain additional lock objects (biometric, keycar
       self.locked = false;
       const msg = await $.format('Access granted for {0} minutes. Code: {1}', Math.round(duration/60000), code);
       return { success: true, message: msg, code: code };
-    `);
-        // Example usage of $.prompt for code entry (to be called from exit verb handler)
-        obj.setMethod('promptForCode', `
+    `,
+    );
+    // Example usage of $.prompt for code entry (to be called from exit verb handler)
+    obj.setMethod(
+      'promptForCode',
+      `
           /** Prompt agent for code and check access. */
           const agent = args[0];
           const target = args[1];
           const promptMsg = 'Enter your access code:';
           const inputCode = await $.prompt(agent, promptMsg);
           return await self.canAccess(agent, target, inputCode);
-        `);
-    obj.setMethod('syncCode', `
+        `,
+    );
+    obj.setMethod(
+      'syncCode',
+      `
       /** Set code and sync with linked lock. */
       const code = args[0];
       self.code = code;
       if (self.linkedLock) {
         self.linkedLock.code = code;
       }
-    `);
+    `,
+    );
 
-    obj.setMethod('revoke', `
+    obj.setMethod(
+      'revoke',
+      `
       /** Remove agent's access. */
       const agent = args[0];
       const renters = self.renters || {};
@@ -156,24 +170,46 @@ COMPOSABLE: 'locks' array can contain additional lock objects (biometric, keycar
         delete renters[agent.id];
         self.renters = renters;
       }
-    `);
+    `,
+    );
 
-    obj.setMethod('isRenter', `
+    obj.setMethod(
+      'isRenter',
+      `
       /** Check if agent currently has access. */
       const agent = args[0];
       const now = Date.now();
       const renters = self.renters || {};
       return !!(agent && renters[agent.id] && renters[agent.id] > now);
-    `);
+    `,
+    );
 
     // Property descriptions
     obj.setPropertyDescription('price', 'Rental price in credits (integer)');
-    obj.setPropertyDescription('duration', 'Rental duration in milliseconds (default 1 hour)');
-    obj.setPropertyDescription('bank', 'Bank object for processing payments (ObjRef)');
-    obj.setPropertyDescription('account', 'Account ID to receive rental payments (string)');
-    obj.setPropertyDescription('renters', 'Map of agent IDs to expiration timestamps { agentId: timestamp }');
-    obj.setPropertyDescription('code', 'Access code generated on rental (string)');
-    obj.setPropertyDescription('linkedLockId', 'Paired lock for syncing codes on double-doors (integer)');
+    obj.setPropertyDescription(
+      'duration',
+      'Rental duration in milliseconds (default 1 hour)',
+    );
+    obj.setPropertyDescription(
+      'bank',
+      'Bank object for processing payments (ObjRef)',
+    );
+    obj.setPropertyDescription(
+      'account',
+      'Account ID to receive rental payments (string)',
+    );
+    obj.setPropertyDescription(
+      'renters',
+      'Map of agent IDs to expiration timestamps { agentId: timestamp }',
+    );
+    obj.setPropertyDescription(
+      'code',
+      'Access code generated on rental (string)',
+    );
+    obj.setPropertyDescription(
+      'linkedLockId',
+      'Paired lock for syncing codes on double-doors (integer)',
+    );
 
     return obj;
   }

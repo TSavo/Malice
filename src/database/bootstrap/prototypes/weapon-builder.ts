@@ -1,28 +1,28 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Builds the Weapon prototype
- * 
+ *
  * Base prototype for all weapons. Weapons have:
  * - skill: The skill name used when fighting with this weapon (e.g., "knife", "pistol", "katana")
  * - damage: Base damage modifier (added to combat damage rolls)
  * - damageType: Default damage type inflicted (cut, bruise, puncture, etc.)
  * - twoHanded: Whether the weapon requires two hands for effective use
- * 
+ *
  * Two-Handed Weapons:
  * All weapons can be HELD with one hand, but twoHanded weapons require a free
  * second hand to use effectively. Using a two-handed weapon one-handed results in:
  * - Severe accuracy/skill penalty
  * - Risk of injury to the wielder (recoil, loss of control)
  * - Reduced damage effectiveness
- * 
+ *
  * The $.combat system checks twoHanded and caller.getHands() to determine penalties.
- * 
+ *
  * The skill system is use-to-advance: every time you make a skill check in combat,
  * you gain XP in that skill. So the weapon's .skill property is critical - it determines
  * what skill improves when you fight with this weapon.
- * 
+ *
  * Examples:
  * - Combat knife: skill="knife", damage=15, damageType="cut", twoHanded=false
  * - Baseball bat: skill="club", damage=20, damageType="bruise", twoHanded=false
@@ -94,53 +94,94 @@ CONDITION: Weapons can degrade with use. Broken weapons have reduced damage or m
     });
 
     // Add property descriptions
-    obj.setPropertyDescription('skill', "Combat skill used and trained: improvised, knife, club, sword, etc.");
-    obj.setPropertyDescription('damage', "Base damage modifier 0-100. Added to attack severity.");
-    obj.setPropertyDescription('damageType', "Wound type inflicted: cut, bruise, puncture, laceration, burn.");
-    obj.setPropertyDescription('twoHanded', "If true, requires both hands for effective use. One-handed use has penalties.");
-    obj.setPropertyDescription('ranged', "If true, this is a ranged weapon (gun, bow).");
-    obj.setPropertyDescription('range', "Effective range in meters for ranged weapons.");
-    obj.setPropertyDescription('ammo', "Current ammunition count for ranged weapons.");
-    obj.setPropertyDescription('maxAmmo', "Maximum ammo capacity for ranged weapons.");
-    obj.setPropertyDescription('ammoType', "Required ammunition type for reloading (e.g., '9mm', '12gauge').");
+    obj.setPropertyDescription(
+      'skill',
+      'Combat skill used and trained: improvised, knife, club, sword, etc.',
+    );
+    obj.setPropertyDescription(
+      'damage',
+      'Base damage modifier 0-100. Added to attack severity.',
+    );
+    obj.setPropertyDescription(
+      'damageType',
+      'Wound type inflicted: cut, bruise, puncture, laceration, burn.',
+    );
+    obj.setPropertyDescription(
+      'twoHanded',
+      'If true, requires both hands for effective use. One-handed use has penalties.',
+    );
+    obj.setPropertyDescription(
+      'ranged',
+      'If true, this is a ranged weapon (gun, bow).',
+    );
+    obj.setPropertyDescription(
+      'range',
+      'Effective range in meters for ranged weapons.',
+    );
+    obj.setPropertyDescription(
+      'ammo',
+      'Current ammunition count for ranged weapons.',
+    );
+    obj.setPropertyDescription(
+      'maxAmmo',
+      'Maximum ammo capacity for ranged weapons.',
+    );
+    obj.setPropertyDescription(
+      'ammoType',
+      "Required ammunition type for reloading (e.g., '9mm', '12gauge').",
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // COMBAT INTERFACE
     // ═══════════════════════════════════════════════════════════════════
 
-    obj.setMethod('getSkill', `
+    obj.setMethod(
+      'getSkill',
+      `
       /** Get the combat skill name for this weapon.
        *  @returns Skill name (e.g., "knife", "pistol")
        */
       return self.skill || 'improvised';
-    `);
+    `,
+    );
 
-    obj.setMethod('getDamage', `
+    obj.setMethod(
+      'getDamage',
+      `
       /** Get base damage modifier for this weapon.
        *  @returns Damage value 0-100
        */
       return self.damage || 0;
-    `);
+    `,
+    );
 
-    obj.setMethod('getDamageType', `
+    obj.setMethod(
+      'getDamageType',
+      `
       /** Get the type of damage this weapon inflicts.
        *  @returns Damage type: cut, bruise, puncture, laceration, burn
        */
       return self.damageType || 'bruise';
-    `);
+    `,
+    );
 
-    obj.setMethod('isTwoHanded', `
+    obj.setMethod(
+      'isTwoHanded',
+      `
       /** Check if this weapon requires two hands for effective use.
        *  @returns true if two-handed, false otherwise
        */
       return self.twoHanded || false;
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // RANGED WEAPON METHODS
     // ═══════════════════════════════════════════════════════════════════
 
-    obj.setMethod('canFire', `
+    obj.setMethod(
+      'canFire',
+      `
       /** Check if this ranged weapon can fire.
        *  @returns { success: boolean, reason?: string }
        */
@@ -151,9 +192,12 @@ CONDITION: Weapons can degrade with use. Broken weapons have reduced damage or m
         return { success: false, reason: 'Out of ammo.' };
       }
       return { success: true };
-    `);
+    `,
+    );
 
-    obj.setMethod('fire', `
+    obj.setMethod(
+      'fire',
+      `
       /** Expend one round of ammo (infrastructure method).
        *  @returns { success: boolean, ammoRemaining?: number, reason?: string }
        */
@@ -164,9 +208,12 @@ CONDITION: Weapons can degrade with use. Broken weapons have reduced damage or m
 
       self.ammo = (self.ammo || 0) - 1;
       return { success: true, ammoRemaining: self.ammo };
-    `);
+    `,
+    );
 
-    obj.setMethod('reload', `
+    obj.setMethod(
+      'reload',
+      `
       /** Reload from an ammo source (infrastructure method).
        *  @param ammoSource - Ammo object to load from
        *  @returns { success: boolean, loaded?: number, ammoRemaining?: number, reason?: string }
@@ -212,13 +259,16 @@ CONDITION: Weapons can degrade with use. Broken weapons have reduced damage or m
       }
       
       return { success: true, loaded: toLoad, ammoRemaining: self.ammo };
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // DISPLAY
     // ═══════════════════════════════════════════════════════════════════
 
-    obj.setMethod('describe', `
+    obj.setMethod(
+      'describe',
+      `
       let desc = self.name + '\\r\\n' + self.description;
       
       if (self.ranged && self.maxAmmo > 0) {
@@ -226,7 +276,8 @@ CONDITION: Weapons can degrade with use. Broken weapons have reduced damage or m
       }
       
       return desc;
-    `);
+    `,
+    );
 
     return obj;
   }

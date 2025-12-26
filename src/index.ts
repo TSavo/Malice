@@ -11,15 +11,15 @@
  * - Dynamic method execution
  */
 
-import { TelnetServer } from './transport/telnet/index.js';
-import { WebSocketServer } from './transport/websocket/index.js';
-import { SSHServer } from './transport/ssh/index.js';
+import { DevToolsServer } from './devtools/index.js';
 import { GameCoordinator } from './game/index.js';
 import { LSPApiServer } from './lsp/api-server.js';
-import { DevToolsServer } from './devtools/index.js';
 import { createMCPServer, createSessionMCPServer } from './mcp/index.js';
-import { createWebServer } from './web/index.js';
 import { MCPTelnetClient } from './mcp/telnet-client.js';
+import { SSHServer } from './transport/ssh/index.js';
+import { TelnetServer } from './transport/telnet/index.js';
+import { WebSocketServer } from './transport/websocket/index.js';
+import { createWebServer } from './web/index.js';
 
 async function main() {
   console.log('🎮 Malice v2 - Modern TypeScript MUD\n');
@@ -28,9 +28,13 @@ async function main() {
   const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017';
 
   // Force bootstrap flag - rebuilds all prototype methods even if objects exist
-  const forceBootstrap = process.env.FORCE_BOOTSTRAP === 'true' || process.env.FORCE_BOOTSTRAP === '1';
+  const forceBootstrap =
+    process.env.FORCE_BOOTSTRAP === 'true' ||
+    process.env.FORCE_BOOTSTRAP === '1';
   if (forceBootstrap) {
-    console.log('⚠️  FORCE_BOOTSTRAP enabled - rebuilding all prototype methods\n');
+    console.log(
+      '⚠️  FORCE_BOOTSTRAP enabled - rebuilding all prototype methods\n',
+    );
   }
 
   // Initialize game system
@@ -42,7 +46,9 @@ async function main() {
     console.error('❌ Failed to initialize game system:', err);
     console.error('\n💡 Make sure MongoDB is running:');
     console.error('   mongod --dbpath ./data/db');
-    console.error('\nOr set MONGO_URI environment variable to your MongoDB instance.');
+    console.error(
+      '\nOr set MONGO_URI environment variable to your MongoDB instance.',
+    );
     process.exit(1);
   }
 
@@ -121,18 +127,22 @@ async function main() {
   // Set up SSH key lookup - find player by their stored public keys
   sshServer.keyLookup = async (username: string): Promise<string[] | null> => {
     const objectManager = await manager.load(0);
-    const aliases = (objectManager?.get('aliases') as Record<string, number>) || {};
+    const aliases =
+      (objectManager?.get('aliases') as Record<string, number>) || {};
     const playerPrototypeId = aliases.player;
     const adminPrototypeId = aliases.admin;
 
     // Find player by username
     const users = await manager.db.listAll(false);
-    const getValue = (v: any) => v && typeof v === 'object' && 'type' in v ? v.value : v;
+    const getValue = (v: any) =>
+      v && typeof v === 'object' && 'type' in v ? v.value : v;
 
-    const userDoc = users.find(u => {
+    const userDoc = users.find((u) => {
       const parentId = getValue(u.parent);
-      return (parentId === playerPrototypeId || parentId === adminPrototypeId) &&
-        getValue(u.properties.playername) === username.toLowerCase();
+      return (
+        (parentId === playerPrototypeId || parentId === adminPrototypeId) &&
+        getValue(u.properties.playername) === username.toLowerCase()
+      );
     });
 
     if (!userDoc) return null;
@@ -142,19 +152,26 @@ async function main() {
   };
 
   // Set up password verification for fallback auth
-  sshServer.passwordVerify = async (username: string, password: string): Promise<boolean> => {
+  sshServer.passwordVerify = async (
+    username: string,
+    password: string,
+  ): Promise<boolean> => {
     const objectManager = await manager.load(0);
-    const aliases = (objectManager?.get('aliases') as Record<string, number>) || {};
+    const aliases =
+      (objectManager?.get('aliases') as Record<string, number>) || {};
     const playerPrototypeId = aliases.player;
     const adminPrototypeId = aliases.admin;
 
     const users = await manager.db.listAll(false);
-    const getValue = (v: any) => v && typeof v === 'object' && 'type' in v ? v.value : v;
+    const getValue = (v: any) =>
+      v && typeof v === 'object' && 'type' in v ? v.value : v;
 
-    const userDoc = users.find(u => {
+    const userDoc = users.find((u) => {
       const parentId = getValue(u.parent);
-      return (parentId === playerPrototypeId || parentId === adminPrototypeId) &&
-        getValue(u.properties.playername) === username.toLowerCase();
+      return (
+        (parentId === playerPrototypeId || parentId === adminPrototypeId) &&
+        getValue(u.properties.playername) === username.toLowerCase()
+      );
     });
 
     if (!userDoc) return false;
@@ -164,7 +181,7 @@ async function main() {
 
     // Use player's checkPassword method
     try {
-      return await player.call('checkPassword', password) as boolean;
+      return (await player.call('checkPassword', password)) as boolean;
     } catch {
       return false;
     }
@@ -182,7 +199,9 @@ async function main() {
   // WebSocket server now emits Connection objects (may have HTTP auth)
   wsServer.connection$.subscribe(async (connection) => {
     connectionManager.add(connection);
-    console.log(`✅ New ${connection.transport.type} connection: ${connection.id}`);
+    console.log(
+      `✅ New ${connection.transport.type} connection: ${connection.id}`,
+    );
 
     // Hand connection to game coordinator (will invoke System object)
     await game.handleConnection(connection);
@@ -191,7 +210,9 @@ async function main() {
   // SSH server emits Connection objects (with SSH key auth or password auth)
   sshServer.connection$.subscribe(async (connection) => {
     connectionManager.add(connection);
-    console.log(`✅ New ${connection.transport.type} connection: ${connection.id}`);
+    console.log(
+      `✅ New ${connection.transport.type} connection: ${connection.id}`,
+    );
 
     // Hand connection to game coordinator
     await game.handleConnection(connection);

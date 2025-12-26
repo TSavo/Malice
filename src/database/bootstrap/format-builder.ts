@@ -1,5 +1,5 @@
-import { ObjectManager } from '../object-manager.js';
 import type { RuntimeObject } from '../../../types/object.js';
+import type { ObjectManager } from '../object-manager.js';
 
 /**
  * Builds Format utility object ($.format)
@@ -31,7 +31,8 @@ export class FormatBuilder {
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
 
-    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
+    const aliases =
+      (objectManager.get('aliases') as Record<string, number>) || {};
 
     if (aliases.format) {
       this.format = await this.manager.load(aliases.format);
@@ -45,7 +46,8 @@ export class FormatBuilder {
         parent: root!,
         properties: {
           name: 'Format',
-          description: 'Text formatting utilities for columns, tables, and layout',
+          description:
+            'Text formatting utilities for columns, tables, and layout',
           defaultWidth: 78,
         },
         methods: {},
@@ -53,7 +55,9 @@ export class FormatBuilder {
     }
 
     // Pad string on the right to reach target width
-    this.format.setMethod('padRight', `
+    this.format.setMethod(
+      'padRight',
+      `
       /** Pad a string on the right.
        *  Usage: $.format.padRight(str, width, char?)
        *  @param str - String to pad
@@ -67,10 +71,13 @@ export class FormatBuilder {
 
       if (str.length >= width) return str;
       return str + char.repeat(width - str.length);
-    `);
+    `,
+    );
 
     // Pad string on the left to reach target width
-    this.format.setMethod('padLeft', `
+    this.format.setMethod(
+      'padLeft',
+      `
       /** Pad a string on the left.
        *  Usage: $.format.padLeft(str, width, char?)
        *  @param str - String to pad
@@ -84,10 +91,13 @@ export class FormatBuilder {
 
       if (str.length >= width) return str;
       return char.repeat(width - str.length) + str;
-    `);
+    `,
+    );
 
     // Center string within target width
-    this.format.setMethod('center', `
+    this.format.setMethod(
+      'center',
+      `
       /** Center a string within a width.
        *  Usage: $.format.center(str, width, char?)
        *  @param str - String to center
@@ -106,10 +116,13 @@ export class FormatBuilder {
       const right = total - left;
 
       return char.repeat(left) + str + char.repeat(right);
-    `);
+    `,
+    );
 
     // Truncate string with ellipsis
-    this.format.setMethod('truncate', `
+    this.format.setMethod(
+      'truncate',
+      `
       /** Truncate a string with ellipsis if too long.
        *  Usage: $.format.truncate(str, width, ellipsis?)
        *  @param str - String to truncate
@@ -124,10 +137,13 @@ export class FormatBuilder {
       if (str.length <= width) return str;
 
       return str.slice(0, width - ellipsis.length) + ellipsis;
-    `);
+    `,
+    );
 
     // Format items into columns
-    this.format.setMethod('columns', `
+    this.format.setMethod(
+      'columns',
+      `
       /** Format items into multiple columns.
        *  Usage: $.format.columns(items, numCols?, options?)
        *  @param items - Array of strings
@@ -165,10 +181,13 @@ export class FormatBuilder {
       }
 
       return lines;
-    `);
+    `,
+    );
 
     // Format data as a table with optional headers
-    this.format.setMethod('table', `
+    this.format.setMethod(
+      'table',
+      `
       /** Format data as a table with aligned columns.
        *  Usage: $.format.table(rows, options?)
        *  @param rows - Array of row arrays. First row can be headers.
@@ -247,10 +266,13 @@ export class FormatBuilder {
       }
 
       return lines;
-    `);
+    `,
+    );
 
     // Word wrap text to specified width
-    this.format.setMethod('wrap', `
+    this.format.setMethod(
+      'wrap',
+      `
       /** Word-wrap text to a specified width.
        *  Usage: $.format.wrap(text, width?, indent?)
        *  @param text - Text to wrap
@@ -300,10 +322,13 @@ export class FormatBuilder {
       }
 
       return lines;
-    `);
+    `,
+    );
 
     // Draw a box around text
-    this.format.setMethod('box', `
+    this.format.setMethod(
+      'box',
+      `
       /** Draw a box around text.
        *  Usage: $.format.box(text, options?)
        *  @param text - Text or array of lines
@@ -369,10 +394,13 @@ export class FormatBuilder {
       output.push(c.bl + c.h.repeat(innerWidth) + c.br);
 
       return output;
-    `);
+    `,
+    );
 
     // Horizontal rule/line
-    this.format.setMethod('hr', `
+    this.format.setMethod(
+      'hr',
+      `
       /** Create a horizontal rule.
        *  Usage: $.format.hr(width?, char?)
        *  @param width - Width of the line (default: 78)
@@ -383,10 +411,13 @@ export class FormatBuilder {
       const char = args[1] || '-';
 
       return char.repeat(width);
-    `);
+    `,
+    );
 
     // Indent text
-    this.format.setMethod('indent', `
+    this.format.setMethod(
+      'indent',
+      `
       /** Indent text by a number of spaces.
        *  Usage: $.format.indent(text, spaces?)
        *  @param text - Text or array of lines
@@ -406,10 +437,13 @@ export class FormatBuilder {
       const indented = lines.map(line => prefix + line);
 
       return indented.length === 1 ? indented[0] : indented;
-    `);
+    `,
+    );
 
     // Bar/progress bar
-    this.format.setMethod('bar', `
+    this.format.setMethod(
+      'bar',
+      `
       /** Create a progress/status bar.
        *  Usage: $.format.bar(value, max, width?, options?)
        *  @param value - Current value
@@ -443,10 +477,13 @@ export class FormatBuilder {
       }
 
       return bar;
-    `);
+    `,
+    );
 
     // List with bullets or numbers
-    this.format.setMethod('list', `
+    this.format.setMethod(
+      'list',
+      `
       /** Format items as a bulleted or numbered list.
        *  Usage: $.format.list(items, options?)
        *  @param items - Array of items
@@ -510,10 +547,13 @@ export class FormatBuilder {
         }
         return prefix + marker + ' ' + item;
       });
-    `);
+    `,
+    );
 
     // Compose a sentence with template substitution
-    this.format.setMethod('compose', `
+    this.format.setMethod(
+      'compose',
+      `
       /** Compose a sentence with list, verb conjugation, and pronoun substitution.
        *  Usage: $.format.compose(template, items, options?)
        *
@@ -591,10 +631,13 @@ export class FormatBuilder {
       }
 
       return result;
-    `);
+    `,
+    );
 
     // Count-based verb conjugation (singular/plural)
-    this.format.setMethod('verb', `
+    this.format.setMethod(
+      'verb',
+      `
       /** Conjugate a verb based on count (singular/plural).
        *  Usage: $.format.verb(base, count)
        *  @param base - Base verb form (plural form, e.g., 'fall', 'are', 'have')
@@ -613,10 +656,13 @@ export class FormatBuilder {
 
       // Singular - delegate to $.english.conjugate for third person
       return await $.english.conjugate(base, 3);
-    `);
+    `,
+    );
 
     // Natural language list (prose style with Oxford comma)
-    this.format.setMethod('prose', `
+    this.format.setMethod(
+      'prose',
+      `
       /** Format items as a natural language list with Oxford comma.
        *  Usage: $.format.prose(items, conjunction?)
        *  @param items - Array of items
@@ -637,10 +683,13 @@ export class FormatBuilder {
       // 3+ items: use Oxford comma
       const allButLast = items.slice(0, -1).join(', ');
       return allButLast + ', ' + conjunction + ' ' + items[items.length - 1];
-    `);
+    `,
+    );
 
     // Key-value pairs aligned
-    this.format.setMethod('keyValue', `
+    this.format.setMethod(
+      'keyValue',
+      `
       /** Format key-value pairs with aligned values.
        *  Usage: $.format.keyValue(pairs, options?)
        *  @param pairs - Object or array of [key, value] pairs
@@ -672,7 +721,8 @@ export class FormatBuilder {
         const paddedKey = String(key) + ' '.repeat(maxKeyLen - String(key).length);
         return prefix + paddedKey + separator + String(value);
       });
-    `);
+    `,
+    );
   }
 
   async registerAlias(): Promise<void> {

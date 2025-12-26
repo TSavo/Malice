@@ -1,33 +1,33 @@
-import { ObjectManager } from '../object-manager.js';
+import type { ObjectManager } from '../object-manager.js';
+import { AiBuilder } from './ai-builder.js';
 import { AuthManagerBuilder } from './auth-manager-builder.js';
+import { BodyFactoryBuilder } from './body-factory-builder.js';
 import { CharGenBuilder } from './chargen-builder.js';
+import { CombatBuilder } from './combat-builder.js';
+import { EmoteBuilder } from './emote-builder.js';
+import { EnglishBuilder } from './english-builder.js';
+import { ExclusionsBuilder } from './exclusions-builder.js';
+import { FormatBuilder } from './format-builder.js';
+import { MaskBuilder } from './mask-builder.js';
+import { MCPBuilder } from './mcp-builder.js';
+import { MementoBuilder } from './memento-builder.js';
+import { MutexBuilder } from './mutex-builder.js';
+import { NotesBuilder } from './notes-builder.js';
+import { PlotBuilder } from './plot-builder.js';
+import { PluribusBuilder } from './pluribus-builder.js';
 import { PreAuthHandlerBuilder } from './preauth-handler-builder.js';
-import { RecyclerBuilder } from './recycler-builder.js';
+import { PromptBuilder } from './prompt-builder.js';
 import { PronounSubBuilder } from './pronoun-sub-builder.js';
 import { ProportionalBuilder } from './proportional-builder.js';
-import { EnglishBuilder } from './english-builder.js';
+import { RecyclerBuilder } from './recycler-builder.js';
 import { RoomBuilder } from './room-builder.js';
-import { BodyFactoryBuilder } from './body-factory-builder.js';
-import { PromptBuilder } from './prompt-builder.js';
 import { SchedulerBuilder } from './scheduler-builder.js';
-import { EmoteBuilder } from './emote-builder.js';
-import { MutexBuilder } from './mutex-builder.js';
-import { ExclusionsBuilder } from './exclusions-builder.js';
-import { MementoBuilder } from './memento-builder.js';
-import { FormatBuilder } from './format-builder.js';
-import { PlotBuilder } from './plot-builder.js';
-import { AiBuilder } from './ai-builder.js';
-import { NotesBuilder } from './notes-builder.js';
-import { CombatBuilder } from './combat-builder.js';
-import { PluribusBuilder } from './pluribus-builder.js';
-import { MaskBuilder } from './mask-builder.js';
-import { SisterGrayBuilder } from './sister-gray-builder.js';
-import { WebsiteBuilder } from './website-builder.js';
-import { MCPBuilder } from './mcp-builder.js';
 import { SessionBuilder } from './session-builder.js';
+import { SisterGrayBuilder } from './sister-gray-builder.js';
 import { TailorBuilder } from './tailor-builder.js';
 import { WebRouteBuilder } from './web-route-builder.js';
 import { WebRouterBuilder } from './web-router-builder.js';
+import { WebsiteBuilder } from './website-builder.js';
 import { WorldApiBuilder } from './world-api-builder.js';
 
 /**
@@ -59,9 +59,8 @@ import { WorldApiBuilder } from './world-api-builder.js';
 export class CoreSystemBuilder {
   constructor(
     private manager: ObjectManager,
-    private options: { disableDefaultJobs?: boolean } = {}
+    private options: { disableDefaultJobs?: boolean } = {},
   ) {}
-
 
   /**
    * Build all core system objects
@@ -125,7 +124,10 @@ export class CoreSystemBuilder {
     // Build Pluribus and Mask
     // Get prototype IDs from aliases
     const objManager = await this.manager.load(0);
-    const aliases = (objManager?.get('aliases') || {}) as Record<string, number>;
+    const aliases = (objManager?.get('aliases') || {}) as Record<
+      string,
+      number
+    >;
     const agentId = aliases.agent || 8; // agent prototype
     const wearableId = aliases.wearable || 36; // wearable prototype
     const humanId = aliases.human || 9; // human prototype
@@ -260,7 +262,10 @@ export class CoreSystemBuilder {
     // Rebuild Pluribus/Mask methods
     console.log('  Rebuilding Pluribus/Mask methods...');
     const objManager = await this.manager.load(0);
-    const aliases = (objManager?.get('aliases') || {}) as Record<string, number>;
+    const aliases = (objManager?.get('aliases') || {}) as Record<
+      string,
+      number
+    >;
     const agentId = aliases.agent || 8;
     const wearableId = aliases.wearable || 36;
     const humanId = aliases.human || 9;

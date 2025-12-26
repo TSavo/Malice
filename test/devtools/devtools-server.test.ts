@@ -2,11 +2,11 @@
  * DevTools WebSocket Server Tests
  */
 
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import WebSocket from 'ws';
-import { DevToolsServer } from '../../src/devtools/devtools-server.js';
-import { ObjectManager } from '../../src/database/object-manager.js';
 import { ObjectDatabase } from '../../src/database/object-db.js';
+import { ObjectManager } from '../../src/database/object-manager.js';
+import { DevToolsServer } from '../../src/devtools/devtools-server.js';
 
 import type { RuntimeObject } from '../../types/object.js';
 
@@ -23,26 +23,33 @@ describe.sequential('DevToolsServer', () => {
 
   // Setup server once for all tests
   beforeAll(async () => {
-    const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/?replicaSet=rs0&directConnection=true';
+    const MONGO_URI =
+      process.env.MONGO_URI ||
+      'mongodb://localhost:27017/?replicaSet=rs0&directConnection=true';
     db = new ObjectDatabase(MONGO_URI, 'malice_test_devtools');
 
     await Promise.race([
       db.connect(),
-      new Promise((_, reject) => setTimeout(() => reject(new Error('MongoDB connection timeout')), 10000))
+      new Promise((_, reject) =>
+        setTimeout(
+          () => reject(new Error('MongoDB connection timeout')),
+          10000,
+        ),
+      ),
     ]);
 
     manager = new ObjectManager(db);
     server = new DevToolsServer(manager, TEST_PORT);
 
     // Wait for server to start
-    await new Promise(resolve => setTimeout(resolve, 300));
+    await new Promise((resolve) => setTimeout(resolve, 300));
   }, 20000);
 
   // Cleanup after all tests
   afterAll(async () => {
     if (client && client.readyState === WebSocket.OPEN) {
       client.close();
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
     }
 
     if (server) {
@@ -59,12 +66,12 @@ describe.sequential('DevToolsServer', () => {
     // Close any existing client connection
     if (client && client.readyState === WebSocket.OPEN) {
       client.close();
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await new Promise((resolve) => setTimeout(resolve, 50));
     }
     client = null;
 
     // Clear all test data and reinitialize root
-    await db['objects'].deleteMany({});
+    await db.objects.deleteMany({});
     await db.ensureRoot();
 
     // Load root object fresh (stable proxy pattern - no cache clearing)
@@ -99,7 +106,7 @@ describe.sequential('DevToolsServer', () => {
           const response = JSON.parse(data.toString());
           if (response.id === id) {
             clearTimeout(timeout);
-            client!.off('message', handler);
+            client?.off('message', handler);
 
             if (response.error) {
               reject(new Error(response.error.message));
@@ -126,7 +133,7 @@ describe.sequential('DevToolsServer', () => {
 
       client.on('open', () => {
         // Wait for hello message
-        client!.once('message', (data) => {
+        client?.once('message', (data) => {
           const msg = JSON.parse(data.toString());
           expect(msg.method).toBe('server.hello');
           resolve();
@@ -152,7 +159,10 @@ describe.sequential('DevToolsServer', () => {
 
     // Register message listener BEFORE connection opens to catch hello
     const helloPromise = new Promise<void>((resolve, reject) => {
-      const helloTimeout = setTimeout(() => reject(new Error('Hello timeout')), 10000);
+      const helloTimeout = setTimeout(
+        () => reject(new Error('Hello timeout')),
+        10000,
+      );
       client2.once('message', () => {
         clearTimeout(helloTimeout);
         resolve();
@@ -161,7 +171,10 @@ describe.sequential('DevToolsServer', () => {
 
     // Wait for connection
     await new Promise<void>((resolve, reject) => {
-      const connectTimeout = setTimeout(() => reject(new Error('Connect timeout')), 5000);
+      const connectTimeout = setTimeout(
+        () => reject(new Error('Connect timeout')),
+        5000,
+      );
       client2.on('open', () => {
         clearTimeout(connectTimeout);
         resolve();
@@ -202,7 +215,7 @@ describe.sequential('DevToolsServer', () => {
     });
 
     // Small delay to ensure listener is ready
-    await new Promise(resolve => setTimeout(resolve, 50));
+    await new Promise((resolve) => setTimeout(resolve, 50));
 
     return {
       waitForNotification: () => notificationPromise,
@@ -210,7 +223,10 @@ describe.sequential('DevToolsServer', () => {
         resolved = true;
         clearTimeout(timeout);
         client2.removeAllListeners();
-        if (client2.readyState === WebSocket.OPEN || client2.readyState === WebSocket.CONNECTING) {
+        if (
+          client2.readyState === WebSocket.OPEN ||
+          client2.readyState === WebSocket.CONNECTING
+        ) {
           client2.close();
         }
       },
@@ -220,18 +236,18 @@ describe.sequential('DevToolsServer', () => {
   describe('Connection', () => {
     it('should accept WebSocket connections', async () => {
       await connectClient();
-      expect(client!.readyState).toBe(WebSocket.OPEN);
+      expect(client?.readyState).toBe(WebSocket.OPEN);
     });
 
     it('should send hello message with capabilities', async () => {
       client = new WebSocket(SERVER_URL);
 
       const hello: any = await new Promise((resolve, reject) => {
-        client!.on('message', (data) => {
+        client?.on('message', (data) => {
           const msg = JSON.parse(data.toString());
           resolve(msg);
         });
-        client!.on('error', reject);
+        client?.on('error', reject);
         setTimeout(() => reject(new Error('Timeout')), 5000);
       });
 
@@ -274,10 +290,10 @@ describe.sequential('DevToolsServer', () => {
       await connectClient();
 
       const response: any = await new Promise((resolve) => {
-        client!.once('message', (data) => {
+        client?.once('message', (data) => {
           resolve(JSON.parse(data.toString()));
         });
-        client!.send('invalid json{');
+        client?.send('invalid json{');
       });
 
       expect(response.jsonrpc).toBe('2.0');
@@ -288,7 +304,9 @@ describe.sequential('DevToolsServer', () => {
 
     it('should return error for unknown method', async () => {
       await connectClient();
-      await expect(sendRequest('unknown.method')).rejects.toThrow('Method not found');
+      await expect(sendRequest('unknown.method')).rejects.toThrow(
+        'Method not found',
+      );
     });
 
     it('should include request id in response', async () => {
@@ -306,10 +324,10 @@ describe.sequential('DevToolsServer', () => {
       };
 
       const response: any = await new Promise((resolve) => {
-        client!.once('message', (data) => {
+        client?.once('message', (data) => {
           resolve(JSON.parse(data.toString()));
         });
-        client!.send(JSON.stringify(request));
+        client?.send(JSON.stringify(request));
       });
 
       expect(response.id).toBe(id);
@@ -321,8 +339,16 @@ describe.sequential('DevToolsServer', () => {
       await connectClient();
 
       // Create test objects
-      const obj1 = await manager.create({ parent: root, properties: {}, methods: {} });
-      const obj2 = await manager.create({ parent: root, properties: {}, methods: {} });
+      const obj1 = await manager.create({
+        parent: root,
+        properties: {},
+        methods: {},
+      });
+      const obj2 = await manager.create({
+        parent: root,
+        properties: {},
+        methods: {},
+      });
 
       const result = await sendRequest('objects.list');
 
@@ -336,9 +362,16 @@ describe.sequential('DevToolsServer', () => {
     it('should exclude recycled objects by default', async () => {
       await connectClient();
 
-      const obj1 = await manager.create({ parent: root, properties: {}, methods: {} });
+      const obj1 = await manager.create({
+        parent: root,
+        properties: {},
+        methods: {},
+      });
       // Mark as recycled via raw MongoDB (recycling is handled by $.recycler in game)
-      await db['objects'].updateOne({ _id: obj1.id }, { $set: { recycled: true } });
+      await db.objects.updateOne(
+        { _id: obj1.id },
+        { $set: { recycled: true } },
+      );
 
       const result = await sendRequest('objects.list');
 
@@ -350,12 +383,21 @@ describe.sequential('DevToolsServer', () => {
     it('should include recycled objects when requested', async () => {
       await connectClient();
 
-      const obj1 = await manager.create({ parent: root, properties: {}, methods: {} });
+      const obj1 = await manager.create({
+        parent: root,
+        properties: {},
+        methods: {},
+      });
 
       // Mark as recycled via raw MongoDB (recycling is handled by $.recycler in game)
-      await db['objects'].updateOne({ _id: obj1.id }, { $set: { recycled: true } });
+      await db.objects.updateOne(
+        { _id: obj1.id },
+        { $set: { recycled: true } },
+      );
 
-      const result = await sendRequest('objects.list', { includeRecycled: true });
+      const result = await sendRequest('objects.list', {
+        includeRecycled: true,
+      });
 
       // Should contain the recycled object
       const recycledObj = result.objects.find((o: any) => o.id === obj1.id);
@@ -407,7 +449,9 @@ describe.sequential('DevToolsServer', () => {
 
     it('should return error for non-existent object', async () => {
       await connectClient();
-      await expect(sendRequest('object.get', { id: 99999 })).rejects.toThrow('not found');
+      await expect(sendRequest('object.get', { id: 99999 })).rejects.toThrow(
+        'not found',
+      );
     });
   });
 
@@ -426,8 +470,8 @@ describe.sequential('DevToolsServer', () => {
       // Verify object was created
       const obj = await manager.load(result.id);
       expect(obj).toBeDefined();
-      expect(obj!.get('name')).toBe('NewObject');
-      expect(obj!.getOwnMethods().test.code).toBe('return 42;');
+      expect(obj?.get('name')).toBe('NewObject');
+      expect(obj?.getOwnMethods().test.code).toBe('return 42;');
     });
 
     // Skip: Multi-client broadcast tests are flaky in test environment due to timing
@@ -448,7 +492,6 @@ describe.sequential('DevToolsServer', () => {
     });
   });
 
-
   describe('method.get', () => {
     it('should get method code', async () => {
       await connectClient();
@@ -459,7 +502,10 @@ describe.sequential('DevToolsServer', () => {
         methods: { test: { code: 'return 42;' } },
       });
 
-      const result = await sendRequest('method.get', { objectId: obj.id, name: 'test' });
+      const result = await sendRequest('method.get', {
+        objectId: obj.id,
+        name: 'test',
+      });
 
       expect(result.method.name).toBe('test');
       expect(result.method.code).toBe('return 42;');
@@ -468,10 +514,14 @@ describe.sequential('DevToolsServer', () => {
     it('should return error for non-existent method', async () => {
       await connectClient();
 
-      const obj = await manager.create({ parent: root, properties: {}, methods: {} });
+      const obj = await manager.create({
+        parent: root,
+        properties: {},
+        methods: {},
+      });
 
       await expect(
-        sendRequest('method.get', { objectId: obj.id, name: 'unknown' })
+        sendRequest('method.get', { objectId: obj.id, name: 'unknown' }),
       ).rejects.toThrow('not found');
     });
   });
@@ -480,7 +530,11 @@ describe.sequential('DevToolsServer', () => {
     it('should set method code', async () => {
       await connectClient();
 
-      const obj = await manager.create({ parent: root, properties: {}, methods: {} });
+      const obj = await manager.create({
+        parent: root,
+        properties: {},
+        methods: {},
+      });
 
       await sendRequest('method.set', {
         objectId: obj.id,
@@ -490,7 +544,7 @@ describe.sequential('DevToolsServer', () => {
 
       // Verify method was set
       const loaded = await manager.load(obj.id);
-      expect(loaded!.getOwnMethods().newMethod.code).toBe('return 123;');
+      expect(loaded?.getOwnMethods().newMethod.code).toBe('return 123;');
     });
 
     it('should update existing method', async () => {
@@ -509,13 +563,17 @@ describe.sequential('DevToolsServer', () => {
       });
 
       const loaded = await manager.load(obj.id);
-      expect(loaded!.getOwnMethods().test.code).toBe('return 2;');
+      expect(loaded?.getOwnMethods().test.code).toBe('return 2;');
     });
 
     // Skip: Multi-client broadcast tests are flaky in test environment due to timing
     it('should broadcast method.changed notification', async () => {
       await connectClient();
-      const obj = await manager.create({ parent: root, properties: {}, methods: {} });
+      const obj = await manager.create({
+        parent: root,
+        properties: {},
+        methods: {},
+      });
       const { waitForNotification, cleanup } = await setupNotificationClient();
 
       try {
@@ -548,10 +606,10 @@ describe.sequential('DevToolsServer', () => {
       await sendRequest('method.delete', { objectId: obj.id, name: 'test' });
 
       // Wait for DB write to complete - stable proxy reflects changes immediately
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       const loaded = await manager.load(obj.id);
-      expect(loaded!.getOwnMethods().test).toBeUndefined();
+      expect(loaded?.getOwnMethods().test).toBeUndefined();
     });
 
     // Skip: Multi-client broadcast tests are flaky in test environment due to timing
@@ -585,7 +643,10 @@ describe.sequential('DevToolsServer', () => {
         methods: {},
       });
 
-      const result = await sendRequest('property.get', { objectId: obj.id, name: 'name' });
+      const result = await sendRequest('property.get', {
+        objectId: obj.id,
+        name: 'name',
+      });
 
       expect(result.property.name).toBe('name');
       expect(result.property.value).toBe('Test');
@@ -596,7 +657,11 @@ describe.sequential('DevToolsServer', () => {
     it('should set property value', async () => {
       await connectClient();
 
-      const obj = await manager.create({ parent: root, properties: {}, methods: {} });
+      const obj = await manager.create({
+        parent: root,
+        properties: {},
+        methods: {},
+      });
 
       await sendRequest('property.set', {
         objectId: obj.id,
@@ -605,16 +670,20 @@ describe.sequential('DevToolsServer', () => {
       });
 
       // Wait for DB write to complete - stable proxy reflects changes immediately
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       const loaded = await manager.load(obj.id);
-      expect(loaded!.get('newProp')).toBe('newValue');
+      expect(loaded?.get('newProp')).toBe('newValue');
     });
 
     // Skip: Multi-client broadcast tests are flaky in test environment due to timing
     it('should broadcast property.changed notification', async () => {
       await connectClient();
-      const obj = await manager.create({ parent: root, properties: {}, methods: {} });
+      const obj = await manager.create({
+        parent: root,
+        properties: {},
+        methods: {},
+      });
       const { waitForNotification, cleanup } = await setupNotificationClient();
 
       try {
@@ -648,7 +717,7 @@ describe.sequential('DevToolsServer', () => {
       await manager.pull(obj.id);
       const loaded = await manager.load(obj.id);
       // Check own properties directly, not inherited values
-      expect(loaded!.getOwnProperties().name).toBeUndefined();
+      expect(loaded?.getOwnProperties().name).toBeUndefined();
     });
 
     // Skip: Multi-client broadcast tests are flaky in test environment due to timing
@@ -662,7 +731,10 @@ describe.sequential('DevToolsServer', () => {
       const { waitForNotification, cleanup } = await setupNotificationClient();
 
       try {
-        await sendRequest('property.delete', { objectId: obj.id, name: 'name' });
+        await sendRequest('property.delete', {
+          objectId: obj.id,
+          name: 'name',
+        });
 
         const notification: any = await waitForNotification();
         expect(notification.method).toBe('property.deleted');

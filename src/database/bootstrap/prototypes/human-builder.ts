@@ -1,5 +1,5 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Builds the Human prototype
@@ -18,36 +18,41 @@ import type { RuntimeObject } from '../../../../types/object.js';
  * - Appearance description
  */
 export class HumanBuilder {
-  constructor(private manager: ObjectManager) { }
+  constructor(private manager: ObjectManager) {}
 
   /**
    * Build the Human prototype or rebuild methods on existing object
    * @param embodiedId - Parent embodied ID (only used when creating new)
    * @param existingObj - Optional existing object to rebuild methods on
    */
-  async build(embodiedId: number, existingObj?: RuntimeObject): Promise<RuntimeObject> {
+  async build(
+    embodiedId: number,
+    existingObj?: RuntimeObject,
+  ): Promise<RuntimeObject> {
     const parentObj = await this.manager.load(embodiedId);
-    const obj = existingObj || await this.manager.create({
-      parent: parentObj!,
-      properties: {
-        name: 'Human',
-        description: 'Base prototype for human-like agents',
-        sex: 'non-binary',
-        pronouns: {
-          subject: 'they',
-          object: 'them',
-          possessive: 'their',
-        },
-        age: 25,
-        species: 'human',
-        // Appearance properties
-        height: 1.7, // meters
-        weight: 75, // kg
-        // Known languages (for understanding speech)
-        knownLanguages: ['English'],
-        nativeLanguage: 'English',
+    const obj =
+      existingObj ||
+      (await this.manager.create({
+        parent: parentObj!,
+        properties: {
+          name: 'Human',
+          description: 'Base prototype for human-like agents',
+          sex: 'non-binary',
+          pronouns: {
+            subject: 'they',
+            object: 'them',
+            possessive: 'their',
+          },
+          age: 25,
+          species: 'human',
+          // Appearance properties
+          height: 1.7, // meters
+          weight: 75, // kg
+          // Known languages (for understanding speech)
+          knownLanguages: ['English'],
+          nativeLanguage: 'English',
 
-        abilities: `Human being with human body structure and social capabilities.
+          abilities: `Human being with human body structure and social capabilities.
 
 IDENTITY: 'sex', 'pronouns', 'age', 'species' define identity. Pronouns affect narration. Age affects appearance description.
 
@@ -65,31 +70,60 @@ STATS: Derived from body part effective capacities:
 SOCIAL: Can speak (via mouth), emote, give items. AI-controlled humans respond to onSpokenTo(), onItemReceived().
 
 BODY STRUCTURE: Standard human layout - torso with head, 2 arms (hands), 2 legs (feet). Body created via $.humanBodyFactory.`,
-      },
-      methods: {},
-    });
+        },
+        methods: {},
+      }));
 
     // Property descriptions
-    obj.setPropertyDescription('sex', 'Biological sex (male, female, non-binary) affects pronouns and appearance');
-    obj.setPropertyDescription('pronouns', 'Pronoun set with subject/object/possessive for narration (they/them/their)');
-    obj.setPropertyDescription('age', 'Age in years, affects appearance and social interactions');
-    obj.setPropertyDescription('species', 'Species type (human, etc.) for identification and abilities');
-    obj.setPropertyDescription('height', 'Height in meters, affects reach and physical descriptions');
-    obj.setPropertyDescription('weight', 'Weight in kilograms, affects movement costs and appearance');
-    obj.setPropertyDescription('knownLanguages', 'Array of language codes this agent understands when hearing speech');
-    obj.setPropertyDescription('nativeLanguage', 'Primary language for speaking (default if not specified)');
+    obj.setPropertyDescription(
+      'sex',
+      'Biological sex (male, female, non-binary) affects pronouns and appearance',
+    );
+    obj.setPropertyDescription(
+      'pronouns',
+      'Pronoun set with subject/object/possessive for narration (they/them/their)',
+    );
+    obj.setPropertyDescription(
+      'age',
+      'Age in years, affects appearance and social interactions',
+    );
+    obj.setPropertyDescription(
+      'species',
+      'Species type (human, etc.) for identification and abilities',
+    );
+    obj.setPropertyDescription(
+      'height',
+      'Height in meters, affects reach and physical descriptions',
+    );
+    obj.setPropertyDescription(
+      'weight',
+      'Weight in kilograms, affects movement costs and appearance',
+    );
+    obj.setPropertyDescription(
+      'knownLanguages',
+      'Array of language codes this agent understands when hearing speech',
+    );
+    obj.setPropertyDescription(
+      'nativeLanguage',
+      'Primary language for speaking (default if not specified)',
+    );
 
-    obj.setMethod('pronoun', `
+    obj.setMethod(
+      'pronoun',
+      `
       /** Get a pronoun for this human.
        *  @param type - 'subject', 'object', or 'possessive'
        *  @returns The appropriate pronoun (e.g., 'they', 'them', 'their')
        */
       const type = args[0]; // 'subject', 'object', 'possessive'
       return self.pronouns[type] || 'they';
-    `);
+    `,
+    );
 
     // Override hear to add language understanding
-    obj.setMethod('hear', `
+    obj.setMethod(
+      'hear',
+      `
       /** Hear a sound or speech through the ears.
        *  Routes through ear body parts. Language understanding based on knownLanguages.
        *  @param message - String or speech object
@@ -182,9 +216,12 @@ BODY STRUCTURE: Standard human layout - torso with head, 2 arms (hands), 2 legs 
       }
 
       return result;
-    `);
+    `,
+    );
 
-    obj.setMethod('describeAppearance', `
+    obj.setMethod(
+      'describeAppearance',
+      `
       /** Generate appearance description from body parts.
        *  @param viewer - Who is looking at this human
        *  @returns Descriptive string of appearance
@@ -240,9 +277,12 @@ BODY STRUCTURE: Standard human layout - torso with head, 2 arms (hands), 2 legs 
       }
 
       return parts.join(' ');
-    `);
+    `,
+    );
 
-    obj.setMethod('describe', `
+    obj.setMethod(
+      'describe',
+      `
       /** Generate full description including appearance.
        *  @param viewer - Who is looking at this human
        *  @returns Full description string
@@ -309,14 +349,17 @@ BODY STRUCTURE: Standard human layout - torso with head, 2 arms (hands), 2 legs 
       }
 
       return desc.trim();
-    `);
+    `,
+    );
 
     // === STAT AGGREGATION METHODS (calorie-based) ===
     // All stats derive from effective capacity: maxCalories - decayLevel
     // This represents muscle mass minus injury damage
 
     // Helper to get effective capacity of a body part
-    obj.setMethod('getEffectiveCapacity', `
+    obj.setMethod(
+      'getEffectiveCapacity',
+      `
       /** Get effective capacity of a body part.
        *  effectiveCapacity = maxCalories - decayLevel
        *  @param part - The body part to check
@@ -327,9 +370,12 @@ BODY STRUCTURE: Standard human layout - torso with head, 2 arms (hands), 2 legs 
       const maxCal = part.maxCalories || 0;
       const decay = part.decayLevel || 0;
       return Math.max(0, maxCal - decay);
-    `);
+    `,
+    );
 
-    obj.setMethod('getStrength', `
+    obj.setMethod(
+      'getStrength',
+      `
       /** Get total strength (torso + arms + legs effective capacity).
        *  Based on calorie system - larger muscles = more strength.
        *  @returns Total strength (sum of effective capacities)
@@ -367,9 +413,12 @@ BODY STRUCTURE: Standard human layout - torso with head, 2 arms (hands), 2 legs 
       }
 
       return total;
-    `);
+    `,
+    );
 
-    obj.setMethod('getDexterity', `
+    obj.setMethod(
+      'getDexterity',
+      `
       /** Get total dexterity (hands + feet effective capacity).
        *  Fine motor control from extremities. Affected by fat.
        *  @returns Total dexterity
@@ -416,18 +465,24 @@ BODY STRUCTURE: Standard human layout - torso with head, 2 arms (hands), 2 legs 
       // Apply fat penalty
       const fatMod = await self.getFatModifier();
       return Math.floor(total * fatMod);
-    `);
+    `,
+    );
 
-    obj.setMethod('getIntelligence', `
+    obj.setMethod(
+      'getIntelligence',
+      `
       /** Get intelligence stat (from head effective capacity).
        *  @returns Intelligence stat
        */
       const head = await self.getHead();
       if (!head) return 0;
       return await self.getEffectiveCapacity(head);
-    `);
+    `,
+    );
 
-    obj.setMethod('getPerception', `
+    obj.setMethod(
+      'getPerception',
+      `
       /** Get total perception stat (eyes + ears effective capacity).
        *  @returns Total perception stat
        */
@@ -448,9 +503,12 @@ BODY STRUCTURE: Standard human layout - torso with head, 2 arms (hands), 2 legs 
       }
 
       return total;
-    `);
+    `,
+    );
 
-    obj.setMethod('getSpeed', `
+    obj.setMethod(
+      'getSpeed',
+      `
       /** Get derived speed stat (leg effective capacity).
        *  Heavily affected by fat modifier.
        *  @returns Speed stat
@@ -478,9 +536,12 @@ BODY STRUCTURE: Standard human layout - torso with head, 2 arms (hands), 2 legs 
       // Speed penalty is double the normal fat penalty
       const speedMod = 1.0 - ((1.0 - fatMod) * 2);
       return Math.floor(legTotal * Math.max(0.25, speedMod));
-    `);
+    `,
+    );
 
-    obj.setMethod('getStats', `
+    obj.setMethod(
+      'getStats',
+      `
       /** Get all stats as an object.
        *  All stats derived from effective capacity (maxCalories - decayLevel).
        *  @returns Object with all stat values
@@ -499,11 +560,14 @@ BODY STRUCTURE: Standard human layout - torso with head, 2 arms (hands), 2 legs 
         calories: calories.total,
         calorieStatus: calories.status,
       };
-    `);
+    `,
+    );
 
     // Initialize basic verbs for AI-controlled humans
     // Players get verbs in connect(), but AI humans need them set up explicitly
-    obj.setMethod('initVerbs', `
+    obj.setMethod(
+      'initVerbs',
+      `
       /** Initialize basic infrastructure verbs for AI-controlled humans.
        *  Call this after spawning an AI human so they can speak, emote, look.
        *  Game interactions (get, drop, wear, etc.) go through AI narrator.
@@ -529,10 +593,13 @@ BODY STRUCTURE: Standard human layout - torso with head, 2 arms (hands), 2 legs 
       }
 
       return true;
-    `);
+    `,
+    );
 
     // Say method for AI humans (players have this in player-builder)
-    obj.setMethod('say', `
+    obj.setMethod(
+      'say',
+      `
       /** Say something out loud.
        *  Usage: say <message>
        *  Speaks to everyone in the current room.
@@ -559,12 +626,15 @@ BODY STRUCTURE: Standard human layout - torso with head, 2 arms (hands), 2 legs 
       }
 
       return ''; // Actor already received message via announce
-    `);
+    `,
+    );
 
     // NOTE: 'to' verb moved to agent-builder.ts (includes perception filter support)
 
     // Emote method for AI humans
-    obj.setMethod('emote', `
+    obj.setMethod(
+      'emote',
+      `
       /** Perform an emote/action.
        *  Usage: emote <action>, :<action>
        *  Shows your character performing an action.
@@ -590,10 +660,13 @@ BODY STRUCTURE: Standard human layout - torso with head, 2 arms (hands), 2 legs 
           others: announcement
         });
       }
-    `);
+    `,
+    );
 
     // Look method for AI humans
-    obj.setMethod('look', `
+    obj.setMethod(
+      'look',
+      `
       /** Look at the current room.
        *  Usage: look, l
        *  Describes your surroundings.
@@ -605,10 +678,13 @@ BODY STRUCTURE: Standard human layout - torso with head, 2 arms (hands), 2 legs 
 
       const desc = await location.describe(self);
       return desc;
-    `);
+    `,
+    );
 
     // Look at specific item/person
-    obj.setMethod('lookAt', `
+    obj.setMethod(
+      'lookAt',
+      `
       /** Look at something specific.
        *  Usage: look <target>, examine <target>
        */
@@ -623,10 +699,13 @@ BODY STRUCTURE: Standard human layout - torso with head, 2 arms (hands), 2 legs 
       }
 
       return target.description || 'You see nothing special.';
-    `);
+    `,
+    );
 
     // Get method for AI humans - uses hands properly for verb registration
-    obj.setMethod('get', `
+    obj.setMethod(
+      'get',
+      `
       /** Pick up an item.
        *  Usage: get <item>, take <item>
        */
@@ -675,10 +754,13 @@ BODY STRUCTURE: Standard human layout - torso with head, 2 arms (hands), 2 legs 
       }
 
       return ''; // Actor already received message via announce
-    `);
+    `,
+    );
 
     // Drop method for AI humans - uses moveTo properly
-    obj.setMethod('drop', `
+    obj.setMethod(
+      'drop',
+      `
       /** Drop an item.
        *  Usage: drop <item>
        */
@@ -727,10 +809,13 @@ BODY STRUCTURE: Standard human layout - torso with head, 2 arms (hands), 2 legs 
       }
 
       return ''; // Actor already received message via announce
-    `);
+    `,
+    );
 
     // Give method - transfer item to someone using hands
-    obj.setMethod('give', `
+    obj.setMethod(
+      'give',
+      `
       /** Give an item to someone.
        *  Usage: give <item> to <recipient>
        *  Transfers an item from your hand to another person's hand.
@@ -810,7 +895,8 @@ BODY STRUCTURE: Standard human layout - torso with head, 2 arms (hands), 2 legs 
       }
 
       return '';
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // AI AGENT METHODS
@@ -818,7 +904,9 @@ BODY STRUCTURE: Standard human layout - torso with head, 2 arms (hands), 2 legs 
     // ═══════════════════════════════════════════════════════════════════
 
     // Format personality for system prompt
-    obj.setMethod('formatPersonality', `
+    obj.setMethod(
+      'formatPersonality',
+      `
       /** Format personality object/string for system prompt injection. */
       const personality = args[0];
       if (!personality) return '';
@@ -846,10 +934,13 @@ BODY STRUCTURE: Standard human layout - torso with head, 2 arms (hands), 2 legs 
       }
 
       return lines.join('\\n');
-    `);
+    `,
+    );
 
     // Format history for system prompt
-    obj.setMethod('formatHistory', `
+    obj.setMethod(
+      'formatHistory',
+      `
       /** Format history object/string for system prompt injection. */
       const history = args[0];
       if (!history) return '';
@@ -883,10 +974,13 @@ BODY STRUCTURE: Standard human layout - torso with head, 2 arms (hands), 2 legs 
       }
 
       return lines.join('\\n');
-    `);
+    `,
+    );
 
     // Format memories for system prompt
-    obj.setMethod('formatMemories', `
+    obj.setMethod(
+      'formatMemories',
+      `
       /** Format memories array for system prompt injection. */
       const memories = args[0];
       if (!memories || memories.length === 0) return '';
@@ -909,10 +1003,13 @@ BODY STRUCTURE: Standard human layout - torso with head, 2 arms (hands), 2 legs 
       }
 
       return lines.join('\\n');
-    `);
+    `,
+    );
 
     // Format notes for system prompt
-    obj.setMethod('formatNotes', `
+    obj.setMethod(
+      'formatNotes',
+      `
       /** Format notes array for system prompt injection. */
       const notes = args[0];
       if (!notes || notes.length === 0) return '';
@@ -927,10 +1024,13 @@ BODY STRUCTURE: Standard human layout - torso with head, 2 arms (hands), 2 legs 
       }
 
       return lines.join('\\n');
-    `);
+    `,
+    );
 
     // Format sensory history for system prompt
-    obj.setMethod('formatSensoryHistory', `
+    obj.setMethod(
+      'formatSensoryHistory',
+      `
       /** Format sensory history for AI system prompt. */
       const history = self.sensoryHistory || [];
       if (history.length === 0) return '';
@@ -956,10 +1056,13 @@ BODY STRUCTURE: Standard human layout - torso with head, 2 arms (hands), 2 legs 
       }
 
       return lines.join('\\n');
-    `);
+    `,
+    );
 
     // Build the full system prompt from template
-    obj.setMethod('buildAgentPrompt', `
+    obj.setMethod(
+      'buildAgentPrompt',
+      `
       /** Build the system prompt for AI agent from this NPC's template.
        *  @returns Full system prompt string, or null if not AI-controlled
        */
@@ -1006,11 +1109,14 @@ BODY STRUCTURE: Standard human layout - torso with head, 2 arms (hands), 2 legs 
       prompt = prompt.replace(/\\{\\{sensoryHistory\\}\\}/g, sensorySection);
 
       return prompt;
-    `);
+    `,
+    );
 
     // Called when someone speaks directly to this NPC (via "to" verb)
     // Uses mutex to serialize queries and queue incoming messages
-    obj.setMethod('onSpokenTo', `
+    obj.setMethod(
+      'onSpokenTo',
+      `
       /** Handle being spoken to directly.
        *  @param speaker - The RuntimeObject speaking to us
        *  @param message - What they said
@@ -1038,12 +1144,15 @@ BODY STRUCTURE: Standard human layout - torso with head, 2 arms (hands), 2 legs 
 
       // We got the lock - process this message (fire-and-forget, don't block input)
       self._processSpokenMessage(speaker.id, speaker.name, message, systemPrompt);
-    `);
+    `,
+    );
 
     // Internal method to process spoken message(s)
     // After processing, checks queue and batches any pending messages into one
     // Fire-and-forget - does not block caller
-    obj.setMethod('_processSpokenMessage', `
+    obj.setMethod(
+      '_processSpokenMessage',
+      `
       const speakerId = args[0];
       const speakerName = args[1];
       const message = args[2];
@@ -1094,9 +1203,12 @@ BODY STRUCTURE: Standard human layout - torso with head, 2 arms (hands), 2 legs 
           // Release the lock on error
           await $mutex.release(self, 'query');
         });
-    `);
+    `,
+    );
     // Called when someone gives an item to this NPC
-    obj.setMethod('onItemReceived', `
+    obj.setMethod(
+      'onItemReceived',
+      `
       /** Handle receiving an item from someone.
        *  @param giver - The RuntimeObject giving us the item
        *  @param item - The item being given
@@ -1128,7 +1240,8 @@ BODY STRUCTURE: Standard human layout - torso with head, 2 arms (hands), 2 legs 
         .catch((err) => {
           console.error('[onItemReceived] AI error for #' + self.id + ':', err?.message || err);
         });
-    `);
+    `,
+    );
 
     return obj;
   }

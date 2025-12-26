@@ -1,5 +1,5 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Builds the Food prototype
@@ -54,12 +54,23 @@ TO CONSUME: Call consume(eater, 'food') method. It handles calorie transfer to s
     });
 
     // Add property descriptions
-    obj.setPropertyDescription('ingredients', "Array of {name, flavor} objects. Each bite may reveal different flavors.");
-    obj.setPropertyDescription('portions', "Number of bites to finish this food. Larger foods have more portions.");
-    obj.setPropertyDescription('remaining', "Bites left. Each eat action reduces by 1. At 0, food is consumed.");
+    obj.setPropertyDescription(
+      'ingredients',
+      'Array of {name, flavor} objects. Each bite may reveal different flavors.',
+    );
+    obj.setPropertyDescription(
+      'portions',
+      'Number of bites to finish this food. Larger foods have more portions.',
+    );
+    obj.setPropertyDescription(
+      'remaining',
+      'Bites left. Each eat action reduces by 1. At 0, food is consumed.',
+    );
 
     // Get a random flavor from ingredients for this bite
-    obj.setMethod('tasteBite', `
+    obj.setMethod(
+      'tasteBite',
+      `
       const ingredients = self.ingredients || [];
       if (ingredients.length === 0) {
         return null;
@@ -75,11 +86,14 @@ TO CONSUME: Call consume(eater, 'food') method. It handles calorie transfer to s
       } else {
         return 'You taste ' + tasted[0].flavor + ' ' + tasted[0].name + ' and ' + tasted[1].flavor + ' ' + tasted[1].name + '.';
       }
-    `);
+    `,
+    );
 
     // The eat verb - registered when food is in player's inventory or room
     // Pattern: eat %t (this food) - player eats self
-    obj.setMethod('eat', `
+    obj.setMethod(
+      'eat',
+      `
       // Args from verb pattern 'eat %t':
       //   args[0] = handler (the food, same as self) - from %t
       // Direct variables:
@@ -194,7 +208,8 @@ TO CONSUME: Call consume(eater, 'food') method. It handles calorie transfer to s
       }
 
       return msg;
-    `);
+    `,
+    );
 
     // ABILITIES-FIRST: No verb registration needed.
     // AI interprets player intent and calls eat() method directly.

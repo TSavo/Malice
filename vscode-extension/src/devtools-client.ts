@@ -41,10 +41,13 @@ type NotificationHandler = (method: string, params: any) => void;
 export class DevToolsClient {
   private ws: WebSocket | null = null;
   private nextId = 1;
-  private pending = new Map<number | string, {
-    resolve: (result: any) => void;
-    reject: (error: Error) => void;
-  }>();
+  private pending = new Map<
+    number | string,
+    {
+      resolve: (result: any) => void;
+      reject: (error: Error) => void;
+    }
+  >();
   private notificationHandlers: NotificationHandler[] = [];
   private reconnectTimer: NodeJS.Timeout | null = null;
 
@@ -108,7 +111,7 @@ export class DevToolsClient {
     } else {
       // Notification
       const notification = msg as JsonRpcNotification;
-      this.notificationHandlers.forEach(handler => {
+      this.notificationHandlers.forEach((handler) => {
         handler(notification.method, notification.params);
       });
     }
@@ -131,7 +134,7 @@ export class DevToolsClient {
 
     this.reconnectTimer = setTimeout(() => {
       console.log('[DevTools] Attempting to reconnect...');
-      this.connect().catch(err => {
+      this.connect().catch((err) => {
         console.error('[DevTools] Reconnect failed:', err);
       });
     }, 5000);
@@ -155,7 +158,7 @@ export class DevToolsClient {
 
     return new Promise((resolve, reject) => {
       this.pending.set(id, { resolve, reject });
-      this.ws!.send(JSON.stringify(request));
+      this.ws?.send(JSON.stringify(request));
 
       // Timeout after 30 seconds
       setTimeout(() => {
@@ -178,7 +181,7 @@ export class DevToolsClient {
         if (index !== -1) {
           this.notificationHandlers.splice(index, 1);
         }
-      }
+      },
     };
   }
 
@@ -220,8 +223,16 @@ export class DevToolsClient {
   /**
    * Create new object
    */
-  async createObject(parent: number, properties?: Record<string, any>, methods?: Record<string, string>): Promise<number> {
-    const response = await this.request('object.create', { parent, properties, methods });
+  async createObject(
+    parent: number,
+    properties?: Record<string, any>,
+    methods?: Record<string, string>,
+  ): Promise<number> {
+    const response = await this.request('object.create', {
+      parent,
+      properties,
+      methods,
+    });
     return response.id;
   }
 
@@ -235,7 +246,10 @@ export class DevToolsClient {
   /**
    * Get method code
    */
-  async getMethod(objectId: number, name: string): Promise<{ name: string; code: string }> {
+  async getMethod(
+    objectId: number,
+    name: string,
+  ): Promise<{ name: string; code: string }> {
     const response = await this.request('method.get', { objectId, name });
     return response.method;
   }
@@ -243,7 +257,12 @@ export class DevToolsClient {
   /**
    * Set method code
    */
-  async setMethod(objectId: number, name: string, code: string, options?: any): Promise<void> {
+  async setMethod(
+    objectId: number,
+    name: string,
+    code: string,
+    options?: any,
+  ): Promise<void> {
     await this.request('method.set', { objectId, name, code, options });
   }
 

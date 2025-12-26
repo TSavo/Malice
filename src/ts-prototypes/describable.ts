@@ -21,32 +21,42 @@ export class Describable {
     boltedDown: false,
   };
 
-  async describe(self, $, pass) {
+  async describe(self, _$, _pass) {
     return `${self.name}\r\n${self.description}`;
   }
 
-  async shortDesc(self, $, pass) {
+  async shortDesc(self, _$, _pass) {
     return self.name;
   }
 
-  async getVolume(self, $, pass) {
+  async getVolume(self, _$, _pass) {
     return (self.width || 0) * (self.height || 0) * (self.depth || 0);
   }
 
-  async canFitIn(self, $, pass) {
+  async canFitIn(self, _$, _pass) {
     const container = args[0];
-    const dims = [self.width || 0, self.height || 0, self.depth || 0].sort((a, b) => a - b);
-    const containerDims = [container.width || 0, container.height || 0, container.depth || 0].sort((a, b) => b - a);
-    return dims[0] <= containerDims[0] && dims[1] <= containerDims[1] && dims[2] <= containerDims[2];
+    const dims = [self.width || 0, self.height || 0, self.depth || 0].sort(
+      (a, b) => a - b,
+    );
+    const containerDims = [
+      container.width || 0,
+      container.height || 0,
+      container.depth || 0,
+    ].sort((a, b) => b - a);
+    return (
+      dims[0] <= containerDims[0] &&
+      dims[1] <= containerDims[1] &&
+      dims[2] <= containerDims[2]
+    );
   }
 
-  async canContain(self, $, pass) {
+  async canContain(self, _$, _pass) {
     const obj = args[0];
     const objName = obj?.name || 'that';
     return `The ${self.name} cannot contain ${objName}.`;
   }
 
-  async moveTo(self, $, pass) {
+  async moveTo(self, $, _pass) {
     let dest = args[0];
     const mover = args[1];
 
@@ -65,12 +75,12 @@ export class Describable {
       return canContain;
     }
 
-    if (source && source.onContentLeaving) {
+    if (source?.onContentLeaving) {
       await source.onContentLeaving(self, dest, mover);
     }
     await self.onLeaving(source, dest, mover);
 
-    if (source && source.removeContent) {
+    if (source?.removeContent) {
       await source.removeContent(self);
     }
     self.location = dest;
@@ -78,7 +88,7 @@ export class Describable {
       await dest.addContent(self);
     }
 
-    if (source && source.onContentLeft) {
+    if (source?.onContentLeft) {
       await source.onContentLeft(self, dest, mover);
     }
     await self.onArrived(dest, source, mover);
@@ -87,7 +97,7 @@ export class Describable {
     }
   }
 
-  async addContent(self, $, pass) {
+  async addContent(self, _$, _pass) {
     const item = args[0];
     if (!item || typeof item.id !== 'number') {
       return;
@@ -102,8 +112,8 @@ export class Describable {
     }
   }
 
-  async removeContent(self, $, pass) {
-    let item = args[0];
+  async removeContent(self, _$, _pass) {
+    const item = args[0];
 
     const targetId = typeof item === 'number' ? item : item?.id;
     if (targetId === undefined) {
@@ -118,19 +128,19 @@ export class Describable {
     }
   }
 
-  async onLeaving(self, $, pass) {
-    const source = args[0];
-    const dest = args[1];
-    const mover = args[2];
+  async onLeaving(_self, _$, _pass) {
+    const _source = args[0];
+    const _dest = args[1];
+    const _mover = args[2];
   }
 
-  async onArrived(self, $, pass) {
-    const dest = args[0];
-    const source = args[1];
-    const mover = args[2];
+  async onArrived(_self, _$, _pass) {
+    const _dest = args[0];
+    const _source = args[1];
+    const _mover = args[2];
   }
 
-  async onPlayerEnter(self, $, pass) {
+  async onPlayerEnter(self, _$, _pass) {
     const player = args[0];
     for (const obj of self.contents || []) {
       if (obj.getRoomVerbs) {
@@ -141,7 +151,7 @@ export class Describable {
     }
   }
 
-  async onPlayerExit(self, $, pass) {
+  async onPlayerExit(self, _$, _pass) {
     const player = args[0];
     for (const obj of self.contents || []) {
       if (obj.getRoomVerbs) {
@@ -152,7 +162,7 @@ export class Describable {
     }
   }
 
-  async triggerPlotHooks(self, $, pass) {
+  async triggerPlotHooks(self, $, _pass) {
     const eventName = args[0];
     const data = args[1] || {};
 
@@ -190,7 +200,13 @@ export class Describable {
       try {
         if (hook.jobId) {
           if (plot.onJobHookTriggered) {
-            await plot.onJobHookTriggered(hook.jobId, eventName, self.id, data, filter);
+            await plot.onJobHookTriggered(
+              hook.jobId,
+              eventName,
+              self.id,
+              data,
+              filter,
+            );
             triggered++;
           }
         } else {
@@ -200,18 +216,21 @@ export class Describable {
           }
         }
       } catch (e) {
-        console.error('Error triggering hook for plot #' + (plot?.id || plot) + ':', e.message);
+        console.error(
+          `Error triggering hook for plot #${plot?.id || plot}:`,
+          e.message,
+        );
       }
     }
 
     return triggered;
   }
 
-  async getPlotHooks(self, $, pass) {
+  async getPlotHooks(self, _$, _pass) {
     return self.plotHooks || {};
   }
 
-  async hasPlotHook(self, $, pass) {
+  async hasPlotHook(self, _$, _pass) {
     const eventName = args[0];
     const plotHooks = self.plotHooks || {};
     const hooks = plotHooks[eventName] || [];

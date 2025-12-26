@@ -1,5 +1,5 @@
-import { ObjectManager } from '../object-manager.js';
 import type { RuntimeObject } from '../../../types/object.js';
+import type { ObjectManager } from '../object-manager.js';
 
 /**
  * Builds PreAuthHandler object (dynamic ID)
@@ -15,7 +15,8 @@ export class PreAuthHandlerBuilder {
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
 
-    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
+    const aliases =
+      (objectManager.get('aliases') as Record<string, number>) || {};
 
     if (aliases.preAuthHandler) {
       this.preAuthHandler = await this.manager.load(aliases.preAuthHandler);
@@ -28,12 +29,15 @@ export class PreAuthHandlerBuilder {
       parent: root!,
       properties: {
         name: 'PreAuthHandler',
-        description: 'Pre-authenticated connection handler (SSL, HTTP auth, OAuth)',
+        description:
+          'Pre-authenticated connection handler (SSL, HTTP auth, OAuth)',
       },
       methods: {},
     });
 
-    this.preAuthHandler.setMethod('onPreAuth', `
+    this.preAuthHandler.setMethod(
+      'onPreAuth',
+      `
           const context = args[0];
           const authInfo = args[1];
 
@@ -71,9 +75,12 @@ export class PreAuthHandlerBuilder {
             context.send(\`Authentication error: \${err.message}\\\\r\\\\n\`);
             context.close();
           }
-        `);
+        `,
+    );
 
-    this.preAuthHandler.setMethod('handleSSLCert', `
+    this.preAuthHandler.setMethod(
+      'handleSSLCert',
+      `
           const context = args[0];
           const cert = args[1];
 
@@ -128,9 +135,12 @@ export class PreAuthHandlerBuilder {
           // Authenticate and connect
           context.authenticate(player.id);
           await player.connect(context);
-        `);
+        `,
+    );
 
-    this.preAuthHandler.setMethod('handleHTTPBasic', `
+    this.preAuthHandler.setMethod(
+      'handleHTTPBasic',
+      `
           const context = args[0];
           const basic = args[1];
 
@@ -179,9 +189,12 @@ export class PreAuthHandlerBuilder {
           // Authenticate and connect
           context.authenticate(player.id);
           await player.connect(context);
-        `);
+        `,
+    );
 
-    this.preAuthHandler.setMethod('handleSSHKey', `
+    this.preAuthHandler.setMethod(
+      'handleSSHKey',
+      `
           const context = args[0];
           const sshKey = args[1];
 
@@ -233,9 +246,12 @@ export class PreAuthHandlerBuilder {
           // Authenticate and connect
           context.authenticate(player.id);
           await player.connect(context);
-        `);
+        `,
+    );
 
-    this.preAuthHandler.setMethod('handleOAuth', `
+    this.preAuthHandler.setMethod(
+      'handleOAuth',
+      `
           const context = args[0];
           const oauth = args[1];
 
@@ -250,16 +266,20 @@ export class PreAuthHandlerBuilder {
           // const user = users.find(u => u.properties.oauthSubject === payload.sub);
 
           context.close();
-        `);
+        `,
+    );
 
-    this.preAuthHandler.setMethod('handleCustom', `
+    this.preAuthHandler.setMethod(
+      'handleCustom',
+      `
           const context = args[0];
           const custom = args[1];
 
           context.send(\`Custom authentication type: \${custom.type}\\\\r\\\\n\`);
           context.send('Custom authentication not yet implemented\\\\r\\\\n');
           context.close();
-        `);
+        `,
+    );
   }
 
   async registerAlias(): Promise<void> {
@@ -268,7 +288,13 @@ export class PreAuthHandlerBuilder {
     const objectManager = await this.manager.load(0);
     if (!objectManager) return;
 
-    await objectManager.call('addAlias', 'preAuthHandler', this.preAuthHandler.id);
-    console.log(`✅ Registered preAuthHandler alias -> #${this.preAuthHandler.id}`);
+    await objectManager.call(
+      'addAlias',
+      'preAuthHandler',
+      this.preAuthHandler.id,
+    );
+    console.log(
+      `✅ Registered preAuthHandler alias -> #${this.preAuthHandler.id}`,
+    );
   }
 }

@@ -1,5 +1,5 @@
-import { ObjectManager } from '../object-manager.js';
 import type { RuntimeObject } from '../../../types/object.js';
+import type { ObjectManager } from '../object-manager.js';
 
 /**
  * Builds the Sister Gray system object.
@@ -16,22 +16,28 @@ export class SisterGrayBuilder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(rootId: number, existingObj?: RuntimeObject): Promise<RuntimeObject> {
+  async build(
+    rootId: number,
+    existingObj?: RuntimeObject,
+  ): Promise<RuntimeObject> {
     const parent = await this.manager.load(rootId);
-    const obj = existingObj || await this.manager.create({
-      parent: parent!,
-      properties: {
-        name: 'Sister Gray',
-        description: 'The woman who runs the underground. Elena Vasquez Gray. The heir who inherited ashes.',
-        // What Sister Gray has learned through her network
-        sensoryHistory: [],
-        historyLimit: 100,
-        // Her location in the world
-        location: null, // Will be set to Sister's Quarters
-        // The system prompt for AI interactions
-        agentSystemPrompt: this.getSystemPrompt(),
+    const obj =
+      existingObj ||
+      (await this.manager.create({
+        parent: parent!,
+        properties: {
+          name: 'Sister Gray',
+          description:
+            'The woman who runs the underground. Elena Vasquez Gray. The heir who inherited ashes.',
+          // What Sister Gray has learned through her network
+          sensoryHistory: [],
+          historyLimit: 100,
+          // Her location in the world
+          location: null, // Will be set to Sister's Quarters
+          // The system prompt for AI interactions
+          agentSystemPrompt: this.getSystemPrompt(),
 
-        abilities: `Leader of the Gray Cartel. Elena Vasquez Gray. Controls the Seattle Underground.
+          abilities: `Leader of the Gray Cartel. Elena Vasquez Gray. Controls the Seattle Underground.
 
 PERCEPTION: Perceives through network of operatives. 'sensoryHistory' logs reports from Cutters, Runners, Sparks, Ghosts, Keepers. Dead drops and physical marks - no electronic trails.
 
@@ -46,16 +52,31 @@ NPCS: Spawns operatives via $ai.spawn(). Cutters (combat), Runners (couriers), S
 LIMITATIONS: Cannot act on surface directly - flagged hostile. Needs players as hands above ground. 60 loyal operatives, dwindling resources.
 
 THE MASK: Holds Pluribus's Mask but cannot use it (flagged hostile). Looking for someone clean who could wear it and answer to her.`,
-      },
-      methods: {},
-    });
+        },
+        methods: {},
+      }));
 
     // Property descriptions
-    obj.setPropertyDescription('sensoryHistory', 'Array of reports from underground network (operative intel, dead drop checks)');
-    obj.setPropertyDescription('historyLimit', 'Max entries in sensoryHistory before oldest are trimmed');
-    obj.setPropertyDescription('location', 'Her current location (usually Sister\'s Quarters at z=-5)');
-    obj.setPropertyDescription('agentSystemPrompt', 'Full system prompt used when AI is invoked');
-    obj.setPropertyDescription('wakeSession', 'Claude session ID for continuity across hourly wake-ups');
+    obj.setPropertyDescription(
+      'sensoryHistory',
+      'Array of reports from underground network (operative intel, dead drop checks)',
+    );
+    obj.setPropertyDescription(
+      'historyLimit',
+      'Max entries in sensoryHistory before oldest are trimmed',
+    );
+    obj.setPropertyDescription(
+      'location',
+      "Her current location (usually Sister's Quarters at z=-5)",
+    );
+    obj.setPropertyDescription(
+      'agentSystemPrompt',
+      'Full system prompt used when AI is invoked',
+    );
+    obj.setPropertyDescription(
+      'wakeSession',
+      'Claude session ID for continuity across hourly wake-ups',
+    );
 
     this.addCoreMethods(obj);
     this.sisterGray = obj;
@@ -778,7 +799,9 @@ You would never admit any of this. The mask of calm authority is as important as
   }
 
   private addCoreMethods(obj: RuntimeObject): void {
-    obj.setMethod('describe', `
+    obj.setMethod(
+      'describe',
+      `
       /** Describe Sister Gray.
        *  @returns Description string
        */
@@ -788,9 +811,12 @@ You would never admit any of this. The mask of calm authority is as important as
                'Still as stone, watching. The kind of stillness that makes you check your exits.';
       }
       return 'The presence that runs the underground. Not here, but watching through a hundred eyes.';
-    `);
+    `,
+    );
 
-    obj.setMethod('recordSensory', `
+    obj.setMethod(
+      'recordSensory',
+      `
       /** Record a sensory event from the underground network.
        *  @param type - 'see' | 'hear' | 'report'
        *  @param message - The content
@@ -817,9 +843,12 @@ You would never admit any of this. The mask of calm authority is as important as
       } else {
         self.sensoryHistory = history;
       }
-    `);
+    `,
+    );
 
-    obj.setMethod('getRecentHistory', `
+    obj.setMethod(
+      'getRecentHistory',
+      `
       /** Get recent network intelligence.
        *  @param limit - Max entries to return (default 20)
        *  @returns Array of recent events
@@ -833,9 +862,12 @@ You would never admit any of this. The mask of calm authority is as important as
         const source = event.source ? ' [' + event.source + ']' : '';
         return '[' + time + '] ' + event.type.toUpperCase() + source + ': ' + event.content;
       });
-    `);
+    `,
+    );
 
-    obj.setMethod('formatHistoryForPrompt', `
+    obj.setMethod(
+      'formatHistoryForPrompt',
+      `
       /** Format network intelligence as a prompt section.
        *  @param limit - Max entries (default 20)
        *  @returns Formatted string for AI prompt
@@ -849,9 +881,12 @@ You would never admit any of this. The mask of calm authority is as important as
 
       return 'NETWORK INTELLIGENCE (what your operatives have reported):\\n' +
              recent.join('\\n');
-    `);
+    `,
+    );
 
-    obj.setMethod('wake', `
+    obj.setMethod(
+      'wake',
+      `
       /** Hourly wake-up call. Scan the world and act.
        *  Called by $.scheduler every hour (on the half-hour).
        */
@@ -892,7 +927,8 @@ You would never admit any of this. The mask of calm authority is as important as
 
       console.log('[SisterGray] Wake-up complete');
       return { invoked: true, response: result.response };
-    `);
+    `,
+    );
   }
 
   async registerAlias(): Promise<void> {
@@ -905,7 +941,9 @@ You would never admit any of this. The mask of calm authority is as important as
     console.log(`✅ Registered sisterGray alias -> #${this.sisterGray.id}`);
 
     // Register with $ai so she responds to player speech
-    const aliases = objectManager.get('aliases') as Record<string, number> | undefined;
+    const aliases = objectManager.get('aliases') as
+      | Record<string, number>
+      | undefined;
     if (aliases?.ai) {
       const ai = await this.manager.load(aliases.ai);
       if (ai) {

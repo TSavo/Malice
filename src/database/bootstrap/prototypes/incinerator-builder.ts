@@ -1,5 +1,5 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Builds the Incinerator prototype
@@ -26,8 +26,10 @@ export class IncineratorBuilder {
       parent: parentObj!,
       properties: {
         name: 'Incinerator',
-        description: 'An industrial incinerator, its metal housing radiating heat.',
-        destroyMessage: 'The item catches fire and is reduced to ash in seconds.',
+        description:
+          'An industrial incinerator, its metal housing radiating heat.',
+        destroyMessage:
+          'The item catches fire and is reduced to ash in seconds.',
         temperature: 1200,
         fuelLevel: 100,
         fuelConsumption: 1,
@@ -55,7 +57,9 @@ VERBS: 'burn/incinerate/deposit/put/throw %o in %i', 'ignite/light %i', 'extingu
       methods: {},
     });
 
-    obj.setMethod('deposit', `
+    obj.setMethod(
+      'deposit',
+      `
       /** Burn an item in the incinerator. Overrides disposal deposit. */
       const agent = args[0];
       const item = args[1];
@@ -102,14 +106,20 @@ VERBS: 'burn/incinerate/deposit/put/throw %o in %i', 'ignite/light %i', 'extingu
 
       const message = self.destroyMessage || 'The item catches fire and is reduced to ash.';
       return { success: true, message: message };
-    `);
+    `,
+    );
 
-    obj.setMethod('burn', `
+    obj.setMethod(
+      'burn',
+      `
       /** Alias for deposit - burn an item. */
       return await self.deposit(args[0], args[1]);
-    `);
+    `,
+    );
 
-    obj.setMethod('ignite', `
+    obj.setMethod(
+      'ignite',
+      `
       /** Turn on the incinerator. */
       const agent = args[0];
 
@@ -123,9 +133,12 @@ VERBS: 'burn/incinerate/deposit/put/throw %o in %i', 'ignite/light %i', 'extingu
 
       self.operational = true;
       return { success: true, message: 'You ignite the incinerator. Flames roar to life inside the chamber.' };
-    `);
+    `,
+    );
 
-    obj.setMethod('extinguish', `
+    obj.setMethod(
+      'extinguish',
+      `
       /** Turn off the incinerator. */
       const agent = args[0];
 
@@ -135,9 +148,12 @@ VERBS: 'burn/incinerate/deposit/put/throw %o in %i', 'ignite/light %i', 'extingu
 
       self.operational = false;
       return { success: true, message: 'You shut down the incinerator. The flames die down.' };
-    `);
+    `,
+    );
 
-    obj.setMethod('describe', `
+    obj.setMethod(
+      'describe',
+      `
       /** Override describe to show operational status. */
       let desc = self.description || 'An incinerator.';
 
@@ -152,14 +168,27 @@ VERBS: 'burn/incinerate/deposit/put/throw %o in %i', 'ignite/light %i', 'extingu
       }
 
       return desc;
-    `);
+    `,
+    );
 
     // Add property descriptions
-    obj.setPropertyDescription('temperature', 'Operating temperature in degrees (affects what materials can be destroyed)');
+    obj.setPropertyDescription(
+      'temperature',
+      'Operating temperature in degrees (affects what materials can be destroyed)',
+    );
     obj.setPropertyDescription('fuelLevel', 'Current fuel level from 0-100');
-    obj.setPropertyDescription('fuelConsumption', 'Amount of fuel consumed per item burned');
-    obj.setPropertyDescription('ashProduction', 'Whether burning items produces ash residue');
-    obj.setPropertyDescription('operational', 'Whether the incinerator is currently ignited and functional');
+    obj.setPropertyDescription(
+      'fuelConsumption',
+      'Amount of fuel consumed per item burned',
+    );
+    obj.setPropertyDescription(
+      'ashProduction',
+      'Whether burning items produces ash residue',
+    );
+    obj.setPropertyDescription(
+      'operational',
+      'Whether the incinerator is currently ignited and functional',
+    );
 
     return obj;
   }

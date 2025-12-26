@@ -1,5 +1,5 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Vendable: a vending container that sells items in its contents.
@@ -18,20 +18,20 @@ export class VendableBuilder {
     const obj = await this.manager.create({
       parent: parentObj!,
       properties: {
-         name: 'Vendable',
-         description: 'A vending container that sells the items it holds.',
-         bankAccount: null, // target account ID to receive funds (for credits mode)
-         bank: null, // bank object id/alias
-         currency: 'credits', // 'cash' or 'credits' - payment method
-         operator: null, // who receives cash payments (if currency='cash')
-         defaultPrice: 0,
-         owner: null, // agent id that can manage stock/prices
-         locks: [], // optional composable locks controlling manage access
-         spawnables: [], // [{ protoId, price, name, properties, randomize, autoNumber, numberPrefix }]
-                         // randomize: { propertyName: [option1, option2, ...] } - picks random value
-         phoneDb: null, // optional phone directory to use for phone sales
-         // Abilities - vending physics for AI interpretation
-         abilities: `Automated vendor that dispenses items for payment.
+        name: 'Vendable',
+        description: 'A vending container that sells the items it holds.',
+        bankAccount: null, // target account ID to receive funds (for credits mode)
+        bank: null, // bank object id/alias
+        currency: 'credits', // 'cash' or 'credits' - payment method
+        operator: null, // who receives cash payments (if currency='cash')
+        defaultPrice: 0,
+        owner: null, // agent id that can manage stock/prices
+        locks: [], // optional composable locks controlling manage access
+        spawnables: [], // [{ protoId, price, name, properties, randomize, autoNumber, numberPrefix }]
+        // randomize: { propertyName: [option1, option2, ...] } - picks random value
+        phoneDb: null, // optional phone directory to use for phone sales
+        // Abilities - vending physics for AI interpretation
+        abilities: `Automated vendor that dispenses items for payment.
 
 BROWSING: Check 'contents' for physical items in stock, 'spawnables' for items created on demand. Each has a price. Use getAvailableItems() to get full list with prices.
 
@@ -48,20 +48,39 @@ CHECKING FUNDS: Before buying, AI can verify buyer has funds:
 MANAGEMENT: Owner can stock items, set prices, configure spawnables. Requires passing any 'locks' on the machine.
 
 SPAWNABLES: Some vendors create items on demand from templates. These never run out but are created fresh each purchase.`,
-       },
-       methods: {},
-     });
+      },
+      methods: {},
+    });
 
     // Add property descriptions
-    obj.setPropertyDescription('contents', "Physical items currently in stock. Each can be purchased once.");
-    obj.setPropertyDescription('spawnables', "Templates for items created on demand. Never runs out.");
-    obj.setPropertyDescription('currency', "'credits' for bank transfer, 'cash' for physical money.");
-    obj.setPropertyDescription('defaultPrice', "Price for items without individual pricing.");
-    obj.setPropertyDescription('bankAccount', "Account ID receiving credit payments.");
-    obj.setPropertyDescription('operator', "Agent receiving cash payments (or null = machine keeps it).");
+    obj.setPropertyDescription(
+      'contents',
+      'Physical items currently in stock. Each can be purchased once.',
+    );
+    obj.setPropertyDescription(
+      'spawnables',
+      'Templates for items created on demand. Never runs out.',
+    );
+    obj.setPropertyDescription(
+      'currency',
+      "'credits' for bank transfer, 'cash' for physical money.",
+    );
+    obj.setPropertyDescription(
+      'defaultPrice',
+      'Price for items without individual pricing.',
+    );
+    obj.setPropertyDescription(
+      'bankAccount',
+      'Account ID receiving credit payments.',
+    );
+    obj.setPropertyDescription(
+      'operator',
+      'Agent receiving cash payments (or null = machine keeps it).',
+    );
 
-
-    obj.setMethod('listItems', `
+    obj.setMethod(
+      'listItems',
+      `
       const viewer = args[0];
       const contents = self.contents || [];
       const currency = self.currency || 'credits';
@@ -75,10 +94,13 @@ SPAWNABLES: Some vendors create items on demand from templates. These never run 
         out += \`  \${i + 1}) \${item.name || 'Item'} - \${priceStr}\\n\`;
       }
       return out.trim();
-    `);
+    `,
+    );
 
     // AI-callable: get structured list of available items
-    obj.setMethod('getAvailableItems', `
+    obj.setMethod(
+      'getAvailableItems',
+      `
       /** Get all items available for purchase with prices.
        *  Use this to see what can be bought before calling buyItem().
        *  @returns Array of { index, name, price, type: 'stock'|'spawnable' }
@@ -114,10 +136,13 @@ SPAWNABLES: Some vendors create items on demand from templates. These never run 
       }
 
       return items;
-    `);
+    `,
+    );
 
     // AI-callable: purchase a specific item by name or index
-    obj.setMethod('buyItem', `
+    obj.setMethod(
+      'buyItem',
+      `
       /** Purchase a specific item from this vendor.
        *  Handles payment automatically based on currency setting.
        *  @param buyer - The agent making the purchase
@@ -240,10 +265,13 @@ SPAWNABLES: Some vendors create items on demand from templates. These never run 
         item: deliveredItem,
         message: 'You buy ' + (deliveredItem.name || 'the item') + ' for ' + priceStr + '.',
       };
-    `);
+    `,
+    );
 
     // Legacy interactive vend - still works for direct "use vending machine" interaction
-    obj.setMethod('vend', `
+    obj.setMethod(
+      'vend',
+      `
       const buyer = args[0];
       if (!buyer) return 'No buyer specified.';
 
@@ -369,11 +397,13 @@ SPAWNABLES: Some vendors create items on demand from templates. These never run 
       await deliveredItem.moveTo(buyer);
 
       return \`You buy \${deliveredItem.name || 'the item'} for \${priceStr}.\`;
-    `);
-
+    `,
+    );
 
     // Owner management: stock and set prices using prompts/menus
-    obj.setMethod('manage', `
+    obj.setMethod(
+      'manage',
+      `
       const actor = args[0];
       if (!actor) return 'No actor provided.';
 
@@ -594,8 +624,8 @@ SPAWNABLES: Some vendors create items on demand from templates. These never run 
       }
 
       return 'Exited management.';
-    `);
-
+    `,
+    );
 
     return obj;
   }

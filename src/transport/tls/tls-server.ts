@@ -1,8 +1,12 @@
-import { createServer, Server as NodeTLSServer, TLSSocket } from 'tls';
+import {
+  createServer,
+  type Server as NodeTLSServer,
+  type TLSSocket,
+} from 'node:tls';
 import { Subject } from 'rxjs';
-import { TelnetTransport } from '../telnet/telnet-transport.js';
-import { Connection } from '../../connection/connection.js';
 import type { AuthInfo } from '../../../types/auth.js';
+import { Connection } from '../../connection/connection.js';
+import { TelnetTransport } from '../telnet/telnet-transport.js';
 
 /**
  * TLS/SSL server with client certificate authentication
@@ -11,10 +15,10 @@ import type { AuthInfo } from '../../../types/auth.js';
 export interface TLSServerConfig {
   port: number;
   host?: string;
-  key: string | Buffer;       // Server private key
-  cert: string | Buffer;      // Server certificate
-  ca?: string | Buffer;       // Certificate Authority (for verifying client certs)
-  requestCert?: boolean;      // Request client certificates (default: true)
+  key: string | Buffer; // Server private key
+  cert: string | Buffer; // Server certificate
+  ca?: string | Buffer; // Certificate Authority (for verifying client certs)
+  requestCert?: boolean; // Request client certificates (default: true)
   rejectUnauthorized?: boolean; // Reject invalid certs at TLS level (default: false, we validate in MOO)
   debug?: boolean;
 }
@@ -34,15 +38,18 @@ export class TLSServer {
   public readonly error$ = new Subject<Error>();
 
   constructor(private config: TLSServerConfig) {
-    this.server = createServer({
-      key: config.key,
-      cert: config.cert,
-      ca: config.ca,
-      requestCert: config.requestCert !== false, // Default: true
-      rejectUnauthorized: config.rejectUnauthorized || false, // Default: false (validate in MOO)
-    }, (socket) => {
-      this.handleConnection(socket);
-    });
+    this.server = createServer(
+      {
+        key: config.key,
+        cert: config.cert,
+        ca: config.ca,
+        requestCert: config.requestCert !== false, // Default: true
+        rejectUnauthorized: config.rejectUnauthorized || false, // Default: false (validate in MOO)
+      },
+      (socket) => {
+        this.handleConnection(socket);
+      },
+    );
 
     this.setupEventHandlers();
   }
@@ -72,12 +79,18 @@ export class TLSServer {
    */
   async listen(): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.server.listen(this.config.port, this.config.host || '0.0.0.0', () => {
-        if (this.config.debug) {
-          console.log(`[TLSServer] Listening on ${this.config.host || '0.0.0.0'}:${this.config.port}`);
-        }
-        resolve();
-      });
+      this.server.listen(
+        this.config.port,
+        this.config.host || '0.0.0.0',
+        () => {
+          if (this.config.debug) {
+            console.log(
+              `[TLSServer] Listening on ${this.config.host || '0.0.0.0'}:${this.config.port}`,
+            );
+          }
+          resolve();
+        },
+      );
 
       this.server.once('error', reject);
     });
@@ -118,7 +131,9 @@ export class TLSServer {
       };
 
       if (this.config.debug) {
-        console.log(`[TLSServer] SSL cert detected: CN=${cert.subject?.CN}, verified=${socket.authorized}`);
+        console.log(
+          `[TLSServer] SSL cert detected: CN=${cert.subject?.CN}, verified=${socket.authorized}`,
+        );
       }
     } else {
       if (this.config.debug) {

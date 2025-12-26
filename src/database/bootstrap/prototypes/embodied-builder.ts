@@ -1,5 +1,5 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Builds the Embodied prototype
@@ -19,24 +19,29 @@ import type { RuntimeObject } from '../../../../types/object.js';
 export class EmbodiedBuilder {
   constructor(private manager: ObjectManager) {}
 
-  async build(agentId: number, existingObj?: RuntimeObject): Promise<RuntimeObject> {
+  async build(
+    agentId: number,
+    existingObj?: RuntimeObject,
+  ): Promise<RuntimeObject> {
     const parent = await this.manager.load(agentId);
-    const obj = existingObj || await this.manager.create({
-      parent: parent!,
-      properties: {
-        name: 'Embodied',
-        description: 'Base prototype for agents with physical bodies',
-        // Body reference - set when body is created
-        body: null, // ObjRef to torso (root of body tree)
-        // Consciousness state
-        conscious: true,
-        // Breath/air tracking for drowning
-        breath: 100, // Current breath 0-100 (100 = full lungs)
-        maxBreath: 100, // Max breath capacity (trained swimmers have more)
-        // Sensory history for AI awareness (last 50 things seen/heard)
-        sensoryHistory: [],
+    const obj =
+      existingObj ||
+      (await this.manager.create({
+        parent: parent!,
+        properties: {
+          name: 'Embodied',
+          description: 'Base prototype for agents with physical bodies',
+          // Body reference - set when body is created
+          body: null, // ObjRef to torso (root of body tree)
+          // Consciousness state
+          conscious: true,
+          // Breath/air tracking for drowning
+          breath: 100, // Current breath 0-100 (100 = full lungs)
+          maxBreath: 100, // Max breath capacity (trained swimmers have more)
+          // Sensory history for AI awareness (last 50 things seen/heard)
+          sensoryHistory: [],
 
-        abilities: `Agent with a physical body that has sensory organs, metabolism, and mortality.
+          abilities: `Agent with a physical body that has sensory organs, metabolism, and mortality.
 
 BODY STRUCTURE: 'body' property points to torso (root of body tree). Access parts via getBody(), getHead(), getHands(), getEars(), getEyes(). Body parts have their own abilities.
 
@@ -51,26 +56,43 @@ BREATHING: 'breath' tracks air for underwater. Depletes when submerged. Drowning
 WOUNDS: Body parts accumulate wounds. Wounds bleed (drains hydration/calories), cause pain, can infect. bleedTick() processes all wounds each heartbeat.
 
 STRENGTH: Derived from body part effective capacity (maxCalories - decayLevel). Weakest link in arm path limits what can be lifted/held.`,
-      },
-      methods: {},
-    });
+        },
+        methods: {},
+      }));
 
     this.addBodyAccessMethods(obj);
     this.addSensoryMethods(obj);
     this.addCalorieMethods(obj);
 
     // Property descriptions
-    obj.setPropertyDescription('body', 'Reference to torso (root body part object) containing the entire body tree');
-    obj.setPropertyDescription('conscious', 'Whether agent is conscious (controls all perception and action)');
-    obj.setPropertyDescription('breath', 'Current breath level 0-100 for underwater survival (100 = full lungs)');
-    obj.setPropertyDescription('maxBreath', 'Maximum breath capacity (trained swimmers have higher values)');
-    obj.setPropertyDescription('sensoryHistory', 'Array of last 50 sensory events (see/hear) for AI awareness context');
+    obj.setPropertyDescription(
+      'body',
+      'Reference to torso (root body part object) containing the entire body tree',
+    );
+    obj.setPropertyDescription(
+      'conscious',
+      'Whether agent is conscious (controls all perception and action)',
+    );
+    obj.setPropertyDescription(
+      'breath',
+      'Current breath level 0-100 for underwater survival (100 = full lungs)',
+    );
+    obj.setPropertyDescription(
+      'maxBreath',
+      'Maximum breath capacity (trained swimmers have higher values)',
+    );
+    obj.setPropertyDescription(
+      'sensoryHistory',
+      'Array of last 50 sensory events (see/hear) for AI awareness context',
+    );
 
     return obj;
   }
 
   private addBodyAccessMethods(obj: RuntimeObject): void {
-    obj.setMethod('getBody', `
+    obj.setMethod(
+      'getBody',
+      `
       /** Get the body (torso root) of this embodied agent.
        *  @returns The torso RuntimeObject or null if no body
        */
@@ -81,16 +103,22 @@ STRENGTH: Derived from body part effective capacity (maxCalories - decayLevel). 
         body = await $load(body);
       }
       return body || null;
-    `);
+    `,
+    );
 
-    obj.setMethod('getTorso', `
+    obj.setMethod(
+      'getTorso',
+      `
       /** Get the torso (alias for getBody).
        *  @returns The torso RuntimeObject or null
        */
       return await self.getBody();
-    `);
+    `,
+    );
 
-    obj.setMethod('getHead', `
+    obj.setMethod(
+      'getHead',
+      `
       /** Get the head body part.
        *  @returns The head RuntimeObject or null
        */
@@ -99,9 +127,12 @@ STRENGTH: Derived from body part effective capacity (maxCalories - decayLevel). 
         return await body.getPart('head');
       }
       return null;
-    `);
+    `,
+    );
 
-    obj.setMethod('getMouth', `
+    obj.setMethod(
+      'getMouth',
+      `
       /** Get the mouth body part (for speaking).
        *  @returns The mouth RuntimeObject or null
        */
@@ -113,9 +144,12 @@ STRENGTH: Derived from body part effective capacity (maxCalories - decayLevel). 
         }
       }
       return null;
-    `);
+    `,
+    );
 
-    obj.setMethod('getEars', `
+    obj.setMethod(
+      'getEars',
+      `
       /** Get all ear body parts (for hearing).
        *  @returns Array of ear RuntimeObjects
        */
@@ -129,9 +163,12 @@ STRENGTH: Derived from body part effective capacity (maxCalories - decayLevel). 
         }
       }
       return [];
-    `);
+    `,
+    );
 
-    obj.setMethod('getEyes', `
+    obj.setMethod(
+      'getEyes',
+      `
       /** Get all eye body parts (for seeing).
        *  @returns Array of eye RuntimeObjects
        */
@@ -145,9 +182,12 @@ STRENGTH: Derived from body part effective capacity (maxCalories - decayLevel). 
         }
       }
       return [];
-    `);
+    `,
+    );
 
-    obj.setMethod('getHands', `
+    obj.setMethod(
+      'getHands',
+      `
       /** Get hand body parts.
        *  @returns Object with primary, secondary, and both hand arrays
        */
@@ -174,9 +214,12 @@ STRENGTH: Derived from body part effective capacity (maxCalories - decayLevel). 
         secondary: primaryHand === 'right' ? leftHand : rightHand,
         both: [rightHand, leftHand].filter(h => h !== null),
       };
-    `);
+    `,
+    );
 
-    obj.setMethod('resolveAllContents', `
+    obj.setMethod(
+      'resolveAllContents',
+      `
       /** Get all contents including items in body (hands, etc).
        *  @returns Array of object IDs
        */
@@ -199,9 +242,12 @@ STRENGTH: Derived from body part effective capacity (maxCalories - decayLevel). 
       }
 
       return allContents;
-    `);
+    `,
+    );
 
-    obj.setMethod('getCarriedWeight', `
+    obj.setMethod(
+      'getCarriedWeight',
+      `
       /** Get total weight of items being carried (in hands, worn, pockets, etc).
        *  Used for movement calorie cost calculations.
        *  @returns Total weight in grams
@@ -281,12 +327,15 @@ STRENGTH: Derived from body part effective capacity (maxCalories - decayLevel). 
       }
 
       return totalWeight;
-    `);
+    `,
+    );
   }
 
   private addSensoryMethods(obj: RuntimeObject): void {
     // Record sensory events for AI awareness
-    obj.setMethod('recordSensory', `
+    obj.setMethod(
+      'recordSensory',
+      `
       /** Record a sensory event to the history buffer.
        *  @param type - 'see' | 'hear'
        *  @param content - The message/content
@@ -313,9 +362,12 @@ STRENGTH: Derived from body part effective capacity (maxCalories - decayLevel). 
       if (self.sensoryHistory.length > 50) {
         self.sensoryHistory = self.sensoryHistory.slice(-50);
       }
-    `);
+    `,
+    );
 
-    obj.setMethod('speak', `
+    obj.setMethod(
+      'speak',
+      `
       /** Speak a message through the mouth.
        *  Routes through mouth body part and broadcasts to room.
        *  @param message - The text to speak
@@ -349,9 +401,12 @@ STRENGTH: Derived from body part effective capacity (maxCalories - decayLevel). 
       }
 
       return speech;
-    `);
+    `,
+    );
 
-    obj.setMethod('hear', `
+    obj.setMethod(
+      'hear',
+      `
       /** Hear a sound or speech through the ears.
        *  Routes through ear body parts.
        *  @param message - String or speech object
@@ -434,9 +489,12 @@ STRENGTH: Derived from body part effective capacity (maxCalories - decayLevel). 
       }
 
       return heard;
-    `);
+    `,
+    );
 
-    obj.setMethod('see', `
+    obj.setMethod(
+      'see',
+      `
       /** See a visual message through the eyes.
        *  If can see, sends message via tell() and returns true.
        *  @param message - The visual message to see
@@ -498,9 +556,12 @@ STRENGTH: Derived from body part effective capacity (maxCalories - decayLevel). 
       }
 
       return false; // All eyes blocked/blind
-    `);
+    `,
+    );
 
-    obj.setMethod('canSmell', `
+    obj.setMethod(
+      'canSmell',
+      `
       /** Check if can smell (nose is working).
        *  Delegates to head.canSmell() for actual capability check.
        *  @returns boolean - true if can smell
@@ -513,9 +574,12 @@ STRENGTH: Derived from body part effective capacity (maxCalories - decayLevel). 
         return false;
       }
       return await head.canSmell();
-    `);
+    `,
+    );
 
-    obj.setMethod('canTaste', `
+    obj.setMethod(
+      'canTaste',
+      `
       /** Check if can taste (tongue is working).
        *  Delegates to head.canTaste() for actual capability check.
        *  @returns boolean - true if can taste
@@ -528,9 +592,12 @@ STRENGTH: Derived from body part effective capacity (maxCalories - decayLevel). 
         return false;
       }
       return await head.canTaste();
-    `);
+    `,
+    );
 
-    obj.setMethod('smell', `
+    obj.setMethod(
+      'smell',
+      `
       /** Smell an olfactory message through the nose.
        *  If can smell, sends message via tell() and returns true.
        *  @param message - The smell description
@@ -577,9 +644,12 @@ STRENGTH: Derived from body part effective capacity (maxCalories - decayLevel). 
       }
 
       return true;
-    `);
+    `,
+    );
 
-    obj.setMethod('taste', `
+    obj.setMethod(
+      'taste',
+      `
       /** Taste a gustatory message through the tongue.
        *  If can taste, sends message via tell() and returns true.
        *  @param message - The taste description
@@ -626,9 +696,12 @@ STRENGTH: Derived from body part effective capacity (maxCalories - decayLevel). 
       }
 
       return true;
-    `);
+    `,
+    );
 
-    obj.setMethod('feel', `
+    obj.setMethod(
+      'feel',
+      `
       /** Feel a tactile sensation.
        *  If can feel, sends message via tell() and returns true.
        *  @param message - The tactile description
@@ -664,9 +737,12 @@ STRENGTH: Derived from body part effective capacity (maxCalories - decayLevel). 
       }
 
       return true;
-    `);
+    `,
+    );
 
-    obj.setMethod('think', `
+    obj.setMethod(
+      'think',
+      `
       /** Internal monologue - the voice in the character's head.
        *  Not blocked by physical conditions (blind/deaf don't stop thoughts).
        *  Recorded in sensory history for context.
@@ -699,9 +775,12 @@ STRENGTH: Derived from body part effective capacity (maxCalories - decayLevel). 
       }
 
       return true;
-    `);
+    `,
+    );
 
-    obj.setMethod('onSensation', `
+    obj.setMethod(
+      'onSensation',
+      `
       /** Handle incoming sensation from body parts.
        *  @param sensation - Object with part, partName, type, intensity
        */
@@ -731,9 +810,12 @@ STRENGTH: Derived from body part effective capacity (maxCalories - decayLevel). 
         // Pain sensation - could trigger reactions
         // Future: pain tolerance, shock, etc.
       }
-    `);
+    `,
+    );
 
-    obj.setMethod('onCriticalDamage', `
+    obj.setMethod(
+      'onCriticalDamage',
+      `
       /** Handle critical damage to body parts (may cause death).
        *  @param part - The body part that was critically damaged
        */
@@ -748,11 +830,14 @@ STRENGTH: Derived from body part effective capacity (maxCalories - decayLevel). 
           await self.onDeath(part);
         }
       }
-    `);
+    `,
+    );
   }
 
   private addCalorieMethods(obj: RuntimeObject): void {
-    obj.setMethod('getArmPath', `
+    obj.setMethod(
+      'getArmPath',
+      `
       /** Get the arm path from hand to torso for a given side.
        *  @param side - 'right' or 'left'
        *  @returns Array of parts: [hand, forearm, arm, shoulder, torso]
@@ -775,18 +860,24 @@ STRENGTH: Derived from body part effective capacity (maxCalories - decayLevel). 
       if (!hand) return [forearm, arm, shoulder, body];
 
       return [hand, forearm, arm, shoulder, body];
-    `);
+    `,
+    );
 
-    obj.setMethod('getBothArmPaths', `
+    obj.setMethod(
+      'getBothArmPaths',
+      `
       /** Get both arm paths for two-handed operations.
        *  @returns Object with right and left arm paths
        */
       const rightPath = await self.getArmPath('right');
       const leftPath = await self.getArmPath('left');
       return { right: rightPath, left: leftPath };
-    `);
+    `,
+    );
 
-    obj.setMethod('getTotalCalories', `
+    obj.setMethod(
+      'getTotalCalories',
+      `
       /** Get total calories stored in the body.
        *  @returns Total calorie count across all body parts
        */
@@ -820,9 +911,12 @@ STRENGTH: Derived from body part effective capacity (maxCalories - decayLevel). 
       }
 
       return total;
-    `);
+    `,
+    );
 
-    obj.setMethod('strengthCheck', `
+    obj.setMethod(
+      'strengthCheck',
+      `
       /** Check if a body part path can handle a given weight.
        *  @param weight - Weight in grams
        *  @param path - Array of body parts from extremity to torso
@@ -891,9 +985,12 @@ STRENGTH: Derived from body part effective capacity (maxCalories - decayLevel). 
         holdCaloriesPerSecond,
         hasCalories,
       };
-    `);
+    `,
+    );
 
-    obj.setMethod('burnCalories', `
+    obj.setMethod(
+      'burnCalories',
+      `
       /** Burn calories from body parts doing work.
        *  Cascade: body parts → torso → fat → decay.
        *  When fat is exhausted, decay consumes the body part itself,
@@ -991,9 +1088,12 @@ STRENGTH: Derived from body part effective capacity (maxCalories - decayLevel). 
       }
 
       return { burned: totalBurned, fromFat, decayed };
-    `);
+    `,
+    );
 
-    obj.setMethod('replenishCalories', `
+    obj.setMethod(
+      'replenishCalories',
+      `
       /** Replenish calories from eating (distributes to body and limbs).
        *  Excess calories stored as fat.
        *  @param amount - Calories from food
@@ -1068,9 +1168,12 @@ STRENGTH: Derived from body part effective capacity (maxCalories - decayLevel). 
       }
 
       return { absorbed: amount - remaining, storedAsFat };
-    `);
+    `,
+    );
 
-    obj.setMethod('digestTick', `
+    obj.setMethod(
+      'digestTick',
+      `
       /** Process stomach contents and absorb calories.
        *  Called periodically by heartbeat. Burns fat if needed.
        *  Infected wounds reduce calorie absorption.
@@ -1158,9 +1261,12 @@ STRENGTH: Derived from body part effective capacity (maxCalories - decayLevel). 
         infectionPenalty: Math.round(infectionPenalty * 100),
         caloriesLostToInfection
       };
-    `);
+    `,
+    );
 
-    obj.setMethod('bleedTick', `
+    obj.setMethod(
+      'bleedTick',
+      `
       /** Process all wounds on all body parts.
        *  Called periodically by heartbeat.
        *  Wounds tick (bleed, heal, infect, cause pain).
@@ -1261,9 +1367,12 @@ STRENGTH: Derived from body part effective capacity (maxCalories - decayLevel). 
       // This is handled by wound.tick() adding sepsis status effect
 
       return { totalBleeding, woundsHealed: totalWoundsHealed, infections: totalInfections, messages };
-    `);
+    `,
+    );
 
-    obj.setMethod('breathTick', `
+    obj.setMethod(
+      'breathTick',
+      `
       /** Process breathing/drowning for submerged agents.
        *  Called periodically by heartbeat.
        *  When underwater: breath depletes. When out: breath refills.
@@ -1369,9 +1478,12 @@ STRENGTH: Derived from body part effective capacity (maxCalories - decayLevel). 
         drowning,
         messages,
       };
-    `);
+    `,
+    );
 
-    obj.setMethod('getStomachContents', `
+    obj.setMethod(
+      'getStomachContents',
+      `
       /** Get stomach contents (for examining corpses, etc).
        *  @returns Array of item RuntimeObjects in stomach
        */
@@ -1389,9 +1501,12 @@ STRENGTH: Derived from body part effective capacity (maxCalories - decayLevel). 
         }
       }
       return items;
-    `);
+    `,
+    );
 
-    obj.setMethod('getFat', `
+    obj.setMethod(
+      'getFat',
+      `
       /** Get current fat level and status.
        *  @returns Object with fat, maxFat, percentage, status
        */
@@ -1410,9 +1525,12 @@ STRENGTH: Derived from body part effective capacity (maxCalories - decayLevel). 
       );
 
       return { fat, maxFat, percentage, status };
-    `);
+    `,
+    );
 
-    obj.setMethod('getFatModifier', `
+    obj.setMethod(
+      'getFatModifier',
+      `
       /** Get fat modifier for stats (dexterity, speed, stealth).
        *  Returns multiplier: 1.0 = no penalty, lower = penalty.
        *  No penalty for fat <= 20% (healthy weight).
@@ -1436,9 +1554,12 @@ STRENGTH: Derived from body part effective capacity (maxCalories - decayLevel). 
       const penalty = (excessFat / excessRange) * 0.5; // 0 to 0.5
 
       return Math.max(0.5, 1.0 - penalty);
-    `);
+    `,
+    );
 
-    obj.setMethod('getCalorieStatus', `
+    obj.setMethod(
+      'getCalorieStatus',
+      `
       /** Get calorie status for display.
        *  @returns Object with status, percentage, total, maxTotal, feeling
        */
@@ -1472,9 +1593,12 @@ STRENGTH: Derived from body part effective capacity (maxCalories - decayLevel). 
       );
 
       return { status, percentage, total, maxTotal, feeling };
-    `);
+    `,
+    );
 
-    obj.setMethod('getFeeling', `
+    obj.setMethod(
+      'getFeeling',
+      `
       /** Get how the player feels overall.
        *  Combines calorie status, sleep, fat, sedation.
        *  @returns Description string of current feeling
@@ -1527,9 +1651,12 @@ STRENGTH: Derived from body part effective capacity (maxCalories - decayLevel). 
       }
 
       return parts.join(', ');
-    `);
+    `,
+    );
 
-    obj.setMethod('getTotalBodyDecay', `
+    obj.setMethod(
+      'getTotalBodyDecay',
+      `
       /** Get total body decay across all body parts.
        *  Used to determine death by starvation (>= 50% decay).
        *  @returns Object with percentage, totalDecay, maxPossibleDecay, parts array
@@ -1601,9 +1728,12 @@ STRENGTH: Derived from body part effective capacity (maxCalories - decayLevel). 
         maxPossibleDecay,
         parts: decayParts,
       };
-    `);
+    `,
+    );
 
-    obj.setMethod('onStarvationDeath', `
+    obj.setMethod(
+      'onStarvationDeath',
+      `
       /** Called when body decay reaches fatal levels (>= 50%).
        *  The body has consumed too much of itself to survive.
        *  @param decayInfo - Object from getTotalBodyDecay
@@ -1625,6 +1755,7 @@ STRENGTH: Derived from body part effective capacity (maxCalories - decayLevel). 
       if (self.location && self.tell) {
         await self.tell('Your body has consumed too much of itself. You collapse from starvation.');
       }
-    `);
+    `,
+    );
   }
 }

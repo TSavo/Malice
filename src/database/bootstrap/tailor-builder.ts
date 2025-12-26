@@ -1,5 +1,5 @@
-import { ObjectManager } from '../object-manager.js';
 import type { RuntimeObject } from '../../../types/object.js';
+import type { ObjectManager } from '../object-manager.js';
 
 /**
  * Builds $tailor object (dynamic ID)
@@ -11,19 +11,23 @@ export class TailorBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(force = false): Promise<void> {
-    console.log('[TailorBuilder] build() called, force=' + force);
+    console.log(`[TailorBuilder] build() called, force=${force}`);
 
     // Check if already exists via alias
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
 
-    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
-    console.log('[TailorBuilder] Checking for existing alias, found:', aliases.tailor);
+    const aliases =
+      (objectManager.get('aliases') as Record<string, number>) || {};
+    console.log(
+      '[TailorBuilder] Checking for existing alias, found:',
+      aliases.tailor,
+    );
 
     if (aliases.tailor) {
       this.tailor = await this.manager.load(aliases.tailor);
       if (this.tailor) {
-        console.log('[TailorBuilder] Already exists at #' + aliases.tailor);
+        console.log(`[TailorBuilder] Already exists at #${aliases.tailor}`);
         if (!force) return;
         console.log('[TailorBuilder] Force rebuilding methods...');
         await this.rebuildMethods();
@@ -212,7 +216,7 @@ First use ai action=info to learn about the NPC, then dress them appropriately f
 
       console.log('[Tailor] Dressed ' + (human.name || 'NPC') + ' (#' + human.id + ')');
       return { success: true, message: result };
-    `
+    `,
     );
 
     console.log('[TailorBuilder] Methods rebuilt');

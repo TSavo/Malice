@@ -2,7 +2,7 @@
 
 /**
  * Retrofit Pioneer Square room files with environmental properties
- * 
+ *
  * Adds to each room:
  * - population: 0 (empty, post-Event)
  * - ambientNoise: 0 (quiet, abandoned)
@@ -11,43 +11,46 @@
  * - outdoor: true (all street-level rooms)
  */
 
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const PIONEER_SQUARE_DIR = path.join(__dirname, '../src/database/bootstrap/world/seattle/pioneer-square');
+const PIONEER_SQUARE_DIR = path.join(
+  __dirname,
+  '../src/database/bootstrap/world/seattle/pioneer-square',
+);
 
 function retrofitRoomFile(filePath) {
   const content = fs.readFileSync(filePath, 'utf8');
-  
+
   // Check if already has environmental properties
   if (content.includes('population:') || content.includes('ambientNoise:')) {
     console.log(`  ✓ Already retrofitted: ${path.basename(filePath)}`);
     return false;
   }
-  
+
   // Find the room export and add properties before the closing brace
   const roomExportMatch = content.match(/export const room = \{([^}]+)\};/s);
   if (!roomExportMatch) {
     console.warn(`  ⚠ Could not parse: ${filePath}`);
     return false;
   }
-  
+
   const roomContent = roomExportMatch[1];
-  
+
   // Check if it has the basic properties
   if (!roomContent.includes('name:') || !roomContent.includes('description:')) {
     console.warn(`  ⚠ Missing basic properties: ${filePath}`);
     return false;
   }
-  
+
   // Build the new room content with environmental properties
   const lines = roomContent.split('\n');
-  const lastPropertyIndex = lines.length - 1; // Last line before closing brace
-  
+  const _lastPropertyIndex = lines.length - 1; // Last line before closing brace
+
   // Insert environmental properties before the last line
   const environmentalProps = [
     '  // Environmental properties',
@@ -57,7 +60,7 @@ function retrofitRoomFile(filePath) {
     '  waterLevel: 0, // Dry',
     '  outdoor: true, // Street level',
   ];
-  
+
   // Find last property (could be z, or intersection if it exists)
   let insertIndex = lines.length - 1;
   for (let i = lines.length - 1; i >= 0; i--) {
@@ -66,32 +69,39 @@ function retrofitRoomFile(filePath) {
       insertIndex = i;
       // Make sure the line ends with comma
       if (!lines[i].trim().endsWith(',')) {
-        lines[i] = lines[i].trimEnd() + ',';
+        lines[i] = `${lines[i].trimEnd()},`;
       }
       break;
     }
   }
-  
+
   // Insert environmental properties
   lines.splice(insertIndex + 1, 0, ...environmentalProps);
-  
+
   const newRoomContent = lines.join('\n');
-  const newContent = content.replace(roomExportMatch[0], `export const room = {${newRoomContent}};`);
-  
+  const newContent = content.replace(
+    roomExportMatch[0],
+    `export const room = {${newRoomContent}};`,
+  );
+
   fs.writeFileSync(filePath, newContent, 'utf8');
   return true;
 }
 
-function processDirectory(dir, dirName = '') {
+function processDirectory(dir, _dirName = '') {
   const entries = fs.readdirSync(dir, { withFileTypes: true });
   let count = 0;
-  
+
   for (const entry of entries) {
     const fullPath = path.join(dir, entry.name);
-    
+
     if (entry.isDirectory()) {
       count += processDirectory(fullPath, entry.name);
-    } else if (entry.isFile() && entry.name.endsWith('.ts') && !entry.name.includes('MAP')) {
+    } else if (
+      entry.isFile() &&
+      entry.name.endsWith('.ts') &&
+      !entry.name.includes('MAP')
+    ) {
       if (retrofitRoomFile(fullPath)) {
         count++;
         if (count % 10 === 0) {
@@ -100,7 +110,7 @@ function processDirectory(dir, dirName = '') {
       }
     }
   }
-  
+
   return count;
 }
 

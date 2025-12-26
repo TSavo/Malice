@@ -9,7 +9,11 @@ import type { DevToolsClient } from './devtools-client.js';
 /**
  * View mode for tree display
  */
-export type ViewMode = 'flat' | 'categorized' | 'by-prototype' | 'by-complexity';
+export type ViewMode =
+  | 'flat'
+  | 'categorized'
+  | 'by-prototype'
+  | 'by-complexity';
 
 /**
  * Tree item representing a virtual category
@@ -20,7 +24,7 @@ export class MaliceCategoryTreeItem extends vscode.TreeItem {
     public readonly category: string,
     public readonly viewMode: ViewMode,
     public readonly count: number,
-    public readonly description: string
+    public readonly description: string,
   ) {
     super(`${category} (${count})`, vscode.TreeItemCollapsibleState.Collapsed);
 
@@ -28,18 +32,18 @@ export class MaliceCategoryTreeItem extends vscode.TreeItem {
     this.description = `${count} items`;
     this.contextValue = 'maliceCategory';
     this.iconPath = new vscode.ThemeIcon('folder');
-    
+
     // Category to icon mapping
     const iconMap: Record<string, string> = {
-      'lifecycle': 'gear',
-      'events': 'broadcast',
-      'public': 'symbol-mixin',
-      'combat': 'saber',
-      'communication': 'comment-discussion',
-      'movement': 'arrow-right',
-      'inventory': 'package',
-      'internal': 'wrench',
-      'properties': 'symbol-property'
+      lifecycle: 'gear',
+      events: 'broadcast',
+      public: 'symbol-mixin',
+      combat: 'saber',
+      communication: 'comment-discussion',
+      movement: 'arrow-right',
+      inventory: 'package',
+      internal: 'wrench',
+      properties: 'symbol-property',
     };
 
     this.iconPath = new vscode.ThemeIcon(iconMap[category] || 'folder');
@@ -60,7 +64,7 @@ export class MaliceMethodTreeItem extends vscode.TreeItem {
       signature?: string;
       complexity?: number;
       overridden?: boolean;
-    }
+    },
   ) {
     super(name, vscode.TreeItemCollapsibleState.None);
 
@@ -74,9 +78,14 @@ export class MaliceMethodTreeItem extends vscode.TreeItem {
       }
       if (metadata.complexity) {
         const complexity = metadata.complexity;
-        const complexityLabel = complexity <= 3 ? 'Simple' : 
-                             complexity <= 7 ? 'Moderate' : 
-                             complexity <= 12 ? 'Complex' : 'Very Complex';
+        const complexityLabel =
+          complexity <= 3
+            ? 'Simple'
+            : complexity <= 7
+              ? 'Moderate'
+              : complexity <= 12
+                ? 'Complex'
+                : 'Very Complex';
         tooltipLines.push(`Complexity: ${complexity} (${complexityLabel})`);
       }
       if (metadata.description) {
@@ -97,7 +106,7 @@ export class MaliceMethodTreeItem extends vscode.TreeItem {
     // Icons with metadata
     if (type === 'method') {
       this.iconPath = new vscode.ThemeIcon('symbol-method');
-      
+
       // Add complexity indicator
       if (metadata?.complexity) {
         const complexity = metadata.complexity;
@@ -121,8 +130,12 @@ export class MaliceMethodTreeItem extends vscode.TreeItem {
 /**
  * Enhanced tree data provider for Malice objects
  */
-export class EnhancedMaliceTreeProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
-  private _onDidChangeTreeData = new vscode.EventEmitter<vscode.TreeItem | undefined | null>();
+export class EnhancedMaliceTreeProvider
+  implements vscode.TreeDataProvider<vscode.TreeItem>
+{
+  private _onDidChangeTreeData = new vscode.EventEmitter<
+    vscode.TreeItem | undefined | null
+  >();
   readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
 
   private objects: Map<number, any> = new Map();
@@ -131,8 +144,12 @@ export class EnhancedMaliceTreeProvider implements vscode.TreeDataProvider<vscod
 
   constructor(private client: DevToolsClient) {
     // Listen for change notifications from server
-    client.onNotification((method, params) => {
-      if (method.startsWith('object.') || method.startsWith('method.') || method.startsWith('property.')) {
+    client.onNotification((method, _params) => {
+      if (
+        method.startsWith('object.') ||
+        method.startsWith('method.') ||
+        method.startsWith('property.')
+      ) {
         // Refresh tree when objects change
         this.refresh();
       }
@@ -216,7 +233,7 @@ export class EnhancedMaliceTreeProvider implements vscode.TreeDataProvider<vscod
           `Object #${obj.id}`,
           collapsible,
           obj.properties || [],
-          obj.methods || []
+          obj.methods || [],
         );
 
         // Add view mode to description
@@ -239,7 +256,9 @@ export class EnhancedMaliceTreeProvider implements vscode.TreeDataProvider<vscod
   /**
    * Get children for an object based on current view mode
    */
-  private async getObjectChildren(objectId: number): Promise<vscode.TreeItem[]> {
+  private async getObjectChildren(
+    objectId: number,
+  ): Promise<vscode.TreeItem[]> {
     const obj = this.objects.get(objectId);
     if (!obj) return [];
 
@@ -260,26 +279,27 @@ export class EnhancedMaliceTreeProvider implements vscode.TreeDataProvider<vscod
   /**
    * Get flat view of methods and properties
    */
-  private async getFlatView(objectId: number, obj: any): Promise<MaliceMethodTreeItem[]> {
+  private async getFlatView(
+    objectId: number,
+    obj: any,
+  ): Promise<MaliceMethodTreeItem[]> {
     const items: MaliceMethodTreeItem[] = [];
 
     // Add methods
-    Object.entries(obj.methods || {}).forEach(([methodName, methodData]: [string, any]) => {
-      items.push(new MaliceMethodTreeItem(
-        objectId,
-        methodName,
-        'method',
-        undefined,
-        {
-          description: methodData.help,
-          signature: 'unknown args',
-          complexity: this.calculateComplexity(methodData.code || '')
-        }
-      ));
-    });
+    Object.entries(obj.methods || {}).forEach(
+      ([methodName, methodData]: [string, any]) => {
+        items.push(
+          new MaliceMethodTreeItem(objectId, methodName, 'method', undefined, {
+            description: methodData.help,
+            signature: 'unknown args',
+            complexity: this.calculateComplexity(methodData.code || ''),
+          }),
+        );
+      },
+    );
 
     // Add properties
-    Object.keys(obj.properties || {}).forEach(propName => {
+    Object.keys(obj.properties || {}).forEach((propName) => {
       items.push(new MaliceMethodTreeItem(objectId, propName, 'property'));
     });
 
@@ -289,23 +309,31 @@ export class EnhancedMaliceTreeProvider implements vscode.TreeDataProvider<vscod
   /**
    * Get categorized view of methods and properties
    */
-  private async getCategorizedView(objectId: number, obj: any): Promise<vscode.TreeItem[]> {
+  private async getCategorizedView(
+    objectId: number,
+    obj: any,
+  ): Promise<vscode.TreeItem[]> {
     const categories = new Map<string, any[]>();
-    
+
     // Categorize methods
-    Object.entries(obj.methods || {}).forEach(([methodName, methodData]: [string, any]) => {
-      const category = this.categorizeMethod(methodName, methodData.code || '');
-      
-      if (!categories.has(category)) {
-        categories.set(category, []);
-      }
-      
-      categories.get(category)!.push({
-        name: methodName,
-        data: methodData,
-        type: 'method'
-      });
-    });
+    Object.entries(obj.methods || {}).forEach(
+      ([methodName, methodData]: [string, any]) => {
+        const category = this.categorizeMethod(
+          methodName,
+          methodData.code || '',
+        );
+
+        if (!categories.has(category)) {
+          categories.set(category, []);
+        }
+
+        categories.get(category)?.push({
+          name: methodName,
+          data: methodData,
+          type: 'method',
+        });
+      },
+    );
 
     // Create category items
     const items: vscode.TreeItem[] = [];
@@ -313,29 +341,42 @@ export class EnhancedMaliceTreeProvider implements vscode.TreeDataProvider<vscod
     // Add properties as special category
     if (obj.properties && Object.keys(obj.properties).length > 0) {
       const propertyCount = Object.keys(obj.properties).length;
-      items.push(new MaliceCategoryTreeItem(
-        objectId,
-        'properties',
-        this.currentViewMode,
-        propertyCount,
-        'Object properties and data fields'
-      ));
+      items.push(
+        new MaliceCategoryTreeItem(
+          objectId,
+          'properties',
+          this.currentViewMode,
+          propertyCount,
+          'Object properties and data fields',
+        ),
+      );
     }
 
     // Add method categories
-    const categoryNames = ['lifecycle', 'events', 'public', 'combat', 'communication', 'movement', 'inventory', 'internal'];
-    
+    const categoryNames = [
+      'lifecycle',
+      'events',
+      'public',
+      'combat',
+      'communication',
+      'movement',
+      'inventory',
+      'internal',
+    ];
+
     for (const categoryName of categoryNames) {
       const categoryItems = categories.get(categoryName) || [];
       if (categoryItems.length > 0) {
         const categoryInfo = this.getCategoryInfo(categoryName);
-        items.push(new MaliceCategoryTreeItem(
-          objectId,
-          categoryInfo.name,
-          this.currentViewMode,
-          categoryItems.length,
-          categoryInfo.description
-        ));
+        items.push(
+          new MaliceCategoryTreeItem(
+            objectId,
+            categoryInfo.name,
+            this.currentViewMode,
+            categoryItems.length,
+            categoryInfo.description,
+          ),
+        );
       }
     }
 
@@ -345,29 +386,42 @@ export class EnhancedMaliceTreeProvider implements vscode.TreeDataProvider<vscod
   /**
    * Get methods in a specific category
    */
-  private async getCategoryMethods(objectId: number, category: string): Promise<MaliceMethodTreeItem[]> {
+  private async getCategoryMethods(
+    objectId: number,
+    category: string,
+  ): Promise<MaliceMethodTreeItem[]> {
     const obj = this.objects.get(objectId);
     if (!obj) return [];
 
     const items: MaliceMethodTreeItem[] = [];
 
-    Object.entries(obj.methods || {}).forEach(([methodName, methodData]: [string, any]) => {
-      const methodCategory = this.categorizeMethod(methodName, methodData.code || '');
-      
-      if (methodCategory === category || (category === 'properties' && methodCategory === 'properties')) {
-        items.push(new MaliceMethodTreeItem(
-          objectId,
+    Object.entries(obj.methods || {}).forEach(
+      ([methodName, methodData]: [string, any]) => {
+        const methodCategory = this.categorizeMethod(
           methodName,
-          category === 'properties' ? 'property' : 'method',
-          category,
-          {
-            description: methodData.help,
-            signature: 'unknown args',
-            complexity: this.calculateComplexity(methodData.code || '')
-          }
-        ));
-      }
-    });
+          methodData.code || '',
+        );
+
+        if (
+          methodCategory === category ||
+          (category === 'properties' && methodCategory === 'properties')
+        ) {
+          items.push(
+            new MaliceMethodTreeItem(
+              objectId,
+              methodName,
+              category === 'properties' ? 'property' : 'method',
+              category,
+              {
+                description: methodData.help,
+                signature: 'unknown args',
+                complexity: this.calculateComplexity(methodData.code || ''),
+              },
+            ),
+          );
+        }
+      },
+    );
 
     return items.sort((a, b) => a.name.localeCompare(b.name));
   }
@@ -375,7 +429,10 @@ export class EnhancedMaliceTreeProvider implements vscode.TreeDataProvider<vscod
   /**
    * Get prototype-based view
    */
-  private async getPrototypeView(objectId: number, obj: any): Promise<MaliceMethodTreeItem[]> {
+  private async getPrototypeView(
+    objectId: number,
+    obj: any,
+  ): Promise<MaliceMethodTreeItem[]> {
     // This would group methods by their origin prototype
     // Implementation deferred for now
     return await this.getFlatView(objectId, obj);
@@ -384,42 +441,53 @@ export class EnhancedMaliceTreeProvider implements vscode.TreeDataProvider<vscod
   /**
    * Get complexity-based view
    */
-  private async getComplexityView(objectId: number, obj: any): Promise<MaliceMethodTreeItem[]> {
+  private async getComplexityView(
+    objectId: number,
+    obj: any,
+  ): Promise<MaliceMethodTreeItem[]> {
     const items: MaliceMethodTreeItem[] = [];
 
-    Object.entries(obj.methods || {}).forEach(([methodName, methodData]: [string, any]) => {
-      const complexity = this.calculateComplexity(methodData.code || '');
-      
-      items.push(new MaliceMethodTreeItem(
-        objectId,
-        methodName,
-        'method',
-        undefined,
-        {
-          description: methodData.help,
-          signature: 'unknown args',
-          complexity
-        }
-      ));
-    });
+    Object.entries(obj.methods || {}).forEach(
+      ([methodName, methodData]: [string, any]) => {
+        const complexity = this.calculateComplexity(methodData.code || '');
+
+        items.push(
+          new MaliceMethodTreeItem(objectId, methodName, 'method', undefined, {
+            description: methodData.help,
+            signature: 'unknown args',
+            complexity,
+          }),
+        );
+      },
+    );
 
     // Sort by complexity (descending)
-    return items.sort((a, b) => (b.metadata?.complexity || 0) - (a.metadata?.complexity || 0));
+    return items.sort(
+      (a, b) => (b.metadata?.complexity || 0) - (a.metadata?.complexity || 0),
+    );
   }
 
   /**
    * Categorize a method (simplified version for tree view)
    */
-  private categorizeMethod(methodName: string, methodCode: string): string {
+  private categorizeMethod(methodName: string, _methodCode: string): string {
     const patterns: Record<string, RegExp[]> = {
-      lifecycle: [/^(connect|disconnect|init|destroy|onCreate|onDestroy|onConnect|onDisconnect)/],
+      lifecycle: [
+        /^(connect|disconnect|init|destroy|onCreate|onDestroy|onConnect|onDisconnect)/,
+      ],
       events: [/^(on|handle)[A-Z]/, /^.*(?:Event|Hook|Callback)$/],
-      public: [/^(get|set|is|has|can|do|show|display|list)[a-z]/, /^(look|examine|describe)/],
+      public: [
+        /^(get|set|is|has|can|do|show|display|list)[a-z]/,
+        /^(look|examine|describe)/,
+      ],
       combat: [/^(attack|defend|damage|heal|fight|strike|hit)/],
       communication: [/^(say|tell|whisper|shout|announce|broadcast)/],
       movement: [/^(move|go|walk|run|teleport|transport)/],
-      inventory: [/^(inventory|items|equipment|gear)/, /^(take|drop|give|equip|unequip|wield)/],
-      internal: [/^_/, /^(validate|check|verify|test|debug)/]
+      inventory: [
+        /^(inventory|items|equipment|gear)/,
+        /^(take|drop|give|equip|unequip|wield)/,
+      ],
+      internal: [/^_/, /^(validate|check|verify|test|debug)/],
     };
 
     for (const [category, regexList] of Object.entries(patterns)) {
@@ -436,16 +504,43 @@ export class EnhancedMaliceTreeProvider implements vscode.TreeDataProvider<vscod
   /**
    * Get category information
    */
-  private getCategoryInfo(category: string): { name: string; description: string } {
+  private getCategoryInfo(category: string): {
+    name: string;
+    description: string;
+  } {
     const info: Record<string, { name: string; description: string }> = {
-      lifecycle: { name: '🔧 Lifecycle', description: 'Object lifecycle and initialization methods' },
-      events: { name: '📡 Events', description: 'Event handlers and callbacks' },
-      public: { name: '🔍 Public API', description: 'User-facing methods and commands' },
-      combat: { name: '⚔️ Combat', description: 'Combat and battle-related methods' },
-      communication: { name: '💬 Communication', description: 'Chat, messaging and communication' },
-      movement: { name: '🚶 Movement', description: 'Movement and navigation methods' },
-      inventory: { name: '🎒 Inventory', description: 'Item and inventory management' },
-      internal: { name: '🔧 Internal', description: 'Internal utilities and helpers' }
+      lifecycle: {
+        name: '🔧 Lifecycle',
+        description: 'Object lifecycle and initialization methods',
+      },
+      events: {
+        name: '📡 Events',
+        description: 'Event handlers and callbacks',
+      },
+      public: {
+        name: '🔍 Public API',
+        description: 'User-facing methods and commands',
+      },
+      combat: {
+        name: '⚔️ Combat',
+        description: 'Combat and battle-related methods',
+      },
+      communication: {
+        name: '💬 Communication',
+        description: 'Chat, messaging and communication',
+      },
+      movement: {
+        name: '🚶 Movement',
+        description: 'Movement and navigation methods',
+      },
+      inventory: {
+        name: '🎒 Inventory',
+        description: 'Item and inventory management',
+      },
+      internal: {
+        name: '🔧 Internal',
+        description: 'Internal utilities and helpers',
+      },
     };
 
     return info[category] || { name: `📁 ${category}`, description: category };
@@ -455,9 +550,19 @@ export class EnhancedMaliceTreeProvider implements vscode.TreeDataProvider<vscod
    * Calculate method complexity (simple approximation)
    */
   private calculateComplexity(code: string): number {
-    const complexityKeywords = ['if', 'else', 'while', 'for', 'switch', 'case', 'catch', '&&', '||'];
+    const complexityKeywords = [
+      'if',
+      'else',
+      'while',
+      'for',
+      'switch',
+      'case',
+      'catch',
+      '&&',
+      '||',
+    ];
     let complexity = 1; // Base complexity
-    
+
     for (const keyword of complexityKeywords) {
       const regex = new RegExp(`\\b${keyword}\\b`, 'gi');
       const matches = code.match(regex);
@@ -465,7 +570,7 @@ export class EnhancedMaliceTreeProvider implements vscode.TreeDataProvider<vscod
         complexity += matches.length;
       }
     }
-    
+
     return complexity;
   }
 
@@ -498,7 +603,7 @@ export class MaliceObjectTreeItem extends vscode.TreeItem {
     public readonly label: string,
     public readonly collapsibleState: vscode.TreeItemCollapsibleState,
     public readonly properties: string[],
-    public readonly methods: string[]
+    public readonly methods: string[],
   ) {
     super(label, collapsibleState);
 

@@ -1,5 +1,5 @@
-import { ObjectManager } from '../object-manager.js';
 import type { RuntimeObject } from '../../../types/object.js';
+import type { ObjectManager } from '../object-manager.js';
 
 /**
  * Builds BodyFactory object (dynamic ID)
@@ -19,7 +19,8 @@ export class BodyFactoryBuilder {
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
 
-    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
+    const aliases =
+      (objectManager.get('aliases') as Record<string, number>) || {};
 
     if (aliases.bodyFactory) {
       this.bodyFactory = await this.manager.load(aliases.bodyFactory);
@@ -42,7 +43,9 @@ export class BodyFactoryBuilder {
     // Setup methods (runs on both create and force rebuild)
     // Helper method to create a single body part
     // Uses legacy recycler.create(parent, properties) format
-    this.bodyFactory.setMethod('createPart', `
+    this.bodyFactory.setMethod(
+      'createPart',
+      `
       const parentProto = args[0];
       const name = args[1];
       const owner = args[2];
@@ -68,10 +71,13 @@ export class BodyFactoryBuilder {
         maxCalories: options.maxCalories,
       });
       return part;
-    `);
+    `,
+    );
 
     // Create fingers for a hand
-    this.bodyFactory.setMethod('createFingers', `
+    this.bodyFactory.setMethod(
+      'createFingers',
+      `
       const bodyPartId = args[0];
       const side = args[1];
       const handPart = args[2];
@@ -87,10 +93,13 @@ export class BodyFactoryBuilder {
         const fingerKey = finger.replace(' ', '');
         await handPart.addPart(fingerKey, fingerPart);
       }
-    `);
+    `,
+    );
 
     // Create a hand with fingers
-    this.bodyFactory.setMethod('createHand', `
+    this.bodyFactory.setMethod(
+      'createHand',
+      `
       const handProtoId = args[0];
       const bodyPartId = args[1];
       const side = args[2];
@@ -109,11 +118,14 @@ export class BodyFactoryBuilder {
       });
       await self.createFingers(bodyPartId, side, hand, owner);
       return hand;
-    `);
+    `,
+    );
 
     // Create arm chain (shoulder -> arm -> forearm -> hand)
     // Uses pre-injected $bodyPart
-    this.bodyFactory.setMethod('createArm', `
+    this.bodyFactory.setMethod(
+      'createArm',
+      `
       const side = args[0];
       const owner = args[1];
       const primaryHand = args[2];
@@ -149,11 +161,14 @@ export class BodyFactoryBuilder {
       await shoulder.addPart('arm', arm);
 
       return shoulder;
-    `);
+    `,
+    );
 
     // Create leg chain (thigh -> knee -> leg -> foot)
     // Uses pre-injected $bodyPart
-    this.bodyFactory.setMethod('createLeg', `
+    this.bodyFactory.setMethod(
+      'createLeg',
+      `
       const side = args[0];
       const owner = args[1];
 
@@ -196,11 +211,14 @@ export class BodyFactoryBuilder {
       await thigh.addPart('knee', knee);
 
       return thigh;
-    `);
+    `,
+    );
 
     // Create head with face, sensory organs, etc.
     // Uses pre-injected body part prototype aliases: $eye, $ear, $nose, $mouth, etc.
-    this.bodyFactory.setMethod('createHead', `
+    this.bodyFactory.setMethod(
+      'createHead',
+      `
       const owner = args[0];
 
       // Sensory organs - use specialized prototypes for proper method inheritance
@@ -280,11 +298,14 @@ export class BodyFactoryBuilder {
       await head.addPart('face', face);
 
       return head;
-    `);
+    `,
+    );
 
     // Create groin with sex-specific parts
     // Uses pre-injected $bodyPart
-    this.bodyFactory.setMethod('createGroin', `
+    this.bodyFactory.setMethod(
+      'createGroin',
+      `
       const owner = args[0];
       const sex = args[1];
 
@@ -313,10 +334,13 @@ export class BodyFactoryBuilder {
       // neuter/non-binary = no additional parts
 
       return groin;
-    `);
+    `,
+    );
 
     // Main method: create a complete human body
-    this.bodyFactory.setMethod('createHumanBody', `
+    this.bodyFactory.setMethod(
+      'createHumanBody',
+      `
       const owner = args[0];
       const sex = args[1] || 'non-binary';
       const appearance = args[2] || {};
@@ -476,7 +500,8 @@ export class BodyFactoryBuilder {
       }
 
       return torso;
-    `);
+    `,
+    );
   }
 
   async registerAlias(): Promise<void> {

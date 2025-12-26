@@ -1,5 +1,5 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Builds the Admin prototype
@@ -47,7 +47,10 @@ NOTES: @notes attaches admin notes to objects. Searchable, taggable.`,
     });
 
     // Property descriptions
-    obj.setPropertyDescription('isAdmin', 'Whether this player has admin/builder powers for world creation');
+    obj.setPropertyDescription(
+      'isAdmin',
+      'Whether this player has admin/builder powers for world creation',
+    );
 
     this.addConnectionOverride(obj);
     this.addBuildingCommands(obj);
@@ -66,7 +69,9 @@ NOTES: @notes attaches admin notes to objects. Searchable, taggable.`,
   /** Elevator management commands */
   private addElevatorCommands(obj: RuntimeObject): void {
     // @elevator — interactive elevator creation/wiring
-    obj.setMethod('@elevator', `
+    obj.setMethod(
+      '@elevator',
+      `
       // Menu-driven elevator management
       const aliases = $.system.aliases || {};
       const elevProto = aliases.elevator;
@@ -298,14 +303,17 @@ NOTES: @notes attaches admin notes to objects. Searchable, taggable.`,
             await self.tell('Invalid choice.');
         }
       }
-    `);
+    `,
+    );
   }
 
   /** Door/exit management commands */
 
   private addDoorCommands(obj: RuntimeObject): void {
     // @door <direction> — interactive door/lock management for an exit
-    obj.setMethod('@door', `
+    obj.setMethod(
+      '@door',
+      `
       const direction = (args[0] || '').toLowerCase();
       if (!direction) {
         await self.tell('Usage: @door <direction>');
@@ -470,13 +478,15 @@ NOTES: @notes attaches admin notes to objects. Searchable, taggable.`,
             await self.tell('Invalid choice.');
         }
       }
-    `);
+    `,
+    );
   }
-
 
   private addConnectionOverride(obj: RuntimeObject): void {
     // Override connect to add admin verbs after parent's connect
-    obj.setMethod('connect', `
+    obj.setMethod(
+      'connect',
+      `
       // Register admin verbs BEFORE calling parent
       // (so admin message appears before prompt)
       await self.registerVerb('@dig', self);
@@ -508,12 +518,15 @@ NOTES: @notes attaches admin notes to objects. Searchable, taggable.`,
       // Show admin commands after welcome but before we're done
       // Note: prompt was already shown by parent, so this appears after
       await self.tell('[Admin commands: @dig, @link, @teleport, @examine, @set, @create, @recycle, @eval, @evalm]');
-    `);
+    `,
+    );
   }
 
   private addBuildingCommands(obj: RuntimeObject): void {
     // @dig - Interactive room creation
-    obj.setMethod('@dig', `
+    obj.setMethod(
+      '@dig',
+      `
       /** Create a new room with interactive prompts.
        *  Gathers: name, description, coordinates, exit back to current room.
        */
@@ -640,10 +653,13 @@ NOTES: @notes attaches admin notes to objects. Searchable, taggable.`,
       }
 
       await self.tell('\\r\\nDone! Use "@teleport #' + newRoom.id + '" to go there.');
-    `);
+    `,
+    );
 
     // Helper to get standard aliases for directions
-    obj.setMethod('getExitAliases', `
+    obj.setMethod(
+      'getExitAliases',
+      `
       const direction = args[0]?.toLowerCase();
       const aliasMap = {
         north: ['n'],
@@ -660,10 +676,13 @@ NOTES: @notes attaches admin notes to objects. Searchable, taggable.`,
         out: ['o'],
       };
       return aliasMap[direction] || [];
-    `);
+    `,
+    );
 
     // @link - Create an exit between two existing rooms
-    obj.setMethod('@link', `
+    obj.setMethod(
+      '@link',
+      `
       /** Create an exit from current room to another room.
        *  Usage: @link
        */
@@ -749,10 +768,13 @@ NOTES: @notes attaches admin notes to objects. Searchable, taggable.`,
       }
 
       await self.tell('\\r\\nDone!');
-    `);
+    `,
+    );
 
     // @unlink - Remove an exit
-    obj.setMethod('@unlink', `
+    obj.setMethod(
+      '@unlink',
+      `
       /** Remove an exit from current room.
        *  Usage: @unlink <direction>
        */
@@ -782,10 +804,13 @@ NOTES: @notes attaches admin notes to objects. Searchable, taggable.`,
 
       await currentRoom.removeExit(exit);
       await self.tell('Removed exit ' + exit.name + '.');
-    `);
+    `,
+    );
 
     // @set - Set a property on an object
-    obj.setMethod('@set', `
+    obj.setMethod(
+      '@set',
+      `
       /** Set a property on an object.
        *  Usage: @set #123.property = value
        *  Usage: @set here.property = value
@@ -831,10 +856,13 @@ NOTES: @notes attaches admin notes to objects. Searchable, taggable.`,
       // Set the property
       target.set(propName, value);
       await self.tell('Set ' + target.name + ' (#' + target.id + ').' + propName + ' = ' + JSON.stringify(value));
-    `);
+    `,
+    );
 
     // @create - Create a generic object (defaults to prompt flow)
-    obj.setMethod('@create', `
+    obj.setMethod(
+      '@create',
+      `
       /** Create a new object.
        *  Usage: @create [parent_id]
        */
@@ -873,10 +901,13 @@ NOTES: @notes attaches admin notes to objects. Searchable, taggable.`,
       }, self);
 
       await self.tell('Created object #' + newObj.id + ': ' + name);
-    `);
+    `,
+    );
 
     // @create-object - Guided creation of common items (vendable with lock, locker, bank terminal, etc.)
-    obj.setMethod('@create-object', `
+    obj.setMethod(
+      '@create-object',
+      `
       /** Interactive helper to create common object setups. */
       await self.tell('=== @create-object: Helper ===\\r\\n');
       const menu = [
@@ -1055,11 +1086,13 @@ NOTES: @notes attaches admin notes to objects. Searchable, taggable.`,
         await self.tell('Created object #' + obj.id + '.');
         return;
       }
-    `);
-
+    `,
+    );
 
     // @recycle - Recycle an object
-    obj.setMethod('@recycle', `
+    obj.setMethod(
+      '@recycle',
+      `
       /** Recycle an object.
        *  Usage: @recycle #123
        */
@@ -1094,12 +1127,15 @@ NOTES: @notes attaches admin notes to objects. Searchable, taggable.`,
 
       await $recycler.recycle(target, self);
       await self.tell('Recycled object #' + targetId + '.');
-    `);
+    `,
+    );
   }
 
   private addTeleportCommands(obj: RuntimeObject): void {
     // @teleport - Move to any room
-    obj.setMethod('@teleport', `
+    obj.setMethod(
+      '@teleport',
+      `
       /** Teleport to a room.
        *  Usage: @teleport #123
        *  Usage: @teleport <x> <y> [z]
@@ -1152,17 +1188,23 @@ NOTES: @notes attaches admin notes to objects. Searchable, taggable.`,
         const desc = await destRoom.describe(self);
         await self.tell(desc);
       }
-    `);
+    `,
+    );
 
     // Register @tp as alias
-    obj.setMethod('@tp', `
+    obj.setMethod(
+      '@tp',
+      `
       // Alias for @teleport
       const newCommand = command.replace('@tp', '@teleport');
       return await self['@teleport']();
-    `);
+    `,
+    );
 
     // @goto - Teleport to player (by name)
-    obj.setMethod('@goto', `
+    obj.setMethod(
+      '@goto',
+      `
       /** Teleport to a player's location.
        *  Usage: @goto playername
        */
@@ -1198,10 +1240,13 @@ NOTES: @notes attaches admin notes to objects. Searchable, taggable.`,
         const desc = await destRoom.describe(self);
         await self.tell(desc);
       }
-    `);
+    `,
+    );
 
     // @summon - Bring a player here
-    obj.setMethod('@summon', `
+    obj.setMethod(
+      '@summon',
+      `
       /** Summon a player to your location.
        *  Usage: @summon playername
        */
@@ -1238,12 +1283,15 @@ NOTES: @notes attaches admin notes to objects. Searchable, taggable.`,
         const desc = await currentRoom.describe(targetPlayer);
         await targetPlayer.tell(desc);
       }
-    `);
+    `,
+    );
   }
 
   private addInspectCommands(obj: RuntimeObject): void {
     // @examine - Deep inspect an object
-    obj.setMethod('@examine', `
+    obj.setMethod(
+      '@examine',
+      `
       /** Examine an object's internals.
        *  Usage: @examine #123
        *  Usage: @examine here
@@ -1322,16 +1370,22 @@ NOTES: @notes attaches admin notes to objects. Searchable, taggable.`,
       } else {
         await self.tell('  (none)');
       }
-    `);
+    `,
+    );
 
     // @x as alias for @examine
-    obj.setMethod('@x', `
+    obj.setMethod(
+      '@x',
+      `
       const newCommand = command.replace('@x', '@examine');
       return await self['@examine']();
-    `);
+    `,
+    );
 
     // @find - Find objects by name or type
-    obj.setMethod('@find', `
+    obj.setMethod(
+      '@find',
+      `
       /** Find objects matching criteria.
        *  Usage: @find <name pattern>
        */
@@ -1344,10 +1398,13 @@ NOTES: @notes attaches admin notes to objects. Searchable, taggable.`,
       await self.tell('Searching for objects matching "' + pattern + '"...');
       await self.tell('(Object search not fully implemented yet)');
       // TODO: Implement object search
-    `);
+    `,
+    );
 
     // @where - Show coordinates
-    obj.setMethod('@where', `
+    obj.setMethod(
+      '@where',
+      `
       /** Show current room coordinates.
        *  Usage: @where
        */
@@ -1363,10 +1420,13 @@ NOTES: @notes attaches admin notes to objects. Searchable, taggable.`,
 
       await self.tell('Current location: ' + currentRoom.name + ' (#' + currentRoom.id + ')');
       await self.tell('Coordinates: ' + x + ', ' + y + ', ' + z);
-    `);
+    `,
+    );
 
     // @setVerb - Set/edit a method on an object using multiline input
-    obj.setMethod('@setVerb', `
+    obj.setMethod(
+      '@setVerb',
+      `
       /** Set a method on an object using multiline input.
        *  Usage: @setVerb #123 methodName
        *  Usage: @setVerb here methodName
@@ -1432,10 +1492,13 @@ NOTES: @notes attaches admin notes to objects. Searchable, taggable.`,
       // Set the method
       target.setMethod(methodName, code);
       await self.tell('Set ' + target.name + ' (#' + target.id + ').' + methodName);
-    `);
+    `,
+    );
 
     // @listVerbs - List all methods on an object
-    obj.setMethod('@listVerbs', `
+    obj.setMethod(
+      '@listVerbs',
+      `
       /** List all methods on an object.
        *  Usage: @listVerbs #123
        */
@@ -1476,10 +1539,13 @@ NOTES: @notes attaches admin notes to objects. Searchable, taggable.`,
         const preview = code.substring(0, 50).replace(/\\n/g, ' ');
         await self.tell('  ' + name + ' (' + lines + ' lines): ' + preview + (code.length > 50 ? '...' : ''));
       }
-    `);
+    `,
+    );
 
     // @rmVerb - Remove a method from an object
-    obj.setMethod('@rmVerb', `
+    obj.setMethod(
+      '@rmVerb',
+      `
       /** Remove a method from an object.
        *  Usage: @rmVerb #123 methodName
        */
@@ -1524,12 +1590,15 @@ NOTES: @notes attaches admin notes to objects. Searchable, taggable.`,
 
       target.removeMethod(methodName);
       await self.tell('Removed ' + target.name + ' (#' + target.id + ').' + methodName);
-    `);
+    `,
+    );
   }
 
   private addAliasCommands(obj: RuntimeObject): void {
     // @aliases - List all system aliases
-    obj.setMethod('@aliases', `
+    obj.setMethod(
+      '@aliases',
+      `
       /** List all system aliases ($.* objects).
        *  Usage: @aliases
        */
@@ -1590,10 +1659,13 @@ NOTES: @notes attaches admin notes to objects. Searchable, taggable.`,
       }
 
       await self.tell('\\r\\nTotal: ' + Object.keys(aliases).length + ' aliases');
-    `);
+    `,
+    );
 
     // @alias - Create or show an alias
-    obj.setMethod('@alias', `
+    obj.setMethod(
+      '@alias',
+      `
       /** Create or view a system alias.
        *  Usage: @alias name=#123     - Set alias
        *  Usage: @alias name          - Show alias
@@ -1689,10 +1761,13 @@ NOTES: @notes attaches admin notes to objects. Searchable, taggable.`,
           await self.tell('$.' + name + ' -> #' + objId + ' (' + (obj?.name || 'not found') + ')');
         }
       }
-    `);
+    `,
+    );
 
     // @unalias - Remove an alias
-    obj.setMethod('@unalias', `
+    obj.setMethod(
+      '@unalias',
+      `
       /** Remove a system alias.
        *  Usage: @unalias name
        */
@@ -1720,12 +1795,15 @@ NOTES: @notes attaches admin notes to objects. Searchable, taggable.`,
       delete aliases[name];
       $.system.aliases = aliases;
       await self.tell('Removed alias $.' + name + ' (was #' + oldId + ')');
-    `);
+    `,
+    );
   }
 
   private addEvalCommands(obj: RuntimeObject): void {
     // @eval - Execute single-line MOO code
-    obj.setMethod('@eval', `
+    obj.setMethod(
+      '@eval',
+      `
       /** Execute arbitrary MOO code.
        *  Usage: @eval <code>
        *  Example: @eval self.name = "Test"
@@ -1769,10 +1847,13 @@ NOTES: @notes attaches admin notes to objects. Searchable, taggable.`,
       } catch (err) {
         await player.tell('Error: ' + err.message);
       }
-    `);
+    `,
+    );
 
     // @evalm - Execute multiline MOO code
-    obj.setMethod('@evalm', `
+    obj.setMethod(
+      '@evalm',
+      `
       /** Execute multiline MOO code using $.prompt.multiline.
        *  Enter code, then '.' on its own line to execute.
        *  Type @abort to cancel.
@@ -1832,13 +1913,16 @@ NOTES: @notes attaches admin notes to objects. Searchable, taggable.`,
           }
         }
       }
-    `);
+    `,
+    );
   }
 
   /** AI-controlled human commands */
   private addAiCommands(obj: RuntimeObject): void {
     // @spawn - Create an AI-controlled human
-    obj.setMethod('@spawn', `
+    obj.setMethod(
+      '@spawn',
+      `
       /** Create an AI-controlled human.
        *  Usage: @spawn <role> [name]
        *  Example: @spawn guard Marcus
@@ -1994,10 +2078,13 @@ NOTES: @notes attaches admin notes to objects. Searchable, taggable.`,
       if (location) {
         await player.tell('Placed in: ' + location.name);
       }
-    `);
+    `,
+    );
 
     // @despawn - Remove an AI-controlled human
-    obj.setMethod('@despawn', `
+    obj.setMethod(
+      '@despawn',
+      `
       /** Remove an AI-controlled human.
        *  Usage: @despawn <id or name>
        *  Example: @despawn 567
@@ -2047,10 +2134,13 @@ NOTES: @notes attaches admin notes to objects. Searchable, taggable.`,
 
       await ai.despawn(humanId, true);
       await player.tell('Despawned: ' + name + ' (#' + humanId + ')');
-    `);
+    `,
+    );
 
     // @ai - List AI-controlled humans
-    obj.setMethod('@ai', `
+    obj.setMethod(
+      '@ai',
+      `
       /** List AI-controlled humans.
        *  Usage: @ai
        *  Usage: @ai <role>
@@ -2084,13 +2174,16 @@ NOTES: @notes attaches admin notes to objects. Searchable, taggable.`,
         const desc = await ai.describe();
         await player.tell(desc);
       }
-    `);
+    `,
+    );
   }
 
   /** Note management commands */
   private addNotesCommands(obj: RuntimeObject): void {
     // @notes - Interactive note management for objects
-    obj.setMethod('@notes', `
+    obj.setMethod(
+      '@notes',
+      `
       /** Manage notes attached to objects.
        *  Usage: @notes <#id | here | me>
        *  Usage: @notes (defaults to here)
@@ -2290,6 +2383,7 @@ NOTES: @notes attaches admin notes to objects. Searchable, taggable.`,
             await player.tell('Invalid choice.');
         }
       }
-    `);
+    `,
+    );
   }
 }

@@ -1,5 +1,5 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Builds the BiometricLock prototype
@@ -40,21 +40,30 @@ BYPASS: Cannot be picked like a mechanical lock. Can potentially be bypassed wit
     });
 
     // Add property descriptions
-    obj.setPropertyDescription('scanType', "Type of biometric scan: fingerprint, retinal, palm, voice. Determines what body part player needs.");
-    obj.setPropertyDescription('scanLocation', "Physical location of the scanner for player reference.");
+    obj.setPropertyDescription(
+      'scanType',
+      'Type of biometric scan: fingerprint, retinal, palm, voice. Determines what body part player needs.',
+    );
+    obj.setPropertyDescription(
+      'scanLocation',
+      'Physical location of the scanner for player reference.',
+    );
 
     // Inherits isAuthorized, authorize, revoke from $lock
     // AI interprets abilities to determine if scanning succeeds
 
     // Legacy canAccess - simplified, just checks verifiedUsers
     // AI handles the biometric scan requirements via abilities
-    obj.setMethod('canAccess', `
+    obj.setMethod(
+      'canAccess',
+      `
       const agent = args[0];
       if (await self.isAuthorized(agent)) {
         return true;
       }
       return 'Access denied. Biometric signature not recognized.';
-    `);
+    `,
+    );
 
     return obj;
   }

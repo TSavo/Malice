@@ -26,7 +26,7 @@ async function main() {
     console.log('🔐 Auth: Using Claude Code credentials (if available)');
   }
 
-  console.log('🤖 Creating NPC Agent for Marcus Webb (#' + NPC_ID + ')...\n');
+  console.log(`🤖 Creating NPC Agent for Marcus Webb (#${NPC_ID})...\n`);
 
   const agent = new NPCAgent({
     npcId: NPC_ID,
@@ -51,7 +51,7 @@ async function main() {
 
   try {
     const response = await agent.prompt(
-      'Look around your current location using get_room_info. Then say hello to anyone present.'
+      'Look around your current location using get_room_info. Then say hello to anyone present.',
     );
 
     console.log('\n📥 Response:\n');

@@ -1,13 +1,13 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import {
-  MinimalBootstrap,
-  PrototypeBuilder,
-  CoreSystemBuilder,
+  AliasLoader,
   AuthManagerBuilder,
   CharGenBuilder,
+  CoreSystemBuilder,
+  MinimalBootstrap,
   PreAuthHandlerBuilder,
+  PrototypeBuilder,
   RecyclerBuilder,
-  AliasLoader,
 } from '../../src/database/bootstrap/index.js';
 
 describe('Bootstrap Index Exports', () => {

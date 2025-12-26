@@ -1,5 +1,5 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Builds the Clothing prototype
@@ -65,7 +65,9 @@ FIRE: Most fabrics burn. Fire damage destroys clothing, may injure wearer.`,
     });
 
     // Wear this clothing item (AI calls this directly)
-    obj.setMethod('doWear', `
+    obj.setMethod(
+      'doWear',
+      `
       /** Wear this clothing item.
        *  @param wearer - The agent wearing the item (defaults to player)
        *  @returns Message string or error
@@ -91,10 +93,13 @@ FIRE: Most fabrics burn. Fire damage destroys clothing, may injure wearer.`,
       }
 
       return result.message;
-    `);
+    `,
+    );
 
     // Remove clothing - AI calls this directly
-    obj.setMethod('doRemove', `
+    obj.setMethod(
+      'doRemove',
+      `
       /** Remove this clothing item.
        *  @param wearer - The agent removing the item (defaults to player)
        *  @returns Message string or error
@@ -150,10 +155,13 @@ FIRE: Most fabrics burn. Fire damage destroys clothing, may injure wearer.`,
       }
 
       return result.message;
-    `);
+    `,
+    );
 
     // Hook called when clothing arrives somewhere
-    obj.setMethod('onArrived', `
+    obj.setMethod(
+      'onArrived',
+      `
       /** Called when this clothing arrives somewhere.
        *  Can be used for location-based effects.
        */
@@ -161,10 +169,13 @@ FIRE: Most fabrics burn. Fire damage destroys clothing, may injure wearer.`,
       const source = args[1];
       const mover = args[2];
       // No verb registration - AI handles wear/remove commands directly
-    `);
+    `,
+    );
 
     // Hook called when clothing leaves somewhere
-    obj.setMethod('onLeaving', `
+    obj.setMethod(
+      'onLeaving',
+      `
       /** Called when this clothing is about to leave somewhere.
        *  Can be used for cleanup effects.
        */
@@ -172,10 +183,13 @@ FIRE: Most fabrics burn. Fire damage destroys clothing, may injure wearer.`,
       const dest = args[1];
       const mover = args[2];
       // No verb unregistration - AI handles wear/remove commands directly
-    `);
+    `,
+    );
 
     // Override describe to include material and color
-    obj.setMethod('describe', `
+    obj.setMethod(
+      'describe',
+      `
       /** Get full description of this clothing.
        *  @returns Description string
        */
@@ -220,13 +234,16 @@ FIRE: Most fabrics burn. Fire damage destroys clothing, may injure wearer.`,
       }
 
       return desc.trim();
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // POCKET ACCESS
     // ═══════════════════════════════════════════════════════════════════
 
-    obj.setMethod('getPocket', `
+    obj.setMethod(
+      'getPocket',
+      `
       /** Find a pocket by name (case-insensitive partial match).
        *  @param name - The pocket name to search for (e.g., "left", "right pocket")
        *  @returns The pocket object, or null if not found
@@ -264,9 +281,12 @@ FIRE: Most fabrics burn. Fire damage destroys clothing, may injure wearer.`,
       }
 
       return null;
-    `);
+    `,
+    );
 
-    obj.setMethod('listPockets', `
+    obj.setMethod(
+      'listPockets',
+      `
       /** Get descriptions of all pockets.
        *  @returns Array of pocket descriptions
        */
@@ -282,12 +302,25 @@ FIRE: Most fabrics burn. Fire damage destroys clothing, may injure wearer.`,
       }
 
       return descriptions;
-    `);
+    `,
+    );
 
-    obj.setPropertyDescription('material', 'Fabric type (cotton, wool, leather, synthetic). Affects warmth, durability, and water resistance.');
-    obj.setPropertyDescription('color', 'Color of the garment. Can be dyed or stained. Blood stains are incriminating evidence.');
-    obj.setPropertyDescription('condition', 'Wear condition (0-100). Degrades with use and damage. Low condition reduces warmth and can be repaired.');
-    obj.setPropertyDescription('pockets', 'Array of pocket objects attached to this garment. Use getPocket(name) to access.');
+    obj.setPropertyDescription(
+      'material',
+      'Fabric type (cotton, wool, leather, synthetic). Affects warmth, durability, and water resistance.',
+    );
+    obj.setPropertyDescription(
+      'color',
+      'Color of the garment. Can be dyed or stained. Blood stains are incriminating evidence.',
+    );
+    obj.setPropertyDescription(
+      'condition',
+      'Wear condition (0-100). Degrades with use and damage. Low condition reduces warmth and can be repaired.',
+    );
+    obj.setPropertyDescription(
+      'pockets',
+      'Array of pocket objects attached to this garment. Use getPocket(name) to access.',
+    );
 
     return obj;
   }

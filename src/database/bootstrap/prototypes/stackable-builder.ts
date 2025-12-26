@@ -1,5 +1,5 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Builds the Stackable prototype
@@ -64,17 +64,22 @@ OPERATIONS:
     // ═══════════════════════════════════════════════════════════════════
 
     // canStackWith(other) - check if two stacks can merge
-    obj.setMethod('canStackWith', `
+    obj.setMethod(
+      'canStackWith',
+      `
       const other = args[0];
 
       if (!other) return false;
       if (!self.stackType || !other.stackType) return false;
 
       return self.stackType === other.stackType;
-    `);
+    `,
+    );
 
     // merge(other) - combine quantities, recycle the other stack
-    obj.setMethod('merge', `
+    obj.setMethod(
+      'merge',
+      `
       const other = args[0];
 
       if (!other) {
@@ -100,10 +105,13 @@ OPERATIONS:
       }
 
       return { success: true, quantity: self.quantity };
-    `);
+    `,
+    );
 
     // split(amount) - create a new stack with the given amount
-    obj.setMethod('split', `
+    obj.setMethod(
+      'split',
+      `
       const amount = args[0];
 
       // Validate amount
@@ -155,14 +163,17 @@ OPERATIONS:
       }
 
       return { success: true, newStack: newStack, remaining: self.quantity };
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // AUTO-MERGE ON ARRIVAL
     // ═══════════════════════════════════════════════════════════════════
 
     // onArrived - check for matching stacks and merge
-    obj.setMethod('onArrived', `
+    obj.setMethod(
+      'onArrived',
+      `
       const dest = args[0];
       const source = args[1];
       const mover = args[2];
@@ -180,14 +191,17 @@ OPERATIONS:
           return;  // We've been recycled, stop
         }
       }
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // DISPLAY
     // ═══════════════════════════════════════════════════════════════════
 
     // describe - show quantity and type
-    obj.setMethod('describe', `
+    obj.setMethod(
+      'describe',
+      `
       const qty = self.quantity || 0;
       const unit = self.unit || '';
       const type = self.stackType || 'unknown';
@@ -211,10 +225,13 @@ OPERATIONS:
       }
 
       return desc;
-    `);
+    `,
+    );
 
     // shortDesc - brief description for lists
-    obj.setMethod('shortDesc', `
+    obj.setMethod(
+      'shortDesc',
+      `
       const qty = self.quantity || 0;
       const unit = self.unit || '';
       const name = self.name || 'stack';
@@ -223,19 +240,25 @@ OPERATIONS:
         return qty + ' ' + unit + ' ' + name;
       }
       return qty + 'x ' + name;
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // UTILITIES
     // ═══════════════════════════════════════════════════════════════════
 
     // isEmpty - check if stack is empty (should be recycled)
-    obj.setMethod('isEmpty', `
+    obj.setMethod(
+      'isEmpty',
+      `
       return (self.quantity || 0) <= 0;
-    `);
+    `,
+    );
 
     // add(amount) - increase quantity (for creation/spawning)
-    obj.setMethod('add', `
+    obj.setMethod(
+      'add',
+      `
       const amount = args[0];
 
       if (typeof amount !== 'number' || !Number.isInteger(amount) || amount <= 0) {
@@ -244,10 +267,13 @@ OPERATIONS:
 
       self.quantity = (self.quantity || 0) + amount;
       return { success: true, quantity: self.quantity };
-    `);
+    `,
+    );
 
     // remove(amount) - decrease quantity, return success
-    obj.setMethod('remove', `
+    obj.setMethod(
+      'remove',
+      `
       const amount = args[0];
 
       if (typeof amount !== 'number' || !Number.isInteger(amount) || amount <= 0) {
@@ -263,13 +289,26 @@ OPERATIONS:
 
       // If empty, should be recycled by caller
       return { success: true, quantity: self.quantity, empty: self.quantity === 0 };
-    `);
+    `,
+    );
 
     // Add property descriptions
-    obj.setPropertyDescription('stackType', 'Unique identifier for stack category (e.g., "cash:usd", "ammo:9mm", "drug:synth", "scrap:copper"). Stacks auto-merge if types match.');
-    obj.setPropertyDescription('quantity', 'Integer count of items in this stack. Must be positive. Stack is recycled when quantity reaches 0.');
-    obj.setPropertyDescription('unit', 'Display unit for quantity (e.g., "USD", "rounds", "g", "oz"). Used in descriptions and shortDesc.');
-    obj.setPropertyDescription('contraband', 'Boolean flag marking this item as illegal to possess. May be searched for or confiscated by authorities.');
+    obj.setPropertyDescription(
+      'stackType',
+      'Unique identifier for stack category (e.g., "cash:usd", "ammo:9mm", "drug:synth", "scrap:copper"). Stacks auto-merge if types match.',
+    );
+    obj.setPropertyDescription(
+      'quantity',
+      'Integer count of items in this stack. Must be positive. Stack is recycled when quantity reaches 0.',
+    );
+    obj.setPropertyDescription(
+      'unit',
+      'Display unit for quantity (e.g., "USD", "rounds", "g", "oz"). Used in descriptions and shortDesc.',
+    );
+    obj.setPropertyDescription(
+      'contraband',
+      'Boolean flag marking this item as illegal to possess. May be searched for or confiscated by authorities.',
+    );
 
     return obj;
   }

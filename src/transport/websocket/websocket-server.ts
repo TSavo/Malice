@@ -1,10 +1,10 @@
-import { WebSocketServer as WSServer, WebSocket } from 'ws';
+import type { IncomingMessage } from 'node:http';
 import { Subject } from 'rxjs';
-import { IncomingMessage } from 'http';
-import { WebSocketTransport } from './websocket-transport.js';
-import type { TransportServerConfig } from '../../../types/transport.js';
+import { type WebSocket, WebSocketServer as WSServer } from 'ws';
 import type { AuthInfo } from '../../../types/auth.js';
+import type { TransportServerConfig } from '../../../types/transport.js';
 import { Connection } from '../../connection/connection.js';
+import { WebSocketTransport } from './websocket-transport.js';
 
 /**
  * WebSocket server
@@ -47,7 +47,9 @@ export class WebSocketServer {
 
     this.server.on('listening', () => {
       if (this.config.debug) {
-        console.log(`[WebSocketServer] Listening on ${this.config.host || '0.0.0.0'}:${this.config.port}`);
+        console.log(
+          `[WebSocketServer] Listening on ${this.config.host || '0.0.0.0'}:${this.config.port}`,
+        );
       }
     });
   }
@@ -84,7 +86,9 @@ export class WebSocketServer {
         };
 
         if (this.config.debug) {
-          console.log(`[WebSocketServer] HTTP Basic Auth detected for user: ${username}`);
+          console.log(
+            `[WebSocketServer] HTTP Basic Auth detected for user: ${username}`,
+          );
         }
       }
     }

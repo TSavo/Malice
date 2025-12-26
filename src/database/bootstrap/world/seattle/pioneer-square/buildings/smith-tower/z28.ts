@@ -9,7 +9,6 @@ export const building = {
       exits: { out: '%EL_z28' },
     },
 
-
     // Rentable locks
     '%RL_A2_z28': {
       prototype: 'rentableLock',
@@ -32,7 +31,6 @@ export const building = {
       price: 2000,
       duration: 2678400000,
     },
-
 
     // Doors
     '%D_A2_z28': {
@@ -60,12 +58,14 @@ export const building = {
       locks: ['%RL_C3_z28'],
     },
 
-
     // Elevator landing
     '%EL_z28': {
       name: 'Smith Tower - 28th Floor - Elevator Landing',
-      description: 'A compact landing with scuffed brass trim and a single call panel.',
-      x: -12, y: 10, z: 28,
+      description:
+        'A compact landing with scuffed brass trim and a single call panel.',
+      x: -12,
+      y: 10,
+      z: 28,
       exits: {
         north: { room: '%A2_z28', door: '%D_A2_z28' },
         east: { room: '%B2_z28', door: '%D_B2_z28' },
@@ -74,33 +74,41 @@ export const building = {
         in: '%E',
       },
       methods: {
-        onContentArrived: "const obj = args[0];\nif (!obj?.registerVerb) return;\nawait obj.registerVerb(['call elevator', 'summon elevator', 'press elevator button'], self, 'callElevator');",
-        onContentLeaving: "const obj = args[0];\nif (obj?.unregisterVerbsFrom) {\n  await obj.unregisterVerbsFrom(self.id);\n}",
-        callElevator: "const player = args[0];\nconst floorNumber = 28;\nconst elevator = self.elevator || null;\n\nif (!elevator) {\n  return 'The call button clicks uselessly. No power.';\n}\n\nif (elevator.currentFloor === floorNumber) {\n  if (!elevator.doorsOpen && elevator.openDoors) {\n    await elevator.openDoors();\n  }\n  return 'The elevator is already here.';\n}\n\nif (elevator.selectFloor) {\n  const result = await elevator.selectFloor(player, floorNumber);\n  return result?.message || 'You press the button. Machinery stirs above.';\n}\n\nreturn 'The button light flickers, but nothing happens.';",
+        onContentArrived:
+          "const obj = args[0];\nif (!obj?.registerVerb) return;\nawait obj.registerVerb(['call elevator', 'summon elevator', 'press elevator button'], self, 'callElevator');",
+        onContentLeaving:
+          'const obj = args[0];\nif (obj?.unregisterVerbsFrom) {\n  await obj.unregisterVerbsFrom(self.id);\n}',
+        callElevator:
+          "const player = args[0];\nconst floorNumber = 28;\nconst elevator = self.elevator || null;\n\nif (!elevator) {\n  return 'The call button clicks uselessly. No power.';\n}\n\nif (elevator.currentFloor === floorNumber) {\n  if (!elevator.doorsOpen && elevator.openDoors) {\n    await elevator.openDoors();\n  }\n  return 'The elevator is already here.';\n}\n\nif (elevator.selectFloor) {\n  const result = await elevator.selectFloor(player, floorNumber);\n  return result?.message || 'You press the button. Machinery stirs above.';\n}\n\nreturn 'The button light flickers, but nothing happens.';",
       },
       elevatorId: '%E',
     },
 
-
     // Condo units
-
 
     '%A1_z28': {
       name: 'Smith Tower - 28th Floor - North Suite - Living Room',
       description: 'A corner unit with tall windows and pale wood floors.',
-      x: -13, y: 11, z: 28,
-      exits: {"east":"%A2_z28"},
+      x: -13,
+      y: 11,
+      z: 28,
+      exits: { east: '%A2_z28' },
       methods: {
-        onContentArrived: "const obj = args[0];\nif (!obj?.registerVerb) return;\nawait obj.registerVerb(['look out window', 'look through window', 'gaze out window', 'look down'], self, 'lookOutWindow');",
-        onContentLeaving: "const obj = args[0];\nif (obj?.unregisterVerbsFrom) {\n  await obj.unregisterVerbsFrom(self.id);\n}",
-        lookOutWindow: "const player = args[0];\nreturn 'From this height above Pioneer Square, you see nothing. Empty streets, rusted vehicles frozen mid-journey, weeds claiming the pavement. The only movement is wind stirring debris and the occasional bird cutting across the grey sky. The glass rattles in its frame as you stare down at fifty-five years of silence (floor 28).';",
-        onAnnounce: "const msg = args[0];\nawait self.tell(\"Through the window you notice below: \" + msg);",
+        onContentArrived:
+          "const obj = args[0];\nif (!obj?.registerVerb) return;\nawait obj.registerVerb(['look out window', 'look through window', 'gaze out window', 'look down'], self, 'lookOutWindow');",
+        onContentLeaving:
+          'const obj = args[0];\nif (obj?.unregisterVerbsFrom) {\n  await obj.unregisterVerbsFrom(self.id);\n}',
+        lookOutWindow:
+          "const player = args[0];\nreturn 'From this height above Pioneer Square, you see nothing. Empty streets, rusted vehicles frozen mid-journey, weeds claiming the pavement. The only movement is wind stirring debris and the occasional bird cutting across the grey sky. The glass rattles in its frame as you stare down at fifty-five years of silence (floor 28).';",
+        onAnnounce:
+          'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       sittables: [
         {
           name: 'a worn couch',
           capacity: 3,
-          emptyMsg: 'A faded couch sits against the wall, cushions compressed from years of use.',
+          emptyMsg:
+            'A faded couch sits against the wall, cushions compressed from years of use.',
           occupiedMsg: '%s sprawled on the couch.',
         },
       ],
@@ -108,20 +116,32 @@ export const building = {
 
     '%A2_z28': {
       name: 'Smith Tower - 28th Floor - North Suite - Bedroom',
-      description: 'A bright one-bedroom overlooking the skyline, hall-facing door to the south.',
-      x: -12, y: 11, z: 28,
-      exits: {"west":"%A1_z28","east":"%A3_z28","south":{"room":"%EL_z28","door":"%D_A2_z28"}},
+      description:
+        'A bright one-bedroom overlooking the skyline, hall-facing door to the south.',
+      x: -12,
+      y: 11,
+      z: 28,
+      exits: {
+        west: '%A1_z28',
+        east: '%A3_z28',
+        south: { room: '%EL_z28', door: '%D_A2_z28' },
+      },
       methods: {
-        onContentArrived: "const obj = args[0];\nif (!obj?.registerVerb) return;\nawait obj.registerVerb(['look out window', 'look through window', 'gaze out window', 'look down'], self, 'lookOutWindow');",
-        onContentLeaving: "const obj = args[0];\nif (obj?.unregisterVerbsFrom) {\n  await obj.unregisterVerbsFrom(self.id);\n}",
-        lookOutWindow: "const player = args[0];\nreturn 'From this height above Pioneer Square, you see nothing. Empty streets, rusted vehicles frozen mid-journey, weeds claiming the pavement. The only movement is wind stirring debris and the occasional bird cutting across the grey sky. The glass rattles in its frame as you stare down at fifty-five years of silence (floor 28).';",
-        onAnnounce: "const msg = args[0];\nawait self.tell(\"Through the window you notice below: \" + msg);",
+        onContentArrived:
+          "const obj = args[0];\nif (!obj?.registerVerb) return;\nawait obj.registerVerb(['look out window', 'look through window', 'gaze out window', 'look down'], self, 'lookOutWindow');",
+        onContentLeaving:
+          'const obj = args[0];\nif (obj?.unregisterVerbsFrom) {\n  await obj.unregisterVerbsFrom(self.id);\n}',
+        lookOutWindow:
+          "const player = args[0];\nreturn 'From this height above Pioneer Square, you see nothing. Empty streets, rusted vehicles frozen mid-journey, weeds claiming the pavement. The only movement is wind stirring debris and the occasional bird cutting across the grey sky. The glass rattles in its frame as you stare down at fifty-five years of silence (floor 28).';",
+        onAnnounce:
+          'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       sittables: [
         {
           name: 'a dusty bed',
           capacity: 2,
-          emptyMsg: 'A queen bed sits against the wall, sheets grey with age but still intact.',
+          emptyMsg:
+            'A queen bed sits against the wall, sheets grey with age but still intact.',
           occupiedMsg: '%s resting on the bed.',
         },
       ],
@@ -129,20 +149,28 @@ export const building = {
 
     '%A3_z28': {
       name: 'Smith Tower - 28th Floor - North Suite - Studio',
-      description: 'A long studio with exposed brick and a narrow galley kitchen.',
-      x: -11, y: 11, z: 28,
-      exits: {"west":"%A2_z28"},
+      description:
+        'A long studio with exposed brick and a narrow galley kitchen.',
+      x: -11,
+      y: 11,
+      z: 28,
+      exits: { west: '%A2_z28' },
       methods: {
-        onContentArrived: "const obj = args[0];\nif (!obj?.registerVerb) return;\nawait obj.registerVerb(['look out window', 'look through window', 'gaze out window', 'look down'], self, 'lookOutWindow');",
-        onContentLeaving: "const obj = args[0];\nif (obj?.unregisterVerbsFrom) {\n  await obj.unregisterVerbsFrom(self.id);\n}",
-        lookOutWindow: "const player = args[0];\nreturn 'From this height above Pioneer Square, you see nothing. Empty streets, rusted vehicles frozen mid-journey, weeds claiming the pavement. The only movement is wind stirring debris and the occasional bird cutting across the grey sky. The glass rattles in its frame as you stare down at fifty-five years of silence (floor 28).';",
-        onAnnounce: "const msg = args[0];\nawait self.tell(\"Through the window you notice below: \" + msg);",
+        onContentArrived:
+          "const obj = args[0];\nif (!obj?.registerVerb) return;\nawait obj.registerVerb(['look out window', 'look through window', 'gaze out window', 'look down'], self, 'lookOutWindow');",
+        onContentLeaving:
+          'const obj = args[0];\nif (obj?.unregisterVerbsFrom) {\n  await obj.unregisterVerbsFrom(self.id);\n}',
+        lookOutWindow:
+          "const player = args[0];\nreturn 'From this height above Pioneer Square, you see nothing. Empty streets, rusted vehicles frozen mid-journey, weeds claiming the pavement. The only movement is wind stirring debris and the occasional bird cutting across the grey sky. The glass rattles in its frame as you stare down at fifty-five years of silence (floor 28).';",
+        onAnnounce:
+          'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       sittables: [
         {
           name: 'a threadbare futon',
           capacity: 2,
-          emptyMsg: 'A futon frame holds a thin mattress, serving as both couch and bed.',
+          emptyMsg:
+            'A futon frame holds a thin mattress, serving as both couch and bed.',
           occupiedMsg: '%s lounging on the futon.',
         },
       ],
@@ -150,26 +178,35 @@ export const building = {
 
     '%B1_z28': {
       name: 'Smith Tower - 28th Floor - East Suite - Loft',
-      description: 'A lofted corner with sloped ceiling beams and a compact mezzanine.',
-      x: -10, y: 11, z: 28,
-      exits: {"south":"%B2_z28"},
+      description:
+        'A lofted corner with sloped ceiling beams and a compact mezzanine.',
+      x: -10,
+      y: 11,
+      z: 28,
+      exits: { south: '%B2_z28' },
       methods: {
-        onContentArrived: "const obj = args[0];\nif (!obj?.registerVerb) return;\nawait obj.registerVerb(['look out window', 'look through window', 'gaze out window', 'look down'], self, 'lookOutWindow');",
-        onContentLeaving: "const obj = args[0];\nif (obj?.unregisterVerbsFrom) {\n  await obj.unregisterVerbsFrom(self.id);\n}",
-        lookOutWindow: "const player = args[0];\nreturn 'From this height above Pioneer Square, you see nothing. Empty streets, rusted vehicles frozen mid-journey, weeds claiming the pavement. The only movement is wind stirring debris and the occasional bird cutting across the grey sky. The glass rattles in its frame as you stare down at fifty-five years of silence (floor 28).';",
-        onAnnounce: "const msg = args[0];\nawait self.tell(\"Through the window you notice below: \" + msg);",
+        onContentArrived:
+          "const obj = args[0];\nif (!obj?.registerVerb) return;\nawait obj.registerVerb(['look out window', 'look through window', 'gaze out window', 'look down'], self, 'lookOutWindow');",
+        onContentLeaving:
+          'const obj = args[0];\nif (obj?.unregisterVerbsFrom) {\n  await obj.unregisterVerbsFrom(self.id);\n}',
+        lookOutWindow:
+          "const player = args[0];\nreturn 'From this height above Pioneer Square, you see nothing. Empty streets, rusted vehicles frozen mid-journey, weeds claiming the pavement. The only movement is wind stirring debris and the occasional bird cutting across the grey sky. The glass rattles in its frame as you stare down at fifty-five years of silence (floor 28).';",
+        onAnnounce:
+          'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       sittables: [
         {
           name: 'a sagging couch',
           capacity: 3,
-          emptyMsg: 'A couch sits beneath the mezzanine, fabric worn smooth at the armrests.',
+          emptyMsg:
+            'A couch sits beneath the mezzanine, fabric worn smooth at the armrests.',
           occupiedMsg: '%s settled into the couch.',
         },
         {
           name: 'a loft bed',
           capacity: 1,
-          emptyMsg: 'A narrow bed occupies the mezzanine above, accessible by ladder.',
+          emptyMsg:
+            'A narrow bed occupies the mezzanine above, accessible by ladder.',
           occupiedMsg: '%s up in the loft bed.',
         },
       ],
@@ -177,20 +214,28 @@ export const building = {
 
     '%C1_z28': {
       name: 'Smith Tower - 28th Floor - South Suite - Alcove',
-      description: 'A snug unit tucked behind the shaft, with one frosted window.',
-      x: -13, y: 10, z: 28,
-      exits: {"south":"%C2_z28","east":"%EL_z28"},
+      description:
+        'A snug unit tucked behind the shaft, with one frosted window.',
+      x: -13,
+      y: 10,
+      z: 28,
+      exits: { south: '%C2_z28', east: '%EL_z28' },
       methods: {
-        onContentArrived: "const obj = args[0];\nif (!obj?.registerVerb) return;\nawait obj.registerVerb(['look out window', 'look through window', 'gaze out window', 'look down'], self, 'lookOutWindow');",
-        onContentLeaving: "const obj = args[0];\nif (obj?.unregisterVerbsFrom) {\n  await obj.unregisterVerbsFrom(self.id);\n}",
-        lookOutWindow: "const player = args[0];\nreturn 'From this height above Pioneer Square, you see nothing. Empty streets, rusted vehicles frozen mid-journey, weeds claiming the pavement. The only movement is wind stirring debris and the occasional bird cutting across the grey sky. The glass rattles in its frame as you stare down at fifty-five years of silence (floor 28).';",
-        onAnnounce: "const msg = args[0];\nawait self.tell(\"Through the window you notice below: \" + msg);",
+        onContentArrived:
+          "const obj = args[0];\nif (!obj?.registerVerb) return;\nawait obj.registerVerb(['look out window', 'look through window', 'gaze out window', 'look down'], self, 'lookOutWindow');",
+        onContentLeaving:
+          'const obj = args[0];\nif (obj?.unregisterVerbsFrom) {\n  await obj.unregisterVerbsFrom(self.id);\n}',
+        lookOutWindow:
+          "const player = args[0];\nreturn 'From this height above Pioneer Square, you see nothing. Empty streets, rusted vehicles frozen mid-journey, weeds claiming the pavement. The only movement is wind stirring debris and the occasional bird cutting across the grey sky. The glass rattles in its frame as you stare down at fifty-five years of silence (floor 28).';",
+        onAnnounce:
+          'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       sittables: [
         {
           name: 'a narrow cot',
           capacity: 1,
-          emptyMsg: 'A military-style cot is wedged into the corner, blanket folded at the foot.',
+          emptyMsg:
+            'A military-style cot is wedged into the corner, blanket folded at the foot.',
           occupiedMsg: '%s lying on the cot.',
         },
       ],
@@ -198,20 +243,33 @@ export const building = {
 
     '%B2_z28': {
       name: 'Smith Tower - 28th Floor - East Suite - Living Room',
-      description: 'A two-room suite with a west-facing door toward the elevator.',
-      x: -11, y: 10, z: 28,
-      exits: {"north":"%B1_z28","east":"%B3_z28","west":{"room":"%EL_z28","door":"%D_B2_z28"},"south":"%B4_z28"},
+      description:
+        'A two-room suite with a west-facing door toward the elevator.',
+      x: -11,
+      y: 10,
+      z: 28,
+      exits: {
+        north: '%B1_z28',
+        east: '%B3_z28',
+        west: { room: '%EL_z28', door: '%D_B2_z28' },
+        south: '%B4_z28',
+      },
       methods: {
-        onContentArrived: "const obj = args[0];\nif (!obj?.registerVerb) return;\nawait obj.registerVerb(['look out window', 'look through window', 'gaze out window', 'look down'], self, 'lookOutWindow');",
-        onContentLeaving: "const obj = args[0];\nif (obj?.unregisterVerbsFrom) {\n  await obj.unregisterVerbsFrom(self.id);\n}",
-        lookOutWindow: "const player = args[0];\nreturn 'From this height above Pioneer Square, you see nothing. Empty streets, rusted vehicles frozen mid-journey, weeds claiming the pavement. The only movement is wind stirring debris and the occasional bird cutting across the grey sky. The glass rattles in its frame as you stare down at fifty-five years of silence (floor 28).';",
-        onAnnounce: "const msg = args[0];\nawait self.tell(\"Through the window you notice below: \" + msg);",
+        onContentArrived:
+          "const obj = args[0];\nif (!obj?.registerVerb) return;\nawait obj.registerVerb(['look out window', 'look through window', 'gaze out window', 'look down'], self, 'lookOutWindow');",
+        onContentLeaving:
+          'const obj = args[0];\nif (obj?.unregisterVerbsFrom) {\n  await obj.unregisterVerbsFrom(self.id);\n}',
+        lookOutWindow:
+          "const player = args[0];\nreturn 'From this height above Pioneer Square, you see nothing. Empty streets, rusted vehicles frozen mid-journey, weeds claiming the pavement. The only movement is wind stirring debris and the occasional bird cutting across the grey sky. The glass rattles in its frame as you stare down at fifty-five years of silence (floor 28).';",
+        onAnnounce:
+          'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       sittables: [
         {
           name: 'a faded sectional',
           capacity: 4,
-          emptyMsg: 'A large sectional sofa dominates the main room, cushions sunken but serviceable.',
+          emptyMsg:
+            'A large sectional sofa dominates the main room, cushions sunken but serviceable.',
           occupiedMsg: '%s sunk into the sectional.',
         },
       ],
@@ -219,20 +277,28 @@ export const building = {
 
     '%B3_z28': {
       name: 'Smith Tower - 28th Floor - East Suite - Den',
-      description: 'A narrow end unit with a bay of small windows and built-ins.',
-      x: -10, y: 10, z: 28,
-      exits: {"west":"%B2_z28"},
+      description:
+        'A narrow end unit with a bay of small windows and built-ins.',
+      x: -10,
+      y: 10,
+      z: 28,
+      exits: { west: '%B2_z28' },
       methods: {
-        onContentArrived: "const obj = args[0];\nif (!obj?.registerVerb) return;\nawait obj.registerVerb(['look out window', 'look through window', 'gaze out window', 'look down'], self, 'lookOutWindow');",
-        onContentLeaving: "const obj = args[0];\nif (obj?.unregisterVerbsFrom) {\n  await obj.unregisterVerbsFrom(self.id);\n}",
-        lookOutWindow: "const player = args[0];\nreturn 'From this height above Pioneer Square, you see nothing. Empty streets, rusted vehicles frozen mid-journey, weeds claiming the pavement. The only movement is wind stirring debris and the occasional bird cutting across the grey sky. The glass rattles in its frame as you stare down at fifty-five years of silence (floor 28).';",
-        onAnnounce: "const msg = args[0];\nawait self.tell(\"Through the window you notice below: \" + msg);",
+        onContentArrived:
+          "const obj = args[0];\nif (!obj?.registerVerb) return;\nawait obj.registerVerb(['look out window', 'look through window', 'gaze out window', 'look down'], self, 'lookOutWindow');",
+        onContentLeaving:
+          'const obj = args[0];\nif (obj?.unregisterVerbsFrom) {\n  await obj.unregisterVerbsFrom(self.id);\n}',
+        lookOutWindow:
+          "const player = args[0];\nreturn 'From this height above Pioneer Square, you see nothing. Empty streets, rusted vehicles frozen mid-journey, weeds claiming the pavement. The only movement is wind stirring debris and the occasional bird cutting across the grey sky. The glass rattles in its frame as you stare down at fifty-five years of silence (floor 28).';",
+        onAnnounce:
+          'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       sittables: [
         {
           name: 'a reading chair',
           capacity: 1,
-          emptyMsg: 'A wingback chair sits by the window bay, upholstery cracked but comfortable.',
+          emptyMsg:
+            'A wingback chair sits by the window bay, upholstery cracked but comfortable.',
           occupiedMsg: '%s curled up in the reading chair.',
         },
       ],
@@ -241,19 +307,26 @@ export const building = {
     '%C2_z28': {
       name: 'Smith Tower - 28th Floor - South Suite - Living Room',
       description: 'A corner unit with western exposure and aged carpeting.',
-      x: -13, y: 9, z: 28,
-      exits: {"north":"%C1_z28","east":"%C3_z28"},
+      x: -13,
+      y: 9,
+      z: 28,
+      exits: { north: '%C1_z28', east: '%C3_z28' },
       methods: {
-        onContentArrived: "const obj = args[0];\nif (!obj?.registerVerb) return;\nawait obj.registerVerb(['look out window', 'look through window', 'gaze out window', 'look down'], self, 'lookOutWindow');",
-        onContentLeaving: "const obj = args[0];\nif (obj?.unregisterVerbsFrom) {\n  await obj.unregisterVerbsFrom(self.id);\n}",
-        lookOutWindow: "const player = args[0];\nreturn 'From this height above Pioneer Square, you see nothing. Empty streets, rusted vehicles frozen mid-journey, weeds claiming the pavement. The only movement is wind stirring debris and the occasional bird cutting across the grey sky. The glass rattles in its frame as you stare down at fifty-five years of silence (floor 28).';",
-        onAnnounce: "const msg = args[0];\nawait self.tell(\"Through the window you notice below: \" + msg);",
+        onContentArrived:
+          "const obj = args[0];\nif (!obj?.registerVerb) return;\nawait obj.registerVerb(['look out window', 'look through window', 'gaze out window', 'look down'], self, 'lookOutWindow');",
+        onContentLeaving:
+          'const obj = args[0];\nif (obj?.unregisterVerbsFrom) {\n  await obj.unregisterVerbsFrom(self.id);\n}',
+        lookOutWindow:
+          "const player = args[0];\nreturn 'From this height above Pioneer Square, you see nothing. Empty streets, rusted vehicles frozen mid-journey, weeds claiming the pavement. The only movement is wind stirring debris and the occasional bird cutting across the grey sky. The glass rattles in its frame as you stare down at fifty-five years of silence (floor 28).';",
+        onAnnounce:
+          'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       sittables: [
         {
           name: 'an old loveseat',
           capacity: 2,
-          emptyMsg: 'A compact loveseat faces the window, fabric faded to an indeterminate beige.',
+          emptyMsg:
+            'A compact loveseat faces the window, fabric faded to an indeterminate beige.',
           occupiedMsg: '%s squeezed onto the loveseat.',
         },
       ],
@@ -261,20 +334,32 @@ export const building = {
 
     '%C3_z28': {
       name: 'Smith Tower - 28th Floor - South Suite - Foyer',
-      description: 'The single entrance to the C block, with a stout fire door to the elevator.',
-      x: -12, y: 9, z: 28,
-      exits: {"north":{"room":"%EL_z28","door":"%D_C3_z28"},"west":"%C2_z28","east":"%C4_z28"},
+      description:
+        'The single entrance to the C block, with a stout fire door to the elevator.',
+      x: -12,
+      y: 9,
+      z: 28,
+      exits: {
+        north: { room: '%EL_z28', door: '%D_C3_z28' },
+        west: '%C2_z28',
+        east: '%C4_z28',
+      },
       methods: {
-        onContentArrived: "const obj = args[0];\nif (!obj?.registerVerb) return;\nawait obj.registerVerb(['look out window', 'look through window', 'gaze out window', 'look down'], self, 'lookOutWindow');",
-        onContentLeaving: "const obj = args[0];\nif (obj?.unregisterVerbsFrom) {\n  await obj.unregisterVerbsFrom(self.id);\n}",
-        lookOutWindow: "const player = args[0];\nreturn 'From this height above Pioneer Square, you see nothing. Empty streets, rusted vehicles frozen mid-journey, weeds claiming the pavement. The only movement is wind stirring debris and the occasional bird cutting across the grey sky. The glass rattles in its frame as you stare down at fifty-five years of silence (floor 28).';",
-        onAnnounce: "const msg = args[0];\nawait self.tell(\"Through the window you notice below: \" + msg);",
+        onContentArrived:
+          "const obj = args[0];\nif (!obj?.registerVerb) return;\nawait obj.registerVerb(['look out window', 'look through window', 'gaze out window', 'look down'], self, 'lookOutWindow');",
+        onContentLeaving:
+          'const obj = args[0];\nif (obj?.unregisterVerbsFrom) {\n  await obj.unregisterVerbsFrom(self.id);\n}',
+        lookOutWindow:
+          "const player = args[0];\nreturn 'From this height above Pioneer Square, you see nothing. Empty streets, rusted vehicles frozen mid-journey, weeds claiming the pavement. The only movement is wind stirring debris and the occasional bird cutting across the grey sky. The glass rattles in its frame as you stare down at fifty-five years of silence (floor 28).';",
+        onAnnounce:
+          'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       sittables: [
         {
           name: 'a checkered couch',
           capacity: 3,
-          emptyMsg: 'A couch with a faded checkered pattern sits against the wall.',
+          emptyMsg:
+            'A couch with a faded checkered pattern sits against the wall.',
           occupiedMsg: '%s relaxing on the checkered couch.',
         },
       ],
@@ -282,20 +367,28 @@ export const building = {
 
     '%C4_z28': {
       name: 'Smith Tower - 28th Floor - South Suite - Bedroom',
-      description: 'A deep plan with a recessed alcove and polished concrete floors.',
-      x: -11, y: 9, z: 28,
-      exits: {"west":"%C3_z28"},
+      description:
+        'A deep plan with a recessed alcove and polished concrete floors.',
+      x: -11,
+      y: 9,
+      z: 28,
+      exits: { west: '%C3_z28' },
       methods: {
-        onContentArrived: "const obj = args[0];\nif (!obj?.registerVerb) return;\nawait obj.registerVerb(['look out window', 'look through window', 'gaze out window', 'look down'], self, 'lookOutWindow');",
-        onContentLeaving: "const obj = args[0];\nif (obj?.unregisterVerbsFrom) {\n  await obj.unregisterVerbsFrom(self.id);\n}",
-        lookOutWindow: "const player = args[0];\nreturn 'From this height above Pioneer Square, you see nothing. Empty streets, rusted vehicles frozen mid-journey, weeds claiming the pavement. The only movement is wind stirring debris and the occasional bird cutting across the grey sky. The glass rattles in its frame as you stare down at fifty-five years of silence (floor 28).';",
-        onAnnounce: "const msg = args[0];\nawait self.tell(\"Through the window you notice below: \" + msg);",
+        onContentArrived:
+          "const obj = args[0];\nif (!obj?.registerVerb) return;\nawait obj.registerVerb(['look out window', 'look through window', 'gaze out window', 'look down'], self, 'lookOutWindow');",
+        onContentLeaving:
+          'const obj = args[0];\nif (obj?.unregisterVerbsFrom) {\n  await obj.unregisterVerbsFrom(self.id);\n}',
+        lookOutWindow:
+          "const player = args[0];\nreturn 'From this height above Pioneer Square, you see nothing. Empty streets, rusted vehicles frozen mid-journey, weeds claiming the pavement. The only movement is wind stirring debris and the occasional bird cutting across the grey sky. The glass rattles in its frame as you stare down at fifty-five years of silence (floor 28).';",
+        onAnnounce:
+          'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       sittables: [
         {
           name: 'an alcove bed',
           capacity: 2,
-          emptyMsg: 'A bed fills the recessed alcove, half-hidden by a moth-eaten curtain.',
+          emptyMsg:
+            'A bed fills the recessed alcove, half-hidden by a moth-eaten curtain.',
           occupiedMsg: '%s tucked away in the alcove bed.',
         },
       ],
@@ -303,20 +396,28 @@ export const building = {
 
     '%B4_z28': {
       name: 'Smith Tower - 28th Floor - East Suite - Bedroom',
-      description: 'A compact end-cap with a single long window and built-in shelving.',
-      x: -10, y: 9, z: 28,
-      exits: {"north":"%B2_z28"},
+      description:
+        'A compact end-cap with a single long window and built-in shelving.',
+      x: -10,
+      y: 9,
+      z: 28,
+      exits: { north: '%B2_z28' },
       methods: {
-        onContentArrived: "const obj = args[0];\nif (!obj?.registerVerb) return;\nawait obj.registerVerb(['look out window', 'look through window', 'gaze out window', 'look down'], self, 'lookOutWindow');",
-        onContentLeaving: "const obj = args[0];\nif (obj?.unregisterVerbsFrom) {\n  await obj.unregisterVerbsFrom(self.id);\n}",
-        lookOutWindow: "const player = args[0];\nreturn 'From this height above Pioneer Square, you see nothing. Empty streets, rusted vehicles frozen mid-journey, weeds claiming the pavement. The only movement is wind stirring debris and the occasional bird cutting across the grey sky. The glass rattles in its frame as you stare down at fifty-five years of silence (floor 28).';",
-        onAnnounce: "const msg = args[0];\nawait self.tell(\"Through the window you notice below: \" + msg);",
+        onContentArrived:
+          "const obj = args[0];\nif (!obj?.registerVerb) return;\nawait obj.registerVerb(['look out window', 'look through window', 'gaze out window', 'look down'], self, 'lookOutWindow');",
+        onContentLeaving:
+          'const obj = args[0];\nif (obj?.unregisterVerbsFrom) {\n  await obj.unregisterVerbsFrom(self.id);\n}',
+        lookOutWindow:
+          "const player = args[0];\nreturn 'From this height above Pioneer Square, you see nothing. Empty streets, rusted vehicles frozen mid-journey, weeds claiming the pavement. The only movement is wind stirring debris and the occasional bird cutting across the grey sky. The glass rattles in its frame as you stare down at fifty-five years of silence (floor 28).';",
+        onAnnounce:
+          'const msg = args[0];\nawait self.tell("Through the window you notice below: " + msg);',
       },
       sittables: [
         {
           name: 'a Murphy bed',
           capacity: 2,
-          emptyMsg: 'A Murphy bed folds down from the wall, its mechanism still functional.',
+          emptyMsg:
+            'A Murphy bed folds down from the wall, its mechanism still functional.',
           occupiedMsg: '%s stretched out on the Murphy bed.',
         },
       ],

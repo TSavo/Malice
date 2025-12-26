@@ -1,5 +1,5 @@
-import { ObjectManager } from '../object-manager.js';
 import type { RuntimeObject } from '../../../types/object.js';
+import type { ObjectManager } from '../object-manager.js';
 
 /**
  * Builds the Combat system object ($.combat)
@@ -28,7 +28,8 @@ export class CombatBuilder {
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
 
-    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
+    const aliases =
+      (objectManager.get('aliases') as Record<string, number>) || {};
 
     if (aliases.combat) {
       this.combat = await this.manager.load(aliases.combat);
@@ -69,13 +70,18 @@ The actual combat PHYSICS (damage, wounds, skill checks, hit/miss) is handled by
     });
 
     // Add property descriptions
-    this.combat.setPropertyDescription('activeCombats', "Map of combatId -> { combatants, location, startedAt, log, status }");
+    this.combat.setPropertyDescription(
+      'activeCombats',
+      'Map of combatId -> { combatants, location, startedAt, log, status }',
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // START COMBAT
     // ═══════════════════════════════════════════════════════════════════
 
-    this.combat.setMethod('start', `
+    this.combat.setMethod(
+      'start',
+      `
       /** Start combat between combatants. Sets up exclusions.
        *  @param attacker - The attacking agent
        *  @param defender - The defending agent
@@ -128,13 +134,16 @@ The actual combat PHYSICS (damage, wounds, skill checks, hit/miss) is handled by
       await $.exclusions.start(defender, 'fighting', combatId);
 
       return { combatId, combat };
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // ADD COMBATANT
     // ═══════════════════════════════════════════════════════════════════
 
-    this.combat.setMethod('addCombatant', `
+    this.combat.setMethod(
+      'addCombatant',
+      `
       /** Add someone to an existing combat.
        *  @param combatId - Combat ID
        *  @param combatant - Agent to add
@@ -174,13 +183,16 @@ The actual combat PHYSICS (damage, wounds, skill checks, hit/miss) is handled by
       await $.exclusions.start(combatant, 'fighting', combatId);
 
       return { combatId, combat };
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // END COMBAT
     // ═══════════════════════════════════════════════════════════════════
 
-    this.combat.setMethod('end', `
+    this.combat.setMethod(
+      'end',
+      `
       /** End a combat. Removes exclusions.
        *  @param combatId - Combat ID
        *  @param reason - Why it ended: death, flee, surrender, knockout, resolved
@@ -218,13 +230,16 @@ The actual combat PHYSICS (damage, wounds, skill checks, hit/miss) is handled by
       self.activeCombats = activeCombats;
 
       return { success: true, reason, winner: winner?.name };
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // LOG
     // ═══════════════════════════════════════════════════════════════════
 
-    this.combat.setMethod('log', `
+    this.combat.setMethod(
+      'log',
+      `
       /** Add an entry to combat log.
        *  @param combatId - Combat ID
        *  @param message - Log message
@@ -244,13 +259,16 @@ The actual combat PHYSICS (damage, wounds, skill checks, hit/miss) is handled by
       self.activeCombats = activeCombats;
 
       return { success: true };
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // QUERIES
     // ═══════════════════════════════════════════════════════════════════
 
-    this.combat.setMethod('getCombat', `
+    this.combat.setMethod(
+      'getCombat',
+      `
       /** Get a combat by ID.
        *  @param combatId - Combat ID
        *  @returns Combat state or null
@@ -258,9 +276,12 @@ The actual combat PHYSICS (damage, wounds, skill checks, hit/miss) is handled by
       const combatId = args[0];
       const activeCombats = self.activeCombats || {};
       return activeCombats[combatId] || null;
-    `);
+    `,
+    );
 
-    this.combat.setMethod('getCombatByParticipant', `
+    this.combat.setMethod(
+      'getCombatByParticipant',
+      `
       /** Get active combat for a participant.
        *  @param combatant - The agent
        *  @returns Combat state or null
@@ -279,9 +300,12 @@ The actual combat PHYSICS (damage, wounds, skill checks, hit/miss) is handled by
       }
 
       return null;
-    `);
+    `,
+    );
 
-    this.combat.setMethod('isInCombat', `
+    this.combat.setMethod(
+      'isInCombat',
+      `
       /** Check if someone is in active combat.
        *  @param combatant - The agent
        *  @returns boolean
@@ -289,9 +313,12 @@ The actual combat PHYSICS (damage, wounds, skill checks, hit/miss) is handled by
       const combatant = args[0];
       const combat = await self.getCombatByParticipant(combatant);
       return combat !== null;
-    `);
+    `,
+    );
 
-    this.combat.setMethod('getLog', `
+    this.combat.setMethod(
+      'getLog',
+      `
       /** Get combat log.
        *  @param combatId - Combat ID
        *  @returns Array of log entries
@@ -300,21 +327,27 @@ The actual combat PHYSICS (damage, wounds, skill checks, hit/miss) is handled by
       const activeCombats = self.activeCombats || {};
       const combat = activeCombats[combatId];
       return combat ? combat.log : [];
-    `);
+    `,
+    );
 
-    this.combat.setMethod('getActiveCombats', `
+    this.combat.setMethod(
+      'getActiveCombats',
+      `
       /** Get all active combats.
        *  @returns Array of combat states
        */
       const activeCombats = self.activeCombats || {};
       return Object.values(activeCombats).filter(c => c.status === 'active');
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // DESCRIBE
     // ═══════════════════════════════════════════════════════════════════
 
-    this.combat.setMethod('describe', `
+    this.combat.setMethod(
+      'describe',
+      `
       /** Get a description of active combats.
        *  @returns Formatted string
        */
@@ -333,7 +366,8 @@ The actual combat PHYSICS (damage, wounds, skill checks, hit/miss) is handled by
       }
 
       return desc;
-    `);
+    `,
+    );
   }
 
   async registerAlias(): Promise<void> {

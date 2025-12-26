@@ -3,10 +3,10 @@
  * Tests TypeScript .d.ts generation from MongoDB objects
  */
 
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
-import { TypeGenerator } from '../../src/devtools/type-generator.js';
-import { ObjectManager } from '../../src/database/object-manager.js';
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { ObjectDatabase } from '../../src/database/object-db.js';
+import { ObjectManager } from '../../src/database/object-manager.js';
+import { TypeGenerator } from '../../src/devtools/type-generator.js';
 
 // Use unique database name to avoid conflicts with other test files
 const TEST_DB_NAME = `malice_test_typegen_${process.pid}`;
@@ -18,12 +18,19 @@ describe.sequential('TypeGenerator', () => {
   let root: any;
 
   beforeAll(async () => {
-    const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/?replicaSet=rs0&directConnection=true';
+    const MONGO_URI =
+      process.env.MONGO_URI ||
+      'mongodb://localhost:27017/?replicaSet=rs0&directConnection=true';
     db = new ObjectDatabase(MONGO_URI, TEST_DB_NAME);
 
     await Promise.race([
       db.connect(),
-      new Promise((_, reject) => setTimeout(() => reject(new Error('MongoDB connection timeout')), 10000))
+      new Promise((_, reject) =>
+        setTimeout(
+          () => reject(new Error('MongoDB connection timeout')),
+          10000,
+        ),
+      ),
     ]);
 
     manager = new ObjectManager(db);
@@ -37,7 +44,7 @@ describe.sequential('TypeGenerator', () => {
 
   beforeEach(async () => {
     // Clear test data
-    await db['objects'].deleteMany({});
+    await db.objects.deleteMany({});
     await db.ensureRoot();
     // Load fresh root (stable proxy pattern - no cache clearing needed)
     await manager.loadAll();
@@ -287,7 +294,7 @@ describe.sequential('TypeGenerator', () => {
       });
 
       // Mark as recycled via raw MongoDB (recycling is handled by $.recycler in game)
-      await db['objects'].updateOne({ _id: obj.id }, { $set: { recycled: true } });
+      await db.objects.updateOne({ _id: obj.id }, { $set: { recycled: true } });
 
       const types = await generator.generate();
 
@@ -321,8 +328,16 @@ describe.sequential('TypeGenerator', () => {
     });
 
     it('should include multiple aliases', async () => {
-      const system = await manager.create({ parent: root, properties: {}, methods: {} });
-      const auth = await manager.create({ parent: root, properties: {}, methods: {} });
+      const system = await manager.create({
+        parent: root,
+        properties: {},
+        methods: {},
+      });
+      const auth = await manager.create({
+        parent: root,
+        properties: {},
+        methods: {},
+      });
 
       manager.registerAlias('system', system);
       manager.registerAlias('authManager', auth);
@@ -348,12 +363,18 @@ describe.sequential('TypeGenerator', () => {
       expect(types).toContain('interface RuntimeObject');
 
       // Should include object-specific override
-      expect(types).toContain(`// Context-specific type override for Object #${obj.id}`);
-      expect(types).toContain(`declare const self: RuntimeObject & MaliceObject_${obj.id}`);
+      expect(types).toContain(
+        `// Context-specific type override for Object #${obj.id}`,
+      );
+      expect(types).toContain(
+        `declare const self: RuntimeObject & MaliceObject_${obj.id}`,
+      );
     });
 
     it('should throw error for non-existent object', async () => {
-      await expect(generator.generateForObject(99999)).rejects.toThrow('not found');
+      await expect(generator.generateForObject(99999)).rejects.toThrow(
+        'not found',
+      );
     });
   });
 
@@ -389,7 +410,9 @@ describe.sequential('TypeGenerator', () => {
 
       expect(types).toContain(`interface MaliceObject_${obj.id}`);
       // Interface should still be created, just empty
-      expect(types).toMatch(new RegExp(`interface MaliceObject_${obj.id} \\{\\s*\\}`));
+      expect(types).toMatch(
+        new RegExp(`interface MaliceObject_${obj.id} \\{\\s*\\}`),
+      );
     });
 
     it('should handle large number of objects', async () => {
@@ -405,7 +428,8 @@ describe.sequential('TypeGenerator', () => {
       const types = await generator.generate();
 
       // Should contain all 10 object interfaces
-      for (let i = 2; i <= 11; i++) { // IDs start at 2 (1 is root)
+      for (let i = 2; i <= 11; i++) {
+        // IDs start at 2 (1 is root)
         expect(types).toContain(`interface MaliceObject_${i}`);
       }
     });

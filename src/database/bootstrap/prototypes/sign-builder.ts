@@ -1,5 +1,5 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Builds the Sign prototype
@@ -55,15 +55,20 @@ READING: read() returns text content. AI can invoke directly.`,
       methods: {},
     });
 
-    obj.setMethod('read', `
+    obj.setMethod(
+      'read',
+      `
       /** Read the sign's text. */
       const agent = args[0];
       // Support both 'text' and 'content' properties
       const content = self.content || self.text;
       return content;
-    `);
+    `,
+    );
 
-    obj.setMethod('updateText', `
+    obj.setMethod(
+      'updateText',
+      `
       /**
        * Update the sign's text (authorization required).
        * @param agent - The object attempting to update
@@ -120,13 +125,29 @@ READING: read() returns text content. AI can invoke directly.`,
       }
 
       return { success: false, message: 'Access denied: You are not authorized to update this sign.' };
-    `);
+    `,
+    );
 
-    obj.setPropertyDescription('text', 'The text or directory content displayed on the sign');
-    obj.setPropertyDescription('boltedDown', 'Whether the sign is fixed in place and cannot be moved');
-    obj.setPropertyDescription('language', 'Language of the sign text for localization');
-    obj.setPropertyDescription('authorizedUpdaters', 'Array of object IDs or aliases allowed to update the sign');
-    obj.setPropertyDescription('publiclyWritable', 'If true, anyone can update the sign text');
+    obj.setPropertyDescription(
+      'text',
+      'The text or directory content displayed on the sign',
+    );
+    obj.setPropertyDescription(
+      'boltedDown',
+      'Whether the sign is fixed in place and cannot be moved',
+    );
+    obj.setPropertyDescription(
+      'language',
+      'Language of the sign text for localization',
+    );
+    obj.setPropertyDescription(
+      'authorizedUpdaters',
+      'Array of object IDs or aliases allowed to update the sign',
+    );
+    obj.setPropertyDescription(
+      'publiclyWritable',
+      'If true, anyone can update the sign text',
+    );
 
     return obj;
   }

@@ -5,7 +5,7 @@
 
 import WebSocket from 'ws';
 
-async function sleep(ms: number) {
+async function _sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
@@ -15,33 +15,33 @@ async function main() {
   const ws = new WebSocket('ws://localhost:3000');
 
   const responses = [
-    'TestHero',              // Login username
-    '1',                     // Menu: Name
-    'Hero',                  // Alias
-    'John',                  // First name
-    'Doe',                   // Last name
-    '',                      // Middle name (optional)
-    '1',                     // Menu: Birthday
-    '1/15/2072',             // Birthday
-    '1',                     // Menu: Sex
-    '1',                     // Sex: Male
-    '1',                     // Menu: Ethnicity
-    '1',                     // Ethnicity: first option
-    '1',                     // Menu: Stats
-    '1.8',                   // Height
-    '75',                    // Weight
-    '1',                     // Menu: Appearance
-    '3',                     // Hair cut: cropped
-    '1',                     // Hair style: curly
-    '1',                     // Hair color: black
-    '2',                     // Eye color: blue
-    '1',                     // Eye style: hooded
-    '4',                     // Skin style: smooth
-    '4',                     // Skin color: white
-    '1',                     // Menu: Language
-    '1',                     // Language: English
-    '1',                     // Menu: Finish
-    'yes',                   // Confirm character creation
+    'TestHero', // Login username
+    '1', // Menu: Name
+    'Hero', // Alias
+    'John', // First name
+    'Doe', // Last name
+    '', // Middle name (optional)
+    '1', // Menu: Birthday
+    '1/15/2072', // Birthday
+    '1', // Menu: Sex
+    '1', // Sex: Male
+    '1', // Menu: Ethnicity
+    '1', // Ethnicity: first option
+    '1', // Menu: Stats
+    '1.8', // Height
+    '75', // Weight
+    '1', // Menu: Appearance
+    '3', // Hair cut: cropped
+    '1', // Hair style: curly
+    '1', // Hair color: black
+    '2', // Eye color: blue
+    '1', // Eye style: hooded
+    '4', // Skin style: smooth
+    '4', // Skin color: white
+    '1', // Menu: Language
+    '1', // Language: English
+    '1', // Menu: Finish
+    'yes', // Confirm character creation
   ];
 
   let responseIndex = 0;
@@ -59,7 +59,7 @@ async function main() {
       setTimeout(() => {
         const response = responses[responseIndex++];
         console.log('📤 Client:', response);
-        ws.send(response + '\n');
+        ws.send(`${response}\n`);
       }, 500);
     }
   });

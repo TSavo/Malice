@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { Subject, BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ConnectionManager } from '../src/connection/connection-manager.js';
 import type { ITransport, TerminalCapabilities } from '../types/transport.js';
 
@@ -186,7 +186,7 @@ describe('ConnectionManager', () => {
       const connectedSubject = new Subject<boolean>();
       Object.defineProperty(transport, 'connected$', {
         value: connectedSubject.asObservable(),
-        writable: false
+        writable: false,
       });
 
       const connection = manager.addTransport(transport);
@@ -195,14 +195,14 @@ describe('ConnectionManager', () => {
       expect(connection.state).toBe('connecting');
 
       // Wait a tick to ensure no race conditions
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
       expect(connection.state).toBe('connecting'); // Still connecting
 
       // Now emit connected
       connectedSubject.next(true);
 
       // Wait for the emission to process
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       // Should now be connected
       expect(connection.state).toBe('connected');
@@ -219,7 +219,7 @@ describe('ConnectionManager', () => {
       transport.connected$.next(true);
 
       // Wait for any potential state changes
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       // Should still be connected (no state change)
       expect(connection.state).toBe('connected');
@@ -232,7 +232,7 @@ describe('ConnectionManager', () => {
       transport.connected$.next(true);
 
       // Wait for any potential state changes
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       // Should still be authenticated (no state change to 'connected')
       expect(connection.state).toBe('authenticated');
@@ -261,7 +261,7 @@ describe('ConnectionManager', () => {
       const t3 = new MockTransport('test-3');
 
       const c1 = manager.addTransport(t1);
-      const c2 = manager.addTransport(t2);
+      const _c2 = manager.addTransport(t2);
       const c3 = manager.addTransport(t3);
 
       // Authenticate some connections
@@ -324,9 +324,9 @@ describe('ConnectionManager', () => {
       const t2 = new MockTransport('test-2');
       const t3 = new MockTransport('test-3');
 
-      const c1 = manager.addTransport(t1);
+      const _c1 = manager.addTransport(t1);
       const c2 = manager.addTransport(t2);
-      const c3 = manager.addTransport(t3);
+      const _c3 = manager.addTransport(t3);
 
       const received: string[][] = [[], [], []];
 
@@ -347,7 +347,7 @@ describe('ConnectionManager', () => {
       const t3 = new MockTransport('test-3');
 
       const c1 = manager.addTransport(t1);
-      const c2 = manager.addTransport(t2);
+      const _c2 = manager.addTransport(t2);
       const c3 = manager.addTransport(t3);
 
       // Only authenticate some

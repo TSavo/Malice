@@ -19,14 +19,17 @@
  * - Condemned Block: x=+9 to +12, y=-9 to -7
  */
 
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const pioneerSquareDir = path.join(__dirname, '../src/database/bootstrap/world/seattle/pioneer-square');
+const pioneerSquareDir = path.join(
+  __dirname,
+  '../src/database/bootstrap/world/seattle/pioneer-square',
+);
 
 // Collect all existing coordinates
 const existingCoords = new Set();
@@ -35,8 +38,8 @@ function extractCoords(content) {
   const xMatch = content.match(/^\s*x:\s*(-?\d+),/m);
   const yMatch = content.match(/^\s*y:\s*(-?\d+),/m);
   return {
-    x: xMatch ? parseInt(xMatch[1]) : null,
-    y: yMatch ? parseInt(yMatch[1]) : null,
+    x: xMatch ? parseInt(xMatch[1], 10) : null,
+    y: yMatch ? parseInt(yMatch[1], 10) : null,
   };
 }
 

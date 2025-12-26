@@ -7,27 +7,32 @@
  * Street directories (yesler-way, s-main, etc): files named by x coordinate
  */
 
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const PIONEER_SQUARE_DIR = path.join(__dirname, '../src/database/bootstrap/world/seattle/pioneer-square');
+const PIONEER_SQUARE_DIR = path.join(
+  __dirname,
+  '../src/database/bootstrap/world/seattle/pioneer-square',
+);
 
 function getCoordinates(filePath) {
   const content = fs.readFileSync(filePath, 'utf8');
   const xMatch = content.match(/x:\s*(-?\d+)/);
   const yMatch = content.match(/y:\s*(-?\d+)/);
   return {
-    x: xMatch ? parseInt(xMatch[1]) : null,
-    y: yMatch ? parseInt(yMatch[1]) : null
+    x: xMatch ? parseInt(xMatch[1], 10) : null,
+    y: yMatch ? parseInt(yMatch[1], 10) : null,
   };
 }
 
 function renameFilesInDirectory(dir, coordType) {
-  const files = fs.readdirSync(dir).filter(f => f.endsWith('.ts') && !f.includes('MAP'));
+  const files = fs
+    .readdirSync(dir)
+    .filter((f) => f.endsWith('.ts') && !f.includes('MAP'));
   const renames = [];
 
   // First pass: collect all renames needed
@@ -44,7 +49,7 @@ function renameFilesInDirectory(dir, coordType) {
         oldPath: filePath,
         newPath: path.join(dir, newFileName),
         oldName: file,
-        newName: newFileName
+        newName: newFileName,
       });
     }
   }
@@ -57,10 +62,10 @@ function renameFilesInDirectory(dir, coordType) {
   for (const r of renames) {
     if (existingFiles.has(r.newName) && r.oldName !== r.newName) {
       // Rename to temp first
-      const tempPath = r.oldPath + '.tmp';
+      const tempPath = `${r.oldPath}.tmp`;
       tempRenames.push({
         ...r,
-        tempPath
+        tempPath,
       });
     } else {
       tempRenames.push(r);
@@ -83,7 +88,9 @@ function renameFilesInDirectory(dir, coordType) {
     if (fs.existsSync(sourcePath)) {
       // Check if target exists (shouldn't after temp rename)
       if (fs.existsSync(r.newPath) && sourcePath !== r.newPath) {
-        console.log(`  ⚠ Conflict: ${r.newName} already exists, skipping ${r.oldName}`);
+        console.log(
+          `  ⚠ Conflict: ${r.newName} already exists, skipping ${r.oldName}`,
+        );
         // Restore temp file
         if (r.tempPath) {
           fs.renameSync(r.tempPath, r.oldPath);

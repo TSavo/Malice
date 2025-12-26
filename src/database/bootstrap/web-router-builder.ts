@@ -1,5 +1,5 @@
-import { ObjectManager } from '../object-manager.js';
 import type { RuntimeObject } from '../../../types/object.js';
+import type { ObjectManager } from '../object-manager.js';
 
 /**
  * Builds $webRouter object (dynamic ID)
@@ -25,7 +25,8 @@ export class WebRouterBuilder {
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
 
-    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
+    const aliases =
+      (objectManager.get('aliases') as Record<string, number>) || {};
 
     if (aliases.webRouter) {
       this.webRouter = await this.manager.load(aliases.webRouter);
@@ -56,7 +57,9 @@ export class WebRouterBuilder {
   private addRegisterMethod(): void {
     if (!this.webRouter) return;
 
-    this.webRouter.setMethod('register', `
+    this.webRouter.setMethod(
+      'register',
+      `
       const route = args[0];
       if (!route || typeof route.id !== 'number') {
         throw new Error('Invalid route object - must be a RuntimeObject');
@@ -69,13 +72,16 @@ export class WebRouterBuilder {
         self.routes = routes;
         console.log('[WebRouter] Route registered:', route.path, route.methods);
       }
-    `);
+    `,
+    );
   }
 
   private addAddMiddlewareMethod(): void {
     if (!this.webRouter) return;
 
-    this.webRouter.setMethod('addMiddleware', `
+    this.webRouter.setMethod(
+      'addMiddleware',
+      `
       const name = args[0];
       const handlerMethodName = args[1];
 
@@ -90,13 +96,16 @@ export class WebRouterBuilder {
       middleware[name] = handlerMethodName;
       self.middleware = middleware;
       console.log('[WebRouter] Middleware registered:', name);
-    `);
+    `,
+    );
   }
 
   private addDispatchMethod(): void {
     if (!this.webRouter) return;
 
-    this.webRouter.setMethod('dispatch', `
+    this.webRouter.setMethod(
+      'dispatch',
+      `
       const path = args[0];
       const method = args[1];
       const meta = args[2] || {};
@@ -190,13 +199,16 @@ export class WebRouterBuilder {
       }
 
       return null; // No route matched
-    `);
+    `,
+    );
   }
 
   private addCheckAuthMethod(): void {
     if (!this.webRouter) return;
 
-    this.webRouter.setMethod('checkAuth', `
+    this.webRouter.setMethod(
+      'checkAuth',
+      `
       const route = args[0];
       const meta = args[1] || {};
 
@@ -223,7 +235,8 @@ export class WebRouterBuilder {
       }
 
       return null; // Auth passed
-    `);
+    `,
+    );
   }
 
   async registerAlias(): Promise<void> {

@@ -1,5 +1,5 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Builds the Location prototype
@@ -8,16 +8,22 @@ import type { RuntimeObject } from '../../../../types/object.js';
 export class LocationBuilder {
   constructor(private manager: ObjectManager) {}
 
-  async build(describableId: number, existingObj?: RuntimeObject): Promise<RuntimeObject> {
+  async build(
+    describableId: number,
+    existingObj?: RuntimeObject,
+  ): Promise<RuntimeObject> {
     const parentObj = await this.manager.load(describableId);
-    const obj = existingObj || await this.manager.create({
-      parent: parentObj!,
-      properties: {
-        name: 'Location',
-        description: 'Base prototype for locations (things that can contain other things)',
-        // contents inherited from Describable
+    const obj =
+      existingObj ||
+      (await this.manager.create({
+        parent: parentObj!,
+        properties: {
+          name: 'Location',
+          description:
+            'Base prototype for locations (things that can contain other things)',
+          // contents inherited from Describable
 
-        abilities: `Container that can hold other objects - the base for rooms and containers.
+          abilities: `Container that can hold other objects - the base for rooms and containers.
 
 CONTENTS: 'contents' array holds objects inside this location. Objects have 'location' pointing back here.
 
@@ -37,11 +43,13 @@ MESSAGING: announce(actor, target, messages) sends perspective-aware messages to
 SPEECH: broadcastSpeech(speech, speaker) sends speech to all listeners. Understanding depends on their 'knownLanguages'.
 
 SENSATION: broadcastSensation(target, sensation) routes pain/feeling to target's onSensation handler.`,
-      },
-      methods: {},
-    });
+        },
+        methods: {},
+      }));
 
-    obj.setMethod('describe', `
+    obj.setMethod(
+      'describe',
+      `
       const viewer = args[0]; // Agent viewing this location
 
       // Show location name and description
@@ -67,9 +75,12 @@ SENSATION: broadcastSensation(target, sensation) routes pain/feeling to target's
       }
 
       return output;
-    `);
+    `,
+    );
 
-    obj.setMethod('addContent', `
+    obj.setMethod(
+      'addContent',
+      `
       let obj = args[0];
 
       // Accept either a RuntimeObject or an ID number
@@ -96,9 +107,12 @@ SENSATION: broadcastSensation(target, sensation) routes pain/feeling to target's
           await self.onContentArrived(obj);
         }
       }
-    `);
+    `,
+    );
 
-    obj.setMethod('removeContent', `
+    obj.setMethod(
+      'removeContent',
+      `
       let obj = args[0];
 
       // Get the id we're looking for
@@ -113,34 +127,44 @@ SENSATION: broadcastSensation(target, sensation) routes pain/feeling to target's
         contents.splice(index, 1);
         self.contents = contents;
       }
-    `);
+    `,
+    );
 
     // Hook: called before an object leaves this location
     // Can throw to prevent the move
-    obj.setMethod('onContentLeaving', `
+    obj.setMethod(
+      'onContentLeaving',
+      `
       const obj = args[0];
       const dest = args[1];
       const mover = args[2];
       // Default: allow all departures
-    `);
+    `,
+    );
 
     // Hook: called after an object has left this location
     // Use for cleanup, unregistering verbs, notifications
-    obj.setMethod('onContentLeft', `
+    obj.setMethod(
+      'onContentLeft',
+      `
       const obj = args[0];
       const dest = args[1];
       const mover = args[2];
       // Default: do nothing
-    `);
+    `,
+    );
 
     // Hook: called after an object has arrived in this location
     // Use for announcements, registering verbs, triggers
-    obj.setMethod('onContentArrived', `
+    obj.setMethod(
+      'onContentArrived',
+      `
       const obj = args[0];
       const source = args[1];
       const mover = args[2];
       // Default: do nothing
-    `);
+    `,
+    );
 
     // === MESSAGING METHODS ===
 
@@ -149,7 +173,9 @@ SENSATION: broadcastSensation(target, sensation) routes pain/feeling to target's
     // target: who the action is done to (optional)
     // messages: { actor: string, target: string, others: string }
     // sound: optional sound message everyone hears
-    obj.setMethod('announce', `
+    obj.setMethod(
+      'announce',
+      `
       const actor = args[0];
       const target = args[1];
       const messages = args[2];
@@ -183,7 +209,8 @@ SENSATION: broadcastSensation(target, sensation) routes pain/feeling to target's
           await viewer.hear(sound, null, actor);
         }
       }
-    `);
+    `,
+    );
 
     // Format a message with pronoun substitution
     // Placeholders:
@@ -198,7 +225,9 @@ SENSATION: broadcastSensation(target, sensation) routes pain/feeling to target's
     //   %ao = actor's object pronoun (them/you)
     //   %to = target's object pronoun (them/you)
     //   %av = actor's verb form (cuts/cut - s for third person)
-    obj.setMethod('formatMessage', `
+    obj.setMethod(
+      'formatMessage',
+      `
       const template = args[0];
       const actor = args[1];
       const target = args[2];
@@ -244,10 +273,13 @@ SENSATION: broadcastSensation(target, sensation) routes pain/feeling to target's
       });
 
       return result;
-    `);
+    `,
+    );
 
     // Broadcast speech to everyone in the room
-    obj.setMethod('broadcastSpeech', `
+    obj.setMethod(
+      'broadcastSpeech',
+      `
       const speech = args[0]; // { content, language, speaker, ... }
       const speaker = args[1];
 
@@ -269,20 +301,27 @@ SENSATION: broadcastSensation(target, sensation) routes pain/feeling to target's
           }
         }
       }
-    `);
+    `,
+    );
 
     // Broadcast a sensation (pain, etc.) to the target
-    obj.setMethod('broadcastSensation', `
+    obj.setMethod(
+      'broadcastSensation',
+      `
       const target = args[0];
       const sensation = args[1]; // { type, intensity, part, ... }
 
       if (target && target.onSensation) {
         await target.onSensation(sensation);
       }
-    `);
+    `,
+    );
 
     // Property descriptions for AI context (inherits from Describable)
-    obj.setPropertyDescription('contents', 'Array of objects currently inside this location');
+    obj.setPropertyDescription(
+      'contents',
+      'Array of objects currently inside this location',
+    );
 
     return obj;
   }

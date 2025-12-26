@@ -1,5 +1,5 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Builds specialized body part prototypes
@@ -87,7 +87,9 @@ VITAL ORGANS: Contains stomach, heart, lungs (internal, protected by ribs). Punc
       methods: {},
     });
 
-    obj.setMethod('describe', `
+    obj.setMethod(
+      'describe',
+      `
       let desc = self.description;
       const condition = self.condition || {};
 
@@ -96,12 +98,25 @@ VITAL ORGANS: Contains stomach, heart, lungs (internal, protected by ribs). Punc
       }
 
       return desc;
-    `);
+    `,
+    );
 
-    obj.setPropertyDescription('calories', 'Current available energy stored in the torso (kcal).');
-    obj.setPropertyDescription('maxCalories', 'Maximum calorie storage capacity. Excess becomes fat.');
-    obj.setPropertyDescription('fat', 'Fat reserves in units. 1 unit = ~100 calories when burned. High fat impairs movement.');
-    obj.setPropertyDescription('maxFat', 'Maximum fat storage before severe health penalties.');
+    obj.setPropertyDescription(
+      'calories',
+      'Current available energy stored in the torso (kcal).',
+    );
+    obj.setPropertyDescription(
+      'maxCalories',
+      'Maximum calorie storage capacity. Excess becomes fat.',
+    );
+    obj.setPropertyDescription(
+      'fat',
+      'Fat reserves in units. 1 unit = ~100 calories when burned. High fat impairs movement.',
+    );
+    obj.setPropertyDescription(
+      'maxFat',
+      'Maximum fat storage before severe health penalties.',
+    );
 
     return obj;
   }
@@ -141,7 +156,9 @@ INTERNAL: Protected by torso. Not coverable. Cannot be directly attacked without
     });
 
     // Get current total volume of stomach contents
-    obj.setMethod('getCurrentVolume', `
+    obj.setMethod(
+      'getCurrentVolume',
+      `
       const contents = self.contents || [];
       let total = 0;
       for (const item of contents) {
@@ -150,18 +167,24 @@ INTERNAL: Protected by torso. Not coverable. Cannot be directly attacked without
         }
       }
       return total;
-    `);
+    `,
+    );
 
     // Check if there's room for a given volume (ml)
-    obj.setMethod('hasRoomFor', `
+    obj.setMethod(
+      'hasRoomFor',
+      `
       const volumeToAdd = args[0] || 0;
       const currentVolume = await self.getCurrentVolume();
       const maxVolume = self.maxVolume || 1000;
       return (currentVolume + volumeToAdd) <= maxVolume;
-    `);
+    `,
+    );
 
     // Stomach can contain food/drink
-    obj.setMethod('canContain', `
+    obj.setMethod(
+      'canContain',
+      `
       const item = args[0];
       const contents = self.contents || [];
 
@@ -186,11 +209,14 @@ INTERNAL: Protected by torso. Not coverable. Cannot be directly attacked without
       }
 
       return true;
-    `);
+    `,
+    );
 
     // Digest one tick - process StomachContents and extract calories
     // Returns calories extracted this tick
-    obj.setMethod('digest', `
+    obj.setMethod(
+      'digest',
+      `
       const contents = self.contents || [];
       if (contents.length === 0) {
         return 0;
@@ -249,10 +275,13 @@ INTERNAL: Protected by torso. Not coverable. Cannot be directly attacked without
       }
 
       return totalCalories;
-    `);
+    `,
+    );
 
     // Describe stomach contents (for autopsy)
-    obj.setMethod('describe', `
+    obj.setMethod(
+      'describe',
+      `
       const contents = self.contents || [];
       let desc = self.description;
 
@@ -275,10 +304,13 @@ INTERNAL: Protected by torso. Not coverable. Cannot be directly attacked without
       }
 
       return desc;
-    `);
+    `,
+    );
 
     // Get fullness as a proportion (by count and volume)
-    obj.setMethod('getFullness', `
+    obj.setMethod(
+      'getFullness',
+      `
       const contents = self.contents || [];
       const maxCount = self.maxContents || 10;
       const maxVolume = self.maxVolume || 1000;
@@ -291,12 +323,25 @@ INTERNAL: Protected by torso. Not coverable. Cannot be directly attacked without
         // Overall fullness is the higher of the two ratios
         ratio: Math.max(contents.length / maxCount, currentVolume / maxVolume),
       };
-    `);
+    `,
+    );
 
-    obj.setPropertyDescription('maxContents', 'Maximum number of food items the stomach can hold simultaneously.');
-    obj.setPropertyDescription('maxVolume', 'Maximum volume in ml the stomach can stretch to hold (~1 liter).');
-    obj.setPropertyDescription('digestionRate', 'Calories extracted per tick from stomach contents.');
-    obj.setPropertyDescription('internal', 'This is an internal organ, protected by the torso.');
+    obj.setPropertyDescription(
+      'maxContents',
+      'Maximum number of food items the stomach can hold simultaneously.',
+    );
+    obj.setPropertyDescription(
+      'maxVolume',
+      'Maximum volume in ml the stomach can stretch to hold (~1 liter).',
+    );
+    obj.setPropertyDescription(
+      'digestionRate',
+      'Calories extracted per tick from stomach contents.',
+    );
+    obj.setPropertyDescription(
+      'internal',
+      'This is an internal organ, protected by the torso.',
+    );
 
     return obj;
   }
@@ -334,7 +379,9 @@ INTELLIGENCE: 'iq' property affects learning, problem solving, tech use.`,
       methods: {},
     });
 
-    obj.setMethod('describe', `
+    obj.setMethod(
+      'describe',
+      `
       const viewer = args[0];
       let desc = self.description;
 
@@ -354,12 +401,18 @@ INTELLIGENCE: 'iq' property affects learning, problem solving, tech use.`,
       }
 
       return desc;
-    `);
+    `,
+    );
 
-    obj.setPropertyDescription('iq', 'Intelligence quotient. Affects learning, problem solving, and technology use.');
+    obj.setPropertyDescription(
+      'iq',
+      'Intelligence quotient. Affects learning, problem solving, and technology use.',
+    );
 
     // Check if can smell (needs working nose in face)
-    obj.setMethod('canSmell', `
+    obj.setMethod(
+      'canSmell',
+      `
       const face = await self.getPart('face');
       if (!face) return false;
 
@@ -367,10 +420,13 @@ INTELLIGENCE: 'iq' property affects learning, problem solving, tech use.`,
       if (!nose || !nose.canSmell) return false;
 
       return await nose.canSmell();
-    `);
+    `,
+    );
 
     // Check if can taste (needs tongue in mouth in face)
-    obj.setMethod('canTaste', `
+    obj.setMethod(
+      'canTaste',
+      `
       const face = await self.getPart('face');
       if (!face) return false;
 
@@ -378,10 +434,13 @@ INTELLIGENCE: 'iq' property affects learning, problem solving, tech use.`,
       if (!mouth || !mouth.canTaste) return false;
 
       return await mouth.canTaste();
-    `);
+    `,
+    );
 
     // Check if can hear (needs working ears in face)
-    obj.setMethod('canHear', `
+    obj.setMethod(
+      'canHear',
+      `
       const face = await self.getPart('face');
       if (!face) return false;
 
@@ -392,7 +451,8 @@ INTELLIGENCE: 'iq' property affects learning, problem solving, tech use.`,
       if (leftEar && leftEar.hear) return true;
       if (rightEar && rightEar.hear) return true;
       return false;
-    `);
+    `,
+    );
 
     return obj;
   }
@@ -431,17 +491,32 @@ REMOVABLE: Eyes can be gouged out in combat or surgically extracted. Chrome eyes
       methods: {},
     });
 
-    obj.setMethod('shortDesc', `
+    obj.setMethod(
+      'shortDesc',
+      `
       return self.color + ' ' + self.shape + ' eye';
-    `);
+    `,
+    );
 
-    obj.setMethod('describe', `
+    obj.setMethod(
+      'describe',
+      `
       return 'A ' + self.color + ' ' + self.shape + '-shaped eye';
-    `);
+    `,
+    );
 
-    obj.setPropertyDescription('color', 'Eye color (brown, blue, green, etc.).');
-    obj.setPropertyDescription('shape', 'Eye shape (almond, round, hooded, etc.).');
-    obj.setPropertyDescription('perception', 'Visual acuity. Affects noticing details and spotting hidden objects.');
+    obj.setPropertyDescription(
+      'color',
+      'Eye color (brown, blue, green, etc.).',
+    );
+    obj.setPropertyDescription(
+      'shape',
+      'Eye shape (almond, round, hooded, etc.).',
+    );
+    obj.setPropertyDescription(
+      'perception',
+      'Visual acuity. Affects noticing details and spotting hidden objects.',
+    );
 
     return obj;
   }
@@ -479,14 +554,19 @@ PERCEPTION: 'perception' stat affects hearing acuity, detecting whispers, identi
       methods: {},
     });
 
-    obj.setMethod('shortDesc', `
+    obj.setMethod(
+      'shortDesc',
+      `
       return self.shape + ' ear';
-    `);
+    `,
+    );
 
     // DELEGATION: hear() - process incoming speech
     // Ears just hear - they pass through what they receive
     // Translation/understanding is handled by the listener (Human) based on knownLanguages
-    obj.setMethod('hear', `
+    obj.setMethod(
+      'hear',
+      `
       const speech = args[0]; // { type, content, language, volume, speaker }
 
       // Check if ear is damaged
@@ -506,10 +586,17 @@ PERCEPTION: 'perception' stat affects hearing acuity, detecting whispers, identi
       // Ears just pass through what they hear
       // The Human.hear() method checks knownLanguages for understanding
       return speech;
-    `);
+    `,
+    );
 
-    obj.setPropertyDescription('shape', 'Ear shape (normal, pointed, large, etc.).');
-    obj.setPropertyDescription('perception', 'Hearing acuity. Affects detecting whispers and identifying speakers.');
+    obj.setPropertyDescription(
+      'shape',
+      'Ear shape (normal, pointed, large, etc.).',
+    );
+    obj.setPropertyDescription(
+      'perception',
+      'Hearing acuity. Affects detecting whispers and identifying speakers.',
+    );
 
     return obj;
   }
@@ -544,12 +631,17 @@ BREATHING: Nose also handles respiration. Blocked nose forces mouth breathing.`,
       methods: {},
     });
 
-    obj.setMethod('shortDesc', `
+    obj.setMethod(
+      'shortDesc',
+      `
       return 'a ' + self.shape + ' nose';
-    `);
+    `,
+    );
 
     // Can smell if nose exists and not blocked
-    obj.setMethod('canSmell', `
+    obj.setMethod(
+      'canSmell',
+      `
       const condition = self.condition || {};
       if (condition.destroyed || condition.missing || condition.stuffed) {
         return false;
@@ -560,9 +652,13 @@ BREATHING: Nose also handles respiration. Blocked nose forces mouth breathing.`,
         return false;
       }
       return true;
-    `);
+    `,
+    );
 
-    obj.setPropertyDescription('shape', 'Nose shape (straight, hooked, flat, etc.).');
+    obj.setPropertyDescription(
+      'shape',
+      'Nose shape (straight, hooked, flat, etc.).',
+    );
 
     return obj;
   }
@@ -604,18 +700,23 @@ BREATHING: Secondary airway when nose blocked. Cannot breathe underwater without
     });
 
     // Mouth can contain things (food, etc.)
-    obj.setMethod('canContain', `
+    obj.setMethod(
+      'canContain',
+      `
       const obj = args[0];
       // Can only contain small things
       if (obj.size === 'tiny' || obj.size === 'small') {
         return true;
       }
       return 'That is too large to fit in your mouth.';
-    `);
+    `,
+    );
 
     // DELEGATION: speak() - transform and emit speech
     // Returns a speech object with language, volume, content, speaker
-    obj.setMethod('speak', `
+    obj.setMethod(
+      'speak',
+      `
       const message = args[0];
       const speaker = args[1]; // The owner who's speaking
 
@@ -637,16 +738,22 @@ BREATHING: Secondary airway when nose blocked. Cannot breathe underwater without
         tone: self.tone || 'natural',
         speaker: speaker?.id || self.owner,
       };
-    `);
+    `,
+    );
 
     // Set the language this mouth speaks
-    obj.setMethod('setLanguage', `
+    obj.setMethod(
+      'setLanguage',
+      `
       const lang = args[0];
       self.language = lang;
-    `);
+    `,
+    );
 
     // Can taste if tongue is present and functional
-    obj.setMethod('canTaste', `
+    obj.setMethod(
+      'canTaste',
+      `
       const tongue = await self.getPart('tongue');
       if (!tongue) return false;
       if (tongue.canTaste) {
@@ -654,12 +761,25 @@ BREATHING: Secondary airway when nose blocked. Cannot breathe underwater without
       }
       // Default to true if tongue exists but has no canTaste method
       return true;
-    `);
+    `,
+    );
 
-    obj.setPropertyDescription('canSpeak', 'Whether this mouth can produce speech. Requires working tongue.');
-    obj.setPropertyDescription('language', 'The language spoken by this mouth (English, Spanish, etc.).');
-    obj.setPropertyDescription('volume', 'Voice volume (whisper, normal, loud, booming).');
-    obj.setPropertyDescription('tone', 'Voice tone (natural, synthetic, robotic). Modified by chrome.');
+    obj.setPropertyDescription(
+      'canSpeak',
+      'Whether this mouth can produce speech. Requires working tongue.',
+    );
+    obj.setPropertyDescription(
+      'language',
+      'The language spoken by this mouth (English, Spanish, etc.).',
+    );
+    obj.setPropertyDescription(
+      'volume',
+      'Voice volume (whisper, normal, loud, booming).',
+    );
+    obj.setPropertyDescription(
+      'tone',
+      'Voice tone (natural, synthetic, robotic). Modified by chrome.',
+    );
 
     return obj;
   }
@@ -695,24 +815,33 @@ WEIGHT: ~70g. Small but dense muscle tissue.`,
     });
 
     // Can speak if tongue exists and not damaged
-    obj.setMethod('canSpeak', `
+    obj.setMethod(
+      'canSpeak',
+      `
       const condition = self.condition || {};
       if (condition.destroyed || condition.missing || condition.mute) {
         return false;
       }
       return true;
-    `);
+    `,
+    );
 
     // Can taste if tongue exists
-    obj.setMethod('canTaste', `
+    obj.setMethod(
+      'canTaste',
+      `
       const condition = self.condition || {};
       if (condition.destroyed || condition.missing) {
         return false;
       }
       return true;
-    `);
+    `,
+    );
 
-    obj.setPropertyDescription('canSense', 'Array of senses this organ provides (taste).');
+    obj.setPropertyDescription(
+      'canSense',
+      'Array of senses this organ provides (taste).',
+    );
 
     return obj;
   }
@@ -749,7 +878,9 @@ BONES: Humerus (upper), radius/ulna (forearm). Breaking impairs use.`,
       methods: {},
     });
 
-    obj.setMethod('describe', `
+    obj.setMethod(
+      'describe',
+      `
       let desc = self.description;
 
       // Check if hand is attached and what it holds
@@ -760,10 +891,17 @@ BONES: Humerus (upper), radius/ulna (forearm). Breaking impairs use.`,
       }
 
       return desc;
-    `);
+    `,
+    );
 
-    obj.setPropertyDescription('calories', 'Current energy stored in arm muscles.');
-    obj.setPropertyDescription('maxCalories', 'Maximum calorie storage in arm. Refills from torso when depleted.');
+    obj.setPropertyDescription(
+      'calories',
+      'Current energy stored in arm muscles.',
+    );
+    obj.setPropertyDescription(
+      'maxCalories',
+      'Maximum calorie storage in arm. Refills from torso when depleted.',
+    );
 
     return obj;
   }
@@ -814,7 +952,9 @@ BONES: Carpals (wrist), metacarpals (palm). Fractures impair grip.`,
     });
 
     // Hands can hold items
-    obj.setMethod('canContain', `
+    obj.setMethod(
+      'canContain',
+      `
       const obj = args[0];
       const contents = self.contents || [];
 
@@ -844,9 +984,12 @@ BONES: Carpals (wrist), metacarpals (palm). Fractures impair grip.`,
       }
 
       return true;
-    `);
+    `,
+    );
 
-    obj.setMethod('describe', `
+    obj.setMethod(
+      'describe',
+      `
       let desc = 'a hand';
       const contents = self.contents || [];
 
@@ -861,22 +1004,47 @@ BONES: Carpals (wrist), metacarpals (palm). Fractures impair grip.`,
       }
 
       return desc;
-    `);
+    `,
+    );
 
     // Get items held by this hand
-    obj.setMethod('getHeld', `
+    obj.setMethod(
+      'getHeld',
+      `
       const contents = self.contents || [];
       return contents.filter(item => item);
-    `);
+    `,
+    );
 
-    obj.setPropertyDescription('canGrasp', 'Whether this hand can grasp and hold items.');
-    obj.setPropertyDescription('maxItems', 'Maximum number of items this hand can hold simultaneously (typically 2).');
-    obj.setPropertyDescription('maxWeight', 'Maximum weight in grams this hand can hold. Reduced by decay and damage.');
-    obj.setPropertyDescription('width', 'Palm width in cm. Affects what can be grasped.');
-    obj.setPropertyDescription('height', 'Hand length in cm (fingers extended).');
+    obj.setPropertyDescription(
+      'canGrasp',
+      'Whether this hand can grasp and hold items.',
+    );
+    obj.setPropertyDescription(
+      'maxItems',
+      'Maximum number of items this hand can hold simultaneously (typically 2).',
+    );
+    obj.setPropertyDescription(
+      'maxWeight',
+      'Maximum weight in grams this hand can hold. Reduced by decay and damage.',
+    );
+    obj.setPropertyDescription(
+      'width',
+      'Palm width in cm. Affects what can be grasped.',
+    );
+    obj.setPropertyDescription(
+      'height',
+      'Hand length in cm (fingers extended).',
+    );
     obj.setPropertyDescription('depth', 'Grip thickness in cm.');
-    obj.setPropertyDescription('calories', 'Current energy in hand/forearm muscles.');
-    obj.setPropertyDescription('maxCalories', 'Maximum calorie storage in hand. Powers grip strength.');
+    obj.setPropertyDescription(
+      'calories',
+      'Current energy in hand/forearm muscles.',
+    );
+    obj.setPropertyDescription(
+      'maxCalories',
+      'Maximum calorie storage in hand. Powers grip strength.',
+    );
 
     return obj;
   }
@@ -913,7 +1081,10 @@ WEIGHT: ~20g each. Tiny but crucial for hand function.`,
       methods: {},
     });
 
-    obj.setPropertyDescription('canSense', 'Array of senses this organ provides (touch).');
+    obj.setPropertyDescription(
+      'canSense',
+      'Array of senses this organ provides (touch).',
+    );
 
     return obj;
   }
@@ -955,9 +1126,18 @@ AMPUTATION: 'removable' is true. Severing drops leg (with foot attached) to grou
       methods: {},
     });
 
-    obj.setPropertyDescription('canMove', 'Whether this leg enables locomotion. Requires working joints and bones.');
-    obj.setPropertyDescription('calories', 'Current energy in leg muscles. Legs have the highest capacity (largest muscles).');
-    obj.setPropertyDescription('maxCalories', 'Maximum calorie storage in leg. Powers movement, jumping, and kicking.');
+    obj.setPropertyDescription(
+      'canMove',
+      'Whether this leg enables locomotion. Requires working joints and bones.',
+    );
+    obj.setPropertyDescription(
+      'calories',
+      'Current energy in leg muscles. Legs have the highest capacity (largest muscles).',
+    );
+    obj.setPropertyDescription(
+      'maxCalories',
+      'Maximum calorie storage in leg. Powers movement, jumping, and kicking.',
+    );
 
     return obj;
   }
@@ -997,7 +1177,10 @@ REMOVABLE: Can be severed at ankle. Chrome feet provide enhanced grip, shock abs
       methods: {},
     });
 
-    obj.setPropertyDescription('canMove', 'Whether this foot contributes to leg locomotion. Provides traction and balance.');
+    obj.setPropertyDescription(
+      'canMove',
+      'Whether this foot contributes to leg locomotion. Provides traction and balance.',
+    );
 
     return obj;
   }

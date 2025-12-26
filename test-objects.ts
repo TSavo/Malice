@@ -14,7 +14,7 @@ try {
   // Ensure root object #1 exists
   await db.ensureRoot();
   const root = await manager.load(1);
-  console.log(`✅ Root object #${root!.id} loaded`);
+  console.log(`✅ Root object #${root?.id} loaded`);
 
   // Create a "person" prototype (#2) that inherits from root
   console.log('\n📦 Creating person prototype (#2)...');
@@ -46,7 +46,9 @@ try {
     },
   });
   console.log(`✅ Person prototype created: #${personProto.id}`);
-  console.log(`   Properties: ${JSON.stringify(personProto.getOwnProperties())}`);
+  console.log(
+    `   Properties: ${JSON.stringify(personProto.getOwnProperties())}`,
+  );
 
   // Create a specific person (#3) that inherits from person prototype
   console.log('\n👤 Creating Alice (#3)...');
@@ -59,7 +61,9 @@ try {
   });
   console.log(`✅ Alice created: #${alice.id}`);
   console.log(`   Name: ${alice.get('name')}`);
-  console.log(`   HP: ${alice.get('hp')} (inherited maxHp: ${alice.get('maxHp')})`);
+  console.log(
+    `   HP: ${alice.get('hp')} (inherited maxHp: ${alice.get('maxHp')})`,
+  );
 
   // Test method execution
   console.log('\n⚔️  Testing combat methods...');
@@ -74,14 +78,20 @@ try {
   manager.clearCache();
   const aliceReloaded = await manager.load(alice.id);
   console.log(`✅ Alice reloaded from DB`);
-  console.log(`   HP after reload: ${aliceReloaded!.get('hp')}`);
+  console.log(`   HP after reload: ${aliceReloaded?.get('hp')}`);
 
   // Test inheritance chain
   console.log('\n🔗 Testing inheritance...');
-  console.log(`   Alice's parent: #${aliceReloaded!.getParent()}`);
-  console.log(`   Alice has 'takeDamage' method: ${aliceReloaded!.hasMethod('takeDamage')}`);
-  console.log(`   Alice's own methods: ${Object.keys(aliceReloaded!.getOwnMethods())}`);
-  console.log(`   Person's methods: ${Object.keys(personProto.getOwnMethods())}`);
+  console.log(`   Alice's parent: #${aliceReloaded?.getParent()}`);
+  console.log(
+    `   Alice has 'takeDamage' method: ${aliceReloaded?.hasMethod('takeDamage')}`,
+  );
+  console.log(
+    `   Alice's own methods: ${Object.keys(aliceReloaded?.getOwnMethods())}`,
+  );
+  console.log(
+    `   Person's methods: ${Object.keys(personProto.getOwnMethods())}`,
+  );
 
   console.log('\n✅ All tests passed!');
 } catch (err) {

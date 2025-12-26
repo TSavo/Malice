@@ -1,9 +1,11 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { GameBootstrap } from '../../src/database/game-bootstrap.js';
 import { ObjectDatabase } from '../../src/database/object-db.js';
 import { ObjectManager } from '../../src/database/object-manager.js';
-import { GameBootstrap } from '../../src/database/game-bootstrap.js';
 
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/?replicaSet=rs0&directConnection=true';
+const MONGO_URI =
+  process.env.MONGO_URI ||
+  'mongodb://localhost:27017/?replicaSet=rs0&directConnection=true';
 
 // Use lower iterations for regular tests, set PERF_ITERATIONS=1000000 for benchmarks
 const ITERATIONS = parseInt(process.env.PERF_ITERATIONS || '10000', 10);
@@ -16,9 +18,12 @@ describe('Method Call Performance', () => {
   beforeAll(async () => {
     db = new ObjectDatabase(MONGO_URI, 'malice_test_perf');
     await db.connect();
-    await db['objects'].deleteMany({});
+    await db.objects.deleteMany({});
     manager = new ObjectManager(db);
-    const bootstrap = new GameBootstrap(manager, { worldBuildMode: 'systems', disableDefaultJobs: true });
+    const bootstrap = new GameBootstrap(manager, {
+      worldBuildMode: 'systems',
+      disableDefaultJobs: true,
+    });
     await bootstrap.bootstrap();
     $ = manager as any;
   }, 30000);
@@ -29,16 +34,21 @@ describe('Method Call Performance', () => {
   });
 
   it('should measure direct method call (self.b)', async () => {
-    const testObj = await $.recycler.create({
-      parent: $.root,
-      properties: { name: 'Perf Test Object' },
-    }, null);
+    const testObj = await $.recycler.create(
+      {
+        parent: $.root,
+        properties: { name: 'Perf Test Object' },
+      },
+      null,
+    );
 
     // Method b just returns true
     testObj.setMethod('b', `return true;`);
 
     // Method a calls b ITERATIONS times
-    testObj.setMethod('a', `
+    testObj.setMethod(
+      'a',
+      `
       const iterations = ${ITERATIONS};
       const startTime = Date.now();
 
@@ -56,9 +66,12 @@ describe('Method Call Performance', () => {
         callsPerSecond,
         avgMicrosPerCall: Math.round((elapsed / iterations) * 1000)
       };
-    `);
+    `,
+    );
 
-    console.log(`\n=== Direct method call (self.b) [${ITERATIONS} iterations] ===`);
+    console.log(
+      `\n=== Direct method call (self.b) [${ITERATIONS} iterations] ===`,
+    );
 
     const result = await testObj.a();
 
@@ -72,15 +85,21 @@ describe('Method Call Performance', () => {
 
   it('should measure property lookup + method call (self.target.method)', async () => {
     // Create two objects: A holds reference to B, A calls B.method()
-    const objA = await $.recycler.create({
-      parent: $.root,
-      properties: { name: 'Object A' },
-    }, null);
+    const objA = await $.recycler.create(
+      {
+        parent: $.root,
+        properties: { name: 'Object A' },
+      },
+      null,
+    );
 
-    const objB = await $.recycler.create({
-      parent: $.root,
-      properties: { name: 'Object B' },
-    }, null);
+    const objB = await $.recycler.create(
+      {
+        parent: $.root,
+        properties: { name: 'Object B' },
+      },
+      null,
+    );
 
     // A.target = B
     objA.set('target', objB);
@@ -89,7 +108,9 @@ describe('Method Call Performance', () => {
     objB.setMethod('method', `return true;`);
 
     // A calls target.method ITERATIONS times
-    objA.setMethod('runTest', `
+    objA.setMethod(
+      'runTest',
+      `
       const iterations = ${ITERATIONS};
       const startTime = Date.now();
 
@@ -107,9 +128,12 @@ describe('Method Call Performance', () => {
         callsPerSecond,
         avgMicrosPerCall: Math.round((elapsed / iterations) * 1000)
       };
-    `);
+    `,
+    );
 
-    console.log(`\n=== Property lookup + method call (self.target.method) [${ITERATIONS} iterations] ===`);
+    console.log(
+      `\n=== Property lookup + method call (self.target.method) [${ITERATIONS} iterations] ===`,
+    );
 
     const result = await objA.runTest();
 
@@ -122,20 +146,29 @@ describe('Method Call Performance', () => {
 
   it('should measure chained property lookup + method call (self.a.b.method)', async () => {
     // Create three objects: A -> middle -> target
-    const objA = await $.recycler.create({
-      parent: $.root,
-      properties: { name: 'Object A' },
-    }, null);
+    const objA = await $.recycler.create(
+      {
+        parent: $.root,
+        properties: { name: 'Object A' },
+      },
+      null,
+    );
 
-    const middle = await $.recycler.create({
-      parent: $.root,
-      properties: { name: 'Middle Object' },
-    }, null);
+    const middle = await $.recycler.create(
+      {
+        parent: $.root,
+        properties: { name: 'Middle Object' },
+      },
+      null,
+    );
 
-    const target = await $.recycler.create({
-      parent: $.root,
-      properties: { name: 'Target Object' },
-    }, null);
+    const target = await $.recycler.create(
+      {
+        parent: $.root,
+        properties: { name: 'Target Object' },
+      },
+      null,
+    );
 
     // A.middle = middle, middle.target = target
     objA.set('middle', middle);
@@ -145,7 +178,9 @@ describe('Method Call Performance', () => {
     target.setMethod('method', `return true;`);
 
     // A calls middle.target.method ITERATIONS times
-    objA.setMethod('runTest', `
+    objA.setMethod(
+      'runTest',
+      `
       const iterations = ${ITERATIONS};
       const startTime = Date.now();
 
@@ -163,9 +198,12 @@ describe('Method Call Performance', () => {
         callsPerSecond,
         avgMicrosPerCall: Math.round((elapsed / iterations) * 1000)
       };
-    `);
+    `,
+    );
 
-    console.log(`\n=== Chained property lookup + method call (self.middle.target.method) [${ITERATIONS} iterations] ===`);
+    console.log(
+      `\n=== Chained property lookup + method call (self.middle.target.method) [${ITERATIONS} iterations] ===`,
+    );
 
     const result = await objA.runTest();
 

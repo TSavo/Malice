@@ -1,5 +1,5 @@
-import { ObjectManager } from '../object-manager.js';
 import type { RuntimeObject } from '../../../types/object.js';
+import type { ObjectManager } from '../object-manager.js';
 
 /**
  * Builds Memento utility object ($.memento)
@@ -28,7 +28,8 @@ export class MementoBuilder {
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
 
-    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
+    const aliases =
+      (objectManager.get('aliases') as Record<string, number>) || {};
 
     if (aliases.memento) {
       this.memento = await this.manager.load(aliases.memento);
@@ -49,7 +50,9 @@ export class MementoBuilder {
     // Capture a set of objects as a memento
     // objects: array of objects (or IDs) to include in the graph
     // Returns: { objects: { '%0': {...}, '%1': {...} }, root: '%0' }
-    this.memento.setMethod('capture', `
+    this.memento.setMethod(
+      'capture',
+      `
       const objects = args[0];
 
       if (!Array.isArray(objects) || objects.length === 0) {
@@ -149,12 +152,15 @@ export class MementoBuilder {
         objects: serialized,
         root: '%0',
       });
-    `);
+    `,
+    );
 
     // Rehydrate a memento - create new objects with new IDs
     // memento: the captured memento (JSON string)
     // Returns: map of placeholder -> new object { '%0': newObj, '%1': newObj, ... }
-    this.memento.setMethod('rehydrate', `
+    this.memento.setMethod(
+      'rehydrate',
+      `
       const mementoStr = args[0];
 
       if (!mementoStr || typeof mementoStr !== 'string') {
@@ -276,14 +282,18 @@ export class MementoBuilder {
       }
 
       return placeholderToObj;
-    `);
+    `,
+    );
 
     // Convenience: capture and immediately rehydrate (clone)
-    this.memento.setMethod('clone', `
+    this.memento.setMethod(
+      'clone',
+      `
       const objects = args[0];
       const memento = await self.capture(objects);
       return await self.rehydrate(memento);
-    `);
+    `,
+    );
   }
 
   async registerAlias(): Promise<void> {

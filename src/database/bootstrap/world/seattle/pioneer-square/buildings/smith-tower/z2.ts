@@ -336,7 +336,8 @@ The walls are sound-dampened. A small camera dome in the ceiling blinks red, rec
         {
           name: 'a processing bench',
           capacity: 2,
-          emptyMsg: 'A metal bench is bolted to the floor near the processing desk.',
+          emptyMsg:
+            'A metal bench is bolted to the floor near the processing desk.',
           occupiedMsg: '%s seated on the processing bench',
         },
       ],

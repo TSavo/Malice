@@ -1,9 +1,9 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Bladed Weapon Prototypes
- * 
+ *
  * Hierarchy:
  * $.weapon
  *   $.blade (base for all bladed weapons)
@@ -63,9 +63,18 @@ CONCEALMENT: Smaller blades easier to hide. Folding blades even more so. Draw ti
       methods: {},
     });
 
-    obj.setPropertyDescription('skill', 'Combat skill used with this weapon (blade, knife, machete, katana, sword, axe). Affects attack success and damage.');
-    obj.setPropertyDescription('damage', 'Base damage value for attacks. Combined with strength and skill check for final wound severity.');
-    obj.setPropertyDescription('damageType', 'Type of wound inflicted (cut, puncture). Cuts bleed more, punctures go deeper.');
+    obj.setPropertyDescription(
+      'skill',
+      'Combat skill used with this weapon (blade, knife, machete, katana, sword, axe). Affects attack success and damage.',
+    );
+    obj.setPropertyDescription(
+      'damage',
+      'Base damage value for attacks. Combined with strength and skill check for final wound severity.',
+    );
+    obj.setPropertyDescription(
+      'damageType',
+      'Type of wound inflicted (cut, puncture). Cuts bleed more, punctures go deeper.',
+    );
 
     return obj;
   }
@@ -144,7 +153,8 @@ export class SwitchbladeBuilder {
       parent: parentObj!,
       properties: {
         name: 'Switchblade',
-        description: 'A spring-loaded folding knife. Flicks open with a button.',
+        description:
+          'A spring-loaded folding knife. Flicks open with a button.',
         skill: 'knife',
         damage: 10,
         damageType: 'puncture',
@@ -184,7 +194,8 @@ export class ButterflyKnifeBuilder {
       parent: parentObj!,
       properties: {
         name: 'Butterfly Knife',
-        description: 'A folding knife with split handles that rotate around the blade.',
+        description:
+          'A folding knife with split handles that rotate around the blade.',
         skill: 'knife',
         damage: 10,
         damageType: 'cut',
@@ -248,7 +259,8 @@ export class MacheteBuilder {
       parent: parentObj!,
       properties: {
         name: 'Machete',
-        description: 'A heavy blade for chopping. Originally an agricultural tool.',
+        description:
+          'A heavy blade for chopping. Originally an agricultural tool.',
         skill: 'machete',
         damage: 28,
         damageType: 'cut',
@@ -288,7 +300,8 @@ export class KukriBuilder {
       parent: parentObj!,
       properties: {
         name: 'Kukri',
-        description: 'A curved Nepalese blade with a heavy forward edge. Brutal chopper.',
+        description:
+          'A curved Nepalese blade with a heavy forward edge. Brutal chopper.',
         skill: 'machete',
         damage: 30,
         damageType: 'cut',
@@ -316,7 +329,7 @@ export class KatanaBuilder {
         skill: 'katana',
         damage: 35,
         damageType: 'cut',
-        twoHanded: true,  // Traditional two-handed grip
+        twoHanded: true, // Traditional two-handed grip
       },
       methods: {},
     });
@@ -333,7 +346,8 @@ export class WakizashiBuilder {
       parent: parentObj!,
       properties: {
         name: 'Wakizashi',
-        description: 'A shorter companion sword to the katana. Traditional samurai sidearm.',
+        description:
+          'A shorter companion sword to the katana. Traditional samurai sidearm.',
         skill: 'katana',
         damage: 25,
         damageType: 'cut',
@@ -421,7 +435,7 @@ export class LongswordBuilder {
         skill: 'sword',
         damage: 38,
         damageType: 'cut',
-        twoHanded: true,  // Two-handed sword
+        twoHanded: true, // Two-handed sword
       },
       methods: {},
     });
@@ -542,11 +556,11 @@ export class FireAxeBuilder {
       parent: parentObj!,
       properties: {
         name: 'Fire Axe',
-        description: 'A heavy firefighter\'s axe. Long handle, brutal head.',
+        description: "A heavy firefighter's axe. Long handle, brutal head.",
         skill: 'axe',
         damage: 38,
         damageType: 'cut',
-        twoHanded: true,  // Long handle requires two hands
+        twoHanded: true, // Long handle requires two hands
       },
       methods: {},
     });

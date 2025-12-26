@@ -1,12 +1,14 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { ObjectDatabase } from '../../src/database/object-db.js';
-import { ObjectManager } from '../../src/database/object-manager.js';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { AliasLoader } from '../../src/database/bootstrap/alias-loader.js';
 import { MinimalBootstrap } from '../../src/database/bootstrap/minimal-bootstrap.js';
 import { PrototypeBuilder } from '../../src/database/bootstrap/prototype-builder.js';
-import { AliasLoader } from '../../src/database/bootstrap/alias-loader.js';
+import { ObjectDatabase } from '../../src/database/object-db.js';
+import { ObjectManager } from '../../src/database/object-manager.js';
 import type { RuntimeObject } from '../../types/object.js';
 
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/?replicaSet=rs0&directConnection=true';
+const MONGO_URI =
+  process.env.MONGO_URI ||
+  'mongodb://localhost:27017/?replicaSet=rs0&directConnection=true';
 
 /**
  * Integration tests for complete character creation and look flow
@@ -21,7 +23,7 @@ describe('Character Creation and Look Flow Integration', () => {
   beforeEach(async () => {
     db = new ObjectDatabase(MONGO_URI, 'malice_test_chargen_look');
     await db.connect();
-    await db['objects'].deleteMany({});
+    await db.objects.deleteMany({});
 
     // Create ObjectManager first
     manager = new ObjectManager(db);
@@ -39,7 +41,9 @@ describe('Character Creation and Look Flow Integration', () => {
     // Mock connection context
     sentMessages = [];
     mockContext = {
-      send: (msg: string) => { sentMessages.push(msg); },
+      send: (msg: string) => {
+        sentMessages.push(msg);
+      },
       question: async () => '',
       choice: async () => '',
       yesorno: async () => false,
@@ -76,7 +80,8 @@ describe('Character Creation and Look Flow Integration', () => {
         parent: $.room,
         properties: {
           name: 'Tavern',
-          description: 'A cozy tavern with wooden tables and a roaring fireplace.',
+          description:
+            'A cozy tavern with wooden tables and a roaring fireplace.',
           exits: [northExit.id, westExit.id],
           contents: [],
         },
@@ -101,10 +106,18 @@ describe('Character Creation and Look Flow Integration', () => {
 
     it('should execute look command and get room description', async () => {
       // Use callVerb to properly pass player context (as verb system would)
-      const result = await player.callVerb('look', mockContext, player, 'look', []) as string;
+      const result = (await player.callVerb(
+        'look',
+        mockContext,
+        player,
+        'look',
+        [],
+      )) as string;
 
       expect(result).toContain('Tavern');
-      expect(result).toContain('A cozy tavern with wooden tables and a roaring fireplace.');
+      expect(result).toContain(
+        'A cozy tavern with wooden tables and a roaring fireplace.',
+      );
       // Exits include distance by default
       expect(result).toContain('Obvious exits:');
       expect(result).toContain('north');
@@ -112,7 +125,13 @@ describe('Character Creation and Look Flow Integration', () => {
     });
 
     it('should not show the player in their own room description', async () => {
-      const result = await player.callVerb('look', mockContext, player, 'look', []) as string;
+      const result = (await player.callVerb(
+        'look',
+        mockContext,
+        player,
+        'look',
+        [],
+      )) as string;
 
       // Player should NOT see themselves in the room
       expect(result).not.toContain('Diana the Bold');
@@ -135,7 +154,13 @@ describe('Character Creation and Look Flow Integration', () => {
 
       await room.call('addContent', otherPlayer.id);
 
-      const result = await player.callVerb('look', mockContext, player, 'look', []) as string;
+      const result = (await player.callVerb(
+        'look',
+        mockContext,
+        player,
+        'look',
+        [],
+      )) as string;
 
       // Should see the other player
       expect(result).toContain('You see:');
@@ -177,7 +202,8 @@ describe('Character Creation and Look Flow Integration', () => {
         parent: $.room,
         properties: {
           name: 'Newbie Landing',
-          description: 'A safe haven for new adventurers. A signpost points to various destinations.',
+          description:
+            'A safe haven for new adventurers. A signpost points to various destinations.',
           exits: [northExit.id, southExit.id, eastExit.id, westExit.id],
           contents: [],
         },
@@ -210,7 +236,13 @@ describe('Character Creation and Look Flow Integration', () => {
       expect(connectOutput).toContain('Welcome back, Henry!');
 
       // Step 5: Execute look command directly (not via onInput, to test core look functionality)
-      const lookResult = await newPlayer.callVerb('look', mockContext, newPlayer, 'look', []) as string;
+      const lookResult = (await newPlayer.callVerb(
+        'look',
+        mockContext,
+        newPlayer,
+        'look',
+        [],
+      )) as string;
 
       expect(lookResult).toContain('Newbie Landing');
       expect(lookResult).toContain('A safe haven for new adventurers.');

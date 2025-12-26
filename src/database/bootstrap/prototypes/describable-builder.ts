@@ -1,5 +1,5 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Builds the Describable prototype
@@ -8,64 +8,86 @@ import type { RuntimeObject } from '../../../../types/object.js';
 export class DescribableBuilder {
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: number, existingObj?: RuntimeObject): Promise<RuntimeObject> {
+  async build(
+    parentId: number,
+    existingObj?: RuntimeObject,
+  ): Promise<RuntimeObject> {
     const parentObj = await this.manager.load(parentId);
-    const obj = existingObj || await this.manager.create({
-      parent: parentObj!,
-      properties: {
-        name: 'Describable',
-        description: 'Base prototype for things that exist in the world',
-        aliases: [],
-        location: null, // ObjId | null - where this object is located
-        contents: [], // ObjId[] - what's inside this object
-        // Physical dimensions (in centimeters for width/height/depth, grams for weight)
-        width: 0, // cm
-        height: 0, // cm
-        depth: 0, // cm
-        weight: 0, // grams
-        // Movement restrictions
-        boltedDown: false, // If true, cannot be moved at all
-        // AI-readable abilities - natural language mechanics documentation
-        // Describes what this object can do, how to use it, rules/formulas
-        abilities: null, // string - grows as players discover new interactions
-      },
-      methods: {},
-    });
+    const obj =
+      existingObj ||
+      (await this.manager.create({
+        parent: parentObj!,
+        properties: {
+          name: 'Describable',
+          description: 'Base prototype for things that exist in the world',
+          aliases: [],
+          location: null, // ObjId | null - where this object is located
+          contents: [], // ObjId[] - what's inside this object
+          // Physical dimensions (in centimeters for width/height/depth, grams for weight)
+          width: 0, // cm
+          height: 0, // cm
+          depth: 0, // cm
+          weight: 0, // grams
+          // Movement restrictions
+          boltedDown: false, // If true, cannot be moved at all
+          // AI-readable abilities - natural language mechanics documentation
+          // Describes what this object can do, how to use it, rules/formulas
+          abilities: null, // string - grows as players discover new interactions
+        },
+        methods: {},
+      }));
 
-    obj.setMethod('describe', `
+    obj.setMethod(
+      'describe',
+      `
       return \`\${self.name}\\r\\n\${self.description}\`;
-    `);
+    `,
+    );
 
-    obj.setMethod('shortDesc', `
+    obj.setMethod(
+      'shortDesc',
+      `
       return self.name;
-    `);
+    `,
+    );
 
     // Get volume in cubic centimeters
-    obj.setMethod('getVolume', `
+    obj.setMethod(
+      'getVolume',
+      `
       return (self.width || 0) * (self.height || 0) * (self.depth || 0);
-    `);
+    `,
+    );
 
     // Check if this object can fit inside another based on dimensions
-    obj.setMethod('canFitIn', `
+    obj.setMethod(
+      'canFitIn',
+      `
       const container = args[0];
       // Simple check: object's smallest bounding dimension vs container's largest
       const dims = [self.width || 0, self.height || 0, self.depth || 0].sort((a, b) => a - b);
       const containerDims = [container.width || 0, container.height || 0, container.depth || 0].sort((a, b) => b - a);
       // Check if smallest dimension of object fits in largest of container, etc.
       return dims[0] <= containerDims[0] && dims[1] <= containerDims[1] && dims[2] <= containerDims[2];
-    `);
+    `,
+    );
 
     // Check if this object can contain another object
     // Return true to allow, or a string explaining why not
-    obj.setMethod('canContain', `
+    obj.setMethod(
+      'canContain',
+      `
       const obj = args[0];
       const objName = obj?.name || 'that';
       return \`The \${self.name} cannot contain \${objName}.\`;
-    `);
+    `,
+    );
 
     // THE primitive for all location changes
     // Everything that moves goes through this method
-    obj.setMethod('moveTo', `
+    obj.setMethod(
+      'moveTo',
+      `
       /** Move this object to a new location.
        *  THE primitive for all location changes - picking up, dropping, transferring.
        *  To pick up: item.moveTo(hand)
@@ -119,10 +141,13 @@ export class DescribableBuilder {
       if (dest.onContentArrived) {
         await dest.onContentArrived(self, source, mover);
       }
-    `);
+    `,
+    );
 
     // Basic content management - can be overridden by Location for fancier behavior
-    obj.setMethod('addContent', `
+    obj.setMethod(
+      'addContent',
+      `
       let item = args[0];
 
       // Accept either a RuntimeObject or an ID number
@@ -142,9 +167,12 @@ export class DescribableBuilder {
         self.contents = contents;
         item.location = self;
       }
-    `);
+    `,
+    );
 
-    obj.setMethod('removeContent', `
+    obj.setMethod(
+      'removeContent',
+      `
       let item = args[0];
 
       // Get the id we're looking for
@@ -159,28 +187,37 @@ export class DescribableBuilder {
         contents.splice(index, 1);
         self.contents = contents;
       }
-    `);
+    `,
+    );
 
     // Hook: called before leaving current location
     // Override to prepare for departure, can throw to cancel
-    obj.setMethod('onLeaving', `
+    obj.setMethod(
+      'onLeaving',
+      `
       const source = args[0];
       const dest = args[1];
       const mover = args[2];
       // Default: do nothing, allow move
-    `);
+    `,
+    );
 
     // Hook: called after arriving at new location
     // Override to register verbs, announce arrival, etc.
-    obj.setMethod('onArrived', `
+    obj.setMethod(
+      'onArrived',
+      `
       const dest = args[0];
       const source = args[1];
       const mover = args[2];
       // Default: do nothing
-    `);
+    `,
+    );
 
     // Room-centric verb registration API
-    obj.setMethod('onPlayerEnter', `
+    obj.setMethod(
+      'onPlayerEnter',
+      `
       /** Called when a player enters the room. Registers verbs from all contents. */
       const player = args[0];
       for (const obj of self.contents || []) {
@@ -190,9 +227,12 @@ export class DescribableBuilder {
           }
         }
       }
-    `);
+    `,
+    );
 
-    obj.setMethod('onPlayerExit', `
+    obj.setMethod(
+      'onPlayerExit',
+      `
       /** Called when a player leaves the room. Unregisters verbs from all contents. */
       const player = args[0];
       for (const obj of self.contents || []) {
@@ -202,7 +242,8 @@ export class DescribableBuilder {
           }
         }
       }
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // PLOT HOOKS - Allow plots to watch for events on this object
@@ -211,7 +252,9 @@ export class DescribableBuilder {
     // triggerPlotHooks(eventName, data) - notify all plots watching for this event
     // Called by objects when something interesting happens (e.g., item deposited)
     // Checks filter criteria: all filter keys must match corresponding data keys
-    obj.setMethod('triggerPlotHooks', `
+    obj.setMethod(
+      'triggerPlotHooks',
+      `
       const eventName = args[0];
       const data = args[1] || {};
 
@@ -268,27 +311,36 @@ export class DescribableBuilder {
       }
 
       return triggered;
-    `);
+    `,
+    );
 
     // getPlotHooks() - list all plot hooks registered on this object
-    obj.setMethod('getPlotHooks', `
+    obj.setMethod(
+      'getPlotHooks',
+      `
       return self.plotHooks || {};
-    `);
+    `,
+    );
 
     // hasPlotHook(eventName) - check if any plot is watching for this event
-    obj.setMethod('hasPlotHook', `
+    obj.setMethod(
+      'hasPlotHook',
+      `
       const eventName = args[0];
       const plotHooks = self.plotHooks || {};
       const hooks = plotHooks[eventName] || [];
       return hooks.length > 0;
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // ABILITIES - Natural language mechanics documentation for AI
     // ═══════════════════════════════════════════════════════════════════
 
     // getAbilities() - Get abilities, walking inheritance chain if needed
-    obj.setMethod('getAbilities', `
+    obj.setMethod(
+      'getAbilities',
+      `
       // Check self first
       if (self.abilities) {
         return self.abilities;
@@ -299,11 +351,14 @@ export class DescribableBuilder {
         return await parent.getAbilities();
       }
       return null;
-    `);
+    `,
+    );
 
     // updateAbilities(newText) - Append new abilities text to this object's abilities
     // This is how the AI documents newly discovered mechanics
-    obj.setMethod('updateAbilities', `
+    obj.setMethod(
+      'updateAbilities',
+      `
       const newText = args[0];
       if (!newText) return self.abilities;
 
@@ -314,11 +369,14 @@ export class DescribableBuilder {
         self.abilities = newText.trim();
       }
       return self.abilities;
-    `);
+    `,
+    );
 
     // getFullContext() - Get object info for AI context (legacy, use describeForAI)
     // Returns name, description, abilities, and key properties
-    obj.setMethod('getFullContext', `
+    obj.setMethod(
+      'getFullContext',
+      `
       return {
         id: self.id,
         name: self.name,
@@ -327,11 +385,14 @@ export class DescribableBuilder {
         location: self.location?.id,
         contents: (self.contents || []).map(c => ({ id: c.id, name: c.name })),
       };
-    `);
+    `,
+    );
 
     // getMethodsForAI() - Get method signatures with JSDoc for AI context
     // Extracts the first JSDoc comment block from each method as documentation
-    obj.setMethod('getMethodsForAI', `
+    obj.setMethod(
+      'getMethodsForAI',
+      `
       /** Get method names and their JSDoc descriptions for AI context.
        *  Walks inheritance chain to include inherited methods.
        *  @returns Object mapping method names to { doc, from } where from is $alias or #id
@@ -401,11 +462,14 @@ export class DescribableBuilder {
       }
 
       return result;
-    `);
+    `,
+    );
 
     // describeForAI(options) - Rich recursive description for AI context
     // Walks inheritance chain showing each object's LOCAL definitions
-    obj.setMethod('describeForAI', `
+    obj.setMethod(
+      'describeForAI',
+      `
       /** Describe this object for AI context, walking inheritance chain.
        *  Shows each object in the chain with only its LOCALLY defined items.
        *  @param options - { depth, includeProps, includeMethods }
@@ -571,20 +635,39 @@ export class DescribableBuilder {
       }
 
       return result;
-    `);
+    `,
+    );
 
     // Property descriptions for AI context
     obj.setPropertyDescription('name', 'Display name of this object');
-    obj.setPropertyDescription('description', 'Prose description of what the object looks like');
-    obj.setPropertyDescription('aliases', 'Alternative names this object responds to');
-    obj.setPropertyDescription('location', 'The container or room where this object currently is (objref)');
-    obj.setPropertyDescription('contents', 'Array of objects inside this object (objrefs)');
+    obj.setPropertyDescription(
+      'description',
+      'Prose description of what the object looks like',
+    );
+    obj.setPropertyDescription(
+      'aliases',
+      'Alternative names this object responds to',
+    );
+    obj.setPropertyDescription(
+      'location',
+      'The container or room where this object currently is (objref)',
+    );
+    obj.setPropertyDescription(
+      'contents',
+      'Array of objects inside this object (objrefs)',
+    );
     obj.setPropertyDescription('width', 'Width in centimeters');
     obj.setPropertyDescription('height', 'Height in centimeters');
     obj.setPropertyDescription('depth', 'Depth in centimeters');
     obj.setPropertyDescription('weight', 'Weight in grams');
-    obj.setPropertyDescription('boltedDown', 'If true, object cannot be picked up or moved');
-    obj.setPropertyDescription('abilities', 'Natural language physics rules - what this object can do and how');
+    obj.setPropertyDescription(
+      'boltedDown',
+      'If true, object cannot be picked up or moved',
+    );
+    obj.setPropertyDescription(
+      'abilities',
+      'Natural language physics rules - what this object can do and how',
+    );
 
     return obj;
   }

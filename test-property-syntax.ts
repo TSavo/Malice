@@ -79,7 +79,7 @@ async function main() {
   console.log(`  After 30 damage: ${hpAfterNew} HP`);
 
   // Wait a moment for auto-save
-  await new Promise(resolve => setTimeout(resolve, 100));
+  await new Promise((resolve) => setTimeout(resolve, 100));
 
   // Reload to verify auto-save
   await player.refresh();
@@ -90,7 +90,7 @@ async function main() {
   const hpAfterHeal = await player.call('heal', 50);
   console.log(`  After healing 50: ${hpAfterHeal} HP`);
 
-  await new Promise(resolve => setTimeout(resolve, 100));
+  await new Promise((resolve) => setTimeout(resolve, 100));
   await player.refresh();
   console.log(`  Reloaded HP: ${player.get('hp')}\n`);
 
@@ -99,16 +99,22 @@ async function main() {
   const levelUpMsg = await player.call('levelUp');
   console.log(`  ${levelUpMsg}`);
 
-  await new Promise(resolve => setTimeout(resolve, 100));
+  await new Promise((resolve) => setTimeout(resolve, 100));
   await player.refresh();
-  console.log(`  Reloaded - Level: ${player.get('level')}, HP: ${player.get('hp')}/${player.get('maxHp')}\n`);
+  console.log(
+    `  Reloaded - Level: ${player.get('level')}, HP: ${player.get('hp')}/${player.get('maxHp')}\n`,
+  );
 
   await db.disconnect();
   console.log('✅ All tests passed!');
   console.log('\n📝 Summary:');
   console.log('  - Property access: self.hp instead of self.get("hp")');
-  console.log('  - Property setting: self.hp = 50 instead of self.set("hp", 50)');
-  console.log('  - Auto-save: Changes persist automatically (no await self.save())');
+  console.log(
+    '  - Property setting: self.hp = 50 instead of self.set("hp", 50)',
+  );
+  console.log(
+    '  - Auto-save: Changes persist automatically (no await self.save())',
+  );
   process.exit(0);
 }
 

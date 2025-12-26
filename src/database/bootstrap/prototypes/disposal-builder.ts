@@ -1,5 +1,5 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Builds the Disposal prototype
@@ -59,7 +59,9 @@ IMMOVABLE: 'boltedDown' true by default.`,
       methods: {},
     });
 
-    obj.setMethod('canAccept', `
+    obj.setMethod(
+      'canAccept',
+      `
       /** Check if this disposal accepts the given item. */
       const item = args[0];
       if (!item) return false;
@@ -86,9 +88,12 @@ IMMOVABLE: 'boltedDown' true by default.`,
       }
 
       return false;
-    `);
+    `,
+    );
 
-    obj.setMethod('deposit', `
+    obj.setMethod(
+      'deposit',
+      `
       /** Deposit an item into the disposal. */
       const agent = args[0];
       const item = args[1];
@@ -138,9 +143,12 @@ IMMOVABLE: 'boltedDown' true by default.`,
 
         return { success: true, message: 'Item deposited. Processing...' };
       }
-    `);
+    `,
+    );
 
-    obj.setMethod('process', `
+    obj.setMethod(
+      'process',
+      `
       /** Process queued items. Called by scheduler. */
       const now = Date.now();
       const processing = self.processing || [];
@@ -160,15 +168,34 @@ IMMOVABLE: 'boltedDown' true by default.`,
 
       self.processing = stillProcessing;
       return { processed: processing.length - stillProcessing.length };
-    `);
+    `,
+    );
 
     // Add property descriptions
-    obj.setPropertyDescription('capacity', 'Maximum number of items that can be processed simultaneously (0 = unlimited)');
-    obj.setPropertyDescription('processingTime', 'Seconds required to process each item (0 = instant destruction)');
-    obj.setPropertyDescription('acceptedTypes', 'Whitelist array of prototype names this disposal accepts (empty = accept all)');
-    obj.setPropertyDescription('rejectedTypes', 'Blacklist array of prototype names this disposal rejects');
-    obj.setPropertyDescription('processing', 'Array of items currently queued for processing with timestamps');
-    obj.setPropertyDescription('destroyMessage', 'Message displayed when an item is destroyed');
+    obj.setPropertyDescription(
+      'capacity',
+      'Maximum number of items that can be processed simultaneously (0 = unlimited)',
+    );
+    obj.setPropertyDescription(
+      'processingTime',
+      'Seconds required to process each item (0 = instant destruction)',
+    );
+    obj.setPropertyDescription(
+      'acceptedTypes',
+      'Whitelist array of prototype names this disposal accepts (empty = accept all)',
+    );
+    obj.setPropertyDescription(
+      'rejectedTypes',
+      'Blacklist array of prototype names this disposal rejects',
+    );
+    obj.setPropertyDescription(
+      'processing',
+      'Array of items currently queued for processing with timestamps',
+    );
+    obj.setPropertyDescription(
+      'destroyMessage',
+      'Message displayed when an item is destroyed',
+    );
 
     return obj;
   }

@@ -1,5 +1,5 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Builds the StomachContents prototype
@@ -66,7 +66,9 @@ Both flags preserved through digestion for evidence.`,
 
     // Override canStackWith to also check spoiled/poisoned status
     // This extends the parent stackable's stackType check
-    obj.setMethod('canStackWith', `
+    obj.setMethod(
+      'canStackWith',
+      `
       const other = args[0];
       if (!other) return false;
 
@@ -78,15 +80,21 @@ Both flags preserved through digestion for evidence.`,
       if (self.poisoned !== other.poisoned) return false;
 
       return true;
-    `);
+    `,
+    );
 
     // Alias for backward compatibility
-    obj.setMethod('canAggregateWith', `
+    obj.setMethod(
+      'canAggregateWith',
+      `
       return await self.canStackWith(args[0]);
-    `);
+    `,
+    );
 
     // Override merge to also combine calories and volume
-    obj.setMethod('merge', `
+    obj.setMethod(
+      'merge',
+      `
       const other = args[0];
 
       if (!other) {
@@ -113,20 +121,26 @@ Both flags preserved through digestion for evidence.`,
       }
 
       return { success: true, quantity: self.quantity };
-    `);
+    `,
+    );
 
     // Alias for backward compatibility
-    obj.setMethod('aggregate', `
+    obj.setMethod(
+      'aggregate',
+      `
       const other = args[0];
       if (!other) return false;
 
       const result = await self.merge(other);
       return result.success;
-    `);
+    `,
+    );
 
     // Extract calories during digestion (one tick)
     // Returns { calories, volume } extracted
-    obj.setMethod('digestTick', `
+    obj.setMethod(
+      'digestTick',
+      `
       const rate = args[0] || 50; // Calories per tick
 
       const remaining = self.calories || 0;
@@ -143,23 +157,32 @@ Both flags preserved through digestion for evidence.`,
       self.volume = Math.max(0, currentVolume - volumeExtracted);
 
       return { calories: extracted, volume: volumeExtracted };
-    `);
+    `,
+    );
 
     // Check if fully digested
-    obj.setMethod('isFullyDigested', `
+    obj.setMethod(
+      'isFullyDigested',
+      `
       return (self.calories || 0) <= 0;
-    `);
+    `,
+    );
 
     // Get digestion percentage
-    obj.setMethod('getDigestionPercent', `
+    obj.setMethod(
+      'getDigestionPercent',
+      `
       const original = self.caloriesOriginal || 1;
       const remaining = self.calories || 0;
       const digested = original - remaining;
       return Math.round((digested / original) * 100);
-    `);
+    `,
+    );
 
     // Describe for autopsy/examination
-    obj.setMethod('describe', `
+    obj.setMethod(
+      'describe',
+      `
       const qty = self.quantity || 1;
       const name = self.sourceName || 'unknown food';
       const percent = await self.getDigestionPercent();
@@ -192,17 +215,21 @@ Both flags preserved through digestion for evidence.`,
       }
 
       return desc;
-    `);
+    `,
+    );
 
     // Short description for lists
-    obj.setMethod('shortDesc', `
+    obj.setMethod(
+      'shortDesc',
+      `
       const qty = self.quantity || 1;
       const name = self.sourceName || 'unknown';
       if (qty > 1) {
         return qty + 'x ' + name;
       }
       return name;
-    `);
+    `,
+    );
 
     return obj;
   }

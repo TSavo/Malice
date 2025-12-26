@@ -1,5 +1,5 @@
-import { ObjectManager } from '../object-manager.js';
 import type { RuntimeObject } from '../../../types/object.js';
+import type { ObjectManager } from '../object-manager.js';
 
 /**
  * Builds Prompt utility object ($.prompt)
@@ -33,7 +33,8 @@ export class PromptBuilder {
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
 
-    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
+    const aliases =
+      (objectManager.get('aliases') as Record<string, number>) || {};
 
     if (aliases.prompt) {
       this.prompt = await this.manager.load(aliases.prompt);
@@ -68,7 +69,9 @@ export class PromptBuilder {
     // player: the player to prompt
     // text: the prompt text to display
     // validator: optional function that returns error string or null
-    this.prompt.setMethod('question', `
+    this.prompt.setMethod(
+      'question',
+      `
       const player = args[0];
       const text = args[1];
       const validator = args[2]; // Optional validator function
@@ -83,11 +86,14 @@ export class PromptBuilder {
 
         player.tell(text);
       });
-    `);
+    `,
+    );
 
     // Show a choice menu - returns the selected key
     // options: { key: 'Display text', ... }
-    this.prompt.setMethod('choice', `
+    this.prompt.setMethod(
+      'choice',
+      `
       const player = args[0];
       const text = args[1];
       const options = args[2]; // { key: 'label', ... }
@@ -110,10 +116,13 @@ export class PromptBuilder {
 
         player.tell(menu);
       });
-    `);
+    `,
+    );
 
     // Ask a yes/no question - returns true or false
-    this.prompt.setMethod('yesorno', `
+    this.prompt.setMethod(
+      'yesorno',
+      `
       const player = args[0];
       const text = args[1];
 
@@ -128,11 +137,14 @@ export class PromptBuilder {
 
         player.tell(prompt);
       });
-    `);
+    `,
+    );
 
     // Handle input when player is in prompt state
     // Returns true if handled, false if not in prompt state
-    this.prompt.setMethod('handleInput', `
+    this.prompt.setMethod(
+      'handleInput',
+      `
       const player = args[0];
       const input = args[1];
 
@@ -256,26 +268,35 @@ export class PromptBuilder {
         default:
           return false;
       }
-    `);
+    `,
+    );
 
     // Check if player is in a prompt state
-    this.prompt.setMethod('isActive', `
+    this.prompt.setMethod(
+      'isActive',
+      `
       const player = args[0];
       return player._promptState !== null && player._promptState !== undefined;
-    `);
+    `,
+    );
 
     // Cancel current prompt (resolves with null)
-    this.prompt.setMethod('cancel', `
+    this.prompt.setMethod(
+      'cancel',
+      `
       const player = args[0];
       const state = player._promptState;
       if (state && state.resolve) {
         state.resolve(null);
       }
       player._promptState = null;
-    `);
+    `,
+    );
 
     // Menu with columnar display - accepts number or text input
-    this.prompt.setMethod('menu', `
+    this.prompt.setMethod(
+      'menu',
+      `
       /** Display a menu with options in columns.
        *  Usage: $.prompt.menu(player, prompt, options, numCols?)
        *  @param player - Player to prompt
@@ -316,12 +337,15 @@ export class PromptBuilder {
 
         player.tell(menuText);
       });
-    `);
+    `,
+    );
 
     // Multiline text input - collects lines until '.' alone on a line
     // Returns the joined text (without the '.')
     // User can type @abort to cancel (throws Error)
-    this.prompt.setMethod('multiline', `
+    this.prompt.setMethod(
+      'multiline',
+      `
       const player = args[0];
       const text = args[1] || 'Enter text (end with . on its own line):';
 
@@ -336,7 +360,8 @@ export class PromptBuilder {
           reject: reject,
         };
       });
-    `);
+    `,
+    );
   }
 
   async registerAlias(): Promise<void> {

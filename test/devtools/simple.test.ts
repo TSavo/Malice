@@ -2,7 +2,7 @@
  * Simple DevTools Test to verify basic functionality
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 describe('DevTools Simple', () => {
   it('should pass basic test', () => {
@@ -10,7 +10,9 @@ describe('DevTools Simple', () => {
   });
 
   it('should import DevToolsServer', async () => {
-    const { DevToolsServer } = await import('../../src/devtools/devtools-server.js');
+    const { DevToolsServer } = await import(
+      '../../src/devtools/devtools-server.js'
+    );
     expect(DevToolsServer).toBeDefined();
   });
 });

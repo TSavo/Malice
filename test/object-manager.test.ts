@@ -1,9 +1,11 @@
-import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { ObjectDatabase } from '../src/database/object-db.js';
 import { ObjectManager } from '../src/database/object-manager.js';
 import type { RuntimeObject } from '../types/object.js';
 
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/?replicaSet=rs0&directConnection=true';
+const MONGO_URI =
+  process.env.MONGO_URI ||
+  'mongodb://localhost:27017/?replicaSet=rs0&directConnection=true';
 const TEST_DB_NAME = 'malice_test_object_manager';
 
 describe('ObjectManager', () => {
@@ -16,7 +18,7 @@ describe('ObjectManager', () => {
     await db.connect();
 
     // Clean up test database
-    await db['objects'].deleteMany({});
+    await db.objects.deleteMany({});
 
     // Ensure root object exists
     await db.ensureRoot();
@@ -37,17 +39,17 @@ describe('ObjectManager', () => {
   describe('findByProperty()', () => {
     it('should find objects by property value', async () => {
       // Create test objects
-      const obj1 = await manager.create({
+      const _obj1 = await manager.create({
         parent: root,
         properties: { name: 'Alice', role: 'admin' },
       });
 
-      const obj2 = await manager.create({
+      const _obj2 = await manager.create({
         parent: root,
         properties: { name: 'Bob', role: 'admin' },
       });
 
-      const obj3 = await manager.create({
+      const _obj3 = await manager.create({
         parent: root,
         properties: { name: 'Charlie', role: 'user' },
       });
@@ -56,20 +58,23 @@ describe('ObjectManager', () => {
       const admins = await manager.findByProperty('role', 'admin');
 
       expect(admins.length).toBeGreaterThanOrEqual(2);
-      const names = admins.map(o => o.get('name'));
+      const names = admins.map((o) => o.get('name'));
       expect(names).toContain('Alice');
       expect(names).toContain('Bob');
     });
 
     it('should return empty array when no matches found', async () => {
-      const results = await manager.findByProperty('nonexistent_unique_prop_12345', 'value');
+      const results = await manager.findByProperty(
+        'nonexistent_unique_prop_12345',
+        'value',
+      );
 
       expect(results).toEqual([]);
     });
 
     it('should handle multiple matches with different property types', async () => {
       const uniqueLevel = 999888;
-      
+
       await manager.create({
         parent: root,
         properties: { level: uniqueLevel },
@@ -88,7 +93,9 @@ describe('ObjectManager', () => {
       const results = await manager.findByProperty('level', uniqueLevel);
 
       expect(results.length).toBe(2);
-      expect(results.every(obj => obj.get('level') === uniqueLevel)).toBe(true);
+      expect(results.every((obj) => obj.get('level') === uniqueLevel)).toBe(
+        true,
+      );
     });
   });
 
@@ -120,7 +127,11 @@ describe('ObjectManager', () => {
       const children = await manager.getChildren(parent.id);
 
       expect(children.length).toBe(3);
-      expect(children.map(c => c.get('name')).sort()).toEqual(['Child1', 'Child2', 'Child3']);
+      expect(children.map((c) => c.get('name')).sort()).toEqual([
+        'Child1',
+        'Child2',
+        'Child3',
+      ]);
     });
 
     it('should return empty array for objects with no children', async () => {
@@ -234,9 +245,18 @@ describe('ObjectManager', () => {
   describe('preload()', () => {
     it('should preload multiple objects into cache', async () => {
       // Create objects
-      const obj1 = await manager.create({ parent: root, properties: { name: 'PreloadObj1' } });
-      const obj2 = await manager.create({ parent: root, properties: { name: 'PreloadObj2' } });
-      const obj3 = await manager.create({ parent: root, properties: { name: 'PreloadObj3' } });
+      const obj1 = await manager.create({
+        parent: root,
+        properties: { name: 'PreloadObj1' },
+      });
+      const obj2 = await manager.create({
+        parent: root,
+        properties: { name: 'PreloadObj2' },
+      });
+      const obj3 = await manager.create({
+        parent: root,
+        properties: { name: 'PreloadObj3' },
+      });
 
       // Preload (they're already cached from create, but this tests the method)
       await manager.preload([obj1.id, obj2.id, obj3.id]);
@@ -290,8 +310,14 @@ describe('ObjectManager', () => {
     });
 
     it('should get all aliases', async () => {
-      const obj1 = await manager.create({ parent: root, properties: { name: 'AliasObj1' } });
-      const obj2 = await manager.create({ parent: root, properties: { name: 'AliasObj2' } });
+      const obj1 = await manager.create({
+        parent: root,
+        properties: { name: 'AliasObj1' },
+      });
+      const obj2 = await manager.create({
+        parent: root,
+        properties: { name: 'AliasObj2' },
+      });
 
       manager.registerAlias('aliasGetAll1', obj1);
       manager.registerAlias('aliasGetAll2', obj2);
@@ -304,7 +330,10 @@ describe('ObjectManager', () => {
     });
 
     it('should return a copy of aliases map', async () => {
-      const obj = await manager.create({ parent: root, properties: { name: 'AliasCopy' } });
+      const obj = await manager.create({
+        parent: root,
+        properties: { name: 'AliasCopy' },
+      });
 
       manager.registerAlias('originalAlias', obj);
 
@@ -317,8 +346,14 @@ describe('ObjectManager', () => {
     });
 
     it('should overwrite existing alias with same name', async () => {
-      const obj1 = await manager.create({ parent: root, properties: { name: 'First' } });
-      const obj2 = await manager.create({ parent: root, properties: { name: 'Second' } });
+      const obj1 = await manager.create({
+        parent: root,
+        properties: { name: 'First' },
+      });
+      const obj2 = await manager.create({
+        parent: root,
+        properties: { name: 'Second' },
+      });
 
       manager.registerAlias('sharedAlias', obj1);
       expect(manager.getAliases().get('sharedAlias')).toBe(obj1);
@@ -385,7 +420,9 @@ describe('ObjectManager', () => {
     });
 
     it('should reject objects without id property via proxy set', () => {
-      const result = Reflect.set(manager, 'invalidAliasProxy2', { name: 'test' });
+      const result = Reflect.set(manager, 'invalidAliasProxy2', {
+        name: 'test',
+      });
 
       expect(result).toBe(false);
     });
@@ -460,16 +497,16 @@ describe('ObjectManager', () => {
       });
 
       const proxy1 = await manager.load(obj.id);
-      
+
       // Modify via the proxy
-      proxy1!.set('value', 'modified');
+      proxy1?.set('value', 'modified');
 
       // Get the same proxy again
       const proxy2 = await manager.load(obj.id);
 
       // Should be same reference and reflect the change
       expect(proxy1).toBe(proxy2);
-      expect(proxy2!.get('value')).toBe('modified');
+      expect(proxy2?.get('value')).toBe('modified');
     });
   });
 
@@ -502,8 +539,8 @@ describe('ObjectManager', () => {
     });
 
     it('should handle findByProperty with inherited properties', async () => {
-      const uniqueValue = 'inherited_value_' + Date.now();
-      
+      const uniqueValue = `inherited_value_${Date.now()}`;
+
       // Create parent with property
       const parent = await manager.create({
         parent: root,
@@ -517,17 +554,20 @@ describe('ObjectManager', () => {
       });
 
       // findByProperty should find by inherited value
-      const results = await manager.findByProperty('inheritedProp', uniqueValue);
+      const results = await manager.findByProperty(
+        'inheritedProp',
+        uniqueValue,
+      );
 
       // Should find parent
-      expect(results.some(obj => obj.id === parent.id)).toBe(true);
+      expect(results.some((obj) => obj.id === parent.id)).toBe(true);
       // Child also has the property via inheritance
-      expect(results.some(obj => obj.id === child.id)).toBe(true);
+      expect(results.some((obj) => obj.id === child.id)).toBe(true);
     });
 
     it('should handle multiple objects with complex property queries', async () => {
-      const uniqueType = 'weapon_' + Date.now();
-      
+      const uniqueType = `weapon_${Date.now()}`;
+
       // Create objects with various property types
       await manager.create({
         parent: root,
@@ -541,7 +581,7 @@ describe('ObjectManager', () => {
 
       await manager.create({
         parent: root,
-        properties: { type: 'armor_' + Date.now(), defense: 5 },
+        properties: { type: `armor_${Date.now()}`, defense: 5 },
       });
 
       // Find all weapons

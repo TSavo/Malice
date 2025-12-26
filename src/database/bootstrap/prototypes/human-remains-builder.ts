@@ -1,5 +1,5 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Builds the HumanRemains prototype
@@ -54,7 +54,9 @@ FORENSICS: Bone fractures still visible. Time since death estimated from tissue 
     });
 
     // Get the body inside
-    obj.setMethod('getBody', `
+    obj.setMethod(
+      'getBody',
+      `
       const contents = self.contents || [];
       for (const obj of contents) {
         if (obj && (obj.torso !== undefined || obj.getPart)) {
@@ -62,10 +64,13 @@ FORENSICS: Bone fractures still visible. Time since death estimated from tissue 
         }
       }
       return null;
-    `);
+    `,
+    );
 
     // Describe with decay state
-    obj.setMethod('describe', `
+    obj.setMethod(
+      'describe',
+      `
       const decay = self.decayLevel || 0;
 
       const descriptions = [
@@ -88,10 +93,13 @@ FORENSICS: Bone fractures still visible. Time since death estimated from tissue 
       }
 
       return desc;
-    `);
+    `,
+    );
 
     // Search
-    obj.setMethod('search', `
+    obj.setMethod(
+      'search',
+      `
       const searcher = args[0];
       const items = [];
 
@@ -133,10 +141,13 @@ FORENSICS: Bone fractures still visible. Time since death estimated from tissue 
         message: 'You search the remains and find:',
         items,
       };
-    `);
+    `,
+    );
 
     // Loot
-    obj.setMethod('loot', `
+    obj.setMethod(
+      'loot',
+      `
       const itemName = args[0];
       const looter = args[1];
       const itemNameLower = (itemName || '').toLowerCase();
@@ -180,10 +191,13 @@ FORENSICS: Bone fractures still visible. Time since death estimated from tissue 
       }
 
       return { success: false, message: 'You don\\'t find that among the remains.' };
-    `);
+    `,
+    );
 
     // Autopsy - limited, mainly bone trauma
-    obj.setMethod('performAutopsy', `
+    obj.setMethod(
+      'performAutopsy',
+      `
       const examiner = args[0];
       const examinerSkill = args[1] || 50;
       const decay = self.decayLevel || 0;
@@ -265,10 +279,13 @@ FORENSICS: Bone fractures still visible. Time since death estimated from tissue 
       }
 
       return report;
-    `);
+    `,
+    );
 
     // Format report
-    obj.setMethod('formatAutopsyReport', `
+    obj.setMethod(
+      'formatAutopsyReport',
+      `
       const report = args[0];
       const lines = [];
 
@@ -295,10 +312,13 @@ FORENSICS: Bone fractures still visible. Time since death estimated from tissue 
       lines.push('===================================');
 
       return lines.join('\\r\\n');
-    `);
+    `,
+    );
 
     // When fully decayed, become skeletal remains
-    obj.setMethod('onFullyDecayed', `
+    obj.setMethod(
+      'onFullyDecayed',
+      `
       const skeletalProto = $.skeletalRemains;
       if (!skeletalProto) {
         return; // Can't transform, just stay as is
@@ -337,16 +357,29 @@ FORENSICS: Bone fractures still visible. Time since death estimated from tissue 
         self.contents = []; // Don't recycle the body
         await $.recycler.recycle(self);
       }
-    `);
+    `,
+    );
 
-    obj.setMethod('canContain', `
+    obj.setMethod(
+      'canContain',
+      `
       return true;
-    `);
+    `,
+    );
 
     // Add property descriptions
-    obj.setPropertyDescription('originalName', 'Identity carried from corpse stage. Visual identification impossible - requires forensic methods or personal effects.');
-    obj.setPropertyDescription('contents', 'Array containing skeletal body and any items that survived decomposition (metal objects, jewelry). Organic items mostly rotted.');
-    obj.setPropertyDescription('searched', 'Boolean tracking if remains have been searched. Affects description text.');
+    obj.setPropertyDescription(
+      'originalName',
+      'Identity carried from corpse stage. Visual identification impossible - requires forensic methods or personal effects.',
+    );
+    obj.setPropertyDescription(
+      'contents',
+      'Array containing skeletal body and any items that survived decomposition (metal objects, jewelry). Organic items mostly rotted.',
+    );
+    obj.setPropertyDescription(
+      'searched',
+      'Boolean tracking if remains have been searched. Affects description text.',
+    );
 
     return obj;
   }

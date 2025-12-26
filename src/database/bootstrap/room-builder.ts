@@ -1,5 +1,5 @@
-import { ObjectManager } from '../object-manager.js';
 import type { RuntimeObject } from '../../../types/object.js';
+import type { ObjectManager } from '../object-manager.js';
 
 /**
  * Builds Room utility object (dynamic ID)
@@ -33,7 +33,8 @@ export class RoomBuilder {
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
 
-    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
+    const aliases =
+      (objectManager.get('aliases') as Record<string, number>) || {};
 
     if (aliases.room) {
       this.room = await this.manager.load(aliases.room);
@@ -76,7 +77,9 @@ Direct player.see() only reaches ONE person.`,
     // Main announce method
     // announce({ room, actor, target?, see?, hear?, item? })
     // Both see and hear are templates that get pronoun-substituted
-    this.room.setMethod('announce', `
+    this.room.setMethod(
+      'announce',
+      `
       const opts = args[0] || {};
       const room = opts.room;
       const actor = opts.actor;
@@ -105,11 +108,14 @@ Direct player.see() only reaches ONE person.`,
           await viewer.hear(formatted, null, actor);
         }
       }
-    `);
+    `,
+    );
 
     // Announce with different messages for actor/target/others
     // announceMulti({ room, actor, target?, see: { actor?, target?, others }, hear: { actor?, target?, others }?, item? })
-    this.room.setMethod('announceMulti', `
+    this.room.setMethod(
+      'announceMulti',
+      `
       const opts = args[0] || {};
       const room = opts.room;
       const actor = opts.actor;
@@ -153,7 +159,8 @@ Direct player.see() only reaches ONE person.`,
           await viewer.hear(formatted, null, actor);
         }
       }
-    `);
+    `,
+    );
   }
 
   async registerAlias(): Promise<void> {

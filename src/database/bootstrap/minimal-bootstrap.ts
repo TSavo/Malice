@@ -1,4 +1,4 @@
-import { ObjectManager } from '../object-manager.js';
+import type { ObjectManager } from '../object-manager.js';
 
 /**
  * Minimal Bootstrap - Creates only the absolute essentials
@@ -30,7 +30,8 @@ export class MinimalBootstrap {
     const objectManager = await this.manager.load(0);
     if (!objectManager) return;
 
-    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
+    const aliases =
+      (objectManager.get('aliases') as Record<string, number>) || {};
 
     // Register core aliases
     if (!aliases.nothing) aliases.nothing = -1;
@@ -42,7 +43,9 @@ export class MinimalBootstrap {
 
     // Add alias management methods to #0
     if (!objectManager.hasMethod('addAlias')) {
-      objectManager.setMethod('addAlias', `
+      objectManager.setMethod(
+        'addAlias',
+        `
         /** Register a system alias.
          *  Usage: await $[0].addAlias('myUtil', obj.id)
          *  @param name - Alias name (becomes $.name)
@@ -63,11 +66,14 @@ export class MinimalBootstrap {
         aliases[name] = objId;
         self.aliases = aliases;
         return true;
-      `);
+      `,
+      );
     }
 
     if (!objectManager.hasMethod('removeAlias')) {
-      objectManager.setMethod('removeAlias', `
+      objectManager.setMethod(
+        'removeAlias',
+        `
         /** Remove a system alias.
          *  Usage: await $[0].removeAlias('myUtil')
          *  @param name - Alias name to remove
@@ -93,11 +99,14 @@ export class MinimalBootstrap {
         delete aliases[name];
         self.aliases = aliases;
         return true;
-      `);
+      `,
+      );
     }
 
     if (!objectManager.hasMethod('getAlias')) {
-      objectManager.setMethod('getAlias', `
+      objectManager.setMethod(
+        'getAlias',
+        `
         /** Get an alias by name.
          *  Usage: const id = await $[0].getAlias('myUtil')
          *  @param name - Alias name
@@ -106,11 +115,14 @@ export class MinimalBootstrap {
         const name = args[0];
         const aliases = self.aliases || {};
         return aliases[name];
-      `);
+      `,
+      );
     }
 
     if (!objectManager.hasMethod('clearAliasesForObject')) {
-      objectManager.setMethod('clearAliasesForObject', `
+      objectManager.setMethod(
+        'clearAliasesForObject',
+        `
         /** Remove all aliases pointing to a specific object ID.
          *  Used by recycler to clean up when deleting objects.
          *  Usage: await $[0].clearAliasesForObject(123)
@@ -139,7 +151,8 @@ export class MinimalBootstrap {
         }
 
         return removed;
-      `);
+      `,
+      );
     }
 
     console.log('✅ Registered core aliases in #0.properties.aliases');
@@ -186,9 +199,12 @@ export class MinimalBootstrap {
   private async ensureSystem(): Promise<void> {
     // Check if System already exists via alias
     const objectManager = await this.manager.load(0);
-    const aliases = (objectManager?.get('aliases') as Record<string, number>) || {};
+    const aliases =
+      (objectManager?.get('aliases') as Record<string, number>) || {};
 
-    let system = aliases.system ? await this.manager.load(aliases.system) : null;
+    let system = aliases.system
+      ? await this.manager.load(aliases.system)
+      : null;
     if (!system) {
       // Create directly in database with explicit ID (bootstrap-only pattern)
       // Normal objects should be created via $.recycler
@@ -197,16 +213,22 @@ export class MinimalBootstrap {
         parent: { type: 'objref', value: 1 },
         properties: {
           name: { type: 'string', value: 'System' },
-          description: { type: 'string', value: 'Connection router and system coordinator' },
+          description: {
+            type: 'string',
+            value: 'Connection router and system coordinator',
+          },
         },
         methods: {},
       });
       // Now load it to get the RuntimeObject
       system = await this.manager.load(2);
-      if (!system) throw new Error('Failed to load System object after creation');
+      if (!system)
+        throw new Error('Failed to load System object after creation');
 
       // Called when a new connection arrives
-      system.setMethod('onConnection', `
+      system.setMethod(
+        'onConnection',
+        `
         const context = args[0];
         const authInfo = context.getAuthInfo();
 
@@ -242,7 +264,8 @@ export class MinimalBootstrap {
           context.setHandler(preAuth);
           await preAuth.onPreAuth(context, authInfo);
         }
-      `);
+      `,
+      );
       console.log(`✅ Created System object #${system.id}`);
     }
 
@@ -250,7 +273,9 @@ export class MinimalBootstrap {
     if (!system.hasMethod('tickAllPlayers')) {
       // Tick all online players (heartbeat)
       // Called by scheduler every minute
-      system.setMethod('tickAllPlayers', `
+      system.setMethod(
+        'tickAllPlayers',
+        `
         const authManager = $.authManager;
         if (!authManager) return { error: 'No authManager' };
 
@@ -270,8 +295,8 @@ export class MinimalBootstrap {
         }
 
         return { tickedPlayers: results.length, results: results };
-      `);
+      `,
+      );
     }
   }
-
 }

@@ -1,5 +1,5 @@
-import { ObjectManager } from '../object-manager.js';
 import type { RuntimeObject } from '../../../types/object.js';
+import type { ObjectManager } from '../object-manager.js';
 
 /**
  * Builds Plot prototype - simplified for abilities-first architecture
@@ -31,7 +31,8 @@ export class PlotBuilder {
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
 
-    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
+    const aliases =
+      (objectManager.get('aliases') as Record<string, number>) || {};
 
     if (aliases.plot) {
       this.plotPrototype = await this.manager.load(aliases.plot);
@@ -67,12 +68,23 @@ ATTENTION: Set metadata.needsAttentionAt to ISO timestamp when handler (city AI)
     });
 
     // Add property descriptions
-    this.plotPrototype.setPropertyDescription('events', "Array of { timestamp, from, message, ... } event objects.");
-    this.plotPrototype.setPropertyDescription('metadata', "Arbitrary key/value storage: participants, objectives, rewards, etc.");
-    this.plotPrototype.setPropertyDescription('status', "Plot state: active, completed, abandoned, failed.");
+    this.plotPrototype.setPropertyDescription(
+      'events',
+      'Array of { timestamp, from, message, ... } event objects.',
+    );
+    this.plotPrototype.setPropertyDescription(
+      'metadata',
+      'Arbitrary key/value storage: participants, objectives, rewards, etc.',
+    );
+    this.plotPrototype.setPropertyDescription(
+      'status',
+      'Plot state: active, completed, abandoned, failed.',
+    );
 
     // addEvent(event) - append a structured event
-    this.plotPrototype.setMethod('addEvent', `
+    this.plotPrototype.setMethod(
+      'addEvent',
+      `
       /** Add an event to this plot's log.
        *  @param event - { from: 'player'|'handler'|'system', message: string, playerId?, playerName? }
        *  @returns Event count
@@ -93,18 +105,24 @@ ATTENTION: Set metadata.needsAttentionAt to ISO timestamp when handler (city AI)
       self.events = events;
 
       return events.length;
-    `);
+    `,
+    );
 
     // getEventLog() - return all events
-    this.plotPrototype.setMethod('getEventLog', `
+    this.plotPrototype.setMethod(
+      'getEventLog',
+      `
       /** Get all events in this plot.
        *  @returns Array of event objects
        */
       return self.events || [];
-    `);
+    `,
+    );
 
     // getEventLogAsText() - return events as formatted text
-    this.plotPrototype.setMethod('getEventLogAsText', `
+    this.plotPrototype.setMethod(
+      'getEventLogAsText',
+      `
       /** Get events formatted as text for display.
        *  @returns Formatted string of all events
        */
@@ -126,10 +144,13 @@ ATTENTION: Set metadata.needsAttentionAt to ISO timestamp when handler (city AI)
         }
         return '[' + timeStr + '] ' + sender + ': ' + e.message;
       }).join('\\n');
-    `);
+    `,
+    );
 
     // setMetadata(key, value) - store arbitrary metadata
-    this.plotPrototype.setMethod('setMetadata', `
+    this.plotPrototype.setMethod(
+      'setMetadata',
+      `
       /** Set a metadata value on this plot.
        *  @param key - Metadata key
        *  @param value - Any value
@@ -147,10 +168,13 @@ ATTENTION: Set metadata.needsAttentionAt to ISO timestamp when handler (city AI)
       self.metadata = metadata;
 
       return value;
-    `);
+    `,
+    );
 
     // getMetadata(key) - retrieve metadata
-    this.plotPrototype.setMethod('getMetadata', `
+    this.plotPrototype.setMethod(
+      'getMetadata',
+      `
       /** Get a metadata value from this plot.
        *  @param key - Metadata key
        *  @returns The value or undefined
@@ -158,10 +182,13 @@ ATTENTION: Set metadata.needsAttentionAt to ISO timestamp when handler (city AI)
       const key = args[0];
       const metadata = self.metadata || {};
       return metadata[key];
-    `);
+    `,
+    );
 
     // complete(outcome) - mark plot as completed
-    this.plotPrototype.setMethod('complete', `
+    this.plotPrototype.setMethod(
+      'complete',
+      `
       /** Mark this plot as completed.
        *  @param outcome - Optional outcome description
        */
@@ -170,10 +197,13 @@ ATTENTION: Set metadata.needsAttentionAt to ISO timestamp when handler (city AI)
       await self.setMetadata('completedAt', new Date().toISOString());
       await self.setMetadata('outcome', outcome);
       await self.addEvent({ from: 'system', message: 'Plot completed: ' + outcome });
-    `);
+    `,
+    );
 
     // abandon(reason) - mark plot as abandoned
-    this.plotPrototype.setMethod('abandon', `
+    this.plotPrototype.setMethod(
+      'abandon',
+      `
       /** Mark this plot as abandoned.
        *  @param reason - Optional reason
        */
@@ -182,10 +212,13 @@ ATTENTION: Set metadata.needsAttentionAt to ISO timestamp when handler (city AI)
       await self.setMetadata('abandonedAt', new Date().toISOString());
       await self.setMetadata('reason', reason);
       await self.addEvent({ from: 'system', message: 'Plot abandoned: ' + reason });
-    `);
+    `,
+    );
 
     // fail(reason) - mark plot as failed
-    this.plotPrototype.setMethod('fail', `
+    this.plotPrototype.setMethod(
+      'fail',
+      `
       /** Mark this plot as failed.
        *  @param reason - Optional failure reason
        */
@@ -194,7 +227,8 @@ ATTENTION: Set metadata.needsAttentionAt to ISO timestamp when handler (city AI)
       await self.setMetadata('failedAt', new Date().toISOString());
       await self.setMetadata('reason', reason);
       await self.addEvent({ from: 'system', message: 'Plot failed: ' + reason });
-    `);
+    `,
+    );
   }
 
   /**
@@ -204,7 +238,8 @@ ATTENTION: Set metadata.needsAttentionAt to ISO timestamp when handler (city AI)
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
 
-    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
+    const aliases =
+      (objectManager.get('aliases') as Record<string, number>) || {};
 
     if (aliases.plotDB) {
       this.plotDB = await this.manager.load(aliases.plotDB);
@@ -218,7 +253,7 @@ ATTENTION: Set metadata.needsAttentionAt to ISO timestamp when handler (city AI)
       properties: {
         name: 'PlotDB',
         description: 'Minimal plot index for finding plots needing attention',
-        index: {},  // plotId -> true
+        index: {}, // plotId -> true
         abilities: `Index of all plots for the city AI to poll.
 
 REGISTERING: Call register(plot) when creating a plot. Call unregister(plotId) when removing.
@@ -231,10 +266,15 @@ This is infrastructure for Pluribus (city AI) to find player requests that need 
     });
 
     // Add property description
-    this.plotDB.setPropertyDescription('index', "Map of plotId -> true for all registered plots. Used for iteration.");
+    this.plotDB.setPropertyDescription(
+      'index',
+      'Map of plotId -> true for all registered plots. Used for iteration.',
+    );
 
     // register(plot) - add a plot to the index
-    this.plotDB.setMethod('register', `
+    this.plotDB.setMethod(
+      'register',
+      `
       /** Register a plot in the index.
        *  @param plot - The plot object
        *  @returns The plot ID
@@ -249,10 +289,13 @@ This is infrastructure for Pluribus (city AI) to find player requests that need 
       self.index = index;
 
       return plot.id;
-    `);
+    `,
+    );
 
     // unregister(plotId) - remove from index
-    this.plotDB.setMethod('unregister', `
+    this.plotDB.setMethod(
+      'unregister',
+      `
       /** Remove a plot from the index.
        *  @param plotId - The plot ID to remove
        */
@@ -260,10 +303,13 @@ This is infrastructure for Pluribus (city AI) to find player requests that need 
       const index = self.index || {};
       delete index[plotId];
       self.index = index;
-    `);
+    `,
+    );
 
     // needsAttention() - find plots needing handler response (FIFO)
-    this.plotDB.setMethod('needsAttention', `
+    this.plotDB.setMethod(
+      'needsAttention',
+      `
       /** Find plots needing attention, sorted FIFO by needsAttentionAt.
        *  @returns Array of plots where metadata.needsAttentionAt <= now
        */
@@ -290,10 +336,13 @@ This is infrastructure for Pluribus (city AI) to find player requests that need 
       // Sort FIFO - oldest first
       needing.sort((a, b) => a.needsAt - b.needsAt);
       return needing.map(n => n.plot);
-    `);
+    `,
+    );
 
     // all() - get all registered plots
-    this.plotDB.setMethod('all', `
+    this.plotDB.setMethod(
+      'all',
+      `
       /** Get all registered plots.
        *  @returns Array of plot objects
        */
@@ -311,7 +360,8 @@ This is infrastructure for Pluribus (city AI) to find player requests that need 
 
       self.index = index;
       return plots;
-    `);
+    `,
+    );
   }
 
   async registerAliases(): Promise<void> {

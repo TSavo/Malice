@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
+import { describe, expect, it } from 'vitest';
 import { extractPrototypeSpecFromSourceText } from '../../src/database/bootstrap/prototype-ts/extract.js';
 
 describe('prototype-ts extractor', () => {
@@ -53,7 +53,7 @@ describe('prototype-ts extractor', () => {
     // In moveTo, we should see arg bindings for dest/mover
     expect(spec.methods.moveTo.code).toContain('let dest = args[0];');
     expect(spec.methods.moveTo.code).toContain('let mover = args[1];');
-    expect(spec.methods.moveTo.code).toContain("await $.load(dest)");
+    expect(spec.methods.moveTo.code).toContain('await $.load(dest)');
     expect(spec.methods.moveTo.code).toContain('return dest');
   });
 
@@ -135,7 +135,9 @@ describe('prototype-ts extractor', () => {
       }
     `;
 
-    expect(() => extractPrototypeSpecFromSourceText(source, 'RestParams.ts')).toThrow(/rest parameters/);
+    expect(() =>
+      extractPrototypeSpecFromSourceText(source, 'RestParams.ts'),
+    ).toThrow(/rest parameters/);
   });
 
   it('throws if multiple exported decorated classes exist', () => {
@@ -155,7 +157,9 @@ describe('prototype-ts extractor', () => {
       }
     `;
 
-    expect(() => extractPrototypeSpecFromSourceText(source, 'Multi.ts')).toThrow(/Multiple/);
+    expect(() =>
+      extractPrototypeSpecFromSourceText(source, 'Multi.ts'),
+    ).toThrow(/Multiple/);
   });
 
   it('throws if decorator arg is not an object literal', () => {
@@ -169,7 +173,9 @@ describe('prototype-ts extractor', () => {
       }
     `;
 
-    expect(() => extractPrototypeSpecFromSourceText(source, 'BadDecorator.ts')).toThrow(/object literal/);
+    expect(() =>
+      extractPrototypeSpecFromSourceText(source, 'BadDecorator.ts'),
+    ).toThrow(/object literal/);
   });
 
   it('throws if defaults contains shorthand properties', () => {
@@ -183,9 +189,9 @@ describe('prototype-ts extractor', () => {
       }
     `;
 
-    expect(() => extractPrototypeSpecFromSourceText(source, 'BadDefaults.ts')).toThrow(
-      /defaults object must contain only property assignments/,
-    );
+    expect(() =>
+      extractPrototypeSpecFromSourceText(source, 'BadDefaults.ts'),
+    ).toThrow(/defaults object must contain only property assignments/);
   });
 
   it('throws if required prefix params are missing', () => {
@@ -221,9 +227,9 @@ describe('prototype-ts extractor', () => {
       }
     `;
 
-    expect(() => extractPrototypeSpecFromSourceText(source, 'BadDefaults.ts')).toThrow(
-      /static defaults must be an object literal/,
-    );
+    expect(() =>
+      extractPrototypeSpecFromSourceText(source, 'BadDefaults.ts'),
+    ).toThrow(/static defaults must be an object literal/);
   });
 
   it('extracts the real recycler prototype file', async () => {

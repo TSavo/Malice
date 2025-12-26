@@ -1,9 +1,11 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { ObjectDatabase } from '../../src/database/object-db.js';
 import { ObjectManager } from '../../src/database/object-manager.js';
 import { VirtualFileSystem } from '../../src/lsp/virtual-fs.js';
 
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/?replicaSet=rs0&directConnection=true';
+const MONGO_URI =
+  process.env.MONGO_URI ||
+  'mongodb://localhost:27017/?replicaSet=rs0&directConnection=true';
 
 describe('VirtualFileSystem', () => {
   let db: ObjectDatabase;
@@ -15,7 +17,7 @@ describe('VirtualFileSystem', () => {
     await db.connect();
 
     // Clean database
-    await db['objects'].deleteMany({});
+    await db.objects.deleteMany({});
 
     // Create ObjectManager #0 with aliases
     await db.create({
@@ -161,13 +163,13 @@ describe('VirtualFileSystem', () => {
       expect(entries.length).toBeGreaterThan(0);
 
       // Should include our created objects
-      const ids = entries.map(e => e.name);
+      const ids = entries.map((e) => e.name);
       expect(ids).toContain('1');
       expect(ids).toContain('2');
       expect(ids).toContain('5');
 
       // All should be directories
-      entries.forEach(entry => {
+      entries.forEach((entry) => {
         expect(entry.type).toBe('directory');
         expect(entry.uri).toMatch(/^malice:\/\/objects\/\d+\/$/);
       });
@@ -178,7 +180,7 @@ describe('VirtualFileSystem', () => {
 
       expect(entries.length).toBeGreaterThan(0);
 
-      const ids = entries.map(e => e.name);
+      const ids = entries.map((e) => e.name);
       expect(ids).toContain('1');
       expect(ids).toContain('2');
       expect(ids).toContain('5');
@@ -189,14 +191,14 @@ describe('VirtualFileSystem', () => {
 
       expect(entries.length).toBe(4); // 2 methods + 2 properties
 
-      const names = entries.map(e => e.name);
+      const names = entries.map((e) => e.name);
       expect(names).toContain('connect.ts');
       expect(names).toContain('disconnect.ts');
       expect(names).toContain('name.json');
       expect(names).toContain('description.json');
 
       // All should be files
-      entries.forEach(entry => {
+      entries.forEach((entry) => {
         expect(entry.type).toBe('file');
       });
     });
@@ -206,7 +208,7 @@ describe('VirtualFileSystem', () => {
 
       expect(entries.length).toBe(4);
 
-      const names = entries.map(e => e.name);
+      const names = entries.map((e) => e.name);
       expect(names).toContain('connect.ts');
       expect(names).toContain('disconnect.ts');
     });
@@ -259,7 +261,7 @@ describe('VirtualFileSystem', () => {
       expect(entries.length).toBeGreaterThan(0);
 
       // Check that entries have correct structure
-      entries.forEach(entry => {
+      entries.forEach((entry) => {
         expect(entry.type).toBe('directory');
         expect(entry.name).toMatch(/^\d+$/);
         expect(entry.uri).toMatch(/^malice:\/\/objects\/\d+\/$/);
@@ -281,14 +283,14 @@ describe('VirtualFileSystem', () => {
 
       const entries = await vfs.listDirectory('malice://objects/10/');
 
-      const tsFiles = entries.filter(e => e.name.endsWith('.ts'));
+      const tsFiles = entries.filter((e) => e.name.endsWith('.ts'));
       expect(tsFiles.length).toBe(2);
 
-      const names = tsFiles.map(e => e.name);
+      const names = tsFiles.map((e) => e.name);
       expect(names).toContain('init.ts');
       expect(names).toContain('update.ts');
 
-      tsFiles.forEach(file => {
+      tsFiles.forEach((file) => {
         expect(file.type).toBe('file');
         expect(file.uri).toMatch(/^malice:\/\/objects\/10\/.+\.ts$/);
       });
@@ -307,14 +309,14 @@ describe('VirtualFileSystem', () => {
 
       const entries = await vfs.listDirectory('malice://objects/11/');
 
-      const jsonFiles = entries.filter(e => e.name.endsWith('.json'));
+      const jsonFiles = entries.filter((e) => e.name.endsWith('.json'));
       expect(jsonFiles.length).toBe(2);
 
-      const names = jsonFiles.map(e => e.name);
+      const names = jsonFiles.map((e) => e.name);
       expect(names).toContain('name.json');
       expect(names).toContain('hp.json');
 
-      jsonFiles.forEach(file => {
+      jsonFiles.forEach((file) => {
         expect(file.type).toBe('file');
         expect(file.uri).toMatch(/^malice:\/\/objects\/11\/.+\.json$/);
       });
@@ -489,7 +491,9 @@ describe('VirtualFileSystem', () => {
     });
 
     it('should handle invalid URI gracefully', async () => {
-      await expect(vfs.updateDocument('invalid://uri', 'code')).resolves.not.toThrow();
+      await expect(
+        vfs.updateDocument('invalid://uri', 'code'),
+      ).resolves.not.toThrow();
     });
 
     it('should extract method code from TypeScript context wrapper', async () => {
@@ -526,12 +530,12 @@ return "test";`;
       await vfs.updateDocument(uri, codeWithNewline);
 
       // Wait for save to complete
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       // Reload from database
       manager.invalidate(15);
       const obj = await manager.load(15);
-      const raw = obj!['_getRaw']();
+      const raw = obj?._getRaw();
 
       // The extracted code should not have a leading newline
       expect(raw.methods.greet.code).toBe('return "test";');
@@ -764,7 +768,9 @@ return "test";`;
       expect(doc1).not.toBeNull();
 
       // Should return null for non-existent property
-      const doc2 = await vfs.getDocument('malice://objects/50/nonExistent.json');
+      const doc2 = await vfs.getDocument(
+        'malice://objects/50/nonExistent.json',
+      );
       expect(doc2).toBeNull();
     });
 
@@ -820,7 +826,7 @@ return "test";`;
       const doc = await vfs.getDocument('malice://objects/53/config.json');
 
       expect(doc).not.toBeNull();
-      const parsed = JSON.parse(doc!.content);
+      const parsed = JSON.parse(doc?.content);
       expect(parsed.nested.value).toBe(123);
       expect(parsed.nested.array).toEqual([1, 2, 3]);
     });
@@ -830,7 +836,7 @@ return "test";`;
       const entries = await vfs.listDirectory('malice://objects/0/');
 
       expect(entries.length).toBeGreaterThan(0);
-      const names = entries.map(e => e.name);
+      const names = entries.map((e) => e.name);
       expect(names).toContain('name.json');
       expect(names).toContain('aliases.json');
     });

@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { ObjectCache } from '../src/database/object-cache.js';
 import type { RuntimeObject } from '../types/object.js';
 
@@ -72,7 +72,7 @@ describe('ObjectCache', () => {
 
       const chain = cache.getParentChain(5);
       expect(chain).toBeDefined();
-      expect(chain!.parents).toEqual(parents);
+      expect(chain?.parents).toEqual(parents);
     });
 
     it('should return undefined for uncached chains', () => {

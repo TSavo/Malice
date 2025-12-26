@@ -1,5 +1,5 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Builds the Sustain prototype
@@ -25,7 +25,8 @@ export class SustainBuilder {
       parent: parentObj!,
       properties: {
         name: 'Sustain',
-        description: 'A small oblong pill, pale gray with a faint chemical sheen. The Continuum logo is pressed into one side. Nutritionally complete. Best not to think about the source material.',
+        description:
+          'A small oblong pill, pale gray with a faint chemical sheen. The Continuum logo is pressed into one side. Nutritionally complete. Best not to think about the source material.',
         abilities: `Continuum's nutritionally complete ration pill. Manufactured at Fabrication
 Factory biofarm from processed organic waste. Cheap, efficient, ubiquitous.
 
@@ -67,7 +68,9 @@ Subsidized price (2 credits). Everyone can afford to survive.`,
     });
 
     // Override tasteBite for Sustain's distinctive non-taste
-    obj.setMethod('tasteBite', `
+    obj.setMethod(
+      'tasteBite',
+      `
       const flavors = [
         'It tastes like nothing. That\\'s the point.',
         'A chalky texture coats your tongue. You try not to think about it.',
@@ -77,10 +80,13 @@ Subsidized price (2 credits). Everyone can afford to survive.`,
         'Bland. Efficient. Sustaining.',
       ];
       return flavors[Math.floor(Math.random() * flavors.length)];
-    `);
+    `,
+    );
 
     // Override eat for single-pill consumption
-    obj.setMethod('eat', `
+    obj.setMethod(
+      'eat',
+      `
       // Args from verb pattern 'eat %t':
       //   args[0] = handler (the pill, same as self) - from %t
       // Direct variables:
@@ -134,7 +140,8 @@ Subsidized price (2 credits). Everyone can afford to survive.`,
       }
 
       return msg;
-    `);
+    `,
+    );
 
     return obj;
   }

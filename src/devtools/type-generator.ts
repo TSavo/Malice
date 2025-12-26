@@ -3,8 +3,8 @@
  * Generates .d.ts files from MongoDB object state
  */
 
-import type { ObjectManager } from '../database/object-manager.js';
 import type { GameObject } from '../../types/object.js';
+import type { ObjectManager } from '../database/object-manager.js';
 
 /**
  * Generates TypeScript definition files from MongoDB objects
@@ -190,7 +190,12 @@ interface Connection {
     }
 
     // Handle typed Value objects (have a 'type' property)
-    if (value && typeof value === 'object' && 'type' in value && typeof value.type === 'string') {
+    if (
+      value &&
+      typeof value === 'object' &&
+      'type' in value &&
+      typeof value.type === 'string'
+    ) {
       switch (value.type) {
         case 'null':
           return 'null';
@@ -204,10 +209,11 @@ interface Connection {
         case 'boolean':
           return 'boolean';
 
-        case 'objref':
+        case 'objref': {
           // Resolve objref to specific object type
           const objId = value.value as number;
           return `RuntimeObject & MaliceObject_${objId}`;
+        }
 
         case 'array': {
           const arrayValue = value.value as any[];
@@ -217,7 +223,9 @@ interface Connection {
 
           // Check if all elements are same type
           const firstType = this.inferType(arrayValue[0]);
-          const allSameType = arrayValue.every(item => this.inferType(item) === firstType);
+          const allSameType = arrayValue.every(
+            (item) => this.inferType(item) === firstType,
+          );
 
           if (allSameType && firstType !== 'any') {
             return `${firstType}[]`;
@@ -256,7 +264,9 @@ interface Connection {
 
           // Check if all elements are same type
           const firstType = this.inferType(value[0]);
-          const allSameType = value.every(item => this.inferType(item) === firstType);
+          const allSameType = value.every(
+            (item) => this.inferType(item) === firstType,
+          );
 
           if (allSameType && firstType !== 'any') {
             return `${firstType}[]`;

@@ -17,9 +17,14 @@ export const building = {
     '%SERVICE_LOCK': {
       prototype: 'biometricLock',
       name: 'Service Entrance Scanner',
-      description: 'A fingerprint scanner beside a metal door, its housing cracked but functional.',
+      description:
+        'A fingerprint scanner beside a metal door, its housing cracked but functional.',
       scanners: [
-        { type: 'fingerprint', part: 'hand', message: 'Service entrance - staff only.' },
+        {
+          type: 'fingerprint',
+          part: 'hand',
+          message: 'Service entrance - staff only.',
+        },
       ],
       authorizedUsers: {},
     },
@@ -75,10 +80,17 @@ The smell is mildew and bodies and the chemical attempts to mask both. The light
       waterLevel: 0,
       outdoor: false,
       exits: {
-        south: { to: 's-washington/x-16.ts', description: 'A smudged glass door opens onto S. Washington St' },
+        south: {
+          to: 's-washington/x-16.ts',
+          description: 'A smudged glass door opens onto S. Washington St',
+        },
         east: '%OFFICE',
-        northwest: { to: 'alley/y8.ts', locks: ['%SERVICE_LOCK'], description: 'A metal service door leads to the alley' },
-        'in': '%E',
+        northwest: {
+          to: 'alley/y8.ts',
+          locks: ['%SERVICE_LOCK'],
+          description: 'A metal service door leads to the alley',
+        },
+        in: '%E',
       },
     },
 

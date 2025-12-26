@@ -8,18 +8,21 @@
  * etc.
  */
 
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const PIONEER_SQUARE_DIR = path.join(__dirname, '../src/database/bootstrap/world/seattle/pioneer-square');
+const PIONEER_SQUARE_DIR = path.join(
+  __dirname,
+  '../src/database/bootstrap/world/seattle/pioneer-square',
+);
 
 // Expected X coordinate for each avenue directory
 const AVENUE_X = {
-  'waterfront': -21,
+  waterfront: -21,
   '1st-ave-s': -14,
   'occidental-ave-s': -7,
   '2nd-ave-s': 0,
@@ -41,8 +44,8 @@ function getCoordinates(filePath) {
   const xMatch = content.match(/x:\s*(-?\d+)/);
   const yMatch = content.match(/y:\s*(-?\d+)/);
   return {
-    x: xMatch ? parseInt(xMatch[1]) : null,
-    y: yMatch ? parseInt(yMatch[1]) : null
+    x: xMatch ? parseInt(xMatch[1], 10) : null,
+    y: yMatch ? parseInt(yMatch[1], 10) : null,
   };
 }
 
@@ -55,14 +58,18 @@ for (const [dirName, expectedX] of Object.entries(AVENUE_X)) {
   const dir = path.join(PIONEER_SQUARE_DIR, dirName);
   if (!fs.existsSync(dir)) continue;
 
-  const files = fs.readdirSync(dir).filter(f => f.endsWith('.ts') && !f.includes('MAP'));
+  const files = fs
+    .readdirSync(dir)
+    .filter((f) => f.endsWith('.ts') && !f.includes('MAP'));
 
   for (const file of files) {
     const filePath = path.join(dir, file);
     const coords = getCoordinates(filePath);
 
     if (coords.x !== null && coords.x !== expectedX) {
-      console.log(`  Removing ${dirName}/${file}: x=${coords.x} (expected x=${expectedX})`);
+      console.log(
+        `  Removing ${dirName}/${file}: x=${coords.x} (expected x=${expectedX})`,
+      );
       fs.unlinkSync(filePath);
       removed++;
     }
@@ -74,14 +81,18 @@ for (const [dirName, expectedY] of Object.entries(STREET_Y)) {
   const dir = path.join(PIONEER_SQUARE_DIR, dirName);
   if (!fs.existsSync(dir)) continue;
 
-  const files = fs.readdirSync(dir).filter(f => f.endsWith('.ts') && !f.includes('MAP'));
+  const files = fs
+    .readdirSync(dir)
+    .filter((f) => f.endsWith('.ts') && !f.includes('MAP'));
 
   for (const file of files) {
     const filePath = path.join(dir, file);
     const coords = getCoordinates(filePath);
 
     if (coords.y !== null && coords.y !== expectedY) {
-      console.log(`  Removing ${dirName}/${file}: y=${coords.y} (expected y=${expectedY})`);
+      console.log(
+        `  Removing ${dirName}/${file}: y=${coords.y} (expected y=${expectedY})`,
+      );
       fs.unlinkSync(filePath);
       removed++;
     }

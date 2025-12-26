@@ -1,6 +1,10 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { TelnetCommandBuilder } from '../src/transport/telnet/command-builder.js';
-import { TELNET_COMMANDS, TELNET_OPTIONS, TELNET_SUB } from '../types/telnet.js';
+import {
+  TELNET_COMMANDS,
+  TELNET_OPTIONS,
+  TELNET_SUB,
+} from '../types/telnet.js';
 
 describe('TelnetCommandBuilder', () => {
   describe('basic commands', () => {

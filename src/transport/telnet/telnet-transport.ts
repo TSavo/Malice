@@ -1,11 +1,11 @@
-import { Socket } from 'net';
+import type { Socket } from 'node:net';
 import { fromEvent, merge } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { BaseTransport } from '../base-transport.js';
-import { TelnetProtocolParser } from './protocol-parser.js';
-import { TelnetCommandBuilder } from './command-builder.js';
-import { TELNET_COMMANDS, TELNET_OPTIONS } from '../../../types/telnet.js';
 import type { TelnetCommandData } from '../../../types/telnet.js';
+import { TELNET_COMMANDS, TELNET_OPTIONS } from '../../../types/telnet.js';
+import { BaseTransport } from '../base-transport.js';
+import { TelnetCommandBuilder } from './command-builder.js';
+import { TelnetProtocolParser } from './protocol-parser.js';
 
 /**
  * Telnet transport implementation
@@ -101,7 +101,9 @@ export class TelnetTransport extends BaseTransport {
         // \r\n -> \n (Windows/telnet standard)
         // \r -> \n (old Mac / some terminals)
         // \n -> \n (Unix)
-        this.lineBuffer = this.lineBuffer.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+        this.lineBuffer = this.lineBuffer
+          .replace(/\r\n/g, '\n')
+          .replace(/\r/g, '\n');
 
         // Split and emit complete lines
         const lines = this.lineBuffer.split('\n');
@@ -121,7 +123,10 @@ export class TelnetTransport extends BaseTransport {
    */
   private handleCommand(cmd: TelnetCommandData): void {
     // Handle NAWS (window size)
-    if (cmd.optionCode === TELNET_OPTIONS.NAWS && cmd.commandCode === TELNET_COMMANDS.SB) {
+    if (
+      cmd.optionCode === TELNET_OPTIONS.NAWS &&
+      cmd.commandCode === TELNET_COMMANDS.SB
+    ) {
       const size = TelnetProtocolParser.parseWindowSize(cmd.data);
       if (size) {
         this.updateCapabilities({
@@ -141,7 +146,10 @@ export class TelnetTransport extends BaseTransport {
     }
 
     // Handle environment variables
-    if (cmd.optionCode === TELNET_OPTIONS.NEW_ENVIRON && cmd.commandCode === TELNET_COMMANDS.SB) {
+    if (
+      cmd.optionCode === TELNET_OPTIONS.NEW_ENVIRON &&
+      cmd.commandCode === TELNET_COMMANDS.SB
+    ) {
       const env = TelnetProtocolParser.parseEnvironment(cmd.data);
       if (env) {
         this.updateCapabilities({
@@ -177,7 +185,9 @@ export class TelnetTransport extends BaseTransport {
     if (this.rawMode === enabled) return;
 
     this.rawMode = enabled;
-    const commands = enabled ? TelnetCommandBuilder.enterRawMode() : TelnetCommandBuilder.exitRawMode();
+    const commands = enabled
+      ? TelnetCommandBuilder.enterRawMode()
+      : TelnetCommandBuilder.exitRawMode();
 
     commands.forEach((cmd) => this.socket.write(cmd));
   }

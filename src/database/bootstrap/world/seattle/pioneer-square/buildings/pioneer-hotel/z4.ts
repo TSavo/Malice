@@ -26,7 +26,7 @@ Light leaks from beneath the door to the roof access, gray daylight seeping into
       outdoor: false,
       exits: {
         east: '%ROOM_4',
-        'in': '%E',
+        in: '%E',
       },
     },
 

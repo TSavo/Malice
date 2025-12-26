@@ -56,7 +56,7 @@ export class PerformanceRelationshipCache {
       missRate: 0,
       avgAccessTime: 0,
       evictionRate: 0,
-      predictiveAccuracy: 0
+      predictiveAccuracy: 0,
     };
   }
 }

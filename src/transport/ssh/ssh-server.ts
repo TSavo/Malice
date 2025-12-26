@@ -2,19 +2,21 @@
  * SSH Server - SSH2 server with public key and password authentication
  */
 
-import ssh2 from 'ssh2';
 import type { AuthContext, Connection as SSH2Connection } from 'ssh2';
+import ssh2 from 'ssh2';
+
 const { Server: SSH2Server } = ssh2;
-import { generateKeyPairSync } from 'crypto';
+
+import { generateKeyPairSync } from 'node:crypto';
 import { Subject } from 'rxjs';
-import { SSHTransport } from './ssh-transport.js';
-import { Connection } from '../../connection/connection.js';
 import type { AuthInfo } from '../../../types/auth.js';
+import { Connection } from '../../connection/connection.js';
+import { SSHTransport } from './ssh-transport.js';
 
 export interface SSHServerConfig {
   port: number;
   host?: string;
-  hostKey?: string | Buffer;  // PEM-encoded private key (auto-generated if not provided)
+  hostKey?: string | Buffer; // PEM-encoded private key (auto-generated if not provided)
   debug?: boolean;
 }
 
@@ -28,7 +30,10 @@ export type SSHKeyLookup = (username: string) => Promise<string[] | null>;
  * Callback to verify password for a username
  * Returns true if password is valid
  */
-export type SSHPasswordVerify = (username: string, password: string) => Promise<boolean>;
+export type SSHPasswordVerify = (
+  username: string,
+  password: string,
+) => Promise<boolean>;
 
 /**
  * SSH server for Malice MOO
@@ -55,11 +60,14 @@ export class SSHServer {
     // Generate host key if not provided
     this.hostKey = config.hostKey || this.generateHostKey();
 
-    this.server = new SSH2Server({
-      hostKeys: [this.hostKey],
-    }, (client) => {
-      this.handleClient(client);
-    });
+    this.server = new SSH2Server(
+      {
+        hostKeys: [this.hostKey],
+      },
+      (client) => {
+        this.handleClient(client);
+      },
+    );
 
     this.setupEventHandlers();
   }
@@ -83,7 +91,9 @@ export class SSHServer {
    * Get the host key (for storage in MongoDB)
    */
   getHostKey(): string {
-    return typeof this.hostKey === 'string' ? this.hostKey : this.hostKey.toString('utf8');
+    return typeof this.hostKey === 'string'
+      ? this.hostKey
+      : this.hostKey.toString('utf8');
   }
 
   /**
@@ -140,10 +150,17 @@ export class SSHServer {
             const storedData = parts[1];
 
             // Normalize algorithm names
-            const normalizedClientAlgo = clientAlgo.replace('ssh-', '').toLowerCase();
-            const normalizedStoredAlgo = storedAlgo.replace('ssh-', '').toLowerCase();
+            const normalizedClientAlgo = clientAlgo
+              .replace('ssh-', '')
+              .toLowerCase();
+            const normalizedStoredAlgo = storedAlgo
+              .replace('ssh-', '')
+              .toLowerCase();
 
-            if (normalizedStoredAlgo === normalizedClientAlgo && storedData === clientKeyData) {
+            if (
+              normalizedStoredAlgo === normalizedClientAlgo &&
+              storedData === clientKeyData
+            ) {
               if (ctx.signature) {
                 // Client has provided signature - verify and accept
                 // The ssh2 library handles signature verification
@@ -162,7 +179,9 @@ export class SSHServer {
                   },
                 };
                 if (this.config.debug) {
-                  console.log(`[SSHServer] Public key auth success: ${username}`);
+                  console.log(
+                    `[SSHServer] Public key auth success: ${username}`,
+                  );
                 }
                 return ctx.accept();
               } else {
@@ -189,32 +208,34 @@ export class SSHServer {
 
       if (ctx.method === 'keyboard-interactive') {
         // Keyboard-interactive - try password first, fall back to guest access
-        return (ctx as any).prompt([
-          { prompt: 'Password (or press Enter for guest): ', echo: false }
-        ], '', async (responses: string[]) => {
-          const password = responses[0];
+        return (ctx as any).prompt(
+          [{ prompt: 'Password (or press Enter for guest): ', echo: false }],
+          '',
+          async (responses: string[]) => {
+            const password = responses[0];
 
-          // If password provided, try to authenticate
-          if (password && password.length > 0) {
-            const valid = await this.passwordVerify(username, password);
-            if (valid) {
-              authenticatedUsername = username;
-              authInfo = null; // Password auth goes through normal game auth flow
-              if (this.config.debug) {
-                console.log(`[SSHServer] Password auth success: ${username}`);
+            // If password provided, try to authenticate
+            if (password && password.length > 0) {
+              const valid = await this.passwordVerify(username, password);
+              if (valid) {
+                authenticatedUsername = username;
+                authInfo = null; // Password auth goes through normal game auth flow
+                if (this.config.debug) {
+                  console.log(`[SSHServer] Password auth success: ${username}`);
+                }
+                return ctx.accept();
               }
-              return ctx.accept();
             }
-          }
 
-          // No password or invalid password - allow as guest, game handles auth
-          authenticatedUsername = username;
-          authInfo = null;
-          if (this.config.debug) {
-            console.log(`[SSHServer] Guest access: ${username}`);
-          }
-          ctx.accept();
-        });
+            // No password or invalid password - allow as guest, game handles auth
+            authenticatedUsername = username;
+            authInfo = null;
+            if (this.config.debug) {
+              console.log(`[SSHServer] Guest access: ${username}`);
+            }
+            ctx.accept();
+          },
+        );
       }
 
       if (ctx.method === 'password') {
@@ -224,7 +245,9 @@ export class SSHServer {
           authenticatedUsername = username;
           authInfo = null;
           if (this.config.debug) {
-            console.log(`[SSHServer] Direct password auth success: ${username}`);
+            console.log(
+              `[SSHServer] Direct password auth success: ${username}`,
+            );
           }
           return ctx.accept();
         }
@@ -232,13 +255,20 @@ export class SSHServer {
         authenticatedUsername = username;
         authInfo = null;
         if (this.config.debug) {
-          console.log(`[SSHServer] Guest access (password failed): ${username}`);
+          console.log(
+            `[SSHServer] Guest access (password failed): ${username}`,
+          );
         }
         return ctx.accept();
       }
 
       // Unknown method - suggest available methods
-      return ctx.reject(['publickey', 'keyboard-interactive', 'password', 'none']);
+      return ctx.reject([
+        'publickey',
+        'keyboard-interactive',
+        'password',
+        'none',
+      ]);
     });
 
     // Handle session (shell) request
@@ -315,8 +345,11 @@ export class SSHServer {
       const parts = opensshKey.trim().split(/\s+/);
       if (parts.length >= 2) {
         const keyData = Buffer.from(parts[1], 'base64');
-        const crypto = require('crypto');
-        const hash = crypto.createHash('sha256').update(keyData).digest('base64');
+        const crypto = require('node:crypto');
+        const hash = crypto
+          .createHash('sha256')
+          .update(keyData)
+          .digest('base64');
         return `SHA256:${hash.replace(/=+$/, '')}`;
       }
     } catch {
@@ -330,10 +363,16 @@ export class SSHServer {
    */
   async listen(): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.server.listen(this.config.port, this.config.host || '0.0.0.0', () => {
-        console.log(`🔐 SSH server listening on ${this.config.host || '0.0.0.0'}:${this.config.port}`);
-        resolve();
-      });
+      this.server.listen(
+        this.config.port,
+        this.config.host || '0.0.0.0',
+        () => {
+          console.log(
+            `🔐 SSH server listening on ${this.config.host || '0.0.0.0'}:${this.config.port}`,
+          );
+          resolve();
+        },
+      );
 
       this.server.once('error', reject);
     });

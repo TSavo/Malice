@@ -17,9 +17,14 @@ export const building = {
     '%STAFF_LOCK': {
       prototype: 'biometricLock',
       name: 'Staff Door Scanner',
-      description: 'A fingerprint scanner mounted beside the door, newer than everything else in the room.',
+      description:
+        'A fingerprint scanner mounted beside the door, newer than everything else in the room.',
       scanners: [
-        { type: 'fingerprint', part: 'hand', message: 'Access denied - not authorized.' },
+        {
+          type: 'fingerprint',
+          part: 'hand',
+          message: 'Access denied - not authorized.',
+        },
       ],
       authorizedUsers: {},
     },
@@ -27,7 +32,8 @@ export const building = {
     '%HATCH_LOCK': {
       prototype: 'biometricLock',
       name: 'Roof Hatch Scanner',
-      description: 'A palm scanner bolted to the wall beside the ladder, its LED glowing amber.',
+      description:
+        'A palm scanner bolted to the wall beside the ladder, its LED glowing amber.',
       scanners: [
         { type: 'palm', part: 'hand', message: 'Roof access denied.' },
       ],
@@ -37,10 +43,9 @@ export const building = {
     '%ALLEY_LOCK': {
       prototype: 'biometricLock',
       name: 'Back Exit Scanner',
-      description: 'A palm scanner beside a fire door, its paint chipped and peeling.',
-      scanners: [
-        { type: 'palm', part: 'hand', message: 'Staff access only.' },
-      ],
+      description:
+        'A palm scanner beside a fire door, its paint chipped and peeling.',
+      scanners: [{ type: 'palm', part: 'hand', message: 'Staff access only.' }],
       authorizedUsers: {},
     },
 
@@ -49,7 +54,7 @@ export const building = {
     // ═══════════════════════════════════════════════════════════════════
 
     '%ENTRY': {
-      alias: 'immigrationServices',  // Register as $immigrationServices for chargen spawn point
+      alias: 'immigrationServices', // Register as $immigrationServices for chargen spawn point
       name: 'Immigration Services - Entry Hall',
       description: `The entry hall retains the bones of federal architecture—high ceilings, terrazzo floors worn smooth by a century of footsteps, brass fixtures tarnished to brown. The building served as Seattle's immigration processing station in the early 1900s, funneling arrivals from Pacific crossings into the bureaucratic machinery of citizenship and exclusion.
 
@@ -65,7 +70,10 @@ The federal seal above the entrance has been painted over, but you can still tra
       waterLevel: 0,
       outdoor: false,
       exits: {
-        east: { to: '1st-ave-s/y10.ts', description: 'Heavy wooden doors open onto 1st Ave S' },
+        east: {
+          to: '1st-ave-s/y10.ts',
+          description: 'Heavy wooden doors open onto 1st Ave S',
+        },
         north: '%COFFINS',
         west: '%SERVICES',
       },
@@ -73,7 +81,8 @@ The federal seal above the entrance has been painted over, but you can still tra
         {
           name: 'a wooden bench',
           capacity: 3,
-          emptyMsg: 'A worn wooden bench sits against the wall, its surface smoothed by decades of waiting.',
+          emptyMsg:
+            'A worn wooden bench sits against the wall, its surface smoothed by decades of waiting.',
           occupiedMsg: '%s waiting on the bench.',
         },
       ],
@@ -138,7 +147,11 @@ The room smells of old coffee and mildew. Whatever authority once operated from 
       exits: {
         south: '%SERVICES',
         up: { room: '%ROOF_NW', locks: ['%HATCH_LOCK'] },
-        west: { to: 'alley/y11.ts', locks: ['%ALLEY_LOCK'], description: 'A fire door leads to the alley' },
+        west: {
+          to: 'alley/y11.ts',
+          locks: ['%ALLEY_LOCK'],
+          description: 'A fire door leads to the alley',
+        },
       },
     },
   },

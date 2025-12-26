@@ -3,7 +3,6 @@
  * These types are available in all MOO method code
  */
 
-import type { ObjId } from './object.js';
 import type { ObjectManager } from '../src/database/object-manager.js';
 import type { RuntimeObject } from './object.js';
 

@@ -8,18 +8,21 @@
  * - Streets: King=-12, Jackson=-6, Main=0, Washington=+6, Yesler=+12
  */
 
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const pioneerSquareDir = path.join(__dirname, '../src/database/bootstrap/world/seattle/pioneer-square');
+const pioneerSquareDir = path.join(
+  __dirname,
+  '../src/database/bootstrap/world/seattle/pioneer-square',
+);
 
 // Expected X coordinates for avenues
 const avenueX = {
-  'waterfront': -21,
+  waterfront: -21,
   '1st-ave-s': -14,
   'occidental-ave-s': -7,
   '2nd-ave-s': 0,
@@ -43,8 +46,8 @@ function extractCoords(content) {
   const xMatch = content.match(/^\s*x:\s*(-?\d+),/m);
   const yMatch = content.match(/^\s*y:\s*(-?\d+),/m);
   return {
-    x: xMatch ? parseInt(xMatch[1]) : null,
-    y: yMatch ? parseInt(yMatch[1]) : null,
+    x: xMatch ? parseInt(xMatch[1], 10) : null,
+    y: yMatch ? parseInt(yMatch[1], 10) : null,
   };
 }
 
@@ -78,7 +81,7 @@ function checkFile(filePath, relativePath) {
 
   const parts = relativePath.split(path.sep);
   const dirName = parts[0];
-  const fileName = parts[parts.length - 1];
+  const _fileName = parts[parts.length - 1];
 
   let expectedX = null;
   let expectedY = null;

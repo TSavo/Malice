@@ -1,5 +1,5 @@
-import { ObjectManager } from '../object-manager.js';
 import type { RuntimeObject } from '../../../types/object.js';
+import type { ObjectManager } from '../object-manager.js';
 
 /**
  * Builds Scheduler object (dynamic ID)
@@ -35,7 +35,7 @@ export class SchedulerBuilder {
 
   constructor(
     private manager: ObjectManager,
-    private options: { disableDefaultJobs?: boolean } = {}
+    private options: { disableDefaultJobs?: boolean } = {},
   ) {}
 
   async build(forceRebuild = false): Promise<void> {
@@ -43,7 +43,8 @@ export class SchedulerBuilder {
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
 
-    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
+    const aliases =
+      (objectManager.get('aliases') as Record<string, number>) || {};
 
     if (aliases.scheduler) {
       this.scheduler = await this.manager.load(aliases.scheduler);
@@ -71,7 +72,9 @@ export class SchedulerBuilder {
     // schedule(name, delay, interval, target, method, ...args)
     // delay: ms until first run (0 = next tick)
     // interval: ms between runs (0 = one-shot)
-    this.scheduler.setMethod('schedule', `
+    this.scheduler.setMethod(
+      'schedule',
+      `
       const name = args[0];
       const delay = args[1]; // ms until first run
       const interval = args[2]; // ms between runs (0 = one-shot)
@@ -107,10 +110,13 @@ export class SchedulerBuilder {
       self.jobs = jobs;
 
       return { success: true, name: name, nextRun: now + delay, interval: interval };
-    `);
+    `,
+    );
 
     // Unschedule a job
-    this.scheduler.setMethod('unschedule', `
+    this.scheduler.setMethod(
+      'unschedule',
+      `
       const name = args[0];
 
       const jobs = self.jobs || {};
@@ -122,10 +128,13 @@ export class SchedulerBuilder {
       self.jobs = jobs;
 
       return { success: true, name: name };
-    `);
+    `,
+    );
 
     // Enable/disable a job without removing it
-    this.scheduler.setMethod('setEnabled', `
+    this.scheduler.setMethod(
+      'setEnabled',
+      `
       const name = args[0];
       const enabled = args[1] !== false;
 
@@ -138,40 +147,58 @@ export class SchedulerBuilder {
       self.jobs = jobs;
 
       return { success: true, name: name, enabled: enabled };
-    `);
+    `,
+    );
 
     // Pause the scheduler - tick() will skip processing
-    this.scheduler.setMethod('pause', `
+    this.scheduler.setMethod(
+      'pause',
+      `
       self.paused = true;
       return { success: true, paused: true };
-    `);
+    `,
+    );
 
     // Resume the scheduler - tick() will process jobs again
-    this.scheduler.setMethod('resume', `
+    this.scheduler.setMethod(
+      'resume',
+      `
       self.paused = false;
       return { success: true, paused: false };
-    `);
+    `,
+    );
 
     // Check if scheduler is paused
-    this.scheduler.setMethod('isPaused', `
+    this.scheduler.setMethod(
+      'isPaused',
+      `
       return self.paused === true;
-    `);
+    `,
+    );
 
     // Get info about a job
-    this.scheduler.setMethod('getJob', `
+    this.scheduler.setMethod(
+      'getJob',
+      `
       const name = args[0];
       const jobs = self.jobs || {};
       return jobs[name] || null;
-    `);
+    `,
+    );
 
     // Get all job names
-    this.scheduler.setMethod('listJobs', `
+    this.scheduler.setMethod(
+      'listJobs',
+      `
       const jobs = self.jobs || {};
       return Object.keys(jobs);
-    `);
+    `,
+    );
 
     // Get next run time for a job
-    this.scheduler.setMethod('getNextRun', `
+    this.scheduler.setMethod(
+      'getNextRun',
+      `
       const name = args[0];
       const jobs = self.jobs || {};
       const job = jobs[name];
@@ -180,11 +207,14 @@ export class SchedulerBuilder {
       if (!job.enabled) return null;
 
       return job.nextRun;
-    `);
+    `,
+    );
 
     // Main tick - called by server periodically
     // Returns array of job results
-    this.scheduler.setMethod('tick', `
+    this.scheduler.setMethod(
+      'tick',
+      `
       // Skip processing if paused
       if (self.paused) {
         return [];
@@ -239,10 +269,13 @@ export class SchedulerBuilder {
       }
 
       return results;
-    `);
+    `,
+    );
 
     // Force run a job immediately (for testing/admin)
-    this.scheduler.setMethod('runNow', `
+    this.scheduler.setMethod(
+      'runNow',
+      `
       const name = args[0];
       const jobs = self.jobs || {};
       const job = jobs[name];
@@ -272,11 +305,14 @@ export class SchedulerBuilder {
       } catch (err) {
         return { success: false, error: String(err) };
       }
-    `);
+    `,
+    );
 
     // Decay tick - process decay for all decayable objects
     // Called periodically (every game minute) to update decay levels
-    this.scheduler.setMethod('decayTick', `
+    this.scheduler.setMethod(
+      'decayTick',
+      `
       /** Process decay for all objects that inherit from Decayable.
        *  Iterates through all objects and calls decayTick() on those
        *  that have the method (i.e., inherit from Decayable).
@@ -320,10 +356,13 @@ export class SchedulerBuilder {
       }
 
       return { processed, decayed, destroyed };
-    `);
+    `,
+    );
 
     // Describe scheduler state
-    this.scheduler.setMethod('describe', `
+    this.scheduler.setMethod(
+      'describe',
+      `
       const jobs = self.jobs || {};
       const jobNames = Object.keys(jobs);
       const pausedStr = self.paused ? ' [PAUSED]' : '';
@@ -348,7 +387,8 @@ export class SchedulerBuilder {
       }
 
       return lines.join('\\\\r\\\\n');
-    `);
+    `,
+    );
   }
 
   async registerAlias(): Promise<void> {
@@ -371,11 +411,16 @@ export class SchedulerBuilder {
   /**
    * Register default scheduled jobs
    */
-  private async registerDefaultJobs(objectManager: RuntimeObject): Promise<void> {
+  private async registerDefaultJobs(
+    objectManager: RuntimeObject,
+  ): Promise<void> {
     if (!this.scheduler) return;
 
     const jobs = (this.scheduler.get('jobs') as Record<string, unknown>) || {};
-    const systemId = (await objectManager.call('getAlias', 'system') as number | undefined) || 2;
+    const systemId =
+      ((await objectManager.call('getAlias', 'system')) as
+        | number
+        | undefined) || 2;
     let modified = false;
 
     // Player heartbeat - every 60 seconds
@@ -430,7 +475,9 @@ export class SchedulerBuilder {
     let modified = false;
 
     // Pluribus hourly wake-up - on the hour
-    const pluribusId = (await objectManager.call('getAlias', 'pluribus') as number | undefined);
+    const pluribusId = (await objectManager.call('getAlias', 'pluribus')) as
+      | number
+      | undefined;
     if (pluribusId && !jobs.pluribusWake) {
       // Calculate ms until next hour
       const now = Date.now();
@@ -451,7 +498,9 @@ export class SchedulerBuilder {
     }
 
     // Sister Gray hourly wake-up - on the half-hour
-    const sisterGrayId = (await objectManager.call('getAlias', 'sisterGray') as number | undefined);
+    const sisterGrayId = (await objectManager.call('getAlias', 'sisterGray')) as
+      | number
+      | undefined;
     if (sisterGrayId && !jobs.sisterGrayWake) {
       // Calculate ms until next half-hour
       const now = Date.now();
@@ -459,9 +508,10 @@ export class SchedulerBuilder {
       const msPerHalfHour = 1800000;
       const msSinceHour = now % msPerHour;
       // Time until next half-hour mark (either :30 or :00 + 30min)
-      const msUntilNextHalfHour = msSinceHour < msPerHalfHour
-        ? msPerHalfHour - msSinceHour
-        : msPerHour - msSinceHour + msPerHalfHour;
+      const msUntilNextHalfHour =
+        msSinceHour < msPerHalfHour
+          ? msPerHalfHour - msSinceHour
+          : msPerHour - msSinceHour + msPerHalfHour;
 
       (jobs as Record<string, unknown>).sisterGrayWake = {
         interval: msPerHour, // every hour
@@ -472,7 +522,9 @@ export class SchedulerBuilder {
         enabled: true,
       };
       modified = true;
-      console.log('✅ Registered sisterGrayWake job (hourly, on the half-hour)');
+      console.log(
+        '✅ Registered sisterGrayWake job (hourly, on the half-hour)',
+      );
     }
 
     if (modified) {

@@ -28,33 +28,37 @@ export class RelationshipCache {
   get(objectId: number, methodName: string): MethodRelationship | null {
     const key = `${objectId}:${methodName}`;
     const entry = this.cache.get(key);
-    
+
     if (entry && this.isEntryValid(entry)) {
       entry.lastAccessed = Date.now();
       entry.accessCount++;
       return entry.relationship;
     }
-    
+
     return null;
   }
 
   /**
    * Set cached relationship
    */
-  set(objectId: number, methodName: string, relationship: MethodRelationship): void {
+  set(
+    objectId: number,
+    methodName: string,
+    relationship: MethodRelationship,
+  ): void {
     const key = `${objectId}:${methodName}`;
-    
+
     // Evict if cache is full
     if (this.cache.size >= this.MAX_SIZE && !this.cache.has(key)) {
       this.evictLeastRecentlyUsed();
     }
-    
+
     const entry: CacheEntry = {
       relationship,
       lastAccessed: Date.now(),
-      accessCount: 1
+      accessCount: 1,
     };
-    
+
     this.cache.set(key, entry);
   }
 
@@ -63,13 +67,13 @@ export class RelationshipCache {
    */
   invalidateObject(objectId: number): void {
     const keysToDelete: string[] = [];
-    
+
     for (const key of this.cache.keys()) {
       if (key.startsWith(`${objectId}:`)) {
         keysToDelete.push(key);
       }
     }
-    
+
     for (const key of keysToDelete) {
       this.cache.delete(key);
     }
@@ -99,24 +103,24 @@ export class RelationshipCache {
     hitRate: number;
   } {
     let validEntries = 0;
-    
+
     for (const entry of this.cache.values()) {
       if (this.isEntryValid(entry)) {
         validEntries++;
       }
     }
-    
+
     // Estimate memory usage (rough calculation)
     const avgEntrySize = 1024; // ~1KB per relationship entry
     const memoryUsage = this.cache.size * avgEntrySize;
-    
+
     // Calculate hit rate (would need actual hit/miss tracking)
     const hitRate = validEntries > 0 ? 0.85 : 0; // Placeholder
-    
+
     return {
       totalEntries: this.cache.size,
       memoryUsage,
-      hitRate
+      hitRate,
     };
   }
 
@@ -134,14 +138,14 @@ export class RelationshipCache {
   private evictLeastRecentlyUsed(): void {
     let oldestKey: string | null = null;
     let oldestAccess = Date.now();
-    
+
     for (const [key, entry] of this.cache) {
       if (entry.lastAccessed < oldestAccess) {
         oldestAccess = entry.lastAccessed;
         oldestKey = key;
       }
     }
-    
+
     if (oldestKey) {
       this.cache.delete(oldestKey);
     }

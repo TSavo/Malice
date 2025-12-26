@@ -1,5 +1,5 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Factory for creating human body object trees
@@ -34,11 +34,12 @@ export class BodyFactory {
   async createHumanBody(
     ownerId: number,
     sex: 'male' | 'female' | 'neuter' = 'neuter',
-    primaryHand: 'left' | 'right' = Math.random() > 0.5 ? 'right' : 'left'
+    primaryHand: 'left' | 'right' = Math.random() > 0.5 ? 'right' : 'left',
   ): Promise<RuntimeObject> {
     // Get prototype IDs from aliases
     const objectManager = await this.manager.load(0);
-    const aliases = (objectManager?.get('aliases') as Record<string, number>) || {};
+    const aliases =
+      (objectManager?.get('aliases') as Record<string, number>) || {};
 
     const bodyPartId = aliases.bodyPart;
     const handId = aliases.hand;
@@ -63,7 +64,7 @@ export class BodyFactory {
         removable?: boolean;
         critical?: boolean;
         aliases?: string[];
-      } = {}
+      } = {},
     ): Promise<RuntimeObject> => {
       const parentObj = await this.manager.load(parentProto);
       const part = await this.manager.create({
@@ -87,8 +88,17 @@ export class BodyFactory {
     // Create the body tree from bottom up, linking parts
 
     // === FINGERS ===
-    const createFingers = async (side: string, handPart: RuntimeObject): Promise<void> => {
-      const fingers = ['thumb', 'index finger', 'middle finger', 'ring finger', 'pinky'];
+    const createFingers = async (
+      side: string,
+      handPart: RuntimeObject,
+    ): Promise<void> => {
+      const fingers = [
+        'thumb',
+        'index finger',
+        'middle finger',
+        'ring finger',
+        'pinky',
+      ];
       for (const finger of fingers) {
         const fingerPart = await createPart(bodyPartId, `${side} ${finger}`, {
           bones: ['metacarpals', 'phalanges'],
@@ -96,7 +106,7 @@ export class BodyFactory {
           removable: true,
         });
         const fingerKey = finger.replace(' ', '');
-        await handPart.call('addPart',fingerKey, fingerPart.id);
+        await handPart.call('addPart', fingerKey, fingerPart.id);
       }
     };
 
@@ -121,21 +131,21 @@ export class BodyFactory {
         coverable: true,
         removable: true,
       });
-      await forearm.call('addPart','hand', hand.id);
+      await forearm.call('addPart', 'hand', hand.id);
 
       const arm = await createPart(bodyPartId, `${side} arm`, {
         bones: ['humerus'],
         coverable: true,
         removable: true,
       });
-      await arm.call('addPart','forearm', forearm.id);
+      await arm.call('addPart', 'forearm', forearm.id);
 
       const shoulder = await createPart(bodyPartId, `${side} shoulder`, {
         bones: ['clavicle', 'scapula'],
         coverable: true,
         removable: false,
       });
-      await shoulder.call('addPart','arm', arm.id);
+      await shoulder.call('addPart', 'arm', arm.id);
 
       return shoulder;
     };
@@ -153,21 +163,21 @@ export class BodyFactory {
         coverable: true,
         removable: true,
       });
-      await leg.call('addPart','foot', foot.id);
+      await leg.call('addPart', 'foot', foot.id);
 
       const knee = await createPart(bodyPartId, `${side} knee`, {
         bones: ['patella'],
         coverable: true,
         removable: true,
       });
-      await knee.call('addPart','leg', leg.id);
+      await knee.call('addPart', 'leg', leg.id);
 
       const thigh = await createPart(bodyPartId, `${side} thigh`, {
         bones: ['femur'],
         coverable: true,
         removable: true,
       });
-      await thigh.call('addPart','knee', knee.id);
+      await thigh.call('addPart', 'knee', knee.id);
 
       return thigh;
     };
@@ -203,18 +213,18 @@ export class BodyFactory {
       const mouth = await createPart(mouthId || bodyPartId, 'mouth', {
         coverable: true,
       });
-      await mouth.call('addPart','tongue', tongue.id);
+      await mouth.call('addPart', 'tongue', tongue.id);
 
       // Face
       const face = await createPart(bodyPartId, 'face', {
         coverable: true,
       });
-      await face.call('addPart','leftEye', leftEye.id);
-      await face.call('addPart','rightEye', rightEye.id);
-      await face.call('addPart','leftEar', leftEar.id);
-      await face.call('addPart','rightEar', rightEar.id);
-      await face.call('addPart','nose', nose.id);
-      await face.call('addPart','mouth', mouth.id);
+      await face.call('addPart', 'leftEye', leftEye.id);
+      await face.call('addPart', 'rightEye', rightEye.id);
+      await face.call('addPart', 'leftEar', leftEar.id);
+      await face.call('addPart', 'rightEar', rightEar.id);
+      await face.call('addPart', 'nose', nose.id);
+      await face.call('addPart', 'mouth', mouth.id);
 
       // Throat/Neck
       const throat = await createPart(bodyPartId, 'throat', {
@@ -227,7 +237,7 @@ export class BodyFactory {
         coverable: true,
         critical: true,
       });
-      await neck.call('addPart','throat', throat.id);
+      await neck.call('addPart', 'throat', throat.id);
 
       // Scalp (with hair)
       const scalp = await createPart(bodyPartId, 'scalp', {
@@ -244,9 +254,9 @@ export class BodyFactory {
         removable: true,
         critical: true,
       });
-      await head.call('addPart','scalp', scalp.id);
-      await head.call('addPart','neck', neck.id);
-      await head.call('addPart','face', face.id);
+      await head.call('addPart', 'scalp', scalp.id);
+      await head.call('addPart', 'neck', neck.id);
+      await head.call('addPart', 'face', face.id);
 
       return head;
     };
@@ -268,12 +278,12 @@ export class BodyFactory {
         const rightTesticle = await createPart(bodyPartId, 'right testicle', {
           removable: true,
         });
-        await groin.call('addPart','penis', penis.id);
-        await groin.call('addPart','leftTesticle', leftTesticle.id);
-        await groin.call('addPart','rightTesticle', rightTesticle.id);
+        await groin.call('addPart', 'penis', penis.id);
+        await groin.call('addPart', 'leftTesticle', leftTesticle.id);
+        await groin.call('addPart', 'rightTesticle', rightTesticle.id);
       } else if (sex === 'female') {
         const vagina = await createPart(bodyPartId, 'vagina', {});
-        await groin.call('addPart','vagina', vagina.id);
+        await groin.call('addPart', 'vagina', vagina.id);
       }
       // neuter = no additional parts
 
@@ -312,16 +322,16 @@ export class BodyFactory {
       critical: true,
     });
 
-    await torso.call('addPart','head', head.id);
-    await torso.call('addPart','rightShoulder', rightShoulder.id);
-    await torso.call('addPart','leftShoulder', leftShoulder.id);
-    await torso.call('addPart','rightThigh', rightThigh.id);
-    await torso.call('addPart','leftThigh', leftThigh.id);
-    await torso.call('addPart','groin', groin.id);
-    await torso.call('addPart','leftChest', leftChest.id);
-    await torso.call('addPart','rightChest', rightChest.id);
-    await torso.call('addPart','stomach', stomach.id);
-    await torso.call('addPart','back', back.id);
+    await torso.call('addPart', 'head', head.id);
+    await torso.call('addPart', 'rightShoulder', rightShoulder.id);
+    await torso.call('addPart', 'leftShoulder', leftShoulder.id);
+    await torso.call('addPart', 'rightThigh', rightThigh.id);
+    await torso.call('addPart', 'leftThigh', leftThigh.id);
+    await torso.call('addPart', 'groin', groin.id);
+    await torso.call('addPart', 'leftChest', leftChest.id);
+    await torso.call('addPart', 'rightChest', rightChest.id);
+    await torso.call('addPart', 'stomach', stomach.id);
+    await torso.call('addPart', 'back', back.id);
 
     // Store primary hand preference on torso
     torso.set('primaryHand', primaryHand);

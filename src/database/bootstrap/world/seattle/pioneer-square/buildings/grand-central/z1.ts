@@ -64,7 +64,8 @@ The balcony runs along the interior of the building, connecting the offices on t
         {
           name: 'a balcony bench',
           capacity: 2,
-          emptyMsg: 'A wooden bench sits against the wall, offering a view down into the arcade.',
+          emptyMsg:
+            'A wooden bench sits against the wall, offering a view down into the arcade.',
           occupiedMsg: '%s sitting on the balcony bench',
         },
       ],
@@ -232,7 +233,8 @@ The ceiling has partially collapsed in one corner, revealing the floor of the ho
         {
           name: 'the dental chair',
           capacity: 1,
-          emptyMsg: 'The Victorian dental chair tilts at an uncomfortable angle, leather straps dangling from its arms.',
+          emptyMsg:
+            'The Victorian dental chair tilts at an uncomfortable angle, leather straps dangling from its arms.',
           occupiedMsg: '%s reclining uneasily in the dental chair',
         },
       ],
@@ -286,7 +288,8 @@ The windows offer a view of Washington Street and the buildings beyond. The glas
         {
           name: 'a leather club chair',
           capacity: 1,
-          emptyMsg: 'A worn leather club chair sits before the mahogany desk, its stuffing visible through cracks in the upholstery.',
+          emptyMsg:
+            'A worn leather club chair sits before the mahogany desk, its stuffing visible through cracks in the upholstery.',
           occupiedMsg: '%s sitting in the club chair',
         },
       ],
@@ -316,7 +319,8 @@ The balcony floor is iron grating, some sections weakened by rust. Weight limits
         {
           name: 'a window ledge',
           capacity: 2,
-          emptyMsg: 'A wide window ledge offers seating with a view of the arcade below.',
+          emptyMsg:
+            'A wide window ledge offers seating with a view of the arcade below.',
           occupiedMsg: '%s sitting on the window ledge',
         },
       ],

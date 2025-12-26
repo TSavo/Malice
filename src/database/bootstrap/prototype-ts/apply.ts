@@ -24,7 +24,6 @@ function ensureNumber(value: unknown, description: string): number {
   return value;
 }
 
-
 function toMethodRecord(spec: ExtractedPrototypeSpec): Record<string, Method> {
   const result: Record<string, Method> = {};
   for (const [name, method] of Object.entries(spec.methods)) {
@@ -42,16 +41,24 @@ export async function applyExtractedPrototypeSpec(
 
   const objectManager = await manager.load(0);
   if (!objectManager) {
-    throw new Error('ObjectManager (#0) not found; run minimal bootstrap first');
+    throw new Error(
+      'ObjectManager (#0) not found; run minimal bootstrap first',
+    );
   }
 
-  const aliases = (objectManager.get('aliases') as Record<string, unknown>) || {};
+  const aliases =
+    (objectManager.get('aliases') as Record<string, unknown>) || {};
 
-  const prototypeId = ensureNumber(aliases[spec.alias], `Alias '${spec.alias}'`);
+  const prototypeId = ensureNumber(
+    aliases[spec.alias],
+    `Alias '${spec.alias}'`,
+  );
 
   const prototypeObj = await manager.load(prototypeId);
   if (!prototypeObj) {
-    throw new Error(`Prototype for alias '${spec.alias}' not found at #${prototypeId}`);
+    throw new Error(
+      `Prototype for alias '${spec.alias}' not found at #${prototypeId}`,
+    );
   }
 
   const updatedProperties: string[] = [];
@@ -63,14 +70,20 @@ export async function applyExtractedPrototypeSpec(
   const existingProperties = raw.properties ?? {};
   const existingMethods = raw.methods ?? {};
 
-  const toValue: ((value: unknown, seen?: WeakSet<object>, path?: string) => unknown) | undefined = (prototypeObj as any)
-    .toValue;
+  const toValue:
+    | ((value: unknown, seen?: WeakSet<object>, path?: string) => unknown)
+    | undefined = (prototypeObj as any).toValue;
   if (!toValue) {
-    throw new Error('Internal error: RuntimeObject is missing toValue() converter');
+    throw new Error(
+      'Internal error: RuntimeObject is missing toValue() converter',
+    );
   }
 
   const parentAlias = spec.parent;
-  const parentId = ensureNumber(aliases[parentAlias], `Alias '${parentAlias}' (parent of '${spec.alias}')`);
+  const parentId = ensureNumber(
+    aliases[parentAlias],
+    `Alias '${parentAlias}' (parent of '${spec.alias}')`,
+  );
   const updatedParent = raw.parent.value !== parentId;
 
   const nextProperties = { ...existingProperties };
@@ -81,10 +94,15 @@ export async function applyExtractedPrototypeSpec(
   }
 
   for (const [key, value] of Object.entries(spec.properties)) {
-    const hasOwn = Object.prototype.hasOwnProperty.call(existingProperties, key);
+    const hasOwn = Object.hasOwn(existingProperties, key);
 
     if (force || !hasOwn) {
-      nextProperties[key] = toValue.call(prototypeObj as any, value, new WeakSet(), `#${prototypeId}.${key}`) as any;
+      nextProperties[key] = toValue.call(
+        prototypeObj as any,
+        value,
+        new WeakSet(),
+        `#${prototypeId}.${key}`,
+      ) as any;
       updatedProperties.push(key);
     } else {
       skippedProperties.push(key);
@@ -94,7 +112,7 @@ export async function applyExtractedPrototypeSpec(
   const desiredMethods = toMethodRecord(spec);
 
   for (const [name, method] of Object.entries(desiredMethods)) {
-    const hasOwn = Object.prototype.hasOwnProperty.call(existingMethods, name);
+    const hasOwn = Object.hasOwn(existingMethods, name);
 
     if (force || !hasOwn) {
       nextMethods[name] = method;

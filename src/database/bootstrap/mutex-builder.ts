@@ -1,5 +1,5 @@
-import { ObjectManager } from '../object-manager.js';
 import type { RuntimeObject } from '../../../types/object.js';
+import type { ObjectManager } from '../object-manager.js';
 
 /**
  * Builds Mutex utility object ($.mutex)
@@ -33,7 +33,8 @@ export class MutexBuilder {
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
 
-    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
+    const aliases =
+      (objectManager.get('aliases') as Record<string, number>) || {};
 
     if (aliases.mutex) {
       this.mutex = await this.manager.load(aliases.mutex);
@@ -46,7 +47,8 @@ export class MutexBuilder {
       parent: root!,
       properties: {
         name: 'Mutex',
-        description: 'Object-based mutex lock system with data storage and timed expiration',
+        description:
+          'Object-based mutex lock system with data storage and timed expiration',
       },
       methods: {},
     });
@@ -57,7 +59,9 @@ export class MutexBuilder {
     // name: string - the mutex name on that object
     // data: any - data to store with the lock (should be truthy for if-check to work)
     // timeout: number - optional duration in ms before auto-release via scheduler
-    this.mutex.setMethod('acquire', `
+    this.mutex.setMethod(
+      'acquire',
+      `
       const obj = args[0];
       const name = args[1];
       const data = args[2] !== undefined ? args[2] : true;
@@ -94,12 +98,15 @@ export class MutexBuilder {
       }
 
       return false; // Lock acquired
-    `);
+    `,
+    );
 
     // Release a named lock on an object
     // obj can be object or object ID (scheduler passes ID)
     // Returns true if released, false if wasn't locked
-    this.mutex.setMethod('release', `
+    this.mutex.setMethod(
+      'release',
+      `
       let obj = args[0];
       const name = args[1];
 
@@ -129,11 +136,14 @@ export class MutexBuilder {
       await $.scheduler.unschedule(jobName);
 
       return true;
-    `);
+    `,
+    );
 
     // Check if a mutex is locked on an object without acquiring
     // Returns false if not locked, or stored data if locked
-    this.mutex.setMethod('check', `
+    this.mutex.setMethod(
+      'check',
+      `
       const obj = args[0];
       const name = args[1];
 
@@ -151,11 +161,14 @@ export class MutexBuilder {
       }
 
       return locks[name].data;
-    `);
+    `,
+    );
 
     // Update data on an existing lock (without releasing/reacquiring)
     // Returns true if updated, false if not locked
-    this.mutex.setMethod('update', `
+    this.mutex.setMethod(
+      'update',
+      `
       const obj = args[0];
       const name = args[1];
       const data = args[2];
@@ -176,11 +189,14 @@ export class MutexBuilder {
       locks[name].data = data;
       obj._mutexes = locks;
       return true;
-    `);
+    `,
+    );
 
     // Extend/reset the timeout on a lock
     // Returns true if extended, false if not locked
-    this.mutex.setMethod('extend', `
+    this.mutex.setMethod(
+      'extend',
+      `
       const obj = args[0];
       const name = args[1];
       const timeout = args[2];
@@ -207,11 +223,14 @@ export class MutexBuilder {
       }
 
       return true;
-    `);
+    `,
+    );
 
     // List all active locks on an object (for debugging/admin)
     // Returns { name: { data, acquiredAt }, ... }
-    this.mutex.setMethod('list', `
+    this.mutex.setMethod(
+      'list',
+      `
       const obj = args[0];
 
       if (!obj) {
@@ -219,19 +238,25 @@ export class MutexBuilder {
       }
 
       return obj._mutexes || {};
-    `);
+    `,
+    );
 
     // Force release a lock (admin use)
     // Same as release but named differently for clarity
-    this.mutex.setMethod('forceRelease', `
+    this.mutex.setMethod(
+      'forceRelease',
+      `
       const obj = args[0];
       const name = args[1];
       return await self.release(obj, name);
-    `);
+    `,
+    );
 
     // Release all locks on an object
     // Returns number of locks released
-    this.mutex.setMethod('releaseAll', `
+    this.mutex.setMethod(
+      'releaseAll',
+      `
       const obj = args[0];
 
       if (!obj) {
@@ -249,7 +274,8 @@ export class MutexBuilder {
 
       obj._mutexes = {};
       return names.length;
-    `);
+    `,
+    );
   }
 
   async registerAlias(): Promise<void> {

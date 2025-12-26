@@ -1,5 +1,5 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Builds the Agent prototype
@@ -20,66 +20,71 @@ import type { RuntimeObject } from '../../../../types/object.js';
 export class AgentBuilder {
   constructor(private manager: ObjectManager) {}
 
-  async build(describableId: number, existingObj?: RuntimeObject): Promise<RuntimeObject> {
+  async build(
+    describableId: number,
+    existingObj?: RuntimeObject,
+  ): Promise<RuntimeObject> {
     const parentObj = await this.manager.load(describableId);
-    const obj = existingObj || await this.manager.create({
-      parent: parentObj!,
-      properties: {
-        name: 'Agent',
-        description: 'Base prototype for things that can act',
-        // Verb registry: { pattern: { obj: ObjId, method: string } }
-        // Patterns like 'get %i', 'shoot %i with %t', 'say %s'
-        verbs: {},
-        // Watch list - people we're paying attention to
-        // Watching someone gives +50 perception clarity in crowds
-        // Limited by perception capacity (computed from eyes/ears)
-        watchList: [], // Array of object IDs
-        watchExpiry: {}, // { objId: expiryTimestamp } for auto-expire
-        // Display options
-        options: {
-          seePrompt: '',       // Prefix for visual messages (empty = none)
-          hearPrompt: '',      // Prefix for audio messages (empty = none)
-          color: true,         // Enable ANSI color output
-          screenReader: false, // Screen reader accessibility mode
-        },
-        // Sleep state: 'awake', 'falling_asleep', 'asleep', 'waking_up'
-        sleepState: 'awake',
-        // Scheduled job name for sleep transitions (for cancellation)
-        sleepTransitionJob: null,
-        // Status effects from substances, injuries, etc.
-        // Each effect: { intensity: 0-100, decay: rate per tick }
-        // Effects: sedation, stimulation, impaired_coordination, impaired_perception,
-        //          nausea, euphoria, pain
-        statusEffects: {},
-        // Sleep debt - accumulates while awake (+1/tick), decreases while asleep (-3/tick)
-        // 960 = ~16 hours awake (normal bedtime)
-        // Higher debt = higher metabolism, chance to doze off
-        sleepDebt: 0,
-        // Skills learned through use: { skillName: { level, xp, lastProgressed } }
-        skills: {},
-        // Dying state - 15 minute countdown before death
-        // Progress 0-100, increases ~6.67 per minute (100 in 15 min)
-        dyingProgress: 0,
-        isDying: false,
-        // Skill cooldown in ms (how long before same skill can progress again)
-        skillCooldown: 3600000, // 1 hour
-        // Hidden luck attribute (1-100) - failed rolls get a luck save
-        // Roll d100, if <= luck, failure becomes success
-        luck: 1, // Everyone starts with 1
-        // Movement system
-        movementMode: 'walk', // 'walk' or 'run'
-        // Movement state (null if not moving)
-        // { destId, direction, distanceRemaining, startTime, mode }
-        movementState: null,
-        // Movement job name (for cancellation)
-        movementJob: null,
-        // Perception filters - modify what this agent perceives
-        // Each filter: { source: objref, filter: objref }
-        // Filter methods: modifyRoomDescription, getAddressableEntities, onAddressed
-        // Sensory hooks: onSee, onHear, onSmell, onTaste, onFeel
-        perceptionFilters: [],
+    const obj =
+      existingObj ||
+      (await this.manager.create({
+        parent: parentObj!,
+        properties: {
+          name: 'Agent',
+          description: 'Base prototype for things that can act',
+          // Verb registry: { pattern: { obj: ObjId, method: string } }
+          // Patterns like 'get %i', 'shoot %i with %t', 'say %s'
+          verbs: {},
+          // Watch list - people we're paying attention to
+          // Watching someone gives +50 perception clarity in crowds
+          // Limited by perception capacity (computed from eyes/ears)
+          watchList: [], // Array of object IDs
+          watchExpiry: {}, // { objId: expiryTimestamp } for auto-expire
+          // Display options
+          options: {
+            seePrompt: '', // Prefix for visual messages (empty = none)
+            hearPrompt: '', // Prefix for audio messages (empty = none)
+            color: true, // Enable ANSI color output
+            screenReader: false, // Screen reader accessibility mode
+          },
+          // Sleep state: 'awake', 'falling_asleep', 'asleep', 'waking_up'
+          sleepState: 'awake',
+          // Scheduled job name for sleep transitions (for cancellation)
+          sleepTransitionJob: null,
+          // Status effects from substances, injuries, etc.
+          // Each effect: { intensity: 0-100, decay: rate per tick }
+          // Effects: sedation, stimulation, impaired_coordination, impaired_perception,
+          //          nausea, euphoria, pain
+          statusEffects: {},
+          // Sleep debt - accumulates while awake (+1/tick), decreases while asleep (-3/tick)
+          // 960 = ~16 hours awake (normal bedtime)
+          // Higher debt = higher metabolism, chance to doze off
+          sleepDebt: 0,
+          // Skills learned through use: { skillName: { level, xp, lastProgressed } }
+          skills: {},
+          // Dying state - 15 minute countdown before death
+          // Progress 0-100, increases ~6.67 per minute (100 in 15 min)
+          dyingProgress: 0,
+          isDying: false,
+          // Skill cooldown in ms (how long before same skill can progress again)
+          skillCooldown: 3600000, // 1 hour
+          // Hidden luck attribute (1-100) - failed rolls get a luck save
+          // Roll d100, if <= luck, failure becomes success
+          luck: 1, // Everyone starts with 1
+          // Movement system
+          movementMode: 'walk', // 'walk' or 'run'
+          // Movement state (null if not moving)
+          // { destId, direction, distanceRemaining, startTime, mode }
+          movementState: null,
+          // Movement job name (for cancellation)
+          movementJob: null,
+          // Perception filters - modify what this agent perceives
+          // Each filter: { source: objref, filter: objref }
+          // Filter methods: modifyRoomDescription, getAddressableEntities, onAddressed
+          // Sensory hooks: onSee, onHear, onSmell, onTaste, onFeel
+          perceptionFilters: [],
 
-        abilities: `Entity that can act in the world - process verbs, move, perceive, learn skills.
+          abilities: `Entity that can act in the world - process verbs, move, perceive, learn skills.
 
 VERBS: 'verbs' registry maps patterns to handlers. Patterns like 'get %i' (item), 'shoot %i with %t' (item with this). matchVerb() finds best pattern. Infrastructure verbs coded, everything else to AI.
 
@@ -98,9 +103,9 @@ STATUS EFFECTS: 'statusEffects' tracks chemical/injury effects: sedation, stimul
 PERCEPTION FILTERS: 'perceptionFilters' modify what this agent perceives. Neural interfaces, hallucinations, AR overlays. Each filter can inject entities, modify descriptions.
 
 LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, if <= luck, failure becomes success.`,
-      },
-      methods: {},
-    });
+        },
+        methods: {},
+      }));
 
     this.addVerbMethods(obj);
     this.addResolutionMethods(obj);
@@ -115,24 +120,62 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
     this.addPerceptionFilterMethods(obj);
 
     // Property descriptions
-    obj.setPropertyDescription('verbs', 'Verb registry mapping command patterns to handler methods (e.g., "get %i" → object.get)');
-    obj.setPropertyDescription('watchList', 'Array of object IDs being actively watched (+50 perception clarity in crowds)');
-    obj.setPropertyDescription('options', 'Display options (seePrompt, hearPrompt, color, screenReader)');
-    obj.setPropertyDescription('sleepState', 'Current sleep state: awake, falling_asleep, asleep, waking_up');
-    obj.setPropertyDescription('sleepDebt', 'Accumulated sleep need (0-960+), increases while awake, decreases when sleeping');
-    obj.setPropertyDescription('statusEffects', 'Active status effects with intensity and decay rates (sedation, pain, etc.)');
-    obj.setPropertyDescription('skills', 'Learned skills with level/XP progression (lockpicking, combat, etc.)');
-    obj.setPropertyDescription('isDying', 'Whether agent is in dying state (15 minute countdown to death)');
-    obj.setPropertyDescription('dyingProgress', 'Dying countdown progress 0-100 (100 = death)');
-    obj.setPropertyDescription('luck', 'Hidden luck attribute 1-100, gives chance to turn failures into successes');
-    obj.setPropertyDescription('movementMode', 'Current movement mode: walk (default) or run (costs more calories)');
-    obj.setPropertyDescription('perceptionFilters', 'Array of perception filter objects that modify what agent perceives');
+    obj.setPropertyDescription(
+      'verbs',
+      'Verb registry mapping command patterns to handler methods (e.g., "get %i" → object.get)',
+    );
+    obj.setPropertyDescription(
+      'watchList',
+      'Array of object IDs being actively watched (+50 perception clarity in crowds)',
+    );
+    obj.setPropertyDescription(
+      'options',
+      'Display options (seePrompt, hearPrompt, color, screenReader)',
+    );
+    obj.setPropertyDescription(
+      'sleepState',
+      'Current sleep state: awake, falling_asleep, asleep, waking_up',
+    );
+    obj.setPropertyDescription(
+      'sleepDebt',
+      'Accumulated sleep need (0-960+), increases while awake, decreases when sleeping',
+    );
+    obj.setPropertyDescription(
+      'statusEffects',
+      'Active status effects with intensity and decay rates (sedation, pain, etc.)',
+    );
+    obj.setPropertyDescription(
+      'skills',
+      'Learned skills with level/XP progression (lockpicking, combat, etc.)',
+    );
+    obj.setPropertyDescription(
+      'isDying',
+      'Whether agent is in dying state (15 minute countdown to death)',
+    );
+    obj.setPropertyDescription(
+      'dyingProgress',
+      'Dying countdown progress 0-100 (100 = death)',
+    );
+    obj.setPropertyDescription(
+      'luck',
+      'Hidden luck attribute 1-100, gives chance to turn failures into successes',
+    );
+    obj.setPropertyDescription(
+      'movementMode',
+      'Current movement mode: walk (default) or run (costs more calories)',
+    );
+    obj.setPropertyDescription(
+      'perceptionFilters',
+      'Array of perception filter objects that modify what agent perceives',
+    );
 
     return obj;
   }
 
   private addVerbMethods(obj: RuntimeObject): void {
-    obj.setMethod('registerVerb', `
+    obj.setMethod(
+      'registerVerb',
+      `
       /** Register verb pattern(s) that this agent can use.
        *  @param patterns - String or array of patterns (e.g., 'get %i', 'shoot %i with %t')
        *  @param sourceObj - The object providing the verb handler
@@ -153,9 +196,12 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       }
 
       self.verbs = verbs;
-    `);
+    `,
+    );
 
-    obj.setMethod('unregisterVerb', `
+    obj.setMethod(
+      'unregisterVerb',
+      `
       /** Unregister a specific verb pattern.
        *  @param pattern - The pattern to remove
        */
@@ -163,9 +209,12 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       const verbs = self.verbs || {};
       delete verbs[pattern];
       self.verbs = verbs;
-    `);
+    `,
+    );
 
-    obj.setMethod('unregisterVerbsFrom', `
+    obj.setMethod(
+      'unregisterVerbsFrom',
+      `
       /** Unregister all verbs provided by a specific object.
        *  @param sourceObj - The object whose verbs should be removed
        */
@@ -180,9 +229,12 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       }
 
       self.verbs = verbs;
-    `);
+    `,
+    );
 
-    obj.setMethod('matchVerb', `
+    obj.setMethod(
+      'matchVerb',
+      `
       /** Match input against all registered verbs.
        *  @param input - The user's input string
        *  @returns Best matching verb info or null
@@ -215,9 +267,12 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       }
 
       return null;
-    `);
+    `,
+    );
 
-    obj.setMethod('tryMatchPattern', `
+    obj.setMethod(
+      'tryMatchPattern',
+      `
       /** Match input against a specific pattern.
        *  @param input - The user's input string
        *  @param pattern - The pattern to match against
@@ -304,11 +359,14 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       if (inputIdx !== inputWords.length) return null;
 
       return { args: resolvedArgs, sourceObj };
-    `);
+    `,
+    );
   }
 
   private addResolutionMethods(obj: RuntimeObject): void {
-    obj.setMethod('parseOrdinal', `
+    obj.setMethod(
+      'parseOrdinal',
+      `
       /** Parse ordinal from item reference (e.g., "first sword" → { ordinal: 0, name: "sword" }).
        *  @param text - The item reference text
        *  @returns Object with ordinal (null if none) and name
@@ -333,9 +391,12 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
         return { ordinal: ordinals[words[0]], name: words.slice(1).join(' ') };
       }
       return { ordinal: null, name: text.trim().toLowerCase() };
-    `);
+    `,
+    );
 
-    obj.setMethod('findMatches', `
+    obj.setMethod(
+      'findMatches',
+      `
       /** Find objects matching a name in a list of contents.
        *  @param name - The name to search for (partial match supported)
        *  @param contents - Array of RuntimeObjects to search
@@ -372,9 +433,12 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
         }
       }
       return matches;
-    `);
+    `,
+    );
 
-    obj.setMethod('resolveItem', `
+    obj.setMethod(
+      'resolveItem',
+      `
       /** Resolve %i - find item by name with ordinal support.
        *  @param text - The item reference (e.g., "sword", "second apple")
        *  @returns Object with resolved RuntimeObject or error string
@@ -447,13 +511,16 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       }
 
       return { resolved: matches[index], error: null };
-    `);
+    `,
+    );
   }
 
   private addActionMethods(obj: RuntimeObject): void {
     // Pattern: say %s
     // args[3] = the message string
-    obj.setMethod('say', `
+    obj.setMethod(
+      'say',
+      `
       /** Say something out loud to everyone in the room.
        *  Usage: say <message>, "<message>, '<message>
        *  Everyone in your current location will hear what you say.
@@ -461,11 +528,14 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       const message = args[3];
       // TODO: Broadcast to room
       return \`\${player.name} says: \${message}\`;
-    `);
+    `,
+    );
 
     // Pattern: emote %s
     // args[3] = the action string
-    obj.setMethod('emote', `
+    obj.setMethod(
+      'emote',
+      `
       /** Perform an action or express an emotion.
        *  Usage: emote <action>, :<action>
        *  Displays "YourName <action>" to everyone in the room.
@@ -474,7 +544,8 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       const action = args[3];
       // TODO: Broadcast to room
       return \`\${player.name} \${action}\`;
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // ACTION QUEUE SYSTEM
@@ -483,14 +554,16 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
 
     // Timing constants per action type
     obj.set('_actionTimings', {
-      say: { baseDelay: 1500, msPerChar: 120 },     // Speech is slow, deliberate
-      emote: { baseDelay: 800, msPerChar: 80 },     // Physical actions faster
-      default: { baseDelay: 1000, msPerChar: 120 }  // Fallback
+      say: { baseDelay: 1500, msPerChar: 120 }, // Speech is slow, deliberate
+      emote: { baseDelay: 800, msPerChar: 80 }, // Physical actions faster
+      default: { baseDelay: 1000, msPerChar: 120 }, // Fallback
     });
     obj.set('_actionVariance', 5000); // Random 0-5000ms added
 
     // Queue an action for metered execution
-    obj.setMethod('queueAction', `
+    obj.setMethod(
+      'queueAction',
+      `
       /** Queue a say/emote action for metered execution.
        *  @param command - The full command string (e.g., "say Hello")
        */
@@ -506,10 +579,13 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       if (!self._actionProcessing) {
         await self._processActionQueue();
       }
-    `);
+    `,
+    );
 
     // Process the action queue - executes one action, schedules next
-    obj.setMethod('_processActionQueue', `
+    obj.setMethod(
+      '_processActionQueue',
+      `
       const queue = self._actionQueue || [];
 
       if (queue.length === 0) {
@@ -563,22 +639,31 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       } else {
         self._actionProcessing = false;
       }
-    `);
+    `,
+    );
 
     // Get current queue length (for MCP response)
-    obj.setMethod('getActionQueueLength', `
+    obj.setMethod(
+      'getActionQueueLength',
+      `
       return (self._actionQueue || []).length;
-    `);
+    `,
+    );
 
     // Clear the action queue (admin/emergency use)
-    obj.setMethod('clearActionQueue', `
+    obj.setMethod(
+      'clearActionQueue',
+      `
       self._actionQueue = [];
       self._actionProcessing = false;
-    `);
+    `,
+    );
 
     // Pattern: look (no args)
     // Look at current location
-    obj.setMethod('look', `
+    obj.setMethod(
+      'look',
+      `
       /** Look at your surroundings.
        *  Usage: look, l
        *  Displays the description of your current location and any visible items.
@@ -588,11 +673,14 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
         return await location.describe(player);
       }
       return 'You are in a void.';
-    `);
+    `,
+    );
 
     // Pattern: look %i
     // args[3] = the resolved item (RuntimeObject)
-    obj.setMethod('lookAt', `
+    obj.setMethod(
+      'lookAt',
+      `
       /** Examine something in detail.
        *  Usage: look <item>, look at <item>, examine <item>, ex <item>
        *  Shows the detailed description of the item or person.
@@ -605,12 +693,15 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       }
 
       return await target.describe(player);
-    `);
+    `,
+    );
 
     // Pattern: look %i in %t
     // args[3] = the item (RuntimeObject)
     // args[4] = the container (RuntimeObject)
-    obj.setMethod('lookIn', `
+    obj.setMethod(
+      'lookIn',
+      `
       /** Examine something inside a container.
        *  Usage: look <item> in <container>, look <item> on <container>
        *  Shows the description of an item that's inside or on something else.
@@ -625,20 +716,26 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       }
 
       return await item.describe(player);
-    `);
+    `,
+    );
 
     // Enter options menu
-    obj.setMethod('options', `
+    obj.setMethod(
+      'options',
+      `
       /** Open the options menu to configure your display settings.
        *  Usage: @options
        *  Configure color output, screen reader mode, and message prefixes.
        */
       player._inOptionsMenu = true;
       await player.showOptionsMenu();
-    `);
+    `,
+    );
 
     // Show the options menu
-    obj.setMethod('showOptionsMenu', `
+    obj.setMethod(
+      'showOptionsMenu',
+      `
       const options = self.options || {};
 
       const showPrompt = (val) => val ? '%{green}"' + val + '"%{/}' : '%{dim}(none)%{/}';
@@ -670,10 +767,13 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       }
 
       await self.tell(menu);
-    `);
+    `,
+    );
 
     // Handle options menu input
-    obj.setMethod('handleOptionsInput', `
+    obj.setMethod(
+      'handleOptionsInput',
+      `
       const input = args[0].trim();
       const inputLower = input.toLowerCase();
       const options = self.options || {};
@@ -742,7 +842,8 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       }
 
       await self.showOptionsMenu();
-    `);
+    `,
+    );
   }
 
   private addColorMethods(obj: RuntimeObject): void {
@@ -754,7 +855,9 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
     // 256-color: %{123} for palette index
     // RGB: %{r,g,b} for true color
     // Reset: %{/} or %{reset}
-    obj.setMethod('processColors', `
+    obj.setMethod(
+      'processColors',
+      `
       const text = args[0];
       if (!text || typeof text !== 'string') return text;
 
@@ -906,25 +1009,34 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
         // Unknown - leave as-is
         return match;
       });
-    `);
+    `,
+    );
   }
 
   private addSleepMethods(obj: RuntimeObject): void {
-    obj.setMethod('isAwake', `
+    obj.setMethod(
+      'isAwake',
+      `
       /** Check if agent is awake and can act.
        *  @returns true if awake
        */
       return self.sleepState === 'awake';
-    `);
+    `,
+    );
 
-    obj.setMethod('isAsleep', `
+    obj.setMethod(
+      'isAsleep',
+      `
       /** Check if agent is fully asleep.
        *  @returns true if asleep
        */
       return self.sleepState === 'asleep';
-    `);
+    `,
+    );
 
-    obj.setMethod('canBeInterrupted', `
+    obj.setMethod(
+      'canBeInterrupted',
+      `
       /** Check if agent can be interrupted while falling asleep.
        *  Override in subclasses to add conditions (noise level, etc.).
        *  @returns true if can be interrupted
@@ -932,9 +1044,12 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       // Default: can always be interrupted
       // Subclasses can check room noise, etc.
       return true;
-    `);
+    `,
+    );
 
-    obj.setMethod('canWakeUp', `
+    obj.setMethod(
+      'canWakeUp',
+      `
       /** Check if agent can wake up.
        *  Override to add conditions (sedation, exhaustion, etc.).
        *  @returns Object with allowed boolean and optional reason
@@ -945,9 +1060,12 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       }
       // Default: can wake
       return { allowed: true };
-    `);
+    `,
+    );
 
-    obj.setMethod('canFallAsleep', `
+    obj.setMethod(
+      'canFallAsleep',
+      `
       /** Check if agent can fall asleep.
        *  Override to add conditions (in combat, etc.).
        *  @returns Object with allowed boolean and optional reason
@@ -957,9 +1075,12 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
         return { allowed: false, reason: 'You are already sleeping or trying to.' };
       }
       return { allowed: true };
-    `);
+    `,
+    );
 
-    obj.setMethod('cancelSleepTransition', `
+    obj.setMethod(
+      'cancelSleepTransition',
+      `
       /** Cancel any pending sleep/wake transition.
        */
       const jobName = self.sleepTransitionJob;
@@ -967,9 +1088,12 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
         await $.scheduler.unschedule(jobName);
         self.sleepTransitionJob = null;
       }
-    `);
+    `,
+    );
 
-    obj.setMethod('startSleep', `
+    obj.setMethod(
+      'startSleep',
+      `
       /** Start falling asleep (voluntary or from exhaustion).
        *  @param delay - Milliseconds until fully asleep (default 10000)
        *  @returns Object with success, state, and completesIn
@@ -993,9 +1117,12 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       self.sleepTransitionJob = jobName;
 
       return { success: true, state: 'falling_asleep', completesIn: delay };
-    `);
+    `,
+    );
 
-    obj.setMethod('completeSleep', `
+    obj.setMethod(
+      'completeSleep',
+      `
       /** Called by scheduler when falling asleep completes.
        *  @returns Object with success and state
        */
@@ -1013,9 +1140,12 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       }
 
       return { success: true, state: 'asleep' };
-    `);
+    `,
+    );
 
-    obj.setMethod('interruptSleep', `
+    obj.setMethod(
+      'interruptSleep',
+      `
       /** Interrupt falling asleep (noise, damage, etc.).
        *  @param reason - Message to show (default: 'You were disturbed.')
        *  @returns Object with success, state, and reason
@@ -1042,9 +1172,12 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       }
 
       return { success: true, state: 'awake', reason: reason };
-    `);
+    `,
+    );
 
-    obj.setMethod('receiveStimulus', `
+    obj.setMethod(
+      'receiveStimulus',
+      `
       /** Called when agent receives external stimulus (sound, touch, etc.).
        *  If dozing (falling_asleep), this cancels the doze silently.
        *  @param intensity - How strong the stimulus is (0-10, default 5)
@@ -1074,9 +1207,12 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       }
 
       return true;
-    `);
+    `,
+    );
 
-    obj.setMethod('startWake', `
+    obj.setMethod(
+      'startWake',
+      `
       /** Start waking up (voluntary or from external stimulus).
        *  @param delay - Milliseconds until fully awake (default 5000)
        *  @returns Object with success, state, and completesIn
@@ -1104,9 +1240,12 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       self.sleepTransitionJob = jobName;
 
       return { success: true, state: 'waking_up', completesIn: delay };
-    `);
+    `,
+    );
 
-    obj.setMethod('completeWake', `
+    obj.setMethod(
+      'completeWake',
+      `
       /** Called by scheduler when waking up completes.
        *  @returns Object with success and state
        */
@@ -1136,9 +1275,12 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       }
 
       return { success: true, state: 'awake' };
-    `);
+    `,
+    );
 
-    obj.setMethod('blockWake', `
+    obj.setMethod(
+      'blockWake',
+      `
       /** Block waking up (e.g., re-sedation during wake process).
        *  @param reason - Message to show (default: 'You fall back asleep.')
        *  @returns Object with success, state, and reason
@@ -1159,9 +1301,12 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       }
 
       return { success: true, state: 'asleep', reason: reason };
-    `);
+    `,
+    );
 
-    obj.setMethod('forceWake', `
+    obj.setMethod(
+      'forceWake',
+      `
       /** Force wake (bypasses checks, for admin/emergency).
        *  @returns Object with success and state
        */
@@ -1169,18 +1314,24 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       self.sleepState = 'awake';
       self.sedation = 0;
       return { success: true, state: 'awake' };
-    `);
+    `,
+    );
 
-    obj.setMethod('forceSleep', `
+    obj.setMethod(
+      'forceSleep',
+      `
       /** Force sleep (bypasses checks, for admin/emergency).
        *  @returns Object with success and state
        */
       await self.cancelSleepTransition();
       self.sleepState = 'asleep';
       return { success: true, state: 'asleep' };
-    `);
+    `,
+    );
 
-    obj.setMethod('getMetabolismMultiplier', `
+    obj.setMethod(
+      'getMetabolismMultiplier',
+      `
       /** Get metabolism multiplier based on sleep state and debt.
        *  Sleeping reduces calorie burn by ~65% (real BMR reduction).
        *  Sleep debt increases burn rate when awake (body working harder).
@@ -1199,9 +1350,12 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       if (debt <= 1440) return 1.5;
       if (debt <= 1920) return 2.0;
       return 4.0;
-    `);
+    `,
+    );
 
-    obj.setMethod('sleepTick', `
+    obj.setMethod(
+      'sleepTick',
+      `
       /** Called each heartbeat to handle sleep-related effects.
        *  Decreases sedation over time.
        *  @returns Object with state and sedation
@@ -1223,12 +1377,15 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       }
 
       return results;
-    `);
+    `,
+    );
   }
 
   private addWatchMethods(obj: RuntimeObject): void {
     // Get current watch capacity based on perception (eyes/ears)
-    obj.setMethod('getWatchCapacity', `
+    obj.setMethod(
+      'getWatchCapacity',
+      `
       /** Calculate max people we can watch based on sensory capabilities.
        *  Computed value based on eyes and ears - not stored.
        *  Base: 5 slots (normal human perception)
@@ -1270,10 +1427,13 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       }
 
       return capacity;
-    `);
+    `,
+    );
 
     // Watch someone (add to watch list)
-    obj.setMethod('watch', `
+    obj.setMethod(
+      'watch',
+      `
       /** Add someone to your watch list.
        *  Watched people are easier to perceive in crowds (+50 clarity).
        *  Limited by maxWatchSlots - if full, oldest watch is silently dropped.
@@ -1322,10 +1482,13 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       }
 
       return { success: true, message: 'You are now watching ' + target.name + '.' };
-    `);
+    `,
+    );
 
     // Unwatch someone (remove from watch list)
-    obj.setMethod('unwatch', `
+    obj.setMethod(
+      'unwatch',
+      `
       /** Remove someone from your watch list.
        *  @param target - Object to stop watching
        *  @returns {success, message}
@@ -1351,10 +1514,13 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       self.watchExpiry = watchExpiry;
 
       return { success: true, message: 'You stop watching ' + target.name + '.' };
-    `);
+    `,
+    );
 
     // Check if watching someone
-    obj.setMethod('isWatching', `
+    obj.setMethod(
+      'isWatching',
+      `
       /** Check if this agent is watching a target.
        *  @param target - Object to check
        *  @returns true if watching
@@ -1363,10 +1529,13 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       if (!target?.id) return false;
       const watchList = self.watchList || [];
       return watchList.some(t => t === target);
-    `);
+    `,
+    );
 
     // Auto-watch (called when interacting with someone)
-    obj.setMethod('autoWatch', `
+    obj.setMethod(
+      'autoWatch',
+      `
       /** Automatically watch someone for a short duration.
        *  Called when emoting at or talking to someone.
        *  @param target - Object to auto-watch
@@ -1393,10 +1562,13 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
         watchExpiry[target.id] = Math.max(currentExpiry || 0, Date.now() + duration);
         self.watchExpiry = watchExpiry;
       }
-    `);
+    `,
+    );
 
     // Clean up expired watches (called on heartbeat)
-    obj.setMethod('cleanExpiredWatches', `
+    obj.setMethod(
+      'cleanExpiredWatches',
+      `
       /** Remove expired watches from watch list.
        *  Called periodically by heartbeat.
        *  @returns Number of watches removed
@@ -1425,10 +1597,13 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       }
 
       return removed;
-    `);
+    `,
+    );
 
     // List who you're watching
-    obj.setMethod('listWatching', `
+    obj.setMethod(
+      'listWatching',
+      `
       /** Get list of who this agent is watching.
        *  @returns Array of {id, name, permanent, expiresIn}
        */
@@ -1452,10 +1627,13 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       }
 
       return result;
-    `);
+    `,
+    );
 
     // Watch command (for player use)
-    obj.setMethod('watchCommand', `
+    obj.setMethod(
+      'watchCommand',
+      `
       /** Command handler for 'watch <person>'.
        *  @param target - Resolved target from %i
        */
@@ -1481,10 +1659,13 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
 
       const result = await self.watch(target, 0); // Permanent manual watch
       return result.message;
-    `);
+    `,
+    );
 
     // Unwatch command
-    obj.setMethod('unwatchCommand', `
+    obj.setMethod(
+      'unwatchCommand',
+      `
       /** Command handler for 'unwatch <person>'.
        *  @param target - Resolved target from %i
        */
@@ -1496,10 +1677,13 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
 
       const result = await self.unwatch(target);
       return result.message;
-    `);
+    `,
+    );
 
     // Clear watches for people not in current room
-    obj.setMethod('clearOutOfRangeWatches', `
+    obj.setMethod(
+      'clearOutOfRangeWatches',
+      `
       /** Remove people from watch list who are no longer in the same room.
        *  Called when leaving a room or when someone else leaves.
        *  @returns Number of watches removed
@@ -1530,10 +1714,13 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       }
 
       return toRemove.length;
-    `);
+    `,
+    );
 
     // Called when this agent enters a new room
-    obj.setMethod('onEnterRoom', `
+    obj.setMethod(
+      'onEnterRoom',
+      `
       /** Called when entering a new room.
        *  Clears out-of-range watches from previous room.
        *  @param newRoom - The room being entered
@@ -1546,10 +1733,13 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       if (oldRoom) {
         await self.clearOutOfRangeWatches();
       }
-    `);
+    `,
+    );
 
     // Called when someone else leaves the room
-    obj.setMethod('onOtherLeft', `
+    obj.setMethod(
+      'onOtherLeft',
+      `
       /** Called when someone else leaves our room.
        *  Removes them from watch list if we were watching them.
        *  @param other - The person who left
@@ -1560,12 +1750,15 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       if (otherId && await self.isWatching(otherId)) {
         await self.unwatch(otherId);
       }
-    `);
+    `,
+    );
   }
 
   private addSkillMethods(obj: RuntimeObject): void {
     // Get current skill level (0 if never used)
-    obj.setMethod('getSkillLevel', `
+    obj.setMethod(
+      'getSkillLevel',
+      `
       /** Get current level for a skill.
        *  @param skillName - Name of the skill
        *  @returns Skill level (0 if never used)
@@ -1574,10 +1767,13 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       const skills = self.skills || {};
       const skill = skills[skillName];
       return skill ? skill.level : 0;
-    `);
+    `,
+    );
 
     // Get full skill info
-    obj.setMethod('getSkill', `
+    obj.setMethod(
+      'getSkill',
+      `
       /** Get full skill info.
        *  @param skillName - Name of the skill
        *  @returns { level, xp, lastProgressed } or null if never used
@@ -1585,10 +1781,13 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       const skillName = args[0];
       const skills = self.skills || {};
       return skills[skillName] || null;
-    `);
+    `,
+    );
 
     // Check if skill is off cooldown for progression
-    obj.setMethod('canProgress', `
+    obj.setMethod(
+      'canProgress',
+      `
       /** Check if a skill can progress (off cooldown).
        *  @param skillName - Name of the skill
        *  @returns true if off cooldown
@@ -1602,10 +1801,13 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       const cooldown = self.skillCooldown || 3600000; // 1 hour default
       const now = Date.now();
       return (now - (skill.lastProgressed || 0)) >= cooldown;
-    `);
+    `,
+    );
 
     // Calculate XP needed for next level (diminishing returns)
-    obj.setMethod('xpForLevel', `
+    obj.setMethod(
+      'xpForLevel',
+      `
       /** Calculate XP needed to reach a level.
        *  Quadratic scaling - 100 levels, ~10,000 total uses to master.
        *  Level 1: 1 XP, Level 50: 50 XP, Level 100: 199 XP
@@ -1618,10 +1820,13 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       // Quadratic: 2 * level - 1 (arithmetic progression)
       // Sum from 1 to 100 = 100^2 = 10,000
       return (2 * level) - 1;
-    `);
+    `,
+    );
 
     // Use a skill - may grant XP if off cooldown
-    obj.setMethod('useSkill', `
+    obj.setMethod(
+      'useSkill',
+      `
       /** Use a skill, potentially gaining XP.
        *  Only grants XP if off cooldown.
        *  @param skillName - Name of the skill
@@ -1675,10 +1880,13 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
         leveledUp,
         onCooldown: false,
       };
-    `);
+    `,
+    );
 
     // List all skills
-    obj.setMethod('listSkills', `
+    obj.setMethod(
+      'listSkills',
+      `
       /** Get all skills with levels.
        *  @returns Array of { name, level, xp, xpToNext }
        */
@@ -1698,10 +1906,13 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       // Sort by level descending
       result.sort((a, b) => b.level - a.level);
       return result;
-    `);
+    `,
+    );
 
     // Skill check - roll skill level dice against opposing skill level
-    obj.setMethod('skillCheck', `
+    obj.setMethod(
+      'skillCheck',
+      `
       /** Perform a skill check.
        *  Roll X d100s (X = skill level), count successes against opposing level.
        *  Each die succeeds if roll > opposing level.
@@ -1744,20 +1955,26 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
         level,
         opposingLevel,
       };
-    `);
+    `,
+    );
 
     // Get current luck (base + temporary bonuses)
-    obj.setMethod('getLuck', `
+    obj.setMethod(
+      'getLuck',
+      `
       /** Get current effective luck.
        *  @returns Current luck value (1-100)
        */
       const baseLuck = self.luck || 1;
       const tempLuck = self.tempLuck || 0;
       return Math.min(100, Math.max(1, baseLuck + tempLuck));
-    `);
+    `,
+    );
 
     // Set temporary luck bonus (replaces any existing boost)
-    obj.setMethod('boostLuck', `
+    obj.setMethod(
+      'boostLuck',
+      `
       /** Set temporary luck bonus. Replaces any existing boost.
        *  Caller is responsible for scheduling removal.
        *  @param amount - Luck bonus to set
@@ -1766,16 +1983,20 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       const amount = args[0] || 0;
       self.tempLuck = amount;
       return await self.getLuck();
-    `);
+    `,
+    );
 
     // Clear luck boost
-    obj.setMethod('clearLuckBoost', `
+    obj.setMethod(
+      'clearLuckBoost',
+      `
       /** Clear any temporary luck bonus.
        *  @returns New effective luck (base only)
        */
       self.tempLuck = 0;
       return await self.getLuck();
-    `);
+    `,
+    );
   }
 
   private addMovementMethods(obj: RuntimeObject): void {
@@ -1784,21 +2005,29 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
     // Run:  2.8 m/s (10 km/h), 2.5 calories per 10 meters
     // Time to travel = distance / speed (in seconds)
 
-    obj.setMethod('isMoving', `
+    obj.setMethod(
+      'isMoving',
+      `
       /** Check if agent is currently moving.
        *  @returns true if in motion
        */
       return self.movementState !== null;
-    `);
+    `,
+    );
 
-    obj.setMethod('getMovementMode', `
+    obj.setMethod(
+      'getMovementMode',
+      `
       /** Get current movement mode.
        *  @returns 'walk' or 'run'
        */
       return self.movementMode || 'walk';
-    `);
+    `,
+    );
 
-    obj.setMethod('setMovementMode', `
+    obj.setMethod(
+      'setMovementMode',
+      `
       /** Set movement mode for future movement.
        *  @param mode - 'walk' or 'run'
        *  @returns { success, mode }
@@ -1809,9 +2038,12 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       }
       self.movementMode = mode;
       return { success: true, mode };
-    `);
+    `,
+    );
 
-    obj.setMethod('getMovementSpeed', `
+    obj.setMethod(
+      'getMovementSpeed',
+      `
       /** Get movement speed in m/s for a mode.
        *  Walk: 1.4 m/s, Run: 2.8 m/s
        *  @param mode - Optional mode override (uses current mode if not specified)
@@ -1819,9 +2051,12 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
        */
       const mode = args[0] || self.movementMode || 'walk';
       return mode === 'run' ? 2.8 : 1.4;
-    `);
+    `,
+    );
 
-    obj.setMethod('getMovementCalorieCost', `
+    obj.setMethod(
+      'getMovementCalorieCost',
+      `
       /** Get calorie cost per 10 meters for a mode.
        *  Base: Walk: 1 cal/10m, Run: 2.5 cal/10m
        *  Modifiers:
@@ -1854,9 +2089,12 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       }
 
       return baseCost;
-    `);
+    `,
+    );
 
-    obj.setMethod('startMovement', `
+    obj.setMethod(
+      'startMovement',
+      `
       /** Start moving toward a destination.
        *  @param destRoom - Destination room (ID or RuntimeObject)
        *  @param distance - Distance in meters
@@ -1930,9 +2168,12 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
         message: 'You ' + verb + ' ' + direction + '. (' + timeStr + ')',
         timeMs,
       };
-    `);
+    `,
+    );
 
-    obj.setMethod('completeMovement', `
+    obj.setMethod(
+      'completeMovement',
+      `
       /** Called by scheduler when movement completes.
        *  Burns calories and moves to destination.
        *  @returns { success, message }
@@ -1968,9 +2209,12 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       }
 
       return { success: true, message: 'Arrived.' };
-    `);
+    `,
+    );
 
-    obj.setMethod('stopMovement', `
+    obj.setMethod(
+      'stopMovement',
+      `
       /** Stop current movement. Partial calorie cost applies.
        *  @returns { success, message }
        */
@@ -2008,9 +2252,12 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
         success: true,
         message: 'You stop moving after ' + Math.round(distanceTraveled) + 'm.'
       };
-    `);
+    `,
+    );
 
-    obj.setMethod('getMovementStatus', `
+    obj.setMethod(
+      'getMovementStatus',
+      `
       /** Get current movement status.
        *  @returns { moving, mode, direction, progress, timeRemaining } or null
        */
@@ -2035,37 +2282,49 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
         progress: Math.round(progress),
         timeRemainingMs: Math.round(timeRemaining),
       };
-    `);
+    `,
+    );
 
     // Command handlers for walk/run mode switching
-    obj.setMethod('walkCommand', `
+    obj.setMethod(
+      'walkCommand',
+      `
       /** Switch to walk mode.
        *  Usage: walk
        */
       const result = await self.setMovementMode('walk');
       return 'You will now walk.';
-    `);
+    `,
+    );
 
-    obj.setMethod('runCommand', `
+    obj.setMethod(
+      'runCommand',
+      `
       /** Switch to run mode.
        *  Usage: run
        */
       const result = await self.setMovementMode('run');
       return 'You will now run.';
-    `);
+    `,
+    );
 
-    obj.setMethod('stopCommand', `
+    obj.setMethod(
+      'stopCommand',
+      `
       /** Stop current movement.
        *  Usage: stop
        */
       const result = await self.stopMovement();
       return result.message;
-    `);
+    `,
+    );
   }
 
   private addStatusEffectMethods(obj: RuntimeObject): void {
     // Add a status effect or increase existing intensity
-    obj.setMethod('addEffect', `
+    obj.setMethod(
+      'addEffect',
+      `
       /** Add or increase a status effect.
        *  @param name - Effect name (sedation, stimulation, impaired_coordination, etc.)
        *  @param intensity - Amount to add (0-100)
@@ -2090,10 +2349,13 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       self.statusEffects = effects;
 
       return current;
-    `);
+    `,
+    );
 
     // Get current intensity of an effect
-    obj.setMethod('getEffect', `
+    obj.setMethod(
+      'getEffect',
+      `
       /** Get current intensity of an effect.
        *  @param name - Effect name
        *  @returns Intensity (0-100) or 0 if not present
@@ -2101,10 +2363,13 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       const name = args[0];
       const effects = self.statusEffects || {};
       return effects[name]?.intensity || 0;
-    `);
+    `,
+    );
 
     // Get all active effects
-    obj.setMethod('getActiveEffects', `
+    obj.setMethod(
+      'getActiveEffects',
+      `
       /** Get all effects with intensity > 0.
        *  @returns Object of active effects
        */
@@ -2116,10 +2381,13 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
         }
       }
       return active;
-    `);
+    `,
+    );
 
     // Remove or reduce an effect
-    obj.setMethod('reduceEffect', `
+    obj.setMethod(
+      'reduceEffect',
+      `
       /** Reduce an effect's intensity.
        *  @param name - Effect name
        *  @param amount - Amount to reduce
@@ -2140,10 +2408,13 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
 
       self.statusEffects = effects;
       return effects[name]?.intensity || 0;
-    `);
+    `,
+    );
 
     // Process decay for all effects (called each tick)
-    obj.setMethod('decayEffects', `
+    obj.setMethod(
+      'decayEffects',
+      `
       /** Process natural decay of all effects.
        *  Called each heartbeat tick.
        *  @returns Summary of decayed effects
@@ -2167,10 +2438,13 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
 
       self.statusEffects = effects;
       return decayed;
-    `);
+    `,
+    );
 
     // Get net alertness (stimulation - sedation) for doze mechanic
-    obj.setMethod('getNetAlertness', `
+    obj.setMethod(
+      'getNetAlertness',
+      `
       /** Get net alertness level.
        *  Positive = stimulated (harder to sleep)
        *  Negative = sedated (easier to doze)
@@ -2179,10 +2453,13 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       const stimulation = await self.getEffect('stimulation');
       const sedation = await self.getEffect('sedation');
       return stimulation - sedation;
-    `);
+    `,
+    );
 
     // Check if an effect is at dangerous levels
-    obj.setMethod('isEffectDangerous', `
+    obj.setMethod(
+      'isEffectDangerous',
+      `
       /** Check if effect is at dangerous intensity.
        *  @param name - Effect name
        *  @param threshold - Danger threshold (default 80)
@@ -2192,10 +2469,13 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       const threshold = args[1] || 80;
       const intensity = await self.getEffect(name);
       return intensity >= threshold;
-    `);
+    `,
+    );
 
     // Check for dangerous combination (both sedation and stimulation high)
-    obj.setMethod('hasDangerousCombination', `
+    obj.setMethod(
+      'hasDangerousCombination',
+      `
       /** Check for dangerous drug combinations.
        *  High sedation + high stimulation = heart strain
        *  @returns { dangerous: boolean, reason: string }
@@ -2211,10 +2491,13 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
         return { dangerous: false, reason: 'You feel jittery and unstable.' };
       }
       return { dangerous: false, reason: null };
-    `);
+    `,
+    );
 
     // Get coordination penalty from effects
-    obj.setMethod('getCoordinationPenalty', `
+    obj.setMethod(
+      'getCoordinationPenalty',
+      `
       /** Get total coordination penalty from effects.
        *  Used for dexterity checks.
        *  @returns Penalty value (0-100)
@@ -2223,10 +2506,13 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       const sedation = await self.getEffect('sedation');
       // Sedation also affects coordination at 50% rate
       return Math.min(100, impaired + (sedation * 0.5));
-    `);
+    `,
+    );
 
     // Get perception penalty from effects
-    obj.setMethod('getPerceptionPenalty', `
+    obj.setMethod(
+      'getPerceptionPenalty',
+      `
       /** Get total perception penalty from effects.
        *  Used for see/hear checks.
        *  @returns Penalty value (0-100)
@@ -2236,10 +2522,13 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       const euphoria = await self.getEffect('euphoria');
       // Sedation and euphoria also affect perception
       return Math.min(100, impaired + (sedation * 0.3) + (euphoria * 0.2));
-    `);
+    `,
+    );
 
     // Check nausea for vomiting
-    obj.setMethod('checkNausea', `
+    obj.setMethod(
+      'checkNausea',
+      `
       /** Check if nausea triggers vomiting.
        *  @returns { vomit: boolean, intensity: number }
        */
@@ -2252,10 +2541,13 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       const vomit = Math.random() < vomitChance;
 
       return { vomit, intensity: nausea, chance: vomitChance };
-    `);
+    `,
+    );
 
     // Describe current effect state for health command
-    obj.setMethod('describeEffects', `
+    obj.setMethod(
+      'describeEffects',
+      `
       /** Get human-readable description of active effects.
        *  @returns Array of description strings
        */
@@ -2343,13 +2635,16 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       }
 
       return lines;
-    `);
+    `,
+    );
   }
 
   private addDyingMethods(obj: RuntimeObject): void {
     // Death funnel messages - one per minute for 15 minutes
     // Progress through stages of dying using $.proportional
-    obj.setMethod('getDeathMessage', `
+    obj.setMethod(
+      'getDeathMessage',
+      `
       /** Get the death message for current dying progress.
        *  Uses $.proportional to select from death stages.
        *  @returns Creative death funnel message
@@ -2391,10 +2686,13 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       ];
 
       return await $.proportional.fromPercent(messages, progress);
-    `);
+    `,
+    );
 
     // Start the dying process
-    obj.setMethod('startDying', `
+    obj.setMethod(
+      'startDying',
+      `
       /** Begin the dying process. Called when body decay reaches 100%.
        *  @returns { success, message }
        */
@@ -2416,10 +2714,13 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       }
 
       return { success: true, message: 'You are dying.' };
-    `);
+    `,
+    );
 
     // Process dying tick - called each heartbeat (1 minute)
-    obj.setMethod('dyingTick', `
+    obj.setMethod(
+      'dyingTick',
+      `
       /** Process one tick of dying. Called each heartbeat.
        *  Progress increases ~6.67 per tick (100 in 15 ticks/minutes).
        *  @returns { progress, dead, message }
@@ -2448,10 +2749,13 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       }
 
       return { progress: newProgress, dead: false, message };
-    `);
+    `,
+    );
 
     // Stabilize - reduce dying progress (for doctors)
-    obj.setMethod('stabilize', `
+    obj.setMethod(
+      'stabilize',
+      `
       /** Reduce dying progress. Used by doctors to save a dying person.
        *  @param amount - Amount to reduce (default 20)
        *  @returns { success, progress, stabilized }
@@ -2480,10 +2784,13 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       }
 
       return { success: true, progress: newProgress, stabilized: false };
-    `);
+    `,
+    );
 
     // Complete death - convert to corpse, send player to chargen
-    obj.setMethod('completeDeath', `
+    obj.setMethod(
+      'completeDeath',
+      `
       /** Complete the death process. Body becomes corpse, player goes to chargen.
        *  @returns { success, corpseId }
        */
@@ -2544,26 +2851,35 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       }
 
       return { success: true, corpseId: corpse.id };
-    `);
+    `,
+    );
 
     // Check if dying
-    obj.setMethod('checkDying', `
+    obj.setMethod(
+      'checkDying',
+      `
       /** Check if this agent is in dying state.
        *  @returns true if dying
        */
       return self.isDying === true;
-    `);
+    `,
+    );
 
     // Get dying progress
-    obj.setMethod('getDyingProgress', `
+    obj.setMethod(
+      'getDyingProgress',
+      `
       /** Get current dying progress (0-100).
        *  @returns Progress percentage
        */
       return self.dyingProgress || 0;
-    `);
+    `,
+    );
 
     // Get time remaining before death (in minutes)
-    obj.setMethod('getTimeUntilDeath', `
+    obj.setMethod(
+      'getTimeUntilDeath',
+      `
       /** Get estimated time until death in minutes.
        *  @returns Minutes remaining (0-15)
        */
@@ -2571,12 +2887,15 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       const progress = self.dyingProgress || 0;
       const remaining = 100 - progress;
       return Math.ceil(remaining / 6.67);
-    `);
+    `,
+    );
   }
 
   private addPerceptionFilterMethods(obj: RuntimeObject): void {
     // Add a perception filter
-    obj.setMethod('addPerceptionFilter', `
+    obj.setMethod(
+      'addPerceptionFilter',
+      `
       /** Add a perception filter to this agent.
        *  Filters can modify room descriptions, provide addressable entities,
        *  and receive sensory hooks (onSee, onHear, onSmell, onTaste, onFeel).
@@ -2603,10 +2922,13 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       self.perceptionFilters = filters;
 
       return { success: true, message: 'Filter added.' };
-    `);
+    `,
+    );
 
     // Remove a perception filter by source
-    obj.setMethod('removePerceptionFilter', `
+    obj.setMethod(
+      'removePerceptionFilter',
+      `
       /** Remove a perception filter by its source object.
        *  @param source - The source object to remove
        *  @returns { success, message }
@@ -2628,18 +2950,24 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       self.perceptionFilters = filters;
 
       return { success: true, message: 'Filter removed.' };
-    `);
+    `,
+    );
 
     // Get all active perception filters
-    obj.setMethod('getPerceptionFilters', `
+    obj.setMethod(
+      'getPerceptionFilters',
+      `
       /** Get all active perception filters.
        *  @returns Array of { source, filter }
        */
       return self.perceptionFilters || [];
-    `);
+    `,
+    );
 
     // The 'to' verb - speak to someone (checks perception filters first)
-    obj.setMethod('to', `
+    obj.setMethod(
+      'to',
+      `
       /** Speak directly to someone.
        *  Usage: to <name> <message>
        *  Addresses a specific person, triggering their attention.
@@ -2730,6 +3058,7 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       }
 
       return '';
-    `);
+    `,
+    );
   }
 }

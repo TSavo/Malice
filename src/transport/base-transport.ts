@@ -1,6 +1,10 @@
-import { Observable, Subject, BehaviorSubject, ReplaySubject } from 'rxjs';
+import { BehaviorSubject, type Observable, ReplaySubject, Subject } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
-import type { ITransport, TransportType, TerminalCapabilities } from '../../types/transport.js';
+import type {
+  ITransport,
+  TerminalCapabilities,
+  TransportType,
+} from '../../types/transport.js';
 
 /**
  * Abstract base class for all transports

@@ -11,32 +11,35 @@
  * Between each street pair (6 apart), there are 5 rooms at y+1 through y+5
  */
 
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const PIONEER_SQUARE_DIR = path.join(__dirname, '../src/database/bootstrap/world/seattle/pioneer-square');
+const PIONEER_SQUARE_DIR = path.join(
+  __dirname,
+  '../src/database/bootstrap/world/seattle/pioneer-square',
+);
 
 // Avenue names by X coordinate
 const AVENUES = {
   '-21': 'Waterfront',
   '-14': '1st Ave S',
   '-7': 'Occidental Ave S',
-  '0': '2nd Ave S',
-  '7': '3rd Ave S',
-  '14': '4th Ave S'
+  0: '2nd Ave S',
+  7: '3rd Ave S',
+  14: '4th Ave S',
 };
 
 // Street names by Y coordinate
 const STREETS = {
   '-12': 'S. King St',
   '-6': 'S. Jackson St',
-  '0': 'S. Main St',
-  '6': 'S. Washington St',
-  '12': 'Yesler Way'
+  0: 'S. Main St',
+  6: 'S. Washington St',
+  12: 'Yesler Way',
 };
 
 // Get avenue directory name
@@ -50,7 +53,7 @@ function getAvenueDir(x) {
 }
 
 // Check if coordinate exists
-function roomExists(x, y) {
+function _roomExists(x, y) {
   const dir = path.join(PIONEER_SQUARE_DIR, getAvenueDir(x));
   if (!fs.existsSync(dir)) return false;
 
@@ -64,7 +67,7 @@ function roomExists(x, y) {
   const xMatch = content.match(/x:\s*(-?\d+)/);
   if (!xMatch) return false;
 
-  return parseInt(xMatch[1]) === x;
+  return parseInt(xMatch[1], 10) === x;
 }
 
 // Collect all existing coordinates
@@ -79,7 +82,11 @@ function collectExistingCoordinates() {
       const fullPath = path.join(dir, entry.name);
       if (entry.isDirectory()) {
         scanDir(fullPath);
-      } else if (entry.isFile() && entry.name.endsWith('.ts') && !entry.name.includes('MAP')) {
+      } else if (
+        entry.isFile() &&
+        entry.name.endsWith('.ts') &&
+        !entry.name.includes('MAP')
+      ) {
         const content = fs.readFileSync(fullPath, 'utf8');
         const xMatch = content.match(/x:\s*(-?\d+)/);
         const yMatch = content.match(/y:\s*(-?\d+)/);
@@ -120,7 +127,10 @@ function getLocationContext(x, y) {
 
 // Generate room content for a new coordinate
 function generateRoomContent(x, y) {
-  const { aveName, stName, nearestAve, nearestStreet } = getLocationContext(x, y);
+  const { aveName, stName, nearestAve, nearestStreet } = getLocationContext(
+    x,
+    y,
+  );
 
   // Determine room type
   const isOnAvenue = [-21, -14, -7, 0, 7, 14].includes(x);
@@ -190,7 +200,9 @@ for (let x = -21; x <= 14; x++) {
 }
 
 // Find missing coordinates
-const missingCoords = allCoords.filter(({ x, y }) => !existingCoords.has(`${x},${y}`));
+const missingCoords = allCoords.filter(
+  ({ x, y }) => !existingCoords.has(`${x},${y}`),
+);
 console.log(`Found ${missingCoords.length} missing coordinates`);
 
 // Generate files for missing coordinates
@@ -201,7 +213,9 @@ for (const { x, y } of missingCoords) {
   // Create directory if needed
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
-    console.log(`  Created directory: ${path.relative(PIONEER_SQUARE_DIR, dir)}`);
+    console.log(
+      `  Created directory: ${path.relative(PIONEER_SQUARE_DIR, dir)}`,
+    );
   }
 
   const filename = `y${y}.ts`;
@@ -213,7 +227,9 @@ for (const { x, y } of missingCoords) {
     const content = fs.readFileSync(filepath, 'utf8');
     const xMatch = content.match(/x:\s*(-?\d+)/);
     if (xMatch) {
-      console.log(`  ⚠ File exists with different x: ${filename} has x=${xMatch[1]}, need x=${x}`);
+      console.log(
+        `  ⚠ File exists with different x: ${filename} has x=${xMatch[1]}, need x=${x}`,
+      );
     }
     continue;
   }

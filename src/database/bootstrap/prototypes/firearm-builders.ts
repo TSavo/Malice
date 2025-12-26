@@ -1,9 +1,9 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Firearm Prototypes
- * 
+ *
  * Hierarchy:
  * $.weapon
  *   $.gun (base for all firearms)
@@ -21,7 +21,7 @@ import type { RuntimeObject } from '../../../../types/object.js';
  *       $.doubleBarrel
  *     $.smg (submachine guns - skill: smg)
  *       $.machinePistol
- * 
+ *
  * All firearms are ranged, have ammo, and use puncture damage.
  * Low-tech focus: no assault rifles, no military hardware (yet).
  */
@@ -78,16 +78,27 @@ CONCEALMENT: Smaller guns ('compactPistol', 'derringer') easier to hide. Long gu
     });
 
     // Add property descriptions
-    obj.setPropertyDescription('usesMagazine', "If true, uses detachable magazines. If false, loads ammo directly (revolver, shotgun).");
-    obj.setPropertyDescription('ammo', "Current rounds loaded (direct-load guns only). Magazine-fed guns check the magazine.");
-    obj.setPropertyDescription('maxAmmo', "Capacity when fully loaded.");
-    obj.setPropertyDescription('ammoType', "Required ammo type: 9mm, .45, 12gauge, .308, etc.");
+    obj.setPropertyDescription(
+      'usesMagazine',
+      'If true, uses detachable magazines. If false, loads ammo directly (revolver, shotgun).',
+    );
+    obj.setPropertyDescription(
+      'ammo',
+      'Current rounds loaded (direct-load guns only). Magazine-fed guns check the magazine.',
+    );
+    obj.setPropertyDescription('maxAmmo', 'Capacity when fully loaded.');
+    obj.setPropertyDescription(
+      'ammoType',
+      'Required ammo type: 9mm, .45, 12gauge, .308, etc.',
+    );
 
     // ═══════════════════════════════════════════════════════════════════════
     // AMMO MANAGEMENT
     // ═══════════════════════════════════════════════════════════════════════
 
-    obj.setMethod('getLoadedMagazine', `
+    obj.setMethod(
+      'getLoadedMagazine',
+      `
       /** Get the magazine currently loaded in this gun.
        *  @returns Magazine RuntimeObject or null if none loaded
        */
@@ -100,9 +111,12 @@ CONCEALMENT: Smaller guns ('compactPistol', 'derringer') easier to hide. Long gu
         }
       }
       return null;
-    `);
+    `,
+    );
 
-    obj.setMethod('load', `
+    obj.setMethod(
+      'load',
+      `
       /** Load a magazine or ammo into this gun (infrastructure method).
        *  @param item - Magazine or ammo object to load
        *  @returns { success: boolean, loaded?: string|number, rounds?: number, error?: string }
@@ -186,9 +200,12 @@ CONCEALMENT: Smaller guns ('compactPistol', 'derringer') easier to hide. Long gu
           return { success: true, loaded: toLoad, remaining: self.ammo, recycled: false };
         }
       }
-    `);
+    `,
+    );
 
-    obj.setMethod('unload', `
+    obj.setMethod(
+      'unload',
+      `
       /** Eject magazine or unload direct ammo (infrastructure method).
        *  @param caller - Who is unloading (for hand/room placement)
        *  @returns { success: boolean, ejected?: string, magazine?: object, rounds?: number, error?: string }
@@ -266,13 +283,16 @@ CONCEALMENT: Smaller guns ('compactPistol', 'derringer') easier to hide. Long gu
         
         return { success: true, unloaded: currentAmmo, ammo: newAmmo };
       }
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════════
     // FIRING
     // ═══════════════════════════════════════════════════════════════════════
 
-    obj.setMethod('getAmmoCount', `
+    obj.setMethod(
+      'getAmmoCount',
+      `
       /** Get current ammo count, checking magazine if applicable.
        *  @returns Number of rounds available
        */
@@ -281,9 +301,12 @@ CONCEALMENT: Smaller guns ('compactPistol', 'derringer') easier to hide. Long gu
         return magazine ? (magazine.ammo || 0) : 0;
       }
       return self.ammo || 0;
-    `);
+    `,
+    );
 
-    obj.setMethod('canFire', `
+    obj.setMethod(
+      'canFire',
+      `
       /** Check if this gun can fire.
        *  @returns { success: boolean, reason?: string }
        */
@@ -297,9 +320,12 @@ CONCEALMENT: Smaller guns ('compactPistol', 'derringer') easier to hide. Long gu
       }
 
       return { success: true };
-    `);
+    `,
+    );
 
-    obj.setMethod('fire', `
+    obj.setMethod(
+      'fire',
+      `
       /** Fire the gun, expending one round (infrastructure method).
        *  @returns { success: boolean, ammoRemaining?: number, reason?: string }
        */
@@ -318,13 +344,16 @@ CONCEALMENT: Smaller guns ('compactPistol', 'derringer') easier to hide. Long gu
 
       self.ammo = (self.ammo || 0) - 1;
       return { success: true, ammoRemaining: self.ammo };
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════════
     // DISPLAY
     // ═══════════════════════════════════════════════════════════════════════
 
-    obj.setMethod('describe', `
+    obj.setMethod(
+      'describe',
+      `
       let desc = self.name + '\\r\\n' + self.description;
       
       if (self.ranged) {
@@ -345,7 +374,8 @@ CONCEALMENT: Smaller guns ('compactPistol', 'derringer') easier to hide. Long gu
       }
       
       return desc;
-    `);
+    `,
+    );
 
     return obj;
   }
@@ -372,7 +402,7 @@ export class PistolBuilder {
         range: 25,
         maxAmmo: 15,
         ammoType: '9mm',
-        usesMagazine: true,  // Magazine-fed
+        usesMagazine: true, // Magazine-fed
       },
       methods: {},
     });
@@ -398,7 +428,7 @@ export class RevolverBuilder {
         ammo: 0,
         maxAmmo: 6,
         ammoType: '.38',
-        usesMagazine: false,  // Direct load (cylinder)
+        usesMagazine: false, // Direct load (cylinder)
       },
       methods: {},
     });
@@ -424,7 +454,7 @@ export class MagnumBuilder {
         ammo: 0,
         maxAmmo: 6,
         ammoType: '.44',
-        usesMagazine: false,  // Direct load (cylinder)
+        usesMagazine: false, // Direct load (cylinder)
       },
       methods: {},
     });
@@ -449,7 +479,7 @@ export class SemiAutoPistolBuilder {
         range: 25,
         maxAmmo: 17,
         ammoType: '9mm',
-        usesMagazine: true,  // Magazine-fed
+        usesMagazine: true, // Magazine-fed
       },
       methods: {},
     });
@@ -474,7 +504,7 @@ export class CompactPistolBuilder {
         range: 15,
         maxAmmo: 7,
         ammoType: '.380',
-        usesMagazine: true,  // Magazine-fed
+        usesMagazine: true, // Magazine-fed
       },
       methods: {},
     });
@@ -500,7 +530,7 @@ export class DerringerBuilder {
         ammo: 0,
         maxAmmo: 2,
         ammoType: '.22',
-        usesMagazine: false,  // Break-action, direct load
+        usesMagazine: false, // Break-action, direct load
       },
       methods: {},
     });
@@ -517,7 +547,8 @@ export class M1911Builder {
       parent: parent!,
       properties: {
         name: 'M1911',
-        description: 'The classic .45 ACP semi-automatic. American military icon.',
+        description:
+          'The classic .45 ACP semi-automatic. American military icon.',
         skill: 'pistol',
         damage: 42,
         damageType: 'puncture',
@@ -525,7 +556,7 @@ export class M1911Builder {
         range: 25,
         maxAmmo: 7,
         ammoType: '.45',
-        usesMagazine: true,  // Magazine-fed
+        usesMagazine: true, // Magazine-fed
       },
       methods: {},
     });
@@ -555,8 +586,8 @@ export class RifleBuilder {
         ammo: 0,
         maxAmmo: 5,
         ammoType: '.308',
-        usesMagazine: false,  // Internal magazine, direct load
-        twoHanded: true,      // Long gun requires two hands
+        usesMagazine: false, // Internal magazine, direct load
+        twoHanded: true, // Long gun requires two hands
       },
       methods: {},
     });
@@ -582,8 +613,8 @@ export class BoltActionRifleBuilder {
         ammo: 0,
         maxAmmo: 5,
         ammoType: '.308',
-        usesMagazine: false,  // Internal magazine, direct load
-        twoHanded: true,      // Long gun requires two hands
+        usesMagazine: false, // Internal magazine, direct load
+        twoHanded: true, // Long gun requires two hands
       },
       methods: {},
     });
@@ -609,8 +640,8 @@ export class LeverActionRifleBuilder {
         ammo: 0,
         maxAmmo: 10,
         ammoType: '.30-30',
-        usesMagazine: false,  // Tubular magazine, direct load
-        twoHanded: true,      // Long gun requires two hands
+        usesMagazine: false, // Tubular magazine, direct load
+        twoHanded: true, // Long gun requires two hands
       },
       methods: {},
     });
@@ -636,8 +667,8 @@ export class HuntingRifleBuilder {
         ammo: 0,
         maxAmmo: 4,
         ammoType: '.308',
-        usesMagazine: false,  // Internal magazine, direct load
-        twoHanded: true,      // Long gun requires two hands
+        usesMagazine: false, // Internal magazine, direct load
+        twoHanded: true, // Long gun requires two hands
       },
       methods: {},
     });
@@ -663,8 +694,8 @@ export class Rifle22Builder {
         ammo: 0,
         maxAmmo: 10,
         ammoType: '.22',
-        usesMagazine: false,  // Internal magazine, direct load
-        twoHanded: true,      // Long gun requires two hands
+        usesMagazine: false, // Internal magazine, direct load
+        twoHanded: true, // Long gun requires two hands
       },
       methods: {},
     });
@@ -685,7 +716,8 @@ export class ShotgunBuilder {
       parent: parent!,
       properties: {
         name: 'Shotgun',
-        description: 'A smoothbore long gun firing shot shells. Devastating up close.',
+        description:
+          'A smoothbore long gun firing shot shells. Devastating up close.',
         skill: 'shotgun',
         damage: 55,
         damageType: 'puncture',
@@ -694,8 +726,8 @@ export class ShotgunBuilder {
         ammo: 0,
         maxAmmo: 5,
         ammoType: '12gauge',
-        usesMagazine: false,  // Tube magazine, direct load
-        twoHanded: true,      // Long gun requires two hands
+        usesMagazine: false, // Tube magazine, direct load
+        twoHanded: true, // Long gun requires two hands
       },
       methods: {},
     });
@@ -721,8 +753,8 @@ export class PumpShotgunBuilder {
         ammo: 0,
         maxAmmo: 8,
         ammoType: '12gauge',
-        usesMagazine: false,  // Tube magazine, direct load
-        twoHanded: true,      // Long gun requires two hands
+        usesMagazine: false, // Tube magazine, direct load
+        twoHanded: true, // Long gun requires two hands
       },
       methods: {},
     });
@@ -739,7 +771,8 @@ export class SawnOffShotgunBuilder {
       parent: parent!,
       properties: {
         name: 'Sawn-Off Shotgun',
-        description: 'A shotgun with the barrel cut down. Concealable, brutal spread.',
+        description:
+          'A shotgun with the barrel cut down. Concealable, brutal spread.',
         skill: 'shotgun',
         damage: 50,
         damageType: 'puncture',
@@ -748,7 +781,7 @@ export class SawnOffShotgunBuilder {
         ammo: 0,
         maxAmmo: 2,
         ammoType: '12gauge',
-        usesMagazine: false,  // Break-action, direct load
+        usesMagazine: false, // Break-action, direct load
       },
       methods: {},
     });
@@ -765,7 +798,8 @@ export class DoubleBarrelBuilder {
       parent: parent!,
       properties: {
         name: 'Double Barrel Shotgun',
-        description: 'A break-action two-barrel shotgun. Two shots, then reload.',
+        description:
+          'A break-action two-barrel shotgun. Two shots, then reload.',
         skill: 'shotgun',
         damage: 55,
         damageType: 'puncture',
@@ -774,8 +808,8 @@ export class DoubleBarrelBuilder {
         ammo: 0,
         maxAmmo: 2,
         ammoType: '12gauge',
-        usesMagazine: false,  // Break-action, direct load
-        twoHanded: true,      // Long gun requires two hands
+        usesMagazine: false, // Break-action, direct load
+        twoHanded: true, // Long gun requires two hands
       },
       methods: {},
     });
@@ -801,8 +835,8 @@ export class CoachGunBuilder {
         ammo: 0,
         maxAmmo: 2,
         ammoType: '12gauge',
-        usesMagazine: false,  // Break-action, direct load
-        twoHanded: true,      // Long gun requires two hands
+        usesMagazine: false, // Break-action, direct load
+        twoHanded: true, // Long gun requires two hands
       },
       methods: {},
     });
@@ -831,7 +865,7 @@ export class SmgBuilder {
         range: 50,
         maxAmmo: 30,
         ammoType: '9mm',
-        usesMagazine: true,  // Detachable magazine
+        usesMagazine: true, // Detachable magazine
       },
       methods: {},
     });
@@ -856,7 +890,7 @@ export class MachinePistolBuilder {
         range: 25,
         maxAmmo: 20,
         ammoType: '9mm',
-        usesMagazine: true,  // Detachable magazine
+        usesMagazine: true, // Detachable magazine
       },
       methods: {},
     });
@@ -881,7 +915,7 @@ export class UziBuilder {
         range: 40,
         maxAmmo: 32,
         ammoType: '9mm',
-        usesMagazine: true,  // Detachable magazine
+        usesMagazine: true, // Detachable magazine
       },
       methods: {},
     });
@@ -906,7 +940,7 @@ export class Mac10Builder {
         range: 30,
         maxAmmo: 30,
         ammoType: '.45',
-        usesMagazine: true,  // Detachable magazine
+        usesMagazine: true, // Detachable magazine
       },
       methods: {},
     });
@@ -923,7 +957,8 @@ export class TecBuilder {
       parent: parent!,
       properties: {
         name: 'TEC-9',
-        description: 'A semi-auto pistol easily converted to full-auto. Gang gun.',
+        description:
+          'A semi-auto pistol easily converted to full-auto. Gang gun.',
         skill: 'smg',
         damage: 30,
         damageType: 'puncture',
@@ -931,7 +966,7 @@ export class TecBuilder {
         range: 35,
         maxAmmo: 32,
         ammoType: '9mm',
-        usesMagazine: true,  // Detachable magazine
+        usesMagazine: true, // Detachable magazine
       },
       methods: {},
     });

@@ -1,5 +1,5 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Builds the Elevator prototype
@@ -67,7 +67,9 @@ SCHEDULING: Uses $.scheduler to delay arrival. Job: elevator_[id]_arrive.`,
     // LOCK SYSTEM
     // ═══════════════════════════════════════════════════════════════════
 
-    obj.setMethod('canAccessFloor', `
+    obj.setMethod(
+      'canAccessFloor',
+      `
       /** Check if agent can access a floor via lock system.
        *  @param agent - The agent requesting access
        *  @param floor - The floor number
@@ -99,9 +101,12 @@ SCHEDULING: Uses $.scheduler to delay arrival. Job: elevator_[id]_arrive.`,
       }
 
       return true; // All locks approved
-    `);
+    `,
+    );
 
-    obj.setMethod('addLock', `
+    obj.setMethod(
+      'addLock',
+      `
       /** Add a lock object to this elevator.
        *  @param lock - Lock object or ID
        */
@@ -109,9 +114,12 @@ SCHEDULING: Uses $.scheduler to delay arrival. Job: elevator_[id]_arrive.`,
       const locks = self.locks || [];
       locks.push(lock);
       self.locks = locks;
-    `);
+    `,
+    );
 
-    obj.setMethod('removeLock', `
+    obj.setMethod(
+      'removeLock',
+      `
       /** Remove a lock object from this elevator.
        *  @param lock - Lock object or ID to remove
        */
@@ -122,13 +130,16 @@ SCHEDULING: Uses $.scheduler to delay arrival. Job: elevator_[id]_arrive.`,
         return id !== lockId;
       });
       self.locks = locks;
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // MOVEMENT
     // ═══════════════════════════════════════════════════════════════════
 
-    obj.setMethod('selectFloor', `
+    obj.setMethod(
+      'selectFloor',
+      `
       /** Agent requests to go to a floor.
        *  @param agent - The agent pressing the button
        *  @param floor - The floor number
@@ -158,9 +169,12 @@ SCHEDULING: Uses $.scheduler to delay arrival. Job: elevator_[id]_arrive.`,
       await self.startMovement(floor);
 
       return { success: true, message: 'The elevator begins moving to floor ' + floor + '.' };
-    `);
+    `,
+    );
 
-    obj.setMethod('startMovement', `
+    obj.setMethod(
+      'startMovement',
+      `
       /** Start elevator movement to destination floor.
        *  @param floor - Destination floor
        */
@@ -179,9 +193,12 @@ SCHEDULING: Uses $.scheduler to delay arrival. Job: elevator_[id]_arrive.`,
       // Schedule arrival
       const jobName = 'elevator_' + self.id + '_arrive';
       await $.scheduler.schedule(jobName, travelTime, 0, self, 'arrive');
-    `);
+    `,
+    );
 
-    obj.setMethod('arrive', `
+    obj.setMethod(
+      'arrive',
+      `
       /** Called when elevator reaches destination floor.
        */
       const floor = self.destination;
@@ -194,31 +211,40 @@ SCHEDULING: Uses $.scheduler to delay arrival. Job: elevator_[id]_arrive.`,
 
       // Open doors
       await self.openDoors();
-    `);
+    `,
+    );
 
-    obj.setMethod('openDoors', `
+    obj.setMethod(
+      'openDoors',
+      `
       /** Open the elevator doors.
        */
       if (self.doorsOpen) return;
 
       self.doorsOpen = true;
       await self.announce(null, null, { others: 'The elevator doors slide open.' });
-    `);
+    `,
+    );
 
-    obj.setMethod('closeDoors', `
+    obj.setMethod(
+      'closeDoors',
+      `
       /** Close the elevator doors.
        */
       if (!self.doorsOpen) return;
 
       self.doorsOpen = false;
       await self.announce(null, null, { others: 'The elevator doors slide closed.' });
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // DESCRIPTION
     // ═══════════════════════════════════════════════════════════════════
 
-    obj.setMethod('describe', `
+    obj.setMethod(
+      'describe',
+      `
       /** Describe the elevator interior.
        *  @param viewer - The agent looking
        *  @returns Description string
@@ -244,13 +270,16 @@ SCHEDULING: Uses $.scheduler to delay arrival. Job: elevator_[id]_arrive.`,
       }
 
       return text;
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // CAPACITY CHECKING
     // ═══════════════════════════════════════════════════════════════════
 
-    obj.setMethod('canContain', `
+    obj.setMethod(
+      'canContain',
+      `
       /** Check if elevator can accept another passenger.
        *  @param obj - Object trying to enter
        *  @returns true or rejection string
@@ -270,19 +299,50 @@ SCHEDULING: Uses $.scheduler to delay arrival. Job: elevator_[id]_arrive.`,
       }
 
       return true;
-    `);
+    `,
+    );
 
     // Property descriptions
-    obj.setPropertyDescription('currentFloor', 'Current floor number where elevator is positioned');
-    obj.setPropertyDescription('floors', 'Array of accessible floor numbers (e.g., [1, 2, 11, 35, 42])');
-    obj.setPropertyDescription('floorRooms', 'Map of floor numbers to destination room objects');
-    obj.setPropertyDescription('moving', 'Whether elevator is currently in motion between floors');
-    obj.setPropertyDescription('destination', 'Target floor number being traveled to, or null if stationary');
-    obj.setPropertyDescription('locks', 'Array of composable lock objects that control floor access');
-    obj.setPropertyDescription('doorsOpen', 'Whether elevator doors are currently open');
-    obj.setPropertyDescription('travelTimePerFloor', 'Milliseconds per floor traveled (default 2000ms)');
-    obj.setPropertyDescription('capacity', 'Maximum number of passengers allowed');
-    obj.setPropertyDescription('door', 'Reference to $.door object for access control');
+    obj.setPropertyDescription(
+      'currentFloor',
+      'Current floor number where elevator is positioned',
+    );
+    obj.setPropertyDescription(
+      'floors',
+      'Array of accessible floor numbers (e.g., [1, 2, 11, 35, 42])',
+    );
+    obj.setPropertyDescription(
+      'floorRooms',
+      'Map of floor numbers to destination room objects',
+    );
+    obj.setPropertyDescription(
+      'moving',
+      'Whether elevator is currently in motion between floors',
+    );
+    obj.setPropertyDescription(
+      'destination',
+      'Target floor number being traveled to, or null if stationary',
+    );
+    obj.setPropertyDescription(
+      'locks',
+      'Array of composable lock objects that control floor access',
+    );
+    obj.setPropertyDescription(
+      'doorsOpen',
+      'Whether elevator doors are currently open',
+    );
+    obj.setPropertyDescription(
+      'travelTimePerFloor',
+      'Milliseconds per floor traveled (default 2000ms)',
+    );
+    obj.setPropertyDescription(
+      'capacity',
+      'Maximum number of passengers allowed',
+    );
+    obj.setPropertyDescription(
+      'door',
+      'Reference to $.door object for access control',
+    );
 
     return obj;
   }

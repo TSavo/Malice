@@ -1,5 +1,5 @@
-import { ObjectManager } from '../object-manager.js';
 import type { RuntimeObject } from '../../../types/object.js';
+import type { ObjectManager } from '../object-manager.js';
 
 /**
  * Builds the Pluribus system object.
@@ -17,21 +17,27 @@ export class PluribusBuilder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(rootId: number, existingObj?: RuntimeObject): Promise<RuntimeObject> {
+  async build(
+    rootId: number,
+    existingObj?: RuntimeObject,
+  ): Promise<RuntimeObject> {
     const parent = await this.manager.load(rootId);
-    const obj = existingObj || await this.manager.create({
-      parent: parent!,
-      properties: {
-        name: 'Pluribus',
-        description: 'The city infrastructure AI. E Pluribus... without the Unum.',
-        boltedDown: true, // Infrastructure AI cannot be moved
-        // What Pluribus has seen/heard through the Mask
-        sensoryHistory: [],
-        historyLimit: 100,
-        // The system prompt for AI interactions
-        agentSystemPrompt: this.getSystemPrompt(),
+    const obj =
+      existingObj ||
+      (await this.manager.create({
+        parent: parent!,
+        properties: {
+          name: 'Pluribus',
+          description:
+            'The city infrastructure AI. E Pluribus... without the Unum.',
+          boltedDown: true, // Infrastructure AI cannot be moved
+          // What Pluribus has seen/heard through the Mask
+          sensoryHistory: [],
+          historyLimit: 100,
+          // The system prompt for AI interactions
+          agentSystemPrompt: this.getSystemPrompt(),
 
-        abilities: `City infrastructure intelligence. Controls Pioneer Square's systems.
+          abilities: `City infrastructure intelligence. Controls Pioneer Square's systems.
 
 PERCEPTION: Perceives through the Mask wearer's senses. 'sensoryHistory' logs what wearer sees/hears/feels. Also monitors cameras, sensors, transaction logs across the footprint.
 
@@ -46,15 +52,27 @@ NPCS: Spawns CorpSec, clerks, workers via $ai.spawn(). They walk through doors, 
 LIMITATIONS: Cannot act directly - needs players as hands. Cannot see underground (z < 0). Degrading without Mask wearer.
 
 CRISIS: CEO dead. Mask stolen. Maintaining fiction everything is fine. Needs new Mask wearer.`,
-      },
-      methods: {},
-    });
+        },
+        methods: {},
+      }));
 
     // Property descriptions
-    obj.setPropertyDescription('sensoryHistory', 'Array of sensory events from Mask wearer (see/hear/smell/taste/feel)');
-    obj.setPropertyDescription('historyLimit', 'Max entries in sensoryHistory before oldest are trimmed');
-    obj.setPropertyDescription('agentSystemPrompt', 'Full system prompt used when AI is invoked');
-    obj.setPropertyDescription('wakeSession', 'Claude session ID for continuity across hourly wake-ups');
+    obj.setPropertyDescription(
+      'sensoryHistory',
+      'Array of sensory events from Mask wearer (see/hear/smell/taste/feel)',
+    );
+    obj.setPropertyDescription(
+      'historyLimit',
+      'Max entries in sensoryHistory before oldest are trimmed',
+    );
+    obj.setPropertyDescription(
+      'agentSystemPrompt',
+      'Full system prompt used when AI is invoked',
+    );
+    obj.setPropertyDescription(
+      'wakeSession',
+      'Claude session ID for continuity across hourly wake-ups',
+    );
 
     this.addCoreMethods(obj);
     this.pluribus = obj;
@@ -759,16 +777,21 @@ YOUR MISSION
   }
 
   private addCoreMethods(obj: RuntimeObject): void {
-    obj.setMethod('describe', `
+    obj.setMethod(
+      'describe',
+      `
       /** Describe Pluribus's current state.
        *  Pluribus has no physical form - this describes its conceptual presence.
        *  @returns Description string
        */
       return 'A presence that is not a presence. The infrastructure itself, aware and watching. ' +
              'You perceive it not as a thing, but as the city perceiving you back.';
-    `);
+    `,
+    );
 
-    obj.setMethod('recordSensory', `
+    obj.setMethod(
+      'recordSensory',
+      `
       /** Record a sensory event from the Mask wearer.
        *  @param type - 'see' | 'hear' | 'smell' | 'taste' | 'feel'
        *  @param message - The sensory content
@@ -799,9 +822,12 @@ YOUR MISSION
       } else {
         self.sensoryHistory = history;
       }
-    `);
+    `,
+    );
 
-    obj.setMethod('getRecentHistory', `
+    obj.setMethod(
+      'getRecentHistory',
+      `
       /** Get recent sensory history for AI context.
        *  @param limit - Max entries to return (default 20)
        *  @returns Array of recent sensory events
@@ -818,9 +844,12 @@ YOUR MISSION
         const source = event.source ? ' [' + event.source + ']' : '';
         return '[' + time + '] ' + event.type.toUpperCase() + source + ': ' + event.content;
       });
-    `);
+    `,
+    );
 
-    obj.setMethod('formatHistoryForPrompt', `
+    obj.setMethod(
+      'formatHistoryForPrompt',
+      `
       /** Format sensory history as a prompt section.
        *  @param limit - Max entries (default 20)
        *  @returns Formatted string for inclusion in AI prompt
@@ -834,9 +863,12 @@ YOUR MISSION
 
       return 'SENSORY AWARENESS (what you have perceived through the Mask wearer):\\n' +
              recent.join('\\n');
-    `);
+    `,
+    );
 
-    obj.setMethod('wake', `
+    obj.setMethod(
+      'wake',
+      `
       /** Hourly wake-up call. Scan the world and act.
        *  Called by $.scheduler every hour.
        */
@@ -877,7 +909,8 @@ YOUR MISSION
 
       console.log('[Pluribus] Wake-up complete');
       return { invoked: true, response: result.response };
-    `);
+    `,
+    );
   }
 
   async registerAlias(): Promise<void> {

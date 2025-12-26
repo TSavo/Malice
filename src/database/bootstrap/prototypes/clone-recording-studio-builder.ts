@@ -1,25 +1,25 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Builds the CloneRecordingStudio prototype
- * 
+ *
  * A recording studio captures player body data and stores it in a linked clone tank.
  * Players pay to create or update their backup.
- * 
+ *
  * Key mechanics:
  * - Hardwired to a specific tank (linkedTank property)
  * - Charges a fee (in cash or credits) for backup
  * - Captures: body template, appearance, preserved stats (maxCalories)
  * - Recording in one studio invalidates backups at other tanks
- * 
+ *
  * Usage:
  *   const studio = await $.recycler.create({ parent: $.cloneRecordingStudio });
  *   studio.linkedTank = someTank;     // Required: which tank to store backups
  *   studio.backupPrice = 500;         // Cost to backup
  *   studio.currency = 'cash';         // 'cash' or 'credits'
  *   studio.operator = somePlayer;     // Who receives payment
- *   
+ *
  *   // Player uses the studio
  *   await studio.backup(player);
  */
@@ -34,23 +34,23 @@ export class CloneRecordingStudioBuilder {
         name: 'Clone Recording Studio',
         description:
           'A reclining chair surrounded by neural scanning equipment. Electrodes dangle from an articulated arm. A console displays pricing and status. Sit down, pay up, and your consciousness gets backed up—insurance against the permanent kind of death.',
-        
+
         // Cannot be moved
         boltedDown: true,
-        
+
         // Linked tank - where backups are stored (required)
-        linkedTank: null,    // ObjRef to clone tank
-        
+        linkedTank: null, // ObjRef to clone tank
+
         // Pricing
-        backupPrice: 500,    // Cost to create/update backup
-        currency: 'cash',    // 'cash' or 'credits'
-        
+        backupPrice: 500, // Cost to create/update backup
+        currency: 'cash', // 'cash' or 'credits'
+
         // Operator - who receives payment
-        operator: null,      // ObjRef to player/NPC who receives payment
-        
+        operator: null, // ObjRef to player/NPC who receives payment
+
         // Owner - who can configure the studio
-        owner: null,         // ObjRef to player/NPC who owns this studio
-        
+        owner: null, // ObjRef to player/NPC who owns this studio
+
         // Aliases for commands
         aliases: ['studio', 'recording studio', 'backup station', 'chair'],
 
@@ -77,7 +77,9 @@ IMMOVABLE: 'boltedDown' true.`,
     // BACKUP OPERATIONS
     // ═══════════════════════════════════════════════════════════════════
 
-    obj.setMethod('backup', `
+    obj.setMethod(
+      'backup',
+      `
       /** Create or update a backup for a player.
        *  Charges the player, captures their body, stores in linked tank.
        *  @param player - The player to backup
@@ -156,9 +158,12 @@ IMMOVABLE: 'boltedDown' true.`,
         message: 'Backup complete.',
         backupTimestamp: new Date()
       };
-    `);
+    `,
+    );
 
-    obj.setMethod('canAfford', `
+    obj.setMethod(
+      'canAfford',
+      `
       /** Check if player can afford the backup.
        *  @param player - The player to check
        *  @returns { canAfford: boolean, message?: string }
@@ -205,9 +210,12 @@ IMMOVABLE: 'boltedDown' true.`,
         
         return { canAfford: true };
       }
-    `);
+    `,
+    );
 
-    obj.setMethod('chargePlayer', `
+    obj.setMethod(
+      'chargePlayer',
+      `
       /** Deduct payment from player and give to operator.
        *  @param player - The player to charge
        *  @returns { success, message }
@@ -284,9 +292,12 @@ IMMOVABLE: 'boltedDown' true.`,
         
         return { success: true };
       }
-    `);
+    `,
+    );
 
-    obj.setMethod('captureBody', `
+    obj.setMethod(
+      'captureBody',
+      `
       /** Capture player's body as a memento template.
        *  @param player - The player whose body to capture
        *  @returns JSON string of body template, or null on failure
@@ -322,9 +333,12 @@ IMMOVABLE: 'boltedDown' true.`,
         console.error('Failed to capture body:', e);
         return null;
       }
-    `);
+    `,
+    );
 
-    obj.setMethod('captureAppearance', `
+    obj.setMethod(
+      'captureAppearance',
+      `
       /** Capture player's appearance data.
        *  @param player - The player whose appearance to capture
        *  @returns Appearance object
@@ -365,9 +379,12 @@ IMMOVABLE: 'boltedDown' true.`,
       }
       
       return appearance;
-    `);
+    `,
+    );
 
-    obj.setMethod('captureStats', `
+    obj.setMethod(
+      'captureStats',
+      `
       /** Capture stats to preserve across resurrection.
        *  Currently: maxCalories for each body part (trained capacity).
        *  @param player - The player whose stats to capture
@@ -408,13 +425,16 @@ IMMOVABLE: 'boltedDown' true.`,
       capturePart(body, '');
       
       return preservedStats;
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // DISPLAY
     // ═══════════════════════════════════════════════════════════════════
 
-    obj.setMethod('describe', `
+    obj.setMethod(
+      'describe',
+      `
       /** Describe the studio, including pricing and linked tank. */
       let desc = self.name + '\\n' + self.description;
       
@@ -442,9 +462,12 @@ IMMOVABLE: 'boltedDown' true.`,
       }
       
       return desc;
-    `);
+    `,
+    );
 
-    obj.setMethod('shortDesc', `
+    obj.setMethod(
+      'shortDesc',
+      `
       const price = self.backupPrice || 500;
       const currency = self.currency || 'cash';
       
@@ -455,13 +478,16 @@ IMMOVABLE: 'boltedDown' true.`,
       } else {
         return 'clone recording studio ($' + price + ')';
       }
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // OWNER MANAGEMENT
     // ═══════════════════════════════════════════════════════════════════
 
-    obj.setMethod('manage', `
+    obj.setMethod(
+      'manage',
+      `
       /** Owner management menu for configuring the studio.
        *  @param actor - The player trying to manage
        */
@@ -614,14 +640,30 @@ IMMOVABLE: 'boltedDown' true.`,
       
       // 5 or other) Exit
       return 'Exited management.';
-    `);
+    `,
+    );
 
     // Property descriptions
-    obj.setPropertyDescription('linkedTank', 'Clone tank where backups are stored (ObjRef, required)');
-    obj.setPropertyDescription('backupPrice', 'Cost to create or update a backup (integer)');
-    obj.setPropertyDescription('currency', 'Payment type: "cash" (physical) or "credits" (bank transfer)');
-    obj.setPropertyDescription('operator', 'Player or NPC who receives backup payments (ObjRef)');
-    obj.setPropertyDescription('owner', 'Player who can configure studio settings (ObjRef)');
+    obj.setPropertyDescription(
+      'linkedTank',
+      'Clone tank where backups are stored (ObjRef, required)',
+    );
+    obj.setPropertyDescription(
+      'backupPrice',
+      'Cost to create or update a backup (integer)',
+    );
+    obj.setPropertyDescription(
+      'currency',
+      'Payment type: "cash" (physical) or "credits" (bank transfer)',
+    );
+    obj.setPropertyDescription(
+      'operator',
+      'Player or NPC who receives backup payments (ObjRef)',
+    );
+    obj.setPropertyDescription(
+      'owner',
+      'Player who can configure studio settings (ObjRef)',
+    );
 
     return obj;
   }

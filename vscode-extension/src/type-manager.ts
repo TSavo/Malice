@@ -4,8 +4,7 @@
  */
 
 import * as vscode from 'vscode';
-import * as path from 'path';
-import { DevToolsClient } from './devtools-client.js';
+import type { DevToolsClient } from './devtools-client.js';
 
 /**
  * Manages .d.ts type definition files for Malice objects
@@ -26,7 +25,7 @@ export class TypeDefinitionManager {
    * - Generates initial types
    * - Sets up change listeners
    */
-  async initialize(context: vscode.ExtensionContext): Promise<void> {
+  async initialize(_context: vscode.ExtensionContext): Promise<void> {
     const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
     if (!workspaceFolder) {
       console.log('[TypeManager] No workspace folder - types disabled');
@@ -37,7 +36,7 @@ export class TypeDefinitionManager {
     this.typesDir = vscode.Uri.joinPath(workspaceFolder.uri, '.malice');
     try {
       await vscode.workspace.fs.createDirectory(this.typesDir);
-    } catch (err) {
+    } catch (_err) {
       // Directory might already exist
     }
 
@@ -49,7 +48,7 @@ export class TypeDefinitionManager {
 
     // Listen for change notifications from DevTools server
     this.disposables.push(
-      this.client.onNotification((method, params) => {
+      this.client.onNotification((method, _params) => {
         if (this.shouldRegenerateTypes(method)) {
           // Debounce - wait 500ms after last change before regenerating
           if (this.updateTimer) {
@@ -59,7 +58,7 @@ export class TypeDefinitionManager {
             this.regenerateTypes();
           }, 500);
         }
-      })
+      }),
     );
 
     console.log('[TypeManager] Initialized - types dir:', this.typesDir.fsPath);
@@ -96,7 +95,10 @@ export class TypeDefinitionManager {
 
       // Write to malice.d.ts
       const typesFile = vscode.Uri.joinPath(this.typesDir, 'malice.d.ts');
-      await vscode.workspace.fs.writeFile(typesFile, Buffer.from(definitions, 'utf-8'));
+      await vscode.workspace.fs.writeFile(
+        typesFile,
+        Buffer.from(definitions, 'utf-8'),
+      );
 
       console.log('[TypeManager] Types regenerated:', typesFile.fsPath);
     } catch (err) {
@@ -123,15 +125,17 @@ export class TypeDefinitionManager {
    * Ensure TypeScript/JavaScript config includes .malice types
    * Creates jsconfig.json if it doesn't exist
    */
-  private async ensureTypeScriptConfig(workspaceUri: vscode.Uri): Promise<void> {
+  private async ensureTypeScriptConfig(
+    workspaceUri: vscode.Uri,
+  ): Promise<void> {
     const jsconfigUri = vscode.Uri.joinPath(workspaceUri, 'jsconfig.json');
     const tsconfigUri = vscode.Uri.joinPath(workspaceUri, 'tsconfig.json');
 
     // Check if tsconfig.json exists
-    let configExists = false;
+    let _configExists = false;
     try {
       await vscode.workspace.fs.stat(tsconfigUri);
-      configExists = true;
+      _configExists = true;
       console.log('[TypeManager] Found existing tsconfig.json');
       return; // Don't modify existing tsconfig.json
     } catch {
@@ -151,9 +155,11 @@ export class TypeDefinitionManager {
         config.include.push('.malice/**/*');
         await vscode.workspace.fs.writeFile(
           jsconfigUri,
-          Buffer.from(JSON.stringify(config, null, 2), 'utf-8')
+          Buffer.from(JSON.stringify(config, null, 2), 'utf-8'),
         );
-        console.log('[TypeManager] Updated jsconfig.json to include .malice types');
+        console.log(
+          '[TypeManager] Updated jsconfig.json to include .malice types',
+        );
       }
     } catch {
       // jsconfig doesn't exist, create one
@@ -170,7 +176,7 @@ export class TypeDefinitionManager {
 
       await vscode.workspace.fs.writeFile(
         jsconfigUri,
-        Buffer.from(JSON.stringify(config, null, 2), 'utf-8')
+        Buffer.from(JSON.stringify(config, null, 2), 'utf-8'),
       );
       console.log('[TypeManager] Created jsconfig.json with .malice types');
     }
@@ -183,6 +189,6 @@ export class TypeDefinitionManager {
     if (this.updateTimer) {
       clearTimeout(this.updateTimer);
     }
-    this.disposables.forEach(d => d.dispose());
+    this.disposables.forEach((d) => d.dispose());
   }
 }

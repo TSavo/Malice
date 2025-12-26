@@ -19,7 +19,7 @@ export interface WebServerConfig {
 
 export async function createWebServer(
   manager: ObjectManager,
-  config: WebServerConfig = {}
+  config: WebServerConfig = {},
 ) {
   const port = config.port ?? 80;
   const host = config.host ?? '0.0.0.0';
@@ -29,7 +29,9 @@ export async function createWebServer(
   });
 
   // Authenticate HTTP Basic Auth
-  async function authenticate(request: any): Promise<{ player: any; isAdmin: boolean }> {
+  async function authenticate(
+    request: any,
+  ): Promise<{ player: any; isAdmin: boolean }> {
     const authHeader = request.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith('Basic ')) {
@@ -46,17 +48,21 @@ export async function createWebServer(
       }
 
       const objectManager = await manager.load(0);
-      const aliases = (objectManager?.get('aliases') as Record<string, number>) || {};
+      const aliases =
+        (objectManager?.get('aliases') as Record<string, number>) || {};
       const playerPrototypeId = aliases.player;
       const adminPrototypeId = aliases.admin;
 
       const users = await manager.db.listAll(false);
-      const getValue = (v: any) => v && typeof v === 'object' && 'type' in v ? v.value : v;
+      const getValue = (v: any) =>
+        v && typeof v === 'object' && 'type' in v ? v.value : v;
 
-      const userDoc = users.find(u => {
+      const userDoc = users.find((u) => {
         const parentId = getValue(u.parent);
-        return (parentId === playerPrototypeId || parentId === adminPrototypeId) &&
-          getValue(u.properties.playername) === username.toLowerCase();
+        return (
+          (parentId === playerPrototypeId || parentId === adminPrototypeId) &&
+          getValue(u.properties.playername) === username.toLowerCase()
+        );
       });
 
       if (!userDoc) {
@@ -68,12 +74,13 @@ export async function createWebServer(
         return { player: null, isAdmin: false };
       }
 
-      const valid = await player.call('checkPassword', password) as boolean;
+      const valid = (await player.call('checkPassword', password)) as boolean;
       if (!valid) {
         return { player: null, isAdmin: false };
       }
 
-      const isAdmin = player.get('isAdmin') === true || player.get('isWizard') === true;
+      const isAdmin =
+        player.get('isAdmin') === true || player.get('isWizard') === true;
 
       return { player, isAdmin };
     } catch (err) {
@@ -89,7 +96,10 @@ export async function createWebServer(
       const webSite = manager.getAliases().get('webSite');
 
       if (!webSite) {
-        reply.code(503).type('text/html').send(`
+        reply
+          .code(503)
+          .type('text/html')
+          .send(`
           <!DOCTYPE html>
           <html>
           <head><title>Malice - Starting</title></head>
@@ -107,18 +117,30 @@ export async function createWebServer(
       const auth = await authenticate(request);
 
       // Call the MOO handleRequest method
-      const result = await webSite.call('handleRequest', request.url, request.method, {
-        headers: Object.fromEntries(
-          Object.entries(request.headers).filter(([_, v]) => typeof v === 'string')
-        ),
-        query: request.query,
-        player: auth.player,
-        isAdmin: auth.isAdmin,
-      });
+      const result = await webSite.call(
+        'handleRequest',
+        request.url,
+        request.method,
+        {
+          headers: Object.fromEntries(
+            Object.entries(request.headers).filter(
+              ([_, v]) => typeof v === 'string',
+            ),
+          ),
+          query: request.query,
+          player: auth.player,
+          isAdmin: auth.isAdmin,
+        },
+      );
 
       // Handle the response
       if (result && typeof result === 'object') {
-        const { status = 200, contentType = 'text/html', body = '', headers = {} } = result as {
+        const {
+          status = 200,
+          contentType = 'text/html',
+          body = '',
+          headers = {},
+        } = result as {
           status?: number;
           contentType?: string;
           body?: string;
@@ -137,7 +159,10 @@ export async function createWebServer(
       }
     } catch (error) {
       console.error('Web server error:', error);
-      reply.code(500).type('text/html').send(`
+      reply
+        .code(500)
+        .type('text/html')
+        .send(`
         <!DOCTYPE html>
         <html>
         <head><title>Malice - Error</title></head>
@@ -151,7 +176,9 @@ export async function createWebServer(
   });
 
   await app.listen({ port, host });
-  console.log(`🌐 Website: http://${host === '0.0.0.0' ? 'localhost' : host}:${port}`);
+  console.log(
+    `🌐 Website: http://${host === '0.0.0.0' ? 'localhost' : host}:${port}`,
+  );
 
   return app;
 }

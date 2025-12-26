@@ -3,11 +3,11 @@
  * Tests full end-to-end WebSocket communication
  */
 
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { DevToolsServer } from '../../src/devtools/devtools-server.js';
-import { ObjectManager } from '../../src/database/object-manager.js';
-import { ObjectDatabase } from '../../src/database/object-db.js';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import WebSocket from 'ws';
+import { ObjectDatabase } from '../../src/database/object-db.js';
+import { ObjectManager } from '../../src/database/object-manager.js';
+import { DevToolsServer } from '../../src/devtools/devtools-server.js';
 
 describe.sequential('DevTools Integration', () => {
   let server: DevToolsServer;
@@ -30,15 +30,22 @@ describe.sequential('DevTools Integration', () => {
     serverUrl = `ws://localhost:${testPort}`;
 
     // Setup database
-    const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/?replicaSet=rs0&directConnection=true';
+    const MONGO_URI =
+      process.env.MONGO_URI ||
+      'mongodb://localhost:27017/?replicaSet=rs0&directConnection=true';
     db = new ObjectDatabase(MONGO_URI, 'malice_test_integration');
 
     await Promise.race([
       db.connect(),
-      new Promise((_, reject) => setTimeout(() => reject(new Error('MongoDB connection timeout')), 10000))
+      new Promise((_, reject) =>
+        setTimeout(
+          () => reject(new Error('MongoDB connection timeout')),
+          10000,
+        ),
+      ),
     ]);
 
-    await db['objects'].deleteMany({});
+    await db.objects.deleteMany({});
     await db.ensureRoot();
 
     // Setup manager and server
@@ -47,22 +54,22 @@ describe.sequential('DevTools Integration', () => {
     root = await manager.load(1);
     server = new DevToolsServer(manager, testPort);
 
-    await new Promise(resolve => setTimeout(resolve, 300));
+    await new Promise((resolve) => setTimeout(resolve, 300));
   }, 15000);
 
   afterEach(async () => {
     if (client1 && client1.readyState === WebSocket.OPEN) {
       client1.close();
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await new Promise((resolve) => setTimeout(resolve, 50));
     }
     if (client2 && client2.readyState === WebSocket.OPEN) {
       client2.close();
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await new Promise((resolve) => setTimeout(resolve, 50));
     }
 
     if (server) {
       await server.close();
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 500));
     }
 
     // Flush any pending property writes before disconnecting
@@ -96,7 +103,11 @@ describe.sequential('DevTools Integration', () => {
   /**
    * Send JSON-RPC request
    */
-  function sendRequest(client: WebSocket, method: string, params?: any): Promise<any> {
+  function sendRequest(
+    client: WebSocket,
+    method: string,
+    params?: any,
+  ): Promise<any> {
     return new Promise((resolve, reject) => {
       const id = Math.random();
       const request = { jsonrpc: '2.0', method, params, id };
@@ -136,7 +147,7 @@ describe.sequential('DevTools Integration', () => {
 
       // Client 1 creates object
       const result = await sendRequest(client1, 'object.create', {
-        parent: 1,  // DevTools API expects number, server loads parent internally
+        parent: 1, // DevTools API expects number, server loads parent internally
         properties: { name: 'Test' },
         methods: {},
       });
@@ -148,7 +159,11 @@ describe.sequential('DevTools Integration', () => {
     });
 
     it('should broadcast method changes to all clients', async () => {
-      const obj = await manager.create({ parent: root, properties: {}, methods: {} });
+      const obj = await manager.create({
+        parent: root,
+        properties: {},
+        methods: {},
+      });
 
       client1 = await connectClient();
       client2 = await connectClient();
@@ -172,7 +187,11 @@ describe.sequential('DevTools Integration', () => {
     });
 
     it('should broadcast property changes to all clients', async () => {
-      const obj = await manager.create({ parent: root, properties: {}, methods: {} });
+      const obj = await manager.create({
+        parent: root,
+        properties: {},
+        methods: {},
+      });
 
       client1 = await connectClient();
       client2 = await connectClient();
@@ -192,7 +211,6 @@ describe.sequential('DevTools Integration', () => {
       const notification = await notificationPromise;
       expect(notification.method).toBe('property.changed');
     });
-
   });
 
   describe('End-to-End Object Editing', () => {
@@ -206,7 +224,7 @@ describe.sequential('DevTools Integration', () => {
 
       // 2. Create object
       result = await sendRequest(client1, 'object.create', {
-        parent: 1,  // DevTools API expects number, server loads parent internally
+        parent: 1, // DevTools API expects number, server loads parent internally
         properties: { name: 'TestObject', count: 0 },
         methods: { increment: 'this.count++;' },
       });
@@ -222,7 +240,10 @@ describe.sequential('DevTools Integration', () => {
       expect(result.object.properties.name).toBe('TestObject');
       // Methods created with object.create are stored as-is (string or object)
       const incrementMethod = result.object.methods.increment;
-      const incrementCode = typeof incrementMethod === 'string' ? incrementMethod : incrementMethod.code;
+      const incrementCode =
+        typeof incrementMethod === 'string'
+          ? incrementMethod
+          : incrementMethod.code;
       expect(incrementCode).toBe('this.count++;');
 
       // 5. Update method
@@ -264,7 +285,8 @@ describe.sequential('DevTools Integration', () => {
       result = await sendRequest(client1, 'object.get', { id: objectId });
       // Methods set via method.set are stored as { code: '...' }
       const resetMethod = result.object.methods.reset;
-      const resetCode = typeof resetMethod === 'string' ? resetMethod : resetMethod.code;
+      const resetCode =
+        typeof resetMethod === 'string' ? resetMethod : resetMethod.code;
       expect(resetCode).toBe('this.count = 0;');
 
       // 11. Delete method
@@ -288,16 +310,25 @@ describe.sequential('DevTools Integration', () => {
       expect(result.object.properties.count).toBeUndefined();
 
       // 15. Mark object as recycled (via raw MongoDB - recycling is handled by $.recycler in game)
-      await db['objects'].updateOne({ _id: objectId }, { $set: { recycled: true } });
+      await db.objects.updateOne(
+        { _id: objectId },
+        { $set: { recycled: true } },
+      );
 
       // 16. Verify object recycled (back to initial count)
       result = await sendRequest(client1, 'objects.list');
       expect(result.objects).toHaveLength(initialCount);
-      expect(result.objects.find((o: any) => o.id === objectId)).toBeUndefined();
+      expect(
+        result.objects.find((o: any) => o.id === objectId),
+      ).toBeUndefined();
 
-      result = await sendRequest(client1, 'objects.list', { includeRecycled: true });
+      result = await sendRequest(client1, 'objects.list', {
+        includeRecycled: true,
+      });
       expect(result.objects).toHaveLength(initialCount + 1);
-      expect(result.objects.find((o: any) => o.recycled === true)).toBeDefined();
+      expect(
+        result.objects.find((o: any) => o.recycled === true),
+      ).toBeDefined();
     });
   });
 
@@ -336,7 +367,11 @@ describe.sequential('DevTools Integration', () => {
     });
 
     it('should handle rapid sequential edits', async () => {
-      const obj = await manager.create({ parent: root, properties: {}, methods: {} });
+      const obj = await manager.create({
+        parent: root,
+        properties: {},
+        methods: {},
+      });
 
       client1 = await connectClient();
 
@@ -373,7 +408,11 @@ describe.sequential('DevTools Integration', () => {
     });
 
     it('should return error for non-existent method', async () => {
-      const obj = await manager.create({ parent: root, properties: {}, methods: {} });
+      const obj = await manager.create({
+        parent: root,
+        properties: {},
+        methods: {},
+      });
 
       try {
         await sendRequest(client1, 'method.get', {
@@ -391,12 +430,16 @@ describe.sequential('DevTools Integration', () => {
       client1.close();
 
       // Wait a bit
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       // New client connects and should work fine
       client2 = await connectClient();
 
-      const obj = await manager.create({ parent: root, properties: {}, methods: {} });
+      const obj = await manager.create({
+        parent: root,
+        properties: {},
+        methods: {},
+      });
       const result = await sendRequest(client2, 'object.get', { id: obj.id });
 
       expect(result.object._id).toBe(obj.id);
@@ -414,7 +457,7 @@ describe.sequential('DevTools Integration', () => {
       }
 
       const result = await sendRequest(client1, 'object.create', {
-        parent: 1,  // DevTools API expects number, server loads parent internally
+        parent: 1, // DevTools API expects number, server loads parent internally
         properties: {},
         methods,
       });
@@ -434,7 +477,7 @@ describe.sequential('DevTools Integration', () => {
       // Create 50 objects sequentially (parallel creates cause duplicate key errors)
       for (let i = 0; i < 50; i++) {
         await sendRequest(client1, 'object.create', {
-          parent: 1,  // DevTools API expects number, server loads parent internally
+          parent: 1, // DevTools API expects number, server loads parent internally
           properties: { index: i },
           methods: {},
         });

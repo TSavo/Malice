@@ -1,5 +1,5 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Builds the Locker prototype
@@ -62,7 +62,9 @@ EXPIRATION: checkExpired() auto-expires old rentals. getExpirationInfo() shows t
 
     // createCompartment(id?) - create a new empty compartment
     // If id not provided, auto-generates one
-    obj.setMethod('createCompartment', `
+    obj.setMethod(
+      'createCompartment',
+      `
       let id = args[0];
 
       if (!id) {
@@ -88,25 +90,34 @@ EXPIRATION: checkExpired() auto-expires old rentals. getExpirationInfo() shows t
       self.compartments = compartments;
 
       return { success: true, id: id };
-    `);
+    `,
+    );
 
     // getCompartment(id) - get compartment data
-    obj.setMethod('getCompartment', `
+    obj.setMethod(
+      'getCompartment',
+      `
       const id = args[0];
       if (!id) return null;
 
       const compartments = self.compartments || {};
       return compartments[id] || null;
-    `);
+    `,
+    );
 
     // listCompartments() - list all compartment IDs
-    obj.setMethod('listCompartments', `
+    obj.setMethod(
+      'listCompartments',
+      `
       const compartments = self.compartments || {};
       return Object.keys(compartments);
-    `);
+    `,
+    );
 
     // listAvailable() - list unrented compartments (auto-expires old ones first)
-    obj.setMethod('listAvailable', `
+    obj.setMethod(
+      'listAvailable',
+      `
       // Check for expired rentals first
       await self.checkExpired();
 
@@ -120,14 +131,17 @@ EXPIRATION: checkExpired() auto-expires old rentals. getExpirationInfo() shows t
       }
 
       return available;
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // OWNERSHIP
     // ═══════════════════════════════════════════════════════════════════
 
     // rentCompartment(id, player) - assign ownership to player
-    obj.setMethod('rentCompartment', `
+    obj.setMethod(
+      'rentCompartment',
+      `
       const id = args[0];
       const player = args[1];
 
@@ -160,10 +174,13 @@ EXPIRATION: checkExpired() auto-expires old rentals. getExpirationInfo() shows t
       self.compartments = compartments;
 
       return { success: true, expiresAt: comp.expiresAt };
-    `);
+    `,
+    );
 
     // releaseCompartment(id, player) - release ownership (must be owner or empty)
-    obj.setMethod('releaseCompartment', `
+    obj.setMethod(
+      'releaseCompartment',
+      `
       const id = args[0];
       const player = args[1];
 
@@ -190,10 +207,13 @@ EXPIRATION: checkExpired() auto-expires old rentals. getExpirationInfo() shows t
       self.compartments = compartments;
 
       return { success: true };
-    `);
+    `,
+    );
 
     // isOwner(id, player) - check if player owns compartment
-    obj.setMethod('isOwner', `
+    obj.setMethod(
+      'isOwner',
+      `
       const id = args[0];
       const player = args[1];
 
@@ -206,20 +226,26 @@ EXPIRATION: checkExpired() auto-expires old rentals. getExpirationInfo() shows t
 
       const ownerId = typeof comp.owner === 'object' ? comp.owner.id : comp.owner;
       return ownerId === player.id;
-    `);
+    `,
+    );
 
     // getOwner(id) - get owner of compartment
-    obj.setMethod('getOwner', `
+    obj.setMethod(
+      'getOwner',
+      `
       const id = args[0];
       const compartments = self.compartments || {};
       const comp = compartments[id];
 
       if (!comp) return null;
       return comp.owner;
-    `);
+    `,
+    );
 
     // renewCompartment(id) - extend rental by another duration
-    obj.setMethod('renewCompartment', `
+    obj.setMethod(
+      'renewCompartment',
+      `
       const id = args[0];
       const compartments = self.compartments || {};
       const comp = compartments[id];
@@ -241,10 +267,13 @@ EXPIRATION: checkExpired() auto-expires old rentals. getExpirationInfo() shows t
       self.compartments = compartments;
 
       return { success: true, expiresAt: comp.expiresAt };
-    `);
+    `,
+    );
 
     // isExpired(id) - check if compartment rental has expired
-    obj.setMethod('isExpired', `
+    obj.setMethod(
+      'isExpired',
+      `
       const id = args[0];
       const compartments = self.compartments || {};
       const comp = compartments[id];
@@ -253,10 +282,13 @@ EXPIRATION: checkExpired() auto-expires old rentals. getExpirationInfo() shows t
       if (!comp.expiresAt) return false;
 
       return new Date(comp.expiresAt) <= new Date();
-    `);
+    `,
+    );
 
     // expireCompartment(id) - force expire, recycle contents, clear ownership
-    obj.setMethod('expireCompartment', `
+    obj.setMethod(
+      'expireCompartment',
+      `
       const id = args[0];
       const compartments = self.compartments || {};
       const comp = compartments[id];
@@ -288,11 +320,14 @@ EXPIRATION: checkExpired() auto-expires old rentals. getExpirationInfo() shows t
       self.compartments = compartments;
 
       return { success: true, recycledItems: recycledItems };
-    `);
+    `,
+    );
 
     // checkExpired() - check all compartments for expiration, expire any past due
     // Returns list of expired compartment IDs
-    obj.setMethod('checkExpired', `
+    obj.setMethod(
+      'checkExpired',
+      `
       const compartments = self.compartments || {};
       const now = new Date();
       const expired = [];
@@ -305,10 +340,13 @@ EXPIRATION: checkExpired() auto-expires old rentals. getExpirationInfo() shows t
       }
 
       return expired;
-    `);
+    `,
+    );
 
     // getExpirationInfo(id) - get time remaining on rental
-    obj.setMethod('getExpirationInfo', `
+    obj.setMethod(
+      'getExpirationInfo',
+      `
       const id = args[0];
       const compartments = self.compartments || {};
       const comp = compartments[id];
@@ -346,14 +384,17 @@ EXPIRATION: checkExpired() auto-expires old rentals. getExpirationInfo() shows t
         expiresAt: comp.expiresAt,
         timeRemaining: timeStr,
       };
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // CODES
     // ═══════════════════════════════════════════════════════════════════
 
     // setMasterCode(id, code) - set master code for compartment
-    obj.setMethod('setMasterCode', `
+    obj.setMethod(
+      'setMasterCode',
+      `
       const id = args[0];
       const code = args[1];
 
@@ -376,20 +417,26 @@ EXPIRATION: checkExpired() auto-expires old rentals. getExpirationInfo() shows t
       self.compartments = compartments;
 
       return { success: true };
-    `);
+    `,
+    );
 
     // generateCode() - generate a random 6-character code
-    obj.setMethod('generateCode', `
+    obj.setMethod(
+      'generateCode',
+      `
       const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
       let code = '';
       for (let i = 0; i < 6; i++) {
         code += chars.charAt(Math.floor(Math.random() * chars.length));
       }
       return code;
-    `);
+    `,
+    );
 
     // createOneTimeCode(id) - create one-time code for compartment
-    obj.setMethod('createOneTimeCode', `
+    obj.setMethod(
+      'createOneTimeCode',
+      `
       const id = args[0];
 
       const compartments = self.compartments || {};
@@ -422,11 +469,14 @@ EXPIRATION: checkExpired() auto-expires old rentals. getExpirationInfo() shows t
       self.compartments = compartments;
 
       return { success: true, code: code };
-    `);
+    `,
+    );
 
     // validateCode(id, code) - check if code is valid for compartment
     // Returns { valid: bool, isMaster: bool, isOneTime: bool }
-    obj.setMethod('validateCode', `
+    obj.setMethod(
+      'validateCode',
+      `
       const id = args[0];
       const code = args[1];
 
@@ -449,10 +499,13 @@ EXPIRATION: checkExpired() auto-expires old rentals. getExpirationInfo() shows t
       }
 
       return { valid: false };
-    `);
+    `,
+    );
 
     // consumeOneTimeCode(id, code) - mark one-time code as used
-    obj.setMethod('consumeOneTimeCode', `
+    obj.setMethod(
+      'consumeOneTimeCode',
+      `
       const id = args[0];
       const code = args[1];
 
@@ -473,10 +526,13 @@ EXPIRATION: checkExpired() auto-expires old rentals. getExpirationInfo() shows t
       self.compartments = compartments;
 
       return { success: true };
-    `);
+    `,
+    );
 
     // getActiveCodeCount(id) - count unused one-time codes
-    obj.setMethod('getActiveCodeCount', `
+    obj.setMethod(
+      'getActiveCodeCount',
+      `
       const id = args[0];
       const compartments = self.compartments || {};
       const comp = compartments[id];
@@ -484,24 +540,30 @@ EXPIRATION: checkExpired() auto-expires old rentals. getExpirationInfo() shows t
       if (!comp) return 0;
 
       return (comp.oneTimeCodes || []).filter(c => !c.used).length;
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // LOCK STATE
     // ═══════════════════════════════════════════════════════════════════
 
     // isLocked(id) - check if compartment is locked
-    obj.setMethod('isLocked', `
+    obj.setMethod(
+      'isLocked',
+      `
       const id = args[0];
       const compartments = self.compartments || {};
       const comp = compartments[id];
 
       if (!comp) return true;  // Non-existent = locked
       return comp.locked !== false;
-    `);
+    `,
+    );
 
     // lock(id) - lock a compartment
-    obj.setMethod('lock', `
+    obj.setMethod(
+      'lock',
+      `
       const id = args[0];
       const compartments = self.compartments || {};
       const comp = compartments[id];
@@ -518,10 +580,13 @@ EXPIRATION: checkExpired() auto-expires old rentals. getExpirationInfo() shows t
       self.compartments = compartments;
 
       return { success: true };
-    `);
+    `,
+    );
 
     // unlock(id, code) - unlock with code
-    obj.setMethod('unlock', `
+    obj.setMethod(
+      'unlock',
+      `
       const id = args[0];
       const code = args[1];
 
@@ -558,24 +623,30 @@ EXPIRATION: checkExpired() auto-expires old rentals. getExpirationInfo() shows t
         usedOneTime: validation.isOneTime,
         codeUsed: validation.isOneTime ? code : null,
       };
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // CONTENTS
     // ═══════════════════════════════════════════════════════════════════
 
     // getContents(id) - get contents of compartment
-    obj.setMethod('getContents', `
+    obj.setMethod(
+      'getContents',
+      `
       const id = args[0];
       const compartments = self.compartments || {};
       const comp = compartments[id];
 
       if (!comp) return [];
       return comp.contents || [];
-    `);
+    `,
+    );
 
     // canAddContent(id, item) - check if item can be added
-    obj.setMethod('canAddContent', `
+    obj.setMethod(
+      'canAddContent',
+      `
       const id = args[0];
       const item = args[1];
 
@@ -591,10 +662,13 @@ EXPIRATION: checkExpired() auto-expires old rentals. getExpirationInfo() shows t
       }
 
       return true;
-    `);
+    `,
+    );
 
     // addContent(id, item) - add item to compartment
-    obj.setMethod('addContent', `
+    obj.setMethod(
+      'addContent',
+      `
       const id = args[0];
       const item = args[1];
 
@@ -622,10 +696,13 @@ EXPIRATION: checkExpired() auto-expires old rentals. getExpirationInfo() shows t
       });
 
       return { success: true };
-    `);
+    `,
+    );
 
     // removeContent(id, item) - remove item from compartment
-    obj.setMethod('removeContent', `
+    obj.setMethod(
+      'removeContent',
+      `
       const id = args[0];
       const item = args[1];
 
@@ -664,13 +741,16 @@ EXPIRATION: checkExpired() auto-expires old rentals. getExpirationInfo() shows t
       });
 
       return { success: true };
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // DESCRIPTION
     // ═══════════════════════════════════════════════════════════════════
 
-    obj.setMethod('describe', `
+    obj.setMethod(
+      'describe',
+      `
       let desc = self.name + '\\r\\n';
 
       if (self.description) {
@@ -688,10 +768,13 @@ EXPIRATION: checkExpired() auto-expires old rentals. getExpirationInfo() shows t
       }
 
       return desc;
-    `);
+    `,
+    );
 
     // describeCompartment(id, viewer) - describe a specific compartment
-    obj.setMethod('describeCompartment', `
+    obj.setMethod(
+      'describeCompartment',
+      `
       const id = args[0];
       const viewer = args[1];
 
@@ -736,13 +819,26 @@ EXPIRATION: checkExpired() auto-expires old rentals. getExpirationInfo() shows t
       }
 
       return desc.trim();
-    `);
+    `,
+    );
 
     // Property descriptions
-    obj.setPropertyDescription('compartments', 'Map of compartment IDs to compartment state (owner, codes, locked, contents, rental info)');
-    obj.setPropertyDescription('compartmentPrefix', 'Prefix for auto-generated compartment IDs (e.g., "A" for A1, A2, A3)');
-    obj.setPropertyDescription('nextCompartmentNum', 'Next number to use when auto-generating compartment IDs');
-    obj.setPropertyDescription('rentalDurationMs', 'Rental period in milliseconds (default: 7 days), after which contents are recycled');
+    obj.setPropertyDescription(
+      'compartments',
+      'Map of compartment IDs to compartment state (owner, codes, locked, contents, rental info)',
+    );
+    obj.setPropertyDescription(
+      'compartmentPrefix',
+      'Prefix for auto-generated compartment IDs (e.g., "A" for A1, A2, A3)',
+    );
+    obj.setPropertyDescription(
+      'nextCompartmentNum',
+      'Next number to use when auto-generating compartment IDs',
+    );
+    obj.setPropertyDescription(
+      'rentalDurationMs',
+      'Rental period in milliseconds (default: 7 days), after which contents are recycled',
+    );
 
     return obj;
   }

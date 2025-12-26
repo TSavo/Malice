@@ -1,13 +1,15 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { ObjectDatabase } from '../../src/database/object-db.js';
-import { ObjectManager } from '../../src/database/object-manager.js';
-import { MinimalBootstrap } from '../../src/database/bootstrap/minimal-bootstrap.js';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { AuthManagerBuilder } from '../../src/database/bootstrap/auth-manager-builder.js';
 import { CharGenBuilder } from '../../src/database/bootstrap/chargen-builder.js';
+import { MinimalBootstrap } from '../../src/database/bootstrap/minimal-bootstrap.js';
 import { PreAuthHandlerBuilder } from '../../src/database/bootstrap/preauth-handler-builder.js';
 import { RecyclerBuilder } from '../../src/database/bootstrap/recycler-builder.js';
+import { ObjectDatabase } from '../../src/database/object-db.js';
+import { ObjectManager } from '../../src/database/object-manager.js';
 
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/?replicaSet=rs0&directConnection=true';
+const MONGO_URI =
+  process.env.MONGO_URI ||
+  'mongodb://localhost:27017/?replicaSet=rs0&directConnection=true';
 
 describe('Bootstrap Builders Idempotency', () => {
   let db: ObjectDatabase;
@@ -18,7 +20,7 @@ describe('Bootstrap Builders Idempotency', () => {
     await db.connect();
 
     // Clean database
-    await db['objects'].deleteMany({});
+    await db.objects.deleteMany({});
 
     manager = new ObjectManager(db);
 
@@ -41,7 +43,7 @@ describe('Bootstrap Builders Idempotency', () => {
 
       // Get the created object ID
       const objectManager = await manager.load(0);
-      const aliases1 = objectManager!.get('aliases') as Record<string, number>;
+      const aliases1 = objectManager?.get('aliases') as Record<string, number>;
       const firstAuthManagerId = aliases1.authManager;
 
       expect(firstAuthManagerId).toBeTruthy();
@@ -53,14 +55,17 @@ describe('Bootstrap Builders Idempotency', () => {
 
       // Verify alias still points to same object (no duplicate created)
       const objectManager2 = await manager.load(0);
-      const aliases2 = objectManager2!.get('aliases') as Record<string, number>;
+      const aliases2 = objectManager2?.get('aliases') as Record<string, number>;
       const secondAuthManagerId = aliases2.authManager;
 
       expect(secondAuthManagerId).toBe(firstAuthManagerId);
 
       // Verify only one AuthManager exists in database
       const allObjects = await db.listAll();
-      const authManagers = allObjects.filter(obj => (obj.properties.name?.value || obj.properties.name) === 'AuthManager');
+      const authManagers = allObjects.filter(
+        (obj) =>
+          (obj.properties.name?.value || obj.properties.name) === 'AuthManager',
+      );
       expect(authManagers.length).toBe(1);
       expect(authManagers[0]._id).toBe(firstAuthManagerId);
     });
@@ -73,7 +78,7 @@ describe('Bootstrap Builders Idempotency', () => {
       await builder.registerAlias();
 
       const objectManager = await manager.load(0);
-      const aliases = objectManager!.get('aliases') as Record<string, number>;
+      const aliases = objectManager?.get('aliases') as Record<string, number>;
       const authManagerId = aliases.authManager;
 
       // Call build multiple times
@@ -83,7 +88,10 @@ describe('Bootstrap Builders Idempotency', () => {
 
       // Verify object count hasn't changed
       const allObjects = await db.listAll();
-      const authManagers = allObjects.filter(obj => (obj.properties.name?.value || obj.properties.name) === 'AuthManager');
+      const authManagers = allObjects.filter(
+        (obj) =>
+          (obj.properties.name?.value || obj.properties.name) === 'AuthManager',
+      );
       expect(authManagers.length).toBe(1);
       expect(authManagers[0]._id).toBe(authManagerId);
     });
@@ -99,7 +107,7 @@ describe('Bootstrap Builders Idempotency', () => {
 
       // Get the created object ID
       const objectManager = await manager.load(0);
-      const aliases1 = objectManager!.get('aliases') as Record<string, number>;
+      const aliases1 = objectManager?.get('aliases') as Record<string, number>;
       const firstCharGenId = aliases1.charGen;
 
       expect(firstCharGenId).toBeTruthy();
@@ -111,14 +119,17 @@ describe('Bootstrap Builders Idempotency', () => {
 
       // Verify alias still points to same object (no duplicate created)
       const objectManager2 = await manager.load(0);
-      const aliases2 = objectManager2!.get('aliases') as Record<string, number>;
+      const aliases2 = objectManager2?.get('aliases') as Record<string, number>;
       const secondCharGenId = aliases2.charGen;
 
       expect(secondCharGenId).toBe(firstCharGenId);
 
       // Verify only one CharGen exists in database
       const allObjects = await db.listAll();
-      const charGens = allObjects.filter(obj => (obj.properties.name?.value || obj.properties.name) === 'CharGen');
+      const charGens = allObjects.filter(
+        (obj) =>
+          (obj.properties.name?.value || obj.properties.name) === 'CharGen',
+      );
       expect(charGens.length).toBe(1);
       expect(charGens[0]._id).toBe(firstCharGenId);
     });
@@ -131,7 +142,7 @@ describe('Bootstrap Builders Idempotency', () => {
       await builder.registerAlias();
 
       const objectManager = await manager.load(0);
-      const aliases = objectManager!.get('aliases') as Record<string, number>;
+      const aliases = objectManager?.get('aliases') as Record<string, number>;
       const charGenId = aliases.charGen;
 
       // Call build multiple times
@@ -141,7 +152,10 @@ describe('Bootstrap Builders Idempotency', () => {
 
       // Verify object count hasn't changed
       const allObjects = await db.listAll();
-      const charGens = allObjects.filter(obj => (obj.properties.name?.value || obj.properties.name) === 'CharGen');
+      const charGens = allObjects.filter(
+        (obj) =>
+          (obj.properties.name?.value || obj.properties.name) === 'CharGen',
+      );
       expect(charGens.length).toBe(1);
       expect(charGens[0]._id).toBe(charGenId);
     });
@@ -157,7 +171,7 @@ describe('Bootstrap Builders Idempotency', () => {
 
       // Get the created object ID
       const objectManager = await manager.load(0);
-      const aliases1 = objectManager!.get('aliases') as Record<string, number>;
+      const aliases1 = objectManager?.get('aliases') as Record<string, number>;
       const firstPreAuthHandlerId = aliases1.preAuthHandler;
 
       expect(firstPreAuthHandlerId).toBeTruthy();
@@ -169,14 +183,18 @@ describe('Bootstrap Builders Idempotency', () => {
 
       // Verify alias still points to same object (no duplicate created)
       const objectManager2 = await manager.load(0);
-      const aliases2 = objectManager2!.get('aliases') as Record<string, number>;
+      const aliases2 = objectManager2?.get('aliases') as Record<string, number>;
       const secondPreAuthHandlerId = aliases2.preAuthHandler;
 
       expect(secondPreAuthHandlerId).toBe(firstPreAuthHandlerId);
 
       // Verify only one PreAuthHandler exists in database
       const allObjects = await db.listAll();
-      const preAuthHandlers = allObjects.filter(obj => (obj.properties.name?.value || obj.properties.name) === 'PreAuthHandler');
+      const preAuthHandlers = allObjects.filter(
+        (obj) =>
+          (obj.properties.name?.value || obj.properties.name) ===
+          'PreAuthHandler',
+      );
       expect(preAuthHandlers.length).toBe(1);
       expect(preAuthHandlers[0]._id).toBe(firstPreAuthHandlerId);
     });
@@ -189,7 +207,7 @@ describe('Bootstrap Builders Idempotency', () => {
       await builder.registerAlias();
 
       const objectManager = await manager.load(0);
-      const aliases = objectManager!.get('aliases') as Record<string, number>;
+      const aliases = objectManager?.get('aliases') as Record<string, number>;
       const preAuthHandlerId = aliases.preAuthHandler;
 
       // Call build multiple times
@@ -199,7 +217,11 @@ describe('Bootstrap Builders Idempotency', () => {
 
       // Verify object count hasn't changed
       const allObjects = await db.listAll();
-      const preAuthHandlers = allObjects.filter(obj => (obj.properties.name?.value || obj.properties.name) === 'PreAuthHandler');
+      const preAuthHandlers = allObjects.filter(
+        (obj) =>
+          (obj.properties.name?.value || obj.properties.name) ===
+          'PreAuthHandler',
+      );
       expect(preAuthHandlers.length).toBe(1);
       expect(preAuthHandlers[0]._id).toBe(preAuthHandlerId);
     });
@@ -215,7 +237,7 @@ describe('Bootstrap Builders Idempotency', () => {
 
       // Get the created object ID
       const objectManager = await manager.load(0);
-      const aliases1 = objectManager!.get('aliases') as Record<string, number>;
+      const aliases1 = objectManager?.get('aliases') as Record<string, number>;
       const firstRecyclerId = aliases1.recycler;
 
       expect(firstRecyclerId).toBeTruthy();
@@ -227,14 +249,17 @@ describe('Bootstrap Builders Idempotency', () => {
 
       // Verify alias still points to same object (no duplicate created)
       const objectManager2 = await manager.load(0);
-      const aliases2 = objectManager2!.get('aliases') as Record<string, number>;
+      const aliases2 = objectManager2?.get('aliases') as Record<string, number>;
       const secondRecyclerId = aliases2.recycler;
 
       expect(secondRecyclerId).toBe(firstRecyclerId);
 
       // Verify only one Recycler exists in database
       const allObjects = await db.listAll();
-      const recyclers = allObjects.filter(obj => (obj.properties.name?.value || obj.properties.name) === 'Recycler');
+      const recyclers = allObjects.filter(
+        (obj) =>
+          (obj.properties.name?.value || obj.properties.name) === 'Recycler',
+      );
       expect(recyclers.length).toBe(1);
       expect(recyclers[0]._id).toBe(firstRecyclerId);
     });
@@ -247,7 +272,7 @@ describe('Bootstrap Builders Idempotency', () => {
       await builder.registerAlias();
 
       const objectManager = await manager.load(0);
-      const aliases = objectManager!.get('aliases') as Record<string, number>;
+      const aliases = objectManager?.get('aliases') as Record<string, number>;
       const recyclerId = aliases.recycler;
 
       // Call build multiple times
@@ -257,7 +282,10 @@ describe('Bootstrap Builders Idempotency', () => {
 
       // Verify object count hasn't changed
       const allObjects = await db.listAll();
-      const recyclers = allObjects.filter(obj => (obj.properties.name?.value || obj.properties.name) === 'Recycler');
+      const recyclers = allObjects.filter(
+        (obj) =>
+          (obj.properties.name?.value || obj.properties.name) === 'Recycler',
+      );
       expect(recyclers.length).toBe(1);
       expect(recyclers[0]._id).toBe(recyclerId);
     });
@@ -286,7 +314,7 @@ describe('Bootstrap Builders Idempotency', () => {
 
       // Get initial state
       const objectManager1 = await manager.load(0);
-      const aliases1 = objectManager1!.get('aliases') as Record<string, number>;
+      const aliases1 = objectManager1?.get('aliases') as Record<string, number>;
       const initialAuthId = aliases1.authManager;
       const initialCharGenId = aliases1.charGen;
       const initialPreAuthId = aliases1.preAuthHandler;
@@ -300,7 +328,7 @@ describe('Bootstrap Builders Idempotency', () => {
 
       // Verify all aliases unchanged
       const objectManager2 = await manager.load(0);
-      const aliases2 = objectManager2!.get('aliases') as Record<string, number>;
+      const aliases2 = objectManager2?.get('aliases') as Record<string, number>;
 
       expect(aliases2.authManager).toBe(initialAuthId);
       expect(aliases2.charGen).toBe(initialCharGenId);
@@ -309,10 +337,23 @@ describe('Bootstrap Builders Idempotency', () => {
 
       // Verify object counts
       const allObjects = await db.listAll();
-      const authManagers = allObjects.filter(obj => (obj.properties.name?.value || obj.properties.name) === 'AuthManager');
-      const charGens = allObjects.filter(obj => (obj.properties.name?.value || obj.properties.name) === 'CharGen');
-      const preAuthHandlers = allObjects.filter(obj => (obj.properties.name?.value || obj.properties.name) === 'PreAuthHandler');
-      const recyclers = allObjects.filter(obj => (obj.properties.name?.value || obj.properties.name) === 'Recycler');
+      const authManagers = allObjects.filter(
+        (obj) =>
+          (obj.properties.name?.value || obj.properties.name) === 'AuthManager',
+      );
+      const charGens = allObjects.filter(
+        (obj) =>
+          (obj.properties.name?.value || obj.properties.name) === 'CharGen',
+      );
+      const preAuthHandlers = allObjects.filter(
+        (obj) =>
+          (obj.properties.name?.value || obj.properties.name) ===
+          'PreAuthHandler',
+      );
+      const recyclers = allObjects.filter(
+        (obj) =>
+          (obj.properties.name?.value || obj.properties.name) === 'Recycler',
+      );
 
       expect(authManagers.length).toBe(1);
       expect(charGens.length).toBe(1);
@@ -338,8 +379,14 @@ describe('Bootstrap Builders Idempotency', () => {
 
       // Verify no duplicates
       const allObjects = await db.listAll();
-      const authManagers = allObjects.filter(obj => (obj.properties.name?.value || obj.properties.name) === 'AuthManager');
-      const charGens = allObjects.filter(obj => (obj.properties.name?.value || obj.properties.name) === 'CharGen');
+      const authManagers = allObjects.filter(
+        (obj) =>
+          (obj.properties.name?.value || obj.properties.name) === 'AuthManager',
+      );
+      const charGens = allObjects.filter(
+        (obj) =>
+          (obj.properties.name?.value || obj.properties.name) === 'CharGen',
+      );
 
       expect(authManagers.length).toBe(1);
       expect(charGens.length).toBe(1);
@@ -359,10 +406,13 @@ describe('Bootstrap Builders Idempotency', () => {
       }
 
       const root = await manager.load(1);
-      const testObj = await recycler.create({
-        parent: root,
-        properties: { name: 'TestRecyclable', testProp: 'value' }
-      }, null);
+      const testObj = await recycler.create(
+        {
+          parent: root,
+          properties: { name: 'TestRecyclable', testProp: 'value' },
+        },
+        null,
+      );
 
       expect(testObj).toBeTruthy();
       expect(testObj.get('name')).toBe('TestRecyclable');
@@ -384,7 +434,7 @@ describe('Bootstrap Builders Idempotency', () => {
     it('should handle empty aliases object', async () => {
       // Clear aliases - with stable proxies, set auto-persists
       const objectManager = await manager.load(0);
-      objectManager!.set('aliases', {});
+      objectManager?.set('aliases', {});
 
       const builder = new AuthManagerBuilder(manager);
 
@@ -393,18 +443,21 @@ describe('Bootstrap Builders Idempotency', () => {
       await builder.registerAlias();
 
       const allObjects = await db.listAll();
-      const authManagers = allObjects.filter(obj => (obj.properties.name?.value || obj.properties.name) === 'AuthManager');
+      const authManagers = allObjects.filter(
+        (obj) =>
+          (obj.properties.name?.value || obj.properties.name) === 'AuthManager',
+      );
       expect(authManagers.length).toBe(1);
     });
 
     it('should work when aliases property is missing entirely', async () => {
       // Remove aliases property
       const objectManager = await manager.load(0);
-      const raw = objectManager!['_getRaw']();
+      const raw = objectManager?._getRaw();
       delete raw.properties.aliases;
-      await db['objects'].updateOne(
+      await db.objects.updateOne(
         { _id: 0 },
-        { $unset: { 'properties.aliases': '' } }
+        { $unset: { 'properties.aliases': '' } },
       );
 
       const builder = new RecyclerBuilder(manager);
@@ -414,7 +467,7 @@ describe('Bootstrap Builders Idempotency', () => {
       await builder.registerAlias();
 
       const objectManager2 = await manager.load(0);
-      const aliases = objectManager2!.get('aliases') as Record<string, number>;
+      const aliases = objectManager2?.get('aliases') as Record<string, number>;
       expect(aliases).toBeTruthy();
       expect(aliases.recycler).toBeGreaterThan(0);
     });
@@ -441,7 +494,7 @@ describe('Bootstrap Builders Idempotency', () => {
 
       // Verify all created successfully
       const objectManager = await manager.load(0);
-      const aliases = objectManager!.get('aliases') as Record<string, number>;
+      const aliases = objectManager?.get('aliases') as Record<string, number>;
 
       expect(aliases.authManager).toBeTruthy();
       expect(aliases.charGen).toBeTruthy();
@@ -450,10 +503,32 @@ describe('Bootstrap Builders Idempotency', () => {
 
       // Verify no duplicates
       const allObjects = await db.listAll();
-      expect(allObjects.filter(obj => (obj.properties.name?.value || obj.properties.name) === 'AuthManager').length).toBe(1);
-      expect(allObjects.filter(obj => (obj.properties.name?.value || obj.properties.name) === 'CharGen').length).toBe(1);
-      expect(allObjects.filter(obj => (obj.properties.name?.value || obj.properties.name) === 'PreAuthHandler').length).toBe(1);
-      expect(allObjects.filter(obj => (obj.properties.name?.value || obj.properties.name) === 'Recycler').length).toBe(1);
+      expect(
+        allObjects.filter(
+          (obj) =>
+            (obj.properties.name?.value || obj.properties.name) ===
+            'AuthManager',
+        ).length,
+      ).toBe(1);
+      expect(
+        allObjects.filter(
+          (obj) =>
+            (obj.properties.name?.value || obj.properties.name) === 'CharGen',
+        ).length,
+      ).toBe(1);
+      expect(
+        allObjects.filter(
+          (obj) =>
+            (obj.properties.name?.value || obj.properties.name) ===
+            'PreAuthHandler',
+        ).length,
+      ).toBe(1);
+      expect(
+        allObjects.filter(
+          (obj) =>
+            (obj.properties.name?.value || obj.properties.name) === 'Recycler',
+        ).length,
+      ).toBe(1);
     });
   });
 });

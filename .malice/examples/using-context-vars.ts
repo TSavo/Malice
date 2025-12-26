@@ -31,8 +31,8 @@ if (context) {
 // Example 3: Using player object
 if (player) {
   // Access player properties and methods
-  const health = player.get('health');
-  const name = player.get('name');
+  const _health = player.get('health');
+  const _name = player.get('name');
 
   // Call player methods
   await player.call('updateStatus', context, 'online');
@@ -44,7 +44,7 @@ if (player) {
 }
 
 // Example 4: Complete interaction handler
-async function handleCommand(input: string) {
+async function _handleCommand(input: string) {
   // Parse the command
   const cmd = await $2.parseCommand(input);
 
@@ -61,7 +61,7 @@ async function handleCommand(input: string) {
     // Broadcast to room
     await $2.broadcast(
       player.get('location') as number,
-      `${player.get('name')} says: ${message}`
+      `${player.get('name')} says: ${message}`,
     );
   }
 }

@@ -21,7 +21,8 @@ export const building = {
     '%GC_RL_1': {
       prototype: 'rentableLock',
       name: 'Room 201 Lock',
-      description: 'An antique mortise lock on the door of Room 201. The brass is tarnished but the mechanism still works.',
+      description:
+        'An antique mortise lock on the door of Room 201. The brass is tarnished but the mechanism still works.',
       price: 500,
       duration: 2678400000, // 1 month
     },
@@ -37,7 +38,8 @@ export const building = {
     '%GC_RL_2': {
       prototype: 'rentableLock',
       name: 'Room 202 Lock',
-      description: 'A brass mortise lock on Room 202, well-worn but functional.',
+      description:
+        'A brass mortise lock on Room 202, well-worn but functional.',
       price: 500,
       duration: 2678400000,
     },
@@ -53,7 +55,8 @@ export const building = {
     '%GC_RL_3': {
       prototype: 'rentableLock',
       name: 'Room 203 Lock',
-      description: 'The lock on Room 203, its keyhole worn smooth by decades of use.',
+      description:
+        'The lock on Room 203, its keyhole worn smooth by decades of use.',
       price: 500,
       duration: 2678400000,
     },
@@ -76,7 +79,7 @@ export const building = {
     '%GC_D_4': {
       prototype: 'door',
       name: 'Room 204 Door',
-      description: 'Room 204\'s door, its oak panels darkened with age.',
+      description: "Room 204's door, its oak panels darkened with age.",
       locked: true,
       open: false,
       locks: ['%GC_RL_4'],
@@ -185,7 +188,8 @@ Personal effects are absent, but the room shows signs of occupation at various p
         {
           name: 'an iron bed frame',
           capacity: 2,
-          emptyMsg: 'An iron bed frame sits against the wall, its mattress long since rotted to springs and stuffing.',
+          emptyMsg:
+            'An iron bed frame sits against the wall, its mattress long since rotted to springs and stuffing.',
           occupiedMsg: '%s resting on the bed frame',
         },
         {
@@ -375,7 +379,8 @@ The floor is hexagonal tile, black and white, missing in patches but surprisingl
         {
           name: 'a claw-foot tub',
           capacity: 1,
-          emptyMsg: 'Three claw-foot tubs line the wall, their porcelain stained yellow-brown.',
+          emptyMsg:
+            'Three claw-foot tubs line the wall, their porcelain stained yellow-brown.',
           occupiedMsg: '%s sitting in one of the dry tubs',
         },
       ],
@@ -407,19 +412,21 @@ Crown molding decorates the ceiling, water-stained but intact. This was where bu
         {
           name: 'a rotted settee',
           capacity: 2,
-          emptyMsg: 'A Victorian settee molders against one wall, its velvet rotted to reveal horsehair beneath.',
+          emptyMsg:
+            'A Victorian settee molders against one wall, its velvet rotted to reveal horsehair beneath.',
           occupiedMsg: '%s reclining on the decrepit settee',
         },
         {
           name: 'a cane-seat chair',
           capacity: 1,
-          emptyMsg: 'A spindly chair with a hole in its cane seat sits by the window.',
+          emptyMsg:
+            'A spindly chair with a hole in its cane seat sits by the window.',
           occupiedMsg: '%s perched carefully on the broken chair',
         },
         {
           name: 'an iron bed',
           capacity: 2,
-          emptyMsg: 'A larger iron bed frame occupies the room\'s center.',
+          emptyMsg: "A larger iron bed frame occupies the room's center.",
           occupiedMsg: '%s on the bed',
         },
       ],

@@ -1,5 +1,5 @@
-import { ObjectManager } from '../object-manager.js';
 import type { RuntimeObject } from '../../../types/object.js';
+import type { ObjectManager } from '../object-manager.js';
 
 /**
  * Builds $world object
@@ -16,7 +16,8 @@ export class WorldApiBuilder {
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
 
-    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
+    const aliases =
+      (objectManager.get('aliases') as Record<string, number>) || {};
 
     if (aliases.world) {
       this.world = await this.manager.load(aliases.world);
@@ -42,7 +43,9 @@ export class WorldApiBuilder {
   private addGetAllRoomsMethod(): void {
     if (!this.world) return;
 
-    this.world.setMethod('getAllRooms', `
+    this.world.setMethod(
+      'getAllRooms',
+      `
       // Get all rooms that have coordinates (x, y, z properties)
       const allIds = $.getAllIds();
       const rooms = [];
@@ -69,13 +72,16 @@ export class WorldApiBuilder {
       }
 
       return rooms;
-    `);
+    `,
+    );
   }
 
   private addGetAuthenticatedConnectionsMethod(): void {
     if (!this.world) return;
 
-    this.world.setMethod('getAuthenticatedConnections', `
+    this.world.setMethod(
+      'getAuthenticatedConnections',
+      `
       // Get authenticated connections from the game coordinator
       const gameCoordinator = $.getGameCoordinator();
       if (!gameCoordinator) {
@@ -110,7 +116,8 @@ export class WorldApiBuilder {
       }
 
       return result;
-    `);
+    `,
+    );
   }
 
   async registerAlias(): Promise<void> {

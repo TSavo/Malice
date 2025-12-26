@@ -16,7 +16,7 @@ export enum TestCategory {
   SCENARIO = 'scenario',
   PERFORMANCE = 'performance',
   EDGE_CASE = 'edge',
-  REGRESSION = 'regression'
+  REGRESSION = 'regression',
 }
 
 /**
@@ -29,7 +29,20 @@ export interface AutoTestTemplate {
   setupCode?: string;
   teardownCode?: string;
   assertions: Array<{
-    type: 'equals' | 'throws' | 'exists' | 'notExists' | 'greaterThan' | 'lessThan' | 'contains' | 'matches' | 'type' | 'instanceof' | 'changed' | 'called' | 'notCalled';
+    type:
+      | 'equals'
+      | 'throws'
+      | 'exists'
+      | 'notExists'
+      | 'greaterThan'
+      | 'lessThan'
+      | 'contains'
+      | 'matches'
+      | 'type'
+      | 'instanceof'
+      | 'changed'
+      | 'called'
+      | 'notCalled';
     description: string;
     expression: string;
     expected: unknown;
@@ -44,20 +57,21 @@ export interface AutoTestTemplate {
  * Auto-Test Generator - stub implementation
  */
 export class AutoTestGenerator {
-  constructor() {}
-
   /**
    * Generate comprehensive tests for a method
    * Returns empty stub template - implementation pending
    */
-  generateTest(_methodRelationship: MethodRelationship, complexity: number = 50): AutoTestTemplate {
+  generateTest(
+    _methodRelationship: MethodRelationship,
+    complexity: number = 50,
+  ): AutoTestTemplate {
     return {
       category: TestCategory.UNIT,
       methodName: 'stub',
       testCode: '// Test generation not implemented',
       assertions: [],
       mockObjects: {},
-      complexity
+      complexity,
     };
   }
 }

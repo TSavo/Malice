@@ -3,16 +3,16 @@
  * Each session represents a player connection to the MOO
  */
 
-import { Socket } from 'net';
-import { randomBytes } from 'crypto';
+import { randomBytes } from 'node:crypto';
+import { Socket } from 'node:net';
 
 export interface TelnetSession {
   socket: Socket;
   buffer: string[];
-  log: string[];        // full session log (last 1000 lines)
+  log: string[]; // full session log (last 1000 lines)
   connected: boolean;
   closed: boolean;
-  onData?: (sessionId: string, data: string) => void;  // callback for push notifications
+  onData?: (sessionId: string, data: string) => void; // callback for push notifications
 }
 
 /**
@@ -23,7 +23,7 @@ export class MCPTelnetClient {
 
   constructor(
     private host: string = 'localhost',
-    private port: number = 5555
+    private port: number = 5555,
   ) {}
 
   /**
@@ -31,7 +31,9 @@ export class MCPTelnetClient {
    * Connects to the MOO and returns the welcome message
    * @param onData Optional callback for push notifications when data arrives
    */
-  async connect(onData?: (sessionId: string, data: string) => void): Promise<{ sessionId: string; output: string }> {
+  async connect(
+    onData?: (sessionId: string, data: string) => void,
+  ): Promise<{ sessionId: string; output: string }> {
     // Cryptographically random session ID (32 bytes = 64 hex chars)
     const sessionId = randomBytes(32).toString('hex');
 
@@ -106,7 +108,10 @@ export class MCPTelnetClient {
    * Send a command to an existing session
    * Returns accumulated output after a short wait
    */
-  async send(sessionId: string, text: string): Promise<{ output: string; closed: boolean }> {
+  async send(
+    sessionId: string,
+    text: string,
+  ): Promise<{ output: string; closed: boolean }> {
     const session = this.sessions.get(sessionId);
     if (!session) {
       throw new Error(`Session ${sessionId} not found`);
@@ -116,7 +121,7 @@ export class MCPTelnetClient {
     }
 
     // Send the command with CRLF
-    session.socket.write(text + '\r\n');
+    session.socket.write(`${text}\r\n`);
 
     // Wait for response
     await this.wait(500);
@@ -140,7 +145,12 @@ export class MCPTelnetClient {
   /**
    * Get session status
    */
-  getStatus(sessionId: string): { exists: boolean; connected: boolean; closed: boolean; bufferSize: number } {
+  getStatus(sessionId: string): {
+    exists: boolean;
+    connected: boolean;
+    closed: boolean;
+    bufferSize: number;
+  } {
     const session = this.sessions.get(sessionId);
     if (!session) {
       return { exists: false, connected: false, closed: true, bufferSize: 0 };
@@ -168,7 +178,7 @@ export class MCPTelnetClient {
    * List all active sessions
    */
   listSessions(): string[] {
-    return Array.from(this.sessions.keys()).filter(id => {
+    return Array.from(this.sessions.keys()).filter((id) => {
       const session = this.sessions.get(id);
       return session && !session.closed;
     });
@@ -234,6 +244,6 @@ export class MCPTelnetClient {
    * Wait for a specified time
    */
   private wait(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }

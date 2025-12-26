@@ -1,5 +1,5 @@
-import { ObjectManager } from '../object-manager.js';
 import type { RuntimeObject } from '../../../types/object.js';
+import type { ObjectManager } from '../object-manager.js';
 
 /**
  * Builds Proportional object (dynamic ID)
@@ -32,7 +32,8 @@ export class ProportionalBuilder {
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
 
-    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
+    const aliases =
+      (objectManager.get('aliases') as Record<string, number>) || {};
 
     if (aliases.proportional) {
       this.proportional = await this.manager.load(aliases.proportional);
@@ -65,7 +66,9 @@ export class ProportionalBuilder {
     // - amount=7-13: messages[2] "half"
     // - amount=14-19: messages[3] "mostly full"
     // - amount=20: messages[4] "full"
-    this.proportional.setMethod('sub', `
+    this.proportional.setMethod(
+      'sub',
+      `
       const messages = args[0];
       const amount = args[1];
       const total = args[2];
@@ -113,10 +116,13 @@ export class ProportionalBuilder {
       const index = Math.min(bucketIndex, middleCount - 1) + 1;
 
       return messages[index];
-    `);
+    `,
+    );
 
     // Variant that returns the index instead of the message
-    this.proportional.setMethod('index', `
+    this.proportional.setMethod(
+      'index',
+      `
       const messages = args[0];
       const amount = args[1];
       const total = args[2];
@@ -147,15 +153,19 @@ export class ProportionalBuilder {
       const bucketSize = rangeSize / middleCount;
       const bucketIndex = Math.floor((safeAmount - 1) / bucketSize);
       return Math.min(bucketIndex, middleCount - 1) + 1;
-    `);
+    `,
+    );
 
     // Percentage helper - returns which message for a given percentage (0-100)
-    this.proportional.setMethod('fromPercent', `
+    this.proportional.setMethod(
+      'fromPercent',
+      `
       const messages = args[0];
       const percent = args[1];
 
       return await self.sub(messages, percent, 100);
-    `);
+    `,
+    );
   }
 
   async registerAlias(): Promise<void> {

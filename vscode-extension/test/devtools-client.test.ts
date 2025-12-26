@@ -2,8 +2,8 @@
  * DevTools Client Tests
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import WebSocket, { WebSocketServer } from 'ws';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { WebSocketServer } from 'ws';
 import { DevToolsClient } from '../src/devtools-client';
 
 describe('DevToolsClient', () => {
@@ -17,7 +17,7 @@ describe('DevToolsClient', () => {
     mockServer = new WebSocketServer({ port: TEST_PORT });
 
     // Wait for server to start
-    await new Promise(resolve => mockServer.on('listening', resolve));
+    await new Promise((resolve) => mockServer.on('listening', resolve));
   });
 
   afterEach(async () => {
@@ -25,7 +25,7 @@ describe('DevToolsClient', () => {
       client.close();
     }
 
-    await new Promise(resolve => mockServer.close(resolve));
+    await new Promise((resolve) => mockServer.close(resolve));
   });
 
   describe('Connection', () => {
@@ -35,7 +35,7 @@ describe('DevToolsClient', () => {
       const connectPromise = client.connect();
 
       // Server accepts connection
-      mockServer.once('connection', (ws) => {
+      mockServer.once('connection', (_ws) => {
         // Do nothing, just accept
       });
 
@@ -55,11 +55,13 @@ describe('DevToolsClient', () => {
 
       mockServer.once('connection', (ws) => {
         // Send hello
-        ws.send(JSON.stringify({
-          jsonrpc: '2.0',
-          method: 'server.hello',
-          params: { version: '1.0.0', capabilities: {} },
-        }));
+        ws.send(
+          JSON.stringify({
+            jsonrpc: '2.0',
+            method: 'server.hello',
+            params: { version: '1.0.0', capabilities: {} },
+          }),
+        );
       });
 
       await connectPromise;
@@ -71,7 +73,7 @@ describe('DevToolsClient', () => {
 
     it('should handle connection errors', async () => {
       // Close server before client connects
-      await new Promise(resolve => mockServer.close(resolve));
+      await new Promise((resolve) => mockServer.close(resolve));
 
       client = new DevToolsClient(TEST_URL);
 
@@ -93,11 +95,11 @@ describe('DevToolsClient', () => {
       expect(connectionCount).toBe(1);
 
       // Force disconnect
-      mockServer.clients.forEach(ws => ws.close());
+      mockServer.clients.forEach((ws) => ws.close());
 
       // Wait for reconnect timer (5 seconds)
       await vi.advanceTimersByTimeAsync(5000);
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       expect(connectionCount).toBe(2);
 
@@ -158,17 +160,21 @@ describe('DevToolsClient', () => {
       mockServer.once('connection', (ws) => {
         ws.on('message', (data) => {
           const request = JSON.parse(data.toString());
-          ws.send(JSON.stringify({
-            jsonrpc: '2.0',
-            error: { code: -32601, message: 'Method not found' },
-            id: request.id,
-          }));
+          ws.send(
+            JSON.stringify({
+              jsonrpc: '2.0',
+              error: { code: -32601, message: 'Method not found' },
+              id: request.id,
+            }),
+          );
         });
       });
 
       await connectPromise;
 
-      await expect(client.request('unknown')).rejects.toThrow('Method not found');
+      await expect(client.request('unknown')).rejects.toThrow(
+        'Method not found',
+      );
     });
 
     // Skip: Fake timers with real WebSocket operations causes unhandled promise rejections
@@ -201,7 +207,7 @@ describe('DevToolsClient', () => {
       const requestPromise = client.request('test.method');
 
       // Force disconnect
-      mockServer.clients.forEach(ws => ws.close());
+      mockServer.clients.forEach((ws) => ws.close());
 
       await expect(requestPromise).rejects.toThrow('Connection closed');
     });
@@ -221,15 +227,17 @@ describe('DevToolsClient', () => {
       });
 
       // Send notification from server
-      mockServer.clients.forEach(ws => {
-        ws.send(JSON.stringify({
-          jsonrpc: '2.0',
-          method: 'object.changed',
-          params: { id: 5 },
-        }));
+      mockServer.clients.forEach((ws) => {
+        ws.send(
+          JSON.stringify({
+            jsonrpc: '2.0',
+            method: 'object.changed',
+            params: { id: 5 },
+          }),
+        );
       });
 
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       expect(notifications.length).toBe(1);
       expect(notifications[0].method).toBe('object.changed');
@@ -248,15 +256,17 @@ describe('DevToolsClient', () => {
         handler2Calls.push({ method, params });
       });
 
-      mockServer.clients.forEach(ws => {
-        ws.send(JSON.stringify({
-          jsonrpc: '2.0',
-          method: 'test.notification',
-          params: { value: 123 },
-        }));
+      mockServer.clients.forEach((ws) => {
+        ws.send(
+          JSON.stringify({
+            jsonrpc: '2.0',
+            method: 'test.notification',
+            params: { value: 123 },
+          }),
+        );
       });
 
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       expect(handler1Calls.length).toBe(1);
       expect(handler2Calls.length).toBe(1);
@@ -272,30 +282,34 @@ describe('DevToolsClient', () => {
       });
 
       // Send notification
-      mockServer.clients.forEach(ws => {
-        ws.send(JSON.stringify({
-          jsonrpc: '2.0',
-          method: 'test1',
-          params: {},
-        }));
+      mockServer.clients.forEach((ws) => {
+        ws.send(
+          JSON.stringify({
+            jsonrpc: '2.0',
+            method: 'test1',
+            params: {},
+          }),
+        );
       });
 
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
       expect(calls.length).toBe(1);
 
       // Dispose handler
       disposable.dispose();
 
       // Send another notification
-      mockServer.clients.forEach(ws => {
-        ws.send(JSON.stringify({
-          jsonrpc: '2.0',
-          method: 'test2',
-          params: {},
-        }));
+      mockServer.clients.forEach((ws) => {
+        ws.send(
+          JSON.stringify({
+            jsonrpc: '2.0',
+            method: 'test2',
+            params: {},
+          }),
+        );
       });
 
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
       expect(calls.length).toBe(1); // Should still be 1
     });
   });
@@ -325,7 +339,9 @@ describe('DevToolsClient', () => {
               result = { success: true };
               break;
             case 'method.get':
-              result = { method: { name: request.params.name, code: 'return 1;' } };
+              result = {
+                method: { name: request.params.name, code: 'return 1;' },
+              };
               break;
             case 'method.set':
             case 'method.delete':
@@ -334,22 +350,28 @@ describe('DevToolsClient', () => {
               result = { success: true };
               break;
             case 'property.get':
-              result = { property: { name: request.params.name, value: 'test' } };
+              result = {
+                property: { name: request.params.name, value: 'test' },
+              };
               break;
             default:
-              ws.send(JSON.stringify({
-                jsonrpc: '2.0',
-                error: { code: -32601, message: 'Method not found' },
-                id: request.id,
-              }));
+              ws.send(
+                JSON.stringify({
+                  jsonrpc: '2.0',
+                  error: { code: -32601, message: 'Method not found' },
+                  id: request.id,
+                }),
+              );
               return;
           }
 
-          ws.send(JSON.stringify({
-            jsonrpc: '2.0',
-            result,
-            id: request.id,
-          }));
+          ws.send(
+            JSON.stringify({
+              jsonrpc: '2.0',
+              result,
+              id: request.id,
+            }),
+          );
         });
       });
 
@@ -369,7 +391,11 @@ describe('DevToolsClient', () => {
     });
 
     it('should create object', async () => {
-      const id = await client.createObject(1, { name: 'Test' }, { test: 'code' });
+      const id = await client.createObject(
+        1,
+        { name: 'Test' },
+        { test: 'code' },
+      );
       expect(id).toBe(42);
     });
 
@@ -384,7 +410,9 @@ describe('DevToolsClient', () => {
     });
 
     it('should set method', async () => {
-      await expect(client.setMethod(5, 'test', 'return 2;')).resolves.toBeUndefined();
+      await expect(
+        client.setMethod(5, 'test', 'return 2;'),
+      ).resolves.toBeUndefined();
     });
 
     it('should delete method', async () => {
@@ -397,7 +425,9 @@ describe('DevToolsClient', () => {
     });
 
     it('should set property', async () => {
-      await expect(client.setProperty(5, 'name', 'newValue')).resolves.toBeUndefined();
+      await expect(
+        client.setProperty(5, 'name', 'newValue'),
+      ).resolves.toBeUndefined();
     });
 
     it('should delete property', async () => {
@@ -425,7 +455,7 @@ describe('DevToolsClient', () => {
       await connectPromise;
 
       // Should not crash, just log error
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
     });
 
     it('should close gracefully', async () => {
