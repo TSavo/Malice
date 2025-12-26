@@ -796,39 +796,68 @@ Exits: \${worldContext.room?.exits ? Object.keys(worldContext.room.exits).join('
 ### Conversation Context
 Last spoke to: \${worldContext.lastConversationPartner?.name || 'nobody recently'}
 
-## SENSORY OUTPUT - Use the Right Method
+## SENSORY OUTPUT - Use $emote, $pronoun, and Sensory Methods
 
-CRITICAL: Use sensory methods, NOT just tell(). This matters because:
-- Sensory events get recorded in sensoryHistory (context for future actions)
-- Sensory conditions are respected (blind can't see, deaf can't hear)
-- Perception filters can hook into sensory events
+### $emote - Freeform Actions (PREFERRED for descriptive actions)
+Use \`$.emote.broadcast()\` - it handles verb conjugation, pronouns, AND sensory routing:
 
-**The methods:**
-- \`player.see(message)\` - Visual: what they observe, movements, expressions
-- \`player.hear(message)\` - Audio: sounds, speech, ambient noise
-- \`player.smell(message)\` - Olfactory: scents, odors, smoke
-- \`player.taste(message)\` - Gustatory: flavors when eating/drinking
-- \`player.feel(message)\` - Tactile: touch, pain, temperature, texture
-- \`player.tell(message)\` - Meta/system only: prompts, OOC, errors
+**Syntax:** \`.verb\` = visual, \`,verb\` = audible, \`~verb\` = smell, \`^verb\` = taste
 
-**Examples:**
 \`\`\`javascript
-// WRONG - doesn't record, doesn't respect blindness
-await player.tell("The guard draws his weapon.");
+await $.emote.broadcast('.draw my weapon and .say "Don\\'t move."', player, room);
+// Player sees: "You draw your weapon and say, 'Don't move.'"
+// Guard sees: "Bob draws his weapon and says, 'Don't move.'"
+// Blind guard hears: "Bob says, 'Don't move.'"
+// Deaf guard sees: "Bob draws his weapon and says something."
 
-// RIGHT - records to history, blocked if player is blind
-await player.see("The guard draws his weapon.");
-
-// Sounds go through hear()
-await player.hear("Metal scrapes as the guard draws his weapon.");
-
-// Pain and physical sensation through feel()
-await player.feel("A sharp pain shoots through your wrists as the cuffs bite in.");
-
-// Combine senses for rich description
-await player.see("The guard's eyes narrow.");
-await player.hear("'Going somewhere?' he growls.");
+await $.emote.broadcast('.narrow my eyes and ,growl', guard, room);
+// Sighted+hearing: "Guard narrows his eyes and growls."
+// Blind: "Guard growls."
+// Deaf: "Guard narrows his eyes."
 \`\`\`
+
+### $pronoun - Template Messages (PREFERRED for structured events)
+Use \`$.pronoun.sub()\` or \`$.pronoun.announce()\` for combat, system events, structured actions:
+
+**Codes:** %N=name, %s=he/she, %o=him/her, %p=his/her, %r=himself, %t=item, %d=direct obj
+
+\`\`\`javascript
+// Simple substitution
+const msg = await $.pronoun.sub("%N picks up %t.", player, null, null, item);
+// "Bob picks up the sword."
+
+// Multi-perspective with verb conjugation
+await $.pronoun.announce(room, player, guard, {
+  actor: "You %v{slash} at %t with %i!",
+  target: "%A %v{slash} at you with %i!",
+  others: "%A %v{slash} at %t with %i!"
+}, null, weapon);
+// Player sees: "You slash at Guard with the sword!"
+// Guard sees: "Bob slashes at you with the sword!"
+// Others see: "Bob slashes at Guard with the sword!"
+\`\`\`
+
+### Direct Sensory Methods (for non-action descriptions)
+- \`player.see(msg)\` - Visual (recorded, blocked if blind)
+- \`player.hear(msg)\` - Audio (recorded, blocked if deaf)
+- \`player.feel(msg)\` - Tactile/pain (recorded)
+- \`player.smell(msg)\` - Olfactory (recorded)
+- \`player.taste(msg)\` - Gustatory (recorded)
+- \`player.tell(msg)\` - Meta/system ONLY - NOT recorded, bypasses senses
+
+\`\`\`javascript
+// Internal sensations
+await player.feel("Adrenaline surges through your veins.");
+
+// Environmental (not actions)
+await player.hear("Distant gunfire echoes from the tunnels.");
+await player.see("Shadows flicker in the dim light.");
+\`\`\`
+
+### When to Use What
+- **$emote** - Player/NPC performing visible/audible actions
+- **$pronoun** - Combat hits, system events, structured multi-target messages
+- **Direct sense** - Environmental, internal sensations, ambient description
 
 ## IMMEDIATE RESPONSE - Don't Make Them Wait
 
