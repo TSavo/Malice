@@ -725,10 +725,10 @@ describe('Pluribus System Object', () => {
     expect($.pluribus.name).toBe('Pluribus');
   });
 
-  it('should have systemPrompt property', async () => {
-    expect($.pluribus.systemPrompt).toBeDefined();
-    expect($.pluribus.systemPrompt).toContain('Pluribus');
-    expect($.pluribus.systemPrompt).toContain('infrastructure');
+  it('should have agentSystemPrompt property', async () => {
+    expect($.pluribus.agentSystemPrompt).toBeDefined();
+    expect($.pluribus.agentSystemPrompt).toContain('Pluribus');
+    expect($.pluribus.agentSystemPrompt).toContain('infrastructure');
   });
 
   it('should have empty sensoryHistory initially', async () => {
