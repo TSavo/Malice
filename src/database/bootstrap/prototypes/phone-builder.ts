@@ -18,6 +18,18 @@ export class PhoneBuilder {
         number: null, // phone number string
         phoneDb: null, // reference to phone DB object
         connectedTo: null, // active call target id
+
+        abilities: `Communication device for voice calls and messages.
+
+DIALING: dial(number) looks up target in 'phoneDb', establishes connection, calls target.onIncomingCall().
+
+CONNECTION: 'connectedTo' tracks active call. hangup() ends call, notifies other party via onHangup().
+
+MESSAGING: sendMessage(number, text) sends text to target. Target receives via onMessage().
+
+HOOKS: Subclasses override onIncomingCall(), onHangup(), onMessage() to handle events.
+
+DATABASE: 'phoneDb' references $.phoneDB for number lookups. findPhoneByNumber() resolves targets.`,
       },
       methods: {},
     });
@@ -73,6 +85,10 @@ export class PhoneBuilder {
       const message = args[1];
       await $.tell(self, 'Message from ' + (from.number || from.name || 'unknown') + ': ' + message);
     `);
+
+    obj.setPropertyDescription('number', 'The phone number that can be dialed to reach this phone');
+    obj.setPropertyDescription('phoneDb', 'Reference to the phone database object for number lookups');
+    obj.setPropertyDescription('connectedTo', 'Active call target object ID, or null if no call in progress');
 
     return obj;
   }

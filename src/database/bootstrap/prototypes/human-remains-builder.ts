@@ -37,6 +37,18 @@ export class HumanRemainsBuilder {
         // Contents
         contents: [],
         searched: false,
+
+        abilities: `Desiccated human remains - between corpse and skeleton.
+
+DECAY: Very slow (~6 months). Dried tissue clings to bones, gradually flaking away. At 100% decay, transforms to $.skeletalRemains.
+
+LOOTING: Can still be searched for items. Clothing/gear may have degraded but metal items persist.
+
+AUTOPSY: Limited - mainly bone trauma visible. Soft tissue too degraded for toxicology or stomach contents. Missing limbs detectable. Skill affects bone analysis.
+
+IDENTIFICATION: 'originalName' carries identity from corpse. Visual identification impossible - requires dental records or other forensic methods.
+
+FORENSICS: Bone fractures still visible. Time since death estimated from tissue desiccation. Can determine if limbs were severed vs naturally decomposed.`,
       },
       methods: {},
     });
@@ -330,6 +342,11 @@ export class HumanRemainsBuilder {
     obj.setMethod('canContain', `
       return true;
     `);
+
+    // Add property descriptions
+    obj.setPropertyDescription('originalName', 'Identity carried from corpse stage. Visual identification impossible - requires forensic methods or personal effects.');
+    obj.setPropertyDescription('contents', 'Array containing skeletal body and any items that survived decomposition (metal objects, jewelry). Organic items mostly rotted.');
+    obj.setPropertyDescription('searched', 'Boolean tracking if remains have been searched. Affects description text.');
 
     return obj;
   }

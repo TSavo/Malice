@@ -35,6 +35,26 @@ export class StackableBuilder {
         unit: '',
         // Contraband flag - illegal to possess
         contraband: false,
+
+        abilities: `Commodity that combines and splits. Base for cash, ammo, drugs, scrap.
+
+STACKING: Same 'stackType' items merge automatically. onArrived() finds matching stacks and combines via merge().
+
+SPLITTING: split(amount) peels off quantity into new stack. Integer amounts only.
+
+TYPES: 'stackType' string identifies category (cash:usd, ammo:9mm, drug:synth, scrap:copper).
+
+QUANTITY: 'quantity' is integer count. 'unit' for display (USD, rounds, g, oz).
+
+AUTO-MERGE: When two stacks of same type land in same location, they automatically combine. One stack is recycled.
+
+CONTRABAND: 'contraband' flag marks illegal items. May be searched for, confiscated.
+
+OPERATIONS:
+- add(amount): Increase quantity
+- remove(amount): Decrease quantity, returns success
+- split(amount): Create new stack with portion
+- merge(other): Absorb other stack's quantity`,
       },
       methods: {},
     });
@@ -244,6 +264,12 @@ export class StackableBuilder {
       // If empty, should be recycled by caller
       return { success: true, quantity: self.quantity, empty: self.quantity === 0 };
     `);
+
+    // Add property descriptions
+    obj.setPropertyDescription('stackType', 'Unique identifier for stack category (e.g., "cash:usd", "ammo:9mm", "drug:synth", "scrap:copper"). Stacks auto-merge if types match.');
+    obj.setPropertyDescription('quantity', 'Integer count of items in this stack. Must be positive. Stack is recycled when quantity reaches 0.');
+    obj.setPropertyDescription('unit', 'Display unit for quantity (e.g., "USD", "rounds", "g", "oz"). Used in descriptions and shortDesc.');
+    obj.setPropertyDescription('contraband', 'Boolean flag marking this item as illegal to possess. May be searched for or confiscated by authorities.');
 
     return obj;
   }

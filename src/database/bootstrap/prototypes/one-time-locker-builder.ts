@@ -29,6 +29,23 @@ export class OneTimeLockerBuilder {
         description: 'A bank of storage lockers that support one-time access codes for couriers.',
         // Override rental duration - courier lockers are shorter term (24 hours default)
         rentalDurationMs: 24 * 60 * 60 * 1000,
+
+        abilities: `Locker bank optimized for courier dead-drops. Adds verbs to base $.locker.
+
+VERBS: rent locker, open/close locker [id], set code, get code, check, release, renew, put/get from locker.
+
+COURIER WORKFLOW:
+1. Owner rents locker, sets master code
+2. Owner deposits item, generates one-time code
+3. Owner gives code to courier out-of-band
+4. Courier unlocks with one-time code (consumed on use)
+5. Courier takes item, locker auto-locks
+
+SHORT RENTAL: 24-hour default rental (vs 7-day base). Courier jobs are quick.
+
+PLOT HOOKS: Triggers 'opened', 'closed', 'oneTimeCodeUsed' for story tracking.
+
+VERB REGISTRATION: Registers verbs when placed in room or player enters. Unregisters on leave.`,
       },
       methods: {},
     });
@@ -456,72 +473,8 @@ export class OneTimeLockerBuilder {
       return 'You take ' + foundItem.name + '.';
     `);
 
-    // ═══════════════════════════════════════════════════════════════════
-    // VERB REGISTRATION HOOKS
-    // ═══════════════════════════════════════════════════════════════════
-
-    // registerVerbsFor - register verbs for a player
-    obj.setMethod('registerVerbsFor', `
-      const player = args[0];
-      if (!player || !player.registerVerb) return;
-
-      // Basic verbs (no compartment ID needed)
-      await player.registerVerb(['rent locker', 'rent compartment'], self, 'doRent');
-      await player.registerVerb(['look at locker', 'examine locker', 'look locker'], self, 'doLook');
-
-      // Compartment-specific verbs (compartment ID captured as args[0] via %s)
-      await player.registerVerb(['open locker %s', 'unlock locker %s'], self, 'doOpen');
-      await player.registerVerb(['close locker %s', 'lock locker %s'], self, 'doClose');
-      await player.registerVerb(['set code on locker %s', 'change code on locker %s'], self, 'doSetCode');
-      await player.registerVerb(['get code from locker %s', 'generate code for locker %s'], self, 'doGetCode');
-      await player.registerVerb(['check locker %s', 'status locker %s'], self, 'doCheck');
-      await player.registerVerb(['release locker %s', 'abandon locker %s'], self, 'doRelease');
-      await player.registerVerb(['renew locker %s', 'extend locker %s'], self, 'doRenew');
-      await player.registerVerb(['look at locker %s', 'examine locker %s', 'look locker %s'], self, 'doLook');
-
-      // Put/get verbs
-      // Note: %s must be the last token, so "get <thing> from locker <id>" is not currently expressible.
-      // Instead we prompt you to pick an item after identifying the compartment.
-      await player.registerVerb(['put %i in locker %s', 'place %i in locker %s'], self, 'doPut');
-      await player.registerVerb(['get from locker %s', 'take from locker %s'], self, 'doGet');
-
-    `);
-
-    // onArrived - register verbs when placed in room
-    obj.setMethod('onArrived', `
-      const dest = args[0];
-      const source = args[1];
-      const mover = args[2];
-
-      if (dest && dest.contents) {
-        for (const obj of dest.contents) {
-          if (obj && obj.isPlayer && obj.registerVerb) {
-            await self.registerVerbsFor(obj);
-          }
-        }
-      }
-    `);
-
-    // onLeaving - unregister verbs when leaving
-    obj.setMethod('onLeaving', `
-      const source = args[0];
-      const dest = args[1];
-      const mover = args[2];
-
-      if (source && source.contents) {
-        for (const obj of source.contents) {
-          if (obj && obj.isPlayer && obj.unregisterVerbsFrom) {
-            await obj.unregisterVerbsFrom(self.id);
-          }
-        }
-      }
-    `);
-
-    // onPlayerArrived - register verbs when player enters room
-    obj.setMethod('onPlayerArrived', `
-      const player = args[0];
-      await self.registerVerbsFor(player);
-    `);
+    // Property descriptions
+    obj.setPropertyDescription('rentalDurationMs', 'Rental period in milliseconds (24 hours for courier lockers vs 7 days for base)');
 
     return obj;
   }

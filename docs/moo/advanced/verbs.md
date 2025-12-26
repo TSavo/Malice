@@ -2,6 +2,32 @@
 
 Understanding Malice's dynamic per-player verb registration system.
 
+> **⚠️ ABILITIES-FIRST ARCHITECTURE**
+>
+> **Most game interactions should NOT use registered verbs.**
+>
+> Malice uses an abilities-first paradigm where the AI narrator interprets player intent by reading object abilities (prose physics). Verb registration is reserved for **infrastructure only**.
+>
+> **Only these verbs should be coded:**
+> ```
+> MOVEMENT:    north, south, east, west, up, down, enter, exit
+> PERCEPTION:  look, glance
+> SOCIAL:      say, whisper, shout, emote, to
+> META:        quit, who, help, inventory, exits, stand, sit
+> ```
+>
+> **Everything else goes through the AI:**
+> - "eat the apple" → AI reads edible abilities
+> - "wear the jacket" → AI reads wearable abilities
+> - "unlock the door" → AI reads lock abilities
+> - "pick up the gun" → AI reads hand/weight abilities
+>
+> See `docs/ABILITIES-FIRST.md` for the full architecture.
+>
+> **The information below is retained for infrastructure verbs only.**
+
+---
+
 ## Purpose
 
 Verbs in Malice are **dynamically registered per-player** based on context. Only commands that are actually available appear in tab completion and help. When you pick up an item, its verbs become available. When you drop it, they disappear.

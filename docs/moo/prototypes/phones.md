@@ -1,5 +1,7 @@
 # Phone System
 
+> **Abilities-First**: Phones use abilities to describe calling, texting, and features. The AI interprets "call someone" actions. See `docs/ABILITIES-FIRST.md`.
+
 Voice calls and text messaging.
 
 ## Overview

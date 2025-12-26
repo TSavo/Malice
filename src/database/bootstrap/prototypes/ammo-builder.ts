@@ -25,18 +25,34 @@ export class AmmoBuilder {
       properties: {
         name: 'Ammunition',
         description: 'A quantity of ammunition.',
-        
+
         // What type of ammo (must match gun.ammoType)
         ammoType: 'generic',
-        
+
         // Inherits quantity from stackable
         // quantity: 0,
-        
+
         // Display unit
         unit: 'rounds',
-        
+
         // Ammo is often contraband
         contraband: false,
+
+        abilities: `Stackable commodity - cartridges for firearms.
+
+STACKING: Ammo of same 'ammoType' stacks together. 'quantity' tracks count.
+
+LOADING: Put ammo into magazine or directly into gun. Consumed when loaded (quantity decreases or object recycled).
+
+COMPATIBILITY: 'ammoType' must match weapon's ammoType. 9mm != .45. Wrong ammo won't fit.
+
+TYPES: 9mm, .38, .44, .45, .22, .380, .308, .30-30, 12gauge, etc. Each for specific weapon classes.
+
+CONTRABAND: 'contraband' flag if illegal to possess. May be searched for, confiscated.
+
+WEIGHT: Bullets are heavy in quantity. 1000 rounds = significant weight.
+
+EXPOSED: Loose ammo can be damaged by water, fire. Store in sealed containers.`,
       },
       methods: {},
     });
@@ -60,20 +76,24 @@ export class AmmoBuilder {
     obj.setMethod('describe', `
       const qty = self.quantity || 0;
       const type = self.ammoType || 'generic';
-      
+
       let desc = self.name || 'Ammunition';
       desc += '\\r\\n' + qty + ' rounds of ' + type + ' ammunition.';
-      
+
       if (self.description && self.description !== 'A quantity of ammunition.') {
         desc += '\\r\\n' + self.description;
       }
-      
+
       if (self.contraband) {
         desc += '\\r\\n[CONTRABAND]';
       }
-      
+
       return desc;
     `);
+
+    obj.setPropertyDescription('ammoType', 'The caliber or type of ammunition (e.g., 9mm, .45, 12gauge). Must match weapon ammoType.');
+    obj.setPropertyDescription('unit', 'Display unit for this ammo type (rounds, shells, etc.).');
+    obj.setPropertyDescription('contraband', 'Whether this ammunition is illegal to possess.');
 
     return obj;
   }

@@ -28,6 +28,21 @@ export class WoundBuilder {
       properties: {
         name: 'Wound',
         description: 'A wound.',
+        abilities: `Physical injury that exists on a body part. Wounds have complex lifecycle physics:
+
+BLEEDING: Wounds bleed based on type, depth, and severity. Cuts and lacerations bleed more than bruises or burns. Deep wounds bleed more than superficial ones. Arterial bleeding is severe and life-threatening. Blood loss drains both hydration (blood is mostly water) and calories (blood carries nutrients and energy). Bleeding naturally slows over time as blood clots form. Bandaging accelerates clotting. Stitching nearly stops bleeding for cuts. Movement or aggravation can reopen wounds and restart bleeding.
+
+PAIN: Wounds cause pain proportional to their severity and type. Burns hurt the most, followed by fractures and lacerations. Pain pulses periodically, not constantly. As wounds heal, pain gradually subsides. Infection increases pain. Examining or touching the wound causes sharp pain. Severe pain can impair function of the affected body part.
+
+INFECTION: Uncleaned wounds risk infection over time, especially deep or penetrating wounds. Dirty causes (bites, claws, dirty weapons) vastly increase infection risk. Infected wounds show inflammation, pus, discoloration, and increased pain. Infection severity progresses if untreated. Severe infections become septic, spreading throughout the body and threatening life. Cleaning wounds reduces or eliminates infection. Bandages protect against new infection. Antibiotics treat established infections.
+
+HEALING: Clean wounds heal naturally over time. Dirty wounds do not heal - they fester until cleaned. Bandaging accelerates healing by protecting the wound. Stitching accelerates healing for cuts by holding edges together. Deep wounds heal slower than shallow ones. Active bleeding prevents healing. Infection drastically slows healing. Fully healed wounds (100% progress) disappear from the body part.
+
+TREATMENT: Wounds can be cleaned with water, antiseptic, or medical supplies. Quality of cleaning determines effectiveness. Bandages can be applied to stop bleeding and protect wounds. Cloth strips work but sterile gauze is better. Cuts and lacerations can be stitched closed with needle and thread. Skill affects outcome - poor stitching causes pain. Medical treatment (surgery, antibiotics) can treat severe wounds or infections.
+
+FORENSICS: Wounds preserve evidence of how they were inflicted. The type and pattern reveal the weapon or cause. Age can be estimated from clotting, healing, and tissue changes. Treatment history is visible (stitches, bandage remnants, cleaning). Infection and decay can obscure details. Skilled examiners extract more information. Useful for autopsies and investigations.
+
+AGGRAVATION: Physical stress, impacts, or movement can aggravate healing wounds. Aggravation increases bleeding and pain, reverses healing progress, and can knock off bandages. Fighting while wounded risks aggravation. Strenuous activity on injured limbs aggravates wounds.`,
         // Wound type: cut, bruise, puncture, burn, laceration, abrasion, fracture
         type: 'cut',
         // Severity 0-100 (minor scrape to life-threatening)
@@ -582,6 +597,24 @@ export class WoundBuilder {
     obj.setMethod('describe', `
       return self.description || await self.generateDescription();
     `);
+
+    // Property descriptions
+    obj.setPropertyDescription('type', 'Wound type: cut, bruise, puncture, burn, laceration, abrasion, or fracture');
+    obj.setPropertyDescription('severity', 'Wound severity 0-100 (0=minor scrape, 100=life-threatening)');
+    obj.setPropertyDescription('depth', 'Wound depth: superficial, shallow, deep, or penetrating (affects healing time and infection risk)');
+    obj.setPropertyDescription('bodyPart', 'Reference to the body part this wound is on');
+    obj.setPropertyDescription('bleeding', 'Bleeding rate 0-100 (0=not bleeding, 100=arterial)');
+    obj.setPropertyDescription('infected', 'Whether the wound is infected');
+    obj.setPropertyDescription('infectionSeverity', 'Infection severity 0-100');
+    obj.setPropertyDescription('infectionType', 'Infection type: bacterial, necrotic, or septic');
+    obj.setPropertyDescription('healingProgress', 'Healing progress 0-100 (100=fully healed, wound removed)');
+    obj.setPropertyDescription('cleaned', 'Whether the wound has been cleaned/disinfected');
+    obj.setPropertyDescription('bandaged', 'Whether the wound has been bandaged');
+    obj.setPropertyDescription('stitched', 'Whether the wound has been stitched closed (for deep cuts)');
+    obj.setPropertyDescription('painLevel', 'Pain level 0-100');
+    obj.setPropertyDescription('inflictedTick', 'Game tick when the wound was inflicted (for age calculations)');
+    obj.setPropertyDescription('cause', 'What caused the wound: blade, blunt, claw, bite, fire, acid, or dirty (for autopsy/forensics)');
+    obj.setPropertyDescription('attacker', 'Reference to the entity that inflicted the wound (if any)');
 
     return obj;
   }

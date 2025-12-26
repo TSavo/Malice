@@ -5,173 +5,55 @@ import type { RuntimeObject } from '../../../../types/object.js';
  * Builds the BiometricLock prototype
  * Scans body parts for authorization.
  *
- * Inherits from Lock.
+ * ABILITIES-FIRST ARCHITECTURE:
+ * - Inherits verifiedUsers from Lock
+ * - Adds biometric scan requirements as properties
+ * - Abilities describe the scanning and authorization process
+ * - AI interprets abilities to determine access
  *
  * Properties:
- * - authorizedUsers: Map of target (e.g., floor number) to array of authorized player objects
- *   Example: { 1: [player1, player2], 35: [adminPlayer] }
- * - scanners: Array of scan requirements
- *   Example: [
- *     { type: 'retinal', part: 'eye', message: 'Retinal scan failed.' },
- *     { type: 'fingerprint', part: 'hand', message: 'Fingerprint scan failed.' }
- *   ]
- * - allowedFaction: string - Faction name that can access this lock (null = no faction restriction)
- * - factionDenyMessage: string - Custom message shown when faction check fails
- * - legacy fields (scannerType, requiredBodyPart) are still supported for single-scan configs
- *
- * Methods:
- * - canAccess(agent, target): Checks faction, then required scans and authorization
+ * - verifiedUsers: (inherited) Array of player objects authorized
+ * - scanType: Type of biometric scan (retinal, fingerprint, palm, etc.)
+ * - scanLocation: Where to present for scanning (e.g., "right side of door")
  */
- export class BiometricLockBuilder {
-   constructor(private manager: ObjectManager) {}
- 
-   async build(lockId: number): Promise<RuntimeObject> {
-     const parentObj = await this.manager.load(lockId);
-      const obj = await this.manager.create({
-        parent: parentObj!,
-        properties: {
-          name: 'Biometric Lock',
-          description: 'A biometric scanner with a red LED.',
-          authorizedUsers: {}, // { target: [player objects] }
-          scannerType: 'retinal', // legacy single-scan type
-          requiredBodyPart: 'eye', // legacy single-scan part
-          scanners: [], // preferred multi-scan config: [{ type, part, message? }]
-          allowedFaction: null, // Faction name that can access this lock (null = no faction restriction)
-          factionDenyMessage: null, // Custom message shown when faction check fails
-        },
-        methods: {},
-      });
- 
-      obj.setMethod('canAccess', `
-        /** Check if agent can access target via faction check, then biometric scan.
-         *  @param agent - The agent requesting access
-         *  @param target - The target (floor number, room, etc.)
-         *  @returns true to allow, or rejection string to deny
-         */
-        const agent = args[0];
-        const target = args[1];
+export class BiometricLockBuilder {
+  constructor(private manager: ObjectManager) {}
 
-        // Check faction restriction first (runs before biometric scans)
-        const allowedFaction = self.allowedFaction;
-        if (allowedFaction) {
-          const faction = await $.faction;
-          if (!faction) {
-            return 'Access control unavailable.';
-          }
+  async build(lockId: number): Promise<RuntimeObject> {
+    const parentObj = await this.manager.load(lockId);
+    const obj = await this.manager.create({
+      parent: parentObj!,
+      properties: {
+        name: 'Biometric Lock',
+        description: 'A biometric scanner with a red LED.',
+        scanType: 'fingerprint',
+        scanLocation: 'beside the door',
+        abilities: `Biometric scanner that reads fingerprints/retinas/palms. LED glows red when locked, green when access granted.
 
-          const agentFaction = await faction.getFaction(agent);
-          if (agentFaction !== allowedFaction) {
-            return self.factionDenyMessage || ('Access denied. ' + allowedFaction + ' personnel only.');
-          }
+AUTHORIZATION: Player must be in 'verifiedUsers' array. Check if player object is present in the array.
 
-          // If faction matches, still run biometric scans (security layering)
-          // Falls through to scan checks below
-        }
+SCANNING: Player must have the appropriate body part uncovered. Gloves block fingerprint scans. Eyewear may block retinal scans. The 'scanType' property indicates what kind of scan.
 
-         // Helper: check a single scan requirement (including coverage)
-         const runScan = async (scan) => {
-          const requiredPart = scan?.part || self.requiredBodyPart;
-          if (!requiredPart) return true;
- 
-          const parts = agent.bodyParts || {};
-          let matchedPart = null;
-          for (const partName in parts) {
-            const part = parts[partName];
-            if (part && part.partType === requiredPart) {
-              matchedPart = part;
-              break;
-            }
-          }
- 
-          if (!matchedPart) {
-            return scan?.message || 'Biometric scan failed: missing required body part.';
-          }
- 
-          // Check for clothing/coverage blocking the scan
-          let wornItems = [];
-          if (matchedPart.getWornItems) {
-            wornItems = await matchedPart.getWornItems();
-          } else if (Array.isArray(matchedPart.worn)) {
-            wornItems = matchedPart.worn.filter(item => item);
-          }
- 
-          if (wornItems.length > 0) {
-            const outermost = wornItems[wornItems.length - 1];
-            const blockerName = outermost?.name || 'clothing';
-            return scan?.message || ('Biometric scan blocked by ' + blockerName + '.');
-          }
- 
-          return true;
-        };
- 
-        // Determine scans to run (prefer scanners[]; else legacy single scan)
-        const scans = (self.scanners && self.scanners.length > 0)
-          ? self.scanners
-          : [{ type: self.scannerType, part: self.requiredBodyPart }];
- 
-        for (const scan of scans) {
-          const result = await runScan(scan);
-          if (result !== true) {
-            return result;
-          }
-        }
- 
-        // Check authorization list for this target
-        const authMap = self.authorizedUsers || {};
-        const authorized = authMap[target];
- 
-        // If no list exists for this target, treat as unlocked after scans
-        if (authorized === undefined) {
-          return true;
-        }
- 
-        if (!Array.isArray(authorized) || authorized.length === 0) {
-          return 'Access denied. Biometric signature not recognized.';
-        }
- 
-        if (!authorized.some(user => user === agent)) {
-          return 'Access denied. Biometric signature not recognized.';
-        }
- 
-        return true; // Authorized
+BYPASS: Cannot be picked like a mechanical lock. Can potentially be bypassed with severed authorized body parts (grim but possible). Electronics can be hacked with appropriate tools/skills.`,
+      },
+      methods: {},
+    });
 
-     `);
+    // Add property descriptions
+    obj.setPropertyDescription('scanType', "Type of biometric scan: fingerprint, retinal, palm, voice. Determines what body part player needs.");
+    obj.setPropertyDescription('scanLocation', "Physical location of the scanner for player reference.");
 
+    // Inherits isAuthorized, authorize, revoke from $lock
+    // AI interprets abilities to determine if scanning succeeds
 
-    obj.setMethod('authorize', `
-      /** Add a user to the authorized list for a target.
-       *  @param user - Player object to authorize
-       *  @param target - Target (floor, room, etc.)
-       */
-      const user = args[0];
-      const target = args[1];
-
-      const auth = self.authorizedUsers || {};
-      if (!auth[target]) {
-        auth[target] = [];
+    // Legacy canAccess - simplified, just checks verifiedUsers
+    // AI handles the biometric scan requirements via abilities
+    obj.setMethod('canAccess', `
+      const agent = args[0];
+      if (await self.isAuthorized(agent)) {
+        return true;
       }
-      
-      // Add if not already present
-      if (!auth[target].some(u => u === user)) {
-        auth[target].push(user);
-      }
-      
-      self.authorizedUsers = auth;
-    `);
-
-    obj.setMethod('revoke', `
-      /** Remove a user from the authorized list for a target.
-       *  @param user - Player object to revoke
-       *  @param target - Target (floor, room, etc.)
-       */
-      const user = args[0];
-      const target = args[1];
-
-      const auth = self.authorizedUsers || {};
-      if (!auth[target]) return;
-
-      auth[target] = auth[target].filter(u => u !== user);
-      self.authorizedUsers = auth;
+      return 'Access denied. Biometric signature not recognized.';
     `);
 
     return obj;

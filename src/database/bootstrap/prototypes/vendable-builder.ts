@@ -3,7 +3,12 @@ import type { RuntimeObject } from '../../../../types/object.js';
 
 /**
  * Vendable: a vending container that sells items in its contents.
- * Uses $.prompt for selection/confirmation, $.bank for payment, and $.recycler to issue receipts.
+ *
+ * ABILITIES-FIRST ARCHITECTURE:
+ * - Abilities describe how vending works as prose for AI interpretation
+ * - AI reads available items via getAvailableItems(), picks one, calls buyItem()
+ * - Legacy vend() with $.prompt still works for direct interaction
+ * - Payment handled via $bank (credits) or $cash (physical money)
  */
 export class VendableBuilder {
   constructor(private manager: ObjectManager) {}
@@ -25,9 +30,35 @@ export class VendableBuilder {
          spawnables: [], // [{ protoId, price, name, properties, randomize, autoNumber, numberPrefix }]
                          // randomize: { propertyName: [option1, option2, ...] } - picks random value
          phoneDb: null, // optional phone directory to use for phone sales
+         // Abilities - vending physics for AI interpretation
+         abilities: `Automated vendor that dispenses items for payment.
+
+BROWSING: Check 'contents' for physical items in stock, 'spawnables' for items created on demand. Each has a price. Use getAvailableItems() to get full list with prices.
+
+PAYMENT MODES: Check 'currency' property to see how this vendor accepts payment:
+- 'credits': Uses $bank. Transfers from buyer's bank account to vendor's 'bankAccount'. Legal, traceable.
+- 'cash': Uses $cash. Takes physical dollars from buyer, gives to 'operator' (or machine keeps it). Contraband, anonymous.
+
+TO BUY: Call buyItem(buyer, itemNameOrIndex) with the buyer and what they want. Handles payment automatically based on 'currency' setting. Returns { success, item, message } or { success: false, error }.
+
+CHECKING FUNDS: Before buying, AI can verify buyer has funds:
+- Credits: $bank.getAccountByOwner(buyer) then check balance
+- Cash: $cash.has(buyer, price)
+
+MANAGEMENT: Owner can stock items, set prices, configure spawnables. Requires passing any 'locks' on the machine.
+
+SPAWNABLES: Some vendors create items on demand from templates. These never run out but are created fresh each purchase.`,
        },
        methods: {},
      });
+
+    // Add property descriptions
+    obj.setPropertyDescription('contents', "Physical items currently in stock. Each can be purchased once.");
+    obj.setPropertyDescription('spawnables', "Templates for items created on demand. Never runs out.");
+    obj.setPropertyDescription('currency', "'credits' for bank transfer, 'cash' for physical money.");
+    obj.setPropertyDescription('defaultPrice', "Price for items without individual pricing.");
+    obj.setPropertyDescription('bankAccount', "Account ID receiving credit payments.");
+    obj.setPropertyDescription('operator', "Agent receiving cash payments (or null = machine keeps it).");
 
 
     obj.setMethod('listItems', `
@@ -46,6 +77,172 @@ export class VendableBuilder {
       return out.trim();
     `);
 
+    // AI-callable: get structured list of available items
+    obj.setMethod('getAvailableItems', `
+      /** Get all items available for purchase with prices.
+       *  Use this to see what can be bought before calling buyItem().
+       *  @returns Array of { index, name, price, type: 'stock'|'spawnable' }
+       */
+      const currency = self.currency || 'credits';
+      const contents = self.contents || [];
+      const spawnables = self.spawnables || [];
+      const items = [];
+
+      for (let i = 0; i < contents.length; i++) {
+        const item = contents[i];
+        if (!item) continue;
+        const price = item.price ?? self.defaultPrice ?? 0;
+        items.push({
+          index: i + 1,
+          name: item.name || 'Item',
+          price,
+          priceDisplay: currency === 'cash' ? '$' + price : price + ' credits',
+          type: 'stock',
+        });
+      }
+
+      for (let i = 0; i < spawnables.length; i++) {
+        const spawn = spawnables[i];
+        const price = spawn.price ?? self.defaultPrice ?? 0;
+        items.push({
+          index: contents.length + i + 1,
+          name: spawn.name || 'Item',
+          price,
+          priceDisplay: currency === 'cash' ? '$' + price : price + ' credits',
+          type: 'spawnable',
+        });
+      }
+
+      return items;
+    `);
+
+    // AI-callable: purchase a specific item by name or index
+    obj.setMethod('buyItem', `
+      /** Purchase a specific item from this vendor.
+       *  Handles payment automatically based on currency setting.
+       *  @param buyer - The agent making the purchase
+       *  @param selection - Item name (string) or index number
+       *  @returns { success, item, message } or { success: false, error }
+       */
+      const buyer = args[0];
+      const selection = args[1];
+
+      if (!buyer) return { success: false, error: 'No buyer specified.' };
+      if (selection === undefined) return { success: false, error: 'No item specified.' };
+
+      const currency = self.currency || 'credits';
+      const bank = self.bank || $.bank || null;
+      const account = self.bankAccount;
+      const contents = self.contents || [];
+      const spawnables = self.spawnables || [];
+
+      // Build unified item list
+      const saleItems = [];
+      for (let i = 0; i < contents.length; i++) {
+        const item = contents[i];
+        if (!item) continue;
+        saleItems.push({ type: 'existing', item, price: item.price ?? self.defaultPrice ?? 0, index: i });
+      }
+      for (let i = 0; i < spawnables.length; i++) {
+        const spawn = spawnables[i];
+        saleItems.push({ type: 'spawn', spawn, price: spawn.price ?? self.defaultPrice ?? 0, index: i, name: spawn.name || 'Item' });
+      }
+
+      if (!saleItems.length) return { success: false, error: 'Out of stock.' };
+
+      // Find the requested item
+      let selected = null;
+      if (typeof selection === 'number') {
+        // By index (1-based)
+        if (selection >= 1 && selection <= saleItems.length) {
+          selected = saleItems[selection - 1];
+        }
+      } else if (typeof selection === 'string') {
+        // By name (case-insensitive partial match)
+        const searchLower = selection.toLowerCase();
+        selected = saleItems.find(s => {
+          const name = s.type === 'spawn' ? s.name : (s.item?.name || '');
+          return name.toLowerCase().includes(searchLower);
+        });
+      }
+
+      if (!selected) return { success: false, error: 'Item not found: ' + selection };
+
+      const price = selected.price;
+      const label = selected.type === 'spawn' ? selected.name : (selected.item?.name || 'item');
+      const priceStr = currency === 'cash' ? '$' + price : price + ' credits';
+
+      // Process payment
+      if (currency === 'credits') {
+        if (!bank || !account) return { success: false, error: 'Vendor not configured for credit payments.' };
+        const buyerAccounts = await bank.getAccountByOwner(buyer);
+        if (!buyerAccounts || !buyerAccounts.length) return { success: false, error: 'You have no bank account.' };
+        const buyerAccountId = buyerAccounts[0].accountId;
+        const tx = await bank.transfer(buyerAccountId, account, price, 'vend-' + Date.now(), 'Vending purchase');
+        if (!tx?.success) return { success: false, error: tx?.error || 'Payment failed.' };
+      } else {
+        if (!$cash) return { success: false, error: 'Cash system unavailable.' };
+        const takeResult = await $cash.take(buyer, price);
+        if (!takeResult.success) return { success: false, error: takeResult.message };
+        const operator = self.operator;
+        if (operator) {
+          await $cash.give(operator, price);
+        }
+      }
+
+      // Deliver the item
+      let deliveredItem = null;
+
+      if (selected.type === 'existing') {
+        const { item, index } = selected;
+        const newContents = [...contents];
+        newContents.splice(index, 1);
+        self.contents = newContents;
+        deliveredItem = item;
+      } else {
+        const spawn = selected.spawn;
+        const protoId = spawn.protoId || spawn.prototype || null;
+        if (!protoId) return { success: false, error: 'Spawn config missing prototype.' };
+        if (!$.recycler) return { success: false, error: 'Spawner unavailable.' };
+        const properties = { ...(spawn.properties || {}) };
+
+        // Apply randomized properties
+        const randomize = spawn.randomize || {};
+        for (const key of Object.keys(randomize)) {
+          const options = randomize[key];
+          if (Array.isArray(options) && options.length > 0) {
+            properties[key] = options[Math.floor(Math.random() * options.length)];
+          }
+        }
+
+        // Auto-assign phone number if requested
+        if (spawn.autoNumber && self.phoneDb) {
+          const db = self.phoneDb;
+          if (!db || !db.register) return { success: false, error: 'Phone directory unavailable.' };
+          const prefix = spawn.numberPrefix || '';
+          const number = prefix + Math.floor(Math.random() * 1_000_000_000).toString().padStart(9, '0');
+          properties.number = number;
+          properties.phoneDb = db;
+          deliveredItem = await $.recycler.create({ parent: protoId, properties }, buyer);
+          await db.register(number, deliveredItem);
+        } else {
+          deliveredItem = await $.recycler.create({ parent: protoId, properties }, buyer);
+        }
+      }
+
+      if (!deliveredItem) return { success: false, error: 'Delivery failed.' };
+
+      // Move to buyer
+      await deliveredItem.moveTo(buyer);
+
+      return {
+        success: true,
+        item: deliveredItem,
+        message: 'You buy ' + (deliveredItem.name || 'the item') + ' for ' + priceStr + '.',
+      };
+    `);
+
+    // Legacy interactive vend - still works for direct "use vending machine" interaction
     obj.setMethod('vend', `
       const buyer = args[0];
       if (!buyer) return 'No buyer specified.';
@@ -109,16 +306,16 @@ export class VendableBuilder {
         const tx = await bank.transfer(buyerAccountId, account, price, \`vend-\${Date.now()}\`, 'Vending purchase');
         if (!tx?.success) return tx?.error || 'Payment failed.';
       } else {
-        // Cash payment via $.cash utility
-        if (!$.cash) return 'Cash system unavailable.';
-        
-        const takeResult = await $.cash.take(buyer, price);
+        // Cash payment via $cash utility
+        if (!$cash) return 'Cash system unavailable.';
+
+        const takeResult = await $cash.take(buyer, price);
         if (!takeResult.success) return takeResult.message;
-        
+
         // Give cash to operator if configured
         const operator = self.operator;
         if (operator) {
-          await $.cash.give(operator, price);
+          await $cash.give(operator, price);
         }
         // If no operator, cash is burned (machine keeps it)
       }

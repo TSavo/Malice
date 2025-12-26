@@ -1,5 +1,7 @@
 # Weapon Prototypes
 
+> **Abilities-First**: Weapons use abilities to describe combat physics, handling, and damage. The AI narrator interprets combat actions by reading weapon abilities. See `docs/ABILITIES-FIRST.md`.
+
 Weapons are objects that can be used in combat. They define skill, damage, and damage type properties that are used by the combat system.
 
 ## Base Weapon (`$weapon`)

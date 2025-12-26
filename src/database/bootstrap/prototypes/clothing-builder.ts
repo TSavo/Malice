@@ -42,20 +42,35 @@ export class ClothingBuilder {
         condition: 100, // 0-100, degrades with wear
         // Pockets - array of $.pocket ObjRefs (empty by default)
         pockets: [],
+
+        abilities: `Wearable fabric garment for covering body.
+
+WEARING: doWear(player) equips on body. doRemove(player) takes off and places in hand or drops.
+
+MATERIAL: 'material' (cotton, wool, leather, synthetic) affects warmth, durability, water resistance.
+
+COLOR: 'color' for appearance. Can be dyed/stained. Blood stains are incriminating.
+
+CONDITION: 'condition' (0-100) degrades with wear and damage. Ragged clothing provides less warmth. Can be repaired.
+
+POCKETS: 'pockets' array contains $.pocket objects. Pockets store small items. Access via getPocket(name).
+
+CONCEALMENT: Items in pockets are hidden from casual observation. Searched to find.
+
+BLOOD/STAINS: Combat can stain clothing. Evidence of violence. Wash or destroy to remove.
+
+FIRE: Most fabrics burn. Fire damage destroys clothing, may injure wearer.`,
       },
       methods: {},
     });
 
-    // The wear verb - registered when clothing is held
+    // Wear this clothing item (AI calls this directly)
     obj.setMethod('doWear', `
       /** Wear this clothing item.
-       *  Called by the verb system when player types 'wear <item>'.
-       *  Args from verb pattern 'wear %t':
-       *    args[0] = handler (the clothing, same as self) - from %t
-       *  Direct variables:
-       *    player = the player executing the command
+       *  @param wearer - The agent wearing the item (defaults to player)
+       *  @returns Message string or error
        */
-      const wearer = player;
+      const wearer = args[0] || player;
 
       if (!wearer) {
         return 'Wear what?';
@@ -68,16 +83,6 @@ export class ClothingBuilder {
         return result.error || 'You cannot wear that.';
       }
 
-      // Unregister the wear verb from the wearer
-      if (wearer.unregisterVerbsFrom) {
-        await wearer.unregisterVerbsFrom(self.id);
-      }
-
-      // Register the remove verb
-      if (wearer.registerVerb) {
-        await wearer.registerVerb(['remove ' + self.name, 'take off ' + self.name, 'remove %t', 'take off %t'], self, 'doRemove');
-      }
-
       // Announce to room with proper message structure
       const location = wearer.location || null;
       if (location && location.announce) {
@@ -88,16 +93,13 @@ export class ClothingBuilder {
       return result.message;
     `);
 
-    // The remove verb - registered when clothing is worn
+    // Remove clothing - AI calls this directly
     obj.setMethod('doRemove', `
       /** Remove this clothing item.
-       *  Called by the verb system when player types 'remove <item>'.
-       *  Args from verb pattern 'remove %t':
-       *    args[0] = handler (the clothing, same as self) - from %t
-       *  Direct variables:
-       *    player = the player executing the command
+       *  @param wearer - The agent removing the item (defaults to player)
+       *  @returns Message string or error
        */
-      const wearer = player;
+      const wearer = args[0] || player;
 
       if (!wearer) {
         return 'Remove what?';
@@ -108,11 +110,6 @@ export class ClothingBuilder {
 
       if (!result.success) {
         return result.error || 'You cannot remove that.';
-      }
-
-      // Unregister the remove verb
-      if (wearer.unregisterVerbsFrom) {
-        await wearer.unregisterVerbsFrom(self.id);
       }
 
       // Move clothing to wearer's hand
@@ -145,11 +142,6 @@ export class ClothingBuilder {
         }
       }
 
-      // Register the wear verb again (via onArrived or manually)
-      if (wearer.registerVerb) {
-        await wearer.registerVerb(['wear ' + self.name, 'put on ' + self.name, 'wear %t', 'put on %t'], self, 'doWear');
-      }
-
       // Announce to room with proper message structure
       const loc = wearer.location || null;
       if (loc && loc.announce) {
@@ -160,46 +152,26 @@ export class ClothingBuilder {
       return result.message;
     `);
 
-    // Register wear verb when clothing arrives in a player's hand
+    // Hook called when clothing arrives somewhere
     obj.setMethod('onArrived', `
       /** Called when this clothing arrives somewhere.
-       *  Registers wear verb when arriving in a hand.
+       *  Can be used for location-based effects.
        */
       const dest = args[0];
       const source = args[1];
       const mover = args[2];
-
-      // If arriving in a body part (hand) that has an owner
-      if (dest && dest.owner) {
-        const owner = dest.owner;
-        if (owner && owner.registerVerb) {
-          // Only register wear if not already worn
-          if (!self.wornBy) {
-            await owner.registerVerb(['wear ' + self.name, 'put on ' + self.name, 'wear %t', 'put on %t'], self, 'doWear');
-          }
-        }
-      }
-
-      // If arriving in a room, players in the room can see it
-      // but need to pick it up first to wear it
+      // No verb registration - AI handles wear/remove commands directly
     `);
 
-    // Unregister verbs when leaving
+    // Hook called when clothing leaves somewhere
     obj.setMethod('onLeaving', `
       /** Called when this clothing is about to leave somewhere.
-       *  Unregisters verbs from the owner.
+       *  Can be used for cleanup effects.
        */
       const source = args[0];
       const dest = args[1];
       const mover = args[2];
-
-      // If leaving a body part that has an owner
-      if (source && source.owner) {
-        const owner = source.owner;
-        if (owner && owner.unregisterVerbsFrom) {
-          await owner.unregisterVerbsFrom(self.id);
-        }
-      }
+      // No verb unregistration - AI handles wear/remove commands directly
     `);
 
     // Override describe to include material and color
@@ -311,6 +283,11 @@ export class ClothingBuilder {
 
       return descriptions;
     `);
+
+    obj.setPropertyDescription('material', 'Fabric type (cotton, wool, leather, synthetic). Affects warmth, durability, and water resistance.');
+    obj.setPropertyDescription('color', 'Color of the garment. Can be dyed or stained. Blood stains are incriminating evidence.');
+    obj.setPropertyDescription('condition', 'Wear condition (0-100). Degrades with use and damage. Low condition reduces warmth and can be repaired.');
+    obj.setPropertyDescription('pockets', 'Array of pocket objects attached to this garment. Use getPocket(name) to access.');
 
     return obj;
   }

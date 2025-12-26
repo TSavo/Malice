@@ -47,9 +47,38 @@ export class BodyPartBuilder {
         // Edible overrides - meat is ~2 kcal/gram, set by weight
         // calories will be calculated from weight in getCaloriesPerPortion override
         portions: 4, // A body part is multiple portions
+
+        // Abilities - physics for AI interpretation
+        abilities: `Organic tissue attached to a living body.
+
+HIERARCHY: Body parts form a tree. 'parts' contains child parts (arm→forearm→hand→fingers). 'owner' is the agent whose body this belongs to. All actions on body parts affect the owner.
+
+DAMAGE: Can receive wounds via takeDamage(). Wounds bleed, can infect, and heal over time. 'bones' array lists bones that can break under sufficient force. Broken bones must be set before healing.
+
+AMPUTATION: If 'removable' is true, can be severed via amputate(). Severed parts drop to ground, begin decaying, and become edible (cannibalism). Clothing on severed parts is destroyed.
+
+COVERING: If 'coverable' is true, can wear clothing. 'worn' array holds equipped wearables. Outermost layer determines visible appearance.
+
+SENSATION: Can feel pain, touch, temperature via feel(). Reports to owner. Numb/destroyed parts can't feel.
+
+CRITICAL: If 'critical' is true, destruction kills the owner.
+
+DECAY: Attached parts don't decay (maintained by living body). Severed parts decay rapidly. Decayed parts provide fewer calories when consumed.`,
       },
       methods: {},
     });
+
+    // Property descriptions
+    obj.setPropertyDescription('owner', "The agent (player/NPC) whose body this part belongs to.");
+    obj.setPropertyDescription('parts', "Child body parts: { slotName: partObj }. Forms hierarchy (arm→forearm→hand).");
+    obj.setPropertyDescription('bones', "Bones in this part that can break under force (e.g., ['femur', 'tibia']).");
+    obj.setPropertyDescription('wounds', "Active wound objects on this body part. Wounds bleed, infect, heal.");
+    obj.setPropertyDescription('coverable', "If true, clothing can be worn on this part.");
+    obj.setPropertyDescription('removable', "If true, this part can be amputated/severed.");
+    obj.setPropertyDescription('critical', "If true, destroying this part kills the owner.");
+    obj.setPropertyDescription('condition', "Status conditions: { severed, numb, destroyed, brokenBones: [...] }.");
+    obj.setPropertyDescription('nakedDescription', "Text shown when examining this uncovered body part.");
+    obj.setPropertyDescription('worn', "Array of wearable objects currently covering this part, by layer.");
 
     obj.setMethod('canContain', `
       /** Check if this body part can contain items.
@@ -837,7 +866,6 @@ export class BodyPartBuilder {
 
     obj.setMethod('onContentArrived', `
       /** Called when something arrives in this body part.
-       *  Registers verbs on the owner.
        *  @param obj - The arriving object
        *  @param source - Where it came from
        *  @param mover - Who moved it
@@ -845,29 +873,20 @@ export class BodyPartBuilder {
       const obj = args[0];
       const source = args[1];
       const mover = args[2];
-
-      // If this body part has an owner and the arriving object has verbs to register
-      const owner = await self.getOwner();
-      if (owner && owner.registerVerb && obj.getVerbsToRegister) {
-        const verbs = await obj.getVerbsToRegister();
-        for (const verbInfo of verbs) {
-          await owner.registerVerb(verbInfo.patterns, obj, verbInfo.method);
-        }
-      }
+      // No verb registration - AI handles object interactions directly via abilities
     `);
 
     // When something leaves this body part
-    // Unregister verbs from the owner
     obj.setMethod('onContentLeft', `
+      /** Called when something leaves this body part.
+       *  @param obj - The leaving object
+       *  @param dest - Where it's going
+       *  @param mover - Who moved it
+       */
       const obj = args[0];
       const dest = args[1];
       const mover = args[2];
-
-      // Unregister any verbs this object had registered
-      const owner = await self.getOwner();
-      if (owner && owner.unregisterVerbsFrom) {
-        await owner.unregisterVerbsFrom(obj.id);
-      }
+      // No verb unregistration - AI handles object interactions directly via abilities
     `);
 
     // Describe this body part with damage

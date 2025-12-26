@@ -5,23 +5,18 @@ import type { RuntimeObject } from '../../../../types/object.js';
  * Builds the Lock prototype
  * Base prototype for access control systems.
  *
- * Inherits from Describable.
- *
- * Locks can be attached to elevators, doors, containers, etc.
- * Each lock implements canAccess() to approve or deny access.
+ * ABILITIES-FIRST ARCHITECTURE:
+ * - Properties hold authorization data with descriptions
+ * - Abilities describe how the lock evaluates access
+ * - AI interprets abilities to determine if player is authorized
  *
  * Properties:
- * - name: Lock type name
- * - description: What the lock looks like
+ * - verifiedUsers: Array of player objects authorized by this lock
+ * - difficulty: How hard to pick/bypass (1-10)
  *
- * Methods:
- * - canAccess(agent, target): Returns true or rejection string
- *
- * Subclasses override canAccess() for specific authorization logic:
+ * Subclasses extend abilities for specific authorization logic:
  * - $.biometricLock: Scans body parts
  * - $.keycardLock: Requires keycard item
- * - $.passwordLock: Requires password knowledge
- * - $.timeLock: Restricts by time of day
  */
 export class LockBuilder {
   constructor(private manager: ObjectManager) {}
@@ -33,18 +28,59 @@ export class LockBuilder {
       properties: {
         name: 'Lock',
         description: 'A basic lock mechanism.',
+        verifiedUsers: [],
+        difficulty: 5,
+        abilities: `Basic mechanical lock. Grants access if player is in 'verifiedUsers' array.
+
+AUTHORIZATION: Check if player object is present in 'verifiedUsers'. If yes, access granted. If no, access denied.
+
+PICKING: Can be picked with thin rigid tools. Compare tool rigidity + player skill against 'difficulty'. Success bypasses authorization check.
+
+FORCING: Lock mechanism can be damaged with sufficient force, but this usually damages the container too.`,
       },
       methods: {},
     });
 
-    obj.setMethod('canAccess', `
-      /** Check if agent can access target via this lock.
-       *  @param agent - The agent requesting access
-       *  @param target - The target (floor number, room, etc.)
-       *  @returns true to allow, or rejection string to deny
-       */
-      // Base lock allows all access
+    // Add property descriptions
+    obj.setPropertyDescription('verifiedUsers', "Array of player objects authorized to pass this lock. Check if player is in this array.");
+    obj.setPropertyDescription('difficulty', "Resistance to picking/bypassing, 1-10 scale. Higher = harder.");
+
+    // isAuthorized(player) - Simple check for AI to use
+    obj.setMethod('isAuthorized', `
+      const player = args[0];
+      if (!player) return false;
+      const verified = self.verifiedUsers || [];
+      return verified.some(u => u && u.id === player.id);
+    `);
+
+    // authorize(player) - Add player to verified list
+    obj.setMethod('authorize', `
+      const player = args[0];
+      if (!player || typeof player.id !== 'number') return false;
+      const verified = self.verifiedUsers || [];
+      if (!verified.some(u => u && u.id === player.id)) {
+        verified.push(player);
+        self.verifiedUsers = verified;
+      }
       return true;
+    `);
+
+    // revoke(player) - Remove player from verified list
+    obj.setMethod('revoke', `
+      const player = args[0];
+      if (!player) return false;
+      const verified = self.verifiedUsers || [];
+      self.verifiedUsers = verified.filter(u => u && u.id !== player.id);
+      return true;
+    `);
+
+    // Legacy canAccess - simplified
+    obj.setMethod('canAccess', `
+      const agent = args[0];
+      if (await self.isAuthorized(agent)) {
+        return true;
+      }
+      return 'Access denied.';
     `);
 
     return obj;

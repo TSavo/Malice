@@ -5,24 +5,9 @@ import type { RuntimeObject } from '../../../types/object.js';
  * Builds the $.cash utility object
  * Singleton utility for cash operations across player inventory.
  *
- * Handles finding, taking, and giving physical cash ($.dollar stacks)
- * anywhere on a player - hands, pockets, etc.
- *
- * Search order: primary hand → secondary hand → worn clothing pockets
- * Give priority: existing cash stack → free hand → pocket with space
- *
- * Usage:
- *   const found = await $.cash.find(player);
- *   // { total: 500, stacks: [{item, location, quantity}, ...] }
- *
- *   const hasEnough = await $.cash.has(player, 100);
- *   // true/false
- *
- *   const result = await $.cash.take(player, 100);
- *   // { success: true, taken: 100, message: 'Took $100.' }
- *
- *   const result = await $.cash.give(player, 100);
- *   // { success: true, location: pocket, message: 'Added $100 to left pocket.' }
+ * ABILITIES-FIRST ARCHITECTURE:
+ * - Abilities describe how to use this utility for AI interpretation
+ * - AI calls these methods when handling cash transactions
  */
 export class CashBuilder {
   constructor(private manager: ObjectManager) {}
@@ -34,6 +19,26 @@ export class CashBuilder {
       properties: {
         name: 'Cash Utility',
         description: 'Utility object for cash operations',
+        // Abilities - cash handling for AI interpretation
+        abilities: `Utility for handling physical cash (contraband US dollars) on players.
+
+FINDING CASH: Call find(player) to locate all cash on a player.
+Returns { total: amount, stacks: [{item, location, quantity}] }.
+Searches hands first, then pockets in worn clothing.
+
+CHECKING: Call has(player, amount) to check if player has enough cash. Returns boolean.
+
+TAKING: Call take(player, amount) to remove cash from player.
+Returns { success, taken, message }. Fails if insufficient funds.
+Automatically recycles empty stacks.
+
+GIVING: Call give(player, amount) to add cash to player.
+Returns { success, location, message }. Adds to existing stack if found, otherwise creates new in free hand or pocket.
+
+TRANSFERRING: Call transfer(from, to, amount) to move cash between players.
+Atomic - if give fails, refunds the take.
+
+NOTE: Physical cash is contraband. Possession is illegal. Use $bank for legal credit transactions.`,
       },
       methods: {},
     });

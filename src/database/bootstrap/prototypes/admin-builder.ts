@@ -24,9 +24,30 @@ export class AdminBuilder {
         name: 'Admin',
         description: 'Base prototype for admin characters with building powers',
         isAdmin: true,
+
+        abilities: `Player with world-building powers. Can create, modify, and destroy objects.
+
+BUILDING: @dig creates rooms, @link creates exits, @create makes objects, @recycle destroys them. @set modifies properties.
+
+TELEPORTATION: @teleport/#tp moves to any room by ID. @goto goes to player's location. @summon brings player here.
+
+INSPECTION: @examine shows object internals (properties, methods). @aliases lists system aliases. @where shows coordinates.
+
+CODE: @eval runs single-line MOO code. @evalm runs multiline. @setVerb edits methods. @listVerbs/@rmVerb manage verbs.
+
+DOORS: @door <direction> manages door properties and locks. Interactive menu for lock types, codes.
+
+ELEVATORS: @elevator creates and wires elevators. Maps floors to rooms.
+
+AI: @spawn creates AI-controlled NPCs with role and appearance. @despawn removes them. @ai lists all AI humans.
+
+NOTES: @notes attaches admin notes to objects. Searchable, taggable.`,
       },
       methods: {},
     });
+
+    // Property descriptions
+    obj.setPropertyDescription('isAdmin', 'Whether this player has admin/builder powers for world creation');
 
     this.addConnectionOverride(obj);
     this.addBuildingCommands(obj);

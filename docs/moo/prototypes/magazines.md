@@ -1,5 +1,7 @@
 # Magazine Prototypes
 
+> **Abilities-First**: Magazines use abilities to describe loading, ejecting, and compatibility. The AI interprets reload actions. See `docs/ABILITIES-FIRST.md`.
+
 Detachable ammunition magazines for firearms. Magazines hold ammo and can be loaded into/ejected from guns.
 
 ## Base Magazine (`$magazine`)

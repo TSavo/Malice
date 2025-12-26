@@ -134,6 +134,72 @@ self.relationships = {
 };
 ```
 
+## Abilities-First Architecture
+
+**IMPORTANT**: See `docs/ABILITIES-FIRST.md` for the full architecture guide.
+
+Malice uses an abilities-first paradigm where object behavior is defined through prose, not procedural methods.
+
+### Three Types of Specification
+
+| Type | Purpose | Example |
+|------|---------|---------|
+| **Property descriptions** | Define what data MEANS | `"Whether the door is locked"` |
+| **Abilities** | Define how things INTERACT | `"Can be picked with thin tools against lockDifficulty"` |
+| **JSDoc on methods** | Define what infrastructure does | `"@returns The held item or null"` |
+
+### Property Descriptions
+
+Every property can have a description explaining its meaning:
+
+```javascript
+// Set a property description
+obj.setPropertyDescription('locked', "When true, door won't open without key/picking/force");
+obj.setPropertyDescription('durability', "Structural integrity 0-100. At 0, breaks.");
+
+// Get all properties with descriptions
+const props = obj.properties();
+// Returns: { locked: { value: true, description: "When true..." }, ... }
+```
+
+### Abilities
+
+Abilities are prose physics that the AI narrator interprets:
+
+```javascript
+const door = await $recycler.create($describable, {
+  name: 'Steel Door',
+  locked: true,
+  durability: 100,
+  abilities: `Hinged door that swings open or closed.
+
+OPENING: Requires 'locked' to be false. Push or pull to swing.
+
+LOCKING: Key with matching 'keyId' toggles 'locked' state.
+
+PICKING: Thin rigid tools can work against 'lockDifficulty'.
+Compare tool quality + user skill against difficulty.
+
+FORCING: Strength check against 'durability'. Success damages door.`
+});
+```
+
+### How It Works
+
+1. Player types "pick the lock"
+2. No coded verb matches → goes to AI narrator
+3. AI reads door's abilities, player's skills, tool abilities
+4. AI reasons about success/failure
+5. AI modifies properties (`locked = false`) and narrates result
+
+### When to Use Methods vs Abilities
+
+| Use **Methods** for | Use **Abilities** for |
+|---------------------|----------------------|
+| Infrastructure (look, say, move) | Game physics (combat, crafting) |
+| Event hooks (onRoomEvent) | Interaction outcomes |
+| Data queries (getHeld, isFree) | Player intent interpretation |
+
 ## Loading Objects
 
 ### When You Need `$load()`

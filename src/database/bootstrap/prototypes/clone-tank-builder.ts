@@ -55,6 +55,22 @@ export class CloneTankBuilder {
         
         // Aliases for commands
         aliases: ['tank', 'clone tank', 'cloning tank'],
+
+        abilities: `Resurrection device that grows clones from backup data.
+
+BACKUP STORAGE: 'cloneData' stores backup records keyed by player ID. One backup per player per tank. New backup overwrites old.
+
+RESURRECTION: beginResurrection(player) starts clone growth. Takes 'growthDuration' minutes. completeResurrection() spawns finished clone.
+
+GROWTH PHASES: 'occupant' is current resurrection. 'growthStarted' timestamp. getResurrectionProgress() returns percentage and time remaining.
+
+PRESERVATION: Backups preserve appearance, trained maxCalories (strength), skills. Memories up to backup timestamp.
+
+RESET: New clone has wounds healed, calories at minimum, no tattoos. Must eat and recover.
+
+CONSUMPTION: Backup data ERASED after resurrection. Must re-backup at recording studio.
+
+IMMOVABLE: 'boltedDown' true. Cannot be moved.`,
       },
       methods: {},
     });
@@ -473,14 +489,21 @@ export class CloneTankBuilder {
     obj.setMethod('canContain', `
       /** Only the occupant can be "in" the tank during resurrection. */
       const item = args[0];
-      
+
       // During resurrection, the occupant is conceptually inside
       if (self.occupant && item.id === self.occupant.id) {
         return true;
       }
-      
+
       return 'The clone tank cannot hold that.';
     `);
+
+    // Property descriptions
+    obj.setPropertyDescription('cloneData', 'Map of player IDs to backup records, one backup per player');
+    obj.setPropertyDescription('occupant', 'Player currently being resurrected (ObjRef), null if idle');
+    obj.setPropertyDescription('growthStarted', 'Timestamp when current resurrection began (Date)');
+    obj.setPropertyDescription('growthDuration', 'Minutes required to grow a clone (default 5)');
+    obj.setPropertyDescription('owner', 'Player who owns this tank (ObjRef)');
 
     return obj;
   }

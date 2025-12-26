@@ -39,7 +39,26 @@ export class ExitBuilder {
         locked: false, // Legacy simple lock
         lockKey: null, // Legacy key-based lock
         locks: [], // Composable lock objects
-          door: null, // Reference to $.door object
+        door: null, // Reference to $.door object
+
+        abilities: `Passage connecting one room to another.
+
+DIRECTION: 'name' is primary direction (north, south, door). 'aliases' are shortcuts ([n], [s]).
+
+DESTINATION: 'destRoom' points to target room. 'distance' in meters affects travel time.
+
+HIDDEN: If 'hidden' is true, exit doesn't appear in room description. Secret passages, concealed doors.
+
+LOCKING: Three systems:
+- Simple: 'locked' boolean, 'lockKey' item that unlocks it
+- Composable: 'locks' array of lock objects, each with canAccess() method
+- Door: 'door' points to $.door object with full door mechanics
+
+ACCESS: canUse(agent) checks all lock systems. Returns { allowed, reason }.
+
+MATCHING: matches(direction) checks name and aliases. Case-insensitive.
+
+USAGE: Room.go() finds exit via findExit(), checks canUse(), queues movement to destRoom.`,
       },
       methods: {},
     });
@@ -165,6 +184,15 @@ export class ExitBuilder {
       const lockStr = self.locked ? ' (locked)' : '';
       return self.name + shortAlias + ' (' + self.distance + 'm)' + lockStr;
     `);
+
+    // Property descriptions
+    obj.setPropertyDescription('destRoom', 'Destination room object that this exit leads to');
+    obj.setPropertyDescription('distance', 'Distance in meters that affects travel time');
+    obj.setPropertyDescription('hidden', 'Whether this exit is hidden from room descriptions (secret passages)');
+    obj.setPropertyDescription('locked', 'Legacy simple lock - whether exit is currently locked');
+    obj.setPropertyDescription('lockKey', 'Legacy key-based lock - ID of item that can unlock this exit');
+    obj.setPropertyDescription('locks', 'Array of composable lock objects that control access');
+    obj.setPropertyDescription('door', 'Reference to $.door object with full door mechanics');
 
     return obj;
   }

@@ -1,5 +1,7 @@
 # Wound System
 
+> **Abilities-First**: Wounds use abilities to describe healing, treatment, and complications. The scheduler handles progression. See `docs/ABILITIES-FIRST.md`.
+
 Injuries that bleed, heal, and infect over time.
 
 ## Overview

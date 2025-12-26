@@ -1,5 +1,7 @@
 # Consumables System
 
+> **Abilities-First**: Consumables use abilities to describe eating, drinking, and effects. Players type natural language like "eat the apple" and the AI interprets via abilities. The digestion scheduler still runs automatically. See `docs/ABILITIES-FIRST.md`.
+
 Food, drink, and digestion mechanics.
 
 ## Overview

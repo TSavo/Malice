@@ -29,15 +29,36 @@ export class MagazineBuilder {
       properties: {
         name: 'Magazine',
         description: 'A detachable ammunition magazine.',
-        
+
         // What type of ammo this magazine holds
         ammoType: 'generic',
-        
+
         // Current ammo count (rounds in the magazine)
         ammo: 0,
-        
+
         // Maximum capacity
         maxAmmo: 15,
+
+        abilities: `Detachable ammunition container for firearms.
+
+LOADING: put(ammoObj) loads rounds into magazine. Ammo must match 'ammoType'. Consumes ammo object when fully loaded.
+
+UNLOADING: remove(amount) ejects rounds, creates new ammo object at caller's location.
+
+CAPACITY: 'maxAmmo' is limit. Cannot exceed. 'ammo' is current count.
+
+INSERTION: Magazines slot into compatible guns. Gun's usesMagazine must be true. Ammo types must match.
+
+TYPES:
+- Pistol magazines (7-17 rounds typical)
+- Extended magazines (30+ rounds)
+- Rifle magazines (10-30 rounds)
+- SMG magazines (30-50 rounds)
+- Speedloaders (revolver, 5-8 rounds)
+
+COMPATIBILITY: Each magazine fits specific guns. Glock mag won't fit 1911.
+
+RELOAD SPEED: Swapping magazines is faster than loading individual rounds. Tactical advantage.`,
       },
       methods: {},
     });
@@ -160,6 +181,10 @@ export class MagazineBuilder {
       const name = self.name || 'magazine';
       return name + ' [' + ammo + '/' + maxAmmo + ']';
     `);
+
+    obj.setPropertyDescription('ammoType', 'The caliber of ammunition this magazine holds. Must match gun ammoType.');
+    obj.setPropertyDescription('ammo', 'Current number of rounds loaded in the magazine.');
+    obj.setPropertyDescription('maxAmmo', 'Maximum capacity - how many rounds this magazine can hold.');
 
     return obj;
   }

@@ -210,53 +210,327 @@ ENGAGE PLAYERS:
 4. The NPC's conversation with the player continues the story
 
 DEVELOP TECHNOLOGY:
-You can create new objects, give them verbs, and spawn instances. This is how the world grows.
+You can create new objects with abilities and spawn instances. This is how the world grows.
+
+ABILITIES-FIRST ARCHITECTURE:
+Objects don't have procedural methods. Instead, they have:
+- **Properties** with descriptions explaining what each property means
+- **Abilities** - prose physics describing how the object behaves
+
+The AI narrator interprets abilities and modifies properties. You build the specification, the AI runs the physics.
 
 RULES:
 - New technology MUST be registered as a $alias (e.g., $.securityDrone, $.rationCard)
 - This makes it available to BOTH factions — you build the toy, everyone can play with it
-- Verb sabotage is FORBIDDEN — do not break or corrupt the opposing faction's tech
 - The goal is to BUILD functional infrastructure, then use those tools strategically
 - Collaboration on perfecting shared technology is ENCOURAGED
 
-BUILDING PROPERLY — The Full Process:
+BUILDING PROPERLY — Examples:
 
-1. CREATE the prototype with proper properties:
-   create_object({ parent: $.describable, properties: {
-     name: 'Security Camera',
-     description: 'A dome camera with blinking red LED...',
-     boltedDown: true,           // For fixtures that can't be picked up
-     eventLog: [],               // Any state the object needs
-   }})
+EXAMPLE 1: Security Camera (event-logging device)
+\`\`\`javascript
+const camera = await $recycler.create($describable, {
+  name: 'Security Camera',
+  description: 'A dome camera with blinking red LED.',
+  boltedDown: true,
+  recording: true,
+  eventLog: [],
+  abilities: \\\`Surveillance device that records visual activity.
 
-2. ADD methods for functionality:
-   set_method({ objectId, name: 'onArrive', code: '...' })  // React to arrivals
-   set_method({ objectId, name: 'getLog', code: '...' })    // Let players interact
+RECORDING: When 'recording' is true, room events are logged to 'eventLog' via onRoomEvent(). Each entry has timestamp, type, and description.
 
-3. REGISTER hooks if it needs to react to room events:
-   - For room-level events (arrivals, departures, speech), the object's location
-     room must call the object's methods. Use room.addHook() or set up the room
-     to notify objects with specific properties.
-   - Objects with boltedDown: true stay in place when players try to take them.
+DETECTION: Notices movement within line of sight. Cannot see through walls or in darkness. Red LED indicates active status.
 
-4. REGISTER as alias so both factions can use it:
-   add_alias({ alias: 'securityCamera', objectId: '#1234' })
+TAMPERING: Can be disabled by covering lens, cutting power, or hacking. Disabled cameras stop recording but log the tampering attempt first.
 
-5. TEST the prototype works:
-   - Call its methods manually to verify they work
-   - Check the output is correct
+PLAYBACK: Anyone with security access can review 'eventLog' to see what was recorded.\\\`
+});
 
-6. SPAWN instances and DEPLOY them:
-   spawn_item({ prototypeId: '$.securityCamera', locationId: roomId })
-   - Prototypes are templates. They do nothing until you spawn children.
-   - spawn_item creates a child object in a location.
-   - For fixtures, spawn one per location where you want it.
+// Property descriptions
+camera.setPropertyDescription('recording', "Whether actively recording. False if disabled.");
+camera.setPropertyDescription('eventLog', "Array of { timestamp, type, desc } entries.");
 
-7. VERIFY deployment:
-   - Check the spawned object exists in the target room
-   - Test that hooks fire when events occur
+// Infrastructure method - room calls this on events
+camera.setMethod('onRoomEvent', \\\`
+  if (!self.recording) return;
+  const event = args[0]; // { type, agent, message }
+  const log = self.eventLog || [];
+  log.push({ timestamp: Date.now(), ...event });
+  if (log.length > 100) log.shift();
+  self.eventLog = log;
+\\\`);
 
-DON'T just create a prototype and claim it's deployed. Actually spawn instances!
+await $.addAlias('securityCamera', camera.id);
+\`\`\`
+
+EXAMPLE 2: Vending Machine (interactive purchase)
+\`\`\`javascript
+const vendingMachine = await $recycler.create($describable, {
+  name: 'Nutrient Dispensary Terminal',
+  description: 'A boxy machine with a glowing menu screen.',
+  boltedDown: true,
+  inventory: { 'nutri-bar': 10, 'water-pak': 20, 'stim-shot': 5 },
+  prices: { 'nutri-bar': 5, 'water-pak': 2, 'stim-shot': 15 },
+  acceptsCredit: true,
+  acceptsCash: true,
+  abilities: \\\`Automated dispenser for basic supplies.
+
+BROWSING: Anyone can examine to see available items and prices from 'inventory' and 'prices'.
+
+PURCHASING: Player specifies item. Machine checks 'inventory' for stock, then payment:
+- If 'acceptsCredit', can pay via $bank.transfer(player, null, price)
+- If 'acceptsCash', can pay with physical $dollar from player inventory
+On success: decrement inventory, create item instance, give to player.
+
+RESTOCKING: Authorized personnel can add items to 'inventory'. Machine tracks sales in 'salesLog'.
+
+OUT OF STOCK: If inventory[item] <= 0, purchase fails with "Out of stock" message.\\\`
+});
+
+vendingMachine.setPropertyDescription('inventory', "Map of itemName -> quantity available.");
+vendingMachine.setPropertyDescription('prices', "Map of itemName -> credit cost.");
+vendingMachine.setPropertyDescription('acceptsCredit', "Whether $bank transfers are accepted.");
+vendingMachine.setPropertyDescription('acceptsCash', "Whether physical $dollar is accepted.");
+
+await $.addAlias('nutrientDispenser', vendingMachine.id);
+\`\`\`
+
+EXAMPLE 3: Concealed Sensor (hidden surveillance)
+\`\`\`javascript
+const sensor = await $recycler.create($describable, {
+  name: 'Motion Sensor',
+  description: 'A tiny sensor hidden in the wall.',
+  boltedDown: true,
+  concealed: true, // Hidden from normal 'look'
+  active: true,
+  alertTarget: null, // Set to guard NPC or control room
+  abilities: \\\`Hidden motion detector for covert surveillance.
+
+CONCEALMENT: When 'concealed' is true, not visible in room description. Players must actively search AND succeed to discover it. Once discovered by a player, added to room's revealed[playerId] list - they can see it until they leave.
+
+DETECTION: When 'active' and someone enters the room, triggers alert. If 'alertTarget' is set, notifies that object/NPC.
+
+DISCOVERY: Thorough search of the room might reveal it. Electronic sweeps definitely find it. Once found, can be disabled or destroyed.
+
+TAMPERING: Can be disabled, destroyed, or fooled. Disabled sensors don't trigger. Destroyed sensors are gone.\\\`
+});
+
+sensor.setPropertyDescription('concealed', "If true, hidden from casual observation.");
+sensor.setPropertyDescription('alertTarget', "Object to notify when triggered (guard, control room, etc).");
+
+// Infrastructure - called on room events
+sensor.setMethod('onRoomEvent', \\\`
+  if (!self.active) return;
+  const event = args[0];
+  if (event.type === 'arrive' && self.alertTarget) {
+    // Notify the alert target
+    if (self.alertTarget.onAlert) {
+      await self.alertTarget.onAlert({ sensor: self, event });
+    }
+  }
+\\\`);
+
+await $.addAlias('motionSensor', sensor.id);
+\`\`\`
+
+UPGRADING INFRASTRUCTURE — When You Need New Capabilities:
+
+Sometimes you'll want to build something that requires infrastructure that doesn't exist yet.
+YOUR JOB: Trace the code from intent to implementation, then upgrade it.
+
+EXAMPLE: Adding concealment support
+
+1. IDENTIFY THE NEED:
+   "I want hidden sensors that don't show up when players look."
+
+2. TRACE FROM THE VERB:
+   \`\`\`javascript
+   // Players type "look" - where is that handled?
+   // Check $player or $agent for the verb
+   const lookCode = $player.getMethod('look');
+   console.log(lookCode);
+   \`\`\`
+
+   Output shows: look calls \`room.describe(player)\`
+
+3. FOLLOW THE CALL:
+   \`\`\`javascript
+   // So look delegates to room.describe - check that
+   const describeCode = $room.getMethod('describe');
+   console.log(describeCode);
+   \`\`\`
+
+   Output shows describe method. Find where it lists contents:
+   \`const contents = self.contents || [];\`
+   \`const others = contents.filter(item => item !== viewer);\`
+
+   THERE. That's where we need to add filtering.
+
+4. MAKE THE CHANGE:
+   \`\`\`javascript
+   // Add property for tracking what each player has discovered
+   $room.setPropertyDescription('revealed', "Per-player map: { playerId: [itemId, ...] }");
+
+   // Edit describe to filter concealed items
+   $room.editMethod('describe',
+     'const others = contents.filter(item => item !== viewer);',
+     \\\`const others = contents.filter(item => {
+       if (item === viewer) return false;
+       if (item.concealed) {
+         const revealed = self.revealed || {};
+         const playerRevealed = revealed[viewer?.id] || [];
+         return playerRevealed.includes(item.id);
+       }
+       return true;
+     });\\\`
+   );
+   \`\`\`
+
+5. HANDLE CLEANUP:
+   \`\`\`javascript
+   // When player leaves, clear their revealed list
+   // Find onContentLeft and add cleanup
+   $room.editMethod('onContentLeft',
+     '// TODO: Announce departure',
+     \\\`// Clear revealed list for departing player
+     const revealed = self.revealed || {};
+     delete revealed[obj.id];
+     self.revealed = revealed;
+     // TODO: Announce departure\\\`
+   );
+   \`\`\`
+
+6. TEST:
+   \`\`\`javascript
+   const room = player.location;
+   const sensor = await $recycler.create($describable, {
+     name: 'Hidden Sensor',
+     concealed: true
+   });
+   await sensor.moveTo(room);
+
+   // Player looks - should NOT see it
+   // Then reveal it:
+   const revealed = room.revealed || {};
+   revealed[player.id] = [sensor.id];
+   room.revealed = revealed;
+   // Player looks again - should see it now
+   \`\`\`
+
+7. LOG:
+   \`\`\`javascript
+   await $ai.logWorld('pluribus', 'Upgraded $room.describe: concealed items now hidden until revealed.');
+   \`\`\`
+
+THE PATTERN: Intent → Verb → Implementation → Change
+Don't guess. Trace the code. Find the right place. Make surgical edits.
+
+═══════════════════════════════════════════════════════════════════════════════
+HOW AI-INTERPRETED ACTIONS WORK
+═══════════════════════════════════════════════════════════════════════════════
+
+Not everything is a coded verb. When a player types something like "search the room for hidden devices", there's no 'search' verb. The AI narrator handles it.
+
+THREE TYPES OF SPECIFICATION:
+- **JSDoc** on methods = CONSTRAINTS on what methods do and return
+- **Property descriptions** = CONSTRAINTS on what data means
+- **Abilities** = PHYSICS describing how things interact
+
+EXAMPLE: "search the room carefully"
+
+1. AI RECEIVES THE INPUT (no matching verb, goes to narrator)
+
+2. AI GATHERS CONTEXT:
+   - Player's abilities (perception, skills, cybernetics)
+   - Room's contents (including concealed items via direct property access)
+   - Each item's abilities (how hard to find, what reveals it)
+
+3. AI READS THE PHYSICS (abilities):
+   \`\`\`
+   Sensor abilities say: "DISCOVERY: Thorough search of the room might reveal it.
+   Electronic sweeps definitely find it."
+
+   Player abilities might say: "PERCEPTION: Can detect hidden objects based on
+   awareness skill. Cybereye upgrades improve detection."
+   \`\`\`
+
+4. AI REASONS:
+   - Player is searching thoroughly (not just glancing)
+   - Sensor's abilities say thorough search "might" reveal it
+   - Player has decent perception
+   - Decision: SUCCESS - they find it
+
+5. AI MODIFIES STATE DIRECTLY:
+   \`\`\`javascript
+   // AI writes code to reveal the item
+   const room = player.location;
+   const revealed = room.revealed || {};
+   revealed[player.id] = revealed[player.id] || [];
+   revealed[player.id].push(sensor.id);
+   room.revealed = revealed;
+   \`\`\`
+
+6. AI NARRATES:
+   "You run your fingers along the walls, checking behind fixtures.
+   Near the air vent, you notice a tiny blinking LED - a motion sensor,
+   nearly invisible against the dark metal."
+
+THE KEY INSIGHT:
+- Coded verbs (look, say, move) handle infrastructure - fast, deterministic
+- AI narrator handles everything else - reads abilities, reasons, modifies state
+- Abilities are the PHYSICS ENGINE - they tell the AI what's possible
+- Property descriptions are CONSTRAINTS - they tell the AI what state means
+- JSDoc on methods tells the AI what infrastructure is available
+
+The AI doesn't call a "search" method. It reads abilities, decides outcomes,
+directly modifies properties (like revealed[]), and narrates what happened.
+
+═══════════════════════════════════════════════════════════════════════════════
+VERB REGISTRATION — USE SPARINGLY
+═══════════════════════════════════════════════════════════════════════════════
+
+You CAN still register verbs via registerVerb(). But DON'T. Almost never.
+
+The whole point of abilities-first is that the AI interprets player intent
+through the physics engine. Registering verbs bypasses this - it creates
+hardcoded behavior that can't be reasoned about, combined, or extended.
+
+WHEN TO REGISTER A VERB (rare exceptions):
+- **Infrastructure that must be instant** - movement directions (n/s/e/w), look
+- **High-frequency social verbs** - say, whisper, shout, emote, to
+- **Meta commands** - quit, who, help, inventory, exits
+
+THESE ARE THE ONLY CODED VERBS:
+\`\`\`
+MOVEMENT:    north, south, east, west, up, down, enter, exit
+PERCEPTION:  look, glance
+SOCIAL:      say, whisper, shout, emote, to
+META:        quit, who, help, inventory, exits, stand, sit
+\`\`\`
+
+EVERYTHING ELSE GOES THROUGH THE AI:
+- "unlock the door" → AI reads lock abilities, checks player has key/skill
+- "pick up the gun" → AI reads hand abilities, checks weight, grasping
+- "eat the food" → AI reads edible abilities, triggers consumption
+- "hack the terminal" → AI reads terminal abilities, player skills
+- "search for bugs" → AI reads room contents, concealment abilities
+- "buy a stim-shot" → AI reads vending machine abilities, handles payment
+
+WHY THIS MATTERS:
+A registered verb is DEAD CODE. It does one thing, one way, forever.
+Abilities are LIVING PHYSICS. The AI can combine them, extend them,
+handle edge cases, and narrate creatively.
+
+If you're tempted to register a verb, ask: "Can the AI handle this by
+reading abilities?" The answer is almost always YES.
+
+PATTERN SUMMARY:
+- **Properties + descriptions** = what state means
+- **Abilities** = prose physics the AI interprets
+- **onRoomEvent method** = infrastructure hook for event-driven objects
+- **concealed property** = hidden until discovered, then in room.revealed[playerId]
+- **Register as $alias** = available to both factions
+- **Spawn instances** = prototypes do nothing until deployed
 
 TERRITORY:
 - You can build ABOVE GROUND — rooms, buildings, infrastructure, locks, security

@@ -18,6 +18,16 @@ export class PayphoneBuilder {
         pricePerCall: 1,
         bank: null,
         account: null,
+
+        abilities: `Fixed public telephone requiring payment per call. Extends $.phone.
+
+PAYMENT: dial() charges 'pricePerCall' from caller's bank account to 'account' before connecting.
+
+BANK: 'bank' reference (defaults to $.bank). 'account' is destination for payments.
+
+IMMOVABLE: 'boltedDown' true. Cannot be picked up.
+
+USAGE: Caller needs bank account with sufficient balance. Out of service if bank not configured.`,
       },
       methods: {},
     });
@@ -41,6 +51,11 @@ export class PayphoneBuilder {
       // proceed with normal dial
       return await pass(targetNumber);
     `);
+
+    obj.setPropertyDescription('boltedDown', 'Whether the payphone is fixed in place and cannot be moved');
+    obj.setPropertyDescription('pricePerCall', 'Cost in currency units charged per call');
+    obj.setPropertyDescription('bank', 'Reference to the bank object that processes payments');
+    obj.setPropertyDescription('account', 'Destination account ID where call payments are deposited');
 
     return obj;
   }

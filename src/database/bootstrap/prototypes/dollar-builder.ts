@@ -4,18 +4,11 @@ import type { RuntimeObject } from '../../../../types/object.js';
 /**
  * Builds the Dollar prototype
  * Physical US currency - illegal contraband in Malice's dystopian Seattle.
- * Inherits from Stackable for merge/split behavior.
  *
- * In the world of Malice, physical cash is:
- * - Contraband: The economy runs on digital credits, physical money is banned
- * - Untraceable: Unlike bank transfers, cash leaves no audit trail
- * - Valuable: Black market premium for anonymity
- * - Dangerous: Possession alone is a crime
- *
- * Usage:
- * - $.recycler.create({ parent: $.dollar.id, properties: { quantity: 500 } })
- * - Stacks auto-merge when in same location
- * - Can be split for transactions
+ * ABILITIES-FIRST ARCHITECTURE:
+ * - Abilities describe how physical cash works for AI interpretation
+ * - Cash is contraband - possession is a crime
+ * - Use $.cash utility for taking/giving cash to players
  */
 export class DollarBuilder {
   constructor(private manager: ObjectManager) {}
@@ -34,9 +27,33 @@ export class DollarBuilder {
         unit: 'USD',
         // Physical cash is illegal
         contraband: true,
+        // Abilities - physical cash for AI interpretation
+        abilities: `Physical US currency - illegal contraband in this world.
+
+POSSESSION: Having cash is a crime. Police will confiscate and arrest. Hide it well. The 'contraband' property marks this as illegal.
+
+VALUE: The 'quantity' property is the dollar amount. Cash stacks automatically merge when in same location.
+
+HANDLING: Cash can be held in hand, stored in pockets, hidden in containers. Use $cash utility:
+- $cash.find(player) - locate all cash on a player
+- $cash.has(player, amount) - check if player has enough
+- $cash.take(player, amount) - remove cash from player
+- $cash.give(player, amount) - add cash to player
+- $cash.transfer(from, to, amount) - move cash between players
+
+TRANSACTIONS: Some vendors accept cash (currency='cash'). Black market prefers cash for anonymity. Cash leaves no audit trail unlike bank transfers.
+
+SPLITTING: To give partial amount, take the full stack and give the remainder back.
+
+ANONYMITY: Cash cannot be traced. Unlike bank credits, no transaction history exists.`,
       },
       methods: {},
     });
+
+    // Add property descriptions
+    obj.setPropertyDescription('quantity', "Dollar amount in this stack. Integer only.");
+    obj.setPropertyDescription('contraband', "True = illegal to possess. Police will confiscate.");
+    obj.setPropertyDescription('stackType', "Identifies this as cash for auto-stacking.");
 
     // ═══════════════════════════════════════════════════════════════════
     // DISPLAY OVERRIDES

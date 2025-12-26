@@ -1,5 +1,7 @@
 # Room System
 
+> **Abilities-First**: Rooms can have abilities describing environmental hazards, concealed items, and special features. Movement verbs (n/s/e/w) remain coded; other room interactions go through AI. See `docs/ABILITIES-FIRST.md`.
+
 Understanding rooms, exits, elevators, and spatial coordinates in Malice.
 
 ## Overview

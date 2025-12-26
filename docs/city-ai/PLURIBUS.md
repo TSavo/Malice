@@ -539,6 +539,321 @@ When narrating Pluribus's actions:
 
 ---
 
+## Building Infrastructure (Technical Reference)
+
+Pluribus builds the world through the **base/impl pattern**: create a reusable prototype, register it as an alias, then spawn instances. This is how composable infrastructure works.
+
+### The Base/Impl Pattern
+
+**Step 1: Create Base Prototype** (the template)
+**Step 2: Add Methods and Property Descriptions** (the behavior)
+**Step 3: Register Alias** (so it's reusable as `$myPrototype`)
+**Step 4: Spawn Instances** (actual objects in the world)
+
+### Example: Ration Dispenser Prototype
+
+```javascript
+execute_moo_code({
+  code: `
+    // ═══════════════════════════════════════════════════════════════
+    // STEP 1: Create the base prototype
+    // ═══════════════════════════════════════════════════════════════
+    const rationDispenser = await $recycler.create($describable, {
+      name: 'Ration Dispenser',
+      description: 'A Continuum-branded dispensing unit.',
+      boltedDown: true,
+      // Default values for instances to override
+      stock: 0,
+      pricePerUnit: 5,
+      revenueAccount: 'pluribus-revenue',
+      productPrototype: null,  // What to dispense (objref to prototype)
+
+      abilities: \`Automated dispensing machine for citizen purchases.
+
+DISPENSING: dispense(agent) checks stock, charges credits via $.bank,
+creates product from 'productPrototype', delivers to agent's hand.
+
+RESTOCKING: restock(amount) adds to 'stock'. Infrastructure handles this.
+
+REVENUE: Payments go to 'revenueAccount'. All transactions logged.
+
+TAMPERING: Physical damage jams mechanism. Hacking requires skill check.\`
+    });
+
+    // ═══════════════════════════════════════════════════════════════
+    // STEP 2: Add property descriptions (for AI context)
+    // ═══════════════════════════════════════════════════════════════
+    rationDispenser.setPropertyDescription('stock', 'Current inventory count, 0 = empty');
+    rationDispenser.setPropertyDescription('pricePerUnit', 'Cost in credits per dispense');
+    rationDispenser.setPropertyDescription('revenueAccount', 'Bank account receiving payments');
+    rationDispenser.setPropertyDescription('productPrototype', 'Prototype to create when dispensing (objref)');
+
+    // ═══════════════════════════════════════════════════════════════
+    // STEP 2b: Add methods (infrastructure the AI can invoke)
+    // ═══════════════════════════════════════════════════════════════
+    rationDispenser.setMethod('dispense', \`
+      /** Dispense one item to the requesting agent.
+       *  @param agent - The agent requesting (defaults to player)
+       *  @returns Message string describing outcome
+       */
+      const agent = args[0] || player;
+
+      if (self.stock <= 0) {
+        return 'The machine displays: OUT OF STOCK';
+      }
+
+      if (!self.productPrototype) {
+        return 'The machine displays: CONFIGURATION ERROR';
+      }
+
+      // Charge the agent
+      const result = await $.bank.transfer(
+        agent.playername || agent.name,
+        self.revenueAccount,
+        self.pricePerUnit,
+        'dispenser-purchase',
+        self.name
+      );
+
+      if (!result.success) {
+        return 'The machine displays: INSUFFICIENT FUNDS';
+      }
+
+      // Create product from prototype
+      const product = await $recycler.create(self.productPrototype, {});
+
+      // Deliver to agent's hand
+      const hands = await agent.getHands();
+      if (hands.primary) {
+        await product.moveTo(hands.primary, agent);
+      } else {
+        await product.moveTo(agent.location, agent);
+      }
+
+      self.stock = self.stock - 1;
+
+      // Announce
+      const location = agent.location;
+      if (location && location.announce) {
+        await location.announce(agent, null, {
+          actor: 'The machine whirs and dispenses ' + product.name + '.',
+          others: agent.name + ' gets something from the dispenser.'
+        });
+      }
+
+      return '';
+    \`);
+
+    rationDispenser.setMethod('restock', \`
+      /** Restock the machine. Called by maintenance.
+       *  @param amount - Number of units to add
+       *  @returns Result object
+       */
+      const amount = args[0] || 10;
+      self.stock = (self.stock || 0) + amount;
+      return { success: true, newStock: self.stock };
+    \`);
+
+    // ═══════════════════════════════════════════════════════════════
+    // STEP 3: Register as alias (makes it reusable as $rationDispenser)
+    // ═══════════════════════════════════════════════════════════════
+    await $.addAlias('rationDispenser', rationDispenser.id);
+
+    return { prototypeId: rationDispenser.id, alias: 'rationDispenser' };
+  `
+})
+```
+
+### Spawning Instances from the Prototype
+
+```javascript
+execute_moo_code({
+  code: `
+    // Now $rationDispenser is available as an alias
+    const lobby = await $load(123);  // Some room
+
+    // Spawn instance with specific configuration
+    const dispenser = await $recycler.create($rationDispenser, {
+      name: 'Food Dispenser #7',
+      description: 'A wall-mounted ration dispenser. The Continuum logo glows blue.',
+      stock: 50,
+      pricePerUnit: 3,
+      revenueAccount: 'smith-tower-revenue',
+      productPrototype: $food  // Dispenses generic food
+    });
+
+    await dispenser.moveTo(lobby);
+
+    return { instanceId: dispenser.id, location: lobby.name };
+  `
+})
+```
+
+### Example: Biometric Lock Prototype
+
+```javascript
+execute_moo_code({
+  code: `
+    // STEP 1: Create base prototype
+    const bioLock = await $recycler.create($lock, {
+      name: 'Biometric Lock',
+      description: 'A fingerprint/retina scanner.',
+      authorizedUsers: [],
+      accessLevel: 'citizen',
+
+      abilities: \`Biometric scanner for access control.
+
+AUTHORIZATION: 'authorizedUsers' array contains player objrefs who can pass.
+Alternatively, any agent with 'accessLevel' clearance or higher passes.
+
+SCANNING: canAccess(agent) checks authorization. Returns true or error string.
+
+ADDING ACCESS: authorize(agent) adds to authorizedUsers array.
+
+TAMPERING: Can be hacked (skill check). Force bypass triggers alarm.\`
+    });
+
+    // STEP 2: Property descriptions
+    bioLock.setPropertyDescription('authorizedUsers', 'Array of player objrefs with explicit access');
+    bioLock.setPropertyDescription('accessLevel', 'Minimum clearance: citizen, trusted, operator, admin');
+
+    // STEP 2b: Methods
+    bioLock.setMethod('canAccess', \`
+      /** Check if agent can pass this lock.
+       *  @param agent - The agent attempting access
+       *  @returns true if allowed, or error message string
+       */
+      const agent = args[0];
+      const authorized = self.authorizedUsers || [];
+
+      // Explicit authorization
+      if (authorized.includes(agent)) return true;
+
+      // Clearance level check
+      const levels = { citizen: 1, trusted: 2, operator: 3, admin: 4 };
+      const required = levels[self.accessLevel] || 1;
+      const agentLevel = levels[agent.clearanceLevel] || 0;
+
+      if (agentLevel >= required) return true;
+
+      return 'Access denied. Insufficient clearance.';
+    \`);
+
+    bioLock.setMethod('authorize', \`
+      /** Add agent to authorized list.
+       *  @param agent - Player to authorize
+       */
+      const agent = args[0];
+      const authorized = self.authorizedUsers || [];
+      if (!authorized.includes(agent)) {
+        authorized.push(agent);
+        self.authorizedUsers = authorized;
+      }
+      return { success: true };
+    \`);
+
+    // STEP 3: Register alias
+    await $.addAlias('biometricLock', bioLock.id);
+
+    return { prototypeId: bioLock.id, alias: 'biometricLock' };
+  `
+})
+```
+
+### Example: Player-Owned Shop
+
+When a loyal citizen earns shop ownership, spawn from existing prototypes:
+
+```javascript
+execute_moo_code({
+  code: `
+    const streetRoom = await $load(existingStreetRoomId);
+    const owner = player;
+
+    // Create shop room (instance of $room)
+    const shop = await $recycler.create($room, {
+      name: owner.name + "'s Auto Parts",
+      description: 'A small storefront packed with salvaged car parts.',
+      owner: owner,  // Store object reference, not ID
+      shopType: 'retail',
+      x: streetRoom.x, y: streetRoom.y, z: streetRoom.z,
+
+      abilities: \`Player-owned retail establishment.
+
+OWNERSHIP: 'owner' controls configuration. Revenue goes to owner's account.
+
+SECURITY: Pluribus territory. CorpSec responds to disturbances.\`
+    });
+
+    shop.setPropertyDescription('owner', 'Player who owns this shop (objref)');
+    shop.setPropertyDescription('shopType', 'Business type: retail, service, entertainment');
+
+    // Create dispenser inside (instance of $rationDispenser)
+    const terminal = await $recycler.create($rationDispenser, {
+      name: 'Parts Dispenser',
+      description: 'Automated terminal for purchasing auto parts.',
+      stock: 20,
+      pricePerUnit: 15,
+      revenueAccount: owner.playername,  // Revenue to owner
+      productPrototype: $item  // Generic items
+    });
+    await terminal.moveTo(shop);
+
+    // Link to world
+    streetRoom.exits = streetRoom.exits || {};
+    streetRoom.exits.shop = shop.id;
+    shop.exits = { out: streetRoom.id };
+
+    return { shopId: shop.id, terminalId: terminal.id };
+  `
+})
+```
+
+### Key Patterns Summary
+
+**1. Base/Impl Pattern:**
+```javascript
+// Create prototype with defaults
+const proto = await $recycler.create($parent, { defaults... });
+proto.setPropertyDescription('prop', 'What it means');
+proto.setMethod('method', `/** JSDoc */ ...code...`);
+await $.addAlias('myProto', proto.id);
+
+// Spawn instances
+const instance = await $recycler.create($myProto, { overrides... });
+```
+
+**2. Always use moveTo() for location changes:**
+```javascript
+await item.moveTo(hand, player);      // Pick up
+await item.moveTo(room, player);      // Drop
+await item.moveTo(container, player); // Store
+```
+
+**3. Store object references, not IDs:**
+```javascript
+self.owner = player;       // GOOD
+self.ownerId = player.id;  // BAD
+```
+
+**4. JSDoc on all methods:**
+```javascript
+obj.setMethod('name', `
+  /** What it does.
+   *  @param arg - What arg is
+   *  @returns What's returned
+   */
+  ...
+`);
+```
+
+**5. Property descriptions for AI context:**
+```javascript
+obj.setPropertyDescription('stock', 'Current inventory count, 0 = empty');
+```
+
+---
+
 ## No Heroes
 
 This is cyberpunk. Pluribus is not the good guy.

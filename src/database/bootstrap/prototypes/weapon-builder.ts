@@ -41,71 +41,98 @@ export class WeaponBuilder {
       properties: {
         name: 'Weapon',
         description: 'Base prototype for weapons',
-        
+
         // The skill used when fighting with this weapon
-        // This is what gets checked and gains XP in combat
         skill: 'improvised',
-        
-        // Base damage modifier (0-100 scale, added to severity)
-        // 0 = bare hands equivalent
-        // 10-20 = small weapons (pocket knife, brass knuckles)
-        // 20-35 = medium weapons (combat knife, baton, machete)
-        // 35-50 = large weapons (sword, baseball bat, axe)
-        // 40-60 = firearms
-        // 60+ = heavy weapons
+
+        // Base damage modifier (0-100 scale)
         damage: 0,
-        
-        // Default damage type this weapon inflicts
-        // cut, bruise, puncture, laceration, burn
+
+        // Default damage type: cut, bruise, puncture, laceration, burn
         damageType: 'bruise',
-        
-        // Whether this weapon requires two hands for effective use
-        // All weapons can be HELD one-handed, but twoHanded weapons
-        // impose severe penalties when used without a free second hand:
-        // - Accuracy/skill penalty
-        // - Risk of self-injury (recoil, loss of control)
-        // - Reduced damage
+
+        // Whether requires two hands for effective use
         twoHanded: false,
-        
+
         // Whether this is a ranged weapon
         ranged: false,
-        
-        // For ranged weapons: effective range in meters
+
+        // Effective range in meters (ranged only)
         range: 0,
-        
-        // For ranged weapons: current ammo count
+
+        // Current ammo count (ranged only)
         ammo: 0,
-        
-        // For ranged weapons: max ammo capacity
+
+        // Max ammo capacity (ranged only)
         maxAmmo: 0,
-        
-        // Ammo type required (for reloading)
+
+        // Ammo type required for reloading
         ammoType: null,
+
+        // Abilities - weapon physics for AI interpretation
+        abilities: `Object that can be used to inflict damage in combat.
+
+COMBAT TRACKING: When attacking someone, call $combat.start(attacker, defender) to set up exclusions. This prevents sleep, travel, etc. during the fight. Call $combat.log(combatId, message) to record events. Call $combat.end(combatId, reason, winner) when combat concludes.
+
+WIELDING: Must be held in hand to use. Check 'twoHanded' - if true, effective use requires BOTH hands free. Using two-handed weapon one-handed imposes severe accuracy penalty and risk of self-injury.
+
+STRIKING: Melee attack using this weapon. Damage based on 'damage' property + wielder strength + skill check. Create wounds on target body parts directly. Damage type from 'damageType' determines wound characteristics.
+
+SKILL: The 'skill' property names what combat skill is used and gains XP. e.g., "knife", "club", "sword". Higher skill improves accuracy and damage.
+
+DAMAGE SCALE:
+- 0-10: Improvised (fist, bottle)
+- 10-20: Small (pocket knife, brass knuckles)
+- 20-35: Medium (combat knife, baton, machete)
+- 35-50: Large (sword, baseball bat, axe)
+- 40-60: Firearms
+- 60+: Heavy weapons
+
+CONDITION: Weapons can degrade with use. Broken weapons have reduced damage or may fail.`,
       },
       methods: {},
     });
+
+    // Add property descriptions
+    obj.setPropertyDescription('skill', "Combat skill used and trained: improvised, knife, club, sword, etc.");
+    obj.setPropertyDescription('damage', "Base damage modifier 0-100. Added to attack severity.");
+    obj.setPropertyDescription('damageType', "Wound type inflicted: cut, bruise, puncture, laceration, burn.");
+    obj.setPropertyDescription('twoHanded', "If true, requires both hands for effective use. One-handed use has penalties.");
+    obj.setPropertyDescription('ranged', "If true, this is a ranged weapon (gun, bow).");
+    obj.setPropertyDescription('range', "Effective range in meters for ranged weapons.");
+    obj.setPropertyDescription('ammo', "Current ammunition count for ranged weapons.");
+    obj.setPropertyDescription('maxAmmo', "Maximum ammo capacity for ranged weapons.");
+    obj.setPropertyDescription('ammoType', "Required ammunition type for reloading (e.g., '9mm', '12gauge').");
 
     // ═══════════════════════════════════════════════════════════════════
     // COMBAT INTERFACE
     // ═══════════════════════════════════════════════════════════════════
 
-    // getSkill() - returns the skill name for combat checks
     obj.setMethod('getSkill', `
+      /** Get the combat skill name for this weapon.
+       *  @returns Skill name (e.g., "knife", "pistol")
+       */
       return self.skill || 'improvised';
     `);
 
-    // getDamage() - returns base damage modifier
     obj.setMethod('getDamage', `
+      /** Get base damage modifier for this weapon.
+       *  @returns Damage value 0-100
+       */
       return self.damage || 0;
     `);
 
-    // getDamageType() - returns the type of damage this weapon deals
     obj.setMethod('getDamageType', `
+      /** Get the type of damage this weapon inflicts.
+       *  @returns Damage type: cut, bruise, puncture, laceration, burn
+       */
       return self.damageType || 'bruise';
     `);
 
-    // isTwoHanded() - returns whether this weapon requires two hands for effective use
     obj.setMethod('isTwoHanded', `
+      /** Check if this weapon requires two hands for effective use.
+       *  @returns true if two-handed, false otherwise
+       */
       return self.twoHanded || false;
     `);
 
@@ -113,8 +140,10 @@ export class WeaponBuilder {
     // RANGED WEAPON METHODS
     // ═══════════════════════════════════════════════════════════════════
 
-    // canFire() - check if ranged weapon can fire
     obj.setMethod('canFire', `
+      /** Check if this ranged weapon can fire.
+       *  @returns { success: boolean, reason?: string }
+       */
       if (!self.ranged) {
         return { success: false, reason: 'This is not a ranged weapon.' };
       }
@@ -124,21 +153,26 @@ export class WeaponBuilder {
       return { success: true };
     `);
 
-    // fire() - expend one round of ammo
     obj.setMethod('fire', `
+      /** Expend one round of ammo (infrastructure method).
+       *  @returns { success: boolean, ammoRemaining?: number, reason?: string }
+       */
       const canFire = await self.canFire();
       if (!canFire.success) {
         return canFire;
       }
-      
+
       self.ammo = (self.ammo || 0) - 1;
       return { success: true, ammoRemaining: self.ammo };
     `);
 
-    // reload(ammoSource) - reload from an ammo source
     obj.setMethod('reload', `
+      /** Reload from an ammo source (infrastructure method).
+       *  @param ammoSource - Ammo object to load from
+       *  @returns { success: boolean, loaded?: number, ammoRemaining?: number, reason?: string }
+       */
       const ammoSource = args[0];
-      
+
       if (!self.ranged) {
         return { success: false, reason: 'This is not a ranged weapon.' };
       }

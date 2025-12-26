@@ -18,7 +18,6 @@ import { WritableBuilder } from './writable-builder.js';
  * Methods:
  * - read(agent): Returns the letter's text
  * - write(agent, newText): Sets the letter's text
- * - getRoomVerbs(): Declares 'read %i' and 'write %i' verbs
  */
 export class LetterBuilder {
   constructor(private manager: ObjectManager) {}
@@ -34,6 +33,18 @@ export class LetterBuilder {
         text: '',
         writable: true,
         maxLength: 1000,
+
+        abilities: `Portable writable paper for personal correspondence.
+
+WRITING: Inherits from $.writable. write(agent, text) records message.
+
+READING: read() returns written text.
+
+PORTABLE: Can be picked up, given, dropped. Compact size.
+
+EVIDENCE: Written letters persist. Can be found, read by others. Evidence of communication.
+
+DESTRUCTION: Can be burned, torn, disposed. Fire destroys contents permanently.`,
       },
       methods: {},
     });
@@ -44,6 +55,10 @@ export class LetterBuilder {
     for (const [name, method] of Object.entries(writableObj.getOwnMethods())) {
       obj.setMethod(name, method.code);
     }
+
+    // Add property descriptions
+    obj.setPropertyDescription('text', 'The written message content of the letter');
+    obj.setPropertyDescription('maxLength', 'Maximum character length for the letter text');
 
     return obj;
   }

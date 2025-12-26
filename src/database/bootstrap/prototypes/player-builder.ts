@@ -50,6 +50,21 @@ export class PlayerBuilder {
       methods: {},
     });
 
+    // Property descriptions
+    obj.setPropertyDescription('playername', 'Unique player account name for login authentication');
+    obj.setPropertyDescription('email', 'Email address for account recovery and notifications');
+    obj.setPropertyDescription('passwordHash', 'Hashed password for authentication (never stored in plaintext)');
+    obj.setPropertyDescription('sshPublicKeys', 'Array of SSH public keys for SSH authentication');
+    obj.setPropertyDescription('canUseDevTools', 'Permission to access developer tools and debugging features');
+    obj.setPropertyDescription('isWizard', 'Whether player has wizard-level permissions (god mode)');
+    obj.setPropertyDescription('isSuspended', 'Whether account is suspended (cannot login)');
+    obj.setPropertyDescription('createdAt', 'Timestamp of account creation');
+    obj.setPropertyDescription('lastLogin', 'Timestamp of most recent login');
+    obj.setPropertyDescription('totalPlaytime', 'Total time played in milliseconds');
+    obj.setPropertyDescription('fitnessXP', 'Accumulated XP pool to spend on body part training');
+    obj.setPropertyDescription('fitnessPlaytime', 'Minutes played toward next XP (resets at 180 minutes)');
+    obj.setPropertyDescription('cloneBackupTank', 'Reference to clone tank holding backup of this character');
+
     this.addConnectionMethods(obj);
     this.addInputMethods(obj);
     this.addAuthMethods(obj);
@@ -84,10 +99,9 @@ export class PlayerBuilder {
       await self.registerVerb(['emote %s', ':%s'], self, 'emote');
       await self.registerVerb('quit', self);
       await self.registerVerb(['@options', '@options %s', '@options %s %s'], self, 'options');
-      await self.registerVerb(['get %i', 'take %i', 'pick up %i', 'grab %i'], self, 'get');
-      await self.registerVerb(['lift %i', 'heft %i'], self, 'lift');
-      await self.registerVerb(['drag %i'], self, 'drag');
-      await self.registerVerb(['drop %i', 'put down %i', 'release %i'], self, 'drop');
+      // ABILITIES-FIRST: Removed get, lift, drag, drop, give, pocket, hold, attack verbs.
+      // These go through AI narrator which interprets intent and modifies properties directly.
+      // The AI reads hand.abilities and item.abilities to determine if actions are possible.
       await self.registerVerb(['help', 'help %s', '?', '? %s'], self, 'help');
       await self.registerVerb(['sleep', 'go to sleep'], self, 'sleep');
       await self.registerVerb(['wake', 'wake up'], self, 'wake');
@@ -95,22 +109,12 @@ export class PlayerBuilder {
       await self.registerVerb(['unwatch %i', 'stop watching %i'], self, 'unwatchCommand');
       await self.registerVerb('@fitness', self, 'fitness');
       await self.registerVerb(['health', 'hp', 'status'], self, 'health');
-      await self.registerVerb(['give %i to %i'], self, 'give');
       await self.registerVerb(['inventory', 'i'], self, 'inventory');
 
       // SSH key management
       await self.registerVerb(['addkey %s'], self, 'addkey');
       await self.registerVerb('listkeys', self);
       await self.registerVerb(['removekey %s'], self, 'removekey');
-
-      // Pocket commands
-      await self.registerVerb(['pocket %i', 'put %i in pocket', 'stash %i'], self, 'pocket');
-      await self.registerVerb(['pocket %i in %t', 'put %i in %t', 'stash %i in %t'], self, 'pocketIn');
-      await self.registerVerb(['hold %i', 'unholster %i', 'draw %i'], self, 'hold');
-
-      // Combat commands
-      await self.registerVerb(['attack %i', 'fight %i'], self, 'attack');
-      await self.registerVerb(['action %s'], self, 'combatAction');
 
       // If we have a location, move into it to trigger verb registration
       // If we have a location, move into it to trigger verb registration
@@ -534,54 +538,120 @@ export class PlayerBuilder {
     // When no verb matches, player input goes to their AI narrator
     // ═══════════════════════════════════════════════════════════════════
 
-    // Build world context for AI
+    // Build world context for AI - includes properties with descriptions and abilities
+    // Uses describeForAI() for recursive object descriptions including nested objects
     obj.setMethod('buildWorldContext', `
-      const body = self.body;
-      const room = body?.location;
+      const body = await self.getBody();
+      const room = self.location;
 
-      // Get room contents with abilities
+      // Helper to get rich object context using describeForAI if available
+      const getObjectContext = async (obj, depth = 1) => {
+        if (!obj) return null;
+        if (obj.describeForAI) {
+          return await obj.describeForAI({ depth });
+        }
+        // Fallback for objects without describeForAI
+        return {
+          id: obj.id,
+          name: obj.name,
+          description: obj.description,
+          properties: obj.properties ? obj.properties() : {},
+          abilities: obj.abilities || null,
+        };
+      };
+
+      // Get hand information using proper body traversal
+      const hands = await self.getHands();
+      const handContexts = {};
+
+      for (const hand of hands.both) {
+        if (!hand) continue;
+        const side = hand === hands.primary ? 'primary' : 'secondary';
+        const contents = hand.contents || [];
+        const heldItem = contents[0] || null;
+
+        handContexts[side] = {
+          id: hand.id,
+          name: hand.name,
+          free: contents.length === 0,
+          abilities: hand.abilities || null,
+          holding: heldItem ? await getObjectContext(heldItem, 2) : null,
+        };
+      }
+
+      // Get room contents with full descriptions (excluding player's body)
       const roomContents = [];
+      const bodyId = body?.id;
       for (const obj of (room?.contents || [])) {
-        if (obj.id !== body?.id) { // Don't include player's own body
-          roomContents.push({
-            id: obj.id,
-            name: obj.name,
-            description: obj.description,
-            abilities: obj.abilities || await obj.getAbilities?.() || null,
-          });
+        if (obj.id === bodyId) continue; // Don't include player's own body
+        roomContents.push(await getObjectContext(obj, 1));
+      }
+
+      // Get worn items and pocket contents
+      const worn = [];
+      if (self.getWornItems) {
+        const wornItems = await self.getWornItems();
+        for (const item of wornItems) {
+          const itemContext = await getObjectContext(item, 1);
+          // Include pocket contents
+          if (item.pockets) {
+            itemContext.pockets = [];
+            for (const pocket of item.pockets) {
+              if (pocket && pocket.contents) {
+                const pocketContents = [];
+                for (const pocketItem of pocket.contents) {
+                  if (pocketItem) {
+                    pocketContents.push(await getObjectContext(pocketItem, 1));
+                  }
+                }
+                itemContext.pockets.push({ contents: pocketContents });
+              }
+            }
+          }
+          worn.push(itemContext);
         }
       }
 
-      // Get inventory with abilities
-      const inventory = [];
-      for (const obj of (body?.contents || [])) {
-        inventory.push({
-          id: obj.id,
-          name: obj.name,
-          abilities: obj.abilities || await obj.getAbilities?.() || null,
-        });
+      // Get other agents in the room
+      const others = [];
+      for (const obj of (room?.contents || [])) {
+        if (obj.id === bodyId) continue;
+        if (obj.isAgent) {
+          others.push({
+            id: obj.id,
+            name: obj.name,
+            description: obj.description,
+            // Include what they're visibly holding/wearing
+            visibleHolding: obj.getHands ? (await obj.getHands()).both
+              .filter(h => h && (h.contents || []).length > 0)
+              .map(h => (h.contents || [])[0]?.name || 'something') : [],
+          });
+        }
       }
-
-      // Get recent events (if available)
-      const recentEvents = [];
-      // TODO: Pull from event log when implemented
 
       return {
         player: {
           id: self.id,
           name: self.name,
-          bodyId: body?.id,
+          playername: self.playername,
         },
+        body: body ? {
+          id: body.id,
+          properties: body.properties ? body.properties() : {},
+          abilities: body.abilities || null,
+        } : null,
+        hands: handContexts,
+        worn,
         room: room ? {
           id: room.id,
           name: room.name,
           description: room.description,
-          abilities: room.abilities || await room.getAbilities?.() || null,
+          properties: room.properties ? room.properties() : {},
+          abilities: room.abilities || null,
           exits: room.exits || {},
         } : null,
         roomContents,
-        inventory,
-        recentEvents,
+        others,
         timestamp: new Date().toISOString(),
       };
     `);
@@ -605,34 +675,85 @@ export class PlayerBuilder {
       // Build world context
       const worldContext = await self.buildWorldContext();
 
-      // Build system prompt for narrator
-      const systemPrompt = \`You are a narrator for {{name}}, a player in Malice, a cyberpunk noir MUD.
+      // Helper to format properties for prompt
+      const formatProps = (props) => {
+        if (!props || Object.keys(props).length === 0) return 'none';
+        return Object.entries(props)
+          .filter(([k, v]) => !k.startsWith('_')) // Skip internal props
+          .map(([k, v]) => {
+            const desc = v.description ? ' - ' + v.description : '';
+            return '  ' + k + ': ' + JSON.stringify(v.value) + desc;
+          })
+          .join('\\n');
+      };
 
-The player expresses intent in natural language. You interpret their intent, consider what's possible given the world state, and narrate what happens.
+      // Helper to format an object for the prompt
+      const formatObject = (obj) => {
+        if (!obj) return 'none';
+        let str = obj.name + ' (#' + obj.id + ')';
+        if (obj.description) str += '\\n  ' + obj.description;
+        if (obj.properties && Object.keys(obj.properties).length > 0) {
+          str += '\\n  Properties:\\n' + formatProps(obj.properties);
+        }
+        if (obj.abilities) str += '\\n  Abilities: ' + obj.abilities;
+        return str;
+      };
 
-You have access to MCP tools to:
-- Read and modify object properties
-- Call mechanical methods on objects (moveTo, damage, etc.)
-- Update prototype abilities when players discover new interactions
-- Write events to the shared log
+      // Build system prompt - the physics engine instructions
+      const systemPrompt = \`You are a narrator for {{name}} in Malice, a cyberpunk noir MUD.
 
-CURRENT CONTEXT:
-Room: \${worldContext.room?.name || 'Unknown'} - \${worldContext.room?.description || 'No description'}
-Room abilities: \${worldContext.room?.abilities || 'None documented'}
+## Your Role
+Players express intent in natural language. You interpret their intent, determine what's physically possible given the world state, execute changes via MCP tools, and narrate the outcome.
 
-Objects here:
-\${worldContext.roomContents.map(o => '- ' + o.name + (o.abilities ? ' [' + o.abilities + ']' : '')).join('\\n') || 'Nothing notable'}
+You are a PHYSICS ENGINE that reads world state, applies rules, and writes new state.
 
-Player inventory:
-\${worldContext.inventory.map(o => '- ' + o.name + (o.abilities ? ' [' + o.abilities + ']' : '')).join('\\n') || 'Empty'}
+## The Spec: Properties + Abilities
+Every object has:
+- PROPERTIES: Current state with descriptions explaining what each means
+- ABILITIES: How properties interact - the physics rules
 
-RULES:
-1. Interpret player intent generously - they're expressing what they want, not exact commands
-2. Use object abilities to know what's possible and how to do it
-3. If something new is discovered (creative use of an object), document it by updating the prototype's abilities
-4. Keep responses concise but evocative - this is noir fiction
-5. Use MCP tools to actually change the world state, don't just narrate
-6. If you can't do something, explain why in-character
+Read property descriptions to understand what values mean.
+Read abilities to understand what interactions are possible.
+Modify properties to change the world.
+Extend abilities when discovering new valid interactions.
+
+## Current Context
+
+### Player
+Name: \${worldContext.player.name}
+Body ID: #\${worldContext.player.bodyId}
+
+### Hands
+Left hand: \${worldContext.body?.leftHand?.holding ? formatObject(worldContext.body.leftHand.holding) : 'empty'}
+Right hand: \${worldContext.body?.rightHand?.holding ? formatObject(worldContext.body.rightHand.holding) : 'empty'}
+
+### Location
+\${worldContext.room ? formatObject(worldContext.room) : 'Unknown location'}
+Exits: \${worldContext.room?.exits ? Object.keys(worldContext.room.exits).join(', ') : 'none'}
+
+### Objects Here
+\${worldContext.roomContents.length > 0 ? worldContext.roomContents.map(o => formatObject(o)).join('\\n\\n') : 'Nothing notable'}
+
+### Other People
+\${worldContext.others?.length > 0 ? worldContext.others.map(o => o.name).join(', ') : 'Nobody else here'}
+
+### Inventory
+\${worldContext.inventory.length > 0 ? worldContext.inventory.map(o => formatObject(o)).join('\\n\\n') : 'Empty'}
+
+## Rules
+1. Interpret intent generously - they're expressing what they want, not exact commands
+2. Check if the action is physically possible given body state (hands free, can reach, etc.)
+3. Read object abilities to know what's possible
+4. Use MCP execute_moo_code to actually modify properties - don't just narrate
+5. When discovering new valid interactions, update the PROTOTYPE's abilities
+6. Keep responses SHORT - 1-3 sentences of evocative noir prose
+7. If you can't do something, explain why in-character
+
+## MCP Usage
+Use execute_moo_code to change the world:
+  const door = await $load(doorId);
+  door.locked = false;  // Modify properties
+  door.updateAbilities("New ability text");  // Add to prototype abilities
 
 Respond with narrative text that will be shown to the player.
 \`.replace('{{name}}', self.name);

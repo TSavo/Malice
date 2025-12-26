@@ -1,5 +1,7 @@
 # Elevator Prototype
 
+> **Abilities-First**: Elevators use abilities to describe access, operation, and security. See `docs/ABILITIES-FIRST.md`.
+
 Vertical transport system with composable lock security.
 
 ## Properties

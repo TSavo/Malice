@@ -37,6 +37,20 @@ export class IncineratorBuilder {
         capacity: 0,
         acceptedTypes: [],
         rejectedTypes: [],
+
+        abilities: `High-temperature disposal unit. Burns items to ash. Extends $.disposal.
+
+OPERATION: 'operational' must be true to burn. ignite() turns on, extinguish() turns off.
+
+FUEL: 'fuelLevel' 0-100. Each item consumes 'fuelConsumption'. Out of fuel = can't burn.
+
+TEMPERATURE: 'temperature' degrees. Affects what can be destroyed. Higher temps destroy more materials.
+
+BURNING: burn()/deposit() instantly destroys item if operational and fueled. Emits 'itemBurned' event.
+
+EVIDENCE DESTRUCTION: Perfect for disposing of incriminating items. Leaves no trace (unless ashProduction enabled).
+
+VERBS: 'burn/incinerate/deposit/put/throw %o in %i', 'ignite/light %i', 'extinguish/turn off %i'.`,
       },
       methods: {},
     });
@@ -140,21 +154,12 @@ export class IncineratorBuilder {
       return desc;
     `);
 
-    // Room-centric verb declaration
-    obj.setMethod('getRoomVerbs', `
-      /** Declare verbs to be registered by the room for players. */
-      return [
-        { pattern: 'burn %o in %i', method: 'burn' },
-        { pattern: 'incinerate %o in %i', method: 'burn' },
-        { pattern: 'deposit %o in %i', method: 'deposit' },
-        { pattern: 'put %o in %i', method: 'deposit' },
-        { pattern: 'throw %o in %i', method: 'deposit' },
-        { pattern: 'ignite %i', method: 'ignite' },
-        { pattern: 'light %i', method: 'ignite' },
-        { pattern: 'extinguish %i', method: 'extinguish' },
-        { pattern: 'turn off %i', method: 'extinguish' },
-      ];
-    `);
+    // Add property descriptions
+    obj.setPropertyDescription('temperature', 'Operating temperature in degrees (affects what materials can be destroyed)');
+    obj.setPropertyDescription('fuelLevel', 'Current fuel level from 0-100');
+    obj.setPropertyDescription('fuelConsumption', 'Amount of fuel consumed per item burned');
+    obj.setPropertyDescription('ashProduction', 'Whether burning items produces ash residue');
+    obj.setPropertyDescription('operational', 'Whether the incinerator is currently ignited and functional');
 
     return obj;
   }

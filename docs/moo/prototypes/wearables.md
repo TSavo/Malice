@@ -1,5 +1,7 @@
 # Wearables System
 
+> **Abilities-First**: Wearables use abilities to describe wearing, protection, and layering. Players type "wear the jacket" and the AI interprets via abilities. See `docs/ABILITIES-FIRST.md`.
+
 Clothing, armor, and accessories that can be worn on body parts.
 
 ## Overview

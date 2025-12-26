@@ -45,6 +45,24 @@ export class WearableBuilder {
         // Description shown when worn (replaces naked description)
         // If null, uses the item's name in a generic phrase
         wornDescription: null,
+
+        abilities: `Item that can be worn on body parts.
+
+SLOTS: 'covers' array defines which body parts this covers: head, face, neck, torso, back, waist, leftArm, rightArm, hands, leftLeg, rightLeg, feet.
+
+LAYERS: 'layer' determines stacking order (1=underwear, 2=base, 3=mid, 4=outer, 5=outerwear). Only one item per layer per slot.
+
+WEARING: canWear() checks body parts exist and layer conflicts. wear() attaches to body parts, sets wornBy/wornOn.
+
+REMOVING: remove() detaches from body, moves to hand or drops to ground.
+
+PROTECTION: 'protection' reduces incoming damage to covered parts. Armor inherits and maximizes this.
+
+WARMTH: 'warmth' provides cold resistance. Layering adds warmth. Exposed parts lose heat.
+
+APPEARANCE: Outermost layer on each slot determines visible appearance. 'wornDescription' overrides naked description.
+
+REQUIRED PARTS: Can't wear gloves without hands, boots without feet. Missing parts = can't wear.`,
       },
       methods: {},
     });
@@ -372,6 +390,14 @@ export class WearableBuilder {
 
       return desc.trim();
     `);
+
+    obj.setPropertyDescription('covers', 'Array of body part slot names this item covers when worn (e.g., head, torso, hands, feet)');
+    obj.setPropertyDescription('layer', 'Stacking layer for clothing (1=underwear, 2=base, 3=mid, 4=outer, 5=outerwear). Only one item per layer per slot.');
+    obj.setPropertyDescription('warmth', 'Cold resistance value (0-100). Higher values provide better protection from cold environments.');
+    obj.setPropertyDescription('protection', 'Damage reduction value (0-100). Armor maximizes this, clothing provides minimal protection.');
+    obj.setPropertyDescription('wornOn', 'The body part object this item is currently worn on (null if not worn)');
+    obj.setPropertyDescription('wornBy', 'The agent who is currently wearing this item (null if not worn)');
+    obj.setPropertyDescription('wornDescription', 'Description shown when this item is worn. If null, uses item name in generic phrase.');
 
     return obj;
   }

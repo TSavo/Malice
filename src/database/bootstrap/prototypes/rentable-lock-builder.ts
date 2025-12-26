@@ -41,6 +41,23 @@ export class RentableLockBuilder {
         linkedLockId: null, // Paired lock for syncing
         locked: true, // Legacy/simple lock
         locks: [], // Composable locks
+
+        abilities: `Lock that grants access via payment. Extends $.lock.
+
+RENTAL: rent(agent, key) transfers 'price' from agent's account to 'account' via 'bank'. Grants access for 'duration' ms.
+
+ACCESS: canAccess(agent, target, code) checks:
+1. Is agent a current renter (not expired)?
+2. Does code match 'code'?
+3. Do all composable 'locks' allow?
+
+RENTERS: 'renters' map tracks { agentId: expirationTimestamp }. isRenter() checks current status.
+
+EXTENSION: Renting while already active extends duration, keeps same code.
+
+CODE: Generated on first rental. syncCode() updates linked lock for paired doors.
+
+COMPOSABLE: 'locks' array can contain additional lock objects (biometric, keycard, etc).`,
       },
       methods: {},
     });
@@ -148,6 +165,15 @@ export class RentableLockBuilder {
       const renters = self.renters || {};
       return !!(agent && renters[agent.id] && renters[agent.id] > now);
     `);
+
+    // Property descriptions
+    obj.setPropertyDescription('price', 'Rental price in credits (integer)');
+    obj.setPropertyDescription('duration', 'Rental duration in milliseconds (default 1 hour)');
+    obj.setPropertyDescription('bank', 'Bank object for processing payments (ObjRef)');
+    obj.setPropertyDescription('account', 'Account ID to receive rental payments (string)');
+    obj.setPropertyDescription('renters', 'Map of agent IDs to expiration timestamps { agentId: timestamp }');
+    obj.setPropertyDescription('code', 'Access code generated on rental (string)');
+    obj.setPropertyDescription('linkedLockId', 'Paired lock for syncing codes on double-doors (integer)');
 
     return obj;
   }

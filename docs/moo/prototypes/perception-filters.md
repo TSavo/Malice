@@ -1,5 +1,7 @@
 # Perception Filters
 
+> **Abilities-First**: Perception filters are infrastructure that modifies what agents see/hear. They work alongside abilities. See `docs/ABILITIES-FIRST.md`.
+
 Perception filters are objects that modify how agents perceive the world. They can inject content into room descriptions, provide virtual addressable entities, and receive callbacks when the agent experiences sensory input.
 
 ## Overview

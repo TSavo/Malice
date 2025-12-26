@@ -27,6 +27,20 @@ export class GuardedExitBuilder {
         description: 'A passage restricted to faction members.',
         allowedFaction: null, // Faction name that can pass (null = unrestricted)
         denyMessage: 'You are not authorized to pass.',
+
+        abilities: `Exit restricted to faction members. Extends $.exit with faction check.
+
+FACTION CHECK: 'allowedFaction' specifies which faction can pass. null = unrestricted.
+
+ACCESS: canUse() checks agent's faction via $.faction.getFaction(). Non-members get 'denyMessage'.
+
+LAYERED: Faction check happens BEFORE door/lock checks. Must pass faction check first.
+
+CONFIGURATION:
+- setAllowedFaction(name): Set faction requirement or null
+- setDenyMessage(msg): Customize rejection message
+
+DISPLAY: describe() shows faction requirement in exit listing.`,
       },
       methods: {},
     });
@@ -113,6 +127,10 @@ export class GuardedExitBuilder {
       const guardStr = self.allowedFaction ? ' [' + self.allowedFaction + ' only]' : '';
       return self.name + shortAlias + ' (' + self.distance + 'm)' + lockStr + guardStr;
     `);
+
+    // Property descriptions
+    obj.setPropertyDescription('allowedFaction', 'Faction name that can use this exit, or null for no restriction');
+    obj.setPropertyDescription('denyMessage', 'Message shown when faction check fails');
 
     return obj;
   }

@@ -61,6 +61,49 @@ Objects have:
 - **Methods**: TypeScript code strings compiled and executed at runtime
 - **Parent**: Single prototype inheritance chain (walks up to find properties/methods)
 
+### Abilities-First Architecture
+
+**IMPORTANT**: Malice uses an abilities-first paradigm. See `docs/ABILITIES-FIRST.md` for full details.
+
+**The core idea**: Instead of procedural methods, objects have:
+- **Property descriptions** - explain what each property MEANS
+- **Abilities** - prose physics describing how the object BEHAVES
+
+The AI narrator reads abilities and interprets player intent, modifying properties directly.
+
+**Three types of specification:**
+- **JSDoc** on methods = CONSTRAINTS (what infrastructure methods do)
+- **Property descriptions** = CONSTRAINTS (what data means)
+- **Abilities** = PHYSICS (how things interact)
+
+**Only these verbs are coded:**
+```
+MOVEMENT:    north, south, east, west, up, down, enter, exit
+PERCEPTION:  look, glance
+SOCIAL:      say, whisper, shout, emote, to
+META:        quit, who, help, inventory, exits, stand, sit
+```
+
+**Everything else goes through the AI narrator:**
+- "unlock the door" → AI reads lock abilities, checks key
+- "pick up the gun" → AI reads hand abilities, checks weight
+- "search for bugs" → AI reads concealment abilities, reveals items
+
+**When building objects:**
+```typescript
+const camera = await $recycler.create($describable, {
+  name: 'Security Camera',
+  recording: true,
+  eventLog: [],
+  abilities: `Surveillance device. When 'recording' is true, logs events.
+  Can be disabled by covering lens or cutting power.`
+});
+camera.setPropertyDescription('recording', "Whether actively recording.");
+camera.setPropertyDescription('eventLog', "Array of recorded events.");
+```
+
+**DO NOT** register verbs for game interactions. Let the AI handle them via abilities.
+
 ### Method Execution Context
 
 Methods are TypeScript code stored as strings in MongoDB. When executed, they have access to:

@@ -4,26 +4,18 @@ import type { RuntimeObject } from '../../../../types/object.js';
 /**
  * Builds the Edible prototype
  * Base prototype for consumable items that provide calories (food, drink, etc.)
- * Inherits from Decayable - all edibles can decay/spoil over time.
  *
- * Edible items have:
- * - calories: How many calories this provides when consumed
- * - portions: How many portions to consume it (1 = consume whole)
- * - remaining: How many portions left
- * - spoiled: Whether it has gone bad (set automatically when decayed)
- * - poisoned: Whether it is poisoned
+ * ABILITIES-FIRST ARCHITECTURE:
+ * - Properties hold nutrition/spoilage state with descriptions
+ * - Abilities describe consumption physics as prose for AI interpretation
+ * - Infrastructure methods (consume, sendBiteToStomach) handle state changes
+ * - AI determines if/when consumption is appropriate based on abilities
  *
- * Decay (1 tick = 1 minute):
- * - decayCondition: 'harvested' - decay starts when harvested from source
- * - decayRate: 0.01% per tick (food rots in ~7 days)
- * - Refrigeration: 0.2x rate (5x longer = 35 days)
- * - Freezing: 0x rate (no decay)
- * - When decay reaches 25%, item starts to spoil
- * - When decay reaches 50%, item provides 0 calories
- * - When decay reaches 100%, item is garbage (negative calories)
- *
- * Subclasses: Food, Drink, etc.
- * The subclasses provide the consume verb (eat for Food, drink for Drink)
+ * Properties:
+ * - calories: Total energy content
+ * - portions/remaining: How many bites/sips to consume
+ * - spoiled/poisoned: Safety status
+ * - effects: Status effects applied when consumed
  */
 export class EdibleBuilder {
   constructor(private manager: ObjectManager) {}
@@ -67,9 +59,33 @@ export class EdibleBuilder {
           heated: 3.0, // 3x decay (warm food spoils fast)
           preserved: 0, // No decay (salt, vinegar, etc.)
         },
+        // Abilities - consumption physics for AI interpretation
+        abilities: `Consumable item that provides nutrition when eaten or drunk.
+
+CONSUMPTION: Must reach mouth to consume. Solid food is chewed, liquids are swallowed. Each consumption takes one portion from 'remaining'. When 'remaining' reaches 0, item is fully consumed and recycled.
+
+NUTRITION: Each portion provides 'calories' / 'portions' calories and 'hydration' / 'portions' ml water equivalent. Calories go to stomach for digestion. Hydration restores body water directly.
+
+SPOILAGE: Check 'decayLevel' property. At 25%+ decay, food is spoiling - risk of nausea. At 50%+ decay, provides 0 calories. At 100% decay, toxic - negative calories damage body. Smell and appearance reveal spoilage.
+
+POISON: If 'poisoned' is true, consumption damages internal organs and may cause sedation. Poison may not be obvious from appearance - requires detection or taste.
+
+EFFECTS: The 'effects' property contains status effects applied per portion. Examples: sedation, euphoria, nausea. Each has intensity and decay rate.
+
+STOMACH CAPACITY: Consumer's stomach has limited volume. Check stomach.hasRoomFor(volume) before consuming. If stomach is full, consumption fails.`,
       },
       methods: {},
     });
+
+    // Add property descriptions
+    obj.setPropertyDescription('calories', "Total caloric content in kcal. Divided by portions to get calories per bite/sip.");
+    obj.setPropertyDescription('hydration', "Water content in ml. Restores body hydration when consumed.");
+    obj.setPropertyDescription('portions', "Total portions to fully consume this item. Food has bites, drinks have sips.");
+    obj.setPropertyDescription('remaining', "Portions left. Decreases with each consumption. At 0, item is gone.");
+    obj.setPropertyDescription('spoiled', "True if decay has made this unsafe. Causes nausea risk.");
+    obj.setPropertyDescription('poisoned', "True if intentionally poisoned. Causes organ damage and sedation.");
+    obj.setPropertyDescription('effects', "Status effects applied on consumption: { effectName: { intensity, decay } }");
+    obj.setPropertyDescription('decayLevel', "0-100 decay percentage. 25%=spoiling, 50%=rotten, 100%=toxic.");
 
     // Get calories per portion, factoring in decay
     // Fresh = full calories, 50% decay = 0 calories, 100% decay = negative calories
@@ -115,6 +131,13 @@ export class EdibleBuilder {
     // Consume a portion - returns calories consumed or error
     // Handles weight reduction, stomach transfer, and recycling when fully consumed
     obj.setMethod('consume', `
+      /** Consume one portion of this edible item.
+       *  Transfers calories to consumer's stomach, updates weight/remaining.
+       *  Call this when AI determines eating/drinking should happen.
+       *  @param consumer - The embodied agent consuming this (has getBody, getTorso)
+       *  @param sourceType - 'food' or 'drink' for stomach tracking
+       *  @returns { calories, hydration, effects, warnings, fullyConsumed, remaining } or { error }
+       */
       const consumer = args[0]; // The human consuming this
       const sourceType = args[1] || 'food'; // 'food', 'drink', etc.
 

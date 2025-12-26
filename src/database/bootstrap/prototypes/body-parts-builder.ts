@@ -71,6 +71,18 @@ export class BodyPartsBuilder {
         // Burns when out of digestible food and calories
         fat: 0, // Current fat reserves (0 = lean)
         maxFat: 100, // Max fat storage (100 = severely overweight)
+
+        abilities: `Central body trunk. Root of body part hierarchy.
+
+ENERGY HUB: Main calorie storage ('calories', 'maxCalories'). Limbs draw from torso when depleted. Stomach is inside torso.
+
+FAT RESERVES: 'fat' stores excess calories. Burns when out of food. High fat slows movement.
+
+CRITICAL: Cannot be removed (it IS the body). Destroying torso = death.
+
+BONES: Spine (posture, movement), ribs (protect organs), pelvis (support legs).
+
+VITAL ORGANS: Contains stomach, heart, lungs (internal, protected by ribs). Puncture wounds can hit organs.`,
       },
       methods: {},
     });
@@ -85,6 +97,11 @@ export class BodyPartsBuilder {
 
       return desc;
     `);
+
+    obj.setPropertyDescription('calories', 'Current available energy stored in the torso (kcal).');
+    obj.setPropertyDescription('maxCalories', 'Maximum calorie storage capacity. Excess becomes fat.');
+    obj.setPropertyDescription('fat', 'Fat reserves in units. 1 unit = ~100 calories when burned. High fat impairs movement.');
+    obj.setPropertyDescription('maxFat', 'Maximum fat storage before severe health penalties.');
 
     return obj;
   }
@@ -109,6 +126,16 @@ export class BodyPartsBuilder {
         // 5 cal/tick = enough to sustain activity and slowly gain
         // Activity burns more, so healthy eating matters
         digestionRate: 5, // kcal per tick
+
+        abilities: `Internal digestive organ.
+
+DIGESTION: Processes contents via digest(). Extracts 'digestionRate' calories per tick. Fully digested items are recycled.
+
+CAPACITY: 'maxContents' item limit, 'maxVolume' ml volume limit. Check getFullness() for current state.
+
+VOMITING: Can forcibly empty via vomit(). Useful for expelling poison before absorption.
+
+INTERNAL: Protected by torso. Not coverable. Cannot be directly attacked without penetrating torso first.`,
       },
       methods: {},
     });
@@ -266,6 +293,11 @@ export class BodyPartsBuilder {
       };
     `);
 
+    obj.setPropertyDescription('maxContents', 'Maximum number of food items the stomach can hold simultaneously.');
+    obj.setPropertyDescription('maxVolume', 'Maximum volume in ml the stomach can stretch to hold (~1 liter).');
+    obj.setPropertyDescription('digestionRate', 'Calories extracted per tick from stomach contents.');
+    obj.setPropertyDescription('internal', 'This is an internal organ, protected by the torso.');
+
     return obj;
   }
 
@@ -284,6 +316,20 @@ export class BodyPartsBuilder {
         bones: ['skull', 'jaw'],
         // Stats
         iq: 1, // Intelligence
+
+        abilities: `Sensory and cognitive center. Contains brain (consciousness, intelligence).
+
+HIERARCHY: Contains face (eyes, ears, nose, mouth→tongue). All sensory organs are here.
+
+SENSES: Vision (eyes), hearing (ears), smell (nose), taste (tongue). Uses canSmell(), canTaste(), canHear() to check working organs.
+
+SPEECH: Mouth contains tongue. Without head, cannot speak or perceive world.
+
+CRITICAL: Destroying head = instant death. Brain death, sensory shutdown.
+
+BONES: Skull (protects brain), jaw (enables eating/speech). Skull fracture can cause brain damage.
+
+INTELLIGENCE: 'iq' property affects learning, problem solving, tech use.`,
       },
       methods: {},
     });
@@ -309,6 +355,8 @@ export class BodyPartsBuilder {
 
       return desc;
     `);
+
+    obj.setPropertyDescription('iq', 'Intelligence quotient. Affects learning, problem solving, and technology use.');
 
     // Check if can smell (needs working nose in face)
     obj.setMethod('canSmell', `
@@ -367,6 +415,18 @@ export class BodyPartsBuilder {
         shape: 'almond',
         // Stats
         perception: 1,
+
+        abilities: `Visual sensory organ. Provides sight capability.
+
+VISION: 'canSense' includes 'sight'. Enables look/glance verbs and environmental awareness.
+
+APPEARANCE: 'color' and 'shape' define cosmetic features. Chrome eyes may have different colors (cybernetic blue, etc).
+
+PERCEPTION: 'perception' stat affects visual acuity, noticing details, spotting hidden objects.
+
+DAMAGE: Losing eye reduces perception, impairs depth perception. Losing both = blindness.
+
+REMOVABLE: Eyes can be gouged out in combat or surgically extracted. Chrome eyes can be swapped.`,
       },
       methods: {},
     });
@@ -378,6 +438,10 @@ export class BodyPartsBuilder {
     obj.setMethod('describe', `
       return 'A ' + self.color + ' ' + self.shape + '-shaped eye';
     `);
+
+    obj.setPropertyDescription('color', 'Eye color (brown, blue, green, etc.).');
+    obj.setPropertyDescription('shape', 'Eye shape (almond, round, hooded, etc.).');
+    obj.setPropertyDescription('perception', 'Visual acuity. Affects noticing details and spotting hidden objects.');
 
     return obj;
   }
@@ -399,6 +463,18 @@ export class BodyPartsBuilder {
         shape: 'normal',
         // Stats
         perception: 1, // Hearing acuity
+
+        abilities: `Auditory sensory organ. Receives sound and speech.
+
+HEARING: hear() method processes incoming speech. Checks if deaf/destroyed/blocked before passing through.
+
+LANGUAGE: Ears receive raw speech objects. Understanding depends on listener's knownLanguages, not the ear.
+
+BLOCKING: Contents (earplugs, bugs) muffle sound. Sets 'muffled' flag on speech object.
+
+DAMAGE: 'deaf' condition or destruction = cannot hear. Need at least one working ear.
+
+PERCEPTION: 'perception' stat affects hearing acuity, detecting whispers, identifying speakers.`,
       },
       methods: {},
     });
@@ -432,6 +508,9 @@ export class BodyPartsBuilder {
       return speech;
     `);
 
+    obj.setPropertyDescription('shape', 'Ear shape (normal, pointed, large, etc.).');
+    obj.setPropertyDescription('perception', 'Hearing acuity. Affects detecting whispers and identifying speakers.');
+
     return obj;
   }
 
@@ -449,6 +528,18 @@ export class BodyPartsBuilder {
         canSense: ['smell'],
         // Appearance
         shape: 'straight',
+
+        abilities: `Olfactory sensory organ. Detects scents and odors.
+
+SMELL: canSmell() checks if functional. Returns false if destroyed/missing/stuffed or if contents block airway.
+
+BLOCKING: Items shoved into nose (drugs, implants, plugs) prevent smelling.
+
+DAMAGE: Losing nose or 'stuffed' condition = cannot smell. Impairs taste (smell/taste linked).
+
+APPEARANCE: 'shape' property (straight, hooked, flat, etc) is cosmetic.
+
+BREATHING: Nose also handles respiration. Blocked nose forces mouth breathing.`,
       },
       methods: {},
     });
@@ -471,6 +562,8 @@ export class BodyPartsBuilder {
       return true;
     `);
 
+    obj.setPropertyDescription('shape', 'Nose shape (straight, hooked, flat, etc.).');
+
     return obj;
   }
 
@@ -492,6 +585,20 @@ export class BodyPartsBuilder {
         // Voice modifiers (chrome mods can change these)
         volume: 'normal', // whisper, normal, loud, booming
         tone: 'natural', // natural, synthetic, robotic, etc.
+
+        abilities: `Oral cavity for speech, eating, breathing.
+
+SPEECH: speak() method creates speech objects. Requires working tongue. 'language' property determines spoken language.
+
+VOICE: 'volume' (whisper/normal/loud/booming) and 'tone' (natural/synthetic/robotic) modify speech. Chrome can augment.
+
+EATING: Gateway to stomach. canContain() checks size (only tiny/small items fit).
+
+TASTE: Delegates to tongue via canTaste(). Requires functional tongue.
+
+BLOCKING: Contents (gag, food) prevent speech. Must be empty to speak.
+
+BREATHING: Secondary airway when nose blocked. Cannot breathe underwater without equipment.`,
       },
       methods: {},
     });
@@ -549,6 +656,11 @@ export class BodyPartsBuilder {
       return true;
     `);
 
+    obj.setPropertyDescription('canSpeak', 'Whether this mouth can produce speech. Requires working tongue.');
+    obj.setPropertyDescription('language', 'The language spoken by this mouth (English, Spanish, etc.).');
+    obj.setPropertyDescription('volume', 'Voice volume (whisper, normal, loud, booming).');
+    obj.setPropertyDescription('tone', 'Voice tone (natural, synthetic, robotic). Modified by chrome.');
+
     return obj;
   }
 
@@ -566,6 +678,18 @@ export class BodyPartsBuilder {
         removable: true,
         critical: false,
         canSense: ['taste'],
+
+        abilities: `Muscular organ for taste and speech articulation.
+
+TASTE: canTaste() returns true unless destroyed/missing. Enables flavor detection.
+
+SPEECH: canSpeak() required for mouth.speak(). Without tongue, cannot articulate words (mute).
+
+DAMAGE: Losing tongue = cannot speak, cannot taste. 'mute' condition silences speech.
+
+REMOVABLE: Can be cut out (torture, combat). Chrome replacement possible (synth-tongue).
+
+WEIGHT: ~70g. Small but dense muscle tissue.`,
       },
       methods: {},
     });
@@ -588,6 +712,8 @@ export class BodyPartsBuilder {
       return true;
     `);
 
+    obj.setPropertyDescription('canSense', 'Array of senses this organ provides (taste).');
+
     return obj;
   }
 
@@ -607,6 +733,18 @@ export class BodyPartsBuilder {
         // Local muscle energy (glycogen in arm muscles)
         calories: 100, // Current arm calories
         maxCalories: 150, // Max arm calorie storage
+
+        abilities: `Limb for reaching, carrying, striking.
+
+HIERARCHY: Contains forearm→hand→fingers. Losing arm loses all child parts.
+
+STRENGTH: Local 'calories' power arm actions. Depletes with heavy use, refills from torso.
+
+COMBAT: Can punch, block, grapple. Weapons held in hand use arm strength.
+
+AMPUTATION: 'removable' is true. Severing drops arm (with hand attached) to ground.
+
+BONES: Humerus (upper), radius/ulna (forearm). Breaking impairs use.`,
       },
       methods: {},
     });
@@ -623,6 +761,9 @@ export class BodyPartsBuilder {
 
       return desc;
     `);
+
+    obj.setPropertyDescription('calories', 'Current energy stored in arm muscles.');
+    obj.setPropertyDescription('maxCalories', 'Maximum calorie storage in arm. Refills from torso when depleted.');
 
     return obj;
   }
@@ -652,6 +793,22 @@ export class BodyPartsBuilder {
         // Local muscle energy (hand/forearm muscles)
         calories: 50, // Current hand calories
         maxCalories: 75, // Max hand calorie storage
+
+        abilities: `Grasping appendage at end of arm. Enables object manipulation.
+
+HIERARCHY: Contains fingers (5 typically). Losing hand loses all fingers.
+
+GRASP: 'canGrasp' enables holding items. 'maxItems' (2) limit - can hold 2 objects at once.
+
+CAPACITY: 'maxWeight' (10kg base). Effective capacity = maxCalories - decayLevel (~133g per calorie).
+
+STRENGTH: Local 'calories' power grip strength. Depletes with sustained holding, refills from arm.
+
+TOUCH: 'canSense' includes 'touch'. Tactile feedback for texture, temperature, pressure.
+
+DAMAGE: Broken hand (bone damage) = cannot grasp. Losing fingers reduces dexterity.
+
+BONES: Carpals (wrist), metacarpals (palm). Fractures impair grip.`,
       },
       methods: {},
     });
@@ -712,6 +869,15 @@ export class BodyPartsBuilder {
       return contents.filter(item => item);
     `);
 
+    obj.setPropertyDescription('canGrasp', 'Whether this hand can grasp and hold items.');
+    obj.setPropertyDescription('maxItems', 'Maximum number of items this hand can hold simultaneously (typically 2).');
+    obj.setPropertyDescription('maxWeight', 'Maximum weight in grams this hand can hold. Reduced by decay and damage.');
+    obj.setPropertyDescription('width', 'Palm width in cm. Affects what can be grasped.');
+    obj.setPropertyDescription('height', 'Hand length in cm (fingers extended).');
+    obj.setPropertyDescription('depth', 'Grip thickness in cm.');
+    obj.setPropertyDescription('calories', 'Current energy in hand/forearm muscles.');
+    obj.setPropertyDescription('maxCalories', 'Maximum calorie storage in hand. Powers grip strength.');
+
     return obj;
   }
 
@@ -729,9 +895,25 @@ export class BodyPartsBuilder {
         removable: true,
         canSense: ['touch'],
         bones: ['phalanges'],
+
+        abilities: `Digit for fine manipulation. Part of hand.
+
+DEXTERITY: Enables precise actions (typing, lockpicking, trigger pulling). Losing fingers reduces dexterity.
+
+TOUCH: High-density tactile receptors. 'canSense' includes 'touch'. Sensitive to texture, pressure, temperature.
+
+DAMAGE: Individual fingers can be severed. Losing thumb = major grip impairment. Losing multiple fingers = cannot hold items.
+
+BONES: Phalanges (3 per finger, 2 for thumb). Breaking disables finger.
+
+REMOVABLE: Can be cut/shot off individually. Chrome fingers are modular replacements.
+
+WEIGHT: ~20g each. Tiny but crucial for hand function.`,
       },
       methods: {},
     });
+
+    obj.setPropertyDescription('canSense', 'Array of senses this organ provides (touch).');
 
     return obj;
   }
@@ -753,9 +935,29 @@ export class BodyPartsBuilder {
         // Local muscle energy (leg muscles - largest muscle group)
         calories: 200, // Current leg calories
         maxCalories: 300, // Max leg calorie storage
+
+        abilities: `Primary locomotion limb. Largest muscle group in body.
+
+HIERARCHY: Contains knee→foot→toes. Losing leg loses all child parts.
+
+MOVEMENT: 'canMove' enables walking/running. Need at least one leg to stand. Two legs = normal speed.
+
+STRENGTH: Massive 'maxCalories' (300) - legs are strongest muscles. Powers movement, jumping, kicking.
+
+COMBAT: Can kick with devastating force. Leg sweeps, stomps. Heavy weapons.
+
+DAMAGE: Losing one leg = reduced mobility (crutch/prosthetic needed). Losing both = cannot walk.
+
+BONES: Femur (thigh, strongest bone), tibia/fibula (shin). Femur break = immobilized.
+
+AMPUTATION: 'removable' is true. Severing drops leg (with foot attached) to ground. Chrome legs common.`,
       },
       methods: {},
     });
+
+    obj.setPropertyDescription('canMove', 'Whether this leg enables locomotion. Requires working joints and bones.');
+    obj.setPropertyDescription('calories', 'Current energy in leg muscles. Legs have the highest capacity (largest muscles).');
+    obj.setPropertyDescription('maxCalories', 'Maximum calorie storage in leg. Powers movement, jumping, and kicking.');
 
     return obj;
   }
@@ -775,9 +977,27 @@ export class BodyPartsBuilder {
         canMove: true,
         canSense: ['touch'],
         bones: ['tarsals', 'metatarsals', 'phalanges'],
+
+        abilities: `Ground contact point for leg. Enables balance and propulsion.
+
+MOVEMENT: 'canMove' links to leg locomotion. Feet provide traction, balance, push-off.
+
+TOUCH: 'canSense' includes 'touch'. Ground texture, temperature feedback. Barefoot = tactile awareness.
+
+COVERAGE: 'coverable' is true. Shoes/boots provide protection, reduce noise. Bare feet = stealthy but vulnerable.
+
+DAMAGE: Losing foot = impaired balance, reduced speed. Can use peg leg or prosthetic.
+
+COMBAT: Can stomp/kick. Less force than full leg but still effective.
+
+BONES: Tarsals (ankle/heel), metatarsals (arch), phalanges (toes). Broken ankle = cannot walk.
+
+REMOVABLE: Can be severed at ankle. Chrome feet provide enhanced grip, shock absorption.`,
       },
       methods: {},
     });
+
+    obj.setPropertyDescription('canMove', 'Whether this foot contributes to leg locomotion. Provides traction and balance.');
 
     return obj;
   }

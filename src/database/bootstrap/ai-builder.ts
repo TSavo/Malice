@@ -47,6 +47,27 @@ export class AiBuilder {
         name: 'AI',
         description: 'Registry for AI-controlled humans',
 
+        // Abilities - what $ai is for
+        abilities: `Infrastructure registry for AI-controlled NPCs. NOT an in-game object.
+
+SPAWNING: spawn(role, options) creates a new AI human with randomized appearance, body, and the default agent prompt. Options: name, description, location, personality, history, clothed, sex, age, height, weight, appearance.
+
+DESPAWNING: despawn(humanId) removes an AI human and optionally recycles the object.
+
+REGISTRY: register/unregister track which humans are AI-controlled. Query with isAiControlled(id), getByRole(role), getAll(), getInfo(id).
+
+MEMORIES: AI NPCs have persistent memories across session resets. remember(humanId, text, importance, tags) stores. recall(humanId, options) retrieves. Importance levels: critical (never forget), important, normal.
+
+PROFILE: setPersonality(humanId, personality) and setHistory(humanId, history) configure NPC character. getProfile(humanId) returns full profile with memories and notes.
+
+PATHFINDING: path(fromRoom, toRoom, options) finds shortest route using A*. walkPath(humanId, path) moves an NPC along the route.
+
+EXPECTATIONS: expectResponseFrom(targetId, options) sets timeout when AI is waiting for player response. cancelExpectation(targetId, humanId) clears it.
+
+SESSIONS: registerSession/listSessions/getSession track Claude API sessions for conversation continuity.
+
+WORLD LOG: logWorld(author, message) and getWorldLog(limit) manage the deity chat between Pluribus and Sister Gray.`,
+
         // Role → Human ID[] mapping
         // { 'guard': [123, 456], 'shopkeeper': [789] }
         roles: {},
@@ -423,11 +444,25 @@ CORE PRINCIPLES
       methods: {},
     });
 
+    // Add property descriptions
+    this.ai.setPropertyDescription('roles', "Map of role name → array of human objects. E.g., { 'guard': [#123, #456] }");
+    this.ai.setPropertyDescription('registry', "Map of humanId → metadata. Tracks spawnedAt, spawnedBy, role, human objref.");
+    this.ai.setPropertyDescription('memories', "Map of humanId → array of { text, importance, timestamp, tags }. Persistent across sessions.");
+    this.ai.setPropertyDescription('sessionLogs', "Map of npcId → { npcName, role, wakeSession?, interactionSession? }. Tracks Claude sessions.");
+    this.ai.setPropertyDescription('expectations', "Map of jobName → { targetId, humanId, prompt, recurring, timeout }. Response timeout tracking.");
+    this.ai.setPropertyDescription('worldLog', "Array of { timestamp, author, message }. OOC deity chat between Pluribus and Sister Gray.");
+    this.ai.setPropertyDescription('defaultAgentPrompt', "Template string for NPC system prompts. Uses {{variable}} syntax.");
+
     // ═══════════════════════════════════════════════════════════════════
     // SPAWN - Create a new AI-controlled human
     // ═══════════════════════════════════════════════════════════════════
 
     this.ai.setMethod('spawn', `
+      /** Spawn a new AI-controlled human with randomized or specified attributes.
+       *  @param role - The NPC's role (e.g., 'guard', 'shopkeeper')
+       *  @param options - { name, description, location, personality, history, clothed, sex, age, height, weight, appearance, context }
+       *  @returns The spawned human RuntimeObject
+       */
       const role = args[0];
       const options = args[1] || {};
 
@@ -760,6 +795,10 @@ CORE PRINCIPLES
     // ═══════════════════════════════════════════════════════════════════
 
     this.ai.setMethod('despawn', `
+      /** Remove an AI-controlled human from the registry and optionally recycle it.
+       *  @param humanId - The human's object ID
+       *  @param recycle - Whether to recycle the object (default true)
+       */
       const humanId = args[0];
       const recycle = args[1] !== false; // Default true
 
@@ -801,6 +840,12 @@ CORE PRINCIPLES
     // ═══════════════════════════════════════════════════════════════════
 
     this.ai.setMethod('register', `
+      /** Register a human as AI-controlled in the registry.
+       *  @param humanId - The human's object ID
+       *  @param role - The NPC's role
+       *  @param metadata - Additional metadata (spawnedAt, spawnedBy, etc.)
+       *  @returns true on success
+       */
       const humanId = args[0];
       const role = args[1];
       const metadata = args[2] || {};
@@ -841,6 +886,10 @@ CORE PRINCIPLES
     `);
 
     this.ai.setMethod('unregister', `
+      /** Remove a human from the AI registry (does not recycle the object).
+       *  @param humanId - The human's object ID
+       *  @returns true if found and removed, false if not registered
+       */
       const humanId = args[0];
 
       const registry = self.registry || {};
@@ -870,6 +919,11 @@ CORE PRINCIPLES
     `);
 
     this.ai.setMethod('setRole', `
+      /** Change the role of an AI-controlled human.
+       *  @param humanId - The human's object ID
+       *  @param newRole - The new role to assign
+       *  @returns true on success
+       */
       const humanId = args[0];
       const newRole = args[1];
 
@@ -912,12 +966,20 @@ CORE PRINCIPLES
     // ═══════════════════════════════════════════════════════════════════
 
     this.ai.setMethod('isAiControlled', `
+      /** Check if a human is AI-controlled.
+       *  @param humanId - The human's object ID
+       *  @returns true if AI-controlled, false otherwise
+       */
       const humanId = args[0];
       const registry = self.registry || {};
       return !!registry[humanId];
     `);
 
     this.ai.setMethod('getByRole', `
+      /** Get all AI humans with a specific role.
+       *  @param role - The role to filter by
+       *  @returns Array of human RuntimeObjects
+       */
       const role = args[0];
       const roles = self.roles || {};
       // Returns array of human objects (stored as objrefs, resolved on read)
@@ -925,17 +987,27 @@ CORE PRINCIPLES
     `);
 
     this.ai.setMethod('getRoles', `
+      /** Get all roles that have AI humans assigned.
+       *  @returns Array of role names
+       */
       const roles = self.roles || {};
       return Object.keys(roles);
     `);
 
     this.ai.setMethod('getAll', `
+      /** Get all AI-controlled humans.
+       *  @returns Array of human RuntimeObjects
+       */
       const registry = self.registry || {};
       // Return array of human objects from registry entries
       return Object.values(registry).map(entry => entry.human).filter(h => h);
     `);
 
     this.ai.setMethod('getInfo', `
+      /** Get detailed info about an AI-controlled human.
+       *  @param humanId - The human's object ID
+       *  @returns Object with human, role, spawnedAt, personality, history, etc. or null
+       */
       const humanId = args[0];
       const registry = self.registry || {};
       const entry = registry[humanId];
@@ -1283,11 +1355,18 @@ CORE PRINCIPLES
     `);
 
     this.ai.setMethod('count', `
+      /** Get total number of AI-controlled humans.
+       *  @returns Number of registered AI humans
+       */
       const registry = self.registry || {};
       return Object.keys(registry).length;
     `);
 
     this.ai.setMethod('countByRole', `
+      /** Get number of AI humans with a specific role.
+       *  @param role - The role to count
+       *  @returns Number of AI humans with that role
+       */
       const role = args[0];
       const roles = self.roles || {};
       return (roles[role] || []).length;
@@ -1868,6 +1947,9 @@ CORE PRINCIPLES
     // ═══════════════════════════════════════════════════════════════════
 
     this.ai.setMethod('describe', `
+      /** Get a formatted description of the AI registry.
+       *  @returns Multi-line string listing all AI humans by role
+       */
       const roles = self.roles || {};
       const registry = self.registry || {};
       const total = Object.keys(registry).length;

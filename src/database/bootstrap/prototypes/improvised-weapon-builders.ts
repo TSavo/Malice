@@ -39,9 +39,34 @@ export class ImprovisedBuilder {
         skill: 'improvised',
         damage: 8,
         damageType: 'bruise',
+
+        abilities: `Everyday object used as a weapon. Desperate or opportunistic.
+
+VERSATILITY: Found anywhere. Bottles, tools, furniture. Skill: 'improvised' covers all.
+
+FRAGILITY: Many improvised weapons break on impact. Bottles shatter (creates cutting edges). Chairs splinter.
+
+DAMAGE: Lower 'damage' than purpose-built weapons. Compensated by availability and surprise.
+
+SURPRISE: Using mundane objects as weapons may catch targets off-guard. First strike advantage.
+
+DISPOSAL: Can be dropped at scene without connecting to attacker. No registered weapons.
+
+TYPES:
+- Glass (bottles, jars): Shatters to 'cut' damage
+- Tools (screwdrivers, hammers): 'puncture' or 'bruise'
+- Blunt objects (bats, pipes): 'bruise', may break bones
+- Thrown (rocks, bricks): Ranged, 'bruise'
+
+LEGAL: Most improvised weapons are not contraband until used criminally.`,
       },
       methods: {},
     });
+
+    obj.setPropertyDescription('skill', 'The combat skill used with this weapon (improvised, throwing, etc.).');
+    obj.setPropertyDescription('damage', 'Base damage value. Lower than purpose-built weapons but compensated by availability.');
+    obj.setPropertyDescription('damageType', 'Type of damage inflicted (bruise, cut, puncture, burn).');
+
     return obj;
   }
 }

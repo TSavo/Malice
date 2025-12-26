@@ -59,6 +59,26 @@ export class RoomBuilder {
         waterLevel: 0, // 0=dry, 50=waist-deep, 100=fully submerged
         // Environment
         outdoor: true, // Is this room outdoors? (affects weather, natural light)
+
+        abilities: `Physical space that agents can occupy and traverse.
+
+COORDINATES: x, y, z position in meters. Used for distance calculations between rooms. z negative = underground.
+
+EXITS: 'exits' array contains Exit objects. Each exit has destination, distance, locks. Agents arrive → exit verbs registered. Leave → verbs unregistered.
+
+CROWD: 'population' is artificial crowd (NPCs). getCrowdLevel() adds actual agents. High crowd → harder to perceive non-watched people. getCrowdDescription() narrates atmosphere.
+
+LIGHTING: 'lighting' (0-100) affects vision. 0=pitch black, 50=dim, 100=well-lit. Low light → reduced visual clarity.
+
+NOISE: 'ambientNoise' base level. Crowd adds more. High noise → harder to hear clearly.
+
+WATER: 'waterLevel' (0-100) affects breathing. 50=waist deep, 100=submerged. Submerged → drowning risk.
+
+SITTABLES: 'sittables' array defines seating. Each has capacity. Sitting registers 'stand' verb, starts 'sit' exclusion.
+
+PERCEPTION: getPerception(viewer, target) calculates clarity based on crowd, light, noise, viewer senses, whether watching target.
+
+OUTDOOR: 'outdoor' affects weather exposure, natural lighting cycles.`,
       },
       methods: {},
     });
@@ -811,6 +831,18 @@ export class RoomBuilder {
 
       return '';
     `);
+
+    // Property descriptions
+    obj.setPropertyDescription('x', 'X coordinate position in world space (meters, integer)');
+    obj.setPropertyDescription('y', 'Y coordinate position in world space (meters, integer)');
+    obj.setPropertyDescription('z', 'Z coordinate position in world space (meters, integer, negative = underground)');
+    obj.setPropertyDescription('exits', 'Array of Exit object IDs that connect to other rooms');
+    obj.setPropertyDescription('sittables', 'Array of sittable locations with capacity and occupancy tracking');
+    obj.setPropertyDescription('population', 'Artificial crowd level (0-100), represents NPCs and ambient crowds');
+    obj.setPropertyDescription('ambientNoise', 'Base noise level (0-100) affecting hearing clarity');
+    obj.setPropertyDescription('lighting', 'Light level (0=pitch black, 50=dim, 100=well-lit) affecting vision');
+    obj.setPropertyDescription('waterLevel', 'Water depth (0=dry, 50=waist-deep, 100=fully submerged) affecting breathing');
+    obj.setPropertyDescription('outdoor', 'Whether this room is outdoors (affects weather and natural light cycles)');
 
     return obj;
   }

@@ -43,9 +43,30 @@ export class BladeBuilder {
         skill: 'blade',
         damage: 15,
         damageType: 'cut',
+
+        abilities: `Sharp-edged weapon for cutting and stabbing.
+
+CUTTING: Primary attack creates 'cut' wounds. Severity based on 'damage' + strength + skill check. Cuts bleed freely.
+
+STABBING: Thrust attack creates 'puncture' wounds. Deep punctures can hit organs. Less bleeding but more internal damage.
+
+SLASHING: Wide swings can hit multiple targets or create longer wounds. More bleeding, less depth.
+
+BLOCKING: Can parry other blades. Edge damage degrades weapon. Blocking blunt weapons risks blade breakage.
+
+UTILITY: Outside combat, blades cut rope, fabric, leather. Can be used for butchering, whittling, prying (poorly).
+
+MAINTENANCE: 'sharpness' degrades with use. Dull blade = reduced damage. Can be sharpened with proper tools.
+
+CONCEALMENT: Smaller blades easier to hide. Folding blades even more so. Draw time varies by type.`,
       },
       methods: {},
     });
+
+    obj.setPropertyDescription('skill', 'Combat skill used with this weapon (blade, knife, machete, katana, sword, axe). Affects attack success and damage.');
+    obj.setPropertyDescription('damage', 'Base damage value for attacks. Combined with strength and skill check for final wound severity.');
+    obj.setPropertyDescription('damageType', 'Type of wound inflicted (cut, puncture). Cuts bleed more, punctures go deeper.');
+
     return obj;
   }
 }

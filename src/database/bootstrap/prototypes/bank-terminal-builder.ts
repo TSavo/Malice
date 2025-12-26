@@ -37,6 +37,27 @@ export class BankTerminalBuilder {
         },
         // Credchip denominations available
         credchipDenominations: [100, 500, 1000, 5000, 10000],
+
+        abilities: `Banking kiosk for account management and credchips.
+
+SERVICES: doUse() shows menu via $.prompt:
+- Check Balance (showBalance)
+- Transfer Funds (showTransfer)
+- Transaction History (showHistory)
+- Buy Credchip (showBuyCredchip)
+- Deposit Credchip (showDepositCredchip)
+- Open Account (showOpenAccount)
+
+CREDCHIPS: Bearer tokens for anonymous value transfer.
+- Buy: money burned from account, physical credchip created
+- Deposit: credchip consumed, money issued to account
+- Enables off-grid payments and money laundering
+
+FEES: 'fees' object configures per-operation costs.
+
+ACCOUNTS: Players must have bank account. getPlayerAccount() checks. openAccount creates new.
+
+VERBS: 'use terminal', 'bank', 'check balance'. Registered when terminal placed or player enters room.`,
       },
       methods: {},
     });
@@ -613,73 +634,14 @@ export class BankTerminalBuilder {
 
     obj.setMethod('describe', `
       let desc = self.name + '\\r\\n';
-      desc += self.description + '\\r\\n';
-      desc += '\\r\\n';
-      desc += 'Type "use terminal" or "bank" to access services.';
+      desc += self.description;
       return desc;
     `);
 
-    // ═══════════════════════════════════════════════════════════════════
-    // VERB REGISTRATION
-    // ═══════════════════════════════════════════════════════════════════
-
-    obj.setMethod('registerVerbsFor', `
-      const player = args[0];
-      if (!player || !player.registerVerb) return;
-
-      await player.registerVerb(['use terminal', 'use bank terminal', 'use kiosk'], self, 'doUse');
-      await player.registerVerb(['bank', 'banking'], self, 'doUse');
-      await player.registerVerb(['check balance', 'balance'], self, 'doBalance');
-    `);
-
-    // doBalance - shortcut for balance check
-    obj.setMethod('doBalance', `
-      // Args from verb pattern 'check balance' (no %i/%t):
-      //   args = [] (empty, no pattern variables)
-      // Direct variables:
-      //   player = the player executing the command
-
-      if (!player) return 'Check whose balance?';
-
-      const account = await self.getPlayerAccount(player);
-      if (!account) {
-        return 'You do not have a bank account. Use the terminal to open one.';
-      }
-
-      return await self.showBalance(player, account);
-    `);
-
-    // onArrived - register verbs when placed in room
-    obj.setMethod('onArrived', `
-      const dest = args[0];
-
-      if (dest && dest.contents) {
-        for (const obj of dest.contents) {
-          if (obj && obj.isPlayer && obj.registerVerb) {
-            await self.registerVerbsFor(obj);
-          }
-        }
-      }
-    `);
-
-    // onLeaving - unregister verbs when leaving
-    obj.setMethod('onLeaving', `
-      const source = args[0];
-
-      if (source && source.contents) {
-        for (const obj of source.contents) {
-          if (obj && obj.isPlayer && obj.unregisterVerbsFrom) {
-            await obj.unregisterVerbsFrom(self.id);
-          }
-        }
-      }
-    `);
-
-    // onPlayerArrived - register verbs when player enters room
-    obj.setMethod('onPlayerArrived', `
-      const player = args[0];
-      await self.registerVerbsFor(player);
-    `);
+    // Add property descriptions
+    obj.setPropertyDescription('bank', 'Reference to the Bank object this terminal connects to (null = uses $.bank)');
+    obj.setPropertyDescription('fees', 'Object mapping operation types to their fees (transfer, credchip, deposit)');
+    obj.setPropertyDescription('credchipDenominations', 'Array of standard credchip values available for purchase');
 
     return obj;
   }

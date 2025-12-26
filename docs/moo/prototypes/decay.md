@@ -1,5 +1,7 @@
 # Decay System
 
+> **Abilities-First**: Decay uses abilities to describe spoilage, transformation, and condition. The scheduler handles tick progression. See `docs/ABILITIES-FIRST.md`.
+
 Objects that rot, decompose, and transform over time.
 
 ## Overview

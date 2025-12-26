@@ -1,5 +1,7 @@
 # Security System
 
+> **Abilities-First**: Security systems use abilities to describe access control, authentication, and bypassing. The AI interprets unlock/bypass attempts. See `docs/ABILITIES-FIRST.md`.
+
 Composable locks, biometric authentication, faction access, banks, and lockers in Malice.
 
 ## Overview

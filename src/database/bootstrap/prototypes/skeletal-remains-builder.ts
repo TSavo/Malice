@@ -36,6 +36,18 @@ export class SkeletalRemainsBuilder {
         contents: [],
         // Can be searched
         searched: false,
+
+        abilities: `Bleached skeleton - the final stage of a corpse. Permanent.
+
+NO DECAY: Bones persist indefinitely. Weather, animals may scatter them but they don't disappear. Grim landmarks of past violence.
+
+LOOTING: Can be searched but most organic items have rotted. Metal objects (weapons, jewelry, coins) may remain.
+
+AUTOPSY: Very limited - only bone trauma visible. Skull fractures, broken ribs, severed limbs. No soft tissue, no toxicology, no stomach contents.
+
+IDENTIFICATION: 'originalName' if known. Otherwise requires dental records, DNA (if tech allows), or personal effects. Sex may be determinable from pelvis shape.
+
+USES: Bones can be collected, buried, arranged. Skulls as trophies. Bone meal for fertilizer. Ritual purposes. Evidence of crimes.`,
       },
       methods: {},
     });
@@ -279,6 +291,11 @@ export class SkeletalRemainsBuilder {
     obj.setMethod('canContain', `
       return true;
     `);
+
+    // Add property descriptions
+    obj.setPropertyDescription('originalName', 'Identity if known from earlier stages. Otherwise requires dental records, DNA, or personal effects for identification.');
+    obj.setPropertyDescription('contents', 'Array containing skeletal body structure and any metal/non-organic items (weapons, jewelry, coins). All organic material has decayed.');
+    obj.setPropertyDescription('searched', 'Boolean tracking if skeleton has been searched for items or evidence.');
 
     return obj;
   }

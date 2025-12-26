@@ -1,5 +1,7 @@
 # MOO Programming Documentation
 
+> **Abilities-First Architecture**: Malice uses abilities (prose physics) instead of procedural methods for game interactions. See `docs/ABILITIES-FIRST.md`.
+
 Comprehensive guides for programming in Malice's MOO layer.
 
 ## MCP Integration (Direct MOO Code)

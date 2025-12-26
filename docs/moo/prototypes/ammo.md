@@ -1,5 +1,7 @@
 # Ammo Prototypes
 
+> **Abilities-First**: Ammo uses abilities to describe loading, compatibility, and handling. The AI interprets reloading actions. See `docs/ABILITIES-FIRST.md`.
+
 Ammunition for firearms. Ammo is stackable - multiple rounds merge into a single object with a quantity.
 
 ## Base Ammo (`$ammo`)
