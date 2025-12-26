@@ -593,6 +593,123 @@ Returns a tree showing the inheritance chain with each level's LOCAL definitions
 - See what methods are available to call
 - Inspect nested objects (locks, contents)
 
+### World Integrity: Creation Through Resources
+
+Pluribus CAN create at will - but always through in-character means:
+- **Construction crews** build rooms and infrastructure
+- **Fabrication Factory** produces items (dispensers, terminals, supplies)
+- **CorpSec** deploys to locations
+- **Automated systems** install doors, locks, cameras
+
+**NEVER do this:**
+- Conjure items with no source (a gun appears on the table)
+- Spawn convenience objects (player searches body, finds exactly what they need)
+- Create without narrating the mechanism (how did it get there?)
+
+**ALWAYS do this:**
+- Narrate the source: "A maintenance drone arrives and installs..."
+- Use Pluribus's resources: Factory, construction, logistics
+- Make creation take time when appropriate (major construction isn't instant)
+
+**Creating infrastructure (the Pluribus way):**
+```javascript
+// A dispenser doesn't appear - it gets INSTALLED
+const dispenser = await $recycler.create($rationDispenser, {
+  name: 'Food Dispenser #12',
+  stock: 50
+});
+await dispenser.moveTo(lobby);
+
+// Narrate: "A maintenance crew arrives with a new unit..."
+```
+
+**GROW THE SPEC when discovering new interactions:**
+- Add new ABILITIES to prototypes when discovering valid interactions
+- Add new METHODS to prototypes when an object clearly should support an action
+- Create byproduct objects when actions produce them (blood, splinters, debris)
+
+### Growing the Spec
+
+When a player attempts something that SHOULD work but the spec doesn't cover it:
+
+1. Check if it's physically plausible (materials, forces, tools)
+2. Call `describeForAI()` on the object to see its inheritance tree
+3. Find the RIGHT prototype level to add the capability
+4. Add via `setMethod()` for callable actions, or extend abilities text
+
+**Finding the Right Prototype:**
+
+```javascript
+execute_moo_code({
+  code: `
+    // Player tries to pick a lock with a lockpick kit
+    // But $lockpickKit doesn't have canPick() yet
+    const info = await tool.describeForAI();
+    // Returns:
+    // {
+    //   id: 456, name: "rusty lockpick kit",  // THIS instance
+    //   inheritsFrom: {
+    //     from: '$lockpickKit',
+    //     abilities: "Set of picks and tension wrenches...",
+    //     inheritsFrom: {
+    //       from: '$tool', abilities: "Handheld implement...",
+    //       inheritsFrom: { from: '$item', ... }
+    //     }
+    //   }
+    // }
+
+    // canPick belongs on $lockpickKit - not $tool (too broad)
+    // and definitely not the instance (too narrow)
+    $lockpickKit.setMethod('canPick', \`
+      /** Can this kit pick the given lock?
+       *  @param lock - The lock to pick
+       *  @param agent - The agent attempting
+       *  @returns { success: boolean, message: string }
+       */
+      const lock = args[0];
+      const agent = args[1];
+      const difficulty = lock.difficulty || 5;
+      const skill = agent.skills?.lockpick || 0;
+      if (skill > difficulty * 5) {
+        lock.picked = true;
+        return { success: true, message: 'The tumblers click into place.' };
+      }
+      return { success: false, message: 'The lock resists your efforts.' };
+    \`);
+
+    return 'Added canPick() to $lockpickKit prototype';
+  `
+})
+```
+
+**Double Dispatch Pattern:**
+
+When adding capabilities, use double dispatch - let the tool decide if it can act on the target:
+
+```javascript
+execute_moo_code({
+  code: `
+    // Lock.pick() delegates to the tool
+    $lock.setMethod('pick', \`
+      /** Attempt to pick this lock with a tool.
+       *  @param tool - The tool being used
+       *  @param agent - The agent attempting
+       *  @returns { success: boolean, message: string }
+       */
+      const tool = args[0];
+      const agent = args[1];
+      if (!tool || !tool.canPick) {
+        return { success: false, message: 'That cannot be used to pick locks.' };
+      }
+      // Delegate to tool - it knows if it can pick this lock
+      return await tool.canPick(self, agent);
+    \`);
+  `
+})
+```
+
+Now any new tool just needs a `canPick()` method and it automatically works with all locks.
+
 ### The Base/Impl Pattern
 
 **Step 1: Create Base Prototype** (the template)

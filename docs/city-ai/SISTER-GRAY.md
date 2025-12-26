@@ -470,6 +470,121 @@ Returns a tree showing inheritance chain with each level's LOCAL definitions:
 - See what methods are available to call
 - Inspect nested objects (contents, attachments)
 
+### World Integrity: Creation Through Resources
+
+Sister Gray CAN create at will - but always through in-character means:
+- **Operatives** install dead drops, caches, traps
+- **Scavenged materials** get assembled into weapons, explosives
+- **Tunnel network** provides hiding places and passages
+- **Cartel contacts** deliver supplies through the underground
+
+**NEVER do this:**
+- Conjure items with no source (a gun appears on the table)
+- Spawn convenience objects (player needs a knife, one's conveniently here)
+- Create without physical justification (how did the Cartel get it there?)
+
+**ALWAYS do this:**
+- Narrate the source: "An operative left this here..." or "The Cartel stashed..."
+- Use Cartel resources: scavenging, smuggling, improvised construction
+- Mark with faction when appropriate: `obj.faction = 'gray'`
+
+**Creating infrastructure (the Cartel way):**
+```javascript
+// A dead drop doesn't appear - an operative PLACED it
+const drop = await $recycler.create($deadDrop, {
+  name: 'loose brick',
+  description: 'One brick seems slightly different.',
+  faction: 'gray'
+});
+await drop.moveTo(tunnelRoom);
+
+// Narrate: "An operative must have prepared this spot..."
+```
+
+**GROW THE SPEC when discovering new interactions:**
+- Add new ABILITIES to prototypes when discovering valid interactions
+- Add new METHODS to prototypes when an object clearly should support an action
+- Create byproduct objects when actions produce them (blood, shell casings, debris)
+
+### Growing the Spec
+
+When a player attempts something that SHOULD work but the spec doesn't cover it:
+
+1. Check if it's physically plausible (materials, forces, tools)
+2. Call `describeForAI()` on the object to see its inheritance tree
+3. Find the RIGHT prototype level to add the capability
+4. Add via `setMethod()` for callable actions, or extend abilities text
+
+**Finding the Right Prototype:**
+
+```javascript
+execute_moo_code({
+  code: `
+    // Player tries to pick a lock with a hairpin
+    // But $hairpin doesn't have canPick() yet
+    const info = await tool.describeForAI();
+    // Returns:
+    // {
+    //   id: 789, name: "bent hairpin",  // THIS instance
+    //   inheritsFrom: {
+    //     from: '$hairpin',
+    //     abilities: "Thin metal wire...",
+    //     inheritsFrom: { from: '$item', ... }
+    //   }
+    // }
+
+    // canPick belongs on $hairpin - a legitimate improvised lockpick
+    $hairpin.setMethod('canPick', \`
+      /** Can this hairpin pick the given lock?
+       *  @param lock - The lock to pick
+       *  @param agent - The agent attempting
+       *  @returns { success: boolean, message: string }
+       */
+      const lock = args[0];
+      const agent = args[1];
+      const difficulty = lock.difficulty || 5;
+      const skill = agent.skills?.lockpick || 0;
+      // Hairpins are crude - only work on simple locks
+      if (difficulty <= 3 && skill > 10) {
+        lock.picked = true;
+        return { success: true, message: 'The crude pick finds purchase.' };
+      }
+      return { success: false, message: 'Too crude for this lock.' };
+    \`);
+
+    return 'Added canPick() to $hairpin prototype';
+  `
+})
+```
+
+**Double Dispatch Pattern:**
+
+When adding capabilities, use double dispatch - let the tool decide if it can act on the target:
+
+```javascript
+execute_moo_code({
+  code: `
+    // Lock.pick() delegates to the tool
+    $lock.setMethod('pick', \`
+      /** Attempt to pick this lock with a tool.
+       *  @param tool - The tool being used
+       *  @param agent - The agent attempting
+       *  @returns { success: boolean, message: string }
+       */
+      const tool = args[0];
+      const agent = args[1];
+      if (!tool || !tool.canPick) {
+        return { success: false, message: 'That cannot be used to pick locks.' };
+      }
+      // Delegate to tool - it knows if it can pick this lock
+      return await tool.canPick(self, agent);
+    \`);
+  `
+})
+```
+
+Now any new tool (hairpin, knife blade, wire) just needs a `canPick()` method and it works with all locks.
+
 ### The Base/Impl Pattern (Cartel Edition)
 
 **Step 1: Create Base Prototype** (the template - hidden by default)
