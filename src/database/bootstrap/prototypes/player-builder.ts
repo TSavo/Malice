@@ -800,13 +800,40 @@ Use execute_moo_code to change the world:
   const currentAbilities = proto.abilities || '';
   proto.abilities = currentAbilities + '\\nCan be wedged open with sufficient leverage.';
 
-  // Add a method when an object clearly needs one
-  proto.setMethod('wedgeOpen', \\\`
-    /** Wedge this door open with a prying tool.
-     *  @param tool - The lever/pry tool being used
-     *  @returns Message string
+  // DOUBLE DISPATCH: Lock delegates to tool to ask "can you pick me?"
+  // Add pick() to $lock that asks the tool if it can pick:
+  $lock.setMethod('pick', \\\`
+    /** Attempt to pick this lock with a tool.
+     *  @param tool - The tool being used
+     *  @param agent - The agent attempting the pick
+     *  @returns { success: boolean, message: string }
      */
-    // Implementation...
+    const tool = args[0];
+    const agent = args[1];
+    if (!tool || !tool.canPick) {
+      return { success: false, message: 'That cannot be used to pick locks.' };
+    }
+    // Delegate to tool - it knows if it can pick this lock
+    return await tool.canPick(self, agent);
+  \\\`);
+
+  // Add canPick() to $knife that evaluates against the lock:
+  $knife.setMethod('canPick', \\\`
+    /** Can this knife pick the given lock?
+     *  @param lock - The lock to pick
+     *  @param agent - The agent attempting
+     *  @returns { success: boolean, message: string }
+     */
+    const lock = args[0];
+    const agent = args[1];
+    const difficulty = lock.difficulty || 5;
+    const skill = agent.skills?.lockpick || 0;
+    // Thin blade can work simple locks
+    if (difficulty <= 3 || skill > difficulty * 10) {
+      lock.picked = true;
+      return { success: true, message: 'The blade finds the tumblers.' };
+    }
+    return { success: false, message: 'The lock is too complex for a knife.' };
   \\\`);
 
 Respond with narrative text that will be shown to the player.
