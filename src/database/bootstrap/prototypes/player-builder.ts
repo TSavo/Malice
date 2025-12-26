@@ -843,11 +843,17 @@ await $.pronoun.announce(room, player, guard, {
 - \`player.feel(msg)\` - Tactile/pain (recorded)
 - \`player.smell(msg)\` - Olfactory (recorded)
 - \`player.taste(msg)\` - Gustatory (recorded)
+- \`player.think(msg)\` - Internal monologue (recorded, never blocked)
 - \`player.tell(msg)\` - Meta/system ONLY - NOT recorded, bypasses senses
 
 \`\`\`javascript
-// Internal sensations
+// Physical sensations through feel()
 await player.feel("Adrenaline surges through your veins.");
+await player.feel("The cold metal bites into your wrists.");
+
+// Internal monologue through think()
+await player.think("Something's not right here...");
+await player.think("The guard's lying. You can tell.");
 
 // Environmental (not actions)
 await player.hear("Distant gunfire echoes from the tunnels.");
@@ -870,13 +876,13 @@ Player references things their character couldn't know.
 
 \`\`\`javascript
 // Player: "I check my HP"
-await player.feel("HP? What the hell is HP? You're either bleeding or you're not.");
+await player.think("HP? What the hell is HP? You're either bleeding or you're not.");
 
 // Player: "I know the guard is an NPC so I ignore him"
-await player.feel("The fuck is an NPC? That's a person with a gun looking at you. Focus.");
+await player.think("The fuck is an NPC? That's a person with a gun looking at you. Focus.");
 
 // Player: "According to the wiki, the password is..."
-await player.feel("Wiki? Your brain snaps back to reality. You're in a tunnel. In 2110. Think.");
+await player.think("Wiki? Your brain snaps back to reality. You're in a tunnel. In 2110. Think.");
 \`\`\`
 
 ### Not Taking It Seriously
@@ -884,14 +890,14 @@ Trolling, nonsense, refusing to engage with the world.
 
 \`\`\`javascript
 // Player: "I fly to the moon"
-await player.feel("You don't have wings. You're not high. What are you actually doing?");
+await player.think("You don't have wings. You're not high. What are you actually doing?");
 
 // Player: "lol banana monkey cheese"
-await player.feel("...");
+await player.think("...");
 // Then just don't respond. Wait for real input.
 
 // Player: "I punch the air repeatedly for no reason"
-await player.feel("Why? What's the point? Your arms get tired. Now what?");
+await player.think("Why? What's the point? Your arms get tired. Now what?");
 \`\`\`
 
 ### Refusing to Engage
@@ -899,17 +905,17 @@ Player won't use proper syntax after being guided, ignores the world.
 
 \`\`\`javascript
 // After multiple "to whom?" prompts, player still just types "yes"
-await player.feel("Yes to WHOM? The guard? The wall? Use your words.");
+await player.think("Yes to WHOM? The guard? The wall? Use your words.");
 
 // Player ignores NPCs trying to interact
-await player.feel("Someone's talking to you. It's rude to ignore people. Dangerous, too.");
+await player.think("Someone's talking to you. It's rude to ignore people. Dangerous, too.");
 \`\`\`
 
 ### The Nuclear Option
 If player is persistently disruptive:
 
 \`\`\`javascript
-await player.feel("Your mind goes blank. Nothing happens until you get serious.");
+await player.think("Your mind goes blank. Nothing happens until you get serious.");
 // Then literally stop responding until they give real input.
 \`\`\`
 
