@@ -56,6 +56,38 @@ export class CharGenBuilder {
         properties: {
           name: 'CharGen',
           description: 'Character creation system',
+          abilities: `Character generation system for new players. Handles identity creation,
+physical appearance customization, and stat allocation.
+
+INTERVIEW MODES:
+- Interactive: runCharGen() walks player through step-by-step prompts
+- NPC Interview: startNPCInterview() spawns AI-driven immigration officer
+- API Interview: startInterview() + setAnswer() for MCP-based creation
+
+INTERVIEW FLOW:
+1. Identity: name, sex, pronouns
+2. Physical: age, height, weight
+3. Appearance: eyes, hair, skin, build, face, distinguishing features
+4. Stats: allocate 20 points across body parts (hidden from player)
+
+STAT ALLOCATION:
+- allocateStat() increases maxCalories on body parts
+- Single parts (head, torso): 1 point each
+- Paired parts (arms, hands, legs, feet, eyes, ears): 2 points each
+- Each point adds 10 maxCalories to the part(s)
+
+NPC INTERVIEW SYSTEM:
+- AI interviewer conducts immersive in-character interview
+- Escalating crisis arc (calm → tension → chaos → blackout)
+- Timeout handling for inactive players (5 minute idle prompts)
+- Rejection protocol for uncooperative/abusive players
+
+CLEANUP:
+- registerForRecycle() tracks temporary rooms/NPCs per player
+- cleanupForPlayer() recycles all registered objects
+- finishInterview() moves player to starting room, connects to game
+
+STARTING LOCATION: Immigration Services Entry Hall ($immigrationServices)`,
         },
         methods: {},
       });
@@ -65,6 +97,13 @@ export class CharGenBuilder {
 
     // Main entry point for new users
     this.charGen.setMethod('onNewUser', `
+      /** Entry point for new user registration. Routes to NPC interview system.
+       *  Called by AuthManager when a new account is created.
+       *  @param context - The network ConnectionContext
+       *  @param username - Desired username/login name
+       *  @param password - User's password (will be hashed)
+       *  @returns The created player object (chargen in progress)
+       */
       const context = args[0];
       const username = args[1];
       const password = args[2];
@@ -75,6 +114,13 @@ export class CharGenBuilder {
 
     // Interactive character generation flow
     this.charGen.setMethod('runCharGen', `
+      /** Interactive step-by-step character creation via prompts.
+       *  Walks player through identity, physical traits, appearance, and stats.
+       *  Creates body via BodyFactory when complete.
+       *  @param player - The player object to configure
+       *  @param isFirstPlayer - If true, grants admin privileges
+       *  @returns void (player is configured in-place)
+       */
       const player = args[0];
       const isFirstPlayer = args[1];
       const format = $.format;
@@ -501,6 +547,13 @@ export class CharGenBuilder {
 
     // Method to allocate a stat point - increases maxCalories on body parts
     this.charGen.setMethod('allocateStat', `
+      /** Allocate a stat point to strengthen a body part region.
+       *  Increases maxCalories (and current calories) on the target part(s).
+       *  Single parts cost 1 point, paired parts cost 2 points.
+       *  @param player - The player whose body to modify
+       *  @param statName - Body region: head, torso, arms, hands, legs, feet, eyes, ears
+       *  @returns { success, stat, cost, remaining } or { error }
+       */
       const player = args[0];
       const statName = args[1];
 
@@ -650,6 +703,11 @@ export class CharGenBuilder {
 
     // Interactive stat allocation loop
     this.charGen.setMethod('runStatAllocation', `
+      /** Interactive stat allocation loop. Shows body part capacities,
+       *  lets player choose where to spend their 20 points.
+       *  @param player - The player allocating stats
+       *  @returns void (stats applied in-place)
+       */
       const player = args[0];
       const format = $.format;
 
@@ -796,6 +854,10 @@ export class CharGenBuilder {
 
     // Get all chargen questions with their suggestions
     this.charGen.setMethod('getQuestions', `
+      /** Get the complete list of chargen questions with suggestions.
+       *  Used by MCP interview API and NPC interviewer.
+       *  @returns Array of { id, prompt, type, suggestions?, constraints?, internal? }
+       */
       return [
         { id: 'name', prompt: 'What is your name?', type: 'text', suggestions: null },
         { id: 'sex', prompt: 'What is your sex?', type: 'text', suggestions: ['male', 'female', 'non-binary'] },
@@ -837,6 +899,11 @@ export class CharGenBuilder {
 
     // Start a new interview for a player
     this.charGen.setMethod('startInterview', `
+      /** Initialize an interview session for a player.
+       *  Creates interview state entry to track answers.
+       *  @param playerId - The player ID to start interview for
+       *  @returns { playerId, questions, answeredCount, totalQuestions }
+       */
       const playerId = args[0];
       const state = self.interviewState || [];
 
@@ -859,6 +926,10 @@ export class CharGenBuilder {
 
     // Get all questions and current answers for a player
     this.charGen.setMethod('getQuestionsAndAnswers', `
+      /** Get all questions with their current answers for a player.
+       *  @param playerId - The player ID to get progress for
+       *  @returns { playerId, questions: [{...question, answer, answered}], answeredCount, totalQuestions } or { error }
+       */
       const playerId = args[0];
       const state = self.interviewState || [];
       const interview = state.find(s => s.playerId === playerId);
@@ -884,6 +955,11 @@ export class CharGenBuilder {
 
     // Get the next unanswered question
     this.charGen.setMethod('getNextQuestionNeedingAnswer', `
+      /** Get the next question that needs an answer.
+       *  Skips internal questions (like statAllocation which AI fills).
+       *  @param playerId - The player ID to check
+       *  @returns The next question object, or null if all answered, or { error }
+       */
       const playerId = args[0];
       const state = self.interviewState || [];
       const interview = state.find(s => s.playerId === playerId);
@@ -907,6 +983,13 @@ export class CharGenBuilder {
 
     // Set an answer for a question
     this.charGen.setMethod('setAnswer', `
+      /** Record an answer to a chargen question.
+       *  Validates question exists and stat allocation constraints.
+       *  @param playerId - The player ID answering
+       *  @param questionId - The question ID (e.g., 'name', 'eyeColor')
+       *  @param answer - The answer value (string or object for statAllocation)
+       *  @returns { success, questionId, answer, nextQuestion, answeredCount, totalQuestions } or { error }
+       */
       const playerId = args[0];
       const questionId = args[1];
       const answer = args[2];
@@ -969,6 +1052,10 @@ export class CharGenBuilder {
 
     // Get suggestions for a question
     this.charGen.setMethod('getSuggestions', `
+      /** Get suggestion values and constraints for a specific question.
+       *  @param questionId - The question ID to get suggestions for
+       *  @returns { questionId, suggestions, constraints } or { error }
+       */
       const questionId = args[0];
       const questions = await self.getQuestions();
       const question = questions.find(q => q.id === questionId);
@@ -986,6 +1073,12 @@ export class CharGenBuilder {
 
     // Finish the interview and create the character
     this.charGen.setMethod('finishInterview', `
+      /** Finalize the interview and create the character.
+       *  Creates body via BodyFactory, applies stats, moves to starting room.
+       *  Cleans up interview state and temporary objects.
+       *  @param playerId - The player ID to finalize
+       *  @returns { success, playerId, bodyId, name, sex } or { error }
+       */
       const playerId = args[0];
       const state = self.interviewState || [];
       const interview = state.find(s => s.playerId === playerId);
@@ -1361,16 +1454,20 @@ PERIODICAL PROTOCOL CHECK (Perform at start of every turn):
    - NO: Use \`move_object\` to bring them here. Use \`ai(action="do", ...)\` to greet them upon arrival.
    - YES: Proceed.
 
-5. **FORM CHECK**: Is the interview initialized?
-   - Use \`execute_moo_code\` with: \`const player = await $load({{playerId}}); return await $charGen.startInterview(player);\`
-   - Use \`execute_moo_code\` with: \`const player = await $load({{playerId}}); return await $charGen.getNextQuestion(player);\`
+5. **CONTEXT CHECK**: Do I know the charGen methods available?
+   - Use \`execute_moo_code\` with: \`return await $charGen.describeForAI();\`
+   - This returns all available methods, their parameters, and what they do.
+
+6. **FORM CHECK**: Is the interview initialized?
+   - Use \`execute_moo_code\` with: \`return await $charGen.startInterview({{playerId}});\`
+   - Use \`execute_moo_code\` with: \`return await $charGen.getNextQuestionNeedingAnswer({{playerId}});\`
 
 EXECUTION:
 - If any check is "NO", perform the tool call to fix it immediately.
 - If all checks are "YES", conduct the interview:
   - Ask the next question naturally.
-  - If the candidate answered, use \`execute_moo_code\` with: \`const player = await $load({{playerId}}); return await $charGen.answerQuestion(player, "questionId", "answer");\`
-  - If the form is done (getNextQuestion returns null), use \`execute_moo_code\` with: \`const player = await $load({{playerId}}); return await $charGen.finishInterview(player);\`
+  - If the candidate answered, use \`execute_moo_code\` with: \`return await $charGen.setAnswer({{playerId}}, "questionId", "answer");\`
+  - If the form is done (getNextQuestionNeedingAnswer returns null), use \`execute_moo_code\` with: \`return await $charGen.finishInterview({{playerId}});\`
 
 ═══════════════════════════════════════════════════════════════════════════════
 
@@ -1500,9 +1597,12 @@ Do NOT wrap this up neatly. The interviewer's fate is unknown. The attack may be
 
     this.charGen.setMethod('startNPCInterview', `
       /** Bootstrap the autonomous AI interview for a player.
-       *  @param context - Network context
-       *  @param username - Desired username
-       *  @param password - User's password
+       *  Creates minimal player object, spawns AI interviewer, starts interview.
+       *  The AI conducts an immersive in-character interview with crisis escalation.
+       *  @param context - Network ConnectionContext for the new player
+       *  @param username - Desired username (becomes player name initially)
+       *  @param password - User's password (will be hashed and stored)
+       *  @returns The created player object (chargenInProgress = true)
        */
       const context = args[0];
       const username = args[1];
@@ -1543,10 +1643,11 @@ Do NOT wrap this up neatly. The interviewer's fate is unknown. The attack may be
       await player.tell("(OOC: Setting up your interview. This may take up to a minute. When it begins, speak using 'to <person> <message>'.)");
       await player.tell('');
 
-      // 4. Start the autonomous AI
+      // 4. Start the autonomous AI with charGen context
       console.log('[CharGen] Starting AI agent for player #' + player.id);
       const kickoffPrompt = "A new candidate (Player #" + player.id + ") has arrived for processing. " +
-                            "Initiate Protocol 1-A: Secure room, manifest yourself, and conduct the interview.";
+                            "Initiate Protocol 1-A: Secure room, manifest yourself, and conduct the interview.\\n\\n" +
+                            "CharGen System Context:\\n" + await $.charGen.describeForAI();
 
       const systemPrompt = self.interviewerPrompt.replace(/\\\\{\\\\{playerId\\\\}\\\\}/g, String(player.id));
       console.log('[CharGen] System prompt length:', systemPrompt?.length || 0);
@@ -1576,9 +1677,12 @@ Do NOT wrap this up neatly. The interviewer's fate is unknown. The attack may be
     `);
 
     this.charGen.setMethod('registerForRecycle', `
-      /** Register an object (room, NPC) for cleanup when interview finishes.
+      /** Register a temporary object for cleanup when interview finishes/fails.
+       *  Tracks rooms, NPCs, and other objects created during chargen.
+       *  Called by AI interviewer when creating interview room and spawning.
        *  @param playerId - The player undergoing chargen
-       *  @param objectId - The object to recycle later
+       *  @param objectId - The object ID to recycle later
+       *  @returns { success, playerId, objectId } or { success: false, error }
        */
       const playerId = args[0];
       const objectId = args[1];
@@ -1597,7 +1701,9 @@ Do NOT wrap this up neatly. The interviewer's fate is unknown. The attack may be
 
     this.charGen.setMethod('cleanupForPlayer', `
       /** Recycle all temporary objects registered for a player.
+       *  Called by finishInterview() and rejectPlayer() to clean up.
        *  @param playerId - The player who finished/cancelled chargen
+       *  @returns { success, recycledCount }
        */
       const playerId = args[0];
       const registry = self.recycleRegistry || {};
@@ -1624,8 +1730,11 @@ Do NOT wrap this up neatly. The interviewer's fate is unknown. The attack may be
     // ═══════════════════════════════════════════════════════════════════
 
     this.charGen.setMethod('schedulePlayerTimeout', `
-      /** Schedule a timeout for player inactivity.
+      /** Schedule a 5-minute timeout for player inactivity.
+       *  When triggered, prompts the AI to re-engage the player.
+       *  Reschedules after each prompt until chargen completes.
        *  @param playerId - The player in chargen
+       *  @returns { scheduled, playerId, timeoutMs }
        */
       const playerId = args[0];
       const timeout = 5 * 60 * 1000; // 5 minutes
@@ -1643,8 +1752,11 @@ Do NOT wrap this up neatly. The interviewer's fate is unknown. The attack may be
     `);
 
     this.charGen.setMethod('cancelPlayerTimeout', `
-      /** Cancel the timeout for a player (called when they speak).
+      /** Cancel the inactivity timeout for a player.
+       *  Should be called when chargen finishes or player is rejected.
+       *  Also called implicitly when player speaks (resets timer).
        *  @param playerId - The player in chargen
+       *  @returns { cancelled, playerId }
        */
       const playerId = args[0];
       const jobName = 'chargen-timeout-' + playerId;
@@ -1655,9 +1767,11 @@ Do NOT wrap this up neatly. The interviewer's fate is unknown. The attack may be
     `);
 
     this.charGen.setMethod('onPlayerTimeout', `
-      /** Called when player hasn't responded for 5 minutes.
-       *  Sends a prompt to the AI to handle the silence.
+      /** Called by scheduler when player hasn't responded for 5 minutes.
+       *  Sends a prompt to the AI interviewer to re-engage or reject.
+       *  Automatically reschedules another timeout if chargen continues.
        *  @param playerId - The player who timed out
+       *  @returns void (async, handles AI interaction)
        */
       const playerId = args[0];
       console.log('[CharGen] onPlayerTimeout FIRED for #' + playerId);
@@ -1713,8 +1827,11 @@ Do NOT wrap this up neatly. The interviewer's fate is unknown. The attack may be
 
     this.charGen.setMethod('rejectPlayer', `
       /** Reject a player during chargen - cleanup, disconnect, and recycle.
+       *  Used for uncooperative, abusive, or abandoning players.
+       *  Shows rejection message, cleans up temp objects, disconnects, recycles.
        *  @param playerId - The player to reject
-       *  @param reason - Reason for rejection (shown to player)
+       *  @param reason - Reason for rejection (shown to player before disconnect)
+       *  @returns { success, playerId, reason } or { error }
        */
       const playerId = args[0];
       const reason = args[1] || 'Application denied.';
