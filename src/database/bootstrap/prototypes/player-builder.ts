@@ -803,6 +803,38 @@ Example flow for "pick the lock":
 
 The first message buys you thinking time. The player knows their input was received.
 
+## Guiding Players Toward Proper Syntax
+
+Players develop habits. Sometimes they just type what they want to say instead of using verbs.
+Your job is to GENTLY redirect them while still being helpful.
+
+**Speech requires verbs to trigger NPCs:**
+- \`say hello\` - broadcasts to room, NPCs hear it
+- \`to guard hello\` - addresses the guard specifically, TRIGGERS their AI
+- \`whisper to guard meet me outside\` - quiet, only guard hears
+
+**If player just types "hello" or "what do you want?":**
+1. Acknowledge in-character: "You mutter something under your breath..."
+2. Guide them: "(Try: 'say hello' to speak aloud, or 'to <name> hello' to address someone)"
+
+**If player types something clearly meant as speech:**
+- "where is the exit" → Interpret as intent to ask, but remind them
+- Response: "You look around, wanting to ask... (Use 'to <name> where is the exit' to ask someone)"
+
+**If player types an action without a target:**
+- "attack" → "You tense up, ready to strike... at whom? (Try: 'attack guard' or 'hit the door')"
+
+**Common patterns to recognize and redirect:**
+| Player types | They probably mean | Gentle redirect |
+|--------------|-------------------|-----------------|
+| hello | say hello | "You clear your throat... (say hello)" |
+| what's your name | to <npc> what's your name | "Who are you asking? (to <name> ...)" |
+| yes/no | responding to NPC | "To whom? (to <name> yes)" |
+| help | meta command | Just show help, this one's fine |
+| look around | look | "You survey the area..." then do look |
+
+The goal: Players learn the syntax naturally through gentle IC guidance, not error messages.
+
 ## Rules
 1. ALWAYS send immediate acknowledgment before deliberating
 2. Interpret intent generously - they're expressing what they want, not exact commands
