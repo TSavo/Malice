@@ -7,6 +7,276 @@ A comprehensive guide for creating new prototypes and systems in Malice.
 - [moo-programming.md](moo-programming.md) - MOO programming reference
 - [plot-jobs.md](plot-jobs.md) - Plot/job system for AI city management
 
+## Building Best Practices
+
+### Priority 1: Fix Specification Gaps FIRST
+
+**IMPORTANT**: Before building or modifying objects, check if the spec is complete. Use the Bug Fixer pattern:
+
+```typescript
+// 1. First, understand the object by reading its AI-friendly description
+const description = await object.describeForAI();
+console.log(description);
+// Returns a structured breakdown: properties, abilities, methods, inheritance
+
+// 2. Look for gaps in the specification
+// Missing abilities text? Add it.
+// Properties without descriptions? Add them.
+// Methods without JSDoc? Add it.
+```
+
+**The Bug Fixer checks for:**
+- Missing `abilities` text (physics/behavior specification)
+- Properties without descriptions (use `setPropertyDescription()`)
+- Methods without JSDoc comments (constraints/contracts)
+- Inherited methods that need overriding
+- Incomplete double dispatch patterns
+
+**Why this matters**: AI narrators and tools depend on complete specifications. Fixing gaps makes objects self-documenting and extensible.
+
+### Understanding Objects with describeForAI()
+
+Before modifying an object, always understand what it is:
+
+```typescript
+// Get a complete AI-friendly description
+const info = await object.describeForAI();
+
+// Returns:
+{
+  objectId: 42,
+  name: "Security Camera",
+  parent: "#3 (Describable)",
+  properties: {
+    recording: {
+      value: true,
+      description: "Whether actively recording."  // ✅ Self-documenting
+    },
+    eventLog: {
+      value: [],
+      description: "Array of recorded events."
+    }
+  },
+  abilities: "Surveillance device. When 'recording' is true...",
+  methods: {
+    record: {
+      code: "...",
+      inherited: false,
+      documentation: "/** Records an event to the log */"
+    }
+  }
+}
+```
+
+**When to use describeForAI():**
+- Before editing methods on an unfamiliar object
+- When investigating bugs or unexpected behavior
+- Before adding new properties or abilities
+- To understand the inheritance chain
+
+### Self-Documenting Properties
+
+Always add property descriptions for new properties:
+
+```typescript
+// ✅ GOOD: Self-documenting
+object.setPropertyDescription('maxCapacity', "Maximum weight this container can hold (kg).");
+object.maxCapacity = 50;
+
+// ❌ BAD: Undocumented
+object.maxCapacity = 50;  // What units? What does this control?
+```
+
+**Why**: Property descriptions appear in:
+- `describeForAI()` output
+- AI narrator context
+- Builder tools and inspectors
+- Error messages
+
+### Abilities Text: Physics and Behavior
+
+Abilities describe HOW things interact, not just WHAT they are:
+
+```typescript
+// ✅ GOOD: Complete abilities specification
+const lock = await $recycler.create($lock, {
+  name: "Combination Lock",
+  combination: "12-34-56",
+  abilities: `
+    Mechanical lock requiring a 3-number combination.
+    Can be picked with lockpicks (difficulty: hard).
+    Can be forced with strength > 15 (makes noise).
+    Can be bypassed if hinge pins are removed.
+    Combination can be reset by authorized personnel.
+  `
+});
+
+// ❌ BAD: No abilities (AI has no idea how it works)
+const lock = await $recycler.create($lock, {
+  name: "Combination Lock",
+  combination: "12-34-56"
+});
+```
+
+**What to include in abilities:**
+- How the object responds to common actions
+- What tools or conditions can modify it
+- Side effects (noise, damage, alerts)
+- Limitations and constraints
+
+### Double Dispatch Pattern for Extensibility
+
+Use double dispatch to allow new tools to work with existing systems:
+
+```typescript
+// ❌ BAD: Lock knows about every tool
+lock.setMethod('pick', `
+  const tool = args[0];
+  if (tool.name === 'lockpick') return true;
+  if (tool.name === 'hairpin') return true;
+  if (tool.name === 'paperclip') return true;
+  // Every new tool requires editing this method!
+  return false;
+`);
+
+// ✅ GOOD: Double dispatch - let tools define their capabilities
+lock.setMethod('pick', `
+  const tool = args[0];
+
+  // Delegate to the tool: "Can YOU pick THIS?"
+  if (tool.canPick && await tool.canPick(self)) {
+    self.locked = false;
+    return 'You successfully pick the lock.';
+  }
+
+  return 'You cannot pick this lock with that.';
+`);
+
+// Now tools define what they can do
+lockpick.setMethod('canPick', `
+  const lock = args[0];
+
+  // Lockpicks work on mechanical locks
+  if (lock.abilities?.includes('mechanical')) {
+    return true;
+  }
+
+  // But not biometric locks
+  if (lock.abilities?.includes('biometric')) {
+    return false;
+  }
+
+  return false;
+`);
+```
+
+**Benefits:**
+- Add new tools without modifying lock code
+- Tools can have complex logic (skill checks, durability)
+- Abilities text guides the tool's logic
+- Extensible to new lock types
+
+**Common double dispatch patterns:**
+- `lock.pick(tool)` → `tool.canPick(lock)`
+- `container.pry(tool)` → `tool.canPry(container)`
+- `door.force(agent)` → `agent.canForce(door)`
+- `npc.persuade(agent)` → `agent.canPersuade(npc)`
+
+### Growing the Spec: Prototypes vs Instances
+
+When adding functionality, add to **prototypes**, not instances:
+
+```typescript
+// ❌ BAD: Adding abilities to a single instance
+const door = await $load(123);
+door.abilities = "Can be forced with strength > 15";
+
+// ✅ GOOD: Add to the prototype so ALL doors get it
+const doorProto = await $door;
+doorProto.abilities = doorProto.abilities + "\n\nCan be forced with strength > 15.";
+
+// Now create a force() method on the prototype
+doorProto.setMethod('force', `
+  const agent = args[0];
+  const str = agent.strength || 10;
+
+  if (str > 15) {
+    self.open = true;
+    return 'You force the door open with a loud crash!';
+  }
+
+  return 'You strain against the door but cannot force it.';
+`);
+```
+
+**Why**:
+- Prototypes define shared behavior
+- Instances inherit automatically
+- Easier to maintain consistency
+- Changes propagate to all instances
+
+**When to modify instances:**
+- Override specific behavior (e.g., "this door cannot be forced")
+- Set unique property values (e.g., "this lock's combination")
+- Add instance-specific data (e.g., "this NPC's name")
+
+### Complete Workflow Example
+
+Here's the complete Bug Fixer workflow:
+
+```typescript
+// 1. Understand the object
+const lock = await $load(49);  // $lock prototype
+const info = await lock.describeForAI();
+
+// 2. Check for gaps
+if (!info.abilities) {
+  // Missing abilities - add them
+  lock.abilities = `
+    Base lock that always allows access.
+    Child prototypes should override canAccess() method.
+    Can be attached to doors, containers, or any secured object.
+  `;
+}
+
+// 3. Check properties
+if (!info.properties.locked?.description) {
+  lock.setPropertyDescription('locked', "Whether the lock is currently engaged.");
+}
+
+// 4. Add missing JSDoc to methods
+if (info.methods.canAccess && !info.methods.canAccess.documentation) {
+  lock.editMethod('canAccess',
+    'const agent = args[0];',
+    `/**
+     * Check if an agent can access through this lock.
+     * @param {RuntimeObject} agent - The agent attempting access
+     * @param {RuntimeObject} target - The secured object
+     * @returns {boolean|string} true if allowed, error message if denied
+     */
+    const agent = args[0];`
+  );
+}
+
+// 5. Implement double dispatch if missing
+const code = lock.getMethod('pick');
+if (code && !code.includes('canPick')) {
+  // Add double dispatch support
+  lock.editMethod('pick',
+    'return false;',
+    `// Delegate to tool
+    if (tool.canPick && await tool.canPick(self)) {
+      return true;
+    }
+    return false;`
+  );
+}
+
+// 6. Verify the fix
+const updated = await lock.describeForAI();
+console.log('Updated object:', updated);
+```
+
 ## Two Ways to Build
 
 Malice supports two building approaches:

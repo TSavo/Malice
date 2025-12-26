@@ -78,6 +78,23 @@ Do not use out-of-character information to make in-character decisions.
 - Trusting someone because you know OOC they're a "good" player
 - Changing your route because you read about an ambush in chat
 
+**Your character doesn't know game terms:**
+
+Your character lives in the game world. They don't know what "HP" means. They don't know what an "NPC" is. They've never heard of "respawning" or "grinding skills."
+
+```
+BAD:  "My HP is low, I need to rest"
+GOOD: "I'm hurt badly. I need to find somewhere safe to recover."
+
+BAD:  "Is that an NPC or a real player?"
+GOOD: "I wonder if they can be trusted..."
+
+BAD:  "I'm going to grind my lockpicking skill"
+GOOD: "I'm going to practice picking locks"
+```
+
+**Think like your character, not like a gamer.** You're a person surviving in a harsh world, not a player manipulating game mechanics.
+
 ### 3. No OOC Coordination
 
 **All coordination happens IN CHARACTER, IN GAME.**
@@ -517,6 +534,63 @@ These basic commands are instant and predictable:
 | `inventory` | See what you're carrying |
 | `exits` | Show available exits |
 | `help` | Get help |
+
+### Talking to NPCs
+
+To have a conversation with another character (whether player or AI-controlled), use the `to` verb:
+
+```
+> to guard hello
+You address the guard.
+Guard: "What do you want?"
+
+> I'm looking for work
+Guard: "Talk to the foreman. Building B, third floor."
+
+> thanks
+You thank the guard with a nod.
+```
+
+**How it works:**
+- `to <person> <message>` establishes a conversation
+- After you've addressed someone, you can type bare responses
+- The system remembers who you're talking to
+- They remember the conversation context
+
+**Conversation continuity:**
+```
+> to merchant do you have any water?
+You address the merchant.
+Merchant: "Fresh water? That'll be fifty credits a liter."
+
+> that's ridiculous
+Merchant: "Supply and demand, friend. Aquifer's running dry."
+
+> fine, I'll take two liters
+Merchant: "Smart choice. Dehydration's a bad way to go."
+```
+
+Notice you don't need to keep saying "to merchant" once the conversation is established.
+
+### The Voice in Your Head
+
+Your character has self-preservation instincts. Sometimes, when you're about to do something stupid, **your own mind pushes back.**
+
+```
+> drink the green liquid
+Your survival instincts scream at you. Unknown liquids in abandoned labs?
+That's how people die. You hesitate, bottle in hand.
+
+> I drink it anyway
+Against every screaming neuron of self-preservation, you raise the bottle
+to your lips...
+```
+
+This is not the narrator being arbitrary. This is your character's mind - their experience, their instincts, their will to survive - manifesting as a voice in your head.
+
+**Your character is not a puppet.** They have thoughts, fears, and survival instincts. Sometimes they resist your decisions. That's realistic. Real people hesitate before doing dangerous things.
+
+You can usually override it if you insist. But the warning is there for a reason.
 
 ### Everything Else: Just Describe What You Do
 

@@ -767,6 +767,265 @@ world({ action: 'query', q: ".parent == 10 and .location exists", limit: 20 })
 X and Y / X or Y             # Logical operators
 ```
 
+## Understanding Objects: describeForAI()
+
+**MOST IMPORTANT**: When you need to understand what an object is and how it works, use `describeForAI()`:
+
+```javascript
+const obj = await $load(objectId);
+const description = await obj.describeForAI();
+// Returns comprehensive AI-readable description including:
+// - Object type and inheritance chain
+// - All properties with descriptions
+// - All methods (local and inherited)
+// - Abilities (prose physics)
+// - Current state
+```
+
+This is the **primary interface** for AI understanding. When in doubt about what an object is or how it behaves, call `describeForAI()`.
+
+**Example:**
+```javascript
+const camera = await $load(500);
+const desc = await camera.describeForAI();
+// "Security Camera (#500)
+//  Parent: Describable (#10)
+//
+//  PROPERTIES:
+//  - recording (boolean): Whether actively recording. Currently: true
+//  - eventLog (array): Array of recorded events. Currently: [...]
+//
+//  ABILITIES:
+//  Surveillance device that records visual activity.
+//  RECORDING: When 'recording' is true, logs events to 'eventLog' via onRoomEvent().
+//  TAMPERING: Can be disabled by covering lens, cutting power, or hacking.
+//  PLAYBACK: Security personnel can review 'eventLog'."
+```
+
+## Communication and Perception
+
+### Broadcast Actions: $emote.broadcast()
+
+Use `$emote.broadcast()` to narrate actions with proper sensory routing:
+
+```javascript
+await $emote.broadcast({
+  actor: actor,           // RuntimeObject performing the action
+  location: room,         // RuntimeObject (Room) where action occurs
+  visual: "...",          // What people see (optional)
+  auditory: "...",        // What people hear (optional)
+  tactile: "...",         // What people feel (optional)
+  olfactory: "...",       // What people smell (optional)
+  gustatory: "...",       // What people taste (optional)
+  actorVisual: "...",     // What actor sees (first-person, optional)
+  actorAuditory: "...",   // What actor hears (optional)
+});
+```
+
+**How it works:**
+- Routes sensory output to agents based on their capabilities
+- Checks `canSee()`, `canHear()`, `canSmell()`, `canTaste()`, `canFeel()` on each agent
+- Only delivers sensory channels the agent can perceive
+- Handles first-person vs third-person perspective
+- Applies perception filters (neural interfaces, augmented reality, etc.)
+
+**Example:**
+```javascript
+await $emote.broadcast({
+  actor: player,
+  location: room,
+  visual: "Jack draws his pistol, the barrel gleaming under the neon.",
+  auditory: "A metallic click as the safety disengages.",
+  actorVisual: "You draw your pistol. The weight is familiar in your hand."
+});
+```
+
+### Structured Messages: $pronoun
+
+Use `$pronoun` for consistent, grammatically correct messages:
+
+**$pronoun.sub()** - Substitute pronouns in a template:
+
+```javascript
+const msg = $pronoun.sub(
+  agent,
+  "{Sub} {verb:draw} {poss} weapon.",
+  { tense: 'present' }
+);
+// For male agent: "He draws his weapon."
+// For female agent: "She draws her weapon."
+// For first-person: "You draw your weapon."
+```
+
+**Substitution tokens:**
+- `{Sub}` - Subject pronoun (he/she/you)
+- `{Obj}` - Object pronoun (him/her/you)
+- `{poss}` - Possessive (his/her/your)
+- `{reflex}` - Reflexive (himself/herself/yourself)
+- `{verb:action}` - Conjugated verb (draws/draw)
+
+**$pronoun.announce()** - Announce to room with perspective handling:
+
+```javascript
+await $pronoun.announce({
+  actor: player,
+  location: room,
+  firstPerson: "You slash at the guard.",
+  thirdPerson: "{Sub} {verb:slash} at the guard.",
+  tense: 'present'
+});
+```
+
+Automatically:
+- Shows first-person message to actor
+- Shows third-person message to others
+- Handles pronoun substitution
+- Routes through sensory system
+
+### Direct Sensory Methods
+
+Send messages directly to specific sensory channels:
+
+```javascript
+// Visual
+await player.see("The room flickers with holographic static.");
+
+// Auditory
+await player.hear("A distant siren wails.");
+
+// Tactile
+await player.feel("The floor vibrates beneath your feet.");
+
+// Olfactory
+await player.smell("The acrid scent of burnt electronics.");
+
+// Gustatory
+await player.taste("Metallic blood fills your mouth.");
+
+// Internal (thoughts, no sensory check)
+await player.think("Something isn't right here.");
+```
+
+**When to use:**
+- `$emote.broadcast()` - Multi-sensory actions visible to room
+- `$pronoun.announce()` - Single message with perspective handling
+- Direct sensory - Private or specific sensory experiences
+
+## Growing the Specification
+
+The abilities-first architecture means **adding methods to prototypes** as physics emerges:
+
+### Adding Infrastructure Methods
+
+When you discover new physics that needs support:
+
+1. **Identify the prototype** - Where does this physics apply?
+2. **Add the method** - Infrastructure to support the physics
+3. **Document with JSDoc** - Constraints, not behavior
+4. **Update abilities** - Prose physics that uses the method
+
+**Example: Adding concealment physics**
+
+```javascript
+// 1. Add method to $describable prototype
+const describable = $describable;
+describable.setMethod('isConcealed', `
+  /**
+   * Check if this object is concealed from casual observation.
+   * CONSTRAINT: Returns boolean based on 'concealed' property.
+   * DOES NOT describe how concealment works - see abilities.
+   */
+  return self.concealed === true;
+`);
+
+// 2. Add search infrastructure
+describable.setMethod('onSearch', `
+  /**
+   * Called when agent performs thorough search.
+   * CONSTRAINT: Reveals concealed objects in location.
+   * Game logic in abilities, not here.
+   */
+  const searcher = args[0];
+  if (self.concealed) {
+    self.concealed = false;
+    await searcher.see('You find ' + self.name + '!');
+  }
+`);
+
+// 3. Update prototype abilities
+describable.abilities = `
+CONCEALMENT: Objects with 'concealed' property are hidden from
+casual observation. Thorough searching reveals them.
+
+SEARCHING: Players can search areas to find concealed items.
+Success depends on searcher's perception vs object's concealment quality.
+`;
+
+// 4. Now objects can use it
+const bug = await $recycler.create($describable, {
+  name: 'listening device',
+  concealed: true,
+  abilities: `
+Tiny surveillance bug. Concealed behind ventilation grate.
+DETECTION: Requires thorough search or scanning equipment.
+AUDIO: Records conversations when active.
+  `
+});
+```
+
+### Double Dispatch Pattern
+
+For interactions between object types, use **double dispatch**:
+
+```javascript
+// Item tries to be picked up
+$item.setMethod('pickUpBy', `
+  /**
+   * Called when agent tries to pick up this item.
+   * Double-dispatches to agent's hand to check physics.
+   */
+  const agent = args[0];
+  const hand = agent.body?.parts?.find(p => p.name === 'hand');
+
+  if (!hand) {
+    await agent.see("You have no hands to pick things up with.");
+    return false;
+  }
+
+  // Double dispatch - ask hand if it can hold this
+  const canHold = await hand.canHold(self);
+  if (!canHold) {
+    await agent.see("Your hands are full.");
+    return false;
+  }
+
+  // Move item to agent's inventory
+  await self.moveTo(agent, agent);
+  await agent.see("You pick up " + self.name + ".");
+  return true;
+`);
+
+// Hand checks if it can hold item
+$hand.setMethod('canHold', `
+  /**
+   * Check if this hand can hold the given item.
+   * Considers weight, size, and current contents.
+   */
+  const item = args[0];
+  const maxWeight = 50;  // Arbitrary units
+  const currentWeight = self.contents.reduce((sum, obj) =>
+    sum + (obj.weight || 0), 0);
+
+  return (currentWeight + (item.weight || 0)) <= maxWeight;
+`);
+```
+
+**Why double dispatch:**
+- Each object type knows its own constraints
+- Physics distributed across relevant prototypes
+- No centralized "can player pick up item?" logic
+- Objects negotiate interactions directly
+
 ## Common Patterns
 
 ### Find and modify a player

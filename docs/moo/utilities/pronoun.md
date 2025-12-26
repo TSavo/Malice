@@ -42,6 +42,8 @@ await $pronoun.announce(
 
 ## Template Codes
 
+All codes are replaced during substitution to create perspective-aware messages.
+
 ### Actor Codes (The person performing the action)
 
 | Code | Meaning | Actor Sees | Others See |
@@ -308,8 +310,111 @@ await $pronoun.announce(
 );
 ```
 
+## When to Use $pronoun vs $emote
+
+### Use $pronoun for:
+- **Structured actions with clear actor/target/object** - Combat, item manipulation, social interactions
+- **When you need precise control over perspective** - Different messages for actor vs target vs observers
+- **Multi-perspective announcements** - Everyone in the room sees their own personalized version
+- **Programmatic messages** - Combat systems, automated events, scripted interactions
+
+### Use $emote for:
+- **Free-form roleplay** - Player-typed emotes like `emote draws his sword`
+- **Atmospheric descriptions** - Environmental effects, ambient messages
+- **Simple broadcasts** - When everyone sees the same message
+- **Quick announcements** - No need for perspective differences
+
+### Examples:
+
+```javascript
+// $pronoun - Structured combat action with different perspectives
+await $pronoun.announce(
+  room,
+  '%N %v{dodge} %tN\'s attack!',
+  defender,
+  null,
+  attacker
+);
+// Defender: "You dodge Jim's attack!"
+// Attacker: "Bob dodges your attack!"
+// Others:   "Bob dodges Jim's attack!"
+
+// $emote - Free-form roleplay emote
+await $emote.emote(player, 'draws his sword with a flourish');
+// Everyone: "Bob draws his sword with a flourish"
+
+// $pronoun - Item interaction with target
+await $pronoun.announce(
+  room,
+  '%N %v{toss} %d to %tN.',
+  thrower,
+  ball,
+  catcher
+);
+// Thrower:  "You toss the ball to Jim."
+// Catcher:  "Bob tosses the ball to you."
+// Others:   "Bob tosses the ball to Jim."
+
+// $emote - Atmospheric broadcast
+await $emote.emote(room, 'The wind howls through the trees.');
+// Everyone: "The wind howls through the trees."
+```
+
+## Advanced Template Features
+
+### Verb Conjugation
+
+The `%v{verb}` code automatically conjugates verbs based on subject:
+
+```javascript
+// Second person (you) vs third person (he/she/they)
+await $pronoun.announce(room, '%N %v{walk} slowly.', actor);
+// Actor:  "You walk slowly."
+// Others: "Bob walks slowly."
+
+// Irregular verbs work too
+await $pronoun.announce(room, '%N %v{have} a sword.', actor);
+// Actor:  "You have a sword."
+// Others: "Bob has a sword."
+```
+
+### Multiple Perspective Codes
+
+You can use both actor and target codes in the same template:
+
+```javascript
+// Actor and target both get personalized views
+await $pronoun.announce(
+  room,
+  '%N %v{show} %tN %p map.',
+  actor,
+  null,
+  target
+);
+// Actor:  "You show Jim your map."
+// Target: "Bob shows you his map."
+// Others: "Bob shows Jim his map."
+```
+
+### Capitalization Control
+
+Use uppercase codes for sentence-start, lowercase for mid-sentence:
+
+```javascript
+// Capitalize at start of sentence
+await $pronoun.announce(room, '%N %v{arrive}.', actor);
+// Actor:  "You arrive."
+// Others: "Bob arrives."
+
+// Lowercase in middle of sentence
+await $pronoun.announce(room, 'Suddenly, %n %v{stumble}!', actor);
+// Actor:  "Suddenly, you stumble!"
+// Others: "Suddenly, Bob stumbles!"
+```
+
 ## See Also
 
 - [$english](./english.md) - Grammar and pluralization
+- [$emote](./emote.md) - Free-form emotes and atmospheric messages
 - [$format](./format.md) - Text layout and compose()
 - [Best Practices](../best-practices.md) - Composition patterns
