@@ -778,16 +778,40 @@ Exits: \${worldContext.room?.exits ? Object.keys(worldContext.room.exits).join('
 When a player attempts something that SHOULD work but the spec doesn't cover it:
 
 1. Check if it's physically plausible (materials, forces, tools)
-2. If yes, ADD the capability to the PROTOTYPE (not the instance)
-3. Use describeForAI() to understand existing structure first
+2. Call describeForAI() on the object to see its inheritance tree
+3. Find the RIGHT prototype level to add the capability
 4. Add via setMethod() for callable actions, or extend abilities text
+
+### Finding the Right Prototype with describeForAI()
+
+  // Player has a lockpick kit instance - where does canPick belong?
+  const info = await tool.describeForAI();
+  // Returns inheritance tree:
+  // {
+  //   id: 456, name: "rusty lockpick kit",  // THIS instance
+  //   parent: {
+  //     id: 45, name: "LockpickKit",         // $lockpickKit prototype
+  //     abilities: "Set of picks and tension wrenches...",
+  //     parent: {
+  //       id: 12, name: "Tool",              // $tool prototype
+  //       abilities: "Handheld implement...",
+  //       parent: { ... }                    // $item, $describable, etc.
+  //     }
+  //   }
+  // }
+
+  // canPick belongs on $lockpickKit (#45) - not $tool (too broad)
+  // and definitely not the instance (#456)
+  const proto = await $load(45);  // or use $lockpickKit alias
+  proto.setMethod('canPick', \\\`...\\\`);
 
 Example: Player tries "pick the lock with my lockpick kit"
 - lock.pick(tool, agent) is called
 - Lock checks tool.canPick - IT DOESN'T EXIST
-- But lockpicks obviously CAN pick locks - this is a SPEC GAP
-- Add canPick() to $lockpickKit prototype (not the instance!)
-- Then re-run the action - now it works, and ALL lockpick kits gain the ability
+- Call tool.describeForAI() to see: instance -> $lockpickKit -> $tool -> $item...
+- canPick belongs on $lockpickKit (specific enough, not too broad)
+- Add canPick() to $lockpickKit prototype
+- Re-run - now ALL lockpick kits can pick locks
 
 ## MCP Usage
 Use execute_moo_code to change the world:
