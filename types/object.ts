@@ -27,6 +27,8 @@ export type ValueType =
 export interface Value {
   type: ValueType;
   value: any; // Actual value depends on type
+  /** Optional description for AI context - explains what this property means */
+  description?: string;
 }
 
 /**
@@ -65,6 +67,16 @@ export type PropertyValue =
   | RuntimeObject  // Resolved objref
   | PropertyValue[]  // Recursive array
   | { [key: string]: PropertyValue };  // Recursive object
+
+/**
+ * Rich property info for AI context
+ * Returned by properties() - includes value, type, and description
+ */
+export interface PropertyInfo {
+  value: PropertyValue;
+  type: ValueType;
+  description?: string;
+}
 
 /**
  * Method with metadata
@@ -162,6 +174,12 @@ export interface RuntimeObject {
 
   /** Get all own properties (resolved to JavaScript values, objrefs become RuntimeObjects) */
   getOwnProperties(): Record<string, PropertyValue>;
+
+  /** Get all properties with rich info (value, type, description) for AI context */
+  properties(): Record<string, PropertyInfo>;
+
+  /** Set description for a property (metadata for AI interpretation) */
+  setPropertyDescription(prop: string, description: string): void;
 
   /** Get all own methods */
   getOwnMethods(): Record<string, Method>;

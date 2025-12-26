@@ -5,20 +5,10 @@ import type { RuntimeObject } from '../../../../types/object.js';
  * Builds the Bank prototype
  * Foundation for all electronic currency in the game.
  *
- * Design principles:
- * - IDEMPOTENCY: Every mutating operation takes an idempotencyKey.
- *   If the same key is used twice, return the original result without re-executing.
- * - ATOMICITY: Transfers either fully complete or fully fail. No partial states.
- * - INTEGER ONLY: All amounts are positive integers. No decimals, no floats.
- *
- * Structure:
- *   accounts: {
- *     "acc-uuid": { owner: objref, balance: int, createdAt: ISO, frozen: bool }
- *   }
- *   ledger: [
- *     { id, type, account, amount, balance, timestamp, memo, idempotencyKey }
- *   ]
- *   processedKeys: { "key": { result, timestamp } }
+ * ABILITIES-FIRST ARCHITECTURE:
+ * - Abilities describe how electronic banking works for AI interpretation
+ * - AI uses bank methods for credit payments (vending, services, transfers)
+ * - All operations are idempotent and atomic
  */
 export class BankBuilder {
   constructor(private manager: ObjectManager) {}
@@ -39,9 +29,31 @@ export class BankBuilder {
         // Counter for generating unique IDs
         nextAccountNum: 1,
         nextTxNum: 1,
+        // Abilities - banking system for AI interpretation
+        abilities: `Electronic banking system for credit transactions. The official currency of the city.
+
+ACCOUNTS: Each agent has a bank account with a balance in credits. Use getAccountByOwner(agent) to find their account. Accounts can be frozen to block transactions.
+
+CHECKING BALANCE: Call getBalance(accountId) to see available funds. Returns { success, balance }.
+
+TRANSFERS: Call transfer(fromAccountId, toAccountId, amount, idempotencyKey, memo) to move credits between accounts. Both accounts must exist and not be frozen. Source must have sufficient funds.
+
+PAYMENTS: For vending/services, get buyer's account via getAccountByOwner(buyer), then transfer to the vendor's bankAccount.
+
+ISSUING: Only system can create new credits via issue(). Money enters circulation through jobs, rewards.
+
+BURNING: Taxes, fines, fees remove credits via burn(). Money leaves circulation.
+
+HISTORY: Call getAccountHistory(accountId) to see recent transactions.
+
+NOTE: This is the legal payment system. Physical cash ($dollar) is contraband.`,
       },
       methods: {},
     });
+
+    // Add property descriptions
+    obj.setPropertyDescription('accounts', "All bank accounts: { accountId: { owner, balance, frozen } }");
+    obj.setPropertyDescription('ledger', "Append-only transaction log for auditing.");
 
     // ═══════════════════════════════════════════════════════════════════
     // VALIDATION HELPERS

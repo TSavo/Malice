@@ -15,7 +15,6 @@ import type { RuntimeObject } from '../../../../types/object.js';
  * Methods:
  * - read(agent): Returns the current text
  * - write(agent, newText): Sets or appends to the text
- * - getRoomVerbs(): Declares 'read %i' and 'write %i' verbs
  */
 export class WritableBuilder {
   constructor(private manager: ObjectManager) {}
@@ -30,6 +29,14 @@ export class WritableBuilder {
         text: '',
         writable: true,
         maxLength: 2000,
+
+        abilities: `Surface that can be written on. Base for letters, notes, whiteboards.
+
+READING: read() returns current 'text' content. AI can invoke directly.
+
+WRITING: write(agent, newText) sets 'text' if 'writable' is true. Respects 'maxLength' limit.
+
+PORTABLE: Can be picked up, carried, dropped. Contents persist.`,
       },
       methods: {},
     });
@@ -50,12 +57,9 @@ export class WritableBuilder {
       return 'You write: ' + newText;
     `);
 
-    obj.setMethod('getRoomVerbs', `
-      return [
-        { pattern: 'read %i', method: 'read' },
-        { pattern: 'write %i', method: 'write' }
-      ];
-    `);
+    obj.setPropertyDescription('text', 'The current written text content on this object');
+    obj.setPropertyDescription('writable', 'Whether the object can currently be written on');
+    obj.setPropertyDescription('maxLength', 'Maximum allowed length for text content');
 
     return obj;
   }

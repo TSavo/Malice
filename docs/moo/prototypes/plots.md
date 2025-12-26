@@ -1,6 +1,8 @@
 # Plot System
 
-Narrative event logging, job tracking, and dynamic quest system for Malice.
+> **Abilities-First**: Plots are simplified event logs. NPCs create plots directly and handle quests conversationally. See `docs/ABILITIES-FIRST.md`.
+
+Narrative event logging for Malice.
 
 ## Overview
 

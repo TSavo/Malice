@@ -31,6 +31,20 @@ export class FactionBuilder {
         relationships: {},
         // Map of entityId -> factionName for quick lookup
         memberships: {},
+
+        abilities: `Singleton manager for faction system. Accessed via $.faction.
+
+FACTIONS: createFaction(name, desc) creates. getFactionInfo(name) gets details. listFactions() lists all.
+
+MEMBERSHIP: setFaction(entity, name) assigns entity to faction. getFaction(entity) gets current faction. Entities can belong to only one faction.
+
+RELATIONSHIPS: setRelationship(A, B, type) sets relationship (friendly/hostile/neutral). getRelationship(A, B) checks.
+
+CHECKS: isFriendly(entityA, entityB) true if same faction or allied. isHostile(entityA, entityB) true if factions hostile.
+
+LEADERSHIP: setLeader(faction, entity) designates leader. getLeader(faction) gets current.
+
+MEMBERS: getMembers(faction) returns array of entity IDs in faction.`,
       },
       methods: {},
     });
@@ -262,6 +276,11 @@ export class FactionBuilder {
 
       return faction ? faction.leader : null;
     `);
+
+    // Property descriptions
+    obj.setPropertyDescription('factions', 'Map of factionName -> {members: [entityIds], description, leader, created}');
+    obj.setPropertyDescription('relationships', 'Map of "factionA:factionB" -> relationship (friendly/hostile/neutral), bidirectional with sorted keys');
+    obj.setPropertyDescription('memberships', 'Map of entityId -> factionName for quick faction lookup by entity');
 
     return obj;
   }

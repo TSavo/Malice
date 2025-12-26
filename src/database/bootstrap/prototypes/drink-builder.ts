@@ -3,17 +3,13 @@ import type { RuntimeObject } from '../../../../types/object.js';
 
 /**
  * Builds the Drink prototype
- * Inherits from Edible, provides the 'drink' verb
+ * Inherits from Edible. Liquid consumed by drinking.
  *
- * Drink is consumed by drinking, which:
- * 1. Takes a sip (via Edible.consume)
- * 2. When fully consumed, moves to stomach for digestion
- * 3. Stomach digests over time and releases calories
- *
- * Decay (1 tick = 1 minute):
- * - decayRate: 0.005% per tick (~14 days to spoil at room temp)
- * - Drinks last longer than solid food due to less surface area
- * - Refrigeration: 5x longer (70 days)
+ * ABILITIES-FIRST ARCHITECTURE:
+ * - Abilities describe drinking physics as prose for AI interpretation
+ * - No verb registration - AI interprets "drink X" and calls drink() method
+ * - The drink() method is infrastructure that handles state changes
+ * - AI determines if drinking is possible based on abilities
  */
 export class DrinkBuilder {
   constructor(private manager: ObjectManager) {}
@@ -41,9 +37,30 @@ export class DrinkBuilder {
         // Decay overrides - drinks last longer than food (14 days vs 7)
         // 14 days = 20160 ticks, 100% / 20160 = ~0.005% per tick
         decayRate: 0.005, // ~14 days to fully spoil at room temp
+        // Abilities - liquid consumption physics for AI interpretation
+        abilities: `Liquid in a container that is consumed by drinking.
+
+DRINKING: Liquid must be in a container (cup, bottle, glass). Bring container to mouth, tilt to pour liquid in, swallow. Each sip consumes one portion. Use 'remaining' to track sips left.
+
+CONTAINER: Drinks require a vessel. The container persists after drinking (empty bottle remains). 'containerWeight' is the weight of the empty vessel.
+
+POURING: Liquids can be poured from one container to another. Can be poured out onto ground or objects. Poured liquid spills and is lost unless caught.
+
+SPILLING: Dropping or tipping a drink container spills the liquid. Hot drinks cause burns. Cold drinks cause shock. Spilled drinks leave puddles.
+
+MIXING: Different liquids can be combined by pouring together. May create new effects or flavors. Some combinations are dangerous (poison + water dilutes).
+
+HYDRATION: Drinks primarily restore hydration, not calories. Water has 0 calories but high hydration. Alcoholic drinks dehydrate despite being liquid.
+
+TO CONSUME: Call consume(drinker, 'drink') method. It handles hydration, calorie transfer, weight reduction, and recycling when container is empty.`,
       },
       methods: {},
     });
+
+    // Add property descriptions
+    obj.setPropertyDescription('containerWeight', "Weight in grams of the empty container. Subtracted from weight to get liquid weight.");
+    obj.setPropertyDescription('portions', "Number of sips to finish this drink. Larger containers have more portions.");
+    obj.setPropertyDescription('remaining', "Sips left. Each drink action reduces by 1. At 0, liquid is consumed.");
 
     // The drink verb - registered when drink is in player's inventory or room
     // Pattern: drink %t (this drink) - player drinks self
@@ -161,30 +178,9 @@ export class DrinkBuilder {
       return await self.drink(args[0], args[1]);
     `);
 
-    // Override onArrived to register drink verb when picked up or entering room
-    obj.setMethod('onArrived', `
-      const dest = args[0];
-      const source = args[1];
-      const mover = args[2];
-
-      // If arriving in a player's hand, register the drink verb
-      if (dest && dest.owner) {
-        const owner = dest.owner;
-        if (owner && owner.registerVerb) {
-          await owner.registerVerb(['drink ' + self.name, 'drink %t', 'sip ' + self.name, 'sip %t'], self, 'drink');
-        }
-      }
-
-      // If arriving in a room with a player, they can see it to drink
-      if (dest && dest.contents) {
-        for (const item of dest.contents) {
-          const obj = item;
-          if (obj && obj.registerVerb) {
-            await obj.registerVerb(['drink ' + self.name, 'drink %t', 'sip ' + self.name, 'sip %t'], self, 'drink');
-          }
-        }
-      }
-    `);
+    // ABILITIES-FIRST: No verb registration needed.
+    // AI interprets player intent and calls drink() method directly.
+    // The onArrived hook from parent ($describable) handles location tracking.
 
     // Override describe to show liquid level
     obj.setMethod('describe', `

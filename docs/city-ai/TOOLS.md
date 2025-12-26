@@ -2,6 +2,43 @@
 
 The tools and resources available to you for managing the city.
 
+## Abilities-First Architecture
+
+**IMPORTANT**: See `docs/ABILITIES-FIRST.md` for the full architecture guide.
+
+When building objects, use **abilities** (prose physics) instead of procedural methods:
+
+```javascript
+// ✅ RIGHT: Abilities describe physics
+const camera = await $recycler.create($describable, {
+  name: 'Security Camera',
+  recording: true,
+  eventLog: [],
+  abilities: `Surveillance device that records visual activity.
+
+RECORDING: When 'recording' is true, logs events to 'eventLog' via onRoomEvent().
+
+TAMPERING: Can be disabled by covering lens, cutting power, or hacking.
+
+PLAYBACK: Security personnel can review 'eventLog'.`
+});
+camera.setPropertyDescription('recording', "Whether actively recording.");
+camera.setPropertyDescription('eventLog', "Array of recorded events.");
+
+// ❌ WRONG: Procedural methods for game logic
+camera.setMethod('capture', `...`);  // Don't do this
+camera.setMethod('playback', `...`); // Let AI interpret abilities instead
+```
+
+**Three types of specification:**
+- **Property descriptions** = what data MEANS (constraints)
+- **Abilities** = how things INTERACT (physics)
+- **JSDoc on methods** = what infrastructure does (constraints)
+
+**The AI narrator** reads abilities and interprets player intent. You build the specification, the AI runs the physics.
+
+---
+
 ## Overview
 
 You interact with the Malice MOO by writing native MOO code using `execute_moo_code`:
@@ -11,9 +48,13 @@ You interact with the Malice MOO by writing native MOO code using `execute_moo_c
 execute_moo_code({
   code: `
     // Create a plot
-    const plot = await $plotSpawner.createPlot('Water Main Repair');
+    const plot = await $recycler.create($plot, {
+      name: 'Water Main Repair',
+      status: 'active'
+    });
     await plot.setMetadata('type', 'infrastructure');
     await plot.setMetadata('priority', 'high');
+    await $plotDB.register(plot);
 
     // Spawn an NPC
     const npc = await $ai.spawn({
@@ -467,25 +508,29 @@ Manage narrative arcs and missions using the plot system.
 
 ### create
 
-Create a narrative container:
+Create a narrative container directly via $recycler:
 
 ```javascript
-const plot = await $plotSpawner.createPlot('Water Main Repair');
+const plot = await $recycler.create($plot, {
+  name: 'Water Main Repair',
+  status: 'active'
+});
 await plot.setMetadata('type', 'infrastructure');
 await plot.setMetadata('priority', 'high');
+await $plotDB.register(plot);  // Register for tracking
 // Returns: RuntimeObject (Plot instance)
 ```
 
 ### list
 
-List plots with optional status filter:
+List plots via $plotDB:
 
 ```javascript
-// All active plots
-const active = await $plotDB.getByStatus('active');
+// All plots needing attention
+const needing = await $plotDB.needsAttention();
 
 // All plots
-const all = await $plotDB.getAll();
+const all = await $plotDB.all();
 ```
 
 ### get_events
@@ -519,47 +564,22 @@ Close a plot with a final status:
 
 ```javascript
 const plot = await $load(plotId);
-await plot.close('completed', 'Repair successful.');
+await plot.complete('Repair successful.');  // or .abandon() or .fail()
 // status: 'completed', 'abandoned', 'failed'
 ```
 
-### create_job / complete_job / fail_job
+### Simplified Plot Model
 
-Manage jobs within plots:
+In abilities-first architecture, plots are simplified event logs:
 
-```javascript
-const plot = await $load(plotId);
+- **Events**: Log what happens via `plot.addEvent({ from, message })`
+- **Metadata**: Store arbitrary data via `plot.setMetadata(key, value)`
+- **Status**: Track state via `plot.status` property
+- **Attention**: Set `metadata.needsAttentionAt` for city AI polling
 
-// Create job
-await plot.createJob('repair_pipe', {
-  expiresAt: new Date(Date.now() + 24*60*60*1000).toISOString(),
-  reward: 50
-});
+NPCs create plots directly, handle job requests conversationally, and update status as narrative progresses. No complex job/hook system needed.
 
-// Complete job
-await plot.completeJob('repair_pipe', 'Done.');
-
-// Fail job
-await plot.failJob('repair_pipe', 'Abandoned.');
-```
-
-### Hooks and Filters
-
-Register event hooks to watch for game events:
-
-```javascript
-const plot = await $load(plotId);
-
-// Watch for a specific code being used
-await plot.registerJobHook(
-  'deliver-package',      // jobId
-  lockerId,               // targetId
-  'oneTimeCodeUsed',      // eventName
-  { code: 'XYZ789' }      // filter
-);
-```
-
-See [Plot System Reference](../moo/reference/plots.md) and [Plot Jobs Guide](../plot-jobs.md) for full documentation.
+See [Plot System Reference](../moo/reference/plots.md) for full documentation.
 
 ## Notes System ($notes)
 
@@ -766,12 +786,14 @@ await mcp.set_property({ objectId: player.id, name: 'credits', value: 100 });
 ### Create a repair job
 
 ```javascript
-// Create plot
-const plot = await $plotSpawner.createPlot('Repair: Water Main');
+// Create plot directly
+const plot = await $recycler.create($plot, {
+  name: 'Repair: Water Main',
+  status: 'active'
+});
 await plot.setMetadata('type', 'repair');
-
-// Create job
-await plot.createJob('fix_pipe', { reward: 50 });
+await plot.setMetadata('reward', 50);
+await $plotDB.register(plot);
 
 // Spawn supervisor NPC
 const supervisor = await $ai.spawn({

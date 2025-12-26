@@ -78,6 +78,26 @@ export class AgentBuilder {
         // Filter methods: modifyRoomDescription, getAddressableEntities, onAddressed
         // Sensory hooks: onSee, onHear, onSmell, onTaste, onFeel
         perceptionFilters: [],
+
+        abilities: `Entity that can act in the world - process verbs, move, perceive, learn skills.
+
+VERBS: 'verbs' registry maps patterns to handlers. Patterns like 'get %i' (item), 'shoot %i with %t' (item with this). matchVerb() finds best pattern. Infrastructure verbs coded, everything else to AI.
+
+WATCHING: 'watchList' tracks observed agents. Watching gives +50 perception clarity in crowds. Auto-expires. Limited by perception capacity.
+
+SLEEP: 'sleepState' tracks consciousness (awake/falling_asleep/asleep/waking_up). 'sleepDebt' accumulates while awake. High debt = drowsiness, may doze off. Combat blocks sleep.
+
+SKILLS: 'skills' tracks learned abilities { name: { level, xp, lastProgressed } }. Skills emerge from use. cooldown prevents grinding. Higher skill = slower progression.
+
+DYING: 'isDying' + 'dyingProgress' = 15-minute death countdown. Can be rescued with first aid. Progress resets when stabilized.
+
+MOVEMENT: 'movementMode' (walk/run). 'movementState' tracks in-progress moves. Running is faster but burns more calories.
+
+STATUS EFFECTS: 'statusEffects' tracks chemical/injury effects: sedation, stimulation, nausea, pain, etc. Each has intensity (0-100) and decay rate.
+
+PERCEPTION FILTERS: 'perceptionFilters' modify what this agent perceives. Neural interfaces, hallucinations, AR overlays. Each filter can inject entities, modify descriptions.
+
+LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, if <= luck, failure becomes success.`,
       },
       methods: {},
     });
@@ -93,6 +113,20 @@ export class AgentBuilder {
     this.addStatusEffectMethods(obj);
     this.addDyingMethods(obj);
     this.addPerceptionFilterMethods(obj);
+
+    // Property descriptions
+    obj.setPropertyDescription('verbs', 'Verb registry mapping command patterns to handler methods (e.g., "get %i" → object.get)');
+    obj.setPropertyDescription('watchList', 'Array of object IDs being actively watched (+50 perception clarity in crowds)');
+    obj.setPropertyDescription('options', 'Display options (seePrompt, hearPrompt, color, screenReader)');
+    obj.setPropertyDescription('sleepState', 'Current sleep state: awake, falling_asleep, asleep, waking_up');
+    obj.setPropertyDescription('sleepDebt', 'Accumulated sleep need (0-960+), increases while awake, decreases when sleeping');
+    obj.setPropertyDescription('statusEffects', 'Active status effects with intensity and decay rates (sedation, pain, etc.)');
+    obj.setPropertyDescription('skills', 'Learned skills with level/XP progression (lockpicking, combat, etc.)');
+    obj.setPropertyDescription('isDying', 'Whether agent is in dying state (15 minute countdown to death)');
+    obj.setPropertyDescription('dyingProgress', 'Dying countdown progress 0-100 (100 = death)');
+    obj.setPropertyDescription('luck', 'Hidden luck attribute 1-100, gives chance to turn failures into successes');
+    obj.setPropertyDescription('movementMode', 'Current movement mode: walk (default) or run (costs more calories)');
+    obj.setPropertyDescription('perceptionFilters', 'Array of perception filter objects that modify what agent perceives');
 
     return obj;
   }

@@ -35,6 +35,22 @@ export class EmbodiedBuilder {
         maxBreath: 100, // Max breath capacity (trained swimmers have more)
         // Sensory history for AI awareness (last 50 things seen/heard)
         sensoryHistory: [],
+
+        abilities: `Agent with a physical body that has sensory organs, metabolism, and mortality.
+
+BODY STRUCTURE: 'body' property points to torso (root of body tree). Access parts via getBody(), getHead(), getHands(), getEars(), getEyes(). Body parts have their own abilities.
+
+SENSES: see(), hear(), smell(), taste(), feel() methods route through body parts. Damaged/missing organs impair senses. Unconscious agents perceive nothing. sensoryHistory stores recent observations for AI awareness.
+
+CONSCIOUSNESS: 'conscious' controls all perception and action. Unconscious from damage, drugs, sleep. Critical damage (head/torso destroyed) = death.
+
+METABOLISM: Calorie system powers all actions. Torso stores main calories, limbs have local reserves. Eating replenishes via stomach→digestion. Fat stores excess. Starvation causes body to consume itself (decay).
+
+BREATHING: 'breath' tracks air for underwater. Depletes when submerged. Drowning drains calories like bleeding.
+
+WOUNDS: Body parts accumulate wounds. Wounds bleed (drains hydration/calories), cause pain, can infect. bleedTick() processes all wounds each heartbeat.
+
+STRENGTH: Derived from body part effective capacity (maxCalories - decayLevel). Weakest link in arm path limits what can be lifted/held.`,
       },
       methods: {},
     });
@@ -42,6 +58,13 @@ export class EmbodiedBuilder {
     this.addBodyAccessMethods(obj);
     this.addSensoryMethods(obj);
     this.addCalorieMethods(obj);
+
+    // Property descriptions
+    obj.setPropertyDescription('body', 'Reference to torso (root body part object) containing the entire body tree');
+    obj.setPropertyDescription('conscious', 'Whether agent is conscious (controls all perception and action)');
+    obj.setPropertyDescription('breath', 'Current breath level 0-100 for underwater survival (100 = full lungs)');
+    obj.setPropertyDescription('maxBreath', 'Maximum breath capacity (trained swimmers have higher values)');
+    obj.setPropertyDescription('sensoryHistory', 'Array of last 50 sensory events (see/hear) for AI awareness context');
 
     return obj;
   }

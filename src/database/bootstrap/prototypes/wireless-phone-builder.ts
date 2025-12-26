@@ -17,6 +17,18 @@ export class WirelessPhoneBuilder {
         battery: 100,
         signal: 5,
         ringtone: 'ring',
+
+        abilities: `Portable phone with battery and signal requirements. Extends $.phone.
+
+BATTERY: 'battery' 0-100. Depletes with use. Must be > 0 to function.
+
+SIGNAL: 'signal' 0-5. Location-dependent. Must be > 0 to connect. Underground/shielded areas block signal.
+
+USAGE: canUse() checks battery and signal. dial()/sendMessage() fail if unavailable.
+
+RINGTONE: 'ringtone' customizable alert sound for incoming calls.
+
+PORTABLE: Can be picked up, carried. Unlike payphones.`,
       },
       methods: {},
     });
@@ -44,6 +56,10 @@ export class WirelessPhoneBuilder {
       const tone = self.ringtone || 'ring';
       await $.tell(self, 'Incoming call from ' + (from.number || from.name || 'unknown') + ' [' + tone + ']');
     `);
+
+    obj.setPropertyDescription('battery', 'Battery charge level from 0-100, must be above 0 to function');
+    obj.setPropertyDescription('signal', 'Signal strength from 0-5, location-dependent, must be above 0 to connect');
+    obj.setPropertyDescription('ringtone', 'Customizable alert sound for incoming calls');
 
     return obj;
   }

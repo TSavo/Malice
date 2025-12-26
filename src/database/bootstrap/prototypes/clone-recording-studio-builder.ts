@@ -53,6 +53,22 @@ export class CloneRecordingStudioBuilder {
         
         // Aliases for commands
         aliases: ['studio', 'recording studio', 'backup station', 'chair'],
+
+        abilities: `Neural scanning station that creates consciousness backups.
+
+LINKED: 'linkedTank' is the clone tank where backups are stored. Required for operation.
+
+BACKUP: backup(player) charges fee, captures body template and stats, stores in linked tank. Replaces any previous backup.
+
+PRICING: 'backupPrice' cost, 'currency' (cash/credits). 'operator' receives payment. canAfford(player) checks funds.
+
+CAPTURE: Uses $.memento to capture body template. Preserves appearance, trained maxCalories (strength), skills.
+
+INVALIDATION: Recording here invalidates backups at other tanks. One active backup per player.
+
+MANAGEMENT: Owner can configure price, currency, payment recipient via manage().
+
+IMMOVABLE: 'boltedDown' true.`,
       },
       methods: {},
     });
@@ -442,56 +458,6 @@ export class CloneRecordingStudioBuilder {
     `);
 
     // ═══════════════════════════════════════════════════════════════════
-    // ROOM VERBS - Available when player is in same room
-    // ═══════════════════════════════════════════════════════════════════
-
-    obj.setMethod('getRoomVerbs', `
-      /** Return verbs available when in same room as the studio. */
-      return [
-        { pattern: ['backup', 'record backup', 'clone backup'], method: 'doBackup' },
-        { pattern: ['check backup', 'backup status'], method: 'doCheckBackup' },
-        { pattern: ['manage studio', 'manage recording studio'], method: 'doManage' },
-      ];
-    `);
-
-    obj.setMethod('doBackup', `
-      /** Handle 'backup' command from player. */
-      const player = args[0];
-      const result = await self.backup(player);
-      
-      if (!result.success) {
-        await player.tell(result.message);
-      }
-      // Success message is handled in backup() method
-    `);
-
-    obj.setMethod('doCheckBackup', `
-      /** Handle 'check backup' command - show backup status. */
-      const player = args[0];
-      const tank = self.linkedTank;
-      
-      if (!tank) {
-        await player.tell('This studio is not connected to any tank.');
-        return;
-      }
-      
-      const backup = await tank.getBackup(player);
-      
-      if (!backup) {
-        await player.tell('You have no backup stored in the linked tank.');
-        await player.tell('Use BACKUP to create one.');
-      } else {
-        await player.tell('');
-        await player.tell('=== BACKUP STATUS ===');
-        await player.tell('Tank: ' + (tank.name || 'Clone Tank'));
-        await player.tell('Timestamp: ' + new Date(backup.backupTimestamp).toLocaleString());
-        await player.tell('');
-        await player.tell('If you die, you will resurrect with memories up to this timestamp.');
-        await player.tell('Use BACKUP to update your backup (will overwrite current).');
-      }
-    `);
-
-    // ═══════════════════════════════════════════════════════════════════
     // OWNER MANAGEMENT
     // ═══════════════════════════════════════════════════════════════════
 
@@ -650,15 +616,12 @@ export class CloneRecordingStudioBuilder {
       return 'Exited management.';
     `);
 
-    obj.setMethod('doManage', `
-      /** Handle 'manage' command from owner. */
-      const actor = args[0];
-      const result = await self.manage(actor);
-      
-      if (result && actor.tell) {
-        await actor.tell(result);
-      }
-    `);
+    // Property descriptions
+    obj.setPropertyDescription('linkedTank', 'Clone tank where backups are stored (ObjRef, required)');
+    obj.setPropertyDescription('backupPrice', 'Cost to create or update a backup (integer)');
+    obj.setPropertyDescription('currency', 'Payment type: "cash" (physical) or "credits" (bank transfer)');
+    obj.setPropertyDescription('operator', 'Player or NPC who receives backup payments (ObjRef)');
+    obj.setPropertyDescription('owner', 'Player who can configure studio settings (ObjRef)');
 
     return obj;
   }

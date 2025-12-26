@@ -1,5 +1,7 @@
 # Stackables and Vendables
 
+> **Abilities-First**: Stackables and vendables use abilities to describe merging, splitting, and purchasing. The AI interprets "buy" actions. See `docs/ABILITIES-FIRST.md`.
+
 Physical commodities and vending machines.
 
 ## Overview

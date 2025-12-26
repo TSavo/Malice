@@ -4,24 +4,20 @@ import type { RuntimeObject } from '../../../../types/object.js';
 /**
  * Builds the Door prototype
  * Shared object for bidirectional access between rooms, used by exits and elevators.
- * Holds lock(s), state, code, and all messages as properties.
+ *
+ * ABILITIES-FIRST ARCHITECTURE:
+ * - Properties hold state with descriptions explaining meaning
+ * - Abilities describe physics/rules as prose for AI interpretation
+ * - canPass() provides simple property check for coded movement verbs
+ * - AI narrator handles state transitions (unlock, pick, force) via abilities
  *
  * Properties:
- * - name: Door name (e.g., 'Suite 1 Door')
- * - description: Description
- * - locked: Boolean (legacy/simple lock)
- * - locks: Array of composable lock objects
- * - code: Access code (optional)
- * - open: Boolean (is door open)
- * - messages: { locked, unlocked, open, closed, denied, prompt, ... }
- *
- * Methods:
- * - canAccess(agent, target, code?): Checks all locks, code, and open/closed state
- * - openDoor(agent): Opens the door
- * - closeDoor(agent): Closes the door
- * - lockDoor(agent): Locks the door
- * - unlockDoor(agent, code?): Unlocks the door (checks code/locks)
- * - promptForCode(agent): Uses $.prompt and messages.prompt
+ * - locked: Boolean - whether the door is locked
+ * - open: Boolean - whether the door is swung open
+ * - locks: Array of composable lock objects (each with their own abilities)
+ * - lockDifficulty: Number - resistance to picking (1-10)
+ * - durability: Number - structural integrity (0-100)
+ * - material: String - what the door is made of
  */
 export class DoorBuilder {
   constructor(private manager: ObjectManager) {}
@@ -34,97 +30,72 @@ export class DoorBuilder {
         name: 'Door',
         description: 'A sturdy door between rooms.',
         locked: false,
-        locks: [],
-        code: null,
         open: true,
+        locks: [],
+        lockDifficulty: 5,
+        durability: 100,
+        material: 'wood',
         autolockOnClose: false,
-        messages: {
-          locked: 'The door is locked.',
-          unlocked: 'The door is unlocked.',
-          open: 'The door swings open.',
-          closed: 'The door closes.',
-          denied: 'Access denied.',
-          prompt: 'Enter the door code:'
-        }
+        // Abilities - physics rules for AI interpretation
+        abilities: `Hinged door that swings open or closed. Passage blocked when 'open' is false or 'locked' is true.
+
+UNLOCKING: If 'locks' array is empty, door can be unlocked freely. Otherwise, all locks in array must authorize the player (check each lock's abilities and verifiedUsers). May also have a 'code' property - correct code unlocks.
+
+PICKING: Can be picked with thin rigid tools. Compare tool rigidity + player skill against 'lockDifficulty'. Success sets 'locked' to false.
+
+FORCING: Can be forced open. Compare player strength against 'durability'. Success opens but damages door (reduce durability). May break if durability reaches 0.
+
+CLOSING: Setting 'open' to false closes the door. If 'autolockOnClose' is true, also sets 'locked' to true.`,
       },
       methods: {},
     });
 
-    obj.setMethod('canAccess', `
-      /** Check if agent can access (open/unlock) the door. */
-      const agent = args[0];
-      const target = args[1];
-      const inputCode = args[2];
+    // Add property descriptions
+    obj.setPropertyDescription('locked', "When true, door blocks passage and won't open without key, picking, or force");
+    obj.setPropertyDescription('open', "When true, door is swung open allowing passage. When false, door is closed.");
+    obj.setPropertyDescription('locks', "Array of lock objects. All must authorize player for unlock. Each lock has its own abilities and verifiedUsers.");
+    obj.setPropertyDescription('lockDifficulty', "Resistance to picking, 1-10 scale. Higher = harder to pick.");
+    obj.setPropertyDescription('durability', "Structural integrity 0-100. Forcing reduces it. At 0, door breaks.");
+    obj.setPropertyDescription('material', "What door is made of. Wood splinters loudly, metal dents, glass shatters.");
+    obj.setPropertyDescription('autolockOnClose', "If true, door automatically locks when closed.");
+
+    // ═══════════════════════════════════════════════════════════════════
+    // CODED INTERFACE - Simple property checks for infrastructure verbs
+    // ═══════════════════════════════════════════════════════════════════
+
+    // canPass() - Simple check for coded movement verbs
+    // Returns true if passage is allowed, false if blocked
+    // This is the ONLY method that coded movement needs to call
+    obj.setMethod('canPass', `
+      return self.open === true && self.locked !== true;
+    `);
+
+    // getBlockedReason() - Human-readable reason why passage is blocked
+    // For movement verbs to show appropriate message
+    obj.setMethod('getBlockedReason', `
       if (self.locked) {
-        if (self.code && inputCode !== self.code) {
-          return self.messages.denied;
-        }
-        // Composable locks
-        const locks = self.locks || [];
-        for (const lock of locks) {
-          if (!lock || !lock.canAccess) continue;
-          const result = await lock.canAccess(agent, target);
-          if (result !== true) {
-            return result;
-          }
-        }
-        // If all locks pass, allow
+        return 'The door is locked.';
       }
       if (!self.open) {
-        return self.messages.closed;
+        return 'The door is closed.';
+      }
+      return null;
+    `);
+
+    // ═══════════════════════════════════════════════════════════════════
+    // LEGACY METHODS - Kept for backwards compatibility during transition
+    // AI narrator should modify properties directly instead of calling these
+    // ═══════════════════════════════════════════════════════════════════
+
+    // canAccess - simplified, just reads properties
+    obj.setMethod('canAccess', `
+      if (self.locked) {
+        return 'The door is locked.';
+      }
+      if (!self.open) {
+        return 'The door is closed.';
       }
       return true;
-    `);
-
-    obj.setMethod('openDoor', `
-      /** Open the door. */
-      self.open = true;
-      return self.messages.open;
-    `);
-
-    obj.setMethod('closeDoor', `
-      /** Close the door. Autolock if enabled. */
-      self.open = false;
-      let msg = self.messages.closed;
-      if (self.autolockOnClose) {
-        self.locked = true;
-        msg += ' ' + (self.messages.locked || 'The door is locked.');
-      }
-      return msg;
-    `);
-
-    obj.setMethod('lockDoor', `
-      /** Lock the door. */
-      self.locked = true;
-      return self.messages.locked;
-    `);
-
-    obj.setMethod('unlockDoor', `
-      /** Unlock the door (checks code/locks). */
-      const agent = args[0];
-      const inputCode = args[1];
-      if (self.code && inputCode !== self.code) {
-        return self.messages.denied;
-      }
-      // Composable locks
-      const locks = self.locks || [];
-      for (const lock of locks) {
-        if (!lock || !lock.canAccess) continue;
-        const result = await lock.canAccess(agent, self);
-        if (result !== true) {
-          return result;
-        }
-      }
-      self.locked = false;
-      return self.messages.unlocked;
-    `);
-
-    obj.setMethod('promptForCode', `
-      /** Prompt agent for code using $.prompt and messages.prompt. */
-      const agent = args[0];
-      const promptMsg = self.messages.prompt || 'Enter code:';
-      const inputCode = await $.prompt(agent, promptMsg);
-      return inputCode;
     `);
 
     return obj;

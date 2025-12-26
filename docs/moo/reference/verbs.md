@@ -2,6 +2,26 @@
 
 The verb system handles player commands by matching input against registered patterns and dispatching to handler methods.
 
+> **⚠️ ABILITIES-FIRST ARCHITECTURE**
+>
+> **Most game interactions should NOT use registered verbs.**
+>
+> Malice uses an abilities-first paradigm where the AI narrator interprets player intent by reading object abilities (prose physics). Verb registration is reserved for **infrastructure only**.
+>
+> **Only these verbs should be coded:**
+> ```
+> MOVEMENT:    north, south, east, west, up, down, enter, exit
+> PERCEPTION:  look, glance
+> SOCIAL:      say, whisper, shout, emote, to
+> META:        quit, who, help, inventory, exits, stand, sit
+> ```
+>
+> **Everything else goes through the AI narrator.**
+>
+> See `docs/ABILITIES-FIRST.md` for the full architecture.
+
+---
+
 ## Overview
 
 When a player types a command:
@@ -335,26 +355,38 @@ Arguments are passed in the order placeholders appear in the pattern:
 // args[1] = bob (RuntimeObject)
 ```
 
-## Default Player Verbs
+## Default Player Verbs (Infrastructure Only)
 
-### Note: Where defaults come from
+### Note: Abilities-First
+
+Most traditional verbs (get, drop, eat, wear, unlock, attack) have been **removed** in favor of AI interpretation. The AI narrator reads object abilities and handles these interactions.
 
 Default player verbs are registered in `src/database/bootstrap/prototypes/player-builder.ts` via `connect()`.
 
-
-Players automatically get these verbs on connect:
+**Infrastructure verbs that remain coded:**
 
 | Pattern | Method | Description |
 |---------|--------|-------------|
 | `look`, `l` | `look` | Look at surroundings |
-| `look %i`, `examine %i` | `lookAt` | Examine an item |
-| `look %i in %t` | `lookIn` | Examine item in container |
+| `glance` | `glance` | Quick look |
 | `say %s`, `"%s`, `'%s` | `say` | Say something |
+| `whisper %s to %i` | `whisper` | Private message |
+| `shout %s` | `shout` | Loud announcement |
 | `emote %s`, `:%s` | `emote` | Perform an action |
-| `get %i`, `take %i` | `get` | Pick up an item |
-| `drop %i` | `drop` | Drop an item |
+| `to %i %s` | `addressTo` | Speak to specific entity |
+| `north`, `south`, etc. | via exits | Movement |
+| `inventory`, `i` | `inventory` | List carried items |
+| `exits` | `exits` | Show available exits |
 | `help`, `help %s` | `help` | Get help |
-| `@options` | `options` | Open options menu |
+| `quit`, `@quit` | `quit` | Disconnect |
+
+**Removed (now AI-interpreted):**
+- `get`, `take`, `grab`, `lift`, `drag` → AI reads hand abilities
+- `drop`, `put`, `place` → AI reads grasping abilities
+- `eat`, `drink`, `consume` → AI reads edible abilities
+- `wear`, `remove`, `don`, `doff` → AI reads wearable abilities
+- `open`, `close`, `unlock`, `lock` → AI reads door/lock abilities
+- `attack`, `fight`, `hit` → AI reads combat abilities
 
 ## Implementation Details
 

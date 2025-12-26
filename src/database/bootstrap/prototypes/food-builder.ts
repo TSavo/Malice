@@ -3,12 +3,13 @@ import type { RuntimeObject } from '../../../../types/object.js';
 
 /**
  * Builds the Food prototype
- * Inherits from Edible, provides the 'eat' verb
+ * Inherits from Edible. Solid food consumed by eating.
  *
- * Food is consumed by eating, which:
- * 1. Takes a bite (via Edible.takeBite)
- * 2. When fully consumed, moves to stomach for digestion
- * 3. Stomach digests over time and releases calories
+ * ABILITIES-FIRST ARCHITECTURE:
+ * - Abilities describe eating physics as prose for AI interpretation
+ * - No verb registration - AI interprets "eat X" and calls eat() method
+ * - The eat() method is infrastructure that handles state changes
+ * - AI determines if eating is possible based on abilities
  */
 export class FoodBuilder {
   constructor(private manager: ObjectManager) {}
@@ -34,9 +35,28 @@ export class FoodBuilder {
         height: 5,
         depth: 8,
         weight: 150, // grams
+        // Abilities - solid food physics for AI interpretation
+        abilities: `Solid food that must be chewed and swallowed.
+
+EATING: Food must be accessible - in hand, on table, or in reach. Bring food to mouth, bite off portion, chew thoroughly, swallow. Each bite consumes one portion. Use 'remaining' to track bites left.
+
+HOLDING: Food is typically held in one hand while eating. Messy foods may require both hands or utensils. Some foods (soup, stew) need a container.
+
+TASTE: The 'ingredients' array lists components with flavors. Eating reveals flavor notes. Spoilage adds off-tastes. Poison may have bitter/chemical taste.
+
+SHARING: Food with multiple portions can be shared - one person takes bites while another waits. Or food can be split/cut into pieces.
+
+CHOKING HAZARD: Eating too fast or while talking risks choking. Large bites harder to swallow. Unconscious people cannot eat safely.
+
+TO CONSUME: Call consume(eater, 'food') method. It handles calorie transfer to stomach, weight reduction, portion tracking, and recycling when empty.`,
       },
       methods: {},
     });
+
+    // Add property descriptions
+    obj.setPropertyDescription('ingredients', "Array of {name, flavor} objects. Each bite may reveal different flavors.");
+    obj.setPropertyDescription('portions', "Number of bites to finish this food. Larger foods have more portions.");
+    obj.setPropertyDescription('remaining', "Bites left. Each eat action reduces by 1. At 0, food is consumed.");
 
     // Get a random flavor from ingredients for this bite
     obj.setMethod('tasteBite', `
@@ -176,30 +196,9 @@ export class FoodBuilder {
       return msg;
     `);
 
-    // Override onArrived to register eat verb when picked up or entering room
-    obj.setMethod('onArrived', `
-      const dest = args[0];
-      const source = args[1];
-      const mover = args[2];
-
-      // If arriving in a player's hand, register the eat verb
-      if (dest && dest.owner) {
-        const owner = dest.owner;
-        if (owner && owner.registerVerb) {
-          await owner.registerVerb(['eat ' + self.name, 'eat %t'], self, 'eat');
-        }
-      }
-
-      // If arriving in a room with a player, they can see it to eat
-      if (dest && dest.contents) {
-        for (const item of dest.contents) {
-          const obj = item;
-          if (obj && obj.registerVerb) {
-            await obj.registerVerb(['eat ' + self.name, 'eat %t'], self, 'eat');
-          }
-        }
-      }
-    `);
+    // ABILITIES-FIRST: No verb registration needed.
+    // AI interprets player intent and calls eat() method directly.
+    // The onArrived hook from parent ($describable) handles location tracking.
 
     return obj;
   }

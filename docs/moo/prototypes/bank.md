@@ -1,5 +1,7 @@
 # Bank System
 
+> **Abilities-First**: Bank uses abilities to describe transactions, balance checks, and account management. See `docs/ABILITIES-FIRST.md`.
+
 Electronic currency and account management for Malice.
 
 ## Structure

@@ -1,4 +1,4 @@
-import type { GameObject, ObjId, PropertyValue, MethodCode, Method, RuntimeObject, Value, ObjRefValue } from '../../types/object.js';
+import type { GameObject, ObjId, PropertyValue, MethodCode, Method, RuntimeObject, Value, ObjRefValue, PropertyInfo } from '../../types/object.js';
 import type { ObjectManager } from './object-manager.js';
 import * as ts from 'typescript';
 
@@ -906,6 +906,81 @@ export class RuntimeObjectImpl implements RuntimeObject {
       result[key] = this.fromValue(value);
     }
     return result;
+  }
+
+  /**
+   * Get all properties with rich info (value, type, description) for AI context
+   * Walks inheritance chain - child properties override parent properties
+   * Descriptions can be inherited from prototype if not set on instance
+   */
+  properties(): Record<string, PropertyInfo> {
+    const result: Record<string, PropertyInfo> = {};
+
+    // First, gather from parent (so child can override)
+    const parentId = this.obj.parent.value;
+    if (parentId !== this.obj._id) {
+      const parent = this.manager.getSync(parentId);
+      if (parent) {
+        const parentProps = parent.properties();
+        Object.assign(result, parentProps);
+      }
+    }
+
+    // Then overlay own properties
+    for (const [key, storedValue] of Object.entries(this.obj.properties || {})) {
+      const typedValue = storedValue as Value;
+
+      // If we have an existing entry from parent, preserve description if we don't have one
+      const existingDesc = result[key]?.description;
+
+      result[key] = {
+        value: this.fromValue(typedValue),
+        type: typedValue.type,
+        description: typedValue.description || existingDesc,
+      };
+    }
+
+    return result;
+  }
+
+  /**
+   * Set description for a property (metadata for AI interpretation)
+   * If property doesn't exist yet, creates it with null value
+   */
+  setPropertyDescription(prop: string, description: string): void {
+    if (!this.obj.properties) {
+      this.obj.properties = {};
+    }
+
+    if (prop in this.obj.properties) {
+      // Property exists - add/update description
+      const existing = this.obj.properties[prop] as Value;
+      existing.description = description;
+    } else {
+      // Property doesn't exist - check if it's inherited
+      const inheritedValue = this.get(prop);
+      if (inheritedValue !== undefined) {
+        // Create local copy with description
+        this.obj.properties[prop] = {
+          ...this.toValue(inheritedValue),
+          description,
+        };
+      } else {
+        // Create new null property with description
+        this.obj.properties[prop] = {
+          type: 'null',
+          value: null,
+          description,
+        };
+      }
+    }
+
+    // Auto-persist
+    this.manager.update(this.id, {
+      properties: this.obj.properties
+    }, false).catch(err => {
+      console.error(`[RuntimeObject] Failed to persist property description for ${prop} on #${this.id}:`, err);
+    });
   }
 
   /**

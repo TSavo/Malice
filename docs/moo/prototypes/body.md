@@ -1,5 +1,7 @@
 # Body System
 
+> **Abilities-First**: Body parts use abilities to describe physical capabilities, grasping, sensing, and damage effects. See `docs/ABILITIES-FIRST.md`.
+
 Body parts, wounds, metabolism, sensory organs, and death states in Malice.
 
 ## Overview

@@ -1,5 +1,75 @@
 # Best Practices
 
+## Abilities-First Design
+
+**See `docs/ABILITIES-FIRST.md` for the full architecture guide.**
+
+The most important best practice in Malice: use abilities (prose physics) instead of procedural methods for game interactions.
+
+### When to Use Abilities vs Methods
+
+| Use **Abilities** | Use **Methods** |
+|-------------------|-----------------|
+| Game physics (combat, crafting, lockpicking) | Infrastructure (look, say, move) |
+| Interaction outcomes | Event hooks (onRoomEvent) |
+| Player intent interpretation | Data queries (getHeld, isFree) |
+| Anything the AI should reason about | Anything that must be instant/deterministic |
+
+### Writing Good Abilities
+
+```javascript
+// ✅ GOOD: Specific, actionable physics
+abilities: `Mechanical lock with pin tumbler mechanism.
+
+PICKING: Thin rigid tools can work against 'lockDifficulty'.
+Compare tool quality + user skill vs difficulty (1-10 scale, ×10 for DC).
+Time/noise tradeoff: rushed = loud and harder, patient = quiet and easier.
+
+FORCING: Brute strength can break the lock. Compare strength vs 'durability'.
+Success damages lock, makes noise. At durability 0, lock is destroyed.
+
+BYPASSING: Key with matching 'keyId' opens instantly and silently.`
+
+// ❌ BAD: Vague, no actionable details
+abilities: `A lock that can be opened various ways.`
+```
+
+### Property Descriptions
+
+Every game-relevant property needs a description:
+
+```javascript
+obj.setPropertyDescription('locked', "When true, door won't open without key/picking/force");
+obj.setPropertyDescription('durability', "Structural integrity 0-100. At 0, breaks.");
+obj.setPropertyDescription('lockDifficulty', "Resistance to picking, 1-10 scale.");
+```
+
+### Don't Register Verbs for Game Actions
+
+```javascript
+// ❌ WRONG: Registering game verbs
+await player.registerVerb(['unlock %t'], self, 'doUnlock');
+await player.registerVerb(['pick %t'], self, 'doPick');
+
+// ✅ RIGHT: Let AI interpret via abilities
+// No verb registration needed - player types "pick the lock",
+// AI reads abilities, reasons about outcome, modifies properties
+```
+
+### Infrastructure Methods Still Need JSDoc
+
+```javascript
+// ✅ GOOD: JSDoc for infrastructure methods
+obj.setMethod('isFree', `
+  /** Check if this hand is empty.
+   *  @returns true if hand is free, false if holding something
+   */
+  return (self.contents || []).length === 0;
+`);
+```
+
+---
+
 ## Object References
 
 **Store Objects, Compare with ===**

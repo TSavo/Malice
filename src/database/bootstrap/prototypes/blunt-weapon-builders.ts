@@ -46,9 +46,32 @@ export class BluntBuilder {
         skill: 'club',
         damage: 15,
         damageType: 'bruise',
+
+        abilities: `Heavy impact weapon for crushing and battering.
+
+STRIKING: Primary attack creates 'bruise' wounds. Severity based on 'damage' + strength + skill. Bruises cause pain, swelling.
+
+BREAKING: High-force hits can break bones. Broken bones impair function, cause extreme pain, require setting.
+
+STUNNING: Head strikes can cause unconsciousness. Compare force vs skull toughness.
+
+BLOCKING: Can block other weapons. Blunt weapons are durable blockers. Takes less damage than blades when blocking.
+
+DESTRUCTION: Effective against objects - doors, locks, furniture. Breaching tool.
+
+NOISE: Impacts are LOUD. Breaking bones, smashing objects - attracts attention.
+
+ARMOR: Less affected by armor than blades. Impact transfers through padding. Effective vs protected targets.
+
+NO MAINTENANCE: Blunt weapons don't need sharpening. Durable. May bend or crack under extreme stress.`,
       },
       methods: {},
     });
+
+    obj.setPropertyDescription('skill', 'Combat skill used with this weapon (club, hammer, staff, mace, chain, brawling). Affects attack success.');
+    obj.setPropertyDescription('damage', 'Base damage value for attacks. Blunt weapons excel at breaking bones and stunning.');
+    obj.setPropertyDescription('damageType', 'Type of wound inflicted (bruise, puncture for spiked weapons). Bruises cause pain and swelling.');
+
     return obj;
   }
 }

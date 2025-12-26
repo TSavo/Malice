@@ -1,5 +1,7 @@
 # Quick Reference
 
+> **Abilities-First**: Use abilities for game physics. Infrastructure methods for system operations. See `docs/ABILITIES-FIRST.md`.
+
 Fast lookup for common MOO programming tasks.
 
 ## Object Operations

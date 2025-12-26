@@ -36,6 +36,22 @@ export class LockerBuilder {
         nextCompartmentNum: 1,
         // Rental duration in milliseconds (default: 7 days)
         rentalDurationMs: 7 * 24 * 60 * 60 * 1000,
+
+        abilities: `Bank of rentable storage compartments with code-based access.
+
+COMPARTMENTS: 'compartments' map keyed by ID (A1, B2, etc.). Each has: owner, masterCode, oneTimeCodes[], locked, contents[], rentedAt, expiresAt.
+
+RENTAL: rentCompartment(id, player) claims ownership. releaseCompartment(id) gives up. Rentals expire after 'rentalDurationMs' - contents get recycled on expiration.
+
+CODES: Owner sets masterCode for permanent access. createOneTimeCode(id) generates courier codes - consumed on first use. validateCode() checks both types.
+
+LOCKING: Compartments default locked. unlock(id, code) requires valid code. lock(id) re-locks.
+
+CONTENTS: Items stored via addContent(id, item). Must be unlocked to access. removeContent() takes items out.
+
+PLOT HOOKS: Triggers 'itemDeposited', 'itemRemoved' for plot watching.
+
+EXPIRATION: checkExpired() auto-expires old rentals. getExpirationInfo() shows time remaining. renewCompartment() extends rental.`,
       },
       methods: {},
     });
@@ -721,6 +737,12 @@ export class LockerBuilder {
 
       return desc.trim();
     `);
+
+    // Property descriptions
+    obj.setPropertyDescription('compartments', 'Map of compartment IDs to compartment state (owner, codes, locked, contents, rental info)');
+    obj.setPropertyDescription('compartmentPrefix', 'Prefix for auto-generated compartment IDs (e.g., "A" for A1, A2, A3)');
+    obj.setPropertyDescription('nextCompartmentNum', 'Next number to use when auto-generating compartment IDs');
+    obj.setPropertyDescription('rentalDurationMs', 'Rental period in milliseconds (default: 7 days), after which contents are recycled');
 
     return obj;
   }

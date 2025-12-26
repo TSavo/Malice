@@ -1,5 +1,7 @@
 # Item Types
 
+> **Abilities-First**: Items use abilities to describe interaction physics. Players type natural language and the AI interprets via abilities. See `docs/ABILITIES-FIRST.md`.
+
 Wearables, consumables, stackables, and decayable items in Malice.
 
 ## Overview

@@ -35,6 +35,22 @@ export class SealedBoxBuilder {
         delivered: false,         // Has been delivered
         // Weight for carrying
         weight: 2,                // kg
+
+        abilities: `Tamper-proof container for courier delivery jobs.
+
+SEALED: Cannot be opened by players. open() explains why. Contents are inaccessible until delivered.
+
+TAMPERING: breakSeal() destroys the seal, voids delivery, triggers 'packageTampered' plot hook. Consequences for the courier.
+
+DELIVERY: 'destinationId' is target room. onArrived() checks if destination reached. markDelivered() completes delivery, triggers 'packageDelivered' hook.
+
+ASSIGNMENT: assign(player, destId, destName) assigns the delivery job. Generates tracking 'packageCode'.
+
+TRACKING: 'packageCode' unique identifier. 'assignedTo' is courier, 'assignedAt' is assignment time.
+
+PLOT HOOKS: Triggers 'packageTampered', 'packageDelivered', 'packageArrivedAtDestination' for story tracking.
+
+WEIGHT: Packages have 'weight' for carrying mechanics.`,
       },
       methods: {},
     });
@@ -214,6 +230,15 @@ export class SealedBoxBuilder {
       }
       return 'sealed package' + (self.packageCode ? ' (' + self.packageCode + ')' : '');
     `);
+
+    // Property descriptions
+    obj.setPropertyDescription('destinationId', 'Room ID where package should be delivered (integer)');
+    obj.setPropertyDescription('destinationName', 'Human-readable destination name (string)');
+    obj.setPropertyDescription('packageCode', 'Unique tracking code (e.g., PKG-ABC123)');
+    obj.setPropertyDescription('assignedTo', 'Player assigned to deliver this package (ObjRef)');
+    obj.setPropertyDescription('assignedAt', 'ISO timestamp when package was assigned');
+    obj.setPropertyDescription('sealed', 'Whether tamper seal is intact (boolean)');
+    obj.setPropertyDescription('delivered', 'Whether package has been successfully delivered (boolean)');
 
     return obj;
   }

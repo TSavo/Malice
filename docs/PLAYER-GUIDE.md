@@ -498,25 +498,56 @@ We won't tell you much about the world here. That's IC information.
 
 ---
 
-## Commands Reference
+## Commands and Natural Language
 
-Basic commands everyone knows:
+Malice understands natural language. You don't need to memorize specific commands.
+
+### Core Commands (Always Work)
+
+These basic commands are instant and predictable:
 
 | Command | What It Does |
 |---------|--------------|
 | `look` | See your surroundings |
-| `look <thing>` | Examine something |
-| `inventory` | See what you're carrying |
-| `get <thing>` | Pick something up |
-| `drop <thing>` | Put something down |
-| `go <direction>` | Move in a direction |
 | `say <message>` | Speak aloud |
+| `whisper <message> to <person>` | Private message |
+| `emote <action>` | Describe what you do |
+| `to <person> <message>` | Address someone specifically |
+| `north`, `south`, `east`, `west` | Move in a direction |
+| `inventory` | See what you're carrying |
+| `exits` | Show available exits |
 | `help` | Get help |
-| `help <topic>` | Get help on a specific topic |
 
-Movement directions are context-dependent - rooms have different exits.
+### Everything Else: Just Describe What You Do
 
-More commands exist. Discover them through play or ask other players.
+For actions beyond the basics, **just type what you want to do in natural language:**
+
+```
+> pick up the knife
+You reach down and pick up the knife, its blade catching the dim light.
+
+> eat the apple
+You take a bite. It's slightly mealy but satisfies some hunger.
+
+> unlock the door with the keycard
+You swipe the keycard. The lock clicks open.
+
+> search the room for hidden compartments
+You run your hands along the walls, checking behind fixtures...
+
+> check if the gun is loaded
+You pop the magazine. Three rounds remaining.
+```
+
+The AI narrator interprets your intent and describes what happens based on your character's abilities, the objects involved, and the circumstances.
+
+**This means:**
+- You don't need to know the "right" command
+- You can try creative solutions
+- Actions have realistic consequences
+- The world responds intelligently
+
+**Note:** Typing natural language involves a brief AI response time. Core commands (look, say, move) are instant.
 
 ---
 

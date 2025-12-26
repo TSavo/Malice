@@ -36,6 +36,21 @@ export class SignBuilder {
         language: 'English',
         authorizedUpdaters: [],
         publiclyWritable: false,
+
+        abilities: `Fixed, readable display for directories, notices, announcements.
+
+IMMOVABLE: 'boltedDown' true by default. Cannot be picked up.
+
+READING: read() returns 'text' or 'content' property.
+
+UPDATING: updateText(agent, newText) requires authorization:
+- 'publiclyWritable' true = anyone can edit
+- Agent is admin/wizard
+- Agent ID in 'authorizedUpdaters' array
+
+LANGUAGE: 'language' property for localization.
+
+READING: read() returns text content. AI can invoke directly.`,
       },
       methods: {},
     });
@@ -107,13 +122,11 @@ export class SignBuilder {
       return { success: false, message: 'Access denied: You are not authorized to update this sign.' };
     `);
 
-    // Room-centric verb declaration for sign
-    obj.setMethod('getRoomVerbs', `
-      /** Declare verbs to be registered by the room for players. */
-      return [
-        { pattern: 'read %i', method: 'read' }
-      ];
-    `);
+    obj.setPropertyDescription('text', 'The text or directory content displayed on the sign');
+    obj.setPropertyDescription('boltedDown', 'Whether the sign is fixed in place and cannot be moved');
+    obj.setPropertyDescription('language', 'Language of the sign text for localization');
+    obj.setPropertyDescription('authorizedUpdaters', 'Array of object IDs or aliases allowed to update the sign');
+    obj.setPropertyDescription('publiclyWritable', 'If true, anyone can update the sign text');
 
     return obj;
   }

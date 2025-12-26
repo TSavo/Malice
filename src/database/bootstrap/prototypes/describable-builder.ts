@@ -66,6 +66,15 @@ export class DescribableBuilder {
     // THE primitive for all location changes
     // Everything that moves goes through this method
     obj.setMethod('moveTo', `
+      /** Move this object to a new location.
+       *  THE primitive for all location changes - picking up, dropping, transferring.
+       *  To pick up: item.moveTo(hand)
+       *  To drop: item.moveTo(room)
+       *  To put in container: item.moveTo(container)
+       *  @param dest - Destination RuntimeObject or ID (room, hand, container)
+       *  @param mover - Optional: who is causing the move (for hooks/announcements)
+       *  @returns undefined on success, or error string if destination rejects
+       */
       let dest = args[0]; // RuntimeObject or ID destination
       const mover = args[1]; // Who/what is causing the move (optional)
 
@@ -307,7 +316,7 @@ export class DescribableBuilder {
       return self.abilities;
     `);
 
-    // getFullContext() - Get object info for AI context
+    // getFullContext() - Get object info for AI context (legacy, use describeForAI)
     // Returns name, description, abilities, and key properties
     obj.setMethod('getFullContext', `
       return {
@@ -319,6 +328,263 @@ export class DescribableBuilder {
         contents: (self.contents || []).map(c => ({ id: c.id, name: c.name })),
       };
     `);
+
+    // getMethodsForAI() - Get method signatures with JSDoc for AI context
+    // Extracts the first JSDoc comment block from each method as documentation
+    obj.setMethod('getMethodsForAI', `
+      /** Get method names and their JSDoc descriptions for AI context.
+       *  Walks inheritance chain to include inherited methods.
+       *  @returns Object mapping method names to { doc, from } where from is $alias or #id
+       */
+      const result = {};
+
+      // Build reverse alias lookup: id -> $alias
+      const aliasMap = {};
+      if ($.getAliases) {
+        const aliases = $.getAliases();
+        for (const [alias, obj] of aliases.entries()) {
+          if (obj && obj.id !== undefined) {
+            aliasMap[obj.id] = '$' + alias;
+          }
+        }
+      }
+
+      // Helper to get $alias or #id for an object
+      const getRef = (obj) => {
+        if (!obj) return null;
+        return aliasMap[obj.id] || ('#' + obj.id);
+      };
+
+      // Helper to extract JSDoc from method code
+      const extractDoc = (code) => {
+        if (!code) return null;
+        // Match /** ... */ at the start of code (with optional whitespace)
+        const match = code.match(/^\\s*\\/\\*\\*([\\s\\S]*?)\\*\\//);
+        if (match) {
+          // Clean up the JSDoc: remove * prefixes, trim lines
+          return match[1]
+            .split('\\n')
+            .map(line => line.replace(/^\\s*\\*\\s?/, '').trim())
+            .filter(line => line.length > 0)
+            .join(' ');
+        }
+        return null;
+      };
+
+      // Get own methods
+      const selfRef = getRef(self);
+      if (self.getOwnMethods) {
+        const ownMethods = self.getOwnMethods();
+        for (const [name, method] of Object.entries(ownMethods)) {
+          const doc = extractDoc(method.code);
+          if (doc) {
+            result[name] = { doc, from: selfRef };
+          }
+        }
+      }
+
+      // Walk up inheritance chain for inherited methods
+      let current = self.getParent ? self.getParent() : null;
+      while (current && current.id !== self.id) {
+        const currentRef = getRef(current);
+        if (current.getOwnMethods) {
+          const parentMethods = current.getOwnMethods();
+          for (const [name, method] of Object.entries(parentMethods)) {
+            if (result[name]) continue; // Already have this method (overridden)
+            const doc = extractDoc(method.code);
+            if (doc) {
+              result[name] = { doc, from: currentRef };
+            }
+          }
+        }
+        current = current.getParent ? current.getParent() : null;
+      }
+
+      return result;
+    `);
+
+    // describeForAI(options) - Rich recursive description for AI context
+    // Walks inheritance chain showing each object's LOCAL definitions
+    obj.setMethod('describeForAI', `
+      /** Describe this object for AI context, walking inheritance chain.
+       *  Shows each object in the chain with only its LOCALLY defined items.
+       *  @param options - { depth, includeProps, includeMethods }
+       *  @returns Object with id, name, description, local: {props, abilities, methods}, inheritsFrom: [...]
+       */
+      const options = args[0] || {};
+      const depth = options.depth !== undefined ? options.depth : 2;
+      const includeProps = options.includeProps || ['contents', 'locks', 'holding'];
+      const includeMethods = options.includeMethods !== undefined ? options.includeMethods : true;
+
+      // Build reverse alias lookup: id -> $alias
+      const aliasMap = {};
+      if ($.getAliases) {
+        const aliases = $.getAliases();
+        for (const [alias, obj] of aliases.entries()) {
+          if (obj && obj.id !== undefined) {
+            aliasMap[obj.id] = '$' + alias;
+          }
+        }
+      }
+      const getRef = (obj) => obj ? (aliasMap[obj.id] || ('#' + obj.id)) : null;
+
+      // Helper to extract JSDoc from method code
+      const extractDoc = (code) => {
+        if (!code) return null;
+        const match = code.match(/^\\s*\\/\\*\\*([\\s\\S]*?)\\*\\//);
+        if (match) {
+          return match[1]
+            .split('\\n')
+            .map(line => line.replace(/^\\s*\\*\\s?/, '').trim())
+            .filter(line => line.length > 0)
+            .join(' ');
+        }
+        return null;
+      };
+
+      // Helper to get LOCAL definitions for an object
+      const getLocalDefs = (obj) => {
+        const local = {};
+
+        // Local properties with descriptions
+        if (obj.getOwnProperties) {
+          const ownProps = obj.getOwnProperties();
+          if (Object.keys(ownProps).length > 0) {
+            local.properties = {};
+            for (const [name, prop] of Object.entries(ownProps)) {
+              local.properties[name] = {
+                value: prop.value,
+                type: prop.type,
+              };
+              if (prop.description) {
+                local.properties[name].description = prop.description;
+              }
+            }
+          }
+        }
+
+        // Local abilities
+        if (obj.getOwnProperties) {
+          const ownProps = obj.getOwnProperties();
+          if (ownProps.abilities && ownProps.abilities.value) {
+            local.abilities = ownProps.abilities.value;
+          }
+        }
+
+        // Local methods with JSDoc
+        if (includeMethods && obj.getOwnMethods) {
+          const ownMethods = obj.getOwnMethods();
+          const methodDocs = {};
+          for (const [name, method] of Object.entries(ownMethods)) {
+            const doc = extractDoc(method.code);
+            if (doc) {
+              methodDocs[name] = doc;
+            }
+          }
+          if (Object.keys(methodDocs).length > 0) {
+            local.methods = methodDocs;
+          }
+        }
+
+        return local;
+      };
+
+      // Build inheritance tree recursively
+      const buildInheritanceTree = (obj) => {
+        if (!obj || obj.id === 1) return null; // Stop at Root
+
+        const local = getLocalDefs(obj);
+        const parent = obj.getParent ? obj.getParent() : null;
+        const parentTree = buildInheritanceTree(parent);
+
+        const node = {
+          from: getRef(obj),
+          name: obj.name,
+        };
+
+        // Add local defs if any
+        if (Object.keys(local).length > 0) {
+          Object.assign(node, local);
+        }
+
+        // Add parent tree if exists
+        if (parentTree) {
+          node.inheritsFrom = parentTree;
+        }
+
+        return node;
+      };
+
+      // Base result with self's local definitions
+      const selfLocal = getLocalDefs(self);
+      const parent = self.getParent ? self.getParent() : null;
+      const parentTree = buildInheritanceTree(parent);
+
+      const result = {
+        id: self.id,
+        ref: getRef(self),
+        name: self.name,
+        description: self.description,
+      };
+
+      // Add local defs if any
+      if (Object.keys(selfLocal).length > 0) {
+        Object.assign(result, selfLocal);
+      }
+
+      // Add inheritance tree if exists
+      if (parentTree) {
+        result.inheritsFrom = parentTree;
+      }
+
+      // Recursively describe nested objects if depth allows
+      if (depth > 0) {
+        for (const propName of includeProps) {
+          const propValue = self[propName];
+          if (!propValue) continue;
+
+          if (Array.isArray(propValue) && propValue.length > 0) {
+            result[propName] = [];
+            for (const item of propValue) {
+              if (item && typeof item === 'object' && item.describeForAI) {
+                result[propName].push(await item.describeForAI({ depth: depth - 1, includeProps, includeMethods }));
+              } else if (item && typeof item === 'object' && item.id !== undefined) {
+                result[propName].push({
+                  id: item.id,
+                  name: item.name,
+                  description: item.description,
+                });
+              }
+            }
+          } else if (propValue && typeof propValue === 'object' && propValue.id !== undefined) {
+            if (propValue.describeForAI) {
+              result[propName] = await propValue.describeForAI({ depth: depth - 1, includeProps, includeMethods });
+            } else {
+              result[propName] = {
+                id: propValue.id,
+                name: propValue.name,
+                description: propValue.description,
+              };
+            }
+          }
+        }
+      }
+
+      return result;
+    `);
+
+    // Property descriptions for AI context
+    obj.setPropertyDescription('name', 'Display name of this object');
+    obj.setPropertyDescription('description', 'Prose description of what the object looks like');
+    obj.setPropertyDescription('aliases', 'Alternative names this object responds to');
+    obj.setPropertyDescription('location', 'The container or room where this object currently is (objref)');
+    obj.setPropertyDescription('contents', 'Array of objects inside this object (objrefs)');
+    obj.setPropertyDescription('width', 'Width in centimeters');
+    obj.setPropertyDescription('height', 'Height in centimeters');
+    obj.setPropertyDescription('depth', 'Depth in centimeters');
+    obj.setPropertyDescription('weight', 'Weight in grams');
+    obj.setPropertyDescription('boltedDown', 'If true, object cannot be picked up or moved');
+    obj.setPropertyDescription('abilities', 'Natural language physics rules - what this object can do and how');
 
     return obj;
   }

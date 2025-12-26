@@ -1,5 +1,7 @@
 # Faction System
 
+> **Abilities-First**: Factions use abilities to describe membership, reputation, and access rights. See `docs/ABILITIES-FIRST.md`.
+
 Group membership and inter-faction relationships in Malice.
 
 ## Overview

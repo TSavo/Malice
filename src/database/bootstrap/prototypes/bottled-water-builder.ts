@@ -39,6 +39,20 @@ export class BottledWaterBuilder {
         sealed: true,
         // When opened, normal decay applies
         openedDecayRate: 0.003, // ~23 days once opened
+
+        abilities: `Sealed bottle of purified water. Cheap, essential hydration.
+
+SEALED: 'sealed' true = no decay, can't drink. Must open() first. Breaking seal enables decay.
+
+HYDRATION: Pure water, no calories. 500ml 'hydration'. 5 'portions' - each sip restores some hydration.
+
+CONSUMPTION: drink() takes a sip if open. Shows fullness via $.proportional.
+
+DECAY: Once opened, 'openedDecayRate' kicks in (~23 days). Sealed bottles last indefinitely.
+
+VERBS: 'drink water', 'open bottle'. Registered when picked up or in room.
+
+ECONOMY: 'basePrice' 1 credit. Ubiquitous vending machine item.`,
       },
       methods: {},
     });
@@ -129,37 +143,6 @@ export class BottledWaterBuilder {
       return 'You twist off the cap. The seal breaks with a soft crack.';
     `);
 
-    // Register open verb when acquired
-    obj.setMethod('onArrived', `
-      const dest = args[0];
-      const source = args[1];
-      const mover = args[2];
-
-      // Register verbs with the owner
-      if (dest && dest.owner) {
-        const owner = dest.owner;
-        if (owner && owner.registerVerb) {
-          await owner.registerVerb(['drink ' + self.name, 'drink water', 'drink %t'], self, 'drink');
-          if (self.sealed) {
-            await owner.registerVerb(['open ' + self.name, 'open water', 'open bottle', 'open %t'], self, 'open');
-          }
-        }
-      }
-
-      // If arriving in a room with players
-      if (dest && dest.contents) {
-        for (const item of dest.contents) {
-          const obj = item;
-          if (obj && obj.registerVerb) {
-            await obj.registerVerb(['drink ' + self.name, 'drink water', 'drink %t'], self, 'drink');
-            if (self.sealed) {
-              await obj.registerVerb(['open ' + self.name, 'open water', 'open bottle', 'open %t'], self, 'open');
-            }
-          }
-        }
-      }
-    `);
-
     // Override describe to show sealed/open status
     obj.setMethod('describe', `
       let desc = self.name + '\\r\\n' + self.description;
@@ -182,6 +165,12 @@ export class BottledWaterBuilder {
 
       return desc;
     `);
+
+    // Add property descriptions
+    obj.setPropertyDescription('sealed', 'Whether the bottle is still sealed (must open before drinking, prevents decay)');
+    obj.setPropertyDescription('openedDecayRate', 'Decay rate applied once the bottle seal is broken');
+    obj.setPropertyDescription('hydration', 'Total hydration value in milliliters (500ml for standard bottle)');
+    obj.setPropertyDescription('containerWeight', 'Weight of the empty bottle container in grams');
 
     return obj;
   }

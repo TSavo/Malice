@@ -27,7 +27,6 @@ export class CorpseBuilder {
     const obj = await this.manager.create({
       parent: parentObj!,
       properties: {
-
         name: 'Corpse',
         description: 'A lifeless body.',
         // Original identity - for autopsy, sex is determined from anatomy
@@ -47,6 +46,23 @@ export class CorpseBuilder {
         decayCondition: 'always', // Always decaying
         // Can be searched/looted
         searched: false,
+
+        abilities: `Dead body left behind when someone dies.
+
+DECAY TIMELINE: Corpses decompose over ~60 days through stages:
+- Fresh (0-10%): Recently dead, recognizable, can identify victim
+- Rigor (10-30%): Stiff, features distorting, harder to identify
+- Bloated (30-50%): Swelling from gases, unrecognizable, strong odor
+- Decaying (50-80%): Flesh liquefying, overwhelming stench
+- Skeletal (80-100%): Mostly bones, transforms to $.humanRemains
+
+LOOTING: 'searched' tracks if body was examined. search() finds items in hands/on body. loot() takes specific items. Dead players drop their inventory here.
+
+AUTOPSY: performAutopsy() examines body for cause of death. Skill level affects detail. Decay obscures findings. Can determine: trauma, starvation, dehydration, toxins, stomach contents.
+
+FORENSICS: Wounds on body preserve evidence of death. 'originalName' identifies victim when fresh. Sex determined from anatomy. Species from body structure.
+
+TRANSFORMATION: At 100% decay, transforms into $.humanRemains (dried bones) which continues slower decay to $.skeletalRemains.`,
       },
       methods: {},
     });
@@ -535,6 +551,11 @@ export class CorpseBuilder {
         await $.recycler.recycle(self);
       }
     `);
+
+    // Add property descriptions
+    obj.setPropertyDescription('originalName', 'Name of the person who died. Visible when fresh (0-10% decay), unrecognizable after bloating. Used for autopsy identification.');
+    obj.setPropertyDescription('contents', 'Array of items and body object. Contains the dead player\'s inventory and their body structure. Searchable for loot.');
+    obj.setPropertyDescription('searched', 'Boolean tracking if corpse has been searched. Affects description and search results.');
 
     return obj;
   }

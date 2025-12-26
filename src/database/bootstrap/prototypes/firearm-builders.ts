@@ -41,34 +41,60 @@ export class GunBuilder {
         name: 'Gun',
         description: 'A firearm.',
         skill: 'gun',
-        // No damage here - sub-prototypes define it
         damageType: 'puncture',
         ranged: true,
         range: 25,
-        
+
         // Ammo system
-        ammo: 0,           // Current rounds (for direct-load guns like shotguns)
-        maxAmmo: 6,        // Capacity
+        ammo: 0,
+        maxAmmo: 6,
         ammoType: 'generic',
-        
+
         // Magazine system
-        usesMagazine: false,   // If true, must load a magazine; if false, load ammo directly
-        // Magazine is stored via containment (location = gun.id), not by ID reference
+        usesMagazine: false,
+
+        // Abilities - firearm physics for AI interpretation
+        abilities: `Ranged weapon that fires projectiles using gunpowder.
+
+COMBAT TRACKING: When shooting at someone, call $combat.start(shooter, target) to set up exclusions. Call $combat.log(combatId, message) to record events. Call $combat.end(combatId, reason, winner) when combat concludes.
+
+FIRING: Point and shoot. Requires ammo (check via getAmmoCount()). Call fire() to expend one round. Create wounds on target body parts directly. Missed shots go somewhere - may hit unintended targets or objects.
+
+AIMING: Accuracy based on 'skill' + distance vs 'range'. Beyond effective range, accuracy drops sharply. Cover and movement affect hit chance.
+
+RELOADING: If 'usesMagazine' is true, call unload() to eject, then load(magazine). Otherwise load(ammo) directly (revolvers, shotguns). Reloading takes time - vulnerable while doing it.
+
+NOISE: Gunfire is LOUD. Everyone nearby hears it. Suppressed weapons are quieter but not silent. Gunshots attract attention.
+
+RECOIL: Heavier calibers kick more. Rapid fire reduces accuracy. 'twoHanded' weapons are harder to control one-handed.
+
+AMMUNITION: Check 'ammoType' for compatible ammo. Wrong ammo won't load. Different ammo types may exist (hollow point, FMJ, etc).
+
+MALFUNCTIONS: Guns can jam, especially if dirty or damaged. Clearing a jam takes time.
+
+CONCEALMENT: Smaller guns ('compactPistol', 'derringer') easier to hide. Long guns obvious.`,
       },
       methods: {},
     });
+
+    // Add property descriptions
+    obj.setPropertyDescription('usesMagazine', "If true, uses detachable magazines. If false, loads ammo directly (revolver, shotgun).");
+    obj.setPropertyDescription('ammo', "Current rounds loaded (direct-load guns only). Magazine-fed guns check the magazine.");
+    obj.setPropertyDescription('maxAmmo', "Capacity when fully loaded.");
+    obj.setPropertyDescription('ammoType', "Required ammo type: 9mm, .45, 12gauge, .308, etc.");
 
     // ═══════════════════════════════════════════════════════════════════════
     // AMMO MANAGEMENT
     // ═══════════════════════════════════════════════════════════════════════
 
-    // getLoadedMagazine() - find magazine contained in this gun
     obj.setMethod('getLoadedMagazine', `
+      /** Get the magazine currently loaded in this gun.
+       *  @returns Magazine RuntimeObject or null if none loaded
+       */
       if (!self.usesMagazine) return null;
-      
+
       const contents = self.contents || [];
       for (const item of contents) {
-        // Magazine has maxAmmo and ammo properties but no quantity
         if (item.maxAmmo !== undefined && item.ammo !== undefined && item.quantity === undefined) {
           return item;
         }
@@ -76,10 +102,13 @@ export class GunBuilder {
       return null;
     `);
 
-    // load(magazineOrAmmo) - load a magazine or ammo into the gun
     obj.setMethod('load', `
+      /** Load a magazine or ammo into this gun (infrastructure method).
+       *  @param item - Magazine or ammo object to load
+       *  @returns { success: boolean, loaded?: string|number, rounds?: number, error?: string }
+       */
       const item = args[0];
-      
+
       if (!item) {
         return { success: false, error: 'Load what?' };
       }
@@ -159,10 +188,13 @@ export class GunBuilder {
       }
     `);
 
-    // unload(caller) - eject magazine or unload direct ammo
     obj.setMethod('unload', `
-      const caller = args[0]; // Who is unloading
-      
+      /** Eject magazine or unload direct ammo (infrastructure method).
+       *  @param caller - Who is unloading (for hand/room placement)
+       *  @returns { success: boolean, ejected?: string, magazine?: object, rounds?: number, error?: string }
+       */
+      const caller = args[0];
+
       if (self.usesMagazine) {
         // Eject the magazine
         const magazine = await self.getLoadedMagazine();
@@ -240,8 +272,10 @@ export class GunBuilder {
     // FIRING
     // ═══════════════════════════════════════════════════════════════════════
 
-    // getAmmoCount() - get current ammo, checking magazine if applicable
     obj.setMethod('getAmmoCount', `
+      /** Get current ammo count, checking magazine if applicable.
+       *  @returns Number of rounds available
+       */
       if (self.usesMagazine) {
         const magazine = await self.getLoadedMagazine();
         return magazine ? (magazine.ammo || 0) : 0;
@@ -249,37 +283,39 @@ export class GunBuilder {
       return self.ammo || 0;
     `);
 
-    // canFire() - check if gun can fire
     obj.setMethod('canFire', `
+      /** Check if this gun can fire.
+       *  @returns { success: boolean, reason?: string }
+       */
       if (!self.ranged) {
         return { success: false, reason: 'This is not a ranged weapon.' };
       }
-      
+
       const ammoCount = await self.getAmmoCount();
       if (ammoCount <= 0) {
         return { success: false, reason: 'Out of ammo.' };
       }
-      
+
       return { success: true };
     `);
 
-    // fire() - expend one round
     obj.setMethod('fire', `
+      /** Fire the gun, expending one round (infrastructure method).
+       *  @returns { success: boolean, ammoRemaining?: number, reason?: string }
+       */
       const canFire = await self.canFire();
       if (!canFire.success) {
         return canFire;
       }
-      
+
       if (self.usesMagazine) {
-        // Consume from magazine
         const magazine = await self.getLoadedMagazine();
         if (magazine) {
           magazine.ammo = (magazine.ammo || 0) - 1;
           return { success: true, ammoRemaining: magazine.ammo };
         }
       }
-      
-      // Direct ammo
+
       self.ammo = (self.ammo || 0) - 1;
       return { success: true, ammoRemaining: self.ammo };
     `);

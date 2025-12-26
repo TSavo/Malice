@@ -1,5 +1,7 @@
 # The Mask & Pluribus
 
+> **Abilities-First**: The Mask uses perception filters and abilities to describe neural interface capabilities. See `docs/ABILITIES-FIRST.md`.
+
 The Mask is a neural interface device that creates a symbiotic bond between its wearer and Pluribus, the city's AI consciousness. Together, they become "Unum" - the one that completes the many.
 
 ## Overview

@@ -42,7 +42,23 @@ export class ElevatorBuilder {
         doorsOpen: true,
         travelTimePerFloor: 2000, // 2 seconds per floor
         capacity: 10, // Max passengers
-          door: null, // Reference to $.door object
+        door: null, // Reference to $.door object
+
+        abilities: `Vertical transport between floors. A location that moves.
+
+FLOORS: 'floors' array lists accessible floor numbers. 'floorRooms' maps floor numbers to destination room objects.
+
+MOVEMENT: selectFloor(agent, floor) requests travel. Checks locks, closes doors, schedules arrival. 'travelTimePerFloor' ms per floor traveled.
+
+STATE: 'moving' true while in motion. 'destination' is target floor. 'currentFloor' is current position.
+
+DOORS: 'doorsOpen' controls entry/exit. Doors close before movement, open on arrival. canContain() checks doors and capacity.
+
+LOCKS: 'locks' array of lock objects. canAccessFloor(agent, floor) checks all locks. Composable: biometric, keycard, etc.
+
+CAPACITY: 'capacity' max passengers. canContain() rejects if full.
+
+SCHEDULING: Uses $.scheduler to delay arrival. Job: elevator_[id]_arrive.`,
       },
       methods: {},
     });
@@ -255,6 +271,18 @@ export class ElevatorBuilder {
 
       return true;
     `);
+
+    // Property descriptions
+    obj.setPropertyDescription('currentFloor', 'Current floor number where elevator is positioned');
+    obj.setPropertyDescription('floors', 'Array of accessible floor numbers (e.g., [1, 2, 11, 35, 42])');
+    obj.setPropertyDescription('floorRooms', 'Map of floor numbers to destination room objects');
+    obj.setPropertyDescription('moving', 'Whether elevator is currently in motion between floors');
+    obj.setPropertyDescription('destination', 'Target floor number being traveled to, or null if stationary');
+    obj.setPropertyDescription('locks', 'Array of composable lock objects that control floor access');
+    obj.setPropertyDescription('doorsOpen', 'Whether elevator doors are currently open');
+    obj.setPropertyDescription('travelTimePerFloor', 'Milliseconds per floor traveled (default 2000ms)');
+    obj.setPropertyDescription('capacity', 'Maximum number of passengers allowed');
+    obj.setPropertyDescription('door', 'Reference to $.door object for access control');
 
     return obj;
   }

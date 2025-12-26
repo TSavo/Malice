@@ -16,6 +16,27 @@ export class LocationBuilder {
         name: 'Location',
         description: 'Base prototype for locations (things that can contain other things)',
         // contents inherited from Describable
+
+        abilities: `Container that can hold other objects - the base for rooms and containers.
+
+CONTENTS: 'contents' array holds objects inside this location. Objects have 'location' pointing back here.
+
+MOVEMENT: Objects enter/leave via obj.moveTo(destination). This is THE primitive for all location changes:
+- Pick up item: item.moveTo(hand)
+- Drop item: item.moveTo(room)
+- Put in container: item.moveTo(container)
+moveTo() handles canContain() checks, hook calls, and contents array updates.
+
+HOOKS: Movement triggers hooks in sequence:
+- onContentLeaving(obj, dest, mover) - before leaving (can throw to cancel)
+- onContentLeft(obj, dest, mover) - after leaving (cleanup, notifications)
+- onContentArrived(obj, source, mover) - after arriving (register verbs, announce)
+
+MESSAGING: announce(actor, target, messages) sends perspective-aware messages to everyone in location. formatMessage() handles pronoun substitution (%a, %t, %as, %ts, etc.).
+
+SPEECH: broadcastSpeech(speech, speaker) sends speech to all listeners. Understanding depends on their 'knownLanguages'.
+
+SENSATION: broadcastSensation(target, sensation) routes pain/feeling to target's onSensation handler.`,
       },
       methods: {},
     });
@@ -259,6 +280,9 @@ export class LocationBuilder {
         await target.onSensation(sensation);
       }
     `);
+
+    // Property descriptions for AI context (inherits from Describable)
+    obj.setPropertyDescription('contents', 'Array of objects currently inside this location');
 
     return obj;
   }

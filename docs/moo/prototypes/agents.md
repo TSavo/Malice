@@ -1,5 +1,7 @@
 # Agent System
 
+> **Abilities-First**: Agents have body part abilities describing physical capabilities. Infrastructure verbs (look, say, move) remain coded; other actions interpreted via AI. See `docs/ABILITIES-FIRST.md`.
+
 Players, NPCs, and embodied entities in Malice.
 
 ## Overview

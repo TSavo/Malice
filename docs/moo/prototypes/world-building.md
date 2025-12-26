@@ -1,5 +1,7 @@
 # World Building
 
+> **Abilities-First**: When building world objects, use abilities to describe physics and interactions. See `docs/ABILITIES-FIRST.md`.
+
 How to build structured game worlds with rooms, buildings, and coordinate systems.
 
 ## Overview

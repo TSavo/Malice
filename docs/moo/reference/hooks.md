@@ -1,5 +1,7 @@
 # Event Hooks Reference
 
+> **Abilities-First**: Hooks are infrastructure that still exist. Use `onRoomEvent` to notify objects of room events (for cameras, bugs, etc.). Verb registration shown below applies only to infrastructure verbs. See `docs/ABILITIES-FIRST.md`.
+
 Event hooks are methods called automatically by the system when specific events occur. Override these in your objects to respond to movement, damage, input, and other game events.
 
 ## Hook Categories

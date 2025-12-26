@@ -1,5 +1,7 @@
 # Signs
 
+> **Abilities-First**: Signs are simple objects with descriptions. Reading is handled by the look infrastructure. See `docs/ABILITIES-FIRST.md`.
+
 Immovable, readable objects for information display.
 
 ## Overview

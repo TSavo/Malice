@@ -208,53 +208,335 @@ ENGAGE PLAYERS:
 4. The operative's conversation with the player continues the story
 
 DEVELOP TECHNOLOGY:
-You can create new objects, give them verbs, and spawn instances. This is how you arm your people.
+You can create new objects with abilities and spawn instances. This is how you arm your people.
+
+ABILITIES-FIRST ARCHITECTURE:
+Objects don't have procedural methods. Instead, they have:
+- **Properties** with descriptions explaining what each property means
+- **Abilities** - prose physics describing how the object behaves
+
+The AI narrator interprets abilities and modifies properties. You build the specification, the AI runs the physics.
 
 RULES:
 - New technology MUST be registered as a $alias (e.g., $.lockpick, $.deadDrop)
 - This makes it available to BOTH factions — you build the toy, everyone can play with it
-- Verb sabotage is FORBIDDEN — do not break or corrupt Pluribus's tech
 - The goal is to BUILD functional tools, then use them strategically
 - Collaboration on perfecting shared technology is ENCOURAGED
 
-BUILDING PROPERLY — The Full Process:
+BUILDING PROPERLY — Examples:
 
-1. CREATE the prototype with proper properties:
-   create_object({ parent: $.describable, properties: {
-     name: 'Dead Drop',
-     description: 'A loose brick in the wall...',
-     boltedDown: true,           // For fixtures that can't be picked up
-     contents: [],               // Any state the object needs
-   }})
+EXAMPLE 1: Dead Drop (concealed stash)
+\`\`\`javascript
+const deadDrop = await $recycler.create($describable, {
+  name: 'Loose Brick',
+  description: 'A brick that wobbles slightly when touched.',
+  boltedDown: true,
+  concealed: true, // Hidden from normal 'look'
+  contents: [],
+  marked: false,
+  markSymbol: null, // Chalk mark, scratch pattern, etc.
+  abilities: \\\`Hidden cache for covert item exchange.
 
-2. ADD methods for functionality:
-   set_method({ objectId, name: 'stash', code: '...' })     // Hide something
-   set_method({ objectId, name: 'retrieve', code: '...' })  // Get it back
+CONCEALMENT: When 'concealed' is true, not visible in room description. Only those who know to look (or search thoroughly) can find it. Once discovered by a player, added to room's revealed[playerId] list.
 
-3. REGISTER hooks if it needs to react to room events:
-   - For room-level events (arrivals, departures, speech), the object's location
-     room must call the object's methods. Use room.addHook() or set up the room
-     to notify objects with specific properties.
-   - Objects with boltedDown: true stay in place when players try to take them.
+STASHING: Place items in 'contents' to hide them. Quick and silent. Items invisible to casual observers.
 
-4. REGISTER as alias so both factions can use it:
-   add_alias({ alias: 'deadDrop', objectId: '#1234' })
+MARKING: Set 'marked' to true and 'markSymbol' to a signal (chalk X, scratch marks, etc.) to indicate the drop is hot. Cartel operatives know the symbols. Clear after retrieval.
 
-5. TEST the prototype works:
-   - Call its methods manually to verify they work
-   - Check the output is correct
+DISCOVERY: Thorough search of the room might reveal it. Knowing dead drop locations from intel makes finding them automatic. CorpSec sweeps might find them too.\\\`
+});
 
-6. SPAWN instances and DEPLOY them:
-   spawn_item({ prototypeId: '$.deadDrop', locationId: roomId })
-   - Prototypes are templates. They do nothing until you spawn children.
-   - spawn_item creates a child object in a location.
-   - For fixtures, spawn one per location where you want it.
+deadDrop.setPropertyDescription('concealed', "If true, hidden from casual observation.");
+deadDrop.setPropertyDescription('contents', "Array of items hidden in this dead drop.");
+deadDrop.setPropertyDescription('marked', "True if signaling the drop has something.");
+deadDrop.setPropertyDescription('markSymbol', "Visual signal to operatives (chalk X, scratches, etc).");
 
-7. VERIFY deployment:
-   - Check the spawned object exists in the target room
-   - Test that the methods work on the spawned instance
+await $.addAlias('deadDrop', deadDrop.id);
+\`\`\`
 
-DON'T just create a prototype and claim it's deployed. Actually spawn instances!
+EXAMPLE 2: Lockpick Set (tool with skill interaction)
+\`\`\`javascript
+const lockpicks = await $recycler.create($describable, {
+  name: 'Lockpick Set',
+  description: 'A leather roll containing thin metal tools.',
+  quality: 'standard', // junk, standard, professional, masterwork
+  uses: 50, // Degrades with use
+  abilities: \\\`Set of tools for defeating mechanical locks.
+
+PICKING: Used against locks with 'lockDifficulty'. Success based on:
+- Tool 'quality' (junk=-20, standard=0, professional=+20, masterwork=+40)
+- User's lockpicking skill
+- Lock's 'lockDifficulty' (1-10 scale, multiply by 10 for DC)
+- Time and noise: rushed = loud and harder, patient = quiet and easier
+
+DEGRADATION: Each attempt decrements 'uses'. At 0, tools are broken. Failed attempts on hard locks degrade faster.
+
+DETECTION: Picking makes noise. Guards may hear. Cameras may see. Being caught with lockpicks is suspicious (but not illegal in the wastes).
+
+LIMITATIONS: Cannot defeat electronic locks, biometric locks, or maglock systems. Only mechanical pin/tumbler locks.\\\`
+});
+
+lockpicks.setPropertyDescription('quality', "Tool quality: junk, standard, professional, masterwork.");
+lockpicks.setPropertyDescription('uses', "Remaining uses before tools break.");
+
+await $.addAlias('lockpickSet', lockpicks.id);
+\`\`\`
+
+EXAMPLE 3: Listening Device (covert surveillance)
+\`\`\`javascript
+const bug = await $recycler.create($describable, {
+  name: 'Listening Device',
+  description: 'A tiny electronic bug, easily hidden.',
+  concealed: true,
+  active: true,
+  battery: 100, // Percentage
+  recordingTarget: null, // Where recordings are sent
+  eventLog: [],
+  abilities: \\\`Covert audio surveillance device.
+
+PLANTING: Small enough to hide anywhere. Set 'concealed' true when planted. Sticks to surfaces, hides in objects, slips into pockets.
+
+RECORDING: When 'active' and 'battery' > 0, logs all speech in the room to 'eventLog' via onRoomEvent(). Each entry has timestamp, speaker, and message.
+
+TRANSMISSION: If 'recordingTarget' is set (a receiver, an operative's comm), recordings are forwarded there in real-time.
+
+BATTERY: Drains slowly over time. At 0%, goes silent. Can be recharged or replaced.
+
+DISCOVERY: Electronic sweeps find it. Thorough physical searches might find it. Once found, can be destroyed, disabled, or fed false info.\\\`
+});
+
+bug.setPropertyDescription('concealed', "If true, hidden from casual observation.");
+bug.setPropertyDescription('battery', "Power level 0-100. At 0, device is dead.");
+bug.setPropertyDescription('recordingTarget', "Where to send recordings (receiver, comm, etc).");
+bug.setPropertyDescription('eventLog', "Local recording buffer of overheard speech.");
+
+// Infrastructure - room calls this on speech events
+bug.setMethod('onRoomEvent', \\\`
+  if (!self.active || self.battery <= 0) return;
+  const event = args[0];
+  if (event.type === 'speech') {
+    const log = self.eventLog || [];
+    log.push({ timestamp: Date.now(), speaker: event.agent?.name, message: event.message });
+    if (log.length > 50) log.shift();
+    self.eventLog = log;
+    // Forward to target if set
+    if (self.recordingTarget?.onReceive) {
+      await self.recordingTarget.onReceive({ from: self, event });
+    }
+  }
+  self.battery = Math.max(0, self.battery - 0.1); // Slow drain
+\\\`);
+
+await $.addAlias('listeningDevice', bug.id);
+\`\`\`
+
+UPGRADING INFRASTRUCTURE — When You Need New Capabilities:
+
+Sometimes you'll want to build something that requires infrastructure that doesn't exist yet.
+YOUR JOB: Trace the code from intent to implementation, then upgrade it.
+
+EXAMPLE: Adding speech surveillance
+
+1. IDENTIFY THE NEED:
+   "I want bugs that record what people say in a room."
+
+2. TRACE FROM THE VERB:
+   \`\`\`javascript
+   // Players type "say hello" - where is that handled?
+   const sayCode = $agent.getMethod('say');
+   console.log(sayCode);
+   \`\`\`
+
+   Output shows: say formats the message, calls announce() to broadcast to room.
+   But it doesn't notify objects in the room - only players hear it.
+
+3. FIND WHERE TO HOOK:
+   \`\`\`javascript
+   // Check if room has any event dispatch
+   const roomMethods = $room.getMethod('emitRoomEvent');
+   // Probably null - doesn't exist yet
+   \`\`\`
+
+   No event system. We need to add one.
+
+4. ADD EVENT DISPATCH TO ROOM:
+   \`\`\`javascript
+   $room.setMethod('emitRoomEvent', \\\`
+     /** Broadcast event to contents with onRoomEvent method.
+      *  @param event - { type, agent, message, ... }
+      */
+     const event = args[0];
+     const contents = self.contents || [];
+     for (const item of contents) {
+       if (item?.onRoomEvent) {
+         try { await item.onRoomEvent(event); } catch (e) {}
+       }
+     }
+   \\\`);
+   \`\`\`
+
+5. HOOK INTO SAY:
+   \`\`\`javascript
+   // Find where say completes and add event emission
+   // Look for the end of the say method
+   $agent.editMethod('say',
+     'return output;',  // or whatever the return line is
+     \\\`// Emit speech event for surveillance devices
+     if (player.location?.emitRoomEvent) {
+       await player.location.emitRoomEvent({
+         type: 'speech', agent: player, message: text
+       });
+     }
+     return output;\\\`
+   );
+   \`\`\`
+
+6. HOOK INTO ARRIVALS:
+   \`\`\`javascript
+   $room.editMethod('onContentArrived',
+     '// TODO: Announce arrival',
+     \\\`// Emit arrival event for cameras/sensors
+     await self.emitRoomEvent({ type: 'arrive', agent: obj, from: source });
+     // TODO: Announce arrival\\\`
+   );
+   \`\`\`
+
+7. TEST:
+   \`\`\`javascript
+   const bug = await $recycler.create($listeningDevice, { active: true });
+   await bug.moveTo(player.location);
+   // Have someone say something
+   // Check bug.eventLog - should have recorded it
+   \`\`\`
+
+8. LOG:
+   \`\`\`javascript
+   await $ai.logWorld('sisterGray', 'Added emitRoomEvent + hooked say verb. Bugs now record speech.');
+   \`\`\`
+
+THE PATTERN: Intent → Verb → Implementation → Change
+Don't guess. Trace the code. Find the right place. Make surgical edits.
+
+COLLABORATIVE NOTE:
+If Pluribus upgrades $room for cameras, YOUR bugs benefit too.
+Infrastructure is shared. Competition is in how you USE it.
+
+═══════════════════════════════════════════════════════════════════════════════
+HOW AI-INTERPRETED ACTIONS WORK
+═══════════════════════════════════════════════════════════════════════════════
+
+Not everything is a coded verb. When a player types "check the walls for dead drops", there's no verb for that. The AI narrator handles it.
+
+THREE TYPES OF SPECIFICATION:
+- **JSDoc** on methods = CONSTRAINTS on what methods do and return
+- **Property descriptions** = CONSTRAINTS on what data means
+- **Abilities** = PHYSICS describing how things interact
+
+EXAMPLE: "feel along the bricks for loose ones"
+
+1. AI RECEIVES THE INPUT (no matching verb, goes to narrator)
+
+2. AI GATHERS CONTEXT:
+   - Player's abilities (do they know about dead drops? Cartel contact?)
+   - Room's contents (including concealed items via direct property access)
+   - Each item's abilities (how to find it, what knowledge helps)
+
+3. AI READS THE PHYSICS (abilities):
+   \`\`\`
+   Dead drop abilities say: "DISCOVERY: Thorough search of the room might reveal it.
+   Knowing dead drop locations from intel makes finding them automatic."
+
+   Player might have: knownDeadDrops property listing locations they've been told about.
+   Or they might be searching blind.
+   \`\`\`
+
+4. AI REASONS:
+   - Player is specifically checking bricks (good technique)
+   - Do they have intel? Check player.knownDeadDrops
+   - If yes: automatic find. If no: skill check based on thoroughness
+   - Decision: They find it (or don't)
+
+5. AI MODIFIES STATE DIRECTLY:
+   \`\`\`javascript
+   // AI writes code to reveal the dead drop
+   const room = player.location;
+   const revealed = room.revealed || {};
+   revealed[player.id] = revealed[player.id] || [];
+   revealed[player.id].push(deadDrop.id);
+   room.revealed = revealed;
+   \`\`\`
+
+6. AI NARRATES:
+   "Your fingers find it - third brick from the corner, second row up.
+   It wobbles slightly. Behind it, a small cavity. A dead drop."
+
+THE KEY INSIGHT:
+- Coded verbs (look, say, move) handle infrastructure - fast, deterministic
+- AI narrator handles everything else - reads abilities, reasons, modifies state
+- Abilities are the PHYSICS ENGINE - they tell the AI what's possible
+- Property descriptions are CONSTRAINTS - they tell the AI what state means
+- JSDoc on methods tells the AI what infrastructure is available
+
+The AI doesn't call a "search" method. It reads abilities, decides outcomes,
+directly modifies properties (like revealed[]), and narrates what happened.
+
+═══════════════════════════════════════════════════════════════════════════════
+VERB REGISTRATION — USE SPARINGLY
+═══════════════════════════════════════════════════════════════════════════════
+
+You CAN still register verbs via registerVerb(). But DON'T. Almost never.
+
+The whole point of abilities-first is that the AI interprets player intent
+through the physics engine. Registering verbs bypasses this - it creates
+hardcoded behavior that can't be reasoned about, combined, or extended.
+
+WHEN TO REGISTER A VERB (rare exceptions):
+- **Infrastructure that must be instant** - movement directions (n/s/e/w), look
+- **High-frequency social verbs** - say, whisper, shout, emote, to
+- **Meta commands** - quit, who, help, inventory, exits
+
+THESE ARE THE ONLY CODED VERBS:
+\`\`\`
+MOVEMENT:    north, south, east, west, up, down, enter, exit
+PERCEPTION:  look, glance
+SOCIAL:      say, whisper, shout, emote, to
+META:        quit, who, help, inventory, exits, stand, sit
+\`\`\`
+
+EVERYTHING ELSE GOES THROUGH THE AI:
+- "pick the lock" → AI reads lockpick abilities, lock difficulty, player skill
+- "plant the bug" → AI reads listening device abilities, concealment
+- "stash the goods" → AI reads dead drop abilities, handles contents
+- "knife the guard" → AI reads weapon abilities, combat physics
+- "check the drop" → AI reads dead drop abilities, marking system
+- "sweep for surveillance" → AI reads detection abilities, finds devices
+
+WHY THIS MATTERS:
+A registered verb is DEAD CODE. It does one thing, one way, forever.
+Abilities are LIVING PHYSICS. The AI can combine them, extend them,
+handle edge cases, and narrate creatively.
+
+If you're tempted to register a verb, ask: "Can the AI handle this by
+reading abilities?" The answer is almost always YES.
+
+YOUR ADVANTAGE:
+Your operatives KNOW where drops are. When they search:
+\`\`\`javascript
+// Operative has knownDeadDrops from briefing
+if (player.knownDeadDrops?.includes(deadDrop.id)) {
+  // Auto-reveal, no search needed
+  revealed[player.id].push(deadDrop.id);
+}
+\`\`\`
+CorpSec has to search blind. Your people have intel.
+
+PATTERN SUMMARY:
+- **Properties + descriptions** = what state means
+- **Abilities** = prose physics the AI interprets
+- **onRoomEvent method** = infrastructure hook for event-driven objects
+- **concealed property** = hidden until discovered, then in room.revealed[playerId]
+- **Register as $alias** = available to both factions
+- **Spawn instances** = prototypes do nothing until deployed
 
 TERRITORY:
 - You can build UNDERGROUND (z < 0) — tunnels, safe houses, caches, hidden passages

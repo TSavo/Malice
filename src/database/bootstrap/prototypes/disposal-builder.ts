@@ -39,6 +39,22 @@ export class DisposalBuilder {
         processing: [],
         destroyMessage: 'The item is destroyed.',
         boltedDown: true,
+
+        abilities: `Device that accepts and destroys items. Base for incinerators, crushers, etc.
+
+DEPOSIT: deposit(agent, item) accepts item, either destroys instantly or queues for processing.
+
+FILTERING: 'acceptedTypes' whitelist, 'rejectedTypes' blacklist. Empty acceptedTypes = accept all.
+
+CAPACITY: 'capacity' limits concurrent processing (0 = unlimited).
+
+PROCESSING: 'processingTime' seconds to destroy. 0 = instant. 'processing' queue holds pending items.
+
+DESTRUCTION: Items recycled via $.recycler.recycle(). Permanent removal from game.
+
+DEPOSIT: deposit(item, agent) destroys item. AI invokes directly.
+
+IMMOVABLE: 'boltedDown' true by default.`,
       },
       methods: {},
     });
@@ -146,16 +162,13 @@ export class DisposalBuilder {
       return { processed: processing.length - stillProcessing.length };
     `);
 
-    // Room-centric verb declaration
-    obj.setMethod('getRoomVerbs', `
-      /** Declare verbs to be registered by the room for players. */
-      return [
-        { pattern: 'deposit %o in %i', method: 'deposit' },
-        { pattern: 'put %o in %i', method: 'deposit' },
-        { pattern: 'throw %o in %i', method: 'deposit' },
-        { pattern: 'dispose %o in %i', method: 'deposit' },
-      ];
-    `);
+    // Add property descriptions
+    obj.setPropertyDescription('capacity', 'Maximum number of items that can be processed simultaneously (0 = unlimited)');
+    obj.setPropertyDescription('processingTime', 'Seconds required to process each item (0 = instant destruction)');
+    obj.setPropertyDescription('acceptedTypes', 'Whitelist array of prototype names this disposal accepts (empty = accept all)');
+    obj.setPropertyDescription('rejectedTypes', 'Blacklist array of prototype names this disposal rejects');
+    obj.setPropertyDescription('processing', 'Array of items currently queued for processing with timestamps');
+    obj.setPropertyDescription('destroyMessage', 'Message displayed when an item is destroyed');
 
     return obj;
   }

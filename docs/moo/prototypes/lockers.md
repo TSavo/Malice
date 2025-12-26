@@ -1,5 +1,7 @@
 # Locker System
 
+> **Abilities-First**: Lockers use abilities to describe access, storage, and code entry. The AI interprets "open locker" actions. See `docs/ABILITIES-FIRST.md`.
+
 Rentable storage compartments with code-based access.
 
 ## Overview

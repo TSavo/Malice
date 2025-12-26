@@ -1,5 +1,7 @@
 # Combat System
 
+> **Abilities-First**: Combat is AI-resolved. Weapon and body abilities describe combat physics. The AI narrator interprets attacks and determines outcomes. See `docs/ABILITIES-FIRST.md`.
+
 Simultaneous-action combat with AI resolution.
 
 ## Overview

@@ -46,9 +46,38 @@ export class HumanBuilder {
         // Known languages (for understanding speech)
         knownLanguages: ['English'],
         nativeLanguage: 'English',
+
+        abilities: `Human being with human body structure and social capabilities.
+
+IDENTITY: 'sex', 'pronouns', 'age', 'species' define identity. Pronouns affect narration. Age affects appearance description.
+
+APPEARANCE: 'height', 'weight' plus body part cosmetics (eye color, hair, etc.) combine in describeAppearance().
+
+LANGUAGE: 'knownLanguages' determines what speech is understood. Foreign languages produce heard-but-not-understood result. 'nativeLanguage' is spoken by default.
+
+STATS: Derived from body part effective capacities:
+- Strength: torso + arms + legs (raw power)
+- Dexterity: hands + feet (fine motor, affected by fat)
+- Intelligence: head effective capacity
+- Perception: eyes + ears
+- Speed: legs (heavily affected by fat)
+
+SOCIAL: Can speak (via mouth), emote, give items. AI-controlled humans respond to onSpokenTo(), onItemReceived().
+
+BODY STRUCTURE: Standard human layout - torso with head, 2 arms (hands), 2 legs (feet). Body created via $.humanBodyFactory.`,
       },
       methods: {},
     });
+
+    // Property descriptions
+    obj.setPropertyDescription('sex', 'Biological sex (male, female, non-binary) affects pronouns and appearance');
+    obj.setPropertyDescription('pronouns', 'Pronoun set with subject/object/possessive for narration (they/them/their)');
+    obj.setPropertyDescription('age', 'Age in years, affects appearance and social interactions');
+    obj.setPropertyDescription('species', 'Species type (human, etc.) for identification and abilities');
+    obj.setPropertyDescription('height', 'Height in meters, affects reach and physical descriptions');
+    obj.setPropertyDescription('weight', 'Weight in kilograms, affects movement costs and appearance');
+    obj.setPropertyDescription('knownLanguages', 'Array of language codes this agent understands when hearing speech');
+    obj.setPropertyDescription('nativeLanguage', 'Primary language for speaking (default if not specified)');
 
     obj.setMethod('pronoun', `
       /** Get a pronoun for this human.
@@ -475,23 +504,21 @@ export class HumanBuilder {
     // Initialize basic verbs for AI-controlled humans
     // Players get verbs in connect(), but AI humans need them set up explicitly
     obj.setMethod('initVerbs', `
-      /** Initialize basic communication and interaction verbs for AI-controlled humans.
-       *  Call this after spawning an AI human so they can speak, emote, look, etc.
+      /** Initialize basic infrastructure verbs for AI-controlled humans.
+       *  Call this after spawning an AI human so they can speak, emote, look.
+       *  Game interactions (get, drop, wear, etc.) go through AI narrator.
        */
-      // Communication verbs
+      // Communication verbs (infrastructure)
       await self.registerVerb(['say %s', '"%s', "'" + "%s"], self, 'say');
       await self.registerVerb(['to %s'], self, 'to');
       await self.registerVerb(['emote %s', ':%s'], self, 'emote');
 
-      // Looking verbs
+      // Looking verbs (infrastructure)
       await self.registerVerb(['look', 'l'], self, 'look');
       await self.registerVerb(['look %i', 'look at %i', 'l %i', 'examine %i', 'ex %i'], self, 'lookAt');
 
       // Movement verbs - will be added by room when AI enters
-      // Pickup/drop verbs
-      await self.registerVerb(['get %i', 'take %i', 'pick up %i', 'grab %i'], self, 'get');
-      await self.registerVerb(['drop %i', 'put down %i', 'release %i'], self, 'drop');
-      await self.registerVerb(['give %i to %i'], self, 'give');
+      // Game interactions (get, drop, give, wear, etc.) handled by AI narrator
 
       // If we have a location, trigger onArrived to register room verbs
       if (self.location && self.location !== 0) {

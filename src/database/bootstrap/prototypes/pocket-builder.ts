@@ -40,6 +40,22 @@ export class PocketBuilder {
         attachedTo: null, // ObjRef to clothing item
 
         // contents: [] inherited from describable
+
+        abilities: `Container attached to clothing for storing small items.
+
+CAPACITY: 'maxWeight' (grams) and 'maxVolume' (cubic cm) limit what fits. canContain() checks both.
+
+ATTACHED: 'attachedTo' points to parent clothing. Pocket goes with the garment.
+
+CONCEALMENT: Contents are hidden from casual observation. Requires searching to find. Good for hiding contraband.
+
+ACCESS: Put/take items via standard container mechanics. Quick access for wearer.
+
+BULGE: Overloading pockets makes them visibly bulge. Heavy items sag. Can be noticed.
+
+HOLES: Damaged pockets may have holes. Items can fall out unnoticed.
+
+TYPES: Side pockets, breast pocket, back pocket, cargo pocket. Different sizes and access.`,
       },
       methods: {},
     });
@@ -173,6 +189,10 @@ export class PocketBuilder {
         volume: maxVolume - usedVolume,
       };
     `);
+
+    obj.setPropertyDescription('maxWeight', 'Maximum weight capacity in grams. Items exceeding this cannot be placed in pocket.');
+    obj.setPropertyDescription('maxVolume', 'Maximum volume capacity in cubic centimeters. Prevents oversized items from fitting.');
+    obj.setPropertyDescription('attachedTo', 'The clothing item this pocket is sewn into. Pocket moves with the garment.');
 
     return obj;
   }

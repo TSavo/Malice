@@ -1,5 +1,7 @@
 # Prototypes Reference
 
+> **Abilities-First**: Prototypes define properties, abilities (prose physics), and infrastructure methods. Game interactions go through the AI narrator. See `docs/ABILITIES-FIRST.md`.
+
 Complete reference for all object prototypes available in Malice.
 
 ## Inheritance Hierarchy

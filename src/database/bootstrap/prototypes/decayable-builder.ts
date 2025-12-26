@@ -53,6 +53,27 @@ export class DecayableBuilder {
         storageDamage: {
           frozen: 0, // Some items (organs, certain drugs) damaged by freezing
         },
+
+        abilities: `Object that deteriorates over time. Base for food, corpses, body parts.
+
+DECAY MECHANICS: 'decayRate' % per tick. 'decayLevel' tracks current state (0-100%). decayTick() called by scheduler.
+
+CONDITIONS: 'decayCondition' determines when decay starts: null=always, 'severed'=detached parts, 'dead'=corpses, 'harvested'=food.
+
+STAGES: 0-25% fresh, 25-50% slight, 50-75% decayed, 75-99% severe, 100% destroyed. getDecayStage() returns stage name.
+
+STORAGE: Containers can modify decay rate:
+- refrigerated: 10% rate (slows)
+- frozen: 0% (stops, may damage organs)
+- vacuum: 20% rate
+- heated: 200% rate (accelerates)
+- preserved: 0% (salt, vinegar)
+
+HEALING: receiveCalories() reverses decay. Bodies heal when fed. 100 calories = 1% healed.
+
+DESTRUCTION: At 100%, onFullyDecayed() called. Item destroyed, may spawn maggots/flies.
+
+PRESERVATION: preserve(method) stops decay if caught early.`,
       },
       methods: {},
     });
@@ -343,6 +364,15 @@ export class DecayableBuilder {
         stage: await self.getDecayStage(),
       };
     `);
+
+    // Add property descriptions
+    obj.setPropertyDescription('decayRate', 'Base decay rate as percentage per tick (0-100). Modified by storage conditions.');
+    obj.setPropertyDescription('decayLevel', 'Current decay state (0-100%). 0 = fresh, 100 = fully decayed/destroyed.');
+    obj.setPropertyDescription('decayCondition', 'Condition that triggers decay start (null = always, "severed" = detached parts, "dead" = corpses, "harvested" = food).');
+    obj.setPropertyDescription('decayStarted', 'Timestamp (Date.now()) when decay began. Null if not currently decaying.');
+    obj.setPropertyDescription('decaying', 'Whether currently undergoing decay. Updated by shouldDecay() checks.');
+    obj.setPropertyDescription('storageSensitivity', 'Object mapping storage conditions to decay rate multipliers (refrigerated: 0.1, frozen: 0, vacuum: 0.2, heated: 2.0, preserved: 0).');
+    obj.setPropertyDescription('storageDamage', 'Object mapping storage conditions to damage amounts (frozen: damage to organs, heated: damage from heat).');
 
     return obj;
   }

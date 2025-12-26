@@ -1,5 +1,7 @@
 # Door Prototype
 
+> **Abilities-First**: Doors use abilities to describe locking, picking, and forcing physics. The AI narrator interprets player actions like "pick the lock" or "force the door open" by reading abilities. See `docs/ABILITIES-FIRST.md`.
+
 A shared object for bidirectional access between rooms, used by both exits and elevators.
 
 ## Properties
