@@ -1,12 +1,12 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Improvised & Miscellaneous Weapon Prototypes
- * 
+ *
  * These are weapons of opportunity - things not designed as weapons
  * but used as such in desperation or criminal activity.
- * 
+ *
  * Hierarchy:
  * $.weapon
  *   $.improvised (base for all improvised weapons)
@@ -63,9 +63,18 @@ LEGAL: Most improvised weapons are not contraband until used criminally.`,
       methods: {},
     });
 
-    obj.setPropertyDescription('skill', 'The combat skill used with this weapon (improvised, throwing, etc.).');
-    obj.setPropertyDescription('damage', 'Base damage value. Lower than purpose-built weapons but compensated by availability.');
-    obj.setPropertyDescription('damageType', 'Type of damage inflicted (bruise, cut, puncture, burn).');
+    obj.setPropertyDescription(
+      'skill',
+      'The combat skill used with this weapon (improvised, throwing, etc.).',
+    );
+    obj.setPropertyDescription(
+      'damage',
+      'Base damage value. Lower than purpose-built weapons but compensated by availability.',
+    );
+    obj.setPropertyDescription(
+      'damageType',
+      'Type of damage inflicted (bruise, cut, puncture, burn).',
+    );
 
     return obj;
   }
@@ -104,7 +113,8 @@ export class BrokenBottleBuilder {
       parent: parentObj!,
       properties: {
         name: 'Broken Bottle',
-        description: 'A shattered bottle with jagged glass edges. Bar fight classic.',
+        description:
+          'A shattered bottle with jagged glass edges. Bar fight classic.',
         skill: 'improvised',
         damage: 14,
         damageType: 'cut',
@@ -605,7 +615,8 @@ export class PepperSprayBuilder {
       parent: parentObj!,
       properties: {
         name: 'Pepper Spray',
-        description: 'A canister of OC spray. Causes temporary blindness and pain.',
+        description:
+          'A canister of OC spray. Causes temporary blindness and pain.',
         skill: 'improvised',
         damage: 5,
         damageType: 'burn',

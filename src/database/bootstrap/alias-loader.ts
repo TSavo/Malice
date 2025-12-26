@@ -1,4 +1,4 @@
-import { ObjectManager } from '../object-manager.js';
+import type { ObjectManager } from '../object-manager.js';
 
 /**
  * Loads aliases from ObjectManager (#0)
@@ -21,7 +21,8 @@ export class AliasLoader {
       return;
     }
 
-    const aliases = objectManager.get('aliases') as Record<string, number> || {};
+    const aliases =
+      (objectManager.get('aliases') as Record<string, number>) || {};
     const aliasCount = Object.keys(aliases).length;
 
     if (aliasCount === 0) {
@@ -45,7 +46,9 @@ export class AliasLoader {
           this.manager.registerAlias(name, obj);
           registered++;
         } else {
-          console.log(`⚠️  Alias '${name}' points to non-existent object #${id}`);
+          console.log(
+            `⚠️  Alias '${name}' points to non-existent object #${id}`,
+          );
         }
       } catch (err) {
         console.error(`❌ Failed to register alias '${name}':`, err);
@@ -53,6 +56,8 @@ export class AliasLoader {
     }
 
     const actualCount = aliasCount - skipped;
-    console.log(`✅ Registered ${registered}/${actualCount} aliases from MongoDB`);
+    console.log(
+      `✅ Registered ${registered}/${actualCount} aliases from MongoDB`,
+    );
   }
 }

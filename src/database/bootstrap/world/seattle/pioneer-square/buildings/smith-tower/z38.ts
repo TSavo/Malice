@@ -16,7 +16,11 @@ export const building = {
       name: 'Smith Tower - 38th Floor - Roof Hatch Scanner',
       description: 'A recessed retinal scanner set into the hatch frame.',
       scanners: [
-        { type: 'retinal', part: 'eye', message: 'Roof access denied: retinal scan failed.' },
+        {
+          type: 'retinal',
+          part: 'eye',
+          message: 'Roof access denied: retinal scan failed.',
+        },
       ],
       authorizedUsers: {},
     },
@@ -35,7 +39,7 @@ export const building = {
         open: 'You swing the roof hatch open.',
         closed: 'You pull the roof hatch closed.',
         denied: 'Access denied.',
-        prompt: 'Enter code for the roof hatch:'
+        prompt: 'Enter code for the roof hatch:',
       },
     },
 

@@ -15,7 +15,7 @@ export class Recycler {
     recycledObjects: [],
   };
 
-  async create(self, $, pass, arg0, arg1, arg2) {
+  async create(self, $, _pass, arg0, arg1, arg2) {
     let params;
     let caller = null;
 
@@ -44,7 +44,11 @@ export class Recycler {
     }
 
     // Validate parent is a RuntimeObject
-    if (!params.parent || typeof params.parent !== 'object' || typeof params.parent.id !== 'number') {
+    if (
+      !params.parent ||
+      typeof params.parent !== 'object' ||
+      typeof params.parent.id !== 'number'
+    ) {
       throw new Error('Parent must be a RuntimeObject');
     }
 
@@ -53,7 +57,7 @@ export class Recycler {
     // - No caller (system creation like CharGen)
     // - Caller is wizard
     // - Caller has canBuild flag
-    if (caller && caller.get) {
+    if (caller?.get) {
       const isWizard = caller.get('isWizard');
       const canBuild = caller.get('canBuild');
 
@@ -133,26 +137,27 @@ export class Recycler {
       for (const [key, value] of Object.entries(params.properties)) {
         obj.set(key, value);
       }
-
     } else {
       // Pool empty - create fresh object
       obj = await $.create(params);
     }
 
     // Call onCreate hook if it exists
-    if (obj.hasMethod && obj.hasMethod('onCreate')) {
+    if (obj.hasMethod?.('onCreate')) {
       await obj.onCreate(caller);
     }
 
     return obj;
   }
 
-  async recycle(self, $, pass, objectOrId, caller) {
+  async recycle(self, $, _pass, objectOrId, caller) {
     // Accept either object or ID
-    const objectId = typeof objectOrId === 'number' ? objectOrId : objectOrId.id;
+    const objectId =
+      typeof objectOrId === 'number' ? objectOrId : objectOrId.id;
 
     // Load the object
-    const obj = typeof objectOrId === 'number' ? await $.load(objectId) : objectOrId;
+    const obj =
+      typeof objectOrId === 'number' ? await $.load(objectId) : objectOrId;
     if (!obj) {
       throw new Error('Object not found');
     }
@@ -163,7 +168,7 @@ export class Recycler {
     }
 
     // Notify object it's being deleted
-    if (obj.hasMethod && obj.hasMethod('beforeRecycle')) {
+    if (obj.hasMethod?.('beforeRecycle')) {
       await obj.beforeRecycle();
     }
 
@@ -201,9 +206,9 @@ export class Recycler {
     return { recycled: objectId };
   }
 
-  canRecycle(self, $, pass, caller, obj) {
+  canRecycle(_self, _$, _pass, caller, obj) {
     // Wizards can recycle anything
-    if (caller && caller.get('isWizard')) return true;
+    if (caller?.get('isWizard')) return true;
 
     // Can't recycle core system objects
     if (obj.id < 20) return false;
@@ -215,9 +220,10 @@ export class Recycler {
     return false;
   }
 
-  async unrecycle(self, $, pass, objectOrId) {
+  async unrecycle(self, _$, _pass, objectOrId) {
     // Accept either object or ID
-    const objectId = typeof objectOrId === 'number' ? objectOrId : objectOrId.id;
+    const objectId =
+      typeof objectOrId === 'number' ? objectOrId : objectOrId.id;
 
     // Find in recycled objects pool
     const pool = self.recycledObjects || [];
@@ -244,7 +250,7 @@ export class Recycler {
   }
 
   // Recursively recycle an object and all nested parts (for body trees)
-  async recycleTree(self, $, pass, objectId, caller) {
+  async recycleTree(self, $, _pass, objectId, caller) {
     const obj = await $.load(objectId);
     if (!obj) return;
 
@@ -264,7 +270,7 @@ export class Recycler {
     await self.recycle(objectId, caller);
   }
 
-  async purge(self, $, pass, objectId, caller) {
+  async purge(self, $, _pass, objectId, caller) {
     // Only wizards can purge
     if (!caller || !caller.get('isWizard')) {
       throw new Error('Only wizards can permanently delete objects');

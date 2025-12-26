@@ -18,12 +18,9 @@ The car is spotless, recently maintained. It smells faintly of cleaning solution
       },
       elevator: {
         floors: [
-          0,
-          1,
-          2,
-          3,
-          4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37,
-          38,
+          0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+          20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36,
+          37, 38,
         ],
         currentFloor: 0,
         doorsOpen: true,
@@ -66,7 +63,7 @@ The car is spotless, recently maintained. It smells faintly of cleaning solution
           35: '%LOBBY',
           36: '%CONCOURSE',
           37: '%PROMENADE',
-          38: "%ODL", // Floor 38 observation deck
+          38: '%ODL', // Floor 38 observation deck
         },
         locks: ['%L_CORP', '%LR'],
       },
@@ -76,9 +73,11 @@ The car is spotless, recently maintained. It smells faintly of cleaning solution
       // Corporate elevator lock for floor 3
       prototype: 'biometricLock',
       name: 'Corporate Access Scanner',
-      description: 'A sleek retinal scanner with a corporate emblem. The indicator glows blue when active.',
+      description:
+        'A sleek retinal scanner with a corporate emblem. The indicator glows blue when active.',
       allowedFaction: 'Corporate',
-      factionDenyMessage: 'Corporate clearance required. Your faction is not authorized for this floor.',
+      factionDenyMessage:
+        'Corporate clearance required. Your faction is not authorized for this floor.',
       scanners: [
         { type: 'retinal', part: 'eye', message: 'Biometric scan failed.' },
       ],
@@ -91,13 +90,26 @@ The car is spotless, recently maintained. It smells faintly of cleaning solution
       // Residential elevator lock
       prototype: 'biometricLock',
       name: 'Residential Access Scanner',
-      description: 'A palm scanner embedded in the elevator panel, glowing soft amber.',
+      description:
+        'A palm scanner embedded in the elevator panel, glowing soft amber.',
       scanners: [
         { type: 'palm', part: 'hand', message: 'Residential access denied.' },
       ],
       authorizedUsers: {
-        4: [], 5: [], 6: [], 7: [], 8: [], 9: [], 10: [],
-        25: [], 26: [], 27: [], 28: [], 29: [], 30: [], 31: [],
+        4: [],
+        5: [],
+        6: [],
+        7: [],
+        8: [],
+        9: [],
+        10: [],
+        25: [],
+        26: [],
+        27: [],
+        28: [],
+        29: [],
+        30: [],
+        31: [],
       },
     },
 
@@ -105,9 +117,14 @@ The car is spotless, recently maintained. It smells faintly of cleaning solution
       // Vault biometric lock
       prototype: 'biometricLock',
       name: 'Vault Access Scanner',
-      description: 'A fingerprint scanner with a steady blue LED, mounted beside the vault entrance.',
+      description:
+        'A fingerprint scanner with a steady blue LED, mounted beside the vault entrance.',
       scanners: [
-        { type: 'fingerprint', part: 'hand', message: 'Vault access denied - insufficient clearance.' },
+        {
+          type: 'fingerprint',
+          part: 'hand',
+          message: 'Vault access denied - insufficient clearance.',
+        },
       ],
       authorizedUsers: [],
     },
@@ -116,9 +133,14 @@ The car is spotless, recently maintained. It smells faintly of cleaning solution
       // Datacenter access lock - multi-factor authentication
       prototype: 'biometricLock',
       name: 'Datacenter Access Scanner',
-      description: 'A sophisticated multi-factor scanner hidden behind a server rack panel. Retinal, palm, and voice authentication required.',
+      description:
+        'A sophisticated multi-factor scanner hidden behind a server rack panel. Retinal, palm, and voice authentication required.',
       scanners: [
-        { type: 'retinal', part: 'eye', message: 'Retinal pattern not recognized.' },
+        {
+          type: 'retinal',
+          part: 'eye',
+          message: 'Retinal pattern not recognized.',
+        },
         { type: 'palm', part: 'hand', message: 'Palm print not authorized.' },
       ],
       authorizedUsers: {
@@ -194,7 +216,10 @@ This is Continuum's flagship - ultra-modern, functional, depopulated. A showroom
       waterLevel: 0,
       outdoor: false,
       exits: {
-        north: { to: "yesler-way/x-12.ts", description: 'Glass doors open onto Yesler Way' },
+        north: {
+          to: 'yesler-way/x-12.ts',
+          description: 'Glass doors open onto Yesler Way',
+        },
         west: '%0',
         east: '%2',
         south: '%4',
@@ -261,7 +286,10 @@ The space is clean, bare, echoing. Modern but hollow. Functional but unwelcoming
       waterLevel: 0,
       outdoor: false,
       exits: {
-        west: { to: "1st-ave-s/y10.ts", description: 'Glass doors open onto 1st Ave S' },
+        west: {
+          to: '1st-ave-s/y10.ts',
+          description: 'Glass doors open onto 1st Ave S',
+        },
         north: '%1',
         east: '%5',
         south: '%8',
@@ -271,7 +299,8 @@ The space is clean, bare, echoing. Modern but hollow. Functional but unwelcoming
     '%CITY_ANNOUNCE': {
       prototype: 'sign',
       name: 'City Announcement Board',
-      description: 'A sleek digital display mounted on the wall, showing official announcements from the Continuum city AI. The screen glows with a soft blue light.',
+      description:
+        'A sleek digital display mounted on the wall, showing official announcements from the Continuum city AI. The screen glows with a soft blue light.',
       content: `--- CITY ANNOUNCEMENTS ---
 
 No current announcements.

@@ -1,5 +1,5 @@
-import { ObjectManager } from '../object-manager.js';
 import type { RuntimeObject } from '../../../types/object.js';
+import type { ObjectManager } from '../object-manager.js';
 
 /**
  * Builds PronounSub object (dynamic ID)
@@ -33,7 +33,8 @@ export class PronounSubBuilder {
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
 
-    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
+    const aliases =
+      (objectManager.get('aliases') as Record<string, number>) || {};
 
     if (aliases.pronoun) {
       this.pronounSub = await this.manager.load(aliases.pronoun);
@@ -47,7 +48,8 @@ export class PronounSubBuilder {
         parent: root!,
         properties: {
           name: 'PronounSub',
-          description: 'Pronoun and name substitution system for perspective-aware messaging',
+          description:
+            'Pronoun and name substitution system for perspective-aware messaging',
           abilities: `Template-based pronoun and name substitution for structured messages.
 
 SIMPLE SUBSTITUTION - sub(template, actor, directObj?, indirectObj?, item?):
@@ -86,7 +88,9 @@ USE CASES:
 
     // Main substitution method
     // sub(template, actor, directObj?, indirectObj?, item?)
-    this.pronounSub.setMethod('sub', `
+    this.pronounSub.setMethod(
+      'sub',
+      `
       const template = args[0];
       const actor = args[1];
       const directObj = args[2];
@@ -173,28 +177,40 @@ USE CASES:
       });
 
       return result;
-    `);
+    `,
+    );
 
     // Convenience methods for direct pronoun access
-    this.pronounSub.setMethod('subject', `
+    this.pronounSub.setMethod(
+      'subject',
+      `
       const actor = args[0];
       const pronouns = actor?.pronouns || { subject: 'they' };
       return pronouns.subject;
-    `);
+    `,
+    );
 
-    this.pronounSub.setMethod('object', `
+    this.pronounSub.setMethod(
+      'object',
+      `
       const actor = args[0];
       const pronouns = actor?.pronouns || { object: 'them' };
       return pronouns.object;
-    `);
+    `,
+    );
 
-    this.pronounSub.setMethod('possessive', `
+    this.pronounSub.setMethod(
+      'possessive',
+      `
       const actor = args[0];
       const pronouns = actor?.pronouns || { possessive: 'their' };
       return pronouns.possessive;
-    `);
+    `,
+    );
 
-    this.pronounSub.setMethod('reflexive', `
+    this.pronounSub.setMethod(
+      'reflexive',
+      `
       const actor = args[0];
       const pronouns = actor?.pronouns || { subject: 'they' };
       const map = {
@@ -204,7 +220,8 @@ USE CASES:
         'it': 'itself',
       };
       return map[pronouns.subject] || 'themselves';
-    `);
+    `,
+    );
 
     // === MULTI-PERSPECTIVE SUBSTITUTION ===
 
@@ -229,7 +246,9 @@ USE CASES:
     //   Other:
     //     %i = item/indirect object name
     //     %l = location name
-    this.pronounSub.setMethod('perspective', `
+    this.pronounSub.setMethod(
+      'perspective',
+      `
       const template = args[0];
       const actor = args[1];
       const target = args[2];
@@ -330,12 +349,15 @@ USE CASES:
       result = result.replace(/%%/g, '%');
 
       return result;
-    `);
+    `,
+    );
 
     // Announce to a room with multi-perspective messages
     // messages object has optional actor/target/others keys
     // If a key is missing, falls back to others -> actor
-    this.pronounSub.setMethod('announce', `
+    this.pronounSub.setMethod(
+      'announce',
+      `
       const room = args[0];
       const actor = args[1];
       const target = args[2];
@@ -375,17 +397,21 @@ USE CASES:
           await viewer.hear(sound, null, actor);
         }
       }
-    `);
+    `,
+    );
 
     // Send sensation to a target
-    this.pronounSub.setMethod('sensation', `
+    this.pronounSub.setMethod(
+      'sensation',
+      `
       const target = args[0];
       const sensation = args[1]; // { type, intensity, partName, ... }
 
       if (target && target.onSensation) {
         await target.onSensation(sensation);
       }
-    `);
+    `,
+    );
   }
 
   async registerAlias(): Promise<void> {

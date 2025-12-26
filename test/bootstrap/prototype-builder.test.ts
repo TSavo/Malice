@@ -1,10 +1,12 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { AliasLoader } from '../../src/database/bootstrap/alias-loader.js';
+import { PrototypeBuilder } from '../../src/database/bootstrap/prototype-builder.js';
 import { ObjectDatabase } from '../../src/database/object-db.js';
 import { ObjectManager } from '../../src/database/object-manager.js';
-import { PrototypeBuilder } from '../../src/database/bootstrap/prototype-builder.js';
-import { AliasLoader } from '../../src/database/bootstrap/alias-loader.js';
 
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/?replicaSet=rs0&directConnection=true';
+const MONGO_URI =
+  process.env.MONGO_URI ||
+  'mongodb://localhost:27017/?replicaSet=rs0&directConnection=true';
 
 describe('PrototypeBuilder', () => {
   let db: ObjectDatabase;
@@ -16,7 +18,7 @@ describe('PrototypeBuilder', () => {
     await db.connect();
 
     // Clean database
-    await db['objects'].deleteMany({});
+    await db.objects.deleteMany({});
 
     // Create ObjectManager #0 and Root #1
     await db.create({
@@ -96,7 +98,7 @@ describe('PrototypeBuilder', () => {
       await builder.buildPrototypes();
 
       const objectManager = await manager.load(0);
-      const aliases = objectManager!.get('aliases') as Record<string, number>;
+      const aliases = objectManager?.get('aliases') as Record<string, number>;
 
       expect(aliases.describable).toBeTruthy();
       expect(aliases.agent).toBeTruthy();

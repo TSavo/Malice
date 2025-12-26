@@ -1,5 +1,5 @@
-import { ObjectManager } from '../object-manager.js';
 import type { RuntimeObject } from '../../../types/object.js';
+import type { ObjectManager } from '../object-manager.js';
 
 /**
  * Builds The Mask - the neural interface that connects a wearer to Pluribus.
@@ -18,17 +18,23 @@ export class MaskBuilder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(wearableId: number, existingObj?: RuntimeObject): Promise<RuntimeObject> {
+  async build(
+    wearableId: number,
+    existingObj?: RuntimeObject,
+  ): Promise<RuntimeObject> {
     const parent = await this.manager.load(wearableId);
-    const obj = existingObj || await this.manager.create({
-      parent: parent!,
-      properties: {
-        name: 'The Mask',
-        description: 'A sleek neural interface device, designed to rest seamlessly against the face. ' +
-                     'Its surface shifts between matte black and iridescent patterns that seem to respond ' +
-                     'to nearby movement. Looking at it too long creates the unsettling sense that it is ' +
-                     'looking back.',
-        abilities: `Neural interface connecting wearer to Pluribus, the city infrastructure AI.
+    const obj =
+      existingObj ||
+      (await this.manager.create({
+        parent: parent!,
+        properties: {
+          name: 'The Mask',
+          description:
+            'A sleek neural interface device, designed to rest seamlessly against the face. ' +
+            'Its surface shifts between matte black and iridescent patterns that seem to respond ' +
+            'to nearby movement. Looking at it too long creates the unsettling sense that it is ' +
+            'looking back.',
+          abilities: `Neural interface connecting wearer to Pluribus, the city infrastructure AI.
 
 BONDING: wear() creates symbiotic link. Wearer becomes "Unum" - the one who
 completes "the many." remove() severs the connection. bondState tracks status.
@@ -47,19 +53,19 @@ TODO: Implement rejection protocols based on Pluribus authorization.
 
 SESSIONS: interactionSession maintains AI conversation continuity across
 multiple interactions. Pluribus remembers the conversation.`,
-        aliases: ['mask', 'neural interface', 'interface'],
-        // Wearable properties
-        covers: ['face'],
-        layer: 5,
-        // The current wearer (RuntimeObject reference)
-        wearer: null,
-        // AI session for continuity
-        interactionSession: null,
-        // Bond state: 'inactive', 'bonded', 'rejected'
-        bondState: 'inactive',
-      },
-      methods: {},
-    });
+          aliases: ['mask', 'neural interface', 'interface'],
+          // Wearable properties
+          covers: ['face'],
+          layer: 5,
+          // The current wearer (RuntimeObject reference)
+          wearer: null,
+          // AI session for continuity
+          interactionSession: null,
+          // Bond state: 'inactive', 'bonded', 'rejected'
+          bondState: 'inactive',
+        },
+        methods: {},
+      }));
 
     this.addWearMethods(obj);
     this.addPerceptionFilterMethods(obj);
@@ -71,7 +77,9 @@ multiple interactions. Pluribus remembers the conversation.`,
 
   private addWearMethods(obj: RuntimeObject): void {
     // Override wear to add perception filter
-    obj.setMethod('wear', `
+    obj.setMethod(
+      'wear',
+      `
       /** Wear the Mask - attempt to bond with Pluribus.
        *  @param wearer - The agent attempting to wear this
        *  @returns { success, message }
@@ -128,10 +136,13 @@ multiple interactions. Pluribus remembers the conversation.`,
       }
 
       return { success: true, message: 'You put on the Mask.' };
-    `);
+    `,
+    );
 
     // Override remove to clear perception filter
-    obj.setMethod('remove', `
+    obj.setMethod(
+      'remove',
+      `
       /** Remove the Mask - break the bond with Pluribus.
        *  @param wearer - The agent removing this (optional, defaults to current wearer)
        *  @returns { success, message }
@@ -175,12 +186,15 @@ multiple interactions. Pluribus remembers the conversation.`,
       }
 
       return removeResult;
-    `);
+    `,
+    );
   }
 
   private addPerceptionFilterMethods(obj: RuntimeObject): void {
     // Modify room description to show Pluribus
-    obj.setMethod('modifyRoomDescription', `
+    obj.setMethod(
+      'modifyRoomDescription',
+      `
       /** Inject Pluribus into the room description for the Mask wearer.
        *  @param output - Current room description
        *  @param room - The room being described
@@ -203,10 +217,13 @@ multiple interactions. Pluribus remembers the conversation.`,
         'The city watches through your eyes.';
 
       return output + pluribusPresence;
-    `);
+    `,
+    );
 
     // Provide addressable entities
-    obj.setMethod('getAddressableEntities', `
+    obj.setMethod(
+      'getAddressableEntities',
+      `
       /** Return entities that can be addressed through this filter.
        *  @returns Array of addressable names
        */
@@ -214,10 +231,13 @@ multiple interactions. Pluribus remembers the conversation.`,
         return [];
       }
       return ['pluribus'];
-    `);
+    `,
+    );
 
     // Handle addressing Pluribus
-    obj.setMethod('onAddressed', `
+    obj.setMethod(
+      'onAddressed',
+      `
       /** Handle 'to pluribus <message>' - fire AI query.
        *  @param speaker - The agent speaking
        *  @param targetName - 'pluribus'
@@ -273,10 +293,13 @@ multiple interactions. Pluribus remembers the conversation.`,
         console.error('[Mask.onAddressed] AI error:', err?.message || err);
         return 'The connection flickers. Static. The response is lost.';
       }
-    `);
+    `,
+    );
 
     // Handle silent thinking to Pluribus (registered as verb 'think %s')
-    obj.setMethod('onThink', `
+    obj.setMethod(
+      'onThink',
+      `
       /** Handle 'think <message>' - silent communication with Pluribus.
        *  Verb pattern: 'think %s' -> args[0] = message, player = thinker
        */
@@ -322,12 +345,15 @@ multiple interactions. Pluribus remembers the conversation.`,
         console.error('[Mask.onThink] AI error:', err?.message || err);
         return 'The connection flickers. Static. The response is lost.';
       }
-    `);
+    `,
+    );
   }
 
   private addSensoryHookMethods(obj: RuntimeObject): void {
     // Forward visual perception to Pluribus
-    obj.setMethod('onSee', `
+    obj.setMethod(
+      'onSee',
+      `
       /** Called when the Mask wearer sees something.
        *  Forward to Pluribus's sensory history.
        *  @param message - What was seen
@@ -341,10 +367,13 @@ multiple interactions. Pluribus remembers the conversation.`,
       if ($pluribus && $pluribus.recordSensory) {
         await $pluribus.recordSensory('see', message, source);
       }
-    `);
+    `,
+    );
 
     // Forward auditory perception to Pluribus
-    obj.setMethod('onHear', `
+    obj.setMethod(
+      'onHear',
+      `
       /** Called when the Mask wearer hears something.
        *  Forward to Pluribus's sensory history.
        *  @param message - What was heard
@@ -358,10 +387,13 @@ multiple interactions. Pluribus remembers the conversation.`,
       if ($pluribus && $pluribus.recordSensory) {
         await $pluribus.recordSensory('hear', message, source);
       }
-    `);
+    `,
+    );
 
     // Forward olfactory perception to Pluribus
-    obj.setMethod('onSmell', `
+    obj.setMethod(
+      'onSmell',
+      `
       /** Called when the Mask wearer smells something.
        *  Forward to Pluribus's sensory history.
        *  @param message - What was smelled
@@ -375,10 +407,13 @@ multiple interactions. Pluribus remembers the conversation.`,
       if ($pluribus && $pluribus.recordSensory) {
         await $pluribus.recordSensory('smell', message, source);
       }
-    `);
+    `,
+    );
 
     // Forward gustatory perception to Pluribus
-    obj.setMethod('onTaste', `
+    obj.setMethod(
+      'onTaste',
+      `
       /** Called when the Mask wearer tastes something.
        *  Forward to Pluribus's sensory history.
        *  @param message - What was tasted
@@ -392,10 +427,13 @@ multiple interactions. Pluribus remembers the conversation.`,
       if ($pluribus && $pluribus.recordSensory) {
         await $pluribus.recordSensory('taste', message, source);
       }
-    `);
+    `,
+    );
 
     // Forward tactile perception to Pluribus
-    obj.setMethod('onFeel', `
+    obj.setMethod(
+      'onFeel',
+      `
       /** Called when the Mask wearer feels something.
        *  Forward to Pluribus's sensory history.
        *  @param message - What was felt
@@ -409,7 +447,8 @@ multiple interactions. Pluribus remembers the conversation.`,
       if ($pluribus && $pluribus.recordSensory) {
         await $pluribus.recordSensory('feel', message, source);
       }
-    `);
+    `,
+    );
   }
 
   async registerAlias(): Promise<void> {

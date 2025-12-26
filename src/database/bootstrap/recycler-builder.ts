@@ -1,5 +1,5 @@
-import { ObjectManager } from '../object-manager.js';
 import type { RuntimeObject } from '../../../types/object.js';
+import type { ObjectManager } from '../object-manager.js';
 
 /**
  * Builds Recycler object (dynamic ID)
@@ -8,15 +8,15 @@ import type { RuntimeObject } from '../../../types/object.js';
 export class RecyclerBuilder {
   private recycler: RuntimeObject | null = null;
 
-  constructor(private manager: ObjectManager) { }
+  constructor(private manager: ObjectManager) {}
 
   async build(forceRebuild = false): Promise<void> {
     // Check if already exists via alias
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
 
-    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
-
+    const aliases =
+      (objectManager.get('aliases') as Record<string, number>) || {};
 
     if (aliases.recycler) {
       this.recycler = await this.manager.load(aliases.recycler);
@@ -41,7 +41,9 @@ export class RecyclerBuilder {
     // 1. create({ parent: id, properties: {...} }, caller?) - new format
     // 2. create(parentId, { name: ..., ... }, caller?) - legacy format
     // Parent can be a number (ID) or an object with .id property (e.g., $.dollar)
-    this.recycler.setMethod('create', `
+    this.recycler.setMethod(
+      'create',
+      `
           const arg0 = args[0];
           const arg1 = args[1];
 
@@ -168,9 +170,12 @@ export class RecyclerBuilder {
           }
 
           return obj;
-        `);
+        `,
+    );
 
-    this.recycler.setMethod('recycle', `
+    this.recycler.setMethod(
+      'recycle',
+      `
           const objectOrId = args[0];
           const caller = args[1];
 
@@ -225,9 +230,12 @@ export class RecyclerBuilder {
 
           console.log(\`Recycled object #\${objectId}\`);
           return { recycled: objectId };
-        `);
+        `,
+    );
 
-    this.recycler.setMethod('canRecycle', `
+    this.recycler.setMethod(
+      'canRecycle',
+      `
           const caller = args[0];
           const obj = args[1];
 
@@ -243,9 +251,12 @@ export class RecyclerBuilder {
 
 
           return false;
-        `);
+        `,
+    );
 
-    this.recycler.setMethod('unrecycle', `
+    this.recycler.setMethod(
+      'unrecycle',
+      `
           const objectOrId = args[0];
 
           // Accept either object or ID
@@ -273,10 +284,13 @@ export class RecyclerBuilder {
 
           console.log(\`Restored object #\${objectId}\`);
           return obj;
-        `);
+        `,
+    );
 
     // Recursively recycle an object and all nested parts (for body trees)
-    this.recycler.setMethod('recycleTree', `
+    this.recycler.setMethod(
+      'recycleTree',
+      `
       const objectId = args[0];
       const caller = args[1];
 
@@ -297,7 +311,8 @@ export class RecyclerBuilder {
 
       // Now recycle this object
       await self.recycle(objectId, caller);
-    `);
+    `,
+    );
   }
 
   async registerAlias(): Promise<void> {

@@ -1,12 +1,12 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Builds the CloneTank prototype
- * 
+ *
  * A clone tank stores backup data for players and handles resurrection.
  * When a player with a backup dies, they can choose to resurrect from the tank.
- * 
+ *
  * Key mechanics:
  * - Stores one backup per player (new backup overwrites old)
  * - Resurrection takes time (growthDuration minutes)
@@ -14,14 +14,14 @@ import type { RuntimeObject } from '../../../../types/object.js';
  * - Backup data is ERASED on resurrection (must re-backup)
  * - Preserves: appearance, maxCalories (trained capacity), skills
  * - Resets: wounds healed, tattoos removed, calories set to minimums
- * 
+ *
  * Usage:
  *   const tank = await $.recycler.create({ parent: $.cloneTank });
  *   tank.owner = somePlayer;  // Who owns this tank
- *   
+ *
  *   // Recording studio stores backups here
  *   await tank.storeBackup(player, backupRecord);
- *   
+ *
  *   // On death, resurrection begins
  *   await tank.beginResurrection(player);
  *   // ... minutes later ...
@@ -38,21 +38,21 @@ export class CloneTankBuilder {
         name: 'Clone Tank',
         description:
           'A cylindrical glass tank filled with murky amniotic fluid. Cables and tubes snake from the base into the ceiling. Status lights blink lazily on the control panel. This is where the dead come back—if they paid their dues.',
-        
+
         // Cannot be moved
         boltedDown: true,
-        
+
         // Clone data storage: { [playerId]: BackupRecord }
         cloneData: {},
-        
+
         // Current resurrection in progress
-        occupant: null,        // Player being resurrected (ObjRef)
-        growthStarted: null,   // When resurrection started (Date)
-        growthDuration: 5,     // Minutes to grow a clone
-        
+        occupant: null, // Player being resurrected (ObjRef)
+        growthStarted: null, // When resurrection started (Date)
+        growthDuration: 5, // Minutes to grow a clone
+
         // Ownership
-        owner: null,           // Who owns this tank (ObjRef)
-        
+        owner: null, // Who owns this tank (ObjRef)
+
         // Aliases for commands
         aliases: ['tank', 'clone tank', 'cloning tank'],
 
@@ -79,7 +79,9 @@ IMMOVABLE: 'boltedDown' true. Cannot be moved.`,
     // BACKUP DATA MANAGEMENT
     // ═══════════════════════════════════════════════════════════════════
 
-    obj.setMethod('hasBackup', `
+    obj.setMethod(
+      'hasBackup',
+      `
       /** Check if a player has backup data in this tank.
        *  @param player - The player to check
        *  @returns true if backup exists
@@ -89,9 +91,12 @@ IMMOVABLE: 'boltedDown' true. Cannot be moved.`,
       
       const cloneData = self.cloneData || {};
       return !!cloneData[player.id];
-    `);
+    `,
+    );
 
-    obj.setMethod('getBackup', `
+    obj.setMethod(
+      'getBackup',
+      `
       /** Get backup record for a player.
        *  @param player - The player to get backup for
        *  @returns BackupRecord or null
@@ -101,9 +106,12 @@ IMMOVABLE: 'boltedDown' true. Cannot be moved.`,
       
       const cloneData = self.cloneData || {};
       return cloneData[player.id] || null;
-    `);
+    `,
+    );
 
-    obj.setMethod('storeBackup', `
+    obj.setMethod(
+      'storeBackup',
+      `
       /** Store backup data for a player. Overwrites any existing backup.
        *  Also sets player.cloneBackupTank to this tank.
        *  @param player - The player being backed up
@@ -136,9 +144,12 @@ IMMOVABLE: 'boltedDown' true. Cannot be moved.`,
       player.cloneBackupTank = self;
       
       return true;
-    `);
+    `,
+    );
 
-    obj.setMethod('deleteBackup', `
+    obj.setMethod(
+      'deleteBackup',
+      `
       /** Remove backup data for a player.
        *  Clears player.cloneBackupTank if it points to this tank.
        *  @param player - The player whose backup to delete
@@ -158,13 +169,16 @@ IMMOVABLE: 'boltedDown' true. Cannot be moved.`,
       }
       
       return true;
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // RESURRECTION
     // ═══════════════════════════════════════════════════════════════════
 
-    obj.setMethod('beginResurrection', `
+    obj.setMethod(
+      'beginResurrection',
+      `
       /** Begin growing a clone for resurrection.
        *  @param player - The player to resurrect
        *  @returns { success, message, estimatedTime? }
@@ -202,9 +216,12 @@ IMMOVABLE: 'boltedDown' true. Cannot be moved.`,
         estimatedTime: duration,
         backupTimestamp: backup.backupTimestamp
       };
-    `);
+    `,
+    );
 
-    obj.setMethod('getResurrectionProgress', `
+    obj.setMethod(
+      'getResurrectionProgress',
+      `
       /** Get current resurrection progress.
        *  @returns { inProgress, occupant?, progress?, minutesRemaining? }
        */
@@ -228,9 +245,12 @@ IMMOVABLE: 'boltedDown' true. Cannot be moved.`,
         minutesRemaining: Math.ceil(minutesRemaining),
         ready: progress >= 100
       };
-    `);
+    `,
+    );
 
-    obj.setMethod('completeResurrection', `
+    obj.setMethod(
+      'completeResurrection',
+      `
       /** Complete resurrection - create new body and eject clone.
        *  Called when growth timer completes.
        *  @returns { success, message, player? }
@@ -342,9 +362,12 @@ IMMOVABLE: 'boltedDown' true. Cannot be moved.`,
         player: player,
         backupTimestamp: backup.backupTimestamp
       };
-    `);
+    `,
+    );
 
-    obj.setMethod('applyPreservedStats', `
+    obj.setMethod(
+      'applyPreservedStats',
+      `
       /** Apply preserved stats (maxCalories) to a new body.
        *  @param body - The torso (root of body tree)
        *  @param preservedStats - { maxCalories: { partName: value, ... } }
@@ -383,9 +406,12 @@ IMMOVABLE: 'boltedDown' true. Cannot be moved.`,
       };
       
       await applyToParts(body);
-    `);
+    `,
+    );
 
-    obj.setMethod('resetBodyToFresh', `
+    obj.setMethod(
+      'resetBodyToFresh',
+      `
       /** Reset body to fresh clone state.
        *  - All wounds healed (decayLevel = 0)
        *  - Calories at minimum (10% of max)
@@ -429,13 +455,16 @@ IMMOVABLE: 'boltedDown' true. Cannot be moved.`,
       };
       
       await resetPart(body);
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // TICK PROCESSING
     // ═══════════════════════════════════════════════════════════════════
 
-    obj.setMethod('tick', `
+    obj.setMethod(
+      'tick',
+      `
       /** Called each game tick to check resurrection progress. */
       if (!self.occupant) return;
       
@@ -443,13 +472,16 @@ IMMOVABLE: 'boltedDown' true. Cannot be moved.`,
       if (progress.ready) {
         await self.completeResurrection();
       }
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // DISPLAY
     // ═══════════════════════════════════════════════════════════════════
 
-    obj.setMethod('describe', `
+    obj.setMethod(
+      'describe',
+      `
       /** Describe the tank, including current state. */
       let desc = self.name + '\\n' + self.description;
       
@@ -472,21 +504,27 @@ IMMOVABLE: 'boltedDown' true. Cannot be moved.`,
       }
       
       return desc;
-    `);
+    `,
+    );
 
-    obj.setMethod('shortDesc', `
+    obj.setMethod(
+      'shortDesc',
+      `
       const progress = await self.getResurrectionProgress();
       if (progress.inProgress) {
         return 'clone tank (active - ' + progress.progress + '%)';
       }
       return 'clone tank';
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // CONTAINMENT - Tank can contain the resurrecting player
     // ═══════════════════════════════════════════════════════════════════
 
-    obj.setMethod('canContain', `
+    obj.setMethod(
+      'canContain',
+      `
       /** Only the occupant can be "in" the tank during resurrection. */
       const item = args[0];
 
@@ -496,13 +534,26 @@ IMMOVABLE: 'boltedDown' true. Cannot be moved.`,
       }
 
       return 'The clone tank cannot hold that.';
-    `);
+    `,
+    );
 
     // Property descriptions
-    obj.setPropertyDescription('cloneData', 'Map of player IDs to backup records, one backup per player');
-    obj.setPropertyDescription('occupant', 'Player currently being resurrected (ObjRef), null if idle');
-    obj.setPropertyDescription('growthStarted', 'Timestamp when current resurrection began (Date)');
-    obj.setPropertyDescription('growthDuration', 'Minutes required to grow a clone (default 5)');
+    obj.setPropertyDescription(
+      'cloneData',
+      'Map of player IDs to backup records, one backup per player',
+    );
+    obj.setPropertyDescription(
+      'occupant',
+      'Player currently being resurrected (ObjRef), null if idle',
+    );
+    obj.setPropertyDescription(
+      'growthStarted',
+      'Timestamp when current resurrection began (Date)',
+    );
+    obj.setPropertyDescription(
+      'growthDuration',
+      'Minutes required to grow a clone (default 5)',
+    );
     obj.setPropertyDescription('owner', 'Player who owns this tank (ObjRef)');
 
     return obj;

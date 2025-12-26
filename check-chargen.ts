@@ -22,7 +22,7 @@ async function main() {
   console.log(Object.keys(methods).join(', '));
 
   console.log('\nonNewUser method preview:');
-  console.log(methods.onNewUser?.substring(0, 200) + '...');
+  console.log(`${methods.onNewUser?.substring(0, 200)}...`);
 
   await db.disconnect();
   process.exit(0);

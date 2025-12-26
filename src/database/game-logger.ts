@@ -5,20 +5,24 @@
  * All logging happens automatically at the TypeScript layer.
  */
 
-import { Db, Collection } from 'mongodb';
-import type { ObjId } from '../../types/object.js';
+import type { Collection, Db } from 'mongodb';
 import type {
-  LogEntry,
-  LogType,
-  LogQuery,
   CommandPattern,
   CoordinationPattern,
+  LogEntry,
+  LogQuery,
+  LogType,
 } from '../../types/log.js';
+import type { ObjId } from '../../types/object.js';
 
 /**
  * Sanitize an object for MongoDB storage, removing circular references
  */
-function sanitizeForMongo(value: any, seen: WeakSet<object> = new WeakSet(), path: string = 'root'): any {
+function sanitizeForMongo(
+  value: any,
+  seen: WeakSet<object> = new WeakSet(),
+  path: string = 'root',
+): any {
   if (value === null || value === undefined) {
     return value;
   }
@@ -30,14 +34,18 @@ function sanitizeForMongo(value: any, seen: WeakSet<object> = new WeakSet(), pat
 
   // Check for circular reference
   if (seen.has(value)) {
-    console.error(`[GameLogger] Circular reference detected at ${path}, replacing with null`);
+    console.error(
+      `[GameLogger] Circular reference detected at ${path}, replacing with null`,
+    );
     return null;
   }
   seen.add(value);
 
   // Handle arrays
   if (Array.isArray(value)) {
-    return value.map((item, i) => sanitizeForMongo(item, seen, `${path}[${i}]`));
+    return value.map((item, i) =>
+      sanitizeForMongo(item, seen, `${path}[${i}]`),
+    );
   }
 
   // Handle Date objects
@@ -170,7 +178,7 @@ export class GameLogger {
       location?: ObjId;
       ip?: string;
       details?: Record<string, any>;
-    } = {}
+    } = {},
   ): Promise<void> {
     const timing = this.getTiming(session);
 
@@ -199,7 +207,7 @@ export class GameLogger {
   async logConnect(
     session: string,
     ip: string,
-    transport: 'telnet' | 'websocket' | 'tls'
+    transport: 'telnet' | 'websocket' | 'tls',
   ): Promise<void> {
     await this.log('connect', -1, session, {
       ip,
@@ -215,7 +223,7 @@ export class GameLogger {
     actor: ObjId,
     ip: string,
     success: boolean,
-    username: string
+    username: string,
   ): Promise<void> {
     await this.log(success ? 'auth' : 'auth_fail', actor, session, {
       ip,
@@ -233,7 +241,7 @@ export class GameLogger {
     raw: string,
     verb?: string,
     args?: string,
-    ip?: string
+    ip?: string,
   ): Promise<void> {
     await this.log('command', actor, session, {
       location,
@@ -248,7 +256,7 @@ export class GameLogger {
   async logDisconnect(
     session: string,
     actor: ObjId,
-    reason?: string
+    reason?: string,
   ): Promise<void> {
     await this.log('disconnect', actor, session, {
       details: { reason },
@@ -298,7 +306,7 @@ export class GameLogger {
    */
   async analyzeCommandPattern(
     actor: ObjId,
-    windowMinutes: number = 60
+    windowMinutes: number = 60,
   ): Promise<CommandPattern | null> {
     const from = new Date(Date.now() - windowMinutes * 60 * 1000);
     const to = new Date();
@@ -321,19 +329,19 @@ export class GameLogger {
       intervals.push(logs[i].ts.getTime() - logs[i - 1].ts.getTime());
     }
 
-    const avgInterval =
-      intervals.reduce((a, b) => a + b, 0) / intervals.length;
+    const avgInterval = intervals.reduce((a, b) => a + b, 0) / intervals.length;
 
     // Calculate standard deviation
     const variance =
-      intervals.reduce((sum, val) => sum + Math.pow(val - avgInterval, 2), 0) /
+      intervals.reduce((sum, val) => sum + (val - avgInterval) ** 2, 0) /
       intervals.length;
     const stdDev = Math.sqrt(variance);
 
     // Count command frequency
     const commandCounts = new Map<string, number>();
     for (const log of logs) {
-      const verb = log.details?.verb || log.details?.raw?.split(' ')[0] || 'unknown';
+      const verb =
+        log.details?.verb || log.details?.raw?.split(' ')[0] || 'unknown';
       commandCounts.set(verb, (commandCounts.get(verb) || 0) + 1);
     }
 
@@ -364,14 +372,14 @@ export class GameLogger {
    */
   async analyzeCoordination(
     players: ObjId[],
-    windowHours: number = 24
+    windowHours: number = 24,
   ): Promise<CoordinationPattern> {
     const from = new Date(Date.now() - windowHours * 60 * 60 * 1000);
     const to = new Date();
 
     const flags: string[] = [];
     let colocations = 0;
-    let interactions = 0;
+    const interactions = 0;
 
     // Get all command logs for these players
     const playerLogs = await Promise.all(
@@ -381,8 +389,8 @@ export class GameLogger {
           actor: p,
           from,
           to,
-        })
-      )
+        }),
+      ),
     );
 
     // Build location timeline for each player
@@ -416,12 +424,15 @@ export class GameLogger {
           actor: p,
           from,
           to,
-        })
-      )
+        }),
+      ),
     );
 
     // Check if players login within 5 minutes of each other frequently
-    const loginTimes = connectLogs.flat().map((l) => l.ts.getTime()).sort();
+    const loginTimes = connectLogs
+      .flat()
+      .map((l) => l.ts.getTime())
+      .sort();
     let closeLogins = 0;
     for (let i = 1; i < loginTimes.length; i++) {
       if (loginTimes[i] - loginTimes[i - 1] < 5 * 60 * 1000) {
@@ -445,12 +456,14 @@ export class GameLogger {
     }
 
     // Check for shared IP
-    const ipsByPlayer = connectLogs.map((logs) =>
-      new Set(logs.map((l) => l.ip).filter(Boolean))
+    const ipsByPlayer = connectLogs.map(
+      (logs) => new Set(logs.map((l) => l.ip).filter(Boolean)),
     );
     const allIps = new Set(ipsByPlayer.flatMap((s) => [...s]));
     for (const ip of allIps) {
-      const playersWithIp = ipsByPlayer.filter((s) => s.has(ip as string)).length;
+      const playersWithIp = ipsByPlayer.filter((s) =>
+        s.has(ip as string),
+      ).length;
       if (playersWithIp > 1) {
         suspicionScore += 0.4;
         flags.push(`Shared IP detected: ${ip}`);
@@ -476,7 +489,7 @@ export class GameLogger {
    */
   async getPlayerActivity(
     actor: ObjId,
-    windowHours: number = 24
+    windowHours: number = 24,
   ): Promise<{
     commands: number;
     movements: number;
@@ -499,16 +512,42 @@ export class GameLogger {
 
     // Verbs that indicate movement
     const movementVerbs = new Set([
-      'north', 'south', 'east', 'west', 'up', 'down',
-      'n', 's', 'e', 'w', 'u', 'd',
-      'ne', 'nw', 'se', 'sw',
-      'northeast', 'northwest', 'southeast', 'southwest',
-      'go', 'enter', 'leave', 'exit', 'climb',
+      'north',
+      'south',
+      'east',
+      'west',
+      'up',
+      'down',
+      'n',
+      's',
+      'e',
+      'w',
+      'u',
+      'd',
+      'ne',
+      'nw',
+      'se',
+      'sw',
+      'northeast',
+      'northwest',
+      'southeast',
+      'southwest',
+      'go',
+      'enter',
+      'leave',
+      'exit',
+      'climb',
     ]);
 
     // Verbs that indicate speech
     const speechVerbs = new Set([
-      'say', 'whisper', 'emote', 'shout', 'yell', 'tell', 'ask',
+      'say',
+      'whisper',
+      'emote',
+      'shout',
+      'yell',
+      'tell',
+      'ask',
     ]);
 
     for (const log of logs) {

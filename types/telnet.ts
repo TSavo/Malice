@@ -3,22 +3,22 @@
  */
 
 export const TELNET_COMMANDS = {
-  SE: 240,   // End of subnegotiation
-  NOP: 241,  // No operation
-  DM: 242,   // Data mark
-  BRK: 243,  // Break
-  IP: 244,   // Interrupt process
-  AO: 245,   // Abort output
-  AYT: 246,  // Are you there
-  EC: 247,   // Erase character
-  EL: 248,   // Erase line
-  GA: 249,   // Go ahead
-  SB: 250,   // Subnegotiation begin
+  SE: 240, // End of subnegotiation
+  NOP: 241, // No operation
+  DM: 242, // Data mark
+  BRK: 243, // Break
+  IP: 244, // Interrupt process
+  AO: 245, // Abort output
+  AYT: 246, // Are you there
+  EC: 247, // Erase character
+  EL: 248, // Erase line
+  GA: 249, // Go ahead
+  SB: 250, // Subnegotiation begin
   WILL: 251, // Will
   WONT: 252, // Won't
-  DO: 253,   // Do
+  DO: 253, // Do
   DONT: 254, // Don't
-  IAC: 255,  // Interpret as command
+  IAC: 255, // Interpret as command
 } as const;
 
 export const TELNET_OPTIONS = {
@@ -29,11 +29,11 @@ export const TELNET_OPTIONS = {
   TIMING_MARK: 6,
   TERMINAL_TYPE: 24,
   END_OF_RECORD: 25,
-  NAWS: 31,              // Negotiate about window size
+  NAWS: 31, // Negotiate about window size
   TERMINAL_SPEED: 32,
   TOGGLE_FLOW_CONTROL: 33,
   LINEMODE: 34,
-  NEW_ENVIRON: 39,       // Environment variables
+  NEW_ENVIRON: 39, // Environment variables
 } as const;
 
 export const TELNET_SUB = {
@@ -46,9 +46,10 @@ export const TELNET_SUB = {
   USER_VARIABLE: 3,
 } as const;
 
-export type TelnetCommand = typeof TELNET_COMMANDS[keyof typeof TELNET_COMMANDS];
-export type TelnetOption = typeof TELNET_OPTIONS[keyof typeof TELNET_OPTIONS];
-export type TelnetSub = typeof TELNET_SUB[keyof typeof TELNET_SUB];
+export type TelnetCommand =
+  (typeof TELNET_COMMANDS)[keyof typeof TELNET_COMMANDS];
+export type TelnetOption = (typeof TELNET_OPTIONS)[keyof typeof TELNET_OPTIONS];
+export type TelnetSub = (typeof TELNET_SUB)[keyof typeof TELNET_SUB];
 
 /**
  * Parsed telnet command

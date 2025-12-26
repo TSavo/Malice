@@ -3,19 +3,22 @@ import {
   TELNET_OPTIONS,
   TELNET_SUB,
   type TelnetCommandData,
-  type TelnetWindowSize,
   type TelnetEnvironment,
+  type TelnetWindowSize,
 } from '../../../types/telnet.js';
 
 /**
  * Create reverse lookup maps
  */
 const COMMAND_NAMES = Object.fromEntries(
-  Object.entries(TELNET_COMMANDS).map(([k, v]) => [v, k.toLowerCase()])
+  Object.entries(TELNET_COMMANDS).map(([k, v]) => [v, k.toLowerCase()]),
 );
 
 const OPTION_NAMES = Object.fromEntries(
-  Object.entries(TELNET_OPTIONS).map(([k, v]) => [v, k.toLowerCase().replace(/_/g, ' ')])
+  Object.entries(TELNET_OPTIONS).map(([k, v]) => [
+    v,
+    k.toLowerCase().replace(/_/g, ' '),
+  ]),
 );
 
 /**
@@ -115,8 +118,12 @@ export class TelnetProtocolParser {
    */
   private tryParseCommand(
     buffer: Buffer,
-    position: number
-  ): { command: TelnetCommandData | null; length: number; incomplete: boolean } {
+    position: number,
+  ): {
+    command: TelnetCommandData | null;
+    length: number;
+    incomplete: boolean;
+  } {
     // Need at least 3 bytes for basic command: IAC + CMD + OPT
     if (buffer.length - position < 3) {
       return { command: null, length: 0, incomplete: true };
@@ -137,7 +144,15 @@ export class TelnetProtocolParser {
 
     // Handle subnegotiation (variable length)
     if (commandCode === TELNET_COMMANDS.SB) {
-      return this.tryParseSubnegotiation(buffer, position, iacCode, commandCode, optionCode, commandName, optionName);
+      return this.tryParseSubnegotiation(
+        buffer,
+        position,
+        iacCode,
+        commandCode,
+        optionCode,
+        commandName,
+        optionName,
+      );
     }
 
     // Simple 3-byte command
@@ -164,12 +179,19 @@ export class TelnetProtocolParser {
     commandCode: number,
     optionCode: number,
     commandName: string,
-    optionName: string
-  ): { command: TelnetCommandData | null; length: number; incomplete: boolean } {
+    optionName: string,
+  ): {
+    command: TelnetCommandData | null;
+    length: number;
+    incomplete: boolean;
+  } {
     // Find the SE (end subnegotiation) marker
     let endPosition = position + 3;
     while (endPosition < buffer.length) {
-      if (buffer[endPosition] === TELNET_COMMANDS.IAC && buffer[endPosition + 1] === TELNET_COMMANDS.SE) {
+      if (
+        buffer[endPosition] === TELNET_COMMANDS.IAC &&
+        buffer[endPosition + 1] === TELNET_COMMANDS.SE
+      ) {
         // Found complete subnegotiation
         const length = endPosition - position + 2; // Include IAC SE
         const cmd: TelnetCommandData = {

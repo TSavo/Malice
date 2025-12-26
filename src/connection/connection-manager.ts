@@ -1,8 +1,8 @@
-import { BehaviorSubject, merge, Observable } from 'rxjs';
+import { BehaviorSubject, merge, type Observable } from 'rxjs';
 import { map, share, switchMap } from 'rxjs/operators';
-import { Connection } from './connection.js';
-import type { ITransport } from '../../types/transport.js';
 import type { AuthInfo } from '../../types/auth.js';
+import type { ITransport } from '../../types/transport.js';
+import { Connection } from './connection.js';
 
 /**
  * Manages all active connections
@@ -12,7 +12,8 @@ export class ConnectionManager {
   private readonly connectionsSubject = new BehaviorSubject<Connection[]>([]);
 
   /** Observable of all active connections */
-  public readonly connections$: Observable<Connection[]> = this.connectionsSubject.asObservable();
+  public readonly connections$: Observable<Connection[]> =
+    this.connectionsSubject.asObservable();
 
   /** Observable of connection events (new connections) */
   public readonly connected$ = new BehaviorSubject<Connection | null>(null);
@@ -33,12 +34,12 @@ export class ConnectionManager {
               map((data) => ({
                 connection: conn,
                 data,
-              }))
-            )
-          )
-        )
+              })),
+            ),
+          ),
+        ),
       ),
-      share()
+      share(),
     );
   }
 
@@ -46,7 +47,10 @@ export class ConnectionManager {
    * Add a new transport (creates a Connection)
    * Optionally pass authInfo from transport layer
    */
-  addTransport(transport: ITransport, authInfo: AuthInfo | null = null): Connection {
+  addTransport(
+    transport: ITransport,
+    authInfo: AuthInfo | null = null,
+  ): Connection {
     const connection = new Connection(transport, authInfo);
     return this.add(connection);
   }

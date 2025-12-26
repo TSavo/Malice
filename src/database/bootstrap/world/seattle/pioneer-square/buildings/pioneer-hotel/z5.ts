@@ -27,7 +27,7 @@ No railings protect the roof's edges. No one has bothered. Anyone who comes up h
       waterLevel: 0,
       outdoor: true,
       exits: {
-        'in': '%E',
+        in: '%E',
       },
     },
   },

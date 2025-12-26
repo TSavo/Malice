@@ -17,7 +17,8 @@ export const building = {
     '%BREAKROOM_BACK_LOCK': {
       prototype: 'biometricLock',
       name: 'Breakroom Exit Scanner',
-      description: 'A palm scanner beside a steel door marked EMERGENCY EXIT, its warning sticker peeling.',
+      description:
+        'A palm scanner beside a steel door marked EMERGENCY EXIT, its warning sticker peeling.',
       scanners: [
         { type: 'palm', part: 'hand', message: 'Employee access only.' },
       ],
@@ -27,7 +28,8 @@ export const building = {
     '%SECURITY_BACK_LOCK': {
       prototype: 'biometricLock',
       name: 'Security Exit Scanner',
-      description: 'A retinal scanner beside a reinforced door, its housing newer than the surrounding wall.',
+      description:
+        'A retinal scanner beside a reinforced door, its housing newer than the surrounding wall.',
       scanners: [
         { type: 'retinal', part: 'eye', message: 'Security personnel only.' },
       ],
@@ -82,7 +84,8 @@ The air smells of machine oil and ozone. Through the loading door, you can see t
           to: 'waterfront/y11.ts',
           prototype: 'guardedExit',
           allowedFaction: 'Citizen',
-          denyMessage: 'A security scanner beside the loading door flashes red. "Authorized personnel only."',
+          denyMessage:
+            'A security scanner beside the loading door flashes red. "Authorized personnel only."',
           description: 'A massive roll-up door opens onto the Waterfront',
         },
         east: '%WAREHOUSE',
@@ -118,7 +121,11 @@ A coffee maker sits unplugged on the desk. Someone's mug still rests beside it, 
       z: 0,
       exits: {
         west: '%WAREHOUSE',
-        east: { to: 'alley/y11.ts', locks: ['%SECURITY_BACK_LOCK'], description: 'A reinforced security door leads to the alley' },
+        east: {
+          to: 'alley/y11.ts',
+          locks: ['%SECURITY_BACK_LOCK'],
+          description: 'A reinforced security door leads to the alley',
+        },
       },
     },
 
@@ -141,7 +148,8 @@ The counter is unstaffed. A speaker grille handles customer inquiries. The AI's 
           to: 'waterfront/y10.ts',
           prototype: 'guardedExit',
           allowedFaction: 'Citizen',
-          denyMessage: 'The glass doors remain locked. A speaker crackles: "Citizens only."',
+          denyMessage:
+            'The glass doors remain locked. A speaker crackles: "Citizens only."',
           description: 'Glass doors open onto the Waterfront',
         },
         east: '%ELEVATORS',
@@ -163,7 +171,7 @@ Safety markings cover the floor: yellow hazard stripes, designated walking paths
         east: '%BREAKROOM',
         south: '%FACTORY_2',
         west: '%PUBLIC_SERVICES',
-        'in': '%E',
+        in: '%E',
       },
     },
 
@@ -179,7 +187,11 @@ A bulletin board displays outdated safety notices and a shift schedule from befo
       z: 0,
       exits: {
         west: '%ELEVATORS',
-        east: { to: 'alley/y10.ts', locks: ['%BREAKROOM_BACK_LOCK'], description: 'A steel emergency exit leads to the alley' },
+        east: {
+          to: 'alley/y10.ts',
+          locks: ['%BREAKROOM_BACK_LOCK'],
+          description: 'A steel emergency exit leads to the alley',
+        },
       },
     },
 
@@ -275,7 +287,7 @@ A testing station occupies one corner: pressure vessels, electrical test benches
     },
 
     '%FOREMAN': {
-      name: 'Fabrication Factory - Foreman\'s Office',
+      name: "Fabrication Factory - Foreman's Office",
       description: `A glass-walled office overlooking the factory floor. The foreman's desk faces outward, positioned to watch the production lines. The chair is ergonomic, expensive, empty. Personal effects remain: a hard hat on a hook, safety glasses in a drawer, a union calendar three months out of date.
 
 The walls display production charts, safety records, employee recognition plaques. "287 Days Without a Lost-Time Injury" reads one sign. The counter stopped updating when the humans left. The AI hasn't had any injuries to report.

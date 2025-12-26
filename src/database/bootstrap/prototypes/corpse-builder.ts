@@ -1,5 +1,5 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Builds the Corpse prototype
@@ -68,7 +68,9 @@ TRANSFORMATION: At 100% decay, transforms into $.humanRemains (dried bones) whic
     });
 
     // Get the body object inside this corpse
-    obj.setMethod('getBody', `
+    obj.setMethod(
+      'getBody',
+      `
       const contents = self.contents || [];
       for (const obj of contents) {
         // Body has torso, head, etc - check for body-like properties
@@ -77,11 +79,14 @@ TRANSFORMATION: At 100% decay, transforms into $.humanRemains (dried bones) whic
         }
       }
       return null;
-    `);
+    `,
+    );
 
     // Describe corpse with decay state using $.proportional
     // Name only visible when fresh - after that, need autopsy to identify
-    obj.setMethod('describe', `
+    obj.setMethod(
+      'describe',
+      `
       const decay = self.decayLevel || 0;
       const name = self.originalName || 'someone';
 
@@ -120,10 +125,13 @@ TRANSFORMATION: At 100% decay, transforms into $.humanRemains (dried bones) whic
       }
 
       return desc;
-    `);
+    `,
+    );
 
     // Search/loot the corpse - looks in hands and on body
-    obj.setMethod('search', `
+    obj.setMethod(
+      'search',
+      `
       /** Search the corpse for items.
        *  @param searcher - The person searching
        *  @returns List of items found (in hands, on body)
@@ -173,10 +181,13 @@ TRANSFORMATION: At 100% decay, transforms into $.humanRemains (dried bones) whic
         message: 'You search the body and find:',
         items,
       };
-    `);
+    `,
+    );
 
     // Take an item from the corpse
-    obj.setMethod('loot', `
+    obj.setMethod(
+      'loot',
+      `
       /** Take an item from the corpse.
        *  @param itemName - Name of item to take
        *  @param looter - The person looting
@@ -239,18 +250,24 @@ TRANSFORMATION: At 100% decay, transforms into $.humanRemains (dried bones) whic
       }
 
       return { success: false, message: 'You don\\'t see that on the body.' };
-    `);
+    `,
+    );
 
     // Check if this can contain something (corpses can hold inventory)
-    obj.setMethod('canContain', `
+    obj.setMethod(
+      'canContain',
+      `
       // Corpses can contain items (dead player's inventory)
       return true;
-    `);
+    `,
+    );
 
     // === AUTOPSY HOOKS ===
     // Main autopsy method - examines corpse and returns narrative findings
 
-    obj.setMethod('performAutopsy', `
+    obj.setMethod(
+      'performAutopsy',
+      `
       /** Perform an autopsy on this corpse.
        *  @param examiner - The person performing the autopsy
        *  @param examinerSkill - 0-100, skill level affects detail
@@ -503,9 +520,12 @@ TRANSFORMATION: At 100% decay, transforms into $.humanRemains (dried bones) whic
       }
 
       return report;
-    `);
+    `,
+    );
     // When decay reaches 100%, transform into human remains (not recycle!)
-    obj.setMethod('onFullyDecayed', `
+    obj.setMethod(
+      'onFullyDecayed',
+      `
       /** Called when corpse is fully decomposed.
        *  Transforms into $.humanRemains - dried remains that decay to skeleton.
        */
@@ -550,12 +570,22 @@ TRANSFORMATION: At 100% decay, transforms into $.humanRemains (dried bones) whic
         self.contents = []; // Don't recycle the body
         await $.recycler.recycle(self);
       }
-    `);
+    `,
+    );
 
     // Add property descriptions
-    obj.setPropertyDescription('originalName', 'Name of the person who died. Visible when fresh (0-10% decay), unrecognizable after bloating. Used for autopsy identification.');
-    obj.setPropertyDescription('contents', 'Array of items and body object. Contains the dead player\'s inventory and their body structure. Searchable for loot.');
-    obj.setPropertyDescription('searched', 'Boolean tracking if corpse has been searched. Affects description and search results.');
+    obj.setPropertyDescription(
+      'originalName',
+      'Name of the person who died. Visible when fresh (0-10% decay), unrecognizable after bloating. Used for autopsy identification.',
+    );
+    obj.setPropertyDescription(
+      'contents',
+      "Array of items and body object. Contains the dead player's inventory and their body structure. Searchable for loot.",
+    );
+    obj.setPropertyDescription(
+      'searched',
+      'Boolean tracking if corpse has been searched. Affects description and search results.',
+    );
 
     return obj;
   }

@@ -1,69 +1,107 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Builds the Player prototype
  * Base prototype for player characters with authentication and command handling
  */
 export class PlayerBuilder {
-  constructor(private manager: ObjectManager) { }
+  constructor(private manager: ObjectManager) {}
 
-  async build(humanId: number, existingObj?: RuntimeObject): Promise<RuntimeObject> {
+  async build(
+    humanId: number,
+    existingObj?: RuntimeObject,
+  ): Promise<RuntimeObject> {
     const parentObj = await this.manager.load(humanId);
-    const obj = existingObj || await this.manager.create({
-      parent: parentObj!,
-      properties: {
-        name: 'Player',
-        description: 'Base prototype for player characters',
+    const obj =
+      existingObj ||
+      (await this.manager.create({
+        parent: parentObj!,
+        properties: {
+          name: 'Player',
+          description: 'Base prototype for player characters',
 
-        // Authentication
-        playername: '',
-        email: '',
-        passwordHash: '',
-        sslFingerprint: '',
-        sshPublicKeys: [],  // Array of OpenSSH format public keys
-        oauthSubject: '',
+          // Authentication
+          playername: '',
+          email: '',
+          passwordHash: '',
+          sslFingerprint: '',
+          sshPublicKeys: [], // Array of OpenSSH format public keys
+          oauthSubject: '',
 
-        // Permissions
-        canUseDevTools: false,
-        isWizard: false,
-        isSuspended: false,
+          // Permissions
+          canUseDevTools: false,
+          isWizard: false,
+          isSuspended: false,
 
-        // Stats
-        createdAt: null,
-        lastLogin: null,
-        totalPlaytime: 0,
+          // Stats
+          createdAt: null,
+          lastLogin: null,
+          totalPlaytime: 0,
 
-        // Player-specific
-        title: '',
-        homepage: '',
+          // Player-specific
+          title: '',
+          homepage: '',
 
-        // Fitness training
-        fitnessXP: 0, // Accumulated XP pool to spend
-        fitnessPlaytime: 0, // Minutes played toward next XP (resets at 180)
-        fitnessXPToday: 0, // XP earned today (max 3)
-        fitnessLastDay: null, // Date string of last XP day (for reset)
-        
-        // Clone system
-        cloneBackupTank: null, // ObjRef to tank holding our backup (or null)
-      },
-      methods: {},
-    });
+          // Fitness training
+          fitnessXP: 0, // Accumulated XP pool to spend
+          fitnessPlaytime: 0, // Minutes played toward next XP (resets at 180)
+          fitnessXPToday: 0, // XP earned today (max 3)
+          fitnessLastDay: null, // Date string of last XP day (for reset)
+
+          // Clone system
+          cloneBackupTank: null, // ObjRef to tank holding our backup (or null)
+        },
+        methods: {},
+      }));
 
     // Property descriptions
-    obj.setPropertyDescription('playername', 'Unique player account name for login authentication');
-    obj.setPropertyDescription('email', 'Email address for account recovery and notifications');
-    obj.setPropertyDescription('passwordHash', 'Hashed password for authentication (never stored in plaintext)');
-    obj.setPropertyDescription('sshPublicKeys', 'Array of SSH public keys for SSH authentication');
-    obj.setPropertyDescription('canUseDevTools', 'Permission to access developer tools and debugging features');
-    obj.setPropertyDescription('isWizard', 'Whether player has wizard-level permissions (god mode)');
-    obj.setPropertyDescription('isSuspended', 'Whether account is suspended (cannot login)');
+    obj.setPropertyDescription(
+      'playername',
+      'Unique player account name for login authentication',
+    );
+    obj.setPropertyDescription(
+      'email',
+      'Email address for account recovery and notifications',
+    );
+    obj.setPropertyDescription(
+      'passwordHash',
+      'Hashed password for authentication (never stored in plaintext)',
+    );
+    obj.setPropertyDescription(
+      'sshPublicKeys',
+      'Array of SSH public keys for SSH authentication',
+    );
+    obj.setPropertyDescription(
+      'canUseDevTools',
+      'Permission to access developer tools and debugging features',
+    );
+    obj.setPropertyDescription(
+      'isWizard',
+      'Whether player has wizard-level permissions (god mode)',
+    );
+    obj.setPropertyDescription(
+      'isSuspended',
+      'Whether account is suspended (cannot login)',
+    );
     obj.setPropertyDescription('createdAt', 'Timestamp of account creation');
     obj.setPropertyDescription('lastLogin', 'Timestamp of most recent login');
-    obj.setPropertyDescription('totalPlaytime', 'Total time played in milliseconds');
-    obj.setPropertyDescription('fitnessXP', 'Accumulated XP pool to spend on body part training');
-    obj.setPropertyDescription('fitnessPlaytime', 'Minutes played toward next XP (resets at 180 minutes)');
-    obj.setPropertyDescription('cloneBackupTank', 'Reference to clone tank holding backup of this character');
+    obj.setPropertyDescription(
+      'totalPlaytime',
+      'Total time played in milliseconds',
+    );
+    obj.setPropertyDescription(
+      'fitnessXP',
+      'Accumulated XP pool to spend on body part training',
+    );
+    obj.setPropertyDescription(
+      'fitnessPlaytime',
+      'Minutes played toward next XP (resets at 180 minutes)',
+    );
+    obj.setPropertyDescription(
+      'cloneBackupTank',
+      'Reference to clone tank holding backup of this character',
+    );
 
     this.addConnectionMethods(obj);
     this.addInputMethods(obj);
@@ -77,7 +115,9 @@ export class PlayerBuilder {
   }
 
   private addConnectionMethods(obj: RuntimeObject): void {
-    obj.setMethod('connect', `
+    obj.setMethod(
+      'connect',
+      `
       const context = args[0];
 
       // Store context reference so tell() can send messages
@@ -143,9 +183,12 @@ export class PlayerBuilder {
 
       // Show prompt (system - uses tell)
       await self.print('> ');
-    `);
+    `,
+    );
 
-    obj.setMethod('disconnect', `
+    obj.setMethod(
+      'disconnect',
+      `
       // Unregister all verbs from current location
       if (self.location && self.location !== 0) {
         // Ensure location is loaded as RuntimeObject (might be raw ID if not cached)
@@ -161,10 +204,13 @@ export class PlayerBuilder {
       // Save any unsaved state
 
       // TODO: Notify room that player left
-    `);
+    `,
+    );
 
     // Pattern: quit (no args)
-    obj.setMethod('quit', `
+    obj.setMethod(
+      'quit',
+      `
       /** Disconnect from the game.
        *  Usage: quit
        *  Saves your character and closes the connection.
@@ -172,31 +218,40 @@ export class PlayerBuilder {
       await player.tell('Goodbye!');
       await player.disconnect();
       player._context.close();
-    `);
+    `,
+    );
 
     // Tell - sends message directly to player's connection (bypasses eyes)
     // Use for system messages, prompts, errors
     // Processes %{color} codes based on player options
-    obj.setMethod('tell', `
+    obj.setMethod(
+      'tell',
+      `
       const message = args[0];
       if (self._context && self._context.send) {
         const processed = await self.processColors(message);
         self._context.send(processed + '\\r\\n');
       }
-    `);
+    `,
+    );
 
     // Send without trailing newline (for prompts)
-    obj.setMethod('print', `
+    obj.setMethod(
+      'print',
+      `
       const message = args[0];
       if (self._context && self._context.send) {
         const processed = await self.processColors(message);
         self._context.send(processed);
       }
-    `);
+    `,
+    );
   }
 
   private addInputMethods(obj: RuntimeObject): void {
-    obj.setMethod('onInput', `
+    obj.setMethod(
+      'onInput',
+      `
       const context = args[0];
       const input = args[1];
 
@@ -324,11 +379,14 @@ export class PlayerBuilder {
         await self.tell('Error: ' + err.message);
         await self.print('> ');
       }
-    `);
+    `,
+    );
 
     // Internal method to process chargen message(s)
     // After processing, checks queue and batches any pending messages into one
-    obj.setMethod('_processChargenMessage', `
+    obj.setMethod(
+      '_processChargenMessage',
+      `
       const message = args[0];
 
       console.log('[CharGen] _processChargenMessage for player #' + self.id + ': "' + message.substring(0, 50) + '..."');
@@ -372,22 +430,31 @@ export class PlayerBuilder {
         // Queue is empty, release the lock
         await $mutex.release(self, 'chargenQuery');
       }
-    `);
+    `,
+    );
   }
 
   private addAuthMethods(obj: RuntimeObject): void {
-    obj.setMethod('checkPassword', `
+    obj.setMethod(
+      'checkPassword',
+      `
       const password = args[0];
       return await $.checkPassword(password, self.passwordHash);
-    `);
+    `,
+    );
 
-    obj.setMethod('setPassword', `
+    obj.setMethod(
+      'setPassword',
+      `
       const password = args[0];
       self.passwordHash = await $.hashPassword(password);
-    `);
+    `,
+    );
 
     // SSH key management
-    obj.setMethod('addkey', `
+    obj.setMethod(
+      'addkey',
+      `
       /**
        * Add an SSH public key to your account
        * Usage: addkey ssh-rsa AAAA... comment
@@ -443,9 +510,13 @@ export class PlayerBuilder {
       const fingerprint = 'SHA256:' + hash.replace(/=+$/, '');
 
       return 'SSH key added successfully.\\nFingerprint: ' + fingerprint + '\\nYou now have ' + keys.length + ' key(s) registered.';
-    `, { callable: true, help: 'Add an SSH public key to your account' });
+    `,
+      { callable: true, help: 'Add an SSH public key to your account' },
+    );
 
-    obj.setMethod('listkeys', `
+    obj.setMethod(
+      'listkeys',
+      `
       /**
        * List your registered SSH public keys
        */
@@ -476,9 +547,13 @@ export class PlayerBuilder {
       });
 
       return output.trim();
-    `, { callable: true, help: 'List your registered SSH public keys' });
+    `,
+      { callable: true, help: 'List your registered SSH public keys' },
+    );
 
-    obj.setMethod('removekey', `
+    obj.setMethod(
+      'removekey',
+      `
       /**
        * Remove an SSH public key from your account
        * Usage: removekey <number or fingerprint>
@@ -529,7 +604,9 @@ export class PlayerBuilder {
       const comment = parts.slice(2).join(' ') || '(no comment)';
 
       return 'Removed key: ' + parts[0] + ' ' + comment + '\\nYou now have ' + keys.length + ' key(s) registered.';
-    `, { callable: true, help: 'Remove an SSH public key from your account' });
+    `,
+      { callable: true, help: 'Remove an SSH public key from your account' },
+    );
   }
 
   private addAIMethods(obj: RuntimeObject): void {
@@ -540,7 +617,9 @@ export class PlayerBuilder {
 
     // Build world context for AI - includes properties with descriptions and abilities
     // Uses describeForAI() for recursive object descriptions including nested objects
-    obj.setMethod('buildWorldContext', `
+    obj.setMethod(
+      'buildWorldContext',
+      `
       const body = await self.getBody();
       const room = self.location;
 
@@ -671,10 +750,13 @@ export class PlayerBuilder {
         lastConversationPartner,
         timestamp: new Date().toISOString(),
       };
-    `);
+    `,
+    );
 
     // Process queued AI inputs
-    obj.setMethod('processAIQueue', `
+    obj.setMethod(
+      'processAIQueue',
+      `
       const context = args[0];
 
       self.aiQueryActive = true;
@@ -1173,12 +1255,15 @@ Respond with narrative text that will be shown to the player.
       } else {
         await self.print('> ');
       }
-    `);
+    `,
+    );
   }
 
   private addActionMethods(obj: RuntimeObject): void {
     // Pattern: get %i - one-handed pickup for light items
-    obj.setMethod('get', `
+    obj.setMethod(
+      'get',
+      `
       /** Pick up a light item with one hand.
        *  Usage: get <item>, take <item>, grab <item>, pick up <item>
        *  For heavier items, use "lift" (two hands) or "drag".
@@ -1238,7 +1323,7 @@ Respond with narrative text that will be shown to the player.
         if (!check.hasCalories) {
           return 'You\\'re too exhausted to pick that up.';
         }
-        return 'That\\'s too heavy to pick up with one hand. Try \"lift\" or \"drag\".';
+        return 'That\\'s too heavy to pick up with one hand. Try "lift" or "drag".';
       }
 
       // Check if item can fit in hand (dimensions check)
@@ -1248,7 +1333,7 @@ Respond with narrative text that will be shown to the player.
 
       const itemDims = [item.width || 0, item.height || 0, item.depth || 0].sort((a, b) => a - b);
       if (itemDims[0] > handDepth * 2 || itemDims[1] > handWidth * 2) {
-        return 'That\\'s too large to hold in one hand. Try \"lift\".';
+        return 'That\\'s too large to hold in one hand. Try "lift".';
       }
 
       // Move item to hand
@@ -1271,10 +1356,13 @@ Respond with narrative text that will be shown to the player.
       }
 
       return ''; // Actor already received message via announce
-    `);
+    `,
+    );
 
     // Pattern: lift %i - two-handed lift for heavier items
-    obj.setMethod('lift', `
+    obj.setMethod(
+      'lift',
+      `
       /** Lift a heavy item using both hands.
        *  Usage: lift <item>, heft <item>
        *  Requires both hands free. For very heavy items, use "drag".
@@ -1333,9 +1421,9 @@ Respond with narrative text that will be shown to the player.
           return 'You\\'re too exhausted to lift that.';
         }
         if (weight > check.dragCapacity * 2) {
-          return 'That\\'s far too heavy to lift. You might be able to \"drag\" it.';
+          return 'That\\'s far too heavy to lift. You might be able to "drag" it.';
         }
-        return 'That\\'s too heavy to lift. You might be able to \"drag\" it.';
+        return 'That\\'s too heavy to lift. You might be able to "drag" it.';
       }
 
       // Move item to primary hand (represents two-hand carry)
@@ -1362,10 +1450,13 @@ Respond with narrative text that will be shown to the player.
       }
 
       return ''; // Actor already received message via announce
-    `);
+    `,
+    );
 
     // Pattern: drag %i - drag very heavy items
-    obj.setMethod('drag', `
+    obj.setMethod(
+      'drag',
+      `
       /** Drag a very heavy item along the ground.
        *  Usage: drag <item>
        *  For items too heavy to lift. Slower movement while dragging.
@@ -1454,10 +1545,13 @@ Respond with narrative text that will be shown to the player.
       }
 
       return ''; // Actor already received message via announce
-    `);
+    `,
+    );
 
     // Pattern: drop %i - drops an item from your hand to the room
-    obj.setMethod('drop', `
+    obj.setMethod(
+      'drop',
+      `
       /** Drop an item you are holding.
        *  Usage: drop <item>, put down <item>, release <item>
        *  Places the item on the ground in your current location.
@@ -1527,10 +1621,13 @@ Respond with narrative text that will be shown to the player.
       }
 
       return ''; // Actor already received message via announce
-    `);
+    `,
+    );
 
     // Pattern: help [verb] - shows help for a verb or lists all verbs
-    obj.setMethod('help', `
+    obj.setMethod(
+      'help',
+      `
       /** Get help on available commands.
        *  Usage: help, ?, help <command>, ? <command>
        *  Without arguments, lists all available commands.
@@ -1608,11 +1705,14 @@ Respond with narrative text that will be shown to the player.
 
       await player.tell(topic.toUpperCase());
       await player.tell(docText);
-    `);
+    `,
+    );
 
     // Heartbeat - called every minute by scheduler
     // Handles digestion, metabolism, sleep, bleeding, breathing, and other periodic effects
-    obj.setMethod('heartbeat', `
+    obj.setMethod(
+      'heartbeat',
+      `
       const results = {
         digestion: null,
         metabolism: 0,
@@ -2070,10 +2170,13 @@ Respond with narrative text that will be shown to the player.
       }
 
       return results;
-    `);
+    `,
+    );
 
     // Register sleep/wake verbs
-    obj.setMethod('sleep', `
+    obj.setMethod(
+      'sleep',
+      `
       /** Go to sleep.
        *  Usage: sleep
        *  Begin falling asleep. Takes time and can be interrupted by noise.
@@ -2095,9 +2198,12 @@ Respond with narrative text that will be shown to the player.
       }
 
       return 'You close your eyes and begin to drift off to sleep...';
-    `);
+    `,
+    );
 
-    obj.setMethod('wake', `
+    obj.setMethod(
+      'wake',
+      `
       /** Wake up from sleep.
        *  Usage: wake, wake up
        *  Begin waking up. Takes time and may be blocked by sedation or exhaustion.
@@ -2124,9 +2230,12 @@ Respond with narrative text that will be shown to the player.
       }
 
       return 'You begin to stir awake...';
-    `);
+    `,
+    );
 
-    obj.setMethod('health', `
+    obj.setMethod(
+      'health',
+      `
       /** Check your health status.
        *  Usage: health, hp, status
        *  Shows how you're feeling without exact numbers.
@@ -2259,30 +2368,45 @@ Respond with narrative text that will be shown to the player.
       }
 
       return lines.join('\\r\\n');
-    `);
+    `,
+    );
 
     // Sleep notification hooks - override Agent's empty ones
-    obj.setMethod('onFellAsleep', `
+    obj.setMethod(
+      'onFellAsleep',
+      `
       await self.tell('You fall asleep.');
-    `);
+    `,
+    );
 
-    obj.setMethod('onWokeUp', `
+    obj.setMethod(
+      'onWokeUp',
+      `
       await self.tell('You wake up.');
       await self.print('> ');
-    `);
+    `,
+    );
 
-    obj.setMethod('onSleepInterrupted', `
+    obj.setMethod(
+      'onSleepInterrupted',
+      `
       const reason = args[0];
       await self.tell(reason || 'Your sleep is interrupted!');
-    `);
+    `,
+    );
 
-    obj.setMethod('onWakeBlocked', `
+    obj.setMethod(
+      'onWakeBlocked',
+      `
       const reason = args[0];
       await self.tell(reason || 'You fall back asleep.');
-    `);
+    `,
+    );
 
     // Called when player dies - body becomes corpse, player goes to chargen
-    obj.setMethod('onDeath', `
+    obj.setMethod(
+      'onDeath',
+      `
       /** Called when the player dies and their body becomes a corpse.
        *  @param corpse - The corpse object created from the body
        */
@@ -2363,10 +2487,13 @@ Respond with narrative text that will be shown to the player.
           self._context.close();
         }
       }
-    `);
-    
+    `,
+    );
+
     // Death funnel: player chose to resurrect from clone
-    obj.setMethod('deathFunnelClone', `
+    obj.setMethod(
+      'deathFunnelClone',
+      `
       /** Handle player choosing to resurrect from clone. */
       if (self._deathFunnelState !== 'choosing') {
         await self.tell('You are not at the death screen.');
@@ -2416,10 +2543,13 @@ Respond with narrative text that will be shown to the player.
       
       // The tank's tick() will call completeResurrection() when ready
       // which will place the player in the tank's room with a new body
-    `);
-    
+    `,
+    );
+
     // Death funnel: player chose to create new character
-    obj.setMethod('deathFunnelNew', `
+    obj.setMethod(
+      'deathFunnelNew',
+      `
       /** Handle player choosing to create a new character instead of cloning. */
       if (self._deathFunnelState === 'choosing') {
         // Clear death funnel state
@@ -2449,10 +2579,13 @@ Respond with narrative text that will be shown to the player.
         await self.tell('Please reconnect to create a new character.');
         self._context.close();
       }
-    `);
+    `,
+    );
 
     // Override canFallAsleep to check for combat, etc.
-    obj.setMethod('canFallAsleep', `
+    obj.setMethod(
+      'canFallAsleep',
+      `
       // Can't sleep if already in a sleep state
       if (self.sleepState !== 'awake') {
         return { allowed: false, reason: 'You are already sleeping or trying to.' };
@@ -2462,10 +2595,13 @@ Respond with narrative text that will be shown to the player.
       // TODO: Check room noise level
 
       return { allowed: true };
-    `);
+    `,
+    );
 
     // Override canWakeUp to check exhaustion
-    obj.setMethod('canWakeUp', `
+    obj.setMethod(
+      'canWakeUp',
+      `
       // Can't wake if sedated
       if ((self.sedation || 0) > 0) {
         return { allowed: false, reason: 'You are too sedated to wake.' };
@@ -2478,22 +2614,28 @@ Respond with narrative text that will be shown to the player.
       }
 
       return { allowed: true };
-    `);
+    `,
+    );
   }
 
   private addFitnessMethods(obj: RuntimeObject): void {
     // @fitness verb - enter the fitness menu
-    obj.setMethod('fitness', `
+    obj.setMethod(
+      'fitness',
+      `
       /** Open the fitness training menu.
        *  Usage: @fitness
        *  Manage your physical training goals.
        */
       self._inFitnessMenu = true;
       await self.showFitnessMenu();
-    `);
+    `,
+    );
 
     // Show the fitness menu
-    obj.setMethod('showFitnessMenu', `
+    obj.setMethod(
+      'showFitnessMenu',
+      `
       const xpPool = self.fitnessXP || 0;
 
       await self.tell('');
@@ -2593,10 +2735,13 @@ Respond with narrative text that will be shown to the player.
       await self.tell('');
       await self.tell('Enter 1-8 to spend XP, or q to exit.');
       await self.tell('');
-    `);
+    `,
+    );
 
     // Handle fitness menu input
-    obj.setMethod('handleFitnessInput', `
+    obj.setMethod(
+      'handleFitnessInput',
+      `
       const input = args[0].toLowerCase().trim();
 
       const partMap = {
@@ -2630,11 +2775,14 @@ Respond with narrative text that will be shown to the player.
       }
 
       await self.tell('Invalid option. Enter 1-8 or q.');
-    `);
+    `,
+    );
 
     // Add fitness XP (called when body parts are used)
     // Get current capacity for a fitness goal
-    obj.setMethod('getFitnessCapacity', `
+    obj.setMethod(
+      'getFitnessCapacity',
+      `
       /** Get the current maxCalories for a fitness goal.
        *  @param goal - The body part goal name
        *  @returns Current maxCalories (highest of paired parts)
@@ -2685,10 +2833,13 @@ Respond with narrative text that will be shown to the player.
         return Math.max(leftEar?.maxCalories || 100, rightEar?.maxCalories || 100);
       }
       return 100;
-    `);
+    `,
+    );
 
     // Calculate XP needed for next level based on current capacity
-    obj.setMethod('getFitnessXPNeeded', `
+    obj.setMethod(
+      'getFitnessXPNeeded',
+      `
       /** Calculate XP needed to advance based on current level.
        *  Uses 2*level - 1 formula where level = (maxCalories - 90) / 10
        *  Level 1 (100 cal) = 1 XP, Level 2 (110 cal) = 3 XP, etc.
@@ -2699,10 +2850,13 @@ Respond with narrative text that will be shown to the player.
       const capacity = await self.getFitnessCapacity(goal);
       const level = Math.floor((capacity - 90) / 10); // 100 cal = level 1
       return (2 * level) - 1;
-    `);
+    `,
+    );
 
     // Spend XP to advance a body part
-    obj.setMethod('spendFitnessXP', `
+    obj.setMethod(
+      'spendFitnessXP',
+      `
       /** Spend XP from pool to advance a body part.
        *  @param part - The body part to advance
        *  @returns { success, reason?, newCapacity? }
@@ -2784,12 +2938,15 @@ Respond with narrative text that will be shown to the player.
 
       const newCapacity = await self.getFitnessCapacity(part);
       return { success: true, newCapacity };
-    `);
+    `,
+    );
   }
 
   private addInventoryMethods(obj: RuntimeObject): void {
     // Helper to get all worn items
-    obj.setMethod('getWornItems', `
+    obj.setMethod(
+      'getWornItems',
+      `
       /** Get all items currently worn by the player.
        *  Traverses body parts to find worn items.
        *  @returns Array of { item: RuntimeObject, part: string }
@@ -2836,10 +2993,13 @@ Respond with narrative text that will be shown to the player.
 
       await checkPart(body);
       return worn;
-    `);
+    `,
+    );
 
     // Pattern: inventory, i - show held and worn items
-    obj.setMethod('inventory', `
+    obj.setMethod(
+      'inventory',
+      `
       /** Show inventory (held and worn items).
        *  Usage: inventory, i
        *  Displays a natural language description of what you are holding and wearing.
@@ -2973,14 +3133,17 @@ Respond with narrative text that will be shown to the player.
         await self.tell('');
         await self.tell('Pocketed: ' + pocketClauses.join('; ') + '.');
       }
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // POCKET COMMANDS
     // ═══════════════════════════════════════════════════════════════════
 
     // pocket X - put held item into first available pocket
-    obj.setMethod('pocket', `
+    obj.setMethod(
+      'pocket',
+      `
       /** Put an item from your hand into a pocket.
        *  Usage: pocket <item>, stash <item>, put <item> in pocket
        *  Finds the first pocket with space and puts the item there.
@@ -3027,10 +3190,13 @@ Respond with narrative text that will be shown to the player.
       }
 
       return 'You have no pocket that can hold ' + item.name + '.';
-    `);
+    `,
+    );
 
     // pocket X in Y - put held item into specific pocket
-    obj.setMethod('pocketIn', `
+    obj.setMethod(
+      'pocketIn',
+      `
       /** Put an item from your hand into a specific pocket.
        *  Usage: pocket <item> in <pocket>, put <item> in <pocket>
        *  The pocket can be referenced by name or the clothing item.
@@ -3099,10 +3265,13 @@ Respond with narrative text that will be shown to the player.
 
       await item.moveTo(targetPocket);
       return 'You slip ' + item.name + ' into your ' + targetPocket.name + '.';
-    `);
+    `,
+    );
 
     // hold X - take item from pocket into hand
-    obj.setMethod('hold', `
+    obj.setMethod(
+      'hold',
+      `
       /** Take an item from your pocket into your hand.
        *  Usage: hold <item>, draw <item>, unholster <item>
        *  Finds the item in your pockets and moves it to a free hand.
@@ -3172,14 +3341,17 @@ Respond with narrative text that will be shown to the player.
 
       await item.moveTo(targetHand);
       return 'You draw ' + item.name + ' from your ' + foundInPocket.name + '.';
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // COMBAT COMMANDS
     // ═══════════════════════════════════════════════════════════════════
 
     // attack X / fight X - initiate or join combat
-    obj.setMethod('attack', `
+    obj.setMethod(
+      'attack',
+      `
       /** Attack another character, initiating combat.
        *  Usage: attack <target>, fight <target>
        *  If the target is already in combat, you join that combat.
@@ -3222,10 +3394,13 @@ Respond with narrative text that will be shown to the player.
       }
 
       return null; // Combat system handles messaging
-    `);
+    `,
+    );
 
     // action <text> - submit combat action
-    obj.setMethod('combatAction', `
+    obj.setMethod(
+      'combatAction',
+      `
       /** Submit your action for the current combat round.
        *  Usage: action <what you do>
        *  Example: action I swing my knife at his throat
@@ -3250,6 +3425,7 @@ Respond with narrative text that will be shown to the player.
       }
 
       return null; // submitAction handles messaging
-    `);
+    `,
+    );
   }
 }

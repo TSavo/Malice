@@ -41,7 +41,8 @@ From here, the geometry of the iron and glass roof is visible in detail—where 
         {
           name: 'an iron beam',
           capacity: 1,
-          emptyMsg: 'An exposed iron beam of the roof framework offers precarious seating.',
+          emptyMsg:
+            'An exposed iron beam of the roof framework offers precarious seating.',
           occupiedMsg: '%s perched on the iron beam',
         },
       ],
@@ -73,7 +74,8 @@ The view west is limited by the neighboring building, but looking south you can 
         {
           name: 'a water tank bracket',
           capacity: 2,
-          emptyMsg: 'Iron brackets that once held a water tank provide rough seating.',
+          emptyMsg:
+            'Iron brackets that once held a water tank provide rough seating.',
           occupiedMsg: '%s sitting on the old tank brackets',
         },
       ],
@@ -104,7 +106,8 @@ This section of roof is relatively stable, the structure supported by the iron f
         {
           name: 'a flat section of roof',
           capacity: 4,
-          emptyMsg: 'A relatively flat and stable section of rooftop offers open-air seating.',
+          emptyMsg:
+            'A relatively flat and stable section of rooftop offers open-air seating.',
           occupiedMsg: '%s sitting on the roof',
         },
       ],
@@ -219,7 +222,8 @@ The view north shows the collision of Seattle's street grids—Pioneer Square's 
         {
           name: 'the parapet',
           capacity: 3,
-          emptyMsg: 'The decorative stone parapet offers seating with a view of Washington Street below.',
+          emptyMsg:
+            'The decorative stone parapet offers seating with a view of Washington Street below.',
           occupiedMsg: '%s sitting on the parapet',
         },
         {
@@ -254,7 +258,8 @@ The clock faces glow faintly at night, a phenomenon no one has explained. There'
         {
           name: 'the tower steps',
           capacity: 2,
-          emptyMsg: 'The bottom steps of the clock tower spiral staircase provide seating in the tower\'s shadow.',
+          emptyMsg:
+            "The bottom steps of the clock tower spiral staircase provide seating in the tower's shadow.",
           occupiedMsg: '%s sitting on the tower steps',
         },
       ],

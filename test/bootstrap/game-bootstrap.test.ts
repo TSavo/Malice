@@ -1,9 +1,11 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { GameBootstrap } from '../../src/database/game-bootstrap.js';
 import { ObjectDatabase } from '../../src/database/object-db.js';
 import { ObjectManager } from '../../src/database/object-manager.js';
-import { GameBootstrap } from '../../src/database/game-bootstrap.js';
 
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/?replicaSet=rs0&directConnection=true';
+const MONGO_URI =
+  process.env.MONGO_URI ||
+  'mongodb://localhost:27017/?replicaSet=rs0&directConnection=true';
 
 describe('GameBootstrap', () => {
   let db: ObjectDatabase;
@@ -15,7 +17,7 @@ describe('GameBootstrap', () => {
     await db.connect();
 
     // Clean database
-    await db['objects'].deleteMany({});
+    await db.objects.deleteMany({});
 
     manager = new ObjectManager(db);
     bootstrap = new GameBootstrap(manager, {
@@ -38,7 +40,7 @@ describe('GameBootstrap', () => {
       await bootstrap.bootstrap();
 
       const objectManager = await manager.load(0);
-      const root = await manager.load(1);
+      const _root = await manager.load(1);
       const system = await manager.load(2);
 
       expect(objectManager).toBeTruthy();
@@ -102,7 +104,7 @@ describe('GameBootstrap', () => {
       await bootstrap.bootstrap();
 
       const objectManager = await manager.load(0);
-      const aliases = objectManager!.get('aliases') as Record<string, number>;
+      const aliases = objectManager?.get('aliases') as Record<string, number>;
 
       expect(aliases).toBeTruthy();
       expect(aliases.system).toBe(2);
@@ -116,7 +118,6 @@ describe('GameBootstrap', () => {
       expect(system.get('name')).toBe('System');
       expect(system.hasMethod('onConnection')).toBe(true);
     });
-
   });
 
   describe('World status check', () => {
@@ -189,11 +190,11 @@ describe('GameBootstrap', () => {
       await bootstrap.bootstrap();
 
       // Add custom data
-      const objectManager = await manager.load(0);
+      const _objectManager = await manager.load(0);
       const root = await manager.load(1);
-      const config = root!.get('config') as any;
+      const config = root?.get('config') as any;
       config.customSetting = 'test value';
-      root!.set('config', config);
+      root?.set('config', config);
       await manager.flushWrites();
 
       // Re-bootstrap
@@ -204,9 +205,9 @@ describe('GameBootstrap', () => {
       await bootstrap2.bootstrap();
 
       // Check custom data preserved
-      const objectManager2 = await manager.load(0);
+      const _objectManager2 = await manager.load(0);
       const root2 = await manager.load(1);
-      const config2 = root2!.get('config') as any;
+      const config2 = root2?.get('config') as any;
       expect(config2.customSetting).toBe('test value');
     });
 
@@ -215,9 +216,9 @@ describe('GameBootstrap', () => {
 
       // Add custom alias
       const objectManager = await manager.load(0);
-      const aliases = objectManager!.get('aliases') as Record<string, number>;
+      const aliases = objectManager?.get('aliases') as Record<string, number>;
       aliases.myCustomAlias = 999;
-      objectManager!.set('aliases', aliases);
+      objectManager?.set('aliases', aliases);
       await manager.flushWrites();
 
       // Re-bootstrap
@@ -229,7 +230,7 @@ describe('GameBootstrap', () => {
 
       // Check custom alias preserved
       const objectManager2 = await manager.load(0);
-      const aliases2 = objectManager2!.get('aliases') as Record<string, number>;
+      const aliases2 = objectManager2?.get('aliases') as Record<string, number>;
       expect(aliases2.myCustomAlias).toBe(999);
       expect(aliases2.system).toBe(2);
     });

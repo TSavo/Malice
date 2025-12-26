@@ -1,5 +1,5 @@
-import { ObjectManager } from '../object-manager.js';
 import type { RuntimeObject } from '../../../types/object.js';
+import type { ObjectManager } from '../object-manager.js';
 
 /**
  * Builds GameEvents object for emitting game events to MongoDB
@@ -20,7 +20,8 @@ export class GameEventsBuilder {
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
 
-    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
+    const aliases =
+      (objectManager.get('aliases') as Record<string, number>) || {};
 
     if (aliases.events) {
       this.events = await this.manager.load(aliases.events);
@@ -39,7 +40,9 @@ export class GameEventsBuilder {
     });
 
     // Emit method - inserts event into game_events collection
-    this.events.setMethod('emit', `
+    this.events.setMethod(
+      'emit',
+      `
       /** Emit a game event for external services to consume.
        *  @param eventType - Type of event (speech, emote, movement, etc.)
        *  @param data - Event data object
@@ -65,7 +68,8 @@ export class GameEventsBuilder {
       const eventId = await $._emitGameEvent(event);
 
       return eventId;
-    `);
+    `,
+    );
 
     // Register alias
     aliases.events = this.events.id;

@@ -18,7 +18,17 @@ export interface PlayerStats {
 }
 
 /** Direction for room exits */
-export type Direction = 'north' | 'south' | 'east' | 'west' | 'up' | 'down' | 'northeast' | 'northwest' | 'southeast' | 'southwest';
+export type Direction =
+  | 'north'
+  | 'south'
+  | 'east'
+  | 'west'
+  | 'up'
+  | 'down'
+  | 'northeast'
+  | 'northwest'
+  | 'southeast'
+  | 'southwest';
 
 /** Room exit definition */
 export interface RoomExit {
@@ -71,7 +81,9 @@ export interface PlayerObject extends RuntimeObject {
   stats: PlayerStats;
   location: number;
   inventory: number[];
-  equipment: Partial<Record<'weapon' | 'armor' | 'helmet' | 'boots' | 'ring' | 'amulet', number>>;
+  equipment: Partial<
+    Record<'weapon' | 'armor' | 'helmet' | 'boots' | 'ring' | 'amulet', number>
+  >;
   title?: string;
   description?: string;
 }

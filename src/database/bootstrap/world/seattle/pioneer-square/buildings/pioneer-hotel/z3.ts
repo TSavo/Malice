@@ -26,7 +26,7 @@ A fire extinguisher hangs on the wall, its pressure gauge in the red. Someone ha
       outdoor: false,
       exits: {
         east: '%ROOM_3',
-        'in': '%E',
+        in: '%E',
       },
     },
 

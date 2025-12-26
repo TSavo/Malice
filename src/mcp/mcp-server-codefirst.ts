@@ -10,15 +10,22 @@
  * This is a thin transport layer - all logic lives in MOO objects.
  */
 
-import { McpServer, ResourceTemplate } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { existsSync, readFileSync } from 'node:fs';
+import { readdir, readFile } from 'node:fs/promises';
+import {
+  createServer,
+  type IncomingMessage,
+  type ServerResponse,
+} from 'node:http';
+import { join } from 'node:path';
+import {
+  McpServer,
+  ResourceTemplate,
+} from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
-import { createServer, IncomingMessage, ServerResponse } from 'http';
 import { z } from 'zod';
-import { readdir, readFile } from 'fs/promises';
-import { join } from 'path';
-import { existsSync, readFileSync } from 'fs';
-import type { ObjectManager } from '../database/object-manager.js';
 import type { RuntimeObject } from '../../types/object.js';
+import type { ObjectManager } from '../database/object-manager.js';
 
 interface MCPServerConfig {
   port?: number;
@@ -43,7 +50,7 @@ export class MaliceMCPServer {
 
   constructor(
     private manager: ObjectManager,
-    config: MCPServerConfig = {}
+    config: MCPServerConfig = {},
   ) {
     this.port = config.port ?? 3010;
     this.host = config.host ?? '127.0.0.1';
@@ -60,7 +67,9 @@ export class MaliceMCPServer {
    * Authenticate user via HTTP Basic Auth
    * Returns player ID if valid, undefined if invalid
    */
-  private async authenticate(authHeader: string | undefined): Promise<number | undefined> {
+  private async authenticate(
+    authHeader: string | undefined,
+  ): Promise<number | undefined> {
     if (!authHeader || !authHeader.startsWith('Basic ')) {
       return undefined;
     }
@@ -77,17 +86,21 @@ export class MaliceMCPServer {
 
       // Look up player by username
       const objectManager = await this.manager.load(0);
-      const aliases = (objectManager?.get('aliases') as Record<string, number>) || {};
+      const aliases =
+        (objectManager?.get('aliases') as Record<string, number>) || {};
       const playerPrototypeId = aliases.player;
       const adminPrototypeId = aliases.admin;
 
       const users = await this.manager.db.listAll(false);
-      const getValue = (v: any) => v && typeof v === 'object' && 'type' in v ? v.value : v;
+      const getValue = (v: any) =>
+        v && typeof v === 'object' && 'type' in v ? v.value : v;
 
-      const userDoc = users.find(u => {
+      const userDoc = users.find((u) => {
         const parentId = getValue(u.parent);
-        return (parentId === playerPrototypeId || parentId === adminPrototypeId) &&
-          getValue(u.properties.playername) === username.toLowerCase();
+        return (
+          (parentId === playerPrototypeId || parentId === adminPrototypeId) &&
+          getValue(u.properties.playername) === username.toLowerCase()
+        );
       });
 
       if (!userDoc) {
@@ -101,7 +114,7 @@ export class MaliceMCPServer {
       }
 
       // Check password using player's checkPassword method
-      const valid = await player.call('checkPassword', password) as boolean;
+      const valid = (await player.call('checkPassword', password)) as boolean;
       if (!valid) {
         return undefined;
       }
@@ -120,12 +133,18 @@ export class MaliceMCPServer {
     if (value === null || value === undefined) return value;
 
     // RuntimeObject -> #ID
-    if (value && typeof value === 'object' && 'id' in value && typeof value.id === 'number' && typeof value.get === 'function') {
+    if (
+      value &&
+      typeof value === 'object' &&
+      'id' in value &&
+      typeof value.id === 'number' &&
+      typeof value.get === 'function'
+    ) {
       return `#${value.id}`;
     }
 
     if (Array.isArray(value)) {
-      return value.map(v => this.serializeValue(v, seen));
+      return value.map((v) => this.serializeValue(v, seen));
     }
 
     if (typeof value === 'object') {
@@ -197,7 +216,15 @@ Write composable code - loops, conditionals, multi-step operations all work.`,
           const $mcp = this.getMCP();
           if (!$mcp) {
             return {
-              content: [{ type: 'text', text: JSON.stringify({ error: 'MCP not bootstrapped. Run FORCE_BOOTSTRAP=true npm start' }) }],
+              content: [
+                {
+                  type: 'text',
+                  text: JSON.stringify({
+                    error:
+                      'MCP not bootstrapped. Run FORCE_BOOTSTRAP=true npm start',
+                  }),
+                },
+              ],
               isError: true,
             };
           }
@@ -207,15 +234,24 @@ Write composable code - loops, conditionals, multi-step operations all work.`,
           const serialized = this.serializeValue(result);
 
           return {
-            content: [{ type: 'text', text: JSON.stringify(serialized, null, 2) }],
+            content: [
+              { type: 'text', text: JSON.stringify(serialized, null, 2) },
+            ],
           };
         } catch (err) {
           return {
-            content: [{ type: 'text', text: JSON.stringify({ error: err instanceof Error ? err.message : String(err) }) }],
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify({
+                  error: err instanceof Error ? err.message : String(err),
+                }),
+              },
+            ],
             isError: true,
           };
         }
-      }
+      },
     );
 
     // Discovery tool: List available tools
@@ -228,7 +264,12 @@ Write composable code - loops, conditionals, multi-step operations all work.`,
           const $mcp = this.getMCP();
           if (!$mcp) {
             return {
-              content: [{ type: 'text', text: JSON.stringify({ error: 'MCP not bootstrapped' }) }],
+              content: [
+                {
+                  type: 'text',
+                  text: JSON.stringify({ error: 'MCP not bootstrapped' }),
+                },
+              ],
               isError: true,
             };
           }
@@ -239,11 +280,18 @@ Write composable code - loops, conditionals, multi-step operations all work.`,
           };
         } catch (err) {
           return {
-            content: [{ type: 'text', text: JSON.stringify({ error: err instanceof Error ? err.message : String(err) }) }],
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify({
+                  error: err instanceof Error ? err.message : String(err),
+                }),
+              },
+            ],
             isError: true,
           };
         }
-      }
+      },
     );
 
     // Schema tool: Get specific tool schema
@@ -258,7 +306,12 @@ Write composable code - loops, conditionals, multi-step operations all work.`,
           const $mcp = this.getMCP();
           if (!$mcp) {
             return {
-              content: [{ type: 'text', text: JSON.stringify({ error: 'MCP not bootstrapped' }) }],
+              content: [
+                {
+                  type: 'text',
+                  text: JSON.stringify({ error: 'MCP not bootstrapped' }),
+                },
+              ],
               isError: true,
             };
           }
@@ -269,11 +322,18 @@ Write composable code - loops, conditionals, multi-step operations all work.`,
           };
         } catch (err) {
           return {
-            content: [{ type: 'text', text: JSON.stringify({ error: err instanceof Error ? err.message : String(err) }) }],
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify({
+                  error: err instanceof Error ? err.message : String(err),
+                }),
+              },
+            ],
             isError: true,
           };
         }
-      }
+      },
     );
   }
 
@@ -297,33 +357,39 @@ Write composable code - loops, conditionals, multi-step operations all work.`,
         const $mcp = this.getMCP();
         if (!$mcp) {
           return {
-            contents: [{
-              uri: 'moo://tools',
-              mimeType: 'application/json',
-              text: JSON.stringify({ error: 'MCP not bootstrapped' }),
-            }],
+            contents: [
+              {
+                uri: 'moo://tools',
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: 'MCP not bootstrapped' }),
+              },
+            ],
           };
         }
 
         try {
           const tools = await $mcp.call('listTools');
           return {
-            contents: [{
-              uri: 'moo://tools',
-              mimeType: 'application/json',
-              text: JSON.stringify(tools, null, 2),
-            }],
+            contents: [
+              {
+                uri: 'moo://tools',
+                mimeType: 'application/json',
+                text: JSON.stringify(tools, null, 2),
+              },
+            ],
           };
         } catch (err) {
           return {
-            contents: [{
-              uri: 'moo://tools',
-              mimeType: 'application/json',
-              text: JSON.stringify({ error: String(err) }),
-            }],
+            contents: [
+              {
+                uri: 'moo://tools',
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: String(err) }),
+              },
+            ],
           };
         }
-      }
+      },
     );
 
     // Aliases resource
@@ -334,7 +400,8 @@ Write composable code - loops, conditionals, multi-step operations all work.`,
       async () => {
         try {
           const objectManager = await this.manager.load(0);
-          const aliases = (objectManager?.get('aliases') as Record<string, number>) || {};
+          const aliases =
+            (objectManager?.get('aliases') as Record<string, number>) || {};
           const sorted: Record<string, number> = {};
           for (const key of Object.keys(aliases).sort()) {
             if (typeof aliases[key] === 'number') {
@@ -342,22 +409,26 @@ Write composable code - loops, conditionals, multi-step operations all work.`,
             }
           }
           return {
-            contents: [{
-              uri: 'moo://aliases',
-              mimeType: 'application/json',
-              text: JSON.stringify(sorted, null, 2),
-            }],
+            contents: [
+              {
+                uri: 'moo://aliases',
+                mimeType: 'application/json',
+                text: JSON.stringify(sorted, null, 2),
+              },
+            ],
           };
         } catch (err) {
           return {
-            contents: [{
-              uri: 'moo://aliases',
-              mimeType: 'application/json',
-              text: JSON.stringify({ error: String(err) }),
-            }],
+            contents: [
+              {
+                uri: 'moo://aliases',
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: String(err) }),
+              },
+            ],
           };
         }
-      }
+      },
     );
 
     // Object by ID - moo://objects/{id}
@@ -371,25 +442,31 @@ Write composable code - loops, conditionals, multi-step operations all work.`,
           const match = uriStr.match(/moo:\/\/objects\/(.+)/);
           if (!match) {
             return {
-              contents: [{
-                uri: uriStr,
-                mimeType: 'application/json',
-                text: JSON.stringify({ error: 'Invalid URI format' }),
-              }],
+              contents: [
+                {
+                  uri: uriStr,
+                  mimeType: 'application/json',
+                  text: JSON.stringify({ error: 'Invalid URI format' }),
+                },
+              ],
             };
           }
 
           const idStr = match[1];
-          const objId = idStr.startsWith('#') ? parseInt(idStr.slice(1)) : parseInt(idStr);
+          const objId = idStr.startsWith('#')
+            ? parseInt(idStr.slice(1), 10)
+            : parseInt(idStr, 10);
 
           const obj = await this.manager.load(objId);
           if (!obj) {
             return {
-              contents: [{
-                uri: uriStr,
-                mimeType: 'application/json',
-                text: JSON.stringify({ error: `Object #${objId} not found` }),
-              }],
+              contents: [
+                {
+                  uri: uriStr,
+                  mimeType: 'application/json',
+                  text: JSON.stringify({ error: `Object #${objId} not found` }),
+                },
+              ],
             };
           }
 
@@ -404,22 +481,26 @@ Write composable code - loops, conditionals, multi-step operations all work.`,
           });
 
           return {
-            contents: [{
-              uri: uriStr,
-              mimeType: 'application/json',
-              text: JSON.stringify(serialized, null, 2),
-            }],
+            contents: [
+              {
+                uri: uriStr,
+                mimeType: 'application/json',
+                text: JSON.stringify(serialized, null, 2),
+              },
+            ],
           };
         } catch (err) {
           return {
-            contents: [{
-              uri: uri.toString(),
-              mimeType: 'application/json',
-              text: JSON.stringify({ error: String(err) }),
-            }],
+            contents: [
+              {
+                uri: uri.toString(),
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: String(err) }),
+              },
+            ],
           };
         }
-      }
+      },
     );
 
     // Object by alias - moo://alias/{name}
@@ -433,37 +514,48 @@ Write composable code - loops, conditionals, multi-step operations all work.`,
           const match = uriStr.match(/moo:\/\/alias\/(.+)/);
           if (!match) {
             return {
-              contents: [{
-                uri: uriStr,
-                mimeType: 'application/json',
-                text: JSON.stringify({ error: 'Invalid URI format' }),
-              }],
+              contents: [
+                {
+                  uri: uriStr,
+                  mimeType: 'application/json',
+                  text: JSON.stringify({ error: 'Invalid URI format' }),
+                },
+              ],
             };
           }
 
           const aliasName = match[1];
           const objectManager = await this.manager.load(0);
-          const aliases = (objectManager?.get('aliases') as Record<string, number>) || {};
+          const aliases =
+            (objectManager?.get('aliases') as Record<string, number>) || {};
           const objId = aliases[aliasName];
 
           if (objId === undefined) {
             return {
-              contents: [{
-                uri: uriStr,
-                mimeType: 'application/json',
-                text: JSON.stringify({ error: `Alias '${aliasName}' not found` }),
-              }],
+              contents: [
+                {
+                  uri: uriStr,
+                  mimeType: 'application/json',
+                  text: JSON.stringify({
+                    error: `Alias '${aliasName}' not found`,
+                  }),
+                },
+              ],
             };
           }
 
           const obj = await this.manager.load(objId);
           if (!obj) {
             return {
-              contents: [{
-                uri: uriStr,
-                mimeType: 'application/json',
-                text: JSON.stringify({ error: `Object #${objId} not found for alias '${aliasName}'` }),
-              }],
+              contents: [
+                {
+                  uri: uriStr,
+                  mimeType: 'application/json',
+                  text: JSON.stringify({
+                    error: `Object #${objId} not found for alias '${aliasName}'`,
+                  }),
+                },
+              ],
             };
           }
 
@@ -478,22 +570,26 @@ Write composable code - loops, conditionals, multi-step operations all work.`,
           });
 
           return {
-            contents: [{
-              uri: uriStr,
-              mimeType: 'application/json',
-              text: JSON.stringify(serialized, null, 2),
-            }],
+            contents: [
+              {
+                uri: uriStr,
+                mimeType: 'application/json',
+                text: JSON.stringify(serialized, null, 2),
+              },
+            ],
           };
         } catch (err) {
           return {
-            contents: [{
-              uri: uri.toString(),
-              mimeType: 'application/json',
-              text: JSON.stringify({ error: String(err) }),
-            }],
+            contents: [
+              {
+                uri: uri.toString(),
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: String(err) }),
+              },
+            ],
           };
         }
-      }
+      },
     );
 
     // Room state - moo://rooms/{id}
@@ -507,33 +603,39 @@ Write composable code - loops, conditionals, multi-step operations all work.`,
           const match = uriStr.match(/moo:\/\/rooms\/(.+)/);
           if (!match) {
             return {
-              contents: [{
-                uri: uriStr,
-                mimeType: 'application/json',
-                text: JSON.stringify({ error: 'Invalid URI format' }),
-              }],
+              contents: [
+                {
+                  uri: uriStr,
+                  mimeType: 'application/json',
+                  text: JSON.stringify({ error: 'Invalid URI format' }),
+                },
+              ],
             };
           }
 
           const idStr = match[1];
-          const roomId = idStr.startsWith('#') ? parseInt(idStr.slice(1)) : parseInt(idStr);
+          const roomId = idStr.startsWith('#')
+            ? parseInt(idStr.slice(1), 10)
+            : parseInt(idStr, 10);
 
           const room = await this.manager.load(roomId);
           if (!room) {
             return {
-              contents: [{
-                uri: uriStr,
-                mimeType: 'application/json',
-                text: JSON.stringify({ error: `Room #${roomId} not found` }),
-              }],
+              contents: [
+                {
+                  uri: uriStr,
+                  mimeType: 'application/json',
+                  text: JSON.stringify({ error: `Room #${roomId} not found` }),
+                },
+              ],
             };
           }
 
           // Get room contents
           const allObjs = await this.manager.db.listAll(false);
           const contents = allObjs
-            .filter(doc => this.getValue(doc.properties.location) === roomId)
-            .map(doc => ({
+            .filter((doc) => this.getValue(doc.properties.location) === roomId)
+            .map((doc) => ({
               id: doc._id,
               name: this.getValue(doc.properties.name),
             }));
@@ -565,22 +667,26 @@ Write composable code - loops, conditionals, multi-step operations all work.`,
           });
 
           return {
-            contents: [{
-              uri: uriStr,
-              mimeType: 'application/json',
-              text: JSON.stringify(serialized, null, 2),
-            }],
+            contents: [
+              {
+                uri: uriStr,
+                mimeType: 'application/json',
+                text: JSON.stringify(serialized, null, 2),
+              },
+            ],
           };
         } catch (err) {
           return {
-            contents: [{
-              uri: uri.toString(),
-              mimeType: 'application/json',
-              text: JSON.stringify({ error: String(err) }),
-            }],
+            contents: [
+              {
+                uri: uri.toString(),
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: String(err) }),
+              },
+            ],
           };
         }
-      }
+      },
     );
 
     // Players list - moo://players
@@ -591,17 +697,20 @@ Write composable code - loops, conditionals, multi-step operations all work.`,
       async () => {
         try {
           const objectManager = await this.manager.load(0);
-          const aliases = (objectManager?.get('aliases') as Record<string, number>) || {};
+          const aliases =
+            (objectManager?.get('aliases') as Record<string, number>) || {};
           const playerPrototypeId = aliases.player;
           const adminPrototypeId = aliases.admin;
 
           const allObjs = await this.manager.db.listAll(false);
           const players = allObjs
-            .filter(doc => {
+            .filter((doc) => {
               const parentId = this.getValue(doc.parent);
-              return parentId === playerPrototypeId || parentId === adminPrototypeId;
+              return (
+                parentId === playerPrototypeId || parentId === adminPrototypeId
+              );
             })
-            .map(doc => ({
+            .map((doc) => ({
               id: doc._id,
               playername: this.getValue(doc.properties.playername),
               name: this.getValue(doc.properties.name),
@@ -610,22 +719,26 @@ Write composable code - loops, conditionals, multi-step operations all work.`,
             }));
 
           return {
-            contents: [{
-              uri: 'moo://players',
-              mimeType: 'application/json',
-              text: JSON.stringify(players, null, 2),
-            }],
+            contents: [
+              {
+                uri: 'moo://players',
+                mimeType: 'application/json',
+                text: JSON.stringify(players, null, 2),
+              },
+            ],
           };
         } catch (err) {
           return {
-            contents: [{
-              uri: 'moo://players',
-              mimeType: 'application/json',
-              text: JSON.stringify({ error: String(err) }),
-            }],
+            contents: [
+              {
+                uri: 'moo://players',
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: String(err) }),
+              },
+            ],
           };
         }
-      }
+      },
     );
 
     // AI NPCs list - moo://ai
@@ -638,11 +751,13 @@ Write composable code - loops, conditionals, multi-step operations all work.`,
           const $ai = this.manager.getAliases().get('ai');
           if (!$ai) {
             return {
-              contents: [{
-                uri: 'moo://ai',
-                mimeType: 'application/json',
-                text: JSON.stringify({ error: '$.ai not bootstrapped' }),
-              }],
+              contents: [
+                {
+                  uri: 'moo://ai',
+                  mimeType: 'application/json',
+                  text: JSON.stringify({ error: '$.ai not bootstrapped' }),
+                },
+              ],
             };
           }
 
@@ -650,7 +765,7 @@ Write composable code - loops, conditionals, multi-step operations all work.`,
           const npcs = [];
 
           for (const [npcIdStr, agentData] of Object.entries(registry)) {
-            const npcId = parseInt(npcIdStr);
+            const npcId = parseInt(npcIdStr, 10);
             const npc = await this.manager.load(npcId);
             if (npc) {
               npcs.push({
@@ -664,22 +779,26 @@ Write composable code - loops, conditionals, multi-step operations all work.`,
           }
 
           return {
-            contents: [{
-              uri: 'moo://ai',
-              mimeType: 'application/json',
-              text: JSON.stringify(npcs, null, 2),
-            }],
+            contents: [
+              {
+                uri: 'moo://ai',
+                mimeType: 'application/json',
+                text: JSON.stringify(npcs, null, 2),
+              },
+            ],
           };
         } catch (err) {
           return {
-            contents: [{
-              uri: 'moo://ai',
-              mimeType: 'application/json',
-              text: JSON.stringify({ error: String(err) }),
-            }],
+            contents: [
+              {
+                uri: 'moo://ai',
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: String(err) }),
+              },
+            ],
           };
         }
-      }
+      },
     );
 
     // AI NPC details - moo://ai/{id}
@@ -693,36 +812,44 @@ Write composable code - loops, conditionals, multi-step operations all work.`,
           const match = uriStr.match(/moo:\/\/ai\/(.+)/);
           if (!match) {
             return {
-              contents: [{
-                uri: uriStr,
-                mimeType: 'application/json',
-                text: JSON.stringify({ error: 'Invalid URI format' }),
-              }],
+              contents: [
+                {
+                  uri: uriStr,
+                  mimeType: 'application/json',
+                  text: JSON.stringify({ error: 'Invalid URI format' }),
+                },
+              ],
             };
           }
 
           const idStr = match[1];
-          const npcId = idStr.startsWith('#') ? parseInt(idStr.slice(1)) : parseInt(idStr);
+          const npcId = idStr.startsWith('#')
+            ? parseInt(idStr.slice(1), 10)
+            : parseInt(idStr, 10);
 
           const $ai = this.manager.getAliases().get('ai');
           if (!$ai) {
             return {
-              contents: [{
-                uri: uriStr,
-                mimeType: 'application/json',
-                text: JSON.stringify({ error: '$.ai not bootstrapped' }),
-              }],
+              contents: [
+                {
+                  uri: uriStr,
+                  mimeType: 'application/json',
+                  text: JSON.stringify({ error: '$.ai not bootstrapped' }),
+                },
+              ],
             };
           }
 
           const npc = await this.manager.load(npcId);
           if (!npc) {
             return {
-              contents: [{
-                uri: uriStr,
-                mimeType: 'application/json',
-                text: JSON.stringify({ error: `NPC #${npcId} not found` }),
-              }],
+              contents: [
+                {
+                  uri: uriStr,
+                  mimeType: 'application/json',
+                  text: JSON.stringify({ error: `NPC #${npcId} not found` }),
+                },
+              ],
             };
           }
 
@@ -743,22 +870,26 @@ Write composable code - loops, conditionals, multi-step operations all work.`,
           });
 
           return {
-            contents: [{
-              uri: uriStr,
-              mimeType: 'application/json',
-              text: JSON.stringify(serialized, null, 2),
-            }],
+            contents: [
+              {
+                uri: uriStr,
+                mimeType: 'application/json',
+                text: JSON.stringify(serialized, null, 2),
+              },
+            ],
           };
         } catch (err) {
           return {
-            contents: [{
-              uri: uri.toString(),
-              mimeType: 'application/json',
-              text: JSON.stringify({ error: String(err) }),
-            }],
+            contents: [
+              {
+                uri: uri.toString(),
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: String(err) }),
+              },
+            ],
           };
         }
-      }
+      },
     );
 
     // Plots list - moo://plots
@@ -771,32 +902,38 @@ Write composable code - loops, conditionals, multi-step operations all work.`,
           const $plot = this.manager.getAliases().get('plot');
           if (!$plot) {
             return {
-              contents: [{
-                uri: 'moo://plots',
-                mimeType: 'application/json',
-                text: JSON.stringify({ error: '$.plot not bootstrapped' }),
-              }],
+              contents: [
+                {
+                  uri: 'moo://plots',
+                  mimeType: 'application/json',
+                  text: JSON.stringify({ error: '$.plot not bootstrapped' }),
+                },
+              ],
             };
           }
 
           const plots = await $plot.call('listPlots');
           return {
-            contents: [{
-              uri: 'moo://plots',
-              mimeType: 'application/json',
-              text: JSON.stringify(plots, null, 2),
-            }],
+            contents: [
+              {
+                uri: 'moo://plots',
+                mimeType: 'application/json',
+                text: JSON.stringify(plots, null, 2),
+              },
+            ],
           };
         } catch (err) {
           return {
-            contents: [{
-              uri: 'moo://plots',
-              mimeType: 'application/json',
-              text: JSON.stringify({ error: String(err) }),
-            }],
+            contents: [
+              {
+                uri: 'moo://plots',
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: String(err) }),
+              },
+            ],
           };
         }
-      }
+      },
     );
 
     // Plot details - moo://plots/{id}
@@ -810,11 +947,13 @@ Write composable code - loops, conditionals, multi-step operations all work.`,
           const match = uriStr.match(/moo:\/\/plots\/(.+)/);
           if (!match) {
             return {
-              contents: [{
-                uri: uriStr,
-                mimeType: 'application/json',
-                text: JSON.stringify({ error: 'Invalid URI format' }),
-              }],
+              contents: [
+                {
+                  uri: uriStr,
+                  mimeType: 'application/json',
+                  text: JSON.stringify({ error: 'Invalid URI format' }),
+                },
+              ],
             };
           }
 
@@ -822,44 +961,52 @@ Write composable code - loops, conditionals, multi-step operations all work.`,
           const $plot = this.manager.getAliases().get('plot');
           if (!$plot) {
             return {
-              contents: [{
-                uri: uriStr,
-                mimeType: 'application/json',
-                text: JSON.stringify({ error: '$.plot not bootstrapped' }),
-              }],
+              contents: [
+                {
+                  uri: uriStr,
+                  mimeType: 'application/json',
+                  text: JSON.stringify({ error: '$.plot not bootstrapped' }),
+                },
+              ],
             };
           }
 
-          const plots = await $plot.call('listPlots') as any[];
-          const plot = plots.find(p => p.id === plotId);
+          const plots = (await $plot.call('listPlots')) as any[];
+          const plot = plots.find((p) => p.id === plotId);
 
           if (!plot) {
             return {
-              contents: [{
-                uri: uriStr,
-                mimeType: 'application/json',
-                text: JSON.stringify({ error: `Plot '${plotId}' not found` }),
-              }],
+              contents: [
+                {
+                  uri: uriStr,
+                  mimeType: 'application/json',
+                  text: JSON.stringify({ error: `Plot '${plotId}' not found` }),
+                },
+              ],
             };
           }
 
           return {
-            contents: [{
-              uri: uriStr,
-              mimeType: 'application/json',
-              text: JSON.stringify(plot, null, 2),
-            }],
+            contents: [
+              {
+                uri: uriStr,
+                mimeType: 'application/json',
+                text: JSON.stringify(plot, null, 2),
+              },
+            ],
           };
         } catch (err) {
           return {
-            contents: [{
-              uri: uri.toString(),
-              mimeType: 'application/json',
-              text: JSON.stringify({ error: String(err) }),
-            }],
+            contents: [
+              {
+                uri: uri.toString(),
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: String(err) }),
+              },
+            ],
           };
         }
-      }
+      },
     );
 
     // Docs list - moo://docs
@@ -872,30 +1019,34 @@ Write composable code - loops, conditionals, multi-step operations all work.`,
           const docsDir = join(process.cwd(), 'docs');
           const files = await readdir(docsDir);
           const mdFiles = files
-            .filter(f => f.endsWith('.md'))
-            .map(f => ({
+            .filter((f) => f.endsWith('.md'))
+            .map((f) => ({
               uri: `moo://docs/${f.replace('.md', '').toLowerCase()}`,
               name: f.replace('.md', ''),
               description: `Documentation: ${f.replace('.md', '').replace(/-/g, ' ')}`,
             }));
 
           return {
-            contents: [{
-              uri: 'moo://docs',
-              mimeType: 'application/json',
-              text: JSON.stringify(mdFiles, null, 2),
-            }],
+            contents: [
+              {
+                uri: 'moo://docs',
+                mimeType: 'application/json',
+                text: JSON.stringify(mdFiles, null, 2),
+              },
+            ],
           };
         } catch (err) {
           return {
-            contents: [{
-              uri: 'moo://docs',
-              mimeType: 'application/json',
-              text: JSON.stringify({ error: String(err) }),
-            }],
+            contents: [
+              {
+                uri: 'moo://docs',
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: String(err) }),
+              },
+            ],
           };
         }
-      }
+      },
     );
 
     // Docs by name - moo://docs/{name}
@@ -909,11 +1060,13 @@ Write composable code - loops, conditionals, multi-step operations all work.`,
           const match = uriStr.match(/moo:\/\/docs\/(.+)/);
           if (!match) {
             return {
-              contents: [{
-                uri: uriStr,
-                mimeType: 'text/markdown',
-                text: 'Invalid URI format',
-              }],
+              contents: [
+                {
+                  uri: uriStr,
+                  mimeType: 'text/markdown',
+                  text: 'Invalid URI format',
+                },
+              ],
             };
           }
 
@@ -925,32 +1078,36 @@ Write composable code - loops, conditionals, multi-step operations all work.`,
           if (name.includes('/')) {
             // Path like city-ai/combat -> docs/city-ai/COMBAT.md
             const parts = name.split('/');
-            const fileName = parts[parts.length - 1].toUpperCase() + '.md';
+            const fileName = `${parts[parts.length - 1].toUpperCase()}.md`;
             const dirPath = parts.slice(0, -1).join('/');
             filePath = join(docsDir, dirPath, fileName);
           } else {
             // Direct filename like builders-guide -> docs/BUILDERS-GUIDE.md
-            filePath = join(docsDir, name.toUpperCase() + '.md');
+            filePath = join(docsDir, `${name.toUpperCase()}.md`);
           }
 
           const content = await readFile(filePath, 'utf-8');
           return {
-            contents: [{
-              uri: uriStr,
-              mimeType: 'text/markdown',
-              text: content,
-            }],
+            contents: [
+              {
+                uri: uriStr,
+                mimeType: 'text/markdown',
+                text: content,
+              },
+            ],
           };
         } catch (err) {
           return {
-            contents: [{
-              uri: uri.toString(),
-              mimeType: 'text/markdown',
-              text: `Error: ${String(err)}`,
-            }],
+            contents: [
+              {
+                uri: uri.toString(),
+                mimeType: 'text/markdown',
+                text: `Error: ${String(err)}`,
+              },
+            ],
           };
         }
-      }
+      },
     );
 
     // City AI docs list - moo://city-ai
@@ -963,30 +1120,34 @@ Write composable code - loops, conditionals, multi-step operations all work.`,
           const cityAiDir = join(process.cwd(), 'docs', 'city-ai');
           const files = await readdir(cityAiDir);
           const mdFiles = files
-            .filter(f => f.endsWith('.md'))
-            .map(f => ({
+            .filter((f) => f.endsWith('.md'))
+            .map((f) => ({
               uri: `moo://city-ai/${f.replace('.md', '').toLowerCase()}`,
               name: f.replace('.md', ''),
               description: `City AI: ${f.replace('.md', '').replace(/-/g, ' ')}`,
             }));
 
           return {
-            contents: [{
-              uri: 'moo://city-ai',
-              mimeType: 'application/json',
-              text: JSON.stringify(mdFiles, null, 2),
-            }],
+            contents: [
+              {
+                uri: 'moo://city-ai',
+                mimeType: 'application/json',
+                text: JSON.stringify(mdFiles, null, 2),
+              },
+            ],
           };
         } catch (err) {
           return {
-            contents: [{
-              uri: 'moo://city-ai',
-              mimeType: 'application/json',
-              text: JSON.stringify({ error: String(err) }),
-            }],
+            contents: [
+              {
+                uri: 'moo://city-ai',
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: String(err) }),
+              },
+            ],
           };
         }
-      }
+      },
     );
 
     // City AI doc by name - moo://city-ai/{name}
@@ -1000,74 +1161,89 @@ Write composable code - loops, conditionals, multi-step operations all work.`,
           const match = uriStr.match(/moo:\/\/city-ai\/(.+)/);
           if (!match) {
             return {
-              contents: [{
-                uri: uriStr,
-                mimeType: 'text/markdown',
-                text: 'Invalid URI format',
-              }],
+              contents: [
+                {
+                  uri: uriStr,
+                  mimeType: 'text/markdown',
+                  text: 'Invalid URI format',
+                },
+              ],
             };
           }
 
           const name = match[1];
           const cityAiDir = join(process.cwd(), 'docs', 'city-ai');
-          const filePath = join(cityAiDir, name.toUpperCase() + '.md');
+          const filePath = join(cityAiDir, `${name.toUpperCase()}.md`);
 
           const content = await readFile(filePath, 'utf-8');
           return {
-            contents: [{
-              uri: uriStr,
-              mimeType: 'text/markdown',
-              text: content,
-            }],
+            contents: [
+              {
+                uri: uriStr,
+                mimeType: 'text/markdown',
+                text: content,
+              },
+            ],
           };
         } catch (err) {
           return {
-            contents: [{
-              uri: uri.toString(),
-              mimeType: 'text/markdown',
-              text: `Error: ${String(err)}`,
-            }],
+            contents: [
+              {
+                uri: uri.toString(),
+                mimeType: 'text/markdown',
+                text: `Error: ${String(err)}`,
+              },
+            ],
           };
         }
-      }
+      },
     );
 
     // AI World Log - moo://ai/worldLog
     server.resource(
       'ai/worldLog',
       new ResourceTemplate('moo://ai/worldLog', { list: undefined }),
-      { description: 'Shared OOC chat between Pluribus and Sister Gray (deity chat)' },
+      {
+        description:
+          'Shared OOC chat between Pluribus and Sister Gray (deity chat)',
+      },
       async () => {
         try {
           const $ai = this.manager.getAliases().get('ai');
           if (!$ai) {
             return {
-              contents: [{
-                uri: 'moo://ai/worldLog',
-                mimeType: 'application/json',
-                text: JSON.stringify({ error: '$.ai not bootstrapped' }),
-              }],
+              contents: [
+                {
+                  uri: 'moo://ai/worldLog',
+                  mimeType: 'application/json',
+                  text: JSON.stringify({ error: '$.ai not bootstrapped' }),
+                },
+              ],
             };
           }
 
           const worldLog = $ai.get('worldLog') || [];
           return {
-            contents: [{
-              uri: 'moo://ai/worldLog',
-              mimeType: 'application/json',
-              text: JSON.stringify(worldLog, null, 2),
-            }],
+            contents: [
+              {
+                uri: 'moo://ai/worldLog',
+                mimeType: 'application/json',
+                text: JSON.stringify(worldLog, null, 2),
+              },
+            ],
           };
         } catch (err) {
           return {
-            contents: [{
-              uri: 'moo://ai/worldLog',
-              mimeType: 'application/json',
-              text: JSON.stringify({ error: String(err) }),
-            }],
+            contents: [
+              {
+                uri: 'moo://ai/worldLog',
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: String(err) }),
+              },
+            ],
           };
         }
-      }
+      },
     );
 
     // AI NPC memories - moo://ai/{id}/memories
@@ -1081,46 +1257,56 @@ Write composable code - loops, conditionals, multi-step operations all work.`,
           const match = uriStr.match(/moo:\/\/ai\/(.+)\/memories/);
           if (!match) {
             return {
-              contents: [{
-                uri: uriStr,
-                mimeType: 'application/json',
-                text: JSON.stringify({ error: 'Invalid URI format' }),
-              }],
+              contents: [
+                {
+                  uri: uriStr,
+                  mimeType: 'application/json',
+                  text: JSON.stringify({ error: 'Invalid URI format' }),
+                },
+              ],
             };
           }
 
           const idStr = match[1];
-          const npcId = idStr.startsWith('#') ? parseInt(idStr.slice(1)) : parseInt(idStr);
+          const npcId = idStr.startsWith('#')
+            ? parseInt(idStr.slice(1), 10)
+            : parseInt(idStr, 10);
 
           const npc = await this.manager.load(npcId);
           if (!npc) {
             return {
-              contents: [{
-                uri: uriStr,
-                mimeType: 'application/json',
-                text: JSON.stringify({ error: `NPC #${npcId} not found` }),
-              }],
+              contents: [
+                {
+                  uri: uriStr,
+                  mimeType: 'application/json',
+                  text: JSON.stringify({ error: `NPC #${npcId} not found` }),
+                },
+              ],
             };
           }
 
           const memories = npc.get('memories') || [];
           return {
-            contents: [{
-              uri: uriStr,
-              mimeType: 'application/json',
-              text: JSON.stringify(memories, null, 2),
-            }],
+            contents: [
+              {
+                uri: uriStr,
+                mimeType: 'application/json',
+                text: JSON.stringify(memories, null, 2),
+              },
+            ],
           };
         } catch (err) {
           return {
-            contents: [{
-              uri: uri.toString(),
-              mimeType: 'application/json',
-              text: JSON.stringify({ error: String(err) }),
-            }],
+            contents: [
+              {
+                uri: uri.toString(),
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: String(err) }),
+              },
+            ],
           };
         }
-      }
+      },
     );
 
     // AI NPC notes - moo://ai/{id}/notes
@@ -1134,46 +1320,56 @@ Write composable code - loops, conditionals, multi-step operations all work.`,
           const match = uriStr.match(/moo:\/\/ai\/(.+)\/notes/);
           if (!match) {
             return {
-              contents: [{
-                uri: uriStr,
-                mimeType: 'application/json',
-                text: JSON.stringify({ error: 'Invalid URI format' }),
-              }],
+              contents: [
+                {
+                  uri: uriStr,
+                  mimeType: 'application/json',
+                  text: JSON.stringify({ error: 'Invalid URI format' }),
+                },
+              ],
             };
           }
 
           const idStr = match[1];
-          const npcId = idStr.startsWith('#') ? parseInt(idStr.slice(1)) : parseInt(idStr);
+          const npcId = idStr.startsWith('#')
+            ? parseInt(idStr.slice(1), 10)
+            : parseInt(idStr, 10);
 
           const npc = await this.manager.load(npcId);
           if (!npc) {
             return {
-              contents: [{
-                uri: uriStr,
-                mimeType: 'application/json',
-                text: JSON.stringify({ error: `NPC #${npcId} not found` }),
-              }],
+              contents: [
+                {
+                  uri: uriStr,
+                  mimeType: 'application/json',
+                  text: JSON.stringify({ error: `NPC #${npcId} not found` }),
+                },
+              ],
             };
           }
 
           const notes = npc.get('notes') || {};
           return {
-            contents: [{
-              uri: uriStr,
-              mimeType: 'application/json',
-              text: JSON.stringify(notes, null, 2),
-            }],
+            contents: [
+              {
+                uri: uriStr,
+                mimeType: 'application/json',
+                text: JSON.stringify(notes, null, 2),
+              },
+            ],
           };
         } catch (err) {
           return {
-            contents: [{
-              uri: uri.toString(),
-              mimeType: 'application/json',
-              text: JSON.stringify({ error: String(err) }),
-            }],
+            contents: [
+              {
+                uri: uri.toString(),
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: String(err) }),
+              },
+            ],
           };
         }
-      }
+      },
     );
 
     // Plot events - moo://plots/{id}/events
@@ -1187,11 +1383,13 @@ Write composable code - loops, conditionals, multi-step operations all work.`,
           const match = uriStr.match(/moo:\/\/plots\/(.+)\/events/);
           if (!match) {
             return {
-              contents: [{
-                uri: uriStr,
-                mimeType: 'application/json',
-                text: JSON.stringify({ error: 'Invalid URI format' }),
-              }],
+              contents: [
+                {
+                  uri: uriStr,
+                  mimeType: 'application/json',
+                  text: JSON.stringify({ error: 'Invalid URI format' }),
+                },
+              ],
             };
           }
 
@@ -1199,45 +1397,53 @@ Write composable code - loops, conditionals, multi-step operations all work.`,
           const $plot = this.manager.getAliases().get('plot');
           if (!$plot) {
             return {
-              contents: [{
-                uri: uriStr,
-                mimeType: 'application/json',
-                text: JSON.stringify({ error: '$.plot not bootstrapped' }),
-              }],
+              contents: [
+                {
+                  uri: uriStr,
+                  mimeType: 'application/json',
+                  text: JSON.stringify({ error: '$.plot not bootstrapped' }),
+                },
+              ],
             };
           }
 
-          const plots = await $plot.call('listPlots') as any[];
-          const plot = plots.find(p => p.id === plotId);
+          const plots = (await $plot.call('listPlots')) as any[];
+          const plot = plots.find((p) => p.id === plotId);
 
           if (!plot) {
             return {
-              contents: [{
-                uri: uriStr,
-                mimeType: 'application/json',
-                text: JSON.stringify({ error: `Plot '${plotId}' not found` }),
-              }],
+              contents: [
+                {
+                  uri: uriStr,
+                  mimeType: 'application/json',
+                  text: JSON.stringify({ error: `Plot '${plotId}' not found` }),
+                },
+              ],
             };
           }
 
           const events = plot.events || [];
           return {
-            contents: [{
-              uri: uriStr,
-              mimeType: 'application/json',
-              text: JSON.stringify(events, null, 2),
-            }],
+            contents: [
+              {
+                uri: uriStr,
+                mimeType: 'application/json',
+                text: JSON.stringify(events, null, 2),
+              },
+            ],
           };
         } catch (err) {
           return {
-            contents: [{
-              uri: uri.toString(),
-              mimeType: 'application/json',
-              text: JSON.stringify({ error: String(err) }),
-            }],
+            contents: [
+              {
+                uri: uri.toString(),
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: String(err) }),
+              },
+            ],
           };
         }
-      }
+      },
     );
 
     // Recent events - moo://events/recent
@@ -1250,15 +1456,17 @@ Write composable code - loops, conditionals, multi-step operations all work.`,
           const $plot = this.manager.getAliases().get('plot');
           if (!$plot) {
             return {
-              contents: [{
-                uri: 'moo://events/recent',
-                mimeType: 'application/json',
-                text: JSON.stringify({ error: '$.plot not bootstrapped' }),
-              }],
+              contents: [
+                {
+                  uri: 'moo://events/recent',
+                  mimeType: 'application/json',
+                  text: JSON.stringify({ error: '$.plot not bootstrapped' }),
+                },
+              ],
             };
           }
 
-          const plots = await $plot.call('listPlots') as any[];
+          const plots = (await $plot.call('listPlots')) as any[];
           const allEvents: any[] = [];
 
           for (const plot of plots) {
@@ -1278,22 +1486,26 @@ Write composable code - loops, conditionals, multi-step operations all work.`,
           const recent = allEvents.slice(0, 50);
 
           return {
-            contents: [{
-              uri: 'moo://events/recent',
-              mimeType: 'application/json',
-              text: JSON.stringify(recent, null, 2),
-            }],
+            contents: [
+              {
+                uri: 'moo://events/recent',
+                mimeType: 'application/json',
+                text: JSON.stringify(recent, null, 2),
+              },
+            ],
           };
         } catch (err) {
           return {
-            contents: [{
-              uri: 'moo://events/recent',
-              mimeType: 'application/json',
-              text: JSON.stringify({ error: String(err) }),
-            }],
+            contents: [
+              {
+                uri: 'moo://events/recent',
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: String(err) }),
+              },
+            ],
           };
         }
-      }
+      },
     );
 
     // Individual player - moo://players/{id}
@@ -1307,25 +1519,33 @@ Write composable code - loops, conditionals, multi-step operations all work.`,
           const match = uriStr.match(/moo:\/\/players\/(.+)/);
           if (!match) {
             return {
-              contents: [{
-                uri: uriStr,
-                mimeType: 'application/json',
-                text: JSON.stringify({ error: 'Invalid URI format' }),
-              }],
+              contents: [
+                {
+                  uri: uriStr,
+                  mimeType: 'application/json',
+                  text: JSON.stringify({ error: 'Invalid URI format' }),
+                },
+              ],
             };
           }
 
           const idStr = match[1];
-          const playerId = idStr.startsWith('#') ? parseInt(idStr.slice(1)) : parseInt(idStr);
+          const playerId = idStr.startsWith('#')
+            ? parseInt(idStr.slice(1), 10)
+            : parseInt(idStr, 10);
 
           const player = await this.manager.load(playerId);
           if (!player) {
             return {
-              contents: [{
-                uri: uriStr,
-                mimeType: 'application/json',
-                text: JSON.stringify({ error: `Player #${playerId} not found` }),
-              }],
+              contents: [
+                {
+                  uri: uriStr,
+                  mimeType: 'application/json',
+                  text: JSON.stringify({
+                    error: `Player #${playerId} not found`,
+                  }),
+                },
+              ],
             };
           }
 
@@ -1341,22 +1561,26 @@ Write composable code - loops, conditionals, multi-step operations all work.`,
           });
 
           return {
-            contents: [{
-              uri: uriStr,
-              mimeType: 'application/json',
-              text: JSON.stringify(serialized, null, 2),
-            }],
+            contents: [
+              {
+                uri: uriStr,
+                mimeType: 'application/json',
+                text: JSON.stringify(serialized, null, 2),
+              },
+            ],
           };
         } catch (err) {
           return {
-            contents: [{
-              uri: uri.toString(),
-              mimeType: 'application/json',
-              text: JSON.stringify({ error: String(err) }),
-            }],
+            contents: [
+              {
+                uri: uri.toString(),
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: String(err) }),
+              },
+            ],
           };
         }
-      }
+      },
     );
 
     // Schema - moo://schema
@@ -1365,10 +1589,11 @@ Write composable code - loops, conditionals, multi-step operations all work.`,
       'moo://schema',
       { description: 'MOO object schema documentation' },
       async () => ({
-        contents: [{
-          uri: 'moo://schema',
-          mimeType: 'text/plain',
-          text: `MOO Object Schema:
+        contents: [
+          {
+            uri: 'moo://schema',
+            mimeType: 'text/plain',
+            text: `MOO Object Schema:
 
 GameObject {
   _id: number          // Unique object ID (e.g., 0, 1, 2...)
@@ -1401,14 +1626,17 @@ Core Objects:
 - #0: ObjectManager (system root)
 - #1: Root (base for inheritance)
 - #2: System (connection handlers)`,
-        }],
-      })
+          },
+        ],
+      }),
     );
 
     // Object property - moo://objects/{id}/prop/{name}
     server.resource(
       'objects/{id}/prop/{name}',
-      new ResourceTemplate('moo://objects/{id}/prop/{name}', { list: undefined }),
+      new ResourceTemplate('moo://objects/{id}/prop/{name}', {
+        list: undefined,
+      }),
       { description: 'Get a specific property from a MOO object' },
       async (uri: URL) => {
         try {
@@ -1416,25 +1644,31 @@ Core Objects:
           const match = uriStr.match(/moo:\/\/objects\/(.+)\/prop\/(.+)/);
           if (!match) {
             return {
-              contents: [{
-                uri: uriStr,
-                mimeType: 'application/json',
-                text: JSON.stringify({ error: 'Invalid URI format' }),
-              }],
+              contents: [
+                {
+                  uri: uriStr,
+                  mimeType: 'application/json',
+                  text: JSON.stringify({ error: 'Invalid URI format' }),
+                },
+              ],
             };
           }
 
           const [, idStr, propName] = match;
-          const objId = idStr.startsWith('#') ? parseInt(idStr.slice(1)) : parseInt(idStr);
+          const objId = idStr.startsWith('#')
+            ? parseInt(idStr.slice(1), 10)
+            : parseInt(idStr, 10);
 
           const obj = await this.manager.load(objId);
           if (!obj) {
             return {
-              contents: [{
-                uri: uriStr,
-                mimeType: 'application/json',
-                text: JSON.stringify({ error: `Object #${objId} not found` }),
-              }],
+              contents: [
+                {
+                  uri: uriStr,
+                  mimeType: 'application/json',
+                  text: JSON.stringify({ error: `Object #${objId} not found` }),
+                },
+              ],
             };
           }
 
@@ -1442,54 +1676,69 @@ Core Objects:
           const serialized = this.serializeValue({ [propName]: value });
 
           return {
-            contents: [{
-              uri: uriStr,
-              mimeType: 'application/json',
-              text: JSON.stringify(serialized, null, 2),
-            }],
+            contents: [
+              {
+                uri: uriStr,
+                mimeType: 'application/json',
+                text: JSON.stringify(serialized, null, 2),
+              },
+            ],
           };
         } catch (err) {
           return {
-            contents: [{
-              uri: uri.toString(),
-              mimeType: 'application/json',
-              text: JSON.stringify({ error: String(err) }),
-            }],
+            contents: [
+              {
+                uri: uri.toString(),
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: String(err) }),
+              },
+            ],
           };
         }
-      }
+      },
     );
 
     // Object method - moo://objects/{id}/method/{name}
     server.resource(
       'objects/{id}/method/{name}',
-      new ResourceTemplate('moo://objects/{id}/method/{name}', { list: undefined }),
-      { description: 'Get the TypeScript code for a method on a MOO object (walks inheritance chain)' },
+      new ResourceTemplate('moo://objects/{id}/method/{name}', {
+        list: undefined,
+      }),
+      {
+        description:
+          'Get the TypeScript code for a method on a MOO object (walks inheritance chain)',
+      },
       async (uri: URL) => {
         try {
           const uriStr = uri.toString();
           const match = uriStr.match(/moo:\/\/objects\/(.+)\/method\/(.+)/);
           if (!match) {
             return {
-              contents: [{
-                uri: uriStr,
-                mimeType: 'text/typescript',
-                text: '// Invalid URI format',
-              }],
+              contents: [
+                {
+                  uri: uriStr,
+                  mimeType: 'text/typescript',
+                  text: '// Invalid URI format',
+                },
+              ],
             };
           }
 
           const [, idStr, methodName] = match;
-          const objId = idStr.startsWith('#') ? parseInt(idStr.slice(1)) : parseInt(idStr);
+          const objId = idStr.startsWith('#')
+            ? parseInt(idStr.slice(1), 10)
+            : parseInt(idStr, 10);
 
           const obj = await this.manager.load(objId);
           if (!obj) {
             return {
-              contents: [{
-                uri: uriStr,
-                mimeType: 'text/typescript',
-                text: `// Object #${objId} not found`,
-              }],
+              contents: [
+                {
+                  uri: uriStr,
+                  mimeType: 'text/typescript',
+                  text: `// Object #${objId} not found`,
+                },
+              ],
             };
           }
 
@@ -1506,40 +1755,50 @@ Core Objects:
               break;
             }
             const parent = current.get('parent');
-            current = parent && typeof parent === 'object' && 'id' in parent ? parent : undefined;
+            current =
+              parent && typeof parent === 'object' && 'id' in parent
+                ? parent
+                : undefined;
           }
 
           if (!methodCode) {
             return {
-              contents: [{
-                uri: uriStr,
-                mimeType: 'text/typescript',
-                text: `// Method '${methodName}' not found on #${objId} or its parents`,
-              }],
+              contents: [
+                {
+                  uri: uriStr,
+                  mimeType: 'text/typescript',
+                  text: `// Method '${methodName}' not found on #${objId} or its parents`,
+                },
+              ],
             };
           }
 
-          const header = foundInId !== objId
-            ? `// Method '${methodName}' inherited from #${foundInId}\n\n`
-            : `// Method '${methodName}' on #${objId}\n\n`;
+          const header =
+            foundInId !== objId
+              ? `// Method '${methodName}' inherited from #${foundInId}\n\n`
+              : `// Method '${methodName}' on #${objId}\n\n`;
 
           return {
-            contents: [{
-              uri: uriStr,
-              mimeType: 'text/typescript',
-              text: header + methodCode,
-            }],
+            contents: [
+              {
+                uri: uriStr,
+                mimeType: 'text/typescript',
+                text: header + methodCode,
+              },
+            ],
           };
         } catch (err) {
           return {
-            contents: [{
-              uri: uri.toString(),
-              mimeType: 'text/typescript',
-              text: `// Error: ${String(err)}`,
-            }],
+            contents: [
+              {
+                uri: uri.toString(),
+                mimeType: 'text/typescript',
+                text: `// Error: ${String(err)}`,
+              },
+            ],
           };
         }
-      }
+      },
     );
 
     // Object verbs - moo://objects/{id}/verbs
@@ -1553,46 +1812,56 @@ Core Objects:
           const match = uriStr.match(/moo:\/\/objects\/(.+)\/verbs/);
           if (!match) {
             return {
-              contents: [{
-                uri: uriStr,
-                mimeType: 'application/json',
-                text: JSON.stringify({ error: 'Invalid URI format' }),
-              }],
+              contents: [
+                {
+                  uri: uriStr,
+                  mimeType: 'application/json',
+                  text: JSON.stringify({ error: 'Invalid URI format' }),
+                },
+              ],
             };
           }
 
           const idStr = match[1];
-          const objId = idStr.startsWith('#') ? parseInt(idStr.slice(1)) : parseInt(idStr);
+          const objId = idStr.startsWith('#')
+            ? parseInt(idStr.slice(1), 10)
+            : parseInt(idStr, 10);
 
           const obj = await this.manager.load(objId);
           if (!obj) {
             return {
-              contents: [{
-                uri: uriStr,
-                mimeType: 'application/json',
-                text: JSON.stringify({ error: `Object #${objId} not found` }),
-              }],
+              contents: [
+                {
+                  uri: uriStr,
+                  mimeType: 'application/json',
+                  text: JSON.stringify({ error: `Object #${objId} not found` }),
+                },
+              ],
             };
           }
 
           const verbs = obj.get('verbs') || {};
           return {
-            contents: [{
-              uri: uriStr,
-              mimeType: 'application/json',
-              text: JSON.stringify(verbs, null, 2),
-            }],
+            contents: [
+              {
+                uri: uriStr,
+                mimeType: 'application/json',
+                text: JSON.stringify(verbs, null, 2),
+              },
+            ],
           };
         } catch (err) {
           return {
-            contents: [{
-              uri: uri.toString(),
-              mimeType: 'application/json',
-              text: JSON.stringify({ error: String(err) }),
-            }],
+            contents: [
+              {
+                uri: uri.toString(),
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: String(err) }),
+              },
+            ],
           };
         }
-      }
+      },
     );
 
     // Paginated object list - moo://objects/list/{page}
@@ -1606,15 +1875,17 @@ Core Objects:
           const match = uriStr.match(/moo:\/\/objects\/list\/(\d+)/);
           if (!match) {
             return {
-              contents: [{
-                uri: uriStr,
-                mimeType: 'application/json',
-                text: JSON.stringify({ error: 'Invalid URI format' }),
-              }],
+              contents: [
+                {
+                  uri: uriStr,
+                  mimeType: 'application/json',
+                  text: JSON.stringify({ error: 'Invalid URI format' }),
+                },
+              ],
             };
           }
 
-          const page = parseInt(match[1]);
+          const page = parseInt(match[1], 10);
           const pageSize = 100;
           const skip = (page - 1) * pageSize;
 
@@ -1622,37 +1893,43 @@ Core Objects:
           const total = allObjs.length;
           const totalPages = Math.ceil(total / pageSize);
 
-          const pageObjs = allObjs
-            .slice(skip, skip + pageSize)
-            .map(doc => ({
-              id: doc._id,
-              parent: this.getValue(doc.parent),
-              name: this.getValue(doc.properties.name),
-            }));
+          const pageObjs = allObjs.slice(skip, skip + pageSize).map((doc) => ({
+            id: doc._id,
+            parent: this.getValue(doc.parent),
+            name: this.getValue(doc.properties.name),
+          }));
 
           return {
-            contents: [{
-              uri: uriStr,
-              mimeType: 'application/json',
-              text: JSON.stringify({
-                page,
-                pageSize,
-                total,
-                totalPages,
-                objects: pageObjs,
-              }, null, 2),
-            }],
+            contents: [
+              {
+                uri: uriStr,
+                mimeType: 'application/json',
+                text: JSON.stringify(
+                  {
+                    page,
+                    pageSize,
+                    total,
+                    totalPages,
+                    objects: pageObjs,
+                  },
+                  null,
+                  2,
+                ),
+              },
+            ],
           };
         } catch (err) {
           return {
-            contents: [{
-              uri: uri.toString(),
-              mimeType: 'application/json',
-              text: JSON.stringify({ error: String(err) }),
-            }],
+            contents: [
+              {
+                uri: uri.toString(),
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: String(err) }),
+              },
+            ],
           };
         }
-      }
+      },
     );
 
     // NPC Sessions list - moo://npc-sessions
@@ -1665,82 +1942,110 @@ Core Objects:
           const $ai = this.manager.getAliases().get('ai');
           if (!$ai) {
             return {
-              contents: [{
-                uri: 'moo://npc-sessions',
-                mimeType: 'application/json',
-                text: JSON.stringify({ error: '$.ai not bootstrapped' }),
-              }],
+              contents: [
+                {
+                  uri: 'moo://npc-sessions',
+                  mimeType: 'application/json',
+                  text: JSON.stringify({ error: '$.ai not bootstrapped' }),
+                },
+              ],
             };
           }
 
           // Get sessions from $ai.listSessions() - persists after NPC recycling
-          const sessions = await $ai.call('listSessions') || [];
+          const sessions = (await $ai.call('listSessions')) || [];
 
           return {
-            contents: [{
-              uri: 'moo://npc-sessions',
-              mimeType: 'application/json',
-              text: JSON.stringify({ sessions }, null, 2),
-            }],
+            contents: [
+              {
+                uri: 'moo://npc-sessions',
+                mimeType: 'application/json',
+                text: JSON.stringify({ sessions }, null, 2),
+              },
+            ],
           };
         } catch (err) {
           return {
-            contents: [{
-              uri: 'moo://npc-sessions',
-              mimeType: 'application/json',
-              text: JSON.stringify({ error: String(err) }),
-            }],
+            contents: [
+              {
+                uri: 'moo://npc-sessions',
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: String(err) }),
+              },
+            ],
           };
         }
-      }
+      },
     );
 
     // Individual NPC session - moo://npc-sessions/{sessionId}
     server.resource(
       'npc-sessions/{sessionId}',
-      new ResourceTemplate('moo://npc-sessions/{sessionId}', { list: undefined }),
+      new ResourceTemplate('moo://npc-sessions/{sessionId}', {
+        list: undefined,
+      }),
       { description: 'Get conversation history for a specific NPC session' },
       async (_uri: URL, variables: { sessionId?: string | string[] }) => {
         const sessionIdVar = variables.sessionId;
-        const sessionId = Array.isArray(sessionIdVar) ? sessionIdVar[0] : sessionIdVar;
+        const sessionId = Array.isArray(sessionIdVar)
+          ? sessionIdVar[0]
+          : sessionIdVar;
 
         if (!sessionId) {
           return {
-            contents: [{
-              uri: 'moo://npc-sessions/unknown',
-              mimeType: 'application/json',
-              text: JSON.stringify({ error: 'Missing session ID' }),
-            }],
+            contents: [
+              {
+                uri: 'moo://npc-sessions/unknown',
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: 'Missing session ID' }),
+              },
+            ],
           };
         }
 
         try {
           // Get session metadata from $ai registry
           const $ai = this.manager.getAliases().get('ai');
-          const sessionInfo = $ai ? await $ai.call('getSession', sessionId) : null;
+          const sessionInfo = $ai
+            ? await $ai.call('getSession', sessionId)
+            : null;
 
           // JSONL session files are stored in ~/.claude/projects/-home-node/
-          const sessionsDir = join(process.env.HOME || '/home/node', '.claude', 'projects', '-home-node');
+          const sessionsDir = join(
+            process.env.HOME || '/home/node',
+            '.claude',
+            'projects',
+            '-home-node',
+          );
           const sessionFile = join(sessionsDir, `${sessionId}.jsonl`);
 
           if (!existsSync(sessionFile)) {
             return {
-              contents: [{
-                uri: `moo://npc-sessions/${sessionId}`,
-                mimeType: 'application/json',
-                text: JSON.stringify({
-                  sessionId,
-                  ...(sessionInfo as any || {}),
-                  error: 'Session file not found',
-                }),
-              }],
+              contents: [
+                {
+                  uri: `moo://npc-sessions/${sessionId}`,
+                  mimeType: 'application/json',
+                  text: JSON.stringify({
+                    sessionId,
+                    ...((sessionInfo as any) || {}),
+                    error: 'Session file not found',
+                  }),
+                },
+              ],
             };
           }
 
           // Read and parse JSONL file
           const content = readFileSync(sessionFile, 'utf-8');
-          const lines = content.trim().split('\n').filter(l => l.trim());
-          const messages: Array<{ type: string; timestamp?: string; content?: unknown }> = [];
+          const lines = content
+            .trim()
+            .split('\n')
+            .filter((l) => l.trim());
+          const messages: Array<{
+            type: string;
+            timestamp?: string;
+            content?: unknown;
+          }> = [];
 
           for (const line of lines) {
             try {
@@ -1752,7 +2057,10 @@ Core Objects:
                   timestamp: parsed.timestamp,
                   content: parsed.message.content,
                 });
-              } else if (parsed.type === 'assistant' && parsed.message?.content) {
+              } else if (
+                parsed.type === 'assistant' &&
+                parsed.message?.content
+              ) {
                 messages.push({
                   type: 'assistant',
                   timestamp: parsed.timestamp,
@@ -1764,33 +2072,41 @@ Core Objects:
             }
           }
 
-          const sessionInfoObj = sessionInfo as any || {};
+          const sessionInfoObj = (sessionInfo as any) || {};
           return {
-            contents: [{
-              uri: `moo://npc-sessions/${sessionId}`,
-              mimeType: 'application/json',
-              text: JSON.stringify({
-                sessionId,
-                npcId: sessionInfoObj.npcId,
-                npcName: sessionInfoObj.npcName,
-                role: sessionInfoObj.role,
-                startTime: sessionInfoObj.startTime,
-                lastActive: sessionInfoObj.lastActive,
-                messageCount: messages.length,
-                messages,
-              }, null, 2),
-            }],
+            contents: [
+              {
+                uri: `moo://npc-sessions/${sessionId}`,
+                mimeType: 'application/json',
+                text: JSON.stringify(
+                  {
+                    sessionId,
+                    npcId: sessionInfoObj.npcId,
+                    npcName: sessionInfoObj.npcName,
+                    role: sessionInfoObj.role,
+                    startTime: sessionInfoObj.startTime,
+                    lastActive: sessionInfoObj.lastActive,
+                    messageCount: messages.length,
+                    messages,
+                  },
+                  null,
+                  2,
+                ),
+              },
+            ],
           };
         } catch (err) {
           return {
-            contents: [{
-              uri: `moo://npc-sessions/${sessionId}`,
-              mimeType: 'application/json',
-              text: JSON.stringify({ error: String(err) }),
-            }],
+            contents: [
+              {
+                uri: `moo://npc-sessions/${sessionId}`,
+                mimeType: 'application/json',
+                text: JSON.stringify({ error: String(err) }),
+              },
+            ],
           };
         }
-      }
+      },
     );
   }
 
@@ -1798,50 +2114,64 @@ Core Objects:
    * Start HTTP server
    */
   async start(): Promise<void> {
-    this.httpServer = createServer(async (req: IncomingMessage, res: ServerResponse) => {
-      // CORS
-      res.setHeader('Access-Control-Allow-Origin', '*');
-      res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
-      res.setHeader('Access-Control-Allow-Headers', 'Content-Type, mcp-session-id');
+    this.httpServer = createServer(
+      async (req: IncomingMessage, res: ServerResponse) => {
+        // CORS
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader(
+          'Access-Control-Allow-Methods',
+          'GET, POST, DELETE, OPTIONS',
+        );
+        res.setHeader(
+          'Access-Control-Allow-Headers',
+          'Content-Type, mcp-session-id',
+        );
 
-      if (req.method === 'OPTIONS') {
-        res.writeHead(204);
-        res.end();
-        return;
-      }
-
-      if (req.url !== '/mcp') {
-        res.writeHead(404);
-        res.end('Not Found');
-        return;
-      }
-
-      const sessionId = req.headers['mcp-session-id'] as string | undefined;
-
-      try {
-        if (req.method === 'POST') {
-          await this.handlePost(req, res, sessionId);
-        } else if (req.method === 'GET') {
-          await this.handleGet(req, res, sessionId);
-        } else if (req.method === 'DELETE') {
-          this.handleDelete(res, sessionId);
-        } else {
-          res.writeHead(405);
-          res.end('Method Not Allowed');
+        if (req.method === 'OPTIONS') {
+          res.writeHead(204);
+          res.end();
+          return;
         }
-      } catch (err) {
-        console.error('MCP request error:', err);
-        res.writeHead(500);
-        res.end('Internal Server Error');
-      }
-    });
+
+        if (req.url !== '/mcp') {
+          res.writeHead(404);
+          res.end('Not Found');
+          return;
+        }
+
+        const sessionId = req.headers['mcp-session-id'] as string | undefined;
+
+        try {
+          if (req.method === 'POST') {
+            await this.handlePost(req, res, sessionId);
+          } else if (req.method === 'GET') {
+            await this.handleGet(req, res, sessionId);
+          } else if (req.method === 'DELETE') {
+            this.handleDelete(res, sessionId);
+          } else {
+            res.writeHead(405);
+            res.end('Method Not Allowed');
+          }
+        } catch (err) {
+          console.error('MCP request error:', err);
+          res.writeHead(500);
+          res.end('Internal Server Error');
+        }
+      },
+    );
 
     this.httpServer.listen(this.port, this.host, () => {
-      console.log(`🔮 MCP server (code-first) listening on http://${this.host}:${this.port}/mcp`);
+      console.log(
+        `🔮 MCP server (code-first) listening on http://${this.host}:${this.port}/mcp`,
+      );
     });
   }
 
-  private async handlePost(req: IncomingMessage, res: ServerResponse, sessionId?: string): Promise<void> {
+  private async handlePost(
+    req: IncomingMessage,
+    res: ServerResponse,
+    sessionId?: string,
+  ): Promise<void> {
     const body = await this.readBody(req);
     const message = JSON.parse(body);
 
@@ -1859,9 +2189,13 @@ Core Objects:
         onsessioninitialized: (newSessionId) => {
           this.sessions.set(newSessionId, { server, transport, playerId });
           if (playerId) {
-            console.log(`[MCP] Authenticated session ${newSessionId} as player #${playerId}`);
+            console.log(
+              `[MCP] Authenticated session ${newSessionId} as player #${playerId}`,
+            );
           } else {
-            console.log(`[MCP] Unauthenticated session ${newSessionId} (no credentials provided)`);
+            console.log(
+              `[MCP] Unauthenticated session ${newSessionId} (no credentials provided)`,
+            );
           }
         },
       });
@@ -1891,8 +2225,8 @@ Core Objects:
         params: {
           protocolVersion: '2024-11-05',
           capabilities: {},
-          clientInfo: { name: 'reconnected-client', version: '1.0.0' }
-        }
+          clientInfo: { name: 'reconnected-client', version: '1.0.0' },
+        },
       };
 
       const fakeRes = {
@@ -1907,11 +2241,19 @@ Core Objects:
       await transport.handleRequest(req, res, message);
     } else {
       res.writeHead(400);
-      res.end(JSON.stringify({ error: 'Bad Request: No session ID and not an initialize request' }));
+      res.end(
+        JSON.stringify({
+          error: 'Bad Request: No session ID and not an initialize request',
+        }),
+      );
     }
   }
 
-  private async handleGet(req: IncomingMessage, res: ServerResponse, sessionId?: string): Promise<void> {
+  private async handleGet(
+    req: IncomingMessage,
+    res: ServerResponse,
+    sessionId?: string,
+  ): Promise<void> {
     if (!sessionId) {
       res.writeHead(400);
       res.end(JSON.stringify({ error: 'Missing session ID' }));
@@ -1919,7 +2261,9 @@ Core Objects:
     }
     if (!this.sessions.has(sessionId)) {
       res.writeHead(410);
-      res.end(JSON.stringify({ error: 'Session expired', code: 'SESSION_EXPIRED' }));
+      res.end(
+        JSON.stringify({ error: 'Session expired', code: 'SESSION_EXPIRED' }),
+      );
       return;
     }
     const session = this.sessions.get(sessionId)!;
@@ -1941,7 +2285,7 @@ Core Objects:
   private readBody(req: IncomingMessage): Promise<string> {
     return new Promise((resolve, reject) => {
       let body = '';
-      req.on('data', chunk => body += chunk);
+      req.on('data', (chunk) => (body += chunk));
       req.on('end', () => resolve(body));
       req.on('error', reject);
     });
@@ -1954,14 +2298,17 @@ Core Objects:
     }
     if (this.httpServer) {
       await new Promise<void>((resolve, reject) => {
-        this.httpServer!.close(err => err ? reject(err) : resolve());
+        this.httpServer?.close((err) => (err ? reject(err) : resolve()));
       });
       this.httpServer = null;
     }
   }
 }
 
-export async function createMCPServer(manager: ObjectManager, config?: MCPServerConfig): Promise<MaliceMCPServer> {
+export async function createMCPServer(
+  manager: ObjectManager,
+  config?: MCPServerConfig,
+): Promise<MaliceMCPServer> {
   const server = new MaliceMCPServer(manager, config);
   await server.start();
   return server;

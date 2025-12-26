@@ -3,9 +3,8 @@
  * Maps MongoDB objects to TypeScript virtual files
  */
 
-import type { ObjId } from '../../types/object.js';
+import type { ObjId, RuntimeObject } from '../../types/object.js';
 import type { ObjectManager } from '../database/object-manager.js';
-import type { RuntimeObject } from '../../types/object.js';
 
 /**
  * Virtual document representing an object's method
@@ -65,57 +64,105 @@ export class VirtualFileSystem {
 
   // Automatic categorization rules
   private readonly CATEGORIES: MethodCategory[] = [
-    { id: 'lifecycle', name: '🔧 Lifecycle', icon: 'gear', priority: 1, description: 'Object lifecycle methods (connect, disconnect, init, etc.)' },
-    { id: 'events', name: '📡 Events', icon: 'broadcast', priority: 2, description: 'Event handlers and callbacks' },
-    { id: 'public', name: '🔍 Public API', icon: 'symbol-mixin', priority: 3, description: 'User-facing methods and commands' },
-    { id: 'combat', name: '⚔️ Combat', icon: 'sword', priority: 4, description: 'Combat-related methods' },
-    { id: 'communication', name: '💬 Communication', icon: 'comment-discussion', priority: 5, description: 'Chat and messaging methods' },
-    { id: 'movement', name: '🚶 Movement', icon: 'arrow-right', priority: 6, description: 'Movement and navigation methods' },
-    { id: 'inventory', name: '🎒 Inventory', icon: 'package', priority: 7, description: 'Item and inventory management' },
-    { id: 'internal', name: '🔧 Internal', icon: 'wrench', priority: 8, description: 'Internal helper methods and utilities' },
+    {
+      id: 'lifecycle',
+      name: '🔧 Lifecycle',
+      icon: 'gear',
+      priority: 1,
+      description: 'Object lifecycle methods (connect, disconnect, init, etc.)',
+    },
+    {
+      id: 'events',
+      name: '📡 Events',
+      icon: 'broadcast',
+      priority: 2,
+      description: 'Event handlers and callbacks',
+    },
+    {
+      id: 'public',
+      name: '🔍 Public API',
+      icon: 'symbol-mixin',
+      priority: 3,
+      description: 'User-facing methods and commands',
+    },
+    {
+      id: 'combat',
+      name: '⚔️ Combat',
+      icon: 'sword',
+      priority: 4,
+      description: 'Combat-related methods',
+    },
+    {
+      id: 'communication',
+      name: '💬 Communication',
+      icon: 'comment-discussion',
+      priority: 5,
+      description: 'Chat and messaging methods',
+    },
+    {
+      id: 'movement',
+      name: '🚶 Movement',
+      icon: 'arrow-right',
+      priority: 6,
+      description: 'Movement and navigation methods',
+    },
+    {
+      id: 'inventory',
+      name: '🎒 Inventory',
+      icon: 'package',
+      priority: 7,
+      description: 'Item and inventory management',
+    },
+    {
+      id: 'internal',
+      name: '🔧 Internal',
+      icon: 'wrench',
+      priority: 8,
+      description: 'Internal helper methods and utilities',
+    },
   ];
 
   // Method name patterns for categorization
   private readonly CATEGORY_PATTERNS: Record<string, RegExp[]> = {
     lifecycle: [
       /^(connect|disconnect|init|destroy|onCreate|onDestroy|onConnect|onDisconnect)/,
-      /^(startup|shutdown|reset|cleanup)/
+      /^(startup|shutdown|reset|cleanup)/,
     ],
     events: [
       /^(on|handle)[A-Z]/,
       /^(trigger|fire|emit)[A-Z]/,
-      /.*(?:Event|Hook|Callback)$/
+      /.*(?:Event|Hook|Callback)$/,
     ],
     public: [
       /^(get|set|is|has|can|do|show|display|list)[a-z]/,
-      /^(look|examine|describe|say|tell|whisper|shout)/
+      /^(look|examine|describe|say|tell|whisper|shout)/,
     ],
     combat: [
       /^(attack|defend|damage|heal|fight|strike|hit)/,
       /^(combat|battle|duel)/,
-      /.*(?:Combat|Battle|Attack|Damage|Heal)$/
+      /.*(?:Combat|Battle|Attack|Damage|Heal)$/,
     ],
     communication: [
       /^(say|tell|whisper|shout|announce|broadcast)/,
       /^(chat|message|communicate|speak)/,
-      /.*(?:Message|Chat|Speak)$/
+      /.*(?:Message|Chat|Speak)$/,
     ],
     movement: [
       /^(move|go|walk|run|teleport|transport)/,
       /^(enter|exit|leave|arrive)/,
-      /.*(?:Move|Go|Walk|Teleport)$/
+      /.*(?:Move|Go|Walk|Teleport)$/,
     ],
     inventory: [
       /^(inventory|items|equipment|gear)/,
       /^(take|drop|give|equip|unequip|wield)/,
       /^(carry|hold|store|retrieve)/,
-      /.*(?:Inventory|Item|Equipment)$/
+      /.*(?:Inventory|Item|Equipment)$/,
     ],
     internal: [
-      /^_/,  // Private methods starting with underscore
+      /^_/, // Private methods starting with underscore
       /^(validate|check|verify|test|debug)/,
-      /^(helper|util|internal|private)/
-    ]
+      /^(helper|util|internal|private)/,
+    ],
   };
 
   constructor(private manager: ObjectManager) {}
@@ -136,21 +183,33 @@ export class VirtualFileSystem {
     // Analyze method content for additional clues
     if (methodCode) {
       const content = methodCode.toLowerCase();
-      
+
       // Check for common keywords
       if (content.includes('self.') || content.includes('this.')) {
         // Already analyzed by patterns, continue
       }
-      
-      if (content.includes('damage') || content.includes('health') || content.includes('combat')) {
+
+      if (
+        content.includes('damage') ||
+        content.includes('health') ||
+        content.includes('combat')
+      ) {
         return 'combat';
       }
-      
-      if (content.includes('message') || content.includes('chat') || content.includes('tell')) {
+
+      if (
+        content.includes('message') ||
+        content.includes('chat') ||
+        content.includes('tell')
+      ) {
         return 'communication';
       }
-      
-      if (content.includes('location') || content.includes('move') || content.includes('go')) {
+
+      if (
+        content.includes('location') ||
+        content.includes('move') ||
+        content.includes('go')
+      ) {
         return 'movement';
       }
     }
@@ -162,7 +221,11 @@ export class VirtualFileSystem {
   /**
    * Infer method signature from code and method name
    */
-  private inferMethodSignature(methodName: string, methodCode: string, category: string): MethodSignature {
+  private inferMethodSignature(
+    methodName: string,
+    methodCode: string,
+    category: string,
+  ): MethodSignature {
     const args: string[] = [];
     let returnType = 'void';
     const context: string[] = [];
@@ -170,13 +233,21 @@ export class VirtualFileSystem {
     // Analyze method name for common patterns
     if (methodName.startsWith('get') && methodName.length > 3) {
       returnType = 'any';
-    } else if (methodName.startsWith('is') || methodName.startsWith('has') || methodName.startsWith('can')) {
+    } else if (
+      methodName.startsWith('is') ||
+      methodName.startsWith('has') ||
+      methodName.startsWith('can')
+    ) {
       returnType = 'boolean';
     } else if (methodName.startsWith('set')) {
       args.push('value: any');
       returnType = 'void';
     } else if (category === 'communication') {
-      if (methodName === 'say' || methodName === 'tell' || methodName === 'whisper') {
+      if (
+        methodName === 'say' ||
+        methodName === 'tell' ||
+        methodName === 'whisper'
+      ) {
         args.push('message: string');
         returnType = 'void';
       }
@@ -193,7 +264,9 @@ export class VirtualFileSystem {
     // Look for explicit parameter usage in method code
     const argUsage = methodCode.match(/args\[(\d+)\]/g);
     if (argUsage) {
-      const maxArg = Math.max(...argUsage.map(match => parseInt(match.match(/\d+/)![0])));
+      const maxArg = Math.max(
+        ...argUsage.map((match) => parseInt(match.match(/\d+/)?.[0], 10)),
+      );
       if (maxArg >= args.length) {
         // Add generic args for additional parameters
         for (let i = args.length; i <= maxArg; i++) {
@@ -207,7 +280,7 @@ export class VirtualFileSystem {
       args,
       returnType,
       context,
-      category
+      category,
     };
   }
 
@@ -215,11 +288,13 @@ export class VirtualFileSystem {
    * Parse URI into object ID, name, and type
    * Format: malice://objects/{id}/{name}.{ts|json}
    */
-  parseUri(uri: string): { objectId: ObjId; name: string; type: 'method' | 'property' } | null {
+  parseUri(
+    uri: string,
+  ): { objectId: ObjId; name: string; type: 'method' | 'property' } | null {
     const tsMatch = uri.match(/^malice:\/\/objects\/(\d+)\/(.+)\.ts$/);
     if (tsMatch) {
       return {
-        objectId: parseInt(tsMatch[1]),
+        objectId: parseInt(tsMatch[1], 10),
         name: tsMatch[2],
         type: 'method',
       };
@@ -228,7 +303,7 @@ export class VirtualFileSystem {
     const jsonMatch = uri.match(/^malice:\/\/objects\/(\d+)\/(.+)\.json$/);
     if (jsonMatch) {
       return {
-        objectId: parseInt(jsonMatch[1]),
+        objectId: parseInt(jsonMatch[1], 10),
         name: jsonMatch[2],
         type: 'property',
       };
@@ -259,17 +334,19 @@ export class VirtualFileSystem {
     }
 
     // Object directory with view parameter
-    const objMatch = uri.match(/^malice:\/\/objects\/(\d+)(?:\/view:(\w+))?\/?$/);
+    const objMatch = uri.match(
+      /^malice:\/\/objects\/(\d+)(?:\/view:(\w+))?\/?$/,
+    );
     if (objMatch) {
-      const objectId = parseInt(objMatch[1]);
-      const view = objMatch[2] as 'flat' | 'categorized' || 'categorized';
+      const objectId = parseInt(objMatch[1], 10);
+      const view = (objMatch[2] as 'flat' | 'categorized') || 'categorized';
       return await this.listMethodFiles(objectId, view);
     }
 
     // Category directory
-    const categoryMatch = uri.match(/^malice:\/\/objects\/(\d+)\/([^\/]+)\/$/);
+    const categoryMatch = uri.match(/^malice:\/\/objects\/(\d+)\/([^/]+)\/$/);
     if (categoryMatch) {
-      const objectId = parseInt(categoryMatch[1]);
+      const objectId = parseInt(categoryMatch[1], 10);
       const category = categoryMatch[2];
       return await this.listCategoryMethods(objectId, category);
     }
@@ -280,18 +357,25 @@ export class VirtualFileSystem {
   /**
    * List methods in a specific category
    */
-  private async listCategoryMethods(objectId: ObjId, category: string): Promise<VirtualEntry[]> {
+  private async listCategoryMethods(
+    objectId: ObjId,
+    category: string,
+  ): Promise<VirtualEntry[]> {
     const obj = await this.manager.load(objectId);
     if (!obj) return [];
 
-    const raw = obj['_getRaw']();
+    const raw = obj._getRaw();
     const entries: VirtualEntry[] = [];
 
     Object.entries(raw.methods).forEach(([methodName, methodData]) => {
       const methodCategory = this.categorizeMethod(methodName, methodData.code);
-      
+
       if (methodCategory === category) {
-        const signature = this.inferMethodSignature(methodName, methodData.code, category);
+        const signature = this.inferMethodSignature(
+          methodName,
+          methodData.code,
+          category,
+        );
         entries.push({
           name: `${methodName}.ts`,
           type: 'file' as const,
@@ -301,8 +385,8 @@ export class VirtualFileSystem {
             description: methodData.help,
             signature: `${signature.args.join(', ')}`,
             complexity: this.calculateComplexity(methodData.code),
-            overridden: false
-          }
+            overridden: false,
+          },
         });
       }
     });
@@ -326,59 +410,74 @@ export class VirtualFileSystem {
    * List methods as .ts files and properties as .json files
    * Enhanced with categorization and multiple view support
    */
-  private async listMethodFiles(objectId: ObjId, view: 'flat' | 'categorized' = 'categorized'): Promise<VirtualEntry[]> {
+  private async listMethodFiles(
+    objectId: ObjId,
+    view: 'flat' | 'categorized' = 'categorized',
+  ): Promise<VirtualEntry[]> {
     const obj = await this.manager.load(objectId);
     if (!obj) return [];
 
-    const raw = obj['_getRaw']();
+    const raw = obj._getRaw();
     const entries: VirtualEntry[] = [];
 
     if (view === 'categorized') {
       // Group methods by category
-      const categorizedMethods = new Map<string, Array<{ name: string; code: string; metadata?: any }>>();
+      const categorizedMethods = new Map<
+        string,
+        Array<{ name: string; code: string; metadata?: any }>
+      >();
 
       // Categorize methods
       Object.entries(raw.methods).forEach(([methodName, methodData]) => {
         const category = this.categorizeMethod(methodName, methodData.code);
-        const signature = this.inferMethodSignature(methodName, methodData.code, category);
-        
+        const signature = this.inferMethodSignature(
+          methodName,
+          methodData.code,
+          category,
+        );
+
         if (!categorizedMethods.has(category)) {
           categorizedMethods.set(category, []);
         }
-        
-        categorizedMethods.get(category)!.push({
+
+        categorizedMethods.get(category)?.push({
           name: methodName,
           code: methodData.code,
           metadata: {
             description: methodData.help,
             signature: `${signature.args.join(', ')}`,
             complexity: this.calculateComplexity(methodData.code),
-            overridden: false
-          }
+            overridden: false,
+          },
         });
       });
 
       // Add virtual category directories
       for (const [category, methods] of categorizedMethods) {
-        const categoryInfo = this.CATEGORIES.find(c => c.id === category) || 
-          { id: category, name: `📁 ${category}`, icon: 'folder', priority: 999, description: category };
-        
+        const categoryInfo = this.CATEGORIES.find((c) => c.id === category) || {
+          id: category,
+          name: `📁 ${category}`,
+          icon: 'folder',
+          priority: 999,
+          description: category,
+        };
+
         // Add category directory
         entries.push({
           name: categoryInfo.name,
           type: 'directory' as const,
           uri: `malice://objects/${objectId}/${category}/`,
-          category
+          category,
         });
 
         // Add methods to category
-        methods.forEach(method => {
+        methods.forEach((method) => {
           entries.push({
             name: `${method.name}.ts`,
             type: 'file' as const,
             uri: `malice://objects/${objectId}/${category}/${method.name}.ts`,
             category,
-            metadata: method.metadata
+            metadata: method.metadata,
           });
         });
       }
@@ -386,8 +485,12 @@ export class VirtualFileSystem {
       // Flat view - original behavior
       Object.entries(raw.methods).forEach(([methodName, methodData]) => {
         const category = this.categorizeMethod(methodName, methodData.code);
-        const signature = this.inferMethodSignature(methodName, methodData.code, category);
-        
+        const signature = this.inferMethodSignature(
+          methodName,
+          methodData.code,
+          category,
+        );
+
         entries.push({
           name: `${methodName}.ts`,
           type: 'file' as const,
@@ -396,8 +499,8 @@ export class VirtualFileSystem {
           metadata: {
             description: methodData.help,
             signature: `${signature.args.join(', ')}`,
-            complexity: this.calculateComplexity(methodData.code)
-          }
+            complexity: this.calculateComplexity(methodData.code),
+          },
         });
       });
     }
@@ -411,21 +514,23 @@ export class VirtualFileSystem {
         category: 'properties',
         metadata: {
           description: `Property: ${propName}`,
-          signature: typeof (obj.get(propName)),
-          overridden: false
-        }
+          signature: typeof obj.get(propName),
+          overridden: false,
+        },
       });
     });
 
     // Sort by category priority then name
     return entries.sort((a, b) => {
-      const aPriority = this.CATEGORIES.find(c => c.id === a.category)?.priority || 999;
-      const bPriority = this.CATEGORIES.find(c => c.id === b.category)?.priority || 999;
-      
+      const aPriority =
+        this.CATEGORIES.find((c) => c.id === a.category)?.priority || 999;
+      const bPriority =
+        this.CATEGORIES.find((c) => c.id === b.category)?.priority || 999;
+
       if (aPriority !== bPriority) {
         return aPriority - bPriority;
       }
-      
+
       return a.name.localeCompare(b.name);
     });
   }
@@ -435,9 +540,19 @@ export class VirtualFileSystem {
    */
   private calculateComplexity(code: string): number {
     // Simple complexity metric based on control flow keywords
-    const complexityKeywords = ['if', 'else', 'while', 'for', 'switch', 'case', 'catch', '&&', '||'];
+    const complexityKeywords = [
+      'if',
+      'else',
+      'while',
+      'for',
+      'switch',
+      'case',
+      'catch',
+      '&&',
+      '||',
+    ];
     let complexity = 1; // Base complexity
-    
+
     for (const keyword of complexityKeywords) {
       const regex = new RegExp(`\\b${keyword}\\b`, 'gi');
       const matches = code.match(regex);
@@ -445,7 +560,7 @@ export class VirtualFileSystem {
         complexity += matches.length;
       }
     }
-    
+
     return complexity;
   }
 
@@ -466,7 +581,7 @@ export class VirtualFileSystem {
     const obj = await this.manager.load(parsed.objectId);
     if (!obj) return null;
 
-    const raw = obj['_getRaw']();
+    const raw = obj._getRaw();
     let content: string;
 
     if (parsed.type === 'method') {
@@ -481,7 +596,7 @@ export class VirtualFileSystem {
       content = this.buildTypeScriptContext(
         parsed.name,
         method.code,
-        prototypeType
+        prototypeType,
       );
     } else {
       // Get property value as JSON (use resolved value, not typed Value)
@@ -525,7 +640,7 @@ export class VirtualFileSystem {
     const content = this.buildTypeScriptContext(
       parsed.name,
       actualCode,
-      prototypeType
+      prototypeType,
     );
 
     const doc = this.documents.get(uri);
@@ -570,7 +685,8 @@ export class VirtualFileSystem {
   private async inferPrototypeType(obj: RuntimeObject): Promise<string> {
     // Check common aliases
     const objectManager = await this.manager.load(0);
-    const aliases = (objectManager?.get('aliases') as Record<string, number>) || {};
+    const aliases =
+      (objectManager?.get('aliases') as Record<string, number>) || {};
 
     // Map known prototype IDs to type names
     // Filter out undefined aliases to avoid creating invalid keys
@@ -579,8 +695,10 @@ export class VirtualFileSystem {
     if (aliases.human !== undefined) prototypeMap[aliases.human] = 'Human';
     if (aliases.agent !== undefined) prototypeMap[aliases.agent] = 'Agent';
     if (aliases.room !== undefined) prototypeMap[aliases.room] = 'Room';
-    if (aliases.location !== undefined) prototypeMap[aliases.location] = 'Location';
-    if (aliases.describable !== undefined) prototypeMap[aliases.describable] = 'Describable';
+    if (aliases.location !== undefined)
+      prototypeMap[aliases.location] = 'Location';
+    if (aliases.describable !== undefined)
+      prototypeMap[aliases.describable] = 'Describable';
 
     // Walk parent chain
     let current: RuntimeObject | null = obj;
@@ -590,7 +708,7 @@ export class VirtualFileSystem {
       }
 
       // Read parent ID directly from raw object (getParent uses sync lookup which may miss)
-      const raw = (current as any)['_getRaw']();
+      const raw = (current as any)._getRaw();
       const parentId = raw.parent?.value;
       // Stop if no parent or self-parented
       if (parentId === undefined || parentId === current.id) break;
@@ -607,22 +725,31 @@ export class VirtualFileSystem {
   private buildTypeScriptContext(
     methodName: string,
     code: string,
-    prototypeType: string
+    prototypeType: string,
   ): string {
     const category = this.categorizeMethod(methodName, code);
     const signature = this.inferMethodSignature(methodName, code, category);
     const jsDoc = this.generateJSDoc(methodName, signature, category);
-    
+
     // Build enhanced context with specific types
-    const contextImports = signature.context.length > 0 ? 
-      signature.context.map(ctx => `import type { ${ctx} } from '@malice/game/connection-context';`).join('\n') : '';
-    
-    const argsDeclaration = signature.args.length > 0 ? 
-      `declare const args: [${signature.args.join(', ')}];` : 'declare const args: [];';
-    
-    const parameterDeclarations = signature.args.map(arg => 
-      `declare const ${arg.split(':')[0]}: ${arg.split(':')[1]};`
-    ).join('\n    ');
+    const contextImports =
+      signature.context.length > 0
+        ? signature.context
+            .map(
+              (ctx) =>
+                `import type { ${ctx} } from '@malice/game/connection-context';`,
+            )
+            .join('\n')
+        : '';
+
+    const argsDeclaration =
+      signature.args.length > 0
+        ? `declare const args: [${signature.args.join(', ')}];`
+        : 'declare const args: [];';
+
+    const parameterDeclarations = signature.args
+      .map((arg) => `declare const ${arg.split(':')[0]}: ${arg.split(':')[1]};`)
+      .join('\n    ');
 
     return `// Malice MOO Method: ${methodName}
 // Category: ${category}
@@ -648,17 +775,21 @@ ${code}
   /**
    * Generate JSDoc comment for method
    */
-  private generateJSDoc(methodName: string, signature: MethodSignature, category: string): string {
-    const categoryInfo = this.CATEGORIES.find(c => c.id === category);
+  private generateJSDoc(
+    methodName: string,
+    signature: MethodSignature,
+    category: string,
+  ): string {
+    const categoryInfo = this.CATEGORIES.find((c) => c.id === category);
     const categoryDesc = categoryInfo ? ` (${categoryInfo.description})` : '';
-    
+
     let jsDoc = `/**
  * ${methodName} - ${this.toTitleCase(category)} method${categoryDesc}
  * @category ${this.toTitleCase(category)}`;
 
     // Add parameter documentation
     if (signature.args.length > 0) {
-      signature.args.forEach(arg => {
+      signature.args.forEach((arg) => {
         const [name, type] = arg.split(':');
         jsDoc += `\n * @param {${type}} ${name} ${this.getParameterDescription(name, methodName, category)}`;
       });
@@ -682,31 +813,35 @@ ${code}
   /**
    * Get parameter description based on name and context
    */
-  private getParameterDescription(paramName: string, methodName: string, category: string): string {
+  private getParameterDescription(
+    paramName: string,
+    methodName: string,
+    category: string,
+  ): string {
     const name = paramName.replace(/\[\]$/, '').toLowerCase();
-    
+
     // Common parameter names with context-aware descriptions
     const descriptions: Record<string, string> = {
-      'message': 'The message to send or display',
-      'target': 'The target object or player',
-      'player': 'The player performing the action',
-      'context': 'Connection context and session information',
-      'value': 'The value to set',
-      'amount': 'The amount or quantity',
-      'damage': 'The amount of damage to inflict',
-      'direction': 'The direction to move or look',
-      'command': 'The command being executed',
-      'text': 'The text content'
+      message: 'The message to send or display',
+      target: 'The target object or player',
+      player: 'The player performing the action',
+      context: 'Connection context and session information',
+      value: 'The value to set',
+      amount: 'The amount or quantity',
+      damage: 'The amount of damage to inflict',
+      direction: 'The direction to move or look',
+      command: 'The command being executed',
+      text: 'The text content',
     };
 
     // Method-specific descriptions
     const methodSpecificDescriptions: Record<string, Record<string, string>> = {
-      'say': { 'message': 'The message to broadcast to the room' },
-      'tell': { 'message': 'The private message to send to target player' },
-      'whisper': { 'message': 'The whispered message to send' },
-      'move': { 'direction': 'The direction to move in' },
-      'take': { 'target': 'The object to pick up' },
-      'drop': { 'target': 'The object to place on the ground' }
+      say: { message: 'The message to broadcast to the room' },
+      tell: { message: 'The private message to send to target player' },
+      whisper: { message: 'The whispered message to send' },
+      move: { direction: 'The direction to move in' },
+      take: { target: 'The object to pick up' },
+      drop: { target: 'The object to place on the ground' },
     };
 
     // Check method-specific descriptions first
@@ -716,17 +851,17 @@ ${code}
 
     // Category-specific parameter descriptions
     const categoryDescriptions: Record<string, Record<string, string>> = {
-      'combat': {
-        'damage': 'The amount of damage to inflict',
-        'target': 'The combat target'
+      combat: {
+        damage: 'The amount of damage to inflict',
+        target: 'The combat target',
       },
-      'communication': {
-        'message': 'The message content to send',
-        'target': 'The recipient player'
+      communication: {
+        message: 'The message content to send',
+        target: 'The recipient player',
       },
-      'movement': {
-        'direction': 'The direction or exit to take'
-      }
+      movement: {
+        direction: 'The direction or exit to take',
+      },
     };
 
     if (categoryDescriptions[category]?.[name]) {
@@ -739,14 +874,27 @@ ${code}
   /**
    * Generate usage example for method
    */
-  private generateExample(methodName: string, signature: MethodSignature, category: string): string | null {
+  private generateExample(
+    methodName: string,
+    signature: MethodSignature,
+    category: string,
+  ): string | null {
     if (category === 'communication' && signature.args.length > 0) {
       return ` * // Example usage in MOO:\n * ${methodName}("Hello, world!")`;
-    } else if (category === 'movement' && signature.args.includes('direction:')) {
+    } else if (
+      category === 'movement' &&
+      signature.args.includes('direction:')
+    ) {
       return ` * // Example usage in MOO:\n * ${methodName}("north")`;
-    } else if (methodName.startsWith('get') && signature.returnType !== 'void') {
+    } else if (
+      methodName.startsWith('get') &&
+      signature.returnType !== 'void'
+    ) {
       return ` * // Example usage in MOO:\n * const value = ${methodName}()`;
-    } else if (methodName.startsWith('set') && signature.args.includes('value:')) {
+    } else if (
+      methodName.startsWith('set') &&
+      signature.args.includes('value:')
+    ) {
       return ` * // Example usage in MOO:\n * ${methodName}(newValue)`;
     }
 
@@ -767,7 +915,7 @@ ${code}
     const obj = await this.manager.load(objectId);
     if (!obj) return [];
 
-    const methods = obj['_getRaw']().methods;
+    const methods = obj._getRaw().methods;
     return Object.keys(methods);
   }
 }

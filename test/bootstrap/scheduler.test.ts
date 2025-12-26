@@ -1,9 +1,11 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { GameBootstrap } from '../../src/database/game-bootstrap.js';
 import { ObjectDatabase } from '../../src/database/object-db.js';
 import { ObjectManager } from '../../src/database/object-manager.js';
-import { GameBootstrap } from '../../src/database/game-bootstrap.js';
 
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/?replicaSet=rs0&directConnection=true';
+const MONGO_URI =
+  process.env.MONGO_URI ||
+  'mongodb://localhost:27017/?replicaSet=rs0&directConnection=true';
 
 describe('$.scheduler', () => {
   let db: ObjectDatabase;
@@ -13,9 +15,12 @@ describe('$.scheduler', () => {
   beforeAll(async () => {
     db = new ObjectDatabase(MONGO_URI, 'malice_test_scheduler');
     await db.connect();
-    await db['objects'].deleteMany({});
+    await db.objects.deleteMany({});
     manager = new ObjectManager(db);
-    const bootstrap = new GameBootstrap(manager, { worldBuildMode: 'systems', disableDefaultJobs: true });
+    const bootstrap = new GameBootstrap(manager, {
+      worldBuildMode: 'systems',
+      disableDefaultJobs: true,
+    });
     await bootstrap.bootstrap();
     $ = manager as any;
   }, 30000);
@@ -27,7 +32,13 @@ describe('$.scheduler', () => {
 
   describe('schedule()', () => {
     it('should schedule a one-shot job', async () => {
-      const result = await $.scheduler.schedule('testOneShot', 1000, 0, $.system, 'describe');
+      const result = await $.scheduler.schedule(
+        'testOneShot',
+        1000,
+        0,
+        $.system,
+        'describe',
+      );
 
       expect(result.success).toBe(true);
       expect(result.name).toBe('testOneShot');
@@ -35,7 +46,13 @@ describe('$.scheduler', () => {
     });
 
     it('should schedule a repeating job', async () => {
-      const result = await $.scheduler.schedule('testRepeating', 0, 5000, $.system, 'describe');
+      const result = await $.scheduler.schedule(
+        'testRepeating',
+        0,
+        5000,
+        $.system,
+        'describe',
+      );
 
       expect(result.success).toBe(true);
       expect(result.name).toBe('testRepeating');
@@ -43,26 +60,52 @@ describe('$.scheduler', () => {
     });
 
     it('should reject interval less than 1 second', async () => {
-      const result = await $.scheduler.schedule('tooFast', 0, 500, $.system, 'describe');
+      const result = await $.scheduler.schedule(
+        'tooFast',
+        0,
+        500,
+        $.system,
+        'describe',
+      );
 
       expect(result.error).toBeTruthy();
       expect(result.error).toContain('at least 1000ms');
     });
 
     it('should allow 0 interval for one-shot', async () => {
-      const result = await $.scheduler.schedule('zeroInterval', 1000, 0, $.system, 'describe');
+      const result = await $.scheduler.schedule(
+        'zeroInterval',
+        1000,
+        0,
+        $.system,
+        'describe',
+      );
 
       expect(result.success).toBe(true);
     });
 
     it('should accept object ID as target', async () => {
-      const result = await $.scheduler.schedule('idTarget', 1000, 0, $.system.id, 'describe');
+      const result = await $.scheduler.schedule(
+        'idTarget',
+        1000,
+        0,
+        $.system.id,
+        'describe',
+      );
 
       expect(result.success).toBe(true);
     });
 
     it('should store job with correct structure', async () => {
-      await $.scheduler.schedule('structureTest', 2000, 3000, $.system, 'testMethod', 'arg1', 'arg2');
+      await $.scheduler.schedule(
+        'structureTest',
+        2000,
+        3000,
+        $.system,
+        'testMethod',
+        'arg1',
+        'arg2',
+      );
 
       const job = await $.scheduler.getJob('structureTest');
 
@@ -82,7 +125,13 @@ describe('$.scheduler', () => {
     });
 
     it('should reject negative delay', async () => {
-      const result = await $.scheduler.schedule('negDelay', -1000, 0, $.system, 'describe');
+      const result = await $.scheduler.schedule(
+        'negDelay',
+        -1000,
+        0,
+        $.system,
+        'describe',
+      );
 
       expect(result.error).toBeTruthy();
     });
@@ -136,7 +185,13 @@ describe('$.scheduler', () => {
 
   describe('getJob()', () => {
     it('should return job details', async () => {
-      await $.scheduler.schedule('getJobTest', 1000, 2000, $.system, 'describe');
+      await $.scheduler.schedule(
+        'getJobTest',
+        1000,
+        2000,
+        $.system,
+        'describe',
+      );
 
       const job = await $.scheduler.getJob('getJobTest');
 
@@ -201,15 +256,21 @@ describe('$.scheduler', () => {
   describe('tick()', () => {
     it('should run jobs whose time has come', async () => {
       // Create a test object with a method that sets a flag
-      const testObj = await $.recycler.create({
-        parent: $.root,
-        properties: { name: 'TickTest', wasRun: false },
-      }, null);
+      const testObj = await $.recycler.create(
+        {
+          parent: $.root,
+          properties: { name: 'TickTest', wasRun: false },
+        },
+        null,
+      );
 
-      testObj.setMethod('markRun', `
+      testObj.setMethod(
+        'markRun',
+        `
         self.wasRun = true;
         return 'executed';
-      `);
+      `,
+      );
 
       // Schedule for immediate execution
       await $.scheduler.schedule('tickTest', 0, 0, testObj, 'markRun');
@@ -225,10 +286,13 @@ describe('$.scheduler', () => {
     });
 
     it('should delete one-shot jobs after execution', async () => {
-      const testObj = await $.recycler.create({
-        parent: $.root,
-        properties: { name: 'OneShotTest' },
-      }, null);
+      const testObj = await $.recycler.create(
+        {
+          parent: $.root,
+          properties: { name: 'OneShotTest' },
+        },
+        null,
+      );
 
       testObj.setMethod('noop', `return 'done';`);
 
@@ -240,10 +304,13 @@ describe('$.scheduler', () => {
     });
 
     it('should reschedule repeating jobs', async () => {
-      const testObj = await $.recycler.create({
-        parent: $.root,
-        properties: { name: 'RepeatTest' },
-      }, null);
+      const testObj = await $.recycler.create(
+        {
+          parent: $.root,
+          properties: { name: 'RepeatTest' },
+        },
+        null,
+      );
 
       testObj.setMethod('noop', `return 'done';`);
 
@@ -257,14 +324,20 @@ describe('$.scheduler', () => {
     });
 
     it('should not run disabled jobs', async () => {
-      const testObj = await $.recycler.create({
-        parent: $.root,
-        properties: { name: 'DisabledTest', wasRun: false },
-      }, null);
+      const testObj = await $.recycler.create(
+        {
+          parent: $.root,
+          properties: { name: 'DisabledTest', wasRun: false },
+        },
+        null,
+      );
 
-      testObj.setMethod('markRun', `
+      testObj.setMethod(
+        'markRun',
+        `
         self.wasRun = true;
-      `);
+      `,
+      );
 
       await $.scheduler.schedule('disabledTick', 0, 0, testObj, 'markRun');
       await $.scheduler.setEnabled('disabledTick', false);
@@ -274,14 +347,20 @@ describe('$.scheduler', () => {
     });
 
     it('should not run jobs whose time has not come', async () => {
-      const testObj = await $.recycler.create({
-        parent: $.root,
-        properties: { name: 'FutureTest', wasRun: false },
-      }, null);
+      const testObj = await $.recycler.create(
+        {
+          parent: $.root,
+          properties: { name: 'FutureTest', wasRun: false },
+        },
+        null,
+      );
 
-      testObj.setMethod('markRun', `
+      testObj.setMethod(
+        'markRun',
+        `
         self.wasRun = true;
-      `);
+      `,
+      );
 
       await $.scheduler.schedule('futureTick', 60000, 0, testObj, 'markRun');
       await $.scheduler.tick();
@@ -290,14 +369,20 @@ describe('$.scheduler', () => {
     });
 
     it('should handle errors gracefully', async () => {
-      const testObj = await $.recycler.create({
-        parent: $.root,
-        properties: { name: 'ErrorTest' },
-      }, null);
+      const testObj = await $.recycler.create(
+        {
+          parent: $.root,
+          properties: { name: 'ErrorTest' },
+        },
+        null,
+      );
 
-      testObj.setMethod('throwError', `
+      testObj.setMethod(
+        'throwError',
+        `
         throw new Error('Test error');
-      `);
+      `,
+      );
 
       await $.scheduler.schedule('errorTick', 0, 0, testObj, 'throwError');
       const results = await $.scheduler.tick();
@@ -309,17 +394,32 @@ describe('$.scheduler', () => {
     });
 
     it('should pass arguments to job method', async () => {
-      const testObj = await $.recycler.create({
-        parent: $.root,
-        properties: { name: 'ArgsTest', receivedArgs: null },
-      }, null);
+      const testObj = await $.recycler.create(
+        {
+          parent: $.root,
+          properties: { name: 'ArgsTest', receivedArgs: null },
+        },
+        null,
+      );
 
-      testObj.setMethod('receiveArgs', `
+      testObj.setMethod(
+        'receiveArgs',
+        `
         self.receivedArgs = [...args];
         return self.receivedArgs;
-      `);
+      `,
+      );
 
-      await $.scheduler.schedule('argsTick', 0, 0, testObj, 'receiveArgs', 'hello', 42, true);
+      await $.scheduler.schedule(
+        'argsTick',
+        0,
+        0,
+        testObj,
+        'receiveArgs',
+        'hello',
+        42,
+        true,
+      );
       await $.scheduler.tick();
 
       expect(testObj.receivedArgs).toEqual(['hello', 42, true]);
@@ -328,15 +428,21 @@ describe('$.scheduler', () => {
 
   describe('runNow()', () => {
     it('should run job immediately', async () => {
-      const testObj = await $.recycler.create({
-        parent: $.root,
-        properties: { name: 'RunNowTest', wasRun: false },
-      }, null);
+      const testObj = await $.recycler.create(
+        {
+          parent: $.root,
+          properties: { name: 'RunNowTest', wasRun: false },
+        },
+        null,
+      );
 
-      testObj.setMethod('markRun', `
+      testObj.setMethod(
+        'markRun',
+        `
         self.wasRun = true;
         return 'immediate';
-      `);
+      `,
+      );
 
       // Schedule for far future
       await $.scheduler.schedule('runNowTest', 60000, 0, testObj, 'markRun');
@@ -350,10 +456,13 @@ describe('$.scheduler', () => {
     });
 
     it('should delete one-shot after runNow', async () => {
-      const testObj = await $.recycler.create({
-        parent: $.root,
-        properties: { name: 'RunNowDelete' },
-      }, null);
+      const testObj = await $.recycler.create(
+        {
+          parent: $.root,
+          properties: { name: 'RunNowDelete' },
+        },
+        null,
+      );
 
       testObj.setMethod('noop', `return 'done';`);
 
@@ -365,10 +474,13 @@ describe('$.scheduler', () => {
     });
 
     it('should reschedule repeating job after runNow', async () => {
-      const testObj = await $.recycler.create({
-        parent: $.root,
-        properties: { name: 'RunNowRepeat' },
-      }, null);
+      const testObj = await $.recycler.create(
+        {
+          parent: $.root,
+          properties: { name: 'RunNowRepeat' },
+        },
+        null,
+      );
 
       testObj.setMethod('noop', `return 'done';`);
 
@@ -424,10 +536,16 @@ describe('$.scheduler', () => {
     it('should persist jobs across scheduler reload', async () => {
       const schedulerId = $.scheduler.id;
 
-      await $.scheduler.schedule('persistJob', 10000, 5000, $.system, 'describe');
+      await $.scheduler.schedule(
+        'persistJob',
+        10000,
+        5000,
+        $.system,
+        'describe',
+      );
 
       // Wait for persistence
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       // Reload scheduler from database
       const reloadedScheduler = await $.load(schedulerId);

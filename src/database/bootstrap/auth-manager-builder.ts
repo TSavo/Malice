@@ -1,5 +1,5 @@
-import { ObjectManager } from '../object-manager.js';
 import type { RuntimeObject } from '../../../types/object.js';
+import type { ObjectManager } from '../object-manager.js';
 
 /**
  * Builds AuthManager object (dynamic ID)
@@ -15,7 +15,8 @@ export class AuthManagerBuilder {
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
 
-    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
+    const aliases =
+      (objectManager.get('aliases') as Record<string, number>) || {};
 
     if (aliases.authManager) {
       this.authManager = await this.manager.load(aliases.authManager);
@@ -26,11 +27,11 @@ export class AuthManagerBuilder {
       // Create new AuthManager only if it doesn't exist
       const root = await this.manager.load(1);
       this.authManager = await this.manager.create({
-      parent: root!,
-      properties: {
-        name: 'AuthManager',
-        description: 'Interactive login and authentication',
-        welcomeMessage: `
+        parent: root!,
+        properties: {
+          name: 'AuthManager',
+          description: 'Interactive login and authentication',
+          welcomeMessage: `
     ,·'´¨;.  '                                   ‚.,       '              ,.  '             ,.-·.                  ,. - ., ‚     '        '        ,_,.‚
     ;   ';:\\           .·´¨';\\                 ;'   '·‚.,               /   ';\\            /    ;'\\'           ,·'´ ,. - ,   ';\\'             ,.·'´  ,. , \`\`;\\
    ;     ';:'\\      .'´     ;:'\\              .´  .-‚   ";\\           ,'   ,'::'\\          ;    ;:::\\      ,·´  .'´\\:::::;'   ;:'\\          .´   ;´"::::\\'\`'´ \\'\\
@@ -47,22 +48,27 @@ export class AuthManagerBuilder {
 Enter your username, or a new name to create a character.
 
 Login: `,
-      },
-      methods: {},
-    });
+        },
+        methods: {},
+      });
     }
 
     // Setup methods (runs on both create and force rebuild)
-    this.authManager.setMethod('onConnect', `
+    this.authManager.setMethod(
+      'onConnect',
+      `
           const context = args[0];
           const welcome = self.welcomeMessage;
           context.send(welcome);
 
           // Set state to collect username
           self._state = { stage: 'username', context: context };
-        `);
+        `,
+    );
 
-    this.authManager.setMethod('onInput', `
+    this.authManager.setMethod(
+      'onInput',
+      `
           const context = args[0];
           const input = args[1];
 
@@ -156,7 +162,8 @@ Login: `,
               context.send('Character creation system not available.\\r\\n');
             }
           }
-        `);
+        `,
+    );
   }
 
   async registerAlias(): Promise<void> {

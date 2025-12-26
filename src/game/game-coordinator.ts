@@ -1,9 +1,9 @@
-import { ObjectDatabase, ObjectManager } from '../database/index.js';
-import { GameBootstrap } from '../database/game-bootstrap.js';
-import { ConnectionManager } from '../connection/connection-manager.js';
-import { ConnectionContext } from './connection-context.js';
-import { initGameLogger } from '../database/game-logger.js';
 import type { Connection } from '../connection/connection.js';
+import { ConnectionManager } from '../connection/connection-manager.js';
+import { GameBootstrap } from '../database/game-bootstrap.js';
+import { initGameLogger } from '../database/game-logger.js';
+import { ObjectDatabase, ObjectManager } from '../database/index.js';
+import { ConnectionContext } from './connection-context.js';
 
 export interface GameCoordinatorOptions {
   forceBootstrap?: boolean;
@@ -42,7 +42,9 @@ export class GameCoordinator {
     console.log('✅ Game logger initialized');
 
     // Bootstrap core game objects (MinimalBootstrap handles Root creation)
-    const bootstrap = new GameBootstrap(this.manager, { forceBootstrap: this.options.forceBootstrap });
+    const bootstrap = new GameBootstrap(this.manager, {
+      forceBootstrap: this.options.forceBootstrap,
+    });
     await bootstrap.bootstrap();
     console.log('✅ Core objects bootstrapped');
 
@@ -77,7 +79,9 @@ export class GameCoordinator {
     const scheduler = (this.manager as any).scheduler;
     const isPaused = scheduler?.paused === true;
     if (isPaused) {
-      console.log('⏸️  Scheduler tick loop started (1s interval) - PAUSED (call $.scheduler.resume() to start)');
+      console.log(
+        '⏸️  Scheduler tick loop started (1s interval) - PAUSED (call $.scheduler.resume() to start)',
+      );
     } else {
       console.log('✅ Scheduler tick loop started (1s interval)');
     }

@@ -1,5 +1,5 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 import { WritableBuilder } from './writable-builder.js';
 
 /**
@@ -57,8 +57,14 @@ DESTRUCTION: Can be burned, torn, disposed. Fire destroys contents permanently.`
     }
 
     // Add property descriptions
-    obj.setPropertyDescription('text', 'The written message content of the letter');
-    obj.setPropertyDescription('maxLength', 'Maximum character length for the letter text');
+    obj.setPropertyDescription(
+      'text',
+      'The written message content of the letter',
+    );
+    obj.setPropertyDescription(
+      'maxLength',
+      'Maximum character length for the letter text',
+    );
 
     return obj;
   }

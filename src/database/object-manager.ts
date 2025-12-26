@@ -1,21 +1,25 @@
-import { ObjectDatabase } from './object-db.js';
-import { RuntimeObjectImpl } from './runtime-object.js';
-import { ObjectCache } from './object-cache.js';
-import { getLoggerFacade, RESERVED_ALIASES } from './logger-facade.js';
 import * as bcrypt from 'bcrypt';
-import type { MCPTelnetClient } from '../mcp/telnet-client.js';
 import type {
+  CreateObjectParams,
   GameObject,
   ObjId,
-  RuntimeObject,
-  CreateObjectParams,
   PropertyValue,
+  RuntimeObject,
 } from '../../types/object.js';
+import type { MCPTelnetClient } from '../mcp/telnet-client.js';
+import { getLoggerFacade, RESERVED_ALIASES } from './logger-facade.js';
+import { ObjectCache } from './object-cache.js';
+import type { ObjectDatabase } from './object-db.js';
+import { RuntimeObjectImpl } from './runtime-object.js';
 
 /**
  * Sanitize an object for MongoDB storage, removing circular references
  */
-function sanitizeForMongo(value: any, seen: WeakSet<object> = new WeakSet(), path: string = 'root'): any {
+function sanitizeForMongo(
+  value: any,
+  seen: WeakSet<object> = new WeakSet(),
+  path: string = 'root',
+): any {
   if (value === null || value === undefined) {
     return value;
   }
@@ -27,14 +31,18 @@ function sanitizeForMongo(value: any, seen: WeakSet<object> = new WeakSet(), pat
 
   // Check for circular reference
   if (seen.has(value)) {
-    console.error(`[ObjectManager] Circular reference detected at ${path}, replacing with null`);
+    console.error(
+      `[ObjectManager] Circular reference detected at ${path}, replacing with null`,
+    );
     return null;
   }
   seen.add(value);
 
   // Handle arrays
   if (Array.isArray(value)) {
-    return value.map((item, i) => sanitizeForMongo(item, seen, `${path}[${i}]`));
+    return value.map((item, i) =>
+      sanitizeForMongo(item, seen, `${path}[${i}]`),
+    );
   }
 
   // Handle Date objects
@@ -84,9 +92,13 @@ export class ObjectManager {
     // Return a Proxy to enable dynamic property access
     return new Proxy(this, {
       get: (target, prop: string | symbol) => {
-        if (typeof prop === 'string' && prop.startsWith('$') && prop.length > 1) {
+        if (
+          typeof prop === 'string' &&
+          prop.startsWith('$') &&
+          prop.length > 1
+        ) {
           const id = parseInt(prop.slice(1), 10);
-          if (!isNaN(id)) {
+          if (!Number.isNaN(id)) {
             return target.load(id);
           }
         }
@@ -115,7 +127,12 @@ export class ObjectManager {
         }
 
         // Block overwriting internal properties
-        const internalProps = ['db', 'cache', 'aliases', 'pendingUpdateOperations'];
+        const internalProps = [
+          'db',
+          'cache',
+          'aliases',
+          'pendingUpdateOperations',
+        ];
         if (internalProps.includes(prop)) {
           return false;
         }
@@ -133,7 +150,7 @@ export class ObjectManager {
         }
 
         return false;
-      }
+      },
     }) as any;
   }
 
@@ -183,7 +200,10 @@ export class ObjectManager {
 
         // Set properties through proxy to auto-convert to typed Values
         proxy.set('name', 'nothing');
-        proxy.set('description', 'The null object reference - immutable, no properties or methods');
+        proxy.set(
+          'description',
+          'The null object reference - immutable, no properties or methods',
+        );
 
         return proxy;
       }
@@ -221,7 +241,10 @@ export class ObjectManager {
 
         // Set properties through proxy to auto-convert to typed Values
         proxy.set('name', 'ObjectManager');
-        proxy.set('description', 'The root system object - provides object management and global aliases');
+        proxy.set(
+          'description',
+          'The root system object - provides object management and global aliases',
+        );
         proxy.set('aliases', {});
 
         return proxy;
@@ -242,7 +265,9 @@ export class ObjectManager {
 
     // Cache miss - this should only happen for newly created objects
     // or objects created after startup. Log a warning for debugging.
-    console.warn(`[ObjectManager] Cache miss for #${id} - loading from database`);
+    console.warn(
+      `[ObjectManager] Cache miss for #${id} - loading from database`,
+    );
 
     const obj = await this.db.get(id);
     if (!obj) return null;
@@ -270,10 +295,14 @@ export class ObjectManager {
 
     // Validate parent is a RuntimeObject, not a number
     if (typeof params.parent === 'number') {
-      throw new Error('Parent must be a RuntimeObject, not a number. Use manager.load(id) to get the parent object.');
+      throw new Error(
+        'Parent must be a RuntimeObject, not a number. Use manager.load(id) to get the parent object.',
+      );
     }
     if (!params.parent || typeof params.parent.id !== 'number') {
-      throw new Error('Parent must be a RuntimeObject with a valid id property.');
+      throw new Error(
+        'Parent must be a RuntimeObject with a valid id property.',
+      );
     }
 
     // Extract parent ID from RuntimeObject and store as ObjRefValue
@@ -331,15 +360,33 @@ export class ObjectManager {
     }
 
     // Already a typed Value - return as-is to avoid double-wrapping
-    if (jsValue && typeof jsValue === 'object' && 'type' in jsValue && 'value' in jsValue) {
-      const validTypes = ['null', 'string', 'number', 'boolean', 'objref', 'array', 'object'];
+    if (
+      jsValue &&
+      typeof jsValue === 'object' &&
+      'type' in jsValue &&
+      'value' in jsValue
+    ) {
+      const validTypes = [
+        'null',
+        'string',
+        'number',
+        'boolean',
+        'objref',
+        'array',
+        'object',
+      ];
       if (validTypes.includes(jsValue.type)) {
         return jsValue;
       }
     }
 
     // Handle RuntimeObject (store as objref)
-    if (jsValue && typeof jsValue === 'object' && 'id' in jsValue && typeof jsValue.id === 'number') {
+    if (
+      jsValue &&
+      typeof jsValue === 'object' &&
+      'id' in jsValue &&
+      typeof jsValue.id === 'number'
+    ) {
       return { type: 'objref', value: jsValue.id };
     }
 
@@ -368,7 +415,7 @@ export class ObjectManager {
     if (Array.isArray(jsValue)) {
       return {
         type: 'array',
-        value: jsValue.map(item => this.toValue(item))
+        value: jsValue.map((item) => this.toValue(item)),
       };
     }
 
@@ -392,7 +439,7 @@ export class ObjectManager {
   async update(
     id: ObjId,
     updates: Partial<Omit<GameObject, '_id' | 'created'>>,
-    invalidateCache = true
+    invalidateCache = true,
   ): Promise<void> {
     // Track in-flight writes so tests can flush them before teardown.
     const updatePromise = this.db.update(id, updates);
@@ -411,7 +458,10 @@ export class ObjectManager {
   /**
    * Find object by property value
    */
-  async findByProperty(prop: string, value: PropertyValue): Promise<RuntimeObject[]> {
+  async findByProperty(
+    prop: string,
+    value: PropertyValue,
+  ): Promise<RuntimeObject[]> {
     const results: RuntimeObject[] = [];
 
     // Scan cache - all objects are loaded at startup
@@ -450,14 +500,14 @@ export class ObjectManager {
     const ids: ObjId[] = [];
 
     // Get all positive IDs from the array cache
-    for (let i = 0; i < this.cache['objects'].length; i++) {
-      if (this.cache['objects'][i] !== undefined) {
+    for (let i = 0; i < this.cache.objects.length; i++) {
+      if (this.cache.objects[i] !== undefined) {
         ids.push(i);
       }
     }
 
     // Get all infrastructure object IDs (negative IDs)
-    for (const id of this.cache['infrastructureObjects'].keys()) {
+    for (const id of this.cache.infrastructureObjects.keys()) {
       ids.push(id);
     }
 
@@ -503,7 +553,11 @@ export class ObjectManager {
   /**
    * Store compiled method code in cache
    */
-  setCompiledMethod(objId: ObjId, methodName: string, compiledCode: string): void {
+  setCompiledMethod(
+    objId: ObjId,
+    methodName: string,
+    compiledCode: string,
+  ): void {
     this.cache.setCompiledMethod(objId, methodName, compiledCode);
   }
 
@@ -573,7 +627,7 @@ export class ObjectManager {
 
     // Ensure core infrastructure objects are loaded first (special logic)
     await this.load(-1); // $.nothing
-    await this.load(0);  // $ (ObjectManager)
+    await this.load(0); // $ (ObjectManager)
 
     const allObjects = await this.db.listAll(false); // exclude recycled
     let count = 0;
@@ -592,7 +646,9 @@ export class ObjectManager {
     }
 
     const elapsed = Date.now() - start;
-    console.log(`[ObjectManager] Loaded ${count} objects in ${elapsed}ms (${allObjects.length} total in DB)`);
+    console.log(
+      `[ObjectManager] Loaded ${count} objects in ${elapsed}ms (${allObjects.length} total in DB)`,
+    );
 
     return count;
   }
@@ -689,9 +745,6 @@ export class ObjectManager {
     return new Map(this.aliases);
   }
 
-
-
-
   // ==========================================================================
   // MOO Helper Methods
   // These methods are exposed to MOO code via $ and hide infrastructure details
@@ -752,7 +805,9 @@ export class ObjectManager {
     systemPrompt: string,
     prompt: string,
     session?: string,
-    options?: { additionalMcpServers?: Record<string, { type: string; url: string }> }
+    options?: {
+      additionalMcpServers?: Record<string, { type: string; url: string }>;
+    },
   ): Promise<{ response: string; session: string }> {
     console.log('[ObjectManager.$query] Importing SDK...');
     // Dynamic import to avoid loading SDK at startup
@@ -769,7 +824,10 @@ export class ObjectManager {
     if (options?.additionalMcpServers) {
       Object.assign(mcpServers, options.additionalMcpServers);
     }
-    console.log('[ObjectManager.$query] MCP servers:', Object.keys(mcpServers).join(', '));
+    console.log(
+      '[ObjectManager.$query] MCP servers:',
+      Object.keys(mcpServers).join(', '),
+    );
 
     const queryOptions: Record<string, unknown> = {
       systemPrompt,
@@ -783,22 +841,36 @@ export class ObjectManager {
 
     if (session) {
       queryOptions.resume = session;
-      console.log('[ObjectManager.$query] Resuming session:', session.substring(0, 20) + '...');
+      console.log(
+        '[ObjectManager.$query] Resuming session:',
+        `${session.substring(0, 20)}...`,
+      );
     }
 
     let response = '';
     let newSessionId: string | null = null;
 
-    console.log('[ObjectManager.$query] Calling sdkQuery with prompt length:', prompt.length);
+    console.log(
+      '[ObjectManager.$query] Calling sdkQuery with prompt length:',
+      prompt.length,
+    );
     try {
       for await (const message of sdkQuery({ prompt, options: queryOptions })) {
         const msg = message as Record<string, unknown>;
-        console.log('[ObjectManager.$query] Message type:', msg.type, (msg as any).subtype || '');
+        console.log(
+          '[ObjectManager.$query] Message type:',
+          msg.type,
+          (msg as any).subtype || '',
+        );
 
         // Capture session ID from init message
         if (msg.type === 'system' && (msg as any).subtype === 'init') {
-          newSessionId = (msg as any).session_id || (msg as any).data?.session_id;
-          console.log('[ObjectManager.$query] Got session:', newSessionId?.substring(0, 20) + '...');
+          newSessionId =
+            (msg as any).session_id || (msg as any).data?.session_id;
+          console.log(
+            '[ObjectManager.$query] Got session:',
+            `${newSessionId?.substring(0, 20)}...`,
+          );
         }
 
         // Capture text responses from assistant messages
@@ -816,7 +888,10 @@ export class ObjectManager {
       throw err;
     }
 
-    console.log('[ObjectManager.$query] Completed, response length:', response.length);
+    console.log(
+      '[ObjectManager.$query] Completed, response length:',
+      response.length,
+    );
     return {
       response,
       session: newSessionId || session || '',
@@ -837,7 +912,11 @@ export class ObjectManager {
   }): Promise<string> {
     const collection = this.db.getCollection('game_events');
     // Sanitize event data to prevent circular reference errors
-    const sanitizedEvent = sanitizeForMongo(event, new WeakSet(), `event.${event.type}`);
+    const sanitizedEvent = sanitizeForMongo(
+      event,
+      new WeakSet(),
+      `event.${event.type}`,
+    );
     const result = await collection.insertOne({
       ...sanitizedEvent,
       createdAt: new Date(), // For TTL index
@@ -883,7 +962,8 @@ export class ObjectManager {
         return {
           sessionId: result.sessionId,
           output: result.output,
-          message: 'Connected to MOO. Use this sessionId for subsequent commands.',
+          message:
+            'Connected to MOO. Use this sessionId for subsequent commands.',
         };
       },
 
@@ -917,5 +997,4 @@ export class ObjectManager {
       },
     };
   }
-
 }

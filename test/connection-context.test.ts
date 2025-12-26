@@ -1,11 +1,10 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { Subject, BehaviorSubject } from 'rxjs';
-import { ConnectionContext } from '../src/game/connection-context.js';
+import { BehaviorSubject, Subject } from 'rxjs';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { Connection } from '../src/connection/connection.js';
-import { ObjectManager } from '../src/database/object-manager.js';
-import type { ITransport, TerminalCapabilities } from '../types/transport.js';
-import type { RuntimeObject, ObjId } from '../types/object.js';
+import { ConnectionContext } from '../src/game/connection-context.js';
 import type { AuthInfo } from '../types/auth.js';
+import type { ObjId, RuntimeObject } from '../types/object.js';
+import type { ITransport, TerminalCapabilities } from '../types/transport.js';
 
 // Mock transport for testing
 class MockTransport implements ITransport {
@@ -55,23 +54,28 @@ class MockTransport implements ITransport {
 // Mock RuntimeObject
 class MockRuntimeObject implements RuntimeObject {
   id: ObjId;
-  private callHandler?: (method: string, ...args: unknown[]) => Promise<unknown>;
+  private callHandler?: (
+    method: string,
+    ...args: unknown[]
+  ) => Promise<unknown>;
 
   constructor(id: ObjId) {
     this.id = id;
   }
 
-  setCallHandler(handler: (method: string, ...args: unknown[]) => Promise<unknown>) {
+  setCallHandler(
+    handler: (method: string, ...args: unknown[]) => Promise<unknown>,
+  ) {
     this.callHandler = handler;
   }
 
-  get(prop: string): any {
+  get(_prop: string): any {
     return undefined;
   }
 
-  set(prop: string, value: any): void {}
+  set(_prop: string, _value: any): void {}
 
-  setMethod(name: string, code: string, options?: any): void {}
+  setMethod(_name: string, _code: string, _options?: any): void {}
 
   async call(method: string, ...args: unknown[]): Promise<unknown> {
     if (this.callHandler) {
@@ -80,7 +84,7 @@ class MockRuntimeObject implements RuntimeObject {
     return undefined;
   }
 
-  hasMethod(method: string): boolean {
+  hasMethod(_method: string): boolean {
     return true;
   }
 
@@ -88,7 +92,7 @@ class MockRuntimeObject implements RuntimeObject {
     return 0;
   }
 
-  async setParent(parent: ObjId): Promise<void> {}
+  async setParent(_parent: ObjId): Promise<void> {}
 
   getOwnProperties(): Record<string, any> {
     return {};
@@ -246,7 +250,7 @@ describe('ConnectionContext', () => {
       transport.input$.next('test input');
 
       // Wait for async processing
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       expect(calls).toHaveLength(1);
       expect(calls[0].method).toBe('onInput');
@@ -259,7 +263,7 @@ describe('ConnectionContext', () => {
       transport.input$.next('test input');
 
       // Wait for async processing
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       // Should not throw error
       expect(sentMessages).toHaveLength(0);
@@ -277,9 +281,11 @@ describe('ConnectionContext', () => {
       transport.input$.next('test input');
 
       // Wait for async processing
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
-      expect(sentMessages.some(msg => msg.includes('An error occurred'))).toBe(true);
+      expect(
+        sentMessages.some((msg) => msg.includes('An error occurred')),
+      ).toBe(true);
     });
   });
 
@@ -303,7 +309,7 @@ describe('ConnectionContext', () => {
       const questionPromise = context.question('What is your name? ');
 
       // Wait for prompt to be sent
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       expect(sentMessages).toContain('What is your name? ');
 
@@ -317,14 +323,14 @@ describe('ConnectionContext', () => {
     it('should ignore empty input and wait for non-empty input', async () => {
       const questionPromise = context.question('Enter something: ');
 
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       // Empty inputs should be ignored
       transport.input$.next('   \n');
       transport.input$.next('');
       transport.input$.next('\r\n');
 
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       // Promise should still be pending - send real input
       transport.input$.next('actual input');
@@ -344,17 +350,23 @@ describe('ConnectionContext', () => {
       const questionPromise = context.question('Enter name: ', validator);
 
       // Wait for initial prompt
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
       expect(sentMessages).toContain('Enter name: ');
 
       // Provide invalid input
       transport.input$.next('AB');
 
       // Wait for error and re-prompt
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
-      expect(sentMessages.filter(msg => msg.includes('Name must be at least 3 characters')).length).toBe(1);
-      expect(sentMessages.filter(msg => msg === 'Enter name: ').length).toBe(2);
+      expect(
+        sentMessages.filter((msg) =>
+          msg.includes('Name must be at least 3 characters'),
+        ).length,
+      ).toBe(1);
+      expect(sentMessages.filter((msg) => msg === 'Enter name: ').length).toBe(
+        2,
+      );
 
       // Provide valid input
       transport.input$.next('Alice');
@@ -373,7 +385,7 @@ describe('ConnectionContext', () => {
 
       const questionPromise = context.question('Email: ', validator);
 
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       transport.input$.next('user@example.com');
 
@@ -383,25 +395,32 @@ describe('ConnectionContext', () => {
 
     it('should handle multiple validation failures', async () => {
       const validator = (input: string) => {
-        const num = parseInt(input);
-        if (isNaN(num)) return 'Must be a number';
+        const num = parseInt(input, 10);
+        if (Number.isNaN(num)) return 'Must be a number';
         if (num < 1 || num > 10) return 'Must be between 1 and 10';
         return undefined;
       };
 
-      const questionPromise = context.question('Pick a number (1-10): ', validator);
+      const questionPromise = context.question(
+        'Pick a number (1-10): ',
+        validator,
+      );
 
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       // First try: not a number
       transport.input$.next('abc');
-      await new Promise(resolve => setTimeout(resolve, 10));
-      expect(sentMessages.some(msg => msg.includes('Must be a number'))).toBe(true);
+      await new Promise((resolve) => setTimeout(resolve, 10));
+      expect(sentMessages.some((msg) => msg.includes('Must be a number'))).toBe(
+        true,
+      );
 
       // Second try: out of range
       transport.input$.next('15');
-      await new Promise(resolve => setTimeout(resolve, 10));
-      expect(sentMessages.some(msg => msg.includes('Must be between 1 and 10'))).toBe(true);
+      await new Promise((resolve) => setTimeout(resolve, 10));
+      expect(
+        sentMessages.some((msg) => msg.includes('Must be between 1 and 10')),
+      ).toBe(true);
 
       // Third try: valid
       transport.input$.next('7');
@@ -422,7 +441,7 @@ describe('ConnectionContext', () => {
       const choicePromise = context.choice('Choose a color:', options);
 
       // Wait for menu to be sent
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       // Verify menu was displayed
       const menu = sentMessages.join('');
@@ -447,14 +466,16 @@ describe('ConnectionContext', () => {
 
       const choicePromise = context.choice('Choose:', options);
 
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       // Provide invalid input (not a number)
       transport.input$.next('abc');
 
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
-      expect(sentMessages.some(msg => msg.includes('Invalid choice'))).toBe(true);
+      expect(sentMessages.some((msg) => msg.includes('Invalid choice'))).toBe(
+        true,
+      );
 
       // Provide valid input
       transport.input$.next('1');
@@ -471,14 +492,16 @@ describe('ConnectionContext', () => {
 
       const choicePromise = context.choice('Select:', options);
 
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       // Provide out of range number
       transport.input$.next('5');
 
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
-      expect(sentMessages.some(msg => msg.includes('Invalid choice'))).toBe(true);
+      expect(sentMessages.some((msg) => msg.includes('Invalid choice'))).toBe(
+        true,
+      );
 
       // Provide valid input
       transport.input$.next('2');
@@ -495,14 +518,16 @@ describe('ConnectionContext', () => {
 
       const choicePromise = context.choice('Pick one:', options);
 
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       // Try selecting 0
       transport.input$.next('0');
 
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
-      expect(sentMessages.some(msg => msg.includes('Invalid choice'))).toBe(true);
+      expect(sentMessages.some((msg) => msg.includes('Invalid choice'))).toBe(
+        true,
+      );
 
       // Provide valid input
       transport.input$.next('1');
@@ -519,7 +544,7 @@ describe('ConnectionContext', () => {
 
       const choicePromise = context.choice('Choose:', options);
 
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       // Input with whitespace
       transport.input$.next('  2  \n');
@@ -537,7 +562,7 @@ describe('ConnectionContext', () => {
 
       const choicePromise = context.choice('Choose:', options);
 
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       // Select first item (should be 'third' since objects maintain insertion order)
       transport.input$.next('1');
@@ -554,17 +579,19 @@ describe('ConnectionContext', () => {
 
       const choicePromise = context.choice('Choose:', options);
 
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       // Empty inputs should be ignored (not treated as invalid)
       transport.input$.next('');
       transport.input$.next('   ');
       transport.input$.next('\r\n');
 
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       // Should NOT have "Invalid choice" messages for empty input
-      const invalidMessages = sentMessages.filter(msg => msg.includes('Invalid choice'));
+      const invalidMessages = sentMessages.filter((msg) =>
+        msg.includes('Invalid choice'),
+      );
       expect(invalidMessages).toHaveLength(0);
 
       // Provide valid input
@@ -579,9 +606,13 @@ describe('ConnectionContext', () => {
     it('should return true for "yes"', async () => {
       const yesnoPromise = context.yesorno('Do you agree?');
 
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
-      expect(sentMessages.some(msg => msg.includes('Do you agree?') && msg.includes('(yes/no)'))).toBe(true);
+      expect(
+        sentMessages.some(
+          (msg) => msg.includes('Do you agree?') && msg.includes('(yes/no)'),
+        ),
+      ).toBe(true);
 
       transport.input$.next('yes');
 
@@ -592,7 +623,7 @@ describe('ConnectionContext', () => {
     it('should return true for "y"', async () => {
       const yesnoPromise = context.yesorno('Continue?');
 
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       transport.input$.next('y');
 
@@ -603,7 +634,7 @@ describe('ConnectionContext', () => {
     it('should return false for "no"', async () => {
       const yesnoPromise = context.yesorno('Delete file?');
 
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       transport.input$.next('no');
 
@@ -614,7 +645,7 @@ describe('ConnectionContext', () => {
     it('should return false for "n"', async () => {
       const yesnoPromise = context.yesorno('Exit?');
 
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       transport.input$.next('n');
 
@@ -625,7 +656,7 @@ describe('ConnectionContext', () => {
     it('should be case insensitive', async () => {
       const yesnoPromise = context.yesorno('Confirm?');
 
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       transport.input$.next('YES');
 
@@ -636,7 +667,7 @@ describe('ConnectionContext', () => {
     it('should handle mixed case', async () => {
       const yesnoPromise = context.yesorno('Ready?');
 
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       transport.input$.next('No');
 
@@ -647,14 +678,16 @@ describe('ConnectionContext', () => {
     it('should re-prompt on invalid input', async () => {
       const yesnoPromise = context.yesorno('Accept?');
 
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       // Invalid input
       transport.input$.next('maybe');
 
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
-      expect(sentMessages.some(msg => msg.includes('Please answer yes or no'))).toBe(true);
+      expect(
+        sentMessages.some((msg) => msg.includes('Please answer yes or no')),
+      ).toBe(true);
 
       // Valid input
       transport.input$.next('yes');
@@ -666,21 +699,24 @@ describe('ConnectionContext', () => {
     it('should re-prompt multiple times on invalid input', async () => {
       const yesnoPromise = context.yesorno('Proceed?');
 
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       // First invalid input
       transport.input$.next('maybe');
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       // Second invalid input
       transport.input$.next('ok');
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       // Third invalid input
       transport.input$.next('sure');
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
-      expect(sentMessages.filter(msg => msg.includes('Please answer yes or no')).length).toBe(3);
+      expect(
+        sentMessages.filter((msg) => msg.includes('Please answer yes or no'))
+          .length,
+      ).toBe(3);
 
       // Valid input
       transport.input$.next('n');
@@ -692,7 +728,7 @@ describe('ConnectionContext', () => {
     it('should trim whitespace from input', async () => {
       const yesnoPromise = context.yesorno('OK?');
 
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       transport.input$.next('  yes  \n');
 
@@ -703,7 +739,7 @@ describe('ConnectionContext', () => {
     it('should handle uppercase single letter', async () => {
       const yesnoPromise = context.yesorno('Save?');
 
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       transport.input$.next('Y');
 
@@ -714,17 +750,19 @@ describe('ConnectionContext', () => {
     it('should ignore empty input and wait for valid answer', async () => {
       const yesnoPromise = context.yesorno('Continue?');
 
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       // Empty inputs should be ignored
       transport.input$.next('');
       transport.input$.next('   ');
       transport.input$.next('\n');
 
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       // Should NOT have "Please answer yes or no" for empty input
-      const errorMessages = sentMessages.filter(msg => msg.includes('Please answer yes or no'));
+      const errorMessages = sentMessages.filter((msg) =>
+        msg.includes('Please answer yes or no'),
+      );
       expect(errorMessages).toHaveLength(0);
 
       // Provide valid input
@@ -739,14 +777,14 @@ describe('ConnectionContext', () => {
     it('should handle question followed by yesorno', async () => {
       // First ask a question
       const namePromise = context.question('Name: ');
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
       transport.input$.next('Alice');
       const name = await namePromise;
       expect(name).toBe('Alice');
 
       // Then ask yes/no
       const confirmPromise = context.yesorno('Is this correct?');
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
       transport.input$.next('yes');
       const confirmed = await confirmPromise;
       expect(confirmed).toBe(true);
@@ -758,14 +796,14 @@ describe('ConnectionContext', () => {
         warrior: 'Warrior',
         mage: 'Mage',
       });
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
       transport.input$.next('1');
       const role = await choicePromise;
       expect(role).toBe('warrior');
 
       // Then ask question
       const namePromise = context.question('Character name: ');
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
       transport.input$.next('Conan');
       const name = await namePromise;
       expect(name).toBe('Conan');

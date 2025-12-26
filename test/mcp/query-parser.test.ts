@@ -3,7 +3,7 @@
  * Tests tokenizer, parser, and MongoDB translation
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { parseQuery, validateQuery } from '../../src/mcp/query-parser.js';
 
 describe('Query Parser', () => {
@@ -90,42 +90,42 @@ describe('Query Parser', () => {
     it('should parse contains (case-insensitive substring)', () => {
       const query = parseQuery('.name contains "sword"');
       expect(query).toEqual({
-        'properties.name.value': { $regex: 'sword', $options: 'i' }
+        'properties.name.value': { $regex: 'sword', $options: 'i' },
       });
     });
 
     it('should escape regex special characters in contains', () => {
       const query = parseQuery('.name contains "test.value"');
       expect(query).toEqual({
-        'properties.name.value': { $regex: 'test\\.value', $options: 'i' }
+        'properties.name.value': { $regex: 'test\\.value', $options: 'i' },
       });
     });
 
     it('should parse like with wildcard *', () => {
       const query = parseQuery('.name like "Iron*"');
       expect(query).toEqual({
-        'properties.name.value': { $regex: '^Iron.*$', $options: 'i' }
+        'properties.name.value': { $regex: '^Iron.*$', $options: 'i' },
       });
     });
 
     it('should parse like with single char wildcard ?', () => {
       const query = parseQuery('.name like "Item?"');
       expect(query).toEqual({
-        'properties.name.value': { $regex: '^Item.$', $options: 'i' }
+        'properties.name.value': { $regex: '^Item.$', $options: 'i' },
       });
     });
 
     it('should parse like with mixed wildcards', () => {
       const query = parseQuery('.name like "*Sword?"');
       expect(query).toEqual({
-        'properties.name.value': { $regex: '^.*Sword.$', $options: 'i' }
+        'properties.name.value': { $regex: '^.*Sword.$', $options: 'i' },
       });
     });
 
     it('should parse matches with direct regex', () => {
       const query = parseQuery('.name matches "^[A-Z].*"');
       expect(query).toEqual({
-        'properties.name.value': { $regex: '^[A-Z].*' }
+        'properties.name.value': { $regex: '^[A-Z].*' },
       });
     });
   });
@@ -133,13 +133,15 @@ describe('Query Parser', () => {
   describe('Exists operator', () => {
     it('should parse property exists', () => {
       const query = parseQuery('.description exists');
-      expect(query).toEqual({ 'properties.description.value': { $exists: true } });
+      expect(query).toEqual({
+        'properties.description.value': { $exists: true },
+      });
     });
 
     it('should parse negated exists with not', () => {
       const query = parseQuery('not .description exists');
       expect(query).toEqual({
-        $nor: [{ 'properties.description.value': { $exists: true } }]
+        $nor: [{ 'properties.description.value': { $exists: true } }],
       });
     });
   });
@@ -150,8 +152,8 @@ describe('Query Parser', () => {
       expect(query).toEqual({
         $and: [
           { 'properties.type.value': 'weapon' },
-          { 'properties.damage.value': { $gt: 10 } }
-        ]
+          { 'properties.damage.value': { $gt: 10 } },
+        ],
       });
     });
 
@@ -160,15 +162,15 @@ describe('Query Parser', () => {
       expect(query).toEqual({
         $or: [
           { 'properties.type.value': 'weapon' },
-          { 'properties.type.value': 'armor' }
-        ]
+          { 'properties.type.value': 'armor' },
+        ],
       });
     });
 
     it('should parse NOT', () => {
       const query = parseQuery('not .hidden == true');
       expect(query).toEqual({
-        $nor: [{ 'properties.hidden.value': true }]
+        $nor: [{ 'properties.hidden.value': true }],
       });
     });
 
@@ -177,13 +179,10 @@ describe('Query Parser', () => {
       expect(query).toEqual({
         $and: [
           {
-            $and: [
-              { 'properties.a.value': 1 },
-              { 'properties.b.value': 2 }
-            ]
+            $and: [{ 'properties.a.value': 1 }, { 'properties.b.value': 2 }],
           },
-          { 'properties.c.value': 3 }
-        ]
+          { 'properties.c.value': 3 },
+        ],
       });
     });
 
@@ -192,13 +191,10 @@ describe('Query Parser', () => {
       expect(query).toEqual({
         $or: [
           {
-            $or: [
-              { 'properties.a.value': 1 },
-              { 'properties.b.value': 2 }
-            ]
+            $or: [{ 'properties.a.value': 1 }, { 'properties.b.value': 2 }],
           },
-          { 'properties.c.value': 3 }
-        ]
+          { 'properties.c.value': 3 },
+        ],
       });
     });
 
@@ -209,12 +205,9 @@ describe('Query Parser', () => {
         $or: [
           { 'properties.a.value': 1 },
           {
-            $and: [
-              { 'properties.b.value': 2 },
-              { 'properties.c.value': 3 }
-            ]
-          }
-        ]
+            $and: [{ 'properties.b.value': 2 }, { 'properties.c.value': 3 }],
+          },
+        ],
       });
     });
   });
@@ -230,13 +223,10 @@ describe('Query Parser', () => {
       expect(query).toEqual({
         $and: [
           {
-            $or: [
-              { 'properties.a.value': 1 },
-              { 'properties.b.value': 2 }
-            ]
+            $or: [{ 'properties.a.value': 1 }, { 'properties.b.value': 2 }],
           },
-          { 'properties.c.value': 3 }
-        ]
+          { 'properties.c.value': 3 },
+        ],
       });
     });
 
@@ -250,18 +240,12 @@ describe('Query Parser', () => {
       expect(query).toEqual({
         $and: [
           {
-            $or: [
-              { 'properties.a.value': 1 },
-              { 'properties.b.value': 2 }
-            ]
+            $or: [{ 'properties.a.value': 1 }, { 'properties.b.value': 2 }],
           },
           {
-            $or: [
-              { 'properties.c.value': 3 },
-              { 'properties.d.value': 4 }
-            ]
-          }
-        ]
+            $or: [{ 'properties.c.value': 3 }, { 'properties.d.value': 4 }],
+          },
+        ],
       });
     });
   });
@@ -316,7 +300,9 @@ describe('Query Parser', () => {
     });
 
     it('should throw on unexpected character', () => {
-      expect(() => parseQuery('.name @@ "test"')).toThrow('Unexpected character');
+      expect(() => parseQuery('.name @@ "test"')).toThrow(
+        'Unexpected character',
+      );
     });
 
     it('should throw on missing operator', () => {
@@ -332,7 +318,9 @@ describe('Query Parser', () => {
     });
 
     it('should throw on unexpected token at end', () => {
-      expect(() => parseQuery('.name == "test" "extra"')).toThrow('Unexpected token');
+      expect(() => parseQuery('.name == "test" "extra"')).toThrow(
+        'Unexpected token',
+      );
     });
 
     it('should throw on missing property after dot', () => {
@@ -354,28 +342,29 @@ describe('Query Parser', () => {
 
   describe('Real-world queries', () => {
     it('should parse weapon query', () => {
-      const query = parseQuery('.type == "weapon" and .damage >= 10 and .weight < 5');
+      const query = parseQuery(
+        '.type == "weapon" and .damage >= 10 and .weight < 5',
+      );
       expect(query.$and).toBeDefined();
     });
 
     it('should parse item search', () => {
-      const query = parseQuery('.name contains "sword" or .name contains "blade"');
+      const query = parseQuery(
+        '.name contains "sword" or .name contains "blade"',
+      );
       expect(query.$or).toBeDefined();
     });
 
     it('should parse player lookup', () => {
       const query = parseQuery('.parent == 10 and .type == "player"');
       expect(query).toEqual({
-        $and: [
-          { parent: 10 },
-          { 'properties.type.value': 'player' }
-        ]
+        $and: [{ parent: 10 }, { 'properties.type.value': 'player' }],
       });
     });
 
     it('should parse complex filter', () => {
       const query = parseQuery(
-        '(.type == "weapon" or .type == "armor") and .owner == 42 and .level >= 5'
+        '(.type == "weapon" or .type == "armor") and .owner == 42 and .level >= 5',
       );
       expect(query.$and).toBeDefined();
       // Parser is left-associative: ((A and B) and C) = 2 elements at top level

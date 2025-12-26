@@ -1,5 +1,5 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Builds the Faction prototype
@@ -23,7 +23,8 @@ export class FactionBuilder {
       parent: parent!,
       properties: {
         name: 'Faction Manager',
-        description: 'Manages faction memberships and inter-faction relationships.',
+        description:
+          'Manages faction memberships and inter-faction relationships.',
         // Map of factionName -> { members: [entityIds], description, leader }
         factions: {},
         // Map of "factionA:factionB" -> relationship ('friendly', 'hostile', 'neutral')
@@ -50,7 +51,9 @@ MEMBERS: getMembers(faction) returns array of entity IDs in faction.`,
     });
 
     // Create a new faction
-    obj.setMethod('createFaction', `
+    obj.setMethod(
+      'createFaction',
+      `
       const name = args[0];
       const description = args[1] || '';
 
@@ -72,23 +75,32 @@ MEMBERS: getMembers(faction) returns array of entity IDs in faction.`,
       self.factions = factions;
 
       return { success: true, faction: name };
-    `);
+    `,
+    );
 
     // Get faction info
-    obj.setMethod('getFactionInfo', `
+    obj.setMethod(
+      'getFactionInfo',
+      `
       const name = args[0];
       const factions = self.factions || {};
       return factions[name] || null;
-    `);
+    `,
+    );
 
     // List all factions
-    obj.setMethod('listFactions', `
+    obj.setMethod(
+      'listFactions',
+      `
       const factions = self.factions || {};
       return Object.keys(factions);
-    `);
+    `,
+    );
 
     // Set an entity's faction membership
-    obj.setMethod('setFaction', `
+    obj.setMethod(
+      'setFaction',
+      `
       const entity = args[0];
       const factionName = args[1];
 
@@ -124,10 +136,13 @@ MEMBERS: getMembers(faction) returns array of entity IDs in faction.`,
       self.memberships = memberships;
 
       return { success: true, faction: factionName };
-    `);
+    `,
+    );
 
     // Get an entity's faction
-    obj.setMethod('getFaction', `
+    obj.setMethod(
+      'getFaction',
+      `
       const entity = args[0];
       if (!entity) return null;
 
@@ -136,10 +151,13 @@ MEMBERS: getMembers(faction) returns array of entity IDs in faction.`,
 
       const memberships = self.memberships || {};
       return memberships[entityId] || null;
-    `);
+    `,
+    );
 
     // Set relationship between two factions
-    obj.setMethod('setRelationship', `
+    obj.setMethod(
+      'setRelationship',
+      `
       const factionA = args[0];
       const factionB = args[1];
       const relationship = args[2]; // 'friendly', 'hostile', 'neutral'
@@ -166,10 +184,13 @@ MEMBERS: getMembers(faction) returns array of entity IDs in faction.`,
       self.relationships = relationships;
 
       return { success: true, relationship };
-    `);
+    `,
+    );
 
     // Get relationship between two factions
-    obj.setMethod('getRelationship', `
+    obj.setMethod(
+      'getRelationship',
+      `
       const factionA = args[0];
       const factionB = args[1];
 
@@ -180,10 +201,13 @@ MEMBERS: getMembers(faction) returns array of entity IDs in faction.`,
       const relationships = self.relationships || {};
 
       return relationships[key] || 'neutral';
-    `);
+    `,
+    );
 
     // Check if two entities are friendly (same faction or allied factions)
-    obj.setMethod('isFriendly', `
+    obj.setMethod(
+      'isFriendly',
+      `
       const entityA = args[0];
       const entityB = args[1];
 
@@ -207,10 +231,13 @@ MEMBERS: getMembers(faction) returns array of entity IDs in faction.`,
       // Check faction relationship
       const relationship = await self.getRelationship(factionA, factionB);
       return relationship === 'friendly';
-    `);
+    `,
+    );
 
     // Check if two entities are hostile
-    obj.setMethod('isHostile', `
+    obj.setMethod(
+      'isHostile',
+      `
       const entityA = args[0];
       const entityB = args[1];
 
@@ -234,10 +261,13 @@ MEMBERS: getMembers(faction) returns array of entity IDs in faction.`,
       // Check faction relationship
       const relationship = await self.getRelationship(factionA, factionB);
       return relationship === 'hostile';
-    `);
+    `,
+    );
 
     // Get all members of a faction
-    obj.setMethod('getMembers', `
+    obj.setMethod(
+      'getMembers',
+      `
       const factionName = args[0];
       if (!factionName) return [];
 
@@ -245,10 +275,13 @@ MEMBERS: getMembers(faction) returns array of entity IDs in faction.`,
       const faction = factions[factionName];
 
       return faction ? [...faction.members] : [];
-    `);
+    `,
+    );
 
     // Set faction leader
-    obj.setMethod('setLeader', `
+    obj.setMethod(
+      'setLeader',
+      `
       const factionName = args[0];
       const entity = args[1];
 
@@ -264,10 +297,13 @@ MEMBERS: getMembers(faction) returns array of entity IDs in faction.`,
       self.factions = factions;
 
       return { success: true };
-    `);
+    `,
+    );
 
     // Get faction leader
-    obj.setMethod('getLeader', `
+    obj.setMethod(
+      'getLeader',
+      `
       const factionName = args[0];
       if (!factionName) return null;
 
@@ -275,12 +311,22 @@ MEMBERS: getMembers(faction) returns array of entity IDs in faction.`,
       const faction = factions[factionName];
 
       return faction ? faction.leader : null;
-    `);
+    `,
+    );
 
     // Property descriptions
-    obj.setPropertyDescription('factions', 'Map of factionName -> {members: [entityIds], description, leader, created}');
-    obj.setPropertyDescription('relationships', 'Map of "factionA:factionB" -> relationship (friendly/hostile/neutral), bidirectional with sorted keys');
-    obj.setPropertyDescription('memberships', 'Map of entityId -> factionName for quick faction lookup by entity');
+    obj.setPropertyDescription(
+      'factions',
+      'Map of factionName -> {members: [entityIds], description, leader, created}',
+    );
+    obj.setPropertyDescription(
+      'relationships',
+      'Map of "factionA:factionB" -> relationship (friendly/hostile/neutral), bidirectional with sorted keys',
+    );
+    obj.setPropertyDescription(
+      'memberships',
+      'Map of entityId -> factionName for quick faction lookup by entity',
+    );
 
     return obj;
   }

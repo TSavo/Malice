@@ -228,7 +228,9 @@ class Parser {
   private expect(type: TokenType): Token {
     const token = this.current();
     if (token.type !== type) {
-      throw new Error(`Expected ${type} but got ${token.type} at position ${token.pos}`);
+      throw new Error(
+        `Expected ${type} but got ${token.type} at position ${token.pos}`,
+      );
     }
     return this.advance();
   }
@@ -240,7 +242,9 @@ class Parser {
   parse(): ASTNode {
     const result = this.parseOr();
     if (this.current().type !== 'EOF') {
-      throw new Error(`Unexpected token ${this.current().type} at position ${this.current().pos}`);
+      throw new Error(
+        `Unexpected token ${this.current().type} at position ${this.current().pos}`,
+      );
     }
     return result;
   }
@@ -317,7 +321,9 @@ class Parser {
       } else if (this.match('MATCHES')) {
         operator = 'matches';
       } else {
-        throw new Error(`Expected operator but got ${opToken.type} at position ${opToken.pos}`);
+        throw new Error(
+          `Expected operator but got ${opToken.type} at position ${opToken.pos}`,
+        );
       }
       this.advance();
 
@@ -337,13 +343,17 @@ class Parser {
         value = null;
         this.advance();
       } else {
-        throw new Error(`Expected value but got ${valueToken.type} at position ${valueToken.pos}`);
+        throw new Error(
+          `Expected value but got ${valueToken.type} at position ${valueToken.pos}`,
+        );
       }
 
       return { type: 'comparison', property, operator, value };
     }
 
-    throw new Error(`Unexpected token ${this.current().type} at position ${this.current().pos}`);
+    throw new Error(
+      `Unexpected token ${this.current().type} at position ${this.current().pos}`,
+    );
   }
 }
 
@@ -351,7 +361,9 @@ class Parser {
 function translateToMongo(ast: ASTNode): Record<string, any> {
   switch (ast.type) {
     case 'and':
-      return { $and: [translateToMongo(ast.left), translateToMongo(ast.right)] };
+      return {
+        $and: [translateToMongo(ast.left), translateToMongo(ast.right)],
+      };
 
     case 'or':
       return { $or: [translateToMongo(ast.left), translateToMongo(ast.right)] };
@@ -385,10 +397,11 @@ function translateToMongo(ast: ASTNode): Record<string, any> {
         case 'contains':
           // Case-insensitive substring match
           return { [field]: { $regex: escapeRegex(value), $options: 'i' } };
-        case 'like':
+        case 'like': {
           // Glob to regex: * -> .*, ? -> .
-          const globRegex = '^' + escapeRegex(value).replace(/\\\*/g, '.*').replace(/\\\?/g, '.') + '$';
+          const globRegex = `^${escapeRegex(value).replace(/\\\*/g, '.*').replace(/\\\?/g, '.')}$`;
           return { [field]: { $regex: globRegex, $options: 'i' } };
+        }
         case 'matches':
           // Direct regex
           return { [field]: { $regex: value } };
@@ -431,11 +444,17 @@ export function parseQuery(query: string): Record<string, any> {
 /**
  * Validate a query string without executing it
  */
-export function validateQuery(query: string): { valid: boolean; error?: string } {
+export function validateQuery(query: string): {
+  valid: boolean;
+  error?: string;
+} {
   try {
     parseQuery(query);
     return { valid: true };
   } catch (err) {
-    return { valid: false, error: err instanceof Error ? err.message : String(err) };
+    return {
+      valid: false,
+      error: err instanceof Error ? err.message : String(err),
+    };
   }
 }

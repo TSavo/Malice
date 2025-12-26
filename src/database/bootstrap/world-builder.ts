@@ -1,8 +1,8 @@
-import { ObjectManager } from '../object-manager.js';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+import { pathToFileURL } from 'node:url';
 import type { RuntimeObject } from '../../../types/object.js';
-import * as fs from 'fs';
-import * as path from 'path';
-import { pathToFileURL } from 'url';
+import type { ObjectManager } from '../object-manager.js';
 
 interface ExitData {
   to?: string; // Target file path (for building connections, ignored by world-builder)
@@ -67,7 +67,9 @@ export class WorldBuilder {
     }
 
     if (!$.room || !$.exit || !$.recycler) {
-      throw new Error('Room, Exit, and Recycler prototypes must exist before building world');
+      throw new Error(
+        'Room, Exit, and Recycler prototypes must exist before building world',
+      );
     }
 
     console.log('  📍 Building Pioneer Square...');
@@ -95,7 +97,7 @@ export class WorldBuilder {
   private async loadRoomData(): Promise<void> {
     const worldDir = path.join(
       process.cwd(),
-      'src/database/bootstrap/world/seattle/pioneer-square'
+      'src/database/bootstrap/world/seattle/pioneer-square',
     );
 
     // Street directories (east-west, files named x*.ts)
@@ -126,7 +128,9 @@ export class WorldBuilder {
         continue;
       }
 
-      const files = fs.readdirSync(streetDir).filter(f => f.endsWith('.ts') && f.startsWith('x'));
+      const files = fs
+        .readdirSync(streetDir)
+        .filter((f) => f.endsWith('.ts') && f.startsWith('x'));
 
       for (const file of files) {
         try {
@@ -153,7 +157,9 @@ export class WorldBuilder {
         continue;
       }
 
-      const files = fs.readdirSync(avenueDir).filter(f => f.endsWith('.ts') && f.startsWith('y'));
+      const files = fs
+        .readdirSync(avenueDir)
+        .filter((f) => f.endsWith('.ts') && f.startsWith('y'));
 
       for (const file of files) {
         try {
@@ -175,7 +181,7 @@ export class WorldBuilder {
     // Load alley rooms (all *.ts files in alleys directory)
     const alleysDir = path.join(worldDir, 'alleys');
     if (fs.existsSync(alleysDir)) {
-      const files = fs.readdirSync(alleysDir).filter(f => f.endsWith('.ts'));
+      const files = fs.readdirSync(alleysDir).filter((f) => f.endsWith('.ts'));
 
       for (const file of files) {
         try {
@@ -197,7 +203,7 @@ export class WorldBuilder {
     // Load Occidental Park rooms (all *.ts files in occidental-park directory)
     const parkDir = path.join(worldDir, 'occidental-park');
     if (fs.existsSync(parkDir)) {
-      const files = fs.readdirSync(parkDir).filter(f => f.endsWith('.ts'));
+      const files = fs.readdirSync(parkDir).filter((f) => f.endsWith('.ts'));
 
       for (const file of files) {
         try {
@@ -219,13 +225,14 @@ export class WorldBuilder {
     // Load Underground rooms (all *.ts files in underground subdirectories)
     const undergroundDir = path.join(worldDir, 'underground');
     if (fs.existsSync(undergroundDir)) {
-      const subdirs = fs.readdirSync(undergroundDir, { withFileTypes: true })
-        .filter(d => d.isDirectory())
-        .map(d => d.name);
+      const subdirs = fs
+        .readdirSync(undergroundDir, { withFileTypes: true })
+        .filter((d) => d.isDirectory())
+        .map((d) => d.name);
 
       for (const subdir of subdirs) {
         const dir = path.join(undergroundDir, subdir);
-        const files = fs.readdirSync(dir).filter(f => f.endsWith('.ts'));
+        const files = fs.readdirSync(dir).filter((f) => f.endsWith('.ts'));
 
         for (const file of files) {
           try {
@@ -239,7 +246,9 @@ export class WorldBuilder {
               this.roomData.set(key, roomDef);
             }
           } catch (err) {
-            console.warn(`    Warning: Could not load underground ${subdir}/${file}: ${err}`);
+            console.warn(
+              `    Warning: Could not load underground ${subdir}/${file}: ${err}`,
+            );
           }
         }
       }
@@ -292,7 +301,13 @@ export class WorldBuilder {
       const data = this.roomData.get(key);
 
       // Check each cardinal direction
-      const directions: Array<{ dx: number; dy: number; dz: number; name: string; aliases: string[] }> = [
+      const directions: Array<{
+        dx: number;
+        dy: number;
+        dz: number;
+        name: string;
+        aliases: string[];
+      }> = [
         { dx: 0, dy: 1, dz: 0, name: 'north', aliases: ['n'] },
         { dx: 0, dy: -1, dz: 0, name: 'south', aliases: ['s'] },
         { dx: 1, dy: 0, dz: 0, name: 'east', aliases: ['e'] },
@@ -308,7 +323,8 @@ export class WorldBuilder {
         if (neighbor) {
           // Check for custom exit definition
           const customExit = data?.exits?.[dir.name];
-          const exitData: ExitData | undefined = typeof customExit === 'object' ? customExit : undefined;
+          const exitData: ExitData | undefined =
+            typeof customExit === 'object' ? customExit : undefined;
 
           // Determine exit prototype
           let parent = exitProto;
@@ -317,7 +333,14 @@ export class WorldBuilder {
           }
 
           // Calculate distance between rooms
-          const distance = this.calculateDistance(x, y, z, x + dir.dx, y + dir.dy, z + dir.dz);
+          const distance = this.calculateDistance(
+            x,
+            y,
+            z,
+            x + dir.dx,
+            y + dir.dy,
+            z + dir.dz,
+          );
 
           // Build exit properties
           const properties: Record<string, unknown> = {
@@ -360,7 +383,14 @@ export class WorldBuilder {
    * Calculate distance between coordinates (in meters)
    * Grid spacing: ~30m per coordinate unit
    */
-  private calculateDistance(x1: number, y1: number, z1: number, x2: number, y2: number, z2: number): number {
+  private calculateDistance(
+    x1: number,
+    y1: number,
+    z1: number,
+    x2: number,
+    y2: number,
+    z2: number,
+  ): number {
     const dx = (x2 - x1) * 30; // 30m per grid unit horizontal
     const dy = (y2 - y1) * 30;
     const dz = (z2 - z1) * 3; // 3m per floor vertical
@@ -379,7 +409,9 @@ export class WorldBuilder {
 
     if (startRoom && objectManager) {
       await objectManager.call('addAlias', 'startRoom', startRoom.id);
-      console.log(`    Registered $.startRoom = #${startRoom.id} (${startRoom.get('name')})`);
+      console.log(
+        `    Registered $.startRoom = #${startRoom.id} (${startRoom.get('name')})`,
+      );
     } else {
       // Fallback: use first room
       const firstRoom = this.rooms.values().next().value;

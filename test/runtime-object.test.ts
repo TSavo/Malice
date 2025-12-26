@@ -1,10 +1,12 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { ObjectDatabase } from '../src/database/object-db.js';
 import { ObjectManager } from '../src/database/object-manager.js';
 import { RuntimeObjectImpl } from '../src/database/runtime-object.js';
-import type { RuntimeObject, GameObject } from '../types/object.js';
+import type { GameObject, RuntimeObject } from '../types/object.js';
 
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/?replicaSet=rs0&directConnection=true';
+const MONGO_URI =
+  process.env.MONGO_URI ||
+  'mongodb://localhost:27017/?replicaSet=rs0&directConnection=true';
 
 describe('RuntimeObject', () => {
   let db: ObjectDatabase;
@@ -17,7 +19,7 @@ describe('RuntimeObject', () => {
     await db.connect();
 
     // Clean database
-    await db['objects'].deleteMany({});
+    await db.objects.deleteMany({});
 
     manager = new ObjectManager(db);
 
@@ -101,7 +103,7 @@ describe('RuntimeObject', () => {
       (proxy as any).newProp = 'new value';
 
       // Give auto-save time to complete
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       // Verify property was set
       expect(testObj.get('newProp')).toBe('new value');
@@ -116,7 +118,7 @@ describe('RuntimeObject', () => {
       (proxy as any).hp = 75;
 
       // Give auto-save time to complete
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       expect(testObj.get('hp')).toBe(75);
     });
@@ -322,7 +324,7 @@ describe('RuntimeObject', () => {
       expect(testObj.getParent()?.id).toBe(parent.id);
 
       // Give async auto-persist time to complete
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       // Verify persisted to DB
       await testObj.pull();
@@ -330,8 +332,16 @@ describe('RuntimeObject', () => {
     });
 
     it('should allow changing parent multiple times', async () => {
-      const parent1 = await manager.create({ parent: root, properties: {}, methods: {} });
-      const parent2 = await manager.create({ parent: root, properties: {}, methods: {} });
+      const parent1 = await manager.create({
+        parent: root,
+        properties: {},
+        methods: {},
+      });
+      const parent2 = await manager.create({
+        parent: root,
+        properties: {},
+        methods: {},
+      });
 
       testObj.setParent(parent1);
       expect(testObj.getParent()?.id).toBe(parent1.id);
@@ -472,9 +482,9 @@ describe('RuntimeObject', () => {
       await testObj.save();
 
       // Track if update is called
-      const originalUpdate = manager['db']['objects'].updateOne;
+      const originalUpdate = manager.db.objects.updateOne;
       let updateCalled = false;
-      manager['db']['objects'].updateOne = function(...args: any[]) {
+      manager.db.objects.updateOne = function (...args: any[]) {
         updateCalled = true;
         return originalUpdate.apply(this, args);
       } as any;
@@ -486,7 +496,7 @@ describe('RuntimeObject', () => {
       expect(updateCalled).toBe(false);
 
       // Restore
-      manager['db']['objects'].updateOne = originalUpdate;
+      manager.db.objects.updateOne = originalUpdate;
     });
 
     it('should mark as clean after save', async () => {
@@ -496,9 +506,9 @@ describe('RuntimeObject', () => {
       await testObj.save();
 
       // Second save should be no-op (not dirty)
-      const updateSpy = manager['db']['objects'].updateOne;
+      const updateSpy = manager.db.objects.updateOne;
       let secondUpdateCalled = false;
-      manager['db']['objects'].updateOne = function(...args: any[]) {
+      manager.db.objects.updateOne = function (...args: any[]) {
         secondUpdateCalled = true;
         return updateSpy.apply(this, args);
       } as any;
@@ -508,7 +518,7 @@ describe('RuntimeObject', () => {
       expect(secondUpdateCalled).toBe(false);
 
       // Restore
-      manager['db']['objects'].updateOne = updateSpy;
+      manager.db.objects.updateOne = updateSpy;
     });
 
     it('should save property changes', async () => {
@@ -531,9 +541,9 @@ describe('RuntimeObject', () => {
   describe('pull()', () => {
     it('should reload object properties from database', async () => {
       // Modify object in database directly (properties are now typed Values)
-      await db['objects'].updateOne(
+      await db.objects.updateOne(
         { _id: testObj.id },
-        { $set: { 'properties.hp': { type: 'number', value: 999 } } }
+        { $set: { 'properties.hp': { type: 'number', value: 999 } } },
       );
 
       // Pull should load new value from DB into memory
@@ -544,15 +554,15 @@ describe('RuntimeObject', () => {
 
     it('should reload object methods from database', async () => {
       // Add method in database directly
-      await db['objects'].updateOne(
+      await db.objects.updateOne(
         { _id: testObj.id },
         {
           $set: {
             'methods.dbMethod': {
-              code: 'return "db";'
-            }
-          }
-        }
+              code: 'return "db";',
+            },
+          },
+        },
       );
 
       await testObj.pull();
@@ -562,7 +572,7 @@ describe('RuntimeObject', () => {
 
     it('should handle pull when object does not exist in DB', async () => {
       // Edge case - object deleted from database but proxy still in memory
-      await db['objects'].deleteOne({ _id: testObj.id });
+      await db.objects.deleteOne({ _id: testObj.id });
 
       // Pull should handle gracefully (no error, no change)
       await expect(testObj.pull()).resolves.not.toThrow();
@@ -917,10 +927,13 @@ describe('RuntimeObject', () => {
         properties: {},
         methods: {},
       });
-      child.setMethod('greet', `
+      child.setMethod(
+        'greet',
+        `
         const parentResult = await pass();
         return parentResult + " and child";
-      `);
+      `,
+      );
 
       const result = await child.call('greet');
       expect(result).toBe('Hello from parent and child');
@@ -940,10 +953,13 @@ describe('RuntimeObject', () => {
         properties: {},
         methods: {},
       });
-      child.setMethod('add', `
+      child.setMethod(
+        'add',
+        `
         const parentResult = await pass(args[0], args[1]);
         return parentResult * 2;
-      `);
+      `,
+      );
 
       const result = await child.call('add', 3, 4);
       expect(result).toBe(14); // (3 + 4) * 2
@@ -963,10 +979,13 @@ describe('RuntimeObject', () => {
         properties: {},
         methods: {},
       });
-      child.setMethod('echo', `
+      child.setMethod(
+        'echo',
+        `
         const parentResult = await pass();
         return "child: " + parentResult;
-      `);
+      `,
+      );
 
       const result = await child.call('echo', 'test message');
       expect(result).toBe('child: test message');
@@ -986,10 +1005,13 @@ describe('RuntimeObject', () => {
         properties: { name: 'Child' },
         methods: {},
       });
-      child.setMethod('getName', `
+      child.setMethod(
+        'getName',
+        `
         const parentName = await pass();
         return parentName;
-      `);
+      `,
+      );
 
       // Even though pass() calls parent's method, self should still be child
       const result = await child.call('getName');
@@ -1011,10 +1033,13 @@ describe('RuntimeObject', () => {
         properties: {},
         methods: {},
       });
-      parent.setMethod('level', `
+      parent.setMethod(
+        'level',
+        `
         const up = await pass();
         return up + " -> parent";
-      `);
+      `,
+      );
       await parent.save();
 
       const child = await manager.create({
@@ -1022,10 +1047,13 @@ describe('RuntimeObject', () => {
         properties: {},
         methods: {},
       });
-      child.setMethod('level', `
+      child.setMethod(
+        'level',
+        `
         const up = await pass();
         return up + " -> child";
-      `);
+      `,
+      );
 
       const result = await child.call('level');
       expect(result).toBe('grandparent -> parent -> child');
@@ -1037,12 +1065,17 @@ describe('RuntimeObject', () => {
         properties: {},
         methods: {},
       });
-      obj.setMethod('noParent', `
+      obj.setMethod(
+        'noParent',
+        `
         await pass();
         return "never reached";
-      `);
+      `,
+      );
 
-      await expect(obj.call('noParent')).rejects.toThrow(/no parent implementation/i);
+      await expect(obj.call('noParent')).rejects.toThrow(
+        /no parent implementation/i,
+      );
     });
 
     it('should work when method defined on ancestor is called on descendant', async () => {
@@ -1060,10 +1093,13 @@ describe('RuntimeObject', () => {
         properties: {},
         methods: {},
       });
-      parent.setMethod('action', `
+      parent.setMethod(
+        'action',
+        `
         const base = await pass();
         return base + " + parent enhancement";
-      `);
+      `,
+      );
       await parent.save();
 
       // Child doesn't override, just inherits parent's method
@@ -1095,10 +1131,13 @@ describe('RuntimeObject', () => {
         methods: {},
       });
       // Parent overrides and calls pass()
-      parent.setMethod('identify', `
+      parent.setMethod(
+        'identify',
+        `
         const parentResult = await pass();
         return parentResult + " -> parent";
-      `);
+      `,
+      );
       await parent.save();
 
       const child = await manager.create({
@@ -1129,11 +1168,14 @@ describe('RuntimeObject', () => {
         properties: {},
         methods: {},
       });
-      child.setMethod('multiply', `
+      child.setMethod(
+        'multiply',
+        `
         // Child doubles the first argument before passing
         const result = await pass(args[0] * 2, args[1]);
         return result;
-      `);
+      `,
+      );
 
       const result = await child.call('multiply', 5, 3);
       expect(result).toBe(30); // (5 * 2) * 3
@@ -1145,10 +1187,13 @@ describe('RuntimeObject', () => {
         properties: {},
         methods: {},
       });
-      parent.setMethod('asyncOp', `
+      parent.setMethod(
+        'asyncOp',
+        `
         await new Promise(r => setTimeout(r, 10));
         return "async parent done";
-      `);
+      `,
+      );
       await parent.save();
 
       const child = await manager.create({
@@ -1156,10 +1201,13 @@ describe('RuntimeObject', () => {
         properties: {},
         methods: {},
       });
-      child.setMethod('asyncOp', `
+      child.setMethod(
+        'asyncOp',
+        `
         const parentResult = await pass();
         return parentResult + " and child";
-      `);
+      `,
+      );
 
       const result = await child.call('asyncOp');
       expect(result).toBe('async parent done and child');
@@ -1208,10 +1256,13 @@ describe('RuntimeObject', () => {
 
     it('should handle method calling method on self', async () => {
       testObj.setMethod('helper', 'return "helper result";');
-      testObj.setMethod('caller', `
+      testObj.setMethod(
+        'caller',
+        `
         const result = await self.helper();
         return "caller: " + result;
-      `);
+      `,
+      );
 
       const result = await testObj.call('caller');
       expect(result).toBe('caller: helper result');
@@ -1372,8 +1423,8 @@ describe('RuntimeObject', () => {
 
       // Find using === comparison
       const list = (testObj as any).list as RuntimeObject[];
-      const found = list.find(item => item === target);
-      const index = list.findIndex(item => item === target);
+      const found = list.find((item) => item === target);
+      const index = list.indexOf(target);
 
       expect(found).toBe(target);
       expect(index).toBe(1);
@@ -1398,8 +1449,8 @@ describe('RuntimeObject', () => {
 
       // Note: includes() won't work because it uses SameValueZero
       // But we can use .some() with ===
-      expect(members.some(m => m === member)).toBe(true);
-      expect(members.some(m => m === nonMember)).toBe(false);
+      expect(members.some((m) => m === member)).toBe(true);
+      expect(members.some((m) => m === nonMember)).toBe(false);
     });
 
     it('should persist objrefs across save/reload', async () => {
@@ -1434,11 +1485,14 @@ describe('RuntimeObject', () => {
       (testObj as any).target = target;
 
       // Method that compares objrefs
-      testObj.setMethod('checkTarget', `
+      testObj.setMethod(
+        'checkTarget',
+        `
         const t = self.target;
         const loaded = await $.load(${target.id});
         return t === loaded;
-      `);
+      `,
+      );
 
       const result = await testObj.call('checkTarget');
       expect(result).toBe(true);

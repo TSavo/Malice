@@ -62,7 +62,10 @@ Beyond the threshold, the arcade stretches west into shadow, its iron framework 
       waterLevel: 0,
       outdoor: false,
       exits: {
-        east: { to: 'alleys/x-9-y2.ts', description: 'Through the ornate archway to the street' },
+        east: {
+          to: 'alleys/x-9-y2.ts',
+          description: 'Through the ornate archway to the street',
+        },
         west: '%GC_ARCADE_S',
         north: '%GC_ELEV_LOBBY',
       },
@@ -70,7 +73,8 @@ Beyond the threshold, the arcade stretches west into shadow, its iron framework 
         {
           name: 'a fallen door',
           capacity: 2,
-          emptyMsg: 'One of the original oak doors lies flat on the floor, making an improvised bench.',
+          emptyMsg:
+            'One of the original oak doors lies flat on the floor, making an improvised bench.',
           occupiedMsg: '%s sitting on the fallen door',
         },
       ],
@@ -100,7 +104,8 @@ Empty shop fronts line both sides. Display windows are shattered or boarded. Fad
         {
           name: 'an iron bench',
           capacity: 3,
-          emptyMsg: 'A Victorian-era iron bench sits against the wall, its wooden slats rotted away leaving only the ornate metal frame.',
+          emptyMsg:
+            'A Victorian-era iron bench sits against the wall, its wooden slats rotted away leaving only the ornate metal frame.',
           occupiedMsg: '%s perched on the iron bench frame',
         },
       ],
@@ -200,7 +205,8 @@ Iron balconies ring the upper floors, their railings rusted but intact. From bel
         {
           name: 'the fountain rim',
           capacity: 6,
-          emptyMsg: 'The dry fountain basin has a wide stone rim, worn smooth by generations of shoppers who once rested here.',
+          emptyMsg:
+            'The dry fountain basin has a wide stone rim, worn smooth by generations of shoppers who once rested here.',
           occupiedMsg: '%s sitting on the fountain rim',
         },
       ],
@@ -231,7 +237,8 @@ The smell is surprisingly neutral—whatever food rotted here did so long ago, l
         {
           name: 'a lunch counter stool',
           capacity: 4,
-          emptyMsg: 'Four lunch counter stools remain bolted to the floor, their leather seats cracked but intact.',
+          emptyMsg:
+            'Four lunch counter stools remain bolted to the floor, their leather seats cracked but intact.',
           occupiedMsg: '%s sitting at the lunch counter',
         },
       ],

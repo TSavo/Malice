@@ -1,9 +1,11 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { AliasLoader } from '../../src/database/bootstrap/alias-loader.js';
 import { ObjectDatabase } from '../../src/database/object-db.js';
 import { ObjectManager } from '../../src/database/object-manager.js';
-import { AliasLoader } from '../../src/database/bootstrap/alias-loader.js';
 
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/?replicaSet=rs0&directConnection=true';
+const MONGO_URI =
+  process.env.MONGO_URI ||
+  'mongodb://localhost:27017/?replicaSet=rs0&directConnection=true';
 
 describe('AliasLoader', () => {
   let db: ObjectDatabase;
@@ -15,7 +17,7 @@ describe('AliasLoader', () => {
     await db.connect();
 
     // Clean database
-    await db['objects'].deleteMany({});
+    await db.objects.deleteMany({});
 
     manager = new ObjectManager(db);
     loader = new AliasLoader(manager);
@@ -107,8 +109,8 @@ describe('AliasLoader', () => {
       const fooAlias = aliases.get('foo');
 
       expect(fooAlias).toBeTruthy();
-      expect(fooAlias!.id).toBe(1);
-      expect(fooAlias!.get('name')).toBe('Foo');
+      expect(fooAlias?.id).toBe(1);
+      expect(fooAlias?.get('name')).toBe('Foo');
     });
 
     it('should handle non-existent object references', async () => {
@@ -171,7 +173,7 @@ describe('AliasLoader', () => {
 
       expect(sys).toBeTruthy();
       expect(system).toBeTruthy();
-      expect(sys!.id).toBe(system!.id);
+      expect(sys?.id).toBe(system?.id);
     });
 
     it('should load numeric IDs correctly', async () => {
@@ -204,9 +206,9 @@ describe('AliasLoader', () => {
       const aliases = manager.getAliases();
       expect(aliases.size).toBe(3);
 
-      expect(aliases.get('obj1')!.id).toBe(100);
-      expect(aliases.get('obj2')!.id).toBe(200);
-      expect(aliases.get('obj3')!.id).toBe(300);
+      expect(aliases.get('obj1')?.id).toBe(100);
+      expect(aliases.get('obj2')?.id).toBe(200);
+      expect(aliases.get('obj3')?.id).toBe(300);
     });
   });
 
@@ -263,8 +265,8 @@ describe('AliasLoader', () => {
 
       // Update aliases in MongoDB
       const objectManager = await manager.load(0);
-      objectManager!.set('aliases', { v1: 1, v2: 1 });
-      await objectManager!.save();
+      objectManager?.set('aliases', { v1: 1, v2: 1 });
+      await objectManager?.save();
 
       // Reload aliases
       const loader2 = new AliasLoader(manager);

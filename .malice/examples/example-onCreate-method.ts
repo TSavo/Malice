@@ -24,7 +24,7 @@ player.stats = {
   intelligence: 10,
   charisma: 10,
   level: 1,
-  experience: 0
+  experience: 0,
 };
 
 // Initialize player inventory
@@ -35,14 +35,16 @@ player.equipment = {};
 player.location = 1;
 
 // Set player description
-player.name = args[0] as string || 'Unnamed Player';
+player.name = (args[0] as string) || 'Unnamed Player';
 player.description = 'A new adventurer.';
 
 // Save the changes to MongoDB
 await player.save();
 
 // Use system utilities to send welcome message
-await $.system.sendToPlayer(player.id, `
+await $.system.sendToPlayer(
+  player.id,
+  `
 ╔════════════════════════════════════════╗
 ║     Welcome to Malice, ${player.name}!     ║
 ╚════════════════════════════════════════╝
@@ -51,20 +53,21 @@ You find yourself in a strange new world...
 
 Type 'look' to see your surroundings.
 Type 'help' for a list of commands.
-`);
+`,
+);
 
 // Broadcast to the room that a new player arrived
 await $.system.broadcastToRoom(
   player.location,
   `${player.name} materializes out of thin air!`,
-  player.id // Don't send to the player themselves
+  player.id, // Don't send to the player themselves
 );
 
 // Log the event
 await $.system.log('info', 'Player created', {
   playerId: player.id,
   name: player.name,
-  timestamp: new Date()
+  timestamp: new Date(),
 });
 
 // Example: Roll for starting gold using dice
@@ -73,5 +76,5 @@ player.set('gold', startingGold * 10);
 
 await $.system.sendToPlayer(
   player.id,
-  `You start your adventure with ${startingGold * 10} gold pieces.`
+  `You start your adventure with ${startingGold * 10} gold pieces.`,
 );

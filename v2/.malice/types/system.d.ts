@@ -3,7 +3,7 @@
  * Defines types for system-level utility objects
  */
 
-import { ParsedCommand, CombatResult, PlayerStats, Direction, RoomExit } from './game';
+import { ParsedCommand, CombatResult } from './game';
 
 /**
  * System object - provides core utility methods
@@ -38,7 +38,10 @@ export interface SystemObject extends RuntimeObject {
    * @param defender - Defending object
    * @returns Combat result with damage and messages
    */
-  calculateCombat(attacker: RuntimeObject, defender: RuntimeObject): Promise<CombatResult>;
+  calculateCombat(
+    attacker: RuntimeObject,
+    defender: RuntimeObject,
+  ): Promise<CombatResult>;
 
   /**
    * Broadcast message to all players in a room
@@ -46,7 +49,11 @@ export interface SystemObject extends RuntimeObject {
    * @param message - Message to broadcast
    * @param exclude - Optional player ID to exclude from broadcast
    */
-  broadcastToRoom(roomId: number, message: string, exclude?: number): Promise<void>;
+  broadcastToRoom(
+    roomId: number,
+    message: string,
+    exclude?: number,
+  ): Promise<void>;
 
   /**
    * Send message to specific player
@@ -61,7 +68,11 @@ export interface SystemObject extends RuntimeObject {
    * @param message - Log message
    * @param data - Additional data to log
    */
-  log(level: 'info' | 'warn' | 'error', message: string, data?: any): Promise<void>;
+  log(
+    level: 'info' | 'warn' | 'error',
+    message: string,
+    data?: any,
+  ): Promise<void>;
 }
 
 /**
@@ -84,7 +95,11 @@ export interface AuthManagerObject extends RuntimeObject {
    * @param email - Email address
    * @returns New player object ID
    */
-  createAccount(username: string, password: string, email: string): Promise<number>;
+  createAccount(
+    username: string,
+    password: string,
+    email: string,
+  ): Promise<number>;
 
   /**
    * Check if username is available
@@ -100,7 +115,11 @@ export interface AuthManagerObject extends RuntimeObject {
    * @param newPassword - New password
    * @returns True if successful
    */
-  changePassword(playerId: number, oldPassword: string, newPassword: string): Promise<boolean>;
+  changePassword(
+    playerId: number,
+    oldPassword: string,
+    newPassword: string,
+  ): Promise<boolean>;
 }
 
 /**
@@ -123,7 +142,11 @@ export interface CombatManagerObject extends RuntimeObject {
    * @param source - Source of damage (for logging)
    * @returns True if target died
    */
-  applyDamage(targetId: number, damage: number, source: string): Promise<boolean>;
+  applyDamage(
+    targetId: number,
+    damage: number,
+    source: string,
+  ): Promise<boolean>;
 
   /**
    * Heal an object

@@ -1,6 +1,6 @@
 #!/usr/bin/env tsx
-import { TelnetServer } from './src/transport/telnet/telnet-server.js';
 import { ConnectionManager } from './src/connection/connection-manager.js';
+import { TelnetServer } from './src/transport/telnet/telnet-server.js';
 
 console.log('🎮 Testing Malice v2 Transport...\n');
 

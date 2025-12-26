@@ -100,7 +100,9 @@ export class ObjectCache {
    * Check if object is cached
    */
   hasObject(id: ObjId): boolean {
-    return id >= 0 ? this.objects[id] !== undefined : this.infrastructureObjects.has(id);
+    return id >= 0
+      ? this.objects[id] !== undefined
+      : this.infrastructureObjects.has(id);
   }
 
   /**
@@ -120,7 +122,11 @@ export class ObjectCache {
   /**
    * Store compiled method code (never evicts)
    */
-  setCompiledMethod(objId: ObjId, methodName: string, compiledCode: string): void {
+  setCompiledMethod(
+    objId: ObjId,
+    methodName: string,
+    compiledCode: string,
+  ): void {
     const key = `${objId}:${methodName}`;
     if (!this.compiledMethods.has(key)) {
       this.stats.methodCompilationsCached++;

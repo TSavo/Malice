@@ -30,7 +30,7 @@ Be helpful and brief. Respond in 1-2 sentences.`;
         allowDangerouslySkipPermissions: true,
         cwd: process.env.HOME || '/home/node',
         persistSession: true,
-      }
+      },
     })) {
       const msg = message as Record<string, unknown>;
 

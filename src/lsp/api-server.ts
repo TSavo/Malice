@@ -3,7 +3,11 @@
  * Provides REST endpoints for file system operations
  */
 
-import { createServer, IncomingMessage, ServerResponse } from 'http';
+import {
+  createServer,
+  type IncomingMessage,
+  type ServerResponse,
+} from 'node:http';
 import type { ObjectManager } from '../database/object-manager.js';
 import { VirtualFileSystem } from './virtual-fs.js';
 
@@ -15,7 +19,7 @@ export class LSPApiServer {
 
   constructor(
     manager: ObjectManager,
-    private port = 3000
+    private port = 3000,
   ) {
     this.vfs = new VirtualFileSystem(manager);
   }
@@ -27,14 +31,19 @@ export class LSPApiServer {
     const server = createServer(this.handleRequest.bind(this));
 
     server.listen(this.port, () => {
-      console.log(`📡 LSP API Server listening on http://localhost:${this.port}`);
+      console.log(
+        `📡 LSP API Server listening on http://localhost:${this.port}`,
+      );
     });
   }
 
   /**
    * Handle HTTP requests
    */
-  private async handleRequest(req: IncomingMessage, res: ServerResponse): Promise<void> {
+  private async handleRequest(
+    req: IncomingMessage,
+    res: ServerResponse,
+  ): Promise<void> {
     // Enable CORS
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');

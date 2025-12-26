@@ -1,5 +1,5 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Builds the BankTerminal prototype
@@ -26,14 +26,15 @@ export class BankTerminalBuilder {
       parent: parentObj!,
       properties: {
         name: 'Bank Terminal',
-        description: 'A sleek banking kiosk with a touchscreen interface. The corporate logo pulses softly.',
+        description:
+          'A sleek banking kiosk with a touchscreen interface. The corporate logo pulses softly.',
         // Reference to the bank this terminal connects to (default: system bank)
         bank: null, // Will use $.bank if null
         // Fees for various operations
         fees: {
-          transfer: 0,      // Flat fee per transfer
-          credchip: 10,     // Fee to buy a credchip
-          deposit: 0,       // Fee to deposit a credchip
+          transfer: 0, // Flat fee per transfer
+          credchip: 10, // Fee to buy a credchip
+          deposit: 0, // Fee to deposit a credchip
         },
         // Credchip denominations available
         credchipDenominations: [100, 500, 1000, 5000, 10000],
@@ -67,16 +68,21 @@ VERBS: 'use terminal', 'bank', 'check balance'. Registered when terminal placed 
     // ═══════════════════════════════════════════════════════════════════
 
     // getBank() - get the bank this terminal connects to
-    obj.setMethod('getBank', `
+    obj.setMethod(
+      'getBank',
+      `
       if (self.bank) {
         return self.bank;
       }
       // Default to system bank
       return $.bank;
-    `);
+    `,
+    );
 
     // getPlayerAccount(player) - find or prompt to create account
-    obj.setMethod('getPlayerAccount', `
+    obj.setMethod(
+      'getPlayerAccount',
+      `
       const player = args[0];
       if (!player) return null;
 
@@ -89,14 +95,17 @@ VERBS: 'use terminal', 'bank', 'check balance'. Registered when terminal placed 
       }
 
       return null;
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // MAIN MENU
     // ═══════════════════════════════════════════════════════════════════
 
     // doUse - main interaction, show menu
-    obj.setMethod('doUse', `
+    obj.setMethod(
+      'doUse',
+      `
       // Args from verb pattern 'use terminal' (no %i/%t):
       //   args = [] (empty, no pattern variables)
       // Direct variables:
@@ -153,13 +162,16 @@ VERBS: 'use terminal', 'bank', 'check balance'. Registered when terminal placed 
         default:
           return 'Invalid selection.';
       }
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // BALANCE
     // ═══════════════════════════════════════════════════════════════════
 
-    obj.setMethod('showBalance', `
+    obj.setMethod(
+      'showBalance',
+      `
       const player = args[0];
       const account = args[1];
 
@@ -181,13 +193,16 @@ VERBS: 'use terminal', 'bank', 'check balance'. Registered when terminal placed 
       await player.tell('═══════════════════════════════════════');
 
       return '';
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // TRANSFER
     // ═══════════════════════════════════════════════════════════════════
 
-    obj.setMethod('showTransfer', `
+    obj.setMethod(
+      'showTransfer',
+      `
       const player = args[0];
       const account = args[1];
 
@@ -277,13 +292,16 @@ VERBS: 'use terminal', 'bank', 'check balance'. Registered when terminal placed 
       await player.tell('═══════════════════════════════════════');
 
       return '';
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // HISTORY
     // ═══════════════════════════════════════════════════════════════════
 
-    obj.setMethod('showHistory', `
+    obj.setMethod(
+      'showHistory',
+      `
       const player = args[0];
       const account = args[1];
 
@@ -325,13 +343,16 @@ VERBS: 'use terminal', 'bank', 'check balance'. Registered when terminal placed 
       await player.tell('═══════════════════════════════════════');
 
       return '';
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // CREDCHIPS
     // ═══════════════════════════════════════════════════════════════════
 
-    obj.setMethod('showBuyCredchip', `
+    obj.setMethod(
+      'showBuyCredchip',
+      `
       const player = args[0];
       const account = args[1];
 
@@ -445,10 +466,13 @@ VERBS: 'use terminal', 'bank', 'check balance'. Registered when terminal placed 
       }
 
       return '';
-    `);
+    `,
+    );
 
     // createCredchip(amount) - create a credchip object with given value
-    obj.setMethod('createCredchip', `
+    obj.setMethod(
+      'createCredchip',
+      `
       const amount = args[0];
 
       if (!$.recycler) {
@@ -480,9 +504,12 @@ VERBS: 'use terminal', 'bank', 'check balance'. Registered when terminal placed 
       });
 
       return chip;
-    `);
+    `,
+    );
 
-    obj.setMethod('showDepositCredchip', `
+    obj.setMethod(
+      'showDepositCredchip',
+      `
       const player = args[0];
       const account = args[1];
 
@@ -576,13 +603,16 @@ VERBS: 'use terminal', 'bank', 'check balance'. Registered when terminal placed 
       await player.tell('═══════════════════════════════════════');
 
       return '';
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // OPEN ACCOUNT
     // ═══════════════════════════════════════════════════════════════════
 
-    obj.setMethod('showOpenAccount', `
+    obj.setMethod(
+      'showOpenAccount',
+      `
       const player = args[0];
 
       if (!$.prompt) return 'System error.';
@@ -626,22 +656,35 @@ VERBS: 'use terminal', 'bank', 'check balance'. Registered when terminal placed 
       await player.tell('═══════════════════════════════════════');
 
       return '';
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // DESCRIBE
     // ═══════════════════════════════════════════════════════════════════
 
-    obj.setMethod('describe', `
+    obj.setMethod(
+      'describe',
+      `
       let desc = self.name + '\\r\\n';
       desc += self.description;
       return desc;
-    `);
+    `,
+    );
 
     // Add property descriptions
-    obj.setPropertyDescription('bank', 'Reference to the Bank object this terminal connects to (null = uses $.bank)');
-    obj.setPropertyDescription('fees', 'Object mapping operation types to their fees (transfer, credchip, deposit)');
-    obj.setPropertyDescription('credchipDenominations', 'Array of standard credchip values available for purchase');
+    obj.setPropertyDescription(
+      'bank',
+      'Reference to the Bank object this terminal connects to (null = uses $.bank)',
+    );
+    obj.setPropertyDescription(
+      'fees',
+      'Object mapping operation types to their fees (transfer, credchip, deposit)',
+    );
+    obj.setPropertyDescription(
+      'credchipDenominations',
+      'Array of standard credchip values available for purchase',
+    );
 
     return obj;
   }

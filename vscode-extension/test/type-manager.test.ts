@@ -2,7 +2,7 @@
  * TypeDefinitionManager Tests
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Mock VS Code API - must be defined before imports
 vi.mock('vscode', () => {
@@ -39,17 +39,15 @@ vi.mock('vscode', () => {
       event = vi.fn();
       fire = vi.fn();
     },
-    Disposable: class {
-      constructor(fn: any) {}
-    },
+    Disposable: class {},
     window: {
       showErrorMessage: vi.fn(),
     },
   };
 });
 
-import { TypeDefinitionManager } from '../src/type-manager';
 import * as vscode from 'vscode';
+import { TypeDefinitionManager } from '../src/type-manager';
 
 const mockWorkspaceFs = (vscode.workspace as any).fs;
 
@@ -86,7 +84,7 @@ describe('TypeDefinitionManager', () => {
       expect(mockWorkspaceFs.createDirectory).toHaveBeenCalledWith(
         expect.objectContaining({
           fsPath: '/test/workspace/.malice',
-        })
+        }),
       );
     });
 
@@ -105,7 +103,7 @@ describe('TypeDefinitionManager', () => {
         expect.objectContaining({
           fsPath: '/test/workspace/.malice/malice.d.ts',
         }),
-        expect.any(Buffer)
+        expect.any(Buffer),
       );
     });
 
@@ -125,12 +123,12 @@ describe('TypeDefinitionManager', () => {
         expect.objectContaining({
           fsPath: '/test/workspace/jsconfig.json',
         }),
-        expect.any(Buffer)
+        expect.any(Buffer),
       );
 
       // Verify jsconfig content
       const writeCall = mockWorkspaceFs.writeFile.mock.calls.find((call: any) =>
-        call[0].fsPath.endsWith('jsconfig.json')
+        call[0].fsPath.endsWith('jsconfig.json'),
       );
       expect(writeCall).toBeDefined();
 
@@ -149,8 +147,8 @@ describe('TypeDefinitionManager', () => {
       await manager.initialize({} as any);
 
       // Should not try to write jsconfig.json
-      const jsconfigWrite = mockWorkspaceFs.writeFile.mock.calls.find((call: any) =>
-        call[0].fsPath.endsWith('jsconfig.json')
+      const jsconfigWrite = mockWorkspaceFs.writeFile.mock.calls.find(
+        (call: any) => call[0].fsPath.endsWith('jsconfig.json'),
       );
       expect(jsconfigWrite).toBeUndefined();
     });
@@ -194,7 +192,7 @@ describe('TypeDefinitionManager', () => {
       await manager.initialize({} as any);
 
       const writeCall = mockWorkspaceFs.writeFile.mock.calls.find((call: any) =>
-        call[0].fsPath.endsWith('malice.d.ts')
+        call[0].fsPath.endsWith('malice.d.ts'),
       );
       expect(writeCall).toBeDefined();
 
@@ -206,7 +204,8 @@ describe('TypeDefinitionManager', () => {
   describe('generateTypesForObject', () => {
     it('should request object-specific types', async () => {
       const objectId = 42;
-      const testDefinitions = 'declare const self: RuntimeObject & MaliceObject_42;';
+      const testDefinitions =
+        'declare const self: RuntimeObject & MaliceObject_42;';
 
       mockClient.request.mockResolvedValue({
         definitions: testDefinitions,
@@ -258,7 +257,7 @@ describe('TypeDefinitionManager', () => {
       notificationHandler('object.created', { id: 10 });
 
       // Wait for debounce (500ms)
-      await new Promise(resolve => setTimeout(resolve, 600));
+      await new Promise((resolve) => setTimeout(resolve, 600));
 
       // Should have regenerated types
       expect(mockClient.request).toHaveBeenCalledWith('types.generate', {});
@@ -288,7 +287,7 @@ describe('TypeDefinitionManager', () => {
       notificationHandler('method.changed', { objectId: 5, name: 'test2' });
 
       // Wait for debounce
-      await new Promise(resolve => setTimeout(resolve, 600));
+      await new Promise((resolve) => setTimeout(resolve, 600));
 
       // Should only regenerate once (debounced)
       expect(mockClient.request).toHaveBeenCalledTimes(1);

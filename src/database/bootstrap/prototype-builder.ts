@@ -1,65 +1,62 @@
-import { ObjectManager } from '../object-manager.js';
-import {
-    DescribableBuilder,
-    LocationBuilder,
-    ExitBuilder,
-    GuardedExitBuilder,
-    RoomBuilder,
-    AgentBuilder,
-    EmbodiedBuilder,
-    HumanBuilder,
-    PlayerBuilder,
-    AdminBuilder,
-    DecayableBuilder,
-    CorpseBuilder,
-    HumanRemainsBuilder,
-    SkeletalRemainsBuilder,
-    WoundBuilder,
-    EdibleBuilder,
-    FoodBuilder,
-    SustainBuilder,
-    DrinkBuilder,
-    BottledWaterBuilder,
-    StomachContentsBuilder,
-    BodyPartBuilder,
-    BodyPartsBuilder,
-    WearableBuilder,
-    ClothingBuilder,
-    LockerBuilder,
-    OneTimeLockerBuilder,
-    BankBuilder,
-    BankTerminalBuilder,
-    StackableBuilder,
-    DollarBuilder,
-    WeaponBuilder,
-    WeaponPrototypesBuilder,
-    SealedBoxBuilder,
-    ElevatorBuilder,
-    DoorBuilder,
-    SignBuilder,
-    LockBuilder,
-    BiometricLockBuilder,
-    RentableLockBuilder,
-    PhoneBuilder,
-    WirelessPhoneBuilder,
-    PhoneDbBuilder,
-    VendableBuilder,
-    PayphoneBuilder,
-    DisposalBuilder,
-    IncineratorBuilder,
-    FactionBuilder,
-    CloneTankBuilder,
-    CloneRecordingStudioBuilder,
-    PocketBuilder,
-    AmmoBuilder,
-    AmmoPrototypesBuilder,
-    MagazineBuilder,
-    MagazinePrototypesBuilder,
-  } from './prototypes/index.js';
-
+import type { ObjectManager } from '../object-manager.js';
 import { CashBuilder } from './cash-builder.js';
-
-
+import {
+  AdminBuilder,
+  AgentBuilder,
+  AmmoBuilder,
+  AmmoPrototypesBuilder,
+  BankBuilder,
+  BankTerminalBuilder,
+  BiometricLockBuilder,
+  BodyPartBuilder,
+  BodyPartsBuilder,
+  BottledWaterBuilder,
+  CloneRecordingStudioBuilder,
+  CloneTankBuilder,
+  ClothingBuilder,
+  CorpseBuilder,
+  DecayableBuilder,
+  DescribableBuilder,
+  DisposalBuilder,
+  DollarBuilder,
+  DoorBuilder,
+  DrinkBuilder,
+  EdibleBuilder,
+  ElevatorBuilder,
+  EmbodiedBuilder,
+  ExitBuilder,
+  FactionBuilder,
+  FoodBuilder,
+  GuardedExitBuilder,
+  HumanBuilder,
+  HumanRemainsBuilder,
+  IncineratorBuilder,
+  LocationBuilder,
+  LockBuilder,
+  LockerBuilder,
+  MagazineBuilder,
+  MagazinePrototypesBuilder,
+  OneTimeLockerBuilder,
+  PayphoneBuilder,
+  PhoneBuilder,
+  PhoneDbBuilder,
+  PlayerBuilder,
+  PocketBuilder,
+  RentableLockBuilder,
+  RoomBuilder,
+  SealedBoxBuilder,
+  SignBuilder,
+  SkeletalRemainsBuilder,
+  StackableBuilder,
+  StomachContentsBuilder,
+  SustainBuilder,
+  VendableBuilder,
+  WeaponBuilder,
+  WeaponPrototypesBuilder,
+  WearableBuilder,
+  WirelessPhoneBuilder,
+  WoundBuilder,
+} from './prototypes/index.js';
 
 /**
  * Orchestrates building the object prototype hierarchy
@@ -110,37 +107,36 @@ export class PrototypeBuilder {
   private oneTimeLockerBuilder: OneTimeLockerBuilder;
   private bankBuilder: BankBuilder;
   private bankTerminalBuilder: BankTerminalBuilder;
-    private stackableBuilder: StackableBuilder;
-    private dollarBuilder: DollarBuilder;
-    private sealedBoxBuilder: SealedBoxBuilder;
-    private vendableBuilder: VendableBuilder;
-    private elevatorBuilder: ElevatorBuilder;
-    private doorBuilder: DoorBuilder;
-    private signBuilder: SignBuilder;
-    private lockBuilder: LockBuilder;
-    private biometricLockBuilder: BiometricLockBuilder;
-    private rentableLockBuilder: RentableLockBuilder;
-    private phoneBuilder: PhoneBuilder;
-    private wirelessPhoneBuilder: WirelessPhoneBuilder;
-    private payphoneBuilder: PayphoneBuilder;
-    private phoneDbBuilder: PhoneDbBuilder;
-    private disposalBuilder: DisposalBuilder;
-    private incineratorBuilder: IncineratorBuilder;
-    private factionBuilder: FactionBuilder;
-    private cloneTankBuilder: CloneTankBuilder;
-    private cloneRecordingStudioBuilder: CloneRecordingStudioBuilder;
-    private pocketBuilder: PocketBuilder;
-    private cashBuilder: CashBuilder;
-    private weaponBuilder: WeaponBuilder;
-    private weaponPrototypesBuilder: WeaponPrototypesBuilder;
-    private ammoBuilder: AmmoBuilder;
-    private ammoPrototypesBuilder: AmmoPrototypesBuilder;
-    private magazineBuilder: MagazineBuilder;
-    private magazinePrototypesBuilder: MagazinePrototypesBuilder;
+  private stackableBuilder: StackableBuilder;
+  private dollarBuilder: DollarBuilder;
+  private sealedBoxBuilder: SealedBoxBuilder;
+  private vendableBuilder: VendableBuilder;
+  private elevatorBuilder: ElevatorBuilder;
+  private doorBuilder: DoorBuilder;
+  private signBuilder: SignBuilder;
+  private lockBuilder: LockBuilder;
+  private biometricLockBuilder: BiometricLockBuilder;
+  private rentableLockBuilder: RentableLockBuilder;
+  private phoneBuilder: PhoneBuilder;
+  private wirelessPhoneBuilder: WirelessPhoneBuilder;
+  private payphoneBuilder: PayphoneBuilder;
+  private phoneDbBuilder: PhoneDbBuilder;
+  private disposalBuilder: DisposalBuilder;
+  private incineratorBuilder: IncineratorBuilder;
+  private factionBuilder: FactionBuilder;
+  private cloneTankBuilder: CloneTankBuilder;
+  private cloneRecordingStudioBuilder: CloneRecordingStudioBuilder;
+  private pocketBuilder: PocketBuilder;
+  private cashBuilder: CashBuilder;
+  private weaponBuilder: WeaponBuilder;
+  private weaponPrototypesBuilder: WeaponPrototypesBuilder;
+  private ammoBuilder: AmmoBuilder;
+  private ammoPrototypesBuilder: AmmoPrototypesBuilder;
+  private magazineBuilder: MagazineBuilder;
+  private magazinePrototypesBuilder: MagazinePrototypesBuilder;
 
-
-   constructor(private manager: ObjectManager) {
-     this.describableBuilder = new DescribableBuilder(manager);
+  constructor(private manager: ObjectManager) {
+    this.describableBuilder = new DescribableBuilder(manager);
 
     this.locationBuilder = new LocationBuilder(manager);
 
@@ -200,9 +196,6 @@ export class PrototypeBuilder {
     this.magazinePrototypesBuilder = new MagazinePrototypesBuilder(manager);
   }
 
-
-
-
   /**
    * Build all prototype objects
    * Idempotent - checks for existing aliases before creating
@@ -210,10 +203,13 @@ export class PrototypeBuilder {
   async buildPrototypes(): Promise<void> {
     // Check if prototypes already exist via aliases
     const objectManager = await this.manager.load(0);
-    if (!objectManager) throw new Error('Root object not found - run minimal bootstrap first');
-    const aliases = (objectManager.get('aliases') as Record<string, number | Record<string, number>>) || {};
-
-
+    if (!objectManager)
+      throw new Error('Root object not found - run minimal bootstrap first');
+    const aliases =
+      (objectManager.get('aliases') as Record<
+        string,
+        number | Record<string, number>
+      >) || {};
 
     // Create prototypes (or get existing ones)
     const describable = aliases.describable
@@ -222,93 +218,93 @@ export class PrototypeBuilder {
 
     const location = aliases.location
       ? await this.manager.load(aliases.location as number)
-      : await this.locationBuilder.build(describable!.id);
+      : await this.locationBuilder.build(describable?.id);
 
     // Exit inherits from Describable (has name, aliases)
     const exit = aliases.exit
       ? await this.manager.load(aliases.exit as number)
-      : await this.exitBuilder.build(describable!.id);
+      : await this.exitBuilder.build(describable?.id);
 
     // GuardedExit - faction-restricted exit (inherits from Exit)
     const guardedExit = aliases.guardedExit
       ? await this.manager.load(aliases.guardedExit as number)
-      : await this.guardedExitBuilder.build(exit!.id);
+      : await this.guardedExitBuilder.build(exit?.id);
 
     const room = aliases.room
       ? await this.manager.load(aliases.room as number)
-      : await this.roomBuilder.build(location!.id);
+      : await this.roomBuilder.build(location?.id);
 
     const agent = aliases.agent
       ? await this.manager.load(aliases.agent as number)
-      : await this.agentBuilder.build(describable!.id);
+      : await this.agentBuilder.build(describable?.id);
 
     const embodied = aliases.embodied
       ? await this.manager.load(aliases.embodied as number)
-      : await this.embodiedBuilder.build(agent!.id);
+      : await this.embodiedBuilder.build(agent?.id);
 
     const human = aliases.human
       ? await this.manager.load(aliases.human as number)
-      : await this.humanBuilder.build(embodied!.id);
+      : await this.humanBuilder.build(embodied?.id);
 
     const player = aliases.player
       ? await this.manager.load(aliases.player as number)
-      : await this.playerBuilder.build(human!.id);
+      : await this.playerBuilder.build(human?.id);
 
     // Admin inherits from Player
     const admin = aliases.admin
       ? await this.manager.load(aliases.admin as number)
-      : await this.adminBuilder.build(player!.id);
+      : await this.adminBuilder.build(player?.id);
 
     // Decayable - base for anything that decays over time
     const decayable = aliases.decayable
       ? await this.manager.load(aliases.decayable as number)
-      : await this.decayableBuilder.build(describable!.id);
+      : await this.decayableBuilder.build(describable?.id);
 
     // Corpse inherits from Decayable (dead bodies decay)
     const corpse = aliases.corpse
       ? await this.manager.load(aliases.corpse as number)
-      : await this.corpseBuilder.build(decayable!.id);
+      : await this.corpseBuilder.build(decayable?.id);
 
     // HumanRemains inherits from Describable (dried remains, very slow decay)
     const humanRemains = aliases.humanRemains
       ? await this.manager.load(aliases.humanRemains as number)
-      : await this.humanRemainsBuilder.build(describable!.id);
+      : await this.humanRemainsBuilder.build(describable?.id);
 
     // SkeletalRemains inherits from Describable (permanent bones)
     const skeletalRemains = aliases.skeletalRemains
       ? await this.manager.load(aliases.skeletalRemains as number)
-      : await this.skeletalRemainsBuilder.build(describable!.id);
+      : await this.skeletalRemainsBuilder.build(describable?.id);
 
     // Wound inherits from Describable (wounds are objects on body parts)
     const wound = aliases.wound
       ? await this.manager.load(aliases.wound as number)
-      : await this.woundBuilder.build(describable!.id);
+      : await this.woundBuilder.build(describable?.id);
 
     // Edible inherits from Decayable (food/drink decay)
     const edible = aliases.edible
       ? await this.manager.load(aliases.edible as number)
-      : await this.edibleBuilder.build(decayable!.id);
+      : await this.edibleBuilder.build(decayable?.id);
 
     const food = aliases.food
       ? await this.manager.load(aliases.food as number)
-      : await this.foodBuilder.build(edible!.id);
+      : await this.foodBuilder.build(edible?.id);
 
     const sustain = aliases.sustain
       ? await this.manager.load(aliases.sustain as number)
-      : await this.sustainBuilder.build(food!.id);
+      : await this.sustainBuilder.build(food?.id);
 
     const drink = aliases.drink
       ? await this.manager.load(aliases.drink as number)
-      : await this.drinkBuilder.build(edible!.id);
+      : await this.drinkBuilder.build(edible?.id);
 
     const bottledWater = aliases.bottledWater
       ? await this.manager.load(aliases.bottledWater as number)
-      : await this.bottledWaterBuilder.build(drink!.id);
+      : await this.bottledWaterBuilder.build(drink?.id);
 
     // BodyPart inherits from Edible (severed parts can be eaten, decay over time)
     const bodyPart = aliases.bodyPart
       ? await this.manager.load(aliases.bodyPart as number)
-      : await this.bodyPartBuilder.build(edible!.id);
+      : await this.bodyPartBuilder.build(edible?.id);
 
     // Build specialized body parts (inherit from BodyPart)
     // Store under bodyParts.* namespace in aliases
@@ -316,7 +312,7 @@ export class PrototypeBuilder {
     const needsBodyParts = !bodyParts.torso; // Check if any specialized parts exist
 
     if (needsBodyParts) {
-      const builtParts = await this.bodyPartsBuilder.buildAll(bodyPart!.id);
+      const builtParts = await this.bodyPartsBuilder.buildAll(bodyPart?.id);
       bodyParts = {};
       for (const [name, part] of Object.entries(builtParts)) {
         bodyParts[name] = part.id;
@@ -326,22 +322,22 @@ export class PrototypeBuilder {
     // Wearable - base for clothing, armor, jewelry (inherits from Describable)
     const wearable = aliases.wearable
       ? await this.manager.load(aliases.wearable as number)
-      : await this.wearableBuilder.build(describable!.id);
+      : await this.wearableBuilder.build(describable?.id);
 
     // Clothing - wearable items that provide warmth (inherits from Wearable)
     const clothing = aliases.clothing
       ? await this.manager.load(aliases.clothing as number)
-      : await this.clothingBuilder.build(wearable!.id);
+      : await this.clothingBuilder.build(wearable?.id);
 
     // Locker - lockable containers with codes (inherits from Location)
     const locker = aliases.locker
       ? await this.manager.load(aliases.locker as number)
-      : await this.lockerBuilder.build(location!.id);
+      : await this.lockerBuilder.build(location?.id);
 
     // OneTimeLocker - courier-friendly lockers (inherits from Locker)
     const oneTimeLocker = aliases.oneTimeLocker
       ? await this.manager.load(aliases.oneTimeLocker as number)
-      : await this.oneTimeLockerBuilder.build(locker!.id);
+      : await this.oneTimeLockerBuilder.build(locker?.id);
 
     // Bank - electronic currency ledger (inherits from Root)
     const bank = aliases.bank
@@ -351,27 +347,27 @@ export class PrototypeBuilder {
     // BankTerminal - player-facing banking kiosk (inherits from Describable)
     const bankTerminal = aliases.bankTerminal
       ? await this.manager.load(aliases.bankTerminal as number)
-      : await this.bankTerminalBuilder.build(describable!.id);
+      : await this.bankTerminalBuilder.build(describable?.id);
 
     // Stackable - physical commodities (inherits from Describable)
     const stackable = aliases.stackable
       ? await this.manager.load(aliases.stackable as number)
-      : await this.stackableBuilder.build(describable!.id);
+      : await this.stackableBuilder.build(describable?.id);
 
     // Dollar - physical US currency, contraband (inherits from Stackable)
     const dollar = aliases.dollar
       ? await this.manager.load(aliases.dollar as number)
-      : await this.dollarBuilder.build(stackable!.id);
+      : await this.dollarBuilder.build(stackable?.id);
 
     // StomachContents - digesting food in stomach (inherits from Stackable)
     const stomachContents = aliases.stomachContents
       ? await this.manager.load(aliases.stomachContents as number)
-      : await this.stomachContentsBuilder.build(stackable!.id);
+      : await this.stomachContentsBuilder.build(stackable?.id);
 
     // Weapon - base for all weapons (inherits from Describable)
     const weapon = aliases.weapon
       ? await this.manager.load(aliases.weapon as number)
-      : await this.weaponBuilder.build(describable!.id);
+      : await this.weaponBuilder.build(describable?.id);
 
     // Build weapon sub-prototypes (inherit from weapon)
     // Store under weapons.* namespace in aliases
@@ -379,7 +375,9 @@ export class PrototypeBuilder {
     const needsWeapons = !weapons.blade; // Check if any weapon prototypes exist
 
     if (needsWeapons) {
-      const builtWeapons = await this.weaponPrototypesBuilder.buildAll(weapon!.id);
+      const builtWeapons = await this.weaponPrototypesBuilder.buildAll(
+        weapon?.id,
+      );
       weapons = {};
       for (const [name, weaponObj] of Object.entries(builtWeapons)) {
         weapons[name] = weaponObj.id;
@@ -389,7 +387,7 @@ export class PrototypeBuilder {
     // Ammo - base for all ammunition (inherits from Stackable)
     const ammo = aliases.ammo
       ? await this.manager.load(aliases.ammo as number)
-      : await this.ammoBuilder.build(stackable!.id);
+      : await this.ammoBuilder.build(stackable?.id);
 
     // Build ammo sub-prototypes (inherit from ammo)
     // Store under ammoTypes.* namespace in aliases
@@ -397,7 +395,7 @@ export class PrototypeBuilder {
     const needsAmmo = !ammoTypes.ammo9mm; // Check if any ammo prototypes exist
 
     if (needsAmmo) {
-      const builtAmmo = await this.ammoPrototypesBuilder.buildAll(ammo!.id);
+      const builtAmmo = await this.ammoPrototypesBuilder.buildAll(ammo?.id);
       ammoTypes = {};
       for (const [name, ammoObj] of Object.entries(builtAmmo)) {
         ammoTypes[name] = ammoObj.id;
@@ -407,7 +405,7 @@ export class PrototypeBuilder {
     // Magazine - base for all magazines (inherits from Describable)
     const magazine = aliases.magazine
       ? await this.manager.load(aliases.magazine as number)
-      : await this.magazineBuilder.build(describable!.id);
+      : await this.magazineBuilder.build(describable?.id);
 
     // Build magazine sub-prototypes (inherit from magazine)
     // Store under magazines.* namespace in aliases
@@ -415,7 +413,9 @@ export class PrototypeBuilder {
     const needsMagazines = !magazines.pistolMagazine; // Check if any magazine prototypes exist
 
     if (needsMagazines) {
-      const builtMagazines = await this.magazinePrototypesBuilder.buildAll(magazine!.id);
+      const builtMagazines = await this.magazinePrototypesBuilder.buildAll(
+        magazine?.id,
+      );
       magazines = {};
       for (const [name, magazineObj] of Object.entries(builtMagazines)) {
         magazines[name] = magazineObj.id;
@@ -425,68 +425,67 @@ export class PrototypeBuilder {
     // SealedBox - tamper-proof delivery containers (inherits from Describable)
     const sealedBox = aliases.sealedBox
       ? await this.manager.load(aliases.sealedBox as number)
-      : await this.sealedBoxBuilder.build(describable!.id);
+      : await this.sealedBoxBuilder.build(describable?.id);
 
     const vendable = aliases.vendable
       ? await this.manager.load(aliases.vendable as number)
-      : await this.vendableBuilder.build(location!.id);
- 
+      : await this.vendableBuilder.build(location?.id);
+
     // Elevator - vertical transport system (inherits from Room for addExit)
     const elevator = aliases.elevator
       ? await this.manager.load(aliases.elevator as number)
-      : await this.elevatorBuilder.build(room!.id);
+      : await this.elevatorBuilder.build(room?.id);
 
     // Door - shared bidirectional access object (inherits from Describable)
     const door = aliases.door
       ? await this.manager.load(aliases.door as number)
-      : await this.doorBuilder.build(describable!.id);
+      : await this.doorBuilder.build(describable?.id);
 
     // Sign - readable, bolted-down object (inherits from Describable)
     const sign = aliases.sign
       ? await this.manager.load(aliases.sign as number)
-      : await this.signBuilder.build(describable!.id);
+      : await this.signBuilder.build(describable?.id);
 
     // Phones
     const phone = aliases.phone
       ? await this.manager.load(aliases.phone as number)
-      : await this.phoneBuilder.build(describable!.id);
+      : await this.phoneBuilder.build(describable?.id);
 
     const wirelessPhone = aliases.wirelessPhone
       ? await this.manager.load(aliases.wirelessPhone as number)
-      : await this.wirelessPhoneBuilder.build(phone!.id);
+      : await this.wirelessPhoneBuilder.build(phone?.id);
 
     const payphone = aliases.payphone
       ? await this.manager.load(aliases.payphone as number)
-      : await this.payphoneBuilder.build(phone!.id);
+      : await this.payphoneBuilder.build(phone?.id);
 
     const phoneDb = aliases.phoneDb
       ? await this.manager.load(aliases.phoneDb as number)
-      : await this.phoneDbBuilder.build(describable!.id);
+      : await this.phoneDbBuilder.build(describable?.id);
 
- 
     // Lock - base access control (inherits from Describable)
     const lock = aliases.lock
       ? await this.manager.load(aliases.lock as number)
-      : await this.lockBuilder.build(describable!.id);
+      : await this.lockBuilder.build(describable?.id);
 
     // BiometricLock - body-scanning access control (inherits from Lock)
-     const biometricLock = aliases.biometricLock
-       ? await this.manager.load(aliases.biometricLock as number)
-       : await this.biometricLockBuilder.build(lock!.id);
- 
-     const rentableLock = aliases.rentableLock
-       ? await this.manager.load(aliases.rentableLock as number)
-       : await this.rentableLockBuilder.build(lock!.id);
+    const biometricLock = aliases.biometricLock
+      ? await this.manager.load(aliases.biometricLock as number)
+      : await this.biometricLockBuilder.build(lock?.id);
+
+    const rentableLock = aliases.rentableLock
+      ? await this.manager.load(aliases.rentableLock as number)
+      : await this.rentableLockBuilder.build(lock?.id);
 
     // Disposal - base class for item destruction (inherits from Describable)
     const disposal = aliases.disposal
       ? await this.manager.load(aliases.disposal as number)
-      : await this.disposalBuilder.build(describable!.id);
+      : await this.disposalBuilder.build(describable?.id);
 
     // Incinerator - burns items (inherits from Disposal)
     const incinerator = aliases.incinerator
       ? await this.manager.load(aliases.incinerator as number)
-      : await this.incineratorBuilder.build(disposal!.id);
+      : await this.incineratorBuilder.build(disposal?.id);
 
     // Faction - manages faction memberships and relationships (inherits from Root)
     const faction = aliases.faction
@@ -496,88 +495,86 @@ export class PrototypeBuilder {
     // CloneTank - stores clone backup data and handles resurrection (inherits from Describable)
     const cloneTank = aliases.cloneTank
       ? await this.manager.load(aliases.cloneTank as number)
-      : await this.cloneTankBuilder.build(describable!.id);
+      : await this.cloneTankBuilder.build(describable?.id);
 
     // CloneRecordingStudio - captures body data for backup (inherits from Describable)
     const cloneRecordingStudio = aliases.cloneRecordingStudio
       ? await this.manager.load(aliases.cloneRecordingStudio as number)
-      : await this.cloneRecordingStudioBuilder.build(describable!.id);
+      : await this.cloneRecordingStudioBuilder.build(describable?.id);
 
     // Pocket - container for pockets in clothing (inherits from Describable)
     const pocket = aliases.pocket
       ? await this.manager.load(aliases.pocket as number)
-      : await this.pocketBuilder.build(describable!.id);
+      : await this.pocketBuilder.build(describable?.id);
 
     // Cash - utility object for cash operations (inherits from Root)
     const cash = aliases.cash
       ? await this.manager.load(aliases.cash as number)
       : await this.cashBuilder.build();
 
-     // Register aliases in root.properties.aliases
-     await this.registerAliases({
-
-
-      describable: describable!.id,
-      location: location!.id,
-      exit: exit!.id,
-      guardedExit: guardedExit!.id,
-      room: room!.id,
-      agent: agent!.id,
-      embodied: embodied!.id,
-      human: human!.id,
-      player: player!.id,
-      admin: admin!.id,
-      decayable: decayable!.id,
-      corpse: corpse!.id,
-      humanRemains: humanRemains!.id,
-      skeletalRemains: skeletalRemains!.id,
-      wound: wound!.id,
-      edible: edible!.id,
-      food: food!.id,
-      sustain: sustain!.id,
-      drink: drink!.id,
-      bottledWater: bottledWater!.id,
-      stomachContents: stomachContents!.id,
-      bodyPart: bodyPart!.id,
+    // Register aliases in root.properties.aliases
+    await this.registerAliases({
+      describable: describable?.id,
+      location: location?.id,
+      exit: exit?.id,
+      guardedExit: guardedExit?.id,
+      room: room?.id,
+      agent: agent?.id,
+      embodied: embodied?.id,
+      human: human?.id,
+      player: player?.id,
+      admin: admin?.id,
+      decayable: decayable?.id,
+      corpse: corpse?.id,
+      humanRemains: humanRemains?.id,
+      skeletalRemains: skeletalRemains?.id,
+      wound: wound?.id,
+      edible: edible?.id,
+      food: food?.id,
+      sustain: sustain?.id,
+      drink: drink?.id,
+      bottledWater: bottledWater?.id,
+      stomachContents: stomachContents?.id,
+      bodyPart: bodyPart?.id,
       bodyParts,
-      wearable: wearable!.id,
-      clothing: clothing!.id,
-      locker: locker!.id,
-      oneTimeLocker: oneTimeLocker!.id,
-      bank: bank!.id,
-      bankTerminal: bankTerminal!.id,
-      stackable: stackable!.id,
-      dollar: dollar!.id,
-      weapon: weapon!.id,
+      wearable: wearable?.id,
+      clothing: clothing?.id,
+      locker: locker?.id,
+      oneTimeLocker: oneTimeLocker?.id,
+      bank: bank?.id,
+      bankTerminal: bankTerminal?.id,
+      stackable: stackable?.id,
+      dollar: dollar?.id,
+      weapon: weapon?.id,
       weapons,
-      ammo: ammo!.id,
+      ammo: ammo?.id,
       ammoTypes,
-      magazine: magazine!.id,
+      magazine: magazine?.id,
       magazines,
-      sealedBox: sealedBox!.id,
-      vendable: vendable!.id,
-      elevator: elevator!.id,
-      door: door!.id,
-      sign: sign!.id,
-      phone: phone!.id,
-      wirelessPhone: wirelessPhone!.id,
-      payphone: payphone!.id,
-      phoneDb: phoneDb!.id,
-      lock: lock!.id,
-      biometricLock: biometricLock!.id,
-      rentableLock: rentableLock!.id,
-      disposal: disposal!.id,
-      incinerator: incinerator!.id,
-      faction: faction!.id,
-      cloneTank: cloneTank!.id,
-      cloneRecordingStudio: cloneRecordingStudio!.id,
-      pocket: pocket!.id,
-      cash: cash!.id,
+      sealedBox: sealedBox?.id,
+      vendable: vendable?.id,
+      elevator: elevator?.id,
+      door: door?.id,
+      sign: sign?.id,
+      phone: phone?.id,
+      wirelessPhone: wirelessPhone?.id,
+      payphone: payphone?.id,
+      phoneDb: phoneDb?.id,
+      lock: lock?.id,
+      biometricLock: biometricLock?.id,
+      rentableLock: rentableLock?.id,
+      disposal: disposal?.id,
+      incinerator: incinerator?.id,
+      faction: faction?.id,
+      cloneTank: cloneTank?.id,
+      cloneRecordingStudio: cloneRecordingStudio?.id,
+      pocket: pocket?.id,
+      cash: cash?.id,
     });
   }
- 
+
   private async registerAliases(ids: {
-     describable: number;
+    describable: number;
 
     location: number;
     exit: number;
@@ -601,46 +598,48 @@ export class PrototypeBuilder {
     stomachContents: number;
     bodyPart: number;
     bodyParts: Record<string, number>;
-     wearable: number;
-     clothing: number;
-     locker: number;
-     oneTimeLocker: number;
-     bank: number;
-     bankTerminal: number;
-     stackable: number;
-     dollar: number;
-     weapon: number;
-     weapons: Record<string, number>;
-     ammo: number;
-     ammoTypes: Record<string, number>;
-     magazine: number;
-     magazines: Record<string, number>;
-     sealedBox: number;
-     vendable: number;
-     elevator: number;
-     door: number;
-     sign: number;
-     phone: number;
-     wirelessPhone: number;
-     payphone: number;
-     phoneDb: number;
-     lock: number;
-     biometricLock: number;
-     rentableLock: number;
-     disposal: number;
-     incinerator: number;
-     faction: number;
-     cloneTank: number;
-     cloneRecordingStudio: number;
-     pocket: number;
-     cash: number;
-   }): Promise<void> {
-
-
+    wearable: number;
+    clothing: number;
+    locker: number;
+    oneTimeLocker: number;
+    bank: number;
+    bankTerminal: number;
+    stackable: number;
+    dollar: number;
+    weapon: number;
+    weapons: Record<string, number>;
+    ammo: number;
+    ammoTypes: Record<string, number>;
+    magazine: number;
+    magazines: Record<string, number>;
+    sealedBox: number;
+    vendable: number;
+    elevator: number;
+    door: number;
+    sign: number;
+    phone: number;
+    wirelessPhone: number;
+    payphone: number;
+    phoneDb: number;
+    lock: number;
+    biometricLock: number;
+    rentableLock: number;
+    disposal: number;
+    incinerator: number;
+    faction: number;
+    cloneTank: number;
+    cloneRecordingStudio: number;
+    pocket: number;
+    cash: number;
+  }): Promise<void> {
     const objectManager = await this.manager.load(0);
     if (!objectManager) return;
 
-    const aliases = (objectManager.get('aliases') as Record<string, number | Record<string, number>>) || {};
+    const aliases =
+      (objectManager.get('aliases') as Record<
+        string,
+        number | Record<string, number>
+      >) || {};
 
     // Register all prototype aliases directly in #0.properties.aliases
     // (do not depend on #0 having an `addAlias` method)
@@ -750,7 +749,11 @@ export class PrototypeBuilder {
   async rebuildMethods(): Promise<void> {
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
-    const aliases = (objectManager.get('aliases') as Record<string, number | Record<string, number>>) || {};
+    const aliases =
+      (objectManager.get('aliases') as Record<
+        string,
+        number | Record<string, number>
+      >) || {};
 
     // Rebuild Room methods
     if (aliases.room) {
@@ -808,7 +811,9 @@ export class PrototypeBuilder {
 
     // Rebuild Describable methods
     if (aliases.describable) {
-      const describable = await this.manager.load(aliases.describable as number);
+      const describable = await this.manager.load(
+        aliases.describable as number,
+      );
       if (describable) {
         console.log('  Rebuilding Describable methods...');
         await this.describableBuilder.build(0, describable);

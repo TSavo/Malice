@@ -1,22 +1,22 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Builds the Magazine prototype
- * 
+ *
  * A magazine holds ammunition for firearms. When ammo is loaded into a magazine,
  * the ammo object is recycled and the magazine's ammo count increases. When unloaded,
  * new ammo objects are created.
- * 
+ *
  * Magazines have:
  * - ammoType: What type of ammo it holds (must match gun)
  * - ammo: Current round count
  * - maxAmmo: Capacity
- * 
+ *
  * Verbs:
  * - put <ammo> in <magazine>: Load ammo into the magazine
  * - remove <amount> from <magazine>: Unload ammo from the magazine
- * 
+ *
  * Inherits from $.describable.
  */
 export class MagazineBuilder {
@@ -68,7 +68,9 @@ RELOAD SPEED: Swapping magazines is faster than loading individual rounds. Tacti
     // ═══════════════════════════════════════════════════════════════════════
 
     // put(ammoObj) - load ammo into the magazine, recycles the ammo object
-    obj.setMethod('put', `
+    obj.setMethod(
+      'put',
+      `
       const ammoObj = args[0];
       
       if (!ammoObj) {
@@ -113,10 +115,13 @@ RELOAD SPEED: Swapping magazines is faster than loading individual rounds. Tacti
         ammoObj.quantity = available - toLoad;
         return { success: true, loaded: toLoad, remaining: self.ammo, recycled: false };
       }
-    `);
+    `,
+    );
 
     // remove(amount, caller) - unload ammo from the magazine, creates new ammo object
-    obj.setMethod('remove', `
+    obj.setMethod(
+      'remove',
+      `
       const amount = args[0];
       const caller = args[1]; // Who is removing (to find the room)
       
@@ -147,23 +152,32 @@ RELOAD SPEED: Swapping magazines is faster than loading individual rounds. Tacti
       }
       
       return { success: true, removed: toRemove, remaining: self.ammo, ammo: newAmmo };
-    `);
+    `,
+    );
 
     // isEmpty() - check if magazine is empty
-    obj.setMethod('isEmpty', `
+    obj.setMethod(
+      'isEmpty',
+      `
       return (self.ammo || 0) <= 0;
-    `);
+    `,
+    );
 
     // isFull() - check if magazine is full
-    obj.setMethod('isFull', `
+    obj.setMethod(
+      'isFull',
+      `
       return (self.ammo || 0) >= (self.maxAmmo || 15);
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════════
     // DISPLAY
     // ═══════════════════════════════════════════════════════════════════════
 
-    obj.setMethod('describe', `
+    obj.setMethod(
+      'describe',
+      `
       const ammo = self.ammo || 0;
       const maxAmmo = self.maxAmmo || 15;
       const type = self.ammoType || 'generic';
@@ -173,18 +187,31 @@ RELOAD SPEED: Swapping magazines is faster than loading individual rounds. Tacti
       desc += '\\r\\n[' + ammo + '/' + maxAmmo + ' rounds of ' + type + ']';
       
       return desc;
-    `);
+    `,
+    );
 
-    obj.setMethod('shortDesc', `
+    obj.setMethod(
+      'shortDesc',
+      `
       const ammo = self.ammo || 0;
       const maxAmmo = self.maxAmmo || 15;
       const name = self.name || 'magazine';
       return name + ' [' + ammo + '/' + maxAmmo + ']';
-    `);
+    `,
+    );
 
-    obj.setPropertyDescription('ammoType', 'The caliber of ammunition this magazine holds. Must match gun ammoType.');
-    obj.setPropertyDescription('ammo', 'Current number of rounds loaded in the magazine.');
-    obj.setPropertyDescription('maxAmmo', 'Maximum capacity - how many rounds this magazine can hold.');
+    obj.setPropertyDescription(
+      'ammoType',
+      'The caliber of ammunition this magazine holds. Must match gun ammoType.',
+    );
+    obj.setPropertyDescription(
+      'ammo',
+      'Current number of rounds loaded in the magazine.',
+    );
+    obj.setPropertyDescription(
+      'maxAmmo',
+      'Maximum capacity - how many rounds this magazine can hold.',
+    );
 
     return obj;
   }
@@ -354,21 +381,37 @@ export class MagazinePrototypesBuilder {
     const magazines: Record<string, RuntimeObject> = {};
 
     // Pistol magazines
-    magazines.pistolMagazine = await new PistolMagazineBuilder(this.manager).build(magazineId);
-    magazines.extendedMagazine = await new ExtendedMagazineBuilder(this.manager).build(magazineId);
-    magazines.m1911Magazine = await new M1911MagazineBuilder(this.manager).build(magazineId);
+    magazines.pistolMagazine = await new PistolMagazineBuilder(
+      this.manager,
+    ).build(magazineId);
+    magazines.extendedMagazine = await new ExtendedMagazineBuilder(
+      this.manager,
+    ).build(magazineId);
+    magazines.m1911Magazine = await new M1911MagazineBuilder(
+      this.manager,
+    ).build(magazineId);
 
     // Rifle magazines
-    magazines.rifleMagazine = await new RifleMagazineBuilder(this.manager).build(magazineId);
+    magazines.rifleMagazine = await new RifleMagazineBuilder(
+      this.manager,
+    ).build(magazineId);
 
     // SMG magazines
-    magazines.smgMagazine = await new SmgMagazineBuilder(this.manager).build(magazineId);
-    magazines.mac10Magazine = await new Mac10MagazineBuilder(this.manager).build(magazineId);
+    magazines.smgMagazine = await new SmgMagazineBuilder(this.manager).build(
+      magazineId,
+    );
+    magazines.mac10Magazine = await new Mac10MagazineBuilder(
+      this.manager,
+    ).build(magazineId);
 
     // Revolver speedloader
-    magazines.speedloader = await new SpeedloaderBuilder(this.manager).build(magazineId);
+    magazines.speedloader = await new SpeedloaderBuilder(this.manager).build(
+      magazineId,
+    );
 
-    console.log(`✅ Built ${Object.keys(magazines).length} magazine prototypes`);
+    console.log(
+      `✅ Built ${Object.keys(magazines).length} magazine prototypes`,
+    );
     return magazines;
   }
 }

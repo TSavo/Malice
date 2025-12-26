@@ -1,5 +1,5 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Builds the Wound prototype
@@ -77,7 +77,9 @@ AGGRAVATION: Physical stress, impacts, or movement can aggravate healing wounds.
     });
 
     // Initialize wound with proper values based on type and severity
-    obj.setMethod('initialize', `
+    obj.setMethod(
+      'initialize',
+      `
       /** Set up wound properties based on type and severity.
        *  @param type - Wound type
        *  @param severity - 0-100
@@ -136,10 +138,13 @@ AGGRAVATION: Physical stress, impacts, or movement can aggravate healing wounds.
       self.description = await self.generateDescription();
 
       return self;
-    `);
+    `,
+    );
 
     // Generate narrative description of the wound
-    obj.setMethod('generateDescription', `
+    obj.setMethod(
+      'generateDescription',
+      `
       const severity = self.severity || 20;
       const type = self.type || 'wound';
       const depth = self.depth || 'shallow';
@@ -210,10 +215,13 @@ AGGRAVATION: Physical stress, impacts, or movement can aggravate healing wounds.
 
       desc += '.';
       return desc;
-    `);
+    `,
+    );
 
     // Process one tick of wound effects
-    obj.setMethod('tick', `
+    obj.setMethod(
+      'tick',
+      `
       /** Process wound effects for one game tick.
        *  @returns { bled, healed, infected, pain }
        */
@@ -387,10 +395,13 @@ AGGRAVATION: Physical stress, impacts, or movement can aggravate healing wounds.
       }
 
       return results;
-    `);
+    `,
+    );
 
     // Cause the wound to bleed more (reopened, aggravated)
-    obj.setMethod('aggravate', `
+    obj.setMethod(
+      'aggravate',
+      `
       /** Aggravate the wound, increasing bleeding and pain.
        *  @param amount - How much to aggravate (0-100)
        */
@@ -412,10 +423,13 @@ AGGRAVATION: Physical stress, impacts, or movement can aggravate healing wounds.
         message: 'The wound reopens!',
         bleeding: self.bleeding,
       };
-    `);
+    `,
+    );
 
     // Infect the wound
-    obj.setMethod('infect', `
+    obj.setMethod(
+      'infect',
+      `
       /** Infect the wound.
        *  @param type - Infection type ('bacterial', 'necrotic', 'septic')
        */
@@ -433,10 +447,13 @@ AGGRAVATION: Physical stress, impacts, or movement can aggravate healing wounds.
         type: type,
         message: 'The wound has become infected.',
       };
-    `);
+    `,
+    );
 
     // Clean/disinfect the wound
-    obj.setMethod('clean', `
+    obj.setMethod(
+      'clean',
+      `
       /** Clean and disinfect the wound.
        *  @param thoroughness - 0-100, how well cleaned
        */
@@ -463,10 +480,13 @@ AGGRAVATION: Physical stress, impacts, or movement can aggravate healing wounds.
           ? 'You clean the wound, but the infection remains.'
           : 'The wound is now clean.',
       };
-    `);
+    `,
+    );
 
     // Bandage the wound
-    obj.setMethod('bandage', `
+    obj.setMethod(
+      'bandage',
+      `
       /** Apply a bandage to the wound.
        *  @param quality - 0-100, bandage quality
        */
@@ -485,10 +505,13 @@ AGGRAVATION: Physical stress, impacts, or movement can aggravate healing wounds.
         success: true,
         message: 'The wound is now bandaged.',
       };
-    `);
+    `,
+    );
 
     // Stitch the wound (for cuts/lacerations)
-    obj.setMethod('stitch', `
+    obj.setMethod(
+      'stitch',
+      `
       /** Stitch the wound closed.
        *  @param skill - 0-100, stitching skill
        */
@@ -522,10 +545,13 @@ AGGRAVATION: Physical stress, impacts, or movement can aggravate healing wounds.
         success: true,
         message: 'The wound has been stitched closed.',
       };
-    `);
+    `,
+    );
 
     // Get autopsy findings for this wound
-    obj.setMethod('getAutopsyFindings', `
+    obj.setMethod(
+      'getAutopsyFindings',
+      `
       /** Get forensic findings about this wound.
        *  @param examinerSkill - 0-100
        *  @param decay - Body decay level 0-100
@@ -591,30 +617,73 @@ AGGRAVATION: Physical stress, impacts, or movement can aggravate healing wounds.
       }
 
       return findings;
-    `);
+    `,
+    );
 
     // Describe the wound for player viewing
-    obj.setMethod('describe', `
+    obj.setMethod(
+      'describe',
+      `
       return self.description || await self.generateDescription();
-    `);
+    `,
+    );
 
     // Property descriptions
-    obj.setPropertyDescription('type', 'Wound type: cut, bruise, puncture, burn, laceration, abrasion, or fracture');
-    obj.setPropertyDescription('severity', 'Wound severity 0-100 (0=minor scrape, 100=life-threatening)');
-    obj.setPropertyDescription('depth', 'Wound depth: superficial, shallow, deep, or penetrating (affects healing time and infection risk)');
-    obj.setPropertyDescription('bodyPart', 'Reference to the body part this wound is on');
-    obj.setPropertyDescription('bleeding', 'Bleeding rate 0-100 (0=not bleeding, 100=arterial)');
+    obj.setPropertyDescription(
+      'type',
+      'Wound type: cut, bruise, puncture, burn, laceration, abrasion, or fracture',
+    );
+    obj.setPropertyDescription(
+      'severity',
+      'Wound severity 0-100 (0=minor scrape, 100=life-threatening)',
+    );
+    obj.setPropertyDescription(
+      'depth',
+      'Wound depth: superficial, shallow, deep, or penetrating (affects healing time and infection risk)',
+    );
+    obj.setPropertyDescription(
+      'bodyPart',
+      'Reference to the body part this wound is on',
+    );
+    obj.setPropertyDescription(
+      'bleeding',
+      'Bleeding rate 0-100 (0=not bleeding, 100=arterial)',
+    );
     obj.setPropertyDescription('infected', 'Whether the wound is infected');
     obj.setPropertyDescription('infectionSeverity', 'Infection severity 0-100');
-    obj.setPropertyDescription('infectionType', 'Infection type: bacterial, necrotic, or septic');
-    obj.setPropertyDescription('healingProgress', 'Healing progress 0-100 (100=fully healed, wound removed)');
-    obj.setPropertyDescription('cleaned', 'Whether the wound has been cleaned/disinfected');
-    obj.setPropertyDescription('bandaged', 'Whether the wound has been bandaged');
-    obj.setPropertyDescription('stitched', 'Whether the wound has been stitched closed (for deep cuts)');
+    obj.setPropertyDescription(
+      'infectionType',
+      'Infection type: bacterial, necrotic, or septic',
+    );
+    obj.setPropertyDescription(
+      'healingProgress',
+      'Healing progress 0-100 (100=fully healed, wound removed)',
+    );
+    obj.setPropertyDescription(
+      'cleaned',
+      'Whether the wound has been cleaned/disinfected',
+    );
+    obj.setPropertyDescription(
+      'bandaged',
+      'Whether the wound has been bandaged',
+    );
+    obj.setPropertyDescription(
+      'stitched',
+      'Whether the wound has been stitched closed (for deep cuts)',
+    );
     obj.setPropertyDescription('painLevel', 'Pain level 0-100');
-    obj.setPropertyDescription('inflictedTick', 'Game tick when the wound was inflicted (for age calculations)');
-    obj.setPropertyDescription('cause', 'What caused the wound: blade, blunt, claw, bite, fire, acid, or dirty (for autopsy/forensics)');
-    obj.setPropertyDescription('attacker', 'Reference to the entity that inflicted the wound (if any)');
+    obj.setPropertyDescription(
+      'inflictedTick',
+      'Game tick when the wound was inflicted (for age calculations)',
+    );
+    obj.setPropertyDescription(
+      'cause',
+      'What caused the wound: blade, blunt, claw, bite, fire, acid, or dirty (for autopsy/forensics)',
+    );
+    obj.setPropertyDescription(
+      'attacker',
+      'Reference to the entity that inflicted the wound (if any)',
+    );
 
     return obj;
   }

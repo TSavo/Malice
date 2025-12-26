@@ -1,9 +1,11 @@
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { GameBootstrap } from '../../src/database/game-bootstrap.js';
 import { ObjectDatabase } from '../../src/database/object-db.js';
 import { ObjectManager } from '../../src/database/object-manager.js';
-import { GameBootstrap } from '../../src/database/game-bootstrap.js';
 
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/?replicaSet=rs0&directConnection=true';
+const MONGO_URI =
+  process.env.MONGO_URI ||
+  'mongodb://localhost:27017/?replicaSet=rs0&directConnection=true';
 
 describe('Perception Filter System', () => {
   let db: ObjectDatabase;
@@ -13,9 +15,12 @@ describe('Perception Filter System', () => {
   beforeAll(async () => {
     db = new ObjectDatabase(MONGO_URI, 'malice_test_perception');
     await db.connect();
-    await db['objects'].deleteMany({});
+    await db.objects.deleteMany({});
     manager = new ObjectManager(db);
-    const bootstrap = new GameBootstrap(manager, { worldBuildMode: 'systems', disableDefaultJobs: true });
+    const bootstrap = new GameBootstrap(manager, {
+      worldBuildMode: 'systems',
+      disableDefaultJobs: true,
+    });
     await bootstrap.bootstrap();
     $ = manager as any;
   }, 60000);
@@ -27,24 +32,33 @@ describe('Perception Filter System', () => {
 
   describe('Agent perceptionFilters property', () => {
     it('should have perceptionFilters as empty array by default', async () => {
-      const agent = await $.recycler.create({
-        parent: $.agent,
-        properties: { name: 'Test Agent' },
-      }, null);
+      const agent = await $.recycler.create(
+        {
+          parent: $.agent,
+          properties: { name: 'Test Agent' },
+        },
+        null,
+      );
 
       expect(agent.perceptionFilters).toEqual([]);
     });
 
     it('should add perception filter via addPerceptionFilter', async () => {
-      const agent = await $.recycler.create({
-        parent: $.agent,
-        properties: { name: 'Filter Agent' },
-      }, null);
+      const agent = await $.recycler.create(
+        {
+          parent: $.agent,
+          properties: { name: 'Filter Agent' },
+        },
+        null,
+      );
 
-      const filter = await $.recycler.create({
-        parent: $.describable,
-        properties: { name: 'Test Filter' },
-      }, null);
+      const filter = await $.recycler.create(
+        {
+          parent: $.describable,
+          properties: { name: 'Test Filter' },
+        },
+        null,
+      );
 
       const result = await agent.addPerceptionFilter(filter, filter);
 
@@ -54,15 +68,21 @@ describe('Perception Filter System', () => {
     });
 
     it('should prevent duplicate filters from same source', async () => {
-      const agent = await $.recycler.create({
-        parent: $.agent,
-        properties: { name: 'Dup Filter Agent' },
-      }, null);
+      const agent = await $.recycler.create(
+        {
+          parent: $.agent,
+          properties: { name: 'Dup Filter Agent' },
+        },
+        null,
+      );
 
-      const filter = await $.recycler.create({
-        parent: $.describable,
-        properties: { name: 'Dup Filter' },
-      }, null);
+      const filter = await $.recycler.create(
+        {
+          parent: $.describable,
+          properties: { name: 'Dup Filter' },
+        },
+        null,
+      );
 
       await agent.addPerceptionFilter(filter, filter);
       const result = await agent.addPerceptionFilter(filter, filter);
@@ -72,15 +92,21 @@ describe('Perception Filter System', () => {
     });
 
     it('should remove perception filter via removePerceptionFilter', async () => {
-      const agent = await $.recycler.create({
-        parent: $.agent,
-        properties: { name: 'Remove Filter Agent' },
-      }, null);
+      const agent = await $.recycler.create(
+        {
+          parent: $.agent,
+          properties: { name: 'Remove Filter Agent' },
+        },
+        null,
+      );
 
-      const filter = await $.recycler.create({
-        parent: $.describable,
-        properties: { name: 'Remove Filter' },
-      }, null);
+      const filter = await $.recycler.create(
+        {
+          parent: $.describable,
+          properties: { name: 'Remove Filter' },
+        },
+        null,
+      );
 
       await agent.addPerceptionFilter(filter, filter);
       expect(agent.perceptionFilters.length).toBe(1);
@@ -92,20 +118,29 @@ describe('Perception Filter System', () => {
     });
 
     it('should return filters via getPerceptionFilters', async () => {
-      const agent = await $.recycler.create({
-        parent: $.agent,
-        properties: { name: 'Get Filter Agent' },
-      }, null);
+      const agent = await $.recycler.create(
+        {
+          parent: $.agent,
+          properties: { name: 'Get Filter Agent' },
+        },
+        null,
+      );
 
-      const filter1 = await $.recycler.create({
-        parent: $.describable,
-        properties: { name: 'Filter 1' },
-      }, null);
+      const filter1 = await $.recycler.create(
+        {
+          parent: $.describable,
+          properties: { name: 'Filter 1' },
+        },
+        null,
+      );
 
-      const filter2 = await $.recycler.create({
-        parent: $.describable,
-        properties: { name: 'Filter 2' },
-      }, null);
+      const filter2 = await $.recycler.create(
+        {
+          parent: $.describable,
+          properties: { name: 'Filter 2' },
+        },
+        null,
+      );
 
       await agent.addPerceptionFilter(filter1, filter1);
       await agent.addPerceptionFilter(filter2, filter2);
@@ -116,15 +151,21 @@ describe('Perception Filter System', () => {
     });
 
     it('should return failure when removing non-existent filter', async () => {
-      const agent = await $.recycler.create({
-        parent: $.agent,
-        properties: { name: 'NoFilter Agent' },
-      }, null);
+      const agent = await $.recycler.create(
+        {
+          parent: $.agent,
+          properties: { name: 'NoFilter Agent' },
+        },
+        null,
+      );
 
-      const filter = await $.recycler.create({
-        parent: $.describable,
-        properties: { name: 'NonExistent Filter' },
-      }, null);
+      const filter = await $.recycler.create(
+        {
+          parent: $.describable,
+          properties: { name: 'NonExistent Filter' },
+        },
+        null,
+      );
 
       const result = await agent.removePerceptionFilter(filter);
 
@@ -135,30 +176,39 @@ describe('Perception Filter System', () => {
 
   describe('Room describe() with perception filters', () => {
     it('should call modifyRoomDescription on filters', async () => {
-      const room = await $.recycler.create({
-        parent: $.room,
-        properties: {
-          name: 'Test Room',
-          description: 'A simple room.',
+      const room = await $.recycler.create(
+        {
+          parent: $.room,
+          properties: {
+            name: 'Test Room',
+            description: 'A simple room.',
+          },
         },
-      }, null);
+        null,
+      );
 
       // Create a filter that modifies room description
-      const filter = await $.recycler.create({
-        parent: $.describable,
-        properties: { name: 'Visual Filter' },
-        methods: {
-          modifyRoomDescription: `
+      const filter = await $.recycler.create(
+        {
+          parent: $.describable,
+          properties: { name: 'Visual Filter' },
+          methods: {
+            modifyRoomDescription: `
             const output = args[0];
             return output + '\\r\\n[FILTER OVERLAY]';
           `,
+          },
         },
-      }, null);
+        null,
+      );
 
-      const viewer = await $.recycler.create({
-        parent: $.agent,
-        properties: { name: 'Viewer' },
-      }, null);
+      const viewer = await $.recycler.create(
+        {
+          parent: $.agent,
+          properties: { name: 'Viewer' },
+        },
+        null,
+      );
 
       // Add filter to viewer
       await viewer.addPerceptionFilter(filter, filter);
@@ -171,18 +221,24 @@ describe('Perception Filter System', () => {
     });
 
     it('should not modify description for viewers without filters', async () => {
-      const room = await $.recycler.create({
-        parent: $.room,
-        properties: {
-          name: 'Normal Room',
-          description: 'An ordinary room.',
+      const room = await $.recycler.create(
+        {
+          parent: $.room,
+          properties: {
+            name: 'Normal Room',
+            description: 'An ordinary room.',
+          },
         },
-      }, null);
+        null,
+      );
 
-      const viewer = await $.recycler.create({
-        parent: $.agent,
-        properties: { name: 'Normal Viewer' },
-      }, null);
+      const viewer = await $.recycler.create(
+        {
+          parent: $.agent,
+          properties: { name: 'Normal Viewer' },
+        },
+        null,
+      );
 
       const description = await room.describe(viewer);
 
@@ -191,38 +247,50 @@ describe('Perception Filter System', () => {
     });
 
     it('should apply multiple filters in order', async () => {
-      const room = await $.recycler.create({
-        parent: $.room,
-        properties: {
-          name: 'Multi Filter Room',
-          description: 'Base description.',
+      const room = await $.recycler.create(
+        {
+          parent: $.room,
+          properties: {
+            name: 'Multi Filter Room',
+            description: 'Base description.',
+          },
         },
-      }, null);
+        null,
+      );
 
-      const filter1 = await $.recycler.create({
-        parent: $.describable,
-        properties: { name: 'Filter A' },
-        methods: {
-          modifyRoomDescription: `
+      const filter1 = await $.recycler.create(
+        {
+          parent: $.describable,
+          properties: { name: 'Filter A' },
+          methods: {
+            modifyRoomDescription: `
             return args[0] + ' [A]';
           `,
+          },
         },
-      }, null);
+        null,
+      );
 
-      const filter2 = await $.recycler.create({
-        parent: $.describable,
-        properties: { name: 'Filter B' },
-        methods: {
-          modifyRoomDescription: `
+      const filter2 = await $.recycler.create(
+        {
+          parent: $.describable,
+          properties: { name: 'Filter B' },
+          methods: {
+            modifyRoomDescription: `
             return args[0] + ' [B]';
           `,
+          },
         },
-      }, null);
+        null,
+      );
 
-      const viewer = await $.recycler.create({
-        parent: $.agent,
-        properties: { name: 'Multi Viewer' },
-      }, null);
+      const viewer = await $.recycler.create(
+        {
+          parent: $.agent,
+          properties: { name: 'Multi Viewer' },
+        },
+        null,
+      );
 
       await viewer.addPerceptionFilter(filter1, filter1);
       await viewer.addPerceptionFilter(filter2, filter2);
@@ -232,102 +300,155 @@ describe('Perception Filter System', () => {
       expect(description).toContain('[A]');
       expect(description).toContain('[B]');
       // Filters apply in order, so A then B
-      expect(description.indexOf('[A]')).toBeLessThan(description.indexOf('[B]'));
+      expect(description.indexOf('[A]')).toBeLessThan(
+        description.indexOf('[B]'),
+      );
     });
   });
 
   describe('to verb with perception filters', () => {
     it('should check filters for addressable entities', async () => {
-      const room = await $.recycler.create({
-        parent: $.room,
-        properties: { name: 'Chat Room' },
-      }, null);
+      const room = await $.recycler.create(
+        {
+          parent: $.room,
+          properties: { name: 'Chat Room' },
+        },
+        null,
+      );
 
       // Create a filter that provides addressable entity
-      const filter = await $.recycler.create({
-        parent: $.describable,
-        properties: { name: 'Entity Filter' },
-        methods: {
-          getAddressableEntities: `
+      const filter = await $.recycler.create(
+        {
+          parent: $.describable,
+          properties: { name: 'Entity Filter' },
+          methods: {
+            getAddressableEntities: `
             return ['ghost'];
           `,
-          onAddressed: `
+            onAddressed: `
             const speaker = args[0];
             const target = args[1];
             const message = args[2];
             return 'The ghost hears: ' + message;
           `,
+          },
         },
-      }, null);
+        null,
+      );
 
-      const speaker = await $.recycler.create({
-        parent: $.human,
-        properties: { name: 'Speaker' },
-      }, null);
+      const speaker = await $.recycler.create(
+        {
+          parent: $.human,
+          properties: { name: 'Speaker' },
+        },
+        null,
+      );
 
       await speaker.moveTo(room);
       await speaker.addPerceptionFilter(filter, filter);
 
       // Use the to verb to address the ghost
-      const result = await speaker.callVerb('to', {}, speaker, 'to ghost hello there', []);
+      const result = await speaker.callVerb(
+        'to',
+        {},
+        speaker,
+        'to ghost hello there',
+        [],
+      );
 
       expect(result).toContain('The ghost hears: hello there');
     });
 
     it('should fall back to room lookup if no filter claims target', async () => {
-      const room = await $.recycler.create({
-        parent: $.room,
-        properties: { name: 'Fallback Room' },
-      }, null);
+      const room = await $.recycler.create(
+        {
+          parent: $.room,
+          properties: { name: 'Fallback Room' },
+        },
+        null,
+      );
 
-      const speaker = await $.recycler.create({
-        parent: $.human,
-        properties: { name: 'Fallback Speaker' },
-      }, null);
+      const speaker = await $.recycler.create(
+        {
+          parent: $.human,
+          properties: { name: 'Fallback Speaker' },
+        },
+        null,
+      );
 
       await speaker.moveTo(room);
 
       // No filter, no target in room
-      const result = await speaker.callVerb('to', {}, speaker, 'to nobody hello', []);
+      const result = await speaker.callVerb(
+        'to',
+        {},
+        speaker,
+        'to nobody hello',
+        [],
+      );
 
       expect(result).toContain("don't see");
     });
 
     it('should handle multiple filters with different addressable entities', async () => {
-      const room = await $.recycler.create({
-        parent: $.room,
-        properties: { name: 'Multi Entity Room' },
-      }, null);
-
-      const ghostFilter = await $.recycler.create({
-        parent: $.describable,
-        properties: { name: 'Ghost Filter' },
-        methods: {
-          getAddressableEntities: `return ['ghost'];`,
-          onAddressed: `return 'Ghost responds: ' + args[2];`,
+      const room = await $.recycler.create(
+        {
+          parent: $.room,
+          properties: { name: 'Multi Entity Room' },
         },
-      }, null);
+        null,
+      );
 
-      const demonFilter = await $.recycler.create({
-        parent: $.describable,
-        properties: { name: 'Demon Filter' },
-        methods: {
-          getAddressableEntities: `return ['demon'];`,
-          onAddressed: `return 'Demon responds: ' + args[2];`,
+      const ghostFilter = await $.recycler.create(
+        {
+          parent: $.describable,
+          properties: { name: 'Ghost Filter' },
+          methods: {
+            getAddressableEntities: `return ['ghost'];`,
+            onAddressed: `return 'Ghost responds: ' + args[2];`,
+          },
         },
-      }, null);
+        null,
+      );
 
-      const speaker = await $.recycler.create({
-        parent: $.human,
-        properties: { name: 'Multi Entity Speaker' },
-      }, null);
+      const demonFilter = await $.recycler.create(
+        {
+          parent: $.describable,
+          properties: { name: 'Demon Filter' },
+          methods: {
+            getAddressableEntities: `return ['demon'];`,
+            onAddressed: `return 'Demon responds: ' + args[2];`,
+          },
+        },
+        null,
+      );
+
+      const speaker = await $.recycler.create(
+        {
+          parent: $.human,
+          properties: { name: 'Multi Entity Speaker' },
+        },
+        null,
+      );
 
       await speaker.moveTo(room);
       await speaker.addPerceptionFilter(ghostFilter, ghostFilter);
       await speaker.addPerceptionFilter(demonFilter, demonFilter);
 
-      const ghostResult = await speaker.callVerb('to', {}, speaker, 'to ghost hello', []);
-      const demonResult = await speaker.callVerb('to', {}, speaker, 'to demon greetings', []);
+      const ghostResult = await speaker.callVerb(
+        'to',
+        {},
+        speaker,
+        'to ghost hello',
+        [],
+      );
+      const demonResult = await speaker.callVerb(
+        'to',
+        {},
+        speaker,
+        'to demon greetings',
+        [],
+      );
 
       expect(ghostResult).toContain('Ghost responds: hello');
       expect(demonResult).toContain('Demon responds: greetings');
@@ -337,29 +458,35 @@ describe('Perception Filter System', () => {
   describe('Sensory hooks', () => {
     it('should call onSee hook when agent sees something', async () => {
       // Create a filter that tracks what was seen
-      const filter = await $.recycler.create({
-        parent: $.describable,
-        properties: {
-          name: 'See Tracker',
-          seenMessages: [],
-        },
-        methods: {
-          onSee: `
+      const filter = await $.recycler.create(
+        {
+          parent: $.describable,
+          properties: {
+            name: 'See Tracker',
+            seenMessages: [],
+          },
+          methods: {
+            onSee: `
             const message = args[0];
             const seen = self.seenMessages || [];
             seen.push(message);
             self.seenMessages = seen;
           `,
+          },
         },
-      }, null);
+        null,
+      );
 
-      const agent = await $.recycler.create({
-        parent: $.human,
-        properties: {
-          name: 'Seeing Agent',
-          conscious: true,
+      const agent = await $.recycler.create(
+        {
+          parent: $.human,
+          properties: {
+            name: 'Seeing Agent',
+            conscious: true,
+          },
         },
-      }, null);
+        null,
+      );
 
       // Give agent a body with eyes
       await $.bodyFactory.createHumanBody(agent);
@@ -373,29 +500,35 @@ describe('Perception Filter System', () => {
     });
 
     it('should call onHear hook when agent hears something', async () => {
-      const filter = await $.recycler.create({
-        parent: $.describable,
-        properties: {
-          name: 'Hear Tracker',
-          heardMessages: [],
-        },
-        methods: {
-          onHear: `
+      const filter = await $.recycler.create(
+        {
+          parent: $.describable,
+          properties: {
+            name: 'Hear Tracker',
+            heardMessages: [],
+          },
+          methods: {
+            onHear: `
             const message = args[0];
             const heard = self.heardMessages || [];
             heard.push(message);
             self.heardMessages = heard;
           `,
+          },
         },
-      }, null);
+        null,
+      );
 
-      const agent = await $.recycler.create({
-        parent: $.human,
-        properties: {
-          name: 'Hearing Agent',
-          conscious: true,
+      const agent = await $.recycler.create(
+        {
+          parent: $.human,
+          properties: {
+            name: 'Hearing Agent',
+            conscious: true,
+          },
         },
-      }, null);
+        null,
+      );
 
       await $.bodyFactory.createHumanBody(agent);
       await agent.addPerceptionFilter(filter, filter);
@@ -406,29 +539,35 @@ describe('Perception Filter System', () => {
     });
 
     it('should call onFeel hook when agent feels something', async () => {
-      const filter = await $.recycler.create({
-        parent: $.describable,
-        properties: {
-          name: 'Feel Tracker',
-          feltMessages: [],
-        },
-        methods: {
-          onFeel: `
+      const filter = await $.recycler.create(
+        {
+          parent: $.describable,
+          properties: {
+            name: 'Feel Tracker',
+            feltMessages: [],
+          },
+          methods: {
+            onFeel: `
             const message = args[0];
             const felt = self.feltMessages || [];
             felt.push(message);
             self.feltMessages = felt;
           `,
+          },
         },
-      }, null);
+        null,
+      );
 
-      const agent = await $.recycler.create({
-        parent: $.human,
-        properties: {
-          name: 'Feeling Agent',
-          conscious: true,
+      const agent = await $.recycler.create(
+        {
+          parent: $.human,
+          properties: {
+            name: 'Feeling Agent',
+            conscious: true,
+          },
         },
-      }, null);
+        null,
+      );
 
       await agent.addPerceptionFilter(filter, filter);
 
@@ -438,29 +577,35 @@ describe('Perception Filter System', () => {
     });
 
     it('should call onSmell hook when agent smells something', async () => {
-      const filter = await $.recycler.create({
-        parent: $.describable,
-        properties: {
-          name: 'Smell Tracker',
-          smelledMessages: [],
-        },
-        methods: {
-          onSmell: `
+      const filter = await $.recycler.create(
+        {
+          parent: $.describable,
+          properties: {
+            name: 'Smell Tracker',
+            smelledMessages: [],
+          },
+          methods: {
+            onSmell: `
             const message = args[0];
             const smelled = self.smelledMessages || [];
             smelled.push(message);
             self.smelledMessages = smelled;
           `,
+          },
         },
-      }, null);
+        null,
+      );
 
-      const agent = await $.recycler.create({
-        parent: $.human,
-        properties: {
-          name: 'Smelling Agent',
-          conscious: true,
+      const agent = await $.recycler.create(
+        {
+          parent: $.human,
+          properties: {
+            name: 'Smelling Agent',
+            conscious: true,
+          },
         },
-      }, null);
+        null,
+      );
 
       await $.bodyFactory.createHumanBody(agent);
       await agent.addPerceptionFilter(filter, filter);
@@ -471,29 +616,35 @@ describe('Perception Filter System', () => {
     });
 
     it('should call onTaste hook when agent tastes something', async () => {
-      const filter = await $.recycler.create({
-        parent: $.describable,
-        properties: {
-          name: 'Taste Tracker',
-          tastedMessages: [],
-        },
-        methods: {
-          onTaste: `
+      const filter = await $.recycler.create(
+        {
+          parent: $.describable,
+          properties: {
+            name: 'Taste Tracker',
+            tastedMessages: [],
+          },
+          methods: {
+            onTaste: `
             const message = args[0];
             const tasted = self.tastedMessages || [];
             tasted.push(message);
             self.tastedMessages = tasted;
           `,
+          },
         },
-      }, null);
+        null,
+      );
 
-      const agent = await $.recycler.create({
-        parent: $.human,
-        properties: {
-          name: 'Tasting Agent',
-          conscious: true,
+      const agent = await $.recycler.create(
+        {
+          parent: $.human,
+          properties: {
+            name: 'Tasting Agent',
+            conscious: true,
+          },
         },
-      }, null);
+        null,
+      );
 
       await $.bodyFactory.createHumanBody(agent);
       await agent.addPerceptionFilter(filter, filter);
@@ -504,26 +655,35 @@ describe('Perception Filter System', () => {
     });
 
     it('should call hooks on multiple filters', async () => {
-      const filter1 = await $.recycler.create({
-        parent: $.describable,
-        properties: { name: 'Filter 1', sawCount: 0 },
-        methods: {
-          onSee: `self.sawCount = (self.sawCount || 0) + 1;`,
+      const filter1 = await $.recycler.create(
+        {
+          parent: $.describable,
+          properties: { name: 'Filter 1', sawCount: 0 },
+          methods: {
+            onSee: `self.sawCount = (self.sawCount || 0) + 1;`,
+          },
         },
-      }, null);
+        null,
+      );
 
-      const filter2 = await $.recycler.create({
-        parent: $.describable,
-        properties: { name: 'Filter 2', sawCount: 0 },
-        methods: {
-          onSee: `self.sawCount = (self.sawCount || 0) + 1;`,
+      const filter2 = await $.recycler.create(
+        {
+          parent: $.describable,
+          properties: { name: 'Filter 2', sawCount: 0 },
+          methods: {
+            onSee: `self.sawCount = (self.sawCount || 0) + 1;`,
+          },
         },
-      }, null);
+        null,
+      );
 
-      const agent = await $.recycler.create({
-        parent: $.human,
-        properties: { name: 'Multi Filter Agent', conscious: true },
-      }, null);
+      const agent = await $.recycler.create(
+        {
+          parent: $.human,
+          properties: { name: 'Multi Filter Agent', conscious: true },
+        },
+        null,
+      );
 
       await $.bodyFactory.createHumanBody(agent);
       await agent.addPerceptionFilter(filter1, filter1);
@@ -545,9 +705,12 @@ describe('Pluribus System Object', () => {
   beforeAll(async () => {
     db = new ObjectDatabase(MONGO_URI, 'malice_test_pluribus');
     await db.connect();
-    await db['objects'].deleteMany({});
+    await db.objects.deleteMany({});
     manager = new ObjectManager(db);
-    const bootstrap = new GameBootstrap(manager, { worldBuildMode: 'systems', disableDefaultJobs: true });
+    const bootstrap = new GameBootstrap(manager, {
+      worldBuildMode: 'systems',
+      disableDefaultJobs: true,
+    });
     await bootstrap.bootstrap();
     $ = manager as any;
   }, 60000);
@@ -655,9 +818,12 @@ describe('The Mask Wearable', () => {
   beforeAll(async () => {
     db = new ObjectDatabase(MONGO_URI, 'malice_test_mask');
     await db.connect();
-    await db['objects'].deleteMany({});
+    await db.objects.deleteMany({});
     manager = new ObjectManager(db);
-    const bootstrap = new GameBootstrap(manager, { worldBuildMode: 'systems', disableDefaultJobs: true });
+    const bootstrap = new GameBootstrap(manager, {
+      worldBuildMode: 'systems',
+      disableDefaultJobs: true,
+    });
     await bootstrap.bootstrap();
     $ = manager as any;
   }, 60000);
@@ -685,10 +851,13 @@ describe('The Mask Wearable', () => {
 
   describe('Wearing the Mask', () => {
     it('should add perception filter when worn', async () => {
-      const wearer = await $.recycler.create({
-        parent: $.human,
-        properties: { name: 'Mask Wearer' },
-      }, null);
+      const wearer = await $.recycler.create(
+        {
+          parent: $.human,
+          properties: { name: 'Mask Wearer' },
+        },
+        null,
+      );
 
       await $.bodyFactory.createHumanBody(wearer);
 
@@ -704,17 +873,22 @@ describe('The Mask Wearable', () => {
     });
 
     it('should register think verb on wearer', async () => {
-      const wearer = await $.recycler.create({
-        parent: $.human,
-        properties: { name: 'Think Verb Wearer' },
-      }, null);
+      const wearer = await $.recycler.create(
+        {
+          parent: $.human,
+          properties: { name: 'Think Verb Wearer' },
+        },
+        null,
+      );
 
       await $.bodyFactory.createHumanBody(wearer);
       await $.theMask.wear(wearer);
 
       // Check that think verb is registered
       const verbs = wearer.verbs || {};
-      const hasThinkVerb = Object.keys(verbs).some(pattern => pattern.includes('think'));
+      const hasThinkVerb = Object.keys(verbs).some((pattern) =>
+        pattern.includes('think'),
+      );
       expect(hasThinkVerb).toBe(true);
 
       // Cleanup
@@ -722,15 +896,21 @@ describe('The Mask Wearable', () => {
     });
 
     it('should fail if already worn by someone else', async () => {
-      const wearer1 = await $.recycler.create({
-        parent: $.human,
-        properties: { name: 'First Wearer' },
-      }, null);
+      const wearer1 = await $.recycler.create(
+        {
+          parent: $.human,
+          properties: { name: 'First Wearer' },
+        },
+        null,
+      );
 
-      const wearer2 = await $.recycler.create({
-        parent: $.human,
-        properties: { name: 'Second Wearer' },
-      }, null);
+      const wearer2 = await $.recycler.create(
+        {
+          parent: $.human,
+          properties: { name: 'Second Wearer' },
+        },
+        null,
+      );
 
       await $.bodyFactory.createHumanBody(wearer1);
       await $.bodyFactory.createHumanBody(wearer2);
@@ -746,10 +926,13 @@ describe('The Mask Wearable', () => {
     });
 
     it('should fail if already worn by same person', async () => {
-      const wearer = await $.recycler.create({
-        parent: $.human,
-        properties: { name: 'Double Wearer' },
-      }, null);
+      const wearer = await $.recycler.create(
+        {
+          parent: $.human,
+          properties: { name: 'Double Wearer' },
+        },
+        null,
+      );
 
       await $.bodyFactory.createHumanBody(wearer);
       await $.theMask.wear(wearer);
@@ -772,10 +955,13 @@ describe('The Mask Wearable', () => {
         await $.theMask.remove($.theMask.wearer);
       }
 
-      wearer = await $.recycler.create({
-        parent: $.human,
-        properties: { name: 'Filter Test Wearer' },
-      }, null);
+      wearer = await $.recycler.create(
+        {
+          parent: $.human,
+          properties: { name: 'Filter Test Wearer' },
+        },
+        null,
+      );
 
       await $.bodyFactory.createHumanBody(wearer);
       await $.theMask.wear(wearer);
@@ -793,13 +979,16 @@ describe('The Mask Wearable', () => {
     });
 
     it('should modify room description to show Pluribus', async () => {
-      const room = await $.recycler.create({
-        parent: $.room,
-        properties: {
-          name: 'Mask Test Room',
-          description: 'A test room.',
+      const room = await $.recycler.create(
+        {
+          parent: $.room,
+          properties: {
+            name: 'Mask Test Room',
+            description: 'A test room.',
+          },
         },
-      }, null);
+        null,
+      );
 
       await wearer.moveTo(room);
 
@@ -810,18 +999,24 @@ describe('The Mask Wearable', () => {
     });
 
     it('should not modify description for non-wearers', async () => {
-      const room = await $.recycler.create({
-        parent: $.room,
-        properties: {
-          name: 'Non Wearer Room',
-          description: 'A normal room.',
+      const room = await $.recycler.create(
+        {
+          parent: $.room,
+          properties: {
+            name: 'Non Wearer Room',
+            description: 'A normal room.',
+          },
         },
-      }, null);
+        null,
+      );
 
-      const nonWearer = await $.recycler.create({
-        parent: $.human,
-        properties: { name: 'Non Wearer' },
-      }, null);
+      const nonWearer = await $.recycler.create(
+        {
+          parent: $.human,
+          properties: { name: 'Non Wearer' },
+        },
+        null,
+      );
 
       await nonWearer.moveTo(room);
 
@@ -840,10 +1035,13 @@ describe('The Mask Wearable', () => {
     });
 
     it('should remove perception filter when removed', async () => {
-      const wearer = await $.recycler.create({
-        parent: $.human,
-        properties: { name: 'Remove Filter Wearer' },
-      }, null);
+      const wearer = await $.recycler.create(
+        {
+          parent: $.human,
+          properties: { name: 'Remove Filter Wearer' },
+        },
+        null,
+      );
 
       await $.bodyFactory.createHumanBody(wearer);
       await $.theMask.wear(wearer);
@@ -859,24 +1057,31 @@ describe('The Mask Wearable', () => {
     });
 
     it('should unregister think verb when removed', async () => {
-      const wearer = await $.recycler.create({
-        parent: $.human,
-        properties: { name: 'Unregister Verb Wearer' },
-      }, null);
+      const wearer = await $.recycler.create(
+        {
+          parent: $.human,
+          properties: { name: 'Unregister Verb Wearer' },
+        },
+        null,
+      );
 
       await $.bodyFactory.createHumanBody(wearer);
       await $.theMask.wear(wearer);
 
       // Verify think verb exists
       const verbsBefore = wearer.verbs || {};
-      const hasThinkBefore = Object.keys(verbsBefore).some(p => p.includes('think'));
+      const hasThinkBefore = Object.keys(verbsBefore).some((p) =>
+        p.includes('think'),
+      );
       expect(hasThinkBefore).toBe(true);
 
       await $.theMask.remove(wearer);
 
       // Verify think verb removed
       const verbsAfter = wearer.verbs || {};
-      const hasThinkAfter = Object.keys(verbsAfter).some(p => p.includes('think'));
+      const hasThinkAfter = Object.keys(verbsAfter).some((p) =>
+        p.includes('think'),
+      );
       expect(hasThinkAfter).toBe(false);
     });
 
@@ -893,15 +1098,21 @@ describe('The Mask Wearable', () => {
     });
 
     it('should fail if someone else tries to remove it', async () => {
-      const wearer = await $.recycler.create({
-        parent: $.human,
-        properties: { name: 'Removal Victim' },
-      }, null);
+      const wearer = await $.recycler.create(
+        {
+          parent: $.human,
+          properties: { name: 'Removal Victim' },
+        },
+        null,
+      );
 
-      const thief = await $.recycler.create({
-        parent: $.human,
-        properties: { name: 'Mask Thief' },
-      }, null);
+      const thief = await $.recycler.create(
+        {
+          parent: $.human,
+          properties: { name: 'Mask Thief' },
+        },
+        null,
+      );
 
       await $.bodyFactory.createHumanBody(wearer);
       await $.theMask.wear(wearer);
@@ -921,10 +1132,13 @@ describe('The Mask Wearable', () => {
       // Reset Pluribus history
       $.pluribus.sensoryHistory = [];
 
-      const wearer = await $.recycler.create({
-        parent: $.human,
-        properties: { name: 'Sensory Wearer' },
-      }, null);
+      const wearer = await $.recycler.create(
+        {
+          parent: $.human,
+          properties: { name: 'Sensory Wearer' },
+        },
+        null,
+      );
 
       await $.bodyFactory.createHumanBody(wearer);
       await $.theMask.wear(wearer);
@@ -942,17 +1156,22 @@ describe('The Mask Wearable', () => {
     it('should forward hear events to Pluribus', async () => {
       $.pluribus.sensoryHistory = [];
 
-      const wearer = await $.recycler.create({
-        parent: $.human,
-        properties: { name: 'Hear Sensory Wearer' },
-      }, null);
+      const wearer = await $.recycler.create(
+        {
+          parent: $.human,
+          properties: { name: 'Hear Sensory Wearer' },
+        },
+        null,
+      );
 
       await $.bodyFactory.createHumanBody(wearer);
       await $.theMask.wear(wearer);
 
       await $.theMask.onHear('Test audio input', null);
 
-      expect($.pluribus.sensoryHistory.some(e => e.content === 'Test audio input')).toBe(true);
+      expect(
+        $.pluribus.sensoryHistory.some((e) => e.content === 'Test audio input'),
+      ).toBe(true);
 
       await $.theMask.remove(wearer);
     });
@@ -960,17 +1179,22 @@ describe('The Mask Wearable', () => {
     it('should forward smell events to Pluribus', async () => {
       $.pluribus.sensoryHistory = [];
 
-      const wearer = await $.recycler.create({
-        parent: $.human,
-        properties: { name: 'Smell Sensory Wearer' },
-      }, null);
+      const wearer = await $.recycler.create(
+        {
+          parent: $.human,
+          properties: { name: 'Smell Sensory Wearer' },
+        },
+        null,
+      );
 
       await $.bodyFactory.createHumanBody(wearer);
       await $.theMask.wear(wearer);
 
       await $.theMask.onSmell('Burning ozone', null);
 
-      expect($.pluribus.sensoryHistory.some(e => e.content === 'Burning ozone')).toBe(true);
+      expect(
+        $.pluribus.sensoryHistory.some((e) => e.content === 'Burning ozone'),
+      ).toBe(true);
 
       await $.theMask.remove(wearer);
     });
@@ -978,17 +1202,22 @@ describe('The Mask Wearable', () => {
     it('should forward taste events to Pluribus', async () => {
       $.pluribus.sensoryHistory = [];
 
-      const wearer = await $.recycler.create({
-        parent: $.human,
-        properties: { name: 'Taste Sensory Wearer' },
-      }, null);
+      const wearer = await $.recycler.create(
+        {
+          parent: $.human,
+          properties: { name: 'Taste Sensory Wearer' },
+        },
+        null,
+      );
 
       await $.bodyFactory.createHumanBody(wearer);
       await $.theMask.wear(wearer);
 
       await $.theMask.onTaste('Metallic tang', null);
 
-      expect($.pluribus.sensoryHistory.some(e => e.content === 'Metallic tang')).toBe(true);
+      expect(
+        $.pluribus.sensoryHistory.some((e) => e.content === 'Metallic tang'),
+      ).toBe(true);
 
       await $.theMask.remove(wearer);
     });
@@ -996,17 +1225,22 @@ describe('The Mask Wearable', () => {
     it('should forward feel events to Pluribus', async () => {
       $.pluribus.sensoryHistory = [];
 
-      const wearer = await $.recycler.create({
-        parent: $.human,
-        properties: { name: 'Feel Sensory Wearer' },
-      }, null);
+      const wearer = await $.recycler.create(
+        {
+          parent: $.human,
+          properties: { name: 'Feel Sensory Wearer' },
+        },
+        null,
+      );
 
       await $.bodyFactory.createHumanBody(wearer);
       await $.theMask.wear(wearer);
 
       await $.theMask.onFeel('Cold metal', null);
 
-      expect($.pluribus.sensoryHistory.some(e => e.content === 'Cold metal')).toBe(true);
+      expect(
+        $.pluribus.sensoryHistory.some((e) => e.content === 'Cold metal'),
+      ).toBe(true);
 
       await $.theMask.remove(wearer);
     });
@@ -1034,27 +1268,34 @@ describe('The Mask Wearable', () => {
     });
 
     it('should handle silent thinking when bonded', async () => {
-      const wearer = await $.recycler.create({
-        parent: $.human,
-        properties: { name: 'Think Wearer', messages: [] },
-        methods: {
-          tell: `
+      const wearer = await $.recycler.create(
+        {
+          parent: $.human,
+          properties: { name: 'Think Wearer', messages: [] },
+          methods: {
+            tell: `
             const messages = self.messages || [];
             messages.push(args[0]);
             self.messages = messages;
           `,
+          },
         },
-      }, null);
+        null,
+      );
 
       await $.bodyFactory.createHumanBody(wearer);
       await $.theMask.wear(wearer);
 
       // Simulate onThink being called (normally via verb dispatch)
       // Use callVerb to properly pass player in context
-      await $.theMask.callVerb('onThink', {}, wearer, 'think Hello Pluribus', ['Hello Pluribus']);
+      await $.theMask.callVerb('onThink', {}, wearer, 'think Hello Pluribus', [
+        'Hello Pluribus',
+      ]);
 
       // Check the thinker received the echo
-      expect(wearer.messages.some((m: string) => m.includes('You think'))).toBe(true);
+      expect(wearer.messages.some((m: string) => m.includes('You think'))).toBe(
+        true,
+      );
 
       await $.theMask.remove(wearer);
     });
@@ -1065,12 +1306,21 @@ describe('The Mask Wearable', () => {
         await $.theMask.remove($.theMask.wearer);
       }
 
-      const nonWearer = await $.recycler.create({
-        parent: $.human,
-        properties: { name: 'NonWearer' },
-      }, null);
+      const nonWearer = await $.recycler.create(
+        {
+          parent: $.human,
+          properties: { name: 'NonWearer' },
+        },
+        null,
+      );
 
-      const result = await $.theMask.callVerb('onThink', {}, nonWearer, 'think Hello', ['Hello']);
+      const result = await $.theMask.callVerb(
+        'onThink',
+        {},
+        nonWearer,
+        'think Hello',
+        ['Hello'],
+      );
 
       expect(result).toContain('silence');
     });

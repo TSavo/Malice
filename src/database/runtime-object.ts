@@ -1,6 +1,16 @@
-import type { GameObject, ObjId, PropertyValue, MethodCode, Method, RuntimeObject, Value, ObjRefValue, PropertyInfo } from '../../types/object.js';
-import type { ObjectManager } from './object-manager.js';
 import * as ts from 'typescript';
+import type {
+  GameObject,
+  Method,
+  MethodCode,
+  ObjId,
+  ObjRefValue,
+  PropertyInfo,
+  PropertyValue,
+  RuntimeObject,
+  Value,
+} from '../../types/object.js';
+import type { ObjectManager } from './object-manager.js';
 
 /**
  * Runtime wrapper around GameObject with inheritance and method execution
@@ -14,7 +24,7 @@ export class RuntimeObjectImpl implements RuntimeObject {
 
   constructor(
     obj: GameObject,
-    private manager: ObjectManager
+    private manager: ObjectManager,
   ) {
     this.obj = obj;
 
@@ -50,7 +60,7 @@ export class RuntimeObjectImpl implements RuntimeObject {
         // Set property (auto-persists)
         target.set(prop, value);
         return true;
-      }
+      },
     });
   }
 
@@ -71,7 +81,11 @@ export class RuntimeObjectImpl implements RuntimeObject {
    * @param seen - WeakSet for circular reference detection
    * @param path - Path for debugging
    */
-  private toValue(jsValue: any, seen: WeakSet<object> = new WeakSet(), path: string = 'root'): Value {
+  private toValue(
+    jsValue: any,
+    seen: WeakSet<object> = new WeakSet(),
+    path: string = 'root',
+  ): Value {
     // Handle null
     if (jsValue === null) {
       return { type: 'null', value: null };
@@ -83,15 +97,33 @@ export class RuntimeObjectImpl implements RuntimeObject {
     }
 
     // Already a typed Value - return as-is to avoid double-wrapping
-    if (jsValue && typeof jsValue === 'object' && 'type' in jsValue && 'value' in jsValue) {
-      const validTypes = ['null', 'string', 'number', 'boolean', 'objref', 'array', 'object'];
+    if (
+      jsValue &&
+      typeof jsValue === 'object' &&
+      'type' in jsValue &&
+      'value' in jsValue
+    ) {
+      const validTypes = [
+        'null',
+        'string',
+        'number',
+        'boolean',
+        'objref',
+        'array',
+        'object',
+      ];
       if (validTypes.includes(jsValue.type)) {
         return jsValue;
       }
     }
 
     // Handle RuntimeObject (store as objref)
-    if (jsValue && typeof jsValue === 'object' && 'id' in jsValue && typeof jsValue.id === 'number') {
+    if (
+      jsValue &&
+      typeof jsValue === 'object' &&
+      'id' in jsValue &&
+      typeof jsValue.id === 'number'
+    ) {
       return { type: 'objref', value: jsValue.id };
     }
 
@@ -126,7 +158,9 @@ export class RuntimeObjectImpl implements RuntimeObject {
       seen.add(jsValue);
       return {
         type: 'array',
-        value: jsValue.map((item, i) => this.toValue(item, seen, `${path}[${i}]`))
+        value: jsValue.map((item, i) =>
+          this.toValue(item, seen, `${path}[${i}]`),
+        ),
       };
     }
 
@@ -142,7 +176,9 @@ export class RuntimeObjectImpl implements RuntimeObject {
       // Skip special objects that shouldn't be serialized
       const constructor = jsValue.constructor?.name;
       if (constructor && !['Object', 'Array'].includes(constructor)) {
-        console.warn(`[RuntimeObject] Skipping non-plain object at ${path}: ${constructor}`);
+        console.warn(
+          `[RuntimeObject] Skipping non-plain object at ${path}: ${constructor}`,
+        );
         return { type: 'null', value: null };
       }
 
@@ -188,7 +224,7 @@ export class RuntimeObjectImpl implements RuntimeObject {
       case 'boolean':
         return value.value;
 
-      case 'objref':
+      case 'objref': {
         // Resolve object reference - getSync returns the proxy directly
         const obj = this.manager.getSync(value.value);
         if (!obj) {
@@ -196,18 +232,22 @@ export class RuntimeObjectImpl implements RuntimeObject {
           return value.value;
         }
         return obj;
+      }
 
       case 'array':
         // Recursively convert array elements
-        return (value.value as Value[]).map(item => this.fromValue(item));
+        return (value.value as Value[]).map((item) => this.fromValue(item));
 
-      case 'object':
+      case 'object': {
         // Recursively convert object properties
         const result: Record<string, any> = {};
-        for (const [key, val] of Object.entries(value.value as Record<string, Value>)) {
+        for (const [key, val] of Object.entries(
+          value.value as Record<string, Value>,
+        )) {
           result[key] = this.fromValue(val);
         }
         return result;
+      }
 
       default:
         return undefined;
@@ -247,20 +287,35 @@ export class RuntimeObjectImpl implements RuntimeObject {
       this.obj.properties = {};
     }
     // Convert JavaScript value to typed Value
-    this.obj.properties[prop] = this.toValue(value, new WeakSet(), `#${this.id}.${prop}`);
+    this.obj.properties[prop] = this.toValue(
+      value,
+      new WeakSet(),
+      `#${this.id}.${prop}`,
+    );
 
     // Auto-persist - fire and forget, MOO never sees save semantics
-    this.manager.update(this.id, {
-      properties: this.obj.properties
-    }, false).catch(err => {
-      console.error(`[RuntimeObject] Failed to persist property ${prop} on #${this.id}:`, err);
-      // Log the problematic properties structure for debugging
-      try {
-        console.error(`[RuntimeObject] Properties keys: ${Object.keys(this.obj.properties || {}).join(', ')}`);
-      } catch {
-        console.error('[RuntimeObject] Could not stringify properties');
-      }
-    });
+    this.manager
+      .update(
+        this.id,
+        {
+          properties: this.obj.properties,
+        },
+        false,
+      )
+      .catch((err) => {
+        console.error(
+          `[RuntimeObject] Failed to persist property ${prop} on #${this.id}:`,
+          err,
+        );
+        // Log the problematic properties structure for debugging
+        try {
+          console.error(
+            `[RuntimeObject] Properties keys: ${Object.keys(this.obj.properties || {}).join(', ')}`,
+          );
+        } catch {
+          console.error('[RuntimeObject] Could not stringify properties');
+        }
+      });
   }
 
   /**
@@ -272,11 +327,20 @@ export class RuntimeObjectImpl implements RuntimeObject {
       delete this.obj.properties[prop];
 
       // Auto-persist
-      this.manager.update(this.id, {
-        properties: this.obj.properties
-      }, false).catch(err => {
-        console.error(`[RuntimeObject] Failed to delete property ${prop} on #${this.id}:`, err);
-      });
+      this.manager
+        .update(
+          this.id,
+          {
+            properties: this.obj.properties,
+          },
+          false,
+        )
+        .catch((err) => {
+          console.error(
+            `[RuntimeObject] Failed to delete property ${prop} on #${this.id}:`,
+            err,
+          );
+        });
     }
   }
 
@@ -284,7 +348,11 @@ export class RuntimeObjectImpl implements RuntimeObject {
    * Set a method on this object
    * Auto-persists to database
    */
-  setMethod(name: string, code: string, options?: { callable?: boolean; aliases?: string[]; help?: string }): void {
+  setMethod(
+    name: string,
+    code: string,
+    options?: { callable?: boolean; aliases?: string[]; help?: string },
+  ): void {
     if (!this.obj.methods) {
       this.obj.methods = {};
     }
@@ -297,11 +365,20 @@ export class RuntimeObjectImpl implements RuntimeObject {
     this.manager.invalidateCompiledMethod(this.id, name);
 
     // Auto-persist
-    this.manager.update(this.id, {
-      methods: this.obj.methods
-    }, false).catch(err => {
-      console.error(`[RuntimeObject] Failed to persist method ${name} on #${this.id}:`, err);
-    });
+    this.manager
+      .update(
+        this.id,
+        {
+          methods: this.obj.methods,
+        },
+        false,
+      )
+      .catch((err) => {
+        console.error(
+          `[RuntimeObject] Failed to persist method ${name} on #${this.id}:`,
+          err,
+        );
+      });
   }
 
   /**
@@ -314,12 +391,17 @@ export class RuntimeObjectImpl implements RuntimeObject {
    * @param options - Optional: replaceAll (default false) to replace all occurrences
    * @returns Object with success/error info and the updated code
    */
-  editMethod(name: string, oldString: string, newString: string, options?: { replaceAll?: boolean }): { success: boolean; error?: string; code?: string } {
+  editMethod(
+    name: string,
+    oldString: string,
+    newString: string,
+    options?: { replaceAll?: boolean },
+  ): { success: boolean; error?: string; code?: string } {
     // Check if method exists on this object directly
     if (!this.obj.methods || !(name in this.obj.methods)) {
       return {
         success: false,
-        error: `Method '${name}' not found on this object. Use setMethod() to create it, or editMethod() on the object where it's defined.`
+        error: `Method '${name}' not found on this object. Use setMethod() to create it, or editMethod() on the object where it's defined.`,
       };
     }
 
@@ -331,7 +413,7 @@ export class RuntimeObjectImpl implements RuntimeObject {
       return {
         success: false,
         error: `String not found in method '${name}'. The old_string must match exactly.`,
-        code: currentCode
+        code: currentCode,
       };
     }
 
@@ -342,7 +424,7 @@ export class RuntimeObjectImpl implements RuntimeObject {
         return {
           success: false,
           error: `String appears ${occurrences} times in method '${name}'. Use replaceAll: true to replace all, or provide more context to make it unique.`,
-          code: currentCode
+          code: currentCode,
         };
       }
     }
@@ -357,7 +439,7 @@ export class RuntimeObjectImpl implements RuntimeObject {
       return {
         success: false,
         error: `No changes made - old_string and new_string result in identical code.`,
-        code: currentCode
+        code: currentCode,
       };
     }
 
@@ -371,11 +453,20 @@ export class RuntimeObjectImpl implements RuntimeObject {
     this.manager.invalidateCompiledMethod(this.id, name);
 
     // Auto-persist
-    this.manager.update(this.id, {
-      methods: this.obj.methods
-    }, false).catch(err => {
-      console.error(`[RuntimeObject] Failed to persist edited method ${name} on #${this.id}:`, err);
-    });
+    this.manager
+      .update(
+        this.id,
+        {
+          methods: this.obj.methods,
+        },
+        false,
+      )
+      .catch((err) => {
+        console.error(
+          `[RuntimeObject] Failed to persist edited method ${name} on #${this.id}:`,
+          err,
+        );
+      });
 
     return { success: true, code: newCode };
   }
@@ -401,7 +492,9 @@ export class RuntimeObjectImpl implements RuntimeObject {
    * @param name - Method name
    * @returns Object with code and the objectId where it was found, or null
    */
-  async getMethodCode(name: string): Promise<{ code: string; objectId: number } | null> {
+  async getMethodCode(
+    name: string,
+  ): Promise<{ code: string; objectId: number } | null> {
     const found = await this.findMethodAsync(name);
     if (!found) return null;
     return { code: found.code, objectId: found.objectId };
@@ -419,7 +512,13 @@ export class RuntimeObjectImpl implements RuntimeObject {
     }
 
     // Context will be undefined for programmatic calls
-    return await this.executeMethod(found.code, undefined, args, method, found.objectId);
+    return await this.executeMethod(
+      found.code,
+      undefined,
+      args,
+      method,
+      found.objectId,
+    );
   }
 
   /**
@@ -431,7 +530,13 @@ export class RuntimeObjectImpl implements RuntimeObject {
    * @param command - Raw command string
    * @param args - Verb-resolved arguments only
    */
-  async callVerb(method: string, context: any, player: RuntimeObject, command: string, args: unknown[]): Promise<unknown> {
+  async callVerb(
+    method: string,
+    context: any,
+    player: RuntimeObject,
+    command: string,
+    args: unknown[],
+  ): Promise<unknown> {
     const found = await this.findMethodAsync(method);
     if (!found) {
       throw new Error(`Method ${method} not found on object #${this.id}`);
@@ -444,7 +549,13 @@ export class RuntimeObjectImpl implements RuntimeObject {
       command,
     };
 
-    return await this.executeMethod(found.code, verbContext, args, method, found.objectId);
+    return await this.executeMethod(
+      found.code,
+      verbContext,
+      args,
+      method,
+      found.objectId,
+    );
   }
 
   /**
@@ -490,7 +601,9 @@ export class RuntimeObjectImpl implements RuntimeObject {
    * Find method code by walking inheritance chain (async - loads from DB if needed)
    * Returns both the code AND the object ID where method was found (for pass() support)
    */
-  private async findMethodAsync(method: string): Promise<{ code: MethodCode; objectId: number } | null> {
+  private async findMethodAsync(
+    method: string,
+  ): Promise<{ code: MethodCode; objectId: number } | null> {
     // Check this object first
     if (method in this.obj.methods) {
       const methodDef = this.obj.methods[method];
@@ -514,7 +627,9 @@ export class RuntimeObjectImpl implements RuntimeObject {
    * Find method code on parent object (for pass/super functionality)
    * Starts search from parent, not from self
    */
-  async findParentMethod(method: string): Promise<{ code: MethodCode; objectId: number } | null> {
+  async findParentMethod(
+    method: string,
+  ): Promise<{ code: MethodCode; objectId: number } | null> {
     // Start from parent, not self
     // Self-parented objects have no parent to search
     const parentId = this.obj.parent.value;
@@ -556,13 +671,15 @@ export class RuntimeObjectImpl implements RuntimeObject {
           const message = ts.flattenDiagnosticMessageText(d.messageText, '\n');
           return `Line ${d.start}: ${message}`;
         });
-        throw new Error(`TypeScript compilation errors in method '${methodName}':\n${errors.join('\n')}`);
+        throw new Error(
+          `TypeScript compilation errors in method '${methodName}':\n${errors.join('\n')}`,
+        );
       }
 
       return result.outputText;
     } catch (err) {
       throw new Error(
-        `Failed to compile TypeScript for method '${methodName}': ${err instanceof Error ? err.message : String(err)}`
+        `Failed to compile TypeScript for method '${methodName}': ${err instanceof Error ? err.message : String(err)}`,
       );
     }
   }
@@ -573,7 +690,13 @@ export class RuntimeObjectImpl implements RuntimeObject {
    * Uses caching for compiled code
    * @param definingObjectId - The object ID where this method was found (for pass() support)
    */
-  private async executeMethod(code: MethodCode, userContext: any, args: unknown[], methodName = 'anonymous', definingObjectId?: number): Promise<unknown> {
+  private async executeMethod(
+    code: MethodCode,
+    userContext: any,
+    args: unknown[],
+    methodName = 'anonymous',
+    definingObjectId?: number,
+  ): Promise<unknown> {
     // Use definingObjectId if provided, otherwise fall back to this.id
     const methodObjectId = definingObjectId ?? this.id;
 
@@ -600,7 +723,11 @@ export class RuntimeObjectImpl implements RuntimeObject {
     // Pre-load all aliases as RuntimeObjects for direct access as $alias variables
     // This allows MOO code to use $exit, $room, $recycler directly
     const objectManager = await this.manager.load(0);
-    const aliasIds = (objectManager?.get('aliases') as Record<string, number | Record<string, number>>) || {};
+    const aliasIds =
+      (objectManager?.get('aliases') as Record<
+        string,
+        number | Record<string, number>
+      >) || {};
     const resolvedAliases: Record<string, RuntimeObject> = {};
     const aliasNames: string[] = [];
 
@@ -617,7 +744,7 @@ export class RuntimeObjectImpl implements RuntimeObject {
 
     // Generate variable declarations for all aliases (e.g., "const $exit = ctx._aliases['exit'];")
     const aliasDeclarations = aliasNames
-      .map(name => `const $${name} = ctx._aliases['${name}'];`)
+      .map((name) => `const $${name} = ctx._aliases['${name}'];`)
       .join('\n        ');
 
     // Create a Proxy for $ that allows $[42] syntax (returns Promise)
@@ -677,21 +804,35 @@ export class RuntimeObjectImpl implements RuntimeObject {
         const searchFromImpl = searchFrom as RuntimeObjectImpl;
         const parentMethod = await searchFromImpl.findParentMethod(methodName);
         if (!parentMethod) {
-          throw new Error(`pass(): No parent implementation of '${methodName}' found above #${searchFromId}`);
+          throw new Error(
+            `pass(): No parent implementation of '${methodName}' found above #${searchFromId}`,
+          );
         }
 
         // Execute parent's method with current self binding
-        let parentJsCode = manager.getCompiledMethod(parentMethod.objectId, methodName);
+        let parentJsCode = manager.getCompiledMethod(
+          parentMethod.objectId,
+          methodName,
+        );
         if (!parentJsCode) {
           const parentObj = await manager.load(parentMethod.objectId);
           if (parentObj) {
-            parentJsCode = (parentObj as RuntimeObjectImpl).compileTypeScript(parentMethod.code, methodName);
-            manager.setCompiledMethod(parentMethod.objectId, methodName, parentJsCode);
+            parentJsCode = (parentObj as RuntimeObjectImpl).compileTypeScript(
+              parentMethod.code,
+              methodName,
+            );
+            manager.setCompiledMethod(
+              parentMethod.objectId,
+              methodName,
+              parentJsCode,
+            );
           }
         }
 
         if (!parentJsCode) {
-          throw new Error(`pass(): Could not compile parent method '${methodName}'`);
+          throw new Error(
+            `pass(): Could not compile parent method '${methodName}'`,
+          );
         }
 
         // Create new pass for chained calls - search from the parent's object
@@ -710,12 +851,28 @@ export class RuntimeObjectImpl implements RuntimeObject {
           methodName,
           _aliases: resolvedAliases, // Pre-resolved alias objects for $alias variable injection
           // Standard JavaScript globals
-          Object, Array, Math, JSON, Date, String, Number, Boolean,
-          RegExp, Error, Promise, console, parseInt, parseFloat, isNaN, isFinite,
+          Object,
+          Array,
+          Math,
+          JSON,
+          Date,
+          String,
+          Number,
+          Boolean,
+          RegExp,
+          Error,
+          Promise,
+          console,
+          parseInt,
+          parseFloat,
+          isNaN,
+          isFinite,
         };
 
-        const AsyncFn = async function () { }.constructor as FunctionConstructor;
-        const parentFn = new AsyncFn('ctx', `
+        const AsyncFn = (async () => {}).constructor as FunctionConstructor;
+        const parentFn = new AsyncFn(
+          'ctx',
+          `
           const self = ctx.self;
           const $ = ctx.$;
           const args = ctx.args;
@@ -754,7 +911,8 @@ export class RuntimeObjectImpl implements RuntimeObject {
           return (async () => {
             ${parentJsCode}
           })();
-        `);
+        `,
+        );
         return await parentFn(parentContext);
       };
     };
@@ -795,8 +953,10 @@ export class RuntimeObjectImpl implements RuntimeObject {
       // Wrap code in async function for execution
       // Don't destructure $ so we can use $2, $3, etc. via Proxy
       // eslint-disable-next-line @typescript-eslint/no-implied-eval
-      const AsyncFn = async function () { }.constructor as FunctionConstructor;
-      const fn = new AsyncFn('ctx', `
+      const AsyncFn = (async () => {}).constructor as FunctionConstructor;
+      const fn = new AsyncFn(
+        'ctx',
+        `
         const self = ctx.self;
         const $ = ctx.$;
         const args = ctx.args;
@@ -835,18 +995,23 @@ export class RuntimeObjectImpl implements RuntimeObject {
         return (async () => {
           ${jsCode}
         })();
-      `);
+      `,
+      );
 
       return await fn(context);
     } catch (err) {
       // Log detailed error info for debugging circular reference issues
       if (err instanceof Error && err.message.includes('circular')) {
-        console.error(`[RuntimeObject] Circular reference error in method '${methodName}' on #${this.id}`);
-        console.error(`[RuntimeObject] Method code excerpt: ${jsCode.substring(0, 200)}...`);
+        console.error(
+          `[RuntimeObject] Circular reference error in method '${methodName}' on #${this.id}`,
+        );
+        console.error(
+          `[RuntimeObject] Method code excerpt: ${jsCode.substring(0, 200)}...`,
+        );
         console.error(`[RuntimeObject] Stack: ${err.stack}`);
       }
       throw new Error(
-        `Error executing method '${methodName}' on object #${this.id}: ${err instanceof Error ? err.message : String(err)}`
+        `Error executing method '${methodName}' on object #${this.id}: ${err instanceof Error ? err.message : String(err)}`,
       );
     }
   }
@@ -877,8 +1042,14 @@ export class RuntimeObjectImpl implements RuntimeObject {
    */
   setParent(parent: RuntimeObject): void {
     // Validate that we received an actual RuntimeObject, not an ID
-    if (!parent || typeof parent !== 'object' || typeof parent.id !== 'number') {
-      throw new Error(`setParent requires a RuntimeObject, got: ${typeof parent === 'object' ? JSON.stringify(parent) : parent}`);
+    if (
+      !parent ||
+      typeof parent !== 'object' ||
+      typeof parent.id !== 'number'
+    ) {
+      throw new Error(
+        `setParent requires a RuntimeObject, got: ${typeof parent === 'object' ? JSON.stringify(parent) : parent}`,
+      );
     }
 
     // Cache the parent reference (reuse existing RuntimeObject)
@@ -889,11 +1060,20 @@ export class RuntimeObjectImpl implements RuntimeObject {
     this.dirty = true;
 
     // Auto-persist
-    this.manager.update(this.id, {
-      parent: this.obj.parent
-    }, false).catch(err => {
-      console.error(`[RuntimeObject] Failed to persist parent on #${this.id}:`, err);
-    });
+    this.manager
+      .update(
+        this.id,
+        {
+          parent: this.obj.parent,
+        },
+        false,
+      )
+      .catch((err) => {
+        console.error(
+          `[RuntimeObject] Failed to persist parent on #${this.id}:`,
+          err,
+        );
+      });
   }
 
   /**
@@ -927,7 +1107,9 @@ export class RuntimeObjectImpl implements RuntimeObject {
     }
 
     // Then overlay own properties
-    for (const [key, storedValue] of Object.entries(this.obj.properties || {})) {
+    for (const [key, storedValue] of Object.entries(
+      this.obj.properties || {},
+    )) {
       const typedValue = storedValue as Value;
 
       // If we have an existing entry from parent, preserve description if we don't have one
@@ -976,11 +1158,20 @@ export class RuntimeObjectImpl implements RuntimeObject {
     }
 
     // Auto-persist
-    this.manager.update(this.id, {
-      properties: this.obj.properties
-    }, false).catch(err => {
-      console.error(`[RuntimeObject] Failed to persist property description for ${prop} on #${this.id}:`, err);
-    });
+    this.manager
+      .update(
+        this.id,
+        {
+          properties: this.obj.properties,
+        },
+        false,
+      )
+      .catch((err) => {
+        console.error(
+          `[RuntimeObject] Failed to persist property description for ${prop} on #${this.id}:`,
+          err,
+        );
+      });
   }
 
   /**
@@ -1007,11 +1198,15 @@ export class RuntimeObjectImpl implements RuntimeObject {
     if (!this.dirty) return;
 
     // Don't invalidate transient caches - we're the source of truth
-    await this.manager.update(this.id, {
-      parent: this.obj.parent,
-      properties: this.obj.properties,
-      methods: this.obj.methods,
-    }, false);
+    await this.manager.update(
+      this.id,
+      {
+        parent: this.obj.parent,
+        properties: this.obj.properties,
+        methods: this.obj.methods,
+      },
+      false,
+    );
 
     this.dirty = false;
   }
@@ -1031,7 +1226,6 @@ export class RuntimeObjectImpl implements RuntimeObject {
     }
   }
 
-
   /**
    * Add a method to this object
    * Auto-persists to database
@@ -1040,11 +1234,20 @@ export class RuntimeObjectImpl implements RuntimeObject {
     this.obj.methods[name] = { code };
 
     // Auto-persist
-    this.manager.update(this.id, {
-      methods: this.obj.methods
-    }, false).catch(err => {
-      console.error(`[RuntimeObject] Failed to persist method ${name} on #${this.id}:`, err);
-    });
+    this.manager
+      .update(
+        this.id,
+        {
+          methods: this.obj.methods,
+        },
+        false,
+      )
+      .catch((err) => {
+        console.error(
+          `[RuntimeObject] Failed to persist method ${name} on #${this.id}:`,
+          err,
+        );
+      });
   }
 
   /**
@@ -1055,11 +1258,20 @@ export class RuntimeObjectImpl implements RuntimeObject {
     delete this.obj.methods[name];
 
     // Auto-persist
-    this.manager.update(this.id, {
-      methods: this.obj.methods
-    }, false).catch(err => {
-      console.error(`[RuntimeObject] Failed to persist method removal on #${this.id}:`, err);
-    });
+    this.manager
+      .update(
+        this.id,
+        {
+          methods: this.obj.methods,
+        },
+        false,
+      )
+      .catch((err) => {
+        console.error(
+          `[RuntimeObject] Failed to persist method removal on #${this.id}:`,
+          err,
+        );
+      });
   }
 
   /**

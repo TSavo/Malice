@@ -1,5 +1,5 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Builds the Room prototype
@@ -31,36 +31,41 @@ export class RoomBuilder {
    * @param locationId - Parent location ID (only used when creating new)
    * @param existingObj - Optional existing object to rebuild methods on
    */
-  async build(locationId: number, existingObj?: RuntimeObject): Promise<RuntimeObject> {
+  async build(
+    locationId: number,
+    existingObj?: RuntimeObject,
+  ): Promise<RuntimeObject> {
     const parentObj = await this.manager.load(locationId);
-    const obj = existingObj || await this.manager.create({
-      parent: parentObj!,
-      properties: {
-        name: 'Room',
-        description: 'Base prototype for rooms',
-        // Spatial coordinates (integers, in meters)
-        x: 0,
-        y: 0,
-        z: 0, // Vertical: negative = underground, positive = above ground
-        // Array of Exit object IDs
-        // Each Exit has: name, aliases, destRoom, distance, hidden, locked
-        exits: [],
-        // Sittable locations in the room
-        // Each entry: { name, capacity, occupied: [] }
-        // e.g., { name: 'a wooden chair', capacity: 1, occupied: [] }
-        // e.g., { name: 'a long bench', capacity: 4, occupied: [] }
-        sittables: [],
-        // Crowd mechanics
-        population: 0, // Artificial crowd level (0-100)
-        ambientNoise: 0, // Base noise level (0-100)
-        // Lighting (affects vision)
-        lighting: 100, // 0=pitch black, 50=dim, 100=well-lit
-        // Water level (affects breathing)
-        waterLevel: 0, // 0=dry, 50=waist-deep, 100=fully submerged
-        // Environment
-        outdoor: true, // Is this room outdoors? (affects weather, natural light)
+    const obj =
+      existingObj ||
+      (await this.manager.create({
+        parent: parentObj!,
+        properties: {
+          name: 'Room',
+          description: 'Base prototype for rooms',
+          // Spatial coordinates (integers, in meters)
+          x: 0,
+          y: 0,
+          z: 0, // Vertical: negative = underground, positive = above ground
+          // Array of Exit object IDs
+          // Each Exit has: name, aliases, destRoom, distance, hidden, locked
+          exits: [],
+          // Sittable locations in the room
+          // Each entry: { name, capacity, occupied: [] }
+          // e.g., { name: 'a wooden chair', capacity: 1, occupied: [] }
+          // e.g., { name: 'a long bench', capacity: 4, occupied: [] }
+          sittables: [],
+          // Crowd mechanics
+          population: 0, // Artificial crowd level (0-100)
+          ambientNoise: 0, // Base noise level (0-100)
+          // Lighting (affects vision)
+          lighting: 100, // 0=pitch black, 50=dim, 100=well-lit
+          // Water level (affects breathing)
+          waterLevel: 0, // 0=dry, 50=waist-deep, 100=fully submerged
+          // Environment
+          outdoor: true, // Is this room outdoors? (affects weather, natural light)
 
-        abilities: `Physical space that agents can occupy and traverse.
+          abilities: `Physical space that agents can occupy and traverse.
 
 COORDINATES: x, y, z position in meters. Used for distance calculations between rooms. z negative = underground.
 
@@ -79,11 +84,13 @@ SITTABLES: 'sittables' array defines seating. Each has capacity. Sitting registe
 PERCEPTION: getPerception(viewer, target) calculates clarity based on crowd, light, noise, viewer senses, whether watching target.
 
 OUTDOOR: 'outdoor' affects weather exposure, natural lighting cycles.`,
-      },
-      methods: {},
-    });
+        },
+        methods: {},
+      }));
 
-    obj.setMethod('describe', `
+    obj.setMethod(
+      'describe',
+      `
       const viewer = args[0]; // Agent viewing this room
 
       // Show room name and description
@@ -176,9 +183,12 @@ OUTDOOR: 'outdoor' affects weather exposure, natural lighting cycles.`,
       }
 
       return output;
-    `);
+    `,
+    );
 
-    obj.setMethod('addExit', `
+    obj.setMethod(
+      'addExit',
+      `
       /** Add an exit to this room.
        *  @param exit - Exit object
        */
@@ -191,9 +201,12 @@ OUTDOOR: 'outdoor' affects weather exposure, natural lighting cycles.`,
         exits.push(exit);
         self.exits = exits;
       }
-    `);
+    `,
+    );
 
-    obj.setMethod('removeExit', `
+    obj.setMethod(
+      'removeExit',
+      `
       /** Remove an exit from this room.
        *  @param exit - Exit object or direction name
        */
@@ -219,9 +232,12 @@ OUTDOOR: 'outdoor' affects weather exposure, natural lighting cycles.`,
           self.exits = exits;
         }
       }
-    `);
+    `,
+    );
 
-    obj.setMethod('findExit', `
+    obj.setMethod(
+      'findExit',
+      `
       /** Find an exit by direction name (matches name or aliases).
        *  @param direction - Direction to search for (e.g., 'n', 'north')
        *  @returns The matching Exit object or null
@@ -236,17 +252,23 @@ OUTDOOR: 'outdoor' affects weather exposure, natural lighting cycles.`,
         }
       }
       return null;
-    `);
+    `,
+    );
 
-    obj.setMethod('getExits', `
+    obj.setMethod(
+      'getExits',
+      `
       /** Get all exit objects.
        *  @returns Array of Exit RuntimeObjects
        */
       return (self.exits || []).filter(e => e);
-    `);
+    `,
+    );
 
     // Coordinate methods
-    obj.setMethod('getCoordinates', `
+    obj.setMethod(
+      'getCoordinates',
+      `
       /** Get this room's spatial coordinates.
        *  @returns { x, y, z } integer coordinates in meters
        */
@@ -255,9 +277,12 @@ OUTDOOR: 'outdoor' affects weather exposure, natural lighting cycles.`,
         y: self.y || 0,
         z: self.z || 0,
       };
-    `);
+    `,
+    );
 
-    obj.setMethod('setCoordinates', `
+    obj.setMethod(
+      'setCoordinates',
+      `
       /** Set this room's spatial coordinates.
        *  @param x - X coordinate (integer)
        *  @param y - Y coordinate (integer)
@@ -271,9 +296,12 @@ OUTDOOR: 'outdoor' affects weather exposure, natural lighting cycles.`,
       self.x = Math.round(x);
       self.y = Math.round(y);
       self.z = Math.round(z);
-    `);
+    `,
+    );
 
-    obj.setMethod('distanceTo', `
+    obj.setMethod(
+      'distanceTo',
+      `
       /** Calculate 3D distance to another room.
        *  @param otherRoom - Room RuntimeObject
        *  @returns Distance in meters (integer), or null if room not found
@@ -287,9 +315,12 @@ OUTDOOR: 'outdoor' affects weather exposure, natural lighting cycles.`,
 
       // Euclidean distance, rounded to integer
       return Math.round(Math.sqrt(dx * dx + dy * dy + dz * dz));
-    `);
+    `,
+    );
 
-    obj.setMethod('directionTo', `
+    obj.setMethod(
+      'directionTo',
+      `
       /** Get compass direction to another room.
        *  @param otherRoom - Room RuntimeObject
        *  @returns Direction string (n, s, e, w, ne, nw, se, sw, up, down) or null
@@ -315,12 +346,15 @@ OUTDOOR: 'outdoor' affects weather exposure, natural lighting cycles.`,
       else if (dx < 0) dir += 'w';
 
       return dir || null;
-    `);
+    `,
+    );
 
     // The 'go' verb - used by exit directions
     // Pattern is just the direction word like 'north', 'south'
     // Queues movement instead of instant teleportation
-    obj.setMethod('go', `
+    obj.setMethod(
+      'go',
+      `
       /** Move in a direction. Queues movement based on distance.
        *  Uses player's current movement mode (walk/run).
        *  Distance is taken from exit, or computed from room coordinates.
@@ -384,10 +418,13 @@ OUTDOOR: 'outdoor' affects weather exposure, natural lighting cycles.`,
       if (destRoom) {
         return await destRoom.describe(player);
       }
-    `);
+    `,
+    );
 
     // Override: when an agent arrives, register exit verbs and sit verb
-    obj.setMethod('onContentArrived', `
+    obj.setMethod(
+      'onContentArrived',
+      `
       const obj = args[0];
       const source = args[1];
       const mover = args[2];
@@ -417,10 +454,13 @@ OUTDOOR: 'outdoor' affects weather exposure, natural lighting cycles.`,
       }
 
       // TODO: Announce arrival to others in room
-    `);
+    `,
+    );
 
     // Override: when an agent leaves, unregister exit verbs and notify others
-    obj.setMethod('onContentLeft', `
+    obj.setMethod(
+      'onContentLeft',
+      `
       const obj = args[0];
       const dest = args[1];
       const mover = args[2];
@@ -442,16 +482,22 @@ OUTDOOR: 'outdoor' affects weather exposure, natural lighting cycles.`,
       }
 
       // TODO: Announce departure to others in room
-    `);
+    `,
+    );
 
     // Rooms can contain things
-    obj.setMethod('canContain', `
+    obj.setMethod(
+      'canContain',
+      `
       const obj = args[0];
       return true;
-    `);
+    `,
+    );
 
     // Get effective crowd level (population + actual agents)
-    obj.setMethod('getCrowdLevel', `
+    obj.setMethod(
+      'getCrowdLevel',
+      `
       /** Calculate effective crowd level (0-100+).
        *  Combines artificial population with actual agents in room.
        *  Each agent adds ~5 to crowd level.
@@ -470,10 +516,13 @@ OUTDOOR: 'outdoor' affects weather exposure, natural lighting cycles.`,
 
       // Each agent adds 5 to crowd level
       return Math.min(100, population + (agentCount * 5));
-    `);
+    `,
+    );
 
     // Get effective noise level
-    obj.setMethod('getNoiseLevel', `
+    obj.setMethod(
+      'getNoiseLevel',
+      `
       /** Calculate effective noise level (0-100).
        *  Combines ambient noise with crowd noise.
        *  @returns Effective noise level
@@ -485,11 +534,14 @@ OUTDOOR: 'outdoor' affects weather exposure, natural lighting cycles.`,
       const crowdNoise = crowdLevel * 0.5;
 
       return Math.min(100, ambient + crowdNoise);
-    `);
+    `,
+    );
 
     // Check if viewer can perceive target in this room
     // Returns { canSee: bool, canHear: bool, visualClarity: 0-100, audioClarity: 0-100 }
-    obj.setMethod('getPerception', `
+    obj.setMethod(
+      'getPerception',
+      `
       /** Check how well viewer can perceive target in this room.
        *  Factors: crowd level, lighting, viewer's sensory ability, whether target is watched.
        *  Viewer's canSee/canHear return { max, percent } where:
@@ -556,10 +608,13 @@ OUTDOOR: 'outdoor' affects weather exposure, natural lighting cycles.`,
         visionStats,
         hearingStats,
       };
-    `);
+    `,
+    );
 
     // Get water level description
-    obj.setMethod('getWaterDescription', `
+    obj.setMethod(
+      'getWaterDescription',
+      `
       /** Get a text description of the room's water level.
        *  @returns Description string or empty if dry
        */
@@ -580,10 +635,13 @@ OUTDOOR: 'outdoor' affects weather exposure, natural lighting cycles.`,
       } else {
         return 'This area is completely submerged underwater.';
       }
-    `);
+    `,
+    );
 
     // Check if an agent at a given height would be submerged
-    obj.setMethod('isSubmerged', `
+    obj.setMethod(
+      'isSubmerged',
+      `
       /** Check if an agent of given height would have their head underwater.
        *  @param agentHeight - Height of the agent in cm (default 170)
        *  @returns boolean - true if head would be underwater
@@ -595,19 +653,25 @@ OUTDOOR: 'outdoor' affects weather exposure, natural lighting cycles.`,
       // Agent is submerged if water exceeds their height
       const waterDepthCm = (waterLevel / 100) * 300;
       return waterDepthCm >= agentHeight;
-    `);
+    `,
+    );
 
     // Get water depth in cm
-    obj.setMethod('getWaterDepth', `
+    obj.setMethod(
+      'getWaterDepth',
+      `
       /** Get water depth in centimeters.
        *  @returns Depth in cm (0-300)
        */
       const waterLevel = self.waterLevel || 0;
       return (waterLevel / 100) * 300;
-    `);
+    `,
+    );
 
     // Get a description of the crowd/atmosphere
-    obj.setMethod('getCrowdDescription', `
+    obj.setMethod(
+      'getCrowdDescription',
+      `
       /** Get a text description of the room's crowd level.
        *  @returns Description string
        */
@@ -639,10 +703,13 @@ OUTDOOR: 'outdoor' affects weather exposure, natural lighting cycles.`,
       }
 
       return desc;
-    `);
+    `,
+    );
 
     // Add a sittable location to the room
-    obj.setMethod('addSittable', `
+    obj.setMethod(
+      'addSittable',
+      `
       /** Add a sittable location to the room.
        *  @param name - Name of the sittable (e.g., "a wooden chair")
        *  @param capacity - How many people can sit here (default: 1)
@@ -673,10 +740,13 @@ OUTDOOR: 'outdoor' affects weather exposure, natural lighting cycles.`,
           await obj.registerVerb('sit', self, 'sit');
         }
       }
-    `);
+    `,
+    );
 
     // Remove a sittable location
-    obj.setMethod('removeSittable', `
+    obj.setMethod(
+      'removeSittable',
+      `
       /** Remove a sittable location by name or index.
        *  @param nameOrIndex - Name string or numeric index
        */
@@ -713,10 +783,13 @@ OUTDOOR: 'outdoor' affects weather exposure, natural lighting cycles.`,
           self.sittables = sittables;
         }
       }
-    `);
+    `,
+    );
 
     // The 'sit' verb - sit on a sittable location
-    obj.setMethod('sit', `
+    obj.setMethod(
+      'sit',
+      `
       /** Sit down on a sittable location in this room.
        *  Usage: sit
        *  Usage: sit <location>
@@ -792,10 +865,13 @@ OUTDOOR: 'outdoor' affects weather exposure, natural lighting cycles.`,
       });
 
       return '';
-    `);
+    `,
+    );
 
     // The 'stand' verb - stand up from sitting
-    obj.setMethod('stand', `
+    obj.setMethod(
+      'stand',
+      `
       /** Stand up from a sitting position. */
       if (!player.sitting || player.sitting !== self) {
         return 'You are not sitting.';
@@ -830,19 +906,50 @@ OUTDOOR: 'outdoor' affects weather exposure, natural lighting cycles.`,
       });
 
       return '';
-    `);
+    `,
+    );
 
     // Property descriptions
-    obj.setPropertyDescription('x', 'X coordinate position in world space (meters, integer)');
-    obj.setPropertyDescription('y', 'Y coordinate position in world space (meters, integer)');
-    obj.setPropertyDescription('z', 'Z coordinate position in world space (meters, integer, negative = underground)');
-    obj.setPropertyDescription('exits', 'Array of Exit object IDs that connect to other rooms');
-    obj.setPropertyDescription('sittables', 'Array of sittable locations with capacity and occupancy tracking');
-    obj.setPropertyDescription('population', 'Artificial crowd level (0-100), represents NPCs and ambient crowds');
-    obj.setPropertyDescription('ambientNoise', 'Base noise level (0-100) affecting hearing clarity');
-    obj.setPropertyDescription('lighting', 'Light level (0=pitch black, 50=dim, 100=well-lit) affecting vision');
-    obj.setPropertyDescription('waterLevel', 'Water depth (0=dry, 50=waist-deep, 100=fully submerged) affecting breathing');
-    obj.setPropertyDescription('outdoor', 'Whether this room is outdoors (affects weather and natural light cycles)');
+    obj.setPropertyDescription(
+      'x',
+      'X coordinate position in world space (meters, integer)',
+    );
+    obj.setPropertyDescription(
+      'y',
+      'Y coordinate position in world space (meters, integer)',
+    );
+    obj.setPropertyDescription(
+      'z',
+      'Z coordinate position in world space (meters, integer, negative = underground)',
+    );
+    obj.setPropertyDescription(
+      'exits',
+      'Array of Exit object IDs that connect to other rooms',
+    );
+    obj.setPropertyDescription(
+      'sittables',
+      'Array of sittable locations with capacity and occupancy tracking',
+    );
+    obj.setPropertyDescription(
+      'population',
+      'Artificial crowd level (0-100), represents NPCs and ambient crowds',
+    );
+    obj.setPropertyDescription(
+      'ambientNoise',
+      'Base noise level (0-100) affecting hearing clarity',
+    );
+    obj.setPropertyDescription(
+      'lighting',
+      'Light level (0=pitch black, 50=dim, 100=well-lit) affecting vision',
+    );
+    obj.setPropertyDescription(
+      'waterLevel',
+      'Water depth (0=dry, 50=waist-deep, 100=fully submerged) affecting breathing',
+    );
+    obj.setPropertyDescription(
+      'outdoor',
+      'Whether this room is outdoors (affects weather and natural light cycles)',
+    );
 
     return obj;
   }

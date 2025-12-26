@@ -1,5 +1,5 @@
-import { ObjectManager } from './object-manager.js';
-import { MinimalBootstrap, AliasLoader } from './bootstrap/index.js';
+import { AliasLoader, MinimalBootstrap } from './bootstrap/index.js';
+import type { ObjectManager } from './object-manager.js';
 
 export type WorldBuildMode = 'full' | 'systems' | 'skip';
 
@@ -35,7 +35,10 @@ export interface GameBootstrapOptions {
 export class GameBootstrap {
   private options: GameBootstrapOptions;
 
-  constructor(private manager: ObjectManager, options: GameBootstrapOptions = {}) {
+  constructor(
+    private manager: ObjectManager,
+    options: GameBootstrapOptions = {},
+  ) {
     this.options = {
       worldBuildMode: 'full',
       disableDefaultJobs: false,
@@ -79,14 +82,20 @@ export class GameBootstrap {
 
     if (!describable || !player || !authManager) {
       if (this.options.worldBuildMode === 'skip') {
-        console.log('⚠️ World not built (skipped by options.worldBuildMode=skip)');
+        console.log(
+          '⚠️ World not built (skipped by options.worldBuildMode=skip)',
+        );
         return;
       }
 
       console.log('');
-      console.log('═══════════════════════════════════════════════════════════');
+      console.log(
+        '═══════════════════════════════════════════════════════════',
+      );
       console.log('  🏗️  Building World...');
-      console.log('═══════════════════════════════════════════════════════════');
+      console.log(
+        '═══════════════════════════════════════════════════════════',
+      );
       console.log('');
 
       if (this.options.worldBuildMode === 'systems') {
@@ -101,9 +110,13 @@ export class GameBootstrap {
     } else if (this.options.forceBootstrap) {
       // World exists but force rebuild methods
       console.log('');
-      console.log('═══════════════════════════════════════════════════════════');
+      console.log(
+        '═══════════════════════════════════════════════════════════',
+      );
       console.log('  🔄 Force rebuilding prototype methods...');
-      console.log('═══════════════════════════════════════════════════════════');
+      console.log(
+        '═══════════════════════════════════════════════════════════',
+      );
       console.log('');
 
       await this.rebuildPrototypeMethods();
@@ -120,8 +133,12 @@ export class GameBootstrap {
    * Rebuild methods on existing prototypes (called when FORCE_BOOTSTRAP=true)
    */
   private async rebuildPrototypeMethods(): Promise<void> {
-    const { PrototypeBuilder } = await import('./bootstrap/prototype-builder.js');
-    const { CoreSystemBuilder } = await import('./bootstrap/core-system-builder.js');
+    const { PrototypeBuilder } = await import(
+      './bootstrap/prototype-builder.js'
+    );
+    const { CoreSystemBuilder } = await import(
+      './bootstrap/core-system-builder.js'
+    );
 
     const prototypeBuilder = new PrototypeBuilder(this.manager);
     const coreSystemBuilder = new CoreSystemBuilder(this.manager);
@@ -129,7 +146,9 @@ export class GameBootstrap {
     // Rebuild prototype methods
     console.log('Rebuilding object prototype methods...');
     await prototypeBuilder.rebuildMethods();
-    console.log('  ✅ Rebuilt Describable, Agent, Human, Player prototype methods');
+    console.log(
+      '  ✅ Rebuilt Describable, Agent, Human, Player prototype methods',
+    );
 
     // Rebuild core system methods
     console.log('Rebuilding core system methods...');
@@ -142,8 +161,12 @@ export class GameBootstrap {
    * This is useful for unit tests that only need `$.recycler`, prototypes, and core utilities.
    */
   private async buildSystemsOnly(): Promise<void> {
-    const { PrototypeBuilder } = await import('./bootstrap/prototype-builder.js');
-    const { CoreSystemBuilder } = await import('./bootstrap/core-system-builder.js');
+    const { PrototypeBuilder } = await import(
+      './bootstrap/prototype-builder.js'
+    );
+    const { CoreSystemBuilder } = await import(
+      './bootstrap/core-system-builder.js'
+    );
 
     const prototypeBuilder = new PrototypeBuilder(this.manager);
     const coreSystemBuilder = new CoreSystemBuilder(this.manager, {
@@ -157,7 +180,9 @@ export class GameBootstrap {
     console.log('Creating core systems...');
     await coreSystemBuilder.buildCoreSystems();
     console.log('  ✅ Created AuthManager, CharGen, PreAuthHandler, Recycler');
-    console.log('  ✅ Created $.pronoun, $.proportional, $.room, $.bodyFactory');
+    console.log(
+      '  ✅ Created $.pronoun, $.proportional, $.room, $.bodyFactory',
+    );
 
     // Reload aliases so everything is addressable via `manager as any`.
     const aliasLoader = new AliasLoader(this.manager);
@@ -169,8 +194,12 @@ export class GameBootstrap {
    * Build the complete world (prototypes + core systems + world geometry/buildings)
    */
   private async buildWorld(): Promise<void> {
-    const { PrototypeBuilder } = await import('./bootstrap/prototype-builder.js');
-    const { CoreSystemBuilder } = await import('./bootstrap/core-system-builder.js');
+    const { PrototypeBuilder } = await import(
+      './bootstrap/prototype-builder.js'
+    );
+    const { CoreSystemBuilder } = await import(
+      './bootstrap/core-system-builder.js'
+    );
     const { WorldBuilder } = await import('./bootstrap/world-builder.js');
     const { BuildingBuilder } = await import('./bootstrap/building-builder.js');
 
@@ -190,7 +219,9 @@ export class GameBootstrap {
     console.log('Creating core systems...');
     await coreSystemBuilder.buildCoreSystems();
     console.log('  ✅ Created AuthManager, CharGen, PreAuthHandler, Recycler');
-    console.log('  ✅ Created $.pronoun, $.proportional, $.room, $.bodyFactory');
+    console.log(
+      '  ✅ Created $.pronoun, $.proportional, $.room, $.bodyFactory',
+    );
 
     // Reload aliases so they're available for world building
     const aliasLoader = new AliasLoader(this.manager);
@@ -210,7 +241,10 @@ export class GameBootstrap {
     console.log('Registering global building aliases...');
     const objectManager = await this.manager.load(0);
 
-    const citySigns = await this.manager.findByProperty('name', 'City Announcement Board');
+    const citySigns = await this.manager.findByProperty(
+      'name',
+      'City Announcement Board',
+    );
     if (citySigns[0]) {
       await objectManager?.call('addAlias', 'cityAnnounce', citySigns[0].id);
       console.log('  ✅ Registered $.cityAnnounce');
@@ -226,7 +260,10 @@ export class GameBootstrap {
       console.warn('  ⚠️  The Core not found');
     }
 
-    const theBlindRooms = await this.manager.findByProperty('name', 'The Blind');
+    const theBlindRooms = await this.manager.findByProperty(
+      'name',
+      'The Blind',
+    );
     if (theBlindRooms[0]) {
       await objectManager?.call('addAlias', 'theBlind', theBlindRooms[0].id);
       console.log('  ✅ Registered $.theBlind');
@@ -236,15 +273,23 @@ export class GameBootstrap {
 
     // Place special objects (created before the world is built)
     // Reload aliases to include the new room aliases
-    const aliases = (objectManager?.get('aliases') || {}) as Record<string, number>;
+    const aliases = (objectManager?.get('aliases') || {}) as Record<
+      string,
+      number
+    >;
 
     // Sister Gray → Sister's Quarters (z=-5)
     if (aliases.sisterGray) {
       const sisterGray = await this.manager.load(aliases.sisterGray);
-      const sistersQuarters = await this.manager.findByProperty('name', "Sister's Quarters");
+      const sistersQuarters = await this.manager.findByProperty(
+        'name',
+        "Sister's Quarters",
+      );
       if (sisterGray && sistersQuarters.length > 0) {
         await sisterGray.call('moveTo', sistersQuarters[0]);
-        console.log(`  ✅ Placed Sister Gray in Sister's Quarters (#${sistersQuarters[0].id})`);
+        console.log(
+          `  ✅ Placed Sister Gray in Sister's Quarters (#${sistersQuarters[0].id})`,
+        );
       }
     }
 

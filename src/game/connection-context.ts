@@ -1,9 +1,8 @@
-import { Connection } from '../connection/connection.js';
-import { ObjectManager } from '../database/object-manager.js';
-import { getGameLogger } from '../database/game-logger.js';
-import type { RuntimeObject } from '../../types/object.js';
-import type { ObjId } from '../../types/object.js';
 import type { AuthInfo } from '../../types/auth.js';
+import type { ObjId, RuntimeObject } from '../../types/object.js';
+import type { Connection } from '../connection/connection.js';
+import { getGameLogger } from '../database/game-logger.js';
+import type { ObjectManager } from '../database/object-manager.js';
 
 /**
  * Connection context - bridges transport layer with object system
@@ -17,7 +16,7 @@ export class ConnectionContext {
 
   constructor(
     private connection: Connection,
-    private manager: ObjectManager
+    private manager: ObjectManager,
   ) {
     // Log connection
     const logger = getGameLogger();
@@ -25,7 +24,7 @@ export class ConnectionContext {
       logger.logConnect(
         this.id,
         this.connection.transport.remoteAddress,
-        this.connection.transport.type as 'telnet' | 'websocket' | 'tls'
+        this.connection.transport.type as 'telnet' | 'websocket' | 'tls',
       );
     }
 
@@ -78,7 +77,7 @@ export class ConnectionContext {
           trimmed,
           verb,
           args,
-          this.connection.transport.remoteAddress
+          this.connection.transport.remoteAddress,
         );
       }
     }
@@ -89,7 +88,7 @@ export class ConnectionContext {
     } catch (err) {
       console.error(
         `Error in handler #${this.currentHandler.id} onInput:`,
-        err instanceof Error ? err.message : String(err)
+        err instanceof Error ? err.message : String(err),
       );
       this.send('An error occurred processing your input.\r\n');
     }
@@ -141,7 +140,7 @@ export class ConnectionContext {
         userId,
         this.connection.transport.remoteAddress,
         true,
-        `#${userId}`
+        `#${userId}`,
       );
     }
   }
@@ -234,7 +233,7 @@ export class ConnectionContext {
    */
   async question(
     prompt: string,
-    validator?: (input: string) => string | undefined
+    validator?: (input: string) => string | undefined,
   ): Promise<string> {
     return new Promise((resolve) => {
       const askAgain = (errorMsg?: string) => {
@@ -276,7 +275,7 @@ export class ConnectionContext {
    */
   async choice(
     prompt: string,
-    options: Record<string, string>
+    options: Record<string, string>,
   ): Promise<string> {
     return new Promise((resolve) => {
       // Build menu text
@@ -303,8 +302,8 @@ export class ConnectionContext {
 
           subscription.unsubscribe();
 
-          const num = parseInt(trimmed);
-          if (isNaN(num) || num < 1 || num > keys.length) {
+          const num = parseInt(trimmed, 10);
+          if (Number.isNaN(num) || num < 1 || num > keys.length) {
             askAgain('Invalid choice. Please enter a number from the menu.');
             return;
           }

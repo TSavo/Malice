@@ -124,7 +124,7 @@ The wind is constant up here, channeled between the rooftop equipment into unpre
         east: '%COOLING_TOWERS',
         south: '%MAINTENANCE',
         west: '%SOLAR_E',
-        'in': '%E',
+        in: '%E',
       },
     },
 

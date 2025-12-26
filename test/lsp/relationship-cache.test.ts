@@ -3,15 +3,21 @@
  * Tests LRU caching, TTL expiration, and invalidation
  */
 
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type {
+  MethodRelationship,
+  RelationshipType,
+} from '../../src/lsp/relationship-analyzer.js';
 import { RelationshipCache } from '../../src/lsp/relationship-cache.js';
-import type { MethodRelationship, RelationshipType } from '../../src/lsp/relationship-analyzer.js';
 
 describe('RelationshipCache', () => {
   let cache: RelationshipCache;
 
   // Helper to create mock relationship data
-  function createMockRelationship(objectId: number, methodName: string): MethodRelationship {
+  function createMockRelationship(
+    objectId: number,
+    methodName: string,
+  ): MethodRelationship {
     return {
       sourceObjectId: objectId,
       sourceMethod: methodName,

@@ -17,9 +17,14 @@ export const building = {
     '%PAWN_LOCK': {
       prototype: 'biometricLock',
       name: 'Pawn Shop Door Scanner',
-      description: 'A fingerprint reader beside a steel security door. A handwritten sign is taped over the scanner.',
+      description:
+        'A fingerprint reader beside a steel security door. A handwritten sign is taped over the scanner.',
       scanners: [
-        { type: 'fingerprint', part: 'hand', message: 'CLOSED - Come back later.' },
+        {
+          type: 'fingerprint',
+          part: 'hand',
+          message: 'CLOSED - Come back later.',
+        },
       ],
       authorizedUsers: {},
     },
@@ -27,7 +32,8 @@ export const building = {
     '%BAR_LOCK': {
       prototype: 'biometricLock',
       name: 'Bar Door Scanner',
-      description: 'A retinal scanner beside a heavy door, its indicator light dark.',
+      description:
+        'A retinal scanner beside a heavy door, its indicator light dark.',
       scanners: [
         { type: 'retinal', part: 'eye', message: 'Establishment closed.' },
       ],
@@ -37,10 +43,9 @@ export const building = {
     '%BAR_BACK_LOCK': {
       prototype: 'biometricLock',
       name: 'Back Door Scanner',
-      description: 'A palm scanner beside a dented steel door, mounted at an angle where the frame has warped.',
-      scanners: [
-        { type: 'palm', part: 'hand', message: 'Staff access only.' },
-      ],
+      description:
+        'A palm scanner beside a dented steel door, mounted at an angle where the frame has warped.',
+      scanners: [{ type: 'palm', part: 'hand', message: 'Staff access only.' }],
       authorizedUsers: {},
     },
 
@@ -68,7 +73,8 @@ The space smells of nothing. The air is filtered, the surfaces sanitized. The fa
           to: 's-washington/x-20.ts',
           prototype: 'guardedExit',
           allowedFaction: 'Citizen',
-          denyMessage: 'A scanner beside the door flashes red. "Citizens only."',
+          denyMessage:
+            'A scanner beside the door flashes red. "Citizens only."',
           description: 'A reinforced door opens onto S. Washington St',
         },
       },
@@ -76,7 +82,8 @@ The space smells of nothing. The air is filtered, the surfaces sanitized. The fa
         {
           prototype: 'vendable',
           name: 'Nutrient Dispensing Station',
-          description: 'A row of automated kiosks along the back wall. Screens display nutritional information and prices. Payment is handled electronically—scan your account, make your selection, receive your ration. The Continuum logo pulses gently on each screen.',
+          description:
+            'A row of automated kiosks along the back wall. Screens display nutritional information and prices. Payment is handled electronically—scan your account, make your selection, receive your ration. The Continuum logo pulses gently on each screen.',
           bank: '$bank',
           bankAccount: 'CONTINUUM-NUTRIENT',
           spawnables: [
@@ -111,7 +118,11 @@ The space between the shutters smells of dust and old metal, the scent of invent
       waterLevel: 0,
       outdoor: false,
       exits: {
-        south: { to: 's-washington/x-19.ts', locks: ['%PAWN_LOCK'], description: 'A steel security door, shuttered and locked' },
+        south: {
+          to: 's-washington/x-19.ts',
+          locks: ['%PAWN_LOCK'],
+          description: 'A steel security door, shuttered and locked',
+        },
       },
     },
 
@@ -131,8 +142,16 @@ A notice on the door claims temporary closure for "renovation." The dust suggest
       waterLevel: 0,
       outdoor: false,
       exits: {
-        south: { to: 's-washington/x-18.ts', locks: ['%BAR_LOCK'], description: 'A heavy door beneath a dead neon sign' },
-        northeast: { to: 'alley/y8.ts', locks: ['%BAR_BACK_LOCK'], description: 'A dented steel door leads to the alley' },
+        south: {
+          to: 's-washington/x-18.ts',
+          locks: ['%BAR_LOCK'],
+          description: 'A heavy door beneath a dead neon sign',
+        },
+        northeast: {
+          to: 'alley/y8.ts',
+          locks: ['%BAR_BACK_LOCK'],
+          description: 'A dented steel door leads to the alley',
+        },
       },
     },
   },

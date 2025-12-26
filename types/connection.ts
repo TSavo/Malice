@@ -4,7 +4,11 @@ import type { ITransport } from './transport.js';
 /**
  * Connection state
  */
-export type ConnectionState = 'connecting' | 'connected' | 'authenticated' | 'disconnected';
+export type ConnectionState =
+  | 'connecting'
+  | 'connected'
+  | 'authenticated'
+  | 'disconnected';
 
 /**
  * Connection wraps a transport with session state

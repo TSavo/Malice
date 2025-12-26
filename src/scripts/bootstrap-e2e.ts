@@ -1,12 +1,11 @@
+import assert from 'node:assert/strict';
 import { readdir, readFile } from 'node:fs/promises';
 import { extname, join } from 'node:path';
-import assert from 'node:assert/strict';
-
+import { applyExtractedPrototypeSpec } from '../database/bootstrap/prototype-ts/apply.js';
+import type { ExtractedPrototypeSpec } from '../database/bootstrap/prototype-ts/extract.js';
+import { extractPrototypeSpecFromSourceText } from '../database/bootstrap/prototype-ts/extract.js';
 import { ObjectDatabase } from '../database/object-db.js';
 import { ObjectManager } from '../database/object-manager.js';
-import { extractPrototypeSpecFromSourceText } from '../database/bootstrap/prototype-ts/extract.js';
-import type { ExtractedPrototypeSpec } from '../database/bootstrap/prototype-ts/extract.js';
-import { applyExtractedPrototypeSpec } from '../database/bootstrap/prototype-ts/apply.js';
 
 type CliOptions = {
   mongoUri: string;
@@ -22,8 +21,10 @@ function parseArgs(argv: string[]): CliOptions {
   };
 
   for (const arg of argv) {
-    if (arg.startsWith('--mongoUri=')) opts.mongoUri = arg.slice('--mongoUri='.length);
-    else if (arg.startsWith('--dbName=')) opts.dbName = arg.slice('--dbName='.length);
+    if (arg.startsWith('--mongoUri='))
+      opts.mongoUri = arg.slice('--mongoUri='.length);
+    else if (arg.startsWith('--dbName='))
+      opts.dbName = arg.slice('--dbName='.length);
     else if (arg.startsWith('--dir=')) opts.dir = arg.slice('--dir='.length);
     else if (arg === '--help' || arg === '-h') {
       throw new Error('help');
@@ -36,7 +37,9 @@ function parseArgs(argv: string[]): CliOptions {
 }
 
 function printHelp(): void {
-  console.log('Usage: node --import tsx src/scripts/bootstrap-e2e.ts [--dir=src/ts-prototypes]');
+  console.log(
+    'Usage: node --import tsx src/scripts/bootstrap-e2e.ts [--dir=src/ts-prototypes]',
+  );
   console.log('');
   console.log('Environment:');
   console.log('  MONGO_URI  MongoDB URI (default: mongodb://localhost:27017)');
@@ -66,7 +69,10 @@ async function loadSpecs(files: string[]): Promise<ExtractedPrototypeSpec[]> {
   return specs;
 }
 
-async function verifySpecs(manager: ObjectManager, specs: ExtractedPrototypeSpec[]): Promise<void> {
+async function verifySpecs(
+  manager: ObjectManager,
+  specs: ExtractedPrototypeSpec[],
+): Promise<void> {
   const root = await manager.load(0);
   assert(root, 'ObjectManager (#0) not found');
 
@@ -74,13 +80,22 @@ async function verifySpecs(manager: ObjectManager, specs: ExtractedPrototypeSpec
 
   for (const spec of specs) {
     const objectId = aliases[spec.alias];
-    assert.ok(typeof objectId === 'number', `Alias '${spec.alias}' must exist and be a number`);
+    assert.ok(
+      typeof objectId === 'number',
+      `Alias '${spec.alias}' must exist and be a number`,
+    );
 
     const obj = await manager.load(objectId);
-    assert.ok(obj, `Object for alias '${spec.alias}' not found at #${objectId}`);
+    assert.ok(
+      obj,
+      `Object for alias '${spec.alias}' not found at #${objectId}`,
+    );
 
     const parentId = aliases[spec.parent];
-    assert.ok(typeof parentId === 'number', `Alias '${spec.parent}' (parent of '${spec.alias}') must be a number`);
+    assert.ok(
+      typeof parentId === 'number',
+      `Alias '${spec.parent}' (parent of '${spec.alias}') must be a number`,
+    );
     assert.equal(obj.getParent(), parentId, `#${objectId} parent mismatch`);
 
     const ownProps = obj.getOwnProperties();
@@ -93,12 +108,18 @@ async function verifySpecs(manager: ObjectManager, specs: ExtractedPrototypeSpec
     const expectedMethods = Object.keys(spec.methods);
 
     const missing = expectedMethods.filter((name) => !(name in ownMethods));
-    assert.deepEqual(missing, [], `#${objectId} missing own method(s): ${missing.join(', ')}`);
+    assert.deepEqual(
+      missing,
+      [],
+      `#${objectId} missing own method(s): ${missing.join(', ')}`,
+    );
 
     // Intentionally not comparing method code while migrating TS prototypes.
     // Extra methods on the DB object are allowed.
 
-    console.log(`✅ Verified ${spec.alias} (#${objectId}) from ${spec.sourceFile ?? 'unknown file'}`);
+    console.log(
+      `✅ Verified ${spec.alias} (#${objectId}) from ${spec.sourceFile ?? 'unknown file'}`,
+    );
   }
 }
 
@@ -128,10 +149,16 @@ async function main(): Promise<void> {
   try {
     const manager = new ObjectManager(db);
 
-    console.log(`Applying ${files.length} TS prototype file(s) from ${opts.dir} (force)...`);
+    console.log(
+      `Applying ${files.length} TS prototype file(s) from ${opts.dir} (force)...`,
+    );
     for (const spec of specs) {
-      const result = await applyExtractedPrototypeSpec(manager, spec, { force: true });
-      console.log(`- ${result.alias} (#${result.prototypeId}): props:${result.updatedProperties.length}, methods:${result.updatedMethods.length}`);
+      const result = await applyExtractedPrototypeSpec(manager, spec, {
+        force: true,
+      });
+      console.log(
+        `- ${result.alias} (#${result.prototypeId}): props:${result.updatedProperties.length}, methods:${result.updatedMethods.length}`,
+      );
     }
 
     console.log('Verifying applied prototypes...');

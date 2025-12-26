@@ -1,4 +1,4 @@
-import { query, type Options } from '@anthropic-ai/claude-agent-sdk';
+import { type Options, query } from '@anthropic-ai/claude-agent-sdk';
 
 const TAILOR_SYSTEM_PROMPT = `You are a costume designer for NPCs in a post-apocalyptic MUD game.
 
@@ -136,7 +136,7 @@ export async function tailorNPC(
   humanId: number,
   mcpHost: string,
   mcpPort: number,
-  context?: string
+  context?: string,
 ): Promise<{ success: boolean; message: string }> {
   const options: Options = {
     systemPrompt: TAILOR_SYSTEM_PROMPT,
@@ -162,7 +162,11 @@ First use ai action=info to learn about the NPC, then dress them appropriately f
     for await (const message of query({ prompt, options })) {
       // Extract final response text
       if (message.type === 'assistant' && 'message' in message) {
-        const content = (message as { message?: { content?: Array<{ type: string; text?: string }> } }).message?.content;
+        const content = (
+          message as {
+            message?: { content?: Array<{ type: string; text?: string }> };
+          }
+        ).message?.content;
         if (content) {
           for (const block of content) {
             if (block.type === 'text' && block.text) {

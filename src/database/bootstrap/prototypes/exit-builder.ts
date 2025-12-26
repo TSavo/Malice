@@ -1,5 +1,5 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Builds the Exit prototype
@@ -63,7 +63,9 @@ USAGE: Room.go() finds exit via findExit(), checks canUse(), queues movement to 
       methods: {},
     });
 
-    obj.setMethod('matches', `
+    obj.setMethod(
+      'matches',
+      `
       /** Check if a direction string matches this exit.
        *  @param direction - Direction to check (e.g., 'n', 'north')
        *  @returns true if matches name or any alias
@@ -77,9 +79,12 @@ USAGE: Room.go() finds exit via findExit(), checks canUse(), queues movement to 
       // Check aliases
       const aliases = self.aliases || [];
       return aliases.some(a => a.toLowerCase() === direction);
-    `);
+    `,
+    );
 
-    obj.setMethod('canUse', `
+    obj.setMethod(
+      'canUse',
+      `
       /** Check if an agent can use this exit.
        *  @param agent - The agent trying to use the exit
        *  @returns { allowed, reason }
@@ -106,9 +111,12 @@ USAGE: Room.go() finds exit via findExit(), checks canUse(), queues movement to 
         }
       }
       return { allowed: true };
-    `);
+    `,
+    );
     // Add composable lock management
-    obj.setMethod('addLock', `
+    obj.setMethod(
+      'addLock',
+      `
       /** Add a lock object to this exit.
        *  @param lock - Lock object or ID
        */
@@ -116,9 +124,12 @@ USAGE: Room.go() finds exit via findExit(), checks canUse(), queues movement to 
       const locks = self.locks || [];
       locks.push(lock);
       self.locks = locks;
-    `);
+    `,
+    );
 
-    obj.setMethod('removeLock', `
+    obj.setMethod(
+      'removeLock',
+      `
       /** Remove a lock object from this exit.
        *  @param lock - Lock object or ID to remove
        */
@@ -129,9 +140,12 @@ USAGE: Room.go() finds exit via findExit(), checks canUse(), queues movement to 
         return id !== lockId;
       });
       self.locks = locks;
-    `);
+    `,
+    );
 
-    obj.setMethod('unlock', `
+    obj.setMethod(
+      'unlock',
+      `
       /** Attempt to unlock this exit with an item.
        *  @param agent - The agent trying to unlock
        *  @param item - The item being used as a key
@@ -155,9 +169,12 @@ USAGE: Room.go() finds exit via findExit(), checks canUse(), queues movement to 
       // If no specific key required, any key works (or just unlock)
       self.locked = false;
       return { success: true, message: 'You unlock the way ' + self.name + '.' };
-    `);
+    `,
+    );
 
-    obj.setMethod('lock', `
+    obj.setMethod(
+      'lock',
+      `
       /** Lock this exit.
        *  @returns { success, message }
        */
@@ -166,16 +183,22 @@ USAGE: Room.go() finds exit via findExit(), checks canUse(), queues movement to 
       }
       self.locked = true;
       return { success: true, message: 'You lock the way ' + self.name + '.' };
-    `);
+    `,
+    );
 
-    obj.setMethod('getDestination', `
+    obj.setMethod(
+      'getDestination',
+      `
       /** Get the destination room.
        *  @returns The destination room object or null
        */
       return self.destRoom || null;
-    `);
+    `,
+    );
 
-    obj.setMethod('describe', `
+    obj.setMethod(
+      'describe',
+      `
       /** Get description of this exit for room listing.
        *  @returns Description string like "north (10m)"
        */
@@ -183,16 +206,38 @@ USAGE: Room.go() finds exit via findExit(), checks canUse(), queues movement to 
       const shortAlias = aliases.length > 0 ? ' [' + aliases[0] + ']' : '';
       const lockStr = self.locked ? ' (locked)' : '';
       return self.name + shortAlias + ' (' + self.distance + 'm)' + lockStr;
-    `);
+    `,
+    );
 
     // Property descriptions
-    obj.setPropertyDescription('destRoom', 'Destination room object that this exit leads to');
-    obj.setPropertyDescription('distance', 'Distance in meters that affects travel time');
-    obj.setPropertyDescription('hidden', 'Whether this exit is hidden from room descriptions (secret passages)');
-    obj.setPropertyDescription('locked', 'Legacy simple lock - whether exit is currently locked');
-    obj.setPropertyDescription('lockKey', 'Legacy key-based lock - ID of item that can unlock this exit');
-    obj.setPropertyDescription('locks', 'Array of composable lock objects that control access');
-    obj.setPropertyDescription('door', 'Reference to $.door object with full door mechanics');
+    obj.setPropertyDescription(
+      'destRoom',
+      'Destination room object that this exit leads to',
+    );
+    obj.setPropertyDescription(
+      'distance',
+      'Distance in meters that affects travel time',
+    );
+    obj.setPropertyDescription(
+      'hidden',
+      'Whether this exit is hidden from room descriptions (secret passages)',
+    );
+    obj.setPropertyDescription(
+      'locked',
+      'Legacy simple lock - whether exit is currently locked',
+    );
+    obj.setPropertyDescription(
+      'lockKey',
+      'Legacy key-based lock - ID of item that can unlock this exit',
+    );
+    obj.setPropertyDescription(
+      'locks',
+      'Array of composable lock objects that control access',
+    );
+    obj.setPropertyDescription(
+      'door',
+      'Reference to $.door object with full door mechanics',
+    );
 
     return obj;
   }

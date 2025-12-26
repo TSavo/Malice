@@ -11,32 +11,76 @@
  * 2. Creates new room files for the additional grid points
  */
 
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const PIONEER_SQUARE_DIR = path.join(__dirname, '../src/database/bootstrap/world/seattle/pioneer-square');
+const PIONEER_SQUARE_DIR = path.join(
+  __dirname,
+  '../src/database/bootstrap/world/seattle/pioneer-square',
+);
 
 // Old avenue X coordinates -> New
 const X_MAP = {
-  '-15': -21, '-14': -20, '-13': -19, '-12': -18, '-11': -17, '-10': -16,
-  '-9': -14, '-8': -13, '-7': -12, '-6': -11, '-5': -10, '-4': -9,
-  '-3': -7, '-2': -6, '-1': -5, '0': -4, '1': -3, '2': -2,
-  '3': 0, '4': 1, '5': 2, '6': 3, '7': 4, '8': 5,
-  '9': 7, '10': 8, '11': 9, '12': 10, '13': 11, '14': 12,
-  '15': 14
+  '-15': -21,
+  '-14': -20,
+  '-13': -19,
+  '-12': -18,
+  '-11': -17,
+  '-10': -16,
+  '-9': -14,
+  '-8': -13,
+  '-7': -12,
+  '-6': -11,
+  '-5': -10,
+  '-4': -9,
+  '-3': -7,
+  '-2': -6,
+  '-1': -5,
+  0: -4,
+  1: -3,
+  2: -2,
+  3: 0,
+  4: 1,
+  5: 2,
+  6: 3,
+  7: 4,
+  8: 5,
+  9: 7,
+  10: 8,
+  11: 9,
+  12: 10,
+  13: 11,
+  14: 12,
+  15: 14,
 };
 
 // Old street Y coordinates -> New
 const Y_MAP = {
-  '-10': -12, '-9': -11, '-8': -10, '-7': -9, '-6': -8,
-  '-5': -6, '-4': -5, '-3': -4, '-2': -3, '-1': -2,
-  '0': 0, '1': 1, '2': 2, '3': 3, '4': 4,
-  '5': 6, '6': 7, '7': 8, '8': 9, '9': 10,
-  '10': 12
+  '-10': -12,
+  '-9': -11,
+  '-8': -10,
+  '-7': -9,
+  '-6': -8,
+  '-5': -6,
+  '-4': -5,
+  '-3': -4,
+  '-2': -3,
+  '-1': -2,
+  0: 0,
+  1: 1,
+  2: 2,
+  3: 3,
+  4: 4,
+  5: 6,
+  6: 7,
+  7: 8,
+  8: 9,
+  9: 10,
+  10: 12,
 };
 
 function transformX(oldX) {
@@ -46,30 +90,30 @@ function transformX(oldX) {
   // For values outside the defined range, scale proportionally
   // Old spacing: 6 apart, New spacing: 7 apart
   // Find which block it's in and interpolate
-  const oldNum = parseInt(oldX);
+  const oldNum = parseInt(oldX, 10);
 
   // Determine which avenue block we're in
-  if (oldNum <= -15) return Math.round((oldNum + 15) * (7/6) - 21);
-  if (oldNum <= -9) return Math.round((oldNum + 9) * (7/6) - 14);
-  if (oldNum <= -3) return Math.round((oldNum + 3) * (7/6) - 7);
-  if (oldNum <= 3) return Math.round((oldNum - 3) * (7/6) + 0);
-  if (oldNum <= 9) return Math.round((oldNum - 9) * (7/6) + 7);
-  return Math.round((oldNum - 15) * (7/6) + 14);
+  if (oldNum <= -15) return Math.round((oldNum + 15) * (7 / 6) - 21);
+  if (oldNum <= -9) return Math.round((oldNum + 9) * (7 / 6) - 14);
+  if (oldNum <= -3) return Math.round((oldNum + 3) * (7 / 6) - 7);
+  if (oldNum <= 3) return Math.round((oldNum - 3) * (7 / 6) + 0);
+  if (oldNum <= 9) return Math.round((oldNum - 9) * (7 / 6) + 7);
+  return Math.round((oldNum - 15) * (7 / 6) + 14);
 }
 
 function transformY(oldY) {
   const key = String(oldY);
   if (key in Y_MAP) return Y_MAP[key];
 
-  const oldNum = parseInt(oldY);
+  const oldNum = parseInt(oldY, 10);
 
   // Determine which street block we're in
-  if (oldNum <= -10) return Math.round((oldNum + 10) * (6/5) - 12);
-  if (oldNum <= -5) return Math.round((oldNum + 5) * (6/5) - 6);
-  if (oldNum <= 0) return Math.round(oldNum * (6/5));
-  if (oldNum <= 5) return Math.round(oldNum * (6/5));
-  if (oldNum <= 10) return Math.round((oldNum - 5) * (6/5) + 6);
-  return Math.round((oldNum - 10) * (6/5) + 12);
+  if (oldNum <= -10) return Math.round((oldNum + 10) * (6 / 5) - 12);
+  if (oldNum <= -5) return Math.round((oldNum + 5) * (6 / 5) - 6);
+  if (oldNum <= 0) return Math.round(oldNum * (6 / 5));
+  if (oldNum <= 5) return Math.round(oldNum * (6 / 5));
+  if (oldNum <= 10) return Math.round((oldNum - 5) * (6 / 5) + 6);
+  return Math.round((oldNum - 10) * (6 / 5) + 12);
 }
 
 function updateRoomFile(filePath) {
@@ -84,8 +128,8 @@ function updateRoomFile(filePath) {
     return { updated: false };
   }
 
-  const oldX = parseInt(xMatch[1]);
-  const oldY = parseInt(yMatch[1]);
+  const oldX = parseInt(xMatch[1], 10);
+  const oldY = parseInt(yMatch[1], 10);
   const newX = transformX(oldX);
   const newY = transformY(oldY);
 
@@ -114,7 +158,11 @@ function processDirectory(dir) {
       const result = processDirectory(fullPath);
       count += result.count;
       changes.push(...result.changes);
-    } else if (entry.isFile() && entry.name.endsWith('.ts') && !entry.name.includes('MAP')) {
+    } else if (
+      entry.isFile() &&
+      entry.name.endsWith('.ts') &&
+      !entry.name.includes('MAP')
+    ) {
       const result = updateRoomFile(fullPath);
       if (result.updated) {
         count++;
@@ -123,7 +171,7 @@ function processDirectory(dir) {
           oldX: result.oldX,
           oldY: result.oldY,
           newX: result.newX,
-          newY: result.newY
+          newY: result.newY,
         });
       }
     }

@@ -1,8 +1,8 @@
-import { ObjectManager } from '../object-manager.js';
-import type { RuntimeObject, ObjId } from '../../../types/object.js';
-import * as fs from 'fs';
-import * as path from 'path';
-import { pathToFileURL } from 'url';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+import { pathToFileURL } from 'node:url';
+import type { ObjId, RuntimeObject } from '../../../types/object.js';
+import type { ObjectManager } from '../object-manager.js';
 
 /**
  * Builds buildings from structured definitions with explicit exit connections.
@@ -72,7 +72,9 @@ export class BuildingBuilder {
     const $ = this.manager as any;
 
     if (!$.room || !$.exit || !$.recycler) {
-      throw new Error('Room, Exit, and Recycler prototypes must exist before building buildings');
+      throw new Error(
+        'Room, Exit, and Recycler prototypes must exist before building buildings',
+      );
     }
 
     console.log('  🏢 Building structures...');
@@ -91,7 +93,7 @@ export class BuildingBuilder {
   private async loadBuildings(): Promise<void> {
     const worldDir = path.join(
       process.cwd(),
-      'src/database/bootstrap/world/seattle/pioneer-square/buildings'
+      'src/database/bootstrap/world/seattle/pioneer-square/buildings',
     );
 
     if (!fs.existsSync(worldDir)) {
@@ -99,7 +101,7 @@ export class BuildingBuilder {
     }
 
     // Each subdirectory is a building
-    const buildingDirs = fs.readdirSync(worldDir).filter(f => {
+    const buildingDirs = fs.readdirSync(worldDir).filter((f) => {
       const fullPath = path.join(worldDir, f);
       return fs.statSync(fullPath).isDirectory();
     });
@@ -113,9 +115,14 @@ export class BuildingBuilder {
   /**
    * Load a single building from its directory
    */
-  private async loadBuilding(buildingName: string, buildingPath: string): Promise<void> {
+  private async loadBuilding(
+    buildingName: string,
+    buildingPath: string,
+  ): Promise<void> {
     // Look for floor definition files (z0.ts, z1.ts, z2.ts, etc.)
-    const files = fs.readdirSync(buildingPath).filter(f => f.match(/^z-?\d+\.ts$/));
+    const files = fs
+      .readdirSync(buildingPath)
+      .filter((f) => f.match(/^z-?\d+\.ts$/));
 
     // Shared placeholder map (cross-floor), and deferred processors
     const sharedPlaceholders = new Map<string, RuntimeObject>();
@@ -129,10 +136,18 @@ export class BuildingBuilder {
 
         if (module.building) {
           const floorName = file.replace('.ts', '');
-          await this.buildFloor(buildingName, floorName, module.building, sharedPlaceholders, postProcessors);
+          await this.buildFloor(
+            buildingName,
+            floorName,
+            module.building,
+            sharedPlaceholders,
+            postProcessors,
+          );
         }
       } catch (err) {
-        console.warn(`    Warning: Could not load ${buildingName}/${file}: ${err}`);
+        console.warn(
+          `    Warning: Could not load ${buildingName}/${file}: ${err}`,
+        );
       }
     }
 
@@ -150,7 +165,7 @@ export class BuildingBuilder {
     floorName: string,
     definition: any,
     sharedPlaceholders: Map<string, RuntimeObject>,
-    postProcessors: Array<() => Promise<void>>
+    postProcessors: Array<() => Promise<void>>,
   ): Promise<void> {
     const $ = this.manager as any;
     const objectManager = await this.manager.load(0);
@@ -160,7 +175,9 @@ export class BuildingBuilder {
     const elevatorProto = $.elevator;
 
     if (!definition.rooms || typeof definition.rooms !== 'object') {
-      throw new Error(`Building ${buildingName}/${floorName}: missing rooms object`);
+      throw new Error(
+        `Building ${buildingName}/${floorName}: missing rooms object`,
+      );
     }
 
     // First pass: create all rooms and map placeholders to room objects
@@ -168,7 +185,9 @@ export class BuildingBuilder {
 
     for (const [placeholder, roomDef] of Object.entries(definition.rooms)) {
       if (!placeholder.startsWith('%')) {
-        throw new Error(`Invalid placeholder ${placeholder}: must start with %`);
+        throw new Error(
+          `Invalid placeholder ${placeholder}: must start with %`,
+        );
       }
 
       // Reuse shared placeholder if already created (cross-floor objects like elevators/doors/locks)
@@ -184,7 +203,8 @@ export class BuildingBuilder {
       let parentProto = roomProto;
       if (def.prototype) {
         const protoName = def.prototype;
-        const aliases = (objectManager?.get('aliases') as Record<string, number>) || {};
+        const aliases =
+          (objectManager?.get('aliases') as Record<string, number>) || {};
         if (protoName === 'elevator' && elevatorProto) {
           parentProto = elevatorProto;
         } else if (aliases[protoName]) {
@@ -193,10 +213,14 @@ export class BuildingBuilder {
           if (loaded) {
             parentProto = loaded;
           } else {
-            console.warn(`    Warning: could not load prototype '${protoName}' (ID ${aliases[protoName]}) for ${placeholder}, defaulting to room.`);
+            console.warn(
+              `    Warning: could not load prototype '${protoName}' (ID ${aliases[protoName]}) for ${placeholder}, defaulting to room.`,
+            );
           }
         } else {
-          console.warn(`    Warning: prototype alias '${protoName}' not found for ${placeholder}, defaulting to room.`);
+          console.warn(
+            `    Warning: prototype alias '${protoName}' not found for ${placeholder}, defaulting to room.`,
+          );
         }
       }
 
@@ -234,7 +258,9 @@ export class BuildingBuilder {
       // Register alias if specified (e.g., alias: 'immigrationServices' -> $immigrationServices)
       if (def.alias && objectManager) {
         await objectManager.call('addAlias', def.alias, room.id);
-        console.log(`    Registered $.${def.alias} = #${room.id} (${room.get('name')})`);
+        console.log(
+          `    Registered $.${def.alias} = #${room.id} (${room.get('name')})`,
+        );
       }
     }
 
@@ -255,7 +281,8 @@ export class BuildingBuilder {
 
     for (const [placeholder, roomDef] of Object.entries(definition.rooms)) {
       const def = roomDef as any;
-      const sourceRoom = placeholderToRoom.get(placeholder) || resolvePlaceholder(placeholder);
+      const sourceRoom =
+        placeholderToRoom.get(placeholder) || resolvePlaceholder(placeholder);
       if (!sourceRoom) continue;
 
       if (!def.exits) continue;
@@ -288,31 +315,48 @@ export class BuildingBuilder {
           destPlaceholder = (exitDef as any).room;
           exitProps = exitDef;
         } else {
-          console.warn(`    Invalid exit definition in ${placeholder}.${direction}`);
+          console.warn(
+            `    Invalid exit definition in ${placeholder}.${direction}`,
+          );
           continue;
         }
 
-        let destRoom = resolvePlaceholder(destPlaceholder);
+        const destRoom = resolvePlaceholder(destPlaceholder);
         if (!destRoom) {
           // Defer cross-floor exits - placeholder might exist on a later floor
           if (destPlaceholder.startsWith('%')) {
             postProcessors.push(async () => {
               const deferredDest = sharedPlaceholders.get(destPlaceholder);
               if (!deferredDest) {
-                console.warn(`    Warning: Room ${placeholder} exit ${direction} references unknown room ${destPlaceholder}`);
+                console.warn(
+                  `    Warning: Room ${placeholder} exit ${direction} references unknown room ${destPlaceholder}`,
+                );
                 return;
               }
 
               const aliases = this.getDirectionAliases(direction);
-              const distance = exitProps.distance || this.calculateDistance(
-                (sourceRoom.get('x') as number) || 0, (sourceRoom.get('y') as number) || 0, (sourceRoom.get('z') as number) || 0,
-                (deferredDest.get('x') as number) || 0, (deferredDest.get('y') as number) || 0, (deferredDest.get('z') as number) || 0
-              );
+              const distance =
+                exitProps.distance ||
+                this.calculateDistance(
+                  (sourceRoom.get('x') as number) || 0,
+                  (sourceRoom.get('y') as number) || 0,
+                  (sourceRoom.get('z') as number) || 0,
+                  (deferredDest.get('x') as number) || 0,
+                  (deferredDest.get('y') as number) || 0,
+                  (deferredDest.get('z') as number) || 0,
+                );
 
-              const doorResolved = typeof exitProps.door === 'string' && exitProps.door.startsWith('%')
-                ? sharedPlaceholders.get(exitProps.door) : exitProps.door;
+              const doorResolved =
+                typeof exitProps.door === 'string' &&
+                exitProps.door.startsWith('%')
+                  ? sharedPlaceholders.get(exitProps.door)
+                  : exitProps.door;
               const locksResolved = Array.isArray(exitProps.locks)
-                ? exitProps.locks.map((l: string) => l.startsWith('%') ? sharedPlaceholders.get(l) : l).filter(Boolean)
+                ? exitProps.locks
+                    .map((l: string) =>
+                      l.startsWith('%') ? sharedPlaceholders.get(l) : l,
+                    )
+                    .filter(Boolean)
                 : undefined;
 
               const exit = await recycler.create({
@@ -335,7 +379,9 @@ export class BuildingBuilder {
             });
             continue;
           }
-          console.warn(`    Warning: Room ${placeholder} exit ${direction} references unknown room ${destPlaceholder}`);
+          console.warn(
+            `    Warning: Room ${placeholder} exit ${direction} references unknown room ${destPlaceholder}`,
+          );
           continue;
         }
 
@@ -343,14 +389,22 @@ export class BuildingBuilder {
         const aliases = this.getDirectionAliases(direction);
 
         // Calculate distance if not specified
-        const distance = exitProps.distance || this.calculateDistance(
-          (sourceRoom.get('x') as number) || 0, (sourceRoom.get('y') as number) || 0, (sourceRoom.get('z') as number) || 0,
-          (destRoom.get('x') as number) || 0, (destRoom.get('y') as number) || 0, (destRoom.get('z') as number) || 0
-        );
+        const distance =
+          exitProps.distance ||
+          this.calculateDistance(
+            (sourceRoom.get('x') as number) || 0,
+            (sourceRoom.get('y') as number) || 0,
+            (sourceRoom.get('z') as number) || 0,
+            (destRoom.get('x') as number) || 0,
+            (destRoom.get('y') as number) || 0,
+            (destRoom.get('z') as number) || 0,
+          );
 
         const doorResolved = resolveValue(exitProps.door);
         const locksResolved = Array.isArray(exitProps.locks)
-          ? exitProps.locks.map((l: string | number) => resolveValue(l)).filter(Boolean)
+          ? exitProps.locks
+              .map((l: string | number) => resolveValue(l))
+              .filter(Boolean)
           : undefined;
 
         // Create exit
@@ -379,11 +433,15 @@ export class BuildingBuilder {
     // Third pass: attach methods, resolve placeholders for special props, and elevator configs
     for (const [placeholder, roomDef] of Object.entries(definition.rooms)) {
       const def = roomDef as any;
-      const room = placeholderToRoom.get(placeholder) || resolvePlaceholder(placeholder);
+      const room =
+        placeholderToRoom.get(placeholder) || resolvePlaceholder(placeholder);
       if (!room) continue;
 
       // Resolve elevator reference if provided as placeholder
-      if (typeof def.elevatorId === 'string' && def.elevatorId.startsWith('%')) {
+      if (
+        typeof def.elevatorId === 'string' &&
+        def.elevatorId.startsWith('%')
+      ) {
         const targetPh = def.elevatorId;
         const apply = async () => {
           const target = resolvePlaceholder(targetPh);
@@ -409,7 +467,9 @@ export class BuildingBuilder {
         if (resolvedDoor) room.set('door', resolvedDoor);
       }
       if (Array.isArray(def.locks)) {
-        const resolvedLocks = def.locks.map((l: string | number) => resolveValue(l)).filter(Boolean);
+        const resolvedLocks = def.locks
+          .map((l: string | number) => resolveValue(l))
+          .filter(Boolean);
         room.set('locks', resolvedLocks);
       }
 
@@ -418,9 +478,11 @@ export class BuildingBuilder {
         const cfg = def.elevator;
         postProcessors.push(async () => {
           if (cfg.floors) room.set('floors', cfg.floors);
-          if (cfg.currentFloor !== undefined) room.set('currentFloor', cfg.currentFloor);
+          if (cfg.currentFloor !== undefined)
+            room.set('currentFloor', cfg.currentFloor);
           if (cfg.doorsOpen !== undefined) room.set('doorsOpen', cfg.doorsOpen);
-          if (cfg.travelTimePerFloor !== undefined) room.set('travelTimePerFloor', cfg.travelTimePerFloor);
+          if (cfg.travelTimePerFloor !== undefined)
+            room.set('travelTimePerFloor', cfg.travelTimePerFloor);
           if (cfg.capacity !== undefined) room.set('capacity', cfg.capacity);
 
           if (cfg.floorRooms && typeof cfg.floorRooms === 'object') {
@@ -439,22 +501,29 @@ export class BuildingBuilder {
 
       // Spawn objects inside the room
       if (Array.isArray(def.objects)) {
-        const aliases = (objectManager?.get('aliases') as Record<string, number>) || {};
+        const aliases =
+          (objectManager?.get('aliases') as Record<string, number>) || {};
         for (const objDef of def.objects) {
           if (!objDef.prototype) {
-            console.warn(`    Warning: object in ${placeholder} missing prototype, skipping`);
+            console.warn(
+              `    Warning: object in ${placeholder} missing prototype, skipping`,
+            );
             continue;
           }
 
           const protoId = aliases[objDef.prototype];
           if (!protoId) {
-            console.warn(`    Warning: prototype '${objDef.prototype}' not found for object in ${placeholder}`);
+            console.warn(
+              `    Warning: prototype '${objDef.prototype}' not found for object in ${placeholder}`,
+            );
             continue;
           }
 
           const proto = await this.manager.load(protoId as ObjId);
           if (!proto) {
-            console.warn(`    Warning: could not load prototype '${objDef.prototype}' (#${protoId})`);
+            console.warn(
+              `    Warning: could not load prototype '${objDef.prototype}' (#${protoId})`,
+            );
             continue;
           }
 
@@ -467,7 +536,9 @@ export class BuildingBuilder {
             if (typeof value === 'string' && value.startsWith('$')) {
               const aliasName = value.slice(1); // Remove $ prefix
               if (aliases[aliasName]) {
-                const resolved = await this.manager.load(aliases[aliasName] as ObjId);
+                const resolved = await this.manager.load(
+                  aliases[aliasName] as ObjId,
+                );
                 if (resolved) {
                   objProps[key] = resolved;
                 }
@@ -491,9 +562,13 @@ export class BuildingBuilder {
     if (!this.buildings.has(buildingName)) {
       this.buildings.set(buildingName, new Map());
     }
-    this.buildings.get(buildingName)!.set(floorName, placeholderToRoom.get('%0')!);
+    this.buildings
+      .get(buildingName)
+      ?.set(floorName, placeholderToRoom.get('%0')!);
 
-    console.log(`    Built ${buildingName}/${floorName}: ${placeholderToRoom.size} rooms, ${exitCount} exits`);
+    console.log(
+      `    Built ${buildingName}/${floorName}: ${placeholderToRoom.size} rooms, ${exitCount} exits`,
+    );
   }
 
   /**
@@ -520,7 +595,14 @@ export class BuildingBuilder {
   /**
    * Calculate distance between coordinates (in meters)
    */
-  private calculateDistance(x1: number, y1: number, z1: number, x2: number, y2: number, z2: number): number {
+  private calculateDistance(
+    x1: number,
+    y1: number,
+    z1: number,
+    x2: number,
+    y2: number,
+    z2: number,
+  ): number {
     const dx = (x2 - x1) * 30; // 30m per grid unit horizontal
     const dy = (y2 - y1) * 30;
     const dz = (z2 - z1) * 3; // 3m per floor vertical
@@ -540,39 +622,53 @@ export class BuildingBuilder {
     const recycler = $.recycler;
     const exitProto = $.exit;
     const objectManager = await this.manager.load(0);
-    const aliases = (objectManager?.get('aliases') as Record<string, number>) || {};
+    const aliases =
+      (objectManager?.get('aliases') as Record<string, number>) || {};
 
-    console.log(`    Connecting ${this.deferredWorldExits.length} building-to-world exits...`);
+    console.log(
+      `    Connecting ${this.deferredWorldExits.length} building-to-world exits...`,
+    );
 
     let connectedCount = 0;
 
     for (const deferred of this.deferredWorldExits) {
-      const { sourceRoom, direction, toPath, exitProps, description } = deferred;
+      const { sourceRoom, direction, toPath, exitProps, description } =
+        deferred;
 
       // Parse the path to extract coordinates
       // Format: "yesler-way/x-12.ts" or "1st-ave-s/y10.ts"
       const targetCoords = await this.parsePathToCoordinates(toPath);
       if (!targetCoords) {
-        console.warn(`    Warning: Could not parse coordinates from path: ${toPath}`);
+        console.warn(
+          `    Warning: Could not parse coordinates from path: ${toPath}`,
+        );
         continue;
       }
 
       // Find the world room by coordinates
-      const worldRoom = await this.findRoomByCoordinates(targetCoords.x, targetCoords.y, targetCoords.z);
+      const worldRoom = await this.findRoomByCoordinates(
+        targetCoords.x,
+        targetCoords.y,
+        targetCoords.z,
+      );
       if (!worldRoom) {
-        console.warn(`    Warning: No world room found at (${targetCoords.x}, ${targetCoords.y}, ${targetCoords.z}) for path: ${toPath}`);
+        console.warn(
+          `    Warning: No world room found at (${targetCoords.x}, ${targetCoords.y}, ${targetCoords.z}) for path: ${toPath}`,
+        );
         continue;
       }
 
       // Calculate distance
-      const distance = exitProps.distance || this.calculateDistance(
-        (sourceRoom.get('x') as number) || 0,
-        (sourceRoom.get('y') as number) || 0,
-        (sourceRoom.get('z') as number) || 0,
-        targetCoords.x,
-        targetCoords.y,
-        targetCoords.z
-      );
+      const distance =
+        exitProps.distance ||
+        this.calculateDistance(
+          (sourceRoom.get('x') as number) || 0,
+          (sourceRoom.get('y') as number) || 0,
+          (sourceRoom.get('z') as number) || 0,
+          targetCoords.x,
+          targetCoords.y,
+          targetCoords.z,
+        );
 
       // Resolve locks if specified (locks are placeholders like '%LOCK_NAME')
       const resolvedLocks: RuntimeObject[] = [];
@@ -584,7 +680,9 @@ export class BuildingBuilder {
             if (lockObj) {
               resolvedLocks.push(lockObj);
             } else {
-              console.warn(`    Warning: Lock placeholder ${lockRef} not found for exit ${direction}`);
+              console.warn(
+                `    Warning: Lock placeholder ${lockRef} not found for exit ${direction}`,
+              );
             }
           } else if (typeof lockRef === 'number') {
             const lockObj = await this.manager.load(lockRef);
@@ -596,7 +694,9 @@ export class BuildingBuilder {
       // Determine exit prototype (default to $.exit, allow guardedExit etc.)
       let exitParent = exitProto;
       if (exitProps.prototype && aliases[exitProps.prototype]) {
-        exitParent = await this.manager.load(aliases[exitProps.prototype] as ObjId);
+        exitParent = await this.manager.load(
+          aliases[exitProps.prototype] as ObjId,
+        );
         if (!exitParent) exitParent = exitProto;
       }
 
@@ -634,7 +734,9 @@ export class BuildingBuilder {
           hidden: exitProps.hidden ?? false,
           locked: exitProps.locked ?? false,
           locks: resolvedLocks,
-          description: description ? description.replace(/lead[s]? (\w+) to/, `lead $1 into`) : undefined,
+          description: description
+            ? description.replace(/lead[s]? (\w+) to/, `lead $1 into`)
+            : undefined,
           // GuardedExit properties
           allowedFaction: exitProps.allowedFaction ?? null,
           denyMessage: exitProps.denyMessage ?? null,
@@ -654,11 +756,13 @@ export class BuildingBuilder {
    * Examples: "yesler-way/x-12.ts" -> x=-12, y=12, z=0
    *           "1st-ave-s/y10.ts" -> x=-14, y=10, z=0
    */
-  private async parsePathToCoordinates(toPath: string): Promise<{ x: number; y: number; z: number } | null> {
+  private async parsePathToCoordinates(
+    toPath: string,
+  ): Promise<{ x: number; y: number; z: number } | null> {
     // Try to load the file and get coordinates directly
     const worldDir = path.join(
       process.cwd(),
-      'src/database/bootstrap/world/seattle/pioneer-square'
+      'src/database/bootstrap/world/seattle/pioneer-square',
     );
 
     const filePath = path.join(worldDir, toPath);
@@ -668,7 +772,11 @@ export class BuildingBuilder {
       const module = await import(fileUrl);
       const roomDef = module.room;
 
-      if (roomDef && typeof roomDef.x === 'number' && typeof roomDef.y === 'number') {
+      if (
+        roomDef &&
+        typeof roomDef.x === 'number' &&
+        typeof roomDef.y === 'number'
+      ) {
         return {
           x: roomDef.x,
           y: roomDef.y,
@@ -685,18 +793,27 @@ export class BuildingBuilder {
   /**
    * Find a world room by its coordinates
    */
-  private async findRoomByCoordinates(x: number, y: number, z: number): Promise<RuntimeObject | null> {
+  private async findRoomByCoordinates(
+    x: number,
+    y: number,
+    z: number,
+  ): Promise<RuntimeObject | null> {
     // Find rooms with matching coordinates
     const rooms = await this.manager.findByProperty('x', x);
 
     for (const room of rooms) {
       if (room.get('y') === y && room.get('z') === z) {
         // Verify it's a world room (not a building room) by checking if it has outdoor or is named after a street
-        const name = room.get('name') as string || '';
+        const name = (room.get('name') as string) || '';
         const outdoor = room.get('outdoor') as boolean;
 
         // World rooms are typically streets/avenues and are outdoor
-        if (outdoor || name.includes('Way') || name.includes('Ave') || name.includes('St')) {
+        if (
+          outdoor ||
+          name.includes('Way') ||
+          name.includes('Ave') ||
+          name.includes('St')
+        ) {
           return room;
         }
       }
@@ -741,7 +858,9 @@ export class BuildingBuilder {
   /**
    * Find a placeholder object by name across all buildings
    */
-  private async findPlaceholderObject(placeholder: string): Promise<RuntimeObject | null> {
+  private async findPlaceholderObject(
+    placeholder: string,
+  ): Promise<RuntimeObject | null> {
     return this.allPlaceholders.get(placeholder) || null;
   }
 

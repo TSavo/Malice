@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { TelnetProtocolParser } from '../src/transport/telnet/protocol-parser.js';
 import { TELNET_COMMANDS, TELNET_OPTIONS } from '../types/telnet.js';
 
@@ -61,7 +61,9 @@ describe('TelnetProtocolParser', () => {
 
       expect(result.commands).toHaveLength(1);
       expect(result.commands[0].commandCode).toBe(TELNET_COMMANDS.WILL);
-      expect(result.commands[0].optionCode).toBe(TELNET_OPTIONS.SUPPRESS_GO_AHEAD);
+      expect(result.commands[0].optionCode).toBe(
+        TELNET_OPTIONS.SUPPRESS_GO_AHEAD,
+      );
     });
 
     it('should parse WONT command', () => {
@@ -93,7 +95,11 @@ describe('TelnetProtocolParser', () => {
     it('should separate text from commands', () => {
       const input = Buffer.concat([
         Buffer.from('Hello '),
-        Buffer.from([TELNET_COMMANDS.IAC, TELNET_COMMANDS.DO, TELNET_OPTIONS.ECHO]),
+        Buffer.from([
+          TELNET_COMMANDS.IAC,
+          TELNET_COMMANDS.DO,
+          TELNET_OPTIONS.ECHO,
+        ]),
         Buffer.from(' World'),
       ]);
       const result = parser.parse(input);
@@ -106,9 +112,21 @@ describe('TelnetProtocolParser', () => {
 
     it('should handle multiple commands', () => {
       const input = Buffer.concat([
-        Buffer.from([TELNET_COMMANDS.IAC, TELNET_COMMANDS.DO, TELNET_OPTIONS.ECHO]),
-        Buffer.from([TELNET_COMMANDS.IAC, TELNET_COMMANDS.WILL, TELNET_OPTIONS.NAWS]),
-        Buffer.from([TELNET_COMMANDS.IAC, TELNET_COMMANDS.DO, TELNET_OPTIONS.TERMINAL_TYPE]),
+        Buffer.from([
+          TELNET_COMMANDS.IAC,
+          TELNET_COMMANDS.DO,
+          TELNET_OPTIONS.ECHO,
+        ]),
+        Buffer.from([
+          TELNET_COMMANDS.IAC,
+          TELNET_COMMANDS.WILL,
+          TELNET_OPTIONS.NAWS,
+        ]),
+        Buffer.from([
+          TELNET_COMMANDS.IAC,
+          TELNET_COMMANDS.DO,
+          TELNET_OPTIONS.TERMINAL_TYPE,
+        ]),
       ]);
       const result = parser.parse(input);
 
@@ -232,7 +250,7 @@ describe('TelnetProtocolParser', () => {
         0x01,
         0x90, // width = 400
         0x00,
-        0xC8, // height = 200
+        0xc8, // height = 200
         TELNET_COMMANDS.IAC,
         TELNET_COMMANDS.SE,
       ]);
@@ -251,7 +269,7 @@ describe('TelnetProtocolParser', () => {
 
     it('should reject NAWS with wrong IAC', () => {
       const data = Buffer.from([
-        0xFE, // Wrong - should be IAC (0xFF / 255)
+        0xfe, // Wrong - should be IAC (0xFF / 255)
         TELNET_COMMANDS.SB,
         TELNET_OPTIONS.NAWS,
         0x00,
@@ -369,7 +387,7 @@ describe('TelnetProtocolParser', () => {
     it('should reject environment with wrong IAC', () => {
       const data = Buffer.concat([
         Buffer.from([
-          0xFE, // Wrong - should be IAC
+          0xfe, // Wrong - should be IAC
           TELNET_COMMANDS.SB,
           TELNET_OPTIONS.NEW_ENVIRON,
           0x02,

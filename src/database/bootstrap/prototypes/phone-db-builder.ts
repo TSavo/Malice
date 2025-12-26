@@ -1,5 +1,5 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * PhoneDb: registry mapping numbers to phone objects.
@@ -29,29 +29,38 @@ to support formats like "555-1234" or extension codes.`,
       methods: {},
     });
 
-    obj.setMethod('register', `
+    obj.setMethod(
+      'register',
+      `
       const number = args[0];
       const phone = args[1];
       if (!number || !phone) return 'number and phone required';
       const reg = self.registry || {};
       reg[number] = phone;
       self.registry = reg;
-    `);
+    `,
+    );
 
-    obj.setMethod('unregister', `
+    obj.setMethod(
+      'unregister',
+      `
       const number = args[0];
       if (!number) return;
       const reg = self.registry || {};
       delete reg[number];
       self.registry = reg;
-    `);
+    `,
+    );
 
-    obj.setMethod('findPhoneByNumber', `
+    obj.setMethod(
+      'findPhoneByNumber',
+      `
       const number = args[0];
       if (!number) return null;
       const reg = self.registry || {};
       return reg[number] || null;
-    `);
+    `,
+    );
 
     return obj;
   }

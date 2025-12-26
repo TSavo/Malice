@@ -1,9 +1,11 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { GameBootstrap } from '../../src/database/game-bootstrap.js';
 import { ObjectDatabase } from '../../src/database/object-db.js';
 import { ObjectManager } from '../../src/database/object-manager.js';
-import { GameBootstrap } from '../../src/database/game-bootstrap.js';
 
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/?replicaSet=rs0&directConnection=true';
+const MONGO_URI =
+  process.env.MONGO_URI ||
+  'mongodb://localhost:27017/?replicaSet=rs0&directConnection=true';
 
 describe('$.memento', () => {
   let db: ObjectDatabase;
@@ -15,10 +17,13 @@ describe('$.memento', () => {
     await db.connect();
 
     // Clean database
-    await db['objects'].deleteMany({});
+    await db.objects.deleteMany({});
 
     manager = new ObjectManager(db);
-    const bootstrap = new GameBootstrap(manager, { worldBuildMode: 'systems', disableDefaultJobs: true });
+    const bootstrap = new GameBootstrap(manager, {
+      worldBuildMode: 'systems',
+      disableDefaultJobs: true,
+    });
     await bootstrap.bootstrap();
 
     $ = manager as any;
@@ -32,13 +37,16 @@ describe('$.memento', () => {
   describe('capture()', () => {
     it('should capture a single object', async () => {
       // Create a test object
-      const obj = await $.recycler.create({
-        parent: $.root,
-        properties: {
-          name: 'Test Object',
-          value: 42,
+      const obj = await $.recycler.create(
+        {
+          parent: $.root,
+          properties: {
+            name: 'Test Object',
+            value: 42,
+          },
         },
-      }, null);
+        null,
+      );
 
       const mementoStr = await $.memento.capture([obj]);
 
@@ -53,16 +61,22 @@ describe('$.memento', () => {
 
     it('should capture multiple objects with inter-references', async () => {
       // Create parent object
-      const parent = await $.recycler.create({
-        parent: $.root,
-        properties: { name: 'Parent' },
-      }, null);
+      const parent = await $.recycler.create(
+        {
+          parent: $.root,
+          properties: { name: 'Parent' },
+        },
+        null,
+      );
 
       // Create child that references parent
-      const child = await $.recycler.create({
-        parent: $.root,
-        properties: { name: 'Child' },
-      }, null);
+      const child = await $.recycler.create(
+        {
+          parent: $.root,
+          properties: { name: 'Child' },
+        },
+        null,
+      );
 
       // Set up reference: parent.child = child
       parent.set('child', child);
@@ -79,13 +93,16 @@ describe('$.memento', () => {
 
     it('should preserve external references as _objref', async () => {
       // Create object that references $.root (external)
-      const obj = await $.recycler.create({
-        parent: $.root,
-        properties: {
-          name: 'Test',
-          externalRef: $.root,
+      const obj = await $.recycler.create(
+        {
+          parent: $.root,
+          properties: {
+            name: 'Test',
+            externalRef: $.root,
+          },
         },
-      }, null);
+        null,
+      );
 
       const mementoStr = await $.memento.capture([obj]);
       const memento = JSON.parse(mementoStr);
@@ -96,23 +113,32 @@ describe('$.memento', () => {
     });
 
     it('should handle arrays of object references', async () => {
-      const obj1 = await $.recycler.create({
-        parent: $.root,
-        properties: { name: 'Obj1' },
-      }, null);
-
-      const obj2 = await $.recycler.create({
-        parent: $.root,
-        properties: { name: 'Obj2' },
-      }, null);
-
-      const container = await $.recycler.create({
-        parent: $.root,
-        properties: {
-          name: 'Container',
-          items: [obj1, obj2],
+      const obj1 = await $.recycler.create(
+        {
+          parent: $.root,
+          properties: { name: 'Obj1' },
         },
-      }, null);
+        null,
+      );
+
+      const obj2 = await $.recycler.create(
+        {
+          parent: $.root,
+          properties: { name: 'Obj2' },
+        },
+        null,
+      );
+
+      const container = await $.recycler.create(
+        {
+          parent: $.root,
+          properties: {
+            name: 'Container',
+            items: [obj1, obj2],
+          },
+        },
+        null,
+      );
 
       const mementoStr = await $.memento.capture([container, obj1, obj2]);
       const memento = JSON.parse(mementoStr);
@@ -122,21 +148,27 @@ describe('$.memento', () => {
     });
 
     it('should handle nested objects with references', async () => {
-      const target = await $.recycler.create({
-        parent: $.root,
-        properties: { name: 'Target' },
-      }, null);
+      const target = await $.recycler.create(
+        {
+          parent: $.root,
+          properties: { name: 'Target' },
+        },
+        null,
+      );
 
-      const obj = await $.recycler.create({
-        parent: $.root,
-        properties: {
-          name: 'Test',
-          nested: {
-            ref: target,
-            value: 123,
+      const obj = await $.recycler.create(
+        {
+          parent: $.root,
+          properties: {
+            name: 'Test',
+            nested: {
+              ref: target,
+              value: 123,
+            },
           },
         },
-      }, null);
+        null,
+      );
 
       const mementoStr = await $.memento.capture([obj, target]);
       const memento = JSON.parse(mementoStr);
@@ -147,14 +179,17 @@ describe('$.memento', () => {
     });
 
     it('should preserve plain numbers (not treat as objrefs)', async () => {
-      const obj = await $.recycler.create({
-        parent: $.root,
-        properties: {
-          name: 'Test',
-          count: 42,
-          values: [1, 2, 3],
+      const obj = await $.recycler.create(
+        {
+          parent: $.root,
+          properties: {
+            name: 'Test',
+            count: 42,
+            values: [1, 2, 3],
+          },
         },
-      }, null);
+        null,
+      );
 
       const mementoStr = await $.memento.capture([obj]);
       const memento = JSON.parse(mementoStr);
@@ -165,13 +200,16 @@ describe('$.memento', () => {
     });
 
     it('should skip internal properties starting with _', async () => {
-      const obj = await $.recycler.create({
-        parent: $.root,
-        properties: {
-          name: 'Test',
-          _internal: 'secret',
+      const obj = await $.recycler.create(
+        {
+          parent: $.root,
+          properties: {
+            name: 'Test',
+            _internal: 'secret',
+          },
         },
-      }, null);
+        null,
+      );
 
       const mementoStr = await $.memento.capture([obj]);
       const memento = JSON.parse(mementoStr);
@@ -182,15 +220,21 @@ describe('$.memento', () => {
     });
 
     it('should handle in-graph parent references', async () => {
-      const parent = await $.recycler.create({
-        parent: $.root,
-        properties: { name: 'Parent' },
-      }, null);
+      const parent = await $.recycler.create(
+        {
+          parent: $.root,
+          properties: { name: 'Parent' },
+        },
+        null,
+      );
 
-      const child = await $.recycler.create({
-        parent: parent,
-        properties: { name: 'Child' },
-      }, null);
+      const child = await $.recycler.create(
+        {
+          parent: parent,
+          properties: { name: 'Child' },
+        },
+        null,
+      );
 
       const mementoStr = await $.memento.capture([parent, child]);
       const memento = JSON.parse(mementoStr);
@@ -201,10 +245,13 @@ describe('$.memento', () => {
     });
 
     it('should handle external parent references', async () => {
-      const obj = await $.recycler.create({
-        parent: $.root,
-        properties: { name: 'Test' },
-      }, null);
+      const obj = await $.recycler.create(
+        {
+          parent: $.root,
+          properties: { name: 'Test' },
+        },
+        null,
+      );
 
       const mementoStr = await $.memento.capture([obj]);
       const memento = JSON.parse(mementoStr);
@@ -217,13 +264,16 @@ describe('$.memento', () => {
 
   describe('rehydrate()', () => {
     it('should create new objects from memento', async () => {
-      const obj = await $.recycler.create({
-        parent: $.root,
-        properties: {
-          name: 'Original',
-          value: 42,
+      const obj = await $.recycler.create(
+        {
+          parent: $.root,
+          properties: {
+            name: 'Original',
+            value: 42,
+          },
         },
-      }, null);
+        null,
+      );
 
       const memento = await $.memento.capture([obj]);
       const newObjects = await $.memento.rehydrate(memento);
@@ -235,15 +285,21 @@ describe('$.memento', () => {
     });
 
     it('should fix up inter-object references', async () => {
-      const parent = await $.recycler.create({
-        parent: $.root,
-        properties: { name: 'Parent' },
-      }, null);
+      const parent = await $.recycler.create(
+        {
+          parent: $.root,
+          properties: { name: 'Parent' },
+        },
+        null,
+      );
 
-      const child = await $.recycler.create({
-        parent: $.root,
-        properties: { name: 'Child' },
-      }, null);
+      const child = await $.recycler.create(
+        {
+          parent: $.root,
+          properties: { name: 'Child' },
+        },
+        null,
+      );
 
       parent.set('child', child);
 
@@ -258,13 +314,16 @@ describe('$.memento', () => {
     });
 
     it('should preserve external references', async () => {
-      const obj = await $.recycler.create({
-        parent: $.root,
-        properties: {
-          name: 'Test',
-          externalRef: $.root,
+      const obj = await $.recycler.create(
+        {
+          parent: $.root,
+          properties: {
+            name: 'Test',
+            externalRef: $.root,
+          },
         },
-      }, null);
+        null,
+      );
 
       const memento = await $.memento.capture([obj]);
       const newObjects = await $.memento.rehydrate(memento);
@@ -275,23 +334,32 @@ describe('$.memento', () => {
     });
 
     it('should fix up array references', async () => {
-      const obj1 = await $.recycler.create({
-        parent: $.root,
-        properties: { name: 'Obj1' },
-      }, null);
-
-      const obj2 = await $.recycler.create({
-        parent: $.root,
-        properties: { name: 'Obj2' },
-      }, null);
-
-      const container = await $.recycler.create({
-        parent: $.root,
-        properties: {
-          name: 'Container',
-          items: [obj1, obj2],
+      const obj1 = await $.recycler.create(
+        {
+          parent: $.root,
+          properties: { name: 'Obj1' },
         },
-      }, null);
+        null,
+      );
+
+      const obj2 = await $.recycler.create(
+        {
+          parent: $.root,
+          properties: { name: 'Obj2' },
+        },
+        null,
+      );
+
+      const container = await $.recycler.create(
+        {
+          parent: $.root,
+          properties: {
+            name: 'Container',
+            items: [obj1, obj2],
+          },
+        },
+        null,
+      );
 
       const memento = await $.memento.capture([container, obj1, obj2]);
       const newObjects = await $.memento.rehydrate(memento);
@@ -306,21 +374,27 @@ describe('$.memento', () => {
     });
 
     it('should fix up nested object references', async () => {
-      const target = await $.recycler.create({
-        parent: $.root,
-        properties: { name: 'Target' },
-      }, null);
+      const target = await $.recycler.create(
+        {
+          parent: $.root,
+          properties: { name: 'Target' },
+        },
+        null,
+      );
 
-      const obj = await $.recycler.create({
-        parent: $.root,
-        properties: {
-          name: 'Test',
-          nested: {
-            ref: target,
-            value: 123,
+      const obj = await $.recycler.create(
+        {
+          parent: $.root,
+          properties: {
+            name: 'Test',
+            nested: {
+              ref: target,
+              value: 123,
+            },
           },
         },
-      }, null);
+        null,
+      );
 
       const memento = await $.memento.capture([obj, target]);
       const newObjects = await $.memento.rehydrate(memento);
@@ -333,15 +407,21 @@ describe('$.memento', () => {
     });
 
     it('should fix up in-graph parent relationships', async () => {
-      const parent = await $.recycler.create({
-        parent: $.root,
-        properties: { name: 'Parent' },
-      }, null);
+      const parent = await $.recycler.create(
+        {
+          parent: $.root,
+          properties: { name: 'Parent' },
+        },
+        null,
+      );
 
-      const child = await $.recycler.create({
-        parent: parent,
-        properties: { name: 'Child' },
-      }, null);
+      const child = await $.recycler.create(
+        {
+          parent: parent,
+          properties: { name: 'Child' },
+        },
+        null,
+      );
 
       const memento = await $.memento.capture([parent, child]);
       const newObjects = await $.memento.rehydrate(memento);
@@ -353,10 +433,13 @@ describe('$.memento', () => {
     });
 
     it('should preserve external parent relationships', async () => {
-      const obj = await $.recycler.create({
-        parent: $.root,
-        properties: { name: 'Test' },
-      }, null);
+      const obj = await $.recycler.create(
+        {
+          parent: $.root,
+          properties: { name: 'Test' },
+        },
+        null,
+      );
 
       const memento = await $.memento.capture([obj]);
       const newObjects = await $.memento.rehydrate(memento);
@@ -368,13 +451,16 @@ describe('$.memento', () => {
 
   describe('clone()', () => {
     it('should capture and rehydrate in one step', async () => {
-      const obj = await $.recycler.create({
-        parent: $.root,
-        properties: {
-          name: 'Original',
-          value: 42,
+      const obj = await $.recycler.create(
+        {
+          parent: $.root,
+          properties: {
+            name: 'Original',
+            value: 42,
+          },
         },
-      }, null);
+        null,
+      );
 
       const cloned = await $.memento.clone([obj]);
 
@@ -385,15 +471,21 @@ describe('$.memento', () => {
     });
 
     it('should clone object graph with preserved references', async () => {
-      const parent = await $.recycler.create({
-        parent: $.root,
-        properties: { name: 'Parent' },
-      }, null);
+      const parent = await $.recycler.create(
+        {
+          parent: $.root,
+          properties: { name: 'Parent' },
+        },
+        null,
+      );
 
-      const child = await $.recycler.create({
-        parent: $.root,
-        properties: { name: 'Child' },
-      }, null);
+      const child = await $.recycler.create(
+        {
+          parent: $.root,
+          properties: { name: 'Child' },
+        },
+        null,
+      );
 
       parent.set('child', child);
       child.set('parent', parent);
@@ -410,30 +502,51 @@ describe('$.memento', () => {
 
     it('should clone a dungeon with rooms, exits, and items', async () => {
       // Build a dungeon template
-      const room1 = await $.recycler.create({
-        parent: $.root,
-        properties: { name: 'Entrance Hall', description: 'A dark entrance.' },
-      }, null);
+      const room1 = await $.recycler.create(
+        {
+          parent: $.root,
+          properties: {
+            name: 'Entrance Hall',
+            description: 'A dark entrance.',
+          },
+        },
+        null,
+      );
 
-      const room2 = await $.recycler.create({
-        parent: $.root,
-        properties: { name: 'Treasury', description: 'Glittering gold everywhere.' },
-      }, null);
+      const room2 = await $.recycler.create(
+        {
+          parent: $.root,
+          properties: {
+            name: 'Treasury',
+            description: 'Glittering gold everywhere.',
+          },
+        },
+        null,
+      );
 
-      const exit1 = await $.recycler.create({
-        parent: $.root,
-        properties: { name: 'north', dest: room2 },
-      }, null);
+      const exit1 = await $.recycler.create(
+        {
+          parent: $.root,
+          properties: { name: 'north', dest: room2 },
+        },
+        null,
+      );
 
-      const exit2 = await $.recycler.create({
-        parent: $.root,
-        properties: { name: 'south', dest: room1 },
-      }, null);
+      const exit2 = await $.recycler.create(
+        {
+          parent: $.root,
+          properties: { name: 'south', dest: room1 },
+        },
+        null,
+      );
 
-      const chest = await $.recycler.create({
-        parent: $.root,
-        properties: { name: 'Treasure Chest', contents: ['gold', 'gems'] },
-      }, null);
+      const chest = await $.recycler.create(
+        {
+          parent: $.root,
+          properties: { name: 'Treasure Chest', contents: ['gold', 'gems'] },
+        },
+        null,
+      );
 
       // Wire up the rooms
       room1.set('exits', [exit1]);
@@ -441,16 +554,25 @@ describe('$.memento', () => {
       room2.set('contents', [chest]);
 
       // Capture the whole graph as a JSON string
-      const template = await $.memento.capture([room1, room2, exit1, exit2, chest]);
+      const template = await $.memento.capture([
+        room1,
+        room2,
+        exit1,
+        exit2,
+        chest,
+      ]);
 
       // Verify it's a string
       expect(typeof template).toBe('string');
 
       // Store it (simulating storage on a factory object)
-      const dungeonFactory = await $.recycler.create({
-        parent: $.root,
-        properties: { name: 'DungeonFactory' },
-      }, null);
+      const dungeonFactory = await $.recycler.create(
+        {
+          parent: $.root,
+          properties: { name: 'DungeonFactory' },
+        },
+        null,
+      );
       dungeonFactory.set('smallDungeonTemplate', template);
 
       // Retrieve and rehydrate - spawning a new instance

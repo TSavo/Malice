@@ -6,17 +6,20 @@
  * 2. Delete x2-*.ts files (they're beyond park boundary)
  */
 
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const parkDir = path.join(__dirname, '../src/database/bootstrap/world/seattle/pioneer-square/occidental-park');
+const parkDir = path.join(
+  __dirname,
+  '../src/database/bootstrap/world/seattle/pioneer-square/occidental-park',
+);
 
 // 1. Fix x1-*.ts files (change x=0 to x=-5)
-const x1Files = fs.readdirSync(parkDir).filter(f => f.startsWith('x1-'));
+const x1Files = fs.readdirSync(parkDir).filter((f) => f.startsWith('x1-'));
 console.log('Fixing x1-*.ts files (x=0 → x=-5):');
 for (const file of x1Files) {
   const filePath = path.join(parkDir, file);
@@ -27,7 +30,7 @@ for (const file of x1Files) {
 }
 
 // 2. Delete x2-*.ts files
-const x2Files = fs.readdirSync(parkDir).filter(f => f.startsWith('x2-'));
+const x2Files = fs.readdirSync(parkDir).filter((f) => f.startsWith('x2-'));
 console.log('\nDeleting x2-*.ts files (x=1, beyond park boundary):');
 for (const file of x2Files) {
   const filePath = path.join(parkDir, file);
@@ -37,7 +40,7 @@ for (const file of x2Files) {
 
 // 3. Verify final state
 console.log('\n--- Verification ---');
-const remainingFiles = fs.readdirSync(parkDir).filter(f => f.endsWith('.ts'));
+const remainingFiles = fs.readdirSync(parkDir).filter((f) => f.endsWith('.ts'));
 console.log(`Files remaining: ${remainingFiles.length}`);
 
 const xCoords = new Set();
@@ -47,8 +50,8 @@ for (const file of remainingFiles) {
   const content = fs.readFileSync(path.join(parkDir, file), 'utf8');
   const xMatch = content.match(/^\s*x:\s*(-?\d+),/m);
   const yMatch = content.match(/^\s*y:\s*(\d+),/m);
-  if (xMatch) xCoords.add(parseInt(xMatch[1]));
-  if (yMatch) yCoords.add(parseInt(yMatch[1]));
+  if (xMatch) xCoords.add(parseInt(xMatch[1], 10));
+  if (yMatch) yCoords.add(parseInt(yMatch[1], 10));
 }
 
 const sortedX = [...xCoords].sort((a, b) => a - b);

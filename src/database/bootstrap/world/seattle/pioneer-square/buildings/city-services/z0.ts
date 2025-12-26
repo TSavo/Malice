@@ -17,7 +17,8 @@ export const building = {
     '%INCINERATOR_LOCK': {
       prototype: 'biometricLock',
       name: 'Incinerator Access Scanner',
-      description: 'A palm scanner mounted beside the heavy door, its surface discolored by heat and grime.',
+      description:
+        'A palm scanner mounted beside the heavy door, its surface discolored by heat and grime.',
       scanners: [
         { type: 'palm', part: 'hand', message: 'Incinerator access denied.' },
       ],
@@ -27,7 +28,8 @@ export const building = {
     '%ALLEY_LOCK': {
       prototype: 'biometricLock',
       name: 'Rear Exit Scanner',
-      description: 'A fingerprint scanner beside a steel door, its surface grimy from years of use.',
+      description:
+        'A fingerprint scanner beside a steel door, its surface grimy from years of use.',
       scanners: [
         { type: 'fingerprint', part: 'hand', message: 'Staff access only.' },
       ],
@@ -82,7 +84,10 @@ An elevator stands in the corner, its doors industrial steel rather than the bra
       waterLevel: 0,
       outdoor: false,
       exits: {
-        east: { to: '1st-ave-s/y9.ts', description: 'Glass doors open onto 1st Ave S' },
+        east: {
+          to: '1st-ave-s/y9.ts',
+          description: 'Glass doors open onto 1st Ave S',
+        },
         west: '%LOBBY',
         south: '%STORAGE',
         in: '%E',
@@ -149,7 +154,8 @@ A door to the south leads to the processing area. A sign reads: AUTHORIZED PERSO
         {
           name: 'a plastic chair',
           capacity: 1,
-          emptyMsg: 'A row of plastic chairs sits bolted to the floor, worn smooth by decades of waiting.',
+          emptyMsg:
+            'A row of plastic chairs sits bolted to the floor, worn smooth by decades of waiting.',
           occupiedMsg: '%s sitting in one of the plastic chairs.',
         },
       ],
@@ -173,7 +179,11 @@ The room smells of industrial cleaner layered over older, more organic odors. Sa
       exits: {
         north: '%LOBBY',
         east: { room: '%INCINERATOR_BAY', locks: ['%INCINERATOR_LOCK'] },
-        west: { to: 'alley/y8.ts', locks: ['%ALLEY_LOCK'], description: 'A steel door leads to the alley' },
+        west: {
+          to: 'alley/y8.ts',
+          locks: ['%ALLEY_LOCK'],
+          description: 'A steel door leads to the alley',
+        },
       },
     },
 
@@ -199,8 +209,10 @@ The floor is concrete, stained and scored. A metal cart sits nearby for loading 
         {
           prototype: 'incinerator',
           name: 'municipal incinerator',
-          description: 'A heavy-duty municipal incinerator, its metal housing blackened by years of use. The control panel is simple—ignition, fuel gauge, temperature readout. The inspection window reveals the burn chamber within.',
-          destroyMessage: 'The item catches fire instantly, consumed by the intense heat. Nothing remains but ash.',
+          description:
+            'A heavy-duty municipal incinerator, its metal housing blackened by years of use. The control panel is simple—ignition, fuel gauge, temperature readout. The inspection window reveals the burn chamber within.',
+          destroyMessage:
+            'The item catches fire instantly, consumed by the intense heat. Nothing remains but ash.',
           temperature: 1400,
           fuelLevel: 80,
           operational: true,

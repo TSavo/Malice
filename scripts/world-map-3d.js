@@ -1,6 +1,6 @@
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -14,15 +14,16 @@ function extractCoordsFromFile(filePath) {
 
   // Find all room blocks with their names and coordinates
   // Match room definitions like '%ROOM': { name: '...', ... x: N, y: N, z: N }
-  const roomBlockRegex = /'%([^']+)':\s*\{[^}]*?name:\s*['"`]([^'"`]+)['"`][^}]*?x:\s*(-?\d+),\s*y:\s*(-?\d+),\s*z:\s*(-?\d+)/gs;
+  const roomBlockRegex =
+    /'%([^']+)':\s*\{[^}]*?name:\s*['"`]([^'"`]+)['"`][^}]*?x:\s*(-?\d+),\s*y:\s*(-?\d+),\s*z:\s*(-?\d+)/gs;
   let match;
   while ((match = roomBlockRegex.exec(content))) {
     matches.push({
       id: match[1],
       name: match[2],
-      x: parseInt(match[3]),
-      y: parseInt(match[4]),
-      z: parseInt(match[5]),
+      x: parseInt(match[3], 10),
+      y: parseInt(match[4], 10),
+      z: parseInt(match[5], 10),
       file: path.basename(filePath),
       path: relativePath,
     });
@@ -35,9 +36,9 @@ function extractCoordsFromFile(filePath) {
       matches.push({
         id: path.basename(filePath, '.ts'),
         name: path.basename(filePath, '.ts'),
-        x: parseInt(match[1]),
-        y: parseInt(match[2]),
-        z: parseInt(match[3]),
+        x: parseInt(match[1], 10),
+        y: parseInt(match[2], 10),
+        z: parseInt(match[3], 10),
         file: path.basename(filePath),
         path: relativePath,
       });
@@ -367,5 +368,5 @@ const html = `<!DOCTYPE html>
 
 const outputPath = path.join(__dirname, '../world-map-3d.html');
 fs.writeFileSync(outputPath, html);
-console.log('\nGenerated 3D visualization: ' + outputPath);
+console.log(`\nGenerated 3D visualization: ${outputPath}`);
 console.log('Open world-map-3d.html in your browser to view the 3D map!');

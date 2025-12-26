@@ -26,7 +26,7 @@ The single door to the room stands slightly ajar, its frame warped by humidity o
       outdoor: false,
       exits: {
         east: '%ROOM_2',
-        'in': '%E',
+        in: '%E',
       },
     },
 

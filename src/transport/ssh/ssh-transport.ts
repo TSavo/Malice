@@ -3,8 +3,8 @@
  */
 
 import type { ServerChannel } from 'ssh2';
-import { BaseTransport } from '../base-transport.js';
 import type { TransportType } from '../../../types/transport.js';
+import { BaseTransport } from '../base-transport.js';
 
 /**
  * SSH transport wrapping an SSH server channel (PTY session)
@@ -17,7 +17,7 @@ export class SSHTransport extends BaseTransport {
 
   constructor(
     private channel: ServerChannel,
-    remoteAddress: string
+    remoteAddress: string,
   ) {
     super();
     this.remoteAddress = remoteAddress;
@@ -94,7 +94,10 @@ export class SSHTransport extends BaseTransport {
   setTerminalType(termType: string): void {
     this.updateCapabilities({
       terminalType: termType,
-      ansi: termType.includes('xterm') || termType.includes('ansi') || termType.includes('vt'),
+      ansi:
+        termType.includes('xterm') ||
+        termType.includes('ansi') ||
+        termType.includes('vt'),
     });
   }
 

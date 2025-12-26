@@ -1,5 +1,5 @@
 #!/usr/bin/env tsx
-import { Socket } from 'net';
+import { Socket } from 'node:net';
 
 console.log('🔌 Connecting to Malice v2 server...\n');
 

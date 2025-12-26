@@ -9,30 +9,33 @@
  * Transform: x -= 1, y += 1
  */
 
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const SMITH_TOWER_DIR = path.join(__dirname, '../src/database/bootstrap/world/seattle/pioneer-square/buildings/smith-tower');
+const SMITH_TOWER_DIR = path.join(
+  __dirname,
+  '../src/database/bootstrap/world/seattle/pioneer-square/buildings/smith-tower',
+);
 
 function updateFile(filePath) {
   let content = fs.readFileSync(filePath, 'utf8');
   let changes = 0;
 
   // Match x: <number> - only positive or negative integers
-  content = content.replace(/(\bx:\s*)(-?\d+)/g, (match, prefix, num) => {
-    const oldX = parseInt(num);
+  content = content.replace(/(\bx:\s*)(-?\d+)/g, (_match, prefix, num) => {
+    const oldX = parseInt(num, 10);
     const newX = oldX - 1;
     changes++;
     return `${prefix}${newX}`;
   });
 
   // Match y: <number> - only positive or negative integers
-  content = content.replace(/(\by:\s*)(-?\d+)/g, (match, prefix, num) => {
-    const oldY = parseInt(num);
+  content = content.replace(/(\by:\s*)(-?\d+)/g, (_match, prefix, num) => {
+    const oldY = parseInt(num, 10);
     const newY = oldY + 1;
     changes++;
     return `${prefix}${newY}`;
@@ -47,9 +50,10 @@ console.log('');
 console.log('Transform: x -= 1, y += 1');
 console.log('');
 
-const files = fs.readdirSync(SMITH_TOWER_DIR)
-  .filter(f => f.endsWith('.ts'))
-  .map(f => path.join(SMITH_TOWER_DIR, f));
+const files = fs
+  .readdirSync(SMITH_TOWER_DIR)
+  .filter((f) => f.endsWith('.ts'))
+  .map((f) => path.join(SMITH_TOWER_DIR, f));
 
 let totalChanges = 0;
 for (const file of files) {
@@ -59,4 +63,6 @@ for (const file of files) {
 }
 
 console.log('');
-console.log(`✅ Updated ${files.length} files with ${totalChanges} total coordinate changes`);
+console.log(
+  `✅ Updated ${files.length} files with ${totalChanges} total coordinate changes`,
+);

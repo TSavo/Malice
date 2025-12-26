@@ -1,5 +1,5 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Builds the Door prototype
@@ -51,13 +51,34 @@ CLOSING: Setting 'open' to false closes the door. If 'autolockOnClose' is true, 
     });
 
     // Add property descriptions
-    obj.setPropertyDescription('locked', "When true, door blocks passage and won't open without key, picking, or force");
-    obj.setPropertyDescription('open', "When true, door is swung open allowing passage. When false, door is closed.");
-    obj.setPropertyDescription('locks', "Array of lock objects. All must authorize player for unlock. Each lock has its own abilities and verifiedUsers.");
-    obj.setPropertyDescription('lockDifficulty', "Resistance to picking, 1-10 scale. Higher = harder to pick.");
-    obj.setPropertyDescription('durability', "Structural integrity 0-100. Forcing reduces it. At 0, door breaks.");
-    obj.setPropertyDescription('material', "What door is made of. Wood splinters loudly, metal dents, glass shatters.");
-    obj.setPropertyDescription('autolockOnClose', "If true, door automatically locks when closed.");
+    obj.setPropertyDescription(
+      'locked',
+      "When true, door blocks passage and won't open without key, picking, or force",
+    );
+    obj.setPropertyDescription(
+      'open',
+      'When true, door is swung open allowing passage. When false, door is closed.',
+    );
+    obj.setPropertyDescription(
+      'locks',
+      'Array of lock objects. All must authorize player for unlock. Each lock has its own abilities and verifiedUsers.',
+    );
+    obj.setPropertyDescription(
+      'lockDifficulty',
+      'Resistance to picking, 1-10 scale. Higher = harder to pick.',
+    );
+    obj.setPropertyDescription(
+      'durability',
+      'Structural integrity 0-100. Forcing reduces it. At 0, door breaks.',
+    );
+    obj.setPropertyDescription(
+      'material',
+      'What door is made of. Wood splinters loudly, metal dents, glass shatters.',
+    );
+    obj.setPropertyDescription(
+      'autolockOnClose',
+      'If true, door automatically locks when closed.',
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // CODED INTERFACE - Simple property checks for infrastructure verbs
@@ -66,13 +87,18 @@ CLOSING: Setting 'open' to false closes the door. If 'autolockOnClose' is true, 
     // canPass() - Simple check for coded movement verbs
     // Returns true if passage is allowed, false if blocked
     // This is the ONLY method that coded movement needs to call
-    obj.setMethod('canPass', `
+    obj.setMethod(
+      'canPass',
+      `
       return self.open === true && self.locked !== true;
-    `);
+    `,
+    );
 
     // getBlockedReason() - Human-readable reason why passage is blocked
     // For movement verbs to show appropriate message
-    obj.setMethod('getBlockedReason', `
+    obj.setMethod(
+      'getBlockedReason',
+      `
       if (self.locked) {
         return 'The door is locked.';
       }
@@ -80,7 +106,8 @@ CLOSING: Setting 'open' to false closes the door. If 'autolockOnClose' is true, 
         return 'The door is closed.';
       }
       return null;
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // LEGACY METHODS - Kept for backwards compatibility during transition
@@ -88,7 +115,9 @@ CLOSING: Setting 'open' to false closes the door. If 'autolockOnClose' is true, 
     // ═══════════════════════════════════════════════════════════════════
 
     // canAccess - simplified, just reads properties
-    obj.setMethod('canAccess', `
+    obj.setMethod(
+      'canAccess',
+      `
       if (self.locked) {
         return 'The door is locked.';
       }
@@ -96,7 +125,8 @@ CLOSING: Setting 'open' to false closes the door. If 'autolockOnClose' is true, 
         return 'The door is closed.';
       }
       return true;
-    `);
+    `,
+    );
 
     return obj;
   }

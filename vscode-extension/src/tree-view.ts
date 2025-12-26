@@ -16,7 +16,7 @@ export class MaliceObjectTreeItem extends vscode.TreeItem {
     public readonly label: string,
     public readonly collapsibleState: vscode.TreeItemCollapsibleState,
     public readonly properties: string[],
-    public readonly methods: string[]
+    public readonly methods: string[],
   ) {
     super(label, collapsibleState);
 
@@ -45,7 +45,7 @@ export class MaliceMethodTreeItem extends vscode.TreeItem {
   constructor(
     public readonly objectId: number,
     public readonly name: string,
-    public readonly type: 'method' | 'property'
+    public readonly type: 'method' | 'property',
   ) {
     super(name, vscode.TreeItemCollapsibleState.None);
 
@@ -54,7 +54,7 @@ export class MaliceMethodTreeItem extends vscode.TreeItem {
 
     // Icon
     this.iconPath = new vscode.ThemeIcon(
-      type === 'method' ? 'symbol-method' : 'symbol-property'
+      type === 'method' ? 'symbol-method' : 'symbol-property',
     );
 
     // Command to open method/property
@@ -69,8 +69,12 @@ export class MaliceMethodTreeItem extends vscode.TreeItem {
 /**
  * Tree data provider for Malice objects
  */
-export class MaliceTreeProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
-  private _onDidChangeTreeData = new vscode.EventEmitter<vscode.TreeItem | undefined | null>();
+export class MaliceTreeProvider
+  implements vscode.TreeDataProvider<vscode.TreeItem>
+{
+  private _onDidChangeTreeData = new vscode.EventEmitter<
+    vscode.TreeItem | undefined | null
+  >();
   readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
 
   private objects: Map<number, any> = new Map();
@@ -78,8 +82,12 @@ export class MaliceTreeProvider implements vscode.TreeDataProvider<vscode.TreeIt
 
   constructor(private client: DevToolsClient) {
     // Listen for change notifications from server
-    client.onNotification((method, params) => {
-      if (method.startsWith('object.') || method.startsWith('method.') || method.startsWith('property.')) {
+    client.onNotification((method, _params) => {
+      if (
+        method.startsWith('object.') ||
+        method.startsWith('method.') ||
+        method.startsWith('property.')
+      ) {
         // Refresh tree when objects change
         this.refresh();
       }
@@ -116,12 +124,16 @@ export class MaliceTreeProvider implements vscode.TreeDataProvider<vscode.TreeIt
 
       // Add methods
       for (const methodName of element.methods) {
-        children.push(new MaliceMethodTreeItem(element.objectId, methodName, 'method'));
+        children.push(
+          new MaliceMethodTreeItem(element.objectId, methodName, 'method'),
+        );
       }
 
       // Add properties
       for (const propName of element.properties) {
-        children.push(new MaliceMethodTreeItem(element.objectId, propName, 'property'));
+        children.push(
+          new MaliceMethodTreeItem(element.objectId, propName, 'property'),
+        );
       }
 
       return children;
@@ -155,7 +167,7 @@ export class MaliceTreeProvider implements vscode.TreeDataProvider<vscode.TreeIt
           `Object #${obj.id}`,
           collapsible,
           obj.properties || [],
-          obj.methods || []
+          obj.methods || [],
         );
       });
 

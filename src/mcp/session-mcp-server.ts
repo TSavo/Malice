@@ -11,12 +11,16 @@
  * - No JavaScript execution - just simple action dispatch
  */
 
+import {
+  createServer,
+  type IncomingMessage,
+  type ServerResponse,
+} from 'node:http';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
-import { createServer, IncomingMessage, ServerResponse } from 'http';
 import { z } from 'zod';
-import type { ObjectManager } from '../database/object-manager.js';
 import type { RuntimeObject } from '../../types/object.js';
+import type { ObjectManager } from '../database/object-manager.js';
 
 interface SessionMCPServerConfig {
   port?: number;
@@ -37,7 +41,7 @@ export class SessionMCPServer {
 
   constructor(
     private manager: ObjectManager,
-    config: SessionMCPServerConfig = {}
+    config: SessionMCPServerConfig = {},
   ) {
     this.port = config.port ?? 3012;
     this.host = config.host ?? '127.0.0.1';
@@ -51,51 +55,61 @@ export class SessionMCPServer {
   }
 
   async start(): Promise<void> {
-    this.httpServer = createServer(async (req: IncomingMessage, res: ServerResponse) => {
-      // CORS headers
-      res.setHeader('Access-Control-Allow-Origin', '*');
-      res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
-      res.setHeader('Access-Control-Allow-Headers', 'Content-Type, mcp-session-id');
-      res.setHeader('Access-Control-Expose-Headers', 'mcp-session-id');
+    this.httpServer = createServer(
+      async (req: IncomingMessage, res: ServerResponse) => {
+        // CORS headers
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader(
+          'Access-Control-Allow-Methods',
+          'GET, POST, DELETE, OPTIONS',
+        );
+        res.setHeader(
+          'Access-Control-Allow-Headers',
+          'Content-Type, mcp-session-id',
+        );
+        res.setHeader('Access-Control-Expose-Headers', 'mcp-session-id');
 
-      if (req.method === 'OPTIONS') {
-        res.writeHead(204);
-        res.end();
-        return;
-      }
-
-      const sessionId = req.headers['mcp-session-id'] as string | undefined;
-
-      // DELETE = close session
-      if (req.method === 'DELETE' && sessionId) {
-        const session = this.sessions.get(sessionId);
-        if (session) {
-          await session.transport.close();
-          this.sessions.delete(sessionId);
+        if (req.method === 'OPTIONS') {
+          res.writeHead(204);
+          res.end();
+          return;
         }
-        res.writeHead(200);
-        res.end();
-        return;
-      }
 
-      // GET or POST without session = new session
-      if (!sessionId || !this.sessions.has(sessionId)) {
-        const newSession = await this.createSession();
-        const newSessionId = `session-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-        this.sessions.set(newSessionId, newSession);
-        res.setHeader('mcp-session-id', newSessionId);
-        await newSession.transport.handleRequest(req, res);
-        return;
-      }
+        const sessionId = req.headers['mcp-session-id'] as string | undefined;
 
-      // Existing session
-      const session = this.sessions.get(sessionId)!;
-      await session.transport.handleRequest(req, res);
-    });
+        // DELETE = close session
+        if (req.method === 'DELETE' && sessionId) {
+          const session = this.sessions.get(sessionId);
+          if (session) {
+            await session.transport.close();
+            this.sessions.delete(sessionId);
+          }
+          res.writeHead(200);
+          res.end();
+          return;
+        }
+
+        // GET or POST without session = new session
+        if (!sessionId || !this.sessions.has(sessionId)) {
+          const newSession = await this.createSession();
+          const newSessionId = `session-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+          this.sessions.set(newSessionId, newSession);
+          res.setHeader('mcp-session-id', newSessionId);
+          await newSession.transport.handleRequest(req, res);
+          return;
+        }
+
+        // Existing session
+        const session = this.sessions.get(sessionId)!;
+        await session.transport.handleRequest(req, res);
+      },
+    );
 
     return new Promise((resolve) => {
-      this.httpServer!.listen(this.port, this.host, () => {
-        console.log(`[SessionMCP] Server listening on http://${this.host}:${this.port}`);
+      this.httpServer?.listen(this.port, this.host, () => {
+        console.log(
+          `[SessionMCP] Server listening on http://${this.host}:${this.port}`,
+        );
         resolve();
       });
     });
@@ -119,7 +133,7 @@ export class SessionMCPServer {
 
     if (this.httpServer) {
       return new Promise((resolve) => {
-        this.httpServer!.close(() => {
+        this.httpServer?.close(() => {
           this.httpServer = null;
           console.log('[SessionMCP] Server stopped');
           resolve();
@@ -135,7 +149,11 @@ export class SessionMCPServer {
       throw new Error('$.session not bootstrapped');
     }
 
-    const telnetResult = await $session.call('connect') as { sessionId: string; output: string; message: string };
+    const telnetResult = (await $session.call('connect')) as {
+      sessionId: string;
+      output: string;
+      message: string;
+    };
     const telnetSessionId = telnetResult.sessionId;
 
     const server = new McpServer({
@@ -182,31 +200,62 @@ EXAMPLES:
   session(action="listKeys")
   session(action="removeKey", keyId="1")`,
       {
-        action: z.enum(['send', 'getLog', 'getStatus', 'addKey', 'listKeys', 'removeKey'])
+        action: z
+          .enum([
+            'send',
+            'getLog',
+            'getStatus',
+            'addKey',
+            'listKeys',
+            'removeKey',
+          ])
           .describe('Action to perform'),
-        command: z.string().optional()
+        command: z
+          .string()
+          .optional()
           .describe('Command to send (required for send action)'),
-        lines: z.number().optional()
+        lines: z
+          .number()
+          .optional()
           .describe('Number of log lines to return (default: all, max 1000)'),
-        key: z.string().optional()
+        key: z
+          .string()
+          .optional()
           .describe('SSH public key (required for addKey action)'),
-        keyId: z.string().optional()
-          .describe('Key number or fingerprint (required for removeKey action)'),
+        keyId: z
+          .string()
+          .optional()
+          .describe(
+            'Key number or fingerprint (required for removeKey action)',
+          ),
       },
       async ({ action, command, lines, key, keyId }) => {
         const $session = this.getSession();
         if (!$session) {
           return {
-            content: [{ type: 'text', text: JSON.stringify({ error: '$.session not bootstrapped' }) }],
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify({ error: '$.session not bootstrapped' }),
+              },
+            ],
             isError: true,
           };
         }
 
         const ok = (data: unknown) => ({
-          content: [{ type: 'text' as const, text: typeof data === 'string' ? data : JSON.stringify(data, null, 2) }],
+          content: [
+            {
+              type: 'text' as const,
+              text:
+                typeof data === 'string' ? data : JSON.stringify(data, null, 2),
+            },
+          ],
         });
         const err = (msg: string) => ({
-          content: [{ type: 'text' as const, text: JSON.stringify({ error: msg }) }],
+          content: [
+            { type: 'text' as const, text: JSON.stringify({ error: msg }) },
+          ],
           isError: true,
         });
 
@@ -214,12 +263,20 @@ EXAMPLES:
           switch (action) {
             case 'send': {
               if (!command) return err('command required for send action');
-              const result = await $session.call('send', telnetSessionId, command);
+              const result = await $session.call(
+                'send',
+                telnetSessionId,
+                command,
+              );
               return ok(result);
             }
 
             case 'getLog': {
-              const result = await $session.call('getLog', telnetSessionId, lines);
+              const result = await $session.call(
+                'getLog',
+                telnetSessionId,
+                lines,
+              );
               return ok(result);
             }
 
@@ -230,7 +287,11 @@ EXAMPLES:
 
             case 'addKey': {
               if (!key) return err('key required for addKey action');
-              const result = await $session.call('addKey', telnetSessionId, key);
+              const result = await $session.call(
+                'addKey',
+                telnetSessionId,
+                key,
+              );
               return ok(result);
             }
 
@@ -241,7 +302,11 @@ EXAMPLES:
 
             case 'removeKey': {
               if (!keyId) return err('keyId required for removeKey action');
-              const result = await $session.call('removeKey', telnetSessionId, keyId);
+              const result = await $session.call(
+                'removeKey',
+                telnetSessionId,
+                keyId,
+              );
               return ok(result);
             }
 
@@ -249,9 +314,11 @@ EXAMPLES:
               return err(`Unknown action: ${action}`);
           }
         } catch (error) {
-          return err(`Error: ${error instanceof Error ? error.message : String(error)}`);
+          return err(
+            `Error: ${error instanceof Error ? error.message : String(error)}`,
+          );
         }
-      }
+      },
     );
   }
 }
@@ -261,7 +328,7 @@ EXAMPLES:
  */
 export async function createSessionMCPServer(
   manager: ObjectManager,
-  config: SessionMCPServerConfig = {}
+  config: SessionMCPServerConfig = {},
 ): Promise<SessionMCPServer> {
   const server = new SessionMCPServer(manager, config);
   await server.start();

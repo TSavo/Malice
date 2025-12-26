@@ -1,6 +1,6 @@
-import type { WebSocket } from 'ws';
 import { fromEvent } from 'rxjs';
-import { takeUntil, filter, map } from 'rxjs/operators';
+import { filter, map, takeUntil } from 'rxjs/operators';
+import type { WebSocket } from 'ws';
 import { BaseTransport } from '../base-transport.js';
 
 /**
@@ -11,7 +11,10 @@ export class WebSocketTransport extends BaseTransport {
   public readonly type = 'websocket' as const;
   public readonly remoteAddress: string;
 
-  constructor(private ws: WebSocket, remoteAddr?: string) {
+  constructor(
+    private ws: WebSocket,
+    remoteAddr?: string,
+  ) {
     super();
 
     // Extract remote address (WebSocket doesn't always expose this cleanly)
@@ -34,7 +37,7 @@ export class WebSocketTransport extends BaseTransport {
       .pipe(
         takeUntil(this.closed$),
         map((event) => this.parseMessage(event)),
-        filter((msg): msg is string => msg !== null)
+        filter((msg): msg is string => msg !== null),
       )
       .subscribe({
         next: (data) => this.emitInput(data),

@@ -1,6 +1,6 @@
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -15,9 +15,9 @@ function extractCoordsFromFile(filePath) {
   while ((match = regex.exec(content))) {
     const relativePath = path.relative(WORLD_ROOT, filePath);
     matches.push({
-      x: parseInt(match[1]),
-      y: parseInt(match[2]),
-      z: parseInt(match[3]),
+      x: parseInt(match[1], 10),
+      y: parseInt(match[2], 10),
+      z: parseInt(match[3], 10),
       file: path.basename(filePath),
       path: relativePath,
     });
@@ -60,7 +60,9 @@ function printMap(map, zLevel) {
     return;
   }
   const xs = Array.from(
-    new Set(Object.values(level).flatMap(row => Object.keys(row).map(Number)))
+    new Set(
+      Object.values(level).flatMap((row) => Object.keys(row).map(Number)),
+    ),
   ).sort((a, b) => a - b);
   const ys = Object.keys(level)
     .map(Number)
@@ -71,7 +73,7 @@ function printMap(map, zLevel) {
     for (const x of xs) {
       row += level[y][x] ? '■ ' : '. ';
     }
-    console.log(row + ` y=${y}`);
+    console.log(`${row} y=${y}`);
   }
   console.log('x:', xs.join(' '));
 }
@@ -82,23 +84,30 @@ console.log(`Found ${allCoords.length} coordinate entries\n`);
 const map = buildMap(allCoords);
 
 // Show available z-levels
-const zLevels = Object.keys(map).map(Number).sort((a, b) => b - a);
+const zLevels = Object.keys(map)
+  .map(Number)
+  .sort((a, b) => b - a);
 console.log(`Available z-levels: ${zLevels.join(', ')}`);
 console.log(`Range: ${Math.min(...zLevels)} to ${Math.max(...zLevels)}\n`);
 
 // Print statistics for each level
 console.log('=== Level Statistics ===');
 for (const z of zLevels) {
-  const roomCount = Object.values(map[z]).reduce((sum, row) => sum + Object.keys(row).length, 0);
-  console.log(`z=${z.toString().padStart(3)}: ${roomCount.toString().padStart(4)} rooms`);
+  const roomCount = Object.values(map[z]).reduce(
+    (sum, row) => sum + Object.keys(row).length,
+    0,
+  );
+  console.log(
+    `z=${z.toString().padStart(3)}: ${roomCount.toString().padStart(4)} rooms`,
+  );
 }
 console.log();
 
 // Print maps for key levels
-printMap(map, 0);   // Surface
-printMap(map, -1);  // Underground level 1
-printMap(map, -4);  // Underground level 4
-printMap(map, 1);   // Smith Tower floor 1
-printMap(map, 10);  // Smith Tower floor 10
+printMap(map, 0); // Surface
+printMap(map, -1); // Underground level 1
+printMap(map, -4); // Underground level 4
+printMap(map, 1); // Smith Tower floor 1
+printMap(map, 10); // Smith Tower floor 10
 
 // To print other levels, call printMap(map, zLevel);

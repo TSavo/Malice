@@ -26,7 +26,7 @@ The air is stale, recycled through vents that wheeze but function. Someone has s
       outdoor: false,
       exits: {
         east: '%ROOM_1',
-        'in': '%E',
+        in: '%E',
       },
     },
 

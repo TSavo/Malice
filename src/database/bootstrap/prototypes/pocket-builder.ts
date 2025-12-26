@@ -1,5 +1,5 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Builds the Pocket prototype
@@ -64,7 +64,9 @@ TYPES: Side pockets, breast pocket, back pocket, cargo pocket. Different sizes a
     // CONTAINMENT
     // ═══════════════════════════════════════════════════════════════════
 
-    obj.setMethod('canContain', `
+    obj.setMethod(
+      'canContain',
+      `
       /** Check if this pocket can hold an object.
        *  @param obj - The object to check
        *  @returns true if allowed, or error string
@@ -112,13 +114,16 @@ TYPES: Side pockets, breast pocket, back pocket, cargo pocket. Different sizes a
       }
 
       return true;
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // DISPLAY
     // ═══════════════════════════════════════════════════════════════════
 
-    obj.setMethod('describe', `
+    obj.setMethod(
+      'describe',
+      `
       /** Describe the pocket and its contents. */
       const contents = self.contents || [];
       
@@ -142,9 +147,12 @@ TYPES: Side pockets, breast pocket, back pocket, cargo pocket. Different sizes a
       }
 
       return self.name + ' containing ' + itemNames.join(', ');
-    `);
+    `,
+    );
 
-    obj.setMethod('shortDesc', `
+    obj.setMethod(
+      'shortDesc',
+      `
       /** Short description for lists. */
       const contents = self.contents || [];
       const count = contents.filter(c => c).length;
@@ -156,13 +164,16 @@ TYPES: Side pockets, breast pocket, back pocket, cargo pocket. Different sizes a
       } else {
         return self.name + ' (' + count + ' items)';
       }
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // UTILITY
     // ═══════════════════════════════════════════════════════════════════
 
-    obj.setMethod('getRemainingCapacity', `
+    obj.setMethod(
+      'getRemainingCapacity',
+      `
       /** Get remaining weight and volume capacity.
        *  @returns { weight: number, volume: number }
        */
@@ -188,11 +199,21 @@ TYPES: Side pockets, breast pocket, back pocket, cargo pocket. Different sizes a
         weight: maxWeight - usedWeight,
         volume: maxVolume - usedVolume,
       };
-    `);
+    `,
+    );
 
-    obj.setPropertyDescription('maxWeight', 'Maximum weight capacity in grams. Items exceeding this cannot be placed in pocket.');
-    obj.setPropertyDescription('maxVolume', 'Maximum volume capacity in cubic centimeters. Prevents oversized items from fitting.');
-    obj.setPropertyDescription('attachedTo', 'The clothing item this pocket is sewn into. Pocket moves with the garment.');
+    obj.setPropertyDescription(
+      'maxWeight',
+      'Maximum weight capacity in grams. Items exceeding this cannot be placed in pocket.',
+    );
+    obj.setPropertyDescription(
+      'maxVolume',
+      'Maximum volume capacity in cubic centimeters. Prevents oversized items from fitting.',
+    );
+    obj.setPropertyDescription(
+      'attachedTo',
+      'The clothing item this pocket is sewn into. Pocket moves with the garment.',
+    );
 
     return obj;
   }

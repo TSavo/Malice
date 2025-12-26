@@ -1,5 +1,5 @@
-import { ObjectManager } from '../object-manager.js';
 import type { RuntimeObject } from '../../../types/object.js';
+import type { ObjectManager } from '../object-manager.js';
 
 /**
  * Builds Emote object (dynamic ID)
@@ -59,7 +59,8 @@ export class EmoteBuilder {
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
 
-    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
+    const aliases =
+      (objectManager.get('aliases') as Record<string, number>) || {};
 
     if (aliases.emote) {
       this.emote = await this.manager.load(aliases.emote);
@@ -73,7 +74,8 @@ export class EmoteBuilder {
         parent: root!,
         properties: {
           name: 'Emote',
-          description: 'Freeform emote parsing and formatting with sensory awareness',
+          description:
+            'Freeform emote parsing and formatting with sensory awareness',
           abilities: `Sensory-aware emote system for broadcasting actions to rooms.
 
 SYNTAX PREFIXES:
@@ -107,14 +109,25 @@ METHODS:
           // Possessive pronouns
           possessivePronouns: ['his', 'her', 'their', 'its'],
           // Reflexive pronouns
-          reflexivePronouns: ['himself', 'herself', 'themselves', 'itself', 'myself', 'yourself', 'yourselves', 'ourselves'],
+          reflexivePronouns: [
+            'himself',
+            'herself',
+            'themselves',
+            'itself',
+            'myself',
+            'yourself',
+            'yourselves',
+            'ourselves',
+          ],
         },
         methods: {},
       });
     }
 
     // Main parse method - parses emote string and returns structured sensory data
-    this.emote.setMethod('parse', `
+    this.emote.setMethod(
+      'parse',
+      `
       /** Parse an emote string and generate structured sensory data per viewer.
        *  Usage: $.emote.parse(emoteStr, actor, room)
        *  @param emoteStr - The emote string (with or without leading .)
@@ -164,10 +177,13 @@ METHODS:
       }
 
       return results;
-    `);
+    `,
+    );
 
     // Extract targets mentioned in an emote (for auto-watch)
-    this.emote.setMethod('extractTargets', `
+    this.emote.setMethod(
+      'extractTargets',
+      `
       /** Extract people/objects mentioned by name in an emote.
        *  Usage: $.emote.extractTargets(emoteStr, room)
        *  @param emoteStr - The emote string
@@ -203,10 +219,13 @@ METHODS:
       }
 
       return targets;
-    `);
+    `,
+    );
 
     // Format emote for a specific viewer
-    this.emote.setMethod('format', `
+    this.emote.setMethod(
+      'format',
+      `
       /** Format an emote string for a specific viewer.
        *  Usage: $.emote.format(emoteStr, actor, viewer, room?)
        *  @param emoteStr - The emote string
@@ -256,10 +275,13 @@ METHODS:
       }
 
       return result;
-    `);
+    `,
+    );
 
     // Format emote with sensory separation
-    this.emote.setMethod('formatSensory', `
+    this.emote.setMethod(
+      'formatSensory',
+      `
       /** Format an emote into separate visual, audible, olfactory, and gustatory components.
        *  Usage: $.emote.formatSensory(emoteStr, actor, viewer, knownNames)
        *  @param emoteStr - The emote string
@@ -341,10 +363,13 @@ METHODS:
         visualDeaf: finalize(visualDeaf),
         combined: finalize(combined),
       };
-    `);
+    `,
+    );
 
     // Parse emote into typed segments
-    this.emote.setMethod('parseSegments', `
+    this.emote.setMethod(
+      'parseSegments',
+      `
       /** Parse emote text into visual, audible, olfactory, and gustatory segments.
        *  @param text - The emote text
        *  @param actor - The emote actor
@@ -826,10 +851,13 @@ METHODS:
       }
 
       return segments;
-    `);
+    `,
+    );
 
     // Process emote text - handles verbs, names, pronouns
-    this.emote.setMethod('processEmote', `
+    this.emote.setMethod(
+      'processEmote',
+      `
       /** Internal: Process emote text with verb conjugation and pronoun substitution.
        *  @param text - The text to process
        *  @param actor - The emote actor
@@ -968,10 +996,13 @@ METHODS:
       }
 
       return result;
-    `);
+    `,
+    );
 
     // Get object pronoun for a character
-    this.emote.setMethod('getObjectPronoun', `
+    this.emote.setMethod(
+      'getObjectPronoun',
+      `
       /** Get object pronoun (him/her/them) for a character.
        *  @param char - The character
        *  @returns The appropriate object pronoun
@@ -983,10 +1014,13 @@ METHODS:
       if (gender === 'male' || gender === 'm') return 'him';
       if (gender === 'female' || gender === 'f') return 'her';
       return 'them';
-    `);
+    `,
+    );
 
     // Get possessive pronoun for a character
-    this.emote.setMethod('getPossessive', `
+    this.emote.setMethod(
+      'getPossessive',
+      `
       /** Get possessive pronoun (his/her/their) for a character.
        *  @param char - The character
        *  @returns The appropriate possessive pronoun
@@ -998,10 +1032,13 @@ METHODS:
       if (gender === 'male' || gender === 'm') return 'his';
       if (gender === 'female' || gender === 'f') return 'her';
       return 'their';
-    `);
+    `,
+    );
 
     // Get reflexive pronoun for a character
-    this.emote.setMethod('getReflexive', `
+    this.emote.setMethod(
+      'getReflexive',
+      `
       /** Get reflexive pronoun (himself/herself/themselves) for a character.
        *  @param char - The character
        *  @returns The appropriate reflexive pronoun
@@ -1013,10 +1050,13 @@ METHODS:
       if (gender === 'male' || gender === 'm') return 'himself';
       if (gender === 'female' || gender === 'f') return 'herself';
       return 'themselves';
-    `);
+    `,
+    );
 
     // Get subject pronoun for a character
-    this.emote.setMethod('getSubjectPronoun', `
+    this.emote.setMethod(
+      'getSubjectPronoun',
+      `
       /** Get subject pronoun (he/she/they) for a character.
        *  @param char - The character
        *  @returns The appropriate subject pronoun
@@ -1028,10 +1068,13 @@ METHODS:
       if (gender === 'male' || gender === 'm') return 'he';
       if (gender === 'female' || gender === 'f') return 'she';
       return 'they';
-    `);
+    `,
+    );
 
     // Broadcast emote to room with sensory awareness and crowd perception
-    this.emote.setMethod('broadcast', `
+    this.emote.setMethod(
+      'broadcast',
+      `
       /** Parse emote and send to all viewers via appropriate senses.
        *  Usage: $.emote.broadcast(emoteStr, actor, room, targets?)
        *  Routes visual through viewer.see(), speech through viewer.hear().
@@ -1192,12 +1235,22 @@ METHODS:
           }
         }
       }
-    `);
+    `,
+    );
 
     // Property descriptions
-    this.emote.setPropertyDescription('objectPronouns', 'Object pronouns (him/her/them/it) that reference the current target in emotes.');
-    this.emote.setPropertyDescription('possessivePronouns', 'Possessive pronouns (his/her/their/its) that reference the current target.');
-    this.emote.setPropertyDescription('reflexivePronouns', 'Reflexive pronouns (himself/herself/myself) that refer back to actor or target.');
+    this.emote.setPropertyDescription(
+      'objectPronouns',
+      'Object pronouns (him/her/them/it) that reference the current target in emotes.',
+    );
+    this.emote.setPropertyDescription(
+      'possessivePronouns',
+      'Possessive pronouns (his/her/their/its) that reference the current target.',
+    );
+    this.emote.setPropertyDescription(
+      'reflexivePronouns',
+      'Reflexive pronouns (himself/herself/myself) that refer back to actor or target.',
+    );
   }
 
   async registerAlias(): Promise<void> {

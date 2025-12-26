@@ -3,19 +3,22 @@ import {
   TELNET_OPTIONS,
   TELNET_SUB,
   type TelnetCommandData,
-  type TelnetWindowSize,
   type TelnetEnvironment,
+  type TelnetWindowSize,
 } from '../../../types/telnet.js';
 
 /**
  * Create reverse lookup maps for debugging
  */
 const COMMAND_NAMES = Object.fromEntries(
-  Object.entries(TELNET_COMMANDS).map(([k, v]) => [v, k.toLowerCase()])
+  Object.entries(TELNET_COMMANDS).map(([k, v]) => [v, k.toLowerCase()]),
 );
 
 const OPTION_NAMES = Object.fromEntries(
-  Object.entries(TELNET_OPTIONS).map(([k, v]) => [v, k.toLowerCase().replace(/_/g, ' ')])
+  Object.entries(TELNET_OPTIONS).map(([k, v]) => [
+    v,
+    k.toLowerCase().replace(/_/g, ' '),
+  ]),
 );
 
 /**
@@ -125,7 +128,10 @@ export class TelnetProtocolParser {
   private isCommand(data: Buffer, i: number): boolean {
     if (data.length - 1 - i < 2) return false;
     if (data[i] !== TELNET_COMMANDS.IAC) return false;
-    return COMMAND_NAMES[data[i + 1]] !== undefined && OPTION_NAMES[data[i + 2]] !== undefined;
+    return (
+      COMMAND_NAMES[data[i + 1]] !== undefined &&
+      OPTION_NAMES[data[i + 2]] !== undefined
+    );
   }
 
   /**
@@ -133,7 +139,7 @@ export class TelnetProtocolParser {
    */
   private parseCommand(
     data: Buffer,
-    i: number
+    i: number,
   ): { command: TelnetCommandData | null; length: number } {
     const cdata = data.slice(i);
 
@@ -171,7 +177,10 @@ export class TelnetProtocolParser {
   /**
    * Parse subnegotiation data
    */
-  private parseSubnegotiation(cmd: TelnetCommandData): { command: TelnetCommandData; length: number } {
+  private parseSubnegotiation(cmd: TelnetCommandData): {
+    command: TelnetCommandData;
+    length: number;
+  } {
     // Find SE (end of subnegotiation)
     let len = 0;
     while (cmd.data[len] && cmd.data[len] !== TELNET_COMMANDS.SE) {

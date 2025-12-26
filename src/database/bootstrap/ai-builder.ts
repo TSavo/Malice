@@ -1,5 +1,5 @@
-import { ObjectManager } from '../object-manager.js';
 import type { RuntimeObject } from '../../../types/object.js';
+import type { ObjectManager } from '../object-manager.js';
 
 /**
  * Builds AI object (dynamic ID)
@@ -14,18 +14,19 @@ export class AiBuilder {
   constructor(private manager: ObjectManager) {}
 
   async build(force = false): Promise<void> {
-    console.log('[AiBuilder] build() called, force=' + force);
+    console.log(`[AiBuilder] build() called, force=${force}`);
     // Check if already exists via alias
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
 
-    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
+    const aliases =
+      (objectManager.get('aliases') as Record<string, number>) || {};
     console.log('[AiBuilder] Checking for existing alias, found:', aliases.ai);
 
     if (aliases.ai) {
       this.ai = await this.manager.load(aliases.ai);
       if (this.ai) {
-        console.log('[AiBuilder] Already exists at #' + aliases.ai);
+        console.log(`[AiBuilder] Already exists at #${aliases.ai}`);
         if (!force) return;
         // Force rebuild - continue to rebuild methods
         console.log('[AiBuilder] Force rebuilding methods...');
@@ -445,19 +446,42 @@ CORE PRINCIPLES
     });
 
     // Add property descriptions
-    this.ai.setPropertyDescription('roles', "Map of role name → array of human objects. E.g., { 'guard': [#123, #456] }");
-    this.ai.setPropertyDescription('registry', "Map of humanId → metadata. Tracks spawnedAt, spawnedBy, role, human objref.");
-    this.ai.setPropertyDescription('memories', "Map of humanId → array of { text, importance, timestamp, tags }. Persistent across sessions.");
-    this.ai.setPropertyDescription('sessionLogs', "Map of npcId → { npcName, role, wakeSession?, interactionSession? }. Tracks Claude sessions.");
-    this.ai.setPropertyDescription('expectations', "Map of jobName → { targetId, humanId, prompt, recurring, timeout }. Response timeout tracking.");
-    this.ai.setPropertyDescription('worldLog', "Array of { timestamp, author, message }. OOC deity chat between Pluribus and Sister Gray.");
-    this.ai.setPropertyDescription('defaultAgentPrompt', "Template string for NPC system prompts. Uses {{variable}} syntax.");
+    this.ai.setPropertyDescription(
+      'roles',
+      "Map of role name → array of human objects. E.g., { 'guard': [#123, #456] }",
+    );
+    this.ai.setPropertyDescription(
+      'registry',
+      'Map of humanId → metadata. Tracks spawnedAt, spawnedBy, role, human objref.',
+    );
+    this.ai.setPropertyDescription(
+      'memories',
+      'Map of humanId → array of { text, importance, timestamp, tags }. Persistent across sessions.',
+    );
+    this.ai.setPropertyDescription(
+      'sessionLogs',
+      'Map of npcId → { npcName, role, wakeSession?, interactionSession? }. Tracks Claude sessions.',
+    );
+    this.ai.setPropertyDescription(
+      'expectations',
+      'Map of jobName → { targetId, humanId, prompt, recurring, timeout }. Response timeout tracking.',
+    );
+    this.ai.setPropertyDescription(
+      'worldLog',
+      'Array of { timestamp, author, message }. OOC deity chat between Pluribus and Sister Gray.',
+    );
+    this.ai.setPropertyDescription(
+      'defaultAgentPrompt',
+      'Template string for NPC system prompts. Uses {{variable}} syntax.',
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // SPAWN - Create a new AI-controlled human
     // ═══════════════════════════════════════════════════════════════════
 
-    this.ai.setMethod('spawn', `
+    this.ai.setMethod(
+      'spawn',
+      `
       /** Spawn a new AI-controlled human with randomized or specified attributes.
        *  @param role - The NPC's role (e.g., 'guard', 'shopkeeper')
        *  @param options - { name, description, location, personality, history, clothed, sex, age, height, weight, appearance, context }
@@ -788,13 +812,16 @@ CORE PRINCIPLES
       }
 
       return human;
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // DESPAWN - Remove an AI-controlled human
     // ═══════════════════════════════════════════════════════════════════
 
-    this.ai.setMethod('despawn', `
+    this.ai.setMethod(
+      'despawn',
+      `
       /** Remove an AI-controlled human from the registry and optionally recycle it.
        *  @param humanId - The human's object ID
        *  @param recycle - Whether to recycle the object (default true)
@@ -833,13 +860,16 @@ CORE PRINCIPLES
       }
 
       console.log('[AI] Despawned human #' + humanId);
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // REGISTRY MANAGEMENT
     // ═══════════════════════════════════════════════════════════════════
 
-    this.ai.setMethod('register', `
+    this.ai.setMethod(
+      'register',
+      `
       /** Register a human as AI-controlled in the registry.
        *  @param humanId - The human's object ID
        *  @param role - The NPC's role
@@ -883,9 +913,12 @@ CORE PRINCIPLES
       self.roles = roles;
 
       return true;
-    `);
+    `,
+    );
 
-    this.ai.setMethod('unregister', `
+    this.ai.setMethod(
+      'unregister',
+      `
       /** Remove a human from the AI registry (does not recycle the object).
        *  @param humanId - The human's object ID
        *  @returns true if found and removed, false if not registered
@@ -916,9 +949,12 @@ CORE PRINCIPLES
       }
 
       return true;
-    `);
+    `,
+    );
 
-    this.ai.setMethod('setRole', `
+    this.ai.setMethod(
+      'setRole',
+      `
       /** Change the role of an AI-controlled human.
        *  @param humanId - The human's object ID
        *  @param newRole - The new role to assign
@@ -959,13 +995,16 @@ CORE PRINCIPLES
       self.registry = registry;
 
       return true;
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // QUERIES
     // ═══════════════════════════════════════════════════════════════════
 
-    this.ai.setMethod('isAiControlled', `
+    this.ai.setMethod(
+      'isAiControlled',
+      `
       /** Check if a human is AI-controlled.
        *  @param humanId - The human's object ID
        *  @returns true if AI-controlled, false otherwise
@@ -973,9 +1012,12 @@ CORE PRINCIPLES
       const humanId = args[0];
       const registry = self.registry || {};
       return !!registry[humanId];
-    `);
+    `,
+    );
 
-    this.ai.setMethod('getByRole', `
+    this.ai.setMethod(
+      'getByRole',
+      `
       /** Get all AI humans with a specific role.
        *  @param role - The role to filter by
        *  @returns Array of human RuntimeObjects
@@ -984,26 +1026,35 @@ CORE PRINCIPLES
       const roles = self.roles || {};
       // Returns array of human objects (stored as objrefs, resolved on read)
       return roles[role] || [];
-    `);
+    `,
+    );
 
-    this.ai.setMethod('getRoles', `
+    this.ai.setMethod(
+      'getRoles',
+      `
       /** Get all roles that have AI humans assigned.
        *  @returns Array of role names
        */
       const roles = self.roles || {};
       return Object.keys(roles);
-    `);
+    `,
+    );
 
-    this.ai.setMethod('getAll', `
+    this.ai.setMethod(
+      'getAll',
+      `
       /** Get all AI-controlled humans.
        *  @returns Array of human RuntimeObjects
        */
       const registry = self.registry || {};
       // Return array of human objects from registry entries
       return Object.values(registry).map(entry => entry.human).filter(h => h);
-    `);
+    `,
+    );
 
-    this.ai.setMethod('getInfo', `
+    this.ai.setMethod(
+      'getInfo',
+      `
       /** Get detailed info about an AI-controlled human.
        *  @param humanId - The human's object ID
        *  @returns Object with human, role, spawnedAt, personality, history, etc. or null
@@ -1031,14 +1082,17 @@ CORE PRINCIPLES
         description: human ? human.description : null,
         location: human ? human.location : null,
       };
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // SESSION LOG MANAGEMENT
     // Persist session info even after NPCs are recycled
     // ═══════════════════════════════════════════════════════════════════
 
-    this.ai.setMethod('registerSession', `
+    this.ai.setMethod(
+      'registerSession',
+      `
       /**
        * Register a session for an NPC (called when AI query runs)
        * @param sessionId - The Claude session ID
@@ -1089,18 +1143,24 @@ CORE PRINCIPLES
 
       self.sessionLogs = logs;
       return { success: true, npcId, sessionType, sessionId };
-    `);
+    `,
+    );
 
-    this.ai.setMethod('listSessions', `
+    this.ai.setMethod(
+      'listSessions',
+      `
       /** List all registered sessions by NPC */
       const logs = self.sessionLogs || {};
       return Object.entries(logs).map(([npcId, info]) => ({
         npcId: parseInt(npcId, 10),
         ...info,
       }));
-    `);
+    `,
+    );
 
-    this.ai.setMethod('getSession', `
+    this.ai.setMethod(
+      'getSession',
+      `
       /** Get session info by NPC ID and optionally session type */
       const npcId = args[0];
       const sessionType = args[1]; // optional: 'wake' or 'interaction'
@@ -1111,14 +1171,17 @@ CORE PRINCIPLES
       if (sessionType === 'wake') return entry.wakeSession || null;
       if (sessionType === 'interaction') return entry.interactionSession || null;
       return entry; // Return full entry if no type specified
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // RESPONSE EXPECTATIONS
     // Schedule timeouts when AI is waiting for a response
     // ═══════════════════════════════════════════════════════════════════
 
-    this.ai.setMethod('expectResponseFrom', `
+    this.ai.setMethod(
+      'expectResponseFrom',
+      `
       /**
        * Set up a timeout expectation for a response from a target
        * @param targetId - The object we're waiting for a response from
@@ -1156,9 +1219,12 @@ CORE PRINCIPLES
       await $.scheduler.schedule(jobName, timeout, 0, self, 'onExpectationTimeout', jobName);
 
       return { success: true, jobName, timeout };
-    `);
+    `,
+    );
 
-    this.ai.setMethod('cancelExpectation', `
+    this.ai.setMethod(
+      'cancelExpectation',
+      `
       /**
        * Cancel a pending response expectation
        * @param targetId - The object we were waiting for
@@ -1183,9 +1249,12 @@ CORE PRINCIPLES
       self.expectations = expectations;
 
       return { success: true, jobName };
-    `);
+    `,
+    );
 
-    this.ai.setMethod('onExpectationTimeout', `
+    this.ai.setMethod(
+      'onExpectationTimeout',
+      `
       /**
        * Internal handler called when timeout fires
        * @param jobName - The job name that fired
@@ -1242,14 +1311,17 @@ CORE PRINCIPLES
       }
 
       return { success: true, prompted: true };
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // PROFILE MANAGEMENT
     // Set/update personality and history for AI context
     // ═══════════════════════════════════════════════════════════════════
 
-    this.ai.setMethod('setPersonality', `
+    this.ai.setMethod(
+      'setPersonality',
+      `
       /**
        * Set or update the personality for an AI NPC
        * @param humanId - The NPC's object ID
@@ -1275,9 +1347,12 @@ CORE PRINCIPLES
       human.aiPersonality = personality;
 
       return { success: true, humanId: humanId, personality: personality };
-    `);
+    `,
+    );
 
-    this.ai.setMethod('setHistory', `
+    this.ai.setMethod(
+      'setHistory',
+      `
       /**
        * Set or update the history/backstory for an AI NPC
        * @param humanId - The NPC's object ID
@@ -1303,9 +1378,12 @@ CORE PRINCIPLES
       human.aiHistory = history;
 
       return { success: true, humanId: humanId, history: history };
-    `);
+    `,
+    );
 
-    this.ai.setMethod('getProfile', `
+    this.ai.setMethod(
+      'getProfile',
+      `
       /**
        * Get the full profile for an AI NPC (personality, history, notes)
        * @param humanId - The NPC's object ID
@@ -1352,17 +1430,23 @@ CORE PRINCIPLES
         notes: notes,
         memories: npcMemories,
       };
-    `);
+    `,
+    );
 
-    this.ai.setMethod('count', `
+    this.ai.setMethod(
+      'count',
+      `
       /** Get total number of AI-controlled humans.
        *  @returns Number of registered AI humans
        */
       const registry = self.registry || {};
       return Object.keys(registry).length;
-    `);
+    `,
+    );
 
-    this.ai.setMethod('countByRole', `
+    this.ai.setMethod(
+      'countByRole',
+      `
       /** Get number of AI humans with a specific role.
        *  @param role - The role to count
        *  @returns Number of AI humans with that role
@@ -1370,14 +1454,17 @@ CORE PRINCIPLES
       const role = args[0];
       const roles = self.roles || {};
       return (roles[role] || []).length;
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // MEMORY MANAGEMENT
     // Critical memories that persist across session resets
     // ═══════════════════════════════════════════════════════════════════
 
-    this.ai.setMethod('remember', `
+    this.ai.setMethod(
+      'remember',
+      `
       /**
        * Store a critical memory for an NPC
        * @param humanId - The NPC's object ID
@@ -1427,9 +1514,12 @@ CORE PRINCIPLES
         memory: memory,
         totalMemories: memories[humanId].length
       };
-    `);
+    `,
+    );
 
-    this.ai.setMethod('recall', `
+    this.ai.setMethod(
+      'recall',
+      `
       /**
        * Retrieve memories for an NPC
        * @param humanId - The NPC's object ID
@@ -1468,9 +1558,12 @@ CORE PRINCIPLES
         memories: npcMemories,
         count: npcMemories.length
       };
-    `);
+    `,
+    );
 
-    this.ai.setMethod('forget', `
+    this.ai.setMethod(
+      'forget',
+      `
       /**
        * Remove a memory from an NPC
        * @param humanId - The NPC's object ID
@@ -1504,9 +1597,12 @@ CORE PRINCIPLES
         removed: removed,
         remainingMemories: memories[humanId].length
       };
-    `);
+    `,
+    );
 
-    this.ai.setMethod('forgetByText', `
+    this.ai.setMethod(
+      'forgetByText',
+      `
       /**
        * Remove memories matching a text pattern
        * @param humanId - The NPC's object ID
@@ -1542,9 +1638,12 @@ CORE PRINCIPLES
         removed: removed,
         remainingMemories: memories[humanId].length
       };
-    `);
+    `,
+    );
 
-    this.ai.setMethod('clearMemories', `
+    this.ai.setMethod(
+      'clearMemories',
+      `
       /**
        * Clear all memories for an NPC
        * @param humanId - The NPC's object ID
@@ -1565,9 +1664,12 @@ CORE PRINCIPLES
         success: true,
         cleared: count
       };
-    `);
+    `,
+    );
 
-    this.ai.setMethod('getMemorySummary', `
+    this.ai.setMethod(
+      'getMemorySummary',
+      `
       /**
        * Get a summary of memories for an NPC (for system prompt injection)
        * @param humanId - The NPC's object ID
@@ -1632,13 +1734,16 @@ CORE PRINCIPLES
       }
 
       return summary.trim();
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // PATHFINDING - A* algorithm for room-to-room navigation
     // ═══════════════════════════════════════════════════════════════════
 
-    this.ai.setMethod('path', `
+    this.ai.setMethod(
+      'path',
+      `
       /**
        * Find shortest path between two rooms using A* algorithm
        * @param fromRoom - Starting room (object or ID)
@@ -1800,9 +1905,12 @@ CORE PRINCIPLES
       }
 
       return { success: false, error: 'No path found' };
-    `);
+    `,
+    );
 
-    this.ai.setMethod('walkPath', `
+    this.ai.setMethod(
+      'walkPath',
+      `
       /**
        * Walk an AI human along a path returned by path()
        * @param humanId - The AI human's object ID
@@ -1892,13 +2000,16 @@ CORE PRINCIPLES
       }
 
       return { success: true, stepsCompleted };
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // WORLD LOG - Deity Chat between Pluribus and Sister Gray
     // ═══════════════════════════════════════════════════════════════════
 
-    this.ai.setMethod('logWorld', `
+    this.ai.setMethod(
+      'logWorld',
+      `
       /**
        * Add an entry to the shared world log (deity chat)
        * @param author - 'pluribus' or 'sisterGray'
@@ -1926,9 +2037,12 @@ CORE PRINCIPLES
       }
 
       return { success: true, entries: self.worldLog.length };
-    `);
+    `,
+    );
 
-    this.ai.setMethod('getWorldLog', `
+    this.ai.setMethod(
+      'getWorldLog',
+      `
       /**
        * Get recent world log entries
        * @param limit - Max entries to return (default 20)
@@ -1940,13 +2054,16 @@ CORE PRINCIPLES
         const time = new Date(entry.timestamp).toISOString();
         return '[' + time + '] ' + entry.author + ': ' + entry.message;
       });
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // DESCRIBE
     // ═══════════════════════════════════════════════════════════════════
 
-    this.ai.setMethod('describe', `
+    this.ai.setMethod(
+      'describe',
+      `
       /** Get a formatted description of the AI registry.
        *  @returns Multi-line string listing all AI humans by role
        */
@@ -1976,7 +2093,8 @@ CORE PRINCIPLES
       }
 
       return desc;
-    `);
+    `,
+    );
   }
 
   /**
@@ -1987,7 +2105,9 @@ CORE PRINCIPLES
     if (!this.ai) return;
 
     // Session management methods
-    this.ai.setMethod('registerSession', `
+    this.ai.setMethod(
+      'registerSession',
+      `
       const sessionId = args[0];
       const npcId = args[1];
       const npcName = args[2];
@@ -2011,14 +2131,20 @@ CORE PRINCIPLES
       }
       self.sessionLogs = logs;
       return { success: true, npcId, sessionType, sessionId };
-    `);
+    `,
+    );
 
-    this.ai.setMethod('listSessions', `
+    this.ai.setMethod(
+      'listSessions',
+      `
       const logs = self.sessionLogs || {};
       return Object.entries(logs).map(([npcId, info]) => ({ npcId: parseInt(npcId, 10), ...info }));
-    `);
+    `,
+    );
 
-    this.ai.setMethod('getSession', `
+    this.ai.setMethod(
+      'getSession',
+      `
       const npcId = args[0];
       const sessionType = args[1];
       const logs = self.sessionLogs || {};
@@ -2028,10 +2154,13 @@ CORE PRINCIPLES
       if (sessionType === 'wake') return entry.wakeSession || null;
       if (sessionType === 'interaction') return entry.interactionSession || null;
       return entry;
-    `);
+    `,
+    );
 
     // Response expectation methods
-    this.ai.setMethod('expectResponseFrom', `
+    this.ai.setMethod(
+      'expectResponseFrom',
+      `
       const targetId = args[0];
       const options = args[1] || {};
       if (!targetId) {
@@ -2052,9 +2181,12 @@ CORE PRINCIPLES
       self.expectations = expectations;
       await $.scheduler.schedule(jobName, timeout, 0, self, 'onExpectationTimeout', jobName);
       return { success: true, jobName, timeout };
-    `);
+    `,
+    );
 
-    this.ai.setMethod('cancelExpectation', `
+    this.ai.setMethod(
+      'cancelExpectation',
+      `
       const targetId = args[0];
       const humanId = args[1];
       if (!targetId || !humanId) {
@@ -2067,9 +2199,12 @@ CORE PRINCIPLES
       delete expectations[jobName];
       self.expectations = expectations;
       return { success: true, jobName };
-    `);
+    `,
+    );
 
-    this.ai.setMethod('onExpectationTimeout', `
+    this.ai.setMethod(
+      'onExpectationTimeout',
+      `
       const jobName = args[0];
       console.log('[AI] Expectation timeout fired: ' + jobName);
       const expectations = self.expectations || {};
@@ -2107,10 +2242,13 @@ CORE PRINCIPLES
         self.expectations = expectations;
       }
       return { success: true, prompted: true };
-    `);
+    `,
+    );
 
     // Pathfinding methods
-    this.ai.setMethod('path', `
+    this.ai.setMethod(
+      'path',
+      `
       const fromRoomArg = args[0];
       const toRoomArg = args[1];
       const options = args[2] || {};
@@ -2185,9 +2323,12 @@ CORE PRINCIPLES
       }
       if (steps >= maxSteps) return { success: false, error: 'Max steps exceeded' };
       return { success: false, error: 'No path found' };
-    `);
+    `,
+    );
 
-    this.ai.setMethod('walkPath', `
+    this.ai.setMethod(
+      'walkPath',
+      `
       const humanId = args[0];
       const path = args[1];
       if (!humanId) return { success: false, stepsCompleted: 0, error: 'Human ID required' };
@@ -2225,10 +2366,13 @@ CORE PRINCIPLES
         stepsCompleted++;
       }
       return { success: true, stepsCompleted };
-    `);
+    `,
+    );
 
     // World log methods
-    this.ai.setMethod('logWorld', `
+    this.ai.setMethod(
+      'logWorld',
+      `
       const author = args[0];
       const message = args[1];
       if (!author || !message) return { success: false, error: 'Author and message required' };
@@ -2236,18 +2380,24 @@ CORE PRINCIPLES
       log.push({ timestamp: Date.now(), author, message });
       if (log.length > 100) { self.worldLog = log.slice(-100); } else { self.worldLog = log; }
       return { success: true, entries: self.worldLog.length };
-    `);
+    `,
+    );
 
-    this.ai.setMethod('getWorldLog', `
+    this.ai.setMethod(
+      'getWorldLog',
+      `
       const limit = args[0] || 20;
       const log = self.worldLog || [];
       return log.slice(-limit).map(entry => {
         const time = new Date(entry.timestamp).toISOString();
         return '[' + time + '] ' + entry.author + ': ' + entry.message;
       });
-    `);
+    `,
+    );
 
-    console.log('[AiBuilder] Session, expectation, pathfinding, and worldLog methods rebuilt');
+    console.log(
+      '[AiBuilder] Session, expectation, pathfinding, and worldLog methods rebuilt',
+    );
   }
 
   async registerAlias(): Promise<void> {

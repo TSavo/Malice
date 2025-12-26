@@ -123,7 +123,7 @@ Through reinforced windows, the vat halls are visible below—rows of bioreactor
         east: '%BIOREACTORS',
         south: '%VAT_BETA',
         west: '%GRINDING',
-        'in': '%E',
+        in: '%E',
       },
     },
 

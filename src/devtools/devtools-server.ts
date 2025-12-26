@@ -5,12 +5,12 @@
  * Provides CRUD operations for objects, methods, and properties
  */
 
-import { WebSocketServer, WebSocket } from 'ws';
+import { WebSocket, WebSocketServer } from 'ws';
+import type { Method, ObjId } from '../../types/object.js';
 import type { ObjectManager } from '../database/object-manager.js';
-import type { ObjId, Method } from '../../types/object.js';
-import { TypeGenerator } from './type-generator.js';
-import { MethodTemplateGenerator } from './method-templates.js';
 import { RelationshipAnalyzer } from '../lsp/relationship-analyzer.js';
+import { MethodTemplateGenerator } from './method-templates.js';
+import { TypeGenerator } from './type-generator.js';
 
 interface JsonRpcRequest {
   jsonrpc: '2.0';
@@ -46,7 +46,7 @@ export class DevToolsServer {
 
   constructor(
     private manager: ObjectManager,
-    port = 9999
+    port = 9999,
   ) {
     this.wss = new WebSocketServer({
       port,
@@ -122,7 +122,9 @@ export class DevToolsServer {
   /**
    * Handle JSON-RPC request
    */
-  private async handleRequest(request: JsonRpcRequest): Promise<JsonRpcResponse> {
+  private async handleRequest(
+    request: JsonRpcRequest,
+  ): Promise<JsonRpcResponse> {
     const { method, params, id } = request;
 
     try {
@@ -241,10 +243,12 @@ export class DevToolsServer {
   /**
    * List all objects
    */
-  private async listObjects(params: { includeRecycled?: boolean } = {}): Promise<any> {
+  private async listObjects(
+    params: { includeRecycled?: boolean } = {},
+  ): Promise<any> {
     const allObjects = await this.manager.db.listAll(params.includeRecycled);
 
-    const objects = allObjects.map(obj => ({
+    const objects = allObjects.map((obj) => ({
       id: obj._id,
       parent: obj.parent?.value ?? obj.parent, // Extract ID from ObjRefValue
       properties: Object.keys(obj.properties || {}),
@@ -324,7 +328,10 @@ export class DevToolsServer {
   /**
    * Get method code
    */
-  private async getMethod(params: { objectId: ObjId; name: string }): Promise<any> {
+  private async getMethod(params: {
+    objectId: ObjId;
+    name: string;
+  }): Promise<any> {
     const { objectId, name } = params;
     const obj = await this.manager.load(objectId);
 
@@ -377,7 +384,10 @@ export class DevToolsServer {
   /**
    * Delete method
    */
-  private async deleteMethod(params: { objectId: ObjId; name: string }): Promise<any> {
+  private async deleteMethod(params: {
+    objectId: ObjId;
+    name: string;
+  }): Promise<any> {
     const { objectId, name } = params;
     const obj = await this.manager.load(objectId);
 
@@ -396,7 +406,10 @@ export class DevToolsServer {
   /**
    * Get property value
    */
-  private async getProperty(params: { objectId: ObjId; name: string }): Promise<any> {
+  private async getProperty(params: {
+    objectId: ObjId;
+    name: string;
+  }): Promise<any> {
     const { objectId, name } = params;
     const obj = await this.manager.load(objectId);
 
@@ -440,7 +453,10 @@ export class DevToolsServer {
   /**
    * Delete property
    */
-  private async deleteProperty(params: { objectId: ObjId; name: string }): Promise<any> {
+  private async deleteProperty(params: {
+    objectId: ObjId;
+    name: string;
+  }): Promise<any> {
     const { objectId, name } = params;
     const obj = await this.manager.load(objectId);
 
@@ -482,12 +498,19 @@ export class DevToolsServer {
   /**
    * Analyze method relationships for a specific method
    */
-  private async analyzeMethodRelationships(params: { objectId: ObjId; methodName: string }): Promise<any> {
+  private async analyzeMethodRelationships(params: {
+    objectId: ObjId;
+    methodName: string;
+  }): Promise<any> {
     const { objectId, methodName } = params;
-    
+
     try {
-      const relationship = await this.relationshipAnalyzer.analyzeMethodRelationships(objectId, methodName);
-      
+      const relationship =
+        await this.relationshipAnalyzer.analyzeMethodRelationships(
+          objectId,
+          methodName,
+        );
+
       return {
         objectId,
         methodName,
@@ -502,12 +525,12 @@ export class DevToolsServer {
           callFrequency: relationship.callFrequency,
           fanOut: relationship.fanOut,
           fanIn: relationship.fanIn,
-          testCoverage: relationship.testCoverage
-        }
+          testCoverage: relationship.testCoverage,
+        },
       };
     } catch (error) {
       return {
-        error: `Failed to analyze relationships: ${error instanceof Error ? error.message : 'Unknown error'}`
+        error: `Failed to analyze relationships: ${error instanceof Error ? error.message : 'Unknown error'}`,
       };
     }
   }
@@ -515,24 +538,26 @@ export class DevToolsServer {
   /**
    * Get complete call graph for all methods
    */
-  private async getCallGraph(_params: { includeStats?: boolean } = {}): Promise<any> {
+  private async getCallGraph(
+    _params: { includeStats?: boolean } = {},
+  ): Promise<any> {
     try {
       await this.relationshipAnalyzer.buildCallGraph();
-      
+
       const stats = this.relationshipAnalyzer.getStats();
-      
+
       return {
         callGraph: {
           totalNodes: stats.totalNodes,
           totalEdges: stats.totalEdges,
           avgComplexity: stats.avgComplexity,
           mostCalled: stats.mostCalled,
-          leastCalled: stats.leastCalled
-        }
+          leastCalled: stats.leastCalled,
+        },
       };
     } catch (error) {
       return {
-        error: `Failed to build call graph: ${error instanceof Error ? error.message : 'Unknown error'}`
+        error: `Failed to build call graph: ${error instanceof Error ? error.message : 'Unknown error'}`,
       };
     }
   }
@@ -540,24 +565,30 @@ export class DevToolsServer {
   /**
    * Find all objects that call a specific method
    */
-  private async findMethodCallers(params: { objectId: ObjId; methodName: string }): Promise<any> {
+  private async findMethodCallers(params: {
+    objectId: ObjId;
+    methodName: string;
+  }): Promise<any> {
     const { objectId, methodName } = params;
-    
+
     try {
-      const callers = await this.relationshipAnalyzer.getCallers(objectId, methodName);
-      
+      const callers = await this.relationshipAnalyzer.getCallers(
+        objectId,
+        methodName,
+      );
+
       return {
         objectId,
         methodName,
-        callers: callers.map(caller => ({
+        callers: callers.map((caller) => ({
           objectId: caller.objectId,
           methodName: caller.context,
-          frequency: caller.frequency
-        }))
+          frequency: caller.frequency,
+        })),
       };
     } catch (error) {
       return {
-        error: `Failed to find method callers: ${error instanceof Error ? error.message : 'Unknown error'}`
+        error: `Failed to find method callers: ${error instanceof Error ? error.message : 'Unknown error'}`,
       };
     }
   }
@@ -565,23 +596,29 @@ export class DevToolsServer {
   /**
    * Find all method overrides for a specific method
    */
-  private async findMethodOverrides(params: { objectId: ObjId; methodName: string }): Promise<any> {
+  private async findMethodOverrides(params: {
+    objectId: ObjId;
+    methodName: string;
+  }): Promise<any> {
     const { objectId, methodName } = params;
-    
+
     try {
-      const overrides = await this.relationshipAnalyzer.analyzeOverriddenBy(objectId, methodName);
-      
+      const overrides = await this.relationshipAnalyzer.analyzeOverriddenBy(
+        objectId,
+        methodName,
+      );
+
       return {
         objectId,
         methodName,
-        overrides: overrides.map(override => ({
+        overrides: overrides.map((override) => ({
           objectId: override.objectId,
-          methodName: override.methodName
-        }))
+          methodName: override.methodName,
+        })),
       };
     } catch (error) {
       return {
-        error: `Failed to find method overrides: ${error instanceof Error ? error.message : 'Unknown error'}`
+        error: `Failed to find method overrides: ${error instanceof Error ? error.message : 'Unknown error'}`,
       };
     }
   }
@@ -589,25 +626,31 @@ export class DevToolsServer {
   /**
    * Get related methods for a specific method
    */
-  private async getRelatedMethods(params: { objectId: ObjId; methodName: string }): Promise<any> {
+  private async getRelatedMethods(params: {
+    objectId: ObjId;
+    methodName: string;
+  }): Promise<any> {
     const { objectId, methodName } = params;
-    
+
     try {
-      const related = await this.relationshipAnalyzer.findRelatedMethods(objectId, methodName);
-      
+      const related = await this.relationshipAnalyzer.findRelatedMethods(
+        objectId,
+        methodName,
+      );
+
       return {
         objectId,
         methodName,
-        related: related.map(rel => ({
+        related: related.map((rel) => ({
           objectId: rel.objectId,
           methodName: rel.methodName,
           type: rel.type,
-          strength: rel.strength
-        }))
+          strength: rel.strength,
+        })),
       };
     } catch (error) {
       return {
-        error: `Failed to find related methods: ${error instanceof Error ? error.message : 'Unknown error'}`
+        error: `Failed to find related methods: ${error instanceof Error ? error.message : 'Unknown error'}`,
       };
     }
   }
@@ -645,51 +688,56 @@ export class DevToolsServer {
   /**
    * List available method templates
    */
-  private async listTemplates(params: { category?: string } = {}): Promise<any> {
+  private async listTemplates(
+    params: { category?: string } = {},
+  ): Promise<any> {
     const category = params.category;
-    
+
     if (category) {
       return {
         templates: this.templateGenerator.getCategoryTemplates(category),
-        category
+        category,
       };
     }
-    
+
     return {
-      categories: this.templateGenerator.getCategories().map(cat => ({
+      categories: this.templateGenerator.getCategories().map((cat) => ({
         id: cat,
         name: this.toTitleCase(cat),
-        templates: this.templateGenerator.getCategoryTemplates(cat).length
-      }))
+        templates: this.templateGenerator.getCategoryTemplates(cat).length,
+      })),
     };
   }
 
   /**
    * Get specific method template
    */
-  private async getTemplate(params: { category: string; methodName?: string }): Promise<any> {
+  private async getTemplate(params: {
+    category: string;
+    methodName?: string;
+  }): Promise<any> {
     const { category, methodName } = params;
-    
+
     if (methodName) {
       const template = this.templateGenerator.getTemplate(category, methodName);
       if (!template) {
         throw new Error(`Template not found: ${category}.${methodName}`);
       }
-      
+
       return {
         template,
-        usage: `await obj.setMethod('${methodName}', template.template);`
+        usage: `await obj.setMethod('${methodName}', template.template);`,
       };
     }
-    
+
     const template = this.templateGenerator.getTemplate(category);
     if (!template) {
       throw new Error(`Category not found: ${category}`);
     }
-    
+
     return {
       template,
-      usage: `// Use this as a template for creating ${category} methods`
+      usage: `// Use this as a template for creating ${category} methods`,
     };
   }
 
@@ -703,15 +751,21 @@ export class DevToolsServer {
     methodName: string;
   }): Promise<any> {
     const { objectId, category, pattern, methodName } = params;
-    
+
     const obj = await this.manager.load(objectId);
     if (!obj) {
       throw new Error(`Object #${objectId} not found`);
     }
 
-    const template = this.templateGenerator.generateTemplate(category, methodName, pattern);
+    const template = this.templateGenerator.generateTemplate(
+      category,
+      methodName,
+      pattern,
+    );
     if (!template) {
-      throw new Error(`Cannot generate template: ${category}.${methodName} (${pattern})`);
+      throw new Error(
+        `Cannot generate template: ${category}.${methodName} (${pattern})`,
+      );
     }
 
     // Apply template to object
@@ -725,7 +779,7 @@ export class DevToolsServer {
       method: methodName,
       category,
       template: template.template,
-      usage: `await obj.setMethod('${methodName}', template.template);`
+      usage: `await obj.setMethod('${methodName}', template.template);`,
     };
   }
 

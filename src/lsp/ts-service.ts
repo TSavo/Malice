@@ -39,7 +39,10 @@ export class TypeScriptService {
       readFile: (path) => this.files.get(path),
     };
 
-    this.languageService = ts.createLanguageService(serviceHost, ts.createDocumentRegistry());
+    this.languageService = ts.createLanguageService(
+      serviceHost,
+      ts.createDocumentRegistry(),
+    );
   }
 
   /**
@@ -56,20 +59,32 @@ export class TypeScriptService {
   /**
    * Get completions at a position
    */
-  async getCompletions(uri: string, line: number, character: number): Promise<ts.CompletionInfo | undefined> {
+  async getCompletions(
+    uri: string,
+    line: number,
+    character: number,
+  ): Promise<ts.CompletionInfo | undefined> {
     await this.updateDocument(uri);
 
     const doc = await this.vfs.getDocument(uri);
     if (!doc) return undefined;
 
     const offset = this.getOffset(doc.content, line, character);
-    return this.languageService.getCompletionsAtPosition(uri, offset, undefined);
+    return this.languageService.getCompletionsAtPosition(
+      uri,
+      offset,
+      undefined,
+    );
   }
 
   /**
    * Get hover information
    */
-  async getHover(uri: string, line: number, character: number): Promise<ts.QuickInfo | undefined> {
+  async getHover(
+    uri: string,
+    line: number,
+    character: number,
+  ): Promise<ts.QuickInfo | undefined> {
     await this.updateDocument(uri);
 
     const doc = await this.vfs.getDocument(uri);
@@ -93,7 +108,11 @@ export class TypeScriptService {
   /**
    * Get definition location
    */
-  async getDefinition(uri: string, line: number, character: number): Promise<ts.DefinitionInfo[] | undefined> {
+  async getDefinition(
+    uri: string,
+    line: number,
+    character: number,
+  ): Promise<ts.DefinitionInfo[] | undefined> {
     await this.updateDocument(uri);
 
     const doc = await this.vfs.getDocument(uri);
@@ -107,7 +126,11 @@ export class TypeScriptService {
   /**
    * Get references
    */
-  async getReferences(uri: string, line: number, character: number): Promise<ts.ReferenceEntry[] | undefined> {
+  async getReferences(
+    uri: string,
+    line: number,
+    character: number,
+  ): Promise<ts.ReferenceEntry[] | undefined> {
     await this.updateDocument(uri);
 
     const doc = await this.vfs.getDocument(uri);

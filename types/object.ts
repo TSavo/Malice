@@ -12,13 +12,13 @@ export type ObjId = number;
  * Value type - represents the type of a stored value
  */
 export type ValueType =
-  | 'number'   // JavaScript number (int or float)
-  | 'string'   // JavaScript string
-  | 'boolean'  // JavaScript boolean
-  | 'null'     // JavaScript null
-  | 'objref'   // Object reference (stores ObjId, resolves to RuntimeObject)
-  | 'array'    // Array of Values
-  | 'object';  // Record of Values
+  | 'number' // JavaScript number (int or float)
+  | 'string' // JavaScript string
+  | 'boolean' // JavaScript boolean
+  | 'null' // JavaScript null
+  | 'objref' // Object reference (stores ObjId, resolves to RuntimeObject)
+  | 'array' // Array of Values
+  | 'object'; // Record of Values
 
 /**
  * Typed value container
@@ -64,9 +64,9 @@ export type PropertyValue =
   | number
   | boolean
   | null
-  | RuntimeObject  // Resolved objref
-  | PropertyValue[]  // Recursive array
-  | { [key: string]: PropertyValue };  // Recursive object
+  | RuntimeObject // Resolved objref
+  | PropertyValue[] // Recursive array
+  | { [key: string]: PropertyValue }; // Recursive object
 
 /**
  * Rich property info for AI context
@@ -146,7 +146,11 @@ export interface RuntimeObject {
   set(prop: string, value: PropertyValue): void;
 
   /** Set a method on this object */
-  setMethod(name: string, code: string, options?: { callable?: boolean; aliases?: string[]; help?: string }): void;
+  setMethod(
+    name: string,
+    code: string,
+    options?: { callable?: boolean; aliases?: string[]; help?: string },
+  ): void;
 
   /** Add a method to this object (alias for setMethod with just code) */
   addMethod(name: string, code: string): void;

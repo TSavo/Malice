@@ -1,10 +1,12 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { AliasLoader } from '../../src/database/bootstrap/alias-loader.js';
+import { MinimalBootstrap } from '../../src/database/bootstrap/minimal-bootstrap.js';
 import { ObjectDatabase } from '../../src/database/object-db.js';
 import { ObjectManager } from '../../src/database/object-manager.js';
-import { MinimalBootstrap } from '../../src/database/bootstrap/minimal-bootstrap.js';
-import { AliasLoader } from '../../src/database/bootstrap/alias-loader.js';
 
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/?replicaSet=rs0&directConnection=true';
+const MONGO_URI =
+  process.env.MONGO_URI ||
+  'mongodb://localhost:27017/?replicaSet=rs0&directConnection=true';
 
 describe('MinimalBootstrap', () => {
   let db: ObjectDatabase;
@@ -16,7 +18,7 @@ describe('MinimalBootstrap', () => {
     await db.connect();
 
     // Clean database
-    await db['objects'].deleteMany({});
+    await db.objects.deleteMany({});
 
     manager = new ObjectManager(db);
     bootstrap = new MinimalBootstrap(manager);
@@ -32,9 +34,9 @@ describe('MinimalBootstrap', () => {
 
       const root = await manager.load(1);
       expect(root).toBeTruthy();
-      expect(root!.id).toBe(1);
-      expect(root!.get('name')).toBe('Root');
-      expect(root!.getParent()?.id).toBe(0); // Parent is ObjectManager #0
+      expect(root?.id).toBe(1);
+      expect(root?.get('name')).toBe('Root');
+      expect(root?.getParent()?.id).toBe(0); // Parent is ObjectManager #0
     });
 
     it('should create System object (#2)', async () => {
@@ -52,12 +54,11 @@ describe('MinimalBootstrap', () => {
       expect($.system.getParent()).toBe($.root);
     });
 
-
     it('should initialize empty aliases in Root', async () => {
       await bootstrap.bootstrap();
 
       const objectManager = await manager.load(0);
-      const aliases = objectManager!.get('aliases') as Record<string, number>;
+      const aliases = objectManager?.get('aliases') as Record<string, number>;
 
       expect(aliases).toBeTruthy();
       expect(typeof aliases).toBe('object');
@@ -67,7 +68,7 @@ describe('MinimalBootstrap', () => {
       await bootstrap.bootstrap();
 
       const objectManager = await manager.load(0);
-      const aliases = objectManager!.get('aliases') as Record<string, number>;
+      const aliases = objectManager?.get('aliases') as Record<string, number>;
 
       expect(aliases.system).toBe(2);
     });
@@ -87,9 +88,9 @@ describe('MinimalBootstrap', () => {
     it('should create objects with correct structure', async () => {
       await bootstrap.bootstrap();
 
-      const objectManager = await manager.load(0);
+      const _objectManager = await manager.load(0);
       const root = await manager.load(1);
-      const doc = root!['_getRaw']();
+      const doc = root?._getRaw();
 
       expect(doc._id).toBe(1);
       expect(doc.parent).toEqual({ type: 'objref', value: 0 });
@@ -104,9 +105,9 @@ describe('MinimalBootstrap', () => {
     it('should have config property', async () => {
       await bootstrap.bootstrap();
 
-      const objectManager = await manager.load(0);
+      const _objectManager = await manager.load(0);
       const root = await manager.load(1);
-      const config = root!.get('config');
+      const config = root?.get('config');
 
       expect(config).toBeTruthy();
       expect(typeof config).toBe('object');
@@ -115,9 +116,9 @@ describe('MinimalBootstrap', () => {
     it('should have default site configuration', async () => {
       await bootstrap.bootstrap();
 
-      const objectManager = await manager.load(0);
+      const _objectManager = await manager.load(0);
       const root = await manager.load(1);
-      const config = root!.get('config') as any;
+      const config = root?.get('config') as any;
 
       expect(config.siteName).toBe('Malice');
       expect(config.motd).toBeTruthy();
@@ -130,14 +131,14 @@ describe('MinimalBootstrap', () => {
       await bootstrap.bootstrap();
 
       const system = await manager.load(2);
-      expect(system!.hasMethod('onConnection')).toBe(true);
+      expect(system?.hasMethod('onConnection')).toBe(true);
     });
 
     it('should have functional onConnection method', async () => {
       await bootstrap.bootstrap();
 
       const system = await manager.load(2);
-      const method = system!['_getRaw']().methods.onConnection;
+      const method = system?._getRaw().methods.onConnection;
 
       expect(method).toBeTruthy();
       const code = typeof method === 'string' ? method : method.code;
@@ -146,14 +147,13 @@ describe('MinimalBootstrap', () => {
     });
   });
 
-
   describe('Alias registration', () => {
     it('should not duplicate aliases on repeated bootstrap', async () => {
       await bootstrap.bootstrap();
       await bootstrap.bootstrap();
 
       const objectManager = await manager.load(0);
-      const aliases = objectManager!.get('aliases') as Record<string, number>;
+      const aliases = objectManager?.get('aliases') as Record<string, number>;
 
       expect(aliases.nothing).toBe(-1);
       expect(aliases.object_manager).toBe(0);
@@ -166,17 +166,17 @@ describe('MinimalBootstrap', () => {
       await bootstrap.bootstrap();
 
       const objectManager = await manager.load(0);
-      const aliases = objectManager!.get('aliases') as Record<string, number>;
+      const aliases = objectManager?.get('aliases') as Record<string, number>;
       aliases.custom = 999;
-      objectManager!.set('aliases', aliases);
-      await objectManager!.save();
+      objectManager?.set('aliases', aliases);
+      await objectManager?.save();
 
       // Bootstrap again
       const bootstrap2 = new MinimalBootstrap(manager);
       await bootstrap2.bootstrap();
 
       const objectManager2 = await manager.load(0);
-      const aliases2 = objectManager2!.get('aliases') as Record<string, number>;
+      const aliases2 = objectManager2?.get('aliases') as Record<string, number>;
 
       expect(aliases2.custom).toBe(999);
       expect(aliases2.system).toBe(2);

@@ -1,5 +1,5 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Builds the BottledWater prototype
@@ -18,7 +18,8 @@ export class BottledWaterBuilder {
       parent: parentObj!,
       properties: {
         name: 'Bottled Water',
-        description: 'A clear plastic bottle of purified water. The Continuum logo is embossed on the cap. 500ml of municipal tap, filtered and sealed.',
+        description:
+          'A clear plastic bottle of purified water. The Continuum logo is embossed on the cap. 500ml of municipal tap, filtered and sealed.',
         aliases: ['water', 'water bottle', 'bottle'],
         // Pure water - no calories, maximum hydration
         calories: 0,
@@ -58,7 +59,9 @@ ECONOMY: 'basePrice' 1 credit. Ubiquitous vending machine item.`,
     });
 
     // Override drink to handle sealed bottles
-    obj.setMethod('drink', `
+    obj.setMethod(
+      'drink',
+      `
       // Args from verb pattern 'drink %t':
       //   args[0] = handler (the drink, same as self) - from %t
       // Direct variables:
@@ -116,10 +119,13 @@ ECONOMY: 'basePrice' 1 credit. Ubiquitous vending machine item.`,
       }
 
       return msg;
-    `);
+    `,
+    );
 
     // Open the bottle
-    obj.setMethod('open', `
+    obj.setMethod(
+      'open',
+      `
       // Args from verb pattern 'open %t':
       //   args[0] = handler (the bottle, same as self) - from %t
       // Direct variables:
@@ -141,10 +147,13 @@ ECONOMY: 'basePrice' 1 credit. Ubiquitous vending machine item.`,
       }
 
       return 'You twist off the cap. The seal breaks with a soft crack.';
-    `);
+    `,
+    );
 
     // Override describe to show sealed/open status
-    obj.setMethod('describe', `
+    obj.setMethod(
+      'describe',
+      `
       let desc = self.name + '\\r\\n' + self.description;
 
       if (self.sealed) {
@@ -164,13 +173,26 @@ ECONOMY: 'basePrice' 1 credit. Ubiquitous vending machine item.`,
       }
 
       return desc;
-    `);
+    `,
+    );
 
     // Add property descriptions
-    obj.setPropertyDescription('sealed', 'Whether the bottle is still sealed (must open before drinking, prevents decay)');
-    obj.setPropertyDescription('openedDecayRate', 'Decay rate applied once the bottle seal is broken');
-    obj.setPropertyDescription('hydration', 'Total hydration value in milliliters (500ml for standard bottle)');
-    obj.setPropertyDescription('containerWeight', 'Weight of the empty bottle container in grams');
+    obj.setPropertyDescription(
+      'sealed',
+      'Whether the bottle is still sealed (must open before drinking, prevents decay)',
+    );
+    obj.setPropertyDescription(
+      'openedDecayRate',
+      'Decay rate applied once the bottle seal is broken',
+    );
+    obj.setPropertyDescription(
+      'hydration',
+      'Total hydration value in milliliters (500ml for standard bottle)',
+    );
+    obj.setPropertyDescription(
+      'containerWeight',
+      'Weight of the empty bottle container in grams',
+    );
 
     return obj;
   }

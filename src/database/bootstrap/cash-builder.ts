@@ -1,5 +1,5 @@
-import { ObjectManager } from '../object-manager.js';
 import type { RuntimeObject } from '../../../types/object.js';
+import type { ObjectManager } from '../object-manager.js';
 
 /**
  * Builds the $.cash utility object
@@ -47,7 +47,9 @@ NOTE: Physical cash is contraband. Possession is illegal. Use $bank for legal cr
     // FIND CASH
     // ═══════════════════════════════════════════════════════════════════
 
-    obj.setMethod('find', `
+    obj.setMethod(
+      'find',
+      `
       /** Find all cash on a player.
        *  @param player - The player to search
        *  @returns { total: number, stacks: [{item, location, quantity}] }
@@ -89,13 +91,16 @@ NOTE: Physical cash is contraband. Possession is illegal. Use $bank for legal cr
       }
 
       return { total, stacks };
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // HAS CASH
     // ═══════════════════════════════════════════════════════════════════
 
-    obj.setMethod('has', `
+    obj.setMethod(
+      'has',
+      `
       /** Check if player has at least a certain amount of cash.
        *  @param player - The player to check
        *  @param amount - The amount needed
@@ -106,13 +111,16 @@ NOTE: Physical cash is contraband. Possession is illegal. Use $bank for legal cr
 
       const found = await self.find(player);
       return found.total >= amount;
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // TAKE CASH
     // ═══════════════════════════════════════════════════════════════════
 
-    obj.setMethod('take', `
+    obj.setMethod(
+      'take',
+      `
       /** Take cash from a player.
        *  Modifies stack quantities directly, recycles empty stacks.
        *  @param player - The player to take from
@@ -166,13 +174,16 @@ NOTE: Physical cash is contraband. Possession is illegal. Use $bank for legal cr
         taken: amount,
         message: 'Took $' + amount + '.',
       };
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // GIVE CASH
     // ═══════════════════════════════════════════════════════════════════
 
-    obj.setMethod('give', `
+    obj.setMethod(
+      'give',
+      `
       /** Give cash to a player/target.
        *  Tries to add to existing stack, otherwise creates new.
        *  @param target - The player/entity to give cash to
@@ -279,13 +290,16 @@ NOTE: Physical cash is contraband. Possession is illegal. Use $bank for legal cr
         location: targetLocation,
         message: 'Placed $' + amount + ' in ' + locationName + '.',
       };
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // TRANSFER CASH
     // ═══════════════════════════════════════════════════════════════════
 
-    obj.setMethod('transfer', `
+    obj.setMethod(
+      'transfer',
+      `
       /** Transfer cash from one player to another.
        *  @param from - The player to take from
        *  @param to - The player to give to
@@ -318,7 +332,8 @@ NOTE: Physical cash is contraband. Possession is illegal. Use $bank for legal cr
         success: true,
         message: 'Transferred $' + amount + '.',
       };
-    `);
+    `,
+    );
 
     return obj;
   }

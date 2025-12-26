@@ -1,8 +1,8 @@
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, type Observable } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import type { IConnection, ConnectionState } from '../../types/connection.js';
-import type { ITransport } from '../../types/transport.js';
 import type { AuthInfo } from '../../types/auth.js';
+import type { ConnectionState, IConnection } from '../../types/connection.js';
+import type { ITransport } from '../../types/transport.js';
 
 /**
  * Connection wraps a transport with session state
@@ -39,13 +39,15 @@ export class Connection implements IConnection {
     this.output$ = transport.output$;
 
     // Auto-transition to connected
-    transport.connected$.pipe(takeUntil(transport.closed$)).subscribe((connected) => {
-      if (connected && this.stateSubject.value === 'connecting') {
-        this.stateSubject.next('connected');
-      } else if (!connected) {
-        this.stateSubject.next('disconnected');
-      }
-    });
+    transport.connected$
+      .pipe(takeUntil(transport.closed$))
+      .subscribe((connected) => {
+        if (connected && this.stateSubject.value === 'connecting') {
+          this.stateSubject.next('connected');
+        } else if (!connected) {
+          this.stateSubject.next('disconnected');
+        }
+      });
 
     // Handle close
     transport.closed$.subscribe(() => {

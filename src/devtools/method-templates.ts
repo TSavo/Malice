@@ -41,13 +41,10 @@ export class MethodTemplateGenerator {
           args: [],
           returnType: 'void',
           context: [],
-          category: 'lifecycle'
+          category: 'lifecycle',
         },
         description: 'Called when object is first created or initialized',
-        examples: [
-          '// Log object creation',
-          'await onCreate();'
-        ]
+        examples: ['// Log object creation', 'await onCreate();'],
       },
       {
         category: 'lifecycle',
@@ -70,14 +67,11 @@ export class MethodTemplateGenerator {
           args: [],
           returnType: 'void',
           context: [],
-          category: 'lifecycle'
+          category: 'lifecycle',
         },
         description: 'Called when object is being destroyed or cleaned up',
-        examples: [
-          '// Clean up before destruction',
-          'await onDestroy();'
-        ]
-      }
+        examples: ['// Clean up before destruction', 'await onDestroy();'],
+      },
     ],
     events: [
       {
@@ -103,13 +97,10 @@ export class MethodTemplateGenerator {
           args: ['player: any'],
           returnType: 'void',
           context: [],
-          category: 'events'
+          category: 'events',
         },
         description: 'Called when a player enters this room or object',
-        examples: [
-          '// Welcome player to room',
-          'await onPlayerEnter(player);'
-        ]
+        examples: ['// Welcome player to room', 'await onPlayerEnter(player);'],
       },
       {
         category: 'events',
@@ -134,14 +125,11 @@ export class MethodTemplateGenerator {
           args: ['player: any'],
           returnType: 'void',
           context: [],
-          category: 'events'
+          category: 'events',
         },
         description: 'Called when a player leaves this room or object',
-        examples: [
-          '// Handle player departure',
-          'await onPlayerExit(player);'
-        ]
-      }
+        examples: ['// Handle player departure', 'await onPlayerExit(player);'],
+      },
     ],
     public: [
       {
@@ -189,13 +177,13 @@ export class MethodTemplateGenerator {
           args: ['target?: any'],
           returnType: 'string',
           context: [],
-          category: 'public'
+          category: 'public',
         },
         description: 'Look at surroundings or examine a specific object',
         examples: [
           'await look(); // Look around',
-          'await look(object); // Examine object'
-        ]
+          'await look(object); // Examine object',
+        ],
       },
       {
         category: 'public',
@@ -234,14 +222,14 @@ export class MethodTemplateGenerator {
           args: ['message: string'],
           returnType: 'void',
           context: [],
-          category: 'public'
+          category: 'public',
         },
         description: 'Send a message to everyone in the same location',
         examples: [
           'await say("Hello everyone!");',
-          'await say(""); // Try without message'
-        ]
-      }
+          'await say(""); // Try without message',
+        ],
+      },
     ],
     combat: [
       {
@@ -303,14 +291,14 @@ export class MethodTemplateGenerator {
           args: ['target: any'],
           returnType: 'string',
           context: [],
-          category: 'combat'
+          category: 'combat',
         },
         description: 'Attack a target with combat calculations',
         examples: [
           'await attack(monster);',
-          'await attack(5); // Attack object #5'
-        ]
-      }
+          'await attack(5); // Attack object #5',
+        ],
+      },
     ],
     communication: [
       {
@@ -357,14 +345,14 @@ export class MethodTemplateGenerator {
           args: ['target: any', 'message: string'],
           returnType: 'void',
           context: [],
-          category: 'communication'
+          category: 'communication',
         },
         description: 'Send a private message to a specific target',
         examples: [
           'await tell(player, "Hello there!");',
-          'await tell(42, "Secret message");'
-        ]
-      }
+          'await tell(42, "Secret message");',
+        ],
+      },
     ],
     movement: [
       {
@@ -418,15 +406,11 @@ export class MethodTemplateGenerator {
           args: ['direction: string'],
           returnType: 'string',
           context: [],
-          category: 'movement'
+          category: 'movement',
         },
         description: 'Move in a direction through exits',
-        examples: [
-          'await go("north");',
-          'await go("up");',
-          'await go("out");'
-        ]
-      }
+        examples: ['await go("north");', 'await go("up");', 'await go("out");'],
+      },
     ],
     internal: [
       {
@@ -466,15 +450,15 @@ export class MethodTemplateGenerator {
           args: ['player: any', 'permission: string', 'context?: any'],
           returnType: 'boolean',
           context: [],
-          category: 'internal'
+          category: 'internal',
         },
         description: 'Internal helper to validate player permissions',
         examples: [
           'if (!await _validatePermission(player, "build")) return;',
-          'const canModify = await _validatePermission(player, "modify");'
-        ]
-      }
-    ]
+          'const canModify = await _validatePermission(player, "modify");',
+        ],
+      },
+    ],
   };
 
   /**
@@ -482,10 +466,10 @@ export class MethodTemplateGenerator {
    */
   getTemplate(category: string, methodName?: string): MethodTemplate | null {
     const templates = this.TEMPLATES[category] || [];
-    
+
     if (methodName) {
       // Find specific method template
-      const template = templates.find(t => t.methodName === methodName);
+      const template = templates.find((t) => t.methodName === methodName);
       return template || null;
     } else {
       // Return first template from category as example
@@ -513,7 +497,7 @@ export class MethodTemplateGenerator {
   generateTemplate(
     category: string,
     methodName: string,
-    pattern: 'getter' | 'setter' | 'validator' | 'handler'
+    pattern: 'getter' | 'setter' | 'validator' | 'handler',
   ): MethodTemplate | null {
     const baseTemplate = this.getBasePatternTemplate(pattern);
     if (!baseTemplate) return null;
@@ -527,10 +511,12 @@ export class MethodTemplateGenerator {
         args: baseTemplate.args,
         returnType: baseTemplate.returnType,
         context: [],
-        category
+        category,
       },
       description: baseTemplate.description.replace(/METHOD_NAME/g, methodName),
-      examples: baseTemplate.examples.map((ex: string) => ex.replace(/METHOD_NAME/g, methodName))
+      examples: baseTemplate.examples.map((ex: string) =>
+        ex.replace(/METHOD_NAME/g, methodName),
+      ),
     };
   }
 
@@ -551,7 +537,7 @@ export class MethodTemplateGenerator {
         args: [],
         returnType: 'any',
         description: 'Get METHOD_NAME property value',
-        examples: ['const value = await METHOD_NAME();']
+        examples: ['const value = await METHOD_NAME();'],
       },
       setter: {
         template: `async function METHOD_NAME(self: any, $: any, pass: any, ...args: any[]): Promise<void> {
@@ -570,7 +556,7 @@ export class MethodTemplateGenerator {
         args: ['value: any'],
         returnType: 'void',
         description: 'Set METHOD_NAME property value',
-        examples: ['await METHOD_NAME(newValue);']
+        examples: ['await METHOD_NAME(newValue);'],
       },
       validator: {
         template: `async function METHOD_NAME(self: any, $: any, pass: any, ...args: any[]): Promise<boolean> {
@@ -591,7 +577,7 @@ export class MethodTemplateGenerator {
         args: ['input: any'],
         returnType: 'boolean',
         description: 'Validate METHOD_NAME input or state',
-        examples: ['const isValid = await METHOD_NAME(input);']
+        examples: ['const isValid = await METHOD_NAME(input);'],
       },
       handler: {
         template: `async function METHOD_NAME(self: any, $: any, pass: any, ...args: any[]): Promise<void> {
@@ -617,10 +603,23 @@ export class MethodTemplateGenerator {
         args: ['event: any', 'data?: any'],
         returnType: 'void',
         description: 'Handle METHOD_NAME events',
-        examples: ['await METHOD_NAME(event, data);']
-      }
+        examples: ['await METHOD_NAME(event, data);'],
+      },
     };
 
-    return (patterns as Record<string, { template: string; args: string[]; returnType: string; description: string; examples: string[] }>)[pattern] || null;
+    return (
+      (
+        patterns as Record<
+          string,
+          {
+            template: string;
+            args: string[];
+            returnType: string;
+            description: string;
+            examples: string[];
+          }
+        >
+      )[pattern] || null
+    );
   }
 }

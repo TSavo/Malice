@@ -1,5 +1,5 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Payphone extends Phone: bolted down, requires bank payment per call.
@@ -32,7 +32,9 @@ USAGE: Caller needs bank account with sufficient balance. Out of service if bank
       methods: {},
     });
 
-    obj.setMethod('dial', `
+    obj.setMethod(
+      'dial',
+      `
       const targetNumber = args[0];
       const bank = self.bank || $.bank || null;
       const account = self.account;
@@ -50,12 +52,25 @@ USAGE: Caller needs bank account with sufficient balance. Out of service if bank
 
       // proceed with normal dial
       return await pass(targetNumber);
-    `);
+    `,
+    );
 
-    obj.setPropertyDescription('boltedDown', 'Whether the payphone is fixed in place and cannot be moved');
-    obj.setPropertyDescription('pricePerCall', 'Cost in currency units charged per call');
-    obj.setPropertyDescription('bank', 'Reference to the bank object that processes payments');
-    obj.setPropertyDescription('account', 'Destination account ID where call payments are deposited');
+    obj.setPropertyDescription(
+      'boltedDown',
+      'Whether the payphone is fixed in place and cannot be moved',
+    );
+    obj.setPropertyDescription(
+      'pricePerCall',
+      'Cost in currency units charged per call',
+    );
+    obj.setPropertyDescription(
+      'bank',
+      'Reference to the bank object that processes payments',
+    );
+    obj.setPropertyDescription(
+      'account',
+      'Destination account ID where call payments are deposited',
+    );
 
     return obj;
   }

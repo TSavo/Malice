@@ -11,13 +11,13 @@
  * Exposed as $.logger but blocks all attempts to modify it.
  */
 
-import { getGameLogger } from './game-logger.js';
-import type { ObjId } from '../../types/object.js';
 import type {
-  LogQuery,
   CommandPattern,
   CoordinationPattern,
+  LogQuery,
 } from '../../types/log.js';
+import type { ObjId } from '../../types/object.js';
+import { getGameLogger } from './game-logger.js';
 
 /**
  * LoggerFacade - looks like a RuntimeObject but is pure TypeScript
@@ -60,7 +60,9 @@ export class LoggerFacade {
    * Block call - use typed methods instead
    */
   async call(_method: string, ..._args: any[]): Promise<any> {
-    throw new Error('$.logger methods are not callable via call() - use typed methods directly');
+    throw new Error(
+      '$.logger methods are not callable via call() - use typed methods directly',
+    );
   }
 
   // ==========================================================================
@@ -83,7 +85,7 @@ export class LoggerFacade {
    */
   async analyzeCommandPattern(
     actor: ObjId,
-    windowMinutes = 60
+    windowMinutes = 60,
   ): Promise<CommandPattern | null> {
     const logger = getGameLogger();
     if (!logger) {
@@ -97,7 +99,7 @@ export class LoggerFacade {
    */
   async analyzeCoordination(
     players: ObjId[],
-    windowHours = 24
+    windowHours = 24,
   ): Promise<CoordinationPattern> {
     const logger = getGameLogger();
     if (!logger) {

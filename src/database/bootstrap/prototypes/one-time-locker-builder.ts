@@ -1,5 +1,5 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Builds the OneTimeLocker prototype
@@ -26,7 +26,8 @@ export class OneTimeLockerBuilder {
       parent: parentObj!,
       properties: {
         name: 'One-Time Locker Bank',
-        description: 'A bank of storage lockers that support one-time access codes for couriers.',
+        description:
+          'A bank of storage lockers that support one-time access codes for couriers.',
         // Override rental duration - courier lockers are shorter term (24 hours default)
         rentalDurationMs: 24 * 60 * 60 * 1000,
 
@@ -55,7 +56,9 @@ VERB REGISTRATION: Registers verbs when placed in room or player enters. Unregis
     // ═══════════════════════════════════════════════════════════════════
 
     // doRent - rent an available compartment
-    obj.setMethod('doRent', `
+    obj.setMethod(
+      'doRent',
+      `
       if (!player) return 'Rent what?';
 
 
@@ -98,10 +101,13 @@ VERB REGISTRATION: Registers verbs when placed in room or player enters. Unregis
       }
 
       return 'You now own compartment ' + compId + '. Set a master code with: set code on locker ' + compId;
-    `);
+    `,
+    );
 
     // doOpen - open a compartment
-    obj.setMethod('doOpen', `
+    obj.setMethod(
+      'doOpen',
+      `
       const compId = (args[0] || '').trim();
 
 
@@ -159,11 +165,14 @@ VERB REGISTRATION: Registers verbs when placed in room or player enters. Unregis
       }
 
       return await self.describeCompartment(compId, player);
-    `);
+    `,
+    );
 
     // doClose - close and lock a compartment
-    obj.setMethod('doClose', `
-      const compId = ((args[0] || '').trim().split(/\s+/)[0]) || '';
+    obj.setMethod(
+      'doClose',
+      `
+      const compId = ((args[0] || '').trim().split(/s+/)[0]) || '';
 
 
       if (!player) return 'Close what?';
@@ -200,11 +209,14 @@ VERB REGISTRATION: Registers verbs when placed in room or player enters. Unregis
       });
 
       return 'Compartment ' + compId + ' is now locked.';
-    `);
+    `,
+    );
 
     // doSetCode - set master code (owner only)
-    obj.setMethod('doSetCode', `
-      const compId = ((args[0] || '').trim().split(/\s+/)[0]) || '';
+    obj.setMethod(
+      'doSetCode',
+      `
+      const compId = ((args[0] || '').trim().split(/s+/)[0]) || '';
 
 
       if (!player) return 'Set code on what?';
@@ -228,11 +240,14 @@ VERB REGISTRATION: Registers verbs when placed in room or player enters. Unregis
       }
 
       return 'Master code set for compartment ' + compId + '.';
-    `);
+    `,
+    );
 
     // doGetCode - generate one-time code (owner only)
-    obj.setMethod('doGetCode', `
-      const compId = ((args[0] || '').trim().split(/\s+/)[0]) || '';
+    obj.setMethod(
+      'doGetCode',
+      `
+      const compId = ((args[0] || '').trim().split(/s+/)[0]) || '';
 
 
       if (!player) return 'Get code from what?';
@@ -259,11 +274,14 @@ VERB REGISTRATION: Registers verbs when placed in room or player enters. Unregis
       await player.tell('Give this to a courier. It can only be used once.');
 
       return '';
-    `);
+    `,
+    );
 
     // doCheck - view status (owner only)
-    obj.setMethod('doCheck', `
-      const compId = ((args[0] || '').trim().split(/\s+/)[0]) || '';
+    obj.setMethod(
+      'doCheck',
+      `
+      const compId = ((args[0] || '').trim().split(/s+/)[0]) || '';
 
 
       if (!player) return 'Check what?';
@@ -297,11 +315,14 @@ VERB REGISTRATION: Registers verbs when placed in room or player enters. Unregis
       }
 
       return status;
-    `);
+    `,
+    );
 
     // doRelease - give up ownership
-    obj.setMethod('doRelease', `
-      const compId = ((args[0] || '').trim().split(/\s+/)[0]) || '';
+    obj.setMethod(
+      'doRelease',
+      `
+      const compId = ((args[0] || '').trim().split(/s+/)[0]) || '';
 
 
       if (!player) return 'Release what?';
@@ -324,11 +345,14 @@ VERB REGISTRATION: Registers verbs when placed in room or player enters. Unregis
       }
 
       return 'You no longer own compartment ' + compId + '.';
-    `);
+    `,
+    );
 
     // doRenew - extend rental period
-    obj.setMethod('doRenew', `
-      const compId = ((args[0] || '').trim().split(/\s+/)[0]) || '';
+    obj.setMethod(
+      'doRenew',
+      `
+      const compId = ((args[0] || '').trim().split(/s+/)[0]) || '';
 
 
       if (!player) return 'Renew what?';
@@ -346,11 +370,14 @@ VERB REGISTRATION: Registers verbs when placed in room or player enters. Unregis
 
       const info = await self.getExpirationInfo(compId);
       return 'Rental extended. Expires in ' + info.timeRemaining + '.';
-    `);
+    `,
+    );
 
     // doLook - look at locker bank or specific compartment
-    obj.setMethod('doLook', `
-      const compId = ((args[0] || '').trim().split(/\s+/)[0]) || '';
+    obj.setMethod(
+      'doLook',
+      `
+      const compId = ((args[0] || '').trim().split(/s+/)[0]) || '';
 
 
       if (compId) {
@@ -358,16 +385,19 @@ VERB REGISTRATION: Registers verbs when placed in room or player enters. Unregis
       }
 
       return await self.describe();
-    `);
+    `,
+    );
 
     // doPut - put item in compartment
-    obj.setMethod('doPut', `
+    obj.setMethod(
+      'doPut',
+      `
       /** Store an item in a locker compartment.
        *  Usage: put <item> in locker <compartment>
        *  Example: put apple in locker A1
        */
       const item = args[0];
-      const compId = ((args[1] || '').trim().split(/\s+/)[0]) || '';
+      const compId = ((args[1] || '').trim().split(/s+/)[0]) || '';
 
 
       if (!player) return 'Put what where?';
@@ -398,16 +428,19 @@ VERB REGISTRATION: Registers verbs when placed in room or player enters. Unregis
       }
 
       return 'You put ' + item.name + ' in compartment ' + compId + '.';
-    `);
+    `,
+    );
 
     // doGet - take an item from a compartment
-    obj.setMethod('doGet', `
+    obj.setMethod(
+      'doGet',
+      `
       /** Take something out of a locker compartment.
        *  Usage: get from locker <compartment>
        *  Notes:
        *  - If multiple items are inside, you'll be prompted to choose.
        */
-      const compId = ((args[0] || '').trim().split(/\s+/)[0]) || '';
+      const compId = ((args[0] || '').trim().split(/s+/)[0]) || '';
 
       if (!player) return 'Get what?';
       if (!compId) return 'Which compartment?';
@@ -471,10 +504,14 @@ VERB REGISTRATION: Registers verbs when placed in room or player enters. Unregis
       }
 
       return 'You take ' + foundItem.name + '.';
-    `);
+    `,
+    );
 
     // Property descriptions
-    obj.setPropertyDescription('rentalDurationMs', 'Rental period in milliseconds (24 hours for courier lockers vs 7 days for base)');
+    obj.setPropertyDescription(
+      'rentalDurationMs',
+      'Rental period in milliseconds (24 hours for courier lockers vs 7 days for base)',
+    );
 
     return obj;
   }

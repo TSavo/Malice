@@ -1,5 +1,5 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Builds the Bank prototype
@@ -52,15 +52,23 @@ NOTE: This is the legal payment system. Physical cash ($dollar) is contraband.`,
     });
 
     // Add property descriptions
-    obj.setPropertyDescription('accounts', "All bank accounts: { accountId: { owner, balance, frozen } }");
-    obj.setPropertyDescription('ledger', "Append-only transaction log for auditing.");
+    obj.setPropertyDescription(
+      'accounts',
+      'All bank accounts: { accountId: { owner, balance, frozen } }',
+    );
+    obj.setPropertyDescription(
+      'ledger',
+      'Append-only transaction log for auditing.',
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // VALIDATION HELPERS
     // ═══════════════════════════════════════════════════════════════════
 
     // validateAmount(amount) - ensure positive integer
-    obj.setMethod('validateAmount', `
+    obj.setMethod(
+      'validateAmount',
+      `
       const amount = args[0];
 
       if (amount === undefined || amount === null) {
@@ -88,11 +96,14 @@ NOTE: This is the legal payment system. Physical cash ($dollar) is contraband.`,
       }
 
       return { valid: true, amount: amount };
-    `);
+    `,
+    );
 
     // checkIdempotency(key) - check if operation was already processed
     // Returns { processed: bool, result?: any }
-    obj.setMethod('checkIdempotency', `
+    obj.setMethod(
+      'checkIdempotency',
+      `
       const key = args[0];
 
       if (!key) {
@@ -105,10 +116,13 @@ NOTE: This is the legal payment system. Physical cash ($dollar) is contraband.`,
       }
 
       return { processed: false };
-    `);
+    `,
+    );
 
     // recordIdempotency(key, result) - record that operation was processed
-    obj.setMethod('recordIdempotency', `
+    obj.setMethod(
+      'recordIdempotency',
+      `
       const key = args[0];
       const result = args[1];
 
@@ -120,28 +134,37 @@ NOTE: This is the legal payment system. Physical cash ($dollar) is contraband.`,
         timestamp: new Date().toISOString(),
       };
       self.processedKeys = processed;
-    `);
+    `,
+    );
 
     // generateAccountId() - generate unique account ID
-    obj.setMethod('generateAccountId', `
+    obj.setMethod(
+      'generateAccountId',
+      `
       const num = self.nextAccountNum || 1;
       self.nextAccountNum = num + 1;
       return 'ACC-' + String(num).padStart(6, '0');
-    `);
+    `,
+    );
 
     // generateTxId() - generate unique transaction ID
-    obj.setMethod('generateTxId', `
+    obj.setMethod(
+      'generateTxId',
+      `
       const num = self.nextTxNum || 1;
       self.nextTxNum = num + 1;
       return 'TX-' + String(num).padStart(8, '0');
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // ACCOUNT MANAGEMENT
     // ═══════════════════════════════════════════════════════════════════
 
     // createAccount(owner, idempotencyKey?) - create new account for owner
-    obj.setMethod('createAccount', `
+    obj.setMethod(
+      'createAccount',
+      `
       const owner = args[0];
       const idempotencyKey = args[1];
 
@@ -173,17 +196,23 @@ NOTE: This is the legal payment system. Physical cash ($dollar) is contraband.`,
       const result = { success: true, accountId: accountId };
       if (idempotencyKey) await self.recordIdempotency(idempotencyKey, result);
       return result;
-    `);
+    `,
+    );
 
     // getAccount(accountId) - get account data
-    obj.setMethod('getAccount', `
+    obj.setMethod(
+      'getAccount',
+      `
       const accountId = args[0];
       const accounts = self.accounts || {};
       return accounts[accountId] || null;
-    `);
+    `,
+    );
 
     // getBalance(accountId) - get current balance
-    obj.setMethod('getBalance', `
+    obj.setMethod(
+      'getBalance',
+      `
       const accountId = args[0];
       const accounts = self.accounts || {};
       const account = accounts[accountId];
@@ -193,10 +222,13 @@ NOTE: This is the legal payment system. Physical cash ($dollar) is contraband.`,
       }
 
       return { success: true, balance: account.balance };
-    `);
+    `,
+    );
 
     // getAccountByOwner(owner) - find account(s) by owner
-    obj.setMethod('getAccountByOwner', `
+    obj.setMethod(
+      'getAccountByOwner',
+      `
       const owner = args[0];
       if (!owner) return [];
 
@@ -212,10 +244,13 @@ NOTE: This is the legal payment system. Physical cash ($dollar) is contraband.`,
       }
 
       return matches;
-    `);
+    `,
+    );
 
     // freezeAccount(accountId) - prevent all transactions
-    obj.setMethod('freezeAccount', `
+    obj.setMethod(
+      'freezeAccount',
+      `
       const accountId = args[0];
       const accounts = self.accounts || {};
       const account = accounts[accountId];
@@ -228,10 +263,13 @@ NOTE: This is the legal payment system. Physical cash ($dollar) is contraband.`,
       self.accounts = accounts;
 
       return { success: true };
-    `);
+    `,
+    );
 
     // unfreezeAccount(accountId) - allow transactions again
-    obj.setMethod('unfreezeAccount', `
+    obj.setMethod(
+      'unfreezeAccount',
+      `
       const accountId = args[0];
       const accounts = self.accounts || {};
       const account = accounts[accountId];
@@ -244,7 +282,8 @@ NOTE: This is the legal payment system. Physical cash ($dollar) is contraband.`,
       self.accounts = accounts;
 
       return { success: true };
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // TRANSACTIONS
@@ -253,7 +292,9 @@ NOTE: This is the legal payment system. Physical cash ($dollar) is contraband.`,
     // issue(toAccount, amount, idempotencyKey, memo?) - CREATE money into existence
     // This is the ONLY way money enters the system.
     // Used for: job payments, system rewards, initial grants
-    obj.setMethod('issue', `
+    obj.setMethod(
+      'issue',
+      `
       const accountId = args[0];
       const amount = args[1];
       const idempotencyKey = args[2];
@@ -319,12 +360,15 @@ NOTE: This is the legal payment system. Physical cash ($dollar) is contraband.`,
       };
       if (idempotencyKey) await self.recordIdempotency(idempotencyKey, result);
       return result;
-    `);
+    `,
+    );
 
     // burn(fromAccount, amount, idempotencyKey, memo?) - DESTROY money
     // Removes money from existence entirely.
     // Used for: taxes, fines, fees, account closures
-    obj.setMethod('burn', `
+    obj.setMethod(
+      'burn',
+      `
       const accountId = args[0];
       const amount = args[1];
       const idempotencyKey = args[2];
@@ -397,11 +441,14 @@ NOTE: This is the legal payment system. Physical cash ($dollar) is contraband.`,
       };
       if (idempotencyKey) await self.recordIdempotency(idempotencyKey, result);
       return result;
-    `);
+    `,
+    );
 
     // transfer(fromAccountId, toAccountId, amount, idempotencyKey, memo?) - move funds
     // ATOMIC: Either both accounts update or neither does
-    obj.setMethod('transfer', `
+    obj.setMethod(
+      'transfer',
+      `
       const fromId = args[0];
       const toId = args[1];
       const amount = args[2];
@@ -500,21 +547,27 @@ NOTE: This is the legal payment system. Physical cash ($dollar) is contraband.`,
       };
       if (idempotencyKey) await self.recordIdempotency(idempotencyKey, result);
       return result;
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // LEDGER QUERIES
     // ═══════════════════════════════════════════════════════════════════
 
     // getTransaction(txId) - get single transaction by ID
-    obj.setMethod('getTransaction', `
+    obj.setMethod(
+      'getTransaction',
+      `
       const txId = args[0];
       const ledger = self.ledger || [];
       return ledger.find(tx => tx.id === txId) || null;
-    `);
+    `,
+    );
 
     // getAccountHistory(accountId, limit?) - get transactions for account
-    obj.setMethod('getAccountHistory', `
+    obj.setMethod(
+      'getAccountHistory',
+      `
       const accountId = args[0];
       const limit = args[1] || 100;
 
@@ -530,28 +583,37 @@ NOTE: This is the legal payment system. Physical cash ($dollar) is contraband.`,
       }
 
       return history;
-    `);
+    `,
+    );
 
     // getRecentTransactions(limit?) - get most recent transactions
-    obj.setMethod('getRecentTransactions', `
+    obj.setMethod(
+      'getRecentTransactions',
+      `
       const limit = args[0] || 100;
       const ledger = self.ledger || [];
       return ledger.slice(-limit).reverse();
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // UTILITIES
     // ═══════════════════════════════════════════════════════════════════
 
     // getTotalSupply() - total money in existence (issued - burned)
-    obj.setMethod('getTotalSupply', `
+    obj.setMethod(
+      'getTotalSupply',
+      `
       const issued = self.totalIssued || 0;
       const burned = self.totalBurned || 0;
       return issued - burned;
-    `);
+    `,
+    );
 
     // getSupplyStats() - detailed supply information
-    obj.setMethod('getSupplyStats', `
+    obj.setMethod(
+      'getSupplyStats',
+      `
       const issued = self.totalIssued || 0;
       const burned = self.totalBurned || 0;
       const supply = issued - burned;
@@ -570,16 +632,22 @@ NOTE: This is the legal payment system. Physical cash ($dollar) is contraband.`,
         accountTotal: accountTotal,
         balanced: supply === accountTotal,  // Should always be true
       };
-    `);
+    `,
+    );
 
     // getAccountCount() - number of accounts
-    obj.setMethod('getAccountCount', `
+    obj.setMethod(
+      'getAccountCount',
+      `
       const accounts = self.accounts || {};
       return Object.keys(accounts).length;
-    `);
+    `,
+    );
 
     // cleanupOldIdempotencyKeys(maxAgeMs?) - remove old processed keys
-    obj.setMethod('cleanupOldIdempotencyKeys', `
+    obj.setMethod(
+      'cleanupOldIdempotencyKeys',
+      `
       const maxAgeMs = args[0] || (7 * 24 * 60 * 60 * 1000); // Default 7 days
       const cutoff = new Date(Date.now() - maxAgeMs).toISOString();
 
@@ -595,7 +663,8 @@ NOTE: This is the legal payment system. Physical cash ($dollar) is contraband.`,
 
       self.processedKeys = processed;
       return removed;
-    `);
+    `,
+    );
 
     return obj;
   }

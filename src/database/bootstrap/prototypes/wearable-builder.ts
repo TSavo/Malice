@@ -1,5 +1,5 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Builds the Wearable prototype
@@ -67,7 +67,9 @@ REQUIRED PARTS: Can't wear gloves without hands, boots without feet. Missing par
       methods: {},
     });
 
-    obj.setMethod('canWear', `
+    obj.setMethod(
+      'canWear',
+      `
       /** Check if this item can be worn by the given wearer.
        *  @param wearer - The player trying to wear this
        *  @returns { success: boolean, error?: string }
@@ -148,9 +150,12 @@ REQUIRED PARTS: Can't wear gloves without hands, boots without feet. Missing par
       }
 
       return { success: true };
-    `);
+    `,
+    );
 
-    obj.setMethod('getWornOnSlot', `
+    obj.setMethod(
+      'getWornOnSlot',
+      `
       /** Get items worn on a specific slot by a wearer.
        *  @param wearer - The player
        *  @param slot - The slot name (e.g., 'torso', 'head')
@@ -194,9 +199,12 @@ REQUIRED PARTS: Can't wear gloves without hands, boots without feet. Missing par
       // Get worn items from this part
       const worn = (part.worn || []).filter(item => item);
       return worn;
-    `);
+    `,
+    );
 
-    obj.setMethod('wear', `
+    obj.setMethod(
+      'wear',
+      `
       /** Wear this item.
        *  @param wearer - The player wearing this
        *  @returns { success: boolean, message: string }
@@ -260,9 +268,12 @@ REQUIRED PARTS: Can't wear gloves without hands, boots without feet. Missing par
       await self.moveTo(wearer);
 
       return { success: true, message: 'You put on ' + self.name + '.' };
-    `);
+    `,
+    );
 
-    obj.setMethod('remove', `
+    obj.setMethod(
+      'remove',
+      `
       /** Remove this item (take it off).
        *  @param wearer - The player removing this (optional, defaults to wornBy)
        *  @returns { success: boolean, message: string }
@@ -336,9 +347,12 @@ REQUIRED PARTS: Can't wear gloves without hands, boots without feet. Missing par
       self.wornOn = null;
 
       return { success: true, message: 'You take off ' + self.name + '.' };
-    `);
+    `,
+    );
 
-    obj.setMethod('getWornDescription', `
+    obj.setMethod(
+      'getWornDescription',
+      `
       /** Get the description shown when this is worn.
        *  @returns Description string
        */
@@ -347,9 +361,12 @@ REQUIRED PARTS: Can't wear gloves without hands, boots without feet. Missing par
       }
       // Default: just the item name
       return self.name;
-    `);
+    `,
+    );
 
-    obj.setMethod('describe', `
+    obj.setMethod(
+      'describe',
+      `
       /** Get full description of this wearable.
        *  @returns Description string
        */
@@ -389,15 +406,37 @@ REQUIRED PARTS: Can't wear gloves without hands, boots without feet. Missing par
       }
 
       return desc.trim();
-    `);
+    `,
+    );
 
-    obj.setPropertyDescription('covers', 'Array of body part slot names this item covers when worn (e.g., head, torso, hands, feet)');
-    obj.setPropertyDescription('layer', 'Stacking layer for clothing (1=underwear, 2=base, 3=mid, 4=outer, 5=outerwear). Only one item per layer per slot.');
-    obj.setPropertyDescription('warmth', 'Cold resistance value (0-100). Higher values provide better protection from cold environments.');
-    obj.setPropertyDescription('protection', 'Damage reduction value (0-100). Armor maximizes this, clothing provides minimal protection.');
-    obj.setPropertyDescription('wornOn', 'The body part object this item is currently worn on (null if not worn)');
-    obj.setPropertyDescription('wornBy', 'The agent who is currently wearing this item (null if not worn)');
-    obj.setPropertyDescription('wornDescription', 'Description shown when this item is worn. If null, uses item name in generic phrase.');
+    obj.setPropertyDescription(
+      'covers',
+      'Array of body part slot names this item covers when worn (e.g., head, torso, hands, feet)',
+    );
+    obj.setPropertyDescription(
+      'layer',
+      'Stacking layer for clothing (1=underwear, 2=base, 3=mid, 4=outer, 5=outerwear). Only one item per layer per slot.',
+    );
+    obj.setPropertyDescription(
+      'warmth',
+      'Cold resistance value (0-100). Higher values provide better protection from cold environments.',
+    );
+    obj.setPropertyDescription(
+      'protection',
+      'Damage reduction value (0-100). Armor maximizes this, clothing provides minimal protection.',
+    );
+    obj.setPropertyDescription(
+      'wornOn',
+      'The body part object this item is currently worn on (null if not worn)',
+    );
+    obj.setPropertyDescription(
+      'wornBy',
+      'The agent who is currently wearing this item (null if not worn)',
+    );
+    obj.setPropertyDescription(
+      'wornDescription',
+      'Description shown when this item is worn. If null, uses item name in generic phrase.',
+    );
 
     return obj;
   }

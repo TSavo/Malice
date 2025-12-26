@@ -14,7 +14,7 @@ export enum RelationshipType {
   OVERRIDE = 'override',
   REFERENCE = 'reference',
   IMPLEMENTATION = 'implementation',
-  DELEGATION = 'delegation'
+  DELEGATION = 'delegation',
 }
 
 /**
@@ -119,7 +119,10 @@ export class RelationshipAnalyzer {
   /**
    * Analyze method relationships
    */
-  async analyzeMethodRelationships(objectId: ObjId, methodName: string): Promise<RelationshipAnalysis> {
+  async analyzeMethodRelationships(
+    objectId: ObjId,
+    methodName: string,
+  ): Promise<RelationshipAnalysis> {
     // Return empty analysis - implementation pending
     return {
       objectId,
@@ -135,7 +138,7 @@ export class RelationshipAnalyzer {
       callFrequency: 0,
       fanOut: 0,
       fanIn: 0,
-      testCoverage: 0
+      testCoverage: 0,
     };
   }
 
@@ -158,14 +161,17 @@ export class RelationshipAnalyzer {
       totalEdges: 0,
       avgComplexity: 0,
       mostCalled: [],
-      leastCalled: []
+      leastCalled: [],
     };
   }
 
   /**
    * Get callers of a method
    */
-  async getCallers(_objectId: ObjId, _methodName: string): Promise<MethodCaller[]> {
+  async getCallers(
+    _objectId: ObjId,
+    _methodName: string,
+  ): Promise<MethodCaller[]> {
     // Return empty list - implementation pending
     return [];
   }
@@ -173,7 +179,10 @@ export class RelationshipAnalyzer {
   /**
    * Analyze which methods override the given method
    */
-  async analyzeOverriddenBy(_objectId: ObjId, _methodName: string): Promise<MethodOverride[]> {
+  async analyzeOverriddenBy(
+    _objectId: ObjId,
+    _methodName: string,
+  ): Promise<MethodOverride[]> {
     // Return empty list - implementation pending
     return [];
   }
@@ -181,7 +190,10 @@ export class RelationshipAnalyzer {
   /**
    * Find methods related to the given method
    */
-  async findRelatedMethods(_objectId: ObjId, _methodName: string): Promise<RelatedMethod[]> {
+  async findRelatedMethods(
+    _objectId: ObjId,
+    _methodName: string,
+  ): Promise<RelatedMethod[]> {
     // Return empty list - implementation pending
     return [];
   }

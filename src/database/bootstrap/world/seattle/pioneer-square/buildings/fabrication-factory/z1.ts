@@ -121,7 +121,7 @@ Glass walls on either side reveal glimpses of the server halls—endless rows of
         east: '%COOLING',
         south: '%SERVER_D',
         west: '%POWER_DIST',
-        'in': '%E',
+        in: '%E',
       },
     },
 

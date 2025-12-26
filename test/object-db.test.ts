@@ -1,8 +1,9 @@
-import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach, vi } from 'vitest';
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { ObjectDatabase } from '../src/database/object-db.js';
-import type { GameObject } from '../types/object.js';
 
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/?replicaSet=rs0&directConnection=true';
+const MONGO_URI =
+  process.env.MONGO_URI ||
+  'mongodb://localhost:27017/?replicaSet=rs0&directConnection=true';
 const TEST_DB_NAME = 'malice_test_object_db';
 
 describe('ObjectDatabase', () => {
@@ -13,23 +14,23 @@ describe('ObjectDatabase', () => {
     await db.connect();
 
     // Clean up test database before running tests
-    await db['objects'].deleteMany({});
+    await db.objects.deleteMany({});
   }, 15000);
 
   afterAll(async () => {
     // Clean up test database after all tests
-    await db['objects'].deleteMany({});
+    await db.objects.deleteMany({});
     await db.disconnect();
   });
 
   beforeEach(async () => {
     // Clean database before each test
-    await db['objects'].deleteMany({});
+    await db.objects.deleteMany({});
   });
 
   describe('connect()', () => {
     it('should connect to MongoDB successfully', async () => {
-      const testDb = new ObjectDatabase(MONGO_URI, TEST_DB_NAME + '_connect');
+      const testDb = new ObjectDatabase(MONGO_URI, `${TEST_DB_NAME}_connect`);
       await testDb.connect();
 
       // Verify connection by creating an object
@@ -42,72 +43,84 @@ describe('ObjectDatabase', () => {
 
       expect(obj._id).toBe(1);
 
-      await testDb['objects'].deleteMany({});
+      await testDb.objects.deleteMany({});
       await testDb.disconnect();
     });
 
     it('should return early when already connected (line 20)', async () => {
-      const testDb = new ObjectDatabase(MONGO_URI, TEST_DB_NAME + '_double_connect');
+      const testDb = new ObjectDatabase(
+        MONGO_URI,
+        `${TEST_DB_NAME}_double_connect`,
+      );
 
       // First connect
       await testDb.connect();
-      expect(testDb['connected']).toBe(true);
+      expect(testDb.connected).toBe(true);
 
       // Second connect should return early
       await testDb.connect();
-      expect(testDb['connected']).toBe(true);
+      expect(testDb.connected).toBe(true);
 
-      await testDb['objects'].deleteMany({});
+      await testDb.objects.deleteMany({});
       await testDb.disconnect();
     });
 
     it('should create indexes on connect', async () => {
-      const testDb = new ObjectDatabase(MONGO_URI, TEST_DB_NAME + '_indexes');
+      const testDb = new ObjectDatabase(MONGO_URI, `${TEST_DB_NAME}_indexes`);
       await testDb.connect();
 
       // Verify parent index exists
-      const indexes = await testDb['objects'].indexes();
+      const indexes = await testDb.objects.indexes();
       const parentIndex = indexes.find((idx) => idx.key.parent === 1);
       expect(parentIndex).toBeDefined();
 
-      await testDb['objects'].deleteMany({});
+      await testDb.objects.deleteMany({});
       await testDb.disconnect();
     });
   });
 
   describe('disconnect()', () => {
     it('should disconnect from MongoDB successfully', async () => {
-      const testDb = new ObjectDatabase(MONGO_URI, TEST_DB_NAME + '_disconnect');
+      const testDb = new ObjectDatabase(
+        MONGO_URI,
+        `${TEST_DB_NAME}_disconnect`,
+      );
       await testDb.connect();
 
-      expect(testDb['connected']).toBe(true);
+      expect(testDb.connected).toBe(true);
 
       await testDb.disconnect();
-      expect(testDb['connected']).toBe(false);
+      expect(testDb.connected).toBe(false);
     });
 
     it('should return early when not connected', async () => {
-      const testDb = new ObjectDatabase(MONGO_URI, TEST_DB_NAME + '_not_connected');
+      const testDb = new ObjectDatabase(
+        MONGO_URI,
+        `${TEST_DB_NAME}_not_connected`,
+      );
 
       // Try to disconnect without connecting first
-      expect(testDb['connected']).toBe(false);
+      expect(testDb.connected).toBe(false);
 
       // Should not throw, just return early
       await expect(testDb.disconnect()).resolves.not.toThrow();
 
-      expect(testDb['connected']).toBe(false);
+      expect(testDb.connected).toBe(false);
     });
 
     it('should handle multiple disconnects gracefully', async () => {
-      const testDb = new ObjectDatabase(MONGO_URI, TEST_DB_NAME + '_multi_disconnect');
+      const testDb = new ObjectDatabase(
+        MONGO_URI,
+        `${TEST_DB_NAME}_multi_disconnect`,
+      );
       await testDb.connect();
 
       await testDb.disconnect();
-      expect(testDb['connected']).toBe(false);
+      expect(testDb.connected).toBe(false);
 
       // Second disconnect should return early
       await testDb.disconnect();
-      expect(testDb['connected']).toBe(false);
+      expect(testDb.connected).toBe(false);
     });
   });
 
@@ -211,7 +224,9 @@ describe('ObjectDatabase', () => {
 
       const obj = await db.get(70);
       expect(obj?.properties.hp).toBe(50);
-      expect(obj?.modified.getTime()).toBeGreaterThan(beforeModified!.getTime());
+      expect(obj?.modified.getTime()).toBeGreaterThan(
+        beforeModified?.getTime(),
+      );
     });
 
     it('should update object methods', async () => {
@@ -233,7 +248,6 @@ describe('ObjectDatabase', () => {
       expect(obj?.methods.greet.code).toBe('return "Hello";');
     });
   });
-
 
   describe('getChildren()', () => {
     it('should return all children of a parent object', async () => {
@@ -286,9 +300,24 @@ describe('ObjectDatabase', () => {
 
     it('should not return grandchildren', async () => {
       // Create hierarchy: 95 -> 96 -> 97
-      await db.create({ _id: 95, parent: { type: 'objref', value: 0 }, properties: {}, methods: {} });
-      await db.create({ _id: 96, parent: { type: 'objref', value: 95 }, properties: {}, methods: {} });
-      await db.create({ _id: 97, parent: { type: 'objref', value: 96 }, properties: {}, methods: {} });
+      await db.create({
+        _id: 95,
+        parent: { type: 'objref', value: 0 },
+        properties: {},
+        methods: {},
+      });
+      await db.create({
+        _id: 96,
+        parent: { type: 'objref', value: 95 },
+        properties: {},
+        methods: {},
+      });
+      await db.create({
+        _id: 97,
+        parent: { type: 'objref', value: 96 },
+        properties: {},
+        methods: {},
+      });
 
       const children = await db.getChildren(95);
       expect(children.length).toBe(1);
@@ -321,7 +350,7 @@ describe('ObjectDatabase', () => {
       });
 
       // Mark as recycled via raw MongoDB (recycling is handled by $.recycler in game)
-      await db['objects'].updateOne({ _id: 101 }, { $set: { recycled: true } });
+      await db.objects.updateOne({ _id: 101 }, { $set: { recycled: true } });
 
       // Recycled objects still exist in the database
       expect(await db.exists(101)).toBe(true);
@@ -331,7 +360,7 @@ describe('ObjectDatabase', () => {
   describe('ensureRoot()', () => {
     it('should create root object if not exists', async () => {
       // Ensure no root exists
-      await db['objects'].deleteOne({ _id: 1 });
+      await db.objects.deleteOne({ _id: 1 });
       expect(await db.exists(1)).toBe(false);
 
       await db.ensureRoot();
@@ -370,11 +399,26 @@ describe('ObjectDatabase', () => {
   describe('listAll()', () => {
     it('should list all non-recycled objects', async () => {
       // Clean database
-      await db['objects'].deleteMany({});
+      await db.objects.deleteMany({});
 
-      await db.create({ _id: 110, parent: { type: 'objref', value: 0 }, properties: { a: 1 }, methods: {} });
-      await db.create({ _id: 111, parent: { type: 'objref', value: 0 }, properties: { b: 2 }, methods: {} });
-      await db.create({ _id: 112, parent: { type: 'objref', value: 0 }, properties: { c: 3 }, methods: {} });
+      await db.create({
+        _id: 110,
+        parent: { type: 'objref', value: 0 },
+        properties: { a: 1 },
+        methods: {},
+      });
+      await db.create({
+        _id: 111,
+        parent: { type: 'objref', value: 0 },
+        properties: { b: 2 },
+        methods: {},
+      });
+      await db.create({
+        _id: 112,
+        parent: { type: 'objref', value: 0 },
+        properties: { c: 3 },
+        methods: {},
+      });
 
       const all = await db.listAll();
       expect(all.length).toBe(3);
@@ -383,14 +427,29 @@ describe('ObjectDatabase', () => {
 
     it('should exclude recycled objects', async () => {
       // Clean database
-      await db['objects'].deleteMany({});
+      await db.objects.deleteMany({});
 
-      await db.create({ _id: 120, parent: { type: 'objref', value: 0 }, properties: {}, methods: {} });
-      await db.create({ _id: 121, parent: { type: 'objref', value: 0 }, properties: {}, methods: {} });
-      await db.create({ _id: 122, parent: { type: 'objref', value: 0 }, properties: {}, methods: {} });
+      await db.create({
+        _id: 120,
+        parent: { type: 'objref', value: 0 },
+        properties: {},
+        methods: {},
+      });
+      await db.create({
+        _id: 121,
+        parent: { type: 'objref', value: 0 },
+        properties: {},
+        methods: {},
+      });
+      await db.create({
+        _id: 122,
+        parent: { type: 'objref', value: 0 },
+        properties: {},
+        methods: {},
+      });
 
       // Mark as recycled via raw MongoDB (recycling is handled by $.recycler in game)
-      await db['objects'].updateOne({ _id: 121 }, { $set: { recycled: true } });
+      await db.objects.updateOne({ _id: 121 }, { $set: { recycled: true } });
 
       const all = await db.listAll();
       expect(all.length).toBe(2);
@@ -399,11 +458,16 @@ describe('ObjectDatabase', () => {
 
     it('should return empty array when all objects are recycled', async () => {
       // Clean database
-      await db['objects'].deleteMany({});
+      await db.objects.deleteMany({});
 
-      await db.create({ _id: 130, parent: { type: 'objref', value: 0 }, properties: {}, methods: {} });
+      await db.create({
+        _id: 130,
+        parent: { type: 'objref', value: 0 },
+        properties: {},
+        methods: {},
+      });
       // Mark as recycled via raw MongoDB (recycling is handled by $.recycler in game)
-      await db['objects'].updateOne({ _id: 130 }, { $set: { recycled: true } });
+      await db.objects.updateOne({ _id: 130 }, { $set: { recycled: true } });
 
       const all = await db.listAll();
       expect(all).toEqual([]);
@@ -438,7 +502,7 @@ describe('ObjectDatabase', () => {
 
     it('should maintain parent-child relationships', async () => {
       // Create parent
-      const parent = await db.create({
+      const _parent = await db.create({
         _id: 300,
         parent: { type: 'objref', value: 0 },
         properties: { type: 'container' },
@@ -446,14 +510,14 @@ describe('ObjectDatabase', () => {
       });
 
       // Create children
-      const child1 = await db.create({
+      const _child1 = await db.create({
         _id: 301,
         parent: { type: 'objref', value: 300 },
         properties: { name: 'item1' },
         methods: {},
       });
 
-      const child2 = await db.create({
+      const _child2 = await db.create({
         _id: 302,
         parent: { type: 'objref', value: 300 },
         properties: { name: 'item2' },

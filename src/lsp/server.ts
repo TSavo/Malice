@@ -3,26 +3,25 @@
  * Implements Language Server Protocol for MOO objects
  */
 
+import * as ts from 'typescript';
 import {
+  type CompletionItem,
   createConnection,
-  TextDocuments,
-  ProposedFeatures,
-  InitializeParams,
-  CompletionItem,
-  TextDocumentPositionParams,
-  TextDocumentSyncKind,
-  InitializeResult,
-  Hover,
-  MarkupKind,
-  Diagnostic,
+  type Diagnostic,
   DiagnosticSeverity,
+  type Hover,
+  type InitializeParams,
+  type InitializeResult,
+  MarkupKind,
+  ProposedFeatures,
+  type TextDocumentPositionParams,
+  TextDocumentSyncKind,
+  TextDocuments,
 } from 'vscode-languageserver/node.js';
-
 import { TextDocument } from 'vscode-languageserver-textdocument';
 import type { ObjectManager } from '../database/object-manager.js';
-import { VirtualFileSystem } from './virtual-fs.js';
 import { TypeScriptService } from './ts-service.js';
-import * as ts from 'typescript';
+import { VirtualFileSystem } from './virtual-fs.js';
 
 /**
  * Malice LSP Server
@@ -87,11 +86,17 @@ export class MaliceLSPServer {
   /**
    * Handle completion requests
    */
-  private async onCompletion(params: TextDocumentPositionParams): Promise<CompletionItem[]> {
+  private async onCompletion(
+    params: TextDocumentPositionParams,
+  ): Promise<CompletionItem[]> {
     const uri = params.textDocument.uri;
     const { line, character } = params.position;
 
-    const completions = await this.tsService.getCompletions(uri, line, character);
+    const completions = await this.tsService.getCompletions(
+      uri,
+      line,
+      character,
+    );
     if (!completions) return [];
 
     return completions.entries.map((entry) => ({
@@ -105,7 +110,9 @@ export class MaliceLSPServer {
   /**
    * Handle hover requests
    */
-  private async onHover(params: TextDocumentPositionParams): Promise<Hover | null> {
+  private async onHover(
+    params: TextDocumentPositionParams,
+  ): Promise<Hover | null> {
     const uri = params.textDocument.uri;
     const { line, character } = params.position;
 
@@ -118,7 +125,9 @@ export class MaliceLSPServer {
     return {
       contents: {
         kind: MarkupKind.Markdown,
-        value: ['```typescript', displayString, '```', documentation].filter(Boolean).join('\n'),
+        value: ['```typescript', displayString, '```', documentation]
+          .filter(Boolean)
+          .join('\n'),
       },
     };
   }
@@ -126,7 +135,9 @@ export class MaliceLSPServer {
   /**
    * Handle document change (send diagnostics)
    */
-  private async onDocumentChange(change: { document: TextDocument }): Promise<void> {
+  private async onDocumentChange(change: {
+    document: TextDocument;
+  }): Promise<void> {
     const uri = change.document.uri;
 
     const diagnostics = await this.tsService.getDiagnostics(uri);
@@ -150,7 +161,11 @@ export class MaliceLSPServer {
     const uri = params.textDocument.uri;
     const { line, character } = params.position;
 
-    const definitions = await this.tsService.getDefinition(uri, line, character);
+    const definitions = await this.tsService.getDefinition(
+      uri,
+      line,
+      character,
+    );
     if (!definitions || definitions.length === 0) return null;
 
     return definitions.map((def) => ({
@@ -205,7 +220,9 @@ export class MaliceLSPServer {
   /**
    * Convert TypeScript diagnostic severity to LSP
    */
-  private convertDiagnosticSeverity(category: ts.DiagnosticCategory): DiagnosticSeverity {
+  private convertDiagnosticSeverity(
+    category: ts.DiagnosticCategory,
+  ): DiagnosticSeverity {
     switch (category) {
       case ts.DiagnosticCategory.Error:
         return DiagnosticSeverity.Error;

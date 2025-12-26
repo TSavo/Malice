@@ -11,18 +11,18 @@
  * - "eat apple" → verb="eat", args="apple" (action)
  */
 
-import type { ObjId } from './object.js';
 import type { ObjectId } from 'mongodb';
+import type { ObjId } from './object.js';
 
 /**
  * Log event types - kept minimal
  */
 export type LogType =
-  | 'connect'     // Player connected
-  | 'disconnect'  // Player disconnected
-  | 'auth'        // Successful authentication
-  | 'auth_fail'   // Failed authentication
-  | 'command';    // Player command (universal - captures everything)
+  | 'connect' // Player connected
+  | 'disconnect' // Player disconnected
+  | 'auth' // Successful authentication
+  | 'auth_fail' // Failed authentication
+  | 'command'; // Player command (universal - captures everything)
 
 /**
  * Log entry - all logs have these fields

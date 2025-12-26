@@ -206,7 +206,8 @@ export const building = {
         {
           prototype: 'jobBoard',
           name: 'Employment Terminal',
-          description: 'A sleek terminal bolted to the floor. The screen glows pale blue with the Continuum logo. Touch to begin.',
+          description:
+            'A sleek terminal bolted to the floor. The screen glows pale blue with the Continuum logo. Touch to begin.',
         },
       ],
     },
@@ -318,7 +319,7 @@ export const building = {
         {
           name: 'a desk chair',
           capacity: 1,
-          emptyMsg: 'The supervisor\'s chair sits empty.',
+          emptyMsg: "The supervisor's chair sits empty.",
           occupiedMsg: '%s sitting at the supervisor desk',
         },
       ],

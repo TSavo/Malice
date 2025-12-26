@@ -9,16 +9,19 @@
  * Shift: x += 3, y += 1
  */
 
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const parkDir = path.join(__dirname, '../src/database/bootstrap/world/seattle/pioneer-square/occidental-park');
+const parkDir = path.join(
+  __dirname,
+  '../src/database/bootstrap/world/seattle/pioneer-square/occidental-park',
+);
 
-const files = fs.readdirSync(parkDir).filter(f => f.endsWith('.ts'));
+const files = fs.readdirSync(parkDir).filter((f) => f.endsWith('.ts'));
 
 console.log(`Found ${files.length} files in occidental-park\n`);
 
@@ -37,8 +40,8 @@ for (const file of files) {
     continue;
   }
 
-  const oldX = parseInt(xMatch[1]);
-  const oldY = parseInt(yMatch[1]);
+  const oldX = parseInt(xMatch[1], 10);
+  const oldY = parseInt(yMatch[1], 10);
 
   // Apply shift: x += 3, y += 1
   const newX = oldX + 3;
@@ -52,8 +55,10 @@ for (const file of files) {
 
   changes.push({
     file,
-    oldX, oldY,
-    newX, newY
+    oldX,
+    oldY,
+    newX,
+    newY,
   });
 
   console.log(`${file}: (${oldX}, ${oldY}) → (${newX}, ${newY})`);
@@ -62,8 +67,8 @@ for (const file of files) {
 console.log(`\nUpdated ${changes.length} files`);
 
 // Show final coordinate range
-const allX = changes.map(c => c.newX);
-const allY = changes.map(c => c.newY);
+const allX = changes.map((c) => c.newX);
+const allY = changes.map((c) => c.newY);
 console.log(`\nNew coordinate range:`);
 console.log(`  x: ${Math.min(...allX)} to ${Math.max(...allX)}`);
 console.log(`  y: ${Math.min(...allY)} to ${Math.max(...allY)}`);

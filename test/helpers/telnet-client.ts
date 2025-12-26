@@ -1,5 +1,5 @@
-import { Socket } from 'net';
-import { EventEmitter } from 'events';
+import { EventEmitter } from 'node:events';
+import { Socket } from 'node:net';
 
 /**
  * Simple telnet client for integration testing
@@ -11,7 +11,10 @@ export class TelnetTestClient extends EventEmitter {
   private connected = false;
   private responseQueue: Array<(data: string) => void> = [];
 
-  constructor(private host: string = 'localhost', private port: number = 5555) {
+  constructor(
+    private host: string = 'localhost',
+    private port: number = 5555,
+  ) {
     super();
     this.socket = new Socket();
   }
@@ -72,7 +75,8 @@ export class TelnetTestClient extends EventEmitter {
     let i = 0;
 
     while (i < data.length) {
-      if (data[i] === 0xff) { // IAC
+      if (data[i] === 0xff) {
+        // IAC
         i++; // Skip IAC
         if (i >= data.length) break;
 
@@ -82,7 +86,10 @@ export class TelnetTestClient extends EventEmitter {
           i += 2;
         } else if (cmd === 0xfa) {
           // SB - skip until SE
-          while (i < data.length && !(data[i] === 0xff && data[i + 1] === 0xf0)) {
+          while (
+            i < data.length &&
+            !(data[i] === 0xff && data[i + 1] === 0xf0)
+          ) {
             i++;
           }
           i += 2; // Skip IAC SE
@@ -105,7 +112,7 @@ export class TelnetTestClient extends EventEmitter {
     if (!this.connected) {
       throw new Error('Not connected');
     }
-    this.socket.write(text + '\r\n');
+    this.socket.write(`${text}\r\n`);
   }
 
   /**
@@ -125,7 +132,9 @@ export class TelnetTestClient extends EventEmitter {
     return new Promise((resolve, reject) => {
       const timer = setTimeout(() => {
         this.responseQueue.shift();
-        reject(new Error(`Timeout waiting for: ${pattern}\nBuffer: ${this.buffer}`));
+        reject(
+          new Error(`Timeout waiting for: ${pattern}\nBuffer: ${this.buffer}`),
+        );
       }, timeout);
 
       const check = (buffer: string): boolean => {

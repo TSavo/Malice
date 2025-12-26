@@ -1,5 +1,5 @@
-import { ObjectManager } from '../object-manager.js';
 import type { RuntimeObject } from '../../../types/object.js';
+import type { ObjectManager } from '../object-manager.js';
 
 /**
  * Builds English object (dynamic ID)
@@ -22,7 +22,8 @@ export class EnglishBuilder {
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
 
-    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
+    const aliases =
+      (objectManager.get('aliases') as Record<string, number>) || {};
 
     if (aliases.english) {
       this.english = await this.manager.load(aliases.english);
@@ -38,147 +39,187 @@ export class EnglishBuilder {
         description: 'English text formatting utilities',
         // Irregular plurals
         irregularPlurals: {
-          'child': 'children',
-          'person': 'people',
-          'man': 'men',
-          'woman': 'women',
-          'tooth': 'teeth',
-          'foot': 'feet',
-          'goose': 'geese',
-          'mouse': 'mice',
-          'louse': 'lice',
-          'ox': 'oxen',
-          'knife': 'knives',
-          'wife': 'knives',
-          'life': 'lives',
-          'wolf': 'wolves',
-          'shelf': 'shelves',
-          'leaf': 'leaves',
-          'loaf': 'loaves',
-          'half': 'halves',
-          'calf': 'calves',
-          'self': 'selves',
-          'elf': 'elves',
-          'thief': 'thieves',
-          'deer': 'deer',
-          'sheep': 'sheep',
-          'fish': 'fish',
-          'species': 'species',
-          'series': 'series',
-          'die': 'dice',
-          'criterion': 'criteria',
-          'phenomenon': 'phenomena',
-          'index': 'indices',
-          'appendix': 'appendices',
-          'cactus': 'cacti',
-          'fungus': 'fungi',
-          'nucleus': 'nuclei',
-          'stimulus': 'stimuli',
-          'focus': 'foci',
-          'thesis': 'theses',
-          'crisis': 'crises',
-          'analysis': 'analyses',
-          'basis': 'bases',
+          child: 'children',
+          person: 'people',
+          man: 'men',
+          woman: 'women',
+          tooth: 'teeth',
+          foot: 'feet',
+          goose: 'geese',
+          mouse: 'mice',
+          louse: 'lice',
+          ox: 'oxen',
+          knife: 'knives',
+          wife: 'knives',
+          life: 'lives',
+          wolf: 'wolves',
+          shelf: 'shelves',
+          leaf: 'leaves',
+          loaf: 'loaves',
+          half: 'halves',
+          calf: 'calves',
+          self: 'selves',
+          elf: 'elves',
+          thief: 'thieves',
+          deer: 'deer',
+          sheep: 'sheep',
+          fish: 'fish',
+          species: 'species',
+          series: 'series',
+          die: 'dice',
+          criterion: 'criteria',
+          phenomenon: 'phenomena',
+          index: 'indices',
+          appendix: 'appendices',
+          cactus: 'cacti',
+          fungus: 'fungi',
+          nucleus: 'nuclei',
+          stimulus: 'stimuli',
+          focus: 'foci',
+          thesis: 'theses',
+          crisis: 'crises',
+          analysis: 'analyses',
+          basis: 'bases',
         },
         // Number words (0-20)
         numberWords: [
-          'zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten',
-          'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty'
+          'zero',
+          'one',
+          'two',
+          'three',
+          'four',
+          'five',
+          'six',
+          'seven',
+          'eight',
+          'nine',
+          'ten',
+          'eleven',
+          'twelve',
+          'thirteen',
+          'fourteen',
+          'fifteen',
+          'sixteen',
+          'seventeen',
+          'eighteen',
+          'nineteen',
+          'twenty',
         ],
         // Ordinal words
         ordinalWords: [
-          'zeroth', 'first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth', 'ninth', 'tenth',
-          'eleventh', 'twelfth', 'thirteenth', 'fourteenth', 'fifteenth', 'sixteenth', 'seventeenth', 'eighteenth', 'nineteenth', 'twentieth'
+          'zeroth',
+          'first',
+          'second',
+          'third',
+          'fourth',
+          'fifth',
+          'sixth',
+          'seventh',
+          'eighth',
+          'ninth',
+          'tenth',
+          'eleventh',
+          'twelfth',
+          'thirteenth',
+          'fourteenth',
+          'fifteenth',
+          'sixteenth',
+          'seventeenth',
+          'eighteenth',
+          'nineteenth',
+          'twentieth',
         ],
         // Irregular verb conjugations (base -> third person singular)
         irregularVerbs: {
-          'be': 'is',
-          'have': 'has',
-          'do': 'does',
-          'go': 'goes',
+          be: 'is',
+          have: 'has',
+          do: 'does',
+          go: 'goes',
         },
         // Irregular past tense
         irregularPast: {
-          'be': 'was',
-          'have': 'had',
-          'do': 'did',
-          'go': 'went',
-          'see': 'saw',
-          'come': 'came',
-          'get': 'got',
-          'give': 'gave',
-          'take': 'took',
-          'make': 'made',
-          'know': 'knew',
-          'think': 'thought',
-          'say': 'said',
-          'tell': 'told',
-          'find': 'found',
-          'feel': 'felt',
-          'put': 'put',
-          'cut': 'cut',
-          'run': 'ran',
-          'sit': 'sat',
-          'stand': 'stood',
-          'hear': 'heard',
-          'hold': 'held',
-          'write': 'wrote',
-          'read': 'read',
-          'eat': 'ate',
-          'drink': 'drank',
-          'sleep': 'slept',
-          'speak': 'spoke',
-          'break': 'broke',
-          'fall': 'fell',
-          'hit': 'hit',
-          'let': 'let',
-          'begin': 'began',
-          'keep': 'kept',
-          'leave': 'left',
-          'meet': 'met',
-          'bring': 'brought',
-          'buy': 'bought',
-          'catch': 'caught',
-          'teach': 'taught',
-          'fight': 'fought',
-          'throw': 'threw',
-          'grow': 'grew',
-          'draw': 'drew',
-          'fly': 'flew',
-          'blow': 'blew',
-          'swim': 'swam',
-          'sing': 'sang',
-          'ring': 'rang',
-          'win': 'won',
-          'lose': 'lost',
-          'send': 'sent',
-          'spend': 'spent',
-          'build': 'built',
-          'lend': 'lent',
-          'bend': 'bent',
-          'lay': 'laid',
-          'pay': 'paid',
-          'lie': 'lay',
-          'lead': 'led',
-          'hide': 'hid',
-          'bite': 'bit',
-          'ride': 'rode',
-          'drive': 'drove',
-          'rise': 'rose',
-          'wear': 'wore',
-          'tear': 'tore',
-          'wake': 'woke',
-          'shake': 'shook',
-          'forget': 'forgot',
-          'choose': 'chose',
-          'freeze': 'froze',
-          'steal': 'stole',
+          be: 'was',
+          have: 'had',
+          do: 'did',
+          go: 'went',
+          see: 'saw',
+          come: 'came',
+          get: 'got',
+          give: 'gave',
+          take: 'took',
+          make: 'made',
+          know: 'knew',
+          think: 'thought',
+          say: 'said',
+          tell: 'told',
+          find: 'found',
+          feel: 'felt',
+          put: 'put',
+          cut: 'cut',
+          run: 'ran',
+          sit: 'sat',
+          stand: 'stood',
+          hear: 'heard',
+          hold: 'held',
+          write: 'wrote',
+          read: 'read',
+          eat: 'ate',
+          drink: 'drank',
+          sleep: 'slept',
+          speak: 'spoke',
+          break: 'broke',
+          fall: 'fell',
+          hit: 'hit',
+          let: 'let',
+          begin: 'began',
+          keep: 'kept',
+          leave: 'left',
+          meet: 'met',
+          bring: 'brought',
+          buy: 'bought',
+          catch: 'caught',
+          teach: 'taught',
+          fight: 'fought',
+          throw: 'threw',
+          grow: 'grew',
+          draw: 'drew',
+          fly: 'flew',
+          blow: 'blew',
+          swim: 'swam',
+          sing: 'sang',
+          ring: 'rang',
+          win: 'won',
+          lose: 'lost',
+          send: 'sent',
+          spend: 'spent',
+          build: 'built',
+          lend: 'lent',
+          bend: 'bent',
+          lay: 'laid',
+          pay: 'paid',
+          lie: 'lay',
+          lead: 'led',
+          hide: 'hid',
+          bite: 'bit',
+          ride: 'rode',
+          drive: 'drove',
+          rise: 'rose',
+          wear: 'wore',
+          tear: 'tore',
+          wake: 'woke',
+          shake: 'shook',
+          forget: 'forgot',
+          choose: 'chose',
+          freeze: 'froze',
+          steal: 'stole',
         },
       },
       methods: {},
     });
 
-    this.english.setMethod('list', `
+    this.english.setMethod(
+      'list',
+      `
       /** Join an array into an English list with Oxford comma.
        *  Usage: $.english.list(items, conjunction?)
        *  @param items - Array of strings to join
@@ -204,9 +245,12 @@ export class EnglishBuilder {
       const last = items[items.length - 1];
       const rest = items.slice(0, -1);
       return rest.join(', ') + ', ' + conjunction + ' ' + last;
-    `);
+    `,
+    );
 
-    this.english.setMethod('plural', `
+    this.english.setMethod(
+      'plural',
+      `
       /** Pluralize a word based on count.
        *  Usage: $.english.plural(n, word)
        *  Handles irregular plurals (wolf->wolves, child->children).
@@ -264,9 +308,12 @@ export class EnglishBuilder {
 
       // Default: add 's'
       return word + 's';
-    `);
+    `,
+    );
 
-    this.english.setMethod('count', `
+    this.english.setMethod(
+      'count',
+      `
       /** Count items with proper English phrasing.
        *  Usage: $.english.count(n, word, zeroWord?)
        *  Returns "a cat", "five cats", "no cats", etc.
@@ -308,9 +355,12 @@ export class EnglishBuilder {
       }
 
       return n + ' ' + pluralized;
-    `);
+    `,
+    );
 
-    this.english.setMethod('article', `
+    this.english.setMethod(
+      'article',
+      `
       /** Add indefinite article (a/an) to a word.
        *  Usage: $.english.article(word)
        *  @param word - The word to add an article to
@@ -340,9 +390,12 @@ export class EnglishBuilder {
       }
 
       return 'a ' + word;
-    `);
+    `,
+    );
 
-    this.english.setMethod('ordinal', `
+    this.english.setMethod(
+      'ordinal',
+      `
       /** Convert a number to its ordinal form.
        *  Usage: $.english.ordinal(n)
        *  @param n - The number
@@ -378,9 +431,12 @@ export class EnglishBuilder {
       }
 
       return n + suffix;
-    `);
+    `,
+    );
 
-    this.english.setMethod('possessive', `
+    this.english.setMethod(
+      'possessive',
+      `
       /** Make a name possessive.
        *  Usage: $.english.possessive(name)
        *  @param name - The name
@@ -396,9 +452,12 @@ export class EnglishBuilder {
       }
 
       return name + "'s";
-    `);
+    `,
+    );
 
-    this.english.setMethod('capitalize', `
+    this.english.setMethod(
+      'capitalize',
+      `
       /** Capitalize the first letter of a string.
        *  Usage: $.english.capitalize(str)
        *  @param str - The string
@@ -407,9 +466,12 @@ export class EnglishBuilder {
       const str = args[0];
       if (!str) return '';
       return str[0].toUpperCase() + str.slice(1);
-    `);
+    `,
+    );
 
-    this.english.setMethod('titleCase', `
+    this.english.setMethod(
+      'titleCase',
+      `
       /** Convert a string to title case.
        *  Usage: $.english.titleCase(str)
        *  Small words (a, the, of, etc.) are not capitalized unless first/last.
@@ -435,9 +497,12 @@ export class EnglishBuilder {
         }
         return word[0].toUpperCase() + word.slice(1).toLowerCase();
       }).join(' ');
-    `);
+    `,
+    );
 
-    this.english.setMethod('numberWord', `
+    this.english.setMethod(
+      'numberWord',
+      `
       /** Convert a number to its word form (for 0-20).
        *  Usage: $.english.numberWord(n)
        *  @param n - The number
@@ -453,9 +518,12 @@ export class EnglishBuilder {
       }
 
       return String(n);
-    `);
+    `,
+    );
 
-    this.english.setMethod('conjugate', `
+    this.english.setMethod(
+      'conjugate',
+      `
       /** Conjugate a verb for a given person.
        *  Usage: $.english.conjugate(verb, person)
        *  @param verb - The base verb
@@ -506,9 +574,12 @@ export class EnglishBuilder {
 
       // Default: add 's'
       return verb + 's';
-    `);
+    `,
+    );
 
-    this.english.setMethod('pastTense', `
+    this.english.setMethod(
+      'pastTense',
+      `
       /** Convert a verb to its past tense form.
        *  Usage: $.english.pastTense(verb)
        *  Handles irregular verbs and regular -ed endings.
@@ -553,9 +624,12 @@ export class EnglishBuilder {
 
       // Default: add 'ed'
       return verb + 'ed';
-    `);
+    `,
+    );
 
-    this.english.setMethod('presentParticiple', `
+    this.english.setMethod(
+      'presentParticiple',
+      `
       /** Convert a verb to its present participle (-ing) form.
        *  Usage: $.english.presentParticiple(verb)
        *  Handles doubling consonants, dropping 'e', and special cases.
@@ -594,10 +668,13 @@ export class EnglishBuilder {
 
       // Default: add 'ing'
       return verb + 'ing';
-    `);
+    `,
+    );
 
     // Garble text to simulate hearing difficulty in noisy environments
-    this.english.setMethod('garble', `
+    this.english.setMethod(
+      'garble',
+      `
       /** Garble text to simulate hearing difficulty (crowd noise, distance, etc.).
        *  Usage: $.english.garble(text, amount)
        *  Progressive degradation with realistic audio distortion effects:
@@ -823,12 +900,16 @@ export class EnglishBuilder {
       final = final.trim();
 
       return final || '...';
-    `);
+    `,
+    );
 
     // Keep scramble as alias for backwards compatibility
-    this.english.setMethod('scramble', `
+    this.english.setMethod(
+      'scramble',
+      `
       return await self.garble(args[0], args[1]);
-    `);
+    `,
+    );
   }
 
   async registerAlias(): Promise<void> {

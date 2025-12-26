@@ -1,5 +1,5 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Builds the GuardedExit prototype
@@ -46,7 +46,9 @@ DISPLAY: describe() shows faction requirement in exit listing.`,
     });
 
     // Override canUse to add faction check before other checks
-    obj.setMethod('canUse', `
+    obj.setMethod(
+      'canUse',
+      `
       /** Check if an agent can use this exit.
        *  First checks faction, then delegates to parent exit checks.
        *  @param agent - The agent trying to use the exit
@@ -94,10 +96,13 @@ DISPLAY: describe() shows faction requirement in exit listing.`,
       }
 
       return { allowed: true };
-    `);
+    `,
+    );
 
     // Set allowed faction
-    obj.setMethod('setAllowedFaction', `
+    obj.setMethod(
+      'setAllowedFaction',
+      `
       /** Set which faction can use this exit.
        *  @param factionName - Faction name or null to remove restriction
        *  @returns { success, faction }
@@ -105,19 +110,25 @@ DISPLAY: describe() shows faction requirement in exit listing.`,
       const factionName = args[0];
       self.allowedFaction = factionName || null;
       return { success: true, faction: self.allowedFaction };
-    `);
+    `,
+    );
 
     // Set denial message
-    obj.setMethod('setDenyMessage', `
+    obj.setMethod(
+      'setDenyMessage',
+      `
       /** Set the message shown when access is denied.
        *  @param message - Denial message
        */
       const message = args[0];
       self.denyMessage = message || 'You are not authorized to pass.';
-    `);
+    `,
+    );
 
     // Override describe to show faction restriction
-    obj.setMethod('describe', `
+    obj.setMethod(
+      'describe',
+      `
       /** Get description of this exit for room listing.
        *  @returns Description string
        */
@@ -126,11 +137,18 @@ DISPLAY: describe() shows faction requirement in exit listing.`,
       const lockStr = self.locked ? ' (locked)' : '';
       const guardStr = self.allowedFaction ? ' [' + self.allowedFaction + ' only]' : '';
       return self.name + shortAlias + ' (' + self.distance + 'm)' + lockStr + guardStr;
-    `);
+    `,
+    );
 
     // Property descriptions
-    obj.setPropertyDescription('allowedFaction', 'Faction name that can use this exit, or null for no restriction');
-    obj.setPropertyDescription('denyMessage', 'Message shown when faction check fails');
+    obj.setPropertyDescription(
+      'allowedFaction',
+      'Faction name that can use this exit, or null for no restriction',
+    );
+    obj.setPropertyDescription(
+      'denyMessage',
+      'Message shown when faction check fails',
+    );
 
     return obj;
   }

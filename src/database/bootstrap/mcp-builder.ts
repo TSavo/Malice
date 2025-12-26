@@ -13,8 +13,8 @@
  * - Tool instances: $mcp.tools.set_property, $mcp.tools.dig, etc.
  */
 
-import { ObjectManager } from '../object-manager.js';
 import type { RuntimeObject } from '../../../types/object.js';
+import type { ObjectManager } from '../object-manager.js';
 
 export class MCPBuilder {
   private mcpTool: RuntimeObject | null = null;
@@ -29,7 +29,8 @@ export class MCPBuilder {
     const root = await this.manager.load(1);
     if (!root) throw new Error('Root prototype not found');
 
-    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
+    const aliases =
+      (objectManager.get('aliases') as Record<string, number>) || {};
 
     // Build $mcpTool prototype
     await this.buildMCPTool(root, aliases, forceRebuild);
@@ -47,7 +48,7 @@ export class MCPBuilder {
   private async buildMCPTool(
     root: RuntimeObject,
     aliases: Record<string, number>,
-    forceRebuild: boolean
+    forceRebuild: boolean,
   ): Promise<void> {
     if (aliases.mcpTool) {
       this.mcpTool = await this.manager.load(aliases.mcpTool);
@@ -69,18 +70,24 @@ export class MCPBuilder {
     }
 
     // Default execute method - override in tool instances
-    this.mcpTool.setMethod('execute', `
+    this.mcpTool.setMethod(
+      'execute',
+      `
       throw new Error('Tool execute() not implemented');
-    `);
+    `,
+    );
 
     // Get tool definition for listing
-    this.mcpTool.setMethod('getDefinition', `
+    this.mcpTool.setMethod(
+      'getDefinition',
+      `
       return {
         name: self.toolName,
         description: self.toolDescription,
         inputSchema: self.inputSchema,
       };
-    `);
+    `,
+    );
   }
 
   /**
@@ -89,7 +96,7 @@ export class MCPBuilder {
   private async buildMCP(
     root: RuntimeObject,
     aliases: Record<string, number>,
-    forceRebuild: boolean
+    forceRebuild: boolean,
   ): Promise<void> {
     if (aliases.mcp) {
       this.mcp = await this.manager.load(aliases.mcp);
@@ -101,7 +108,8 @@ export class MCPBuilder {
         parent: root,
         properties: {
           name: 'MCP',
-          description: 'Code-first MCP interface - execute MOO code with tool access',
+          description:
+            'Code-first MCP interface - execute MOO code with tool access',
           tools: {}, // Will be populated with tool references
         },
         methods: {},
@@ -111,7 +119,9 @@ export class MCPBuilder {
     // execute(code) - Run MOO code with access to tools
     // This is the core of the code-first approach
     // We set the code as a temporary method and call it to get full MOO context
-    this.mcp.setMethod('execute', `
+    this.mcp.setMethod(
+      'execute',
+      `
       const code = args[0];
       const playerId = args[1]; // Optional: authenticated player ID
       if (typeof code !== 'string') {
@@ -156,10 +166,13 @@ export class MCPBuilder {
         return { error: err.message || String(err), stack: err.stack };
       }
       // Note: temp method isn't persisted, so no cleanup needed
-    `);
+    `,
+    );
 
     // listTools() - Return all tool definitions for discovery
-    this.mcp.setMethod('listTools', `
+    this.mcp.setMethod(
+      'listTools',
+      `
       const tools = self.tools || {};
       const definitions = [];
       for (const [name, tool] of Object.entries(tools)) {
@@ -168,10 +181,13 @@ export class MCPBuilder {
         }
       }
       return definitions;
-    `);
+    `,
+    );
 
     // getToolSchema(name) - Get schema for a specific tool
-    this.mcp.setMethod('getToolSchema', `
+    this.mcp.setMethod(
+      'getToolSchema',
+      `
       const name = args[0];
       const tools = self.tools || {};
       const tool = tools[name];
@@ -179,10 +195,13 @@ export class MCPBuilder {
         throw new Error('Tool not found: ' + name);
       }
       return tool.inputSchema;
-    `);
+    `,
+    );
 
     // registerTool(tool) - Add a tool to the registry
-    this.mcp.setMethod('registerTool', `
+    this.mcp.setMethod(
+      'registerTool',
+      `
       const tool = args[0];
       if (!tool || !tool.toolName) {
         throw new Error('Invalid tool: must have toolName');
@@ -191,7 +210,8 @@ export class MCPBuilder {
       tools[tool.toolName] = tool;
       self.tools = tools;
       return { registered: tool.toolName };
-    `);
+    `,
+    );
   }
 
   /**
@@ -201,18 +221,23 @@ export class MCPBuilder {
     if (!this.mcpTool || !this.mcp) return;
 
     // Core object tools
-    await this.buildTool('set_property', {
-      description: 'Set a property value on a MOO object',
-      inputSchema: {
-        type: 'object',
-        properties: {
-          objectId: { type: 'string', description: 'Object reference (#id or $alias)' },
-          name: { type: 'string', description: 'Property name' },
-          value: { description: 'Property value' },
+    await this.buildTool(
+      'set_property',
+      {
+        description: 'Set a property value on a MOO object',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            objectId: {
+              type: 'string',
+              description: 'Object reference (#id or $alias)',
+            },
+            name: { type: 'string', description: 'Property name' },
+            value: { description: 'Property value' },
+          },
+          required: ['objectId', 'name', 'value'],
         },
-        required: ['objectId', 'name', 'value'],
-      },
-      execute: `
+        execute: `
         const { objectId, name, value } = args[0];
         const obj = typeof objectId === 'string' && objectId.startsWith('#')
           ? await $load(parseInt(objectId.slice(1)))
@@ -221,19 +246,26 @@ export class MCPBuilder {
         obj.set(name, value);
         return { success: true, message: 'Set ' + name + ' on #' + obj.id };
       `,
-    }, forceRebuild);
-
-    await this.buildTool('get_property', {
-      description: 'Get a property value from a MOO object',
-      inputSchema: {
-        type: 'object',
-        properties: {
-          objectId: { type: 'string', description: 'Object reference (#id or $alias)' },
-          name: { type: 'string', description: 'Property name' },
-        },
-        required: ['objectId', 'name'],
       },
-      execute: `
+      forceRebuild,
+    );
+
+    await this.buildTool(
+      'get_property',
+      {
+        description: 'Get a property value from a MOO object',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            objectId: {
+              type: 'string',
+              description: 'Object reference (#id or $alias)',
+            },
+            name: { type: 'string', description: 'Property name' },
+          },
+          required: ['objectId', 'name'],
+        },
+        execute: `
         const { objectId, name } = args[0];
         const obj = typeof objectId === 'string' && objectId.startsWith('#')
           ? await $load(parseInt(objectId.slice(1)))
@@ -241,22 +273,35 @@ export class MCPBuilder {
         if (!obj) throw new Error('Object not found: ' + objectId);
         return { property: name, value: obj.get(name) };
       `,
-    }, forceRebuild);
-
-    await this.buildTool('set_method', {
-      description: 'Create or update a method on a MOO object',
-      inputSchema: {
-        type: 'object',
-        properties: {
-          objectId: { type: 'string', description: 'Object reference (#id or $alias)' },
-          name: { type: 'string', description: 'Method name' },
-          code: { type: 'string', description: 'TypeScript code for the method body' },
-          callable: { type: 'boolean', description: 'Whether players can call this directly' },
-          help: { type: 'string', description: 'Help text' },
-        },
-        required: ['objectId', 'name', 'code'],
       },
-      execute: `
+      forceRebuild,
+    );
+
+    await this.buildTool(
+      'set_method',
+      {
+        description: 'Create or update a method on a MOO object',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            objectId: {
+              type: 'string',
+              description: 'Object reference (#id or $alias)',
+            },
+            name: { type: 'string', description: 'Method name' },
+            code: {
+              type: 'string',
+              description: 'TypeScript code for the method body',
+            },
+            callable: {
+              type: 'boolean',
+              description: 'Whether players can call this directly',
+            },
+            help: { type: 'string', description: 'Help text' },
+          },
+          required: ['objectId', 'name', 'code'],
+        },
+        execute: `
         const { objectId, name, code, callable, help } = args[0];
         const obj = typeof objectId === 'string' && objectId.startsWith('#')
           ? await $load(parseInt(objectId.slice(1)))
@@ -265,20 +310,27 @@ export class MCPBuilder {
         obj.setMethod(name, code, { callable, help });
         return { success: true, message: 'Method ' + name + ' saved on #' + obj.id };
       `,
-    }, forceRebuild);
-
-    await this.buildTool('call_method', {
-      description: 'Execute a method on a MOO object',
-      inputSchema: {
-        type: 'object',
-        properties: {
-          objectId: { type: 'string', description: 'Object reference (#id or $alias)' },
-          name: { type: 'string', description: 'Method name' },
-          args: { type: 'array', description: 'Method arguments' },
-        },
-        required: ['objectId', 'name'],
       },
-      execute: `
+      forceRebuild,
+    );
+
+    await this.buildTool(
+      'call_method',
+      {
+        description: 'Execute a method on a MOO object',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            objectId: {
+              type: 'string',
+              description: 'Object reference (#id or $alias)',
+            },
+            name: { type: 'string', description: 'Method name' },
+            args: { type: 'array', description: 'Method arguments' },
+          },
+          required: ['objectId', 'name'],
+        },
+        execute: `
         const { objectId, name, args: methodArgs } = args[0];
         const obj = typeof objectId === 'string' && objectId.startsWith('#')
           ? await $load(parseInt(objectId.slice(1)))
@@ -287,19 +339,26 @@ export class MCPBuilder {
         const result = await obj.call(name, ...(methodArgs || []));
         return { result };
       `,
-    }, forceRebuild);
-
-    await this.buildTool('create_object', {
-      description: 'Create a new MOO object with a specified parent',
-      inputSchema: {
-        type: 'object',
-        properties: {
-          parent: { type: 'string', description: 'Parent object reference (#id or $alias)' },
-          properties: { type: 'object', description: 'Initial properties' },
-        },
-        required: ['parent'],
       },
-      execute: `
+      forceRebuild,
+    );
+
+    await this.buildTool(
+      'create_object',
+      {
+        description: 'Create a new MOO object with a specified parent',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            parent: {
+              type: 'string',
+              description: 'Parent object reference (#id or $alias)',
+            },
+            properties: { type: 'object', description: 'Initial properties' },
+          },
+          required: ['parent'],
+        },
+        execute: `
         const { parent, properties } = args[0];
         const parentObj = typeof parent === 'string' && parent.startsWith('#')
           ? await $load(parseInt(parent.slice(1)))
@@ -316,18 +375,25 @@ export class MCPBuilder {
         const obj = await $create({ parent: parentObj, properties: properties || {} });
         return { id: obj.id, message: 'Created #' + obj.id };
       `,
-    }, forceRebuild);
-
-    await this.buildTool('clone_object', {
-      description: 'Clone an existing MOO object',
-      inputSchema: {
-        type: 'object',
-        properties: {
-          objectId: { type: 'string', description: 'Object to clone (#id or $alias)' },
-        },
-        required: ['objectId'],
       },
-      execute: `
+      forceRebuild,
+    );
+
+    await this.buildTool(
+      'clone_object',
+      {
+        description: 'Clone an existing MOO object',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            objectId: {
+              type: 'string',
+              description: 'Object to clone (#id or $alias)',
+            },
+          },
+          required: ['objectId'],
+        },
+        execute: `
         const { objectId } = args[0];
         const obj = typeof objectId === 'string' && objectId.startsWith('#')
           ? await $load(parseInt(objectId.slice(1)))
@@ -340,18 +406,25 @@ export class MCPBuilder {
         }
         throw new Error('Recycler not available for cloning');
       `,
-    }, forceRebuild);
-
-    await this.buildTool('recycle_object', {
-      description: 'Recycle (soft-delete) a MOO object',
-      inputSchema: {
-        type: 'object',
-        properties: {
-          objectId: { type: 'string', description: 'Object to recycle (#id or $alias)' },
-        },
-        required: ['objectId'],
       },
-      execute: `
+      forceRebuild,
+    );
+
+    await this.buildTool(
+      'recycle_object',
+      {
+        description: 'Recycle (soft-delete) a MOO object',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            objectId: {
+              type: 'string',
+              description: 'Object to recycle (#id or $alias)',
+            },
+          },
+          required: ['objectId'],
+        },
+        execute: `
         const { objectId } = args[0];
         const obj = typeof objectId === 'string' && objectId.startsWith('#')
           ? await $load(parseInt(objectId.slice(1)))
@@ -364,26 +437,40 @@ export class MCPBuilder {
         }
         throw new Error('Recycler not available');
       `,
-    }, forceRebuild);
+      },
+      forceRebuild,
+    );
 
     // Room tools
-    await this.buildTool('dig', {
-      description: 'Create a new room with optional bidirectional exits from an existing room',
-      inputSchema: {
-        type: 'object',
-        properties: {
-          name: { type: 'string', description: 'Room name' },
-          description: { type: 'string', description: 'Room description' },
-          x: { type: 'number', description: 'X coordinate' },
-          y: { type: 'number', description: 'Y coordinate' },
-          z: { type: 'number', description: 'Z coordinate' },
-          fromRoomId: { type: 'string', description: 'Source room for exits (#id or $alias)' },
-          exitDirection: { type: 'string', description: 'Exit direction (north, east, up, etc.)' },
-          returnDirection: { type: 'string', description: 'Return exit direction' },
+    await this.buildTool(
+      'dig',
+      {
+        description:
+          'Create a new room with optional bidirectional exits from an existing room',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            name: { type: 'string', description: 'Room name' },
+            description: { type: 'string', description: 'Room description' },
+            x: { type: 'number', description: 'X coordinate' },
+            y: { type: 'number', description: 'Y coordinate' },
+            z: { type: 'number', description: 'Z coordinate' },
+            fromRoomId: {
+              type: 'string',
+              description: 'Source room for exits (#id or $alias)',
+            },
+            exitDirection: {
+              type: 'string',
+              description: 'Exit direction (north, east, up, etc.)',
+            },
+            returnDirection: {
+              type: 'string',
+              description: 'Return exit direction',
+            },
+          },
+          required: ['name', 'description'],
         },
-        required: ['name', 'description'],
-      },
-      execute: `
+        execute: `
         const { name, description, x, y, z, fromRoomId, exitDirection, returnDirection } = args[0];
 
         // Direction alias map
@@ -444,21 +531,37 @@ export class MCPBuilder {
 
         return result;
       `,
-    }, forceRebuild);
-
-    await this.buildTool('link_rooms', {
-      description: 'Create bidirectional exits between two existing rooms',
-      inputSchema: {
-        type: 'object',
-        properties: {
-          fromRoomId: { type: 'string', description: 'Source room (#id or $alias)' },
-          toRoomId: { type: 'string', description: 'Destination room (#id or $alias)' },
-          exitDirection: { type: 'string', description: 'Exit direction from source' },
-          returnDirection: { type: 'string', description: 'Exit direction from destination' },
-        },
-        required: ['fromRoomId', 'toRoomId', 'exitDirection'],
       },
-      execute: `
+      forceRebuild,
+    );
+
+    await this.buildTool(
+      'link_rooms',
+      {
+        description: 'Create bidirectional exits between two existing rooms',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            fromRoomId: {
+              type: 'string',
+              description: 'Source room (#id or $alias)',
+            },
+            toRoomId: {
+              type: 'string',
+              description: 'Destination room (#id or $alias)',
+            },
+            exitDirection: {
+              type: 'string',
+              description: 'Exit direction from source',
+            },
+            returnDirection: {
+              type: 'string',
+              description: 'Exit direction from destination',
+            },
+          },
+          required: ['fromRoomId', 'toRoomId', 'exitDirection'],
+        },
+        execute: `
         const { fromRoomId, toRoomId, exitDirection, returnDirection } = args[0];
 
         const aliasMap = {
@@ -508,17 +611,21 @@ export class MCPBuilder {
 
         return result;
       `,
-    }, forceRebuild);
-
-    await this.buildTool('list_rooms', {
-      description: 'List all rooms in the world',
-      inputSchema: {
-        type: 'object',
-        properties: {
-          limit: { type: 'number', description: 'Maximum rooms to return' },
-        },
       },
-      execute: `
+      forceRebuild,
+    );
+
+    await this.buildTool(
+      'list_rooms',
+      {
+        description: 'List all rooms in the world',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            limit: { type: 'number', description: 'Maximum rooms to return' },
+          },
+        },
+        execute: `
         const { limit } = args[0] || {};
         const rooms = [];
         const roomProtoId = $room?.id;
@@ -558,19 +665,29 @@ export class MCPBuilder {
 
         return { count: rooms.length, rooms };
       `,
-    }, forceRebuild);
-
-    await this.buildTool('move_object', {
-      description: 'Move an object to a new location',
-      inputSchema: {
-        type: 'object',
-        properties: {
-          objectId: { type: 'string', description: 'Object to move (#id or $alias)' },
-          destinationId: { type: 'string', description: 'Destination room/container (#id or $alias)' },
-        },
-        required: ['objectId', 'destinationId'],
       },
-      execute: `
+      forceRebuild,
+    );
+
+    await this.buildTool(
+      'move_object',
+      {
+        description: 'Move an object to a new location',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            objectId: {
+              type: 'string',
+              description: 'Object to move (#id or $alias)',
+            },
+            destinationId: {
+              type: 'string',
+              description: 'Destination room/container (#id or $alias)',
+            },
+          },
+          required: ['objectId', 'destinationId'],
+        },
+        execute: `
         const { objectId, destinationId } = args[0];
 
         const obj = typeof objectId === 'string' && objectId.startsWith('#')
@@ -597,20 +714,30 @@ export class MCPBuilder {
 
         return { success: true, message: 'Moved #' + obj.id + ' to #' + dest.id };
       `,
-    }, forceRebuild);
-
-    await this.buildTool('spawn_item', {
-      description: 'Spawn an item from a prototype in a room',
-      inputSchema: {
-        type: 'object',
-        properties: {
-          prototypeId: { type: 'string', description: 'Item prototype (#id or $alias)' },
-          roomId: { type: 'string', description: 'Room to spawn in (#id or $alias)' },
-          properties: { type: 'object', description: 'Override properties' },
-        },
-        required: ['prototypeId', 'roomId'],
       },
-      execute: `
+      forceRebuild,
+    );
+
+    await this.buildTool(
+      'spawn_item',
+      {
+        description: 'Spawn an item from a prototype in a room',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            prototypeId: {
+              type: 'string',
+              description: 'Item prototype (#id or $alias)',
+            },
+            roomId: {
+              type: 'string',
+              description: 'Room to spawn in (#id or $alias)',
+            },
+            properties: { type: 'object', description: 'Override properties' },
+          },
+          required: ['prototypeId', 'roomId'],
+        },
+        execute: `
         const { prototypeId, roomId, properties } = args[0];
 
         // Resolve prototypeId: '#123' or '$alias'
@@ -648,18 +775,25 @@ export class MCPBuilder {
 
         return { id: item.id, name: item.name, room: room.id };
       `,
-    }, forceRebuild);
-
-    await this.buildTool('describe_object', {
-      description: 'Get detailed information about a MOO object',
-      inputSchema: {
-        type: 'object',
-        properties: {
-          objectId: { type: 'string', description: 'Object to describe (#id or $alias)' },
-        },
-        required: ['objectId'],
       },
-      execute: `
+      forceRebuild,
+    );
+
+    await this.buildTool(
+      'describe_object',
+      {
+        description: 'Get detailed information about a MOO object',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            objectId: {
+              type: 'string',
+              description: 'Object to describe (#id or $alias)',
+            },
+          },
+          required: ['objectId'],
+        },
+        execute: `
         const { objectId } = args[0];
 
         const obj = typeof objectId === 'string' && objectId.startsWith('#')
@@ -688,15 +822,19 @@ export class MCPBuilder {
           methods,
         };
       `,
-    }, forceRebuild);
-
-    await this.buildTool('list_aliases', {
-      description: 'List all registered object aliases',
-      inputSchema: {
-        type: 'object',
-        properties: {},
       },
-      execute: `
+      forceRebuild,
+    );
+
+    await this.buildTool(
+      'list_aliases',
+      {
+        description: 'List all registered object aliases',
+        inputSchema: {
+          type: 'object',
+          properties: {},
+        },
+        execute: `
         const objectManager = await $load(0);
         const aliases = objectManager.get('aliases') || {};
         const result = {};
@@ -707,19 +845,23 @@ export class MCPBuilder {
         }
         return result;
       `,
-    }, forceRebuild);
-
-    await this.buildTool('add_alias', {
-      description: 'Register a new object alias',
-      inputSchema: {
-        type: 'object',
-        properties: {
-          name: { type: 'string', description: 'Alias name (without $)' },
-          objectId: { type: 'string', description: 'Object to alias (#id)' },
-        },
-        required: ['name', 'objectId'],
       },
-      execute: `
+      forceRebuild,
+    );
+
+    await this.buildTool(
+      'add_alias',
+      {
+        description: 'Register a new object alias',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            name: { type: 'string', description: 'Alias name (without $)' },
+            objectId: { type: 'string', description: 'Object to alias (#id)' },
+          },
+          required: ['name', 'objectId'],
+        },
+        execute: `
         const { name, objectId } = args[0];
 
         const obj = typeof objectId === 'string' && objectId.startsWith('#')
@@ -733,37 +875,54 @@ export class MCPBuilder {
 
         return { success: true, message: 'Added alias $' + name + ' -> #' + obj.id };
       `,
-    }, forceRebuild);
+      },
+      forceRebuild,
+    );
 
     // Plot tool
-    await this.buildTool('plot', {
-      description: 'Plot and job management - delegates to $plot and $plotDB',
-      inputSchema: {
-        type: 'object',
-        properties: {
-          action: { type: 'string', description: 'Action: create, get, list, search, close, set_metadata, add_event, get_events, set_phases, get_phases, create_job, get_job, complete_job, fail_job, get_job_phase, advance_phase, set_phase, register_hook, next, active' },
-          plotId: { type: 'number', description: 'Plot object ID' },
-          jobId: { type: 'string', description: 'Job identifier' },
-          name: { type: 'string', description: 'Plot name' },
-          status: { type: 'string', description: 'Plot status: active, completed, abandoned, failed' },
-          reason: { type: 'string', description: 'Reason for action' },
-          message: { type: 'string', description: 'Event message' },
-          from: { type: 'string', description: 'Event source: handler, system' },
-          metadata: { type: 'object', description: 'Metadata object' },
-          key: { type: 'string', description: 'Metadata key' },
-          value: { description: 'Metadata value' },
-          query: { type: 'string', description: 'Search query' },
-          limit: { type: 'number', description: 'Result limit' },
-          phases: { type: 'array', description: 'Phase definitions' },
-          phaseId: { type: 'string', description: 'Phase identifier' },
-          targetId: { type: 'number', description: 'Hook target object ID' },
-          eventName: { type: 'string', description: 'Hook event name' },
-          filter: { type: 'object', description: 'Hook filter' },
-          expiresAt: { type: 'number', description: 'Job expiration timestamp' },
+    await this.buildTool(
+      'plot',
+      {
+        description: 'Plot and job management - delegates to $plot and $plotDB',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            action: {
+              type: 'string',
+              description:
+                'Action: create, get, list, search, close, set_metadata, add_event, get_events, set_phases, get_phases, create_job, get_job, complete_job, fail_job, get_job_phase, advance_phase, set_phase, register_hook, next, active',
+            },
+            plotId: { type: 'number', description: 'Plot object ID' },
+            jobId: { type: 'string', description: 'Job identifier' },
+            name: { type: 'string', description: 'Plot name' },
+            status: {
+              type: 'string',
+              description: 'Plot status: active, completed, abandoned, failed',
+            },
+            reason: { type: 'string', description: 'Reason for action' },
+            message: { type: 'string', description: 'Event message' },
+            from: {
+              type: 'string',
+              description: 'Event source: handler, system',
+            },
+            metadata: { type: 'object', description: 'Metadata object' },
+            key: { type: 'string', description: 'Metadata key' },
+            value: { description: 'Metadata value' },
+            query: { type: 'string', description: 'Search query' },
+            limit: { type: 'number', description: 'Result limit' },
+            phases: { type: 'array', description: 'Phase definitions' },
+            phaseId: { type: 'string', description: 'Phase identifier' },
+            targetId: { type: 'number', description: 'Hook target object ID' },
+            eventName: { type: 'string', description: 'Hook event name' },
+            filter: { type: 'object', description: 'Hook filter' },
+            expiresAt: {
+              type: 'number',
+              description: 'Job expiration timestamp',
+            },
+          },
+          required: ['action'],
         },
-        required: ['action'],
-      },
-      execute: `
+        execute: `
         const { action, plotId, jobId, name, status, reason, message, from, metadata, key, value, query, limit, phases, phaseId, targetId, eventName, filter, expiresAt } = args[0];
 
         if (!$plot || !$plotDB) throw new Error('Plot system not available');
@@ -922,27 +1081,43 @@ export class MCPBuilder {
             throw new Error('Unknown action: ' + action);
         }
       `,
-    }, forceRebuild);
+      },
+      forceRebuild,
+    );
 
     // Notes tool
-    await this.buildTool('notes', {
-      description: 'Notes management - get, add, append, delete, search notes on objects',
-      inputSchema: {
-        type: 'object',
-        properties: {
-          action: { type: 'string', description: 'Action: get, add, append, delete, search, list_objects' },
-          objectId: { type: 'string', description: 'Target object (#id or $alias)' },
-          text: { type: 'string', description: 'Note text' },
-          author: { type: 'string', description: 'Note author' },
-          tags: { type: 'array', items: { type: 'string' }, description: 'Note tags' },
-          tag: { type: 'string', description: 'Tag to filter/append by' },
-          index: { type: 'number', description: 'Note index for delete' },
-          query: { type: 'string', description: 'Search query' },
-          limit: { type: 'number', description: 'Max results' },
+    await this.buildTool(
+      'notes',
+      {
+        description:
+          'Notes management - get, add, append, delete, search notes on objects',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            action: {
+              type: 'string',
+              description:
+                'Action: get, add, append, delete, search, list_objects',
+            },
+            objectId: {
+              type: 'string',
+              description: 'Target object (#id or $alias)',
+            },
+            text: { type: 'string', description: 'Note text' },
+            author: { type: 'string', description: 'Note author' },
+            tags: {
+              type: 'array',
+              items: { type: 'string' },
+              description: 'Note tags',
+            },
+            tag: { type: 'string', description: 'Tag to filter/append by' },
+            index: { type: 'number', description: 'Note index for delete' },
+            query: { type: 'string', description: 'Search query' },
+            limit: { type: 'number', description: 'Max results' },
+          },
+          required: ['action'],
         },
-        required: ['action'],
-      },
-      execute: `
+        execute: `
         const { action, objectId, text, author, tags, tag, index, query, limit } = args[0];
 
         if (!$notes) throw new Error('Notes system not available');
@@ -1018,50 +1193,77 @@ export class MCPBuilder {
             throw new Error('Unknown action: ' + action);
         }
       `,
-    }, forceRebuild);
+      },
+      forceRebuild,
+    );
 
     // AI tool
-    await this.buildTool('ai', {
-      description: 'AI-controlled human management - spawn, list, pathfinding, memory, etc',
-      inputSchema: {
-        type: 'object',
-        properties: {
-          action: { type: 'string', description: 'Action: spawn, despawn, list, info, do, look, tailor, profile, setPersonality, setHistory, remember, recall, forget, memories, expect, cancelExpect, path, walkPath, worldLog, getWorldLog' },
-          role: { type: 'string', description: 'AI role (for spawn)' },
-          name: { type: 'string', description: 'Human name' },
-          description: { type: 'string', description: 'Human description' },
-          locationId: { type: 'number', description: 'Room ID' },
-          sex: { type: 'string', enum: ['male', 'female', 'non-binary'], description: 'Sex' },
-          age: { type: 'number', description: 'Age in years' },
-          humanId: { type: 'number', description: 'Human object ID' },
-          command: { type: 'string', description: 'Command to execute' },
-          recycle: { type: 'boolean', description: 'Recycle on despawn' },
-          personality: { description: 'Personality string or object' },
-          history: { description: 'History string or object' },
-          text: { type: 'string', description: 'Memory/note text' },
-          importance: { type: 'string', enum: ['critical', 'important', 'normal'], description: 'Memory importance' },
-          tags: { type: 'array', items: { type: 'string' }, description: 'Tags' },
-          tag: { type: 'string', description: 'Filter tag' },
-          index: { type: 'number', description: 'Memory index' },
-          limit: { type: 'number', description: 'Result limit' },
-          criticalOnly: { type: 'boolean', description: 'Critical memories only' },
-          context: { type: 'string', description: 'Tailor context' },
-          clothed: { type: 'boolean', description: 'Auto-dress on spawn' },
-          targetId: { type: 'number', description: 'Target object ID' },
-          timeout: { type: 'number', description: 'Timeout in ms' },
-          prompt: { type: 'string', description: 'Custom timeout prompt' },
-          recurring: { type: 'boolean', description: 'Recurring timeout' },
-          fromRoomId: { type: 'number', description: 'Starting room ID' },
-          toRoomId: { type: 'number', description: 'Destination room ID' },
-          ignoreLocks: { type: 'boolean', description: 'Ignore locked exits' },
-          maxSteps: { type: 'number', description: 'Max pathfinding steps' },
-          path: { type: 'array', description: 'Path array for walkPath' },
-          author: { type: 'string', description: 'WorldLog author' },
-          message: { type: 'string', description: 'WorldLog message' },
+    await this.buildTool(
+      'ai',
+      {
+        description:
+          'AI-controlled human management - spawn, list, pathfinding, memory, etc',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            action: {
+              type: 'string',
+              description:
+                'Action: spawn, despawn, list, info, do, look, tailor, profile, setPersonality, setHistory, remember, recall, forget, memories, expect, cancelExpect, path, walkPath, worldLog, getWorldLog',
+            },
+            role: { type: 'string', description: 'AI role (for spawn)' },
+            name: { type: 'string', description: 'Human name' },
+            description: { type: 'string', description: 'Human description' },
+            locationId: { type: 'number', description: 'Room ID' },
+            sex: {
+              type: 'string',
+              enum: ['male', 'female', 'non-binary'],
+              description: 'Sex',
+            },
+            age: { type: 'number', description: 'Age in years' },
+            humanId: { type: 'number', description: 'Human object ID' },
+            command: { type: 'string', description: 'Command to execute' },
+            recycle: { type: 'boolean', description: 'Recycle on despawn' },
+            personality: { description: 'Personality string or object' },
+            history: { description: 'History string or object' },
+            text: { type: 'string', description: 'Memory/note text' },
+            importance: {
+              type: 'string',
+              enum: ['critical', 'important', 'normal'],
+              description: 'Memory importance',
+            },
+            tags: {
+              type: 'array',
+              items: { type: 'string' },
+              description: 'Tags',
+            },
+            tag: { type: 'string', description: 'Filter tag' },
+            index: { type: 'number', description: 'Memory index' },
+            limit: { type: 'number', description: 'Result limit' },
+            criticalOnly: {
+              type: 'boolean',
+              description: 'Critical memories only',
+            },
+            context: { type: 'string', description: 'Tailor context' },
+            clothed: { type: 'boolean', description: 'Auto-dress on spawn' },
+            targetId: { type: 'number', description: 'Target object ID' },
+            timeout: { type: 'number', description: 'Timeout in ms' },
+            prompt: { type: 'string', description: 'Custom timeout prompt' },
+            recurring: { type: 'boolean', description: 'Recurring timeout' },
+            fromRoomId: { type: 'number', description: 'Starting room ID' },
+            toRoomId: { type: 'number', description: 'Destination room ID' },
+            ignoreLocks: {
+              type: 'boolean',
+              description: 'Ignore locked exits',
+            },
+            maxSteps: { type: 'number', description: 'Max pathfinding steps' },
+            path: { type: 'array', description: 'Path array for walkPath' },
+            author: { type: 'string', description: 'WorldLog author' },
+            message: { type: 'string', description: 'WorldLog message' },
+          },
+          required: ['action'],
         },
-        required: ['action'],
-      },
-      execute: `
+        execute: `
         const { action, role, name, description, locationId, sex, age, humanId, command, recycle, personality, history, text, importance, tags, tag, index, limit, criticalOnly, context, clothed, targetId, timeout, prompt, recurring, fromRoomId, toRoomId, ignoreLocks, maxSteps, path, author, message } = args[0];
 
         if (!$ai) throw new Error('AI registry not available');
@@ -1240,34 +1442,60 @@ export class MCPBuilder {
             throw new Error('Unknown action: ' + action);
         }
       `,
-    }, forceRebuild);
+      },
+      forceRebuild,
+    );
 
     // Combat tool
-    await this.buildTool('combat', {
-      description: 'Combat resolution - status, check, damage, effects',
-      inputSchema: {
-        type: 'object',
-        properties: {
-          action: { type: 'string', description: 'Action: status, context, check, damage, emote, effect, end, next_round, list' },
-          combatId: { type: 'string', description: 'Combat ID' },
-          combatantId: { type: 'number', description: 'Combatant object ID' },
-          targetId: { type: 'number', description: 'Target object ID' },
-          skillName: { type: 'string', description: 'Skill name' },
-          opposingLevel: { type: 'number', description: 'Opposing skill level' },
-          bodyPart: { type: 'string', description: 'Body part to damage' },
-          damageType: { type: 'string', description: 'Damage type: cut, bruise, puncture, burn, laceration, abrasion' },
-          severity: { type: 'number', description: 'Damage severity 0-100' },
-          cause: { type: 'string', description: 'Damage cause' },
-          text: { type: 'string', description: 'Narration text' },
-          effect: { type: 'string', description: 'Status effect: stunned, knockedDown, disarmed, winded' },
-          intensity: { type: 'number', description: 'Effect intensity 0-100' },
-          duration: { type: 'number', description: 'Effect duration in ms' },
-          reason: { type: 'string', description: 'End reason: death, flee, surrender, knockout, intervention' },
-          winnerId: { type: 'number', description: 'Winner object ID' },
+    await this.buildTool(
+      'combat',
+      {
+        description: 'Combat resolution - status, check, damage, effects',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            action: {
+              type: 'string',
+              description:
+                'Action: status, context, check, damage, emote, effect, end, next_round, list',
+            },
+            combatId: { type: 'string', description: 'Combat ID' },
+            combatantId: { type: 'number', description: 'Combatant object ID' },
+            targetId: { type: 'number', description: 'Target object ID' },
+            skillName: { type: 'string', description: 'Skill name' },
+            opposingLevel: {
+              type: 'number',
+              description: 'Opposing skill level',
+            },
+            bodyPart: { type: 'string', description: 'Body part to damage' },
+            damageType: {
+              type: 'string',
+              description:
+                'Damage type: cut, bruise, puncture, burn, laceration, abrasion',
+            },
+            severity: { type: 'number', description: 'Damage severity 0-100' },
+            cause: { type: 'string', description: 'Damage cause' },
+            text: { type: 'string', description: 'Narration text' },
+            effect: {
+              type: 'string',
+              description:
+                'Status effect: stunned, knockedDown, disarmed, winded',
+            },
+            intensity: {
+              type: 'number',
+              description: 'Effect intensity 0-100',
+            },
+            duration: { type: 'number', description: 'Effect duration in ms' },
+            reason: {
+              type: 'string',
+              description:
+                'End reason: death, flee, surrender, knockout, intervention',
+            },
+            winnerId: { type: 'number', description: 'Winner object ID' },
+          },
+          required: ['action'],
         },
-        required: ['action'],
-      },
-      execute: `
+        execute: `
         const { action, combatId, combatantId, targetId, skillName, opposingLevel, bodyPart, damageType, severity, cause, text, effect, intensity, duration, reason, winnerId } = args[0];
 
         if (!$combat) throw new Error('Combat system not available');
@@ -1348,22 +1576,26 @@ export class MCPBuilder {
             throw new Error('Unknown action: ' + action);
         }
       `,
-    }, forceRebuild);
+      },
+      forceRebuild,
+    );
 
     // World query tool
-    await this.buildTool('world', {
-      description: 'Query objects with SQL-like DSL syntax',
-      inputSchema: {
-        type: 'object',
-        properties: {
-          action: { type: 'string', description: 'Action: query, validate' },
-          q: { type: 'string', description: 'Query string (DSL syntax)' },
-          limit: { type: 'number', description: 'Max results (default 50)' },
-          offset: { type: 'number', description: 'Skip first N results' },
+    await this.buildTool(
+      'world',
+      {
+        description: 'Query objects with SQL-like DSL syntax',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            action: { type: 'string', description: 'Action: query, validate' },
+            q: { type: 'string', description: 'Query string (DSL syntax)' },
+            limit: { type: 'number', description: 'Max results (default 50)' },
+            offset: { type: 'number', description: 'Skip first N results' },
+          },
+          required: ['action'],
         },
-        required: ['action'],
-      },
-      execute: `
+        execute: `
         const { action, q, limit, offset } = args[0];
 
         // Import query parser
@@ -1420,8 +1652,9 @@ export class MCPBuilder {
             throw new Error('Unknown action: ' + action + '. Valid: query, validate');
         }
       `,
-    }, forceRebuild);
-
+      },
+      forceRebuild,
+    );
   }
 
   /**
@@ -1434,12 +1667,13 @@ export class MCPBuilder {
       inputSchema: object;
       execute: string;
     },
-    forceRebuild: boolean
+    forceRebuild: boolean,
   ): Promise<void> {
     if (!this.mcpTool || !this.mcp) return;
 
     const objectManager = await this.manager.load(0);
-    const aliases = (objectManager?.get('aliases') as Record<string, number>) || {};
+    const aliases =
+      (objectManager?.get('aliases') as Record<string, number>) || {};
     const aliasName = `mcp_${name}`;
 
     let tool: RuntimeObject | null = null;
@@ -1467,7 +1701,8 @@ export class MCPBuilder {
     }
 
     // Register the tool with $mcp
-    const tools = (this.mcp.get('tools') as Record<string, RuntimeObject>) || {};
+    const tools =
+      (this.mcp.get('tools') as Record<string, RuntimeObject>) || {};
     tools[name] = tool;
     this.mcp.set('tools', tools);
 

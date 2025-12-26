@@ -1,5 +1,5 @@
-import { ObjectManager } from '../object-manager.js';
 import type { RuntimeObject } from '../../../types/object.js';
+import type { ObjectManager } from '../object-manager.js';
 
 /**
  * Builds Website objects for the Malice web server
@@ -28,7 +28,8 @@ export class WebsiteBuilder {
     const root = await this.manager.load(1);
     if (!root) throw new Error('Root prototype not found');
 
-    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
+    const aliases =
+      (objectManager.get('aliases') as Record<string, number>) || {};
 
     // Build $webTemplate prototype
     await this.buildWebTemplate(root, aliases, forceRebuild);
@@ -51,7 +52,7 @@ export class WebsiteBuilder {
   private async buildWebTemplate(
     root: RuntimeObject,
     aliases: Record<string, number>,
-    forceRebuild: boolean
+    forceRebuild: boolean,
   ): Promise<void> {
     if (aliases.webTemplate) {
       this.webTemplate = await this.manager.load(aliases.webTemplate);
@@ -71,7 +72,9 @@ export class WebsiteBuilder {
     }
 
     // render(data) - Substitute {{placeholders}} with data
-    this.webTemplate.setMethod('render', `
+    this.webTemplate.setMethod(
+      'render',
+      `
       const data = args[0] || {};
       let html = self.layout || '';
 
@@ -85,13 +88,14 @@ export class WebsiteBuilder {
       html = html.replace(/\\{\\{[^}]+\\}\\}/g, '');
 
       return html;
-    `);
+    `,
+    );
   }
 
   private async buildWebPage(
     root: RuntimeObject,
     aliases: Record<string, number>,
-    forceRebuild: boolean
+    forceRebuild: boolean,
   ): Promise<void> {
     if (aliases.webPage) {
       this.webPage = await this.manager.load(aliases.webPage);
@@ -115,7 +119,9 @@ export class WebsiteBuilder {
     }
 
     // render() - Render content through template
-    this.webPage.setMethod('render', `
+    this.webPage.setMethod(
+      'render',
+      `
       const template = self.template;
       if (!template) {
         return '<html><body>' + (self.content || '') + '</body></html>';
@@ -152,13 +158,14 @@ export class WebsiteBuilder {
         path: self.path || '/',
         description: self.description || '',
       });
-    `);
+    `,
+    );
   }
 
   private async buildWebSite(
     root: RuntimeObject,
     aliases: Record<string, number>,
-    forceRebuild: boolean
+    forceRebuild: boolean,
   ): Promise<void> {
     if (aliases.webSite) {
       this.webSite = await this.manager.load(aliases.webSite);
@@ -178,7 +185,9 @@ export class WebsiteBuilder {
 
     // handleRequest(path, method, meta) - Main entry point
     // Delegates to $webRouter for registered routes, then falls back to page lookup
-    this.webSite.setMethod('handleRequest', `
+    this.webSite.setMethod(
+      'handleRequest',
+      `
       const path = args[0] || '/';
       const method = args[1] || 'GET';
       const meta = args[2] || {};
@@ -204,10 +213,13 @@ export class WebsiteBuilder {
 
       // 404
       return { status: 404, contentType: 'text/html', body: await self.render404(path) };
-    `);
+    `,
+    );
 
     // getPage(path) - Find page by path
-    this.webSite.setMethod('getPage', `
+    this.webSite.setMethod(
+      'getPage',
+      `
       const path = args[0] || '/';
 
       // Get all webPage children
@@ -227,10 +239,13 @@ export class WebsiteBuilder {
       }
 
       return null;
-    `);
+    `,
+    );
 
     // handleDocsRequest(path) - Serve documentation from docs folder
-    this.webSite.setMethod('handleDocsRequest', `
+    this.webSite.setMethod(
+      'handleDocsRequest',
+      `
       const path = args[0] || '/docs';
       const fs = await import('fs');
       const pathModule = await import('path');
@@ -285,10 +300,13 @@ export class WebsiteBuilder {
       } catch (err) {
         return { status: 500, body: 'Error loading documentation: ' + String(err) };
       }
-    `);
+    `,
+    );
 
     // render404(path) - Render 404 page
-    this.webSite.setMethod('render404', `
+    this.webSite.setMethod(
+      'render404',
+      `
       const path = args[0] || '/';
 
       return \`<!DOCTYPE html>
@@ -307,7 +325,8 @@ export class WebsiteBuilder {
   </div>
 </body>
 </html>\`;
-    `);
+    `,
+    );
   }
 
   private async buildTemplateInstances(forceRebuild: boolean): Promise<void> {
@@ -316,7 +335,8 @@ export class WebsiteBuilder {
     const objectManager = await this.manager.load(0);
     if (!objectManager) return;
 
-    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
+    const aliases =
+      (objectManager.get('aliases') as Record<string, number>) || {};
 
     // Landing Template
     let landingTemplate: RuntimeObject | null = null;
@@ -623,7 +643,8 @@ export class WebsiteBuilder {
     const objectManager = await this.manager.load(0);
     if (!objectManager) return;
 
-    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
+    const aliases =
+      (objectManager.get('aliases') as Record<string, number>) || {};
 
     // Homepage
     let homepage: RuntimeObject | null = null;
@@ -640,7 +661,8 @@ export class WebsiteBuilder {
           template: this._landingTemplate,
           contentType: 'html',
           published: true,
-          description: 'Hardcore survival cyberpunk text game. Permadeath. No hand-holding.',
+          description:
+            'Hardcore survival cyberpunk text game. Permadeath. No hand-holding.',
           content: `
 <div class="max-w-4xl mx-auto px-6 py-20">
   <h1 class="text-5xl md:text-7xl font-bold text-malice-accent mb-6">
@@ -733,7 +755,7 @@ export class WebsiteBuilder {
 
   private async buildRoutes(
     aliases: Record<string, number>,
-    _forceRebuild: boolean
+    _forceRebuild: boolean,
   ): Promise<void> {
     console.log('[WebsiteBuilder] buildRoutes() called');
 
@@ -746,7 +768,9 @@ export class WebsiteBuilder {
     }
     const webRoute = await this.manager.load(webRouteId);
     if (!webRoute) {
-      console.log('⚠️ webRoute prototype not found, skipping route registration');
+      console.log(
+        '⚠️ webRoute prototype not found, skipping route registration',
+      );
       return;
     }
     console.log(`[WebsiteBuilder] webRoute loaded: #${webRoute.id}`);
@@ -754,7 +778,9 @@ export class WebsiteBuilder {
     // Build docs route
     console.log('[WebsiteBuilder] Checking docsRoute...');
     if (aliases.docsRoute) {
-      console.log(`[WebsiteBuilder] docsRoute alias exists: ${aliases.docsRoute}, loading...`);
+      console.log(
+        `[WebsiteBuilder] docsRoute alias exists: ${aliases.docsRoute}, loading...`,
+      );
       this._docsRoute = await this.manager.load(aliases.docsRoute);
     }
     if (!this._docsRoute) {
@@ -771,15 +797,21 @@ export class WebsiteBuilder {
         },
         methods: {},
       });
-      console.log(`[WebsiteBuilder] docsRoute created: #${this._docsRoute?.id}`);
+      console.log(
+        `[WebsiteBuilder] docsRoute created: #${this._docsRoute?.id}`,
+      );
     } else {
-      console.log(`[WebsiteBuilder] docsRoute already exists: #${this._docsRoute?.id}`);
+      console.log(
+        `[WebsiteBuilder] docsRoute already exists: #${this._docsRoute?.id}`,
+      );
     }
 
     // Set the handler for docs route
     console.log('[WebsiteBuilder] Setting docsRoute handler...');
     if (this._docsRoute) {
-      this._docsRoute.setMethod('handleRequest', `
+      this._docsRoute.setMethod(
+        'handleRequest',
+        `
         const params = args[0] || {};
         // const meta = args[1] || {};
 
@@ -846,7 +878,8 @@ export class WebsiteBuilder {
             body: 'Error loading documentation: ' + String(err)
           };
         }
-      `);
+      `,
+      );
       console.log('[WebsiteBuilder] docsRoute handler set');
     }
 
@@ -858,7 +891,7 @@ export class WebsiteBuilder {
 
   private async buildMapRoutes(
     aliases: Record<string, number>,
-    webRoute: RuntimeObject
+    webRoute: RuntimeObject,
   ): Promise<void> {
     console.log('[WebsiteBuilder] buildMapRoutes() called');
     console.log(`[WebsiteBuilder] webRoute parent: #${webRoute.id}`);
@@ -866,7 +899,9 @@ export class WebsiteBuilder {
     // 1. RoomsRoute - /api/map/rooms
     console.log('[WebsiteBuilder] Building mapRoomsRoute...');
     if (aliases.mapRoomsRoute) {
-      console.log(`[WebsiteBuilder] mapRoomsRoute alias exists: ${aliases.mapRoomsRoute}`);
+      console.log(
+        `[WebsiteBuilder] mapRoomsRoute alias exists: ${aliases.mapRoomsRoute}`,
+      );
       this._mapRoomsRoute = await this.manager.load(aliases.mapRoomsRoute);
     }
     if (!this._mapRoomsRoute) {
@@ -883,14 +918,20 @@ export class WebsiteBuilder {
         },
         methods: {},
       });
-      console.log(`[WebsiteBuilder] mapRoomsRoute created: #${this._mapRoomsRoute?.id}`);
+      console.log(
+        `[WebsiteBuilder] mapRoomsRoute created: #${this._mapRoomsRoute?.id}`,
+      );
     } else {
-      console.log(`[WebsiteBuilder] mapRoomsRoute already exists: #${this._mapRoomsRoute?.id}`);
+      console.log(
+        `[WebsiteBuilder] mapRoomsRoute already exists: #${this._mapRoomsRoute?.id}`,
+      );
     }
 
     if (this._mapRoomsRoute) {
       console.log('[WebsiteBuilder] Setting mapRoomsRoute handler...');
-      this._mapRoomsRoute.setMethod('handleRequest', `
+      this._mapRoomsRoute.setMethod(
+        'handleRequest',
+        `
         const params = args[0] || {};
         const meta = args[1] || {};
 
@@ -968,14 +1009,17 @@ export class WebsiteBuilder {
           contentType: 'application/json',
           body: JSON.stringify({ rooms: filteredRooms, exits })
         };
-      `);
+      `,
+      );
       console.log('[WebsiteBuilder] mapRoomsRoute handler set');
     }
 
     // 2. PlayersRoute - /api/map/players (public, aggregated)
     console.log('[WebsiteBuilder] Building mapPlayersRoute...');
     if (aliases.mapPlayersRoute) {
-      console.log(`[WebsiteBuilder] mapPlayersRoute alias exists: ${aliases.mapPlayersRoute}`);
+      console.log(
+        `[WebsiteBuilder] mapPlayersRoute alias exists: ${aliases.mapPlayersRoute}`,
+      );
       this._mapPlayersRoute = await this.manager.load(aliases.mapPlayersRoute);
     }
     if (!this._mapPlayersRoute) {
@@ -994,14 +1038,20 @@ export class WebsiteBuilder {
         },
         methods: {},
       });
-      console.log(`[WebsiteBuilder] mapPlayersRoute created: #${this._mapPlayersRoute?.id}`);
+      console.log(
+        `[WebsiteBuilder] mapPlayersRoute created: #${this._mapPlayersRoute?.id}`,
+      );
     } else {
-      console.log(`[WebsiteBuilder] mapPlayersRoute already exists: #${this._mapPlayersRoute?.id}`);
+      console.log(
+        `[WebsiteBuilder] mapPlayersRoute already exists: #${this._mapPlayersRoute?.id}`,
+      );
     }
 
     if (this._mapPlayersRoute) {
       console.log('[WebsiteBuilder] Setting mapPlayersRoute handler...');
-      this._mapPlayersRoute.setMethod('handleRequest', `
+      this._mapPlayersRoute.setMethod(
+        'handleRequest',
+        `
         const params = args[0] || {};
         const meta = args[1] || {};
 
@@ -1115,15 +1165,20 @@ export class WebsiteBuilder {
             cached: false
           })
         };
-      `);
+      `,
+      );
       console.log('[WebsiteBuilder] mapPlayersRoute handler set');
     }
 
     // 3. PlayersAdminRoute - /api/map/players/admin (admin only, exact positions)
     console.log('[WebsiteBuilder] Building mapPlayersAdminRoute...');
     if (aliases.mapPlayersAdminRoute) {
-      console.log(`[WebsiteBuilder] mapPlayersAdminRoute alias exists: ${aliases.mapPlayersAdminRoute}`);
-      this._mapPlayersAdminRoute = await this.manager.load(aliases.mapPlayersAdminRoute);
+      console.log(
+        `[WebsiteBuilder] mapPlayersAdminRoute alias exists: ${aliases.mapPlayersAdminRoute}`,
+      );
+      this._mapPlayersAdminRoute = await this.manager.load(
+        aliases.mapPlayersAdminRoute,
+      );
     }
     if (!this._mapPlayersAdminRoute) {
       console.log('[WebsiteBuilder] Creating mapPlayersAdminRoute...');
@@ -1139,14 +1194,20 @@ export class WebsiteBuilder {
         },
         methods: {},
       });
-      console.log(`[WebsiteBuilder] mapPlayersAdminRoute created: #${this._mapPlayersAdminRoute?.id}`);
+      console.log(
+        `[WebsiteBuilder] mapPlayersAdminRoute created: #${this._mapPlayersAdminRoute?.id}`,
+      );
     } else {
-      console.log(`[WebsiteBuilder] mapPlayersAdminRoute already exists: #${this._mapPlayersAdminRoute?.id}`);
+      console.log(
+        `[WebsiteBuilder] mapPlayersAdminRoute already exists: #${this._mapPlayersAdminRoute?.id}`,
+      );
     }
 
     if (this._mapPlayersAdminRoute) {
       console.log('[WebsiteBuilder] Setting mapPlayersAdminRoute handler...');
-      this._mapPlayersAdminRoute.setMethod('handleRequest', `
+      this._mapPlayersAdminRoute.setMethod(
+        'handleRequest',
+        `
         const params = args[0] || {};
         const meta = args[1] || {};
 
@@ -1221,14 +1282,17 @@ export class WebsiteBuilder {
           contentType: 'application/json',
           body: JSON.stringify({ agents })
         };
-      `);
+      `,
+      );
       console.log('[WebsiteBuilder] mapPlayersAdminRoute handler set');
     }
 
     // 4. MapRoute - /map (public HTML page)
     console.log('[WebsiteBuilder] Building mapRoute...');
     if (aliases.mapRoute) {
-      console.log(`[WebsiteBuilder] mapRoute alias exists: ${aliases.mapRoute}`);
+      console.log(
+        `[WebsiteBuilder] mapRoute alias exists: ${aliases.mapRoute}`,
+      );
       this._mapRoute = await this.manager.load(aliases.mapRoute);
     }
     if (!this._mapRoute) {
@@ -1243,27 +1307,31 @@ export class WebsiteBuilder {
           contentType: 'text/html',
           requiresAuth: false,
           // Visual config - tweak via MOO code
-          roomColor: 0x00ff44,       // Bright green
-          roomOpacity: 0.7,          // More visible
-          roomEmissive: 0.4,         // Glow intensity
-          blockSize: 1.8,            // Cube size
-          ambientIntensity: 1.5,     // Ambient light
+          roomColor: 0x00ff44, // Bright green
+          roomOpacity: 0.7, // More visible
+          roomEmissive: 0.4, // Glow intensity
+          blockSize: 1.8, // Cube size
+          ambientIntensity: 1.5, // Ambient light
           directionalIntensity: 0.8, // Directional light
-          gridColor: 0x00ff00,       // Grid main color
-          gridFade: 0x003300,        // Grid fade color
-          fogNear: 80,               // Fog start
-          fogFar: 300,               // Fog end
+          gridColor: 0x00ff00, // Grid main color
+          gridFade: 0x003300, // Grid fade color
+          fogNear: 80, // Fog start
+          fogFar: 300, // Fog end
         },
         methods: {},
       });
       console.log(`[WebsiteBuilder] mapRoute created: #${this._mapRoute?.id}`);
     } else {
-      console.log(`[WebsiteBuilder] mapRoute already exists: #${this._mapRoute?.id}`);
+      console.log(
+        `[WebsiteBuilder] mapRoute already exists: #${this._mapRoute?.id}`,
+      );
     }
 
     if (this._mapRoute) {
       console.log('[WebsiteBuilder] Setting mapRoute handler...');
-      this._mapRoute.setMethod('handleRequest', `
+      this._mapRoute.setMethod(
+        'handleRequest',
+        `
         // Read visual config from route props
         const config = {
           roomColor: self.roomColor || 0x00ff44,
@@ -1679,14 +1747,17 @@ export class WebsiteBuilder {
           contentType: 'text/html',
           body: html
         };
-      `);
+      `,
+      );
       console.log('[WebsiteBuilder] mapRoute handler set');
     }
 
     // 5. MapAdminRoute - /map/admin (admin HTML page)
     console.log('[WebsiteBuilder] Building mapAdminRoute...');
     if (aliases.mapAdminRoute) {
-      console.log(`[WebsiteBuilder] mapAdminRoute alias exists: ${aliases.mapAdminRoute}`);
+      console.log(
+        `[WebsiteBuilder] mapAdminRoute alias exists: ${aliases.mapAdminRoute}`,
+      );
       this._mapAdminRoute = await this.manager.load(aliases.mapAdminRoute);
     }
     if (!this._mapAdminRoute) {
@@ -1703,14 +1774,20 @@ export class WebsiteBuilder {
         },
         methods: {},
       });
-      console.log(`[WebsiteBuilder] mapAdminRoute created: #${this._mapAdminRoute?.id}`);
+      console.log(
+        `[WebsiteBuilder] mapAdminRoute created: #${this._mapAdminRoute?.id}`,
+      );
     } else {
-      console.log(`[WebsiteBuilder] mapAdminRoute already exists: #${this._mapAdminRoute?.id}`);
+      console.log(
+        `[WebsiteBuilder] mapAdminRoute already exists: #${this._mapAdminRoute?.id}`,
+      );
     }
 
     if (this._mapAdminRoute) {
       console.log('[WebsiteBuilder] Setting mapAdminRoute handler...');
-      this._mapAdminRoute.setMethod('handleRequest', `
+      this._mapAdminRoute.setMethod(
+        'handleRequest',
+        `
         // Use the existing 3D visualizer HTML from world-map-3d.html but fetch data from APIs
         const html = \`<!DOCTYPE html>
 <html lang="en">
@@ -2123,7 +2200,8 @@ export class WebsiteBuilder {
           contentType: 'text/html',
           body: html
         };
-      `);
+      `,
+      );
       console.log('[WebsiteBuilder] mapAdminRoute handler set');
     }
 
@@ -2135,7 +2213,8 @@ export class WebsiteBuilder {
     if (!objectManager) return;
 
     // Get current aliases (webRoute/webRouter should exist now)
-    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
+    const aliases =
+      (objectManager.get('aliases') as Record<string, number>) || {};
 
     // Build routes NOW that webRoute/webRouter aliases exist
     console.log('[WebsiteBuilder] registerAliases() - building routes now');
@@ -2182,7 +2261,8 @@ export class WebsiteBuilder {
       return;
     }
 
-    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
+    const aliases =
+      (objectManager.get('aliases') as Record<string, number>) || {};
     const webRouterId = aliases.webRouter;
     if (!webRouterId) {
       console.log('⚠️ webRouter alias not found, routes not registered');

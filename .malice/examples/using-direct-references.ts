@@ -12,27 +12,27 @@ const systemOld = await $.load(2);
 await systemOld.call('someMethod', args);
 
 // NEW WAY (clean and autocomplete-friendly):
-const sys = $2;  // Direct reference to Object #2
-await sys.someMethod(args);  // TypeScript knows what methods exist!
+const sys = $2; // Direct reference to Object #2
+await sys.someMethod(args); // TypeScript knows what methods exist!
 
 // Even cleaner - use it inline:
 await $2.prompt('What is your name?');
 await $3.doStuff();
 
 // Assign to variables with types:
-const player = $5;  // If $5 is a player object
-player.health -= 10;  // IntelliSense works!
+const player = $5; // If $5 is a player object
+player.health -= 10; // IntelliSense works!
 await player.save();
 
 // Mix with traditional $ methods:
 const newObj = await $.create({
   parent: 1,
   properties: { name: 'Test' },
-  methods: {}
+  methods: {},
 });
 
 // Then immediately reference it:
-const obj = await $.load(newObj.id);
+const _obj = await $.load(newObj.id);
 // Or if you know the ID: $42.doSomething()
 
 /**
@@ -52,16 +52,16 @@ const obj = await $.load(newObj.id);
 
 // Example: Command handler using direct references
 const input = args[0] as string;
-const cmd = await $2.parseCommand(input);  // $2 is system object
+const cmd = await $2.parseCommand(input); // $2 is system object
 
 if (cmd.verb === 'look') {
-  const room = $10;  // Current room
+  const room = $10; // Current room
   await $2.sendToPlayer(self.id, room.description);
 } else if (cmd.verb === 'attack') {
-  const targetId = parseInt(cmd.target || '0');
-  const target = await $.load(targetId);  // Load first time
+  const targetId = parseInt(cmd.target || '0', 10);
+  const target = await $.load(targetId); // Load first time
 
   // Then use direct reference:
-  const result = await $4.attack(self.id, target.id);  // $4 is combat manager
+  const result = await $4.attack(self.id, target.id); // $4 is combat manager
   await $2.sendToPlayer(self.id, result.message);
 }

@@ -1,10 +1,20 @@
-import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach } from 'vitest';
-import { TelnetTestClient } from '../helpers/telnet-client.js';
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+} from 'vitest';
 import { ObjectDatabase } from '../../src/database/object-db.js';
+import { TelnetTestClient } from '../helpers/telnet-client.js';
 
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/?replicaSet=rs0&directConnection=true';
+const MONGO_URI =
+  process.env.MONGO_URI ||
+  'mongodb://localhost:27017/?replicaSet=rs0&directConnection=true';
 const TELNET_HOST = process.env.TELNET_HOST || 'localhost';
-const TELNET_PORT = parseInt(process.env.TELNET_PORT || '5555');
+const TELNET_PORT = parseInt(process.env.TELNET_PORT || '5555', 10);
 
 /**
  * End-to-end telnet integration tests
@@ -71,7 +81,9 @@ describe('Telnet Integration Tests', () => {
 
     afterEach(async () => {
       // Clean up test user from database
-      await db['objects'].deleteMany({ 'properties.playername.value': testUsername });
+      await db.objects.deleteMany({
+        'properties.playername.value': testUsername,
+      });
     });
 
     it('should prompt for password when entering new username', async () => {
@@ -124,7 +136,9 @@ describe('Telnet Integration Tests', () => {
 
     afterEach(async () => {
       // Clean up test user
-      await db['objects'].deleteMany({ 'properties.playername.value': testUsername });
+      await db.objects.deleteMany({
+        'properties.playername.value': testUsername,
+      });
     });
 
     it('should complete basic chargen flow', async () => {
@@ -207,7 +221,9 @@ describe('Telnet Integration Tests', () => {
     });
 
     afterAll(async () => {
-      await db['objects'].deleteMany({ 'properties.playername.value': testUsername });
+      await db.objects.deleteMany({
+        'properties.playername.value': testUsername,
+      });
     });
 
     it('should prompt for password when entering existing username', async () => {
@@ -308,7 +324,9 @@ describe('Telnet Integration Tests', () => {
       expect(buffer).toContain('How old are you');
 
       // Cleanup
-      await db['objects'].deleteMany({ 'properties.playername.value': testUsername });
+      await db.objects.deleteMany({
+        'properties.playername.value': testUsername,
+      });
     });
   });
 });

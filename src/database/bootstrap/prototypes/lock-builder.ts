@@ -1,5 +1,5 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Builds the Lock prototype
@@ -42,19 +42,30 @@ FORCING: Lock mechanism can be damaged with sufficient force, but this usually d
     });
 
     // Add property descriptions
-    obj.setPropertyDescription('verifiedUsers', "Array of player objects authorized to pass this lock. Check if player is in this array.");
-    obj.setPropertyDescription('difficulty', "Resistance to picking/bypassing, 1-10 scale. Higher = harder.");
+    obj.setPropertyDescription(
+      'verifiedUsers',
+      'Array of player objects authorized to pass this lock. Check if player is in this array.',
+    );
+    obj.setPropertyDescription(
+      'difficulty',
+      'Resistance to picking/bypassing, 1-10 scale. Higher = harder.',
+    );
 
     // isAuthorized(player) - Simple check for AI to use
-    obj.setMethod('isAuthorized', `
+    obj.setMethod(
+      'isAuthorized',
+      `
       const player = args[0];
       if (!player) return false;
       const verified = self.verifiedUsers || [];
       return verified.some(u => u && u.id === player.id);
-    `);
+    `,
+    );
 
     // authorize(player) - Add player to verified list
-    obj.setMethod('authorize', `
+    obj.setMethod(
+      'authorize',
+      `
       const player = args[0];
       if (!player || typeof player.id !== 'number') return false;
       const verified = self.verifiedUsers || [];
@@ -63,25 +74,32 @@ FORCING: Lock mechanism can be damaged with sufficient force, but this usually d
         self.verifiedUsers = verified;
       }
       return true;
-    `);
+    `,
+    );
 
     // revoke(player) - Remove player from verified list
-    obj.setMethod('revoke', `
+    obj.setMethod(
+      'revoke',
+      `
       const player = args[0];
       if (!player) return false;
       const verified = self.verifiedUsers || [];
       self.verifiedUsers = verified.filter(u => u && u.id !== player.id);
       return true;
-    `);
+    `,
+    );
 
     // Legacy canAccess - simplified
-    obj.setMethod('canAccess', `
+    obj.setMethod(
+      'canAccess',
+      `
       const agent = args[0];
       if (await self.isAuthorized(agent)) {
         return true;
       }
       return 'Access denied.';
-    `);
+    `,
+    );
 
     return obj;
   }

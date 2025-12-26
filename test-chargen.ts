@@ -4,14 +4,12 @@
  */
 
 import { WebSocketServer } from 'ws';
-import { WebSocketTransport } from './src/transport/websocket/websocket-transport.js';
-import { Connection } from './src/connection/connection.js';
 import { ConnectionManager } from './src/connection/connection-manager.js';
+import { GameBootstrap } from './src/database/bootstrap.js';
 import { ObjectDatabase } from './src/database/object-db.js';
 import { ObjectManager } from './src/database/object-manager.js';
-import { GameBootstrap } from './src/database/bootstrap.js';
 import { ConnectionContext } from './src/game/connection-context.js';
-import { WebSocket } from 'ws';
+import { WebSocketTransport } from './src/transport/websocket/websocket-transport.js';
 
 async function main() {
   console.log('🎮 Testing CharGen Flow...\n');

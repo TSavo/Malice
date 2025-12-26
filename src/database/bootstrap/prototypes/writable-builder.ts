@@ -1,5 +1,5 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Builds the Writable prototype
@@ -41,12 +41,17 @@ PORTABLE: Can be picked up, carried, dropped. Contents persist.`,
       methods: {},
     });
 
-    obj.setMethod('read', `
+    obj.setMethod(
+      'read',
+      `
       /** Read the current text. */
       return self.text || '(It is blank.)';
-    `);
+    `,
+    );
 
-    obj.setMethod('write', `
+    obj.setMethod(
+      'write',
+      `
       /** Write or edit the text. */
       const agent = args[0];
       const newText = args[1];
@@ -55,11 +60,21 @@ PORTABLE: Can be picked up, carried, dropped. Contents persist.`,
       if (self.maxLength && newText.length > self.maxLength) return 'That is too long.';
       self.text = newText;
       return 'You write: ' + newText;
-    `);
+    `,
+    );
 
-    obj.setPropertyDescription('text', 'The current written text content on this object');
-    obj.setPropertyDescription('writable', 'Whether the object can currently be written on');
-    obj.setPropertyDescription('maxLength', 'Maximum allowed length for text content');
+    obj.setPropertyDescription(
+      'text',
+      'The current written text content on this object',
+    );
+    obj.setPropertyDescription(
+      'writable',
+      'Whether the object can currently be written on',
+    );
+    obj.setPropertyDescription(
+      'maxLength',
+      'Maximum allowed length for text content',
+    );
 
     return obj;
   }

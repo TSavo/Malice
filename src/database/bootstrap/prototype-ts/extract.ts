@@ -45,18 +45,33 @@ export function extractPrototypeSpecFromSourceText(
     ts.ScriptKind.TS,
   );
 
-  const exportedClass = findExportedDecoratedClass(sourceFile, resolvedOptions.decoratorName);
+  const exportedClass = findExportedDecoratedClass(
+    sourceFile,
+    resolvedOptions.decoratorName,
+  );
   if (!exportedClass) {
-    throw new Error(`No exported class decorated with @${resolvedOptions.decoratorName} found in ${fileName}`);
+    throw new Error(
+      `No exported class decorated with @${resolvedOptions.decoratorName} found in ${fileName}`,
+    );
   }
 
-  const decoratorInfo = getPrototypeDecoratorInfo(exportedClass, resolvedOptions.decoratorName);
+  const decoratorInfo = getPrototypeDecoratorInfo(
+    exportedClass,
+    resolvedOptions.decoratorName,
+  );
 
-  const defaults = getStaticDefaultsObjectLiteral(exportedClass, resolvedOptions.defaultsPropertyName);
+  const defaults = getStaticDefaultsObjectLiteral(
+    exportedClass,
+    resolvedOptions.defaultsPropertyName,
+  );
 
   const properties = parseObjectLiteralToJsonish(defaults);
 
-  const methods = extractMethods(sourceFile, exportedClass, resolvedOptions.requiredPrefixParams);
+  const methods = extractMethods(
+    sourceFile,
+    exportedClass,
+    resolvedOptions.requiredPrefixParams,
+  );
 
   return {
     alias: decoratorInfo.alias,
@@ -67,7 +82,10 @@ export function extractPrototypeSpecFromSourceText(
   };
 }
 
-function findExportedDecoratedClass(sourceFile: ts.SourceFile, decoratorName: string): ts.ClassDeclaration | null {
+function findExportedDecoratedClass(
+  sourceFile: ts.SourceFile,
+  decoratorName: string,
+): ts.ClassDeclaration | null {
   const matches: ts.ClassDeclaration[] = [];
 
   for (const statement of sourceFile.statements) {
@@ -75,13 +93,17 @@ function findExportedDecoratedClass(sourceFile: ts.SourceFile, decoratorName: st
 
     const hasExport =
       statement.modifiers?.some(
-        (modifier) => modifier.kind === ts.SyntaxKind.ExportKeyword || modifier.kind === ts.SyntaxKind.DefaultKeyword,
+        (modifier) =>
+          modifier.kind === ts.SyntaxKind.ExportKeyword ||
+          modifier.kind === ts.SyntaxKind.DefaultKeyword,
       ) ?? false;
 
     if (!hasExport) continue;
 
     const decorators = ts.getDecorators(statement) ?? [];
-    const isMatch = decorators.some((decorator) => isDecoratorCallNamed(decorator, decoratorName));
+    const isMatch = decorators.some((decorator) =>
+      isDecoratorCallNamed(decorator, decoratorName),
+    );
     if (isMatch) matches.push(statement);
   }
 
@@ -95,7 +117,10 @@ function findExportedDecoratedClass(sourceFile: ts.SourceFile, decoratorName: st
   return matches[0];
 }
 
-function isDecoratorCallNamed(decorator: ts.Decorator, decoratorName: string): boolean {
+function isDecoratorCallNamed(
+  decorator: ts.Decorator,
+  decoratorName: string,
+): boolean {
   const expr = decorator.expression;
   if (!ts.isCallExpression(expr)) return false;
   if (!ts.isIdentifier(expr.expression)) return false;
@@ -107,7 +132,9 @@ function getPrototypeDecoratorInfo(
   decoratorName: string,
 ): PrototypeDecoratorInfo {
   const decorators = ts.getDecorators(classDecl) ?? [];
-  const decorator = decorators.find((d) => isDecoratorCallNamed(d, decoratorName));
+  const decorator = decorators.find((d) =>
+    isDecoratorCallNamed(d, decoratorName),
+  );
   if (!decorator) {
     throw new Error(`Class is missing @${decoratorName} decorator`);
   }
@@ -115,7 +142,9 @@ function getPrototypeDecoratorInfo(
   const callExpr = decorator.expression as ts.CallExpression;
   const arg0 = callExpr.arguments[0];
   if (!arg0 || !ts.isObjectLiteralExpression(arg0)) {
-    throw new Error(`@${decoratorName} must be called with an object literal argument`);
+    throw new Error(
+      `@${decoratorName} must be called with an object literal argument`,
+    );
   }
 
   const alias = readRequiredStringProperty(arg0, 'alias');
@@ -124,7 +153,10 @@ function getPrototypeDecoratorInfo(
   return { alias, parent };
 }
 
-function readRequiredStringProperty(obj: ts.ObjectLiteralExpression, key: string): string {
+function readRequiredStringProperty(
+  obj: ts.ObjectLiteralExpression,
+  key: string,
+): string {
   for (const prop of obj.properties) {
     if (!ts.isPropertyAssignment(prop)) continue;
     if (!ts.isIdentifier(prop.name) && !ts.isStringLiteral(prop.name)) continue;
@@ -149,24 +181,41 @@ function getStaticDefaultsObjectLiteral(
   for (const member of classDecl.members) {
     if (!ts.isPropertyDeclaration(member)) continue;
 
-    const isStatic = member.modifiers?.some((m) => m.kind === ts.SyntaxKind.StaticKeyword) ?? false;
+    const isStatic =
+      member.modifiers?.some((m) => m.kind === ts.SyntaxKind.StaticKeyword) ??
+      false;
     if (!isStatic) continue;
 
-    if (!member.name || (!ts.isIdentifier(member.name) && !ts.isStringLiteral(member.name))) continue;
-    const name = ts.isIdentifier(member.name) ? member.name.text : member.name.text;
+    if (
+      !member.name ||
+      (!ts.isIdentifier(member.name) && !ts.isStringLiteral(member.name))
+    )
+      continue;
+    const name = ts.isIdentifier(member.name)
+      ? member.name.text
+      : member.name.text;
     if (name !== defaultsPropertyName) continue;
 
-    if (!member.initializer || !ts.isObjectLiteralExpression(member.initializer)) {
-      throw new Error(`static ${defaultsPropertyName} must be an object literal`);
+    if (
+      !member.initializer ||
+      !ts.isObjectLiteralExpression(member.initializer)
+    ) {
+      throw new Error(
+        `static ${defaultsPropertyName} must be an object literal`,
+      );
     }
 
     return member.initializer;
   }
 
-  throw new Error(`Missing static ${defaultsPropertyName} object literal on prototype class`);
+  throw new Error(
+    `Missing static ${defaultsPropertyName} object literal on prototype class`,
+  );
 }
 
-function parseObjectLiteralToJsonish(obj: ts.ObjectLiteralExpression): Record<string, unknown> {
+function parseObjectLiteralToJsonish(
+  obj: ts.ObjectLiteralExpression,
+): Record<string, unknown> {
   const result: Record<string, unknown> = {};
 
   for (const prop of obj.properties) {
@@ -175,7 +224,9 @@ function parseObjectLiteralToJsonish(obj: ts.ObjectLiteralExpression): Record<st
     }
 
     if (!ts.isIdentifier(prop.name) && !ts.isStringLiteral(prop.name)) {
-      throw new Error('defaults object keys must be identifiers or string literals');
+      throw new Error(
+        'defaults object keys must be identifiers or string literals',
+      );
     }
 
     const key = ts.isIdentifier(prop.name) ? prop.name.text : prop.name.text;
@@ -203,7 +254,9 @@ function parseJsonishExpression(expr: ts.Expression): unknown {
     if (expr.operator === ts.SyntaxKind.MinusToken) {
       const value = parseJsonishExpression(expr.operand);
       if (typeof value !== 'number') {
-        throw new Error('Unary minus in defaults is only supported for numbers');
+        throw new Error(
+          'Unary minus in defaults is only supported for numbers',
+        );
       }
       return -value;
     }
@@ -240,7 +293,9 @@ function parseJsonishExpression(expr: ts.Expression): unknown {
     return parseJsonishExpression(expr.expression);
   }
 
-  throw new Error(`Unsupported defaults expression kind: ${ts.SyntaxKind[expr.kind]}`);
+  throw new Error(
+    `Unsupported defaults expression kind: ${ts.SyntaxKind[expr.kind]}`,
+  );
 }
 
 function extractMethods(
@@ -255,24 +310,40 @@ function extractMethods(
     if (!ts.isMethodDeclaration(member)) continue;
 
     // Ignore constructor
-    if (member.name && ts.isIdentifier(member.name) && member.name.text === 'constructor') continue;
+    if (
+      member.name &&
+      ts.isIdentifier(member.name) &&
+      member.name.text === 'constructor'
+    )
+      continue;
 
-    const isStatic = member.modifiers?.some((m) => m.kind === ts.SyntaxKind.StaticKeyword) ?? false;
+    const isStatic =
+      member.modifiers?.some((m) => m.kind === ts.SyntaxKind.StaticKeyword) ??
+      false;
     if (isStatic) continue;
 
-    if (!member.name || (!ts.isIdentifier(member.name) && !ts.isStringLiteral(member.name))) {
+    if (
+      !member.name ||
+      (!ts.isIdentifier(member.name) && !ts.isStringLiteral(member.name))
+    ) {
       throw new Error('Method name must be identifier or string literal');
     }
 
-    const methodName = ts.isIdentifier(member.name) ? member.name.text : member.name.text;
+    const methodName = ts.isIdentifier(member.name)
+      ? member.name.text
+      : member.name.text;
 
     const params = member.parameters.map((p) => {
       if (p.dotDotDotToken) {
-        throw new Error(`Method '${methodName}' rest parameters are not supported`);
+        throw new Error(
+          `Method '${methodName}' rest parameters are not supported`,
+        );
       }
 
       if (!ts.isIdentifier(p.name)) {
-        throw new Error(`Method '${methodName}' parameter must be an identifier`);
+        throw new Error(
+          `Method '${methodName}' parameter must be an identifier`,
+        );
       }
 
       return p.name.text;
@@ -296,7 +367,9 @@ function extractMethods(
       .join('\n');
 
     const bodyStatements = member.body.statements
-      .map((stmt) => printer.printNode(ts.EmitHint.Unspecified, stmt, sourceFile))
+      .map((stmt) =>
+        printer.printNode(ts.EmitHint.Unspecified, stmt, sourceFile),
+      )
       .join('\n');
 
     const code = [argBindings, bodyStatements].filter(Boolean).join('\n\n');

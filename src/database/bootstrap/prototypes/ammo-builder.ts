@@ -1,18 +1,18 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Builds the Ammo prototype
- * 
+ *
  * Ammunition is a stackable commodity. When loaded into a gun (directly or via clip),
  * the ammo is recycled - it doesn't exist as a separate object while loaded.
- * 
+ *
  * Ammo types must match the gun's ammoType property:
  * - 9mm, .38, .44, .45, .380, .22
  * - .308, .30-30
  * - 12gauge, 20gauge
  * - etc.
- * 
+ *
  * Inherits from $.stackable for quantity management.
  */
 export class AmmoBuilder {
@@ -58,22 +58,30 @@ EXPOSED: Loose ammo can be damaged by water, fire. Store in sealed containers.`,
     });
 
     // Override stackType to use ammoType for stacking
-    obj.setMethod('canStackWith', `
+    obj.setMethod(
+      'canStackWith',
+      `
       const other = args[0];
       if (!other) return false;
       if (!self.ammoType || !other.ammoType) return false;
       return self.ammoType === other.ammoType;
-    `);
+    `,
+    );
 
     // Override shortDesc for ammo display
-    obj.setMethod('shortDesc', `
+    obj.setMethod(
+      'shortDesc',
+      `
       const qty = self.quantity || 0;
       const type = self.ammoType || 'generic';
       return qty + ' rounds of ' + type;
-    `);
+    `,
+    );
 
     // describe - show ammo details
-    obj.setMethod('describe', `
+    obj.setMethod(
+      'describe',
+      `
       const qty = self.quantity || 0;
       const type = self.ammoType || 'generic';
 
@@ -89,11 +97,21 @@ EXPOSED: Loose ammo can be damaged by water, fire. Store in sealed containers.`,
       }
 
       return desc;
-    `);
+    `,
+    );
 
-    obj.setPropertyDescription('ammoType', 'The caliber or type of ammunition (e.g., 9mm, .45, 12gauge). Must match weapon ammoType.');
-    obj.setPropertyDescription('unit', 'Display unit for this ammo type (rounds, shells, etc.).');
-    obj.setPropertyDescription('contraband', 'Whether this ammunition is illegal to possess.');
+    obj.setPropertyDescription(
+      'ammoType',
+      'The caliber or type of ammunition (e.g., 9mm, .45, 12gauge). Must match weapon ammoType.',
+    );
+    obj.setPropertyDescription(
+      'unit',
+      'Display unit for this ammo type (rounds, shells, etc.).',
+    );
+    obj.setPropertyDescription(
+      'contraband',
+      'Whether this ammunition is illegal to possess.',
+    );
 
     return obj;
   }
@@ -305,7 +323,9 @@ export class AmmoPrototypesBuilder {
     ammoTypes.ammo3030 = await new Ammo3030Builder(this.manager).build(ammoId);
 
     // Shotgun
-    ammoTypes.ammo12gauge = await new Ammo12GaugeBuilder(this.manager).build(ammoId);
+    ammoTypes.ammo12gauge = await new Ammo12GaugeBuilder(this.manager).build(
+      ammoId,
+    );
 
     console.log(`✅ Built ${Object.keys(ammoTypes).length} ammo prototypes`);
     return ammoTypes;

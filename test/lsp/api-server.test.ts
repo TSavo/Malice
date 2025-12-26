@@ -1,10 +1,20 @@
-import { describe, it, expect, beforeAll, afterAll, beforeEach, vi } from 'vitest';
+import type { Server } from 'node:http';
+import {
+  afterAll,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from 'vitest';
 import { ObjectDatabase } from '../../src/database/object-db.js';
 import { ObjectManager } from '../../src/database/object-manager.js';
 import { LSPApiServer } from '../../src/lsp/api-server.js';
-import type { Server } from 'http';
 
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/?replicaSet=rs0&directConnection=true';
+const MONGO_URI =
+  process.env.MONGO_URI ||
+  'mongodb://localhost:27017/?replicaSet=rs0&directConnection=true';
 const TEST_PORT = 13579; // Use a unique test port to avoid conflicts
 
 describe('LSP API Server', () => {
@@ -19,7 +29,7 @@ describe('LSP API Server', () => {
     // Setup database
     db = new ObjectDatabase(MONGO_URI, 'malice_test_lsp_api');
     await db.connect();
-    await db['objects'].deleteMany({});
+    await db.objects.deleteMany({});
     await db.ensureRoot();
 
     manager = new ObjectManager(db);
@@ -33,7 +43,7 @@ describe('LSP API Server', () => {
     // Start server and capture reference
     await new Promise<void>((resolve) => {
       const apiServer = server as any;
-      const createServer = require('http').createServer;
+      const createServer = require('node:http').createServer;
       httpServer = createServer(apiServer.handleRequest.bind(apiServer));
       httpServer.listen(TEST_PORT, () => {
         console.log(`Test server started on port ${TEST_PORT}`);
@@ -42,7 +52,7 @@ describe('LSP API Server', () => {
     });
 
     // Give server time to start
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 500));
   }, 30000);
 
   afterAll(async () => {
@@ -65,7 +75,10 @@ describe('LSP API Server', () => {
     const allObjects = await db.listAll();
     for (const obj of allObjects) {
       if (obj._id > 1) {
-        await db['objects'].updateOne({ _id: obj._id }, { $set: { recycled: true } });
+        await db.objects.updateOne(
+          { _id: obj._id },
+          { $set: { recycled: true } },
+        );
       }
     }
   });
@@ -75,8 +88,12 @@ describe('LSP API Server', () => {
       const response = await fetch(`${baseUrl}/api/lsp/list/objects/`);
 
       expect(response.headers.get('Access-Control-Allow-Origin')).toBe('*');
-      expect(response.headers.get('Access-Control-Allow-Methods')).toContain('GET');
-      expect(response.headers.get('Access-Control-Allow-Headers')).toContain('Content-Type');
+      expect(response.headers.get('Access-Control-Allow-Methods')).toContain(
+        'GET',
+      );
+      expect(response.headers.get('Access-Control-Allow-Headers')).toContain(
+        'Content-Type',
+      );
     });
 
     it('should set CORS headers on POST requests', async () => {
@@ -94,11 +111,13 @@ describe('LSP API Server', () => {
         {
           method: 'POST',
           body: 'return "updated";',
-        }
+        },
       );
 
       expect(response.headers.get('Access-Control-Allow-Origin')).toBe('*');
-      expect(response.headers.get('Access-Control-Allow-Methods')).toContain('POST');
+      expect(response.headers.get('Access-Control-Allow-Methods')).toContain(
+        'POST',
+      );
     });
 
     it('should handle OPTIONS preflight requests', async () => {
@@ -108,8 +127,12 @@ describe('LSP API Server', () => {
 
       expect(response.status).toBe(200);
       expect(response.headers.get('Access-Control-Allow-Origin')).toBe('*');
-      expect(response.headers.get('Access-Control-Allow-Methods')).toContain('GET');
-      expect(response.headers.get('Access-Control-Allow-Methods')).toContain('POST');
+      expect(response.headers.get('Access-Control-Allow-Methods')).toContain(
+        'GET',
+      );
+      expect(response.headers.get('Access-Control-Allow-Methods')).toContain(
+        'POST',
+      );
     });
   });
 
@@ -183,7 +206,9 @@ describe('LSP API Server', () => {
       obj.setMethod('attack', 'return "attack!";');
       await obj.save();
 
-      const response = await fetch(`${baseUrl}/api/lsp/list/objects/${obj.id}/`);
+      const response = await fetch(
+        `${baseUrl}/api/lsp/list/objects/${obj.id}/`,
+      );
       expect(response.status).toBe(200);
 
       const entries = await response.json();
@@ -216,7 +241,9 @@ describe('LSP API Server', () => {
         methods: {},
       });
 
-      const response = await fetch(`${baseUrl}/api/lsp/list/objects/${obj.id}/`);
+      const response = await fetch(
+        `${baseUrl}/api/lsp/list/objects/${obj.id}/`,
+      );
       expect(response.status).toBe(200);
 
       const entries = await response.json();
@@ -245,7 +272,9 @@ describe('LSP API Server', () => {
       obj.setMethod('greet', methodCode);
       await obj.save();
 
-      const response = await fetch(`${baseUrl}/api/lsp/read/objects/${obj.id}/greet.ts`);
+      const response = await fetch(
+        `${baseUrl}/api/lsp/read/objects/${obj.id}/greet.ts`,
+      );
       expect(response.status).toBe(200);
       expect(response.headers.get('Content-Type')).toBe('text/plain');
 
@@ -268,7 +297,9 @@ describe('LSP API Server', () => {
         methods: {},
       });
 
-      const response = await fetch(`${baseUrl}/api/lsp/read/objects/${obj.id}/nonexistent.ts`);
+      const response = await fetch(
+        `${baseUrl}/api/lsp/read/objects/${obj.id}/nonexistent.ts`,
+      );
       expect(response.status).toBe(404);
 
       const text = await response.text();
@@ -276,7 +307,9 @@ describe('LSP API Server', () => {
     });
 
     it('should return 404 for non-existent object', async () => {
-      const response = await fetch(`${baseUrl}/api/lsp/read/objects/99999/test.ts`);
+      const response = await fetch(
+        `${baseUrl}/api/lsp/read/objects/99999/test.ts`,
+      );
       expect(response.status).toBe(404);
     });
 
@@ -289,7 +322,9 @@ describe('LSP API Server', () => {
       obj.setMethod('test', 'return self.id;');
       await obj.save();
 
-      const response = await fetch(`${baseUrl}/api/lsp/read/objects/${obj.id}/test.ts`);
+      const response = await fetch(
+        `${baseUrl}/api/lsp/read/objects/${obj.id}/test.ts`,
+      );
       const content = await response.text();
 
       // Should have some prototype type (RuntimeObject or specific type)
@@ -310,19 +345,25 @@ describe('LSP API Server', () => {
       });
 
       // Read number property
-      const hpResponse = await fetch(`${baseUrl}/api/lsp/read/objects/${obj.id}/hp.json`);
+      const hpResponse = await fetch(
+        `${baseUrl}/api/lsp/read/objects/${obj.id}/hp.json`,
+      );
       expect(hpResponse.status).toBe(200);
       expect(hpResponse.headers.get('Content-Type')).toBe('text/plain');
       const hpContent = await hpResponse.text();
       expect(JSON.parse(hpContent)).toBe(100);
 
       // Read string property
-      const nameResponse = await fetch(`${baseUrl}/api/lsp/read/objects/${obj.id}/name.json`);
+      const nameResponse = await fetch(
+        `${baseUrl}/api/lsp/read/objects/${obj.id}/name.json`,
+      );
       const nameContent = await nameResponse.text();
       expect(JSON.parse(nameContent)).toBe('Test Player');
 
       // Read object property
-      const statsResponse = await fetch(`${baseUrl}/api/lsp/read/objects/${obj.id}/stats.json`);
+      const statsResponse = await fetch(
+        `${baseUrl}/api/lsp/read/objects/${obj.id}/stats.json`,
+      );
       const statsContent = await statsResponse.text();
       expect(JSON.parse(statsContent)).toEqual({ strength: 10, dexterity: 15 });
     });
@@ -334,7 +375,9 @@ describe('LSP API Server', () => {
         methods: {},
       });
 
-      const response = await fetch(`${baseUrl}/api/lsp/read/objects/${obj.id}/nonexistent.json`);
+      const response = await fetch(
+        `${baseUrl}/api/lsp/read/objects/${obj.id}/nonexistent.json`,
+      );
       expect(response.status).toBe(404);
     });
 
@@ -347,7 +390,9 @@ describe('LSP API Server', () => {
         methods: {},
       });
 
-      const response = await fetch(`${baseUrl}/api/lsp/read/objects/${obj.id}/data.json`);
+      const response = await fetch(
+        `${baseUrl}/api/lsp/read/objects/${obj.id}/data.json`,
+      );
       const content = await response.text();
 
       // Should be formatted with indentation (not minified)
@@ -373,7 +418,7 @@ describe('LSP API Server', () => {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain' },
           body: newCode,
-        }
+        },
       );
 
       expect(response.status).toBe(200);
@@ -381,7 +426,7 @@ describe('LSP API Server', () => {
       expect(text).toBe('OK');
 
       // Wait for changes to propagate
-      await new Promise(resolve => setTimeout(resolve, 200));
+      await new Promise((resolve) => setTimeout(resolve, 200));
 
       // Invalidate cache to force reload
       manager.invalidate(obj.id);
@@ -390,7 +435,7 @@ describe('LSP API Server', () => {
       const reloaded = await manager.load(obj.id);
       expect(reloaded).not.toBeNull();
 
-      const result = await reloaded!.call('test');
+      const result = await reloaded?.call('test');
       expect(result).toBe('new value');
     });
 
@@ -407,18 +452,18 @@ describe('LSP API Server', () => {
         {
           method: 'POST',
           body: code,
-        }
+        },
       );
 
       expect(response.status).toBe(200);
 
       // Wait for changes and invalidate cache
-      await new Promise(resolve => setTimeout(resolve, 200));
+      await new Promise((resolve) => setTimeout(resolve, 200));
       manager.invalidate(obj.id);
 
       // Verify method was created
       const reloaded = await manager.load(obj.id);
-      const result = await reloaded!.call('newMethod');
+      const result = await reloaded?.call('newMethod');
       expect(result).toBe('brand new');
     });
 
@@ -440,18 +485,18 @@ describe('LSP API Server', () => {
         {
           method: 'POST',
           body: code,
-        }
+        },
       );
 
       expect(response.status).toBe(200);
 
       // Wait for changes and invalidate cache
-      await new Promise(resolve => setTimeout(resolve, 200));
+      await new Promise((resolve) => setTimeout(resolve, 200));
       manager.invalidate(obj.id);
 
       // Verify method executes correctly
       const reloaded = await manager.load(obj.id);
-      const result = await reloaded!.call('calculate');
+      const result = await reloaded?.call('calculate');
       expect(result).toBe(20);
     });
 
@@ -468,21 +513,18 @@ describe('LSP API Server', () => {
       await obj.call('cached');
 
       // Write new code via API
-      await fetch(
-        `${baseUrl}/api/lsp/write/objects/${obj.id}/cached.ts`,
-        {
-          method: 'POST',
-          body: 'return "updated";',
-        }
-      );
+      await fetch(`${baseUrl}/api/lsp/write/objects/${obj.id}/cached.ts`, {
+        method: 'POST',
+        body: 'return "updated";',
+      });
 
       // Wait for changes and invalidate cache
-      await new Promise(resolve => setTimeout(resolve, 200));
+      await new Promise((resolve) => setTimeout(resolve, 200));
       manager.invalidate(obj.id);
 
       // Should get updated code
       const reloaded = await manager.load(obj.id);
-      const result = await reloaded!.call('cached');
+      const result = await reloaded?.call('cached');
       expect(result).toBe('updated');
     });
 
@@ -492,7 +534,7 @@ describe('LSP API Server', () => {
         {
           method: 'POST',
           body: 'return "test";',
-        }
+        },
       );
 
       // Returns 200 but silently fails (VFS returns early if object doesn't exist)
@@ -515,7 +557,9 @@ describe('LSP API Server', () => {
     });
 
     it('should handle malformed URIs gracefully', async () => {
-      const response = await fetch(`${baseUrl}/api/lsp/read/objects/abc/test.ts`);
+      const response = await fetch(
+        `${baseUrl}/api/lsp/read/objects/abc/test.ts`,
+      );
 
       // Should either return 404 or 500, but not crash
       expect([404, 500]).toContain(response.status);
@@ -525,7 +569,9 @@ describe('LSP API Server', () => {
       // Try to read from an object after disconnecting (simulated error)
       // This is hard to test without mocking, so we'll test with invalid data
 
-      const response = await fetch(`${baseUrl}/api/lsp/read/objects/-999/test.ts`);
+      const response = await fetch(
+        `${baseUrl}/api/lsp/read/objects/-999/test.ts`,
+      );
 
       // Should handle gracefully
       expect([404, 500]).toContain(response.status);
@@ -547,8 +593,8 @@ describe('LSP API Server', () => {
       };
 
       // Start the broken server
-      const brokenHttpServer = require('http').createServer(
-        (brokenServer as any).handleRequest.bind(brokenServer)
+      const brokenHttpServer = require('node:http').createServer(
+        (brokenServer as any).handleRequest.bind(brokenServer),
       );
 
       await new Promise<void>((resolve) => {
@@ -556,14 +602,18 @@ describe('LSP API Server', () => {
       });
 
       try {
-        const response = await fetch(`http://localhost:${brokenPort}/api/lsp/list/objects/`);
+        const response = await fetch(
+          `http://localhost:${brokenPort}/api/lsp/list/objects/`,
+        );
         expect(response.status).toBe(500);
 
         const text = await response.text();
         expect(text).toBe('Database connection failed');
       } finally {
         await new Promise<void>((resolve, reject) => {
-          brokenHttpServer.close((err: Error) => err ? reject(err) : resolve());
+          brokenHttpServer.close((err: Error) =>
+            err ? reject(err) : resolve(),
+          );
         });
       }
     });
@@ -583,8 +633,8 @@ describe('LSP API Server', () => {
       };
 
       // Start the broken server
-      const brokenHttpServer = require('http').createServer(
-        (brokenServer as any).handleRequest.bind(brokenServer)
+      const brokenHttpServer = require('node:http').createServer(
+        (brokenServer as any).handleRequest.bind(brokenServer),
       );
 
       await new Promise<void>((resolve) => {
@@ -592,14 +642,18 @@ describe('LSP API Server', () => {
       });
 
       try {
-        const response = await fetch(`http://localhost:${brokenPort}/api/lsp/list/objects/`);
+        const response = await fetch(
+          `http://localhost:${brokenPort}/api/lsp/list/objects/`,
+        );
         expect(response.status).toBe(500);
 
         const text = await response.text();
         expect(text).toBe('Internal server error');
       } finally {
         await new Promise<void>((resolve, reject) => {
-          brokenHttpServer.close((err: Error) => err ? reject(err) : resolve());
+          brokenHttpServer.close((err: Error) =>
+            err ? reject(err) : resolve(),
+          );
         });
       }
     });
@@ -626,16 +680,20 @@ describe('LSP API Server', () => {
       });
 
       // Wait for changes and invalidate cache
-      await new Promise(resolve => setTimeout(resolve, 200));
+      await new Promise((resolve) => setTimeout(resolve, 200));
       manager.invalidate(obj.id);
 
       // Read method (Read)
-      const readResponse = await fetch(`${baseUrl}/api/lsp/read/objects/${obj.id}/increment.ts`);
+      const readResponse = await fetch(
+        `${baseUrl}/api/lsp/read/objects/${obj.id}/increment.ts`,
+      );
       const content = await readResponse.text();
       expect(content).toContain('self.counter++');
 
       // List methods (Read)
-      const methodsResponse = await fetch(`${baseUrl}/api/lsp/list/objects/${obj.id}/`);
+      const methodsResponse = await fetch(
+        `${baseUrl}/api/lsp/list/objects/${obj.id}/`,
+      );
       const methods = await methodsResponse.json();
       const incrementFile = methods.find((e: any) => e.name === 'increment.ts');
       expect(incrementFile).toBeDefined();
@@ -647,12 +705,12 @@ describe('LSP API Server', () => {
       });
 
       // Wait for changes and invalidate cache
-      await new Promise(resolve => setTimeout(resolve, 200));
+      await new Promise((resolve) => setTimeout(resolve, 200));
       manager.invalidate(obj.id);
 
       // Verify update
       const updated = await manager.load(obj.id);
-      const result = await updated!.call('increment');
+      const result = await updated?.call('increment');
       expect(result).toBe(2);
     });
 
@@ -676,26 +734,32 @@ describe('LSP API Server', () => {
       expect(readResponses[1].status).toBe(200);
 
       // Write methods sequentially to avoid race conditions on the same object
-      const write1Response = await fetch(`${baseUrl}/api/lsp/write/objects/${obj.id}/test1.ts`, {
-        method: 'POST',
-        body: 'return 1;',
-      });
+      const write1Response = await fetch(
+        `${baseUrl}/api/lsp/write/objects/${obj.id}/test1.ts`,
+        {
+          method: 'POST',
+          body: 'return 1;',
+        },
+      );
       expect(write1Response.status).toBe(200);
 
-      const write2Response = await fetch(`${baseUrl}/api/lsp/write/objects/${obj.id}/test2.ts`, {
-        method: 'POST',
-        body: 'return 2;',
-      });
+      const write2Response = await fetch(
+        `${baseUrl}/api/lsp/write/objects/${obj.id}/test2.ts`,
+        {
+          method: 'POST',
+          body: 'return 2;',
+        },
+      );
       expect(write2Response.status).toBe(200);
 
       // Wait for changes and invalidate cache
-      await new Promise(resolve => setTimeout(resolve, 200));
+      await new Promise((resolve) => setTimeout(resolve, 200));
       manager.invalidate(obj.id);
 
       // Verify both methods were created
       const reloaded = await manager.load(obj.id);
-      expect(await reloaded!.call('test1')).toBe(1);
-      expect(await reloaded!.call('test2')).toBe(2);
+      expect(await reloaded?.call('test1')).toBe(1);
+      expect(await reloaded?.call('test2')).toBe(2);
     });
 
     it('should work with objects that have many methods', async () => {
@@ -712,7 +776,9 @@ describe('LSP API Server', () => {
       await obj.save();
 
       // List should show all methods
-      const response = await fetch(`${baseUrl}/api/lsp/list/objects/${obj.id}/`);
+      const response = await fetch(
+        `${baseUrl}/api/lsp/list/objects/${obj.id}/`,
+      );
       const entries = await response.json();
 
       const methodFiles = entries.filter((e: any) => e.name.endsWith('.ts'));
@@ -721,7 +787,7 @@ describe('LSP API Server', () => {
       // Verify we can read each one
       for (let i = 0; i < 10; i++) {
         const readResponse = await fetch(
-          `${baseUrl}/api/lsp/read/objects/${obj.id}/method${i}.ts`
+          `${baseUrl}/api/lsp/read/objects/${obj.id}/method${i}.ts`,
         );
         expect(readResponse.status).toBe(200);
         const content = await readResponse.text();
@@ -742,15 +808,19 @@ describe('LSP API Server', () => {
       startServer.start();
 
       // Wait for server to start
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
       // Verify the log message was printed
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining(`LSP API Server listening on http://localhost:${startPort}`)
+        expect.stringContaining(
+          `LSP API Server listening on http://localhost:${startPort}`,
+        ),
       );
 
       // Verify server is actually listening by making a request
-      const response = await fetch(`http://localhost:${startPort}/api/lsp/list/objects/`);
+      const response = await fetch(
+        `http://localhost:${startPort}/api/lsp/list/objects/`,
+      );
       expect(response.status).toBe(200);
 
       // Cleanup - we need to close the server
@@ -773,7 +843,7 @@ describe('LSP API Server', () => {
       await obj.save();
 
       const response = await fetch(
-        `${baseUrl}/api/lsp/read/objects/${obj.id}/on_connection_123.ts`
+        `${baseUrl}/api/lsp/read/objects/${obj.id}/on_connection_123.ts`,
       );
       expect(response.status).toBe(200);
     });
@@ -790,18 +860,18 @@ describe('LSP API Server', () => {
         {
           method: 'POST',
           body: '',
-        }
+        },
       );
 
       expect(response.status).toBe(200);
 
       // Wait longer for empty methods to propagate
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 500));
       manager.invalidate(obj.id);
 
       // Should be able to read it back
       const readResponse = await fetch(
-        `${baseUrl}/api/lsp/read/objects/${obj.id}/empty.ts`
+        `${baseUrl}/api/lsp/read/objects/${obj.id}/empty.ts`,
       );
       expect(readResponse.status).toBe(200);
     });
@@ -814,25 +884,25 @@ describe('LSP API Server', () => {
       });
 
       // Generate large code (10KB)
-      const largeCode = 'return "' + 'x'.repeat(10000) + '";';
+      const largeCode = `return "${'x'.repeat(10000)}";`;
 
       const response = await fetch(
         `${baseUrl}/api/lsp/write/objects/${obj.id}/large.ts`,
         {
           method: 'POST',
           body: largeCode,
-        }
+        },
       );
 
       expect(response.status).toBe(200);
 
       // Wait for changes and invalidate cache
-      await new Promise(resolve => setTimeout(resolve, 200));
+      await new Promise((resolve) => setTimeout(resolve, 200));
       manager.invalidate(obj.id);
 
       // Verify it was saved
       const readResponse = await fetch(
-        `${baseUrl}/api/lsp/read/objects/${obj.id}/large.ts`
+        `${baseUrl}/api/lsp/read/objects/${obj.id}/large.ts`,
       );
       const content = await readResponse.text();
       expect(content).toContain('x'.repeat(10000));
@@ -847,7 +917,9 @@ describe('LSP API Server', () => {
         methods: {},
       });
 
-      const response = await fetch(`${baseUrl}/api/lsp/read/objects/${obj.id}/nullProp.json`);
+      const response = await fetch(
+        `${baseUrl}/api/lsp/read/objects/${obj.id}/nullProp.json`,
+      );
       expect(response.status).toBe(200);
 
       const content = await response.text();
@@ -863,7 +935,9 @@ describe('LSP API Server', () => {
         methods: {},
       });
 
-      const response = await fetch(`${baseUrl}/api/lsp/read/objects/${obj.id}/items.json`);
+      const response = await fetch(
+        `${baseUrl}/api/lsp/read/objects/${obj.id}/items.json`,
+      );
       const content = await response.text();
 
       expect(JSON.parse(content)).toEqual(['sword', 'shield', 'potion']);

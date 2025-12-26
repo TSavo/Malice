@@ -32,7 +32,10 @@ To the east, the warehouse proper holds row after row of shelving. The scale of 
       waterLevel: 0,
       outdoor: false,
       exits: {
-        west: { to: 'waterfront/y-5.ts', description: 'A steel door leads to the waterfront' },
+        west: {
+          to: 'waterfront/y-5.ts',
+          description: 'A steel door leads to the waterfront',
+        },
         east: '%WAREHOUSE',
         north: '%LOADING',
       },

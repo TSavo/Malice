@@ -1,5 +1,5 @@
-import { ObjectManager } from '../object-manager.js';
 import type { RuntimeObject } from '../../../types/object.js';
+import type { ObjectManager } from '../object-manager.js';
 
 /**
  * Builds $webRoute prototype (dynamic ID)
@@ -28,7 +28,8 @@ export class WebRouteBuilder {
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
 
-    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
+    const aliases =
+      (objectManager.get('aliases') as Record<string, number>) || {};
 
     if (aliases.webRoute) {
       this.webRoute = await this.manager.load(aliases.webRoute);
@@ -61,7 +62,9 @@ export class WebRouteBuilder {
   private addMatchMethod(): void {
     if (!this.webRoute) return;
 
-    this.webRoute.setMethod('match', `
+    this.webRoute.setMethod(
+      'match',
+      `
       let requestPath = args[0];
       const requestMethod = args[1];
 
@@ -125,18 +128,22 @@ export class WebRouteBuilder {
       }
 
       return { matched: true, params };
-    `);
+    `,
+    );
   }
 
   private addHandleRequestMethod(): void {
     if (!this.webRoute) return;
 
     // Default handler - subclasses override this
-    this.webRoute.setMethod('handleRequest', `
+    this.webRoute.setMethod(
+      'handleRequest',
+      `
       // Default implementation - returns 404
       // Routes should override this method
       return { error: 'Not implemented' };
-    `);
+    `,
+    );
   }
 
   async registerAlias(): Promise<void> {

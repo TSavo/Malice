@@ -1,5 +1,5 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Builds the Decayable prototype
@@ -79,7 +79,9 @@ PRESERVATION: preserve(method) stops decay if caught early.`,
     });
 
     // Check if decay condition is met
-    obj.setMethod('shouldDecay', `
+    obj.setMethod(
+      'shouldDecay',
+      `
       /** Check if this object should be decaying.
        *  Override in subclasses to define decay conditions.
        *  @returns true if decay should be active
@@ -115,10 +117,13 @@ PRESERVATION: preserve(method) stops decay if caught early.`,
 
       // Default: check if condition property is true
       return self[condition] === true;
-    `);
+    `,
+    );
 
     // Get current storage modifier
-    obj.setMethod('getStorageModifier', `
+    obj.setMethod(
+      'getStorageModifier',
+      `
       /** Get the decay rate modifier based on current storage.
        *  Checks parent containers for storage properties.
        *  @returns Multiplier for decay rate (0 = no decay, 1 = normal, 2 = accelerated)
@@ -156,10 +161,13 @@ PRESERVATION: preserve(method) stops decay if caught early.`,
       }
 
       return modifier;
-    `);
+    `,
+    );
 
     // Check for storage damage
-    obj.setMethod('checkStorageDamage', `
+    obj.setMethod(
+      'checkStorageDamage',
+      `
       /** Check if current storage is damaging this item.
        *  Some items are harmed by certain storage (organs by freezing, etc.)
        *  @returns {damage: number, reason: string} or null if no damage
@@ -179,10 +187,13 @@ PRESERVATION: preserve(method) stops decay if caught early.`,
       }
 
       return null;
-    `);
+    `,
+    );
 
     // Process decay tick
-    obj.setMethod('decayTick', `
+    obj.setMethod(
+      'decayTick',
+      `
       /** Process one tick of decay.
        *  Called by scheduler or heartbeat.
        *  @returns {decayed: number, level: number, stage: string, destroyed: boolean}
@@ -240,10 +251,13 @@ PRESERVATION: preserve(method) stops decay if caught early.`,
         stage: await self.getDecayStage(),
         destroyed,
       };
-    `);
+    `,
+    );
 
     // Get decay stage name
-    obj.setMethod('getDecayStage', `
+    obj.setMethod(
+      'getDecayStage',
+      `
       /** Get the current decay stage name.
        *  @returns 'fresh' | 'slight' | 'decayed' | 'severe' | 'destroyed'
        */
@@ -255,10 +269,13 @@ PRESERVATION: preserve(method) stops decay if caught early.`,
       if (level < 75) return 'decayed';
       if (level < 100) return 'severe';
       return 'destroyed';
-    `);
+    `,
+    );
 
     // Get decay description for examine
-    obj.setMethod('getDecayDescription', `
+    obj.setMethod(
+      'getDecayDescription',
+      `
       /** Get a description of the decay state.
        *  @returns Description string or empty if fresh
        */
@@ -271,10 +288,13 @@ PRESERVATION: preserve(method) stops decay if caught early.`,
       if (stage === 'destroyed') return 'It has completely decayed.';
 
       return '';
-    `);
+    `,
+    );
 
     // Hook for when fully decayed
-    obj.setMethod('onFullyDecayed', `
+    obj.setMethod(
+      'onFullyDecayed',
+      `
       /** Called when item reaches 100% decay.
        *  Override to handle destruction, spawn flies, etc.
        */
@@ -283,10 +303,13 @@ PRESERVATION: preserve(method) stops decay if caught early.`,
 
       // Could spawn maggots, flies, etc.
       // Could announce decay smell to room
-    `);
+    `,
+    );
 
     // Hook for storage damage
-    obj.setMethod('onStorageDamage', `
+    obj.setMethod(
+      'onStorageDamage',
+      `
       /** Called when storage is damaging this item.
        *  @param amount - Damage amount
        *  @param reason - Reason for damage (e.g., 'freezing')
@@ -296,10 +319,13 @@ PRESERVATION: preserve(method) stops decay if caught early.`,
 
       // Default: add to decay
       self.decayLevel = Math.min(100, (self.decayLevel || 0) + amount);
-    `);
+    `,
+    );
 
     // Preserve the item (stop decay)
-    obj.setMethod('preserve', `
+    obj.setMethod(
+      'preserve',
+      `
       /** Preserve this item, stopping decay.
        *  @param method - Preservation method ('salt', 'vinegar', 'vacuum', etc.)
        *  @returns true if preserved successfully
@@ -316,11 +342,14 @@ PRESERVATION: preserve(method) stops decay if caught early.`,
       }
 
       return true;
-    `);
+    `,
+    );
 
     // Receive calories to reduce decay (healing/undecay)
     // This is the inverse of decay - calories repair damage
-    obj.setMethod('receiveCalories', `
+    obj.setMethod(
+      'receiveCalories',
+      `
       /** Receive calories to reduce decay level (healing).
        *  Calories reverse decay at the same rate decay consumes them.
        *  100 calories = 1% decay reduction (adjustable via healRate).
@@ -363,16 +392,38 @@ PRESERVATION: preserve(method) stops decay if caught early.`,
         caloriesUsed,
         stage: await self.getDecayStage(),
       };
-    `);
+    `,
+    );
 
     // Add property descriptions
-    obj.setPropertyDescription('decayRate', 'Base decay rate as percentage per tick (0-100). Modified by storage conditions.');
-    obj.setPropertyDescription('decayLevel', 'Current decay state (0-100%). 0 = fresh, 100 = fully decayed/destroyed.');
-    obj.setPropertyDescription('decayCondition', 'Condition that triggers decay start (null = always, "severed" = detached parts, "dead" = corpses, "harvested" = food).');
-    obj.setPropertyDescription('decayStarted', 'Timestamp (Date.now()) when decay began. Null if not currently decaying.');
-    obj.setPropertyDescription('decaying', 'Whether currently undergoing decay. Updated by shouldDecay() checks.');
-    obj.setPropertyDescription('storageSensitivity', 'Object mapping storage conditions to decay rate multipliers (refrigerated: 0.1, frozen: 0, vacuum: 0.2, heated: 2.0, preserved: 0).');
-    obj.setPropertyDescription('storageDamage', 'Object mapping storage conditions to damage amounts (frozen: damage to organs, heated: damage from heat).');
+    obj.setPropertyDescription(
+      'decayRate',
+      'Base decay rate as percentage per tick (0-100). Modified by storage conditions.',
+    );
+    obj.setPropertyDescription(
+      'decayLevel',
+      'Current decay state (0-100%). 0 = fresh, 100 = fully decayed/destroyed.',
+    );
+    obj.setPropertyDescription(
+      'decayCondition',
+      'Condition that triggers decay start (null = always, "severed" = detached parts, "dead" = corpses, "harvested" = food).',
+    );
+    obj.setPropertyDescription(
+      'decayStarted',
+      'Timestamp (Date.now()) when decay began. Null if not currently decaying.',
+    );
+    obj.setPropertyDescription(
+      'decaying',
+      'Whether currently undergoing decay. Updated by shouldDecay() checks.',
+    );
+    obj.setPropertyDescription(
+      'storageSensitivity',
+      'Object mapping storage conditions to decay rate multipliers (refrigerated: 0.1, frozen: 0, vacuum: 0.2, heated: 2.0, preserved: 0).',
+    );
+    obj.setPropertyDescription(
+      'storageDamage',
+      'Object mapping storage conditions to damage amounts (frozen: damage to organs, heated: damage from heat).',
+    );
 
     return obj;
   }

@@ -1,5 +1,5 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Builds the SealedBox prototype
@@ -21,20 +21,21 @@ export class SealedBoxBuilder {
       parent: parentObj!,
       properties: {
         name: 'Sealed Box',
-        description: 'A white plastic case with black tamper strips and a barcode label. The seal is intact.',
+        description:
+          'A white plastic case with black tamper strips and a barcode label. The seal is intact.',
         // Delivery info
-        destinationId: null,      // Room ID where this should be delivered
-        destinationName: null,    // Human-readable destination
-        contents: null,           // What's inside (for description only, not accessible)
+        destinationId: null, // Room ID where this should be delivered
+        destinationName: null, // Human-readable destination
+        contents: null, // What's inside (for description only, not accessible)
         // Tracking
-        packageCode: null,        // Unique tracking code
-        assignedTo: null,         // Player assigned to deliver
-        assignedAt: null,         // ISO timestamp
+        packageCode: null, // Unique tracking code
+        assignedTo: null, // Player assigned to deliver
+        assignedAt: null, // ISO timestamp
         // Status
-        sealed: true,             // Tamper seal intact
-        delivered: false,         // Has been delivered
+        sealed: true, // Tamper seal intact
+        delivered: false, // Has been delivered
         // Weight for carrying
-        weight: 2,                // kg
+        weight: 2, // kg
 
         abilities: `Tamper-proof container for courier delivery jobs.
 
@@ -60,15 +61,20 @@ WEIGHT: Packages have 'weight' for carrying mechanics.`,
     // ═══════════════════════════════════════════════════════════════════
 
     // open() - cannot be opened
-    obj.setMethod('open', `
+    obj.setMethod(
+      'open',
+      `
       if (!self.sealed) {
         return 'The seal has already been broken. The box is empty.';
       }
       return 'The box is sealed with tamper-proof strips. Opening it would destroy the seal and void the delivery.';
-    `);
+    `,
+    );
 
     // breakSeal() - intentionally break the seal (consequences)
-    obj.setMethod('breakSeal', `
+    obj.setMethod(
+      'breakSeal',
+      `
       if (!self.sealed) {
         return { success: false, error: 'The seal is already broken.' };
       }
@@ -87,14 +93,17 @@ WEIGHT: Packages have 'weight' for carrying mechanics.`,
         success: true,
         message: 'You break the tamper seal. The strips tear with a satisfying rip. The box is now worthless for delivery purposes.',
       };
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // DELIVERY
     // ═══════════════════════════════════════════════════════════════════
 
     // checkDeliveryLocation() - verify current location matches destination
-    obj.setMethod('checkDeliveryLocation', `
+    obj.setMethod(
+      'checkDeliveryLocation',
+      `
       if (!self.destinationId) {
         return { valid: false, reason: 'No destination assigned.' };
       }
@@ -111,10 +120,13 @@ WEIGHT: Packages have 'weight' for carrying mechanics.`,
       }
 
       return { valid: false, reason: 'Wrong location.' };
-    `);
+    `,
+    );
 
     // markDelivered() - mark as successfully delivered
-    obj.setMethod('markDelivered', `
+    obj.setMethod(
+      'markDelivered',
+      `
       if (self.delivered) {
         return { success: false, error: 'Already delivered.' };
       }
@@ -134,10 +146,13 @@ WEIGHT: Packages have 'weight' for carrying mechanics.`,
       });
 
       return { success: true };
-    `);
+    `,
+    );
 
     // onArrived() - check if arrived at destination, trigger hooks
-    obj.setMethod('onArrived', `
+    obj.setMethod(
+      'onArrived',
+      `
       const dest = args[0];
       const source = args[1];
       const mover = args[2];
@@ -156,14 +171,17 @@ WEIGHT: Packages have 'weight' for carrying mechanics.`,
           deliveredByName: mover?.name || 'unknown',
         });
       }
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // ASSIGNMENT
     // ═══════════════════════════════════════════════════════════════════
 
     // assign(player, destinationId, destinationName) - assign delivery job
-    obj.setMethod('assign', `
+    obj.setMethod(
+      'assign',
+      `
       const player = args[0];
       const destId = args[1];
       const destName = args[2];
@@ -192,13 +210,16 @@ WEIGHT: Packages have 'weight' for carrying mechanics.`,
         packageCode: self.packageCode,
         destination: self.destinationName,
       };
-    `);
+    `,
+    );
 
     // ═══════════════════════════════════════════════════════════════════
     // DISPLAY
     // ═══════════════════════════════════════════════════════════════════
 
-    obj.setMethod('describe', `
+    obj.setMethod(
+      'describe',
+      `
       let desc = self.name + '\\r\\n';
       desc += self.description + '\\r\\n';
 
@@ -219,9 +240,12 @@ WEIGHT: Packages have 'weight' for carrying mechanics.`,
       }
 
       return desc;
-    `);
+    `,
+    );
 
-    obj.setMethod('shortDesc', `
+    obj.setMethod(
+      'shortDesc',
+      `
       if (self.delivered) {
         return 'delivered package';
       }
@@ -229,16 +253,38 @@ WEIGHT: Packages have 'weight' for carrying mechanics.`,
         return 'tampered package';
       }
       return 'sealed package' + (self.packageCode ? ' (' + self.packageCode + ')' : '');
-    `);
+    `,
+    );
 
     // Property descriptions
-    obj.setPropertyDescription('destinationId', 'Room ID where package should be delivered (integer)');
-    obj.setPropertyDescription('destinationName', 'Human-readable destination name (string)');
-    obj.setPropertyDescription('packageCode', 'Unique tracking code (e.g., PKG-ABC123)');
-    obj.setPropertyDescription('assignedTo', 'Player assigned to deliver this package (ObjRef)');
-    obj.setPropertyDescription('assignedAt', 'ISO timestamp when package was assigned');
-    obj.setPropertyDescription('sealed', 'Whether tamper seal is intact (boolean)');
-    obj.setPropertyDescription('delivered', 'Whether package has been successfully delivered (boolean)');
+    obj.setPropertyDescription(
+      'destinationId',
+      'Room ID where package should be delivered (integer)',
+    );
+    obj.setPropertyDescription(
+      'destinationName',
+      'Human-readable destination name (string)',
+    );
+    obj.setPropertyDescription(
+      'packageCode',
+      'Unique tracking code (e.g., PKG-ABC123)',
+    );
+    obj.setPropertyDescription(
+      'assignedTo',
+      'Player assigned to deliver this package (ObjRef)',
+    );
+    obj.setPropertyDescription(
+      'assignedAt',
+      'ISO timestamp when package was assigned',
+    );
+    obj.setPropertyDescription(
+      'sealed',
+      'Whether tamper seal is intact (boolean)',
+    );
+    obj.setPropertyDescription(
+      'delivered',
+      'Whether package has been successfully delivered (boolean)',
+    );
 
     return obj;
   }

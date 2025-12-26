@@ -1,5 +1,5 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Builds the Edible prototype
@@ -78,18 +78,44 @@ STOMACH CAPACITY: Consumer's stomach has limited volume. Check stomach.hasRoomFo
     });
 
     // Add property descriptions
-    obj.setPropertyDescription('calories', "Total caloric content in kcal. Divided by portions to get calories per bite/sip.");
-    obj.setPropertyDescription('hydration', "Water content in ml. Restores body hydration when consumed.");
-    obj.setPropertyDescription('portions', "Total portions to fully consume this item. Food has bites, drinks have sips.");
-    obj.setPropertyDescription('remaining', "Portions left. Decreases with each consumption. At 0, item is gone.");
-    obj.setPropertyDescription('spoiled', "True if decay has made this unsafe. Causes nausea risk.");
-    obj.setPropertyDescription('poisoned', "True if intentionally poisoned. Causes organ damage and sedation.");
-    obj.setPropertyDescription('effects', "Status effects applied on consumption: { effectName: { intensity, decay } }");
-    obj.setPropertyDescription('decayLevel', "0-100 decay percentage. 25%=spoiling, 50%=rotten, 100%=toxic.");
+    obj.setPropertyDescription(
+      'calories',
+      'Total caloric content in kcal. Divided by portions to get calories per bite/sip.',
+    );
+    obj.setPropertyDescription(
+      'hydration',
+      'Water content in ml. Restores body hydration when consumed.',
+    );
+    obj.setPropertyDescription(
+      'portions',
+      'Total portions to fully consume this item. Food has bites, drinks have sips.',
+    );
+    obj.setPropertyDescription(
+      'remaining',
+      'Portions left. Decreases with each consumption. At 0, item is gone.',
+    );
+    obj.setPropertyDescription(
+      'spoiled',
+      'True if decay has made this unsafe. Causes nausea risk.',
+    );
+    obj.setPropertyDescription(
+      'poisoned',
+      'True if intentionally poisoned. Causes organ damage and sedation.',
+    );
+    obj.setPropertyDescription(
+      'effects',
+      'Status effects applied on consumption: { effectName: { intensity, decay } }',
+    );
+    obj.setPropertyDescription(
+      'decayLevel',
+      '0-100 decay percentage. 25%=spoiling, 50%=rotten, 100%=toxic.',
+    );
 
     // Get calories per portion, factoring in decay
     // Fresh = full calories, 50% decay = 0 calories, 100% decay = negative calories
-    obj.setMethod('getCaloriesPerPortion', `
+    obj.setMethod(
+      'getCaloriesPerPortion',
+      `
       /** Calculate calories per portion, adjusted for decay.
        *  - Fresh (0% decay): full calories
        *  - 50% decay: 0 calories (rotting, nutrients destroyed)
@@ -112,25 +138,34 @@ STOMACH CAPACITY: Consumer's stomach has limited volume. Check stomach.hasRoomFo
       // At 100%: 1 - 2 = -1.0 (-100%)
       const decayMultiplier = 1 - (decayLevel / 50);
       return Math.round(baseCal * decayMultiplier);
-    `);
+    `,
+    );
 
     // Get volume per portion (ml)
-    obj.setMethod('getVolumePerPortion', `
+    obj.setMethod(
+      'getVolumePerPortion',
+      `
       const totalVolume = self.volume || self.weight || 100;
       const totalPortions = self.portions || 1;
       return Math.ceil(totalVolume / totalPortions);
-    `);
+    `,
+    );
 
     // Get hydration per portion (ml water equivalent)
-    obj.setMethod('getHydrationPerPortion', `
+    obj.setMethod(
+      'getHydrationPerPortion',
+      `
       const totalHydration = self.hydration || 0;
       const totalPortions = self.portions || 1;
       return Math.ceil(totalHydration / totalPortions);
-    `);
+    `,
+    );
 
     // Consume a portion - returns calories consumed or error
     // Handles weight reduction, stomach transfer, and recycling when fully consumed
-    obj.setMethod('consume', `
+    obj.setMethod(
+      'consume',
+      `
       /** Consume one portion of this edible item.
        *  Transfers calories to consumer's stomach, updates weight/remaining.
        *  Call this when AI determines eating/drinking should happen.
@@ -251,16 +286,22 @@ STOMACH CAPACITY: Consumer's stomach has limited volume. Check stomach.hasRoomFo
         fullyConsumed,
         remaining: self.remaining,
       };
-    `);
+    `,
+    );
 
     // Check if there's any left
-    obj.setMethod('hasRemaining', `
+    obj.setMethod(
+      'hasRemaining',
+      `
       return (self.remaining || 0) > 0;
-    `);
+    `,
+    );
 
     // Send a single bite's calories and volume to stomach
     // Creates/aggregates StomachContents for this food type
-    obj.setMethod('sendBiteToStomach', `
+    obj.setMethod(
+      'sendBiteToStomach',
+      `
       const stomach = args[0]; // The digestive stomach
       const sourceType = args[1] || 'food'; // 'food', 'drink', etc.
       const biteCalories = args[2] || 0; // Calories for THIS bite only
@@ -333,12 +374,15 @@ STOMACH CAPACITY: Consumer's stomach has limited volume. Check stomach.hasRoomFo
       }
 
       return { contents, aggregated, calories: biteCalories, volume: biteVolume };
-    `);
+    `,
+    );
 
     // Send this edible to stomach as StomachContents (DEPRECATED - use sendBiteToStomach)
     // Creates StomachContents object with metadata, handles aggregation
     // Returns the StomachContents object (new or aggregated)
-    obj.setMethod('sendToStomach', `
+    obj.setMethod(
+      'sendToStomach',
+      `
       const stomach = args[0]; // The digestive stomach
       const sourceType = args[1] || 'food'; // 'food', 'drink', 'pill', etc.
 
@@ -400,10 +444,13 @@ STOMACH CAPACITY: Consumer's stomach has limited volume. Check stomach.hasRoomFo
       }
 
       return { contents, aggregated };
-    `);
+    `,
+    );
 
     // Describe with consumption status
-    obj.setMethod('describe', `
+    obj.setMethod(
+      'describe',
+      `
       let desc = self.name + '\\r\\n' + self.description;
 
       const portions = self.portions || 1;
@@ -435,7 +482,8 @@ STOMACH CAPACITY: Consumer's stomach has limited volume. Check stomach.hasRoomFo
       }
 
       return desc;
-    `);
+    `,
+    );
 
     return obj;
   }

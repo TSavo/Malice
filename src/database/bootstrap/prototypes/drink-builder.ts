@@ -1,5 +1,5 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Builds the Drink prototype
@@ -58,13 +58,24 @@ TO CONSUME: Call consume(drinker, 'drink') method. It handles hydration, calorie
     });
 
     // Add property descriptions
-    obj.setPropertyDescription('containerWeight', "Weight in grams of the empty container. Subtracted from weight to get liquid weight.");
-    obj.setPropertyDescription('portions', "Number of sips to finish this drink. Larger containers have more portions.");
-    obj.setPropertyDescription('remaining', "Sips left. Each drink action reduces by 1. At 0, liquid is consumed.");
+    obj.setPropertyDescription(
+      'containerWeight',
+      'Weight in grams of the empty container. Subtracted from weight to get liquid weight.',
+    );
+    obj.setPropertyDescription(
+      'portions',
+      'Number of sips to finish this drink. Larger containers have more portions.',
+    );
+    obj.setPropertyDescription(
+      'remaining',
+      'Sips left. Each drink action reduces by 1. At 0, liquid is consumed.',
+    );
 
     // The drink verb - registered when drink is in player's inventory or room
     // Pattern: drink %t (this drink) - player drinks self
-    obj.setMethod('drink', `
+    obj.setMethod(
+      'drink',
+      `
       // Args from verb pattern 'drink %t':
       //   args[0] = handler (the drink, same as self) - from %t
       // Direct variables:
@@ -171,19 +182,25 @@ TO CONSUME: Call consume(drinker, 'drink') method. It handles hydration, calorie
       }
 
       return msg;
-    `);
+    `,
+    );
 
     // Shorthand: sip is same as drink
-    obj.setMethod('sip', `
+    obj.setMethod(
+      'sip',
+      `
       return await self.drink(args[0], args[1]);
-    `);
+    `,
+    );
 
     // ABILITIES-FIRST: No verb registration needed.
     // AI interprets player intent and calls drink() method directly.
     // The onArrived hook from parent ($describable) handles location tracking.
 
     // Override describe to show liquid level
-    obj.setMethod('describe', `
+    obj.setMethod(
+      'describe',
+      `
       let desc = self.name + '\\\\r\\\\n' + self.description;
 
       const portions = self.portions || 1;
@@ -203,7 +220,8 @@ TO CONSUME: Call consume(drinker, 'drink') method. It handles hydration, calorie
       }
 
       return desc;
-    `);
+    `,
+    );
 
     return obj;
   }

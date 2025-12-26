@@ -4,16 +4,19 @@
  * Rename Occidental Park files to match their actual coordinates
  */
 
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const parkDir = path.join(__dirname, '../src/database/bootstrap/world/seattle/pioneer-square/occidental-park');
+const parkDir = path.join(
+  __dirname,
+  '../src/database/bootstrap/world/seattle/pioneer-square/occidental-park',
+);
 
-const files = fs.readdirSync(parkDir).filter(f => f.endsWith('.ts'));
+const files = fs.readdirSync(parkDir).filter((f) => f.endsWith('.ts'));
 
 console.log(`Analyzing ${files.length} files...\n`);
 
@@ -31,8 +34,8 @@ for (const file of files) {
     continue;
   }
 
-  const x = parseInt(xMatch[1]);
-  const y = parseInt(yMatch[1]);
+  const x = parseInt(xMatch[1], 10);
+  const y = parseInt(yMatch[1], 10);
 
   const expectedName = `x${x}-y${y}.ts`;
 
@@ -64,7 +67,10 @@ for (const r of renames) {
 // Also check against existing files that won't be renamed
 const existingNames = new Set(files);
 for (const r of renames) {
-  if (existingNames.has(r.newName) && !renames.some(x => x.oldName === r.newName)) {
+  if (
+    existingNames.has(r.newName) &&
+    !renames.some((x) => x.oldName === r.newName)
+  ) {
     console.error(`CONFLICT: ${r.newName} already exists and won't be renamed`);
     process.exit(1);
   }

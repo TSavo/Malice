@@ -7,27 +7,32 @@
  * 3. Identify missing street rooms
  */
 
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const PIONEER_SQUARE_DIR = path.join(__dirname, '../src/database/bootstrap/world/seattle/pioneer-square');
+const PIONEER_SQUARE_DIR = path.join(
+  __dirname,
+  '../src/database/bootstrap/world/seattle/pioneer-square',
+);
 
 function getCoordinates(filePath) {
   const content = fs.readFileSync(filePath, 'utf8');
   const xMatch = content.match(/x:\s*(-?\d+)/);
   const yMatch = content.match(/y:\s*(-?\d+)/);
   return {
-    x: xMatch ? parseInt(xMatch[1]) : null,
-    y: yMatch ? parseInt(yMatch[1]) : null
+    x: xMatch ? parseInt(xMatch[1], 10) : null,
+    y: yMatch ? parseInt(yMatch[1], 10) : null,
   };
 }
 
 function analyzeDirectory(dir, streetType) {
-  const files = fs.readdirSync(dir).filter(f => f.endsWith('.ts') && !f.includes('MAP'));
+  const files = fs
+    .readdirSync(dir)
+    .filter((f) => f.endsWith('.ts') && !f.includes('MAP'));
   const results = [];
 
   for (const file of files) {
@@ -39,11 +44,11 @@ function analyzeDirectory(dir, streetType) {
     if (streetType === 'avenue') {
       // Files like y5.ts, y-3.ts
       const match = file.match(/y(-?\d+)\.ts/);
-      expectedCoord = match ? parseInt(match[1]) : null;
+      expectedCoord = match ? parseInt(match[1], 10) : null;
     } else {
       // Files like x5.ts, x-3.ts
       const match = file.match(/x(-?\d+)\.ts/);
-      expectedCoord = match ? parseInt(match[1]) : null;
+      expectedCoord = match ? parseInt(match[1], 10) : null;
     }
 
     results.push({
@@ -51,9 +56,10 @@ function analyzeDirectory(dir, streetType) {
       actualX: coords.x,
       actualY: coords.y,
       expectedCoord,
-      needsRename: streetType === 'avenue'
-        ? (expectedCoord !== coords.y)
-        : (expectedCoord !== coords.x)
+      needsRename:
+        streetType === 'avenue'
+          ? expectedCoord !== coords.y
+          : expectedCoord !== coords.x,
     });
   }
 
@@ -83,14 +89,16 @@ for (const street of streets) {
   }
 
   const results = analyzeDirectory(dir, street.type);
-  const mismatches = results.filter(r => r.needsRename);
+  const mismatches = results.filter((r) => r.needsRename);
 
   if (mismatches.length > 0) {
     console.log(`\n📁 ${street.name} (${mismatches.length} mismatches):`);
     for (const m of mismatches.slice(0, 10)) {
       const coordKey = street.type === 'avenue' ? 'y' : 'x';
       const actual = street.type === 'avenue' ? m.actualY : m.actualX;
-      console.log(`  ${m.file}: expected ${coordKey}=${m.expectedCoord}, actual ${coordKey}=${actual}`);
+      console.log(
+        `  ${m.file}: expected ${coordKey}=${m.expectedCoord}, actual ${coordKey}=${actual}`,
+      );
     }
     if (mismatches.length > 10) {
       console.log(`  ... and ${mismatches.length - 10} more`);
@@ -102,9 +110,13 @@ for (const street of streets) {
 console.log(`\n📊 Total files needing rename: ${totalMismatches}`);
 
 // Check for missing 1st Ave rooms near Smith Tower
-console.log('\n\n🏗️ Checking 1st Ave S coverage near Smith Tower (y=9 to y=12):');
+console.log(
+  '\n\n🏗️ Checking 1st Ave S coverage near Smith Tower (y=9 to y=12):',
+);
 const firstAveDir = path.join(PIONEER_SQUARE_DIR, '1st-ave-s');
-const firstAveFiles = fs.readdirSync(firstAveDir).filter(f => f.endsWith('.ts'));
+const firstAveFiles = fs
+  .readdirSync(firstAveDir)
+  .filter((f) => f.endsWith('.ts'));
 
 const existingYCoords = new Set();
 for (const file of firstAveFiles) {
@@ -112,16 +124,24 @@ for (const file of firstAveFiles) {
   if (coords.y !== null) existingYCoords.add(coords.y);
 }
 
-console.log('Existing 1st Ave S y-coordinates:', [...existingYCoords].sort((a,b) => a-b).join(', '));
+console.log(
+  'Existing 1st Ave S y-coordinates:',
+  [...existingYCoords].sort((a, b) => a - b).join(', '),
+);
 
 const neededY = [9, 10, 11, 12];
-const missingY = neededY.filter(y => !existingYCoords.has(y));
-console.log('Missing y-coordinates for Smith Tower area:', missingY.length > 0 ? missingY.join(', ') : 'None');
+const missingY = neededY.filter((y) => !existingYCoords.has(y));
+console.log(
+  'Missing y-coordinates for Smith Tower area:',
+  missingY.length > 0 ? missingY.join(', ') : 'None',
+);
 
 // Check Yesler Way coverage
-console.log('\n🏗️ Checking Yesler Way coverage near Smith Tower (x=-14 to x=-10):');
+console.log(
+  '\n🏗️ Checking Yesler Way coverage near Smith Tower (x=-14 to x=-10):',
+);
 const yeslerDir = path.join(PIONEER_SQUARE_DIR, 'yesler-way');
-const yeslerFiles = fs.readdirSync(yeslerDir).filter(f => f.endsWith('.ts'));
+const yeslerFiles = fs.readdirSync(yeslerDir).filter((f) => f.endsWith('.ts'));
 
 const existingXCoords = new Set();
 for (const file of yeslerFiles) {
@@ -129,8 +149,14 @@ for (const file of yeslerFiles) {
   if (coords.x !== null) existingXCoords.add(coords.x);
 }
 
-console.log('Existing Yesler Way x-coordinates:', [...existingXCoords].sort((a,b) => a-b).join(', '));
+console.log(
+  'Existing Yesler Way x-coordinates:',
+  [...existingXCoords].sort((a, b) => a - b).join(', '),
+);
 
 const neededX = [-14, -13, -12, -11, -10];
-const missingX = neededX.filter(x => !existingXCoords.has(x));
-console.log('Missing x-coordinates for Smith Tower area:', missingX.length > 0 ? missingX.join(', ') : 'None');
+const missingX = neededX.filter((x) => !existingXCoords.has(x));
+console.log(
+  'Missing x-coordinates for Smith Tower area:',
+  missingX.length > 0 ? missingX.join(', ') : 'None',
+);

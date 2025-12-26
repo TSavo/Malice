@@ -1,8 +1,8 @@
-import { createServer, Server as NetServer, Socket } from 'net';
-import { Subject, fromEvent } from 'rxjs';
+import { createServer, type Server as NetServer, type Socket } from 'node:net';
+import { fromEvent, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { TelnetTransport } from './telnet-transport.js';
 import type { TransportServerConfig } from '../../../types/transport.js';
+import { TelnetTransport } from './telnet-transport.js';
 
 /**
  * Telnet server
@@ -44,7 +44,9 @@ export class TelnetServer {
     listening$.pipe(takeUntil(this.destroyed$)).subscribe({
       next: () => {
         if (this.config.debug) {
-          console.log(`[TelnetServer] Listening on ${this.config.host || '0.0.0.0'}:${this.config.port}`);
+          console.log(
+            `[TelnetServer] Listening on ${this.config.host || '0.0.0.0'}:${this.config.port}`,
+          );
         }
       },
     });
@@ -55,7 +57,9 @@ export class TelnetServer {
    */
   private handleConnection(socket: Socket): void {
     if (this.config.debug) {
-      console.log(`[TelnetServer] New connection from ${socket.remoteAddress}:${socket.remotePort}`);
+      console.log(
+        `[TelnetServer] New connection from ${socket.remoteAddress}:${socket.remotePort}`,
+      );
     }
 
     const transport = new TelnetTransport(socket);
@@ -66,7 +70,9 @@ export class TelnetServer {
     // Log when closed
     if (this.config.debug) {
       transport.closed$.subscribe(() => {
-        console.log(`[TelnetServer] Connection closed: ${transport.remoteAddress}`);
+        console.log(
+          `[TelnetServer] Connection closed: ${transport.remoteAddress}`,
+        );
       });
     }
   }
@@ -77,10 +83,14 @@ export class TelnetServer {
   listen(): Promise<void> {
     return new Promise((resolve, reject) => {
       this.server.once('error', reject);
-      this.server.listen(this.config.port, this.config.host || '0.0.0.0', () => {
-        this.server.removeListener('error', reject);
-        resolve();
-      });
+      this.server.listen(
+        this.config.port,
+        this.config.host || '0.0.0.0',
+        () => {
+          this.server.removeListener('error', reject);
+          resolve();
+        },
+      );
     });
   }
 

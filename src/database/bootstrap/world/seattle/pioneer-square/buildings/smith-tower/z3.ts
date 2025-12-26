@@ -17,9 +17,11 @@ export const building = {
     '%L_CORP': {
       prototype: 'biometricLock',
       name: 'Corporate Access Scanner',
-      description: 'A sleek retinal scanner with a corporate emblem. The indicator glows blue when active.',
+      description:
+        'A sleek retinal scanner with a corporate emblem. The indicator glows blue when active.',
       allowedFaction: 'Corporate',
-      factionDenyMessage: 'Corporate clearance required. Your faction is not authorized for this floor.',
+      factionDenyMessage:
+        'Corporate clearance required. Your faction is not authorized for this floor.',
       scanners: [
         { type: 'retinal', part: 'eye', message: 'Biometric scan failed.' },
       ],

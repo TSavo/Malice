@@ -1,5 +1,5 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Base Phone prototype (abstract-style behaviors).
@@ -34,7 +34,9 @@ DATABASE: 'phoneDb' references $.phoneDB for number lookups. findPhoneByNumber()
       methods: {},
     });
 
-    obj.setMethod('dial', `
+    obj.setMethod(
+      'dial',
+      `
       const targetNumber = args[0];
       if (!targetNumber) return 'No number specified.';
       const db = self.phoneDb || null;
@@ -46,18 +48,24 @@ DATABASE: 'phoneDb' references $.phoneDB for number lookups. findPhoneByNumber()
         await target.onIncomingCall(self);
       }
       return 'Dialing ' + targetNumber + '...';
-    `);
+    `,
+    );
 
-    obj.setMethod('hangup', `
+    obj.setMethod(
+      'hangup',
+      `
       const other = self.connectedTo;
       self.connectedTo = null;
       if (other && other.onHangup) {
         await other.onHangup(self);
       }
       return 'Call ended.';
-    `);
+    `,
+    );
 
-    obj.setMethod('sendMessage', `
+    obj.setMethod(
+      'sendMessage',
+      `
       const targetNumber = args[0];
       const message = args[1];
       if (!targetNumber) return 'No number specified.';
@@ -68,27 +76,46 @@ DATABASE: 'phoneDb' references $.phoneDB for number lookups. findPhoneByNumber()
       if (!target) return 'Number not found.';
       if (target.onMessage) await target.onMessage(self, message);
       return 'Message sent to ' + targetNumber + '.';
-    `);
+    `,
+    );
 
-    obj.setMethod('onIncomingCall', `
+    obj.setMethod(
+      'onIncomingCall',
+      `
       const from = args[0];
       await $.tell(self, 'Incoming call from ' + (from.number || from.name || 'unknown'));
-    `);
+    `,
+    );
 
-    obj.setMethod('onHangup', `
+    obj.setMethod(
+      'onHangup',
+      `
       const from = args[0];
       await $.tell(self, 'Call ended with ' + (from.number || from.name || 'unknown'));
-    `);
+    `,
+    );
 
-    obj.setMethod('onMessage', `
+    obj.setMethod(
+      'onMessage',
+      `
       const from = args[0];
       const message = args[1];
       await $.tell(self, 'Message from ' + (from.number || from.name || 'unknown') + ': ' + message);
-    `);
+    `,
+    );
 
-    obj.setPropertyDescription('number', 'The phone number that can be dialed to reach this phone');
-    obj.setPropertyDescription('phoneDb', 'Reference to the phone database object for number lookups');
-    obj.setPropertyDescription('connectedTo', 'Active call target object ID, or null if no call in progress');
+    obj.setPropertyDescription(
+      'number',
+      'The phone number that can be dialed to reach this phone',
+    );
+    obj.setPropertyDescription(
+      'phoneDb',
+      'Reference to the phone database object for number lookups',
+    );
+    obj.setPropertyDescription(
+      'connectedTo',
+      'Active call target object ID, or null if no call in progress',
+    );
 
     return obj;
   }

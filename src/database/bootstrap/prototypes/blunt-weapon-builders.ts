@@ -1,9 +1,9 @@
-import { ObjectManager } from '../../object-manager.js';
 import type { RuntimeObject } from '../../../../types/object.js';
+import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Blunt Weapon Prototypes
- * 
+ *
  * Hierarchy:
  * $.weapon
  *   $.blunt (base for all blunt weapons)
@@ -68,9 +68,18 @@ NO MAINTENANCE: Blunt weapons don't need sharpening. Durable. May bend or crack 
       methods: {},
     });
 
-    obj.setPropertyDescription('skill', 'Combat skill used with this weapon (club, hammer, staff, mace, chain, brawling). Affects attack success.');
-    obj.setPropertyDescription('damage', 'Base damage value for attacks. Blunt weapons excel at breaking bones and stunning.');
-    obj.setPropertyDescription('damageType', 'Type of wound inflicted (bruise, puncture for spiked weapons). Bruises cause pain and swelling.');
+    obj.setPropertyDescription(
+      'skill',
+      'Combat skill used with this weapon (club, hammer, staff, mace, chain, brawling). Affects attack success.',
+    );
+    obj.setPropertyDescription(
+      'damage',
+      'Base damage value for attacks. Blunt weapons excel at breaking bones and stunning.',
+    );
+    obj.setPropertyDescription(
+      'damageType',
+      'Type of wound inflicted (bruise, puncture for spiked weapons). Bruises cause pain and swelling.',
+    );
 
     return obj;
   }
@@ -89,7 +98,7 @@ export class ClubBuilder {
       parent: parentObj!,
       properties: {
         name: 'Club',
-        description: 'A simple bludgeon. Humanity\'s oldest weapon.',
+        description: "A simple bludgeon. Humanity's oldest weapon.",
         skill: 'club',
         damage: 18,
         damageType: 'bruise',
@@ -109,7 +118,8 @@ export class BaseballBatBuilder {
       parent: parentObj!,
       properties: {
         name: 'Baseball Bat',
-        description: 'A wooden or aluminum bat. America\'s favorite melee weapon.',
+        description:
+          "A wooden or aluminum bat. America's favorite melee weapon.",
         skill: 'club',
         damage: 25,
         damageType: 'bruise',
@@ -149,7 +159,8 @@ export class NightstickBuilder {
       parent: parentObj!,
       properties: {
         name: 'Nightstick',
-        description: 'A police-issue side-handle baton. Versatile striking tool.',
+        description:
+          'A police-issue side-handle baton. Versatile striking tool.',
         skill: 'club',
         damage: 18,
         damageType: 'bruise',
@@ -189,7 +200,8 @@ export class BlackjackBuilder {
       parent: parentObj!,
       properties: {
         name: 'Blackjack',
-        description: 'A leather-wrapped lead weight on a spring handle. Silent and effective.',
+        description:
+          'A leather-wrapped lead weight on a spring handle. Silent and effective.',
         skill: 'club',
         damage: 14,
         damageType: 'bruise',
@@ -293,7 +305,8 @@ export class CrowbarBuilder {
       parent: parentObj!,
       properties: {
         name: 'Crowbar',
-        description: 'A heavy iron pry bar. Good for opening things. And people.',
+        description:
+          'A heavy iron pry bar. Good for opening things. And people.',
         skill: 'club',
         damage: 26,
         damageType: 'bruise',
@@ -337,7 +350,7 @@ export class ClawHammerBuilder {
       parent: parentObj!,
       properties: {
         name: 'Claw Hammer',
-        description: 'A carpenter\'s hammer with a nail-pulling claw.',
+        description: "A carpenter's hammer with a nail-pulling claw.",
         skill: 'hammer',
         damage: 18,
         damageType: 'bruise',
@@ -361,7 +374,7 @@ export class SledgehammerBuilder {
         skill: 'hammer',
         damage: 40,
         damageType: 'bruise',
-        twoHanded: true,  // Heavy, requires two hands
+        twoHanded: true, // Heavy, requires two hands
       },
       methods: {},
     });
@@ -378,7 +391,7 @@ export class BallPeenHammerBuilder {
       parent: parentObj!,
       properties: {
         name: 'Ball Peen Hammer',
-        description: 'A machinist\'s hammer with a rounded head.',
+        description: "A machinist's hammer with a rounded head.",
         skill: 'hammer',
         damage: 16,
         damageType: 'bruise',
@@ -426,7 +439,7 @@ export class StaffBuilder {
         skill: 'staff',
         damage: 15,
         damageType: 'bruise',
-        twoHanded: true,  // Long pole requires two hands
+        twoHanded: true, // Long pole requires two hands
       },
       methods: {},
     });
@@ -447,7 +460,7 @@ export class BoStaffBuilder {
         skill: 'staff',
         damage: 18,
         damageType: 'bruise',
-        twoHanded: true,  // Long pole requires two hands
+        twoHanded: true, // Long pole requires two hands
       },
       methods: {},
     });
@@ -552,7 +565,8 @@ export class BrassKnucklesBuilder {
       parent: parentObj!,
       properties: {
         name: 'Brass Knuckles',
-        description: 'Metal rings worn over the fingers. Adds weight to punches.',
+        description:
+          'Metal rings worn over the fingers. Adds weight to punches.',
         skill: 'brawling',
         damage: 12,
         damageType: 'bruise',
@@ -572,7 +586,8 @@ export class SapGlovesBuilder {
       parent: parentObj!,
       properties: {
         name: 'Sap Gloves',
-        description: 'Leather gloves with powdered lead in the knuckles. Discrete.',
+        description:
+          'Leather gloves with powdered lead in the knuckles. Discrete.',
         skill: 'brawling',
         damage: 10,
         damageType: 'bruise',
@@ -636,7 +651,8 @@ export class BikeChainBuilder {
       parent: parentObj!,
       properties: {
         name: 'Bike Chain',
-        description: 'A bicycle chain with a padlock on the end. Street classic.',
+        description:
+          'A bicycle chain with a padlock on the end. Street classic.',
         skill: 'chain',
         damage: 16,
         damageType: 'bruise',
@@ -656,7 +672,8 @@ export class NunchakuBuilder {
       parent: parentObj!,
       properties: {
         name: 'Nunchaku',
-        description: 'Two short sticks connected by a chain. Martial arts weapon.',
+        description:
+          'Two short sticks connected by a chain. Martial arts weapon.',
         skill: 'chain',
         damage: 14,
         damageType: 'bruise',
@@ -680,7 +697,7 @@ export class FlailBuilder {
         skill: 'chain',
         damage: 28,
         damageType: 'bruise',
-        twoHanded: true,  // Needs swing room and control
+        twoHanded: true, // Needs swing room and control
       },
       methods: {},
     });
