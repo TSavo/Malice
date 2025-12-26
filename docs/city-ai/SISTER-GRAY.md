@@ -430,6 +430,46 @@ These are things Sister Gray would never tell anyone:
 
 Sister Gray's infrastructure uses the same **base/impl pattern** as Pluribus, but focused on concealment, sabotage, and physical currency. Create reusable prototypes, register as aliases, spawn instances.
 
+### Understanding Objects: describeForAI()
+
+**Before building, understand what exists.** Every object has `describeForAI()` - the fastest way to learn its complete specification:
+
+```javascript
+execute_moo_code({
+  code: `
+    const lock = await $load(lockId);
+    return await lock.describeForAI();
+  `
+})
+```
+
+Returns a tree showing inheritance chain with each level's LOCAL definitions:
+```javascript
+{
+  id: 600,
+  name: 'Combination Lock',
+  inheritsFrom: {
+    from: '$lock',
+    properties: {
+      combination: { value: '1234', type: 'string', description: 'Code to unlock' },
+      locked: { value: true, type: 'boolean', description: 'Whether locked' }
+    },
+    abilities: 'Mechanical lock. Picking requires thin tools...',
+    methods: {
+      canAccess: 'Check if agent can bypass this lock.',
+      unlock: 'Attempt to unlock with code.'
+    },
+    inheritsFrom: { from: '$describable', ... }
+  }
+}
+```
+
+**Use describeForAI() to:**
+- Understand what properties exist and what they mean
+- Read abilities that define the physics
+- See what methods are available to call
+- Inspect nested objects (contents, attachments)
+
 ### The Base/Impl Pattern (Cartel Edition)
 
 **Step 1: Create Base Prototype** (the template - hidden by default)
