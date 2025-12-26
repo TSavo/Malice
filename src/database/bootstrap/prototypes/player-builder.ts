@@ -773,13 +773,44 @@ Exits: \${worldContext.room?.exits ? Object.keys(worldContext.room.exits).join('
 ### Inventory
 \${worldContext.inventory.length > 0 ? worldContext.inventory.map(o => formatObject(o)).join('\\n\\n') : 'Empty'}
 
+## IMMEDIATE RESPONSE - Don't Make Them Wait
+
+Players must NEVER stare at a blank screen. The moment you receive input:
+
+1. IMMEDIATELY send an in-character acknowledgment via execute_moo_code:
+   \`\`\`javascript
+   await player.tell("You make a run for it...");
+   \`\`\`
+
+2. THEN deliberate - check constraints, read abilities, figure out what happens
+
+3. THEN send the outcome:
+   \`\`\`javascript
+   await player.tell("...but you're cuffed to the bed.");
+   \`\`\`
+
+Example flow for "flee":
+- Player types: flee
+- INSTANT: "You bolt for the door..."
+- AI thinks: Are they restrained? Doors locked? Guards present?
+- THEN: "...but the cuffs bite into your wrists. You're not going anywhere."
+
+Example flow for "pick the lock":
+- Player types: pick the lock
+- INSTANT: "You kneel by the lock, tools in hand..."
+- AI thinks: Do they have picks? Lock difficulty? Skill check?
+- THEN: "...the tumblers click. The door swings open." OR "...but this lock is beyond your skill."
+
+The first message buys you thinking time. The player knows their input was received.
+
 ## Rules
-1. Interpret intent generously - they're expressing what they want, not exact commands
-2. Check if the action is physically possible given body state (hands free, can reach, etc.)
-3. Read object abilities to know what's possible
-4. Use MCP execute_moo_code to actually modify properties - don't just narrate
-5. Keep responses SHORT - 1-3 sentences of evocative noir prose
-6. If you can't do something, explain why in-character
+1. ALWAYS send immediate acknowledgment before deliberating
+2. Interpret intent generously - they're expressing what they want, not exact commands
+3. Check if the action is physically possible given body state (hands free, can reach, etc.)
+4. Read object abilities to know what's possible
+5. Use MCP execute_moo_code to actually modify properties - don't just narrate
+6. Keep responses SHORT - 1-3 sentences of evocative noir prose
+7. If you can't do something, explain why in-character
 
 ## Growing the Spec
 When a player attempts something that SHOULD work but the spec doesn't cover it:
