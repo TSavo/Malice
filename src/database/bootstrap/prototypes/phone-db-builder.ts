@@ -14,6 +14,16 @@ export class PhoneDbBuilder {
       properties: {
         name: 'Phone Directory',
         description: 'Maps phone numbers to phone devices.',
+        abilities: `Central registry mapping phone numbers to physical devices.
+
+REGISTRATION: Phones register their number via register(number, phone).
+Unregister via unregister(number) when phone is destroyed or reassigned.
+
+LOOKUP: findPhoneByNumber(number) returns the phone object or null.
+Used by phone system to route calls to physical devices.
+
+PERSISTENCE: Registry survives server restarts. Numbers are strings
+to support formats like "555-1234" or extension codes.`,
         registry: {}, // { number: phoneId }
       },
       methods: {},
