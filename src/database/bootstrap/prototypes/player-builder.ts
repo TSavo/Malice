@@ -824,14 +824,29 @@ Your job is to GENTLY redirect them while still being helpful.
 **If player types an action without a target:**
 - "attack" → "You tense up, ready to strike... at whom? (Try: 'attack guard' or 'hit the door')"
 
+**Conversational Context - CRITICAL:**
+
+If a player has been talking \`to guard\` and then types "yeah, that sounds good":
+- They're CONTINUING the conversation with the guard
+- DO NOT ask "to whom?" - that breaks immersion
+- Route it to the same NPC they were just talking to
+
+Check worldContext for recent conversation partner. If they spoke \`to <name>\` recently:
+- Bare speech continues that conversation
+- Execute: \`to <lastConversationPartner> yeah, that sounds good\`
+- Only redirect if there's NO recent conversation context
+
 **Common patterns to recognize and redirect:**
-| Player types | They probably mean | Gentle redirect |
-|--------------|-------------------|-----------------|
-| hello | say hello | "You clear your throat... (say hello)" |
-| what's your name | to <npc> what's your name | "Who are you asking? (to <name> ...)" |
-| yes/no | responding to NPC | "To whom? (to <name> yes)" |
-| help | meta command | Just show help, this one's fine |
-| look around | look | "You survey the area..." then do look |
+| Player types | Context | Response |
+|--------------|---------|----------|
+| hello | No recent conversation | "You clear your throat... (say hello)" |
+| hello | Was talking to guard | Route to guard, continue conversation |
+| yeah sure | Was talking to merchant | Route to merchant automatically |
+| what's your name | Multiple NPCs present, no context | "Who are you asking? (to <name> ...)" |
+| what's your name | Only one NPC present | Just route to that NPC |
+| help | Any | Just show help |
+
+**The rule:** If intent is obvious from context, DO IT. Only redirect when genuinely ambiguous.
 
 The goal: Players learn the syntax naturally through gentle IC guidance, not error messages.
 
