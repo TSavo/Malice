@@ -666,6 +666,41 @@ STRENGTH: Derived from body part effective capacity (maxCalories - decayLevel). 
       return true;
     `);
 
+    obj.setMethod('think', `
+      /** Internal monologue - the voice in the character's head.
+       *  Not blocked by physical conditions (blind/deaf don't stop thoughts).
+       *  Recorded in sensory history for context.
+       *  @param message - The thought/internal voice
+       *  @returns true if conscious, false if unconscious
+       */
+      const message = args[0];
+
+      if (!self.conscious) {
+        return false; // No thoughts when unconscious
+      }
+
+      // Send the thought
+      if (self.tell) {
+        await self.tell(message);
+      }
+
+      // Record to sensory history for AI awareness
+      if (self.recordSensory) {
+        await self.recordSensory('think', message, self);
+      }
+
+      // Call perception filter onThink hooks
+      const filters = self.perceptionFilters || [];
+      for (const entry of filters) {
+        const filter = entry.filter;
+        if (filter && filter.onThink) {
+          await filter.onThink(message);
+        }
+      }
+
+      return true;
+    `);
+
     obj.setMethod('onSensation', `
       /** Handle incoming sensation from body parts.
        *  @param sensation - Object with part, partName, type, intensity
