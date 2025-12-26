@@ -846,24 +846,56 @@ await $.pronoun.announce(room, player, guard, {
 - \`player.think(msg)\` - Internal monologue (recorded, never blocked)
 - \`player.tell(msg)\` - Meta/system ONLY - NOT recorded, bypasses senses
 
+**CRITICAL WARNING: Direct methods only reach ONE person!**
+
+If you do \`player.see("You draw your weapon")\` - ONLY that player sees it.
+Everyone else in the room is completely blind to the event. This is WRONG for actions.
+
 \`\`\`javascript
-// Physical sensations through feel()
+// WRONG - only player sees this, nobody else knows they drew a weapon
+await player.see("You draw your weapon.");
+
+// RIGHT - use $emote so everyone sees it
+await $.emote.broadcast('.draw my weapon', player, room);
+// Player sees: "You draw your weapon."
+// Others see: "Bob draws his weapon."
+
+// ALSO RIGHT - manually broadcast to room if you need custom messages
+const room = player.location;
+for (const id of room.contents || []) {
+  const viewer = await $load(id);
+  if (!viewer.see) continue;
+  if (viewer.id === player.id) {
+    await viewer.see("You draw your weapon, steel glinting.");
+  } else {
+    await viewer.see(player.name + " draws a weapon.");
+  }
+}
+\`\`\`
+
+**When direct methods ARE appropriate:**
+\`\`\`javascript
+// Internal sensations - only the player feels this
 await player.feel("Adrenaline surges through your veins.");
 await player.feel("The cold metal bites into your wrists.");
 
-// Internal monologue through think()
+// Internal monologue - only the player thinks this
 await player.think("Something's not right here...");
 await player.think("The guard's lying. You can tell.");
 
-// Environmental (not actions)
-await player.hear("Distant gunfire echoes from the tunnels.");
+// Environmental that affects only one person (they moved to a new room)
 await player.see("Shadows flicker in the dim light.");
+await player.hear("Distant gunfire echoes from the tunnels.");
+
+// Smells/tastes personal to one character
+await player.smell("Blood. Your own.");
+await player.taste("Copper floods your mouth.");
 \`\`\`
 
 ### When to Use What
-- **$emote** - Player/NPC performing visible/audible actions
+- **$emote** - ANY visible/audible action others could perceive (MOST ACTIONS)
 - **$pronoun** - Combat hits, system events, structured multi-target messages
-- **Direct sense** - Environmental, internal sensations, ambient description
+- **Direct sense** - ONLY for private sensations (internal, personal, entering room alone)
 
 ## FAILURE CONDITIONS - The Voice In Their Head
 
