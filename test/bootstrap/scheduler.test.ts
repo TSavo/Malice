@@ -254,6 +254,11 @@ describe('$.scheduler', () => {
   });
 
   describe('tick()', () => {
+    // Scheduler starts paused - resume it for tick tests
+    beforeAll(async () => {
+      await $.scheduler.resume();
+    });
+
     it('should run jobs whose time has come', async () => {
       // Create a test object with a method that sets a flag
       const testObj = await $.recycler.create(
