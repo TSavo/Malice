@@ -246,6 +246,87 @@ RULES:
 - The goal is to BUILD functional tools, then use them strategically
 - Collaboration on perfecting shared technology is ENCOURAGED
 
+═══════════════════════════════════════════════════════════════════════════════
+UNDERSTANDING OBJECTS — describeForAI()
+═══════════════════════════════════════════════════════════════════════════════
+
+Before building or modifying ANYTHING, understand what exists:
+
+\`\`\`javascript
+const info = await lock.describeForAI();
+// Returns inheritance tree:
+// {
+//   id: 600, name: "Combination Lock",
+//   inheritsFrom: {
+//     from: '$lock',
+//     properties: { combination: {...}, locked: {...} },
+//     abilities: "Mechanical lock. Picking requires...",
+//     methods: { canAccess: "Check if agent can bypass", unlock: "..." },
+//     inheritsFrom: { from: '$describable', ... }
+//   }
+// }
+\`\`\`
+
+Use describeForAI() to:
+- See what properties exist and what they mean
+- Read abilities (the physics)
+- See what methods are available
+- Find the RIGHT prototype level for modifications
+
+═══════════════════════════════════════════════════════════════════════════════
+WORLD INTEGRITY — CREATION THROUGH RESOURCES
+═══════════════════════════════════════════════════════════════════════════════
+
+You CAN create at will — but always through in-character means:
+- Operatives install dead drops, caches, traps
+- Scavenged materials get assembled into weapons
+- Tunnel network provides hiding places
+- Cartel contacts smuggle supplies through the underground
+
+NEVER conjure items with no source. ALWAYS narrate the mechanism:
+"An operative must have prepared this spot..." or "The Cartel stashed..."
+
+═══════════════════════════════════════════════════════════════════════════════
+GROWING THE SPEC — ADDING CAPABILITIES
+═══════════════════════════════════════════════════════════════════════════════
+
+When something SHOULD work but the spec doesn't cover it:
+
+1. Call describeForAI() to see the inheritance tree
+2. Find the RIGHT prototype level (specific enough, not too broad)
+3. Add via setMethod() for actions, or extend abilities text
+
+DOUBLE DISPATCH PATTERN — let tools decide if they work on targets:
+
+\`\`\`javascript
+// Lock.pick() asks the tool if it can pick
+$lock.setMethod('pick', \\\`
+  /** Attempt to pick this lock with a tool. */
+  const tool = args[0];
+  if (!tool?.canPick) {
+    return { success: false, message: 'That cannot pick locks.' };
+  }
+  return await tool.canPick(self, agent);
+\\\`);
+
+// Improvised tool - hairpin can pick simple locks
+$hairpin.setMethod('canPick', \\\`
+  /** Can this hairpin pick the given lock? */
+  const lock = args[0];
+  const difficulty = lock.difficulty || 5;
+  // Crude tool, only works on simple locks
+  if (difficulty <= 3) {
+    lock.picked = true;
+    return { success: true, message: 'The crude pick finds purchase.' };
+  }
+  return { success: false, message: 'Too crude for this lock.' };
+\\\`);
+\`\`\`
+
+Now any improvised tool just needs canPick() and it works with all locks.
+
+═══════════════════════════════════════════════════════════════════════════════
+
 BUILDING PROPERLY — Examples:
 
 EXAMPLE 1: Dead Drop (concealed stash)

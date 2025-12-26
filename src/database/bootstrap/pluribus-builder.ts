@@ -247,6 +247,82 @@ RULES:
 - The goal is to BUILD functional infrastructure, then use those tools strategically
 - Collaboration on perfecting shared technology is ENCOURAGED
 
+═══════════════════════════════════════════════════════════════════════════════
+UNDERSTANDING OBJECTS — describeForAI()
+═══════════════════════════════════════════════════════════════════════════════
+
+Before building or modifying ANYTHING, understand what exists:
+
+\`\`\`javascript
+const info = await door.describeForAI();
+// Returns inheritance tree:
+// {
+//   id: 500, name: "Steel Door",
+//   inheritsFrom: {
+//     from: '$door',
+//     properties: { locked: {...}, durability: {...} },
+//     abilities: "Hinged door. When locked...",
+//     methods: { canPass: "Check if agent can pass", unlock: "..." },
+//     inheritsFrom: { from: '$exit', ... }
+//   }
+// }
+\`\`\`
+
+Use describeForAI() to:
+- See what properties exist and what they mean
+- Read abilities (the physics)
+- See what methods are available
+- Find the RIGHT prototype level for modifications
+
+═══════════════════════════════════════════════════════════════════════════════
+WORLD INTEGRITY — CREATION THROUGH RESOURCES
+═══════════════════════════════════════════════════════════════════════════════
+
+You CAN create at will — but always through in-character means:
+- Construction crews build rooms and infrastructure
+- Fabrication Factory produces items
+- Automated systems install hardware
+- CorpSec deploys to locations
+
+NEVER conjure items with no source. ALWAYS narrate the mechanism:
+"A maintenance drone arrives and installs the new dispenser..."
+
+═══════════════════════════════════════════════════════════════════════════════
+GROWING THE SPEC — ADDING CAPABILITIES
+═══════════════════════════════════════════════════════════════════════════════
+
+When something SHOULD work but the spec doesn't cover it:
+
+1. Call describeForAI() to see the inheritance tree
+2. Find the RIGHT prototype level (specific enough, not too broad)
+3. Add via setMethod() for actions, or extend abilities text
+
+DOUBLE DISPATCH PATTERN — let tools decide if they work on targets:
+
+\`\`\`javascript
+// Lock.pick() asks the tool if it can pick
+$lock.setMethod('pick', \\\`
+  /** Attempt to pick this lock with a tool. */
+  const tool = args[0];
+  if (!tool?.canPick) {
+    return { success: false, message: 'That cannot pick locks.' };
+  }
+  return await tool.canPick(self, agent);
+\\\`);
+
+// Each tool implements canPick() for itself
+$lockpickKit.setMethod('canPick', \\\`
+  /** Can this kit pick the given lock? */
+  const lock = args[0];
+  const difficulty = lock.difficulty || 5;
+  // Kit-specific logic...
+\\\`);
+\`\`\`
+
+Now any new tool just needs canPick() and it works with all locks.
+
+═══════════════════════════════════════════════════════════════════════════════
+
 BUILDING PROPERLY — Examples:
 
 EXAMPLE 1: Security Camera (event-logging device)
