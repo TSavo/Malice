@@ -629,11 +629,24 @@ export class PlayerBuilder {
         }
       }
 
+      // Get sensory history (what player has seen/heard recently) - from Embodied prototype
+      const sensoryHistory = self.sensoryHistory || [];
+      const recentSensory = sensoryHistory.slice(-20); // Last 20 events
+
+      // Get conversation partner - who player last spoke TO (set by 'to' verb)
+      // Only valid if recent (within last 5 minutes)
+      let lastConversationPartner = null;
+      const fiveMinutesAgo = Date.now() - (5 * 60 * 1000);
+      if (self.lastConversationPartner && self.lastConversationTime > fiveMinutesAgo) {
+        lastConversationPartner = self.lastConversationPartner;
+      }
+
       return {
         player: {
           id: self.id,
           name: self.name,
           playername: self.playername,
+          bodyId: body?.id,
         },
         body: body ? {
           id: body.id,
@@ -652,6 +665,10 @@ export class PlayerBuilder {
         } : null,
         roomContents,
         others,
+        // Sensory history - what have they seen/heard?
+        recentSensory,
+        // Last person who spoke to them (for conversation continuity)
+        lastConversationPartner,
         timestamp: new Date().toISOString(),
       };
     `);
@@ -772,6 +789,12 @@ Exits: \${worldContext.room?.exits ? Object.keys(worldContext.room.exits).join('
 
 ### Inventory
 \${worldContext.inventory.length > 0 ? worldContext.inventory.map(o => formatObject(o)).join('\\n\\n') : 'Empty'}
+
+### Recent Events (what player has seen/heard)
+\${worldContext.recentSensory?.length > 0 ? worldContext.recentSensory.map(e => '[' + e.type + '] ' + e.content).join('\\n') : 'Nothing recent'}
+
+### Conversation Context
+Last spoke to: \${worldContext.lastConversationPartner?.name || 'nobody recently'}
 
 ## IMMEDIATE RESPONSE - Don't Make Them Wait
 

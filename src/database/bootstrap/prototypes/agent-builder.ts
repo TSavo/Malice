@@ -2701,6 +2701,10 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
         return 'You don\\'t see "' + targetName + '" here.';
       }
 
+      // Track conversation partner for context continuity
+      self.lastConversationPartner = target;
+      self.lastConversationTime = Date.now();
+
       // Announce to room
       if (location.announce) {
         await location.announce(self, target, {
