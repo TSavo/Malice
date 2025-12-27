@@ -15,6 +15,9 @@ import type { ObjectManager } from '../../object-manager.js';
  *   const friendly = await $.faction.isFriendly(entityA, entityB)
  */
 export class FactionBuilder {
+  static readonly alias = 'faction';
+  static readonly parent = 'root';
+
   constructor(private manager: ObjectManager) {}
 
   async build(rootId: number): Promise<RuntimeObject> {

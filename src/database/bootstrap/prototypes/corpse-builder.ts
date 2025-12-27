@@ -20,6 +20,9 @@ import type { ObjectManager } from '../../object-manager.js';
  * - At 100%: recycled
  */
 export class CorpseBuilder {
+  static readonly alias = 'corpse';
+  static readonly parent = 'decayable';
+
   constructor(private manager: ObjectManager) {}
 
   async build(decayableId: number): Promise<RuntimeObject> {

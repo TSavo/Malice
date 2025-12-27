@@ -18,6 +18,9 @@ import type { ObjectManager } from '../../object-manager.js';
  * - effects: Status effects applied when consumed
  */
 export class EdibleBuilder {
+  static readonly alias = 'edible';
+  static readonly parent = 'decayable';
+
   constructor(private manager: ObjectManager) {}
 
   async build(decayableId: number): Promise<RuntimeObject> {

@@ -22,6 +22,9 @@ import type { ObjectManager } from '../../object-manager.js';
  * - updateText(agent, newText): Updates the sign text if authorized
  */
 export class SignBuilder {
+  static readonly alias = 'sign';
+  static readonly parent = 'describable';
+
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {

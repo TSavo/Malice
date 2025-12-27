@@ -18,6 +18,9 @@ import type { ObjectManager } from '../../object-manager.js';
  * - Cooldown prevents spam-grinding
  */
 export class AgentBuilder {
+  static readonly alias = 'agent';
+  static readonly parent = 'describable';
+
   constructor(private manager: ObjectManager) {}
 
   async build(

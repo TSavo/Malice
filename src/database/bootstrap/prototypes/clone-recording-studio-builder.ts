@@ -24,6 +24,9 @@ import type { ObjectManager } from '../../object-manager.js';
  *   await studio.backup(player);
  */
 export class CloneRecordingStudioBuilder {
+  static readonly alias = 'cloneRecordingStudio';
+  static readonly parent = 'describable';
+
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {

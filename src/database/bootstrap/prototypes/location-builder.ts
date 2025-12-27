@@ -6,6 +6,9 @@ import type { ObjectManager } from '../../object-manager.js';
  * Base prototype for things that can contain other things
  */
 export class LocationBuilder {
+  static readonly alias = 'location';
+  static readonly parent = 'describable';
+
   constructor(private manager: ObjectManager) {}
 
   async build(

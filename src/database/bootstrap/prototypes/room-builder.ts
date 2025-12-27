@@ -24,6 +24,9 @@ import type { ObjectManager } from '../../object-manager.js';
  * - 81-100: Packed (can barely perceive anyone not watched)
  */
 export class RoomBuilder {
+  static readonly alias = 'room';
+  static readonly parent = 'location';
+
   constructor(private manager: ObjectManager) {}
 
   /**

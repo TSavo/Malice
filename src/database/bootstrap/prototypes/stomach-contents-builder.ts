@@ -19,6 +19,9 @@ import type { ObjectManager } from '../../object-manager.js';
  * Aggregation key: stackType based on sourceProto + spoiled/poisoned state
  */
 export class StomachContentsBuilder {
+  static readonly alias = 'stomachContents';
+  static readonly parent = 'stackable';
+
   constructor(private manager: ObjectManager) {}
 
   async build(stackableId: number): Promise<RuntimeObject> {

@@ -23,6 +23,9 @@ import type { ObjectManager } from '../../object-manager.js';
  * - in/i, out/o
  */
 export class ExitBuilder {
+  static readonly alias = 'exit';
+  static readonly parent = 'describable';
+
   constructor(private manager: ObjectManager) {}
 
   async build(describableId: number): Promise<RuntimeObject> {

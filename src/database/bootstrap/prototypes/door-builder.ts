@@ -20,6 +20,9 @@ import type { ObjectManager } from '../../object-manager.js';
  * - material: String - what the door is made of
  */
 export class DoorBuilder {
+  static readonly alias = 'door';
+  static readonly parent = 'describable';
+
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {

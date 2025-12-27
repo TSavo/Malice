@@ -17,6 +17,9 @@ import type { ObjectManager } from '../../object-manager.js';
  * - scanLocation: Where to present for scanning (e.g., "right side of door")
  */
 export class BiometricLockBuilder {
+  static readonly alias = 'biometricLock';
+  static readonly parent = 'lock';
+
   constructor(private manager: ObjectManager) {}
 
   async build(lockId: number): Promise<RuntimeObject> {

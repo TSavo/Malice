@@ -13,6 +13,9 @@ import type { ObjectManager } from '../../object-manager.js';
  * - Contain the original body (now skeletal)
  */
 export class SkeletalRemainsBuilder {
+  static readonly alias = 'skeletalRemains';
+  static readonly parent = 'describable';
+
   constructor(private manager: ObjectManager) {}
 
   async build(describableId: number): Promise<RuntimeObject> {

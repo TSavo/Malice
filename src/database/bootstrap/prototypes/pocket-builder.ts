@@ -21,6 +21,9 @@ import type { ObjectManager } from '../../object-manager.js';
  *   pocket.attachedTo = jacket;
  */
 export class PocketBuilder {
+  static readonly alias = 'pocket';
+  static readonly parent = 'describable';
+
   constructor(private manager: ObjectManager) {}
 
   async build(describableId: number): Promise<RuntimeObject> {

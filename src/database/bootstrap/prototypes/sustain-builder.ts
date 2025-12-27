@@ -17,6 +17,9 @@ import type { ObjectManager } from '../../object-manager.js';
  * - Cheap and ubiquitous
  */
 export class SustainBuilder {
+  static readonly alias = 'sustain';
+  static readonly parent = 'food';
+
   constructor(private manager: ObjectManager) {}
 
   async build(foodId: number): Promise<RuntimeObject> {

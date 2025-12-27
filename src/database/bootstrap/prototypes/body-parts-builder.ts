@@ -20,6 +20,12 @@ import type { ObjectManager } from '../../object-manager.js';
  *     - Foot
  */
 export class BodyPartsBuilder {
+  static readonly aliases = [
+    'torso', 'stomach', 'head', 'eye', 'ear', 'nose', 'mouth', 'tongue',
+    'arm', 'hand', 'finger', 'leg', 'foot',
+  ] as const;
+  static readonly parent = 'bodyPart';
+
   constructor(private manager: ObjectManager) {}
 
   /**

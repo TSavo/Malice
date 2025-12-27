@@ -32,6 +32,9 @@ import type { ObjectManager } from '../../object-manager.js';
  * - Sledgehammer: skill="hammer", damage=45, damageType="bruise", twoHanded=true
  */
 export class WeaponBuilder {
+  static readonly alias = 'weapon';
+  static readonly parent = 'describable';
+
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {

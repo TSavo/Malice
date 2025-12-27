@@ -66,6 +66,8 @@ export { SkeletalRemainsBuilder } from './skeletal-remains-builder.js';
 export { StackableBuilder } from './stackable-builder.js';
 export { StomachContentsBuilder } from './stomach-contents-builder.js';
 export { SustainBuilder } from './sustain-builder.js';
+// Telescope
+export { TelescopeBuilder } from './telescope-builder.js';
 // Vendors
 export { VendableBuilder } from './vendable-builder.js';
 // Weapons

@@ -19,6 +19,9 @@ import type { ObjectManager } from '../../object-manager.js';
  * - Removed when fully healed (healingProgress >= 100)
  */
 export class WoundBuilder {
+  static readonly alias = 'wound';
+  static readonly parent = 'describable';
+
   constructor(private manager: ObjectManager) {}
 
   async build(describableId: number): Promise<RuntimeObject> {

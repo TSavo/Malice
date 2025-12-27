@@ -13,6 +13,9 @@ import type { ObjectManager } from '../../object-manager.js';
  * - Eventually become $.skeletalRemains
  */
 export class HumanRemainsBuilder {
+  static readonly alias = 'humanRemains';
+  static readonly parent = 'describable';
+
   constructor(private manager: ObjectManager) {}
 
   async build(describableId: number): Promise<RuntimeObject> {

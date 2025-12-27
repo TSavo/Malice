@@ -18,6 +18,9 @@ import type { ObjectManager } from '../../object-manager.js';
  * - extinguish(agent): Turn off the incinerator
  */
 export class IncineratorBuilder {
+  static readonly alias = 'incinerator';
+  static readonly parent = 'disposal';
+
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {

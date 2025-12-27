@@ -6,6 +6,9 @@ import type { ObjectManager } from '../../object-manager.js';
  * Provides a number, basic dial/send handling, and hooks for subclasses.
  */
 export class PhoneBuilder {
+  static readonly alias = 'phone';
+  static readonly parent = 'describable';
+
   constructor(private manager: ObjectManager) {}
 
   async build(describableId: number): Promise<RuntimeObject> {

@@ -23,6 +23,9 @@ import type { ObjectManager } from '../../object-manager.js';
  * - isRenter(agent): Checks if agent currently has access
  */
 export class RentableLockBuilder {
+  static readonly alias = 'rentableLock';
+  static readonly parent = 'lock';
+
   constructor(private manager: ObjectManager) {}
 
   async build(lockId: number): Promise<RuntimeObject> {

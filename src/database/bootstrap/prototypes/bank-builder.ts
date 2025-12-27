@@ -11,6 +11,9 @@ import type { ObjectManager } from '../../object-manager.js';
  * - All operations are idempotent and atomic
  */
 export class BankBuilder {
+  static readonly alias = 'bank';
+  static readonly parent = 'root';
+
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {

@@ -19,6 +19,9 @@ import type { ObjectManager } from '../../object-manager.js';
  * Subprototypes: $.oneTimeLocker (adds verbs/messaging for courier use)
  */
 export class LockerBuilder {
+  static readonly alias = 'locker';
+  static readonly parent = 'location';
+
   constructor(private manager: ObjectManager) {}
 
   async build(locationId: number): Promise<RuntimeObject> {

@@ -24,6 +24,9 @@ import type { ObjectManager } from '../../object-manager.js';
  * - Compose security: add $.biometricLock, $.keycardLock, etc.
  */
 export class ElevatorBuilder {
+  static readonly alias = 'elevator';
+  static readonly parent = 'room';
+
   constructor(private manager: ObjectManager) {}
 
   async build(locationId: number): Promise<RuntimeObject> {

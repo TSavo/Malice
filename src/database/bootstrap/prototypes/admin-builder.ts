@@ -14,6 +14,9 @@ import type { ObjectManager } from '../../object-manager.js';
  * - @examine: Deep inspect objects
  */
 export class AdminBuilder {
+  static readonly alias = 'admin';
+  static readonly parent = 'player';
+
   constructor(private manager: ObjectManager) {}
 
   async build(playerId: number): Promise<RuntimeObject> {

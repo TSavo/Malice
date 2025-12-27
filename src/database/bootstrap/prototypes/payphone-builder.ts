@@ -5,6 +5,9 @@ import type { ObjectManager } from '../../object-manager.js';
  * Payphone extends Phone: bolted down, requires bank payment per call.
  */
 export class PayphoneBuilder {
+  static readonly alias = 'payphone';
+  static readonly parent = 'phone';
+
   constructor(private manager: ObjectManager) {}
 
   async build(phoneId: number): Promise<RuntimeObject> {

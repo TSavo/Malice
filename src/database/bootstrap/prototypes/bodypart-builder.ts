@@ -21,6 +21,9 @@ import type { ObjectManager } from '../../object-manager.js';
  * - Calories based on weight (meat ~2 kcal/gram)
  */
 export class BodyPartBuilder {
+  static readonly alias = 'bodyPart';
+  static readonly parent = 'edible';
+
   constructor(private manager: ObjectManager) {}
 
   async build(

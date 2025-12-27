@@ -16,6 +16,9 @@ import type { ObjectManager } from '../../object-manager.js';
  * - setAllowedFaction(factionName): Set which faction can use this exit
  */
 export class GuardedExitBuilder {
+  static readonly alias = 'guardedExit';
+  static readonly parent = 'exit';
+
   constructor(private manager: ObjectManager) {}
 
   async build(exitId: number): Promise<RuntimeObject> {

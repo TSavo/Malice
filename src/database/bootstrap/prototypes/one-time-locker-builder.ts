@@ -18,6 +18,9 @@ import type { ObjectManager } from '../../object-manager.js';
  * - "get from locker A1" - then choose item to take
  */
 export class OneTimeLockerBuilder {
+  static readonly alias = 'oneTimeLocker';
+  static readonly parent = 'locker';
+
   constructor(private manager: ObjectManager) {}
 
   async build(lockerId: number): Promise<RuntimeObject> {

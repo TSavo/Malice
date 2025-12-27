@@ -20,6 +20,9 @@ import type { ObjectManager } from '../../object-manager.js';
  * Inherits from $.describable.
  */
 export class MagazineBuilder {
+  static readonly alias = 'magazine';
+  static readonly parent = 'describable';
+
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
@@ -370,6 +373,12 @@ export class SpeedloaderBuilder {
  *   $.speedloader (.38, 6 rounds)
  */
 export class MagazinePrototypesBuilder {
+  static readonly aliases = [
+    'pistolMagazine', 'extendedMagazine', 'm1911Magazine',
+    'rifleMagazine', 'smgMagazine', 'mac10Magazine', 'speedloader',
+  ] as const;
+  static readonly parent = 'magazine';
+
   constructor(private manager: ObjectManager) {}
 
   /**
