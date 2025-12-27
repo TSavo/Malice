@@ -13,6 +13,485 @@ import type { ObjectDatabase } from './object-db.js';
 import { RuntimeObjectImpl } from './runtime-object.js';
 
 /**
+ * Selector for property predicates in fluent query builder
+ */
+class PropertySelector {
+  private negate = false;
+
+  constructor(
+    private query: QueryBuilder,
+    private propName: string,
+  ) {}
+
+  /** Negate the next predicate */
+  not(): this {
+    this.negate = true;
+    return this;
+  }
+
+  /** Property equals value */
+  equals(value: unknown): QueryBuilder {
+    const propName = this.propName;
+    const negate = this.negate;
+    return this.query.addPredicate((obj) => {
+      const objValue = obj.get(propName);
+      // Handle RuntimeObject comparison (compare by ID)
+      let result: boolean;
+      if (
+        value &&
+        typeof value === 'object' &&
+        'id' in value &&
+        objValue &&
+        typeof objValue === 'object' &&
+        'id' in objValue
+      ) {
+        result =
+          (value as RuntimeObject).id === (objValue as RuntimeObject).id;
+      } else {
+        result = objValue === value;
+      }
+      return negate ? !result : result;
+    });
+  }
+
+  /** Property exists (is not undefined) */
+  exists(): QueryBuilder {
+    const propName = this.propName;
+    const negate = this.negate;
+    return this.query.addPredicate((obj) => {
+      const result = obj.get(propName) !== undefined;
+      return negate ? !result : result;
+    });
+  }
+
+  /** Property contains text (string) or value (array). Use '*' to search all string properties. */
+  contains(text: string): QueryBuilder {
+    const propName = this.propName;
+    const negate = this.negate;
+    const lowerText = text.toLowerCase();
+    return this.query.addPredicate((obj) => {
+      let result = false;
+      if (propName === '*') {
+        // Search all string properties
+        const ownProps = obj.getOwnProperties();
+        for (const [, val] of Object.entries(ownProps)) {
+          if (typeof val === 'string' && val.toLowerCase().includes(lowerText)) {
+            result = true;
+            break;
+          }
+        }
+      } else {
+        const val = obj.get(propName);
+        if (typeof val === 'string') {
+          result = val.toLowerCase().includes(lowerText);
+        } else if (Array.isArray(val)) {
+          result = val.includes(text);
+        }
+      }
+      return negate ? !result : result;
+    });
+  }
+
+  /** Property greater than value */
+  gt(n: number): QueryBuilder {
+    const propName = this.propName;
+    const negate = this.negate;
+    return this.query.addPredicate((obj) => {
+      const val = obj.get(propName);
+      const result = typeof val === 'number' && val > n;
+      return negate ? !result : result;
+    });
+  }
+
+  /** Property greater than or equal to value */
+  gte(n: number): QueryBuilder {
+    const propName = this.propName;
+    const negate = this.negate;
+    return this.query.addPredicate((obj) => {
+      const val = obj.get(propName);
+      const result = typeof val === 'number' && val >= n;
+      return negate ? !result : result;
+    });
+  }
+
+  /** Property less than value */
+  lt(n: number): QueryBuilder {
+    const propName = this.propName;
+    const negate = this.negate;
+    return this.query.addPredicate((obj) => {
+      const val = obj.get(propName);
+      const result = typeof val === 'number' && val < n;
+      return negate ? !result : result;
+    });
+  }
+
+  /** Property less than or equal to value */
+  lte(n: number): QueryBuilder {
+    const propName = this.propName;
+    const negate = this.negate;
+    return this.query.addPredicate((obj) => {
+      const val = obj.get(propName);
+      const result = typeof val === 'number' && val <= n;
+      return negate ? !result : result;
+    });
+  }
+
+  /** Property value is in the given set */
+  in(values: unknown[]): QueryBuilder {
+    const propName = this.propName;
+    const negate = this.negate;
+    return this.query.addPredicate((obj) => {
+      const val = obj.get(propName);
+      const result = values.includes(val);
+      return negate ? !result : result;
+    });
+  }
+
+  /** Property matches regex pattern */
+  matches(pattern: string | RegExp): QueryBuilder {
+    const propName = this.propName;
+    const negate = this.negate;
+    const regex = typeof pattern === 'string' ? new RegExp(pattern) : pattern;
+    return this.query.addPredicate((obj) => {
+      const val = obj.get(propName);
+      const result = typeof val === 'string' && regex.test(val);
+      return negate ? !result : result;
+    });
+  }
+
+  /** Property starts with text */
+  startsWith(text: string): QueryBuilder {
+    const propName = this.propName;
+    const negate = this.negate;
+    return this.query.addPredicate((obj) => {
+      const val = obj.get(propName);
+      const result = typeof val === 'string' && val.startsWith(text);
+      return negate ? !result : result;
+    });
+  }
+
+  /** Property ends with text */
+  endsWith(text: string): QueryBuilder {
+    const propName = this.propName;
+    const negate = this.negate;
+    return this.query.addPredicate((obj) => {
+      const val = obj.get(propName);
+      const result = typeof val === 'string' && val.endsWith(text);
+      return negate ? !result : result;
+    });
+  }
+}
+
+/**
+ * Selector for method predicates in fluent query builder
+ */
+class MethodSelector {
+  private negate = false;
+
+  constructor(
+    private query: QueryBuilder,
+    private methodName: string,
+  ) {}
+
+  /** Negate the next predicate */
+  not(): this {
+    this.negate = true;
+    return this;
+  }
+
+  /** Method exists (walks inheritance chain) */
+  exists(): QueryBuilder {
+    const methodName = this.methodName;
+    const negate = this.negate;
+    return this.query.addPredicate((obj) => {
+      let found = false;
+      let current: RuntimeObject | null = obj;
+      while (current) {
+        const ownMethods = current.getOwnMethods();
+        if (ownMethods[methodName]) {
+          found = true;
+          break;
+        }
+        current = current.getParent();
+      }
+      return negate ? !found : found;
+    });
+  }
+
+  /** Method exists locally (not inherited) */
+  existsLocal(): QueryBuilder {
+    const methodName = this.methodName;
+    const negate = this.negate;
+    return this.query.addPredicate((obj) => {
+      const ownMethods = obj.getOwnMethods();
+      const result = !!ownMethods[methodName];
+      return negate ? !result : result;
+    });
+  }
+
+  /** Method code contains text. Use '*' to search all methods. */
+  contains(text: string): QueryBuilder {
+    const methodName = this.methodName;
+    const negate = this.negate;
+    return this.query.addPredicate((obj) => {
+      const ownMethods = obj.getOwnMethods();
+      let found = false;
+
+      if (methodName === '*') {
+        // Search all methods
+        for (const method of Object.values(ownMethods)) {
+          const code = typeof method === 'string' ? method : method?.code;
+          if (typeof code === 'string' && code.includes(text)) {
+            found = true;
+            break;
+          }
+        }
+      } else {
+        // Search specific method
+        const method = ownMethods[methodName];
+        if (method) {
+          const code = typeof method === 'string' ? method : method?.code;
+          if (typeof code === 'string' && code.includes(text)) {
+            found = true;
+          }
+        }
+      }
+      return negate ? !found : found;
+    });
+  }
+
+  /** Method code matches regex pattern. Use '*' to search all methods. */
+  matches(pattern: string | RegExp): QueryBuilder {
+    const methodName = this.methodName;
+    const negate = this.negate;
+    const regex = typeof pattern === 'string' ? new RegExp(pattern) : pattern;
+    return this.query.addPredicate((obj) => {
+      const ownMethods = obj.getOwnMethods();
+      let found = false;
+
+      if (methodName === '*') {
+        for (const method of Object.values(ownMethods)) {
+          const code = typeof method === 'string' ? method : method?.code;
+          if (typeof code === 'string' && regex.test(code)) {
+            found = true;
+            break;
+          }
+        }
+      } else {
+        const method = ownMethods[methodName];
+        if (method) {
+          const code = typeof method === 'string' ? method : method?.code;
+          if (typeof code === 'string' && regex.test(code)) {
+            found = true;
+          }
+        }
+      }
+      return negate ? !found : found;
+    });
+  }
+}
+
+/**
+ * Fluent query builder for MOO objects
+ *
+ * @example
+ * // Find outdoor rooms
+ * $query().prop('outdoor').equals(true).all()
+ *
+ * // Find weapons OR high-damage items
+ * $query().parent($weapon).or().prop('damage').gt(10).all()
+ *
+ * // Find non-recycled items
+ * $query().prop('recycled').not().equals(true).all()
+ *
+ * // Find objects without tick method
+ * $query().method('tick').not().exists().all()
+ *
+ * // Find objects where any method uses $recycler
+ * $query().method('*').contains('$recycler').all()
+ *
+ * // Find objects where any property contains 'secret'
+ * $query().prop('*').contains('secret').all()
+ *
+ * // With .and() for readability
+ * $query().prop('x').equals(1).and().prop('y').equals(2).all()
+ *
+ * // Complex: (outdoor AND z>0) OR (indoor AND z<0)
+ * $query()
+ *   .prop('outdoor').equals(true).and().prop('z').gt(0)
+ *   .or()
+ *   .prop('outdoor').equals(false).and().prop('z').lt(0)
+ *   .all()
+ */
+export class QueryBuilder {
+  private groups: Array<Array<(obj: RuntimeObject) => boolean>> = [[]];
+  private _limit?: number;
+  private _parent?: RuntimeObject | number;
+  private _inheritedFrom?: RuntimeObject | number;
+
+  constructor(private cache: ObjectCache) {}
+
+  /** Start a property selector. Use '*' to search all properties. */
+  prop(name: string): PropertySelector {
+    return new PropertySelector(this, name);
+  }
+
+  /** Start a method selector. Use '*' to search all methods. */
+  method(name: string): MethodSelector {
+    return new MethodSelector(this, name);
+  }
+
+  /** Filter by parent prototype */
+  parent(proto: RuntimeObject | number): this {
+    this._parent = proto;
+    return this;
+  }
+
+  /** Filter by ancestor in prototype chain */
+  inheritedFrom(proto: RuntimeObject | number): this {
+    this._inheritedFrom = proto;
+    return this;
+  }
+
+  /** Start a new OR group. Predicates within a group are ANDed; groups are ORed. */
+  or(): this {
+    this.groups.push([]);
+    return this;
+  }
+
+  /** Noop for readability - predicates are ANDed by default */
+  and(): this {
+    return this;
+  }
+
+  /** Limit number of results */
+  limit(n: number): this {
+    this._limit = n;
+    return this;
+  }
+
+  /** Add a predicate to current group (internal use by selectors) */
+  addPredicate(pred: (obj: RuntimeObject) => boolean): this {
+    this.groups[this.groups.length - 1].push(pred);
+    return this;
+  }
+
+  /** Execute query and return all matching objects */
+  all(): RuntimeObject[] {
+    return this.execute();
+  }
+
+  /** Execute query and return first matching object (or null) */
+  first(): RuntimeObject | null {
+    const results = this.execute(1);
+    return results[0] ?? null;
+  }
+
+  /** Execute query and return count of matching objects */
+  count(): number {
+    return this.execute().length;
+  }
+
+  /** Execute query and return unique parents of all matching objects */
+  parents(): RuntimeObject[] {
+    const results = this.execute();
+    const parentMap = new Map<number, RuntimeObject>();
+    for (const obj of results) {
+      const parent = obj.getParent();
+      if (parent && !parentMap.has(parent.id)) {
+        parentMap.set(parent.id, parent);
+      }
+    }
+    return Array.from(parentMap.values());
+  }
+
+  /** Execute query and return all direct children of matching objects */
+  children(): RuntimeObject[] {
+    const results = this.execute();
+    const parentIds = new Set(results.map((obj) => obj.id));
+    const children: RuntimeObject[] = [];
+
+    for (const obj of this.cache.values()) {
+      const parent = obj.getParent();
+      if (parent && parentIds.has(parent.id)) {
+        children.push(obj);
+      }
+    }
+
+    return children;
+  }
+
+  /** Execute query and return all IDs of matching objects */
+  ids(): number[] {
+    return this.execute().map((obj) => obj.id);
+  }
+
+  /** Execute query and return names of matching objects */
+  names(): string[] {
+    return this.execute()
+      .map((obj) => obj.get('name'))
+      .filter((n): n is string => typeof n === 'string');
+  }
+
+  /** Check if object matches parent constraint */
+  private matchesParent(obj: RuntimeObject): boolean {
+    if (this._parent === undefined) return true;
+    const parentId =
+      typeof this._parent === 'number' ? this._parent : this._parent.id;
+    const objParent = obj.getParent();
+    return objParent !== null && objParent.id === parentId;
+  }
+
+  /** Check if object matches inheritedFrom constraint */
+  private matchesInherited(obj: RuntimeObject): boolean {
+    if (this._inheritedFrom === undefined) return true;
+    const inheritedFromId =
+      typeof this._inheritedFrom === 'number'
+        ? this._inheritedFrom
+        : this._inheritedFrom.id;
+    let current: RuntimeObject | null = obj;
+    while (current) {
+      if (current.id === inheritedFromId) return true;
+      current = current.getParent();
+    }
+    return false;
+  }
+
+  /** Execute the query */
+  private execute(overrideLimit?: number): RuntimeObject[] {
+    const results: RuntimeObject[] = [];
+    const limit = overrideLimit ?? this._limit;
+
+    // Check if we have any predicates in any group
+    const hasPredicates = this.groups.some((g) => g.length > 0);
+
+    for (const obj of this.cache.values()) {
+      // Always check parent constraint
+      if (!this.matchesParent(obj)) continue;
+
+      // Always check inheritedFrom constraint
+      if (!this.matchesInherited(obj)) continue;
+
+      // Check OR groups: any group must match
+      // Each group: all predicates must pass (AND within group)
+      let groupsMatch = true;
+      if (hasPredicates) {
+        groupsMatch = this.groups.some(
+          (group) => group.length === 0 || group.every((pred) => pred(obj)),
+        );
+      }
+
+      if (groupsMatch) {
+        results.push(obj);
+        if (limit && results.length >= limit) break;
+      }
+    }
+
+    return results;
+  }
+}
+
+/**
  * Sanitize an object for MongoDB storage, removing circular references
  */
 function sanitizeForMongo(
@@ -569,6 +1048,36 @@ export class ObjectManager {
   }
 
   /**
+   * Create a fluent query builder for MOO objects
+   *
+   * @returns QueryBuilder for fluent chaining
+   *
+   * @example
+   * // Property selectors
+   * $query().prop('outdoor').equals(true).all()
+   * $query().prop('z').gt(0).all()
+   * $query().prop('name').contains('smith').all()
+   * $query().prop('*').contains('secret').all()  // search all properties
+   *
+   * // Method selectors
+   * $query().method('tick').exists().all()
+   * $query().method('*').contains('$recycler').all()  // search all methods
+   *
+   * // Negation
+   * $query().prop('recycled').not().equals(true).all()
+   * $query().method('tick').not().exists().all()
+   *
+   * // OR groups
+   * $query().parent($weapon).or().prop('damage').gt(10).all()
+   *
+   * // AND for readability (noop)
+   * $query().prop('x').equals(1).and().prop('y').equals(2).all()
+   */
+  query(): QueryBuilder {
+    return new QueryBuilder(this.cache);
+  }
+
+  /**
    * Get all children of an object
    * Scans in-memory cache (all objects loaded at startup)
    */
@@ -893,16 +1402,16 @@ export class ObjectManager {
    *
    * @example
    * // First call - new session
-   * const { response, session } = await $query(
+   * const { response, session } = await $aiQuery(
    *   "You are a guard. Be suspicious.",
    *   "A stranger approaches."
    * );
    * self.agentSession = session;
    *
    * // Later - resume session
-   * const result = await $query(systemPrompt, input, self.agentSession);
+   * const result = await $aiQuery(systemPrompt, input, self.agentSession);
    */
-  async query(
+  async aiQuery(
     systemPrompt: string,
     prompt: string,
     session?: string,
@@ -910,10 +1419,10 @@ export class ObjectManager {
       additionalMcpServers?: Record<string, { type: string; url: string }>;
     },
   ): Promise<{ response: string; session: string }> {
-    console.log('[ObjectManager.$query] Importing SDK...');
+    console.log('[ObjectManager.$aiQuery] Importing SDK...');
     // Dynamic import to avoid loading SDK at startup
     const { query: sdkQuery } = await import('@anthropic-ai/claude-agent-sdk');
-    console.log('[ObjectManager.$query] SDK imported successfully');
+    console.log('[ObjectManager.$aiQuery] SDK imported successfully');
 
     const mcpServers: Record<string, { type: string; url: string }> = {
       'malice-moo': {
@@ -926,7 +1435,7 @@ export class ObjectManager {
       Object.assign(mcpServers, options.additionalMcpServers);
     }
     console.log(
-      '[ObjectManager.$query] MCP servers:',
+      '[ObjectManager.$aiQuery] MCP servers:',
       Object.keys(mcpServers).join(', '),
     );
 
@@ -943,7 +1452,7 @@ export class ObjectManager {
     if (session) {
       queryOptions.resume = session;
       console.log(
-        '[ObjectManager.$query] Resuming session:',
+        '[ObjectManager.$aiQuery] Resuming session:',
         `${session.substring(0, 20)}...`,
       );
     }
@@ -952,14 +1461,14 @@ export class ObjectManager {
     let newSessionId: string | null = null;
 
     console.log(
-      '[ObjectManager.$query] Calling sdkQuery with prompt length:',
+      '[ObjectManager.$aiQuery] Calling sdkQuery with prompt length:',
       prompt.length,
     );
     try {
       for await (const message of sdkQuery({ prompt, options: queryOptions })) {
         const msg = message as Record<string, unknown>;
         console.log(
-          '[ObjectManager.$query] Message type:',
+          '[ObjectManager.$aiQuery] Message type:',
           msg.type,
           (msg as any).subtype || '',
         );
@@ -969,7 +1478,7 @@ export class ObjectManager {
           newSessionId =
             (msg as any).session_id || (msg as any).data?.session_id;
           console.log(
-            '[ObjectManager.$query] Got session:',
+            '[ObjectManager.$aiQuery] Got session:',
             `${newSessionId?.substring(0, 20)}...`,
           );
         }
@@ -985,12 +1494,12 @@ export class ObjectManager {
       }
     } catch (err: unknown) {
       const error = err as Error;
-      console.error('[ObjectManager.$query] Error:', error?.message || err);
+      console.error('[ObjectManager.$aiQuery] Error:', error?.message || err);
       throw err;
     }
 
     console.log(
-      '[ObjectManager.$query] Completed, response length:',
+      '[ObjectManager.$aiQuery] Completed, response length:',
       response.length,
     );
     return {

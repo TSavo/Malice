@@ -212,7 +212,7 @@ Be creative with descriptions. Clothing tells a story about the wearer.\`;
 First use ai action=info to learn about the NPC, then dress them appropriately for their role.\`;
 
       // Use $query to call Claude with MCP tools
-      const result = await $query('tailor', prompt, null, systemPrompt);
+      const result = await $aiQuery('tailor', prompt, null, systemPrompt);
 
       console.log('[Tailor] Dressed ' + (human.name || 'NPC') + ' (#' + human.id + ')');
       return { success: true, message: result };

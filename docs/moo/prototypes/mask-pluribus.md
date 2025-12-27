@@ -161,7 +161,7 @@ const fullPrompt = systemPrompt + '\n\n' + historyPrompt;
 const userPrompt = 'The Mask wearer (PlayerName) addresses you: "message"';
 
 // Query AI with MCP tools available
-const result = await $query(fullPrompt, userPrompt, session);
+const result = await $aiQuery(fullPrompt, userPrompt, session);
 ```
 
 The AI response is delivered back to the wearer, and the session is preserved for conversational continuity.

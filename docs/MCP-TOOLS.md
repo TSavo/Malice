@@ -57,11 +57,41 @@ curl http://localhost:3010/mcp
 ```typescript
 $                      // ObjectManager ($.db, $.addAlias, $.ai, $.plot, etc.)
 $load(id)              // Load object by ID
+$query()               // Fluent query builder for finding objects
+$aiQuery(sys, prompt)  // Query Claude AI with MCP tools
 $recycler              // Create/destroy objects
 $room, $player, etc.   // All registered aliases
 player                 // Your player object (if authenticated)
 // Plus all JavaScript: loops, conditionals, async/await, etc.
 ```
+
+### Finding Objects with $query
+
+```typescript
+// Property selectors
+$query().prop('outdoor').equals(true).all()
+$query().prop('z').gt(0).all()
+$query().prop('*').contains('secret').all()  // search all properties
+
+// Method selectors
+$query().method('tick').exists().all()
+$query().method('*').contains('$recycler').all()  // search all methods
+
+// Negation and OR groups
+$query().prop('recycled').not().equals(true).all()
+$query().parent($weapon).or().prop('damage').gt(10).all()
+
+// With parent/inheritance
+$query().parent($room).prop('z').equals(0).all()
+```
+
+**Property predicates:** `.equals()`, `.exists()`, `.contains()`, `.gt()`, `.gte()`, `.lt()`, `.lte()`, `.in()`, `.matches()`, `.startsWith()`, `.endsWith()`
+
+**Method predicates:** `.exists()`, `.existsLocal()`, `.contains()`, `.matches()`
+
+**Query methods:** `.parent()`, `.inheritedFrom()`, `.or()`, `.and()`, `.limit()`
+
+**Results:** `.all()`, `.first()`, `.count()`, `.ids()`, `.names()`, `.parents()`, `.children()`
 
 ### Method Management
 

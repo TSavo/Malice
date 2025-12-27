@@ -759,6 +759,72 @@ map[key] = value;
 self.registry = map;
 ```
 
+### Finding Objects with $query
+
+The fluent query builder uses a selector pattern:
+
+```javascript
+// Property selectors
+$query().prop('outdoor').equals(true).all()
+$query().prop('z').gt(0).all()
+$query().prop('name').contains('smith').all()
+$query().prop('*').contains('secret').all()  // search all properties
+
+// Method selectors
+$query().method('tick').exists().all()
+$query().method('*').contains('$recycler').all()  // search all methods
+
+// Negation
+$query().prop('recycled').not().equals(true).all()
+$query().method('tick').not().exists().all()
+
+// OR groups (predicates within group are ANDed, groups are ORed)
+$query().parent($weapon).or().prop('damage').gt(10).all()
+
+// AND for readability (noop)
+$query().prop('x').equals(1).and().prop('y').equals(2).all()
+
+// Parent/inheritance filters
+$query().parent($room).prop('z').equals(0).all()
+$query().inheritedFrom($item).limit(10).all()
+```
+
+**Property predicates:** `.equals()`, `.exists()`, `.contains()`, `.gt()`, `.gte()`, `.lt()`, `.lte()`, `.in()`, `.matches()`, `.startsWith()`, `.endsWith()`
+
+**Method predicates:** `.exists()`, `.existsLocal()`, `.contains()`, `.matches()`
+
+**Query methods:**
+- `.parent(proto)` - Direct parent prototype
+- `.inheritedFrom(proto)` - Anywhere in prototype chain
+- `.or()` - Start new OR group
+- `.and()` - Noop for readability
+- `.limit(n)` - Limit results
+
+**Result methods:**
+- `.all()` - All matching objects
+- `.first()` - First match or null
+- `.count()` - Count of matches
+- `.ids()` - Array of IDs
+- `.names()` - Array of names
+- `.parents()` - Unique parents of matches
+- `.children()` - Direct children of matches
+
+### AI Queries with $aiQuery
+
+Query Claude AI from MOO code:
+
+```javascript
+// Basic AI query
+const result = await $aiQuery(systemPrompt, userPrompt);
+// Returns: { response: "...", session: "abc123" }
+
+// Resume conversation with session
+const result = await $aiQuery(systemPrompt, userPrompt, previousSession);
+
+// Store session for continuity
+self.agentSession = result.session;
+```
+
 ## Inheritance Chain
 
 ```

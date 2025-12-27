@@ -1691,7 +1691,7 @@ Do NOT wrap this up neatly. The interviewer's fate is unknown. The attack may be
       const systemPrompt = self.interviewerPrompt.replace(/\\\\{\\\\{playerId\\\\}\\\\}/g, String(player.id));
       console.log('[CharGen] System prompt length:', systemPrompt?.length || 0);
 
-      $query(systemPrompt, kickoffPrompt, null).then(async (result) => {
+      $aiQuery(systemPrompt, kickoffPrompt, null).then(async (result) => {
         console.log('[CharGen] AI agent completed first turn, session:', result.session?.substring(0, 20) + '...');
         // Session saved on player until NPC is spawned
         player.chargenAgentSession = result.session;
@@ -1857,7 +1857,7 @@ Do NOT wrap this up neatly. The interviewer's fate is unknown. The attack may be
         'consider using reject_player if they appear to have abandoned the process.';
 
       try {
-        const result = await $query(promptTemplate, timeoutPrompt, session);
+        const result = await $aiQuery(promptTemplate, timeoutPrompt, session);
         console.log('[CharGen] AI responded to timeout prompt for player #' + playerId);
         player.chargenAgentSession = result.session;
 

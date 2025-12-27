@@ -8,7 +8,7 @@ This guide covers debugging the AI-autonomous character generation (chargen v2) 
 1. New player connects via telnet
 2. AuthManager routes to CharGen for new users
 3. CharGen calls `startNPCInterview(playerId)` which:
-   - Creates an AI agent session via `$query`
+   - Creates an AI agent session via `$aiQuery`
    - Spawns an NPC interviewer (e.g., "Processing Officer Venn")
    - Creates an interview room
    - Moves player and NPC to that room

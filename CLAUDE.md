@@ -51,7 +51,7 @@ The core architectural pattern is the **Stable Proxy Architecture**:
 Everything is a `RuntimeObject` with numeric IDs (#0, #1, #2, etc.):
 
 - `#-1` - `$.nothing` - Immutable null object reference
-- `#0` - `$` - ObjectManager itself (stores aliases, provides `$load`, `$create`, `$query`)
+- `#0` - `$` - ObjectManager itself (stores aliases, provides `$load`, `$create`, `$query`, `$aiQuery`)
 - `#1` - Root - Base of all inheritance
 - `#2` - System - Routes new connections to AuthManager
 - `#3` - Programmer - Wizard-level access, can build world
@@ -118,9 +118,51 @@ command      // Raw command string
 pass()       // Call parent's version of this method (MOO-style super)
 $load(id)    // Load object by ID
 $create({parent, properties, methods})  // Create new object
-$query(system, prompt, session?)        // Query Claude AI with MCP tools
+$query(criteria?)                       // Fluent query builder (see below)
+$aiQuery(system, prompt, session?)      // Query Claude AI with MCP tools
 $.telnet     // Native telnet session management (admin use)
 $<alias>     // Pre-resolved aliases: $room, $exit, $player, $recycler, $session, etc.
+```
+
+### Fluent Query Builder
+
+`$query()` provides fluent, chainable queries for finding objects using a selector pattern:
+
+```typescript
+// Property selectors
+$query().prop('outdoor').equals(true).all()
+$query().prop('z').gt(0).all()
+$query().prop('name').contains('smith').all()
+$query().prop('*').contains('secret').all()  // search all string properties
+
+// Method selectors
+$query().method('tick').exists().all()
+$query().method('*').contains('$recycler').all()  // search all methods
+
+// Negation
+$query().prop('recycled').not().equals(true).all()
+$query().method('tick').not().exists().all()
+
+// OR groups (predicates within group are ANDed, groups are ORed)
+$query().parent($weapon).or().prop('damage').gt(10).all()
+
+// AND for readability (noop - predicates are ANDed by default)
+$query().prop('x').equals(1).and().prop('y').equals(2).all()
+
+// Complex: (outdoor AND z>0) OR (indoor AND z<0)
+$query()
+  .prop('outdoor').equals(true).and().prop('z').gt(0)
+  .or()
+  .prop('outdoor').equals(false).and().prop('z').lt(0)
+  .all()
+
+// Parent/inheritance filters
+$query().parent($room).prop('z').equals(0).all()
+$query().inheritedFrom($item).limit(10).all()
+
+// Property predicates: .equals(), .exists(), .contains(), .gt(), .gte(), .lt(), .lte(), .in(), .matches(), .startsWith(), .endsWith()
+// Method predicates: .exists(), .existsLocal(), .contains(), .matches()
+// Result methods: .all(), .first(), .count(), .ids(), .names(), .parents(), .children()
 ```
 
 ### Key Directories
@@ -364,8 +406,11 @@ return {roomId: room.id, torchId: torch.id};
 
 - `$` - ObjectManager ($.db, $.addAlias, etc.)
 - `$load(id)` - Load object by ID
-- `$recycler` - Create/destroy objects
-- All `$aliases` - `$room`, `$player`, `$exit`, `$ai`, `$plot`, etc.
+- `$create({parent, properties, methods})` - Create new object
+- `$query()` - Fluent query builder for finding objects
+- `$aiQuery(system, prompt, session?)` - Query Claude AI with MCP tools
+- `$recycler` - Create/destroy objects via recycler pattern
+- All `$aliases` - `$room`, `$player`, `$exit`, `$ai`, `$plot`, `$spatial`, etc.
 - `player` - Your authenticated player object (if HTTP Basic Auth provided)
 - Full JavaScript - loops, conditionals, async/await, etc.
 

@@ -115,7 +115,7 @@ New to Malice? Start here:
 ## AI & NPCs
 
 - **[Building Great NPCs](./npc-guide.md)** ✅ - Practical guide: spawn, personality, memories, system prompts
-- **[$ai Registry](./ai.md)** ✅ - AI-controlled humans, spawn, $query(), API reference
+- **[$ai Registry](./ai.md)** ✅ - AI-controlled humans, spawn, $aiQuery(), API reference
 - **[NPC Agent System](../npc-agent.md)** ✅ - Technical architecture, MCP integration
 
 ## Advanced Topics

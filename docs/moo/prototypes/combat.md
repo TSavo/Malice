@@ -79,7 +79,7 @@ Each active combat is tracked with:
 3. RESOLUTION (triggered when all actions in, or timeout)
    → $combat.resolve(combatId)
    → gatherContext() collects all relevant info
-   → $query() calls AI with combat MCP tool access
+   → $aiQuery() calls AI with combat MCP tool access
    → AI performs skill checks, applies damage, narrates
    → AI calls next_round or end
 
@@ -202,7 +202,7 @@ This is called automatically when all actions are in or timeout expires.
 **Resolution process:**
 1. Set status to 'resolving'
 2. Gather context (stats, wounds, weapons, actions)
-3. Call $query with combat system prompt
+3. Call $aiQuery with combat system prompt
 4. AI uses MCP combat tool to apply results
 5. AI calls next_round or end
 

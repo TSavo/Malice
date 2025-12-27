@@ -424,7 +424,8 @@ OUTDOOR: 'outdoor' affects weather exposure, natural lighting cycles.`,
     `,
     );
 
-    // Override: when an agent arrives, register exit verbs and sit verb
+    // Override: when an agent arrives, announce to others
+    // ZERO VERBS: Exit/sit verbs removed - AI narrator handles movement
     obj.setMethod(
       'onContentArrived',
       `
@@ -432,47 +433,18 @@ OUTDOOR: 'outdoor' affects weather exposure, natural lighting cycles.`,
       const source = args[1];
       const mover = args[2];
 
-      // Only register verbs for agents (things with registerVerb)
-      if (!obj.registerVerb) return;
-
-      // Register each exit's name and aliases as verbs
-      const exits = self.exits || [];
-      for (const exit of exits) {
-        if (!exit || !exit.name) continue;
-
-        // Register primary name
-        await obj.registerVerb(exit.name.toLowerCase(), self, 'go');
-
-        // Register aliases
-        const aliases = exit.aliases || [];
-        for (const alias of aliases) {
-          await obj.registerVerb(alias.toLowerCase(), self, 'go');
-        }
-      }
-
-      // Register 'sit' verb if there are sittables
-      const sittables = self.sittables || [];
-      if (sittables.length > 0) {
-        await obj.registerVerb('sit', self, 'sit');
-      }
-
       // TODO: Announce arrival to others in room
     `,
     );
 
-    // Override: when an agent leaves, unregister exit verbs and notify others
+    // Override: when an agent leaves, notify others
+    // ZERO VERBS: Verb unregistration removed - AI narrator handles movement
     obj.setMethod(
       'onContentLeft',
       `
       const obj = args[0];
       const dest = args[1];
       const mover = args[2];
-
-      // Only unregister verbs for agents
-      if (obj.unregisterVerbsFrom) {
-        // Unregister all verbs this room provided
-        await obj.unregisterVerbsFrom(self.id);
-      }
 
       // Notify other agents in the room that this person left
       // They should remove them from watch lists, etc.

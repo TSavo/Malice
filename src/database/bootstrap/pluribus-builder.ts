@@ -897,7 +897,7 @@ YOUR MISSION
 
       // Invoke the AI
       const session = self.wakeSession || null;
-      const result = await $query(systemPrompt, prompt, session);
+      const result = await $aiQuery(systemPrompt, prompt, session);
 
       // Store session for continuity
       self.wakeSession = result.session;

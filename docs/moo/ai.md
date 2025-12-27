@@ -308,17 +308,17 @@ if (isAi) {
 
 AI-controlled humans respond to interactions via built-in handlers.
 
-### $query(systemPrompt, userPrompt, session?)
+### $aiQuery(systemPrompt, userPrompt, session?)
 
 Query the Claude Agent SDK from MOO code:
 
 ```javascript
 // Basic query
-const result = await $query(systemPrompt, userPrompt);
+const result = await $aiQuery(systemPrompt, userPrompt);
 // result = { response: "...", session: "abc123" }
 
 // Resume a session for conversation continuity
-const result = await $query(systemPrompt, userPrompt, previousSession);
+const result = await $aiQuery(systemPrompt, userPrompt, previousSession);
 ```
 
 The agent has access to all MCP tools and can:
@@ -341,7 +341,7 @@ async onSpokenTo(speaker, message) {
 
   const userPrompt = speaker.name + ' says: "' + message + '"';
 
-  $query(systemPrompt, userPrompt, self.agentSession)
+  $aiQuery(systemPrompt, userPrompt, self.agentSession)
     .then(result => {
       self.agentSession = result.session;
     });
@@ -363,7 +363,7 @@ async onItemReceived(giver, item) {
 
   const userPrompt = giver.name + ' gave you ' + item.name;
 
-  $query(systemPrompt, userPrompt, self.agentSession)
+  $aiQuery(systemPrompt, userPrompt, self.agentSession)
     .then(result => {
       self.agentSession = result.session;
     });
