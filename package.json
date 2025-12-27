@@ -14,6 +14,8 @@
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
+    "bootstrap:world": "node --import tsx src/scripts/bootstrap-world.ts --systems",
+    "bootstrap:world:full": "node --import tsx src/scripts/bootstrap-world.ts --full",
     "bootstrap:apply": "node --import tsx src/scripts/bootstrap-apply.ts",
     "bootstrap:force": "node --import tsx src/scripts/bootstrap-apply.ts --force",
     "bootstrap:e2e": "node --import tsx src/scripts/bootstrap-e2e.ts",

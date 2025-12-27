@@ -7,9 +7,12 @@ export interface GameBootstrapOptions {
   forceBootstrap?: boolean;
   /**
    * Controls what gets built when we detect a missing world.
-   * - `full`: build prototypes + core systems + world geometry and buildings (default)
+   * - `full`: build prototypes + core systems + world geometry and buildings
    * - `systems`: build prototypes + core systems only (fast; good for unit tests)
-   * - `skip`: never auto-build anything beyond minimal bootstrap
+   * - `skip`: fail fast if world not built (default for production)
+   *
+   * For production, run `npm run bootstrap:world` before starting the server.
+   * For tests, use `worldBuildMode: 'systems'` to bootstrap inline.
    */
   worldBuildMode?: WorldBuildMode;
   /**
@@ -40,7 +43,7 @@ export class GameBootstrap {
     options: GameBootstrapOptions = {},
   ) {
     this.options = {
-      worldBuildMode: 'full',
+      worldBuildMode: 'skip',
       disableDefaultJobs: false,
       ...options,
     };
@@ -82,10 +85,19 @@ export class GameBootstrap {
 
     if (!describable || !player || !authManager) {
       if (this.options.worldBuildMode === 'skip') {
-        console.log(
-          '⚠️ World not built (skipped by options.worldBuildMode=skip)',
+        // Fail fast - world must be built before starting server
+        console.error('');
+        console.error(
+          '═══════════════════════════════════════════════════════════',
         );
-        return;
+        console.error('  ❌ World not built!');
+        console.error(
+          '═══════════════════════════════════════════════════════════',
+        );
+        console.error('');
+        console.error('Run: npm run bootstrap:world');
+        console.error('');
+        process.exit(1);
       }
 
       console.log('');
@@ -133,14 +145,14 @@ export class GameBootstrap {
    * Rebuild methods on existing prototypes (called when FORCE_BOOTSTRAP=true)
    */
   private async rebuildPrototypeMethods(): Promise<void> {
-    const { PrototypeBuilder } = await import(
-      './bootstrap/prototype-builder.js'
+    const { PrototypeOrchestrator } = await import(
+      './bootstrap/prototype-orchestrator.js'
     );
     const { CoreSystemBuilder } = await import(
       './bootstrap/core-system-builder.js'
     );
 
-    const prototypeBuilder = new PrototypeBuilder(this.manager);
+    const prototypeBuilder = new PrototypeOrchestrator(this.manager);
     const coreSystemBuilder = new CoreSystemBuilder(this.manager);
 
     // Rebuild prototype methods
@@ -161,14 +173,14 @@ export class GameBootstrap {
    * This is useful for unit tests that only need `$.recycler`, prototypes, and core utilities.
    */
   private async buildSystemsOnly(): Promise<void> {
-    const { PrototypeBuilder } = await import(
-      './bootstrap/prototype-builder.js'
+    const { PrototypeOrchestrator } = await import(
+      './bootstrap/prototype-orchestrator.js'
     );
     const { CoreSystemBuilder } = await import(
       './bootstrap/core-system-builder.js'
     );
 
-    const prototypeBuilder = new PrototypeBuilder(this.manager);
+    const prototypeBuilder = new PrototypeOrchestrator(this.manager);
     const coreSystemBuilder = new CoreSystemBuilder(this.manager, {
       disableDefaultJobs: this.options.disableDefaultJobs,
     });
@@ -194,8 +206,8 @@ export class GameBootstrap {
    * Build the complete world (prototypes + core systems + world geometry/buildings)
    */
   private async buildWorld(): Promise<void> {
-    const { PrototypeBuilder } = await import(
-      './bootstrap/prototype-builder.js'
+    const { PrototypeOrchestrator } = await import(
+      './bootstrap/prototype-orchestrator.js'
     );
     const { CoreSystemBuilder } = await import(
       './bootstrap/core-system-builder.js'
@@ -203,7 +215,7 @@ export class GameBootstrap {
     const { WorldBuilder } = await import('./bootstrap/world-builder.js');
     const { BuildingBuilder } = await import('./bootstrap/building-builder.js');
 
-    const prototypeBuilder = new PrototypeBuilder(this.manager);
+    const prototypeBuilder = new PrototypeOrchestrator(this.manager);
     const coreSystemBuilder = new CoreSystemBuilder(this.manager, {
       disableDefaultJobs: this.options.disableDefaultJobs,
     });
