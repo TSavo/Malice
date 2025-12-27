@@ -199,6 +199,9 @@ export interface RuntimeObject {
 
   /** Legacy alias for push() - forces save to database */
   save(): Promise<void>;
+
+  /** Wait for all queued writes to complete */
+  flushQueue(): Promise<void>;
 }
 
 /**
