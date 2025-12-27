@@ -68,6 +68,8 @@ export { StomachContentsBuilder } from './stomach-contents-builder.js';
 export { SustainBuilder } from './sustain-builder.js';
 // Telescope
 export { TelescopeBuilder } from './telescope-builder.js';
+// Totem Pole (Pluribus perception point)
+export { TotemPoleBuilder } from './totem-pole-builder.js';
 // Vendors
 export { VendableBuilder } from './vendable-builder.js';
 // Weapons

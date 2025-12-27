@@ -158,6 +158,17 @@ async function main() {
       console.log('Phase 7: Placing special objects...');
       await placeSpecialObjects(manager);
 
+      // Build spatial index
+      console.log('');
+      console.log('Phase 8: Building spatial index...');
+      const spatial = manager.getAliases().get('spatial');
+      if (spatial) {
+        const result = (await spatial.call('rebuild')) as { indexed?: number };
+        console.log(`  ✅ Indexed ${result?.indexed || 0} rooms`);
+      } else {
+        console.warn('  ⚠️  $spatial not found - skipping index rebuild');
+      }
+
       // Final alias reload
       await aliasLoader.loadAliases();
     }
@@ -249,6 +260,100 @@ async function placeSpecialObjects(manager: ObjectManager): Promise<void> {
     if (theMask && theBlind) {
       await theMask.call('moveTo', theBlind);
       console.log(`  ✅ Placed The Mask in The Blind (#${theBlind.id})`);
+    }
+  }
+
+  // Totem Pole → Occidental Ave S & S. Main St (the zero point)
+  if (aliases.totemPole && aliases.room) {
+    const totemPole = await manager.load(aliases.totemPole);
+    const roomPrototype = await manager.load(aliases.room);
+    // Find the intersection room at x=-7, y=0 (Occidental & Main)
+    const zeroPoint = await manager.findByProperty('name', 'Occidental Ave S & S. Main St');
+
+    if (totemPole && zeroPoint.length > 0 && roomPrototype) {
+      const groundRoom = zeroPoint[0];
+      await totemPole.call('moveTo', groundRoom);
+
+      // Register $bottomOfTotemPole alias
+      await objectManager.call('addAlias', 'bottomOfTotemPole', groundRoom.id);
+      console.log(`  ✅ Placed Totem Pole at zero point (#${groundRoom.id}), aliased $bottomOfTotemPole`);
+
+      // Create the top-of-pole room at z=1
+      const topRoom = await manager.create({
+        parent: roomPrototype,
+        properties: {
+          name: 'Top of the Totem Pole',
+          description: `Sixty feet above the plaza, you crouch among Raven's carved wings. The platform here—if you can call it that—is barely wide enough for one person, a maintenance ledge added when CorpSec installed the cameras decades ago. The wood is weathered smooth, grey as bone.
+
+The city spreads below in a grid of empty streets and dead buildings. From here you can see the whole of Pioneer Square: Occidental Park's dead trees, the Smith Tower rising to the north, the seawall and the grey water beyond. The wind is stronger at this height, cold and constant.
+
+Raven's beak points at the sky inches from your face. The camera lenses in its eyes are visible from here—small, dark, watching. A red LED pulses faintly behind the left eye. Someone is always recording.
+
+The only way down is the way you came up: sixty feet of carved cedar, hand over hand past Wolf and Whale and Bear.`,
+          x: groundRoom.get('x') ?? -7,
+          y: groundRoom.get('y') ?? 0,
+          z: 1,
+          outdoor: true,
+          abilities: `The top of the sixty-foot totem pole. A narrow maintenance ledge among Raven's wings.
+
+CLIMBING DOWN: player.moveTo($bottomOfTotemPole)
+
+NARRATION when descending:
+- $topOfTotemPole sees: "[Player] begins the long climb down, disappearing below Raven's beak."
+- $bottomOfTotemPole sees: "[Player] descends the totem pole, emerging from among the carved
+  figures to drop the last few feet to the concrete."
+
+NARRATION when someone arrives from below:
+- $bottomOfTotemPole sees: "[Player] climbs the totem pole, ascending hand over hand past
+  Bear and Whale and Wolf until they disappear among Raven's wings."
+- $topOfTotemPole sees: "[Player] pulls themselves up onto the narrow platform, wind
+  whipping at their clothes, sixty feet above the plaza."
+
+SURVEILLANCE: The camera in Raven's left eye has a clear view of anyone up here.
+Pluribus sees all.
+
+CAPACITY: One person. Maybe two if they're friendly. Three would be suicide.`,
+        },
+        methods: {},
+      });
+
+      // Register $topOfTotemPole alias
+      await objectManager.call('addAlias', 'topOfTotemPole', topRoom.id);
+      console.log(`  ✅ Created Top of the Totem Pole room (#${topRoom.id}), aliased $topOfTotemPole`);
+    } else {
+      console.warn('  ⚠️  Could not place Totem Pole - room not found');
+    }
+  }
+
+  // Observation Deck Telescopes - 4 at cardinal directions on 38th floor
+  if (aliases.telescope) {
+    const telescopeProto = await manager.load(aliases.telescope);
+    if (telescopeProto) {
+      const telescopeSpots = [
+        { roomName: 'Smith Tower - 38th Floor - Observation Deck', name: 'West Telescope', desc: 'A coin-operated telescope facing west toward the waterfront and Elliott Bay.' },
+        { roomName: 'Smith Tower - 38th Floor - Glass Dome Catwalk', name: 'North Telescope', desc: 'A coin-operated telescope facing north toward downtown Seattle.' },
+        { roomName: 'Smith Tower - 38th Floor - East Terrace', name: 'East Telescope', desc: 'A coin-operated telescope facing east toward the International District.' },
+        { roomName: 'Smith Tower - 38th Floor - Southeast Alcove', name: 'South Telescope', desc: 'A coin-operated telescope facing south toward the stadiums and SoDo.' },
+      ];
+
+      for (const spot of telescopeSpots) {
+        const rooms = await manager.findByProperty('name', spot.roomName);
+        if (rooms.length > 0) {
+          const room = rooms[0];
+          const telescope = await manager.create({
+            parent: telescopeProto,
+            properties: {
+              name: spot.name,
+              description: spot.desc,
+              mountZ: 38,
+            },
+            methods: {},
+          });
+          await telescope.call('moveTo', room);
+          await telescope.call('calibratePointsOfInterest');
+          console.log(`  ✅ Placed ${spot.name} in ${spot.roomName.split(' - ').pop()} (#${room.id})`);
+        }
+      }
     }
   }
 }
