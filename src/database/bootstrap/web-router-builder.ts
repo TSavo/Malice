@@ -48,40 +48,43 @@ export class WebRouterBuilder {
       });
     }
 
-    this.addRegisterMethod();
-    this.addAddMiddlewareMethod();
-    this.addDispatchMethod();
-    this.addCheckAuthMethod();
+    // Set methods using atomic updates (no race conditions)
+    this.webRouter.setMethod('register', this.getRegisterCode());
+    this.webRouter.setMethod('addMiddleware', this.getAddMiddlewareCode());
+    this.webRouter.setMethod('dispatch', this.getDispatchCode());
+    this.webRouter.setMethod('checkAuth', this.getCheckAuthCode());
   }
 
-  private addRegisterMethod(): void {
+  async registerAlias(): Promise<void> {
     if (!this.webRouter) return;
 
-    this.webRouter.setMethod(
-      'register',
-      `
+    const objectManager = await this.manager.load(0);
+    if (!objectManager) return;
+
+    await objectManager.call('addAlias', 'webRouter', this.webRouter.id);
+    console.log(`✅ Registered webRouter alias -> #${this.webRouter.id}`);
+  }
+
+  // Code getter methods for inline creation
+  private getRegisterCode(): string {
+    return `
       const route = args[0];
       if (!route || typeof route.id !== 'number') {
         throw new Error('Invalid route object - must be a RuntimeObject');
       }
 
       const routes = self.routes || [];
-      // Store route IDs, not objects (for persistence)
-      if (!routes.includes(route.id)) {
-        routes.push(route.id);
-        self.routes = routes;
+      // Check if already registered
+      if (!routes.some(r => r && r.id === route.id)) {
+        // .push() is proxied - automatically uses atomic $push
+        routes.push(route);
         console.log('[WebRouter] Route registered:', route.path, route.methods);
       }
-    `,
-    );
+    `;
   }
 
-  private addAddMiddlewareMethod(): void {
-    if (!this.webRouter) return;
-
-    this.webRouter.setMethod(
-      'addMiddleware',
-      `
+  private getAddMiddlewareCode(): string {
+    return `
       const name = args[0];
       const handlerMethodName = args[1];
 
@@ -96,16 +99,11 @@ export class WebRouterBuilder {
       middleware[name] = handlerMethodName;
       self.middleware = middleware;
       console.log('[WebRouter] Middleware registered:', name);
-    `,
-    );
+    `;
   }
 
-  private addDispatchMethod(): void {
-    if (!this.webRouter) return;
-
-    this.webRouter.setMethod(
-      'dispatch',
-      `
+  private getDispatchCode(): string {
+    return `
       const path = args[0];
       const method = args[1];
       const meta = args[2] || {};
@@ -114,8 +112,8 @@ export class WebRouterBuilder {
       let responseHeaders = {};
 
       // Iterate in registration order (first match wins)
-      for (const routeId of routes) {
-        const route = await $load(routeId);
+      // Routes are stored as objrefs, fromValue resolves them to RuntimeObjects
+      for (const route of routes) {
         if (!route) continue;
 
         // Check if route matches
@@ -199,16 +197,11 @@ export class WebRouterBuilder {
       }
 
       return null; // No route matched
-    `,
-    );
+    `;
   }
 
-  private addCheckAuthMethod(): void {
-    if (!this.webRouter) return;
-
-    this.webRouter.setMethod(
-      'checkAuth',
-      `
+  private getCheckAuthCode(): string {
+    return `
       const route = args[0];
       const meta = args[1] || {};
 
@@ -235,17 +228,6 @@ export class WebRouterBuilder {
       }
 
       return null; // Auth passed
-    `,
-    );
-  }
-
-  async registerAlias(): Promise<void> {
-    if (!this.webRouter) return;
-
-    const objectManager = await this.manager.load(0);
-    if (!objectManager) return;
-
-    await objectManager.call('addAlias', 'webRouter', this.webRouter.id);
-    console.log(`✅ Registered webRouter alias -> #${this.webRouter.id}`);
+    `;
   }
 }
