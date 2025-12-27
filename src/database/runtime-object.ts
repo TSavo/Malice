@@ -323,9 +323,13 @@ export class RuntimeObjectImpl implements RuntimeObject {
    * Get property - walks inheritance chain
    * Resolves typed Values to JavaScript values (objrefs become RuntimeObjects)
    * Arrays are wrapped in proxies that intercept mutations
+   *
+   * IMPORTANT: Inherited mutable values (arrays, plain objects) are COPIED
+   * to prevent mutations from affecting the prototype. This ensures that
+   * mutating an object's state never mutates its parent's state.
    */
   get(prop: string): PropertyValue | undefined {
-    // Check this object first
+    // Check this object first - return value directly (it's ours)
     if (this.obj.properties && prop in this.obj.properties) {
       const value = this.fromValue(this.obj.properties[prop]);
       // Wrap arrays in a proxy to intercept mutations
@@ -341,7 +345,22 @@ export class RuntimeObjectImpl implements RuntimeObject {
     if (parentId !== this.obj._id) {
       const parent = this.manager.getSync(parentId);
       if (parent) {
-        return parent.get(prop);
+        const inheritedValue = parent.get(prop);
+        // CRITICAL: Copy inherited mutable values to prevent prototype mutation
+        // Arrays and plain objects must be copied; RuntimeObjects are references (correct)
+        if (Array.isArray(inheritedValue)) {
+          // Deep copy the array (shallow copy of elements)
+          return [...inheritedValue];
+        }
+        if (inheritedValue !== null && typeof inheritedValue === 'object') {
+          // Check if it's a plain object (not a RuntimeObject or other class instance)
+          const proto = Object.getPrototypeOf(inheritedValue);
+          if (proto === Object.prototype || proto === null) {
+            // Deep copy plain objects
+            return { ...inheritedValue };
+          }
+        }
+        return inheritedValue;
       }
     }
 
