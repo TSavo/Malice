@@ -37,20 +37,23 @@ export class TelescopeBuilder {
         swivelMin: 0,
         swivelMax: 359,
         mountZ: 0,
-        abilities: `Observation telescope mounted on a fixed base. Can be tilted and swiveled within
-configured limits to view different areas of the city.
+        abilities: `Observation telescope mounted on a fixed base. Can be tilted and swiveled to view
+different areas of the city.
 
-ADJUSTING: Players can 'tilt telescope to X' or 'swivel telescope to Y' where X/Y
-are angles in degrees. Tilt 0 = straight down, higher = further out. Swivel 0 = north,
-90 = east, 180 = south, 270 = west.
+PROPERTIES:
+- tilt: vertical angle (0=straight down, higher=further out)
+- swivel: horizontal angle (0=north, 90=east, 180=south, 270=west)
 
-VIEWING: When a player looks through the telescope, it casts a ray from the mount
-position at the current tilt/swivel angles. Looking down shows surface rooms plus
-the 8 surrounding cells. Looking horizontally traces through outdoor rooms until
-blocked by an indoor room or gap.
+USING THE TELESCOPE: When a player looks through the telescope, call lookThrough()
+which returns raw room descriptions along the line of sight. AGGREGATE THIS DATA
+INTO A VIVID NARRATION for the player - describe what they see as a cohesive scene,
+not a list of rooms. Focus on landmarks, activity, atmosphere, and spatial relationships.
 
-RANGE: At tilt=0, views directly below. At tilt=60, views ~1.7x the mount height
-away. At tilt=85, views ~11x the mount height away.`,
+ADJUSTING: The AI can modify tilt/swivel properties directly based on player intent
+("point it north", "look down at the street", etc.).
+
+RANGE: At tilt=0, views directly below. At tilt=60, views ~1.7x mount height away.
+At tilt=85, views ~11x mount height away.`,
       },
       methods: {},
     });
@@ -85,9 +88,9 @@ away. At tilt=85, views ~11x the mount height away.`,
       'Z-level where telescope is mounted, used for ray calculations.',
     );
 
-    // tilt(angle) - Adjust vertical angle
+    // setTilt(angle) - Adjust vertical angle
     obj.setMethod(
-      'tilt',
+      'setTilt',
       `
       /** Adjust telescope tilt angle.
        *  @param angle - Tilt in degrees (0=straight down, higher=further out)
@@ -106,9 +109,9 @@ away. At tilt=85, views ~11x the mount height away.`,
       `,
     );
 
-    // swivel(angle) - Adjust horizontal angle
+    // setSwivel(angle) - Adjust horizontal angle
     obj.setMethod(
-      'swivel',
+      'setSwivel',
       `
       /** Adjust telescope swivel angle.
        *  @param angle - Swivel in degrees (0=north, 90=east, 180=south, 270=west)
@@ -139,7 +142,7 @@ away. At tilt=85, views ~11x the mount height away.`,
       /** Look through the telescope and see the city.
        *  Uses $world.castRay for proper line-of-sight tracing.
        *  @param player - The player looking through
-       *  @returns AI-synthesized description of what's visible
+       *  @returns Aggregated descriptions of visible rooms
        */
       const loc = self.location;
       const fromX = loc?.x ?? 0;
@@ -180,8 +183,7 @@ away. At tilt=85, views ~11x the mount height away.`,
           const roomObj = await $load(room.id);
           if (roomObj) {
             visibleRooms.push({
-              name: roomObj.name,
-              description: roomObj.description,
+              room: roomObj,
               x: room.x, y: room.y, z: room.z,
               isCenter: cell.isCenter || false,
             });
@@ -193,8 +195,7 @@ away. At tilt=85, views ~11x the mount height away.`,
           const roomObj = await $load(r.id);
           if (roomObj) {
             visibleRooms.push({
-              name: roomObj.name,
-              description: roomObj.description,
+              room: roomObj,
               x: r.x, y: r.y, z: r.z,
               isCenter: false,
             });
@@ -206,21 +207,24 @@ away. At tilt=85, views ~11x the mount height away.`,
         return 'You peer through the telescope but see only empty terrain.';
       }
 
-      // Build AI prompt
-      const roomDescriptions = visibleRooms.map(r =>
-        \`[\${r.isCenter ? 'CENTER' : 'VISIBLE'}] \${r.name}: \${r.description}\`
-      ).join('\\n\\n');
+      // Build header
+      const directions = ['north', 'northeast', 'east', 'southeast', 'south', 'southwest', 'west', 'northwest'];
+      const dir = directions[Math.round((self.swivel || 0) / 45) % 8];
+      const viewType = isLookingDown ? 'down' : isLookingUp ? 'up' : 'horizontally';
 
-      const viewType = self.tilt < 45 ? "bird's-eye view from above" : 'horizontal view';
-      const prompt = \`You are looking through a telescope. View type: \${viewType}. Distance: \${distance}m.
+      let output = \`Looking \${viewType} toward the \${dir} (tilt \${tilt}°, swivel \${self.swivel || 0}°):\\n\\n\`;
 
-Visible areas:
-\${roomDescriptions}
+      // Aggregate room descriptions using describe()
+      for (const { room, isCenter } of visibleRooms) {
+        const marker = isCenter ? '[CENTER] ' : '';
+        const desc = await room.describe();
+        output += \`\${marker}\${desc}\\n\\n\`;
+      }
 
-Describe what the viewer sees in 2-3 sentences, synthesizing these locations naturally. Focus on activity, landmarks, atmosphere. Don't list room names.\`;
+      output += \`Distance: ~\${Math.round(distance)}m\`;
+      if (blocked) output += ' (view blocked by structure)';
 
-      const response = await $query('openrouter/google/gemini-2.0-flash-exp:free', prompt);
-      return response || 'The view is hazy today.';
+      return output;
       `,
     );
 

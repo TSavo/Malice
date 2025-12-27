@@ -30,6 +30,9 @@ COPY --chown=node:node docs ./docs
 ENV CLAUDE_CONFIG_DIR=/home/node/.claude
 ENV HOME=/home/node
 
+# Create .claude directory for SDK debug logs (must exist before USER switch)
+RUN mkdir -p /home/node/.claude/debug && chown -R node:node /home/node/.claude
+
 # Switch to non-root user (matches npc-agent)
 USER node
 
