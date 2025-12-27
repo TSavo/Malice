@@ -87,32 +87,39 @@ export class TelescopeBuilder {
           { name: '3rd & King', x: 7, y: -12, z: 0 },
           { name: '4th & King', x: 14, y: -12, z: 0 },
         ],
-        abilities: `Observation telescope mounted on a fixed base with pre-calibrated points of interest.
+        abilities: `Observation telescope mounted on a fixed base. Can view distant locations across the city.
 
-AIMING THE TELESCOPE - PREFER aimAt(name):
-The easiest way to aim is with aimAt() using a POI name:
-  await telescope.aimAt('Totem Pole')
-  await telescope.aimAt('4th & King')
-  await telescope.aimAt('Sinkhole')
-Then call lookThrough() to see what's there.
+BASIC USAGE:
+1. await telescope.aimAt('Totem Pole')  // Aim at a point of interest
+2. const view = await telescope.lookThrough()  // See what's visible
 
-LOOKING: Call lookThrough() and AGGREGATE the raw room descriptions into a vivid
-narration - describe what they see as a cohesive scene, not a list of rooms.
+The view returns rich descriptions of all visible outdoor rooms along the sightline.
+For horizontal views, shows the entire street. For downward views, shows a 3x3 area.
 
-AVAILABLE POI NAMES:
-Landmarks: Totem Pole, Top of Totem, Grand Central, Occidental Park, Pioneer Building,
-  Sinkhole, Supply Depot, Fabrication Factory, Smith Tower Entrance
-Intersections: "[Avenue] & [Street]" format, e.g. "Waterfront & Yesler", "4th & King"
+NARRATING WHAT PLAYERS SEE:
+When a player looks through, aggregate the room descriptions into a cohesive scene.
+Don't just list rooms - describe what they observe as a panorama, noting landmarks,
+activity, and atmosphere. The raw descriptions provide the details to weave together.
+
+POINTS OF INTEREST (POIs):
+Use aimAt(name) with these pre-calibrated targets:
+- Landmarks: "Totem Pole", "Top of Totem", "Grand Central", "Occidental Park",
+  "Pioneer Building", "Sinkhole", "Supply Depot", "Fabrication Factory"
+- Intersections: "[Avenue] & [Street]" e.g. "Waterfront & Yesler", "4th & King"
   Avenues: Waterfront, 1st, Occidental, 2nd, 3rd, 4th
   Streets: Yesler, Washington, Main, Jackson, King
 
-CALIBRATION: If the telescope is moved, call calibratePointsOfInterest() to
-recalculate angles. POIs outside range are marked available:false.
+OBSTRUCTIONS:
+Some POIs may be blocked by buildings. Check poi.available before aiming:
+  const pois = telescope.pointsOfInterest;
+  const blocked = pois.filter(p => !p.available);  // Shows reason in p.reason
 
-MANUAL AIMING (if needed):
-- setTilt(angle): 0=straight down, higher=further out
+If telescope is moved, call calibratePointsOfInterest() to recalculate angles.
+
+MANUAL AIMING (advanced):
+- setTilt(angle): 0=straight down, 90=horizontal, higher=looking up
 - setSwivel(angle): 0=north, 90=east, 180=south, 270=west
-- pointsOfInterest: array with { name, x, y, z, tilt, swivel, distance, available }`,
+- Tilt <45° = looking down (ground view), Tilt ≥45° = looking out (street view)`,
       },
       methods: {},
     });
