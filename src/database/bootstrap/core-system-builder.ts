@@ -24,6 +24,7 @@ import { RoomBuilder } from './room-builder.js';
 import { SchedulerBuilder } from './scheduler-builder.js';
 import { SessionBuilder } from './session-builder.js';
 import { SisterGrayBuilder } from './sister-gray-builder.js';
+import { SpatialBuilder } from './spatial-builder.js';
 import { TailorBuilder } from './tailor-builder.js';
 import { WebRouteBuilder } from './web-route-builder.js';
 import { WebRouterBuilder } from './web-router-builder.js';
@@ -70,6 +71,7 @@ export class CoreSystemBuilder {
     const charGenBuilder = new CharGenBuilder(this.manager);
     const preAuthHandlerBuilder = new PreAuthHandlerBuilder(this.manager);
     const recyclerBuilder = new RecyclerBuilder(this.manager);
+    const spatialBuilder = new SpatialBuilder(this.manager);
     const pronounSubBuilder = new PronounSubBuilder(this.manager);
     const proportionalBuilder = new ProportionalBuilder(this.manager);
     const englishBuilder = new EnglishBuilder(this.manager);
@@ -104,6 +106,7 @@ export class CoreSystemBuilder {
     await charGenBuilder.build();
     await preAuthHandlerBuilder.build();
     await recyclerBuilder.build();
+    await spatialBuilder.build();
     await pronounSubBuilder.build();
     await proportionalBuilder.build();
     await englishBuilder.build();
@@ -147,6 +150,7 @@ export class CoreSystemBuilder {
     await charGenBuilder.registerAlias();
     await preAuthHandlerBuilder.registerAlias();
     await recyclerBuilder.registerAlias();
+    await spatialBuilder.registerAlias();
     await pronounSubBuilder.registerAlias();
     await proportionalBuilder.registerAlias();
     await englishBuilder.registerAlias();
@@ -219,6 +223,12 @@ export class CoreSystemBuilder {
     console.log('  Rebuilding Recycler methods...');
     const recyclerBuilder = new RecyclerBuilder(this.manager);
     await recyclerBuilder.build(true);
+
+    // Rebuild Spatial methods
+    console.log('  Rebuilding Spatial methods...');
+    const spatialBuilder = new SpatialBuilder(this.manager);
+    await spatialBuilder.build(true);
+    await spatialBuilder.registerAlias();
 
     // Rebuild PronounSub methods
     console.log('  Rebuilding PronounSub methods...');

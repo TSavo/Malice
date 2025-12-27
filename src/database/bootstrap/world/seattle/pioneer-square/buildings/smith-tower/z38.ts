@@ -112,7 +112,7 @@ export const building = {
       ambientNoise: 6,
       lighting: 55,
       waterLevel: 0,
-      outdoor: false,
+      outdoor: true, // Observation deck - open to sky for telescope sightlines
       exits: {
         east: '%ODL',
         north: '%DOME_MECH',
@@ -204,7 +204,7 @@ export const building = {
       ambientNoise: 8,
       lighting: 50,
       waterLevel: 0,
-      outdoor: false,
+      outdoor: true, // Glass dome - open to sky for telescope sightlines
       exits: {
         down: '%PH',
         south: '%ODL',
@@ -292,7 +292,7 @@ export const building = {
       ambientNoise: 5,
       lighting: 60,
       waterLevel: 0,
-      outdoor: false,
+      outdoor: true, // Terrace - open to sky for telescope sightlines
       exits: {
         west: '%DOME_VIEW',
         south: '%EAST_NOOK',
@@ -343,7 +343,7 @@ export const building = {
       ambientNoise: 4,
       lighting: 60,
       waterLevel: 0,
-      outdoor: false,
+      outdoor: true, // Alcove - open to sky for telescope sightlines
       exits: {
         north: '%EAST_NOOK',
         west: '%SERVICE',

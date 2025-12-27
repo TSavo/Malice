@@ -217,6 +217,7 @@ export class WorldApiBuilder {
        *
        *  BEHAVIOR:
        *  - If looking down (tilt < 45): Returns first surface room hit
+       *    - If no room at target, spirals outward to find nearest room
        *  - If looking horizontal/up: Traces through outdoor rooms via exits
        *    - Stops at: indoor room (blocks view), gap (no room), no exit in direction
        */
@@ -246,10 +247,39 @@ export class WorldApiBuilder {
         const targetX = Math.round(fromX + stepsToGround * dx);
         const targetY = Math.round(fromY + stepsToGround * dy);
 
-        const surfaceRoom = await self.getHighestRoomAt(targetX, targetY);
+        // Try target first
+        let surfaceRoom = await self.getHighestRoomAt(targetX, targetY);
+        let foundX = targetX, foundY = targetY;
+
+        // If no room, spiral outward to find nearest
+        if (!surfaceRoom) {
+          const maxSpiral = 10;
+          outer: for (let radius = 1; radius <= maxSpiral; radius++) {
+            for (let offsetX = -radius; offsetX <= radius; offsetX++) {
+              for (let offsetY = -radius; offsetY <= radius; offsetY++) {
+                // Only check perimeter of this radius
+                if (Math.abs(offsetX) !== radius && Math.abs(offsetY) !== radius) continue;
+
+                const checkX = targetX + offsetX;
+                const checkY = targetY + offsetY;
+                const room = await self.getHighestRoomAt(checkX, checkY);
+                if (room) {
+                  surfaceRoom = room;
+                  foundX = checkX;
+                  foundY = checkY;
+                  break outer;
+                }
+              }
+            }
+          }
+        }
+
         if (surfaceRoom) {
           rooms.push(surfaceRoom);
-          distance = Math.round(stepsToGround);
+          // Recalculate distance based on actual found position
+          const actualDx = foundX - fromX;
+          const actualDy = foundY - fromY;
+          distance = Math.round(Math.sqrt(actualDx*actualDx + actualDy*actualDy + fromZ*fromZ));
         }
         return { rooms, distance, blocked: !surfaceRoom };
       }

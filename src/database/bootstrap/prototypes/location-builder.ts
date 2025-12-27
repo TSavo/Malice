@@ -320,6 +320,32 @@ SENSATION: broadcastSensation(target, sensation) routes pain/feeling to target's
     `,
     );
 
+    // === LIFECYCLE HOOKS ===
+
+    // Auto-register with spatial index when created via $recycler
+    obj.setMethod(
+      'onCreate',
+      `
+      /** Called after object is created via $recycler.create() */
+      // Auto-register with spatial index if this location has coordinates
+      if (self.x !== undefined && self.y !== undefined && self.z !== undefined) {
+        await $spatial.add(self);
+      }
+      `,
+    );
+
+    // Auto-unregister from spatial index when recycled
+    obj.setMethod(
+      'beforeRecycle',
+      `
+      /** Called before object is recycled via $recycler.recycle() */
+      // Unregister from spatial index if this location has coordinates
+      if (self.x !== undefined && self.y !== undefined && self.z !== undefined) {
+        await $spatial.remove(self);
+      }
+      `,
+    );
+
     // Property descriptions for AI context (inherits from Describable)
     obj.setPropertyDescription(
       'contents',

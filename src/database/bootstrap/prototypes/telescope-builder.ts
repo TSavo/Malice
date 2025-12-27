@@ -37,23 +37,82 @@ export class TelescopeBuilder {
         swivelMin: 0,
         swivelMax: 359,
         mountZ: 0,
-        abilities: `Observation telescope mounted on a fixed base. Can be tilted and swiveled to view
-different areas of the city.
+        // Default POIs - major intersections and landmarks from Pioneer Square
+        // Avenues: Waterfront(-21), 1st(-14), Occidental(-7), 2nd(0), 3rd(+7), 4th(+14)
+        // Streets: King(-12), Jackson(-6), Main(0), Washington(+6), Yesler(+12)
+        pointsOfInterest: [
+          // Landmarks
+          { name: 'Totem Pole', x: -7, y: 0, z: 0 },
+          { name: 'Top of Totem', x: -7, y: 0, z: 1 },
+          { name: 'Smith Tower Entrance', x: -12, y: 12, z: 0 },
+          { name: 'Grand Central', x: -9, y: 2, z: 0 },
+          { name: 'Occidental Park', x: -3, y: 2, z: 0 },
+          { name: 'Pioneer Building', x: 5, y: 9, z: 0 },
+          { name: 'Sinkhole', x: -16, y: -8, z: 0 },
+          { name: 'Supply Depot', x: -21, y: -5, z: 0 },
+          { name: 'Fabrication Factory', x: -21, y: 10, z: 0 },
+          // Yesler Way intersections (y=+12)
+          { name: 'Waterfront & Yesler', x: -21, y: 12, z: 0 },
+          { name: '1st & Yesler', x: -14, y: 12, z: 0 },
+          { name: 'Occidental & Yesler', x: -7, y: 12, z: 0 },
+          { name: '2nd & Yesler', x: 0, y: 12, z: 0 },
+          { name: '3rd & Yesler', x: 7, y: 12, z: 0 },
+          { name: '4th & Yesler', x: 14, y: 12, z: 0 },
+          // Washington intersections (y=+6)
+          { name: 'Waterfront & Washington', x: -21, y: 6, z: 0 },
+          { name: '1st & Washington', x: -14, y: 6, z: 0 },
+          { name: 'Occidental & Washington', x: -7, y: 6, z: 0 },
+          { name: '2nd & Washington', x: 0, y: 6, z: 0 },
+          { name: '3rd & Washington', x: 7, y: 6, z: 0 },
+          { name: '4th & Washington', x: 14, y: 6, z: 0 },
+          // Main intersections (y=0)
+          { name: 'Waterfront & Main', x: -21, y: 0, z: 0 },
+          { name: '1st & Main', x: -14, y: 0, z: 0 },
+          { name: 'Occidental & Main', x: -7, y: 0, z: 0 },
+          { name: '2nd & Main', x: 0, y: 0, z: 0 },
+          { name: '3rd & Main', x: 7, y: 0, z: 0 },
+          { name: '4th & Main', x: 14, y: 0, z: 0 },
+          // Jackson intersections (y=-6)
+          { name: 'Waterfront & Jackson', x: -21, y: -6, z: 0 },
+          { name: '1st & Jackson', x: -14, y: -6, z: 0 },
+          { name: 'Occidental & Jackson', x: -7, y: -6, z: 0 },
+          { name: '2nd & Jackson', x: 0, y: -6, z: 0 },
+          { name: '3rd & Jackson', x: 7, y: -6, z: 0 },
+          { name: '4th & Jackson', x: 14, y: -6, z: 0 },
+          // King intersections (y=-12)
+          { name: 'Waterfront & King', x: -21, y: -12, z: 0 },
+          { name: '1st & King', x: -14, y: -12, z: 0 },
+          { name: 'Occidental & King', x: -7, y: -12, z: 0 },
+          { name: '2nd & King', x: 0, y: -12, z: 0 },
+          { name: '3rd & King', x: 7, y: -12, z: 0 },
+          { name: '4th & King', x: 14, y: -12, z: 0 },
+        ],
+        abilities: `Observation telescope mounted on a fixed base with pre-calibrated points of interest.
 
-PROPERTIES:
-- tilt: vertical angle (0=straight down, higher=further out)
-- swivel: horizontal angle (0=north, 90=east, 180=south, 270=west)
+AIMING THE TELESCOPE - PREFER aimAt(name):
+The easiest way to aim is with aimAt() using a POI name:
+  await telescope.aimAt('Totem Pole')
+  await telescope.aimAt('4th & King')
+  await telescope.aimAt('Sinkhole')
+Then call lookThrough() to see what's there.
 
-USING THE TELESCOPE: When a player looks through the telescope, call lookThrough()
-which returns raw room descriptions along the line of sight. AGGREGATE THIS DATA
-INTO A VIVID NARRATION for the player - describe what they see as a cohesive scene,
-not a list of rooms. Focus on landmarks, activity, atmosphere, and spatial relationships.
+LOOKING: Call lookThrough() and AGGREGATE the raw room descriptions into a vivid
+narration - describe what they see as a cohesive scene, not a list of rooms.
 
-ADJUSTING: The AI can modify tilt/swivel properties directly based on player intent
-("point it north", "look down at the street", etc.).
+AVAILABLE POI NAMES:
+Landmarks: Totem Pole, Top of Totem, Grand Central, Occidental Park, Pioneer Building,
+  Sinkhole, Supply Depot, Fabrication Factory, Smith Tower Entrance
+Intersections: "[Avenue] & [Street]" format, e.g. "Waterfront & Yesler", "4th & King"
+  Avenues: Waterfront, 1st, Occidental, 2nd, 3rd, 4th
+  Streets: Yesler, Washington, Main, Jackson, King
 
-RANGE: At tilt=0, views directly below. At tilt=60, views ~1.7x mount height away.
-At tilt=85, views ~11x mount height away.`,
+CALIBRATION: If the telescope is moved, call calibratePointsOfInterest() to
+recalculate angles. POIs outside range are marked available:false.
+
+MANUAL AIMING (if needed):
+- setTilt(angle): 0=straight down, higher=further out
+- setSwivel(angle): 0=north, 90=east, 180=south, 270=west
+- pointsOfInterest: array with { name, x, y, z, tilt, swivel, distance, available }`,
       },
       methods: {},
     });
@@ -86,6 +145,10 @@ At tilt=85, views ~11x mount height away.`,
     obj.setPropertyDescription(
       'mountZ',
       'Z-level where telescope is mounted, used for ray calculations.',
+    );
+    obj.setPropertyDescription(
+      'pointsOfInterest',
+      'Array of {name, x, y, z, tilt?, swivel?, available?} for quick aiming.',
     );
 
     // setTilt(angle) - Adjust vertical angle
@@ -135,94 +198,252 @@ At tilt=85, views ~11x mount height away.`,
       `,
     );
 
-    // lookThrough(player) - Main viewing method
+    // calibratePointsOfInterest() - Update POIs with tilt/swivel from current location
     obj.setMethod(
-      'lookThrough',
+      'calibratePointsOfInterest',
       `
-      /** Look through the telescope and see the city.
-       *  Uses $world.castRay for proper line-of-sight tracing.
-       *  @param player - The player looking through
-       *  @returns Aggregated descriptions of visible rooms
+      /** Recalculate tilt/swivel for all points of interest from current location.
+       *  Updates each POI with: tilt, swivel, distance, available (within limits).
+       *  @returns Updated pointsOfInterest array
        */
       const loc = self.location;
       const fromX = loc?.x ?? 0;
       const fromY = loc?.y ?? 0;
       const fromZ = self.mountZ ?? loc?.z ?? 0;
 
-      // Cast ray - returns rooms along line of sight
-      const { rooms: rayRooms, distance, blocked } = await $.world.castRay(
-        fromX, fromY, fromZ, self.tilt || 0, self.swivel || 0
-      );
+      const tiltMin = self.tiltMin ?? 0;
+      const tiltMax = self.tiltMax ?? 85;
+      const swivelMin = self.swivelMin ?? 0;
+      const swivelMax = self.swivelMax ?? 359;
 
-      // For vertical views (down or up), get 9 surrounding rooms at target height
-      const visibleRooms = [];
-      const tilt = self.tilt || 0;
-      const isLookingDown = tilt < 45;
-      const isLookingUp = tilt > 135;
+      const pois = self.pointsOfInterest || [];
+      const updated = [];
 
-      if ((isLookingDown || isLookingUp) && rayRooms.length > 0) {
-        const center = rayRooms[0];
-        const cells = [
-          { x: center.x, y: center.y, isCenter: true },
-          { x: center.x - 1, y: center.y + 1 },
-          { x: center.x, y: center.y + 1 },
-          { x: center.x + 1, y: center.y + 1 },
-          { x: center.x - 1, y: center.y },
-          { x: center.x + 1, y: center.y },
-          { x: center.x - 1, y: center.y - 1 },
-          { x: center.x, y: center.y - 1 },
-          { x: center.x + 1, y: center.y - 1 },
-        ];
+      for (const poi of pois) {
+        const dx = poi.x - fromX;
+        const dy = poi.y - fromY;
+        const dz = (poi.z ?? 0) - fromZ;
 
-        for (const cell of cells) {
-          // Looking down: get highest (surface). Looking up: get lowest (floor above)
-          const room = isLookingDown
-            ? await $.world.getHighestRoomAt(cell.x, cell.y)
-            : await $.world.getLowestRoomAt(cell.x, cell.y);
-          if (!room) continue;
-          const roomObj = await $load(room.id);
-          if (roomObj) {
-            visibleRooms.push({
-              room: roomObj,
-              x: room.x, y: room.y, z: room.z,
-              isCenter: cell.isCenter || false,
-            });
+        // Horizontal distance
+        const horizDist = Math.sqrt(dx * dx + dy * dy);
+        const totalDist = Math.sqrt(horizDist * horizDist + dz * dz);
+
+        // Calculate tilt (0 = straight down, 90 = horizontal)
+        // tilt = atan(horizDist / |dz|) when looking down
+        let tilt = 0;
+        if (dz < 0) {
+          // Looking down
+          tilt = Math.atan2(horizDist, Math.abs(dz)) * 180 / Math.PI;
+        } else if (dz === 0) {
+          tilt = 90; // Horizontal
+        } else {
+          tilt = 90 + Math.atan2(dz, horizDist) * 180 / Math.PI; // Looking up
+        }
+
+        // Calculate swivel (bearing from north)
+        // 0=north(+y), 90=east(+x), 180=south(-y), 270=west(-x)
+        const swivel = (90 - Math.atan2(dy, dx) * 180 / Math.PI + 360) % 360;
+
+        // Check if within limits
+        let available = true;
+        let reason = null;
+
+        if (tilt < tiltMin || tilt > tiltMax) {
+          available = false;
+          reason = tilt < tiltMin ? 'too steep' : 'too shallow';
+        }
+
+        // Check swivel limits (handle wrap-around)
+        if (available && swivelMin <= swivelMax) {
+          if (swivel < swivelMin || swivel > swivelMax) {
+            available = false;
+            reason = 'outside swivel range';
           }
         }
-      } else {
-        // Horizontal: use all rooms from ray trace
-        for (const r of rayRooms) {
-          const roomObj = await $load(r.id);
-          if (roomObj) {
-            visibleRooms.push({
-              room: roomObj,
-              x: r.x, y: r.y, z: r.z,
-              isCenter: false,
-            });
+
+        // Check for obstructions - cast ray and see if it hits indoor first
+        if (available) {
+          const rayResult = await $spatial.castRay(fromX, fromY, fromZ, tilt, swivel, Math.min(totalDist + 5, 50));
+          if (rayResult.hit && !rayResult.room.outdoor) {
+            available = false;
+            reason = 'obstructed by building';
+          }
+        }
+
+        updated.push({
+          name: poi.name,
+          x: poi.x,
+          y: poi.y,
+          z: poi.z ?? 0,
+          tilt: Math.round(tilt),
+          swivel: Math.round(swivel),
+          distance: Math.round(totalDist),
+          available,
+          reason,
+        });
+      }
+
+      self.pointsOfInterest = updated;
+      return updated;
+      `,
+    );
+
+    // aimAt(poiName) - Point telescope at a named POI
+    obj.setMethod(
+      'aimAt',
+      `
+      /** Aim telescope at a named point of interest.
+       *  @param poiName - Name of the POI to aim at
+       *  @returns Status message
+       */
+      const name = args[0];
+      const pois = self.pointsOfInterest || [];
+      const poi = pois.find(p => p.name.toLowerCase() === name.toLowerCase());
+
+      if (!poi) {
+        const names = pois.map(p => p.name).join(', ');
+        return \`Unknown point of interest: "\${name}". Known: \${names || 'none'}\`;
+      }
+
+      if (!poi.available) {
+        return \`Cannot aim at \${poi.name}: \${poi.reason || 'unavailable from this location'}.\`;
+      }
+
+      self.tilt = poi.tilt;
+      self.swivel = poi.swivel;
+
+      const directions = ['north', 'northeast', 'east', 'southeast', 'south', 'southwest', 'west', 'northwest'];
+      const dir = directions[Math.round(poi.swivel / 45) % 8];
+
+      return \`You aim the telescope at \${poi.name} (\${dir}, ~\${poi.distance}m away).\`;
+      `,
+    );
+
+    // lookThrough(player, exclusions) - Main viewing method with raycasting
+    obj.setMethod(
+      'lookThrough',
+      `
+      /** Look through the telescope and see the city.
+       *  Uses $spatial for O(1) coordinate lookups and efficient raycasting.
+       *  @param player - The player looking through (optional)
+       *  @returns Aggregated descriptions of visible rooms
+       */
+      const t0 = Date.now();
+      const loc = self.location;
+      const startX = loc?.x ?? 0;
+      const startY = loc?.y ?? 0;
+      const fromZ = self.mountZ ?? loc?.z ?? 0;
+      const tilt = self.tilt || 0;
+      const swivel = self.swivel || 0;
+
+      // Project sqrt(3) units (cube diagonal) to clear adjacent cell in any direction
+      const checkDist = Math.sqrt(3);
+      const tiltRad = tilt * Math.PI / 180;
+      const swivelRad = swivel * Math.PI / 180;
+      const horizontal = Math.sin(tiltRad) * checkDist;
+      const vertical = -Math.cos(tiltRad) * checkDist;
+      const checkX = Math.round(startX + horizontal * Math.sin(swivelRad));
+      const checkY = Math.round(startY + horizontal * Math.cos(swivelRad));
+      const checkZ = Math.round(fromZ + vertical);
+
+      // Check for wall/ground using $spatial (O(1) lookup)
+      const t1 = Date.now();
+      const nearbyRoom = await $spatial.getRoomDataAt(checkX, checkY, checkZ);
+      console.log('[telescope] getRoomDataAt took', Date.now() - t1, 'ms');
+
+      if (nearbyRoom && !nearbyRoom.outdoor) {
+        if (tilt < 45) {
+          return 'The telescope is pointed at the ground.';
+        } else {
+          return 'The telescope is pointed at a wall.';
+        }
+      }
+
+      // Cast ray using $spatial (efficient index-based raycasting)
+      const t2 = Date.now();
+      const maxDist = 50;
+      let rayResult = await $spatial.castRay(startX, startY, fromZ, tilt, swivel, maxDist);
+      console.log('[telescope] castRay took', Date.now() - t2, 'ms, hit:', rayResult.hit, 'dist:', rayResult.distance);
+
+      const isLookingDown = tilt < 45;
+
+      // If we hit an indoor room, trace backwards up the ray to find first outdoor
+      if (rayResult.hit && !rayResult.room.outdoor) {
+        console.log('[telescope] hit indoor room, searching back for outdoor...');
+        const tiltRad = tilt * Math.PI / 180;
+        const swivelRad = swivel * Math.PI / 180;
+        const dx = Math.sin(tiltRad) * Math.sin(swivelRad);
+        const dy = Math.sin(tiltRad) * Math.cos(swivelRad);
+        const dz = -Math.cos(tiltRad);
+
+        // Trace back from hit point toward telescope
+        for (let d = rayResult.distance - 1; d >= 1; d--) {
+          const x = Math.round(startX + dx * d);
+          const y = Math.round(startY + dy * d);
+          const z = Math.round(fromZ + dz * d);
+          const room = await $spatial.getRoomDataAt(x, y, z);
+          if (room && room.outdoor) {
+            rayResult = { hit: true, room, distance: d, x, y, z };
+            console.log('[telescope] found outdoor at dist', d);
+            break;
           }
         }
       }
 
-      if (visibleRooms.length === 0) {
+      if (!rayResult.hit) {
+        return 'You peer through the telescope but see only empty terrain.';
+      }
+
+      const center = rayResult.room;
+      const distance = rayResult.distance;
+      const visibleRooms = new Map();
+
+      // Build grid around target at z=0 - just check if rooms exist
+      const t3 = Date.now();
+      if (isLookingDown) {
+        // Drop to z=0 and check 3x3 grid
+        for (let dx = -1; dx <= 1; dx++) {
+          for (let dy = -1; dy <= 1; dy++) {
+            const room = await $spatial.getRoomDataAt(center.x + dx, center.y + dy, 0);
+            if (room && room.outdoor && !visibleRooms.has(room.id)) {
+              visibleRooms.set(room.id, { room, z: 0 });
+            }
+          }
+        }
+      } else {
+        // Horizontal view - just add center room
+        if (!visibleRooms.has(center.id)) {
+          visibleRooms.set(center.id, { room: center, z: rayResult.z });
+        }
+      }
+      console.log('[telescope] grid check took', Date.now() - t3, 'ms, found', visibleRooms.size, 'rooms');
+
+      if (visibleRooms.size === 0) {
         return 'You peer through the telescope but see only empty terrain.';
       }
 
       // Build header
       const directions = ['north', 'northeast', 'east', 'southeast', 'south', 'southwest', 'west', 'northwest'];
-      const dir = directions[Math.round((self.swivel || 0) / 45) % 8];
-      const viewType = isLookingDown ? 'down' : isLookingUp ? 'up' : 'horizontally';
+      const dir = directions[Math.round(swivel / 45) % 8];
 
-      let output = \`Looking \${viewType} toward the \${dir} (tilt \${tilt}°, swivel \${self.swivel || 0}°):\\n\\n\`;
+      let output = \`Looking down toward the \${dir} (tilt \${tilt}°, swivel \${swivel}°):\\n\\n\`;
 
-      // Aggregate room descriptions using describe()
-      for (const { room, isCenter } of visibleRooms) {
-        const marker = isCenter ? '[CENTER] ' : '';
-        const desc = await room.describe();
-        output += \`\${marker}\${desc}\\n\\n\`;
+      // Sort by z-level (highest first)
+      const sorted = [...visibleRooms.values()].sort((a, b) => b.z - a.z);
+
+      // The room objrefs can be used directly - no need to $load
+      const t4 = Date.now();
+      for (const { room, z } of sorted) {
+        if (room) {
+          const zLabel = z > 0 ? \`[z=\${z}] \` : '';
+          const desc = await room.describe();
+          output += \`\${zLabel}\${desc}\\n\\n\`;
+        }
       }
+      console.log('[telescope] describe x', sorted.length, 'took', Date.now() - t4, 'ms');
+      console.log('[telescope] TOTAL took', Date.now() - t0, 'ms');
 
       output += \`Distance: ~\${Math.round(distance)}m\`;
-      if (blocked) output += ' (view blocked by structure)';
 
       return output;
       `,
