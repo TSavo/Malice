@@ -186,6 +186,140 @@ export class ObjectDatabase {
   }
 
   /**
+   * Atomically set a single method on an object
+   * Uses path-based $set to avoid race conditions with concurrent method updates
+   */
+  async setMethod(
+    id: ObjId,
+    name: string,
+    methodDef: { code: string; callable?: boolean; aliases?: string[]; help?: string },
+  ): Promise<void> {
+    const sanitized = sanitizeForMongo(methodDef, new WeakSet(), `#${id}.methods.${name}`);
+
+    await this.objects.updateOne(
+      { _id: id },
+      {
+        $set: {
+          [`methods.${name}`]: sanitized,
+          modified: new Date(),
+        },
+      },
+    );
+  }
+
+  /**
+   * Atomically set a single property on an object
+   * Uses path-based $set to avoid race conditions with concurrent property updates
+   */
+  async setProperty(
+    id: ObjId,
+    name: string,
+    value: unknown,
+  ): Promise<void> {
+    const sanitized = sanitizeForMongo(value, new WeakSet(), `#${id}.properties.${name}`);
+
+    await this.objects.updateOne(
+      { _id: id },
+      {
+        $set: {
+          [`properties.${name}`]: sanitized,
+          modified: new Date(),
+        },
+      },
+    );
+  }
+
+  /**
+   * Atomically push a value to an array property
+   * Uses MongoDB $push to avoid race conditions with concurrent array modifications
+   */
+  async pushToArray(
+    id: ObjId,
+    name: string,
+    value: unknown,
+  ): Promise<void> {
+    const sanitized = sanitizeForMongo(value, new WeakSet(), `#${id}.properties.${name}[]`);
+
+    await this.objects.updateOne(
+      { _id: id },
+      {
+        $push: {
+          [`properties.${name}.value`]: sanitized,
+        },
+        $set: {
+          modified: new Date(),
+        },
+      },
+    );
+  }
+
+  /**
+   * Atomically pop (remove last element) from an array property
+   * Uses MongoDB $pop to avoid race conditions
+   */
+  async popFromArray(
+    id: ObjId,
+    name: string,
+  ): Promise<void> {
+    await this.objects.updateOne(
+      { _id: id },
+      {
+        $pop: {
+          [`properties.${name}.value`]: 1, // 1 = last, -1 = first
+        },
+        $set: {
+          modified: new Date(),
+        },
+      },
+    );
+  }
+
+  /**
+   * Atomically shift (remove first element) from an array property
+   * Uses MongoDB $pop with -1 to avoid race conditions
+   */
+  async shiftFromArray(
+    id: ObjId,
+    name: string,
+  ): Promise<void> {
+    await this.objects.updateOne(
+      { _id: id },
+      {
+        $pop: {
+          [`properties.${name}.value`]: -1, // -1 = first element
+        },
+        $set: {
+          modified: new Date(),
+        },
+      },
+    );
+  }
+
+  /**
+   * Atomically remove a value from an array property by matching
+   * Uses MongoDB $pull to avoid race conditions
+   */
+  async pullFromArray(
+    id: ObjId,
+    name: string,
+    value: unknown,
+  ): Promise<void> {
+    const sanitized = sanitizeForMongo(value, new WeakSet(), `#${id}.properties.${name}[]`);
+
+    await this.objects.updateOne(
+      { _id: id },
+      {
+        $pull: {
+          [`properties.${name}.value`]: sanitized,
+        },
+        $set: {
+          modified: new Date(),
+        },
+      },
+    );
+  }
+
+  /**
    * Get all children of an object
    */
   async getChildren(parentId: ObjId): Promise<GameObject[]> {
