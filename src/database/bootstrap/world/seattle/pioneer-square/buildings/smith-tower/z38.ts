@@ -104,7 +104,7 @@ export const building = {
     '%ODECK': {
       // Observation Deck (-13, +10, 38)
       name: 'Smith Tower - 38th Floor - Observation Deck',
-      description: `Tall glass panes arc around a slim walkway, offering a vertigo-inducing view of rooftops and freeways far below. Sun-faded placards point out landmarks that no longer match the skyline. Several cracked panes are backed by plywood screwed in from the inside.`,
+      description: `Tall glass panes arc around a slim walkway, offering a vertigo-inducing view of rooftops and freeways far below. Sun-faded placards point out landmarks that no longer match the skyline. Several cracked panes are backed by plywood screwed in from the inside. A coin-operated telescope is mounted near the western window.`,
       x: -13,
       y: 10,
       z: 38,
@@ -117,6 +117,22 @@ export const building = {
         east: '%ODL',
         north: '%DOME_MECH',
       },
+      objects: [
+        {
+          prototype: 'telescope',
+          name: 'observation telescope',
+          description:
+            'A coin-operated observation telescope bolted to the brass railing. Its black metal housing is worn smooth by countless hands. The eyepiece is cool to the touch, and a faded placard promises views of "Historic Pioneer Square and Elliott Bay."',
+          tilt: 45,
+          swivel: 90, // pointing east toward the bay
+          tiltMin: 0,
+          tiltMax: 85,
+          swivelMin: 0,
+          swivelMax: 359,
+          mountZ: 38,
+          boltedDown: true,
+        },
+      ],
     },
 
     '%ODB': {
