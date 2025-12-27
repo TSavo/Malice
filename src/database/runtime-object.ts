@@ -21,6 +21,7 @@ export class RuntimeObjectImpl implements RuntimeObject {
   private dirty = false;
   private proxy: RuntimeObject;
   private _cachedParent: RuntimeObject | undefined = undefined; // undefined = not cached
+  private writeQueue: Promise<void> = Promise.resolve(); // Serializes ALL writes to this object
 
   constructor(
     obj: GameObject,
@@ -234,9 +235,12 @@ export class RuntimeObjectImpl implements RuntimeObject {
         return obj;
       }
 
-      case 'array':
+      case 'array': {
         // Recursively convert array elements
-        return (value.value as Value[]).map((item) => this.fromValue(item));
+        const arr = (value.value as Value[]).map((item) => this.fromValue(item));
+        // Return plain array - proxying happens in get() where we know the property name
+        return arr;
+      }
 
       case 'object': {
         // Recursively convert object properties
@@ -255,13 +259,80 @@ export class RuntimeObjectImpl implements RuntimeObject {
   }
 
   /**
+   * Create a proxy for an array that intercepts mutating methods
+   * Mutations trigger atomic persistence via pushToArray, etc.
+   */
+  private createArrayProxy(arr: any[], prop: string): any[] {
+    const self = this;
+    return new Proxy(arr, {
+      get(target, method) {
+        switch (method) {
+          case 'push':
+            return (...values: any[]) => {
+              for (const value of values) {
+                target.push(value);
+                self.pushToArray(prop, value);
+              }
+              return target.length;
+            };
+
+          case 'pop':
+            return () => {
+              const removed = target.pop();
+              self.popFromArray(prop);
+              return removed;
+            };
+
+          case 'shift':
+            return () => {
+              const removed = target.shift();
+              self.shiftFromArray(prop);
+              return removed;
+            };
+
+          case 'unshift':
+            return (...values: any[]) => {
+              // unshift adds to front - we need to reverse and push each
+              // MongoDB doesn't have atomic unshift, so we fall back to full set
+              target.unshift(...values);
+              self.set(prop, target);
+              return target.length;
+            };
+
+          case 'splice':
+            return (start: number, deleteCount?: number, ...items: any[]) => {
+              const removed = target.splice(start, deleteCount ?? 0, ...items);
+              // splice is complex - fall back to full set
+              self.set(prop, target);
+              return removed;
+            };
+
+          default: {
+            const val = (target as any)[method];
+            if (typeof val === 'function') {
+              return val.bind(target);
+            }
+            return val;
+          }
+        }
+      },
+    });
+  }
+
+  /**
    * Get property - walks inheritance chain
    * Resolves typed Values to JavaScript values (objrefs become RuntimeObjects)
+   * Arrays are wrapped in proxies that intercept mutations
    */
   get(prop: string): PropertyValue | undefined {
     // Check this object first
     if (this.obj.properties && prop in this.obj.properties) {
-      return this.fromValue(this.obj.properties[prop]);
+      const value = this.fromValue(this.obj.properties[prop]);
+      // Wrap arrays in a proxy to intercept mutations
+      if (Array.isArray(value)) {
+        return this.createArrayProxy(value, prop);
+      }
+      return value;
     }
 
     // Walk up parent chain
@@ -293,29 +364,9 @@ export class RuntimeObjectImpl implements RuntimeObject {
       `#${this.id}.${prop}`,
     );
 
-    // Auto-persist - fire and forget, MOO never sees save semantics
-    this.manager
-      .update(
-        this.id,
-        {
-          properties: this.obj.properties,
-        },
-        false,
-      )
-      .catch((err) => {
-        console.error(
-          `[RuntimeObject] Failed to persist property ${prop} on #${this.id}:`,
-          err,
-        );
-        // Log the problematic properties structure for debugging
-        try {
-          console.error(
-            `[RuntimeObject] Properties keys: ${Object.keys(this.obj.properties || {}).join(', ')}`,
-          );
-        } catch {
-          console.error('[RuntimeObject] Could not stringify properties');
-        }
-      });
+    // Queue the write to ensure ordering
+    const valueToWrite = this.obj.properties[prop];
+    this.queueWrite(() => this.manager.setProperty(this, prop, valueToWrite));
   }
 
   /**
@@ -326,22 +377,121 @@ export class RuntimeObjectImpl implements RuntimeObject {
     if (this.obj.properties && prop in this.obj.properties) {
       delete this.obj.properties[prop];
 
-      // Auto-persist
-      this.manager
-        .update(
-          this.id,
-          {
-            properties: this.obj.properties,
-          },
-          false,
-        )
-        .catch((err) => {
-          console.error(
-            `[RuntimeObject] Failed to delete property ${prop} on #${this.id}:`,
-            err,
-          );
-        });
+      // Queue the write to ensure ordering
+      const props = { ...this.obj.properties };
+      this.queueWrite(() => this.manager.update(this.id, { properties: props }, false));
     }
+  }
+
+  /**
+   * Queue a write operation to ensure sequential execution
+   * ALL writes to this object are serialized to prevent race conditions
+   */
+  private queueWrite(write: () => Promise<void>): void {
+    this.writeQueue = this.writeQueue.then(write).catch((err) => {
+      console.error(`[RuntimeObject] Write failed on #${this.id}:`, err);
+    });
+  }
+
+  /**
+   * Wait for all queued writes to complete
+   */
+  async flushQueue(): Promise<void> {
+    await this.writeQueue;
+  }
+
+  /**
+   * Atomically push a value to an array property
+   * Uses MongoDB $push to avoid race conditions
+   * Also updates the in-memory array
+   */
+  pushToArray(prop: string, value: unknown): void {
+    if (!this.obj.properties) {
+      this.obj.properties = {};
+    }
+
+    // Ensure the property exists as an array
+    if (!this.obj.properties[prop]) {
+      this.obj.properties[prop] = { type: 'array', value: [] };
+    }
+
+    const propValue = this.obj.properties[prop];
+    if (propValue.type !== 'array' || !Array.isArray(propValue.value)) {
+      throw new Error(`Property ${prop} is not an array`);
+    }
+
+    // Convert value to typed Value and push to in-memory array
+    const typedValue = this.toValue(value, new WeakSet(), `#${this.id}.${prop}[]`);
+    propValue.value.push(typedValue);
+
+    // Queue the write to ensure ordering
+    this.queueWrite(() => this.manager.pushToArray(this, prop, typedValue));
+  }
+
+  /**
+   * Atomically pop (remove last element) from an array property
+   * Returns the removed element
+   */
+  popFromArray(prop: string): unknown {
+    const propValue = this.obj.properties?.[prop];
+    if (!propValue || propValue.type !== 'array' || !Array.isArray(propValue.value)) {
+      return undefined;
+    }
+
+    // Pop from in-memory array
+    const removed = propValue.value.pop();
+
+    // Queue the write to ensure ordering
+    this.queueWrite(() => this.manager.popFromArray(this, prop));
+
+    return removed ? this.fromValue(removed) : undefined;
+  }
+
+  /**
+   * Atomically shift (remove first element) from an array property
+   * Returns the removed element
+   */
+  shiftFromArray(prop: string): unknown {
+    const propValue = this.obj.properties?.[prop];
+    if (!propValue || propValue.type !== 'array' || !Array.isArray(propValue.value)) {
+      return undefined;
+    }
+
+    // Shift from in-memory array
+    const removed = propValue.value.shift();
+
+    // Queue the write to ensure ordering
+    this.queueWrite(() => this.manager.shiftFromArray(this, prop));
+
+    return removed ? this.fromValue(removed) : undefined;
+  }
+
+  /**
+   * Atomically remove a value from an array by matching
+   * For objrefs, matches by ID
+   */
+  pullFromArray(prop: string, value: unknown): void {
+    const propValue = this.obj.properties?.[prop];
+    if (!propValue || propValue.type !== 'array' || !Array.isArray(propValue.value)) {
+      return;
+    }
+
+    // Convert to typed value for comparison
+    const typedValue = this.toValue(value, new WeakSet(), `#${this.id}.${prop}[]`);
+
+    // Remove from in-memory array (find by deep equality)
+    const idx = propValue.value.findIndex((v) => {
+      if (v.type === 'objref' && typedValue.type === 'objref') {
+        return v.value === typedValue.value;
+      }
+      return JSON.stringify(v) === JSON.stringify(typedValue);
+    });
+    if (idx !== -1) {
+      propValue.value.splice(idx, 1);
+    }
+
+    // Queue the write to ensure ordering
+    this.queueWrite(() => this.manager.pullFromArray(this, prop, typedValue));
   }
 
   /**
@@ -361,24 +511,9 @@ export class RuntimeObjectImpl implements RuntimeObject {
       ...options,
     };
 
-    // Invalidate compiled method cache for this method
-    this.manager.invalidateCompiledMethod(this.id, name);
-
-    // Auto-persist
-    this.manager
-      .update(
-        this.id,
-        {
-          methods: this.obj.methods,
-        },
-        false,
-      )
-      .catch((err) => {
-        console.error(
-          `[RuntimeObject] Failed to persist method ${name} on #${this.id}:`,
-          err,
-        );
-      });
+    // Queue the write to ensure ordering
+    const methodDef = this.obj.methods[name];
+    this.queueWrite(() => this.manager.setMethod(this, name, methodDef));
   }
 
   /**
