@@ -1,5 +1,6 @@
 import type { ObjectManager } from '../object-manager.js';
 import { AiBuilder } from './ai-builder.js';
+import { AiPromptsBuilder } from './ai-prompts-builder.js';
 import { AuthManagerBuilder } from './auth-manager-builder.js';
 import { BodyFactoryBuilder } from './body-factory-builder.js';
 import { CharGenBuilder } from './chargen-builder.js';
@@ -54,6 +55,7 @@ import { WorldApiBuilder } from './world-api-builder.js';
  * - Plot ($.plot): Narrative event log prototype
  * - PlotSpawner ($.plotSpawner): Base prototype for plot-generating entities
  * - AI ($.ai): Registry for AI-controlled humans
+ * - AiPrompts ($.aiPrompts): AI system prompts loaded from disk
  * - Notes ($.notes): Object note attachment system
  * - Combat ($.combat): Combat system manager
  */
@@ -89,6 +91,7 @@ export class CoreSystemBuilder {
     const formatBuilder = new FormatBuilder(this.manager);
     const plotBuilder = new PlotBuilder(this.manager);
     const aiBuilder = new AiBuilder(this.manager);
+    const aiPromptsBuilder = new AiPromptsBuilder(this.manager);
     const notesBuilder = new NotesBuilder(this.manager);
     const combatBuilder = new CombatBuilder(this.manager);
     const pluribusBuilder = new PluribusBuilder(this.manager);
@@ -121,6 +124,7 @@ export class CoreSystemBuilder {
     await formatBuilder.build();
     await plotBuilder.build();
     await aiBuilder.build();
+    await aiPromptsBuilder.build();
     await notesBuilder.build();
     await combatBuilder.build();
 

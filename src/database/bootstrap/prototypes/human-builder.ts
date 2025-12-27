@@ -566,38 +566,9 @@ BODY STRUCTURE: Standard human layout - torso with head, 2 arms (hands), 2 legs 
     `,
     );
 
-    // Initialize basic verbs for AI-controlled humans
-    // Players get verbs in connect(), but AI humans need them set up explicitly
-    obj.setMethod(
-      'initVerbs',
-      `
-      /** Initialize basic infrastructure verbs for AI-controlled humans.
-       *  Call this after spawning an AI human so they can speak, emote, look.
-       *  Game interactions (get, drop, wear, etc.) go through AI narrator.
-       */
-      // Communication verbs (infrastructure)
-      await self.registerVerb(['say %s', '"%s', "'" + "%s"], self, 'say');
-      await self.registerVerb(['to %s'], self, 'to');
-      await self.registerVerb(['emote %s', ':%s'], self, 'emote');
-
-      // Looking verbs (infrastructure)
-      await self.registerVerb(['look', 'l'], self, 'look');
-      await self.registerVerb(['look %i', 'look at %i', 'l %i', 'examine %i', 'ex %i'], self, 'lookAt');
-
-      // Movement verbs - will be added by room when AI enters
-      // Game interactions (get, drop, give, wear, etc.) handled by AI narrator
-
-      // If we have a location, trigger onArrived to register room verbs
-      if (self.location && self.location !== 0) {
-        const location = self.location;
-        if (location && self.onArrived) {
-          await self.onArrived(location, null, null);
-        }
-      }
-
-      return true;
-    `,
-    );
+    // ZERO VERBS: AI narrator handles all commands.
+    // initVerbs removed - no verb registration needed for AI humans.
+    // The methods (say, emote, look, etc.) still exist and can be called directly.
 
     // Say method for AI humans (players have this in player-builder)
     obj.setMethod(
@@ -1169,7 +1140,7 @@ BODY STRUCTURE: Standard human layout - torso with head, 2 arms (hands), 2 legs 
       const role = profile?.role || 'npc';
 
       // Fire-and-forget query - don't block the input prompt
-      $query(systemPrompt, userPrompt, self.interactionSession)
+      $aiQuery(systemPrompt, userPrompt, self.interactionSession)
         .then(async (result) => {
           self.interactionSession = result.session;
 
@@ -1229,7 +1200,7 @@ BODY STRUCTURE: Standard human layout - torso with head, 2 arms (hands), 2 legs 
       const userPrompt = giver.name + ' just gave you ' + item.name + '.\\n\\nReact appropriately - thank them, examine the item, or respond based on your role.';
 
       // Fire-and-forget query
-      $query(systemPrompt, userPrompt, self.interactionSession)
+      $aiQuery(systemPrompt, userPrompt, self.interactionSession)
         .then(async (result) => {
           self.interactionSession = result.session;
 

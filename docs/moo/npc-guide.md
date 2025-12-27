@@ -367,4 +367,4 @@ npc.agentSession = null;
 
 - [$ai Registry](./ai.md) - Full API reference
 - [NPC Agent System](../npc-agent.md) - Technical architecture
-- [$query](./ai.md#aiquery) - How AI queries work
+- [$aiQuery](./ai.md#aiqueryystemprompt-userprompt-session) - How AI queries work

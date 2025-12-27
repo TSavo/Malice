@@ -87,39 +87,36 @@ export class TelescopeBuilder {
           { name: '3rd & King', x: 7, y: -12, z: 0 },
           { name: '4th & King', x: 14, y: -12, z: 0 },
         ],
-        abilities: `Observation telescope mounted on a fixed base. Can view distant locations across the city.
+        abilities: `Observation telescope for viewing distant locations across the city.
 
-BASIC USAGE:
-1. await telescope.aimAt('Totem Pole')  // Aim at a point of interest
-2. const view = await telescope.lookThrough()  // See what's visible
+MOUNTED TELESCOPE (at fixed location like observation deck):
+1. First check available POIs:
+   const pois = telescope.pointsOfInterest.filter(p => p.available);
+2. Aim at one: await telescope.aimAt('Totem Pole')
+3. Look: const view = await telescope.lookThrough()
 
-The view returns rich descriptions of all visible outdoor rooms along the sightline.
-For horizontal views, shows the entire street. For downward views, shows a 3x3 area.
-
-NARRATING WHAT PLAYERS SEE:
-When a player looks through, aggregate the room descriptions into a cohesive scene.
-Don't just list rooms - describe what they observe as a panorama, noting landmarks,
-activity, and atmosphere. The raw descriptions provide the details to weave together.
-
-POINTS OF INTEREST (POIs):
-Use aimAt(name) with these pre-calibrated targets:
+Available POI names:
 - Landmarks: "Totem Pole", "Top of Totem", "Grand Central", "Occidental Park",
   "Pioneer Building", "Sinkhole", "Supply Depot", "Fabrication Factory"
 - Intersections: "[Avenue] & [Street]" e.g. "Waterfront & Yesler", "4th & King"
   Avenues: Waterfront, 1st, Occidental, 2nd, 3rd, 4th
   Streets: Yesler, Washington, Main, Jackson, King
 
-OBSTRUCTIONS:
-Some POIs may be blocked by buildings. Check poi.available before aiming:
-  const pois = telescope.pointsOfInterest;
-  const blocked = pois.filter(p => !p.available);  // Shows reason in p.reason
+Blocked POIs have available:false with reason (e.g. "obstructed by building").
 
-If telescope is moved, call calibratePointsOfInterest() to recalculate angles.
+PORTABLE TELESCOPE (player carrying it around):
+Don't bother with POIs - just use cardinal directions:
+  await telescope.setTilt(90);  // horizontal
+  await telescope.setSwivel(0);   // north (90=east, 180=south, 270=west)
+  const view = await telescope.lookThrough();
 
-MANUAL AIMING (advanced):
-- setTilt(angle): 0=straight down, 90=horizontal, higher=looking up
-- setSwivel(angle): 0=north, 90=east, 180=south, 270=west
-- Tilt <45° = looking down (ground view), Tilt ≥45° = looking out (street view)`,
+UNDERSTANDING THE VIEW:
+- Horizontal (tilt ≥45°): Shows all rooms along the sightline (entire street)
+- Downward (tilt <45°): Shows 3x3 grid of ground-level rooms
+
+NARRATING TO PLAYERS:
+Aggregate the room descriptions into a cohesive panorama. Don't list rooms -
+describe what they observe as a scene, weaving together landmarks and atmosphere.`,
       },
       methods: {},
     });

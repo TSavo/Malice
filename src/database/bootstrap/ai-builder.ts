@@ -1291,7 +1291,7 @@ CORE PRINCIPLES
       // Send timeout prompt to AI
       const systemPrompt = human.agentSystemPrompt || '';
       try {
-        const result = await $query(systemPrompt, exp.prompt, session, {});
+        const result = await $aiQuery(systemPrompt, exp.prompt, session, {});
         human.interactionSession = result.session;
 
         // Register session for persistence
@@ -2228,7 +2228,7 @@ CORE PRINCIPLES
       console.log('[AI] Sending timeout prompt to AI for human #' + exp.humanId);
       const systemPrompt = human.agentSystemPrompt || '';
       try {
-        const result = await $query(systemPrompt, exp.prompt, session, {});
+        const result = await $aiQuery(systemPrompt, exp.prompt, session, {});
         human.interactionSession = result.session;
         await self.registerSession(result.session, exp.humanId, human.name, 'expectation-timeout', 'interaction');
       } catch (err) {

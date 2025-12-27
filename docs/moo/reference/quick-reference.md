@@ -98,6 +98,76 @@ await pass();                               // Same args
 await pass(arg1, arg2);                     // Different args
 ```
 
+## Querying Objects
+
+### Fluent Query Builder
+```javascript
+// Property selectors
+$query().prop('outdoor').equals(true).all()
+$query().prop('z').gt(0).all()
+$query().prop('name').contains('smith').all()
+$query().prop('*').contains('secret').all()  // all properties
+
+// Method selectors
+$query().method('tick').exists().all()
+$query().method('*').contains('$recycler').all()  // all methods
+
+// Negation
+$query().prop('recycled').not().equals(true).all()
+$query().method('tick').not().exists().all()
+
+// OR groups
+$query().parent($weapon).or().prop('damage').gt(10).all()
+
+// AND for readability (noop)
+$query().prop('x').equals(1).and().prop('y').equals(2).all()
+
+// Parent/inheritance filters
+$query().parent($room).prop('z').equals(0).all()
+$query().inheritedFrom($item).limit(10).all()
+```
+
+### Property Predicates
+```javascript
+.equals(value)      // exact match
+.exists()           // property is defined
+.contains(text)     // string/array contains
+.gt(n) .gte(n)      // greater than (or equal)
+.lt(n) .lte(n)      // less than (or equal)
+.in([...])          // value in set
+.matches(/regex/)   // regex match
+.startsWith(text)   // string prefix
+.endsWith(text)     // string suffix
+```
+
+### Method Predicates
+```javascript
+.exists()           // method exists (walks inheritance)
+.existsLocal()      // exists on this object only
+.contains(text)     // code contains string
+.matches(/regex/)   // code matches regex
+```
+
+### Query Results
+```javascript
+.all()       // RuntimeObject[] - all matches
+.first()     // RuntimeObject | null - first match
+.count()     // number - count of matches
+.ids()       // number[] - just the IDs
+.names()     // string[] - just the names
+.parents()   // RuntimeObject[] - unique parents of matches
+.children()  // RuntimeObject[] - direct children of matches
+```
+
+### AI Query
+```javascript
+const result = await $aiQuery(systemPrompt, userPrompt);
+// result = { response: "...", session: "abc123" }
+
+const result = await $aiQuery(systemPrompt, userPrompt, previousSession);
+// Resume conversation with session
+```
+
 ## Verbs
 
 ### Register Verb

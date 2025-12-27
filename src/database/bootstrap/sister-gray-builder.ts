@@ -915,7 +915,7 @@ You would never admit any of this. The mask of calm authority is as important as
 
       // Invoke the AI
       const session = self.wakeSession || null;
-      const result = await $query(systemPrompt, prompt, session);
+      const result = await $aiQuery(systemPrompt, prompt, session);
 
       // Store session for continuity
       self.wakeSession = result.session;

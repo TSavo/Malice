@@ -279,7 +279,7 @@ multiple interactions. Pluribus remembers the conversation.`,
 
       // Fire the AI query
       try {
-        const result = await $query(fullPrompt, userPrompt, self.interactionSession);
+        const result = await $aiQuery(fullPrompt, userPrompt, self.interactionSession);
 
         // Store session for continuity
         if (result && result.session) {
@@ -333,7 +333,7 @@ multiple interactions. Pluribus remembers the conversation.`,
 
       // Fire the AI query
       try {
-        const result = await $query(fullPrompt, userPrompt, self.interactionSession);
+        const result = await $aiQuery(fullPrompt, userPrompt, self.interactionSession);
 
         // Store session for continuity
         if (result && result.session) {
