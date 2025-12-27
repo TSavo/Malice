@@ -17,6 +17,9 @@ import type { ObjectManager } from '../../object-manager.js';
  * - Stat aggregation
  */
 export class EmbodiedBuilder {
+  static readonly alias = 'embodied';
+  static readonly parent = 'agent';
+
   constructor(private manager: ObjectManager) {}
 
   async build(

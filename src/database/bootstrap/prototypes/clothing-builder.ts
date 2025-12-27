@@ -20,6 +20,9 @@ import type { ObjectManager } from '../../object-manager.js';
  * Subprototypes: $.shirt, $.pants, $.shoes, $.hat, etc.
  */
 export class ClothingBuilder {
+  static readonly alias = 'clothing';
+  static readonly parent = 'wearable';
+
   constructor(private manager: ObjectManager) {}
 
   async build(wearableId: number): Promise<RuntimeObject> {

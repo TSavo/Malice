@@ -12,6 +12,9 @@ import type { ObjectManager } from '../../object-manager.js';
  * - AI determines if eating is possible based on abilities
  */
 export class FoodBuilder {
+  static readonly alias = 'food';
+  static readonly parent = 'edible';
+
   constructor(private manager: ObjectManager) {}
 
   async build(edibleId: number): Promise<RuntimeObject> {

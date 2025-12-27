@@ -13,6 +13,9 @@ import type { ObjectManager } from '../../object-manager.js';
  * - Tamper seal can be broken (fails delivery, consequences)
  */
 export class SealedBoxBuilder {
+  static readonly alias = 'sealedBox';
+  static readonly parent = 'describable';
+
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {

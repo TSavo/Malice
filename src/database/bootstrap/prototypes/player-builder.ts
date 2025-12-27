@@ -6,6 +6,9 @@ import type { ObjectManager } from '../../object-manager.js';
  * Base prototype for player characters with authentication and command handling
  */
 export class PlayerBuilder {
+  static readonly alias = 'player';
+  static readonly parent = 'human';
+
   constructor(private manager: ObjectManager) {}
 
   async build(

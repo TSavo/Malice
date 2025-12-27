@@ -5,6 +5,9 @@ import type { ObjectManager } from '../../object-manager.js';
  * PhoneDb: registry mapping numbers to phone objects.
  */
 export class PhoneDbBuilder {
+  static readonly alias = 'phoneDb';
+  static readonly parent = 'describable';
+
   constructor(private manager: ObjectManager) {}
 
   async build(describableId: number): Promise<RuntimeObject> {

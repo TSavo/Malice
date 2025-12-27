@@ -28,6 +28,9 @@ import type { ObjectManager } from '../../object-manager.js';
  *   await tank.completeResurrection();
  */
 export class CloneTankBuilder {
+  static readonly alias = 'cloneTank';
+  static readonly parent = 'describable';
+
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {

@@ -19,6 +19,9 @@ import type { ObjectManager } from '../../object-manager.js';
  * - $.keycardLock: Requires keycard item
  */
 export class LockBuilder {
+  static readonly alias = 'lock';
+  static readonly parent = 'describable';
+
   constructor(private manager: ObjectManager) {}
 
   async build(describableId: number): Promise<RuntimeObject> {

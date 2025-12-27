@@ -18,6 +18,9 @@ import type { ObjectManager } from '../../object-manager.js';
  * - Enables anonymous value transfer (and money laundering...)
  */
 export class BankTerminalBuilder {
+  static readonly alias = 'bankTerminal';
+  static readonly parent = 'describable';
+
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {

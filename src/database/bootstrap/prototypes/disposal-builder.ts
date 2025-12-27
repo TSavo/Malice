@@ -23,6 +23,9 @@ import type { ObjectManager } from '../../object-manager.js';
  * - process(): Process/destroy items (called by scheduler or instantly)
  */
 export class DisposalBuilder {
+  static readonly alias = 'disposal';
+  static readonly parent = 'describable';
+
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {

@@ -11,6 +11,9 @@ import type { ObjectManager } from '../../object-manager.js';
  * - Payment handled via $bank (credits) or $cash (physical money)
  */
 export class VendableBuilder {
+  static readonly alias = 'vendable';
+  static readonly parent = 'location';
+
   constructor(private manager: ObjectManager) {}
 
   async build(locationId: number): Promise<RuntimeObject> {

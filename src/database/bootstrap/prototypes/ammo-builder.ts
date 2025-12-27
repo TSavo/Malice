@@ -16,6 +16,9 @@ import type { ObjectManager } from '../../object-manager.js';
  * Inherits from $.stackable for quantity management.
  */
 export class AmmoBuilder {
+  static readonly alias = 'ammo';
+  static readonly parent = 'stackable';
+
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {
@@ -300,6 +303,12 @@ export class Ammo12GaugeBuilder {
  *   $.ammo12gauge
  */
 export class AmmoPrototypesBuilder {
+  static readonly aliases = [
+    'ammo9mm', 'ammo38', 'ammo44', 'ammo45', 'ammo22', 'ammo380',
+    'ammo308', 'ammo3030', 'ammo12gauge',
+  ] as const;
+  static readonly parent = 'ammo';
+
   constructor(private manager: ObjectManager) {}
 
   /**

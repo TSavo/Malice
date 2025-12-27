@@ -18,6 +18,9 @@ import type { ObjectManager } from '../../object-manager.js';
  * - Appearance description
  */
 export class HumanBuilder {
+  static readonly alias = 'human';
+  static readonly parent = 'embodied';
+
   constructor(private manager: ObjectManager) {}
 
   /**

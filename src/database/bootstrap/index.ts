@@ -14,7 +14,7 @@ export { PluribusBuilder } from './pluribus-builder.js';
 export { PreAuthHandlerBuilder } from './preauth-handler-builder.js';
 export { PromptBuilder } from './prompt-builder.js';
 export { PronounSubBuilder } from './pronoun-sub-builder.js';
-export { PrototypeBuilder } from './prototype-builder.js';
+export { PrototypeOrchestrator } from './prototype-orchestrator.js';
 export { RecyclerBuilder } from './recycler-builder.js';
 export { RoomBuilder } from './room-builder.js';
 export { SessionBuilder } from './session-builder.js';

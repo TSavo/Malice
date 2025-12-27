@@ -18,6 +18,9 @@ import type { ObjectManager } from '../../object-manager.js';
  * - Integer quantities only (no fractions)
  */
 export class StackableBuilder {
+  static readonly alias = 'stackable';
+  static readonly parent = 'describable';
+
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {

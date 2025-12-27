@@ -10,6 +10,9 @@ import type { ObjectManager } from '../../object-manager.js';
  * bottles last indefinitely until opened.
  */
 export class BottledWaterBuilder {
+  static readonly alias = 'bottledWater';
+  static readonly parent = 'drink';
+
   constructor(private manager: ObjectManager) {}
 
   async build(drinkId: number): Promise<RuntimeObject> {

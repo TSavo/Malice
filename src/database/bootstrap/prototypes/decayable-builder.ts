@@ -26,6 +26,9 @@ import type { ObjectManager } from '../../object-manager.js';
  * - 100%: Fully decayed (destroyed, unusable)
  */
 export class DecayableBuilder {
+  static readonly alias = 'decayable';
+  static readonly parent = 'describable';
+
   constructor(private manager: ObjectManager) {}
 
   async build(describableId: number): Promise<RuntimeObject> {

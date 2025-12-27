@@ -11,6 +11,9 @@ import type { ObjectManager } from '../../object-manager.js';
  * - Use $.cash utility for taking/giving cash to players
  */
 export class DollarBuilder {
+  static readonly alias = 'dollar';
+  static readonly parent = 'stackable';
+
   constructor(private manager: ObjectManager) {}
 
   async build(parentId: number): Promise<RuntimeObject> {

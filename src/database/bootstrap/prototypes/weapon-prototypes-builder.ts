@@ -157,6 +157,33 @@ import {
  *     $.golfClub, $.hockeyStick, etc.
  */
 export class WeaponPrototypesBuilder {
+  static readonly aliases = [
+    // Bladed
+    'blade', 'knife', 'pocketKnife', 'combatKnife', 'switchblade', 'boxCutter',
+    'butterflyKnife', 'stiletto', 'shiv', 'machete', 'cleaver', 'kukri',
+    'katana', 'wakizashi', 'tanto', 'ninjato', 'sword', 'longsword', 'shortsword',
+    'rapier', 'cutlass', 'axe', 'hatchet', 'fireAxe', 'tomahawk',
+    // Blunt
+    'blunt', 'club', 'baseballBat', 'baton', 'nightstick', 'tonfa', 'blackjack',
+    'tireIron', 'pipe', 'leadPipe', 'metalPipe', 'crowbar', 'hammer', 'clawHammer',
+    'sledgehammer', 'ballPeenHammer', 'mallet', 'staff', 'boStaff', 'walkingStick',
+    'poolCue', 'mace', 'morningstar', 'brassKnuckles', 'sapGloves', 'pushDagger',
+    'chain', 'bikeChain', 'nunchaku', 'flail',
+    // Firearms
+    'gun', 'pistol', 'revolver', 'magnum', 'semiAutoPistol', 'compactPistol',
+    'derringer', 'm1911', 'rifle', 'boltActionRifle', 'leverActionRifle',
+    'huntingRifle', 'rifle22', 'shotgun', 'pumpShotgun', 'sawnOffShotgun',
+    'doubleBarrel', 'coachGun', 'smg', 'machinePistol', 'uzi', 'mac10', 'tec9',
+    // Improvised
+    'improvised', 'bottle', 'brokenBottle', 'beerBottle', 'brick', 'rock',
+    'cinderBlock', 'screwdriver', 'icepick', 'awl', 'wrench', 'prybar',
+    'hammerImprovised', 'kitchenKnife', 'butcherKnife', 'skillet', 'rollingPin',
+    'throwingKnife', 'throwingStar', 'dart', 'garrote', 'whip', 'cattleProd',
+    'stunGun', 'taser', 'pepperSpray', 'golfClub', 'hockeyStick', 'lacrosseStick',
+    'cricketBat',
+  ] as const;
+  static readonly parent = 'weapon';
+
   constructor(private manager: ObjectManager) {}
 
   /**

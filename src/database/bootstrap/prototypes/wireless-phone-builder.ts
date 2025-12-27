@@ -5,6 +5,9 @@ import type { ObjectManager } from '../../object-manager.js';
  * WirelessPhone extends Phone with battery, signal checks, and ringtone.
  */
 export class WirelessPhoneBuilder {
+  static readonly alias = 'wirelessPhone';
+  static readonly parent = 'phone';
+
   constructor(private manager: ObjectManager) {}
 
   async build(phoneId: number): Promise<RuntimeObject> {

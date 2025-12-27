@@ -6,6 +6,9 @@ import type { ObjectManager } from '../../object-manager.js';
  * Base prototype for things that exist in the world
  */
 export class DescribableBuilder {
+  static readonly alias = 'describable';
+  static readonly parent = 'root';
+
   constructor(private manager: ObjectManager) {}
 
   async build(
