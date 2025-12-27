@@ -456,6 +456,100 @@ export class ObjectManager {
   }
 
   /**
+   * Atomically set a single method on an object
+   * Uses path-based $set to avoid race conditions with concurrent method updates
+   */
+  async setMethod(
+    obj: RuntimeObject,
+    name: string,
+    methodDef: { code: string; callable?: boolean; aliases?: string[]; help?: string },
+  ): Promise<void> {
+    const updatePromise = this.db.setMethod(obj.id, name, methodDef);
+    this.pendingUpdateOperations.add(updatePromise);
+    try {
+      await updatePromise;
+    } finally {
+      this.pendingUpdateOperations.delete(updatePromise);
+    }
+    this.invalidateCompiledMethod(obj.id, name);
+  }
+
+  /**
+   * Atomically set a single property on an object
+   * Uses path-based $set to avoid race conditions with concurrent property updates
+   */
+  async setProperty(
+    obj: RuntimeObject,
+    name: string,
+    value: unknown,
+  ): Promise<void> {
+    const updatePromise = this.db.setProperty(obj.id, name, value);
+    this.pendingUpdateOperations.add(updatePromise);
+    try {
+      await updatePromise;
+    } finally {
+      this.pendingUpdateOperations.delete(updatePromise);
+    }
+  }
+
+  /**
+   * Atomically push a value to an array property
+   * Uses MongoDB $push to avoid race conditions with concurrent array modifications
+   */
+  async pushToArray(
+    obj: RuntimeObject,
+    name: string,
+    value: unknown,
+  ): Promise<void> {
+    const updatePromise = this.db.pushToArray(obj.id, name, value);
+    this.pendingUpdateOperations.add(updatePromise);
+    try {
+      await updatePromise;
+    } finally {
+      this.pendingUpdateOperations.delete(updatePromise);
+    }
+  }
+
+  /**
+   * Atomically pop (remove last element) from an array property
+   */
+  async popFromArray(obj: RuntimeObject, name: string): Promise<void> {
+    const updatePromise = this.db.popFromArray(obj.id, name);
+    this.pendingUpdateOperations.add(updatePromise);
+    try {
+      await updatePromise;
+    } finally {
+      this.pendingUpdateOperations.delete(updatePromise);
+    }
+  }
+
+  /**
+   * Atomically shift (remove first element) from an array property
+   */
+  async shiftFromArray(obj: RuntimeObject, name: string): Promise<void> {
+    const updatePromise = this.db.shiftFromArray(obj.id, name);
+    this.pendingUpdateOperations.add(updatePromise);
+    try {
+      await updatePromise;
+    } finally {
+      this.pendingUpdateOperations.delete(updatePromise);
+    }
+  }
+
+  /**
+   * Atomically remove a value from an array by matching
+   */
+  async pullFromArray(obj: RuntimeObject, name: string, value: unknown): Promise<void> {
+    const updatePromise = this.db.pullFromArray(obj.id, name, value);
+    this.pendingUpdateOperations.add(updatePromise);
+    try {
+      await updatePromise;
+    } finally {
+      this.pendingUpdateOperations.delete(updatePromise);
+    }
+  }
+
+  /**
    * Find object by property value
    */
   async findByProperty(
@@ -522,7 +616,14 @@ export class ObjectManager {
    */
 
   async flushWrites(): Promise<void> {
-    // Drain in waves in case awaiting one write triggers others.
+    // First, flush all object write queues
+    const allQueues: Promise<void>[] = [];
+    for (const obj of this.cache.values()) {
+      allQueues.push(obj.flushQueue());
+    }
+    await Promise.allSettled(allQueues);
+
+    // Then drain pending operations in waves in case awaiting one write triggers others.
     while (this.pendingUpdateOperations.size > 0) {
       const pending = Array.from(this.pendingUpdateOperations);
       await Promise.allSettled(pending);
