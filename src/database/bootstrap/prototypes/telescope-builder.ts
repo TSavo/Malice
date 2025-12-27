@@ -411,9 +411,22 @@ MANUAL AIMING (if needed):
           }
         }
       } else {
-        // Horizontal view - just add center room
-        if (!visibleRooms.has(center.id)) {
-          visibleRooms.set(center.id, { room: center, z: rayResult.z });
+        // Horizontal view - trace along ray and collect all outdoor rooms
+        const tiltRad = tilt * Math.PI / 180;
+        const swivelRad = swivel * Math.PI / 180;
+        const dx = Math.sin(tiltRad) * Math.sin(swivelRad);
+        const dy = Math.sin(tiltRad) * Math.cos(swivelRad);
+        const dz = -Math.cos(tiltRad);
+
+        // Trace ray and collect outdoor rooms
+        for (let d = 1; d <= maxDist; d++) {
+          const x = Math.round(startX + dx * d);
+          const y = Math.round(startY + dy * d);
+          const z = Math.round(fromZ + dz * d);
+          const room = await $spatial.getRoomDataAt(x, y, z);
+          if (room && room.outdoor && !visibleRooms.has(room.id)) {
+            visibleRooms.set(room.id, { room, z, distance: d });
+          }
         }
       }
       console.log('[telescope] grid check took', Date.now() - t3, 'ms, found', visibleRooms.size, 'rooms');

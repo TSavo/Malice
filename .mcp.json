@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "narsil": {
+      "type": "stdio",
+      "command": "/home/kevlar/.cargo/bin/narsil-mcp",
+      "args": ["--repos", ".", "--call-graph", "--reindex"]
+    }
+  }
+}
