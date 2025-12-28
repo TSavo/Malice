@@ -1208,8 +1208,18 @@ STARTING LOCATION: Immigration Services Entry Hall ($immigrationServices)`,
       // Cancel any pending timeout
       await self.cancelPlayerTimeout(playerId);
 
+      // Retrieve stored context (transient properties don't survive $load in MCP context)
+      const storedContext = self._playerContexts?.[playerId];
+      const ctx = player._context || storedContext;
+
       // Connect player to game
-      await player.connect(player._context);
+      if (ctx) {
+        await player.connect(ctx);
+        // Clean up stored context
+        if (self._playerContexts) {
+          delete self._playerContexts[playerId];
+        }
+      }
 
       // Cleanup all registered objects
       await self.cleanupForPlayer(playerId);
@@ -1717,6 +1727,10 @@ Do NOT wrap this up neatly. The interviewer's fate is unknown. The attack may be
       player._context = context;
       context.authenticate(player.id);
       context.setHandler(player);
+
+      // Store context reference for finishInterview (transient properties don't survive $load)
+      self._playerContexts = self._playerContexts || {};
+      self._playerContexts[player.id] = context;
 
       // 2. Mark player as in-chargen
       player.chargenInProgress = true;
