@@ -694,6 +694,9 @@ export class PlayerBuilder {
         lastConversationPartner = self.lastConversationPartner;
       }
 
+      // Get full inventory (held + worn) with AI context
+      const inventory = await self.getInventoryForAI();
+
       return {
         player: {
           id: self.id,
@@ -708,6 +711,7 @@ export class PlayerBuilder {
         } : null,
         hands: handContexts,
         worn,
+        inventory,
         room: room ? {
           id: room.id,
           name: room.name,
@@ -795,7 +799,10 @@ export class PlayerBuilder {
         .replace(/\\{\\{exits\\}\\}/g, worldContext.room?.exits ? Object.keys(worldContext.room.exits).join(', ') : 'none')
         .replace(/\\{\\{roomContents\\}\\}/g, worldContext.roomContents.length > 0 ? worldContext.roomContents.map(o => formatObject(o)).join('\\n\\n') : 'Nothing notable')
         .replace(/\\{\\{others\\}\\}/g, worldContext.others?.length > 0 ? worldContext.others.map(o => o.name).join(', ') : 'Nobody else here')
-        .replace(/\\{\\{inventory\\}\\}/g, worldContext.worn?.length > 0 ? worldContext.worn.map(o => formatObject(o)).join('\\n\\n') : 'Empty')
+        .replace(/\\{\\{inventory\\}\\}/g, worldContext.inventory?.length > 0 ? worldContext.inventory.map(i => {
+          const loc = i.held ? 'held in ' + i.location : 'worn on ' + i.location;
+          return formatObject(i.context) + ' (' + loc + ')';
+        }).join('\\n\\n') : 'Empty')
         .replace(/\\{\\{recentSensory\\}\\}/g, worldContext.recentSensory?.length > 0 ? worldContext.recentSensory.map(e => '[' + e.type + '] ' + e.content).join('\\n') : 'Nothing recent')
         .replace(/\\{\\{lastConversationPartner\\}\\}/g, worldContext.lastConversationPartner?.name || 'nobody recently');
 
@@ -2575,6 +2582,61 @@ export class PlayerBuilder {
 
       await checkPart(body);
       return worn;
+    `,
+    );
+
+    // Helper to get full inventory for AI context
+    obj.setMethod(
+      'getInventoryForAI',
+      `
+      /** Get all inventory items (held + worn) with AI-friendly descriptions.
+       *  @returns Array of { item, location, context } where context is describeForAI() output
+       */
+      const inventory = [];
+
+      // Get held items from hands
+      const hands = await self.getHands();
+      for (const hand of hands.both) {
+        if (!hand) continue;
+        const contents = hand.contents || [];
+        for (const item of contents) {
+          if (item) {
+            const context = item.describeForAI ? await item.describeForAI({ depth: 2 }) : {
+              id: item.id,
+              name: item.name,
+              description: item.description,
+              abilities: item.abilities || null
+            };
+            inventory.push({
+              item,
+              location: hand.name,
+              held: true,
+              context
+            });
+          }
+        }
+      }
+
+      // Get worn items
+      const wornItems = await self.getWornItems();
+      for (const { item, part } of wornItems) {
+        if (item) {
+          const context = item.describeForAI ? await item.describeForAI({ depth: 2 }) : {
+            id: item.id,
+            name: item.name,
+            description: item.description,
+            abilities: item.abilities || null
+          };
+          inventory.push({
+            item,
+            location: part,
+            worn: true,
+            context
+          });
+        }
+      }
+
+      return inventory;
     `,
     );
 
