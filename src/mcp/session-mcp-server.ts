@@ -116,16 +116,19 @@ export class SessionMCPServer {
             };
             const telnetSessionId = telnetResult.sessionId;
 
+            // Generate session ID upfront so we can pass it to registerTools
+            const mcpSessionId = `mcp-${Date.now()}`;
+
             const server = new McpServer({
               name: 'malice-session',
               version: '2.0.0',
             });
-            this.registerTools(server, telnetSessionId);
+            this.registerTools(server, mcpSessionId, telnetSessionId);
 
             // Create transport with callback to capture the session ID
             let capturedSessionId: string | null = null;
             const transport = new StreamableHTTPServerTransport({
-              sessionIdGenerator: () => `mcp-${Date.now()}`,
+              sessionIdGenerator: () => mcpSessionId,
               onsessioninitialized: (newId) => {
                 capturedSessionId = newId;
                 this.sessions.set(newId, { server, transport, telnetSessionId });
@@ -227,7 +230,10 @@ export class SessionMCPServer {
     return this.port;
   }
 
-  private registerTools(server: McpServer, telnetSessionId: string): void {
+  private registerTools(server: McpServer, mcpSessionId: string, initialTelnetSessionId: string): void {
+    // Store telnetSessionId in a mutable wrapper so reconnect can update it
+    const sessionRef = { telnetSessionId: initialTelnetSessionId };
+
     // Simple action-based session tool
     // sessionId is curried - player can ONLY access their own telnet session
     server.tool(
@@ -311,12 +317,28 @@ EXAMPLES:
         });
 
         try {
+          // Check if session is closed and auto-reconnect on send
+          const status = await $session.call('getStatus', sessionRef.telnetSessionId) as { closed?: boolean };
+          if (status?.closed && action === 'send') {
+            // Auto-reconnect
+            const telnetResult = (await $session.call('connect')) as {
+              sessionId: string;
+              output: string;
+            };
+            sessionRef.telnetSessionId = telnetResult.sessionId;
+            // Update the session state
+            const mcpSession = this.sessions.get(mcpSessionId);
+            if (mcpSession) {
+              mcpSession.telnetSessionId = sessionRef.telnetSessionId;
+            }
+          }
+
           switch (action) {
             case 'send': {
               if (!command) return err('command required for send action');
               const result = await $session.call(
                 'send',
-                telnetSessionId,
+                sessionRef.telnetSessionId,
                 command,
               );
               return ok(result);
@@ -325,14 +347,14 @@ EXAMPLES:
             case 'getLog': {
               const result = await $session.call(
                 'getLog',
-                telnetSessionId,
+                sessionRef.telnetSessionId,
                 lines,
               );
               return ok(result);
             }
 
             case 'getStatus': {
-              const result = await $session.call('getStatus', telnetSessionId);
+              const result = await $session.call('getStatus', sessionRef.telnetSessionId);
               return ok(result);
             }
 
@@ -340,14 +362,14 @@ EXAMPLES:
               if (!key) return err('key required for addKey action');
               const result = await $session.call(
                 'addKey',
-                telnetSessionId,
+                sessionRef.telnetSessionId,
                 key,
               );
               return ok(result);
             }
 
             case 'listKeys': {
-              const result = await $session.call('listKeys', telnetSessionId);
+              const result = await $session.call('listKeys', sessionRef.telnetSessionId);
               return ok(result);
             }
 
@@ -355,7 +377,7 @@ EXAMPLES:
               if (!keyId) return err('keyId required for removeKey action');
               const result = await $session.call(
                 'removeKey',
-                telnetSessionId,
+                sessionRef.telnetSessionId,
                 keyId,
               );
               return ok(result);

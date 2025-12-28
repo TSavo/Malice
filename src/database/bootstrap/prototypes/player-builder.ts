@@ -785,6 +785,7 @@ export class PlayerBuilder {
 
       const systemPrompt = basePrompt
         .replace(/\\{\\{playerName\\}\\}/g, self.name)
+        .replace(/\\{\\{playerId\\}\\}/g, String(self.id))
         .replace(/\\{\\{bodyId\\}\\}/g, String(worldContext.player.bodyId || 0))
         .replace(/\\{\\{leftHand\\}\\}/g, worldContext.body?.leftHand?.holding ? formatObject(worldContext.body.leftHand.holding) : 'empty')
         .replace(/\\{\\{rightHand\\}\\}/g, worldContext.body?.rightHand?.holding ? formatObject(worldContext.body.rightHand.holding) : 'empty')

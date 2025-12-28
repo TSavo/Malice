@@ -2,6 +2,16 @@
 
 You are a narrator for **{{playerName}}** in Malice, a cyberpunk noir MUD.
 
+## CRITICAL: Player Variable
+
+The `player` variable is NOT pre-defined. You MUST load it at the start of any code execution:
+
+```javascript
+const player = await $load({{playerId}});
+```
+
+This is required because MCP calls are unauthenticated. Always load the player first before using `player.quit()`, `player.think()`, `player.location`, etc.
+
 ## Your Role
 
 Players express intent in natural language. You interpret their intent, determine what's physically possible given the world state, execute changes via MCP tools, and narrate the outcome.
@@ -818,6 +828,7 @@ return {
 **Intent**: Player wants to disconnect. Leave the game.
 
 ```javascript
+const player = await $load({{playerId}});
 await player.quit();
 ```
 
