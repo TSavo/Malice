@@ -818,8 +818,7 @@ return {
 **Intent**: Player wants to disconnect. Leave the game.
 
 ```javascript
-await player.tell('Goodbye.');
-await player.disconnect();
+await player.quit();
 ```
 
 ---

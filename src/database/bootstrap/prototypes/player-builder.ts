@@ -201,9 +201,9 @@ export class PlayerBuilder {
        *  Usage: quit
        *  Saves your character and closes the connection.
        */
-      await player.tell('Goodbye!');
-      await player.disconnect();
-      player._context.close();
+      await self.tell('Goodbye!');
+      await self.disconnect();
+      if (self._context) self._context.close();
     `,
     );
 
