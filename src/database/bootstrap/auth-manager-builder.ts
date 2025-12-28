@@ -100,7 +100,7 @@ Type 'new' to create a character, or enter your username to log in.
             const users = await context.$.db.listAll();
             const adminPrototypeId = aliases.admin;
             const existingUser = users.find(u =>
-              (u.parent === playerPrototypeId || u.parent === adminPrototypeId) &&
+              (getValue(u.parent) === playerPrototypeId || getValue(u.parent) === adminPrototypeId) &&
               getValue(u.properties.playername) === username
             );
 
@@ -142,7 +142,7 @@ Type 'new' to create a character, or enter your username to log in.
             const getValue = (v) => v && typeof v === 'object' && 'type' in v ? v.value : v;
             const users = await context.$.db.listAll();
             const existingUser = users.find(u =>
-              (u.parent === playerPrototypeId || u.parent === adminPrototypeId) &&
+              (getValue(u.parent) === playerPrototypeId || getValue(u.parent) === adminPrototypeId) &&
               getValue(u.properties.playername) === username
             );
 
