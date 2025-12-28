@@ -665,20 +665,17 @@ export class PlayerBuilder {
         }
       }
 
-      // Get other agents in the room
+      // Get other agents in the room with full AI context
       const others = [];
       for (const obj of (room?.contents || [])) {
         if (obj.id === bodyId) continue;
         if (obj.isAgent) {
-          others.push({
-            id: obj.id,
-            name: obj.name,
-            description: obj.description,
-            // Include what they're visibly holding/wearing
-            visibleHolding: obj.getHands ? (await obj.getHands()).both
-              .filter(h => h && (h.contents || []).length > 0)
-              .map(h => (h.contents || [])[0]?.name || 'something') : [],
-          });
+          const agentContext = await getObjectContext(obj, 1);
+          // Add what they're visibly holding
+          agentContext.visibleHolding = obj.getHands ? (await obj.getHands()).both
+            .filter(h => h && (h.contents || []).length > 0)
+            .map(h => (h.contents || [])[0]?.name || 'something') : [];
+          others.push(agentContext);
         }
       }
 
@@ -691,11 +688,18 @@ export class PlayerBuilder {
       let lastConversationPartner = null;
       const fiveMinutesAgo = Date.now() - (5 * 60 * 1000);
       if (self.lastConversationPartner && self.lastConversationTime > fiveMinutesAgo) {
-        lastConversationPartner = self.lastConversationPartner;
+        lastConversationPartner = await getObjectContext(self.lastConversationPartner, 1);
       }
 
       // Get full inventory (held + worn) with AI context
       const inventory = await self.getInventoryForAI();
+
+      // Get body and room context with describeForAI
+      const bodyContext = body ? await getObjectContext(body, 1) : null;
+      const roomContext = room ? await getObjectContext(room, 1) : null;
+      if (roomContext && room.exits) {
+        roomContext.exits = room.exits; // Preserve exits map
+      }
 
       return {
         player: {
@@ -704,22 +708,11 @@ export class PlayerBuilder {
           playername: self.playername,
           bodyId: body?.id,
         },
-        body: body ? {
-          id: body.id,
-          properties: body.properties ? body.properties() : {},
-          abilities: body.abilities || null,
-        } : null,
+        body: bodyContext,
         hands: handContexts,
         worn,
         inventory,
-        room: room ? {
-          id: room.id,
-          name: room.name,
-          description: room.description,
-          properties: room.properties ? room.properties() : {},
-          abilities: room.abilities || null,
-          exits: room.exits || {},
-        } : null,
+        room: roomContext,
         roomContents,
         others,
         // Sensory history - what have they seen/heard?
