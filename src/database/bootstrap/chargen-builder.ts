@@ -1702,7 +1702,8 @@ Do NOT wrap this up neatly. The interviewer's fate is unknown. The attack may be
       const player = await $.recycler.create({
         parent: $player,  // Use pre-injected $player alias
         properties: {
-          name: username,
+          playername: username.toLowerCase(),  // Login name for auth
+          name: username,  // Display name, updated during chargen
           aliases: [username.toLowerCase()],
           description: 'A new arrival awaiting processing.',
           passwordHash: passwordHash,

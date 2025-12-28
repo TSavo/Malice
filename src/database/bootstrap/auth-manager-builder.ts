@@ -45,9 +45,9 @@ export class AuthManagerBuilder {
     '´¨               ¨'              \\'°\\;'              \\;'         '\\;::_;:-·'´'          \`*´'            \`· :;::\\;::-·'´              \\::::::\\;::-·^*'´
                                       \`¨''                '            '¨                                                  '                \`*´¯'
 
-Enter your username, or a new name to create a character.
+Type 'new' to create a character, or enter your username to log in.
 
-Login: `,
+> `,
         },
         methods: {},
       });
@@ -72,13 +72,20 @@ Login: `,
           const context = args[0];
           const input = args[1];
 
-          const state = self._state || { stage: 'username' };
+          const state = self._state || { stage: 'username', attempts: 0 };
 
           if (state.stage === 'username') {
-            const username = input.trim();
+            const username = input.trim().toLowerCase();
 
             if (!username) {
-              context.send('Please enter a username: ');
+              context.send('> ');
+              return;
+            }
+
+            // Check for 'new' command to create character
+            if (username === 'new') {
+              self._state = { stage: 'new-username', attempts: 0 };
+              context.send('Choose a username: ');
               return;
             }
 
@@ -94,18 +101,59 @@ Login: `,
             const adminPrototypeId = aliases.admin;
             const existingUser = users.find(u =>
               (u.parent === playerPrototypeId || u.parent === adminPrototypeId) &&
-              getValue(u.properties.playername) === username.toLowerCase()
+              getValue(u.properties.playername) === username
             );
 
             if (existingUser) {
               // Existing user - ask for password
-              self._state = { stage: 'password', username: username, userId: existingUser._id };
+              self._state = { stage: 'password', username: username, userId: existingUser._id, attempts: 0 };
               context.send('Password: ');
             } else {
-              // New user - ask for password to create account
-              self._state = { stage: 'new-password', username: username };
-              context.send('New user! Choose a password: ');
+              // User not found - increment attempts
+              const attempts = (state.attempts || 0) + 1;
+              if (attempts >= 3) {
+                context.send('Too many failed attempts. Disconnecting.\\r\\n');
+                context.close();
+                return;
+              }
+              self._state = { stage: 'username', attempts: attempts };
+              context.send(\`User '\${input.trim()}' not found. Type 'new' to create a character.\\r\\n> \`);
             }
+          } else if (state.stage === 'new-username') {
+            // Choosing username for new character
+            const username = input.trim().toLowerCase();
+
+            if (!username) {
+              context.send('Choose a username: ');
+              return;
+            }
+
+            // Validate username format
+            if (!/^[a-z][a-z0-9_]{2,15}$/.test(username)) {
+              context.send('Username must be 3-16 characters, start with a letter, and contain only letters, numbers, and underscores.\\r\\nChoose a username: ');
+              return;
+            }
+
+            // Check if username already taken
+            const objectManager = await $load(0);
+            const aliases = objectManager.aliases || {};
+            const playerPrototypeId = aliases.player;
+            const adminPrototypeId = aliases.admin;
+            const getValue = (v) => v && typeof v === 'object' && 'type' in v ? v.value : v;
+            const users = await context.$.db.listAll();
+            const existingUser = users.find(u =>
+              (u.parent === playerPrototypeId || u.parent === adminPrototypeId) &&
+              getValue(u.properties.playername) === username
+            );
+
+            if (existingUser) {
+              context.send('That username is already taken.\\r\\nChoose a username: ');
+              return;
+            }
+
+            // Username available - ask for password
+            self._state = { stage: 'new-password', username: username };
+            context.send('Choose a password: ');
           } else if (state.stage === 'password') {
             // Login existing user
             const password = input.trim();
@@ -129,9 +177,14 @@ Login: `,
             const valid = await player.checkPassword(password);
 
             if (!valid) {
-              context.send('Invalid password\\r\\n');
-              context.send('Login: ');
-              self._state = { stage: 'username' };
+              const attempts = (state.attempts || 0) + 1;
+              if (attempts >= 3) {
+                context.send('Too many failed password attempts. Disconnecting.\\r\\n');
+                context.close();
+                return;
+              }
+              self._state = { ...state, attempts: attempts };
+              context.send(\`Invalid password. (\${3 - attempts} attempts remaining)\\r\\nPassword: \`);
               return;
             }
 
