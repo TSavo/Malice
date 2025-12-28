@@ -185,8 +185,6 @@ export class MaliceMCPServer {
       `Execute MOO/TypeScript code with access to all MCP tools.
 
 The code runs in the MOO execution context with access to:
-- $mcp.toolName(params) - Call any MCP tool (dig, spawn_item, set_property, etc.)
-- $mcp.listTools() - List all available tools
 - $ - Object manager for queries
 - $load(id) - Load object by ID
 - $create({parent, properties}) - Create new object
@@ -202,10 +200,18 @@ Example (authenticated):
   // Access your player properties
   console.log(\`Logged in as: \${player?.playername}\`);
 
-  // Create a room and link it
-  const room = await $mcp.dig({name: 'Hallway', description: 'A long hallway', x: 0, y: 1, z: 0});
-  await $mcp.spawn_item({prototypeId: '$torch', roomId: '#' + room.room.id});
-  return room;
+  // Create a room using $recycler
+  const room = await $recycler.create($room, {
+    name: 'Hallway',
+    description: 'A long hallway',
+    x: 0, y: 1, z: 0
+  });
+
+  // Create an item and move it to the room
+  const torch = await $recycler.create($item, { name: 'torch' });
+  await torch.moveTo(room);
+
+  return { roomId: room.id, torchId: torch.id };
 
 Write composable code - loops, conditionals, multi-step operations all work.`,
       {

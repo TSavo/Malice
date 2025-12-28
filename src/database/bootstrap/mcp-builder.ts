@@ -1696,7 +1696,9 @@ export class MCPBuilder {
     }
 
     // Set/update the execute method
-    if (forceRebuild || !tool.hasMethod('execute')) {
+    // Check for LOCAL execute method (not inherited from parent)
+    const hasLocalExecute = tool.getMethod('execute') !== undefined;
+    if (forceRebuild || !hasLocalExecute) {
       tool.setMethod('execute', config.execute);
     }
 
