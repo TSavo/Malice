@@ -57,6 +57,8 @@ export class SessionMCPServer {
   async start(): Promise<void> {
     this.httpServer = createServer(
       async (req: IncomingMessage, res: ServerResponse) => {
+        console.log(`[SessionMCP] ${req.method} ${req.url} sessionId=${req.headers['mcp-session-id'] || 'none'}`);
+
         // CORS headers
         res.setHeader('Access-Control-Allow-Origin', '*');
         res.setHeader(
@@ -70,6 +72,7 @@ export class SessionMCPServer {
         res.setHeader('Access-Control-Expose-Headers', 'mcp-session-id');
 
         if (req.method === 'OPTIONS') {
+          console.log('[SessionMCP] OPTIONS preflight');
           res.writeHead(204);
           res.end();
           return;
@@ -79,6 +82,7 @@ export class SessionMCPServer {
 
         // DELETE = close session
         if (req.method === 'DELETE' && sessionId) {
+          console.log(`[SessionMCP] DELETE session ${sessionId}`);
           const session = this.sessions.get(sessionId);
           if (session) {
             await session.transport.close();
@@ -91,15 +95,92 @@ export class SessionMCPServer {
 
         // GET or POST without session = new session
         if (!sessionId || !this.sessions.has(sessionId)) {
-          const newSession = await this.createSession();
-          const newSessionId = `session-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-          this.sessions.set(newSessionId, newSession);
-          res.setHeader('mcp-session-id', newSessionId);
-          await newSession.transport.handleRequest(req, res);
+          console.log('[SessionMCP] Creating new session...');
+          try {
+            // Read the request body to check if it's an initialize request
+            const chunks: Buffer[] = [];
+            for await (const chunk of req) {
+              chunks.push(chunk);
+            }
+            const body = Buffer.concat(chunks).toString();
+            const message = body ? JSON.parse(body) : null;
+
+            // Create telnet session and MCP server
+            const $session = this.getSession();
+            if (!$session) {
+              throw new Error('$.session not bootstrapped');
+            }
+            const telnetResult = (await $session.call('connect')) as {
+              sessionId: string;
+              output: string;
+            };
+            const telnetSessionId = telnetResult.sessionId;
+
+            const server = new McpServer({
+              name: 'malice-session',
+              version: '2.0.0',
+            });
+            this.registerTools(server, telnetSessionId);
+
+            // Create transport with callback to capture the session ID
+            let capturedSessionId: string | null = null;
+            const transport = new StreamableHTTPServerTransport({
+              sessionIdGenerator: () => `mcp-${Date.now()}`,
+              onsessioninitialized: (newId) => {
+                capturedSessionId = newId;
+                this.sessions.set(newId, { server, transport, telnetSessionId });
+                console.log(`[SessionMCP] Session initialized: ${newId}`);
+              },
+            });
+
+            await server.connect(transport);
+
+            // If not an initialize request, auto-initialize first
+            if (message && message.method !== 'initialize') {
+              console.log('[SessionMCP] Auto-initializing session...');
+              const initMessage = {
+                jsonrpc: '2.0',
+                id: 0,
+                method: 'initialize',
+                params: {
+                  protocolVersion: '2024-11-05',
+                  capabilities: {},
+                  clientInfo: { name: 'auto-init', version: '1.0.0' },
+                },
+              };
+
+              // Create a fake response to absorb the initialize response
+              const fakeRes = {
+                writeHead: () => {},
+                end: () => {},
+                setHeader: () => {},
+                write: () => true,
+                on: () => {},
+              } as unknown as ServerResponse;
+
+              await transport.handleRequest(req, fakeRes, initMessage);
+
+              // Set the session ID header that the transport generated
+              if (capturedSessionId) {
+                res.setHeader('mcp-session-id', capturedSessionId);
+              }
+
+              // Now handle the actual request
+              await transport.handleRequest(req, res, message);
+            } else {
+              // It's an initialize request, handle normally
+              await transport.handleRequest(req, res, message);
+            }
+          } catch (err) {
+            console.error('[SessionMCP] Error creating session:', err);
+            res.writeHead(500);
+            res.end(JSON.stringify({ error: String(err) }));
+          }
           return;
         }
 
         // Existing session
+        console.log(`[SessionMCP] Using existing session ${sessionId}`);
         const session = this.sessions.get(sessionId)!;
         await session.transport.handleRequest(req, res);
       },
@@ -140,36 +221,6 @@ export class SessionMCPServer {
         });
       });
     }
-  }
-
-  private async createSession(): Promise<SessionState> {
-    // Create telnet session for this MCP session
-    const $session = this.getSession();
-    if (!$session) {
-      throw new Error('$.session not bootstrapped');
-    }
-
-    const telnetResult = (await $session.call('connect')) as {
-      sessionId: string;
-      output: string;
-      message: string;
-    };
-    const telnetSessionId = telnetResult.sessionId;
-
-    const server = new McpServer({
-      name: 'malice-session',
-      version: '2.0.0',
-    });
-
-    this.registerTools(server, telnetSessionId);
-
-    const transport = new StreamableHTTPServerTransport({
-      sessionIdGenerator: () => `mcp-${Date.now()}`,
-    });
-
-    server.connect(transport).catch(console.error);
-
-    return { server, transport, telnetSessionId };
   }
 
   getPort(): number {

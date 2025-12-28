@@ -243,6 +243,30 @@ export class PlayerBuilder {
 
       const trimmed = input.trim();
 
+      // Check chargen FIRST - blocks ALL other input handling
+      // During chargen interview, everything goes directly to the NPC
+      if (self.chargenInProgress && self.chargenAgentSession) {
+        if (!trimmed) {
+          await self.print('> ');
+          return;
+        }
+
+        // Use mutex to serialize queries - prevent race conditions
+        const pending = await $mutex.acquire(self, 'chargenQuery', []);
+        if (pending !== false) {
+          // Query already in progress - queue this message
+          pending.push(trimmed);
+          await $mutex.update(self, 'chargenQuery', pending);
+          await self.print('> ');
+          return;
+        }
+
+        // We got the lock - process this message directly
+        await self._processChargenMessage(trimmed);
+        await self.print('> ');
+        return;
+      }
+
       // Check if in prompt state ($.prompt handles questions, choices, yesorno)
       if (await $.prompt.isActive(self)) {
         await $.prompt.handleInput(self, trimmed);
@@ -290,42 +314,6 @@ export class PlayerBuilder {
             return;
           }
         }
-      }
-
-      // Check if in chargen - forward input to AI interview session
-      if (self.chargenInProgress && self.chargenAgentSession) {
-        // Player is in AI-driven chargen interview
-        // Player must use "to <target> <message>" to speak to the NPC
-        const toMatch = trimmed.match(/^to\\s+(\\S+)\\s+(.+)$/i);
-        if (!toMatch) {
-          // Not a "to" command - tell them how to communicate
-          await self.tell('(Use "to <name> <message>" to speak to someone. Example: to clerk My name is John.)');
-          await self.print('> ');
-          return;
-        }
-
-        const message = toMatch[2].trim();
-        if (!message) {
-          await self.tell('Say what?');
-          await self.print('> ');
-          return;
-        }
-
-        // Use mutex to serialize queries - prevent race conditions
-        const pending = await $mutex.acquire(self, 'chargenQuery', []);
-
-        if (pending !== false) {
-          // Query already in progress - queue this message
-          pending.push(message);
-          await $mutex.update(self, 'chargenQuery', pending);
-          await self.print('> ');
-          return;
-        }
-
-        // We got the lock - process this message
-        await self._processChargenMessage(message);
-        await self.print('> ');
-        return;
       }
 
       try {
@@ -387,7 +375,7 @@ export class PlayerBuilder {
 
       try {
         // Run the query (awaited, not fire-and-forget)
-        const result = await $aiQuery(systemPrompt, 'The candidate says: "' + message + '"', session);
+        const result = await $aiQuery(systemPrompt, message, session);
         self.chargenAgentSession = result.session;
 
         // Register session with $ai for persistence (survives player logout)
@@ -767,7 +755,18 @@ export class PlayerBuilder {
           .filter(([k, v]) => !k.startsWith('_')) // Skip internal props
           .map(([k, v]) => {
             const desc = v.description ? ' - ' + v.description : '';
-            return '  ' + k + ': ' + JSON.stringify(v.value) + desc;
+            // Handle objrefs (RuntimeObjects have proxy property)
+            let valStr;
+            if (v.value?.proxy !== undefined) {
+              valStr = '#' + v.value.id;
+            } else {
+              try {
+                valStr = JSON.stringify(v.value);
+              } catch {
+                valStr = String(v.value);
+              }
+            }
+            return '  ' + k + ': ' + valStr + desc;
           })
           .join('\\n');
       };
@@ -796,7 +795,7 @@ export class PlayerBuilder {
         .replace(/\\{\\{exits\\}\\}/g, worldContext.room?.exits ? Object.keys(worldContext.room.exits).join(', ') : 'none')
         .replace(/\\{\\{roomContents\\}\\}/g, worldContext.roomContents.length > 0 ? worldContext.roomContents.map(o => formatObject(o)).join('\\n\\n') : 'Nothing notable')
         .replace(/\\{\\{others\\}\\}/g, worldContext.others?.length > 0 ? worldContext.others.map(o => o.name).join(', ') : 'Nobody else here')
-        .replace(/\\{\\{inventory\\}\\}/g, worldContext.inventory.length > 0 ? worldContext.inventory.map(o => formatObject(o)).join('\\n\\n') : 'Empty')
+        .replace(/\\{\\{inventory\\}\\}/g, worldContext.worn?.length > 0 ? worldContext.worn.map(o => formatObject(o)).join('\\n\\n') : 'Empty')
         .replace(/\\{\\{recentSensory\\}\\}/g, worldContext.recentSensory?.length > 0 ? worldContext.recentSensory.map(e => '[' + e.type + '] ' + e.content).join('\\n') : 'Nothing recent')
         .replace(/\\{\\{lastConversationPartner\\}\\}/g, worldContext.lastConversationPartner?.name || 'nobody recently');
 

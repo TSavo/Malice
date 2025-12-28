@@ -519,6 +519,7 @@ export class DescribableBuilder {
           if (Object.keys(ownProps).length > 0) {
             local.properties = {};
             for (const [name, prop] of Object.entries(ownProps)) {
+              if (!prop) continue; // Skip null/undefined properties
               local.properties[name] = {
                 value: prop.value,
                 type: prop.type,

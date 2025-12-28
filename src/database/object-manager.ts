@@ -1427,7 +1427,7 @@ export class ObjectManager {
     const mcpServers: Record<string, { type: string; url: string }> = {
       'malice-moo': {
         type: 'http',
-        url: 'http://localhost:3001/mcp',
+        url: 'http://localhost:3010/mcp',
       },
     };
 

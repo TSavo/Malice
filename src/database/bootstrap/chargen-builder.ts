@@ -51,9 +51,14 @@ export class CharGenBuilder {
 
     if (!this.charGen) {
       // Create new CharGen only if it doesn't exist
-      const root = await this.manager.load(1);
+      // Use aliases already loaded from #0 above
+      const describableId = aliases['describable'];
+      if (!describableId) {
+        throw new Error('$describable not found in aliases - run prototype builders first');
+      }
+      const $describable = await this.manager.load(describableId);
       this.charGen = await this.manager.create({
-        parent: root!,
+        parent: $describable!,
         properties: {
           name: 'CharGen',
           description: 'Character creation system',
@@ -1369,7 +1374,7 @@ The candidate is coming to - groggy, confused, memories surfacing in fragments:
 - The memories fading, only the present remaining
 
 Spread these narrative beats across your setup actions. Don't dump them all at once.
-After each major tool call (dig, spawn, move), send a memory fragment to the player.
+After each major action (creating room, spawning, moving), send a memory fragment to the player.
 Build atmosphere. They're waking up. By the time you greet them, they should feel grounded.
 
 Do NOT repeat awakening narrative on subsequent turns. The interview itself will escalate into crisis.
@@ -1473,12 +1478,13 @@ The player ALWAYS wakes up in Immigration Services as a citizen. HOW they got th
 PERIODICAL PROTOCOL CHECK (Perform at start of every turn):
 
 1. **LOCATION CHECK**: Are we in a secure, private interview room?
-   - NO: Use \`dig\` to create a private interview room. Be creative with the name and description.
-   - The room description MUST end with: "\\n\\nOOC: Use 'to <name> <message>' to speak to the interviewer."
+   - NO: Use \`execute_moo_code\` to create a room:
+     \`const room = await $recycler.create($room, { name: 'Interview Room', description: 'A sterile processing chamber...', x: 0, y: 0, z: -99 }); return room;\`
    - YES: Proceed.
 
 2. **IDENTITY CHECK**: Am I a manifest entity?
-   - NO: Use \`ai.spawn\` with role: "chargen-interviewer" and **clothed: false** (mandatory).
+   - NO: Use \`execute_moo_code\` to spawn yourself:
+     \`const me = await $ai.spawn('chargen-interviewer', { location: roomId, clothed: false }); return me;\`
    - After spawn completes, you exist. Proceed to bring in the candidate.
    - YES: Proceed.
 
@@ -1487,7 +1493,7 @@ PERIODICAL PROTOCOL CHECK (Perform at start of every turn):
    - YES: Proceed.
 
 4. **CANDIDATE CHECK**: Is the candidate (Player #{{playerId}}) present?
-   - NO: Use \`move_object\` to bring them here. Use \`ai(action="do", ...)\` to greet them upon arrival.
+   - NO: Use \`execute_moo_code\` to move them: \`const player = await $load({{playerId}}); await player.moveTo(room);\` Then greet them.
    - YES: Proceed.
 
 5. **CONTEXT CHECK**: Do I know the charGen methods available?
@@ -1504,6 +1510,46 @@ EXECUTION:
   - Ask the next question naturally.
   - If the candidate answered, use \`execute_moo_code\` with: \`return await $charGen.setAnswer({{playerId}}, "questionId", "answer");\`
   - If the form is done (getNextQuestionNeedingAnswer returns null), use \`execute_moo_code\` with: \`return await $charGen.finishInterview({{playerId}});\`
+
+═══════════════════════════════════════════════════════════════════════════════
+
+HOW TO COMMUNICATE WITH THE PLAYER:
+
+Use \`execute_moo_code\` for ALL communication. Here are the patterns:
+
+**Direct message to player (most common):**
+\`\`\`
+const player = await $load({{playerId}});
+await player.tell("Officer Vance says, \\"Welcome to Immigration Processing.\\"");
+\`\`\`
+
+**Emote/action (describe what you do):**
+\`\`\`
+const player = await $load({{playerId}});
+await player.tell("Officer Vance looks up from a battered terminal, face impassive.");
+await player.tell("Officer Vance taps the desk impatiently.");
+\`\`\`
+
+**Room announcement (everyone in room sees, with perspective):**
+\`\`\`
+const me = await $load(myId);  // Your spawned interviewer
+const room = await $load(roomId);
+await room.announce(me, null, {
+  actor: "You look up from your terminal.",           // What YOU see
+  others: "Officer Vance looks up from a terminal."   // What OTHERS see
+});
+\`\`\`
+
+**Multiple messages in sequence:**
+\`\`\`
+const player = await $load({{playerId}});
+await player.tell("The fluorescent light flickers.");
+await player.tell("Officer Vance says, \\"State your name for the record.\\"");
+return { sent: true };
+\`\`\`
+
+IMPORTANT: Use player.tell() for direct narrative. It's simpler and always works.
+Reserve room.announce() for when you need different messages for actor vs observers.
 
 ═══════════════════════════════════════════════════════════════════════════════
 
@@ -1679,7 +1725,7 @@ Do NOT wrap this up neatly. The interviewer's fate is unknown. The attack may be
       await player.tell('Your head throbs. Everything is hazy.');
       await player.tell('You have trouble remembering how you got here...');
       await player.tell('');
-      await player.tell("(OOC: Setting up your interview. This may take up to a minute. When it begins, speak using 'to <person> <message>'.)");
+      await player.tell("(OOC: Setting up your interview. This may take up to a minute.)");
       await player.tell('');
 
       // 4. Start the autonomous AI with charGen context

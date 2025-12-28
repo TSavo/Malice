@@ -20,6 +20,7 @@
     "bootstrap:force": "node --import tsx src/scripts/bootstrap-apply.ts --force",
     "bootstrap:e2e": "node --import tsx src/scripts/bootstrap-e2e.ts",
     "docker:rebuild": "docker compose down && docker volume rm malice_mongodb_data malice_mongodb-data 2>/dev/null; docker compose build game && docker compose up -d",
+    "docker:reset": "docker compose down && docker compose up -d mongodb && sleep 3 && docker exec malice-mongo mongosh --quiet --eval 'db.dropDatabase()' malice && npm run bootstrap:world:full && docker compose up -d game",
     "lint": "biome check .",
     "format": "biome format --write .",
     "lint:fix": "biome check --fix ."
