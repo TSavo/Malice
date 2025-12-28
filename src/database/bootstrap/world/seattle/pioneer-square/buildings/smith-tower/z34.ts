@@ -28,42 +28,6 @@ Six unit doors line the hallway, each marked with clean metal numbers. The space
         west: '%C1',
         in: '%E',
       },
-      methods: {
-        onContentArrived: `
-          const obj = args[0];
-          if (!obj?.registerVerb) return;
-          await obj.registerVerb(['call elevator', 'summon elevator', 'press elevator button'], self, 'callElevator');
-        `,
-        onContentLeaving: `
-          const obj = args[0];
-          if (obj?.unregisterVerbsFrom) {
-            await obj.unregisterVerbsFrom(self.id);
-          }
-        `,
-        callElevator: `
-          const player = args[0];
-          const floorNumber = 34;
-          const elevator = self.elevator || null;
-
-          if (!elevator) {
-            return 'The call button clicks uselessly. No power.';
-          }
-
-          if (elevator.currentFloor === floorNumber) {
-            if (!elevator.doorsOpen && elevator.openDoors) {
-              await elevator.openDoors();
-            }
-            return 'The elevator is already here.';
-          }
-
-          if (elevator.selectFloor) {
-            const result = await elevator.selectFloor(player, floorNumber);
-            return result?.message || 'You press the button. Machinery stirs above.';
-          }
-
-          return 'The button light flickers, but nothing happens.';
-        `,
-      },
       elevatorId: '%E',
     },
 

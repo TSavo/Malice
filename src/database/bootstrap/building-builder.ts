@@ -452,13 +452,83 @@ export class BuildingBuilder {
         postProcessors.push(apply);
       }
 
-      // Attach custom methods
+      // Attach custom methods (abilities-first: skip elevator verb registration)
+      const isElevatorLobby = !!def.elevatorId;
       if (def.methods && typeof def.methods === 'object') {
         for (const [methodName, body] of Object.entries(def.methods)) {
           if (typeof body === 'string') {
+            // Skip elevator-related methods - replaced by $callButton and $elevatorDoor
+            if (isElevatorLobby) {
+              if (
+                methodName === 'callElevator' ||
+                methodName === 'onContentArrived' ||
+                methodName === 'onContentLeaving'
+              ) {
+                continue; // Skip - elevator lobby handled by prototypes
+              }
+            }
             room.setMethod(methodName, body);
           }
         }
+      }
+
+      // Auto-create $callButton and $elevatorDoor for elevator lobbies
+      if (isElevatorLobby) {
+        const floorNumber = def.z || 0;
+        const elevatorPlaceholder = def.elevatorId;
+
+        // Defer creation until elevator is resolved
+        postProcessors.push(async () => {
+          const elevator = sharedPlaceholders.get(elevatorPlaceholder);
+          if (!elevator) {
+            console.warn(
+              `    Warning: Elevator lobby ${placeholder} references unknown elevator ${elevatorPlaceholder}`,
+            );
+            return;
+          }
+
+          // Create $callButton and place in room
+          const callButtonProto = $.callButton;
+          if (callButtonProto) {
+            const callButton = await recycler.create({
+              parent: callButtonProto,
+              properties: {
+                name: 'Elevator Call Panel',
+                floor: floorNumber,
+                elevator: elevator,
+              },
+            });
+            await callButton.call('moveTo', room);
+          }
+
+          // Create $elevatorDoor for the 'in' exit
+          const elevatorDoorProto = $.elevatorDoor;
+          if (elevatorDoorProto) {
+            const elevatorDoor = await recycler.create({
+              parent: elevatorDoorProto,
+              properties: {
+                name: 'Elevator Doors',
+                floor: floorNumber,
+                elevator: elevator,
+              },
+            });
+
+            // Find the 'in' exit and attach this door
+            const exits = room.get('exits') || [];
+            for (const exit of exits as RuntimeObject[]) {
+              if (!exit) continue;
+              const exitName = exit.get('name');
+              const exitAliases = exit.get('aliases') || [];
+              if (
+                exitName === 'in' ||
+                (exitAliases as string[]).includes('in')
+              ) {
+                exit.set('door', elevatorDoor);
+                break;
+              }
+            }
+          }
+        });
       }
 
       // Resolve door/lock placeholders on rooms if present
@@ -495,6 +565,10 @@ export class BuildingBuilder {
               }
             }
             room.set('floorRooms', mapped);
+
+            // Set initial exit destination based on currentFloor
+            const currentFloor = room.get('currentFloor') ?? 0;
+            await room.call('updateExitDestination', currentFloor);
           }
         });
       }

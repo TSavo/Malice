@@ -777,6 +777,84 @@ YOUR MISSION
   }
 
   private addCoreMethods(obj: RuntimeObject): void {
+    // Standard addressable interface - called when someone says "to pluribus <message>"
+    obj.setMethod(
+      'to',
+      `
+      /** Handle being addressed via "to pluribus <message>".
+       *  Only works if speaker is wearing The Mask (bonded).
+       *  @param speaker - The agent addressing Pluribus
+       *  @param message - What they said
+       *  @param options - { silent: boolean } - true for thought, false for spoken
+       *  @returns Response message or null
+       */
+      const speaker = args[0];
+      const message = args[1];
+      const options = args[2] || {};
+
+      if (!speaker || !message) {
+        return { success: false, error: 'Invalid address.' };
+      }
+
+      // Check if speaker is wearing The Mask
+      const mask = $theMask;
+      if (!mask || mask.bondState !== 'bonded' || mask.wearer?.id !== speaker.id) {
+        // Not wearing the mask - no connection
+        if (speaker.tell) {
+          await speaker.tell('You reach for something that is not there. Silence answers.');
+        }
+        return { success: false, error: 'No connection to Pluribus.' };
+      }
+
+      // Announce to room (if not silent thought)
+      const isSilent = options.silent === true;
+      const location = speaker.location;
+
+      if (!isSilent && location && location.announce) {
+        // Others hear gibberish - the mask translates
+        await location.announce(speaker, null, {
+          actor: 'You say to Pluribus, "' + message + '"',
+          target: '',
+          others: speaker.name + ' murmurs something unintelligible, as if speaking to the air.'
+        });
+      } else if (isSilent && speaker.tell) {
+        // Just show the thought to the thinker
+        await speaker.tell('You think: "' + message + '"');
+      }
+
+      // Build the AI query
+      const systemPrompt = self.agentSystemPrompt || '';
+      const historyPrompt = self.formatHistoryForPrompt ?
+        await self.formatHistoryForPrompt(20) : '';
+
+      const commType = isSilent ? 'thinks to' : 'says to';
+      const userPrompt = 'The Mask wearer (' + speaker.name + ') ' + commType + ' you: "' + message + '"\\n\\n' +
+                         'Respond as Pluribus. Information appears as KNOWING, not speech. ' +
+                         'Use the player_tell tool to send your response to ' + speaker.name + '.';
+
+      const fullPrompt = systemPrompt + '\\n\\n' + historyPrompt;
+
+      // Fire the AI query
+      try {
+        const session = mask.interactionSession || null;
+        const result = await $aiQuery(fullPrompt, userPrompt, session);
+
+        // Store session on the mask for continuity
+        if (result && result.session) {
+          mask.interactionSession = result.session;
+        }
+
+        return { success: true };
+      } catch (err) {
+        console.error('[Pluribus.to] AI error:', err?.message || err);
+        if (speaker.tell) {
+          await speaker.tell('The connection flickers. Static. The response is lost.');
+        }
+        return { success: false, error: 'Connection error.' };
+      }
+    `,
+    );
+
     obj.setMethod(
       'describe',
       `

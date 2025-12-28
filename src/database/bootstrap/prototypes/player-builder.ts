@@ -789,7 +789,7 @@ export class PlayerBuilder {
         .replace(/\\{\\{leftHand\\}\\}/g, worldContext.body?.leftHand?.holding ? formatObject(worldContext.body.leftHand.holding) : 'empty')
         .replace(/\\{\\{rightHand\\}\\}/g, worldContext.body?.rightHand?.holding ? formatObject(worldContext.body.rightHand.holding) : 'empty')
         .replace(/\\{\\{room\\}\\}/g, worldContext.room ? formatObject(worldContext.room) : 'Unknown location')
-        .replace(/\\{\\{exits\\}\\}/g, worldContext.room?.exits ? Object.keys(worldContext.room.exits).join(', ') : 'none')
+        .replace(/\\{\\{exits\\}\\}/g, worldContext.room?.exits ? worldContext.room.exits.map(e => e.name || e.direction).join(', ') : 'none')
         .replace(/\\{\\{roomContents\\}\\}/g, worldContext.roomContents.length > 0 ? worldContext.roomContents.map(o => formatObject(o)).join('\\n\\n') : 'Nothing notable')
         .replace(/\\{\\{others\\}\\}/g, worldContext.others?.length > 0 ? worldContext.others.map(o => o.name).join(', ') : 'Nobody else here')
         .replace(/\\{\\{inventory\\}\\}/g, worldContext.inventory?.length > 0 ? worldContext.inventory.map(i => {

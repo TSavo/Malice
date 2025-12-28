@@ -49,19 +49,25 @@ export class ElevatorBuilder {
 
         abilities: `Vertical transport between floors. A location that moves.
 
-FLOORS: 'floors' array lists accessible floor numbers. 'floorRooms' maps floor numbers to destination room objects.
+CONTROL PANEL: When someone presses a floor button, call selectFloor(agent, floorNumber).
+Example: Player says "press 5" → await self.selectFloor(player, 5)
+The panel shows available floors via 'floors' array. Buttons glow, panel beeps on press.
 
-MOVEMENT: selectFloor(agent, floor) requests travel. Checks locks, closes doors, schedules arrival. 'travelTimePerFloor' ms per floor traveled.
+FLOORS: 'floors' array lists accessible floor numbers. 'floorRooms' maps floor numbers to destination rooms.
 
-STATE: 'moving' true while in motion. 'destination' is target floor. 'currentFloor' is current position.
+MOVEMENT: selectFloor checks locks, closes doors, schedules arrival. Returns { success, message }.
+While moving: 'moving' is true, 'destination' shows target floor, buttons are unresponsive.
+Travel time: 'travelTimePerFloor' ms per floor traveled. Car lurches, floor numbers tick by.
 
-DOORS: 'doorsOpen' controls entry/exit. Doors close before movement, open on arrival. canContain() checks doors and capacity.
+DOORS: 'doorsOpen' controls entry/exit. Doors close before movement, open on arrival.
+Someone can manually call openDoors() or closeDoors() if stationary.
 
-LOCKS: 'locks' array of lock objects. canAccessFloor(agent, floor) checks all locks. Composable: biometric, keycard, etc.
+LOCKS: 'locks' array of lock objects. Some floors may require authorization.
+Denied access: panel beeps angrily, doesn't move.
 
-CAPACITY: 'capacity' max passengers. canContain() rejects if full.
+CAPACITY: 'capacity' max passengers. Full elevator won't accept more.
 
-SCHEDULING: Uses $.scheduler to delay arrival. Job: elevator_[id]_arrive.`,
+EMERGENCY: If stuck, maintenance can force arrive() or reset state manually.`,
       },
       methods: {},
     });
@@ -209,11 +215,42 @@ SCHEDULING: Uses $.scheduler to delay arrival. Job: elevator_[id]_arrive.`,
       self.moving = false;
       self.destination = null;
 
+      // Update 'out' exit to point to current floor's lobby room
+      await self.updateExitDestination(floor);
+
       // Announce arrival with proper message structure
       await self.announce(null, null, { others: 'The elevator stops smoothly. You have arrived at floor ' + floor + '.' });
 
       // Open doors
       await self.openDoors();
+    `,
+    );
+
+    obj.setMethod(
+      'updateExitDestination',
+      `
+      /** Update the 'out' exit to point to the lobby for the given floor.
+       *  @param floor - Floor number to point exit to
+       */
+      const floor = args[0];
+      const lobbyRoom = self.floorRooms?.[floor];
+      if (!lobbyRoom) return;
+
+      // exits is an array of exit objrefs
+      const exits = self.exits || [];
+      for (const exitRef of exits) {
+        // exitRef might be an objref or already resolved
+        const exit = typeof exitRef === 'object' && exitRef.aliases ? exitRef : await $load(exitRef.id || exitRef);
+        if (!exit) continue;
+
+        // Check if this is the 'out' exit
+        const aliases = exit.aliases || [];
+        const direction = exit.direction;
+        if (direction === 'out' || aliases.includes('out') || aliases.includes('o')) {
+          exit.destination = lobbyRoom;
+          break;
+        }
+      }
     `,
     );
 
