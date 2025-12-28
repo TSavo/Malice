@@ -730,8 +730,8 @@ if (exit.canUse) {
   if (!check.allowed) return check.reason;
 }
 
-await player.moveTo(exit.destination, player);
-return exit.destination.describe(player);
+await player.moveTo(exit.destRoom, player);
+return exit.destRoom.describe(player);
 ```
 
 ---

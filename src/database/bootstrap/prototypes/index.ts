@@ -31,7 +31,9 @@ export { DrinkBuilder } from './drink-builder.js';
 // Consumables
 export { EdibleBuilder } from './edible-builder.js';
 // Elevators, doors, signs and locks
+export { CallButtonBuilder } from './call-button-builder.js';
 export { ElevatorBuilder } from './elevator-builder.js';
+export { ElevatorDoorBuilder } from './elevator-door-builder.js';
 export { EmbodiedBuilder } from './embodied-builder.js';
 export { ExitBuilder } from './exit-builder.js';
 // Faction system

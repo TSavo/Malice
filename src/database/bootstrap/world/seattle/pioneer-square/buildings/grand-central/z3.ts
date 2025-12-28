@@ -156,42 +156,6 @@ The elevator call button here still works, connecting to the mysterious power so
         down: '%GC_STAIRS_2',
         in: '%GC_E',
       },
-      methods: {
-        onContentArrived: `
-          const obj = args[0];
-          if (!obj?.registerVerb) return;
-          await obj.registerVerb(['call elevator', 'summon elevator', 'press elevator button', 'press button'], self, 'callElevator');
-        `,
-        onContentLeaving: `
-          const obj = args[0];
-          if (obj?.unregisterVerbsFrom) {
-            await obj.unregisterVerbsFrom(self.id);
-          }
-        `,
-        callElevator: `
-          const player = args[0];
-          const floorNumber = 3;
-          const elevator = self.elevator || null;
-
-          if (!elevator) {
-            return 'The call button clicks uselessly. No power.';
-          }
-
-          if (elevator.currentFloor === floorNumber) {
-            if (!elevator.doorsOpen && elevator.openDoors) {
-              await elevator.openDoors();
-            }
-            return 'The elevator is already here at roof level.';
-          }
-
-          if (elevator.selectFloor) {
-            const result = await elevator.selectFloor(player, floorNumber);
-            return result?.message || 'You press the button. Far below, the elevator machinery groans to life, cables singing in the shaft.';
-          }
-
-          return 'The button clicks, but nothing responds.';
-        `,
-      },
       elevatorId: '%GC_E',
     },
 

@@ -169,42 +169,6 @@ The elevator gate stands at the hall's eastern end, the cage car visible behind 
         north: '%GC_BALC_N',
         in: '%GC_E',
       },
-      methods: {
-        onContentArrived: `
-          const obj = args[0];
-          if (!obj?.registerVerb) return;
-          await obj.registerVerb(['call elevator', 'summon elevator', 'press elevator button', 'press button'], self, 'callElevator');
-        `,
-        onContentLeaving: `
-          const obj = args[0];
-          if (obj?.unregisterVerbsFrom) {
-            await obj.unregisterVerbsFrom(self.id);
-          }
-        `,
-        callElevator: `
-          const player = args[0];
-          const floorNumber = 1;
-          const elevator = self.elevator || null;
-
-          if (!elevator) {
-            return 'The call button clicks uselessly. No power.';
-          }
-
-          if (elevator.currentFloor === floorNumber) {
-            if (!elevator.doorsOpen && elevator.openDoors) {
-              await elevator.openDoors();
-            }
-            return 'The elevator is already here. The brass gate stands open.';
-          }
-
-          if (elevator.selectFloor) {
-            const result = await elevator.selectFloor(player, floorNumber);
-            return result?.message || 'You press the button. From below, the elevator machinery groans reluctantly to life.';
-          }
-
-          return 'The button depresses with a click, but nothing happens.';
-        `,
-      },
       elevatorId: '%GC_E',
     },
 

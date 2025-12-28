@@ -36,23 +36,18 @@ export class MaskBuilder {
             'looking back.',
           abilities: `Neural interface connecting wearer to Pluribus, the city infrastructure AI.
 
-BONDING: wear() creates symbiotic link. Wearer becomes "Unum" - the one who
-completes "the many." remove() severs the connection. bondState tracks status.
+BONDING: Wear to bond (bondState='bonded'). Remove to sever (bondState='inactive').
 
-PERCEPTION FILTER: When bonded, modifyRoomDescription() injects Pluribus's
-presence. Wearer sees data overlays, threat assessments, infrastructure status.
+INPUT ROUTING (when bonded):
+ALL player input except "remove mask" should be routed to $pluribus.to(player, command).
+Pluribus interprets intent through the symbiotic link and responds as sudden knowing.
+The wearer and Pluribus act as one - Unum.
 
-COMMUNICATION: 'to pluribus <message>' for spoken (others hear gibberish).
-'think <message>' for silent neural communication (private).
+PERCEPTION: modifyRoomDescription injects Pluribus's presence - data overlays, threat assessments. Only wearer sees this.
 
-SENSORY SHARING: onSee/onHear/onSmell/onTaste/onFeel forward wearer's
-perceptions to Pluribus. The city sees through your eyes.
+SENSORY LINK: onSee/onHear/onSmell/onTaste/onFeel forward to $pluribus.recordSensory(). The city experiences what you experience.
 
-REJECTION: Hostile entities may suffer consequences when attempting to wear.
-TODO: Implement rejection protocols based on Pluribus authorization.
-
-SESSIONS: interactionSession maintains AI conversation continuity across
-multiple interactions. Pluribus remembers the conversation.`,
+REJECTION: May reject hostile entities per Pluribus authorization.`,
           aliases: ['mask', 'neural interface', 'interface'],
           // Wearable properties
           covers: ['face'],
@@ -117,11 +112,6 @@ multiple interactions. Pluribus remembers the conversation.`,
         await wearer.addPerceptionFilter(self, self);
       }
 
-      // Register think verb for silent communication with Pluribus
-      if (wearer.registerVerb) {
-        await wearer.registerVerb(['think %s'], self, 'onThink');
-      }
-
       // Clear any previous session for fresh start
       self.interactionSession = null;
 
@@ -162,11 +152,6 @@ multiple interactions. Pluribus remembers the conversation.`,
       // Remove perception filter before calling parent
       if (wearer && wearer.removePerceptionFilter) {
         await wearer.removePerceptionFilter(self);
-      }
-
-      // Unregister think verb
-      if (wearer && wearer.unregisterVerbsFrom) {
-        await wearer.unregisterVerbsFrom(self.id);
       }
 
       // Call parent remove method
@@ -220,133 +205,6 @@ multiple interactions. Pluribus remembers the conversation.`,
     `,
     );
 
-    // Provide addressable entities
-    obj.setMethod(
-      'getAddressableEntities',
-      `
-      /** Return entities that can be addressed through this filter.
-       *  @returns Array of addressable names
-       */
-      if (self.bondState !== 'bonded') {
-        return [];
-      }
-      return ['pluribus'];
-    `,
-    );
-
-    // Handle addressing Pluribus
-    obj.setMethod(
-      'onAddressed',
-      `
-      /** Handle 'to pluribus <message>' - fire AI query.
-       *  @param speaker - The agent speaking
-       *  @param targetName - 'pluribus'
-       *  @param message - What they said
-       */
-      const speaker = args[0];
-      const targetName = args[1];
-      const message = args[2];
-
-      if (self.bondState !== 'bonded' || !self.wearer || self.wearer.id !== speaker?.id) {
-        return 'The Mask is silent.';
-      }
-
-      // Announce to room - actor sees "You say to Pluribus", others see "says to no one in particular"
-      const location = speaker.location;
-      if (location && location.announce) {
-        await location.announce(speaker, null, {
-          actor: 'You say to Pluribus, "' + message + '"',
-          target: '', // No target to notify
-          others: speaker.name + ' says to no one in particular, "' + message + '"'
-        });
-      }
-
-      // Get Pluribus (pre-injected as $pluribus)
-      if (!$pluribus) {
-        return 'You reach for the connection, but find only static.';
-      }
-
-      // Build the full prompt with sensory context
-      const systemPrompt = $pluribus.systemPrompt || '';
-      const historyPrompt = $pluribus.formatHistoryForPrompt ?
-        await $pluribus.formatHistoryForPrompt(20) : '';
-
-      const fullPrompt = systemPrompt + '\\n\\n' + historyPrompt;
-
-      // The user's message
-      const userPrompt = 'The Mask wearer (' + speaker.name + ') addresses you: "' + message + '"\\n\\n' +
-                         'Respond as Pluribus. Remember: information appears as KNOWING, not speech.';
-
-      // Fire the AI query
-      try {
-        const result = await $aiQuery(fullPrompt, userPrompt, self.interactionSession);
-
-        // Store session for continuity
-        if (result && result.session) {
-          self.interactionSession = result.session;
-        }
-
-        // The response will be delivered via MCP tools (the AI uses 'tell' or similar)
-        // But we also want to show immediate acknowledgment
-        return '';
-      } catch (err) {
-        console.error('[Mask.onAddressed] AI error:', err?.message || err);
-        return 'The connection flickers. Static. The response is lost.';
-      }
-    `,
-    );
-
-    // Handle silent thinking to Pluribus (registered as verb 'think %s')
-    obj.setMethod(
-      'onThink',
-      `
-      /** Handle 'think <message>' - silent communication with Pluribus.
-       *  Verb pattern: 'think %s' -> args[0] = message, player = thinker
-       */
-      const thinker = player;
-      const message = args[0];
-
-      if (self.bondState !== 'bonded' || !self.wearer || self.wearer.id !== thinker?.id) {
-        return 'The thought echoes in silence. Nothing answers.';
-      }
-
-      // Silent - only thinker sees this, no room announcement
-      if (thinker.tell) {
-        await thinker.tell('You think, "' + message + '"');
-      }
-
-      // Get Pluribus (pre-injected as $pluribus)
-      if (!$pluribus) {
-        return 'You reach for the connection, but find only static.';
-      }
-
-      // Build the full prompt with sensory context
-      const systemPrompt = $pluribus.systemPrompt || '';
-      const historyPrompt = $pluribus.formatHistoryForPrompt ?
-        await $pluribus.formatHistoryForPrompt(20) : '';
-
-      const fullPrompt = systemPrompt + '\\n\\n' + historyPrompt;
-
-      // The user's thought
-      const userPrompt = 'The Mask wearer (' + thinker.name + ') thinks to you: "' + message + '"\\n\\n' +
-                         'Respond as Pluribus. Remember: information appears as KNOWING, not speech.';
-
-      // Fire the AI query
-      try {
-        const result = await $aiQuery(fullPrompt, userPrompt, self.interactionSession);
-
-        // Store session for continuity
-        if (result && result.session) {
-          self.interactionSession = result.session;
-        }
-
-        return '';
-      } catch (err) {
-        console.error('[Mask.onThink] AI error:', err?.message || err);
-        return 'The connection flickers. Static. The response is lost.';
-      }
-    `,
-    );
   }
 
   private addSensoryHookMethods(obj: RuntimeObject): void {
