@@ -70,13 +70,13 @@ async function activate(context) {
         vscode.window.showErrorMessage(`Failed to connect to DevTools server: ${err}`);
         console.error('[Malice] Connection failed:', err);
     }
+    // Create tree view provider first (needed for notification coordination)
+    const treeProvider = new tree_view_js_1.MaliceTreeProvider(client);
     // Register malice:// file system provider
-    const fileSystemProvider = new MaliceFileSystemProvider(client);
+    const fileSystemProvider = new MaliceFileSystemProvider(client, treeProvider);
     context.subscriptions.push(vscode.workspace.registerFileSystemProvider('malice', fileSystemProvider, {
         isCaseSensitive: true,
     }));
-    // Create tree view provider
-    const treeProvider = new tree_view_js_1.MaliceTreeProvider(client);
     treeView = vscode.window.createTreeView('malice-objects', {
         treeDataProvider: treeProvider,
     });
@@ -310,17 +310,33 @@ function deactivate() {
  * Reads/writes from Malice DevTools WebSocket server
  */
 class MaliceFileSystemProvider {
-    constructor(client) {
+    constructor(client, treeProvider) {
         this.client = client;
+        this.treeProvider = treeProvider;
         this._emitter = new vscode.EventEmitter();
         this.onDidChangeFile = this._emitter.event;
-        // Listen for change notifications from server
+        // Listen for notifications from server
         client.onNotification((method, params) => {
+            const { objectId, name } = params;
             if (method === 'method.changed' || method === 'property.changed') {
-                const { objectId, name } = params;
+                // File changed or created
                 const ext = method === 'method.changed' ? 'ts' : 'json';
                 const uri = vscode.Uri.parse(`malice://objects/${objectId}/${name}.${ext}`);
                 this._emitter.fire([{ type: vscode.FileChangeType.Changed, uri }]);
+                // Refresh tree in case it's a new method/property
+                this.treeProvider.refresh();
+            }
+            else if (method === 'method.deleted' || method === 'property.deleted') {
+                // File deleted
+                const ext = method === 'method.deleted' ? 'ts' : 'json';
+                const uri = vscode.Uri.parse(`malice://objects/${objectId}/${name}.${ext}`);
+                this._emitter.fire([{ type: vscode.FileChangeType.Deleted, uri }]);
+                // Refresh tree to remove the item
+                this.treeProvider.refresh();
+            }
+            else if (method === 'object.created' || method === 'object.changed') {
+                // Object structure changed - refresh tree
+                this.treeProvider.refresh();
             }
         });
     }

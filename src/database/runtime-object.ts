@@ -426,6 +426,13 @@ export class RuntimeObjectImpl implements RuntimeObject {
     // Queue the write to ensure ordering
     const valueToWrite = this.obj.properties[prop];
     this.queueWrite(() => this.manager.setProperty(this, prop, valueToWrite));
+
+    // Emit change event for DevTools sync
+    this.manager.emitChange({
+      type: 'property.changed',
+      objectId: this.id,
+      name: prop,
+    });
   }
 
   /**
@@ -441,6 +448,13 @@ export class RuntimeObjectImpl implements RuntimeObject {
       this.queueWrite(() =>
         this.manager.update(this.id, { properties: props }, false),
       );
+
+      // Emit change event for DevTools sync
+      this.manager.emitChange({
+        type: 'property.deleted',
+        objectId: this.id,
+        name: prop,
+      });
     }
   }
 
@@ -596,6 +610,13 @@ export class RuntimeObjectImpl implements RuntimeObject {
     // Queue the write to ensure ordering
     const methodDef = this.obj.methods[name];
     this.queueWrite(() => this.manager.setMethod(this, name, methodDef));
+
+    // Emit change event for DevTools sync
+    this.manager.emitChange({
+      type: 'method.changed',
+      objectId: this.id,
+      name,
+    });
   }
 
   /**
@@ -1309,6 +1330,12 @@ export class RuntimeObjectImpl implements RuntimeObject {
           err,
         );
       });
+
+    // Emit change event for DevTools sync
+    this.manager.emitChange({
+      type: 'object.changed',
+      objectId: this.id,
+    });
   }
 
   /**
@@ -1507,6 +1534,13 @@ export class RuntimeObjectImpl implements RuntimeObject {
           err,
         );
       });
+
+    // Emit change event for DevTools sync
+    this.manager.emitChange({
+      type: 'method.deleted',
+      objectId: this.id,
+      name,
+    });
   }
 
   /**

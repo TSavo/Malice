@@ -1,4 +1,5 @@
 import * as bcrypt from 'bcrypt';
+import { EventEmitter } from 'events';
 import type {
   CreateObjectParams,
   GameObject,
@@ -11,6 +12,17 @@ import { getLoggerFacade, RESERVED_ALIASES } from './logger-facade.js';
 import { ObjectCache } from './object-cache.js';
 import type { ObjectDatabase } from './object-db.js';
 import { RuntimeObjectImpl } from './runtime-object.js';
+
+/**
+ * Event types emitted by ObjectManager for change notifications
+ */
+export type ObjectChangeEvent =
+  | { type: 'method.changed'; objectId: number; name: string }
+  | { type: 'method.deleted'; objectId: number; name: string }
+  | { type: 'property.changed'; objectId: number; name: string }
+  | { type: 'property.deleted'; objectId: number; name: string }
+  | { type: 'object.created'; objectId: number }
+  | { type: 'object.changed'; objectId: number };
 
 /**
  * Selector for property predicates in fluent query builder
@@ -566,6 +578,9 @@ export class ObjectManager {
   // Track in-flight update operations (fire-and-forget writes from RuntimeObject)
   private pendingUpdateOperations = new Set<Promise<void>>();
 
+  // Event emitter for change notifications (used by DevTools)
+  private changeEmitter = new EventEmitter();
+
   constructor(db: ObjectDatabase) {
     this.db = db;
     this.cache = new ObjectCache();
@@ -770,6 +785,7 @@ export class ObjectManager {
 
   /**
    * Create new object
+   * All mutations go through RuntimeObject for consistent event emission
    */
   async create(params: CreateObjectParams): Promise<RuntimeObject> {
     const id = await this.db.getNextId();
@@ -789,128 +805,47 @@ export class ObjectManager {
     // Extract parent ID from RuntimeObject and store as ObjRefValue
     const parentId = params.parent.id as ObjId;
 
-    // Convert properties to typed Values upfront
-    const typedProperties: Record<string, any> = {};
-    if (params.properties) {
-      for (const [key, value] of Object.entries(params.properties)) {
-        typedProperties[key] = this.toValue(value);
-      }
-    }
-
-    // Convert methods to proper format ({ code: string })
-    // Methods may be passed as plain strings or as { code: string, ... } objects
-    const wrappedMethods: Record<string, any> = {};
-    if (params.methods) {
-      for (const [name, method] of Object.entries(params.methods)) {
-        if (typeof method === 'string') {
-          wrappedMethods[name] = { code: method };
-        } else {
-          wrappedMethods[name] = method;
-        }
-      }
-    }
-
-    // Create object with all properties in one atomic operation
+    // Create bare object with just parent - properties/methods set via RuntimeObject
     const obj = await this.db.create({
       _id: id,
       parent: { type: 'objref', value: parentId },
-      properties: typedProperties,
-      methods: wrappedMethods,
+      properties: {},
+      methods: {},
     });
 
     const runtime = new RuntimeObjectImpl(obj, this);
     const proxy = runtime.getProxy();
     this.cache.setObject(id, proxy);
 
+    // Set properties via RuntimeObject (emits property.changed events)
+    if (params.properties) {
+      for (const [key, value] of Object.entries(params.properties)) {
+        proxy.set(key, value);
+      }
+    }
+
+    // Set methods via RuntimeObject (emits method.changed events)
+    if (params.methods) {
+      for (const [name, method] of Object.entries(params.methods)) {
+        if (typeof method === 'string') {
+          proxy.setMethod(name, method);
+        } else {
+          proxy.setMethod(name, method.code, {
+            callable: method.callable,
+            aliases: method.aliases,
+            help: method.help,
+          });
+        }
+      }
+    }
+
+    // Emit object.created after all properties/methods are set
+    this.emitChange({
+      type: 'object.created',
+      objectId: id,
+    });
+
     return proxy;
-  }
-
-  /**
-   * Convert a JavaScript value to a typed Value
-   * Duplicated from RuntimeObjectImpl for use in create()
-   */
-  private toValue(jsValue: any): any {
-    // Handle null
-    if (jsValue === null) {
-      return { type: 'null', value: null };
-    }
-
-    // Handle undefined (treat as null)
-    if (jsValue === undefined) {
-      return { type: 'null', value: null };
-    }
-
-    // Already a typed Value - return as-is to avoid double-wrapping
-    if (
-      jsValue &&
-      typeof jsValue === 'object' &&
-      'type' in jsValue &&
-      'value' in jsValue
-    ) {
-      const validTypes = [
-        'null',
-        'string',
-        'number',
-        'boolean',
-        'objref',
-        'array',
-        'object',
-      ];
-      if (validTypes.includes(jsValue.type)) {
-        return jsValue;
-      }
-    }
-
-    // Handle RuntimeObject (store as objref)
-    if (
-      jsValue &&
-      typeof jsValue === 'object' &&
-      'id' in jsValue &&
-      typeof jsValue.id === 'number'
-    ) {
-      return { type: 'objref', value: jsValue.id };
-    }
-
-    // Handle primitives
-    const jsType = typeof jsValue;
-
-    if (jsType === 'string') {
-      // Check for objref string format "#N" (e.g., "#5", "#123")
-      // This allows MCP and external systems to pass objrefs as strings
-      if (/^#\d+$/.test(jsValue)) {
-        const objId = parseInt(jsValue.slice(1), 10);
-        return { type: 'objref', value: objId };
-      }
-      return { type: 'string', value: jsValue };
-    }
-
-    if (jsType === 'number') {
-      return { type: 'number', value: jsValue };
-    }
-
-    if (jsType === 'boolean') {
-      return { type: 'boolean', value: jsValue };
-    }
-
-    // Handle arrays (recursively convert elements)
-    if (Array.isArray(jsValue)) {
-      return {
-        type: 'array',
-        value: jsValue.map((item) => this.toValue(item)),
-      };
-    }
-
-    // Handle objects (recursively convert properties)
-    if (jsType === 'object') {
-      const objValue: Record<string, any> = {};
-      for (const [key, val] of Object.entries(jsValue)) {
-        objValue[key] = this.toValue(val);
-      }
-      return { type: 'object', value: objValue };
-    }
-
-    // Fallback to null for unknown types
-    return { type: 'null', value: null };
   }
 
   /**
@@ -1603,5 +1538,22 @@ export class ObjectManager {
         return client.getStatus(sessionId);
       },
     };
+  }
+
+  /**
+   * Emit a change event (for DevTools sync)
+   * Called by RuntimeObject when methods/properties change
+   */
+  emitChange(event: ObjectChangeEvent): void {
+    this.changeEmitter.emit('change', event);
+  }
+
+  /**
+   * Subscribe to change events
+   * Used by DevTools server to broadcast notifications
+   */
+  onObjectChange(listener: (event: ObjectChangeEvent) => void): () => void {
+    this.changeEmitter.on('change', listener);
+    return () => this.changeEmitter.off('change', listener);
   }
 }
