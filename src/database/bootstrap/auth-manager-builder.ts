@@ -300,10 +300,15 @@ export class AuthManagerBuilder {
               return;
             }
 
-            // Hand off to CharGen
-            const chargen = $.charGen;
-            if (chargen) {
-              await chargen.onNewUser(context, state.username, password);
+            // Check if this is a Cartel recruit (connected via graycartel.com/descend)
+            const authInfo = context.getAuthInfo();
+            const chargenMode = authInfo?.metadata?.chargenMode;
+            
+            // Hand off to appropriate CharGen based on mode
+            if (chargenMode === 'cartel' && $.cartelCharGen) {
+              await $.cartelCharGen.onNewUser(context, state.username, password);
+            } else if ($.charGen) {
+              await $.charGen.onNewUser(context, state.username, password);
             } else {
               context.send('Character creation system not available.\\r\\n');
             }
