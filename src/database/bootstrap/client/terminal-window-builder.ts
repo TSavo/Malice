@@ -271,6 +271,9 @@ export class TerminalWindow extends Window {
 
     if (!command) return;
 
+    // Echo command to terminal
+    this._writeToTerminal(command + '\\\\r\\\\n');
+
     // Add to history if different from last
     if (this.history.length === 0 || this.history[this.history.length - 1] !== command) {
       this.history.push(command);
@@ -338,11 +341,9 @@ export class TerminalWindow extends Window {
    * Restore buffer from saved state
    */
   restoreBuffer(buffer) {
-    console.log('[TerminalWindow] restoreBuffer called, buffer length:', buffer?.length, 'terminal exists:', !!this.terminal);
     this.outputBuffer = buffer || '';
     if (this.terminal && this.outputBuffer) {
       this.terminal.write(this.outputBuffer);
-      console.log('[TerminalWindow] wrote buffer to terminal');
     }
   }
 

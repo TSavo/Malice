@@ -1045,6 +1045,10 @@ export class RuntimeObjectImpl implements RuntimeObject {
           parseFloat,
           isNaN,
           isFinite,
+          setTimeout,
+          setInterval,
+          clearTimeout,
+          clearInterval,
         };
 
         const AsyncFn = (async () => {}).constructor as FunctionConstructor;
@@ -1074,6 +1078,10 @@ export class RuntimeObjectImpl implements RuntimeObject {
           const parseFloat = ctx.parseFloat;
           const isNaN = ctx.isNaN;
           const isFinite = ctx.isFinite;
+          const setTimeout = ctx.setTimeout;
+          const setInterval = ctx.setInterval;
+          const clearTimeout = ctx.clearTimeout;
+          const clearInterval = ctx.clearInterval;
           const $load = $.load.bind($);
           const $create = $.create.bind($);
           const $query = $.query.bind($);
@@ -1126,6 +1134,10 @@ export class RuntimeObjectImpl implements RuntimeObject {
       parseFloat,
       isNaN,
       isFinite,
+      setTimeout,
+      setInterval,
+      clearTimeout,
+      clearInterval,
     };
 
     try {
@@ -1159,6 +1171,10 @@ export class RuntimeObjectImpl implements RuntimeObject {
         const parseFloat = ctx.parseFloat;
         const isNaN = ctx.isNaN;
         const isFinite = ctx.isFinite;
+        const setTimeout = ctx.setTimeout;
+        const setInterval = ctx.setInterval;
+        const clearTimeout = ctx.clearTimeout;
+        const clearInterval = ctx.clearInterval;
         const $load = $.load.bind($);
         const $create = $.create.bind($);
         const $query = $.query.bind($);

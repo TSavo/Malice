@@ -380,6 +380,184 @@ export class MinimalBootstrap {
       console.log(`✅ Created System object #${system.id}`);
     }
 
+    // Ensure processColors exists - shared color code processing utility
+    if (!system.hasMethod('processColors')) {
+      system.setMethod(
+        'processColors',
+        `
+        /** Process %{color} codes in text, converting to ANSI escape sequences.
+         *  Usage: const colored = await $system.processColors('%{green}Hello%{/}');
+         *  
+         *  Supported codes:
+         *  - Named colors: red, green, yellow, blue, magenta, cyan, white, gray
+         *  - Bright: brightred, brightgreen, etc.
+         *  - Styles: bold, dim, italic, underline, blink, reverse, strike
+         *  - Extended: orange, pink, purple, gold, coral, etc.
+         *  - Short forms: %{r}, %{g}, %{b}, %{B} (bold), etc.
+         *  - 256-color: %{123} (palette index 0-255)
+         *  - RGB: %{255,128,0} (true color)
+         *  - Reset: %{/} or %{reset}
+         *  - Background: bgred, bggreen, etc.
+         *  
+         *  @param text - Text with %{...} color codes
+         *  @param options - Optional { color: boolean } to strip codes if false
+         *  @returns Text with ANSI codes (or stripped if color disabled)
+         */
+        const text = args[0];
+        const options = args[1] || { color: true };
+        
+        if (!text || typeof text !== 'string') return text;
+        
+        const useColor = options.color !== false;
+
+        const colors = {
+          // Reset
+          '/': '\\x1b[0m',
+          'reset': '\\x1b[0m',
+
+          // Styles
+          'bold': '\\x1b[1m',
+          'dim': '\\x1b[2m',
+          'italic': '\\x1b[3m',
+          'underline': '\\x1b[4m',
+          'blink': '\\x1b[5m',
+          'reverse': '\\x1b[7m',
+          'hidden': '\\x1b[8m',
+          'strike': '\\x1b[9m',
+
+          // Standard foreground colors
+          'black': '\\x1b[30m',
+          'red': '\\x1b[31m',
+          'green': '\\x1b[32m',
+          'yellow': '\\x1b[33m',
+          'blue': '\\x1b[34m',
+          'magenta': '\\x1b[35m',
+          'cyan': '\\x1b[36m',
+          'white': '\\x1b[37m',
+          'gray': '\\x1b[90m',
+          'grey': '\\x1b[90m',
+
+          // Bright foreground colors
+          'brightblack': '\\x1b[90m',
+          'brightred': '\\x1b[91m',
+          'brightgreen': '\\x1b[92m',
+          'brightyellow': '\\x1b[93m',
+          'brightblue': '\\x1b[94m',
+          'brightmagenta': '\\x1b[95m',
+          'brightcyan': '\\x1b[96m',
+          'brightwhite': '\\x1b[97m',
+
+          // Background colors
+          'bgblack': '\\x1b[40m',
+          'bgred': '\\x1b[41m',
+          'bggreen': '\\x1b[42m',
+          'bgyellow': '\\x1b[43m',
+          'bgblue': '\\x1b[44m',
+          'bgmagenta': '\\x1b[45m',
+          'bgcyan': '\\x1b[46m',
+          'bgwhite': '\\x1b[47m',
+
+          // Bright background colors
+          'bgbrightblack': '\\x1b[100m',
+          'bgbrightred': '\\x1b[101m',
+          'bgbrightgreen': '\\x1b[102m',
+          'bgbrightyellow': '\\x1b[103m',
+          'bgbrightblue': '\\x1b[104m',
+          'bgbrightmagenta': '\\x1b[105m',
+          'bgbrightcyan': '\\x1b[106m',
+          'bgbrightwhite': '\\x1b[107m',
+
+          // Extended named colors (256-color palette)
+          'orange': '\\x1b[38;5;208m',
+          'pink': '\\x1b[38;5;213m',
+          'purple': '\\x1b[38;5;129m',
+          'brown': '\\x1b[38;5;94m',
+          'lime': '\\x1b[38;5;118m',
+          'teal': '\\x1b[38;5;30m',
+          'navy': '\\x1b[38;5;17m',
+          'maroon': '\\x1b[38;5;52m',
+          'olive': '\\x1b[38;5;58m',
+          'silver': '\\x1b[38;5;7m',
+          'gold': '\\x1b[38;5;220m',
+          'coral': '\\x1b[38;5;209m',
+          'salmon': '\\x1b[38;5;173m',
+          'violet': '\\x1b[38;5;177m',
+          'indigo': '\\x1b[38;5;54m',
+          'crimson': '\\x1b[38;5;160m',
+          'azure': '\\x1b[38;5;39m',
+          'aqua': '\\x1b[38;5;51m',
+          'turquoise': '\\x1b[38;5;80m',
+          'chartreuse': '\\x1b[38;5;118m',
+          'tan': '\\x1b[38;5;180m',
+          'khaki': '\\x1b[38;5;143m',
+          'lavender': '\\x1b[38;5;183m',
+          'plum': '\\x1b[38;5;96m',
+          'mint': '\\x1b[38;5;121m',
+          'peach': '\\x1b[38;5;217m',
+          'ivory': '\\x1b[38;5;230m',
+          'beige': '\\x1b[38;5;230m',
+          'hotpink': '\\x1b[38;5;206m',
+          'deeppink': '\\x1b[38;5;198m',
+          'skyblue': '\\x1b[38;5;117m',
+          'steelblue': '\\x1b[38;5;67m',
+          'forestgreen': '\\x1b[38;5;28m',
+          'seagreen': '\\x1b[38;5;78m',
+          'slategray': '\\x1b[38;5;66m',
+          'darkgray': '\\x1b[38;5;240m',
+          'lightgray': '\\x1b[38;5;250m',
+
+          // Short forms for foreground
+          'k': '\\x1b[30m', // black
+          'r': '\\x1b[31m',
+          'g': '\\x1b[32m',
+          'y': '\\x1b[33m',
+          'b': '\\x1b[34m',
+          'm': '\\x1b[35m',
+          'c': '\\x1b[36m',
+          'w': '\\x1b[37m',
+          'd': '\\x1b[90m', // dim/gray
+          'o': '\\x1b[38;5;208m', // orange
+          'p': '\\x1b[38;5;129m', // purple
+
+          // Short forms for styles
+          'B': '\\x1b[1m',  // bold
+          'D': '\\x1b[2m',  // dim
+          'I': '\\x1b[3m',  // italic
+          'U': '\\x1b[4m',  // underline
+          'R': '\\x1b[7m',  // reverse
+          'S': '\\x1b[9m',  // strikethrough
+        };
+
+        // Replace %{...} patterns
+        return text.replace(/%\\{([^}]+)\\}/g, (match, code) => {
+          if (!useColor) return ''; // Strip color codes
+
+          const lower = code.toLowerCase();
+
+          // Named color or short form
+          if (colors[code] || colors[lower]) {
+            return colors[code] || colors[lower];
+          }
+
+          // 256-color palette: %{123}
+          const num = parseInt(code, 10);
+          if (!isNaN(num) && num >= 0 && num <= 255) {
+            return '\\x1b[38;5;' + num + 'm';
+          }
+
+          // RGB true color: %{r,g,b}
+          const rgb = code.split(',').map(n => parseInt(n.trim(), 10));
+          if (rgb.length === 3 && rgb.every(n => !isNaN(n) && n >= 0 && n <= 255)) {
+            return '\\x1b[38;2;' + rgb[0] + ';' + rgb[1] + ';' + rgb[2] + 'm';
+          }
+
+          // Unknown - leave as-is
+          return match;
+        });
+        `,
+      );
+    }
+
     // Always ensure tickAllPlayers exists (may not exist on older systems)
     if (!system.hasMethod('tickAllPlayers')) {
       // Tick all online players (heartbeat)
@@ -407,6 +585,60 @@ export class MinimalBootstrap {
 
         return { tickedPlayers: results.length, results: results };
       `,
+      );
+    }
+
+    // Auth token storage for web pre-auth
+    if (!system.hasMethod('storeAuthToken')) {
+      system.setMethod(
+        'storeAuthToken',
+        `
+        /** Store a one-time auth token for web pre-authentication.
+         *  @param token - UUID token string
+         *  @param playerId - Player object ID
+         *  @param expiresAt - Timestamp when token expires
+         */
+        const token = args[0];
+        const playerId = args[1];
+        const expiresAt = args[2];
+
+        self.authTokens = self.authTokens || {};
+        self.authTokens[token] = { playerId, expiresAt };
+        `,
+      );
+    }
+
+    if (!system.hasMethod('validateAuthToken')) {
+      system.setMethod(
+        'validateAuthToken',
+        `
+        /** Validate and consume a one-time auth token.
+         *  @param token - Token to validate
+         *  @returns Player ID if valid, null otherwise
+         */
+        const token = args[0];
+
+        const tokens = self.authTokens || {};
+        const entry = tokens[token];
+
+        if (!entry) {
+          return null;
+        }
+
+        // Check expiration
+        if (Date.now() > entry.expiresAt) {
+          delete tokens[token];
+          self.authTokens = tokens;
+          return null;
+        }
+
+        // One-time use - delete after validation
+        const playerId = entry.playerId;
+        delete tokens[token];
+        self.authTokens = tokens;
+
+        return playerId;
+        `,
       );
     }
   }

@@ -67,6 +67,10 @@ export class PreAuthHandlerBuilder {
                 await self.handleCustom(context, authInfo.custom);
                 break;
 
+              case 'token':
+                await self.handleToken(context, authInfo.token);
+                break;
+
               default:
                 context.send(\`Unknown authentication mode: \${authInfo.mode}\\\\r\\\\n\`);
                 context.close();
@@ -278,6 +282,42 @@ export class PreAuthHandlerBuilder {
           context.send(\`Custom authentication type: \${custom.type}\\\\r\\\\n\`);
           context.send('Custom authentication not yet implemented\\\\r\\\\n');
           context.close();
+        `,
+    );
+
+    this.preAuthHandler.setMethod(
+      'handleToken',
+      `
+          const context = args[0];
+          const tokenInfo = args[1];
+
+          // Validate token against $system
+          const playerId = await $.system.validateAuthToken(tokenInfo.value);
+
+          if (!playerId) {
+            context.send('Invalid or expired token\\\\r\\\\n');
+            context.close();
+            return;
+          }
+
+          // Load player
+          const player = await $load(playerId);
+          if (!player) {
+            context.send('Player not found\\\\r\\\\n');
+            context.close();
+            return;
+          }
+
+          // Check if suspended
+          if (player.isSuspended) {
+            context.send('Your account has been suspended\\\\r\\\\n');
+            context.close();
+            return;
+          }
+
+          // Authenticate and connect (silent - no banner for web clients)
+          context.authenticate(player.id);
+          await player.connect(context);
         `,
     );
   }

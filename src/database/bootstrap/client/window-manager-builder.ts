@@ -443,6 +443,9 @@ export class WindowManager {
     const el = win.render();
     this.windowArea.appendChild(el);
 
+    // Apply initial maximized state if configured
+    win.applyInitialMaximized();
+
     // Add to tracking
     this.windows.set(config.windowId, win);
     this.zOrder.push(config.windowId);
@@ -496,7 +499,6 @@ export class WindowManager {
 
     // Save terminal state before closing
     if (win.windowType === 'terminal') {
-      console.log('[WM] closeWindow - saving terminal state, history:', win.history?.length, 'buffer:', win.outputBuffer?.length);
       this._savedTerminalHistory = win.history ? [...win.history] : [];
       this._savedTerminalBuffer = win.outputBuffer || '';
     }
@@ -732,18 +734,17 @@ export class WindowManager {
     // Use cascade placement
     const pos = this._getCascadePosition();
 
-    console.log('[WM] openTerminal - saved history:', this._savedTerminalHistory?.length, 'saved buffer:', this._savedTerminalBuffer?.length);
-
     await this.openWindow({
       windowId: id,
       windowType: 'terminal',
       title: 'Terminal',
       channel: 'game',
       config: {
-        x: pos.x,
-        y: pos.y,
+        x: 0,
+        y: 0,
         width: 800,
-        height: 500
+        height: 500,
+        maximized: true
       },
       restoreHistory: this._savedTerminalHistory?.length > 0 ? [...this._savedTerminalHistory] : null,
       restoreBuffer: this._savedTerminalBuffer || null

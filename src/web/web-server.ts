@@ -13,6 +13,7 @@
  * - MOO objects handle all the logic
  */
 
+import crypto from 'node:crypto';
 import Fastify from 'fastify';
 import type { ObjectManager } from '../database/object-manager.js';
 
@@ -54,25 +55,12 @@ export async function createWebServer(
     },
   );
 
-  // Authenticate HTTP Basic Auth
-  async function authenticate(
-    request: any,
-  ): Promise<{ player: any; isAdmin: boolean }> {
-    const authHeader = request.headers.authorization;
-
-    if (!authHeader || !authHeader.startsWith('Basic ')) {
-      return { player: null, isAdmin: false };
-    }
-
+  // Validate credentials and return player object
+  async function validateCredentials(
+    username: string,
+    password: string,
+  ): Promise<any | null> {
     try {
-      const base64Creds = authHeader.slice(6);
-      const credentials = Buffer.from(base64Creds, 'base64').toString('utf-8');
-      const [username, password] = credentials.split(':', 2);
-
-      if (!username || !password) {
-        return { player: null, isAdmin: false };
-      }
-
       const objectManager = await manager.load(0);
       const aliases =
         (objectManager?.get('aliases') as Record<string, number>) || {};
@@ -92,19 +80,48 @@ export async function createWebServer(
       });
 
       if (!userDoc) {
-        console.log('[WebAuth] User not found:', username);
-        return { player: null, isAdmin: false };
+        return null;
       }
 
       const player = await manager.load(userDoc._id);
       if (!player) {
-        console.log('[WebAuth] Failed to load player:', userDoc._id);
-        return { player: null, isAdmin: false };
+        return null;
       }
 
       const valid = (await player.call('checkPassword', password)) as boolean;
       if (!valid) {
-        console.log('[WebAuth] Invalid password for:', username);
+        return null;
+      }
+
+      return player;
+    } catch (err) {
+      console.error('[WebServer] Auth error:', err);
+      return null;
+    }
+  }
+
+  // Authenticate HTTP Basic Auth
+  async function authenticate(
+    request: any,
+  ): Promise<{ player: any; isAdmin: boolean }> {
+    const authHeader = request.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith('Basic ')) {
+      return { player: null, isAdmin: false };
+    }
+
+    try {
+      const base64Creds = authHeader.slice(6);
+      const credentials = Buffer.from(base64Creds, 'base64').toString('utf-8');
+      const [username, password] = credentials.split(':', 2);
+
+      if (!username || !password) {
+        return { player: null, isAdmin: false };
+      }
+
+      const player = await validateCredentials(username, password);
+      if (!player) {
+        console.log('[WebAuth] Auth failed for:', username);
         return { player: null, isAdmin: false };
       }
 
@@ -118,6 +135,39 @@ export async function createWebServer(
       return { player: null, isAdmin: false };
     }
   }
+
+  // POST /api/auth - Authenticate and return one-time token
+  app.post('/api/auth', async (request, reply) => {
+    try {
+      const body = request.body as { username?: string; password?: string };
+      const { username, password } = body || {};
+
+      if (!username || !password) {
+        return reply.code(400).send({ error: 'Username and password required' });
+      }
+
+      const player = await validateCredentials(username, password);
+      if (!player) {
+        return reply.code(401).send({ error: 'Invalid credentials' });
+      }
+
+      // Generate one-time token
+      const token = crypto.randomUUID();
+      const expiresAt = Date.now() + 60000; // 60 seconds
+
+      // Store token on $system
+      const system = manager.getAliases().get('system');
+      if (system) {
+        await system.call('storeAuthToken', token, player.id, expiresAt);
+      }
+
+      console.log('[WebAuth] Token issued for:', username);
+      return { token, expiresIn: 60 };
+    } catch (err) {
+      console.error('[WebServer] Auth API error:', err);
+      return reply.code(500).send({ error: 'Internal server error' });
+    }
+  });
 
   // All requests route through domain tree, then route tree
   app.all('*', async (request, reply) => {
