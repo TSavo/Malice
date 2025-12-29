@@ -405,7 +405,7 @@ export class WebsiteBuilder {
       landingTemplate.set('layout', landingTemplate.get('layout') as string);
     }
 
-    // Terminal Template
+    // Terminal Template - Windowed Desktop
     let terminalTemplate: RuntimeObject | null = null;
     if (aliases.terminalTemplate) {
       terminalTemplate = await this.manager.load(aliases.terminalTemplate);
@@ -423,91 +423,134 @@ export class WebsiteBuilder {
   <title>{{title}}</title>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/open-props">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body { height: 100%; overflow: hidden; background: #0a0a0a; }
-    #terminal { height: 100%; width: 100%; }
-    .xterm { height: 100%; }
-    #status {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      padding: 4px 12px;
-      border-radius: 4px;
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      background: #0a0a0a;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
-      z-index: 1000;
     }
-    .status-connecting { background: #f59e0b; color: #000; }
-    .status-connected { background: #00ff88; color: #000; }
-    .status-disconnected { background: #ff3366; color: #fff; }
+
+    /* Desktop container */
+    .malice-desktop {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      background: #0a0a0a;
+    }
+
+    /* Window area (excludes taskbar) */
+    #window-area {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Taskbar container */
+    #taskbar-container {
+      flex-shrink: 0;
+    }
+
+    /* Window flashing animation */
+    @keyframes window-flash {
+      0%, 100% { border-color: #333; }
+      50% { border-color: #00ff88; }
+    }
+    .malice-window.flashing {
+      animation: window-flash 0.5s ease-in-out 4;
+    }
+
+    /* Taskbar button flashing */
+    @keyframes taskbar-flash {
+      0%, 100% { background: #1a1a1a; }
+      50% { background: #00ff8833; }
+    }
   </style>
 </head>
 <body>
-  <div id="status" class="status-connecting">Connecting...</div>
-  <div id="terminal"></div>
+  <div class="malice-desktop">
+    <div id="window-area"></div>
+    <div id="taskbar-container"></div>
+  </div>
 
-  <script src="/js/malice-client.js"></script>
-  <script type="module">
-    import { Terminal } from 'https://cdn.jsdelivr.net/npm/xterm@5.3.0/+esm';
-    import { FitAddon } from 'https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.8.0/+esm';
-    import { WebLinksAddon } from 'https://cdn.jsdelivr.net/npm/xterm-addon-web-links@0.9.0/+esm';
-
-    const term = new Terminal({
-      theme: {
-        background: '#0a0a0a',
-        foreground: '#e0e0e0',
-        cursor: '#00ff88',
-        cursorAccent: '#0a0a0a',
-        selectionBackground: '#00ff8844',
-      },
-      fontFamily: "'JetBrains Mono', monospace",
-      fontSize: 14,
-      cursorBlink: true,
-      cursorStyle: 'block',
-      scrollback: 10000,
-    });
-
-    const fitAddon = new FitAddon();
-    const webLinksAddon = new WebLinksAddon();
-
-    term.loadAddon(fitAddon);
-    term.loadAddon(webLinksAddon);
-    term.open(document.getElementById('terminal'));
-    fitAddon.fit();
-
-    window.addEventListener('resize', () => {
-      fitAddon.fit();
-      if (window.client) window.client.sendResize();
-    });
-
-    // Connect to game server via multiplexed WebSocket
-    const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsPort = 8080;
-    const wsUrl = wsProtocol + '//' + location.hostname + ':' + wsPort + '/mux';
-
-    const client = new window.MaliceClient(wsUrl, term);
-    window.client = client; // Expose for debugging
-
-    // Terminal input goes to game channel
-    term.onData((data) => {
-      client.sendCommand(data);
-    });
-
-    // Focus terminal on click
-    document.getElementById('terminal').addEventListener('click', () => {
-      term.focus();
-    });
-
-    // Start connection
-    client.connect();
-    term.focus();
-  </script>
+  <script type="module" src="/js/desktop.js"></script>
 </body>
 </html>`,
         },
         methods: {},
       });
+    } else if (forceRebuild) {
+      // Update layout on force rebuild
+      terminalTemplate.set(
+        'layout',
+        `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{title}}</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/open-props">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      background: #0a0a0a;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Desktop container */
+    .malice-desktop {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      background: #0a0a0a;
+    }
+
+    /* Window area (excludes taskbar) */
+    #window-area {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Taskbar container */
+    #taskbar-container {
+      flex-shrink: 0;
+    }
+
+    /* Window flashing animation */
+    @keyframes window-flash {
+      0%, 100% { border-color: #333; }
+      50% { border-color: #00ff88; }
+    }
+    .malice-window.flashing {
+      animation: window-flash 0.5s ease-in-out 4;
+    }
+
+    /* Taskbar button flashing */
+    @keyframes taskbar-flash {
+      0%, 100% { background: #1a1a1a; }
+      50% { background: #00ff8833; }
+    }
+  </style>
+</head>
+<body>
+  <div class="malice-desktop">
+    <div id="window-area"></div>
+    <div id="taskbar-container"></div>
+  </div>
+
+  <script type="module" src="/js/desktop.js"></script>
+</body>
+</html>`,
+      );
     }
 
     // Doc Template
