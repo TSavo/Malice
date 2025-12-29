@@ -101,7 +101,7 @@ export class RecyclerBuilder {
 
           // Set creation metadata
           if (!params.properties.createdAt) {
-            params.properties.createdAt = new Date();
+            params.properties.createdAt = new Date().toISOString();
           }
 
           if (caller && !params.properties.createdBy) {

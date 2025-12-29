@@ -1,5 +1,5 @@
 // Auto-generated from MongoDB - DO NOT EDIT
-// Generated: 2025-12-29T16:38:28.462Z
+// Generated: 2025-12-29T17:57:30.936Z
 
 /**
  * Runtime object wrapper
@@ -4465,6 +4465,9 @@ interface MaliceObject_286 {
   _mcp_exec_1767025628755(...args: any[]): Promise<any>;
   _mcp_exec_1767026146804(...args: any[]): Promise<any>;
   _mcp_exec_1767026157906(...args: any[]): Promise<any>;
+  _mcp_exec_1767026411778(...args: any[]): Promise<any>;
+  _mcp_exec_1767026515778(...args: any[]): Promise<any>;
+  _mcp_exec_1767026524305(...args: any[]): Promise<any>;
   execute(...args: any[]): Promise<any>;
   getToolSchema(...args: any[]): Promise<any>;
   listTools(...args: any[]): Promise<any>;
