@@ -188,6 +188,9 @@ export interface RuntimeObject {
   /** Get all own methods */
   getOwnMethods(): Record<string, Method>;
 
+  /** Get local method code (does not walk inheritance chain) */
+  getMethod(name: string): string | null;
+
   /** Get the raw GameObject (for internal use) */
   _getRaw(): GameObject;
 

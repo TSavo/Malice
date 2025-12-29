@@ -374,8 +374,13 @@ export class SpeedloaderBuilder {
  */
 export class MagazinePrototypesBuilder {
   static readonly aliases = [
-    'pistolMagazine', 'extendedMagazine', 'm1911Magazine',
-    'rifleMagazine', 'smgMagazine', 'mac10Magazine', 'speedloader',
+    'pistolMagazine',
+    'extendedMagazine',
+    'm1911Magazine',
+    'rifleMagazine',
+    'smgMagazine',
+    'mac10Magazine',
+    'speedloader',
   ] as const;
   static readonly parent = 'magazine';
 

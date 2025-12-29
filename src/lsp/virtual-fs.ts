@@ -265,7 +265,9 @@ export class VirtualFileSystem {
     const argUsage = methodCode.match(/args\[(\d+)\]/g);
     if (argUsage) {
       const maxArg = Math.max(
-        ...argUsage.map((match) => parseInt(match.match(/\d+/)?.[0], 10)),
+        ...argUsage.map((match) =>
+          parseInt(match.match(/\d+/)?.[0] ?? '0', 10),
+        ),
       );
       if (maxArg >= args.length) {
         // Add generic args for additional parameters

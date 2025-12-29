@@ -1,7 +1,7 @@
 import type { RuntimeObject } from '../../../types/object.js';
 import type { ObjectManager } from '../object-manager.js';
-import * as Builders from './prototypes/index.js';
 import { CashBuilder } from './cash-builder.js';
+import * as Builders from './prototypes/index.js';
 
 /**
  * Interface for builders with self-declared metadata
@@ -9,8 +9,13 @@ import { CashBuilder } from './cash-builder.js';
 interface SinglePrototypeBuilder {
   readonly alias: string;
   readonly parent: string;
-  new (manager: ObjectManager): {
-    build(parentId: number, existingObj?: RuntimeObject): Promise<RuntimeObject>;
+  new (
+    manager: ObjectManager,
+  ): {
+    build(
+      parentId: number,
+      existingObj?: RuntimeObject,
+    ): Promise<RuntimeObject>;
   };
 }
 
@@ -20,7 +25,9 @@ interface SinglePrototypeBuilder {
 interface CompoundPrototypeBuilder {
   readonly aliases: readonly string[];
   readonly parent: string;
-  new (manager: ObjectManager): {
+  new (
+    manager: ObjectManager,
+  ): {
     buildAll(parentId: number): Promise<Record<string, RuntimeObject>>;
   };
 }
@@ -59,7 +66,10 @@ export class PrototypeOrchestrator {
     }
 
     const existingAliases =
-      (objectManager.get('aliases') as Record<string, number | Record<string, number>>) || {};
+      (objectManager.get('aliases') as Record<
+        string,
+        number | Record<string, number>
+      >) || {};
 
     const builders = this.discoverBuilders();
     const sorted = this.topoSort(builders);
@@ -80,7 +90,7 @@ export class PrototypeOrchestrator {
 
       if (parentId === undefined) {
         throw new Error(
-          `Parent '${parentAlias}' not found for '${isSingleBuilder(BuilderClass) ? BuilderClass.alias : BuilderClass.aliases.join(', ')}'`
+          `Parent '${parentAlias}' not found for '${isSingleBuilder(BuilderClass) ? BuilderClass.alias : BuilderClass.aliases.join(', ')}'`,
         );
       }
 
@@ -102,7 +112,9 @@ export class PrototypeOrchestrator {
         for (const [name, obj] of Object.entries(results)) {
           aliases[name] = obj.id;
         }
-        console.log(`  ✓ ${BuilderClass.aliases.length} ${parentAlias} subtypes`);
+        console.log(
+          `  ✓ ${BuilderClass.aliases.length} ${parentAlias} subtypes`,
+        );
       } else {
         // Single builder
         if (aliases[BuilderClass.alias]) {
@@ -123,7 +135,9 @@ export class PrototypeOrchestrator {
     }
 
     await this.registerAllAliases(aliases, objectManager);
-    console.log(`✅ Registered ${Object.keys(aliases).length} prototype aliases`);
+    console.log(
+      `✅ Registered ${Object.keys(aliases).length} prototype aliases`,
+    );
   }
 
   /**
@@ -137,7 +151,10 @@ export class PrototypeOrchestrator {
     }
 
     const aliases =
-      (objectManager.get('aliases') as Record<string, number | Record<string, number>>) || {};
+      (objectManager.get('aliases') as Record<
+        string,
+        number | Record<string, number>
+      >) || {};
 
     const builders = this.discoverBuilders();
     console.log('🔧 Rebuilding prototype methods...');
@@ -229,10 +246,13 @@ export class PrototypeOrchestrator {
    */
   private async registerAllAliases(
     aliases: Record<string, number>,
-    objectManager: RuntimeObject
+    objectManager: RuntimeObject,
   ): Promise<void> {
     const existing =
-      (objectManager.get('aliases') as Record<string, number | Record<string, number>>) || {};
+      (objectManager.get('aliases') as Record<
+        string,
+        number | Record<string, number>
+      >) || {};
 
     // Merge scalar aliases
     for (const [key, value] of Object.entries(aliases)) {

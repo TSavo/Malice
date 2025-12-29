@@ -67,7 +67,7 @@ This is the correct architecture for a MOO because:
 ### Layer 1: TypeScript Core (Minimal)
 
 **ONLY these things:**
-- WebSocket/Telnet transport
+- WebSocket/Telnet transport (including multiplexed channels)
 - MongoDB connection and queries
 - Object database (ObjectManager, RuntimeObject)
 - Change stream subscription
@@ -79,6 +79,24 @@ This is the correct architecture for a MOO because:
 - Prototypes (belongs in Layer 2)
 - Utilities (belongs in Layer 2)
 - Calculations (belongs in Layer 2)
+
+#### Transport Layer
+
+The transport layer handles connections from various clients:
+
+| Transport | Port | Purpose |
+|-----------|------|---------|
+| Telnet | 5555 | Traditional MUD clients |
+| SSH | 5556 | Secure terminal connections |
+| WebSocket `/` | 8080 | Simple web terminals (raw text) |
+| WebSocket `/mux` | 8080 | Rich web clients (multiplexed channels) |
+
+The **multiplexed transport** (`/mux`) provides out-of-band channels for state updates, control signals, and custom data. See [Transport](./transport.md) for details.
+
+Channel methods are exposed as MOO code on:
+- `$player` - `state()`, `ctrl()`, `channel()`
+- `$location` - `broadcastState()`, `broadcastCtrl()`, `broadcastChannel()`
+- `$` - `broadcastState()`, `broadcastCtrl()`, `broadcastChannel()`
 
 ### Layer 2: Bootstrap Code (Foundational)
 
@@ -193,3 +211,4 @@ Players CANNOT see the database and don't know mystery meat has radiation.
 
 - [Core Concepts](./core-concepts.md) - Objects, properties, methods
 - [Best Practices](./best-practices.md) - The Golden Rule
+- [Transport](./transport.md) - Multiplexed channels and wire protocol

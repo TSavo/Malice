@@ -304,8 +304,15 @@ export class Ammo12GaugeBuilder {
  */
 export class AmmoPrototypesBuilder {
   static readonly aliases = [
-    'ammo9mm', 'ammo38', 'ammo44', 'ammo45', 'ammo22', 'ammo380',
-    'ammo308', 'ammo3030', 'ammo12gauge',
+    'ammo9mm',
+    'ammo38',
+    'ammo44',
+    'ammo45',
+    'ammo22',
+    'ammo380',
+    'ammo308',
+    'ammo3030',
+    'ammo12gauge',
   ] as const;
   static readonly parent = 'ammo';
 

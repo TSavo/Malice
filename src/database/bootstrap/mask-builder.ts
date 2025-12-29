@@ -204,7 +204,6 @@ REJECTION: May reject hostile entities per Pluribus authorization.`,
       return output + pluribusPresence;
     `,
     );
-
   }
 
   private addSensoryHookMethods(obj: RuntimeObject): void {

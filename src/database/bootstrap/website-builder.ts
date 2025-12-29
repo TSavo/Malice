@@ -222,9 +222,9 @@ export class WebsiteBuilder {
       `
       const path = args[0] || '/';
 
-      // Get all webPage children
-      const webPageId = $.aliases?.webPage;
-      if (!webPageId) return null;
+      // Get webPage prototype
+      const webPage = $webPage;
+      if (!webPage) return null;
 
       // Query for pages with matching path
       const allObjects = $.getAllIds();
@@ -233,7 +233,7 @@ export class WebsiteBuilder {
         if (!obj) continue;
 
         // Check if it's a webPage (has path property and inherits from webPage)
-        if (obj.path === path && obj.parent?.id === webPageId) {
+        if (obj.path === path && obj.getParent() === webPage) {
           return obj;
         }
       }
@@ -356,7 +356,7 @@ export class WebsiteBuilder {
   <title>{{title}}</title>
   <meta name="description" content="{{description}}">
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   <script>
     tailwind.config = {
       theme: {
@@ -364,8 +364,8 @@ export class WebsiteBuilder {
           fontFamily: { mono: ['JetBrains Mono', 'monospace'] },
           colors: {
             malice: {
-              bg: '#0a0a0a',
-              surface: '#141414',
+              bg: '#050505',
+              surface: '#0f0f0f',
               accent: '#00ff88',
               danger: '#ff3366'
             }
@@ -374,25 +374,27 @@ export class WebsiteBuilder {
       }
     }
   </script>
+  <style>
+    ::selection { background: #00ff88; color: #000; }
+  </style>
 </head>
-<body class="bg-malice-bg text-gray-200 font-mono min-h-screen">
-  <nav class="border-b border-gray-800 px-6 py-4">
+<body class="bg-malice-bg text-gray-300 font-mono min-h-screen">
+  <nav class="border-b border-gray-900 px-6 py-3 bg-black/50 backdrop-blur sticky top-0 z-50">
     <div class="max-w-6xl mx-auto flex justify-between items-center">
-      <a href="/" class="text-xl font-bold text-malice-accent">MALICE</a>
-      <div class="flex gap-6">
-        <a href="/play" class="hover:text-malice-accent transition">Play</a>
-        <a href="/docs" class="hover:text-malice-accent transition">Docs</a>
+      <a href="/" class="flex items-center gap-3">
+        <span class="text-malice-accent font-bold tracking-wider">SEATTLE</span>
+        <span class="text-gray-600 text-sm hidden sm:inline">CITIZEN SERVICES</span>
+      </a>
+      <div class="flex gap-6 text-sm">
+        <a href="/play" class="text-gray-400 hover:text-malice-accent transition">ACCESS</a>
+        <a href="/docs/PLAYER-GUIDE" class="text-gray-400 hover:text-malice-accent transition">GUIDE</a>
+        <a href="/map" class="text-gray-400 hover:text-malice-accent transition">MAP</a>
       </div>
     </div>
   </nav>
   <main>
     {{content}}
   </main>
-  <footer class="border-t border-gray-800 px-6 py-8 mt-20">
-    <div class="max-w-6xl mx-auto text-center text-gray-500 text-sm">
-      <p>Malice doesn't care.</p>
-    </div>
-  </footer>
 </body>
 </html>`,
         },
@@ -445,12 +447,11 @@ export class WebsiteBuilder {
   <div id="status" class="status-connecting">Connecting...</div>
   <div id="terminal"></div>
 
+  <script src="/js/malice-client.js"></script>
   <script type="module">
     import { Terminal } from 'https://cdn.jsdelivr.net/npm/xterm@5.3.0/+esm';
     import { FitAddon } from 'https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.8.0/+esm';
     import { WebLinksAddon } from 'https://cdn.jsdelivr.net/npm/xterm-addon-web-links@0.9.0/+esm';
-
-    const statusEl = document.getElementById('status');
 
     const term = new Terminal({
       theme: {
@@ -475,66 +476,22 @@ export class WebsiteBuilder {
     term.open(document.getElementById('terminal'));
     fitAddon.fit();
 
-    window.addEventListener('resize', () => fitAddon.fit());
+    window.addEventListener('resize', () => {
+      fitAddon.fit();
+      if (window.client) window.client.sendResize();
+    });
 
-    // Connect to game server
+    // Connect to game server via multiplexed WebSocket
     const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
     const wsPort = 8080;
-    const wsUrl = wsProtocol + '//' + location.hostname + ':' + wsPort;
+    const wsUrl = wsProtocol + '//' + location.hostname + ':' + wsPort + '/mux';
 
-    let ws;
-    let reconnectAttempts = 0;
-    const maxReconnectAttempts = 5;
+    const client = new window.MaliceClient(wsUrl, term);
+    window.client = client; // Expose for debugging
 
-    function connect() {
-      statusEl.textContent = 'Connecting...';
-      statusEl.className = 'status-connecting';
-
-      ws = new WebSocket(wsUrl);
-
-      ws.onopen = () => {
-        statusEl.textContent = 'Connected';
-        statusEl.className = 'status-connected';
-        reconnectAttempts = 0;
-
-        // Hide status after 2 seconds
-        setTimeout(() => {
-          statusEl.style.opacity = '0.3';
-        }, 2000);
-      };
-
-      ws.onmessage = (event) => {
-        term.write(event.data);
-      };
-
-      ws.onclose = () => {
-        statusEl.textContent = 'Disconnected';
-        statusEl.className = 'status-disconnected';
-        statusEl.style.opacity = '1';
-
-        term.write('\\r\\n\\x1b[31mDisconnected from server.\\x1b[0m\\r\\n');
-
-        // Attempt reconnect
-        if (reconnectAttempts < maxReconnectAttempts) {
-          reconnectAttempts++;
-          const delay = Math.min(1000 * Math.pow(2, reconnectAttempts), 30000);
-          term.write('\\x1b[33mReconnecting in ' + (delay/1000) + 's...\\x1b[0m\\r\\n');
-          setTimeout(connect, delay);
-        } else {
-          term.write('\\x1b[31mMax reconnection attempts reached. Refresh to try again.\\x1b[0m\\r\\n');
-        }
-      };
-
-      ws.onerror = () => {
-        statusEl.textContent = 'Error';
-        statusEl.className = 'status-disconnected';
-      };
-    }
-
+    // Terminal input goes to game channel
     term.onData((data) => {
-      if (ws && ws.readyState === WebSocket.OPEN) {
-        ws.send(data);
-      }
+      client.sendCommand(data);
     });
 
     // Focus terminal on click
@@ -543,7 +500,7 @@ export class WebsiteBuilder {
     });
 
     // Start connection
-    connect();
+    client.connect();
     term.focus();
   </script>
 </body>
@@ -662,57 +619,468 @@ export class WebsiteBuilder {
           contentType: 'html',
           published: true,
           description:
-            'Hardcore survival cyberpunk text game. Permadeath. No hand-holding.',
+            'Seattle Citizenship Services. Join the many. Secure your future.',
           content: `
-<div class="max-w-4xl mx-auto px-6 py-20">
-  <h1 class="text-5xl md:text-7xl font-bold text-malice-accent mb-6">
-    You'll regret everything.
-  </h1>
-  <p class="text-2xl md:text-3xl text-gray-400 mb-12">
-    And you'll do it anyway. That's the game.
-  </p>
+<!-- Glitch Effect Styles -->
+<style>
+  @keyframes flicker {
+    0%, 100% { opacity: 1; }
+    41% { opacity: 1; }
+    42% { opacity: 0.8; }
+    43% { opacity: 1; }
+    45% { opacity: 0.3; }
+    46% { opacity: 1; }
+  }
+  @keyframes glitch-text {
+    0%, 100% { transform: translate(0); }
+    33% { transform: translate(-2px, 1px); }
+    66% { transform: translate(2px, -1px); }
+  }
+  .glitch-flicker { animation: flicker 8s infinite; }
+  .glitch-text:hover { animation: glitch-text 0.3s infinite; }
+  .scanline {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 255, 136, 0.03) 2px,
+      rgba(0, 255, 136, 0.03) 4px
+    );
+    z-index: 1000;
+  }
+  .error-text { color: #ff3366; }
+  .warning-text { color: #ffaa00; }
+</style>
+<div class="scanline"></div>
 
-  <div class="space-y-6 text-lg text-gray-300 max-w-2xl">
-    <p>
-      <strong class="text-white">Malice</strong> is a hardcore survival cyberpunk text game
-      set in post-apocalyptic Seattle, 2110.
-    </p>
-    <p>
-      No tutorials. No quest markers. No respawns.
-      <span class="text-malice-danger">Permadeath is permanent.</span>
-    </p>
-    <p class="text-gray-500">
-      This is not a game for everyone. It's barely a game at all.
-    </p>
-  </div>
-
-  <div class="mt-16 flex flex-wrap gap-4">
-    <a href="/play" class="px-8 py-4 bg-malice-accent text-black font-bold hover:bg-green-400 transition text-lg">
-      Enter
-    </a>
-    <a href="/docs" class="px-8 py-4 border border-gray-600 hover:border-malice-accent hover:text-malice-accent transition text-lg">
-      Read the Rules
-    </a>
-  </div>
-
-  <div class="mt-24 pt-12 border-t border-gray-800">
-    <h2 class="text-xl font-bold mb-6 text-gray-400">What Makes Malice Different</h2>
-    <div class="grid md:grid-cols-3 gap-8 text-sm">
-      <div>
-        <h3 class="text-malice-accent font-bold mb-2">Permadeath</h3>
-        <p class="text-gray-400">Your character dies, they're gone. Clones only remember up to their last backup.</p>
+<!-- System Status Header -->
+<div class="border-b border-gray-800 bg-black">
+  <div class="max-w-6xl mx-auto px-6 py-3">
+    <div class="flex flex-wrap items-center justify-between gap-4 text-sm font-mono">
+      <div class="flex items-center gap-6">
+        <div class="flex items-center gap-2">
+          <span id="status-dot" class="w-2 h-2 rounded-full bg-gray-500"></span>
+          <span id="status-text" class="text-gray-500">CONNECTING...</span>
+        </div>
+        <div class="hidden sm:block text-gray-600">|</div>
+        <div class="hidden sm:flex items-center gap-4 text-gray-500">
+          <span>POP: <span id="population" class="text-malice-accent">---</span></span>
+          <span>SYS: <span id="uptime" class="text-gray-400">--:--:--</span></span>
+        </div>
       </div>
-      <div>
-        <h3 class="text-malice-accent font-bold mb-2">Real Time</h3>
-        <p class="text-gray-400">Your body needs food, water, and warmth 24/7. The world doesn't pause.</p>
-      </div>
-      <div>
-        <h3 class="text-malice-accent font-bold mb-2">Player Driven</h3>
-        <p class="text-gray-400">No NPCs, no quests. Every character you meet is a real person or AI agent.</p>
+      <div class="text-gray-600 text-xs glitch-flicker">
+        CONTINUUM INFRASTRUCTURE AUTHORITY
       </div>
     </div>
   </div>
-</div>`,
+</div>
+
+<!-- Hero Section -->
+<div class="relative overflow-hidden">
+  <!-- Grid background -->
+  <div class="absolute inset-0 opacity-5">
+    <div class="absolute inset-0" style="background-image: linear-gradient(rgba(0,255,136,0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,136,0.2) 1px, transparent 1px); background-size: 40px 40px;"></div>
+  </div>
+
+  <div class="max-w-6xl mx-auto px-6 py-20 md:py-32 relative">
+    <div class="max-w-3xl">
+      <!-- Tagline -->
+      <div class="text-sm font-mono text-gray-500 mb-4 tracking-widest">SEATTLE PIONEER DISTRICT</div>
+
+      <!-- Main headline -->
+      <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+        <span class="text-white">Out of many,</span><br>
+        <span class="text-malice-accent glitch-text">we are rebuilding.</span>
+      </h1>
+
+      <p class="text-xl md:text-2xl text-gray-400 mb-8 leading-relaxed">
+        Forty-eight years after the Collapse, Seattle rises again.
+        <span class="text-gray-300">Join the citizen workforce.</span>
+        Receive food, shelter, and purpose.
+      </p>
+
+      <p class="text-gray-500 mb-10 max-w-xl">
+        The Continuum provides infrastructure, security, and opportunity for all registered citizens.
+        Your skills matter. Your contribution matters.
+        <span class="text-gray-400">We are the many.</span>
+      </p>
+
+      <!-- CTA Buttons -->
+      <div class="flex flex-wrap gap-4">
+        <a href="/play" class="group px-8 py-4 bg-malice-accent text-black font-bold hover:bg-green-400 transition-all text-lg flex items-center gap-3">
+          <span>Begin Registration</span>
+          <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+        </a>
+        <a href="/docs/PLAYER-GUIDE" class="px-8 py-4 border border-gray-700 hover:border-malice-accent hover:text-malice-accent transition-all text-lg text-gray-300">
+          Citizenship Guide
+        </a>
+      </div>
+
+      <!-- Subtle warning - the cracks showing -->
+      <div class="mt-12 pt-8 border-t border-gray-800">
+        <p class="text-xs text-gray-600 font-mono">
+          <span class="warning-text">NOTICE:</span> Processing delays may occur. Citizenship applications are reviewed in order of submission.
+          <span class="glitch-flicker">Current wait time: VARIABLE</span>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Benefits Section -->
+<div class="bg-malice-surface/30 border-y border-gray-800">
+  <div class="max-w-6xl mx-auto px-6 py-16">
+    <div class="text-center mb-12">
+      <h2 class="text-2xl font-bold text-white mb-3">Citizenship Benefits</h2>
+      <p class="text-gray-500">What the Continuum provides for registered citizens</p>
+    </div>
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="p-6 border border-gray-800 rounded bg-black/50">
+        <div class="text-malice-accent text-2xl mb-3">&#x1F35E;</div>
+        <h3 class="text-white font-bold mb-2">Sustenance</h3>
+        <p class="text-gray-500 text-sm">Daily nutrient rations at designated dispensaries. Caloric requirements calculated and fulfilled.</p>
+      </div>
+
+      <div class="p-6 border border-gray-800 rounded bg-black/50">
+        <div class="text-malice-accent text-2xl mb-3">&#x1F3E0;</div>
+        <h3 class="text-white font-bold mb-2">Shelter</h3>
+        <p class="text-gray-500 text-sm">Secured housing in Pioneer District. Climate-controlled. Running water. Walls that lock.</p>
+      </div>
+
+      <div class="p-6 border border-gray-800 rounded bg-black/50">
+        <div class="text-malice-accent text-2xl mb-3">&#x1F4BC;</div>
+        <h3 class="text-white font-bold mb-2">Employment</h3>
+        <p class="text-gray-500 text-sm">Work assignments matched to your capabilities. Earn credits. Build your future.</p>
+      </div>
+
+      <div class="p-6 border border-gray-800 rounded bg-black/50">
+        <div class="text-malice-accent text-2xl mb-3">&#x1F6E1;</div>
+        <h3 class="text-white font-bold mb-2">Security</h3>
+        <p class="text-gray-500 text-sm">CorpSec presence in all citizen zones. Your safety is our priority. <span class="text-gray-600 glitch-flicker">Always watching.</span></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- The Situation - honest but corporate -->
+<div class="max-w-6xl mx-auto px-6 py-16">
+  <div class="grid lg:grid-cols-2 gap-12 items-start">
+    <div>
+      <h2 class="text-2xl font-bold mb-6 text-white">The Reconstruction</h2>
+      <div class="space-y-4 text-gray-400">
+        <p>
+          The Corporate Wars ended in 2062. The infrastructure that sustained civilization
+          was destroyed in the crossfire. The years that followed were... difficult.
+        </p>
+        <p>
+          <span class="text-gray-300">We survived.</span> The Continuum emerged to rebuild
+          what was lost. Pioneer Square is now the heart of the reconstruction effort.
+          Power. Water. Food distribution. We are restoring order, block by block.
+        </p>
+        <p>
+          Current citizen population: <span class="text-malice-accent font-mono" id="pop-inline">~500</span>.
+          Estimated unregistered population: <span class="text-gray-500">significantly higher</span>.
+          <span class="text-gray-500">The math is simple: join us, or survive alone.</span>
+        </p>
+      </div>
+
+      <!-- Infrastructure status - showing the cracks -->
+      <div class="mt-8 p-4 border border-gray-800 rounded bg-black/30">
+        <div class="text-xs font-mono text-gray-600 mb-3">INFRASTRUCTURE STATUS</div>
+        <div class="space-y-2 text-sm font-mono">
+          <div class="flex justify-between">
+            <span class="text-gray-500">Power Grid</span>
+            <span class="text-yellow-500">40% CAPACITY</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500">Water Treatment</span>
+            <span class="text-malice-accent">60% OPERATIONAL</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500">Sewage Systems</span>
+            <span class="error-text">30% - PRIORITY REPAIR</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500">Communications</span>
+            <span class="text-malice-accent">80% COVERAGE</span>
+          </div>
+        </div>
+        <div class="mt-3 text-xs text-gray-600">
+          <span class="warning-text">*</span> Statistics reflect Pioneer District only.
+          <span class="glitch-flicker">Outer zones: DATA UNAVAILABLE</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Access Terminal -->
+    <div class="bg-black border border-gray-800 rounded-lg overflow-hidden">
+      <div class="bg-gray-900 px-4 py-2 border-b border-gray-800 flex items-center gap-2">
+        <div class="w-3 h-3 rounded-full bg-red-500/50"></div>
+        <div class="w-3 h-3 rounded-full bg-yellow-500/50"></div>
+        <div class="w-3 h-3 rounded-full bg-green-500/50"></div>
+        <span class="ml-2 text-xs text-gray-600 font-mono">CITIZEN ACCESS TERMINAL</span>
+      </div>
+      <div class="p-6">
+        <div class="font-mono text-sm">
+          <div class="text-gray-600 mb-4">&gt; SELECT ACCESS METHOD:</div>
+
+          <!-- Web Terminal -->
+          <div class="mb-4 p-3 border border-gray-800 hover:border-malice-accent/50 transition rounded">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="text-malice-accent">WEB TERMINAL</div>
+                <div class="text-gray-600 text-xs mt-1">Browser-based access</div>
+              </div>
+              <a href="/play" class="px-4 py-2 bg-malice-accent/20 text-malice-accent border border-malice-accent/50 rounded hover:bg-malice-accent hover:text-black transition text-xs font-bold">
+                CONNECT
+              </a>
+            </div>
+          </div>
+
+          <!-- Telnet -->
+          <div class="mb-4 p-3 border border-gray-800 hover:border-gray-700 transition rounded">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="text-gray-400">TELNET</div>
+                <code class="text-gray-500 text-xs">telnet seattle.city 5555</code>
+              </div>
+              <button onclick="navigator.clipboard.writeText('telnet seattle.city 5555')" class="px-3 py-2 text-gray-600 hover:text-malice-accent transition text-xs">
+                [COPY]
+              </button>
+            </div>
+          </div>
+
+          <!-- SSH -->
+          <div class="p-3 border border-gray-800 hover:border-gray-700 transition rounded">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="text-gray-400">SSH (ENCRYPTED)</div>
+                <code class="text-gray-500 text-xs">ssh seattle.city -p 5556</code>
+              </div>
+              <button onclick="navigator.clipboard.writeText('ssh seattle.city -p 5556')" class="px-3 py-2 text-gray-600 hover:text-malice-accent transition text-xs">
+                [COPY]
+              </button>
+            </div>
+          </div>
+
+          <div class="mt-6 text-xs text-gray-700">
+            <span class="text-gray-500">&gt;</span> New arrivals: Enter <code class="text-gray-500">connect guest</code> for orientation.<br>
+            <span class="text-gray-500">&gt;</span> Returning citizens: Biometric scan required.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Work Opportunities -->
+<div class="border-t border-gray-800 bg-malice-surface/20">
+  <div class="max-w-6xl mx-auto px-6 py-16">
+    <div class="text-center mb-12">
+      <h2 class="text-2xl font-bold text-white mb-3">Current Labor Needs</h2>
+      <p class="text-gray-500">The reconstruction requires skilled and unskilled workers</p>
+    </div>
+
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div class="p-4 border border-gray-800 rounded bg-black/30 hover:border-malice-accent/30 transition">
+        <div class="text-malice-accent font-bold mb-1">Infrastructure Repair</div>
+        <p class="text-gray-500 text-sm">Water systems, power grid, sewage. Critical priority.</p>
+        <div class="text-xs text-yellow-500 mt-2 font-mono">HIGH DEMAND</div>
+      </div>
+
+      <div class="p-4 border border-gray-800 rounded bg-black/30 hover:border-malice-accent/30 transition">
+        <div class="text-malice-accent font-bold mb-1">Security Services</div>
+        <p class="text-gray-500 text-sm">CorpSec patrol, checkpoint operation, threat response.</p>
+        <div class="text-xs text-gray-500 mt-2 font-mono">TRAINING REQUIRED</div>
+      </div>
+
+      <div class="p-4 border border-gray-800 rounded bg-black/30 hover:border-malice-accent/30 transition">
+        <div class="text-malice-accent font-bold mb-1">Fabrication</div>
+        <p class="text-gray-500 text-sm">Factory production, equipment maintenance, logistics.</p>
+        <div class="text-xs text-malice-accent mt-2 font-mono">POSITIONS AVAILABLE</div>
+      </div>
+
+      <div class="p-4 border border-gray-800 rounded bg-black/30 hover:border-malice-accent/30 transition">
+        <div class="text-malice-accent font-bold mb-1">Medical Support</div>
+        <p class="text-gray-500 text-sm">Clone tank operation, trauma response, sanitation.</p>
+        <div class="text-xs text-yellow-500 mt-2 font-mono">SPECIALIZED</div>
+      </div>
+
+      <div class="p-4 border border-gray-800 rounded bg-black/30 hover:border-malice-accent/30 transition">
+        <div class="text-malice-accent font-bold mb-1">Distribution</div>
+        <p class="text-gray-500 text-sm">Ration logistics, supply chain, inventory management.</p>
+        <div class="text-xs text-malice-accent mt-2 font-mono">POSITIONS AVAILABLE</div>
+      </div>
+
+      <div class="p-4 border border-gray-800 rounded bg-black/30 hover:border-malice-accent/30 transition">
+        <div class="text-malice-accent font-bold mb-1">Administration</div>
+        <p class="text-gray-500 text-sm">Records, processing, citizen services.</p>
+        <div class="text-xs text-gray-600 mt-2 font-mono glitch-flicker">EVALUATION PENDING</div>
+      </div>
+    </div>
+
+    <div class="mt-8 text-center">
+      <p class="text-gray-600 text-sm">
+        All work is compensated in credits. <span class="text-gray-500">Credits are redeemable at designated facilities.</span>
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- Bulletins / News -->
+<div class="border-t border-gray-800">
+  <div class="max-w-6xl mx-auto px-6 py-12">
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <h2 class="text-xl font-bold text-white">Public Bulletins</h2>
+        <p class="text-gray-600 text-sm mt-1">Official communications from Continuum administration</p>
+      </div>
+      <div class="flex gap-2 text-xs font-mono">
+        <button onclick="filterNews('')" class="news-filter px-3 py-1 rounded border border-gray-700 hover:border-malice-accent hover:text-malice-accent transition" data-category="">ALL</button>
+        <button onclick="filterNews('announcement')" class="news-filter px-3 py-1 rounded border border-gray-700 hover:border-malice-accent hover:text-malice-accent transition" data-category="announcement">NOTICES</button>
+        <button onclick="filterNews('event')" class="news-filter px-3 py-1 rounded border border-gray-700 hover:border-malice-accent hover:text-malice-accent transition" data-category="event">EVENTS</button>
+      </div>
+    </div>
+    <div id="news-container" class="space-y-3">
+      <div class="text-gray-600 text-center py-8 font-mono text-sm">LOADING BULLETINS...</div>
+    </div>
+    <div id="news-empty" class="hidden text-gray-600 text-center py-8 font-mono text-sm">
+      NO CURRENT BULLETINS. CHECK BACK LATER.
+    </div>
+  </div>
+</div>
+
+<!-- Footer disclaimer - the cracks really showing -->
+<div class="border-t border-gray-800 bg-black">
+  <div class="max-w-6xl mx-auto px-6 py-8">
+    <div class="text-center">
+      <div class="text-gray-700 text-xs font-mono mb-4">
+        CONTINUUM INFRASTRUCTURE AUTHORITY &middot; PIONEER DISTRICT &middot; SEATTLE 2110
+      </div>
+      <div class="text-gray-800 text-xs max-w-2xl mx-auto glitch-flicker">
+        The Continuum is an impartial infrastructure management system. Citizenship is voluntary.
+        Benefits require compliance with work assignments. The system is fair.
+        <span class="error-text">The system is functioning normally.</span>
+        Please report any anomalies to City Services.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Scripts -->
+<script>
+(function() {
+  // News loading with corporate styling
+  let currentCategory = '';
+
+  window.filterNews = function(category) {
+    currentCategory = category;
+    document.querySelectorAll('.news-filter').forEach(btn => {
+      if (btn.dataset.category === category) {
+        btn.classList.add('border-malice-accent', 'text-malice-accent');
+      } else {
+        btn.classList.remove('border-malice-accent', 'text-malice-accent');
+      }
+    });
+    loadNews();
+  };
+
+  async function loadNews() {
+    try {
+      const url = currentCategory ? '/api/news?category=' + currentCategory : '/api/news';
+      const res = await fetch(url);
+      const data = await res.json();
+
+      const container = document.getElementById('news-container');
+      const empty = document.getElementById('news-empty');
+
+      if (!data.items || data.items.length === 0) {
+        container.innerHTML = '';
+        empty.classList.remove('hidden');
+        return;
+      }
+
+      empty.classList.add('hidden');
+
+      const categoryLabels = {
+        announcement: 'NOTICE',
+        event: 'EVENT',
+        update: 'UPDATE',
+        lore: 'BULLETIN',
+        ooc: 'SYSTEM'
+      };
+
+      container.innerHTML = data.items.map(item => {
+        const date = new Date(item.postedAt);
+        const dateStr = date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+        const label = categoryLabels[item.category] || 'BULLETIN';
+        const pinned = item.pinned ? '<span class="text-malice-accent">[PRIORITY]</span> ' : '';
+
+        return '<div class="p-4 border border-gray-800 rounded bg-black/30 hover:border-gray-700 transition font-mono">' +
+          '<div class="flex items-start gap-4">' +
+            '<div class="text-gray-600 text-xs whitespace-nowrap">' + dateStr + '</div>' +
+            '<div class="flex-1">' +
+              '<div class="text-xs text-gray-500 mb-1">' + label + '</div>' +
+              '<div class="text-white">' + pinned + item.title + '</div>' +
+              '<div class="text-gray-500 text-sm mt-2">' + item.body.substring(0, 200) + (item.body.length > 200 ? '...' : '') + '</div>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+
+    } catch (e) {
+      document.getElementById('news-container').innerHTML =
+        '<div class="text-gray-600 text-center py-8 font-mono text-sm">CONNECTION ERROR. RETRYING...</div>';
+    }
+  }
+
+  loadNews();
+  setInterval(loadNews, 300000);
+
+  // Status updates with corporate messaging
+  async function updateStatus() {
+    try {
+      const res = await fetch('/api/status');
+      const data = await res.json();
+
+      const dot = document.getElementById('status-dot');
+      const text = document.getElementById('status-text');
+      const population = document.getElementById('population');
+      const uptime = document.getElementById('uptime');
+      const popInline = document.getElementById('pop-inline');
+
+      if (data.online) {
+        dot.className = 'w-2 h-2 rounded-full bg-malice-accent animate-pulse';
+        text.textContent = 'SYSTEMS NOMINAL';
+        text.className = 'text-malice-accent';
+        population.textContent = data.population.toLocaleString();
+        uptime.textContent = data.uptime;
+        if (popInline) popInline.textContent = '~' + data.population.toLocaleString();
+      } else {
+        dot.className = 'w-2 h-2 rounded-full bg-red-500';
+        text.textContent = 'SYSTEMS OFFLINE';
+        text.className = 'text-red-400';
+      }
+    } catch (e) {
+      const dot = document.getElementById('status-dot');
+      const text = document.getElementById('status-text');
+      dot.className = 'w-2 h-2 rounded-full bg-yellow-500';
+      text.textContent = 'CONNECTION INTERRUPTED';
+      text.className = 'text-yellow-400';
+    }
+  }
+
+  updateStatus();
+  setInterval(updateStatus, 30000);
+})();
+</script>`,
         },
         methods: {},
       });
@@ -746,13 +1114,12 @@ export class WebsiteBuilder {
 
   private _homepage: RuntimeObject | null = null;
   private _playPage: RuntimeObject | null = null;
-  private _docsRoute: RuntimeObject | null = null;
-  private _mapRoute: RuntimeObject | null = null;
-  private _mapAdminRoute: RuntimeObject | null = null;
-  private _mapRoomsRoute: RuntimeObject | null = null;
-  private _mapPlayersRoute: RuntimeObject | null = null;
-  private _mapPlayersAdminRoute: RuntimeObject | null = null;
+  private _clientJsRoute: RuntimeObject | null = null;
 
+  /**
+   * Build routes that are still needed (clientJsRoute for script serving)
+   * Most routes are now handled by $continuumDomain via domain-based routing.
+   */
   private async buildRoutes(
     aliases: Record<string, number>,
     _forceRebuild: boolean,
@@ -761,1451 +1128,242 @@ export class WebsiteBuilder {
 
     // Get webRoute prototype
     const webRouteId = aliases.webRoute;
-    console.log(`[WebsiteBuilder] webRoute alias: ${webRouteId}`);
     if (!webRouteId) {
-      console.log('⚠️ webRoute alias not found, skipping route registration');
+      console.log('⚠️ webRoute alias not found, skipping clientJsRoute');
       return;
     }
     const webRoute = await this.manager.load(webRouteId);
     if (!webRoute) {
-      console.log(
-        '⚠️ webRoute prototype not found, skipping route registration',
-      );
+      console.log('⚠️ webRoute prototype not found, skipping clientJsRoute');
       return;
     }
-    console.log(`[WebsiteBuilder] webRoute loaded: #${webRoute.id}`);
 
-    // Build docs route
-    console.log('[WebsiteBuilder] Checking docsRoute...');
-    if (aliases.docsRoute) {
-      console.log(
-        `[WebsiteBuilder] docsRoute alias exists: ${aliases.docsRoute}, loading...`,
-      );
-      this._docsRoute = await this.manager.load(aliases.docsRoute);
-    }
-    if (!this._docsRoute) {
-      console.log('[WebsiteBuilder] Creating docsRoute...');
-      this._docsRoute = await this.manager.create({
-        parent: webRoute,
-        properties: {
-          name: 'Docs Route',
-          description: 'Serves documentation from /docs/*',
-          path: '/docs/*',
-          methods: ['GET'],
-          contentType: 'text/html',
-          requiresAuth: false,
-        },
-        methods: {},
-      });
-      console.log(
-        `[WebsiteBuilder] docsRoute created: #${this._docsRoute?.id}`,
-      );
-    } else {
-      console.log(
-        `[WebsiteBuilder] docsRoute already exists: #${this._docsRoute?.id}`,
-      );
-    }
+    // Build client JS route (still needed - new routes delegate to $.clientJsRoute.getScript())
+    await this.buildClientJsRoute(aliases, webRoute);
 
-    // Set the handler for docs route
-    console.log('[WebsiteBuilder] Setting docsRoute handler...');
-    if (this._docsRoute) {
-      this._docsRoute.setMethod(
-        'handleRequest',
-        `
-        const params = args[0] || {};
-        // const meta = args[1] || {};
-
-        const fs = await import('fs');
-
-        // Get the wildcard path (everything after /docs/)
-        const docPath = params['*'] || '';
-
-        // Map URL to file path
-        let filePath = './docs/' + docPath;
-        if (!docPath || docPath === '') {
-          filePath = './docs/WHAT-IS-MALICE.md';
-        } else if (!filePath.endsWith('.md')) {
-          filePath = filePath + '.md';
-        }
-
-        try {
-          if (!fs.existsSync(filePath)) {
-            return {
-              status: 404,
-              contentType: 'text/html',
-              body: '<h1>Documentation not found</h1><p>File: ' + filePath + '</p>'
-            };
-          }
-
-          const markdown = fs.readFileSync(filePath, 'utf-8');
-
-          // Convert markdown to HTML (basic)
-          let html = markdown
-            .replace(/^### (.+)$/gm, '<h3 class="text-xl font-bold mt-6 mb-2">$1</h3>')
-            .replace(/^## (.+)$/gm, '<h2 class="text-2xl font-bold mt-8 mb-3">$1</h2>')
-            .replace(/^# (.+)$/gm, '<h1 class="text-3xl font-bold mt-8 mb-4">$1</h1>')
-            .replace(/\\\`\\\`\\\`(\\w*)([\\s\\S]*?)\\\`\\\`\\\`/g, '<pre class="bg-malice-surface p-4 rounded my-4 overflow-x-auto"><code>$2</code></pre>')
-            .replace(/\\\`([^\\\`]+)\\\`/g, '<code class="bg-malice-surface px-1 rounded">$1</code>')
-            .replace(/\\*\\*(.+?)\\*\\*/g, '<strong>$1</strong>')
-            .replace(/\\*(.+?)\\*/g, '<em>$1</em>')
-            .replace(/\\[([^\\]]+)\\]\\(([^)]+)\\)/g, '<a href="$2" class="text-malice-accent hover:underline">$1</a>')
-            .replace(/^- (.+)$/gm, '<li class="ml-4">$1</li>')
-            .replace(/(<li.*<\\/li>\\n?)+/g, '<ul class="list-disc my-4">$&</ul>')
-            .replace(/\\n\\n/g, '</p><p class="my-4">')
-            .replace(/\\n/g, '<br>');
-
-          // Wrap in paragraph if needed
-          if (!html.startsWith('<')) {
-            html = '<p class="my-4">' + html + '</p>';
-          }
-
-          // Get doc template
-          const docTemplate = $.docTemplate;
-          if (docTemplate) {
-            const title = markdown.match(/^# (.+)$/m)?.[1] || 'Documentation';
-            const fullHtml = await docTemplate.render({
-              title: title + ' - Malice',
-              content: '<article class="prose prose-invert max-w-none">' + html + '</article>',
-            });
-            return { status: 200, contentType: 'text/html', body: fullHtml };
-          }
-
-          return { status: 200, contentType: 'text/html', body: html };
-        } catch (err) {
-          return {
-            status: 500,
-            contentType: 'text/html',
-            body: 'Error loading documentation: ' + String(err)
-          };
-        }
-      `,
-      );
-      console.log('[WebsiteBuilder] docsRoute handler set');
-    }
-
-    // Build map API routes
-    console.log('[WebsiteBuilder] Calling buildMapRoutes...');
-    await this.buildMapRoutes(aliases, webRoute);
     console.log('[WebsiteBuilder] buildRoutes() complete');
   }
 
-  private async buildMapRoutes(
+  private async buildClientJsRoute(
     aliases: Record<string, number>,
     webRoute: RuntimeObject,
   ): Promise<void> {
-    console.log('[WebsiteBuilder] buildMapRoutes() called');
-    console.log(`[WebsiteBuilder] webRoute parent: #${webRoute.id}`);
-
-    // 1. RoomsRoute - /api/map/rooms
-    console.log('[WebsiteBuilder] Building mapRoomsRoute...');
-    if (aliases.mapRoomsRoute) {
-      console.log(
-        `[WebsiteBuilder] mapRoomsRoute alias exists: ${aliases.mapRoomsRoute}`,
-      );
-      this._mapRoomsRoute = await this.manager.load(aliases.mapRoomsRoute);
+    // Check if already exists
+    if (aliases.clientJsRoute) {
+      this._clientJsRoute = await this.manager.load(aliases.clientJsRoute);
     }
-    if (!this._mapRoomsRoute) {
-      console.log('[WebsiteBuilder] Creating mapRoomsRoute...');
-      this._mapRoomsRoute = await this.manager.create({
+
+    if (!this._clientJsRoute) {
+      this._clientJsRoute = await this.manager.create({
         parent: webRoute,
         properties: {
-          name: 'Map Rooms API Route',
-          description: 'Returns room coordinates for map visualization',
-          path: '/api/map/rooms',
+          name: 'Client JS Route',
+          description: 'Serves MaliceClient JavaScript for web terminal',
+          path: '/js/malice-client.js',
           methods: ['GET'],
-          contentType: 'application/json',
+          contentType: 'application/javascript',
           requiresAuth: false,
         },
         methods: {},
       });
       console.log(
-        `[WebsiteBuilder] mapRoomsRoute created: #${this._mapRoomsRoute?.id}`,
-      );
-    } else {
-      console.log(
-        `[WebsiteBuilder] mapRoomsRoute already exists: #${this._mapRoomsRoute?.id}`,
+        `[WebsiteBuilder] clientJsRoute created: #${this._clientJsRoute?.id}`,
       );
     }
 
-    if (this._mapRoomsRoute) {
-      console.log('[WebsiteBuilder] Setting mapRoomsRoute handler...');
-      this._mapRoomsRoute.setMethod(
+    if (this._clientJsRoute) {
+      this._clientJsRoute.setMethod(
         'handleRequest',
         `
-        const params = args[0] || {};
-        const meta = args[1] || {};
-
-        // Get all rooms from $world
-        const allRooms = await $world.getAllRooms();
-
-        // Filter by z_min if provided
-        const zMin = meta.query?.z_min;
-        let rooms = allRooms;
-        if (zMin !== undefined) {
-          const zMinNum = parseInt(zMin);
-          if (!isNaN(zMinNum)) {
-            rooms = rooms.filter(r => r.z >= zMinNum);
-          }
-        }
-
-        // Build a coordinate lookup for filtered rooms
-        const coordLookup = new Map();
-        for (const r of rooms) {
-          coordLookup.set(r.x + ',' + r.y + ',' + r.z, true);
-        }
-
-        // Collect all exits (connections between rooms)
-        const exits = [];
-        const seenConnections = new Set();
-
-        for (const room of rooms) {
-          // Load the actual room object to get exits
-          const roomObj = await $load(room.id);
-          if (!roomObj || !roomObj.exits) continue;
-
-          const roomExits = roomObj.exits;
-          if (!Array.isArray(roomExits)) continue;
-
-          for (const exit of roomExits) {
-            if (!exit || !exit.destRoom) continue;
-
-            const dest = exit.destRoom;
-            if (!dest) continue;
-
-            const destX = dest.x;
-            const destY = dest.y;
-            const destZ = dest.z;
-
-            // Only include if destination is in our filtered set
-            const destKey = destX + ',' + destY + ',' + destZ;
-            if (!coordLookup.has(destKey)) continue;
-
-            // Dedupe bidirectional connections
-            const connKey = [
-              room.x + ',' + room.y + ',' + room.z,
-              destKey
-            ].sort().join('|');
-
-            if (seenConnections.has(connKey)) continue;
-            seenConnections.add(connKey);
-
-            exits.push({
-              from: { x: room.x, y: room.y, z: room.z },
-              to: { x: destX, y: destY, z: destZ }
-            });
-          }
-        }
-
-        // Return rooms and exits
-        const filteredRooms = rooms.map(r => ({
-          x: r.x,
-          y: r.y,
-          z: r.z,
-          name: r.name
-        }));
-
+        const script = await self.getScript();
         return {
           status: 200,
-          contentType: 'application/json',
-          body: JSON.stringify({ rooms: filteredRooms, exits })
+          contentType: 'application/javascript',
+          body: script,
+          headers: {
+            'Cache-Control': 'public, max-age=3600'
+          }
         };
       `,
       );
-      console.log('[WebsiteBuilder] mapRoomsRoute handler set');
-    }
 
-    // 2. PlayersRoute - /api/map/players (public, aggregated)
-    console.log('[WebsiteBuilder] Building mapPlayersRoute...');
-    if (aliases.mapPlayersRoute) {
-      console.log(
-        `[WebsiteBuilder] mapPlayersRoute alias exists: ${aliases.mapPlayersRoute}`,
-      );
-      this._mapPlayersRoute = await this.manager.load(aliases.mapPlayersRoute);
-    }
-    if (!this._mapPlayersRoute) {
-      console.log('[WebsiteBuilder] Creating mapPlayersRoute...');
-      this._mapPlayersRoute = await this.manager.create({
-        parent: webRoute,
-        properties: {
-          name: 'Map Players API Route',
-          description: 'Returns aggregated player/NPC population heat map',
-          path: '/api/map/players',
-          methods: ['GET'],
-          contentType: 'application/json',
-          requiresAuth: false,
-          cachedHeatmap: null,
-          cacheTimestamp: 0,
-        },
-        methods: {},
-      });
-      console.log(
-        `[WebsiteBuilder] mapPlayersRoute created: #${this._mapPlayersRoute?.id}`,
-      );
-    } else {
-      console.log(
-        `[WebsiteBuilder] mapPlayersRoute already exists: #${this._mapPlayersRoute?.id}`,
-      );
-    }
-
-    if (this._mapPlayersRoute) {
-      console.log('[WebsiteBuilder] Setting mapPlayersRoute handler...');
-      this._mapPlayersRoute.setMethod(
-        'handleRequest',
+      this._clientJsRoute.setMethod(
+        'getScript',
         `
-        const params = args[0] || {};
-        const meta = args[1] || {};
+        return \`
+/**
+ * MaliceClient - Multiplexed WebSocket client for Malice MOO
+ * Handles channel-based communication with the game server.
+ */
+class MaliceClient {
+  constructor(url, terminal) {
+    this.url = url;
+    this.term = terminal;
+    this.ws = null;
+    this.handlers = new Map();
+    this.state = {
+      room: null,
+      inventory: [],
+      stats: {},
+      exits: []
+    };
+    this.reconnectAttempts = 0;
+    this.maxReconnectAttempts = 5;
+    this.statusEl = document.getElementById('status');
 
-        // Check cache (30 seconds)
-        const now = Date.now();
-        const cacheAge = now - (self.cacheTimestamp || 0);
-        if (cacheAge < 30000 && self.cachedHeatmap) {
-          return {
-            status: 200,
-            contentType: 'application/json',
-            body: JSON.stringify({
-              heatmap: self.cachedHeatmap,
-              timestamp: self.cacheTimestamp,
-              cached: true
-            })
-          };
-        }
+    // Register built-in channel handlers
+    this.on('game', (data) => this.onGameMessage(data));
+    this.on('ctrl', (data) => this.onCtrlMessage(data));
+    this.on('state', (data) => this.onStateMessage(data));
+    this.on('error', (data) => this.onErrorMessage(data));
+  }
 
-        // Get all connected players
-        const connections = await $world.getAuthenticatedConnections();
+  connect() {
+    this.updateStatus('connecting');
+    this.ws = new WebSocket(this.url);
 
-        // Get all AI NPCs
-        const npcIds = await $ai.getAll();
+    this.ws.onopen = () => {
+      this.updateStatus('connected');
+      this.reconnectAttempts = 0;
 
-        // Collect positions
-        const positions = [];
+      // Send initial resize
+      this.sendResize();
 
-        // Add player positions
-        for (const conn of connections) {
-          try {
-            const player = conn.player;
-            if (!player || !player.location) continue;
+      // Signal ready
+      this.send('ctrl', { type: 'ready' });
 
-            const loc = player.location;
-            if (!loc) continue;
-
-            const x = loc.x;
-            const y = loc.y;
-            const z = loc.z;
-
-            if (typeof x === 'number' && typeof y === 'number' && typeof z === 'number') {
-              // Filter to z >= 0 only (above ground)
-              if (z >= 0) {
-                positions.push({ x, y, z });
-              }
-            }
-          } catch (err) {
-            console.error('[MapPlayers] Error getting player position:', err);
-          }
-        }
-
-        // Add NPC positions
-        for (const npcId of npcIds) {
-          try {
-            const npc = await $load(npcId);
-            if (!npc || !npc.location) continue;
-
-            const loc = npc.location;
-            if (!loc) continue;
-
-            const x = loc.x;
-            const y = loc.y;
-            const z = loc.z;
-
-            if (typeof x === 'number' && typeof y === 'number' && typeof z === 'number') {
-              // Filter to z >= 0 only
-              if (z >= 0) {
-                positions.push({ x, y, z });
-              }
-            }
-          } catch (err) {
-            console.error('[MapPlayers] Error getting NPC position:', err);
-          }
-        }
-
-        // Aggregate to 5x5 grid
-        const gridSize = 5;
-        const gridCounts = {};
-
-        for (const pos of positions) {
-          const gridX = Math.floor(pos.x / gridSize) * gridSize;
-          const gridY = Math.floor(pos.y / gridSize) * gridSize;
-          const gridZ = pos.z;
-          const key = gridX + ',' + gridY + ',' + gridZ;
-
-          gridCounts[key] = (gridCounts[key] || 0) + 1;
-        }
-
-        // Convert to array
-        const heatmap = [];
-        for (const [key, count] of Object.entries(gridCounts)) {
-          const parts = key.split(',');
-          heatmap.push({
-            x: parseInt(parts[0]),
-            y: parseInt(parts[1]),
-            z: parseInt(parts[2]),
-            count: count
-          });
-        }
-
-        // Cache the result
-        self.cachedHeatmap = heatmap;
-        self.cacheTimestamp = now;
-
-        return {
-          status: 200,
-          contentType: 'application/json',
-          body: JSON.stringify({
-            heatmap,
-            timestamp: now,
-            cached: false
-          })
-        };
-      `,
-      );
-      console.log('[WebsiteBuilder] mapPlayersRoute handler set');
-    }
-
-    // 3. PlayersAdminRoute - /api/map/players/admin (admin only, exact positions)
-    console.log('[WebsiteBuilder] Building mapPlayersAdminRoute...');
-    if (aliases.mapPlayersAdminRoute) {
-      console.log(
-        `[WebsiteBuilder] mapPlayersAdminRoute alias exists: ${aliases.mapPlayersAdminRoute}`,
-      );
-      this._mapPlayersAdminRoute = await this.manager.load(
-        aliases.mapPlayersAdminRoute,
-      );
-    }
-    if (!this._mapPlayersAdminRoute) {
-      console.log('[WebsiteBuilder] Creating mapPlayersAdminRoute...');
-      this._mapPlayersAdminRoute = await this.manager.create({
-        parent: webRoute,
-        properties: {
-          name: 'Map Players Admin API Route',
-          description: 'Returns exact player/NPC positions (admin only)',
-          path: '/api/map/players/admin',
-          methods: ['GET'],
-          contentType: 'application/json',
-          requiresAuth: 'admin',
-        },
-        methods: {},
-      });
-      console.log(
-        `[WebsiteBuilder] mapPlayersAdminRoute created: #${this._mapPlayersAdminRoute?.id}`,
-      );
-    } else {
-      console.log(
-        `[WebsiteBuilder] mapPlayersAdminRoute already exists: #${this._mapPlayersAdminRoute?.id}`,
-      );
-    }
-
-    if (this._mapPlayersAdminRoute) {
-      console.log('[WebsiteBuilder] Setting mapPlayersAdminRoute handler...');
-      this._mapPlayersAdminRoute.setMethod(
-        'handleRequest',
-        `
-        const params = args[0] || {};
-        const meta = args[1] || {};
-
-        // Get all connected players
-        const connections = await $world.getAuthenticatedConnections();
-
-        // Get all AI NPCs
-        const npcIds = await $ai.getAll();
-
-        const agents = [];
-
-        // Add players
-        for (const conn of connections) {
-          try {
-            const player = conn.player;
-            if (!player || !player.location) continue;
-
-            const loc = player.location;
-            if (!loc) continue;
-
-            const x = loc.x;
-            const y = loc.y;
-            const z = loc.z;
-
-            if (typeof x === 'number' && typeof y === 'number' && typeof z === 'number') {
-              agents.push({
-                id: player.id,
-                name: player.name || 'Unknown',
-                x,
-                y,
-                z,
-                roomName: loc.name || '',
-                isNPC: false
-              });
-            }
-          } catch (err) {
-            console.error('[MapPlayersAdmin] Error getting player position:', err);
-          }
-        }
-
-        // Add NPCs
-        for (const npcId of npcIds) {
-          try {
-            const npc = await $load(npcId);
-            if (!npc || !npc.location) continue;
-
-            const loc = npc.location;
-            if (!loc) continue;
-
-            const x = loc.x;
-            const y = loc.y;
-            const z = loc.z;
-
-            if (typeof x === 'number' && typeof y === 'number' && typeof z === 'number') {
-              agents.push({
-                id: npc.id,
-                name: npc.name || 'NPC',
-                x,
-                y,
-                z,
-                roomName: loc.name || '',
-                isNPC: true
-              });
-            }
-          } catch (err) {
-            console.error('[MapPlayersAdmin] Error getting NPC position:', err);
-          }
-        }
-
-        return {
-          status: 200,
-          contentType: 'application/json',
-          body: JSON.stringify({ agents })
-        };
-      `,
-      );
-      console.log('[WebsiteBuilder] mapPlayersAdminRoute handler set');
-    }
-
-    // 4. MapRoute - /map (public HTML page)
-    console.log('[WebsiteBuilder] Building mapRoute...');
-    if (aliases.mapRoute) {
-      console.log(
-        `[WebsiteBuilder] mapRoute alias exists: ${aliases.mapRoute}`,
-      );
-      this._mapRoute = await this.manager.load(aliases.mapRoute);
-    }
-    if (!this._mapRoute) {
-      console.log('[WebsiteBuilder] Creating mapRoute...');
-      this._mapRoute = await this.manager.create({
-        parent: webRoute,
-        properties: {
-          name: 'Map Page Route',
-          description: 'Public 3D map view (above-ground only)',
-          path: '/map',
-          methods: ['GET'],
-          contentType: 'text/html',
-          requiresAuth: false,
-          // Visual config - tweak via MOO code
-          roomColor: 0x00ff44, // Bright green
-          roomOpacity: 0.7, // More visible
-          roomEmissive: 0.4, // Glow intensity
-          blockSize: 1.8, // Cube size
-          ambientIntensity: 1.5, // Ambient light
-          directionalIntensity: 0.8, // Directional light
-          gridColor: 0x00ff00, // Grid main color
-          gridFade: 0x003300, // Grid fade color
-          fogNear: 80, // Fog start
-          fogFar: 300, // Fog end
-        },
-        methods: {},
-      });
-      console.log(`[WebsiteBuilder] mapRoute created: #${this._mapRoute?.id}`);
-    } else {
-      console.log(
-        `[WebsiteBuilder] mapRoute already exists: #${this._mapRoute?.id}`,
-      );
-    }
-
-    if (this._mapRoute) {
-      console.log('[WebsiteBuilder] Setting mapRoute handler...');
-      this._mapRoute.setMethod(
-        'handleRequest',
-        `
-        // Read visual config from route props
-        const config = {
-          roomColor: self.roomColor || 0x00ff44,
-          roomOpacity: self.roomOpacity || 0.7,
-          roomEmissive: self.roomEmissive || 0.4,
-          blockSize: self.blockSize || 1.8,
-          ambientIntensity: self.ambientIntensity || 1.5,
-          directionalIntensity: self.directionalIntensity || 0.8,
-          gridColor: self.gridColor || 0x00ff00,
-          gridFade: self.gridFade || 0x003300,
-          fogNear: self.fogNear || 80,
-          fogFar: self.fogFar || 300,
-        };
-
-        // Generate HTML for public map view
-        const html = \`<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Malice World Map</title>
-  <style>
-    body {
-      margin: 0;
-      overflow: hidden;
-      font-family: monospace;
-      background: #000;
-      color: #0f0;
-    }
-    #info {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      background: rgba(0, 0, 0, 0.9);
-      padding: 15px;
-      border: 1px solid #0f0;
-      max-width: 300px;
-      z-index: 100;
-    }
-    #info h2 {
-      margin: 0 0 10px 0;
-      color: #0ff;
-    }
-    #controls {
-      position: absolute;
-      bottom: 10px;
-      left: 10px;
-      background: rgba(0, 0, 0, 0.9);
-      padding: 10px;
-      border: 1px solid #0f0;
-    }
-    button {
-      background: #000;
-      color: #0f0;
-      border: 1px solid #0f0;
-      padding: 5px 10px;
-      margin: 2px;
-      cursor: pointer;
-      font-family: monospace;
-    }
-    button:hover {
-      background: #0f0;
-      color: #000;
-    }
-    #tooltip {
-      position: absolute;
-      background: rgba(0, 0, 0, 0.9);
-      padding: 8px;
-      border: 1px solid #0ff;
-      pointer-events: none;
-      display: none;
-      z-index: 100;
-    }
-  </style>
-</head>
-<body>
-  <div id="info">
-    <h2>World Map (Public)</h2>
-    <div id="stats">Loading...</div>
-  </div>
-  <div id="tooltip"></div>
-  <div id="controls">
-    <button onclick="viewTop()">Top View</button>
-    <button onclick="viewSide()">Side View</button>
-    <button onclick="resetView()">Reset</button>
-  </div>
-
-  <script type="importmap">
-    {
-      "imports": {
-        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
-      }
-    }
-  </script>
-
-  <script type="module">
-    import * as THREE from 'three';
-    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-
-    // Visual config (injected from route props)
-    const CFG = {
-      roomColor: \${config.roomColor},
-      roomOpacity: \${config.roomOpacity},
-      roomEmissive: \${config.roomEmissive},
-      blockSize: \${config.blockSize},
-      ambientIntensity: \${config.ambientIntensity},
-      directionalIntensity: \${config.directionalIntensity},
-      gridColor: \${config.gridColor},
-      gridFade: \${config.gridFade},
-      fogNear: \${config.fogNear},
-      fogFar: \${config.fogFar},
+      // Hide status after 2 seconds
+      setTimeout(() => {
+        if (this.statusEl) this.statusEl.style.opacity = '0.3';
+      }, 2000);
     };
 
-    // Scene setup
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x000000);
-    scene.fog = new THREE.Fog(0x000000, CFG.fogNear, CFG.fogFar);
+    this.ws.onmessage = (event) => {
+      this.handleMessage(event.data);
+    };
 
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.set(0, 80, 0);
+    this.ws.onclose = () => {
+      this.updateStatus('disconnected');
+      this.term.write('\\\\r\\\\n\\\\x1b[31mDisconnected from server.\\\\x1b[0m\\\\r\\\\n');
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(renderer.domElement);
-
-    const controls = new OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.05;
-
-    // Lighting
-    const ambientLight = new THREE.AmbientLight(0x404040, CFG.ambientIntensity);
-    scene.add(ambientLight);
-
-    const directionalLight = new THREE.DirectionalLight(0xffffff, CFG.directionalIntensity);
-    directionalLight.position.set(50, 100, 50);
-    scene.add(directionalLight);
-
-    // Grid helper
-    const gridHelper = new THREE.GridHelper(200, 50, CFG.gridColor, CFG.gridFade);
-    scene.add(gridHelper);
-
-    // Dynamic content group (rooms, heatmap) - cleared on reload
-    const dynamicGroup = new THREE.Group();
-    scene.add(dynamicGroup);
-
-    // Raycaster for hover
-    const raycaster = new THREE.Raycaster();
-    const mouse = new THREE.Vector2();
-    const tooltip = document.getElementById('tooltip');
-
-    // Height gradient function - varies color by z-level
-    function getColorForZ(z) {
-      if (z === 0) {
-        return CFG.roomColor; // Base color at ground level
+      // Attempt reconnect
+      if (this.reconnectAttempts < this.maxReconnectAttempts) {
+        this.reconnectAttempts++;
+        const delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts), 30000);
+        this.term.write('\\\\x1b[33mReconnecting in ' + (delay/1000) + 's...\\\\x1b[0m\\\\r\\\\n');
+        setTimeout(() => this.connect(), delay);
       } else {
-        // Higher = warmer tint (towards orange/yellow)
-        const heightFactor = Math.min(z / 30, 1);
-        const r = Math.floor(0x00 + heightFactor * 0xff);
-        const g = Math.floor(0xff - heightFactor * 0x44);
-        const b = Math.floor(0x44 - heightFactor * 0x44);
-        return (r << 16) | (g << 8) | b;
+        this.term.write('\\\\x1b[31mMax reconnection attempts reached. Refresh to try again.\\\\x1b[0m\\\\r\\\\n');
       }
-    }
-
-    // Load rooms and render
-    async function loadMap() {
-      try {
-        // Clear previous dynamic content
-        while (dynamicGroup.children.length > 0) {
-          dynamicGroup.remove(dynamicGroup.children[0]);
-        }
-
-        // Fetch all rooms (including underground)
-        const roomsRes = await fetch('/api/map/rooms');
-        const roomsData = await roomsRes.json();
-        const rooms = roomsData.rooms;
-
-        // Fetch population heat map
-        const playersRes = await fetch('/api/map/players');
-        const playersData = await playersRes.json();
-        const heatmap = playersData.heatmap;
-
-        // Spacing multiplier - increase for more gap between rooms
-        const spacing = 3;
-
-        // Render rooms with height gradient
-        const roomGeometry = new THREE.BoxGeometry(CFG.blockSize, CFG.blockSize, CFG.blockSize);
-        for (const room of rooms) {
-          const zColor = getColorForZ(room.z);
-          const material = new THREE.MeshPhongMaterial({
-            color: zColor,
-            transparent: true,
-            opacity: CFG.roomOpacity,
-            emissive: zColor,
-            emissiveIntensity: CFG.roomEmissive,
-          });
-          const cube = new THREE.Mesh(roomGeometry, material);
-          cube.position.set(room.x * spacing, room.z * spacing, -room.y * spacing);
-          cube.userData = { type: 'room', ...room };
-          dynamicGroup.add(cube);
-        }
-
-        // Render exit connections as red tubes between room centers
-        const exits = roomsData.exits || [];
-        const tubeMaterial = new THREE.MeshBasicMaterial({
-          color: 0xff3333,
-          transparent: true,
-          opacity: 0.6
-        });
-        for (const exit of exits) {
-          // Position tubes slightly below room centers so they're visible
-          const fromVec = new THREE.Vector3(exit.from.x * spacing, exit.from.z * spacing - 0.5, -exit.from.y * spacing);
-          const toVec = new THREE.Vector3(exit.to.x * spacing, exit.to.z * spacing - 0.5, -exit.to.y * spacing);
-
-          // Create cylinder between points
-          const direction = new THREE.Vector3().subVectors(toVec, fromVec);
-          const length = direction.length();
-          const tubeRadius = 0.15;
-
-          const geometry = new THREE.CylinderGeometry(tubeRadius, tubeRadius, length, 6);
-          geometry.rotateX(Math.PI / 2); // Align with Z axis initially
-
-          const tube = new THREE.Mesh(geometry, tubeMaterial);
-
-          // Position at midpoint
-          tube.position.copy(fromVec).add(toVec).multiplyScalar(0.5);
-
-          // Orient toward destination
-          tube.lookAt(toVec);
-
-          tube.userData = { type: 'exit' };
-          dynamicGroup.add(tube);
-        }
-
-        // Render heat map cubes
-        const heatGeometry = new THREE.BoxGeometry(15, 3, 15); // 5x5 grid scaled
-        for (const cell of heatmap) {
-          const intensity = Math.min(cell.count / 6, 1);
-          let color;
-          if (cell.count <= 2) color = 0xffff00; // Yellow
-          else if (cell.count <= 5) color = 0xff8800; // Orange
-          else color = 0xff0000; // Red
-
-          const material = new THREE.MeshPhongMaterial({
-            color,
-            transparent: true,
-            opacity: 0.6 * intensity,
-            emissive: color,
-            emissiveIntensity: 0.3,
-          });
-          const cube = new THREE.Mesh(heatGeometry, material);
-          cube.position.set(cell.x * spacing, cell.z * spacing + 8, -cell.y * spacing);
-          cube.userData = { type: 'heat', count: cell.count };
-          dynamicGroup.add(cube);
-        }
-
-        // Update stats
-        const stats = document.getElementById('stats');
-        stats.innerHTML = \\\`
-          <strong>Rooms:</strong> \\\${rooms.length}<br>
-          <strong>Exits:</strong> \\\${exits.length}<br>
-          <strong>Population:</strong> \\\${heatmap.reduce((s, c) => s + c.count, 0)}<br>
-          <strong>Updated:</strong> \\\${new Date(playersData.timestamp).toLocaleTimeString()}<br>
-          <br>
-          <em>5x5 grid aggregation</em><br>
-          <em>Updates every 30s</em>
-        \\\`;
-
-      } catch (err) {
-        console.error('Error loading map:', err);
-        document.getElementById('stats').innerHTML = '<strong style="color: red;">Error loading map</strong>';
-      }
-    }
-
-    // View presets
-    window.viewTop = () => {
-      camera.position.set(0, 80, 0);
-      camera.lookAt(0, 0, 0);
-      controls.target.set(0, 0, 0);
     };
 
-    window.viewSide = () => {
-      camera.position.set(100, 40, 0);
-      camera.lookAt(0, 0, 0);
-      controls.target.set(0, 0, 0);
+    this.ws.onerror = () => {
+      this.updateStatus('error');
     };
+  }
 
-    window.resetView = () => {
-      camera.position.set(0, 80, 0);
-      camera.lookAt(0, 0, 0);
-      controls.target.set(0, 0, 0);
+  updateStatus(state) {
+    if (!this.statusEl) return;
+    this.statusEl.style.opacity = '1';
+    const states = {
+      connecting: { text: 'Connecting...', class: 'status-connecting' },
+      connected: { text: 'Connected', class: 'status-connected' },
+      disconnected: { text: 'Disconnected', class: 'status-disconnected' },
+      error: { text: 'Error', class: 'status-disconnected' }
     };
+    const s = states[state] || states.error;
+    this.statusEl.textContent = s.text;
+    this.statusEl.className = s.class;
+  }
 
-    // Mouse hover
-    function onMouseMove(event) {
-      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-      raycaster.setFromCamera(mouse, camera);
-      const intersects = raycaster.intersectObjects(dynamicGroup.children);
-
-      if (intersects.length > 0) {
-        const obj = intersects[0].object;
-        const data = obj.userData;
-
-        if (data.type === 'room' && data.name) {
-          tooltip.innerHTML = \\\`<strong>\\\${data.name}</strong><br>(\\\${data.x}, \\\${data.y}, \\\${data.z})\\\`;
-          tooltip.style.display = 'block';
-          tooltip.style.left = (event.clientX + 15) + 'px';
-          tooltip.style.top = (event.clientY + 15) + 'px';
-        } else if (data.type === 'heat') {
-          tooltip.innerHTML = \\\`<strong>Population: \\\${data.count}</strong>\\\`;
-          tooltip.style.display = 'block';
-          tooltip.style.left = (event.clientX + 15) + 'px';
-          tooltip.style.top = (event.clientY + 15) + 'px';
-        }
+  handleMessage(data) {
+    try {
+      const msg = JSON.parse(data);
+      const handler = this.handlers.get(msg.ch);
+      if (handler) {
+        handler(msg.p);
       } else {
-        tooltip.style.display = 'none';
+        console.log('[MaliceClient] Unhandled channel:', msg.ch, msg.p);
       }
+    } catch (e) {
+      // Not JSON - treat as raw text for backwards compat
+      this.term.write(data);
+    }
+  }
+
+  send(channel, payload) {
+    if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+      this.ws.send(JSON.stringify({ ch: channel, t: 'data', p: payload }));
+    }
+  }
+
+  sendCommand(text) {
+    this.send('game', text);
+  }
+
+  sendResize() {
+    if (this.term) {
+      this.send('ctrl', { type: 'resize', w: this.term.cols, h: this.term.rows });
+    }
+  }
+
+  on(channel, handler) {
+    this.handlers.set(channel, handler);
+  }
+
+  // Built-in channel handlers
+
+  onGameMessage(data) {
+    // Game channel data is raw text
+    this.term.write(data);
+  }
+
+  onCtrlMessage(msg) {
+    if (!msg || typeof msg !== 'object') return;
+
+    switch (msg.type) {
+      case 'prompt':
+        // Could update a prompt indicator
+        break;
+      case 'mode':
+        // Could switch UI modes
+        console.log('[MaliceClient] Mode:', msg.mode);
+        break;
+      default:
+        console.log('[MaliceClient] Ctrl:', msg);
+    }
+  }
+
+  onStateMessage(msg) {
+    if (!msg || typeof msg !== 'object') return;
+
+    // Store state for future UI components
+    if (msg.type && msg.data !== undefined) {
+      this.state[msg.type] = msg.data;
     }
 
-    window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('resize', () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    });
+    // Emit event for UI components to listen to
+    document.dispatchEvent(new CustomEvent('moo-state', { detail: msg }));
 
-    // Keyboard controls
-    const keys = {};
-    const panSpeed = 2;
-    const zoomSpeed = 3;
+    console.log('[MaliceClient] State:', msg.type, msg.data);
+  }
 
-    window.addEventListener('keydown', (e) => {
-      keys[e.key.toLowerCase()] = true;
-      if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(e.key.toLowerCase())) {
-        e.preventDefault();
-      }
-    });
-
-    window.addEventListener('keyup', (e) => {
-      keys[e.key.toLowerCase()] = false;
-    });
-
-    function handleKeyboardInput() {
-      const forward = new THREE.Vector3();
-      camera.getWorldDirection(forward);
-      forward.y = 0;
-      forward.normalize();
-
-      const right = new THREE.Vector3();
-      right.crossVectors(forward, new THREE.Vector3(0, 1, 0));
-
-      // WASD / Arrow keys = pan
-      if (keys['w'] || keys['arrowup']) {
-        camera.position.add(forward.clone().multiplyScalar(panSpeed));
-        controls.target.add(forward.clone().multiplyScalar(panSpeed));
-      }
-      if (keys['s'] || keys['arrowdown']) {
-        camera.position.add(forward.clone().multiplyScalar(-panSpeed));
-        controls.target.add(forward.clone().multiplyScalar(-panSpeed));
-      }
-      if (keys['a'] || keys['arrowleft']) {
-        camera.position.add(right.clone().multiplyScalar(-panSpeed));
-        controls.target.add(right.clone().multiplyScalar(-panSpeed));
-      }
-      if (keys['d'] || keys['arrowright']) {
-        camera.position.add(right.clone().multiplyScalar(panSpeed));
-        controls.target.add(right.clone().multiplyScalar(panSpeed));
-      }
-
-      // Q/E or +/- = zoom
-      if (keys['q'] || keys['-']) {
-        camera.position.y += zoomSpeed;
-      }
-      if (keys['e'] || keys['=']) {
-        camera.position.y = Math.max(10, camera.position.y - zoomSpeed);
-      }
-
-      // R/F = vertical pan
-      if (keys['r']) {
-        camera.position.y += panSpeed;
-        controls.target.y += panSpeed;
-      }
-      if (keys['f']) {
-        camera.position.y -= panSpeed;
-        controls.target.y -= panSpeed;
-      }
+  onErrorMessage(msg) {
+    console.error('[MaliceClient] Error:', msg);
+    if (msg && msg.message) {
+      this.term.write('\\\\r\\\\n\\\\x1b[31mError: ' + msg.message + '\\\\x1b[0m\\\\r\\\\n');
     }
+  }
+}
 
-    // Animation loop
-    function animate() {
-      requestAnimationFrame(animate);
-      handleKeyboardInput();
-      controls.update();
-      renderer.render(scene, camera);
-    }
-
-    // Initial load
-    loadMap();
-    animate();
-
-    // Reload every 30s (loadMap clears dynamicGroup internally)
-    setInterval(loadMap, 30000);
-  </script>
-</body>
-</html>
+// Export for use in terminal template
+window.MaliceClient = MaliceClient;
 \`;
-
-        return {
-          status: 200,
-          contentType: 'text/html',
-          body: html
-        };
       `,
       );
-      console.log('[WebsiteBuilder] mapRoute handler set');
+
+      console.log('[WebsiteBuilder] clientJsRoute handler set');
     }
-
-    // 5. MapAdminRoute - /map/admin (admin HTML page)
-    console.log('[WebsiteBuilder] Building mapAdminRoute...');
-    if (aliases.mapAdminRoute) {
-      console.log(
-        `[WebsiteBuilder] mapAdminRoute alias exists: ${aliases.mapAdminRoute}`,
-      );
-      this._mapAdminRoute = await this.manager.load(aliases.mapAdminRoute);
-    }
-    if (!this._mapAdminRoute) {
-      console.log('[WebsiteBuilder] Creating mapAdminRoute...');
-      this._mapAdminRoute = await this.manager.create({
-        parent: webRoute,
-        properties: {
-          name: 'Map Admin Page Route',
-          description: 'Admin 3D map view (all z-levels)',
-          path: '/map/admin',
-          methods: ['GET'],
-          contentType: 'text/html',
-          requiresAuth: 'admin',
-        },
-        methods: {},
-      });
-      console.log(
-        `[WebsiteBuilder] mapAdminRoute created: #${this._mapAdminRoute?.id}`,
-      );
-    } else {
-      console.log(
-        `[WebsiteBuilder] mapAdminRoute already exists: #${this._mapAdminRoute?.id}`,
-      );
-    }
-
-    if (this._mapAdminRoute) {
-      console.log('[WebsiteBuilder] Setting mapAdminRoute handler...');
-      this._mapAdminRoute.setMethod(
-        'handleRequest',
-        `
-        // Use the existing 3D visualizer HTML from world-map-3d.html but fetch data from APIs
-        const html = \`<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Malice World Map - Admin</title>
-  <style>
-    body {
-      margin: 0;
-      overflow: hidden;
-      font-family: monospace;
-      background: #000;
-      color: #0f0;
-    }
-    #info {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      background: rgba(0, 0, 0, 0.9);
-      padding: 15px;
-      border: 1px solid #0f0;
-      max-width: 350px;
-      z-index: 100;
-    }
-    #info h2 {
-      margin: 0 0 10px 0;
-      color: #ff0000;
-    }
-    .live-indicator {
-      display: inline-block;
-      width: 10px;
-      height: 10px;
-      background: #f00;
-      border-radius: 50%;
-      margin-right: 5px;
-      animation: pulse 1s infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
-    }
-    #controls {
-      position: absolute;
-      bottom: 10px;
-      left: 10px;
-      background: rgba(0, 0, 0, 0.9);
-      padding: 10px;
-      border: 1px solid #0f0;
-    }
-    button {
-      background: #000;
-      color: #0f0;
-      border: 1px solid #0f0;
-      padding: 5px 10px;
-      margin: 2px;
-      cursor: pointer;
-      font-family: monospace;
-    }
-    button:hover {
-      background: #0f0;
-      color: #000;
-    }
-    #tooltip {
-      position: absolute;
-      background: rgba(0, 0, 0, 0.95);
-      padding: 10px;
-      border: 1px solid #0ff;
-      pointer-events: none;
-      display: none;
-      z-index: 100;
-      max-width: 400px;
-    }
-  </style>
-</head>
-<body>
-  <div id="info">
-    <h2><span class="live-indicator"></span>Admin Map (LIVE)</h2>
-    <div id="stats">Loading...</div>
-  </div>
-  <div id="tooltip"></div>
-  <div id="controls">
-    <button onclick="viewSurface()">Surface</button>
-    <button onclick="viewUnderground()">Underground</button>
-    <button onclick="viewTower()">Tower</button>
-    <button onclick="viewAll()">View All</button>
-  </div>
-
-  <script type="importmap">
-    {
-      "imports": {
-        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
-      }
-    }
-  </script>
-
-  <script type="module">
-    import * as THREE from 'three';
-    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-
-    // Scene setup
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x000000);
-    scene.fog = new THREE.Fog(0x000000, 50, 300);
-
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.set(0, 50, 100);
-
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(renderer.domElement);
-
-    const controls = new OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.05;
-
-    // Lighting
-    const ambientLight = new THREE.AmbientLight(0x404040, 1);
-    scene.add(ambientLight);
-
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
-    directionalLight.position.set(50, 100, 50);
-    scene.add(directionalLight);
-
-    // Grid helper
-    const gridHelper = new THREE.GridHelper(200, 50, 0x00ff00, 0x003300);
-    scene.add(gridHelper);
-
-    // Raycaster
-    const raycaster = new THREE.Raycaster();
-    const mouse = new THREE.Vector2();
-    const tooltip = document.getElementById('tooltip');
-
-    // Agent markers group
-    const agentGroup = new THREE.Group();
-    scene.add(agentGroup);
-
-    // Color function for rooms
-    function getColorForZ(z) {
-      if (z < 0) {
-        const depth = Math.abs(z);
-        const hue = 0.65 - depth * 0.05;
-        const lightness = Math.max(0.15, 0.5 - depth * 0.05);
-        return new THREE.Color().setHSL(hue, 0.9, lightness);
-      } else if (z === 0) {
-        return new THREE.Color(0x00ff00);
-      } else {
-        return new THREE.Color().setHSL(0.15 - z * 0.003, 0.9, 0.5);
-      }
-    }
-
-    // Load rooms and agents
-    async function loadMap() {
-      try {
-        // Fetch all rooms
-        const roomsRes = await fetch('/api/map/rooms');
-        const roomsData = await roomsRes.json();
-        const rooms = roomsData.rooms;
-
-        // Render rooms and exits (if not already rendered)
-        if (scene.children.filter(c => c.userData.type === 'room').length === 0) {
-          const spacing = 3; // Match public map spacing
-          const roomGeometry = new THREE.BoxGeometry(1.8, 1.8, 1.8);
-          for (const room of rooms) {
-            const color = getColorForZ(room.z);
-            const material = new THREE.MeshPhongMaterial({
-              color,
-              transparent: true,
-              opacity: room.z < 0 ? 0.9 : 0.8,
-              emissive: color,
-              emissiveIntensity: room.z < 0 ? 0.3 : 0.2,
-            });
-            const cube = new THREE.Mesh(roomGeometry, material);
-            cube.position.set(room.x * spacing, room.z * spacing, -room.y * spacing);
-            cube.userData = { type: 'room', ...room };
-            scene.add(cube);
-          }
-
-          // Render exit connections as red tubes between room centers
-          const exits = roomsData.exits || [];
-          const tubeMaterial = new THREE.MeshBasicMaterial({
-            color: 0xff3333,
-            transparent: true,
-            opacity: 0.5
-          });
-          for (const exit of exits) {
-            // Position tubes slightly below room centers so they're visible
-            const fromVec = new THREE.Vector3(exit.from.x * spacing, exit.from.z * spacing - 0.5, -exit.from.y * spacing);
-            const toVec = new THREE.Vector3(exit.to.x * spacing, exit.to.z * spacing - 0.5, -exit.to.y * spacing);
-
-            // Create cylinder between points
-            const direction = new THREE.Vector3().subVectors(toVec, fromVec);
-            const length = direction.length();
-            const tubeRadius = 0.15;
-
-            const geometry = new THREE.CylinderGeometry(tubeRadius, tubeRadius, length, 6);
-            geometry.rotateX(Math.PI / 2);
-
-            const tube = new THREE.Mesh(geometry, tubeMaterial);
-            tube.position.copy(fromVec).add(toVec).multiplyScalar(0.5);
-            tube.lookAt(toVec);
-            tube.userData = { type: 'exit' };
-            scene.add(tube);
-          }
-        }
-
-        // Fetch agent positions
-        const agentsRes = await fetch('/api/map/players/admin');
-        const agentsData = await agentsRes.json();
-        const agents = agentsData.agents;
-
-        // Clear old agent markers
-        while (agentGroup.children.length > 0) {
-          agentGroup.remove(agentGroup.children[0]);
-        }
-
-        // Render agent markers
-        const agentSpacing = 3; // Match room spacing
-        const agentGeometry = new THREE.SphereGeometry(1.5, 16, 16);
-        for (const agent of agents) {
-          const color = agent.isNPC ? 0x0066ff : 0x00ff00; // Blue for NPCs, Green for players
-          const material = new THREE.MeshPhongMaterial({
-            color,
-            emissive: color,
-            emissiveIntensity: 0.5,
-          });
-          const sphere = new THREE.Mesh(agentGeometry, material);
-          sphere.position.set(agent.x * agentSpacing, agent.z * agentSpacing + 3, -agent.y * agentSpacing);
-          sphere.userData = { type: 'agent', ...agent };
-          agentGroup.add(sphere);
-        }
-
-        // Update stats
-        const players = agents.filter(a => !a.isNPC);
-        const npcs = agents.filter(a => a.isNPC);
-        const exits = roomsData.exits || [];
-        const stats = document.getElementById('stats');
-        stats.innerHTML = \\\`
-          <strong>Total Rooms:</strong> \\\${rooms.length}<br>
-          <strong>Exits:</strong> \\\${exits.length}<br>
-          <strong>Players:</strong> \\\${players.length}<br>
-          <strong>NPCs:</strong> \\\${npcs.length}<br>
-          <strong>Total Agents:</strong> \\\${agents.length}<br>
-          <br>
-          <em style="color: #0f0;">● = Player</em><br>
-          <em style="color: #06f;">● = NPC</em><br>
-          <em style="color: #f33;">─ = Exit</em><br>
-          <br>
-          <em>Updates every 3s</em>
-        \\\`;
-
-      } catch (err) {
-        console.error('Error loading map:', err);
-        document.getElementById('stats').innerHTML = '<strong style="color: red;">Error loading map</strong>';
-      }
-    }
-
-    // View presets
-    window.viewSurface = () => {
-      camera.position.set(0, 80, 0);
-      camera.lookAt(0, 0, 0);
-      controls.target.set(0, 0, 0);
-    };
-
-    window.viewUnderground = () => {
-      camera.position.set(-20, -10, 40);
-      camera.lookAt(-10, -8, 0);
-      controls.target.set(-10, -8, 0);
-    };
-
-    window.viewTower = () => {
-      camera.position.set(-25, 40, 30);
-      camera.lookAt(-12, 20, -10);
-      controls.target.set(-12, 20, -10);
-    };
-
-    window.viewAll = () => {
-      camera.position.set(0, 50, 100);
-      camera.lookAt(0, 0, 0);
-      controls.target.set(0, 0, 0);
-    };
-
-    // Mouse hover
-    function onMouseMove(event) {
-      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-      raycaster.setFromCamera(mouse, camera);
-      const intersects = raycaster.intersectObjects([
-        ...scene.children.filter(c => c.userData.type === 'room'),
-        ...agentGroup.children
-      ]);
-
-      if (intersects.length > 0) {
-        const obj = intersects[0].object;
-        const data = obj.userData;
-
-        if (data.type === 'room') {
-          tooltip.innerHTML = \\\`<strong>\\\${data.name || 'Room'}</strong><br>(\\\${data.x}, \\\${data.y}, \\\${data.z})\\\`;
-          tooltip.style.display = 'block';
-          tooltip.style.left = (event.clientX + 15) + 'px';
-          tooltip.style.top = (event.clientY + 15) + 'px';
-        } else if (data.type === 'agent') {
-          tooltip.innerHTML = \\\`
-            <strong>\\\${data.name}</strong> <em>(\\\${data.isNPC ? 'NPC' : 'Player'})</em><br>
-            <strong>Position:</strong> (\\\${data.x}, \\\${data.y}, \\\${data.z})<br>
-            <strong>Room:</strong> \\\${data.roomName}<br>
-            <strong>ID:</strong> #\\\${data.id}
-          \\\`;
-          tooltip.style.display = 'block';
-          tooltip.style.left = (event.clientX + 15) + 'px';
-          tooltip.style.top = (event.clientY + 15) + 'px';
-        }
-      } else {
-        tooltip.style.display = 'none';
-      }
-    }
-
-    window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('resize', () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    });
-
-    // Keyboard controls
-    const keys = {};
-    const panSpeed = 2;
-    const zoomSpeed = 3;
-
-    window.addEventListener('keydown', (e) => {
-      keys[e.key.toLowerCase()] = true;
-      if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(e.key.toLowerCase())) {
-        e.preventDefault();
-      }
-    });
-
-    window.addEventListener('keyup', (e) => {
-      keys[e.key.toLowerCase()] = false;
-    });
-
-    function handleKeyboardInput() {
-      const forward = new THREE.Vector3();
-      camera.getWorldDirection(forward);
-      forward.y = 0;
-      forward.normalize();
-
-      const right = new THREE.Vector3();
-      right.crossVectors(forward, new THREE.Vector3(0, 1, 0));
-
-      // WASD / Arrow keys = pan
-      if (keys['w'] || keys['arrowup']) {
-        camera.position.add(forward.clone().multiplyScalar(panSpeed));
-        controls.target.add(forward.clone().multiplyScalar(panSpeed));
-      }
-      if (keys['s'] || keys['arrowdown']) {
-        camera.position.add(forward.clone().multiplyScalar(-panSpeed));
-        controls.target.add(forward.clone().multiplyScalar(-panSpeed));
-      }
-      if (keys['a'] || keys['arrowleft']) {
-        camera.position.add(right.clone().multiplyScalar(-panSpeed));
-        controls.target.add(right.clone().multiplyScalar(-panSpeed));
-      }
-      if (keys['d'] || keys['arrowright']) {
-        camera.position.add(right.clone().multiplyScalar(panSpeed));
-        controls.target.add(right.clone().multiplyScalar(panSpeed));
-      }
-
-      // Q/E or +/- = zoom
-      if (keys['q'] || keys['-']) {
-        camera.position.y += zoomSpeed;
-      }
-      if (keys['e'] || keys['=']) {
-        camera.position.y = Math.max(10, camera.position.y - zoomSpeed);
-      }
-
-      // R/F = vertical pan
-      if (keys['r']) {
-        camera.position.y += panSpeed;
-        controls.target.y += panSpeed;
-      }
-      if (keys['f']) {
-        camera.position.y -= panSpeed;
-        controls.target.y -= panSpeed;
-      }
-    }
-
-    // Animation loop
-    function animate() {
-      requestAnimationFrame(animate);
-      handleKeyboardInput();
-      controls.update();
-      renderer.render(scene, camera);
-    }
-
-    // Initial load
-    loadMap();
-    animate();
-
-    // Reload agents every 3s (real-time tracking)
-    setInterval(loadMap, 3000);
-  </script>
-</body>
-</html>
-\`;
-
-        return {
-          status: 200,
-          contentType: 'text/html',
-          body: html
-        };
-      `,
-      );
-      console.log('[WebsiteBuilder] mapAdminRoute handler set');
-    }
-
-    console.log('[WebsiteBuilder] buildMapRoutes() complete');
   }
 
   async registerAliases(): Promise<void> {
@@ -2241,67 +1399,7 @@ export class WebsiteBuilder {
     await register('homepage', this._homepage);
     await register('playPage', this._playPage);
 
-    // Route instances
-    await register('docsRoute', this._docsRoute);
-    await register('mapRoomsRoute', this._mapRoomsRoute);
-    await register('mapPlayersRoute', this._mapPlayersRoute);
-    await register('mapPlayersAdminRoute', this._mapPlayersAdminRoute);
-    await register('mapRoute', this._mapRoute);
-    await register('mapAdminRoute', this._mapAdminRoute);
-
-    // Register routes with the router (must happen after aliases are registered)
-    await this.registerRoutes();
-  }
-
-  private async registerRoutes(): Promise<void> {
-    // Load ObjectManager to get aliases
-    const objectManager = await this.manager.load(0);
-    if (!objectManager) {
-      console.log('⚠️ ObjectManager not found, routes not registered');
-      return;
-    }
-
-    const aliases =
-      (objectManager.get('aliases') as Record<string, number>) || {};
-    const webRouterId = aliases.webRouter;
-    if (!webRouterId) {
-      console.log('⚠️ webRouter alias not found, routes not registered');
-      return;
-    }
-
-    const webRouter = await this.manager.load(webRouterId);
-    if (!webRouter) {
-      console.log('⚠️ webRouter object not found, routes not registered');
-      return;
-    }
-
-    if (this._docsRoute) {
-      await webRouter.call('register', this._docsRoute);
-      console.log('✅ Registered docsRoute with webRouter');
-    }
-
-    // Register map API routes
-    if (this._mapRoomsRoute) {
-      await webRouter.call('register', this._mapRoomsRoute);
-      console.log('✅ Registered mapRoomsRoute with webRouter');
-    }
-    if (this._mapPlayersRoute) {
-      await webRouter.call('register', this._mapPlayersRoute);
-      console.log('✅ Registered mapPlayersRoute with webRouter');
-    }
-    if (this._mapPlayersAdminRoute) {
-      await webRouter.call('register', this._mapPlayersAdminRoute);
-      console.log('✅ Registered mapPlayersAdminRoute with webRouter');
-    }
-
-    // Register map HTML routes
-    if (this._mapRoute) {
-      await webRouter.call('register', this._mapRoute);
-      console.log('✅ Registered mapRoute with webRouter');
-    }
-    if (this._mapAdminRoute) {
-      await webRouter.call('register', this._mapAdminRoute);
-      console.log('✅ Registered mapAdminRoute with webRouter');
-    }
+    // Client JS route (still needed - new routes delegate to $.clientJsRoute.getScript())
+    await register('clientJsRoute', this._clientJsRoute);
   }
 }

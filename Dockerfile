@@ -26,6 +26,9 @@ COPY --chown=node:node tsconfig.json ./
 # Copy all documentation for MCP resources
 COPY --chown=node:node docs ./docs
 
+# Copy web assets
+COPY --chown=node:node world-map-3d.html ./
+
 # Set Claude home for credentials (mounted from host)
 ENV CLAUDE_CONFIG_DIR=/home/node/.claude
 ENV HOME=/home/node

@@ -252,4 +252,20 @@ export class ObjectCache {
   set(id: ObjId, obj: RuntimeObject): void {
     this.setObject(id, obj);
   }
+
+  /**
+   * Get all object IDs in the cache
+   */
+  getAllIds(): ObjId[] {
+    const ids: ObjId[] = [];
+    for (let i = 0; i < this.objects.length; i++) {
+      if (this.objects[i] !== undefined) {
+        ids.push(i);
+      }
+    }
+    for (const id of this.infrastructureObjects.keys()) {
+      ids.push(id);
+    }
+    return ids;
+  }
 }

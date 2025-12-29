@@ -65,7 +65,9 @@ function printHelp(): void {
   console.log(
     '  --systems        Build prototypes + core systems only (default)',
   );
-  console.log('  --full           Build complete world with geometry + buildings');
+  console.log(
+    '  --full           Build complete world with geometry + buildings',
+  );
   console.log('  --mongoUri=URI   Override Mongo connection URI');
   console.log('  --dbName=NAME    Override Mongo database name');
 }
@@ -87,7 +89,9 @@ async function main() {
   console.log('  🏗️  Bootstrap World');
   console.log('═══════════════════════════════════════════════════════════');
   console.log('');
-  console.log(`Mode: ${opts.full ? 'FULL (prototypes + systems + geometry)' : 'SYSTEMS (prototypes + core systems only)'}`);
+  console.log(
+    `Mode: ${opts.full ? 'FULL (prototypes + systems + geometry)' : 'SYSTEMS (prototypes + core systems only)'}`,
+  );
   console.log(`Database: ${opts.dbName} @ ${opts.mongoUri}`);
   console.log('');
 
@@ -120,7 +124,9 @@ async function main() {
     const coreSystemBuilder = new CoreSystemBuilder(manager);
     await coreSystemBuilder.buildCoreSystems();
     console.log('  ✅ Created AuthManager, CharGen, PreAuthHandler, Recycler');
-    console.log('  ✅ Created $.pronoun, $.proportional, $.room, $.bodyFactory');
+    console.log(
+      '  ✅ Created $.pronoun, $.proportional, $.room, $.bodyFactory',
+    );
 
     // Phase 4: Reload aliases
     console.log('');
@@ -268,7 +274,10 @@ async function placeSpecialObjects(manager: ObjectManager): Promise<void> {
     const totemPole = await manager.load(aliases.totemPole);
     const roomPrototype = await manager.load(aliases.room);
     // Find the intersection room at x=-7, y=0 (Occidental & Main)
-    const zeroPoint = await manager.findByProperty('name', 'Occidental Ave S & S. Main St');
+    const zeroPoint = await manager.findByProperty(
+      'name',
+      'Occidental Ave S & S. Main St',
+    );
 
     if (totemPole && zeroPoint.length > 0 && roomPrototype) {
       const groundRoom = zeroPoint[0];
@@ -276,7 +285,9 @@ async function placeSpecialObjects(manager: ObjectManager): Promise<void> {
 
       // Register $bottomOfTotemPole alias
       await objectManager.call('addAlias', 'bottomOfTotemPole', groundRoom.id);
-      console.log(`  ✅ Placed Totem Pole at zero point (#${groundRoom.id}), aliased $bottomOfTotemPole`);
+      console.log(
+        `  ✅ Placed Totem Pole at zero point (#${groundRoom.id}), aliased $bottomOfTotemPole`,
+      );
 
       // Create the top-of-pole room at z=1
       const topRoom = await manager.create({
@@ -319,7 +330,9 @@ CAPACITY: One person. Maybe two if they're friendly. Three would be suicide.`,
 
       // Register $topOfTotemPole alias
       await objectManager.call('addAlias', 'topOfTotemPole', topRoom.id);
-      console.log(`  ✅ Created Top of the Totem Pole room (#${topRoom.id}), aliased $topOfTotemPole`);
+      console.log(
+        `  ✅ Created Top of the Totem Pole room (#${topRoom.id}), aliased $topOfTotemPole`,
+      );
     } else {
       console.warn('  ⚠️  Could not place Totem Pole - room not found');
     }
@@ -330,10 +343,26 @@ CAPACITY: One person. Maybe two if they're friendly. Three would be suicide.`,
     const telescopeProto = await manager.load(aliases.telescope);
     if (telescopeProto) {
       const telescopeSpots = [
-        { roomName: 'Smith Tower - 38th Floor - Observation Deck', name: 'West Telescope', desc: 'A coin-operated telescope facing west toward the waterfront and Elliott Bay.' },
-        { roomName: 'Smith Tower - 38th Floor - Glass Dome Catwalk', name: 'North Telescope', desc: 'A coin-operated telescope facing north toward downtown Seattle.' },
-        { roomName: 'Smith Tower - 38th Floor - East Terrace', name: 'East Telescope', desc: 'A coin-operated telescope facing east toward the International District.' },
-        { roomName: 'Smith Tower - 38th Floor - Southeast Alcove', name: 'South Telescope', desc: 'A coin-operated telescope facing south toward the stadiums and SoDo.' },
+        {
+          roomName: 'Smith Tower - 38th Floor - Observation Deck',
+          name: 'West Telescope',
+          desc: 'A coin-operated telescope facing west toward the waterfront and Elliott Bay.',
+        },
+        {
+          roomName: 'Smith Tower - 38th Floor - Glass Dome Catwalk',
+          name: 'North Telescope',
+          desc: 'A coin-operated telescope facing north toward downtown Seattle.',
+        },
+        {
+          roomName: 'Smith Tower - 38th Floor - East Terrace',
+          name: 'East Telescope',
+          desc: 'A coin-operated telescope facing east toward the International District.',
+        },
+        {
+          roomName: 'Smith Tower - 38th Floor - Southeast Alcove',
+          name: 'South Telescope',
+          desc: 'A coin-operated telescope facing south toward the stadiums and SoDo.',
+        },
       ];
 
       for (const spot of telescopeSpots) {
@@ -351,7 +380,9 @@ CAPACITY: One person. Maybe two if they're friendly. Three would be suicide.`,
           });
           await telescope.call('moveTo', room);
           await telescope.call('calibratePointsOfInterest');
-          console.log(`  ✅ Placed ${spot.name} in ${spot.roomName.split(' - ').pop()} (#${room.id})`);
+          console.log(
+            `  ✅ Placed ${spot.name} in ${spot.roomName.split(' - ').pop()} (#${room.id})`,
+          );
         }
       }
     }

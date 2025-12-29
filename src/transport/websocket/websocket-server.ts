@@ -4,6 +4,7 @@ import { type WebSocket, WebSocketServer as WSServer } from 'ws';
 import type { AuthInfo } from '../../../types/auth.js';
 import type { TransportServerConfig } from '../../../types/transport.js';
 import { Connection } from '../../connection/connection.js';
+import { MultiplexedTransport } from '../multiplexed/multiplexed-transport.js';
 import { WebSocketTransport } from './websocket-transport.js';
 
 /**
@@ -57,12 +58,17 @@ export class WebSocketServer {
   /**
    * Handle new WebSocket connection
    * Extracts HTTP Basic Auth from headers if present
+   * Routes to MultiplexedTransport for /ws/mux paths
    */
   private handleConnection(ws: WebSocket, req: IncomingMessage): void {
     const remoteAddress = req.socket.remoteAddress || 'unknown';
+    const url = req.url || '/';
+    const isMultiplexed = url.startsWith('/mux') || url.startsWith('/ws/mux');
 
     if (this.config.debug) {
-      console.log(`[WebSocketServer] New connection from ${remoteAddress}`);
+      console.log(
+        `[WebSocketServer] New ${isMultiplexed ? 'multiplexed ' : ''}connection from ${remoteAddress} (${url})`,
+      );
     }
 
     // Extract HTTP Basic Auth if present
@@ -81,7 +87,7 @@ export class WebSocketServer {
           metadata: {
             remoteAddress,
             userAgent: req.headers['user-agent'],
-            protocol: 'websocket',
+            protocol: isMultiplexed ? 'websocket-mux' : 'websocket',
           },
         };
 
@@ -93,8 +99,11 @@ export class WebSocketServer {
       }
     }
 
-    // Create transport and connection
-    const transport = new WebSocketTransport(ws, remoteAddress);
+    // Create transport based on path
+    const transport = isMultiplexed
+      ? new MultiplexedTransport(ws, remoteAddress)
+      : new WebSocketTransport(ws, remoteAddress);
+
     const connection = new Connection(transport, authInfo);
 
     // Emit the connection

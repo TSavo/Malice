@@ -186,6 +186,82 @@ $query().inheritedFrom($item).limit(10).all()
 - **3012** - Session MCP server (code-first: execute_session_code, sandboxed player access)
 - **9999** - DevTools WebSocket (VS Code extension)
 
+## Multiplexed Transport
+
+The WebSocket server supports a **multiplexed channel protocol** for rich web clients. Connect to `/mux` path for channel support.
+
+### Wire Protocol
+
+Messages are JSON envelopes with channel routing:
+```json
+{ "ch": "game", "t": "data", "p": "Hello world" }
+{ "ch": "state", "t": "data", "p": { "type": "room", "data": {...} } }
+{ "ch": "ctrl", "t": "data", "p": { "type": "prompt", "text": "> " } }
+```
+
+- `ch` - Channel ID (game, state, ctrl, or custom)
+- `t` - Message type (data, open, close, ack, ping, pong)
+- `p` - Payload (string for game, object for state/ctrl)
+
+### Built-in Channels
+
+| Channel | Direction | Purpose |
+|---------|-----------|---------|
+| `game` | bidirectional | Text I/O (like telnet) |
+| `state` | server→client | State pushes (room, inventory, etc.) |
+| `ctrl` | bidirectional | Control signals (resize, ready, prompt) |
+| `custom:*` | bidirectional | Custom channels (open with `t: 'open'`) |
+
+### MOO Methods for Channels
+
+**On `$player`** (individual):
+```typescript
+player.state('room', { name: 'Lobby', exits: ['n', 's'] });  // state channel
+player.ctrl('prompt', { text: '> ' });                       // ctrl channel
+player.channel('custom:events', { type: 'alert' });          // any channel
+```
+
+**On `$location`** (spatial broadcast):
+```typescript
+room.broadcastState('room', roomData);     // all players in room
+room.broadcastCtrl('mode', { combat: true });
+room.broadcastChannel('custom:fx', { sound: 'explosion.mp3' });
+```
+
+**On `$`** (global broadcast):
+```typescript
+await $.broadcastState('announcement', { message: 'Server restart in 5m' });
+await $.broadcastCtrl('mode', { maintenance: true });
+await $.broadcastChannel('custom:alert', { level: 'critical' });
+```
+
+### Client Connection
+
+```javascript
+// Connect to multiplexed endpoint
+const ws = new WebSocket('ws://localhost:8080/mux');
+
+ws.onmessage = (e) => {
+  const { ch, t, p } = JSON.parse(e.data);
+  if (ch === 'game') terminal.write(p);
+  if (ch === 'state') updateState(p);
+  if (ch === 'ctrl') handleCtrl(p);
+};
+
+// Send game input
+ws.send(JSON.stringify({ ch: 'game', t: 'data', p: 'look' }));
+
+// Send resize
+ws.send(JSON.stringify({ ch: 'ctrl', t: 'data', p: { type: 'resize', w: 80, h: 24 } }));
+```
+
+### Raw vs Multiplexed
+
+| Path | Format | Use Case |
+|------|--------|----------|
+| `/` | Raw text | Simple telnet-like clients |
+| `/mux` | JSON envelopes | Rich web clients with channels |
+
 ## Code Style
 
 - TypeScript with strict mode enabled

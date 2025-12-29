@@ -155,6 +155,111 @@ export class MinimalBootstrap {
       );
     }
 
+    // === GLOBAL MULTIPLEXED CHANNEL BROADCASTS ===
+
+    if (!objectManager.hasMethod('broadcastState')) {
+      objectManager.setMethod(
+        'broadcastState',
+        `
+        /**
+         * Send state channel message to all connected multiplexed clients globally
+         * @param type - State message type (e.g., 'announcement', 'event')
+         * @param data - State data payload
+         * @returns Number of clients messaged
+         */
+        const type = args[0];
+        const data = args[1];
+
+        // Find all players with active connections
+        const players = await $query()
+          .parent($player)
+          .prop('connection').exists()
+          .all();
+
+        let count = 0;
+        for (const p of players) {
+          if (p.state) {
+            try {
+              await p.call('state', type, data);
+              count++;
+            } catch (e) {
+              // Ignore - player may not have mux connection
+            }
+          }
+        }
+        return count;
+        `,
+      );
+    }
+
+    if (!objectManager.hasMethod('broadcastCtrl')) {
+      objectManager.setMethod(
+        'broadcastCtrl',
+        `
+        /**
+         * Send ctrl channel message to all connected multiplexed clients globally
+         * @param type - Ctrl message type (e.g., 'mode', 'prompt')
+         * @param data - Ctrl data payload
+         * @returns Number of clients messaged
+         */
+        const type = args[0];
+        const data = args[1];
+
+        const players = await $query()
+          .parent($player)
+          .prop('connection').exists()
+          .all();
+
+        let count = 0;
+        for (const p of players) {
+          if (p.ctrl) {
+            try {
+              await p.call('ctrl', type, data);
+              count++;
+            } catch (e) {
+              // Ignore - player may not have mux connection
+            }
+          }
+        }
+        return count;
+        `,
+      );
+    }
+
+    if (!objectManager.hasMethod('broadcastChannel')) {
+      objectManager.setMethod(
+        'broadcastChannel',
+        `
+        /**
+         * Send message on any channel to all connected multiplexed clients globally
+         * @param channel - Channel name (e.g., 'custom:alerts')
+         * @param data - Message payload
+         * @returns Number of clients messaged
+         */
+        const channel = args[0];
+        const data = args[1];
+
+        const players = await $query()
+          .parent($player)
+          .prop('connection').exists()
+          .all();
+
+        let count = 0;
+        for (const p of players) {
+          if (p.channel) {
+            try {
+              await p.call('channel', channel, data);
+              count++;
+            } catch (e) {
+              // Ignore - player may not have mux connection
+            }
+          }
+        }
+        return count;
+        `,
+      );
+    }
+
     console.log('✅ Registered core aliases in #0.properties.aliases');
   }
 
@@ -197,7 +302,7 @@ export class MinimalBootstrap {
    * Routes new connections to appropriate handlers
    */
   private async ensureSystem(): Promise<void> {
-    // Check if System already exists via alias
+    // Check if System already exists via alias OR directly by ID
     const objectManager = await this.manager.load(0);
     const aliases =
       (objectManager?.get('aliases') as Record<string, number>) || {};
@@ -205,6 +310,12 @@ export class MinimalBootstrap {
     let system = aliases.system
       ? await this.manager.load(aliases.system)
       : null;
+
+    // Also check if #2 exists directly (in case alias wasn't registered yet)
+    if (!system) {
+      system = await this.manager.load(2);
+    }
+
     if (!system) {
       // Create directly in database with explicit ID (bootstrap-only pattern)
       // Normal objects should be created via $.recycler

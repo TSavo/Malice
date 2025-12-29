@@ -237,7 +237,9 @@ export class RuntimeObjectImpl implements RuntimeObject {
 
       case 'array': {
         // Recursively convert array elements
-        const arr = (value.value as Value[]).map((item) => this.fromValue(item));
+        const arr = (value.value as Value[]).map((item) =>
+          this.fromValue(item),
+        );
         // Return plain array - proxying happens in get() where we know the property name
         return arr;
       }
@@ -398,7 +400,9 @@ export class RuntimeObjectImpl implements RuntimeObject {
 
       // Queue the write to ensure ordering
       const props = { ...this.obj.properties };
-      this.queueWrite(() => this.manager.update(this.id, { properties: props }, false));
+      this.queueWrite(() =>
+        this.manager.update(this.id, { properties: props }, false),
+      );
     }
   }
 
@@ -440,7 +444,11 @@ export class RuntimeObjectImpl implements RuntimeObject {
     }
 
     // Convert value to typed Value and push to in-memory array
-    const typedValue = this.toValue(value, new WeakSet(), `#${this.id}.${prop}[]`);
+    const typedValue = this.toValue(
+      value,
+      new WeakSet(),
+      `#${this.id}.${prop}[]`,
+    );
     propValue.value.push(typedValue);
 
     // Queue the write to ensure ordering
@@ -453,7 +461,11 @@ export class RuntimeObjectImpl implements RuntimeObject {
    */
   popFromArray(prop: string): unknown {
     const propValue = this.obj.properties?.[prop];
-    if (!propValue || propValue.type !== 'array' || !Array.isArray(propValue.value)) {
+    if (
+      !propValue ||
+      propValue.type !== 'array' ||
+      !Array.isArray(propValue.value)
+    ) {
       return undefined;
     }
 
@@ -472,7 +484,11 @@ export class RuntimeObjectImpl implements RuntimeObject {
    */
   shiftFromArray(prop: string): unknown {
     const propValue = this.obj.properties?.[prop];
-    if (!propValue || propValue.type !== 'array' || !Array.isArray(propValue.value)) {
+    if (
+      !propValue ||
+      propValue.type !== 'array' ||
+      !Array.isArray(propValue.value)
+    ) {
       return undefined;
     }
 
@@ -491,12 +507,20 @@ export class RuntimeObjectImpl implements RuntimeObject {
    */
   pullFromArray(prop: string, value: unknown): void {
     const propValue = this.obj.properties?.[prop];
-    if (!propValue || propValue.type !== 'array' || !Array.isArray(propValue.value)) {
+    if (
+      !propValue ||
+      propValue.type !== 'array' ||
+      !Array.isArray(propValue.value)
+    ) {
       return;
     }
 
     // Convert to typed value for comparison
-    const typedValue = this.toValue(value, new WeakSet(), `#${this.id}.${prop}[]`);
+    const typedValue = this.toValue(
+      value,
+      new WeakSet(),
+      `#${this.id}.${prop}[]`,
+    );
 
     // Remove from in-memory array (find by deep equality)
     const idx = propValue.value.findIndex((v) => {

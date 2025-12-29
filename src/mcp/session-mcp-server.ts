@@ -57,7 +57,9 @@ export class SessionMCPServer {
   async start(): Promise<void> {
     this.httpServer = createServer(
       async (req: IncomingMessage, res: ServerResponse) => {
-        console.log(`[SessionMCP] ${req.method} ${req.url} sessionId=${req.headers['mcp-session-id'] || 'none'}`);
+        console.log(
+          `[SessionMCP] ${req.method} ${req.url} sessionId=${req.headers['mcp-session-id'] || 'none'}`,
+        );
 
         // CORS headers
         res.setHeader('Access-Control-Allow-Origin', '*');
@@ -131,7 +133,11 @@ export class SessionMCPServer {
               sessionIdGenerator: () => mcpSessionId,
               onsessioninitialized: (newId) => {
                 capturedSessionId = newId;
-                this.sessions.set(newId, { server, transport, telnetSessionId });
+                this.sessions.set(newId, {
+                  server,
+                  transport,
+                  telnetSessionId,
+                });
                 console.log(`[SessionMCP] Session initialized: ${newId}`);
               },
             });
@@ -230,7 +236,11 @@ export class SessionMCPServer {
     return this.port;
   }
 
-  private registerTools(server: McpServer, mcpSessionId: string, initialTelnetSessionId: string): void {
+  private registerTools(
+    server: McpServer,
+    mcpSessionId: string,
+    initialTelnetSessionId: string,
+  ): void {
     // Store telnetSessionId in a mutable wrapper so reconnect can update it
     const sessionRef = { telnetSessionId: initialTelnetSessionId };
 
@@ -318,7 +328,10 @@ EXAMPLES:
 
         try {
           // Check if session is closed and auto-reconnect on send
-          const status = await $session.call('getStatus', sessionRef.telnetSessionId) as { closed?: boolean };
+          const status = (await $session.call(
+            'getStatus',
+            sessionRef.telnetSessionId,
+          )) as { closed?: boolean };
           if (status?.closed && action === 'send') {
             // Auto-reconnect
             const telnetResult = (await $session.call('connect')) as {
@@ -354,7 +367,10 @@ EXAMPLES:
             }
 
             case 'getStatus': {
-              const result = await $session.call('getStatus', sessionRef.telnetSessionId);
+              const result = await $session.call(
+                'getStatus',
+                sessionRef.telnetSessionId,
+              );
               return ok(result);
             }
 
@@ -369,7 +385,10 @@ EXAMPLES:
             }
 
             case 'listKeys': {
-              const result = await $session.call('listKeys', sessionRef.telnetSessionId);
+              const result = await $session.call(
+                'listKeys',
+                sessionRef.telnetSessionId,
+              );
               return ok(result);
             }
 
