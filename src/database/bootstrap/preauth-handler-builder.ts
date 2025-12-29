@@ -74,6 +74,13 @@ export class PreAuthHandlerBuilder {
                 await self.handleToken(context, authInfo.token);
                 break;
 
+              case 'none':
+                // No auth credentials, but may have metadata (like chargenMode)
+                // Switch handler to authManager and start normal auth flow
+                context.setHandler($.authManager);
+                await $.authManager.onConnect(context);
+                break;
+
               default:
                 context.send(\`Unknown authentication mode: \${authInfo.mode}\\\\r\\\\n\`);
                 context.close();

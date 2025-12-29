@@ -65,7 +65,7 @@ export interface TokenAuthInfo {
  */
 export interface AuthInfo {
   /** Authentication mode */
-  mode: 'ssl-cert' | 'http-basic' | 'oauth' | 'ssh-key' | 'token' | 'custom';
+  mode: 'ssl-cert' | 'http-basic' | 'oauth' | 'ssh-key' | 'token' | 'custom' | 'none';
 
   /** SSL client certificate (if mode === 'ssl-cert') */
   sslCert?: SSLCertInfo;

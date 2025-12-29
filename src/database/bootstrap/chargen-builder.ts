@@ -1321,6 +1321,7 @@ STARTING LOCATION: Immigration Services Entry Hall ($immigrationServices)`,
 
       // 2. Mark player as in-chargen
       player.chargenInProgress = true;
+      player.chargenFaction = 'continuum';
 
       // 3. Immediate feedback - keep them engaged while AI boots up
       await player.tell('');

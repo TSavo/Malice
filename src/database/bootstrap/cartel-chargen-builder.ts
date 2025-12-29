@@ -589,6 +589,7 @@ CURRENCY: Cash (50 starting)`,
 
       // 2. Mark player as in-chargen
       player.chargenInProgress = true;
+      player.chargenFaction = 'cartel';
 
       // 3. Immediate feedback - atmospheric
       await player.tell('');
