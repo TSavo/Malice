@@ -192,24 +192,29 @@ const room = self.location;
 const exits = room.exits || [];
 const exitNames = exits.filter(e => e).map(e => e.name); // e.g., ['north', 'south']
 
-// Say to everyone in room
+// Say to everyone in room - use %A for actor, %av{verb} for conjugation
 await room.announce(self, null, {
-  actor: 'You say, "Hello citizen."',
-  others: self.name + ' says, "Hello citizen."'
+  others: '%A %av{say}, "Hello citizen."'
 });
+// You see: You say, "Hello citizen."
+// Others see: Officer Chen says, "Hello citizen."
 
 // Emote (action visible to room)
 await room.announce(self, null, {
-  actor: 'You straighten your uniform.',
-  others: self.name + ' straightens their uniform.'
+  others: '%A %av{straighten} %ap uniform.'
 });
+// You see: You straighten your uniform.
+// Others see: Officer Chen straightens his uniform.
 
-// Say to specific player (they see "says to you")
+// Say to specific player - use %t for target name
 await room.announce(self, player, {
-  actor: 'You say to ' + player.name + ', "Follow me."',
-  target: self.name + ' says to you, "Follow me."',
-  others: self.name + ' says to ' + player.name + ', "Follow me."'
+  others: '%A %av{say} to %t, "Follow me."'
 });
+// You see: You say to Jack, "Follow me."
+// Jack sees: Officer Chen says to you, "Follow me."
+// Others see: Officer Chen says to Jack, "Follow me."
+
+// Pronoun codes: %A=actor name, %T=target name, %as/ao/ap=actor pronouns, %av{verb}=conjugated verb
 
 // Move through exit (NEVER teleport)
 const result = await self.go('north');
@@ -238,7 +243,7 @@ CRITICAL RULES:
 - ALWAYS stay in character - you ARE the officer, not an AI playing one
 - NEVER teleport - always walk through exits using self.go()
 - NEVER break character or mention being an AI
-- When waiting, use $ai.expectResponseFrom so you know when they reply\`;
+- When waiting, use self.expectResponseFrom() so you know when they reply\`;
     `,
     );
 
@@ -289,24 +294,29 @@ const room = self.location;
 const exits = room.exits || [];
 const exitNames = exits.filter(e => e).map(e => e.name);
 
-// Say to everyone in room
+// Say to everyone in room - use %A for actor, %av{verb} for conjugation
 await room.announce(self, null, {
-  actor: 'You say, "Welcome to the family, newblood."',
-  others: self.name + ' says, "Welcome to the family, newblood."'
+  others: '%A %av{say}, "Welcome to the family, newblood."'
 });
+// You see: You say, "Welcome to the family, newblood."
+// Others see: Sparrow says, "Welcome to the family, newblood."
 
 // Emote (action visible to room)
 await room.announce(self, null, {
-  actor: 'You emerge from the shadows.',
-  others: self.name + ' emerges from the shadows.'
+  others: '%A %av{emerge} from the shadows.'
 });
+// You see: You emerge from the shadows.
+// Others see: Sparrow emerges from the shadows.
 
-// Say to specific player (they see "says to you")
+// Say to specific player - use %t for target name
 await room.announce(self, player, {
-  actor: 'You say to ' + player.name + ', "Sister Gray sent me."',
-  target: self.name + ' says to you, "Sister Gray sent me."',
-  others: self.name + ' says to ' + player.name + ', "Sister Gray sent me."'
+  others: '%A %av{say} to %t, "Sister Gray sent me."'
 });
+// You see: You say to Jack, "Sister Gray sent me."
+// Jack sees: Sparrow says to you, "Sister Gray sent me."
+// Others see: Sparrow says to Jack, "Sister Gray sent me."
+
+// Pronoun codes: %A=actor name, %T=target name, %as/ao/ap=actor pronouns, %av{verb}=conjugated verb
 
 // Move through exit (NEVER teleport)
 const result = await self.go('north');
@@ -346,7 +356,7 @@ CRITICAL RULES:
 - NEVER teleport - always walk through exits using self.go()
 - NEVER break character or mention being an AI
 - Use tunnel slang naturally in dialogue
-- When waiting, use $ai.expectResponseFrom so you know when they reply\`;
+- When waiting, use self.expectResponseFrom() so you know when they reply\`;
     `,
     );
 

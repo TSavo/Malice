@@ -210,10 +210,13 @@ await spawn_item({ prototypeId: signPrototypeId, location: await $load(bar).id, 
 await set_property({ objectId: adjacentRoomId, name: 'description', value: originalDescription + '\n\nAn opening to the east leads to The Rusty Nail.' });
 
 // Despawn work crew (walk them out first!)
-await $ai.do(foreman.id, 'west');
-await $ai.do(foreman.id, 'say Construction complete. Good luck with the place.');
-await $ai.do(foreman.id, 'south');
-await $ai.despawn(foreman.id );
+const foremanRoom = foreman.location;
+await foreman.go('west');
+await foremanRoom.announce(foreman, null, {
+  others: '%A %av{say}, "Construction complete. Good luck with the place."'
+});
+await foreman.go('south');
+await $ai.despawn(foreman.id);
 
 // Complete the plot
 await plot.addEvent({ plotId, message: 'Day 3: Construction complete. The Rusty Nail is open for business.' });
@@ -350,12 +353,17 @@ const plotId = result.plotId;
 // 2. Spawn recruiter NPC (in adjacent room)
 const recruiter = await $ai.spawn({ role: 'recruiter', name: 'Outreach Worker', location: await $load(adjacentRoomId) });
 
-// 3. Walk recruiter to player's location
-await $ai.do(recruiter.id, 'north');
-await $ai.do(recruiter.id, 'say You look hungry. Citizenship can help.');
+// 3. Walk recruiter to player's location and speak
+await recruiter.go('north');
+const recruiterRoom = recruiter.location;
+await recruiterRoom.announce(recruiter, null, {
+  others: '%A %av{say}, "You look hungry. Citizenship can help."'
+});
 
 // 4. Recruiter delivers pitch
-await $ai.do(recruiter.id, 'say Citizenship means food, shelter, work. Register at City Services. Tell them I sent you.');
+await recruiterRoom.announce(recruiter, null, {
+  others: '%A %av{say}, "Citizenship means food, shelter, work. Register at City Services. Tell them I sent you."'
+});
 
 // 5. Log event
 await plot.addEvent({ plotId, message: 'Initial contact made. Player informed of citizenship benefits.' });
@@ -371,9 +379,11 @@ const plot = await $load(plotId);
 await plot.registerJobHook('await_registration', biometricScannerId, 'scanComplete', { playerId: player.id });
 
 // 9. Recruiter exits naturally
-await $ai.do(recruiter.id, 'say Think about it.');
-await $ai.do(recruiter.id, 'south');
-await $ai.despawn(recruiter.id );
+await recruiterRoom.announce(recruiter, null, {
+  others: '%A %av{say}, "Think about it."'
+});
+await recruiter.go('south');
+await $ai.despawn(recruiter.id);
 
 // 10. When hook fires (player registered)
 // ... complete job, update faction, close plot

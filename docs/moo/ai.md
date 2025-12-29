@@ -324,7 +324,8 @@ const result = await $aiQuery(systemPrompt, userPrompt, previousSession);
 The agent has access to all MCP tools and can:
 - Read game state via resources
 - Modify objects via tools
-- Execute commands via `$ai.do(npcId, command)`
+- Speak/emote via `location.announce()` with pronoun substitution
+- Move via `self.go(direction)`
 
 ### onSpokenTo(speaker, message)
 
