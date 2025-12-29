@@ -72,6 +72,18 @@ export class WindowManager {
     this.activeWindowId = null;
     this.zIndexBase = 100;
 
+    // Cascade placement tracking
+    this.cascadeOffset = 0;
+    this.cascadeStep = 30;
+    this.cascadeMax = 150;
+
+    // Snapping
+    this.snapThreshold = 20;
+
+    // Alt+Tab state
+    this.altTabbing = false;
+    this.altTabIndex = 0;
+
     // Create taskbar
     this.taskbar = new Taskbar(taskbarContainer, this);
 
@@ -79,6 +91,275 @@ export class WindowManager {
     this.Terminal = null;
     this.FitAddon = null;
     this.WebLinksAddon = null;
+
+    // Set up keyboard shortcuts
+    this._initKeyboardShortcuts();
+  }
+
+  /**
+   * Initialize keyboard shortcuts
+   */
+  _initKeyboardShortcuts() {
+    document.addEventListener('keydown', (e) => {
+      // Alt+Tab - cycle windows
+      if (e.altKey && e.key === 'Tab') {
+        e.preventDefault();
+        this._handleAltTab(e.shiftKey);
+        return;
+      }
+
+      // Win+D or Meta+D - show desktop (minimize all)
+      if ((e.metaKey || e.key === 'Meta') && e.key === 'd') {
+        e.preventDefault();
+        this.showDesktop();
+        return;
+      }
+
+      // Escape - cancel alt-tab
+      if (e.key === 'Escape' && this.altTabbing) {
+        this._cancelAltTab();
+        return;
+      }
+    });
+
+    document.addEventListener('keyup', (e) => {
+      // Alt released - confirm alt-tab selection
+      if (e.key === 'Alt' && this.altTabbing) {
+        this._confirmAltTab();
+      }
+    });
+  }
+
+  /**
+   * Handle Alt+Tab window cycling
+   */
+  _handleAltTab(reverse) {
+    const nonMinimized = this.zOrder.filter(id => {
+      const win = this.windows.get(id);
+      return win && !win.minimized;
+    });
+
+    if (nonMinimized.length < 2) return;
+
+    if (!this.altTabbing) {
+      this.altTabbing = true;
+      this.altTabIndex = nonMinimized.length - 2; // Start at second-to-last
+      this._showAltTabPreview();
+    } else {
+      if (reverse) {
+        this.altTabIndex = (this.altTabIndex + 1) % nonMinimized.length;
+      } else {
+        this.altTabIndex = (this.altTabIndex - 1 + nonMinimized.length) % nonMinimized.length;
+      }
+    }
+
+    // Highlight the window
+    const targetId = nonMinimized[this.altTabIndex];
+    this._updateAltTabPreview(targetId);
+  }
+
+  _showAltTabPreview() {
+    // Create overlay
+    this.altTabOverlay = document.createElement('div');
+    this.altTabOverlay.style.cssText = \\\`
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+    \\\`;
+
+    // Create preview container
+    this.altTabPreview = document.createElement('div');
+    this.altTabPreview.style.cssText = \\\`
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 16px;
+      display: flex;
+      gap: 8px;
+      max-width: 80%;
+      overflow-x: auto;
+    \\\`;
+
+    // Add window thumbnails
+    for (const id of this.zOrder) {
+      const win = this.windows.get(id);
+      if (!win || win.minimized) continue;
+
+      const thumb = document.createElement('div');
+      thumb.dataset.windowId = id;
+      thumb.style.cssText = \\\`
+        width: 120px;
+        padding: 8px;
+        border: 2px solid transparent;
+        border-radius: 4px;
+        cursor: pointer;
+        text-align: center;
+      \\\`;
+      thumb.innerHTML = \\\`
+        <div style="font-size: 24px; margin-bottom: 4px;">\${this._getWindowIcon(win.config?.windowType)}</div>
+        <div style="font-size: 12px; color: #888; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">\${win.title}</div>
+      \\\`;
+      thumb.addEventListener('click', () => {
+        this.altTabIndex = this.zOrder.indexOf(id);
+        this._confirmAltTab();
+      });
+      this.altTabPreview.appendChild(thumb);
+    }
+
+    this.altTabOverlay.appendChild(this.altTabPreview);
+    document.body.appendChild(this.altTabOverlay);
+  }
+
+  _updateAltTabPreview(targetId) {
+    if (!this.altTabPreview) return;
+
+    const thumbs = this.altTabPreview.querySelectorAll('[data-window-id]');
+    thumbs.forEach(thumb => {
+      if (thumb.dataset.windowId === targetId) {
+        thumb.style.borderColor = '#00ff88';
+        thumb.style.background = '#252525';
+      } else {
+        thumb.style.borderColor = 'transparent';
+        thumb.style.background = 'transparent';
+      }
+    });
+  }
+
+  _confirmAltTab() {
+    if (!this.altTabbing) return;
+
+    const nonMinimized = this.zOrder.filter(id => {
+      const win = this.windows.get(id);
+      return win && !win.minimized;
+    });
+
+    if (nonMinimized[this.altTabIndex]) {
+      this.focusWindow(nonMinimized[this.altTabIndex]);
+    }
+
+    this._cancelAltTab();
+  }
+
+  _cancelAltTab() {
+    this.altTabbing = false;
+    if (this.altTabOverlay) {
+      this.altTabOverlay.remove();
+      this.altTabOverlay = null;
+      this.altTabPreview = null;
+    }
+  }
+
+  /**
+   * Show desktop - minimize all windows
+   */
+  showDesktop() {
+    // Check if all are minimized
+    const allMinimized = Array.from(this.windows.values()).every(w => w.minimized);
+
+    if (allMinimized) {
+      // Restore all
+      for (const win of this.windows.values()) {
+        win.restore();
+      }
+    } else {
+      // Minimize all
+      for (const win of this.windows.values()) {
+        if (!win.minimized) {
+          win.minimize();
+        }
+      }
+    }
+  }
+
+  /**
+   * Get cascade position for new window
+   */
+  _getCascadePosition() {
+    const x = 50 + this.cascadeOffset;
+    const y = 50 + this.cascadeOffset;
+
+    this.cascadeOffset += this.cascadeStep;
+    if (this.cascadeOffset > this.cascadeMax) {
+      this.cascadeOffset = 0;
+    }
+
+    return { x, y };
+  }
+
+  /**
+   * Snap window position to edges or other windows
+   */
+  snapPosition(windowId, x, y, width, height) {
+    const area = this.getWindowArea();
+    let snappedX = x;
+    let snappedY = y;
+
+    // Snap to left edge
+    if (Math.abs(x) < this.snapThreshold) {
+      snappedX = 0;
+    }
+    // Snap to right edge
+    if (Math.abs(x + width - area.width) < this.snapThreshold) {
+      snappedX = area.width - width;
+    }
+    // Snap to top edge
+    if (Math.abs(y) < this.snapThreshold) {
+      snappedY = 0;
+    }
+    // Snap to bottom edge
+    if (Math.abs(y + height - area.height) < this.snapThreshold) {
+      snappedY = area.height - height;
+    }
+
+    // Snap to half-screen on edge drag
+    // (This is handled in window drag end)
+
+    return { x: snappedX, y: snappedY };
+  }
+
+  /**
+   * Snap window to left/right half of screen
+   */
+  snapToHalf(windowId, side) {
+    const win = this.windows.get(windowId);
+    if (!win) return;
+
+    const area = this.getWindowArea();
+    const halfWidth = Math.floor(area.width / 2);
+
+    win.preSnapX = win.x;
+    win.preSnapY = win.y;
+    win.preSnapWidth = win.width;
+    win.preSnapHeight = win.height;
+
+    if (side === 'left') {
+      win.x = 0;
+      win.y = 0;
+      win.width = halfWidth;
+      win.height = area.height;
+    } else {
+      win.x = halfWidth;
+      win.y = 0;
+      win.width = halfWidth;
+      win.height = area.height;
+    }
+
+    win.element.style.left = win.x + 'px';
+    win.element.style.top = win.y + 'px';
+    win.element.style.width = win.width + 'px';
+    win.element.style.height = win.height + 'px';
+    win.element.style.transition = 'all 0.15s ease-out';
+    setTimeout(() => {
+      win.element.style.transition = '';
+      win.onResize();
+    }, 150);
+
+    this.userResized(windowId, win.width, win.height);
+    this.userMoved(windowId, win.x, win.y);
   }
 
   /**
@@ -128,6 +409,16 @@ export class WindowManager {
       // Already exists, just focus it
       this.focusWindow(config.windowId);
       return this.windows.get(config.windowId);
+    }
+
+    // Apply cascade positioning if no position specified
+    if (config.config && config.config.x === undefined && config.config.y === undefined) {
+      const pos = this._getCascadePosition();
+      config.config.x = pos.x;
+      config.config.y = pos.y;
+    } else if (!config.config) {
+      const pos = this._getCascadePosition();
+      config.config = { x: pos.x, y: pos.y };
     }
 
     let win;

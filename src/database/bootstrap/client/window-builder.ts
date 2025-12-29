@@ -233,6 +233,7 @@ export class Window {
   _initDrag() {
     let startX, startY, origX, origY;
     let dragging = false;
+    let snapPreview = null;
 
     const onMouseDown = (e) => {
       if (e.target !== this.titlebar && !e.target.classList.contains('window-title')) return;
@@ -257,14 +258,49 @@ export class Window {
       this.y = origY + dy;
       this.element.style.left = this.x + 'px';
       this.element.style.top = this.y + 'px';
+
+      // Check for edge snap preview
+      const area = this.wm?.getWindowArea() || { width: 800, height: 600 };
+      const edgeThreshold = 10;
+
+      if (e.clientX <= edgeThreshold) {
+        this._showSnapPreview('left', area);
+      } else if (e.clientX >= area.width - edgeThreshold) {
+        this._showSnapPreview('right', area);
+      } else {
+        this._hideSnapPreview();
+      }
     };
 
-    const onMouseUp = () => {
+    const onMouseUp = (e) => {
       if (dragging) {
         dragging = false;
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('mouseup', onMouseUp);
-        this.wm?.userMoved(this.id, this.x, this.y);
+
+        // Check for edge snap
+        const area = this.wm?.getWindowArea() || { width: 800, height: 600 };
+        const edgeThreshold = 10;
+
+        if (e.clientX <= edgeThreshold) {
+          this._hideSnapPreview();
+          this.wm?.snapToHalf(this.id, 'left');
+        } else if (e.clientX >= area.width - edgeThreshold) {
+          this._hideSnapPreview();
+          this.wm?.snapToHalf(this.id, 'right');
+        } else {
+          // Apply edge snapping
+          if (this.wm?.snapPosition) {
+            const snapped = this.wm.snapPosition(this.id, this.x, this.y, this.width, this.height);
+            if (snapped.x !== this.x || snapped.y !== this.y) {
+              this.x = snapped.x;
+              this.y = snapped.y;
+              this.element.style.left = this.x + 'px';
+              this.element.style.top = this.y + 'px';
+            }
+          }
+          this.wm?.userMoved(this.id, this.x, this.y);
+        }
       }
     };
 
@@ -276,6 +312,43 @@ export class Window {
       if (this.maximized) this.restore();
       else this.maximize();
     });
+  }
+
+  _showSnapPreview(side, area) {
+    if (!this.snapPreview) {
+      this.snapPreview = document.createElement('div');
+      this.snapPreview.style.cssText = \\\`
+        position: fixed;
+        background: rgba(0, 255, 136, 0.1);
+        border: 2px solid #00ff88;
+        border-radius: 4px;
+        pointer-events: none;
+        z-index: 9999;
+        transition: all 0.1s ease-out;
+      \\\`;
+      document.body.appendChild(this.snapPreview);
+    }
+
+    const halfWidth = Math.floor(area.width / 2);
+    if (side === 'left') {
+      this.snapPreview.style.left = '0px';
+      this.snapPreview.style.top = '0px';
+      this.snapPreview.style.width = halfWidth + 'px';
+      this.snapPreview.style.height = area.height + 'px';
+    } else {
+      this.snapPreview.style.left = halfWidth + 'px';
+      this.snapPreview.style.top = '0px';
+      this.snapPreview.style.width = halfWidth + 'px';
+      this.snapPreview.style.height = area.height + 'px';
+    }
+    this.snapPreview.style.display = 'block';
+  }
+
+  _hideSnapPreview() {
+    if (this.snapPreview) {
+      this.snapPreview.remove();
+      this.snapPreview = null;
+    }
   }
 
   _initResize() {
@@ -350,13 +423,24 @@ export class Window {
 
   minimize() {
     this.minimized = true;
-    this.element.style.display = 'none';
+    // Animate minimize
+    this.element.style.transition = 'transform 0.15s ease-out, opacity 0.15s ease-out';
+    this.element.style.transform = 'scale(0.8)';
+    this.element.style.opacity = '0';
+    setTimeout(() => {
+      this.element.style.display = 'none';
+      this.element.style.transition = '';
+      this.element.style.transform = '';
+      this.element.style.opacity = '';
+    }, 150);
     this.wm?.userMinimized(this.id);
   }
 
   restore() {
     if (this.maximized) {
       this.maximized = false;
+      // Animate restore from maximized
+      this.element.style.transition = 'all 0.15s ease-out';
       this.x = this.preMaxX;
       this.y = this.preMaxY;
       this.width = this.preMaxWidth;
@@ -366,12 +450,28 @@ export class Window {
       this.element.style.width = this.width + 'px';
       this.element.style.height = this.height + 'px';
       this.element.style.borderRadius = '4px';
-      this.onResize();
+      setTimeout(() => {
+        this.element.style.transition = '';
+        this.onResize();
+      }, 150);
       this.wm?.userRestored(this.id);
     }
     if (this.minimized) {
       this.minimized = false;
+      // Animate restore from minimized
+      this.element.style.transform = 'scale(0.8)';
+      this.element.style.opacity = '0';
       this.element.style.display = 'flex';
+      // Force reflow
+      this.element.offsetHeight;
+      this.element.style.transition = 'transform 0.15s ease-out, opacity 0.15s ease-out';
+      this.element.style.transform = 'scale(1)';
+      this.element.style.opacity = '1';
+      setTimeout(() => {
+        this.element.style.transition = '';
+        this.element.style.transform = '';
+        this.element.style.opacity = '';
+      }, 150);
       this.wm?.focusWindow(this.id);
     }
   }
@@ -385,9 +485,13 @@ export class Window {
     this.preMaxWidth = this.width;
     this.preMaxHeight = this.height;
 
-    // Maximize to window area
+    // Maximize to window area with animation
     this.maximized = true;
+    this.element.style.transition = 'all 0.15s ease-out';
     this._applyMaximized();
+    setTimeout(() => {
+      this.element.style.transition = '';
+    }, 150);
     this.wm?.userMaximized(this.id);
   }
 
@@ -402,7 +506,7 @@ export class Window {
     this.element.style.width = this.width + 'px';
     this.element.style.height = this.height + 'px';
     this.element.style.borderRadius = '0';
-    this.onResize();
+    setTimeout(() => this.onResize(), 150);
   }
 
   close() {
