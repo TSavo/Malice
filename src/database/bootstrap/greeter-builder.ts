@@ -217,10 +217,9 @@ const result = await self.go('north');
 // On failure: { success: false, error, availableExits }
 
 // Wait for player response (120s timeout)
-await $ai.expectResponseFrom(\${playerId}, {
-  prompt: 'Waiting for citizen to respond',
-  timeout: 120000,
-  humanId: self.id
+await self.expectResponseFrom(\${playerId}, {
+  prompt: 'The citizen seems distracted. Try getting their attention.',
+  timeout: 120000
 });
 
 // Award credits via bank
@@ -315,10 +314,9 @@ const result = await self.go('north');
 // On failure: { success: false, error, availableExits }
 
 // Wait for player response (120s timeout)
-await $ai.expectResponseFrom(\${playerId}, {
-  prompt: 'Waiting for newblood to respond',
-  timeout: 120000,
-  humanId: self.id
+await self.expectResponseFrom(\${playerId}, {
+  prompt: 'The newblood seems distracted. Try getting their attention.',
+  timeout: 120000
 });
 
 // Award cash (physical contraband currency - underground)

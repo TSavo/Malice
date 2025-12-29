@@ -65,7 +65,7 @@ PATHFINDING: path(fromRoom, toRoom, options) finds shortest route using A*. walk
 
 NOTE: For movement, use agent.go(direction) directly on the NPC object, not $ai. Example: await npc.go('north')
 
-EXPECTATIONS: expectResponseFrom(targetId, options) sets timeout when AI is waiting for player response. cancelExpectation(targetId, humanId) clears it.
+EXPECTATIONS: Use agent.expectResponseFrom(targetId, options) to set timeout when waiting for player response. agent.cancelExpectation(targetId) clears it. These are on the agent, not $ai.
 
 SESSIONS: registerSession/listSessions/getSession track Claude API sessions for conversation continuity.
 
