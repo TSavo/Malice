@@ -42,11 +42,7 @@ export class WindowManagerBuilder {
         methods: {},
       });
 
-      await objectManager.call(
-        'addAlias',
-        WindowManagerBuilder.alias,
-        obj.id,
-      );
+      await objectManager.call('addAlias', WindowManagerBuilder.alias, obj.id);
     }
 
     obj.setMethod(
@@ -200,8 +196,8 @@ export class WindowManager {
         text-align: center;
       \\\`;
       thumb.innerHTML = \\\`
-        <div style="font-size: 24px; margin-bottom: 4px;">\${this._getWindowIcon(win.config?.windowType)}</div>
-        <div style="font-size: 12px; color: #888; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">\${win.title}</div>
+        <div style="font-size: 24px; margin-bottom: 4px;">\\\${this._getWindowIcon(win.config?.windowType)}</div>
+        <div style="font-size: 12px; color: #888; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">\\\${win.title}</div>
       \\\`;
       thumb.addEventListener('click', () => {
         this.altTabIndex = this.zOrder.indexOf(id);

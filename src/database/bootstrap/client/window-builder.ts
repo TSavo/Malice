@@ -90,10 +90,10 @@ export class Window {
     this.element.className = 'malice-window';
     this.element.style.cssText = \\\`
       position: absolute;
-      left: \${this.x}px;
-      top: \${this.y}px;
-      width: \${this.width}px;
-      height: \${this.height}px;
+      left: \\\${this.x}px;
+      top: \\\${this.y}px;
+      width: \\\${this.width}px;
+      height: \\\${this.height}px;
       background: #141414;
       border: 1px solid #333;
       border-radius: 4px;
@@ -209,7 +209,7 @@ export class Window {
       height: 24px;
       border: none;
       background: transparent;
-      color: \${color};
+      color: \\\${color};
       font-size: 16px;
       cursor: pointer;
       border-radius: 4px;
