@@ -12,7 +12,9 @@ import type {
   FactionPorts,
   FactionTransportConfig,
 } from '../../types/transport.js';
+import type { ObjectManager } from '../database/object-manager.js';
 import { Connection } from '../connection/connection.js';
+import { FactionWebServer } from '../web/faction-web-server.js';
 import { SSHServer } from './ssh/ssh-server.js';
 import { TelnetServer } from './telnet/telnet-server.js';
 import { TelnetTransport } from './telnet/telnet-transport.js';
@@ -39,11 +41,14 @@ export class FactionBundle {
   /** WebSocket server */
   private wsServer: WebSocketServer | null = null;
 
-  /** HTTP server (placeholder - web server integration TBD) */
-  // private httpServer: WebServer | null = null;
+  /** HTTP server (per-faction web server) */
+  private httpServer: FactionWebServer | null = null;
 
   /** Session MCP server (placeholder - integration TBD) */
   // private sessionMcpServer: SessionMCPServer | null = null;
+
+  /** Object manager for web server */
+  private manager: ObjectManager | null = null;
 
   /** SSH host key (generated or loaded from faction object) */
   private sshHostKey: string | null = null;
@@ -57,10 +62,18 @@ export class FactionBundle {
   /** Track active connections */
   private connections = new Set<Connection>();
 
-  constructor(config: FactionTransportConfig) {
+  constructor(config: FactionTransportConfig, manager?: ObjectManager) {
     this.config = config;
     this.ports = config.ports;
     this.sshHostKey = config.sshHostKey || null;
+    this.manager = manager || null;
+  }
+
+  /**
+   * Set the object manager (for HTTP server integration)
+   */
+  setManager(manager: ObjectManager): void {
+    this.manager = manager;
   }
 
   /**
@@ -164,7 +177,22 @@ export class FactionBundle {
       );
     }
 
-    // TODO: Start HTTP server (web server integration)
+    // Start HTTP server if manager is available and faction has a domain
+    if (this.manager && this.config.domain) {
+      this.httpServer = new FactionWebServer(this.manager, {
+        port: ports.http,
+        domain: this.config.domain,
+        factionId: this.config.factionId,
+        factionName: this.config.name,
+        debug,
+      });
+      await this.httpServer.start();
+    } else if (debug && !this.config.domain) {
+      console.log(
+        `  ⚠️  HTTP server skipped for ${this.config.name} (no domain configured)`,
+      );
+    }
+
     // TODO: Start Session MCP server
 
     if (debug) {
@@ -303,6 +331,9 @@ export class FactionBundle {
     }
     if (this.wsServer) {
       closePromises.push(this.wsServer.close());
+    }
+    if (this.httpServer) {
+      closePromises.push(this.httpServer.close());
     }
 
     await Promise.all(closePromises);
