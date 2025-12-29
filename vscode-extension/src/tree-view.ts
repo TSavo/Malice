@@ -13,15 +13,16 @@ export class MaliceObjectTreeItem extends vscode.TreeItem {
   constructor(
     public readonly objectId: number,
     public readonly parentId: number | null,
-    public readonly label: string,
+    label: string,
     public readonly collapsibleState: vscode.TreeItemCollapsibleState,
     public readonly properties: string[],
     public readonly methods: string[],
+    description?: string,
   ) {
     super(label, collapsibleState);
 
     this.tooltip = `Object #${objectId}`;
-    this.description = `#${objectId}`;
+    this.description = description || `#${objectId}`;
     this.contextValue = 'maliceObject';
 
     // Icon
@@ -161,13 +162,25 @@ export class MaliceTreeProvider
           ? vscode.TreeItemCollapsibleState.Expanded
           : vscode.TreeItemCollapsibleState.Collapsed;
 
+        // Build label: "Name" or "Object #id" if no name
+        let label = obj.name || `Object #${obj.id}`;
+
+        // Build description: "$alias" and/or "#id"
+        const descParts: string[] = [];
+        if (obj.alias) {
+          descParts.push(`$${obj.alias}`);
+        }
+        descParts.push(`#${obj.id}`);
+        const description = descParts.join(' ');
+
         return new MaliceObjectTreeItem(
           obj.id,
           obj.parent,
-          `Object #${obj.id}`,
+          label,
           collapsible,
           obj.properties || [],
           obj.methods || [],
+          description,
         );
       });
 

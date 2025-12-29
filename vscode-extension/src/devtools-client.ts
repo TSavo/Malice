@@ -58,6 +58,7 @@ export class DevToolsClient {
    */
   async connect(): Promise<void> {
     return new Promise((resolve, reject) => {
+      console.log('[DevTools] Connecting to', this.url);
       this.ws = new WebSocket(this.url);
 
       this.ws.on('open', () => {
@@ -103,6 +104,7 @@ export class DevToolsClient {
         this.pending.delete(id);
 
         if (response.error) {
+          console.error('[DevTools] Response error:', response.error);
           pending.reject(new Error(response.error.message));
         } else {
           pending.resolve(response.result);
@@ -144,8 +146,15 @@ export class DevToolsClient {
    * Send JSON-RPC request and wait for response
    */
   async request(method: string, params?: any): Promise<any> {
-    if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
-      throw new Error('Not connected to DevTools server');
+    console.log('[DevTools] request:', method, JSON.stringify(params));
+
+    if (!this.ws) {
+      console.error('[DevTools] WebSocket is null');
+      throw new Error('Not connected to DevTools server (ws is null)');
+    }
+    if (this.ws.readyState !== WebSocket.OPEN) {
+      console.error('[DevTools] WebSocket not open, state:', this.ws.readyState);
+      throw new Error(`Not connected to DevTools server (state: ${this.ws.readyState})`);
     }
 
     const id = this.nextId++;
@@ -164,6 +173,7 @@ export class DevToolsClient {
       setTimeout(() => {
         if (this.pending.has(id)) {
           this.pending.delete(id);
+          console.error('[DevTools] Request timeout:', method);
           reject(new Error('Request timeout'));
         }
       }, 30000);

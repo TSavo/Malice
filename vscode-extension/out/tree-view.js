@@ -43,16 +43,15 @@ const vscode = __importStar(require("vscode"));
  * Tree item representing a Malice object
  */
 class MaliceObjectTreeItem extends vscode.TreeItem {
-    constructor(objectId, parentId, label, collapsibleState, properties, methods) {
+    constructor(objectId, parentId, label, collapsibleState, properties, methods, description) {
         super(label, collapsibleState);
         this.objectId = objectId;
         this.parentId = parentId;
-        this.label = label;
         this.collapsibleState = collapsibleState;
         this.properties = properties;
         this.methods = methods;
         this.tooltip = `Object #${objectId}`;
-        this.description = `#${objectId}`;
+        this.description = description || `#${objectId}`;
         this.contextValue = 'maliceObject';
         // Icon
         this.iconPath = new vscode.ThemeIcon('symbol-object');
@@ -161,7 +160,16 @@ class MaliceTreeProvider {
                 const collapsible = this.expandedObjects.has(obj.id)
                     ? vscode.TreeItemCollapsibleState.Expanded
                     : vscode.TreeItemCollapsibleState.Collapsed;
-                return new MaliceObjectTreeItem(obj.id, obj.parent, `Object #${obj.id}`, collapsible, obj.properties || [], obj.methods || []);
+                // Build label: "Name" or "Object #id" if no name
+                let label = obj.name || `Object #${obj.id}`;
+                // Build description: "$alias" and/or "#id"
+                const descParts = [];
+                if (obj.alias) {
+                    descParts.push(`$${obj.alias}`);
+                }
+                descParts.push(`#${obj.id}`);
+                const description = descParts.join(' ');
+                return new MaliceObjectTreeItem(obj.id, obj.parent, label, collapsible, obj.properties || [], obj.methods || [], description);
             });
             // Sort by ID
             items.sort((a, b) => a.objectId - b.objectId);

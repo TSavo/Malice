@@ -245,19 +245,27 @@ class MaliceFileSystemProvider {
         return Promise.resolve([]);
     }
     async readFile(uri) {
+        console.log('[FileSystem] readFile called:', uri.toString());
+        console.log('[FileSystem] URI authority:', uri.authority, 'path:', uri.path);
         try {
-            const parts = uri.path.split('/').filter(Boolean);
             // malice://objects/{id}/{name}.{ext}
-            if (parts.length !== 3 || parts[0] !== 'objects') {
+            // authority = 'objects', path = '/{id}/{name}.{ext}'
+            const parts = uri.path.split('/').filter(Boolean);
+            console.log('[FileSystem] Path parts:', parts);
+            if (uri.authority !== 'objects' || parts.length !== 2) {
+                console.log('[FileSystem] Invalid path structure');
                 throw vscode.FileSystemError.FileNotFound(uri);
             }
-            const objectId = parseInt(parts[1], 10);
-            const filename = parts[2];
+            const objectId = parseInt(parts[0], 10);
+            const filename = parts[1];
             const ext = filename.substring(filename.lastIndexOf('.') + 1);
             const name = filename.substring(0, filename.lastIndexOf('.'));
+            console.log('[FileSystem] Parsed:', { objectId, filename, ext, name });
             if (ext === 'ts') {
                 // Method
+                console.log('[FileSystem] Fetching method...');
                 const method = await this.client.getMethod(objectId, name);
+                console.log('[FileSystem] Got method, code length:', method.code?.length);
                 // Inject type reference at the top of the file
                 // This makes VS Code's TypeScript language service aware of generated types
                 const typeReference = '/// <reference path="../.malice/malice.d.ts" />\n\n';
@@ -266,26 +274,35 @@ class MaliceFileSystemProvider {
             }
             else if (ext === 'json') {
                 // Property
+                console.log('[FileSystem] Fetching property...');
                 const value = await this.client.getProperty(objectId, name);
-                return Buffer.from(JSON.stringify(value, null, 2), 'utf-8');
+                console.log('[FileSystem] Got property value:', typeof value, value);
+                // Handle undefined values - JSON.stringify(undefined) returns undefined, not a string
+                const jsonStr = value === undefined ? 'null' : JSON.stringify(value, null, 2);
+                console.log('[FileSystem] JSON string:', jsonStr);
+                return Buffer.from(jsonStr, 'utf-8');
             }
             else {
+                console.log('[FileSystem] Unknown extension:', ext);
                 throw vscode.FileSystemError.FileNotFound(uri);
             }
         }
         catch (err) {
-            console.error('[FileSystem] Failed to read file:', err);
+            console.error('[FileSystem] Failed to read file:', uri.toString());
+            console.error('[FileSystem] Error:', err);
             throw vscode.FileSystemError.FileNotFound(uri);
         }
     }
     async writeFile(uri, content, _options) {
         try {
+            // malice://objects/{id}/{name}.{ext}
+            // authority = 'objects', path = '/{id}/{name}.{ext}'
             const parts = uri.path.split('/').filter(Boolean);
-            if (parts.length !== 3 || parts[0] !== 'objects') {
+            if (uri.authority !== 'objects' || parts.length !== 2) {
                 throw vscode.FileSystemError.NoPermissions(uri);
             }
-            const objectId = parseInt(parts[1], 10);
-            const filename = parts[2];
+            const objectId = parseInt(parts[0], 10);
+            const filename = parts[1];
             const ext = filename.substring(filename.lastIndexOf('.') + 1);
             const name = filename.substring(0, filename.lastIndexOf('.'));
             const text = Buffer.from(content).toString('utf-8');
