@@ -7,6 +7,7 @@ import { CartelCharGenBuilder } from './cartel-chargen-builder.js';
 import { CharGenBuilder } from './chargen-builder.js';
 import { ClientBuilder } from './client/index.js';
 import { CombatBuilder } from './combat-builder.js';
+import { DefaultFactionsBuilder } from './default-factions-builder.js';
 import { CartelDomainBuilder } from './cartel-domain-builder.js';
 import { ContinuumDomainBuilder } from './continuum-domain-builder.js';
 import { DomainRegistryBuilder } from './domain-registry-builder.js';
@@ -34,6 +35,7 @@ import { SessionBuilder } from './session-builder.js';
 import { SisterGrayBuilder } from './sister-gray-builder.js';
 import { SpatialBuilder } from './spatial-builder.js';
 import { TailorBuilder } from './tailor-builder.js';
+import { TransportsBuilder } from './transports-builder.js';
 import { WebDomainBuilder } from './web-domain-builder.js';
 import { WebNodeBuilder } from './web-node-builder.js';
 import { WebRouteBuilder } from './web-route-builder.js';
@@ -112,6 +114,8 @@ export class CoreSystemBuilder {
     const mcpBuilder = new MCPBuilder(this.manager);
     const sessionBuilder = new SessionBuilder(this.manager);
     const tailorBuilder = new TailorBuilder(this.manager);
+    const transportsBuilder = new TransportsBuilder(this.manager);
+    const defaultFactionsBuilder = new DefaultFactionsBuilder(this.manager);
     const webNodeBuilder = new WebNodeBuilder(this.manager);
     const webDomainBuilder = new WebDomainBuilder(this.manager);
     const domainRegistryBuilder = new DomainRegistryBuilder(this.manager);
@@ -183,6 +187,10 @@ export class CoreSystemBuilder {
     await mcpBuilder.build(); // MCP code-first tools
     await sessionBuilder.build(); // Session management wrapper
     await tailorBuilder.build(); // AI costume designer
+    await transportsBuilder.build(); // Transport registry for factions
+
+    // Build default factions (needs charGen and transports aliases first)
+    await defaultFactionsBuilder.build();
 
     // Register aliases
     await authManagerBuilder.registerAlias();
@@ -220,6 +228,8 @@ export class CoreSystemBuilder {
     await cartelDomainBuilder.registerAlias();
     await mcpBuilder.registerAliases();
     await tailorBuilder.registerAlias();
+    await transportsBuilder.registerAlias();
+    await defaultFactionsBuilder.registerAliases();
 
     // Register wake jobs now that Pluribus/SisterGray aliases exist
     await schedulerBuilder.registerWakeJobs();

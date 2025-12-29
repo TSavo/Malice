@@ -74,4 +74,41 @@ export interface TransportServerConfig {
 
   /** Enable debug logging */
   debug?: boolean;
+
+  /** Faction ID this server belongs to (for per-faction transports) */
+  factionId?: number;
+}
+
+/**
+ * Port allocation for a faction's transport bundle
+ */
+export interface FactionPorts {
+  /** HTTP web server port */
+  http: number;
+  /** WebSocket server port */
+  ws: number;
+  /** Telnet server port */
+  telnet: number;
+  /** SSH server port */
+  ssh: number;
+  /** Session MCP server port */
+  sessionMcp: number;
+}
+
+/**
+ * Configuration for creating a faction's transport bundle
+ */
+export interface FactionTransportConfig {
+  /** Faction object ID */
+  factionId: number;
+  /** Faction name (for logging) */
+  name: string;
+  /** Web domain for HTTP Host routing */
+  domain?: string;
+  /** Allocated ports */
+  ports: FactionPorts;
+  /** Per-faction SSH host key (PEM format) */
+  sshHostKey?: string;
+  /** Enable debug logging */
+  debug?: boolean;
 }

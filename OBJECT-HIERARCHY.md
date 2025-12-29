@@ -16,7 +16,12 @@
       └─ #15 Agent (parent: 10)
           └─ #12 Human (parent: 15)
               └─ #13 Player (parent: 12)
+      └─ $faction Faction (parent: Describable)
+          └─ $continuum Continuum (instance)
+          └─ $cartel Gray Cartel (instance)
   └─ #20 Recycler (parent: 1)
+  └─ $factionManager FactionManager (parent: 1)
+  └─ $transports Transports (parent: 1)
 ```
 
 ## Object Purposes
@@ -226,6 +231,95 @@ methods: {
 - Maintains list of recyclable IDs
 - New objects reuse lowest available ID
 
+### $faction (Prototype)
+**Purpose:** Faction organization with isolated network infrastructure
+```typescript
+properties: {
+  // From Describable
+  name: string;           // Faction name
+  description: string;    // Faction description
+
+  // Faction-specific
+  domain: string;         // Web domain (e.g., 'graycartel.com')
+  charGen: ObjRef;        // Character generation object
+  leader: ObjRef;         // Faction leader entity
+  index: number;          // Port allocation index (0, 1, 2, ...)
+  ports: {                // Allocated ports (set by $transports)
+    http: number;
+    ws: number;
+    telnet: number;
+    ssh: number;
+    sessionMcp: number;
+  };
+  sshHostKey: string;     // Per-faction SSH host key
+}
+```
+
+**Examples:** `$continuum`, `$cartel`, dynamically created factions
+
+### $factionManager (Singleton)
+**Purpose:** Faction lifecycle and relationships
+```typescript
+properties: {
+  members: { [factionId]: number[] };         // Faction -> member entity IDs
+  memberships: { [entityId]: number };        // Entity -> faction ID
+  relationships: { [key]: string };           // "id1:id2" -> 'friendly'|'hostile'|'neutral'
+  nextFactionIndex: number;                   // Next index for port allocation
+  domainMap: { [domain]: number };            // Domain -> faction ID
+}
+
+methods: {
+  // Lifecycle
+  create(config): Faction;          // Create faction + start transports
+  destroy(faction, options): void;  // Stop transports + recycle object
+
+  // Membership
+  setMembership(entity, faction): void;
+  getMembership(entity): Faction;
+  getMembers(faction): number[];
+
+  // Relationships
+  setRelationship(factionA, factionB, type): void;
+  getRelationship(factionA, factionB): string;
+  isFriendly(entityA, entityB): boolean;
+  isHostile(entityA, entityB): boolean;
+
+  // Lookup
+  getByDomain(domain): Faction;
+  list(): Faction[];
+}
+```
+
+### $transports (Singleton)
+**Purpose:** Transport registry for faction network infrastructure
+```typescript
+properties: {
+  _registryRef: FactionTransportRegistry;  // TypeScript registry reference
+}
+
+methods: {
+  // Lifecycle
+  startAll(): void;               // Start transports for all factions
+  create(faction): Ports;         // Start transports for one faction
+  destroy(faction, options): void; // Stop transports for one faction
+
+  // Query
+  list(): FactionInfo[];
+  get(faction): FactionInfo;
+  has(faction): boolean;
+
+  // Connections
+  getConnections(faction): Connection[];
+  getConnectionCount(faction): number;
+  getTotalConnectionCount(): number;
+
+  // SSH
+  getSSHHostKey(faction): string;
+}
+```
+
+**Note:** `$transports` is internal infrastructure. Use `$factionManager.create()` for creating factions.
+
 ## Verb Registration Flow
 
 ```
@@ -414,8 +508,15 @@ The bootstrap process creates objects in this order:
 10. **#12 Human** (has sex, pronouns)
 11. **#13 Player** (login, auth, onInput command loop)
 12. **#20 Recycler** (object deletion/recovery)
+13. **$faction** (faction prototype)
+14. **$factionManager** (faction lifecycle singleton)
+15. **$transports** (transport registry singleton)
+16. **$continuum** (default faction instance, index 0)
+17. **$cartel** (default faction instance, index 1)
 
 All player objects created by CharGen inherit from Player (#13), which inherits from Human → Agent → Describable → Root.
+
+At startup, `$transports.startAll()` is called to spin up transport bundles for all registered factions.
 
 ## Key Design Principles
 
