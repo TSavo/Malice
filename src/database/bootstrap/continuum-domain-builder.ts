@@ -1039,7 +1039,7 @@ export class ContinuumDomainBuilder {
             return {
               status: 200,
               contentType: 'text/html',
-              body: self.renderSetupPage(errors, username)
+              body: await self.renderSetupPage(errors, username)
             };
           }
           
@@ -1047,7 +1047,7 @@ export class ContinuumDomainBuilder {
           const adminPlayer = await $recycler.create($admin, {
             name: username,
             playername: username.toLowerCase(),
-            passwordHash: await $authManager.hashPassword(password),
+            passwordHash: await $.hashPassword(password),
           });
           
           // Place in start room
@@ -1059,14 +1059,14 @@ export class ContinuumDomainBuilder {
           return {
             status: 200,
             contentType: 'text/html',
-            body: self.renderSuccessPage(username, adminPlayer.id)
+            body: await self.renderSuccessPage(username, adminPlayer.id)
           };
           
         } catch (err) {
           return {
             status: 200,
             contentType: 'text/html',
-            body: self.renderSetupPage(['Error: ' + (err.message || String(err))], '')
+            body: await self.renderSetupPage(['Error: ' + (err.message || String(err))], '')
           };
         }
       }
@@ -1075,7 +1075,7 @@ export class ContinuumDomainBuilder {
       return {
         status: 200,
         contentType: 'text/html',
-        body: self.renderSetupPage([], '')
+        body: await self.renderSetupPage([], '')
       };
     `,
     );
