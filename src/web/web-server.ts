@@ -32,6 +32,19 @@ export async function createWebServer(
     logger: false,
   });
 
+  // Register JSON body parser
+  app.addContentTypeParser(
+    'application/json',
+    { parseAs: 'string' },
+    (_req, body, done) => {
+      try {
+        done(null, JSON.parse(body as string));
+      } catch (err) {
+        done(err as Error, undefined);
+      }
+    },
+  );
+
   // Authenticate HTTP Basic Auth
   async function authenticate(
     request: any,
@@ -70,21 +83,25 @@ export async function createWebServer(
       });
 
       if (!userDoc) {
+        console.log('[WebAuth] User not found:', username);
         return { player: null, isAdmin: false };
       }
 
       const player = await manager.load(userDoc._id);
       if (!player) {
+        console.log('[WebAuth] Failed to load player:', userDoc._id);
         return { player: null, isAdmin: false };
       }
 
       const valid = (await player.call('checkPassword', password)) as boolean;
       if (!valid) {
+        console.log('[WebAuth] Invalid password for:', username);
         return { player: null, isAdmin: false };
       }
 
       const isAdmin =
         player.get('isAdmin') === true || player.get('isWizard') === true;
+      console.log('[WebAuth] Auth success:', username, 'isAdmin:', isAdmin);
 
       return { player, isAdmin };
     } catch (err) {
@@ -112,6 +129,7 @@ export async function createWebServer(
           ),
         ),
         query: request.query,
+        body: request.body,
         player: auth.player,
         isAdmin: auth.isAdmin,
       };

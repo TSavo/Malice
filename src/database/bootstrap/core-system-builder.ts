@@ -4,6 +4,7 @@ import { AiPromptsBuilder } from './ai-prompts-builder.js';
 import { AuthManagerBuilder } from './auth-manager-builder.js';
 import { BodyFactoryBuilder } from './body-factory-builder.js';
 import { CharGenBuilder } from './chargen-builder.js';
+import { ClientBuilder } from './client/index.js';
 import { CombatBuilder } from './combat-builder.js';
 import { ContinuumDomainBuilder } from './continuum-domain-builder.js';
 import { DomainRegistryBuilder } from './domain-registry-builder.js';
@@ -164,6 +165,11 @@ export class CoreSystemBuilder {
     await webRouterBuilder.build(); // Web router object (legacy, to be removed)
     await worldApiBuilder.build(); // World API for map routes
     await websiteBuilder.build(); // Website objects (includes API routes)
+
+    // Build client JS modules (must be before continuumDomainBuilder which creates routes)
+    const clientBuilder = new ClientBuilder(this.manager);
+    await clientBuilder.build();
+
     await continuumDomainBuilder.build(); // thecontinuum.city domain
     await mcpBuilder.build(); // MCP code-first tools
     await sessionBuilder.build(); // Session management wrapper

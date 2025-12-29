@@ -54,6 +54,13 @@ export class PlayerBuilder {
 
           // Clone system
           cloneBackupTank: null, // ObjRef to tank holding our backup (or null)
+
+          // Window layout for web client
+          windowLayout: {
+            windows: [],
+            taskbarOrder: [],
+            lastUpdated: null,
+          },
         },
         methods: {},
       }));
@@ -104,6 +111,10 @@ export class PlayerBuilder {
     obj.setPropertyDescription(
       'cloneBackupTank',
       'Reference to clone tank holding backup of this character',
+    );
+    obj.setPropertyDescription(
+      'windowLayout',
+      'Web client window positions, sizes, and state for session restore',
     );
 
     this.addConnectionMethods(obj);
@@ -166,6 +177,9 @@ export class PlayerBuilder {
 
       // Set up command loop - player handles their own input now
       context.setHandler(self);
+
+      // Sync window layout for multiplexed web clients
+      await self.syncWindowLayout();
 
       // Show prompt (system - uses tell)
       await self.print('> ');
@@ -285,6 +299,177 @@ export class PlayerBuilder {
         return self._context.media(type, data);
       }
       return false;
+    `,
+    );
+
+    // Window management for web client
+    this.addWindowMethods(obj);
+  }
+
+  private addWindowMethods(obj: RuntimeObject): void {
+    // Sync window layout to client (called on connect)
+    obj.setMethod(
+      'syncWindowLayout',
+      `
+      const layout = self.windowLayout || { windows: [], taskbarOrder: [] };
+      return self.channel('wm', {
+        action: 'sync',
+        windows: layout.windows || [],
+        taskbarOrder: layout.taskbarOrder || []
+      });
+    `,
+    );
+
+    // Open a new window on client
+    obj.setMethod(
+      'openWindow',
+      `
+      const windowId = args[0];
+      const windowType = args[1]; // 'terminal' | 'html' | 'iframe'
+      const config = args[2] || {};
+
+      // Validate window type
+      const validTypes = ['terminal', 'html', 'iframe'];
+      if (!validTypes.includes(windowType)) {
+        return { error: 'Invalid window type: ' + windowType };
+      }
+
+      // Build window config
+      const windowConfig = {
+        windowId: windowId,
+        windowType: windowType,
+        title: config.title || windowId,
+        channel: config.channel || 'win:' + windowId,
+        config: {
+          x: config.x ?? 100,
+          y: config.y ?? 100,
+          width: config.width ?? 600,
+          height: config.height ?? 400,
+          minimized: config.minimized ?? false,
+          maximized: config.maximized ?? false,
+          resizable: config.resizable ?? true,
+          closable: config.closable ?? true,
+          minimizable: config.minimizable ?? true
+        },
+        content: config.content || null,  // For html type
+        url: config.url || null           // For iframe type
+      };
+
+      // Update stored layout
+      const layout = self.windowLayout || { windows: [], taskbarOrder: [], lastUpdated: null };
+      const existingIdx = layout.windows.findIndex(w => w.windowId === windowId);
+      if (existingIdx >= 0) {
+        layout.windows[existingIdx] = windowConfig;
+      } else {
+        layout.windows.push(windowConfig);
+        layout.taskbarOrder.push(windowId);
+      }
+      layout.lastUpdated = new Date().toISOString();
+      self.windowLayout = layout;
+
+      // Send to client
+      return self.channel('wm', {
+        action: 'open',
+        ...windowConfig
+      });
+    `,
+    );
+
+    // Close a window
+    obj.setMethod(
+      'closeWindow',
+      `
+      const windowId = args[0];
+
+      // Update stored layout
+      const layout = self.windowLayout || { windows: [], taskbarOrder: [], lastUpdated: null };
+      layout.windows = layout.windows.filter(w => w.windowId !== windowId);
+      layout.taskbarOrder = layout.taskbarOrder.filter(id => id !== windowId);
+      layout.lastUpdated = new Date().toISOString();
+      self.windowLayout = layout;
+
+      // Send to client
+      return self.channel('wm', {
+        action: 'close',
+        windowId: windowId
+      });
+    `,
+    );
+
+    // Update window geometry (called when client moves/resizes)
+    obj.setMethod(
+      'updateWindowGeometry',
+      `
+      const windowId = args[0];
+      const geometry = args[1]; // { x, y, width, height, minimized, maximized }
+
+      const layout = self.windowLayout || { windows: [], taskbarOrder: [], lastUpdated: null };
+      const window = layout.windows.find(w => w.windowId === windowId);
+      if (window) {
+        window.config = { ...window.config, ...geometry };
+        layout.lastUpdated = new Date().toISOString();
+        self.windowLayout = layout;
+      }
+      return true;
+    `,
+    );
+
+    // Handle incoming wm channel messages from client
+    obj.setMethod(
+      'onWmMessage',
+      `
+      const msg = args[0];
+      if (!msg || typeof msg !== 'object') return;
+
+      switch (msg.action) {
+        case 'geometry':
+          // Client moved/resized a window
+          await self.updateWindowGeometry(msg.windowId, {
+            x: msg.x,
+            y: msg.y,
+            width: msg.width,
+            height: msg.height
+          });
+          break;
+
+        case 'minimize':
+        case 'maximize':
+        case 'restore':
+          await self.updateWindowGeometry(msg.windowId, {
+            minimized: msg.action === 'minimize',
+            maximized: msg.action === 'maximize'
+          });
+          break;
+
+        case 'close':
+          // Client closed a window - update layout
+          const layout = self.windowLayout || { windows: [], taskbarOrder: [], lastUpdated: null };
+          layout.windows = layout.windows.filter(w => w.windowId !== msg.windowId);
+          layout.taskbarOrder = layout.taskbarOrder.filter(id => id !== msg.windowId);
+          layout.lastUpdated = new Date().toISOString();
+          self.windowLayout = layout;
+          break;
+
+        case 'reorder':
+          // Client reordered taskbar
+          if (msg.taskbarOrder) {
+            const layout = self.windowLayout || { windows: [], taskbarOrder: [], lastUpdated: null };
+            layout.taskbarOrder = msg.taskbarOrder;
+            layout.lastUpdated = new Date().toISOString();
+            self.windowLayout = layout;
+          }
+          break;
+      }
+    `,
+    );
+
+    // Send content to a window's channel
+    obj.setMethod(
+      'sendToWindow',
+      `
+      const windowId = args[0];
+      const content = args[1];
+      return self.channel('win:' + windowId, content);
     `,
     );
   }
