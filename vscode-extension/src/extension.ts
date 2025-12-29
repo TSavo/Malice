@@ -5,7 +5,11 @@
 
 import * as vscode from 'vscode';
 import { DevToolsClient } from './devtools-client.js';
-import { MaliceTreeProvider } from './tree-view.js';
+import {
+  MaliceTreeProvider,
+  MaliceObjectTreeItem,
+  MaliceMethodTreeItem,
+} from './tree-view.js';
 import { TypeDefinitionManager } from './type-manager.js';
 
 let client: DevToolsClient;
@@ -246,6 +250,147 @@ export async function activate(context: vscode.ExtensionContext) {
         vscode.window.showErrorMessage(`Failed to browse objects: ${err}`);
       }
     }),
+  );
+
+  // Add Method command
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
+      'malice.addMethod',
+      async (item: MaliceObjectTreeItem) => {
+        if (!item) {
+          vscode.window.showErrorMessage('No object selected');
+          return;
+        }
+
+        const name = await vscode.window.showInputBox({
+          prompt: 'Enter method name',
+          placeHolder: 'myMethod',
+          validateInput: (value) => {
+            if (!value) return 'Method name is required';
+            if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(value)) {
+              return 'Invalid method name';
+            }
+            return null;
+          },
+        });
+
+        if (!name) return;
+
+        try {
+          // Create with template code
+          const templateCode = `// ${name} method\nreturn null;`;
+          await client.setMethod(item.objectId, name, templateCode);
+          treeProvider.refresh();
+
+          // Open the new method
+          await vscode.commands.executeCommand(
+            'malice.openMethod',
+            item.objectId,
+            name,
+          );
+        } catch (err) {
+          vscode.window.showErrorMessage(`Failed to create method: ${err}`);
+        }
+      },
+    ),
+  );
+
+  // Add Property command
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
+      'malice.addProperty',
+      async (item: MaliceObjectTreeItem) => {
+        if (!item) {
+          vscode.window.showErrorMessage('No object selected');
+          return;
+        }
+
+        const name = await vscode.window.showInputBox({
+          prompt: 'Enter property name',
+          placeHolder: 'myProperty',
+          validateInput: (value) => {
+            if (!value) return 'Property name is required';
+            if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(value)) {
+              return 'Invalid property name';
+            }
+            return null;
+          },
+        });
+
+        if (!name) return;
+
+        try {
+          // Create with null value
+          await client.setProperty(item.objectId, name, null);
+          treeProvider.refresh();
+
+          // Open the new property
+          await vscode.commands.executeCommand(
+            'malice.openProperty',
+            item.objectId,
+            name,
+          );
+        } catch (err) {
+          vscode.window.showErrorMessage(`Failed to create property: ${err}`);
+        }
+      },
+    ),
+  );
+
+  // Delete Method command
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
+      'malice.deleteMethod',
+      async (item: MaliceMethodTreeItem) => {
+        if (!item || item.type !== 'method') {
+          vscode.window.showErrorMessage('No method selected');
+          return;
+        }
+
+        const confirm = await vscode.window.showWarningMessage(
+          `Delete method '${item.name}' from object #${item.objectId}?`,
+          { modal: true },
+          'Delete',
+        );
+
+        if (confirm !== 'Delete') return;
+
+        try {
+          await client.deleteMethod(item.objectId, item.name);
+          treeProvider.refresh();
+        } catch (err) {
+          vscode.window.showErrorMessage(`Failed to delete method: ${err}`);
+        }
+      },
+    ),
+  );
+
+  // Delete Property command
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
+      'malice.deleteProperty',
+      async (item: MaliceMethodTreeItem) => {
+        if (!item || item.type !== 'property') {
+          vscode.window.showErrorMessage('No property selected');
+          return;
+        }
+
+        const confirm = await vscode.window.showWarningMessage(
+          `Delete property '${item.name}' from object #${item.objectId}?`,
+          { modal: true },
+          'Delete',
+        );
+
+        if (confirm !== 'Delete') return;
+
+        try {
+          await client.deleteProperty(item.objectId, item.name);
+          treeProvider.refresh();
+        } catch (err) {
+          vscode.window.showErrorMessage(`Failed to delete property: ${err}`);
+        }
+      },
+    ),
   );
 
   context.subscriptions.push(treeView);

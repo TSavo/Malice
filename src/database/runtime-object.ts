@@ -13,6 +13,44 @@ import type {
 import type { ObjectManager } from './object-manager.js';
 
 /**
+ * Dedent a string by removing common leading whitespace from all lines.
+ * Also trims leading/trailing empty lines.
+ */
+function dedent(str: string): string {
+  // Split into lines
+  const lines = str.split('\n');
+
+  // Remove leading empty lines
+  while (lines.length > 0 && lines[0].trim() === '') {
+    lines.shift();
+  }
+
+  // Remove trailing empty lines
+  while (lines.length > 0 && lines[lines.length - 1].trim() === '') {
+    lines.pop();
+  }
+
+  if (lines.length === 0) return '';
+
+  // Find minimum indentation (ignoring empty lines)
+  let minIndent = Infinity;
+  for (const line of lines) {
+    if (line.trim() === '') continue; // Skip empty lines
+    const match = line.match(/^(\s*)/);
+    if (match) {
+      minIndent = Math.min(minIndent, match[1].length);
+    }
+  }
+
+  if (minIndent === Infinity || minIndent === 0) {
+    return lines.join('\n');
+  }
+
+  // Remove the common indentation
+  return lines.map((line) => line.slice(minIndent)).join('\n');
+}
+
+/**
  * Runtime wrapper around GameObject with inheritance and method execution
  * Uses Proxy to enable direct property access (e.g., self.hp instead of self.get('hp'))
  */
@@ -540,6 +578,7 @@ export class RuntimeObjectImpl implements RuntimeObject {
   /**
    * Set a method on this object
    * Auto-persists to database
+   * Code is automatically dedented (common leading whitespace removed)
    */
   setMethod(
     name: string,
@@ -550,7 +589,7 @@ export class RuntimeObjectImpl implements RuntimeObject {
       this.obj.methods = {};
     }
     this.obj.methods[name] = {
-      code,
+      code: dedent(code),
       ...options,
     };
 
