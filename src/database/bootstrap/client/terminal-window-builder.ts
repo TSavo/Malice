@@ -42,11 +42,7 @@ export class TerminalWindowBuilder {
         methods: {},
       });
 
-      await objectManager.call(
-        'addAlias',
-        TerminalWindowBuilder.alias,
-        obj.id,
-      );
+      await objectManager.call('addAlias', TerminalWindowBuilder.alias, obj.id);
     }
 
     obj.setMethod(
@@ -56,8 +52,8 @@ export class TerminalWindowBuilder {
 import { Window } from '/js/window.js';
 
 /**
- * TerminalWindow - Window with xterm.js terminal
- * Extends base Window with terminal functionality.
+ * TerminalWindow - Window with xterm.js terminal output + dedicated input area
+ * Terminal is output-only, input field at bottom handles commands.
  */
 export class TerminalWindow extends Window {
   constructor(wm, config) {
@@ -65,27 +61,96 @@ export class TerminalWindow extends Window {
     this.terminal = null;
     this.fitAddon = null;
     this.boundChannel = null;
+    this.inputArea = null;
+    this.inputField = null;
+    this.terminalContainer = null;
 
-    // Line editing state
-    this.inputBuffer = '';
-    this.cursorPos = 0;
+    // Command history
     this.history = [];
     this.historyIndex = -1;
     this.savedInput = '';
+
+    // Output buffer for restore after close
+    this.outputBuffer = '';
+    this.maxBufferSize = 100000; // ~100KB of text
   }
 
   /**
    * Initialize terminal (called after render)
    */
   async initTerminal(Terminal, FitAddon, WebLinksAddon) {
-    // Create terminal
+    // Restructure content area: terminal on top, input at bottom
+    this.content.style.display = 'flex';
+    this.content.style.flexDirection = 'column';
+
+    // Terminal container (takes remaining space)
+    this.terminalContainer = document.createElement('div');
+    this.terminalContainer.style.cssText = 'flex: 1; min-height: 0; overflow: hidden;';
+    this.content.appendChild(this.terminalContainer);
+
+    // Input area at bottom
+    this.inputArea = document.createElement('div');
+    this.inputArea.style.cssText = \\\`
+      display: flex;
+      align-items: center;
+      padding: 4px 8px;
+      background: #1a1a1a;
+      border-top: 1px solid #333;
+      gap: 8px;
+    \\\`;
+
+    // Input field
+    this.inputField = document.createElement('input');
+    this.inputField.type = 'text';
+    this.inputField.style.cssText = \\\`
+      flex: 1;
+      background: #0d0d0d;
+      border: 1px solid #333;
+      border-radius: 3px;
+      padding: 6px 10px;
+      color: #e0e0e0;
+      font-family: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Monaco, "Courier New", monospace;
+      font-size: 14px;
+      outline: none;
+    \\\`;
+    this.inputField.placeholder = 'Enter command...';
+    this.inputArea.appendChild(this.inputField);
+
+    // Send button
+    const sendBtn = document.createElement('button');
+    sendBtn.textContent = 'Send';
+    sendBtn.style.cssText = \\\`
+      background: #00ff88;
+      color: #0a0a0a;
+      border: none;
+      border-radius: 3px;
+      padding: 6px 12px;
+      font-family: monospace;
+      font-weight: bold;
+      cursor: pointer;
+    \\\`;
+    sendBtn.addEventListener('click', () => this._sendCommand());
+    this.inputArea.appendChild(sendBtn);
+
+    this.content.appendChild(this.inputArea);
+
+    // Input field event handlers
+    this.inputField.addEventListener('keydown', (e) => this._handleInputKey(e));
+    this.inputField.addEventListener('focus', () => {
+      this.inputField.style.borderColor = '#00ff88';
+    });
+    this.inputField.addEventListener('blur', () => {
+      this.inputField.style.borderColor = '#333';
+    });
+
+    // Create terminal (output only)
     this.terminal = new Terminal({
       fontFamily: 'ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Monaco, "Courier New", monospace',
       fontSize: 14,
       theme: {
         background: '#0d0d0d',
         foreground: '#e0e0e0',
-        cursor: '#00ff88',
+        cursor: '#0d0d0d', // Hide cursor since output only
         cursorAccent: '#0d0d0d',
         selection: 'rgba(0, 255, 136, 0.3)',
         black: '#0d0d0d',
@@ -105,7 +170,8 @@ export class TerminalWindow extends Window {
         brightCyan: '#99ffff',
         brightWhite: '#ffffff'
       },
-      cursorBlink: true,
+      cursorBlink: false,
+      disableStdin: true, // Output only
       allowTransparency: false,
       scrollback: 5000
     });
@@ -118,231 +184,53 @@ export class TerminalWindow extends Window {
     const webLinksAddon = new WebLinksAddon();
     this.terminal.loadAddon(webLinksAddon);
 
-    // Open terminal in content area
-    this.terminal.open(this.content);
+    // Open terminal in container
+    this.terminal.open(this.terminalContainer);
 
-    // Fit to window
+    // Fit to container
     setTimeout(() => {
       this.fitAddon.fit();
     }, 0);
 
-    // Handle terminal input with line buffering
-    this.terminal.onData((data) => this._handleInput(data));
-    this.terminal.onKey((e) => this._handleKey(e));
+    // Click on terminal focuses input field
+    this.terminalContainer.addEventListener('click', () => {
+      this.inputField.focus();
+    });
   }
 
   /**
-   * Handle raw input data
+   * Handle input field key events
    */
-  _handleInput(data) {
-    // Check for special sequences (handled in onKey)
-    // Only process printable characters here
-    for (const char of data) {
-      const code = char.charCodeAt(0);
-      // Printable ASCII and extended chars, but not control chars
-      if (code >= 32 && code !== 127) {
-        this._insertChar(char);
-      }
-    }
-  }
-
-  /**
-   * Handle key events
-   */
-  _handleKey(e) {
-    const key = e.domEvent.key;
-    const ctrl = e.domEvent.ctrlKey;
-    const shift = e.domEvent.shiftKey;
-
-    switch (key) {
+  _handleInputKey(e) {
+    switch (e.key) {
       case 'Enter':
-        if (shift) {
-          // Shift+Enter: insert newline in buffer
-          this._insertChar('\\n');
-          this.terminal.write('\\r\\n');
-        } else {
-          // Enter: send command
-          this._sendCommand();
-        }
-        break;
-
-      case 'Backspace':
-        this._backspace();
-        break;
-
-      case 'Delete':
-        this._delete();
-        break;
-
-      case 'ArrowLeft':
-        if (ctrl) {
-          this._wordLeft();
-        } else {
-          this._cursorLeft();
-        }
-        break;
-
-      case 'ArrowRight':
-        if (ctrl) {
-          this._wordRight();
-        } else {
-          this._cursorRight();
-        }
+        e.preventDefault();
+        this._sendCommand();
         break;
 
       case 'ArrowUp':
+        e.preventDefault();
         this._historyUp();
         break;
 
       case 'ArrowDown':
+        e.preventDefault();
         this._historyDown();
         break;
 
-      case 'Home':
-        this._cursorHome();
-        break;
-
-      case 'End':
-        this._cursorEnd();
-        break;
-
-      case 'c':
-        if (ctrl) {
-          // Ctrl+C: cancel current input
-          this.terminal.write('^C\\r\\n');
-          this.inputBuffer = '';
-          this.cursorPos = 0;
-          this._showPrompt();
-        }
+      case 'Escape':
+        // Clear input
+        this.inputField.value = '';
+        this.historyIndex = -1;
         break;
 
       case 'l':
-        if (ctrl) {
-          // Ctrl+L: clear screen
+        if (e.ctrlKey) {
+          e.preventDefault();
           this.terminal.clear();
-          this._redrawLine();
-        }
-        break;
-
-      case 'u':
-        if (ctrl) {
-          // Ctrl+U: clear line before cursor
-          this._clearLineBefore();
-        }
-        break;
-
-      case 'k':
-        if (ctrl) {
-          // Ctrl+K: clear line after cursor
-          this._clearLineAfter();
-        }
-        break;
-
-      case 'a':
-        if (ctrl) {
-          // Ctrl+A: go to beginning
-          this._cursorHome();
-        }
-        break;
-
-      case 'e':
-        if (ctrl) {
-          // Ctrl+E: go to end
-          this._cursorEnd();
         }
         break;
     }
-  }
-
-  _insertChar(char) {
-    // Insert at cursor position
-    this.inputBuffer =
-      this.inputBuffer.slice(0, this.cursorPos) +
-      char +
-      this.inputBuffer.slice(this.cursorPos);
-    this.cursorPos++;
-
-    // Redraw from cursor
-    this._redrawFromCursor();
-  }
-
-  _backspace() {
-    if (this.cursorPos > 0) {
-      this.inputBuffer =
-        this.inputBuffer.slice(0, this.cursorPos - 1) +
-        this.inputBuffer.slice(this.cursorPos);
-      this.cursorPos--;
-      this._redrawFromCursor(true);
-    }
-  }
-
-  _delete() {
-    if (this.cursorPos < this.inputBuffer.length) {
-      this.inputBuffer =
-        this.inputBuffer.slice(0, this.cursorPos) +
-        this.inputBuffer.slice(this.cursorPos + 1);
-      this._redrawFromCursor(true);
-    }
-  }
-
-  _cursorLeft() {
-    if (this.cursorPos > 0) {
-      this.cursorPos--;
-      this.terminal.write('\\x1b[D'); // Move cursor left
-    }
-  }
-
-  _cursorRight() {
-    if (this.cursorPos < this.inputBuffer.length) {
-      this.cursorPos++;
-      this.terminal.write('\\x1b[C'); // Move cursor right
-    }
-  }
-
-  _wordLeft() {
-    // Move to start of previous word
-    while (this.cursorPos > 0 && this.inputBuffer[this.cursorPos - 1] === ' ') {
-      this._cursorLeft();
-    }
-    while (this.cursorPos > 0 && this.inputBuffer[this.cursorPos - 1] !== ' ') {
-      this._cursorLeft();
-    }
-  }
-
-  _wordRight() {
-    // Move to end of next word
-    while (this.cursorPos < this.inputBuffer.length && this.inputBuffer[this.cursorPos] !== ' ') {
-      this._cursorRight();
-    }
-    while (this.cursorPos < this.inputBuffer.length && this.inputBuffer[this.cursorPos] === ' ') {
-      this._cursorRight();
-    }
-  }
-
-  _cursorHome() {
-    while (this.cursorPos > 0) {
-      this._cursorLeft();
-    }
-  }
-
-  _cursorEnd() {
-    while (this.cursorPos < this.inputBuffer.length) {
-      this._cursorRight();
-    }
-  }
-
-  _clearLineBefore() {
-    const removed = this.cursorPos;
-    this.inputBuffer = this.inputBuffer.slice(this.cursorPos);
-    this.cursorPos = 0;
-    // Move to start and redraw
-    this.terminal.write('\\x1b[' + removed + 'D');
-    this._redrawFromCursor(true);
-  }
-
-  _clearLineAfter() {
-    this.inputBuffer = this.inputBuffer.slice(0, this.cursorPos);
-    this.terminal.write('\\x1b[K'); // Clear to end of line
   }
 
   _historyUp() {
@@ -350,7 +238,7 @@ export class TerminalWindow extends Window {
 
     if (this.historyIndex === -1) {
       // Save current input
-      this.savedInput = this.inputBuffer;
+      this.savedInput = this.inputField.value;
       this.historyIndex = this.history.length - 1;
     } else if (this.historyIndex > 0) {
       this.historyIndex--;
@@ -358,7 +246,9 @@ export class TerminalWindow extends Window {
       return; // At oldest
     }
 
-    this._replaceInput(this.history[this.historyIndex]);
+    this.inputField.value = this.history[this.historyIndex];
+    // Move cursor to end
+    this.inputField.selectionStart = this.inputField.selectionEnd = this.inputField.value.length;
   }
 
   _historyDown() {
@@ -366,59 +256,23 @@ export class TerminalWindow extends Window {
 
     if (this.historyIndex < this.history.length - 1) {
       this.historyIndex++;
-      this._replaceInput(this.history[this.historyIndex]);
+      this.inputField.value = this.history[this.historyIndex];
     } else {
       // Restore saved input
       this.historyIndex = -1;
-      this._replaceInput(this.savedInput);
+      this.inputField.value = this.savedInput;
     }
-  }
-
-  _replaceInput(newInput) {
-    // Clear current line
-    this._cursorHome();
-    this.terminal.write('\\x1b[K'); // Clear to end
-
-    // Set new input
-    this.inputBuffer = newInput;
-    this.cursorPos = newInput.length;
-    this.terminal.write(newInput);
-  }
-
-  _redrawFromCursor(deleted = false) {
-    // Save cursor, write rest of line, restore cursor
-    const rest = this.inputBuffer.slice(this.cursorPos - (deleted ? 0 : 1));
-    this.terminal.write(rest);
-    if (deleted) {
-      this.terminal.write(' '); // Erase last char
-      this.terminal.write('\\x1b[D'); // Back one
-    }
-    // Move cursor back
-    const moveBack = this.inputBuffer.length - this.cursorPos;
-    if (moveBack > 0) {
-      this.terminal.write('\\x1b[' + moveBack + 'D');
-    }
-  }
-
-  _redrawLine() {
-    // Clear line and redraw
-    this.terminal.write('\\r\\x1b[K');
-    this.terminal.write(this.inputBuffer);
-    // Position cursor
-    const moveBack = this.inputBuffer.length - this.cursorPos;
-    if (moveBack > 0) {
-      this.terminal.write('\\x1b[' + moveBack + 'D');
-    }
+    // Move cursor to end
+    this.inputField.selectionStart = this.inputField.selectionEnd = this.inputField.value.length;
   }
 
   _sendCommand() {
-    const command = this.inputBuffer.trim();
+    const command = this.inputField.value.trim();
 
-    // Echo newline
-    this.terminal.write('\\r\\n');
+    if (!command) return;
 
-    // Add to history if non-empty and different from last
-    if (command && (this.history.length === 0 || this.history[this.history.length - 1] !== command)) {
+    // Add to history if different from last
+    if (this.history.length === 0 || this.history[this.history.length - 1] !== command) {
       this.history.push(command);
       // Limit history
       if (this.history.length > 100) {
@@ -427,20 +281,13 @@ export class TerminalWindow extends Window {
     }
 
     // Reset state
-    this.inputBuffer = '';
-    this.cursorPos = 0;
+    this.inputField.value = '';
     this.historyIndex = -1;
 
     // Send to server
-    if (command && this.wm?.client) {
+    if (this.wm?.client) {
       this.wm.client.send(this.boundChannel || 'game', command);
     }
-  }
-
-  _showPrompt() {
-    // Server sends prompts, we just reset our state
-    this.inputBuffer = '';
-    this.cursorPos = 0;
   }
 
   /**
@@ -451,24 +298,51 @@ export class TerminalWindow extends Window {
   }
 
   /**
+   * Write to terminal and buffer
+   */
+  _writeToTerminal(text) {
+    if (this.terminal) {
+      this.terminal.write(text);
+    }
+    // Save to buffer for restore
+    this.outputBuffer += text;
+    // Trim if too large (keep end)
+    if (this.outputBuffer.length > this.maxBufferSize) {
+      this.outputBuffer = this.outputBuffer.slice(-this.maxBufferSize);
+    }
+  }
+
+  /**
    * Handle channel data
    */
   onChannelData(data) {
-    if (this.terminal) {
-      if (typeof data === 'string') {
-        this.terminal.write(data);
-      } else if (data && typeof data === 'object') {
-        // Handle structured terminal data
-        if (data.text) {
-          this.terminal.write(data.text);
-        }
-        if (data.clear) {
-          this.terminal.clear();
-        }
-        if (data.reset) {
-          this.terminal.reset();
-        }
+    if (typeof data === 'string') {
+      this._writeToTerminal(data);
+    } else if (data && typeof data === 'object') {
+      // Handle structured terminal data
+      if (data.text) {
+        this._writeToTerminal(data.text);
       }
+      if (data.clear) {
+        if (this.terminal) this.terminal.clear();
+        this.outputBuffer = '';
+      }
+      if (data.reset) {
+        if (this.terminal) this.terminal.reset();
+        this.outputBuffer = '';
+      }
+    }
+  }
+
+  /**
+   * Restore buffer from saved state
+   */
+  restoreBuffer(buffer) {
+    console.log('[TerminalWindow] restoreBuffer called, buffer length:', buffer?.length, 'terminal exists:', !!this.terminal);
+    this.outputBuffer = buffer || '';
+    if (this.terminal && this.outputBuffer) {
+      this.terminal.write(this.outputBuffer);
+      console.log('[TerminalWindow] wrote buffer to terminal');
     }
   }
 
@@ -492,12 +366,12 @@ export class TerminalWindow extends Window {
   }
 
   /**
-   * Focus terminal when window focuses
+   * Focus input field when window focuses
    */
   focus() {
     super.focus();
-    if (this.terminal) {
-      this.terminal.focus();
+    if (this.inputField) {
+      this.inputField.focus();
     }
   }
 }

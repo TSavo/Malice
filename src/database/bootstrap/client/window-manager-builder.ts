@@ -80,6 +80,10 @@ export class WindowManager {
     this.altTabbing = false;
     this.altTabIndex = 0;
 
+    // Saved terminal state for restore after close
+    this._savedTerminalHistory = [];
+    this._savedTerminalBuffer = '';
+
     // Create taskbar
     this.taskbar = new Taskbar(taskbarContainer, this);
 
@@ -453,6 +457,13 @@ export class WindowManager {
       if (config.channel) {
         win.bindChannel(config.channel);
       }
+      // Restore saved state if provided
+      if (config.restoreHistory) {
+        win.history = config.restoreHistory;
+      }
+      if (config.restoreBuffer) {
+        win.restoreBuffer(config.restoreBuffer);
+      }
     } else if (windowType === 'html' || windowType === 'iframe') {
       // These types initialize content in their initContent() called from render()
       if (config.channel) {
@@ -482,6 +493,13 @@ export class WindowManager {
   closeWindow(windowId) {
     const win = this.windows.get(windowId);
     if (!win) return;
+
+    // Save terminal state before closing
+    if (win.windowType === 'terminal') {
+      console.log('[WM] closeWindow - saving terminal state, history:', win.history?.length, 'buffer:', win.outputBuffer?.length);
+      this._savedTerminalHistory = win.history ? [...win.history] : [];
+      this._savedTerminalBuffer = win.outputBuffer || '';
+    }
 
     // Remove from DOM
     if (win.element) {
@@ -692,6 +710,169 @@ export class WindowManager {
         break;
       }
     }
+  }
+
+  /**
+   * Open a terminal window (from start menu)
+   * If one exists, focus it instead of creating new
+   */
+  async openTerminal() {
+    // Check if terminal already exists
+    for (const [id, win] of this.windows) {
+      if (win.config?.windowType === 'terminal') {
+        // Focus existing terminal
+        this.focusWindow(id);
+        return;
+      }
+    }
+
+    // No terminal exists - create one
+    const id = 'terminal-main';
+
+    // Use cascade placement
+    const pos = this._getCascadePosition();
+
+    console.log('[WM] openTerminal - saved history:', this._savedTerminalHistory?.length, 'saved buffer:', this._savedTerminalBuffer?.length);
+
+    await this.openWindow({
+      windowId: id,
+      windowType: 'terminal',
+      title: 'Terminal',
+      channel: 'game',
+      config: {
+        x: pos.x,
+        y: pos.y,
+        width: 800,
+        height: 500
+      },
+      restoreHistory: this._savedTerminalHistory?.length > 0 ? [...this._savedTerminalHistory] : null,
+      restoreBuffer: this._savedTerminalBuffer || null
+    });
+
+    // Notify server
+    if (this.client) {
+      this.client.send('wm', {
+        action: 'open',
+        windowId: id,
+        windowType: 'terminal',
+        title: 'Terminal',
+        channel: 'game'
+      });
+    }
+  }
+
+  /**
+   * Disconnect from server and show reconnect dialog
+   */
+  disconnect() {
+    // Close the WebSocket
+    if (this.client) {
+      this.client.close();
+    }
+
+    // Show reconnect dialog
+    this.showReconnectDialog();
+  }
+
+  /**
+   * Show reconnect dialog overlay
+   */
+  showReconnectDialog() {
+    // Remove existing dialog if any
+    const existing = document.getElementById('malice-reconnect-dialog');
+    if (existing) existing.remove();
+
+    // Create overlay
+    const overlay = document.createElement('div');
+    overlay.id = 'malice-reconnect-dialog';
+    overlay.style.cssText = \\\`
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+    \\\`;
+
+    // Dialog box
+    const dialog = document.createElement('div');
+    dialog.style.cssText = \\\`
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 12px;
+      padding: 32px 48px;
+      text-align: center;
+      box-shadow: 0 16px 64px rgba(0, 0, 0, 0.5);
+    \\\`;
+
+    // Icon
+    const icon = document.createElement('div');
+    icon.textContent = '🔌';
+    icon.style.cssText = 'font-size: 48px; margin-bottom: 16px;';
+    dialog.appendChild(icon);
+
+    // Title
+    const title = document.createElement('h2');
+    title.textContent = 'Disconnected';
+    title.style.cssText = \\\`
+      color: #e0e0e0;
+      font-family: system-ui, -apple-system, sans-serif;
+      font-size: 24px;
+      font-weight: 600;
+      margin: 0 0 8px 0;
+    \\\`;
+    dialog.appendChild(title);
+
+    // Message
+    const msg = document.createElement('p');
+    msg.textContent = 'Your connection to the server has been closed.';
+    msg.style.cssText = \\\`
+      color: #888;
+      font-family: system-ui, -apple-system, sans-serif;
+      font-size: 14px;
+      margin: 0 0 24px 0;
+    \\\`;
+    dialog.appendChild(msg);
+
+    // Reconnect button
+    const btn = document.createElement('button');
+    btn.textContent = 'Reconnect';
+    btn.style.cssText = \\\`
+      background: #00ff88;
+      color: #0a0a0a;
+      border: none;
+      border-radius: 6px;
+      padding: 12px 32px;
+      font-family: system-ui, -apple-system, sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+    \\\`;
+    btn.addEventListener('mouseenter', () => {
+      btn.style.background = '#00cc6a';
+    });
+    btn.addEventListener('mouseleave', () => {
+      btn.style.background = '#00ff88';
+    });
+    btn.addEventListener('click', () => {
+      overlay.remove();
+      if (this.client) {
+        this.client.connect();
+      }
+    });
+    dialog.appendChild(btn);
+
+    overlay.appendChild(dialog);
+    document.body.appendChild(overlay);
+  }
+
+  /**
+   * Hide reconnect dialog
+   */
+  hideReconnectDialog() {
+    const dialog = document.getElementById('malice-reconnect-dialog');
+    if (dialog) dialog.remove();
   }
 }
 \`;

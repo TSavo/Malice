@@ -182,8 +182,7 @@ export class PlayerBuilder {
       await self.syncWindowLayout();
 
       // Show prompt (system - uses tell)
-      await self.print('> ');
-    `,
+          `,
     );
 
     obj.setMethod(
@@ -487,8 +486,7 @@ export class PlayerBuilder {
       // During chargen interview, everything goes directly to the NPC
       if (self.chargenInProgress && self.chargenAgentSession) {
         if (!trimmed) {
-          await self.print('> ');
-          return;
+                    return;
         }
 
         // Use mutex to serialize queries - prevent race conditions
@@ -497,21 +495,18 @@ export class PlayerBuilder {
           // Query already in progress - queue this message
           pending.push(trimmed);
           await $mutex.update(self, 'chargenQuery', pending);
-          await self.print('> ');
-          return;
+                    return;
         }
 
         // We got the lock - process this message directly
         await self._processChargenMessage(trimmed);
-        await self.print('> ');
-        return;
+                return;
       }
 
       // Check if in prompt state ($.prompt handles questions, choices, yesorno)
       if (await $.prompt.isActive(self)) {
         await $.prompt.handleInput(self, trimmed);
-        await self.print('> ');
-        return;
+                return;
       }
 
       // Check if in options menu
@@ -527,8 +522,7 @@ export class PlayerBuilder {
       }
 
       if (!trimmed) {
-        await self.print('> ');
-        return;
+                return;
       }
 
       // Check sleep state
@@ -588,11 +582,9 @@ export class PlayerBuilder {
           return; // processAIQueue handles the prompt
         }
 
-        await self.print('> ');
-      } catch (err) {
+              } catch (err) {
         await self.tell('Error: ' + err.message);
-        await self.print('> ');
-      }
+              }
     `,
     );
 
@@ -978,8 +970,7 @@ export class PlayerBuilder {
 
       if (inputs.length === 0) {
         self.aiQueryActive = false;
-        await self.print('> ');
-        return;
+                return;
       }
 
       // Build world context
@@ -1076,8 +1067,7 @@ export class PlayerBuilder {
       if (self.aiQueue?.length > 0) {
         await self.processAIQueue(context);
       } else {
-        await self.print('> ');
-      }
+              }
     `,
     );
   }
@@ -2206,8 +2196,7 @@ export class PlayerBuilder {
       'onWokeUp',
       `
       await self.tell('You wake up.');
-      await self.print('> ');
-    `,
+          `,
     );
 
     obj.setMethod(
@@ -2581,8 +2570,7 @@ export class PlayerBuilder {
       if (input === 'q' || input === 'quit' || input === 'exit') {
         self._inFitnessMenu = false;
         await self.tell('Exiting fitness menu.');
-        await self.print('> ');
-        return;
+                return;
       }
 
       if (partMap[input]) {

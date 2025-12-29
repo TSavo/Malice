@@ -55,6 +55,7 @@ export class Window {
   constructor(wm, config) {
     this.wm = wm;
     this.id = config.windowId;
+    this.windowType = config.windowType || 'generic';
     this.config = config.config || {};
     this.title = config.title || 'Window';
     this.channel = config.channel || null;
