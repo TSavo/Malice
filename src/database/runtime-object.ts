@@ -1444,6 +1444,40 @@ export class RuntimeObjectImpl implements RuntimeObject {
   }
 
   /**
+   * Get all methods including inherited ones.
+   * Methods defined on child objects override parent methods.
+   * @returns Record of method name to Method definition
+   */
+  getMethods(): Record<string, Method> {
+    const result: Record<string, Method> = {};
+
+    // Walk up the parent chain, collecting methods
+    // Start from root and work down so child methods override parent ones
+    const chain: RuntimeObjectImpl[] = [];
+    let current: RuntimeObjectImpl | null = this;
+
+    while (current) {
+      chain.unshift(current); // prepend to get root-first order
+      const parent = current.getParent();
+      // Stop when parent is self (root objects)
+      if (parent && (parent as unknown as RuntimeObjectImpl) !== current) {
+        current = parent as unknown as RuntimeObjectImpl;
+      } else {
+        current = null;
+      }
+    }
+
+    // Apply methods from root to child (child overrides parent)
+    for (const obj of chain) {
+      if (obj.obj.methods) {
+        Object.assign(result, obj.obj.methods);
+      }
+    }
+
+    return result;
+  }
+
+  /**
    * Save changes to database
    */
   /**

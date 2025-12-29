@@ -719,6 +719,17 @@ WORLD LOG: logWorld(author, message) and getWorldLog(limit) manage the deity cha
     `,
     );
 
+    // Alias for getAll
+    this.ai.setMethod(
+      'list',
+      `
+      /** List all AI-controlled humans (alias for getAll).
+       *  @returns Array of human RuntimeObjects
+       */
+      return await self.getAll();
+    `,
+    );
+
     this.ai.setMethod(
       'getInfo',
       `
