@@ -6,6 +6,18 @@ import type { ObjectManager } from '../object-manager.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DOCS_DIR = join(__dirname, '../../../docs');
+const PROMPTS_DIR = join(DOCS_DIR, 'prompts');
+
+/** Prompt file definitions: property name -> filename */
+const PROMPT_FILES: Record<string, string> = {
+  narrator: 'NARRATOR-PROMPT.md', // In docs/ root
+  pluribus: 'PLURIBUS.md',
+  sisterGray: 'SISTER-GRAY.md',
+  tailor: 'TAILOR.md',
+  defaultAgent: 'DEFAULT-AGENT.md',
+  immigrationOfficer: 'IMMIGRATION-OFFICER.md',
+  ghostInterviewer: 'GHOST-INTERVIEWER.md',
+};
 
 /**
  * Builds AiPrompts utility object ($.aiPrompts)
@@ -13,11 +25,31 @@ const DOCS_DIR = join(__dirname, '../../../docs');
  *
  * Usage from MOO code:
  *   const narratorPrompt = $.aiPrompts.narrator;
+ *   const pluribusPrompt = $.aiPrompts.pluribus;
  */
 export class AiPromptsBuilder {
   private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
+
+  /**
+   * Load a prompt file from disk
+   */
+  private loadPrompt(name: string, filename: string): string {
+    const fallback = `# ${name} Prompt\n\nFailed to load from disk.`;
+    try {
+      // narrator is in docs/, others are in docs/prompts/
+      const dir = name === 'narrator' ? DOCS_DIR : PROMPTS_DIR;
+      const content = readFileSync(join(dir, filename), 'utf-8');
+      console.log(
+        `[AiPromptsBuilder] Loaded ${filename} (${content.length} chars)`,
+      );
+      return content;
+    } catch (e) {
+      console.error(`[AiPromptsBuilder] Failed to load ${filename}:`, e);
+      return fallback;
+    }
+  }
 
   /**
    * Build the AiPrompts utility or reload prompts on existing object
@@ -34,17 +66,10 @@ export class AiPromptsBuilder {
       this.obj = await this.manager.load(aliases.aiPrompts);
     }
 
-    // Load prompts from disk
-    let narrator = '# Narrator Prompt\n\nFailed to load from disk.';
-    try {
-      narrator = readFileSync(join(DOCS_DIR, 'NARRATOR-PROMPT.md'), 'utf-8');
-      console.log(
-        '[AiPromptsBuilder] Loaded NARRATOR-PROMPT.md (' +
-          narrator.length +
-          ' chars)',
-      );
-    } catch (e) {
-      console.error('[AiPromptsBuilder] Failed to load NARRATOR-PROMPT.md:', e);
+    // Load all prompts from disk
+    const prompts: Record<string, string> = {};
+    for (const [name, filename] of Object.entries(PROMPT_FILES)) {
+      prompts[name] = this.loadPrompt(name, filename);
     }
 
     if (!this.obj) {
@@ -55,7 +80,7 @@ export class AiPromptsBuilder {
         properties: {
           name: 'AiPrompts',
           description: 'AI system prompts loaded from disk',
-          narrator,
+          ...prompts,
         },
         methods: {},
       });
@@ -65,9 +90,13 @@ export class AiPromptsBuilder {
       objectManager.set('aliases', aliases);
       console.log(`[AiPromptsBuilder] Created $.aiPrompts as #${this.obj.id}`);
     } else {
-      // Update existing - reload prompts from disk
-      this.obj.set('narrator', narrator);
-      console.log('[AiPromptsBuilder] Reloaded $.aiPrompts.narrator from disk');
+      // Update existing - reload all prompts from disk
+      for (const [name, content] of Object.entries(prompts)) {
+        this.obj.set(name, content);
+      }
+      console.log(
+        `[AiPromptsBuilder] Reloaded ${Object.keys(prompts).length} prompts from disk`,
+      );
     }
   }
 }
