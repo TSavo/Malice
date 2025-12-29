@@ -219,8 +219,29 @@ export class AuthManagerBuilder {
             );
 
             if (existingUser) {
-              context.send('That username is already taken.\\r\\nChoose a username: ');
-              return;
+              // Check if existing user completed chargen
+              const chargenComplete = getValue(existingUser.properties.chargenComplete);
+
+              if (chargenComplete) {
+                // Complete character - name is truly taken
+                context.send('That username is already taken.\\r\\nChoose a username: ');
+                return;
+              }
+
+              // Incomplete character - check if still connected
+              const incompletePlayer = await context.$.load(existingUser._id);
+              if (incompletePlayer && incompletePlayer._context) {
+                // Still connected (doing chargen) - don't recycle
+                context.send('That username is already taken.\\r\\nChoose a username: ');
+                return;
+              }
+
+              // Disconnected incomplete character - recycle and allow re-registration
+              console.log('[AuthManager] Recycling incomplete character:', username, 'id:', existingUser._id);
+              if (incompletePlayer) {
+                await $recycler.recycle(incompletePlayer);
+              }
+              // Fall through to create new character with this username
             }
 
             // Username available - ask for password

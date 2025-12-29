@@ -589,57 +589,56 @@ export class MinimalBootstrap {
     }
 
     // Auth token storage for web pre-auth
-    if (!system.hasMethod('storeAuthToken')) {
-      system.setMethod(
-        'storeAuthToken',
-        `
-        /** Store a one-time auth token for web pre-authentication.
-         *  @param token - UUID token string
-         *  @param playerId - Player object ID
-         *  @param expiresAt - Timestamp when token expires
-         */
-        const token = args[0];
-        const playerId = args[1];
-        const expiresAt = args[2];
+    // Always update these methods to ensure correct implementation
+    system.setMethod(
+      'storeAuthToken',
+      `
+      /** Store a one-time auth token for web pre-authentication.
+       *  @param token - UUID token string
+       *  @param playerId - Player object ID
+       *  @param expiresAt - Timestamp when token expires
+       */
+      const token = args[0];
+      const playerId = args[1];
+      const expiresAt = args[2];
 
-        self.authTokens = self.authTokens || {};
-        self.authTokens[token] = { playerId, expiresAt };
-        `,
-      );
-    }
+      // Must reassign whole object to trigger persistence
+      const tokens = self.authTokens || {};
+      tokens[token] = { playerId, expiresAt };
+      self.authTokens = tokens;
+      `,
+    );
 
-    if (!system.hasMethod('validateAuthToken')) {
-      system.setMethod(
-        'validateAuthToken',
-        `
-        /** Validate and consume a one-time auth token.
-         *  @param token - Token to validate
-         *  @returns Player ID if valid, null otherwise
-         */
-        const token = args[0];
+    system.setMethod(
+      'validateAuthToken',
+      `
+      /** Validate and consume a one-time auth token.
+       *  @param token - Token to validate
+       *  @returns Player ID if valid, null otherwise
+       */
+      const token = args[0];
 
-        const tokens = self.authTokens || {};
-        const entry = tokens[token];
+      const tokens = self.authTokens || {};
+      const entry = tokens[token];
 
-        if (!entry) {
-          return null;
-        }
+      if (!entry) {
+        return null;
+      }
 
-        // Check expiration
-        if (Date.now() > entry.expiresAt) {
-          delete tokens[token];
-          self.authTokens = tokens;
-          return null;
-        }
-
-        // One-time use - delete after validation
-        const playerId = entry.playerId;
+      // Check expiration
+      if (Date.now() > entry.expiresAt) {
         delete tokens[token];
         self.authTokens = tokens;
+        return null;
+      }
 
-        return playerId;
-        `,
-      );
-    }
+      // One-time use - delete after validation
+      const playerId = entry.playerId;
+      delete tokens[token];
+      self.authTokens = tokens;
+
+      return playerId;
+      `,
+    );
   }
 }

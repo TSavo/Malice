@@ -6,6 +6,7 @@ import { BodyFactoryBuilder } from './body-factory-builder.js';
 import { CharGenBuilder } from './chargen-builder.js';
 import { ClientBuilder } from './client/index.js';
 import { CombatBuilder } from './combat-builder.js';
+import { CartelDomainBuilder } from './cartel-domain-builder.js';
 import { ContinuumDomainBuilder } from './continuum-domain-builder.js';
 import { DomainRegistryBuilder } from './domain-registry-builder.js';
 import { EmoteBuilder } from './emote-builder.js';
@@ -115,6 +116,7 @@ export class CoreSystemBuilder {
     const worldApiBuilder = new WorldApiBuilder(this.manager);
     const websiteBuilder = new WebsiteBuilder(this.manager);
     const continuumDomainBuilder = new ContinuumDomainBuilder(this.manager);
+    const cartelDomainBuilder = new CartelDomainBuilder(this.manager);
 
     await authManagerBuilder.build();
     await charGenBuilder.build();
@@ -171,6 +173,7 @@ export class CoreSystemBuilder {
     await clientBuilder.build();
 
     await continuumDomainBuilder.build(); // thecontinuum.city domain
+    await cartelDomainBuilder.build(); // graycartel.com domain
     await mcpBuilder.build(); // MCP code-first tools
     await sessionBuilder.build(); // Session management wrapper
     await tailorBuilder.build(); // AI costume designer

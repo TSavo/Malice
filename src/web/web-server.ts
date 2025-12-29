@@ -93,6 +93,12 @@ export async function createWebServer(
         return null;
       }
 
+      // Reject incomplete characters
+      if (!player.get('chargenComplete')) {
+        console.log('[WebAuth] Rejecting incomplete character:', username);
+        return null;
+      }
+
       return player;
     } catch (err) {
       console.error('[WebServer] Auth error:', err);
@@ -143,7 +149,9 @@ export async function createWebServer(
       const { username, password } = body || {};
 
       if (!username || !password) {
-        return reply.code(400).send({ error: 'Username and password required' });
+        return reply
+          .code(400)
+          .send({ error: 'Username and password required' });
       }
 
       const player = await validateCredentials(username, password);
