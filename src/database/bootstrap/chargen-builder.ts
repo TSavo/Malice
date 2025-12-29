@@ -554,6 +554,9 @@ STARTING LOCATION: Immigration Services Entry Hall ($immigrationServices)`,
         await player.moveTo(startingRoom, player);
       }
 
+      // Mark chargen as complete
+      player.chargenComplete = true;
+
       // Connect player to the game
       await player.connect(player._context);
     `,
@@ -1203,9 +1206,10 @@ STARTING LOCATION: Immigration Services Entry Hall ($immigrationServices)`,
         console.error('[CharGen] $immigrationServices alias not found!');
       }
 
-      // Clear chargen state
+      // Clear chargen state and mark complete
       player.chargenInProgress = false;
       player.chargenAgentSession = null;
+      player.chargenComplete = true;
 
       // Cancel any pending timeout
       await self.cancelPlayerTimeout(playerId);

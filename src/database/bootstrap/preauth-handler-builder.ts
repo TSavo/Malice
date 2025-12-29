@@ -41,8 +41,11 @@ export class PreAuthHandlerBuilder {
           const context = args[0];
           const authInfo = args[1];
 
-          context.send('Pre-authenticated connection detected\\\\r\\\\n');
-          context.send(\`Auth mode: \${authInfo.mode}\\\\r\\\\n\`);
+          // Silent for token auth (web clients)
+          if (authInfo.mode !== 'token') {
+            context.send('Pre-authenticated connection detected\\\\r\\\\n');
+            context.send(\`Auth mode: \${authInfo.mode}\\\\r\\\\n\`);
+          }
 
           // Route to appropriate handler based on auth mode
           try {
