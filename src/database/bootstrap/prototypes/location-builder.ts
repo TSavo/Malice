@@ -346,6 +346,83 @@ SENSATION: broadcastSensation(target, sensation) routes pain/feeling to target's
       `,
     );
 
+    // === MULTIPLEXED CHANNEL BROADCASTS ===
+
+    // Broadcast state to all multiplexed clients in this location
+    obj.setMethod(
+      'broadcastState',
+      `
+      /**
+       * Send state channel message to all multiplexed clients in this location
+       * @param type - State message type (e.g., 'room', 'inventory')
+       * @param data - State data payload
+       */
+      const type = args[0];
+      const data = args[1];
+      const contents = self.contents || [];
+
+      for (const obj of contents) {
+        if (obj && obj.state) {
+          try {
+            await obj.call('state', type, data);
+          } catch (e) {
+            // Ignore - object may not have a mux connection
+          }
+        }
+      }
+      `,
+    );
+
+    // Broadcast ctrl to all multiplexed clients in this location
+    obj.setMethod(
+      'broadcastCtrl',
+      `
+      /**
+       * Send ctrl channel message to all multiplexed clients in this location
+       * @param type - Ctrl message type (e.g., 'prompt', 'mode')
+       * @param data - Ctrl data payload
+       */
+      const type = args[0];
+      const data = args[1];
+      const contents = self.contents || [];
+
+      for (const obj of contents) {
+        if (obj && obj.ctrl) {
+          try {
+            await obj.call('ctrl', type, data);
+          } catch (e) {
+            // Ignore - object may not have a mux connection
+          }
+        }
+      }
+      `,
+    );
+
+    // Broadcast on any channel to all multiplexed clients in this location
+    obj.setMethod(
+      'broadcastChannel',
+      `
+      /**
+       * Send message on any channel to all multiplexed clients in this location
+       * @param channel - Channel name (e.g., 'custom:events')
+       * @param data - Message payload
+       */
+      const channel = args[0];
+      const data = args[1];
+      const contents = self.contents || [];
+
+      for (const obj of contents) {
+        if (obj && obj.channel) {
+          try {
+            await obj.call('channel', channel, data);
+          } catch (e) {
+            // Ignore - object may not have a mux connection
+          }
+        }
+      }
+      `,
+    );
+
     // Property descriptions for AI context (inherits from Describable)
     obj.setPropertyDescription(
       'contents',

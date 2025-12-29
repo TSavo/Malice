@@ -232,6 +232,61 @@ export class PlayerBuilder {
       }
     `,
     );
+
+    // Channel methods - send to multiplexed channels
+    // No-op for telnet/raw WebSocket clients, active for multiplexed clients
+
+    // Send to an arbitrary named channel
+    obj.setMethod(
+      'channel',
+      `
+      const name = args[0];
+      const payload = args[1];
+      if (self._context?.channel) {
+        return self._context.channel(name, payload);
+      }
+      return false;
+    `,
+    );
+
+    // Send state update (room, inventory, stats, etc.)
+    obj.setMethod(
+      'state',
+      `
+      const type = args[0];
+      const data = args[1];
+      if (self._context?.state) {
+        return self._context.state(type, data);
+      }
+      return false;
+    `,
+    );
+
+    // Send control message (mode, prompt, etc.)
+    obj.setMethod(
+      'ctrl',
+      `
+      const type = args[0];
+      const data = args[1];
+      if (self._context?.ctrl) {
+        return self._context.ctrl(type, data);
+      }
+      return false;
+    `,
+    );
+
+    // Send media content (images, audio cues, maps)
+    obj.setMethod(
+      'media',
+      `
+      const type = args[0];
+      const data = args[1];
+      if (self._context?.media) {
+        return self._context.media(type, data);
+      }
+      return false;
+    `,
+    );
   }
 
   private addInputMethods(obj: RuntimeObject): void {

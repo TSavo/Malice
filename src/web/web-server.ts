@@ -4,6 +4,10 @@
  * A lightweight Fastify server that delegates all requests to MOO objects.
  * Content, templates, and routing logic all live in MongoDB as $webSite, $webPage, $webTemplate.
  *
+ * Routing order:
+ * 1. Try new domain-based routing via $domainRegistry (tree-based, supports multi-domain)
+ * 2. Fallback to legacy $webSite routing (single-site)
+ *
  * This follows the same pattern as other transports:
  * - TypeScript handles the socket/HTTP infrastructure
  * - MOO objects handle all the logic
@@ -89,10 +93,63 @@ export async function createWebServer(
     }
   }
 
-  // All requests go to $webSite.handleRequest
+  // All requests route through domain tree, then route tree
   app.all('*', async (request, reply) => {
     try {
-      // Load $webSite object via alias
+      // Extract hostname (strip port if present)
+      const hostname = (request.hostname || 'localhost')
+        .split(':')[0]
+        .toLowerCase();
+
+      // Build meta object for handlers
+      const auth = await authenticate(request);
+      const meta = {
+        hostname,
+        method: request.method,
+        headers: Object.fromEntries(
+          Object.entries(request.headers).filter(
+            ([_, v]) => typeof v === 'string',
+          ),
+        ),
+        query: request.query,
+        player: auth.player,
+        isAdmin: auth.isAdmin,
+      };
+
+      // Try new domain-based routing first
+      const domainRegistry = manager.getAliases().get('domainRegistry');
+
+      if (domainRegistry) {
+        // Use new tree-based domain/route resolution
+        const domainResult = (await domainRegistry.call(
+          'handleRequest',
+          hostname,
+          request.url,
+          meta,
+        )) as {
+          status?: number;
+          contentType?: string;
+          body?: string;
+          headers?: Record<string, string>;
+        } | null;
+
+        if (domainResult && domainResult.status !== 404) {
+          // Domain handled the request
+          const {
+            status = 200,
+            contentType = 'text/html',
+            body = '',
+            headers = {},
+          } = domainResult;
+          for (const [key, value] of Object.entries(headers)) {
+            reply.header(key, value);
+          }
+          reply.code(status).type(contentType).send(body);
+          return;
+        }
+      }
+
+      // Fallback to legacy $webSite routing
       const webSite = manager.getAliases().get('webSite');
 
       if (!webSite) {
@@ -113,24 +170,12 @@ export async function createWebServer(
         return;
       }
 
-      // Authenticate the request (HTTP Basic Auth)
-      const auth = await authenticate(request);
-
-      // Call the MOO handleRequest method
+      // Call the legacy MOO handleRequest method
       const result = await webSite.call(
         'handleRequest',
         request.url,
         request.method,
-        {
-          headers: Object.fromEntries(
-            Object.entries(request.headers).filter(
-              ([_, v]) => typeof v === 'string',
-            ),
-          ),
-          query: request.query,
-          player: auth.player,
-          isAdmin: auth.isAdmin,
-        },
+        meta,
       );
 
       // Handle the response

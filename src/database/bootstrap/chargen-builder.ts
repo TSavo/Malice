@@ -52,9 +52,11 @@ export class CharGenBuilder {
     if (!this.charGen) {
       // Create new CharGen only if it doesn't exist
       // Use aliases already loaded from #0 above
-      const describableId = aliases['describable'];
+      const describableId = aliases.describable;
       if (!describableId) {
-        throw new Error('$describable not found in aliases - run prototype builders first');
+        throw new Error(
+          '$describable not found in aliases - run prototype builders first',
+        );
       }
       const $describable = await this.manager.load(describableId);
       this.charGen = await this.manager.create({

@@ -45,8 +45,7 @@ class PropertySelector {
         typeof objValue === 'object' &&
         'id' in objValue
       ) {
-        result =
-          (value as RuntimeObject).id === (objValue as RuntimeObject).id;
+        result = (value as RuntimeObject).id === (objValue as RuntimeObject).id;
       } else {
         result = objValue === value;
       }
@@ -75,7 +74,10 @@ class PropertySelector {
         // Search all string properties
         const ownProps = obj.getOwnProperties();
         for (const [, val] of Object.entries(ownProps)) {
-          if (typeof val === 'string' && val.toLowerCase().includes(lowerText)) {
+          if (
+            typeof val === 'string' &&
+            val.toLowerCase().includes(lowerText)
+          ) {
             result = true;
             break;
           }
@@ -941,7 +943,12 @@ export class ObjectManager {
   async setMethod(
     obj: RuntimeObject,
     name: string,
-    methodDef: { code: string; callable?: boolean; aliases?: string[]; help?: string },
+    methodDef: {
+      code: string;
+      callable?: boolean;
+      aliases?: string[];
+      help?: string;
+    },
   ): Promise<void> {
     const updatePromise = this.db.setMethod(obj.id, name, methodDef);
     this.pendingUpdateOperations.add(updatePromise);
@@ -1018,7 +1025,11 @@ export class ObjectManager {
   /**
    * Atomically remove a value from an array by matching
    */
-  async pullFromArray(obj: RuntimeObject, name: string, value: unknown): Promise<void> {
+  async pullFromArray(
+    obj: RuntimeObject,
+    name: string,
+    value: unknown,
+  ): Promise<void> {
     const updatePromise = this.db.pullFromArray(obj.id, name, value);
     this.pendingUpdateOperations.add(updatePromise);
     try {
@@ -1100,21 +1111,7 @@ export class ObjectManager {
    * Returns an array of all object IDs (used by MOO code for iteration)
    */
   getAllIds(): ObjId[] {
-    const ids: ObjId[] = [];
-
-    // Get all positive IDs from the array cache
-    for (let i = 0; i < this.cache.objects.length; i++) {
-      if (this.cache.objects[i] !== undefined) {
-        ids.push(i);
-      }
-    }
-
-    // Get all infrastructure object IDs (negative IDs)
-    for (const id of this.cache.infrastructureObjects.keys()) {
-      ids.push(id);
-    }
-
-    return ids;
+    return this.cache.getAllIds();
   }
 
   /**

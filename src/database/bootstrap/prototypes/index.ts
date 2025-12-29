@@ -15,6 +15,8 @@ export { BodyPartsBuilder } from './body-parts-builder.js';
 // Body system
 export { BodyPartBuilder } from './bodypart-builder.js';
 export { BottledWaterBuilder } from './bottled-water-builder.js';
+// Elevators, doors, signs and locks
+export { CallButtonBuilder } from './call-button-builder.js';
 export { CloneRecordingStudioBuilder } from './clone-recording-studio-builder.js';
 // Clone system
 export { CloneTankBuilder } from './clone-tank-builder.js';
@@ -30,8 +32,6 @@ export { DoorBuilder } from './door-builder.js';
 export { DrinkBuilder } from './drink-builder.js';
 // Consumables
 export { EdibleBuilder } from './edible-builder.js';
-// Elevators, doors, signs and locks
-export { CallButtonBuilder } from './call-button-builder.js';
 export { ElevatorBuilder } from './elevator-builder.js';
 export { ElevatorDoorBuilder } from './elevator-door-builder.js';
 export { EmbodiedBuilder } from './embodied-builder.js';

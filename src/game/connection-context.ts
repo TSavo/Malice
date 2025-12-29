@@ -3,6 +3,8 @@ import type { ObjId, RuntimeObject } from '../../types/object.js';
 import type { Connection } from '../connection/connection.js';
 import { getGameLogger } from '../database/game-logger.js';
 import type { ObjectManager } from '../database/object-manager.js';
+import { MultiplexedTransport } from '../transport/multiplexed/multiplexed-transport.js';
+import type { IChannelMux } from '../transport/multiplexed/types.js';
 
 /**
  * Connection context - bridges transport layer with object system
@@ -123,6 +125,61 @@ export class ConnectionContext {
    */
   send(text: string): void {
     this.connection.send(text);
+  }
+
+  /**
+   * Send to a named channel. No-op if transport doesn't support multiplexing.
+   * @returns true if sent, false if not supported
+   */
+  channel(name: string, payload: unknown): boolean {
+    const transport = this.connection.transport;
+    if (transport instanceof MultiplexedTransport) {
+      transport.mux.send(name, payload);
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Send a state update to the client
+   * @returns true if sent, false if not supported
+   */
+  state(type: string, data: unknown): boolean {
+    return this.channel('state', { type, data });
+  }
+
+  /**
+   * Send a control message to the client
+   * @returns true if sent, false if not supported
+   */
+  ctrl(type: string, data?: Record<string, unknown>): boolean {
+    return this.channel('ctrl', { type, ...data });
+  }
+
+  /**
+   * Send media content to the client
+   * @returns true if sent, false if not supported
+   */
+  media(type: string, data: unknown): boolean {
+    return this.channel('media', { type, data });
+  }
+
+  /**
+   * Get the channel multiplexer if transport supports it
+   */
+  get channels(): IChannelMux | null {
+    const transport = this.connection.transport;
+    if (transport instanceof MultiplexedTransport) {
+      return transport.mux;
+    }
+    return null;
+  }
+
+  /**
+   * Check if this connection supports multiplexed channels
+   */
+  get isMultiplexed(): boolean {
+    return this.connection.transport instanceof MultiplexedTransport;
   }
 
   /**

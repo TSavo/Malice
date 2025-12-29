@@ -51,10 +51,7 @@ Even if forced, there may be no elevator car behind them (empty shaft).`,
       'elevator',
       'Reference to the elevator these doors connect to',
     );
-    obj.setPropertyDescription(
-      'floor',
-      'The floor number these doors are on',
-    );
+    obj.setPropertyDescription('floor', 'The floor number these doors are on');
 
     // Override canPass to check elevator presence
     obj.setMethod(

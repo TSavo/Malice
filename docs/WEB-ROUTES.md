@@ -1,313 +1,367 @@
-# Web Routes in Malice
+# Web Routing in Malice
 
-This guide explains how to build web endpoints and pages using the MOO-based web routing system.
+This guide explains the multi-domain web routing system.
 
 ## Architecture Overview
 
 ```
-HTTP Request → Web Server → $webSite.handleRequest()
-                                    ↓
-                           $webRouter.dispatch()
-                                    ↓
-                           Route.match() → Route.handleRequest()
+HTTP Request → web-server.ts → $domainRegistry.handleRequest()
+                                       ↓
+                              findDomain(hostname)
+                                       ↓
+                              $webDomain.handleRequest()
+                                       ↓
+                              resolve(path segments)
+                                       ↓
+                              $webRoute.handleRequest()
 ```
 
 **Key Objects:**
-- `$webRoute` - Prototype for all route definitions
-- `$webRouter` - Singleton that dispatches requests to routes
-- `$webSite` - Main entry point, delegates to router then falls back to pages
 
-## Creating a Route
+| Object | Purpose |
+|--------|---------|
+| `$webNode` | Base prototype for segment-tree matching |
+| `$webDomain` | Domain/subdomain node (inherits $webNode) |
+| `$webRoute` | Path route node (inherits $webNode) |
+| `$domainRegistry` | Central domain manager, entry point for requests |
 
-### 1. Create Route Object
+**Built-in Domain:**
+- `thecontinuum.city` - Pluribus's citizenship recruitment site (also serves as default for localhost)
 
-Routes inherit from `$webRoute` and define path, methods, and handler:
+## How It Works
+
+### Segment Trees
+
+Both domains and routes use the same tree structure (`$webNode`):
+
+```
+Domain Tree (hostname, right-to-left):
+  thecontinuum.city
+    ├── www (alias → parent)
+    ├── api (API subdomain)
+    └── * (wildcard → player profiles)
+
+Route Tree (path, left-to-right):
+  / (root)
+    ├── api
+    │   ├── status
+    │   └── news
+    ├── docs
+    │   └── * (wildcard → doc name)
+    └── play
+```
+
+### Wildcard Matching
+
+The `*` segment matches anything and captures the value:
 
 ```javascript
-// Create a new API route
-const myRoute = await $recycler.create($webRoute, {
-  name: 'My API Route',
-  description: 'Returns some data',
-  path: '/api/mydata',           // URL path
-  methods: ['GET'],               // HTTP methods: GET, POST, PUT, DELETE
-  contentType: 'application/json', // Response Content-Type
-  requiresAuth: false,            // false, true, or 'admin'
+// Subdomain wildcard: kevin.thecontinuum.city
+// → domain.match = 'kevin'
+
+// Path wildcard: /docs/PLAYER-GUIDE
+// → route.match = 'PLAYER-GUIDE'
+```
+
+## Creating a New Domain
+
+### 1. Create Domain Object
+
+```javascript
+const myDomain = await $recycler.create($webDomain, {
+  name: 'My Site',
+  description: 'A custom website',
+  segment: 'example.com',
 });
 ```
 
-### 2. Add Handler Method
-
-The handler receives `(params, meta)` and returns a response:
+### 2. Create Route Tree
 
 ```javascript
-myRoute.setMethod('handleRequest', `
-  const params = args[0] || {};  // URL params from :param or *
-  const meta = args[1] || {};    // { query, isAdmin, player, ... }
+// Root route
+const rootRoute = await $recycler.create($webRoute, {
+  name: 'Homepage',
+  segment: '',  // Empty = root
+  methods: ['GET'],
+  contentType: 'text/html',
+});
 
-  // Your logic here
-  const data = { hello: 'world', time: Date.now() };
-
+rootRoute.setMethod('handleRequest', `
+  const meta = args[0] || {};
   return {
     status: 200,
-    contentType: 'application/json',
-    body: JSON.stringify(data)
+    contentType: 'text/html',
+    body: '<html><body><h1>Welcome</h1></body></html>'
   };
+`);
+
+// Set as domain's route tree
+myDomain.rootRoute = rootRoute;
+```
+
+### 3. Add Child Routes
+
+```javascript
+// /api route
+const apiRoute = await $recycler.create($webRoute, {
+  parent: rootRoute,  // Child of root
+  name: 'API',
+  segment: 'api',
+  methods: ['GET'],
+  contentType: 'application/json',
+});
+
+// /api/data route
+const dataRoute = await $recycler.create($webRoute, {
+  parent: apiRoute,  // Child of /api
+  name: 'Data API',
+  segment: 'data',
+  methods: ['GET'],
+  contentType: 'application/json',
+});
+
+dataRoute.setMethod('handleRequest', `
+  return { status: 200, body: JSON.stringify({ hello: 'world' }) };
 `);
 ```
 
-### 3. Register with Router
+### 4. Register with Registry
 
 ```javascript
-await $.webRouter.register(myRoute);
+await $.domainRegistry.register(myDomain);
+
+// Optionally set as default (handles unknown hosts)
+await $.domainRegistry.setDefault(myDomain);
+```
+
+## Creating Subdomains
+
+Subdomains are child `$webDomain` objects:
+
+```javascript
+// api.example.com
+const apiSubdomain = await $recycler.create($webDomain, {
+  parent: myDomain,  // Child of example.com
+  name: 'API Subdomain',
+  segment: 'api',
+});
+
+// www.example.com (alias to parent)
+const wwwSubdomain = await $recycler.create($webDomain, {
+  parent: myDomain,
+  name: 'WWW Alias',
+  segment: 'www',
+  aliasOf: myDomain,  // Delegates to parent
+});
+
+// *.example.com (wildcard for user profiles)
+const userSubdomain = await $recycler.create($webDomain, {
+  parent: myDomain,
+  name: 'User Subdomain',
+  segment: '*',  // Wildcard
+});
+
+userSubdomain.setMethod('handleRequest', `
+  const playerName = self.match;  // Captured from wildcard
+  const path = args[0];
+  const meta = args[2];
+  
+  // Look up player
+  const player = await $query()
+    .parent($player)
+    .prop('playername').equals(playerName.toLowerCase())
+    .first();
+  
+  if (!player) {
+    return { status: 404, body: 'User not found' };
+  }
+  
+  return {
+    status: 200,
+    contentType: 'text/html',
+    body: '<h1>' + player.name + '</h1>'
+  };
+`);
 ```
 
 ## Route Properties
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `path` | string | URL pattern: `/api/users/:id`, `/docs/*` |
+| `segment` | string | Path segment to match (empty for root, `*` for wildcard) |
 | `methods` | string[] | HTTP methods: `['GET']`, `['GET', 'POST']` |
 | `contentType` | string | Response type: `application/json`, `text/html` |
 | `requiresAuth` | boolean\|string | `false`, `true` (any auth), `'admin'` |
-| `middleware` | string[] | Middleware names to run before handler |
 | `handler` | string | Handler method name (default: `handleRequest`) |
+| `match` | string | Captured value when this is a wildcard route |
 
-## Path Patterns
+## Handler Response Format
 
-### Static Paths
-```javascript
-path: '/api/status'        // Matches exactly /api/status
-```
-
-### URL Parameters
-```javascript
-path: '/api/users/:id'     // :id captured as params.id
-path: '/api/:type/:id'     // Multiple params
-
-// In handler:
-const userId = params.id;
-```
-
-### Wildcards
-```javascript
-path: '/docs/*'            // * matches rest of path
-
-// /docs/guide/intro → params['*'] = 'guide/intro'
-```
-
-## Handler Response Formats
-
-### Full Response Object
 ```javascript
 return {
   status: 200,              // HTTP status code
-  contentType: 'text/html', // Overrides route contentType
-  body: '<h1>Hello</h1>',   // Response body
-  headers: { 'X-Custom': 'value' }  // Optional headers
+  contentType: 'text/html', // Response Content-Type
+  body: '<h1>Hello</h1>',   // Response body (string)
+  headers: {                // Optional headers
+    'X-Custom': 'value'
+  }
 };
 ```
 
-### Simple Return (uses route contentType)
-```javascript
-return { data: [1, 2, 3] };  // Auto-stringified as JSON
-return '<html>...</html>';   // Returned as-is for text/html
-```
+## Meta Object
 
-### Error Responses
+The `meta` object passed to handlers contains:
+
 ```javascript
-if (!found) {
-  return { status: 404, body: JSON.stringify({ error: 'Not found' }) };
+{
+  hostname: 'example.com',
+  method: 'GET',
+  headers: { ... },
+  query: { key: 'value' },  // Parsed query string
+  player: RuntimeObject,    // Authenticated player or null
+  isAdmin: boolean,
+  domain: $webDomain,       // The matched domain
+  domainCaptures: string[], // Captured wildcard values from domain
+  pathCaptures: string[],   // Captured wildcard values from path
 }
-```
-
-## Query String Access
-
-Query parameters are in `meta.query`:
-
-```javascript
-// Request: /api/rooms?z_min=0&limit=10
-
-myRoute.setMethod('handleRequest', `
-  const meta = args[1] || {};
-  const zMin = parseInt(meta.query?.z_min) || 0;
-  const limit = parseInt(meta.query?.limit) || 100;
-
-  // Use zMin, limit...
-`);
 ```
 
 ## Authentication
 
 ### Public Routes
 ```javascript
-requiresAuth: false  // Anyone can access
+requiresAuth: false  // Default - anyone can access
 ```
 
 ### Authenticated Routes
 ```javascript
-requiresAuth: true   // Requires logged-in player
-
-// In handler:
-const player = meta.player;  // Player object or null
+requiresAuth: true   // Requires HTTP Basic Auth
 ```
 
 ### Admin Routes
 ```javascript
 requiresAuth: 'admin'  // Requires admin privileges
-
-// In handler:
-const isAdmin = meta.isAdmin;  // true/false
 ```
 
-## HTML Pages
+Authentication is checked via the route's `checkAuth` method (inherited from `$webRoute`).
 
-For pages, return full HTML:
+## Example: Complete API
 
 ```javascript
-const pageRoute = await $recycler.create($webRoute, {
-  name: 'Dashboard Page',
-  path: '/dashboard',
-  methods: ['GET'],
-  contentType: 'text/html',
-  requiresAuth: true,
+// Create domain
+const apiDomain = await $recycler.create($webDomain, {
+  name: 'API Domain',
+  segment: 'api.example.com',
 });
 
-pageRoute.setMethod('handleRequest', `
-  const player = args[1]?.player;
+// Root route
+const root = await $recycler.create($webRoute, {
+  name: 'API Root',
+  segment: '',
+  methods: ['GET'],
+});
+apiDomain.rootRoute = root;
 
+// /health endpoint
+const health = await $recycler.create($webRoute, {
+  parent: root,
+  name: 'Health Check',
+  segment: 'health',
+  methods: ['GET'],
+  contentType: 'application/json',
+});
+
+health.setMethod('handleRequest', `
   return {
     status: 200,
-    contentType: 'text/html',
-    body: \\\`<!DOCTYPE html>
-<html>
-<head><title>Dashboard</title></head>
-<body>
-  <h1>Welcome, \\\${player?.name || 'Guest'}</h1>
-</body>
-</html>\\\`
+    body: JSON.stringify({ status: 'ok', timestamp: Date.now() })
   };
 `);
-```
 
-## Dynamic Config via Props
-
-Store config in route properties for runtime tweaking:
-
-```javascript
-const mapRoute = await $recycler.create($webRoute, {
-  path: '/map',
+// /users/:id endpoint (wildcard)
+const users = await $recycler.create($webRoute, {
+  parent: root,
+  name: 'Users',
+  segment: 'users',
   methods: ['GET'],
-  contentType: 'text/html',
-  // Custom props
-  roomColor: 0x00ff44,
-  roomOpacity: 0.7,
-  blockSize: 1.8,
 });
 
-mapRoute.setMethod('handleRequest', `
-  // Read config from self
-  const color = self.roomColor || 0x00ff00;
-  const opacity = self.roomOpacity || 0.5;
-
-  // Inject into HTML template
-  const html = \\\`<script>
-    const CONFIG = { color: \\\${color}, opacity: \\\${opacity} };
-  </script>\\\`;
-
-  return { status: 200, body: html };
-`);
-
-// Later, tweak without rebuild:
-$.mapRoute.roomOpacity = 0.9;
-```
-
-## Middleware
-
-Middleware runs before the handler:
-
-```javascript
-// Register middleware on router
-await $.webRouter.addMiddleware('logRequest', 'logMiddleware');
-
-// Add middleware to route
-myRoute.middleware = ['logRequest'];
-
-// Implement middleware method on route
-myRoute.setMethod('logMiddleware', `
-  const path = args[0];
-  const method = args[1];
-  console.log('[Request]', method, path);
-
-  return null;  // Continue to next middleware/handler
-  // Or return { status: 403, body: 'Forbidden' } to short-circuit
-`);
-```
-
-## Complete Example: JSON API
-
-```javascript
-// Create route for player stats
-const statsRoute = await $recycler.create($webRoute, {
-  name: 'Player Stats API',
-  path: '/api/players/:id/stats',
+const userById = await $recycler.create($webRoute, {
+  parent: users,
+  name: 'User by ID',
+  segment: '*',  // Captures user ID
   methods: ['GET'],
   contentType: 'application/json',
   requiresAuth: true,
 });
 
-statsRoute.setMethod('handleRequest', `
-  const params = args[0];
-  const meta = args[1];
-
-  // Get player ID from URL
-  const playerId = parseInt(params.id);
-  if (isNaN(playerId)) {
-    return { status: 400, body: JSON.stringify({ error: 'Invalid player ID' }) };
+userById.setMethod('handleRequest', `
+  const userId = parseInt(self.match);
+  const meta = args[0];
+  
+  const user = await $load(userId);
+  if (!user) {
+    return { status: 404, body: JSON.stringify({ error: 'Not found' }) };
   }
-
-  // Load player
-  const player = await $load(playerId);
-  if (!player) {
-    return { status: 404, body: JSON.stringify({ error: 'Player not found' }) };
-  }
-
-  // Check authorization
-  if (!meta.isAdmin && meta.player?.id !== playerId) {
-    return { status: 403, body: JSON.stringify({ error: 'Not authorized' }) };
-  }
-
-  // Return stats
+  
   return {
     status: 200,
-    body: JSON.stringify({
-      id: player.id,
-      name: player.name,
-      hp: player.hp,
-      location: player.location?.name,
-    })
+    body: JSON.stringify({ id: user.id, name: user.name })
   };
 `);
 
-// Register with router
-await $.webRouter.register(statsRoute);
-
-// Add alias for easy access
-await $.addAlias('statsRoute', statsRoute.id);
+// Register
+await $.domainRegistry.register(apiDomain);
 ```
 
-## Debugging Routes
+## Debugging
 
-Check registered routes:
+### List Registered Domains
 ```javascript
-const routes = $.webRouter.routes;  // Array of route IDs
-for (const id of routes) {
-  const r = await $load(id);
-  console.log(r.path, r.methods);
-}
+const domains = await $.domainRegistry.list();
+console.log(domains);
+// [{ id: 236, segment: 'thecontinuum.city', name: 'The Continuum' }]
 ```
 
-Test dispatch manually:
+### Describe Registry
 ```javascript
-const result = await $.webRouter.dispatch('/api/status', 'GET', {});
-console.log(result);
+const desc = await $.domainRegistry.describe();
+console.log(desc);
+// Domain Registry
+// ================
+// Default: thecontinuum.city
+// Domains:
+//   - thecontinuum.city (#236)
+//     - www (#237)
+//     - * (#238)
 ```
+
+### Print Route Tree
+```javascript
+const domain = await $.continuumDomain;
+const tree = await domain.rootRoute.printTree();
+console.log(tree);
+// (root)
+//   api
+//     status
+//     news
+//   docs
+//     *
+//   play
+```
+
+### Test Domain Resolution
+```javascript
+const match = await $.domainRegistry.findDomain('kevin.thecontinuum.city');
+console.log(match.domain.segment);  // '*'
+console.log(match.captures);        // ['kevin']
+```
+
+## Legacy Routing
+
+The old `$webRouter` and `$webSite` objects still exist for backwards compatibility. If the new domain routing returns 404 or isn't configured, requests fall back to the legacy system.
+
+To migrate a legacy route:
+1. Create equivalent `$webRoute` in the new tree structure
+2. Remove from `$.webRouter.routes`
+3. Test both paths work
