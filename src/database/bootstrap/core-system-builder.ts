@@ -14,6 +14,7 @@ import { EmoteBuilder } from './emote-builder.js';
 import { EnglishBuilder } from './english-builder.js';
 import { ExclusionsBuilder } from './exclusions-builder.js';
 import { FormatBuilder } from './format-builder.js';
+import { GreeterBuilder } from './greeter-builder.js';
 import { MaskBuilder } from './mask-builder.js';
 import { MCPBuilder } from './mcp-builder.js';
 import { MementoBuilder } from './memento-builder.js';
@@ -101,6 +102,7 @@ export class CoreSystemBuilder {
     const plotBuilder = new PlotBuilder(this.manager);
     const aiBuilder = new AiBuilder(this.manager);
     const aiPromptsBuilder = new AiPromptsBuilder(this.manager);
+    const greeterBuilder = new GreeterBuilder(this.manager);
     const newsBuilder = new NewsBuilder(this.manager);
     const notesBuilder = new NotesBuilder(this.manager);
     const combatBuilder = new CombatBuilder(this.manager);
@@ -141,6 +143,7 @@ export class CoreSystemBuilder {
     await plotBuilder.build();
     await aiBuilder.build();
     await aiPromptsBuilder.build();
+    await greeterBuilder.build();
     await newsBuilder.build();
     await notesBuilder.build();
     await combatBuilder.build();
@@ -202,6 +205,7 @@ export class CoreSystemBuilder {
     await formatBuilder.registerAlias();
     await plotBuilder.registerAliases();
     await aiBuilder.registerAlias();
+    await greeterBuilder.registerAlias();
     await newsBuilder.registerAlias();
     await notesBuilder.registerAlias();
     await combatBuilder.registerAlias();
@@ -290,6 +294,12 @@ export class CoreSystemBuilder {
     const aiBuilder = new AiBuilder(this.manager);
     await aiBuilder.build(true);
     await aiBuilder.registerAlias();
+
+    // Rebuild Greeter methods
+    console.log('  Rebuilding Greeter methods...');
+    const greeterBuilder = new GreeterBuilder(this.manager);
+    await greeterBuilder.build(true);
+    await greeterBuilder.registerAlias();
 
     // Rebuild Plot methods
     console.log('  Rebuilding Plot methods...');

@@ -860,6 +860,15 @@ They're in the Cartel now. Information is earned.`,
         self.interviewState = state;
       }
 
+      // Spawn orientation greeter (async, don't block completion)
+      if ($greeter) {
+        $greeter.spawnForPlayer(playerId, 'cartel').then(greeter => {
+          console.log('[CartelCharGen] Spawned greeter #' + greeter.id + ' for player #' + playerId);
+        }).catch(err => {
+          console.error('[CartelCharGen] Greeter spawn error:', err);
+        });
+      }
+
       return {
         success: true,
         playerId,

@@ -61,7 +61,9 @@ MEMORIES: AI NPCs have persistent memories across session resets. remember(human
 
 PROFILE: setPersonality(humanId, personality) and setHistory(humanId, history) configure NPC character. getProfile(humanId) returns full profile with memories and notes.
 
-PATHFINDING: path(fromRoom, toRoom, options) finds shortest route using A*. walkPath(humanId, path) moves an NPC along the route.
+MOVEMENT: go(humanId, direction) moves an NPC through an exit by direction name. Simple and reliable - handles exit lookup, movement, and waiting for completion.
+
+PATHFINDING: path(fromRoom, toRoom, options) finds shortest route using A*. walkPath(humanId, path) moves an NPC along the full route.
 
 EXPECTATIONS: expectResponseFrom(targetId, options) sets timeout when AI is waiting for player response. cancelExpectation(targetId, humanId) clears it.
 
@@ -246,16 +248,40 @@ const info = await someObject.describeForAI();
 // Returns: { id, name, properties, abilities, methods, inheritsFrom: {...} }
 \\\`\\\`\\\`
 
-COMMUNICATION:
+COMMUNICATION (use location.announce for all speech/emotes):
 \\\`\\\`\\\`javascript
-// To speak
-await $ai.do({{id}}, 'say Hello there!');
+const room = self.location;
 
-// To emote
-await $ai.do({{id}}, ':nods thoughtfully');
+// Say to everyone in room
+await room.announce(self, null, {
+  actor: 'You say, "Hello there!"',
+  others: self.name + ' says, "Hello there!"'
+});
 
-// To move (use exits, don't teleport)
-await $ai.do({{id}}, 'north');
+// Emote (action)
+await room.announce(self, null, {
+  actor: 'You nod thoughtfully.',
+  others: self.name + ' nods thoughtfully.'
+});
+
+// Say to specific person (target sees special message)
+await room.announce(self, targetPlayer, {
+  actor: 'You say to ' + targetPlayer.name + ', "Follow me."',
+  target: self.name + ' says to you, "Follow me."',
+  others: self.name + ' says to ' + targetPlayer.name + ', "Follow me."'
+});
+\\\`\\\`\\\`
+
+MOVEMENT:
+\\\`\\\`\\\`javascript
+// Move through an exit (use self.go - never teleport)
+const result = await self.go('north');
+// Returns: { success, direction, fromRoom: {id, name}, toRoom: {id, name} }
+// On failure: { success: false, error, availableExits }
+
+// Check available exits first
+const exits = self.location.exits || [];
+const exitNames = exits.filter(e => e).map(e => e.name);
 \\\`\\\`\\\`
 
 PATHFINDING:
@@ -2036,6 +2062,41 @@ CORE PRINCIPLES
     );
 
     // ═══════════════════════════════════════════════════════════════════
+    // GO - Convenience wrapper for agent.go()
+    // ═══════════════════════════════════════════════════════════════════
+
+    this.ai.setMethod(
+      'go',
+      `
+      /**
+       * Move an NPC through an exit. Convenience wrapper for agent.go().
+       * Prefer calling npc.go('north') directly when you have the object.
+       *
+       * @param humanId - The NPC's object ID
+       * @param direction - Exit name (e.g., 'north', 'enter')
+       * @returns { success, direction, fromRoom, toRoom, error?, availableExits? }
+       */
+      const humanId = args[0];
+      const direction = args[1];
+
+      if (!humanId) {
+        return { success: false, error: 'Human ID is required' };
+      }
+
+      const human = await $load(humanId);
+      if (!human) {
+        return { success: false, error: 'Could not load human #' + humanId };
+      }
+
+      if (!human.go) {
+        return { success: false, error: 'Human #' + humanId + ' does not have go method (not an agent?)' };
+      }
+
+      return await human.go(direction);
+    `,
+    );
+
+    // ═══════════════════════════════════════════════════════════════════
     // WORLD LOG - Deity Chat between Pluribus and Sister Gray
     // ═══════════════════════════════════════════════════════════════════
 
@@ -2398,6 +2459,20 @@ CORE PRINCIPLES
         stepsCompleted++;
       }
       return { success: true, stepsCompleted };
+    `,
+    );
+
+    // Go method - convenience wrapper for agent.go()
+    this.ai.setMethod(
+      'go',
+      `
+      const humanId = args[0];
+      const direction = args[1];
+      if (!humanId) return { success: false, error: 'Human ID required' };
+      const human = await $load(humanId);
+      if (!human) return { success: false, error: 'Could not load human' };
+      if (!human.go) return { success: false, error: 'Human has no go method' };
+      return await human.go(direction);
     `,
     );
 

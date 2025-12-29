@@ -529,8 +529,24 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
        *  Everyone in your current location will hear what you say.
        */
       const message = args[3];
-      // TODO: Broadcast to room
-      return \`\${player.name} says: \${message}\`;
+      if (!message || !message.trim()) {
+        return 'What do you want to say?';
+      }
+
+      const location = player.location;
+      if (!location) {
+        return 'You are nowhere.';
+      }
+
+      // Broadcast via announce
+      if (location.announce) {
+        await location.announce(player, null, {
+          actor: 'You say, "' + message + '"',
+          others: player.name + ' says, "' + message + '"'
+        }, player.name + ' says, "' + message + '"');
+      }
+
+      return '';
     `,
     );
 
@@ -545,8 +561,24 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
        *  Example: emote waves hello → "Bob waves hello"
        */
       const action = args[3];
-      // TODO: Broadcast to room
-      return \`\${player.name} \${action}\`;
+      if (!action || !action.trim()) {
+        return 'What do you want to do?';
+      }
+
+      const location = player.location;
+      if (!location) {
+        return 'You are nowhere.';
+      }
+
+      // Broadcast via announce
+      if (location.announce) {
+        await location.announce(player, null, {
+          actor: 'You ' + action,
+          others: player.name + ' ' + action
+        });
+      }
+
+      return '';
     `,
     );
 
@@ -2284,6 +2316,129 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
         distanceTraveled: Math.round(distanceTraveled),
         progress: Math.round(progress),
         timeRemainingMs: Math.round(timeRemaining),
+      };
+    `,
+    );
+
+    obj.setMethod(
+      'go',
+      `
+      /**
+       * Move through an exit by direction name.
+       * Handles exit lookup, lock checking, movement initiation, and waiting for arrival.
+       *
+       * @param direction - Exit name (e.g., 'north', 'south', 'east', 'west', 'up', 'down', 'enter')
+       * @returns { success, direction, fromRoom, toRoom, error?, availableExits? }
+       *
+       * @example
+       * await self.go('north');
+       * await npc.go('enter');
+       */
+      const direction = args[0];
+
+      if (!direction || typeof direction !== 'string') {
+        return { success: false, error: 'Direction is required (e.g., "north", "south", "enter")' };
+      }
+
+      const currentRoom = self.location;
+      if (!currentRoom) {
+        return { success: false, error: 'You have no location' };
+      }
+
+      // Find the exit by name or alias
+      const exits = currentRoom.exits || [];
+      let targetExit = null;
+      const dirLower = direction.toLowerCase();
+
+      for (const exit of exits) {
+        if (!exit) continue;
+        const exitName = (exit.name || '').toLowerCase();
+        if (exitName === dirLower) {
+          targetExit = exit;
+          break;
+        }
+        // Check aliases
+        const aliases = exit.aliases || [];
+        for (const alias of aliases) {
+          if ((alias || '').toLowerCase() === dirLower) {
+            targetExit = exit;
+            break;
+          }
+        }
+        if (targetExit) break;
+      }
+
+      if (!targetExit) {
+        const available = exits.filter(e => e).map(e => e.name);
+        return {
+          success: false,
+          error: 'No exit "' + direction + '" found. Available: ' + (available.join(', ') || 'none'),
+          availableExits: available
+        };
+      }
+
+      // Check if exit is usable (locks, permissions, etc.)
+      if (targetExit.canUse) {
+        try {
+          const canUse = await targetExit.canUse(self);
+          if (!canUse) {
+            // Try to get a reason
+            let reason = 'locked or blocked';
+            if (targetExit.locked) reason = 'locked';
+            if (targetExit.blockedReason) reason = targetExit.blockedReason;
+            return { success: false, error: 'Cannot use exit "' + direction + '" - ' + reason };
+          }
+        } catch (e) {
+          // canUse threw an error - treat as blocked
+          return { success: false, error: 'Cannot use exit "' + direction + '" - ' + (e.message || 'blocked') };
+        }
+      }
+
+      const destRoom = targetExit.destRoom;
+      if (!destRoom) {
+        return { success: false, error: 'Exit "' + direction + '" has no destination' };
+      }
+
+      const distance = targetExit.distance || 10;
+      const fromRoomId = currentRoom.id;
+      const fromRoomName = currentRoom.name || 'Unknown';
+
+      // Start movement
+      try {
+        const result = await self.startMovement(destRoom, distance, direction);
+        if (!result.success) {
+          return { success: false, error: result.message || 'Movement failed' };
+        }
+      } catch (e) {
+        return { success: false, error: 'Movement error: ' + (e.message || e) };
+      }
+
+      // Wait for movement to complete
+      const maxWait = 60000; // 60 seconds max
+      const pollInterval = 100;
+      let waited = 0;
+
+      while (waited < maxWait) {
+        const moving = await self.isMoving();
+        if (!moving) break;
+        await new Promise(resolve => setTimeout(resolve, pollInterval));
+        waited += pollInterval;
+      }
+
+      if (waited >= maxWait) {
+        return { success: false, error: 'Movement timeout waiting to arrive' };
+      }
+
+      // Get new location
+      const newRoom = self.location;
+      const toRoomId = newRoom ? newRoom.id : null;
+      const toRoomName = newRoom ? (newRoom.name || 'Unknown') : 'Unknown';
+
+      return {
+        success: true,
+        direction: direction,
+        fromRoom: { id: fromRoomId, name: fromRoomName },
+        toRoom: { id: toRoomId, name: toRoomName }
       };
     `,
     );
