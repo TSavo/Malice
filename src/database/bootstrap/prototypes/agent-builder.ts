@@ -2443,6 +2443,146 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
     `,
     );
 
+    // ═══════════════════════════════════════════════════════════════════
+    // RESPONSE EXPECTATIONS - Wait for player responses with timeout
+    // ═══════════════════════════════════════════════════════════════════
+
+    obj.setMethod(
+      'expectResponseFrom',
+      `
+      /**
+       * Set up a timeout expectation for a response from someone.
+       * If they don't respond within timeout, the NPC gets prompted to re-engage.
+       *
+       * @param targetId - The player/agent we're waiting for a response from
+       * @param options - { timeout?, prompt?, recurring? }
+       * @returns { success, jobName, timeout }
+       *
+       * @example
+       * await self.expectResponseFrom(playerId, {
+       *   prompt: 'The citizen seems distracted. Try getting their attention.',
+       *   timeout: 120000  // 2 minutes
+       * });
+       */
+      const targetId = args[0];
+      const options = args[1] || {};
+
+      if (!targetId) {
+        return { success: false, error: 'Target ID is required' };
+      }
+
+      const timeout = options.timeout || 5 * 60 * 1000; // 5 min default
+      const prompt = options.prompt || 'The person you are speaking with has been silent for ' + Math.round(timeout / 60000) + ' minutes. Try re-engaging them or move on.';
+      const recurring = options.recurring !== false; // default true
+
+      const jobName = 'expect-' + self.id + '-' + targetId;
+
+      console.log('[Agent] Setting up expectation: ' + jobName + ' timeout=' + timeout + 'ms');
+
+      // Cancel existing expectation first
+      await $.scheduler.unschedule(jobName);
+
+      // Store expectation metadata on self
+      const expectations = self._expectations || {};
+      expectations[jobName] = { targetId, prompt, recurring, timeout };
+      self._expectations = expectations;
+
+      // Schedule the timeout
+      await $.scheduler.schedule(jobName, timeout, 0, self, '_onExpectationTimeout', jobName);
+
+      return { success: true, jobName, timeout };
+    `,
+    );
+
+    obj.setMethod(
+      'cancelExpectation',
+      `
+      /**
+       * Cancel a pending response expectation.
+       * Called automatically when the target speaks to this agent.
+       *
+       * @param targetId - The object we were waiting for
+       * @returns { success, jobName }
+       */
+      const targetId = args[0];
+
+      if (!targetId) {
+        return { success: false, error: 'targetId is required' };
+      }
+
+      const jobName = 'expect-' + self.id + '-' + targetId;
+
+      console.log('[Agent] Cancelling expectation: ' + jobName);
+
+      await $.scheduler.unschedule(jobName);
+
+      // Clean up metadata
+      const expectations = self._expectations || {};
+      delete expectations[jobName];
+      self._expectations = expectations;
+
+      return { success: true, jobName };
+    `,
+    );
+
+    obj.setMethod(
+      '_onExpectationTimeout',
+      `
+      /**
+       * Internal handler called when expectation timeout fires.
+       * Sends prompt to the NPC's AI to re-engage the player.
+       *
+       * @param jobName - The job name that fired
+       */
+      const jobName = args[0];
+
+      console.log('[Agent] Expectation timeout fired: ' + jobName);
+
+      const expectations = self._expectations || {};
+      const exp = expectations[jobName];
+
+      if (!exp) {
+        console.log('[Agent] Expectation not found, may have been cancelled');
+        return { success: false, error: 'Expectation not found' };
+      }
+
+      // Get session from self
+      const session = self.interactionSession;
+      if (!session) {
+        console.log('[Agent] No session for agent #' + self.id);
+        return { success: false, error: 'No session' };
+      }
+
+      console.log('[Agent] Sending timeout prompt to AI for agent #' + self.id);
+
+      // Send timeout prompt to AI
+      const systemPrompt = self.agentSystemPrompt || '';
+      try {
+        const result = await $aiQuery(systemPrompt, exp.prompt, session, {});
+        self.interactionSession = result.session;
+
+        // Register session for persistence
+        if ($ai && $ai.registerSession) {
+          await $ai.registerSession(result.session, self.id, self.name, 'expectation-timeout', 'interaction');
+        }
+      } catch (err) {
+        console.error('[Agent] Expectation timeout prompt error:', err?.message || err);
+      }
+
+      // Reschedule if recurring
+      if (exp.recurring) {
+        console.log('[Agent] Rescheduling expectation: ' + jobName);
+        await $.scheduler.schedule(jobName, exp.timeout, 0, self, '_onExpectationTimeout', jobName);
+      } else {
+        // One-shot: clean up
+        delete expectations[jobName];
+        self._expectations = expectations;
+      }
+
+      return { success: true, prompted: true };
+    `,
+    );
+
     // Command handlers for walk/run mode switching
     obj.setMethod(
       'walkCommand',
@@ -3200,11 +3340,11 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
         });
       }
 
-      // Auto-cancel any response expectation the NPC had for this speaker
+      // Auto-cancel any response expectation the target NPC had for this speaker
       // This happens before triggering AI response so the timeout doesn't fire
-      if ($.ai && $.ai.cancelExpectation) {
+      if (target.cancelExpectation) {
         try {
-          await $.ai.cancelExpectation(self.id, target.id);
+          await target.cancelExpectation(self.id);
         } catch (e) {
           // Ignore - expectation may not exist
         }
