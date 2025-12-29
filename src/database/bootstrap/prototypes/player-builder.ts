@@ -483,24 +483,63 @@ export class PlayerBuilder {
       const trimmed = input.trim();
 
       // Check chargen FIRST - blocks ALL other input handling
-      // During chargen interview, everything goes directly to the NPC
-      if (self.chargenInProgress && self.chargenAgentSession) {
-        if (!trimmed) {
-                    return;
+      if (self.chargenInProgress) {
+        // If no session yet, AI hasn't manifested - show confusion based on faction
+        if (!self.chargenAgentSession) {
+          if (!trimmed) return;
+
+          let confusionMessages;
+
+          if (self.chargenFaction === 'cartel') {
+            // Cartel: kidnapped, bag over head
+            confusionMessages = [
+              "You try to speak, but your throat is dry. The bag over your head muffles any sound.",
+              "You strain against the darkness. Nothing makes sense yet.",
+              "Muffled voices somewhere nearby. They haven't noticed you're awake.",
+              "The rough canvas scratches your face as you try to move.",
+              "Footsteps. Echoing. Getting closer... or farther? Hard to tell.",
+              "Your fingers twitch. Still numb. Still can't feel the bindings.",
+              "A drip of water somewhere. The smell of old stone and rust.",
+              "You try to remember how you got here. The memories are fog.",
+              "Someone coughs. Close. Very close.",
+              "The floor is cold. Concrete? Stone? Your cheek presses against it.",
+            ];
+          } else {
+            // Continuum: Immigration Services, bureaucratic haze
+            confusionMessages = [
+              "Fluorescent lights buzz overhead. Your head pounds.",
+              "A voice crackles over an intercom somewhere. You can't make out the words.",
+              "Forms. There were forms. You think you signed something.",
+              "The plastic chair creaks as you shift. How long have you been waiting?",
+              "Footsteps in the corridor. Official-sounding. They pass by.",
+              "Your vision swims. The room smells of antiseptic and recycled air.",
+              "A number. You're supposed to remember a number. Was it yours?",
+              "The clock on the wall seems frozen. Or maybe time just moves differently here.",
+              "Someone is crying softly in another room. Or is that a ventilation fan?",
+              "Your mouth is dry. There was a water cooler. Somewhere.",
+            ];
+          }
+
+          const msg = confusionMessages[Math.floor(Math.random() * confusionMessages.length)];
+          await self.tell('');
+          await self.tell(msg);
+          await self.tell('');
+          return;
         }
+
+        // Session exists - route to chargen interview
+        if (!trimmed) return;
 
         // Use mutex to serialize queries - prevent race conditions
         const pending = await $mutex.acquire(self, 'chargenQuery', []);
         if (pending !== false) {
-          // Query already in progress - queue this message
           pending.push(trimmed);
           await $mutex.update(self, 'chargenQuery', pending);
-                    return;
+          return;
         }
 
-        // We got the lock - process this message directly
         await self._processChargenMessage(trimmed);
-                return;
+        return;
       }
 
       // Check if in prompt state ($.prompt handles questions, choices, yesorno)

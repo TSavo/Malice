@@ -135,10 +135,11 @@ export class WebSocketServer {
     }
 
     // If we have a chargenMode but no auth info, create minimal auth info to carry it
+    // Use mode: 'none' so normal pre-auth flow runs, but chargenMode in metadata
+    // routes new character creation to the appropriate chargen (e.g., cartel)
     if (!authInfo && chargenMode) {
       authInfo = {
-        mode: 'custom',
-        custom: { type: 'chargen-mode', data: {} },
+        mode: 'none',
         metadata: {
           remoteAddress,
           userAgent: req.headers['user-agent'],
