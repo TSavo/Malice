@@ -209,6 +209,7 @@ export class CoreSystemBuilder {
     await worldApiBuilder.registerAlias();
     await websiteBuilder.registerAliases();
     await continuumDomainBuilder.registerAlias();
+    await cartelDomainBuilder.registerAlias();
     await mcpBuilder.registerAliases();
     await tailorBuilder.registerAlias();
 
@@ -371,6 +372,12 @@ export class CoreSystemBuilder {
     const continuumDomainBuilder = new ContinuumDomainBuilder(this.manager);
     await continuumDomainBuilder.build(true);
     await continuumDomainBuilder.registerAlias();
+
+    // Rebuild Cartel Domain methods
+    console.log('  Rebuilding CartelDomain methods...');
+    const cartelDomainBuilder = new CartelDomainBuilder(this.manager);
+    await cartelDomainBuilder.build(true);
+    await cartelDomainBuilder.registerAlias();
 
     // Rebuild MCP methods
     console.log('  Rebuilding MCP methods...');
