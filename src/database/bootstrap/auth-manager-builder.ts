@@ -31,23 +31,74 @@ export class AuthManagerBuilder {
         properties: {
           name: 'AuthManager',
           description: 'Interactive login and authentication',
-          welcomeMessage: `
-    ,·'´¨;.  '                                   ‚.,       '              ,.  '             ,.-·.                  ,. - ., ‚     '        '        ,_,.‚
-    ;   ';:\\           .·´¨';\\                 ;'   '·‚.,               /   ';\\            /    ;'\\'           ,·'´ ,. - ,   ';\\'             ,.·'´  ,. , \`\`;\\
-   ;     ';:'\\      .'´     ;:'\\              .´  .-‚   ";\\           ,'   ,'::'\\          ;    ;:::\\      ,·´  .'´\\:::::;'   ;:'\\          .´   ;´"::::\\'\`'´ \\'\\
-   ;   ,  '·:;  .·´,.´';  ,'::;'             /   /:\\:';   ;:'\\        ,'    ;:::';'        ';    ;::::;'    /  ,'´::::'\\;:-/   ,' ::;\`       /   ,'::\\::::::\\::::\\:'
-  ;   ;'\`.    ¨,.·´::;'  ;:::;            ,'  ,'::::'\\';   ;::';      ';   ,':::;'          ;   ;::::;   ,'   ;':::::;'´ ';   /\\::;'        ;   ;:;:-·'~^ª*';\\'´
-  ;  ';::; \\*´\\:::::;  ,':::;'        ,.-·'  '·~^*'´¨   ;::;\`     ;  ,':::;' '         ';  ;'::::;    ;   ;:::::;   '\\*'´\\::\\'          ;  ,.-·:*'´¨'\`*´\\::\\
- ';  ,'::;   \\::\\;:·';  ;:::; '        ':,  ,·:²*´¨¯'\`;  ;::';     ,'  ,'::;'            ;  ';:::';     ';   ';::::';    '\\::'\\/.´        ;   ;\\:::::::::::::'\\;'
- ;  ';::;     '*´  ;',·':::;'          ,'  / \\:::::::::';   ;::;     ;  ';_:,.-·´';\\'     ';  ;::::;'     \\    '·:;:'_ ‚.‚-·'´.·´\\‚      ;  ;'_\\_:;::'-·^*';\\'
- \\´¨\\::;          \\¨\\::::;          ,' ,'::::\\·²*'´¨¯':,'\\.;'     ',   _,.-·'´:\\:\\'     \\*´\\:::;'      '\\:\` ·  .,.  -·:´:::::::\\     ';    ‚  ‚.‚-·:*'´::\\:'\\
-  '\\::\\;            \\:\\;·'           \\\`¨\\::·/           \\:·\\'       \\¨:::::::::::\\';      '\\::\\:;'         \\:::::::\\::::::::;:·'''´      \\\`*´ ¯\\::::::::::::\\;'
-    '´¨               ¨'              \\'°\\;'              \\;'         '\\;::_;:-·'´'          \`*´'            \`· :;::\\;::-·'´              \\::::::\\;::-·^*'´
-                                      \`¨''                '            '¨                                                  '                \`*´¯'
-
-Type 'new' to create a character, or enter your username to log in.
-
-> `,
+          welcomeMessage: '', // Set dynamically via showUplinkSequence
+          uplinkSequence: [
+            {
+              delay: 0,
+              text: '\r\n%{green}[NEURAL INTERFACE]%{/} Initializing...\r\n',
+            },
+            {
+              delay: 400,
+              text: '%{dim}> Calibrating synaptic bridge...%{/}\r\n',
+            },
+            {
+              delay: 600,
+              text: '%{dim}> Establishing encrypted tunnel...%{/}\r\n',
+            },
+            {
+              delay: 800,
+              text: '%{green}[OK]%{/} Handshake complete\r\n',
+            },
+            {
+              delay: 400,
+              text: '\r\n%{green}[NETWORK]%{/} Scanning for access points...\r\n',
+            },
+            {
+              delay: 500,
+              text: '%{dim}> Node detected: PIONEER-SQUARE-7%{/}\r\n',
+            },
+            {
+              delay: 400,
+              text: '%{dim}> Signal strength: 94%%{/}\r\n',
+            },
+            { delay: 300, text: '%{dim}> Latency: 12ms%{/}\r\n' },
+            {
+              delay: 600,
+              text: '%{green}[OK]%{/} Uplink to Pioneer Square established\r\n',
+            },
+            {
+              delay: 400,
+              text: '\r\n%{green}[CONTINUUM]%{/} Authenticating...\r\n',
+            },
+            {
+              delay: 700,
+              text: '%{dim}> Verifying credentials...%{/}\r\n',
+            },
+            {
+              delay: 500,
+              text: '%{green}[OK]%{/} Connected to The Continuum\r\n',
+            },
+            {
+              delay: 300,
+              text: '\r\n%{cyan}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━%{/}\r\n',
+            },
+            {
+              delay: 100,
+              text: '%{bold}%{white}                    M A L I C E%{/}\r\n',
+            },
+            {
+              delay: 100,
+              text: '%{dim}                  Seattle - 2110%{/}\r\n',
+            },
+            {
+              delay: 100,
+              text: '%{cyan}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━%{/}\r\n',
+            },
+            {
+              delay: 400,
+              text: "\r\nType 'new' to create a character, or enter your username.\r\n\r\n> ",
+            },
+          ],
         },
         methods: {},
       });
@@ -58,11 +109,27 @@ Type 'new' to create a character, or enter your username to log in.
       'onConnect',
       `
           const context = args[0];
-          const welcome = self.welcomeMessage;
-          context.send(welcome);
-
-          // Set state to collect username
-          self._state = { stage: 'username', context: context };
+          
+          // Play uplink sequence with delays
+          const sequence = self.uplinkSequence || [];
+          let totalDelay = 0;
+          
+          // Mark as playing sequence (ignore input during this time)
+          self._state = { stage: 'uplink', context: context };
+          
+          for (const step of sequence) {
+            totalDelay += step.delay;
+            // Process color codes via $system.processColors
+            const coloredText = await $system.processColors(step.text);
+            setTimeout(() => {
+              context.send(coloredText);
+            }, totalDelay);
+          }
+          
+          // After sequence completes, switch to username stage
+          setTimeout(() => {
+            self._state = { stage: 'username', context: context };
+          }, totalDelay + 100);
         `,
     );
 
@@ -73,6 +140,11 @@ Type 'new' to create a character, or enter your username to log in.
           const input = args[1];
 
           const state = self._state || { stage: 'username', attempts: 0 };
+          
+          // Ignore input during uplink sequence
+          if (state.stage === 'uplink') {
+            return;
+          }
 
           if (state.stage === 'username') {
             const username = input.trim().toLowerCase();

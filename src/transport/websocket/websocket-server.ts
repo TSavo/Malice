@@ -58,6 +58,7 @@ export class WebSocketServer {
   /**
    * Handle new WebSocket connection
    * Extracts HTTP Basic Auth from headers if present
+   * Extracts token from URL query params if present
    * Routes to MultiplexedTransport for /ws/mux paths
    */
   private handleConnection(ws: WebSocket, req: IncomingMessage): void {
@@ -71,19 +72,18 @@ export class WebSocketServer {
       );
     }
 
-    // Extract HTTP Basic Auth if present
+    // Extract auth info from various sources
     let authInfo: AuthInfo | null = null;
-    const authHeader = req.headers.authorization;
 
-    if (authHeader?.startsWith('Basic ')) {
-      const base64 = authHeader.substring(6);
-      const decoded = Buffer.from(base64, 'base64').toString('utf-8');
-      const [username, password] = decoded.split(':', 2);
+    // Check for token in URL query params (for web pre-auth)
+    try {
+      const urlObj = new URL(url, 'http://localhost');
+      const token = urlObj.searchParams.get('token');
 
-      if (username && password) {
+      if (token) {
         authInfo = {
-          mode: 'http-basic',
-          httpBasic: { username, password },
+          mode: 'token',
+          token: { value: token },
           metadata: {
             remoteAddress,
             userAgent: req.headers['user-agent'],
@@ -93,8 +93,39 @@ export class WebSocketServer {
 
         if (this.config.debug) {
           console.log(
-            `[WebSocketServer] HTTP Basic Auth detected for user: ${username}`,
+            `[WebSocketServer] Token auth detected: ${token.substring(0, 8)}...`,
           );
+        }
+      }
+    } catch {
+      // URL parsing failed, continue without token
+    }
+
+    // Check for HTTP Basic Auth if no token
+    if (!authInfo) {
+      const authHeader = req.headers.authorization;
+
+      if (authHeader?.startsWith('Basic ')) {
+        const base64 = authHeader.substring(6);
+        const decoded = Buffer.from(base64, 'base64').toString('utf-8');
+        const [username, password] = decoded.split(':', 2);
+
+        if (username && password) {
+          authInfo = {
+            mode: 'http-basic',
+            httpBasic: { username, password },
+            metadata: {
+              remoteAddress,
+              userAgent: req.headers['user-agent'],
+              protocol: isMultiplexed ? 'websocket-mux' : 'websocket',
+            },
+          };
+
+          if (this.config.debug) {
+            console.log(
+              `[WebSocketServer] HTTP Basic Auth detected for user: ${username}`,
+            );
+          }
         }
       }
     }

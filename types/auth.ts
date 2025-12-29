@@ -53,12 +53,19 @@ export interface CustomAuthInfo {
 }
 
 /**
+ * One-time token authentication (for web pre-auth)
+ */
+export interface TokenAuthInfo {
+  value: string;
+}
+
+/**
  * Authentication information from transport layer
  * Transport extracts credentials, game code validates them
  */
 export interface AuthInfo {
   /** Authentication mode */
-  mode: 'ssl-cert' | 'http-basic' | 'oauth' | 'ssh-key' | 'custom';
+  mode: 'ssl-cert' | 'http-basic' | 'oauth' | 'ssh-key' | 'token' | 'custom';
 
   /** SSL client certificate (if mode === 'ssl-cert') */
   sslCert?: SSLCertInfo;
@@ -71,6 +78,9 @@ export interface AuthInfo {
 
   /** SSH key (if mode === 'ssh-key') */
   sshKey?: SSHKeyInfo;
+
+  /** One-time token (if mode === 'token') */
+  token?: TokenAuthInfo;
 
   /** Custom auth (if mode === 'custom') */
   custom?: CustomAuthInfo;

@@ -192,7 +192,21 @@ export class Window {
       this.element.style.display = 'none';
     }
 
+    // Apply maximized state if configured
+    if (this.maximized) {
+      // Will be applied after DOM append via applyInitialMaximized()
+    }
+
     return this.element;
+  }
+
+  /**
+   * Apply maximized geometry after DOM append
+   */
+  applyInitialMaximized() {
+    if (this.maximized) {
+      this._applyMaximized();
+    }
   }
 
   /**
