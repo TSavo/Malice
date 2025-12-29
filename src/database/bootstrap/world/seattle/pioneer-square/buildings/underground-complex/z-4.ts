@@ -185,6 +185,7 @@ The shaft downward is newer than the one above, the concrete still relatively br
 
     '%RD': {
       name: `Runner's Den`,
+      alias: 'runnersDen', // Register as $runnersDen for Cartel chargen spawn point
       description: `The passage ends here in a chamber that feels temporary despite its permanence—the walls reinforced with materials that could be stripped in hours, the space organized for rapid departure. This is a waystation, not a destination, sized for brief occupancy and quick evacuation. The architecture anticipates abandonment.
 
 The room shows evidence of constant transit: the floor worn in paths that trace movement between the shaft above and the passage west, the walls smooth at hand-height where bodies have brushed past in the dark. The space accommodates passage more than presence, designed for people who don't stay.

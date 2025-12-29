@@ -209,11 +209,21 @@ async function initDesktop(token) {
     return;
   }
 
-  // Determine WebSocket URL (with token if provided)
+  // Determine WebSocket URL (with token and/or mode if provided)
   const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
   let wsUrl = protocol + '//' + window.location.hostname + ':8080/mux';
+  const params = [];
   if (token) {
-    wsUrl += '?token=' + encodeURIComponent(token);
+    params.push('token=' + encodeURIComponent(token));
+  }
+  // Check for chargen mode (e.g., 'cartel' for Gray Cartel path)
+  const urlParams = new URLSearchParams(window.location.search);
+  const mode = urlParams.get('mode');
+  if (mode) {
+    params.push('mode=' + encodeURIComponent(mode));
+  }
+  if (params.length > 0) {
+    wsUrl += '?' + params.join('&');
   }
 
   // Create window manager first (without client reference)

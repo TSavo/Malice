@@ -901,13 +901,75 @@ export class CartelDomainBuilder {
     </div>
     
     <div class="back-link">
-      <p>The underground access point is not yet operational.</p>
-      <p style="margin-top: 1rem;"><a href="/">Return to surface broadcast</a></p>
+      <p style="margin-top: 2rem;"><a href="/" style="color:#666; border-bottom: 1px solid #333;">Return to surface broadcast</a></p>
     </div>
   </div>
+  
+  <script>
+    // Animate the connection sequence, then redirect to terminal
+    let step = 0;
+    const lines = document.querySelectorAll('.terminal-line');
+    
+    function showLine() {
+      if (step < lines.length) {
+        lines[step].style.opacity = '1';
+        step++;
+        
+        if (step === lines.length) {
+          // After showing "CONNECTION TERMINATED", wait then show success
+          setTimeout(() => {
+            // Replace the error with success
+            document.querySelector('.error-main').textContent = 'ROUTE FOUND';
+            document.querySelector('.error-main').style.color = '#ff3366';
+            document.querySelector('.error-code').textContent = 'CONNECTING TO UNDERGROUND NODE...';
+            
+            // Redirect to terminal with cartel mode
+            setTimeout(() => {
+              window.location.href = '/descend?new=1&mode=cartel';
+            }, 1500);
+          }, 2000);
+        } else {
+          setTimeout(showLine, 300 + Math.random() * 400);
+        }
+      }
+    }
+    
+    // Hide all lines initially, then reveal them one by one
+    lines.forEach(line => line.style.opacity = '0');
+    lines.forEach(line => line.style.transition = 'opacity 0.3s');
+    
+    // Check if we're already in terminal mode (has mode param)
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('mode') === 'cartel' || urlParams.get('new') === '1') {
+      // Already going to terminal - don't show animation, just load terminal
+      // The desktop.js will handle this via the terminal template
+    } else {
+      // Show the animation sequence
+      setTimeout(showLine, 500);
+    }
+  </script>
 </body>
 </html>\`;
       
+      // Check if this is a request with mode=cartel (terminal flow)
+      const meta = args[0] || {};
+      const url = meta.url || '';
+      const urlParams = new URLSearchParams(url.split('?')[1] || '');
+      const mode = urlParams.get('mode');
+      const isNew = urlParams.get('new');
+      
+      if (mode === 'cartel' || isNew === '1') {
+        // Serve terminal template for actual play
+        const terminalHtml = await $.terminalTemplate?.get('layout') || '';
+        const rendered = terminalHtml.replace(/\\{\\{title\\}\\}/g, 'DESCENT // GRAY CARTEL');
+        return {
+          status: 200,
+          contentType: 'text/html',
+          body: rendered
+        };
+      }
+      
+      // Otherwise serve the animation page
       return {
         status: 200,
         contentType: 'text/html',
