@@ -29,6 +29,26 @@
         "command": "malice.refresh",
         "title": "Malice: Refresh",
         "icon": "$(refresh)"
+      },
+      {
+        "command": "malice.addMethod",
+        "title": "Add Method",
+        "icon": "$(add)"
+      },
+      {
+        "command": "malice.addProperty",
+        "title": "Add Property",
+        "icon": "$(add)"
+      },
+      {
+        "command": "malice.deleteMethod",
+        "title": "Delete Method",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "malice.deleteProperty",
+        "title": "Delete Property",
+        "icon": "$(trash)"
       }
     ],
     "menus": {
@@ -37,6 +57,28 @@
           "command": "malice.refresh",
           "when": "view == malice-objects",
           "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "malice.addMethod",
+          "when": "view == malice-objects && viewItem == maliceObject",
+          "group": "1_add@1"
+        },
+        {
+          "command": "malice.addProperty",
+          "when": "view == malice-objects && viewItem == maliceObject",
+          "group": "1_add@2"
+        },
+        {
+          "command": "malice.deleteMethod",
+          "when": "view == malice-objects && viewItem == maliceMethod",
+          "group": "2_delete"
+        },
+        {
+          "command": "malice.deleteProperty",
+          "when": "view == malice-objects && viewItem == maliceProperty",
+          "group": "2_delete"
         }
       ]
     },
