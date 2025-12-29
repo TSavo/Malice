@@ -8,6 +8,7 @@
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import type { FactionPorts, FactionTransportConfig } from '../../types/transport.js';
+import type { ObjectManager } from '../database/object-manager.js';
 import { calculateFactionPorts } from '../config/faction-ports.js';
 import { Connection } from '../connection/connection.js';
 import { FactionBundle } from './faction-bundle.js';
@@ -62,14 +63,29 @@ export class FactionTransportRegistry {
   /** Debug mode */
   private debug: boolean;
 
+  /** Object manager for HTTP server integration */
+  private manager: ObjectManager | null = null;
+
   /** SSH key lookup callback (set by game coordinator) */
   private sshKeyLookup: ((username: string) => Promise<string[] | null>) | null = null;
 
   /** SSH password verify callback (set by game coordinator) */
   private sshPasswordVerify: ((username: string, password: string) => Promise<boolean>) | null = null;
 
-  constructor(options?: { debug?: boolean }) {
+  constructor(options?: { debug?: boolean; manager?: ObjectManager }) {
     this.debug = options?.debug ?? false;
+    this.manager = options?.manager ?? null;
+  }
+
+  /**
+   * Set the object manager (for HTTP server integration)
+   */
+  setManager(manager: ObjectManager): void {
+    this.manager = manager;
+    // Update existing bundles
+    for (const bundle of this.bundles.values()) {
+      bundle.setManager(manager);
+    }
   }
 
   /**
@@ -127,8 +143,8 @@ export class FactionTransportRegistry {
       debug: this.debug || debug,
     };
 
-    // Create and start bundle
-    const bundle = new FactionBundle(config);
+    // Create and start bundle (pass manager for HTTP server)
+    const bundle = new FactionBundle(config, this.manager ?? undefined);
 
     // Apply SSH callbacks if set
     if (this.sshKeyLookup) {

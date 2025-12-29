@@ -31,6 +31,7 @@ export class GameCoordinator {
     this.options = options;
     this.transportRegistry = new FactionTransportRegistry({
       debug: options.transportDebug,
+      manager: this.manager,
     });
   }
 
