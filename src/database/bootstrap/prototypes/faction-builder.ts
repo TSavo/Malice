@@ -3,332 +3,140 @@ import type { ObjectManager } from '../../object-manager.js';
 
 /**
  * Builds the Faction prototype
- * Singleton manager for faction memberships and relationships
+ * A creatable object representing a faction in the game world.
  *
- * Tracks:
- * - Which entities belong to which factions
- * - Relationships between factions (friendly, hostile, neutral)
+ * Each faction has:
+ * - name: Faction display name (e.g., 'Gray Cartel')
+ * - domain: Web domain for faction (e.g., 'graycartel.com')
+ * - charGen: Reference to chargen object for new players
+ * - description: Faction description
+ * - leader: Reference to faction leader entity
+ * - sshHostKey: Per-faction SSH host key (auto-generated)
+ * - ports: Allocated port bundle {http, ws, telnet, ssh, sessionMcp}
  *
  * Usage:
- *   await $.faction.setFaction(entity, 'Continuum')
- *   await $.faction.setRelationship('Continuum', 'Scavengers', 'hostile')
- *   const friendly = await $.faction.isFriendly(entityA, entityB)
+ *   const faction = await $recycler.create($faction, {
+ *     name: 'Gray Cartel',
+ *     domain: 'graycartel.com',
+ *     charGen: $cartelCharGen,
+ *     description: 'Underground resistance network'
+ *   });
+ *
+ * Network transports are managed by $factionManager.create() which
+ * creates the faction object AND spins up its transport bundle.
  */
 export class FactionBuilder {
   static readonly alias = 'faction';
-  static readonly parent = 'root';
+  static readonly parent = 'describable';
 
   constructor(private manager: ObjectManager) {}
 
-  async build(rootId: number): Promise<RuntimeObject> {
-    const parent = await this.manager.load(rootId);
-    const obj = await this.manager.create({
-      parent: parent!,
-      properties: {
-        name: 'Faction Manager',
-        description:
-          'Manages faction memberships and inter-faction relationships.',
-        // Map of factionName -> { members: [entityIds], description, leader }
-        factions: {},
-        // Map of "factionA:factionB" -> relationship ('friendly', 'hostile', 'neutral')
-        // Relationships are bidirectional - stored once with sorted key
-        relationships: {},
-        // Map of entityId -> factionName for quick lookup
-        memberships: {},
+  async build(
+    describableId: number,
+    existingObj?: RuntimeObject,
+  ): Promise<RuntimeObject> {
+    const obj =
+      existingObj ??
+      (await this.manager.create({
+        parent: (await this.manager.load(describableId))!,
+        properties: {
+          name: 'Faction',
+          description: 'A faction in the game world.',
+          // Faction-specific properties
+          domain: null, // Web domain (e.g., 'graycartel.com')
+          charGen: null, // Objref to chargen object
+          leader: null, // Objref to faction leader
+          sshHostKey: null, // Per-faction SSH host key
+          ports: null, // {http, ws, telnet, ssh, sessionMcp}
+          index: null, // Faction index for port allocation
 
-        abilities: `Singleton manager for faction system. Accessed via $.faction.
+          abilities: `A faction is an organization in the game world.
 
-FACTIONS: createFaction(name, desc) creates. getFactionInfo(name) gets details. listFactions() lists all.
+IDENTITY: 'name' is display name. 'description' explains the faction. 'domain' is web address.
 
-MEMBERSHIP: setFaction(entity, name) assigns entity to faction. getFaction(entity) gets current faction. Entities can belong to only one faction.
+LEADERSHIP: 'leader' is objref to faction leader entity.
 
-RELATIONSHIPS: setRelationship(A, B, type) sets relationship (friendly/hostile/neutral). getRelationship(A, B) checks.
+CHARACTER CREATION: 'charGen' is objref to chargen handler. New players joining this faction go through faction.charGen.onNewUser().
 
-CHECKS: isFriendly(entityA, entityB) true if same faction or allied. isHostile(entityA, entityB) true if factions hostile.
+NETWORK: 'ports' contains allocated ports {http, ws, telnet, ssh, sessionMcp}. 'sshHostKey' is per-faction SSH key.
 
-LEADERSHIP: setLeader(faction, entity) designates leader. getLeader(faction) gets current.
+MEMBERSHIP: Use $factionManager.setMembership(entity, faction) to add members. $factionManager.getMembers(faction) lists members.
 
-MEMBERS: getMembers(faction) returns array of entity IDs in faction.`,
-      },
-      methods: {},
-    });
+LIFECYCLE: Created via $factionManager.create(), destroyed via $factionManager.destroy(). This handles transport spinup/spindown.`,
+        },
+        methods: {},
+      }));
 
-    // Create a new faction
     obj.setMethod(
-      'createFaction',
+      'describe',
       `
-      const name = args[0];
-      const description = args[1] || '';
+      /** Get a description of this faction.
+       *  @returns Description string with name and member count
+       */
+      const members = await $factionManager.getMembers(self);
+      const memberCount = members ? members.length : 0;
+      const leaderName = self.leader ? self.leader.name : 'none';
 
-      if (!name || typeof name !== 'string') {
-        return { success: false, error: 'Faction name required.' };
+      let desc = self.name;
+      if (self.description) {
+        desc += ' - ' + self.description;
       }
-
-      const factions = self.factions || {};
-      if (factions[name]) {
-        return { success: false, error: 'Faction already exists.' };
+      desc += '\\nLeader: ' + leaderName;
+      desc += '\\nMembers: ' + memberCount;
+      if (self.domain) {
+        desc += '\\nDomain: ' + self.domain;
       }
-
-      factions[name] = {
-        members: [],
-        description,
-        leader: null,
-        created: Date.now(),
-      };
-      self.factions = factions;
-
-      return { success: true, faction: name };
+      return desc;
     `,
     );
 
-    // Get faction info
     obj.setMethod(
-      'getFactionInfo',
+      'getPortInfo',
       `
-      const name = args[0];
-      const factions = self.factions || {};
-      return factions[name] || null;
+      /** Get port allocation info for this faction.
+       *  @returns Object with port numbers or null if not allocated
+       */
+      return self.ports || null;
     `,
     );
 
-    // List all factions
     obj.setMethod(
-      'listFactions',
+      'isOnline',
       `
-      const factions = self.factions || {};
-      return Object.keys(factions);
-    `,
-    );
-
-    // Set an entity's faction membership
-    obj.setMethod(
-      'setFaction',
-      `
-      const entity = args[0];
-      const factionName = args[1];
-
-      if (!entity) return { success: false, error: 'Entity required.' };
-
-      const entityId = typeof entity === 'number' ? entity : entity.id;
-      if (!entityId) return { success: false, error: 'Invalid entity.' };
-
-      const factions = self.factions || {};
-      const memberships = self.memberships || {};
-
-      // Remove from old faction if any
-      const oldFaction = memberships[entityId];
-      if (oldFaction && factions[oldFaction]) {
-        factions[oldFaction].members = factions[oldFaction].members.filter(id => id !== entityId);
-      }
-
-      // Add to new faction (or clear if null)
-      if (factionName) {
-        if (!factions[factionName]) {
-          // Auto-create faction if it doesn't exist
-          factions[factionName] = { members: [], description: '', leader: null, created: Date.now() };
-        }
-        if (!factions[factionName].members.includes(entityId)) {
-          factions[factionName].members.push(entityId);
-        }
-        memberships[entityId] = factionName;
-      } else {
-        delete memberships[entityId];
-      }
-
-      self.factions = factions;
-      self.memberships = memberships;
-
-      return { success: true, faction: factionName };
-    `,
-    );
-
-    // Get an entity's faction
-    obj.setMethod(
-      'getFaction',
-      `
-      const entity = args[0];
-      if (!entity) return null;
-
-      const entityId = typeof entity === 'number' ? entity : entity.id;
-      if (!entityId) return null;
-
-      const memberships = self.memberships || {};
-      return memberships[entityId] || null;
-    `,
-    );
-
-    // Set relationship between two factions
-    obj.setMethod(
-      'setRelationship',
-      `
-      const factionA = args[0];
-      const factionB = args[1];
-      const relationship = args[2]; // 'friendly', 'hostile', 'neutral'
-
-      if (!factionA || !factionB) {
-        return { success: false, error: 'Two faction names required.' };
-      }
-
-      if (!['friendly', 'hostile', 'neutral'].includes(relationship)) {
-        return { success: false, error: 'Relationship must be friendly, hostile, or neutral.' };
-      }
-
-      // Create sorted key for bidirectional lookup
-      const key = [factionA, factionB].sort().join(':');
-
-      const relationships = self.relationships || {};
-
-      if (relationship === 'neutral') {
-        delete relationships[key];
-      } else {
-        relationships[key] = relationship;
-      }
-
-      self.relationships = relationships;
-
-      return { success: true, relationship };
-    `,
-    );
-
-    // Get relationship between two factions
-    obj.setMethod(
-      'getRelationship',
-      `
-      const factionA = args[0];
-      const factionB = args[1];
-
-      if (!factionA || !factionB) return 'neutral';
-      if (factionA === factionB) return 'friendly'; // Same faction = friendly
-
-      const key = [factionA, factionB].sort().join(':');
-      const relationships = self.relationships || {};
-
-      return relationships[key] || 'neutral';
-    `,
-    );
-
-    // Check if two entities are friendly (same faction or allied factions)
-    obj.setMethod(
-      'isFriendly',
-      `
-      const entityA = args[0];
-      const entityB = args[1];
-
-      if (!entityA || !entityB) return false;
-
-      const idA = typeof entityA === 'number' ? entityA : entityA.id;
-      const idB = typeof entityB === 'number' ? entityB : entityB.id;
-
-      if (idA === idB) return true; // Same entity
-
-      const memberships = self.memberships || {};
-      const factionA = memberships[idA];
-      const factionB = memberships[idB];
-
-      // No faction = neutral to everyone
-      if (!factionA || !factionB) return false;
-
-      // Same faction = friendly
-      if (factionA === factionB) return true;
-
-      // Check faction relationship
-      const relationship = await self.getRelationship(factionA, factionB);
-      return relationship === 'friendly';
-    `,
-    );
-
-    // Check if two entities are hostile
-    obj.setMethod(
-      'isHostile',
-      `
-      const entityA = args[0];
-      const entityB = args[1];
-
-      if (!entityA || !entityB) return false;
-
-      const idA = typeof entityA === 'number' ? entityA : entityA.id;
-      const idB = typeof entityB === 'number' ? entityB : entityB.id;
-
-      if (idA === idB) return false; // Can't be hostile to self
-
-      const memberships = self.memberships || {};
-      const factionA = memberships[idA];
-      const factionB = memberships[idB];
-
-      // No faction = neutral
-      if (!factionA || !factionB) return false;
-
-      // Same faction = not hostile
-      if (factionA === factionB) return false;
-
-      // Check faction relationship
-      const relationship = await self.getRelationship(factionA, factionB);
-      return relationship === 'hostile';
-    `,
-    );
-
-    // Get all members of a faction
-    obj.setMethod(
-      'getMembers',
-      `
-      const factionName = args[0];
-      if (!factionName) return [];
-
-      const factions = self.factions || {};
-      const faction = factions[factionName];
-
-      return faction ? [...faction.members] : [];
-    `,
-    );
-
-    // Set faction leader
-    obj.setMethod(
-      'setLeader',
-      `
-      const factionName = args[0];
-      const entity = args[1];
-
-      if (!factionName) return { success: false, error: 'Faction name required.' };
-
-      const factions = self.factions || {};
-      if (!factions[factionName]) {
-        return { success: false, error: 'Faction does not exist.' };
-      }
-
-      const entityId = entity ? (typeof entity === 'number' ? entity : entity.id) : null;
-      factions[factionName].leader = entityId;
-      self.factions = factions;
-
-      return { success: true };
-    `,
-    );
-
-    // Get faction leader
-    obj.setMethod(
-      'getLeader',
-      `
-      const factionName = args[0];
-      if (!factionName) return null;
-
-      const factions = self.factions || {};
-      const faction = factions[factionName];
-
-      return faction ? faction.leader : null;
+      /** Check if this faction's transports are running.
+       *  @returns true if transport bundle is active
+       */
+      if (!self.ports) return false;
+      // Check with $transports registry
+      const info = await $transports?.get(self.id);
+      return info !== null && info !== undefined;
     `,
     );
 
     // Property descriptions
     obj.setPropertyDescription(
-      'factions',
-      'Map of factionName -> {members: [entityIds], description, leader, created}',
+      'domain',
+      'Web domain for this faction (e.g., graycartel.com). Used for HTTP Host routing.',
     );
     obj.setPropertyDescription(
-      'relationships',
-      'Map of "factionA:factionB" -> relationship (friendly/hostile/neutral), bidirectional with sorted keys',
+      'charGen',
+      'Objref to chargen handler. New players call faction.charGen.onNewUser(context, username, password).',
     );
     obj.setPropertyDescription(
-      'memberships',
-      'Map of entityId -> factionName for quick faction lookup by entity',
+      'leader',
+      'Objref to the faction leader entity.',
+    );
+    obj.setPropertyDescription(
+      'sshHostKey',
+      'Per-faction SSH host key. Auto-generated on first transport spinup, persisted for consistency.',
+    );
+    obj.setPropertyDescription(
+      'ports',
+      'Allocated port bundle: {http, ws, telnet, ssh, sessionMcp}. Set by $transports.create().',
+    );
+    obj.setPropertyDescription(
+      'index',
+      'Faction index used for port allocation. Lower indices get lower port numbers.',
     );
 
     return obj;

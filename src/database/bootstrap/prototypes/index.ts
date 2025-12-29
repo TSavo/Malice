@@ -38,6 +38,7 @@ export { EmbodiedBuilder } from './embodied-builder.js';
 export { ExitBuilder } from './exit-builder.js';
 // Faction system
 export { FactionBuilder } from './faction-builder.js';
+export { FactionManagerBuilder } from './faction-manager-builder.js';
 export * from './firearm-builders.js';
 export { FoodBuilder } from './food-builder.js';
 export { GuardedExitBuilder } from './guarded-exit-builder.js';

@@ -25,14 +25,17 @@ services:
     container_name: malice-game
     restart: unless-stopped
     ports:
-      - "80:80"      # Website
-      - "5555:5555"  # Telnet
-      - "5556:5556"  # SSH
-      - "8080:8080"  # WebSocket
-      - "3000:3000"  # LSP API (VS Code extension)
-      - "3010:3010"  # MCP (code-first - includes all tools)
-      - "3012:3012"  # Session MCP
-      - "9999:9999"  # DevTools WebSocket (VS Code extension)
+      # Static services (admin/dev)
+      - "80:80"        # Main website
+      - "3000:3000"    # LSP API (VS Code extension)
+      - "3010:3010"    # MCP (code-first - admin access)
+      - "9999:9999"    # DevTools WebSocket (VS Code extension)
+      # Per-faction transport ports (ranges for up to 20 factions)
+      # Faction N: HTTP=8000+N, WS=8080+N, Telnet=5555+N*2, SSH=5556+N*2, SessionMCP=3012+N
+      - "8000-8019:8000-8019"    # Faction HTTP servers
+      - "8080-8099:8080-8099"    # Faction WebSocket servers
+      - "5555-5594:5555-5594"    # Faction Telnet + SSH servers
+      - "3012-3031:3012-3031"    # Faction Session MCP servers
     environment:
       - MONGO_URI=mongodb://mongodb:27017/
       - DB_NAME=malice

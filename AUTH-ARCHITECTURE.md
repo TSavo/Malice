@@ -653,6 +653,30 @@ describe('SSL Client Certificate Auth', () => {
 });
 ```
 
+## Faction-Aware Connections
+
+Each faction has its own transport bundle (Telnet, SSH, WebSocket). Connections are tagged with `factionId` in their metadata:
+
+```typescript
+authInfo: {
+  mode: 'unauthenticated',
+  metadata: {
+    factionId: 311,  // Faction object ID
+    transportType: 'telnet'
+  }
+}
+```
+
+**Routing to CharGen:**
+- System object checks connection's `factionId`
+- Loads faction via `$factionManager.getByDomain()` or `$load(factionId)`
+- Routes to faction's `charGen` object for character creation
+- Each faction can have custom character creation flow
+
+**Example:**
+- Connect to `telnet localhost 5555` → Continuum's chargen
+- Connect to `telnet localhost 5557` → Gray Cartel's chargen
+
 ## Summary
 
 **Key Principles:**
@@ -662,7 +686,8 @@ describe('SSL Client Certificate Auth', () => {
 3. **ConnectionContext exposes `authInfo` to MOO code**
 4. **System object routes based on `authInfo === null` check**
 5. **PreAuthHandler validates and authenticates**
-6. **All validation logic in MOO code (MongoDB)**
+6. **Connections tagged with `factionId`** for faction-specific routing
+7. **All validation logic in MOO code (MongoDB)**
 
 **Result:**
 - ✅ Support both interactive and pre-authenticated modes
@@ -671,3 +696,4 @@ describe('SSL Client Certificate Auth', () => {
 - ✅ Extensible for new auth mechanisms
 - ✅ Secure trust boundaries
 - ✅ Backward compatible
+- ✅ Faction-aware connection routing

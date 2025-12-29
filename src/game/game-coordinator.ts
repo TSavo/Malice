@@ -3,10 +3,13 @@ import { ConnectionManager } from '../connection/connection-manager.js';
 import { GameBootstrap } from '../database/game-bootstrap.js';
 import { initGameLogger } from '../database/game-logger.js';
 import { ObjectDatabase, ObjectManager } from '../database/index.js';
+import { FactionTransportRegistry } from '../transport/faction-transport-registry.js';
 import { ConnectionContext } from './connection-context.js';
 
 export interface GameCoordinatorOptions {
   forceBootstrap?: boolean;
+  /** Enable debug logging for transports */
+  transportDebug?: boolean;
 }
 
 /**
@@ -19,12 +22,16 @@ export class GameCoordinator {
   private contexts = new Map<string, ConnectionContext>();
   private schedulerInterval: ReturnType<typeof setInterval> | null = null;
   private options: GameCoordinatorOptions;
+  private transportRegistry: FactionTransportRegistry;
 
   constructor(mongoUri: string, options: GameCoordinatorOptions = {}) {
     this.db = new ObjectDatabase(mongoUri, 'malice');
     this.manager = new ObjectManager(this.db);
     this.connections = new ConnectionManager();
     this.options = options;
+    this.transportRegistry = new FactionTransportRegistry({
+      debug: options.transportDebug,
+    });
   }
 
   /**
@@ -147,11 +154,53 @@ export class GameCoordinator {
   }
 
   /**
+   * Get the faction transport registry
+   */
+  getTransportRegistry(): FactionTransportRegistry {
+    return this.transportRegistry;
+  }
+
+  /**
+   * Initialize the transport registry and start faction transports
+   * Must be called after bootstrap completes
+   */
+  async initializeTransports(): Promise<void> {
+    const transports = (this.manager as any).transports;
+    if (!transports) {
+      console.warn('⚠️  $transports not available');
+      return;
+    }
+
+    // Connect registry to $transports MOO object
+    await transports.call('setRegistry', this.transportRegistry);
+    console.log('✅ Transport registry connected to $transports');
+
+    // Subscribe to merged connection stream
+    this.transportRegistry.connection$.subscribe(async (connection) => {
+      this.connections.add(connection);
+      console.log(
+        `✅ New ${connection.transport.type} connection: ${connection.id}`,
+      );
+      await this.handleConnection(connection);
+    });
+
+    // Start transports for all factions via MOO method
+    await transports.call('startAll');
+  }
+
+  /**
    * Shutdown - disconnect from database
    */
   async shutdown(): Promise<void> {
     console.log('🛑 Shutting down game system...');
     this.stopScheduler();
+
+    // Shutdown all faction transports
+    await this.transportRegistry.shutdown({
+      gracefulTimeoutMs: 2000,
+      message: 'Server shutting down...',
+    });
+
     this.connections.closeAll();
     await this.db.disconnect();
     console.log('✅ Shutdown complete');

@@ -169,7 +169,10 @@ $query().inheritedFrom($item).limit(10).all()
 
 - `src/database/` - Object system core (`RuntimeObject`, `ObjectManager`, `ObjectCache`, `ObjectDatabase`)
 - `src/database/bootstrap/` - World/prototype builders run at startup
-- `src/transport/` - Telnet, WebSocket, TLS servers
+- `src/transport/` - Transport servers and faction bundles
+  - `faction-bundle.ts` - Wraps Telnet+SSH+WebSocket for one faction
+  - `faction-transport-registry.ts` - Manages all faction bundles
+- `src/config/faction-ports.ts` - Port allocation logic for factions
 - `src/game/` - `GameCoordinator` (startup orchestration), `ConnectionContext` (player session)
 - `src/mcp/` - MCP servers for Claude Code integration
 - `src/devtools/` - VS Code extension server (WebSocket JSON-RPC)
@@ -178,13 +181,22 @@ $query().inheritedFrom($item).limit(10).all()
 
 ### Servers and Ports
 
-- **5555** - Telnet server (player connections)
-- **5556** - SSH server (secure player connections with key auth)
-- **8080** - WebSocket server (web clients)
+**Static Services (Admin/Dev):**
+- **80** - Main website
 - **3000** - LSP REST API (VS Code extension)
 - **3010** - MCP server for Claude Code (code-first: execute_moo_code, admin access)
-- **3012** - Session MCP server (code-first: execute_session_code, sandboxed player access)
 - **9999** - DevTools WebSocket (VS Code extension)
+
+**Per-Faction Transport Bundles:**
+Each faction gets its own isolated network infrastructure. Ports are calculated from faction index:
+
+| Faction | Index | HTTP | WebSocket | Telnet | SSH | Session MCP |
+|---------|-------|------|-----------|--------|-----|-------------|
+| Continuum | 0 | 8000 | 8080 | 5555 | 5556 | 3012 |
+| Gray Cartel | 1 | 8001 | 8081 | 5557 | 5558 | 3013 |
+| (new faction) | N | 8000+N | 8080+N | 5555+N×2 | 5556+N×2 | 3012+N |
+
+Factions are created dynamically via `$factionManager.create()` - see Faction System below.
 
 ## Multiplexed Transport
 
@@ -486,7 +498,7 @@ return {roomId: room.id, torchId: torch.id};
 - `$query()` - Fluent query builder for finding objects
 - `$aiQuery(system, prompt, session?)` - Query Claude AI with MCP tools
 - `$recycler` - Create/destroy objects via recycler pattern
-- All `$aliases` - `$room`, `$player`, `$exit`, `$ai`, `$plot`, `$spatial`, etc.
+- All `$aliases` - `$room`, `$player`, `$exit`, `$ai`, `$plot`, `$spatial`, `$faction`, `$factionManager`, `$transports`, `$continuum`, `$cartel`, etc.
 - `player` - Your authenticated player object (if HTTP Basic Auth provided)
 - Full JavaScript - loops, conditionals, async/await, etc.
 
@@ -616,3 +628,105 @@ The server provides 3D map visualization at:
 - `GET /api/map/rooms?z_min=0` - Filter by minimum z-level
 - `GET /api/map/players` - Aggregated population heatmap
 - `GET /api/map/players/admin` - Individual agent positions (auth required)
+
+## Faction System
+
+Factions are organizations with isolated network infrastructure. Each faction gets its own transport bundle (HTTP, WebSocket, Telnet, SSH, Session MCP).
+
+### Key Objects
+
+- **`$faction`** - Prototype for faction instances (creatable)
+- **`$factionManager`** - Singleton for creation, destruction, memberships, relationships
+- **`$transports`** - Registry for transport bundles (internal, used by $factionManager)
+
+### Default Factions
+
+- **`$continuum`** - The governing authority (domain: malice.life, index: 0)
+- **`$cartel`** - Underground resistance (domain: graycartel.com, index: 1)
+
+### Creating Factions at Runtime
+
+```typescript
+// Create a new faction with full transport bundle
+const faction = await $factionManager.create({
+  name: 'Shadow Syndicate',
+  domain: 'shadowsyndicate.net',
+  description: 'A mysterious organization',
+  charGen: $charGen,  // Optional: custom character generation
+});
+
+// Transports are automatically started
+console.log(faction.ports);
+// { http: 8002, ws: 8082, telnet: 5559, ssh: 5560, sessionMcp: 3014 }
+
+// Players can now connect via telnet localhost 5559
+```
+
+### Destroying Factions
+
+```typescript
+// Graceful shutdown with message to connected players
+await $factionManager.destroy(faction, {
+  gracefulTimeoutMs: 5000,
+  message: 'Faction shutting down...'
+});
+// Transports stopped, object recycled, domain mapping cleared
+```
+
+### Faction Memberships
+
+```typescript
+// Assign entity to faction
+await $factionManager.setMembership(player, $cartel);
+
+// Get entity's faction
+const faction = await $factionManager.getMembership(player);
+
+// Get all members of a faction
+const members = await $factionManager.getMembers($continuum);
+```
+
+### Faction Relationships
+
+```typescript
+// Set relationship between factions
+await $factionManager.setRelationship($continuum, $cartel, 'hostile');
+// Types: 'friendly', 'hostile', 'neutral'
+
+// Check relationships
+const rel = await $factionManager.getRelationship($continuum, $cartel);
+const friendly = await $factionManager.isFriendly(entityA, entityB);
+const hostile = await $factionManager.isHostile(entityA, entityB);
+```
+
+### Querying Factions
+
+```typescript
+// List all factions
+const factions = await $factionManager.list();
+
+// Get faction by domain
+const cartel = await $factionManager.getByDomain('graycartel.com');
+
+// Check transport status
+const info = await $transports.get(faction);
+// { factionId, name, domain, ports, connectionCount, online }
+
+// Get connections for a faction
+const conns = await $transports.getConnections(faction);
+const count = await $transports.getConnectionCount(faction);
+```
+
+### Transport Bundle Details
+
+Each faction's transport bundle includes:
+
+| Transport | Purpose |
+|-----------|---------|
+| HTTP | Web server for landing page, /play, domain content |
+| WebSocket | /mux multiplexed channels for web clients |
+| Telnet | Terminal client connections |
+| SSH | Secure terminal with key auth |
+| Session MCP | Player-scoped MCP access |
+
+All transports tag connections with `factionId` for routing to the correct character generation flow.
