@@ -6,6 +6,7 @@ export { CoreSystemBuilder } from './core-system-builder.js';
 export { EmoteBuilder } from './emote-builder.js';
 export { EnglishBuilder } from './english-builder.js';
 export { FormatBuilder } from './format-builder.js';
+export { GreeterBuilder } from './greeter-builder.js';
 export { MaskBuilder } from './mask-builder.js';
 export { MCPBuilder } from './mcp-builder.js';
 export { MinimalBootstrap } from './minimal-bootstrap.js';

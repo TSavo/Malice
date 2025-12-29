@@ -1237,6 +1237,15 @@ STARTING LOCATION: Immigration Services Entry Hall ($immigrationServices)`,
         self.interviewState = state;
       }
 
+      // Spawn orientation greeter (async, don't block completion)
+      if ($greeter) {
+        $greeter.spawnForPlayer(playerId, 'continuum').then(greeter => {
+          console.log('[CharGen] Spawned greeter #' + greeter.id + ' for player #' + playerId);
+        }).catch(err => {
+          console.error('[CharGen] Greeter spawn error:', err);
+        });
+      }
+
       return {
         success: true,
         playerId,
