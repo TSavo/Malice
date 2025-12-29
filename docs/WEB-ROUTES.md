@@ -357,11 +357,12 @@ console.log(match.domain.segment);  // '*'
 console.log(match.captures);        // ['kevin']
 ```
 
-## Legacy Routing
+## Architecture Notes
 
-The old `$webRouter` and `$webSite` objects still exist for backwards compatibility. If the new domain routing returns 404 or isn't configured, requests fall back to the legacy system.
+The web routing system uses a segment-tree pattern where:
+- `$webNode` provides the base tree traversal (getChildren, matchChild, resolve)
+- `$webDomain` handles hostname resolution and delegates to route trees
+- `$webRoute` handles path matching with HTTP method/auth checks
+- `$domainRegistry` is the entry point that finds the right domain
 
-To migrate a legacy route:
-1. Create equivalent `$webRoute` in the new tree structure
-2. Remove from `$.webRouter.routes`
-3. Test both paths work
+All routes for `thecontinuum.city` are defined in `continuum-domain-builder.ts`. Route handlers are inlined directly rather than delegating to separate route objects.
