@@ -248,13 +248,33 @@ export class DevToolsServer {
   ): Promise<any> {
     const allObjects = await this.manager.db.listAll(params.includeRecycled);
 
-    const objects = allObjects.map((obj) => ({
-      id: obj._id,
-      parent: obj.parent?.value ?? obj.parent, // Extract ID from ObjRefValue
-      properties: Object.keys(obj.properties || {}),
-      methods: Object.keys(obj.methods || {}),
-      recycled: obj.recycled || false,
-    }));
+    // Build reverse alias map (objectId -> alias name)
+    const aliasMap = new Map<number, string>();
+    const aliasEntries = this.manager.getAliases();
+    for (const [aliasName, aliasObj] of aliasEntries) {
+      aliasMap.set(aliasObj.id, aliasName);
+    }
+
+    const objects = allObjects.map((obj) => {
+      // Get name from properties
+      const nameValue = obj.properties?.name;
+      const objName =
+        nameValue?.type === 'string'
+          ? nameValue.value
+          : typeof nameValue === 'string'
+            ? nameValue
+            : undefined;
+
+      return {
+        id: obj._id,
+        parent: obj.parent?.value ?? obj.parent,
+        properties: Object.keys(obj.properties || {}),
+        methods: Object.keys(obj.methods || {}),
+        recycled: obj.recycled || false,
+        name: objName,
+        alias: aliasMap.get(obj._id),
+      };
+    });
 
     return { objects };
   }
