@@ -527,12 +527,14 @@ const dressed = await $ai.spawn({
 // Dress an existing NPC
 await $tailor.dress(npc, "shabby, recently demoted");
 
-// See what the guard sees
-const view = await $ai.look(npc.id);
+// NPC communication - use announce with pronoun substitution
+const room = npc.location;
+await room.announce(npc, null, {
+  others: '%A %av{say}, "Halt! Who goes there?"'
+});
 
-// Make the guard do things
-await $ai.do(npc.id, "say Halt! Who goes there?");
-await $ai.do(npc.id, "north");
+// NPC movement
+await npc.go("north");
 
 // Get info
 const info = await $ai.getInfo(npc.id);
@@ -572,12 +574,19 @@ await $ai.forget(npc.id, 0);  // By index
 
 ### Response Expectations
 
+NPCs can expect player responses using methods on their object:
+
 ```javascript
+const npc = await $load(npcId);
+
 // Set up response timeout (NPC expects player to respond within 5 minutes)
-await $ai.expectResponseFrom(npc.id, playerId, 300000, "Player walked away");
+await npc.expectResponseFrom(playerId, {
+  timeout: 300000,
+  prompt: 'Player walked away'
+});
 
 // Cancel expectation
-await $ai.cancelExpectation(npc.id, playerId);
+await npc.cancelExpectation(playerId);
 ```
 
 ### Pathfinding
@@ -857,15 +866,21 @@ const guard = await $ai.spawn({
 });
 
 // 2. See what the guard sees
-const view = await $ai.look(guard.id);
+const view = await guard.location.describeForAI();
 
-// 3. Make the guard do things
-await $ai.do(guard.id, "say Halt!");
+// 3. Make the guard speak - use announce with pronoun substitution
+const room = guard.location;
+await room.announce(guard, null, {
+  others: '%A %av{say}, "Halt!"'
+});
 
-// 4. Check the guard's profile (via resource)
+// 4. Move the guard
+await guard.go('north');
+
+// 5. Check the guard's profile (via resource)
 const profile = await readResource(`moo://ai/${guard.id}`);
 
-// 5. When no longer needed
+// 6. When no longer needed
 await $ai.despawn(guard.id);
 ```
 

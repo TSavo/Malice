@@ -241,17 +241,21 @@ call_method({
 })
 ```
 
-**Option C: Make NPCs act via `ai do`**
+**Option C: Make NPCs emote via announce**
 
-For NPCs, use `ai do` to execute commands:
+For NPCs, use `room.announce()` with pronoun substitution:
 
 ```javascript
-$ai.do(200, 'emote staggers backward, blood welling from the new cut across his forearm')
+const npc = await $load(200);
+const room = npc.location;
+await room.announce(npc, null, {
+  others: '%A %av{stagger} backward, blood welling from the new cut across %ap forearm.'
+});
 ```
 
 **Mix and match.** A complex exchange might use all three:
-- Player emotes their attack
-- NPC emotes via `ai do`
+- Player emotes their attack via `call_method`
+- NPC emotes via `room.announce()` with pronoun substitution
 - Room announce for environmental effects or summary narration
 
 **Narration rules:**
@@ -511,8 +515,12 @@ call_method({
   args: ["catches Marcus across the forearm with a vicious slash"]
 })
 
-// Marcus reacts via ai do
-$ai.do(200, 'emote howls, stumbling back - but he\\'s grinning. His other hand is already coming up with Jack\\'s dropped wallet.')
+// Marcus reacts via announce
+const room = await $load(500);
+const marcus = await $load(200);
+await room.announce(marcus, null, {
+  others: "%A %av{howl}, stumbling back - but %as grinning. %Ap other hand is already coming up with Jack's dropped wallet."
+});
 ```
 
 Use this for:
@@ -673,8 +681,11 @@ call_method({
   args: ["ejects the empty magazine, fumbling for a fresh one"]
 })
 
-// NPC sees the opening - use ai do
-$ai.do(200, 'emote sees his chance and lunges forward')
+// NPC sees the opening - use announce
+const npcRoom = (await $load(200)).location;
+await npcRoom.announce(await $load(200), null, {
+  others: '%A %av{see} %ap chance and %av{lunge} forward.'
+});
 
 // The actual reload happens via the gun's load() method
 // Find the fresh magazine in their inventory, then:
@@ -762,11 +773,15 @@ If an NPC or player wants to grab a dropped weapon, use `ai do` for NPCs or `mov
 
 ```javascript
 // Marcus (NPC, id: 200) goes for the dropped knife
-$ai.do(200, 'get knife')
+const marcus = await $load(200);
+const knife = // find knife in room
+await knife.moveTo(marcus, marcus);
 
-// This physically moves the knife to Marcus's hands
-// Have him emote it too
-$ai.do(200, 'emote dives for the fallen knife, fingers closing around the handle. He comes up grinning, armed again.')
+// Narrate it
+const room = marcus.location;
+await room.announce(marcus, null, {
+  others: '%A %av{dive} for the fallen knife, fingers closing around the handle. %A %av{come} up grinning, armed again.'
+});
 ```
 
 **Player retrieves weapon:**
@@ -860,12 +875,12 @@ call_method({
 | `combat end` | End combat |
 | `call_method` location `announce()` | Third-person room narration with pronoun substitution |
 | `call_method` player `emote()` | Make a player emote their action |
-| `ai do` NPC `emote ...` | Make an NPC emote their action |
+| `room.announce(npc, null, {others: '...'})` | Make an NPC emote with pronoun substitution |
 | `call_method` gun `fire()` | Fire a gun (decrements ammo correctly) |
 | `call_method` gun `load()` | Reload a gun (magazine or ammo) |
 | `call_method` gun `getAmmoCount()` | Check current ammo |
 | `move_object` | Disarm (drop weapon), give weapon, retrieve weapon |
-| `ai do` NPC `get ...` | Have NPC pick up item |
+| `item.moveTo(npc, npc)` | Have NPC pick up item |
 | `set_property` | Modify object properties (use sparingly) |
 
 ---

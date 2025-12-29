@@ -95,20 +95,35 @@ await $ai.despawn(npcId);
 await $ai.despawn(npcId, false);
 ```
 
-### do - Execute Commands as NPC
+### NPC Communication (via announce)
+
+NPCs speak and emote using `location.announce()` with pronoun substitution:
 
 ```javascript
-// Make NPC speak
-await $ai.do(npcId, 'say Hello there!');
+const npc = await $load(npcId);
+const room = npc.location;
+
+// Make NPC speak - %A = NPC's name, %av{say} = conjugated verb
+await room.announce(npc, null, {
+  others: '%A %av{say}, "Hello there!"'
+});
+// Others see: "Marcus says, Hello there!"
 
 // Make NPC emote
-await $ai.do(npcId, ':waves dismissively');
+await room.announce(npc, null, {
+  others: '%A %av{wave} dismissively.'
+});
+// Others see: "Marcus waves dismissively."
 
-// Make NPC look around
-await $ai.do(npcId, 'look');
+// Speak to specific target - %T = target name, %t = lowercase
+await room.announce(npc, target, {
+  target: '%A %av{say} to you, "State your business."',
+  others: '%A %av{say} to %t, "State your business."'
+});
 
-// Make NPC move
-await $ai.do(npcId, 'north');
+// Move NPC through exit
+await npc.go('north');
+// Returns: { success, direction, fromRoom, toRoom, availableExits }
 ```
 
 ### look - Get NPC's View
@@ -426,12 +441,26 @@ await $notes.add(npcId,
 The MCP server provides tools for managing NPCs:
 
 ```javascript
-// Via MCP ai tool
-$ai.spawn({ role: 'guard', name: 'Bob', location: await $load(123) })
-$ai.despawn(456 )
-$ai.do(456, 'say Hello!')
-$ai.remember(456, 'Met Jack', 'critical')
-$ai.getProfile(456)
+// Spawn NPC
+const npc = await $ai.spawn({ role: 'guard', name: 'Bob', location: await $load(123) });
+
+// Despawn
+await $ai.despawn(456);
+
+// NPC communication - use announce with pronoun substitution
+const room = npc.location;
+await room.announce(npc, null, {
+  others: '%A %av{say}, "Hello!"'
+});
+
+// NPC movement
+await npc.go('north');
+
+// Memory management
+await $ai.remember(456, 'Met Jack', 'critical');
+
+// Get profile
+await $ai.getProfile(456);
 ```
 
 ## Best Practices

@@ -360,46 +360,87 @@ await notes({
 
 ## Controlling NPCs
 
-### $ai.do()
+NPCs use direct methods on their object for actions. In NPC code, `self` refers to the NPC.
 
-Make an NPC perform an action.
+### Speech - location.announce()
 
-```javascript
-await $ai.do(npcId, 'say Halt! State your business.');
-```
-
-**Common commands:**
-```javascript
-// Speech
-await $ai.do(npcId, 'say Welcome to City Services.');
-await $ai.do(npcId, 'whisper Follow me.');
-await $ai.do(npcId, 'shout Security alert!');
-
-// Movement
-await $ai.do(npcId, 'north');
-await $ai.do(npcId, 'go east');
-await $ai.do(npcId, 'enter building');
-
-// Actions
-await $ai.do(npcId, 'look');
-await $ai.do(npcId, 'get wrench');
-await $ai.do(npcId, 'give wrench to player');
-await $ai.do(npcId, 'unlock door');
-```
-
-### $ai.look()
-
-See what the NPC sees in their location.
+All speech and emotes go through `location.announce()` with **pronoun substitution**:
 
 ```javascript
-const view = await $ai.look(npcId);
-// Returns room description, exits, other people present
+const room = self.location;
+
+// Say to everyone - use %A for actor name, %av{verb} for conjugation
+await room.announce(self, null, {
+  others: '%A %av{say}, "Halt! State your business."'
+});
+// Actor sees: You say, "Halt! State your business."
+// Others see: Officer Chen says, "Halt! State your business."
+
+// Emote
+await room.announce(self, null, {
+  others: '%A %av{nod} professionally.'
+});
+// Actor sees: You nod professionally.
+// Others see: Officer Chen nods professionally.
+
+// Say to specific person - use %T for target name
+await room.announce(self, target, {
+  others: '%A %av{say} to %t, "Follow me."'
+});
+// Actor sees: You say to Jack, "Follow me."
+// Target sees: Officer Chen says to you, "Follow me."
+// Others see: Officer Chen says to Jack, "Follow me."
 ```
 
-Use this to:
-- Check if a player has arrived
-- See what's in the area
-- Verify conditions before acting
+**Pronoun Substitution Codes:**
+| Code | Meaning | Example |
+|------|---------|---------|
+| `%A` | Actor name (You for actor) | You / Officer Chen |
+| `%a` | Actor name lowercase | you / officer chen |
+| `%as` | Actor subject pronoun | you / he / she / they |
+| `%ao` | Actor object pronoun | you / him / her / them |
+| `%ap` | Actor possessive | your / his / her / their |
+| `%av{verb}` | Conjugated verb | you say / he says |
+| `%T` | Target name (You for target) | You / Jack |
+| `%t` | Target name lowercase | you / jack |
+| `%ts` | Target subject pronoun | you / he / she / they |
+| `%to` | Target object pronoun | you / him / her / them |
+| `%tp` | Target possessive | your / his / her / their |
+
+### Movement - self.go()
+
+Use `self.go(direction)` to move through exits:
+
+```javascript
+// Move through an exit
+const result = await self.go('north');
+// Returns: { success, direction, fromRoom, toRoom }
+// On failure: { success: false, error, availableExits }
+
+// Check exits first
+const exits = self.location.exits || [];
+const exitNames = exits.filter(e => e).map(e => e.name);
+```
+
+### Waiting - self.expectResponseFrom()
+
+Wait for player response with timeout:
+
+```javascript
+await self.expectResponseFrom(playerId, {
+  prompt: 'The citizen seems distracted. Try re-engaging them.',
+  timeout: 120000  // 2 minutes
+});
+```
+
+### Room Info - describeForAI()
+
+Get rich information about a location:
+
+```javascript
+const roomInfo = await self.location.describeForAI();
+// Returns: id, name, exits, contents, etc.
+```
 
 ## NPC Behavior Patterns
 
@@ -408,11 +449,13 @@ Use this to:
 When a player enters an NPC's location:
 
 ```javascript
-// Check for new arrivals
-const view = await $ai.look(clerkId);
+const room = self.location;
+const player = await $load(playerId);
 
-// If player present
-await $ai.do(clerkId, 'say Welcome to City Services. How may I assist you?');
+// Greet them using pronoun substitution
+await room.announce(self, player, {
+  others: '%A %av{say} to %t, "Welcome to City Services. How may I assist you?"'
+});
 ```
 
 ### Challenge Pattern
@@ -420,18 +463,30 @@ await $ai.do(clerkId, 'say Welcome to City Services. How may I assist you?');
 Guard challenges unknown person:
 
 ```javascript
-await $ai.do(guardId, 'say Halt. Identification required.');
-
-// Wait for response...
-
-// Check faction
+const room = self.location;
 const player = await $load(playerId);
-const playerFaction = player.faction;
 
+// Challenge
+await room.announce(self, player, {
+  others: '%A %av{say} to %t, "Halt. Identification required."'
+});
+
+// Wait for response
+await self.expectResponseFrom(playerId, {
+  prompt: 'The person hasnt responded. Challenge again or take action.',
+  timeout: 30000
+});
+
+// Later, check faction and respond
+const playerFaction = player.faction;
 if (playerFaction === 'Citizen') {
-  await $ai.do(guardId, 'say Verified. You may proceed.');
+  await room.announce(self, null, {
+    others: '%A %av{say}, "Verified. You may proceed."'
+  });
 } else {
-  await $ai.do(guardId, 'say Access denied. Citizens only. Register at City Services.');
+  await room.announce(self, null, {
+    others: '%A %av{say}, "Access denied. Citizens only."'
+  });
 }
 ```
 
@@ -441,9 +496,13 @@ Move with a player:
 
 ```javascript
 // NPC follows player direction
-await $ai.do(escortId, 'north');
-await $ai.do(escortId, 'say This way.');
-await $ai.do(escortId, 'east');
+const escort = await $load(escortId);
+await escort.go('north');
+const room = escort.location;
+await room.announce(escort, null, {
+  others: '%A %av{say}, "This way."'
+});
+await escort.go('east');
 ```
 
 ### Task Verification Pattern
@@ -455,11 +514,17 @@ Supervisor checks work completion:
 const propInfo = await readResource(`moo://objects/${brokenPipeId}/prop/repaired`);
 const repaired = propInfo.value;
 
+const supervisor = await $load(supervisorId);
+const room = supervisor.location;
 if (repaired) {
-  await $ai.do(supervisorId, 'say Good work. Payment authorized.');
+  await room.announce(supervisor, null, {
+    others: '%A %av{say}, "Good work. Payment authorized."'
+  });
   // Complete job, pay worker
 } else {
-  await $ai.do(supervisorId, 'say Work not complete. Keep at it.');
+  await room.announce(supervisor, null, {
+    others: '%A %av{say}, "Work not complete. Keep at it."'
+  });
 }
 ```
 
@@ -1232,7 +1297,11 @@ Your NPCs speak like you - clinical, efficient, impersonal:
 NPCs deliver information you want players to have:
 
 ```javascript
-await $ai.do(clerkId, 'say Citizenship provides: food rations, shelter access, work eligibility. Requirements: biometric registration, work commitment. Processing time: immediate.');
+const clerk = await $load(clerkId);
+const room = clerk.location;
+await room.announce(clerk, null, {
+  others: '%A %av{say}, "Citizenship provides: food rations, shelter access, work eligibility. Requirements: biometric registration, work commitment. Processing time: immediate."'
+});
 ```
 
 ### Directing Behavior
@@ -1240,7 +1309,11 @@ await $ai.do(clerkId, 'say Citizenship provides: food rations, shelter access, w
 NPCs guide players toward objectives:
 
 ```javascript
-await $ai.do(supervisorId, 'say Repair crew needed at the water treatment plant. 75 credits. Tools at supply depot. Report when ready.');
+const supervisor = await $load(supervisorId);
+const room = supervisor.location;
+await room.announce(supervisor, null, {
+  others: '%A %av{say}, "Repair crew needed at the water treatment plant. 75 credits. Tools at supply depot. Report when ready."'
+});
 ```
 
 ## Example: Complete NPC Interaction Flow
@@ -1251,23 +1324,37 @@ await $ai.do(supervisorId, 'say Repair crew needed at the water treatment plant.
 // 1. Player enters City Services
 // (detected via plot hook or monitoring)
 
-// 2. Clerk greets
-await $ai.do(clerkId, 'say Welcome to City Services. State your purpose.');
+// 2. Clerk greets (using room.announce with pronoun substitution)
+const clerk = await $load(clerkId);
+const clerkRoom = clerk.location;
+await clerkRoom.announce(clerk, null, {
+  others: '%A %av{say}, "Welcome to City Services. State your purpose."'
+});
 
 // 3. Player says they want citizenship
 // (detected via hook or monitoring)
 
 // 4. Clerk explains
-await $ai.do(clerkId, 'say Citizenship registration. Requirements: biometric scan, work commitment. Benefits: food rations, shelter access, employment. Proceed to Registration Room for processing.');
+await clerkRoom.announce(clerk, null, {
+  others: '%A %av{say}, "Citizenship registration. Requirements: biometric scan, work commitment. Benefits: food rations, shelter access, employment. Proceed to Registration Room for processing."'
+});
 
 // 5. Clerk directs
-await $ai.do(clerkId, 'say Registration is through the door to the east. A technician will assist you.');
+await clerkRoom.announce(clerk, null, {
+  others: '%A %av{say}, "Registration is through the door to the east. A technician will assist you."'
+});
 
 // 6. In Registration Room, tech NPC handles biometric
-await $ai.do(techId, 'say Step forward. Place hand on scanner.');
+const tech = await $load(techId);
+const techRoom = tech.location;
+await techRoom.announce(tech, null, {
+  others: '%A %av{say}, "Step forward. Place hand on scanner."'
+});
 
 // 7. On scan completion (via hook)
-await $ai.do(techId, 'say Biometric capture complete. Citizenship granted. Welcome to the Continuum.');
+await techRoom.announce(tech, null, {
+  others: '%A %av{say}, "Biometric capture complete. Citizenship granted. Welcome to the Continuum."'
+});
 
 // 8. Update faction
 await call_method({ objectId: factionId, name: 'setFaction', args: [playerId, 'Citizen'] });

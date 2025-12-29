@@ -114,14 +114,28 @@ The `$aiQuery()` method:
 - Calls the Claude Agent SDK
 - Provides access to all MCP tools
 - Returns `{ response, session }` for continuity
-- Agent uses `ai do` to speak/emote
+- Agent uses direct methods to speak/emote/move
 
 ### 4. NPC Response
 
-The agent responds by calling MCP tools:
+The agent responds using `location.announce()` with **pronoun substitution**:
 ```javascript
-$ai.do(3061, "say Hello there!")
-$ai.do(3061, ":waves politely")
+// Speech - %A = actor name, %av{verb} = conjugated verb
+const room = self.location;
+await room.announce(self, null, {
+  others: '%A %av{say}, "Hello there!"'
+});
+// Others see: "Janet says, Hello there!"
+
+// Emote
+await room.announce(self, null, {
+  others: '%A %av{wave} politely.'
+});
+// Others see: "Janet waves politely."
+
+// Movement - use self.go()
+await self.go('north');
+// Returns: { success, direction, fromRoom, toRoom, availableExits }
 ```
 
 ## Per-NPC Storage
@@ -157,27 +171,68 @@ volumes:
 export ANTHROPIC_API_KEY=<your-api-key>
 ```
 
-## MCP Tools Available to NPCs
+## NPC Actions (Direct Methods)
 
-NPCs have full access to MCP tools:
+NPCs act using methods directly on their object (self):
 
 ### Communication
+
+Use `location.announce()` with pronoun substitution for all speech and emotes:
+
 ```javascript
-$ai.do(ID, "say Hello!")
-$ai.do(ID, ":waves")
+// Say to room - %A = your name, %av{verb} = conjugated
+const room = self.location;
+await room.announce(self, null, {
+  others: '%A %av{say}, "Hello!"'
+});
+
+// Emote
+await room.announce(self, null, {
+  others: '%A %av{wave}.'
+});
+
+// Say to specific person - %T = their name, %t = lowercase
+await room.announce(self, target, {
+  target: '%A %av{say} to you, "..."',
+  others: '%A %av{say} to %t, "..."'
+});
+
+// Pronoun reference:
+// %A = actor name (capitalized)
+// %a = actor name (lowercase)
+// %T = target name (capitalized)
+// %t = target name (lowercase)
+// %av{verb} = verb conjugated for actor (say → says)
+// %as/%ao/%ap = actor pronouns (subject/object/possessive)
+// %ts/%to/%tp = target pronouns
+```
+
+### Movement
+```javascript
+// Move through exit (never teleport)
+await self.go('north');
+// Returns: { success, direction, fromRoom, toRoom, availableExits }
+```
+
+### Waiting for Response
+```javascript
+// Set up timeout for player response
+await self.expectResponseFrom(playerId, {
+  prompt: 'They seem distracted. Try again.',
+  timeout: 120000  // 2 minutes
+});
 ```
 
 ### Memory Management
 ```javascript
-$ai.remember(ID, "...", "critical")
-$ai.recall(ID)
+$ai.remember(self.id, "Met Jack - suspicious character", "critical", ['player'])
+$ai.recall(self.id)
 ```
 
 ### World Interaction
 ```javascript
-$ai.do(ID, "get sword")
-$ai.do(ID, "go north")
-$ai.look(ID)
+// Read room info
+const roomInfo = await self.location.describeForAI();
 ```
 
 ### Resources (Read-Only)

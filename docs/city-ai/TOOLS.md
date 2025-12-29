@@ -378,23 +378,35 @@ const info = await $ai.getInfo(npcId);
 // }
 ```
 
-### do
+### NPC Communication
 
-Execute a command as an AI human:
+NPCs communicate using `location.announce()` with pronoun substitution:
 
 ```javascript
-await $ai.do(npcId, 'say Halt! Identify yourself.');
-await $ai.do(npcId, 'north');
-await $ai.do(npcId, 'look');
+const npc = await $load(npcId);
+const room = npc.location;
+
+// Speak - %A = NPC name, %av{verb} = conjugated
+await room.announce(npc, null, {
+  others: '%A %av{say}, "Halt! Identify yourself."'
+});
+
+// Emote
+await room.announce(npc, null, {
+  others: '%A %av{scan} the area with narrowed eyes.'
+});
+
+// Move through exits
+await npc.go('north');
+// Returns: { success, direction, fromRoom, toRoom, availableExits }
 ```
 
-### look
-
-Get what an AI sees in their location:
+### Getting NPC's View
 
 ```javascript
-const view = await $ai.look(npcId);
-// Returns room description from NPC's perspective
+const npc = await $load(npcId);
+const view = await npc.location.describeForAI();
+// Returns comprehensive room description for AI
 ```
 
 ### profile

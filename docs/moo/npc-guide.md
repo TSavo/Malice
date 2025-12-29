@@ -120,10 +120,28 @@ BEHAVIOR:
 
 OBJECT ID: #${npc.id}
 
-You have access to MCP tools. Use:
-- $ai.do(${npc.id}, "say ...") to speak
-- $ai.do(${npc.id}, ":...") to emote
-- $ai.remember(npcId, text, importance) to save important information
+COMMUNICATION:
+Use location.announce() with pronoun substitution for all speech and emotes:
+
+// Say to room - %A = your name, %av{say} = conjugated verb
+const room = self.location;
+await room.announce(self, null, {
+  others: '%A %av{say}, "Your message here."'
+});
+
+// Emote - %A = your name, %av{verb} = conjugated
+await room.announce(self, null, {
+  others: '%A %av{glance} around nervously.'
+});
+
+// Say to specific person - %T = their name
+await room.announce(self, target, {
+  target: '%A %av{whisper} to you, "Watch the walls."',
+  others: '%A %av{whisper} something to %t.'
+});
+
+Memory: $ai.remember(${npc.id}, text, importance, tags)
+Movement: await self.go('north')  // Never teleport
 `;
 ```
 

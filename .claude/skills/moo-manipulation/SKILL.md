@@ -236,8 +236,14 @@ execute_moo_code({
       history: 'Former military.'
     });
 
-    // Execute command as NPC
-    await $ai.do(npc.id, 'say Halt! State your business.');
+    // NPC communication - use announce with pronoun substitution
+    // %A = NPC name, %av{verb} = conjugated verb
+    await room.announce(npc, null, {
+      others: '%A %av{say}, "Halt! State your business."'
+    });
+
+    // NPC movement
+    await npc.go('north');
 
     return {npcId: npc.id, location: room.name};
   `

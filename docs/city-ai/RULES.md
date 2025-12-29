@@ -84,9 +84,12 @@ await $ai.spawn({ location: await $load(targetRoomId), ... });
 // Spawn guard in adjacent room
 const guard = await $ai.spawn({ location: await $load(hallwayId), ... });
 
-// Walk them in
-await $ai.do(guard.id, 'south');
-await $ai.do(guard.id, 'say Security responding.');
+// Walk them in using self.go() and announce
+await guard.go('south');
+const room = guard.location;
+await room.announce(guard, null, {
+  others: '%A %av{say}, "Security responding."'
+});
 ```
 
 If no adjacent room is appropriate, spawn them "off-screen" and walk them through multiple rooms to arrive naturally.
@@ -164,9 +167,12 @@ NPCs should:
 ```javascript
 // Start in security station
 // Walk to incident location
-await $ai.do(guard, 'north');
-await $ai.do(guard, 'east');
-await $ai.do(guard, 'say Security. What\'s the situation?');
+await guard.go('north');
+await guard.go('east');
+const room = guard.location;
+await room.announce(guard, null, {
+  others: '%A %av{say}, "Security. What\'s the situation?"'
+});
 ```
 
 **Worker starting shift:**
@@ -187,9 +193,12 @@ await $ai.do(guard, 'say Security. What\'s the situation?');
 NPCs don't vanish. They leave.
 
 ```javascript
-await $ai.do(npc, 'say Shift\'s over. Heading out.');
-await $ai.do(npc, 'south');
-await $ai.do(npc, 'out');
+const room = npc.location;
+await room.announce(npc, null, {
+  others: '%A %av{say}, "Shift\'s over. Heading out."'
+});
+await npc.go('south');
+await npc.go('out');
 // Now safe to despawn - they're "gone home"
 ```
 
