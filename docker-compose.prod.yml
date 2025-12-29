@@ -1,0 +1,130 @@
+# Production docker-compose with IP binding
+#
+# Usage:
+#   export ADMIN_IP=1.2.3.4
+#   export CONTINUUM_IP=1.2.3.5
+#   export CARTEL_IP=1.2.3.6
+#   docker compose -f docker-compose.prod.yml up -d
+#
+# Or use a .env file:
+#   ADMIN_IP=1.2.3.4
+#   CONTINUUM_IP=1.2.3.5
+#   CARTEL_IP=1.2.3.6
+
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: malice-mongo
+    restart: unless-stopped
+    # No external ports - internal only
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      - MONGO_INITDB_DATABASE=malice
+    networks:
+      malice-network:
+        ipv4_address: 172.20.0.2
+    healthcheck:
+      test: ["CMD-SHELL", "mongosh --eval 'db.adminCommand(\"ping\")' --quiet || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+
+  game:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: malice-game
+    restart: unless-stopped
+    ports:
+      # Admin services - bound to admin IP only
+      - "${ADMIN_IP}:3000:3000"    # LSP API
+      - "${ADMIN_IP}:3010:3010"    # MCP (admin access)
+      - "${ADMIN_IP}:9999:9999"    # DevTools
+      - "${ADMIN_IP}:27017:27017"  # MongoDB tunnel (optional)
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/
+      - DB_NAME=malice
+      - NODE_ENV=production
+      - FORCE_BOOTSTRAP=${FORCE_BOOTSTRAP:-false}
+    volumes:
+      - claude_sessions:/home/node/.claude
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      malice-network:
+        ipv4_address: 172.20.0.10
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 3010 || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 60s
+
+  # ============================================================
+  # Faction Proxies - Public-facing on dedicated IPs
+  # ============================================================
+
+  continuum-proxy:
+    build:
+      context: ./docker/faction-proxy
+      dockerfile: Dockerfile
+    container_name: malice-continuum
+    restart: unless-stopped
+    ports:
+      - "${CONTINUUM_IP}:80:80"
+      - "${CONTINUUM_IP}:443:443"
+      - "${CONTINUUM_IP}:22:22"
+      - "${CONTINUUM_IP}:23:23"
+    environment:
+      - GAME_HOST=172.20.0.10
+      - HTTP_PORT=8000
+      - WS_PORT=8080
+      - TELNET_PORT=5555
+      - SSH_PORT=5556
+    depends_on:
+      game:
+        condition: service_healthy
+    networks:
+      malice-network:
+        ipv4_address: 172.20.0.100
+
+  cartel-proxy:
+    build:
+      context: ./docker/faction-proxy
+      dockerfile: Dockerfile
+    container_name: malice-cartel
+    restart: unless-stopped
+    ports:
+      - "${CARTEL_IP}:80:80"
+      - "${CARTEL_IP}:443:443"
+      - "${CARTEL_IP}:22:22"
+      - "${CARTEL_IP}:23:23"
+    environment:
+      - GAME_HOST=172.20.0.10
+      - HTTP_PORT=8001
+      - WS_PORT=8081
+      - TELNET_PORT=5557
+      - SSH_PORT=5558
+    depends_on:
+      game:
+        condition: service_healthy
+    networks:
+      malice-network:
+        ipv4_address: 172.20.0.101
+
+volumes:
+  mongodb_data:
+    driver: local
+  claude_sessions:
+    driver: local
+
+networks:
+  malice-network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.0.0/16
