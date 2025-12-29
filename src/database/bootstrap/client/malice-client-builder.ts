@@ -67,6 +67,7 @@ export class MaliceClient {
     };
     this.reconnectAttempts = 0;
     this.maxReconnectAttempts = 5;
+    this.manualClose = false;
 
     // Register built-in channel handlers
     this.on('game', (data) => this.onGameMessage(data));
@@ -77,7 +78,12 @@ export class MaliceClient {
   }
 
   connect() {
+    this.manualClose = false;
     this.updateStatus('connecting');
+
+    // Hide reconnect dialog if showing
+    this.wm?.hideReconnectDialog();
+
     this.ws = new WebSocket(this.url);
 
     this.ws.onopen = () => {
@@ -95,6 +101,11 @@ export class MaliceClient {
     this.ws.onclose = () => {
       this.updateStatus('disconnected');
 
+      // If manual close, don't auto-reconnect (dialog handles it)
+      if (this.manualClose) {
+        return;
+      }
+
       // Write to main terminal if exists
       const mainTerm = this.wm?.getWindow('terminal-main');
       if (mainTerm?.terminal) {
@@ -110,15 +121,24 @@ export class MaliceClient {
         }
         setTimeout(() => this.connect(), delay);
       } else {
-        if (mainTerm?.terminal) {
-          mainTerm.terminal.write('\\\\x1b[31mMax reconnection attempts reached. Refresh to try again.\\\\x1b[0m\\\\r\\\\n');
-        }
+        // Show reconnect dialog after max attempts
+        this.wm?.showReconnectDialog();
       }
     };
 
     this.ws.onerror = () => {
       this.updateStatus('error');
     };
+  }
+
+  /**
+   * Manually close the connection (no auto-reconnect)
+   */
+  close() {
+    this.manualClose = true;
+    if (this.ws) {
+      this.ws.close();
+    }
   }
 
   updateStatus(state) {
