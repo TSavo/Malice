@@ -59,6 +59,30 @@ export class DevToolsServer {
     // Initialize relationship components
     this.templateGenerator = new MethodTemplateGenerator();
     this.relationshipAnalyzer = new RelationshipAnalyzer();
+
+    // Subscribe to object change events from ObjectManager
+    // This broadcasts changes from any source (MCP, recycler, direct MOO code)
+    manager.onObjectChange((event) => {
+      if (event.type === 'method.changed' || event.type === 'method.deleted') {
+        this.broadcast(event.type, {
+          objectId: event.objectId,
+          name: event.name,
+        });
+      } else if (
+        event.type === 'property.changed' ||
+        event.type === 'property.deleted'
+      ) {
+        this.broadcast(event.type, {
+          objectId: event.objectId,
+          name: event.name,
+        });
+      } else if (
+        event.type === 'object.created' ||
+        event.type === 'object.changed'
+      ) {
+        this.broadcast(event.type, { id: event.objectId });
+      }
+    });
   }
 
   private templateGenerator: MethodTemplateGenerator;
@@ -320,8 +344,7 @@ export class DevToolsServer {
       methods: (params.methods || {}) as unknown as Record<string, Method>,
     });
 
-    // Notify all clients
-    this.broadcast('object.created', { id: obj.id });
+    // Note: object.created event is emitted by ObjectManager.create()
 
     return { id: obj.id };
   }
@@ -395,8 +418,7 @@ export class DevToolsServer {
 
     obj.setMethod(name, code, options);
 
-    // Notify all clients
-    this.broadcast('method.changed', { objectId, name });
+    // Note: method.changed event is emitted by RuntimeObject.setMethod()
 
     return { success: true };
   }
@@ -417,8 +439,7 @@ export class DevToolsServer {
 
     obj.removeMethod(name);
 
-    // Notify all clients
-    this.broadcast('method.deleted', { objectId, name });
+    // Note: method.deleted event is emitted by RuntimeObject.removeMethod()
 
     return { success: true };
   }
@@ -464,8 +485,7 @@ export class DevToolsServer {
 
     obj.set(name, value);
 
-    // Notify all clients
-    this.broadcast('property.changed', { objectId, name });
+    // Note: property.changed event is emitted by RuntimeObject.set()
 
     return { success: true };
   }
@@ -490,8 +510,7 @@ export class DevToolsServer {
     // Wait for auto-persist to complete
     await this.manager.flushWrites();
 
-    // Notify all clients
-    this.broadcast('property.deleted', { objectId, name });
+    // Note: property.deleted event is emitted by RuntimeObject.deleteProperty()
 
     return { success: true };
   }
@@ -791,8 +810,7 @@ export class DevToolsServer {
     // Apply template to object
     obj.setMethod(methodName, template.template);
 
-    // Notify clients
-    this.broadcast('method.created', { objectId, name: methodName });
+    // Note: method.changed event is emitted by RuntimeObject.setMethod()
 
     return {
       success: true,
