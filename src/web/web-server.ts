@@ -45,6 +45,15 @@ export async function createWebServer(
     },
   );
 
+  // Register form urlencoded body parser
+  app.addContentTypeParser(
+    'application/x-www-form-urlencoded',
+    { parseAs: 'string' },
+    (_req, body, done) => {
+      done(null, body as string);
+    },
+  );
+
   // Authenticate HTTP Basic Auth
   async function authenticate(
     request: any,
