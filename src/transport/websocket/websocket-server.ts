@@ -75,10 +75,12 @@ export class WebSocketServer {
     // Extract auth info from various sources
     let authInfo: AuthInfo | null = null;
 
-    // Check for token in URL query params (for web pre-auth)
+    // Check for token and mode in URL query params
+    let chargenMode: string | null = null;
     try {
       const urlObj = new URL(url, 'http://localhost');
       const token = urlObj.searchParams.get('token');
+      chargenMode = urlObj.searchParams.get('mode'); // 'cartel' for Cartel chargen
 
       if (token) {
         authInfo = {
@@ -88,6 +90,7 @@ export class WebSocketServer {
             remoteAddress,
             userAgent: req.headers['user-agent'],
             protocol: isMultiplexed ? 'websocket-mux' : 'websocket',
+            chargenMode: chargenMode || undefined,
           },
         };
 
@@ -118,6 +121,7 @@ export class WebSocketServer {
               remoteAddress,
               userAgent: req.headers['user-agent'],
               protocol: isMultiplexed ? 'websocket-mux' : 'websocket',
+              chargenMode: chargenMode || undefined,
             },
           };
 
@@ -127,6 +131,24 @@ export class WebSocketServer {
             );
           }
         }
+      }
+    }
+
+    // If we have a chargenMode but no auth info, create minimal auth info to carry it
+    if (!authInfo && chargenMode) {
+      authInfo = {
+        mode: 'custom',
+        custom: { type: 'chargen-mode', data: {} },
+        metadata: {
+          remoteAddress,
+          userAgent: req.headers['user-agent'],
+          protocol: isMultiplexed ? 'websocket-mux' : 'websocket',
+          chargenMode,
+        },
+      };
+
+      if (this.config.debug) {
+        console.log(`[WebSocketServer] ChargenMode detected: ${chargenMode}`);
       }
     }
 

@@ -3,6 +3,7 @@ import { AiBuilder } from './ai-builder.js';
 import { AiPromptsBuilder } from './ai-prompts-builder.js';
 import { AuthManagerBuilder } from './auth-manager-builder.js';
 import { BodyFactoryBuilder } from './body-factory-builder.js';
+import { CartelCharGenBuilder } from './cartel-chargen-builder.js';
 import { CharGenBuilder } from './chargen-builder.js';
 import { ClientBuilder } from './client/index.js';
 import { CombatBuilder } from './combat-builder.js';
@@ -78,6 +79,7 @@ export class CoreSystemBuilder {
   async buildCoreSystems(): Promise<void> {
     const authManagerBuilder = new AuthManagerBuilder(this.manager);
     const charGenBuilder = new CharGenBuilder(this.manager);
+    const cartelCharGenBuilder = new CartelCharGenBuilder(this.manager);
     const preAuthHandlerBuilder = new PreAuthHandlerBuilder(this.manager);
     const recyclerBuilder = new RecyclerBuilder(this.manager);
     const spatialBuilder = new SpatialBuilder(this.manager);
@@ -120,6 +122,7 @@ export class CoreSystemBuilder {
 
     await authManagerBuilder.build();
     await charGenBuilder.build();
+    await cartelCharGenBuilder.build();
     await preAuthHandlerBuilder.build();
     await recyclerBuilder.build();
     await spatialBuilder.build();
@@ -181,6 +184,7 @@ export class CoreSystemBuilder {
     // Register aliases
     await authManagerBuilder.registerAlias();
     await charGenBuilder.registerAlias();
+    await cartelCharGenBuilder.registerAlias();
     await preAuthHandlerBuilder.registerAlias();
     await recyclerBuilder.registerAlias();
     await spatialBuilder.registerAlias();
