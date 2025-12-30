@@ -58,46 +58,36 @@ reduces durability, makes noise. At durability 0, door breaks open.`
 
 Abilities are **prose physics**. They describe how things interact, what's possible, what the consequences are. The AI reads abilities and reasons about outcomes.
 
-## The Two Layers
+## The Flow
 
 ```
 Player Input
     ↓
-Infrastructure verb? (look, say, move)
-    ├─ YES → Execute directly (instant, deterministic)
-    └─ NO  → AI Narrator (Priority Order)
-                1. Bug Fixer (detect failures FIRST)
-                   ├─ Metagaming?
-                   ├─ Trolling?
-                   └─ Nonsense?
-                       └─ YES → player.think(correction)
-                2. Narrator (execute intent)
-                   ├─ Gather context (room, contents, player abilities)
-                   ├─ describeForAI() - understand objects
-                   ├─ Read relevant abilities
-                   ├─ Reason about intent vs physics
-                   ├─ Double dispatch (lock.pick() → tool.canPick())
-                   ├─ Modify properties directly
-                   └─ Narrate outcome via player.think()
-                3. Creator (grow the spec)
-                   └─ Add methods/abilities to prototypes when discovering valid interactions
+AI Narrator (Priority Order)
+    1. Bug Fixer (detect failures FIRST)
+       ├─ Metagaming?
+       ├─ Trolling?
+       └─ Nonsense?
+           └─ YES → player.think(correction)
+    2. Narrator (execute intent)
+       ├─ Gather context (room, contents, player abilities)
+       ├─ describeForAI() - understand objects
+       ├─ Read relevant abilities
+       ├─ Reason about intent vs physics
+       ├─ Double dispatch (lock.pick() → tool.canPick())
+       ├─ Modify properties directly
+       └─ Narrate outcome via player.think()
+    3. Creator (grow the spec)
+       └─ Add methods/abilities to prototypes when discovering valid interactions
 ```
 
-### Infrastructure Verbs (Coded)
+### All Actions Are AI-Interpreted
 
-These remain as coded verbs for speed and determinism:
+Every player action goes through the AI narrator - there are no coded verbs:
 
-```
-MOVEMENT:    north, south, east, west, up, down, enter, exit
-PERCEPTION:  look, glance
-SOCIAL:      say, whisper, shout, emote, to
-META:        quit, who, help, inventory, exits, stand, sit
-```
-
-### Everything Else (AI-Interpreted)
-
-All other player actions go through the AI narrator:
-
+- "look" → AI reads room abilities, describes contents and exits
+- "north" → AI reads exit abilities, moves player if passable
+- "say hello" → AI reads social abilities, broadcasts speech
 - "unlock the door" → AI reads lock abilities, checks player has key
 - "pick up the gun" → AI reads hand abilities, checks weight
 - "eat the food" → AI reads edible abilities, triggers digestion
@@ -712,9 +702,9 @@ When you need capabilities that don't exist, trace and upgrade:
 
 ## Why This Matters
 
-### Registered Verbs = Dead Code
+### Why No Coded Verbs?
 
-A registered verb does one thing, one way, forever. It can't be reasoned about, combined, or extended.
+A coded verb does one thing, one way, forever. It can't be reasoned about, combined, or extended.
 
 ### Abilities = Living Physics
 
@@ -726,18 +716,18 @@ The AI can:
 
 ### The Test
 
-If you're tempted to register a verb, ask:
+If you're tempted to code a verb handler, ask:
 
 > "Can the AI handle this by reading abilities?"
 
-The answer is almost always **YES**.
+The answer is **YES**. That's why there are no coded verbs.
 
 ## Key Principles
 
 1. **Properties are self-documenting** - Every property carries meaning via descriptions
 2. **Abilities describe relationships** - How properties interact, not what they mean
 3. **AI is the physics engine** - Interprets descriptions + abilities, modifies properties
-4. **Infrastructure is minimal** - Only high-frequency, zero-ambiguity verbs stay coded
+4. **No coded verbs** - All player actions go through the AI narrator
 5. **No procedural game logic** - Physics lives in prose, not code
 6. **Discovery is growth** - New interactions can become permanent abilities
 
@@ -780,7 +770,7 @@ When players discover valid interactions:
 
 ## Complete Flow Summary
 
-Every non-infrastructure player action follows this complete flow:
+Every player action follows this complete flow:
 
 ### Phase 1: Bug Fixer (MANDATORY FIRST)
 
