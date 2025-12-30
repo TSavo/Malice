@@ -116,6 +116,8 @@ $load(id)    // Load object by ID
 $create({parent, properties, methods})  // Create new object
 $query(criteria?)                       // Fluent query builder (see below)
 $aiQuery(system, prompt, session?)      // Query Claude AI with MCP tools
+$email       // Email service - send emails via faction domains
+$http        // HTTP service - make external HTTP requests
 $<alias>     // Pre-resolved aliases: $room, $exit, $player, $recycler, $session, etc.
 ```
 
@@ -639,7 +641,7 @@ Factions are organizations with isolated network infrastructure. Each faction ge
 
 ### Default Factions
 
-- **`$continuum`** - The governing authority (domain: malice.life, index: 0)
+- **`$continuum`** - The governing authority (domain: thecontinuum.city, index: 0)
 - **`$cartel`** - Underground resistance (domain: graycartel.com, index: 1)
 
 ### Creating Factions at Runtime
@@ -721,8 +723,94 @@ Each faction's transport bundle includes:
 
 | Transport | Purpose |
 |-----------|---------|
-| HTTP | Web server for landing page, /register, /play, domain content |
+| HTTP | Web server for landing page, /register, /verify, /play, domain content |
 | WebSocket | Authenticated connections with /mux multiplexed channels |
 | Session MCP | Player-scoped MCP access for AI-driven clients |
+
+### Email Verification Flow
+
+New player registration requires email verification:
+
+```
+1. User visits faction site (thecontinuum.city or graycartel.com)
+2. User fills registration form (username, email, password)
+3. POST /register creates player with emailVerified=false
+4. faction.onPlayerRegistered(player) is called:
+   - Sends branded verification email via $email
+   - Sends Discord notification via $http (if discordWebhook configured)
+5. User clicks email link → GET /verify?t=token
+   - Sets emailVerified=true, clears verificationToken
+   - Redirects to /play?verified=1
+6. User logs in → POST /api/auth
+   - Checks emailVerified === true
+   - Returns 403 if not verified
+   - Returns one-time token if verified
+```
+
+### Faction Registration Hook
+
+Each faction has an `onPlayerRegistered(player)` method called after registration:
+
+```typescript
+// Base implementation in $faction prototype
+// Override in faction instances for custom branding
+
+// $continuum sends blue-themed email
+// $cartel sends green/dark-themed email
+// Both can send Discord notifications if discordWebhook is set
+
+// Set Discord webhook for registration notifications:
+$continuum.discordWebhook = 'https://discord.com/api/webhooks/...';
+$cartel.discordWebhook = 'https://discord.com/api/webhooks/...';
+```
+
+## Email and HTTP Services
+
+Services for external communication from MOO code. Requires `EMAIL_API_KEY` environment variable.
+
+### $email - Email Service
+
+Send emails via faction-specific domains using Resend:
+
+```typescript
+// Send email from faction domain (noreply@thecontinuum.city)
+await $email.send({
+  to: 'user@example.com',
+  subject: 'Welcome!',
+  html: '<h1>Hello</h1>',
+  faction: $continuum  // Optional: uses faction's domain
+});
+
+// Without faction, sends from malice.world
+await $email.send({
+  to: 'user@example.com',
+  subject: 'Admin Notice',
+  html: '<p>System message</p>'
+});
+```
+
+### $http - HTTP Service
+
+Make external HTTP requests (webhooks, APIs):
+
+```typescript
+// POST to Discord webhook
+await $http.post('https://discord.com/api/webhooks/...', {
+  content: 'Hello from Malice!',
+  embeds: [{ title: 'Alert', color: 0xff0000 }]
+});
+
+// GET request
+const response = await $http.get('https://api.example.com/data');
+// { status: 200, body: { ... } }
+
+// Full request with options
+await $http.request('https://api.example.com', {
+  method: 'PUT',
+  headers: { 'Authorization': 'Bearer ...' },
+  body: { key: 'value' },
+  timeout: 5000
+});
+```
 
 All transports require authentication. Players must first register via `POST /register` on the faction's HTTP server, then connect via WebSocket or Session MCP with their credentials. Connections are tagged with `factionId` for routing to the correct character generation flow.

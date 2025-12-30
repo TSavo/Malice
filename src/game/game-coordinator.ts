@@ -60,6 +60,21 @@ export class GameCoordinator {
     const loadedCount = await this.manager.loadAll();
     console.log(`✅ Loaded ${loadedCount} objects into cache`);
 
+    // Initialize services ($email, $http)
+    this.manager.initializeServices({
+      emailApiKey: process.env.EMAIL_API_KEY,
+    });
+
+    // Register faction email domains
+    const continuum = this.manager.getAliases().get('continuum');
+    const cartel = this.manager.getAliases().get('cartel');
+    if (continuum) {
+      this.manager.registerEmailDomain(continuum.id, 'thecontinuum.city');
+    }
+    if (cartel) {
+      this.manager.registerEmailDomain(cartel.id, 'graycartel.com');
+    }
+
     // Start scheduler tick loop (every second)
     this.startScheduler();
   }

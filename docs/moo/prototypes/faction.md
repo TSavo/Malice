@@ -2,151 +2,199 @@
 
 > **Abilities-First**: Factions use abilities to describe membership, reputation, and access rights. See `docs/ABILITIES-FIRST.md`.
 
-Group membership and inter-faction relationships in Malice.
+Organizations with isolated network infrastructure in Malice.
 
 ## Overview
 
-The **$faction** singleton manages faction memberships and relationships between factions. Use it to:
-- Assign entities (players, NPCs) to factions
-- Define relationships between factions (friendly, hostile, neutral)
-- Query whether two entities are friendly or hostile
-- Restrict access to areas based on faction membership
+The faction system consists of:
+- **$faction** - Prototype for faction instances (creatable)
+- **$factionManager** - Singleton for creation, destruction, memberships, relationships
+- **$transports** - Registry for transport bundles (internal)
 
-## $faction - Faction Manager
+Each faction has its own:
+- Web domain (e.g., `thecontinuum.city`, `graycartel.com`)
+- Transport bundle (HTTP, WebSocket, Session MCP)
+- Character generation flow
+- Email branding
 
-**Type:** Singleton (inherits from $root)
+## Default Factions
+
+| Alias | Name | Domain | Index |
+|-------|------|--------|-------|
+| `$continuum` | The Continuum | thecontinuum.city | 0 |
+| `$cartel` | Gray Cartel | graycartel.com | 1 |
+
+## $faction - Faction Prototype
+
+**Type:** Prototype (inherits from $describable)
 
 ### Properties
 
 ```javascript
 {
-  factions: {
-    'Citizen': {
-      members: [playerId1, playerId2, ...],
-      description: 'Registered citizens of the Continuum',
-      leader: null,
-      created: 1699999999999
-    },
-    'Scavenger': { ... }
-  },
-
-  relationships: {
-    'Citizen:Scavenger': 'hostile',  // Sorted key for bidirectional lookup
-    'Citizen:Corporate': 'friendly'
-  },
-
-  memberships: {
-    [playerId1]: 'Citizen',  // Quick lookup: entity -> faction
-    [npcId]: 'Scavenger'
-  }
+  name: 'Faction Name',
+  description: 'Faction description',
+  domain: 'faction.domain.com',     // Web domain
+  charGen: objref,                   // Character generation handler
+  leader: objref,                    // Faction leader entity
+  sshHostKey: null,                  // Per-faction SSH key (auto-generated)
+  ports: { http, ws, sessionMcp },   // Allocated ports
+  index: 0,                          // Port allocation index
+  discordWebhook: null,              // Discord webhook for notifications
 }
 ```
 
 ### Key Methods
 
-#### createFaction(name, description)
-Create a new faction.
+#### describe()
+Get a description of the faction including member count.
 
 ```javascript
-await $faction.createFaction('Citizen', 'Registered citizens of the Continuum');
-// { success: true, faction: 'Citizen' }
+const desc = await faction.describe();
+// "The Continuum - The governing authority\nLeader: Admin\nMembers: 42\nDomain: thecontinuum.city"
 ```
 
-#### setFaction(entity, factionName)
-Assign an entity to a faction. Removes from previous faction if any.
+#### getPortInfo()
+Get port allocation for this faction.
 
 ```javascript
-await $faction.setFaction(player, 'Citizen');
-// { success: true, faction: 'Citizen' }
-
-// Remove from all factions
-await $faction.setFaction(player, null);
+const ports = await faction.getPortInfo();
+// { http: 8000, ws: 8080, sessionMcp: 3012 }
 ```
 
-#### getFaction(entity)
-Get an entity's current faction.
+#### isOnline()
+Check if faction's transports are running.
 
 ```javascript
-const faction = await $faction.getFaction(player);
-// 'Citizen' or null
+const online = await faction.isOnline();
+// true/false
 ```
 
-#### setRelationship(factionA, factionB, relationship)
-Set the relationship between two factions.
+#### onPlayerRegistered(player)
+Called when a new player registers with this faction. Override for custom branding.
 
 ```javascript
-await $faction.setRelationship('Citizen', 'Scavenger', 'hostile');
-await $faction.setRelationship('Citizen', 'Corporate', 'friendly');
-await $faction.setRelationship('Citizen', 'Neutral', 'neutral');
-// { success: true, relationship: 'hostile' }
+// Base implementation sends:
+// 1. Verification email via $email
+// 2. Discord notification via $http (if discordWebhook set)
+
+// Each faction instance overrides with branded HTML
+await faction.onPlayerRegistered(newPlayer);
 ```
 
-**Relationship types:**
-- `'friendly'` - Allied factions
-- `'hostile'` - Enemy factions
-- `'neutral'` - Default, no special relationship
+## $factionManager - Faction Manager
 
-#### getRelationship(factionA, factionB)
-Get the relationship between two factions.
+**Type:** Singleton (inherits from $root)
+
+### Creating Factions
 
 ```javascript
-const rel = await $faction.getRelationship('Citizen', 'Scavenger');
-// 'hostile', 'friendly', or 'neutral'
+const faction = await $factionManager.create({
+  name: 'Shadow Syndicate',
+  domain: 'shadowsyndicate.net',
+  description: 'A mysterious organization',
+  charGen: $charGen,
+});
+
+// Transports automatically started
+console.log(faction.ports);
+// { http: 8002, ws: 8082, sessionMcp: 3014 }
 ```
 
-#### isFriendly(entityA, entityB)
-Check if two entities are friendly (same faction or allied factions).
+### Destroying Factions
 
 ```javascript
-const friendly = await $faction.isFriendly(player, npc);
-// true if same faction or factions are 'friendly'
+await $factionManager.destroy(faction, {
+  gracefulTimeoutMs: 5000,
+  message: 'Faction shutting down...'
+});
 ```
 
-#### isHostile(entityA, entityB)
-Check if two entities are hostile (enemy factions).
+### Memberships
 
 ```javascript
-const hostile = await $faction.isHostile(player, npc);
-// true if factions are 'hostile'
+// Assign entity to faction
+await $factionManager.setMembership(player, $cartel);
+
+// Get entity's faction
+const faction = await $factionManager.getMembership(player);
+
+// Get all members
+const members = await $factionManager.getMembers($continuum);
 ```
 
-#### getMembers(factionName)
-Get all members of a faction.
+### Relationships
 
 ```javascript
-const members = await $faction.getMembers('Citizen');
-// [playerId1, playerId2, npcId3, ...]
+// Set relationship
+await $factionManager.setRelationship($continuum, $cartel, 'hostile');
+// Types: 'friendly', 'hostile', 'neutral'
+
+// Check relationships
+const rel = await $factionManager.getRelationship($continuum, $cartel);
+const friendly = await $factionManager.isFriendly(entityA, entityB);
+const hostile = await $factionManager.isHostile(entityA, entityB);
 ```
 
-#### setLeader(factionName, entity)
-Set the leader of a faction.
+### Querying
 
 ```javascript
-await $faction.setLeader('Citizen', adminPlayer);
+// List all factions
+const factions = await $factionManager.list();
+
+// Get by domain
+const cartel = await $factionManager.getByDomain('graycartel.com');
+
+// Get by ID
+const faction = await $factionManager.getById(factionId);
 ```
 
-#### getLeader(factionName)
-Get the leader of a faction.
+## Email Verification Flow
 
-```javascript
-const leader = await $faction.getLeader('Citizen');
-// entity ID or null
+Registration requires email verification:
+
+```
+1. POST /register { username, email, password }
+   → Creates player with emailVerified=false, verificationToken
+   → Calls faction.onPlayerRegistered(player)
+
+2. faction.onPlayerRegistered(player):
+   → Sends verification email via $email
+   → Sends Discord notification via $http (optional)
+
+3. GET /verify?t=token
+   → Sets emailVerified=true
+   → Clears verificationToken
+   → Redirects to /play?verified=1
+
+4. POST /api/auth { username, password }
+   → Checks emailVerified === true
+   → Returns 403 if not verified
+   → Returns one-time token if verified
 ```
 
-#### listFactions()
-Get all faction names.
+### Player Properties
 
 ```javascript
-const factions = await $faction.listFactions();
-// ['Citizen', 'Scavenger', 'Corporate', ...]
+{
+  email: 'user@example.com',
+  emailVerified: false,
+  verificationToken: 'abc123...',  // 64-char hex string
+  factionId: 123,
+}
 ```
 
-#### getFactionInfo(factionName)
-Get detailed info about a faction.
+## Discord Integration
+
+Set `discordWebhook` on faction to receive registration notifications:
 
 ```javascript
-const info = await $faction.getFactionInfo('Citizen');
-// { members: [...], description: '...', leader: null, created: ... }
+$continuum.discordWebhook = 'https://discord.com/api/webhooks/...';
+
+// Registration creates Discord embed:
+// Title: "🎫 New Continuum Citizen Application"
+// Fields: Username, Email
+// Color: #0066cc (Continuum blue)
 ```
 
 ## $guardedExit - Faction-Restricted Passage
@@ -159,39 +207,22 @@ An exit that only allows passage for members of a specific faction.
 
 ```javascript
 {
-  allowedFaction: 'Citizen',  // Faction that can use this exit (null = unrestricted)
-  denyMessage: 'Citizens only.'  // Message shown when access denied
+  allowedFaction: 'Citizen',  // Faction that can use this exit
+  denyMessage: 'Citizens only.'
 }
 ```
 
 ### Key Methods
 
 #### canUse(agent)
-Checks faction membership before checking doors/locks.
+Checks faction membership before allowing passage.
 
 ```javascript
 const result = await guardedExit.canUse(player);
 // { allowed: true } or { allowed: false, reason: 'Citizens only.' }
 ```
 
-#### setAllowedFaction(factionName)
-Set which faction can use this exit.
-
-```javascript
-await guardedExit.setAllowedFaction('Citizen');
-// null to remove restriction
-```
-
-#### setDenyMessage(message)
-Set the denial message.
-
-```javascript
-await guardedExit.setDenyMessage('Authorized personnel only.');
-```
-
 ### Building Definition
-
-In building files, use `prototype: 'guardedExit'`:
 
 ```javascript
 exits: {
@@ -200,69 +231,35 @@ exits: {
     prototype: 'guardedExit',
     allowedFaction: 'Citizen',
     denyMessage: 'The door scanner flashes red. "Citizens only."',
-    description: 'Glass doors open onto the Waterfront',
   },
 }
-```
-
-## Example: Faction-Based Access Control
-
-```javascript
-// Create factions
-await $faction.createFaction('Citizen', 'Registered citizens');
-await $faction.createFaction('Scavenger', 'Outcasts and survivors');
-await $faction.setRelationship('Citizen', 'Scavenger', 'hostile');
-
-// Assign players to factions
-await $faction.setFaction(player1, 'Citizen');
-await $faction.setFaction(player2, 'Scavenger');
-
-// Check relationships
-await $faction.isFriendly(player1, player2);  // false
-await $faction.isHostile(player1, player2);   // true
-
-// Create guarded exit
-const guardedExit = await $recycler.create($guardedExit, {
-  name: 'north',
-  destRoom: nutrientDispensary.id,
-  allowedFaction: 'Citizen',
-  denyMessage: 'Citizens only.',
-});
-
-// Citizen can enter
-await guardedExit.canUse(player1);  // { allowed: true }
-
-// Scavenger cannot
-await guardedExit.canUse(player2);  // { allowed: false, reason: 'Citizens only.' }
 ```
 
 ## Use Cases
 
 ### 1. Restricted Areas
-Faction members only can enter certain buildings (e.g., Continuum facilities).
+Faction members only can enter certain buildings.
 
 ### 2. NPC Behavior
-NPCs can check faction relationships to determine hostility:
+NPCs check faction relationships for hostility:
 ```javascript
-if (await $faction.isHostile(npc, player)) {
+if (await $factionManager.isHostile(npc, player)) {
   await npc.attack(player);
 }
 ```
 
 ### 3. Quest Eligibility
-Certain quests only available to faction members:
 ```javascript
-const faction = await $faction.getFaction(player);
-if (faction !== 'Citizen') {
-  return 'You must be a Citizen to accept this job.';
+const faction = await $factionManager.getMembership(player);
+if (faction?.id !== $continuum.id) {
+  return 'You must be a Continuum citizen.';
 }
 ```
 
 ### 4. Pricing/Services
-Different prices or services based on faction:
 ```javascript
-const faction = await $faction.getFaction(player);
-const price = faction === 'Citizen' ? 2 : 5;  // Citizens get discount
+const faction = await $factionManager.getMembership(player);
+const price = faction?.id === $continuum.id ? 2 : 5;
 ```
 
 ## See Also

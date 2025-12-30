@@ -6,10 +6,11 @@
  * based on faction configuration (ignores Host header).
  *
  * This allows direct access to faction websites without DNS configuration:
- *   - http://localhost:8000 → Continuum (malice.life)
+ *   - http://localhost:8000 → Continuum (thecontinuum.city)
  *   - http://localhost:8001 → Gray Cartel (graycartel.com)
  */
 
+import { randomBytes } from 'crypto';
 import Fastify, { type FastifyInstance } from 'fastify';
 import type { ObjectManager } from '../database/object-manager.js';
 import type { RuntimeObjectImpl } from '../database/runtime-object.js';
@@ -63,7 +64,11 @@ export class FactionWebServer {
     // POST /register - Create new player account for this faction
     this.app.post('/register', async (request, reply) => {
       try {
-        const body = request.body as { username?: string; password?: string };
+        const body = request.body as {
+          username?: string;
+          password?: string;
+          email?: string;
+        };
 
         // Validate request body
         if (!body || typeof body !== 'object') {
@@ -73,7 +78,7 @@ export class FactionWebServer {
           });
         }
 
-        const { username, password } = body;
+        const { username, password, email } = body;
 
         // Validate username: 3-16 chars, starts with letter, alphanumeric + underscore, lowercase
         if (!username || typeof username !== 'string') {
@@ -107,6 +112,36 @@ export class FactionWebServer {
           });
         }
 
+        // Validate email
+        if (!email || typeof email !== 'string') {
+          return reply.code(400).send({
+            success: false,
+            error: 'Email is required',
+          });
+        }
+
+        const emailLower = email.toLowerCase().trim();
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(emailLower)) {
+          return reply.code(400).send({
+            success: false,
+            error: 'Invalid email format',
+          });
+        }
+
+        // Check email uniqueness
+        const existingEmail = this.manager
+          .query()
+          .prop('email')
+          .equals(emailLower)
+          .first();
+        if (existingEmail) {
+          return reply.code(409).send({
+            success: false,
+            error: 'Email already registered',
+          });
+        }
+
         // Check uniqueness - no existing player with this playername
         const existingPlayer = this.manager
           .query()
@@ -134,10 +169,16 @@ export class FactionWebServer {
           });
         }
 
+        // Generate verification token
+        const verificationToken = randomBytes(32).toString('hex');
+
         // Create player via $recycler
         const newPlayer = (await recycler.call('create', playerProto, {
           name: usernameLower, // Display name
           playername: usernameLower, // Login name
+          email: emailLower, // Email address
+          emailVerified: false, // Needs to verify email
+          verificationToken, // Token for email verification link
           chargenComplete: false, // Needs to complete in-game chargen
           factionId: this.config.factionId, // Ties to this faction
         })) as RuntimeObjectImpl;
@@ -151,10 +192,34 @@ export class FactionWebServer {
           );
         }
 
+        // Call faction's onPlayerRegistered hook to send email + create ticket
+        const faction = this.manager.getAliases().get('factionManager');
+        if (faction) {
+          try {
+            // Get the faction object for this player
+            const factionObj = await faction.call(
+              'getById',
+              this.config.factionId,
+            );
+            if (factionObj && typeof factionObj === 'object' && 'call' in factionObj) {
+              await (factionObj as RuntimeObjectImpl).call(
+                'onPlayerRegistered',
+                newPlayer,
+              );
+            }
+          } catch (hookError) {
+            // Log but don't fail registration if hook fails
+            console.error(
+              `[FactionWeb:${this.config.factionName}] onPlayerRegistered hook error:`,
+              hookError,
+            );
+          }
+        }
+
         return reply.code(201).send({
           success: true,
           playerId: newPlayer.id,
-          message: `Account created. Connect to complete character creation.`,
+          message: `Account created. Please check your email to verify your account.`,
         });
       } catch (error) {
         console.error(
@@ -168,6 +233,145 @@ export class FactionWebServer {
               ? error.message
               : 'Registration failed',
         });
+      }
+    });
+
+    // GET /verify - Verify email address via token
+    this.app.get('/verify', async (request, reply) => {
+      try {
+        const query = request.query as { t?: string };
+        const token = query.t;
+
+        if (!token || typeof token !== 'string') {
+          return reply.code(400).type('text/html').send(`
+            <!DOCTYPE html>
+            <html>
+            <head><title>Invalid Link</title></head>
+            <body style="background:#0a0a0a;color:#ff6666;font-family:system-ui;padding:2rem;text-align:center;">
+              <h1>Invalid Verification Link</h1>
+              <p>The verification link is missing or invalid.</p>
+              <a href="/play" style="color:#6699ff;">Go to login</a>
+            </body>
+            </html>
+          `);
+        }
+
+        // Find player with this verification token
+        const player = this.manager
+          .query()
+          .prop('verificationToken')
+          .equals(token)
+          .first() as RuntimeObjectImpl | null;
+
+        if (!player) {
+          return reply.code(400).type('text/html').send(`
+            <!DOCTYPE html>
+            <html>
+            <head><title>Invalid Token</title></head>
+            <body style="background:#0a0a0a;color:#ff6666;font-family:system-ui;padding:2rem;text-align:center;">
+              <h1>Invalid or Expired Token</h1>
+              <p>This verification link is no longer valid.</p>
+              <a href="/play" style="color:#6699ff;">Go to login</a>
+            </body>
+            </html>
+          `);
+        }
+
+        // Mark as verified and clear token
+        player.set('emailVerified', true);
+        player.set('verificationToken', null);
+
+        if (debug) {
+          console.log(
+            `[FactionWeb:${this.config.factionName}] Email verified for ${player.get('playername')} (#${player.id})`,
+          );
+        }
+
+        // Redirect to play with success flag
+        return reply.redirect('/play?verified=1');
+      } catch (error) {
+        console.error(
+          `[FactionWeb:${this.config.factionName}] Verification error:`,
+          error,
+        );
+        return reply.code(500).type('text/html').send(`
+          <!DOCTYPE html>
+          <html>
+          <head><title>Error</title></head>
+          <body style="background:#0a0a0a;color:#ff6666;font-family:system-ui;padding:2rem;text-align:center;">
+            <h1>Verification Failed</h1>
+            <p>An error occurred. Please try again later.</p>
+            <a href="/play" style="color:#6699ff;">Go to login</a>
+          </body>
+          </html>
+        `);
+      }
+    });
+
+    // POST /api/auth - Authenticate and return one-time token
+    this.app.post('/api/auth', async (request, reply) => {
+      try {
+        const body = request.body as { username?: string; password?: string };
+        const { username, password } = body || {};
+
+        if (!username || !password) {
+          return reply.code(400).send({ error: 'Username and password required' });
+        }
+
+        // Find player by username
+        const player = this.manager
+          .query()
+          .prop('playername')
+          .equals(username.toLowerCase())
+          .first() as RuntimeObjectImpl | null;
+
+        if (!player) {
+          return reply.code(401).send({ error: 'Invalid credentials' });
+        }
+
+        // Check password
+        const validPassword = await player.call('checkPassword', password);
+        if (!validPassword) {
+          return reply.code(401).send({ error: 'Invalid credentials' });
+        }
+
+        // Check if email is verified
+        if (!player.get('emailVerified')) {
+          return reply.code(403).send({
+            error: 'Please verify your email before logging in',
+            needsVerification: true,
+            email: player.get('email'),
+          });
+        }
+
+        // Check if suspended
+        if (player.get('isSuspended')) {
+          return reply.code(403).send({ error: 'Account suspended' });
+        }
+
+        // Generate one-time token
+        const token = randomBytes(32).toString('hex');
+        const expiresAt = Date.now() + 60000; // 60 seconds
+
+        // Store token on $system
+        const system = this.manager.getAliases().get('system');
+        if (system) {
+          await system.call('storeAuthToken', token, player.id, expiresAt);
+        }
+
+        if (debug) {
+          console.log(
+            `[FactionWeb:${this.config.factionName}] Auth token issued for ${username}`,
+          );
+        }
+
+        return { token, expiresIn: 60 };
+      } catch (err) {
+        console.error(
+          `[FactionWeb:${this.config.factionName}] Auth error:`,
+          err,
+        );
+        return reply.code(500).send({ error: 'Internal server error' });
       }
     });
 
