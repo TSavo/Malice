@@ -1,0 +1,43 @@
+# Malice Reverse Proxy Configuration
+# Routes domains to correct game container ports
+# Automatic HTTPS via Let's Encrypt
+
+# Admin site
+malice.world {
+    reverse_proxy game:80
+}
+
+# Continuum faction
+thecontinuum.city {
+    # WebSocket connections (upgrade header present)
+    @websocket {
+        header Connection *Upgrade*
+        header Upgrade websocket
+    }
+    reverse_proxy @websocket game:8080
+
+    # All other HTTP traffic
+    reverse_proxy game:8000
+}
+
+# Gray Cartel faction
+graycartel.com {
+    # WebSocket connections
+    @websocket {
+        header Connection *Upgrade*
+        header Upgrade websocket
+    }
+    reverse_proxy @websocket game:8081
+
+    # All other HTTP traffic
+    reverse_proxy game:8001
+}
+
+# Wildcard subdomains for player profiles
+*.thecontinuum.city {
+    reverse_proxy game:8000
+}
+
+*.graycartel.com {
+    reverse_proxy game:8001
+}
