@@ -26,14 +26,13 @@ services:
     container_name: malice-game
     restart: unless-stopped
     ports:
-      # Admin/dev services only - faction ports accessed via proxies
+      # Admin/dev services - exposed for local development
       - "3000:3000"    # LSP API (VS Code extension)
       - "3010:3010"    # MCP (code-first - admin access)
       - "9999:9999"    # DevTools WebSocket (VS Code extension)
-      # Dev access to faction ports (not public - use proxies for public access)
+      # Faction ports - accessed via Caddy in production, direct in dev
       - "8000-8019:8000-8019"    # Faction HTTP servers
       - "8080-8099:8080-8099"    # Faction WebSocket servers
-      - "5555-5594:5555-5594"    # Faction Telnet + SSH servers
       - "3012-3031:3012-3031"    # Faction Session MCP servers
     environment:
       - MONGO_URI=mongodb://mongodb:27017/
@@ -56,60 +55,36 @@ services:
       start_period: 60s
 
   # ============================================================
-  # Faction Proxies - Public-facing, route to game container
-  # Each faction gets its own IP with standard ports (80, 22, 23)
+  # Caddy - Reverse proxy with automatic HTTPS
+  # Routes all domains to correct game ports
   # ============================================================
 
-  continuum-proxy:
-    build:
-      context: ./docker/faction-proxy
-      dockerfile: Dockerfile
-    container_name: malice-continuum
+  caddy:
+    image: caddy:2-alpine
+    container_name: malice-caddy
     restart: unless-stopped
     ports:
-      - "80:80"        # HTTP (malice.life)
-      - "22:22"        # SSH
-      - "23:23"        # Telnet
-    environment:
-      - GAME_HOST=172.20.0.10
-      - HTTP_PORT=8000
-      - WS_PORT=8080
-      - TELNET_PORT=5555
-      - SSH_PORT=5556
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
     depends_on:
       game:
         condition: service_healthy
     networks:
       malice-network:
-        ipv4_address: 172.20.0.100
-
-  cartel-proxy:
-    build:
-      context: ./docker/faction-proxy
-      dockerfile: Dockerfile
-    container_name: malice-cartel
-    restart: unless-stopped
-    ports:
-      - "81:80"        # HTTP (graycartel.com) - offset for local testing
-      - "2222:22"      # SSH - offset for local testing
-      - "2323:23"      # Telnet - offset for local testing
-    environment:
-      - GAME_HOST=172.20.0.10
-      - HTTP_PORT=8001
-      - WS_PORT=8081
-      - TELNET_PORT=5557
-      - SSH_PORT=5558
-    depends_on:
-      game:
-        condition: service_healthy
-    networks:
-      malice-network:
-        ipv4_address: 172.20.0.101
+        ipv4_address: 172.20.0.50
 
 volumes:
   mongodb_data:
     driver: local
   claude_sessions:
+    driver: local
+  caddy_data:
+    driver: local
+  caddy_config:
     driver: local
 
 networks:
