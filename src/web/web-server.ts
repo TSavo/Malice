@@ -1,12 +1,16 @@
 /**
- * Web Server for Malice
+ * Web Server for Malice (malice.world)
  *
- * A lightweight Fastify server that delegates all requests to MOO objects.
- * Content, templates, and routing logic all live in MongoDB as $webSite, $webPage, $webTemplate.
+ * A lightweight Fastify server that serves the $metaDomain (malice.world).
+ * Port 80 serves malice.world directly - no hostname-based routing.
  *
- * Routing order:
- * 1. Try new domain-based routing via $domainRegistry (tree-based, supports multi-domain)
- * 2. Fallback to legacy $webSite routing (single-site)
+ * Routes:
+ * - /admin/* - Admin setup wizard and MOO editor
+ * - /map/* - 3D world map visualization
+ * - /api/map/* - Map API endpoints
+ *
+ * Faction websites (thecontinuum.city, graycartel.com) are served
+ * via faction proxy containers on their own ports.
  *
  * This follows the same pattern as other transports:
  * - TypeScript handles the socket/HTTP infrastructure
@@ -177,18 +181,14 @@ export async function createWebServer(
     }
   });
 
-  // All requests route through domain tree, then route tree
+  // All requests route through $metaDomain (malice.world)
+  // Port 80 serves malice.world directly - no hostname-based routing
   app.all('*', async (request, reply) => {
     try {
-      // Extract hostname (strip port if present)
-      const hostname = (request.hostname || 'localhost')
-        .split(':')[0]
-        .toLowerCase();
-
       // Build meta object for handlers
       const auth = await authenticate(request);
       const meta = {
-        hostname,
+        hostname: 'malice.world',
         method: request.method,
         headers: Object.fromEntries(
           Object.entries(request.headers).filter(
@@ -201,15 +201,15 @@ export async function createWebServer(
         isAdmin: auth.isAdmin,
       };
 
-      // Try new domain-based routing first
-      const domainRegistry = manager.getAliases().get('domainRegistry');
+      // Route through $metaDomain (malice.world)
+      const metaDomain = manager.getAliases().get('metaDomain');
 
-      if (domainRegistry) {
-        // Use new tree-based domain/route resolution
-        const domainResult = (await domainRegistry.call(
+      if (metaDomain) {
+        // Use $metaDomain's route tree for all requests
+        const result = (await metaDomain.call(
           'handleRequest',
-          hostname,
           request.url,
+          request.method,
           meta,
         )) as {
           status?: number;
@@ -218,14 +218,13 @@ export async function createWebServer(
           headers?: Record<string, string>;
         } | null;
 
-        if (domainResult && domainResult.status !== 404) {
-          // Domain handled the request
+        if (result) {
           const {
             status = 200,
             contentType = 'text/html',
             body = '',
             headers = {},
-          } = domainResult;
+          } = result;
           for (const [key, value] of Object.entries(headers)) {
             reply.header(key, value);
           }
@@ -234,7 +233,7 @@ export async function createWebServer(
         }
       }
 
-      // Fallback to legacy $webSite routing
+      // Fallback to legacy $webSite routing (for backwards compatibility)
       const webSite = manager.getAliases().get('webSite');
 
       if (!webSite) {
@@ -307,7 +306,7 @@ export async function createWebServer(
 
   await app.listen({ port, host });
   console.log(
-    `🌐 Website: http://${host === '0.0.0.0' ? 'localhost' : host}:${port}`,
+    `🌐 malice.world: http://${host === '0.0.0.0' ? 'localhost' : host}:${port}`,
   );
 
   return app;
