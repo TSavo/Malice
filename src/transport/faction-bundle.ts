@@ -1,13 +1,12 @@
 /**
  * FactionBundle - Complete transport bundle for a single faction
  *
- * Wraps HTTP, WebSocket, Telnet, SSH, and Session MCP servers
+ * Wraps HTTP, WebSocket, and Session MCP servers
  * for a single faction, with unified connection stream.
  */
 
 import { Subject } from 'rxjs';
-import { map, takeUntil } from 'rxjs/operators';
-import type { AuthInfo } from '../../types/auth.js';
+import { takeUntil } from 'rxjs/operators';
 import type {
   FactionPorts,
   FactionTransportConfig,
@@ -16,9 +15,6 @@ import type { ObjectManager } from '../database/object-manager.js';
 import { Connection } from '../connection/connection.js';
 import { SessionMCPServer } from '../mcp/session-mcp-server.js';
 import { FactionWebServer } from '../web/faction-web-server.js';
-import { SSHServer } from './ssh/ssh-server.js';
-import { TelnetServer } from './telnet/telnet-server.js';
-import { TelnetTransport } from './telnet/telnet-transport.js';
 import { WebSocketServer } from './websocket/websocket-server.js';
 
 /**
@@ -33,12 +29,6 @@ export class FactionBundle {
   /** Allocated ports */
   public readonly ports: FactionPorts;
 
-  /** Telnet server */
-  private telnetServer: TelnetServer | null = null;
-
-  /** SSH server */
-  private sshServer: SSHServer | null = null;
-
   /** WebSocket server */
   private wsServer: WebSocketServer | null = null;
 
@@ -50,9 +40,6 @@ export class FactionBundle {
 
   /** Object manager for web server */
   private manager: ObjectManager | null = null;
-
-  /** SSH host key (generated or loaded from faction object) */
-  private sshHostKey: string | null = null;
 
   /** Merged connection stream from all transports */
   public readonly connection$ = new Subject<Connection>();
@@ -66,7 +53,6 @@ export class FactionBundle {
   constructor(config: FactionTransportConfig, manager?: ObjectManager) {
     this.config = config;
     this.ports = config.ports;
-    this.sshHostKey = config.sshHostKey || null;
     this.manager = manager || null;
   }
 
@@ -86,69 +72,6 @@ export class FactionBundle {
     if (debug) {
       console.log(
         `[FactionBundle:${this.config.name}] Starting transport bundle...`,
-      );
-    }
-
-    // Start Telnet server
-    this.telnetServer = new TelnetServer({
-      port: ports.telnet,
-      debug,
-      factionId: this.config.factionId,
-    });
-
-    // Wrap Telnet connections
-    this.telnetServer.connection$
-      .pipe(
-        takeUntil(this.destroyed$),
-        map((transport: TelnetTransport) => this.wrapConnection(transport)),
-      )
-      .subscribe({
-        next: (conn) => {
-          this.trackConnection(conn);
-          this.connection$.next(conn);
-        },
-      });
-
-    this.telnetServer.error$.pipe(takeUntil(this.destroyed$)).subscribe({
-      next: (err) => this.error$.next(err),
-    });
-
-    await this.telnetServer.listen();
-    if (debug) {
-      console.log(
-        `  📡 Telnet listening on port ${ports.telnet} for ${this.config.name}`,
-      );
-    }
-
-    // Start SSH server
-    this.sshServer = new SSHServer({
-      port: ports.ssh,
-      hostKey: this.sshHostKey || undefined,
-      debug,
-    });
-
-    // If SSH generated a key, store it
-    if (!this.sshHostKey) {
-      this.sshHostKey = this.sshServer.getHostKey();
-    }
-
-    // SSH already emits Connection objects, but we need to tag them
-    this.sshServer.connection$.pipe(takeUntil(this.destroyed$)).subscribe({
-      next: (conn) => {
-        this.tagConnection(conn);
-        this.trackConnection(conn);
-        this.connection$.next(conn);
-      },
-    });
-
-    this.sshServer.error$.pipe(takeUntil(this.destroyed$)).subscribe({
-      next: (err) => this.error$.next(err),
-    });
-
-    await this.sshServer.listen();
-    if (debug) {
-      console.log(
-        `  🔐 SSH listening on port ${ports.ssh} for ${this.config.name}`,
       );
     }
 
@@ -230,22 +153,6 @@ export class FactionBundle {
   }
 
   /**
-   * Wrap a transport in a Connection with faction-tagged AuthInfo
-   */
-  private wrapConnection(transport: TelnetTransport): Connection {
-    const authInfo: AuthInfo = {
-      mode: 'none',
-      metadata: {
-        remoteAddress: transport.remoteAddress,
-        protocol: 'telnet',
-        factionId: this.config.factionId,
-        factionName: this.config.name,
-      },
-    };
-    return new Connection(transport, authInfo);
-  }
-
-  /**
    * Tag an existing Connection with faction info
    */
   private tagConnection(conn: Connection): void {
@@ -267,13 +174,6 @@ export class FactionBundle {
   }
 
   /**
-   * Get the SSH host key (for storage in faction object)
-   */
-  getSSHHostKey(): string | null {
-    return this.sshHostKey;
-  }
-
-  /**
    * Get count of active connections
    */
   getConnectionCount(): number {
@@ -285,26 +185,6 @@ export class FactionBundle {
    */
   getConnections(): Connection[] {
     return Array.from(this.connections);
-  }
-
-  /**
-   * Set SSH key lookup callback
-   */
-  setSSHKeyLookup(lookup: (username: string) => Promise<string[] | null>): void {
-    if (this.sshServer) {
-      this.sshServer.keyLookup = lookup;
-    }
-  }
-
-  /**
-   * Set SSH password verify callback
-   */
-  setSSHPasswordVerify(
-    verify: (username: string, password: string) => Promise<boolean>,
-  ): void {
-    if (this.sshServer) {
-      this.sshServer.passwordVerify = verify;
-    }
   }
 
   /**
@@ -350,12 +230,6 @@ export class FactionBundle {
     // Close all servers
     const closePromises: Promise<void>[] = [];
 
-    if (this.telnetServer) {
-      closePromises.push(this.telnetServer.close());
-    }
-    if (this.sshServer) {
-      closePromises.push(this.sshServer.close());
-    }
     if (this.wsServer) {
       closePromises.push(this.wsServer.close());
     }

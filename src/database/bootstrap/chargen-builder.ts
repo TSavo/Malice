@@ -1366,6 +1366,87 @@ STARTING LOCATION: Immigration Services Entry Hall ($immigrationServices)`,
     );
 
     this.charGen.setMethod(
+      'continueNPCInterview',
+      `
+      /** Continue (or start) the NPC interview for a returning player.
+       *  Called when a player with chargenComplete=false reconnects.
+       *  Sets up routing and either resumes existing session or starts fresh.
+       *  @param context - Network ConnectionContext
+       *  @param player - The player RuntimeObject (already loaded)
+       */
+      const context = args[0];
+      const player = args[1];
+
+      console.log('[CharGen] continueNPCInterview for player #' + player.id);
+
+      // Set up routing - commands go to chargen interviewer via player.onInput
+      player._context = context;
+      context.setHandler(player);
+
+      // Store context reference for finishInterview
+      self._playerContexts = self._playerContexts || {};
+      self._playerContexts[player.id] = context;
+
+      // Mark as in-chargen (may already be set)
+      player.chargenInProgress = true;
+      player.chargenFaction = player.chargenFaction || 'continuum';
+
+      // Check if we have an existing AI session
+      if (player.chargenAgentSession) {
+        // Session exists - player is resuming mid-interview
+        console.log('[CharGen] Resuming existing session for player #' + player.id);
+        await player.tell('');
+        await player.tell('You wake up... the interview continues.');
+        await player.tell('');
+        // AI session is still there, just wait for player input
+        // The AI will pick up where it left off on next player message
+        await self.schedulePlayerTimeout(player.id);
+        return;
+      }
+
+      // No session - need to start fresh interview
+      console.log('[CharGen] Starting fresh interview for player #' + player.id);
+
+      // Immediate feedback
+      await player.tell('');
+      await player.tell('Your head throbs. Everything is hazy.');
+      await player.tell('You have trouble remembering how you got here...');
+      await player.tell('');
+      await player.tell("(OOC: Setting up your interview. This may take up to a minute.)");
+      await player.tell('');
+
+      // Start the autonomous AI with charGen context
+      console.log('[CharGen] Starting AI agent for player #' + player.id);
+      const kickoffPrompt = "A new candidate (Player #" + player.id + ") has arrived for processing. " +
+                            "Initiate Protocol 1-A: Secure room, manifest yourself, and conduct the interview.\\n\\n" +
+                            "CharGen System Context:\\n" + await $.charGen.describeForAI();
+
+      const systemPrompt = self.interviewerPrompt.replace(/\\\\{\\\\{playerId\\\\}\\\\}/g, String(player.id));
+      console.log('[CharGen] System prompt length:', systemPrompt?.length || 0);
+
+      $aiQuery(systemPrompt, kickoffPrompt, null).then(async (result) => {
+        console.log('[CharGen] AI agent completed first turn, session:', result.session?.substring(0, 20) + '...');
+        player.chargenAgentSession = result.session;
+
+        // Register session with $ai for persistence
+        if (result.session && $ai) {
+          await $ai.registerSession(result.session, player.id, player.name + ' (chargen)', 'chargen-session', 'interaction');
+        }
+
+        // Schedule timeout if still in chargen
+        const currentPlayer = await $load(player.id);
+        if (currentPlayer && currentPlayer.chargenInProgress) {
+          await self.schedulePlayerTimeout(player.id);
+        } else {
+          console.log('[CharGen] Chargen already complete, not scheduling timeout');
+        }
+      }).catch(err => {
+        console.error('[CharGen] AI Kickoff Error:', err?.message || err);
+      });
+    `,
+    );
+
+    this.charGen.setMethod(
       'registerForRecycle',
       `
       /** Register a temporary object for cleanup when interview finishes/fails.
@@ -1580,17 +1661,23 @@ STARTING LOCATION: Immigration Services Entry Hall ($immigrationServices)`,
         self.interviewState = state;
       }
 
-      // Disconnect the player
+      // Clear the AI session so they start fresh on reconnect
+      // Keep chargenComplete = false so they still need chargen
+      player.chargenAgentSession = null;
+      player.chargenInProgress = false;
+
+      // Remove stored context
+      if (self._playerContexts?.[playerId]) {
+        delete self._playerContexts[playerId];
+      }
+
+      // Disconnect the player (they can reconnect and start fresh)
       if (context) {
         context.close();
       }
 
-      // Recycle the incomplete player object
-      try {
-        await $.recycler.recycle(playerId);
-      } catch (e) {
-        // May already be recycled
-      }
+      // NOTE: We do NOT recycle the player - they registered on the website
+      // and can reconnect to try chargen again from the beginning
 
       return { success: true, playerId, reason };
     `,

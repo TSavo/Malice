@@ -116,7 +116,6 @@ $load(id)    // Load object by ID
 $create({parent, properties, methods})  // Create new object
 $query(criteria?)                       // Fluent query builder (see below)
 $aiQuery(system, prompt, session?)      // Query Claude AI with MCP tools
-$.telnet     // Native telnet session management (admin use)
 $<alias>     // Pre-resolved aliases: $room, $exit, $player, $recycler, $session, etc.
 ```
 
@@ -166,7 +165,7 @@ $query().inheritedFrom($item).limit(10).all()
 - `src/database/` - Object system core (`RuntimeObject`, `ObjectManager`, `ObjectCache`, `ObjectDatabase`)
 - `src/database/bootstrap/` - World/prototype builders run at startup
 - `src/transport/` - Transport servers and faction bundles
-  - `faction-bundle.ts` - Wraps Telnet+SSH+WebSocket for one faction
+  - `faction-bundle.ts` - Wraps HTTP+WebSocket+SessionMCP for one faction
   - `faction-transport-registry.ts` - Manages all faction bundles
 - `src/config/faction-ports.ts` - Port allocation logic for factions
 - `src/game/` - `GameCoordinator` (startup orchestration), `ConnectionContext` (player session)
@@ -186,11 +185,11 @@ $query().inheritedFrom($item).limit(10).all()
 **Per-Faction Transport Bundles:**
 Each faction gets its own isolated network infrastructure. Ports are calculated from faction index:
 
-| Faction | Index | HTTP | WebSocket | Telnet | SSH | Session MCP |
-|---------|-------|------|-----------|--------|-----|-------------|
-| Continuum | 0 | 8000 | 8080 | 5555 | 5556 | 3012 |
-| Gray Cartel | 1 | 8001 | 8081 | 5557 | 5558 | 3013 |
-| (new faction) | N | 8000+N | 8080+N | 5555+N×2 | 5556+N×2 | 3012+N |
+| Faction | Index | HTTP | WebSocket | Session MCP |
+|---------|-------|------|-----------|-------------|
+| Continuum | 0 | 8000 | 8080 | 3012 |
+| Gray Cartel | 1 | 8001 | 8081 | 3013 |
+| (new faction) | N | 8000+N | 8080+N | 3012+N |
 
 Factions are created dynamically via `$factionManager.create()` - see Faction System below.
 
@@ -263,12 +262,15 @@ ws.send(JSON.stringify({ ch: 'game', t: 'data', p: 'look' }));
 ws.send(JSON.stringify({ ch: 'ctrl', t: 'data', p: { type: 'resize', w: 80, h: 24 } }));
 ```
 
-### Raw vs Multiplexed
+### WebSocket Protocol
 
-| Path | Format | Use Case |
-|------|--------|----------|
-| `/` | Raw text | Simple telnet-like clients |
-| `/mux` | JSON envelopes | Rich web clients with channels |
+All WebSocket connections use the multiplexed JSON envelope format. Clients connect with HTTP Basic Auth or token authentication:
+
+```javascript
+const ws = new WebSocket('wss://malice.life:8080/', {
+  headers: { 'Authorization': 'Basic ' + btoa(username + ':' + password) }
+});
+```
 
 ## Code Style
 
@@ -627,7 +629,7 @@ The server provides 3D map visualization at:
 
 ## Faction System
 
-Factions are organizations with isolated network infrastructure. Each faction gets its own transport bundle (HTTP, WebSocket, Telnet, SSH, Session MCP).
+Factions are organizations with isolated network infrastructure. Each faction gets its own transport bundle (HTTP, WebSocket, Session MCP).
 
 ### Key Objects
 
@@ -653,9 +655,9 @@ const faction = await $factionManager.create({
 
 // Transports are automatically started
 console.log(faction.ports);
-// { http: 8002, ws: 8082, telnet: 5559, ssh: 5560, sessionMcp: 3014 }
+// { http: 8002, ws: 8082, sessionMcp: 3014 }
 
-// Players can now connect via telnet localhost 5559
+// Players register on faction website, then connect via WebSocket with auth
 ```
 
 ### Destroying Factions
@@ -719,10 +721,8 @@ Each faction's transport bundle includes:
 
 | Transport | Purpose |
 |-----------|---------|
-| HTTP | Web server for landing page, /play, domain content |
-| WebSocket | /mux multiplexed channels for web clients |
-| Telnet | Terminal client connections |
-| SSH | Secure terminal with key auth |
-| Session MCP | Player-scoped MCP access |
+| HTTP | Web server for landing page, /register, /play, domain content |
+| WebSocket | Authenticated connections with /mux multiplexed channels |
+| Session MCP | Player-scoped MCP access for AI-driven clients |
 
-All transports tag connections with `factionId` for routing to the correct character generation flow.
+All transports require authentication. Players must first register via `POST /register` on the faction's HTTP server, then connect via WebSocket or Session MCP with their credentials. Connections are tagged with `factionId` for routing to the correct character generation flow.

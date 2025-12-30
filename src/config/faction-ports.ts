@@ -6,13 +6,11 @@ import type { FactionPorts } from '../../types/transport.js';
  * Each faction gets a unique set of ports based on its index:
  * - HTTP:       8000 + index
  * - WebSocket:  8080 + index
- * - Telnet:     5555 + (index * 2)
- * - SSH:        5556 + (index * 2)
  * - SessionMCP: 3012 + index
  *
  * Default factions:
- *   Continuum (index 0): HTTP 8000, WS 8080, Telnet 5555, SSH 5556, SessionMCP 3012
- *   Cartel (index 1):    HTTP 8001, WS 8081, Telnet 5557, SSH 5558, SessionMCP 3013
+ *   Continuum (index 0): HTTP 8000, WS 8080, SessionMCP 3012
+ *   Cartel (index 1):    HTTP 8001, WS 8081, SessionMCP 3013
  *
  * Static infrastructure (not per-faction):
  *   MCP:      3010
@@ -25,12 +23,6 @@ export const HTTP_BASE_PORT = 8000;
 
 /** Base port for WebSocket servers */
 export const WS_BASE_PORT = 8080;
-
-/** Base port for Telnet servers */
-export const TELNET_BASE_PORT = 5555;
-
-/** Base port for SSH servers (TELNET_BASE_PORT + 1) */
-export const SSH_BASE_PORT = 5556;
 
 /** Base port for Session MCP servers */
 export const SESSION_MCP_BASE_PORT = 3012;
@@ -53,8 +45,6 @@ export function calculateFactionPorts(index: number): FactionPorts {
   return {
     http: HTTP_BASE_PORT + index,
     ws: WS_BASE_PORT + index,
-    telnet: TELNET_BASE_PORT + index * 2,
-    ssh: SSH_BASE_PORT + index * 2,
     sessionMcp: SESSION_MCP_BASE_PORT + index,
   };
 }
@@ -68,7 +58,6 @@ export function isFactionPort(port: number): boolean {
   // Check each range (assuming max ~100 factions)
   if (port >= HTTP_BASE_PORT && port < HTTP_BASE_PORT + 100) return true;
   if (port >= WS_BASE_PORT && port < WS_BASE_PORT + 100) return true;
-  if (port >= TELNET_BASE_PORT && port < TELNET_BASE_PORT + 200) return true;
   if (port >= SESSION_MCP_BASE_PORT && port < SESSION_MCP_BASE_PORT + 100)
     return true;
   return false;
@@ -97,8 +86,6 @@ export function getAllFactionPorts(factionCount: number): number[] {
     ports.push(
       factionPorts.http,
       factionPorts.ws,
-      factionPorts.telnet,
-      factionPorts.ssh,
       factionPorts.sessionMcp,
     );
   }

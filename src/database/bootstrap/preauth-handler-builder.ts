@@ -200,8 +200,38 @@ export class PreAuthHandlerBuilder {
             return;
           }
 
-          // Authenticate and connect
+          // Authenticate the connection
           context.authenticate(player.id);
+
+          // Check if chargen needs to be completed
+          if (!player.chargenComplete) {
+            context.send('Welcome! Let\\'s complete your character creation...\\\\r\\\\n\\\\r\\\\n');
+
+            // Get faction-specific chargen based on player's factionId
+            let charGen = $.charGen;  // Default (Continuum)
+            let factionName = 'continuum';
+
+            if (player.factionId) {
+              const faction = await $factionManager.get(player.factionId);
+              if (faction && faction.charGen) {
+                charGen = faction.charGen;
+                factionName = (faction.name || 'unknown').toLowerCase();
+              }
+            }
+
+            // Set up routing to chargen
+            context.setHandler(player);
+            charGen._playerContexts = charGen._playerContexts || {};
+            charGen._playerContexts[player.id] = context;
+            player.chargenInProgress = true;
+            player.chargenFaction = factionName;
+
+            // Continue (or start) the NPC interview
+            await charGen.continueNPCInterview(context, player);
+            return;
+          }
+
+          // Chargen complete - connect normally
           await player.connect(context);
         `,
     );
@@ -325,8 +355,38 @@ export class PreAuthHandlerBuilder {
             return;
           }
 
-          // Authenticate and connect (silent - no banner for web clients)
+          // Authenticate the connection
           context.authenticate(player.id);
+
+          // Check if chargen needs to be completed
+          if (!player.chargenComplete) {
+            context.send('Welcome! Let\\'s complete your character creation...\\\\r\\\\n\\\\r\\\\n');
+
+            // Get faction-specific chargen based on player's factionId
+            let charGen = $.charGen;  // Default (Continuum)
+            let factionName = 'continuum';
+
+            if (player.factionId) {
+              const faction = await $factionManager.get(player.factionId);
+              if (faction && faction.charGen) {
+                charGen = faction.charGen;
+                factionName = (faction.name || 'unknown').toLowerCase();
+              }
+            }
+
+            // Set up routing to chargen
+            context.setHandler(player);
+            charGen._playerContexts = charGen._playerContexts || {};
+            charGen._playerContexts[player.id] = context;
+            player.chargenInProgress = true;
+            player.chargenFaction = factionName;
+
+            // Continue (or start) the NPC interview
+            await charGen.continueNPCInterview(context, player);
+            return;
+          }
+
+          // Chargen complete - connect (silent - no banner for web clients)
           await player.connect(context);
         `,
     );

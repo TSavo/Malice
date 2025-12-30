@@ -3,7 +3,7 @@ import type { Observable, Subject } from 'rxjs';
 /**
  * Type of transport protocol
  */
-export type TransportType = 'telnet' | 'websocket' | 'websocket-mux' | 'ssh' | 'polling-mux';
+export type TransportType = 'websocket-mux' | 'polling-mux';
 
 /**
  * Terminal capabilities
@@ -87,10 +87,6 @@ export interface FactionPorts {
   http: number;
   /** WebSocket server port */
   ws: number;
-  /** Telnet server port */
-  telnet: number;
-  /** SSH server port */
-  ssh: number;
   /** Session MCP server port */
   sessionMcp: number;
 }
@@ -107,8 +103,6 @@ export interface FactionTransportConfig {
   domain?: string;
   /** Allocated ports */
   ports: FactionPorts;
-  /** Per-faction SSH host key (PEM format) */
-  sshHostKey?: string;
   /** Enable debug logging */
   debug?: boolean;
 }

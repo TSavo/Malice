@@ -39,8 +39,6 @@ export interface CreateFactionOptions {
   index?: number;
   /** Pre-allocated ports (calculated from index if not provided) */
   ports?: FactionPorts;
-  /** Per-faction SSH host key (generated if not provided) */
-  sshHostKey?: string;
   /** Enable debug logging */
   debug?: boolean;
 }
@@ -66,12 +64,6 @@ export class FactionTransportRegistry {
   /** Object manager for HTTP server integration */
   private manager: ObjectManager | null = null;
 
-  /** SSH key lookup callback (set by game coordinator) */
-  private sshKeyLookup: ((username: string) => Promise<string[] | null>) | null = null;
-
-  /** SSH password verify callback (set by game coordinator) */
-  private sshPasswordVerify: ((username: string, password: string) => Promise<boolean>) | null = null;
-
   constructor(options?: { debug?: boolean; manager?: ObjectManager }) {
     this.debug = options?.debug ?? false;
     this.manager = options?.manager ?? null;
@@ -89,33 +81,11 @@ export class FactionTransportRegistry {
   }
 
   /**
-   * Set SSH key lookup callback for all SSH servers
-   */
-  setSSHKeyLookup(lookup: (username: string) => Promise<string[] | null>): void {
-    this.sshKeyLookup = lookup;
-    // Apply to existing bundles
-    for (const bundle of this.bundles.values()) {
-      bundle.setSSHKeyLookup(lookup);
-    }
-  }
-
-  /**
-   * Set SSH password verify callback for all SSH servers
-   */
-  setSSHPasswordVerify(verify: (username: string, password: string) => Promise<boolean>): void {
-    this.sshPasswordVerify = verify;
-    // Apply to existing bundles
-    for (const bundle of this.bundles.values()) {
-      bundle.setSSHPasswordVerify(verify);
-    }
-  }
-
-  /**
    * Create a transport bundle for a faction
    * @returns The allocated ports
    */
   async create(options: CreateFactionOptions): Promise<FactionPorts> {
-    const { factionId, name, domain, sshHostKey, debug } = options;
+    const { factionId, name, domain, debug } = options;
 
     // Check if already exists
     if (this.bundles.has(factionId)) {
@@ -130,7 +100,7 @@ export class FactionTransportRegistry {
 
     if (this.debug || debug) {
       console.log(`[FactionRegistry] Creating transport bundle for ${name} (#${factionId})`);
-      console.log(`  Ports: HTTP ${ports.http}, WS ${ports.ws}, Telnet ${ports.telnet}, SSH ${ports.ssh}`);
+      console.log(`  Ports: HTTP ${ports.http}, WS ${ports.ws}, SessionMCP ${ports.sessionMcp}`);
     }
 
     // Create bundle config
@@ -139,20 +109,11 @@ export class FactionTransportRegistry {
       name,
       domain,
       ports,
-      sshHostKey,
       debug: this.debug || debug,
     };
 
     // Create and start bundle (pass manager for HTTP server)
     const bundle = new FactionBundle(config, this.manager ?? undefined);
-
-    // Apply SSH callbacks if set
-    if (this.sshKeyLookup) {
-      bundle.setSSHKeyLookup(this.sshKeyLookup);
-    }
-    if (this.sshPasswordVerify) {
-      bundle.setSSHPasswordVerify(this.sshPasswordVerify);
-    }
 
     // Forward connections to merged stream
     bundle.connection$.pipe(takeUntil(this.destroyed$)).subscribe({
@@ -214,14 +175,6 @@ export class FactionTransportRegistry {
       connectionCount: bundle.getConnectionCount(),
       online: true,
     };
-  }
-
-  /**
-   * Get SSH host key for a faction (for storing in faction object)
-   */
-  getSSHHostKey(factionId: number): string | null {
-    const bundle = this.bundles.get(factionId);
-    return bundle?.getSSHHostKey() ?? null;
   }
 
   /**
