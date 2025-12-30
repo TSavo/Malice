@@ -143,7 +143,7 @@ function showLoginForm() {
             color: #6699ff;
             font-size: 14px;
             text-decoration: none;
-          ">Create new character</a>
+          ">Create new account</a>
         </div>
       </div>
     </div>
@@ -180,10 +180,179 @@ function showLoginForm() {
     }
   };
 
-  // Create new character - skip to terminal flow
+  // Create new account - show registration form
   document.getElementById('create-link').onclick = (e) => {
     e.preventDefault();
-    window.location.href = '/play?new=1';
+    showRegisterForm();
+  };
+}
+
+/**
+ * Show registration form for creating new account
+ */
+function showRegisterForm() {
+  document.body.innerHTML = \\\`
+    <div style="
+      min-height: 100vh;
+      background: #0a0a0a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: system-ui, -apple-system, sans-serif;
+    ">
+      <div style="
+        background: #141414;
+        border: 1px solid #333;
+        border-radius: 12px;
+        padding: 48px;
+        width: 100%;
+        max-width: 400px;
+        box-shadow: 0 16px 64px rgba(0,0,0,0.5);
+      ">
+        <h1 style="
+          color: #00ff88;
+          font-size: 32px;
+          margin: 0 0 8px 0;
+          font-weight: 700;
+        ">Register</h1>
+        <p style="
+          color: #888;
+          margin: 0 0 32px 0;
+          font-size: 14px;
+        ">Create your account to enter Seattle</p>
+
+        <form id="register-form">
+          <input type="text" name="username" placeholder="Username" required style="
+            width: 100%;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            background: #0a0a0a;
+            border: 1px solid #333;
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-size: 16px;
+            box-sizing: border-box;
+            outline: none;
+          " onfocus="this.style.borderColor='#00ff88'" onblur="this.style.borderColor='#333'" pattern="[a-zA-Z][a-zA-Z0-9_]{2,15}" title="3-16 characters, start with letter, letters/numbers/underscore only">
+
+          <input type="password" name="password" placeholder="Password (min 6 chars)" required minlength="6" style="
+            width: 100%;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            background: #0a0a0a;
+            border: 1px solid #333;
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-size: 16px;
+            box-sizing: border-box;
+            outline: none;
+          " onfocus="this.style.borderColor='#00ff88'" onblur="this.style.borderColor='#333'">
+
+          <input type="password" name="confirmPassword" placeholder="Confirm Password" required style="
+            width: 100%;
+            padding: 12px 16px;
+            margin-bottom: 24px;
+            background: #0a0a0a;
+            border: 1px solid #333;
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-size: 16px;
+            box-sizing: border-box;
+            outline: none;
+          " onfocus="this.style.borderColor='#00ff88'" onblur="this.style.borderColor='#333'">
+
+          <button type="submit" style="
+            width: 100%;
+            padding: 12px 24px;
+            background: #00ff88;
+            color: #0a0a0a;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+          " onmouseover="this.style.background='#00cc6a'" onmouseout="this.style.background='#00ff88'">Create Account</button>
+        </form>
+
+        <div id="error" style="
+          color: #ff6666;
+          margin-top: 16px;
+          font-size: 14px;
+          text-align: center;
+        "></div>
+
+        <div id="success" style="
+          color: #00ff88;
+          margin-top: 16px;
+          font-size: 14px;
+          text-align: center;
+          display: none;
+        "></div>
+
+        <div style="
+          margin-top: 32px;
+          padding-top: 24px;
+          border-top: 1px solid #333;
+          text-align: center;
+        ">
+          <a href="#" id="login-link" style="
+            color: #6699ff;
+            font-size: 14px;
+            text-decoration: none;
+          ">Already have an account? Login</a>
+        </div>
+      </div>
+    </div>
+  \\\`;
+
+  // Register form handler
+  document.getElementById('register-form').onsubmit = async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const errorDiv = document.getElementById('error');
+    const successDiv = document.getElementById('success');
+    errorDiv.textContent = '';
+    successDiv.style.display = 'none';
+
+    // Validate passwords match
+    if (form.password.value !== form.confirmPassword.value) {
+      errorDiv.textContent = 'Passwords do not match';
+      return;
+    }
+
+    try {
+      const resp = await fetch('/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: form.username.value,
+          password: form.password.value
+        })
+      });
+
+      const data = await resp.json().catch(() => ({}));
+
+      if (!resp.ok) {
+        errorDiv.textContent = data.error || 'Registration failed';
+        return;
+      }
+
+      // Success - show message and redirect to login
+      successDiv.textContent = 'Account created! Redirecting to login...';
+      successDiv.style.display = 'block';
+
+      setTimeout(() => {
+        showLoginForm();
+      }, 1500);
+    } catch (err) {
+      errorDiv.textContent = 'Connection error. Please try again.';
+    }
+  };
+
+  // Back to login link
+  document.getElementById('login-link').onclick = (e) => {
+    e.preventDefault();
+    showLoginForm();
   };
 }
 
@@ -285,15 +454,21 @@ async function initDesktop(token) {
 function main() {
   const urlParams = new URLSearchParams(window.location.search);
   const token = urlParams.get('token');
-  const isNew = urlParams.get('new');
+  const showReg = urlParams.get('register');
 
-  if (!token && !isNew) {
+  if (showReg) {
+    // Direct to registration form
+    showRegisterForm();
+    return;
+  }
+
+  if (!token) {
     // No auth - show login form
     showLoginForm();
     return;
   }
 
-  // Have token or new char flow - proceed with desktop
+  // Have token - proceed with desktop
   initDesktop(token);
 }
 

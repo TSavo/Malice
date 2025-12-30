@@ -5,11 +5,10 @@ import type { AuthInfo } from '../../../types/auth.js';
 import type { TransportServerConfig } from '../../../types/transport.js';
 import { Connection } from '../../connection/connection.js';
 import { MultiplexedTransport } from '../multiplexed/multiplexed-transport.js';
-import { WebSocketTransport } from './websocket-transport.js';
 
 /**
  * WebSocket server
- * Creates WebSocketTransport instances for incoming connections
+ * All connections use MultiplexedTransport for channel-based communication
  */
 export class WebSocketServer {
   private server: WSServer;
@@ -57,30 +56,26 @@ export class WebSocketServer {
 
   /**
    * Handle new WebSocket connection
-   * Extracts HTTP Basic Auth from headers if present
-   * Extracts token from URL query params if present
-   * Routes to MultiplexedTransport for /ws/mux paths
+   * Requires authentication via HTTP Basic Auth or token
+   * All connections use MultiplexedTransport for channel-based communication
    */
   private handleConnection(ws: WebSocket, req: IncomingMessage): void {
     const remoteAddress = req.socket.remoteAddress || 'unknown';
     const url = req.url || '/';
-    const isMultiplexed = url.startsWith('/mux') || url.startsWith('/ws/mux');
 
     if (this.config.debug) {
       console.log(
-        `[WebSocketServer] New ${isMultiplexed ? 'multiplexed ' : ''}connection from ${remoteAddress} (${url})`,
+        `[WebSocketServer] New connection from ${remoteAddress} (${url})`,
       );
     }
 
     // Extract auth info from various sources
     let authInfo: AuthInfo | null = null;
 
-    // Check for token and mode in URL query params
-    let chargenMode: string | null = null;
+    // Check for token in URL query params
     try {
       const urlObj = new URL(url, 'http://localhost');
       const token = urlObj.searchParams.get('token');
-      chargenMode = urlObj.searchParams.get('mode'); // 'cartel' for Cartel chargen
 
       if (token) {
         authInfo = {
@@ -89,8 +84,7 @@ export class WebSocketServer {
           metadata: {
             remoteAddress,
             userAgent: req.headers['user-agent'],
-            protocol: isMultiplexed ? 'websocket-mux' : 'websocket',
-            chargenMode: chargenMode || undefined,
+            protocol: 'websocket-mux',
           },
         };
 
@@ -120,8 +114,7 @@ export class WebSocketServer {
             metadata: {
               remoteAddress,
               userAgent: req.headers['user-agent'],
-              protocol: isMultiplexed ? 'websocket-mux' : 'websocket',
-              chargenMode: chargenMode || undefined,
+              protocol: 'websocket-mux',
             },
           };
 
@@ -134,29 +127,19 @@ export class WebSocketServer {
       }
     }
 
-    // If we have a chargenMode but no auth info, create minimal auth info to carry it
-    // Use mode: 'none' so normal pre-auth flow runs, but chargenMode in metadata
-    // routes new character creation to the appropriate chargen (e.g., cartel)
-    if (!authInfo && chargenMode) {
-      authInfo = {
-        mode: 'none',
-        metadata: {
-          remoteAddress,
-          userAgent: req.headers['user-agent'],
-          protocol: isMultiplexed ? 'websocket-mux' : 'websocket',
-          chargenMode,
-        },
-      };
-
+    // REQUIRE authentication - reject unauthenticated connections
+    if (!authInfo) {
       if (this.config.debug) {
-        console.log(`[WebSocketServer] ChargenMode detected: ${chargenMode}`);
+        console.log(
+          `[WebSocketServer] Rejecting unauthenticated connection from ${remoteAddress}`,
+        );
       }
+      ws.close(4001, 'Authentication required');
+      return;
     }
 
-    // Create transport based on path
-    const transport = isMultiplexed
-      ? new MultiplexedTransport(ws, remoteAddress)
-      : new WebSocketTransport(ws, remoteAddress);
+    // All connections use MultiplexedTransport
+    const transport = new MultiplexedTransport(ws, remoteAddress);
 
     const connection = new Connection(transport, authInfo);
 

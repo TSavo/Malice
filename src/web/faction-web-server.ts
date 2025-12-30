@@ -12,6 +12,7 @@
 
 import Fastify, { type FastifyInstance } from 'fastify';
 import type { ObjectManager } from '../database/object-manager.js';
+import type { RuntimeObjectImpl } from '../database/runtime-object.js';
 
 export interface FactionWebServerConfig {
   port: number;
@@ -58,6 +59,117 @@ export class FactionWebServer {
         done(null, body as string);
       },
     );
+
+    // POST /register - Create new player account for this faction
+    this.app.post('/register', async (request, reply) => {
+      try {
+        const body = request.body as { username?: string; password?: string };
+
+        // Validate request body
+        if (!body || typeof body !== 'object') {
+          return reply.code(400).send({
+            success: false,
+            error: 'Invalid request body',
+          });
+        }
+
+        const { username, password } = body;
+
+        // Validate username: 3-16 chars, starts with letter, alphanumeric + underscore, lowercase
+        if (!username || typeof username !== 'string') {
+          return reply.code(400).send({
+            success: false,
+            error: 'Username is required',
+          });
+        }
+
+        const usernameLower = username.toLowerCase();
+        if (!/^[a-z][a-z0-9_]{2,15}$/.test(usernameLower)) {
+          return reply.code(400).send({
+            success: false,
+            error:
+              'Username must be 3-16 characters, start with a letter, and contain only letters, numbers, and underscores',
+          });
+        }
+
+        // Validate password: min 6 chars
+        if (!password || typeof password !== 'string') {
+          return reply.code(400).send({
+            success: false,
+            error: 'Password is required',
+          });
+        }
+
+        if (password.length < 6) {
+          return reply.code(400).send({
+            success: false,
+            error: 'Password must be at least 6 characters',
+          });
+        }
+
+        // Check uniqueness - no existing player with this playername
+        const existingPlayer = this.manager
+          .query()
+          .prop('playername')
+          .equals(usernameLower)
+          .first();
+        if (existingPlayer) {
+          return reply.code(409).send({
+            success: false,
+            error: 'Username already exists',
+          });
+        }
+
+        // Get $recycler and $player prototype
+        const recycler = this.manager.getAliases().get('recycler');
+        const playerProto = this.manager.getAliases().get('player');
+
+        if (!recycler || !playerProto) {
+          console.error(
+            `[FactionWeb:${this.config.factionName}] Missing $recycler or $player`,
+          );
+          return reply.code(500).send({
+            success: false,
+            error: 'Server configuration error',
+          });
+        }
+
+        // Create player via $recycler
+        const newPlayer = (await recycler.call('create', playerProto, {
+          name: usernameLower, // Display name
+          playername: usernameLower, // Login name
+          chargenComplete: false, // Needs to complete in-game chargen
+          factionId: this.config.factionId, // Ties to this faction
+        })) as RuntimeObjectImpl;
+
+        // Set password (uses bcrypt hashing)
+        await newPlayer.call('setPassword', password);
+
+        if (debug) {
+          console.log(
+            `[FactionWeb:${this.config.factionName}] Created player ${usernameLower} (#${newPlayer.id}) for faction ${this.config.factionId}`,
+          );
+        }
+
+        return reply.code(201).send({
+          success: true,
+          playerId: newPlayer.id,
+          message: `Account created. Connect to complete character creation.`,
+        });
+      } catch (error) {
+        console.error(
+          `[FactionWeb:${this.config.factionName}] Registration error:`,
+          error,
+        );
+        return reply.code(500).send({
+          success: false,
+          error:
+            error instanceof Error
+              ? error.message
+              : 'Registration failed',
+        });
+      }
+    });
 
     // All requests route through the faction's domain
     this.app.all('*', async (request, reply) => {

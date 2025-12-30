@@ -359,22 +359,30 @@ export class MinimalBootstrap {
           return;
         }
 
-        if (authInfo === null) {
-          // Mode 1: Interactive authentication
-          context.setHandler(authManager);
-          await authManager.onConnect(context);
-        } else {
-          // Mode 2: Pre-authenticated (SSL cert, HTTP auth, etc.)
-          const preAuth = await $.preAuthHandler;
-          if (!preAuth) {
-            context.send('Pre-authentication not available.\\r\\n');
-            context.close();
-            return;
-          }
-
-          context.setHandler(preAuth);
-          await preAuth.onPreAuth(context, authInfo);
+        // REQUIRE authentication - no anonymous connections
+        if (!authInfo || authInfo.mode === 'none') {
+          context.send('\\r\\n');
+          context.send('═══════════════════════════════════════════════════════════\\r\\n');
+          context.send('  MALICE - Authentication Required\\r\\n');
+          context.send('═══════════════════════════════════════════════════════════\\r\\n');
+          context.send('\\r\\n');
+          context.send('You must create an account on a faction website first.\\r\\n');
+          context.send('Then connect using your username and password.\\r\\n');
+          context.send('\\r\\n');
+          context.close();
+          return;
         }
+
+        // Route authenticated connections to PreAuthHandler
+        const preAuth = await $.preAuthHandler;
+        if (!preAuth) {
+          context.send('Pre-authentication not available.\\r\\n');
+          context.close();
+          return;
+        }
+
+        context.setHandler(preAuth);
+        await preAuth.onPreAuth(context, authInfo);
       `,
       );
       console.log(`✅ Created System object #${system.id}`);

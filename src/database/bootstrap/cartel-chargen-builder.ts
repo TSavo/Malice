@@ -634,6 +634,83 @@ CURRENCY: Cash (50 starting)`,
     `,
     );
 
+    this.cartelCharGen.setMethod(
+      'continueNPCInterview',
+      `
+      /** Continue (or start) the Ghost interview for a returning Cartel player.
+       *  Called when a player with chargenComplete=false reconnects.
+       *  Sets up routing and either resumes existing session or starts fresh.
+       *  @param context - Network ConnectionContext
+       *  @param player - The player RuntimeObject (already loaded)
+       */
+      const context = args[0];
+      const player = args[1];
+
+      console.log('[CartelCharGen] continueNPCInterview for player #' + player.id);
+
+      // Set up routing - commands go to chargen interviewer via player.onInput
+      player._context = context;
+      context.setHandler(player);
+
+      // Store context reference for finishInterview
+      self._playerContexts = self._playerContexts || {};
+      self._playerContexts[player.id] = context;
+
+      // Mark as in-chargen (may already be set)
+      player.chargenInProgress = true;
+      player.chargenFaction = player.chargenFaction || 'cartel';
+
+      // Check if we have an existing AI session
+      if (player.chargenAgentSession) {
+        // Session exists - player is resuming mid-interview
+        console.log('[CartelCharGen] Resuming existing session for player #' + player.id);
+        await player.tell('');
+        await player.tell('The voices return... you drift back to consciousness.');
+        await player.tell('');
+        // AI session is still there, just wait for player input
+        await self.schedulePlayerTimeout(player.id);
+        return;
+      }
+
+      // No session - need to start fresh interview
+      console.log('[CartelCharGen] Starting fresh interview for player #' + player.id);
+
+      // Immediate feedback
+      await player.tell('');
+      await player.tell('Voices. Muffled. Getting closer.');
+      await player.tell('');
+      await player.tell('(OOC: Setting up your interview. This may take up to a minute.)');
+      await player.tell('');
+
+      // Start the Ghost AI
+      console.log('[CartelCharGen] Starting Ghost AI for player #' + player.id);
+
+      const kickoffPrompt = "A new candidate (Player #" + player.id + ") has arrived for vetting. " +
+                            "Initiate the assessment: secure location, manifest yourself, conduct the interview, administer the test.\\n\\n" +
+                            "CartelCharGen System Context:\\n" + await $.cartelCharGen.describeForAI();
+
+      const systemPrompt = self.ghostInterviewerPrompt.replace(/\\{\\{playerId\\}\\}/g, String(player.id));
+
+      $aiQuery(systemPrompt, kickoffPrompt, null).then(async (result) => {
+        console.log('[CartelCharGen] Ghost AI completed first turn, session:', result.session?.substring(0, 20) + '...');
+        player.chargenAgentSession = result.session;
+
+        // Register session with $ai for persistence
+        if (result.session && $ai) {
+          await $ai.registerSession(result.session, player.id, player.name + ' (cartel-chargen)', 'cartel-chargen-session', 'interaction');
+        }
+
+        // Schedule timeout if still in chargen
+        const currentPlayer = await $load(player.id);
+        if (currentPlayer && currentPlayer.chargenInProgress) {
+          await self.schedulePlayerTimeout(player.id);
+        }
+      }).catch(err => {
+        console.error('[CartelCharGen] Ghost Kickoff Error:', err?.message || err);
+      });
+    `,
+    );
+
     // ════════════════════════════════════════════════════════════════════════
     // CLEANUP AND TIMEOUT METHODS
     // ════════════════════════════════════════════════════════════════════════
@@ -818,15 +895,23 @@ CURRENCY: Cash (50 starting)`,
         self.interviewState = state;
       }
 
-      // Disconnect
+      // Clear the AI session so they start fresh on reconnect
+      // Keep chargenComplete = false so they still need chargen
+      player.chargenAgentSession = null;
+      player.chargenInProgress = false;
+
+      // Remove stored context
+      if (self._playerContexts?.[playerId]) {
+        delete self._playerContexts[playerId];
+      }
+
+      // Disconnect (they can reconnect and start fresh)
       if (context) {
         context.close();
       }
 
-      // Recycle player
-      try {
-        await $.recycler.recycle(playerId);
-      } catch (e) {}
+      // NOTE: We do NOT recycle the player - they registered on the website
+      // and can reconnect to try chargen again from the beginning
 
       return { success: true, playerId, reason };
     `,
