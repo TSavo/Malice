@@ -14,6 +14,7 @@ import type {
 } from '../../types/transport.js';
 import type { ObjectManager } from '../database/object-manager.js';
 import { Connection } from '../connection/connection.js';
+import { SessionMCPServer } from '../mcp/session-mcp-server.js';
 import { FactionWebServer } from '../web/faction-web-server.js';
 import { SSHServer } from './ssh/ssh-server.js';
 import { TelnetServer } from './telnet/telnet-server.js';
@@ -44,8 +45,8 @@ export class FactionBundle {
   /** HTTP server (per-faction web server) */
   private httpServer: FactionWebServer | null = null;
 
-  /** Session MCP server (placeholder - integration TBD) */
-  // private sessionMcpServer: SessionMCPServer | null = null;
+  /** Session MCP server */
+  private sessionMcpServer: SessionMCPServer | null = null;
 
   /** Object manager for web server */
   private manager: ObjectManager | null = null;
@@ -193,7 +194,33 @@ export class FactionBundle {
       );
     }
 
-    // TODO: Start Session MCP server
+    // Start Session MCP server if manager is available
+    if (this.manager) {
+      this.sessionMcpServer = new SessionMCPServer(this.manager, {
+        port: ports.sessionMcp,
+        host: '127.0.0.1',
+        factionId: this.config.factionId,
+        factionName: this.config.name,
+      });
+
+      // Session MCP emits Connection objects like other transports
+      this.sessionMcpServer.connection$
+        .pipe(takeUntil(this.destroyed$))
+        .subscribe({
+          next: (conn) => {
+            this.tagConnection(conn);
+            this.trackConnection(conn);
+            this.connection$.next(conn);
+          },
+        });
+
+      await this.sessionMcpServer.start();
+      if (debug) {
+        console.log(
+          `  🔌 Session MCP listening on port ${ports.sessionMcp} for ${this.config.name}`,
+        );
+      }
+    }
 
     if (debug) {
       console.log(
@@ -334,6 +361,9 @@ export class FactionBundle {
     }
     if (this.httpServer) {
       closePromises.push(this.httpServer.close());
+    }
+    if (this.sessionMcpServer) {
+      closePromises.push(this.sessionMcpServer.stop());
     }
 
     await Promise.all(closePromises);
