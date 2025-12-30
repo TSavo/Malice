@@ -166,13 +166,18 @@ function showLoginForm() {
         })
       });
 
+      const data = await resp.json().catch(() => ({}));
+
       if (!resp.ok) {
-        const data = await resp.json().catch(() => ({}));
-        errorDiv.textContent = data.error || 'Invalid credentials';
+        if (data.needsVerification) {
+          errorDiv.innerHTML = data.error + '<br><small style="color:#888;">Check ' + data.email + ' for verification link</small>';
+        } else {
+          errorDiv.textContent = data.error || 'Invalid credentials';
+        }
         return;
       }
 
-      const { token } = await resp.json();
+      const { token } = data;
       // Redirect with token - will auto-authenticate
       window.location.href = '/play?token=' + token;
     } catch (err) {
@@ -234,6 +239,19 @@ function showRegisterForm() {
             box-sizing: border-box;
             outline: none;
           " onfocus="this.style.borderColor='#00ff88'" onblur="this.style.borderColor='#333'" pattern="[a-zA-Z][a-zA-Z0-9_]{2,15}" title="3-16 characters, start with letter, letters/numbers/underscore only">
+
+          <input type="email" name="email" placeholder="Email address" required style="
+            width: 100%;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            background: #0a0a0a;
+            border: 1px solid #333;
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-size: 16px;
+            box-sizing: border-box;
+            outline: none;
+          " onfocus="this.style.borderColor='#00ff88'" onblur="this.style.borderColor='#333'">
 
           <input type="password" name="password" placeholder="Password (min 6 chars)" required minlength="6" style="
             width: 100%;
@@ -326,6 +344,7 @@ function showRegisterForm() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           username: form.username.value,
+          email: form.email.value,
           password: form.password.value
         })
       });
@@ -337,13 +356,14 @@ function showRegisterForm() {
         return;
       }
 
-      // Success - show message and redirect to login
-      successDiv.textContent = 'Account created! Redirecting to login...';
+      // Success - show message to check email
+      successDiv.textContent = 'Account created! Please check your email to verify your account.';
       successDiv.style.display = 'block';
 
+      // Redirect to login after a bit longer for them to read the message
       setTimeout(() => {
         showLoginForm();
-      }, 1500);
+      }, 3000);
     } catch (err) {
       errorDiv.textContent = 'Connection error. Please try again.';
     }

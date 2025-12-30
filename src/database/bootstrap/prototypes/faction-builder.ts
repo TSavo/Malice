@@ -49,6 +49,7 @@ export class FactionBuilder {
           sshHostKey: null, // Per-faction SSH host key
           ports: null, // {http, ws, telnet, ssh, sessionMcp}
           index: null, // Faction index for port allocation
+          discordWebhook: null, // Discord webhook for registration tickets
 
           abilities: `A faction is an organization in the game world.
 
@@ -113,6 +114,61 @@ LIFECYCLE: Created via $factionManager.create(), destroyed via $factionManager.d
     `,
     );
 
+    obj.setMethod(
+      'onPlayerRegistered',
+      `
+      /** Called when a new player registers with this faction.
+       *  Sends verification email and creates Discord ticket.
+       *  Override in specific faction instances for custom branding.
+       *  @param player - The newly created player object
+       */
+      const player = args[0];
+      if (!player) return;
+
+      const verifyUrl = 'https://' + self.domain + '/verify?t=' + player.verificationToken;
+
+      // Send verification email
+      try {
+        await $email.send({
+          to: player.email,
+          subject: 'Verify your ' + self.name + ' account',
+          html: '<div style="font-family: system-ui; max-width: 600px; margin: 0 auto;">'
+            + '<h1 style="color: #00ff88;">Welcome to ' + self.name + '</h1>'
+            + '<p>Hello <strong>' + player.playername + '</strong>,</p>'
+            + '<p>Click the button below to verify your email address:</p>'
+            + '<p><a href="' + verifyUrl + '" style="display: inline-block; padding: 12px 24px; background: #00ff88; color: #0a0a0a; text-decoration: none; border-radius: 6px; font-weight: 600;">Verify Email</a></p>'
+            + '<p style="color: #888; font-size: 12px;">Or copy this link: ' + verifyUrl + '</p>'
+            + '</div>',
+          faction: self
+        });
+        console.log('[Faction] Verification email sent to ' + player.email);
+      } catch (err) {
+        console.error('[Faction] Failed to send verification email:', err);
+      }
+
+      // Send Discord notification if webhook configured
+      if (self.discordWebhook) {
+        try {
+          await $http.post(self.discordWebhook, {
+            content: null,
+            embeds: [{
+              title: '📧 New Registration',
+              color: 0x00ff88,
+              fields: [
+                { name: 'Username', value: player.playername, inline: true },
+                { name: 'Email', value: player.email, inline: true }
+              ],
+              timestamp: new Date().toISOString()
+            }]
+          });
+          console.log('[Faction] Discord notification sent for ' + player.playername);
+        } catch (err) {
+          console.error('[Faction] Failed to send Discord notification:', err);
+        }
+      }
+    `,
+    );
+
     // Property descriptions
     obj.setPropertyDescription(
       'domain',
@@ -137,6 +193,10 @@ LIFECYCLE: Created via $factionManager.create(), destroyed via $factionManager.d
     obj.setPropertyDescription(
       'index',
       'Faction index used for port allocation. Lower indices get lower port numbers.',
+    );
+    obj.setPropertyDescription(
+      'discordWebhook',
+      'Discord webhook URL for registration notifications. Set to receive alerts when new players register.',
     );
 
     return obj;
