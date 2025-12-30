@@ -39,6 +39,7 @@ services:
       - DB_NAME=malice
       - NODE_ENV=production
       - FORCE_BOOTSTRAP=${FORCE_BOOTSTRAP:-false}
+      - EMAIL_API_KEY=${EMAIL_API_KEY:-}
     volumes:
       - claude_sessions:/home/node/.claude
     depends_on:
