@@ -12,6 +12,8 @@
  *   npm run bootstrap:world:full     # Full world with geometry + buildings
  */
 
+import 'dotenv/config';
+
 import { AliasLoader } from '../database/bootstrap/alias-loader.js';
 import { CoreSystemBuilder } from '../database/bootstrap/core-system-builder.js';
 import { MinimalBootstrap } from '../database/bootstrap/minimal-bootstrap.js';
@@ -100,6 +102,9 @@ async function main() {
 
   try {
     const manager = new ObjectManager(db);
+
+    // Initialize external services (email)
+    manager.initializeServices({ emailApiKey: process.env.EMAIL_API_KEY });
 
     // Load existing objects into memory (may be empty)
     console.log('Loading existing objects...');
