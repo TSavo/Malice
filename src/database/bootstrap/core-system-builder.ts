@@ -19,6 +19,7 @@ import { GreeterBuilder } from './greeter-builder.js';
 import { MaskBuilder } from './mask-builder.js';
 import { MCPBuilder } from './mcp-builder.js';
 import { MementoBuilder } from './memento-builder.js';
+import { MetaDomainBuilder } from './meta-domain-builder.js';
 import { MutexBuilder } from './mutex-builder.js';
 import { NewsBuilder } from './news-builder.js';
 import { NotesBuilder } from './notes-builder.js';
@@ -123,6 +124,7 @@ export class CoreSystemBuilder {
     const webRouterBuilder = new WebRouterBuilder(this.manager);
     const worldApiBuilder = new WorldApiBuilder(this.manager);
     const websiteBuilder = new WebsiteBuilder(this.manager);
+    const metaDomainBuilder = new MetaDomainBuilder(this.manager);
     const continuumDomainBuilder = new ContinuumDomainBuilder(this.manager);
     const cartelDomainBuilder = new CartelDomainBuilder(this.manager);
 
@@ -178,9 +180,13 @@ export class CoreSystemBuilder {
     await worldApiBuilder.build(); // World API for map routes
     await websiteBuilder.build(); // Website objects (includes API routes)
 
-    // Build client JS modules (must be before continuumDomainBuilder which creates routes)
+    // Build client JS modules (must be before domain builders which create routes)
     const clientBuilder = new ClientBuilder(this.manager);
     await clientBuilder.build();
+
+    // Meta domain must be built first (port 80 = malice.world only)
+    await metaDomainBuilder.build(); // malice.world meta-domain
+    await metaDomainBuilder.registerAlias(); // Register immediately for web-server.ts
 
     await continuumDomainBuilder.build(); // thecontinuum.city domain
     await cartelDomainBuilder.build(); // graycartel.com domain
@@ -390,6 +396,12 @@ export class CoreSystemBuilder {
     const websiteBuilder = new WebsiteBuilder(this.manager);
     await websiteBuilder.build(true);
     await websiteBuilder.registerAliases();
+
+    // Rebuild Meta Domain methods (malice.world)
+    console.log('  Rebuilding MetaDomain methods...');
+    const metaDomainBuilder = new MetaDomainBuilder(this.manager);
+    await metaDomainBuilder.build(true);
+    await metaDomainBuilder.registerAlias();
 
     // Rebuild Continuum Domain methods
     console.log('  Rebuilding ContinuumDomain methods...');
