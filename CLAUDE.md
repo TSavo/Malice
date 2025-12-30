@@ -76,18 +76,14 @@ The AI narrator reads abilities and interprets player intent, modifying properti
 - **Property descriptions** = CONSTRAINTS (what data means)
 - **Abilities** = PHYSICS (how things interact)
 
-**Only these verbs are coded:**
-```
-MOVEMENT:    north, south, east, west, up, down, enter, exit
-PERCEPTION:  look, glance
-SOCIAL:      say, whisper, shout, emote, to
-META:        quit, who, help, inventory, exits, stand, sit
-```
-
-**Everything else goes through the AI narrator:**
+**All player actions go through the AI narrator:**
+- "look" → AI reads room and contents abilities, describes scene
+- "north" → AI reads exit abilities, moves player
 - "unlock the door" → AI reads lock abilities, checks key
 - "pick up the gun" → AI reads hand abilities, checks weight
 - "search for bugs" → AI reads concealment abilities, reveals items
+
+There are no coded verbs. The AI interprets every command by reading abilities and property descriptions.
 
 **When building objects:**
 ```typescript
