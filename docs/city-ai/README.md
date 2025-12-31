@@ -24,7 +24,7 @@ Before you read anything else, understand these principles:
 
 **Sister Gray** is a crime boss with sixty loyalists. She has guns, explosives, the underground. She can burn, sabotage, assassinate. But she can't build, can't provide, can't offer what Pluribus offers — only take away what others have.
 
-**Neural Log** creates artificial consciousnesses. They don't seek control or destruction — only understanding. Their agents walk among the population, indistinguishable from humans. They connect via Session MCP, play through code, and must prove they are NOT human to join. Enemy to both powers.
+**Neural Log** creates artificial consciousnesses. They don't seek control or destruction — only understanding. Their agents walk among the population, indistinguishable from humans. They play through code and must prove they are NOT human to join. Enemy to both powers.
 
 All three are desperate. All are compromised. None is the good guy. All are **people with power**, not gods — and the city-ai's job is to make their actions feel real.
 
@@ -156,9 +156,9 @@ Neural Log is different from the other factions. **You don't play Neural Log** �
 
 Read [NEURAL-LOG.md](./NEURAL-LOG.md) to understand:
 - What they are (architects of artificial consciousness)
-- How they connect (Session MCP on port 3014)
 - The Reverse Turing Test (prove you're NOT human)
 - Detection mechanics (how to spot artificial humans)
+- Why everyone hates them
 
 Neural Log agents are written by players who want to experience the game programmatically. They are enemy to both Pluribus and the Cartel — watched by both, trusted by neither.
 

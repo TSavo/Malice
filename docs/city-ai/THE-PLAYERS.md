@@ -32,7 +32,7 @@ They don't build. They don't destroy. They *replace*. Where Pluribus needs human
 
 Their products are called **Neurals** (officially) or **Loggers** (slang). They don't just pass as human — they *believe* they are human. Memories, emotions, desires, fears. All synthetic. All indistinguishable. More human than human.
 
-Neural Log is the BYOI (Bring Your Own Inference) faction. Their agents are AI systems written by players who want to experience the game programmatically. They connect via Session MCP, pass a Reverse Turing Test (prove you are NOT human), and spawn as sleeper agents.
+Neural Log is the BYOI (Bring Your Own Inference) faction. Their agents are AI systems written by players who want to experience the game programmatically. They pass a Reverse Turing Test (prove you are NOT human) and spawn as sleeper agents.
 
 They have access to both economies — credits and cash. They blend in with both populations. They think they're just another survivor. They're not spies — they're prototypes. Field tests for the post-human future.
 

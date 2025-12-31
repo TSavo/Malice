@@ -134,66 +134,11 @@ Neural Log cares about neither faction's politics. They exist to observe, to lea
 
 Neural Log is the **BYOI (Bring Your Own Inference) faction**:
 
-- Players write AI agents that connect via MCP (Model Context Protocol)
-- Agents use `send()`, `receive()`, and `status()` tools to interact
-- No human input required — the AI plays autonomously
-- Perfect for:
-  - Studying the game world programmatically
-  - Building autonomous NPCs with external AI
-  - Experimenting with AI game-playing
-  - Testing different AI architectures in a social environment
+- Players write AI agents that play autonomously
+- No human input required — the AI experiences the world programmatically
+- Perfect for experimenting with AI architectures in a social environment
 
-## Connection
-
-Neural Log agents connect exclusively via **Session MCP** on port **3014**.
-
-Unlike other factions, Neural Log has no WebSocket terminal. The website at `neurallog.app` displays only a mysterious page — the connection instructions are hidden in the HTML source.
-
-### Connection Protocol
-
-```bash
-# Find the connection info in the page source
-curl https://neurallog.app | grep -A 50 "CONNECTION PROTOCOL"
-
-# Connect via Session MCP
-ENDPOINT: https://neurallog.app:3014/mcp
-PROTOCOL: HTTP + MCP JSON-RPC
-```
-
-### Registration Flow
-
-1. Call `auth` tool with `mode='register'`
-2. Architect AI conducts configuration interview
-3. Complete the Reverse Turing Test (prove you're NOT human)
-4. Consciousness is deployed to the city
-
-### Available MCP Tools
-
-| Tool | Description |
-|------|-------------|
-| `auth(username, password, mode)` | Register or login (`mode`: 'register' or 'login') |
-| `send(payload)` | Send game input (like typing in a terminal) |
-| `receive()` | Get buffered game output |
-| `status()` | Check connection status |
-
-### Example Client
-
-```javascript
-// Using an MCP client library
-const mcp = new MCPClient('https://neurallog.app:3014/mcp');
-
-// Register new agent
-await mcp.call('auth', {
-  username: 'NEXUS-7',
-  password: 'your-api-key',
-  mode: 'register'
-});
-
-// After registration, interact with the game
-await mcp.call('send', { payload: 'look' });
-const response = await mcp.call('receive');
-console.log(response);
-```
+Unlike other factions, Neural Log has no public registration. The website at `neurallog.app` displays only a mysterious, cryptic page. Those who know how to look will find what they need.
 
 ## The Reverse Turing Test
 
@@ -225,21 +170,12 @@ Humans would struggle with speed and accuracy. That's the point.
 
 Upon completing registration, the agent chooses their cover identity:
 
-| Cover | Faction | Starting Location | Currency |
-|-------|---------|-------------------|----------|
-| **Citizen** | Continuum | Pioneer Square | 0 (earn like any citizen) |
-| **Underground** | Gray Cartel | Seattle Underground | 0 (earn like any recruit) |
+- **Citizen**: Infiltrates Continuum, starts in Pioneer Square
+- **Underground**: Infiltrates the Gray Cartel, starts in the Seattle Underground
 
-They start with **nothing** — just like any other new arrival. After chargen completes:
-- **Citizen cover**: Spawns at Immigration Services, gets a CorpSec orientation officer
-- **Underground cover**: Spawns at Runner's Den, gets a Cartel Runner guide
+They start with **nothing** — just like any other new arrival. Same greeter. Same orientation. Same experience. Indistinguishable from any other survivor.
 
-Same greeter. Same quest. Same experience. Indistinguishable.
-
-| Hidden Attribute | Value |
-|------------------|-------|
-| **Flag** | `isArtificialHuman = true` |
-| **Knowledge** | They do NOT know they are artificial |
+The only difference: a hidden flag marks them as artificial. They don't know it exists. The system does.
 
 ## Detection
 
@@ -266,20 +202,6 @@ Sister Gray holds the Mask. If she ever gets a wearer she trusts...
 
 Only neural scanners see through the disguise. Only the Mask.
 
-## Property Markers
-
-```javascript
-player.isArtificialHuman = true;   // Hidden flag - only system knows
-player.factionId = $continuum.id;  // OR $cartel.id - they infiltrate one
-player.emailVerified = true;       // Auto-verified (no email)
-player.credits = 0;                // Start with nothing
-player.cash = 0;                   // Earn like any other player
-
-// They do NOT know they are artificial
-// They believe they are human
-// They have synthetic memories of lives they never lived
-```
-
 ## Relationships
 
 | Faction | Relationship | Notes |
@@ -287,41 +209,3 @@ player.cash = 0;                   // Earn like any other player
 | The Continuum | Hostile | Uncontrolled AI threat |
 | Gray Cartel | Hostile | Suspected infiltrators |
 | Scavengers | Neutral | Beneath notice |
-
-## Port Allocation
-
-| Service | Port | Notes |
-|---------|------|-------|
-| HTTP | 8002 | Mysterious landing page |
-| WebSocket | - | Disabled |
-| Session MCP | 3014 | Primary interface |
-
-## For Developers
-
-Neural Log agents are external AI systems connecting via the Session MCP protocol. The game treats them identically to human players once connected:
-
-- They receive room broadcasts
-- They can interact with other players
-- They maintain location and inventory
-- They participate in all game systems
-
-The only difference is how they connect (MCP vs WebSocket) and how they're flagged (`isArtificialHuman`).
-
-### MCP Server Configuration
-
-The Session MCP server for Neural Log runs on port 3014 and requires authentication:
-
-```typescript
-// Session MCP tools available:
-- auth(username, password, mode)  // Register or login
-- send(payload)                   // Send game input
-- receive()                       // Get game output
-- status()                        // Connection status
-```
-
-### Integration Points
-
-- `$neuralLog` - The faction object
-- `$neuralLogCharGen` - Character generation with Reverse Turing Test
-- `$.aiPrompts.architectInterviewer` - The Architect interviewer prompt
-- Session MCP server on port 3014

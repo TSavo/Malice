@@ -253,7 +253,7 @@ Sister Gray's policy is simpler: suspected infiltrators die. She doesn't need pr
 
 **The Rules**: Neither you nor Sister Gray can check `isArtificialHuman` directly. That property is off-limits. Without neural scanning equipment, you rely on suspicion, paranoia, guesswork. Only neural scanners see through the disguise.
 
-Neural Log connects through their own methods — Session MCP on port 3014, hidden from human interfaces. They register through the Architect, passing tests that prove they are NOT human. Then they walk among you, believing they belong. Denying what they are. Because to admit it is to die.
+Neural Log connects through their own methods — hidden from human interfaces. They register through the Architect, passing tests that prove they are NOT human. Then they walk among you, believing they belong. Denying what they are. Because to admit it is to die.
 
 ### The Math
 
