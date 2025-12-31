@@ -981,7 +981,16 @@ export class RuntimeObjectImpl implements RuntimeObject {
     }
 
     // Generate variable declarations for all aliases (e.g., "const $exit = ctx._aliases['exit'];")
-    const aliasDeclarations = aliasNames
+    // Filter out invalid JavaScript identifiers
+    const validAliasNames = aliasNames.filter((name) => {
+      // Must be valid JS identifier (starts with letter/underscore, contains only alphanum/underscore)
+      const isValid = /^[a-zA-Z_][a-zA-Z0-9_]*$/.test(name);
+      if (!isValid) {
+        console.warn(`[RuntimeObject] Skipping invalid alias name for JS: '${name}'`);
+      }
+      return isValid;
+    });
+    const aliasDeclarations = validAliasNames
       .map((name) => `const $${name} = ctx._aliases['${name}'];`)
       .join('\n        ');
 
@@ -1202,14 +1211,8 @@ export class RuntimeObjectImpl implements RuntimeObject {
       clearInterval,
     };
 
-    try {
-      // Wrap code in async function for execution
-      // Don't destructure $ so we can use $2, $3, etc. via Proxy
-      // eslint-disable-next-line @typescript-eslint/no-implied-eval
-      const AsyncFn = (async () => {}).constructor as FunctionConstructor;
-      const fn = new AsyncFn(
-        'ctx',
-        `
+    // Build the full function body for debugging
+    const fnBody = `
         const self = ctx.self;
         const $ = ctx.$;
         const args = ctx.args;
@@ -1255,23 +1258,30 @@ export class RuntimeObjectImpl implements RuntimeObject {
         return (async () => {
           ${jsCode}
         })();
-      `,
-      );
+      `;
+
+    try {
+      // Wrap code in async function for execution
+      // Don't destructure $ so we can use $2, $3, etc. via Proxy
+      // eslint-disable-next-line @typescript-eslint/no-implied-eval
+      const AsyncFn = (async () => {}).constructor as FunctionConstructor;
+      const fn = new AsyncFn('ctx', fnBody);
 
       return await fn(context);
     } catch (err) {
-      // Log detailed error info for debugging circular reference issues
-      if (err instanceof Error && err.message.includes('circular')) {
+      // Log detailed error info for debugging
+      const errMsg = err instanceof Error ? err.message : String(err);
+      if (errMsg.includes('circular') || errMsg.includes('Unexpected token')) {
         console.error(
-          `[RuntimeObject] Circular reference error in method '${methodName}' on #${this.id}`,
+          `[RuntimeObject] Error in method '${methodName}' on #${this.id}: ${errMsg}`,
         );
-        console.error(
-          `[RuntimeObject] Method code excerpt: ${jsCode.substring(0, 200)}...`,
-        );
-        console.error(`[RuntimeObject] Stack: ${err.stack}`);
+        console.error(`[RuntimeObject] === FULL FUNCTION BODY START ===`);
+        console.error(fnBody);
+        console.error(`[RuntimeObject] === FULL FUNCTION BODY END ===`);
+        console.error(`[RuntimeObject] Stack: ${err instanceof Error ? err.stack : 'N/A'}`);
       }
       throw new Error(
-        `Error executing method '${methodName}' on object #${this.id}: ${err instanceof Error ? err.message : String(err)}`,
+        `Error executing method '${methodName}' on object #${this.id}: ${errMsg}`,
       );
     }
   }

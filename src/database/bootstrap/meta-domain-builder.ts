@@ -558,7 +558,7 @@ export class MetaDomainBuilder {
         };
       }
 
-      const html = \\\`<!DOCTYPE html>
+      const html = \`<!DOCTYPE html>
 <html>
 <head>
   <title>Admin Dashboard - Malice</title>
@@ -601,7 +601,7 @@ export class MetaDomainBuilder {
     </div>
   </div>
 </body>
-</html>\\\`;
+</html>\`;
 
       return { status: 200, contentType: 'text/html', body: html };
     `,
