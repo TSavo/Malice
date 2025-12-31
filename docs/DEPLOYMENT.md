@@ -599,7 +599,14 @@ Then just: `ssh malice-prod`
 
 ## Automated Backups
 
-MongoDB is backed up to Google Drive with tiered retention.
+MongoDB and NPC session logs are backed up to Google Drive with tiered retention.
+
+### What's Backed Up
+
+| Data | File Pattern | Source |
+|------|--------------|--------|
+| MongoDB | `malice-*.gz` | Game objects, players, rooms, etc. |
+| NPC Sessions | `sessions-*.tar.gz` | Claude API conversation logs (JSONL) |
 
 ### Backup Schedule
 
@@ -631,8 +638,11 @@ ssh -i ~/.ssh/malice-do root@malice.world 'rclone ls gdrive:Malice-Backups/ | ta
 # Download specific backup
 ssh -i ~/.ssh/malice-do root@malice.world 'rclone copy gdrive:Malice-Backups/malice-2025-12-31_0000.gz /root/backups/'
 
-# Restore to MongoDB (stops game first)
+# Restore MongoDB (stops game first)
 ssh -i ~/.ssh/malice-do root@malice.world 'cd /root/Malice && docker compose stop game && gunzip -c /root/backups/malice-2025-12-31_0000.gz | docker exec -i malice-mongo mongorestore --archive --drop --db malice && docker compose start game'
+
+# Restore NPC sessions (JSONL logs)
+ssh -i ~/.ssh/malice-do root@malice.world 'rclone copy gdrive:Malice-Backups/sessions-2025-12-31_0000.tar.gz /root/backups/ && docker exec -i malice-game tar xzf - -C /home/node/.claude < /root/backups/sessions-2025-12-31_0000.tar.gz'
 ```
 
 ### Backup Script Location
