@@ -13,3 +13,7 @@ test-results.xml
 .env
 vitest-bootstrap.log
 .mcp.json
+
+# Skill Seeker output
+output/
+configs/

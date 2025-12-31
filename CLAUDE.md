@@ -406,6 +406,26 @@ The MCP server at port 3010 provides a **code-first interface** for Claude Code 
 - **Port 3010** - Main MCP server (admin/builder access, code-first)
 - **Port 3012** - Session MCP server (player access, action-based)
 
+### Local vs Production MCP
+
+Two MCP servers are configured in `.mcp.json`:
+
+| Server | URL | Purpose |
+|--------|-----|---------|
+| `malice` | `localhost:3010` | Local dev server |
+| `malice-prod` | `localhost:4010` | Production (via SSH tunnel) |
+
+**To connect to production:**
+```bash
+# Start SSH tunnel (maps prod:3010 → local:4010)
+ssh -L 4010:localhost:3010 -i ~/.ssh/malice-do root@malice.world
+
+# Or use SSH config (see docs/DEPLOYMENT.md)
+ssh malice-prod
+```
+
+Then use `mcp__malice-prod__execute_moo_code` instead of `mcp__malice__execute_moo_code`.
+
 ### Code-First Philosophy
 
 **IMPORTANT**: This project uses direct MOO code execution:
