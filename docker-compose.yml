@@ -3,8 +3,7 @@ services:
     image: mongo:7.0
     container_name: malice-mongo
     restart: unless-stopped
-    ports:
-      - "27017:27017"
+    # No ports exposed - only accessible within Docker network
     volumes:
       - mongodb_data:/data/db
     environment:
@@ -26,14 +25,20 @@ services:
     container_name: malice-game
     restart: unless-stopped
     ports:
-      # Admin/dev services - exposed for local development
-      - "3000:3000"    # LSP API (VS Code extension)
-      - "3010:3010"    # MCP (code-first - admin access)
-      - "9999:9999"    # DevTools WebSocket (VS Code extension)
-      # Faction ports - accessed via Caddy in production, direct in dev
-      - "8000-8019:8000-8019"    # Faction HTTP servers
-      - "8080-8099:8080-8099"    # Faction WebSocket servers
-      - "3012-3031:3012-3031"    # Faction Session MCP servers
+      # ============================================================
+      # Admin/dev services - localhost only (access via SSH tunnel)
+      # ssh -L 3010:localhost:3010 root@malice-prod
+      # ============================================================
+      - "127.0.0.1:3000:3000"    # LSP API (VS Code extension)
+      - "127.0.0.1:3010:3010"    # MCP (code-first - admin access)
+      - "127.0.0.1:9999:9999"    # DevTools WebSocket (VS Code extension)
+      # ============================================================
+      # Faction ports - internal only, accessed via Caddy reverse proxy
+      # Not bound to host - Caddy connects via Docker network
+      # ============================================================
+      # Session MCP - localhost only for AI client access via SSH tunnel
+      - "127.0.0.1:3012:3012"    # Continuum Session MCP
+      - "127.0.0.1:3013:3013"    # Cartel Session MCP
     environment:
       - MONGO_URI=mongodb://mongodb:27017/
       - DB_NAME=malice
