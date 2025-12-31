@@ -47,15 +47,13 @@ export class TransportsBuilder {
 
 STARTUP: startAll() starts transports for all factions registered with $factionManager. Called during bootstrap.
 
-CREATE: create(faction) spins up HTTP/WS/Telnet/SSH/SessionMCP for faction. Returns allocated ports.
+CREATE: create(faction) spins up HTTP/WS/SessionMCP for faction. Returns allocated ports.
 
 DESTROY: destroy(faction, options?) shuts down faction's transports. Options: {gracefulTimeoutMs, message}.
 
 QUERY: list() returns all active bundles. get(factionId) returns bundle info. has(factionId) checks if exists.
 
 CONNECTIONS: getConnections(factionId) returns all connections. getConnectionCount(factionId) returns count.
-
-SSH: getSSHHostKey(factionId) returns SSH host key for storage in faction object.
 
 INTERNAL: Registry is set via setRegistry() by GameCoordinator at startup.`,
         },
@@ -69,7 +67,7 @@ INTERNAL: Registry is set via setRegistry() by GameCoordinator at startup.`,
       `
       /** Create transport bundle for a faction.
        *  @param faction - Faction object to create transports for
-       *  @returns Allocated ports {http, ws, telnet, ssh, sessionMcp}
+       *  @returns Allocated ports {http, ws, sessionMcp}
        */
       const faction = args[0];
       if (!faction || !faction.id) {
@@ -86,16 +84,11 @@ INTERNAL: Registry is set via setRegistry() by GameCoordinator at startup.`,
         name: faction.name || 'Unknown',
         domain: faction.domain || undefined,
         index: faction.index,
-        sshHostKey: faction.sshHostKey || undefined,
         debug: false,
       });
 
-      // Store ports and generated SSH key back to faction
+      // Store ports back to faction
       faction.ports = ports;
-      const hostKey = registry.getSSHHostKey(faction.id);
-      if (hostKey && !faction.sshHostKey) {
-        faction.sshHostKey = hostKey;
-      }
 
       return ports;
     `,
@@ -221,25 +214,6 @@ INTERNAL: Registry is set via setRegistry() by GameCoordinator at startup.`,
       if (!registry) return 0;
 
       return registry.getConnectionCount(id);
-    `,
-    );
-
-    // Get SSH host key for faction
-    this.transports.setMethod(
-      'getSSHHostKey',
-      `
-      /** Get SSH host key for a faction.
-       *  @param factionId - Faction ID or object
-       *  @returns SSH host key string or null
-       */
-      const factionArg = args[0];
-      const id = typeof factionArg === 'number' ? factionArg : factionArg?.id;
-      if (!id) return null;
-
-      const registry = self._registryRef;
-      if (!registry) return null;
-
-      return registry.getSSHHostKey(id);
     `,
     );
 
