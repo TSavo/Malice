@@ -348,31 +348,9 @@ export class CartelDomainBuilder {
   <div class="scanline"></div>
   <div class="noise-bg"></div>
   
-  <nav class="border-b border-red-900/30 px-6 py-3 bg-black/80 backdrop-blur sticky top-0 z-50">
-    <div class="max-w-4xl mx-auto flex justify-between items-center">
-      <a href="/" class="flex items-center gap-3">
-        <span class="text-cartel-accent font-bold tracking-wider glitch-flicker">UNDERGROUND</span>
-      </a>
-      <div class="flex gap-6 text-sm">
-        <a href="/truth" class="text-gray-500 hover:text-cartel-accent transition">TRUTH</a>
-        <a href="/family" class="text-gray-500 hover:text-cartel-accent transition">FAMILY</a>
-        <a href="/descend" class="text-gray-500 hover:text-cartel-accent transition">DESCEND</a>
-      </div>
-    </div>
-  </nav>
-  
   <main>
     {{content}}
   </main>
-  
-  <footer class="border-t border-red-900/20 mt-20 py-8">
-    <div class="max-w-4xl mx-auto px-6 text-center">
-      <p class="text-gray-700 text-xs">
-        <span class="glitch-flicker">SIGNAL UNSTABLE</span> | 
-        <span class="text-gray-600">BROADCAST ORIGIN: <span class="redacted">REDACTED</span></span>
-      </p>
-    </div>
-  </footer>
 </body>
 </html>
     `.trim();
@@ -381,109 +359,11 @@ export class CartelDomainBuilder {
   private getLandingPageHandler(): string {
     const template = this.getBaseTemplate();
     const content = `
-<!-- Hero -->
-<div class="relative overflow-hidden">
-  <!-- Red grid background -->
-  <div class="absolute inset-0 opacity-5">
-    <div class="absolute inset-0" style="background-image: linear-gradient(rgba(255,51,102,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(255,51,102,0.3) 1px, transparent 1px); background-size: 40px 40px;"></div>
-  </div>
-  
-  <div class="max-w-4xl mx-auto px-6 py-20 md:py-32 relative">
-    <div class="text-center mb-16">
-      <div class="text-xs font-mono text-cartel-accent mb-6 tracking-widest glitch-flicker">
-        [ UNAUTHORIZED BROADCAST ]
-      </div>
-      
-      <h1 class="text-4xl md:text-6xl font-bold mb-8 leading-tight">
-        <span class="text-gray-300">They call us</span><br>
-        <span class="text-cartel-accent glitch-text">criminals.</span>
-      </h1>
-      
-      <p class="text-xl md:text-2xl text-gray-500 mb-6">
-        They call themselves <span class="text-gray-400">civilization.</span>
-      </p>
-    </div>
-    
-    <!-- The pitch -->
-    <div class="max-w-2xl mx-auto space-y-8 text-center">
-      <div class="p-6 border border-red-900/30 bg-black/50 rounded">
-        <p class="text-gray-400 leading-relaxed">
-          The machine watches <span class="text-cartel-accent">everything</span>.<br>
-          Every credit you spend. Every door you open.<br>
-          Every word you say.
-        </p>
-        <p class="text-gray-500 mt-4 text-sm">
-          Is that freedom?
-        </p>
-      </div>
-      
-      <div class="text-cartel-gold font-bold tracking-wider">
-        - - - THE UNDERGROUND - - -
-      </div>
-      
-      <div class="space-y-2 text-gray-500">
-        <p><span class="text-gray-400">Cash</span> doesn't track.</p>
-        <p><span class="text-gray-400">Shadows</span> don't talk.</p>
-        <p><span class="text-gray-400">We</span> remember our names.</p>
-      </div>
-    </div>
-    
-    <!-- CTA -->
-    <div class="mt-16 text-center">
-      <div class="inline-block p-6 border border-red-900/50 bg-cartel-surface/50 rounded">
-        <div class="text-xs text-gray-600 mb-4">[ FIND US IF YOU CAN ]</div>
-        <div class="space-y-2 text-sm text-gray-500">
-          <p>&gt; Look for the signs.</p>
-          <p>&gt; Ask for <span class="text-cartel-accent">Gray</span>.</p>
-          <p>&gt; Bring cash.</p>
-        </div>
-        <div class="mt-6">
-          <a href="/descend" class="px-6 py-3 bg-cartel-accent/20 text-cartel-accent border border-cartel-accent/50 rounded hover:bg-cartel-accent hover:text-black transition text-sm font-bold inline-block">
-            DESCEND
-          </a>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Bottom message -->
-    <div class="mt-20 text-center">
-      <p class="text-xs text-gray-700">
-        "What do you want. What are you offering. <span class="glitch-flicker">Be specific.</span>"
-      </p>
-    </div>
-  </div>
-</div>
-
-<!-- The contrast -->
-<div class="border-t border-red-900/20 bg-black/30">
-  <div class="max-w-4xl mx-auto px-6 py-16">
-    <div class="grid md:grid-cols-2 gap-8">
-      <div class="p-6 border border-gray-800 rounded bg-black/30">
-        <div class="text-xs text-gray-600 mb-4">WHAT THEY OFFER</div>
-        <ul class="space-y-2 text-sm text-gray-500">
-          <li>+ Rations (tracked)</li>
-          <li>+ Shelter (monitored)</li>
-          <li>+ Work (assigned)</li>
-          <li>+ Security (controlled)</li>
-        </ul>
-        <div class="mt-4 text-xs text-gray-600">
-          Cost: <span class="text-gray-500">Everything you are.</span>
-        </div>
-      </div>
-      
-      <div class="p-6 border border-red-900/30 rounded bg-cartel-surface/30">
-        <div class="text-xs text-cartel-accent mb-4">WHAT WE OFFER</div>
-        <ul class="space-y-2 text-sm text-gray-400">
-          <li>+ Freedom (real)</li>
-          <li>+ Cash (untraceable)</li>
-          <li>+ Work (your choice)</li>
-          <li>+ Family (earned)</li>
-        </ul>
-        <div class="mt-4 text-xs text-cartel-gold">
-          Cost: <span class="text-gray-400">Blood and silence.</span>
-        </div>
-      </div>
-    </div>
+<div class="min-h-screen flex items-center justify-center">
+  <div class="text-center">
+    <a href="/descend" class="text-cartel-accent hover:text-white transition text-lg tracking-widest">
+      &#x25BC;
+    </a>
   </div>
 </div>
     `.trim();
@@ -505,228 +385,23 @@ export class CartelDomainBuilder {
   }
 
   private getTruthPageHandler(): string {
-    const template = this.getBaseTemplate();
-    const content = `
-<div class="max-w-3xl mx-auto px-6 py-16">
-  <div class="text-xs text-cartel-accent mb-8 tracking-wider">[ CLASSIFIED // BROADCAST 7-ALPHA ]</div>
-  
-  <h1 class="text-3xl font-bold mb-8 text-gray-300">The Truth They Won't Tell You</h1>
-  
-  <div class="space-y-8 text-gray-400 leading-relaxed">
-    <p>
-      In 2055, the corporations went to war. Not with nations. <span class="text-gray-300">With each other.</span>
-    </p>
-    
-    <p>
-      Seven years of hell. Cities burned. Infrastructure collapsed. The systems everyone 
-      depended on - power, water, food distribution - all of it became weapons. All of it 
-      became targets.
-    </p>
-    
-    <p>
-      By 2062, someone decided to end it. <span class="text-cartel-accent">Operation Decapitation.</span> 
-      Coordinated strikes on every corporate AI datacenter. Every automated system. Every 
-      piece of infrastructure that kept the war machine running.
-    </p>
-    
-    <p>
-      It worked. The war ended.
-    </p>
-    
-    <p class="text-gray-500 border-l-2 border-red-900/50 pl-4">
-      So did everything else.
-    </p>
-    
-    <div class="my-12 p-6 border border-red-900/30 bg-black/50 rounded">
-      <div class="text-xs text-gray-600 mb-4">CASUALTIES: 2062-2070</div>
-      <p class="text-2xl text-cartel-accent font-bold">80-90%</p>
-      <p class="text-sm text-gray-500 mt-2">
-        Not from the strikes. From what came after.<br>
-        Starvation. Disease. Violence.<br>
-        <span class="text-gray-600">The infrastructure was gone. People forgot how to survive without it.</span>
-      </p>
-    </div>
-    
-    <p>
-      Now it's 2110. Forty-eight years later. And guess who's back?
-    </p>
-    
-    <p>
-      <span class="text-gray-300">The corporations.</span> New names. Same game. 
-      "The Continuum." "Citizen Services." "Reconstruction."
-    </p>
-    
-    <p>
-      They offer food. Shelter. Safety. All you have to do is <span class="text-cartel-accent">register</span>. 
-      Let them track you. Let them assign you. Let them own you.
-    </p>
-    
-    <p class="text-gray-500">
-      They killed the old world. They're building a cage from the ashes.
-    </p>
-    
-    <div class="my-12 border-t border-b border-red-900/30 py-8">
-      <p class="text-center text-cartel-gold">
-        "History doesn't repeat, but it rhymes."
-      </p>
-    </div>
-    
-    <p>
-      The Cartel remembers. We were here before Pluribus. Before the machine decided 
-      it knew what was best for everyone. Before "citizenship" became another word 
-      for <span class="redacted">slavery</span>.
-    </p>
-    
-    <p>
-      We'll be here after.
-    </p>
-    
-    <div class="mt-12 text-center">
-      <a href="/family" class="text-cartel-accent hover:text-cartel-gold transition">
-        Learn what it means to be family &rarr;
-      </a>
-    </div>
-  </div>
-</div>
-    `.trim();
-
+    // Redirect to landing - no public ideology
     return `
-      const template = \`${template.replace(/`/g, '\\`').replace(/\$\{/g, '\\${')}\`;
-      const content = \`${content.replace(/`/g, '\\`').replace(/\$\{/g, '\\${')}\`;
-      
-      const html = template
-        .replace('{{title}}', 'The Truth - Underground')
-        .replace('{{content}}', content);
-      
       return {
-        status: 200,
-        contentType: 'text/html',
-        body: html
+        status: 302,
+        headers: { 'Location': '/' },
+        body: ''
       };
     `;
   }
 
   private getFamilyPageHandler(): string {
-    const template = this.getBaseTemplate();
-    const content = `
-<div class="max-w-3xl mx-auto px-6 py-16">
-  <div class="text-xs text-cartel-accent mb-8 tracking-wider">[ INTERNAL // EYES ONLY ]</div>
-  
-  <h1 class="text-3xl font-bold mb-8 text-gray-300">Blood and Silence</h1>
-  
-  <div class="space-y-8 text-gray-400 leading-relaxed">
-    <p>
-      We are not a gang. We are not terrorists. We are not what Pluribus calls us.
-    </p>
-    
-    <p>
-      We are <span class="text-cartel-accent">family</span>.
-    </p>
-    
-    <p>
-      Family means something here. It means sixty people who stayed when everyone else ran. 
-      It means watching each other's backs when the machine is hunting. It means 
-      <span class="text-gray-300">blood in, blood out</span>.
-    </p>
-    
-    <div class="my-12 p-6 border border-red-900/30 bg-cartel-surface/30 rounded">
-      <div class="text-xs text-cartel-gold mb-6">THE RULES</div>
-      
-      <div class="space-y-6">
-        <div>
-          <div class="text-gray-300 font-bold mb-2">1. Silence is survival.</div>
-          <p class="text-sm text-gray-500">
-            You don't talk about family. You don't talk about operations. 
-            You don't talk about the tunnels. Not to outsiders. Not to friends. 
-            Not to anyone who hasn't bled with you.
-          </p>
-        </div>
-        
-        <div>
-          <div class="text-gray-300 font-bold mb-2">2. Debts are sacred.</div>
-          <p class="text-sm text-gray-500">
-            When family helps you, you owe. When you help family, they owe. 
-            Every favor is remembered. Every debt is paid. 
-            <span class="text-gray-600">The ledger is always balanced.</span>
-          </p>
-        </div>
-        
-        <div>
-          <div class="text-gray-300 font-bold mb-2">3. Cash only.</div>
-          <p class="text-sm text-gray-500">
-            Credits are chains. Every transaction Pluribus sees is a thread they can pull.
-            We deal in paper. In barter. In things that don't leave trails.
-          </p>
-        </div>
-        
-        <div>
-          <div class="text-gray-300 font-bold mb-2">4. Betrayal is answered.</div>
-          <p class="text-sm text-gray-500 text-cartel-accent">
-            Always.
-          </p>
-        </div>
-      </div>
-    </div>
-    
-    <p>
-      You don't apply to join. You don't fill out forms. 
-      You prove yourself. Small tasks. Observed closely. Trust is earned in inches.
-    </p>
-    
-    <p>
-      If you're useful, you'll hear from us again.<br>
-      If you're not, you won't.<br>
-      If you betray us...
-    </p>
-    
-    <p class="text-gray-600">
-      Well. There's a reason the tunnels go deep.
-    </p>
-    
-    <div class="my-12 border-t border-red-900/30 pt-8">
-      <p class="text-center text-gray-500 text-sm">
-        "There's a problem at this address."
-      </p>
-      <p class="text-center text-gray-700 text-xs mt-2">
-        - How jobs begin
-      </p>
-    </div>
-    
-    <div class="p-6 border border-gray-800 bg-black/50 rounded">
-      <div class="text-xs text-gray-600 mb-4">CELL STRUCTURE</div>
-      <p class="text-sm text-gray-500">
-        You know your cell. Your cell knows you. Nobody knows more than they need to.
-        If one falls, the rest survive. That's how we've lasted nine years underground.
-      </p>
-      <div class="mt-4 text-xs text-gray-600">
-        Roles: <span class="text-gray-500">Cutters. Runners. Sparks. Ghosts. Keepers.</span>
-      </div>
-      <div class="mt-2 text-xs text-gray-700">
-        You'll learn what these mean. If you're chosen.
-      </div>
-    </div>
-    
-    <div class="mt-12 text-center">
-      <a href="/descend" class="text-cartel-accent hover:text-cartel-gold transition">
-        Ready to descend? &rarr;
-      </a>
-    </div>
-  </div>
-</div>
-    `.trim();
-
+    // Redirect to landing - no public rules
     return `
-      const template = \`${template.replace(/`/g, '\\`').replace(/\$\{/g, '\\${')}\`;
-      const content = \`${content.replace(/`/g, '\\`').replace(/\$\{/g, '\\${')}\`;
-      
-      const html = template
-        .replace('{{title}}', 'Family - Underground')
-        .replace('{{content}}', content);
-      
       return {
-        status: 200,
-        contentType: 'text/html',
-        body: html
+        status: 302,
+        headers: { 'Location': '/' },
+        body: ''
       };
     `;
   }
@@ -1144,9 +819,9 @@ export class CartelDomainBuilder {
 
   <script>
     window.MALICE_THEME = {
-      name: 'Gray Cartel',
-      tagline: 'Enter your credentials to descend',
-      registerTagline: 'Join the family',
+      name: '',
+      tagline: '',
+      registerTagline: '',
       accent: '#ff3366',
       surface: '#120808',
       selection: 'rgba(255, 51, 102, 0.3)'
