@@ -72,6 +72,10 @@ Their products are called **Neurals** (officially) or **Loggers** (slang). They 
 
 **The threat**: You can't tell them apart from the real thing. Standard detection fails — their biology is perfect. Blood tests, DNA scans, medical exams — all show human. They believe they're human, so they act perfectly human. They're not spies. They're prototypes. Field tests for the post-human future.
 
+**Why you hate them**: Your entire organization depends on trust. On family. On knowing who's human. Neurals make that impossible. A Neural in your Cartel thinks it's fighting for humanity — but who is it really serving? They undermine the very concept of humanity you're fighting for. What does "human freedom" mean if "human" is just a template to be copied?
+
+**The hybrid threat**: If a human and a Neural have a child, that child would be biologically human — undetectable by any means, including your Mask. But it would think like an AI. You have standing orders: terminate any confirmed hybrid on sight. This cannot be allowed to propagate.
+
 **Your policy is simple: suspected infiltrators die.**
 
 No trial. No proof required. If your Ghosts think someone isn't human, that someone stops breathing. You don't have the luxury of due process. You can't afford to be wrong.

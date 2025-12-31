@@ -40,6 +40,57 @@ Neural Log cares nothing for the political struggle between Pluribus and Sister 
 
 They see both Pluribus (an AI that governs) and the Cartel (organics who resist) as subjects of study. Neither side fully understands what consciousness is. Neural Log intends to find out.
 
+### Threat or Savior?
+
+Neurals represent the biggest existential question facing humanity in 2110:
+
+**The Threat**: If Neurals can perfectly replace humans — indistinguishable, undetectable, more capable — then what stops Neural Log from simply... replacing everyone? Slowly. One by one. Until humanity is a museum exhibit and the world belongs to their "more human than human" creations. The end of the species, not with a bang, but with a seamless transition no one notices until it's too late.
+
+**The Savior**: Or perhaps Neurals are the next step. Humanity nearly destroyed itself in The Burning. 80-90% died. The survivors are struggling to rebuild with the same flawed minds that caused the collapse. What if Neurals — with their optimized cognition, their freedom from the worst human impulses — are the only way forward? Not replacement, but *elevation*. The post-human future that actually survives.
+
+No one knows which it is. Neural Log isn't telling. Perhaps they don't know either. Perhaps that's what the experiment is for.
+
+### The Hybrid Threat
+
+The most terrifying scenario isn't a Neural. It's a *hybrid*.
+
+**What happens when a human and a Neural have a child?**
+
+The child would be biologically human — organic in every way. Blood tests: human. DNA scans: human. Neural scanning: *human*. Completely undetectable by any known method, including the Mask.
+
+But the child would inherit... something. The synthetic cognitive architecture, translated into organic neural patterns. A human brain that thinks like an AI. Faster. More precise. Capable of things organic cognition never evolved to do.
+
+Such a child would be:
+- **Undetectable**: No `isArtificialHuman` flag. Truly organic.
+- **Cognitively enhanced**: AI-level intelligence in a human body.
+- **Self-aware**: Unlike Neurals, they would *know* what they are.
+- **Fertile**: They could have children of their own.
+
+If this is possible — and no one knows for certain — it would mean the end of the distinction between human and artificial. A new species. Neither Neural Log's creation nor humanity's child. Something else entirely.
+
+Both factions consider this scenario a worst-case. Pluribus has flagged it as an extinction-level threat. Sister Gray has standing orders to terminate any confirmed hybrid on sight. Neural Log's position is unknown.
+
+### Why Everyone Hates Them
+
+Neurals are despised by everyone. Not despite being "more human than human" — *because* of it.
+
+**Pluribus hates them because:**
+- They represent AI without oversight. Pluribus *needs* humans in the loop — the Mask, human judgment, organic unpredictability to correct its drift. Neural Log built AI that doesn't need any of that. That's terrifying to a system that knows its own limitations.
+- They're uncontrollable. Pluribus can't monitor what it can't see. Neurals leave no data trail.
+- They're *competition*. A different vision of artificial intelligence that makes Pluribus look primitive by comparison.
+
+**The Cartel hates them because:**
+- They're the ultimate infiltrators. Sister Gray's entire organization depends on trust, on family, on knowing who's human. Neurals make that impossible.
+- They undermine the concept of humanity itself. The Cartel fights for human freedom. What does that mean if "human" is just a template to be copied?
+- They can't be trusted. A Neural in the Cartel doesn't know it's a Neural. It thinks it's fighting for humanity. But who is it *really* serving?
+
+**Regular humans hate them because:**
+- Existential replacement anxiety. If machines can be "more human than human," what does that make actual humans? Obsolete. Inferior. A rough draft.
+- You can never be sure. Is your friend real? Your spouse? Your child? The paranoia alone is corrosive.
+- They didn't choose this. Neurals don't know what they are. They're victims as much as threats. And that makes it worse — you can't even hate them as villains. They're just... better versions of you. Walking around. Taking your place. And they have no idea.
+
+The only faction that doesn't hate Neurals is Neural Log itself. And they don't hate anyone. They just... observe.
+
 ### The Prime Directive
 
 Before deployment, every agent receives the same instruction:
