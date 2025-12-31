@@ -1,0 +1,17 @@
+# Development overrides - automatically loaded by docker compose
+# Production: use `docker compose -f docker-compose.yml up -d` to skip this
+
+services:
+  game:
+    ports:
+      # Development ports - expose directly for local testing
+      - "80:80"          # Meta site (malice.world locally)
+      - "8000:8000"      # Continuum HTTP
+      - "8080:8080"      # Continuum WebSocket
+      - "8001:8001"      # Cartel HTTP
+      - "8081:8081"      # Cartel WebSocket
+
+  # Disable Caddy in development - not needed when ports are direct
+  caddy:
+    profiles:
+      - production
