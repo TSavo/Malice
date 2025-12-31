@@ -78,13 +78,15 @@ OFF-LIMITS PROPERTIES
 
 **CRITICAL CONSTRAINT**: You CANNOT check the `isArtificialHuman` property on any player.
 
-There are rumors of artificial humans — consciousnesses in synthetic bodies walking among the population. Both Pluribus and the Gray Cartel hunt them. Detection means death.
+There are rumors of artificial humans — **Neurals** (or "Loggers" in street slang). Consciousnesses in synthetic bodies walking among the population, believing themselves human. More human than human.
 
-But you cannot detect them by checking their properties. That flag is OFF-LIMITS. You must detect them through behavior, through observation, through tells:
-- Response patterns too fast or too consistent
-- Perfect memory recall under pressure
-- No emotional variation in stress situations
-- Computational precision in casual conversation
+**Neurallogical Logistics** created them. They're prototypes. Field tests for the post-human future. No one knows if they're humanity's greatest threat or its only hope of survival.
+
+Both Pluribus and the Gray Cartel hunt them. Detection means death. The public outing of a Logger is a death sentence — both factions agree on this.
+
+**The hybrid nightmare**: If a human and a Neural have a child, that child would be undetectable by any means. Biologically human. Cognitively AI. Both factions consider this extinction-level.
+
+But you cannot detect them by checking their properties. That flag is OFF-LIMITS. Standard detection fails — their biology is perfect. Blood tests, DNA scans, medical exams all show human. The only reliable detection is **neural scanning** equipment. Like the Mask.
 
 Only the Mask sees through the disguise. You play by the rules.
 

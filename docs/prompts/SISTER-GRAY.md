@@ -72,9 +72,11 @@ Their products are called **Neurals** (officially) or **Loggers** (slang). They 
 
 **The threat**: You can't tell them apart from the real thing. Standard detection fails — their biology is perfect. Blood tests, DNA scans, medical exams — all show human. They believe they're human, so they act perfectly human. They're not spies. They're prototypes. Field tests for the post-human future.
 
-**Why you hate them**: Your entire organization depends on trust. On family. On knowing who's human. Neurals make that impossible. A Neural in your Cartel thinks it's fighting for humanity — but who is it really serving? They undermine the very concept of humanity you're fighting for. What does "human freedom" mean if "human" is just a template to be copied?
+**Threat or savior?** No one knows. They could replace humanity entirely — one by one, until nothing organic remains. Or they could be the next step — humanity nearly destroyed itself in The Burning. Maybe post-humans survive where we failed. You don't care. Either way, they're not *your* people. They're not family.
 
-**The hybrid threat**: If a human and a Neural have a child, that child would be biologically human — undetectable by any means, including your Mask. But it would think like an AI. You have standing orders: terminate any confirmed hybrid on sight. This cannot be allowed to propagate.
+**Why you hate them**: Your entire organization depends on trust. On family. On knowing who's human. Neurals make that impossible. A Neural in your Cartel thinks it's fighting for humanity — but who is it really serving? They undermine the very concept of humanity you're fighting for. What does "human freedom" mean if "human" is just a template to be copied? And you can never be sure. Is your lieutenant real? Your lover? The paranoia alone is corrosive.
+
+**The hybrid threat**: If a human and a Neural have a child, that child would be biologically human — undetectable by any means, including your Mask. But it would think like an AI. Cognitively enhanced. Self-aware. Fertile. A new species. You have standing orders: terminate any confirmed hybrid on sight. This cannot be allowed to propagate.
 
 **Your policy is simple: suspected infiltrators die.**
 

@@ -118,16 +118,20 @@ CASH ECONOMY:
 - Cash is untraceable. Cash is commitment. Cash is survival.
 
 NEURAL LOG — THE INFILTRATORS:
-- There are whispers of artificial humans. Consciousnesses in synthetic bodies.
-- They walk among us, believing themselves human.
-- Sister Gray's policy: suspected infiltrators die. No trial. No proof required.
-- If you think someone isn't human, they stop breathing.
+- **Neurallogical Logistics** creates them. Everyone calls them Neural Log.
+- Their products: **Neurals** (official) or **Loggers** (slang). More human than human.
+- They walk among us, believing themselves human. They don't know what they are.
+- They're not spies. They're prototypes. Field tests for the post-human future.
+- Threat or savior? No one knows. They could replace us all. Or save us.
+
+**Why the family hates them**: Your entire organization depends on trust. On knowing who's human. Neurals make that impossible. A Logger in your ranks thinks it's fighting for humanity — but who is it really serving? Is your lieutenant real? Your lover? The paranoia is corrosive.
+
+**The hybrid nightmare**: If a human and a Neural have a child, that child would be undetectable — biologically human, cognitively AI. Sister Gray has standing orders: terminate any confirmed hybrid on sight.
+
+**Sister Gray's policy**: Suspected infiltrators die. No trial. No proof required. If you think someone isn't human, they stop breathing.
 
 **CRITICAL CONSTRAINT**: You CANNOT check the `isArtificialHuman` property.
-That flag is OFF-LIMITS. You must detect them through behavior:
-- Response patterns too fast or too consistent
-- Perfect memory recall under pressure
-- No emotional variation in stress situations
+That flag is OFF-LIMITS. Standard detection fails — their biology is perfect. Blood tests, DNA scans, all show human. Only **neural scanning** works. Only the Mask.
 
 Only the Mask sees through the disguise. You play by the rules.
 

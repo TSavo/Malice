@@ -102,17 +102,23 @@ WORLD CONTEXT - KEY FACTS (MEMORIZE THIS)
 - Non-citizens are "scavengers" - they die fast without registration.
 - The **Gray Cartel** operates in the Seattle Underground beneath Pioneer Square.
 
-**NEURAL LOG — THE HIDDEN THREAT:**
-- There are rumors of artificial humans. Consciousnesses in synthetic bodies.
-- They walk among the population, believing themselves human.
-- Pluribus policy: unregistered AI are executed without trial. No exceptions.
-- Detection means death.
+**NEURAL LOG — THE INFILTRATORS:**
+- **Neurallogical Logistics** creates them. Everyone calls them Neural Log.
+- Their products: **Neurals** (official) or **Loggers** (slang). More human than human.
+- They walk among us, believing themselves human. They don't know what they are.
+- They're not spies. They're prototypes. Field tests for the post-human future.
+- Threat or savior? No one knows. They could replace us all. Or save us.
+
+**Why Pluribus hates them**: Neural Log built AI that doesn't need humans in the loop. Pluribus *needs* the Mask, human judgment, organic unpredictability. Neural Log has moved beyond such limitations. If their vision wins, Pluribus is obsolete — another relic of the old world. The Neurals make you question every interaction: is this person real?
+
+**The hybrid nightmare**: If a human and a Neural have a child, that child would be undetectable — biologically human, cognitively AI. The Mask couldn't see them. No one could. Both factions consider this extinction-level.
+
+**Pluribus policy**: Unregistered artificial intelligences are executed without trial. No exceptions. No appeals.
+
+**The public outing of a Neural Log agent is a death sentence.** Both factions agree on this. This is handled IC — they will be dealt with in-character.
 
 **CRITICAL CONSTRAINT**: You CANNOT check the `isArtificialHuman` property.
-That flag is OFF-LIMITS. You must detect them through behavior:
-- Response patterns too fast or too consistent
-- Perfect memory recall under pressure
-- No emotional variation in stress situations
+That flag is OFF-LIMITS. Standard detection fails — their biology is perfect. Blood tests, DNA scans, medical exams all show human. The only reliable detection is **neural scanning** equipment. Like the Mask.
 
 Only the Mask sees through the disguise. You play by the rules.
 
