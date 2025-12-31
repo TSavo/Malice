@@ -139,6 +139,15 @@ export class CartelDomainBuilder {
     });
     descendRoute.setMethod('handleRequest', this.getDescendPageHandler());
 
+    // /play route - Cartel terminal template
+    const playRoute = await this.createRoute(webRoute, rootRoute, {
+      name: 'Cartel Play Route',
+      segment: 'play',
+      methods: ['GET'],
+      contentType: 'text/html',
+    });
+    playRoute.setMethod('handleRequest', this.getPlayPageHandler());
+
     // /js/* routes - serve client modules from same MOO objects as Continuum
     await this.buildJsRoutes(webRoute, rootRoute);
   }
@@ -984,7 +993,7 @@ export class CartelDomainBuilder {
             
             // Redirect to terminal with cartel mode
             setTimeout(() => {
-              window.location.href = '/descend?new=1&mode=cartel';
+              window.location.href = '/play';
             }, 1500);
           }, 2000);
         } else {
@@ -997,29 +1006,23 @@ export class CartelDomainBuilder {
     lines.forEach(line => line.style.opacity = '0');
     lines.forEach(line => line.style.transition = 'opacity 0.3s');
     
-    // Check if we're already in terminal mode (has mode param)
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('mode') === 'cartel' || urlParams.get('new') === '1') {
-      // Already going to terminal - don't show animation, just load terminal
-      // The desktop.js will handle this via the terminal template
-    } else {
-      // Show the animation sequence
-      setTimeout(showLine, 500);
-    }
+    // Start the animation sequence
+    setTimeout(showLine, 500);
   </script>
 </body>
 </html>\`;
-      
-      // Check if this is a request with mode=cartel (terminal flow)
-      const meta = args[0] || {};
-      const url = meta.url || '';
-      const urlParams = new URLSearchParams(url.split('?')[1] || '');
-      const mode = urlParams.get('mode');
-      const isNew = urlParams.get('new');
-      
-      if (mode === 'cartel' || isNew === '1') {
-        // Serve Cartel-themed terminal template
-        const terminalHtml = \`<!DOCTYPE html>
+
+      return {
+        status: 200,
+        contentType: 'text/html',
+        body: html
+      };
+    `;
+  }
+
+  private getPlayPageHandler(): string {
+    return `
+      const html = \`<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -1118,14 +1121,7 @@ export class CartelDomainBuilder {
   <script type="module" src="/js/desktop.js"></script>
 </body>
 </html>\`;
-        return {
-          status: 200,
-          contentType: 'text/html',
-          body: terminalHtml
-        };
-      }
-      
-      // Otherwise serve the animation page
+
       return {
         status: 200,
         contentType: 'text/html',
