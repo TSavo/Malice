@@ -7,6 +7,12 @@ description: Update TypeScript bootstrap files for world building at server star
 
 Create prototypes and utilities that exist at server startup via TypeScript builders.
 
+## Inspecting Results via MCP
+
+Use MCP to inspect bootstrap results on local (`mcp__malice__`) or production (`mcp__malice-prod__`).
+
+Production requires SSH tunnel: `ssh -L 4010:localhost:3010 -i ~/.ssh/malice-do root@malice.world`
+
 ## Direct MOO Code for Inspection
 
 **IMPORTANT**: Write native MOO code using `execute_moo_code` to inspect and test the game. Use MOO's built-in capabilities directly.

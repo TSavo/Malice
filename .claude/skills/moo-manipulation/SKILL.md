@@ -7,6 +7,20 @@ description: Direct MOO code manipulation without wrapper tools. Use execute_moo
 
 Interact with the Malice MOO using **native MOO code** via `execute_moo_code`. No wrapper tools, no $mcp object - just pure MOO.
 
+## Local vs Production
+
+Two MCP servers are available:
+
+| Server | Tool Prefix | Use For |
+|--------|-------------|---------|
+| Local dev | `mcp__malice__` | Development & testing |
+| Production | `mcp__malice-prod__` | Live server operations |
+
+**Production requires SSH tunnel:**
+```bash
+ssh -L 4010:localhost:3010 -i ~/.ssh/malice-do root@malice.world
+```
+
 ## The Only Tool You Need
 
 ```typescript

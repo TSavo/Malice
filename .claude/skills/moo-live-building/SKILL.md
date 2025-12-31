@@ -7,6 +7,15 @@ description: Create new MOO prototypes and objects at runtime using MCP tools. U
 
 Create prototypes and objects at runtime without server restart.
 
+## Local vs Production
+
+| Server | Tool Prefix | Use For |
+|--------|-------------|---------|
+| Local dev | `mcp__malice__` | Development & testing |
+| Production | `mcp__malice-prod__` | Live server operations |
+
+**Production requires SSH tunnel:** `ssh -L 4010:localhost:3010 -i ~/.ssh/malice-do root@malice.world`
+
 ## Direct MOO Code: No Wrappers, Just MOO
 
 **IMPORTANT**: Write native MOO code using `execute_moo_code`. Use MOO's built-in capabilities directly - `$recycler`, `$load()`, object methods, property access.
