@@ -6036,6 +6036,10 @@ Core Objects:
         setHeader: () => {},
         write: () => true,
         on: () => {},
+        off: () => {},
+        destroy: () => {},
+        writable: true,
+        finished: false,
       } as unknown as ServerResponse;
 
       await transport.handleRequest(req, fakeRes, initMessage);
