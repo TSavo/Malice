@@ -387,7 +387,6 @@ export class WebsiteBuilder {
       </a>
       <div class="flex gap-6 text-sm">
         <a href="/play" class="text-gray-400 hover:text-malice-accent transition">ACCESS</a>
-        <a href="/docs/PLAYER-GUIDE" class="text-gray-400 hover:text-malice-accent transition">GUIDE</a>
         <a href="/map" class="text-gray-400 hover:text-malice-accent transition">MAP</a>
       </div>
     </div>
@@ -784,12 +783,9 @@ export class WebsiteBuilder {
       Registration is voluntary. Benefits require compliance with work assignments.
     </p>
 
-    <div class="flex flex-wrap gap-4 mb-12">
+    <div class="mb-12">
       <a href="/play" class="px-6 py-3 bg-malice-accent text-black font-bold hover:bg-green-400 transition text-sm">
         Citizen Registration
-      </a>
-      <a href="/docs/PLAYER-GUIDE" class="px-6 py-3 border border-gray-700 hover:border-gray-500 transition text-sm text-gray-400">
-        Registration Requirements
       </a>
     </div>
 
@@ -878,62 +874,12 @@ export class WebsiteBuilder {
     </div>
 
     <!-- Access Terminal -->
-    <div class="bg-black border border-gray-800 rounded-lg overflow-hidden">
-      <div class="bg-gray-900 px-4 py-2 border-b border-gray-800 flex items-center gap-2">
-        <div class="w-3 h-3 rounded-full bg-red-500/50"></div>
-        <div class="w-3 h-3 rounded-full bg-yellow-500/50"></div>
-        <div class="w-3 h-3 rounded-full bg-green-500/50"></div>
-        <span class="ml-2 text-xs text-gray-600 font-mono">CITIZEN ACCESS TERMINAL</span>
-      </div>
-      <div class="p-6">
-        <div class="font-mono text-sm">
-          <div class="text-gray-600 mb-4">&gt; SELECT ACCESS METHOD:</div>
-
-          <!-- Web Terminal -->
-          <div class="mb-4 p-3 border border-gray-800 hover:border-malice-accent/50 transition rounded">
-            <div class="flex items-center justify-between">
-              <div>
-                <div class="text-malice-accent">WEB TERMINAL</div>
-                <div class="text-gray-600 text-xs mt-1">Browser-based access</div>
-              </div>
-              <a href="/play" class="px-4 py-2 bg-malice-accent/20 text-malice-accent border border-malice-accent/50 rounded hover:bg-malice-accent hover:text-black transition text-xs font-bold">
-                CONNECT
-              </a>
-            </div>
-          </div>
-
-          <!-- Telnet -->
-          <div class="mb-4 p-3 border border-gray-800 hover:border-gray-700 transition rounded">
-            <div class="flex items-center justify-between">
-              <div>
-                <div class="text-gray-400">TELNET</div>
-                <code class="text-gray-500 text-xs">telnet seattle.city 5555</code>
-              </div>
-              <button onclick="navigator.clipboard.writeText('telnet seattle.city 5555')" class="px-3 py-2 text-gray-600 hover:text-malice-accent transition text-xs">
-                [COPY]
-              </button>
-            </div>
-          </div>
-
-          <!-- SSH -->
-          <div class="p-3 border border-gray-800 hover:border-gray-700 transition rounded">
-            <div class="flex items-center justify-between">
-              <div>
-                <div class="text-gray-400">SSH (ENCRYPTED)</div>
-                <code class="text-gray-500 text-xs">ssh seattle.city -p 5556</code>
-              </div>
-              <button onclick="navigator.clipboard.writeText('ssh seattle.city -p 5556')" class="px-3 py-2 text-gray-600 hover:text-malice-accent transition text-xs">
-                [COPY]
-              </button>
-            </div>
-          </div>
-
-          <div class="mt-6 text-xs text-gray-700">
-            <span class="text-gray-500">&gt;</span> New arrivals: Enter <code class="text-gray-500">connect guest</code> for orientation.<br>
-            <span class="text-gray-500">&gt;</span> Returning citizens: Biometric scan required.
-          </div>
-        </div>
-      </div>
+    <div class="border border-gray-800 bg-black/50 p-6">
+      <div class="text-xs font-mono text-gray-600 mb-4">CITIZEN ACCESS TERMINAL</div>
+      <a href="/play" class="px-4 py-2 bg-malice-accent/20 text-malice-accent border border-malice-accent/50 hover:bg-malice-accent hover:text-black transition text-xs font-bold">
+        ACCESS
+      </a>
+      <p class="text-xs text-gray-700 mt-4">Biometric verification required.</p>
     </div>
   </div>
 </div>
