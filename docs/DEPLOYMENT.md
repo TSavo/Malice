@@ -597,6 +597,68 @@ Then just: `ssh malice-prod`
 
 ---
 
+## Automated Backups
+
+MongoDB is backed up to Google Drive with tiered retention.
+
+### Backup Schedule
+
+| Frequency | Retention | Purpose |
+|-----------|-----------|---------|
+| Every 30 min | 3 days | Point-in-time recovery |
+| Daily (midnight) | 7 days | Daily snapshots |
+| Weekly (Sunday) | Forever | Long-term archive |
+
+### Storage Locations
+
+| Location | Path | Purpose |
+|----------|------|---------|
+| Local | `/root/backups/` | Fast restore |
+| Google Drive | `Malice-Backups/` | Off-site disaster recovery |
+
+### Manual Backup
+
+```bash
+ssh -i ~/.ssh/malice-do root@malice.world /root/backups/backup-mongo.sh
+```
+
+### Restore from Backup
+
+```bash
+# List available backups
+ssh -i ~/.ssh/malice-do root@malice.world 'rclone ls gdrive:Malice-Backups/ | tail -10'
+
+# Download specific backup
+ssh -i ~/.ssh/malice-do root@malice.world 'rclone copy gdrive:Malice-Backups/malice-2025-12-31_0000.gz /root/backups/'
+
+# Restore to MongoDB (stops game first)
+ssh -i ~/.ssh/malice-do root@malice.world 'cd /root/Malice && docker compose stop game && gunzip -c /root/backups/malice-2025-12-31_0000.gz | docker exec -i malice-mongo mongorestore --archive --drop --db malice && docker compose start game'
+```
+
+### Backup Script Location
+
+- Script: `/root/backups/backup-mongo.sh`
+- Log: `/root/backups/backup.log`
+- Cron: `*/30 * * * *` (every 30 minutes)
+
+### Google Drive Setup
+
+Backups use rclone with Google Drive OAuth. To reconfigure:
+
+```bash
+# On a machine with browser access
+rclone authorize "drive"
+
+# Copy the token JSON to server
+ssh -i ~/.ssh/malice-do root@malice.world 'cat > ~/.config/rclone/rclone.conf << EOF
+[gdrive]
+type = drive
+token = <paste-token-json-here>
+EOF'
+```
+
+---
+
 ## Current Production
 
 **Droplet:** `malice-prod`
