@@ -16,8 +16,9 @@ RUN npm install -g @anthropic-ai/claude-code
 # Copy package files
 COPY --chown=node:node package*.json ./
 
-# Install dependencies (including tsx)
-RUN npm ci
+# Install dependencies with BuildKit cache mount for speed
+RUN --mount=type=cache,target=/root/.npm \
+    npm ci --prefer-offline
 
 # Copy source code and types
 COPY --chown=node:node src ./src
