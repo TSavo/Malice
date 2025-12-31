@@ -847,7 +847,7 @@ export class CartelDomainBuilder {
     
     .error-main::before,
     .error-main::after {
-      content: "SIGNAL LOST";
+      content: attr(data-text);
       position: absolute;
       left: 0;
       right: 0;
@@ -953,7 +953,7 @@ export class CartelDomainBuilder {
   <div class="fragments fragment-4">RETRY: 0</div>
   
   <div class="container">
-    <div class="error-main">INITIALIZING</div>
+    <div class="error-main" data-text="INITIALIZING">INITIALIZING</div>
     <div class="error-code">SECURE_TUNNEL // HANDSHAKE</div>
 
     <div class="terminal-block">
@@ -1006,6 +1006,7 @@ export class CartelDomainBuilder {
         const newSub = line.dataset.sub;
         if (newHeader) {
           headerEl.textContent = newHeader;
+          headerEl.dataset.text = newHeader;
           headerEl.style.color = step === lines.length - 1 ? '#ff3366' : '#ff3366';
         }
         if (newSub) {
