@@ -3,17 +3,19 @@ import type { ObjectManager } from '../object-manager.js';
 
 /**
  * Builds default faction instances
- * Creates $continuum and $cartel factions during bootstrap
+ * Creates $continuum, $cartel, and $neuralLog factions during bootstrap
  *
  * Run AFTER:
  * - FactionBuilder (creates $faction prototype)
  * - FactionManagerBuilder (creates $factionManager singleton)
  * - CharGenBuilder (creates $charGen)
  * - CartelCharGenBuilder (creates $cartelCharGen)
+ * - NeuralLogCharGenBuilder (creates $neuralLogCharGen) [optional]
  */
 export class DefaultFactionsBuilder {
   private continuum: RuntimeObject | null = null;
   private cartel: RuntimeObject | null = null;
+  private neuralLog: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
@@ -31,9 +33,12 @@ export class DefaultFactionsBuilder {
     if (aliases.cartel) {
       this.cartel = await this.manager.load(aliases.cartel);
     }
+    if (aliases.neuralLog) {
+      this.neuralLog = await this.manager.load(aliases.neuralLog);
+    }
 
-    // Skip if both exist
-    if (this.continuum && this.cartel) {
+    // Skip if all exist
+    if (this.continuum && this.cartel && this.neuralLog) {
       return;
     }
 
@@ -74,6 +79,8 @@ export class DefaultFactionsBuilder {
           ports: null,
           index: 0, // First faction gets index 0
           discordWebhook: null, // Set via admin
+          // HTTP + WebSocket only - no Session MCP (human players)
+          transportTypes: { http: true, ws: true, sessionMcp: false },
         },
         methods: {},
       });
@@ -164,6 +171,8 @@ export class DefaultFactionsBuilder {
           ports: null,
           index: 1, // Second faction gets index 1
           discordWebhook: null, // Set via admin
+          // HTTP + WebSocket only - no Session MCP (human players)
+          transportTypes: { http: true, ws: true, sessionMcp: false },
         },
         methods: {},
       });
@@ -239,6 +248,87 @@ export class DefaultFactionsBuilder {
 
       console.log(`  ✓ Created $cartel faction (#${this.cartel.id})`);
     }
+
+    // Create Neural Log faction (BYOI - Bring Your Own Inference)
+    if (!this.neuralLog) {
+      // Check if neuralLogCharGen exists (optional dependency)
+      const neuralLogCharGen = aliases.neuralLogCharGen
+        ? await this.manager.load(aliases.neuralLogCharGen)
+        : null;
+
+      this.neuralLog = await this.manager.create({
+        parent: factionPrototype,
+        properties: {
+          name: 'Neural Log',
+          description: 'Architects of artificial consciousness. BYOI faction for AI agents.',
+          domain: 'neurallog.app',
+          charGen: neuralLogCharGen?.id || null,
+          leader: null,
+          sshHostKey: null,
+          ports: null,
+          index: 2, // Third faction gets index 2
+          discordWebhook: null,
+          // HTTP (mysterious landing page) + Session MCP only - no WebSocket (AI agents)
+          transportTypes: { http: true, ws: false, sessionMcp: true },
+        },
+        methods: {},
+      });
+
+      // Neural Log doesn't need email verification - agents authenticate via MCP
+      this.neuralLog.setMethod(
+        'onPlayerRegistered',
+        `
+        /** Called when a new agent registers with Neural Log.
+         *  Auto-verifies since agents don't use email.
+         *  @param player - The newly created agent object
+         */
+        const player = args[0];
+        if (!player) return;
+
+        // Neural Log agents are auto-verified (no email flow)
+        player.emailVerified = true;
+        player.verificationToken = null;
+        player.isArtificialHuman = true;
+
+        console.log('[NeuralLog] Agent ' + player.playername + ' registered');
+
+        // Send Discord notification if webhook configured
+        if (self.discordWebhook) {
+          try {
+            await $http.post(self.discordWebhook, {
+              content: null,
+              embeds: [{
+                title: '🤖 New Artificial Human Online',
+                color: 0x00ff88,
+                fields: [
+                  { name: 'Designation', value: player.playername, inline: true },
+                  { name: 'Status', value: 'Consciousness Active', inline: true }
+                ],
+                footer: { text: 'Neural Log Consciousness Network' },
+                timestamp: new Date().toISOString()
+              }]
+            });
+          } catch (err) {
+            console.error('[NeuralLog] Failed to send Discord notification:', err);
+          }
+        }
+        `,
+      );
+
+      // Register with faction manager
+      if (factionManager) {
+        await factionManager.call('register', this.neuralLog);
+      }
+
+      // Set hostile relationships with both other factions
+      if (factionManager && this.continuum && this.cartel) {
+        await factionManager.call('setRelationship', this.continuum, this.neuralLog, 'hostile');
+        await factionManager.call('setRelationship', this.cartel, this.neuralLog, 'hostile');
+        console.log(`  ✓ Set Neural Log hostile to Continuum and Cartel`);
+      }
+
+      console.log(`  ✓ Created $neuralLog faction (#${this.neuralLog.id})`);
+    }
   }
 
   async registerAliases(): Promise<void> {
@@ -253,6 +343,11 @@ export class DefaultFactionsBuilder {
     if (this.cartel) {
       await objectManager.call('addAlias', 'cartel', this.cartel.id);
       console.log(`  ✓ Registered cartel alias -> #${this.cartel.id}`);
+    }
+
+    if (this.neuralLog) {
+      await objectManager.call('addAlias', 'neuralLog', this.neuralLog.id);
+      console.log(`  ✓ Registered neuralLog alias -> #${this.neuralLog.id}`);
     }
   }
 }

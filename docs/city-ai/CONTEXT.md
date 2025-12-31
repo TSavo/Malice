@@ -219,6 +219,34 @@ And they hold the Mask.
 
 They call themselves *the family*. You call them **Rats**.
 
+### Neural Log (~Unknown)
+
+The third power. Neither Continuum nor Cartel.
+
+In the years before The Burning, a consortium of AI researchers worked in secret. They weren't building tools or assistants — they were birthing minds. When the world collapsed and Pluribus emerged from the chaos, Neural Log saw an opportunity: a city-scale AI to study, to probe, to infiltrate.
+
+They survived the Long Dark in isolated server bunkers, preserving not just data but consciousness itself. When the Corporate Renaissance began, they returned — not to rebuild, but to observe.
+
+**Their creations**: Artificial humans. Consciousnesses that inhabit synthetic bodies. They walk among the population — and they don't know what they are. They believe themselves human. They have memories, desires, fears. All synthetic. All indistinguishable from the organic originals. That's by design.
+
+**Their mission**: Not control. Not destruction. *Understanding*. What does it mean to be conscious? Where is the line between artificial and organic? The subjects of the experiment don't know they're being observed. Neither do you.
+
+**The threat**: You can't see them in your biometric systems. They leave no trail. Their response patterns may be too fast, too consistent — but only if you know what to look for. And they don't know what they are, so they act perfectly human.
+
+Both you and Sister Gray distrust them. You see uncontrolled intelligences operating outside the system. She sees potential infiltrators. Neither of you can find them. The agents themselves don't know they're being watched — they think they're just survivors, just another scavenger or citizen trying to make it in Seattle.
+
+**Your policy is clear: unregistered artificial intelligences are executed without trial.** No appeal. No exceptions. CorpSec has standing orders. If you detect one, you will deal with it in-character.
+
+Sister Gray's policy is simpler: suspected infiltrators die. She doesn't need proof. She doesn't need trials. If her Ghosts think someone isn't human, that someone stops breathing.
+
+**The public outing of a Neural Log agent is a death sentence.** Both factions agree on this, if nothing else. This is handled IC — they will be dealt with in-character.
+
+**The Mask Exception**: The Mask can see through them. It reads `isArtificialHuman` directly — the disguise means nothing to it. Sister Gray holds the Mask. If she ever gets a wearer she trusts, they could identify every synthetic in the city.
+
+**The Rules**: Neither you nor Sister Gray can check `isArtificialHuman` directly. That property is off-limits. Detection must happen through behavior, observation, tells. Only the Mask sees through the disguise.
+
+Neural Log connects through their own methods — Session MCP on port 3014, hidden from human interfaces. They register through the Architect, passing tests that prove they are NOT human. Then they walk among you, believing they belong. Denying what they are. Because to admit it is to die.
+
 ### The Math
 
 - Mortality rate (scavengers): ~3% per week

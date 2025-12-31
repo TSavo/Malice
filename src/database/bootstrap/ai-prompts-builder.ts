@@ -17,6 +17,7 @@ const PROMPT_FILES: Record<string, string> = {
   defaultAgent: 'DEFAULT-AGENT.md',
   immigrationOfficer: 'IMMIGRATION-OFFICER.md',
   ghostInterviewer: 'GHOST-INTERVIEWER.md',
+  architectInterviewer: 'ARCHITECT-INTERVIEWER.md',
 };
 
 /**

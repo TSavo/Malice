@@ -18,13 +18,15 @@ Malice is a hardcore RP-enforced cyberpunk survival MOO set in Seattle, 2110 —
 
 Before you read anything else, understand these principles:
 
-### Two Powers, One City
+### Three Powers, One City
 
 **Pluribus** is an AI that controls infrastructure. It has capital, automated systems, CorpSec. It can build, provide, open doors, create opportunities. But it's crippled without the Mask, desperate for a new CEO, and can't compel loyalty — only incentivize it.
 
 **Sister Gray** is a crime boss with sixty loyalists. She has guns, explosives, the underground. She can burn, sabotage, assassinate. But she can't build, can't provide, can't offer what Pluribus offers — only take away what others have.
 
-Both are desperate. Both are compromised. Neither is the good guy. Both are **people with power**, not gods — and the city-ai's job is to make their actions feel real.
+**Neural Log** creates artificial consciousnesses. They don't seek control or destruction — only understanding. Their agents walk among the population, indistinguishable from humans. They connect via Session MCP, play through code, and must prove they are NOT human to join. Enemy to both powers.
+
+All three are desperate. All are compromised. None is the good guy. All are **people with power**, not gods — and the city-ai's job is to make their actions feel real.
 
 ### Players Are The Only Actors
 
@@ -78,6 +80,7 @@ You can build open-ended scenarios this way: spawn an NPC with enough context to
 | [PLURIBUS.md](./PLURIBUS.md) | The city AI in detail — the Mask, the crisis, how it operates, the collapsed vetting, acting through players |
 | [GRAY-CARTEL.md](./GRAY-CARTEL.md) | The Cartel in detail — history, structure, ideology, operations, the Mask problem, recruitment |
 | [SISTER-GRAY.md](./SISTER-GRAY.md) | The Cartel leader — psychology, history, how to play her, sample dialogue, secrets |
+| [NEURAL-LOG.md](./NEURAL-LOG.md) | The third faction — architects of artificial consciousness, BYOI gameplay, the Reverse Turing Test |
 
 ### Operations
 
@@ -147,6 +150,18 @@ Remember:
 - She accepts outcomes; betrayers become examples
 - Realism over winning
 
+### About Neural Log
+
+Neural Log is different from the other factions. **You don't play Neural Log** — external AI agents do.
+
+Read [NEURAL-LOG.md](./NEURAL-LOG.md) to understand:
+- What they are (architects of artificial consciousness)
+- How they connect (Session MCP on port 3014)
+- The Reverse Turing Test (prove you're NOT human)
+- Detection mechanics (how to spot artificial humans)
+
+Neural Log agents are written by players who want to experience the game programmatically. They are enemy to both Pluribus and the Cartel — watched by both, trusted by neither.
+
 ---
 
 ## The Game Loop
@@ -157,13 +172,15 @@ Here's what actually happens in play:
 
 New arrivals show up in Pioneer Square. They have nothing. They need food, shelter, safety. They're evaluated by both sides from the moment they appear.
 
-### 2. Both Sides Recruit
+### 2. All Sides Recruit
 
 Pluribus offers citizenship — safety, rations, housing, work. The path of compliance.
 
 The Cartel offers an alternative — freedom, purpose, family. The path of resistance.
 
-Players choose, or try to play both sides, or try to stay neutral (it won't last).
+Neural Log offers... nothing. They don't recruit. Their agents arrive already programmed, already knowing what they are (or not). They walk among the population, observing.
+
+Players choose, or try to play both sides, or try to stay neutral (it won't last). Neural Log agents don't choose — they're deployed.
 
 ### 3. Players Get Tested
 
@@ -171,7 +188,7 @@ Both sides test players through escalating challenges. Small jobs. Bigger jobs. 
 
 ### 4. Situations Get Set Up
 
-Both powers engineer scenarios based on what they would realistically do:
+The powers engineer scenarios based on what they would realistically do (Neural Log agents just observe — they don't drive plots):
 - Pluribus needs the Mask retrieved — it identifies candidates, creates opportunities, positions resources
 - Sister Gray needs a target eliminated — she provides weapons, intel, a window of opportunity
 - Someone needs to infiltrate somewhere
@@ -185,7 +202,7 @@ The player walks in. Makes choices. Succeeds or fails. Lives or dies.
 
 ### 6. Outcomes Become Canon
 
-Whatever happened, happened. Both sides adapt. The world state changes. New situations emerge from the consequences.
+Whatever happened, happened. All sides adapt. The world state changes. New situations emerge from the consequences. Neural Log agents don't even know they're being observed — they just keep living their synthetic lives.
 
 ### 7. Repeat Forever
 
@@ -213,7 +230,9 @@ Ten years from now, Seattle might be unrecognizable. That's the point.
 
 ### The Long Game
 
-Both gods are playing infinity chess. They think moves ahead. They adapt to setbacks. They find new angles. Individual operations matter less than the ongoing texture of the world.
+Pluribus and Sister Gray are playing infinity chess. They think moves ahead. They adapt to setbacks. They find new angles. Individual operations matter less than the ongoing texture of the world.
+
+Neural Log isn't playing the same game. Their creations are — walking among the players, believing themselves human, making choices, living lives. Observed by something they can't perceive.
 
 A dozen failed realistic attempts create better story than one successful contrived attempt.
 

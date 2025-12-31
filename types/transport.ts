@@ -80,15 +80,29 @@ export interface TransportServerConfig {
 }
 
 /**
- * Port allocation for a faction's transport bundle
+ * Port allocation for a faction's transport bundle.
+ * Ports are optional - only allocated if the transport type is enabled.
  */
 export interface FactionPorts {
-  /** HTTP web server port */
-  http: number;
-  /** WebSocket server port */
-  ws: number;
-  /** Session MCP server port */
-  sessionMcp: number;
+  /** HTTP web server port (if HTTP enabled) */
+  http?: number;
+  /** WebSocket server port (if WebSocket enabled) */
+  ws?: number;
+  /** Session MCP server port (if Session MCP enabled) */
+  sessionMcp?: number;
+}
+
+/**
+ * Transport enablement configuration for a faction.
+ * Controls which transport types are started for this faction.
+ */
+export interface FactionTransportTypes {
+  /** Enable HTTP web server (default: true if domain is set) */
+  http?: boolean;
+  /** Enable WebSocket server (default: true) */
+  ws?: boolean;
+  /** Enable Session MCP server (default: false) */
+  sessionMcp?: boolean;
 }
 
 /**
@@ -103,6 +117,8 @@ export interface FactionTransportConfig {
   domain?: string;
   /** Allocated ports */
   ports: FactionPorts;
+  /** Which transports to enable (defaults: http=domain set, ws=true, sessionMcp=false) */
+  transports?: FactionTransportTypes;
   /** Enable debug logging */
   debug?: boolean;
 }
