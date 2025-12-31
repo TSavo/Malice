@@ -5,11 +5,13 @@ import { AuthManagerBuilder } from './auth-manager-builder.js';
 import { BodyFactoryBuilder } from './body-factory-builder.js';
 import { CartelCharGenBuilder } from './cartel-chargen-builder.js';
 import { CharGenBuilder } from './chargen-builder.js';
+import { NeuralLogCharGenBuilder } from './neural-log-chargen-builder.js';
 import { ClientBuilder } from './client/index.js';
 import { CombatBuilder } from './combat-builder.js';
 import { DefaultFactionsBuilder } from './default-factions-builder.js';
 import { CartelDomainBuilder } from './cartel-domain-builder.js';
 import { ContinuumDomainBuilder } from './continuum-domain-builder.js';
+import { NeuralLogDomainBuilder } from './neurallog-domain-builder.js';
 import { DomainRegistryBuilder } from './domain-registry-builder.js';
 import { EmoteBuilder } from './emote-builder.js';
 import { EnglishBuilder } from './english-builder.js';
@@ -84,6 +86,7 @@ export class CoreSystemBuilder {
     const authManagerBuilder = new AuthManagerBuilder(this.manager);
     const charGenBuilder = new CharGenBuilder(this.manager);
     const cartelCharGenBuilder = new CartelCharGenBuilder(this.manager);
+    const neuralLogCharGenBuilder = new NeuralLogCharGenBuilder(this.manager);
     const preAuthHandlerBuilder = new PreAuthHandlerBuilder(this.manager);
     const recyclerBuilder = new RecyclerBuilder(this.manager);
     const spatialBuilder = new SpatialBuilder(this.manager);
@@ -127,10 +130,12 @@ export class CoreSystemBuilder {
     const metaDomainBuilder = new MetaDomainBuilder(this.manager);
     const continuumDomainBuilder = new ContinuumDomainBuilder(this.manager);
     const cartelDomainBuilder = new CartelDomainBuilder(this.manager);
+    const neuralLogDomainBuilder = new NeuralLogDomainBuilder(this.manager);
 
     await authManagerBuilder.build();
     await charGenBuilder.build();
     await cartelCharGenBuilder.build();
+    await neuralLogCharGenBuilder.build();
     await preAuthHandlerBuilder.build();
     await recyclerBuilder.build();
     await spatialBuilder.build();
@@ -190,6 +195,7 @@ export class CoreSystemBuilder {
 
     await continuumDomainBuilder.build(); // thecontinuum.city domain
     await cartelDomainBuilder.build(); // graycartel.com domain
+    await neuralLogDomainBuilder.build(); // neurallog.app domain
     await mcpBuilder.build(); // MCP code-first tools
     await sessionBuilder.build(); // Session management wrapper
     await tailorBuilder.build(); // AI costume designer
@@ -202,6 +208,7 @@ export class CoreSystemBuilder {
     await authManagerBuilder.registerAlias();
     await charGenBuilder.registerAlias();
     await cartelCharGenBuilder.registerAlias();
+    await neuralLogCharGenBuilder.registerAlias();
     await preAuthHandlerBuilder.registerAlias();
     await recyclerBuilder.registerAlias();
     await spatialBuilder.registerAlias();
@@ -232,6 +239,7 @@ export class CoreSystemBuilder {
     await websiteBuilder.registerAliases();
     await continuumDomainBuilder.registerAlias();
     await cartelDomainBuilder.registerAlias();
+    await neuralLogDomainBuilder.registerAlias();
     await mcpBuilder.registerAliases();
     await tailorBuilder.registerAlias();
     await transportsBuilder.registerAlias();

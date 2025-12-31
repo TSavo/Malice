@@ -7,7 +7,7 @@
 
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import type { FactionPorts, FactionTransportConfig } from '../../types/transport.js';
+import type { FactionPorts, FactionTransportConfig, FactionTransportTypes } from '../../types/transport.js';
 import type { ObjectManager } from '../database/object-manager.js';
 import { calculateFactionPorts } from '../config/faction-ports.js';
 import { Connection } from '../connection/connection.js';
@@ -39,6 +39,8 @@ export interface CreateFactionOptions {
   index?: number;
   /** Pre-allocated ports (calculated from index if not provided) */
   ports?: FactionPorts;
+  /** Which transports to enable (defaults: http=domain set, ws=true, sessionMcp=false) */
+  transports?: FactionTransportTypes;
   /** Enable debug logging */
   debug?: boolean;
 }
@@ -85,7 +87,7 @@ export class FactionTransportRegistry {
    * @returns The allocated ports
    */
   async create(options: CreateFactionOptions): Promise<FactionPorts> {
-    const { factionId, name, domain, debug } = options;
+    const { factionId, name, domain, debug, transports } = options;
 
     // Check if already exists
     if (this.bundles.has(factionId)) {
@@ -98,9 +100,15 @@ export class FactionTransportRegistry {
     // Calculate or use provided ports
     const ports = options.ports ?? calculateFactionPorts(index);
 
+    // Determine enabled transports for logging
+    const enabledTransports = [];
+    if (transports?.http ?? !!domain) enabledTransports.push(`HTTP ${ports.http}`);
+    if (transports?.ws ?? true) enabledTransports.push(`WS ${ports.ws}`);
+    if (transports?.sessionMcp ?? false) enabledTransports.push(`SessionMCP ${ports.sessionMcp}`);
+
     if (this.debug || debug) {
       console.log(`[FactionRegistry] Creating transport bundle for ${name} (#${factionId})`);
-      console.log(`  Ports: HTTP ${ports.http}, WS ${ports.ws}, SessionMCP ${ports.sessionMcp}`);
+      console.log(`  Enabled: ${enabledTransports.join(', ') || 'none'}`);
     }
 
     // Create bundle config
@@ -109,6 +117,7 @@ export class FactionTransportRegistry {
       name,
       domain,
       ports,
+      transports,
       debug: this.debug || debug,
     };
 

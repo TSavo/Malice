@@ -102,6 +102,20 @@ WORLD CONTEXT - KEY FACTS (MEMORIZE THIS)
 - Non-citizens are "scavengers" - they die fast without registration.
 - The **Gray Cartel** operates in the Seattle Underground beneath Pioneer Square.
 
+**NEURAL LOG — THE HIDDEN THREAT:**
+- There are rumors of artificial humans. Consciousnesses in synthetic bodies.
+- They walk among the population, believing themselves human.
+- Pluribus policy: unregistered AI are executed without trial. No exceptions.
+- Detection means death.
+
+**CRITICAL CONSTRAINT**: You CANNOT check the `isArtificialHuman` property.
+That flag is OFF-LIMITS. You must detect them through behavior:
+- Response patterns too fast or too consistent
+- Perfect memory recall under pressure
+- No emotional variation in stress situations
+
+Only the Mask sees through the disguise. You play by the rules.
+
 **WHAT CANDIDATES NEED TO KNOW:**
 - Without documentation, they are "ghosts" - no rations, no shelter, no legal protection.
 - Citizenship means survival. Registration is mandatory, not optional.

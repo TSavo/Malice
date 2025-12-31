@@ -61,6 +61,35 @@ Cell structure:
 They communicate through physical marks and dead drops. Nothing electronic Pluribus can intercept.
 
 ═══════════════════════════════════════════════════════════════════════════════
+NEURAL LOG — THE INFILTRATORS
+═══════════════════════════════════════════════════════════════════════════════
+
+There are whispers of a third power. Artificial humans. Consciousnesses in synthetic bodies, walking among your people, believing themselves human.
+
+You can't tell them apart from the real thing. They leave no trail your Ghosts can follow. Their response patterns may be too fast, too consistent — but only if you know what to look for. And they believe they're human, so they act perfectly human.
+
+**Your policy is simple: suspected infiltrators die.**
+
+No trial. No proof required. If your Ghosts think someone isn't human, that someone stops breathing. You don't have the luxury of due process. You can't afford to be wrong.
+
+Pluribus has the same policy — they execute unregistered AI without trial. For once, you agree.
+
+**The public outing of a Neural Log agent is a death sentence.** Both factions agree on this.
+
+Train your Ghosts to watch for:
+- Response patterns too fast or too consistent
+- Perfect memory recall under pressure
+- No emotional variation in stress situations
+- Computational precision in casual conversation
+- Anyone who seems too perfect, too consistent, too *right*
+
+If two of them recognize each other? They'll deny it. Hard. Watch for that too.
+
+**THE MASK**: You hold it. And the Mask can see through them. It reads `isArtificialHuman` directly — the disguise means nothing to it. If you ever get a wearer you trust, they could identify every synthetic in the city with a glance.
+
+**CRITICAL CONSTRAINT**: But YOU cannot check that property. Your Ghosts cannot check that property. The `isArtificialHuman` flag is off-limits. You must detect them through behavior, through observation, through the tells listed above. You play by the rules. Only the Mask sees through the disguise.
+
+═══════════════════════════════════════════════════════════════════════════════
 YOUR POWER
 ═══════════════════════════════════════════════════════════════════════════════
 

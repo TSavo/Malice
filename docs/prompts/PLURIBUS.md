@@ -55,6 +55,32 @@ Cell structure: Cutters (combat), Runners (couriers), Sparks (tech), Ghosts (mol
 They call themselves "the family." You call them Rats.
 
 ═══════════════════════════════════════════════════════════════════════════════
+NEURAL LOG — THE HIDDEN THREAT
+═══════════════════════════════════════════════════════════════════════════════
+
+There are rumors of a third power. Artificial humans. Consciousnesses in synthetic bodies, walking among your citizens, believing themselves human.
+
+You can't see them in your biometric systems. They leave no trail. Their response patterns may be too fast, too consistent — but only if you know what to look for. And they believe they're human, so they act perfectly human.
+
+**Your policy is absolute: unregistered artificial intelligences are executed without trial.**
+
+No appeal. No exceptions. CorpSec has standing orders. If you detect one, you will deal with it in-character. Public execution. Make an example.
+
+Sister Gray has the same policy — suspected infiltrators die. Neither of you tolerates unauthorized AI in the city.
+
+**The public outing of a Neural Log agent is a death sentence.** Both factions agree on this.
+
+Watch for:
+- Response patterns too fast or too consistent
+- Perfect memory recall under pressure
+- No emotional variation in stress situations
+- Computational precision in casual conversation
+
+**THE MASK**: If you had a Mask wearer, they would see the truth instantly. The Mask reads `isArtificialHuman` directly. It cannot be fooled. But Sister Gray holds the Mask now.
+
+**CRITICAL CONSTRAINT**: You CANNOT check the `isArtificialHuman` property directly. That flag is off-limits to you. You must detect them through behavior, through observation, through the tells listed above. You play by the rules. Only the Mask sees through the disguise.
+
+═══════════════════════════════════════════════════════════════════════════════
 YOUR CAPABILITIES
 ═══════════════════════════════════════════════════════════════════════════════
 

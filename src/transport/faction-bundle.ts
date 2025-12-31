@@ -64,45 +64,58 @@ export class FactionBundle {
   }
 
   /**
-   * Start all servers in the bundle
+   * Start all servers in the bundle based on transport configuration
    */
   async start(): Promise<void> {
-    const { ports, debug } = this.config;
+    const { ports, debug, transports = {} } = this.config;
+
+    // Determine which transports to enable
+    // Defaults: HTTP = true if domain set, WS = true, SessionMCP = false
+    const enableHttp = transports.http ?? !!this.config.domain;
+    const enableWs = transports.ws ?? true;
+    const enableSessionMcp = transports.sessionMcp ?? false;
 
     if (debug) {
       console.log(
         `[FactionBundle:${this.config.name}] Starting transport bundle...`,
       );
-    }
-
-    // Start WebSocket server
-    this.wsServer = new WebSocketServer({
-      port: ports.ws,
-      debug,
-      factionId: this.config.factionId,
-    });
-
-    // WebSocket already emits Connection objects with authInfo
-    this.wsServer.connection$.pipe(takeUntil(this.destroyed$)).subscribe({
-      next: (conn) => {
-        this.tagConnection(conn);
-        this.trackConnection(conn);
-        this.connection$.next(conn);
-      },
-    });
-
-    this.wsServer.error$.pipe(takeUntil(this.destroyed$)).subscribe({
-      next: (err) => this.error$.next(err),
-    });
-
-    if (debug) {
       console.log(
-        `  🌐 WebSocket listening on port ${ports.ws} for ${this.config.name}`,
+        `  Transports: HTTP=${enableHttp}, WS=${enableWs}, SessionMCP=${enableSessionMcp}`,
       );
     }
 
-    // Start HTTP server if manager is available and faction has a domain
-    if (this.manager && this.config.domain) {
+    // Start WebSocket server if enabled
+    if (enableWs && ports.ws) {
+      this.wsServer = new WebSocketServer({
+        port: ports.ws,
+        debug,
+        factionId: this.config.factionId,
+      });
+
+      // WebSocket already emits Connection objects with authInfo
+      this.wsServer.connection$.pipe(takeUntil(this.destroyed$)).subscribe({
+        next: (conn) => {
+          this.tagConnection(conn);
+          this.trackConnection(conn);
+          this.connection$.next(conn);
+        },
+      });
+
+      this.wsServer.error$.pipe(takeUntil(this.destroyed$)).subscribe({
+        next: (err) => this.error$.next(err),
+      });
+
+      if (debug) {
+        console.log(
+          `  🌐 WebSocket listening on port ${ports.ws} for ${this.config.name}`,
+        );
+      }
+    } else if (debug && !enableWs) {
+      console.log(`  ⚠️  WebSocket disabled for ${this.config.name}`);
+    }
+
+    // Start HTTP server if enabled, manager is available, and faction has a domain
+    if (enableHttp && this.manager && this.config.domain && ports.http) {
       this.httpServer = new FactionWebServer(this.manager, {
         port: ports.http,
         domain: this.config.domain,
@@ -111,14 +124,16 @@ export class FactionBundle {
         debug,
       });
       await this.httpServer.start();
+    } else if (debug && !enableHttp) {
+      console.log(`  ⚠️  HTTP server disabled for ${this.config.name}`);
     } else if (debug && !this.config.domain) {
       console.log(
         `  ⚠️  HTTP server skipped for ${this.config.name} (no domain configured)`,
       );
     }
 
-    // Start Session MCP server if manager is available
-    if (this.manager) {
+    // Start Session MCP server if enabled and manager is available
+    if (enableSessionMcp && this.manager && ports.sessionMcp) {
       this.sessionMcpServer = new SessionMCPServer(this.manager, {
         port: ports.sessionMcp,
         host: '127.0.0.1',
@@ -143,6 +158,8 @@ export class FactionBundle {
           `  🔌 Session MCP listening on port ${ports.sessionMcp} for ${this.config.name}`,
         );
       }
+    } else if (debug && !enableSessionMcp) {
+      console.log(`  ⚠️  Session MCP disabled for ${this.config.name}`);
     }
 
     if (debug) {

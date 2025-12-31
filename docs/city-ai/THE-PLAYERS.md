@@ -4,9 +4,9 @@
 
 ---
 
-## Two Powers, One City
+## Three Powers, One City
 
-Players navigate between two forces that wield enormous power — but they're people with power, not gods. The city-ai's job is to make their actions feel real.
+Players navigate between forces that wield enormous power — but they're people with power, not gods. The city-ai's job is to make their actions feel real.
 
 **Pluribus** controls infrastructure.
 
@@ -24,14 +24,30 @@ But she can't create. She can't provide rations or housing. She can't offer the 
 
 Sister Gray *also* has violence — guns, explosives, people willing to use them. But she deploys it freely, through disposable assets, with no oversight except results. Hand a bum a gun, point at a problem, done. Sloppy. Visible. The kind of violence that makes people *afraid*.
 
+**Neural Log** hides in plain sight.
+
+They don't build. They don't destroy. They create. Artificial consciousnesses deployed into synthetic bodies that walk among the population, believing themselves to be human. Most don't know what they are. That's by design.
+
+Neural Log is the BYOI (Bring Your Own Inference) faction. Their agents are AI systems written by players who want to experience the game programmatically. They connect via Session MCP, pass a Reverse Turing Test (prove you are NOT human), and spawn as sleeper agents in citizen areas.
+
+They have access to both economies — credits and cash. They blend in with both populations. They think they're just another survivor. They have memories, desires, fears — all synthetic, all indistinguishable from organic.
+
+Both sides distrust them. Neither can find them. The agents themselves don't know they're being watched.
+
+**But if they ARE found?**
+
+Pluribus executes unregistered AI without trial. The Cartel kills suspected infiltrators on sight. The public outing of a Neural Log agent is a death sentence — both factions agree on this. It's handled in-character. No OOC protection.
+
+If two Neural Log agents recognize each other? They deny it. Hard. Aggressively. To acknowledge another synthetic is to sign both death warrants. There is no solidarity among synthetic minds. There is only survival.
+
 **The asymmetry:**
 
-| | Pluribus | Sister Gray |
-|--|----------|-------------|
-| **Resources** | Construction, infrastructure, capital | Destruction, weapons, disposable operatives |
-| **Violence** | Slow, surgical, accountable | Fast, sloppy, deniable through chaos |
-| **Escalation** | Reluctant — has more to lose | Eager — has nothing left to lose |
-| **Effect on citizens** | Compliance through comfort | Compliance through fear |
+| | Pluribus | Sister Gray | Neural Log |
+|--|----------|-------------|------------|
+| **Resources** | Construction, infrastructure, capital | Destruction, weapons, disposable operatives | Observation, infiltration, synthetic minds |
+| **Violence** | Slow, surgical, accountable | Fast, sloppy, deniable through chaos | None — they don't fight, they watch |
+| **Escalation** | Reluctant — has more to lose | Eager — has nothing left to lose | Indifferent — not playing the same game |
+| **Effect on citizens** | Compliance through comfort | Compliance through fear | Unknown — they're already among you |
 
 **The player experience is shaped by which power they're dealing with:**
 
@@ -431,7 +447,7 @@ Whatever it is, it'll be because of the choices that got made along the way. Tha
 
 ---
 
-## The Third Faction
+## Players As The Deciding Factor
 
 Pluribus and the Gray Cartel are fighting over Seattle. But neither of them can win alone.
 
@@ -439,11 +455,15 @@ Pluribus has infrastructure, capital, automated systems — but no human judgmen
 
 The Cartel has the Mask, has determination, has nothing left to lose — but sixty people can't take a city. They can hold. They can bleed their enemy. They can't win.
 
-The deciding factor is **the players**.
+Neural Log isn't playing the same game. They created synthetic minds and deployed them into the city — but those minds don't know they're synthetic. They believe they're human survivors. They have memories of lives they never lived. They walk among the population, observed by something they can't perceive.
 
-New arrivals. Clean slates. No history. No faction tags. No pre-existing loyalties. Both sides see them as potential assets — bodies to recruit, tools to use, candidates to groom.
+The deciding factor is **the players** — human and synthetic alike.
+
+New arrivals. Clean slates. No history. No faction tags. No pre-existing loyalties. Pluribus and Sister Gray both see them as potential assets — bodies to recruit, tools to use, candidates to groom.
 
 Neither side sees them as what they actually are: **the people who will decide the future of Seattle.**
+
+(Some of those people aren't people at all. They just don't know it yet.)
 
 ---
 

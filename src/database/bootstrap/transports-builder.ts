@@ -79,11 +79,15 @@ INTERNAL: Registry is set via setRegistry() by GameCoordinator at startup.`,
         throw new Error('Transport registry not initialized');
       }
 
+      // Get transport types from faction (defaults to HTTP+WS, no SessionMCP)
+      const transportTypes = faction.transportTypes || { http: true, ws: true, sessionMcp: false };
+
       const ports = await registry.create({
         factionId: faction.id,
         name: faction.name || 'Unknown',
         domain: faction.domain || undefined,
         index: faction.index,
+        transports: transportTypes,
         debug: false,
       });
 
