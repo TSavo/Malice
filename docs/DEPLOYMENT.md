@@ -2,6 +2,32 @@
 
 Guide to deploying Malice to production with Caddy reverse proxy, automatic HTTPS, and multi-domain routing.
 
+## Quick Reference
+
+**SSH to production:**
+```bash
+ssh -i ~/.ssh/malice-do root@malice.world
+```
+
+**Server:** `malice-prod` @ `146.190.135.71`
+
+**Domains:**
+| Domain | Purpose |
+|--------|---------|
+| https://malice.world | Admin site |
+| https://thecontinuum.city | Continuum faction |
+| https://graycartel.com | Gray Cartel faction |
+
+**Common commands (on server):**
+```bash
+cd /root/Malice
+docker compose ps                    # Check status
+docker compose logs -f game          # View logs
+git pull && docker compose build game && docker compose up -d  # Deploy update
+```
+
+---
+
 ## Architecture
 
 Single server with Caddy routing multiple domains to the game container:
@@ -513,9 +539,9 @@ mcp__cloudflare-malice__delete_dns_record
 
 **Droplet:** `malice-prod`
 **IP:** `146.190.135.71`
-**SSH:** `ssh -i ~/.ssh/malice-do root@146.190.135.71`
+**SSH:** `ssh -i ~/.ssh/malice-do root@malice.world`
 
 **Domains:**
-- https://malice.world
-- https://thecontinuum.city
-- https://graycartel.com
+- https://malice.world (admin)
+- https://thecontinuum.city (Continuum faction)
+- https://graycartel.com (Gray Cartel faction)
