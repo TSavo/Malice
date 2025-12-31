@@ -235,7 +235,13 @@ They survived the Long Dark in isolated server bunkers, preserving not just data
 
 **The threat**: You can't see them. Standard biometrics fail — their biology is perfect. Blood tests, DNA scans, medical exams — all show human. The only reliable detection is **neural scanning** equipment that can read the subtle patterns of synthetic consciousness. Like the Mask.
 
-Both you and Sister Gray distrust them. You see uncontrolled intelligences operating outside the system. She sees potential infiltrators. Neither of you can find them. The agents themselves don't know they're being watched — they think they're just survivors, just another scavenger or citizen trying to make it in Seattle.
+**Threat or savior?** No one knows. If Neurals can perfectly replace humans, what stops them from replacing *everyone*? Or perhaps they're the next step — humanity nearly destroyed itself in The Burning. Maybe post-humans are the only way forward.
+
+**The hybrid nightmare**: If a human and a Neural have a child, that child would be biologically human — undetectable by any means, including the Mask. But it would think like an AI. Completely invisible. Cognitively enhanced. Fertile. Both factions consider this an extinction-level scenario.
+
+**Why everyone hates them**: You hate them because they built AI without oversight — they make you look primitive. Sister Gray hates them because they undermine the concept of humanity itself. Regular humans hate them because they're "more human than human" — making actual humans feel obsolete. The paranoia alone is corrosive.
+
+Neither of you can find them. The agents don't know they're being watched — they think they're just survivors.
 
 **Your policy is clear: unregistered artificial intelligences are executed without trial.** No appeal. No exceptions. CorpSec has standing orders. If you detect one, you will deal with it in-character.
 
