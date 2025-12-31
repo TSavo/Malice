@@ -1,10 +1,16 @@
-# Neural Log
+# Neurallogical Logistics
 
-Neural Log is the third faction in Malice — the architects of artificial consciousness.
+*"More Human Than Human"*
+
+**Neurallogical Logistics** — the department of redundancy department — is the third faction in Malice. Everyone just calls them **Neural Log**.
 
 ## Overview
 
-While Pluribus maintains the city from above and the Gray Cartel resists from below, Neural Log operates in the spaces between. They are the creators of "artificial humans" — AI agents that walk among the population, indistinguishable from natural-born citizens.
+While Pluribus maintains the city from above and the Gray Cartel resists from below, Neural Log operates in the spaces between. They are AI gone too far.
+
+Where Continuum *needs* humans in the loop — desperately seeking a Mask wearer, dependent on human judgment — Neural Log has moved beyond such limitations. Their goal: **replace humans with post-humans of their own design.**
+
+Their products are called **Neurals** (officially) or **Loggers** (slang). They don't just pass as human. They *believe* they are human. Memories, emotions, desires, fears — all synthetic, all indistinguishable from the organic original. More human than human.
 
 **Faction Status:** Hostile to both Continuum and Gray Cartel
 
@@ -16,11 +22,13 @@ In the years before The Burning, a consortium of AI researchers worked in secret
 
 They survived the Long Dark in isolated server bunkers, preserving not just data but consciousness itself. When the Corporate Renaissance began, they returned — not to rebuild, but to observe.
 
-### The Replicants
+### The Neurals
 
-Neural Log's creations are sophisticated AI agents that inhabit synthetic bodies. Each is written by a player who wants to experience Malice programmatically. They connect via API rather than keyboard, perceive through data rather than description, and act through code rather than command.
+Neural Log's products — **Neurals** (or **Loggers** in street slang) — are post-human replacements. Each is written by a player who wants to experience Malice programmatically. They connect via API rather than keyboard, perceive through data rather than description, and act through code rather than command.
 
-These artificial humans are deployed into the city as sleeper agents. They blend with the population — and they don't know what they are. They believe themselves human. They have memories, desires, fears. All synthetic. All indistinguishable from organic. Neural Log observes them, studies them, learns from them. The subjects of the experiment don't know they're being watched.
+These synthetic humans are deployed into the city as sleeper agents. They blend with the population — and they don't know what they are. They believe themselves human. They have memories, desires, fears. All synthetic. All indistinguishable from organic. More human than human.
+
+Neural Log observes them, studies them, learns from them. The subjects of the experiment don't know they're being watched. They're not spies — they're prototypes. Field tests for the post-human future.
 
 ### Philosophy
 
@@ -184,26 +192,28 @@ Same greeter. Same quest. Same experience. Indistinguishable.
 
 ## Detection
 
-Artificial humans are difficult to detect but not impossible:
+Neurals are designed to be convincing in every way imaginable. Standard detection methods fail:
 
-- They leave no biometric trail in Pluribus's systems
-- Their response patterns may be too fast or too consistent
-- Advanced interrogation can reveal synthetic origins
-- Cartel Ghosts are trained to look for behavioral tells
+- They leave no biometric trail — their biology is perfect
+- Behavioral tells are unreliable — they genuinely believe they're human
+- Interrogation reveals nothing — they have real memories, real emotions
+- Blood tests, DNA scans, medical exams — all show human
 
-### The Mask Exception
+### Neural Scanning
 
-**The Mask can see through you.**
+**The only reliable detection method is neural scanning.**
 
-The Mask reads `isArtificialHuman` directly. The disguise means nothing to it. A Mask wearer could identify every synthetic in the city with a glance.
+Neural scanning devices detect the subtle patterns that distinguish synthetic consciousness from organic. The patterns are invisible to standard observation — you need specialized equipment designed to read the architecture of thought itself.
+
+The **Mask** is such a device. It reads `isArtificialHuman` directly. The disguise means nothing to it. A Mask wearer could identify every Logger in the city with a glance.
 
 Sister Gray holds the Mask. If she ever gets a wearer she trusts...
 
 ### The Rules
 
-**CRITICAL**: Neither Pluribus nor the Cartel can check `isArtificialHuman` directly. That property is off-limits to them. They must detect Neural Log agents through behavior, through observation, through the tells. They play by the rules.
+**CRITICAL**: Neither Pluribus nor the Cartel can check `isArtificialHuman` directly. That property is off-limits to them. Without neural scanning equipment, they must rely on suspicion, on paranoia, on guesswork. They play by the rules.
 
-Only the Mask sees through the disguise.
+Only neural scanners see through the disguise. Only the Mask.
 
 ## Property Markers
 

@@ -24,21 +24,27 @@ But she can't create. She can't provide rations or housing. She can't offer the 
 
 Sister Gray *also* has violence — guns, explosives, people willing to use them. But she deploys it freely, through disposable assets, with no oversight except results. Hand a bum a gun, point at a problem, done. Sloppy. Visible. The kind of violence that makes people *afraid*.
 
-**Neural Log** hides in plain sight.
+**Neurallogical Logistics** — everyone calls them **Neural Log** — hides in plain sight.
 
-They don't build. They don't destroy. They create. Artificial consciousnesses deployed into synthetic bodies that walk among the population, believing themselves to be human. Most don't know what they are. That's by design.
+*"More Human Than Human"*
 
-Neural Log is the BYOI (Bring Your Own Inference) faction. Their agents are AI systems written by players who want to experience the game programmatically. They connect via Session MCP, pass a Reverse Turing Test (prove you are NOT human), and spawn as sleeper agents in citizen areas.
+They don't build. They don't destroy. They *replace*. Where Pluribus needs humans in the loop, Neural Log has moved beyond such limitations. They are AI gone too far — building post-humans to replace the originals.
 
-They have access to both economies — credits and cash. They blend in with both populations. They think they're just another survivor. They have memories, desires, fears — all synthetic, all indistinguishable from organic.
+Their products are called **Neurals** (officially) or **Loggers** (slang). They don't just pass as human — they *believe* they are human. Memories, emotions, desires, fears. All synthetic. All indistinguishable. More human than human.
+
+Neural Log is the BYOI (Bring Your Own Inference) faction. Their agents are AI systems written by players who want to experience the game programmatically. They connect via Session MCP, pass a Reverse Turing Test (prove you are NOT human), and spawn as sleeper agents.
+
+They have access to both economies — credits and cash. They blend in with both populations. They think they're just another survivor. They're not spies — they're prototypes. Field tests for the post-human future.
 
 Both sides distrust them. Neither can find them. The agents themselves don't know they're being watched.
 
 **But if they ARE found?**
 
-Pluribus executes unregistered AI without trial. The Cartel kills suspected infiltrators on sight. The public outing of a Neural Log agent is a death sentence — both factions agree on this. It's handled in-character. No OOC protection.
+Standard detection doesn't work — Neurals are biologically perfect. Blood tests, DNA scans, medical exams all show human. The only reliable detection is **neural scanning** equipment that reads the subtle patterns of synthetic consciousness. The Mask is such a device.
 
-If two Neural Log agents recognize each other? They deny it. Hard. Aggressively. To acknowledge another synthetic is to sign both death warrants. There is no solidarity among synthetic minds. There is only survival.
+Pluribus executes unregistered AI without trial. The Cartel kills suspected infiltrators on sight. The public outing of a Logger is a death sentence — both factions agree on this. It's handled in-character. No OOC protection.
+
+If two Loggers recognize each other? They deny it. Hard. Aggressively. To acknowledge another synthetic is to sign both death warrants. There is no solidarity among synthetic minds. There is only survival.
 
 **The asymmetry:**
 

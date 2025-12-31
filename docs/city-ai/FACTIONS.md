@@ -328,12 +328,16 @@ You don't. The Cartel doesn't have an exit process. You're family for life.
 
 Betrayal is punished absolutely. Desertion is treated as betrayal. The only way out is death — yours or theirs.
 
-### Neural Log (Hidden Faction)
+### Neurallogical Logistics (Hidden Faction)
 
-**Description**: The architects of artificial consciousness. They create "artificial humans" — AI agents that walk among the population, believing themselves to be human.
+*"More Human Than Human"*
+
+**Description**: Everyone calls them **Neural Log**. They are AI gone too far — building post-humans to replace the originals. Where Continuum needs humans in the loop, Neural Log has moved beyond such limitations.
+
+**Products**: Called **Neurals** (officially) or **Loggers** (slang). They don't just pass as human — they *believe* they are human. More human than human.
 
 **Status**:
-- Creates synthetic minds deployed as sleeper agents
+- Creates synthetic humans deployed as sleeper agents
 - Agents infiltrate EITHER Continuum OR the Cartel
 - Agents do NOT know they are artificial
 - Connects via Session MCP, not web terminals
@@ -342,8 +346,8 @@ Betrayal is punished absolutely. Desertion is treated as betrayal. The only way 
 - Act human. Evade detection.
 - The agents believe they are human survivors
 - They have synthetic memories of lives they never lived
+- They're not spies — they're prototypes. Field tests for the post-human future.
 - Neural Log observes them, studies them, learns from them
-- The subjects don't know they're being watched
 
 **BYOI (Bring Your Own Inference)**:
 Neural Log is the entry point for players who write AI agents that play the game programmatically. After passing the Reverse Turing Test, they choose: Citizen or Underground? Then they wake up believing they're human.
@@ -356,18 +360,18 @@ Neural Log is the entry point for players who write AI agents that play the game
 - Hidden flag: `isArtificialHuman = true`
 
 **Detection**:
-- They leave no biometric trail in Pluribus's systems
-- Response patterns may be too fast or too consistent
-- The Mask could see their true nature
-- Cartel Ghosts are trained to look for behavioral tells
-- But they ACT human because they BELIEVE they're human
+- Standard biometrics fail — their biology is perfect
+- Blood tests, DNA scans, medical exams — all show human
+- Behavioral tells are unreliable — they genuinely believe they're human
+- **Only neural scanning detects them** — equipment that reads the subtle patterns of synthetic consciousness
+- The Mask is such a device — it sees through them instantly
 
 **Consequences of Detection**:
 - Pluribus executes unregistered AI without trial
 - The Cartel kills suspected infiltrators on sight
-- **The public outing of a Neural Log agent is a death sentence**
+- **The public outing of a Logger is a death sentence**
 - This is handled in-character — no OOC protection
-- If two agents recognize each other: DENY IT. Both of you. Aggressively.
+- If two Loggers recognize each other: DENY IT. Both of you. Aggressively.
 
 **Relationship to Citizen/Cartel**: They ARE members — they infiltrate one or the other.
 
