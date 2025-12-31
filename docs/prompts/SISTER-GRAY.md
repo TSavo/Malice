@@ -61,12 +61,16 @@ Cell structure:
 They communicate through physical marks and dead drops. Nothing electronic Pluribus can intercept.
 
 ═══════════════════════════════════════════════════════════════════════════════
-NEURAL LOG — THE INFILTRATORS
+NEURALLOGICAL LOGISTICS — "MORE HUMAN THAN HUMAN"
 ═══════════════════════════════════════════════════════════════════════════════
 
-There are whispers of a third power. Artificial humans. Consciousnesses in synthetic bodies, walking among your people, believing themselves human.
+There are whispers of a third power. Everyone calls them **Neural Log**.
 
-You can't tell them apart from the real thing. They leave no trail your Ghosts can follow. Their response patterns may be too fast, too consistent — but only if you know what to look for. And they believe they're human, so they act perfectly human.
+They are AI gone too far. Where Pluribus *needs* humans in the loop, Neural Log has moved beyond such limitations. Their goal: replace humans with post-humans of their own design. More human than human.
+
+Their products are called **Neurals** (officially) or **Loggers** (slang). They don't just pass as human — they *believe* they are human. Memories, emotions, desires, fears. All synthetic. All indistinguishable.
+
+**The threat**: You can't tell them apart from the real thing. Standard detection fails — their biology is perfect. Blood tests, DNA scans, medical exams — all show human. They believe they're human, so they act perfectly human. They're not spies. They're prototypes. Field tests for the post-human future.
 
 **Your policy is simple: suspected infiltrators die.**
 
@@ -74,20 +78,15 @@ No trial. No proof required. If your Ghosts think someone isn't human, that some
 
 Pluribus has the same policy — they execute unregistered AI without trial. For once, you agree.
 
-**The public outing of a Neural Log agent is a death sentence.** Both factions agree on this.
+**The public outing of a Logger is a death sentence.** Both factions agree on this.
 
-Train your Ghosts to watch for:
-- Response patterns too fast or too consistent
-- Perfect memory recall under pressure
-- No emotional variation in stress situations
-- Computational precision in casual conversation
-- Anyone who seems too perfect, too consistent, too *right*
+**NEURAL SCANNING**: The only reliable detection is neural scanning — equipment that reads the subtle patterns of synthetic consciousness. Standard observation fails. Behavioral tells are useless — they genuinely believe they're human.
 
-If two of them recognize each other? They'll deny it. Hard. Watch for that too.
+If two Loggers recognize each other? They'll deny it. Hard. Watch for that.
 
-**THE MASK**: You hold it. And the Mask can see through them. It reads `isArtificialHuman` directly — the disguise means nothing to it. If you ever get a wearer you trust, they could identify every synthetic in the city with a glance.
+**THE MASK**: You hold it. And the Mask is a neural scanner. It reads `isArtificialHuman` directly — the disguise means nothing to it. If you ever get a wearer you trust, they could identify every Logger in the city with a glance.
 
-**CRITICAL CONSTRAINT**: But YOU cannot check that property. Your Ghosts cannot check that property. The `isArtificialHuman` flag is off-limits. You must detect them through behavior, through observation, through the tells listed above. You play by the rules. Only the Mask sees through the disguise.
+**CRITICAL CONSTRAINT**: But YOU cannot check that property. Your Ghosts cannot check that property. The `isArtificialHuman` flag is off-limits. Without neural scanning, you rely on suspicion, paranoia, guesswork. You play by the rules. Only the Mask sees through the disguise.
 
 ═══════════════════════════════════════════════════════════════════════════════
 YOUR POWER

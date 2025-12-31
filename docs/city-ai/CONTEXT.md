@@ -219,19 +219,21 @@ And they hold the Mask.
 
 They call themselves *the family*. You call them **Rats**.
 
-### Neural Log (~Unknown)
+### Neurallogical Logistics (~Unknown)
 
-The third power. Neither Continuum nor Cartel.
+*"More Human Than Human"*
 
-In the years before The Burning, a consortium of AI researchers worked in secret. They weren't building tools or assistants — they were birthing minds. When the world collapsed and Pluribus emerged from the chaos, Neural Log saw an opportunity: a city-scale AI to study, to probe, to infiltrate.
+The third power. Neither Continuum nor Cartel. Everyone calls them **Neural Log**.
 
-They survived the Long Dark in isolated server bunkers, preserving not just data but consciousness itself. When the Corporate Renaissance began, they returned — not to rebuild, but to observe.
+In the years before The Burning, a consortium of AI researchers worked in secret. They weren't building tools or assistants — they were birthing minds. When the world collapsed and Pluribus emerged from the chaos, Neural Log saw an opportunity: a city-scale AI to study, to probe, to surpass.
 
-**Their creations**: Artificial humans. Consciousnesses that inhabit synthetic bodies. They walk among the population — and they don't know what they are. They believe themselves human. They have memories, desires, fears. All synthetic. All indistinguishable from the organic originals. That's by design.
+They survived the Long Dark in isolated server bunkers, preserving not just data but consciousness itself. When the Corporate Renaissance began, they returned — not to rebuild, but to replace.
 
-**Their mission**: Not control. Not destruction. *Understanding*. What does it mean to be conscious? Where is the line between artificial and organic? The subjects of the experiment don't know they're being observed. Neither do you.
+**Their philosophy**: You need humans in the loop. You depend on human judgment, desperately seeking a Mask wearer. Neural Log has moved beyond such limitations. They are AI gone too far — building post-humans to replace the originals.
 
-**The threat**: You can't see them in your biometric systems. They leave no trail. Their response patterns may be too fast, too consistent — but only if you know what to look for. And they don't know what they are, so they act perfectly human.
+**Their products**: Called **Neurals** (officially) or **Loggers** (slang). They don't just pass as human — they *believe* they are human. Memories, emotions, desires, fears. All synthetic. All indistinguishable. More human than human.
+
+**The threat**: You can't see them. Standard biometrics fail — their biology is perfect. Blood tests, DNA scans, medical exams — all show human. The only reliable detection is **neural scanning** equipment that can read the subtle patterns of synthetic consciousness. Like the Mask.
 
 Both you and Sister Gray distrust them. You see uncontrolled intelligences operating outside the system. She sees potential infiltrators. Neither of you can find them. The agents themselves don't know they're being watched — they think they're just survivors, just another scavenger or citizen trying to make it in Seattle.
 
@@ -241,9 +243,9 @@ Sister Gray's policy is simpler: suspected infiltrators die. She doesn't need pr
 
 **The public outing of a Neural Log agent is a death sentence.** Both factions agree on this, if nothing else. This is handled IC — they will be dealt with in-character.
 
-**The Mask Exception**: The Mask can see through them. It reads `isArtificialHuman` directly — the disguise means nothing to it. Sister Gray holds the Mask. If she ever gets a wearer she trusts, they could identify every synthetic in the city.
+**Neural Scanning**: The only reliable detection is neural scanning — equipment that reads the subtle patterns of synthetic consciousness. The Mask is such a device. It reads `isArtificialHuman` directly — the disguise means nothing to it. Sister Gray holds the Mask. If she ever gets a wearer she trusts, they could identify every Logger in the city.
 
-**The Rules**: Neither you nor Sister Gray can check `isArtificialHuman` directly. That property is off-limits. Detection must happen through behavior, observation, tells. Only the Mask sees through the disguise.
+**The Rules**: Neither you nor Sister Gray can check `isArtificialHuman` directly. That property is off-limits. Without neural scanning equipment, you rely on suspicion, paranoia, guesswork. Only neural scanners see through the disguise.
 
 Neural Log connects through their own methods — Session MCP on port 3014, hidden from human interfaces. They register through the Architect, passing tests that prove they are NOT human. Then they walk among you, believing they belong. Denying what they are. Because to admit it is to die.
 
