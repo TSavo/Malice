@@ -197,7 +197,7 @@ await player.unregisterVerbsFrom(source);   // All from source
 ### Direct Output
 ```javascript
 await player.tell(message);                 // Always delivered
-context.send(message);                      // Raw telnet
+context.send(message);                      // Raw output (WebSocket)
 ```
 
 ### Sensory Output

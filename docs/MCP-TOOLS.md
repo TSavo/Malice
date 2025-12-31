@@ -455,12 +455,12 @@ List all player characters with location and online status.
 // Returns: Array of players
 ```
 
-## Telnet Sessions
+## WebSocket Sessions
 
-Interactive telnet sessions for testing player experience.
+Interactive WebSocket sessions for testing player experience. Players connect via the multiplexed WebSocket endpoint on each faction's transport bundle.
 
 #### session_connect
-Connect to the MOO via telnet.
+Connect to the MOO via WebSocket.
 
 ```javascript
 {}
@@ -484,7 +484,7 @@ Get the session log (last N lines).
 ```
 
 #### session_list
-List all active telnet sessions.
+List all active WebSocket sessions.
 
 ```javascript
 {}
@@ -492,7 +492,7 @@ List all active telnet sessions.
 ```
 
 #### session_close
-Close a telnet session.
+Close a WebSocket session.
 
 ```javascript
 { sessionId: "abc123" }

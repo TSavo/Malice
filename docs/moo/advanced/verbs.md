@@ -187,7 +187,7 @@ When a verb handler is called via `callVerb()`, the method body has access to th
 | `self` | The handler object (the object providing the verb) |
 | `player` | The player who typed the command |
 | `command` | The raw command string (e.g., "drop apple") |
-| `context` | Connection context (telnet session info) |
+| `context` | Connection context (WebSocket session info) |
 | `args` | **Only the resolved pattern variables** (see below) |
 | `$` | Object manager for loading objects |
 

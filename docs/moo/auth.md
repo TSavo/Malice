@@ -43,7 +43,7 @@ Connection
 
 ## $authManager - Interactive Login
 
-Handles traditional username/password login via telnet/terminal.
+Handles traditional username/password login via WebSocket connection.
 
 ### Properties
 
@@ -71,7 +71,7 @@ Handles traditional username/password login via telnet/terminal.
 Called when a new connection arrives. Displays welcome message.
 
 ```javascript
-// TelnetServer calls:
+// Transport server calls:
 await authManager.onConnect(connectionContext);
 // Shows ASCII welcome banner
 // "Enter your username, or a new name to create a character."
