@@ -5,7 +5,7 @@ This guide covers debugging the AI-autonomous character generation (chargen v2) 
 ## Architecture Overview
 
 ### CharGen v2 Flow
-1. New player connects via telnet
+1. New player connects via WebSocket
 2. AuthManager routes to CharGen for new users
 3. CharGen calls `startNPCInterview(playerId)` which:
    - Creates an AI agent session via `$aiQuery`
@@ -153,7 +153,7 @@ ai.do "say Hello"
 
 To debug:
 1. Check NPC's location matches player's location
-2. Check player has `_context` (connected telnet session)
+2. Check player has `_context` (connected WebSocket session)
 3. Check `see()` method returns true (or falls back to `tell()`)
 
 ### Force Bootstrap Rebuild
@@ -175,9 +175,14 @@ docker compose logs -f game 2>&1 | grep -i "chargen\|ai\|spawn"
 
 ## Debugging Session Flow
 
-### 1. Start Telnet Connection
+### 1. Start WebSocket Connection
+
+Connect to the faction's WebSocket endpoint:
 ```bash
-telnet localhost 5555
+# Using wscat (npm install -g wscat)
+wscat -c ws://localhost:8080/mux
+
+# Or use the faction's web interface at http://localhost:8000/play
 ```
 
 ### 2. Monitor Docker Logs (Separate Terminal)
@@ -247,11 +252,11 @@ docker compose logs game --tail 100 | grep DEBUG
 | `src/database/bootstrap/ai-builder.ts` | AI human spawning |
 | `src/database/bootstrap/body-factory-builder.ts` | Body creation |
 | `src/database/bootstrap/prototypes/embodied-builder.ts` | `see()`, `tell()` methods |
-| `src/database/bootstrap/prototypes/player-builder.ts` | Player `tell()` to telnet |
+| `src/database/bootstrap/prototypes/player-builder.ts` | Player `tell()` to WebSocket |
 
 ## Testing Chargen Flow
 
-1. Connect: `telnet localhost 5555`
+1. Connect: `wscat -c ws://localhost:8080/mux` or visit `http://localhost:8000/play`
 2. Enter a new username (creates new player)
 3. Watch Docker logs for AI spawn
 4. Verify NPC appears in room: `look`
