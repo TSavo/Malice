@@ -73,8 +73,8 @@ function showLoginForm() {
     </style>
     <div class="login-container">
       <div class="login-box">
-        <h1 class="login-title">Malice</h1>
-        <p class="login-subtitle">Enter your credentials to connect</p>
+        <h1 class="login-title">\${window.MALICE_THEME?.name || 'Malice'}</h1>
+        <p class="login-subtitle">\${window.MALICE_THEME?.tagline || 'Enter your credentials to connect'}</p>
         <form id="login-form">
           <input type="text" name="username" placeholder="Username" required class="login-input">
           <input type="password" name="password" placeholder="Password" required class="login-input password">
@@ -153,8 +153,8 @@ function showRegisterForm() {
     </style>
     <div class="reg-container">
       <div class="reg-box">
-        <h1 class="reg-title">Register</h1>
-        <p class="reg-subtitle">Create your account to enter Seattle</p>
+        <h1 class="reg-title">\${window.MALICE_THEME?.name || 'Register'}</h1>
+        <p class="reg-subtitle">\${window.MALICE_THEME?.registerTagline || 'Create your account'}</p>
         <form id="register-form">
           <input type="text" name="username" placeholder="Username" required class="reg-input" pattern="[a-zA-Z][a-zA-Z0-9_]{2,15}" title="3-16 characters, start with letter, letters/numbers/underscore only">
           <input type="email" name="email" placeholder="Email address" required class="reg-input">

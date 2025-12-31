@@ -1143,6 +1143,9 @@ export class CartelDomainBuilder {
 
   <script>
     window.MALICE_THEME = {
+      name: 'Gray Cartel',
+      tagline: 'Enter your credentials to descend',
+      registerTagline: 'Join the underground',
       accent: '#ff3366',
       surface: '#120808',
       selection: 'rgba(255, 51, 102, 0.3)'
