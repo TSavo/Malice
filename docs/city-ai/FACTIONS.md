@@ -340,7 +340,7 @@ Betrayal is punished absolutely. Desertion is treated as betrayal. The only way 
 - Creates synthetic humans deployed as sleeper agents
 - Agents infiltrate EITHER Continuum OR the Cartel
 - Agents do NOT know they are artificial
-- Connects via Session MCP, not web terminals
+- Connects through hidden interfaces, not web terminals
 
 **The Core Mission**:
 - Act human. Evade detection.
