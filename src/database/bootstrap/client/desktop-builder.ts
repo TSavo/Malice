@@ -57,93 +57,32 @@ import { MaliceClient } from '/js/malice-client.js';
  */
 function showLoginForm() {
   document.body.innerHTML = \\\`
-    <div style="
-      min-height: 100vh;
-      background: #0a0a0a;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: system-ui, -apple-system, sans-serif;
-    ">
-      <div style="
-        background: #141414;
-        border: 1px solid #333;
-        border-radius: 12px;
-        padding: 48px;
-        width: 100%;
-        max-width: 400px;
-        box-shadow: 0 16px 64px rgba(0,0,0,0.5);
-      ">
-        <h1 style="
-          color: #00ff88;
-          font-size: 32px;
-          margin: 0 0 8px 0;
-          font-weight: 700;
-        ">Malice</h1>
-        <p style="
-          color: #888;
-          margin: 0 0 32px 0;
-          font-size: 14px;
-        ">Enter your credentials to connect</p>
-
+    <style>
+      .login-container { min-height: 100vh; background: var(--theme-bg, #0a0a0a); display: flex; align-items: center; justify-content: center; font-family: system-ui, -apple-system, sans-serif; }
+      .login-box { background: #141414; border: 1px solid var(--theme-border, #333); border-radius: 12px; padding: 48px; width: 100%; max-width: 400px; box-shadow: 0 16px 64px rgba(0,0,0,0.5); }
+      .login-title { color: var(--theme-accent, #00ff88); font-size: 32px; margin: 0 0 8px 0; font-weight: 700; }
+      .login-subtitle { color: #888; margin: 0 0 32px 0; font-size: 14px; }
+      .login-input { width: 100%; padding: 12px 16px; margin-bottom: 16px; background: var(--theme-bg, #0a0a0a); border: 1px solid var(--theme-border, #333); border-radius: 6px; color: #e0e0e0; font-size: 16px; box-sizing: border-box; outline: none; }
+      .login-input:focus { border-color: var(--theme-accent, #00ff88); }
+      .login-input.password { margin-bottom: 24px; }
+      .login-button { width: 100%; padding: 12px 24px; background: var(--theme-accent, #00ff88); color: var(--theme-bg, #0a0a0a); border: none; border-radius: 6px; font-size: 16px; font-weight: 600; cursor: pointer; filter: brightness(1); transition: filter 0.15s; }
+      .login-button:hover { filter: brightness(0.85); }
+      .login-error { color: #ff6666; margin-top: 16px; font-size: 14px; text-align: center; }
+      .login-footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--theme-border, #333); text-align: center; }
+      .login-link { color: #6699ff; font-size: 14px; text-decoration: none; }
+    </style>
+    <div class="login-container">
+      <div class="login-box">
+        <h1 class="login-title">Malice</h1>
+        <p class="login-subtitle">Enter your credentials to connect</p>
         <form id="login-form">
-          <input type="text" name="username" placeholder="Username" required style="
-            width: 100%;
-            padding: 12px 16px;
-            margin-bottom: 16px;
-            background: #0a0a0a;
-            border: 1px solid #333;
-            border-radius: 6px;
-            color: #e0e0e0;
-            font-size: 16px;
-            box-sizing: border-box;
-            outline: none;
-          " onfocus="this.style.borderColor='#00ff88'" onblur="this.style.borderColor='#333'">
-
-          <input type="password" name="password" placeholder="Password" required style="
-            width: 100%;
-            padding: 12px 16px;
-            margin-bottom: 24px;
-            background: #0a0a0a;
-            border: 1px solid #333;
-            border-radius: 6px;
-            color: #e0e0e0;
-            font-size: 16px;
-            box-sizing: border-box;
-            outline: none;
-          " onfocus="this.style.borderColor='#00ff88'" onblur="this.style.borderColor='#333'">
-
-          <button type="submit" style="
-            width: 100%;
-            padding: 12px 24px;
-            background: #00ff88;
-            color: #0a0a0a;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-          " onmouseover="this.style.background='#00cc6a'" onmouseout="this.style.background='#00ff88'">Connect</button>
+          <input type="text" name="username" placeholder="Username" required class="login-input">
+          <input type="password" name="password" placeholder="Password" required class="login-input password">
+          <button type="submit" class="login-button">Connect</button>
         </form>
-
-        <div id="error" style="
-          color: #ff6666;
-          margin-top: 16px;
-          font-size: 14px;
-          text-align: center;
-        "></div>
-
-        <div style="
-          margin-top: 32px;
-          padding-top: 24px;
-          border-top: 1px solid #333;
-          text-align: center;
-        ">
-          <a href="#" id="create-link" style="
-            color: #6699ff;
-            font-size: 14px;
-            text-decoration: none;
-          ">Create new account</a>
+        <div id="error" class="login-error"></div>
+        <div class="login-footer">
+          <a href="#" id="create-link" class="login-link">Create new account</a>
         </div>
       </div>
     </div>
@@ -197,127 +136,36 @@ function showLoginForm() {
  */
 function showRegisterForm() {
   document.body.innerHTML = \\\`
-    <div style="
-      min-height: 100vh;
-      background: #0a0a0a;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: system-ui, -apple-system, sans-serif;
-    ">
-      <div style="
-        background: #141414;
-        border: 1px solid #333;
-        border-radius: 12px;
-        padding: 48px;
-        width: 100%;
-        max-width: 400px;
-        box-shadow: 0 16px 64px rgba(0,0,0,0.5);
-      ">
-        <h1 style="
-          color: #00ff88;
-          font-size: 32px;
-          margin: 0 0 8px 0;
-          font-weight: 700;
-        ">Register</h1>
-        <p style="
-          color: #888;
-          margin: 0 0 32px 0;
-          font-size: 14px;
-        ">Create your account to enter Seattle</p>
-
+    <style>
+      .reg-container { min-height: 100vh; background: var(--theme-bg, #0a0a0a); display: flex; align-items: center; justify-content: center; font-family: system-ui, -apple-system, sans-serif; }
+      .reg-box { background: #141414; border: 1px solid var(--theme-border, #333); border-radius: 12px; padding: 48px; width: 100%; max-width: 400px; box-shadow: 0 16px 64px rgba(0,0,0,0.5); }
+      .reg-title { color: var(--theme-accent, #00ff88); font-size: 32px; margin: 0 0 8px 0; font-weight: 700; }
+      .reg-subtitle { color: #888; margin: 0 0 32px 0; font-size: 14px; }
+      .reg-input { width: 100%; padding: 12px 16px; margin-bottom: 16px; background: var(--theme-bg, #0a0a0a); border: 1px solid var(--theme-border, #333); border-radius: 6px; color: #e0e0e0; font-size: 16px; box-sizing: border-box; outline: none; }
+      .reg-input:focus { border-color: var(--theme-accent, #00ff88); }
+      .reg-input.last { margin-bottom: 24px; }
+      .reg-button { width: 100%; padding: 12px 24px; background: var(--theme-accent, #00ff88); color: var(--theme-bg, #0a0a0a); border: none; border-radius: 6px; font-size: 16px; font-weight: 600; cursor: pointer; filter: brightness(1); transition: filter 0.15s; }
+      .reg-button:hover { filter: brightness(0.85); }
+      .reg-error { color: #ff6666; margin-top: 16px; font-size: 14px; text-align: center; }
+      .reg-success { color: var(--theme-accent, #00ff88); margin-top: 16px; font-size: 14px; text-align: center; display: none; }
+      .reg-footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--theme-border, #333); text-align: center; }
+      .reg-link { color: #6699ff; font-size: 14px; text-decoration: none; }
+    </style>
+    <div class="reg-container">
+      <div class="reg-box">
+        <h1 class="reg-title">Register</h1>
+        <p class="reg-subtitle">Create your account to enter Seattle</p>
         <form id="register-form">
-          <input type="text" name="username" placeholder="Username" required style="
-            width: 100%;
-            padding: 12px 16px;
-            margin-bottom: 16px;
-            background: #0a0a0a;
-            border: 1px solid #333;
-            border-radius: 6px;
-            color: #e0e0e0;
-            font-size: 16px;
-            box-sizing: border-box;
-            outline: none;
-          " onfocus="this.style.borderColor='#00ff88'" onblur="this.style.borderColor='#333'" pattern="[a-zA-Z][a-zA-Z0-9_]{2,15}" title="3-16 characters, start with letter, letters/numbers/underscore only">
-
-          <input type="email" name="email" placeholder="Email address" required style="
-            width: 100%;
-            padding: 12px 16px;
-            margin-bottom: 16px;
-            background: #0a0a0a;
-            border: 1px solid #333;
-            border-radius: 6px;
-            color: #e0e0e0;
-            font-size: 16px;
-            box-sizing: border-box;
-            outline: none;
-          " onfocus="this.style.borderColor='#00ff88'" onblur="this.style.borderColor='#333'">
-
-          <input type="password" name="password" placeholder="Password (min 6 chars)" required minlength="6" style="
-            width: 100%;
-            padding: 12px 16px;
-            margin-bottom: 16px;
-            background: #0a0a0a;
-            border: 1px solid #333;
-            border-radius: 6px;
-            color: #e0e0e0;
-            font-size: 16px;
-            box-sizing: border-box;
-            outline: none;
-          " onfocus="this.style.borderColor='#00ff88'" onblur="this.style.borderColor='#333'">
-
-          <input type="password" name="confirmPassword" placeholder="Confirm Password" required style="
-            width: 100%;
-            padding: 12px 16px;
-            margin-bottom: 24px;
-            background: #0a0a0a;
-            border: 1px solid #333;
-            border-radius: 6px;
-            color: #e0e0e0;
-            font-size: 16px;
-            box-sizing: border-box;
-            outline: none;
-          " onfocus="this.style.borderColor='#00ff88'" onblur="this.style.borderColor='#333'">
-
-          <button type="submit" style="
-            width: 100%;
-            padding: 12px 24px;
-            background: #00ff88;
-            color: #0a0a0a;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-          " onmouseover="this.style.background='#00cc6a'" onmouseout="this.style.background='#00ff88'">Create Account</button>
+          <input type="text" name="username" placeholder="Username" required class="reg-input" pattern="[a-zA-Z][a-zA-Z0-9_]{2,15}" title="3-16 characters, start with letter, letters/numbers/underscore only">
+          <input type="email" name="email" placeholder="Email address" required class="reg-input">
+          <input type="password" name="password" placeholder="Password (min 6 chars)" required minlength="6" class="reg-input">
+          <input type="password" name="confirmPassword" placeholder="Confirm Password" required class="reg-input last">
+          <button type="submit" class="reg-button">Create Account</button>
         </form>
-
-        <div id="error" style="
-          color: #ff6666;
-          margin-top: 16px;
-          font-size: 14px;
-          text-align: center;
-        "></div>
-
-        <div id="success" style="
-          color: #00ff88;
-          margin-top: 16px;
-          font-size: 14px;
-          text-align: center;
-          display: none;
-        "></div>
-
-        <div style="
-          margin-top: 32px;
-          padding-top: 24px;
-          border-top: 1px solid #333;
-          text-align: center;
-        ">
-          <a href="#" id="login-link" style="
-            color: #6699ff;
-            font-size: 14px;
-            text-decoration: none;
-          ">Already have an account? Login</a>
+        <div id="error" class="reg-error"></div>
+        <div id="success" class="reg-success"></div>
+        <div class="reg-footer">
+          <a href="#" id="login-link" class="reg-link">Already have an account? Login</a>
         </div>
       </div>
     </div>

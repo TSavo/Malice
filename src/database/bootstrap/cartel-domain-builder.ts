@@ -138,6 +138,65 @@ export class CartelDomainBuilder {
       contentType: 'text/html',
     });
     descendRoute.setMethod('handleRequest', this.getDescendPageHandler());
+
+    // /js/* routes - serve client modules from same MOO objects as Continuum
+    await this.buildJsRoutes(webRoute, rootRoute);
+  }
+
+  /**
+   * Build /js/* routes pointing to the same MOO objects as Continuum.
+   * Each faction serves JS from their own domain for immersion.
+   */
+  private async buildJsRoutes(
+    webRoute: RuntimeObject,
+    rootRoute: RuntimeObject,
+  ): Promise<void> {
+    // /js route parent
+    const jsRoute = await this.createRoute(webRoute, rootRoute, {
+      name: 'Cartel JS Route',
+      segment: 'js',
+      methods: ['GET'],
+      contentType: 'application/javascript',
+    });
+
+    // JS modules and their MOO object aliases
+    const modules = [
+      { segment: 'malice-client.js', alias: 'maliceClientJs' },
+      { segment: 'desktop.js', alias: 'desktopJs' },
+      { segment: 'window-manager.js', alias: 'windowManagerJs' },
+      { segment: 'window.js', alias: 'windowJs' },
+      { segment: 'terminal-window.js', alias: 'terminalWindowJs' },
+      { segment: 'html-window.js', alias: 'htmlWindowJs' },
+      { segment: 'iframe-window.js', alias: 'iframeWindowJs' },
+      { segment: 'taskbar.js', alias: 'taskbarJs' },
+    ];
+
+    for (const mod of modules) {
+      const route = await this.createRoute(webRoute, jsRoute, {
+        name: `Cartel ${mod.segment}`,
+        segment: mod.segment,
+        methods: ['GET'],
+        contentType: 'application/javascript',
+      });
+
+      // Handler delegates to the MOO object's getScript() method
+      route.setMethod(
+        'handleRequest',
+        `
+        const mod = $.${mod.alias};
+        if (mod && mod.getScript) {
+          const script = await mod.getScript();
+          return {
+            status: 200,
+            contentType: 'application/javascript',
+            body: script,
+            headers: { 'Cache-Control': 'public, max-age=3600' }
+          };
+        }
+        return { status: 404, body: '// Module not found: ${mod.segment}' };
+      `,
+      );
+    }
   }
 
   private getBaseTemplate(): string {
@@ -959,13 +1018,110 @@ export class CartelDomainBuilder {
       const isNew = urlParams.get('new');
       
       if (mode === 'cartel' || isNew === '1') {
-        // Serve terminal template for actual play
-        const terminalHtml = await $.terminalTemplate?.get('layout') || '';
-        const rendered = terminalHtml.replace(/\\{\\{title\\}\\}/g, 'DESCENT // GRAY CARTEL');
+        // Serve Cartel-themed terminal template
+        const terminalHtml = \`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DESCENT // GRAY CARTEL</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/open-props">
+  <style>
+    /* Cartel theme - crimson underground aesthetic */
+    :root {
+      --theme-bg: #0a0505;
+      --theme-surface: #120808;
+      --theme-accent: #ff3366;
+      --theme-accent-dim: #ff336633;
+      --theme-selection: rgba(255, 51, 102, 0.3);
+      --theme-text: #e0e0e0;
+      --theme-text-dim: #888;
+      --theme-border: #442222;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      background: var(--theme-bg);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Desktop container */
+    .malice-desktop {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      background: var(--theme-bg);
+    }
+
+    /* Window area (excludes taskbar) */
+    #window-area {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Taskbar container */
+    #taskbar-container {
+      flex-shrink: 0;
+    }
+
+    /* Window flashing animation */
+    @keyframes window-flash {
+      0%, 100% { border-color: var(--theme-border); }
+      50% { border-color: var(--theme-accent); }
+    }
+    .malice-window.flashing {
+      animation: window-flash 0.5s ease-in-out 4;
+    }
+
+    /* Taskbar button flashing */
+    @keyframes taskbar-flash {
+      0%, 100% { background: #1a1a1a; }
+      50% { background: var(--theme-accent-dim); }
+    }
+
+    /* Scanline overlay for underground aesthetic */
+    .scanline-overlay {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(255, 51, 102, 0.015) 2px,
+        rgba(255, 51, 102, 0.015) 4px
+      );
+      z-index: 9999;
+    }
+  </style>
+</head>
+<body>
+  <div class="scanline-overlay"></div>
+  <div class="malice-desktop">
+    <div id="window-area"></div>
+    <div id="taskbar-container"></div>
+  </div>
+
+  <script>
+    window.MALICE_THEME = {
+      accent: '#ff3366',
+      surface: '#120808',
+      selection: 'rgba(255, 51, 102, 0.3)'
+    };
+  </script>
+  <script type="module" src="/js/desktop.js"></script>
+</body>
+</html>\`;
         return {
           status: 200,
           contentType: 'text/html',
-          body: rendered
+          body: terminalHtml
         };
       }
       
