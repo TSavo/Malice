@@ -187,16 +187,16 @@ export class DefaultFactionsBuilder {
             to: player.email,
             subject: 'Verify your Gray Cartel identity',
             html: \`
-              <div style="font-family: system-ui; max-width: 600px; margin: 0 auto; background: #0a0a0a; padding: 32px;">
-                <div style="background: #141414; padding: 32px; border-radius: 8px; border: 1px solid #333;">
-                  <h1 style="color: #00ff88; margin: 0 0 16px 0;">Welcome to the Gray Cartel</h1>
-                  <p style="color: #e0e0e0; font-size: 16px;">Operative <strong style="color: #00ff88;">\${player.playername}</strong>,</p>
+              <div style="font-family: system-ui; max-width: 600px; margin: 0 auto; background: #0a0505; padding: 32px;">
+                <div style="background: #120808; padding: 32px; border-radius: 8px; border: 1px solid #442222;">
+                  <h1 style="color: #ff3366; margin: 0 0 16px 0;">Welcome to the Gray Cartel</h1>
+                  <p style="color: #e0e0e0; font-size: 16px;">Operative <strong style="color: #ff3366;">\${player.playername}</strong>,</p>
                   <p style="color: #e0e0e0; font-size: 16px;">Your application has been received. Verify your identity to complete the initiation process.</p>
                   <p style="margin: 32px 0; text-align: center;">
-                    <a href="\${verifyUrl}" style="display: inline-block; padding: 14px 32px; background: #00ff88; color: #0a0a0a; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px;">Verify Identity</a>
+                    <a href="\${verifyUrl}" style="display: inline-block; padding: 14px 32px; background: #ff3366; color: #0a0a0a; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px;">Verify Identity</a>
                   </p>
                   <p style="color: #666; font-size: 12px;">Or copy this link: \${verifyUrl}</p>
-                  <hr style="border: none; border-top: 1px solid #333; margin: 24px 0;">
+                  <hr style="border: none; border-top: 1px solid #442222; margin: 24px 0;">
                   <p style="color: #666; font-size: 12px; margin: 0;">This message will self-destruct. Do not reply.</p>
                 </div>
               </div>
@@ -215,7 +215,7 @@ export class DefaultFactionsBuilder {
               content: null,
               embeds: [{
                 title: '🎫 New Cartel Recruit',
-                color: 0x00ff88,
+                color: 0xff3366,
                 fields: [
                   { name: 'Codename', value: player.playername, inline: true },
                   { name: 'Contact', value: player.email, inline: true }
