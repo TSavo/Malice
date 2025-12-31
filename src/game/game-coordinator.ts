@@ -66,14 +66,16 @@ export class GameCoordinator {
     });
 
     // Register faction email domains
-    const continuum = this.manager.getAliases().get('continuum');
-    const cartel = this.manager.getAliases().get('cartel');
-    if (continuum) {
-      this.manager.registerEmailDomain(continuum.id, 'thecontinuum.city');
-    }
-    if (cartel) {
-      this.manager.registerEmailDomain(cartel.id, 'graycartel.com');
-    }
+    // NOTE: Uncomment when faction domains are verified in Resend
+    // Until then, all emails send from noreply@malice.world
+    // const continuum = this.manager.getAliases().get('continuum');
+    // const cartel = this.manager.getAliases().get('cartel');
+    // if (continuum) {
+    //   this.manager.registerEmailDomain(continuum.id, 'thecontinuum.city');
+    // }
+    // if (cartel) {
+    //   this.manager.registerEmailDomain(cartel.id, 'graycartel.com');
+    // }
 
     // Start scheduler tick loop (every second)
     this.startScheduler();
