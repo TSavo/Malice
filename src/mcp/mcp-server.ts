@@ -389,7 +389,7 @@ export class MaliceMCPServer {
       {
         parent: z.string().regex(OBJREF_PATTERN).describe(OBJREF_DESCRIPTION),
         properties: z
-          .record(z.any())
+          .record(z.string(), z.any())
           .optional()
           .describe(
             'Initial properties (use "#id" format for object references)',
@@ -1496,7 +1496,7 @@ export class MaliceMCPServer {
           .regex(OBJREF_PATTERN)
           .describe(OBJREF_DESCRIPTION),
         properties: z
-          .record(z.any())
+          .record(z.string(), z.any())
           .optional()
           .describe(
             'Override properties (use "#id" format for object references)',
@@ -1787,7 +1787,7 @@ ACTIONS:
         phaseId: z.string().optional().describe('Phase identifier'),
         targetId: z.number().optional().describe('Target object ID for hooks'),
         eventName: z.string().optional().describe('Event name for hooks'),
-        filter: z.record(z.any()).optional().describe('Hook filter conditions'),
+        filter: z.record(z.string(), z.any()).optional().describe('Hook filter conditions'),
         expiresAt: z
           .string()
           .optional()
@@ -2263,7 +2263,7 @@ WORLD LOG ACTIONS (Deity Chat):
               backstory: z.string().optional(),
               events: z.array(z.string()).optional(),
               secrets: z.array(z.string()).optional(),
-              relationships: z.record(z.string()).optional(),
+              relationships: z.record(z.string(), z.string()).optional(),
             }),
           ])
           .optional()

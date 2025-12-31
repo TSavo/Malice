@@ -1,5 +1,6 @@
-# Use Node.js 20 (full image needed for Claude SDK)
-FROM node:20
+# syntax=docker/dockerfile:1
+# Use Node.js 25 (full image needed for Claude SDK)
+FROM node:25
 
 # Install tools for healthcheck
 RUN apt-get update && apt-get install -y netcat-openbsd && rm -rf /var/lib/apt/lists/*
