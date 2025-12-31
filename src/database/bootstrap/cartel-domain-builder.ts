@@ -953,59 +953,89 @@ export class CartelDomainBuilder {
   <div class="fragments fragment-4">RETRY: 0</div>
   
   <div class="container">
-    <div class="error-main">SIGNAL LOST</div>
-    <div class="error-code">ERR_TUNNEL_COLLAPSE // NODE_UNREACHABLE</div>
-    
+    <div class="error-main">INITIALIZING</div>
+    <div class="error-code">SECURE_TUNNEL // HANDSHAKE</div>
+
     <div class="terminal-block">
-      <div class="terminal-line">&gt; INITIATING SECURE TUNNEL...</div>
-      <div class="terminal-line">&gt; ROUTING THROUGH PROXY CHAIN...</div>
-      <div class="terminal-line">&gt; NODE 7-ALPHA: <span class="warn">TIMEOUT</span></div>
-      <div class="terminal-line">&gt; NODE 7-BETA: <span class="warn">TIMEOUT</span></div>
-      <div class="terminal-line">&gt; NODE 7-GAMMA: <span class="error">CONNECTION REFUSED</span></div>
-      <div class="terminal-line corrupt">&gt; FALLBACK ROUTE: ██████████</div>
-      <div class="terminal-line error">&gt; ALL ROUTES EXHAUSTED</div>
-      <div class="terminal-line">&nbsp;</div>
-      <div class="terminal-line error">CONNECTION TERMINATED<span class="cursor"></span></div>
+      <div class="terminal-line" data-header="CONNECTING" data-sub="PROXY_CHAIN // ROUTING">&gt; INITIATING SECURE TUNNEL...</div>
+      <div class="terminal-line" data-header="CONNECTING" data-sub="NODE_DISCOVERY // ACTIVE">&gt; ROUTING THROUGH PROXY CHAIN...</div>
+      <div class="terminal-line" data-header="SEARCHING" data-sub="NODE_7-ALPHA // TIMEOUT">&gt; NODE 7-ALPHA: <span class="warn">TIMEOUT</span></div>
+      <div class="terminal-line" data-header="SEARCHING" data-sub="NODE_7-BETA // TIMEOUT">&gt; NODE 7-BETA: <span class="warn">TIMEOUT</span></div>
+      <div class="terminal-line" data-header="REROUTING" data-sub="NODE_7-GAMMA // REFUSED">&gt; NODE 7-GAMMA: <span class="error">CONNECTION REFUSED</span></div>
+      <div class="terminal-line corrupt" data-header="REROUTING" data-sub="FALLBACK_ROUTE // ENCRYPTED">&gt; FALLBACK ROUTE: ██████████</div>
+      <div class="terminal-line" data-header="TUNNELING" data-sub="UNDERGROUND_NODE // FOUND">&gt; UNDERGROUND NODE DETECTED...</div>
+      <div class="terminal-line" data-header="HANDSHAKE" data-sub="AUTH_CHALLENGE // ACCEPTED">&gt; AUTHENTICATING...</div>
+      <div class="terminal-line" style="color:#ff3366;" data-header="SIGNAL CONNECTED" data-sub="ENTERING THE UNDERGROUND...">&gt; TUNNEL ESTABLISHED<span class="cursor"></span></div>
     </div>
-    
+
     <div class="back-link">
       <p style="margin-top: 2rem;"><a href="/" style="color:#666; border-bottom: 1px solid #333;">Return to surface broadcast</a></p>
     </div>
   </div>
-  
+
   <script>
-    // Animate the connection sequence, then redirect to terminal
+    // Animate the connection sequence with dynamic header updates
     let step = 0;
     const lines = document.querySelectorAll('.terminal-line');
-    
+    const headerEl = document.querySelector('.error-main');
+    const subEl = document.querySelector('.error-code');
+    const fragments = document.querySelectorAll('.fragments');
+
+    // Fragment messages to cycle through
+    const fragmentMsgs = [
+      ['UPLINK FAIL', 'AUTH REJECT', 'NODE OFFLINE', 'RETRY: 0'],
+      ['SCANNING...', 'PROBE SENT', 'WAIT...', 'RETRY: 1'],
+      ['NODE FOUND', 'HANDSHAKE', 'ENCRYPT ON', 'RETRY: 2'],
+      ['TUNNEL UP', 'VERIFIED', 'SECURE', 'CONNECTED']
+    ];
+
+    function updateFragments(phase) {
+      const msgs = fragmentMsgs[Math.min(phase, fragmentMsgs.length - 1)];
+      fragments.forEach((f, i) => {
+        if (msgs[i]) f.textContent = msgs[i];
+      });
+    }
+
     function showLine() {
       if (step < lines.length) {
-        lines[step].style.opacity = '1';
+        const line = lines[step];
+        line.style.opacity = '1';
+
+        // Update header based on data attributes
+        const newHeader = line.dataset.header;
+        const newSub = line.dataset.sub;
+        if (newHeader) {
+          headerEl.textContent = newHeader;
+          headerEl.style.color = step === lines.length - 1 ? '#ff3366' : '#ff3366';
+        }
+        if (newSub) {
+          subEl.textContent = newSub;
+        }
+
+        // Update fragments at key points
+        if (step === 2) updateFragments(1);
+        if (step === 5) updateFragments(2);
+        if (step === 8) updateFragments(3);
+
         step++;
-        
+
         if (step === lines.length) {
-          // After showing "CONNECTION TERMINATED", wait then show success
+          // Final state - redirect after delay
           setTimeout(() => {
-            // Replace the error with success
-            document.querySelector('.error-main').textContent = 'ROUTE FOUND';
-            document.querySelector('.error-main').style.color = '#ff3366';
-            document.querySelector('.error-code').textContent = 'CONNECTING TO UNDERGROUND NODE...';
-            
-            // Redirect to terminal with cartel mode
-            setTimeout(() => {
-              window.location.href = '/play';
-            }, 1500);
-          }, 2000);
+            window.location.href = '/play';
+          }, 1500);
         } else {
-          setTimeout(showLine, 300 + Math.random() * 400);
+          setTimeout(showLine, 400 + Math.random() * 300);
         }
       }
     }
-    
-    // Hide all lines initially, then reveal them one by one
-    lines.forEach(line => line.style.opacity = '0');
-    lines.forEach(line => line.style.transition = 'opacity 0.3s');
-    
+
+    // Hide all lines initially
+    lines.forEach(line => {
+      line.style.opacity = '0';
+      line.style.transition = 'opacity 0.3s';
+    });
+
     // Start the animation sequence
     setTimeout(showLine, 500);
   </script>
