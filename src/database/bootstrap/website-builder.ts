@@ -491,8 +491,8 @@ export class WebsiteBuilder {
   <script>
     window.MALICE_THEME = {
       name: 'The Continuum',
-      tagline: 'Enter your credentials to connect',
-      registerTagline: 'Become a citizen',
+      tagline: 'Citizen authentication required',
+      registerTagline: 'New citizen registration',
       accent: '#00ff88',
       surface: '#0d0d0d',
       selection: 'rgba(0, 255, 136, 0.3)'
@@ -585,8 +585,8 @@ export class WebsiteBuilder {
     // Theme data for JS that can't use CSS var()
     window.MALICE_THEME = {
       name: 'The Continuum',
-      tagline: 'Enter your credentials to connect',
-      registerTagline: 'Become a citizen',
+      tagline: 'Citizen authentication required',
+      registerTagline: 'New citizen registration',
       accent: '#00ff88',
       surface: '#0d0d0d',
       selection: 'rgba(0, 255, 136, 0.3)'
@@ -771,138 +771,108 @@ export class WebsiteBuilder {
 
 <!-- Hero Section -->
 <div class="relative overflow-hidden">
-  <!-- Grid background -->
-  <div class="absolute inset-0 opacity-5">
-    <div class="absolute inset-0" style="background-image: linear-gradient(rgba(0,255,136,0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,136,0.2) 1px, transparent 1px); background-size: 40px 40px;"></div>
-  </div>
+  <div class="max-w-5xl mx-auto px-6 py-16 md:py-24">
 
-  <div class="max-w-6xl mx-auto px-6 py-20 md:py-32 relative">
-    <div class="max-w-3xl">
-      <!-- Tagline -->
-      <div class="text-sm font-mono text-gray-500 mb-4 tracking-widest">SEATTLE PIONEER DISTRICT</div>
+    <div class="text-xs font-mono text-gray-600 mb-8 tracking-wider">CITIZEN SERVICES // PIONEER DISTRICT</div>
 
-      <!-- Main headline -->
-      <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-        <span class="text-white">Out of many,</span><br>
-        <span class="text-malice-accent glitch-text">we are rebuilding.</span>
-      </h1>
+    <h1 class="text-3xl md:text-4xl font-bold mb-6 text-gray-300 leading-tight max-w-2xl">
+      Citizen registration is available for all Pioneer District residents.
+    </h1>
 
-      <p class="text-xl md:text-2xl text-gray-400 mb-8 leading-relaxed">
-        Forty-eight years after the Collapse, Seattle rises again.
-        <span class="text-gray-300">Join the citizen workforce.</span>
-        Receive food, shelter, and purpose.
-      </p>
+    <p class="text-gray-500 mb-8 max-w-xl text-sm leading-relaxed">
+      Registered citizens receive allocation of sustenance, shelter assignment, and work placement.
+      Registration is voluntary. Benefits require compliance with work assignments.
+    </p>
 
-      <p class="text-gray-500 mb-10 max-w-xl">
-        The Continuum provides infrastructure, security, and opportunity for all registered citizens.
-        Your skills matter. Your contribution matters.
-        <span class="text-gray-400">We are the many.</span>
-      </p>
-
-      <!-- CTA Buttons -->
-      <div class="flex flex-wrap gap-4">
-        <a href="/play" class="group px-8 py-4 bg-malice-accent text-black font-bold hover:bg-green-400 transition-all text-lg flex items-center gap-3">
-          <span>Begin Registration</span>
-          <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
-        </a>
-        <a href="/docs/PLAYER-GUIDE" class="px-8 py-4 border border-gray-700 hover:border-malice-accent hover:text-malice-accent transition-all text-lg text-gray-300">
-          Citizenship Guide
-        </a>
-      </div>
-
-      <!-- Subtle warning - the cracks showing -->
-      <div class="mt-12 pt-8 border-t border-gray-800">
-        <p class="text-xs text-gray-600 font-mono">
-          <span class="warning-text">NOTICE:</span> Processing delays may occur. Citizenship applications are reviewed in order of submission.
-          <span class="glitch-flicker">Current wait time: VARIABLE</span>
-        </p>
-      </div>
+    <div class="flex flex-wrap gap-4 mb-12">
+      <a href="/play" class="px-6 py-3 bg-malice-accent text-black font-bold hover:bg-green-400 transition text-sm">
+        Citizen Registration
+      </a>
+      <a href="/docs/PLAYER-GUIDE" class="px-6 py-3 border border-gray-700 hover:border-gray-500 transition text-sm text-gray-400">
+        Registration Requirements
+      </a>
     </div>
+
+    <div class="border-t border-gray-800 pt-6">
+      <p class="text-xs text-gray-700 font-mono">
+        NOTICE: Processing delays may occur. Applications reviewed in order of submission.
+        <span class="glitch-flicker">Current wait time: VARIABLE</span>
+      </p>
+    </div>
+
   </div>
 </div>
 
-<!-- Benefits Section -->
-<div class="bg-malice-surface/30 border-y border-gray-800">
-  <div class="max-w-6xl mx-auto px-6 py-16">
-    <div class="text-center mb-12">
-      <h2 class="text-2xl font-bold text-white mb-3">Citizenship Benefits</h2>
-      <p class="text-gray-500">What the Continuum provides for registered citizens</p>
-    </div>
+<!-- Services Section -->
+<div class="border-y border-gray-800 bg-black/30">
+  <div class="max-w-5xl mx-auto px-6 py-12">
 
-    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-      <div class="p-6 border border-gray-800 rounded bg-black/50">
-        <div class="text-malice-accent text-2xl mb-3">&#x1F35E;</div>
-        <h3 class="text-white font-bold mb-2">Sustenance</h3>
-        <p class="text-gray-500 text-sm">Daily nutrient rations at designated dispensaries. Caloric requirements calculated and fulfilled.</p>
+    <div class="text-xs font-mono text-gray-600 mb-8">CITIZEN ALLOCATION</div>
+
+    <div class="grid md:grid-cols-2 gap-6 text-sm">
+      <div class="border-l-2 border-gray-800 pl-4">
+        <div class="text-gray-400 font-bold mb-1">Sustenance</div>
+        <p class="text-gray-600">Daily nutrient allocation at designated dispensaries. Caloric requirements calculated per citizen.</p>
       </div>
 
-      <div class="p-6 border border-gray-800 rounded bg-black/50">
-        <div class="text-malice-accent text-2xl mb-3">&#x1F3E0;</div>
-        <h3 class="text-white font-bold mb-2">Shelter</h3>
-        <p class="text-gray-500 text-sm">Secured housing in Pioneer District. Climate-controlled. Running water. Walls that lock.</p>
+      <div class="border-l-2 border-gray-800 pl-4">
+        <div class="text-gray-400 font-bold mb-1">Shelter</div>
+        <p class="text-gray-600">Housing assignment in secured zones. Climate control. Water access. Locking doors.</p>
       </div>
 
-      <div class="p-6 border border-gray-800 rounded bg-black/50">
-        <div class="text-malice-accent text-2xl mb-3">&#x1F4BC;</div>
-        <h3 class="text-white font-bold mb-2">Employment</h3>
-        <p class="text-gray-500 text-sm">Work assignments matched to your capabilities. Earn credits. Build your future.</p>
+      <div class="border-l-2 border-gray-800 pl-4">
+        <div class="text-gray-400 font-bold mb-1">Employment</div>
+        <p class="text-gray-600">Work placement matched to capability assessment. Credit compensation. Advancement available.</p>
       </div>
 
-      <div class="p-6 border border-gray-800 rounded bg-black/50">
-        <div class="text-malice-accent text-2xl mb-3">&#x1F6E1;</div>
-        <h3 class="text-white font-bold mb-2">Security</h3>
-        <p class="text-gray-500 text-sm">CorpSec presence in all citizen zones. Your safety is our priority. <span class="text-gray-600 glitch-flicker">Always watching.</span></p>
+      <div class="border-l-2 border-gray-800 pl-4">
+        <div class="text-gray-400 font-bold mb-1">Security</div>
+        <p class="text-gray-600">CorpSec presence in all citizen zones. Incident response. <span class="text-gray-700 glitch-flicker">Monitoring active.</span></p>
       </div>
     </div>
+
   </div>
 </div>
 
-<!-- The Situation - honest but corporate -->
-<div class="max-w-6xl mx-auto px-6 py-16">
+<!-- Infrastructure Status -->
+<div class="max-w-5xl mx-auto px-6 py-12">
   <div class="grid lg:grid-cols-2 gap-12 items-start">
     <div>
-      <h2 class="text-2xl font-bold mb-6 text-white">The Reconstruction</h2>
-      <div class="space-y-4 text-gray-400">
+      <div class="text-xs font-mono text-gray-600 mb-6">DISTRICT STATUS</div>
+
+      <div class="space-y-4 text-gray-500 text-sm">
         <p>
-          The Corporate Wars ended in 2062. The infrastructure that sustained civilization
-          was destroyed in the crossfire. The years that followed were... difficult.
+          Infrastructure restoration ongoing. Pioneer District designated primary reconstruction zone.
+          Power, water, and distribution systems partially operational.
         </p>
         <p>
-          <span class="text-gray-300">We survived.</span> The Continuum emerged to rebuild
-          what was lost. Pioneer Square is now the heart of the reconstruction effort.
-          Power. Water. Food distribution. We are restoring order, block by block.
-        </p>
-        <p>
-          Current citizen population: <span class="text-malice-accent font-mono" id="pop-inline">~500</span>.
-          Estimated unregistered population: <span class="text-gray-500">significantly higher</span>.
-          <span class="text-gray-500">The math is simple: join us, or survive alone.</span>
+          Registered citizens: <span class="text-gray-400 font-mono" id="pop-inline">~500</span>.
+          Unregistered population: <span class="text-gray-600">estimate unavailable</span>.
         </p>
       </div>
 
-      <!-- Infrastructure status - showing the cracks -->
-      <div class="mt-8 p-4 border border-gray-800 rounded bg-black/30">
-        <div class="text-xs font-mono text-gray-600 mb-3">INFRASTRUCTURE STATUS</div>
+      <div class="mt-8 p-4 border border-gray-800 bg-black/30">
+        <div class="text-xs font-mono text-gray-600 mb-3">SYSTEM STATUS</div>
         <div class="space-y-2 text-sm font-mono">
           <div class="flex justify-between">
-            <span class="text-gray-500">Power Grid</span>
-            <span class="text-yellow-500">40% CAPACITY</span>
+            <span class="text-gray-600">Power Grid</span>
+            <span class="text-yellow-600">40%</span>
           </div>
           <div class="flex justify-between">
-            <span class="text-gray-500">Water Treatment</span>
-            <span class="text-malice-accent">60% OPERATIONAL</span>
+            <span class="text-gray-600">Water Treatment</span>
+            <span class="text-gray-500">60%</span>
           </div>
           <div class="flex justify-between">
-            <span class="text-gray-500">Sewage Systems</span>
-            <span class="error-text">30% - PRIORITY REPAIR</span>
+            <span class="text-gray-600">Sewage</span>
+            <span class="text-red-700">30%</span>
           </div>
           <div class="flex justify-between">
-            <span class="text-gray-500">Communications</span>
-            <span class="text-malice-accent">80% COVERAGE</span>
+            <span class="text-gray-600">Communications</span>
+            <span class="text-gray-500">80%</span>
           </div>
         </div>
-        <div class="mt-3 text-xs text-gray-600">
-          <span class="warning-text">*</span> Statistics reflect Pioneer District only.
-          <span class="glitch-flicker">Outer zones: DATA UNAVAILABLE</span>
+        <div class="mt-3 text-xs text-gray-700">
+          Pioneer District only. <span class="glitch-flicker">Outer zones: NO DATA</span>
         </div>
       </div>
     </div>
@@ -968,79 +938,65 @@ export class WebsiteBuilder {
   </div>
 </div>
 
-<!-- Work Opportunities -->
-<div class="border-t border-gray-800 bg-malice-surface/20">
-  <div class="max-w-6xl mx-auto px-6 py-16">
-    <div class="text-center mb-12">
-      <h2 class="text-2xl font-bold text-white mb-3">Current Labor Needs</h2>
-      <p class="text-gray-500">The reconstruction requires skilled and unskilled workers</p>
-    </div>
+<!-- Work Placement -->
+<div class="border-t border-gray-800">
+  <div class="max-w-5xl mx-auto px-6 py-12">
+    <div class="text-xs font-mono text-gray-600 mb-6">WORK PLACEMENT CATEGORIES</div>
 
-    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      <div class="p-4 border border-gray-800 rounded bg-black/30 hover:border-malice-accent/30 transition">
-        <div class="text-malice-accent font-bold mb-1">Infrastructure Repair</div>
-        <p class="text-gray-500 text-sm">Water systems, power grid, sewage. Critical priority.</p>
-        <div class="text-xs text-yellow-500 mt-2 font-mono">HIGH DEMAND</div>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
+      <div class="p-3 border-l-2 border-gray-800">
+        <div class="text-gray-400 font-bold mb-1">Infrastructure</div>
+        <p class="text-gray-600 text-xs">Water, power, sewage repair</p>
       </div>
 
-      <div class="p-4 border border-gray-800 rounded bg-black/30 hover:border-malice-accent/30 transition">
-        <div class="text-malice-accent font-bold mb-1">Security Services</div>
-        <p class="text-gray-500 text-sm">CorpSec patrol, checkpoint operation, threat response.</p>
-        <div class="text-xs text-gray-500 mt-2 font-mono">TRAINING REQUIRED</div>
+      <div class="p-3 border-l-2 border-gray-800">
+        <div class="text-gray-400 font-bold mb-1">Security</div>
+        <p class="text-gray-600 text-xs">CorpSec auxiliary. Training required.</p>
       </div>
 
-      <div class="p-4 border border-gray-800 rounded bg-black/30 hover:border-malice-accent/30 transition">
-        <div class="text-malice-accent font-bold mb-1">Fabrication</div>
-        <p class="text-gray-500 text-sm">Factory production, equipment maintenance, logistics.</p>
-        <div class="text-xs text-malice-accent mt-2 font-mono">POSITIONS AVAILABLE</div>
+      <div class="p-3 border-l-2 border-gray-800">
+        <div class="text-gray-400 font-bold mb-1">Fabrication</div>
+        <p class="text-gray-600 text-xs">Factory production, maintenance</p>
       </div>
 
-      <div class="p-4 border border-gray-800 rounded bg-black/30 hover:border-malice-accent/30 transition">
-        <div class="text-malice-accent font-bold mb-1">Medical Support</div>
-        <p class="text-gray-500 text-sm">Clone tank operation, trauma response, sanitation.</p>
-        <div class="text-xs text-yellow-500 mt-2 font-mono">SPECIALIZED</div>
+      <div class="p-3 border-l-2 border-gray-800">
+        <div class="text-gray-400 font-bold mb-1">Medical</div>
+        <p class="text-gray-600 text-xs">Clone support, sanitation</p>
       </div>
 
-      <div class="p-4 border border-gray-800 rounded bg-black/30 hover:border-malice-accent/30 transition">
-        <div class="text-malice-accent font-bold mb-1">Distribution</div>
-        <p class="text-gray-500 text-sm">Ration logistics, supply chain, inventory management.</p>
-        <div class="text-xs text-malice-accent mt-2 font-mono">POSITIONS AVAILABLE</div>
+      <div class="p-3 border-l-2 border-gray-800">
+        <div class="text-gray-400 font-bold mb-1">Distribution</div>
+        <p class="text-gray-600 text-xs">Logistics, supply chain</p>
       </div>
 
-      <div class="p-4 border border-gray-800 rounded bg-black/30 hover:border-malice-accent/30 transition">
-        <div class="text-malice-accent font-bold mb-1">Administration</div>
-        <p class="text-gray-500 text-sm">Records, processing, citizen services.</p>
-        <div class="text-xs text-gray-600 mt-2 font-mono glitch-flicker">EVALUATION PENDING</div>
+      <div class="p-3 border-l-2 border-gray-800">
+        <div class="text-gray-400 font-bold mb-1">Administration</div>
+        <p class="text-gray-600 text-xs">Records, processing</p>
       </div>
     </div>
 
-    <div class="mt-8 text-center">
-      <p class="text-gray-600 text-sm">
-        All work is compensated in credits. <span class="text-gray-500">Credits are redeemable at designated facilities.</span>
-      </p>
+    <div class="mt-6 text-xs text-gray-700">
+      Work compensated in credits. Placement determined by capability assessment.
     </div>
   </div>
 </div>
 
-<!-- Bulletins / News -->
+<!-- Bulletins -->
 <div class="border-t border-gray-800">
-  <div class="max-w-6xl mx-auto px-6 py-12">
-    <div class="flex items-center justify-between mb-8">
-      <div>
-        <h2 class="text-xl font-bold text-white">Public Bulletins</h2>
-        <p class="text-gray-600 text-sm mt-1">Official communications from Continuum administration</p>
-      </div>
+  <div class="max-w-5xl mx-auto px-6 py-12">
+    <div class="flex items-center justify-between mb-6">
+      <div class="text-xs font-mono text-gray-600">PUBLIC NOTICES</div>
       <div class="flex gap-2 text-xs font-mono">
-        <button onclick="filterNews('')" class="news-filter px-3 py-1 rounded border border-gray-700 hover:border-malice-accent hover:text-malice-accent transition" data-category="">ALL</button>
-        <button onclick="filterNews('announcement')" class="news-filter px-3 py-1 rounded border border-gray-700 hover:border-malice-accent hover:text-malice-accent transition" data-category="announcement">NOTICES</button>
-        <button onclick="filterNews('event')" class="news-filter px-3 py-1 rounded border border-gray-700 hover:border-malice-accent hover:text-malice-accent transition" data-category="event">EVENTS</button>
+        <button onclick="filterNews('')" class="news-filter px-2 py-1 border border-gray-800 hover:border-gray-600 transition text-gray-600" data-category="">ALL</button>
+        <button onclick="filterNews('announcement')" class="news-filter px-2 py-1 border border-gray-800 hover:border-gray-600 transition text-gray-600" data-category="announcement">NOTICES</button>
+        <button onclick="filterNews('event')" class="news-filter px-2 py-1 border border-gray-800 hover:border-gray-600 transition text-gray-600" data-category="event">EVENTS</button>
       </div>
     </div>
     <div id="news-container" class="space-y-3">
-      <div class="text-gray-600 text-center py-8 font-mono text-sm">LOADING BULLETINS...</div>
+      <div class="text-gray-700 text-center py-6 font-mono text-xs">LOADING...</div>
     </div>
-    <div id="news-empty" class="hidden text-gray-600 text-center py-8 font-mono text-sm">
-      NO CURRENT BULLETINS. CHECK BACK LATER.
+    <div id="news-empty" class="hidden text-gray-700 text-center py-6 font-mono text-xs">
+      NO CURRENT NOTICES.
     </div>
   </div>
 </div>
