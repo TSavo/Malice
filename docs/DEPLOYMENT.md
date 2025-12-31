@@ -535,6 +535,68 @@ mcp__cloudflare-malice__delete_dns_record
 
 ---
 
+## SSH Tunneling for Dev Tools
+
+Admin ports (MCP, LSP, DevTools) are bound to localhost only. Access them via SSH tunnel.
+
+### Basic SSH Tunnel
+
+```bash
+# Forward all dev ports (using 4xxx to avoid conflicts with local dev)
+ssh -L 4000:localhost:3000 \
+    -L 4010:localhost:3010 \
+    -L 4999:localhost:9999 \
+    -L 4012:localhost:3012 \
+    -L 4013:localhost:3013 \
+    -i ~/.ssh/malice-do root@146.190.135.71
+```
+
+### Port Mapping
+
+| Service | Remote Port | Local Tunnel | Local Dev |
+|---------|-------------|--------------|-----------|
+| LSP API | 3000 | 4000 | 3000 |
+| MCP Admin | 3010 | 4010 | 3010 |
+| DevTools | 9999 | 4999 | 9999 |
+| Continuum Session MCP | 3012 | 4012 | 3012 |
+| Cartel Session MCP | 3013 | 4013 | 3013 |
+
+### Claude Code MCP Configuration
+
+Add to your Claude Code MCP settings (with tunnel active):
+
+```json
+{
+  "mcpServers": {
+    "malice-prod": {
+      "type": "http",
+      "url": "http://localhost:4010/mcp"
+    }
+  }
+}
+```
+
+### Keep Tunnel Alive
+
+For persistent access, use autossh or add to SSH config:
+
+```bash
+# ~/.ssh/config
+Host malice-prod
+    HostName 146.190.135.71
+    User root
+    IdentityFile ~/.ssh/malice-do
+    LocalForward 4000 localhost:3000
+    LocalForward 4010 localhost:3010
+    LocalForward 4999 localhost:9999
+    LocalForward 4012 localhost:3012
+    LocalForward 4013 localhost:3013
+```
+
+Then just: `ssh malice-prod`
+
+---
+
 ## Current Production
 
 **Droplet:** `malice-prod`
