@@ -15,9 +15,9 @@ import type {
   CommandPattern,
   CoordinationPattern,
   LogQuery,
-} from '../../types/log.js';
-import type { ObjId } from '../../types/object.js';
-import { getGameLogger } from './game-logger.js';
+} from '../../types/log';
+import type { ObjId } from '../../types/object';
+import { getGameLogger } from './game-logger';
 
 /**
  * LoggerFacade - looks like a RuntimeObject but is pure TypeScript

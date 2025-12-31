@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the Faction prototype
@@ -25,21 +26,28 @@ import type { ObjectManager } from '../../object-manager.js';
  * Network transports are managed by $factionManager.create() which
  * creates the faction object AND spins up its transport bundle.
  */
-export class FactionBuilder {
-  static readonly alias = 'faction';
-  static readonly parent = 'describable';
+export class FactionBuilder implements Builder {
+  static provides = ['faction'];
+  static depends = ['describable'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(
-    describableId: number,
-    existingObj?: RuntimeObject,
-  ): Promise<RuntimeObject> {
-    const obj =
-      existingObj ??
-      (await this.manager.create({
-        parent: (await this.manager.load(describableId))!,
-        properties: {
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.faction && !forceRebuild) {
+      this.obj = $.faction;
+      return;
+    }
+
+    const parentObj = $.describable;
+    if (!parentObj) throw new Error('FactionBuilder: $describable not found');
+
+    this.obj = await this.manager.create({
+      parent: parentObj,
+      properties: {
           name: 'Faction',
           description: 'A faction in the game world.',
           // Faction-specific properties
@@ -66,7 +74,9 @@ MEMBERSHIP: Use $factionManager.setMembership(entity, faction) to add members. $
 LIFECYCLE: Created via $factionManager.create(), destroyed via $factionManager.destroy(). This handles transport spinup/spindown.`,
         },
         methods: {},
-      }));
+    });
+
+    const obj = this.obj;
 
     obj.setMethod(
       'describe',
@@ -198,7 +208,15 @@ LIFECYCLE: Created via $factionManager.create(), destroyed via $factionManager.d
       'discordWebhook',
       'Discord webhook URL for registration notifications. Set to receive alerts when new players register.',
     );
+  }
 
-    return obj;
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'faction', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(FactionBuilder);

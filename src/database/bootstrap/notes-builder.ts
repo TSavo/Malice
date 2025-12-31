@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../types/object.js';
-import type { ObjectManager } from '../object-manager.js';
+import type { RuntimeObject } from '../../../types/object';
+import type { ObjectManager } from '../object-manager';
+import { registerBuilder, type Builder } from './builder-registry';
 
 /**
  * Builds Notes utility object ($.notes)
@@ -13,7 +14,10 @@ import type { ObjectManager } from '../object-manager.js';
  *   await $.notes.delete(objectId, index)
  *   const results = await $.notes.search(query)
  */
-export class NotesBuilder {
+export class NotesBuilder implements Builder {
+  static provides = ['notes'];
+  static depends: string[] = [];
+
   private notes: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
@@ -257,7 +261,7 @@ export class NotesBuilder {
     );
   }
 
-  async registerAlias(): Promise<void> {
+  async registerAliases(): Promise<void> {
     if (!this.notes) return;
 
     const objectManager = await this.manager.load(0);
@@ -267,3 +271,6 @@ export class NotesBuilder {
     console.log(`Registered notes alias -> #${this.notes.id}`);
   }
 }
+
+// Self-register
+registerBuilder(NotesBuilder);

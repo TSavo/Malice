@@ -6,10 +6,14 @@
  * Used by Session MCP server (port 3012) - sandboxed for player access.
  */
 
-import type { RuntimeObject } from '../../../types/object.js';
-import type { ObjectManager } from '../object-manager.js';
+import type { RuntimeObject } from '../../../types/object';
+import type { ObjectManager } from '../object-manager';
+import { registerBuilder, type Builder } from './builder-registry';
 
-export class SessionBuilder {
+export class SessionBuilder implements Builder {
+  static provides = ['session'];
+  static depends: string[] = [];
+
   private session: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
@@ -46,7 +50,6 @@ export class SessionBuilder {
           description: 'Manages telnet sessions for player access',
         },
       });
-      await objectManager.call('addAlias', 'session', this.session.id);
       console.log(`[SessionBuilder] Created $.session (#${this.session.id})`);
     }
 
@@ -145,4 +148,17 @@ export class SessionBuilder {
     `,
     );
   }
+
+  async registerAliases(): Promise<void> {
+    if (!this.session) return;
+
+    const objectManager = await this.manager.load(0);
+    if (!objectManager) return;
+
+    await objectManager.call('addAlias', 'session', this.session.id);
+    console.log(`Registered session alias -> #${this.session.id}`);
+  }
 }
+
+// Self-register
+registerBuilder(SessionBuilder);

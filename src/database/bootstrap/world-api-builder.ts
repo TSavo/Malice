@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../types/object.js';
-import type { ObjectManager } from '../object-manager.js';
+import type { RuntimeObject } from '../../../types/object';
+import type { ObjectManager } from '../object-manager';
+import { registerBuilder, type Builder } from './builder-registry';
 
 /**
  * Builds $world object
@@ -7,7 +8,10 @@ import type { ObjectManager } from '../object-manager.js';
  * - All rooms with coordinates
  * - Authenticated connections (players)
  */
-export class WorldApiBuilder {
+export class WorldApiBuilder implements Builder {
+  static provides = ['world'];
+  static depends: string[] = [];
+
   private world: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
@@ -332,13 +336,16 @@ export class WorldApiBuilder {
     );
   }
 
-  async registerAlias(): Promise<void> {
+  async registerAliases(): Promise<void> {
     if (!this.world) return;
 
     const objectManager = await this.manager.load(0);
     if (!objectManager) return;
 
     await objectManager.call('addAlias', 'world', this.world.id);
-    console.log(`✅ Registered world alias -> #${this.world.id}`);
+    console.log(`Registered world alias -> #${this.world.id}`);
   }
 }
+
+// Self-register
+registerBuilder(WorldApiBuilder);

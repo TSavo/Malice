@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the Clothing prototype
@@ -19,15 +20,24 @@ import type { ObjectManager } from '../../object-manager.js';
  *
  * Subprototypes: $.shirt, $.pants, $.shoes, $.hat, etc.
  */
-export class ClothingBuilder {
-  static readonly alias = 'clothing';
-  static readonly parent = 'wearable';
+export class ClothingBuilder implements Builder {
+  static provides = ['clothing'];
+  static depends = ['wearable'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(wearableId: number): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(wearableId);
-    const obj = await this.manager.create({
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.clothing && !forceRebuild) {
+      this.obj = $.clothing;
+      return;
+    }
+
+    const parentObj = $.wearable;
+    this.obj = await this.manager.create({
       parent: parentObj!,
       properties: {
         name: 'Clothing',
@@ -66,6 +76,8 @@ FIRE: Most fabrics burn. Fire damage destroys clothing, may injure wearer.`,
       },
       methods: {},
     });
+
+    const obj = this.obj;
 
     // Wear this clothing item (AI calls this directly)
     obj.setMethod(
@@ -325,6 +337,16 @@ FIRE: Most fabrics burn. Fire damage destroys clothing, may injure wearer.`,
       'Array of pocket objects attached to this garment. Use getPocket(name) to access.',
     );
 
-    return obj;
+    this.obj = obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'clothing', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(ClothingBuilder);

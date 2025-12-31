@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../types/object.js';
-import type { ObjectManager } from '../object-manager.js';
+import type { RuntimeObject } from '../../../types/object';
+import type { ObjectManager } from '../object-manager';
+import { registerBuilder, type Builder } from './builder-registry';
 
 /**
  * Builds the Combat system object ($.combat)
@@ -19,7 +20,10 @@ import type { ObjectManager } from '../object-manager.js';
  * 5. Narrates the result
  * 6. Calls $combat.end(combatId) when combat concludes
  */
-export class CombatBuilder {
+export class CombatBuilder implements Builder {
+  static provides = ['combat'];
+  static depends = ['exclusions']; // Uses $.exclusions for action tracking
+
   private combat: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
@@ -370,13 +374,16 @@ The actual combat PHYSICS (damage, wounds, skill checks, hit/miss) is handled by
     );
   }
 
-  async registerAlias(): Promise<void> {
+  async registerAliases(): Promise<void> {
     if (!this.combat) return;
 
     const objectManager = await this.manager.load(0);
     if (!objectManager) return;
 
     await objectManager.call('addAlias', 'combat', this.combat.id);
-    console.log(`  Registered $.combat -> #${this.combat.id}`);
+    console.log(`Registered combat alias -> #${this.combat.id}`);
   }
 }
+
+// Self-register
+registerBuilder(CombatBuilder);

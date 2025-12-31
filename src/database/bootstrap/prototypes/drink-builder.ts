@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the Drink prototype
@@ -11,15 +12,24 @@ import type { ObjectManager } from '../../object-manager.js';
  * - The drink() method is infrastructure that handles state changes
  * - AI determines if drinking is possible based on abilities
  */
-export class DrinkBuilder {
-  static readonly alias = 'drink';
-  static readonly parent = 'edible';
+export class DrinkBuilder implements Builder {
+  static provides = ['drink'];
+  static depends = ['edible'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(edibleId: number): Promise<RuntimeObject> {
-    const parent = await this.manager.load(edibleId);
-    const obj = await this.manager.create({
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.drink && !forceRebuild) {
+      this.obj = $.drink;
+      return;
+    }
+
+    const parent = $.edible;
+    this.obj = await this.manager.create({
       parent: parent!,
       properties: {
         name: 'Drink',
@@ -59,6 +69,8 @@ TO CONSUME: Call consume(drinker, 'drink') method. It handles hydration, calorie
       },
       methods: {},
     });
+
+    const obj = this.obj;
 
     // Add property descriptions
     obj.setPropertyDescription(
@@ -226,6 +238,16 @@ TO CONSUME: Call consume(drinker, 'drink') method. It handles hydration, calorie
     `,
     );
 
-    return obj;
+    this.obj = obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'drink', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(DrinkBuilder);

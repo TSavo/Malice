@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../types/object.js';
-import type { ObjectManager } from '../object-manager.js';
+import type { RuntimeObject } from '../../../types/object';
+import type { ObjectManager } from '../object-manager';
+import { registerBuilder, type Builder } from './builder-registry';
 
 /**
  * Stat allocation costs for chargen
@@ -31,7 +32,10 @@ export const STARTING_STAT_POINTS = 20;
  * Builds CharGen object (dynamic ID)
  * Handles character creation with interactive prompts
  */
-export class CharGenBuilder {
+export class CharGenBuilder implements Builder {
+  static provides = ['charGen'];
+  static depends = ['describable', 'aiPrompts'];
+
   private charGen: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
@@ -1684,7 +1688,7 @@ STARTING LOCATION: Immigration Services Entry Hall ($immigrationServices)`,
     );
   }
 
-  async registerAlias(): Promise<void> {
+  async registerAliases(): Promise<void> {
     if (!this.charGen) return;
 
     const objectManager = await this.manager.load(0);
@@ -1694,3 +1698,6 @@ STARTING LOCATION: Immigration Services Entry Hall ($immigrationServices)`,
     console.log(`Registered charGen alias -> #${this.charGen.id}`);
   }
 }
+
+// Self-register
+registerBuilder(CharGenBuilder);

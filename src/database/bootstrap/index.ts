@@ -1,23 +1,7 @@
-export { AliasLoader } from './alias-loader.js';
-export { AuthManagerBuilder } from './auth-manager-builder.js';
-export { BodyFactoryBuilder } from './body-factory-builder.js';
-export { CharGenBuilder } from './chargen-builder.js';
-export { CoreSystemBuilder } from './core-system-builder.js';
-export { EmoteBuilder } from './emote-builder.js';
-export { EnglishBuilder } from './english-builder.js';
-export { FormatBuilder } from './format-builder.js';
-export { GreeterBuilder } from './greeter-builder.js';
-export { MaskBuilder } from './mask-builder.js';
-export { MCPBuilder } from './mcp-builder.js';
-export { MinimalBootstrap } from './minimal-bootstrap.js';
-export { NotesBuilder } from './notes-builder.js';
-export { PluribusBuilder } from './pluribus-builder.js';
-export { PreAuthHandlerBuilder } from './preauth-handler-builder.js';
-export { PromptBuilder } from './prompt-builder.js';
-export { PronounSubBuilder } from './pronoun-sub-builder.js';
-export { PrototypeOrchestrator } from './prototype-orchestrator.js';
-export { RecyclerBuilder } from './recycler-builder.js';
-export { RoomBuilder } from './room-builder.js';
-export { SessionBuilder } from './session-builder.js';
-export { SisterGrayBuilder } from './sister-gray-builder.js';
-export { WebsiteBuilder } from './website-builder.js';
+// Core bootstrap utilities
+export { AliasLoader } from './alias-loader';
+export { MinimalBootstrap } from './minimal-bootstrap';
+
+// Builder registry (new system)
+export { registerBuilder, runBuilders, rebuildAllMethods } from './builder-registry';
+export type { Builder } from './builder-registry';

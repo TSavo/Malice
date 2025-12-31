@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../types/object.js';
-import type { ObjectManager } from '../object-manager.js';
+import type { RuntimeObject } from '../../../types/object';
+import type { ObjectManager } from '../object-manager';
+import { registerBuilder, type Builder } from './builder-registry';
 
 /**
  * Builds the $spatial system object
@@ -12,9 +13,9 @@ import type { ObjectManager } from '../object-manager.js';
  * Used by telescope, world.castRay(), and anywhere that needs fast spatial queries.
  * Rooms self-register via onCreate/beforeRecycle hooks on the Location prototype.
  */
-export class SpatialBuilder {
-  static readonly alias = 'spatial';
-  static readonly parent = 'root';
+export class SpatialBuilder implements Builder {
+  static provides = ['spatial'];
+  static depends: string[] = [];
 
   private spatial: RuntimeObject | null = null;
 
@@ -389,7 +390,7 @@ Bootstrap calls rebuild() after world geometry is built.`,
     );
   }
 
-  async registerAlias(): Promise<void> {
+  async registerAliases(): Promise<void> {
     if (!this.spatial) return;
 
     const objectManager = await this.manager.load(0);
@@ -399,3 +400,6 @@ Bootstrap calls rebuild() after world geometry is built.`,
     console.log(`  ✅ Registered $.spatial -> #${this.spatial.id}`);
   }
 }
+
+// Self-register
+registerBuilder(SpatialBuilder);

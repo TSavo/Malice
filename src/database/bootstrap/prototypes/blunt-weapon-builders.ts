@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Blunt Weapon Prototypes
@@ -704,3 +705,133 @@ export class FlailBuilder {
     return obj;
   }
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// BLUNT WEAPON PROTOTYPES BUILDER (registered builder for all blunt weapons)
+// ═══════════════════════════════════════════════════════════════════════════
+
+export class BluntWeaponPrototypesBuilder implements Builder {
+  static provides = [
+    'blunt',
+    'club',
+    'baseballBat',
+    'baton',
+    'nightstick',
+    'tonfa',
+    'blackjack',
+    'tireIron',
+    'pipe',
+    'leadPipe',
+    'metalPipe',
+    'crowbar',
+    'hammer',
+    'clawHammer',
+    'sledgehammer',
+    'ballPeenHammer',
+    'mallet',
+    'staff',
+    'boStaff',
+    'walkingStick',
+    'poolCue',
+    'mace',
+    'morningstar',
+    'brassKnuckles',
+    'sapGloves',
+    'pushDagger',
+    'chain',
+    'bikeChain',
+    'nunchaku',
+    'flail',
+  ];
+  static depends = ['weapon'];
+
+  private weapons: Record<string, RuntimeObject> = {};
+
+  constructor(private manager: ObjectManager) {}
+
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.blunt && !forceRebuild) {
+      for (const alias of BluntWeaponPrototypesBuilder.provides) {
+        if ($[alias]) this.weapons[alias] = $[alias];
+      }
+      return;
+    }
+
+    const parentObj = $.weapon;
+    if (!parentObj) throw new Error('BluntWeaponPrototypesBuilder: $weapon not found');
+
+    const weaponId = parentObj.id;
+
+    // Base blunt (inherits from weapon)
+    const blunt = await new BluntBuilder(this.manager).build(weaponId);
+    this.weapons.blunt = blunt;
+
+    // Clubs (inherit from blunt)
+    const club = await new ClubBuilder(this.manager).build(blunt.id);
+    this.weapons.club = club;
+    this.weapons.baseballBat = await new BaseballBatBuilder(this.manager).build(club.id);
+    this.weapons.baton = await new BatonBuilder(this.manager).build(club.id);
+    this.weapons.nightstick = await new NightstickBuilder(this.manager).build(club.id);
+    this.weapons.tonfa = await new TonfaBuilder(this.manager).build(club.id);
+    this.weapons.blackjack = await new BlackjackBuilder(this.manager).build(club.id);
+    this.weapons.tireIron = await new TireIronBuilder(this.manager).build(club.id);
+
+    // Pipes (inherit from blunt)
+    const pipe = await new PipeBuilder(this.manager).build(blunt.id);
+    this.weapons.pipe = pipe;
+    this.weapons.leadPipe = await new LeadPipeBuilder(this.manager).build(pipe.id);
+    this.weapons.metalPipe = await new MetalPipeBuilder(this.manager).build(pipe.id);
+    this.weapons.crowbar = await new CrowbarBuilder(this.manager).build(pipe.id);
+
+    // Hammers (inherit from blunt)
+    const hammer = await new HammerBuilder(this.manager).build(blunt.id);
+    this.weapons.hammer = hammer;
+    this.weapons.clawHammer = await new ClawHammerBuilder(this.manager).build(hammer.id);
+    this.weapons.sledgehammer = await new SledgehammerBuilder(this.manager).build(hammer.id);
+    this.weapons.ballPeenHammer = await new BallPeenHammerBuilder(this.manager).build(hammer.id);
+    this.weapons.mallet = await new MalletBuilder(this.manager).build(hammer.id);
+
+    // Staves (inherit from blunt)
+    const staff = await new StaffBuilder(this.manager).build(blunt.id);
+    this.weapons.staff = staff;
+    this.weapons.boStaff = await new BoStaffBuilder(this.manager).build(staff.id);
+    this.weapons.walkingStick = await new WalkingStickBuilder(this.manager).build(staff.id);
+    this.weapons.poolCue = await new PoolCueBuilder(this.manager).build(staff.id);
+
+    // Maces (inherit from blunt)
+    const mace = await new MaceBuilder(this.manager).build(blunt.id);
+    this.weapons.mace = mace;
+    this.weapons.morningstar = await new MorningstarBuilder(this.manager).build(mace.id);
+
+    // Hand weapons (inherit from blunt)
+    this.weapons.brassKnuckles = await new BrassKnucklesBuilder(this.manager).build(blunt.id);
+    this.weapons.sapGloves = await new SapGlovesBuilder(this.manager).build(blunt.id);
+    this.weapons.pushDagger = await new PushDaggerBuilder(this.manager).build(blunt.id);
+
+    // Chains (inherit from blunt)
+    const chain = await new ChainBuilder(this.manager).build(blunt.id);
+    this.weapons.chain = chain;
+    this.weapons.bikeChain = await new BikeChainBuilder(this.manager).build(chain.id);
+    this.weapons.nunchaku = await new NunchakuBuilder(this.manager).build(chain.id);
+    this.weapons.flail = await new FlailBuilder(this.manager).build(chain.id);
+
+    console.log(`✅ Built ${Object.keys(this.weapons).length} blunt weapon prototypes`);
+  }
+
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    const objectManager = await this.manager.load(0);
+    if (!objectManager) return;
+
+    for (const [name, obj] of Object.entries(this.weapons)) {
+      if (obj) {
+        await objectManager.call('addAlias', name, obj.id);
+      }
+    }
+  }
+}
+
+// Self-register
+registerBuilder(BluntWeaponPrototypesBuilder);

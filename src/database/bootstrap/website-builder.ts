@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../types/object.js';
-import type { ObjectManager } from '../object-manager.js';
+import type { RuntimeObject } from '../../../types/object';
+import type { ObjectManager } from '../object-manager';
+import { registerBuilder, type Builder } from './builder-registry';
 
 /**
  * Builds Website objects for the Malice web server
@@ -14,7 +15,10 @@ import type { ObjectManager } from '../object-manager.js';
  * All website content is stored in MongoDB as MOO objects.
  * The TypeScript web server delegates everything to $webSite.handleRequest().
  */
-export class WebsiteBuilder {
+export class WebsiteBuilder implements Builder {
+  static provides = ['webSite', 'webTemplate', 'webPage', 'landingTemplate', 'terminalTemplate', 'docTemplate', 'homepage', 'playPage', 'clientJsRoute'];
+  static depends = ['webRoute', 'webRouter']; // Needs these for routing
+
   private webSite: RuntimeObject | null = null;
   private webTemplate: RuntimeObject | null = null;
   private webPage: RuntimeObject | null = null;
@@ -1393,3 +1397,6 @@ window.MaliceClient = MaliceClient;
     await register('clientJsRoute', this._clientJsRoute);
   }
 }
+
+// Self-register
+registerBuilder(WebsiteBuilder);

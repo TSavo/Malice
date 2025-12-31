@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the TerminalWindow class client module
@@ -7,49 +8,41 @@ import type { ObjectManager } from '../../object-manager.js';
  * Creates $.terminalWindowJs which serves /js/terminal-window.js
  * Extends Window with xterm.js integration.
  */
-export class TerminalWindowBuilder {
-  static readonly alias = 'terminalWindowJs';
+export class TerminalWindowBuilder implements Builder {
+  static provides = ['terminalWindowJs'];
+  static depends = ['root'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<RuntimeObject> {
-    const objectManager = await this.manager.load(0);
-    if (!objectManager) throw new Error('ObjectManager not found');
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
 
-    const aliases =
-      (objectManager.get('aliases') as Record<string, number>) || {};
-
-    let obj: RuntimeObject | null = null;
-
-    if (aliases[TerminalWindowBuilder.alias]) {
-      obj = await this.manager.load(aliases[TerminalWindowBuilder.alias]);
-      if (obj && !forceRebuild) {
-        console.log(
-          `[TerminalWindowBuilder] Using existing $.${TerminalWindowBuilder.alias}`,
-        );
-        return obj;
-      }
+    if ($.terminalWindowJs && !forceRebuild) {
+      this.obj = $.terminalWindowJs;
+      return;
     }
 
-    if (!obj) {
-      const root = await this.manager.load(1);
-      obj = await this.manager.create({
-        parent: root!,
-        properties: {
-          name: 'TerminalWindow JS Module',
-          description: 'Terminal window with xterm.js',
-        },
-        methods: {},
-      });
+    const parentObj = $.root;
+    if (!parentObj) throw new Error('TerminalWindowBuilder: $root not found');
 
-      await objectManager.call('addAlias', TerminalWindowBuilder.alias, obj.id);
-    }
+    this.obj = await this.manager.create({
+      parent: parentObj,
+      properties: {
+        name: 'TerminalWindow JS Module',
+        description: 'Terminal window with xterm.js',
+      },
+      methods: {},
+    });
+
+    const obj = this.obj;
 
     obj.setMethod(
       'getScript',
       `
       return \`
-import { Window } from '/js/window.js';
+import { Window } from '/js/window';
 
 /**
  * TerminalWindow - Window with xterm.js terminal output + dedicated input area
@@ -378,9 +371,15 @@ export class TerminalWindow extends Window {
     `,
     );
 
-    console.log(
-      `[TerminalWindowBuilder] Built $.${TerminalWindowBuilder.alias} -> #${obj.id}`,
-    );
-    return obj;
+    console.log(`[TerminalWindowBuilder] Built $.terminalWindowJs -> #${obj.id}`);
+  }
+
+  async registerAliases(): Promise<void> {
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'terminalWindowJs', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(TerminalWindowBuilder);

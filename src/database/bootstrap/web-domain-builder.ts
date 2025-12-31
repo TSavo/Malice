@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../types/object.js';
-import type { ObjectManager } from '../object-manager.js';
+import type { RuntimeObject } from '../../../types/object';
+import type { ObjectManager } from '../object-manager';
+import { registerBuilder, type Builder } from './builder-registry';
 
 /**
  * Builds $webDomain prototype (inherits from $webNode)
@@ -18,7 +19,10 @@ import type { ObjectManager } from '../object-manager.js';
  * Each domain has its own route tree ($webRoute children).
  * If aliasOf is set, this domain delegates to another domain.
  */
-export class WebDomainBuilder {
+export class WebDomainBuilder implements Builder {
+  static provides = ['webDomain'];
+  static depends = ['webNode'];
+
   private webDomain: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
@@ -255,7 +259,7 @@ export class WebDomainBuilder {
     );
   }
 
-  async registerAlias(): Promise<void> {
+  async registerAliases(): Promise<void> {
     if (!this.webDomain) return;
 
     const objectManager = await this.manager.load(0);
@@ -265,3 +269,6 @@ export class WebDomainBuilder {
     console.log(`✅ Registered webDomain alias -> #${this.webDomain.id}`);
   }
 }
+
+// Self-register
+registerBuilder(WebDomainBuilder);

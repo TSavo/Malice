@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../types/object.js';
-import type { ObjectManager } from '../object-manager.js';
+import type { RuntimeObject } from '../../../types/object';
+import type { ObjectManager } from '../object-manager';
+import { registerBuilder, type Builder } from './builder-registry';
 
 /**
  * Builds PronounSub object (dynamic ID)
@@ -23,7 +24,10 @@ import type { ObjectManager } from '../object-manager.js';
  *
  * Capitalize the code for capitalized output: %S, %N, etc.
  */
-export class PronounSubBuilder {
+export class PronounSubBuilder implements Builder {
+  static provides = ['pronoun'];
+  static depends: string[] = [];
+
   private pronounSub: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
@@ -414,7 +418,7 @@ USE CASES:
     );
   }
 
-  async registerAlias(): Promise<void> {
+  async registerAliases(): Promise<void> {
     if (!this.pronounSub) return;
 
     const objectManager = await this.manager.load(0);
@@ -424,3 +428,6 @@ USE CASES:
     console.log(`✅ Registered pronoun alias -> #${this.pronounSub.id}`);
   }
 }
+
+// Self-register
+registerBuilder(PronounSubBuilder);

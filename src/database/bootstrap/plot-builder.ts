@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../types/object.js';
-import type { ObjectManager } from '../object-manager.js';
+import type { RuntimeObject } from '../../../types/object';
+import type { ObjectManager } from '../object-manager';
+import { registerBuilder, type Builder } from './builder-registry';
 
 /**
  * Builds Plot prototype - simplified for abilities-first architecture
@@ -13,7 +14,10 @@ import type { ObjectManager } from '../object-manager.js';
  * No $jobBoard - NPCs handle job requests conversationally
  * Minimal $plotDB - just for Pluribus to find plots needing attention
  */
-export class PlotBuilder {
+export class PlotBuilder implements Builder {
+  static provides = ['plot', 'plotDB'];
+  static depends: string[] = [];
+
   private plotPrototype: RuntimeObject | null = null;
   private plotDB: RuntimeObject | null = null;
 
@@ -370,15 +374,15 @@ This is infrastructure for Pluribus (city AI) to find player requests that need 
 
     if (this.plotPrototype) {
       await objectManager.call('addAlias', 'plot', this.plotPrototype.id);
-      console.log(`  Registered $.plot -> #${this.plotPrototype.id}`);
+      console.log(`Registered plot alias -> #${this.plotPrototype.id}`);
     }
-
-    // NOTE: $plotSpawner removed - NPCs create plots directly
-    // NOTE: $jobBoard removed - NPCs handle job requests conversationally
 
     if (this.plotDB) {
       await objectManager.call('addAlias', 'plotDB', this.plotDB.id);
-      console.log(`  Registered $.plotDB -> #${this.plotDB.id}`);
+      console.log(`Registered plotDB alias -> #${this.plotDB.id}`);
     }
   }
 }
+
+// Self-register
+registerBuilder(PlotBuilder);

@@ -1,10 +1,10 @@
-import type { AuthInfo } from '../../types/auth.js';
-import type { ObjId, RuntimeObject } from '../../types/object.js';
-import type { Connection } from '../connection/connection.js';
-import { getGameLogger } from '../database/game-logger.js';
-import type { ObjectManager } from '../database/object-manager.js';
-import { MultiplexedTransport } from '../transport/multiplexed/multiplexed-transport.js';
-import type { IChannelMux } from '../transport/multiplexed/types.js';
+import type { AuthInfo } from '../../types/auth';
+import type { ObjId, RuntimeObject } from '../../types/object';
+import type { Connection } from '../connection/connection';
+import { getGameLogger } from '../database/game-logger';
+import type { ObjectManager } from '../database/object-manager';
+import { MultiplexedTransport } from '../transport/multiplexed/multiplexed-transport';
+import type { IChannelMux } from '../transport/multiplexed/types';
 
 /**
  * Connection context - bridges transport layer with object system

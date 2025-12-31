@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../types/object.js';
-import type { ObjectManager } from '../object-manager.js';
+import type { RuntimeObject } from '../../../types/object';
+import type { ObjectManager } from '../object-manager';
+import { registerBuilder, type Builder } from './builder-registry';
 
 /**
  * Builds NeuralLogCharGen object (dynamic ID)
@@ -13,7 +14,10 @@ import type { ObjectManager } from '../object-manager.js';
  * - Currency: Both credits and cash (infiltrators)
  * - No email verification - agents authenticate via MCP
  */
-export class NeuralLogCharGenBuilder {
+export class NeuralLogCharGenBuilder implements Builder {
+  static provides = ['neuralLogCharGen'];
+  static depends = ['charGen', 'aiPrompts', 'describable', 'player', 'scheduler', 'recycler', 'factionManager'];
+
   private neuralLogCharGen: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
@@ -999,7 +1003,7 @@ THE FINAL QUESTION (after Turing test):
     );
   }
 
-  async registerAlias(): Promise<void> {
+  async registerAliases(): Promise<void> {
     if (!this.neuralLogCharGen) return;
 
     const objectManager = await this.manager.load(0);
@@ -1013,3 +1017,6 @@ THE FINAL QUESTION (after Turing test):
     console.log(`Registered neuralLogCharGen alias -> #${this.neuralLogCharGen.id}`);
   }
 }
+
+// Self-register
+registerBuilder(NeuralLogCharGenBuilder);

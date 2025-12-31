@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../types/object.js';
-import type { ObjectManager } from '../object-manager.js';
+import type { RuntimeObject } from '../../../types/object';
+import type { ObjectManager } from '../object-manager';
+import { registerBuilder, type Builder } from './builder-registry';
 
 /**
  * Builds Room utility object (dynamic ID)
@@ -23,7 +24,10 @@ import type { ObjectManager } from '../object-manager.js';
  * For the target:
  *   - feel(sensation) is called separately by the action
  */
-export class RoomBuilder {
+export class RoomBuilder implements Builder {
+  static provides = ['room'];
+  static depends: string[] = [];
+
   private room: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
@@ -163,7 +167,7 @@ Direct player.see() only reaches ONE person.`,
     );
   }
 
-  async registerAlias(): Promise<void> {
+  async registerAliases(): Promise<void> {
     if (!this.room) return;
 
     const objectManager = await this.manager.load(0);
@@ -173,3 +177,6 @@ Direct player.see() only reaches ONE person.`,
     console.log(`Registered room alias -> #${this.room.id}`);
   }
 }
+
+// Self-register
+registerBuilder(RoomBuilder);

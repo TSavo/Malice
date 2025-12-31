@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the Desktop entry point client module
@@ -7,50 +8,42 @@ import type { ObjectManager } from '../../object-manager.js';
  * Creates $.desktopJs which serves /js/desktop.js
  * Main entry point that initializes the windowed desktop.
  */
-export class DesktopBuilder {
-  static readonly alias = 'desktopJs';
+export class DesktopBuilder implements Builder {
+  static provides = ['desktopJs'];
+  static depends = ['root'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<RuntimeObject> {
-    const objectManager = await this.manager.load(0);
-    if (!objectManager) throw new Error('ObjectManager not found');
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
 
-    const aliases =
-      (objectManager.get('aliases') as Record<string, number>) || {};
-
-    let obj: RuntimeObject | null = null;
-
-    if (aliases[DesktopBuilder.alias]) {
-      obj = await this.manager.load(aliases[DesktopBuilder.alias]);
-      if (obj && !forceRebuild) {
-        console.log(
-          `[DesktopBuilder] Using existing $.${DesktopBuilder.alias}`,
-        );
-        return obj;
-      }
+    if ($.desktopJs && !forceRebuild) {
+      this.obj = $.desktopJs;
+      return;
     }
 
-    if (!obj) {
-      const root = await this.manager.load(1);
-      obj = await this.manager.create({
-        parent: root!,
-        properties: {
-          name: 'Desktop JS Module',
-          description: 'Desktop entry point - initializes windowed UI',
-        },
-        methods: {},
-      });
+    const parentObj = $.root;
+    if (!parentObj) throw new Error('DesktopBuilder: $root not found');
 
-      await objectManager.call('addAlias', DesktopBuilder.alias, obj.id);
-    }
+    this.obj = await this.manager.create({
+      parent: parentObj,
+      properties: {
+        name: 'Desktop JS Module',
+        description: 'Desktop entry point - initializes windowed UI',
+      },
+      methods: {},
+    });
+
+    const obj = this.obj;
 
     obj.setMethod(
       'getScript',
       `
       return \`
-import { WindowManager } from '/js/window-manager.js';
-import { MaliceClient } from '/js/malice-client.js';
+import { WindowManager } from '/js/window-manager';
+import { MaliceClient } from '/js/malice-client';
 
 /**
  * Show login form for pre-authentication
@@ -363,9 +356,15 @@ if (document.readyState === 'loading') {
     `,
     );
 
-    console.log(
-      `[DesktopBuilder] Built $.${DesktopBuilder.alias} -> #${obj.id}`,
-    );
-    return obj;
+    console.log(`[DesktopBuilder] Built $.desktopJs -> #${obj.id}`);
+  }
+
+  async registerAliases(): Promise<void> {
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'desktopJs', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(DesktopBuilder);

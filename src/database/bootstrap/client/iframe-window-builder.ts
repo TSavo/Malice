@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the IframeWindow class client module
@@ -7,49 +8,41 @@ import type { ObjectManager } from '../../object-manager.js';
  * Creates $.iframeWindowJs which serves /js/iframe-window.js
  * Window type for loading external URLs in sandboxed iframes.
  */
-export class IframeWindowBuilder {
-  static readonly alias = 'iframeWindowJs';
+export class IframeWindowBuilder implements Builder {
+  static provides = ['iframeWindowJs'];
+  static depends = ['root'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<RuntimeObject> {
-    const objectManager = await this.manager.load(0);
-    if (!objectManager) throw new Error('ObjectManager not found');
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
 
-    const aliases =
-      (objectManager.get('aliases') as Record<string, number>) || {};
-
-    let obj: RuntimeObject | null = null;
-
-    if (aliases[IframeWindowBuilder.alias]) {
-      obj = await this.manager.load(aliases[IframeWindowBuilder.alias]);
-      if (obj && !forceRebuild) {
-        console.log(
-          `[IframeWindowBuilder] Using existing $.${IframeWindowBuilder.alias}`,
-        );
-        return obj;
-      }
+    if ($.iframeWindowJs && !forceRebuild) {
+      this.obj = $.iframeWindowJs;
+      return;
     }
 
-    if (!obj) {
-      const root = await this.manager.load(1);
-      obj = await this.manager.create({
-        parent: root!,
-        properties: {
-          name: 'IframeWindow JS Module',
-          description: 'URL loading window with sandboxed iframe',
-        },
-        methods: {},
-      });
+    const parentObj = $.root;
+    if (!parentObj) throw new Error('IframeWindowBuilder: $root not found');
 
-      await objectManager.call('addAlias', IframeWindowBuilder.alias, obj.id);
-    }
+    this.obj = await this.manager.create({
+      parent: parentObj,
+      properties: {
+        name: 'IframeWindow JS Module',
+        description: 'URL loading window with sandboxed iframe',
+      },
+      methods: {},
+    });
+
+    const obj = this.obj;
 
     obj.setMethod(
       'getScript',
       `
       return \`
-import { Window } from '/js/window.js';
+import { Window } from '/js/window';
 
 /**
  * IframeWindow - Window for loading external URLs
@@ -229,9 +222,15 @@ export class IframeWindow extends Window {
     `,
     );
 
-    console.log(
-      `[IframeWindowBuilder] Built $.${IframeWindowBuilder.alias} -> #${obj.id}`,
-    );
-    return obj;
+    console.log(`[IframeWindowBuilder] Built $.iframeWindowJs -> #${obj.id}`);
+  }
+
+  async registerAliases(): Promise<void> {
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'iframeWindowJs', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(IframeWindowBuilder);

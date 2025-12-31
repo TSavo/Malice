@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the Admin prototype
@@ -13,15 +14,24 @@ import type { ObjectManager } from '../../object-manager.js';
  * - @set: Set properties on objects
  * - @examine: Deep inspect objects
  */
-export class AdminBuilder {
-  static readonly alias = 'admin';
-  static readonly parent = 'player';
+export class AdminBuilder implements Builder {
+  static provides = ['admin'];
+  static depends = ['player'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(playerId: number): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(playerId);
-    const obj = await this.manager.create({
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.admin && !forceRebuild) {
+      this.obj = $.admin;
+      return;
+    }
+
+    const parentObj = $.player;
+    this.obj = await this.manager.create({
       parent: parentObj!,
       properties: {
         name: 'Admin',
@@ -49,6 +59,7 @@ NOTES: @notes attaches admin notes to objects. Searchable, taggable.`,
       methods: {},
     });
 
+    const obj = this.obj;
     // Property descriptions
     obj.setPropertyDescription(
       'isAdmin',
@@ -65,8 +76,6 @@ NOTES: @notes attaches admin notes to objects. Searchable, taggable.`,
     this.addElevatorCommands(obj);
     this.addAiCommands(obj);
     this.addNotesCommands(obj);
-
-    return obj;
   }
 
   /** Elevator management commands */
@@ -2389,4 +2398,14 @@ NOTES: @notes attaches admin notes to objects. Searchable, taggable.`,
     `,
     );
   }
+
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'admin', this.obj.id);
+  }
 }
+
+// Self-register
+registerBuilder(AdminBuilder);

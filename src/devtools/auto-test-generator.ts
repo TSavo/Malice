@@ -5,7 +5,7 @@
  * NOTE: This is a stub implementation - not currently used
  */
 
-import type { MethodRelationship } from '../lsp/relationship-analyzer.js';
+import type { MethodRelationship } from '../lsp/relationship-analyzer';
 
 /**
  * Test category types

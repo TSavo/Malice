@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the SealedBox prototype
@@ -12,15 +13,26 @@ import type { ObjectManager } from '../../object-manager.js';
  * - Triggers hooks when deposited at correct location
  * - Tamper seal can be broken (fails delivery, consequences)
  */
-export class SealedBoxBuilder {
-  static readonly alias = 'sealedBox';
-  static readonly parent = 'describable';
+export class SealedBoxBuilder implements Builder {
+  static provides = ['sealedBox'];
+  static depends = ['describable'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: number): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.sealedBox && !forceRebuild) {
+      this.obj = $.sealedBox;
+      return;
+    }
+
+    const parentObj = $.describable;
+    if (!parentObj) throw new Error('SealedBoxBuilder: $describable not found');
+
+    this.obj = await this.manager.create({
       parent: parentObj!,
       properties: {
         name: 'Sealed Box',
@@ -58,6 +70,8 @@ WEIGHT: Packages have 'weight' for carrying mechanics.`,
       },
       methods: {},
     });
+
+    const obj = this.obj;
 
     // ═══════════════════════════════════════════════════════════════════
     // PREVENT OPENING
@@ -288,7 +302,15 @@ WEIGHT: Packages have 'weight' for carrying mechanics.`,
       'delivered',
       'Whether package has been successfully delivered (boolean)',
     );
+  }
 
-    return obj;
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'sealedBox', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(SealedBoxBuilder);

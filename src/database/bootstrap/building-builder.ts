@@ -1,8 +1,9 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import type { ObjId, RuntimeObject } from '../../../types/object.js';
-import type { ObjectManager } from '../object-manager.js';
+import type { ObjId, RuntimeObject } from '../../../types/object';
+import type { ObjectManager } from '../object-manager';
+import { registerBuilder, type Builder } from './builder-registry';
 
 /**
  * Builds buildings from structured definitions with explicit exit connections.
@@ -59,7 +60,10 @@ interface DeferredWorldExit {
   description?: string;
 }
 
-export class BuildingBuilder {
+export class BuildingBuilder implements Builder {
+  static provides: string[] = []; // Creates individual building room aliases, not a single alias
+  static depends = ['room', 'exit', 'recycler']; // Needs these prototypes
+
   private buildings: Map<string, Map<string, RuntimeObject>> = new Map();
   private deferredWorldExits: DeferredWorldExit[] = [];
 
@@ -944,4 +948,12 @@ export class BuildingBuilder {
   registerPlaceholder(placeholder: string, obj: RuntimeObject): void {
     this.allPlaceholders.set(placeholder, obj);
   }
+
+  async registerAliases(): Promise<void> {
+    // Building aliases (like $immigrationServices) are registered during build()
+    // This is a no-op since aliases are already registered
+  }
 }
+
+// Self-register
+registerBuilder(BuildingBuilder);

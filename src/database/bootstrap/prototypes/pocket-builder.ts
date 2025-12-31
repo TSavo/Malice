@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the Pocket prototype
@@ -20,16 +21,27 @@ import type { ObjectManager } from '../../object-manager.js';
  *   jacket.pockets = [pocket];
  *   pocket.attachedTo = jacket;
  */
-export class PocketBuilder {
-  static readonly alias = 'pocket';
-  static readonly parent = 'describable';
+export class PocketBuilder implements Builder {
+  static provides = ['pocket'];
+  static depends = ['describable'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(describableId: number): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(describableId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.pocket && !forceRebuild) {
+      this.obj = $.pocket;
+      return;
+    }
+
+    const parentObj = $.describable;
+    if (!parentObj) throw new Error('PocketBuilder: $describable not found');
+
+    this.obj = await this.manager.create({
+      parent: parentObj,
       properties: {
         name: 'Pocket',
         description: 'A pocket sewn into clothing',
@@ -63,6 +75,7 @@ TYPES: Side pockets, breast pocket, back pocket, cargo pocket. Different sizes a
       methods: {},
     });
 
+    const obj = this.obj;
     // ═══════════════════════════════════════════════════════════════════
     // CONTAINMENT
     // ═══════════════════════════════════════════════════════════════════
@@ -129,7 +142,7 @@ TYPES: Side pockets, breast pocket, back pocket, cargo pocket. Different sizes a
       `
       /** Describe the pocket and its contents. */
       const contents = self.contents || [];
-      
+
       if (contents.length === 0) {
         return self.name + ' (empty)';
       }
@@ -159,7 +172,7 @@ TYPES: Side pockets, breast pocket, back pocket, cargo pocket. Different sizes a
       /** Short description for lists. */
       const contents = self.contents || [];
       const count = contents.filter(c => c).length;
-      
+
       if (count === 0) {
         return self.name + ' (empty)';
       } else if (count === 1) {
@@ -217,7 +230,15 @@ TYPES: Side pockets, breast pocket, back pocket, cargo pocket. Different sizes a
       'attachedTo',
       'The clothing item this pocket is sewn into. Pocket moves with the garment.',
     );
+  }
 
-    return obj;
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'pocket', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(PocketBuilder);

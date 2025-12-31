@@ -1,2 +1,2 @@
-export { ConnectionContext } from './connection-context.js';
-export { GameCoordinator } from './game-coordinator.js';
+export { ConnectionContext } from './connection-context';
+export { GameCoordinator } from './game-coordinator';

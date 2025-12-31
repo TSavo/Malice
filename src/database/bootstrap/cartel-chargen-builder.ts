@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../types/object.js';
-import type { ObjectManager } from '../object-manager.js';
+import type { RuntimeObject } from '../../../types/object';
+import type { ObjectManager } from '../object-manager';
+import { registerBuilder, type Builder } from './builder-registry';
 
 /**
  * Builds CartelCharGen object (dynamic ID)
@@ -13,7 +14,10 @@ import type { ObjectManager } from '../object-manager.js';
  * - Faction: Gray Cartel
  * - Currency: Cash instead of credits
  */
-export class CartelCharGenBuilder {
+export class CartelCharGenBuilder implements Builder {
+  static provides = ['cartelCharGen'];
+  static depends = ['charGen', 'aiPrompts', 'describable', 'player', 'scheduler', 'recycler'];
+
   private cartelCharGen: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
@@ -963,7 +967,7 @@ THE TEST:
     );
   }
 
-  async registerAlias(): Promise<void> {
+  async registerAliases(): Promise<void> {
     if (!this.cartelCharGen) return;
 
     const objectManager = await this.manager.load(0);
@@ -977,3 +981,6 @@ THE TEST:
     console.log(`Registered cartelCharGen alias -> #${this.cartelCharGen.id}`);
   }
 }
+
+// Self-register
+registerBuilder(CartelCharGenBuilder);

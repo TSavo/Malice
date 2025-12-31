@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the Bank prototype
@@ -10,14 +11,23 @@ import type { ObjectManager } from '../../object-manager.js';
  * - AI uses bank methods for credit payments (vending, services, transfers)
  * - All operations are idempotent and atomic
  */
-export class BankBuilder {
-  static readonly alias = 'bank';
-  static readonly parent = 'root';
+export class BankBuilder implements Builder {
+  static provides = ['bank'];
+  static depends = ['root'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: number): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.bank && !forceRebuild) {
+      this.obj = $.bank;
+      return;
+    }
+
+    const parentObj = $.root;
     const obj = await this.manager.create({
       parent: parentObj!,
       properties: {
@@ -669,6 +679,16 @@ NOTE: This is the legal payment system. Physical cash ($dollar) is contraband.`,
     `,
     );
 
-    return obj;
+    this.obj = obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'bank', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(BankBuilder);

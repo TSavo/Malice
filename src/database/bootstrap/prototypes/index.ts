@@ -1,85 +1,88 @@
-export { AdminBuilder } from './admin-builder.js';
-export { AgentBuilder } from './agent-builder.js';
+export { AdminBuilder } from './admin-builder';
+export { AgentBuilder } from './agent-builder';
 // Ammunition
-export * from './ammo-builder.js';
+export * from './ammo-builder';
 // Appearance
-export * from './appearance-constants.js';
+export * from './appearance-constants';
 // Banking
-export { BankBuilder } from './bank-builder.js';
-export { BankTerminalBuilder } from './bank-terminal-builder.js';
-export { BiometricLockBuilder } from './biometric-lock-builder.js';
-export * from './bladed-weapon-builders.js';
-export * from './blunt-weapon-builders.js';
-export { BodyFactory } from './body-factory.js';
-export { BodyPartsBuilder } from './body-parts-builder.js';
+export { BankBuilder } from './bank-builder';
+export { BankTerminalBuilder } from './bank-terminal-builder';
+export { BiometricLockBuilder } from './biometric-lock-builder';
+export * from './bladed-weapon-builders';
+export * from './blunt-weapon-builders';
+export { BodyFactory } from './body-factory';
+export { BodyPartsBuilder } from './body-parts-builder';
 // Body system
-export { BodyPartBuilder } from './bodypart-builder.js';
-export { BottledWaterBuilder } from './bottled-water-builder.js';
+export { BodyPartBuilder } from './bodypart-builder';
+export { BottledWaterBuilder } from './bottled-water-builder';
 // Elevators, doors, signs and locks
-export { CallButtonBuilder } from './call-button-builder.js';
-export { CloneRecordingStudioBuilder } from './clone-recording-studio-builder.js';
+export { CallButtonBuilder } from './call-button-builder';
+export { CloneRecordingStudioBuilder } from './clone-recording-studio-builder';
 // Clone system
-export { CloneTankBuilder } from './clone-tank-builder.js';
-export { ClothingBuilder } from './clothing-builder.js';
-export { CorpseBuilder } from './corpse-builder.js';
+export { CloneTankBuilder } from './clone-tank-builder';
+export { ClothingBuilder } from './clothing-builder';
+export { CorpseBuilder } from './corpse-builder';
 // Decay system
-export { DecayableBuilder } from './decayable-builder.js';
-export { DescribableBuilder } from './describable-builder.js';
+export { DecayableBuilder } from './decayable-builder';
+export { DescribableBuilder } from './describable-builder';
 // Disposal systems
-export { DisposalBuilder } from './disposal-builder.js';
-export { DollarBuilder } from './dollar-builder.js';
-export { DoorBuilder } from './door-builder.js';
-export { DrinkBuilder } from './drink-builder.js';
+export { DisposalBuilder } from './disposal-builder';
+export { DollarBuilder } from './dollar-builder';
+export { DoorBuilder } from './door-builder';
+export { DrinkBuilder } from './drink-builder';
 // Consumables
-export { EdibleBuilder } from './edible-builder.js';
-export { ElevatorBuilder } from './elevator-builder.js';
-export { ElevatorDoorBuilder } from './elevator-door-builder.js';
-export { EmbodiedBuilder } from './embodied-builder.js';
-export { ExitBuilder } from './exit-builder.js';
+export { EdibleBuilder } from './edible-builder';
+export { ElevatorBuilder } from './elevator-builder';
+export { ElevatorDoorBuilder } from './elevator-door-builder';
+export { EmbodiedBuilder } from './embodied-builder';
+export { ExitBuilder } from './exit-builder';
 // Faction system
-export { FactionBuilder } from './faction-builder.js';
-export { FactionManagerBuilder } from './faction-manager-builder.js';
-export * from './firearm-builders.js';
-export { FoodBuilder } from './food-builder.js';
-export { GuardedExitBuilder } from './guarded-exit-builder.js';
-export { HumanBuilder } from './human-builder.js';
-export { HumanRemainsBuilder } from './human-remains-builder.js';
-export * from './improvised-weapon-builders.js';
-export { IncineratorBuilder } from './incinerator-builder.js';
-export { LocationBuilder } from './location-builder.js';
-export { LockBuilder } from './lock-builder.js';
+export { FactionBuilder } from './faction-builder';
+export { FactionManagerBuilder } from './faction-manager-builder';
+export * from './firearm-builders';
+export { FoodBuilder } from './food-builder';
+export { GuardedExitBuilder } from './guarded-exit-builder';
+export { HumanBuilder } from './human-builder';
+export { HumanRemainsBuilder } from './human-remains-builder';
+export * from './improvised-weapon-builders';
+export { IncineratorBuilder } from './incinerator-builder';
+export { LocationBuilder } from './location-builder';
+export { LockBuilder } from './lock-builder';
 // Lockers
-export { LockerBuilder } from './locker-builder.js';
+export { LockerBuilder } from './locker-builder';
 // Magazines
-export * from './magazine-builder.js';
-export { OneTimeLockerBuilder } from './one-time-locker-builder.js';
-export { PayphoneBuilder } from './payphone-builder.js';
+export * from './magazine-builder';
+export { OneTimeLockerBuilder } from './one-time-locker-builder';
+export { PayphoneBuilder } from './payphone-builder';
 // Phones
-export { PhoneBuilder } from './phone-builder.js';
-export { PhoneDbBuilder } from './phone-db-builder.js';
-export { PlayerBuilder } from './player-builder.js';
-export { PocketBuilder } from './pocket-builder.js';
-export { RentableLockBuilder } from './rentable-lock-builder.js';
-export { RoomBuilder } from './room-builder.js';
+export { PhoneBuilder } from './phone-builder';
+export { PhoneDbBuilder } from './phone-db-builder';
+export { PlayerBuilder } from './player-builder';
+export { PocketBuilder } from './pocket-builder';
+export { RentableLockBuilder } from './rentable-lock-builder';
+export { RoomBuilder } from './room-builder';
 // Delivery items
-export { SealedBoxBuilder } from './sealed-box-builder.js';
-export { SignBuilder } from './sign-builder.js';
-export { SkeletalRemainsBuilder } from './skeletal-remains-builder.js';
+export { SealedBoxBuilder } from './sealed-box-builder';
+export { SignBuilder } from './sign-builder';
+export { SkeletalRemainsBuilder } from './skeletal-remains-builder';
 // Stackables (physical commodities)
-export { StackableBuilder } from './stackable-builder.js';
-export { StomachContentsBuilder } from './stomach-contents-builder.js';
-export { SustainBuilder } from './sustain-builder.js';
+export { StackableBuilder } from './stackable-builder';
+export { StomachContentsBuilder } from './stomach-contents-builder';
+export { SustainBuilder } from './sustain-builder';
 // Telescope
-export { TelescopeBuilder } from './telescope-builder.js';
+export { TelescopeBuilder } from './telescope-builder';
 // Totem Pole (Pluribus perception point)
-export { TotemPoleBuilder } from './totem-pole-builder.js';
+export { TotemPoleBuilder } from './totem-pole-builder';
 // Vendors
-export { VendableBuilder } from './vendable-builder.js';
+export { VendableBuilder } from './vendable-builder';
 // Weapons
-export { WeaponBuilder } from './weapon-builder.js';
-export { WeaponPrototypesBuilder } from './weapon-prototypes-builder.js';
+export { WeaponBuilder } from './weapon-builder';
+export { BladedWeaponPrototypesBuilder } from './bladed-weapon-builders';
+export { BluntWeaponPrototypesBuilder } from './blunt-weapon-builders';
+export { FirearmPrototypesBuilder } from './firearm-builders';
+export { ImprovisedWeaponPrototypesBuilder } from './improvised-weapon-builders';
 // Wearables
-export { WearableBuilder } from './wearable-builder.js';
-export { WirelessPhoneBuilder } from './wireless-phone-builder.js';
+export { WearableBuilder } from './wearable-builder';
+export { WirelessPhoneBuilder } from './wireless-phone-builder';
 // Wound system
-export { WoundBuilder } from './wound-builder.js';
+export { WoundBuilder } from './wound-builder';

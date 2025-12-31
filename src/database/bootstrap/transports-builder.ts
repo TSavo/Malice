@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../types/object.js';
-import type { ObjectManager } from '../object-manager.js';
+import type { RuntimeObject } from '../../../types/object';
+import type { ObjectManager } from '../object-manager';
+import { registerBuilder, type Builder } from './builder-registry';
 
 /**
  * Builds the $transports system object
@@ -15,7 +16,10 @@ import type { ObjectManager } from '../object-manager.js';
  *   $transports.get(factionId)                  // Get bundle info
  *   $transports.getConnections(factionId)       // Get connections for faction
  */
-export class TransportsBuilder {
+export class TransportsBuilder implements Builder {
+  static provides = ['transports'];
+  static depends = ['factionManager']; // Uses $.factionManager.list() in startAll
+
   private transports: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
@@ -292,13 +296,16 @@ INTERNAL: Registry is set via setRegistry() by GameCoordinator at startup.`,
     );
   }
 
-  async registerAlias(): Promise<void> {
+  async registerAliases(): Promise<void> {
     if (!this.transports) return;
 
     const objectManager = await this.manager.load(0);
     if (!objectManager) return;
 
     await objectManager.call('addAlias', 'transports', this.transports.id);
-    console.log(`  ✓ Registered transports alias -> #${this.transports.id}`);
+    console.log(`Registered transports alias -> #${this.transports.id}`);
   }
 }
+
+// Self-register
+registerBuilder(TransportsBuilder);

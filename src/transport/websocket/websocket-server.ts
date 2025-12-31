@@ -1,10 +1,10 @@
 import type { IncomingMessage } from 'node:http';
 import { Subject } from 'rxjs';
 import { type WebSocket, WebSocketServer as WSServer } from 'ws';
-import type { AuthInfo } from '../../../types/auth.js';
-import type { TransportServerConfig } from '../../../types/transport.js';
-import { Connection } from '../../connection/connection.js';
-import { MultiplexedTransport } from '../multiplexed/multiplexed-transport.js';
+import type { AuthInfo } from '../../../types/auth';
+import type { TransportServerConfig } from '../../../types/transport';
+import { Connection } from '../../connection/connection';
+import { MultiplexedTransport } from '../multiplexed/multiplexed-transport';
 
 /**
  * WebSocket server

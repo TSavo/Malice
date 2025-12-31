@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the Disposal prototype
@@ -22,14 +23,23 @@ import type { ObjectManager } from '../../object-manager.js';
  * - canAccept(item): Check if disposal accepts this item type
  * - process(): Process/destroy items (called by scheduler or instantly)
  */
-export class DisposalBuilder {
-  static readonly alias = 'disposal';
-  static readonly parent = 'describable';
+export class DisposalBuilder implements Builder {
+  static provides = ['disposal'];
+  static depends = ['describable'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: number): Promise<RuntimeObject> {
-    const parent = await this.manager.load(parentId);
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.disposal && !forceRebuild) {
+      this.obj = $.disposal;
+      return;
+    }
+
+    const parent = $.describable;
     const obj = await this.manager.create({
       parent: parent!,
       properties: {
@@ -200,6 +210,16 @@ IMMOVABLE: 'boltedDown' true by default.`,
       'Message displayed when an item is destroyed',
     );
 
-    return obj;
+    this.obj = obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'disposal', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(DisposalBuilder);

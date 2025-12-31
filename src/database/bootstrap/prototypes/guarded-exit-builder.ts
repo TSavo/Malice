@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the GuardedExit prototype
@@ -15,14 +16,23 @@ import type { ObjectManager } from '../../object-manager.js';
  * - canUse(agent): Overrides exit.canUse to add faction check
  * - setAllowedFaction(factionName): Set which faction can use this exit
  */
-export class GuardedExitBuilder {
-  static readonly alias = 'guardedExit';
-  static readonly parent = 'exit';
+export class GuardedExitBuilder implements Builder {
+  static provides = ['guardedExit'];
+  static depends = ['exit'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(exitId: number): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(exitId);
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.guardedExit && !forceRebuild) {
+      this.obj = $.guardedExit;
+      return;
+    }
+
+    const parentObj = $.exit;
     const obj = await this.manager.create({
       parent: parentObj!,
       properties: {
@@ -153,6 +163,16 @@ DISPLAY: describe() shows faction requirement in exit listing.`,
       'Message shown when faction check fails',
     );
 
-    return obj;
+    this.obj = obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'guardedExit', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(GuardedExitBuilder);

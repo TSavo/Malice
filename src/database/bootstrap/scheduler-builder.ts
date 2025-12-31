@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../types/object.js';
-import type { ObjectManager } from '../object-manager.js';
+import type { RuntimeObject } from '../../../types/object';
+import type { ObjectManager } from '../object-manager';
+import { registerBuilder, type Builder } from './builder-registry';
 
 /**
  * Builds Scheduler object (dynamic ID)
@@ -30,13 +31,14 @@ import type { ObjectManager } from '../object-manager.js';
  *   enabled: boolean,      // whether job is active
  * }
  */
-export class SchedulerBuilder {
-  private scheduler: RuntimeObject | null = null;
+export class SchedulerBuilder implements Builder {
+  static provides = ['scheduler'];
+  static depends: string[] = [];
 
-  constructor(
-    private manager: ObjectManager,
-    private options: { disableDefaultJobs?: boolean } = {},
-  ) {}
+  private scheduler: RuntimeObject | null = null;
+  private options: { disableDefaultJobs?: boolean } = {};
+
+  constructor(private manager: ObjectManager) {}
 
   async build(forceRebuild = false): Promise<void> {
     // Check if already exists via alias
@@ -391,21 +393,27 @@ export class SchedulerBuilder {
     );
   }
 
-  async registerAlias(): Promise<void> {
+  async registerAliases(): Promise<void> {
     if (!this.scheduler) return;
 
     const objectManager = await this.manager.load(0);
     if (!objectManager) return;
 
     await objectManager.call('addAlias', 'scheduler', this.scheduler.id);
-    console.log(`✅ Registered scheduler alias -> #${this.scheduler.id}`);
+    console.log(`Registered scheduler alias -> #${this.scheduler.id}`);
 
-    if (this.options.disableDefaultJobs) {
-      return;
+    // Register default jobs (unless disabled)
+    if (!this.options.disableDefaultJobs) {
+      await this.registerDefaultJobs(objectManager);
     }
+  }
 
-    // Register default jobs
-    await this.registerDefaultJobs(objectManager);
+  /**
+   * Post-register hook: Register wake jobs for Pluribus and Sister Gray
+   * Called after ALL aliases exist so we can find pluribus/sisterGray
+   */
+  async postRegister(): Promise<void> {
+    await this.registerWakeJobs();
   }
 
   /**
@@ -533,3 +541,6 @@ export class SchedulerBuilder {
     }
   }
 }
+
+// Self-register
+registerBuilder(SchedulerBuilder);

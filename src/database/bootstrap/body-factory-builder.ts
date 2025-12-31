@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../types/object.js';
-import type { ObjectManager } from '../object-manager.js';
+import type { RuntimeObject } from '../../../types/object';
+import type { ObjectManager } from '../object-manager';
+import { registerBuilder, type Builder } from './builder-registry';
 
 /**
  * Builds BodyFactory object (dynamic ID)
@@ -9,7 +10,10 @@ import type { ObjectManager } from '../object-manager.js';
  *   const bodyFactory = await $.bodyFactory;
  *   const body = await bodyFactory.createHumanBody(playerId, 'female');
  */
-export class BodyFactoryBuilder {
+export class BodyFactoryBuilder implements Builder {
+  static provides = ['bodyFactory'];
+  static depends: string[] = [];
+
   private bodyFactory: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
@@ -504,7 +508,7 @@ export class BodyFactoryBuilder {
     );
   }
 
-  async registerAlias(): Promise<void> {
+  async registerAliases(): Promise<void> {
     if (!this.bodyFactory) return;
 
     const objectManager = await this.manager.load(0);
@@ -514,3 +518,6 @@ export class BodyFactoryBuilder {
     console.log(`✅ Registered bodyFactory alias -> #${this.bodyFactory.id}`);
   }
 }
+
+// Self-register
+registerBuilder(BodyFactoryBuilder);

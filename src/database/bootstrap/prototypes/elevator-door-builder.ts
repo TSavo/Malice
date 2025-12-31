@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the ElevatorDoor prototype
@@ -13,16 +14,27 @@ import type { ObjectManager } from '../../object-manager.js';
  * - elevator: objref - the elevator this door connects to
  * - floor: number - which floor this door is on
  */
-export class ElevatorDoorBuilder {
-  static readonly alias = 'elevatorDoor';
-  static readonly parent = 'door';
+export class ElevatorDoorBuilder implements Builder {
+  static provides = ['elevatorDoor'];
+  static depends = ['door'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(doorId: number): Promise<RuntimeObject> {
-    const parent = await this.manager.load(doorId);
-    const obj = await this.manager.create({
-      parent: parent!,
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.elevatorDoor && !forceRebuild) {
+      this.obj = $.elevatorDoor;
+      return;
+    }
+
+    const parentObj = $.door;
+    if (!parentObj) throw new Error('ElevatorDoorBuilder: $door not found');
+
+    this.obj = await this.manager.create({
+      parent: parentObj,
       properties: {
         name: 'Elevator Doors',
         description:
@@ -45,6 +57,8 @@ Even if forced, there may be no elevator car behind them (empty shaft).`,
       },
       methods: {},
     });
+
+    const obj = this.obj;
 
     // Add property descriptions
     obj.setPropertyDescription(
@@ -85,7 +99,15 @@ Even if forced, there may be no elevator car behind them (empty shaft).`,
       return 'The elevator doors block your path.';
     `,
     );
+  }
 
-    return obj;
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'elevatorDoor', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(ElevatorDoorBuilder);

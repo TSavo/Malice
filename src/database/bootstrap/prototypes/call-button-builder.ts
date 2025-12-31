@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the CallButton prototype
@@ -15,14 +16,23 @@ import type { ObjectManager } from '../../object-manager.js';
  * - floor: number - which floor this button is on
  * - lit: boolean - illuminated when pressed/waiting for elevator
  */
-export class CallButtonBuilder {
-  static readonly alias = 'callButton';
-  static readonly parent = 'describable';
+export class CallButtonBuilder implements Builder {
+  static provides = ['callButton'];
+  static depends = ['describable'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: number): Promise<RuntimeObject> {
-    const parent = await this.manager.load(parentId);
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.callButton && !forceRebuild) {
+      this.obj = $.callButton;
+      return;
+    }
+
+    const parent = $.describable;
     const obj = await this.manager.create({
       parent: parent!,
       properties: {
@@ -58,6 +68,16 @@ Read from self.elevator.currentFloor and self.elevator.moving/destination.`,
       'Whether the call button is illuminated (waiting for elevator to arrive)',
     );
 
-    return obj;
+    this.obj = obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'callButton', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(CallButtonBuilder);

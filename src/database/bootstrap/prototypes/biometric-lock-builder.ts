@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the BiometricLock prototype
@@ -16,14 +17,23 @@ import type { ObjectManager } from '../../object-manager.js';
  * - scanType: Type of biometric scan (retinal, fingerprint, palm, etc.)
  * - scanLocation: Where to present for scanning (e.g., "right side of door")
  */
-export class BiometricLockBuilder {
-  static readonly alias = 'biometricLock';
-  static readonly parent = 'lock';
+export class BiometricLockBuilder implements Builder {
+  static provides = ['biometricLock'];
+  static depends = ['lock'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(lockId: number): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(lockId);
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.biometricLock && !forceRebuild) {
+      this.obj = $.biometricLock;
+      return;
+    }
+
+    const parentObj = $.lock;
     const obj = await this.manager.create({
       parent: parentObj!,
       properties: {
@@ -68,6 +78,16 @@ BYPASS: Cannot be picked like a mechanical lock. Can potentially be bypassed wit
     `,
     );
 
-    return obj;
+    this.obj = obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'biometricLock', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(BiometricLockBuilder);

@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the MaliceClient class client module
@@ -7,43 +8,35 @@ import type { ObjectManager } from '../../object-manager.js';
  * Creates $.maliceClientJs which serves /js/malice-client.js
  * Handles multiplexed WebSocket connection and channel routing.
  */
-export class MaliceClientBuilder {
-  static readonly alias = 'maliceClientJs';
+export class MaliceClientBuilder implements Builder {
+  static provides = ['maliceClientJs'];
+  static depends = ['root'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<RuntimeObject> {
-    const objectManager = await this.manager.load(0);
-    if (!objectManager) throw new Error('ObjectManager not found');
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
 
-    const aliases =
-      (objectManager.get('aliases') as Record<string, number>) || {};
-
-    let obj: RuntimeObject | null = null;
-
-    if (aliases[MaliceClientBuilder.alias]) {
-      obj = await this.manager.load(aliases[MaliceClientBuilder.alias]);
-      if (obj && !forceRebuild) {
-        console.log(
-          `[MaliceClientBuilder] Using existing $.${MaliceClientBuilder.alias}`,
-        );
-        return obj;
-      }
+    if ($.maliceClientJs && !forceRebuild) {
+      this.obj = $.maliceClientJs;
+      return;
     }
 
-    if (!obj) {
-      const root = await this.manager.load(1);
-      obj = await this.manager.create({
-        parent: root!,
-        properties: {
-          name: 'MaliceClient JS Module',
-          description: 'Multiplexed WebSocket client',
-        },
-        methods: {},
-      });
+    const parentObj = $.root;
+    if (!parentObj) throw new Error('MaliceClientBuilder: $root not found');
 
-      await objectManager.call('addAlias', MaliceClientBuilder.alias, obj.id);
-    }
+    this.obj = await this.manager.create({
+      parent: parentObj,
+      properties: {
+        name: 'MaliceClient JS Module',
+        description: 'Multiplexed WebSocket client',
+      },
+      methods: {},
+    });
+
+    const obj = this.obj;
 
     obj.setMethod(
       'getScript',
@@ -254,9 +247,15 @@ export class MaliceClient {
     `,
     );
 
-    console.log(
-      `[MaliceClientBuilder] Built $.${MaliceClientBuilder.alias} -> #${obj.id}`,
-    );
-    return obj;
+    console.log(`[MaliceClientBuilder] Built $.maliceClientJs -> #${obj.id}`);
+  }
+
+  async registerAliases(): Promise<void> {
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'maliceClientJs', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(MaliceClientBuilder);

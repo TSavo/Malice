@@ -1,17 +1,27 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * WirelessPhone extends Phone with battery, signal checks, and ringtone.
  */
-export class WirelessPhoneBuilder {
-  static readonly alias = 'wirelessPhone';
-  static readonly parent = 'phone';
+export class WirelessPhoneBuilder implements Builder {
+  static provides = ['wirelessPhone'];
+  static depends = ['phone'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(phoneId: number): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(phoneId);
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.wirelessPhone && !forceRebuild) {
+      this.obj = $.wirelessPhone;
+      return;
+    }
+
+    const parentObj = $.phone;
     const obj = await this.manager.create({
       parent: parentObj!,
       properties: {
@@ -85,6 +95,16 @@ PORTABLE: Can be picked up, carried. Unlike payphones.`,
       'Customizable alert sound for incoming calls',
     );
 
-    return obj;
+    this.obj = obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'wirelessPhone', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(WirelessPhoneBuilder);

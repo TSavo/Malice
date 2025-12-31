@@ -1,4 +1,4 @@
-import type { ObjectManager } from '../object-manager.js';
+import type { ObjectManager } from '../object-manager';
 
 /**
  * Minimal Bootstrap - Creates only the absolute essentials

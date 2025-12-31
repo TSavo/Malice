@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../types/object.js';
-import type { ObjectManager } from '../object-manager.js';
+import type { RuntimeObject } from '../../../types/object';
+import type { ObjectManager } from '../object-manager';
+import { registerBuilder, type Builder } from './builder-registry';
 
 /**
  * Builds Emote object (dynamic ID)
@@ -49,7 +50,10 @@ import type { ObjectManager } from '../object-manager.js';
  *   Has tongue: You taste metallic on your tongue.
  *   No tongue: (nothing)
  */
-export class EmoteBuilder {
+export class EmoteBuilder implements Builder {
+  static provides = ['emote'];
+  static depends: string[] = [];
+
   private emote: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
@@ -1253,7 +1257,7 @@ METHODS:
     );
   }
 
-  async registerAlias(): Promise<void> {
+  async registerAliases(): Promise<void> {
     if (!this.emote) return;
 
     const objectManager = await this.manager.load(0);
@@ -1263,3 +1267,6 @@ METHODS:
     console.log(`✅ Registered emote alias -> #${this.emote.id}`);
   }
 }
+
+// Self-register
+registerBuilder(EmoteBuilder);

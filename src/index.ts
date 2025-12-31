@@ -10,12 +10,12 @@
  * - Dynamic method execution
  */
 
-import { DevToolsServer } from './devtools/index.js';
-import { GameCoordinator } from './game/index.js';
-import { LSPApiServer } from './lsp/api-server.js';
-import { createMCPServer } from './mcp/index.js';
-import { MCPTelnetClient } from './mcp/telnet-client.js';
-import { createWebServer } from './web/index.js';
+import { DevToolsServer } from './devtools/index';
+import { GameCoordinator } from './game/index';
+import { LSPApiServer } from './lsp/api-server';
+import { createMCPServer } from './mcp/index';
+import { MCPTelnetClient } from './mcp/telnet-client';
+import { createWebServer } from './web/index';
 
 async function main() {
   console.log('🎮 Malice v2 - Modern TypeScript MUD\n');

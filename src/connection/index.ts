@@ -1,2 +1,2 @@
-export { Connection } from './connection.js';
-export { ConnectionManager } from './connection-manager.js';
+export { Connection } from './connection';
+export { ConnectionManager } from './connection-manager';

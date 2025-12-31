@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the Telescope prototype
@@ -17,15 +18,26 @@ import type { ObjectManager } from '../../object-manager.js';
  * - swivelMin/swivelMax: Range limits for swivel
  * - mountZ: Z-level where telescope is mounted
  */
-export class TelescopeBuilder {
-  static readonly alias = 'telescope';
-  static readonly parent = 'describable';
+export class TelescopeBuilder implements Builder {
+  static provides = ['telescope'];
+  static depends = ['describable'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(describableId: number): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(describableId);
-    const obj = await this.manager.create({
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.telescope && !forceRebuild) {
+      this.obj = $.telescope;
+      return;
+    }
+
+    const parentObj = $.describable;
+    if (!parentObj) throw new Error('TelescopeBuilder: $describable not found');
+
+    this.obj = await this.manager.create({
       parent: parentObj!,
       properties: {
         name: 'Telescope',
@@ -120,6 +132,8 @@ describe what they observe as a scene, weaving together landmarks and atmosphere
       },
       methods: {},
     });
+
+    const obj = this.obj;
 
     // Property descriptions
     obj.setPropertyDescription(
@@ -465,7 +479,15 @@ describe what they observe as a scene, weaving together landmarks and atmosphere
       return output;
       `,
     );
+  }
 
-    return obj;
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'telescope', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(TelescopeBuilder);

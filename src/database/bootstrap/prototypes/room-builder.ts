@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the Room prototype
@@ -23,52 +24,51 @@ import type { ObjectManager } from '../../object-manager.js';
  * - 61-80: Heavy crowd (hard to perceive non-watched people)
  * - 81-100: Packed (can barely perceive anyone not watched)
  */
-export class RoomBuilder {
-  static readonly alias = 'room';
-  static readonly parent = 'location';
+export class RoomBuilder implements Builder {
+  static provides = ['room'];
+  static depends = ['location'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  /**
-   * Build the Room prototype or rebuild methods on existing object
-   * @param locationId - Parent location ID (only used when creating new)
-   * @param existingObj - Optional existing object to rebuild methods on
-   */
-  async build(
-    locationId: number,
-    existingObj?: RuntimeObject,
-  ): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(locationId);
-    const obj =
-      existingObj ||
-      (await this.manager.create({
-        parent: parentObj!,
-        properties: {
-          name: 'Room',
-          description: 'Base prototype for rooms',
-          // Spatial coordinates (integers, in meters)
-          x: 0,
-          y: 0,
-          z: 0, // Vertical: negative = underground, positive = above ground
-          // Array of Exit object IDs
-          // Each Exit has: name, aliases, destRoom, distance, hidden, locked
-          exits: [],
-          // Sittable locations in the room
-          // Each entry: { name, capacity, occupied: [] }
-          // e.g., { name: 'a wooden chair', capacity: 1, occupied: [] }
-          // e.g., { name: 'a long bench', capacity: 4, occupied: [] }
-          sittables: [],
-          // Crowd mechanics
-          population: 0, // Artificial crowd level (0-100)
-          ambientNoise: 0, // Base noise level (0-100)
-          // Lighting (affects vision)
-          lighting: 100, // 0=pitch black, 50=dim, 100=well-lit
-          // Water level (affects breathing)
-          waterLevel: 0, // 0=dry, 50=waist-deep, 100=fully submerged
-          // Environment
-          outdoor: true, // Is this room outdoors? (affects weather, natural light)
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
 
-          abilities: `Physical space that agents can occupy and traverse.
+    if ($.room && !forceRebuild) {
+      this.obj = $.room;
+      return;
+    }
+
+    const parentObj = $.location;
+    this.obj = await this.manager.create({
+      parent: parentObj!,
+      properties: {
+        name: 'Room',
+        description: 'Base prototype for rooms',
+        // Spatial coordinates (integers, in meters)
+        x: 0,
+        y: 0,
+        z: 0, // Vertical: negative = underground, positive = above ground
+        // Array of Exit object IDs
+        // Each Exit has: name, aliases, destRoom, distance, hidden, locked
+        exits: [],
+        // Sittable locations in the room
+        // Each entry: { name, capacity, occupied: [] }
+        // e.g., { name: 'a wooden chair', capacity: 1, occupied: [] }
+        // e.g., { name: 'a long bench', capacity: 4, occupied: [] }
+        sittables: [],
+        // Crowd mechanics
+        population: 0, // Artificial crowd level (0-100)
+        ambientNoise: 0, // Base noise level (0-100)
+        // Lighting (affects vision)
+        lighting: 100, // 0=pitch black, 50=dim, 100=well-lit
+        // Water level (affects breathing)
+        waterLevel: 0, // 0=dry, 50=waist-deep, 100=fully submerged
+        // Environment
+        outdoor: true, // Is this room outdoors? (affects weather, natural light)
+
+        abilities: `Physical space that agents can occupy and traverse.
 
 COORDINATES: x, y, z position in meters. Used for distance calculations between rooms. z negative = underground.
 
@@ -87,10 +87,11 @@ SITTABLES: 'sittables' array defines seating. Each has capacity. Sitting registe
 PERCEPTION: getPerception(viewer, target) calculates clarity based on crowd, light, noise, viewer senses, whether watching target.
 
 OUTDOOR: 'outdoor' affects weather exposure, natural lighting cycles.`,
-        },
-        methods: {},
-      }));
+      },
+      methods: {},
+    });
 
+    const obj = this.obj;
     obj.setMethod(
       'describe',
       `
@@ -926,6 +927,16 @@ OUTDOOR: 'outdoor' affects weather exposure, natural lighting cycles.`,
       'Whether this room is outdoors (affects weather and natural light cycles)',
     );
 
-    return obj;
+    this.obj = obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'room', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(RoomBuilder);

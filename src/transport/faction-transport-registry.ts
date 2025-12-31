@@ -7,11 +7,11 @@
 
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import type { FactionPorts, FactionTransportConfig, FactionTransportTypes } from '../../types/transport.js';
-import type { ObjectManager } from '../database/object-manager.js';
-import { calculateFactionPorts } from '../config/faction-ports.js';
-import { Connection } from '../connection/connection.js';
-import { FactionBundle } from './faction-bundle.js';
+import type { FactionPorts, FactionTransportConfig, FactionTransportTypes } from '../../types/transport';
+import type { ObjectManager } from '../database/object-manager';
+import { calculateFactionPorts } from '../config/faction-ports';
+import { Connection } from '../connection/connection';
+import { FactionBundle } from './faction-bundle';
 
 /**
  * Information about a registered faction's transports

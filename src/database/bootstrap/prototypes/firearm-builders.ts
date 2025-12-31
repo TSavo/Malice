@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Firearm Prototypes
@@ -973,3 +974,111 @@ export class TecBuilder {
     return obj;
   }
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// FIREARM PROTOTYPES BUILDER (registered builder for all firearms)
+// ═══════════════════════════════════════════════════════════════════════════
+
+export class FirearmPrototypesBuilder implements Builder {
+  static provides = [
+    'gun',
+    'pistol',
+    'revolver',
+    'magnum',
+    'semiAutoPistol',
+    'compactPistol',
+    'derringer',
+    'm1911',
+    'rifle',
+    'boltActionRifle',
+    'leverActionRifle',
+    'huntingRifle',
+    'rifle22',
+    'shotgun',
+    'pumpShotgun',
+    'sawnOffShotgun',
+    'doubleBarrel',
+    'coachGun',
+    'smg',
+    'machinePistol',
+    'uzi',
+    'mac10',
+    'tec9',
+  ];
+  static depends = ['weapon'];
+
+  private weapons: Record<string, RuntimeObject> = {};
+
+  constructor(private manager: ObjectManager) {}
+
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.gun && !forceRebuild) {
+      for (const alias of FirearmPrototypesBuilder.provides) {
+        if ($[alias]) this.weapons[alias] = $[alias];
+      }
+      return;
+    }
+
+    const parentObj = $.weapon;
+    if (!parentObj) throw new Error('FirearmPrototypesBuilder: $weapon not found');
+
+    const weaponId = parentObj.id;
+
+    // Base gun (inherits from weapon)
+    const gun = await new GunBuilder(this.manager).build(weaponId);
+    this.weapons.gun = gun;
+
+    // Pistols (inherit from gun)
+    const pistol = await new PistolBuilder(this.manager).build(gun.id);
+    this.weapons.pistol = pistol;
+    this.weapons.revolver = await new RevolverBuilder(this.manager).build(pistol.id);
+    this.weapons.magnum = await new MagnumBuilder(this.manager).build(pistol.id);
+    this.weapons.semiAutoPistol = await new SemiAutoPistolBuilder(this.manager).build(pistol.id);
+    this.weapons.compactPistol = await new CompactPistolBuilder(this.manager).build(pistol.id);
+    this.weapons.derringer = await new DerringerBuilder(this.manager).build(pistol.id);
+    this.weapons.m1911 = await new M1911Builder(this.manager).build(pistol.id);
+
+    // Rifles (inherit from gun)
+    const rifle = await new RifleBuilder(this.manager).build(gun.id);
+    this.weapons.rifle = rifle;
+    this.weapons.boltActionRifle = await new BoltActionRifleBuilder(this.manager).build(rifle.id);
+    this.weapons.leverActionRifle = await new LeverActionRifleBuilder(this.manager).build(rifle.id);
+    this.weapons.huntingRifle = await new HuntingRifleBuilder(this.manager).build(rifle.id);
+    this.weapons.rifle22 = await new Rifle22Builder(this.manager).build(rifle.id);
+
+    // Shotguns (inherit from gun)
+    const shotgun = await new ShotgunBuilder(this.manager).build(gun.id);
+    this.weapons.shotgun = shotgun;
+    this.weapons.pumpShotgun = await new PumpShotgunBuilder(this.manager).build(shotgun.id);
+    this.weapons.sawnOffShotgun = await new SawnOffShotgunBuilder(this.manager).build(shotgun.id);
+    this.weapons.doubleBarrel = await new DoubleBarrelBuilder(this.manager).build(shotgun.id);
+    this.weapons.coachGun = await new CoachGunBuilder(this.manager).build(shotgun.id);
+
+    // SMGs (inherit from gun)
+    const smg = await new SmgBuilder(this.manager).build(gun.id);
+    this.weapons.smg = smg;
+    this.weapons.machinePistol = await new MachinePistolBuilder(this.manager).build(smg.id);
+    this.weapons.uzi = await new UziBuilder(this.manager).build(smg.id);
+    this.weapons.mac10 = await new Mac10Builder(this.manager).build(smg.id);
+    this.weapons.tec9 = await new TecBuilder(this.manager).build(smg.id);
+
+    console.log(`✅ Built ${Object.keys(this.weapons).length} firearm prototypes`);
+  }
+
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    const objectManager = await this.manager.load(0);
+    if (!objectManager) return;
+
+    for (const [name, obj] of Object.entries(this.weapons)) {
+      if (obj) {
+        await objectManager.call('addAlias', name, obj.id);
+      }
+    }
+  }
+}
+
+// Self-register
+registerBuilder(FirearmPrototypesBuilder);

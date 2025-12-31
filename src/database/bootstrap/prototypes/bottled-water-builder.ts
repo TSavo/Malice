@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the BottledWater prototype
@@ -9,14 +10,23 @@ import type { ObjectManager } from '../../object-manager.js';
  * water sourced from the municipal purification system. Sealed
  * bottles last indefinitely until opened.
  */
-export class BottledWaterBuilder {
-  static readonly alias = 'bottledWater';
-  static readonly parent = 'drink';
+export class BottledWaterBuilder implements Builder {
+  static provides = ['bottledWater'];
+  static depends = ['drink'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(drinkId: number): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(drinkId);
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.bottledWater && !forceRebuild) {
+      this.obj = $.bottledWater;
+      return;
+    }
+
+    const parentObj = $.drink;
     const obj = await this.manager.create({
       parent: parentObj!,
       properties: {
@@ -197,6 +207,16 @@ ECONOMY: 'basePrice' 1 credit. Ubiquitous vending machine item.`,
       'Weight of the empty bottle container in grams',
     );
 
-    return obj;
+    this.obj = obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'bottledWater', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(BottledWaterBuilder);

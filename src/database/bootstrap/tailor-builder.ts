@@ -1,11 +1,15 @@
-import type { RuntimeObject } from '../../../types/object.js';
-import type { ObjectManager } from '../object-manager.js';
+import type { RuntimeObject } from '../../../types/object';
+import type { ObjectManager } from '../object-manager';
+import { registerBuilder, type Builder } from './builder-registry';
 
 /**
  * Builds $tailor object (dynamic ID)
  * AI-powered costume designer for NPCs
  */
-export class TailorBuilder {
+export class TailorBuilder implements Builder {
+  static provides = ['tailor'];
+  static depends = ['aiPrompts']; // Uses $.aiPrompts.tailor
+
   private tailor: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
@@ -49,11 +53,9 @@ export class TailorBuilder {
     // Build methods
     await this.rebuildMethods();
 
-    // Register alias
-    await this.registerAlias();
   }
 
-  private async rebuildMethods(): Promise<void> {
+  async rebuildMethods(): Promise<void> {
     if (!this.tailor) throw new Error('Tailor object not initialized');
 
     // ═══════════════════════════════════════════════════════════════════
@@ -94,17 +96,20 @@ First use ai action=info to learn about the NPC, then dress them appropriately f
     console.log('[TailorBuilder] Methods rebuilt');
   }
 
-  async registerAlias(): Promise<void> {
+  async registerAliases(): Promise<void> {
     if (!this.tailor) return;
 
     const objectManager = await this.manager.load(0);
     if (!objectManager) return;
 
     await objectManager.call('addAlias', 'tailor', this.tailor.id);
-    console.log('[TailorBuilder] Registered $tailor alias');
+    console.log(`Registered tailor alias -> #${this.tailor.id}`);
   }
 
   getTailor(): RuntimeObject | null {
     return this.tailor;
   }
 }
+
+// Self-register
+registerBuilder(TailorBuilder);

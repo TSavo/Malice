@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds specialized body part prototypes
@@ -19,8 +20,8 @@ import type { ObjectManager } from '../../object-manager.js';
  *   - Leg (locomotion)
  *     - Foot
  */
-export class BodyPartsBuilder {
-  static readonly aliases = [
+export class BodyPartsBuilder implements Builder {
+  static provides = [
     'torso',
     'stomach',
     'head',
@@ -34,34 +35,58 @@ export class BodyPartsBuilder {
     'finger',
     'leg',
     'foot',
-  ] as const;
-  static readonly parent = 'bodyPart';
+  ];
+  static depends = ['bodyPart'];
+
+  private parts: Record<string, RuntimeObject> = {};
 
   constructor(private manager: ObjectManager) {}
 
   /**
    * Build all specialized body part prototypes
-   * Returns map of part name -> prototype ID
    */
-  async buildAll(bodyPartId: number): Promise<Record<string, RuntimeObject>> {
-    const parts: Record<string, RuntimeObject> = {};
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    // Check if already built
+    if ($.torso && !forceRebuild) {
+      this.parts = {
+        torso: $.torso,
+        stomach: $.stomach,
+        head: $.head,
+        eye: $.eye,
+        ear: $.ear,
+        nose: $.nose,
+        mouth: $.mouth,
+        tongue: $.tongue,
+        arm: $.arm,
+        hand: $.hand,
+        finger: $.finger,
+        leg: $.leg,
+        foot: $.foot,
+      };
+      return;
+    }
+
+    const parentObj = $.bodyPart;
+    if (!parentObj) throw new Error('BodyPartsBuilder: $bodyPart not found');
+
+    const bodyPartId = parentObj.id;
 
     // Build in dependency order
-    parts.torso = await this.buildTorso(bodyPartId);
-    parts.stomach = await this.buildStomach(bodyPartId);
-    parts.head = await this.buildHead(bodyPartId);
-    parts.eye = await this.buildEye(bodyPartId);
-    parts.ear = await this.buildEar(bodyPartId);
-    parts.nose = await this.buildNose(bodyPartId);
-    parts.mouth = await this.buildMouth(bodyPartId);
-    parts.tongue = await this.buildTongue(bodyPartId);
-    parts.arm = await this.buildArm(bodyPartId);
-    parts.hand = await this.buildHand(bodyPartId);
-    parts.finger = await this.buildFinger(bodyPartId);
-    parts.leg = await this.buildLeg(bodyPartId);
-    parts.foot = await this.buildFoot(bodyPartId);
-
-    return parts;
+    this.parts.torso = await this.buildTorso(bodyPartId);
+    this.parts.stomach = await this.buildStomach(bodyPartId);
+    this.parts.head = await this.buildHead(bodyPartId);
+    this.parts.eye = await this.buildEye(bodyPartId);
+    this.parts.ear = await this.buildEar(bodyPartId);
+    this.parts.nose = await this.buildNose(bodyPartId);
+    this.parts.mouth = await this.buildMouth(bodyPartId);
+    this.parts.tongue = await this.buildTongue(bodyPartId);
+    this.parts.arm = await this.buildArm(bodyPartId);
+    this.parts.hand = await this.buildHand(bodyPartId);
+    this.parts.finger = await this.buildFinger(bodyPartId);
+    this.parts.leg = await this.buildLeg(bodyPartId);
+    this.parts.foot = await this.buildFoot(bodyPartId);
   }
 
   async buildTorso(bodyPartId: number): Promise<RuntimeObject> {
@@ -1201,4 +1226,19 @@ REMOVABLE: Can be severed at ankle. Chrome feet provide enhanced grip, shock abs
 
     return obj;
   }
+
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    const objectManager = await this.manager.load(0);
+    if (!objectManager) return;
+
+    for (const [name, obj] of Object.entries(this.parts)) {
+      if (obj) {
+        await objectManager.call('addAlias', name, obj.id);
+      }
+    }
+  }
 }
+
+// Self-register
+registerBuilder(BodyPartsBuilder);

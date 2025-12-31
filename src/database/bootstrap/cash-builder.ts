@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../types/object.js';
-import type { ObjectManager } from '../object-manager.js';
+import type { RuntimeObject } from '../../../types/object';
+import type { ObjectManager } from '../object-manager';
+import { registerBuilder, type Builder } from './builder-registry';
 
 /**
  * Builds the $.cash utility object
@@ -9,12 +10,29 @@ import type { ObjectManager } from '../object-manager.js';
  * - Abilities describe how to use this utility for AI interpretation
  * - AI calls these methods when handling cash transactions
  */
-export class CashBuilder {
+export class CashBuilder implements Builder {
+  static provides = ['cash'];
+  static depends = ['recycler']; // Uses $.recycler for creating cash stacks
+
+  private cash: RuntimeObject | null = null;
+
   constructor(private manager: ObjectManager) {}
 
-  async build(): Promise<RuntimeObject> {
+  async build(): Promise<void> {
+    // Check if already exists via alias
+    const objectManager = await this.manager.load(0);
+    if (!objectManager) throw new Error('Root object not found');
+
+    const aliases =
+      (objectManager.get('aliases') as Record<string, number>) || {};
+
+    if (aliases.cash) {
+      this.cash = await this.manager.load(aliases.cash);
+      if (this.cash) return;
+    }
+
     const root = await this.manager.load(1);
-    const obj = await this.manager.create({
+    this.cash = await this.manager.create({
       parent: root!, // Root object
       properties: {
         name: 'Cash Utility',
@@ -41,13 +59,13 @@ Atomic - if give fails, refunds the take.
 NOTE: Physical cash is contraband. Possession is illegal. Use $bank for legal credit transactions.`,
       },
       methods: {},
-    });
+    })!;
 
     // ═══════════════════════════════════════════════════════════════════
     // FIND CASH
     // ═══════════════════════════════════════════════════════════════════
 
-    obj.setMethod(
+    this.cash.setMethod(
       'find',
       `
       /** Find all cash on a player.
@@ -98,7 +116,7 @@ NOTE: Physical cash is contraband. Possession is illegal. Use $bank for legal cr
     // HAS CASH
     // ═══════════════════════════════════════════════════════════════════
 
-    obj.setMethod(
+    this.cash.setMethod(
       'has',
       `
       /** Check if player has at least a certain amount of cash.
@@ -118,7 +136,7 @@ NOTE: Physical cash is contraband. Possession is illegal. Use $bank for legal cr
     // TAKE CASH
     // ═══════════════════════════════════════════════════════════════════
 
-    obj.setMethod(
+    this.cash.setMethod(
       'take',
       `
       /** Take cash from a player.
@@ -181,7 +199,7 @@ NOTE: Physical cash is contraband. Possession is illegal. Use $bank for legal cr
     // GIVE CASH
     // ═══════════════════════════════════════════════════════════════════
 
-    obj.setMethod(
+    this.cash.setMethod(
       'give',
       `
       /** Give cash to a player/target.
@@ -297,7 +315,7 @@ NOTE: Physical cash is contraband. Possession is illegal. Use $bank for legal cr
     // TRANSFER CASH
     // ═══════════════════════════════════════════════════════════════════
 
-    obj.setMethod(
+    this.cash.setMethod(
       'transfer',
       `
       /** Transfer cash from one player to another.
@@ -335,6 +353,18 @@ NOTE: Physical cash is contraband. Possession is illegal. Use $bank for legal cr
     `,
     );
 
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    if (!this.cash) return;
+
+    const objectManager = await this.manager.load(0);
+    if (!objectManager) return;
+
+    await objectManager.call('addAlias', 'cash', this.cash.id);
+    console.log(`Registered cash alias -> #${this.cash.id}`);
   }
 }
+
+// Self-register
+registerBuilder(CashBuilder);

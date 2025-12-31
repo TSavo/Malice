@@ -3,8 +3,8 @@
  * Generates .d.ts files from MongoDB object state
  */
 
-import type { GameObject } from '../../types/object.js';
-import type { ObjectManager } from '../database/object-manager.js';
+import type { GameObject } from '../../types/object';
+import type { ObjectManager } from '../database/object-manager';
 
 /**
  * Generates TypeScript definition files from MongoDB objects

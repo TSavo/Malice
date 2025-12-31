@@ -1,8 +1,8 @@
 import { BehaviorSubject, merge, type Observable } from 'rxjs';
 import { map, share, switchMap } from 'rxjs/operators';
-import type { AuthInfo } from '../../types/auth.js';
-import type { ITransport } from '../../types/transport.js';
-import { Connection } from './connection.js';
+import type { AuthInfo } from '../../types/auth';
+import type { ITransport } from '../../types/transport';
+import { Connection } from './connection';
 
 /**
  * Manages all active connections

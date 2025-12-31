@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Vendable: a vending container that sells items in its contents.
@@ -10,14 +11,23 @@ import type { ObjectManager } from '../../object-manager.js';
  * - Legacy vend() with $.prompt still works for direct interaction
  * - Payment handled via $bank (credits) or $cash (physical money)
  */
-export class VendableBuilder {
-  static readonly alias = 'vendable';
-  static readonly parent = 'location';
+export class VendableBuilder implements Builder {
+  static provides = ['vendable'];
+  static depends = ['location'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(locationId: number): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(locationId);
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.vendable && !forceRebuild) {
+      this.obj = $.vendable;
+      return;
+    }
+
+    const parentObj = $.location;
     const obj = await this.manager.create({
       parent: parentObj!,
       properties: {
@@ -630,6 +640,16 @@ SPAWNABLES: Some vendors create items on demand from templates. These never run 
     `,
     );
 
-    return obj;
+    this.obj = obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'vendable', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(VendableBuilder);

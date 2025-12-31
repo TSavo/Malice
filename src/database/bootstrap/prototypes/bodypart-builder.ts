@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the BodyPart prototype
@@ -20,22 +21,26 @@ import type { ObjectManager } from '../../object-manager.js';
  * - decayRate: 2% per tick (body parts decay faster than preserved food)
  * - Calories based on weight (meat ~2 kcal/gram)
  */
-export class BodyPartBuilder {
-  static readonly alias = 'bodyPart';
-  static readonly parent = 'edible';
+export class BodyPartBuilder implements Builder {
+  static provides = ['bodyPart'];
+  static depends = ['edible'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(
-    edibleId: number,
-    existingObj?: RuntimeObject,
-  ): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(edibleId);
-    const obj =
-      existingObj ||
-      (await this.manager.create({
-        parent: parentObj!,
-        properties: {
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.bodyPart && !forceRebuild) {
+      this.obj = $.bodyPart;
+      return;
+    }
+
+    const parentObj = $.edible;
+    this.obj = await this.manager.create({
+      parent: parentObj!,
+      properties: {
           name: 'BodyPart',
           description: 'A body part',
           owner: null, // ObjRef to the player/agent who owns this body
@@ -72,10 +77,11 @@ SENSATION: Can feel pain, touch, temperature via feel(). Reports to owner. Numb/
 CRITICAL: If 'critical' is true, destruction kills the owner.
 
 DECAY: Attached parts don't decay (maintained by living body). Severed parts decay rapidly. Decayed parts provide fewer calories when consumed.`,
-        },
-        methods: {},
-      }));
+      },
+      methods: {},
+    });
 
+    const obj = this.obj;
     // Property descriptions
     obj.setPropertyDescription(
       'owner',
@@ -1528,6 +1534,16 @@ DECAY: Attached parts don't decay (maintained by living body). Severed parts dec
     `,
     );
 
-    return obj;
+    this.obj = obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'bodyPart', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(BodyPartBuilder);

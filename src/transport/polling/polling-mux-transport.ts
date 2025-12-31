@@ -7,10 +7,10 @@
  */
 
 import { takeUntil } from 'rxjs/operators';
-import { BaseTransport } from '../base-transport.js';
-import type { CtrlResize, IChannel } from '../multiplexed/types.js';
-import type { MuxMessage } from './polling-mux.js';
-import { PollingMux } from './polling-mux.js';
+import { BaseTransport } from '../base-transport';
+import type { CtrlResize, IChannel } from '../multiplexed/types';
+import type { MuxMessage } from './polling-mux';
+import { PollingMux } from './polling-mux';
 
 /**
  * Polling-based multiplexed transport

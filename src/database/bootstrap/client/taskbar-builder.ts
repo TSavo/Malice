@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the Taskbar class client module
@@ -7,43 +8,35 @@ import type { ObjectManager } from '../../object-manager.js';
  * Creates $.taskbarJs which serves /js/taskbar.js
  * Windows 11-style taskbar for managing windows.
  */
-export class TaskbarBuilder {
-  static readonly alias = 'taskbarJs';
+export class TaskbarBuilder implements Builder {
+  static provides = ['taskbarJs'];
+  static depends = ['root'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<RuntimeObject> {
-    const objectManager = await this.manager.load(0);
-    if (!objectManager) throw new Error('ObjectManager not found');
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
 
-    const aliases =
-      (objectManager.get('aliases') as Record<string, number>) || {};
-
-    let obj: RuntimeObject | null = null;
-
-    if (aliases[TaskbarBuilder.alias]) {
-      obj = await this.manager.load(aliases[TaskbarBuilder.alias]);
-      if (obj && !forceRebuild) {
-        console.log(
-          `[TaskbarBuilder] Using existing $.${TaskbarBuilder.alias}`,
-        );
-        return obj;
-      }
+    if ($.taskbarJs && !forceRebuild) {
+      this.obj = $.taskbarJs;
+      return;
     }
 
-    if (!obj) {
-      const root = await this.manager.load(1);
-      obj = await this.manager.create({
-        parent: root!,
-        properties: {
-          name: 'Taskbar JS Module',
-          description: 'Windows 11-style taskbar',
-        },
-        methods: {},
-      });
+    const parentObj = $.root;
+    if (!parentObj) throw new Error('TaskbarBuilder: $root not found');
 
-      await objectManager.call('addAlias', TaskbarBuilder.alias, obj.id);
-    }
+    this.obj = await this.manager.create({
+      parent: parentObj,
+      properties: {
+        name: 'Taskbar JS Module',
+        description: 'Windows 11-style taskbar',
+      },
+      methods: {},
+    });
+
+    const obj = this.obj;
 
     obj.setMethod(
       'getScript',
@@ -377,9 +370,15 @@ document.head.appendChild(style);
     `,
     );
 
-    console.log(
-      `[TaskbarBuilder] Built $.${TaskbarBuilder.alias} -> #${obj.id}`,
-    );
-    return obj;
+    console.log(`[TaskbarBuilder] Built $.taskbarJs -> #${obj.id}`);
+  }
+
+  async registerAliases(): Promise<void> {
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'taskbarJs', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(TaskbarBuilder);

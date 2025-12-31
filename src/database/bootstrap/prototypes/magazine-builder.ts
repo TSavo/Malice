@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the Magazine prototype
@@ -19,15 +20,26 @@ import type { ObjectManager } from '../../object-manager.js';
  *
  * Inherits from $.describable.
  */
-export class MagazineBuilder {
-  static readonly alias = 'magazine';
-  static readonly parent = 'describable';
+export class MagazineBuilder implements Builder {
+  static provides = ['magazine'];
+  static depends = ['describable'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: number): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.magazine && !forceRebuild) {
+      this.obj = $.magazine;
+      return;
+    }
+
+    const parentObj = $.describable;
+    if (!parentObj) throw new Error('MagazineBuilder: $describable not found');
+
+    this.obj = await this.manager.create({
       parent: parentObj!,
       properties: {
         name: 'Magazine',
@@ -65,6 +77,8 @@ RELOAD SPEED: Swapping magazines is faster than loading individual rounds. Tacti
       },
       methods: {},
     });
+
+    const obj = this.obj;
 
     // ═══════════════════════════════════════════════════════════════════════
     // AMMO MANAGEMENT
@@ -215,10 +229,18 @@ RELOAD SPEED: Swapping magazines is faster than loading individual rounds. Tacti
       'maxAmmo',
       'Maximum capacity - how many rounds this magazine can hold.',
     );
+  }
 
-    return obj;
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'magazine', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(MagazineBuilder);
 
 /**
  * Specific magazine type builders
@@ -372,8 +394,8 @@ export class SpeedloaderBuilder {
  *   $.mac10Magazine (.45, 30 rounds)
  *   $.speedloader (.38, 6 rounds)
  */
-export class MagazinePrototypesBuilder {
-  static readonly aliases = [
+export class MagazinePrototypesBuilder implements Builder {
+  static provides = [
     'pistolMagazine',
     'extendedMagazine',
     'm1911Magazine',
@@ -381,51 +403,58 @@ export class MagazinePrototypesBuilder {
     'smgMagazine',
     'mac10Magazine',
     'speedloader',
-  ] as const;
-  static readonly parent = 'magazine';
+  ];
+  static depends = ['magazine'];
+
+  private magazines: Record<string, RuntimeObject> = {};
 
   constructor(private manager: ObjectManager) {}
 
-  /**
-   * Build all magazine sub-prototypes
-   * @param magazineId - ID of the base $.magazine prototype
-   * @returns Record of magazine name -> RuntimeObject
-   */
-  async buildAll(magazineId: number): Promise<Record<string, RuntimeObject>> {
-    const magazines: Record<string, RuntimeObject> = {};
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.pistolMagazine && !forceRebuild) {
+      for (const alias of MagazinePrototypesBuilder.provides) {
+        if ($[alias]) this.magazines[alias] = $[alias];
+      }
+      return;
+    }
+
+    const parentObj = $.magazine;
+    if (!parentObj) throw new Error('MagazinePrototypesBuilder: $magazine not found');
+
+    const magazineId = parentObj.id;
 
     // Pistol magazines
-    magazines.pistolMagazine = await new PistolMagazineBuilder(
-      this.manager,
-    ).build(magazineId);
-    magazines.extendedMagazine = await new ExtendedMagazineBuilder(
-      this.manager,
-    ).build(magazineId);
-    magazines.m1911Magazine = await new M1911MagazineBuilder(
-      this.manager,
-    ).build(magazineId);
+    this.magazines.pistolMagazine = await new PistolMagazineBuilder(this.manager).build(magazineId);
+    this.magazines.extendedMagazine = await new ExtendedMagazineBuilder(this.manager).build(magazineId);
+    this.magazines.m1911Magazine = await new M1911MagazineBuilder(this.manager).build(magazineId);
 
     // Rifle magazines
-    magazines.rifleMagazine = await new RifleMagazineBuilder(
-      this.manager,
-    ).build(magazineId);
+    this.magazines.rifleMagazine = await new RifleMagazineBuilder(this.manager).build(magazineId);
 
     // SMG magazines
-    magazines.smgMagazine = await new SmgMagazineBuilder(this.manager).build(
-      magazineId,
-    );
-    magazines.mac10Magazine = await new Mac10MagazineBuilder(
-      this.manager,
-    ).build(magazineId);
+    this.magazines.smgMagazine = await new SmgMagazineBuilder(this.manager).build(magazineId);
+    this.magazines.mac10Magazine = await new Mac10MagazineBuilder(this.manager).build(magazineId);
 
     // Revolver speedloader
-    magazines.speedloader = await new SpeedloaderBuilder(this.manager).build(
-      magazineId,
-    );
+    this.magazines.speedloader = await new SpeedloaderBuilder(this.manager).build(magazineId);
 
-    console.log(
-      `✅ Built ${Object.keys(magazines).length} magazine prototypes`,
-    );
-    return magazines;
+    console.log(`✅ Built ${Object.keys(this.magazines).length} magazine prototypes`);
+  }
+
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    const objectManager = await this.manager.load(0);
+    if (!objectManager) return;
+
+    for (const [name, obj] of Object.entries(this.magazines)) {
+      if (obj) {
+        await objectManager.call('addAlias', name, obj.id);
+      }
+    }
   }
 }
+
+// Self-register
+registerBuilder(MagazinePrototypesBuilder);

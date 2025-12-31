@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the Decayable prototype
@@ -25,15 +26,24 @@ import type { ObjectManager } from '../../object-manager.js';
  * - 75-99%: Severely decayed (dangerous to consume)
  * - 100%: Fully decayed (destroyed, unusable)
  */
-export class DecayableBuilder {
-  static readonly alias = 'decayable';
-  static readonly parent = 'describable';
+export class DecayableBuilder implements Builder {
+  static provides = ['decayable'];
+  static depends = ['describable'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(describableId: number): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(describableId);
-    const obj = await this.manager.create({
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.decayable && !forceRebuild) {
+      this.obj = $.decayable;
+      return;
+    }
+
+    const parentObj = $.describable;
+    this.obj = await this.manager.create({
       parent: parentObj!,
       properties: {
         name: 'Decayable',
@@ -81,6 +91,7 @@ PRESERVATION: preserve(method) stops decay if caught early.`,
       methods: {},
     });
 
+    const obj = this.obj;
     // Check if decay condition is met
     obj.setMethod(
       'shouldDecay',
@@ -427,7 +438,15 @@ PRESERVATION: preserve(method) stops decay if caught early.`,
       'storageDamage',
       'Object mapping storage conditions to damage amounts (frozen: damage to organs, heated: damage from heat).',
     );
+  }
 
-    return obj;
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'decayable', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(DecayableBuilder);

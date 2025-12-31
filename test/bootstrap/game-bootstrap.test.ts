@@ -21,8 +21,7 @@ describe('GameBootstrap', () => {
 
     manager = new ObjectManager(db);
     bootstrap = new GameBootstrap(manager, {
-      worldBuildMode: 'systems',
-      disableDefaultJobs: true,
+      _testMode: true,
     });
   });
 
@@ -199,8 +198,7 @@ describe('GameBootstrap', () => {
 
       // Re-bootstrap
       const bootstrap2 = new GameBootstrap(manager, {
-        worldBuildMode: 'systems',
-        disableDefaultJobs: true,
+        _testMode: true,
       });
       await bootstrap2.bootstrap();
 
@@ -223,8 +221,7 @@ describe('GameBootstrap', () => {
 
       // Re-bootstrap
       const bootstrap2 = new GameBootstrap(manager, {
-        worldBuildMode: 'systems',
-        disableDefaultJobs: true,
+        _testMode: true,
       });
       await bootstrap2.bootstrap();
 

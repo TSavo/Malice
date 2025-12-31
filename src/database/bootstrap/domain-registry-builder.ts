@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../types/object.js';
-import type { ObjectManager } from '../object-manager.js';
+import type { RuntimeObject } from '../../../types/object';
+import type { ObjectManager } from '../object-manager';
+import { registerBuilder, type Builder } from './builder-registry';
 
 /**
  * Builds $domainRegistry object
@@ -15,7 +16,10 @@ import type { ObjectManager } from '../object-manager.js';
  * 2. Find matching root domain
  * 3. Delegate to domain's handleRequest
  */
-export class DomainRegistryBuilder {
+export class DomainRegistryBuilder implements Builder {
+  static provides = ['domainRegistry'];
+  static depends: string[] = [];
+
   private registry: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
@@ -233,13 +237,16 @@ export class DomainRegistryBuilder {
     );
   }
 
-  async registerAlias(): Promise<void> {
+  async registerAliases(): Promise<void> {
     if (!this.registry) return;
 
     const objectManager = await this.manager.load(0);
     if (!objectManager) return;
 
     await objectManager.call('addAlias', 'domainRegistry', this.registry.id);
-    console.log(`✅ Registered domainRegistry alias -> #${this.registry.id}`);
+    console.log(`Registered domainRegistry alias -> #${this.registry.id}`);
   }
 }
+
+// Self-register
+registerBuilder(DomainRegistryBuilder);

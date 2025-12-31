@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../types/object.js';
-import type { ObjectManager } from '../object-manager.js';
+import type { RuntimeObject } from '../../../types/object';
+import type { ObjectManager } from '../object-manager';
+import { registerBuilder, type Builder } from './builder-registry';
 
 /**
  * Builds the Sister Gray system object.
@@ -11,29 +12,46 @@ import type { ObjectManager } from '../object-manager.js';
  * Unlike Pluribus (infrastructure), Sister Gray is a person. But she's also
  * a role, a mask she wears. The woman and the title have become inseparable.
  */
-export class SisterGrayBuilder {
-  private sisterGray?: RuntimeObject;
+export class SisterGrayBuilder implements Builder {
+  static provides = ['sisterGray'];
+  static depends = ['agent', 'aiPrompts', 'ai']; // Inherits from $agent, uses aiPrompts and registers with $ai
+
+  private sisterGray: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(
-    rootId: number,
-    existingObj?: RuntimeObject,
-  ): Promise<RuntimeObject> {
-    const parent = await this.manager.load(rootId);
-
-    // Load prompt from $.aiPrompts (built by AiPromptsBuilder before this runs)
+  async build(forceRebuild = false): Promise<void> {
     const objectManager = await this.manager.load(0);
-    const aliases = (objectManager?.get('aliases') as Record<string, number>) || {};
-    const aiPrompts = aliases.aiPrompts ? await this.manager.load(aliases.aiPrompts) : null;
+    if (!objectManager) throw new Error('Root object not found');
+
+    const aliases =
+      (objectManager.get('aliases') as Record<string, number>) || {};
+
+    // Check if already exists
+    if (aliases.sisterGray) {
+      this.sisterGray = await this.manager.load(aliases.sisterGray);
+      if (this.sisterGray && !forceRebuild) return;
+    }
+
+    // Get agent prototype from alias
+    if (!aliases.agent) {
+      throw new Error('$agent must be built before $sisterGray');
+    }
+    const parent = await this.manager.load(aliases.agent);
+    if (!parent) {
+      throw new Error('Failed to load $agent');
+    }
+
+    // Load prompt from $.aiPrompts
+    const aiPrompts = aliases.aiPrompts
+      ? await this.manager.load(aliases.aiPrompts)
+      : null;
     const systemPrompt =
       (aiPrompts?.get('sisterGray') as string) ||
       '# Sister Gray Prompt\n\nFailed to load from $.aiPrompts';
 
-    const obj =
-      existingObj ||
-      (await this.manager.create({
-        parent: parent!,
+    this.sisterGray = await this.manager.create({
+        parent: parent,
         properties: {
           name: 'Sister Gray',
           description:
@@ -63,33 +81,31 @@ LIMITATIONS: Cannot act on surface directly - flagged hostile. Needs players as 
 THE MASK: Holds Pluribus's Mask but cannot use it (flagged hostile). Looking for someone clean who could wear it and answer to her.`,
         },
         methods: {},
-      }));
+      })!;
 
     // Property descriptions
-    obj.setPropertyDescription(
+    this.sisterGray.setPropertyDescription(
       'sensoryHistory',
       'Array of reports from underground network (operative intel, dead drop checks)',
     );
-    obj.setPropertyDescription(
+    this.sisterGray.setPropertyDescription(
       'historyLimit',
       'Max entries in sensoryHistory before oldest are trimmed',
     );
-    obj.setPropertyDescription(
+    this.sisterGray.setPropertyDescription(
       'location',
       "Her current location (usually Sister's Quarters at z=-5)",
     );
-    obj.setPropertyDescription(
+    this.sisterGray.setPropertyDescription(
       'agentSystemPrompt',
       'Full system prompt used when AI is invoked',
     );
-    obj.setPropertyDescription(
+    this.sisterGray.setPropertyDescription(
       'wakeSession',
       'Claude session ID for continuity across hourly wake-ups',
     );
 
-    this.addCoreMethods(obj);
-    this.sisterGray = obj;
-    return obj;
+    this.addCoreMethods(this.sisterGray);
   }
 
   // System prompt has been moved to docs/prompts/SISTER-GRAY.md
@@ -228,14 +244,14 @@ THE MASK: Holds Pluribus's Mask but cannot use it (flagged hostile). Looking for
     );
   }
 
-  async registerAlias(): Promise<void> {
+  async registerAliases(): Promise<void> {
     if (!this.sisterGray) return;
 
     const objectManager = await this.manager.load(0);
     if (!objectManager) return;
 
     await objectManager.call('addAlias', 'sisterGray', this.sisterGray.id);
-    console.log(`✅ Registered sisterGray alias -> #${this.sisterGray.id}`);
+    console.log(`Registered sisterGray alias -> #${this.sisterGray.id}`);
 
     // Register with $ai so she responds to player speech
     const aliases = objectManager.get('aliases') as
@@ -245,7 +261,7 @@ THE MASK: Holds Pluribus's Mask but cannot use it (flagged hostile). Looking for
       const ai = await this.manager.load(aliases.ai);
       if (ai) {
         await ai.call('register', this.sisterGray, 'faction_leader');
-        console.log(`✅ Registered Sister Gray with $ai as faction_leader`);
+        console.log(`Registered Sister Gray with $ai as faction_leader`);
       }
     }
   }
@@ -259,3 +275,6 @@ THE MASK: Holds Pluribus's Mask but cannot use it (flagged hostile). Looking for
     }
   }
 }
+
+// Self-register
+registerBuilder(SisterGrayBuilder);

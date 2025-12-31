@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../types/object.js';
-import type { ObjectManager } from '../object-manager.js';
+import type { RuntimeObject } from '../../../types/object';
+import type { ObjectManager } from '../object-manager';
+import { registerBuilder, type Builder } from './builder-registry';
 
 /**
  * Builds the Pluribus system object.
@@ -12,29 +13,46 @@ import type { ObjectManager } from '../object-manager.js';
  *
  * The Mask has been stolen. The CEO is dead. Pluribus is degraded.
  */
-export class PluribusBuilder {
-  private pluribus?: RuntimeObject;
+export class PluribusBuilder implements Builder {
+  static provides = ['pluribus'];
+  static depends = ['agent', 'aiPrompts']; // Inherits from $agent, uses aiPrompts
+
+  private pluribus: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(
-    rootId: number,
-    existingObj?: RuntimeObject,
-  ): Promise<RuntimeObject> {
-    const parent = await this.manager.load(rootId);
-
-    // Load prompt from $.aiPrompts (built by AiPromptsBuilder before this runs)
+  async build(forceRebuild = false): Promise<void> {
     const objectManager = await this.manager.load(0);
-    const aliases = (objectManager?.get('aliases') as Record<string, number>) || {};
-    const aiPrompts = aliases.aiPrompts ? await this.manager.load(aliases.aiPrompts) : null;
+    if (!objectManager) throw new Error('Root object not found');
+
+    const aliases =
+      (objectManager.get('aliases') as Record<string, number>) || {};
+
+    // Check if already exists
+    if (aliases.pluribus) {
+      this.pluribus = await this.manager.load(aliases.pluribus);
+      if (this.pluribus && !forceRebuild) return;
+    }
+
+    // Get agent prototype from alias
+    if (!aliases.agent) {
+      throw new Error('$agent must be built before $pluribus');
+    }
+    const parent = await this.manager.load(aliases.agent);
+    if (!parent) {
+      throw new Error('Failed to load $agent');
+    }
+
+    // Load prompt from $.aiPrompts
+    const aiPrompts = aliases.aiPrompts
+      ? await this.manager.load(aliases.aiPrompts)
+      : null;
     const systemPrompt =
       (aiPrompts?.get('pluribus') as string) ||
       '# Pluribus Prompt\n\nFailed to load from $.aiPrompts';
 
-    const obj =
-      existingObj ||
-      (await this.manager.create({
-        parent: parent!,
+    this.pluribus = await this.manager.create({
+        parent: parent,
         properties: {
           name: 'Pluribus',
           description:
@@ -63,29 +81,27 @@ LIMITATIONS: Cannot act directly - needs players as hands. Cannot see undergroun
 CRISIS: CEO dead. Mask stolen. Maintaining fiction everything is fine. Needs new Mask wearer.`,
         },
         methods: {},
-      }));
+      })!;
 
     // Property descriptions
-    obj.setPropertyDescription(
+    this.pluribus.setPropertyDescription(
       'sensoryHistory',
       'Array of sensory events from Mask wearer (see/hear/smell/taste/feel)',
     );
-    obj.setPropertyDescription(
+    this.pluribus.setPropertyDescription(
       'historyLimit',
       'Max entries in sensoryHistory before oldest are trimmed',
     );
-    obj.setPropertyDescription(
+    this.pluribus.setPropertyDescription(
       'agentSystemPrompt',
       'Full system prompt used when AI is invoked',
     );
-    obj.setPropertyDescription(
+    this.pluribus.setPropertyDescription(
       'wakeSession',
       'Claude session ID for continuity across hourly wake-ups',
     );
 
-    this.addCoreMethods(obj);
-    this.pluribus = obj;
-    return obj;
+    this.addCoreMethods(this.pluribus);
   }
 
   // System prompt has been moved to docs/prompts/PLURIBUS.md
@@ -309,13 +325,16 @@ CRISIS: CEO dead. Mask stolen. Maintaining fiction everything is fine. Needs new
     );
   }
 
-  async registerAlias(): Promise<void> {
+  async registerAliases(): Promise<void> {
     if (!this.pluribus) return;
 
     const objectManager = await this.manager.load(0);
     if (!objectManager) return;
 
     await objectManager.call('addAlias', 'pluribus', this.pluribus.id);
-    console.log(`✅ Registered pluribus alias -> #${this.pluribus.id}`);
+    console.log(`Registered pluribus alias -> #${this.pluribus.id}`);
   }
 }
+
+// Self-register
+registerBuilder(PluribusBuilder);

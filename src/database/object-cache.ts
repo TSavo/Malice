@@ -15,7 +15,7 @@
  * - Zero-latency access is critical (no DB hits after warmup)
  */
 
-import type { ObjId, RuntimeObject } from '../../types/object.js';
+import type { ObjId, RuntimeObject } from '../../types/object';
 
 export interface CacheStats {
   objectsCached: number;

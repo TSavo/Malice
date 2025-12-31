@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../types/object.js';
-import type { ObjectManager } from '../object-manager.js';
+import type { RuntimeObject } from '../../../types/object';
+import type { ObjectManager } from '../object-manager';
+import { registerBuilder, type Builder } from './builder-registry';
 
 /**
  * Builds $webRouter object (dynamic ID)
@@ -15,7 +16,10 @@ import type { ObjectManager } from '../object-manager.js';
  *   - { headers }: Add response headers, continue
  *   - { status, body }: Short-circuit with custom response
  */
-export class WebRouterBuilder {
+export class WebRouterBuilder implements Builder {
+  static provides = ['webRouter'];
+  static depends: string[] = [];
+
   private webRouter: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
@@ -55,14 +59,14 @@ export class WebRouterBuilder {
     this.webRouter.setMethod('checkAuth', this.getCheckAuthCode());
   }
 
-  async registerAlias(): Promise<void> {
+  async registerAliases(): Promise<void> {
     if (!this.webRouter) return;
 
     const objectManager = await this.manager.load(0);
     if (!objectManager) return;
 
     await objectManager.call('addAlias', 'webRouter', this.webRouter.id);
-    console.log(`✅ Registered webRouter alias -> #${this.webRouter.id}`);
+    console.log(`Registered webRouter alias -> #${this.webRouter.id}`);
   }
 
   // Code getter methods for inline creation
@@ -231,3 +235,6 @@ export class WebRouterBuilder {
     `;
   }
 }
+
+// Self-register
+registerBuilder(WebRouterBuilder);

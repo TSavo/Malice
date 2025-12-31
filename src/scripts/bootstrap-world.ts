@@ -14,12 +14,12 @@
 
 import 'dotenv/config';
 
-import { AliasLoader } from '../database/bootstrap/alias-loader.js';
-import { CoreSystemBuilder } from '../database/bootstrap/core-system-builder.js';
-import { MinimalBootstrap } from '../database/bootstrap/minimal-bootstrap.js';
-import { PrototypeOrchestrator } from '../database/bootstrap/prototype-orchestrator.js';
-import { ObjectDatabase } from '../database/object-db.js';
-import { ObjectManager } from '../database/object-manager.js';
+import { AliasLoader } from '../database/bootstrap/alias-loader';
+import { MinimalBootstrap } from '../database/bootstrap/minimal-bootstrap';
+import { runBuilders } from '../database/bootstrap/builder-registry';
+import '../database/bootstrap/all-builders'; // Self-register all builders
+import { ObjectDatabase } from '../database/object-db';
+import { ObjectManager } from '../database/object-manager';
 
 type CliOptions = {
   full: boolean;
@@ -103,9 +103,6 @@ async function main() {
   try {
     const manager = new ObjectManager(db);
 
-    // Initialize external services (email)
-    manager.initializeServices({ emailApiKey: process.env.EMAIL_API_KEY });
-
     // Load existing objects into memory (may be empty)
     console.log('Loading existing objects...');
     await manager.loadAll();
@@ -116,27 +113,22 @@ async function main() {
     const minimalBootstrap = new MinimalBootstrap(manager);
     await minimalBootstrap.bootstrap();
 
-    // Phase 2: Prototypes
+    // Phase 2: Load aliases (needed for builders to access $.root, etc.)
     console.log('');
-    console.log('Phase 2: Building prototypes...');
-    const prototypeBuilder = new PrototypeOrchestrator(manager);
-    await prototypeBuilder.buildPrototypes();
-    console.log('  ✅ Created Describable, Agent, Human, Player prototypes');
-
-    // Phase 3: Core systems
-    console.log('');
-    console.log('Phase 3: Building core systems...');
-    const coreSystemBuilder = new CoreSystemBuilder(manager);
-    await coreSystemBuilder.buildCoreSystems();
-    console.log('  ✅ Created AuthManager, CharGen, PreAuthHandler, Recycler');
-    console.log(
-      '  ✅ Created $.pronoun, $.proportional, $.room, $.bodyFactory',
-    );
-
-    // Phase 4: Reload aliases
-    console.log('');
-    console.log('Phase 4: Loading aliases...');
+    console.log('Phase 2: Loading core aliases...');
     const aliasLoader = new AliasLoader(manager);
+    await aliasLoader.loadAliases();
+    console.log('  ✅ Loaded core aliases');
+
+    // Phase 3: Run all registered builders (prototypes + core systems)
+    console.log('');
+    console.log('Phase 3: Running all registered builders...');
+    await runBuilders(manager);
+    console.log('  ✅ Built all prototypes and core systems');
+
+    // Phase 4: Reload aliases (include newly created ones)
+    console.log('');
+    console.log('Phase 4: Loading all aliases...');
     await aliasLoader.loadAliases();
     console.log('  ✅ Loaded all aliases');
 

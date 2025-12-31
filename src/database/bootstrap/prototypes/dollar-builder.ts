@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the Dollar prototype
@@ -10,16 +11,27 @@ import type { ObjectManager } from '../../object-manager.js';
  * - Cash is contraband - possession is a crime
  * - Use $.cash utility for taking/giving cash to players
  */
-export class DollarBuilder {
-  static readonly alias = 'dollar';
-  static readonly parent = 'stackable';
+export class DollarBuilder implements Builder {
+  static provides = ['dollar'];
+  static depends = ['stackable'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: number): Promise<RuntimeObject> {
-    const parent = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parent!,
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.dollar && !forceRebuild) {
+      this.obj = $.dollar;
+      return;
+    }
+
+    const parent = $.stackable;
+    if (!parent) throw new Error('DollarBuilder: $stackable not found');
+
+    this.obj = await this.manager.create({
+      parent: parent,
       properties: {
         name: 'US Dollars',
         description:
@@ -53,6 +65,7 @@ ANONYMITY: Cash cannot be traced. Unlike bank credits, no transaction history ex
       methods: {},
     });
 
+    const obj = this.obj;
     // Add property descriptions
     obj.setPropertyDescription(
       'quantity',
@@ -132,7 +145,15 @@ ANONYMITY: Cash cannot be traced. Unlike bank credits, no transaction history ex
       return 'a brick of cash';
     `,
     );
+  }
 
-    return obj;
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'dollar', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(DollarBuilder);

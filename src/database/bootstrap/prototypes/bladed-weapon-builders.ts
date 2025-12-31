@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Bladed Weapon Prototypes
@@ -587,3 +588,118 @@ export class TomahawkBuilder {
     return obj;
   }
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// BLADED WEAPON PROTOTYPES BUILDER (registered builder for all bladed weapons)
+// ═══════════════════════════════════════════════════════════════════════════
+
+export class BladedWeaponPrototypesBuilder implements Builder {
+  static provides = [
+    'blade',
+    'knife',
+    'pocketKnife',
+    'combatKnife',
+    'switchblade',
+    'boxCutter',
+    'butterflyKnife',
+    'stiletto',
+    'shiv',
+    'machete',
+    'cleaver',
+    'kukri',
+    'katana',
+    'wakizashi',
+    'tanto',
+    'ninjato',
+    'sword',
+    'longsword',
+    'shortsword',
+    'rapier',
+    'cutlass',
+    'axe',
+    'hatchet',
+    'fireAxe',
+    'tomahawk',
+  ];
+  static depends = ['weapon'];
+
+  private weapons: Record<string, RuntimeObject> = {};
+
+  constructor(private manager: ObjectManager) {}
+
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.blade && !forceRebuild) {
+      for (const alias of BladedWeaponPrototypesBuilder.provides) {
+        if ($[alias]) this.weapons[alias] = $[alias];
+      }
+      return;
+    }
+
+    const parentObj = $.weapon;
+    if (!parentObj) throw new Error('BladedWeaponPrototypesBuilder: $weapon not found');
+
+    const weaponId = parentObj.id;
+
+    // Base blade (inherits from weapon)
+    const blade = await new BladeBuilder(this.manager).build(weaponId);
+    this.weapons.blade = blade;
+
+    // Knives (inherit from blade)
+    const knife = await new KnifeBuilder(this.manager).build(blade.id);
+    this.weapons.knife = knife;
+    this.weapons.pocketKnife = await new PocketKnifeBuilder(this.manager).build(knife.id);
+    this.weapons.combatKnife = await new CombatKnifeBuilder(this.manager).build(knife.id);
+    this.weapons.switchblade = await new SwitchbladeBuilder(this.manager).build(knife.id);
+    this.weapons.boxCutter = await new BoxCutterBuilder(this.manager).build(knife.id);
+    this.weapons.butterflyKnife = await new ButterflyKnifeBuilder(this.manager).build(knife.id);
+    this.weapons.stiletto = await new StilettoBuilder(this.manager).build(knife.id);
+    this.weapons.shiv = await new ShivBuilder(this.manager).build(knife.id);
+
+    // Machetes (inherit from blade)
+    const machete = await new MacheteBuilder(this.manager).build(blade.id);
+    this.weapons.machete = machete;
+    this.weapons.cleaver = await new CleaverBuilder(this.manager).build(machete.id);
+    this.weapons.kukri = await new KukriBuilder(this.manager).build(machete.id);
+
+    // Japanese swords (inherit from blade)
+    const katana = await new KatanaBuilder(this.manager).build(blade.id);
+    this.weapons.katana = katana;
+    this.weapons.wakizashi = await new WakizashiBuilder(this.manager).build(katana.id);
+    this.weapons.tanto = await new TantoBuilder(this.manager).build(katana.id);
+    this.weapons.ninjato = await new NinjatōBuilder(this.manager).build(katana.id);
+
+    // Western swords (inherit from blade)
+    const sword = await new SwordBuilder(this.manager).build(blade.id);
+    this.weapons.sword = sword;
+    this.weapons.longsword = await new LongswordBuilder(this.manager).build(sword.id);
+    this.weapons.shortsword = await new ShortswordBuilder(this.manager).build(sword.id);
+    this.weapons.rapier = await new RapierBuilder(this.manager).build(sword.id);
+    this.weapons.cutlass = await new CutlassBuilder(this.manager).build(sword.id);
+
+    // Axes (inherit from blade)
+    const axe = await new AxeBuilder(this.manager).build(blade.id);
+    this.weapons.axe = axe;
+    this.weapons.hatchet = await new HatchetBuilder(this.manager).build(axe.id);
+    this.weapons.fireAxe = await new FireAxeBuilder(this.manager).build(axe.id);
+    this.weapons.tomahawk = await new TomahawkBuilder(this.manager).build(axe.id);
+
+    console.log(`✅ Built ${Object.keys(this.weapons).length} bladed weapon prototypes`);
+  }
+
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    const objectManager = await this.manager.load(0);
+    if (!objectManager) return;
+
+    for (const [name, obj] of Object.entries(this.weapons)) {
+      if (obj) {
+        await objectManager.call('addAlias', name, obj.id);
+      }
+    }
+  }
+}
+
+// Self-register
+registerBuilder(BladedWeaponPrototypesBuilder);

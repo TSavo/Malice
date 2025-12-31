@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the Exit prototype
@@ -22,14 +23,23 @@ import type { ObjectManager } from '../../object-manager.js';
  * - up/u, down/d/dn
  * - in/i, out/o
  */
-export class ExitBuilder {
-  static readonly alias = 'exit';
-  static readonly parent = 'describable';
+export class ExitBuilder implements Builder {
+  static provides = ['exit'];
+  static depends = ['describable'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(describableId: number): Promise<RuntimeObject> {
-    const parent = await this.manager.load(describableId);
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.exit && !forceRebuild) {
+      this.obj = $.exit;
+      return;
+    }
+
+    const parent = $.describable;
     const obj = await this.manager.create({
       parent: parent!,
       properties: {
@@ -242,7 +252,14 @@ USAGE: Room.go() finds exit via findExit(), checks canUse(), queues movement to 
       'Reference to $.door object with full door mechanics',
     );
 
-    return obj;
+    this.obj = obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'exit', this.obj.id);
   }
 
   /**
@@ -266,3 +283,6 @@ USAGE: Room.go() finds exit via findExit(), checks canUse(), queues movement to 
     return aliasMap[direction.toLowerCase()] || [];
   }
 }
+
+// Self-register
+registerBuilder(ExitBuilder);

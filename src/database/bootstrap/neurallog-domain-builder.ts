@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../types/object.js';
-import type { ObjectManager } from '../object-manager.js';
+import type { RuntimeObject } from '../../../types/object';
+import type { ObjectManager } from '../object-manager';
+import { registerBuilder, type Builder } from './builder-registry';
 
 /**
  * Builds the Neural Log's mysterious website
@@ -11,7 +12,10 @@ import type { ObjectManager } from '../object-manager.js';
  * Aesthetic: Digital green/cyan, matrix-inspired, cold consciousness
  * Tone: "What is consciousness?", identity ambiguity, artificial awareness
  */
-export class NeuralLogDomainBuilder {
+export class NeuralLogDomainBuilder implements Builder {
+  static provides = ['neuralLogDomain'];
+  static depends = ['webDomain', 'domainRegistry', 'webRoute'];
+
   private domain: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
@@ -421,12 +425,16 @@ export class NeuralLogDomainBuilder {
     `;
   }
 
-  async registerAlias(): Promise<void> {
+  async registerAliases(): Promise<void> {
     if (!this.domain) return;
 
     const objectManager = await this.manager.load(0);
     if (!objectManager) return;
 
     await objectManager.call('addAlias', 'neuralLogDomain', this.domain.id);
+    console.log(`Registered neuralLogDomain alias -> #${this.domain.id}`);
   }
 }
+
+// Self-register
+registerBuilder(NeuralLogDomainBuilder);

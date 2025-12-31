@@ -6,11 +6,11 @@
  */
 
 import { WebSocket, WebSocketServer } from 'ws';
-import type { Method, ObjId } from '../../types/object.js';
-import type { ObjectManager } from '../database/object-manager.js';
-import { RelationshipAnalyzer } from '../lsp/relationship-analyzer.js';
-import { MethodTemplateGenerator } from './method-templates.js';
-import { TypeGenerator } from './type-generator.js';
+import type { Method, ObjId } from '../../types/object';
+import type { ObjectManager } from '../database/object-manager';
+import { RelationshipAnalyzer } from '../lsp/relationship-analyzer';
+import { MethodTemplateGenerator } from './method-templates';
+import { TypeGenerator } from './type-generator';
 
 interface JsonRpcRequest {
   jsonrpc: '2.0';

@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the CloneTank prototype
@@ -27,15 +28,26 @@ import type { ObjectManager } from '../../object-manager.js';
  *   // ... minutes later ...
  *   await tank.completeResurrection();
  */
-export class CloneTankBuilder {
-  static readonly alias = 'cloneTank';
-  static readonly parent = 'describable';
+export class CloneTankBuilder implements Builder {
+  static provides = ['cloneTank'];
+  static depends = ['describable'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: number): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.cloneTank && !forceRebuild) {
+      this.obj = $.cloneTank;
+      return;
+    }
+
+    const parentObj = $.describable;
+    if (!parentObj) throw new Error('CloneTankBuilder: $describable not found');
+
+    this.obj = await this.manager.create({
       parent: parentObj!,
       properties: {
         name: 'Clone Tank',
@@ -77,6 +89,8 @@ IMMOVABLE: 'boltedDown' true. Cannot be moved.`,
       },
       methods: {},
     });
+
+    const obj = this.obj;
 
     // ═══════════════════════════════════════════════════════════════════
     // BACKUP DATA MANAGEMENT
@@ -558,7 +572,15 @@ IMMOVABLE: 'boltedDown' true. Cannot be moved.`,
       'Minutes required to grow a clone (default 5)',
     );
     obj.setPropertyDescription('owner', 'Player who owns this tank (ObjRef)');
+  }
 
-    return obj;
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'cloneTank', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(CloneTankBuilder);

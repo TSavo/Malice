@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the Door prototype
@@ -19,28 +20,42 @@ import type { ObjectManager } from '../../object-manager.js';
  * - durability: Number - structural integrity (0-100)
  * - material: String - what the door is made of
  */
-export class DoorBuilder {
-  static readonly alias = 'door';
-  static readonly parent = 'describable';
+export class DoorBuilder implements Builder {
+  static provides = ['door'];
+  static depends = ['describable'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: number): Promise<RuntimeObject> {
-    const parent = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parent!,
-      properties: {
-        name: 'Door',
-        description: 'A sturdy door between rooms.',
-        locked: false,
-        open: true,
-        locks: [],
-        lockDifficulty: 5,
-        durability: 100,
-        material: 'wood',
-        autolockOnClose: false,
-        // Abilities - physics rules for AI interpretation
-        abilities: `Hinged door that swings open or closed. Passage blocked when 'open' is false or 'locked' is true.
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.door && !forceRebuild) {
+      this.obj = $.door;
+      return;
+    }
+
+    const parentObj = $.describable;
+    if (!parentObj) throw new Error('DoorBuilder: $describable not found');
+
+    if ($.door) {
+      this.obj = $.door;
+    } else {
+      this.obj = await this.manager.create({
+        parent: parentObj,
+        properties: {
+          name: 'Door',
+          description: 'A sturdy door between rooms.',
+          locked: false,
+          open: true,
+          locks: [],
+          lockDifficulty: 5,
+          durability: 100,
+          material: 'wood',
+          autolockOnClose: false,
+          // Abilities - physics rules for AI interpretation
+          abilities: `Hinged door that swings open or closed. Passage blocked when 'open' is false or 'locked' is true.
 
 UNLOCKING: If 'locks' array is empty, door can be unlocked freely. Otherwise, all locks in array must authorize the player (check each lock's abilities and verifiedUsers). May also have a 'code' property - correct code unlocks.
 
@@ -49,9 +64,12 @@ PICKING: Can be picked with thin rigid tools. Compare tool rigidity + player ski
 FORCING: Can be forced open. Compare player strength against 'durability'. Success opens but damages door (reduce durability). May break if durability reaches 0.
 
 CLOSING: Setting 'open' to false closes the door. If 'autolockOnClose' is true, also sets 'locked' to true.`,
-      },
-      methods: {},
-    });
+        },
+        methods: {},
+      });
+    }
+
+    const obj = this.obj!;
 
     // Add property descriptions
     obj.setPropertyDescription(
@@ -130,7 +148,19 @@ CLOSING: Setting 'open' to false closes the door. If 'autolockOnClose' is true, 
       return true;
     `,
     );
+  }
 
-    return obj;
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+
+    const objectManager = await this.manager.load(0);
+    if (!objectManager) return;
+
+    await objectManager.call('addAlias', 'door', this.obj.id);
+    console.log(`  ✅ Registered $door -> #${this.obj.id}`);
   }
 }
+
+// Self-register
+registerBuilder(DoorBuilder);

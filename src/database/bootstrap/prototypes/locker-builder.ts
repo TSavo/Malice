@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the Locker prototype
@@ -18,15 +19,24 @@ import type { ObjectManager } from '../../object-manager.js';
  *
  * Subprototypes: $.oneTimeLocker (adds verbs/messaging for courier use)
  */
-export class LockerBuilder {
-  static readonly alias = 'locker';
-  static readonly parent = 'location';
+export class LockerBuilder implements Builder {
+  static provides = ['locker'];
+  static depends = ['location'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(locationId: number): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(locationId);
-    const obj = await this.manager.create({
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.locker && !forceRebuild) {
+      this.obj = $.locker;
+      return;
+    }
+
+    const parentObj = $.location;
+    this.obj = await this.manager.create({
       parent: parentObj!,
       properties: {
         name: 'Locker Bank',
@@ -58,6 +68,8 @@ EXPIRATION: checkExpired() auto-expires old rentals. getExpirationInfo() shows t
       },
       methods: {},
     });
+
+    const obj = this.obj;
 
     // ═══════════════════════════════════════════════════════════════════
     // COMPARTMENT MANAGEMENT
@@ -842,7 +854,15 @@ EXPIRATION: checkExpired() auto-expires old rentals. getExpirationInfo() shows t
       'rentalDurationMs',
       'Rental period in milliseconds (default: 7 days), after which contents are recycled',
     );
+  }
 
-    return obj;
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'locker', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(LockerBuilder);
