@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the OneTimeLocker prototype
@@ -17,15 +18,26 @@ import type { ObjectManager } from '../../object-manager.js';
  * - "put <item> in locker A1" - store an item
  * - "get from locker A1" - then choose item to take
  */
-export class OneTimeLockerBuilder {
-  static readonly alias = 'oneTimeLocker';
-  static readonly parent = 'locker';
+export class OneTimeLockerBuilder implements Builder {
+  static provides = ['oneTimeLocker'];
+  static depends = ['locker'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(lockerId: number): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(lockerId);
-    const obj = await this.manager.create({
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.oneTimeLocker && !forceRebuild) {
+      this.obj = $.oneTimeLocker;
+      return;
+    }
+
+    const parentObj = $.locker;
+    if (!parentObj) throw new Error('OneTimeLockerBuilder: $locker not found');
+
+    this.obj = await this.manager.create({
       parent: parentObj!,
       properties: {
         name: 'One-Time Locker Bank',
@@ -53,6 +65,8 @@ VERB REGISTRATION: Registers verbs when placed in room or player enters. Unregis
       },
       methods: {},
     });
+
+    const obj = this.obj;
 
     // ═══════════════════════════════════════════════════════════════════
     // VERB HANDLERS
@@ -516,6 +530,16 @@ VERB REGISTRATION: Registers verbs when placed in room or player enters. Unregis
       'Rental period in milliseconds (24 hours for courier lockers vs 7 days for base)',
     );
 
-    return obj;
+    this.obj = obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'oneTimeLocker', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(OneTimeLockerBuilder);

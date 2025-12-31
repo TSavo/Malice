@@ -6,6 +6,6 @@
  * for batch retrieval.
  */
 
-export { PollingChannel } from './polling-channel.js';
-export { PollingMux, type MuxMessage } from './polling-mux.js';
-export { PollingMuxTransport } from './polling-mux-transport.js';
+export { PollingChannel } from './polling-channel';
+export { PollingMux, type MuxMessage } from './polling-mux';
+export { PollingMuxTransport } from './polling-mux-transport';

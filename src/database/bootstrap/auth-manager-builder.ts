@@ -1,11 +1,15 @@
-import type { RuntimeObject } from '../../../types/object.js';
-import type { ObjectManager } from '../object-manager.js';
+import type { RuntimeObject } from '../../../types/object';
+import type { ObjectManager } from '../object-manager';
+import { registerBuilder, type Builder } from './builder-registry';
 
 /**
  * Builds AuthManager object (dynamic ID)
  * Handles interactive login (username/password)
  */
-export class AuthManagerBuilder {
+export class AuthManagerBuilder implements Builder {
+  static provides = ['authManager'];
+  static depends: string[] = [];
+
   private authManager: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
@@ -317,7 +321,7 @@ export class AuthManagerBuilder {
     );
   }
 
-  async registerAlias(): Promise<void> {
+  async registerAliases(): Promise<void> {
     if (!this.authManager) return;
 
     const objectManager = await this.manager.load(0);
@@ -327,3 +331,6 @@ export class AuthManagerBuilder {
     console.log(`✅ Registered authManager alias -> #${this.authManager.id}`);
   }
 }
+
+// Self-register
+registerBuilder(AuthManagerBuilder);

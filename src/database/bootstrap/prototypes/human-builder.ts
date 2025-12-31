@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the Human prototype
@@ -17,45 +18,44 @@ import type { ObjectManager } from '../../object-manager.js';
  * - Stat aggregation (strength, dexterity, etc.)
  * - Appearance description
  */
-export class HumanBuilder {
-  static readonly alias = 'human';
-  static readonly parent = 'embodied';
+export class HumanBuilder implements Builder {
+  static provides = ['human'];
+  static depends = ['embodied'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  /**
-   * Build the Human prototype or rebuild methods on existing object
-   * @param embodiedId - Parent embodied ID (only used when creating new)
-   * @param existingObj - Optional existing object to rebuild methods on
-   */
-  async build(
-    embodiedId: number,
-    existingObj?: RuntimeObject,
-  ): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(embodiedId);
-    const obj =
-      existingObj ||
-      (await this.manager.create({
-        parent: parentObj!,
-        properties: {
-          name: 'Human',
-          description: 'Base prototype for human-like agents',
-          sex: 'non-binary',
-          pronouns: {
-            subject: 'they',
-            object: 'them',
-            possessive: 'their',
-          },
-          age: 25,
-          species: 'human',
-          // Appearance properties
-          height: 1.7, // meters
-          weight: 75, // kg
-          // Known languages (for understanding speech)
-          knownLanguages: ['English'],
-          nativeLanguage: 'English',
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
 
-          abilities: `Human being with human body structure and social capabilities.
+    if ($.human && !forceRebuild) {
+      this.obj = $.human;
+      return;
+    }
+
+    const parentObj = $.embodied;
+    this.obj = await this.manager.create({
+      parent: parentObj!,
+      properties: {
+        name: 'Human',
+        description: 'Base prototype for human-like agents',
+        sex: 'non-binary',
+        pronouns: {
+          subject: 'they',
+          object: 'them',
+          possessive: 'their',
+        },
+        age: 25,
+        species: 'human',
+        // Appearance properties
+        height: 1.7, // meters
+        weight: 75, // kg
+        // Known languages (for understanding speech)
+        knownLanguages: ['English'],
+        nativeLanguage: 'English',
+
+        abilities: `Human being with human body structure and social capabilities.
 
 IDENTITY: 'sex', 'pronouns', 'age', 'species' define identity. Pronouns affect narration. Age affects appearance description.
 
@@ -73,10 +73,11 @@ STATS: Derived from body part effective capacities:
 SOCIAL: Can speak (via mouth), emote, give items. AI-controlled humans respond to onSpokenTo(), onItemReceived().
 
 BODY STRUCTURE: Standard human layout - torso with head, 2 arms (hands), 2 legs (feet). Body created via $.humanBodyFactory.`,
-        },
-        methods: {},
-      }));
+      },
+      methods: {},
+    });
 
+    const obj = this.obj;
     // Property descriptions
     obj.setPropertyDescription(
       'sex',
@@ -1217,6 +1218,16 @@ BODY STRUCTURE: Standard human layout - torso with head, 2 arms (hands), 2 legs 
     `,
     );
 
-    return obj;
+    this.obj = obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'human', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(HumanBuilder);

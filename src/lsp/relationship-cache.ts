@@ -3,7 +3,7 @@
  * Efficient caching layer for method relationship data
  */
 
-import type { MethodRelationship } from './relationship-analyzer.js';
+import type { MethodRelationship } from './relationship-analyzer';
 
 /**
  * Cache entry with LRU eviction

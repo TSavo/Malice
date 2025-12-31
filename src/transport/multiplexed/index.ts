@@ -1,13 +1,13 @@
 // Core types
 
 // Channel implementation
-export { Channel } from './channel.js';
-export { ChannelMux } from './channel-mux.js';
+export { Channel } from './channel';
+export { ChannelMux } from './channel-mux';
 // Codecs
-export { JsonCodec, jsonCodec } from './codecs/json-codec.js';
+export { JsonCodec, jsonCodec } from './codecs/json-codec';
 
 // Transport
-export { MultiplexedTransport } from './multiplexed-transport.js';
+export { MultiplexedTransport } from './multiplexed-transport';
 export type {
   ChannelMessage,
   CtrlMessage,
@@ -26,4 +26,4 @@ export type {
   StateMessage,
   StateRoom,
   WireCodec,
-} from './types.js';
+} from './types';

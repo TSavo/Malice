@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../types/object.js';
-import type { ObjectManager } from '../object-manager.js';
+import type { RuntimeObject } from '../../../types/object';
+import type { ObjectManager } from '../object-manager';
+import { registerBuilder, type Builder } from './builder-registry';
 
 /**
  * Builds the thecontinuum.city domain
@@ -11,7 +12,10 @@ import type { ObjectManager } from '../object-manager.js';
  * - Wildcard subdomain: * → player profiles
  * - Route tree for all paths
  */
-export class ContinuumDomainBuilder {
+export class ContinuumDomainBuilder implements Builder {
+  static provides = ['continuumDomain'];
+  static depends = ['webDomain', 'domainRegistry', 'webRoute'];
+
   private domain: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
@@ -840,7 +844,7 @@ export class ContinuumDomainBuilder {
     );
   }
 
-  async registerAlias(): Promise<void> {
+  async registerAliases(): Promise<void> {
     if (!this.domain) return;
 
     const objectManager = await this.manager.load(0);
@@ -850,3 +854,6 @@ export class ContinuumDomainBuilder {
     console.log(`Registered continuumDomain alias -> #${this.domain.id}`);
   }
 }
+
+// Self-register
+registerBuilder(ContinuumDomainBuilder);

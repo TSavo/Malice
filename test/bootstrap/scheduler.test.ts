@@ -18,8 +18,7 @@ describe('$.scheduler', () => {
     await db.objects.deleteMany({});
     manager = new ObjectManager(db);
     const bootstrap = new GameBootstrap(manager, {
-      worldBuildMode: 'systems',
-      disableDefaultJobs: true,
+      _testMode: true,
     });
     await bootstrap.bootstrap();
     $ = manager as any;

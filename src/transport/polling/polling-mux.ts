@@ -7,8 +7,8 @@
  */
 
 import { Subject, type Subscription } from 'rxjs';
-import type { IChannel, IChannelMux } from '../multiplexed/types.js';
-import { PollingChannel } from './polling-channel.js';
+import type { IChannel, IChannelMux } from '../multiplexed/types';
+import { PollingChannel } from './polling-channel';
 
 /**
  * Mux message with timestamp for ordering

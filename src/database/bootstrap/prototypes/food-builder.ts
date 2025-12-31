@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the Food prototype
@@ -11,15 +12,24 @@ import type { ObjectManager } from '../../object-manager.js';
  * - The eat() method is infrastructure that handles state changes
  * - AI determines if eating is possible based on abilities
  */
-export class FoodBuilder {
-  static readonly alias = 'food';
-  static readonly parent = 'edible';
+export class FoodBuilder implements Builder {
+  static provides = ['food'];
+  static depends = ['edible'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(edibleId: number): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(edibleId);
-    const obj = await this.manager.create({
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.food && !forceRebuild) {
+      this.obj = $.food;
+      return;
+    }
+
+    const parentObj = $.edible;
+    this.obj = await this.manager.create({
       parent: parentObj!,
       properties: {
         name: 'Food',
@@ -55,6 +65,8 @@ TO CONSUME: Call consume(eater, 'food') method. It handles calorie transfer to s
       },
       methods: {},
     });
+
+    const obj = this.obj;
 
     // Add property descriptions
     obj.setPropertyDescription(
@@ -218,6 +230,16 @@ TO CONSUME: Call consume(eater, 'food') method. It handles calorie transfer to s
     // AI interprets player intent and calls eat() method directly.
     // The onArrived hook from parent ($describable) handles location tracking.
 
-    return obj;
+    this.obj = obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'food', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(FoodBuilder);

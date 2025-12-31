@@ -18,8 +18,7 @@ describe('Perception Filter System', () => {
     await db.objects.deleteMany({});
     manager = new ObjectManager(db);
     const bootstrap = new GameBootstrap(manager, {
-      worldBuildMode: 'systems',
-      disableDefaultJobs: true,
+      _testMode: true,
     });
     await bootstrap.bootstrap();
     $ = manager as any;
@@ -708,8 +707,7 @@ describe('Pluribus System Object', () => {
     await db.objects.deleteMany({});
     manager = new ObjectManager(db);
     const bootstrap = new GameBootstrap(manager, {
-      worldBuildMode: 'systems',
-      disableDefaultJobs: true,
+      _testMode: true,
     });
     await bootstrap.bootstrap();
     $ = manager as any;
@@ -821,8 +819,7 @@ describe('The Mask Wearable', () => {
     await db.objects.deleteMany({});
     manager = new ObjectManager(db);
     const bootstrap = new GameBootstrap(manager, {
-      worldBuildMode: 'systems',
-      disableDefaultJobs: true,
+      _testMode: true,
     });
     await bootstrap.bootstrap();
     $ = manager as any;

@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the Ammo prototype
@@ -15,16 +16,27 @@ import type { ObjectManager } from '../../object-manager.js';
  *
  * Inherits from $.stackable for quantity management.
  */
-export class AmmoBuilder {
-  static readonly alias = 'ammo';
-  static readonly parent = 'stackable';
+export class AmmoBuilder implements Builder {
+  static provides = ['ammo'];
+  static depends = ['stackable'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: number): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.ammo && !forceRebuild) {
+      this.obj = $.ammo;
+      return;
+    }
+
+    const parentObj = $.stackable;
+    if (!parentObj) throw new Error('AmmoBuilder: $stackable not found');
+
+    this.obj = await this.manager.create({
+      parent: parentObj,
       properties: {
         name: 'Ammunition',
         description: 'A quantity of ammunition.',
@@ -60,6 +72,7 @@ EXPOSED: Loose ammo can be damaged by water, fire. Store in sealed containers.`,
       methods: {},
     });
 
+    const obj = this.obj;
     // Override stackType to use ammoType for stacking
     obj.setMethod(
       'canStackWith',
@@ -115,10 +128,18 @@ EXPOSED: Loose ammo can be damaged by water, fire. Store in sealed containers.`,
       'contraband',
       'Whether this ammunition is illegal to possess.',
     );
+  }
 
-    return obj;
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'ammo', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(AmmoBuilder);
 
 /**
  * Specific ammo type builders
@@ -302,8 +323,8 @@ export class Ammo12GaugeBuilder {
  *   $.ammo3030
  *   $.ammo12gauge
  */
-export class AmmoPrototypesBuilder {
-  static readonly aliases = [
+export class AmmoPrototypesBuilder implements Builder {
+  static provides = [
     'ammo9mm',
     'ammo38',
     'ammo44',
@@ -313,37 +334,58 @@ export class AmmoPrototypesBuilder {
     'ammo308',
     'ammo3030',
     'ammo12gauge',
-  ] as const;
-  static readonly parent = 'ammo';
+  ];
+  static depends = ['ammo'];
+
+  private ammoTypes: Record<string, RuntimeObject> = {};
 
   constructor(private manager: ObjectManager) {}
 
-  /**
-   * Build all ammo sub-prototypes
-   * @param ammoId - ID of the base $.ammo prototype
-   * @returns Record of ammo name -> RuntimeObject
-   */
-  async buildAll(ammoId: number): Promise<Record<string, RuntimeObject>> {
-    const ammoTypes: Record<string, RuntimeObject> = {};
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.ammo9mm && !forceRebuild) {
+      for (const alias of AmmoPrototypesBuilder.provides) {
+        if ($[alias]) this.ammoTypes[alias] = $[alias];
+      }
+      return;
+    }
+
+    const parentObj = $.ammo;
+    if (!parentObj) throw new Error('AmmoPrototypesBuilder: $ammo not found');
+
+    const ammoId = parentObj.id;
 
     // Pistol calibers
-    ammoTypes.ammo9mm = await new Ammo9mmBuilder(this.manager).build(ammoId);
-    ammoTypes.ammo38 = await new Ammo38Builder(this.manager).build(ammoId);
-    ammoTypes.ammo44 = await new Ammo44Builder(this.manager).build(ammoId);
-    ammoTypes.ammo45 = await new Ammo45Builder(this.manager).build(ammoId);
-    ammoTypes.ammo22 = await new Ammo22Builder(this.manager).build(ammoId);
-    ammoTypes.ammo380 = await new Ammo380Builder(this.manager).build(ammoId);
+    this.ammoTypes.ammo9mm = await new Ammo9mmBuilder(this.manager).build(ammoId);
+    this.ammoTypes.ammo38 = await new Ammo38Builder(this.manager).build(ammoId);
+    this.ammoTypes.ammo44 = await new Ammo44Builder(this.manager).build(ammoId);
+    this.ammoTypes.ammo45 = await new Ammo45Builder(this.manager).build(ammoId);
+    this.ammoTypes.ammo22 = await new Ammo22Builder(this.manager).build(ammoId);
+    this.ammoTypes.ammo380 = await new Ammo380Builder(this.manager).build(ammoId);
 
     // Rifle calibers
-    ammoTypes.ammo308 = await new Ammo308Builder(this.manager).build(ammoId);
-    ammoTypes.ammo3030 = await new Ammo3030Builder(this.manager).build(ammoId);
+    this.ammoTypes.ammo308 = await new Ammo308Builder(this.manager).build(ammoId);
+    this.ammoTypes.ammo3030 = await new Ammo3030Builder(this.manager).build(ammoId);
 
     // Shotgun
-    ammoTypes.ammo12gauge = await new Ammo12GaugeBuilder(this.manager).build(
-      ammoId,
-    );
+    this.ammoTypes.ammo12gauge = await new Ammo12GaugeBuilder(this.manager).build(ammoId);
 
-    console.log(`✅ Built ${Object.keys(ammoTypes).length} ammo prototypes`);
-    return ammoTypes;
+    console.log(`✅ Built ${Object.keys(this.ammoTypes).length} ammo prototypes`);
+  }
+
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    const objectManager = await this.manager.load(0);
+    if (!objectManager) return;
+
+    for (const [name, obj] of Object.entries(this.ammoTypes)) {
+      if (obj) {
+        await objectManager.call('addAlias', name, obj.id);
+      }
+    }
   }
 }
+
+// Self-register
+registerBuilder(AmmoPrototypesBuilder);

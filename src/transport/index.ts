@@ -1,3 +1,3 @@
-export { BaseTransport } from './base-transport.js';
-export * from './websocket/index.js';
-export * from './polling/index.js';
+export { BaseTransport } from './base-transport';
+export * from './websocket/index';
+export * from './polling/index';

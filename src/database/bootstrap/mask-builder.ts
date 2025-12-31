@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../types/object.js';
-import type { ObjectManager } from '../object-manager.js';
+import type { RuntimeObject } from '../../../types/object';
+import type { ObjectManager } from '../object-manager';
+import { registerBuilder, type Builder } from './builder-registry';
 
 /**
  * Builds The Mask - the neural interface that connects a wearer to Pluribus.
@@ -13,19 +14,37 @@ import type { ObjectManager } from '../object-manager.js';
  * The Mask has rejection protocols. Hostile entities who attempt to wear it
  * suffer consequences.
  */
-export class MaskBuilder {
-  private mask?: RuntimeObject;
+export class MaskBuilder implements Builder {
+  static provides = ['theMask'];
+  static depends = ['wearable']; // Inherits from $wearable
+
+  private mask: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(
-    wearableId: number,
-    existingObj?: RuntimeObject,
-  ): Promise<RuntimeObject> {
-    const parent = await this.manager.load(wearableId);
-    const obj =
-      existingObj ||
-      (await this.manager.create({
+  async build(forceRebuild = false): Promise<void> {
+    const objectManager = await this.manager.load(0);
+    if (!objectManager) throw new Error('Root object not found');
+
+    const aliases =
+      (objectManager.get('aliases') as Record<string, number>) || {};
+
+    // Check if already exists
+    if (aliases.theMask) {
+      this.mask = await this.manager.load(aliases.theMask);
+      if (this.mask && !forceRebuild) return;
+    }
+
+    // Get wearable prototype from alias
+    if (!aliases.wearable) {
+      throw new Error('$wearable must be built before $theMask');
+    }
+    const parent = await this.manager.load(aliases.wearable);
+    if (!parent) {
+      throw new Error('Failed to load $wearable');
+    }
+
+    this.mask = await this.manager.create({
         parent: parent!,
         properties: {
           name: 'The Mask',
@@ -60,14 +79,11 @@ REJECTION: May reject hostile entities per Pluribus authorization.`,
           bondState: 'inactive',
         },
         methods: {},
-      }));
+      })!;
 
-    this.addWearMethods(obj);
-    this.addPerceptionFilterMethods(obj);
-    this.addSensoryHookMethods(obj);
-
-    this.mask = obj;
-    return obj;
+    this.addWearMethods(this.mask);
+    this.addPerceptionFilterMethods(this.mask);
+    this.addSensoryHookMethods(this.mask);
   }
 
   private addWearMethods(obj: RuntimeObject): void {
@@ -308,13 +324,16 @@ REJECTION: May reject hostile entities per Pluribus authorization.`,
     );
   }
 
-  async registerAlias(): Promise<void> {
+  async registerAliases(): Promise<void> {
     if (!this.mask) return;
 
     const objectManager = await this.manager.load(0);
     if (!objectManager) return;
 
     await objectManager.call('addAlias', 'theMask', this.mask.id);
-    console.log(`✅ Registered theMask alias -> #${this.mask.id}`);
+    console.log(`Registered theMask alias -> #${this.mask.id}`);
   }
 }
+
+// Self-register
+registerBuilder(MaskBuilder);

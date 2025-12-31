@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../types/object.js';
-import type { ObjectManager } from '../object-manager.js';
+import type { RuntimeObject } from '../../../types/object';
+import type { ObjectManager } from '../object-manager';
+import { registerBuilder, type Builder } from './builder-registry';
 
 /**
  * Builds Greeter system for post-chargen orientation
@@ -9,7 +10,10 @@ import type { ObjectManager } from '../object-manager.js';
  * - Managing orientation quest state per player
  * - Quest chain logic for both Continuum and Gray Cartel factions
  */
-export class GreeterBuilder {
+export class GreeterBuilder implements Builder {
+  static provides = ['greeter'];
+  static depends: string[] = [];
+
   private greeter: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
@@ -475,13 +479,16 @@ CRITICAL RULES:
     );
   }
 
-  async registerAlias(): Promise<void> {
+  async registerAliases(): Promise<void> {
     if (!this.greeter) return;
 
     const objectManager = await this.manager.load(0);
     if (!objectManager) return;
 
     await objectManager.call('addAlias', 'greeter', this.greeter.id);
-    console.log(`[GreeterBuilder] Registered $greeter alias -> #${this.greeter.id}`);
+    console.log(`Registered greeter alias -> #${this.greeter.id}`);
   }
 }
+
+// Self-register
+registerBuilder(GreeterBuilder);

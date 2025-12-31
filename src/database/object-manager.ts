@@ -6,14 +6,12 @@ import type {
   ObjId,
   PropertyValue,
   RuntimeObject,
-} from '../../types/object.js';
-import type { MCPTelnetClient } from '../mcp/telnet-client.js';
-import { EmailService } from '../services/email.js';
-import { HttpService } from '../services/http.js';
-import { getLoggerFacade, RESERVED_ALIASES } from './logger-facade.js';
-import { ObjectCache } from './object-cache.js';
-import type { ObjectDatabase } from './object-db.js';
-import { RuntimeObjectImpl } from './runtime-object.js';
+} from '../../types/object';
+import type { MCPTelnetClient } from '../mcp/telnet-client';
+import { getLoggerFacade, RESERVED_ALIASES } from './logger-facade';
+import { ObjectCache } from './object-cache';
+import type { ObjectDatabase } from './object-db';
+import { RuntimeObjectImpl } from './runtime-object';
 
 /**
  * Event types emitted by ObjectManager for change notifications
@@ -576,10 +574,6 @@ export class ObjectManager {
   public readonly db: ObjectDatabase; // Expose for DevTools direct access
   private telnetClient?: MCPTelnetClient; // For $.session native methods
   private gameCoordinator?: any; // For $world methods (getAuthenticatedConnections)
-
-  // Email and HTTP services for MOO code
-  private emailService?: EmailService;
-  private httpService: HttpService = new HttpService();
 
   // Track in-flight update operations (fire-and-forget writes from RuntimeObject)
   private pendingUpdateOperations = new Set<Promise<void>>();
@@ -1544,61 +1538,6 @@ export class ObjectManager {
         return client.getStatus(sessionId);
       },
     };
-  }
-
-  /**
-   * Initialize external services (email, http)
-   * Called during server startup with environment config
-   */
-  initializeServices(config: { emailApiKey?: string }): void {
-    if (config.emailApiKey) {
-      this.emailService = new EmailService(config.emailApiKey);
-      console.log('[ObjectManager] Email service initialized');
-    } else {
-      console.log(
-        '[ObjectManager] Email service not configured (EMAIL_API_KEY not set)'
-      );
-    }
-  }
-
-  /**
-   * Register a faction's email domain
-   * Called after factions are loaded to map faction IDs to domains
-   */
-  registerEmailDomain(factionId: number, domain: string): void {
-    if (this.emailService) {
-      this.emailService.registerDomain(factionId, domain);
-      console.log(
-        `[ObjectManager] Registered email domain: ${domain} for faction #${factionId}`
-      );
-    }
-  }
-
-  /**
-   * Get email API object
-   * Exposed as $email in MOO code
-   */
-  get email() {
-    if (!this.emailService) {
-      throw new Error('Email service not configured (EMAIL_API_KEY not set)');
-    }
-    const service = this.emailService;
-    return {
-      send: (opts: {
-        to: string;
-        subject: string;
-        html: string;
-        faction?: RuntimeObject;
-      }) => service.send({ ...opts, factionId: opts.faction?.id }),
-    };
-  }
-
-  /**
-   * Get HTTP API object
-   * Exposed as $http in MOO code
-   */
-  get http() {
-    return this.httpService;
   }
 
   /**

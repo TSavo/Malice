@@ -1,4 +1,4 @@
-import type { ChannelMessage, WireCodec } from '../types.js';
+import type { ChannelMessage, WireCodec } from '../types';
 
 /**
  * JSON wire codec - newline-delimited JSON

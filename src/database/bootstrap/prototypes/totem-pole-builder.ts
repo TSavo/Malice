@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the TotemPole prototype
@@ -14,15 +15,26 @@ import type { ObjectManager } from '../../object-manager.js';
  * In Malice, CorpSec installed cameras in the pole decades ago.
  * Pluribus inherited access to the feeds. Raven sees.
  */
-export class TotemPoleBuilder {
-  static readonly alias = 'totemPole';
-  static readonly parent = 'describable';
+export class TotemPoleBuilder implements Builder {
+  static provides = ['totemPole'];
+  static depends = ['describable'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(describableId: number): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(describableId);
-    const obj = await this.manager.create({
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.totemPole && !forceRebuild) {
+      this.obj = $.totemPole;
+      return;
+    }
+
+    const parentObj = $.describable;
+    if (!parentObj) throw new Error('TotemPoleBuilder: $describable not found');
+
+    this.obj = await this.manager.create({
       parent: parentObj!,
       properties: {
         name: 'Totem Pole',
@@ -81,6 +93,8 @@ The carvings are genuine Tlingit art - stolen twice over.`,
       },
       methods: {},
     });
+
+    const obj = this.obj;
 
     // observe(event, data) - Log an observation (called by Pluribus or surveillance system)
     obj.setMethod(
@@ -209,7 +223,15 @@ The carvings are genuine Tlingit art - stolen twice over.`,
       'observationLog',
       'Array of observations from cameras (last 100)',
     );
+  }
 
-    return obj;
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'totemPole', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(TotemPoleBuilder);

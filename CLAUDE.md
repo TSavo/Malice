@@ -116,9 +116,7 @@ $load(id)    // Load object by ID
 $create({parent, properties, methods})  // Create new object
 $query(criteria?)                       // Fluent query builder (see below)
 $aiQuery(system, prompt, session?)      // Query Claude AI with MCP tools
-$email       // Email service - send emails via faction domains
-$http        // HTTP service - make external HTTP requests
-$<alias>     // Pre-resolved aliases: $room, $exit, $player, $recycler, $session, etc.
+$<alias>     // Pre-resolved aliases: $room, $exit, $player, $recycler, $http, $email, $blob, etc.
 ```
 
 ### Fluent Query Builder
@@ -784,11 +782,11 @@ $continuum.discordWebhook = 'https://discord.com/api/webhooks/...';
 $cartel.discordWebhook = 'https://discord.com/api/webhooks/...';
 ```
 
-## Email and HTTP Services
+## Email, HTTP, and Blob Objects
 
-Services for external communication from MOO code. Requires `EMAIL_API_KEY` environment variable.
+MOO objects for external communication and blob storage. These are proper MOO objects (not injected TypeScript classes) - their methods use native `fetch`, `await import('resend')`, and `await import('mongodb')` for GridFS.
 
-### $email - Email Service
+### $email - Email Object
 
 Send emails via faction-specific domains using Resend:
 
@@ -809,7 +807,7 @@ await $email.send({
 });
 ```
 
-### $http - HTTP Service
+### $http - HTTP Object
 
 Make external HTTP requests (webhooks, APIs):
 
@@ -824,6 +822,10 @@ await $http.post('https://discord.com/api/webhooks/...', {
 const response = await $http.get('https://api.example.com/data');
 // { status: 200, body: { ... } }
 
+// GET binary data (images, files) - returns base64
+const imageResp = await $http.getBinary('https://example.com/image.png');
+// { status: 200, body: 'base64...', contentType: 'image/png' }
+
 // Full request with options
 await $http.request('https://api.example.com', {
   method: 'PUT',
@@ -831,6 +833,54 @@ await $http.request('https://api.example.com', {
   body: { key: 'value' },
   timeout: 5000
 });
+```
+
+### $blob - Blob Storage Object
+
+Store and retrieve binary data using MongoDB GridFS. Binary data is stored on disk, only 24-character keys are stored in object properties (avoiding memory bloat).
+
+```typescript
+// Write binary data, get back a 24-char key
+const blobKey = await $blob.write(base64Data, {
+  contentType: 'image/png',
+  filename: 'avatar.png',
+  createdBy: player.id
+});
+player.avatarBlobKey = blobKey;  // Only 24 chars in memory, not 2MB!
+
+// Read binary data (returns base64)
+const base64Data = await $blob.read(blobKey);
+
+// Get blob metadata
+const meta = await $blob.meta(blobKey);
+// { key, filename, contentType, length, uploadDate, metadata }
+
+// Check if blob exists
+const exists = await $blob.exists(blobKey);
+
+// Delete blob
+await $blob.delete(blobKey);
+
+// Generate URL for web access
+const url = $blob.url(blobKey, 'thecontinuum.city');
+// https://thecontinuum.city/blob/507f1f77bcf86cd799439011
+```
+
+**Typical workflow (e.g., avatar generation in chargen):**
+```typescript
+// Fetch image from AI service
+const imageResp = await $http.getBinary('https://ai-service.com/generate?prompt=...');
+
+// Store in blob storage
+const blobKey = await $blob.write(imageResp.body, {
+  contentType: imageResp.contentType,
+  filename: 'avatar.png'
+});
+
+// Store only the key in player prop (not the 2MB image!)
+player.avatarBlobKey = blobKey;
+
+// Player can view at: https://faction.domain/blob/{blobKey}
 ```
 
 All transports require authentication. Players must first register via `POST /register` on the faction's HTTP server, then connect via WebSocket or Session MCP with their credentials. Connections are tagged with `factionId` for routing to the correct character generation flow.

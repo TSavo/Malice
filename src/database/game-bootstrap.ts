@@ -1,39 +1,33 @@
-import { AliasLoader, MinimalBootstrap } from './bootstrap/index.js';
-import type { ObjectManager } from './object-manager.js';
-
-export type WorldBuildMode = 'full' | 'systems' | 'skip';
+import { AliasLoader, MinimalBootstrap } from './bootstrap/index';
+import { runBuilders, rebuildAllMethods } from './bootstrap/builder-registry';
+import type { ObjectManager } from './object-manager';
 
 export interface GameBootstrapOptions {
+  /**
+   * If true, rebuild all builder methods on existing objects.
+   * Useful for development when you've changed method code.
+   * Set via FORCE_BOOTSTRAP=true environment variable.
+   */
   forceBootstrap?: boolean;
+
   /**
-   * Controls what gets built when we detect a missing world.
-   * - `full`: build prototypes + core systems + world geometry and buildings
-   * - `systems`: build prototypes + core systems only (fast; good for unit tests)
-   * - `skip`: fail fast if world not built (default for production)
-   *
-   * For production, run `npm run bootstrap:world` before starting the server.
-   * For tests, use `worldBuildMode: 'systems'` to bootstrap inline.
+   * TEST ONLY: Build world inline if missing.
+   * Production should NEVER use this - run `npm run bootstrap:world` instead.
    */
-  worldBuildMode?: WorldBuildMode;
-  /**
-   * Skip registering built-in scheduler jobs like `playerHeartbeat` and `decayTick`.
-   * Useful for tests where background jobs cause persistent writes.
-   */
-  disableDefaultJobs?: boolean;
+  _testMode?: boolean;
 }
 
 /**
- * Main bootstrap coordinator
- * Delegates to specialized bootstrap modules
+ * Game startup coordinator
  *
- * Philosophy: Minimal TypeScript bootstrap, maximum MOO flexibility
+ * This assumes the world has already been built via CLI:
+ *   npm run bootstrap:world
  *
- * This creates only:
- * - #1 Root (config storage)
- * - #2 System (connection router)
- * - #3 Programmer (can build everything else)
- *
- * Everything else is created by Programmer.buildWorld() via DevTools
+ * On startup it:
+ * 1. Loads all objects into memory
+ * 2. Loads aliases from root.aliases
+ * 3. Validates the world is built (fails if not)
+ * 4. Optionally rebuilds methods if FORCE_BOOTSTRAP=true
  */
 export class GameBootstrap {
   private options: GameBootstrapOptions;
@@ -43,49 +37,49 @@ export class GameBootstrap {
     options: GameBootstrapOptions = {},
   ) {
     this.options = {
-      worldBuildMode: 'skip',
-      disableDefaultJobs: false,
+      forceBootstrap: false,
+      _testMode: false,
       ...options,
     };
   }
 
   /**
-   * Bootstrap the game system
+   * Initialize the game system
    */
   async bootstrap(): Promise<void> {
-    console.log('🎮 Bootstrapping Malice...');
+    console.log('🎮 Starting Malice...');
 
     // Phase 0: Load ALL objects into memory
     // This ensures synchronous property access (getSync/fromValue) always works
     // In-memory state is the single source of truth; DB is only for persistence.
     await this.manager.loadAll();
 
-    // Phase 1: Create minimal required objects
+    // Phase 1: Create minimal required objects (Root, System) if missing
+    // These are needed for the alias system to work
     const minimalBootstrap = new MinimalBootstrap(this.manager);
     await minimalBootstrap.bootstrap();
 
     // Phase 2: Load aliases from MongoDB
     // ALL aliases are loaded from root.properties.aliases
-    // No hardcoded aliases in TypeScript!
     const aliasLoader = new AliasLoader(this.manager);
     await aliasLoader.loadAliases();
 
-    // Phase 3: Check if world is built
-    await this.checkWorldStatus();
-  }
+    // Phase 3: Validate world is built (or build for tests)
+    const worldExists = await this.checkWorld();
 
-  /**
-   * Check if the world has been built, and build it if not
-   */
-  private async checkWorldStatus(): Promise<void> {
-    const $ = this.manager as any;
-    const describable = $.describable;
-    const player = $.player;
-    const authManager = $.authManager;
-
-    if (!describable || !player || !authManager) {
-      if (this.options.worldBuildMode === 'skip') {
-        // Fail fast - world must be built before starting server
+    if (!worldExists) {
+      if (this.options._testMode) {
+        // TEST ONLY: Build inline
+        console.log('  [TEST MODE] Building world inline...');
+        await import('./bootstrap/all-builders.js');
+        // Aliases needed before builders ($.root, $.system)
+        await aliasLoader.loadAliases();
+        await runBuilders(this.manager);
+        // Reload aliases after builders add new ones
+        await aliasLoader.loadAliases();
+        console.log('  [TEST MODE] World built');
+      } else {
+        // Production: Fail - world must be pre-built
         console.error('');
         console.error(
           '═══════════════════════════════════════════════════════════',
@@ -99,28 +93,10 @@ export class GameBootstrap {
         console.error('');
         process.exit(1);
       }
+    }
 
-      console.log('');
-      console.log(
-        '═══════════════════════════════════════════════════════════',
-      );
-      console.log('  🏗️  Building World...');
-      console.log(
-        '═══════════════════════════════════════════════════════════',
-      );
-      console.log('');
-
-      if (this.options.worldBuildMode === 'systems') {
-        await this.buildSystemsOnly();
-      } else {
-        await this.buildWorld();
-      }
-
-      console.log('');
-      console.log('✅ World built successfully!');
-      console.log('');
-    } else if (this.options.forceBootstrap) {
-      // World exists but force rebuild methods
+    // Phase 4: Optionally rebuild methods (dev only)
+    if (this.options.forceBootstrap) {
       console.log('');
       console.log(
         '═══════════════════════════════════════════════════════════',
@@ -131,7 +107,12 @@ export class GameBootstrap {
       );
       console.log('');
 
-      await this.rebuildPrototypeMethods();
+      // Import all builders to register them
+      await import('./bootstrap/all-builders.js');
+      await rebuildAllMethods(this.manager);
+
+      // Reload aliases after rebuild
+      await aliasLoader.loadAliases();
 
       console.log('');
       console.log('✅ Prototype methods rebuilt!');
@@ -142,190 +123,15 @@ export class GameBootstrap {
   }
 
   /**
-   * Rebuild methods on existing prototypes (called when FORCE_BOOTSTRAP=true)
+   * Check if the world has been built
+   * @returns true if world exists, false if not
    */
-  private async rebuildPrototypeMethods(): Promise<void> {
-    const { PrototypeOrchestrator } = await import(
-      './bootstrap/prototype-orchestrator.js'
-    );
-    const { CoreSystemBuilder } = await import(
-      './bootstrap/core-system-builder.js'
-    );
+  private async checkWorld(): Promise<boolean> {
+    const $ = this.manager as any;
+    const describable = $.describable;
+    const player = $.player;
+    const authManager = $.authManager;
 
-    const prototypeBuilder = new PrototypeOrchestrator(this.manager);
-    const coreSystemBuilder = new CoreSystemBuilder(this.manager);
-
-    // Rebuild prototype methods
-    console.log('Rebuilding object prototype methods...');
-    await prototypeBuilder.rebuildMethods();
-    console.log(
-      '  ✅ Rebuilt Describable, Agent, Human, Player prototype methods',
-    );
-
-    // Rebuild core system methods
-    console.log('Rebuilding core system methods...');
-    await coreSystemBuilder.rebuildMethods();
-    console.log('  ✅ Rebuilt AuthManager, CharGen, Prompt, etc. methods');
-  }
-
-  /**
-   * Build prototypes + core systems only (no world geometry).
-   * This is useful for unit tests that only need `$.recycler`, prototypes, and core utilities.
-   */
-  private async buildSystemsOnly(): Promise<void> {
-    const { PrototypeOrchestrator } = await import(
-      './bootstrap/prototype-orchestrator.js'
-    );
-    const { CoreSystemBuilder } = await import(
-      './bootstrap/core-system-builder.js'
-    );
-
-    const prototypeBuilder = new PrototypeOrchestrator(this.manager);
-    const coreSystemBuilder = new CoreSystemBuilder(this.manager, {
-      disableDefaultJobs: this.options.disableDefaultJobs,
-    });
-
-    console.log('Creating object prototypes...');
-    await prototypeBuilder.buildPrototypes();
-    console.log('  ✅ Created Describable, Agent, Human, Player prototypes');
-
-    console.log('Creating core systems...');
-    await coreSystemBuilder.buildCoreSystems();
-    console.log('  ✅ Created AuthManager, CharGen, PreAuthHandler, Recycler');
-    console.log(
-      '  ✅ Created $.pronoun, $.proportional, $.room, $.bodyFactory',
-    );
-
-    // Reload aliases so everything is addressable via `manager as any`.
-    const aliasLoader = new AliasLoader(this.manager);
-    await aliasLoader.loadAliases();
-    console.log('  ✅ Loaded all aliases');
-  }
-
-  /**
-   * Build the complete world (prototypes + core systems + world geometry/buildings)
-   */
-  private async buildWorld(): Promise<void> {
-    const { PrototypeOrchestrator } = await import(
-      './bootstrap/prototype-orchestrator.js'
-    );
-    const { CoreSystemBuilder } = await import(
-      './bootstrap/core-system-builder.js'
-    );
-    const { WorldBuilder } = await import('./bootstrap/world-builder.js');
-    const { BuildingBuilder } = await import('./bootstrap/building-builder.js');
-
-    const prototypeBuilder = new PrototypeOrchestrator(this.manager);
-    const coreSystemBuilder = new CoreSystemBuilder(this.manager, {
-      disableDefaultJobs: this.options.disableDefaultJobs,
-    });
-    const worldBuilder = new WorldBuilder(this.manager);
-    const buildingBuilder = new BuildingBuilder(this.manager);
-
-    // Build prototypes
-    console.log('Creating object prototypes...');
-    await prototypeBuilder.buildPrototypes();
-    console.log('  ✅ Created Describable, Agent, Human, Player prototypes');
-
-    // Build core systems
-    console.log('Creating core systems...');
-    await coreSystemBuilder.buildCoreSystems();
-    console.log('  ✅ Created AuthManager, CharGen, PreAuthHandler, Recycler');
-    console.log(
-      '  ✅ Created $.pronoun, $.proportional, $.room, $.bodyFactory',
-    );
-
-    // Reload aliases so they're available for world building
-    const aliasLoader = new AliasLoader(this.manager);
-    await aliasLoader.loadAliases();
-    console.log('  ✅ Loaded all aliases');
-
-    // Build world geometry (rooms and exits)
-    console.log('Creating world geometry...');
-    await worldBuilder.build();
-
-    // Build buildings (multi-floor structures)
-    console.log('Creating buildings...');
-    await buildingBuilder.build();
-    console.log('  ✅ Built Smith Tower and other buildings');
-
-    // Register global building object aliases
-    console.log('Registering global building aliases...');
-    const objectManager = await this.manager.load(0);
-
-    const citySigns = await this.manager.findByProperty(
-      'name',
-      'City Announcement Board',
-    );
-    if (citySigns[0]) {
-      await objectManager?.call('addAlias', 'cityAnnounce', citySigns[0].id);
-      console.log('  ✅ Registered $.cityAnnounce');
-    } else {
-      console.warn('  ⚠️  City Announcement Board not found');
-    }
-
-    const theCoreRooms = await this.manager.findByProperty('name', 'The Core');
-    if (theCoreRooms[0]) {
-      await objectManager?.call('addAlias', 'theCore', theCoreRooms[0].id);
-      console.log('  ✅ Registered $.theCore');
-    } else {
-      console.warn('  ⚠️  The Core not found');
-    }
-
-    const theBlindRooms = await this.manager.findByProperty(
-      'name',
-      'The Blind',
-    );
-    if (theBlindRooms[0]) {
-      await objectManager?.call('addAlias', 'theBlind', theBlindRooms[0].id);
-      console.log('  ✅ Registered $.theBlind');
-    } else {
-      console.warn('  ⚠️  The Blind not found');
-    }
-
-    // Place special objects (created before the world is built)
-    // Reload aliases to include the new room aliases
-    const aliases = (objectManager?.get('aliases') || {}) as Record<
-      string,
-      number
-    >;
-
-    // Sister Gray → Sister's Quarters (z=-5)
-    if (aliases.sisterGray) {
-      const sisterGray = await this.manager.load(aliases.sisterGray);
-      const sistersQuarters = await this.manager.findByProperty(
-        'name',
-        "Sister's Quarters",
-      );
-      if (sisterGray && sistersQuarters.length > 0) {
-        await sisterGray.call('moveTo', sistersQuarters[0]);
-        console.log(
-          `  ✅ Placed Sister Gray in Sister's Quarters (#${sistersQuarters[0].id})`,
-        );
-      }
-    }
-
-    // Pluribus → The Core (z=-1, Smith Tower datacenter)
-    if (aliases.pluribus && aliases.theCore) {
-      const pluribus = await this.manager.load(aliases.pluribus);
-      const theCore = await this.manager.load(aliases.theCore);
-      if (pluribus && theCore) {
-        await pluribus.call('moveTo', theCore);
-        console.log(`  ✅ Placed Pluribus in The Core (#${theCore.id})`);
-      }
-    }
-
-    // The Mask → The Blind (z=-6, underground complex)
-    if (aliases.theMask && aliases.theBlind) {
-      const theMask = await this.manager.load(aliases.theMask);
-      const theBlind = await this.manager.load(aliases.theBlind);
-      if (theMask && theBlind) {
-        await theMask.call('moveTo', theBlind);
-        console.log(`  ✅ Placed The Mask in The Blind (#${theBlind.id})`);
-      }
-    }
-
-    // Reload aliases again to include startRoom
-    await aliasLoader.loadAliases();
+    return !!(describable && player && authManager);
   }
 }

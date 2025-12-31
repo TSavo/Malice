@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../types/object.js';
-import type { ObjectManager } from '../object-manager.js';
+import type { RuntimeObject } from '../../../types/object';
+import type { ObjectManager } from '../object-manager';
+import { registerBuilder, type Builder } from './builder-registry';
 
 /**
  * Builds Prompt utility object ($.prompt)
@@ -19,7 +20,10 @@ import type { ObjectManager } from '../object-manager.js';
  *   const confirmed = await $.prompt.yesorno(player, 'Are you sure?');
  *   if (confirmed) { ... }
  */
-export class PromptBuilder {
+export class PromptBuilder implements Builder {
+  static provides = ['prompt'];
+  static depends: string[] = [];
+
   private prompt: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
@@ -364,7 +368,7 @@ export class PromptBuilder {
     );
   }
 
-  async registerAlias(): Promise<void> {
+  async registerAliases(): Promise<void> {
     if (!this.prompt) return;
 
     const objectManager = await this.manager.load(0);
@@ -374,3 +378,6 @@ export class PromptBuilder {
     console.log(`Registered prompt alias -> #${this.prompt.id}`);
   }
 }
+
+// Self-register
+registerBuilder(PromptBuilder);

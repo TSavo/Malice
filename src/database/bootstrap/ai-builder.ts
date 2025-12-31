@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../types/object.js';
-import type { ObjectManager } from '../object-manager.js';
+import type { RuntimeObject } from '../../../types/object';
+import type { ObjectManager } from '../object-manager';
+import { registerBuilder, type Builder } from './builder-registry';
 
 /**
  * Builds AI object (dynamic ID)
@@ -8,7 +9,10 @@ import type { ObjectManager } from '../object-manager.js';
  * AI-controlled humans are regular $.human instances, just tracked here by role.
  * This object does NOT manage behaviors - it's purely a registry.
  */
-export class AiBuilder {
+export class AiBuilder implements Builder {
+  static provides = ['ai'];
+  static depends = ['aiPrompts']; // Loads defaultAgentPrompt from $.aiPrompts
+
   private ai: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
@@ -2078,13 +2082,16 @@ WORLD LOG: logWorld(author, message) and getWorldLog(limit) manage the deity cha
     );
   }
 
-  async registerAlias(): Promise<void> {
+  async registerAliases(): Promise<void> {
     if (!this.ai) return;
 
     const objectManager = await this.manager.load(0);
     if (!objectManager) return;
 
     await objectManager.call('addAlias', 'ai', this.ai.id);
-    console.log(`✅ Registered ai alias -> #${this.ai.id}`);
+    console.log(`Registered ai alias -> #${this.ai.id}`);
   }
 }
+
+// Self-register
+registerBuilder(AiBuilder);

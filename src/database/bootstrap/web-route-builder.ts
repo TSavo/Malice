@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../types/object.js';
-import type { ObjectManager } from '../object-manager.js';
+import type { RuntimeObject } from '../../../types/object';
+import type { ObjectManager } from '../object-manager';
+import { registerBuilder, type Builder } from './builder-registry';
 
 /**
  * Builds $webRoute prototype (inherits from $webNode)
@@ -25,7 +26,10 @@ import type { ObjectManager } from '../object-manager.js';
  * - requiresAuth: false, true (any auth), or 'admin' (admin only)
  * - handler: Method name to call (default: 'handleRequest')
  */
-export class WebRouteBuilder {
+export class WebRouteBuilder implements Builder {
+  static provides = ['webRoute'];
+  static depends = ['webNode']; // Inherits from $webNode
+
   private webRoute: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
@@ -252,13 +256,16 @@ export class WebRouteBuilder {
     );
   }
 
-  async registerAlias(): Promise<void> {
+  async registerAliases(): Promise<void> {
     if (!this.webRoute) return;
 
     const objectManager = await this.manager.load(0);
     if (!objectManager) return;
 
     await objectManager.call('addAlias', 'webRoute', this.webRoute.id);
-    console.log(`✅ Registered webRoute alias -> #${this.webRoute.id}`);
+    console.log(`Registered webRoute alias -> #${this.webRoute.id}`);
   }
 }
+
+// Self-register
+registerBuilder(WebRouteBuilder);

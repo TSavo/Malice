@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../types/object.js';
-import type { ObjectManager } from '../object-manager.js';
+import type { RuntimeObject } from '../../../types/object';
+import type { ObjectManager } from '../object-manager';
+import { registerBuilder, type Builder } from './builder-registry';
 
 /**
  * Builds English object (dynamic ID)
@@ -12,7 +13,10 @@ import type { ObjectManager } from '../object-manager.js';
  *   $.english.plural(3, 'wolf') -> "wolves"
  *   $.english.ordinal(3) -> "third"
  */
-export class EnglishBuilder {
+export class EnglishBuilder implements Builder {
+  static provides = ['english'];
+  static depends: string[] = [];
+
   private english: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
@@ -912,7 +916,7 @@ export class EnglishBuilder {
     );
   }
 
-  async registerAlias(): Promise<void> {
+  async registerAliases(): Promise<void> {
     if (!this.english) return;
 
     const objectManager = await this.manager.load(0);
@@ -922,3 +926,6 @@ export class EnglishBuilder {
     console.log(`✅ Registered english alias -> #${this.english.id}`);
   }
 }
+
+// Self-register
+registerBuilder(EnglishBuilder);

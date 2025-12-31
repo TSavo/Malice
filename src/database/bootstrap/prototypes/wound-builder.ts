@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the Wound prototype
@@ -18,15 +19,24 @@ import type { ObjectManager } from '../../object-manager.js';
  * - Ticks each game tick (bleed, heal, infect chance, pain)
  * - Removed when fully healed (healingProgress >= 100)
  */
-export class WoundBuilder {
-  static readonly alias = 'wound';
-  static readonly parent = 'describable';
+export class WoundBuilder implements Builder {
+  static provides = ['wound'];
+  static depends = ['describable'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(describableId: number): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(describableId);
-    const obj = await this.manager.create({
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.wound && !forceRebuild) {
+      this.obj = $.wound;
+      return;
+    }
+
+    const parentObj = $.describable;
+    this.obj = await this.manager.create({
       parent: parentObj!,
       properties: {
         name: 'Wound',
@@ -78,6 +88,8 @@ AGGRAVATION: Physical stress, impacts, or movement can aggravate healing wounds.
       },
       methods: {},
     });
+
+    const obj = this.obj;
 
     // Initialize wound with proper values based on type and severity
     obj.setMethod(
@@ -687,7 +699,15 @@ AGGRAVATION: Physical stress, impacts, or movement can aggravate healing wounds.
       'attacker',
       'Reference to the entity that inflicted the wound (if any)',
     );
+  }
 
-    return obj;
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'wound', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(WoundBuilder);

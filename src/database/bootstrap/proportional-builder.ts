@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../types/object.js';
-import type { ObjectManager } from '../object-manager.js';
+import type { RuntimeObject } from '../../../types/object';
+import type { ObjectManager } from '../object-manager';
+import { registerBuilder, type Builder } from './builder-registry';
 
 /**
  * Builds Proportional object (dynamic ID)
@@ -22,7 +23,10 @@ import type { ObjectManager } from '../object-manager.js';
  *
  * The middle 3 messages divide range 1-19 (19 values) into 3 buckets of ~6.33 each.
  */
-export class ProportionalBuilder {
+export class ProportionalBuilder implements Builder {
+  static provides = ['proportional'];
+  static depends: string[] = [];
+
   private proportional: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
@@ -168,7 +172,7 @@ export class ProportionalBuilder {
     );
   }
 
-  async registerAlias(): Promise<void> {
+  async registerAliases(): Promise<void> {
     if (!this.proportional) return;
 
     const objectManager = await this.manager.load(0);
@@ -178,3 +182,6 @@ export class ProportionalBuilder {
     console.log(`✅ Registered proportional alias -> #${this.proportional.id}`);
   }
 }
+
+// Self-register
+registerBuilder(ProportionalBuilder);

@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../types/object.js';
-import type { ObjectManager } from '../object-manager.js';
+import type { RuntimeObject } from '../../../types/object';
+import type { ObjectManager } from '../object-manager';
+import { registerBuilder, type Builder } from './builder-registry';
 
 /**
  * Builds Exclusions utility object ($.exclusions)
@@ -27,7 +28,10 @@ import type { ObjectManager } from '../object-manager.js';
  *   // Define custom exclusions (admin/builder use)
  *   await $.exclusions.define('fly', ['walk', 'sit', 'swim']);
  */
-export class ExclusionsBuilder {
+export class ExclusionsBuilder implements Builder {
+  static provides = ['exclusions'];
+  static depends = ['mutex'];  // Uses $.mutex
+
   private exclusions: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
@@ -371,7 +375,7 @@ export class ExclusionsBuilder {
     );
   }
 
-  async registerAlias(): Promise<void> {
+  async registerAliases(): Promise<void> {
     if (!this.exclusions) return;
 
     const objectManager = await this.manager.load(0);
@@ -381,3 +385,6 @@ export class ExclusionsBuilder {
     console.log(`✅ Registered exclusions alias -> #${this.exclusions.id}`);
   }
 }
+
+// Self-register
+registerBuilder(ExclusionsBuilder);

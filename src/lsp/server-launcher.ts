@@ -3,9 +3,9 @@
  * Entry point for starting the Malice LSP server from VS Code extension
  */
 
-import { ObjectDatabase } from '../database/object-db.js';
-import { ObjectManager } from '../database/object-manager.js';
-import { MaliceLSPServer } from './server.js';
+import { ObjectDatabase } from '../database/object-db';
+import { ObjectManager } from '../database/object-manager';
+import { MaliceLSPServer } from './server';
 
 /**
  * Start the LSP server

@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the HtmlWindow class client module
@@ -7,49 +8,41 @@ import type { ObjectManager } from '../../object-manager.js';
  * Creates $.htmlWindowJs which serves /js/html-window.js
  * Window type for displaying rich HTML content.
  */
-export class HtmlWindowBuilder {
-  static readonly alias = 'htmlWindowJs';
+export class HtmlWindowBuilder implements Builder {
+  static provides = ['htmlWindowJs'];
+  static depends = ['root'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<RuntimeObject> {
-    const objectManager = await this.manager.load(0);
-    if (!objectManager) throw new Error('ObjectManager not found');
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
 
-    const aliases =
-      (objectManager.get('aliases') as Record<string, number>) || {};
-
-    let obj: RuntimeObject | null = null;
-
-    if (aliases[HtmlWindowBuilder.alias]) {
-      obj = await this.manager.load(aliases[HtmlWindowBuilder.alias]);
-      if (obj && !forceRebuild) {
-        console.log(
-          `[HtmlWindowBuilder] Using existing $.${HtmlWindowBuilder.alias}`,
-        );
-        return obj;
-      }
+    if ($.htmlWindowJs && !forceRebuild) {
+      this.obj = $.htmlWindowJs;
+      return;
     }
 
-    if (!obj) {
-      const root = await this.manager.load(1);
-      obj = await this.manager.create({
-        parent: root!,
-        properties: {
-          name: 'HtmlWindow JS Module',
-          description: 'Rich HTML content window',
-        },
-        methods: {},
-      });
+    const parentObj = $.root;
+    if (!parentObj) throw new Error('HtmlWindowBuilder: $root not found');
 
-      await objectManager.call('addAlias', HtmlWindowBuilder.alias, obj.id);
-    }
+    this.obj = await this.manager.create({
+      parent: parentObj,
+      properties: {
+        name: 'HtmlWindow JS Module',
+        description: 'Rich HTML content window',
+      },
+      methods: {},
+    });
+
+    const obj = this.obj;
 
     obj.setMethod(
       'getScript',
       `
       return \`
-import { Window } from '/js/window.js';
+import { Window } from '/js/window';
 
 /**
  * HtmlWindow - Window for displaying rich HTML content
@@ -210,9 +203,15 @@ export class HtmlWindow extends Window {
     `,
     );
 
-    console.log(
-      `[HtmlWindowBuilder] Built $.${HtmlWindowBuilder.alias} -> #${obj.id}`,
-    );
-    return obj;
+    console.log(`[HtmlWindowBuilder] Built $.htmlWindowJs -> #${obj.id}`);
+  }
+
+  async registerAliases(): Promise<void> {
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'htmlWindowJs', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(HtmlWindowBuilder);

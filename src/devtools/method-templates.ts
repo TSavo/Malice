@@ -3,7 +3,7 @@
  * Auto-generates method templates based on category and patterns
  */
 
-import type { MethodSignature } from '../lsp/virtual-fs.js';
+import type { MethodSignature } from '../lsp/virtual-fs';
 
 /**
  * Method template with metadata

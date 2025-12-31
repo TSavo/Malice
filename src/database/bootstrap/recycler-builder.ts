@@ -1,11 +1,15 @@
-import type { RuntimeObject } from '../../../types/object.js';
-import type { ObjectManager } from '../object-manager.js';
+import type { RuntimeObject } from '../../../types/object';
+import type { ObjectManager } from '../object-manager';
+import { registerBuilder, type Builder } from './builder-registry';
 
 /**
  * Builds Recycler object (dynamic ID)
  * Handles object deletion, recovery, and cache cleanup
  */
-export class RecyclerBuilder {
+export class RecyclerBuilder implements Builder {
+  static provides = ['recycler'];
+  static depends: string[] = [];
+
   private recycler: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
@@ -315,7 +319,7 @@ export class RecyclerBuilder {
     );
   }
 
-  async registerAlias(): Promise<void> {
+  async registerAliases(): Promise<void> {
     if (!this.recycler) return;
 
     const objectManager = await this.manager.load(0);
@@ -325,3 +329,6 @@ export class RecyclerBuilder {
     console.log(`✅ Registered recycler alias -> #${this.recycler.id} `);
   }
 }
+
+// Self-register
+registerBuilder(RecyclerBuilder);

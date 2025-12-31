@@ -17,11 +17,11 @@ import {
   type TextDocumentPositionParams,
   TextDocumentSyncKind,
   TextDocuments,
-} from 'vscode-languageserver/node.js';
+} from 'vscode-languageserver/node';
 import { TextDocument } from 'vscode-languageserver-textdocument';
-import type { ObjectManager } from '../database/object-manager.js';
-import { TypeScriptService } from './ts-service.js';
-import { VirtualFileSystem } from './virtual-fs.js';
+import type { ObjectManager } from '../database/object-manager';
+import { TypeScriptService } from './ts-service';
+import { VirtualFileSystem } from './virtual-fs';
 
 /**
  * Malice LSP Server

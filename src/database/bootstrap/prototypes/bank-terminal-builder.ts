@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the BankTerminal prototype
@@ -17,14 +18,23 @@ import type { ObjectManager } from '../../object-manager.js';
  * - Deposit: credchip consumed, money issued to account
  * - Enables anonymous value transfer (and money laundering...)
  */
-export class BankTerminalBuilder {
-  static readonly alias = 'bankTerminal';
-  static readonly parent = 'describable';
+export class BankTerminalBuilder implements Builder {
+  static provides = ['bankTerminal'];
+  static depends = ['describable'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: number): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.bankTerminal && !forceRebuild) {
+      this.obj = $.bankTerminal;
+      return;
+    }
+
+    const parentObj = $.describable;
     const obj = await this.manager.create({
       parent: parentObj!,
       properties: {
@@ -689,6 +699,16 @@ VERBS: 'use terminal', 'bank', 'check balance'. Registered when terminal placed 
       'Array of standard credchip values available for purchase',
     );
 
-    return obj;
+    this.obj = obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'bankTerminal', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(BankTerminalBuilder);

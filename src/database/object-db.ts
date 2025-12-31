@@ -1,5 +1,5 @@
 import { type Collection, type Db, MongoClient } from 'mongodb';
-import type { GameObject, ObjId } from '../../types/object.js';
+import type { GameObject, ObjId } from '../../types/object';
 
 /**
  * Sanitize an object for MongoDB storage, removing circular references

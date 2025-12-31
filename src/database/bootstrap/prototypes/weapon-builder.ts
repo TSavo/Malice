@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the Weapon prototype
@@ -31,15 +32,24 @@ import type { ObjectManager } from '../../object-manager.js';
  * - Rifle: skill="rifle", damage=55, damageType="puncture", twoHanded=true
  * - Sledgehammer: skill="hammer", damage=45, damageType="bruise", twoHanded=true
  */
-export class WeaponBuilder {
-  static readonly alias = 'weapon';
-  static readonly parent = 'describable';
+export class WeaponBuilder implements Builder {
+  static provides = ['weapon'];
+  static depends = ['describable'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: number): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.weapon && !forceRebuild) {
+      this.obj = $.weapon;
+      return;
+    }
+
+    const parentObj = $.describable;
+    this.obj = await this.manager.create({
       parent: parentObj!,
       properties: {
         name: 'Weapon',
@@ -96,6 +106,7 @@ CONDITION: Weapons can degrade with use. Broken weapons have reduced damage or m
       methods: {},
     });
 
+    const obj = this.obj;
     // Add property descriptions
     obj.setPropertyDescription(
       'skill',
@@ -273,15 +284,23 @@ CONDITION: Weapons can degrade with use. Broken weapons have reduced damage or m
       'describe',
       `
       let desc = self.name + '\\r\\n' + self.description;
-      
+
       if (self.ranged && self.maxAmmo > 0) {
         desc += '\\r\\n[' + (self.ammo || 0) + '/' + self.maxAmmo + ' rounds]';
       }
-      
+
       return desc;
     `,
     );
+  }
 
-    return obj;
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'weapon', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(WeaponBuilder);

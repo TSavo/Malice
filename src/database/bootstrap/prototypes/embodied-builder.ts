@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the Embodied prototype
@@ -16,35 +17,39 @@ import type { ObjectManager } from '../../object-manager.js';
  * - Pronouns, age, species
  * - Stat aggregation
  */
-export class EmbodiedBuilder {
-  static readonly alias = 'embodied';
-  static readonly parent = 'agent';
+export class EmbodiedBuilder implements Builder {
+  static provides = ['embodied'];
+  static depends = ['agent'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(
-    agentId: number,
-    existingObj?: RuntimeObject,
-  ): Promise<RuntimeObject> {
-    const parent = await this.manager.load(agentId);
-    const obj =
-      existingObj ||
-      (await this.manager.create({
-        parent: parent!,
-        properties: {
-          name: 'Embodied',
-          description: 'Base prototype for agents with physical bodies',
-          // Body reference - set when body is created
-          body: null, // ObjRef to torso (root of body tree)
-          // Consciousness state
-          conscious: true,
-          // Breath/air tracking for drowning
-          breath: 100, // Current breath 0-100 (100 = full lungs)
-          maxBreath: 100, // Max breath capacity (trained swimmers have more)
-          // Sensory history for AI awareness (last 50 things seen/heard)
-          sensoryHistory: [],
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
 
-          abilities: `Agent with a physical body that has sensory organs, metabolism, and mortality.
+    if ($.embodied && !forceRebuild) {
+      this.obj = $.embodied;
+      return;
+    }
+
+    const parent = $.agent;
+    this.obj = await this.manager.create({
+      parent: parent!,
+      properties: {
+        name: 'Embodied',
+        description: 'Base prototype for agents with physical bodies',
+        // Body reference - set when body is created
+        body: null, // ObjRef to torso (root of body tree)
+        // Consciousness state
+        conscious: true,
+        // Breath/air tracking for drowning
+        breath: 100, // Current breath 0-100 (100 = full lungs)
+        maxBreath: 100, // Max breath capacity (trained swimmers have more)
+        // Sensory history for AI awareness (last 50 things seen/heard)
+        sensoryHistory: [],
+
+        abilities: `Agent with a physical body that has sensory organs, metabolism, and mortality.
 
 BODY STRUCTURE: 'body' property points to torso (root of body tree). Access parts via getBody(), getHead(), getHands(), getEars(), getEyes(). Body parts have their own abilities.
 
@@ -59,10 +64,11 @@ BREATHING: 'breath' tracks air for underwater. Depletes when submerged. Drowning
 WOUNDS: Body parts accumulate wounds. Wounds bleed (drains hydration/calories), cause pain, can infect. bleedTick() processes all wounds each heartbeat.
 
 STRENGTH: Derived from body part effective capacity (maxCalories - decayLevel). Weakest link in arm path limits what can be lifted/held.`,
-        },
-        methods: {},
-      }));
+      },
+      methods: {},
+    });
 
+    const obj = this.obj;
     this.addBodyAccessMethods(obj);
     this.addSensoryMethods(obj);
     this.addCalorieMethods(obj);
@@ -89,7 +95,14 @@ STRENGTH: Derived from body part effective capacity (maxCalories - decayLevel). 
       'Array of last 50 sensory events (see/hear) for AI awareness context',
     );
 
-    return obj;
+    this.obj = obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'embodied', this.obj.id);
   }
 
   private addBodyAccessMethods(obj: RuntimeObject): void {
@@ -1762,3 +1775,6 @@ STRENGTH: Derived from body part effective capacity (maxCalories - decayLevel). 
     );
   }
 }
+
+// Self-register
+registerBuilder(EmbodiedBuilder);

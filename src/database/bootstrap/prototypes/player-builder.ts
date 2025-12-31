@@ -1,70 +1,76 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the Player prototype
  * Base prototype for player characters with authentication and command handling
  */
-export class PlayerBuilder {
-  static readonly alias = 'player';
-  static readonly parent = 'human';
+export class PlayerBuilder implements Builder {
+  static provides = ['player'];
+  static depends = ['human'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(
-    humanId: number,
-    existingObj?: RuntimeObject,
-  ): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(humanId);
-    const obj =
-      existingObj ||
-      (await this.manager.create({
-        parent: parentObj!,
-        properties: {
-          name: 'Player',
-          description: 'Base prototype for player characters',
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
 
-          // Authentication
-          playername: '',
-          email: '',
-          passwordHash: '',
-          sslFingerprint: '',
-          sshPublicKeys: [], // Array of OpenSSH format public keys
-          oauthSubject: '',
+    if ($.player && !forceRebuild) {
+      this.obj = $.player;
+      return;
+    }
 
-          // Permissions
-          canUseDevTools: false,
-          isWizard: false,
-          isSuspended: false,
+    const parentObj = $.human;
+    this.obj = await this.manager.create({
+      parent: parentObj!,
+      properties: {
+        name: 'Player',
+        description: 'Base prototype for player characters',
 
-          // Stats
-          createdAt: null,
-          lastLogin: null,
-          totalPlaytime: 0,
+        // Authentication
+        playername: '',
+        email: '',
+        passwordHash: '',
+        sslFingerprint: '',
+        sshPublicKeys: [], // Array of OpenSSH format public keys
+        oauthSubject: '',
 
-          // Player-specific
-          title: '',
-          homepage: '',
+        // Permissions
+        canUseDevTools: false,
+        isWizard: false,
+        isSuspended: false,
 
-          // Fitness training
-          fitnessXP: 0, // Accumulated XP pool to spend
-          fitnessPlaytime: 0, // Minutes played toward next XP (resets at 180)
-          fitnessXPToday: 0, // XP earned today (max 3)
-          fitnessLastDay: null, // Date string of last XP day (for reset)
+        // Stats
+        createdAt: null,
+        lastLogin: null,
+        totalPlaytime: 0,
 
-          // Clone system
-          cloneBackupTank: null, // ObjRef to tank holding our backup (or null)
+        // Player-specific
+        title: '',
+        homepage: '',
 
-          // Window layout for web client
-          windowLayout: {
-            windows: [],
-            taskbarOrder: [],
-            lastUpdated: null,
-          },
+        // Fitness training
+        fitnessXP: 0, // Accumulated XP pool to spend
+        fitnessPlaytime: 0, // Minutes played toward next XP (resets at 180)
+        fitnessXPToday: 0, // XP earned today (max 3)
+        fitnessLastDay: null, // Date string of last XP day (for reset)
+
+        // Clone system
+        cloneBackupTank: null, // ObjRef to tank holding our backup (or null)
+
+        // Window layout for web client
+        windowLayout: {
+          windows: [],
+          taskbarOrder: [],
+          lastUpdated: null,
         },
-        methods: {},
-      }));
+      },
+      methods: {},
+    });
 
+    const obj = this.obj;
     // Property descriptions
     obj.setPropertyDescription(
       'playername',
@@ -125,7 +131,14 @@ export class PlayerBuilder {
     this.addInventoryMethods(obj);
     this.addFitnessMethods(obj);
 
-    return obj;
+    this.obj = obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'player', this.obj.id);
   }
 
   private addConnectionMethods(obj: RuntimeObject): void {
@@ -3334,3 +3347,6 @@ export class PlayerBuilder {
     );
   }
 }
+
+// Self-register
+registerBuilder(PlayerBuilder);

@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the StomachContents prototype
@@ -18,14 +19,23 @@ import type { ObjectManager } from '../../object-manager.js';
  *
  * Aggregation key: stackType based on sourceProto + spoiled/poisoned state
  */
-export class StomachContentsBuilder {
-  static readonly alias = 'stomachContents';
-  static readonly parent = 'stackable';
+export class StomachContentsBuilder implements Builder {
+  static provides = ['stomachContents'];
+  static depends = ['stackable'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(stackableId: number): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(stackableId);
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.stomachContents && !forceRebuild) {
+      this.obj = $.stomachContents;
+      return;
+    }
+
+    const parentObj = $.stackable;
     const obj = await this.manager.create({
       parent: parentObj!,
       properties: {
@@ -234,6 +244,16 @@ Both flags preserved through digestion for evidence.`,
     `,
     );
 
-    return obj;
+    this.obj = obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'stomachContents', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(StomachContentsBuilder);

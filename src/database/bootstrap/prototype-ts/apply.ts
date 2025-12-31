@@ -1,6 +1,6 @@
-import type { Method, ObjId } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
-import type { ExtractedPrototypeSpec } from './extract.js';
+import type { Method, ObjId } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import type { ExtractedPrototypeSpec } from './extract';
 
 export type ApplyPrototypeOptions = {
   force?: boolean;

@@ -1,5 +1,5 @@
 import { Subject } from 'rxjs';
-import type { IChannel } from './types.js';
+import type { IChannel } from './types';
 
 /**
  * A bidirectional communication channel

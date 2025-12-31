@@ -1,4 +1,4 @@
-import type { ObjectManager } from '../object-manager.js';
+import type { ObjectManager } from '../object-manager';
 
 /**
  * Loads aliases from ObjectManager (#0)

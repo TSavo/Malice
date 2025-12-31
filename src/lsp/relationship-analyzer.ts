@@ -3,7 +3,7 @@
  * Core engine for analyzing method relationships across the codebase
  */
 
-import type { ObjId } from '../../types/object.js';
+import type { ObjId } from '../../types/object';
 
 /**
  * Method relationship types

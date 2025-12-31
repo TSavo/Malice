@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../types/object.js';
-import type { ObjectManager } from '../object-manager.js';
+import type { RuntimeObject } from '../../../types/object';
+import type { ObjectManager } from '../object-manager';
+import { registerBuilder, type Builder } from './builder-registry';
 
 /**
  * Builds Mutex utility object ($.mutex)
@@ -23,7 +24,10 @@ import type { ObjectManager } from '../object-manager.js';
  *
  *   // Objects store their locks in _mutexes property
  */
-export class MutexBuilder {
+export class MutexBuilder implements Builder {
+  static provides = ['mutex'];
+  static depends: string[] = [];
+
   private mutex: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
@@ -278,7 +282,7 @@ export class MutexBuilder {
     );
   }
 
-  async registerAlias(): Promise<void> {
+  async registerAliases(): Promise<void> {
     if (!this.mutex) return;
 
     const objectManager = await this.manager.load(0);
@@ -288,3 +292,6 @@ export class MutexBuilder {
     console.log(`Registered mutex alias -> #${this.mutex.id}`);
   }
 }
+
+// Self-register
+registerBuilder(MutexBuilder);

@@ -1,17 +1,27 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Payphone extends Phone: bolted down, requires bank payment per call.
  */
-export class PayphoneBuilder {
-  static readonly alias = 'payphone';
-  static readonly parent = 'phone';
+export class PayphoneBuilder implements Builder {
+  static provides = ['payphone'];
+  static depends = ['phone'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(phoneId: number): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(phoneId);
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.payphone && !forceRebuild) {
+      this.obj = $.payphone;
+      return;
+    }
+
+    const parentObj = $.phone;
     const obj = await this.manager.create({
       parent: parentObj!,
       properties: {
@@ -75,6 +85,16 @@ USAGE: Caller needs bank account with sufficient balance. Out of service if bank
       'Destination account ID where call payments are deposited',
     );
 
-    return obj;
+    this.obj = obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'payphone', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(PayphoneBuilder);

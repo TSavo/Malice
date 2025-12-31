@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../types/object.js';
-import type { ObjectManager } from '../object-manager.js';
+import type { RuntimeObject } from '../../../types/object';
+import type { ObjectManager } from '../object-manager';
+import { registerBuilder, type Builder } from './builder-registry';
 
 /**
  * Builds the malice.world meta-domain
@@ -12,7 +13,10 @@ import type { ObjectManager } from '../object-manager.js';
  *
  * NOT registered with $domainRegistry - served directly by web-server.ts
  */
-export class MetaDomainBuilder {
+export class MetaDomainBuilder implements Builder {
+  static provides = ['metaDomain'];
+  static depends = ['webDomain', 'webRoute'];
+
   private domain: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
@@ -2894,13 +2898,16 @@ function escapeHtml(str) {
     );
   }
 
-  async registerAlias(): Promise<void> {
+  async registerAliases(): Promise<void> {
     if (!this.domain) return;
 
     const objectManager = await this.manager.load(0);
     if (!objectManager) return;
 
     await objectManager.call('addAlias', 'metaDomain', this.domain.id);
-    console.log(`[MetaDomain] Registered metaDomain alias -> #${this.domain.id}`);
+    console.log(`Registered metaDomain alias -> #${this.domain.id}`);
   }
 }
+
+// Self-register
+registerBuilder(MetaDomainBuilder);

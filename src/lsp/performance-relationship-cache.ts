@@ -5,7 +5,7 @@
  * NOTE: This is a stub implementation - not currently used
  */
 
-import type { MethodRelationship } from './relationship-analyzer.js';
+import type { MethodRelationship } from './relationship-analyzer';
 
 /**
  * Cache performance metrics

@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the FactionManager singleton
@@ -25,21 +26,28 @@ import type { ObjectManager } from '../../object-manager.js';
  * - 'friendly', 'hostile', 'neutral' between factions
  * - Bidirectional (stored once with sorted key)
  */
-export class FactionManagerBuilder {
-  static readonly alias = 'factionManager';
-  static readonly parent = 'root';
+export class FactionManagerBuilder implements Builder {
+  static provides = ['factionManager'];
+  static depends = ['root'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(
-    rootId: number,
-    existingObj?: RuntimeObject,
-  ): Promise<RuntimeObject> {
-    const obj =
-      existingObj ??
-      (await this.manager.create({
-        parent: (await this.manager.load(rootId))!,
-        properties: {
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.factionManager && !forceRebuild) {
+      this.obj = $.factionManager;
+      return;
+    }
+
+    const parentObj = $.root;
+    if (!parentObj) throw new Error('FactionManagerBuilder: $root not found');
+
+    this.obj = await this.manager.create({
+      parent: parentObj,
+      properties: {
           name: 'Faction Manager',
           description:
             'Singleton manager for faction creation, memberships, and relationships.',
@@ -67,7 +75,9 @@ CHECKS: isFriendly(entityA, entityB) true if same faction or allied. isHostile(e
 LOOKUP: getByDomain(domain) returns faction. list() returns all factions.`,
         },
         methods: {},
-      }));
+      });
+
+    const obj = this.obj;
 
     // Create a new faction (main entry point)
     obj.setMethod(
@@ -504,7 +514,15 @@ LOOKUP: getByDomain(domain) returns faction. list() returns all factions.`,
       'domainMap',
       'Map of domain -> factionId for quick domain lookup',
     );
+  }
 
-    return obj;
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'factionManager', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(FactionManagerBuilder);

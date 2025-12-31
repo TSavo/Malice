@@ -19,7 +19,7 @@
 
 import crypto from 'node:crypto';
 import Fastify from 'fastify';
-import type { ObjectManager } from '../database/object-manager.js';
+import type { ObjectManager } from '../database/object-manager';
 
 export interface WebServerConfig {
   port?: number;

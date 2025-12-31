@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the Window base class client module
@@ -7,41 +8,35 @@ import type { ObjectManager } from '../../object-manager.js';
  * Creates $.windowJs which serves /js/window.js
  * Base window class with drag, resize, minimize/maximize/close.
  */
-export class WindowBuilder {
-  static readonly alias = 'windowJs';
+export class WindowBuilder implements Builder {
+  static provides = ['windowJs'];
+  static depends = ['root'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<RuntimeObject> {
-    const objectManager = await this.manager.load(0);
-    if (!objectManager) throw new Error('ObjectManager not found');
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
 
-    const aliases =
-      (objectManager.get('aliases') as Record<string, number>) || {};
-
-    let obj: RuntimeObject | null = null;
-
-    if (aliases[WindowBuilder.alias]) {
-      obj = await this.manager.load(aliases[WindowBuilder.alias]);
-      if (obj && !forceRebuild) {
-        console.log(`[WindowBuilder] Using existing $.${WindowBuilder.alias}`);
-        return obj;
-      }
+    if ($.windowJs && !forceRebuild) {
+      this.obj = $.windowJs;
+      return;
     }
 
-    if (!obj) {
-      const root = await this.manager.load(1);
-      obj = await this.manager.create({
-        parent: root!,
-        properties: {
-          name: 'Window JS Module',
-          description: 'Base window class for desktop UI',
-        },
-        methods: {},
-      });
+    const parentObj = $.root;
+    if (!parentObj) throw new Error('WindowBuilder: $root not found');
 
-      await objectManager.call('addAlias', WindowBuilder.alias, obj.id);
-    }
+    this.obj = await this.manager.create({
+      parent: parentObj,
+      properties: {
+        name: 'Window JS Module',
+        description: 'Base window class for desktop UI',
+      },
+      methods: {},
+    });
+
+    const obj = this.obj;
 
     obj.setMethod(
       'getScript',
@@ -603,7 +598,15 @@ document.head.appendChild(style);
     `,
     );
 
-    console.log(`[WindowBuilder] Built $.${WindowBuilder.alias} -> #${obj.id}`);
-    return obj;
+    console.log(`[WindowBuilder] Built $.windowJs -> #${obj.id}`);
+  }
+
+  async registerAliases(): Promise<void> {
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'windowJs', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(WindowBuilder);

@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the HumanRemains prototype
@@ -12,14 +13,23 @@ import type { ObjectManager } from '../../object-manager.js';
  * - Limited autopsy possible (bone trauma, maybe some tissue)
  * - Eventually become $.skeletalRemains
  */
-export class HumanRemainsBuilder {
-  static readonly alias = 'humanRemains';
-  static readonly parent = 'describable';
+export class HumanRemainsBuilder implements Builder {
+  static provides = ['humanRemains'];
+  static depends = ['describable'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(describableId: number): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(describableId);
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.humanRemains && !forceRebuild) {
+      this.obj = $.humanRemains;
+      return;
+    }
+
+    const parentObj = $.describable;
     const obj = await this.manager.create({
       parent: parentObj!,
       properties: {
@@ -384,6 +394,16 @@ FORENSICS: Bone fractures still visible. Time since death estimated from tissue 
       'Boolean tracking if remains have been searched. Affects description text.',
     );
 
-    return obj;
+    this.obj = obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'humanRemains', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(HumanRemainsBuilder);

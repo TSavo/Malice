@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../types/object.js';
-import type { ObjectManager } from '../object-manager.js';
+import type { RuntimeObject } from '../../../types/object';
+import type { ObjectManager } from '../object-manager';
+import { registerBuilder, type Builder } from './builder-registry';
 
 /**
  * Builds default faction instances
@@ -12,7 +13,10 @@ import type { ObjectManager } from '../object-manager.js';
  * - CartelCharGenBuilder (creates $cartelCharGen)
  * - NeuralLogCharGenBuilder (creates $neuralLogCharGen) [optional]
  */
-export class DefaultFactionsBuilder {
+export class DefaultFactionsBuilder implements Builder {
+  static provides = ['continuum', 'cartel', 'neuralLog'];
+  static depends = ['faction', 'factionManager', 'charGen', 'cartelCharGen', 'email', 'http'];
+
   private continuum: RuntimeObject | null = null;
   private cartel: RuntimeObject | null = null;
   private neuralLog: RuntimeObject | null = null;
@@ -351,3 +355,6 @@ export class DefaultFactionsBuilder {
     }
   }
 }
+
+// Self-register
+registerBuilder(DefaultFactionsBuilder);

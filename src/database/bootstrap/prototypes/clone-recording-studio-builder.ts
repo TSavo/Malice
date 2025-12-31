@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the CloneRecordingStudio prototype
@@ -23,15 +24,26 @@ import type { ObjectManager } from '../../object-manager.js';
  *   // Player uses the studio
  *   await studio.backup(player);
  */
-export class CloneRecordingStudioBuilder {
-  static readonly alias = 'cloneRecordingStudio';
-  static readonly parent = 'describable';
+export class CloneRecordingStudioBuilder implements Builder {
+  static provides = ['cloneRecordingStudio'];
+  static depends = ['describable'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: number): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.cloneRecordingStudio && !forceRebuild) {
+      this.obj = $.cloneRecordingStudio;
+      return;
+    }
+
+    const parentObj = $.describable;
+    if (!parentObj) throw new Error('CloneRecordingStudioBuilder: $describable not found');
+
+    this.obj = await this.manager.create({
       parent: parentObj!,
       properties: {
         name: 'Clone Recording Studio',
@@ -75,6 +87,8 @@ IMMOVABLE: 'boltedDown' true.`,
       },
       methods: {},
     });
+
+    const obj = this.obj;
 
     // ═══════════════════════════════════════════════════════════════════
     // BACKUP OPERATIONS
@@ -667,7 +681,15 @@ IMMOVABLE: 'boltedDown' true.`,
       'owner',
       'Player who can configure studio settings (ObjRef)',
     );
+  }
 
-    return obj;
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'cloneRecordingStudio', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(CloneRecordingStudioBuilder);

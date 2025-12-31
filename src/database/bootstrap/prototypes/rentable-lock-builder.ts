@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the RentableLock prototype
@@ -22,15 +23,26 @@ import type { ObjectManager } from '../../object-manager.js';
  * - revoke(agent): Removes access
  * - isRenter(agent): Checks if agent currently has access
  */
-export class RentableLockBuilder {
-  static readonly alias = 'rentableLock';
-  static readonly parent = 'lock';
+export class RentableLockBuilder implements Builder {
+  static provides = ['rentableLock'];
+  static depends = ['lock'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(lockId: number): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(lockId);
-    const obj = await this.manager.create({
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.rentableLock && !forceRebuild) {
+      this.obj = $.rentableLock;
+      return;
+    }
+
+    const parentObj = $.lock;
+    if (!parentObj) throw new Error('RentableLockBuilder: $lock not found');
+
+    this.obj = await this.manager.create({
       parent: parentObj!,
       properties: {
         name: 'Rentable Lock',
@@ -64,6 +76,8 @@ COMPOSABLE: 'locks' array can contain additional lock objects (biometric, keycar
       },
       methods: {},
     });
+
+    const obj = this.obj;
 
     obj.setMethod(
       'canAccess',
@@ -213,7 +227,15 @@ COMPOSABLE: 'locks' array can contain additional lock objects (biometric, keycar
       'linkedLockId',
       'Paired lock for syncing codes on double-doors (integer)',
     );
+  }
 
-    return obj;
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'rentableLock', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(RentableLockBuilder);

@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../types/object.js';
-import type { ObjectManager } from '../object-manager.js';
+import type { RuntimeObject } from '../../../types/object';
+import type { ObjectManager } from '../object-manager';
+import { registerBuilder, type Builder } from './builder-registry';
 
 /**
  * Builds the Gray Cartel's underground website
@@ -11,7 +12,10 @@ import type { ObjectManager } from '../object-manager.js';
  * Aesthetic: Crimson/red + amber accents, glitchy, "pirate broadcast" feel
  * Tone: "Blood and silence", freedom from surveillance, cash economy
  */
-export class CartelDomainBuilder {
+export class CartelDomainBuilder implements Builder {
+  static provides = ['cartelDomain'];
+  static depends = ['webDomain', 'domainRegistry', 'webRoute'];
+
   private domain: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
@@ -839,12 +843,16 @@ export class CartelDomainBuilder {
     `;
   }
 
-  async registerAlias(): Promise<void> {
+  async registerAliases(): Promise<void> {
     if (!this.domain) return;
 
     const objectManager = await this.manager.load(0);
     if (!objectManager) return;
 
     await objectManager.call('addAlias', 'cartelDomain', this.domain.id);
+    console.log(`Registered cartelDomain alias -> #${this.domain.id}`);
   }
 }
+
+// Self-register
+registerBuilder(CartelDomainBuilder);

@@ -12,8 +12,8 @@ import type {
   LogEntry,
   LogQuery,
   LogType,
-} from '../../types/log.js';
-import type { ObjId } from '../../types/object.js';
+} from '../../types/log';
+import type { ObjId } from '../../types/object';
 
 /**
  * Sanitize an object for MongoDB storage, removing circular references

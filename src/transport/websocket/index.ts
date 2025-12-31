@@ -1,1 +1,1 @@
-export { WebSocketServer } from './websocket-server.js';
+export { WebSocketServer } from './websocket-server';

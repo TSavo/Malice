@@ -4,7 +4,7 @@ import type {
   ITransport,
   TerminalCapabilities,
   TransportType,
-} from '../../types/transport.js';
+} from '../../types/transport';
 
 /**
  * Abstract base class for all transports

@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the Sign prototype
@@ -21,26 +22,40 @@ import type { ObjectManager } from '../../object-manager.js';
  * - read(agent): Returns the sign's text (optionally formatted)
  * - updateText(agent, newText): Updates the sign text if authorized
  */
-export class SignBuilder {
-  static readonly alias = 'sign';
-  static readonly parent = 'describable';
+export class SignBuilder implements Builder {
+  static provides = ['sign'];
+  static depends = ['describable'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: number): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
-      properties: {
-        name: 'Sign',
-        description: 'A sturdy, bolted-down sign.',
-        text: 'The sign is blank.',
-        boltedDown: true,
-        language: 'English',
-        authorizedUpdaters: [],
-        publiclyWritable: false,
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
 
-        abilities: `Fixed, readable display for directories, notices, announcements.
+    if ($.sign && !forceRebuild) {
+      this.obj = $.sign;
+      return;
+    }
+
+    const parentObj = $.describable;
+    if (!parentObj) throw new Error('SignBuilder: $describable not found');
+
+    if ($.sign) {
+      this.obj = $.sign;
+    } else {
+      this.obj = await this.manager.create({
+        parent: parentObj,
+        properties: {
+          name: 'Sign',
+          description: 'A sturdy, bolted-down sign.',
+          text: 'The sign is blank.',
+          boltedDown: true,
+          language: 'English',
+          authorizedUpdaters: [],
+          publiclyWritable: false,
+
+          abilities: `Fixed, readable display for directories, notices, announcements.
 
 IMMOVABLE: 'boltedDown' true by default. Cannot be picked up.
 
@@ -54,9 +69,12 @@ UPDATING: updateText(agent, newText) requires authorization:
 LANGUAGE: 'language' property for localization.
 
 READING: read() returns text content. AI can invoke directly.`,
-      },
-      methods: {},
-    });
+        },
+        methods: {},
+      });
+    }
+
+    const obj = this.obj!;
 
     obj.setMethod(
       'read',
@@ -151,7 +169,19 @@ READING: read() returns text content. AI can invoke directly.`,
       'publiclyWritable',
       'If true, anyone can update the sign text',
     );
+  }
 
-    return obj;
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+
+    const objectManager = await this.manager.load(0);
+    if (!objectManager) return;
+
+    await objectManager.call('addAlias', 'sign', this.obj.id);
+    console.log(`  ✅ Registered $sign -> #${this.obj.id}`);
   }
 }
+
+// Self-register
+registerBuilder(SignBuilder);

@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the WindowManager class client module
@@ -7,53 +8,45 @@ import type { ObjectManager } from '../../object-manager.js';
  * Creates $.windowManagerJs which serves /js/window-manager.js
  * Orchestrates all windows, manages z-order, and handles wm channel.
  */
-export class WindowManagerBuilder {
-  static readonly alias = 'windowManagerJs';
+export class WindowManagerBuilder implements Builder {
+  static provides = ['windowManagerJs'];
+  static depends = ['root'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<RuntimeObject> {
-    const objectManager = await this.manager.load(0);
-    if (!objectManager) throw new Error('ObjectManager not found');
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
 
-    const aliases =
-      (objectManager.get('aliases') as Record<string, number>) || {};
-
-    let obj: RuntimeObject | null = null;
-
-    if (aliases[WindowManagerBuilder.alias]) {
-      obj = await this.manager.load(aliases[WindowManagerBuilder.alias]);
-      if (obj && !forceRebuild) {
-        console.log(
-          `[WindowManagerBuilder] Using existing $.${WindowManagerBuilder.alias}`,
-        );
-        return obj;
-      }
+    if ($.windowManagerJs && !forceRebuild) {
+      this.obj = $.windowManagerJs;
+      return;
     }
 
-    if (!obj) {
-      const root = await this.manager.load(1);
-      obj = await this.manager.create({
-        parent: root!,
-        properties: {
-          name: 'WindowManager JS Module',
-          description: 'Window manager orchestration',
-        },
-        methods: {},
-      });
+    const parentObj = $.root;
+    if (!parentObj) throw new Error('WindowManagerBuilder: $root not found');
 
-      await objectManager.call('addAlias', WindowManagerBuilder.alias, obj.id);
-    }
+    this.obj = await this.manager.create({
+      parent: parentObj,
+      properties: {
+        name: 'WindowManager JS Module',
+        description: 'Window manager orchestration',
+      },
+      methods: {},
+    });
+
+    const obj = this.obj;
 
     obj.setMethod(
       'getScript',
       `
       return \`
-import { Window } from '/js/window.js';
-import { TerminalWindow } from '/js/terminal-window.js';
-import { HtmlWindow } from '/js/html-window.js';
-import { IframeWindow } from '/js/iframe-window.js';
-import { Taskbar } from '/js/taskbar.js';
+import { Window } from '/js/window';
+import { TerminalWindow } from '/js/terminal-window';
+import { HtmlWindow } from '/js/html-window';
+import { IframeWindow } from '/js/iframe-window';
+import { Taskbar } from '/js/taskbar';
 
 /**
  * WindowManager - Orchestrates all desktop windows
@@ -893,9 +886,15 @@ export class WindowManager {
     `,
     );
 
-    console.log(
-      `[WindowManagerBuilder] Built $.${WindowManagerBuilder.alias} -> #${obj.id}`,
-    );
-    return obj;
+    console.log(`[WindowManagerBuilder] Built $.windowManagerJs -> #${obj.id}`);
+  }
+
+  async registerAliases(): Promise<void> {
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'windowManagerJs', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(WindowManagerBuilder);

@@ -12,8 +12,8 @@
 
 import { randomBytes } from 'crypto';
 import Fastify, { type FastifyInstance } from 'fastify';
-import type { ObjectManager } from '../database/object-manager.js';
-import type { RuntimeObjectImpl } from '../database/runtime-object.js';
+import type { ObjectManager } from '../database/object-manager';
+import type { RuntimeObjectImpl } from '../database/runtime-object';
 
 export interface FactionWebServerConfig {
   port: number;
@@ -372,6 +372,55 @@ export class FactionWebServer {
           err,
         );
         return reply.code(500).send({ error: 'Internal server error' });
+      }
+    });
+
+    // GET /blob/:key - Serve blob data from GridFS
+    this.app.get('/blob/:key', async (request, reply) => {
+      try {
+        const { key } = request.params as { key: string };
+
+        // Validate key format (24-character hex ObjectId)
+        if (!/^[0-9a-f]{24}$/i.test(key)) {
+          return reply.code(400).send({ error: 'Invalid blob key format' });
+        }
+
+        // Get $blob MOO object from aliases
+        const blob = this.manager.getAliases().get('blob');
+        if (!blob) {
+          return reply.code(500).send({ error: 'Blob service not available' });
+        }
+
+        // Get metadata first to check existence and get content-type
+        const meta = await blob.call('meta', key) as {
+          contentType?: string;
+          filename?: string;
+          length?: number;
+        } | null;
+        if (!meta) {
+          return reply.code(404).send({ error: 'Blob not found' });
+        }
+
+        // Read the blob data as buffer
+        const buffer = await blob.call('readBuffer', key) as Buffer;
+
+        // Set headers
+        reply.header('Content-Type', meta.contentType || 'application/octet-stream');
+        reply.header('Content-Length', buffer.length);
+        if (meta.filename) {
+          reply.header(
+            'Content-Disposition',
+            `inline; filename="${meta.filename}"`,
+          );
+        }
+
+        // Cache for 1 hour (blobs are immutable)
+        reply.header('Cache-Control', 'public, max-age=3600');
+
+        return reply.send(buffer);
+      } catch (err) {
+        console.error(`[FactionWeb:${this.config.factionName}] Blob error:`, err);
+        return reply.code(500).send({ error: 'Failed to retrieve blob' });
       }
     });
 

@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the Sustain prototype
@@ -16,14 +17,23 @@ import type { ObjectManager } from '../../object-manager.js';
  * - No real flavor - synthetic chemical taste
  * - Cheap and ubiquitous
  */
-export class SustainBuilder {
-  static readonly alias = 'sustain';
-  static readonly parent = 'food';
+export class SustainBuilder implements Builder {
+  static provides = ['sustain'];
+  static depends = ['food'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(foodId: number): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(foodId);
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.sustain && !forceRebuild) {
+      this.obj = $.sustain;
+      return;
+    }
+
+    const parentObj = $.food;
     const obj = await this.manager.create({
       parent: parentObj!,
       properties: {
@@ -146,6 +156,16 @@ Subsidized price (2 credits). Everyone can afford to survive.`,
     `,
     );
 
-    return obj;
+    this.obj = obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'sustain', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(SustainBuilder);

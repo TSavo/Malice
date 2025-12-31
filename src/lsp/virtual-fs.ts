@@ -3,8 +3,8 @@
  * Maps MongoDB objects to TypeScript virtual files
  */
 
-import type { ObjId, RuntimeObject } from '../../types/object.js';
-import type { ObjectManager } from '../database/object-manager.js';
+import type { ObjId, RuntimeObject } from '../../types/object';
+import type { ObjectManager } from '../database/object-manager';
 
 /**
  * Virtual document representing an object's method

@@ -1,9 +1,9 @@
 import { readdir, readFile } from 'node:fs/promises';
 import { extname, join } from 'node:path';
-import { applyExtractedPrototypeSpec } from '../database/bootstrap/prototype-ts/apply.js';
-import { extractPrototypeSpecFromSourceText } from '../database/bootstrap/prototype-ts/extract.js';
-import { ObjectDatabase } from '../database/object-db.js';
-import { ObjectManager } from '../database/object-manager.js';
+import { applyExtractedPrototypeSpec } from '../database/bootstrap/prototype-ts/apply';
+import { extractPrototypeSpecFromSourceText } from '../database/bootstrap/prototype-ts/extract';
+import { ObjectDatabase } from '../database/object-db';
+import { ObjectManager } from '../database/object-manager';
 
 type CliOptions = {
   force: boolean;

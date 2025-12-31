@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the Writable prototype
@@ -16,13 +17,27 @@ import type { ObjectManager } from '../../object-manager.js';
  * - read(agent): Returns the current text
  * - write(agent, newText): Sets or appends to the text
  */
-export class WritableBuilder {
+export class WritableBuilder implements Builder {
+  static provides = ['writable'];
+  static depends = ['describable'];
+
+  private obj: RuntimeObject | null = null;
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: number): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.writable && !forceRebuild) {
+      this.obj = $.writable;
+      return;
+    }
+
+    const parentObj = $.describable;
+    if (!parentObj) throw new Error('WritableBuilder: $describable not found');
+
+    this.obj = await this.manager.create({
+      parent: parentObj,
       properties: {
         name: 'Writable',
         description: 'Something you can write on.',
@@ -41,6 +56,7 @@ PORTABLE: Can be picked up, carried, dropped. Contents persist.`,
       methods: {},
     });
 
+    const obj = this.obj;
     obj.setMethod(
       'read',
       `
@@ -75,7 +91,15 @@ PORTABLE: Can be picked up, carried, dropped. Contents persist.`,
       'maxLength',
       'Maximum allowed length for text content',
     );
+  }
 
-    return obj;
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'writable', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(WritableBuilder);

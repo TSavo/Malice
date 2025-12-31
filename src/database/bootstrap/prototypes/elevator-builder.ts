@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the Elevator prototype
@@ -23,16 +24,27 @@ import type { ObjectManager } from '../../object-manager.js';
  * - If any lock denies, access is denied
  * - Compose security: add $.biometricLock, $.keycardLock, etc.
  */
-export class ElevatorBuilder {
-  static readonly alias = 'elevator';
-  static readonly parent = 'room';
+export class ElevatorBuilder implements Builder {
+  static provides = ['elevator'];
+  static depends = ['room'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(locationId: number): Promise<RuntimeObject> {
-    const parent = await this.manager.load(locationId);
-    const obj = await this.manager.create({
-      parent: parent!,
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.elevator && !forceRebuild) {
+      this.obj = $.elevator;
+      return;
+    }
+
+    const parentObj = $.room;
+    if (!parentObj) throw new Error('ElevatorBuilder: $room not found');
+
+    this.obj = await this.manager.create({
+      parent: parentObj,
       properties: {
         name: 'Elevator',
         description: 'A metal elevator car with a control panel.',
@@ -71,6 +83,8 @@ EMERGENCY: If stuck, maintenance can force arrive() or reset state manually.`,
       },
       methods: {},
     });
+
+    const obj = this.obj;
 
     // ═══════════════════════════════════════════════════════════════════
     // LOCK SYSTEM
@@ -383,7 +397,15 @@ EMERGENCY: If stuck, maintenance can force arrive() or reset state manually.`,
       'door',
       'Reference to $.door object for access control',
     );
+  }
 
-    return obj;
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'elevator', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(ElevatorBuilder);

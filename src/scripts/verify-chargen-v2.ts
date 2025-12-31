@@ -1,6 +1,6 @@
-import type { ObjId } from '../../types/object.js';
-import { ObjectDatabase } from '../database/object-db.js';
-import { ObjectManager } from '../database/object-manager.js';
+import type { ObjId } from '../../types/object';
+import { ObjectDatabase } from '../database/object-db';
+import { ObjectManager } from '../database/object-manager';
 
 async function main() {
   const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017';

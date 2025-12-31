@@ -1,11 +1,15 @@
-import type { RuntimeObject } from '../../../types/object.js';
-import type { ObjectManager } from '../object-manager.js';
+import type { RuntimeObject } from '../../../types/object';
+import type { ObjectManager } from '../object-manager';
+import { registerBuilder, type Builder } from './builder-registry';
 
 /**
  * Builds PreAuthHandler object (dynamic ID)
  * Handles pre-authenticated connections (SSL certs, HTTP Basic Auth, OAuth)
  */
-export class PreAuthHandlerBuilder {
+export class PreAuthHandlerBuilder implements Builder {
+  static provides = ['preAuthHandler'];
+  static depends: string[] = [];
+
   private preAuthHandler: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
@@ -392,7 +396,7 @@ export class PreAuthHandlerBuilder {
     );
   }
 
-  async registerAlias(): Promise<void> {
+  async registerAliases(): Promise<void> {
     if (!this.preAuthHandler) return;
 
     const objectManager = await this.manager.load(0);
@@ -408,3 +412,6 @@ export class PreAuthHandlerBuilder {
     );
   }
 }
+
+// Self-register
+registerBuilder(PreAuthHandlerBuilder);

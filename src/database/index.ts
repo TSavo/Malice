@@ -1,3 +1,3 @@
-export { ObjectDatabase } from './object-db.js';
-export { ObjectManager } from './object-manager.js';
-export { RuntimeObjectImpl } from './runtime-object.js';
+export { ObjectDatabase } from './object-db';
+export { ObjectManager } from './object-manager';
+export { RuntimeObjectImpl } from './runtime-object';

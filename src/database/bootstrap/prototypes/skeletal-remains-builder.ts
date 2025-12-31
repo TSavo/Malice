@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the SkeletalRemains prototype
@@ -12,14 +13,23 @@ import type { ObjectManager } from '../../object-manager.js';
  * - Can be scattered, buried, or left as grim landmarks
  * - Contain the original body (now skeletal)
  */
-export class SkeletalRemainsBuilder {
-  static readonly alias = 'skeletalRemains';
-  static readonly parent = 'describable';
+export class SkeletalRemainsBuilder implements Builder {
+  static provides = ['skeletalRemains'];
+  static depends = ['describable'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(describableId: number): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(describableId);
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.skeletalRemains && !forceRebuild) {
+      this.obj = $.skeletalRemains;
+      return;
+    }
+
+    const parentObj = $.describable;
     const obj = await this.manager.create({
       parent: parentObj!,
       properties: {
@@ -330,6 +340,16 @@ USES: Bones can be collected, buried, arranged. Skulls as trophies. Bone meal fo
       'Boolean tracking if skeleton has been searched for items or evidence.',
     );
 
-    return obj;
+    this.obj = obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'skeletalRemains', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(SkeletalRemainsBuilder);

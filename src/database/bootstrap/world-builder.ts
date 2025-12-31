@@ -1,8 +1,9 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import type { RuntimeObject } from '../../../types/object.js';
-import type { ObjectManager } from '../object-manager.js';
+import type { RuntimeObject } from '../../../types/object';
+import type { ObjectManager } from '../object-manager';
+import { registerBuilder, type Builder } from './builder-registry';
 
 interface ExitData {
   to?: string; // Target file path (for building connections, ignored by world-builder)
@@ -48,7 +49,10 @@ interface StreetConfig {
  * - North/South: rooms with same X, Y differs by 1
  * - East/West: rooms with same Y, X differs by 1
  */
-export class WorldBuilder {
+export class WorldBuilder implements Builder {
+  static provides = ['startRoom'];
+  static depends = ['room', 'exit', 'recycler']; // Needs these prototypes
+
   private rooms: Map<string, RuntimeObject> = new Map();
   private roomData: Map<string, RoomData> = new Map();
 
@@ -443,4 +447,12 @@ export class WorldBuilder {
   getRooms(): Map<string, RuntimeObject> {
     return this.rooms;
   }
+
+  async registerAliases(): Promise<void> {
+    // startRoom alias is registered in registerStartRoom() during build()
+    // This is a no-op since the alias is already registered
+  }
 }
+
+// Self-register
+registerBuilder(WorldBuilder);

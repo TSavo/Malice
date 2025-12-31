@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the Wearable prototype
@@ -17,15 +18,24 @@ import type { ObjectManager } from '../../object-manager.js';
  *
  * Subprototypes: $.clothing, $.armor, $.jewelry
  */
-export class WearableBuilder {
-  static readonly alias = 'wearable';
-  static readonly parent = 'describable';
+export class WearableBuilder implements Builder {
+  static provides = ['wearable'];
+  static depends = ['describable'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(describableId: number): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(describableId);
-    const obj = await this.manager.create({
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.wearable && !forceRebuild) {
+      this.obj = $.wearable;
+      return;
+    }
+
+    const parentObj = $.describable;
+    this.obj = await this.manager.create({
       parent: parentObj!,
       properties: {
         name: 'Wearable',
@@ -70,6 +80,7 @@ REQUIRED PARTS: Can't wear gloves without hands, boots without feet. Missing par
       methods: {},
     });
 
+    const obj = this.obj;
     obj.setMethod(
       'canWear',
       `
@@ -440,7 +451,15 @@ REQUIRED PARTS: Can't wear gloves without hands, boots without feet. Missing par
       'wornDescription',
       'Description shown when this item is worn. If null, uses item name in generic phrase.',
     );
+  }
 
-    return obj;
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'wearable', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(WearableBuilder);

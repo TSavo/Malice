@@ -1,18 +1,30 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * PhoneDb: registry mapping numbers to phone objects.
  */
-export class PhoneDbBuilder {
-  static readonly alias = 'phoneDb';
-  static readonly parent = 'describable';
+export class PhoneDbBuilder implements Builder {
+  static provides = ['phoneDb'];
+  static depends = ['describable'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(describableId: number): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(describableId);
-    const obj = await this.manager.create({
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.phoneDb && !forceRebuild) {
+      this.obj = $.phoneDb;
+      return;
+    }
+
+    const parentObj = $.describable;
+    if (!parentObj) throw new Error('PhoneDbBuilder: $describable not found');
+
+    this.obj = await this.manager.create({
       parent: parentObj!,
       properties: {
         name: 'Phone Directory',
@@ -31,6 +43,8 @@ to support formats like "555-1234" or extension codes.`,
       },
       methods: {},
     });
+
+    const obj = this.obj;
 
     obj.setMethod(
       'register',
@@ -64,7 +78,15 @@ to support formats like "555-1234" or extension codes.`,
       return reg[number] || null;
     `,
     );
+  }
 
-    return obj;
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'phoneDb', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(PhoneDbBuilder);

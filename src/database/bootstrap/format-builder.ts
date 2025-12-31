@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../types/object.js';
-import type { ObjectManager } from '../object-manager.js';
+import type { RuntimeObject } from '../../../types/object';
+import type { ObjectManager } from '../object-manager';
+import { registerBuilder, type Builder } from './builder-registry';
 
 /**
  * Builds Format utility object ($.format)
@@ -21,7 +22,10 @@ import type { ObjectManager } from '../object-manager.js';
  *   // Text wrapping
  *   const wrapped = $.format.wrap('Long text here...', 40);
  */
-export class FormatBuilder {
+export class FormatBuilder implements Builder {
+  static provides = ['format'];
+  static depends: string[] = [];
+
   private format: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
@@ -725,7 +729,7 @@ export class FormatBuilder {
     );
   }
 
-  async registerAlias(): Promise<void> {
+  async registerAliases(): Promise<void> {
     if (!this.format) return;
 
     const objectManager = await this.manager.load(0);
@@ -735,3 +739,6 @@ export class FormatBuilder {
     console.log(`Registered format alias -> #${this.format.id}`);
   }
 }
+
+// Self-register
+registerBuilder(FormatBuilder);

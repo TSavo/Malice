@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the Corpse prototype
@@ -19,15 +20,24 @@ import type { ObjectManager } from '../../object-manager.js';
  * - Skeletal: 80-100% - mostly bones
  * - At 100%: recycled
  */
-export class CorpseBuilder {
-  static readonly alias = 'corpse';
-  static readonly parent = 'decayable';
+export class CorpseBuilder implements Builder {
+  static provides = ['corpse'];
+  static depends = ['decayable'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(decayableId: number): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(decayableId);
-    const obj = await this.manager.create({
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.corpse && !forceRebuild) {
+      this.obj = $.corpse;
+      return;
+    }
+
+    const parentObj = $.decayable;
+    this.obj = await this.manager.create({
       parent: parentObj!,
       properties: {
         name: 'Corpse',
@@ -69,6 +79,8 @@ TRANSFORMATION: At 100% decay, transforms into $.humanRemains (dried bones) whic
       },
       methods: {},
     });
+
+    const obj = this.obj;
 
     // Get the body object inside this corpse
     obj.setMethod(
@@ -589,7 +601,15 @@ TRANSFORMATION: At 100% decay, transforms into $.humanRemains (dried bones) whic
       'searched',
       'Boolean tracking if corpse has been searched. Affects description and search results.',
     );
+  }
 
-    return obj;
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'corpse', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(CorpseBuilder);

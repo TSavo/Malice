@@ -9,8 +9,8 @@ import type {
   PropertyValue,
   RuntimeObject,
   Value,
-} from '../../types/object.js';
-import type { ObjectManager } from './object-manager.js';
+} from '../../types/object';
+import type { ObjectManager } from './object-manager';
 
 /**
  * Dedent a string by removing common leading whitespace from all lines.
@@ -1163,8 +1163,6 @@ export class RuntimeObjectImpl implements RuntimeObject {
           const $db = $.db;
           const $evictFromCache = $.evictFromCache.bind($);
           const $getInheritanceChain = $.getInheritanceChain.bind($);
-          const $email = $.email;
-          const $http = $.http;
           ${aliasDeclarations}
           return (async () => {
             ${parentJsCode}
@@ -1252,8 +1250,6 @@ export class RuntimeObjectImpl implements RuntimeObject {
         const $db = $.db;
         const $evictFromCache = $.evictFromCache.bind($);
         const $getInheritanceChain = $.getInheritanceChain.bind($);
-        const $email = $.email;
-        const $http = $.http;
         ${aliasDeclarations}
         return (async () => {
           ${jsCode}

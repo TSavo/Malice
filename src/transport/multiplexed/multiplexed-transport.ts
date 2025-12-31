@@ -1,8 +1,8 @@
 import { takeUntil } from 'rxjs/operators';
 import type { WebSocket } from 'ws';
-import { BaseTransport } from '../base-transport.js';
-import { ChannelMux } from './channel-mux.js';
-import type { CtrlResize, IChannel, WireCodec } from './types.js';
+import { BaseTransport } from '../base-transport';
+import { ChannelMux } from './channel-mux';
+import type { CtrlResize, IChannel, WireCodec } from './types';
 
 /**
  * Multiplexed WebSocket transport

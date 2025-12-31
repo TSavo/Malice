@@ -10,12 +10,12 @@ import { takeUntil } from 'rxjs/operators';
 import type {
   FactionPorts,
   FactionTransportConfig,
-} from '../../types/transport.js';
-import type { ObjectManager } from '../database/object-manager.js';
-import { Connection } from '../connection/connection.js';
-import { SessionMCPServer } from '../mcp/session-mcp-server.js';
-import { FactionWebServer } from '../web/faction-web-server.js';
-import { WebSocketServer } from './websocket/websocket-server.js';
+} from '../../types/transport';
+import type { ObjectManager } from '../database/object-manager';
+import { Connection } from '../connection/connection';
+import { SessionMCPServer } from '../mcp/session-mcp-server';
+import { FactionWebServer } from '../web/faction-web-server';
+import { WebSocketServer } from './websocket/websocket-server';
 
 /**
  * Bundle of all transport servers for one faction

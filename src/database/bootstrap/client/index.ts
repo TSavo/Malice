@@ -1,12 +1,12 @@
-import type { ObjectManager } from '../../object-manager.js';
-import { DesktopBuilder } from './desktop-builder.js';
-import { HtmlWindowBuilder } from './html-window-builder.js';
-import { IframeWindowBuilder } from './iframe-window-builder.js';
-import { MaliceClientBuilder } from './malice-client-builder.js';
-import { TaskbarBuilder } from './taskbar-builder.js';
-import { TerminalWindowBuilder } from './terminal-window-builder.js';
-import { WindowBuilder } from './window-builder.js';
-import { WindowManagerBuilder } from './window-manager-builder.js';
+import type { ObjectManager } from '../../object-manager';
+import { DesktopBuilder } from './desktop-builder';
+import { HtmlWindowBuilder } from './html-window-builder';
+import { IframeWindowBuilder } from './iframe-window-builder';
+import { MaliceClientBuilder } from './malice-client-builder';
+import { TaskbarBuilder } from './taskbar-builder';
+import { TerminalWindowBuilder } from './terminal-window-builder';
+import { WindowBuilder } from './window-builder';
+import { WindowManagerBuilder } from './window-manager-builder';
 
 /**
  * Orchestrates building all client-side JavaScript modules
@@ -58,11 +58,11 @@ export class ClientBuilder {
 }
 
 // Export individual builders for direct use
-export { DesktopBuilder } from './desktop-builder.js';
-export { HtmlWindowBuilder } from './html-window-builder.js';
-export { IframeWindowBuilder } from './iframe-window-builder.js';
-export { MaliceClientBuilder } from './malice-client-builder.js';
-export { TaskbarBuilder } from './taskbar-builder.js';
-export { TerminalWindowBuilder } from './terminal-window-builder.js';
-export { WindowBuilder } from './window-builder.js';
-export { WindowManagerBuilder } from './window-manager-builder.js';
+export { DesktopBuilder } from './desktop-builder';
+export { HtmlWindowBuilder } from './html-window-builder';
+export { IframeWindowBuilder } from './iframe-window-builder';
+export { MaliceClientBuilder } from './malice-client-builder';
+export { TaskbarBuilder } from './taskbar-builder';
+export { TerminalWindowBuilder } from './terminal-window-builder';
+export { WindowBuilder } from './window-builder';
+export { WindowManagerBuilder } from './window-manager-builder';

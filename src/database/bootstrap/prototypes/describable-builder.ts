@@ -1,45 +1,51 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the Describable prototype
  * Base prototype for things that exist in the world
  */
-export class DescribableBuilder {
-  static readonly alias = 'describable';
-  static readonly parent = 'root';
+export class DescribableBuilder implements Builder {
+  static provides = ['describable'];
+  static depends: string[] = []; // Root-level - no dependencies
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(
-    parentId: number,
-    existingObj?: RuntimeObject,
-  ): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj =
-      existingObj ||
-      (await this.manager.create({
-        parent: parentObj!,
-        properties: {
-          name: 'Describable',
-          description: 'Base prototype for things that exist in the world',
-          aliases: [],
-          location: null, // ObjId | null - where this object is located
-          contents: [], // ObjId[] - what's inside this object
-          // Physical dimensions (in centimeters for width/height/depth, grams for weight)
-          width: 0, // cm
-          height: 0, // cm
-          depth: 0, // cm
-          weight: 0, // grams
-          // Movement restrictions
-          boltedDown: false, // If true, cannot be moved at all
-          // AI-readable abilities - natural language mechanics documentation
-          // Describes what this object can do, how to use it, rules/formulas
-          abilities: null, // string - grows as players discover new interactions
-        },
-        methods: {},
-      }));
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
 
+    if ($.describable && !forceRebuild) {
+      this.obj = $.describable;
+      return;
+    }
+
+    const parentObj = await this.manager.load(1); // Root
+    this.obj = await this.manager.create({
+      parent: parentObj!,
+      properties: {
+        name: 'Describable',
+        description: 'Base prototype for things that exist in the world',
+        aliases: [],
+        location: null, // ObjId | null - where this object is located
+        contents: [], // ObjId[] - what's inside this object
+        // Physical dimensions (in centimeters for width/height/depth, grams for weight)
+        width: 0, // cm
+        height: 0, // cm
+        depth: 0, // cm
+        weight: 0, // grams
+        // Movement restrictions
+        boltedDown: false, // If true, cannot be moved at all
+        // AI-readable abilities - natural language mechanics documentation
+        // Describes what this object can do, how to use it, rules/formulas
+        abilities: null, // string - grows as players discover new interactions
+      },
+      methods: {},
+    });
+
+    const obj = this.obj;
     obj.setMethod(
       'describe',
       `
@@ -673,6 +679,19 @@ export class DescribableBuilder {
       'Natural language physics rules - what this object can do and how',
     );
 
-    return obj;
+    this.obj = obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+    // Register in memory for immediate $.describable access
+    this.manager.registerAlias('describable', this.obj);
+    // Persist to MongoDB
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'describable', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(DescribableBuilder);

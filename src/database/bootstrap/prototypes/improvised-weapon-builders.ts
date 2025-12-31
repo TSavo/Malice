@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Improvised & Miscellaneous Weapon Prototypes
@@ -715,3 +716,128 @@ export class CricketBatBuilder {
     return obj;
   }
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// IMPROVISED WEAPON PROTOTYPES BUILDER (registered builder for all improvised weapons)
+// ═══════════════════════════════════════════════════════════════════════════
+
+export class ImprovisedWeaponPrototypesBuilder implements Builder {
+  static provides = [
+    'improvised',
+    'bottle',
+    'brokenBottle',
+    'beerBottle',
+    'brick',
+    'rock',
+    'cinderBlock',
+    'screwdriver',
+    'icepick',
+    'awl',
+    'wrench',
+    'prybar',
+    'hammerImprovised',
+    'kitchenKnife',
+    'butcherKnife',
+    'skillet',
+    'rollingPin',
+    'throwingKnife',
+    'throwingStar',
+    'dart',
+    'garrote',
+    'whip',
+    'cattleProd',
+    'stunGun',
+    'taser',
+    'pepperSpray',
+    'golfClub',
+    'hockeyStick',
+    'lacrosseStick',
+    'cricketBat',
+  ];
+  static depends = ['weapon'];
+
+  private weapons: Record<string, RuntimeObject> = {};
+
+  constructor(private manager: ObjectManager) {}
+
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.improvised && !forceRebuild) {
+      for (const alias of ImprovisedWeaponPrototypesBuilder.provides) {
+        if ($[alias]) this.weapons[alias] = $[alias];
+      }
+      return;
+    }
+
+    const parentObj = $.weapon;
+    if (!parentObj) throw new Error('ImprovisedWeaponPrototypesBuilder: $weapon not found');
+
+    const weaponId = parentObj.id;
+
+    // Base improvised (inherits from weapon)
+    const improvised = await new ImprovisedBuilder(this.manager).build(weaponId);
+    this.weapons.improvised = improvised;
+
+    // Bottles (inherit from improvised)
+    const bottle = await new BottleBuilder(this.manager).build(improvised.id);
+    this.weapons.bottle = bottle;
+    this.weapons.brokenBottle = await new BrokenBottleBuilder(this.manager).build(bottle.id);
+    this.weapons.beerBottle = await new BeerBottleBuilder(this.manager).build(bottle.id);
+
+    // Debris (inherit from improvised)
+    this.weapons.brick = await new BrickBuilder(this.manager).build(improvised.id);
+    this.weapons.rock = await new RockBuilder(this.manager).build(improvised.id);
+    this.weapons.cinderBlock = await new CinderBlockBuilder(this.manager).build(improvised.id);
+
+    // Tools (inherit from improvised)
+    this.weapons.screwdriver = await new ScrewdriverBuilder(this.manager).build(improvised.id);
+    this.weapons.icepick = await new IcepickBuilder(this.manager).build(improvised.id);
+    this.weapons.awl = await new AwlBuilder(this.manager).build(improvised.id);
+    this.weapons.wrench = await new WrenchBuilder(this.manager).build(improvised.id);
+    this.weapons.prybar = await new PrybarBuilder(this.manager).build(improvised.id);
+    this.weapons.hammerImprovised = await new HammerImprovisedBuilder(this.manager).build(improvised.id);
+
+    // Kitchen implements (inherit from improvised)
+    this.weapons.kitchenKnife = await new KitchenKnifeBuilder(this.manager).build(improvised.id);
+    this.weapons.butcherKnife = await new ButcherKnifeBuilder(this.manager).build(improvised.id);
+    this.weapons.skillet = await new SkilletBuilder(this.manager).build(improvised.id);
+    this.weapons.rollingPin = await new RollingPinBuilder(this.manager).build(improvised.id);
+
+    // Throwing weapons (inherit from improvised)
+    this.weapons.throwingKnife = await new ThrowingKnifeBuilder(this.manager).build(improvised.id);
+    this.weapons.throwingStar = await new ThrowingStarBuilder(this.manager).build(improvised.id);
+    this.weapons.dart = await new DartBuilder(this.manager).build(improvised.id);
+
+    // Exotic weapons (inherit from improvised)
+    this.weapons.garrote = await new GarroteBuilder(this.manager).build(improvised.id);
+    this.weapons.whip = await new WhipBuilder(this.manager).build(improvised.id);
+    this.weapons.cattleProd = await new CattleProdBuilder(this.manager).build(improvised.id);
+    this.weapons.stunGun = await new StunGunBuilder(this.manager).build(improvised.id);
+    this.weapons.taser = await new TaserBuilder(this.manager).build(improvised.id);
+    this.weapons.pepperSpray = await new PepperSprayBuilder(this.manager).build(improvised.id);
+
+    // Sports equipment (inherit from improvised)
+    this.weapons.golfClub = await new GolfClubBuilder(this.manager).build(improvised.id);
+    this.weapons.hockeyStick = await new HockeyStickBuilder(this.manager).build(improvised.id);
+    this.weapons.lacrosseStick = await new LacrosseStickBuilder(this.manager).build(improvised.id);
+    this.weapons.cricketBat = await new CricketBatBuilder(this.manager).build(improvised.id);
+
+    console.log(`✅ Built ${Object.keys(this.weapons).length} improvised weapon prototypes`);
+  }
+
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    const objectManager = await this.manager.load(0);
+    if (!objectManager) return;
+
+    for (const [name, obj] of Object.entries(this.weapons)) {
+      if (obj) {
+        await objectManager.call('addAlias', name, obj.id);
+      }
+    }
+  }
+}
+
+// Self-register
+registerBuilder(ImprovisedWeaponPrototypesBuilder);

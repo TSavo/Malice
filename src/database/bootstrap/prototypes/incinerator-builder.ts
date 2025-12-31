@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the Incinerator prototype
@@ -17,14 +18,23 @@ import type { ObjectManager } from '../../object-manager.js';
  * - ignite(agent): Turn on the incinerator
  * - extinguish(agent): Turn off the incinerator
  */
-export class IncineratorBuilder {
-  static readonly alias = 'incinerator';
-  static readonly parent = 'disposal';
+export class IncineratorBuilder implements Builder {
+  static provides = ['incinerator'];
+  static depends = ['disposal'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: number): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.incinerator && !forceRebuild) {
+      this.obj = $.incinerator;
+      return;
+    }
+
+    const parentObj = $.disposal;
     const obj = await this.manager.create({
       parent: parentObj!,
       properties: {
@@ -193,6 +203,16 @@ VERBS: 'burn/incinerate/deposit/put/throw %o in %i', 'ignite/light %i', 'extingu
       'Whether the incinerator is currently ignited and functional',
     );
 
-    return obj;
+    this.obj = obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'incinerator', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(IncineratorBuilder);

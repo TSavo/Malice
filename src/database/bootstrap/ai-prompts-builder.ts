@@ -1,8 +1,9 @@
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { RuntimeObject } from '../../../types/object.js';
-import type { ObjectManager } from '../object-manager.js';
+import type { RuntimeObject } from '../../../types/object';
+import type { ObjectManager } from '../object-manager';
+import { registerBuilder, type Builder } from './builder-registry';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DOCS_DIR = join(__dirname, '../../../docs');
@@ -28,7 +29,10 @@ const PROMPT_FILES: Record<string, string> = {
  *   const narratorPrompt = $.aiPrompts.narrator;
  *   const pluribusPrompt = $.aiPrompts.pluribus;
  */
-export class AiPromptsBuilder {
+export class AiPromptsBuilder implements Builder {
+  static provides = ['aiPrompts'];
+  static depends: string[] = [];
+
   private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
@@ -100,4 +104,14 @@ export class AiPromptsBuilder {
       );
     }
   }
+
+  async registerAliases(): Promise<void> {
+    // Alias is already registered in build() when creating the object
+    // This is needed for Builder interface compliance
+    if (!this.obj) return;
+    console.log(`Registered aiPrompts alias -> #${this.obj.id}`);
+  }
 }
+
+// Self-register
+registerBuilder(AiPromptsBuilder);

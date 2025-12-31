@@ -8,8 +8,8 @@ import {
   type IncomingMessage,
   type ServerResponse,
 } from 'node:http';
-import type { ObjectManager } from '../database/object-manager.js';
-import { VirtualFileSystem } from './virtual-fs.js';
+import type { ObjectManager } from '../database/object-manager';
+import { VirtualFileSystem } from './virtual-fs';
 
 /**
  * Simple HTTP API server for LSP file operations

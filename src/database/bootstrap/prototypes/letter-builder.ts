@@ -1,6 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
-import { WritableBuilder } from './writable-builder.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the Letter prototype
@@ -16,17 +16,30 @@ import { WritableBuilder } from './writable-builder.js';
  * - maxLength: 1000
  *
  * Methods:
- * - read(agent): Returns the letter's text
- * - write(agent, newText): Sets the letter's text
+ * - read(agent): Returns the letter's text (inherited)
+ * - write(agent, newText): Sets the letter's text (inherited)
  */
-export class LetterBuilder {
+export class LetterBuilder implements Builder {
+  static provides = ['letter'];
+  static depends = ['writable'];
+
+  private obj: RuntimeObject | null = null;
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: number): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    // Inherit from Writable
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.letter && !forceRebuild) {
+      this.obj = $.letter;
+      return;
+    }
+
+    const parentObj = $.writable;
+    if (!parentObj) throw new Error('LetterBuilder: $writable not found');
+
+    this.obj = await this.manager.create({
+      parent: parentObj,
       properties: {
         name: 'Letter',
         description: 'A piece of paper for writing messages.',
@@ -49,13 +62,7 @@ DESTRUCTION: Can be burned, torn, disposed. Fire destroys contents permanently.`
       methods: {},
     });
 
-    // Inherit methods from Writable
-    const writable = new WritableBuilder(this.manager);
-    const writableObj = await writable.build(parentId);
-    for (const [name, method] of Object.entries(writableObj.getOwnMethods())) {
-      obj.setMethod(name, method.code);
-    }
-
+    const obj = this.obj;
     // Add property descriptions
     obj.setPropertyDescription(
       'text',
@@ -65,7 +72,15 @@ DESTRUCTION: Can be burned, torn, disposed. Fire destroys contents permanently.`
       'maxLength',
       'Maximum character length for the letter text',
     );
+  }
 
-    return obj;
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'letter', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(LetterBuilder);

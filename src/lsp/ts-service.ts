@@ -4,7 +4,7 @@
  */
 
 import * as ts from 'typescript';
-import type { VirtualFileSystem } from './virtual-fs.js';
+import type { VirtualFileSystem } from './virtual-fs';
 
 /**
  * TypeScript Language Service for Malice

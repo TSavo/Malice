@@ -1,4 +1,4 @@
-import type { FactionPorts } from '../../types/transport.js';
+import type { FactionPorts } from '../../types/transport';
 
 /**
  * Port allocation ranges for faction transport bundles

@@ -13,10 +13,14 @@
  * - Tool instances: $mcp.tools.set_property, $mcp.tools.dig, etc.
  */
 
-import type { RuntimeObject } from '../../../types/object.js';
-import type { ObjectManager } from '../object-manager.js';
+import type { RuntimeObject } from '../../../types/object';
+import type { ObjectManager } from '../object-manager';
+import { registerBuilder, type Builder } from './builder-registry';
 
-export class MCPBuilder {
+export class MCPBuilder implements Builder {
+  static provides = ['mcpTool', 'mcp'];
+  static depends = ['recycler', 'room', 'exit', 'plot', 'plotDB', 'notes', 'ai', 'combat'];
+
   private mcpTool: RuntimeObject | null = null;
   private mcp: RuntimeObject | null = null;
 
@@ -1735,3 +1739,6 @@ export class MCPBuilder {
     }
   }
 }
+
+// Self-register
+registerBuilder(MCPBuilder);

@@ -5,7 +5,7 @@
  * NOTE: This is a stub implementation - not currently used
  */
 
-import type { ObjId } from '../../types/object.js';
+import type { ObjId } from '../../types/object';
 
 /**
  * Call graph node

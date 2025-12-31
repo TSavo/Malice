@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the Agent prototype
@@ -17,24 +18,28 @@ import type { ObjectManager } from '../../object-manager.js';
  * - Higher skill = slower progression (diminishing returns)
  * - Cooldown prevents spam-grinding
  */
-export class AgentBuilder {
-  static readonly alias = 'agent';
-  static readonly parent = 'describable';
+export class AgentBuilder implements Builder {
+  static provides = ['agent'];
+  static depends = ['describable'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(
-    describableId: number,
-    existingObj?: RuntimeObject,
-  ): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(describableId);
-    const obj =
-      existingObj ||
-      (await this.manager.create({
-        parent: parentObj!,
-        properties: {
-          name: 'Agent',
-          description: 'Base prototype for things that can act',
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.agent && !forceRebuild) {
+      this.obj = $.agent;
+      return;
+    }
+
+    const parentObj = $.describable;
+    this.obj = await this.manager.create({
+      parent: parentObj!,
+      properties: {
+        name: 'Agent',
+        description: 'Base prototype for things that can act',
           // Verb registry: { pattern: { obj: ObjId, method: string } }
           // Patterns like 'get %i', 'shoot %i with %t', 'say %s'
           verbs: {},
@@ -106,10 +111,11 @@ STATUS EFFECTS: 'statusEffects' tracks chemical/injury effects: sedation, stimul
 PERCEPTION FILTERS: 'perceptionFilters' modify what this agent perceives. Neural interfaces, hallucinations, AR overlays. Each filter can inject entities, modify descriptions.
 
 LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, if <= luck, failure becomes success.`,
-        },
-        methods: {},
-      }));
+      },
+      methods: {},
+    });
 
+    const obj = this.obj;
     this.addVerbMethods(obj);
     this.addResolutionMethods(obj);
     this.addActionMethods(obj);
@@ -172,7 +178,14 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       'Array of perception filter objects that modify what agent perceives',
     );
 
-    return obj;
+    this.obj = obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'agent', this.obj.id);
   }
 
   private addVerbMethods(obj: RuntimeObject): void {
@@ -3360,3 +3373,6 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
     );
   }
 }
+
+// Self-register
+registerBuilder(AgentBuilder);

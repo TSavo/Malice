@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the Edible prototype
@@ -17,15 +18,24 @@ import type { ObjectManager } from '../../object-manager.js';
  * - spoiled/poisoned: Safety status
  * - effects: Status effects applied when consumed
  */
-export class EdibleBuilder {
-  static readonly alias = 'edible';
-  static readonly parent = 'decayable';
+export class EdibleBuilder implements Builder {
+  static provides = ['edible'];
+  static depends = ['decayable'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(decayableId: number): Promise<RuntimeObject> {
-    const parent = await this.manager.load(decayableId);
-    const obj = await this.manager.create({
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.edible && !forceRebuild) {
+      this.obj = $.edible;
+      return;
+    }
+
+    const parent = $.decayable;
+    this.obj = await this.manager.create({
       parent: parent!,
       properties: {
         name: 'Edible',
@@ -79,6 +89,8 @@ STOMACH CAPACITY: Consumer's stomach has limited volume. Check stomach.hasRoomFo
       },
       methods: {},
     });
+
+    const obj = this.obj;
 
     // Add property descriptions
     obj.setPropertyDescription(
@@ -488,6 +500,16 @@ STOMACH CAPACITY: Consumer's stomach has limited volume. Check stomach.hasRoomFo
     `,
     );
 
-    return obj;
+    this.obj = obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'edible', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(EdibleBuilder);

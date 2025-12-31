@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Builds the Stackable prototype
@@ -17,15 +18,24 @@ import type { ObjectManager } from '../../object-manager.js';
  * - Splittable: Can peel off a quantity into a new stack
  * - Integer quantities only (no fractions)
  */
-export class StackableBuilder {
-  static readonly alias = 'stackable';
-  static readonly parent = 'describable';
+export class StackableBuilder implements Builder {
+  static provides = ['stackable'];
+  static depends = ['describable'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: number): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.stackable && !forceRebuild) {
+      this.obj = $.stackable;
+      return;
+    }
+
+    const parentObj = $.describable;
+    this.obj = await this.manager.create({
       parent: parentObj!,
       properties: {
         name: 'Stackable',
@@ -62,6 +72,7 @@ OPERATIONS:
       methods: {},
     });
 
+    const obj = this.obj;
     // ═══════════════════════════════════════════════════════════════════
     // CORE STACK OPERATIONS
     // ═══════════════════════════════════════════════════════════════════
@@ -312,7 +323,15 @@ OPERATIONS:
       'contraband',
       'Boolean flag marking this item as illegal to possess. May be searched for or confiscated by authorities.',
     );
+  }
 
-    return obj;
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'stackable', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(StackableBuilder);

@@ -7,7 +7,7 @@
  */
 
 import { Subject } from 'rxjs';
-import type { IChannel } from '../multiplexed/types.js';
+import type { IChannel } from '../multiplexed/types';
 
 /** Maximum messages to buffer before dropping oldest */
 const MAX_BUFFER_SIZE = 1000;

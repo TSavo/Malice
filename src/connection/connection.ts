@@ -1,8 +1,8 @@
 import { BehaviorSubject, type Observable } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import type { AuthInfo } from '../../types/auth.js';
-import type { ConnectionState, IConnection } from '../../types/connection.js';
-import type { ITransport } from '../../types/transport.js';
+import type { AuthInfo } from '../../types/auth';
+import type { ConnectionState, IConnection } from '../../types/connection';
+import type { ITransport } from '../../types/transport';
 
 /**
  * Connection wraps a transport with session state

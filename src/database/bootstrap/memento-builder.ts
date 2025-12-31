@@ -1,5 +1,6 @@
-import type { RuntimeObject } from '../../../types/object.js';
-import type { ObjectManager } from '../object-manager.js';
+import type { RuntimeObject } from '../../../types/object';
+import type { ObjectManager } from '../object-manager';
+import { registerBuilder, type Builder } from './builder-registry';
 
 /**
  * Builds Memento utility object ($.memento)
@@ -18,7 +19,10 @@ import type { ObjectManager } from '../object-manager.js';
  * objects you pass to capture(). In-graph objects get new IDs on rehydrate,
  * external references are assumed to exist and stay as-is.
  */
-export class MementoBuilder {
+export class MementoBuilder implements Builder {
+  static provides = ['memento'];
+  static depends: string[] = [];
+
   private memento: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
@@ -296,7 +300,7 @@ export class MementoBuilder {
     );
   }
 
-  async registerAlias(): Promise<void> {
+  async registerAliases(): Promise<void> {
     if (!this.memento) return;
 
     const objectManager = await this.manager.load(0);
@@ -306,3 +310,6 @@ export class MementoBuilder {
     console.log(`Registered memento alias -> #${this.memento.id}`);
   }
 }
+
+// Self-register
+registerBuilder(MementoBuilder);

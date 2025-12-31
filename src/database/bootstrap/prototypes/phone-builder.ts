@@ -1,18 +1,28 @@
-import type { RuntimeObject } from '../../../../types/object.js';
-import type { ObjectManager } from '../../object-manager.js';
+import type { RuntimeObject } from '../../../../types/object';
+import type { ObjectManager } from '../../object-manager';
+import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
  * Base Phone prototype (abstract-style behaviors).
  * Provides a number, basic dial/send handling, and hooks for subclasses.
  */
-export class PhoneBuilder {
-  static readonly alias = 'phone';
-  static readonly parent = 'describable';
+export class PhoneBuilder implements Builder {
+  static provides = ['phone'];
+  static depends = ['describable'];
+
+  private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(describableId: number): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(describableId);
+  async build(forceRebuild = false): Promise<void> {
+    const $ = this.manager as any;
+
+    if ($.phone && !forceRebuild) {
+      this.obj = $.phone;
+      return;
+    }
+
+    const parentObj = $.describable;
     const obj = await this.manager.create({
       parent: parentObj!,
       properties: {
@@ -120,6 +130,16 @@ DATABASE: 'phoneDb' references $.phoneDB for number lookups. findPhoneByNumber()
       'Active call target object ID, or null if no call in progress',
     );
 
-    return obj;
+    this.obj = obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    // Register in memory for immediate access
+    if (!this.obj) return;
+    const objectManager = await this.manager.load(0);
+    await objectManager?.call('addAlias', 'phone', this.obj.id);
   }
 }
+
+// Self-register
+registerBuilder(PhoneBuilder);
