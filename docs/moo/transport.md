@@ -1,15 +1,25 @@
 # Transport Layer
 
-Malice supports multiple transport protocols for player connections.
+Malice uses HTTP and WebSocket transports for player connections. Each faction gets its own transport bundle with dedicated ports.
 
-## Transport Types
+## Transport Architecture
 
-| Transport | Port | Path | Format | Use Case |
-|-----------|------|------|--------|----------|
-| Telnet | 5555 | - | Raw text | Traditional MUD clients |
-| SSH | 5556 | - | Raw text | Secure terminal connections |
-| WebSocket | 8080 | `/` | Raw text | Simple web terminals |
-| WebSocket | 8080 | `/mux` | JSON envelopes | Rich web clients |
+**Per-Faction Transport Bundles:**
+
+Each faction gets isolated network infrastructure:
+
+| Faction | HTTP | WebSocket | Session MCP |
+|---------|------|-----------|-------------|
+| Continuum | 8000 | 8080 | 3012 |
+| Gray Cartel | 8001 | 8081 | 3013 |
+| (new faction N) | 8000+N | 8080+N | 3012+N |
+
+**WebSocket Paths:**
+
+| Path | Format | Use Case |
+|------|--------|----------|
+| `/` | Raw text | Simple web terminals |
+| `/mux` | JSON envelopes | Rich web clients (recommended) |
 
 ## Multiplexed WebSocket Transport
 
@@ -17,7 +27,7 @@ The `/mux` endpoint provides a channel-based protocol for rich web clients that 
 
 ### Why Multiplexed?
 
-Traditional telnet/raw WebSocket connections are single-channel - everything is text in, text out. The multiplexed transport adds:
+Raw WebSocket connections are single-channel - everything is text in, text out. The multiplexed transport adds:
 
 - **Out-of-band state updates** - Push room/inventory changes without cluttering text
 - **Control signals** - Resize, ready state, typing indicators
@@ -155,7 +165,7 @@ await player.call('ctrl', 'prompt', { text: '> ' });
 await player.call('channel', 'custom:events', { event: 'alert' });
 ```
 
-These methods no-op silently for non-multiplexed connections (telnet).
+These methods no-op silently for non-multiplexed connections.
 
 ### Location Broadcast Methods
 

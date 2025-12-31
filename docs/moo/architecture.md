@@ -67,7 +67,7 @@ This is the correct architecture for a MOO because:
 ### Layer 1: TypeScript Core (Minimal)
 
 **ONLY these things:**
-- WebSocket/Telnet transport (including multiplexed channels)
+- HTTP/WebSocket transport (including multiplexed channels)
 - MongoDB connection and queries
 - Object database (ObjectManager, RuntimeObject)
 - Change stream subscription
@@ -82,14 +82,16 @@ This is the correct architecture for a MOO because:
 
 #### Transport Layer
 
-The transport layer handles connections from various clients:
+The transport layer handles connections from various clients. Each faction gets its own transport bundle:
 
-| Transport | Port | Purpose |
-|-----------|------|---------|
-| Telnet | 5555 | Traditional MUD clients |
-| SSH | 5556 | Secure terminal connections |
-| WebSocket `/` | 8080 | Simple web terminals (raw text) |
-| WebSocket `/mux` | 8080 | Rich web clients (multiplexed channels) |
+| Transport | Port Pattern | Purpose |
+|-----------|--------------|---------|
+| HTTP | 8000+N | Faction websites, registration, API |
+| WebSocket `/` | 8080+N | Simple web terminals (raw text) |
+| WebSocket `/mux` | 8080+N | Rich web clients (multiplexed channels) |
+| Session MCP | 3012+N | Player-scoped MCP for AI clients |
+
+Where N = faction index (Continuum=0, Cartel=1, etc.).
 
 The **multiplexed transport** (`/mux`) provides out-of-band channels for state updates, control signals, and custom data. See [Transport](./transport.md) for details.
 
