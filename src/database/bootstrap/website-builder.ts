@@ -425,11 +425,23 @@ export class WebsiteBuilder {
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.min.css">
   <link rel="stylesheet" href="https://unpkg.com/open-props">
   <style>
+    /* Theme variables - override these in faction templates */
+    :root {
+      --theme-bg: #0a0a0a;
+      --theme-surface: #0d0d0d;
+      --theme-accent: #00ff88;
+      --theme-accent-dim: #00ff8833;
+      --theme-selection: rgba(0, 255, 136, 0.3);
+      --theme-text: #e0e0e0;
+      --theme-text-dim: #888;
+      --theme-border: #333;
+    }
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body {
       height: 100%;
       overflow: hidden;
-      background: #0a0a0a;
+      background: var(--theme-bg);
       font-family: 'JetBrains Mono', monospace;
     }
 
@@ -439,7 +451,7 @@ export class WebsiteBuilder {
       inset: 0;
       display: flex;
       flex-direction: column;
-      background: #0a0a0a;
+      background: var(--theme-bg);
     }
 
     /* Window area (excludes taskbar) */
@@ -456,8 +468,8 @@ export class WebsiteBuilder {
 
     /* Window flashing animation */
     @keyframes window-flash {
-      0%, 100% { border-color: #333; }
-      50% { border-color: #00ff88; }
+      0%, 100% { border-color: var(--theme-border); }
+      50% { border-color: var(--theme-accent); }
     }
     .malice-window.flashing {
       animation: window-flash 0.5s ease-in-out 4;
@@ -466,7 +478,7 @@ export class WebsiteBuilder {
     /* Taskbar button flashing */
     @keyframes taskbar-flash {
       0%, 100% { background: #1a1a1a; }
-      50% { background: #00ff8833; }
+      50% { background: var(--theme-accent-dim); }
     }
   </style>
 </head>
@@ -476,6 +488,13 @@ export class WebsiteBuilder {
     <div id="taskbar-container"></div>
   </div>
 
+  <script>
+    window.MALICE_THEME = {
+      accent: '#00ff88',
+      surface: '#0d0d0d',
+      selection: 'rgba(0, 255, 136, 0.3)'
+    };
+  </script>
   <script type="module" src="/js/desktop.js"></script>
 </body>
 </html>`,
@@ -496,11 +515,23 @@ export class WebsiteBuilder {
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.min.css">
   <link rel="stylesheet" href="https://unpkg.com/open-props">
   <style>
+    /* Theme variables - override these in faction templates */
+    :root {
+      --theme-bg: #0a0a0a;
+      --theme-surface: #0d0d0d;
+      --theme-accent: #00ff88;
+      --theme-accent-dim: #00ff8833;
+      --theme-selection: rgba(0, 255, 136, 0.3);
+      --theme-text: #e0e0e0;
+      --theme-text-dim: #888;
+      --theme-border: #333;
+    }
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body {
       height: 100%;
       overflow: hidden;
-      background: #0a0a0a;
+      background: var(--theme-bg);
       font-family: 'JetBrains Mono', monospace;
     }
 
@@ -510,7 +541,7 @@ export class WebsiteBuilder {
       inset: 0;
       display: flex;
       flex-direction: column;
-      background: #0a0a0a;
+      background: var(--theme-bg);
     }
 
     /* Window area (excludes taskbar) */
@@ -527,8 +558,8 @@ export class WebsiteBuilder {
 
     /* Window flashing animation */
     @keyframes window-flash {
-      0%, 100% { border-color: #333; }
-      50% { border-color: #00ff88; }
+      0%, 100% { border-color: var(--theme-border); }
+      50% { border-color: var(--theme-accent); }
     }
     .malice-window.flashing {
       animation: window-flash 0.5s ease-in-out 4;
@@ -537,7 +568,7 @@ export class WebsiteBuilder {
     /* Taskbar button flashing */
     @keyframes taskbar-flash {
       0%, 100% { background: #1a1a1a; }
-      50% { background: #00ff8833; }
+      50% { background: var(--theme-accent-dim); }
     }
   </style>
 </head>
@@ -547,6 +578,14 @@ export class WebsiteBuilder {
     <div id="taskbar-container"></div>
   </div>
 
+  <script>
+    // Theme data for JS that can't use CSS var()
+    window.MALICE_THEME = {
+      accent: '#00ff88',
+      surface: '#0d0d0d',
+      selection: 'rgba(0, 255, 136, 0.3)'
+    };
+  </script>
   <script type="module" src="/js/desktop.js"></script>
 </body>
 </html>`,

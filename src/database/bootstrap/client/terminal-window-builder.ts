@@ -90,69 +90,54 @@ export class TerminalWindow extends Window {
 
     // Input area at bottom
     this.inputArea = document.createElement('div');
-    this.inputArea.style.cssText = \\\`
-      display: flex;
-      align-items: center;
-      padding: 4px 8px;
-      background: #1a1a1a;
-      border-top: 1px solid #333;
-      gap: 8px;
-    \\\`;
+    this.inputArea.style.cssText = 'display: flex; align-items: center; padding: 4px 8px; background: #1a1a1a; border-top: 1px solid var(--theme-border, #333); gap: 8px;';
 
     // Input field
     this.inputField = document.createElement('input');
     this.inputField.type = 'text';
-    this.inputField.style.cssText = \\\`
-      flex: 1;
-      background: #0d0d0d;
-      border: 1px solid #333;
-      border-radius: 3px;
-      padding: 6px 10px;
-      color: #e0e0e0;
-      font-family: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Monaco, "Courier New", monospace;
-      font-size: 14px;
-      outline: none;
-    \\\`;
+    this.inputField.className = 'terminal-input';
+    this.inputField.style.cssText = 'flex: 1; background: var(--theme-surface, #0d0d0d); border: 1px solid var(--theme-border, #333); border-radius: 3px; padding: 6px 10px; color: #e0e0e0; font-family: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Monaco, "Courier New", monospace; font-size: 14px; outline: none;';
     this.inputField.placeholder = 'Enter command...';
     this.inputArea.appendChild(this.inputField);
+
+    // Inject focus styles via stylesheet
+    if (!document.getElementById('terminal-input-styles')) {
+      const focusStyle = document.createElement('style');
+      focusStyle.id = 'terminal-input-styles';
+      focusStyle.textContent = '.terminal-input:focus { border-color: var(--theme-accent, #00ff88) !important; }';
+      document.head.appendChild(focusStyle);
+    }
 
     // Send button
     const sendBtn = document.createElement('button');
     sendBtn.textContent = 'Send';
-    sendBtn.style.cssText = \\\`
-      background: #00ff88;
-      color: #0a0a0a;
-      border: none;
-      border-radius: 3px;
-      padding: 6px 12px;
-      font-family: monospace;
-      font-weight: bold;
-      cursor: pointer;
-    \\\`;
+    sendBtn.style.cssText = 'background: var(--theme-accent, #00ff88); color: var(--theme-bg, #0a0a0a); border: none; border-radius: 3px; padding: 6px 12px; font-family: monospace; font-weight: bold; cursor: pointer; filter: brightness(1); transition: filter 0.15s;';
+    sendBtn.onmouseenter = () => sendBtn.style.filter = 'brightness(0.85)';
+    sendBtn.onmouseleave = () => sendBtn.style.filter = 'brightness(1)';
     sendBtn.addEventListener('click', () => this._sendCommand());
     this.inputArea.appendChild(sendBtn);
 
     this.content.appendChild(this.inputArea);
 
-    // Input field event handlers
+    // Input field key handler
     this.inputField.addEventListener('keydown', (e) => this._handleInputKey(e));
-    this.inputField.addEventListener('focus', () => {
-      this.inputField.style.borderColor = '#00ff88';
-    });
-    this.inputField.addEventListener('blur', () => {
-      this.inputField.style.borderColor = '#333';
-    });
 
-    // Create terminal (output only)
+    // Get theme from template (or use defaults)
+    const theme = window.MALICE_THEME || {};
+    const bg = theme.surface || '#0d0d0d';
+    const selection = theme.selection || 'rgba(0, 255, 136, 0.3)';
+
+    // Create terminal with standard ANSI colors
+    // Only background and selection are themed - ANSI colors stay semantic
     this.terminal = new Terminal({
       fontFamily: 'ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Monaco, "Courier New", monospace',
       fontSize: 14,
       theme: {
-        background: '#0d0d0d',
+        background: bg,
         foreground: '#e0e0e0',
-        cursor: '#0d0d0d', // Hide cursor since output only
-        cursorAccent: '#0d0d0d',
-        selection: 'rgba(0, 255, 136, 0.3)',
+        cursor: bg,
+        cursorAccent: bg,
+        selection: selection,
         black: '#0d0d0d',
         red: '#ff6666',
         green: '#00ff88',
@@ -171,7 +156,7 @@ export class TerminalWindow extends Window {
         brightWhite: '#ffffff'
       },
       cursorBlink: false,
-      disableStdin: true, // Output only
+      disableStdin: true,
       allowTransparency: false,
       scrollback: 5000
     });

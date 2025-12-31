@@ -609,7 +609,7 @@ export class ContinuumDomainBuilder {
     desktopJsRoute.setMethod(
       'handleRequest',
       `
-      const desktop = $.desktopClientJs;
+      const desktop = $.desktopJs;
       if (desktop && desktop.getScript) {
         const script = await desktop.getScript();
         return {
@@ -633,7 +633,7 @@ export class ContinuumDomainBuilder {
     terminalJsRoute.setMethod(
       'handleRequest',
       `
-      const terminal = $.terminalClientJs;
+      const terminal = $.terminalWindowJs;
       if (terminal && terminal.getScript) {
         const script = await terminal.getScript();
         return {
@@ -706,6 +706,126 @@ export class ContinuumDomainBuilder {
       'handleRequest',
       `
       const mod = $.windowManagerJs;
+      if (mod && mod.getScript) {
+        const script = await mod.getScript();
+        return {
+          status: 200,
+          contentType: 'application/javascript',
+          body: script,
+          headers: { 'Cache-Control': 'public, max-age=3600' }
+        };
+      }
+      return { status: 404, contentType: 'text/plain', body: 'Module not found' };
+    `,
+    );
+
+    // /js/window.js - Base Window class
+    const windowJsRoute = await this.createRoute(webRoute, jsRoute, {
+      name: 'Window JS Route',
+      segment: 'window.js',
+      methods: ['GET'],
+      contentType: 'application/javascript',
+    });
+    windowJsRoute.setMethod(
+      'handleRequest',
+      `
+      const mod = $.windowJs;
+      if (mod && mod.getScript) {
+        const script = await mod.getScript();
+        return {
+          status: 200,
+          contentType: 'application/javascript',
+          body: script,
+          headers: { 'Cache-Control': 'public, max-age=3600' }
+        };
+      }
+      return { status: 404, contentType: 'text/plain', body: 'Module not found' };
+    `,
+    );
+
+    // /js/terminal-window.js - TerminalWindow class
+    const terminalWindowJsRoute = await this.createRoute(webRoute, jsRoute, {
+      name: 'TerminalWindow JS Route',
+      segment: 'terminal-window.js',
+      methods: ['GET'],
+      contentType: 'application/javascript',
+    });
+    terminalWindowJsRoute.setMethod(
+      'handleRequest',
+      `
+      const mod = $.terminalWindowJs;
+      if (mod && mod.getScript) {
+        const script = await mod.getScript();
+        return {
+          status: 200,
+          contentType: 'application/javascript',
+          body: script,
+          headers: { 'Cache-Control': 'public, max-age=3600' }
+        };
+      }
+      return { status: 404, contentType: 'text/plain', body: 'Module not found' };
+    `,
+    );
+
+    // /js/html-window.js - HtmlWindow class
+    const htmlWindowJsRoute = await this.createRoute(webRoute, jsRoute, {
+      name: 'HtmlWindow JS Route',
+      segment: 'html-window.js',
+      methods: ['GET'],
+      contentType: 'application/javascript',
+    });
+    htmlWindowJsRoute.setMethod(
+      'handleRequest',
+      `
+      const mod = $.htmlWindowJs;
+      if (mod && mod.getScript) {
+        const script = await mod.getScript();
+        return {
+          status: 200,
+          contentType: 'application/javascript',
+          body: script,
+          headers: { 'Cache-Control': 'public, max-age=3600' }
+        };
+      }
+      return { status: 404, contentType: 'text/plain', body: 'Module not found' };
+    `,
+    );
+
+    // /js/iframe-window.js - IframeWindow class
+    const iframeWindowJsRoute = await this.createRoute(webRoute, jsRoute, {
+      name: 'IframeWindow JS Route',
+      segment: 'iframe-window.js',
+      methods: ['GET'],
+      contentType: 'application/javascript',
+    });
+    iframeWindowJsRoute.setMethod(
+      'handleRequest',
+      `
+      const mod = $.iframeWindowJs;
+      if (mod && mod.getScript) {
+        const script = await mod.getScript();
+        return {
+          status: 200,
+          contentType: 'application/javascript',
+          body: script,
+          headers: { 'Cache-Control': 'public, max-age=3600' }
+        };
+      }
+      return { status: 404, contentType: 'text/plain', body: 'Module not found' };
+    `,
+    );
+
+    // /js/taskbar.js - Taskbar class
+    const taskbarJsRoute = await this.createRoute(webRoute, jsRoute, {
+      name: 'Taskbar JS Route',
+      segment: 'taskbar.js',
+      methods: ['GET'],
+      contentType: 'application/javascript',
+    });
+    taskbarJsRoute.setMethod(
+      'handleRequest',
+      `
+      const mod = $.taskbarJs;
       if (mod && mod.getScript) {
         const script = await mod.getScript();
         return {
