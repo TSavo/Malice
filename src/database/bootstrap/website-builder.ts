@@ -490,6 +490,9 @@ export class WebsiteBuilder {
 
   <script>
     window.MALICE_THEME = {
+      name: 'The Continuum',
+      tagline: 'Enter your credentials to connect',
+      registerTagline: 'Register as a citizen',
       accent: '#00ff88',
       surface: '#0d0d0d',
       selection: 'rgba(0, 255, 136, 0.3)'
@@ -581,6 +584,9 @@ export class WebsiteBuilder {
   <script>
     // Theme data for JS that can't use CSS var()
     window.MALICE_THEME = {
+      name: 'The Continuum',
+      tagline: 'Enter your credentials to connect',
+      registerTagline: 'Register as a citizen',
       accent: '#00ff88',
       surface: '#0d0d0d',
       selection: 'rgba(0, 255, 136, 0.3)'
