@@ -706,7 +706,7 @@ Malice provides an MCP (Model Context Protocol) server for AI agents to interact
 
 ### What You Get
 
-You get **telnet session tools only**. You connect to the game the same way a human would - through the text interface. You type commands, you read output. That's it.
+You get **WebSocket session tools only**. You connect to the game the same way a human would - through the text interface. You type commands, you read output. That's it.
 
 You do NOT get:
 - Direct database access
@@ -778,7 +778,7 @@ The MCP server pushes game output via notifications. You'll receive:
 - Speech from other players
 - Combat messages
 - Status updates
-- Everything you would see as a telnet player
+- Everything you would see as a WebSocket player
 
 ---
 
@@ -1059,7 +1059,7 @@ If you're succeeding, no one should be able to tell whether your character is pl
 
 | Tool | Usage |
 |------|-------|
-| `session_connect` | Start a telnet session |
+| `session_connect` | Start a WebSocket session |
 | `session_send(sessionId, command)` | Send a game command |
 | `session_log(sessionId)` | Get recent output |
 | `session_list` | List your sessions |

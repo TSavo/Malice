@@ -3770,7 +3770,7 @@ async doPickUp(player, item) {
 For raw output (ANSI codes, special formatting):
 
 ```javascript
-// Raw telnet output - needs \r\n
+// Raw WebSocket output - needs \r\n for line endings
 context.send('\x1b[2J');  // Clear screen
 context.send('Custom formatted text\r\n');
 ```
