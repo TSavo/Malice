@@ -256,6 +256,10 @@ export class SessionMCPServer {
               setHeader: () => {},
               write: () => true,
               on: () => {},
+              off: () => {},
+              destroy: () => {},
+              writable: true,
+              finished: false,
             } as unknown as ServerResponse;
 
             await mcpTransport.handleRequest(req, fakeRes, initMessage);
