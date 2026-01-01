@@ -516,7 +516,7 @@ export class MaliceMCPServer {
                 changed = false;
                 for (const o of allObjects) {
                   if (
-                    validParents.has(o.parent.value) &&
+                    validParents.has(o.parent.id) &&
                     !validParents.has(o._id)
                   ) {
                     validParents.add(o._id);
@@ -527,11 +527,11 @@ export class MaliceMCPServer {
               validParents.delete(id); // Don't include the object itself
 
               for (const o of allObjects) {
-                if (validParents.has(o._id) || o.parent.value === id) {
+                if (validParents.has(o._id) || o.parent.id === id) {
                   descendantList.push({
                     id: `#${o._id}`,
                     name: o.properties?.name?.value || '(unnamed)',
-                    parent: `#${o.parent.value}`,
+                    parent: `#${o.parent.id}`,
                   });
                   if (descendantList.length >= maxResults) break;
                 }
@@ -539,11 +539,11 @@ export class MaliceMCPServer {
             } else {
               // Direct children only
               for (const o of allObjects) {
-                if (o.parent.value === id) {
+                if (o.parent.id === id) {
                   descendantList.push({
                     id: `#${o._id}`,
                     name: o.properties?.name?.value || '(unnamed)',
-                    parent: `#${o.parent.value}`,
+                    parent: `#${o.parent.id}`,
                   });
                   if (descendantList.length >= maxResults) break;
                 }
@@ -975,7 +975,7 @@ export class MaliceMCPServer {
         const rooms = [];
         for (const obj of allObjects) {
           // Check if this object inherits from Room (with cycle protection)
-          let parentId = obj.parent.value;
+          let parentId = obj.parent.id;
           let isRoom = obj._id === roomProto._id;
           const seen = new Set<number>();
           while (parentId !== -1 && !isRoom && !seen.has(parentId)) {
@@ -986,7 +986,7 @@ export class MaliceMCPServer {
             }
             const parent = allObjects.find((o) => o._id === parentId);
             if (!parent) break;
-            parentId = parent.parent.value;
+            parentId = parent.parent.id;
           }
 
           if (isRoom && obj._id !== roomProto._id) {
@@ -1032,7 +1032,7 @@ export class MaliceMCPServer {
         const players = [];
         for (const obj of allObjects) {
           // Check if this object inherits from Player (with cycle protection)
-          let parentId = obj.parent.value;
+          let parentId = obj.parent.id;
           let isPlayer = false;
           const seen = new Set<number>();
           while (parentId !== -1 && !seen.has(parentId)) {
@@ -1043,14 +1043,14 @@ export class MaliceMCPServer {
             }
             const parent = allObjects.find((o) => o._id === parentId);
             if (!parent) break;
-            parentId = parent.parent.value;
+            parentId = parent.parent.id;
           }
 
           if (isPlayer) {
             players.push({
               id: obj._id,
               name: obj.properties?.name?.value || '(unnamed)',
-              location: obj.properties?.location?.value ?? null,
+              location: (obj.properties?.location as ObjRefValue | undefined)?.id ?? null,
               connected: obj.properties?.connected?.value ?? false,
             });
           }
@@ -1341,7 +1341,7 @@ export class MaliceMCPServer {
             props.location = { type: 'objref', value: location.id };
           }
 
-          const cloneParent = await this.manager.load(raw.parent.value);
+          const cloneParent = await this.manager.load(raw.parent.id);
           const clone = await this.manager.create({
             parent: cloneParent!,
             properties: props,
@@ -3694,7 +3694,7 @@ Core Objects:
                 {
                   id: raw._id,
                   name: obj.get('name'),
-                  parent: `#${raw.parent.value}`,
+                  parent: `#${raw.parent.id}`,
                   description: obj.get('description'),
                   location: locationRef,
                   properties: Object.keys(raw.properties || {}),
@@ -3850,7 +3850,7 @@ Core Objects:
         const players = [];
         for (const obj of allObjects) {
           // Check if this object inherits from Player (with cycle protection)
-          let parentId = obj.parent.value;
+          let parentId = obj.parent.id;
           let isPlayer = false;
           const seen = new Set<number>();
           while (parentId !== -1 && !seen.has(parentId)) {
@@ -3861,14 +3861,14 @@ Core Objects:
             }
             const parent = allObjects.find((o) => o._id === parentId);
             if (!parent) break;
-            parentId = parent.parent.value;
+            parentId = parent.parent.id;
           }
 
           if (isPlayer) {
             players.push({
               id: obj._id,
               name: obj.properties?.name?.value || '(unnamed)',
-              location: obj.properties?.location?.value,
+              location: (obj.properties?.location as ObjRefValue | undefined)?.id,
             });
           }
         }
@@ -4973,7 +4973,7 @@ Core Objects:
             const rooms: Array<{ id: number; name: string }> = [];
 
             for (const obj of allObjects) {
-              let parentId = obj.parent.value;
+              let parentId = obj.parent.id;
               let isRoom = obj._id === roomProtoId;
               const seen = new Set<number>();
               while (parentId !== -1 && !isRoom && !seen.has(parentId)) {
@@ -4984,7 +4984,7 @@ Core Objects:
                 }
                 const parent = allObjects.find((o) => o._id === parentId);
                 if (!parent) break;
-                parentId = parent.parent.value;
+                parentId = parent.parent.id;
               }
 
               if (isRoom && obj._id !== roomProtoId) {
@@ -5058,7 +5058,7 @@ Core Objects:
 
           if (contentIds) {
             for (const ref of contentIds) {
-              const objId = ref?.value ?? ref;
+              const objId = ref?.id ?? ref;
               if (typeof objId !== 'number') continue;
 
               const obj = await this.manager.load(objId as ObjId);
@@ -5094,7 +5094,7 @@ Core Objects:
 
           // Get exits
           const exitIds = (await room.get('exits')) as
-            | Array<{ type: string; value: number }>
+            | Array<{ type: string; id: ObjId }>
             | undefined;
           const exits: Array<{
             direction: string;
@@ -5104,7 +5104,7 @@ Core Objects:
 
           if (exitIds) {
             for (const ref of exitIds) {
-              const exitId = ref?.value ?? ref;
+              const exitId = ref?.id ?? ref;
               if (typeof exitId !== 'number') continue;
 
               const exit = await this.manager.load(exitId as ObjId);
@@ -5114,11 +5114,11 @@ Core Objects:
                 (await exit.get('direction')) || 'unknown',
               );
               const destRef = (await exit.get('destination')) as
-                | { value: number }
+                | { id: ObjId }
                 | number
                 | undefined;
               const destId =
-                typeof destRef === 'number' ? destRef : destRef?.value;
+                typeof destRef === 'number' ? destRef : destRef?.id;
 
               if (destId) {
                 const dest = await this.manager.load(destId as ObjId);
@@ -5254,11 +5254,11 @@ Core Objects:
           }
 
           const locationRef = (await player.get('location')) as
-            | { value: number }
+            | { id: ObjId }
             | number
             | undefined;
           const locationId =
-            typeof locationRef === 'number' ? locationRef : locationRef?.value;
+            typeof locationRef === 'number' ? locationRef : locationRef?.id;
           let locationName = null;
           if (locationId) {
             const loc = await this.manager.load(locationId as ObjId);
@@ -5344,7 +5344,7 @@ Core Objects:
           const raw = obj._getRaw();
           const result = {
             _id: raw._id,
-            parent: `#${raw.parent.value}`,
+            parent: `#${raw.parent.id}`,
             properties: this.serializeValue(obj.getOwnProperties()),
             methods: Object.keys(raw.methods || {}),
             created: raw.created,
@@ -5576,8 +5576,8 @@ Core Objects:
             }
 
             // Move to parent
-            if (raw.parent && raw.parent.value !== currentObj.id) {
-              currentObj = await this.manager.load(raw.parent.value);
+            if (raw.parent && raw.parent.id !== currentObj.id) {
+              currentObj = await this.manager.load(raw.parent.id);
             } else {
               break;
             }

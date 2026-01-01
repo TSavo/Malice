@@ -291,7 +291,7 @@ export class DevToolsServer {
 
       return {
         id: obj._id,
-        parent: obj.parent?.value ?? obj.parent,
+        parent: obj.parent?.id ?? obj.parent,
         properties: Object.keys(obj.properties || {}),
         methods: Object.keys(obj.methods || {}),
         recycled: obj.recycled || false,
@@ -319,7 +319,7 @@ export class DevToolsServer {
     return {
       object: {
         _id: raw._id,
-        parent: raw.parent?.value ?? raw.parent, // Extract ID from ObjRefValue
+        parent: raw.parent?.id ?? raw.parent, // Extract ID from ObjRefValue
         properties: obj.getOwnProperties(), // Return resolved values, not typed Values
         methods: raw.methods,
         created: raw.created,

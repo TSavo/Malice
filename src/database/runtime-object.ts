@@ -8,6 +8,8 @@ import type {
   PropertyInfo,
   PropertyValue,
   RuntimeObject,
+  RuntimeObjectKind,
+  TypeObject,
   Value,
 } from '../../types/object';
 import type { ObjectManager } from './object-manager';
@@ -51,21 +53,26 @@ function dedent(str: string): string {
 }
 
 /**
- * Runtime wrapper around GameObject with inheritance and method execution
+ * Runtime wrapper around GameObject or TypeObject with inheritance and method execution
  * Uses Proxy to enable direct property access (e.g., self.hp instead of self.get('hp'))
+ *
+ * This class serves both types and objects - the `kind` property indicates which.
  */
 export class RuntimeObjectImpl implements RuntimeObject {
-  private obj: GameObject;
+  private obj: GameObject | TypeObject;
   private dirty = false;
   private proxy: RuntimeObject;
   private _cachedParent: RuntimeObject | undefined = undefined; // undefined = not cached
   private writeQueue: Promise<void> = Promise.resolve(); // Serializes ALL writes to this object
+  private _kind: RuntimeObjectKind;
 
   constructor(
-    obj: GameObject,
+    obj: GameObject | TypeObject,
     private manager: ObjectManager,
+    kind: RuntimeObjectKind = 'object',
   ) {
     this.obj = obj;
+    this._kind = kind;
 
     // Create proxy for direct property access
     this.proxy = new Proxy(this, {
@@ -111,7 +118,20 @@ export class RuntimeObjectImpl implements RuntimeObject {
   }
 
   get id(): ObjId {
+    // Returns string for types, number for objects
     return this.obj._id;
+  }
+
+  get kind(): RuntimeObjectKind {
+    return this._kind;
+  }
+
+  get isType(): boolean {
+    return this._kind === 'type';
+  }
+
+  get isObject(): boolean {
+    return this._kind === 'object';
   }
 
   /**
@@ -157,13 +177,21 @@ export class RuntimeObjectImpl implements RuntimeObject {
     }
 
     // Handle RuntimeObject (store as objref)
+    if (jsValue && typeof jsValue === 'object' && 'kind' in jsValue) {
+      if (jsValue.kind === 'type') {
+        return { type: 'objref', target: 'type', id: jsValue.id } as ObjRefValue;
+      } else if (jsValue.kind === 'object' && typeof jsValue.id === 'number') {
+        return { type: 'objref', target: 'object', id: jsValue.id } as ObjRefValue;
+      }
+    }
+    // RuntimeObject with id - default to object reference
     if (
       jsValue &&
       typeof jsValue === 'object' &&
       'id' in jsValue &&
       typeof jsValue.id === 'number'
     ) {
-      return { type: 'objref', value: jsValue.id };
+      return { type: 'objref', target: 'object', id: jsValue.id } as ObjRefValue;
     }
 
     // Handle primitives
@@ -174,7 +202,7 @@ export class RuntimeObjectImpl implements RuntimeObject {
       // This allows MCP and external systems to pass objrefs as strings
       if (/^#\d+$/.test(jsValue)) {
         const objId = parseInt(jsValue.slice(1), 10);
-        return { type: 'objref', value: objId };
+        return { type: 'objref', target: 'object', id: objId } as ObjRefValue;
       }
       return { type: 'string', value: jsValue };
     }
@@ -264,13 +292,25 @@ export class RuntimeObjectImpl implements RuntimeObject {
         return value.value;
 
       case 'objref': {
-        // Resolve object reference - getSync returns the proxy directly
-        const obj = this.manager.getSync(value.value);
-        if (!obj) {
-          // Object not in cache or doesn't exist - return raw ID
-          return value.value;
+        // Self-describing objref format
+        if (value.target === 'type') {
+          // Reference to a type by id (type name)
+          const typeObj = this.manager.getTypeSync(value.id);
+          if (!typeObj) {
+            // Type not in cache - return the id as a fallback
+            return value.id;
+          }
+          return typeObj;
+        } else if (value.target === 'object') {
+          // Reference to an object by ID
+          const obj = this.manager.getSync(value.id);
+          if (!obj) {
+            return value.id;
+          }
+          return obj;
         }
-        return obj;
+        // Should not reach here with proper typing
+        return null;
       }
 
       case 'array': {
@@ -381,7 +421,7 @@ export class RuntimeObjectImpl implements RuntimeObject {
 
     // Walk up parent chain
     // Stop at self-parented objects (parent.value === self._id) like #-1 and #0
-    const parentId = this.obj.parent.value;
+    const parentId = this.obj.parent.id;
     if (parentId !== this.obj._id) {
       const parent = this.manager.getSync(parentId);
       if (parent) {
@@ -577,7 +617,7 @@ export class RuntimeObjectImpl implements RuntimeObject {
     // Remove from in-memory array (find by deep equality)
     const idx = propValue.value.findIndex((v) => {
       if (v.type === 'objref' && typedValue.type === 'objref') {
-        return v.value === typedValue.value;
+        return v.target === typedValue.target && v.id === typedValue.id;
       }
       return JSON.stringify(v) === JSON.stringify(typedValue);
     });
@@ -732,7 +772,7 @@ export class RuntimeObjectImpl implements RuntimeObject {
    */
   async getMethodCode(
     name: string,
-  ): Promise<{ code: string; objectId: number } | null> {
+  ): Promise<{ code: string; objectId: ObjId } | null> {
     const found = await this.findMethodAsync(name);
     if (!found) return null;
     return { code: found.code, objectId: found.objectId };
@@ -822,7 +862,7 @@ export class RuntimeObjectImpl implements RuntimeObject {
 
     // Walk up parent chain (sync - uses cache only)
     // Stop at self-parented objects (parent.value === self._id) like #-1 and #0
-    const parentId = this.obj.parent.value;
+    const parentId = this.obj.parent.id;
     if (parentId !== this.obj._id) {
       const parent = this.manager.getSync(parentId);
       if (parent) {
@@ -841,7 +881,7 @@ export class RuntimeObjectImpl implements RuntimeObject {
    */
   private async findMethodAsync(
     method: string,
-  ): Promise<{ code: MethodCode; objectId: number } | null> {
+  ): Promise<{ code: MethodCode; objectId: ObjId } | null> {
     // Check this object first
     if (method in this.obj.methods) {
       const methodDef = this.obj.methods[method];
@@ -850,7 +890,7 @@ export class RuntimeObjectImpl implements RuntimeObject {
 
     // Walk up parent chain (async - loads from DB if not cached)
     // Stop at self-parented objects (parent.value === self._id) like #-1 and #0
-    const parentId = this.obj.parent.value;
+    const parentId = this.obj.parent.id;
     if (parentId !== this.obj._id) {
       const parent = await this.manager.load(parentId);
       if (parent) {
@@ -867,10 +907,10 @@ export class RuntimeObjectImpl implements RuntimeObject {
    */
   async findParentMethod(
     method: string,
-  ): Promise<{ code: MethodCode; objectId: number } | null> {
+  ): Promise<{ code: MethodCode; objectId: ObjId } | null> {
     // Start from parent, not self
     // Self-parented objects have no parent to search
-    const parentId = this.obj.parent.value;
+    const parentId = this.obj.parent.id;
     if (parentId === this.obj._id) {
       return null; // No parent to search
     }
@@ -933,7 +973,7 @@ export class RuntimeObjectImpl implements RuntimeObject {
     userContext: any,
     args: unknown[],
     methodName = 'anonymous',
-    definingObjectId?: number,
+    definingObjectId?: ObjId,
   ): Promise<unknown> {
     // Use definingObjectId if provided, otherwise fall back to this.id
     const methodObjectId = definingObjectId ?? this.id;
@@ -1037,7 +1077,7 @@ export class RuntimeObjectImpl implements RuntimeObject {
     // IMPORTANT: We search from the object where method is DEFINED (definingObjectId),
     // not from self (self might be a child instance calling inherited method)
 
-    const createPass = (searchFromId: number) => {
+    const createPass = (searchFromId: ObjId) => {
       return async (...passArgs: unknown[]) => {
         // Use passed args if provided, otherwise use original args
         const argsToPass = passArgs.length > 0 ? passArgs : args;
@@ -1292,7 +1332,7 @@ export class RuntimeObjectImpl implements RuntimeObject {
       return this._cachedParent;
     }
 
-    const parentId = this.obj.parent.value;
+    const parentId = this.obj.parent.id;
     if (parentId === this.obj._id) {
       this._cachedParent = this.proxy; // Self-parented returns self
       return this.proxy;
@@ -1321,8 +1361,12 @@ export class RuntimeObjectImpl implements RuntimeObject {
     // Cache the parent reference (reuse existing RuntimeObject)
     this._cachedParent = parent;
 
-    // Store ID for database persistence
-    this.obj.parent = { type: 'objref', value: parent.id } as ObjRefValue;
+    // Store reference for database persistence
+    if (parent.kind === 'type') {
+      this.obj.parent = { type: 'objref', target: 'type', id: parent.id };
+    } else {
+      this.obj.parent = { type: 'objref', target: 'object', id: parent.id as number };
+    }
     this.dirty = true;
 
     // Auto-persist
@@ -1369,7 +1413,7 @@ export class RuntimeObjectImpl implements RuntimeObject {
     const result: Record<string, PropertyInfo> = {};
 
     // First, gather from parent (so child can override)
-    const parentId = this.obj.parent.value;
+    const parentId = this.obj.parent.id;
     if (parentId !== this.obj._id) {
       const parent = this.manager.getSync(parentId);
       if (parent) {
@@ -1588,9 +1632,9 @@ export class RuntimeObjectImpl implements RuntimeObject {
   }
 
   /**
-   * Get the raw GameObject (for manager use)
+   * Get the raw object (for manager use)
    */
-  _getRaw(): GameObject {
+  _getRaw(): TypeObject | GameObject {
     return this.obj;
   }
 }

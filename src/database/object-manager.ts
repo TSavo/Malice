@@ -17,12 +17,12 @@ import { RuntimeObjectImpl } from './runtime-object';
  * Event types emitted by ObjectManager for change notifications
  */
 export type ObjectChangeEvent =
-  | { type: 'method.changed'; objectId: number; name: string }
-  | { type: 'method.deleted'; objectId: number; name: string }
-  | { type: 'property.changed'; objectId: number; name: string }
-  | { type: 'property.deleted'; objectId: number; name: string }
-  | { type: 'object.created'; objectId: number }
-  | { type: 'object.changed'; objectId: number };
+  | { type: 'method.changed'; objectId: ObjId; name: string }
+  | { type: 'method.deleted'; objectId: ObjId; name: string }
+  | { type: 'property.changed'; objectId: ObjId; name: string }
+  | { type: 'property.deleted'; objectId: ObjId; name: string }
+  | { type: 'object.created'; objectId: ObjId }
+  | { type: 'object.changed'; objectId: ObjId };
 
 /**
  * Selector for property predicates in fluent query builder
@@ -409,7 +409,7 @@ export class QueryBuilder {
   /** Execute query and return unique parents of all matching objects */
   parents(): RuntimeObject[] {
     const results = this.execute();
-    const parentMap = new Map<number, RuntimeObject>();
+    const parentMap = new Map<ObjId, RuntimeObject>();
     for (const obj of results) {
       const parent = obj.getParent();
       if (parent && !parentMap.has(parent.id)) {
@@ -436,7 +436,7 @@ export class QueryBuilder {
   }
 
   /** Execute query and return all IDs of matching objects */
-  ids(): number[] {
+  ids(): ObjId[] {
     return this.execute().map((obj) => obj.id);
   }
 
@@ -567,9 +567,15 @@ function sanitizeForMongo(
  * - Custom aliases can be set: $.myAlias = object
  * - All aliases are loaded from MongoDB, not hardcoded in TypeScript
  * - Aliases can be configured via MOO code for maximum flexibility
+ *
+ * Type System:
+ * - Types are named definitions stored in a separate collection
+ * - Types are automatically aliased by name ($room for type 'room')
+ * - Objects reference types by name, not by ID
  */
 export class ObjectManager {
   private cache: ObjectCache;
+  private typeCache = new Map<string, RuntimeObject>(); // Types keyed by name
   private aliases = new Map<string, RuntimeObject>();
   public readonly db: ObjectDatabase; // Expose for DevTools direct access
   private telnetClient?: MCPTelnetClient; // For $.session native methods
@@ -606,6 +612,11 @@ export class ObjectManager {
         // Infrastructure objects (not stored in MongoDB)
         if (prop === 'logger') {
           return getLoggerFacade();
+        }
+
+        // Check type cache first (types are auto-aliased by name)
+        if (target.typeCache.has(prop as string)) {
+          return target.typeCache.get(prop as string);
         }
 
         // Check if it's a registered alias
@@ -658,10 +669,12 @@ export class ObjectManager {
   }
 
   /**
-   * Load object from database (with caching)
-   * Special cases:
+   * Load object or type from database (with caching)
+   * For objects (numeric IDs):
    * - load(-1) returns $.nothing - immutable null object reference
    * - load(0) returns the ObjectManager itself as a RuntimeObject
+   * For types (string IDs):
+   * - Delegates to loadType()
    */
   async load(id: ObjId | RuntimeObject): Promise<RuntimeObject | null> {
     // Handle RuntimeObject being passed - extract the ID
@@ -669,6 +682,13 @@ export class ObjectManager {
       // Already a RuntimeObject - just return it
       return id as RuntimeObject;
     }
+
+    // Handle type names (string IDs)
+    if (typeof id === 'string') {
+      return this.loadType(id);
+    }
+
+    // From here, id is a number (object ID)
 
     // Special case: #-1 is the null object reference ($.nothing)
     if (id === -1) {
@@ -684,7 +704,7 @@ export class ObjectManager {
         // Create #-1 as immutable null object with empty properties
         obj = await this.db.create({
           _id: -1,
-          parent: { type: 'objref', value: -1 }, // Self-parented
+          parent: { type: 'objref', target: 'object', id: -1 }, // Self-parented
           properties: {},
           methods: {},
         });
@@ -725,7 +745,7 @@ export class ObjectManager {
         // Create #0 on first access with empty properties
         obj = await this.db.create({
           _id: 0,
-          parent: { type: 'objref', value: 0 }, // Self-parented
+          parent: { type: 'objref', target: 'object', id: 0 }, // Self-parented
           properties: {},
           methods: {},
         });
@@ -778,9 +798,143 @@ export class ObjectManager {
 
   /**
    * Synchronous cache-only get (for inheritance chain walking)
+   * Handles both type names (strings) and object IDs (numbers)
    */
   getSync(id: ObjId): RuntimeObject | null {
+    if (typeof id === 'string') {
+      return this.getTypeSync(id);
+    }
     return this.cache.getObject(id) || null;
+  }
+
+  /**
+   * Synchronous type cache get (for objref resolution)
+   */
+  getTypeSync(name: string): RuntimeObject | null {
+    return this.typeCache.get(name) || null;
+  }
+
+  /**
+   * Load type by name
+   */
+  async loadType(name: string): Promise<RuntimeObject | null> {
+    // Check cache first
+    const cached = this.typeCache.get(name);
+    if (cached) {
+      return cached;
+    }
+
+    // Load from database
+    const typeObj = await this.db.getType(name);
+    if (!typeObj) return null;
+
+    // Wrap in RuntimeObject with kind='type'
+    const runtime = new RuntimeObjectImpl(typeObj, this, 'type');
+    const proxy = runtime.getProxy();
+    this.typeCache.set(name, proxy);
+
+    return proxy;
+  }
+
+  /**
+   * Get type by name (alias for loadType, for MOO code convenience)
+   */
+  type(name: string): Promise<RuntimeObject | null> {
+    return this.loadType(name);
+  }
+
+  /**
+   * Define a new type
+   * Creates a type in the types collection, auto-aliases it by name
+   *
+   * @param name - The type name (becomes the $alias)
+   * @param parent - Parent type (RuntimeObject with kind='type')
+   * @param options - Optional initial properties and methods
+   */
+  async define(
+    name: string,
+    parent: RuntimeObject,
+    options?: {
+      properties?: Record<string, any>;
+      methods?: Record<string, any>;
+    },
+  ): Promise<RuntimeObject> {
+    // Validate parent
+    if (!parent || !parent.isType) {
+      throw new Error(
+        `define(): parent must be a type, got ${parent?.kind || 'undefined'}`,
+      );
+    }
+
+    // Create the type in database
+    const typeObj = await this.db.createType({
+      _id: name,
+      parent: { type: 'objref', target: 'type', id: parent.id },
+      properties: {},
+      methods: {},
+    });
+
+    // Wrap in RuntimeObject
+    const runtime = new RuntimeObjectImpl(typeObj, this, 'type');
+    const proxy = runtime.getProxy();
+
+    // Cache it (auto-aliases by name)
+    this.typeCache.set(name, proxy);
+
+    // Set initial properties if provided
+    if (options?.properties) {
+      for (const [key, value] of Object.entries(options.properties)) {
+        proxy.set(key, value);
+      }
+    }
+
+    // Set initial methods if provided
+    if (options?.methods) {
+      for (const [methodName, methodDef] of Object.entries(options.methods)) {
+        if (typeof methodDef === 'string') {
+          proxy.setMethod(methodName, methodDef);
+        } else {
+          proxy.setMethod(methodName, methodDef.code, {
+            callable: methodDef.callable,
+            aliases: methodDef.aliases,
+            help: methodDef.help,
+          });
+        }
+      }
+    }
+
+    return proxy;
+  }
+
+  /**
+   * Load ALL types into memory at startup
+   */
+  async loadAllTypes(): Promise<number> {
+    console.log('[ObjectManager] Loading all types into memory...');
+    const start = Date.now();
+
+    const allTypes = await this.db.listAllTypes();
+    let count = 0;
+
+    for (const typeObj of allTypes) {
+      // Skip if already cached
+      if (this.typeCache.has(typeObj._id)) {
+        continue;
+      }
+
+      // Wrap in RuntimeObject and cache
+      const runtime = new RuntimeObjectImpl(typeObj, this, 'type');
+      const proxy = runtime.getProxy();
+      this.typeCache.set(typeObj._id, proxy);
+      count++;
+    }
+
+    const elapsed = Date.now() - start;
+    console.log(
+      `[ObjectManager] Loaded ${count} types in ${elapsed}ms (${allTypes.length} total)`,
+    );
+
+    return count;
   }
 
   /**
@@ -796,19 +950,26 @@ export class ObjectManager {
         'Parent must be a RuntimeObject, not a number. Use manager.load(id) to get the parent object.',
       );
     }
-    if (!params.parent || typeof params.parent.id !== 'number') {
+    if (!params.parent || !('kind' in params.parent)) {
       throw new Error(
-        'Parent must be a RuntimeObject with a valid id property.',
+        'Parent must be a RuntimeObject with a valid kind property.',
       );
     }
 
-    // Extract parent ID from RuntimeObject and store as ObjRefValue
-    const parentId = params.parent.id as ObjId;
+    // Build parent objref based on parent's kind
+    let parentRef: any;
+    if (params.parent.isType) {
+      // Parent is a type - reference by name
+      parentRef = { type: 'objref', target: 'type', id: params.parent.id };
+    } else {
+      // Parent is an object - reference by ID (new format)
+      parentRef = { type: 'objref', target: 'object', id: params.parent.id };
+    }
 
     // Create bare object with just parent - properties/methods set via RuntimeObject
     const obj = await this.db.create({
       _id: id,
-      parent: { type: 'objref', value: parentId },
+      parent: parentRef,
       properties: {},
       methods: {},
     });
@@ -866,7 +1027,7 @@ export class ObjectManager {
       this.pendingUpdateOperations.delete(updatePromise);
     }
 
-    if (invalidateCache) {
+    if (invalidateCache && typeof id === 'number') {
       this.cache.invalidate(id);
     }
   }
@@ -1113,9 +1274,12 @@ export class ObjectManager {
   /**
    * Invalidate transient caches (compiled methods, parent chains)
    * Does NOT remove the object proxy (Stable Proxy Pattern)
+   * Only applies to objects (numeric IDs)
    */
   invalidateTransientCache(id: ObjId): void {
-    this.cache.invalidate(id);
+    if (typeof id === 'number') {
+      this.cache.invalidate(id);
+    }
   }
 
   /**
@@ -1132,7 +1296,10 @@ export class ObjectManager {
    * Used to sync memory when DB is modified externally
    */
   async pull(id: ObjId): Promise<void> {
-    const obj = this.cache.getObject(id);
+    const obj =
+      typeof id === 'string'
+        ? this.getTypeSync(id)
+        : this.cache.getObject(id);
     if (obj) {
       await obj.pull();
     }
@@ -1143,7 +1310,10 @@ export class ObjectManager {
    * Forces a write of the in-memory object data
    */
   async push(id: ObjId): Promise<void> {
-    const obj = this.cache.getObject(id);
+    const obj =
+      typeof id === 'string'
+        ? this.getTypeSync(id)
+        : this.cache.getObject(id);
     if (obj) {
       await obj.push();
     }
@@ -1159,40 +1329,44 @@ export class ObjectManager {
   }
 
   /**
-   * Load ALL objects into memory at startup
+   * Load ALL types and objects into memory at startup
    * This ensures synchronous property access via getSync() always works
    * In-memory state is the single source of truth; DB is only for persistence.
    */
   async loadAll(): Promise<number> {
-    console.log('[ObjectManager] Loading all objects into memory...');
+    console.log('[ObjectManager] Loading all types and objects into memory...');
     const start = Date.now();
 
-    // Ensure core infrastructure objects are loaded first (special logic)
+    // Load types FIRST (they are referenced by objects)
+    const typeCount = await this.loadAllTypes();
+
+    // Ensure core infrastructure objects are loaded (special logic)
     await this.load(-1); // $.nothing
     await this.load(0); // $ (ObjectManager)
 
     const allObjects = await this.db.listAll(false); // exclude recycled
-    let count = 0;
+    let objectCount = 0;
 
     for (const obj of allObjects) {
+      const objId = obj._id as number; // Objects always have numeric IDs
       // Skip if already cached
-      if (this.cache.getObject(obj._id)) {
+      if (this.cache.getObject(objId)) {
         continue;
       }
 
       // Wrap in RuntimeObject and cache
       const runtime = new RuntimeObjectImpl(obj, this);
       const proxy = runtime.getProxy();
-      this.cache.setObject(obj._id, proxy);
-      count++;
+      this.cache.setObject(objId, proxy);
+      objectCount++;
     }
 
     const elapsed = Date.now() - start;
     console.log(
-      `[ObjectManager] Loaded ${count} objects in ${elapsed}ms (${allObjects.length} total in DB)`,
+      `[ObjectManager] Loaded ${typeCount} types and ${objectCount} objects in ${elapsed}ms`,
     );
 
-    return count;
+    return objectCount + typeCount;
   }
 
   /**
