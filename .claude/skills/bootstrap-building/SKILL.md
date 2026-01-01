@@ -201,6 +201,27 @@ mcp__malice__world({ action: "query", q: ".name contains 'Lock'" })
 | Things that must exist at startup | AI-created NPCs and storylines |
 | Performance-critical methods | Testing method changes live |
 
+### Types vs Objects: Two-Tier System
+
+Malice has **types** (prototypes) and **objects** (instances):
+
+| Aspect | Types (`$.define` or bootstrap) | Objects (`$recycler.create`) |
+|--------|--------------------------------|------------------------------|
+| **ID Format** | String (e.g., `'bandage'`) | Numeric (e.g., `#42`) |
+| **Collection** | `types` | `objects` |
+| **Lifecycle** | Permanent | Recyclable |
+| **Aliasing** | Auto-aliased by name | Manual |
+| **Creation** | `$.define()` (runtime) or `manager.create()` (bootstrap) | `$recycler.create()` |
+
+**The Golden Rule**: Define types first, then create objects from them.
+
+### Bootstrap vs Runtime Type Creation
+
+- **Bootstrap** (`manager.create()`): TypeScript code that runs at server startup
+- **Runtime** (`$.define()`): MOO code that creates types while the game is running
+
+Both create valid types! Use bootstrap for core infrastructure, runtime for game content.
+
 ## Directory Structure
 
 ```
@@ -217,7 +238,23 @@ src/database/bootstrap/
 
 ## Creating a New Prototype
 
-### Step 1: Create Builder File
+**Consider Runtime First**: If your prototype doesn't need to exist at startup, use `$.define()` at runtime instead of bootstrap code. It's simpler and doesn't require a rebuild.
+
+```javascript
+// Runtime type creation via MCP
+execute_moo_code({
+  code: `
+    // Variable uses $ prefix to indicate it's a type alias
+    const $myType = await $.define('myType', $parentType, {
+      properties: { name: 'My Type', ... },
+      methods: { myMethod: \`...\` }
+    });
+    // $myType is now available everywhere
+  `
+})
+```
+
+### Step 1: Create Builder File (Bootstrap Only)
 
 Create `src/database/bootstrap/prototypes/[name]-builder.ts`:
 

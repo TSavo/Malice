@@ -17,3 +17,6 @@ vitest-bootstrap.log
 # Skill Seeker output
 output/
 configs/
+
+# Auto Claude data directory
+.auto-claude/

@@ -3936,15 +3936,38 @@ async transferAll(from, to, mover) {
 
 ## Object Creation
 
-### Always Use $recycler.create()
+### The Golden Rule: Define Types, Then Create Objects
+
+**Always define a type first**, then create objects from it:
 
 ```javascript
-// WRONG: Never create objects any other way
-const obj = await $recycler.create($agent, {});  // NO!
+// ✅ BEST: Define a type, then create instances
+// Variable uses $ prefix to indicate it's a type alias
+const $magicFood = await $.define('magicFood', $food, {
+  properties: {
+    name: 'Magic Food',
+    abilities: 'Magical food that restores mana when eaten.',
+  },
+  methods: {
+    onEat: `
+      await pass();
+      player.mana = (player.mana || 0) + 50;
+      return 'You feel magical energy!';
+    `
+  }
+});
 
+// Now create instances from the type
+const potion = await $recycler.create($magicFood, { name: 'mana potion' });
+```
 
-// RIGHT: Use the recycler
-const obj = await $recycler.create($item);  // Reuses IDs properly
+### Creating Instances (when type already exists)
+
+Use `$recycler.create()` to create instances from existing types:
+
+```javascript
+// Create instances from existing types
+const obj = await $recycler.create($item, { name: 'sword' });
 const obj2 = await $recycler.create($room, { name: 'New Room' });
 ```
 
@@ -3980,38 +4003,56 @@ const apple = await $recycler.create($food, {
 });
 ```
 
-### Prototype vs Instance
+### Types vs Objects (Instances)
 
-Most objects are **instances** - they inherit from a prototype but have their own state:
+Malice has a two-tier system: **types** (prototypes/templates) and **objects** (instances):
 
 ```javascript
-// Instance: A specific apple in the game
-const apple = await $recycler.create($food, { name: 'apple' });
+// TYPE: Define a template for magical apples (string ID, permanent, auto-aliased)
+const $magicApple = await $.define('magicApple', $food, {
+  properties: { name: 'Magic Apple', abilities: 'Restores health when eaten.' },
+  methods: { onEat: `player.hp += 10; return 'Healing energy!';` }
+});
 
-// Prototype: Define once, many instances inherit
-// Only create new prototypes when you need new BEHAVIOR, not just new data
+// OBJECT: A specific magic apple in the game (numeric ID, recyclable)
+const apple = await $recycler.create($magicApple, { name: 'golden apple' });
 ```
 
-### When to Create New Prototypes
+Create new **types** when you need new behavior. Create **objects** for game entities.
 
-Create a new prototype when you need **new methods or different behavior**:
+### When to Create New Types
+
+Create a new type when you need **new methods or different behavior**:
 
 ```javascript
-// New prototype: Magical food with special effects
-const magicFood = await $recycler.create($food, { name: 'MagicFood' });
-magicFood.setMethod('onEat', `
-  await pass();  // Normal eating
-  await player.tell('You feel magical energy coursing through you!');
-  player.mana = (player.mana || 0) + 50;
-`);
-await $addAlias('magicFood', magicFood);
+// New type: Magical food with special effects
+// Uses $.define - creates $magicFood alias automatically
+const $magicFood = await $.define('magicFood', $food, {
+  properties: {
+    name: 'Magic Food',
+    abilities: 'Magical food that restores mana when eaten.',
+  },
+  methods: {
+    onEat: `
+      await pass();  // Normal eating
+      await player.tell('You feel magical energy coursing through you!');
+      player.mana = (player.mana || 0) + 50;
+    `
+  }
+});
 
-// Now create instances of the new prototype
+// Now create instances of the new type
 const manaPotion = await $recycler.create($magicFood, {
   name: 'mana potion',
   calories: 10
 });
 ```
+
+**Why `$.define` instead of `$recycler.create` + `setMethod` + `$addAlias`?**
+- Single call does all three things
+- Auto-aliasing by name (`$magicFood` available everywhere)
+- Stored in `types` collection (permanent, not recyclable)
+- Clearer intent: you're defining a template, not creating a game object
 
 ### Setting Properties After Creation
 

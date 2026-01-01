@@ -61,6 +61,38 @@ Objects have:
 - **Methods**: TypeScript code strings compiled and executed at runtime
 - **Parent**: Single prototype inheritance chain (walks up to find properties/methods)
 
+### Types vs Objects
+
+Malice has a two-tier object system:
+
+| Aspect | Types (`$.define`) | Objects (`$recycler.create`) |
+|--------|-------------------|------------------------------|
+| **ID** | String (e.g., `'bandage'`) | Numeric (e.g., `#42`) |
+| **Collection** | `types` | `objects` |
+| **Lifecycle** | Permanent | Recyclable |
+| **Aliasing** | Auto-aliased by name | Manual |
+
+**The Golden Rule: Define types, then create objects from them.**
+
+```typescript
+// 1. Define a type (creates $securityCamera alias)
+const $securityCamera = await $.define('securityCamera', $device, {
+  properties: {
+    name: 'Security Camera',
+    recording: true,
+    abilities: 'Surveillance device. Logs events when recording.',
+  }
+});
+
+// 2. Create instances from the type
+await $recycler.create($securityCamera, { name: 'Lobby Camera' });
+await $recycler.create($securityCamera, { name: 'Entrance Camera' });
+```
+
+**Even for one-off objects**, define a type first - it gives you an alias, shared behavior, and maintainability.
+
+See `docs/moo/reference/types-vs-objects.md` for full documentation.
+
 ### Abilities-First Architecture
 
 **IMPORTANT**: Malice uses an abilities-first paradigm. See `docs/ABILITIES-FIRST.md` for full details.
@@ -87,15 +119,24 @@ There are no coded verbs. The AI interprets every command by reading abilities a
 
 **When building objects:**
 ```typescript
-const camera = await $recycler.create($describable, {
-  name: 'Security Camera',
-  recording: true,
-  eventLog: [],
-  abilities: `Surveillance device. When 'recording' is true, logs events.
-  Can be disabled by covering lens or cutting power.`
+// First, define a type for your new category of thing
+const $securityCamera = await $.define('securityCamera', $device, {
+  properties: {
+    name: 'Security Camera',
+    recording: true,
+    eventLog: [],
+    abilities: `Surveillance device. When 'recording' is true, logs events.
+    Can be disabled by covering lens or cutting power.`,
+  }
 });
-camera.setPropertyDescription('recording', "Whether actively recording.");
-camera.setPropertyDescription('eventLog', "Array of recorded events.");
+$securityCamera.setPropertyDescription('recording', "Whether actively recording.");
+$securityCamera.setPropertyDescription('eventLog', "Array of recorded events.");
+
+// Then create instances from the type
+const lobbyCamera = await $recycler.create($securityCamera, {
+  name: 'Lobby Camera',
+});
+await lobbyCamera.moveTo(lobbyRoom);
 ```
 
 **DO NOT** register verbs for game interactions. Let the AI handle them via abilities.
