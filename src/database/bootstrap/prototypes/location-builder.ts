@@ -32,6 +32,9 @@ export class LocationBuilder implements Builder {
           description:
             'Base prototype for locations (things that can contain other things)',
           // contents inherited from Describable
+          // Persistence flags for dynamic rooms
+          persistent: false, // If true, never auto-recycle
+          hasModifications: false, // Set true when player builds/modifies
 
           abilities: `Container that can hold other objects - the base for rooms and containers.
 
@@ -437,6 +440,14 @@ SENSATION: broadcastSensation(target, sensation) routes pain/feeling to target's
     obj.setPropertyDescription(
       'contents',
       'Array of objects currently inside this location',
+    );
+    obj.setPropertyDescription(
+      'persistent',
+      'If true, this location is never auto-recycled (e.g., player camps, anchored spots)',
+    );
+    obj.setPropertyDescription(
+      'hasModifications',
+      'Set true when player builds or modifies this location - prevents auto-recycle',
     );
 
     this.obj = obj;

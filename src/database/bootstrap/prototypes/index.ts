@@ -191,6 +191,17 @@ export { WeaponBuilder } from './weapon-builder';
 // Wearables
 export { WearableBuilder } from './wearable-builder';
 export { WirelessPhoneBuilder } from './wireless-phone-builder';
+// Armor
+export { ArmorBuilder } from './armor-builder';
+export { BallisticVestBuilder } from './ballistic-vest-builder';
+export { TacticalVestBuilder } from './tactical-vest-builder';
+export { StabVestBuilder } from './stab-vest-builder';
+export { HelmetBuilder } from './helmet-builder';
+export { RiotHelmetBuilder } from './riot-helmet-builder';
+export { CombatGlovesBuilder } from './combat-gloves-builder';
+export { CombatBootsBuilder } from './combat-boots-builder';
+export { RiotShieldBuilder } from './riot-shield-builder';
+export { GasMaskBuilder } from './gas-mask-builder';
 // Furniture
 export { FurnitureBuilder } from './furniture-builder';
 export { ChairBuilder } from './chair-builder';
