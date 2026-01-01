@@ -3,7 +3,7 @@ import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Builds the Bank prototype
+ * Builds the Bank type
  * Foundation for all electronic currency in the game.
  *
  * ABILITIES-FIRST ARCHITECTURE:
@@ -19,18 +19,20 @@ export class BankBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
+  async build(): Promise<void> {
+    // Check if type already exists
+    const existing = await this.manager.load('bank');
+    if (existing) {
+      this.obj = existing;
+    } else {
+      // Get parent type
+      const root = await this.manager.load('root');
+      if (!root) {
+        throw new Error('Root type not found - required for Bank');
+      }
 
-    if ($.bank && !forceRebuild) {
-      this.obj = $.bank;
-      return;
-    }
-
-    const parentObj = $.root;
-    const obj = await this.manager.create({
-      parent: parentObj!,
-      properties: {
+      this.obj = await this.manager.define('bank', root, {
+        properties: {
         name: 'Bank',
         description: 'Electronic currency ledger',
         // Accounts keyed by account ID
@@ -60,9 +62,13 @@ BURNING: Taxes, fines, fees remove credits via burn(). Money leaves circulation.
 HISTORY: Call getAccountHistory(accountId) to see recent transactions.
 
 NOTE: This is the legal payment system. Physical cash ($dollar) is contraband.`,
-      },
-      methods: {},
-    });
+        },
+        methods: {},
+      });
+    }
+
+    // Always rebuild methods (ensures they exist even if type was pre-existing)
+    const obj = this.obj!;
 
     // Add property descriptions
     obj.setPropertyDescription(
@@ -678,15 +684,10 @@ NOTE: This is the legal payment system. Physical cash ($dollar) is contraband.`,
       return removed;
     `,
     );
-
-    this.obj = obj;
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
-    if (!this.obj) return;
-    const objectManager = await this.manager.load(0);
-    await objectManager?.call('addAlias', 'bank', this.obj.id);
+    console.log('[BankBuilder] Type \'bank\' auto-aliased');
   }
 }
 

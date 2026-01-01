@@ -3,7 +3,8 @@ import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * PhoneDb: registry mapping numbers to phone objects.
+ * PhoneDb: singleton registry mapping numbers to phone objects.
+ * Remains a singleton object (not a type) since there should only be one directory.
  */
 export class PhoneDbBuilder implements Builder {
   static provides = ['phoneDb'];
@@ -13,10 +14,10 @@ export class PhoneDbBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
+  async build(): Promise<void> {
     const $ = this.manager as any;
 
-    if ($.phoneDb && !forceRebuild) {
+    if ($.phoneDb) {
       this.obj = $.phoneDb;
       return;
     }

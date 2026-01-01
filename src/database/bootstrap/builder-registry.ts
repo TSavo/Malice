@@ -23,17 +23,14 @@ import type { ObjectManager } from '../object-manager';
  * Instance interface - what a builder instance must implement
  */
 export interface Builder {
-  /** Create the MOO object(s) */
-  build(forceRebuild?: boolean): Promise<void>;
+  /** Create the MOO type or load existing */
+  build(): Promise<void>;
 
-  /** Register alias(es) for the created object(s) */
+  /** Register alias(es) for the created object(s) - types auto-alias */
   registerAliases(): Promise<void>;
 
   /** Optional: called after ALL aliases are registered */
   postRegister?(): Promise<void>;
-
-  /** Optional: rebuild methods only (for FORCE_BOOTSTRAP) */
-  rebuildMethods?(): Promise<void>;
 }
 
 /**
@@ -165,13 +162,12 @@ export function getSortedBuilders(): BuilderClass[] {
  * Run all registered builders in dependency order.
  * This is the main entry point for bootstrap.
  *
+ * Types are idempotent - if they exist, they're reused.
+ * Methods are always rebuilt to ensure they're up to date.
+ *
  * @param manager - The ObjectManager instance
- * @param forceRebuild - If true, rebuilds even if objects exist
  */
-export async function runBuilders(
-  manager: ObjectManager,
-  forceRebuild = false,
-): Promise<void> {
+export async function runBuilders(manager: ObjectManager): Promise<void> {
   // Import all builders to trigger self-registration
   await import('./all-builders');
   const { AliasLoader } = await import('./alias-loader');
@@ -180,50 +176,25 @@ export async function runBuilders(
   const sorted = getSortedBuilders();
   console.log(`[BuilderRegistry] Running ${sorted.length} builders...`);
 
-  // Build objects + register aliases, reload after each so next builder can use $.alias
+  // Build types + register aliases, reload after each so next builder can use $.alias
+  const instances: Builder[] = [];
   for (const BuilderClass of sorted) {
     const builder = new BuilderClass(manager);
-    await builder.build(forceRebuild);
+    await builder.build();
     await builder.registerAliases();
+    instances.push(builder);
     // Reload aliases into memory so next builder can access them via $.alias
     await aliasLoader.loadAliases();
   }
 
   // Phase 2: Post-registration hooks (optional)
   // Run after ALL builds complete so cross-references work
-  for (const BuilderClass of sorted) {
-    const builder = new BuilderClass(manager);
-    await builder.build(false); // Re-populate this.obj
+  // Reuse instances - don't call build() again!
+  for (const builder of instances) {
     if (builder.postRegister) {
       await builder.postRegister();
     }
   }
 
   console.log(`[BuilderRegistry] ✅ Completed ${sorted.length} builders`);
-}
-
-/**
- * Rebuild methods on all existing objects (for FORCE_BOOTSTRAP).
- * Only calls rebuildMethods() on builders that implement it.
- *
- * @param manager - The ObjectManager instance
- */
-export async function rebuildAllMethods(manager: ObjectManager): Promise<void> {
-  // Import all builders to trigger self-registration
-  await import('./all-builders');
-
-  const sorted = getSortedBuilders();
-  let count = 0;
-
-  for (const BuilderClass of sorted) {
-    const builder = new BuilderClass(manager);
-    // Populate this.obj by running build (no-op, just loads existing)
-    await builder.build(false);
-    if (builder.rebuildMethods) {
-      await builder.rebuildMethods();
-      count++;
-    }
-  }
-
-  console.log(`[BuilderRegistry] ✅ Rebuilt methods on ${count} builders`);
 }

@@ -3,7 +3,7 @@ import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Builds the Locker prototype
+ * Builds the Locker type
  * A BANK of lockers - like at a train station or gym.
  * Contains multiple compartments, each rentable by different users.
  *
@@ -14,10 +14,10 @@ import { registerBuilder, type Builder } from '../builder-registry';
  *     ...
  *   }
  *
- * This is the BASE prototype - handles state and validation only.
+ * This is the BASE type - handles state and validation only.
  * NO verbs, NO messaging.
  *
- * Subprototypes: $.oneTimeLocker (adds verbs/messaging for courier use)
+ * Subtypes: $.oneTimeLocker (adds verbs/messaging for courier use)
  */
 export class LockerBuilder implements Builder {
   static provides = ['locker'];
@@ -27,19 +27,19 @@ export class LockerBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
+  async build(): Promise<void> {
 
-    if ($.locker && !forceRebuild) {
-      this.obj = $.locker;
-      return;
-    }
-
-    const parentObj = $.location;
-    this.obj = await this.manager.create({
-      parent: parentObj!,
-      properties: {
-        name: 'Locker Bank',
+    const existing = await this.manager.load('locker');
+    if (existing) {
+      this.obj = existing;
+    } else {
+      const parent = await this.manager.load('location');
+      if (!parent) {
+        throw new Error('Location type not found - required for Locker');
+      }
+      this.obj = await this.manager.define('locker', parent, {
+        properties: {
+          name: 'Locker Bank',
         description: 'A wall of storage lockers.',
         // Compartments keyed by ID (e.g., "A1", "B2", "1", "2")
         // Each: { owner: objref, masterCode: string, oneTimeCodes: [], locked: bool, contents: [], rentedAt: ISO, expiresAt: ISO }
@@ -65,11 +65,12 @@ CONTENTS: Items stored via addContent(id, item). Must be unlocked to access. rem
 PLOT HOOKS: Triggers 'itemDeposited', 'itemRemoved' for plot watching.
 
 EXPIRATION: checkExpired() auto-expires old rentals. getExpirationInfo() shows time remaining. renewCompartment() extends rental.`,
-      },
-      methods: {},
-    });
-
-    const obj = this.obj;
+        },
+        methods: {},
+      });
+    }
+    // Always rebuild methods (ensures they exist even if type was pre-existing)
+    const obj = this.obj!
 
     // ═══════════════════════════════════════════════════════════════════
     // COMPARTMENT MANAGEMENT
@@ -857,10 +858,7 @@ EXPIRATION: checkExpired() auto-expires old rentals. getExpirationInfo() shows t
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
-    if (!this.obj) return;
-    const objectManager = await this.manager.load(0);
-    await objectManager?.call('addAlias', 'locker', this.obj.id);
+    console.log('[LockerBuilder] Type \'locker\' auto-aliased');
   }
 }
 

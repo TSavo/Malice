@@ -31,7 +31,7 @@ export class CashBuilder implements Builder {
       if (this.cash) return;
     }
 
-    const root = await this.manager.load(1);
+    const root = await this.manager.load('root');
     this.cash = await this.manager.create({
       parent: root!, // Root object
       properties: {

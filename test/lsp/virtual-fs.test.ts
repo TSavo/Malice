@@ -22,7 +22,7 @@ describe('VirtualFileSystem', () => {
     // Create ObjectManager #0 with aliases
     await db.create({
       _id: 0,
-      parent: { type: 'objref', value: 0 },
+      parent: { type: 'objref', target: 'object', id: 0 },
       properties: {
         name: 'ObjectManager',
         aliases: {
@@ -131,21 +131,21 @@ describe('VirtualFileSystem', () => {
       // Create some test objects
       await db.create({
         _id: 1,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: { name: 'Object 1' },
         methods: {},
       });
 
       await db.create({
         _id: 2,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: { name: 'Object 2' },
         methods: {},
       });
 
       await db.create({
         _id: 5,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: {
           name: 'Test Object',
           description: 'A test object',
@@ -187,7 +187,7 @@ describe('VirtualFileSystem', () => {
     });
 
     it('should list methods and properties for an object', async () => {
-      const entries = await vfs.listDirectory('malice://objects/5/');
+      const entries = await vfs.listDirectory('malice://objects/5/view:flat');
 
       expect(entries.length).toBe(4); // 2 methods + 2 properties
 
@@ -204,7 +204,7 @@ describe('VirtualFileSystem', () => {
     });
 
     it('should list methods and properties without trailing slash', async () => {
-      const entries = await vfs.listDirectory('malice://objects/5');
+      const entries = await vfs.listDirectory('malice://objects/5/view:flat');
 
       expect(entries.length).toBe(4);
 
@@ -228,7 +228,7 @@ describe('VirtualFileSystem', () => {
     it('should handle object with no methods or properties', async () => {
       await db.create({
         _id: 100,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: {},
         methods: {},
       });
@@ -244,14 +244,14 @@ describe('VirtualFileSystem', () => {
       // Create test objects
       await db.create({
         _id: 1,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: {},
         methods: {},
       });
 
       await db.create({
         _id: 2,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: {},
         methods: {},
       });
@@ -273,7 +273,7 @@ describe('VirtualFileSystem', () => {
     it('should list methods as .ts files', async () => {
       await db.create({
         _id: 10,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: {},
         methods: {
           init: { code: 'console.log("init");' },
@@ -299,7 +299,7 @@ describe('VirtualFileSystem', () => {
     it('should list properties as .json files', async () => {
       await db.create({
         _id: 11,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: {
           name: 'Test',
           hp: 100,
@@ -334,7 +334,7 @@ describe('VirtualFileSystem', () => {
       // Create test object with methods and properties
       await db.create({
         _id: 10,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: {
           name: 'Player',
           hp: 100,
@@ -427,7 +427,7 @@ describe('VirtualFileSystem', () => {
     beforeEach(async () => {
       await db.create({
         _id: 15,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: {},
         methods: {
           greet: { code: 'return "Hello";' },
@@ -546,7 +546,7 @@ return "test";`;
     it('should remove document from cache', async () => {
       await db.create({
         _id: 20,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: {},
         methods: {
           test: { code: 'return "test";' },
@@ -575,7 +575,7 @@ return "test";`;
       // Root #1
       await db.create({
         _id: 1,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: { name: 'Root' },
         methods: {},
       });
@@ -583,7 +583,7 @@ return "test";`;
       // Player prototype #10 (from aliases in beforeEach)
       await db.create({
         _id: 10,
-        parent: { type: 'objref', value: 1 },
+        parent: { type: 'objref', target: 'object', id: 1 },
         properties: { name: 'Player' },
         methods: {},
       });
@@ -591,7 +591,7 @@ return "test";`;
       // Room prototype #20 (from aliases in beforeEach)
       await db.create({
         _id: 20,
-        parent: { type: 'objref', value: 1 },
+        parent: { type: 'objref', target: 'object', id: 1 },
         properties: { name: 'Room' },
         methods: {},
       });
@@ -599,7 +599,7 @@ return "test";`;
       // Player instance #100
       await db.create({
         _id: 100,
-        parent: { type: 'objref', value: 10 },
+        parent: { type: 'objref', target: 'object', id: 10 },
         properties: { name: 'Alice' },
         methods: { greet: { code: 'return "Hi";' } },
       });
@@ -607,7 +607,7 @@ return "test";`;
       // Room instance #200
       await db.create({
         _id: 200,
-        parent: { type: 'objref', value: 20 },
+        parent: { type: 'objref', target: 'object', id: 20 },
         properties: { name: 'Lobby' },
         methods: { describe: { code: 'return "A lobby";' } },
       });
@@ -615,7 +615,7 @@ return "test";`;
       // Unknown prototype chain #300
       await db.create({
         _id: 300,
-        parent: { type: 'objref', value: 1 },
+        parent: { type: 'objref', target: 'object', id: 1 },
         properties: { name: 'Unknown' },
         methods: { test: { code: 'return "test";' } },
       });
@@ -658,7 +658,7 @@ return "test";`;
     beforeEach(async () => {
       await db.create({
         _id: 30,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: {},
         methods: {
           test: { code: 'console.log("test");' },
@@ -714,7 +714,7 @@ return "test";`;
     beforeEach(async () => {
       await db.create({
         _id: 40,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: {},
         methods: {
           init: { code: 'return "init";' },
@@ -733,7 +733,7 @@ return "test";`;
     it('should return empty array for object with no methods', async () => {
       await db.create({
         _id: 41,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: {},
         methods: {},
       });
@@ -754,7 +754,7 @@ return "test";`;
     it('should handle undefined property values', async () => {
       await db.create({
         _id: 50,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: {
           defined: 'value',
           // Note: MongoDB doesn't store undefined values, they get removed
@@ -777,7 +777,7 @@ return "test";`;
     it('should handle null property values', async () => {
       await db.create({
         _id: 51,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: {
           nullValue: null,
         },
@@ -793,7 +793,7 @@ return "test";`;
     it('should handle boolean property values', async () => {
       await db.create({
         _id: 52,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: {
           isActive: true,
           isDisabled: false,
@@ -811,7 +811,7 @@ return "test";`;
     it('should handle complex nested property values', async () => {
       await db.create({
         _id: 53,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: {
           config: {
             nested: {
@@ -844,7 +844,7 @@ return "test";`;
     it('should handle method with empty code', async () => {
       await db.create({
         _id: 54,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: {},
         methods: {
           empty: { code: '' },
@@ -861,7 +861,7 @@ return "test";`;
     it('should handle method with multiline code', async () => {
       await db.create({
         _id: 55,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: {},
         methods: {
           multiline: {
@@ -885,7 +885,7 @@ return "test";`;
     it('should handle special characters in method code', async () => {
       await db.create({
         _id: 56,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: {},
         methods: {
           special: {
@@ -906,7 +906,7 @@ return "test";`;
       // Create object
       await db.create({
         _id: 60,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: { name: 'Integration Test' },
         methods: {
           test: { code: 'return "v1";' },
@@ -939,28 +939,28 @@ return "test";`;
       // Create chain: Root -> Describable -> Agent -> Human -> Player -> PlayerInstance
       await db.create({
         _id: 1,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: { name: 'Root' },
         methods: {},
       });
 
       await db.create({
         _id: 2,
-        parent: { type: 'objref', value: 1 },
+        parent: { type: 'objref', target: 'object', id: 1 },
         properties: { name: 'Describable' },
         methods: {},
       });
 
       await db.create({
         _id: 3,
-        parent: { type: 'objref', value: 2 },
+        parent: { type: 'objref', target: 'object', id: 2 },
         properties: { name: 'Agent' },
         methods: {},
       });
 
       await db.create({
         _id: 4,
-        parent: { type: 'objref', value: 3 },
+        parent: { type: 'objref', target: 'object', id: 3 },
         properties: { name: 'Human' },
         methods: {},
       });
@@ -980,14 +980,14 @@ return "test";`;
 
       await db.create({
         _id: 10,
-        parent: { type: 'objref', value: 4 },
+        parent: { type: 'objref', target: 'object', id: 4 },
         properties: { name: 'Player' },
         methods: {},
       });
 
       await db.create({
         _id: 101,
-        parent: { type: 'objref', value: 10 },
+        parent: { type: 'objref', target: 'object', id: 10 },
         properties: { name: 'Alice' },
         methods: {
           greet: { code: 'return "Hello!";' },

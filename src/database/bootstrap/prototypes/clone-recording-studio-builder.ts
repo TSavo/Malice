@@ -3,7 +3,7 @@ import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Builds the CloneRecordingStudio prototype
+ * Builds the CloneRecordingStudio type
  *
  * A recording studio captures player body data and stores it in a linked clone tank.
  * Players pay to create or update their backup.
@@ -32,19 +32,17 @@ export class CloneRecordingStudioBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
+  async build(): Promise<void> {
 
-    if ($.cloneRecordingStudio && !forceRebuild) {
-      this.obj = $.cloneRecordingStudio;
-      return;
-    }
+    // Check if type already exists
+    const existing = await this.manager.load('cloneRecordingStudio');
+    if (existing) {
+      this.obj = existing;
+    } else {
+      const parentObj = await this.manager.load('describable');
+      if (!parentObj) throw new Error('CloneRecordingStudioBuilder: describable type not found');
 
-    const parentObj = $.describable;
-    if (!parentObj) throw new Error('CloneRecordingStudioBuilder: $describable not found');
-
-    this.obj = await this.manager.create({
-      parent: parentObj!,
+      this.obj = await this.manager.define('cloneRecordingStudio', parentObj, {
       properties: {
         name: 'Clone Recording Studio',
         description:
@@ -86,9 +84,11 @@ MANAGEMENT: Owner can configure price, currency, payment recipient via manage().
 IMMOVABLE: 'boltedDown' true.`,
       },
       methods: {},
-    });
+      });
+    }
 
-    const obj = this.obj;
+    // Always rebuild methods (ensures they exist even if type was pre-existing)
+    const obj = this.obj!;
 
     // ═══════════════════════════════════════════════════════════════════
     // BACKUP OPERATIONS
@@ -684,10 +684,9 @@ IMMOVABLE: 'boltedDown' true.`,
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
+    // Types auto-alias by name, no manual registration needed
     if (!this.obj) return;
-    const objectManager = await this.manager.load(0);
-    await objectManager?.call('addAlias', 'cloneRecordingStudio', this.obj.id);
+    console.log(`[CloneRecordingStudioBuilder] Type 'cloneRecordingStudio' auto-aliased`);
   }
 }
 

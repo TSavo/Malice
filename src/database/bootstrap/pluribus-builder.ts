@@ -21,7 +21,7 @@ export class PluribusBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
+  async build(): Promise<void> {
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
 
@@ -31,16 +31,13 @@ export class PluribusBuilder implements Builder {
     // Check if already exists
     if (aliases.pluribus) {
       this.pluribus = await this.manager.load(aliases.pluribus);
-      if (this.pluribus && !forceRebuild) return;
+      if (this.pluribus) return;
     }
 
-    // Get agent prototype from alias
-    if (!aliases.agent) {
-      throw new Error('$agent must be built before $pluribus');
-    }
-    const parent = await this.manager.load(aliases.agent);
+    // Get agent type as parent
+    const parent = await this.manager.load('agent');
     if (!parent) {
-      throw new Error('Failed to load $agent');
+      throw new Error('Agent type not found - required for Pluribus');
     }
 
     // Load prompt from $.aiPrompts

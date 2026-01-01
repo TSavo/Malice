@@ -36,7 +36,7 @@ describe('AliasLoader', () => {
       // Create ObjectManager #0 with no aliases
       await db.create({
         _id: 0,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: {
           name: 'ObjectManager',
           aliases: {},
@@ -51,7 +51,7 @@ describe('AliasLoader', () => {
       // Create ObjectManager #0 with aliases
       await db.create({
         _id: 0,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: {
           name: 'ObjectManager',
           aliases: {
@@ -65,13 +65,13 @@ describe('AliasLoader', () => {
       // Create referenced objects with explicit IDs
       await db.create({
         _id: 1,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: { name: 'Test' },
         methods: {},
       });
       await db.create({
         _id: 2,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: { name: 'Example' },
         methods: {},
       });
@@ -88,7 +88,7 @@ describe('AliasLoader', () => {
     it('should register alias objects in ObjectManager', async () => {
       await db.create({
         _id: 0,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: {
           name: 'ObjectManager',
           aliases: { foo: 1 },
@@ -98,7 +98,7 @@ describe('AliasLoader', () => {
 
       await db.create({
         _id: 1,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: { name: 'Foo' },
         methods: {},
       });
@@ -116,7 +116,7 @@ describe('AliasLoader', () => {
     it('should handle non-existent object references', async () => {
       await db.create({
         _id: 0,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: {
           name: 'ObjectManager',
           aliases: {
@@ -129,7 +129,7 @@ describe('AliasLoader', () => {
 
       await db.create({
         _id: 1,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: { name: 'Valid' },
         methods: {},
       });
@@ -145,7 +145,7 @@ describe('AliasLoader', () => {
     it('should handle multiple aliases to same object', async () => {
       await db.create({
         _id: 0,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: {
           name: 'ObjectManager',
           aliases: {
@@ -158,7 +158,7 @@ describe('AliasLoader', () => {
 
       await db.create({
         _id: 1,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: { name: 'System' },
         methods: {},
       });
@@ -179,7 +179,7 @@ describe('AliasLoader', () => {
     it('should load numeric IDs correctly', async () => {
       await db.create({
         _id: 0,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: {
           name: 'ObjectManager',
           aliases: {
@@ -195,7 +195,7 @@ describe('AliasLoader', () => {
       for (const id of [100, 200, 300]) {
         await db.create({
           _id: id,
-          parent: { type: 'objref', value: 0 },
+          parent: { type: 'objref', target: 'object', id: 0 },
           properties: { name: `Object ${id}` },
           methods: {},
         });
@@ -216,7 +216,7 @@ describe('AliasLoader', () => {
     it('should enable $.alias access after loading', async () => {
       await db.create({
         _id: 0,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: {
           name: 'ObjectManager',
           aliases: { testObj: 1 },
@@ -226,7 +226,7 @@ describe('AliasLoader', () => {
 
       await db.create({
         _id: 1,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: { name: 'Test Object' },
         methods: {},
       });
@@ -243,7 +243,7 @@ describe('AliasLoader', () => {
     it('should update when aliases change', async () => {
       await db.create({
         _id: 0,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: {
           name: 'ObjectManager',
           aliases: { v1: 1 },
@@ -253,7 +253,7 @@ describe('AliasLoader', () => {
 
       await db.create({
         _id: 1,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: { name: 'Version 1' },
         methods: {},
       });
@@ -281,7 +281,7 @@ describe('AliasLoader', () => {
     it('should handle corrupt alias data', async () => {
       await db.create({
         _id: 0,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: {
           name: 'ObjectManager',
           aliases: null, // Corrupt data
@@ -295,7 +295,7 @@ describe('AliasLoader', () => {
     it('should handle non-object aliases property', async () => {
       await db.create({
         _id: 0,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: {
           name: 'ObjectManager',
           aliases: 'not an object', // Wrong type

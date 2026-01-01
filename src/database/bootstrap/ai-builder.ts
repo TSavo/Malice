@@ -52,7 +52,7 @@ export class AiBuilder implements Builder {
 
     // Create new AI registry
     console.log('[AiBuilder] Creating new AI registry...');
-    const root = await this.manager.load(1);
+    const root = await this.manager.load('root');
     this.ai = await this.manager.create({
       parent: root!,
       properties: {

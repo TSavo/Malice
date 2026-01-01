@@ -41,7 +41,7 @@ export class TailorBuilder implements Builder {
 
     // Create new tailor object
     console.log('[TailorBuilder] Creating new tailor object...');
-    const root = await this.manager.load(1);
+    const root = await this.manager.load('root');
     this.tailor = await this.manager.create({
       parent: root!,
       properties: {

@@ -16,10 +16,10 @@ export class MaliceClientBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
+  async build(): Promise<void> {
     const $ = this.manager as any;
 
-    if ($.maliceClientJs && !forceRebuild) {
+    if ($.maliceClientJs) {
       this.obj = $.maliceClientJs;
       return;
     }

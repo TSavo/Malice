@@ -26,24 +26,24 @@ export class MCPBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
+  async build(): Promise<void> {
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
 
-    const root = await this.manager.load(1);
+    const root = await this.manager.load('root');
     if (!root) throw new Error('Root prototype not found');
 
     const aliases =
       (objectManager.get('aliases') as Record<string, number>) || {};
 
     // Build $mcpTool prototype
-    await this.buildMCPTool(root, aliases, forceRebuild);
+    await this.buildMCPTool(root, aliases);
 
     // Build $mcp singleton
-    await this.buildMCP(root, aliases, forceRebuild);
+    await this.buildMCP(root, aliases);
 
     // Build tool instances
-    await this.buildTools(forceRebuild);
+    await this.buildTools();
   }
 
   /**
@@ -52,11 +52,10 @@ export class MCPBuilder implements Builder {
   private async buildMCPTool(
     root: RuntimeObject,
     aliases: Record<string, number>,
-    forceRebuild: boolean,
   ): Promise<void> {
     if (aliases.mcpTool) {
       this.mcpTool = await this.manager.load(aliases.mcpTool);
-      if (this.mcpTool && !forceRebuild) return;
+      if (this.mcpTool) return;
     }
 
     if (!this.mcpTool) {
@@ -100,11 +99,10 @@ export class MCPBuilder implements Builder {
   private async buildMCP(
     root: RuntimeObject,
     aliases: Record<string, number>,
-    forceRebuild: boolean,
   ): Promise<void> {
     if (aliases.mcp) {
       this.mcp = await this.manager.load(aliases.mcp);
-      if (this.mcp && !forceRebuild) return;
+      if (this.mcp) return;
     }
 
     if (!this.mcp) {
@@ -221,7 +219,7 @@ export class MCPBuilder implements Builder {
   /**
    * Build all tool instances
    */
-  private async buildTools(forceRebuild: boolean): Promise<void> {
+  private async buildTools(): Promise<void> {
     if (!this.mcpTool || !this.mcp) return;
 
     // Core object tools
@@ -251,7 +249,6 @@ export class MCPBuilder implements Builder {
         return { success: true, message: 'Set ' + name + ' on #' + obj.id };
       `,
       },
-      forceRebuild,
     );
 
     await this.buildTool(
@@ -278,7 +275,6 @@ export class MCPBuilder implements Builder {
         return { property: name, value: obj.get(name) };
       `,
       },
-      forceRebuild,
     );
 
     await this.buildTool(
@@ -315,7 +311,6 @@ export class MCPBuilder implements Builder {
         return { success: true, message: 'Method ' + name + ' saved on #' + obj.id };
       `,
       },
-      forceRebuild,
     );
 
     await this.buildTool(
@@ -344,7 +339,6 @@ export class MCPBuilder implements Builder {
         return { result };
       `,
       },
-      forceRebuild,
     );
 
     await this.buildTool(
@@ -380,7 +374,6 @@ export class MCPBuilder implements Builder {
         return { id: obj.id, message: 'Created #' + obj.id };
       `,
       },
-      forceRebuild,
     );
 
     await this.buildTool(
@@ -411,7 +404,6 @@ export class MCPBuilder implements Builder {
         throw new Error('Recycler not available for cloning');
       `,
       },
-      forceRebuild,
     );
 
     await this.buildTool(
@@ -442,7 +434,6 @@ export class MCPBuilder implements Builder {
         throw new Error('Recycler not available');
       `,
       },
-      forceRebuild,
     );
 
     // Room tools
@@ -536,7 +527,6 @@ export class MCPBuilder implements Builder {
         return result;
       `,
       },
-      forceRebuild,
     );
 
     await this.buildTool(
@@ -616,7 +606,6 @@ export class MCPBuilder implements Builder {
         return result;
       `,
       },
-      forceRebuild,
     );
 
     await this.buildTool(
@@ -670,7 +659,6 @@ export class MCPBuilder implements Builder {
         return { count: rooms.length, rooms };
       `,
       },
-      forceRebuild,
     );
 
     await this.buildTool(
@@ -719,7 +707,6 @@ export class MCPBuilder implements Builder {
         return { success: true, message: 'Moved #' + obj.id + ' to #' + dest.id };
       `,
       },
-      forceRebuild,
     );
 
     await this.buildTool(
@@ -780,7 +767,6 @@ export class MCPBuilder implements Builder {
         return { id: item.id, name: item.name, room: room.id };
       `,
       },
-      forceRebuild,
     );
 
     await this.buildTool(
@@ -827,7 +813,6 @@ export class MCPBuilder implements Builder {
         };
       `,
       },
-      forceRebuild,
     );
 
     await this.buildTool(
@@ -850,7 +835,6 @@ export class MCPBuilder implements Builder {
         return result;
       `,
       },
-      forceRebuild,
     );
 
     await this.buildTool(
@@ -880,7 +864,6 @@ export class MCPBuilder implements Builder {
         return { success: true, message: 'Added alias $' + name + ' -> #' + obj.id };
       `,
       },
-      forceRebuild,
     );
 
     // Plot tool
@@ -1086,7 +1069,6 @@ export class MCPBuilder implements Builder {
         }
       `,
       },
-      forceRebuild,
     );
 
     // Notes tool
@@ -1198,7 +1180,6 @@ export class MCPBuilder implements Builder {
         }
       `,
       },
-      forceRebuild,
     );
 
     // AI tool
@@ -1447,7 +1428,6 @@ export class MCPBuilder implements Builder {
         }
       `,
       },
-      forceRebuild,
     );
 
     // Combat tool
@@ -1581,7 +1561,6 @@ export class MCPBuilder implements Builder {
         }
       `,
       },
-      forceRebuild,
     );
 
     // World query tool
@@ -1657,7 +1636,6 @@ export class MCPBuilder implements Builder {
         }
       `,
       },
-      forceRebuild,
     );
   }
 
@@ -1671,7 +1649,6 @@ export class MCPBuilder implements Builder {
       inputSchema: object;
       execute: string;
     },
-    forceRebuild: boolean,
   ): Promise<void> {
     if (!this.mcpTool || !this.mcp) return;
 
@@ -1699,12 +1676,8 @@ export class MCPBuilder implements Builder {
       });
     }
 
-    // Set/update the execute method
-    // Check for LOCAL execute method (not inherited from parent)
-    const hasLocalExecute = tool.getMethod('execute') !== undefined;
-    if (forceRebuild || !hasLocalExecute) {
-      tool.setMethod('execute', config.execute);
-    }
+    // Always set/update the execute method
+    tool.setMethod('execute', config.execute);
 
     // Register the tool with $mcp
     const tools =

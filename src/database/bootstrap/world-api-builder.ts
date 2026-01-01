@@ -16,7 +16,7 @@ export class WorldApiBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
+  async build(): Promise<void> {
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
 
@@ -25,11 +25,11 @@ export class WorldApiBuilder implements Builder {
 
     if (aliases.world) {
       this.world = await this.manager.load(aliases.world);
-      if (this.world && !forceRebuild) return;
+      if (this.world) return;
     }
 
     if (!this.world) {
-      const root = await this.manager.load(1);
+      const root = await this.manager.load('root');
       this.world = await this.manager.create({
         parent: root!,
         properties: {

@@ -3,7 +3,7 @@ import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Builds the Disposal prototype
+ * Builds the Disposal type
  * Base class for objects that accept and destroy/process items.
  *
  * Inherits from Describable.
@@ -13,8 +13,8 @@ import { registerBuilder, type Builder } from '../builder-registry';
  * - description: Physical description
  * - capacity: Max items that can be processed at once (0 = unlimited)
  * - processingTime: Seconds to process items (0 = instant)
- * - acceptedTypes: Array of prototype names this disposal accepts (empty = all)
- * - rejectedTypes: Array of prototype names this disposal rejects
+ * - acceptedTypes: Array of type names this disposal accepts (empty = all)
+ * - rejectedTypes: Array of type names this disposal rejects
  * - processing: Array of items currently being processed
  * - destroyMessage: Message shown when item is destroyed
  *
@@ -31,20 +31,20 @@ export class DisposalBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
+  async build(): Promise<void> {
 
-    if ($.disposal && !forceRebuild) {
-      this.obj = $.disposal;
-      return;
-    }
-
-    const parent = $.describable;
-    const obj = await this.manager.create({
-      parent: parent!,
-      properties: {
-        name: 'Disposal',
-        description: 'A generic disposal unit.',
+    const existing = await this.manager.load('disposal');
+    if (existing) {
+      this.obj = existing;
+    } else {
+      const parent = await this.manager.load('describable');
+      if (!parent) {
+        throw new Error('Describable type not found - required for Disposal');
+      }
+      this.obj = await this.manager.define('disposal', parent, {
+        properties: {
+          name: 'Disposal',
+          description: 'A generic disposal unit.',
         capacity: 0,
         processingTime: 0,
         acceptedTypes: [],
@@ -68,9 +68,12 @@ DESTRUCTION: Items recycled via $.recycler.recycle(). Permanent removal from gam
 DEPOSIT: deposit(item, agent) destroys item. AI invokes directly.
 
 IMMOVABLE: 'boltedDown' true by default.`,
-      },
-      methods: {},
-    });
+        },
+        methods: {},
+      });
+    }
+    // Always rebuild methods (ensures they exist even if type was pre-existing)
+    const obj = this.obj!;
 
     obj.setMethod(
       'canAccept',
@@ -209,15 +212,10 @@ IMMOVABLE: 'boltedDown' true by default.`,
       'destroyMessage',
       'Message displayed when an item is destroyed',
     );
-
-    this.obj = obj;
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
-    if (!this.obj) return;
-    const objectManager = await this.manager.load(0);
-    await objectManager?.call('addAlias', 'disposal', this.obj.id);
+    console.log('[DisposalBuilder] Type \'disposal\' auto-aliased');
   }
 }
 

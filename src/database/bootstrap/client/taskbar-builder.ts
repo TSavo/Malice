@@ -16,10 +16,10 @@ export class TaskbarBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
+  async build(): Promise<void> {
     const $ = this.manager as any;
 
-    if ($.taskbarJs && !forceRebuild) {
+    if ($.taskbarJs) {
       this.obj = $.taskbarJs;
       return;
     }

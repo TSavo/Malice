@@ -3,7 +3,7 @@ import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * WirelessPhone extends Phone with battery, signal checks, and ringtone.
+ * WirelessPhone type extends Phone with battery, signal checks, and ringtone.
  */
 export class WirelessPhoneBuilder implements Builder {
   static provides = ['wirelessPhone'];
@@ -13,25 +13,25 @@ export class WirelessPhoneBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
+  async build(): Promise<void> {
+    // Check if type already exists (types auto-alias)
+    const existing = await this.manager.load('wirelessPhone');
+    if (existing) {
+      this.obj = existing;
+    } else {
+      // Create wirelessPhone as a TYPE
+      const phone = await this.manager.load('phone');
+      if (!phone) throw new Error('Phone type not found');
 
-    if ($.wirelessPhone && !forceRebuild) {
-      this.obj = $.wirelessPhone;
-      return;
-    }
+      this.obj = await this.manager.define('wirelessPhone', phone, {
+        properties: {
+          name: 'Wireless Phone',
+          description: 'A wireless phone handset.',
+          battery: 100,
+          signal: 5,
+          ringtone: 'ring',
 
-    const parentObj = $.phone;
-    const obj = await this.manager.create({
-      parent: parentObj!,
-      properties: {
-        name: 'Wireless Phone',
-        description: 'A wireless phone handset.',
-        battery: 100,
-        signal: 5,
-        ringtone: 'ring',
-
-        abilities: `Portable phone with battery and signal requirements. Extends $.phone.
+          abilities: `Portable phone with battery and signal requirements. Extends $.phone.
 
 BATTERY: 'battery' 0-100. Depletes with use. Must be > 0 to function.
 
@@ -42,9 +42,13 @@ USAGE: canUse() checks battery and signal. dial()/sendMessage() fail if unavaila
 RINGTONE: 'ringtone' customizable alert sound for incoming calls.
 
 PORTABLE: Can be picked up, carried. Unlike payphones.`,
-      },
-      methods: {},
-    });
+        },
+        methods: {},
+      });
+    }
+
+    // Always rebuild methods (ensures they exist even if type was pre-existing)
+    const obj = this.obj!;
 
     obj.setMethod(
       'canUse',
@@ -99,10 +103,9 @@ PORTABLE: Can be picked up, carried. Unlike payphones.`,
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
+    // Types auto-alias by name, no manual registration needed
     if (!this.obj) return;
-    const objectManager = await this.manager.load(0);
-    await objectManager?.call('addAlias', 'wirelessPhone', this.obj.id);
+    console.log(`[WirelessPhoneBuilder] Type 'wirelessPhone' auto-aliased`);
   }
 }
 

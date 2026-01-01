@@ -3,7 +3,7 @@ import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Builds the Incinerator prototype
+ * Builds the Incinerator type
  * A disposal unit that burns items. Inherits from Disposal.
  *
  * Properties (inherited + new):
@@ -26,19 +26,19 @@ export class IncineratorBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
+  async build(): Promise<void> {
 
-    if ($.incinerator && !forceRebuild) {
-      this.obj = $.incinerator;
-      return;
-    }
-
-    const parentObj = $.disposal;
-    const obj = await this.manager.create({
-      parent: parentObj!,
-      properties: {
-        name: 'Incinerator',
+    const existing = await this.manager.load('incinerator');
+    if (existing) {
+      this.obj = existing;
+    } else {
+      const parent = await this.manager.load('disposal');
+      if (!parent) {
+        throw new Error('Disposal type not found - required for Incinerator');
+      }
+      this.obj = await this.manager.define('incinerator', parent, {
+        properties: {
+          name: 'Incinerator',
         description:
           'An industrial incinerator, its metal housing radiating heat.',
         destroyMessage:
@@ -66,9 +66,12 @@ BURNING: burn()/deposit() instantly destroys item if operational and fueled. Emi
 EVIDENCE DESTRUCTION: Perfect for disposing of incriminating items. Leaves no trace (unless ashProduction enabled).
 
 VERBS: 'burn/incinerate/deposit/put/throw %o in %i', 'ignite/light %i', 'extinguish/turn off %i'.`,
-      },
-      methods: {},
-    });
+        },
+        methods: {},
+      });
+    }
+    // Always rebuild methods (ensures they exist even if type was pre-existing)
+    const obj = this.obj!;
 
     obj.setMethod(
       'deposit',
@@ -202,15 +205,10 @@ VERBS: 'burn/incinerate/deposit/put/throw %o in %i', 'ignite/light %i', 'extingu
       'operational',
       'Whether the incinerator is currently ignited and functional',
     );
-
-    this.obj = obj;
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
-    if (!this.obj) return;
-    const objectManager = await this.manager.load(0);
-    await objectManager?.call('addAlias', 'incinerator', this.obj.id);
+    console.log('[IncineratorBuilder] Type \'incinerator\' auto-aliased');
   }
 }
 

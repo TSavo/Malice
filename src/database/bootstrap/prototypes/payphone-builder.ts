@@ -3,7 +3,7 @@ import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Payphone extends Phone: bolted down, requires bank payment per call.
+ * Payphone type extends Phone: bolted down, requires bank payment per call.
  */
 export class PayphoneBuilder implements Builder {
   static provides = ['payphone'];
@@ -13,26 +13,26 @@ export class PayphoneBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
+  async build(): Promise<void> {
+    // Check if type already exists (types auto-alias)
+    const existing = await this.manager.load('payphone');
+    if (existing) {
+      this.obj = existing;
+    } else {
+      // Create payphone as a TYPE
+      const phone = await this.manager.load('phone');
+      if (!phone) throw new Error('Phone type not found');
 
-    if ($.payphone && !forceRebuild) {
-      this.obj = $.payphone;
-      return;
-    }
+      this.obj = await this.manager.define('payphone', phone, {
+        properties: {
+          name: 'Payphone',
+          description: 'A bolted-down public phone.',
+          boltedDown: true,
+          pricePerCall: 1,
+          bank: null,
+          account: null,
 
-    const parentObj = $.phone;
-    const obj = await this.manager.create({
-      parent: parentObj!,
-      properties: {
-        name: 'Payphone',
-        description: 'A bolted-down public phone.',
-        boltedDown: true,
-        pricePerCall: 1,
-        bank: null,
-        account: null,
-
-        abilities: `Fixed public telephone requiring payment per call. Extends $.phone.
+          abilities: `Fixed public telephone requiring payment per call. Extends $.phone.
 
 PAYMENT: dial() charges 'pricePerCall' from caller's bank account to 'account' before connecting.
 
@@ -41,9 +41,13 @@ BANK: 'bank' reference (defaults to $.bank). 'account' is destination for paymen
 IMMOVABLE: 'boltedDown' true. Cannot be picked up.
 
 USAGE: Caller needs bank account with sufficient balance. Out of service if bank not configured.`,
-      },
-      methods: {},
-    });
+        },
+        methods: {},
+      });
+    }
+
+    // Always rebuild methods (ensures they exist even if type was pre-existing)
+    const obj = this.obj!;
 
     obj.setMethod(
       'dial',
@@ -89,10 +93,9 @@ USAGE: Caller needs bank account with sufficient balance. Out of service if bank
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
+    // Types auto-alias by name, no manual registration needed
     if (!this.obj) return;
-    const objectManager = await this.manager.load(0);
-    await objectManager?.call('addAlias', 'payphone', this.obj.id);
+    console.log(`[PayphoneBuilder] Type 'payphone' auto-aliased`);
   }
 }
 

@@ -3,9 +3,9 @@ import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Builds the Weapon prototype
+ * Builds the Weapon type
  *
- * Base prototype for all weapons. Weapons have:
+ * Base type for all weapons. Weapons have:
  * - skill: The skill name used when fighting with this weapon (e.g., "knife", "pistol", "katana")
  * - damage: Base damage modifier (added to combat damage rolls)
  * - damageType: Default damage type inflicted (cut, bruise, puncture, etc.)
@@ -40,17 +40,13 @@ export class WeaponBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
-
-    if ($.weapon && !forceRebuild) {
-      this.obj = $.weapon;
-      return;
-    }
-
-    const parentObj = $.describable;
-    this.obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    const existing = await this.manager.load('weapon');
+    if (existing) {
+      this.obj = existing;
+    } else {
+      const parent = await this.manager.load('describable');
+      this.obj = await this.manager.define('weapon', parent!, {
       properties: {
         name: 'Weapon',
         description: 'Base prototype for weapons',
@@ -104,9 +100,11 @@ DAMAGE SCALE:
 CONDITION: Weapons can degrade with use. Broken weapons have reduced damage or may fail.`,
       },
       methods: {},
-    });
+      });
+    }
 
-    const obj = this.obj;
+    // Always rebuild methods (ensures they exist even if type was pre-existing)
+    const obj = this.obj!;
     // Add property descriptions
     obj.setPropertyDescription(
       'skill',
@@ -295,10 +293,7 @@ CONDITION: Weapons can degrade with use. Broken weapons have reduced damage or m
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
-    if (!this.obj) return;
-    const objectManager = await this.manager.load(0);
-    await objectManager?.call('addAlias', 'weapon', this.obj.id);
+    console.log('[WeaponBuilder] Type \'weapon\' auto-aliased');
   }
 }
 

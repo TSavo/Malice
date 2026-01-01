@@ -40,7 +40,7 @@ export class CharGenBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
+  async build(): Promise<void> {
     // Check if already exists via alias
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
@@ -57,21 +57,20 @@ export class CharGenBuilder implements Builder {
 
     if (aliases.charGen) {
       this.charGen = await this.manager.load(aliases.charGen);
-      if (this.charGen && !forceRebuild) return; // Already exists and not forcing rebuild
+      if (this.charGen) return; // Already exists and not forcing rebuild
     }
 
     if (!this.charGen) {
       // Create new CharGen only if it doesn't exist
-      // Use aliases already loaded from #0 above
-      const describableId = aliases.describable;
-      if (!describableId) {
+      // Load describable type directly (types auto-alias by name)
+      const $describable = await this.manager.load('describable');
+      if (!$describable) {
         throw new Error(
-          '$describable not found in aliases - run prototype builders first',
+          '$describable type not found - run prototype builders first',
         );
       }
-      const $describable = await this.manager.load(describableId);
       this.charGen = await this.manager.create({
-        parent: $describable!,
+        parent: $describable,
         properties: {
           name: 'CharGen',
           description: 'Character creation system',

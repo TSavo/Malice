@@ -3,7 +3,7 @@ import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Builds the Drink prototype
+ * Builds the Drink type
  * Inherits from Edible. Liquid consumed by drinking.
  *
  * ABILITIES-FIRST ARCHITECTURE:
@@ -20,20 +20,22 @@ export class DrinkBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
+  async build(): Promise<void> {
+    // Check if type already exists
+    const existing = await this.manager.load('drink');
+    if (existing) {
+      this.obj = existing;
+    } else {
+      // Get parent type
+      const edible = await this.manager.load('edible');
+      if (!edible) {
+        throw new Error('Edible type not found - required for Drink');
+      }
 
-    if ($.drink && !forceRebuild) {
-      this.obj = $.drink;
-      return;
-    }
-
-    const parent = $.edible;
-    this.obj = await this.manager.create({
-      parent: parent!,
-      properties: {
+      this.obj = await this.manager.define('drink', edible, {
+        properties: {
         name: 'Drink',
-        description: 'Base prototype for liquid consumables',
+        description: 'Base type for liquid consumables',
         // Typical drink nutrition
         calories: 50, // Some drinks have calories (juice, soda)
         hydration: 200, // ml water equivalent - drinks are very hydrating
@@ -69,8 +71,10 @@ TO CONSUME: Call consume(drinker, 'drink') method. It handles hydration, calorie
       },
       methods: {},
     });
+    }
 
-    const obj = this.obj;
+    // Always rebuild methods (ensures they exist even if type was pre-existing)
+    const obj = this.obj!;
 
     // Add property descriptions
     obj.setPropertyDescription(
@@ -242,10 +246,7 @@ TO CONSUME: Call consume(drinker, 'drink') method. It handles hydration, calorie
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
-    if (!this.obj) return;
-    const objectManager = await this.manager.load(0);
-    await objectManager?.call('addAlias', 'drink', this.obj.id);
+    console.log('[DrinkBuilder] Type \'drink\' auto-aliased');
   }
 }
 

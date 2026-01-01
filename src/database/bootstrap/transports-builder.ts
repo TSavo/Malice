@@ -24,7 +24,7 @@ export class TransportsBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
+  async build(): Promise<void> {
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
 
@@ -33,11 +33,11 @@ export class TransportsBuilder implements Builder {
 
     if (aliases.transports) {
       this.transports = await this.manager.load(aliases.transports);
-      if (this.transports && !forceRebuild) return;
+      if (this.transports) return;
     }
 
     if (!this.transports) {
-      const root = await this.manager.load(1);
+      const root = await this.manager.load('root');
       this.transports = await this.manager.create({
         parent: root!,
         properties: {

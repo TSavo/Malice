@@ -132,38 +132,22 @@ async function main() {
     await aliasLoader.loadAliases();
     console.log('  ✅ Loaded all aliases');
 
-    // Phase 5: World geometry (if --full)
+    // Phase 5: Post-build tasks (if --full)
+    // Note: WorldBuilder and BuildingBuilder already run in Phase 3 via runBuilders()
     if (opts.full) {
-      console.log('');
-      console.log('Phase 5: Building world geometry...');
-
-      const { WorldBuilder } = await import(
-        '../database/bootstrap/world-builder.js'
-      );
-      const { BuildingBuilder } = await import(
-        '../database/bootstrap/building-builder.js'
-      );
-
-      const worldBuilder = new WorldBuilder(manager);
-      await worldBuilder.build();
-
-      const buildingBuilder = new BuildingBuilder(manager);
-      await buildingBuilder.build();
-      console.log('  ✅ Built Smith Tower and other buildings');
-
       // Register global building object aliases
       console.log('');
-      console.log('Phase 6: Registering building aliases...');
+      console.log('Phase 5: Registering building aliases...');
       await registerBuildingAliases(manager);
 
       // Place special objects
       console.log('');
-      console.log('Phase 7: Placing special objects...');
+      console.log('Phase 6: Placing special objects...');
       await placeSpecialObjects(manager);
 
       // Build spatial index
       console.log('');
-      console.log('Phase 8: Building spatial index...');
+      console.log('Phase 7: Building spatial index...');
       const spatial = manager.getAliases().get('spatial');
       if (spatial) {
         const result = (await spatial.call('rebuild')) as { indexed?: number };

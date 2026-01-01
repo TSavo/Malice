@@ -3,7 +3,7 @@ import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Builds the Sustain prototype
+ * Builds the Sustain type
  * Inherits from Food - Continuum's nutritionally complete pills
  *
  * Sustain pills are manufactured at the Fabrication Factory biofarm
@@ -25,18 +25,20 @@ export class SustainBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
+  async build(): Promise<void> {
+    // Check if type already exists
+    const existing = await this.manager.load('sustain');
+    if (existing) {
+      this.obj = existing;
+    } else {
+      // Get parent type
+      const food = await this.manager.load('food');
+      if (!food) {
+        throw new Error('Food type not found - required for Sustain');
+      }
 
-    if ($.sustain && !forceRebuild) {
-      this.obj = $.sustain;
-      return;
-    }
-
-    const parentObj = $.food;
-    const obj = await this.manager.create({
-      parent: parentObj!,
-      properties: {
+      this.obj = await this.manager.define('sustain', food, {
+        properties: {
         name: 'Sustain',
         description:
           'A small oblong pill, pale gray with a faint chemical sheen. The Continuum logo is pressed into one side. Nutritionally complete. Best not to think about the source material.',
@@ -76,9 +78,13 @@ Subsidized price (2 credits). Everyone can afford to survive.`,
         basePrice: 2, // Credits - cheap and subsidized
         // Decay properties - pills last a long time
         decayRate: 0.1, // Very slow decay
-      },
-      methods: {},
-    });
+        },
+        methods: {},
+      });
+    }
+
+    // Always rebuild methods (ensures they exist even if type was pre-existing)
+    const obj = this.obj!;
 
     // Override tasteBite for Sustain's distinctive non-taste
     obj.setMethod(
@@ -155,15 +161,10 @@ Subsidized price (2 credits). Everyone can afford to survive.`,
       return msg;
     `,
     );
-
-    this.obj = obj;
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
-    if (!this.obj) return;
-    const objectManager = await this.manager.load(0);
-    await objectManager?.call('addAlias', 'sustain', this.obj.id);
+    console.log('[SustainBuilder] Type \'sustain\' auto-aliased');
   }
 }
 

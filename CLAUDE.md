@@ -782,9 +782,9 @@ $continuum.discordWebhook = 'https://discord.com/api/webhooks/...';
 $cartel.discordWebhook = 'https://discord.com/api/webhooks/...';
 ```
 
-## Email, HTTP, and Blob Objects
+## Email, HTTP, Blob, and AI Image Objects
 
-MOO objects for external communication and blob storage. These are proper MOO objects (not injected TypeScript classes) - their methods use native `fetch`, `await import('resend')`, and `await import('mongodb')` for GridFS.
+MOO objects for external communication, blob storage, and AI image generation. These are proper MOO objects (not injected TypeScript classes) - their methods use native `fetch`, `await import('resend')`, and `await import('mongodb')` for GridFS.
 
 ### $email - Email Object
 
@@ -882,5 +882,45 @@ player.avatarBlobKey = blobKey;
 
 // Player can view at: https://faction.domain/blob/{blobKey}
 ```
+
+### $aiImageGen - AI Image Generation Object
+
+Generate images using Google's Gemini API (Nano Banana) and store them in `$blob`:
+
+```typescript
+// Generate image and store in $blob
+const result = await $aiImageGen.generate('A cyberpunk banana with neon lights');
+// { success: true, blobKey: '...', contentType: 'image/png', prompt: '...' }
+
+// Get URL for the generated image
+const url = $blob.url(result.blobKey, 'thecontinuum.city');
+
+// Generate with options
+const result = await $aiImageGen.generate('A glowing orb', {
+  model: 'gemini-3-pro-image-preview',  // Use Nano Banana Pro
+  metadata: { createdBy: player.id },
+  filename: 'orb.png'
+});
+
+// Generate without storing (returns base64 directly)
+const raw = await $aiImageGen.generateRaw('A simple icon');
+// { success: true, data: 'base64...', contentType: 'image/png' }
+
+// List available models
+const models = $aiImageGen.listModels();
+// [{ id: 'gemini-2.0-flash-exp-image-generation', name: '...', tier: 'free' }, ...]
+
+// Change default model
+$aiImageGen.setDefaultModel('gemini-3-pro-image-preview');
+```
+
+**Environment:** Requires `GEMINI_API_KEY` environment variable.
+
+**Available models:**
+- `gemini-2.0-flash-exp-image-generation` (default, free tier)
+- `gemini-2.5-flash-image` - Nano Banana (free tier)
+- `gemini-3-pro-image-preview` - Nano Banana Pro (free tier)
+- `imagen-4.0-generate-001` - Imagen 4.0 (paid)
+- `imagen-4.0-ultra-generate-001` - Imagen 4.0 Ultra (paid)
 
 All transports require authentication. Players must first register via `POST /register` on the faction's HTTP server, then connect via WebSocket or Session MCP with their credentials. Connections are tagged with `factionId` for routing to the correct character generation flow.

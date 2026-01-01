@@ -3,7 +3,7 @@ import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Builds the ElevatorDoor prototype
+ * Builds the ElevatorDoor type
  * A door that only allows passage when the elevator is present at this floor.
  *
  * ABILITIES-FIRST ARCHITECTURE:
@@ -22,29 +22,29 @@ export class ElevatorDoorBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
+  async build(): Promise<void> {
+    // Check if type already exists
+    const existing = await this.manager.load('elevatorDoor');
+    if (existing) {
+      this.obj = existing;
+    } else {
+      // Get parent type
+      const door = await this.manager.load('door');
+      if (!door) {
+        throw new Error('Door type not found - required for ElevatorDoor');
+      }
 
-    if ($.elevatorDoor && !forceRebuild) {
-      this.obj = $.elevatorDoor;
-      return;
-    }
-
-    const parentObj = $.door;
-    if (!parentObj) throw new Error('ElevatorDoorBuilder: $door not found');
-
-    this.obj = await this.manager.create({
-      parent: parentObj,
-      properties: {
-        name: 'Elevator Doors',
-        description:
-          'Brushed steel elevator doors that slide open when the elevator arrives.',
-        elevator: null,
-        floor: 0,
-        // Override door defaults - elevator doors are automatic
-        locked: false,
-        open: false, // Controlled by elevator presence, not manual
-        abilities: `Automatic elevator doors that only open when elevator is present.
+      this.obj = await this.manager.define('elevatorDoor', door, {
+        properties: {
+          name: 'Elevator Doors',
+          description:
+            'Brushed steel elevator doors that slide open when the elevator arrives.',
+          elevator: null,
+          floor: 0,
+          // Override door defaults - elevator doors are automatic
+          locked: false,
+          open: false, // Controlled by elevator presence, not manual
+          abilities: `Automatic elevator doors that only open when elevator is present.
 
 PASSAGE: Blocked unless elevator is at this floor with doors open.
 Check: self.elevator?.currentFloor === self.floor AND self.elevator?.doorsOpen
@@ -54,11 +54,13 @@ Cannot be manually opened - controlled by elevator system.
 
 FORCING: Heavy steel construction. Would require significant force or tools to pry open.
 Even if forced, there may be no elevator car behind them (empty shaft).`,
-      },
-      methods: {},
-    });
+        },
+        methods: {},
+      });
+    }
 
-    const obj = this.obj;
+    // Always rebuild methods (ensures they exist even if type was pre-existing)
+    const obj = this.obj!;
 
     // Add property descriptions
     obj.setPropertyDescription(
@@ -102,10 +104,8 @@ Even if forced, there may be no elevator car behind them (empty shaft).`,
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
     if (!this.obj) return;
-    const objectManager = await this.manager.load(0);
-    await objectManager?.call('addAlias', 'elevatorDoor', this.obj.id);
+    console.log("[ElevatorDoorBuilder] Type 'elevatorDoor' auto-aliased");
   }
 }
 

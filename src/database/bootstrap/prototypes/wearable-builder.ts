@@ -3,8 +3,8 @@ import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Builds the Wearable prototype
- * Base prototype for items that can be worn on body parts.
+ * Builds the Wearable type
+ * Base type for items that can be worn on body parts.
  * Inherits from Describable - wearables have name, description, aliases.
  *
  * Wearables:
@@ -26,18 +26,20 @@ export class WearableBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
+  async build(): Promise<void> {
+    // Check if type already exists
+    const existing = await this.manager.load('wearable');
+    if (existing) {
+      this.obj = existing;
+    } else {
+      // Get parent type
+      const describable = await this.manager.load('describable');
+      if (!describable) {
+        throw new Error('Describable type not found - required for Wearable');
+      }
 
-    if ($.wearable && !forceRebuild) {
-      this.obj = $.wearable;
-      return;
-    }
-
-    const parentObj = $.describable;
-    this.obj = await this.manager.create({
-      parent: parentObj!,
-      properties: {
+      this.obj = await this.manager.define('wearable', describable, {
+        properties: {
         name: 'Wearable',
         description: 'Something that can be worn',
         // Which body part slots this covers
@@ -76,11 +78,13 @@ WARMTH: 'warmth' provides cold resistance. Layering adds warmth. Exposed parts l
 APPEARANCE: Outermost layer on each slot determines visible appearance. 'wornDescription' overrides naked description.
 
 REQUIRED PARTS: Can't wear gloves without hands, boots without feet. Missing parts = can't wear.`,
-      },
-      methods: {},
-    });
+        },
+        methods: {},
+      });
+    }
 
-    const obj = this.obj;
+    // Always rebuild methods (ensures they exist even if type was pre-existing)
+    const obj = this.obj!;
     obj.setMethod(
       'canWear',
       `
@@ -454,10 +458,9 @@ REQUIRED PARTS: Can't wear gloves without hands, boots without feet. Missing par
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
+    // Types auto-alias by name, no manual registration needed
     if (!this.obj) return;
-    const objectManager = await this.manager.load(0);
-    await objectManager?.call('addAlias', 'wearable', this.obj.id);
+    console.log(`[WearableBuilder] Type 'wearable' auto-aliased`);
   }
 }
 

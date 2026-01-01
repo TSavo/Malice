@@ -174,7 +174,7 @@ describe('GameBootstrap', () => {
       // Create corrupt root
       await db.create({
         _id: 1,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: null as any, // Corrupt
         methods: {},
       });

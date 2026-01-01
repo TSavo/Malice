@@ -3,7 +3,7 @@ import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Builds the Telescope prototype
+ * Builds the Telescope type
  * An observation device that casts rays and uses AI to synthesize views.
  *
  * ABILITIES-FIRST ARCHITECTURE:
@@ -26,20 +26,18 @@ export class TelescopeBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
+  async build(): Promise<void> {
+    // Check if type already exists (types auto-alias)
+    const existing = await this.manager.load('telescope');
+    if (existing) {
+      this.obj = existing;
+    } else {
+      // Create telescope as a TYPE
+      const parentObj = await this.manager.load('describable');
+      if (!parentObj) throw new Error('TelescopeBuilder: $describable not found');
 
-    if ($.telescope && !forceRebuild) {
-      this.obj = $.telescope;
-      return;
-    }
-
-    const parentObj = $.describable;
-    if (!parentObj) throw new Error('TelescopeBuilder: $describable not found');
-
-    this.obj = await this.manager.create({
-      parent: parentObj!,
-      properties: {
+      this.obj = await this.manager.define('telescope', parentObj, {
+        properties: {
         name: 'Telescope',
         description: 'An observation telescope mounted on a fixed base.',
         tilt: 45,
@@ -129,10 +127,12 @@ UNDERSTANDING THE VIEW:
 NARRATING TO PLAYERS:
 Aggregate the room descriptions into a cohesive panorama. Don't list rooms -
 describe what they observe as a scene, weaving together landmarks and atmosphere.`,
-      },
-      methods: {},
-    });
+        },
+        methods: {},
+      });
+    }
 
+    // Always rebuild methods (ensures they exist even if type was pre-existing)
     const obj = this.obj;
 
     // Property descriptions
@@ -482,10 +482,9 @@ describe what they observe as a scene, weaving together landmarks and atmosphere
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
+    // Types auto-alias by name, no manual registration needed
     if (!this.obj) return;
-    const objectManager = await this.manager.load(0);
-    await objectManager?.call('addAlias', 'telescope', this.obj.id);
+    console.log(`[TelescopeBuilder] Type 'telescope' auto-aliased`);
   }
 }
 

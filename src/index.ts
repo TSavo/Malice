@@ -23,19 +23,8 @@ async function main() {
   // MongoDB connection string (default: local instance)
   const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017';
 
-  // Force bootstrap flag - rebuilds all prototype methods even if objects exist
-  const forceBootstrap =
-    process.env.FORCE_BOOTSTRAP === 'true' ||
-    process.env.FORCE_BOOTSTRAP === '1';
-  if (forceBootstrap) {
-    console.log(
-      '⚠️  FORCE_BOOTSTRAP enabled - rebuilding all prototype methods\n',
-    );
-  }
-
   // Initialize game system
   const game = new GameCoordinator(mongoUri, {
-    forceBootstrap,
     transportDebug: false,
   });
 

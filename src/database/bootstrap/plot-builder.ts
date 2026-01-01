@@ -44,7 +44,7 @@ export class PlotBuilder implements Builder {
     }
 
     // Create Plot prototype
-    const root = await this.manager.load(1);
+    const root = await this.manager.load('root');
     this.plotPrototype = await this.manager.create({
       parent: root!,
       properties: {
@@ -251,7 +251,7 @@ ATTENTION: Set metadata.needsAttentionAt to ISO timestamp when handler (city AI)
     }
 
     // Create minimal PlotDB
-    const root = await this.manager.load(1);
+    const root = await this.manager.load('root');
     this.plotDB = await this.manager.create({
       parent: root!,
       properties: {

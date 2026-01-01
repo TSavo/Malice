@@ -3,8 +3,8 @@ import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Builds the Room prototype
- * Base prototype for rooms with exits and crowd mechanics.
+ * Builds the Room type
+ * Base type for rooms with exits and crowd mechanics.
  *
  * Spatial coordinates (integer only):
  * - x, y, z: Position in world space (meters)
@@ -32,20 +32,22 @@ export class RoomBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
+  async build(): Promise<void> {
+    // Check if type already exists
+    const existing = await this.manager.load('room');
+    if (existing) {
+      this.obj = existing;
+    } else {
+      // Get parent type
+      const location = await this.manager.load('location');
+      if (!location) {
+        throw new Error('Location type not found - required for Room');
+      }
 
-    if ($.room && !forceRebuild) {
-      this.obj = $.room;
-      return;
-    }
-
-    const parentObj = $.location;
-    this.obj = await this.manager.create({
-      parent: parentObj!,
-      properties: {
-        name: 'Room',
-        description: 'Base prototype for rooms',
+      this.obj = await this.manager.define('room', location, {
+        properties: {
+          name: 'Room',
+          description: 'Base prototype for rooms',
         // Spatial coordinates (integers, in meters)
         x: 0,
         y: 0,
@@ -87,11 +89,13 @@ SITTABLES: 'sittables' array defines seating. Each has capacity. Sitting registe
 PERCEPTION: getPerception(viewer, target) calculates clarity based on crowd, light, noise, viewer senses, whether watching target.
 
 OUTDOOR: 'outdoor' affects weather exposure, natural lighting cycles.`,
-      },
-      methods: {},
-    });
+        },
+        methods: {},
+      });
+    }
 
-    const obj = this.obj;
+    // Always rebuild methods (ensures they exist even if type was pre-existing)
+    const obj = this.obj!
     obj.setMethod(
       'describe',
       `
@@ -931,10 +935,9 @@ OUTDOOR: 'outdoor' affects weather exposure, natural lighting cycles.`,
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
+    // Types auto-alias by name, no manual registration needed
     if (!this.obj) return;
-    const objectManager = await this.manager.load(0);
-    await objectManager?.call('addAlias', 'room', this.obj.id);
+    console.log(`[RoomBuilder] Type 'room' auto-aliased`);
   }
 }
 

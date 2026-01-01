@@ -81,6 +81,7 @@ describe.sequential('TypeGenerator', () => {
         methods: {},
       });
 
+      await manager.flushWrites();
       const types = await generator.generate();
 
       expect(types).toContain('name: string');
@@ -93,6 +94,7 @@ describe.sequential('TypeGenerator', () => {
         methods: {},
       });
 
+      await manager.flushWrites();
       const types = await generator.generate();
 
       expect(types).toContain('count: number');
@@ -105,6 +107,7 @@ describe.sequential('TypeGenerator', () => {
         methods: {},
       });
 
+      await manager.flushWrites();
       const types = await generator.generate();
 
       expect(types).toContain('enabled: boolean');
@@ -117,6 +120,7 @@ describe.sequential('TypeGenerator', () => {
         methods: {},
       });
 
+      await manager.flushWrites();
       const types = await generator.generate();
 
       expect(types).toContain('value: null');
@@ -129,6 +133,7 @@ describe.sequential('TypeGenerator', () => {
         methods: {},
       });
 
+      await manager.flushWrites();
       const types = await generator.generate();
 
       expect(types).toContain('items: number[]');
@@ -141,6 +146,7 @@ describe.sequential('TypeGenerator', () => {
         methods: {},
       });
 
+      await manager.flushWrites();
       const types = await generator.generate();
 
       expect(types).toContain('mixed: any[]');
@@ -153,6 +159,7 @@ describe.sequential('TypeGenerator', () => {
         methods: {},
       });
 
+      await manager.flushWrites();
       const types = await generator.generate();
 
       expect(types).toContain('empty: any[]');
@@ -165,6 +172,7 @@ describe.sequential('TypeGenerator', () => {
         methods: {},
       });
 
+      await manager.flushWrites();
       const types = await generator.generate();
 
       expect(types).toContain('config: Record<string, any>');
@@ -177,6 +185,7 @@ describe.sequential('TypeGenerator', () => {
         methods: {},
       });
 
+      await manager.flushWrites();
       const types = await generator.generate();
 
       // MongoDB converts undefined to null when storing documents
@@ -195,6 +204,7 @@ describe.sequential('TypeGenerator', () => {
         methods: {},
       });
 
+      await manager.flushWrites();
       const types = await generator.generate();
 
       expect(types).toContain('name: string');
@@ -212,6 +222,7 @@ describe.sequential('TypeGenerator', () => {
         methods: { onInput: { code: 'return 42;' } },
       });
 
+      await manager.flushWrites();
       const types = await generator.generate();
 
       expect(types).toContain('onInput(...args: any[]): Promise<any>');
@@ -228,6 +239,7 @@ describe.sequential('TypeGenerator', () => {
         },
       });
 
+      await manager.flushWrites();
       const types = await generator.generate();
 
       expect(types).toContain('onCreate(...args: any[]): Promise<any>');
@@ -244,6 +256,7 @@ describe.sequential('TypeGenerator', () => {
         methods: { test: { code: 'return 1;' } },
       });
 
+      await manager.flushWrites();
       const types = await generator.generate();
 
       expect(types).toContain(`/** Object #${obj.id} */`);
@@ -267,6 +280,7 @@ describe.sequential('TypeGenerator', () => {
         },
       });
 
+      await manager.flushWrites();
       const types = await generator.generate();
 
       // Check order: properties should be alpha, middle, zebra
@@ -293,6 +307,7 @@ describe.sequential('TypeGenerator', () => {
         methods: {},
       });
 
+      await manager.flushWrites();
       // Mark as recycled via raw MongoDB (recycling is handled by $.recycler in game)
       await db.objects.updateOne({ _id: obj.id }, { $set: { recycled: true } });
 
@@ -357,6 +372,7 @@ describe.sequential('TypeGenerator', () => {
         methods: { test: { code: 'return 1;' } },
       });
 
+      await manager.flushWrites();
       const types = await generator.generateForObject(obj.id);
 
       // Should include base types
@@ -391,6 +407,7 @@ describe.sequential('TypeGenerator', () => {
         methods: {},
       });
 
+      await manager.flushWrites();
       const types = await generator.generate();
 
       expect(types).toContain('"valid-name": number');

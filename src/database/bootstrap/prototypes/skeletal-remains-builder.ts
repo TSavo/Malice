@@ -3,7 +3,7 @@ import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Builds the SkeletalRemains prototype
+ * Builds the SkeletalRemains type
  * The final stage of a corpse - bones that persist indefinitely.
  *
  * Skeletal remains:
@@ -21,20 +21,17 @@ export class SkeletalRemainsBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
+  async build(): Promise<void> {
 
-    if ($.skeletalRemains && !forceRebuild) {
-      this.obj = $.skeletalRemains;
-      return;
-    }
-
-    const parentObj = $.describable;
-    const obj = await this.manager.create({
-      parent: parentObj!,
-      properties: {
-        name: 'Skeletal Remains',
-        description: 'A pile of bones.',
+    const existing = await this.manager.load('skeletalRemains');
+    if (existing) {
+      this.obj = existing;
+    } else {
+      const parent = await this.manager.load('describable');
+      this.obj = await this.manager.define('skeletalRemains', parent!, {
+        properties: {
+          name: 'Skeletal Remains',
+          description: 'A pile of bones.',
         // Original identity - needs autopsy to determine
         originalName: null,
         // Physical - just bones now
@@ -61,9 +58,13 @@ AUTOPSY: Very limited - only bone trauma visible. Skull fractures, broken ribs, 
 IDENTIFICATION: 'originalName' if known. Otherwise requires dental records, DNA (if tech allows), or personal effects. Sex may be determinable from pelvis shape.
 
 USES: Bones can be collected, buried, arranged. Skulls as trophies. Bone meal for fertilizer. Ritual purposes. Evidence of crimes.`,
-      },
-      methods: {},
-    });
+        },
+        methods: {},
+      });
+    }
+
+    // Always rebuild methods (ensures they exist even if type was pre-existing)
+    const obj = this.obj!;
 
     // Get the body inside (skeletal now)
     obj.setMethod(
@@ -339,15 +340,10 @@ USES: Bones can be collected, buried, arranged. Skulls as trophies. Bone meal fo
       'searched',
       'Boolean tracking if skeleton has been searched for items or evidence.',
     );
-
-    this.obj = obj;
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
-    if (!this.obj) return;
-    const objectManager = await this.manager.load(0);
-    await objectManager?.call('addAlias', 'skeletalRemains', this.obj.id);
+    console.log('[SkeletalRemainsBuilder] Type \'skeletalRemains\' auto-aliased');
   }
 }
 

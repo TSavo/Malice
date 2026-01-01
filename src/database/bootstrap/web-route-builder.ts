@@ -34,7 +34,7 @@ export class WebRouteBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
+  async build(): Promise<void> {
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
 
@@ -52,7 +52,7 @@ export class WebRouteBuilder implements Builder {
 
     if (aliases.webRoute) {
       this.webRoute = await this.manager.load(aliases.webRoute);
-      if (this.webRoute && !forceRebuild) return;
+      if (this.webRoute) return;
     }
 
     if (!this.webRoute) {

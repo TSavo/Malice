@@ -45,7 +45,7 @@ export class ProportionalBuilder implements Builder {
     }
 
     // Create new Proportional
-    const root = await this.manager.load(1);
+    const root = await this.manager.load('root');
     this.proportional = await this.manager.create({
       parent: root!,
       properties: {

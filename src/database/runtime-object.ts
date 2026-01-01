@@ -1565,7 +1565,10 @@ export class RuntimeObjectImpl implements RuntimeObject {
    * Pull fresh data from database (in-place)
    */
   async pull(): Promise<void> {
-    const fresh = await this.manager.getDatabase().get(this.id);
+    const db = this.manager.getDatabase();
+    const fresh = this._kind === 'type'
+      ? await db.getType(this.id as string)
+      : await db.get(this.id as number);
     if (fresh) {
       this.obj = fresh;
       this.dirty = false;

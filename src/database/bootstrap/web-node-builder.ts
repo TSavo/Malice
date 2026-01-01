@@ -36,7 +36,7 @@ export class WebNodeBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
+  async build(): Promise<void> {
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
 
@@ -45,11 +45,11 @@ export class WebNodeBuilder implements Builder {
 
     if (aliases.webNode) {
       this.webNode = await this.manager.load(aliases.webNode);
-      if (this.webNode && !forceRebuild) return;
+      if (this.webNode) return;
     }
 
     if (!this.webNode) {
-      const root = await this.manager.load(1);
+      const root = await this.manager.load('root');
       this.webNode = await this.manager.create({
         parent: root!,
         properties: {

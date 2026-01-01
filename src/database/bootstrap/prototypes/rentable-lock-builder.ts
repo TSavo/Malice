@@ -3,7 +3,7 @@ import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Builds the RentableLock prototype
+ * Builds the RentableLock type
  * Combines lock access control with bank-based rental/payment logic.
  *
  * Inherits from Lock.
@@ -31,33 +31,33 @@ export class RentableLockBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
+  async build(): Promise<void> {
+    // Check if type already exists
+    const existing = await this.manager.load('rentableLock');
+    if (existing) {
+      this.obj = existing;
+    } else {
+      // Get parent type
+      const lock = await this.manager.load('lock');
+      if (!lock) {
+        throw new Error('Lock type not found - required for RentableLock');
+      }
 
-    if ($.rentableLock && !forceRebuild) {
-      this.obj = $.rentableLock;
-      return;
-    }
+      this.obj = await this.manager.define('rentableLock', lock, {
+        properties: {
+          name: 'Rentable Lock',
+          description: 'A lock that can be rented for a fee.',
+          price: 100, // Rental price
+          duration: 3600000, // 1 hour default
+          bank: null, // Bank object
+          account: null, // Account ID to receive payments
+          renters: {}, // { agentId: expiration }
+          code: null, // Access code
+          linkedLockId: null, // Paired lock for syncing
+          locked: true, // Legacy/simple lock
+          locks: [], // Composable locks
 
-    const parentObj = $.lock;
-    if (!parentObj) throw new Error('RentableLockBuilder: $lock not found');
-
-    this.obj = await this.manager.create({
-      parent: parentObj!,
-      properties: {
-        name: 'Rentable Lock',
-        description: 'A lock that can be rented for a fee.',
-        price: 100, // Rental price
-        duration: 3600000, // 1 hour default
-        bank: null, // Bank object
-        account: null, // Account ID to receive payments
-        renters: {}, // { agentId: expiration }
-        code: null, // Access code
-        linkedLockId: null, // Paired lock for syncing
-        locked: true, // Legacy/simple lock
-        locks: [], // Composable locks
-
-        abilities: `Lock that grants access via payment. Extends $.lock.
+          abilities: `Lock that grants access via payment. Extends $.lock.
 
 RENTAL: rent(agent, key) transfers 'price' from agent's account to 'account' via 'bank'. Grants access for 'duration' ms.
 
@@ -73,11 +73,13 @@ EXTENSION: Renting while already active extends duration, keeps same code.
 CODE: Generated on first rental. syncCode() updates linked lock for paired doors.
 
 COMPOSABLE: 'locks' array can contain additional lock objects (biometric, keycard, etc).`,
-      },
-      methods: {},
-    });
+        },
+        methods: {},
+      });
+    }
 
-    const obj = this.obj;
+    // Always rebuild methods (ensures they exist even if type was pre-existing)
+    const obj = this.obj!;
 
     obj.setMethod(
       'canAccess',
@@ -230,10 +232,7 @@ COMPOSABLE: 'locks' array can contain additional lock objects (biometric, keycar
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
-    if (!this.obj) return;
-    const objectManager = await this.manager.load(0);
-    await objectManager?.call('addAlias', 'rentableLock', this.obj.id);
+    console.log('[RentableLockBuilder] Type \'rentableLock\' auto-aliased');
   }
 }
 

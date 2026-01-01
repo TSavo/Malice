@@ -51,36 +51,4 @@ export class CoreSystemBuilder {
 
     console.log(`[CoreSystemBuilder] ✅ ${sorted.length} systems built`);
   }
-
-  /**
-   * Rebuild methods on existing core system objects
-   * Called when FORCE_BOOTSTRAP=true to update methods without recreating objects
-   */
-  async rebuildMethods(): Promise<void> {
-    // Get all registered builders and sort by dependencies
-    const allBuilders = getBuilders();
-    const sorted = topologicalSort(allBuilders);
-
-    console.log(`[CoreSystemBuilder] Rebuilding methods for ${sorted.length} systems...`);
-
-    // Rebuild each in order
-    for (const BuilderClass of sorted) {
-      const builder = new BuilderClass(this.manager);
-
-      // Use rebuildMethods if available, otherwise build(true)
-      if (builder.rebuildMethods) {
-        await builder.rebuildMethods();
-      } else {
-        await builder.build(true);
-      }
-
-      await builder.registerAliases();
-    }
-
-    // Rebuild client JS modules
-    const clientBuilder = new ClientBuilder(this.manager);
-    await clientBuilder.build(true);
-
-    console.log('  ✅ Core system methods rebuilt');
-  }
 }

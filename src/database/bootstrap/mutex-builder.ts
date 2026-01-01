@@ -46,7 +46,7 @@ export class MutexBuilder implements Builder {
     }
 
     // Create new Mutex utility
-    const root = await this.manager.load(1);
+    const root = await this.manager.load('root');
     this.mutex = await this.manager.create({
       parent: root!,
       properties: {

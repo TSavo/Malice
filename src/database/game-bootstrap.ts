@@ -1,15 +1,8 @@
 import { AliasLoader, MinimalBootstrap } from './bootstrap/index';
-import { runBuilders, rebuildAllMethods } from './bootstrap/builder-registry';
+import { runBuilders } from './bootstrap/builder-registry';
 import type { ObjectManager } from './object-manager';
 
 export interface GameBootstrapOptions {
-  /**
-   * If true, rebuild all builder methods on existing objects.
-   * Useful for development when you've changed method code.
-   * Set via FORCE_BOOTSTRAP=true environment variable.
-   */
-  forceBootstrap?: boolean;
-
   /**
    * TEST ONLY: Build world inline if missing.
    * Production should NEVER use this - run `npm run bootstrap:world` instead.
@@ -27,7 +20,6 @@ export interface GameBootstrapOptions {
  * 1. Loads all objects into memory
  * 2. Loads aliases from root.aliases
  * 3. Validates the world is built (fails if not)
- * 4. Optionally rebuilds methods if FORCE_BOOTSTRAP=true
  */
 export class GameBootstrap {
   private options: GameBootstrapOptions;
@@ -37,7 +29,6 @@ export class GameBootstrap {
     options: GameBootstrapOptions = {},
   ) {
     this.options = {
-      forceBootstrap: false,
       _testMode: false,
       ...options,
     };
@@ -95,31 +86,7 @@ export class GameBootstrap {
       }
     }
 
-    // Phase 4: Optionally rebuild methods (dev only)
-    if (this.options.forceBootstrap) {
-      console.log('');
-      console.log(
-        '═══════════════════════════════════════════════════════════',
-      );
-      console.log('  🔄 Force rebuilding prototype methods...');
-      console.log(
-        '═══════════════════════════════════════════════════════════',
-      );
-      console.log('');
-
-      // Import all builders to register them
-      await import('./bootstrap/all-builders.js');
-      await rebuildAllMethods(this.manager);
-
-      // Reload aliases after rebuild
-      await aliasLoader.loadAliases();
-
-      console.log('');
-      console.log('✅ Prototype methods rebuilt!');
-      console.log('');
-    } else {
-      console.log('✅ World is built and ready for connections');
-    }
+    console.log('✅ World is built and ready for connections');
   }
 
   /**

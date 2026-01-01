@@ -342,8 +342,13 @@ export class QueryBuilder {
   private _limit?: number;
   private _parent?: RuntimeObject | number;
   private _inheritedFrom?: RuntimeObject | number;
+  private _typesOnly = false;
+  private _objectsOnly = false;
 
-  constructor(private cache: ObjectCache) {}
+  constructor(
+    private cache: ObjectCache,
+    private typeCache?: Map<string, RuntimeObject>,
+  ) {}
 
   /** Start a property selector. Use '*' to search all properties. */
   prop(name: string): PropertySelector {
@@ -382,6 +387,26 @@ export class QueryBuilder {
   limit(n: number): this {
     this._limit = n;
     return this;
+  }
+
+  /** Filter to only include types (from types collection) */
+  type(): this {
+    this._typesOnly = true;
+    this._objectsOnly = false;
+    return this;
+  }
+
+  /** Filter to only include objects (exclude types) */
+  object(): this {
+    this._objectsOnly = true;
+    this._typesOnly = false;
+    return this;
+  }
+
+  /** Convenience: get all types matching query */
+  types(): RuntimeObject[] {
+    this._typesOnly = true;
+    return this.execute();
   }
 
   /** Add a predicate to current group (internal use by selectors) */
@@ -479,26 +504,47 @@ export class QueryBuilder {
     // Check if we have any predicates in any group
     const hasPredicates = this.groups.some((g) => g.length > 0);
 
-    for (const obj of this.cache.values()) {
-      // Always check parent constraint
-      if (!this.matchesParent(obj)) continue;
-
-      // Always check inheritedFrom constraint
-      if (!this.matchesInherited(obj)) continue;
-
-      // Check OR groups: any group must match
-      // Each group: all predicates must pass (AND within group)
-      let groupsMatch = true;
-      if (hasPredicates) {
-        groupsMatch = this.groups.some(
-          (group) => group.length === 0 || group.every((pred) => pred(obj)),
-        );
+    // Determine which collections to search
+    const sources: Iterable<RuntimeObject>[] = [];
+    if (this._typesOnly) {
+      // Types only
+      if (this.typeCache) {
+        sources.push(this.typeCache.values());
       }
-
-      if (groupsMatch) {
-        results.push(obj);
-        if (limit && results.length >= limit) break;
+    } else if (this._objectsOnly) {
+      // Objects only
+      sources.push(this.cache.values());
+    } else {
+      // Both (default: objects first, then types)
+      sources.push(this.cache.values());
+      if (this.typeCache) {
+        sources.push(this.typeCache.values());
       }
+    }
+
+    for (const source of sources) {
+      for (const obj of source) {
+        // Always check parent constraint
+        if (!this.matchesParent(obj)) continue;
+
+        // Always check inheritedFrom constraint
+        if (!this.matchesInherited(obj)) continue;
+
+        // Check OR groups: any group must match
+        // Each group: all predicates must pass (AND within group)
+        let groupsMatch = true;
+        if (hasPredicates) {
+          groupsMatch = this.groups.some(
+            (group) => group.length === 0 || group.every((pred) => pred(obj)),
+          );
+        }
+
+        if (groupsMatch) {
+          results.push(obj);
+          if (limit && results.length >= limit) break;
+        }
+      }
+      if (limit && results.length >= limit) break;
     }
 
     return results;
@@ -1181,7 +1227,7 @@ export class ObjectManager {
    * $query().prop('x').equals(1).and().prop('y').equals(2).all()
    */
   query(): QueryBuilder {
-    return new QueryBuilder(this.cache);
+    return new QueryBuilder(this.cache, this.typeCache);
   }
 
   /**

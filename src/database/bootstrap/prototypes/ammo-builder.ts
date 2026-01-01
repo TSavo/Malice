@@ -1,9 +1,9 @@
-import type { ObjId, RuntimeObject } from '../../../../types/object';
+import type { RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Builds the Ammo prototype
+ * Builds the Ammo type
  *
  * Ammunition is a stackable commodity. When loaded into a gun (directly or via clip),
  * the ammo is recycled - it doesn't exist as a separate object while loaded.
@@ -14,7 +14,7 @@ import { registerBuilder, type Builder } from '../builder-registry';
  * - 12gauge, 20gauge
  * - etc.
  *
- * Inherits from $.stackable for quantity management.
+ * Inherits from stackable type for quantity management.
  */
 export class AmmoBuilder implements Builder {
   static provides = ['ammo'];
@@ -24,36 +24,32 @@ export class AmmoBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
+  async build(): Promise<void> {
+    const existing = await this.manager.load('ammo');
+    if (existing) {
+      this.obj = existing;
+    } else {
+      const parent = await this.manager.load('stackable');
+      if (!parent) throw new Error('AmmoBuilder: stackable type not found');
 
-    if ($.ammo && !forceRebuild) {
-      this.obj = $.ammo;
-      return;
-    }
+      this.obj = await this.manager.define('ammo', parent, {
+        properties: {
+          name: 'Ammunition',
+          description: 'A quantity of ammunition.',
 
-    const parentObj = $.stackable;
-    if (!parentObj) throw new Error('AmmoBuilder: $stackable not found');
+          // What type of ammo (must match gun.ammoType)
+          ammoType: 'generic',
 
-    this.obj = await this.manager.create({
-      parent: parentObj,
-      properties: {
-        name: 'Ammunition',
-        description: 'A quantity of ammunition.',
+          // Inherits quantity from stackable
+          // quantity: 0,
 
-        // What type of ammo (must match gun.ammoType)
-        ammoType: 'generic',
+          // Display unit
+          unit: 'rounds',
 
-        // Inherits quantity from stackable
-        // quantity: 0,
+          // Ammo is often contraband
+          contraband: false,
 
-        // Display unit
-        unit: 'rounds',
-
-        // Ammo is often contraband
-        contraband: false,
-
-        abilities: `Stackable commodity - cartridges for firearms.
+          abilities: `Stackable commodity - cartridges for firearms.
 
 STACKING: Ammo of same 'ammoType' stacks together. 'quantity' tracks count.
 
@@ -68,11 +64,13 @@ CONTRABAND: 'contraband' flag if illegal to possess. May be searched for, confis
 WEIGHT: Bullets are heavy in quantity. 1000 rounds = significant weight.
 
 EXPOSED: Loose ammo can be damaged by water, fire. Store in sealed containers.`,
-      },
-      methods: {},
-    });
+        },
+        methods: {},
+      });
+    }
 
-    const obj = this.obj;
+    // Always rebuild methods (ensures they exist even if type was pre-existing)
+    const obj = this.obj!;
     // Override stackType to use ammoType for stacking
     obj.setMethod(
       'canStackWith',
@@ -131,10 +129,7 @@ EXPOSED: Loose ammo can be damaged by water, fire. Store in sealed containers.`,
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
-    if (!this.obj) return;
-    const objectManager = await this.manager.load(0);
-    await objectManager?.call('addAlias', 'ammo', this.obj.id);
+    console.log('[AmmoBuilder] Type \'ammo\' auto-aliased');
   }
 }
 
@@ -145,13 +140,19 @@ registerBuilder(AmmoBuilder);
  * Specific ammo type builders
  */
 
-export class Ammo9mmBuilder {
+export class Ammo9mmBuilder implements Builder {
+  static provides = ['ammo9mm'];
+  static depends = ['ammo'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    return await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('ammo9mm')) return;
+
+    const parent = await this.manager.load('ammo');
+    if (!parent) throw new Error('Ammo9mmBuilder: ammo type not found');
+
+    await this.manager.define('ammo9mm', parent, {
       properties: {
         name: '9mm Ammunition',
         description: 'Standard 9x19mm Parabellum cartridges.',
@@ -161,15 +162,25 @@ export class Ammo9mmBuilder {
       methods: {},
     });
   }
+
+  async registerAliases(): Promise<void> {
+    console.log('[Ammo9mmBuilder] Type \'ammo9mm\' auto-aliased');
+  }
 }
 
-export class Ammo38Builder {
+export class Ammo38Builder implements Builder {
+  static provides = ['ammo38'];
+  static depends = ['ammo'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    return await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('ammo38')) return;
+
+    const parent = await this.manager.load('ammo');
+    if (!parent) throw new Error('Ammo38Builder: ammo type not found');
+
+    await this.manager.define('ammo38', parent, {
       properties: {
         name: '.38 Special Ammunition',
         description: 'Revolver cartridges.',
@@ -179,15 +190,25 @@ export class Ammo38Builder {
       methods: {},
     });
   }
+
+  async registerAliases(): Promise<void> {
+    console.log('[Ammo38Builder] Type \'ammo38\' auto-aliased');
+  }
 }
 
-export class Ammo44Builder {
+export class Ammo44Builder implements Builder {
+  static provides = ['ammo44'];
+  static depends = ['ammo'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    return await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('ammo44')) return;
+
+    const parent = await this.manager.load('ammo');
+    if (!parent) throw new Error('Ammo44Builder: ammo type not found');
+
+    await this.manager.define('ammo44', parent, {
       properties: {
         name: '.44 Magnum Ammunition',
         description: 'Large-bore revolver cartridges.',
@@ -197,15 +218,25 @@ export class Ammo44Builder {
       methods: {},
     });
   }
+
+  async registerAliases(): Promise<void> {
+    console.log('[Ammo44Builder] Type \'ammo44\' auto-aliased');
+  }
 }
 
-export class Ammo45Builder {
+export class Ammo45Builder implements Builder {
+  static provides = ['ammo45'];
+  static depends = ['ammo'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    return await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('ammo45')) return;
+
+    const parent = await this.manager.load('ammo');
+    if (!parent) throw new Error('Ammo45Builder: ammo type not found');
+
+    await this.manager.define('ammo45', parent, {
       properties: {
         name: '.45 ACP Ammunition',
         description: 'Heavy pistol cartridges.',
@@ -215,15 +246,25 @@ export class Ammo45Builder {
       methods: {},
     });
   }
+
+  async registerAliases(): Promise<void> {
+    console.log('[Ammo45Builder] Type \'ammo45\' auto-aliased');
+  }
 }
 
-export class Ammo22Builder {
+export class Ammo22Builder implements Builder {
+  static provides = ['ammo22'];
+  static depends = ['ammo'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    return await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('ammo22')) return;
+
+    const parent = await this.manager.load('ammo');
+    if (!parent) throw new Error('Ammo22Builder: ammo type not found');
+
+    await this.manager.define('ammo22', parent, {
       properties: {
         name: '.22 LR Ammunition',
         description: 'Small-caliber rimfire cartridges.',
@@ -233,15 +274,25 @@ export class Ammo22Builder {
       methods: {},
     });
   }
+
+  async registerAliases(): Promise<void> {
+    console.log('[Ammo22Builder] Type \'ammo22\' auto-aliased');
+  }
 }
 
-export class Ammo380Builder {
+export class Ammo380Builder implements Builder {
+  static provides = ['ammo380'];
+  static depends = ['ammo'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    return await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('ammo380')) return;
+
+    const parent = await this.manager.load('ammo');
+    if (!parent) throw new Error('Ammo380Builder: ammo type not found');
+
+    await this.manager.define('ammo380', parent, {
       properties: {
         name: '.380 ACP Ammunition',
         description: 'Compact pistol cartridges.',
@@ -251,15 +302,25 @@ export class Ammo380Builder {
       methods: {},
     });
   }
+
+  async registerAliases(): Promise<void> {
+    console.log('[Ammo380Builder] Type \'ammo380\' auto-aliased');
+  }
 }
 
-export class Ammo308Builder {
+export class Ammo308Builder implements Builder {
+  static provides = ['ammo308'];
+  static depends = ['ammo'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    return await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('ammo308')) return;
+
+    const parent = await this.manager.load('ammo');
+    if (!parent) throw new Error('Ammo308Builder: ammo type not found');
+
+    await this.manager.define('ammo308', parent, {
       properties: {
         name: '.308 Winchester Ammunition',
         description: 'Full-power rifle cartridges.',
@@ -269,15 +330,25 @@ export class Ammo308Builder {
       methods: {},
     });
   }
+
+  async registerAliases(): Promise<void> {
+    console.log('[Ammo308Builder] Type \'ammo308\' auto-aliased');
+  }
 }
 
-export class Ammo3030Builder {
+export class Ammo3030Builder implements Builder {
+  static provides = ['ammo3030'];
+  static depends = ['ammo'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    return await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('ammo3030')) return;
+
+    const parent = await this.manager.load('ammo');
+    if (!parent) throw new Error('Ammo3030Builder: ammo type not found');
+
+    await this.manager.define('ammo3030', parent, {
       properties: {
         name: '.30-30 Winchester Ammunition',
         description: 'Lever-action rifle cartridges.',
@@ -287,15 +358,25 @@ export class Ammo3030Builder {
       methods: {},
     });
   }
+
+  async registerAliases(): Promise<void> {
+    console.log('[Ammo3030Builder] Type \'ammo3030\' auto-aliased');
+  }
 }
 
-export class Ammo12GaugeBuilder {
+export class Ammo12GaugeBuilder implements Builder {
+  static provides = ['ammo12gauge'];
+  static depends = ['ammo'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    return await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('ammo12gauge')) return;
+
+    const parent = await this.manager.load('ammo');
+    if (!parent) throw new Error('Ammo12GaugeBuilder: ammo type not found');
+
+    await this.manager.define('ammo12gauge', parent, {
       properties: {
         name: '12 Gauge Shells',
         description: 'Shotgun shells.',
@@ -305,87 +386,19 @@ export class Ammo12GaugeBuilder {
       methods: {},
     });
   }
-}
-
-/**
- * Builds all ammo sub-prototypes
- *
- * This creates a hierarchy of ammo prototypes under $.ammo:
- *
- * $.ammo (base - inherits from $.stackable)
- *   $.ammo9mm
- *   $.ammo38
- *   $.ammo44
- *   $.ammo45
- *   $.ammo22
- *   $.ammo380
- *   $.ammo308
- *   $.ammo3030
- *   $.ammo12gauge
- */
-export class AmmoPrototypesBuilder implements Builder {
-  static provides = [
-    'ammo9mm',
-    'ammo38',
-    'ammo44',
-    'ammo45',
-    'ammo22',
-    'ammo380',
-    'ammo308',
-    'ammo3030',
-    'ammo12gauge',
-  ];
-  static depends = ['ammo'];
-
-  private ammoTypes: Record<string, RuntimeObject> = {};
-
-  constructor(private manager: ObjectManager) {}
-
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
-
-    if ($.ammo9mm && !forceRebuild) {
-      for (const alias of AmmoPrototypesBuilder.provides) {
-        if ($[alias]) this.ammoTypes[alias] = $[alias];
-      }
-      return;
-    }
-
-    const parentObj = $.ammo;
-    if (!parentObj) throw new Error('AmmoPrototypesBuilder: $ammo not found');
-
-    const ammoId = parentObj.id;
-
-    // Pistol calibers
-    this.ammoTypes.ammo9mm = await new Ammo9mmBuilder(this.manager).build(ammoId);
-    this.ammoTypes.ammo38 = await new Ammo38Builder(this.manager).build(ammoId);
-    this.ammoTypes.ammo44 = await new Ammo44Builder(this.manager).build(ammoId);
-    this.ammoTypes.ammo45 = await new Ammo45Builder(this.manager).build(ammoId);
-    this.ammoTypes.ammo22 = await new Ammo22Builder(this.manager).build(ammoId);
-    this.ammoTypes.ammo380 = await new Ammo380Builder(this.manager).build(ammoId);
-
-    // Rifle calibers
-    this.ammoTypes.ammo308 = await new Ammo308Builder(this.manager).build(ammoId);
-    this.ammoTypes.ammo3030 = await new Ammo3030Builder(this.manager).build(ammoId);
-
-    // Shotgun
-    this.ammoTypes.ammo12gauge = await new Ammo12GaugeBuilder(this.manager).build(ammoId);
-
-    console.log(`✅ Built ${Object.keys(this.ammoTypes).length} ammo prototypes`);
-  }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
-    const objectManager = await this.manager.load(0);
-    if (!objectManager) return;
-
-    for (const [name, obj] of Object.entries(this.ammoTypes)) {
-      if (obj) {
-        await objectManager.call('addAlias', name, obj.id);
-      }
-    }
+    console.log('[Ammo12GaugeBuilder] Type \'ammo12gauge\' auto-aliased');
   }
 }
 
-// Self-register
-registerBuilder(AmmoPrototypesBuilder);
+// Self-register all ammo type builders
+registerBuilder(Ammo9mmBuilder);
+registerBuilder(Ammo38Builder);
+registerBuilder(Ammo44Builder);
+registerBuilder(Ammo45Builder);
+registerBuilder(Ammo22Builder);
+registerBuilder(Ammo380Builder);
+registerBuilder(Ammo308Builder);
+registerBuilder(Ammo3030Builder);
+registerBuilder(Ammo12GaugeBuilder);

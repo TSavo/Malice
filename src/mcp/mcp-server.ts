@@ -987,7 +987,7 @@ export class MaliceMCPServer {
           // Check if this object inherits from Room (with cycle protection)
           let parentId = obj.parent.id;
           let isRoom = obj._id === roomProto._id;
-          const seen = new Set<number>();
+          const seen = new Set<ObjId>();
           while (parentId !== -1 && !isRoom && !seen.has(parentId)) {
             seen.add(parentId);
             if (parentId === roomProto._id) {
@@ -1044,7 +1044,7 @@ export class MaliceMCPServer {
           // Check if this object inherits from Player (with cycle protection)
           let parentId = obj.parent.id;
           let isPlayer = false;
-          const seen = new Set<number>();
+          const seen = new Set<ObjId>();
           while (parentId !== -1 && !seen.has(parentId)) {
             seen.add(parentId);
             if (parentId === playerProto._id) {
@@ -1053,15 +1053,15 @@ export class MaliceMCPServer {
             }
             const parent = allObjects.find((o) => o._id === parentId);
             if (!parent) break;
-            parentId = parent.parent.id;
+            parentId = parent.parent.id as number;
           }
 
           if (isPlayer) {
             players.push({
               id: obj._id,
-              name: obj.properties?.name?.value || '(unnamed)',
+              name: getValueData(obj.properties?.name) || '(unnamed)',
               location: (obj.properties?.location as ObjRefValue | undefined)?.id ?? null,
-              connected: obj.properties?.connected?.value ?? false,
+              connected: getValueData(obj.properties?.connected) ?? false,
             });
           }
         }
@@ -3862,7 +3862,7 @@ Core Objects:
           // Check if this object inherits from Player (with cycle protection)
           let parentId = obj.parent.id;
           let isPlayer = false;
-          const seen = new Set<number>();
+          const seen = new Set<ObjId>();
           while (parentId !== -1 && !seen.has(parentId)) {
             seen.add(parentId);
             if (parentId === playerProto._id) {
@@ -3877,7 +3877,7 @@ Core Objects:
           if (isPlayer) {
             players.push({
               id: obj._id,
-              name: obj.properties?.name?.value || '(unnamed)',
+              name: getValueData(obj.properties?.name) || '(unnamed)',
               location: (obj.properties?.location as ObjRefValue | undefined)?.id,
             });
           }
@@ -4985,7 +4985,7 @@ Core Objects:
             for (const obj of allObjects) {
               let parentId = obj.parent.id;
               let isRoom = obj._id === roomProtoId;
-              const seen = new Set<number>();
+              const seen = new Set<ObjId>();
               while (parentId !== -1 && !isRoom && !seen.has(parentId)) {
                 seen.add(parentId);
                 if (parentId === roomProtoId) {
@@ -4999,8 +4999,8 @@ Core Objects:
 
               if (isRoom && obj._id !== roomProtoId) {
                 rooms.push({
-                  id: obj._id,
-                  name: obj.properties?.name?.value || `Room #${obj._id}`,
+                  id: obj._id as number,
+                  name: (getValueData(obj.properties?.name) as string) || `Room #${obj._id}`,
                 });
               }
               if (rooms.length >= 100) break;
@@ -5056,7 +5056,7 @@ Core Objects:
 
           // Get contents
           const contentIds = (await room.get('contents')) as
-            | Array<{ type: string; value: number }>
+            | Array<ObjRefValue | number>
             | undefined;
           const contents: Array<{ id: number; name: string; type: string }> =
             [];
@@ -5068,7 +5068,7 @@ Core Objects:
 
           if (contentIds) {
             for (const ref of contentIds) {
-              const objId = ref?.id ?? ref;
+              const objId = typeof ref === 'number' ? ref : ref?.id;
               if (typeof objId !== 'number') continue;
 
               const obj = await this.manager.load(objId as ObjId);
@@ -5085,7 +5085,7 @@ Core Objects:
                 });
               } else {
                 const raw = obj._getRaw();
-                const parentId = raw.parent?.value;
+                const parentId = raw.parent?.id;
                 const parentObj =
                   parentId !== undefined
                     ? await this.manager.load(parentId)
@@ -5130,12 +5130,13 @@ Core Objects:
               const destId =
                 typeof destRef === 'number' ? destRef : destRef?.id;
 
-              if (destId) {
-                const dest = await this.manager.load(destId as ObjId);
+              if (destId !== undefined && typeof destId === 'number') {
+                const numericDestId = destId as number;
+                const dest = await this.manager.load(numericDestId);
                 exits.push({
                   direction,
-                  destId,
-                  destName: String(dest?.get('name') || `#${destId}`),
+                  destId: numericDestId,
+                  destName: String(dest?.get('name') || `#${numericDestId}`),
                 });
               }
             }
@@ -5563,14 +5564,14 @@ Core Objects:
           }
 
           // Walk inheritance chain to find the method
-          let foundOn: number | null = null;
+          let foundOn: ObjId | null = null;
           let foundOnName: string | null = null;
           let method: {
             code?: string;
             help?: string;
             callable?: boolean;
           } | null = null;
-          const visited = new Set<number>();
+          const visited = new Set<ObjId>();
 
           while (currentObj && !visited.has(currentObj.id)) {
             visited.add(currentObj.id);

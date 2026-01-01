@@ -20,7 +20,7 @@ export class NeuralLogDomainBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
+  async build(): Promise<void> {
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
 
@@ -51,7 +51,7 @@ export class NeuralLogDomainBuilder implements Builder {
     // Check if already exists
     if (aliases.neuralLogDomain) {
       this.domain = await this.manager.load(aliases.neuralLogDomain);
-      if (this.domain && !forceRebuild) return;
+      if (this.domain) return;
     }
 
     // Create the domain

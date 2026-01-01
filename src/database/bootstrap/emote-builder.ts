@@ -58,7 +58,7 @@ export class EmoteBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
+  async build(): Promise<void> {
     // Check if already exists via alias
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
@@ -68,12 +68,12 @@ export class EmoteBuilder implements Builder {
 
     if (aliases.emote) {
       this.emote = await this.manager.load(aliases.emote);
-      if (this.emote && !forceRebuild) return; // Already exists
+      if (this.emote) return; // Already exists
     }
 
     // Create new Emote only if it doesn't exist
     if (!this.emote) {
-      const root = await this.manager.load(1);
+      const root = await this.manager.load('root');
       this.emote = await this.manager.create({
         parent: root!,
         properties: {

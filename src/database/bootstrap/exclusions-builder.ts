@@ -36,7 +36,7 @@ export class ExclusionsBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
+  async build(): Promise<void> {
     // Check if already exists via alias
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
@@ -46,12 +46,12 @@ export class ExclusionsBuilder implements Builder {
 
     if (aliases.exclusions) {
       this.exclusions = await this.manager.load(aliases.exclusions);
-      if (this.exclusions && !forceRebuild) return; // Already exists
+      if (this.exclusions) return; // Already exists
     }
 
     // Create new Exclusions utility only if it doesn't exist
     if (!this.exclusions) {
-      const root = await this.manager.load(1);
+      const root = await this.manager.load('root');
       this.exclusions = await this.manager.create({
         parent: root!,
         properties: {

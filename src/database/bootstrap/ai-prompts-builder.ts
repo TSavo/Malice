@@ -59,7 +59,7 @@ export class AiPromptsBuilder implements Builder {
   /**
    * Build the AiPrompts utility or reload prompts on existing object
    */
-  async build(_forceRebuild = false): Promise<void> {
+  async build(): Promise<void> {
     // Check if already exists via alias
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
@@ -79,7 +79,7 @@ export class AiPromptsBuilder implements Builder {
 
     if (!this.obj) {
       // Create new AiPrompts utility
-      const root = await this.manager.load(1);
+      const root = await this.manager.load('root');
       this.obj = await this.manager.create({
         parent: root!,
         properties: {
@@ -91,7 +91,7 @@ export class AiPromptsBuilder implements Builder {
       });
 
       // Register alias
-      aliases.aiPrompts = this.obj.id;
+      aliases.aiPrompts = this.obj.id as number;
       objectManager.set('aliases', aliases);
       console.log(`[AiPromptsBuilder] Created $.aiPrompts as #${this.obj.id}`);
     } else {

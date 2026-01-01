@@ -1,39 +1,38 @@
-import type { ObjId, RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Improvised & Miscellaneous Weapon Prototypes
- *
- * These are weapons of opportunity - things not designed as weapons
- * but used as such in desperation or criminal activity.
+ * Improvised & Miscellaneous Weapon Types
  *
  * Hierarchy:
  * $.weapon
  *   $.improvised (base for all improvised weapons)
- *     $.bottle (glass bottles - skill: improvised)
- *     $.brick (thrown debris - skill: improvised)
- *     $.screwdriver (stabbing tools - skill: improvised)
- *   $.thrown (ranged improvised - skill: throwing)
- *     $.throwingKnife
- *     $.rock
- *   $.exotic (unusual weapons - various skills)
- *     $.garotte (strangulation wire - skill: garrote)
- *     $.whip (flexible striking - skill: whip)
- *     $.taser (electrical - skill: taser)
+ *     $.bottle, $.brokenBottle, $.beerBottle
+ *     $.brick, $.rock, $.cinderBlock
+ *     $.screwdriver, $.icepick, $.awl, $.wrench, $.prybar, $.hammerImprovised
+ *     $.kitchenKnife, $.butcherKnife, $.skillet, $.rollingPin
+ *     $.throwingKnife, $.throwingStar, $.dart
+ *     $.garrote, $.whip, $.cattleProd, $.stunGun, $.taser, $.pepperSpray
+ *     $.golfClub, $.hockeyStick, $.lacrosseStick, $.cricketBat
  */
 
 // ═══════════════════════════════════════════════════════════════════════════
 // BASE IMPROVISED
 // ═══════════════════════════════════════════════════════════════════════════
 
-export class ImprovisedBuilder {
+export class ImprovisedBuilder implements Builder {
+  static provides = ['improvised'];
+  static depends = ['weapon'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('improvised')) return;
+
+    const parent = await this.manager.load('weapon');
+    if (!parent) throw new Error('ImprovisedBuilder: weapon type not found');
+
+    const obj = await this.manager.define('improvised', parent, {
       properties: {
         name: 'Improvised Weapon',
         description: 'Something repurposed as a weapon.',
@@ -76,22 +75,32 @@ LEGAL: Most improvised weapons are not contraband until used criminally.`,
       'damageType',
       'Type of damage inflicted (bruise, cut, puncture, burn).',
     );
+  }
 
-    return obj;
+  async registerAliases(): Promise<void> {
+    console.log("[ImprovisedBuilder] Type 'improvised' auto-aliased");
   }
 }
 
+registerBuilder(ImprovisedBuilder);
+
 // ═══════════════════════════════════════════════════════════════════════════
-// GLASS / BOTTLES (skill: improvised)
+// GLASS / BOTTLES
 // ═══════════════════════════════════════════════════════════════════════════
 
-export class BottleBuilder {
+export class BottleBuilder implements Builder {
+  static provides = ['bottle'];
+  static depends = ['improvised'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('bottle')) return;
+
+    const parent = await this.manager.load('improvised');
+    if (!parent) throw new Error('BottleBuilder: improvised type not found');
+
+    await this.manager.define('bottle', parent, {
       properties: {
         name: 'Bottle',
         description: 'A glass bottle. Breaks on impact for cutting edges.',
@@ -101,38 +110,55 @@ export class BottleBuilder {
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[BottleBuilder] Type 'bottle' auto-aliased");
   }
 }
 
-export class BrokenBottleBuilder {
+export class BrokenBottleBuilder implements Builder {
+  static provides = ['brokenBottle'];
+  static depends = ['bottle'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('brokenBottle')) return;
+
+    const parent = await this.manager.load('bottle');
+    if (!parent) throw new Error('BrokenBottleBuilder: bottle type not found');
+
+    await this.manager.define('brokenBottle', parent, {
       properties: {
         name: 'Broken Bottle',
-        description:
-          'A shattered bottle with jagged glass edges. Bar fight classic.',
+        description: 'A shattered bottle with jagged glass edges. Bar fight classic.',
         skill: 'improvised',
         damage: 14,
         damageType: 'cut',
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[BrokenBottleBuilder] Type 'brokenBottle' auto-aliased");
   }
 }
 
-export class BeerBottleBuilder {
+export class BeerBottleBuilder implements Builder {
+  static provides = ['beerBottle'];
+  static depends = ['bottle'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('beerBottle')) return;
+
+    const parent = await this.manager.load('bottle');
+    if (!parent) throw new Error('BeerBottleBuilder: bottle type not found');
+
+    await this.manager.define('beerBottle', parent, {
       properties: {
         name: 'Beer Bottle',
         description: 'A heavy glass beer bottle. Solid swing weight.',
@@ -142,21 +168,30 @@ export class BeerBottleBuilder {
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[BeerBottleBuilder] Type 'beerBottle' auto-aliased");
   }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// DEBRIS / THROWN (skill: improvised or throwing)
+// DEBRIS / THROWN
 // ═══════════════════════════════════════════════════════════════════════════
 
-export class BrickBuilder {
+export class BrickBuilder implements Builder {
+  static provides = ['brick'];
+  static depends = ['improvised'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('brick')) return;
+
+    const parent = await this.manager.load('improvised');
+    if (!parent) throw new Error('BrickBuilder: improvised type not found');
+
+    await this.manager.define('brick', parent, {
       properties: {
         name: 'Brick',
         description: 'A common red brick. Heavy, angular, effective.',
@@ -166,17 +201,26 @@ export class BrickBuilder {
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[BrickBuilder] Type 'brick' auto-aliased");
   }
 }
 
-export class RockBuilder {
+export class RockBuilder implements Builder {
+  static provides = ['rock'];
+  static depends = ['improvised'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('rock')) return;
+
+    const parent = await this.manager.load('improvised');
+    if (!parent) throw new Error('RockBuilder: improvised type not found');
+
+    await this.manager.define('rock', parent, {
       properties: {
         name: 'Rock',
         description: 'A fist-sized stone. The original weapon.',
@@ -190,17 +234,26 @@ export class RockBuilder {
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[RockBuilder] Type 'rock' auto-aliased");
   }
 }
 
-export class CinderBlockBuilder {
+export class CinderBlockBuilder implements Builder {
+  static provides = ['cinderBlock'];
+  static depends = ['improvised'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('cinderBlock')) return;
+
+    const parent = await this.manager.load('improvised');
+    if (!parent) throw new Error('CinderBlockBuilder: improvised type not found');
+
+    await this.manager.define('cinderBlock', parent, {
       properties: {
         name: 'Cinder Block',
         description: 'A heavy concrete block. Requires two hands.',
@@ -210,21 +263,30 @@ export class CinderBlockBuilder {
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[CinderBlockBuilder] Type 'cinderBlock' auto-aliased");
   }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// TOOLS AS WEAPONS (skill: improvised)
+// TOOLS AS WEAPONS
 // ═══════════════════════════════════════════════════════════════════════════
 
-export class ScrewdriverBuilder {
+export class ScrewdriverBuilder implements Builder {
+  static provides = ['screwdriver'];
+  static depends = ['improvised'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('screwdriver')) return;
+
+    const parent = await this.manager.load('improvised');
+    if (!parent) throw new Error('ScrewdriverBuilder: improvised type not found');
+
+    await this.manager.define('screwdriver', parent, {
       properties: {
         name: 'Screwdriver',
         description: 'A flathead screwdriver. Improvised stabbing tool.',
@@ -234,17 +296,26 @@ export class ScrewdriverBuilder {
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[ScrewdriverBuilder] Type 'screwdriver' auto-aliased");
   }
 }
 
-export class IcepickBuilder {
+export class IcepickBuilder implements Builder {
+  static provides = ['icepick'];
+  static depends = ['improvised'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('icepick')) return;
+
+    const parent = await this.manager.load('improvised');
+    if (!parent) throw new Error('IcepickBuilder: improvised type not found');
+
+    await this.manager.define('icepick', parent, {
       properties: {
         name: 'Ice Pick',
         description: 'A pointed metal spike with a handle. Silent killer.',
@@ -254,17 +325,26 @@ export class IcepickBuilder {
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[IcepickBuilder] Type 'icepick' auto-aliased");
   }
 }
 
-export class AwlBuilder {
+export class AwlBuilder implements Builder {
+  static provides = ['awl'];
+  static depends = ['improvised'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('awl')) return;
+
+    const parent = await this.manager.load('improvised');
+    if (!parent) throw new Error('AwlBuilder: improvised type not found');
+
+    await this.manager.define('awl', parent, {
       properties: {
         name: 'Awl',
         description: 'A leather-working tool. Sharp metal spike.',
@@ -274,17 +354,26 @@ export class AwlBuilder {
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[AwlBuilder] Type 'awl' auto-aliased");
   }
 }
 
-export class WrenchBuilder {
+export class WrenchBuilder implements Builder {
+  static provides = ['wrench'];
+  static depends = ['improvised'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('wrench')) return;
+
+    const parent = await this.manager.load('improvised');
+    if (!parent) throw new Error('WrenchBuilder: improvised type not found');
+
+    await this.manager.define('wrench', parent, {
       properties: {
         name: 'Wrench',
         description: 'A heavy metal wrench. Solid bludgeon.',
@@ -294,17 +383,26 @@ export class WrenchBuilder {
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[WrenchBuilder] Type 'wrench' auto-aliased");
   }
 }
 
-export class PrybarBuilder {
+export class PrybarBuilder implements Builder {
+  static provides = ['prybar'];
+  static depends = ['improvised'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('prybar')) return;
+
+    const parent = await this.manager.load('improvised');
+    if (!parent) throw new Error('PrybarBuilder: improvised type not found');
+
+    await this.manager.define('prybar', parent, {
       properties: {
         name: 'Prybar',
         description: 'A small prying tool. Metal bar with a flat end.',
@@ -314,17 +412,26 @@ export class PrybarBuilder {
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[PrybarBuilder] Type 'prybar' auto-aliased");
   }
 }
 
-export class HammerImprovisedBuilder {
+export class HammerImprovisedBuilder implements Builder {
+  static provides = ['hammerImprovised'];
+  static depends = ['improvised'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('hammerImprovised')) return;
+
+    const parent = await this.manager.load('improvised');
+    if (!parent) throw new Error('HammerImprovisedBuilder: improvised type not found');
+
+    await this.manager.define('hammerImprovised', parent, {
       properties: {
         name: 'Claw Hammer',
         description: 'A regular claw hammer. Common household weapon.',
@@ -334,21 +441,30 @@ export class HammerImprovisedBuilder {
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[HammerImprovisedBuilder] Type 'hammerImprovised' auto-aliased");
   }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// KITCHEN IMPLEMENTS (skill: improvised)
+// KITCHEN IMPLEMENTS
 // ═══════════════════════════════════════════════════════════════════════════
 
-export class KitchenKnifeBuilder {
+export class KitchenKnifeBuilder implements Builder {
+  static provides = ['kitchenKnife'];
+  static depends = ['improvised'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('kitchenKnife')) return;
+
+    const parent = await this.manager.load('improvised');
+    if (!parent) throw new Error('KitchenKnifeBuilder: improvised type not found');
+
+    await this.manager.define('kitchenKnife', parent, {
       properties: {
         name: 'Kitchen Knife',
         description: 'A regular kitchen knife. Not designed for fighting.',
@@ -358,17 +474,26 @@ export class KitchenKnifeBuilder {
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[KitchenKnifeBuilder] Type 'kitchenKnife' auto-aliased");
   }
 }
 
-export class ButcherKnifeBuilder {
+export class ButcherKnifeBuilder implements Builder {
+  static provides = ['butcherKnife'];
+  static depends = ['improvised'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('butcherKnife')) return;
+
+    const parent = await this.manager.load('improvised');
+    if (!parent) throw new Error('ButcherKnifeBuilder: improvised type not found');
+
+    await this.manager.define('butcherKnife', parent, {
       properties: {
         name: 'Butcher Knife',
         description: 'A large kitchen knife for cutting meat.',
@@ -378,17 +503,26 @@ export class ButcherKnifeBuilder {
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[ButcherKnifeBuilder] Type 'butcherKnife' auto-aliased");
   }
 }
 
-export class SkilletBuilder {
+export class SkilletBuilder implements Builder {
+  static provides = ['skillet'];
+  static depends = ['improvised'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('skillet')) return;
+
+    const parent = await this.manager.load('improvised');
+    if (!parent) throw new Error('SkilletBuilder: improvised type not found');
+
+    await this.manager.define('skillet', parent, {
       properties: {
         name: 'Cast Iron Skillet',
         description: 'A heavy cast iron pan. Surprisingly effective.',
@@ -398,17 +532,26 @@ export class SkilletBuilder {
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[SkilletBuilder] Type 'skillet' auto-aliased");
   }
 }
 
-export class RollingPinBuilder {
+export class RollingPinBuilder implements Builder {
+  static provides = ['rollingPin'];
+  static depends = ['improvised'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('rollingPin')) return;
+
+    const parent = await this.manager.load('improvised');
+    if (!parent) throw new Error('RollingPinBuilder: improvised type not found');
+
+    await this.manager.define('rollingPin', parent, {
       properties: {
         name: 'Rolling Pin',
         description: 'A wooden rolling pin. Domestic dispute classic.',
@@ -418,21 +561,30 @@ export class RollingPinBuilder {
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[RollingPinBuilder] Type 'rollingPin' auto-aliased");
   }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// THROWING WEAPONS (skill: throwing)
+// THROWING WEAPONS
 // ═══════════════════════════════════════════════════════════════════════════
 
-export class ThrowingKnifeBuilder {
+export class ThrowingKnifeBuilder implements Builder {
+  static provides = ['throwingKnife'];
+  static depends = ['improvised'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('throwingKnife')) return;
+
+    const parent = await this.manager.load('improvised');
+    if (!parent) throw new Error('ThrowingKnifeBuilder: improvised type not found');
+
+    await this.manager.define('throwingKnife', parent, {
       properties: {
         name: 'Throwing Knife',
         description: 'A balanced knife designed for throwing.',
@@ -446,17 +598,26 @@ export class ThrowingKnifeBuilder {
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[ThrowingKnifeBuilder] Type 'throwingKnife' auto-aliased");
   }
 }
 
-export class ThrowingStarBuilder {
+export class ThrowingStarBuilder implements Builder {
+  static provides = ['throwingStar'];
+  static depends = ['improvised'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('throwingStar')) return;
+
+    const parent = await this.manager.load('improvised');
+    if (!parent) throw new Error('ThrowingStarBuilder: improvised type not found');
+
+    await this.manager.define('throwingStar', parent, {
       properties: {
         name: 'Throwing Star',
         description: 'A metal shuriken. Ninja movie prop.',
@@ -470,17 +631,26 @@ export class ThrowingStarBuilder {
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[ThrowingStarBuilder] Type 'throwingStar' auto-aliased");
   }
 }
 
-export class DartBuilder {
+export class DartBuilder implements Builder {
+  static provides = ['dart'];
+  static depends = ['improvised'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('dart')) return;
+
+    const parent = await this.manager.load('improvised');
+    if (!parent) throw new Error('DartBuilder: improvised type not found');
+
+    await this.manager.define('dart', parent, {
       properties: {
         name: 'Dart',
         description: 'A steel-tipped throwing dart. Bar game turned weapon.',
@@ -494,7 +664,10 @@ export class DartBuilder {
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[DartBuilder] Type 'dart' auto-aliased");
   }
 }
 
@@ -502,13 +675,19 @@ export class DartBuilder {
 // EXOTIC WEAPONS
 // ═══════════════════════════════════════════════════════════════════════════
 
-export class GarroteBuilder {
+export class GarroteBuilder implements Builder {
+  static provides = ['garrote'];
+  static depends = ['improvised'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('garrote')) return;
+
+    const parent = await this.manager.load('improvised');
+    if (!parent) throw new Error('GarroteBuilder: improvised type not found');
+
+    await this.manager.define('garrote', parent, {
       properties: {
         name: 'Garrote',
         description: 'A thin wire with handles. Silent strangulation tool.',
@@ -518,17 +697,26 @@ export class GarroteBuilder {
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[GarroteBuilder] Type 'garrote' auto-aliased");
   }
 }
 
-export class WhipBuilder {
+export class WhipBuilder implements Builder {
+  static provides = ['whip'];
+  static depends = ['improvised'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('whip')) return;
+
+    const parent = await this.manager.load('improvised');
+    if (!parent) throw new Error('WhipBuilder: improvised type not found');
+
+    await this.manager.define('whip', parent, {
       properties: {
         name: 'Whip',
         description: 'A leather bullwhip. Long reach, stinging strikes.',
@@ -538,17 +726,26 @@ export class WhipBuilder {
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[WhipBuilder] Type 'whip' auto-aliased");
   }
 }
 
-export class CattleProdBuilder {
+export class CattleProdBuilder implements Builder {
+  static provides = ['cattleProd'];
+  static depends = ['improvised'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('cattleProd')) return;
+
+    const parent = await this.manager.load('improvised');
+    if (!parent) throw new Error('CattleProdBuilder: improvised type not found');
+
+    await this.manager.define('cattleProd', parent, {
       properties: {
         name: 'Cattle Prod',
         description: 'An electric livestock prod. Painful shock.',
@@ -558,17 +755,26 @@ export class CattleProdBuilder {
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[CattleProdBuilder] Type 'cattleProd' auto-aliased");
   }
 }
 
-export class StunGunBuilder {
+export class StunGunBuilder implements Builder {
+  static provides = ['stunGun'];
+  static depends = ['improvised'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('stunGun')) return;
+
+    const parent = await this.manager.load('improvised');
+    if (!parent) throw new Error('StunGunBuilder: improvised type not found');
+
+    await this.manager.define('stunGun', parent, {
       properties: {
         name: 'Stun Gun',
         description: 'A handheld electrical incapacitator. Requires contact.',
@@ -578,17 +784,26 @@ export class StunGunBuilder {
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[StunGunBuilder] Type 'stunGun' auto-aliased");
   }
 }
 
-export class TaserBuilder {
+export class TaserBuilder implements Builder {
+  static provides = ['taser'];
+  static depends = ['improvised'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('taser')) return;
+
+    const parent = await this.manager.load('improvised');
+    if (!parent) throw new Error('TaserBuilder: improvised type not found');
+
+    await this.manager.define('taser', parent, {
       properties: {
         name: 'Taser',
         description: 'A ranged electrical weapon firing barbed probes.',
@@ -603,21 +818,29 @@ export class TaserBuilder {
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[TaserBuilder] Type 'taser' auto-aliased");
   }
 }
 
-export class PepperSprayBuilder {
+export class PepperSprayBuilder implements Builder {
+  static provides = ['pepperSpray'];
+  static depends = ['improvised'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('pepperSpray')) return;
+
+    const parent = await this.manager.load('improvised');
+    if (!parent) throw new Error('PepperSprayBuilder: improvised type not found');
+
+    await this.manager.define('pepperSpray', parent, {
       properties: {
         name: 'Pepper Spray',
-        description:
-          'A canister of OC spray. Causes temporary blindness and pain.',
+        description: 'A canister of OC spray. Causes temporary blindness and pain.',
         skill: 'improvised',
         damage: 5,
         damageType: 'burn',
@@ -629,21 +852,30 @@ export class PepperSprayBuilder {
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[PepperSprayBuilder] Type 'pepperSpray' auto-aliased");
   }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// SPORTS EQUIPMENT (skill: varies)
+// SPORTS EQUIPMENT
 // ═══════════════════════════════════════════════════════════════════════════
 
-export class GolfClubBuilder {
+export class GolfClubBuilder implements Builder {
+  static provides = ['golfClub'];
+  static depends = ['improvised'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('golfClub')) return;
+
+    const parent = await this.manager.load('improvised');
+    if (!parent) throw new Error('GolfClubBuilder: improvised type not found');
+
+    await this.manager.define('golfClub', parent, {
       properties: {
         name: 'Golf Club',
         description: 'A metal golf club. Good reach, solid swing.',
@@ -653,17 +885,26 @@ export class GolfClubBuilder {
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[GolfClubBuilder] Type 'golfClub' auto-aliased");
   }
 }
 
-export class HockeyStickBuilder {
+export class HockeyStickBuilder implements Builder {
+  static provides = ['hockeyStick'];
+  static depends = ['improvised'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('hockeyStick')) return;
+
+    const parent = await this.manager.load('improvised');
+    if (!parent) throw new Error('HockeyStickBuilder: improvised type not found');
+
+    await this.manager.define('hockeyStick', parent, {
       properties: {
         name: 'Hockey Stick',
         description: 'A hockey stick. Light but with reach.',
@@ -673,17 +914,26 @@ export class HockeyStickBuilder {
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[HockeyStickBuilder] Type 'hockeyStick' auto-aliased");
   }
 }
 
-export class LacrosseStickBuilder {
+export class LacrosseStickBuilder implements Builder {
+  static provides = ['lacrosseStick'];
+  static depends = ['improvised'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('lacrosseStick')) return;
+
+    const parent = await this.manager.load('improvised');
+    if (!parent) throw new Error('LacrosseStickBuilder: improvised type not found');
+
+    await this.manager.define('lacrosseStick', parent, {
       properties: {
         name: 'Lacrosse Stick',
         description: 'A lacrosse stick. The metal shaft is the weapon.',
@@ -693,17 +943,26 @@ export class LacrosseStickBuilder {
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[LacrosseStickBuilder] Type 'lacrosseStick' auto-aliased");
   }
 }
 
-export class CricketBatBuilder {
+export class CricketBatBuilder implements Builder {
+  static provides = ['cricketBat'];
+  static depends = ['improvised'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('cricketBat')) return;
+
+    const parent = await this.manager.load('improvised');
+    if (!parent) throw new Error('CricketBatBuilder: improvised type not found');
+
+    await this.manager.define('cricketBat', parent, {
       properties: {
         name: 'Cricket Bat',
         description: 'A flat wooden bat. Commonwealth skull-cracker.',
@@ -713,131 +972,40 @@ export class CricketBatBuilder {
       },
       methods: {},
     });
-    return obj;
-  }
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// IMPROVISED WEAPON PROTOTYPES BUILDER (registered builder for all improvised weapons)
-// ═══════════════════════════════════════════════════════════════════════════
-
-export class ImprovisedWeaponPrototypesBuilder implements Builder {
-  static provides = [
-    'improvised',
-    'bottle',
-    'brokenBottle',
-    'beerBottle',
-    'brick',
-    'rock',
-    'cinderBlock',
-    'screwdriver',
-    'icepick',
-    'awl',
-    'wrench',
-    'prybar',
-    'hammerImprovised',
-    'kitchenKnife',
-    'butcherKnife',
-    'skillet',
-    'rollingPin',
-    'throwingKnife',
-    'throwingStar',
-    'dart',
-    'garrote',
-    'whip',
-    'cattleProd',
-    'stunGun',
-    'taser',
-    'pepperSpray',
-    'golfClub',
-    'hockeyStick',
-    'lacrosseStick',
-    'cricketBat',
-  ];
-  static depends = ['weapon'];
-
-  private weapons: Record<string, RuntimeObject> = {};
-
-  constructor(private manager: ObjectManager) {}
-
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
-
-    if ($.improvised && !forceRebuild) {
-      for (const alias of ImprovisedWeaponPrototypesBuilder.provides) {
-        if ($[alias]) this.weapons[alias] = $[alias];
-      }
-      return;
-    }
-
-    const parentObj = $.weapon;
-    if (!parentObj) throw new Error('ImprovisedWeaponPrototypesBuilder: $weapon not found');
-
-    const weaponId = parentObj.id;
-
-    // Base improvised (inherits from weapon)
-    const improvised = await new ImprovisedBuilder(this.manager).build(weaponId);
-    this.weapons.improvised = improvised;
-
-    // Bottles (inherit from improvised)
-    const bottle = await new BottleBuilder(this.manager).build(improvised.id);
-    this.weapons.bottle = bottle;
-    this.weapons.brokenBottle = await new BrokenBottleBuilder(this.manager).build(bottle.id);
-    this.weapons.beerBottle = await new BeerBottleBuilder(this.manager).build(bottle.id);
-
-    // Debris (inherit from improvised)
-    this.weapons.brick = await new BrickBuilder(this.manager).build(improvised.id);
-    this.weapons.rock = await new RockBuilder(this.manager).build(improvised.id);
-    this.weapons.cinderBlock = await new CinderBlockBuilder(this.manager).build(improvised.id);
-
-    // Tools (inherit from improvised)
-    this.weapons.screwdriver = await new ScrewdriverBuilder(this.manager).build(improvised.id);
-    this.weapons.icepick = await new IcepickBuilder(this.manager).build(improvised.id);
-    this.weapons.awl = await new AwlBuilder(this.manager).build(improvised.id);
-    this.weapons.wrench = await new WrenchBuilder(this.manager).build(improvised.id);
-    this.weapons.prybar = await new PrybarBuilder(this.manager).build(improvised.id);
-    this.weapons.hammerImprovised = await new HammerImprovisedBuilder(this.manager).build(improvised.id);
-
-    // Kitchen implements (inherit from improvised)
-    this.weapons.kitchenKnife = await new KitchenKnifeBuilder(this.manager).build(improvised.id);
-    this.weapons.butcherKnife = await new ButcherKnifeBuilder(this.manager).build(improvised.id);
-    this.weapons.skillet = await new SkilletBuilder(this.manager).build(improvised.id);
-    this.weapons.rollingPin = await new RollingPinBuilder(this.manager).build(improvised.id);
-
-    // Throwing weapons (inherit from improvised)
-    this.weapons.throwingKnife = await new ThrowingKnifeBuilder(this.manager).build(improvised.id);
-    this.weapons.throwingStar = await new ThrowingStarBuilder(this.manager).build(improvised.id);
-    this.weapons.dart = await new DartBuilder(this.manager).build(improvised.id);
-
-    // Exotic weapons (inherit from improvised)
-    this.weapons.garrote = await new GarroteBuilder(this.manager).build(improvised.id);
-    this.weapons.whip = await new WhipBuilder(this.manager).build(improvised.id);
-    this.weapons.cattleProd = await new CattleProdBuilder(this.manager).build(improvised.id);
-    this.weapons.stunGun = await new StunGunBuilder(this.manager).build(improvised.id);
-    this.weapons.taser = await new TaserBuilder(this.manager).build(improvised.id);
-    this.weapons.pepperSpray = await new PepperSprayBuilder(this.manager).build(improvised.id);
-
-    // Sports equipment (inherit from improvised)
-    this.weapons.golfClub = await new GolfClubBuilder(this.manager).build(improvised.id);
-    this.weapons.hockeyStick = await new HockeyStickBuilder(this.manager).build(improvised.id);
-    this.weapons.lacrosseStick = await new LacrosseStickBuilder(this.manager).build(improvised.id);
-    this.weapons.cricketBat = await new CricketBatBuilder(this.manager).build(improvised.id);
-
-    console.log(`✅ Built ${Object.keys(this.weapons).length} improvised weapon prototypes`);
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
-    const objectManager = await this.manager.load(0);
-    if (!objectManager) return;
-
-    for (const [name, obj] of Object.entries(this.weapons)) {
-      if (obj) {
-        await objectManager.call('addAlias', name, obj.id);
-      }
-    }
+    console.log("[CricketBatBuilder] Type 'cricketBat' auto-aliased");
   }
 }
 
-// Self-register
-registerBuilder(ImprovisedWeaponPrototypesBuilder);
+// Self-register all builders
+registerBuilder(BottleBuilder);
+registerBuilder(BrokenBottleBuilder);
+registerBuilder(BeerBottleBuilder);
+registerBuilder(BrickBuilder);
+registerBuilder(RockBuilder);
+registerBuilder(CinderBlockBuilder);
+registerBuilder(ScrewdriverBuilder);
+registerBuilder(IcepickBuilder);
+registerBuilder(AwlBuilder);
+registerBuilder(WrenchBuilder);
+registerBuilder(PrybarBuilder);
+registerBuilder(HammerImprovisedBuilder);
+registerBuilder(KitchenKnifeBuilder);
+registerBuilder(ButcherKnifeBuilder);
+registerBuilder(SkilletBuilder);
+registerBuilder(RollingPinBuilder);
+registerBuilder(ThrowingKnifeBuilder);
+registerBuilder(ThrowingStarBuilder);
+registerBuilder(DartBuilder);
+registerBuilder(GarroteBuilder);
+registerBuilder(WhipBuilder);
+registerBuilder(CattleProdBuilder);
+registerBuilder(StunGunBuilder);
+registerBuilder(TaserBuilder);
+registerBuilder(PepperSprayBuilder);
+registerBuilder(GolfClubBuilder);
+registerBuilder(HockeyStickBuilder);
+registerBuilder(LacrosseStickBuilder);
+registerBuilder(CricketBatBuilder);

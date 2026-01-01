@@ -18,11 +18,11 @@ export class SessionBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild: boolean = false): Promise<void> {
+  async build(): Promise<void> {
     console.log('[SessionBuilder] Building $.session object...');
 
     // Get root
-    const root = await this.manager.load(1);
+    const root = await this.manager.load('root');
     if (!root) throw new Error('Root object not found');
 
     // Check if already exists via alias
@@ -34,7 +34,7 @@ export class SessionBuilder implements Builder {
 
     if (aliases.session) {
       this.session = await this.manager.load(aliases.session);
-      if (this.session && !forceRebuild) {
+      if (this.session) {
         console.log(
           `[SessionBuilder] Loaded existing $.session (#${aliases.session})`,
         );

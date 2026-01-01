@@ -20,7 +20,7 @@ export class SisterGrayBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
+  async build(): Promise<void> {
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
 
@@ -30,16 +30,13 @@ export class SisterGrayBuilder implements Builder {
     // Check if already exists
     if (aliases.sisterGray) {
       this.sisterGray = await this.manager.load(aliases.sisterGray);
-      if (this.sisterGray && !forceRebuild) return;
+      if (this.sisterGray) return;
     }
 
-    // Get agent prototype from alias
-    if (!aliases.agent) {
-      throw new Error('$agent must be built before $sisterGray');
-    }
-    const parent = await this.manager.load(aliases.agent);
+    // Get agent type as parent
+    const parent = await this.manager.load('agent');
     if (!parent) {
-      throw new Error('Failed to load $agent');
+      throw new Error('Agent type not found - required for Sister Gray');
     }
 
     // Load prompt from $.aiPrompts

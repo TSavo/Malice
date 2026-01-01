@@ -3,7 +3,7 @@ import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Builds the Admin prototype
+ * Builds the Admin type
  * Extends Player with world-building commands like @dig, @create, @recycle
  *
  * Admin commands use @ prefix and $.prompt for interactive input:
@@ -22,18 +22,20 @@ export class AdminBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
+  async build(): Promise<void> {
+    // Check if type already exists
+    const existing = await this.manager.load('admin');
+    if (existing) {
+      this.obj = existing;
+    } else {
+      // Get parent type
+      const player = await this.manager.load('player');
+      if (!player) {
+        throw new Error('Player type not found - required for Admin');
+      }
 
-    if ($.admin && !forceRebuild) {
-      this.obj = $.admin;
-      return;
-    }
-
-    const parentObj = $.player;
-    this.obj = await this.manager.create({
-      parent: parentObj!,
-      properties: {
+      this.obj = await this.manager.define('admin', player, {
+        properties: {
         name: 'Admin',
         description: 'Base prototype for admin characters with building powers',
         isAdmin: true,
@@ -55,11 +57,13 @@ ELEVATORS: @elevator creates and wires elevators. Maps floors to rooms.
 AI: @spawn creates AI-controlled NPCs with role and appearance. @despawn removes them. @ai lists all AI humans.
 
 NOTES: @notes attaches admin notes to objects. Searchable, taggable.`,
-      },
-      methods: {},
-    });
+        },
+        methods: {},
+      });
+    }
 
-    const obj = this.obj;
+    // Always rebuild methods (ensures they exist even if type was pre-existing)
+    const obj = this.obj!;
     // Property descriptions
     obj.setPropertyDescription(
       'isAdmin',
@@ -130,8 +134,8 @@ NOTES: @notes attaches admin notes to objects. Searchable, taggable.`,
             const currentRoom = self.location || null;
             if (!currentRoom) { await self.tell('You are nowhere.'); break; }
             // Attach in/out exits to this room (avoid duplicates)
-            const exitProto = aliases.exit;
-            if (!exitProto) { await self.tell('Exit prototype not found.'); break; }
+            const exitType = await $load('exit');
+            if (!exitType) { await self.tell('Exit type not found.'); break; }
             const roomExits = currentRoom.exits || [];
             const elevExits = elev.exits || [];
 
@@ -141,7 +145,7 @@ NOTES: @notes attaches admin notes to objects. Searchable, taggable.`,
               return exObj && exObj.destRoom === elev.id;
             });
             if (!inExit) {
-               inExit = $.recycler ? await $.recycler.create($.exit, { name: 'in', aliases: ['in','i'], destRoom: elev }, self) : null;
+               inExit = $.recycler ? await $.recycler.create(exitType, { name: 'in', aliases: ['in','i'], destRoom: elev }, self) : null;
 
               if (!inExit) { await self.tell('Recycler unavailable.'); break; }
               await currentRoom.addExit(inExit);
@@ -153,7 +157,7 @@ NOTES: @notes attaches admin notes to objects. Searchable, taggable.`,
               return exObj && exObj.destRoom === currentRoom.id;
             });
             if (!outExit) {
-               outExit = $.recycler ? await $.recycler.create($.exit, { name: 'out', aliases: ['out','o'], destRoom: currentRoom }, self) : null;
+               outExit = $.recycler ? await $.recycler.create(exitType, { name: 'out', aliases: ['out','o'], destRoom: currentRoom }, self) : null;
 
               if (!outExit) { await self.tell('Recycler unavailable.'); break; }
               await elev.addExit(outExit);
@@ -621,14 +625,13 @@ NOTES: @notes attaches admin notes to objects. Searchable, taggable.`,
       }
 
       // 6. Create the room
-      const aliases = $.system.aliases || {};
-      const roomProtoId = aliases.room;
-      if (!roomProtoId) {
-        await self.tell('Error: Room prototype not found.');
+      const roomType = await $load('room');
+      if (!roomType) {
+        await self.tell('Error: Room type not found.');
         return;
       }
 
-      const newRoom = await $.recycler.create($.room, {
+      const newRoom = await $.recycler.create(roomType, {
         name: name,
         description: description,
         x: x,
@@ -640,10 +643,10 @@ NOTES: @notes attaches admin notes to objects. Searchable, taggable.`,
 
       // 7. Create exits if requested
       if (exitDirection && currentRoom) {
-        const exitProtoId = aliases.exit;
-        if (exitProtoId) {
+        const exitType = await $load('exit');
+        if (exitType) {
           // Exit from current to new
-          const exitToNew = await $.recycler.create($.exit, {
+          const exitToNew = await $.recycler.create(exitType, {
             name: exitDirection,
             aliases: self.getExitAliases(exitDirection),
             destRoom: newRoom,
@@ -653,7 +656,7 @@ NOTES: @notes attaches admin notes to objects. Searchable, taggable.`,
 
           // Return exit from new to current
           if (returnDirection) {
-            const exitToCurrent = await $.recycler.create($.exit, {
+            const exitToCurrent = await $.recycler.create(exitType, {
               name: returnDirection,
               aliases: self.getExitAliases(returnDirection),
               destRoom: currentRoom,
@@ -754,14 +757,13 @@ NOTES: @notes attaches admin notes to objects. Searchable, taggable.`,
       }
 
       // 5. Create exits
-      const aliases = $.system.aliases || {};
-      const exitProtoId = aliases.exit;
-      if (!exitProtoId) {
-        await self.tell('Error: Exit prototype not found.');
+      const exitType = await $load('exit');
+      if (!exitType) {
+        await self.tell('Error: Exit type not found.');
         return;
       }
 
-      const exitToNew = await $.recycler.create($.exit, {
+      const exitToNew = await $.recycler.create(exitType, {
         name: exitDirection,
         aliases: self.getExitAliases(exitDirection),
         destRoom: destRoom,
@@ -770,7 +772,7 @@ NOTES: @notes attaches admin notes to objects. Searchable, taggable.`,
       await self.tell('Created exit ' + exitDirection + ' (#' + exitToNew.id + ')');
 
       if (returnDirection) {
-        const exitToCurrent = await $.recycler.create($.exit, {
+        const exitToCurrent = await $.recycler.create(exitType, {
           name: returnDirection,
           aliases: self.getExitAliases(returnDirection),
           destRoom: currentRoom,
@@ -1164,12 +1166,7 @@ NOTES: @notes attaches admin notes to objects. Searchable, taggable.`,
         const z = coordMatch[3] ? parseInt(coordMatch[3], 10) : 0;
 
         // Find room at coordinates
-        // This is inefficient but works for now - should have spatial index
-        const aliases = $.system.aliases || {};
-        const roomProtoId = aliases.room;
-
-        // Search all objects for matching room
-        // TODO: Use a proper spatial index
+        // TODO: Use a proper spatial index ($spatial)
         await self.tell('Searching for room at ' + x + ',' + y + ',' + z + '...');
 
         // For now, just tell them we can't search
@@ -2400,10 +2397,9 @@ NOTES: @notes attaches admin notes to objects. Searchable, taggable.`,
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
+    // Types auto-alias by name, no manual registration needed
     if (!this.obj) return;
-    const objectManager = await this.manager.load(0);
-    await objectManager?.call('addAlias', 'admin', this.obj.id);
+    console.log(`[AdminBuilder] Type 'admin' auto-aliased`);
   }
 }
 

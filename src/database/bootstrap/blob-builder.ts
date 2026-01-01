@@ -22,7 +22,7 @@ export class BlobBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
+  async build(): Promise<void> {
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('ObjectManager not found');
 
@@ -31,11 +31,11 @@ export class BlobBuilder implements Builder {
 
     if (aliases.blob) {
       this.blob = await this.manager.load(aliases.blob);
-      if (this.blob && !forceRebuild) return;
+      if (this.blob) return;
     }
 
     if (!this.blob) {
-      const root = await this.manager.load(1);
+      const root = await this.manager.load('root');
       this.blob = await this.manager.create({
         parent: root!,
         properties: {

@@ -3,7 +3,7 @@ import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Builds the CloneTank prototype
+ * Builds the CloneTank type
  *
  * A clone tank stores backup data for players and handles resurrection.
  * When a player with a backup dies, they can choose to resurrect from the tank.
@@ -36,19 +36,17 @@ export class CloneTankBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
+  async build(): Promise<void> {
 
-    if ($.cloneTank && !forceRebuild) {
-      this.obj = $.cloneTank;
-      return;
-    }
+    // Check if type already exists
+    const existing = await this.manager.load('cloneTank');
+    if (existing) {
+      this.obj = existing;
+    } else {
+      const parentObj = await this.manager.load('describable');
+      if (!parentObj) throw new Error('CloneTankBuilder: describable type not found');
 
-    const parentObj = $.describable;
-    if (!parentObj) throw new Error('CloneTankBuilder: $describable not found');
-
-    this.obj = await this.manager.create({
-      parent: parentObj!,
+      this.obj = await this.manager.define('cloneTank', parentObj, {
       properties: {
         name: 'Clone Tank',
         description:
@@ -88,9 +86,11 @@ CONSUMPTION: Backup data ERASED after resurrection. Must re-backup at recording 
 IMMOVABLE: 'boltedDown' true. Cannot be moved.`,
       },
       methods: {},
-    });
+      });
+    }
 
-    const obj = this.obj;
+    // Always rebuild methods (ensures they exist even if type was pre-existing)
+    const obj = this.obj!;
 
     // ═══════════════════════════════════════════════════════════════════
     // BACKUP DATA MANAGEMENT
@@ -575,10 +575,9 @@ IMMOVABLE: 'boltedDown' true. Cannot be moved.`,
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
+    // Types auto-alias by name, no manual registration needed
     if (!this.obj) return;
-    const objectManager = await this.manager.load(0);
-    await objectManager?.call('addAlias', 'cloneTank', this.obj.id);
+    console.log(`[CloneTankBuilder] Type 'cloneTank' auto-aliased`);
   }
 }
 

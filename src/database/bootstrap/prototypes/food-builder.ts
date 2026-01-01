@@ -3,7 +3,7 @@ import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Builds the Food prototype
+ * Builds the Food type
  * Inherits from Edible. Solid food consumed by eating.
  *
  * ABILITIES-FIRST ARCHITECTURE:
@@ -20,20 +20,22 @@ export class FoodBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
+  async build(): Promise<void> {
+    // Check if type already exists
+    const existing = await this.manager.load('food');
+    if (existing) {
+      this.obj = existing;
+    } else {
+      // Get parent type
+      const edible = await this.manager.load('edible');
+      if (!edible) {
+        throw new Error('Edible type not found - required for Food');
+      }
 
-    if ($.food && !forceRebuild) {
-      this.obj = $.food;
-      return;
-    }
-
-    const parentObj = $.edible;
-    this.obj = await this.manager.create({
-      parent: parentObj!,
-      properties: {
+      this.obj = await this.manager.define('food', edible, {
+        properties: {
         name: 'Food',
-        description: 'Base prototype for solid food items',
+        description: 'Base type for solid food items',
         // Typical food nutrition
         calories: 200,
         hydration: 50, // ml water equivalent - solid food has some moisture
@@ -65,8 +67,10 @@ TO CONSUME: Call consume(eater, 'food') method. It handles calorie transfer to s
       },
       methods: {},
     });
+    }
 
-    const obj = this.obj;
+    // Always rebuild methods (ensures they exist even if type was pre-existing)
+    const obj = this.obj!;
 
     // Add property descriptions
     obj.setPropertyDescription(
@@ -234,10 +238,7 @@ TO CONSUME: Call consume(eater, 'food') method. It handles calorie transfer to s
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
-    if (!this.obj) return;
-    const objectManager = await this.manager.load(0);
-    await objectManager?.call('addAlias', 'food', this.obj.id);
+    console.log('[FoodBuilder] Type \'food\' auto-aliased');
   }
 }
 

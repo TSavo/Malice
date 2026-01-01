@@ -28,7 +28,7 @@ export class PreAuthHandlerBuilder implements Builder {
     }
 
     // Create new PreAuthHandler
-    const root = await this.manager.load(1);
+    const root = await this.manager.load('root');
     this.preAuthHandler = await this.manager.create({
       parent: root!,
       properties: {
@@ -112,15 +112,11 @@ export class PreAuthHandlerBuilder implements Builder {
           context.send(\`Certificate CN: \${cert.commonName}\\\\r\\\\n\`);
           context.send(\`Fingerprint: \${cert.fingerprint}\\\\r\\\\n\`);
 
-          // Get Player prototype via alias
-          const objectManager = await $load(0);
-          const aliases = objectManager.aliases || {};
-          const playerPrototypeId = aliases.player;
-
           // Find Player by SSL fingerprint or email
+          // Player type has string ID 'player'
           const users = await context.$.db.listAll();
           const playerDoc = users.find(u =>
-            u.parent === playerPrototypeId &&
+            (u.parent?.id === 'player' || u.parent?.id === 'admin') &&
             (u.properties.sslFingerprint === cert.fingerprint ||
              u.properties.email === cert.commonName)
           );
@@ -164,18 +160,13 @@ export class PreAuthHandlerBuilder implements Builder {
 
           context.send(\`Authenticating user: \${basic.username}\\\\r\\\\n\`);
 
-          // Get Player prototype via alias
-          const objectManager = await $load(0);
-          const aliases = objectManager.aliases || {};
-          const playerPrototypeId = aliases.player;
-
           // Find Player by playername
+          // Player/Admin types have string IDs 'player' and 'admin'
           // Helper to extract value from typed Value or raw value
           const getValue = (v) => v && typeof v === 'object' && 'type' in v ? v.value : v;
           const users = await context.$.db.listAll();
-          const adminPrototypeId = aliases.admin;
           const userDoc = users.find(u =>
-            (u.parent === playerPrototypeId || u.parent === adminPrototypeId) &&
+            (u.parent?.id === 'player' || u.parent?.id === 'admin') &&
             getValue(u.properties.playername) === basic.username.toLowerCase()
           );
 
@@ -251,17 +242,14 @@ export class PreAuthHandlerBuilder implements Builder {
 
           // Get Player prototype via alias
           const objectManager = await $load(0);
-          const aliases = objectManager.aliases || {};
-          const playerPrototypeId = aliases.player;
-          const adminPrototypeId = aliases.admin;
-
           // Helper to extract value from typed Value or raw value
           const getValue = (v) => v && typeof v === 'object' && 'type' in v ? v.value : v;
 
           // Find Player by SSH key fingerprint
+          // Player/Admin types have string IDs 'player' and 'admin'
           const users = await context.$.db.listAll();
           const playerDoc = users.find(u => {
-            if (u.parent !== playerPrototypeId && u.parent !== adminPrototypeId) return false;
+            if (u.parent?.id !== 'player' && u.parent?.id !== 'admin') return false;
             const keys = getValue(u.properties.sshPublicKeys) || [];
             if (!Array.isArray(keys)) return false;
             // Check if any stored key matches the fingerprint

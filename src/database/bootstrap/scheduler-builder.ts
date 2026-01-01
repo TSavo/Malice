@@ -40,7 +40,7 @@ export class SchedulerBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
+  async build(): Promise<void> {
     // Check if already exists via alias
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
@@ -50,12 +50,12 @@ export class SchedulerBuilder implements Builder {
 
     if (aliases.scheduler) {
       this.scheduler = await this.manager.load(aliases.scheduler);
-      if (this.scheduler && !forceRebuild) return; // Already exists and not forcing rebuild
+      if (this.scheduler) return; // Already exists and not forcing rebuild
     }
 
     if (!this.scheduler) {
       // Create new Scheduler only if it doesn't exist
-      const root = await this.manager.load(1);
+      const root = await this.manager.load('root');
       this.scheduler = await this.manager.create({
         parent: root!,
         properties: {

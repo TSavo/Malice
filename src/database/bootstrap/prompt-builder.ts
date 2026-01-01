@@ -28,11 +28,7 @@ export class PromptBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  /**
-   * Build the Prompt utility or rebuild methods on existing object
-   * @param forceRebuild - If true, rebuild methods even if object exists
-   */
-  async build(forceRebuild = false): Promise<void> {
+  async build(): Promise<void> {
     // Check if already exists via alias
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
@@ -42,12 +38,12 @@ export class PromptBuilder implements Builder {
 
     if (aliases.prompt) {
       this.prompt = await this.manager.load(aliases.prompt);
-      if (this.prompt && !forceRebuild) return; // Already exists and not forcing rebuild
+      if (this.prompt) return; // Already exists and not forcing rebuild
     }
 
     if (!this.prompt) {
       // Create new Prompt utility
-      const root = await this.manager.load(1);
+      const root = await this.manager.load('root');
       this.prompt = await this.manager.create({
         parent: root!,
         properties: {

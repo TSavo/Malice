@@ -27,7 +27,7 @@ export class WebDomainBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
+  async build(): Promise<void> {
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
 
@@ -45,7 +45,7 @@ export class WebDomainBuilder implements Builder {
 
     if (aliases.webDomain) {
       this.webDomain = await this.manager.load(aliases.webDomain);
-      if (this.webDomain && !forceRebuild) return;
+      if (this.webDomain) return;
     }
 
     if (!this.webDomain) {

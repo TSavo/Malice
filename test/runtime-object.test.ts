@@ -540,6 +540,9 @@ describe('RuntimeObject', () => {
 
   describe('pull()', () => {
     it('should reload object properties from database', async () => {
+      // Ensure any pending writes are flushed first
+      await manager.flushWrites();
+
       // Modify object in database directly (properties are now typed Values)
       await db.objects.updateOne(
         { _id: testObj.id },
@@ -707,8 +710,8 @@ describe('RuntimeObject', () => {
         mana: 50,
       });
       expect(raw.methods).toBeDefined();
-      // Parent is now stored as ObjRefValue
-      expect(raw.parent).toEqual({ type: 'objref', value: root.id });
+      // Parent is now stored as ObjRefValue with target and id
+      expect(raw.parent).toEqual({ type: 'objref', target: 'object', id: root.id });
     });
 
     it('should reflect current state', () => {

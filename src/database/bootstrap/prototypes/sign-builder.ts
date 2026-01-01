@@ -3,7 +3,7 @@ import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Builds the Sign prototype
+ * Builds the Sign type
  * Immovable, readable object for rooms, elevators, doors, etc.
  *
  * Inherits from Describable.
@@ -30,22 +30,17 @@ export class SignBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
-
-    if ($.sign && !forceRebuild) {
-      this.obj = $.sign;
-      return;
-    }
-
-    const parentObj = $.describable;
-    if (!parentObj) throw new Error('SignBuilder: $describable not found');
-
-    if ($.sign) {
-      this.obj = $.sign;
+  async build(): Promise<void> {
+    // Check if type already exists (types auto-alias)
+    const existing = await this.manager.load('sign');
+    if (existing) {
+      this.obj = existing;
     } else {
-      this.obj = await this.manager.create({
-        parent: parentObj,
+      // Create sign as a TYPE
+      const parentObj = await this.manager.load('describable');
+      if (!parentObj) throw new Error('SignBuilder: $describable not found');
+
+      this.obj = await this.manager.define('sign', parentObj, {
         properties: {
           name: 'Sign',
           description: 'A sturdy, bolted-down sign.',
@@ -74,7 +69,8 @@ READING: read() returns text content. AI can invoke directly.`,
       });
     }
 
-    const obj = this.obj!;
+    // Always rebuild methods (ensures they exist even if type was pre-existing)
+    const obj = this.obj;
 
     obj.setMethod(
       'read',
@@ -172,14 +168,9 @@ READING: read() returns text content. AI can invoke directly.`,
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
+    // Types auto-alias by name, no manual registration needed
     if (!this.obj) return;
-
-    const objectManager = await this.manager.load(0);
-    if (!objectManager) return;
-
-    await objectManager.call('addAlias', 'sign', this.obj.id);
-    console.log(`  ✅ Registered $sign -> #${this.obj.id}`);
+    console.log(`[SignBuilder] Type 'sign' auto-aliased`);
   }
 }
 

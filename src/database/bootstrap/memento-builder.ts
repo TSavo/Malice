@@ -41,7 +41,7 @@ export class MementoBuilder implements Builder {
     }
 
     // Create new Memento utility
-    const root = await this.manager.load(1);
+    const root = await this.manager.load('root');
     this.memento = await this.manager.create({
       parent: root!,
       properties: {
@@ -127,7 +127,7 @@ export class MementoBuilder implements Builder {
         // Get parent - replace if in-graph, otherwise store as objref
         // Note: getParent() returns RuntimeObject, extract ID for serialization
         const parentObj = obj.getParent ? obj.getParent() : null;
-        const parentId = parentObj ? parentObj.id : (obj.parent ? obj.parent.value : null);
+        const parentId = parentObj ? parentObj.id : (obj.parent ? obj.parent.id : null);
         let parent;
         if (parentId !== null && idToPlaceholder.has(parentId)) {
           parent = idToPlaceholder.get(parentId);
@@ -195,13 +195,13 @@ export class MementoBuilder implements Builder {
         let parentObj;
         if (typeof data.parent === 'string' && data.parent.startsWith('%')) {
           // Parent is in-graph, use root temporarily (will be fixed in second pass)
-          parentObj = await $load(1);
+          parentObj = await $load('root');
         } else if (data.parent && typeof data.parent === 'object' && '_objref' in data.parent) {
           // External parent - load it
           parentObj = await $load(data.parent._objref);
         } else {
           // Fallback to root
-          parentObj = await $load(1);
+          parentObj = await $load('root');
         }
 
         // Create object with empty properties first

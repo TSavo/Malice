@@ -16,10 +16,10 @@ export class TerminalWindowBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
+  async build(): Promise<void> {
     const $ = this.manager as any;
 
-    if ($.terminalWindowJs && !forceRebuild) {
+    if ($.terminalWindowJs) {
       this.obj = $.terminalWindowJs;
       return;
     }

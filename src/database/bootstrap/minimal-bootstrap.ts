@@ -34,9 +34,9 @@ export class MinimalBootstrap {
       (objectManager.get('aliases') as Record<string, number>) || {};
 
     // Register core aliases
+    // Note: 'root' is a type and auto-aliases, no need to register
     if (!aliases.nothing) aliases.nothing = -1;
     if (!aliases.object_manager) aliases.object_manager = 0;
-    if (!aliases.root) aliases.root = 1;
     if (!aliases.system) aliases.system = 2;
 
     objectManager.set('aliases', aliases);
@@ -264,36 +264,27 @@ export class MinimalBootstrap {
   }
 
   /**
-   * Ensure Root object #1 exists
-   * Base of all inheritance, stores global configuration
+   * Ensure Root type exists
+   * This is the base of all inheritance - now a TYPE not an object
    *
-   * Note: Root is a special bootstrap object created via db.create() with explicit ID.
-   * Normal objects should be created via $.recycler which uses manager.create().
+   * Root is the only type that is its own parent (self-referential).
    */
   private async ensureRoot(): Promise<void> {
-    let root = await this.manager.load(1);
+    let root = await this.manager.load('root');
     if (!root) {
-      // Create directly in database with explicit ID (bootstrap-only pattern)
-      await this.manager.db.create({
-        _id: 1,
-        parent: { type: 'objref', target: 'object', id: 0 },
+      // Create root type - self-referential parent
+      await this.manager.db.createType({
+        _id: 'root',
+        parent: { type: 'objref', target: 'type', id: 'root' }, // self-reference
         properties: {
           name: { type: 'string', value: 'Root' },
-          description: { type: 'string', value: 'Base of all objects' },
-          config: {
-            type: 'object',
-            value: {
-              siteName: { type: 'string', value: 'Malice' },
-              motd: { type: 'string', value: 'Welcome to Malice!' },
-              maxConnections: { type: 'number', value: 100 },
-            },
-          },
+          description: { type: 'string', value: 'Base of all types' },
         },
         methods: {},
       });
       // Now load it to get the RuntimeObject
-      root = await this.manager.load(1);
-      console.log('✅ Created Root object #1');
+      root = await this.manager.load('root');
+      console.log('✅ Created Root type');
     }
   }
 
@@ -321,7 +312,7 @@ export class MinimalBootstrap {
       // Normal objects should be created via $.recycler
       await this.manager.db.create({
         _id: 2,
-        parent: { type: 'objref', target: 'object', id: 1 },
+        parent: { type: 'objref', target: 'type', id: 'root' },
         properties: {
           name: { type: 'string', value: 'System' },
           description: {

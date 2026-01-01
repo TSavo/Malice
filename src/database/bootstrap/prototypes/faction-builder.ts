@@ -34,20 +34,16 @@ export class FactionBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
+  async build(): Promise<void> {
+    const existing = await this.manager.load('faction');
+    if (existing) {
+      this.obj = existing;
+    } else {
+      const parent = await this.manager.load('describable');
+      if (!parent) throw new Error('FactionBuilder: Parent type \'describable\' not found');
 
-    if ($.faction && !forceRebuild) {
-      this.obj = $.faction;
-      return;
-    }
-
-    const parentObj = $.describable;
-    if (!parentObj) throw new Error('FactionBuilder: $describable not found');
-
-    this.obj = await this.manager.create({
-      parent: parentObj,
-      properties: {
+      this.obj = await this.manager.define('faction', parent, {
+        properties: {
           name: 'Faction',
           description: 'A faction in the game world.',
           // Faction-specific properties
@@ -74,9 +70,11 @@ MEMBERSHIP: Use $factionManager.setMembership(entity, faction) to add members. $
 LIFECYCLE: Created via $factionManager.create(), destroyed via $factionManager.destroy(). This handles transport spinup/spindown.`,
         },
         methods: {},
-    });
+      });
+    }
 
-    const obj = this.obj;
+    // Always rebuild methods
+    const obj = this.obj!
 
     obj.setMethod(
       'describe',
@@ -211,10 +209,7 @@ LIFECYCLE: Created via $factionManager.create(), destroyed via $factionManager.d
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
-    if (!this.obj) return;
-    const objectManager = await this.manager.load(0);
-    await objectManager?.call('addAlias', 'faction', this.obj.id);
+    console.log('[FactionBuilder] Type \'faction\' auto-aliased');
   }
 }
 

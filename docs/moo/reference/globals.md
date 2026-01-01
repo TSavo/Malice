@@ -519,6 +519,85 @@ const result = await $cash.transfer(fromPlayer, toPlayer, 100);
 - `$cloneRecordingStudio` (when `currency: 'cash'`)
 - Any system needing physical cash transactions
 
+### $aiImageGen - AI Image Generation
+
+Generate images using Google's Gemini API (Nano Banana) and store in `$blob`.
+
+```javascript
+// Generate image and store in blob
+const result = await $aiImageGen.generate('A cyberpunk banana');
+// { success: true, blobKey: '...', contentType: 'image/png', prompt: '...' }
+
+// Get URL for the image
+const url = $blob.url(result.blobKey, 'thecontinuum.city');
+
+// Generate with options
+const result = await $aiImageGen.generate('A glowing orb', {
+  model: 'gemini-3-pro-image-preview',
+  metadata: { createdBy: player.id },
+  filename: 'orb.png'
+});
+
+// Generate without storing (returns base64)
+const raw = await $aiImageGen.generateRaw('An icon');
+// { success: true, data: 'base64...', contentType: 'image/png' }
+
+// List available models
+const models = $aiImageGen.listModels();
+
+// Change default model
+$aiImageGen.setDefaultModel('gemini-3-pro-image-preview');
+```
+
+**Environment:** Requires `GEMINI_API_KEY` environment variable.
+
+**Models:**
+- `gemini-2.0-flash-exp-image-generation` (default)
+- `gemini-2.5-flash-image` - Nano Banana
+- `gemini-3-pro-image-preview` - Nano Banana Pro
+- `imagen-4.0-generate-001` (paid)
+
+### $describable.image() - Object Image Generation
+
+Any object that inherits from `$describable` has an `image()` method to generate/retrieve images:
+
+```javascript
+// Get or generate an image (landscape default)
+const blobKey = await item.image();
+
+// Specify aspect ratio
+const blobKey = await room.image({ aspectRatio: 'landscape' });  // 16:9
+const blobKey = await npc.image({ aspectRatio: 'portrait' });    // 9:16
+const blobKey = await icon.image({ aspectRatio: 'square' });     // 1:1
+
+// Force regeneration
+const blobKey = await item.image({ force: true });
+
+// Custom prompt (instead of using .describe())
+const blobKey = await room.image({
+  prompt: 'A rain-slicked cyberpunk street at night, neon reflections'
+});
+
+// Get URL for display
+const url = $blob.url(blobKey, 'thecontinuum.city');
+```
+
+**Caching:** Images are cached by aspect ratio in `self.images`:
+```javascript
+// After calling image() with different ratios:
+item.images = { '16:9': 'abc123', '9:16': 'def456' }
+```
+
+**Showing to Players:**
+```javascript
+const blobKey = await item.image();
+const url = $blob.url(blobKey, 'thecontinuum.city');
+player.openWindow('img-' + Date.now(), 'html', {
+  title: item.name,
+  content: '<img src="' + url + '" style="max-width:100%;max-height:100%">'
+});
+```
+
 ## Prototype Aliases
 
 Quick access to prototype objects for inheritance:
@@ -555,6 +634,10 @@ Quick access to prototype objects for inheritance:
 | `$cash` | Cash utility (physical money operations) |
 | `$phoneDb` | Phone directory |
 | `$startRoom` | Default spawn location |
+| `$http` | HTTP client for external requests |
+| `$blob` | Binary storage (MongoDB GridFS) |
+| `$email` | Email sending (Resend) |
+| `$aiImageGen` | AI image generation (Gemini/Nano Banana) |
 
 ## Special Properties on $
 

@@ -34,10 +34,10 @@ export class FactionManagerBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
+  async build(): Promise<void> {
     const $ = this.manager as any;
 
-    if ($.factionManager && !forceRebuild) {
+    if ($.factionManager) {
       this.obj = $.factionManager;
       return;
     }

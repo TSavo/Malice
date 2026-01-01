@@ -3,7 +3,7 @@ import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Builds the Door prototype
+ * Builds the Door type
  * Shared object for bidirectional access between rooms, used by exits and elevators.
  *
  * ABILITIES-FIRST ARCHITECTURE:
@@ -28,22 +28,19 @@ export class DoorBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
-
-    if ($.door && !forceRebuild) {
-      this.obj = $.door;
-      return;
-    }
-
-    const parentObj = $.describable;
-    if (!parentObj) throw new Error('DoorBuilder: $describable not found');
-
-    if ($.door) {
-      this.obj = $.door;
+  async build(): Promise<void> {
+    // Check if type already exists
+    const existing = await this.manager.load('door');
+    if (existing) {
+      this.obj = existing;
     } else {
-      this.obj = await this.manager.create({
-        parent: parentObj,
+      // Get parent type
+      const describable = await this.manager.load('describable');
+      if (!describable) {
+        throw new Error('Describable type not found - required for Door');
+      }
+
+      this.obj = await this.manager.define('door', describable, {
         properties: {
           name: 'Door',
           description: 'A sturdy door between rooms.',
@@ -69,6 +66,7 @@ CLOSING: Setting 'open' to false closes the door. If 'autolockOnClose' is true, 
       });
     }
 
+    // Always rebuild methods (ensures they exist even if type was pre-existing)
     const obj = this.obj!;
 
     // Add property descriptions
@@ -151,14 +149,8 @@ CLOSING: Setting 'open' to false closes the door. If 'autolockOnClose' is true, 
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
     if (!this.obj) return;
-
-    const objectManager = await this.manager.load(0);
-    if (!objectManager) return;
-
-    await objectManager.call('addAlias', 'door', this.obj.id);
-    console.log(`  ✅ Registered $door -> #${this.obj.id}`);
+    console.log("[DoorBuilder] Type 'door' auto-aliased");
   }
 }
 

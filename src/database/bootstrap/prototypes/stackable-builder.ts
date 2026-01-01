@@ -3,7 +3,7 @@ import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Builds the Stackable prototype
+ * Builds the Stackable type
  * Physical goods that can be combined and split.
  * Enables commodity-based value transfer outside the banking system.
  *
@@ -26,30 +26,27 @@ export class StackableBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
+  async build(): Promise<void> {
 
-    if ($.stackable && !forceRebuild) {
-      this.obj = $.stackable;
-      return;
-    }
+    const existing = await this.manager.load('stackable');
+    if (existing) {
+      this.obj = existing;
+    } else {
+      const parent = await this.manager.load('describable');
+      this.obj = await this.manager.define('stackable', parent!, {
+        properties: {
+          name: 'Stackable',
+          description: 'A quantity of something.',
+          // What type of stackable (e.g., "cash:usd", "ammo:9mm", "drug:synth")
+          stackType: null,
+          // How much (integer only)
+          quantity: 0,
+          // Display unit (e.g., "USD", "rounds", "g", "oz")
+          unit: '',
+          // Contraband flag - illegal to possess
+          contraband: false,
 
-    const parentObj = $.describable;
-    this.obj = await this.manager.create({
-      parent: parentObj!,
-      properties: {
-        name: 'Stackable',
-        description: 'A quantity of something.',
-        // What type of stackable (e.g., "cash:usd", "ammo:9mm", "drug:synth")
-        stackType: null,
-        // How much (integer only)
-        quantity: 0,
-        // Display unit (e.g., "USD", "rounds", "g", "oz")
-        unit: '',
-        // Contraband flag - illegal to possess
-        contraband: false,
-
-        abilities: `Commodity that combines and splits. Base for cash, ammo, drugs, scrap.
+          abilities: `Commodity that combines and splits. Base for cash, ammo, drugs, scrap.
 
 STACKING: Same 'stackType' items merge automatically. onArrived() finds matching stacks and combines via merge().
 
@@ -68,11 +65,13 @@ OPERATIONS:
 - remove(amount): Decrease quantity, returns success
 - split(amount): Create new stack with portion
 - merge(other): Absorb other stack's quantity`,
-      },
-      methods: {},
-    });
+        },
+        methods: {},
+      });
+    }
 
-    const obj = this.obj;
+    // Always rebuild methods (ensures they exist even if type was pre-existing)
+    const obj = this.obj!;
     // ═══════════════════════════════════════════════════════════════════
     // CORE STACK OPERATIONS
     // ═══════════════════════════════════════════════════════════════════
@@ -326,10 +325,7 @@ OPERATIONS:
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
-    if (!this.obj) return;
-    const objectManager = await this.manager.load(0);
-    await objectManager?.call('addAlias', 'stackable', this.obj.id);
+    console.log('[StackableBuilder] Type \'stackable\' auto-aliased');
   }
 }
 
