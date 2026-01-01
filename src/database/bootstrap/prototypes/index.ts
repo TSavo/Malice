@@ -84,6 +84,8 @@ export { VehicleBatteryBuilder } from './vehicle-battery-builder';
 export { WheelBuilder } from './wheel-builder';
 export { TransmissionBuilder } from './transmission-builder';
 export { VehicleBuilder } from './vehicle-builder';
+export { VehicleExitBuilder } from './vehicle-exit-builder';
+export { VehicleRoomBuilder } from './vehicle-room-builder';
 export { CarBuilder } from './car-builder';
 export { GarageBuilder } from './garage-builder';
 export { MechanicBuilder } from './mechanic-builder';
