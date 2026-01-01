@@ -43,33 +43,12 @@ export class AircraftBuilder implements Builder {
           // Override required parts for aircraft
           requiredParts: ['engine', 'fuelTank', 'battery'],
           // AI-readable abilities
-          abilities: `Aircraft capable of 3D flight through airspace.
+          abilities: `Fixed-wing aircraft. Jet fuel, high consumption. Needs runway or VTOL.
 
-FLIGHT vs GROUND: Unlike ground vehicles that use exits, aircraft fly
-directly between coordinates. Use takeoff(), fly(), and land().
+Flies in 3D airspace (x,y,z coordinates). z=1 is low altitude, z=100 is cruising.
+Engine running in flight = continuous fuel burn. Empty tank mid-flight = crash.
 
-TAKEOFF: Call takeoff() when parked on ground (helipad, airport).
-Creates/joins airspace room at z=1 above current position.
-Sets inFlight=true.
-
-FLYING: Call fly(heading) with direction: north, south, east, west,
-northeast, northwest, southeast, southwest, up, down.
-Or fly(heading, targetAltitude) to specify exact z-level.
-Movement is scheduled like ground vehicles.
-
-LANDING: Call land() to descend to ground directly below.
-Or land(destination) for specific landing zone.
-Returns to ground room, sets inFlight=false.
-
-COORDINATES: Same 30m grid as ground. z is 3m per unit.
-z=10 = 30m altitude. z=100 = 300m (cruising). z=200 = 600m (max).
-
-AIRSPACE ROOMS: Dynamic rooms at altitude managed by $airspace.
-Aircraft at same x,y,z share the room (can see each other).
-Rooms recycled when last aircraft leaves.
-
-PARTS: Requires engine, fuelTank, battery, and rotor (or jet).
-Damaged rotor = can't maintain flight.`,
+Needs engine, fuelTank, battery. Damaged engine/control surfaces = emergency.`,
         },
         methods: {},
       });

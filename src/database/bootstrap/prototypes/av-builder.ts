@@ -59,30 +59,12 @@ export class AvBuilder implements Builder {
           weight: 1200000, // 1200kg (lighter than car, needs to fly)
           armor: 3, // Less armor than ground car
           // AI-readable abilities
-          abilities: `VTOL flying car. Takes off and lands vertically using vector thrust.
+          abilities: `VTOL flying car. Electric-hybrid: battery + fuel generator.
 
-PROPULSION: Uses vectorThrusters instead of rotors. Quieter, more maneuverable.
-Requires 2 functional vectorThrusters for stable flight.
+2 vector thrusters required. Quiet. Lands anywhere outdoors.
+Battery limits flight time. Low battery = forced landing. Recharge at stations.
 
-FLIGHT MODES:
-- Hover: thrusters at vectorAngle=0, stationary in air
-- Cruise: thrusters at vectorAngle=90, forward flight
-- Transition: thrusters between 0-90 during takeoff/landing
-
-TAKEOFF: From any outdoor surface. Thrusters activate, vehicle rises.
-No runway needed. Can take off from streets, rooftops, parking lots.
-
-LANDING: Can land anywhere with clearance. Streets, rooftops, helipads.
-More versatile than helicopters (no rotor wash concerns).
-
-URBAN FLIGHT: Designed for city flying. Lower altitude than aircraft.
-Can navigate between buildings, land on rooftops.
-
-POWER: Electric-hybrid. Battery powers thrusters, fuel powers generator.
-More efficient than pure fuel but battery limits range.
-
-DRIVING: Can also drive on ground like a car when thrusters inactive.
-Use drive() for ground movement, fly() for aerial movement.`,
+Can drive on ground when not flying. Urban flight, low altitude.`,
         },
         methods: {},
       });

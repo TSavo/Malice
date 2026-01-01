@@ -55,42 +55,18 @@ export class VehicleBuilder implements Builder {
           // Physical
           weight: 1500000, // grams (1500kg base, parts add more)
           // AI abilities
-          abilities: `Vehicle that carries passengers between outdoor locations via roads/exits.
-Cannot go indoors. Passengers must exit before entering buildings.
+          abilities: `Vehicle carrying passengers between outdoor locations.
 
-MULTI-ROOM: ALL vehicles are multi-room by default.
-- 'internalRooms' array contains rooms inside the vehicle
-- 'entryRoom' is where you enter when boarding
-- Simple vehicles: internalRooms = [self], entryRoom = self (the vehicle IS its room)
-- Complex vehicles: internalRooms = [cab, cargo, ...], each is a $vehicleRoom
-- Use $vehicleExit for doors/exits leading outside (getDestination() returns vehicle.location)
+FUEL: Engine consumes fuel while running (idle or driving). Empty tank = engine dies.
+Driving consumes 'fuelEfficiency' L/km. Idle consumes ~0.05 L/min.
 
-PARTS: 'parts' array holds installed $vehiclePart objects. 'requiredParts' lists
-partTypes needed - all must be functional (condition > 20, damage < 80).
+PARTS: Needs 'requiredParts' functional. Damaged parts (>80) fail.
 
-ENTERING: When not traveling ('travelState' is null) and door unlocked,
-agent can enter via enterVehicle(). Moves them to entryRoom.
+DRIVING: Driver seat + engine running + fuel. Travel time = distance / speed.
 
-DRIVING: Only agent in driver seat can drive. Requires 'engineRunning'
-true and fuel > 0. Call drive(direction) to travel via that exit.
-Travel time = exit.distance / engine.maxSpeed.
+ENTERING/EXITING: Through doors when stopped. Doors can be locked.
 
-STOPPING: Driver can stop mid-travel. Vehicle stays in current room.
-Partial fuel consumed.
-
-EXITING: Use $vehicleExit exits to leave. They resolve to vehicle.location.
-Player walks through exit like any normal room exit.
-
-PERCEPTION: Looking shows current internal room. 'lookOutside' shows
-the current room/street where vehicle is parked.
-
-FUEL: Stored in fuelTank part. Driving consumes based on distance and
-engine efficiency. Empty tank = engine stops.
-
-COMBAT: Passengers can shoot out. Outsiders can shoot in. Vehicle provides
-cover via 'armor'. 'damage' tracks hits. 'windowsBroken' removes cover.
-
-LOCKING: Doors can be locked. Door's 'lock' is objref to $lock object.`,
+DAMAGE: 'armor' reduces incoming. 80+ = disabled. 100 = destroyed.`,
         },
         methods: {},
       });
@@ -382,6 +358,10 @@ LOCKING: Doors can be locked. Door's 'lock' is objref to $lock object.`,
         await trans.shift(0);
       }
 
+      // Schedule engine tick for idle fuel consumption
+      const tickJob = 'engine_tick_' + self.id;
+      await $scheduler.schedule(tickJob, 60000, 60000, self, 'engineTick');
+
       return true;
     `,
     );
@@ -393,7 +373,50 @@ LOCKING: Doors can be locked. Door's 'lock' is objref to $lock object.`,
        * Turn off the engine.
        */
       self.engineRunning = false;
+
+      // Unschedule engine tick
+      const tickJob = 'engine_tick_' + self.id;
+      await $scheduler.unschedule(tickJob);
+
       return true;
+    `,
+    );
+
+    obj.setMethod(
+      'engineTick',
+      `
+      /**
+       * Called every minute when engine is running.
+       * Consumes idle fuel and checks for depletion.
+       */
+      if (!self.engineRunning) return;
+
+      // Get idle fuel consumption rate (liters per minute)
+      const engine = await self.getEngine();
+      const idleRate = engine?.idleFuelRate || 0.05; // Default 0.05 L/min
+
+      // Consume fuel
+      await self.consumeFuel(idleRate);
+
+      // Check if out of fuel
+      const fuel = await self.getFuel();
+      if (fuel <= 0) {
+        // Engine dies
+        self.engineRunning = false;
+
+        // Unschedule this tick
+        const tickJob = 'engine_tick_' + self.id;
+        await $scheduler.unschedule(tickJob);
+
+        // Tell occupants
+        for (const seat of (self.seats || [])) {
+          for (const passenger of (seat.occupied || [])) {
+            if (passenger && passenger.tell) {
+              await passenger.tell('The engine sputters and dies. Out of fuel.');
+            }
+          }
+        }
+      }
     `,
     );
 
