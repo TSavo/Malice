@@ -15,7 +15,7 @@ import { type Builder, registerBuilder } from './builder-registry';
  */
 export class SpatialBuilder implements Builder {
   static provides = ['spatial'];
-  static depends = ['airspaceRoom']; // Dynamic room types (waterRoom, underwaterRoom added later)
+  static depends = ['room']; // Uses $builder at runtime (not build time)
 
   private spatial: RuntimeObject | null = null;
 
@@ -42,18 +42,16 @@ export class SpatialBuilder implements Builder {
         properties: {
           name: 'Spatial Index',
           description:
-            'Unified spatial manager: coordinate indexing, terrain types, dynamic room lifecycle',
+            'Unified spatial manager: coordinate indexing, terrain types, AI-powered room creation',
           // roomIndex: { "x,y,z": room } - coordinate to room
           roomIndex: {},
           // columnIndex: { "x,y": [room, ...] } sorted by z desc
           columnIndex: {},
           // terrainIndex: { "x,y": terrainType } - sparse overrides
           terrainIndex: {},
-          // dynamicRooms: { "x,y,z": room } - track dynamic rooms for cleanup
-          dynamicRooms: {},
           // Last rebuild timestamp
           lastRebuild: null,
-          abilities: `Unified spatial manager. Coordinate indexing + terrain + dynamic rooms.
+          abilities: `Unified spatial manager. Coordinate indexing + terrain + AI-powered room creation.
 
 INDEXES: O(1) lookup by "x,y,z". Column queries by "x,y".
 
@@ -63,13 +61,13 @@ TERRAIN: getTerrainAt(x, y) → 'urban', 'water', 'badlands'.
   - Otherwise: urban
   - Use setTerrain(x, y, type) to override specific columns.
 
-DYNAMIC ROOMS: getOrCreateRoom(x, y, z) creates room based on terrain.
-  - Water terrain: $waterRoom (z=0) or $underwaterRoom (z<0)
-  - Any terrain z>0: $airspaceRoom
-  - Urban z<=0: returns null (must be pre-built)
+ROOM CREATION: ensureRoom(x, y, z) gets existing or creates via $builder.
+  - Generates terrain-appropriate hints (airspace, water surface, underwater, etc.)
+  - $builder.build() sets name, description, creates exits to neighbors
+  - Rooms are PERMANENT once created - never deleted
+  - All movement (walking, flying, sailing) uses exits
 
-PERSISTENCE: Rooms with persistent=true or hasModifications=true survive cleanup.
-releaseRoom(room) recycles empty, non-persistent rooms.`,
+HINTS: getLocationHint(x, y, z) returns terrain-based hint string.`,
         },
         methods: {},
       });
@@ -447,17 +445,59 @@ releaseRoom(room) recycles empty, non-persistent rooms.`,
       `,
     );
 
-    // ============== DYNAMIC ROOM METHODS ==============
+    // ============== ROOM CREATION METHODS ==============
 
-    // getOrCreateRoom(x, y, z) - Get or create dynamic room based on terrain
+    // getLocationHint(x, y, z) - Generate terrain-appropriate hint for $builder
     this.spatial.setMethod(
-      'getOrCreateRoom',
+      'getLocationHint',
       `
-      /** Get existing room or create dynamic room based on terrain.
+      /** Generate a hint string for $builder based on terrain and z-level.
        * @param x - X coordinate
        * @param y - Y coordinate
        * @param z - Z coordinate
-       * @returns Room object or null if cannot create
+       * @returns Hint string for room building
+       */
+      const x = args[0];
+      const y = args[1];
+      const z = args[2];
+
+      const terrain = await self.getTerrainAt(x, y);
+
+      // Water terrain
+      if (terrain === 'water') {
+        if (z > 0) return 'open sky over water, seabirds, salt air';
+        if (z === 0) return 'water surface, waves, open water or near shore';
+        if (z === -1) return 'shallow underwater, murky, some light filtering down';
+        return 'deep underwater, dark, cold, crushing pressure';
+      }
+
+      // Badlands terrain
+      if (terrain === 'badlands') {
+        if (z > 0) return 'open sky over wasteland, dust, harsh sun or acid rain';
+        if (z === 0) return 'radioactive wasteland, ruins, scavenger territory';
+        return 'underground bunker or collapsed structure in wasteland';
+      }
+
+      // Urban terrain
+      if (z > 10) return 'high altitude airspace, city far below, clouds';
+      if (z > 0) return 'urban airspace, between buildings, rooftop level';
+      if (z === 0) return 'street level, could be outdoor or building entrance';
+      if (z === -1) return 'basement, underground parking, subway access';
+      if (z < -1) return 'deep underground, tunnels, sewers, forgotten infrastructure';
+
+      return '';
+      `,
+    );
+
+    // ensureRoom(x, y, z) - Get existing room or create via $builder
+    this.spatial.setMethod(
+      'ensureRoom',
+      `
+      /** Get existing room or create a new permanent room via $builder.
+       * @param x - X coordinate
+       * @param y - Y coordinate
+       * @param z - Z coordinate
+       * @returns Room object (existing or newly created)
        */
       const x = args[0];
       const y = args[1];
@@ -467,82 +507,29 @@ releaseRoom(room) recycles empty, non-persistent rooms.`,
       const existing = await self.getRoomDataAt(x, y, z);
       if (existing) return existing;
 
-      // Determine room type from terrain + z
-      const terrain = await self.getTerrainAt(x, y);
-      let roomType = null;
+      // Generate terrain-appropriate hint
+      const hint = await self.getLocationHint(x, y, z);
 
-      if (terrain === 'water') {
-        if (z === 0) {
-          roomType = $waterRoom;
-        } else if (z < 0) {
-          roomType = $underwaterRoom;
-        } else {
-          roomType = $airspaceRoom;  // Above water
-        }
-      } else if (z > 0) {
-        roomType = $airspaceRoom;  // Any terrain can have airspace
-      } else {
-        // Urban/badlands at z <= 0 - must be pre-built
-        return null;
-      }
-
-      if (!roomType) return null;
-
-      // Create the dynamic room
-      const room = await $recycler.create(roomType, {
+      // Create empty room with coordinates
+      const room = await $recycler.create($room, {
         x: x,
         y: y,
         z: z,
       });
 
-      // Track for cleanup
-      const key = x + ',' + y + ',' + z;
-      const dynamicRooms = self.dynamicRooms || {};
-      dynamicRooms[key] = room;
-      self.dynamicRooms = dynamicRooms;
+      // Let $builder set name, description, and create exits
+      await $builder.build(room, hint);
 
       return room;
       `,
     );
 
-    // releaseRoom(room) - Release a dynamic room for potential recycling
+    // Legacy alias for compatibility
     this.spatial.setMethod(
-      'releaseRoom',
+      'getOrCreateRoom',
       `
-      /** Release a dynamic room, recycling if empty and not persistent.
-       * @param room - The room to potentially recycle
-       */
-      const room = args[0];
-      if (!room) return;
-
-      // Only dynamic rooms can be released
-      const key = room.x + ',' + room.y + ',' + room.z;
-      const dynamicRooms = self.dynamicRooms || {};
-      if (!dynamicRooms[key]) return;  // Not a dynamic room
-
-      // Check persistence
-      if (room.persistent) return;  // Never recycle persistent rooms
-      if (room.hasModifications) return;  // Keep modified rooms
-
-      // Check if room has contents
-      const contents = room.contents || [];
-      if (contents.length > 0) return;  // Still has contents
-
-      // Safe to recycle
-      delete dynamicRooms[key];
-      self.dynamicRooms = dynamicRooms;
-
-      await $recycler.recycle(room);
-      `,
-    );
-
-    // getDynamicRoomCount() - Get count of active dynamic rooms
-    this.spatial.setMethod(
-      'getDynamicRoomCount',
-      `
-      /** Get count of active dynamic rooms */
-      const dynamicRooms = self.dynamicRooms || {};
-      return Object.keys(dynamicRooms).length;
+      /** Legacy alias for ensureRoom. Use ensureRoom instead. */
+      return await self.ensureRoom(args[0], args[1], args[2]);
       `,
     );
 
@@ -554,19 +541,16 @@ releaseRoom(room) recycles empty, non-persistent rooms.`,
       const roomIndex = self.roomIndex || {};
       const columnIndex = self.columnIndex || {};
       const terrainIndex = self.terrainIndex || {};
-      const dynamicRooms = self.dynamicRooms || {};
+      const lastRebuild = self.lastRebuild;
 
       const roomCount = Object.keys(roomIndex).length;
       const columnCount = Object.keys(columnIndex).length;
       const terrainOverrides = Object.keys(terrainIndex).length;
-      const dynamicCount = Object.keys(dynamicRooms).length;
-      const lastRebuild = self.lastRebuild;
 
       let status = 'Spatial Index\\n';
       status += '  Rooms indexed: ' + roomCount + '\\n';
       status += '  Unique columns: ' + columnCount + '\\n';
       status += '  Terrain overrides: ' + terrainOverrides + '\\n';
-      status += '  Dynamic rooms: ' + dynamicCount + '\\n';
 
       if (lastRebuild) {
         const ago = Math.round((Date.now() - lastRebuild) / 1000);
@@ -574,6 +558,8 @@ releaseRoom(room) recycles empty, non-persistent rooms.`,
       } else {
         status += '  Last rebuild: never\\n';
       }
+
+      status += '\\nUse ensureRoom(x, y, z) to get or create rooms via $builder.';
 
       return status;
       `,
@@ -591,10 +577,6 @@ releaseRoom(room) recycles empty, non-persistent rooms.`,
     this.spatial.setPropertyDescription(
       'terrainIndex',
       'Map of "x,y" to terrain type override (sparse)',
-    );
-    this.spatial.setPropertyDescription(
-      'dynamicRooms',
-      'Map of "x,y,z" to dynamically created room objrefs',
     );
     this.spatial.setPropertyDescription(
       'lastRebuild',
