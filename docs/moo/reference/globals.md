@@ -20,7 +20,48 @@ const rooms = $query().prop('outdoor').equals(true).all();  // Fluent query buil
 | `$load(id)` | Load object by ID |
 | `$query()` | Fluent query builder for finding objects |
 | `$aiQuery(system, prompt, session?)` | Query Claude AI with MCP tools |
-| `$create({parent, properties})` | Create new object |
+| `$create({parent, properties})` | Low-level object creation |
+| `$.define(name, parent, options)` | Create a new type (prototype) |
+
+### $.define - Type Creation
+
+Creates a new type (prototype) with automatic aliasing. **This is the recommended first step when building new content.**
+
+```javascript
+// Define a new type (creates $securityCamera alias automatically)
+// Variable uses $ prefix to indicate it's a type alias
+const $securityCamera = await $.define('securityCamera', $device, {
+  properties: {
+    name: 'Security Camera',
+    recording: true,
+    abilities: 'Surveillance device. Logs events when recording.',
+  },
+  methods: {
+    toggle: `
+      self.recording = !self.recording;
+      return self.recording ? 'Recording started.' : 'Recording stopped.';
+    `
+  }
+});
+
+// Now create instances from the type
+const cam1 = await $recycler.create($securityCamera, { name: 'Lobby Camera' });
+const cam2 = await $recycler.create($securityCamera, { name: 'Entrance Camera' });
+```
+
+**Parameters:**
+- `name` - Type name (becomes the alias, e.g., `'securityCamera'` → `$securityCamera`)
+- `parent` - Parent type (must be another type, not an object)
+- `options.properties` - Default properties for instances
+- `options.methods` - Methods shared by all instances
+
+**Key differences from `$recycler.create()`:**
+- Creates a **type** (string ID) not an **object** (numeric ID)
+- Type is **permanent** (cannot be recycled)
+- **Auto-aliased** by name
+- Parent must be a **type**
+
+See [Types vs Objects](./types-vs-objects.md) for full documentation.
 
 ### $query - Fluent Query Builder
 
@@ -681,6 +722,7 @@ const id = await $[0].getAlias('myUtil');
 
 ## See Also
 
+- [Types vs Objects](./types-vs-objects.md) - When to use `$.define` vs `$recycler.create`
 - [Prototypes Reference](./prototypes.md) - Object types and inheritance
 - [Verb System](./verbs.md) - Player command handling
 - [Architecture](../architecture.md) - How methods execute

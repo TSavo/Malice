@@ -182,9 +182,52 @@ lockpick.setMethod('canPick', `
 - `door.force(agent)` → `agent.canForce(door)`
 - `npc.persuade(agent)` → `agent.canPersuade(npc)`
 
-### Growing the Spec: Prototypes vs Instances
+### The Golden Rule: Define Types, Then Create Objects
 
-When adding functionality, add to **prototypes**, not instances:
+**Always define a type first**, then create objects from it. This applies even for one-off objects.
+
+```typescript
+// ✅ GOOD: Define type, then create instances
+// Variable uses $ prefix to indicate it's a type alias
+const $securityCamera = await $.define('securityCamera', $device, {
+  properties: {
+    name: 'Security Camera',
+    recording: true,
+    abilities: 'Surveillance device. Logs events when recording.',
+  }
+});
+
+// Now create instances from the type
+await $recycler.create($securityCamera, { name: 'Lobby Camera' });
+await $recycler.create($securityCamera, { name: 'Entrance Camera' });
+
+// ❌ BAD: Creating objects directly from generic parents
+await $recycler.create($device, { name: 'Security Camera', recording: true });
+await $recycler.create($device, { name: 'Another Camera', recording: true });
+// ^ Duplicates properties, no shared behavior, no alias
+```
+
+**Why types first?**
+- **Auto-aliasing**: `$.define('foo', ...)` creates `$foo` automatically
+- **Reusability**: One type, many instances
+- **Maintainability**: Change the type, all instances inherit updates
+- **Organization**: Clear prototype hierarchy
+
+### Types vs Objects: Two-Tier System
+
+| Aspect | Types (`$.define`) | Objects (`$recycler.create`) |
+|--------|-------------------|------------------------------|
+| **ID Format** | String (e.g., `'bandage'`) | Numeric (e.g., `#42`) |
+| **Collection** | `types` | `objects` |
+| **Lifecycle** | Permanent | Recyclable |
+| **Aliasing** | Auto-aliased by name | Manual via `$.addAlias()` |
+| **Purpose** | Prototypes, templates | Game entities, instances |
+
+See [Types vs Objects Reference](moo/reference/types-vs-objects.md) for full details.
+
+### Growing the Spec: Modifying Existing Prototypes
+
+When adding functionality to **existing** types, modify the prototype:
 
 ```typescript
 // ❌ BAD: Adding abilities to a single instance
@@ -300,39 +343,61 @@ MCP tools allow you to create and modify objects without rebuilding. This is the
 
 ### Direct MOO Code Approach
 
-**IMPORTANT**: Write native MOO code using `execute_moo_code`. Use MOO's built-in capabilities directly:
+**IMPORTANT**: Write native MOO code using `execute_moo_code`. Use MOO's built-in capabilities directly.
+
+### The Golden Rule: Define Types, Then Create Objects
+
+**Always define a type first**, then create instances from it:
 
 ```typescript
-// ✅ Direct MOO code
+// ✅ Direct MOO code - the right way
 execute_moo_code({
   code: `
-    // Create object using $recycler
-    const lock = await $recycler.create($lock, {
-      name: "Combination Lock",
-      description: "A lock with a dial combination.",
-      combination: "12-34-56"
+    // 1. Define a new type (auto-creates $combinationLock alias)
+    // Variable uses $ prefix to indicate it's a type alias
+    const $combinationLock = await $.define('combinationLock', $lock, {
+      properties: {
+        name: 'Combination Lock',
+        description: 'A lock with a dial combination.',
+        combination: null,
+        abilities: 'Mechanical lock requiring 3-number combination.',
+      },
+      methods: {
+        canAccess: \\\`
+          const agent = args[0];
+          const input = args[1];
+          if (!self.combination) return true;
+          if (input === self.combination) return true;
+          return 'Wrong combination.';
+        \\\`
+      }
     });
 
-    // Add method directly
-    lock.setMethod("canAccess", \\\`
-      const agent = args[0];
-      const input = args[1];
-      if (!self.combination) return true;
-      if (input === self.combination) return true;
-      return 'Wrong combination.';
-    \\\`);
+    // 2. Create instances from the type
+    const lock1 = await $recycler.create($combinationLock, {
+      name: 'locker lock',
+      combination: '12-34-56'
+    });
 
-    // Edit method with find/replace (like file editing)
-    lock.editMethod("canAccess", "Wrong combination", "Try again");
-    // Returns: { success: true, code: '...' }
+    return { typeId: $combinationLock.id, instanceId: lock1.id };
+  `
+})
+```
 
-    // Get method source
-    const code = lock.getMethod("canAccess");
+### When Type Already Exists
 
-    // Register alias
-    await $.addAlias("combinationLock", lock.id);
+If the type already exists (like `$item`, `$room`, `$food`), create instances directly:
 
-    return {id: lock.id, name: lock.name};
+```typescript
+execute_moo_code({
+  code: `
+    // Create from existing type
+    const apple = await $recycler.create($food, {
+      name: 'apple',
+      calories: 50
+    });
+    await apple.moveTo(room);
+    return { id: apple.id };
   `
 })
 ```
@@ -340,7 +405,7 @@ execute_moo_code({
 **Why Direct MOO?**:
 - No wrapper layer - just pure MOO
 - Composable code with full JavaScript
-- Access to $, $load(), $recycler, all $aliases
+- Access to $, $load(), $recycler, $.define, all $aliases
 - If authenticated (HTTP Basic Auth), access to `player` variable
 
 ### Creating Objects via MCP (Legacy Examples)

@@ -18,25 +18,62 @@ Create prototypes and objects at runtime without server restart.
 
 ## Direct MOO Code: No Wrappers, Just MOO
 
-**IMPORTANT**: Write native MOO code using `execute_moo_code`. Use MOO's built-in capabilities directly - `$recycler`, `$load()`, object methods, property access.
+**IMPORTANT**: Write native MOO code using `execute_moo_code`. Use MOO's built-in capabilities directly - `$.define`, `$recycler`, `$load()`, object methods, property access.
+
+### The Golden Rule: Define Types, Then Create Objects
+
+**Always define a type first**, then create instances from it:
 
 ```typescript
 // ✅ Direct MOO code (the right way)
 execute_moo_code({
   code: `
-    // Use $recycler to create objects
-    const room = await $recycler.create($room, {
-      name: "Hall",
-      x: 0, y: 0, z: 0
+    // 1. Define a new type (creates $securityCamera alias automatically)
+    // Variable uses $ prefix to indicate it's a type alias
+    const $securityCamera = await $.define('securityCamera', $device, {
+      properties: {
+        name: 'Security Camera',
+        recording: true,
+        abilities: 'Surveillance device. Logs events when recording.',
+      },
+      methods: {
+        toggle: \`
+          self.recording = !self.recording;
+          return self.recording ? 'Recording.' : 'Stopped.';
+        \`
+      }
     });
 
-    // Create and move item
-    const torch = await $recycler.create($item, {
-      name: "torch"
-    });
+    // 2. Create instances from the type
+    const cam1 = await $recycler.create($securityCamera, { name: 'Lobby Camera' });
+    const cam2 = await $recycler.create($securityCamera, { name: 'Exit Camera' });
+
+    await cam1.moveTo(lobby);
+    await cam2.moveTo(entrance);
+
+    return { type: $securityCamera.id, instances: [cam1.id, cam2.id] };
+  `
+})
+```
+
+### Why Define Types First?
+
+| Benefit | Explanation |
+|---------|-------------|
+| **Reusability** | One type, many instances |
+| **Auto-aliasing** | `$.define('foo', ...)` creates `$foo` automatically |
+| **Maintainability** | Change the type, all instances inherit updates |
+| **Organization** | Clear prototype hierarchy |
+
+### Simple Instance Creation (when type already exists)
+
+```typescript
+execute_moo_code({
+  code: `
+    // Create from existing type
+    const torch = await $recycler.create($item, { name: "torch" });
     await torch.moveTo(room, player);
-
-    return {roomId: room.id, torchId: torch.id};
+    return { torchId: torch.id };
   `
 })
 ```
@@ -280,13 +317,53 @@ Use `ReadMcpResourceTool` with these URIs for **live game data**:
 | AI-created NPCs and storylines | Things that must exist at startup |
 | Testing method changes live | Performance-critical methods |
 
-## The Base/Impl Pattern
+## The Define-Then-Create Pattern
 
-Create a **base prototype** (reusable template) and then **instances** (implementations):
+Create a **type** (reusable template) and then **instances** from it. **This is the recommended pattern for all new content.**
 
-### Step 1: Create Base Prototype
+### Using $.define (Recommended)
 
 ```javascript
+execute_moo_code({
+  code: `
+    // 1. Define the type (auto-creates $combinationLock alias)
+    // Variable uses $ prefix to indicate it's a type alias
+    const $combinationLock = await $.define('combinationLock', $lock, {
+      properties: {
+        name: 'Combination Lock',
+        description: 'A lock with a dial combination.',
+        combination: null,
+        abilities: 'Mechanical lock requiring 3-number combination. Can be picked with lockpicks (hard).',
+      },
+      methods: {
+        canAccess: \`
+          const agent = args[0];
+          const input = args[1];
+          if (!self.combination) return true;
+          if (input === self.combination) return true;
+          return 'Wrong combination.';
+        \`
+      }
+    });
+
+    // 2. Create instances from the type
+    const lock1 = await $recycler.create($combinationLock, {
+      name: 'locker lock',
+      combination: '99-99-99'
+    });
+    await lock1.moveTo(locker);
+
+    return { typeId: $combinationLock.id, instanceId: lock1.id };
+  `
+})
+```
+
+### Legacy: Individual MCP Tool Calls
+
+If you need to use individual MCP tools (not recommended):
+
+```javascript
+// Step 1: Create prototype
 mcp__malice__create_object({
   parent: "$lock",
   properties: {
@@ -296,11 +373,8 @@ mcp__malice__create_object({
   }
 })
 // Returns: { objectId: 2500 }
-```
 
-### Step 2: Add Methods to Base
-
-```javascript
+// Step 2: Add methods
 mcp__malice__set_method({
   objectId: "#2500",
   name: "canAccess",
@@ -312,21 +386,15 @@ mcp__malice__set_method({
     return 'Wrong combination.';
   `
 })
-```
 
-### Step 3: Register Alias (Optional)
-
-```javascript
+// Step 3: Register alias manually
 mcp__malice__call_method({
   objectId: "#0",
   name: "addAlias",
   args: ["combinationLock", 2500]
 })
-```
 
-### Step 4: Create Instances
-
-```javascript
+// Step 4: Create instances
 mcp__malice__spawn_item({
   prototypeId: "$combinationLock",
   locationId: "#100",
@@ -336,6 +404,11 @@ mcp__malice__spawn_item({
   }
 })
 ```
+
+**Note**: `$.define` is preferred because it:
+- Automatically registers the alias
+- Stores the type in the `types` collection (permanent)
+- Provides a cleaner, single-step creation
 
 ## Method Code Globals
 
