@@ -43,6 +43,9 @@ export class VehicleBuilder implements Builder {
             { name: 'driver door', side: 'left', locked: false, lock: null },
             { name: 'passenger door', side: 'right', locked: false, lock: null },
           ],
+          // Multi-room support (all vehicles are multi-room by default)
+          internalRooms: [], // Array of room refs - for simple vehicles, populated with [self] after creation
+          entryRoom: null, // Which room to enter when boarding - for simple vehicles, set to self after creation
           // Combat/damage
           damage: 0, // Body damage 0-100
           armor: 5, // Damage reduction from exterior attacks
@@ -55,11 +58,18 @@ export class VehicleBuilder implements Builder {
           abilities: `Vehicle that carries passengers between outdoor locations via roads/exits.
 Cannot go indoors. Passengers must exit before entering buildings.
 
+MULTI-ROOM: ALL vehicles are multi-room by default.
+- 'internalRooms' array contains rooms inside the vehicle
+- 'entryRoom' is where you enter when boarding
+- Simple vehicles: internalRooms = [self], entryRoom = self (the vehicle IS its room)
+- Complex vehicles: internalRooms = [cab, cargo, ...], each is a $vehicleRoom
+- Use $vehicleExit for doors/exits leading outside (getDestination() returns vehicle.location)
+
 PARTS: 'parts' array holds installed $vehiclePart objects. 'requiredParts' lists
 partTypes needed - all must be functional (condition > 20, damage < 80).
 
 ENTERING: When not traveling ('travelState' is null) and door unlocked,
-agent can enter via enterVehicle(). Adds to seat's 'occupied' array.
+agent can enter via enterVehicle(). Moves them to entryRoom.
 
 DRIVING: Only agent in driver seat can drive. Requires 'engineRunning'
 true and fuel > 0. Call drive(direction) to travel via that exit.
@@ -68,11 +78,11 @@ Travel time = exit.distance / engine.maxSpeed.
 STOPPING: Driver can stop mid-travel. Vehicle stays in current room.
 Partial fuel consumed.
 
-EXITING: When not traveling, passengers can exit through unlocked doors.
-Move them to the room the vehicle is in (self.location).
+EXITING: Use $vehicleExit exits to leave. They resolve to vehicle.location.
+Player walks through exit like any normal room exit.
 
-PERCEPTION: Looking shows vehicle interior only. 'lookOutside' shows
-the current room/street.
+PERCEPTION: Looking shows current internal room. 'lookOutside' shows
+the current room/street where vehicle is parked.
 
 FUEL: Stored in fuelTank part. Driving consumes based on distance and
 engine efficiency. Empty tank = engine stops.
@@ -712,8 +722,12 @@ LOCKING: Doors can be locked. Door's 'lock' is objref to $lock object.`,
 
       // TODO: Check door is unlocked
 
-      // Move agent into vehicle
-      const moveResult = await agent.moveTo(self, agent);
+      // Determine entry room (multi-room support)
+      // entryRoom is where the agent enters - for simple vehicles, this is self
+      const entry = self.entryRoom || self;
+
+      // Move agent into entry room
+      const moveResult = await agent.moveTo(entry, agent);
       if (moveResult && typeof moveResult === 'string') {
         return moveResult; // Return error from moveTo
       }
@@ -936,7 +950,81 @@ LOCKING: Doors can be locked. Door's 'lock' is objref to $lock object.`,
     `,
     );
 
+    // ============== MULTI-ROOM SETUP ==============
+
+    obj.setMethod(
+      'initAsSimpleVehicle',
+      `
+      /**
+       * Initialize this vehicle as a simple single-room vehicle.
+       * Sets internalRooms = [self] and entryRoom = self.
+       * Creates a default 'door' vehicleExit.
+       * Call this after creating a new vehicle instance.
+       */
+      // Set defaults
+      self.internalRooms = [self];
+      self.entryRoom = self;
+
+      // Create default vehicle exit (door leading outside)
+      if ($vehicleExit) {
+        const door = await $recycler.create($vehicleExit, {
+          name: 'door',
+          aliases: ['out', 'outside', 'exit', 'leave'],
+          source: self
+        });
+        // Add to exits
+        self.exits = self.exits || [];
+        self.exits.push(door);
+      }
+
+      return true;
+    `,
+    );
+
+    obj.setMethod(
+      'getInternalRooms',
+      `
+      /**
+       * Get all internal rooms in this vehicle.
+       * @returns Array of room objects
+       */
+      return self.internalRooms || [self];
+    `,
+    );
+
+    obj.setMethod(
+      'addInternalRoom',
+      `
+      /**
+       * Add an internal room to this vehicle.
+       * For multi-room vehicles, also set room.vehicle = self.
+       * @param room - The $vehicleRoom to add
+       */
+      const room = args[0];
+      if (!room) return;
+
+      // Set room's vehicle reference
+      room.vehicle = self;
+
+      // Add to internalRooms
+      self.internalRooms = self.internalRooms || [];
+      if (!self.internalRooms.includes(room)) {
+        self.internalRooms.push(room);
+      }
+
+      return true;
+    `,
+    );
+
     // Property descriptions
+    obj.setPropertyDescription(
+      'internalRooms',
+      'Array of rooms inside this vehicle. Simple vehicles: [self]. Multi-room: [$vehicleRoom, ...]',
+    );
+    obj.setPropertyDescription(
+      'entryRoom',
+      'The room where passengers enter when boarding. Simple vehicles: self.',
+    );
     obj.setPropertyDescription(
       'parts',
       'Array of installed $vehiclePart objrefs.',
