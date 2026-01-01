@@ -165,6 +165,12 @@ export { BedBuilder } from './bed-builder';
 export { TableBuilder } from './table-builder';
 export { DeskBuilder } from './desk-builder';
 export { CouchBuilder } from './couch-builder';
+export { WardrobeBuilder } from './wardrobe-builder';
+export { TrunkBuilder } from './trunk-builder';
+export { CabinetBuilder } from './cabinet-builder';
+export { SafeBuilder } from './safe-builder';
+export { CrateBuilder } from './crate-builder';
+export { DumpsterBuilder } from './dumpster-builder';
 // Climbing
 export { LadderBuilder } from './ladder-builder';
 // Wound system
