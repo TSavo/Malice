@@ -41,7 +41,7 @@ export class AircraftBuilder implements Builder {
           maxAltitude: 200, // Maximum z-level (600m)
           climbRate: 1, // z-levels per minute (not used for instant movement)
           // Override required parts for aircraft
-          requiredParts: ['engine', 'fuelTank', 'battery', 'rotor'],
+          requiredParts: ['engine', 'fuelTank', 'battery'],
           // AI-readable abilities
           abilities: `Aircraft capable of 3D flight through airspace.
 
