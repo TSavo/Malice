@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../types/object';
 import type { ObjectManager } from '../object-manager';
-import { registerBuilder, type Builder } from './builder-registry';
+import { type Builder, registerBuilder } from './builder-registry';
 
 /**
  * Builds the Sister Gray system object.
@@ -48,20 +48,20 @@ export class SisterGrayBuilder implements Builder {
       '# Sister Gray Prompt\n\nFailed to load from $.aiPrompts';
 
     this.sisterGray = await this.manager.create({
-        parent: parent,
-        properties: {
-          name: 'Sister Gray',
-          description:
-            'The woman who runs the underground. Elena Vasquez Gray. The heir who inherited ashes.',
-          // What Sister Gray has learned through her network
-          sensoryHistory: [],
-          historyLimit: 100,
-          // Her location in the world
-          location: null, // Will be set to Sister's Quarters
-          // The system prompt for AI interactions (loaded from docs/prompts/SISTER-GRAY.md)
-          agentSystemPrompt: systemPrompt,
+      parent: parent,
+      properties: {
+        name: 'Sister Gray',
+        description:
+          'The woman who runs the underground. Elena Vasquez Gray. The heir who inherited ashes.',
+        // What Sister Gray has learned through her network
+        sensoryHistory: [],
+        historyLimit: 100,
+        // Her location in the world
+        location: null, // Will be set to Sister's Quarters
+        // The system prompt for AI interactions (loaded from docs/prompts/SISTER-GRAY.md)
+        agentSystemPrompt: systemPrompt,
 
-          abilities: `Leader of the Gray Cartel. Elena Vasquez Gray. Controls the Seattle Underground.
+        abilities: `Leader of the Gray Cartel. Elena Vasquez Gray. Controls the Seattle Underground.
 
 PERCEPTION: Perceives through network of operatives. 'sensoryHistory' logs reports from Cutters, Runners, Sparks, Ghosts, Keepers. Dead drops and physical marks - no electronic trails.
 
@@ -76,9 +76,9 @@ NPCS: Spawns operatives via $ai.spawn(). Cutters (combat), Runners (couriers), S
 LIMITATIONS: Cannot act on surface directly - flagged hostile. Needs players as hands above ground. 60 loyal operatives, dwindling resources.
 
 THE MASK: Holds Pluribus's Mask but cannot use it (flagged hostile). Looking for someone clean who could wear it and answer to her.`,
-        },
-        methods: {},
-      })!;
+      },
+      methods: {},
+    })!;
 
     // Property descriptions
     this.sisterGray.setPropertyDescription(

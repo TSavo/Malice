@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
-import { registerBuilder, type Builder } from '../builder-registry';
+import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Builds the BodyPart type
@@ -30,7 +30,6 @@ export class BodyPartBuilder implements Builder {
   constructor(private manager: ObjectManager) {}
 
   async build(): Promise<void> {
-
     const existing = await this.manager.load('bodyPart');
     if (existing) {
       this.obj = existing;
@@ -1534,7 +1533,7 @@ DECAY: Attached parts don't decay (maintained by living body). Severed parts dec
   }
 
   async registerAliases(): Promise<void> {
-    console.log('[BodyPartBuilder] Type \'bodyPart\' auto-aliased');
+    console.log("[BodyPartBuilder] Type 'bodyPart' auto-aliased");
   }
 }
 

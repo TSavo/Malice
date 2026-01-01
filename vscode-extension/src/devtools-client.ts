@@ -153,8 +153,13 @@ export class DevToolsClient {
       throw new Error('Not connected to DevTools server (ws is null)');
     }
     if (this.ws.readyState !== WebSocket.OPEN) {
-      console.error('[DevTools] WebSocket not open, state:', this.ws.readyState);
-      throw new Error(`Not connected to DevTools server (state: ${this.ws.readyState})`);
+      console.error(
+        '[DevTools] WebSocket not open, state:',
+        this.ws.readyState,
+      );
+      throw new Error(
+        `Not connected to DevTools server (state: ${this.ws.readyState})`,
+      );
     }
 
     const id = this.nextId++;

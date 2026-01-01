@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../types/object';
 import type { ObjectManager } from '../object-manager';
-import { registerBuilder, type Builder } from './builder-registry';
+import { type Builder, registerBuilder } from './builder-registry';
 
 /**
  * Builds the $.cash utility object
@@ -352,7 +352,6 @@ NOTE: Physical cash is contraband. Possession is illegal. Use $bank for legal cr
       };
     `,
     );
-
   }
 
   async registerAliases(): Promise<void> {

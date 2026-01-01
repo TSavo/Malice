@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
-import { registerBuilder, type Builder } from '../builder-registry';
+import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Builds the Wound type
@@ -39,9 +39,9 @@ export class WoundBuilder implements Builder {
 
       this.obj = await this.manager.define('wound', parentObj, {
         properties: {
-        name: 'Wound',
-        description: 'A wound.',
-        abilities: `Physical injury that exists on a body part. Wounds have complex lifecycle physics:
+          name: 'Wound',
+          description: 'A wound.',
+          abilities: `Physical injury that exists on a body part. Wounds have complex lifecycle physics:
 
 BLEEDING: Wounds bleed based on type, depth, and severity. Cuts and lacerations bleed more than bruises or burns. Deep wounds bleed more than superficial ones. Arterial bleeding is severe and life-threatening. Blood loss drains both hydration (blood is mostly water) and calories (blood carries nutrients and energy). Bleeding naturally slows over time as blood clots form. Bandaging accelerates clotting. Stitching nearly stops bleeding for cuts. Movement or aggravation can reopen wounds and restart bleeding.
 
@@ -56,35 +56,35 @@ TREATMENT: Wounds can be cleaned with water, antiseptic, or medical supplies. Qu
 FORENSICS: Wounds preserve evidence of how they were inflicted. The type and pattern reveal the weapon or cause. Age can be estimated from clotting, healing, and tissue changes. Treatment history is visible (stitches, bandage remnants, cleaning). Infection and decay can obscure details. Skilled examiners extract more information. Useful for autopsies and investigations.
 
 AGGRAVATION: Physical stress, impacts, or movement can aggravate healing wounds. Aggravation increases bleeding and pain, reverses healing progress, and can knock off bandages. Fighting while wounded risks aggravation. Strenuous activity on injured limbs aggravates wounds.`,
-        // Wound type: cut, bruise, puncture, burn, laceration, abrasion, fracture
-        type: 'cut',
-        // Severity 0-100 (minor scrape to life-threatening)
-        severity: 20,
-        // Depth affects healing time and infection risk
-        // 'superficial', 'shallow', 'deep', 'penetrating'
-        depth: 'shallow',
-        // Reference to the body part this wound is on
-        bodyPart: null,
-        // Bleeding rate 0-100 (0 = not bleeding, 100 = arterial)
-        bleeding: 0,
-        // Infection state
-        infected: false,
-        infectionSeverity: 0, // 0-100
-        infectionType: null, // 'bacterial', 'necrotic', 'septic'
-        // Healing progress 0-100 (100 = fully healed)
-        healingProgress: 0,
-        // Treatment state
-        cleaned: false, // Has been cleaned/disinfected
-        bandaged: false, // Has been bandaged
-        stitched: false, // Has been stitched (for deep cuts)
-        // Pain level 0-100
-        painLevel: 20,
-        // When inflicted (game tick)
-        inflictedTick: 0,
-        // What caused it (for autopsy/forensics)
-        cause: null, // 'blade', 'blunt', 'claw', 'bite', 'fire', 'acid'
-        // Attacker reference (if any)
-        attacker: null,
+          // Wound type: cut, bruise, puncture, burn, laceration, abrasion, fracture
+          type: 'cut',
+          // Severity 0-100 (minor scrape to life-threatening)
+          severity: 20,
+          // Depth affects healing time and infection risk
+          // 'superficial', 'shallow', 'deep', 'penetrating'
+          depth: 'shallow',
+          // Reference to the body part this wound is on
+          bodyPart: null,
+          // Bleeding rate 0-100 (0 = not bleeding, 100 = arterial)
+          bleeding: 0,
+          // Infection state
+          infected: false,
+          infectionSeverity: 0, // 0-100
+          infectionType: null, // 'bacterial', 'necrotic', 'septic'
+          // Healing progress 0-100 (100 = fully healed)
+          healingProgress: 0,
+          // Treatment state
+          cleaned: false, // Has been cleaned/disinfected
+          bandaged: false, // Has been bandaged
+          stitched: false, // Has been stitched (for deep cuts)
+          // Pain level 0-100
+          painLevel: 20,
+          // When inflicted (game tick)
+          inflictedTick: 0,
+          // What caused it (for autopsy/forensics)
+          cause: null, // 'blade', 'blunt', 'claw', 'bite', 'fire', 'acid'
+          // Attacker reference (if any)
+          attacker: null,
         },
         methods: {},
       });

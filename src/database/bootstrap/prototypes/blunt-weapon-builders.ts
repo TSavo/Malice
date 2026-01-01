@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
-import { registerBuilder, type Builder } from '../builder-registry';
+import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Blunt Weapon Types
@@ -71,7 +71,8 @@ export class BluntWeaponPrototypesBuilder implements Builder {
 
   async build(): Promise<void> {
     const parent = await this.manager.load('weapon');
-    if (!parent) throw new Error('BluntWeaponPrototypesBuilder: weapon type not found');
+    if (!parent)
+      throw new Error('BluntWeaponPrototypesBuilder: weapon type not found');
 
     // Base blunt (inherits from weapon)
     let blunt = await this.manager.load('blunt');
@@ -143,17 +144,21 @@ NO MAINTENANCE: Blunt weapons don't need sharpening. Durable. May bend or crack 
     if (existing_baseballBat) {
       this.weapons.baseballBat = existing_baseballBat;
     } else {
-      this.weapons.baseballBat = await this.manager.define('baseballBat', club, {
-        properties: {
-          name: 'Baseball Bat',
-          description:
-            "A wooden or aluminum bat. America's favorite melee weapon.",
-          skill: 'club',
-          damage: 25,
-          damageType: 'bruise',
+      this.weapons.baseballBat = await this.manager.define(
+        'baseballBat',
+        club,
+        {
+          properties: {
+            name: 'Baseball Bat',
+            description:
+              "A wooden or aluminum bat. America's favorite melee weapon.",
+            skill: 'club',
+            damage: 25,
+            damageType: 'bruise',
+          },
+          methods: {},
         },
-        methods: {},
-      });
+      );
     }
 
     const existing_baton = await this.manager.load('baton');
@@ -163,7 +168,8 @@ NO MAINTENANCE: Blunt weapons don't need sharpening. Durable. May bend or crack 
       this.weapons.baton = await this.manager.define('baton', club, {
         properties: {
           name: 'Baton',
-          description: 'A short club. Designed for control rather than killing.',
+          description:
+            'A short club. Designed for control rather than killing.',
           skill: 'club',
           damage: 15,
           damageType: 'bruise',
@@ -327,49 +333,61 @@ NO MAINTENANCE: Blunt weapons don't need sharpening. Durable. May bend or crack 
     if (existing_clawHammer) {
       this.weapons.clawHammer = existing_clawHammer;
     } else {
-      this.weapons.clawHammer = await this.manager.define('clawHammer', hammer, {
-        properties: {
-          name: 'Claw Hammer',
-          description: "A carpenter's hammer with a nail-pulling claw.",
-          skill: 'hammer',
-          damage: 18,
-          damageType: 'bruise',
+      this.weapons.clawHammer = await this.manager.define(
+        'clawHammer',
+        hammer,
+        {
+          properties: {
+            name: 'Claw Hammer',
+            description: "A carpenter's hammer with a nail-pulling claw.",
+            skill: 'hammer',
+            damage: 18,
+            damageType: 'bruise',
+          },
+          methods: {},
         },
-        methods: {},
-      });
+      );
     }
 
     const existing_sledgehammer = await this.manager.load('sledgehammer');
     if (existing_sledgehammer) {
       this.weapons.sledgehammer = existing_sledgehammer;
     } else {
-      this.weapons.sledgehammer = await this.manager.define('sledgehammer', hammer, {
-        properties: {
-          name: 'Sledgehammer',
-          description: 'A massive two-handed hammer. Demolition tool.',
-          skill: 'hammer',
-          damage: 40,
-          damageType: 'bruise',
-          twoHanded: true, // Heavy, requires two hands
+      this.weapons.sledgehammer = await this.manager.define(
+        'sledgehammer',
+        hammer,
+        {
+          properties: {
+            name: 'Sledgehammer',
+            description: 'A massive two-handed hammer. Demolition tool.',
+            skill: 'hammer',
+            damage: 40,
+            damageType: 'bruise',
+            twoHanded: true, // Heavy, requires two hands
+          },
+          methods: {},
         },
-        methods: {},
-      });
+      );
     }
 
     const existing_ballPeenHammer = await this.manager.load('ballPeenHammer');
     if (existing_ballPeenHammer) {
       this.weapons.ballPeenHammer = existing_ballPeenHammer;
     } else {
-      this.weapons.ballPeenHammer = await this.manager.define('ballPeenHammer', hammer, {
-        properties: {
-          name: 'Ball Peen Hammer',
-          description: "A machinist's hammer with a rounded head.",
-          skill: 'hammer',
-          damage: 16,
-          damageType: 'bruise',
+      this.weapons.ballPeenHammer = await this.manager.define(
+        'ballPeenHammer',
+        hammer,
+        {
+          properties: {
+            name: 'Ball Peen Hammer',
+            description: "A machinist's hammer with a rounded head.",
+            skill: 'hammer',
+            damage: 16,
+            damageType: 'bruise',
+          },
+          methods: {},
         },
-        methods: {},
-      });
+      );
     }
 
     const existing_mallet = await this.manager.load('mallet');
@@ -379,7 +397,8 @@ NO MAINTENANCE: Blunt weapons don't need sharpening. Durable. May bend or crack 
       this.weapons.mallet = await this.manager.define('mallet', hammer, {
         properties: {
           name: 'Mallet',
-          description: 'A wooden or rubber mallet. Less lethal but still hurts.',
+          description:
+            'A wooden or rubber mallet. Less lethal but still hurts.',
           skill: 'hammer',
           damage: 12,
           damageType: 'bruise',
@@ -396,7 +415,8 @@ NO MAINTENANCE: Blunt weapons don't need sharpening. Durable. May bend or crack 
       staff = await this.manager.define('staff', blunt, {
         properties: {
           name: 'Staff',
-          description: 'A long wooden pole. Simple but effective with training.',
+          description:
+            'A long wooden pole. Simple but effective with training.',
           skill: 'staff',
           damage: 15,
           damageType: 'bruise',
@@ -428,16 +448,21 @@ NO MAINTENANCE: Blunt weapons don't need sharpening. Durable. May bend or crack 
     if (existing_walkingStick) {
       this.weapons.walkingStick = existing_walkingStick;
     } else {
-      this.weapons.walkingStick = await this.manager.define('walkingStick', staff, {
-        properties: {
-          name: 'Walking Stick',
-          description: 'A sturdy cane or walking stick. Innocuous until swung.',
-          skill: 'staff',
-          damage: 12,
-          damageType: 'bruise',
+      this.weapons.walkingStick = await this.manager.define(
+        'walkingStick',
+        staff,
+        {
+          properties: {
+            name: 'Walking Stick',
+            description:
+              'A sturdy cane or walking stick. Innocuous until swung.',
+            skill: 'staff',
+            damage: 12,
+            damageType: 'bruise',
+          },
+          methods: {},
         },
-        methods: {},
-      });
+      );
     }
 
     const existing_poolCue = await this.manager.load('poolCue');
@@ -447,7 +472,8 @@ NO MAINTENANCE: Blunt weapons don't need sharpening. Durable. May bend or crack 
       this.weapons.poolCue = await this.manager.define('poolCue', staff, {
         properties: {
           name: 'Pool Cue',
-          description: 'A bar pool cue. Breaks easily but good for a quick jab.',
+          description:
+            'A bar pool cue. Breaks easily but good for a quick jab.',
           skill: 'staff',
           damage: 10,
           damageType: 'bruise',
@@ -478,16 +504,20 @@ NO MAINTENANCE: Blunt weapons don't need sharpening. Durable. May bend or crack 
     if (existing_morningstar) {
       this.weapons.morningstar = existing_morningstar;
     } else {
-      this.weapons.morningstar = await this.manager.define('morningstar', mace, {
-        properties: {
-          name: 'Morningstar',
-          description: 'A spiked ball on a handle. Medieval brutality.',
-          skill: 'mace',
-          damage: 35,
-          damageType: 'puncture',
+      this.weapons.morningstar = await this.manager.define(
+        'morningstar',
+        mace,
+        {
+          properties: {
+            name: 'Morningstar',
+            description: 'A spiked ball on a handle. Medieval brutality.',
+            skill: 'mace',
+            damage: 35,
+            damageType: 'puncture',
+          },
+          methods: {},
         },
-        methods: {},
-      });
+      );
     }
 
     // Hand weapons (inherit from blunt)
@@ -495,17 +525,21 @@ NO MAINTENANCE: Blunt weapons don't need sharpening. Durable. May bend or crack 
     if (existing_brassKnuckles) {
       this.weapons.brassKnuckles = existing_brassKnuckles;
     } else {
-      this.weapons.brassKnuckles = await this.manager.define('brassKnuckles', blunt, {
-        properties: {
-          name: 'Brass Knuckles',
-          description:
-            'Metal rings worn over the fingers. Adds weight to punches.',
-          skill: 'brawling',
-          damage: 12,
-          damageType: 'bruise',
+      this.weapons.brassKnuckles = await this.manager.define(
+        'brassKnuckles',
+        blunt,
+        {
+          properties: {
+            name: 'Brass Knuckles',
+            description:
+              'Metal rings worn over the fingers. Adds weight to punches.',
+            skill: 'brawling',
+            damage: 12,
+            damageType: 'bruise',
+          },
+          methods: {},
         },
-        methods: {},
-      });
+      );
     }
 
     const existing_sapGloves = await this.manager.load('sapGloves');
@@ -600,7 +634,8 @@ NO MAINTENANCE: Blunt weapons don't need sharpening. Durable. May bend or crack 
       this.weapons.flail = await this.manager.define('flail', chain, {
         properties: {
           name: 'Flail',
-          description: 'A spiked ball on a chain attached to a handle. Medieval.',
+          description:
+            'A spiked ball on a chain attached to a handle. Medieval.',
           skill: 'chain',
           damage: 28,
           damageType: 'bruise',
@@ -610,11 +645,16 @@ NO MAINTENANCE: Blunt weapons don't need sharpening. Durable. May bend or crack 
       });
     }
 
-    console.log(`✅ Built ${Object.keys(this.weapons).length} blunt weapon prototypes`);
+    console.log(
+      `✅ Built ${Object.keys(this.weapons).length} blunt weapon prototypes`,
+    );
   }
 
   async registerAliases(): Promise<void> {
-    console.log('[BluntWeaponPrototypesBuilder] Types auto-aliased:', BluntWeaponPrototypesBuilder.provides.join(', '));
+    console.log(
+      '[BluntWeaponPrototypesBuilder] Types auto-aliased:',
+      BluntWeaponPrototypesBuilder.provides.join(', '),
+    );
   }
 }
 

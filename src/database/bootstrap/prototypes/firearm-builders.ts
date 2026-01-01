@@ -1,5 +1,5 @@
 import type { ObjectManager } from '../../object-manager';
-import { registerBuilder, type Builder } from '../builder-registry';
+import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Firearm Types
@@ -442,7 +442,8 @@ export class SemiAutoPistolBuilder implements Builder {
     if (await this.manager.load('semiAutoPistol')) return;
 
     const parent = await this.manager.load('pistol');
-    if (!parent) throw new Error('SemiAutoPistolBuilder: pistol type not found');
+    if (!parent)
+      throw new Error('SemiAutoPistolBuilder: pistol type not found');
 
     await this.manager.define('semiAutoPistol', parent, {
       properties: {
@@ -550,7 +551,8 @@ export class M1911Builder implements Builder {
     await this.manager.define('m1911', parent, {
       properties: {
         name: 'M1911',
-        description: 'The classic .45 ACP semi-automatic. American military icon.',
+        description:
+          'The classic .45 ACP semi-automatic. American military icon.',
         skill: 'pistol',
         damage: 42,
         damageType: 'puncture',
@@ -619,7 +621,8 @@ export class BoltActionRifleBuilder implements Builder {
     if (await this.manager.load('boltActionRifle')) return;
 
     const parent = await this.manager.load('rifle');
-    if (!parent) throw new Error('BoltActionRifleBuilder: rifle type not found');
+    if (!parent)
+      throw new Error('BoltActionRifleBuilder: rifle type not found');
 
     await this.manager.define('boltActionRifle', parent, {
       properties: {
@@ -655,7 +658,8 @@ export class LeverActionRifleBuilder implements Builder {
     if (await this.manager.load('leverActionRifle')) return;
 
     const parent = await this.manager.load('rifle');
-    if (!parent) throw new Error('LeverActionRifleBuilder: rifle type not found');
+    if (!parent)
+      throw new Error('LeverActionRifleBuilder: rifle type not found');
 
     await this.manager.define('leverActionRifle', parent, {
       properties: {
@@ -677,7 +681,9 @@ export class LeverActionRifleBuilder implements Builder {
   }
 
   async registerAliases(): Promise<void> {
-    console.log("[LeverActionRifleBuilder] Type 'leverActionRifle' auto-aliased");
+    console.log(
+      "[LeverActionRifleBuilder] Type 'leverActionRifle' auto-aliased",
+    );
   }
 }
 
@@ -772,7 +778,8 @@ export class ShotgunBuilder implements Builder {
     await this.manager.define('shotgun', parent, {
       properties: {
         name: 'Shotgun',
-        description: 'A smoothbore long gun firing shot shells. Devastating up close.',
+        description:
+          'A smoothbore long gun firing shot shells. Devastating up close.',
         skill: 'shotgun',
         damage: 55,
         damageType: 'puncture',
@@ -839,12 +846,14 @@ export class SawnOffShotgunBuilder implements Builder {
     if (await this.manager.load('sawnOffShotgun')) return;
 
     const parent = await this.manager.load('shotgun');
-    if (!parent) throw new Error('SawnOffShotgunBuilder: shotgun type not found');
+    if (!parent)
+      throw new Error('SawnOffShotgunBuilder: shotgun type not found');
 
     await this.manager.define('sawnOffShotgun', parent, {
       properties: {
         name: 'Sawn-Off Shotgun',
-        description: 'A shotgun with the barrel cut down. Concealable, brutal spread.',
+        description:
+          'A shotgun with the barrel cut down. Concealable, brutal spread.',
         skill: 'shotgun',
         damage: 50,
         damageType: 'puncture',
@@ -879,7 +888,8 @@ export class DoubleBarrelBuilder implements Builder {
     await this.manager.define('doubleBarrel', parent, {
       properties: {
         name: 'Double Barrel Shotgun',
-        description: 'A break-action two-barrel shotgun. Two shots, then reload.',
+        description:
+          'A break-action two-barrel shotgun. Two shots, then reload.',
         skill: 'shotgun',
         damage: 55,
         damageType: 'puncture',
@@ -1091,7 +1101,8 @@ export class Tec9Builder implements Builder {
     await this.manager.define('tec9', parent, {
       properties: {
         name: 'TEC-9',
-        description: 'A semi-auto pistol easily converted to full-auto. Gang gun.',
+        description:
+          'A semi-auto pistol easily converted to full-auto. Gang gun.',
         skill: 'smg',
         damage: 30,
         damageType: 'puncture',

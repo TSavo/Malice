@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
-import { registerBuilder, type Builder } from '../builder-registry';
+import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Builds the Wearable type
@@ -40,28 +40,28 @@ export class WearableBuilder implements Builder {
 
       this.obj = await this.manager.define('wearable', describable, {
         properties: {
-        name: 'Wearable',
-        description: 'Something that can be worn',
-        // Which body part slots this covers
-        // Common slots: head, face, neck, torso, back, waist,
-        //               leftArm, rightArm, hands, leftLeg, rightLeg, feet
-        covers: [],
-        // Layer for stacking (lower = closer to skin)
-        // 1=underwear, 2=base layer, 3=mid layer, 4=outer layer, 5=outerwear
-        layer: 2,
-        // Warmth provided (0-100, affects cold survival)
-        warmth: 0,
-        // Protection provided (0-100, damage reduction)
-        protection: 0,
-        // Currently worn on which body part (null if not worn)
-        wornOn: null,
-        // Currently worn by which player (null if not worn)
-        wornBy: null,
-        // Description shown when worn (replaces naked description)
-        // If null, uses the item's name in a generic phrase
-        wornDescription: null,
+          name: 'Wearable',
+          description: 'Something that can be worn',
+          // Which body part slots this covers
+          // Common slots: head, face, neck, torso, back, waist,
+          //               leftArm, rightArm, hands, leftLeg, rightLeg, feet
+          covers: [],
+          // Layer for stacking (lower = closer to skin)
+          // 1=underwear, 2=base layer, 3=mid layer, 4=outer layer, 5=outerwear
+          layer: 2,
+          // Warmth provided (0-100, affects cold survival)
+          warmth: 0,
+          // Protection provided (0-100, damage reduction)
+          protection: 0,
+          // Currently worn on which body part (null if not worn)
+          wornOn: null,
+          // Currently worn by which player (null if not worn)
+          wornBy: null,
+          // Description shown when worn (replaces naked description)
+          // If null, uses the item's name in a generic phrase
+          wornDescription: null,
 
-        abilities: `Item that can be worn on body parts.
+          abilities: `Item that can be worn on body parts.
 
 SLOTS: 'covers' array defines which body parts this covers: head, face, neck, torso, back, waist, leftArm, rightArm, hands, leftLeg, rightLeg, feet.
 

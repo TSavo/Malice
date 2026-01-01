@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
-import { registerBuilder, type Builder } from '../builder-registry';
+import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Builds the RentableLock type
@@ -232,7 +232,7 @@ COMPOSABLE: 'locks' array can contain additional lock objects (biometric, keycar
   }
 
   async registerAliases(): Promise<void> {
-    console.log('[RentableLockBuilder] Type \'rentableLock\' auto-aliased');
+    console.log("[RentableLockBuilder] Type 'rentableLock' auto-aliased");
   }
 }
 

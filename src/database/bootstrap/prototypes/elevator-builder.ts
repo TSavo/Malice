@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
-import { registerBuilder, type Builder } from '../builder-registry';
+import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Builds the Elevator type
@@ -33,7 +33,6 @@ export class ElevatorBuilder implements Builder {
   constructor(private manager: ObjectManager) {}
 
   async build(): Promise<void> {
-
     // Check if type already exists
     const existing = await this.manager.load('elevator');
     if (existing) {
@@ -46,21 +45,21 @@ export class ElevatorBuilder implements Builder {
       }
 
       this.obj = await this.manager.define('elevator', parentObj, {
-      properties: {
-        name: 'Elevator',
-        description: 'A metal elevator car with a control panel.',
-        currentFloor: 1,
-        floors: [1, 2, 3], // Available floors
-        floorRooms: {}, // Map floor number to room objref
-        moving: false,
-        destination: null,
-        locks: [], // Array of lock objects
-        doorsOpen: true,
-        travelTimePerFloor: 2000, // 2 seconds per floor
-        capacity: 10, // Max passengers
-        door: null, // Reference to $.door object
+        properties: {
+          name: 'Elevator',
+          description: 'A metal elevator car with a control panel.',
+          currentFloor: 1,
+          floors: [1, 2, 3], // Available floors
+          floorRooms: {}, // Map floor number to room objref
+          moving: false,
+          destination: null,
+          locks: [], // Array of lock objects
+          doorsOpen: true,
+          travelTimePerFloor: 2000, // 2 seconds per floor
+          capacity: 10, // Max passengers
+          door: null, // Reference to $.door object
 
-        abilities: `Vertical transport between floors. A location that moves.
+          abilities: `Vertical transport between floors. A location that moves.
 
 CONTROL PANEL: When someone presses a floor button, call selectFloor(agent, floorNumber).
 Example: Player says "press 5" → await self.selectFloor(player, 5)
@@ -81,8 +80,8 @@ Denied access: panel beeps angrily, doesn't move.
 CAPACITY: 'capacity' max passengers. Full elevator won't accept more.
 
 EMERGENCY: If stuck, maintenance can force arrive() or reset state manually.`,
-      },
-      methods: {},
+        },
+        methods: {},
       });
     }
 

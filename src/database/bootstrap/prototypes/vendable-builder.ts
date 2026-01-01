@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
-import { registerBuilder, type Builder } from '../builder-registry';
+import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Vendable: a vending container type that sells items in its contents.
@@ -20,7 +20,6 @@ export class VendableBuilder implements Builder {
   constructor(private manager: ObjectManager) {}
 
   async build(): Promise<void> {
-
     const existing = await this.manager.load('vendable');
     if (existing) {
       this.obj = existing;
@@ -33,18 +32,18 @@ export class VendableBuilder implements Builder {
         properties: {
           name: 'Vendable',
           description: 'A vending container that sells the items it holds.',
-        bankAccount: null, // target account ID to receive funds (for credits mode)
-        bank: null, // bank object id/alias
-        currency: 'credits', // 'cash' or 'credits' - payment method
-        operator: null, // who receives cash payments (if currency='cash')
-        defaultPrice: 0,
-        owner: null, // agent id that can manage stock/prices
-        locks: [], // optional composable locks controlling manage access
-        spawnables: [], // [{ protoId, price, name, properties, randomize, autoNumber, numberPrefix }]
-        // randomize: { propertyName: [option1, option2, ...] } - picks random value
-        phoneDb: null, // optional phone directory to use for phone sales
-        // Abilities - vending physics for AI interpretation
-        abilities: `Automated vendor that dispenses items for payment.
+          bankAccount: null, // target account ID to receive funds (for credits mode)
+          bank: null, // bank object id/alias
+          currency: 'credits', // 'cash' or 'credits' - payment method
+          operator: null, // who receives cash payments (if currency='cash')
+          defaultPrice: 0,
+          owner: null, // agent id that can manage stock/prices
+          locks: [], // optional composable locks controlling manage access
+          spawnables: [], // [{ protoId, price, name, properties, randomize, autoNumber, numberPrefix }]
+          // randomize: { propertyName: [option1, option2, ...] } - picks random value
+          phoneDb: null, // optional phone directory to use for phone sales
+          // Abilities - vending physics for AI interpretation
+          abilities: `Automated vendor that dispenses items for payment.
 
 BROWSING: Check 'contents' for physical items in stock, 'spawnables' for items created on demand. Each has a price. Use getAvailableItems() to get full list with prices.
 
@@ -645,7 +644,7 @@ SPAWNABLES: Some vendors create items on demand from templates. These never run 
   }
 
   async registerAliases(): Promise<void> {
-    console.log('[VendableBuilder] Type \'vendable\' auto-aliased');
+    console.log("[VendableBuilder] Type 'vendable' auto-aliased");
   }
 }
 

@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
-import { registerBuilder, type Builder } from '../builder-registry';
+import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Builds the Admin type
@@ -36,11 +36,12 @@ export class AdminBuilder implements Builder {
 
       this.obj = await this.manager.define('admin', player, {
         properties: {
-        name: 'Admin',
-        description: 'Base prototype for admin characters with building powers',
-        isAdmin: true,
+          name: 'Admin',
+          description:
+            'Base prototype for admin characters with building powers',
+          isAdmin: true,
 
-        abilities: `Player with world-building powers. Can create, modify, and destroy objects.
+          abilities: `Player with world-building powers. Can create, modify, and destroy objects.
 
 BUILDING: @dig creates rooms, @link creates exits, @create makes objects, @recycle destroys them. @set modifies properties.
 

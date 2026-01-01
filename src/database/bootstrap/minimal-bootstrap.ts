@@ -270,7 +270,7 @@ export class MinimalBootstrap {
    * Root is the only type that is its own parent (self-referential).
    */
   private async ensureRoot(): Promise<void> {
-    let root = await this.manager.load('root');
+    const root = await this.manager.load('root');
     if (!root) {
       // Create root type - self-referential parent
       await this.manager.db.createType({
@@ -283,7 +283,7 @@ export class MinimalBootstrap {
         methods: {},
       });
       // Now load it to get the RuntimeObject
-      root = await this.manager.load('root');
+      await this.manager.load('root');
       console.log('✅ Created Root type');
     }
   }

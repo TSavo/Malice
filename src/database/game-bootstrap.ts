@@ -1,5 +1,5 @@
-import { AliasLoader, MinimalBootstrap } from './bootstrap/index';
 import { runBuilders } from './bootstrap/builder-registry';
+import { AliasLoader, MinimalBootstrap } from './bootstrap/index';
 import type { ObjectManager } from './object-manager';
 
 export interface GameBootstrapOptions {

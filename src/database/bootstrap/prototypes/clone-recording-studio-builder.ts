@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
-import { registerBuilder, type Builder } from '../builder-registry';
+import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Builds the CloneRecordingStudio type
@@ -33,41 +33,43 @@ export class CloneRecordingStudioBuilder implements Builder {
   constructor(private manager: ObjectManager) {}
 
   async build(): Promise<void> {
-
     // Check if type already exists
     const existing = await this.manager.load('cloneRecordingStudio');
     if (existing) {
       this.obj = existing;
     } else {
       const parentObj = await this.manager.load('describable');
-      if (!parentObj) throw new Error('CloneRecordingStudioBuilder: describable type not found');
+      if (!parentObj)
+        throw new Error(
+          'CloneRecordingStudioBuilder: describable type not found',
+        );
 
       this.obj = await this.manager.define('cloneRecordingStudio', parentObj, {
-      properties: {
-        name: 'Clone Recording Studio',
-        description:
-          'A reclining chair surrounded by neural scanning equipment. Electrodes dangle from an articulated arm. A console displays pricing and status. Sit down, pay up, and your consciousness gets backed up—insurance against the permanent kind of death.',
+        properties: {
+          name: 'Clone Recording Studio',
+          description:
+            'A reclining chair surrounded by neural scanning equipment. Electrodes dangle from an articulated arm. A console displays pricing and status. Sit down, pay up, and your consciousness gets backed up—insurance against the permanent kind of death.',
 
-        // Cannot be moved
-        boltedDown: true,
+          // Cannot be moved
+          boltedDown: true,
 
-        // Linked tank - where backups are stored (required)
-        linkedTank: null, // ObjRef to clone tank
+          // Linked tank - where backups are stored (required)
+          linkedTank: null, // ObjRef to clone tank
 
-        // Pricing
-        backupPrice: 500, // Cost to create/update backup
-        currency: 'cash', // 'cash' or 'credits'
+          // Pricing
+          backupPrice: 500, // Cost to create/update backup
+          currency: 'cash', // 'cash' or 'credits'
 
-        // Operator - who receives payment
-        operator: null, // ObjRef to player/NPC who receives payment
+          // Operator - who receives payment
+          operator: null, // ObjRef to player/NPC who receives payment
 
-        // Owner - who can configure the studio
-        owner: null, // ObjRef to player/NPC who owns this studio
+          // Owner - who can configure the studio
+          owner: null, // ObjRef to player/NPC who owns this studio
 
-        // Aliases for commands
-        aliases: ['studio', 'recording studio', 'backup station', 'chair'],
+          // Aliases for commands
+          aliases: ['studio', 'recording studio', 'backup station', 'chair'],
 
-        abilities: `Neural scanning station that creates consciousness backups.
+          abilities: `Neural scanning station that creates consciousness backups.
 
 LINKED: 'linkedTank' is the clone tank where backups are stored. Required for operation.
 
@@ -82,8 +84,8 @@ INVALIDATION: Recording here invalidates backups at other tanks. One active back
 MANAGEMENT: Owner can configure price, currency, payment recipient via manage().
 
 IMMOVABLE: 'boltedDown' true.`,
-      },
-      methods: {},
+        },
+        methods: {},
       });
     }
 
@@ -686,7 +688,9 @@ IMMOVABLE: 'boltedDown' true.`,
   async registerAliases(): Promise<void> {
     // Types auto-alias by name, no manual registration needed
     if (!this.obj) return;
-    console.log(`[CloneRecordingStudioBuilder] Type 'cloneRecordingStudio' auto-aliased`);
+    console.log(
+      `[CloneRecordingStudioBuilder] Type 'cloneRecordingStudio' auto-aliased`,
+    );
   }
 }
 

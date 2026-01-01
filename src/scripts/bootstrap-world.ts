@@ -15,8 +15,8 @@
 import 'dotenv/config';
 
 import { AliasLoader } from '../database/bootstrap/alias-loader';
-import { MinimalBootstrap } from '../database/bootstrap/minimal-bootstrap';
 import { runBuilders } from '../database/bootstrap/builder-registry';
+import { MinimalBootstrap } from '../database/bootstrap/minimal-bootstrap';
 import '../database/bootstrap/all-builders'; // Self-register all builders
 import { ObjectDatabase } from '../database/object-db';
 import { ObjectManager } from '../database/object-manager';

@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
-import { registerBuilder, type Builder } from '../builder-registry';
+import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Builds the Telescope type
@@ -34,70 +34,71 @@ export class TelescopeBuilder implements Builder {
     } else {
       // Create telescope as a TYPE
       const parentObj = await this.manager.load('describable');
-      if (!parentObj) throw new Error('TelescopeBuilder: $describable not found');
+      if (!parentObj)
+        throw new Error('TelescopeBuilder: $describable not found');
 
       this.obj = await this.manager.define('telescope', parentObj, {
         properties: {
-        name: 'Telescope',
-        description: 'An observation telescope mounted on a fixed base.',
-        tilt: 45,
-        swivel: 0,
-        tiltMin: 0,
-        tiltMax: 85,
-        swivelMin: 0,
-        swivelMax: 359,
-        mountZ: 0,
-        // Default POIs - major intersections and landmarks from Pioneer Square
-        // Avenues: Waterfront(-21), 1st(-14), Occidental(-7), 2nd(0), 3rd(+7), 4th(+14)
-        // Streets: King(-12), Jackson(-6), Main(0), Washington(+6), Yesler(+12)
-        pointsOfInterest: [
-          // Landmarks
-          { name: 'Totem Pole', x: -7, y: 0, z: 0 },
-          { name: 'Top of Totem', x: -7, y: 0, z: 1 },
-          { name: 'Smith Tower Entrance', x: -12, y: 12, z: 0 },
-          { name: 'Grand Central', x: -9, y: 2, z: 0 },
-          { name: 'Occidental Park', x: -3, y: 2, z: 0 },
-          { name: 'Pioneer Building', x: 5, y: 9, z: 0 },
-          { name: 'Sinkhole', x: -16, y: -8, z: 0 },
-          { name: 'Supply Depot', x: -21, y: -5, z: 0 },
-          { name: 'Fabrication Factory', x: -21, y: 10, z: 0 },
-          // Yesler Way intersections (y=+12)
-          { name: 'Waterfront & Yesler', x: -21, y: 12, z: 0 },
-          { name: '1st & Yesler', x: -14, y: 12, z: 0 },
-          { name: 'Occidental & Yesler', x: -7, y: 12, z: 0 },
-          { name: '2nd & Yesler', x: 0, y: 12, z: 0 },
-          { name: '3rd & Yesler', x: 7, y: 12, z: 0 },
-          { name: '4th & Yesler', x: 14, y: 12, z: 0 },
-          // Washington intersections (y=+6)
-          { name: 'Waterfront & Washington', x: -21, y: 6, z: 0 },
-          { name: '1st & Washington', x: -14, y: 6, z: 0 },
-          { name: 'Occidental & Washington', x: -7, y: 6, z: 0 },
-          { name: '2nd & Washington', x: 0, y: 6, z: 0 },
-          { name: '3rd & Washington', x: 7, y: 6, z: 0 },
-          { name: '4th & Washington', x: 14, y: 6, z: 0 },
-          // Main intersections (y=0)
-          { name: 'Waterfront & Main', x: -21, y: 0, z: 0 },
-          { name: '1st & Main', x: -14, y: 0, z: 0 },
-          { name: 'Occidental & Main', x: -7, y: 0, z: 0 },
-          { name: '2nd & Main', x: 0, y: 0, z: 0 },
-          { name: '3rd & Main', x: 7, y: 0, z: 0 },
-          { name: '4th & Main', x: 14, y: 0, z: 0 },
-          // Jackson intersections (y=-6)
-          { name: 'Waterfront & Jackson', x: -21, y: -6, z: 0 },
-          { name: '1st & Jackson', x: -14, y: -6, z: 0 },
-          { name: 'Occidental & Jackson', x: -7, y: -6, z: 0 },
-          { name: '2nd & Jackson', x: 0, y: -6, z: 0 },
-          { name: '3rd & Jackson', x: 7, y: -6, z: 0 },
-          { name: '4th & Jackson', x: 14, y: -6, z: 0 },
-          // King intersections (y=-12)
-          { name: 'Waterfront & King', x: -21, y: -12, z: 0 },
-          { name: '1st & King', x: -14, y: -12, z: 0 },
-          { name: 'Occidental & King', x: -7, y: -12, z: 0 },
-          { name: '2nd & King', x: 0, y: -12, z: 0 },
-          { name: '3rd & King', x: 7, y: -12, z: 0 },
-          { name: '4th & King', x: 14, y: -12, z: 0 },
-        ],
-        abilities: `Observation telescope for viewing distant locations across the city.
+          name: 'Telescope',
+          description: 'An observation telescope mounted on a fixed base.',
+          tilt: 45,
+          swivel: 0,
+          tiltMin: 0,
+          tiltMax: 85,
+          swivelMin: 0,
+          swivelMax: 359,
+          mountZ: 0,
+          // Default POIs - major intersections and landmarks from Pioneer Square
+          // Avenues: Waterfront(-21), 1st(-14), Occidental(-7), 2nd(0), 3rd(+7), 4th(+14)
+          // Streets: King(-12), Jackson(-6), Main(0), Washington(+6), Yesler(+12)
+          pointsOfInterest: [
+            // Landmarks
+            { name: 'Totem Pole', x: -7, y: 0, z: 0 },
+            { name: 'Top of Totem', x: -7, y: 0, z: 1 },
+            { name: 'Smith Tower Entrance', x: -12, y: 12, z: 0 },
+            { name: 'Grand Central', x: -9, y: 2, z: 0 },
+            { name: 'Occidental Park', x: -3, y: 2, z: 0 },
+            { name: 'Pioneer Building', x: 5, y: 9, z: 0 },
+            { name: 'Sinkhole', x: -16, y: -8, z: 0 },
+            { name: 'Supply Depot', x: -21, y: -5, z: 0 },
+            { name: 'Fabrication Factory', x: -21, y: 10, z: 0 },
+            // Yesler Way intersections (y=+12)
+            { name: 'Waterfront & Yesler', x: -21, y: 12, z: 0 },
+            { name: '1st & Yesler', x: -14, y: 12, z: 0 },
+            { name: 'Occidental & Yesler', x: -7, y: 12, z: 0 },
+            { name: '2nd & Yesler', x: 0, y: 12, z: 0 },
+            { name: '3rd & Yesler', x: 7, y: 12, z: 0 },
+            { name: '4th & Yesler', x: 14, y: 12, z: 0 },
+            // Washington intersections (y=+6)
+            { name: 'Waterfront & Washington', x: -21, y: 6, z: 0 },
+            { name: '1st & Washington', x: -14, y: 6, z: 0 },
+            { name: 'Occidental & Washington', x: -7, y: 6, z: 0 },
+            { name: '2nd & Washington', x: 0, y: 6, z: 0 },
+            { name: '3rd & Washington', x: 7, y: 6, z: 0 },
+            { name: '4th & Washington', x: 14, y: 6, z: 0 },
+            // Main intersections (y=0)
+            { name: 'Waterfront & Main', x: -21, y: 0, z: 0 },
+            { name: '1st & Main', x: -14, y: 0, z: 0 },
+            { name: 'Occidental & Main', x: -7, y: 0, z: 0 },
+            { name: '2nd & Main', x: 0, y: 0, z: 0 },
+            { name: '3rd & Main', x: 7, y: 0, z: 0 },
+            { name: '4th & Main', x: 14, y: 0, z: 0 },
+            // Jackson intersections (y=-6)
+            { name: 'Waterfront & Jackson', x: -21, y: -6, z: 0 },
+            { name: '1st & Jackson', x: -14, y: -6, z: 0 },
+            { name: 'Occidental & Jackson', x: -7, y: -6, z: 0 },
+            { name: '2nd & Jackson', x: 0, y: -6, z: 0 },
+            { name: '3rd & Jackson', x: 7, y: -6, z: 0 },
+            { name: '4th & Jackson', x: 14, y: -6, z: 0 },
+            // King intersections (y=-12)
+            { name: 'Waterfront & King', x: -21, y: -12, z: 0 },
+            { name: '1st & King', x: -14, y: -12, z: 0 },
+            { name: 'Occidental & King', x: -7, y: -12, z: 0 },
+            { name: '2nd & King', x: 0, y: -12, z: 0 },
+            { name: '3rd & King', x: 7, y: -12, z: 0 },
+            { name: '4th & King', x: 14, y: -12, z: 0 },
+          ],
+          abilities: `Observation telescope for viewing distant locations across the city.
 
 MOUNTED TELESCOPE (at fixed location like observation deck):
 1. First check available POIs:

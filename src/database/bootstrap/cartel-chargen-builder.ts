@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../types/object';
 import type { ObjectManager } from '../object-manager';
-import { registerBuilder, type Builder } from './builder-registry';
+import { type Builder, registerBuilder } from './builder-registry';
 
 /**
  * Builds CartelCharGen object (dynamic ID)
@@ -16,7 +16,14 @@ import { registerBuilder, type Builder } from './builder-registry';
  */
 export class CartelCharGenBuilder implements Builder {
   static provides = ['cartelCharGen'];
-  static depends = ['charGen', 'aiPrompts', 'describable', 'player', 'scheduler', 'recycler'];
+  static depends = [
+    'charGen',
+    'aiPrompts',
+    'describable',
+    'player',
+    'scheduler',
+    'recycler',
+  ];
 
   private cartelCharGen: RuntimeObject | null = null;
 
@@ -142,7 +149,8 @@ CURRENCY: Cash (50 starting)`,
 
     // Ghost Interviewer prompt loaded from docs/prompts/GHOST-INTERVIEWER.md
     const objectManager = await this.manager.load(0);
-    const aliases = (objectManager?.get('aliases') as Record<string, number>) || {};
+    const aliases =
+      (objectManager?.get('aliases') as Record<string, number>) || {};
     const aiPromptsId = aliases.aiPrompts;
     const aiPrompts = aiPromptsId ? await this.manager.load(aiPromptsId) : null;
     const ghostInterviewerPrompt =

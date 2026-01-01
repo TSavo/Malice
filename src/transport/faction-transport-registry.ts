@@ -7,10 +7,14 @@
 
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import type { FactionPorts, FactionTransportConfig, FactionTransportTypes } from '../../types/transport';
-import type { ObjectManager } from '../database/object-manager';
+import type {
+  FactionPorts,
+  FactionTransportConfig,
+  FactionTransportTypes,
+} from '../../types/transport';
 import { calculateFactionPorts } from '../config/faction-ports';
-import { Connection } from '../connection/connection';
+import type { Connection } from '../connection/connection';
+import type { ObjectManager } from '../database/object-manager';
 import { FactionBundle } from './faction-bundle';
 
 /**
@@ -102,12 +106,16 @@ export class FactionTransportRegistry {
 
     // Determine enabled transports for logging
     const enabledTransports = [];
-    if (transports?.http ?? !!domain) enabledTransports.push(`HTTP ${ports.http}`);
+    if (transports?.http ?? !!domain)
+      enabledTransports.push(`HTTP ${ports.http}`);
     if (transports?.ws ?? true) enabledTransports.push(`WS ${ports.ws}`);
-    if (transports?.sessionMcp ?? false) enabledTransports.push(`SessionMCP ${ports.sessionMcp}`);
+    if (transports?.sessionMcp ?? false)
+      enabledTransports.push(`SessionMCP ${ports.sessionMcp}`);
 
     if (this.debug || debug) {
-      console.log(`[FactionRegistry] Creating transport bundle for ${name} (#${factionId})`);
+      console.log(
+        `[FactionRegistry] Creating transport bundle for ${name} (#${factionId})`,
+      );
       console.log(`  Enabled: ${enabledTransports.join(', ') || 'none'}`);
     }
 
@@ -152,20 +160,26 @@ export class FactionTransportRegistry {
     const bundle = this.bundles.get(factionId);
     if (!bundle) {
       if (this.debug) {
-        console.warn(`[FactionRegistry] No bundle found for faction ${factionId}`);
+        console.warn(
+          `[FactionRegistry] No bundle found for faction ${factionId}`,
+        );
       }
       return;
     }
 
     if (this.debug) {
-      console.log(`[FactionRegistry] Destroying transport bundle for faction ${factionId}`);
+      console.log(
+        `[FactionRegistry] Destroying transport bundle for faction ${factionId}`,
+      );
     }
 
     await bundle.stop(options);
     this.bundles.delete(factionId);
 
     if (this.debug) {
-      console.log(`[FactionRegistry] Transport bundle for faction ${factionId} destroyed`);
+      console.log(
+        `[FactionRegistry] Transport bundle for faction ${factionId} destroyed`,
+      );
     }
   }
 
@@ -241,7 +255,10 @@ export class FactionTransportRegistry {
   /**
    * Shut down all transport bundles
    */
-  async shutdown(options?: { gracefulTimeoutMs?: number; message?: string }): Promise<void> {
+  async shutdown(options?: {
+    gracefulTimeoutMs?: number;
+    message?: string;
+  }): Promise<void> {
     if (this.debug) {
       console.log(`[FactionRegistry] Shutting down all transport bundles...`);
     }

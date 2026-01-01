@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
-import { registerBuilder, type Builder } from '../builder-registry';
+import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Builds the Ammo type
@@ -129,7 +129,7 @@ EXPOSED: Loose ammo can be damaged by water, fire. Store in sealed containers.`,
   }
 
   async registerAliases(): Promise<void> {
-    console.log('[AmmoBuilder] Type \'ammo\' auto-aliased');
+    console.log("[AmmoBuilder] Type 'ammo' auto-aliased");
   }
 }
 
@@ -164,7 +164,7 @@ export class Ammo9mmBuilder implements Builder {
   }
 
   async registerAliases(): Promise<void> {
-    console.log('[Ammo9mmBuilder] Type \'ammo9mm\' auto-aliased');
+    console.log("[Ammo9mmBuilder] Type 'ammo9mm' auto-aliased");
   }
 }
 
@@ -192,7 +192,7 @@ export class Ammo38Builder implements Builder {
   }
 
   async registerAliases(): Promise<void> {
-    console.log('[Ammo38Builder] Type \'ammo38\' auto-aliased');
+    console.log("[Ammo38Builder] Type 'ammo38' auto-aliased");
   }
 }
 
@@ -220,7 +220,7 @@ export class Ammo44Builder implements Builder {
   }
 
   async registerAliases(): Promise<void> {
-    console.log('[Ammo44Builder] Type \'ammo44\' auto-aliased');
+    console.log("[Ammo44Builder] Type 'ammo44' auto-aliased");
   }
 }
 
@@ -248,7 +248,7 @@ export class Ammo45Builder implements Builder {
   }
 
   async registerAliases(): Promise<void> {
-    console.log('[Ammo45Builder] Type \'ammo45\' auto-aliased');
+    console.log("[Ammo45Builder] Type 'ammo45' auto-aliased");
   }
 }
 
@@ -276,7 +276,7 @@ export class Ammo22Builder implements Builder {
   }
 
   async registerAliases(): Promise<void> {
-    console.log('[Ammo22Builder] Type \'ammo22\' auto-aliased');
+    console.log("[Ammo22Builder] Type 'ammo22' auto-aliased");
   }
 }
 
@@ -304,7 +304,7 @@ export class Ammo380Builder implements Builder {
   }
 
   async registerAliases(): Promise<void> {
-    console.log('[Ammo380Builder] Type \'ammo380\' auto-aliased');
+    console.log("[Ammo380Builder] Type 'ammo380' auto-aliased");
   }
 }
 
@@ -332,7 +332,7 @@ export class Ammo308Builder implements Builder {
   }
 
   async registerAliases(): Promise<void> {
-    console.log('[Ammo308Builder] Type \'ammo308\' auto-aliased');
+    console.log("[Ammo308Builder] Type 'ammo308' auto-aliased");
   }
 }
 
@@ -360,7 +360,7 @@ export class Ammo3030Builder implements Builder {
   }
 
   async registerAliases(): Promise<void> {
-    console.log('[Ammo3030Builder] Type \'ammo3030\' auto-aliased');
+    console.log("[Ammo3030Builder] Type 'ammo3030' auto-aliased");
   }
 }
 
@@ -388,7 +388,7 @@ export class Ammo12GaugeBuilder implements Builder {
   }
 
   async registerAliases(): Promise<void> {
-    console.log('[Ammo12GaugeBuilder] Type \'ammo12gauge\' auto-aliased');
+    console.log("[Ammo12GaugeBuilder] Type 'ammo12gauge' auto-aliased");
   }
 }
 

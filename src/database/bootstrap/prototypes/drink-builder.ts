@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
-import { registerBuilder, type Builder } from '../builder-registry';
+import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Builds the Drink type
@@ -34,26 +34,26 @@ export class DrinkBuilder implements Builder {
 
       this.obj = await this.manager.define('drink', edible, {
         properties: {
-        name: 'Drink',
-        description: 'Base type for liquid consumables',
-        // Typical drink nutrition
-        calories: 50, // Some drinks have calories (juice, soda)
-        hydration: 200, // ml water equivalent - drinks are very hydrating
-        // Drink-specific properties
-        portions: 5, // Takes 5 sips to drink
-        remaining: 5,
-        // Typical drink container size
-        width: 7,
-        height: 15,
-        depth: 7,
-        weight: 300, // grams (with liquid)
-        // Drink-specific
-        containerWeight: 50, // Weight of empty container
-        // Decay overrides - drinks last longer than food (14 days vs 7)
-        // 14 days = 20160 ticks, 100% / 20160 = ~0.005% per tick
-        decayRate: 0.005, // ~14 days to fully spoil at room temp
-        // Abilities - liquid consumption physics for AI interpretation
-        abilities: `Liquid in a container that is consumed by drinking.
+          name: 'Drink',
+          description: 'Base type for liquid consumables',
+          // Typical drink nutrition
+          calories: 50, // Some drinks have calories (juice, soda)
+          hydration: 200, // ml water equivalent - drinks are very hydrating
+          // Drink-specific properties
+          portions: 5, // Takes 5 sips to drink
+          remaining: 5,
+          // Typical drink container size
+          width: 7,
+          height: 15,
+          depth: 7,
+          weight: 300, // grams (with liquid)
+          // Drink-specific
+          containerWeight: 50, // Weight of empty container
+          // Decay overrides - drinks last longer than food (14 days vs 7)
+          // 14 days = 20160 ticks, 100% / 20160 = ~0.005% per tick
+          decayRate: 0.005, // ~14 days to fully spoil at room temp
+          // Abilities - liquid consumption physics for AI interpretation
+          abilities: `Liquid in a container that is consumed by drinking.
 
 DRINKING: Liquid must be in a container (cup, bottle, glass). Bring container to mouth, tilt to pour liquid in, swallow. Each sip consumes one portion. Use 'remaining' to track sips left.
 
@@ -68,9 +68,9 @@ MIXING: Different liquids can be combined by pouring together. May create new ef
 HYDRATION: Drinks primarily restore hydration, not calories. Water has 0 calories but high hydration. Alcoholic drinks dehydrate despite being liquid.
 
 TO CONSUME: Call consume(drinker, 'drink') method. It handles hydration, calorie transfer, weight reduction, and recycling when container is empty.`,
-      },
-      methods: {},
-    });
+        },
+        methods: {},
+      });
     }
 
     // Always rebuild methods (ensures they exist even if type was pre-existing)
@@ -246,7 +246,7 @@ TO CONSUME: Call consume(drinker, 'drink') method. It handles hydration, calorie
   }
 
   async registerAliases(): Promise<void> {
-    console.log('[DrinkBuilder] Type \'drink\' auto-aliased');
+    console.log("[DrinkBuilder] Type 'drink' auto-aliased");
   }
 }
 

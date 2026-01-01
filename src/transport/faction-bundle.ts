@@ -11,8 +11,8 @@ import type {
   FactionPorts,
   FactionTransportConfig,
 } from '../../types/transport';
+import type { Connection } from '../connection/connection';
 import type { ObjectManager } from '../database/object-manager';
-import { Connection } from '../connection/connection';
 import { SessionMCPServer } from '../mcp/session-mcp-server';
 import { FactionWebServer } from '../web/faction-web-server';
 import { WebSocketServer } from './websocket/websocket-server';
@@ -174,7 +174,7 @@ export class FactionBundle {
    */
   private tagConnection(conn: Connection): void {
     const authInfo = conn.authInfo;
-    if (authInfo && authInfo.metadata) {
+    if (authInfo?.metadata) {
       authInfo.metadata.factionId = this.config.factionId;
       authInfo.metadata.factionName = this.config.name;
     }
@@ -207,7 +207,10 @@ export class FactionBundle {
   /**
    * Stop all servers with optional graceful shutdown
    */
-  async stop(options?: { gracefulTimeoutMs?: number; message?: string }): Promise<void> {
+  async stop(options?: {
+    gracefulTimeoutMs?: number;
+    message?: string;
+  }): Promise<void> {
     const { debug } = this.config;
 
     if (debug) {

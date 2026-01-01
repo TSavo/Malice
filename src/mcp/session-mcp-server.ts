@@ -16,16 +16,19 @@ import {
   type IncomingMessage,
   type ServerResponse,
 } from 'node:http';
-import { Subject } from 'rxjs';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
+import { Subject } from 'rxjs';
 import { z } from 'zod';
-import type { ObjId, RuntimeObject } from '../../types/object.js';
 import type { AuthInfo } from '../../types/auth.js';
+import type { ObjId, RuntimeObject } from '../../types/object.js';
 import { Connection } from '../connection/connection.js';
 import type { ObjectManager } from '../database/object-manager.js';
 import { ConnectionContext } from '../game/connection-context.js';
-import { PollingMuxTransport, type MuxMessage } from '../transport/polling/index.js';
+import {
+  type MuxMessage,
+  PollingMuxTransport,
+} from '../transport/polling/index.js';
 
 export interface SessionMCPServerConfig {
   port?: number;
@@ -68,7 +71,9 @@ export class SessionMCPServer {
   /**
    * Parse HTTP Basic Auth header
    */
-  private parseBasicAuth(authHeader: string | undefined): { username: string; password: string } | null {
+  private parseBasicAuth(
+    authHeader: string | undefined,
+  ): { username: string; password: string } | null {
     if (!authHeader || !authHeader.startsWith('Basic ')) {
       return null;
     }
@@ -93,7 +98,8 @@ export class SessionMCPServer {
     const objectManager = await this.manager.load(0);
     if (!objectManager) return null;
 
-    const aliases = (objectManager.get('aliases') as Record<string, number>) || {};
+    const aliases =
+      (objectManager.get('aliases') as Record<string, number>) || {};
     const playerPrototypeId = aliases.player;
     const adminPrototypeId = aliases.admin;
 
@@ -109,10 +115,12 @@ export class SessionMCPServer {
 
     // Find player by playername
     const users = await this.manager.db.listAll();
-    const userDoc = users.find(u => {
+    const userDoc = users.find((u) => {
       const parentId = u.parent.id;
-      return (parentId === playerPrototypeId || parentId === adminPrototypeId) &&
-        getValue(u.properties.playername) === username;
+      return (
+        (parentId === playerPrototypeId || parentId === adminPrototypeId) &&
+        getValue(u.properties.playername) === username
+      );
     });
 
     if (!userDoc) return null;
@@ -123,7 +131,10 @@ export class SessionMCPServer {
   /**
    * Validate credentials and return player
    */
-  private async validateCredentials(username: string, password: string): Promise<RuntimeObject | null> {
+  private async validateCredentials(
+    username: string,
+    password: string,
+  ): Promise<RuntimeObject | null> {
     const player = await this.findPlayer(username);
     if (!player) return null;
 
@@ -144,8 +155,14 @@ export class SessionMCPServer {
 
         // CORS headers
         res.setHeader('Access-Control-Allow-Origin', '*');
-        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
-        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, mcp-session-id, Authorization');
+        res.setHeader(
+          'Access-Control-Allow-Methods',
+          'GET, POST, DELETE, OPTIONS',
+        );
+        res.setHeader(
+          'Access-Control-Allow-Headers',
+          'Content-Type, mcp-session-id, Authorization',
+        );
         res.setHeader('Access-Control-Expose-Headers', 'mcp-session-id');
 
         if (req.method === 'OPTIONS') {
@@ -195,7 +212,10 @@ export class SessionMCPServer {
         }
 
         // Validate credentials
-        const player = await this.validateCredentials(auth.username, auth.password);
+        const player = await this.validateCredentials(
+          auth.username,
+          auth.password,
+        );
         if (!player) {
           res.setHeader('WWW-Authenticate', 'Basic realm="Malice MOO"');
           res.writeHead(401);
@@ -214,7 +234,11 @@ export class SessionMCPServer {
 
           // Create session
           const mcpSessionId = `mcp-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-          const sessionState = await this.createSession(mcpSessionId, player, auth);
+          const sessionState = await this.createSession(
+            mcpSessionId,
+            player,
+            auth,
+          );
 
           // Create MCP server and transport
           const mcpServer = new McpServer({
@@ -229,7 +253,9 @@ export class SessionMCPServer {
               sessionState.mcpServer = mcpServer;
               sessionState.mcpTransport = mcpTransport;
               this.sessions.set(newId, sessionState);
-              console.log(`[SessionMCP] Session initialized: ${newId} for ${auth.username}`);
+              console.log(
+                `[SessionMCP] Session initialized: ${newId} for ${auth.username}`,
+              );
             },
           });
 
@@ -276,7 +302,9 @@ export class SessionMCPServer {
 
     return new Promise((resolve) => {
       this.httpServer?.listen(this.port, this.host, () => {
-        console.log(`[SessionMCP] Server listening on http://${this.host}:${this.port}`);
+        console.log(
+          `[SessionMCP] Server listening on http://${this.host}:${this.port}`,
+        );
         resolve();
       });
     });
@@ -316,9 +344,11 @@ export class SessionMCPServer {
     this.connection$.next(connection);
 
     const playerId = player.id;
-    const playerName = player.get('playername') as string || auth.username;
+    const playerName = (player.get('playername') as string) || auth.username;
 
-    console.log(`[SessionMCP] Player ${playerName} (#${playerId}) connected via MCP`);
+    console.log(
+      `[SessionMCP] Player ${playerName} (#${playerId}) connected via MCP`,
+    );
 
     return {
       mcpServer: null as unknown as McpServer, // Set later
@@ -336,13 +366,17 @@ export class SessionMCPServer {
    */
   private registerTools(server: McpServer, session: SessionState): void {
     const ok = (data: unknown) => ({
-      content: [{
-        type: 'text' as const,
-        text: typeof data === 'string' ? data : JSON.stringify(data, null, 2),
-      }],
+      content: [
+        {
+          type: 'text' as const,
+          text: typeof data === 'string' ? data : JSON.stringify(data, null, 2),
+        },
+      ],
     });
     const err = (msg: string) => ({
-      content: [{ type: 'text' as const, text: JSON.stringify({ error: msg }) }],
+      content: [
+        { type: 'text' as const, text: JSON.stringify({ error: msg }) },
+      ],
       isError: true,
     });
 
@@ -363,7 +397,8 @@ EXAMPLES:
   send(channel="custom:debug", payload={trace:true})`,
       {
         channel: z.string().optional().describe('Channel name (default: game)'),
-        payload: z.union([z.string(), z.object({}).passthrough()])
+        payload: z
+          .union([z.string(), z.object({}).passthrough()])
           .describe('Message payload (string for game, object for others)'),
       },
       async ({ channel = 'game', payload }) => {
@@ -372,12 +407,14 @@ EXAMPLES:
 
           // For game channel, wait briefly for synchronous response
           if (channel === 'game') {
-            await new Promise(resolve => setTimeout(resolve, 100));
+            await new Promise((resolve) => setTimeout(resolve, 100));
           }
 
           return ok({ sent: true, channel });
         } catch (error) {
-          return err(`Send error: ${error instanceof Error ? error.message : String(error)}`);
+          return err(
+            `Send error: ${error instanceof Error ? error.message : String(error)}`,
+          );
         }
       },
     );
@@ -399,7 +436,10 @@ EXAMPLES:
   receive(channels=["game","state"])  # Only game and state
   receive(limit=50)                   # Max 50 messages`,
       {
-        channels: z.array(z.string()).optional().describe('Filter to specific channels'),
+        channels: z
+          .array(z.string())
+          .optional()
+          .describe('Filter to specific channels'),
         limit: z.number().optional().describe('Max messages to return'),
       },
       async ({ channels, limit }) => {
@@ -422,7 +462,7 @@ EXAMPLES:
           }
 
           return ok({
-            messages: messages.map(m => ({
+            messages: messages.map((m) => ({
               ch: m.ch,
               t: m.t,
               p: m.p,
@@ -432,7 +472,9 @@ EXAMPLES:
             buffered: session.muxTransport.bufferedCount,
           });
         } catch (error) {
-          return err(`Receive error: ${error instanceof Error ? error.message : String(error)}`);
+          return err(
+            `Receive error: ${error instanceof Error ? error.message : String(error)}`,
+          );
         }
       },
     );
@@ -472,7 +514,9 @@ Returns:
             buffered: session.muxTransport.bufferedCount,
           });
         } catch (error) {
-          return err(`Status error: ${error instanceof Error ? error.message : String(error)}`);
+          return err(
+            `Status error: ${error instanceof Error ? error.message : String(error)}`,
+          );
         }
       },
     );

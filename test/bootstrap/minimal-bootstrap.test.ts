@@ -92,7 +92,11 @@ describe('MinimalBootstrap', () => {
       const doc = root?._getRaw();
 
       expect(doc._id).toBe('root');
-      expect(doc.parent).toEqual({ type: 'objref', target: 'type', id: 'root' });
+      expect(doc.parent).toEqual({
+        type: 'objref',
+        target: 'type',
+        id: 'root',
+      });
       expect(doc.properties).toBeTruthy();
       expect(doc.methods).toBeTruthy();
       expect(doc.created).toBeInstanceOf(Date);

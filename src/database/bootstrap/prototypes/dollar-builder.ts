@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
-import { registerBuilder, type Builder } from '../builder-registry';
+import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Builds the Dollar type
@@ -20,7 +20,6 @@ export class DollarBuilder implements Builder {
   constructor(private manager: ObjectManager) {}
 
   async build(): Promise<void> {
-
     const existing = await this.manager.load('dollar');
     if (existing) {
       this.obj = existing;
@@ -147,7 +146,7 @@ ANONYMITY: Cash cannot be traced. Unlike bank credits, no transaction history ex
   }
 
   async registerAliases(): Promise<void> {
-    console.log('[DollarBuilder] Type \'dollar\' auto-aliased');
+    console.log("[DollarBuilder] Type 'dollar' auto-aliased");
   }
 }
 

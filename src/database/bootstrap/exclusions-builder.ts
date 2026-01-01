@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../types/object';
 import type { ObjectManager } from '../object-manager';
-import { registerBuilder, type Builder } from './builder-registry';
+import { type Builder, registerBuilder } from './builder-registry';
 
 /**
  * Builds Exclusions utility object ($.exclusions)
@@ -30,7 +30,7 @@ import { registerBuilder, type Builder } from './builder-registry';
  */
 export class ExclusionsBuilder implements Builder {
   static provides = ['exclusions'];
-  static depends = ['mutex'];  // Uses $.mutex
+  static depends = ['mutex']; // Uses $.mutex
 
   private exclusions: RuntimeObject | null = null;
 

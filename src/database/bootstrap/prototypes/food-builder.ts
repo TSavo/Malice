@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
-import { registerBuilder, type Builder } from '../builder-registry';
+import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Builds the Food type
@@ -34,24 +34,24 @@ export class FoodBuilder implements Builder {
 
       this.obj = await this.manager.define('food', edible, {
         properties: {
-        name: 'Food',
-        description: 'Base type for solid food items',
-        // Typical food nutrition
-        calories: 200,
-        hydration: 50, // ml water equivalent - solid food has some moisture
-        // Food-specific properties
-        portions: 4, // Takes 4 bites to eat
-        remaining: 4,
-        // Ingredients list - each has name and flavor
-        // e.g. [{ name: 'beef', flavor: 'savory' }, { name: 'onion', flavor: 'sharp' }]
-        ingredients: [],
-        // Typical food size
-        width: 8,
-        height: 5,
-        depth: 8,
-        weight: 150, // grams
-        // Abilities - solid food physics for AI interpretation
-        abilities: `Solid food that must be chewed and swallowed.
+          name: 'Food',
+          description: 'Base type for solid food items',
+          // Typical food nutrition
+          calories: 200,
+          hydration: 50, // ml water equivalent - solid food has some moisture
+          // Food-specific properties
+          portions: 4, // Takes 4 bites to eat
+          remaining: 4,
+          // Ingredients list - each has name and flavor
+          // e.g. [{ name: 'beef', flavor: 'savory' }, { name: 'onion', flavor: 'sharp' }]
+          ingredients: [],
+          // Typical food size
+          width: 8,
+          height: 5,
+          depth: 8,
+          weight: 150, // grams
+          // Abilities - solid food physics for AI interpretation
+          abilities: `Solid food that must be chewed and swallowed.
 
 EATING: Food must be accessible - in hand, on table, or in reach. Bring food to mouth, bite off portion, chew thoroughly, swallow. Each bite consumes one portion. Use 'remaining' to track bites left.
 
@@ -64,9 +64,9 @@ SHARING: Food with multiple portions can be shared - one person takes bites whil
 CHOKING HAZARD: Eating too fast or while talking risks choking. Large bites harder to swallow. Unconscious people cannot eat safely.
 
 TO CONSUME: Call consume(eater, 'food') method. It handles calorie transfer to stomach, weight reduction, portion tracking, and recycling when empty.`,
-      },
-      methods: {},
-    });
+        },
+        methods: {},
+      });
     }
 
     // Always rebuild methods (ensures they exist even if type was pre-existing)
@@ -238,7 +238,7 @@ TO CONSUME: Call consume(eater, 'food') method. It handles calorie transfer to s
   }
 
   async registerAliases(): Promise<void> {
-    console.log('[FoodBuilder] Type \'food\' auto-aliased');
+    console.log("[FoodBuilder] Type 'food' auto-aliased");
   }
 }
 

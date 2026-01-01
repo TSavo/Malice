@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
-import { registerBuilder, type Builder } from '../builder-registry';
+import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Builds the Locker type
@@ -28,7 +28,6 @@ export class LockerBuilder implements Builder {
   constructor(private manager: ObjectManager) {}
 
   async build(): Promise<void> {
-
     const existing = await this.manager.load('locker');
     if (existing) {
       this.obj = existing;
@@ -40,17 +39,17 @@ export class LockerBuilder implements Builder {
       this.obj = await this.manager.define('locker', parent, {
         properties: {
           name: 'Locker Bank',
-        description: 'A wall of storage lockers.',
-        // Compartments keyed by ID (e.g., "A1", "B2", "1", "2")
-        // Each: { owner: objref, masterCode: string, oneTimeCodes: [], locked: bool, contents: [], rentedAt: ISO, expiresAt: ISO }
-        compartments: {},
-        // Configuration
-        compartmentPrefix: '', // e.g., "A" for A1, A2, A3...
-        nextCompartmentNum: 1,
-        // Rental duration in milliseconds (default: 7 days)
-        rentalDurationMs: 7 * 24 * 60 * 60 * 1000,
+          description: 'A wall of storage lockers.',
+          // Compartments keyed by ID (e.g., "A1", "B2", "1", "2")
+          // Each: { owner: objref, masterCode: string, oneTimeCodes: [], locked: bool, contents: [], rentedAt: ISO, expiresAt: ISO }
+          compartments: {},
+          // Configuration
+          compartmentPrefix: '', // e.g., "A" for A1, A2, A3...
+          nextCompartmentNum: 1,
+          // Rental duration in milliseconds (default: 7 days)
+          rentalDurationMs: 7 * 24 * 60 * 60 * 1000,
 
-        abilities: `Bank of rentable storage compartments with code-based access.
+          abilities: `Bank of rentable storage compartments with code-based access.
 
 COMPARTMENTS: 'compartments' map keyed by ID (A1, B2, etc.). Each has: owner, masterCode, oneTimeCodes[], locked, contents[], rentedAt, expiresAt.
 
@@ -70,7 +69,7 @@ EXPIRATION: checkExpired() auto-expires old rentals. getExpirationInfo() shows t
       });
     }
     // Always rebuild methods (ensures they exist even if type was pre-existing)
-    const obj = this.obj!
+    const obj = this.obj!;
 
     // ═══════════════════════════════════════════════════════════════════
     // COMPARTMENT MANAGEMENT
@@ -858,7 +857,7 @@ EXPIRATION: checkExpired() auto-expires old rentals. getExpirationInfo() shows t
   }
 
   async registerAliases(): Promise<void> {
-    console.log('[LockerBuilder] Type \'locker\' auto-aliased');
+    console.log("[LockerBuilder] Type 'locker' auto-aliased");
   }
 }
 

@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
-import { registerBuilder, type Builder } from '../builder-registry';
+import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Builds the CloneTank type
@@ -37,39 +37,39 @@ export class CloneTankBuilder implements Builder {
   constructor(private manager: ObjectManager) {}
 
   async build(): Promise<void> {
-
     // Check if type already exists
     const existing = await this.manager.load('cloneTank');
     if (existing) {
       this.obj = existing;
     } else {
       const parentObj = await this.manager.load('describable');
-      if (!parentObj) throw new Error('CloneTankBuilder: describable type not found');
+      if (!parentObj)
+        throw new Error('CloneTankBuilder: describable type not found');
 
       this.obj = await this.manager.define('cloneTank', parentObj, {
-      properties: {
-        name: 'Clone Tank',
-        description:
-          'A cylindrical glass tank filled with murky amniotic fluid. Cables and tubes snake from the base into the ceiling. Status lights blink lazily on the control panel. This is where the dead come back—if they paid their dues.',
+        properties: {
+          name: 'Clone Tank',
+          description:
+            'A cylindrical glass tank filled with murky amniotic fluid. Cables and tubes snake from the base into the ceiling. Status lights blink lazily on the control panel. This is where the dead come back—if they paid their dues.',
 
-        // Cannot be moved
-        boltedDown: true,
+          // Cannot be moved
+          boltedDown: true,
 
-        // Clone data storage: { [playerId]: BackupRecord }
-        cloneData: {},
+          // Clone data storage: { [playerId]: BackupRecord }
+          cloneData: {},
 
-        // Current resurrection in progress
-        occupant: null, // Player being resurrected (ObjRef)
-        growthStarted: null, // When resurrection started (Date)
-        growthDuration: 5, // Minutes to grow a clone
+          // Current resurrection in progress
+          occupant: null, // Player being resurrected (ObjRef)
+          growthStarted: null, // When resurrection started (Date)
+          growthDuration: 5, // Minutes to grow a clone
 
-        // Ownership
-        owner: null, // Who owns this tank (ObjRef)
+          // Ownership
+          owner: null, // Who owns this tank (ObjRef)
 
-        // Aliases for commands
-        aliases: ['tank', 'clone tank', 'cloning tank'],
+          // Aliases for commands
+          aliases: ['tank', 'clone tank', 'cloning tank'],
 
-        abilities: `Resurrection device that grows clones from backup data.
+          abilities: `Resurrection device that grows clones from backup data.
 
 BACKUP STORAGE: 'cloneData' stores backup records keyed by player ID. One backup per player per tank. New backup overwrites old.
 
@@ -84,8 +84,8 @@ RESET: New clone has wounds healed, calories at minimum, no tattoos. Must eat an
 CONSUMPTION: Backup data ERASED after resurrection. Must re-backup at recording studio.
 
 IMMOVABLE: 'boltedDown' true. Cannot be moved.`,
-      },
-      methods: {},
+        },
+        methods: {},
       });
     }
 

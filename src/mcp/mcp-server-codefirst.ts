@@ -226,8 +226,7 @@ Write composable code - loops, conditionals, multi-step operations all work.`,
                 {
                   type: 'text',
                   text: JSON.stringify({
-                    error:
-                      'MCP not bootstrapped. Run npm run bootstrap:world',
+                    error: 'MCP not bootstrapped. Run npm run bootstrap:world',
                   }),
                 },
               ],

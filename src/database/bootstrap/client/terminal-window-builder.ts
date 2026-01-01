@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
-import { registerBuilder, type Builder } from '../builder-registry';
+import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Builds the TerminalWindow class client module
@@ -371,7 +371,9 @@ export class TerminalWindow extends Window {
     `,
     );
 
-    console.log(`[TerminalWindowBuilder] Built $.terminalWindowJs -> #${obj.id}`);
+    console.log(
+      `[TerminalWindowBuilder] Built $.terminalWindowJs -> #${obj.id}`,
+    );
   }
 
   async registerAliases(): Promise<void> {

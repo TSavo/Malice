@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
-import { registerBuilder, type Builder } from '../builder-registry';
+import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Builds the Player type
@@ -28,53 +28,53 @@ export class PlayerBuilder implements Builder {
 
       this.obj = await this.manager.define('player', human, {
         properties: {
-        name: 'Player',
-        description: 'Base prototype for player characters',
+          name: 'Player',
+          description: 'Base prototype for player characters',
 
-        // Authentication
-        playername: '',
-        email: '',
-        passwordHash: '',
-        sslFingerprint: '',
-        sshPublicKeys: [], // Array of OpenSSH format public keys
-        oauthSubject: '',
+          // Authentication
+          playername: '',
+          email: '',
+          passwordHash: '',
+          sslFingerprint: '',
+          sshPublicKeys: [], // Array of OpenSSH format public keys
+          oauthSubject: '',
 
-        // Permissions
-        canUseDevTools: false,
-        isWizard: false,
-        isSuspended: false,
+          // Permissions
+          canUseDevTools: false,
+          isWizard: false,
+          isSuspended: false,
 
-        // Stats
-        createdAt: null,
-        lastLogin: null,
-        totalPlaytime: 0,
+          // Stats
+          createdAt: null,
+          lastLogin: null,
+          totalPlaytime: 0,
 
-        // Player-specific
-        title: '',
-        homepage: '',
+          // Player-specific
+          title: '',
+          homepage: '',
 
-        // Fitness training
-        fitnessXP: 0, // Accumulated XP pool to spend
-        fitnessPlaytime: 0, // Minutes played toward next XP (resets at 180)
-        fitnessXPToday: 0, // XP earned today (max 3)
-        fitnessLastDay: null, // Date string of last XP day (for reset)
+          // Fitness training
+          fitnessXP: 0, // Accumulated XP pool to spend
+          fitnessPlaytime: 0, // Minutes played toward next XP (resets at 180)
+          fitnessXPToday: 0, // XP earned today (max 3)
+          fitnessLastDay: null, // Date string of last XP day (for reset)
 
-        // Clone system
-        cloneBackupTank: null, // ObjRef to tank holding our backup (or null)
+          // Clone system
+          cloneBackupTank: null, // ObjRef to tank holding our backup (or null)
 
-        // Window layout for web client
-        windowLayout: {
-          windows: [],
-          taskbarOrder: [],
-          lastUpdated: null,
+          // Window layout for web client
+          windowLayout: {
+            windows: [],
+            taskbarOrder: [],
+            lastUpdated: null,
+          },
         },
-      },
         methods: {},
       });
     }
 
     // Always rebuild methods (ensures they exist even if type was pre-existing)
-    const obj = this.obj!
+    const obj = this.obj!;
     // Property descriptions
     obj.setPropertyDescription(
       'playername',

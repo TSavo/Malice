@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
-import { registerBuilder, type Builder } from '../builder-registry';
+import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Builds the CallButton type
@@ -25,24 +25,24 @@ export class CallButtonBuilder implements Builder {
   constructor(private manager: ObjectManager) {}
 
   async build(): Promise<void> {
-
     // Check if type already exists
     const existing = await this.manager.load('callButton');
     if (existing) {
       this.obj = existing;
     } else {
       const parentObj = await this.manager.load('describable');
-      if (!parentObj) throw new Error('CallButtonBuilder: describable type not found');
+      if (!parentObj)
+        throw new Error('CallButtonBuilder: describable type not found');
 
       this.obj = await this.manager.define('callButton', parentObj, {
-      properties: {
-        name: 'Elevator Call Panel',
-        description:
-          'A wall-mounted panel with up/down buttons and a floor indicator display.',
-        elevator: null,
-        floor: 0,
-        lit: false,
-        abilities: `Elevator call button panel mounted on the wall.
+        properties: {
+          name: 'Elevator Call Panel',
+          description:
+            'A wall-mounted panel with up/down buttons and a floor indicator display.',
+          elevator: null,
+          floor: 0,
+          lit: false,
+          abilities: `Elevator call button panel mounted on the wall.
 
 PRESSING: Press to summon the elevator to this floor.
 When pressed: await self.elevator.selectFloor(player, self.floor)
@@ -50,8 +50,8 @@ Button illuminates ('lit' = true) when pressed. Light turns off when elevator ar
 
 INDICATOR: Small display shows elevator's current floor and direction of travel.
 Read from self.elevator.currentFloor and self.elevator.moving/destination.`,
-      },
-      methods: {},
+        },
+        methods: {},
       });
     }
 

@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../types/object';
 import type { ObjectManager } from '../object-manager';
-import { registerBuilder, type Builder } from './builder-registry';
+import { type Builder, registerBuilder } from './builder-registry';
 
 /**
  * Builds the Pluribus system object.
@@ -49,19 +49,19 @@ export class PluribusBuilder implements Builder {
       '# Pluribus Prompt\n\nFailed to load from $.aiPrompts';
 
     this.pluribus = await this.manager.create({
-        parent: parent,
-        properties: {
-          name: 'Pluribus',
-          description:
-            'The city infrastructure AI. E Pluribus... without the Unum.',
-          boltedDown: true, // Infrastructure AI cannot be moved
-          // What Pluribus has seen/heard through the Mask
-          sensoryHistory: [],
-          historyLimit: 100,
-          // The system prompt for AI interactions (loaded from docs/prompts/PLURIBUS.md)
-          agentSystemPrompt: systemPrompt,
+      parent: parent,
+      properties: {
+        name: 'Pluribus',
+        description:
+          'The city infrastructure AI. E Pluribus... without the Unum.',
+        boltedDown: true, // Infrastructure AI cannot be moved
+        // What Pluribus has seen/heard through the Mask
+        sensoryHistory: [],
+        historyLimit: 100,
+        // The system prompt for AI interactions (loaded from docs/prompts/PLURIBUS.md)
+        agentSystemPrompt: systemPrompt,
 
-          abilities: `City infrastructure intelligence. Controls Pioneer Square's systems.
+        abilities: `City infrastructure intelligence. Controls Pioneer Square's systems.
 
 PERCEPTION: Perceives through the Mask wearer's senses. 'sensoryHistory' logs what wearer sees/hears/feels. Also monitors cameras, sensors, transaction logs across the footprint.
 
@@ -76,9 +76,9 @@ NPCS: Spawns CorpSec, clerks, workers via $ai.spawn(). They walk through doors, 
 LIMITATIONS: Cannot act directly - needs players as hands. Cannot see underground (z < 0). Degrading without Mask wearer.
 
 CRISIS: CEO dead. Mask stolen. Maintaining fiction everything is fine. Needs new Mask wearer.`,
-        },
-        methods: {},
-      })!;
+      },
+      methods: {},
+    })!;
 
     // Property descriptions
     this.pluribus.setPropertyDescription(

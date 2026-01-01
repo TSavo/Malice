@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
-import { registerBuilder, type Builder } from '../builder-registry';
+import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Builds the FactionManager singleton
@@ -48,21 +48,21 @@ export class FactionManagerBuilder implements Builder {
     this.obj = await this.manager.create({
       parent: parentObj,
       properties: {
-          name: 'Faction Manager',
-          description:
-            'Singleton manager for faction creation, memberships, and relationships.',
-          // Map of factionId -> array of member entity IDs
-          members: {},
-          // Map of entityId -> factionId
-          memberships: {},
-          // Map of "factionIdA:factionIdB" -> relationship ('friendly', 'hostile', 'neutral')
-          relationships: {},
-          // Next faction index for port allocation
-          nextFactionIndex: 0,
-          // Map of domain -> factionId for quick lookup
-          domainMap: {},
+        name: 'Faction Manager',
+        description:
+          'Singleton manager for faction creation, memberships, and relationships.',
+        // Map of factionId -> array of member entity IDs
+        members: {},
+        // Map of entityId -> factionId
+        memberships: {},
+        // Map of "factionIdA:factionIdB" -> relationship ('friendly', 'hostile', 'neutral')
+        relationships: {},
+        // Next faction index for port allocation
+        nextFactionIndex: 0,
+        // Map of domain -> factionId for quick lookup
+        domainMap: {},
 
-          abilities: `Singleton manager for the faction system. Accessed via $factionManager.
+        abilities: `Singleton manager for the faction system. Accessed via $factionManager.
 
 CREATE/DESTROY: create({name, domain, charGen, description}) creates faction + spins up transports. destroy(faction) shuts down transports + recycles object.
 
@@ -73,9 +73,9 @@ RELATIONSHIPS: setRelationship(factionA, factionB, type) sets relationship (frie
 CHECKS: isFriendly(entityA, entityB) true if same faction or allied. isHostile(entityA, entityB) true if factions hostile.
 
 LOOKUP: getByDomain(domain) returns faction. list() returns all factions.`,
-        },
-        methods: {},
-      });
+      },
+      methods: {},
+    });
 
     const obj = this.obj;
 

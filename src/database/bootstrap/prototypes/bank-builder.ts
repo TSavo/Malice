@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
-import { registerBuilder, type Builder } from '../builder-registry';
+import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Builds the Bank type
@@ -33,19 +33,19 @@ export class BankBuilder implements Builder {
 
       this.obj = await this.manager.define('bank', root, {
         properties: {
-        name: 'Bank',
-        description: 'Electronic currency ledger',
-        // Accounts keyed by account ID
-        accounts: {},
-        // Transaction ledger (append-only)
-        ledger: [],
-        // Processed idempotency keys -> results
-        processedKeys: {},
-        // Counter for generating unique IDs
-        nextAccountNum: 1,
-        nextTxNum: 1,
-        // Abilities - banking system for AI interpretation
-        abilities: `Electronic banking system for credit transactions. The official currency of the city.
+          name: 'Bank',
+          description: 'Electronic currency ledger',
+          // Accounts keyed by account ID
+          accounts: {},
+          // Transaction ledger (append-only)
+          ledger: [],
+          // Processed idempotency keys -> results
+          processedKeys: {},
+          // Counter for generating unique IDs
+          nextAccountNum: 1,
+          nextTxNum: 1,
+          // Abilities - banking system for AI interpretation
+          abilities: `Electronic banking system for credit transactions. The official currency of the city.
 
 ACCOUNTS: Each agent has a bank account with a balance in credits. Use getAccountByOwner(agent) to find their account. Accounts can be frozen to block transactions.
 
@@ -687,7 +687,7 @@ NOTE: This is the legal payment system. Physical cash ($dollar) is contraband.`,
   }
 
   async registerAliases(): Promise<void> {
-    console.log('[BankBuilder] Type \'bank\' auto-aliased');
+    console.log("[BankBuilder] Type 'bank' auto-aliased");
   }
 }
 

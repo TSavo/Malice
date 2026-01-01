@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
-import { registerBuilder, type Builder } from '../builder-registry';
+import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Builds the Clothing type
@@ -42,23 +42,23 @@ export class ClothingBuilder implements Builder {
 
       this.obj = await this.manager.define('clothing', wearable, {
         properties: {
-        name: 'Clothing',
-        description: 'An article of clothing',
-        // Default clothing covers torso
-        covers: ['torso'],
-        // Default layer - base layer (over underwear)
-        layer: 2,
-        // Clothing provides warmth, not protection
-        warmth: 10,
-        protection: 0,
-        // Clothing-specific properties
-        material: 'cotton', // fabric type
-        color: 'white',
-        condition: 100, // 0-100, degrades with wear
-        // Pockets - array of $.pocket ObjRefs (empty by default)
-        pockets: [],
+          name: 'Clothing',
+          description: 'An article of clothing',
+          // Default clothing covers torso
+          covers: ['torso'],
+          // Default layer - base layer (over underwear)
+          layer: 2,
+          // Clothing provides warmth, not protection
+          warmth: 10,
+          protection: 0,
+          // Clothing-specific properties
+          material: 'cotton', // fabric type
+          color: 'white',
+          condition: 100, // 0-100, degrades with wear
+          // Pockets - array of $.pocket ObjRefs (empty by default)
+          pockets: [],
 
-        abilities: `Wearable fabric garment for covering body.
+          abilities: `Wearable fabric garment for covering body.
 
 WEARING: doWear(player) equips on body. doRemove(player) takes off and places in hand or drops.
 
@@ -81,7 +81,7 @@ FIRE: Most fabrics burn. Fire damage destroys clothing, may injure wearer.`,
     }
 
     // Always rebuild methods (ensures they exist even if type was pre-existing)
-    const obj = this.obj!
+    const obj = this.obj!;
 
     // Wear this clothing item (AI calls this directly)
     obj.setMethod(

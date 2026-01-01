@@ -7,5 +7,5 @@
  */
 
 export { PollingChannel } from './polling-channel';
-export { PollingMux, type MuxMessage } from './polling-mux';
+export { type MuxMessage, PollingMux } from './polling-mux';
 export { PollingMuxTransport } from './polling-mux-transport';

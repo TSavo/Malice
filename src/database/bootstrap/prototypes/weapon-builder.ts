@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
-import { registerBuilder, type Builder } from '../builder-registry';
+import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Builds the Weapon type
@@ -47,39 +47,39 @@ export class WeaponBuilder implements Builder {
     } else {
       const parent = await this.manager.load('describable');
       this.obj = await this.manager.define('weapon', parent!, {
-      properties: {
-        name: 'Weapon',
-        description: 'Base prototype for weapons',
+        properties: {
+          name: 'Weapon',
+          description: 'Base prototype for weapons',
 
-        // The skill used when fighting with this weapon
-        skill: 'improvised',
+          // The skill used when fighting with this weapon
+          skill: 'improvised',
 
-        // Base damage modifier (0-100 scale)
-        damage: 0,
+          // Base damage modifier (0-100 scale)
+          damage: 0,
 
-        // Default damage type: cut, bruise, puncture, laceration, burn
-        damageType: 'bruise',
+          // Default damage type: cut, bruise, puncture, laceration, burn
+          damageType: 'bruise',
 
-        // Whether requires two hands for effective use
-        twoHanded: false,
+          // Whether requires two hands for effective use
+          twoHanded: false,
 
-        // Whether this is a ranged weapon
-        ranged: false,
+          // Whether this is a ranged weapon
+          ranged: false,
 
-        // Effective range in meters (ranged only)
-        range: 0,
+          // Effective range in meters (ranged only)
+          range: 0,
 
-        // Current ammo count (ranged only)
-        ammo: 0,
+          // Current ammo count (ranged only)
+          ammo: 0,
 
-        // Max ammo capacity (ranged only)
-        maxAmmo: 0,
+          // Max ammo capacity (ranged only)
+          maxAmmo: 0,
 
-        // Ammo type required for reloading
-        ammoType: null,
+          // Ammo type required for reloading
+          ammoType: null,
 
-        // Abilities - weapon physics for AI interpretation
-        abilities: `Object that can be used to inflict damage in combat.
+          // Abilities - weapon physics for AI interpretation
+          abilities: `Object that can be used to inflict damage in combat.
 
 COMBAT TRACKING: When attacking someone, call $combat.start(attacker, defender) to set up exclusions. This prevents sleep, travel, etc. during the fight. Call $combat.log(combatId, message) to record events. Call $combat.end(combatId, reason, winner) when combat concludes.
 
@@ -98,8 +98,8 @@ DAMAGE SCALE:
 - 60+: Heavy weapons
 
 CONDITION: Weapons can degrade with use. Broken weapons have reduced damage or may fail.`,
-      },
-      methods: {},
+        },
+        methods: {},
       });
     }
 
@@ -293,7 +293,7 @@ CONDITION: Weapons can degrade with use. Broken weapons have reduced damage or m
   }
 
   async registerAliases(): Promise<void> {
-    console.log('[WeaponBuilder] Type \'weapon\' auto-aliased');
+    console.log("[WeaponBuilder] Type 'weapon' auto-aliased");
   }
 }
 

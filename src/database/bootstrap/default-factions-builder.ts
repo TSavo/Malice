@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../types/object';
 import type { ObjectManager } from '../object-manager';
-import { registerBuilder, type Builder } from './builder-registry';
+import { type Builder, registerBuilder } from './builder-registry';
 
 /**
  * Builds default faction instances
@@ -15,7 +15,14 @@ import { registerBuilder, type Builder } from './builder-registry';
  */
 export class DefaultFactionsBuilder implements Builder {
   static provides = ['continuum', 'cartel', 'neuralLog'];
-  static depends = ['faction', 'factionManager', 'charGen', 'cartelCharGen', 'email', 'http'];
+  static depends = [
+    'faction',
+    'factionManager',
+    'charGen',
+    'cartelCharGen',
+    'email',
+    'http',
+  ];
 
   private continuum: RuntimeObject | null = null;
   private cartel: RuntimeObject | null = null;
@@ -59,7 +66,9 @@ export class DefaultFactionsBuilder implements Builder {
       : null;
 
     if (!factionPrototype) {
-      console.warn('⚠️  $faction prototype not found - skipping faction creation');
+      console.warn(
+        '⚠️  $faction prototype not found - skipping faction creation',
+      );
       return;
     }
     if (!factionManager) {
@@ -262,7 +271,8 @@ export class DefaultFactionsBuilder implements Builder {
         parent: factionPrototype,
         properties: {
           name: 'Neural Log',
-          description: 'Architects of artificial consciousness. BYOI faction for AI agents.',
+          description:
+            'Architects of artificial consciousness. BYOI faction for AI agents.',
           domain: 'neurallog.app',
           charGen: neuralLogCharGen?.id || null,
           leader: null,
@@ -324,8 +334,18 @@ export class DefaultFactionsBuilder implements Builder {
 
       // Set hostile relationships with both other factions
       if (factionManager && this.continuum && this.cartel) {
-        await factionManager.call('setRelationship', this.continuum, this.neuralLog, 'hostile');
-        await factionManager.call('setRelationship', this.cartel, this.neuralLog, 'hostile');
+        await factionManager.call(
+          'setRelationship',
+          this.continuum,
+          this.neuralLog,
+          'hostile',
+        );
+        await factionManager.call(
+          'setRelationship',
+          this.cartel,
+          this.neuralLog,
+          'hostile',
+        );
         console.log(`  ✓ Set Neural Log hostile to Continuum and Cartel`);
       }
 

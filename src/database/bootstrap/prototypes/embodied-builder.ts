@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
-import { registerBuilder, type Builder } from '../builder-registry';
+import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Builds the Embodied type
@@ -39,19 +39,19 @@ export class EmbodiedBuilder implements Builder {
 
       this.obj = await this.manager.define('embodied', agent, {
         properties: {
-        name: 'Embodied',
-        description: 'Base prototype for agents with physical bodies',
-        // Body reference - set when body is created
-        body: null, // ObjRef to torso (root of body tree)
-        // Consciousness state
-        conscious: true,
-        // Breath/air tracking for drowning
-        breath: 100, // Current breath 0-100 (100 = full lungs)
-        maxBreath: 100, // Max breath capacity (trained swimmers have more)
-        // Sensory history for AI awareness (last 50 things seen/heard)
-        sensoryHistory: [],
+          name: 'Embodied',
+          description: 'Base prototype for agents with physical bodies',
+          // Body reference - set when body is created
+          body: null, // ObjRef to torso (root of body tree)
+          // Consciousness state
+          conscious: true,
+          // Breath/air tracking for drowning
+          breath: 100, // Current breath 0-100 (100 = full lungs)
+          maxBreath: 100, // Max breath capacity (trained swimmers have more)
+          // Sensory history for AI awareness (last 50 things seen/heard)
+          sensoryHistory: [],
 
-        abilities: `Agent with a physical body that has sensory organs, metabolism, and mortality.
+          abilities: `Agent with a physical body that has sensory organs, metabolism, and mortality.
 
 BODY STRUCTURE: 'body' property points to torso (root of body tree). Access parts via getBody(), getHead(), getHands(), getEars(), getEyes(). Body parts have their own abilities.
 
@@ -66,13 +66,13 @@ BREATHING: 'breath' tracks air for underwater. Depletes when submerged. Drowning
 WOUNDS: Body parts accumulate wounds. Wounds bleed (drains hydration/calories), cause pain, can infect. bleedTick() processes all wounds each heartbeat.
 
 STRENGTH: Derived from body part effective capacity (maxCalories - decayLevel). Weakest link in arm path limits what can be lifted/held.`,
-      },
+        },
         methods: {},
       });
     }
 
     // Always rebuild methods (ensures they exist even if type was pre-existing)
-    const obj = this.obj!
+    const obj = this.obj!;
     this.addBodyAccessMethods(obj);
     this.addSensoryMethods(obj);
     this.addCalorieMethods(obj);

@@ -353,9 +353,7 @@ export class ObjectDatabase {
    */
   async getChildren(parentId: ObjId): Promise<GameObject[]> {
     // Query using dot notation for nested ObjRefValue
-    return await this.objects
-      .find({ 'parent.id': parentId } as any)
-      .toArray();
+    return await this.objects.find({ 'parent.id': parentId } as any).toArray();
   }
 
   /**
