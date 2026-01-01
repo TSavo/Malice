@@ -16,6 +16,10 @@ export class HelicopterBuilder implements Builder {
     'rotor',
     'mainRotor',
     'tailRotor',
+    'starter',
+    'alternator',
+    'ecu',
+    'wiringHarness',
     'pocket',
   ];
 
@@ -40,6 +44,10 @@ export class HelicopterBuilder implements Builder {
             'engine',
             'fuelTank',
             'battery',
+            'starter',
+            'alternator',
+            'ecu',
+            'wiringHarness',
             'rotor', // Main rotor
             'tailRotor', // Tail rotor for stability
           ],

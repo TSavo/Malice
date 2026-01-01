@@ -96,6 +96,7 @@ export { VehicleBuilder } from './vehicle-builder';
 export { VehicleExitBuilder } from './vehicle-exit-builder';
 export { VehicleRoomBuilder } from './vehicle-room-builder';
 export { CarBuilder } from './car-builder';
+export { MotorcycleBuilder } from './motorcycle-builder';
 export { GarageBuilder } from './garage-builder';
 export { MechanicBuilder } from './mechanic-builder';
 // Fuel system
@@ -105,6 +106,18 @@ export { FuelPumpBuilder } from './fuel-pump-builder';
 export { FuelSiphonBuilder } from './fuel-siphon-builder';
 // Tools
 export { GrapplingHookBuilder } from './grappling-hook-builder';
+export { FlashlightBuilder } from './flashlight-builder';
+export { BackpackBuilder } from './backpack-builder';
+export { RadioBuilder } from './radio-builder';
+export { HandcuffsBuilder } from './handcuffs-builder';
+// Surveillance
+export { CameraBuilder } from './camera-builder';
+export { SensorBuilder } from './sensor-builder';
+export { AlarmBuilder } from './alarm-builder';
+export { TrapBuilder } from './trap-builder';
+// Power
+export { GeneratorBuilder } from './generator-builder';
+export { PowerCellBuilder } from './power-cell-builder';
 // Smokables
 export { SmokableBuilder } from './smokable-builder';
 export { CigaretteBuilder } from './cigarette-builder';
