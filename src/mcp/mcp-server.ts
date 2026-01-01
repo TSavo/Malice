@@ -18,9 +18,19 @@ import {
 } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { z } from 'zod';
-import type { ObjId, RuntimeObject } from '../../types/object.js';
+import type { ObjId, RuntimeObject, Value } from '../../types/object.js';
 import type { ObjectManager } from '../database/object-manager.js';
 import { parseQuery, validateQuery } from './query-parser.js';
+
+/**
+ * Safely extract the raw value from a Value type.
+ * Returns the value field for most types, id for objrefs.
+ */
+function getValueData(val: Value | undefined): unknown {
+  if (!val) return undefined;
+  if (val.type === 'objref') return val.id;
+  return val.value;
+}
 
 /**
  * Regex pattern for object references in MCP tools.
@@ -510,7 +520,7 @@ export class MaliceMCPServer {
 
             if (recursive) {
               // Build set of all descendant parent IDs
-              const validParents = new Set<number>([id]);
+              const validParents = new Set<ObjId>([id]);
               let changed = true;
               while (changed) {
                 changed = false;
@@ -528,9 +538,10 @@ export class MaliceMCPServer {
 
               for (const o of allObjects) {
                 if (validParents.has(o._id) || o.parent.id === id) {
+                  const nameVal = o.properties?.name;
                   descendantList.push({
                     id: `#${o._id}`,
-                    name: o.properties?.name?.value || '(unnamed)',
+                    name: (nameVal && 'value' in nameVal ? nameVal.value : null) || '(unnamed)',
                     parent: `#${o.parent.id}`,
                   });
                   if (descendantList.length >= maxResults) break;
@@ -540,9 +551,10 @@ export class MaliceMCPServer {
               // Direct children only
               for (const o of allObjects) {
                 if (o.parent.id === id) {
+                  const nameVal = o.properties?.name;
                   descendantList.push({
                     id: `#${o._id}`,
-                    name: o.properties?.name?.value || '(unnamed)',
+                    name: (nameVal && 'value' in nameVal ? nameVal.value : null) || '(unnamed)',
                     parent: `#${o.parent.id}`,
                   });
                   if (descendantList.length >= maxResults) break;
@@ -850,10 +862,10 @@ export class MaliceMCPServer {
           // Find Room and Exit prototypes
           const allObjects = await this.manager.db.listAll(false);
           const roomProto = allObjects.find(
-            (o) => o.properties?.name?.value === 'Room',
+            (o) => getValueData(o.properties?.name) === 'Room',
           );
           const exitProto = allObjects.find(
-            (o) => o.properties?.name?.value === 'Exit',
+            (o) => getValueData(o.properties?.name) === 'Exit',
           );
 
           if (!roomProto) {
@@ -963,7 +975,7 @@ export class MaliceMCPServer {
       async () => {
         const allObjects = await this.manager.db.listAll(false);
         const roomProto = allObjects.find(
-          (o) => o.properties?.name?.value === 'Room',
+          (o) => getValueData(o.properties?.name) === 'Room',
         );
         if (!roomProto) {
           return {
@@ -992,11 +1004,11 @@ export class MaliceMCPServer {
           if (isRoom && obj._id !== roomProto._id) {
             rooms.push({
               id: obj._id,
-              name: obj.properties?.name?.value || '(unnamed)',
-              x: obj.properties?.x?.value ?? 0,
-              y: obj.properties?.y?.value ?? 0,
-              z: obj.properties?.z?.value ?? 0,
-              exitCount: (obj.properties?.exits?.value || []).length,
+              name: (getValueData(obj.properties?.name) as string) || '(unnamed)',
+              x: (getValueData(obj.properties?.x) as number) ?? 0,
+              y: (getValueData(obj.properties?.y) as number) ?? 0,
+              z: (getValueData(obj.properties?.z) as number) ?? 0,
+              exitCount: ((getValueData(obj.properties?.exits) as unknown[]) || []).length,
             });
           }
         }
@@ -1020,7 +1032,7 @@ export class MaliceMCPServer {
       async () => {
         const allObjects = await this.manager.db.listAll(false);
         const playerProto = allObjects.find(
-          (o) => o.properties?.name?.value === 'Player',
+          (o) => getValueData(o.properties?.name) === 'Player',
         );
         if (!playerProto) {
           return {
@@ -3833,7 +3845,7 @@ Core Objects:
       async () => {
         const allObjects = await this.manager.db.listAll(false);
         const playerProto = allObjects.find(
-          (o) => o.properties?.name?.value === 'Player',
+          (o) => getValueData(o.properties?.name) === 'Player',
         );
         if (!playerProto) {
           return {
