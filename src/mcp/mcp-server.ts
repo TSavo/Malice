@@ -18,7 +18,7 @@ import {
 } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { z } from 'zod';
-import type { ObjId, RuntimeObject, Value } from '../../types/object.js';
+import type { ObjId, ObjRefValue, RuntimeObject, Value } from '../../types/object.js';
 import type { ObjectManager } from '../database/object-manager.js';
 import { parseQuery, validateQuery } from './query-parser.js';
 
@@ -538,10 +538,9 @@ export class MaliceMCPServer {
 
               for (const o of allObjects) {
                 if (validParents.has(o._id) || o.parent.id === id) {
-                  const nameVal = o.properties?.name;
                   descendantList.push({
                     id: `#${o._id}`,
-                    name: (nameVal && 'value' in nameVal ? nameVal.value : null) || '(unnamed)',
+                    name: (getValueData(o.properties?.name) as string) || '(unnamed)',
                     parent: `#${o.parent.id}`,
                   });
                   if (descendantList.length >= maxResults) break;
@@ -551,10 +550,9 @@ export class MaliceMCPServer {
               // Direct children only
               for (const o of allObjects) {
                 if (o.parent.id === id) {
-                  const nameVal = o.properties?.name;
                   descendantList.push({
                     id: `#${o._id}`,
-                    name: (nameVal && 'value' in nameVal ? nameVal.value : null) || '(unnamed)',
+                    name: (getValueData(o.properties?.name) as string) || '(unnamed)',
                     parent: `#${o.parent.id}`,
                   });
                   if (descendantList.length >= maxResults) break;

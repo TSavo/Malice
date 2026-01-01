@@ -273,7 +273,7 @@ export class DevToolsServer {
     const allObjects = await this.manager.db.listAll(params.includeRecycled);
 
     // Build reverse alias map (objectId -> alias name)
-    const aliasMap = new Map<number, string>();
+    const aliasMap = new Map<ObjId, string>();
     const aliasEntries = this.manager.getAliases();
     for (const [aliasName, aliasObj] of aliasEntries) {
       aliasMap.set(aliasObj.id, aliasName);
@@ -324,7 +324,7 @@ export class DevToolsServer {
         methods: raw.methods,
         created: raw.created,
         modified: raw.modified,
-        recycled: raw.recycled,
+        recycled: 'recycled' in raw ? raw.recycled : false,
       },
     };
   }
@@ -523,7 +523,7 @@ export class DevToolsServer {
 
     let definitions: string;
 
-    if (params.objectId !== undefined) {
+    if (params.objectId !== undefined && typeof params.objectId === 'number') {
       // Generate types for specific object (with enhanced self type)
       definitions = await generator.generateForObject(params.objectId);
     } else {
