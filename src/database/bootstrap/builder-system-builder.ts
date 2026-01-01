@@ -14,7 +14,7 @@ import { type Builder, registerBuilder } from './builder-registry';
  */
 export class BuilderSystemBuilder implements Builder {
   static provides = ['builder'];
-  static depends = ['spatial', 'room', 'exit'];
+  static depends = ['room', 'exit']; // Uses $spatial at runtime (not build time)
 
   private builder: RuntimeObject | null = null;
 
