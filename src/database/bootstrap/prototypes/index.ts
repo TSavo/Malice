@@ -93,6 +93,8 @@ export { AirspaceRoomBuilder } from './airspace-room-builder';
 export { RotorBuilder } from './rotor-builder';
 export { AircraftBuilder } from './aircraft-builder';
 export { HelicopterBuilder } from './helicopter-builder';
+export { VectorThrusterBuilder } from './vector-thruster-builder';
+export { AvBuilder } from './av-builder';
 // Weapons
 export { WeaponBuilder } from './weapon-builder';
 // Note: Bladed, Firearm, and Improvised weapons now use individual Builders that self-register
