@@ -55,6 +55,7 @@ export class ExitBuilder implements Builder {
           lockKey: null, // Legacy key-based lock
           locks: [], // Composable lock objects
           door: null, // Reference to $.door object
+          vehicleAllowed: false, // Whether vehicles can use this exit (roads, not stairs/ladders)
 
           abilities: `Passage connecting one room to another.
 
@@ -73,7 +74,11 @@ ACCESS: canUse(agent) checks all lock systems. Returns { allowed, reason }.
 
 MATCHING: matches(direction) checks name and aliases. Case-insensitive.
 
-USAGE: Room.go() finds exit via findExit(), checks canUse(), queues movement to destRoom.`,
+USAGE: Room.go() finds exit via findExit(), checks canUse(), queues movement to destRoom.
+
+VEHICLES: 'vehicleAllowed' (default false) determines if vehicles can use this exit.
+Set true for roads, streets, driveways. Leave false for stairs, ladders, narrow alleys, indoor doors.
+Vehicles check this before driving through an exit.`,
         },
         methods: {},
       });
@@ -255,6 +260,10 @@ USAGE: Room.go() finds exit via findExit(), checks canUse(), queues movement to 
     obj.setPropertyDescription(
       'door',
       'Reference to $.door object with full door mechanics',
+    );
+    obj.setPropertyDescription(
+      'vehicleAllowed',
+      'Whether vehicles can drive through this exit. True for roads, false for stairs/ladders/indoor.',
     );
 
     this.obj = obj;

@@ -76,6 +76,24 @@ import './prototypes/sustain-builder';
 import './prototypes/vendable-builder';
 import './prototypes/wireless-phone-builder';
 
+// Vehicle system
+import './prototypes/vehicle-part-builder';
+import './prototypes/engine-builder';
+import './prototypes/fuel-tank-builder';
+import './prototypes/vehicle-battery-builder';
+import './prototypes/wheel-builder';
+import './prototypes/transmission-builder';
+import './prototypes/vehicle-builder';
+import './prototypes/car-builder';
+import './prototypes/garage-builder';
+import './prototypes/mechanic-builder';
+
+// Airspace system (for aircraft)
+import './prototypes/airspace-room-builder';
+import './prototypes/rotor-builder';
+import './prototypes/aircraft-builder';
+import './prototypes/helicopter-builder';
+
 // ═══════════════════════════════════════════════════════════════════════════
 // CLIENT MODULES (JS served to browser)
 // ═══════════════════════════════════════════════════════════════════════════
@@ -111,6 +129,7 @@ import './preauth-handler-builder';
 
 // Spatial and environment
 import './spatial-builder';
+import './airspace-builder';
 
 // Text formatting and language
 import './prompt-builder';

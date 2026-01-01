@@ -270,7 +270,29 @@ async function placeSpecialObjects(manager: ObjectManager): Promise<void> {
         `  ✅ Placed Totem Pole at zero point (#${groundRoom.id}), aliased $bottomOfTotemPole`,
       );
 
-      // Create the top-of-pole room at z=1
+      // Add totem pole climbing abilities to the ground room
+      const existingAbilities = groundRoom.get('abilities') || '';
+      const totemClimbingAbilities = `
+
+TOTEM POLE: A 60-foot carved cedar pole stands here. Carved figures: Bear at the base,
+then Whale, Wolf, Frog, Eagle, and Raven at the top. The wood is weathered grey.
+
+CLIMBING UP: The totem pole can be climbed. Use $spatial to find adjacent z-level rooms.
+UP: await $spatial.getRoomDataAt(self.x, self.y, self.z + 1) then player.moveTo(targetRoom)
+At z=0 (ground), only up is available.
+
+NARRATION when climbing:
+- Ground sees: "[Player] begins climbing the totem pole, gripping Bear's carved ears."
+- z+1 room sees: "[Player] climbs up from below, breathing hard."
+
+NARRATION when someone descends:
+- z+1 room sees: "[Player] climbs down, descending toward the ground."
+- Ground sees: "[Player] drops the last few feet from the totem pole to the concrete."`;
+
+      groundRoom.set('abilities', existingAbilities + totemClimbingAbilities);
+      console.log(`  ✅ Added totem pole climbing abilities to ground room`);
+
+      // Create the top-of-pole room at z=6
       const topRoom = await manager.create({
         parent: roomPrototype,
         properties: {
@@ -284,21 +306,21 @@ Raven's beak points at the sky inches from your face. The camera lenses in its e
 The only way down is the way you came up: sixty feet of carved cedar, hand over hand past Wolf and Whale and Bear.`,
           x: groundRoom.get('x') ?? -7,
           y: groundRoom.get('y') ?? 0,
-          z: 1,
+          z: 6,
           outdoor: true,
           abilities: `The top of the sixty-foot totem pole. A narrow maintenance ledge among Raven's wings.
 
-CLIMBING DOWN: player.moveTo($bottomOfTotemPole)
+CLIMBING: Use $spatial to find adjacent z-level rooms.
+DOWN: await $spatial.getRoomDataAt(self.x, self.y, self.z - 1) then player.moveTo(targetRoom)
+At z=6 (the top), only down is available.
 
 NARRATION when descending:
-- $topOfTotemPole sees: "[Player] begins the long climb down, disappearing below Raven's beak."
-- $bottomOfTotemPole sees: "[Player] descends the totem pole, emerging from among the carved
-  figures to drop the last few feet to the concrete."
+- This room sees: "[Player] begins the long climb down, disappearing below Raven's beak."
+- z-1 room sees: "[Player] descends from above, gripping the carved wood."
 
 NARRATION when someone arrives from below:
-- $bottomOfTotemPole sees: "[Player] climbs the totem pole, ascending hand over hand past
-  Bear and Whale and Wolf until they disappear among Raven's wings."
-- $topOfTotemPole sees: "[Player] pulls themselves up onto the narrow platform, wind
+- z-1 room sees: "[Player] climbs higher, disappearing among Raven's wings."
+- This room sees: "[Player] pulls themselves up onto the narrow platform, wind
   whipping at their clothes, sixty feet above the plaza."
 
 SURVEILLANCE: The camera in Raven's left eye has a clear view of anyone up here.
@@ -314,6 +336,68 @@ CAPACITY: One person. Maybe two if they're friendly. Three would be suicide.`,
       console.log(
         `  ✅ Created Top of the Totem Pole room (#${topRoom.id}), aliased $topOfTotemPole`,
       );
+
+      // Create intermediate climbing positions (z=1 through z=5)
+      const climbingAbilities = `Clinging to the totem pole, carved cedar under your hands.
+
+CLIMBING: Use $spatial to find adjacent z-level rooms.
+UP: await $spatial.getRoomDataAt(self.x, self.y, self.z + 1) then player.moveTo(targetRoom)
+DOWN: await $spatial.getRoomDataAt(self.x, self.y, self.z - 1) then player.moveTo(targetRoom)
+
+NARRATION: Describe the player ascending or descending past carved figures.
+At z=0 only up is available. At z=6 only down is available.
+
+CAPACITY: One person at a time on this section of pole.`;
+
+      const climbingPositions = [
+        {
+          z: 1,
+          name: 'Totem Pole - Bear',
+          description: `Three meters up, you grip Bear's carved ears. The wood is smooth from decades of weather, the paint long since faded to grey hints. Bear's snout points outward, frozen mid-roar. Below, the plaza seems further than it should. Above, the pole stretches another fifty feet.`,
+        },
+        {
+          z: 2,
+          name: 'Totem Pole - Between Bear and Whale',
+          description: `Six meters up, wedged between Bear's haunches and Whale's curved flukes. The carving here is deep—hand-holds if you know where to look. Wind tugs at your clothes. The street noise fades, replaced by the creak of old wood.`,
+        },
+        {
+          z: 3,
+          name: 'Totem Pole - Wolf',
+          description: `Nine meters up, gripping Wolf's carved ears. The figure's eyes stare past you toward the waterfront, painted pupils long faded to bare wood. Someone scratched initials into Wolf's cheek decades ago—barely visible now under lichen.`,
+        },
+        {
+          z: 4,
+          name: 'Totem Pole - Between Wolf and Frog',
+          description: `Twelve meters up. Your arms burn. Between Wolf below and Frog above, the pole narrows slightly. The wind is stronger here, steady and cold. Occidental Park spreads below like a map—brick paths, dead trees, empty benches.`,
+        },
+        {
+          z: 5,
+          name: 'Totem Pole - Frog and Eagle',
+          description: `Fifteen meters up. Frog's bulbous eyes stare at you, carved tongue curled. Eagle spreads above, talons gripping the pole, wings swept back. Raven waits at the top—three more meters. The cameras in its eyes might already be watching.`,
+        },
+      ];
+
+      const totemX = groundRoom.get('x') ?? -7;
+      const totemY = groundRoom.get('y') ?? 0;
+
+      for (const pos of climbingPositions) {
+        const climbRoom = await manager.create({
+          parent: roomPrototype,
+          properties: {
+            name: pos.name,
+            description: pos.description,
+            x: totemX,
+            y: totemY,
+            z: pos.z,
+            outdoor: true,
+            abilities: climbingAbilities,
+          },
+          methods: {},
+        });
+        console.log(
+          `  ✅ Created ${pos.name} at z=${pos.z} (#${climbRoom.id})`,
+        );
+      }
     } else {
       console.warn('  ⚠️  Could not place Totem Pole - room not found');
     }

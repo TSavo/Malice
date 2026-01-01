@@ -76,6 +76,23 @@ export { TelescopeBuilder } from './telescope-builder';
 export { TotemPoleBuilder } from './totem-pole-builder';
 // Vendors
 export { VendableBuilder } from './vendable-builder';
+// Vehicle system
+export { VehiclePartBuilder } from './vehicle-part-builder';
+export { EngineBuilder } from './engine-builder';
+export { FuelTankBuilder } from './fuel-tank-builder';
+export { VehicleBatteryBuilder } from './vehicle-battery-builder';
+export { WheelBuilder } from './wheel-builder';
+export { TransmissionBuilder } from './transmission-builder';
+export { VehicleBuilder } from './vehicle-builder';
+export { CarBuilder } from './car-builder';
+export { GarageBuilder } from './garage-builder';
+export { MechanicBuilder } from './mechanic-builder';
+export { NavComputerBuilder } from './nav-computer-builder';
+// Airspace system (for aircraft)
+export { AirspaceRoomBuilder } from './airspace-room-builder';
+export { RotorBuilder } from './rotor-builder';
+export { AircraftBuilder } from './aircraft-builder';
+export { HelicopterBuilder } from './helicopter-builder';
 // Weapons
 export { WeaponBuilder } from './weapon-builder';
 // Note: Bladed, Firearm, and Improvised weapons now use individual Builders that self-register

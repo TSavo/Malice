@@ -54,7 +54,7 @@ export class TelescopeBuilder implements Builder {
           pointsOfInterest: [
             // Landmarks
             { name: 'Totem Pole', x: -7, y: 0, z: 0 },
-            { name: 'Top of Totem', x: -7, y: 0, z: 1 },
+            { name: 'Top of Totem', x: -7, y: 0, z: 6 },
             { name: 'Smith Tower Entrance', x: -12, y: 12, z: 0 },
             { name: 'Grand Central', x: -9, y: 2, z: 0 },
             { name: 'Occidental Park', x: -3, y: 2, z: 0 },
