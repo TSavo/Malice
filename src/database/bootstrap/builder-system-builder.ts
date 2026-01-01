@@ -169,25 +169,37 @@ IF YOU BUILD:
 
 SPATIAL RULES FOR EXITS (CRITICAL - think carefully!):
 
-DO CONNECT:
-- Same column (same x,y, different z): Stairs, ladder, or flight between floors
-- Both outdoor at z=0: Street connection, alley, sidewalk
-- Both outdoor at z>0: Open air, rooftop to rooftop (if adjacent)
-- z=0 outdoor to z=0 indoor (same x,y): Door into building
-- z>0 indoor same column: Stairs between floors of SAME building
+HORIZONTAL (same z):
+- Both outdoor at z=0: Street, alley, sidewalk - YES
+- Both outdoor at z>0: Open air between rooftops - YES if adjacent
+- z=0 outdoor to z=0 indoor: Door into building - YES
+- z>0 indoor different columns: NO! Different buildings!
+- Diagonal at z>0: NO diagonal air connections
 
-DO NOT CONNECT:
-- z>0 indoor to z>0 indoor DIFFERENT columns: Different buildings! No floating bridges!
-- z>0 outdoor to z>0 indoor different column: Can't walk from sky into another building
-- Diagonal at z>0: No diagonal air connections
-- Underground to surface (different column): Tunnels don't randomly surface
+VERTICAL (same x,y column) - NOT AUTOMATIC!
+- Floors do NOT automatically connect just because they're stacked
+- Vertical access requires INTENTIONAL infrastructure:
+  * STAIRS: Connect adjacent floors only (z to z+1), name exit 'stairs'
+  * ELEVATOR: Use $elevator for multi-floor access, NOT direct exits
+  * LADDER: For maintenance access, fire escapes
+  * RESTRICTED: Some floors only accessible by specific means
+
+VERTICAL ACCESS PATTERNS:
+- Public building: Stairs z=0↔z=1↔z=2, elevator for all floors
+- Secure building: Lobby stairs to z=1, elevator-only above
+- Warehouse: Ground floor only, ladder to roof
+- Apartment: Stairs every floor, no direct roof access
+- Skyscraper: Express elevator skips floors, local stairs
+
+DO NOT create 'up'/'down' exits between every floor automatically!
+Ask: "How would someone ACTUALLY get between these floors?"
 
 THINK ARCHITECTURALLY:
 - Buildings are vertical stacks (same x,y column)
 - Streets are horizontal connections (same z=0)
-- Airspace connects outdoor-to-outdoor only
-- A door into a building is at z=0 (street level)
-- Upper floors only connect within their building column
+- Vertical access is DESIGNED, not automatic
+- Elevators are rooms that MOVE, not simple exits
+- Stairs connect ADJACENT floors only
 
 Use execute_moo_code. Return { built: true, roomId, name } or { built: false, reason: '...' }\`;
 
@@ -272,22 +284,25 @@ room.population = 0; // 0-100
 room.ambientNoise = 20; // 0-100
 
 // 3. Link to valid neighbors ONLY - think architecturally!
-// For each valid neighbor, create exit from new room AND exit back
 
-// DO CONNECT:
-// - Same column (same x,y): Stairs between floors of SAME building
-// - Both outdoor z=0: Street/alley connection
-// - Both outdoor z>0: Open air (rooftop, sky)
-// - z=0 outdoor→indoor same column: Door into building
+// HORIZONTAL (same z):
+// - Both outdoor z=0: Street/alley - YES
+// - Both outdoor z>0: Rooftop/air - YES if adjacent
+// - z=0 outdoor→indoor: Building entrance - YES
+// - z>0 indoor different column: NO! Different buildings!
 
-// DO NOT CONNECT:
-// - z>0 indoor different columns: Different buildings!
-// - z>0 outdoor to indoor different column: Can't enter building from sky
-// - Diagonal at z>0: No diagonal air passages
-// - Underground to surface different column: Tunnels contained
+// VERTICAL (same column) - NOT AUTOMATIC!
+// - Floors don't auto-connect just because they stack
+// - STAIRS: Only adjacent floors (z↔z+1), name it 'stairs'
+// - ELEVATOR: Use $elevator object, NOT direct exits
+// - LADDER: For maintenance, fire escape
+// - Ask: "How would someone ACTUALLY get here?"
 
-// THINK: Buildings are vertical stacks. Streets are horizontal.
-// Don't create floating bridges between buildings!
+// BUILDING PATTERNS:
+// - Office: stairs lobby↔2nd, elevator all floors
+// - Warehouse: ground only, ladder to roof
+// - Apartment: stairs each floor
+// - Secure: elevator-only above certain floors
 
 return { built: true, roomId: room.id, name: room.name };
 \`\`\`
