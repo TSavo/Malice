@@ -18,7 +18,7 @@ export class BodyFactoryBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
+  async build(): Promise<void> {
     // Check if already exists via alias
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
@@ -28,12 +28,12 @@ export class BodyFactoryBuilder implements Builder {
 
     if (aliases.bodyFactory) {
       this.bodyFactory = await this.manager.load(aliases.bodyFactory);
-      if (this.bodyFactory && !forceRebuild) return; // Already exists and not forcing rebuild
+      if (this.bodyFactory) return; // Already exists and not forcing rebuild
     }
 
     if (!this.bodyFactory) {
       // Create new BodyFactory only if it doesn't exist
-      const root = await this.manager.load(1);
+      const root = await this.manager.load('root');
       this.bodyFactory = await this.manager.create({
         parent: root!,
         properties: {

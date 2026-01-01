@@ -3,8 +3,8 @@ import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Builds the Edible prototype
- * Base prototype for consumable items that provide calories (food, drink, etc.)
+ * Builds the Edible type
+ * Base type for consumable items that provide calories (food, drink, etc.)
  *
  * ABILITIES-FIRST ARCHITECTURE:
  * - Properties hold nutrition/spoilage state with descriptions
@@ -26,20 +26,22 @@ export class EdibleBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
+  async build(): Promise<void> {
+    // Check if type already exists
+    const existing = await this.manager.load('edible');
+    if (existing) {
+      this.obj = existing;
+    } else {
+      // Get parent type
+      const decayable = await this.manager.load('decayable');
+      if (!decayable) {
+        throw new Error('Decayable type not found - required for Edible');
+      }
 
-    if ($.edible && !forceRebuild) {
-      this.obj = $.edible;
-      return;
-    }
-
-    const parent = $.decayable;
-    this.obj = await this.manager.create({
-      parent: parent!,
-      properties: {
+      this.obj = await this.manager.define('edible', decayable, {
+        properties: {
         name: 'Edible',
-        description: 'Base prototype for consumable items',
+        description: 'Base type for consumable items',
         // Nutrition
         calories: 100, // kcal per whole item
         hydration: 20, // ml water equivalent (most food has some water)
@@ -89,8 +91,10 @@ STOMACH CAPACITY: Consumer's stomach has limited volume. Check stomach.hasRoomFo
       },
       methods: {},
     });
+    }
 
-    const obj = this.obj;
+    // Always rebuild methods (ensures they exist even if type was pre-existing)
+    const obj = this.obj!;
 
     // Add property descriptions
     obj.setPropertyDescription(
@@ -504,10 +508,7 @@ STOMACH CAPACITY: Consumer's stomach has limited volume. Check stomach.hasRoomFo
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
-    if (!this.obj) return;
-    const objectManager = await this.manager.load(0);
-    await objectManager?.call('addAlias', 'edible', this.obj.id);
+    console.log('[EdibleBuilder] Type \'edible\' auto-aliased');
   }
 }
 

@@ -21,7 +21,7 @@ export class HttpBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
+  async build(): Promise<void> {
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('ObjectManager not found');
 
@@ -30,11 +30,11 @@ export class HttpBuilder implements Builder {
 
     if (aliases.http) {
       this.http = await this.manager.load(aliases.http);
-      if (this.http && !forceRebuild) return;
+      if (this.http) return;
     }
 
     if (!this.http) {
-      const root = await this.manager.load(1);
+      const root = await this.manager.load('root');
       this.http = await this.manager.create({
         parent: root!,
         properties: {

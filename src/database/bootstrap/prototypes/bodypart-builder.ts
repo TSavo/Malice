@@ -3,8 +3,8 @@ import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Builds the BodyPart prototype
- * Base prototype for body parts that make up a body.
+ * Builds the BodyPart type
+ * Base type for body parts that make up a body.
  * Inherits from Edible - severed body parts can be consumed (cannibalism).
  *
  * BodyParts:
@@ -23,24 +23,21 @@ import { registerBuilder, type Builder } from '../builder-registry';
  */
 export class BodyPartBuilder implements Builder {
   static provides = ['bodyPart'];
-  static depends = ['edible'];
+  static depends = ['decayable'];
 
   private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
+  async build(): Promise<void> {
 
-    if ($.bodyPart && !forceRebuild) {
-      this.obj = $.bodyPart;
-      return;
-    }
-
-    const parentObj = $.edible;
-    this.obj = await this.manager.create({
-      parent: parentObj!,
-      properties: {
+    const existing = await this.manager.load('bodyPart');
+    if (existing) {
+      this.obj = existing;
+    } else {
+      const parent = await this.manager.load('decayable');
+      this.obj = await this.manager.define('bodyPart', parent!, {
+        properties: {
           name: 'BodyPart',
           description: 'A body part',
           owner: null, // ObjRef to the player/agent who owns this body
@@ -77,11 +74,13 @@ SENSATION: Can feel pain, touch, temperature via feel(). Reports to owner. Numb/
 CRITICAL: If 'critical' is true, destruction kills the owner.
 
 DECAY: Attached parts don't decay (maintained by living body). Severed parts decay rapidly. Decayed parts provide fewer calories when consumed.`,
-      },
-      methods: {},
-    });
+        },
+        methods: {},
+      });
+    }
 
-    const obj = this.obj;
+    // Always rebuild methods (ensures they exist even if type was pre-existing)
+    const obj = this.obj!;
     // Property descriptions
     obj.setPropertyDescription(
       'owner',
@@ -903,15 +902,12 @@ DECAY: Attached parts don't decay (maintained by living body). Severed parts dec
 
       const partDesc = part.name.toLowerCase();
 
-      if (dropLocation) {
-        await $.room.announce({
-          room: dropLocation,
-          actor: amputator,
-          target: owner,
-          see: '%A %v{cut} off %tp ' + partDesc + '! It falls to the ground.' + clothingMsg,
-          hear: '*SCHLICK* The wet sound of flesh separating.',
-          item: part,
-        });
+      if (dropLocation && dropLocation.announce) {
+        await dropLocation.announce(amputator, owner, {
+          actor: 'You cut off ' + owner.name + "'s " + partDesc + '! It falls to the ground.' + clothingMsg,
+          target: amputator.name + ' cuts off your ' + partDesc + '! It falls to the ground.' + clothingMsg,
+          others: amputator.name + ' cuts off ' + owner.name + "'s " + partDesc + '! It falls to the ground.' + clothingMsg,
+        }, '*SCHLICK* The wet sound of flesh separating.');
       }
 
       // Generate pain in the remaining stump - victim FEELS this via bodyPart.feel()
@@ -1538,10 +1534,7 @@ DECAY: Attached parts don't decay (maintained by living body). Severed parts dec
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
-    if (!this.obj) return;
-    const objectManager = await this.manager.load(0);
-    await objectManager?.call('addAlias', 'bodyPart', this.obj.id);
+    console.log('[BodyPartBuilder] Type \'bodyPart\' auto-aliased');
   }
 }
 

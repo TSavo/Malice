@@ -77,10 +77,8 @@ export { TotemPoleBuilder } from './totem-pole-builder';
 export { VendableBuilder } from './vendable-builder';
 // Weapons
 export { WeaponBuilder } from './weapon-builder';
-export { BladedWeaponPrototypesBuilder } from './bladed-weapon-builders';
 export { BluntWeaponPrototypesBuilder } from './blunt-weapon-builders';
-export { FirearmPrototypesBuilder } from './firearm-builders';
-export { ImprovisedWeaponPrototypesBuilder } from './improvised-weapon-builders';
+// Note: Bladed, Firearm, and Improvised weapons now use individual Builders that self-register
 // Wearables
 export { WearableBuilder } from './wearable-builder';
 export { WirelessPhoneBuilder } from './wireless-phone-builder';

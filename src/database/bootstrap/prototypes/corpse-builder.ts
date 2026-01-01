@@ -3,7 +3,7 @@ import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Builds the Corpse prototype
+ * Builds the Corpse type
  * A dead body left behind when a player dies.
  *
  * Corpses:
@@ -22,26 +22,23 @@ import { registerBuilder, type Builder } from '../builder-registry';
  */
 export class CorpseBuilder implements Builder {
   static provides = ['corpse'];
-  static depends = ['decayable'];
+  static depends = ['describable'];
 
   private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
+  async build(): Promise<void> {
 
-    if ($.corpse && !forceRebuild) {
-      this.obj = $.corpse;
-      return;
-    }
-
-    const parentObj = $.decayable;
-    this.obj = await this.manager.create({
-      parent: parentObj!,
-      properties: {
-        name: 'Corpse',
-        description: 'A lifeless body.',
+    const existing = await this.manager.load('corpse');
+    if (existing) {
+      this.obj = existing;
+    } else {
+      const parent = await this.manager.load('describable');
+      this.obj = await this.manager.define('corpse', parent!, {
+        properties: {
+          name: 'Corpse',
+          description: 'A lifeless body.',
         // Original identity - for autopsy, sex is determined from anatomy
         originalName: null,
         // Physical - average human body
@@ -76,11 +73,13 @@ AUTOPSY: performAutopsy() examines body for cause of death. Skill level affects 
 FORENSICS: Wounds on body preserve evidence of death. 'originalName' identifies victim when fresh. Sex determined from anatomy. Species from body structure.
 
 TRANSFORMATION: At 100% decay, transforms into $.humanRemains (dried bones) which continues slower decay to $.skeletalRemains.`,
-      },
-      methods: {},
-    });
+        },
+        methods: {},
+      });
+    }
 
-    const obj = this.obj;
+    // Always rebuild methods (ensures they exist even if type was pre-existing)
+    const obj = this.obj!;
 
     // Get the body object inside this corpse
     obj.setMethod(
@@ -604,10 +603,7 @@ TRANSFORMATION: At 100% decay, transforms into $.humanRemains (dried bones) whic
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
-    if (!this.obj) return;
-    const objectManager = await this.manager.load(0);
-    await objectManager?.call('addAlias', 'corpse', this.obj.id);
+    console.log('[CorpseBuilder] Type \'corpse\' auto-aliased');
   }
 }
 

@@ -22,33 +22,29 @@ export class NpmBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
+  async build(): Promise<void> {
     // Check if $npm already exists
     const existing = this.manager.getAliases().get('npm');
-    if (existing && !forceRebuild) {
+    if (existing) {
       this.npm = existing;
       return;
     }
 
     // Get root object as parent
-    const root = await this.manager.load(1);
+    const root = await this.manager.load('root');
     if (!root) {
       throw new Error('Root object (#1) not found');
     }
 
-    // Create or recreate $npm object
-    if (existing && forceRebuild) {
-      this.npm = existing;
-    } else {
-      this.npm = await this.manager.create({
-        parent: root,
-        properties: {
-          name: 'npm',
-          description: 'Runtime package manager - install npm packages without restart',
-        },
-        methods: {},
-      });
-    }
+    // Create $npm object
+    this.npm = await this.manager.create({
+      parent: root,
+      properties: {
+        name: 'npm',
+        description: 'Runtime package manager - install npm packages without restart',
+      },
+      methods: {},
+    });
 
     // install(packageName, version?) - Install a package
     this.npm.setMethod(

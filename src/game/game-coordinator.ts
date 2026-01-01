@@ -7,7 +7,6 @@ import { FactionTransportRegistry } from '../transport/faction-transport-registr
 import { ConnectionContext } from './connection-context';
 
 export interface GameCoordinatorOptions {
-  forceBootstrap?: boolean;
   /** Enable debug logging for transports */
   transportDebug?: boolean;
 }
@@ -21,14 +20,12 @@ export class GameCoordinator {
   private connections: ConnectionManager;
   private contexts = new Map<string, ConnectionContext>();
   private schedulerInterval: ReturnType<typeof setInterval> | null = null;
-  private options: GameCoordinatorOptions;
   private transportRegistry: FactionTransportRegistry;
 
   constructor(mongoUri: string, options: GameCoordinatorOptions = {}) {
     this.db = new ObjectDatabase(mongoUri, 'malice');
     this.manager = new ObjectManager(this.db);
     this.connections = new ConnectionManager();
-    this.options = options;
     this.transportRegistry = new FactionTransportRegistry({
       debug: options.transportDebug,
       manager: this.manager,
@@ -50,9 +47,7 @@ export class GameCoordinator {
     console.log('✅ Game logger initialized');
 
     // Bootstrap core game objects (MinimalBootstrap handles Root creation)
-    const bootstrap = new GameBootstrap(this.manager, {
-      forceBootstrap: this.options.forceBootstrap,
-    });
+    const bootstrap = new GameBootstrap(this.manager);
     await bootstrap.bootstrap();
     console.log('✅ Core objects bootstrapped');
 

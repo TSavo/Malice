@@ -16,10 +16,10 @@ export class WindowBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
+  async build(): Promise<void> {
     const $ = this.manager as any;
 
-    if ($.windowJs && !forceRebuild) {
+    if ($.windowJs) {
       this.obj = $.windowJs;
       return;
     }

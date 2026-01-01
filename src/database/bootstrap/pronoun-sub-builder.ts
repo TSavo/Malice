@@ -32,7 +32,7 @@ export class PronounSubBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
+  async build(): Promise<void> {
     // Check if already exists via alias
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
@@ -42,12 +42,12 @@ export class PronounSubBuilder implements Builder {
 
     if (aliases.pronoun) {
       this.pronounSub = await this.manager.load(aliases.pronoun);
-      if (this.pronounSub && !forceRebuild) return; // Already exists
+      if (this.pronounSub) return; // Already exists
     }
 
     // Create new PronounSub only if it doesn't exist
     if (!this.pronounSub) {
-      const root = await this.manager.load(1);
+      const root = await this.manager.load('root');
       this.pronounSub = await this.manager.create({
         parent: root!,
         properties: {

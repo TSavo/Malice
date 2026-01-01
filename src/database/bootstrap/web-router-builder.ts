@@ -24,7 +24,7 @@ export class WebRouterBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
+  async build(): Promise<void> {
     // Check if already exists via alias
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
@@ -34,12 +34,12 @@ export class WebRouterBuilder implements Builder {
 
     if (aliases.webRouter) {
       this.webRouter = await this.manager.load(aliases.webRouter);
-      if (this.webRouter && !forceRebuild) return; // Already exists
+      if (this.webRouter) return; // Already exists
     }
 
     // Create new webRouter only if it doesn't exist
     if (!this.webRouter) {
-      const root = await this.manager.load(1);
+      const root = await this.manager.load('root');
       this.webRouter = await this.manager.create({
         parent: root!,
         properties: {

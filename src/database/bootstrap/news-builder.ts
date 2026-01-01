@@ -27,7 +27,7 @@ export class NewsBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
+  async build(): Promise<void> {
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
 
@@ -38,7 +38,7 @@ export class NewsBuilder implements Builder {
       this.news = await this.manager.load(aliases.news);
     }
 
-    const root = await this.manager.load(1);
+    const root = await this.manager.load('root');
     if (!this.news) {
       this.news = await this.manager.create({
         parent: root!,
@@ -112,7 +112,7 @@ PINNING: Important items can be pinned to always appear at the top.`,
     );
 
     // Skip method rebuild if not forced
-    if (aliases.news && !forceRebuild) {
+    if (aliases.news) {
       return;
     }
 

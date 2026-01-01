@@ -75,6 +75,12 @@ export class BuildingBuilder implements Builder {
   async build(): Promise<void> {
     const $ = this.manager as any;
 
+    // Check if buildings already built (use immigrationServices as marker)
+    if ($.immigrationServices) {
+      console.log('  ✅ Buildings already built ($.immigrationServices exists)');
+      return;
+    }
+
     if (!$.room || !$.exit || !$.recycler) {
       throw new Error(
         'Room, Exit, and Recycler prototypes must exist before building buildings',
@@ -211,20 +217,17 @@ export class BuildingBuilder implements Builder {
           (objectManager?.get('aliases') as Record<string, number>) || {};
         if (protoName === 'elevator' && elevatorProto) {
           parentProto = elevatorProto;
-        } else if (aliases[protoName]) {
-          // Load the prototype by ID from aliases
-          const loaded = await this.manager.load(aliases[protoName]);
+        } else {
+          // Try to load as type first (types use string names), then fall back to aliases
+          const loaded = await this.manager.load(protoName) ||
+            (aliases[protoName] ? await this.manager.load(aliases[protoName]) : null);
           if (loaded) {
             parentProto = loaded;
           } else {
             console.warn(
-              `    Warning: could not load prototype '${protoName}' (ID ${aliases[protoName]}) for ${placeholder}, defaulting to room.`,
+              `    Warning: prototype '${protoName}' not found for ${placeholder}, defaulting to room.`,
             );
           }
-        } else {
-          console.warn(
-            `    Warning: prototype alias '${protoName}' not found for ${placeholder}, defaulting to room.`,
-          );
         }
       }
 
@@ -589,18 +592,22 @@ export class BuildingBuilder implements Builder {
             continue;
           }
 
-          const protoId = aliases[objDef.prototype];
-          if (!protoId) {
-            console.warn(
-              `    Warning: prototype '${objDef.prototype}' not found for object in ${placeholder}`,
-            );
-            continue;
+          // Try to load as type first (types use string names), then fall back to aliases
+          let proto = await this.manager.load(objDef.prototype);
+          if (!proto) {
+            // Not a type, try aliases
+            const protoId = aliases[objDef.prototype];
+            if (!protoId) {
+              console.warn(
+                `    Warning: prototype '${objDef.prototype}' not found for object in ${placeholder}`,
+              );
+              continue;
+            }
+            proto = await this.manager.load(protoId as ObjId);
           }
-
-          const proto = await this.manager.load(protoId as ObjId);
           if (!proto) {
             console.warn(
-              `    Warning: could not load prototype '${objDef.prototype}' (#${protoId})`,
+              `    Warning: could not load prototype '${objDef.prototype}'`,
             );
             continue;
           }
@@ -771,11 +778,11 @@ export class BuildingBuilder implements Builder {
 
       // Determine exit prototype (default to $.exit, allow guardedExit etc.)
       let exitParent = exitProto;
-      if (exitProps.prototype && aliases[exitProps.prototype]) {
-        exitParent = await this.manager.load(
-          aliases[exitProps.prototype] as ObjId,
-        );
-        if (!exitParent) exitParent = exitProto;
+      if (exitProps.prototype) {
+        // Try as type first, then alias
+        const customProto = await this.manager.load(exitProps.prototype) ||
+          (aliases[exitProps.prototype] ? await this.manager.load(aliases[exitProps.prototype] as ObjId) : null);
+        if (customProto) exitParent = customProto;
       }
 
       // Create exit from building room to world room

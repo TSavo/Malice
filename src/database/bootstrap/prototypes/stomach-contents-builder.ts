@@ -3,10 +3,10 @@ import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Builds the StomachContents prototype
+ * Builds the StomachContents type
  * Created when food/drink is consumed, preserves metadata for autopsy
  *
- * Inherits from $.stackable:
+ * Inherits from stackable type:
  * - Uses stackType = 'stomach:' + sourceProto for aggregation
  * - Inherits merge(), split(), add(), remove(), isEmpty()
  * - Overrides canStackWith() to also check spoiled/poisoned status
@@ -27,21 +27,20 @@ export class StomachContentsBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
+  async build(): Promise<void> {
 
-    if ($.stomachContents && !forceRebuild) {
-      this.obj = $.stomachContents;
-      return;
-    }
+    const existing = await this.manager.load('stomachContents');
+    if (existing) {
+      this.obj = existing;
+    } else {
+      const parent = await this.manager.load('stackable');
+      if (!parent) throw new Error('StomachContentsBuilder: stackable type not found');
 
-    const parentObj = $.stackable;
-    const obj = await this.manager.create({
-      parent: parentObj!,
-      properties: {
-        name: 'StomachContents',
-        description: 'Digesting food matter',
-        abilities: `Represents consumed food/drink in stomach, preserves metadata for autopsy.
+      this.obj = await this.manager.define('stomachContents', parent, {
+        properties: {
+          name: 'StomachContents',
+          description: 'Digesting food matter',
+          abilities: `Represents consumed food/drink in stomach, preserves metadata for autopsy.
 
 DIGESTION: digestTick(rate) extracts calories over time. Volume decreases
 proportionally. isFullyDigested() returns true when calories exhausted.
@@ -73,9 +72,13 @@ Both flags preserved through digestion for evidence.`,
         // Status
         spoiled: false,
         poisoned: false,
-      },
-      methods: {},
-    });
+        },
+        methods: {},
+      });
+    }
+
+    // Always rebuild methods (ensures they exist even if type was pre-existing)
+    const obj = this.obj!;
 
     // Override canStackWith to also check spoiled/poisoned status
     // This extends the parent stackable's stackType check
@@ -243,15 +246,10 @@ Both flags preserved through digestion for evidence.`,
       return name;
     `,
     );
-
-    this.obj = obj;
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
-    if (!this.obj) return;
-    const objectManager = await this.manager.load(0);
-    await objectManager?.call('addAlias', 'stomachContents', this.obj.id);
+    console.log('[StomachContentsBuilder] Type \'stomachContents\' auto-aliased');
   }
 }
 

@@ -3,7 +3,7 @@ import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Vendable: a vending container that sells items in its contents.
+ * Vendable: a vending container type that sells items in its contents.
  *
  * ABILITIES-FIRST ARCHITECTURE:
  * - Abilities describe how vending works as prose for AI interpretation
@@ -19,20 +19,20 @@ export class VendableBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
+  async build(): Promise<void> {
 
-    if ($.vendable && !forceRebuild) {
-      this.obj = $.vendable;
-      return;
-    }
-
-    const parentObj = $.location;
-    const obj = await this.manager.create({
-      parent: parentObj!,
-      properties: {
-        name: 'Vendable',
-        description: 'A vending container that sells the items it holds.',
+    const existing = await this.manager.load('vendable');
+    if (existing) {
+      this.obj = existing;
+    } else {
+      const parent = await this.manager.load('location');
+      if (!parent) {
+        throw new Error('Location type not found - required for Vendable');
+      }
+      this.obj = await this.manager.define('vendable', parent, {
+        properties: {
+          name: 'Vendable',
+          description: 'A vending container that sells the items it holds.',
         bankAccount: null, // target account ID to receive funds (for credits mode)
         bank: null, // bank object id/alias
         currency: 'credits', // 'cash' or 'credits' - payment method
@@ -61,9 +61,12 @@ CHECKING FUNDS: Before buying, AI can verify buyer has funds:
 MANAGEMENT: Owner can stock items, set prices, configure spawnables. Requires passing any 'locks' on the machine.
 
 SPAWNABLES: Some vendors create items on demand from templates. These never run out but are created fresh each purchase.`,
-      },
-      methods: {},
-    });
+        },
+        methods: {},
+      });
+    }
+    // Always rebuild methods (ensures they exist even if type was pre-existing)
+    const obj = this.obj!;
 
     // Add property descriptions
     obj.setPropertyDescription(
@@ -639,15 +642,10 @@ SPAWNABLES: Some vendors create items on demand from templates. These never run 
       return 'Exited management.';
     `,
     );
-
-    this.obj = obj;
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
-    if (!this.obj) return;
-    const objectManager = await this.manager.load(0);
-    await objectManager?.call('addAlias', 'vendable', this.obj.id);
+    console.log('[VendableBuilder] Type \'vendable\' auto-aliased');
   }
 }
 

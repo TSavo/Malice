@@ -80,7 +80,7 @@ export class ObjectDatabase {
     this.types = this.db.collection<TypeObject>('types');
 
     // Ensure indexes (_id is unique by default, no need to specify)
-    await this.objects.createIndex({ 'parent.value': 1 });
+    await this.objects.createIndex({ 'parent.id': 1 });
     // Types: index on parent.name for type inheritance queries
     await this.types.createIndex({ 'parent.name': 1 });
 
@@ -153,7 +153,7 @@ export class ObjectDatabase {
   }
 
   /**
-   * Update existing object
+   * Update existing object or type
    */
   async update(
     id: ObjId,
@@ -182,19 +182,22 @@ export class ObjectDatabase {
       }
     }
 
-    await this.objects.updateOne(
-      { _id: id },
-      {
-        $set: {
-          ...sanitized,
-          modified: new Date(),
-        },
-      },
-    );
+    // Use types collection for string IDs, objects collection for numbers
+    if (typeof id === 'string') {
+      await this.types.updateOne(
+        { _id: id },
+        { $set: { ...sanitized, modified: new Date() } },
+      );
+    } else {
+      await this.objects.updateOne(
+        { _id: id },
+        { $set: { ...sanitized, modified: new Date() } },
+      );
+    }
   }
 
   /**
-   * Atomically set a single method on an object
+   * Atomically set a single method on an object or type
    * Uses path-based $set to avoid race conditions with concurrent method updates
    */
   async setMethod(
@@ -213,19 +216,22 @@ export class ObjectDatabase {
       `#${id}.methods.${name}`,
     );
 
-    await this.objects.updateOne(
-      { _id: id },
-      {
-        $set: {
-          [`methods.${name}`]: sanitized,
-          modified: new Date(),
-        },
+    // Use types collection for string IDs, objects collection for numbers
+    const update = {
+      $set: {
+        [`methods.${name}`]: sanitized,
+        modified: new Date(),
       },
-    );
+    };
+    if (typeof id === 'string') {
+      await this.types.updateOne({ _id: id }, update);
+    } else {
+      await this.objects.updateOne({ _id: id }, update);
+    }
   }
 
   /**
-   * Atomically set a single property on an object
+   * Atomically set a single property on an object or type
    * Uses path-based $set to avoid race conditions with concurrent property updates
    */
   async setProperty(id: ObjId, name: string, value: unknown): Promise<void> {
@@ -235,15 +241,18 @@ export class ObjectDatabase {
       `#${id}.properties.${name}`,
     );
 
-    await this.objects.updateOne(
-      { _id: id },
-      {
-        $set: {
-          [`properties.${name}`]: sanitized,
-          modified: new Date(),
-        },
+    // Use types collection for string IDs, objects collection for numbers
+    const update = {
+      $set: {
+        [`properties.${name}`]: sanitized,
+        modified: new Date(),
       },
-    );
+    };
+    if (typeof id === 'string') {
+      await this.types.updateOne({ _id: id }, update);
+    } else {
+      await this.objects.updateOne({ _id: id }, update);
+    }
   }
 
   /**
@@ -257,17 +266,20 @@ export class ObjectDatabase {
       `#${id}.properties.${name}[]`,
     );
 
-    await this.objects.updateOne(
-      { _id: id },
-      {
-        $push: {
-          [`properties.${name}.value`]: sanitized,
-        },
-        $set: {
-          modified: new Date(),
-        },
+    // Use types collection for string IDs, objects collection for numbers
+    const update = {
+      $push: {
+        [`properties.${name}.value`]: sanitized,
       },
-    );
+      $set: {
+        modified: new Date(),
+      },
+    };
+    if (typeof id === 'string') {
+      await this.types.updateOne({ _id: id }, update);
+    } else {
+      await this.objects.updateOne({ _id: id }, update);
+    }
   }
 
   /**
@@ -275,17 +287,19 @@ export class ObjectDatabase {
    * Uses MongoDB $pop to avoid race conditions
    */
   async popFromArray(id: ObjId, name: string): Promise<void> {
-    await this.objects.updateOne(
-      { _id: id },
-      {
-        $pop: {
-          [`properties.${name}.value`]: 1, // 1 = last, -1 = first
-        },
-        $set: {
-          modified: new Date(),
-        },
+    const update = {
+      $pop: {
+        [`properties.${name}.value`]: 1 as const, // 1 = last, -1 = first
       },
-    );
+      $set: {
+        modified: new Date(),
+      },
+    };
+    if (typeof id === 'string') {
+      await this.types.updateOne({ _id: id }, update);
+    } else {
+      await this.objects.updateOne({ _id: id }, update);
+    }
   }
 
   /**
@@ -293,17 +307,19 @@ export class ObjectDatabase {
    * Uses MongoDB $pop with -1 to avoid race conditions
    */
   async shiftFromArray(id: ObjId, name: string): Promise<void> {
-    await this.objects.updateOne(
-      { _id: id },
-      {
-        $pop: {
-          [`properties.${name}.value`]: -1, // -1 = first element
-        },
-        $set: {
-          modified: new Date(),
-        },
+    const update = {
+      $pop: {
+        [`properties.${name}.value`]: -1 as const, // -1 = first element
       },
-    );
+      $set: {
+        modified: new Date(),
+      },
+    };
+    if (typeof id === 'string') {
+      await this.types.updateOne({ _id: id }, update);
+    } else {
+      await this.objects.updateOne({ _id: id }, update);
+    }
   }
 
   /**
@@ -317,17 +333,19 @@ export class ObjectDatabase {
       `#${id}.properties.${name}[]`,
     );
 
-    await this.objects.updateOne(
-      { _id: id },
-      {
-        $pull: {
-          [`properties.${name}.value`]: sanitized,
-        },
-        $set: {
-          modified: new Date(),
-        },
+    const update = {
+      $pull: {
+        [`properties.${name}.value`]: sanitized,
       },
-    );
+      $set: {
+        modified: new Date(),
+      },
+    };
+    if (typeof id === 'string') {
+      await this.types.updateOne({ _id: id }, update);
+    } else {
+      await this.objects.updateOne({ _id: id }, update);
+    }
   }
 
   /**
@@ -336,7 +354,7 @@ export class ObjectDatabase {
   async getChildren(parentId: ObjId): Promise<GameObject[]> {
     // Query using dot notation for nested ObjRefValue
     return await this.objects
-      .find({ 'parent.value': parentId } as any)
+      .find({ 'parent.id': parentId } as any)
       .toArray();
   }
 

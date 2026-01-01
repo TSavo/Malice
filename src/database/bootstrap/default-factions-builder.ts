@@ -46,10 +46,8 @@ export class DefaultFactionsBuilder implements Builder {
       return;
     }
 
-    // Load dependencies
-    const factionPrototype = aliases.faction
-      ? await this.manager.load(aliases.faction)
-      : null;
+    // Load dependencies - faction is a type now, load by name
+    const factionPrototype = await this.manager.load('faction');
     const factionManager = aliases.factionManager
       ? await this.manager.load(aliases.factionManager)
       : null;

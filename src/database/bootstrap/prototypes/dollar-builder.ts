@@ -3,7 +3,7 @@ import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Builds the Dollar prototype
+ * Builds the Dollar type
  * Physical US currency - illegal contraband in Malice's dystopian Seattle.
  *
  * ABILITIES-FIRST ARCHITECTURE:
@@ -19,31 +19,28 @@ export class DollarBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
+  async build(): Promise<void> {
 
-    if ($.dollar && !forceRebuild) {
-      this.obj = $.dollar;
-      return;
-    }
+    const existing = await this.manager.load('dollar');
+    if (existing) {
+      this.obj = existing;
+    } else {
+      const parent = await this.manager.load('stackable');
+      if (!parent) throw new Error('DollarBuilder: stackable type not found');
 
-    const parent = $.stackable;
-    if (!parent) throw new Error('DollarBuilder: $stackable not found');
-
-    this.obj = await this.manager.create({
-      parent: parent,
-      properties: {
-        name: 'US Dollars',
-        description:
-          'Crumpled bills bearing the faces of dead presidents. In a world of digital credits and biometric banking, physical currency is contraband—anonymous, untraceable, illegal. The paper feels strange, almost archaeological. Each bill represents a crime just by existing in your possession.',
-        // Pre-set stackable properties
-        stackType: 'cash:usd',
-        quantity: 0,
-        unit: 'USD',
-        // Physical cash is illegal
-        contraband: true,
-        // Abilities - physical cash for AI interpretation
-        abilities: `Physical US currency - illegal contraband in this world.
+      this.obj = await this.manager.define('dollar', parent, {
+        properties: {
+          name: 'US Dollars',
+          description:
+            'Crumpled bills bearing the faces of dead presidents. In a world of digital credits and biometric banking, physical currency is contraband—anonymous, untraceable, illegal. The paper feels strange, almost archaeological. Each bill represents a crime just by existing in your possession.',
+          // Pre-set stackable properties
+          stackType: 'cash:usd',
+          quantity: 0,
+          unit: 'USD',
+          // Physical cash is illegal
+          contraband: true,
+          // Abilities - physical cash for AI interpretation
+          abilities: `Physical US currency - illegal contraband in this world.
 
 POSSESSION: Having cash is a crime. Police will confiscate and arrest. Hide it well. The 'contraband' property marks this as illegal.
 
@@ -61,11 +58,13 @@ TRANSACTIONS: Some vendors accept cash (currency='cash'). Black market prefers c
 SPLITTING: To give partial amount, take the full stack and give the remainder back.
 
 ANONYMITY: Cash cannot be traced. Unlike bank credits, no transaction history exists.`,
-      },
-      methods: {},
-    });
+        },
+        methods: {},
+      });
+    }
 
-    const obj = this.obj;
+    // Always rebuild methods (ensures they exist even if type was pre-existing)
+    const obj = this.obj!;
     // Add property descriptions
     obj.setPropertyDescription(
       'quantity',
@@ -148,10 +147,7 @@ ANONYMITY: Cash cannot be traced. Unlike bank credits, no transaction history ex
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
-    if (!this.obj) return;
-    const objectManager = await this.manager.load(0);
-    await objectManager?.call('addAlias', 'dollar', this.obj.id);
+    console.log('[DollarBuilder] Type \'dollar\' auto-aliased');
   }
 }
 

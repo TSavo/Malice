@@ -30,7 +30,7 @@ export class FormatBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
+  async build(): Promise<void> {
     // Check if already exists via alias
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
@@ -40,12 +40,12 @@ export class FormatBuilder implements Builder {
 
     if (aliases.format) {
       this.format = await this.manager.load(aliases.format);
-      if (this.format && !forceRebuild) return; // Already exists
+      if (this.format) return; // Already exists
     }
 
     // Create new Format utility only if it doesn't exist
     if (!this.format) {
-      const root = await this.manager.load(1);
+      const root = await this.manager.load('root');
       this.format = await this.manager.create({
         parent: root!,
         properties: {

@@ -3,7 +3,7 @@ import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Builds the Exit prototype
+ * Builds the Exit type
  * Represents a connection between rooms with aliases and distance.
  *
  * Inherits from Describable for name/description/aliases.
@@ -31,18 +31,20 @@ export class ExitBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
+  async build(): Promise<void> {
+    // Check if type already exists
+    const existing = await this.manager.load('exit');
+    if (existing) {
+      this.obj = existing;
+    } else {
+      // Get parent type
+      const describable = await this.manager.load('describable');
+      if (!describable) {
+        throw new Error('Describable type not found - required for Exit');
+      }
 
-    if ($.exit && !forceRebuild) {
-      this.obj = $.exit;
-      return;
-    }
-
-    const parent = $.describable;
-    const obj = await this.manager.create({
-      parent: parent!,
-      properties: {
+      this.obj = await this.manager.define('exit', describable, {
+        properties: {
         name: 'Exit',
         description: 'A passage to another location',
         aliases: [],
@@ -72,10 +74,13 @@ ACCESS: canUse(agent) checks all lock systems. Returns { allowed, reason }.
 MATCHING: matches(direction) checks name and aliases. Case-insensitive.
 
 USAGE: Room.go() finds exit via findExit(), checks canUse(), queues movement to destRoom.`,
-      },
-      methods: {},
-    });
+        },
+        methods: {},
+      });
+    }
 
+    // Always rebuild methods (ensures they exist even if type was pre-existing)
+    const obj = this.obj!
     obj.setMethod(
       'matches',
       `
@@ -256,10 +261,9 @@ USAGE: Room.go() finds exit via findExit(), checks canUse(), queues movement to 
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
+    // Types auto-alias by name, no manual registration needed
     if (!this.obj) return;
-    const objectManager = await this.manager.load(0);
-    await objectManager?.call('addAlias', 'exit', this.obj.id);
+    console.log(`[ExitBuilder] Type 'exit' auto-aliased`);
   }
 
   /**

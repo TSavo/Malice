@@ -3,7 +3,7 @@ import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Builds the Wound prototype
+ * Builds the Wound type
  * Wounds are complex objects that exist on body parts.
  *
  * Wounds:
@@ -27,18 +27,18 @@ export class WoundBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
+  async build(): Promise<void> {
+    // Check if type already exists (types auto-alias)
+    const existing = await this.manager.load('wound');
+    if (existing) {
+      this.obj = existing;
+    } else {
+      // Create wound as a TYPE
+      const parentObj = await this.manager.load('describable');
+      if (!parentObj) throw new Error('WoundBuilder: $describable not found');
 
-    if ($.wound && !forceRebuild) {
-      this.obj = $.wound;
-      return;
-    }
-
-    const parentObj = $.describable;
-    this.obj = await this.manager.create({
-      parent: parentObj!,
-      properties: {
+      this.obj = await this.manager.define('wound', parentObj, {
+        properties: {
         name: 'Wound',
         description: 'A wound.',
         abilities: `Physical injury that exists on a body part. Wounds have complex lifecycle physics:
@@ -85,10 +85,12 @@ AGGRAVATION: Physical stress, impacts, or movement can aggravate healing wounds.
         cause: null, // 'blade', 'blunt', 'claw', 'bite', 'fire', 'acid'
         // Attacker reference (if any)
         attacker: null,
-      },
-      methods: {},
-    });
+        },
+        methods: {},
+      });
+    }
 
+    // Always rebuild methods (ensures they exist even if type was pre-existing)
     const obj = this.obj;
 
     // Initialize wound with proper values based on type and severity
@@ -702,10 +704,9 @@ AGGRAVATION: Physical stress, impacts, or movement can aggravate healing wounds.
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
+    // Types auto-alias by name, no manual registration needed
     if (!this.obj) return;
-    const objectManager = await this.manager.load(0);
-    await objectManager?.call('addAlias', 'wound', this.obj.id);
+    console.log(`[WoundBuilder] Type 'wound' auto-aliased`);
   }
 }
 

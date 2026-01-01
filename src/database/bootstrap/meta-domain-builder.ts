@@ -21,7 +21,7 @@ export class MetaDomainBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
+  async build(): Promise<void> {
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
 
@@ -46,7 +46,7 @@ export class MetaDomainBuilder implements Builder {
     // Check if already exists
     if (aliases.metaDomain) {
       this.domain = await this.manager.load(aliases.metaDomain);
-      if (this.domain && !forceRebuild) return;
+      if (this.domain) return;
     }
 
     // Create the meta domain
@@ -1005,6 +1005,7 @@ export class MetaDomainBuilder implements Builder {
         <span class="text-sm font-medium text-gray-400">Objects</span>
         <select id="treeRoot" onchange="loadTree()" class="input text-xs py-1">
           <option value="aliases">Aliases</option>
+          <option value="types">Types</option>
           <option value="rooms">Rooms</option>
           <option value="players">Players</option>
           <option value="items">Items</option>
@@ -1108,10 +1109,12 @@ async function loadTree() {
   const root = document.getElementById('treeRoot').value;
   const data = await api('/tree?root=' + root);
   const tree = document.getElementById('objectTree');
-  tree.innerHTML = data.items?.map(item =>
-    '<div class="tree-item" onclick="selectObject(' + item.id + ')" data-id="' + item.id + '">' +
-    '<span class="text-malice-muted">#' + item.id + '</span> ' + escapeHtml(item.name) + '</div>'
-  ).join('') || '<div class="text-malice-muted p-2">No objects found</div>';
+  tree.innerHTML = data.items?.map(item => {
+    const idStr = JSON.stringify(item.id);
+    const prefix = item.isType ? '📋' : '#' + item.id;
+    return '<div class="tree-item" onclick="selectObject(' + idStr + ')" data-id="' + item.id + '">' +
+      '<span class="text-malice-muted">' + prefix + '</span> ' + escapeHtml(item.name) + '</div>';
+  }).join('') || '<div class="text-malice-muted p-2">No objects found</div>';
 }
 
 async function searchObjects() {
@@ -1119,10 +1122,12 @@ async function searchObjects() {
   if (!q) return loadTree();
   const data = await api('/search?q=' + encodeURIComponent(q));
   const tree = document.getElementById('objectTree');
-  tree.innerHTML = data.items?.map(item =>
-    '<div class="tree-item" onclick="selectObject(' + item.id + ')" data-id="' + item.id + '">' +
-    '<span class="text-malice-muted">#' + item.id + '</span> ' + escapeHtml(item.name) + '</div>'
-  ).join('') || '<div class="text-malice-muted p-2">No results</div>';
+  tree.innerHTML = data.items?.map(item => {
+    const idStr = JSON.stringify(item.id);
+    const prefix = item.isType ? '📋' : '#' + item.id;
+    return '<div class="tree-item" onclick="selectObject(' + idStr + ')" data-id="' + item.id + '">' +
+      '<span class="text-malice-muted">' + prefix + '</span> ' + escapeHtml(item.name) + '</div>';
+  }).join('') || '<div class="text-malice-muted p-2">No results</div>';
 }
 
 async function selectObject(id) {
@@ -1308,7 +1313,10 @@ function escapeHtml(str) {
   const urlParams = new URLSearchParams(window.location.search);
   const id = urlParams.get('id');
   if (id) {
-    await selectObject(parseInt(id));
+    // Try to parse as number, otherwise use as string (type name)
+    const numericId = parseInt(id);
+    const objId = isNaN(numericId) ? id : numericId;
+    await selectObject(objId);
     const el = document.querySelector('.tree-item[data-id="' + id + '"]');
     if (el) el.scrollIntoView({ block: 'center' });
   }
@@ -1370,8 +1378,12 @@ function escapeHtml(str) {
         } else if (root === 'players') {
           const players = await $query().parent($player).limit(100).all();
           items = players.map(p => ({ id: p.id, name: p.name || p.playername || 'Player #' + p.id }));
+        } else if (root === 'types') {
+          const types = await $query().types();
+          items = types.map(t => ({ id: t.id, name: t.name || t.id, isType: true }));
+          items.sort((a, b) => a.name.localeCompare(b.name));
         } else {
-          const objs = await $query().limit(100).all();
+          const objs = await $query().object().limit(100).all();
           items = objs.map(o => ({ id: o.id, name: o.name || '#' + o.id }));
         }
 
@@ -1464,12 +1476,17 @@ function escapeHtml(str) {
       }
 
       // Parse path: could be just ID, or ID/method/name, or ID/property/name
+      // ID can be numeric (object) or string (type)
       const pathParts = (self.match || '').split('/');
-      const id = parseInt(pathParts[0]);
+      const rawId = pathParts[0];
       const subResource = pathParts[1]; // 'method' or 'property'
       const resourceName = pathParts.slice(2).join('/');
 
-      if (isNaN(id)) {
+      // Try to parse as number, otherwise use as string (type name)
+      const numericId = parseInt(rawId);
+      const id = isNaN(numericId) ? rawId : numericId;
+
+      if (!id && id !== 0) {
         return { status: 400, body: JSON.stringify({ error: 'Invalid object ID' }) };
       }
 

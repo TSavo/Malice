@@ -16,10 +16,10 @@ export class HtmlWindowBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
+  async build(): Promise<void> {
     const $ = this.manager as any;
 
-    if ($.htmlWindowJs && !forceRebuild) {
+    if ($.htmlWindowJs) {
       this.obj = $.htmlWindowJs;
       return;
     }

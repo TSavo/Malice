@@ -3,7 +3,7 @@ import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Builds the Letter prototype
+ * Builds the Letter type
  * A writable, portable letter that can be read and written on.
  *
  * Inherits from Writable.
@@ -27,20 +27,18 @@ export class LetterBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
+  async build(): Promise<void> {
+    // Check if type already exists (types auto-alias)
+    const existing = await this.manager.load('letter');
+    if (existing) {
+      this.obj = existing;
+    } else {
+      // Create letter as a TYPE
+      const parentObj = await this.manager.load('writable');
+      if (!parentObj) throw new Error('LetterBuilder: $writable not found');
 
-    if ($.letter && !forceRebuild) {
-      this.obj = $.letter;
-      return;
-    }
-
-    const parentObj = $.writable;
-    if (!parentObj) throw new Error('LetterBuilder: $writable not found');
-
-    this.obj = await this.manager.create({
-      parent: parentObj,
-      properties: {
+      this.obj = await this.manager.define('letter', parentObj, {
+        properties: {
         name: 'Letter',
         description: 'A piece of paper for writing messages.',
         text: '',
@@ -58,10 +56,12 @@ PORTABLE: Can be picked up, given, dropped. Compact size.
 EVIDENCE: Written letters persist. Can be found, read by others. Evidence of communication.
 
 DESTRUCTION: Can be burned, torn, disposed. Fire destroys contents permanently.`,
-      },
-      methods: {},
-    });
+        },
+        methods: {},
+      });
+    }
 
+    // Always rebuild methods (ensures they exist even if type was pre-existing)
     const obj = this.obj;
     // Add property descriptions
     obj.setPropertyDescription(
@@ -75,10 +75,9 @@ DESTRUCTION: Can be burned, torn, disposed. Fire destroys contents permanently.`
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
+    // Types auto-alias by name, no manual registration needed
     if (!this.obj) return;
-    const objectManager = await this.manager.load(0);
-    await objectManager?.call('addAlias', 'letter', this.obj.id);
+    console.log(`[LetterBuilder] Type 'letter' auto-aliased`);
   }
 }
 

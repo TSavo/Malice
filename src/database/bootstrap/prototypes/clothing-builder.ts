@@ -3,7 +3,7 @@ import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Builds the Clothing prototype
+ * Builds the Clothing type
  * Inherits from Wearable - clothing is wearable items.
  *
  * Clothing:
@@ -28,18 +28,20 @@ export class ClothingBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
+  async build(): Promise<void> {
+    // Check if type already exists
+    const existing = await this.manager.load('clothing');
+    if (existing) {
+      this.obj = existing;
+    } else {
+      // Get parent type
+      const wearable = await this.manager.load('wearable');
+      if (!wearable) {
+        throw new Error('Wearable type not found - required for Clothing');
+      }
 
-    if ($.clothing && !forceRebuild) {
-      this.obj = $.clothing;
-      return;
-    }
-
-    const parentObj = $.wearable;
-    this.obj = await this.manager.create({
-      parent: parentObj!,
-      properties: {
+      this.obj = await this.manager.define('clothing', wearable, {
+        properties: {
         name: 'Clothing',
         description: 'An article of clothing',
         // Default clothing covers torso
@@ -73,11 +75,13 @@ CONCEALMENT: Items in pockets are hidden from casual observation. Searched to fi
 BLOOD/STAINS: Combat can stain clothing. Evidence of violence. Wash or destroy to remove.
 
 FIRE: Most fabrics burn. Fire damage destroys clothing, may injure wearer.`,
-      },
-      methods: {},
-    });
+        },
+        methods: {},
+      });
+    }
 
-    const obj = this.obj;
+    // Always rebuild methods (ensures they exist even if type was pre-existing)
+    const obj = this.obj!
 
     // Wear this clothing item (AI calls this directly)
     obj.setMethod(
@@ -341,10 +345,9 @@ FIRE: Most fabrics burn. Fire damage destroys clothing, may injure wearer.`,
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
+    // Types auto-alias by name, no manual registration needed
     if (!this.obj) return;
-    const objectManager = await this.manager.load(0);
-    await objectManager?.call('addAlias', 'clothing', this.obj.id);
+    console.log(`[ClothingBuilder] Type 'clothing' auto-aliased`);
   }
 }
 

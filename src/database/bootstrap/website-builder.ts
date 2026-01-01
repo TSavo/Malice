@@ -25,30 +25,30 @@ export class WebsiteBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
+  async build(): Promise<void> {
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
 
-    const root = await this.manager.load(1);
+    const root = await this.manager.load('root');
     if (!root) throw new Error('Root prototype not found');
 
     const aliases =
       (objectManager.get('aliases') as Record<string, number>) || {};
 
     // Build $webTemplate prototype
-    await this.buildWebTemplate(root, aliases, forceRebuild);
+    await this.buildWebTemplate(root, aliases);
 
     // Build $webPage prototype
-    await this.buildWebPage(root, aliases, forceRebuild);
+    await this.buildWebPage(root, aliases);
 
     // Build $webSite singleton
-    await this.buildWebSite(root, aliases, forceRebuild);
+    await this.buildWebSite(root, aliases);
 
     // Build template instances
-    await this.buildTemplateInstances(forceRebuild);
+    await this.buildTemplateInstances();
 
     // Build page instances
-    await this.buildPageInstances(forceRebuild);
+    await this.buildPageInstances();
 
     // Note: Routes are built in registerAliases() after webRoute/webRouter aliases exist
   }
@@ -56,11 +56,10 @@ export class WebsiteBuilder implements Builder {
   private async buildWebTemplate(
     root: RuntimeObject,
     aliases: Record<string, number>,
-    forceRebuild: boolean,
   ): Promise<void> {
     if (aliases.webTemplate) {
       this.webTemplate = await this.manager.load(aliases.webTemplate);
-      if (this.webTemplate && !forceRebuild) return;
+      if (this.webTemplate) return;
     }
 
     if (!this.webTemplate) {
@@ -99,11 +98,10 @@ export class WebsiteBuilder implements Builder {
   private async buildWebPage(
     root: RuntimeObject,
     aliases: Record<string, number>,
-    forceRebuild: boolean,
   ): Promise<void> {
     if (aliases.webPage) {
       this.webPage = await this.manager.load(aliases.webPage);
-      if (this.webPage && !forceRebuild) return;
+      if (this.webPage) return;
     }
 
     if (!this.webPage) {
@@ -169,11 +167,10 @@ export class WebsiteBuilder implements Builder {
   private async buildWebSite(
     root: RuntimeObject,
     aliases: Record<string, number>,
-    forceRebuild: boolean,
   ): Promise<void> {
     if (aliases.webSite) {
       this.webSite = await this.manager.load(aliases.webSite);
-      if (this.webSite && !forceRebuild) return;
+      if (this.webSite) return;
     }
 
     if (!this.webSite) {
@@ -333,7 +330,7 @@ export class WebsiteBuilder implements Builder {
     );
   }
 
-  private async buildTemplateInstances(forceRebuild: boolean): Promise<void> {
+  private async buildTemplateInstances(): Promise<void> {
     if (!this.webTemplate) return;
 
     const objectManager = await this.manager.load(0);
@@ -403,9 +400,6 @@ export class WebsiteBuilder implements Builder {
         },
         methods: {},
       });
-    } else if (forceRebuild) {
-      // Update layout on force rebuild
-      landingTemplate.set('layout', landingTemplate.get('layout') as string);
     }
 
     // Terminal Template - Windowed Desktop
@@ -507,98 +501,6 @@ export class WebsiteBuilder implements Builder {
         },
         methods: {},
       });
-    } else if (forceRebuild) {
-      // Update layout on force rebuild
-      terminalTemplate.set(
-        'layout',
-        `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{title}}</title>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.min.css">
-  <link rel="stylesheet" href="https://unpkg.com/open-props">
-  <style>
-    /* Theme variables - override these in faction templates */
-    :root {
-      --theme-bg: #0a0a0a;
-      --theme-surface: #0d0d0d;
-      --theme-accent: #00ff88;
-      --theme-accent-dim: #00ff8833;
-      --theme-selection: rgba(0, 255, 136, 0.3);
-      --theme-text: #e0e0e0;
-      --theme-text-dim: #888;
-      --theme-border: #333;
-    }
-
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body {
-      height: 100%;
-      overflow: hidden;
-      background: var(--theme-bg);
-      font-family: 'JetBrains Mono', monospace;
-    }
-
-    /* Desktop container */
-    .malice-desktop {
-      position: fixed;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      background: var(--theme-bg);
-    }
-
-    /* Window area (excludes taskbar) */
-    #window-area {
-      flex: 1;
-      position: relative;
-      overflow: hidden;
-    }
-
-    /* Taskbar container */
-    #taskbar-container {
-      flex-shrink: 0;
-    }
-
-    /* Window flashing animation */
-    @keyframes window-flash {
-      0%, 100% { border-color: var(--theme-border); }
-      50% { border-color: var(--theme-accent); }
-    }
-    .malice-window.flashing {
-      animation: window-flash 0.5s ease-in-out 4;
-    }
-
-    /* Taskbar button flashing */
-    @keyframes taskbar-flash {
-      0%, 100% { background: #1a1a1a; }
-      50% { background: var(--theme-accent-dim); }
-    }
-  </style>
-</head>
-<body>
-  <div class="malice-desktop">
-    <div id="window-area"></div>
-    <div id="taskbar-container"></div>
-  </div>
-
-  <script>
-    // Theme data for JS that can't use CSS var()
-    window.MALICE_THEME = {
-      name: 'The Continuum',
-      tagline: 'Citizen authentication required',
-      registerTagline: 'New citizen registration',
-      accent: '#00ff88',
-      surface: '#0d0d0d',
-      selection: 'rgba(0, 255, 136, 0.3)'
-    };
-  </script>
-  <script type="module" src="/js/desktop.js"></script>
-</body>
-</html>`,
-      );
     }
 
     // Doc Template
@@ -685,7 +587,7 @@ export class WebsiteBuilder implements Builder {
   private _terminalTemplate: RuntimeObject | null = null;
   private _docTemplate: RuntimeObject | null = null;
 
-  private async buildPageInstances(_forceRebuild: boolean): Promise<void> {
+  private async buildPageInstances(): Promise<void> {
     if (!this.webPage) return;
 
     const objectManager = await this.manager.load(0);
@@ -1116,7 +1018,6 @@ export class WebsiteBuilder implements Builder {
    */
   private async buildRoutes(
     aliases: Record<string, number>,
-    _forceRebuild: boolean,
   ): Promise<void> {
     console.log('[WebsiteBuilder] buildRoutes() called');
 
@@ -1370,7 +1271,7 @@ window.MaliceClient = MaliceClient;
 
     // Build routes NOW that webRoute/webRouter aliases exist
     console.log('[WebsiteBuilder] registerAliases() - building routes now');
-    await this.buildRoutes(aliases, false);
+    await this.buildRoutes(aliases);
 
     const register = async (alias: string, obj: RuntimeObject | null) => {
       if (obj) {

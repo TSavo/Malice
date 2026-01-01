@@ -35,7 +35,7 @@ export class EnglishBuilder implements Builder {
     }
 
     // Create new English
-    const root = await this.manager.load(1);
+    const root = await this.manager.load('root');
     this.english = await this.manager.create({
       parent: root!,
       properties: {

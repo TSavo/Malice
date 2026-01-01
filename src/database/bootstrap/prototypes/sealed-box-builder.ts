@@ -3,7 +3,7 @@ import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Builds the SealedBox prototype
+ * Builds the SealedBox type
  * Tamper-proof containers for delivery jobs.
  *
  * Properties:
@@ -21,23 +21,21 @@ export class SealedBoxBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
+  async build(): Promise<void> {
 
-    if ($.sealedBox && !forceRebuild) {
-      this.obj = $.sealedBox;
-      return;
-    }
-
-    const parentObj = $.describable;
-    if (!parentObj) throw new Error('SealedBoxBuilder: $describable not found');
-
-    this.obj = await this.manager.create({
-      parent: parentObj!,
-      properties: {
-        name: 'Sealed Box',
-        description:
-          'A white plastic case with black tamper strips and a barcode label. The seal is intact.',
+    const existing = await this.manager.load('sealedBox');
+    if (existing) {
+      this.obj = existing;
+    } else {
+      const parent = await this.manager.load('describable');
+      if (!parent) {
+        throw new Error('Describable type not found - required for SealedBox');
+      }
+      this.obj = await this.manager.define('sealedBox', parent, {
+        properties: {
+          name: 'Sealed Box',
+          description:
+            'A white plastic case with black tamper strips and a barcode label. The seal is intact.',
         // Delivery info
         destinationId: null, // Room ID where this should be delivered
         destinationName: null, // Human-readable destination
@@ -67,11 +65,12 @@ TRACKING: 'packageCode' unique identifier. 'assignedTo' is courier, 'assignedAt'
 PLOT HOOKS: Triggers 'packageTampered', 'packageDelivered', 'packageArrivedAtDestination' for story tracking.
 
 WEIGHT: Packages have 'weight' for carrying mechanics.`,
-      },
-      methods: {},
-    });
-
-    const obj = this.obj;
+        },
+        methods: {},
+      });
+    }
+    // Always rebuild methods (ensures they exist even if type was pre-existing)
+    const obj = this.obj!;
 
     // ═══════════════════════════════════════════════════════════════════
     // PREVENT OPENING
@@ -305,10 +304,7 @@ WEIGHT: Packages have 'weight' for carrying mechanics.`,
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
-    if (!this.obj) return;
-    const objectManager = await this.manager.load(0);
-    await objectManager?.call('addAlias', 'sealedBox', this.obj.id);
+    console.log('[SealedBoxBuilder] Type \'sealedBox\' auto-aliased');
   }
 }
 

@@ -3,7 +3,7 @@ import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Builds the BottledWater prototype
+ * Builds the BottledWater type
  * Inherits from Drink - sealed water bottles
  *
  * Basic hydration sold throughout the city. Continuum-branded
@@ -18,18 +18,20 @@ export class BottledWaterBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
+  async build(): Promise<void> {
+    // Check if type already exists
+    const existing = await this.manager.load('bottledWater');
+    if (existing) {
+      this.obj = existing;
+    } else {
+      // Get parent type
+      const drink = await this.manager.load('drink');
+      if (!drink) {
+        throw new Error('Drink type not found - required for BottledWater');
+      }
 
-    if ($.bottledWater && !forceRebuild) {
-      this.obj = $.bottledWater;
-      return;
-    }
-
-    const parentObj = $.drink;
-    const obj = await this.manager.create({
-      parent: parentObj!,
-      properties: {
+      this.obj = await this.manager.define('bottledWater', drink, {
+        properties: {
         name: 'Bottled Water',
         description:
           'A clear plastic bottle of purified water. The Continuum logo is embossed on the cap. 500ml of municipal tap, filtered and sealed.',
@@ -67,9 +69,13 @@ DECAY: Once opened, 'openedDecayRate' kicks in (~23 days). Sealed bottles last i
 VERBS: 'drink water', 'open bottle'. Registered when picked up or in room.
 
 ECONOMY: 'basePrice' 1 credit. Ubiquitous vending machine item.`,
-      },
-      methods: {},
-    });
+        },
+        methods: {},
+      });
+    }
+
+    // Always rebuild methods (ensures they exist even if type was pre-existing)
+    const obj = this.obj!;
 
     // Override drink to handle sealed bottles
     obj.setMethod(
@@ -206,15 +212,10 @@ ECONOMY: 'basePrice' 1 credit. Ubiquitous vending machine item.`,
       'containerWeight',
       'Weight of the empty bottle container in grams',
     );
-
-    this.obj = obj;
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
-    if (!this.obj) return;
-    const objectManager = await this.manager.load(0);
-    await objectManager?.call('addAlias', 'bottledWater', this.obj.id);
+    console.log('[BottledWaterBuilder] Type \'bottledWater\' auto-aliased');
   }
 }
 

@@ -3,8 +3,8 @@ import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Builds the Location prototype
- * Base prototype for things that can contain other things
+ * Builds the Location type
+ * Base type for things that can contain other things
  */
 export class LocationBuilder implements Builder {
   static provides = ['location'];
@@ -14,24 +14,26 @@ export class LocationBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
+  async build(): Promise<void> {
+    // Check if type already exists
+    const existing = await this.manager.load('location');
+    if (existing) {
+      this.obj = existing;
+    } else {
+      // Get parent type
+      const describable = await this.manager.load('describable');
+      if (!describable) {
+        throw new Error('Describable type not found - required for Location');
+      }
 
-    if ($.location && !forceRebuild) {
-      this.obj = $.location;
-      return;
-    }
+      this.obj = await this.manager.define('location', describable, {
+        properties: {
+          name: 'Location',
+          description:
+            'Base prototype for locations (things that can contain other things)',
+          // contents inherited from Describable
 
-    const parentObj = $.describable;
-    this.obj = await this.manager.create({
-      parent: parentObj!,
-      properties: {
-        name: 'Location',
-        description:
-          'Base prototype for locations (things that can contain other things)',
-        // contents inherited from Describable
-
-        abilities: `Container that can hold other objects - the base for rooms and containers.
+          abilities: `Container that can hold other objects - the base for rooms and containers.
 
 CONTENTS: 'contents' array holds objects inside this location. Objects have 'location' pointing back here.
 
@@ -51,11 +53,13 @@ MESSAGING: announce(actor, target, messages) sends perspective-aware messages to
 SPEECH: broadcastSpeech(speech, speaker) sends speech to all listeners. Understanding depends on their 'knownLanguages'.
 
 SENSATION: broadcastSensation(target, sensation) routes pain/feeling to target's onSensation handler.`,
-      },
-      methods: {},
-    });
+        },
+        methods: {},
+      });
+    }
 
-    const obj = this.obj;
+    // Always rebuild methods (ensures they exist even if type was pre-existing)
+    const obj = this.obj!
     obj.setMethod(
       'describe',
       `
@@ -439,10 +443,9 @@ SENSATION: broadcastSensation(target, sensation) routes pain/feeling to target's
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
+    // Types auto-alias by name, no manual registration needed
     if (!this.obj) return;
-    const objectManager = await this.manager.load(0);
-    await objectManager?.call('addAlias', 'location', this.obj.id);
+    console.log(`[LocationBuilder] Type 'location' auto-aliased`);
   }
 }
 

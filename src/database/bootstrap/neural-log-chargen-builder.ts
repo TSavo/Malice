@@ -22,7 +22,7 @@ export class NeuralLogCharGenBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
+  async build(): Promise<void> {
     // Check if already exists via alias
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
@@ -32,19 +32,19 @@ export class NeuralLogCharGenBuilder implements Builder {
 
     if (aliases.neuralLogCharGen) {
       this.neuralLogCharGen = await this.manager.load(aliases.neuralLogCharGen);
-      if (this.neuralLogCharGen && !forceRebuild) return;
+      if (this.neuralLogCharGen) return;
     }
 
     if (!this.neuralLogCharGen) {
-      const describableId = aliases.describable;
-      if (!describableId) {
+      // Load describable type directly (types auto-alias by name)
+      const $describable = await this.manager.load('describable');
+      if (!$describable) {
         throw new Error(
-          '$describable not found in aliases - run prototype builders first',
+          '$describable type not found - run prototype builders first',
         );
       }
-      const $describable = await this.manager.load(describableId);
       this.neuralLogCharGen = await this.manager.create({
-        parent: $describable!,
+        parent: $describable,
         properties: {
           name: 'NeuralLogCharGen',
           description: 'Neural Log character creation system for AI agents',

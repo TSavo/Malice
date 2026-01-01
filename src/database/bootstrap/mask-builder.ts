@@ -22,7 +22,7 @@ export class MaskBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
+  async build(): Promise<void> {
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
 
@@ -32,16 +32,13 @@ export class MaskBuilder implements Builder {
     // Check if already exists
     if (aliases.theMask) {
       this.mask = await this.manager.load(aliases.theMask);
-      if (this.mask && !forceRebuild) return;
+      if (this.mask) return;
     }
 
-    // Get wearable prototype from alias
-    if (!aliases.wearable) {
-      throw new Error('$wearable must be built before $theMask');
-    }
-    const parent = await this.manager.load(aliases.wearable);
+    // Get wearable type as parent
+    const parent = await this.manager.load('wearable');
     if (!parent) {
-      throw new Error('Failed to load $wearable');
+      throw new Error('Wearable type not found - required for The Mask');
     }
 
     this.mask = await this.manager.create({

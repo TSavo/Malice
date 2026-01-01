@@ -3,8 +3,8 @@ import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Builds the Agent prototype
- * Base prototype for things that can act (verb handling, movement)
+ * Builds the Agent type
+ * Base type for things that can act (verb handling, movement)
  *
  * Watch system:
  * - watchList: array of object IDs being actively observed
@@ -26,18 +26,20 @@ export class AgentBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
+  async build(): Promise<void> {
+    // Check if type already exists
+    const existing = await this.manager.load('agent');
+    if (existing) {
+      this.obj = existing;
+    } else {
+      // Get parent type
+      const describable = await this.manager.load('describable');
+      if (!describable) {
+        throw new Error('Describable type not found - required for Agent');
+      }
 
-    if ($.agent && !forceRebuild) {
-      this.obj = $.agent;
-      return;
-    }
-
-    const parentObj = $.describable;
-    this.obj = await this.manager.create({
-      parent: parentObj!,
-      properties: {
+      this.obj = await this.manager.define('agent', describable, {
+        properties: {
         name: 'Agent',
         description: 'Base prototype for things that can act',
           // Verb registry: { pattern: { obj: ObjId, method: string } }
@@ -111,11 +113,13 @@ STATUS EFFECTS: 'statusEffects' tracks chemical/injury effects: sedation, stimul
 PERCEPTION FILTERS: 'perceptionFilters' modify what this agent perceives. Neural interfaces, hallucinations, AR overlays. Each filter can inject entities, modify descriptions.
 
 LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, if <= luck, failure becomes success.`,
-      },
-      methods: {},
-    });
+        },
+        methods: {},
+      });
+    }
 
-    const obj = this.obj;
+    // Always rebuild methods (ensures they exist even if type was pre-existing)
+    const obj = this.obj!
     this.addVerbMethods(obj);
     this.addResolutionMethods(obj);
     this.addActionMethods(obj);
@@ -182,10 +186,9 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
+    // Types auto-alias by name, no manual registration needed
     if (!this.obj) return;
-    const objectManager = await this.manager.load(0);
-    await objectManager?.call('addAlias', 'agent', this.obj.id);
+    console.log(`[AgentBuilder] Type 'agent' auto-aliased`);
   }
 
   private addVerbMethods(obj: RuntimeObject): void {

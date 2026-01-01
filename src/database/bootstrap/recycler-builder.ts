@@ -14,7 +14,7 @@ export class RecyclerBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
+  async build(): Promise<void> {
     // Check if already exists via alias
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
@@ -24,12 +24,12 @@ export class RecyclerBuilder implements Builder {
 
     if (aliases.recycler) {
       this.recycler = await this.manager.load(aliases.recycler);
-      if (this.recycler && !forceRebuild) return; // Already exists
+      if (this.recycler) return; // Already exists
     }
 
     // Create new Recycler only if it doesn't exist
     if (!this.recycler) {
-      const root = await this.manager.load(1);
+      const root = await this.manager.load('root');
       this.recycler = await this.manager.create({
         parent: root!,
         properties: {
@@ -75,8 +75,9 @@ export class RecyclerBuilder implements Builder {
             throw new Error('Parent must be specified');
           }
 
-          // Parent must be a RuntimeObject
-          if (!params.parent || typeof params.parent !== 'object' || typeof params.parent.id !== 'number') {
+          // Parent must be a RuntimeObject (types have string IDs, objects have number IDs)
+          if (!params.parent || typeof params.parent !== 'object' ||
+              (typeof params.parent.id !== 'number' && typeof params.parent.id !== 'string')) {
             throw new Error('Parent must be a RuntimeObject');
           }
 

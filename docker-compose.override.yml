@@ -2,6 +2,11 @@
 # Production: use `docker compose -f docker-compose.yml up -d` to skip this
 
 services:
+  mongodb:
+    ports:
+      # Expose MongoDB for local testing
+      - "27017:27017"
+
   game:
     ports:
       # Development ports - expose directly for local testing

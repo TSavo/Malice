@@ -14,7 +14,7 @@ export class AuthManagerBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
+  async build(): Promise<void> {
     // Check if already exists via alias
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
@@ -24,12 +24,12 @@ export class AuthManagerBuilder implements Builder {
 
     if (aliases.authManager) {
       this.authManager = await this.manager.load(aliases.authManager);
-      if (this.authManager && !forceRebuild) return; // Already exists and not forcing rebuild
+      if (this.authManager) return; // Already exists and not forcing rebuild
     }
 
     if (!this.authManager) {
       // Create new AuthManager only if it doesn't exist
-      const root = await this.manager.load(1);
+      const root = await this.manager.load('root');
       this.authManager = await this.manager.create({
         parent: root!,
         properties: {
@@ -165,18 +165,13 @@ export class AuthManagerBuilder implements Builder {
               return;
             }
 
-            // Check if user exists via alias lookup
-            const objectManager = await $load(0);
-            const aliases = objectManager.aliases || {};
-            const playerPrototypeId = aliases.player;
-
             // Find player with this username
+            // Player/Admin types have string IDs 'player' and 'admin'
             // Helper to extract value from typed Value or raw value
             const getValue = (v) => v && typeof v === 'object' && 'type' in v ? v.value : v;
             const users = await context.$.db.listAll();
-            const adminPrototypeId = aliases.admin;
             const existingUser = users.find(u =>
-              (getValue(u.parent) === playerPrototypeId || getValue(u.parent) === adminPrototypeId) &&
+              (u.parent?.id === 'player' || u.parent?.id === 'admin') &&
               getValue(u.properties.playername) === username
             );
 
@@ -211,14 +206,11 @@ export class AuthManagerBuilder implements Builder {
             }
 
             // Check if username already taken
-            const objectManager = await $load(0);
-            const aliases = objectManager.aliases || {};
-            const playerPrototypeId = aliases.player;
-            const adminPrototypeId = aliases.admin;
+            // Player/Admin types have string IDs 'player' and 'admin'
             const getValue = (v) => v && typeof v === 'object' && 'type' in v ? v.value : v;
             const users = await context.$.db.listAll();
             const existingUser = users.find(u =>
-              (getValue(u.parent) === playerPrototypeId || getValue(u.parent) === adminPrototypeId) &&
+              (u.parent?.id === 'player' || u.parent?.id === 'admin') &&
               getValue(u.properties.playername) === username
             );
 

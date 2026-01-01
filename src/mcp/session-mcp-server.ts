@@ -20,7 +20,7 @@ import { Subject } from 'rxjs';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { z } from 'zod';
-import type { RuntimeObject } from '../../types/object.js';
+import type { ObjId, RuntimeObject } from '../../types/object.js';
 import type { AuthInfo } from '../../types/auth.js';
 import { Connection } from '../connection/connection.js';
 import type { ObjectManager } from '../database/object-manager.js';
@@ -40,7 +40,7 @@ interface SessionState {
   muxTransport: PollingMuxTransport;
   connection: Connection;
   context: ConnectionContext;
-  playerId: number;
+  playerId: ObjId;
   playerName: string;
 }
 
@@ -110,9 +110,7 @@ export class SessionMCPServer {
     // Find player by playername
     const users = await this.manager.db.listAll();
     const userDoc = users.find(u => {
-      const parentId = typeof u.parent === 'object' && u.parent !== null && 'value' in u.parent
-        ? (u.parent as { value: number }).value
-        : u.parent as number;
+      const parentId = u.parent.id;
       return (parentId === playerPrototypeId || parentId === adminPrototypeId) &&
         getValue(u.properties.playername) === username;
     });

@@ -3,8 +3,8 @@ import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Builds the Embodied prototype
- * Base prototype for agents with physical bodies and sensory organs.
+ * Builds the Embodied type
+ * Base type for agents with physical bodies and sensory organs.
  *
  * Embodied agents have:
  * - A body with head, torso, limbs
@@ -25,18 +25,20 @@ export class EmbodiedBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
+  async build(): Promise<void> {
+    // Check if type already exists
+    const existing = await this.manager.load('embodied');
+    if (existing) {
+      this.obj = existing;
+    } else {
+      // Get parent type
+      const agent = await this.manager.load('agent');
+      if (!agent) {
+        throw new Error('Agent type not found - required for Embodied');
+      }
 
-    if ($.embodied && !forceRebuild) {
-      this.obj = $.embodied;
-      return;
-    }
-
-    const parent = $.agent;
-    this.obj = await this.manager.create({
-      parent: parent!,
-      properties: {
+      this.obj = await this.manager.define('embodied', agent, {
+        properties: {
         name: 'Embodied',
         description: 'Base prototype for agents with physical bodies',
         // Body reference - set when body is created
@@ -65,10 +67,12 @@ WOUNDS: Body parts accumulate wounds. Wounds bleed (drains hydration/calories), 
 
 STRENGTH: Derived from body part effective capacity (maxCalories - decayLevel). Weakest link in arm path limits what can be lifted/held.`,
       },
-      methods: {},
-    });
+        methods: {},
+      });
+    }
 
-    const obj = this.obj;
+    // Always rebuild methods (ensures they exist even if type was pre-existing)
+    const obj = this.obj!
     this.addBodyAccessMethods(obj);
     this.addSensoryMethods(obj);
     this.addCalorieMethods(obj);
@@ -99,10 +103,9 @@ STRENGTH: Derived from body part effective capacity (maxCalories - decayLevel). 
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
+    // Types auto-alias by name, no manual registration needed
     if (!this.obj) return;
-    const objectManager = await this.manager.load(0);
-    await objectManager?.call('addAlias', 'embodied', this.obj.id);
+    console.log(`[EmbodiedBuilder] Type 'embodied' auto-aliased`);
   }
 
   private addBodyAccessMethods(obj: RuntimeObject): void {

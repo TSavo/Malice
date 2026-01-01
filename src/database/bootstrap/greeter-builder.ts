@@ -40,7 +40,7 @@ export class GreeterBuilder implements Builder {
     // Create new Greeter system if needed
     if (!this.greeter) {
       console.log('[GreeterBuilder] Creating new Greeter system...');
-      const root = await this.manager.load(1);
+      const root = await this.manager.load('root');
       this.greeter = await this.manager.create({
         parent: root!,
         properties: {

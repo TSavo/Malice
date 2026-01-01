@@ -29,14 +29,14 @@ describe('MinimalBootstrap', () => {
   });
 
   describe('bootstrap()', () => {
-    it('should create Root object (#1)', async () => {
+    it('should create Root type', async () => {
       await bootstrap.bootstrap();
 
-      const root = await manager.load(1);
+      const root = await manager.load('root');
       expect(root).toBeTruthy();
-      expect(root?.id).toBe(1);
+      expect(root?.id).toBe('root');
       expect(root?.get('name')).toBe('Root');
-      expect(root?.getParent()?.id).toBe(0); // Parent is ObjectManager #0
+      expect(root?.getParent()?.id).toBe('root'); // Parent is self (root type)
     });
 
     it('should create System object (#2)', async () => {
@@ -85,15 +85,14 @@ describe('MinimalBootstrap', () => {
       expect(system).toBeTruthy();
     });
 
-    it('should create objects with correct structure', async () => {
+    it('should create root type with correct structure', async () => {
       await bootstrap.bootstrap();
 
-      const _objectManager = await manager.load(0);
-      const root = await manager.load(1);
+      const root = await manager.load('root');
       const doc = root?._getRaw();
 
-      expect(doc._id).toBe(1);
-      expect(doc.parent).toEqual({ type: 'objref', value: 0 });
+      expect(doc._id).toBe('root');
+      expect(doc.parent).toEqual({ type: 'objref', target: 'type', id: 'root' });
       expect(doc.properties).toBeTruthy();
       expect(doc.methods).toBeTruthy();
       expect(doc.created).toBeInstanceOf(Date);
@@ -101,28 +100,24 @@ describe('MinimalBootstrap', () => {
     });
   });
 
-  describe('Root object', () => {
-    it('should have config property', async () => {
+  describe('Root type', () => {
+    it('should be a type (not an object)', async () => {
       await bootstrap.bootstrap();
 
-      const _objectManager = await manager.load(0);
-      const root = await manager.load(1);
-      const config = root?.get('config');
+      const root = await manager.load('root');
 
-      expect(config).toBeTruthy();
-      expect(typeof config).toBe('object');
+      expect(root).toBeTruthy();
+      expect(root?.isType).toBe(true);
+      expect(root?.kind).toBe('type');
     });
 
-    it('should have default site configuration', async () => {
+    it('should have name and description', async () => {
       await bootstrap.bootstrap();
 
-      const _objectManager = await manager.load(0);
-      const root = await manager.load(1);
-      const config = root?.get('config') as any;
+      const root = await manager.load('root');
 
-      expect(config.siteName).toBe('Malice');
-      expect(config.motd).toBeTruthy();
-      expect(config.maxConnections).toBeGreaterThan(0);
+      expect(root?.get('name')).toBe('Root');
+      expect(root?.get('description')).toBe('Base of all types');
     });
   });
 
@@ -157,9 +152,18 @@ describe('MinimalBootstrap', () => {
 
       expect(aliases.nothing).toBe(-1);
       expect(aliases.object_manager).toBe(0);
-      expect(aliases.root).toBe(1);
+      // Note: 'root' is a type now and auto-aliases, not in aliases map
       expect(aliases.system).toBe(2);
-      expect(Object.keys(aliases).length).toBe(4);
+      expect(Object.keys(aliases).length).toBe(3);
+    });
+
+    it('should auto-alias root type', async () => {
+      await bootstrap.bootstrap();
+
+      // Root should be accessible via $root even though it's not in aliases
+      const root = await manager.load('root');
+      expect(root).toBeTruthy();
+      expect(root?.isType).toBe(true);
     });
 
     it('should preserve existing aliases', async () => {

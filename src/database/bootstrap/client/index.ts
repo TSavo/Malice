@@ -25,33 +25,33 @@ import { WindowManagerBuilder } from './window-manager-builder';
 export class ClientBuilder {
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
+  async build(): Promise<void> {
     console.log('[ClientBuilder] Building client modules...');
 
     // Build in dependency order
     const windowBuilder = new WindowBuilder(this.manager);
-    await windowBuilder.build(forceRebuild);
+    await windowBuilder.build();
 
     const terminalWindowBuilder = new TerminalWindowBuilder(this.manager);
-    await terminalWindowBuilder.build(forceRebuild);
+    await terminalWindowBuilder.build();
 
     const htmlWindowBuilder = new HtmlWindowBuilder(this.manager);
-    await htmlWindowBuilder.build(forceRebuild);
+    await htmlWindowBuilder.build();
 
     const iframeWindowBuilder = new IframeWindowBuilder(this.manager);
-    await iframeWindowBuilder.build(forceRebuild);
+    await iframeWindowBuilder.build();
 
     const taskbarBuilder = new TaskbarBuilder(this.manager);
-    await taskbarBuilder.build(forceRebuild);
+    await taskbarBuilder.build();
 
     const windowManagerBuilder = new WindowManagerBuilder(this.manager);
-    await windowManagerBuilder.build(forceRebuild);
+    await windowManagerBuilder.build();
 
     const maliceClientBuilder = new MaliceClientBuilder(this.manager);
-    await maliceClientBuilder.build(forceRebuild);
+    await maliceClientBuilder.build();
 
     const desktopBuilder = new DesktopBuilder(this.manager);
-    await desktopBuilder.build(forceRebuild);
+    await desktopBuilder.build();
 
     console.log('[ClientBuilder] Client modules built');
   }

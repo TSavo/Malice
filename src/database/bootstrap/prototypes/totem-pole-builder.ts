@@ -3,7 +3,7 @@ import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Builds the TotemPole prototype
+ * Builds the TotemPole type
  * A landmark with embedded surveillance tech.
  *
  * The Pioneer Square totem pole is real Seattle history:
@@ -23,20 +23,20 @@ export class TotemPoleBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
+  async build(): Promise<void> {
+    // Check if type already exists
+    const existing = await this.manager.load('totemPole');
+    if (existing) {
+      this.obj = existing;
+    } else {
+      // Get parent type
+      const describable = await this.manager.load('describable');
+      if (!describable) {
+        throw new Error('Describable type not found - required for TotemPole');
+      }
 
-    if ($.totemPole && !forceRebuild) {
-      this.obj = $.totemPole;
-      return;
-    }
-
-    const parentObj = $.describable;
-    if (!parentObj) throw new Error('TotemPoleBuilder: $describable not found');
-
-    this.obj = await this.manager.create({
-      parent: parentObj!,
-      properties: {
+      this.obj = await this.manager.define('totemPole', describable, {
+        properties: {
         name: 'Totem Pole',
         description: `A sixty-foot cedar column rises from its concrete base, carved with figures from Tlingit mythology. Raven perches at the top, wings folded, beak pointed toward the sky. Below: Bear, Whale, Wolf—each figure emerging from the one beneath.
 
@@ -90,11 +90,13 @@ NARRATION when climbing DOWN:
 
 PHYSICAL: 60 feet tall, cedar, bolted to concrete base. Cannot be moved.
 The carvings are genuine Tlingit art - stolen twice over.`,
-      },
-      methods: {},
-    });
+        },
+        methods: {},
+      });
+    }
 
-    const obj = this.obj;
+    // Always rebuild methods (ensures they exist even if type was pre-existing)
+    const obj = this.obj!;
 
     // observe(event, data) - Log an observation (called by Pluribus or surveillance system)
     obj.setMethod(
@@ -226,10 +228,7 @@ The carvings are genuine Tlingit art - stolen twice over.`,
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
-    if (!this.obj) return;
-    const objectManager = await this.manager.load(0);
-    await objectManager?.call('addAlias', 'totemPole', this.obj.id);
+    console.log('[TotemPoleBuilder] Type \'totemPole\' auto-aliased');
   }
 }
 

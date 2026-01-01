@@ -40,7 +40,7 @@ export class CombatBuilder implements Builder {
       if (this.combat) return;
     }
 
-    const root = await this.manager.load(1);
+    const root = await this.manager.load('root');
     this.combat = await this.manager.create({
       parent: root!,
       properties: {

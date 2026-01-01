@@ -34,7 +34,7 @@ export class NotesBuilder implements Builder {
       if (this.notes) return;
     }
 
-    const root = await this.manager.load(1);
+    const root = await this.manager.load('root');
     this.notes = await this.manager.create({
       parent: root!,
       properties: {

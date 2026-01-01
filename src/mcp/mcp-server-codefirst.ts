@@ -24,7 +24,7 @@ import {
 } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { z } from 'zod';
-import type { RuntimeObject } from '../../types/object.js';
+import type { ObjId, RuntimeObject } from '../../types/object.js';
 import type { ObjectManager } from '../database/object-manager.js';
 
 interface MCPServerConfig {
@@ -35,7 +35,7 @@ interface MCPServerConfig {
 interface SessionState {
   server: McpServer;
   transport: StreamableHTTPServerTransport;
-  playerId?: number; // Authenticated player ID (undefined = unauthenticated)
+  playerId?: ObjId; // Authenticated player ID (undefined = unauthenticated)
 }
 
 /**
@@ -69,7 +69,7 @@ export class MaliceMCPServer {
    */
   private async authenticate(
     authHeader: string | undefined,
-  ): Promise<number | undefined> {
+  ): Promise<ObjId | undefined> {
     if (!authHeader || !authHeader.startsWith('Basic ')) {
       return undefined;
     }
@@ -119,7 +119,7 @@ export class MaliceMCPServer {
         return undefined;
       }
 
-      return player.id;
+      return player.id as number;
     } catch (err) {
       console.error('[MCP] Authentication error:', err);
       return undefined;
@@ -163,7 +163,7 @@ export class MaliceMCPServer {
   /**
    * Create MCP server with code-first tools
    */
-  private createSessionServer(playerId?: number): McpServer {
+  private createSessionServer(playerId?: ObjId): McpServer {
     const server = new McpServer({
       name: 'malice-moo',
       version: '2.0.0',
@@ -178,7 +178,7 @@ export class MaliceMCPServer {
   /**
    * Register code-first tools
    */
-  private registerTools(server: McpServer, playerId?: number): void {
+  private registerTools(server: McpServer, playerId?: ObjId): void {
     // Primary tool: Execute MOO code
     server.tool(
       'execute_moo_code',
@@ -227,7 +227,7 @@ Write composable code - loops, conditionals, multi-step operations all work.`,
                   type: 'text',
                   text: JSON.stringify({
                     error:
-                      'MCP not bootstrapped. Run FORCE_BOOTSTRAP=true npm start',
+                      'MCP not bootstrapped. Run npm run bootstrap:world',
                   }),
                 },
               ],

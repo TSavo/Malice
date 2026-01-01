@@ -3,7 +3,7 @@ import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Builds the Decayable prototype
+ * Builds the Decayable type
  * Base for anything that can decay over time (food, body parts, corpses, drugs)
  *
  * Decay model:
@@ -34,20 +34,22 @@ export class DecayableBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
+  async build(): Promise<void> {
+    // Check if type already exists
+    const existing = await this.manager.load('decayable');
+    if (existing) {
+      this.obj = existing;
+    } else {
+      // Get parent type
+      const describable = await this.manager.load('describable');
+      if (!describable) {
+        throw new Error('Describable type not found - required for Decayable');
+      }
 
-    if ($.decayable && !forceRebuild) {
-      this.obj = $.decayable;
-      return;
-    }
-
-    const parentObj = $.describable;
-    this.obj = await this.manager.create({
-      parent: parentObj!,
-      properties: {
+      this.obj = await this.manager.define('decayable', describable, {
+        properties: {
         name: 'Decayable',
-        description: 'Base prototype for objects that decay over time',
+        description: 'Base type for objects that decay over time',
         // Decay properties
         decayRate: 1, // Base decay rate (% per tick)
         decayLevel: 0, // Current decay (0-100%)
@@ -90,8 +92,10 @@ PRESERVATION: preserve(method) stops decay if caught early.`,
       },
       methods: {},
     });
+    }
 
-    const obj = this.obj;
+    // Always rebuild methods (ensures they exist even if type was pre-existing)
+    const obj = this.obj!;
     // Check if decay condition is met
     obj.setMethod(
       'shouldDecay',
@@ -441,10 +445,7 @@ PRESERVATION: preserve(method) stops decay if caught early.`,
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
-    if (!this.obj) return;
-    const objectManager = await this.manager.load(0);
-    await objectManager?.call('addAlias', 'decayable', this.obj.id);
+    console.log('[DecayableBuilder] Type \'decayable\' auto-aliased');
   }
 }
 

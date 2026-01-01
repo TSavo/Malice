@@ -3,7 +3,7 @@ import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Builds the BankTerminal prototype
+ * Builds the BankTerminal type
  * Physical kiosk that provides player access to the banking system.
  *
  * The terminal connects to a Bank object and provides $.prompt-based menus for:
@@ -26,18 +26,20 @@ export class BankTerminalBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
+  async build(): Promise<void> {
+    // Check if type already exists
+    const existing = await this.manager.load('bankTerminal');
+    if (existing) {
+      this.obj = existing;
+    } else {
+      // Get parent type
+      const describable = await this.manager.load('describable');
+      if (!describable) {
+        throw new Error('Describable type not found - required for BankTerminal');
+      }
 
-    if ($.bankTerminal && !forceRebuild) {
-      this.obj = $.bankTerminal;
-      return;
-    }
-
-    const parentObj = $.describable;
-    const obj = await this.manager.create({
-      parent: parentObj!,
-      properties: {
+      this.obj = await this.manager.define('bankTerminal', describable, {
+        properties: {
         name: 'Bank Terminal',
         description:
           'A sleek banking kiosk with a touchscreen interface. The corporate logo pulses softly.',
@@ -72,9 +74,13 @@ FEES: 'fees' object configures per-operation costs.
 ACCOUNTS: Players must have bank account. getPlayerAccount() checks. openAccount creates new.
 
 VERBS: 'use terminal', 'bank', 'check balance'. Registered when terminal placed or player enters room.`,
-      },
-      methods: {},
-    });
+        },
+        methods: {},
+      });
+    }
+
+    // Always rebuild methods (ensures they exist even if type was pre-existing)
+    const obj = this.obj!;
 
     // ═══════════════════════════════════════════════════════════════════
     // BANK ACCESS
@@ -698,15 +704,10 @@ VERBS: 'use terminal', 'bank', 'check balance'. Registered when terminal placed 
       'credchipDenominations',
       'Array of standard credchip values available for purchase',
     );
-
-    this.obj = obj;
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
-    if (!this.obj) return;
-    const objectManager = await this.manager.load(0);
-    await objectManager?.call('addAlias', 'bankTerminal', this.obj.id);
+    console.log('[BankTerminalBuilder] Type \'bankTerminal\' auto-aliased');
   }
 }
 

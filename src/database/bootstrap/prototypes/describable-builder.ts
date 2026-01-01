@@ -8,43 +8,45 @@ import { registerBuilder, type Builder } from '../builder-registry';
  */
 export class DescribableBuilder implements Builder {
   static provides = ['describable'];
-  static depends: string[] = []; // Root-level - no dependencies
+  static depends = ['aiImageGen']; // For image() method
 
   private obj: RuntimeObject | null = null;
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
+  async build(): Promise<void> {
+    // Check if type already exists (types auto-alias)
+    const existing = await this.manager.load('describable');
+    if (existing) {
+      this.obj = existing;
+    } else {
+      // Create describable as a TYPE
+      const root = await this.manager.load('root');
+      if (!root) throw new Error('Root type not found');
 
-    if ($.describable && !forceRebuild) {
-      this.obj = $.describable;
-      return;
+      this.obj = await this.manager.define('describable', root, {
+        properties: {
+          name: 'Describable',
+          description: 'Base prototype for things that exist in the world',
+          aliases: [],
+          location: null, // ObjId | null - where this object is located
+          contents: [], // ObjId[] - what's inside this object
+          // Physical dimensions (in centimeters for width/height/depth, grams for weight)
+          width: 0, // cm
+          height: 0, // cm
+          depth: 0, // cm
+          weight: 0, // grams
+          // Movement restrictions
+          boltedDown: false, // If true, cannot be moved at all
+          // AI-readable abilities - natural language mechanics documentation
+          // Describes what this object can do, how to use it, rules/formulas
+          abilities: null, // string - grows as players discover new interactions
+        },
+        methods: {},
+      });
     }
 
-    const parentObj = await this.manager.load(1); // Root
-    this.obj = await this.manager.create({
-      parent: parentObj!,
-      properties: {
-        name: 'Describable',
-        description: 'Base prototype for things that exist in the world',
-        aliases: [],
-        location: null, // ObjId | null - where this object is located
-        contents: [], // ObjId[] - what's inside this object
-        // Physical dimensions (in centimeters for width/height/depth, grams for weight)
-        width: 0, // cm
-        height: 0, // cm
-        depth: 0, // cm
-        weight: 0, // grams
-        // Movement restrictions
-        boltedDown: false, // If true, cannot be moved at all
-        // AI-readable abilities - natural language mechanics documentation
-        // Describes what this object can do, how to use it, rules/formulas
-        abilities: null, // string - grows as players discover new interactions
-      },
-      methods: {},
-    });
-
+    // Always rebuild methods (ensures they exist even if type was pre-existing)
     const obj = this.obj;
     obj.setMethod(
       'describe',
@@ -648,6 +650,107 @@ export class DescribableBuilder implements Builder {
     `,
     );
 
+    // ═══════════════════════════════════════════════════════════════════
+    // IMAGE GENERATION - AI-generated images for objects
+    // ═══════════════════════════════════════════════════════════════════
+
+    // image() - Get or generate an image for this object
+    obj.setMethod(
+      'image',
+      `
+      /** Get or generate an image for this object at the specified aspect ratio.
+       *  Images are cached by aspect ratio in self.images property.
+       *  @param options - { force?, prompt?, model?, aspectRatio? }
+       *    aspectRatio: 'landscape' (default), 'portrait', 'square', or '16:9', '9:16', '4:3', '3:4', '1:1'
+       *    force: regenerate even if cached
+       *    prompt: custom prompt (default: from describe())
+       *  @returns blobKey string, or null on error
+       */
+      const options = args[0] || {};
+
+      // Normalize aspect ratio
+      const ratioMap = {
+        'landscape': '16:9',
+        'portrait': '9:16',
+        'square': '1:1',
+        'wide': '16:9',
+        'tall': '9:16',
+      };
+      const rawRatio = options.aspectRatio || 'landscape';
+      const aspectRatio = ratioMap[rawRatio] || rawRatio;
+
+      // Check if we already have an image for this aspect ratio
+      const images = self.images || {};
+      if (images[aspectRatio] && !options.force) {
+        return images[aspectRatio];
+      }
+
+      // Check if $aiImageGen is available
+      const aiImageGen = $aiImageGen;
+      if (!aiImageGen) {
+        throw new Error('$aiImageGen not available');
+      }
+
+      // Build prompt from describe() or custom
+      const prompt = options.prompt || await self.describe();
+
+      // Generate the image
+      const result = await aiImageGen.generate(prompt, {
+        model: options.model,
+        aspectRatio: aspectRatio,
+        metadata: {
+          objectId: self.id,
+          objectName: self.name,
+          aspectRatio: aspectRatio,
+        },
+        filename: 'obj_' + self.id + '_' + aspectRatio.replace(':', 'x') + '_' + Date.now(),
+      });
+
+      if (!result.success) {
+        throw new Error(result.error || 'Image generation failed');
+      }
+
+      // Store by aspect ratio
+      images[aspectRatio] = result.blobKey;
+      self.images = images;
+
+      return result.blobKey;
+    `,
+    );
+
+    // imageUrl(options?) - Convenience to get URL for this object's image
+    obj.setMethod(
+      'imageUrl',
+      `
+      /** Get URL for this object's image (generates if needed).
+       *  @param options - { domain?, aspectRatio?, force?, prompt? } or just domain string
+       *  @returns URL string
+       *  @throws Error if generation fails
+       */
+      const arg = args[0];
+      const options = typeof arg === 'string' ? { domain: arg } : (arg || {});
+
+      const blobKey = await self.image({
+        aspectRatio: options.aspectRatio,
+        force: options.force,
+        prompt: options.prompt,
+      });
+
+      return $blob.url(blobKey, options.domain);
+    `,
+    );
+
+    // allImages() - Get all cached images organized by aspect ratio
+    obj.setMethod(
+      'allImages',
+      `
+      /** Get all cached images organized by aspect ratio.
+       *  @returns { '16:9': blobKey, '9:16': blobKey, ... }
+       */
+      return self.images || {};
+    `,
+    );
+
     // Property descriptions for AI context
     obj.setPropertyDescription('name', 'Display name of this object');
     obj.setPropertyDescription(
@@ -678,18 +781,18 @@ export class DescribableBuilder implements Builder {
       'abilities',
       'Natural language physics rules - what this object can do and how',
     );
+    obj.setPropertyDescription(
+      'images',
+      'AI-generated images by aspect ratio: { "16:9": [...blobKeys], "9:16": [...], "1:1": [...] }',
+    );
 
     this.obj = obj;
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
+    // Types auto-alias by name, no manual registration needed
     if (!this.obj) return;
-    // Register in memory for immediate $.describable access
-    this.manager.registerAlias('describable', this.obj);
-    // Persist to MongoDB
-    const objectManager = await this.manager.load(0);
-    await objectManager?.call('addAlias', 'describable', this.obj.id);
+    console.log(`[DescribableBuilder] Type 'describable' auto-aliased`);
   }
 }
 

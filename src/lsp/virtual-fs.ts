@@ -692,6 +692,7 @@ export class VirtualFileSystem {
 
     // Map known prototype IDs to type names
     // Filter out undefined aliases to avoid creating invalid keys
+    // Map of object IDs to prototype names (for legacy objects still in objects collection)
     const prototypeMap: Record<number, string> = {};
     if (aliases.player !== undefined) prototypeMap[aliases.player] = 'Player';
     if (aliases.human !== undefined) prototypeMap[aliases.human] = 'Human';
@@ -699,19 +700,24 @@ export class VirtualFileSystem {
     if (aliases.room !== undefined) prototypeMap[aliases.room] = 'Room';
     if (aliases.location !== undefined)
       prototypeMap[aliases.location] = 'Location';
-    if (aliases.describable !== undefined)
-      prototypeMap[aliases.describable] = 'Describable';
 
     // Walk parent chain
     let current: RuntimeObject | null = obj;
     while (current) {
-      if (prototypeMap[current.id]) {
-        return prototypeMap[current.id];
+      // Types use their name capitalized (e.g., 'describable' -> 'Describable')
+      if (current.isType && typeof current.id === 'string') {
+        return current.id.charAt(0).toUpperCase() + current.id.slice(1);
+      }
+
+      // Check if current is an object with known ID
+      const currentId = current.id as number;
+      if (typeof currentId === 'number' && prototypeMap[currentId]) {
+        return prototypeMap[currentId];
       }
 
       // Read parent ID directly from raw object (getParent uses sync lookup which may miss)
       const raw = (current as any)._getRaw();
-      const parentId = raw.parent?.value;
+      const parentId = raw.parent?.id;
       // Stop if no parent or self-parented
       if (parentId === undefined || parentId === current.id) break;
       current = await this.manager.load(parentId);
@@ -747,7 +753,7 @@ export class VirtualFileSystem {
     const argsDeclaration =
       signature.args.length > 0
         ? `declare const args: [${signature.args.join(', ')}];`
-        : 'declare const args: [];';
+        : 'declare const args: unknown[];';
 
     const parameterDeclarations = signature.args
       .map((arg) => `declare const ${arg.split(':')[0]}: ${arg.split(':')[1]};`)

@@ -45,11 +45,11 @@ export class BodyPartsBuilder implements Builder {
   /**
    * Build all specialized body part prototypes
    */
-  async build(forceRebuild = false): Promise<void> {
+  async build(): Promise<void> {
     const $ = this.manager as any;
 
     // Check if already built
-    if ($.torso && !forceRebuild) {
+    if ($.torso) {
       this.parts = {
         torso: $.torso,
         stomach: $.stomach,

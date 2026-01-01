@@ -3,8 +3,8 @@ import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Builds the OneTimeLocker prototype
- * Implementation prototype for courier-friendly locker banks.
+ * Builds the OneTimeLocker type
+ * Implementation type for courier-friendly locker banks.
  * Inherits from Locker (bank) - handles verbs, messaging, and hooks.
  *
  * This adds player-facing verbs to interact with the locker bank:
@@ -26,21 +26,19 @@ export class OneTimeLockerBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
+  async build(): Promise<void> {
 
-    if ($.oneTimeLocker && !forceRebuild) {
-      this.obj = $.oneTimeLocker;
-      return;
-    }
-
-    const parentObj = $.locker;
-    if (!parentObj) throw new Error('OneTimeLockerBuilder: $locker not found');
-
-    this.obj = await this.manager.create({
-      parent: parentObj!,
-      properties: {
-        name: 'One-Time Locker Bank',
+    const existing = await this.manager.load('oneTimeLocker');
+    if (existing) {
+      this.obj = existing;
+    } else {
+      const parent = await this.manager.load('locker');
+      if (!parent) {
+        throw new Error('Locker type not found - required for OneTimeLocker');
+      }
+      this.obj = await this.manager.define('oneTimeLocker', parent, {
+        properties: {
+          name: 'One-Time Locker Bank',
         description:
           'A bank of storage lockers that support one-time access codes for couriers.',
         // Override rental duration - courier lockers are shorter term (24 hours default)
@@ -62,11 +60,12 @@ SHORT RENTAL: 24-hour default rental (vs 7-day base). Courier jobs are quick.
 PLOT HOOKS: Triggers 'opened', 'closed', 'oneTimeCodeUsed' for story tracking.
 
 VERB REGISTRATION: Registers verbs when placed in room or player enters. Unregisters on leave.`,
-      },
-      methods: {},
-    });
-
-    const obj = this.obj;
+        },
+        methods: {},
+      });
+    }
+    // Always rebuild methods (ensures they exist even if type was pre-existing)
+    const obj = this.obj!;
 
     // ═══════════════════════════════════════════════════════════════════
     // VERB HANDLERS
@@ -529,15 +528,10 @@ VERB REGISTRATION: Registers verbs when placed in room or player enters. Unregis
       'rentalDurationMs',
       'Rental period in milliseconds (24 hours for courier lockers vs 7 days for base)',
     );
-
-    this.obj = obj;
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
-    if (!this.obj) return;
-    const objectManager = await this.manager.load(0);
-    await objectManager?.call('addAlias', 'oneTimeLocker', this.obj.id);
+    console.log('[OneTimeLockerBuilder] Type \'oneTimeLocker\' auto-aliased');
   }
 }
 

@@ -3,7 +3,7 @@ import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Builds the Lock prototype
+ * Builds the Lock type
  * Base prototype for access control systems.
  *
  * ABILITIES-FIRST ARCHITECTURE:
@@ -27,22 +27,19 @@ export class LockBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
-
-    if ($.lock && !forceRebuild) {
-      this.obj = $.lock;
-      return;
-    }
-
-    const parentObj = $.describable;
-    if (!parentObj) throw new Error('LockBuilder: $describable not found');
-
-    if ($.lock) {
-      this.obj = $.lock;
+  async build(): Promise<void> {
+    // Check if type already exists
+    const existing = await this.manager.load('lock');
+    if (existing) {
+      this.obj = existing;
     } else {
-      this.obj = await this.manager.create({
-        parent: parentObj,
+      // Get parent type
+      const describable = await this.manager.load('describable');
+      if (!describable) {
+        throw new Error('Describable type not found - required for Lock');
+      }
+
+      this.obj = await this.manager.define('lock', describable, {
         properties: {
           name: 'Lock',
           description: 'A basic lock mechanism.',
@@ -60,6 +57,7 @@ FORCING: Lock mechanism can be damaged with sufficient force, but this usually d
       });
     }
 
+    // Always rebuild methods (ensures they exist even if type was pre-existing)
     const obj = this.obj!;
 
     // Add property descriptions
@@ -124,14 +122,7 @@ FORCING: Lock mechanism can be damaged with sufficient force, but this usually d
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
-    if (!this.obj) return;
-
-    const objectManager = await this.manager.load(0);
-    if (!objectManager) return;
-
-    await objectManager.call('addAlias', 'lock', this.obj.id);
-    console.log(`  ✅ Registered $lock -> #${this.obj.id}`);
+    console.log('[LockBuilder] Type \'lock\' auto-aliased');
   }
 }
 

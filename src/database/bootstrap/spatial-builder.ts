@@ -21,7 +21,7 @@ export class SpatialBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
+  async build(): Promise<void> {
     // Check if already exists via alias
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
@@ -31,12 +31,12 @@ export class SpatialBuilder implements Builder {
 
     if (aliases.spatial) {
       this.spatial = await this.manager.load(aliases.spatial);
-      if (this.spatial && !forceRebuild) return; // Already exists
+      if (this.spatial) return; // Already exists
     }
 
     // Create new $spatial only if it doesn't exist
     if (!this.spatial) {
-      const root = await this.manager.load(1);
+      const root = await this.manager.load('root');
       this.spatial = await this.manager.create({
         parent: root!,
         properties: {

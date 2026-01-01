@@ -24,7 +24,7 @@ export class DomainRegistryBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
+  async build(): Promise<void> {
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
 
@@ -33,11 +33,11 @@ export class DomainRegistryBuilder implements Builder {
 
     if (aliases.domainRegistry) {
       this.registry = await this.manager.load(aliases.domainRegistry);
-      if (this.registry && !forceRebuild) return;
+      if (this.registry) return;
     }
 
     if (!this.registry) {
-      const root = await this.manager.load(1);
+      const root = await this.manager.load('root');
       this.registry = await this.manager.create({
         parent: root!,
         properties: {

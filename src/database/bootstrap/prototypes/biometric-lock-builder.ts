@@ -3,7 +3,7 @@ import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Builds the BiometricLock prototype
+ * Builds the BiometricLock type
  * Scans body parts for authorization.
  *
  * ABILITIES-FIRST ARCHITECTURE:
@@ -25,32 +25,38 @@ export class BiometricLockBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
+  async build(): Promise<void> {
+    // Check if type already exists
+    const existing = await this.manager.load('biometricLock');
+    if (existing) {
+      this.obj = existing;
+    } else {
+      // Get parent type
+      const lock = await this.manager.load('lock');
+      if (!lock) {
+        throw new Error('Lock type not found - required for BiometricLock');
+      }
 
-    if ($.biometricLock && !forceRebuild) {
-      this.obj = $.biometricLock;
-      return;
-    }
-
-    const parentObj = $.lock;
-    const obj = await this.manager.create({
-      parent: parentObj!,
-      properties: {
-        name: 'Biometric Lock',
-        description: 'A biometric scanner with a red LED.',
-        scanType: 'fingerprint',
-        scanLocation: 'beside the door',
-        abilities: `Biometric scanner that reads fingerprints/retinas/palms. LED glows red when locked, green when access granted.
+      this.obj = await this.manager.define('biometricLock', lock, {
+        properties: {
+          name: 'Biometric Lock',
+          description: 'A biometric scanner with a red LED.',
+          scanType: 'fingerprint',
+          scanLocation: 'beside the door',
+          abilities: `Biometric scanner that reads fingerprints/retinas/palms. LED glows red when locked, green when access granted.
 
 AUTHORIZATION: Player must be in 'verifiedUsers' array. Check if player object is present in the array.
 
 SCANNING: Player must have the appropriate body part uncovered. Gloves block fingerprint scans. Eyewear may block retinal scans. The 'scanType' property indicates what kind of scan.
 
 BYPASS: Cannot be picked like a mechanical lock. Can potentially be bypassed with severed authorized body parts (grim but possible). Electronics can be hacked with appropriate tools/skills.`,
-      },
-      methods: {},
-    });
+        },
+        methods: {},
+      });
+    }
+
+    // Always rebuild methods (ensures they exist even if type was pre-existing)
+    const obj = this.obj!;
 
     // Add property descriptions
     obj.setPropertyDescription(
@@ -77,15 +83,10 @@ BYPASS: Cannot be picked like a mechanical lock. Can potentially be bypassed wit
       return 'Access denied. Biometric signature not recognized.';
     `,
     );
-
-    this.obj = obj;
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
-    if (!this.obj) return;
-    const objectManager = await this.manager.load(0);
-    await objectManager?.call('addAlias', 'biometricLock', this.obj.id);
+    console.log('[BiometricLockBuilder] Type \'biometricLock\' auto-aliased');
   }
 }
 

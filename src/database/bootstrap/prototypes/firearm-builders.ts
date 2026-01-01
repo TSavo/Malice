@@ -1,43 +1,39 @@
-import type { ObjId, RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Firearm Prototypes
+ * Firearm Types
  *
  * Hierarchy:
  * $.weapon
  *   $.gun (base for all firearms)
  *     $.pistol (handguns - skill: pistol)
- *       $.revolver
- *       $.semiAutoPistol
- *       $.compactPistol
+ *       $.revolver, $.magnum, $.semiAutoPistol, $.compactPistol, $.derringer, $.m1911
  *     $.rifle (long guns - skill: rifle)
- *       $.boltActionRifle
- *       $.leverActionRifle
- *       $.huntingRifle
+ *       $.boltActionRifle, $.leverActionRifle, $.huntingRifle, $.rifle22
  *     $.shotgun (scatterguns - skill: shotgun)
- *       $.pumpShotgun
- *       $.sawnOffShotgun
- *       $.doubleBarrel
+ *       $.pumpShotgun, $.sawnOffShotgun, $.doubleBarrel, $.coachGun
  *     $.smg (submachine guns - skill: smg)
- *       $.machinePistol
- *
- * All firearms are ranged, have ammo, and use puncture damage.
- * Low-tech focus: no assault rifles, no military hardware (yet).
+ *       $.machinePistol, $.uzi, $.mac10, $.tec9
  */
 
 // ═══════════════════════════════════════════════════════════════════════════
 // BASE GUN
 // ═══════════════════════════════════════════════════════════════════════════
 
-export class GunBuilder {
+export class GunBuilder implements Builder {
+  static provides = ['gun'];
+  static depends = ['weapon'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parent = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parent!,
+  async build(): Promise<void> {
+    if (await this.manager.load('gun')) return;
+
+    const parent = await this.manager.load('weapon');
+    if (!parent) throw new Error('GunBuilder: weapon type not found');
+
+    const obj = await this.manager.define('gun', parent, {
       properties: {
         name: 'Gun',
         description: 'A firearm.',
@@ -45,16 +41,11 @@ export class GunBuilder {
         damageType: 'puncture',
         ranged: true,
         range: 25,
-
-        // Ammo system
         ammo: 0,
         maxAmmo: 6,
         ammoType: 'generic',
-
-        // Magazine system
         usesMagazine: false,
 
-        // Abilities - firearm physics for AI interpretation
         abilities: `Ranged weapon that fires projectiles using gunpowder.
 
 COMBAT TRACKING: When shooting at someone, call $combat.start(shooter, target) to set up exclusions. Call $combat.log(combatId, message) to record events. Call $combat.end(combatId, reason, winner) when combat concludes.
@@ -78,7 +69,6 @@ CONCEALMENT: Smaller guns ('compactPistol', 'derringer') easier to hide. Long gu
       methods: {},
     });
 
-    // Add property descriptions
     obj.setPropertyDescription(
       'usesMagazine',
       'If true, uses detachable magazines. If false, loads ammo directly (revolver, shotgun).',
@@ -93,16 +83,9 @@ CONCEALMENT: Smaller guns ('compactPistol', 'derringer') easier to hide. Long gu
       'Required ammo type: 9mm, .45, 12gauge, .308, etc.',
     );
 
-    // ═══════════════════════════════════════════════════════════════════════
-    // AMMO MANAGEMENT
-    // ═══════════════════════════════════════════════════════════════════════
-
     obj.setMethod(
       'getLoadedMagazine',
       `
-      /** Get the magazine currently loaded in this gun.
-       *  @returns Magazine RuntimeObject or null if none loaded
-       */
       if (!self.usesMagazine) return null;
 
       const contents = self.contents || [];
@@ -118,81 +101,64 @@ CONCEALMENT: Smaller guns ('compactPistol', 'derringer') easier to hide. Long gu
     obj.setMethod(
       'load',
       `
-      /** Load a magazine or ammo into this gun (infrastructure method).
-       *  @param item - Magazine or ammo object to load
-       *  @returns { success: boolean, loaded?: string|number, rounds?: number, error?: string }
-       */
       const item = args[0];
 
       if (!item) {
         return { success: false, error: 'Load what?' };
       }
-      
-      // Check if this gun uses magazines
+
       if (self.usesMagazine) {
-        // Must load a magazine, not loose ammo
         if (item.ammoType && item.quantity !== undefined) {
           return { success: false, error: 'This gun uses magazines. Load a magazine, not loose ammo.' };
         }
-        
-        // Check if it's a magazine
+
         if (item.maxAmmo === undefined || item.ammo === undefined) {
           return { success: false, error: 'That is not a magazine.' };
         }
-        
-        // Check ammo type compatibility
+
         if (self.ammoType && item.ammoType !== self.ammoType) {
           return { success: false, error: 'Wrong magazine type. This gun takes ' + self.ammoType + '.' };
         }
-        
-        // Check if already loaded
+
         const currentMag = await self.getLoadedMagazine();
         if (currentMag) {
           return { success: false, error: 'Eject the current magazine first.' };
         }
-        
-        // Load the magazine - move it into the gun via containment
+
         await item.moveTo(self);
-        
+
         return { success: true, loaded: 'magazine', rounds: item.ammo };
-        
+
       } else {
-        // Direct load (shotguns, revolvers, etc.)
-        // Must load ammo, not a magazine
         if (item.maxAmmo !== undefined && item.quantity === undefined) {
           return { success: false, error: 'This gun does not use magazines. Load ammunition directly.' };
         }
-        
-        // Check if it's ammo
+
         if (!item.ammoType || item.quantity === undefined) {
           return { success: false, error: 'That is not ammunition.' };
         }
-        
-        // Check ammo type compatibility
+
         if (self.ammoType && item.ammoType !== self.ammoType) {
           return { success: false, error: 'Wrong ammunition. This gun takes ' + self.ammoType + '.' };
         }
-        
+
         const currentAmmo = self.ammo || 0;
         const maxAmmo = self.maxAmmo || 6;
         const spaceAvailable = maxAmmo - currentAmmo;
-        
+
         if (spaceAvailable <= 0) {
           return { success: false, error: 'Already fully loaded.' };
         }
-        
-        // How much to load
+
         const available = item.quantity || 0;
         const toLoad = Math.min(available, spaceAvailable);
-        
+
         if (toLoad <= 0) {
           return { success: false, error: 'No ammunition to load.' };
         }
-        
-        // Add to gun
+
         self.ammo = currentAmmo + toLoad;
-        
-        // Recycle ammo if used all, otherwise reduce quantity
+
         if (toLoad >= available) {
           await $.recycler.recycle(item);
           return { success: true, loaded: toLoad, remaining: self.ammo, recycled: true };
@@ -207,24 +173,17 @@ CONCEALMENT: Smaller guns ('compactPistol', 'derringer') easier to hide. Long gu
     obj.setMethod(
       'unload',
       `
-      /** Eject magazine or unload direct ammo (infrastructure method).
-       *  @param caller - Who is unloading (for hand/room placement)
-       *  @returns { success: boolean, ejected?: string, magazine?: object, rounds?: number, error?: string }
-       */
       const caller = args[0];
 
       if (self.usesMagazine) {
-        // Eject the magazine
         const magazine = await self.getLoadedMagazine();
         if (!magazine) {
           return { success: false, error: 'No magazine loaded.' };
         }
-        
-        // Try to put magazine in caller's free hand, otherwise drop to room
+
         let destination = null;
         if (caller && caller.getHands) {
           const hands = await caller.getHands();
-          // Find a free hand
           for (const hand of hands.both) {
             if (hand && await hand.isFree()) {
               destination = hand;
@@ -232,35 +191,31 @@ CONCEALMENT: Smaller guns ('compactPistol', 'derringer') easier to hide. Long gu
             }
           }
         }
-        
-        // Fall back to room if no free hand
+
         if (!destination) {
           destination = (caller && caller.location) || self.location;
         }
-        
+
         if (destination) {
           await magazine.moveTo(destination);
         }
-        
+
         return { success: true, ejected: 'magazine', magazine: magazine, rounds: magazine.ammo };
-        
+
       } else {
-        // Unload direct ammo
         const currentAmmo = self.ammo || 0;
-        
+
         if (currentAmmo <= 0) {
           return { success: false, error: 'Gun is empty.' };
         }
-        
-        // Create ammo object via recycler
+
         const newAmmo = await $.recycler.create($.ammo, {
           ammoType: self.ammoType,
           quantity: currentAmmo,
           name: self.ammoType + ' Ammunition',
           description: 'Loose ammunition.',
         });
-        
-        // Try to put ammo in caller's free hand, otherwise drop to room
+
         let destination = null;
         if (caller && caller.getHands) {
           const hands = await caller.getHands();
@@ -271,32 +226,25 @@ CONCEALMENT: Smaller guns ('compactPistol', 'derringer') easier to hide. Long gu
             }
           }
         }
-        
+
         if (!destination) {
           destination = (caller && caller.location) || self.location;
         }
-        
+
         if (destination) {
           await newAmmo.moveTo(destination);
         }
-        
+
         self.ammo = 0;
-        
+
         return { success: true, unloaded: currentAmmo, ammo: newAmmo };
       }
     `,
     );
 
-    // ═══════════════════════════════════════════════════════════════════════
-    // FIRING
-    // ═══════════════════════════════════════════════════════════════════════
-
     obj.setMethod(
       'getAmmoCount',
       `
-      /** Get current ammo count, checking magazine if applicable.
-       *  @returns Number of rounds available
-       */
       if (self.usesMagazine) {
         const magazine = await self.getLoadedMagazine();
         return magazine ? (magazine.ammo || 0) : 0;
@@ -308,9 +256,6 @@ CONCEALMENT: Smaller guns ('compactPistol', 'derringer') easier to hide. Long gu
     obj.setMethod(
       'canFire',
       `
-      /** Check if this gun can fire.
-       *  @returns { success: boolean, reason?: string }
-       */
       if (!self.ranged) {
         return { success: false, reason: 'This is not a ranged weapon.' };
       }
@@ -327,9 +272,6 @@ CONCEALMENT: Smaller guns ('compactPistol', 'derringer') easier to hide. Long gu
     obj.setMethod(
       'fire',
       `
-      /** Fire the gun, expending one round (infrastructure method).
-       *  @returns { success: boolean, ammoRemaining?: number, reason?: string }
-       */
       const canFire = await self.canFire();
       if (!canFire.success) {
         return canFire;
@@ -348,19 +290,15 @@ CONCEALMENT: Smaller guns ('compactPistol', 'derringer') easier to hide. Long gu
     `,
     );
 
-    // ═══════════════════════════════════════════════════════════════════════
-    // DISPLAY
-    // ═══════════════════════════════════════════════════════════════════════
-
     obj.setMethod(
       'describe',
       `
       let desc = self.name + '\\r\\n' + self.description;
-      
+
       if (self.ranged) {
         const ammoCount = await self.getAmmoCount();
         let maxAmmo = self.maxAmmo;
-        
+
         if (self.usesMagazine) {
           const magazine = await self.getLoadedMagazine();
           if (magazine) {
@@ -373,26 +311,36 @@ CONCEALMENT: Smaller guns ('compactPistol', 'derringer') easier to hide. Long gu
           desc += '\\r\\n[' + ammoCount + '/' + maxAmmo + ' rounds]';
         }
       }
-      
+
       return desc;
     `,
     );
+  }
 
-    return obj;
+  async registerAliases(): Promise<void> {
+    console.log("[GunBuilder] Type 'gun' auto-aliased");
   }
 }
+
+registerBuilder(GunBuilder);
 
 // ═══════════════════════════════════════════════════════════════════════════
 // PISTOLS (skill: pistol)
 // ═══════════════════════════════════════════════════════════════════════════
 
-export class PistolBuilder {
+export class PistolBuilder implements Builder {
+  static provides = ['pistol'];
+  static depends = ['gun'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parent = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parent!,
+  async build(): Promise<void> {
+    if (await this.manager.load('pistol')) return;
+
+    const parent = await this.manager.load('gun');
+    if (!parent) throw new Error('PistolBuilder: gun type not found');
+
+    await this.manager.define('pistol', parent, {
       properties: {
         name: 'Pistol',
         description: 'A handgun.',
@@ -403,21 +351,30 @@ export class PistolBuilder {
         range: 25,
         maxAmmo: 15,
         ammoType: '9mm',
-        usesMagazine: true, // Magazine-fed
+        usesMagazine: true,
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[PistolBuilder] Type 'pistol' auto-aliased");
   }
 }
 
-export class RevolverBuilder {
+export class RevolverBuilder implements Builder {
+  static provides = ['revolver'];
+  static depends = ['pistol'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parent = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parent!,
+  async build(): Promise<void> {
+    if (await this.manager.load('revolver')) return;
+
+    const parent = await this.manager.load('pistol');
+    if (!parent) throw new Error('RevolverBuilder: pistol type not found');
+
+    await this.manager.define('revolver', parent, {
       properties: {
         name: 'Revolver',
         description: 'A six-shot wheel gun. Reliable and powerful.',
@@ -429,21 +386,30 @@ export class RevolverBuilder {
         ammo: 0,
         maxAmmo: 6,
         ammoType: '.38',
-        usesMagazine: false, // Direct load (cylinder)
+        usesMagazine: false,
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[RevolverBuilder] Type 'revolver' auto-aliased");
   }
 }
 
-export class MagnumBuilder {
+export class MagnumBuilder implements Builder {
+  static provides = ['magnum'];
+  static depends = ['pistol'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parent = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parent!,
+  async build(): Promise<void> {
+    if (await this.manager.load('magnum')) return;
+
+    const parent = await this.manager.load('pistol');
+    if (!parent) throw new Error('MagnumBuilder: pistol type not found');
+
+    await this.manager.define('magnum', parent, {
       properties: {
         name: 'Magnum Revolver',
         description: 'A large-bore revolver. Hand cannon.',
@@ -455,21 +421,30 @@ export class MagnumBuilder {
         ammo: 0,
         maxAmmo: 6,
         ammoType: '.44',
-        usesMagazine: false, // Direct load (cylinder)
+        usesMagazine: false,
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[MagnumBuilder] Type 'magnum' auto-aliased");
   }
 }
 
-export class SemiAutoPistolBuilder {
+export class SemiAutoPistolBuilder implements Builder {
+  static provides = ['semiAutoPistol'];
+  static depends = ['pistol'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parent = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parent!,
+  async build(): Promise<void> {
+    if (await this.manager.load('semiAutoPistol')) return;
+
+    const parent = await this.manager.load('pistol');
+    if (!parent) throw new Error('SemiAutoPistolBuilder: pistol type not found');
+
+    await this.manager.define('semiAutoPistol', parent, {
       properties: {
         name: 'Semi-Auto Pistol',
         description: 'A magazine-fed automatic handgun. Standard issue.',
@@ -480,21 +455,30 @@ export class SemiAutoPistolBuilder {
         range: 25,
         maxAmmo: 17,
         ammoType: '9mm',
-        usesMagazine: true, // Magazine-fed
+        usesMagazine: true,
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[SemiAutoPistolBuilder] Type 'semiAutoPistol' auto-aliased");
   }
 }
 
-export class CompactPistolBuilder {
+export class CompactPistolBuilder implements Builder {
+  static provides = ['compactPistol'];
+  static depends = ['pistol'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parent = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parent!,
+  async build(): Promise<void> {
+    if (await this.manager.load('compactPistol')) return;
+
+    const parent = await this.manager.load('pistol');
+    if (!parent) throw new Error('CompactPistolBuilder: pistol type not found');
+
+    await this.manager.define('compactPistol', parent, {
       properties: {
         name: 'Compact Pistol',
         description: 'A small concealed-carry pistol. Easy to hide.',
@@ -505,21 +489,30 @@ export class CompactPistolBuilder {
         range: 15,
         maxAmmo: 7,
         ammoType: '.380',
-        usesMagazine: true, // Magazine-fed
+        usesMagazine: true,
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[CompactPistolBuilder] Type 'compactPistol' auto-aliased");
   }
 }
 
-export class DerringerBuilder {
+export class DerringerBuilder implements Builder {
+  static provides = ['derringer'];
+  static depends = ['pistol'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parent = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parent!,
+  async build(): Promise<void> {
+    if (await this.manager.load('derringer')) return;
+
+    const parent = await this.manager.load('pistol');
+    if (!parent) throw new Error('DerringerBuilder: pistol type not found');
+
+    await this.manager.define('derringer', parent, {
       properties: {
         name: 'Derringer',
         description: 'A tiny two-shot pistol. Pocket backup gun.',
@@ -531,25 +524,33 @@ export class DerringerBuilder {
         ammo: 0,
         maxAmmo: 2,
         ammoType: '.22',
-        usesMagazine: false, // Break-action, direct load
+        usesMagazine: false,
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[DerringerBuilder] Type 'derringer' auto-aliased");
   }
 }
 
-export class M1911Builder {
+export class M1911Builder implements Builder {
+  static provides = ['m1911'];
+  static depends = ['pistol'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parent = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parent!,
+  async build(): Promise<void> {
+    if (await this.manager.load('m1911')) return;
+
+    const parent = await this.manager.load('pistol');
+    if (!parent) throw new Error('M1911Builder: pistol type not found');
+
+    await this.manager.define('m1911', parent, {
       properties: {
         name: 'M1911',
-        description:
-          'The classic .45 ACP semi-automatic. American military icon.',
+        description: 'The classic .45 ACP semi-automatic. American military icon.',
         skill: 'pistol',
         damage: 42,
         damageType: 'puncture',
@@ -557,11 +558,14 @@ export class M1911Builder {
         range: 25,
         maxAmmo: 7,
         ammoType: '.45',
-        usesMagazine: true, // Magazine-fed
+        usesMagazine: true,
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[M1911Builder] Type 'm1911' auto-aliased");
   }
 }
 
@@ -569,13 +573,19 @@ export class M1911Builder {
 // RIFLES (skill: rifle)
 // ═══════════════════════════════════════════════════════════════════════════
 
-export class RifleBuilder {
+export class RifleBuilder implements Builder {
+  static provides = ['rifle'];
+  static depends = ['gun'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parent = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parent!,
+  async build(): Promise<void> {
+    if (await this.manager.load('rifle')) return;
+
+    const parent = await this.manager.load('gun');
+    if (!parent) throw new Error('RifleBuilder: gun type not found');
+
+    await this.manager.define('rifle', parent, {
       properties: {
         name: 'Rifle',
         description: 'A long-barreled firearm for accurate shooting.',
@@ -587,22 +597,31 @@ export class RifleBuilder {
         ammo: 0,
         maxAmmo: 5,
         ammoType: '.308',
-        usesMagazine: false, // Internal magazine, direct load
-        twoHanded: true, // Long gun requires two hands
+        usesMagazine: false,
+        twoHanded: true,
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[RifleBuilder] Type 'rifle' auto-aliased");
   }
 }
 
-export class BoltActionRifleBuilder {
+export class BoltActionRifleBuilder implements Builder {
+  static provides = ['boltActionRifle'];
+  static depends = ['rifle'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parent = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parent!,
+  async build(): Promise<void> {
+    if (await this.manager.load('boltActionRifle')) return;
+
+    const parent = await this.manager.load('rifle');
+    if (!parent) throw new Error('BoltActionRifleBuilder: rifle type not found');
+
+    await this.manager.define('boltActionRifle', parent, {
       properties: {
         name: 'Bolt Action Rifle',
         description: 'A manually-cycled rifle. Slow but accurate.',
@@ -614,22 +633,31 @@ export class BoltActionRifleBuilder {
         ammo: 0,
         maxAmmo: 5,
         ammoType: '.308',
-        usesMagazine: false, // Internal magazine, direct load
-        twoHanded: true, // Long gun requires two hands
+        usesMagazine: false,
+        twoHanded: true,
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[BoltActionRifleBuilder] Type 'boltActionRifle' auto-aliased");
   }
 }
 
-export class LeverActionRifleBuilder {
+export class LeverActionRifleBuilder implements Builder {
+  static provides = ['leverActionRifle'];
+  static depends = ['rifle'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parent = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parent!,
+  async build(): Promise<void> {
+    if (await this.manager.load('leverActionRifle')) return;
+
+    const parent = await this.manager.load('rifle');
+    if (!parent) throw new Error('LeverActionRifleBuilder: rifle type not found');
+
+    await this.manager.define('leverActionRifle', parent, {
       properties: {
         name: 'Lever Action Rifle',
         description: 'A cowboy rifle. Tubular magazine, lever cycling.',
@@ -641,22 +669,31 @@ export class LeverActionRifleBuilder {
         ammo: 0,
         maxAmmo: 10,
         ammoType: '.30-30',
-        usesMagazine: false, // Tubular magazine, direct load
-        twoHanded: true, // Long gun requires two hands
+        usesMagazine: false,
+        twoHanded: true,
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[LeverActionRifleBuilder] Type 'leverActionRifle' auto-aliased");
   }
 }
 
-export class HuntingRifleBuilder {
+export class HuntingRifleBuilder implements Builder {
+  static provides = ['huntingRifle'];
+  static depends = ['rifle'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parent = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parent!,
+  async build(): Promise<void> {
+    if (await this.manager.load('huntingRifle')) return;
+
+    const parent = await this.manager.load('rifle');
+    if (!parent) throw new Error('HuntingRifleBuilder: rifle type not found');
+
+    await this.manager.define('huntingRifle', parent, {
       properties: {
         name: 'Hunting Rifle',
         description: 'A civilian sporting rifle. Wood stock, scope mount.',
@@ -668,22 +705,31 @@ export class HuntingRifleBuilder {
         ammo: 0,
         maxAmmo: 4,
         ammoType: '.308',
-        usesMagazine: false, // Internal magazine, direct load
-        twoHanded: true, // Long gun requires two hands
+        usesMagazine: false,
+        twoHanded: true,
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[HuntingRifleBuilder] Type 'huntingRifle' auto-aliased");
   }
 }
 
-export class Rifle22Builder {
+export class Rifle22Builder implements Builder {
+  static provides = ['rifle22'];
+  static depends = ['rifle'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parent = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parent!,
+  async build(): Promise<void> {
+    if (await this.manager.load('rifle22')) return;
+
+    const parent = await this.manager.load('rifle');
+    if (!parent) throw new Error('Rifle22Builder: rifle type not found');
+
+    await this.manager.define('rifle22', parent, {
       properties: {
         name: '.22 Rifle',
         description: 'A small-caliber plinking rifle. Cheap ammo, low power.',
@@ -695,12 +741,15 @@ export class Rifle22Builder {
         ammo: 0,
         maxAmmo: 10,
         ammoType: '.22',
-        usesMagazine: false, // Internal magazine, direct load
-        twoHanded: true, // Long gun requires two hands
+        usesMagazine: false,
+        twoHanded: true,
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[Rifle22Builder] Type 'rifle22' auto-aliased");
   }
 }
 
@@ -708,17 +757,22 @@ export class Rifle22Builder {
 // SHOTGUNS (skill: shotgun)
 // ═══════════════════════════════════════════════════════════════════════════
 
-export class ShotgunBuilder {
+export class ShotgunBuilder implements Builder {
+  static provides = ['shotgun'];
+  static depends = ['gun'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parent = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parent!,
+  async build(): Promise<void> {
+    if (await this.manager.load('shotgun')) return;
+
+    const parent = await this.manager.load('gun');
+    if (!parent) throw new Error('ShotgunBuilder: gun type not found');
+
+    await this.manager.define('shotgun', parent, {
       properties: {
         name: 'Shotgun',
-        description:
-          'A smoothbore long gun firing shot shells. Devastating up close.',
+        description: 'A smoothbore long gun firing shot shells. Devastating up close.',
         skill: 'shotgun',
         damage: 55,
         damageType: 'puncture',
@@ -727,22 +781,31 @@ export class ShotgunBuilder {
         ammo: 0,
         maxAmmo: 5,
         ammoType: '12gauge',
-        usesMagazine: false, // Tube magazine, direct load
-        twoHanded: true, // Long gun requires two hands
+        usesMagazine: false,
+        twoHanded: true,
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[ShotgunBuilder] Type 'shotgun' auto-aliased");
   }
 }
 
-export class PumpShotgunBuilder {
+export class PumpShotgunBuilder implements Builder {
+  static provides = ['pumpShotgun'];
+  static depends = ['shotgun'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parent = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parent!,
+  async build(): Promise<void> {
+    if (await this.manager.load('pumpShotgun')) return;
+
+    const parent = await this.manager.load('shotgun');
+    if (!parent) throw new Error('PumpShotgunBuilder: shotgun type not found');
+
+    await this.manager.define('pumpShotgun', parent, {
       properties: {
         name: 'Pump Shotgun',
         description: 'A pump-action shotgun. The iconic rack sound.',
@@ -754,26 +817,34 @@ export class PumpShotgunBuilder {
         ammo: 0,
         maxAmmo: 8,
         ammoType: '12gauge',
-        usesMagazine: false, // Tube magazine, direct load
-        twoHanded: true, // Long gun requires two hands
+        usesMagazine: false,
+        twoHanded: true,
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[PumpShotgunBuilder] Type 'pumpShotgun' auto-aliased");
   }
 }
 
-export class SawnOffShotgunBuilder {
+export class SawnOffShotgunBuilder implements Builder {
+  static provides = ['sawnOffShotgun'];
+  static depends = ['shotgun'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parent = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parent!,
+  async build(): Promise<void> {
+    if (await this.manager.load('sawnOffShotgun')) return;
+
+    const parent = await this.manager.load('shotgun');
+    if (!parent) throw new Error('SawnOffShotgunBuilder: shotgun type not found');
+
+    await this.manager.define('sawnOffShotgun', parent, {
       properties: {
         name: 'Sawn-Off Shotgun',
-        description:
-          'A shotgun with the barrel cut down. Concealable, brutal spread.',
+        description: 'A shotgun with the barrel cut down. Concealable, brutal spread.',
         skill: 'shotgun',
         damage: 50,
         damageType: 'puncture',
@@ -782,25 +853,33 @@ export class SawnOffShotgunBuilder {
         ammo: 0,
         maxAmmo: 2,
         ammoType: '12gauge',
-        usesMagazine: false, // Break-action, direct load
+        usesMagazine: false,
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[SawnOffShotgunBuilder] Type 'sawnOffShotgun' auto-aliased");
   }
 }
 
-export class DoubleBarrelBuilder {
+export class DoubleBarrelBuilder implements Builder {
+  static provides = ['doubleBarrel'];
+  static depends = ['shotgun'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parent = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parent!,
+  async build(): Promise<void> {
+    if (await this.manager.load('doubleBarrel')) return;
+
+    const parent = await this.manager.load('shotgun');
+    if (!parent) throw new Error('DoubleBarrelBuilder: shotgun type not found');
+
+    await this.manager.define('doubleBarrel', parent, {
       properties: {
         name: 'Double Barrel Shotgun',
-        description:
-          'A break-action two-barrel shotgun. Two shots, then reload.',
+        description: 'A break-action two-barrel shotgun. Two shots, then reload.',
         skill: 'shotgun',
         damage: 55,
         damageType: 'puncture',
@@ -809,22 +888,31 @@ export class DoubleBarrelBuilder {
         ammo: 0,
         maxAmmo: 2,
         ammoType: '12gauge',
-        usesMagazine: false, // Break-action, direct load
-        twoHanded: true, // Long gun requires two hands
+        usesMagazine: false,
+        twoHanded: true,
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[DoubleBarrelBuilder] Type 'doubleBarrel' auto-aliased");
   }
 }
 
-export class CoachGunBuilder {
+export class CoachGunBuilder implements Builder {
+  static provides = ['coachGun'];
+  static depends = ['shotgun'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parent = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parent!,
+  async build(): Promise<void> {
+    if (await this.manager.load('coachGun')) return;
+
+    const parent = await this.manager.load('shotgun');
+    if (!parent) throw new Error('CoachGunBuilder: shotgun type not found');
+
+    await this.manager.define('coachGun', parent, {
       properties: {
         name: 'Coach Gun',
         description: 'A short double-barrel shotgun. Western classic.',
@@ -836,12 +924,15 @@ export class CoachGunBuilder {
         ammo: 0,
         maxAmmo: 2,
         ammoType: '12gauge',
-        usesMagazine: false, // Break-action, direct load
-        twoHanded: true, // Long gun requires two hands
+        usesMagazine: false,
+        twoHanded: true,
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[CoachGunBuilder] Type 'coachGun' auto-aliased");
   }
 }
 
@@ -849,13 +940,19 @@ export class CoachGunBuilder {
 // SUBMACHINE GUNS (skill: smg)
 // ═══════════════════════════════════════════════════════════════════════════
 
-export class SmgBuilder {
+export class SmgBuilder implements Builder {
+  static provides = ['smg'];
+  static depends = ['gun'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parent = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parent!,
+  async build(): Promise<void> {
+    if (await this.manager.load('smg')) return;
+
+    const parent = await this.manager.load('gun');
+    if (!parent) throw new Error('SmgBuilder: gun type not found');
+
+    await this.manager.define('smg', parent, {
       properties: {
         name: 'Submachine Gun',
         description: 'A compact automatic weapon. High rate of fire.',
@@ -866,21 +963,30 @@ export class SmgBuilder {
         range: 50,
         maxAmmo: 30,
         ammoType: '9mm',
-        usesMagazine: true, // Detachable magazine
+        usesMagazine: true,
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[SmgBuilder] Type 'smg' auto-aliased");
   }
 }
 
-export class MachinePistolBuilder {
+export class MachinePistolBuilder implements Builder {
+  static provides = ['machinePistol'];
+  static depends = ['smg'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parent = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parent!,
+  async build(): Promise<void> {
+    if (await this.manager.load('machinePistol')) return;
+
+    const parent = await this.manager.load('smg');
+    if (!parent) throw new Error('MachinePistolBuilder: smg type not found');
+
+    await this.manager.define('machinePistol', parent, {
       properties: {
         name: 'Machine Pistol',
         description: 'A fully-automatic pistol. Sprays bullets.',
@@ -891,21 +997,30 @@ export class MachinePistolBuilder {
         range: 25,
         maxAmmo: 20,
         ammoType: '9mm',
-        usesMagazine: true, // Detachable magazine
+        usesMagazine: true,
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[MachinePistolBuilder] Type 'machinePistol' auto-aliased");
   }
 }
 
-export class UziBuilder {
+export class UziBuilder implements Builder {
+  static provides = ['uzi'];
+  static depends = ['smg'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parent = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parent!,
+  async build(): Promise<void> {
+    if (await this.manager.load('uzi')) return;
+
+    const parent = await this.manager.load('smg');
+    if (!parent) throw new Error('UziBuilder: smg type not found');
+
+    await this.manager.define('uzi', parent, {
       properties: {
         name: 'Uzi',
         description: 'An iconic Israeli submachine gun. Compact and reliable.',
@@ -916,21 +1031,30 @@ export class UziBuilder {
         range: 40,
         maxAmmo: 32,
         ammoType: '9mm',
-        usesMagazine: true, // Detachable magazine
+        usesMagazine: true,
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[UziBuilder] Type 'uzi' auto-aliased");
   }
 }
 
-export class Mac10Builder {
+export class Mac10Builder implements Builder {
+  static provides = ['mac10'];
+  static depends = ['smg'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parent = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parent!,
+  async build(): Promise<void> {
+    if (await this.manager.load('mac10')) return;
+
+    const parent = await this.manager.load('smg');
+    if (!parent) throw new Error('Mac10Builder: smg type not found');
+
+    await this.manager.define('mac10', parent, {
       properties: {
         name: 'MAC-10',
         description: 'A cheap, boxy machine pistol. Street favorite.',
@@ -941,25 +1065,33 @@ export class Mac10Builder {
         range: 30,
         maxAmmo: 30,
         ammoType: '.45',
-        usesMagazine: true, // Detachable magazine
+        usesMagazine: true,
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[Mac10Builder] Type 'mac10' auto-aliased");
   }
 }
 
-export class TecBuilder {
+export class Tec9Builder implements Builder {
+  static provides = ['tec9'];
+  static depends = ['smg'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parent = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parent!,
+  async build(): Promise<void> {
+    if (await this.manager.load('tec9')) return;
+
+    const parent = await this.manager.load('smg');
+    if (!parent) throw new Error('Tec9Builder: smg type not found');
+
+    await this.manager.define('tec9', parent, {
       properties: {
         name: 'TEC-9',
-        description:
-          'A semi-auto pistol easily converted to full-auto. Gang gun.',
+        description: 'A semi-auto pistol easily converted to full-auto. Gang gun.',
         skill: 'smg',
         damage: 30,
         damageType: 'puncture',
@@ -967,118 +1099,37 @@ export class TecBuilder {
         range: 35,
         maxAmmo: 32,
         ammoType: '9mm',
-        usesMagazine: true, // Detachable magazine
+        usesMagazine: true,
       },
       methods: {},
     });
-    return obj;
-  }
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// FIREARM PROTOTYPES BUILDER (registered builder for all firearms)
-// ═══════════════════════════════════════════════════════════════════════════
-
-export class FirearmPrototypesBuilder implements Builder {
-  static provides = [
-    'gun',
-    'pistol',
-    'revolver',
-    'magnum',
-    'semiAutoPistol',
-    'compactPistol',
-    'derringer',
-    'm1911',
-    'rifle',
-    'boltActionRifle',
-    'leverActionRifle',
-    'huntingRifle',
-    'rifle22',
-    'shotgun',
-    'pumpShotgun',
-    'sawnOffShotgun',
-    'doubleBarrel',
-    'coachGun',
-    'smg',
-    'machinePistol',
-    'uzi',
-    'mac10',
-    'tec9',
-  ];
-  static depends = ['weapon'];
-
-  private weapons: Record<string, RuntimeObject> = {};
-
-  constructor(private manager: ObjectManager) {}
-
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
-
-    if ($.gun && !forceRebuild) {
-      for (const alias of FirearmPrototypesBuilder.provides) {
-        if ($[alias]) this.weapons[alias] = $[alias];
-      }
-      return;
-    }
-
-    const parentObj = $.weapon;
-    if (!parentObj) throw new Error('FirearmPrototypesBuilder: $weapon not found');
-
-    const weaponId = parentObj.id;
-
-    // Base gun (inherits from weapon)
-    const gun = await new GunBuilder(this.manager).build(weaponId);
-    this.weapons.gun = gun;
-
-    // Pistols (inherit from gun)
-    const pistol = await new PistolBuilder(this.manager).build(gun.id);
-    this.weapons.pistol = pistol;
-    this.weapons.revolver = await new RevolverBuilder(this.manager).build(pistol.id);
-    this.weapons.magnum = await new MagnumBuilder(this.manager).build(pistol.id);
-    this.weapons.semiAutoPistol = await new SemiAutoPistolBuilder(this.manager).build(pistol.id);
-    this.weapons.compactPistol = await new CompactPistolBuilder(this.manager).build(pistol.id);
-    this.weapons.derringer = await new DerringerBuilder(this.manager).build(pistol.id);
-    this.weapons.m1911 = await new M1911Builder(this.manager).build(pistol.id);
-
-    // Rifles (inherit from gun)
-    const rifle = await new RifleBuilder(this.manager).build(gun.id);
-    this.weapons.rifle = rifle;
-    this.weapons.boltActionRifle = await new BoltActionRifleBuilder(this.manager).build(rifle.id);
-    this.weapons.leverActionRifle = await new LeverActionRifleBuilder(this.manager).build(rifle.id);
-    this.weapons.huntingRifle = await new HuntingRifleBuilder(this.manager).build(rifle.id);
-    this.weapons.rifle22 = await new Rifle22Builder(this.manager).build(rifle.id);
-
-    // Shotguns (inherit from gun)
-    const shotgun = await new ShotgunBuilder(this.manager).build(gun.id);
-    this.weapons.shotgun = shotgun;
-    this.weapons.pumpShotgun = await new PumpShotgunBuilder(this.manager).build(shotgun.id);
-    this.weapons.sawnOffShotgun = await new SawnOffShotgunBuilder(this.manager).build(shotgun.id);
-    this.weapons.doubleBarrel = await new DoubleBarrelBuilder(this.manager).build(shotgun.id);
-    this.weapons.coachGun = await new CoachGunBuilder(this.manager).build(shotgun.id);
-
-    // SMGs (inherit from gun)
-    const smg = await new SmgBuilder(this.manager).build(gun.id);
-    this.weapons.smg = smg;
-    this.weapons.machinePistol = await new MachinePistolBuilder(this.manager).build(smg.id);
-    this.weapons.uzi = await new UziBuilder(this.manager).build(smg.id);
-    this.weapons.mac10 = await new Mac10Builder(this.manager).build(smg.id);
-    this.weapons.tec9 = await new TecBuilder(this.manager).build(smg.id);
-
-    console.log(`✅ Built ${Object.keys(this.weapons).length} firearm prototypes`);
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
-    const objectManager = await this.manager.load(0);
-    if (!objectManager) return;
-
-    for (const [name, obj] of Object.entries(this.weapons)) {
-      if (obj) {
-        await objectManager.call('addAlias', name, obj.id);
-      }
-    }
+    console.log("[Tec9Builder] Type 'tec9' auto-aliased");
   }
 }
 
-// Self-register
-registerBuilder(FirearmPrototypesBuilder);
+// Self-register all builders
+registerBuilder(PistolBuilder);
+registerBuilder(RevolverBuilder);
+registerBuilder(MagnumBuilder);
+registerBuilder(SemiAutoPistolBuilder);
+registerBuilder(CompactPistolBuilder);
+registerBuilder(DerringerBuilder);
+registerBuilder(M1911Builder);
+registerBuilder(RifleBuilder);
+registerBuilder(BoltActionRifleBuilder);
+registerBuilder(LeverActionRifleBuilder);
+registerBuilder(HuntingRifleBuilder);
+registerBuilder(Rifle22Builder);
+registerBuilder(ShotgunBuilder);
+registerBuilder(PumpShotgunBuilder);
+registerBuilder(SawnOffShotgunBuilder);
+registerBuilder(DoubleBarrelBuilder);
+registerBuilder(CoachGunBuilder);
+registerBuilder(SmgBuilder);
+registerBuilder(MachinePistolBuilder);
+registerBuilder(UziBuilder);
+registerBuilder(Mac10Builder);
+registerBuilder(Tec9Builder);

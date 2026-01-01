@@ -24,7 +24,7 @@ export class EmailBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
+  async build(): Promise<void> {
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('ObjectManager not found');
 
@@ -33,11 +33,11 @@ export class EmailBuilder implements Builder {
 
     if (aliases.email) {
       this.email = await this.manager.load(aliases.email);
-      if (this.email && !forceRebuild) return;
+      if (this.email) return;
     }
 
     if (!this.email) {
-      const root = await this.manager.load(1);
+      const root = await this.manager.load('root');
       this.email = await this.manager.create({
         parent: root!,
         properties: {

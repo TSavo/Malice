@@ -22,7 +22,7 @@ export class CartelCharGenBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
+  async build(): Promise<void> {
     // Check if already exists via alias
     const objectManager = await this.manager.load(0);
     if (!objectManager) throw new Error('Root object not found');
@@ -32,19 +32,19 @@ export class CartelCharGenBuilder implements Builder {
 
     if (aliases.cartelCharGen) {
       this.cartelCharGen = await this.manager.load(aliases.cartelCharGen);
-      if (this.cartelCharGen && !forceRebuild) return;
+      if (this.cartelCharGen) return;
     }
 
     if (!this.cartelCharGen) {
-      const describableId = aliases.describable;
-      if (!describableId) {
+      // Load describable type directly (types auto-alias by name)
+      const $describable = await this.manager.load('describable');
+      if (!$describable) {
         throw new Error(
-          '$describable not found in aliases - run prototype builders first',
+          '$describable type not found - run prototype builders first',
         );
       }
-      const $describable = await this.manager.load(describableId);
       this.cartelCharGen = await this.manager.create({
-        parent: $describable!,
+        parent: $describable,
         properties: {
           name: 'CartelCharGen',
           description: 'Gray Cartel character creation system',

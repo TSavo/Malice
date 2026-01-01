@@ -3,8 +3,8 @@ import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Builds the Player prototype
- * Base prototype for player characters with authentication and command handling
+ * Builds the Player type
+ * Base type for player characters with authentication and command handling
  */
 export class PlayerBuilder implements Builder {
   static provides = ['player'];
@@ -14,18 +14,20 @@ export class PlayerBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
+  async build(): Promise<void> {
+    // Check if type already exists
+    const existing = await this.manager.load('player');
+    if (existing) {
+      this.obj = existing;
+    } else {
+      // Get parent type
+      const human = await this.manager.load('human');
+      if (!human) {
+        throw new Error('Human type not found - required for Player');
+      }
 
-    if ($.player && !forceRebuild) {
-      this.obj = $.player;
-      return;
-    }
-
-    const parentObj = $.human;
-    this.obj = await this.manager.create({
-      parent: parentObj!,
-      properties: {
+      this.obj = await this.manager.define('player', human, {
+        properties: {
         name: 'Player',
         description: 'Base prototype for player characters',
 
@@ -67,10 +69,12 @@ export class PlayerBuilder implements Builder {
           lastUpdated: null,
         },
       },
-      methods: {},
-    });
+        methods: {},
+      });
+    }
 
-    const obj = this.obj;
+    // Always rebuild methods (ensures they exist even if type was pre-existing)
+    const obj = this.obj!
     // Property descriptions
     obj.setPropertyDescription(
       'playername',
@@ -135,10 +139,9 @@ export class PlayerBuilder implements Builder {
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
+    // Types auto-alias by name, no manual registration needed
     if (!this.obj) return;
-    const objectManager = await this.manager.load(0);
-    await objectManager?.call('addAlias', 'player', this.obj.id);
+    console.log(`[PlayerBuilder] Type 'player' auto-aliased`);
   }
 
   private addConnectionMethods(obj: RuntimeObject): void {

@@ -3,8 +3,8 @@ import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Builds the Human prototype
- * Base prototype for human-like agents with pronouns, age, etc.
+ * Builds the Human type
+ * Base type for human-like agents with pronouns, age, etc.
  *
  * Inherits from Embodied, which provides:
  * - Body access methods (getBody, getHead, getHands, etc.)
@@ -26,18 +26,20 @@ export class HumanBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
+  async build(): Promise<void> {
+    // Check if type already exists
+    const existing = await this.manager.load('human');
+    if (existing) {
+      this.obj = existing;
+    } else {
+      // Get parent type
+      const embodied = await this.manager.load('embodied');
+      if (!embodied) {
+        throw new Error('Embodied type not found - required for Human');
+      }
 
-    if ($.human && !forceRebuild) {
-      this.obj = $.human;
-      return;
-    }
-
-    const parentObj = $.embodied;
-    this.obj = await this.manager.create({
-      parent: parentObj!,
-      properties: {
+      this.obj = await this.manager.define('human', embodied, {
+        properties: {
         name: 'Human',
         description: 'Base prototype for human-like agents',
         sex: 'non-binary',
@@ -74,10 +76,12 @@ SOCIAL: Can speak (via mouth), emote, give items. AI-controlled humans respond t
 
 BODY STRUCTURE: Standard human layout - torso with head, 2 arms (hands), 2 legs (feet). Body created via $.humanBodyFactory.`,
       },
-      methods: {},
-    });
+        methods: {},
+      });
+    }
 
-    const obj = this.obj;
+    // Always rebuild methods (ensures they exist even if type was pre-existing)
+    const obj = this.obj!
     // Property descriptions
     obj.setPropertyDescription(
       'sex',
@@ -1222,10 +1226,9 @@ BODY STRUCTURE: Standard human layout - torso with head, 2 arms (hands), 2 legs 
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
+    // Types auto-alias by name, no manual registration needed
     if (!this.obj) return;
-    const objectManager = await this.manager.load(0);
-    await objectManager?.call('addAlias', 'human', this.obj.id);
+    console.log(`[HumanBuilder] Type 'human' auto-aliased`);
   }
 }
 

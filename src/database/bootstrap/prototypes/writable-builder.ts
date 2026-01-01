@@ -3,7 +3,7 @@ import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Builds the Writable prototype
+ * Builds the Writable type
  * Base for objects that can be written on or edited (e.g., letters, notebooks, whiteboards).
  *
  * Inherits from Describable.
@@ -25,20 +25,18 @@ export class WritableBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
+  async build(): Promise<void> {
+    // Check if type already exists (types auto-alias)
+    const existing = await this.manager.load('writable');
+    if (existing) {
+      this.obj = existing;
+    } else {
+      // Create writable as a TYPE
+      const parentObj = await this.manager.load('describable');
+      if (!parentObj) throw new Error('WritableBuilder: $describable not found');
 
-    if ($.writable && !forceRebuild) {
-      this.obj = $.writable;
-      return;
-    }
-
-    const parentObj = $.describable;
-    if (!parentObj) throw new Error('WritableBuilder: $describable not found');
-
-    this.obj = await this.manager.create({
-      parent: parentObj,
-      properties: {
+      this.obj = await this.manager.define('writable', parentObj, {
+        properties: {
         name: 'Writable',
         description: 'Something you can write on.',
         text: '',
@@ -52,10 +50,12 @@ READING: read() returns current 'text' content. AI can invoke directly.
 WRITING: write(agent, newText) sets 'text' if 'writable' is true. Respects 'maxLength' limit.
 
 PORTABLE: Can be picked up, carried, dropped. Contents persist.`,
-      },
-      methods: {},
-    });
+        },
+        methods: {},
+      });
+    }
 
+    // Always rebuild methods (ensures they exist even if type was pre-existing)
     const obj = this.obj;
     obj.setMethod(
       'read',
@@ -94,10 +94,9 @@ PORTABLE: Can be picked up, carried, dropped. Contents persist.`,
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
+    // Types auto-alias by name, no manual registration needed
     if (!this.obj) return;
-    const objectManager = await this.manager.load(0);
-    await objectManager?.call('addAlias', 'writable', this.obj.id);
+    console.log(`[WritableBuilder] Type 'writable' auto-aliased`);
   }
 }
 

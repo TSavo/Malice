@@ -3,7 +3,7 @@ import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Builds the HumanRemains prototype
+ * Builds the HumanRemains type
  * Dried/desiccated remains - between corpse and skeleton.
  *
  * Human remains:
@@ -21,20 +21,17 @@ export class HumanRemainsBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
+  async build(): Promise<void> {
 
-    if ($.humanRemains && !forceRebuild) {
-      this.obj = $.humanRemains;
-      return;
-    }
-
-    const parentObj = $.describable;
-    const obj = await this.manager.create({
-      parent: parentObj!,
-      properties: {
-        name: 'Human Remains',
-        description: 'Dried remains of a human.',
+    const existing = await this.manager.load('humanRemains');
+    if (existing) {
+      this.obj = existing;
+    } else {
+      const parent = await this.manager.load('describable');
+      this.obj = await this.manager.define('humanRemains', parent!, {
+        properties: {
+          name: 'Human Remains',
+          description: 'Dried remains of a human.',
         // Original identity
         originalName: null,
         // Physical
@@ -62,9 +59,13 @@ AUTOPSY: Limited - mainly bone trauma visible. Soft tissue too degraded for toxi
 IDENTIFICATION: 'originalName' carries identity from corpse. Visual identification impossible - requires dental records or other forensic methods.
 
 FORENSICS: Bone fractures still visible. Time since death estimated from tissue desiccation. Can determine if limbs were severed vs naturally decomposed.`,
-      },
-      methods: {},
-    });
+        },
+        methods: {},
+      });
+    }
+
+    // Always rebuild methods (ensures they exist even if type was pre-existing)
+    const obj = this.obj!;
 
     // Get the body inside
     obj.setMethod(
@@ -393,15 +394,10 @@ FORENSICS: Bone fractures still visible. Time since death estimated from tissue 
       'searched',
       'Boolean tracking if remains have been searched. Affects description text.',
     );
-
-    this.obj = obj;
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
-    if (!this.obj) return;
-    const objectManager = await this.manager.load(0);
-    await objectManager?.call('addAlias', 'humanRemains', this.obj.id);
+    console.log('[HumanRemainsBuilder] Type \'humanRemains\' auto-aliased');
   }
 }
 

@@ -36,7 +36,7 @@ describe('ObjectDatabase', () => {
       // Verify connection by creating an object
       const obj = await testDb.create({
         _id: 1,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: { test: true },
         methods: {},
       });
@@ -128,13 +128,13 @@ describe('ObjectDatabase', () => {
     it('should create a new object', async () => {
       const obj = await db.create({
         _id: 100,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: { name: 'Test Object' },
         methods: {},
       });
 
       expect(obj._id).toBe(100);
-      expect(obj.parent).toEqual({ type: 'objref', value: 0 });
+      expect(obj.parent).toEqual({ type: 'objref', target: 'object', id: 0 });
       expect(obj.properties.name).toBe('Test Object');
       expect(obj.created).toBeInstanceOf(Date);
       expect(obj.modified).toBeInstanceOf(Date);
@@ -144,7 +144,7 @@ describe('ObjectDatabase', () => {
     it('should create new object when ID is not recycled', async () => {
       const obj = await db.create({
         _id: 300,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: { fresh: true },
         methods: {},
       });
@@ -165,14 +165,14 @@ describe('ObjectDatabase', () => {
     it('should return next sequential ID', async () => {
       await db.create({
         _id: 10,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: {},
         methods: {},
       });
 
       await db.create({
         _id: 15,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: {},
         methods: {},
       });
@@ -186,7 +186,7 @@ describe('ObjectDatabase', () => {
     it('should retrieve object by ID', async () => {
       await db.create({
         _id: 60,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: { name: 'Get Test' },
         methods: {},
       });
@@ -207,7 +207,7 @@ describe('ObjectDatabase', () => {
     it('should update object properties', async () => {
       await db.create({
         _id: 70,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: { hp: 100 },
         methods: {},
       });
@@ -232,7 +232,7 @@ describe('ObjectDatabase', () => {
     it('should update object methods', async () => {
       await db.create({
         _id: 71,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: {},
         methods: {},
       });
@@ -254,7 +254,7 @@ describe('ObjectDatabase', () => {
       // Create parent
       await db.create({
         _id: 90,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: { type: 'parent' },
         methods: {},
       });
@@ -262,21 +262,21 @@ describe('ObjectDatabase', () => {
       // Create children
       await db.create({
         _id: 91,
-        parent: { type: 'objref', value: 90 },
+        parent: { type: 'objref', target: 'object', id: 90 },
         properties: { type: 'child1' },
         methods: {},
       });
 
       await db.create({
         _id: 92,
-        parent: { type: 'objref', value: 90 },
+        parent: { type: 'objref', target: 'object', id: 90 },
         properties: { type: 'child2' },
         methods: {},
       });
 
       await db.create({
         _id: 93,
-        parent: { type: 'objref', value: 90 },
+        parent: { type: 'objref', target: 'object', id: 90 },
         properties: { type: 'child3' },
         methods: {},
       });
@@ -289,7 +289,7 @@ describe('ObjectDatabase', () => {
     it('should return empty array when no children exist', async () => {
       await db.create({
         _id: 94,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: {},
         methods: {},
       });
@@ -302,19 +302,19 @@ describe('ObjectDatabase', () => {
       // Create hierarchy: 95 -> 96 -> 97
       await db.create({
         _id: 95,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: {},
         methods: {},
       });
       await db.create({
         _id: 96,
-        parent: { type: 'objref', value: 95 },
+        parent: { type: 'objref', target: 'object', id: 95 },
         properties: {},
         methods: {},
       });
       await db.create({
         _id: 97,
-        parent: { type: 'objref', value: 96 },
+        parent: { type: 'objref', target: 'object', id: 96 },
         properties: {},
         methods: {},
       });
@@ -329,7 +329,7 @@ describe('ObjectDatabase', () => {
     it('should return true for existing object', async () => {
       await db.create({
         _id: 100,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: {},
         methods: {},
       });
@@ -344,7 +344,7 @@ describe('ObjectDatabase', () => {
     it('should return true for recycled objects', async () => {
       await db.create({
         _id: 101,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: {},
         methods: {},
       });
@@ -368,14 +368,14 @@ describe('ObjectDatabase', () => {
       const root = await db.get(1);
       expect(root).not.toBeNull();
       expect(root?._id).toBe(1);
-      expect(root?.parent).toEqual({ type: 'objref', value: 0 });
+      expect(root?.parent).toEqual({ type: 'objref', target: 'object', id: 0 });
     });
 
     it('should not create root if it already exists', async () => {
       // Create root with custom properties
       await db.create({
         _id: 1,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: { custom: 'data' },
         methods: {},
       });
@@ -403,19 +403,19 @@ describe('ObjectDatabase', () => {
 
       await db.create({
         _id: 110,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: { a: 1 },
         methods: {},
       });
       await db.create({
         _id: 111,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: { b: 2 },
         methods: {},
       });
       await db.create({
         _id: 112,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: { c: 3 },
         methods: {},
       });
@@ -431,19 +431,19 @@ describe('ObjectDatabase', () => {
 
       await db.create({
         _id: 120,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: {},
         methods: {},
       });
       await db.create({
         _id: 121,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: {},
         methods: {},
       });
       await db.create({
         _id: 122,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: {},
         methods: {},
       });
@@ -462,7 +462,7 @@ describe('ObjectDatabase', () => {
 
       await db.create({
         _id: 130,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: {},
         methods: {},
       });
@@ -479,7 +479,7 @@ describe('ObjectDatabase', () => {
       // Create object
       const obj1 = await db.create({
         _id: 200,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: { name: 'Original', hp: 100 },
         methods: { attack: { code: 'return "slash";' } },
       });
@@ -504,7 +504,7 @@ describe('ObjectDatabase', () => {
       // Create parent
       const _parent = await db.create({
         _id: 300,
-        parent: { type: 'objref', value: 0 },
+        parent: { type: 'objref', target: 'object', id: 0 },
         properties: { type: 'container' },
         methods: {},
       });
@@ -512,14 +512,14 @@ describe('ObjectDatabase', () => {
       // Create children
       const _child1 = await db.create({
         _id: 301,
-        parent: { type: 'objref', value: 300 },
+        parent: { type: 'objref', target: 'object', id: 300 },
         properties: { name: 'item1' },
         methods: {},
       });
 
       const _child2 = await db.create({
         _id: 302,
-        parent: { type: 'objref', value: 300 },
+        parent: { type: 'objref', target: 'object', id: 300 },
         properties: { name: 'item2' },
         methods: {},
       });
@@ -530,7 +530,7 @@ describe('ObjectDatabase', () => {
       expect(children.map((c) => c._id).sort()).toEqual([301, 302]);
 
       // Update parent reference
-      await db.update(301, { parent: { type: 'objref', value: 0 } });
+      await db.update(301, { parent: { type: 'objref', target: 'object', id: 0 } });
 
       // Children should be updated
       const newChildren = await db.getChildren(300);

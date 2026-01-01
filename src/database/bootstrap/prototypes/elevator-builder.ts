@@ -3,7 +3,7 @@ import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Builds the Elevator prototype
+ * Builds the Elevator type
  * Vertical transport between floors with composable lock system.
  *
  * Inherits from Location (can contain passengers).
@@ -32,19 +32,20 @@ export class ElevatorBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
+  async build(): Promise<void> {
 
-    if ($.elevator && !forceRebuild) {
-      this.obj = $.elevator;
-      return;
-    }
+    // Check if type already exists
+    const existing = await this.manager.load('elevator');
+    if (existing) {
+      this.obj = existing;
+    } else {
+      // Load room type as parent
+      const parentObj = await this.manager.load('room');
+      if (!parentObj) {
+        throw new Error('Room type not found - required for Elevator');
+      }
 
-    const parentObj = $.room;
-    if (!parentObj) throw new Error('ElevatorBuilder: $room not found');
-
-    this.obj = await this.manager.create({
-      parent: parentObj,
+      this.obj = await this.manager.define('elevator', parentObj, {
       properties: {
         name: 'Elevator',
         description: 'A metal elevator car with a control panel.',
@@ -82,9 +83,11 @@ CAPACITY: 'capacity' max passengers. Full elevator won't accept more.
 EMERGENCY: If stuck, maintenance can force arrive() or reset state manually.`,
       },
       methods: {},
-    });
+      });
+    }
 
-    const obj = this.obj;
+    // Always rebuild methods (ensures they exist even if type was pre-existing)
+    const obj = this.obj!;
 
     // ═══════════════════════════════════════════════════════════════════
     // LOCK SYSTEM
@@ -400,10 +403,9 @@ EMERGENCY: If stuck, maintenance can force arrive() or reset state manually.`,
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
+    // Types auto-alias by name, no manual registration needed
     if (!this.obj) return;
-    const objectManager = await this.manager.load(0);
-    await objectManager?.call('addAlias', 'elevator', this.obj.id);
+    console.log(`[ElevatorBuilder] Type 'elevator' auto-aliased`);
   }
 }
 

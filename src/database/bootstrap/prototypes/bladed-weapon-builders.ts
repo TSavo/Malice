@@ -1,43 +1,41 @@
-import type { ObjId, RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Bladed Weapon Prototypes
+ * Bladed Weapon Types
  *
  * Hierarchy:
  * $.weapon
  *   $.blade (base for all bladed weapons)
  *     $.knife (small blades - skill: knife)
- *       $.pocketKnife
- *       $.combatKnife
- *       $.switchblade
- *       $.boxCutter
- *       $.butterflyKnife
+ *       $.pocketKnife, $.combatKnife, $.switchblade, $.boxCutter, $.butterflyKnife, $.stiletto, $.shiv
  *     $.machete (heavy choppers - skill: machete)
- *       $.cleaver
+ *       $.cleaver, $.kukri
  *     $.katana (Japanese swords - skill: katana)
- *       $.wakizashi
- *       $.tanto
+ *       $.wakizashi, $.tanto, $.ninjato
  *     $.sword (Western swords - skill: sword)
- *       $.longsword
- *       $.shortsword
+ *       $.longsword, $.shortsword, $.rapier, $.cutlass
  *     $.axe (axes - skill: axe)
- *       $.hatchet
- *       $.fireAxe
+ *       $.hatchet, $.fireAxe, $.tomahawk
  */
 
 // ═══════════════════════════════════════════════════════════════════════════
 // BASE BLADE
 // ═══════════════════════════════════════════════════════════════════════════
 
-export class BladeBuilder {
+export class BladeBuilder implements Builder {
+  static provides = ['blade'];
+  static depends = ['weapon'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('blade')) return;
+
+    const parent = await this.manager.load('weapon');
+    if (!parent) throw new Error('BladeBuilder: weapon type not found');
+
+    const obj = await this.manager.define('blade', parent, {
       properties: {
         name: 'Blade',
         description: 'A bladed weapon.',
@@ -76,22 +74,32 @@ CONCEALMENT: Smaller blades easier to hide. Folding blades even more so. Draw ti
       'damageType',
       'Type of wound inflicted (cut, puncture). Cuts bleed more, punctures go deeper.',
     );
+  }
 
-    return obj;
+  async registerAliases(): Promise<void> {
+    console.log("[BladeBuilder] Type 'blade' auto-aliased");
   }
 }
+
+registerBuilder(BladeBuilder);
 
 // ═══════════════════════════════════════════════════════════════════════════
 // KNIVES (skill: knife)
 // ═══════════════════════════════════════════════════════════════════════════
 
-export class KnifeBuilder {
+export class KnifeBuilder implements Builder {
+  static provides = ['knife'];
+  static depends = ['blade'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('knife')) return;
+
+    const parent = await this.manager.load('blade');
+    if (!parent) throw new Error('KnifeBuilder: blade type not found');
+
+    await this.manager.define('knife', parent, {
       properties: {
         name: 'Knife',
         description: 'A small blade for cutting and stabbing.',
@@ -101,17 +109,26 @@ export class KnifeBuilder {
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[KnifeBuilder] Type 'knife' auto-aliased");
   }
 }
 
-export class PocketKnifeBuilder {
+export class PocketKnifeBuilder implements Builder {
+  static provides = ['pocketKnife'];
+  static depends = ['knife'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('pocketKnife')) return;
+
+    const parent = await this.manager.load('knife');
+    if (!parent) throw new Error('PocketKnifeBuilder: knife type not found');
+
+    await this.manager.define('pocketKnife', parent, {
       properties: {
         name: 'Pocket Knife',
         description: 'A small folding knife. Easy to conceal.',
@@ -121,17 +138,26 @@ export class PocketKnifeBuilder {
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[PocketKnifeBuilder] Type 'pocketKnife' auto-aliased");
   }
 }
 
-export class CombatKnifeBuilder {
+export class CombatKnifeBuilder implements Builder {
+  static provides = ['combatKnife'];
+  static depends = ['knife'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('combatKnife')) return;
+
+    const parent = await this.manager.load('knife');
+    if (!parent) throw new Error('CombatKnifeBuilder: knife type not found');
+
+    await this.manager.define('combatKnife', parent, {
       properties: {
         name: 'Combat Knife',
         description: 'A sturdy fixed-blade knife designed for fighting.',
@@ -141,38 +167,55 @@ export class CombatKnifeBuilder {
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[CombatKnifeBuilder] Type 'combatKnife' auto-aliased");
   }
 }
 
-export class SwitchbladeBuilder {
+export class SwitchbladeBuilder implements Builder {
+  static provides = ['switchblade'];
+  static depends = ['knife'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('switchblade')) return;
+
+    const parent = await this.manager.load('knife');
+    if (!parent) throw new Error('SwitchbladeBuilder: knife type not found');
+
+    await this.manager.define('switchblade', parent, {
       properties: {
         name: 'Switchblade',
-        description:
-          'A spring-loaded folding knife. Flicks open with a button.',
+        description: 'A spring-loaded folding knife. Flicks open with a button.',
         skill: 'knife',
         damage: 10,
         damageType: 'puncture',
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[SwitchbladeBuilder] Type 'switchblade' auto-aliased");
   }
 }
 
-export class BoxCutterBuilder {
+export class BoxCutterBuilder implements Builder {
+  static provides = ['boxCutter'];
+  static depends = ['knife'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('boxCutter')) return;
+
+    const parent = await this.manager.load('knife');
+    if (!parent) throw new Error('BoxCutterBuilder: knife type not found');
+
+    await this.manager.define('boxCutter', parent, {
       properties: {
         name: 'Box Cutter',
         description: 'A retractable utility blade. Cheap and disposable.',
@@ -182,17 +225,26 @@ export class BoxCutterBuilder {
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[BoxCutterBuilder] Type 'boxCutter' auto-aliased");
   }
 }
 
-export class ButterflyKnifeBuilder {
+export class ButterflyKnifeBuilder implements Builder {
+  static provides = ['butterflyKnife'];
+  static depends = ['knife'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('butterflyKnife')) return;
+
+    const parent = await this.manager.load('knife');
+    if (!parent) throw new Error('ButterflyKnifeBuilder: knife type not found');
+
+    await this.manager.define('butterflyKnife', parent, {
       properties: {
         name: 'Butterfly Knife',
         description:
@@ -203,17 +255,26 @@ export class ButterflyKnifeBuilder {
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[ButterflyKnifeBuilder] Type 'butterflyKnife' auto-aliased");
   }
 }
 
-export class StilettoBuilder {
+export class StilettoBuilder implements Builder {
+  static provides = ['stiletto'];
+  static depends = ['knife'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('stiletto')) return;
+
+    const parent = await this.manager.load('knife');
+    if (!parent) throw new Error('StilettoBuilder: knife type not found');
+
+    await this.manager.define('stiletto', parent, {
       properties: {
         name: 'Stiletto',
         description: 'A long, thin dagger designed for thrusting.',
@@ -223,17 +284,26 @@ export class StilettoBuilder {
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[StilettoBuilder] Type 'stiletto' auto-aliased");
   }
 }
 
-export class ShivBuilder {
+export class ShivBuilder implements Builder {
+  static provides = ['shiv'];
+  static depends = ['knife'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('shiv')) return;
+
+    const parent = await this.manager.load('knife');
+    if (!parent) throw new Error('ShivBuilder: knife type not found');
+
+    await this.manager.define('shiv', parent, {
       properties: {
         name: 'Shiv',
         description: 'A crude improvised stabbing weapon. Prison-made.',
@@ -243,7 +313,10 @@ export class ShivBuilder {
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[ShivBuilder] Type 'shiv' auto-aliased");
   }
 }
 
@@ -251,34 +324,48 @@ export class ShivBuilder {
 // MACHETES / CLEAVERS (skill: machete)
 // ═══════════════════════════════════════════════════════════════════════════
 
-export class MacheteBuilder {
+export class MacheteBuilder implements Builder {
+  static provides = ['machete'];
+  static depends = ['blade'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('machete')) return;
+
+    const parent = await this.manager.load('blade');
+    if (!parent) throw new Error('MacheteBuilder: blade type not found');
+
+    await this.manager.define('machete', parent, {
       properties: {
         name: 'Machete',
-        description:
-          'A heavy blade for chopping. Originally an agricultural tool.',
+        description: 'A heavy blade for chopping. Originally an agricultural tool.',
         skill: 'machete',
         damage: 28,
         damageType: 'cut',
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[MacheteBuilder] Type 'machete' auto-aliased");
   }
 }
 
-export class CleaverBuilder {
+export class CleaverBuilder implements Builder {
+  static provides = ['cleaver'];
+  static depends = ['machete'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('cleaver')) return;
+
+    const parent = await this.manager.load('machete');
+    if (!parent) throw new Error('CleaverBuilder: machete type not found');
+
+    await this.manager.define('cleaver', parent, {
       properties: {
         name: 'Cleaver',
         description: 'A heavy rectangular blade. Meant for butchering meat.',
@@ -288,17 +375,26 @@ export class CleaverBuilder {
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[CleaverBuilder] Type 'cleaver' auto-aliased");
   }
 }
 
-export class KukriBuilder {
+export class KukriBuilder implements Builder {
+  static provides = ['kukri'];
+  static depends = ['machete'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('kukri')) return;
+
+    const parent = await this.manager.load('machete');
+    if (!parent) throw new Error('KukriBuilder: machete type not found');
+
+    await this.manager.define('kukri', parent, {
       properties: {
         name: 'Kukri',
         description:
@@ -309,7 +405,10 @@ export class KukriBuilder {
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[KukriBuilder] Type 'kukri' auto-aliased");
   }
 }
 
@@ -317,34 +416,49 @@ export class KukriBuilder {
 // JAPANESE SWORDS (skill: katana)
 // ═══════════════════════════════════════════════════════════════════════════
 
-export class KatanaBuilder {
+export class KatanaBuilder implements Builder {
+  static provides = ['katana'];
+  static depends = ['blade'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('katana')) return;
+
+    const parent = await this.manager.load('blade');
+    if (!parent) throw new Error('KatanaBuilder: blade type not found');
+
+    await this.manager.define('katana', parent, {
       properties: {
         name: 'Katana',
         description: 'A curved Japanese longsword. Elegant and deadly.',
         skill: 'katana',
         damage: 35,
         damageType: 'cut',
-        twoHanded: true, // Traditional two-handed grip
+        twoHanded: true,
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[KatanaBuilder] Type 'katana' auto-aliased");
   }
 }
 
-export class WakizashiBuilder {
+export class WakizashiBuilder implements Builder {
+  static provides = ['wakizashi'];
+  static depends = ['katana'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('wakizashi')) return;
+
+    const parent = await this.manager.load('katana');
+    if (!parent) throw new Error('WakizashiBuilder: katana type not found');
+
+    await this.manager.define('wakizashi', parent, {
       properties: {
         name: 'Wakizashi',
         description:
@@ -355,17 +469,26 @@ export class WakizashiBuilder {
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[WakizashiBuilder] Type 'wakizashi' auto-aliased");
   }
 }
 
-export class TantoBuilder {
+export class TantoBuilder implements Builder {
+  static provides = ['tanto'];
+  static depends = ['katana'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('tanto')) return;
+
+    const parent = await this.manager.load('katana');
+    if (!parent) throw new Error('TantoBuilder: katana type not found');
+
+    await this.manager.define('tanto', parent, {
       properties: {
         name: 'Tanto',
         description: 'A short Japanese dagger. Originally for armor piercing.',
@@ -375,17 +498,26 @@ export class TantoBuilder {
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[TantoBuilder] Type 'tanto' auto-aliased");
   }
 }
 
-export class NinjatōBuilder {
+export class NinjatoBuilder implements Builder {
+  static provides = ['ninjato'];
+  static depends = ['katana'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('ninjato')) return;
+
+    const parent = await this.manager.load('katana');
+    if (!parent) throw new Error('NinjatoBuilder: katana type not found');
+
+    await this.manager.define('ninjato', parent, {
       properties: {
         name: 'Ninjatō',
         description: 'A straight-bladed sword. Practical rather than elegant.',
@@ -395,7 +527,10 @@ export class NinjatōBuilder {
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[NinjatoBuilder] Type 'ninjato' auto-aliased");
   }
 }
 
@@ -403,13 +538,19 @@ export class NinjatōBuilder {
 // WESTERN SWORDS (skill: sword)
 // ═══════════════════════════════════════════════════════════════════════════
 
-export class SwordBuilder {
+export class SwordBuilder implements Builder {
+  static provides = ['sword'];
+  static depends = ['blade'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('sword')) return;
+
+    const parent = await this.manager.load('blade');
+    if (!parent) throw new Error('SwordBuilder: blade type not found');
+
+    await this.manager.define('sword', parent, {
       properties: {
         name: 'Sword',
         description: 'A straight-bladed weapon for cutting and thrusting.',
@@ -419,38 +560,56 @@ export class SwordBuilder {
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[SwordBuilder] Type 'sword' auto-aliased");
   }
 }
 
-export class LongswordBuilder {
+export class LongswordBuilder implements Builder {
+  static provides = ['longsword'];
+  static depends = ['sword'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('longsword')) return;
+
+    const parent = await this.manager.load('sword');
+    if (!parent) throw new Error('LongswordBuilder: sword type not found');
+
+    await this.manager.define('longsword', parent, {
       properties: {
         name: 'Longsword',
         description: 'A two-handed straight sword. Reach and power.',
         skill: 'sword',
         damage: 38,
         damageType: 'cut',
-        twoHanded: true, // Two-handed sword
+        twoHanded: true,
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[LongswordBuilder] Type 'longsword' auto-aliased");
   }
 }
 
-export class ShortswordBuilder {
+export class ShortswordBuilder implements Builder {
+  static provides = ['shortsword'];
+  static depends = ['sword'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('shortsword')) return;
+
+    const parent = await this.manager.load('sword');
+    if (!parent) throw new Error('ShortswordBuilder: sword type not found');
+
+    await this.manager.define('shortsword', parent, {
       properties: {
         name: 'Shortsword',
         description: 'A one-handed blade. Quick and maneuverable.',
@@ -460,17 +619,26 @@ export class ShortswordBuilder {
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[ShortswordBuilder] Type 'shortsword' auto-aliased");
   }
 }
 
-export class RapierBuilder {
+export class RapierBuilder implements Builder {
+  static provides = ['rapier'];
+  static depends = ['sword'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('rapier')) return;
+
+    const parent = await this.manager.load('sword');
+    if (!parent) throw new Error('RapierBuilder: sword type not found');
+
+    await this.manager.define('rapier', parent, {
       properties: {
         name: 'Rapier',
         description: 'A thin, elegant thrusting sword. Precise and fast.',
@@ -480,17 +648,26 @@ export class RapierBuilder {
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[RapierBuilder] Type 'rapier' auto-aliased");
   }
 }
 
-export class CutlassBuilder {
+export class CutlassBuilder implements Builder {
+  static provides = ['cutlass'];
+  static depends = ['sword'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('cutlass')) return;
+
+    const parent = await this.manager.load('sword');
+    if (!parent) throw new Error('CutlassBuilder: sword type not found');
+
+    await this.manager.define('cutlass', parent, {
       properties: {
         name: 'Cutlass',
         description: 'A short, broad slashing sword. Naval origin.',
@@ -500,7 +677,10 @@ export class CutlassBuilder {
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[CutlassBuilder] Type 'cutlass' auto-aliased");
   }
 }
 
@@ -508,13 +688,19 @@ export class CutlassBuilder {
 // AXES (skill: axe)
 // ═══════════════════════════════════════════════════════════════════════════
 
-export class AxeBuilder {
+export class AxeBuilder implements Builder {
+  static provides = ['axe'];
+  static depends = ['blade'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('axe')) return;
+
+    const parent = await this.manager.load('blade');
+    if (!parent) throw new Error('AxeBuilder: blade type not found');
+
+    await this.manager.define('axe', parent, {
       properties: {
         name: 'Axe',
         description: 'A heavy chopping tool that doubles as a weapon.',
@@ -524,17 +710,26 @@ export class AxeBuilder {
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[AxeBuilder] Type 'axe' auto-aliased");
   }
 }
 
-export class HatchetBuilder {
+export class HatchetBuilder implements Builder {
+  static provides = ['hatchet'];
+  static depends = ['axe'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('hatchet')) return;
+
+    const parent = await this.manager.load('axe');
+    if (!parent) throw new Error('HatchetBuilder: axe type not found');
+
+    await this.manager.define('hatchet', parent, {
       properties: {
         name: 'Hatchet',
         description: 'A small one-handed axe. Camping tool turned weapon.',
@@ -544,38 +739,56 @@ export class HatchetBuilder {
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[HatchetBuilder] Type 'hatchet' auto-aliased");
   }
 }
 
-export class FireAxeBuilder {
+export class FireAxeBuilder implements Builder {
+  static provides = ['fireAxe'];
+  static depends = ['axe'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('fireAxe')) return;
+
+    const parent = await this.manager.load('axe');
+    if (!parent) throw new Error('FireAxeBuilder: axe type not found');
+
+    await this.manager.define('fireAxe', parent, {
       properties: {
         name: 'Fire Axe',
         description: "A heavy firefighter's axe. Long handle, brutal head.",
         skill: 'axe',
         damage: 38,
         damageType: 'cut',
-        twoHanded: true, // Long handle requires two hands
+        twoHanded: true,
       },
       methods: {},
     });
-    return obj;
+  }
+
+  async registerAliases(): Promise<void> {
+    console.log("[FireAxeBuilder] Type 'fireAxe' auto-aliased");
   }
 }
 
-export class TomahawkBuilder {
+export class TomahawkBuilder implements Builder {
+  static provides = ['tomahawk'];
+  static depends = ['axe'];
+
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: ObjId): Promise<RuntimeObject> {
-    const parentObj = await this.manager.load(parentId);
-    const obj = await this.manager.create({
-      parent: parentObj!,
+  async build(): Promise<void> {
+    if (await this.manager.load('tomahawk')) return;
+
+    const parent = await this.manager.load('axe');
+    if (!parent) throw new Error('TomahawkBuilder: axe type not found');
+
+    await this.manager.define('tomahawk', parent, {
       properties: {
         name: 'Tomahawk',
         description: 'A tactical hatchet. Light and balanced for throwing.',
@@ -585,121 +798,35 @@ export class TomahawkBuilder {
       },
       methods: {},
     });
-    return obj;
-  }
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// BLADED WEAPON PROTOTYPES BUILDER (registered builder for all bladed weapons)
-// ═══════════════════════════════════════════════════════════════════════════
-
-export class BladedWeaponPrototypesBuilder implements Builder {
-  static provides = [
-    'blade',
-    'knife',
-    'pocketKnife',
-    'combatKnife',
-    'switchblade',
-    'boxCutter',
-    'butterflyKnife',
-    'stiletto',
-    'shiv',
-    'machete',
-    'cleaver',
-    'kukri',
-    'katana',
-    'wakizashi',
-    'tanto',
-    'ninjato',
-    'sword',
-    'longsword',
-    'shortsword',
-    'rapier',
-    'cutlass',
-    'axe',
-    'hatchet',
-    'fireAxe',
-    'tomahawk',
-  ];
-  static depends = ['weapon'];
-
-  private weapons: Record<string, RuntimeObject> = {};
-
-  constructor(private manager: ObjectManager) {}
-
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
-
-    if ($.blade && !forceRebuild) {
-      for (const alias of BladedWeaponPrototypesBuilder.provides) {
-        if ($[alias]) this.weapons[alias] = $[alias];
-      }
-      return;
-    }
-
-    const parentObj = $.weapon;
-    if (!parentObj) throw new Error('BladedWeaponPrototypesBuilder: $weapon not found');
-
-    const weaponId = parentObj.id;
-
-    // Base blade (inherits from weapon)
-    const blade = await new BladeBuilder(this.manager).build(weaponId);
-    this.weapons.blade = blade;
-
-    // Knives (inherit from blade)
-    const knife = await new KnifeBuilder(this.manager).build(blade.id);
-    this.weapons.knife = knife;
-    this.weapons.pocketKnife = await new PocketKnifeBuilder(this.manager).build(knife.id);
-    this.weapons.combatKnife = await new CombatKnifeBuilder(this.manager).build(knife.id);
-    this.weapons.switchblade = await new SwitchbladeBuilder(this.manager).build(knife.id);
-    this.weapons.boxCutter = await new BoxCutterBuilder(this.manager).build(knife.id);
-    this.weapons.butterflyKnife = await new ButterflyKnifeBuilder(this.manager).build(knife.id);
-    this.weapons.stiletto = await new StilettoBuilder(this.manager).build(knife.id);
-    this.weapons.shiv = await new ShivBuilder(this.manager).build(knife.id);
-
-    // Machetes (inherit from blade)
-    const machete = await new MacheteBuilder(this.manager).build(blade.id);
-    this.weapons.machete = machete;
-    this.weapons.cleaver = await new CleaverBuilder(this.manager).build(machete.id);
-    this.weapons.kukri = await new KukriBuilder(this.manager).build(machete.id);
-
-    // Japanese swords (inherit from blade)
-    const katana = await new KatanaBuilder(this.manager).build(blade.id);
-    this.weapons.katana = katana;
-    this.weapons.wakizashi = await new WakizashiBuilder(this.manager).build(katana.id);
-    this.weapons.tanto = await new TantoBuilder(this.manager).build(katana.id);
-    this.weapons.ninjato = await new NinjatōBuilder(this.manager).build(katana.id);
-
-    // Western swords (inherit from blade)
-    const sword = await new SwordBuilder(this.manager).build(blade.id);
-    this.weapons.sword = sword;
-    this.weapons.longsword = await new LongswordBuilder(this.manager).build(sword.id);
-    this.weapons.shortsword = await new ShortswordBuilder(this.manager).build(sword.id);
-    this.weapons.rapier = await new RapierBuilder(this.manager).build(sword.id);
-    this.weapons.cutlass = await new CutlassBuilder(this.manager).build(sword.id);
-
-    // Axes (inherit from blade)
-    const axe = await new AxeBuilder(this.manager).build(blade.id);
-    this.weapons.axe = axe;
-    this.weapons.hatchet = await new HatchetBuilder(this.manager).build(axe.id);
-    this.weapons.fireAxe = await new FireAxeBuilder(this.manager).build(axe.id);
-    this.weapons.tomahawk = await new TomahawkBuilder(this.manager).build(axe.id);
-
-    console.log(`✅ Built ${Object.keys(this.weapons).length} bladed weapon prototypes`);
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
-    const objectManager = await this.manager.load(0);
-    if (!objectManager) return;
-
-    for (const [name, obj] of Object.entries(this.weapons)) {
-      if (obj) {
-        await objectManager.call('addAlias', name, obj.id);
-      }
-    }
+    console.log("[TomahawkBuilder] Type 'tomahawk' auto-aliased");
   }
 }
 
-// Self-register
-registerBuilder(BladedWeaponPrototypesBuilder);
+// Self-register all builders
+registerBuilder(KnifeBuilder);
+registerBuilder(PocketKnifeBuilder);
+registerBuilder(CombatKnifeBuilder);
+registerBuilder(SwitchbladeBuilder);
+registerBuilder(BoxCutterBuilder);
+registerBuilder(ButterflyKnifeBuilder);
+registerBuilder(StilettoBuilder);
+registerBuilder(ShivBuilder);
+registerBuilder(MacheteBuilder);
+registerBuilder(CleaverBuilder);
+registerBuilder(KukriBuilder);
+registerBuilder(KatanaBuilder);
+registerBuilder(WakizashiBuilder);
+registerBuilder(TantoBuilder);
+registerBuilder(NinjatoBuilder);
+registerBuilder(SwordBuilder);
+registerBuilder(LongswordBuilder);
+registerBuilder(ShortswordBuilder);
+registerBuilder(RapierBuilder);
+registerBuilder(CutlassBuilder);
+registerBuilder(AxeBuilder);
+registerBuilder(HatchetBuilder);
+registerBuilder(FireAxeBuilder);
+registerBuilder(TomahawkBuilder);

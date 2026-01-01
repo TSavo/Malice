@@ -3,7 +3,7 @@ import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Base Phone prototype (abstract-style behaviors).
+ * Base Phone type (abstract-style behaviors).
  * Provides a number, basic dial/send handling, and hooks for subclasses.
  */
 export class PhoneBuilder implements Builder {
@@ -14,25 +14,25 @@ export class PhoneBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
+  async build(): Promise<void> {
+    // Check if type already exists (types auto-alias)
+    const existing = await this.manager.load('phone');
+    if (existing) {
+      this.obj = existing;
+    } else {
+      // Create phone as a TYPE
+      const describable = await this.manager.load('describable');
+      if (!describable) throw new Error('Describable type not found');
 
-    if ($.phone && !forceRebuild) {
-      this.obj = $.phone;
-      return;
-    }
+      this.obj = await this.manager.define('phone', describable, {
+        properties: {
+          name: 'Phone',
+          description: 'A generic phone handset.',
+          number: null, // phone number string
+          phoneDb: null, // reference to phone DB object
+          connectedTo: null, // active call target id
 
-    const parentObj = $.describable;
-    const obj = await this.manager.create({
-      parent: parentObj!,
-      properties: {
-        name: 'Phone',
-        description: 'A generic phone handset.',
-        number: null, // phone number string
-        phoneDb: null, // reference to phone DB object
-        connectedTo: null, // active call target id
-
-        abilities: `Communication device for voice calls and messages.
+          abilities: `Communication device for voice calls and messages.
 
 DIALING: dial(number) looks up target in 'phoneDb', establishes connection, calls target.onIncomingCall().
 
@@ -43,9 +43,13 @@ MESSAGING: sendMessage(number, text) sends text to target. Target receives via o
 HOOKS: Subclasses override onIncomingCall(), onHangup(), onMessage() to handle events.
 
 DATABASE: 'phoneDb' references $.phoneDB for number lookups. findPhoneByNumber() resolves targets.`,
-      },
-      methods: {},
-    });
+        },
+        methods: {},
+      });
+    }
+
+    // Always rebuild methods (ensures they exist even if type was pre-existing)
+    const obj = this.obj!;
 
     obj.setMethod(
       'dial',
@@ -134,10 +138,9 @@ DATABASE: 'phoneDb' references $.phoneDB for number lookups. findPhoneByNumber()
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
+    // Types auto-alias by name, no manual registration needed
     if (!this.obj) return;
-    const objectManager = await this.manager.load(0);
-    await objectManager?.call('addAlias', 'phone', this.obj.id);
+    console.log(`[PhoneBuilder] Type 'phone' auto-aliased`);
   }
 }
 

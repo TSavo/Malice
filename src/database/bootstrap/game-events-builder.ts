@@ -33,7 +33,7 @@ export class GameEventsBuilder implements Builder {
     }
 
     // Create new GameEvents object
-    const root = await this.manager.load(1);
+    const root = await this.manager.load('root');
     this.events = await this.manager.create({
       parent: root!,
       properties: {

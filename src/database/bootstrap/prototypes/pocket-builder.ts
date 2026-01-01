@@ -3,7 +3,7 @@ import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Builds the Pocket prototype
+ * Builds the Pocket type
  * A container that attaches to clothing for storing small items.
  *
  * Pockets are created by clothing builders and attached to clothing items.
@@ -29,20 +29,18 @@ export class PocketBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
+  async build(): Promise<void> {
+    // Check if type already exists (types auto-alias)
+    const existing = await this.manager.load('pocket');
+    if (existing) {
+      this.obj = existing;
+    } else {
+      // Create pocket as a TYPE
+      const parentObj = await this.manager.load('describable');
+      if (!parentObj) throw new Error('PocketBuilder: $describable not found');
 
-    if ($.pocket && !forceRebuild) {
-      this.obj = $.pocket;
-      return;
-    }
-
-    const parentObj = $.describable;
-    if (!parentObj) throw new Error('PocketBuilder: $describable not found');
-
-    this.obj = await this.manager.create({
-      parent: parentObj,
-      properties: {
+      this.obj = await this.manager.define('pocket', parentObj, {
+        properties: {
         name: 'Pocket',
         description: 'A pocket sewn into clothing',
         aliases: ['pocket'],
@@ -71,10 +69,12 @@ BULGE: Overloading pockets makes them visibly bulge. Heavy items sag. Can be not
 HOLES: Damaged pockets may have holes. Items can fall out unnoticed.
 
 TYPES: Side pockets, breast pocket, back pocket, cargo pocket. Different sizes and access.`,
-      },
-      methods: {},
-    });
+        },
+        methods: {},
+      });
+    }
 
+    // Always rebuild methods (ensures they exist even if type was pre-existing)
     const obj = this.obj;
     // ═══════════════════════════════════════════════════════════════════
     // CONTAINMENT
@@ -233,10 +233,9 @@ TYPES: Side pockets, breast pocket, back pocket, cargo pocket. Different sizes a
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
+    // Types auto-alias by name, no manual registration needed
     if (!this.obj) return;
-    const objectManager = await this.manager.load(0);
-    await objectManager?.call('addAlias', 'pocket', this.obj.id);
+    console.log(`[PocketBuilder] Type 'pocket' auto-aliased`);
   }
 }
 

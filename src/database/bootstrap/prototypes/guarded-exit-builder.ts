@@ -3,7 +3,7 @@ import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Builds the GuardedExit prototype
+ * Builds the GuardedExit type
  * An exit that only allows passage for members of a specific faction.
  *
  * Inherits from Exit.
@@ -24,18 +24,20 @@ export class GuardedExitBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
+  async build(): Promise<void> {
+    // Check if type already exists
+    const existing = await this.manager.load('guardedExit');
+    if (existing) {
+      this.obj = existing;
+    } else {
+      // Get parent type
+      const exit = await this.manager.load('exit');
+      if (!exit) {
+        throw new Error('Exit type not found - required for GuardedExit');
+      }
 
-    if ($.guardedExit && !forceRebuild) {
-      this.obj = $.guardedExit;
-      return;
-    }
-
-    const parentObj = $.exit;
-    const obj = await this.manager.create({
-      parent: parentObj!,
-      properties: {
+      this.obj = await this.manager.define('guardedExit', exit, {
+        properties: {
         name: 'Guarded Exit',
         description: 'A passage restricted to faction members.',
         allowedFaction: null, // Faction name that can pass (null = unrestricted)
@@ -54,9 +56,13 @@ CONFIGURATION:
 - setDenyMessage(msg): Customize rejection message
 
 DISPLAY: describe() shows faction requirement in exit listing.`,
-      },
-      methods: {},
-    });
+        },
+        methods: {},
+      });
+    }
+
+    // Always rebuild methods (ensures they exist even if type was pre-existing)
+    const obj = this.obj!;
 
     // Override canUse to add faction check before other checks
     obj.setMethod(
@@ -167,10 +173,9 @@ DISPLAY: describe() shows faction requirement in exit listing.`,
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
+    // Types auto-alias by name, no manual registration needed
     if (!this.obj) return;
-    const objectManager = await this.manager.load(0);
-    await objectManager?.call('addAlias', 'guardedExit', this.obj.id);
+    console.log(`[GuardedExitBuilder] Type 'guardedExit' auto-aliased`);
   }
 }
 

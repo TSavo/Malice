@@ -3,7 +3,7 @@ import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
 /**
- * Builds the CallButton prototype
+ * Builds the CallButton type
  * A physical item placed in elevator lobbies to summon elevators.
  *
  * ABILITIES-FIRST ARCHITECTURE:
@@ -24,17 +24,17 @@ export class CallButtonBuilder implements Builder {
 
   constructor(private manager: ObjectManager) {}
 
-  async build(forceRebuild = false): Promise<void> {
-    const $ = this.manager as any;
+  async build(): Promise<void> {
 
-    if ($.callButton && !forceRebuild) {
-      this.obj = $.callButton;
-      return;
-    }
+    // Check if type already exists
+    const existing = await this.manager.load('callButton');
+    if (existing) {
+      this.obj = existing;
+    } else {
+      const parentObj = await this.manager.load('describable');
+      if (!parentObj) throw new Error('CallButtonBuilder: describable type not found');
 
-    const parent = $.describable;
-    const obj = await this.manager.create({
-      parent: parent!,
+      this.obj = await this.manager.define('callButton', parentObj, {
       properties: {
         name: 'Elevator Call Panel',
         description:
@@ -52,7 +52,11 @@ INDICATOR: Small display shows elevator's current floor and direction of travel.
 Read from self.elevator.currentFloor and self.elevator.moving/destination.`,
       },
       methods: {},
-    });
+      });
+    }
+
+    // Always rebuild methods (ensures they exist even if type was pre-existing)
+    const obj = this.obj!;
 
     // Add property descriptions
     obj.setPropertyDescription(
@@ -67,15 +71,12 @@ Read from self.elevator.currentFloor and self.elevator.moving/destination.`,
       'lit',
       'Whether the call button is illuminated (waiting for elevator to arrive)',
     );
-
-    this.obj = obj;
   }
 
   async registerAliases(): Promise<void> {
-    // Register in memory for immediate access
+    // Types auto-alias by name, no manual registration needed
     if (!this.obj) return;
-    const objectManager = await this.manager.load(0);
-    await objectManager?.call('addAlias', 'callButton', this.obj.id);
+    console.log(`[CallButtonBuilder] Type 'callButton' auto-aliased`);
   }
 }
 
