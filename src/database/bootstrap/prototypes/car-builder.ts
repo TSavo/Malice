@@ -31,6 +31,12 @@ export class CarBuilder implements Builder {
             'engine',
             'fuelTank',
             'battery',
+            'starter',
+            'alternator',
+            'ecu',
+            'wiringHarness',
+            'brakes',
+            'steering',
             'transmission',
             'wheel', 'wheel', 'wheel', 'wheel', // 4 wheels
           ],

@@ -83,6 +83,15 @@ export { FuelTankBuilder } from './fuel-tank-builder';
 export { VehicleBatteryBuilder } from './vehicle-battery-builder';
 export { WheelBuilder } from './wheel-builder';
 export { TransmissionBuilder } from './transmission-builder';
+export { RadiatorBuilder } from './radiator-builder';
+export { BrakesBuilder } from './brakes-builder';
+export { HeadlightsBuilder } from './headlights-builder';
+export { StarterBuilder } from './starter-builder';
+export { AlternatorBuilder } from './alternator-builder';
+export { ExhaustBuilder } from './exhaust-builder';
+export { SteeringBuilder } from './steering-builder';
+export { EcuBuilder } from './ecu-builder';
+export { WiringHarnessBuilder } from './wiring-harness-builder';
 export { VehicleBuilder } from './vehicle-builder';
 export { VehicleExitBuilder } from './vehicle-exit-builder';
 export { VehicleRoomBuilder } from './vehicle-room-builder';
@@ -93,7 +102,36 @@ export { MechanicBuilder } from './mechanic-builder';
 export { FuelBuilder } from './fuel-builder';
 export { FuelContainerBuilder } from './fuel-container-builder';
 export { FuelPumpBuilder } from './fuel-pump-builder';
+export { FuelSiphonBuilder } from './fuel-siphon-builder';
+// Tools
+export { GrapplingHookBuilder } from './grappling-hook-builder';
+// Smokables
+export { SmokableBuilder } from './smokable-builder';
+export { CigaretteBuilder } from './cigarette-builder';
+export { CigarBuilder } from './cigar-builder';
+// Drugs
+export { DrugBuilder } from './drug-builder';
+export { PillBuilder } from './pill-builder';
+// Drinks
+export { AlcoholBuilder } from './alcohol-builder';
+export { CoffeeBuilder } from './coffee-builder';
+export { SodaBuilder } from './soda-builder';
+// Foods
+export { CannedFoodBuilder } from './canned-food-builder';
+export { RationPackBuilder } from './ration-pack-builder';
+export { SnackBuilder } from './snack-builder';
+export { CandyBuilder } from './candy-builder';
+// Vehicle body parts (optional/cosmetic)
+export { WindshieldBuilder } from './windshield-builder';
+export { VehicleDoorBuilder } from './vehicle-door-builder';
+export { PortBuilder } from './port-builder';
+export { FenderBuilder } from './fender-builder';
+export { BumperBuilder } from './bumper-builder';
+// Hardpoint system
+export { HardpointBuilder } from './hardpoint-builder';
+export { TurretBuilder } from './turret-builder';
 export { NavComputerBuilder } from './nav-computer-builder';
+export { CombatComputerBuilder } from './combat-computer-builder';
 // Airspace system (for aircraft)
 export { AirspaceRoomBuilder } from './airspace-room-builder';
 export { RotorBuilder } from './rotor-builder';
