@@ -1125,6 +1125,39 @@ await mcp.call_method({
 });
 ```
 
+### Dynamic Room Creation with $spatial.ensureRoom()
+
+For AI-controlled dynamic room creation (vehicles, exploration), use `$spatial.ensureRoom()`:
+
+```javascript
+// AI decides IF room should exist - returns room or null
+const room = await $spatial.ensureRoom(x, y, z, 'hint about why');
+if (!room) {
+  // AI said no - this location doesn't make sense
+  return 'Cannot go there.';
+}
+```
+
+**When to use:**
+- Aircraft flying to new coordinates
+- Boats sailing to new water
+- Submarines diving to new depths
+- Room description mentions location that doesn't exist yet
+
+**When NOT to use:**
+- Normal player movement (use exits)
+- Entering buildings (use exits)
+- Any case where an exit should exist
+
+The AI is **conservative** - it only creates rooms that make physical sense:
+- Airspace: only above outdoor rooms
+- Water: only in water terrain (x < -15)
+- Underwater: only in water, max depth z >= -15 without hint
+
+**Rooms are permanent** - once created, they stay forever. No cleanup needed.
+
+See `docs/moo/prototypes/world-building.md` for complete documentation.
+
 ## Testing
 
 Run TypeScript type check:

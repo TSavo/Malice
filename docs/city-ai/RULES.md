@@ -354,4 +354,73 @@ But both are equally real, equally bound by realistic time, equally subject to t
 
 ---
 
+## Dynamic Room Creation: Exception to the Rule
+
+While you must never create rooms instantly or miraculously, there IS a mechanism for AI-driven room creation: `$spatial.ensureRoom()`.
+
+### When You CAN Use ensureRoom()
+
+**Use it for edge-case world expansion** - places that SHOULD exist but haven't been built yet:
+
+| Scenario | Appropriate? |
+|----------|--------------|
+| Room description says "an abandoned building to the north" but no room exists there | YES |
+| Player discovers a cellar entrance that should lead somewhere | YES |
+| Vehicle flies/sails/dives to new coordinates in unbounded space | YES (handled by vehicle code) |
+| Player wants a new shop to magically appear | NO - use construction rules |
+| Player walks "north" and there's no exit | NO - no exit means blocked |
+
+### How It Works
+
+```javascript
+// AI decides IF room should exist - returns room or null
+const room = await $spatial.ensureRoom(x, y, z, 'abandoned building mentioned in room description to the east');
+if (!room) {
+  // AI said no - don't force it
+  return 'The building is completely collapsed and impassable.';
+}
+// Room was created - now it exists permanently
+```
+
+### The AI Is Conservative
+
+The `$builder.maybeCreate` AI that powers this is **very restrictive**:
+
+- **Airspace** (z > 0): Only creates if outdoor room exists below
+- **Water surface** (z = 0): Only in water terrain (Elliott Bay, x < -15)
+- **Underwater** (z < 0): Only in water, maximum z >= -15 without explicit hint
+- **Ground level** (z = 0): Only if urban context with neighboring rooms
+- **Building interior**: Only if established structure exists below
+
+If the AI says no, **respect that**. Don't override with alternative tools.
+
+### The Key Difference from Miracles
+
+This is NOT magic creation. This is the AI recognizing:
+> "A room SHOULD exist here based on world logic. It hasn't been built yet by a human builder. Creating it now makes sense."
+
+It's filling in missing detail that should have been there, not conjuring things from nothing.
+
+### Rooms Are Permanent
+
+Once ensureRoom creates something, it stays forever:
+- No cleanup, no release
+- Becomes part of the permanent world
+- Can be discovered by other players
+
+### For Vehicles
+
+Vehicle prototypes (aircraft, watercraft, submarines) handle ensureRoom internally. You don't need to call it manually when NPCs fly planes or sail boats - the vehicle code does it.
+
+### NOT for Normal Navigation
+
+**Never use ensureRoom for:**
+- Walking between rooms (use exits)
+- Entering buildings (use exits)
+- Creating content on player demand
+
+Exits define the world graph. `ensureRoom` is for unbounded coordinate spaces (sky, ocean) and filling in missing described locations.
+
+---
+
 *This document is builder-facing canon. Do not share with players.*

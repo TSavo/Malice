@@ -672,6 +672,113 @@ for (const [floor, roomId] of Object.entries(elevator.floorRooms)) {
 }
 ```
 
+## Dynamic Room Creation: $spatial.ensureRoom()
+
+For **AI-controlled dynamic room creation** at runtime (vehicles flying to new locations, submarines diving to new depths, etc.), use `$spatial.ensureRoom()`:
+
+```javascript
+// AI-controlled room creation - AI decides IF room should exist
+const room = await $spatial.ensureRoom(x, y, z, 'hint about why');
+// Returns: room object if created, NULL if AI says no
+```
+
+### When to Use ensureRoom()
+
+Use this for **edge-case world expansion** - NOT normal navigation:
+
+| Scenario | Use ensureRoom? |
+|----------|-----------------|
+| Player walks through exit | NO - use exits |
+| Aircraft flies to new airspace | YES - creates airspaceRoom |
+| Submarine dives to new depth | YES - creates underwaterRoom |
+| Boat sails to new water | YES - creates waterRoom |
+| Room description mentions adjacent location | MAYBE - if exploration warranted |
+
+### How It Works
+
+1. **Check existing**: `ensureRoom` first checks if a room already exists at (x,y,z)
+2. **If exists**: Returns it immediately
+3. **If not**: AI (`$builder.maybeCreate`) decides whether to create:
+   - Gathers terrain data, neighboring rooms, context
+   - Applies conservative rules (see below)
+   - Either creates room or returns `null`
+
+### AI Creation Rules (Conservative)
+
+The AI is **very conservative** - it only creates rooms that absolutely make sense:
+
+| Room Type | AI Creates When |
+|-----------|-----------------|
+| **Airspace** (z > 0) | Outdoor room exists below |
+| **Water Surface** (z = 0) | Water terrain at that x,y |
+| **Underwater** (z < 0) | Water terrain above, z >= -15 |
+| **Deep Water** (z < -15) | Explicit "deep trench" hint |
+| **Ground Level** | Urban area with neighboring rooms |
+| **Building Interior** | Established structure below |
+
+### The Hint Parameter
+
+Hints guide AI decisions:
+
+```javascript
+// Aircraft taking off
+await $spatial.ensureRoom(x, y, 10, 'aircraft taking off above outdoor ground');
+
+// Submarine diving
+await $spatial.ensureRoom(x, y, -5, 'submarine descending in water terrain');
+
+// Player discovers abandoned building mentioned in description
+await $spatial.ensureRoom(x+1, y, 0, 'abandoned building mentioned in room description to the east');
+```
+
+### Handling Rejection
+
+**Always handle null** - AI saying no is normal:
+
+```javascript
+const airspace = await $spatial.ensureRoom(x, y, z, 'aircraft taking off');
+if (!airspace) {
+  return 'Cannot take off here - no valid airspace above.';
+}
+await aircraft.moveTo(airspace);
+```
+
+### Rooms Are Permanent
+
+Once created, rooms **stay forever**:
+- No `releaseRoom()` or cleanup
+- AI only creates once, room persists for future visits
+- This is intentional - world grows permanently
+
+### For Vehicles (Aircraft, Boats, Submarines)
+
+Vehicle prototypes handle ensureRoom internally:
+
+```javascript
+// Aircraft takeoff() already does:
+const airspace = await $spatial.ensureRoom(x, y, z, 'aircraft taking off');
+if (!airspace) return 'Cannot take off here';
+
+// Submarine dive() already does:
+const underwater = await $spatial.ensureRoom(x, y, z, 'submarine diving');
+if (!underwater) return 'Cannot dive here';
+```
+
+See vehicle builders for complete implementation:
+- `aircraft-builder.ts` - `takeoff()`, `fly()`
+- `watercraft-builder.ts` - `launch()`, `sail()`, `dive()`
+- `submarine-builder.ts` - dive operations
+- `av-builder.ts` - VTOL takeoff
+
+### NOT for Normal Navigation
+
+**Do NOT use ensureRoom for:**
+- Walking between rooms (use exits)
+- Entering buildings (use exits)
+- Any action where an exit should exist
+
+Exits are explicit connections. `ensureRoom` is for **coordinate-based movement in unbounded spaces** (sky, ocean, underground).
+
 ## See Also
 
 - [Room System](./rooms.md) - Room, Exit, Elevator prototypes

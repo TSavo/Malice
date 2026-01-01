@@ -5,7 +5,7 @@ import { type Builder, registerBuilder } from '../builder-registry';
 /**
  * Builds the AirspaceRoom prototype
  *
- * Temporary location at altitude for aircraft. Created dynamically by $airspace
+ * Temporary location at altitude for aircraft. Created dynamically by $spatial
  * when aircraft fly to new coordinates, recycled when empty.
  *
  * Inherits from Location and auto-registers with $spatial via hooks.
@@ -57,8 +57,9 @@ Look down to see ground rooms below.
 MOVEMENT: Aircraft fly to adjacent coordinates (not via exits).
 No ground vehicles or pedestrians at altitude.
 
-LIFECYCLE: Created by $airspace.getOrCreateRoom() when aircraft arrive.
-Recycled by $airspace.releaseRoom() when last aircraft leaves.`,
+LIFECYCLE: Created by AI via $spatial.ensureRoom() when aircraft fly there.
+AI only creates airspace if outdoor room exists below.
+Rooms are PERMANENT once created - they stay forever for future flights.`,
         },
         methods: {},
       });
