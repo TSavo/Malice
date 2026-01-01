@@ -222,7 +222,7 @@ export class FactionBundle {
     // Send message to all connections if provided
     if (options?.message) {
       for (const conn of this.connections) {
-        conn.send(options.message + '\r\n');
+        conn.send(`${options.message}\r\n`);
       }
     }
 

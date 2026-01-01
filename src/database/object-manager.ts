@@ -1,5 +1,5 @@
+import { EventEmitter } from 'node:events';
 import * as bcrypt from 'bcrypt';
-import { EventEmitter } from 'events';
 import type {
   CreateObjectParams,
   GameObject,

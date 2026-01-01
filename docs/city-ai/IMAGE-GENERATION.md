@@ -158,66 +158,9 @@ try {
 
 ---
 
-## Window Management
-
-Open windows on player clients to display content.
-
-### openWindow(id, type, config)
-
-```javascript
-player.openWindow('my-window', 'html', {
-  title: 'Window Title',
-  width: 600,
-  height: 400,
-  x: 100, y: 100,           // Position (optional, auto-cascades)
-  content: '<html>...',     // For 'html' type
-  maximized: false,
-  resizable: true,
-  closable: true
-});
-```
-
-### Window Types
-
-| Type | Purpose | Key Config |
-|------|---------|------------|
-| `'html'` | Rich HTML content | `content` |
-| `'iframe'` | Sandboxed external URL | `url` |
-| `'terminal'` | xterm.js terminal | `channel` |
-
-### closeWindow(id)
-
-```javascript
-player.closeWindow('my-window');
-```
-
-### sendToWindow(id, payload)
-
-Update window content after opening:
-
-```javascript
-// Replace HTML content
-player.sendToWindow('my-window', {
-  action: 'set',
-  content: '<p>New content</p>'
-});
-
-// Append to HTML
-player.sendToWindow('log-window', {
-  action: 'append',
-  content: '<p>New log entry</p>'
-});
-
-// Load new URL in iframe
-player.sendToWindow('browser', {
-  action: 'load',
-  url: 'https://new-url.com'
-});
-```
-
----
-
 ## Showing Images to Players
+
+See **[WINDOW-MANAGEMENT.md](WINDOW-MANAGEMENT.md)** for full window API documentation.
 
 ### Basic Pattern
 
@@ -354,16 +297,4 @@ Use this for:
 | `prompt` | string | from `.describe()` | Override prompt |
 | `model` | string | default | Override model |
 
-### player.openWindow() Config
-
-| Option | Type | Description |
-|--------|------|-------------|
-| `title` | string | Window title bar |
-| `width` | number | Width in pixels |
-| `height` | number | Height in pixels |
-| `x`, `y` | number | Position (optional) |
-| `content` | string | HTML content (for 'html' type) |
-| `url` | string | URL (for 'iframe' type) |
-| `maximized` | boolean | Start maximized |
-| `resizable` | boolean | Allow resize |
-| `closable` | boolean | Show close button |
+For window management reference, see **[WINDOW-MANAGEMENT.md](WINDOW-MANAGEMENT.md)**.

@@ -1091,12 +1091,10 @@ const roomInfo = await readResource('moo://rooms/100');
 
 ## Image Generation & Window Management
 
-See **[IMAGE-GENERATION.md](IMAGE-GENERATION.md)** for full documentation on:
+See dedicated guides:
 
-- `$aiImageGen` - Generate images via Gemini API (Nano Banana)
-- `$describable.image()` - Generate/cache images for any object
-- `player.openWindow()` - Display images and content in client windows
-- The "real object" pattern for "show me" interactions
+- **[IMAGE-GENERATION.md](IMAGE-GENERATION.md)** - `$aiImageGen`, `$describable.image()`, "show me" pattern
+- **[WINDOW-MANAGEMENT.md](WINDOW-MANAGEMENT.md)** - `openWindow()`, `closeWindow()`, `sendToWindow()`
 
 Quick example:
 ```javascript
