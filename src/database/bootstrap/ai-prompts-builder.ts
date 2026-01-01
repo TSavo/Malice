@@ -19,6 +19,8 @@ const PROMPT_FILES: Record<string, string> = {
   immigrationOfficer: 'IMMIGRATION-OFFICER.md',
   ghostInterviewer: 'GHOST-INTERVIEWER.md',
   architectInterviewer: 'ARCHITECT-INTERVIEWER.md',
+  mechanic: 'MECHANIC.md',
+  navComputer: 'NAV-COMPUTER.md',
 };
 
 /**

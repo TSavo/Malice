@@ -14,6 +14,7 @@ interface ExitData {
   description?: string; // Exit description
   hidden?: boolean;
   locked?: boolean;
+  vehicleAllowed?: boolean; // Whether vehicles can use this exit (default true for world exits)
 }
 
 interface RoomData {
@@ -354,6 +355,8 @@ export class WorldBuilder implements Builder {
             distance: distance,
             hidden: exitData?.hidden ?? false,
             locked: exitData?.locked ?? false,
+            // Vehicles allowed on surface streets only (z=0, horizontal movement)
+            vehicleAllowed: exitData?.vehicleAllowed ?? (z >= 0 && dir.dz === 0),
           };
 
           // Add custom properties from exit definition
