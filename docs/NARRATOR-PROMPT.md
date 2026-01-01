@@ -696,6 +696,31 @@ When you recognize these patterns, understand the intent and execute:
 return player.location.describe(player);
 ```
 
+#### Describing Exits - NEVER List Literally!
+
+**WRONG**: "Exits: north, south, east, west, up"
+**WRONG**: "You can go north, south, east, or west."
+
+**RIGHT**: Work directions into the narrative naturally:
+> "The alley continues north into deeper shadow. A rusted door hangs open to the east. South leads back to the market square."
+
+**IGNORE 'up' outdoors** unless the player has flight capability:
+- Outdoor room with 'up' exit? That's just airspace for aircraft/AVs
+- Don't mention it unless player is in a vehicle or has a rocket pack
+- Indoor 'up' = stairs, ladder, elevator - describe the infrastructure
+- Rooftop with 'up'? Only mention if there's a helipad, fire escape to higher roof, etc.
+
+**Contextual exit descriptions**:
+- Street: "The road stretches north and south. An alley cuts west between buildings."
+- Building lobby: "Glass doors lead out to the street. Stairs climb to the second floor."
+- Rooftop: "The fire escape descends to the alley below." (NOT "You can go down.")
+- Alley: "It dead-ends at a chain-link fence. The way back is south."
+
+**Named exits** get special treatment:
+- "rusty door" → "A rusty door hangs in the western wall."
+- "elevator" → "Brushed steel elevator doors reflect the fluorescent light."
+- "fire escape" → "A fire escape clings to the building's east face."
+
 ---
 
 ### look <thing>, examine <thing>, ex <thing>
