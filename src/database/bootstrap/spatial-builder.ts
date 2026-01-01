@@ -15,7 +15,7 @@ import { type Builder, registerBuilder } from './builder-registry';
  */
 export class SpatialBuilder implements Builder {
   static provides = ['spatial'];
-  static depends: string[] = [];
+  static depends = ['airspaceRoom']; // Dynamic room types (waterRoom, underwaterRoom added later)
 
   private spatial: RuntimeObject | null = null;
 
@@ -41,30 +41,35 @@ export class SpatialBuilder implements Builder {
         parent: root!,
         properties: {
           name: 'Spatial Index',
-          description: 'O(1) spatial queries for rooms via coordinate indexing',
-          // roomIndex: { "x,y,z": { id, outdoor, name } }
+          description:
+            'Unified spatial manager: coordinate indexing, terrain types, dynamic room lifecycle',
+          // roomIndex: { "x,y,z": room } - coordinate to room
           roomIndex: {},
-          // columnIndex: { "x,y": [{ id, z, outdoor }, ...] } sorted by z desc
+          // columnIndex: { "x,y": [room, ...] } sorted by z desc
           columnIndex: {},
+          // terrainIndex: { "x,y": terrainType } - sparse overrides
+          terrainIndex: {},
+          // dynamicRooms: { "x,y,z": room } - track dynamic rooms for cleanup
+          dynamicRooms: {},
           // Last rebuild timestamp
           lastRebuild: null,
-          abilities: `Spatial indexing system for O(1) coordinate lookups.
+          abilities: `Unified spatial manager. Coordinate indexing + terrain + dynamic rooms.
 
-INDEXES:
-- roomIndex: Maps "x,y,z" strings to { id, outdoor, name }
-- columnIndex: Maps "x,y" strings to arrays of { id, z, outdoor } sorted by z descending
+INDEXES: O(1) lookup by "x,y,z". Column queries by "x,y".
 
-METHODS:
-- rebuild() - Full index rebuild from all objects with coordinates
-- add(obj) - Register a single room (called by Location.onCreate)
-- remove(obj) - Unregister a room (called by Location.beforeRecycle)
-- getRoomDataAt(x, y, z) - O(1) lookup, returns { id, outdoor, name } or null
-- isOutdoor(x, y, z) - Quick outdoor check
-- getHighestRoomAt(x, y) - Find topmost room at column
-- castRay(fromX, fromY, fromZ, tilt, swivel, maxDist) - Trace ray using index lookups
+TERRAIN: getTerrainAt(x, y) → 'urban', 'water', 'badlands'.
+  - x < -15: water (Elliott Bay)
+  - x > 20 or |y| > 15: badlands
+  - Otherwise: urban
+  - Use setTerrain(x, y, type) to override specific columns.
 
-USAGE: Rooms auto-register via onCreate hook when created through $recycler.
-Bootstrap calls rebuild() after world geometry is built.`,
+DYNAMIC ROOMS: getOrCreateRoom(x, y, z) creates room based on terrain.
+  - Water terrain: $waterRoom (z=0) or $underwaterRoom (z<0)
+  - Any terrain z>0: $airspaceRoom
+  - Urban z<=0: returns null (must be pre-built)
+
+PERSISTENCE: Rooms with persistent=true or hasModifications=true survive cleanup.
+releaseRoom(room) recycles empty, non-persistent rooms.`,
         },
         methods: {},
       });
@@ -349,6 +354,198 @@ Bootstrap calls rebuild() after world geometry is built.`,
       `,
     );
 
+    // ============== TERRAIN METHODS ==============
+
+    // getTerrainAt(x, y) - Get terrain type for column
+    this.spatial.setMethod(
+      'getTerrainAt',
+      `
+      /** Get terrain type for a column.
+       * @param x - X coordinate
+       * @param y - Y coordinate
+       * @returns 'urban' | 'water' | 'badlands'
+       */
+      const x = args[0];
+      const y = args[1];
+
+      // Check sparse overrides first
+      const terrainIndex = self.terrainIndex || {};
+      const key = x + ',' + y;
+      const override = terrainIndex[key];
+      if (override) return override;
+
+      // Default regions
+      if (x < -15) return 'water';  // Elliott Bay (west)
+      if (x > 20 || y > 15 || y < -15) return 'badlands';  // Outside city
+      return 'urban';  // City
+      `,
+    );
+
+    // isWater(x, y) - Check if column is water
+    this.spatial.setMethod(
+      'isWater',
+      `
+      /** Check if column is water terrain.
+       * @param x - X coordinate
+       * @param y - Y coordinate
+       * @returns true if water
+       */
+      const terrain = await self.getTerrainAt(args[0], args[1]);
+      return terrain === 'water';
+      `,
+    );
+
+    // isCoastal(x, y) - Check if column is adjacent to water
+    this.spatial.setMethod(
+      'isCoastal',
+      `
+      /** Check if column is adjacent to water (can access ocean).
+       * @param x - X coordinate
+       * @param y - Y coordinate
+       * @returns true if coastal
+       */
+      const x = args[0];
+      const y = args[1];
+
+      // Check if any adjacent column is water
+      const adjacent = [
+        [x - 1, y], [x + 1, y],
+        [x, y - 1], [x, y + 1],
+      ];
+
+      for (const [ax, ay] of adjacent) {
+        const terrain = await self.getTerrainAt(ax, ay);
+        if (terrain === 'water') return true;
+      }
+      return false;
+      `,
+    );
+
+    // setTerrain(x, y, type) - Override terrain for specific column
+    this.spatial.setMethod(
+      'setTerrain',
+      `
+      /** Override terrain type for a specific column.
+       * @param x - X coordinate
+       * @param y - Y coordinate
+       * @param type - Terrain type ('urban', 'water', 'badlands', null to clear)
+       */
+      const x = args[0];
+      const y = args[1];
+      const type = args[2];
+
+      const terrainIndex = self.terrainIndex || {};
+      const key = x + ',' + y;
+
+      if (type === null || type === undefined) {
+        delete terrainIndex[key];
+      } else {
+        terrainIndex[key] = type;
+      }
+
+      self.terrainIndex = terrainIndex;
+      `,
+    );
+
+    // ============== DYNAMIC ROOM METHODS ==============
+
+    // getOrCreateRoom(x, y, z) - Get or create dynamic room based on terrain
+    this.spatial.setMethod(
+      'getOrCreateRoom',
+      `
+      /** Get existing room or create dynamic room based on terrain.
+       * @param x - X coordinate
+       * @param y - Y coordinate
+       * @param z - Z coordinate
+       * @returns Room object or null if cannot create
+       */
+      const x = args[0];
+      const y = args[1];
+      const z = args[2];
+
+      // Check if room already exists
+      const existing = await self.getRoomDataAt(x, y, z);
+      if (existing) return existing;
+
+      // Determine room type from terrain + z
+      const terrain = await self.getTerrainAt(x, y);
+      let roomType = null;
+
+      if (terrain === 'water') {
+        if (z === 0) {
+          roomType = $waterRoom;
+        } else if (z < 0) {
+          roomType = $underwaterRoom;
+        } else {
+          roomType = $airspaceRoom;  // Above water
+        }
+      } else if (z > 0) {
+        roomType = $airspaceRoom;  // Any terrain can have airspace
+      } else {
+        // Urban/badlands at z <= 0 - must be pre-built
+        return null;
+      }
+
+      if (!roomType) return null;
+
+      // Create the dynamic room
+      const room = await $recycler.create(roomType, {
+        x: x,
+        y: y,
+        z: z,
+      });
+
+      // Track for cleanup
+      const key = x + ',' + y + ',' + z;
+      const dynamicRooms = self.dynamicRooms || {};
+      dynamicRooms[key] = room;
+      self.dynamicRooms = dynamicRooms;
+
+      return room;
+      `,
+    );
+
+    // releaseRoom(room) - Release a dynamic room for potential recycling
+    this.spatial.setMethod(
+      'releaseRoom',
+      `
+      /** Release a dynamic room, recycling if empty and not persistent.
+       * @param room - The room to potentially recycle
+       */
+      const room = args[0];
+      if (!room) return;
+
+      // Only dynamic rooms can be released
+      const key = room.x + ',' + room.y + ',' + room.z;
+      const dynamicRooms = self.dynamicRooms || {};
+      if (!dynamicRooms[key]) return;  // Not a dynamic room
+
+      // Check persistence
+      if (room.persistent) return;  // Never recycle persistent rooms
+      if (room.hasModifications) return;  // Keep modified rooms
+
+      // Check if room has contents
+      const contents = room.contents || [];
+      if (contents.length > 0) return;  // Still has contents
+
+      // Safe to recycle
+      delete dynamicRooms[key];
+      self.dynamicRooms = dynamicRooms;
+
+      await $recycler.recycle(room);
+      `,
+    );
+
+    // getDynamicRoomCount() - Get count of active dynamic rooms
+    this.spatial.setMethod(
+      'getDynamicRoomCount',
+      `
+      /** Get count of active dynamic rooms */
+      const dynamicRooms = self.dynamicRooms || {};
+      return Object.keys(dynamicRooms).length;
+      `,
+    );
+
     // describe() - Human-readable status
     this.spatial.setMethod(
       'describe',
@@ -356,13 +553,20 @@ Bootstrap calls rebuild() after world geometry is built.`,
       /** Get human-readable status of the spatial index */
       const roomIndex = self.roomIndex || {};
       const columnIndex = self.columnIndex || {};
+      const terrainIndex = self.terrainIndex || {};
+      const dynamicRooms = self.dynamicRooms || {};
+
       const roomCount = Object.keys(roomIndex).length;
       const columnCount = Object.keys(columnIndex).length;
+      const terrainOverrides = Object.keys(terrainIndex).length;
+      const dynamicCount = Object.keys(dynamicRooms).length;
       const lastRebuild = self.lastRebuild;
 
       let status = 'Spatial Index\\n';
       status += '  Rooms indexed: ' + roomCount + '\\n';
       status += '  Unique columns: ' + columnCount + '\\n';
+      status += '  Terrain overrides: ' + terrainOverrides + '\\n';
+      status += '  Dynamic rooms: ' + dynamicCount + '\\n';
 
       if (lastRebuild) {
         const ago = Math.round((Date.now() - lastRebuild) / 1000);
@@ -378,11 +582,19 @@ Bootstrap calls rebuild() after world geometry is built.`,
     // Property descriptions
     this.spatial.setPropertyDescription(
       'roomIndex',
-      'Map of "x,y,z" to { id, outdoor, name }',
+      'Map of "x,y,z" to room objref',
     );
     this.spatial.setPropertyDescription(
       'columnIndex',
-      'Map of "x,y" to array of { id, z, outdoor } sorted by z desc',
+      'Map of "x,y" to array of room objrefs sorted by z desc',
+    );
+    this.spatial.setPropertyDescription(
+      'terrainIndex',
+      'Map of "x,y" to terrain type override (sparse)',
+    );
+    this.spatial.setPropertyDescription(
+      'dynamicRooms',
+      'Map of "x,y,z" to dynamically created room objrefs',
     );
     this.spatial.setPropertyDescription(
       'lastRebuild',
