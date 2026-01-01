@@ -8,7 +8,21 @@ import { type Builder, registerBuilder } from '../builder-registry';
  */
 export class CarBuilder implements Builder {
   static provides = ['car'];
-  static depends = ['vehicle', 'engine', 'fuelTank', 'vehicleBattery', 'wheel', 'transmission', 'pocket'];
+  static depends = [
+    'vehicle',
+    'engine',
+    'fuelTank',
+    'vehicleBattery',
+    'wheel',
+    'transmission',
+    'starter',
+    'alternator',
+    'ecu',
+    'wiringHarness',
+    'brakes',
+    'steering',
+    'pocket',
+  ];
 
   private obj: RuntimeObject | null = null;
 
