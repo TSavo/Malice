@@ -158,5 +158,14 @@ export { WeaponBuilder } from './weapon-builder';
 // Wearables
 export { WearableBuilder } from './wearable-builder';
 export { WirelessPhoneBuilder } from './wireless-phone-builder';
+// Furniture
+export { FurnitureBuilder } from './furniture-builder';
+export { ChairBuilder } from './chair-builder';
+export { BedBuilder } from './bed-builder';
+export { TableBuilder } from './table-builder';
+export { DeskBuilder } from './desk-builder';
+export { CouchBuilder } from './couch-builder';
+// Climbing
+export { LadderBuilder } from './ladder-builder';
 // Wound system
 export { WoundBuilder } from './wound-builder';
