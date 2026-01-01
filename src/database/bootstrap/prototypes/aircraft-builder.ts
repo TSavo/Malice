@@ -5,7 +5,7 @@ import { type Builder, registerBuilder } from '../builder-registry';
 /**
  * Builds the Aircraft prototype
  *
- * A vehicle that can fly in 3D space, using $airspace for dynamic
+ * A vehicle that can fly in 3D space. Uses $spatial for dynamic
  * airspace room management. Extends $vehicle with flight capabilities.
  *
  * Coordinate system: 30m per x/y unit, 3m per z unit.
@@ -15,7 +15,7 @@ export class AircraftBuilder implements Builder {
   static provides = ['aircraft'];
   static depends = [
     'vehicle',
-    'airspace',
+    'spatial',
     'airspaceRoom',
     'starter',
     'alternator',
@@ -61,10 +61,16 @@ export class AircraftBuilder implements Builder {
           // AI-readable abilities
           abilities: `Fixed-wing aircraft. Jet fuel, high consumption. Needs runway or VTOL.
 
-Flies in 3D airspace (x,y,z coordinates). z=1 is low altitude, z=100 is cruising.
-Engine running in flight = continuous fuel burn. Empty tank mid-flight = crash.
+FLIGHT: Moves through 3D airspace (x,y,z). z=1 is low, z=100 is cruising.
+Uses $spatial.ensureRoom(x,y,z,'airspace') for airspace rooms.
+AI creates airspace ONLY if outdoor room exists below (ground or lower airspace).
+If AI says no (returns null), flight path is blocked.
 
-Needs engine, fuelTank, battery. Damaged engine/control surfaces = emergency.`,
+ENGINE: Continuous fuel burn in flight. Empty tank = crash.
+Needs engine, fuelTank, battery. Damaged parts = emergency.
+
+ROOMS ARE PERMANENT: Once AI creates airspace, it stays forever.
+Don't waste airspace on random sky - follow established flight paths.`,
         },
         methods: {},
       });
@@ -104,8 +110,9 @@ Needs engine, fuelTank, battery. Damaged engine/control surfaces = emergency.`,
       self.landedIn = room;
 
       // Get/create airspace room at z=1 (initial altitude)
-      const airRoom = await $airspace.getOrCreateRoom(x, y, 1);
-      if (!airRoom) return 'Cannot enter airspace here';
+      // AI decides if airspace makes sense here (needs outdoor ground below)
+      const airRoom = await $spatial.ensureRoom(room, x, y, 1, 'aircraft taking off');
+      if (!airRoom) return 'Cannot take off here - no valid airspace';
 
       // Set flight state
       self.inFlight = true;
@@ -226,9 +233,10 @@ Needs engine, fuelTank, battery. Damaged engine/control surfaces = emergency.`,
       const duration = Math.ceil((distance / maxSpeed) * 1000); // ms
 
       // Get/create destination airspace room
-      const destRoom = await $airspace.getOrCreateRoom(destX, destY, destZ);
+      // AI decides if airspace makes sense (needs outdoor below or adjacent airspace)
+      const destRoom = await $spatial.ensureRoom(room, destX, destY, destZ, 'aircraft in flight');
       if (!destRoom) {
-        return 'Cannot fly there';
+        return 'Cannot fly there - no valid airspace at that location';
       }
 
       // Set travel state
@@ -294,10 +302,8 @@ Needs engine, fuelTank, battery. Damaged engine/control surfaces = emergency.`,
       const fuelUsed = (distance / 1000) * efficiency;
       await self.consumeFuel(fuelUsed);
 
-      // Release old airspace room if it was airspace
-      if (oldRoom && oldRoom.airspace) {
-        await $airspace.releaseRoom(oldRoom);
-      }
+      // Note: Rooms are PERMANENT - no releaseRoom needed
+      // Old airspace stays in world for future flights
 
       // Tell passengers
       const altitude = (destRoom.z || 1) * 3;
@@ -409,10 +415,7 @@ Needs engine, fuelTank, battery. Damaged engine/control surfaces = emergency.`,
       // Consume some fuel for landing
       await self.consumeFuel(0.5);
 
-      // Release airspace room
-      if (oldRoom && oldRoom.airspace) {
-        await $airspace.releaseRoom(oldRoom);
-      }
+      // Note: Rooms are PERMANENT - airspace stays for future flights
 
       // Announce landing
       if (destRoom.announce) {

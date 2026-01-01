@@ -51,23 +51,23 @@ export class SpatialBuilder implements Builder {
           terrainIndex: {},
           // Last rebuild timestamp
           lastRebuild: null,
-          abilities: `Unified spatial manager. Coordinate indexing + terrain + AI-powered room creation.
+          abilities: `Spatial index + AI-powered room building.
 
-INDEXES: O(1) lookup by "x,y,z". Column queries by "x,y".
+LOOKUPS: O(1) by "x,y,z". Column queries by "x,y".
 
 TERRAIN: getTerrainAt(x, y) → 'urban', 'water', 'badlands'.
-  - x < -15: water (Elliott Bay)
-  - x > 20 or |y| > 15: badlands
-  - Otherwise: urban
-  - Use setTerrain(x, y, type) to override specific columns.
+  x < -15: water (Elliott Bay)
+  x > 20 or |y| > 15: badlands
+  Otherwise: urban
 
-ROOM CREATION: ensureRoom(x, y, z) gets existing or creates via $builder.
-  - Generates terrain-appropriate hints (airspace, water surface, underwater, etc.)
-  - $builder.build() sets name, description, creates exits to neighbors
-  - Rooms are PERMANENT once created - never deleted
-  - All movement (walking, flying, sailing) uses exits
+BUILD: ensureRoom(from, x, y, z, hint?)
+  - from: the room you're coming FROM (gives AI context)
+  - Returns existing room, or AI builds new one, or null if AI refuses
+  - AI does 3x3x3 search and links ALL valid neighbors
+  - Rooms are PERMANENT
 
-HINTS: getLocationHint(x, y, z) returns terrain-based hint string.`,
+AI BUILDS: streets, buildings, airspace, water, tunnels with context.
+AI REFUSES: nonsense (indoor from exterior, deep ocean, isolated sky).`,
         },
         methods: {},
       });
@@ -489,38 +489,30 @@ HINTS: getLocationHint(x, y, z) returns terrain-based hint string.`,
       `,
     );
 
-    // ensureRoom(x, y, z) - Get existing room or create via $builder
+    // ensureRoom(from, x, y, z, hint?) - Get existing room or AI builds it
     this.spatial.setMethod(
       'ensureRoom',
       `
-      /** Get existing room or create a new permanent room via $builder.
+      /** Get existing room or let AI build one.
+       * @param from - The room you're coming from (context for AI)
        * @param x - X coordinate
        * @param y - Y coordinate
        * @param z - Z coordinate
-       * @returns Room object (existing or newly created)
+       * @param hint - Optional hint (e.g., "airspace", "underwater", "tunnel")
+       * @returns Room if exists/built, null if AI refuses
        */
-      const x = args[0];
-      const y = args[1];
-      const z = args[2];
+      const from = args[0];
+      const x = args[1];
+      const y = args[2];
+      const z = args[3];
+      const hint = args[4] || '';
 
-      // Check if room already exists
+      // Already exists? Return it
       const existing = await self.getRoomDataAt(x, y, z);
       if (existing) return existing;
 
-      // Generate terrain-appropriate hint
-      const hint = await self.getLocationHint(x, y, z);
-
-      // Create empty room with coordinates
-      const room = await $recycler.create($room, {
-        x: x,
-        y: y,
-        z: z,
-      });
-
-      // Let $builder set name, description, and create exits
-      await $builder.build(room, hint);
-
-      return room;
+      // Let AI build it (or refuse)
+      return await $builder.build(from, { x, y, z }, hint);
       `,
     );
 
@@ -528,8 +520,14 @@ HINTS: getLocationHint(x, y, z) returns terrain-based hint string.`,
     this.spatial.setMethod(
       'getOrCreateRoom',
       `
-      /** Legacy alias for ensureRoom. Use ensureRoom instead. */
-      return await self.ensureRoom(args[0], args[1], args[2]);
+      /** Legacy alias for ensureRoom.
+       * @param from - Room you're coming from
+       * @param x - X coordinate
+       * @param y - Y coordinate
+       * @param z - Z coordinate
+       * @param hint - Optional hint
+       */
+      return await self.ensureRoom(args[0], args[1], args[2], args[3], args[4]);
       `,
     );
 
@@ -559,7 +557,8 @@ HINTS: getLocationHint(x, y, z) returns terrain-based hint string.`,
         status += '  Last rebuild: never\\n';
       }
 
-      status += '\\nUse ensureRoom(x, y, z) to get or create rooms via $builder.';
+      status += '\\nUse ensureRoom(x, y, z, hint?) to get existing or let AI create.';
+      status += '\\nAI may return null if room doesn\\'t make sense.';
 
       return status;
       `,

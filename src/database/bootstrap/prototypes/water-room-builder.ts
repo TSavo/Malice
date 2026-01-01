@@ -66,8 +66,9 @@ No land vehicles or pedestrians on water.
 ACCESS: Enter from coastal land rooms. sail(heading) to move.
 moor() at coastal edge to exit water back to land.
 
-LIFECYCLE: Created by $spatial.getOrCreateRoom() when vessels arrive.
-Recycled by $spatial.releaseRoom() when empty (unless persistent).`,
+LIFECYCLE: Created by AI via $spatial.ensureRoom() when vessels sail there.
+AI only creates water rooms in water terrain (x < -15 = Elliott Bay).
+Rooms are PERMANENT once created - they stay forever for future voyages.`,
         },
         methods: {},
       });
@@ -224,7 +225,8 @@ Recycled by $spatial.releaseRoom() when empty (unless persistent).`,
         const newY = self.y + (current.dy || 0);
 
         // Get or create destination water room
-        const destRoom = await $spatial.getOrCreateRoom(newX, newY, 0);
+        // AI decides if drift destination is valid water
+        const destRoom = await $spatial.ensureRoom(self, newX, newY, 0, 'vessel drifting with current');
         if (destRoom) {
           await obj.moveTo(destRoom);
           if (destRoom.announce) {
@@ -233,6 +235,7 @@ Recycled by $spatial.releaseRoom() when empty (unless persistent).`,
             });
           }
         }
+        // If AI says no, vessel stays put (hit the shore?)
       }
       `,
     );

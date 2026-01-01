@@ -69,9 +69,14 @@ export class AvBuilder implements Builder {
           // AI-readable abilities
           abilities: `VTOL flying car. Electric-hybrid: battery + fuel generator.
 
+FLIGHT: Uses $spatial.ensureRoom(x,y,z,'AV flying') for airspace rooms.
+AI creates airspace ONLY if outdoor room exists below (ground or lower airspace).
+If AI says no (returns null), cannot fly there.
+
 2 vector thrusters required. Quiet. Lands anywhere outdoors.
 Battery limits flight time. Low battery = forced landing. Recharge at stations.
 
+ROOMS ARE PERMANENT: Airspace stays forever once created.
 Can drive on ground when not flying. Urban flight, low altitude.`,
         },
         methods: {},
@@ -199,21 +204,14 @@ Can drive on ground when not flying. Urban flight, low altitude.`,
       const z = 1; // Just above ground
 
       // Find or create airspace room
-      const airspaceRooms = await $query()
-        .prop('isAirspace').equals(true)
-        .prop('x').equals(x)
-        .prop('y').equals(y)
-        .prop('z').equals(z)
-        .all();
-
-      let airspace = airspaceRooms[0];
-      if (!airspace && $.airspace && $.airspace.getOrCreate) {
-        airspace = await $.airspace.getOrCreate(x, y, z);
+      // AI decides if airspace makes sense (needs outdoor ground below)
+      const airspace = await $spatial.ensureRoom(currentRoom, x, y, z, 'AV taking off, needs airspace above outdoor ground');
+      if (!airspace) {
+        self.inFlight = false;
+        return 'Cannot take off here - no valid airspace';
       }
 
-      if (airspace) {
-        await self.moveTo(airspace);
-      }
+      await self.moveTo(airspace);
 
       // Announce
       if (currentRoom.announce) {

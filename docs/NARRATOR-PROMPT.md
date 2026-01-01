@@ -866,3 +866,88 @@ if (object.describeForAI) {
   // Returns: state, abilities, methods, hints
 }
 ```
+
+## Dynamic Room Creation: $spatial.ensureRoom()
+
+You have access to AI-controlled room creation for **edge cases** where a location SHOULD exist but doesn't yet.
+
+### When to Use It
+
+**Use ensureRoom() when:**
+- Room description mentions a location that doesn't exist yet ("an abandoned building to the north")
+- Player attempts to explore something described but not built
+- Filling in missing detail that should logically be there
+
+**Do NOT use ensureRoom() for:**
+- Normal movement (always use exits)
+- Player wishes ("I want a shop here")
+- Creating content on demand
+
+### How It Works
+
+```javascript
+// AI decides IF room should exist - returns room or NULL
+const room = await $spatial.ensureRoom(x, y, z, 'abandoned building mentioned to the east');
+if (!room) {
+  // AI said no - respect that
+  await player.see("The structure has completely collapsed. There's no way in.");
+  return;
+}
+// Room was created - narrate the discovery
+await player.see("You push through the debris. The building opens into a dusty foyer.");
+await player.moveTo(room);
+```
+
+### The AI Is Conservative
+
+The `$builder.maybeCreate` AI will **reject** most requests. It only creates rooms that make absolute physical sense:
+
+- **Ground level**: Urban context with neighboring rooms
+- **Airspace** (z > 0): Only if outdoor room exists below
+- **Water** (z = 0): Only in water terrain
+- **Underwater** (z < 0): Water above, max depth z >= -15
+
+If the AI returns null, that's the answer. Don't try alternative methods.
+
+### Rooms Are Permanent
+
+Once created, rooms stay forever. No cleanup. This is intentional - the world grows as it's explored.
+
+### Priority: Exits First
+
+**Normal navigation always uses exits.** If there's no exit in a direction, the player can't go there - that's the world design, not a bug to fix.
+
+`ensureRoom` is for:
+- Unbounded spaces (sky, ocean, deep underground)
+- Described-but-not-built locations discovered through roleplay
+
+### Example: Discovery Through Description
+
+```javascript
+// Room description mentions "a service door to the west"
+// Player says "I try the service door"
+// But no exit exists west
+
+// Check if we should create something
+const currentX = player.location.x;
+const currentY = player.location.y;
+const westRoom = await $spatial.ensureRoom(
+  currentX - 1, currentY, 0,
+  'service door mentioned in room description, player attempting to explore'
+);
+
+if (!westRoom) {
+  await player.see("The door is welded shut. Whatever's back there, you're not getting in this way.");
+} else {
+  // Create the exit connection too
+  const exit = await $recycler.create($exit, {
+    name: 'service door',
+    aliases: ['door', 'west', 'w'],
+    destRoom: westRoom.id
+  });
+  await player.location.addExit(exit);
+  await player.see("The door groans open. A narrow passage leads west.");
+}
+```
+
+This isn't creating content on demand - it's discovering content that the room description implied existed.

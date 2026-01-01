@@ -626,6 +626,88 @@ const status = await $scheduler.describe();
 - `pluribusWake` - Wakes Pluribus AI every hour (on the hour)
 - `sisterGrayWake` - Wakes Sister Gray AI every hour (on the half-hour)
 
+## Spatial System ($spatial)
+
+The `$spatial` singleton manages coordinate-based rooms and terrain.
+
+### Coordinate System
+
+```
+X-axis: West (-) to East (+)
+Y-axis: South (-) to North (+)
+Z-axis: Vertical (0 = ground, negative = underground, positive = altitude)
+
+Grid: ~30m per x/y unit, ~3m per z unit
+Water terrain: x < -15 (Elliott Bay)
+```
+
+### Room Lookup
+
+```typescript
+// Get room data at coordinates
+const room = await $spatial.getRoomDataAt(x, y, z);
+
+// Get terrain type
+const terrain = await $spatial.getTerrainAt(x, y);
+// Returns: 'water', 'ground', 'blocked', etc.
+
+// Get location hint for coordinates
+const hint = await $spatial.getLocationHint(x, y, z);
+```
+
+### Dynamic Room Creation: ensureRoom()
+
+For **AI-controlled dynamic room creation** (vehicles, exploration), use `ensureRoom()`:
+
+```typescript
+// AI decides IF room should exist - returns room or NULL
+const room = await $spatial.ensureRoom(x, y, z, 'hint about why');
+if (!room) {
+  // AI said no - this location doesn't make sense
+  return 'Cannot go there.';
+}
+await vehicle.moveTo(room);
+```
+
+**When to use:**
+- Aircraft flying to new coordinates → creates airspaceRoom
+- Boats sailing to new water → creates waterRoom
+- Submarines diving to new depths → creates underwaterRoom
+- Room description mentions location that doesn't exist yet
+
+**When NOT to use:**
+- Normal player movement (use exits)
+- Entering buildings (use exits)
+- Any case where an exit should exist
+
+**The AI is conservative** - it only creates rooms that make physical sense:
+- **Airspace** (z > 0): Only above outdoor rooms
+- **Water surface** (z = 0): Only in water terrain (x < -15)
+- **Underwater** (z < 0): Only in water, max depth z >= -15 without explicit hint
+- **Ground level**: Urban context with neighboring rooms
+
+**Rooms are permanent** - once created, they stay forever. No cleanup needed.
+
+### How ensureRoom Works Internally
+
+1. Checks if room already exists at (x, y, z) → returns it
+2. Gathers terrain data and neighboring room context
+3. Calls `$builder.maybeCreate(x, y, z, hint)` - AI decides
+4. AI either creates room or returns null
+5. Looks up the room again → returns it or null
+
+### Hint Examples
+
+```typescript
+// Vehicle hints (handled internally by vehicle prototypes)
+await $spatial.ensureRoom(x, y, 10, 'aircraft taking off');
+await $spatial.ensureRoom(x, y, 0, 'boat sailing to new water');
+await $spatial.ensureRoom(x, y, -5, 'submarine diving');
+
+// Exploration hints (narrator may use these)
+await $spatial.ensureRoom(x+1, y, 0, 'abandoned building mentioned in room description to the east');
+```
+
 ## Web Map Visualizer
 
 The server provides 3D map visualization at:
