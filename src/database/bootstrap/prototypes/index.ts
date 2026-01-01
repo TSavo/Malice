@@ -89,6 +89,10 @@ export { VehicleRoomBuilder } from './vehicle-room-builder';
 export { CarBuilder } from './car-builder';
 export { GarageBuilder } from './garage-builder';
 export { MechanicBuilder } from './mechanic-builder';
+// Fuel system
+export { FuelBuilder } from './fuel-builder';
+export { FuelContainerBuilder } from './fuel-container-builder';
+export { FuelPumpBuilder } from './fuel-pump-builder';
 export { NavComputerBuilder } from './nav-computer-builder';
 // Airspace system (for aircraft)
 export { AirspaceRoomBuilder } from './airspace-room-builder';

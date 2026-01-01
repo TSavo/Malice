@@ -66,29 +66,10 @@ export class HelicopterBuilder implements Builder {
           maxAltitude: 100, // 300m (helicopters fly lower)
           maxSpeed: 60, // m/s (~216 km/h)
           // Abilities
-          abilities: `Rotorcraft with vertical takeoff/landing (VTOL) capability.
+          abilities: `Rotorcraft with VTOL. Jet fuel, ~200L tank, ~0.25 L/km. High idle burn.
 
-ROTORS: Requires main rotor (lift) and tail rotor (anti-torque).
-Both must be functional for controlled flight.
-
-TAKEOFF: Unlike fixed-wing, can take off from any outdoor location.
-No runway needed. Call takeoff() when parked.
-
-FLIGHT: Use fly(heading) to move in any direction.
-Directions: north, south, east, west, up, down, etc.
-Lower ceiling than fixed-wing aircraft.
-
-LANDING: Can land on any outdoor location with enough space.
-Rooftops, helipads, clearings, roads.
-
-SEATING: Pilot and co-pilot up front. Two passengers in back.
-Pilot seat required for flying.
-
-CARGO: Rear cargo hold for equipment and supplies.
-
-NOISE: Loud! Distinctive rotor sound. Can be heard approaching.
-
-FACTORY: Use $helicopter.create() to spawn a complete helicopter.`,
+Main + tail rotor required. Lands anywhere outdoors. Loud.
+4 seats (pilot, co-pilot, 2 passengers), cargo hold.`,
         },
         methods: {},
       });

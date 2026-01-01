@@ -54,21 +54,9 @@ export class CarBuilder implements Builder {
           weight: 1400000, // 1400kg base
           armor: 5,
           // Abilities
-          abilities: `Four-door sedan with trunk storage.
+          abilities: `Four-door sedan. Gasoline engine, ~60L tank, ~0.08 L/km.
 
-SEATING: 4 seats - driver, passenger, back-left, back-right.
-Each holds one person.
-
-DOORS: 4 doors matching seats. Must be unlocked to enter/exit.
-Driver and passenger doors on sides, rear doors for back seats.
-
-TRUNK: Separate storage space accessed from rear. Weight-limited.
-Cannot be accessed while driving.
-
-PARTS: Requires engine, fuel tank, battery, transmission, and 4 wheels.
-All must be functional to drive.
-
-FACTORY: Use $car.create() to spawn a complete car with all parts installed.`,
+4 seats, 4 doors, trunk storage. Needs engine, tank, battery, transmission, 4 wheels.`,
         },
         methods: {},
       });

@@ -39,6 +39,7 @@ export class EngineBuilder implements Builder {
           horsepower: 100, // Base HP
           maxSpeed: 40, // m/s (~144 km/h, ~90 mph)
           fuelEfficiency: 0.12, // Liters per km (lower is better)
+          idleFuelRate: 0.05, // Liters per minute when idling
           // Physical
           weight: 150000, // grams (150kg)
           // Fuel compatibility
@@ -158,6 +159,10 @@ Condition: \${condition}%\`;
       'fuelType',
       'Required fuel type: gasoline, diesel, or electric.',
     );
+    obj.setPropertyDescription(
+      'idleFuelRate',
+      'Fuel consumption in liters per minute when engine running but stationary.',
+    );
   }
 
   private async buildV4Engine(): Promise<void> {
@@ -174,6 +179,7 @@ Condition: \${condition}%\`;
           horsepower: 120,
           maxSpeed: 45, // ~162 km/h
           fuelEfficiency: 0.08, // 8 L/100km
+          idleFuelRate: 0.03, // Efficient idle
           weight: 120000, // 120kg
         },
         methods: {},
@@ -194,6 +200,7 @@ Condition: \${condition}%\`;
         horsepower: 280,
         maxSpeed: 55, // ~198 km/h
         fuelEfficiency: 0.11, // 11 L/100km
+        idleFuelRate: 0.05, // Moderate idle
         weight: 180000, // 180kg
       },
       methods: {},
@@ -214,6 +221,7 @@ Condition: \${condition}%\`;
         horsepower: 450,
         maxSpeed: 70, // ~252 km/h
         fuelEfficiency: 0.16, // 16 L/100km
+        idleFuelRate: 0.08, // Thirsty even at idle
         weight: 250000, // 250kg
       },
       methods: {},
@@ -234,6 +242,7 @@ Condition: \${condition}%\`;
           horsepower: 300,
           maxSpeed: 50, // ~180 km/h (often electronically limited)
           fuelEfficiency: 0.02, // 0.2 kWh/km equivalent (very efficient)
+          idleFuelRate: 0.005, // Minimal draw when "on" but stationary
           fuelType: 'electric',
           weight: 80000, // 80kg (lighter than combustion)
           abilities: `Silent electric power unit.
