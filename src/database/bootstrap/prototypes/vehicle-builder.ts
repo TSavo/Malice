@@ -28,7 +28,17 @@ export class VehicleBuilder implements Builder {
           description: 'A vehicle that can transport passengers between locations',
           // Parts system
           parts: [], // objrefs to installed $vehiclePart instances
-          requiredParts: ['engine', 'fuelTank', 'battery'], // partTypes needed to function
+          requiredParts: [
+            'engine',
+            'fuelTank',
+            'battery',
+            'starter',
+            'alternator',
+            'ecu',
+            'wiringHarness',
+            'brakes',
+            'steering',
+          ], // partTypes needed to function
           // State
           engineRunning: false,
           travelState: null, // { exit, destRoom, startTime, duration, distance, schedulerJob }
