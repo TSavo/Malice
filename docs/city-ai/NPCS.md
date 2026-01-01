@@ -1357,7 +1357,8 @@ await techRoom.announce(tech, null, {
 });
 
 // 8. Update faction
-await call_method({ objectId: factionId, name: 'setFaction', args: [playerId, 'Citizen'] });
+const player = await $load(playerId);
+await $factionManager.setMembership(player, $continuum);
 ```
 
 ## Strategic NPC Placement

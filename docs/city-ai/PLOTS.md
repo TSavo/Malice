@@ -176,10 +176,11 @@ await plot.addEvent({ plotId, message: 'Construction request received. Site surv
 **Day 1: Work Begins**
 ```javascript
 // Update adjacent room description
-await set_property({ objectId: adjacentRoomId, name: 'description', value: originalDescription + '\n\nThe sound of construction echoes from the east. A section of wall has been marked for demolition.' });
+const adjacentRoom = await $load(adjacentRoomId);
+adjacentRoom.description = originalDescription + '\n\nThe sound of construction echoes from the east. A section of wall has been marked for demolition.';
 
 // Spawn work crew
-const foreman = await $ai.spawn({ role: 'supervisor', name: 'Construction Foreman', location: await $load(adjacentRoomId) });
+const foreman = await $ai.spawn({ role: 'supervisor', name: 'Construction Foreman', location: adjacentRoom });
 
 // Log progress
 await plot.addEvent({ plotId, message: 'Day 1: Demolition begun. Wall section removed. Debris clearing in progress.' });
@@ -191,7 +192,8 @@ await plot.setMetadata('day', 1);
 **Day 2: Progress**
 ```javascript
 // Update site description
-await set_property({ objectId: adjacentRoomId, name: 'description', value: originalDescription + '\n\nThrough the new opening to the east, you can see workers framing walls and running conduit.' });
+const adjacentRoom = await $load(adjacentRoomId);
+adjacentRoom.description = originalDescription + '\n\nThrough the new opening to the east, you can see workers framing walls and running conduit.';
 
 await plot.addEvent({ plotId, message: 'Day 2: Framing complete. Electrical rough-in started. Plumbing connections made.' });
 
@@ -201,13 +203,17 @@ await plot.setMetadata('day', 2);
 **Day 3: Completion**
 ```javascript
 // Create the actual room
-const bar = await dig({ name: 'The Rusty Nail', description: 'A small bar carved out of what was once storage space. The walls are raw concrete, the fixtures salvaged, but it has character. A wooden bar top, polished smooth by previous use, dominates the space. Mismatched stools line up in front of it.', fromRoomId: adjacentRoomId, exitDirection: 'east', returnDirection: 'west' });
+const adjacentRoom = await $load(adjacentRoomId);
+const bar = await $builder.build(adjacentRoom, { x: adjacentRoom.x + 1, y: adjacentRoom.y, z: adjacentRoom.z }, 'bar interior');
+bar.name = 'The Rusty Nail';
+bar.description = 'A small bar carved out of what was once storage space. The walls are raw concrete, the fixtures salvaged, but it has character. A wooden bar top, polished smooth by previous use, dominates the space. Mismatched stools line up in front of it.';
 
 // Spawn furnishings
-await spawn_item({ prototypeId: signPrototypeId, location: await $load(bar).id, properties: { name: 'Menu Board', text: 'DRINKS\nWater - 1 credit\nBrew - 3 credits\n...' }});
+const menuBoard = await $recycler.create($sign, { name: 'Menu Board', text: 'DRINKS\nWater - 1 credit\nBrew - 3 credits\n...' });
+await menuBoard.moveTo(bar);
 
 // Remove construction references from adjacent room
-await set_property({ objectId: adjacentRoomId, name: 'description', value: originalDescription + '\n\nAn opening to the east leads to The Rusty Nail.' });
+adjacentRoom.description = originalDescription + '\n\nAn opening to the east leads to The Rusty Nail.';
 
 // Despawn work crew (walk them out first!)
 const foremanRoom = foreman.location;

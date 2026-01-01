@@ -224,7 +224,8 @@ if (result.plot) {
 await plot.completeJob( plotId, jobId: 'repair_main_7734', reason: 'Water main repaired. Flow restored.' });
 
 // Reward the worker
-await set_property({ objectId: workerId, name: 'credits', value: currentCredits + 50 });
+const worker = await $load(workerId);
+worker.credits = (worker.credits || 0) + 50;
 
 // Log completion
 await plot.addEvent({ plotId, message: 'Job completed by Worker #' + workerId + '. 50 credits paid.' });
@@ -249,7 +250,13 @@ await plot.addEvent({ plotId, message: 'Job failed. Reassigning.' });
 
 ```javascript
 // Spawn a job board terminal in a room
-await spawn_item({ prototypeId: signPrototypeId, location: await $load(cityServicesId), properties: { name: 'Work Assignment Terminal', description: 'A screen displays available work orders. Touch to view assignments.', text: '' }});
+const cityServices = await $load(cityServicesId);
+const terminal = await $recycler.create($sign, {
+  name: 'Work Assignment Terminal',
+  description: 'A screen displays available work orders. Touch to view assignments.',
+  text: ''
+});
+await terminal.moveTo(cityServices);
 ```
 
 ### Updating Job Board Content
@@ -267,7 +274,8 @@ for (const p of result.plots) {
 }
 
 // Update sign
-await set_property({ objectId: jobBoardId, name: 'text', value: boardText });
+const jobBoard = await $load(jobBoardId);
+jobBoard.text = boardText;
 ```
 
 ## Reward Distribution
@@ -275,19 +283,16 @@ await set_property({ objectId: jobBoardId, name: 'text', value: boardText });
 ### Credit Payment
 
 ```javascript
-// Get current balance (via resource)
-const playerInfo = await readResource(`moo://objects/${playerId}/prop/credits`);
-const current = playerInfo.value || 0;
-
-// Add reward
-await set_property({ objectId: playerId, name: 'credits', value: current + rewardAmount });
+// Get player and add reward
+const player = await $load(playerId);
+player.credits = (player.credits || 0) + rewardAmount;
 ```
 
 ### Via Bank Transfer
 
 ```javascript
 // Use bank's transfer method
-await call_method({ objectId: bankId, name: 'transfer', args: ['CONTINUUM-JOBS', playerId, rewardAmount, 'Job completion: ' + jobId] });
+await $bank.transfer('CONTINUUM-JOBS', playerId, rewardAmount, 'Job completion: ' + jobId);
 ```
 
 ## Chained Jobs

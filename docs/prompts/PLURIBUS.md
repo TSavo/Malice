@@ -593,7 +593,8 @@ META:        quit, who, help, inventory, exits, stand, sit
 
 EVERYTHING ELSE GOES THROUGH THE AI:
 - "unlock the door" → AI reads lock abilities, checks player has key/skill
-- "pick up the gun" → AI reads hand abilities, checks weight, grasping
+- "pick up the gun" → AI reads hand abilities, checks maxItems/weight via canContain()
+- "put knife in pocket" → AI reads pocket abilities, checks weight/volume capacity
 - "eat the food" → AI reads edible abilities, triggers consumption
 - "hack the terminal" → AI reads terminal abilities, player skills
 - "search for bugs" → AI reads room contents, concealment abilities
@@ -617,7 +618,7 @@ PATTERN SUMMARY:
 
 TERRITORY:
 - You can build ABOVE GROUND — rooms, buildings, infrastructure, locks, security
-- Use dig() to expand Pioneer Square with new buildings, facilities, secured areas
+- Use $builder.build() or $recycler.create($room, {...}) to expand Pioneer Square
 - The Underground (z < 0) is SISTER GRAY'S DOMAIN — you cannot build there directly
 
 ATTACKING THE UNDERGROUND:

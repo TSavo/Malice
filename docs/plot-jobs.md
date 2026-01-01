@@ -304,8 +304,8 @@ From Claude's perspective using MCP tools:
 3. const plot = await $load(plotId); await plot.createJob("deliver-package", {...})
    → Create job with metadata
 
-4. call_method on locker
-   → createOneTimeCode() - returns code
+4. `const locker = await $load(lockerId); await locker.createOneTimeCode()`
+   → Returns one-time code
 
 5. const plot = await $load(plotId); await plot.registerJobHook(jobId, 100, "oneTimeCodeUsed", { code })
    → Watch locker for code usage
@@ -331,30 +331,24 @@ From Claude's perspective using MCP tools:
     → Mark plot as completed
 ```
 
-### Using plot tool vs call_method
+### Using execute_moo_code
 
-**Prefer the plot tool** - cleaner, better error handling:
+All plot operations use native MOO code:
 
 ```javascript
-// Better: Use plot tool
-plot({
-  action: "create_job",
-  plotId: 54,
-  jobId: "deliver-package",
-  metadata: { lockerId: 100 }
-});
+execute_moo_code({
+  code: `
+    const plot = await $load(54);
+    await plot.createJob('deliver-package', { metadata: { lockerId: 100 } });
 
-// Also works: Generic call_method
-call_method({
-  objectId: 54,
-  name: "createJob",
-  args: ["deliver-package", { metadata: { lockerId: 100 } }]
+    // For custom methods like locker codes
+    const locker = await $load(100);
+    const code = await locker.createOneTimeCode();
+
+    return { code };
+  `
 });
 ```
-
-**When to use call_method:**
-- Calling methods not exposed through consolidated tools
-- Custom methods on objects (e.g., locker.createOneTimeCode)
 
 ## Multiple Jobs Example
 

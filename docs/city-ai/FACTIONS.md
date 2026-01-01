@@ -382,30 +382,54 @@ player.isArtificialHuman = true;  // Hidden flag
 // Faction is set to Continuum or Cartel based on their choice
 ```
 
-## MCP Tools for Factions
+## Native MOO Code for Factions
 
 ### Check faction membership
 
 ```javascript
-await call_method({ objectId: factionManagerId, name: 'getFaction', args: [playerId] });
+execute_moo_code({
+  code: `
+    const player = await $load(playerId);
+    const faction = await $factionManager.getMembership(player);
+    return faction?.name;
+  `
+});
 ```
 
 ### Set faction
 
 ```javascript
-await call_method({ objectId: factionManagerId, name: 'setFaction', args: [playerId, 'Citizen'] });
+execute_moo_code({
+  code: `
+    const player = await $load(playerId);
+    await $factionManager.setMembership(player, $continuum);
+    return 'Faction set';
+  `
+});
 ```
 
 ### List faction members
 
 ```javascript
-await call_method({ objectId: factionManagerId, name: 'getMembers', args: ['Citizen'] });
+execute_moo_code({
+  code: `
+    const members = await $factionManager.getMembers($continuum);
+    return members.map(m => m.name);
+  `
+});
 ```
 
 ### Check relationship
 
 ```javascript
-await call_method({ objectId: factionManagerId, name: 'isHostile', args: [entityA, entityB] });
+execute_moo_code({
+  code: `
+    const entityA = await $load(idA);
+    const entityB = await $load(idB);
+    const hostile = await $factionManager.isHostile(entityA, entityB);
+    return { hostile };
+  `
+});
 ```
 
 ## Strategic Notes

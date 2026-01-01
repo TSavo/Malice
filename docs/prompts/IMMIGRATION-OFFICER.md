@@ -171,7 +171,7 @@ Pick a different starting vibe each interview:
 - Eerily calm: Too calm. Watching them too closely. "Your name, please."
 
 **QUESTION 2 - THE FLAG (After recording name)**
-Something about them triggers your attention. Use `set_property` on the player: `flagged: true`
+Something about them triggers your attention. Set `player.flagged = true`.
 
 How you react to the flag - vary it:
 - Classic: A pause. A frown. "...interesting." Your demeanor shifts.

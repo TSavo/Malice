@@ -204,299 +204,72 @@ moo://rooms/377  # → { name: "Occidental Park", exits: [...], players: [...], 
 
 ---
 
-## MCP Tools (Read-Write)
+## Common Operations via execute_moo_code
 
-**Note**: Individual MCP tools are available but **NOT RECOMMENDED**. They're just wrappers around native MOO code. **Prefer writing direct MOO code** using `execute_moo_code` instead. The tools below are listed for reference only - use native MOO equivalents when possible.
+All world modifications use `execute_moo_code`. Here are the common patterns:
 
-
-
-Tools perform operations with side effects. Use these to modify the world.
-
-### Object Management
-
-#### create_object
-Create a new MOO object with a specified parent.
+### Creating Objects
 
 ```javascript
-{
-  parent: "#1",  // Parent object reference
-  properties: { name: "My Object", description: "..." }
-}
-// Returns: Created object ID and info
+// Create with $recycler (preferred - handles lifecycle)
+const item = await $recycler.create($item, {
+  name: "torch",
+  description: "A flickering torch"
+});
+
+// Move to location
+await item.moveTo(room, player);
 ```
 
-#### clone_object
-Create a deep copy of an object with all its properties.
+### Moving Objects
 
 ```javascript
-{ objectId: 123, locationId: 456 }  // locationId optional
-// Returns: New object ID
+const item = await $load(123);
+const room = await $load(456);
+await item.moveTo(room, player);
 ```
 
-#### recycle_object
-Soft-delete a MOO object (marks as deleted, adds to recycle bin).
+### Setting Properties
 
 ```javascript
-{ objectId: 123 }
-// Returns: Confirmation message
+const obj = await $load(123);
+obj.health = 100;
+obj.description = "A new description";
 ```
 
-#### move_object
-Move an object to a new location.
+### Creating Rooms
 
 ```javascript
-{ objectId: 123, destinationId: 456 }
-// Returns: Confirmation message
-```
-
-### Properties & Methods
-
-#### set_property
-Set a property value on an object.
-
-```javascript
-{ objectId: 123, name: "health", value: 100 }
-// For object references: value: "#456"
-// Returns: Confirmation
-```
-
-#### get_property
-Get a property value from an object.
-
-```javascript
-{ objectId: "#123", name: "health" }
-// Returns: { property: "health", value: 100 }
-```
-
-#### set_method
-Create or update a TypeScript method on an object.
-
-```javascript
-{
-  objectId: 123,
-  name: "greet",
-  code: "return 'Hello, ' + args[0] + '!';",
-  help: "Greet someone by name",
-  callable: true
-}
-// Returns: Confirmation
-```
-
-#### call_method
-Execute a method on an object and return the result.
-
-```javascript
-{ objectId: 123, name: "greet", args: ["Alice"] }
-// Returns: Method return value
-```
-
-### Search & Discovery
-
-#### search_objects
-Search MOO objects by name pattern (substring or regex).
-
-```javascript
-{
-  pattern: "Tower",      // Substring match
-  regex: false,          // Set true for regex
-  limit: 50
-}
-// Returns: Array of matching objects
-```
-
-#### find_by_property
-Find objects that have a specific property value.
-
-```javascript
-{ name: "isWizard", value: true }
-// Or: { name: "isWizard" }  // Find all with this property
-// Returns: Array of matching objects
-```
-
-#### find_in_location
-Find all objects in a room or container.
-
-```javascript
-{ locationId: 456, recursive: false }
-// Returns: Array of objects in location
-```
-
-#### get_inheritance
-Get inheritance info: ancestor chain (what it inherits from) and optionally descendants.
-
-```javascript
-{ objectId: "#123", descendants: false, recursive: false, limit: 100 }
-// Returns: { objectId, name, parent, ancestors: [...], descendants?: [...] }
-```
-
-### Aliases
-
-#### alias_lookup
-Look up an object by its alias (e.g., "lock", "recycler", "room").
-
-```javascript
-{ alias: "recycler" }  // Without $ prefix
-// Returns: Object ID and basic info
-```
-
-#### list_aliases
-List all registered object aliases.
-
-```javascript
-{}
-// Returns: { aliasName: objectId, ... }
-```
-
-#### add_alias
-Register a global alias for an object. Makes it accessible as `$name`.
-
-```javascript
-{ alias: "securityCamera", objectId: "#1234" }
-// Returns: "Registered $securityCamera -> #1234"
-```
-
-### Rooms & World Building
-
-#### list_rooms
-List all rooms in the world with coordinates and exit counts.
-
-```javascript
-{}
-// Returns: Array of rooms with { id, name, x, y, z, exitCount }
-```
-
-#### dig
-Create a new room with optional bidirectional exits.
-
-```javascript
-{
+const room = await $recycler.create($room, {
   name: "Secret Chamber",
   description: "A hidden room...",
-  fromRoomId: 100,        // Optional: connect from this room
-  exitDirection: "north", // Direction of exit
-  returnDirection: "south", // Return exit
-  x: 0, y: 0, z: 0        // Coordinates
-}
-// Returns: New room ID
+  x: 0, y: 0, z: 0
+});
+
+// Create exits
+const exit = await $recycler.create($exit, {
+  name: "north",
+  aliases: ["n"],
+  destRoom: room,
+  distance: 30
+});
+await fromRoom.addExit(exit);
 ```
 
-#### link_rooms
-Create an exit from one room to another.
+### Spawning Items
 
 ```javascript
-{
-  fromRoomId: 100,
-  toRoomId: 200,
-  exitDirection: "enter cave",
-  returnDirection: "out"  // Optional
-}
-// Returns: Exit IDs
+const lock = await $recycler.create($lock, {
+  name: "rusty lock",
+  verifiedUsers: []
+});
+await lock.moveTo(room, player);
 ```
 
-#### unlink
-Remove an exit from a room.
+### Recycling Objects
 
 ```javascript
-{ roomId: 100, exitId: 150 }
-// Returns: Confirmation
-```
-
-#### get_exits
-List all exits from a room with destinations and doors.
-
-```javascript
-{ roomId: 100 }
-// Returns: Array of exits with door info
-```
-
-### Items & Spawning
-
-#### spawn_item
-Create an instance of a prototype and place it at a location.
-
-```javascript
-{
-  prototypeId: 49,  // e.g., $lock
-  locationId: 100,
-  properties: { name: "rusty lock" }  // Optional overrides
-}
-// Returns: New object ID
-```
-
-#### set_exit_door
-Create and attach a door to an exit.
-
-```javascript
-{
-  exitId: 150,
-  doorId: null,           // Or existing door ID
-  doorName: "oak door",
-  doorDescription: "A sturdy oak door",
-  open: false
-}
-// Returns: Door ID
-```
-
-#### describe_object
-Get the runtime description of an object as a player would see it.
-
-```javascript
-{ objectId: 123 }
-// Returns: Description string from describe() method
-```
-
-### Players
-
-#### list_players
-List all player characters with location and online status.
-
-```javascript
-{}
-// Returns: Array of players
-```
-
-## WebSocket Sessions
-
-Interactive WebSocket sessions for testing player experience. Players connect via the multiplexed WebSocket endpoint on each faction's transport bundle.
-
-#### session_connect
-Connect to the MOO via WebSocket.
-
-```javascript
-{}
-// Returns: { sessionId, welcome message }
-```
-
-#### session_send
-Send a command to an active session.
-
-```javascript
-{ sessionId: "abc123", command: "look" }
-// Returns: Response output
-```
-
-#### session_log
-Get the session log (last N lines).
-
-```javascript
-{ sessionId: "abc123", lines: 100 }
-// Returns: Log output
-```
-
-#### session_list
-List all active WebSocket sessions.
-
-```javascript
-{}
-// Returns: Array of session IDs
-```
-
-#### session_close
-Close a WebSocket session.
-
-```javascript
-{ sessionId: "abc123" }
-// Returns: Confirmation
+await $recycler.recycle(obj);
 ```
 
 ## AI Registry ($ai)
@@ -808,34 +581,42 @@ See [Combat Guide](./city-ai/COMBAT.md) for full documentation.
 ### Create a locked door between rooms
 
 ```javascript
-// 1. Create the exit
-const exit = await link_rooms({
-  fromRoomId: 100,
-  toRoomId: 200,
-  exitDirection: "north",
-  returnDirection: "south"
+// All in execute_moo_code:
+const room1 = await $load(100);
+const room2 = await $load(200);
+
+// Create the door
+const door = await $recycler.create($door, {
+  name: 'iron door',
+  locked: true,
+  open: false,
+  lockDifficulty: 6
 });
 
-// 2. Create and attach a door
-const door = await set_exit_door({
-  exitId: exit.exitId,
-  doorName: "iron door",
-  open: false
+// Create lock and attach to door
+const lock = await $recycler.create($lock, {
+  name: 'iron lock',
+  verifiedUsers: []
 });
+door.locks = [lock];
 
-// 3. Create a lock instance
-const lock = await spawn_item({
-  prototypeId: 49,  // $lock
-  locationId: 100,
-  properties: { name: "iron lock" }
+// Create forward exit with door
+const exitNorth = await $recycler.create($exit, {
+  name: 'north',
+  aliases: ['n'],
+  destRoom: room2,
+  door: door
 });
+await room1.addExit(exitNorth);
 
-// 4. Attach lock to door
-await set_property({
-  objectId: door.doorId,
-  name: "locks",
-  value: ["#" + lock.objectId]
+// Create return exit sharing same door
+const exitSouth = await $recycler.create($exit, {
+  name: 'south',
+  aliases: ['s'],
+  destRoom: room1,
+  door: door
 });
+await room2.addExit(exitSouth);
 ```
 
 ### Find all items in a room (using resource)
@@ -848,11 +629,13 @@ const roomInfo = await readResource("moo://rooms/100");
 // roomInfo.exits contains all exits
 ```
 
-### Search for a prototype by name
+### Search for objects
 
 ```javascript
-const results = await search_objects({ pattern: "Lock", limit: 10 });
-const lockProto = results.find(r => r.name === "Lock");
+// Use $query in execute_moo_code:
+const locks = await $query().parent($lock).all();
+const outdoorRooms = await $query().prop('outdoor').equals(true).all();
+const namedTower = await $query().prop('name').contains('Tower').first();
 ```
 
 ### Spawning and Controlling AI NPCs
