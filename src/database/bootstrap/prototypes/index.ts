@@ -135,6 +135,22 @@ export { TrapBuilder } from './trap-builder';
 // Power
 export { GeneratorBuilder } from './generator-builder';
 export { PowerCellBuilder } from './power-cell-builder';
+// Medical
+export { MedicalBuilder } from './medical-builder';
+export { BandageBuilder } from './bandage-builder';
+export { MedkitBuilder } from './medkit-builder';
+export { SyringeBuilder } from './syringe-builder';
+export { TourniquetBuilder } from './tourniquet-builder';
+export { SplintBuilder } from './splint-builder';
+export { SutureKitBuilder } from './suture-kit-builder';
+export { PainkillersBuilder } from './painkillers-builder';
+export { AntibioticsBuilder } from './antibiotics-builder';
+export { MorphineBuilder } from './morphine-builder';
+export { AdrenalineBuilder } from './adrenaline-builder';
+export { BloodBagBuilder } from './blood-bag-builder';
+export { DefibrillatorBuilder } from './defibrillator-builder';
+export { SurgicalKitBuilder } from './surgical-kit-builder';
+export { StimpakBuilder } from './stimpak-builder';
 // Smokables
 export { SmokableBuilder } from './smokable-builder';
 export { CigaretteBuilder } from './cigarette-builder';
