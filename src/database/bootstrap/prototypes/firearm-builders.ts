@@ -1,4 +1,4 @@
-import type { RuntimeObject } from '../../../../types/object';
+import type { ObjId, RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
 import { registerBuilder, type Builder } from '../builder-registry';
 
@@ -34,7 +34,7 @@ import { registerBuilder, type Builder } from '../builder-registry';
 export class GunBuilder {
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: number): Promise<RuntimeObject> {
+  async build(parentId: ObjId): Promise<RuntimeObject> {
     const parent = await this.manager.load(parentId);
     const obj = await this.manager.create({
       parent: parent!,
@@ -389,7 +389,7 @@ CONCEALMENT: Smaller guns ('compactPistol', 'derringer') easier to hide. Long gu
 export class PistolBuilder {
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: number): Promise<RuntimeObject> {
+  async build(parentId: ObjId): Promise<RuntimeObject> {
     const parent = await this.manager.load(parentId);
     const obj = await this.manager.create({
       parent: parent!,
@@ -414,7 +414,7 @@ export class PistolBuilder {
 export class RevolverBuilder {
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: number): Promise<RuntimeObject> {
+  async build(parentId: ObjId): Promise<RuntimeObject> {
     const parent = await this.manager.load(parentId);
     const obj = await this.manager.create({
       parent: parent!,
@@ -440,7 +440,7 @@ export class RevolverBuilder {
 export class MagnumBuilder {
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: number): Promise<RuntimeObject> {
+  async build(parentId: ObjId): Promise<RuntimeObject> {
     const parent = await this.manager.load(parentId);
     const obj = await this.manager.create({
       parent: parent!,
@@ -466,7 +466,7 @@ export class MagnumBuilder {
 export class SemiAutoPistolBuilder {
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: number): Promise<RuntimeObject> {
+  async build(parentId: ObjId): Promise<RuntimeObject> {
     const parent = await this.manager.load(parentId);
     const obj = await this.manager.create({
       parent: parent!,
@@ -491,7 +491,7 @@ export class SemiAutoPistolBuilder {
 export class CompactPistolBuilder {
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: number): Promise<RuntimeObject> {
+  async build(parentId: ObjId): Promise<RuntimeObject> {
     const parent = await this.manager.load(parentId);
     const obj = await this.manager.create({
       parent: parent!,
@@ -516,7 +516,7 @@ export class CompactPistolBuilder {
 export class DerringerBuilder {
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: number): Promise<RuntimeObject> {
+  async build(parentId: ObjId): Promise<RuntimeObject> {
     const parent = await this.manager.load(parentId);
     const obj = await this.manager.create({
       parent: parent!,
@@ -542,7 +542,7 @@ export class DerringerBuilder {
 export class M1911Builder {
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: number): Promise<RuntimeObject> {
+  async build(parentId: ObjId): Promise<RuntimeObject> {
     const parent = await this.manager.load(parentId);
     const obj = await this.manager.create({
       parent: parent!,
@@ -572,7 +572,7 @@ export class M1911Builder {
 export class RifleBuilder {
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: number): Promise<RuntimeObject> {
+  async build(parentId: ObjId): Promise<RuntimeObject> {
     const parent = await this.manager.load(parentId);
     const obj = await this.manager.create({
       parent: parent!,
@@ -599,7 +599,7 @@ export class RifleBuilder {
 export class BoltActionRifleBuilder {
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: number): Promise<RuntimeObject> {
+  async build(parentId: ObjId): Promise<RuntimeObject> {
     const parent = await this.manager.load(parentId);
     const obj = await this.manager.create({
       parent: parent!,
@@ -626,7 +626,7 @@ export class BoltActionRifleBuilder {
 export class LeverActionRifleBuilder {
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: number): Promise<RuntimeObject> {
+  async build(parentId: ObjId): Promise<RuntimeObject> {
     const parent = await this.manager.load(parentId);
     const obj = await this.manager.create({
       parent: parent!,
@@ -653,7 +653,7 @@ export class LeverActionRifleBuilder {
 export class HuntingRifleBuilder {
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: number): Promise<RuntimeObject> {
+  async build(parentId: ObjId): Promise<RuntimeObject> {
     const parent = await this.manager.load(parentId);
     const obj = await this.manager.create({
       parent: parent!,
@@ -680,7 +680,7 @@ export class HuntingRifleBuilder {
 export class Rifle22Builder {
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: number): Promise<RuntimeObject> {
+  async build(parentId: ObjId): Promise<RuntimeObject> {
     const parent = await this.manager.load(parentId);
     const obj = await this.manager.create({
       parent: parent!,
@@ -711,7 +711,7 @@ export class Rifle22Builder {
 export class ShotgunBuilder {
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: number): Promise<RuntimeObject> {
+  async build(parentId: ObjId): Promise<RuntimeObject> {
     const parent = await this.manager.load(parentId);
     const obj = await this.manager.create({
       parent: parent!,
@@ -739,7 +739,7 @@ export class ShotgunBuilder {
 export class PumpShotgunBuilder {
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: number): Promise<RuntimeObject> {
+  async build(parentId: ObjId): Promise<RuntimeObject> {
     const parent = await this.manager.load(parentId);
     const obj = await this.manager.create({
       parent: parent!,
@@ -766,7 +766,7 @@ export class PumpShotgunBuilder {
 export class SawnOffShotgunBuilder {
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: number): Promise<RuntimeObject> {
+  async build(parentId: ObjId): Promise<RuntimeObject> {
     const parent = await this.manager.load(parentId);
     const obj = await this.manager.create({
       parent: parent!,
@@ -793,7 +793,7 @@ export class SawnOffShotgunBuilder {
 export class DoubleBarrelBuilder {
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: number): Promise<RuntimeObject> {
+  async build(parentId: ObjId): Promise<RuntimeObject> {
     const parent = await this.manager.load(parentId);
     const obj = await this.manager.create({
       parent: parent!,
@@ -821,7 +821,7 @@ export class DoubleBarrelBuilder {
 export class CoachGunBuilder {
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: number): Promise<RuntimeObject> {
+  async build(parentId: ObjId): Promise<RuntimeObject> {
     const parent = await this.manager.load(parentId);
     const obj = await this.manager.create({
       parent: parent!,
@@ -852,7 +852,7 @@ export class CoachGunBuilder {
 export class SmgBuilder {
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: number): Promise<RuntimeObject> {
+  async build(parentId: ObjId): Promise<RuntimeObject> {
     const parent = await this.manager.load(parentId);
     const obj = await this.manager.create({
       parent: parent!,
@@ -877,7 +877,7 @@ export class SmgBuilder {
 export class MachinePistolBuilder {
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: number): Promise<RuntimeObject> {
+  async build(parentId: ObjId): Promise<RuntimeObject> {
     const parent = await this.manager.load(parentId);
     const obj = await this.manager.create({
       parent: parent!,
@@ -902,7 +902,7 @@ export class MachinePistolBuilder {
 export class UziBuilder {
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: number): Promise<RuntimeObject> {
+  async build(parentId: ObjId): Promise<RuntimeObject> {
     const parent = await this.manager.load(parentId);
     const obj = await this.manager.create({
       parent: parent!,
@@ -927,7 +927,7 @@ export class UziBuilder {
 export class Mac10Builder {
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: number): Promise<RuntimeObject> {
+  async build(parentId: ObjId): Promise<RuntimeObject> {
     const parent = await this.manager.load(parentId);
     const obj = await this.manager.create({
       parent: parent!,
@@ -952,7 +952,7 @@ export class Mac10Builder {
 export class TecBuilder {
   constructor(private manager: ObjectManager) {}
 
-  async build(parentId: number): Promise<RuntimeObject> {
+  async build(parentId: ObjId): Promise<RuntimeObject> {
     const parent = await this.manager.load(parentId);
     const obj = await this.manager.create({
       parent: parent!,

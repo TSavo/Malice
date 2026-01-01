@@ -84,13 +84,13 @@ export async function applyExtractedPrototypeSpec(
     aliases[parentAlias],
     `Alias '${parentAlias}' (parent of '${spec.alias}')`,
   );
-  const updatedParent = raw.parent.value !== parentId;
+  const updatedParent = raw.parent.id !== parentId;
 
   const nextProperties = { ...existingProperties };
   const nextMethods = { ...existingMethods };
 
   if (updatedParent) {
-    raw.parent = { type: 'objref', value: parentId };
+    raw.parent = { type: 'objref', target: 'object', id: parentId };
   }
 
   for (const [key, value] of Object.entries(spec.properties)) {

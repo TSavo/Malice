@@ -1,5 +1,5 @@
 import { type Collection, type Db, MongoClient } from 'mongodb';
-import type { GameObject, ObjId } from '../../types/object';
+import type { GameObject, ObjId, TypeObject } from '../../types/object';
 
 /**
  * Sanitize an object for MongoDB storage, removing circular references
@@ -48,12 +48,17 @@ function sanitizeForMongo(
 }
 
 /**
- * MongoDB persistence layer for game objects
+ * MongoDB persistence layer for game objects and types
+ *
+ * Two collections:
+ * - types: Named definitions (TypeObject) - keyed by string name
+ * - objects: Numbered instances (GameObject) - keyed by numeric ID
  */
 export class ObjectDatabase {
   private client!: MongoClient;
   private db!: Db;
   private objects!: Collection<GameObject>;
+  private types!: Collection<TypeObject>;
   private connected = false;
 
   constructor(
@@ -72,9 +77,12 @@ export class ObjectDatabase {
 
     this.db = this.client.db(this.dbName);
     this.objects = this.db.collection<GameObject>('objects');
+    this.types = this.db.collection<TypeObject>('types');
 
     // Ensure indexes (_id is unique by default, no need to specify)
     await this.objects.createIndex({ 'parent.value': 1 });
+    // Types: index on parent.name for type inheritance queries
+    await this.types.createIndex({ 'parent.name': 1 });
 
     this.connected = true;
   }
@@ -336,14 +344,14 @@ export class ObjectDatabase {
    * Get next available object ID (sequential allocation)
    * Note: ID reuse for recycled objects is handled by $.recycler
    */
-  async getNextId(): Promise<ObjId> {
+  async getNextId(): Promise<number> {
     const result = await this.objects
       .find({})
       .sort({ _id: -1 })
       .limit(1)
       .toArray();
 
-    return result.length > 0 ? result[0]._id + 1 : 1;
+    return result.length > 0 ? (result[0]._id as number) + 1 : 1;
   }
 
   /**
@@ -382,7 +390,7 @@ export class ObjectDatabase {
     if (!exists) {
       await this.create({
         _id: 1,
-        parent: { type: 'objref', value: 0 }, // Root's parent is #0 (ObjectManager)
+        parent: { type: 'objref', target: 'object', id: 0 }, // Root's parent is #0 (ObjectManager)
         properties: {},
         methods: {},
       });
@@ -408,5 +416,145 @@ export class ObjectDatabase {
   async listAll(includeRecycled = false): Promise<GameObject[]> {
     const query = includeRecycled ? {} : { recycled: { $ne: true } };
     return await this.objects.find(query).toArray();
+  }
+
+  // ==========================================================================
+  // Type Collection Methods
+  // ==========================================================================
+
+  /**
+   * Get type by name
+   */
+  async getType(name: string): Promise<TypeObject | null> {
+    return await this.types.findOne({ _id: name });
+  }
+
+  /**
+   * Create a new type
+   */
+  async createType(
+    type: Omit<TypeObject, 'created' | 'modified'>,
+  ): Promise<TypeObject> {
+    const now = new Date();
+    const sanitizedType = sanitizeForMongo(
+      type,
+      new WeakSet(),
+      `createType:${type._id}`,
+    ) as typeof type;
+
+    const newType: TypeObject = {
+      ...sanitizedType,
+      created: now,
+      modified: now,
+    };
+
+    await this.types.insertOne(newType as any);
+    return newType;
+  }
+
+  /**
+   * Update existing type
+   */
+  async updateType(
+    name: string,
+    updates: Partial<Omit<TypeObject, '_id' | 'created'>>,
+  ): Promise<void> {
+    const sanitized = sanitizeForMongo(updates, new WeakSet(), `type:${name}`);
+
+    await this.types.updateOne(
+      { _id: name },
+      {
+        $set: {
+          ...sanitized,
+          modified: new Date(),
+        },
+      },
+    );
+  }
+
+  /**
+   * Atomically set a single method on a type
+   */
+  async setTypeMethod(
+    name: string,
+    methodName: string,
+    methodDef: {
+      code: string;
+      callable?: boolean;
+      aliases?: string[];
+      help?: string;
+    },
+  ): Promise<void> {
+    const sanitized = sanitizeForMongo(
+      methodDef,
+      new WeakSet(),
+      `type:${name}.methods.${methodName}`,
+    );
+
+    await this.types.updateOne(
+      { _id: name },
+      {
+        $set: {
+          [`methods.${methodName}`]: sanitized,
+          modified: new Date(),
+        },
+      },
+    );
+  }
+
+  /**
+   * Atomically set a single property on a type
+   */
+  async setTypeProperty(
+    name: string,
+    propName: string,
+    value: unknown,
+  ): Promise<void> {
+    const sanitized = sanitizeForMongo(
+      value,
+      new WeakSet(),
+      `type:${name}.properties.${propName}`,
+    );
+
+    await this.types.updateOne(
+      { _id: name },
+      {
+        $set: {
+          [`properties.${propName}`]: sanitized,
+          modified: new Date(),
+        },
+      },
+    );
+  }
+
+  /**
+   * Check if type exists
+   */
+  async typeExists(name: string): Promise<boolean> {
+    const count = await this.types.countDocuments({ _id: name });
+    return count > 0;
+  }
+
+  /**
+   * Delete a type
+   */
+  async deleteType(name: string): Promise<void> {
+    await this.types.deleteOne({ _id: name });
+  }
+
+  /**
+   * List all types
+   */
+  async listAllTypes(): Promise<TypeObject[]> {
+    return await this.types.find({}).toArray();
+  }
+
+  /**
+   * Get children types (types that have this type as parent)
+   */
+  async getTypeChildren(parentName: string): Promise<TypeObject[]> {
+    return await this.types
+      .find({ 'parent.name': parentName } as any)
+      .toArray();
   }
 }

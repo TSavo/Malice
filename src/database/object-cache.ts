@@ -28,7 +28,7 @@ export interface CacheStats {
 }
 
 export interface ParentChain {
-  parents: ObjId[]; // Ordered from immediate parent to root
+  parents: number[]; // Ordered from immediate parent to root (always numeric for objects)
   timestamp: number;
 }
 
@@ -52,8 +52,8 @@ export class ObjectCache {
   // Compiled method cache - key: "objId:methodName"
   private compiledMethods = new Map<string, string>();
 
-  // Parent chain cache for fast inheritance lookups
-  private parentChains = new Map<ObjId, ParentChain>();
+  // Parent chain cache for fast inheritance lookups (objects only, by numeric ID)
+  private parentChains = new Map<number, ParentChain>();
 
   // Statistics
   private stats: CacheStats = {
@@ -67,9 +67,10 @@ export class ObjectCache {
   };
 
   /**
-   * Get object from cache
+   * Get object from cache (objects only, by numeric ID)
+   * For types, use ObjectManager.getTypeSync() instead
    */
-  getObject(id: ObjId): RuntimeObject | undefined {
+  getObject(id: number): RuntimeObject | undefined {
     const obj = id >= 0 ? this.objects[id] : this.infrastructureObjects.get(id);
     if (obj) {
       this.stats.cacheHits++;
@@ -81,8 +82,9 @@ export class ObjectCache {
 
   /**
    * Store object in cache (never evicts)
+   * For types, use ObjectManager.typeCache instead
    */
-  setObject(id: ObjId, obj: RuntimeObject): void {
+  setObject(id: number, obj: RuntimeObject): void {
     if (id >= 0) {
       if (this.objects[id] === undefined) {
         this.stats.objectsCached++;
@@ -99,7 +101,7 @@ export class ObjectCache {
   /**
    * Check if object is cached
    */
-  hasObject(id: ObjId): boolean {
+  hasObject(id: number): boolean {
     return id >= 0
       ? this.objects[id] !== undefined
       : this.infrastructureObjects.has(id);
@@ -146,9 +148,9 @@ export class ObjectCache {
   }
 
   /**
-   * Get cached parent chain
+   * Get cached parent chain (objects only)
    */
-  getParentChain(objId: ObjId): ParentChain | undefined {
+  getParentChain(objId: number): ParentChain | undefined {
     const chain = this.parentChains.get(objId);
     if (chain) {
       this.stats.cacheHits++;
@@ -159,9 +161,9 @@ export class ObjectCache {
   }
 
   /**
-   * Store parent chain (never evicts)
+   * Store parent chain (never evicts, objects only)
    */
-  setParentChain(objId: ObjId, parents: ObjId[]): void {
+  setParentChain(objId: number, parents: number[]): void {
     if (!this.parentChains.has(objId)) {
       this.stats.parentChainsCached++;
     }
@@ -175,7 +177,7 @@ export class ObjectCache {
    * Invalidate transient caches for an object
    * Does NOT remove the object proxy (Stable Proxy Pattern)
    */
-  invalidate(objId: ObjId): void {
+  invalidate(objId: number): void {
     this.stats.invalidations++;
 
     // Remove all compiled methods for this object
@@ -240,24 +242,24 @@ export class ObjectCache {
   }
 
   /**
-   * Get a cached object directly
+   * Get a cached object directly (objects only, by numeric ID)
    */
-  get(id: ObjId): RuntimeObject | undefined {
+  get(id: number): RuntimeObject | undefined {
     return this.getObject(id);
   }
 
   /**
-   * Set a cached object directly
+   * Set a cached object directly (objects only, by numeric ID)
    */
-  set(id: ObjId, obj: RuntimeObject): void {
+  set(id: number, obj: RuntimeObject): void {
     this.setObject(id, obj);
   }
 
   /**
    * Get all object IDs in the cache
    */
-  getAllIds(): ObjId[] {
-    const ids: ObjId[] = [];
+  getAllIds(): number[] {
+    const ids: number[] = [];
     for (let i = 0; i < this.objects.length; i++) {
       if (this.objects[i] !== undefined) {
         ids.push(i);
