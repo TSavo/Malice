@@ -88,11 +88,20 @@ import './prototypes/car-builder';
 import './prototypes/garage-builder';
 import './prototypes/mechanic-builder';
 
-// Airspace system (for aircraft)
+// Dynamic room types (created by $spatial)
 import './prototypes/airspace-room-builder';
+import './prototypes/water-room-builder';
+import './prototypes/underwater-room-builder';
+
+// Aircraft
 import './prototypes/rotor-builder';
 import './prototypes/aircraft-builder';
 import './prototypes/helicopter-builder';
+
+// Watercraft
+import './prototypes/watercraft-builder';
+import './prototypes/boat-builder';
+import './prototypes/submarine-builder';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // CLIENT MODULES (JS served to browser)
@@ -129,7 +138,7 @@ import './preauth-handler-builder';
 
 // Spatial and environment
 import './spatial-builder';
-import './airspace-builder';
+import './builder-system-builder';
 
 // Text formatting and language
 import './prompt-builder';
