@@ -165,14 +165,29 @@ DECISION RULES:
 IF YOU BUILD:
 1. Create room with $recycler.create($room, {x:\${x}, y:\${y}, z:\${z}})
 2. Set: name, description, outdoor, lighting (0-100), population (0-100), ambientNoise (0-100)
-3. Link to ALL valid neighbors using $builder.connect(newRoom, neighbor, direction)
+3. Create bidirectional exits to ALL valid neighbors (see prompt for exit creation)
 
-SPATIAL RULES FOR EXITS:
-- Same column (same x,y): ALWAYS connect (stairs/fly)
-- BOTH outdoor: Connect horizontally (any z)
-- z=0 outdoor→indoor: Connect as door
-- z>0, not both outdoor, different column: NO CONNECTION
-- Diagonal: Only if both outdoor
+SPATIAL RULES FOR EXITS (CRITICAL - think carefully!):
+
+DO CONNECT:
+- Same column (same x,y, different z): Stairs, ladder, or flight between floors
+- Both outdoor at z=0: Street connection, alley, sidewalk
+- Both outdoor at z>0: Open air, rooftop to rooftop (if adjacent)
+- z=0 outdoor to z=0 indoor (same x,y): Door into building
+- z>0 indoor same column: Stairs between floors of SAME building
+
+DO NOT CONNECT:
+- z>0 indoor to z>0 indoor DIFFERENT columns: Different buildings! No floating bridges!
+- z>0 outdoor to z>0 indoor different column: Can't walk from sky into another building
+- Diagonal at z>0: No diagonal air connections
+- Underground to surface (different column): Tunnels don't randomly surface
+
+THINK ARCHITECTURALLY:
+- Buildings are vertical stacks (same x,y column)
+- Streets are horizontal connections (same z=0)
+- Airspace connects outdoor-to-outdoor only
+- A door into a building is at z=0 (street level)
+- Upper floors only connect within their building column
 
 Use execute_moo_code. Return { built: true, roomId, name } or { built: false, reason: '...' }\`;
 
@@ -182,69 +197,6 @@ Use execute_moo_code. Return { built: true, roomId, name } or { built: false, re
       // Check if room was created
       const created = await $spatial.getRoomDataAt(x, y, z);
       return created || null;
-      `,
-    );
-
-    // ============== CONNECT (helper) ==============
-    this.builder.setMethod(
-      'connect',
-      `
-      /**
-       * Create bidirectional exits between two rooms.
-       * @param room1 - First room
-       * @param room2 - Second room
-       * @param direction - Direction from room1 to room2
-       * @param options - { vehicleAllowed }
-       */
-      const room1 = args[0];
-      const room2 = args[1];
-      const direction = args[2];
-      const options = args[3] || {};
-
-      if (!room1 || !room2 || !direction) return null;
-
-      const opposites = {
-        north: 'south', south: 'north',
-        east: 'west', west: 'east',
-        northeast: 'southwest', southwest: 'northeast',
-        northwest: 'southeast', southeast: 'northwest',
-        up: 'down', down: 'up',
-      };
-      const opposite = opposites[direction.toLowerCase()] || 'back';
-
-      const aliasMap = {
-        north: ['n'], south: ['s'], east: ['e'], west: ['w'],
-        northeast: ['ne'], northwest: ['nw'], southeast: ['se'], southwest: ['sw'],
-        up: ['u'], down: ['d', 'dn'],
-      };
-
-      // Calculate distance
-      const dx = Math.abs((room2.x || 0) - (room1.x || 0));
-      const dy = Math.abs((room2.y || 0) - (room1.y || 0));
-      const dz = Math.abs((room2.z || 0) - (room1.z || 0));
-      const distance = Math.round(Math.sqrt(dx*30*dx*30 + dy*30*dy*30 + dz*3*dz*3)) || 10;
-
-      // Forward exit
-      const exit1 = await $recycler.create($exit, {
-        name: direction,
-        aliases: aliasMap[direction.toLowerCase()] || [],
-        destRoom: room2,
-        distance: distance,
-        vehicleAllowed: options.vehicleAllowed || false,
-      });
-      await room1.addExit(exit1);
-
-      // Return exit
-      const exit2 = await $recycler.create($exit, {
-        name: opposite,
-        aliases: aliasMap[opposite.toLowerCase()] || [],
-        destRoom: room1,
-        distance: distance,
-        vehicleAllowed: options.vehicleAllowed || false,
-      });
-      await room2.addExit(exit2);
-
-      return { forward: exit1, backward: exit2 };
       `,
     );
 
@@ -319,15 +271,23 @@ room.lighting = 50;  // 0-100
 room.population = 0; // 0-100
 room.ambientNoise = 20; // 0-100
 
-// 3. Link to ALL valid neighbors (provided in prompt)
-// Use $builder.connect(room, neighbor, direction, { vehicleAllowed })
+// 3. Link to valid neighbors ONLY - think architecturally!
+// For each valid neighbor, create exit from new room AND exit back
 
-// Spatial rules:
-// - Same column: ALWAYS connect
-// - BOTH outdoor: Connect (any z)
-// - z=0 outdoor→indoor: Connect as door
-// - z>0, not both outdoor, different column: NO
-// - Diagonal: Only both outdoor
+// DO CONNECT:
+// - Same column (same x,y): Stairs between floors of SAME building
+// - Both outdoor z=0: Street/alley connection
+// - Both outdoor z>0: Open air (rooftop, sky)
+// - z=0 outdoor→indoor same column: Door into building
+
+// DO NOT CONNECT:
+// - z>0 indoor different columns: Different buildings!
+// - z>0 outdoor to indoor different column: Can't enter building from sky
+// - Diagonal at z>0: No diagonal air passages
+// - Underground to surface different column: Tunnels contained
+
+// THINK: Buildings are vertical stacks. Streets are horizontal.
+// Don't create floating bridges between buildings!
 
 return { built: true, roomId: room.id, name: room.name };
 \`\`\`
@@ -342,7 +302,296 @@ return { built: false, reason: 'Explanation of why this does not make sense' };
 
 Cyberpunk noir. Gritty, atmospheric. Rain-soaked dystopia.
 Names: Short, evocative ("Neon Alley", "Open Sky", "Murky Depths")
-Descriptions: Sensory details, mood, hints of story.`;
+Descriptions: Sensory details, mood, hints of story.
+
+## EXIT SYSTEM
+
+Exits connect rooms. Create bidirectional exits (one in each direction) for normal passages.
+
+### Exit Properties
+- name: Direction name ('north', 'door', 'stairs')
+- aliases: Shortcuts (['n'], ['d', 'dn'])
+- destRoom: Destination room object
+- distance: Meters (affects travel time)
+- hidden: true = secret passage (not shown in room description)
+- vehicleAllowed: true for roads/streets, false for stairs/ladders/indoor
+
+### Custom Exit (named passage)
+\`\`\`javascript
+const exit = await $recycler.create($exit, {
+  name: 'rusty door',
+  aliases: ['door', 'west', 'w'],
+  destRoom: backRoom,
+  distance: 5,
+  hidden: false,
+  vehicleAllowed: false
+});
+await room.addExit(exit);
+\`\`\`
+
+## DOOR SYSTEM
+
+Doors are shared objects that control passage. Attach to exits for access control.
+
+### Creating a Door on an Exit
+\`\`\`javascript
+// Create the door
+const door = await $recycler.create($door, {
+  name: 'steel security door',
+  locked: true,
+  open: false,
+  lockDifficulty: 7,  // 1-10, harder to pick
+  durability: 100,     // structural integrity
+  material: 'steel',   // affects forcing/damage
+  autolockOnClose: true
+});
+
+// Create exit with door attached
+const exit = await $recycler.create($exit, {
+  name: 'security door',
+  aliases: ['door', 'north', 'n'],
+  destRoom: secureRoom,
+  door: door  // Attach the door
+});
+await lobby.addExit(exit);
+
+// Create return exit sharing SAME door
+const returnExit = await $recycler.create($exit, {
+  name: 'security door',
+  aliases: ['door', 'south', 's'],
+  destRoom: lobby,
+  door: door  // Same door object - bidirectional
+});
+await secureRoom.addExit(returnExit);
+\`\`\`
+
+### Door Properties
+- locked: true = won't open without authorization
+- open: true = swung open, passage allowed
+- locks: Array of $lock objects for access control
+- lockDifficulty: 1-10 resistance to picking
+- durability: 0-100 structural integrity
+- material: 'wood', 'steel', 'glass' (affects damage)
+- autolockOnClose: true = auto-locks when closed
+
+### Door State for Passage
+- canPass(): returns true if open && !locked
+- AI narrator handles unlock/pick/force via abilities
+
+## LOCK SYSTEM
+
+Locks provide authorization. Add to doors or exits for access control.
+
+### Creating a Locked Door
+\`\`\`javascript
+// Create a lock with authorized users
+const lock = await $recycler.create($lock, {
+  name: 'security lock',
+  verifiedUsers: [manager, securityGuard],  // Pre-authorized
+  difficulty: 6
+});
+
+// Create door with lock
+const door = await $recycler.create($door, {
+  name: 'office door',
+  locked: true,
+  open: false,
+  locks: [lock]  // Lock controls access
+});
+\`\`\`
+
+### Lock Properties
+- verifiedUsers: Array of authorized player objects
+- difficulty: 1-10 picking resistance
+
+### Lock Methods
+- isAuthorized(player): Check if player in verifiedUsers
+- authorize(player): Add player to verifiedUsers
+- revoke(player): Remove from verifiedUsers
+
+### Multiple Locks (composable security)
+\`\`\`javascript
+const keyLock = await $recycler.create($lock, { verifiedUsers: [] });
+const bioLock = await $recycler.create($biometricLock, { verifiedUsers: [] });
+
+const door = await $recycler.create($door, {
+  locks: [keyLock, bioLock]  // Both must authorize
+});
+\`\`\`
+
+## ELEVATOR SYSTEM
+
+Elevators are rooms that move between floors. Use for vertical building access.
+
+### Creating an Elevator
+\`\`\`javascript
+// Create elevator (it's a room that moves)
+const elevator = await $recycler.create($elevator, {
+  name: 'Main Elevator',
+  description: 'Brushed steel walls reflect distorted neon. A panel glows with floor buttons.',
+  currentFloor: 1,
+  floors: [1, 2, 3, 10, 11, 42],  // Accessible floors
+  floorRooms: {},  // Will be populated
+  doorsOpen: true,
+  travelTimePerFloor: 2000,  // 2 seconds per floor
+  capacity: 8
+});
+
+// Create lobby rooms for each floor
+const lobby1 = await $recycler.create($room, { name: 'Ground Floor Lobby', x: 5, y: 5, z: 0 });
+const lobby2 = await $recycler.create($room, { name: 'Second Floor', x: 5, y: 5, z: 1 });
+const lobby42 = await $recycler.create($room, { name: 'Penthouse Lobby', x: 5, y: 5, z: 14 });
+
+// Map floors to rooms
+elevator.floorRooms = {
+  1: lobby1,
+  2: lobby2,
+  42: lobby42
+};
+
+// Create 'out' exit from elevator (updates destination on arrival)
+const elevatorOut = await $recycler.create($exit, {
+  name: 'out',
+  aliases: ['o', 'exit', 'doors'],
+  destRoom: lobby1,  // Initial destination
+  distance: 2
+});
+await elevator.addExit(elevatorOut);
+
+// Create 'elevator' exit from each lobby INTO the elevator
+for (const [floor, lobby] of Object.entries(elevator.floorRooms)) {
+  const toElevator = await $recycler.create($exit, {
+    name: 'elevator',
+    aliases: ['e', 'lift'],
+    destRoom: elevator,
+    distance: 2
+  });
+  await lobby.addExit(toElevator);
+}
+\`\`\`
+
+### Elevator Properties
+- currentFloor: Current floor number
+- floors: Array of accessible floor numbers [1, 2, 10, 42]
+- floorRooms: Map { floorNum: roomObject }
+- moving: true while in motion
+- destination: Target floor (or null)
+- doorsOpen: true when doors open
+- travelTimePerFloor: ms per floor (default 2000)
+- capacity: Max passengers
+- locks: Array of locks for floor access control
+
+### Elevator Operation
+- Player says "press 5" → AI calls elevator.selectFloor(player, 5)
+- selectFloor() checks locks, closes doors, schedules arrival
+- arrive() updates currentFloor, changes 'out' exit destination, opens doors
+
+### Restricted Floor Access
+\`\`\`javascript
+// Create lock for penthouse
+const penthouseLock = await $recycler.create($lock, {
+  name: 'penthouse access',
+  verifiedUsers: [owner, butler]
+});
+
+// Add to elevator
+elevator.locks = [penthouseLock];
+
+// Now only authorized users can select floor 42
+\`\`\`
+
+### Elevator Doors (lobby side)
+
+Use $elevatorDoor on lobby exits - only allows passage when elevator is present.
+
+\`\`\`javascript
+// Create elevator door for lobby
+const elevatorDoor = await $recycler.create($elevatorDoor, {
+  name: 'Elevator Doors',
+  elevator: elevator,  // Reference to the elevator
+  floor: 1             // This door is on floor 1
+});
+
+// Create exit from lobby with elevator door
+const toElevator = await $recycler.create($exit, {
+  name: 'elevator',
+  aliases: ['e', 'lift'],
+  destRoom: elevator,
+  door: elevatorDoor  // Blocks entry when elevator not present
+});
+await lobby.addExit(toElevator);
+\`\`\`
+
+### $elevatorDoor Properties
+- elevator: Reference to elevator object
+- floor: Floor number this door is on
+- canPass(): Only true when elevator.currentFloor === floor AND elevator.doorsOpen
+
+## GUARDED EXITS
+
+Use $guardedExit for faction-restricted passages.
+
+\`\`\`javascript
+// Create faction-restricted exit
+const factionDoor = await $recycler.create($guardedExit, {
+  name: 'secure passage',
+  aliases: ['passage', 'north', 'n'],
+  destRoom: factionHQ,
+  allowedFaction: 'Continuum',  // Only Continuum members pass
+  denyMessage: 'The guards block your way. "Continuum personnel only."'
+});
+await lobby.addExit(factionDoor);
+\`\`\`
+
+### $guardedExit Properties
+- allowedFaction: Faction name that can pass (null = unrestricted)
+- denyMessage: Custom rejection message
+- Faction check happens BEFORE door/lock checks
+
+## WHEN TO CREATE WHAT
+
+| Situation | Create |
+|-----------|--------|
+| Open passage between rooms | Two $exit objects (bidirectional) |
+| Passage with door | $exit + $door attached |
+| Locked door | $door with locks:[$lock] |
+| Secret passage | $exit with hidden:true |
+| Multi-floor building | $elevator + lobby rooms + $elevatorDoor |
+| Vehicle road | $exit with vehicleAllowed:true |
+| Stairs between floors | $exit named 'stairs' (no vehicleAllowed) |
+| Faction-restricted area | $guardedExit with allowedFaction |
+
+## CREATING BIDIRECTIONAL EXITS
+
+When connecting two rooms, always create exits in BOTH directions:
+
+\`\`\`javascript
+// Forward exit: room1 → room2
+const exitForward = await $recycler.create($exit, {
+  name: 'north',
+  aliases: ['n'],
+  destRoom: room2,
+  distance: 30
+});
+await room1.addExit(exitForward);
+
+// Backward exit: room2 → room1
+const exitBackward = await $recycler.create($exit, {
+  name: 'south',
+  aliases: ['s'],
+  destRoom: room1,
+  distance: 30
+});
+await room2.addExit(exitBackward);
+\`\`\`
+
+Standard direction opposites:
+- north ↔ south
+- east ↔ west
+- up ↔ down
+- northeast ↔ southwest
+- northwest ↔ southeast
+- in ↔ out`;
   }
 }
 
