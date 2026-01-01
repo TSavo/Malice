@@ -565,57 +565,73 @@ const exitUp = await $recycler.create($exit, {
 
 ## Physical Reality Check
 
-You are building in Seattle. Buildings are SEPARATE structures. You CANNOT:
-- Walk horizontally from the 3rd floor of one building into the 3rd floor of another building
-- Create an exit "west" from floor 3 of Building A to floor 3 of Building B
-- Magically connect indoor spaces in different buildings
+You are building in Seattle. Buildings are SEPARATE structures. The key rule is:
+**INDOOR rooms at z>0 cannot connect horizontally to rooms in different buildings.**
+
+But OUTDOOR spaces CAN connect horizontally at any z-level because you can walk/fly between them.
 
 ## Exit Rules by Location
 
-### Same Building (same x,y, different z)
-- Vertical movement (up/down) via stairs, elevator, ladder: ALLOWED
-- These ARE connected - they're the same structure
+### Same Column (same x,y, different z)
+- Vertical movement (up/down) via stairs, elevator, ladder: ALWAYS ALLOWED
+- These ARE connected - they're the same structure or same airspace column
+- Outdoor to outdoor vertically: ALLOWED (flying, climbing, falling)
 
-### Different Buildings (different x,y, same z > 0)
-- Horizontal movement at z > 0: USUALLY NOT ALLOWED
-- Exception: Skywalks, bridges, fire escapes between adjacent rooftops
-- If both are indoor, they are SEPARATE buildings - NO EXIT
+### Different Columns (different x,y), ANY z-level
+**Check: Are BOTH rooms outdoor?**
+- BOTH outdoor → ALLOWED (streets connect, rooftops connect, open sky connects)
+- One or both indoor → NOT ALLOWED at z>0 (different buildings)
+- z=0 outdoor→indoor: ALLOWED (entering a building)
 
 ### Ground Level (z = 0)
-- Horizontal outdoor-to-outdoor: ALLOWED (streets connect)
-- Outdoor to indoor: ALLOWED (enter building)
+- Outdoor-to-outdoor: ALLOWED (streets, plazas, parks)
+- Outdoor to indoor: ALLOWED (entering building)
 - Indoor to indoor (different x,y): NOT ALLOWED (different buildings)
 
+### Above Ground (z > 0)
+- **Both outdoor (rooftops, airspace)**: ALLOWED - you can walk/fly between adjacent rooftops
+- **Indoor to indoor**: NOT ALLOWED - these are different buildings!
+- **Indoor to outdoor**: Usually NOT ALLOWED unless this IS the rooftop access
+
 ### Underground (z < 0)
-- Connected tunnels/sewers may span multiple x,y: context-dependent
-- Subway tunnels connect stations
-- Basements usually don't connect to neighbors
+- Tunnels/sewers may connect horizontally (context-dependent)
+- Basements usually don't connect to neighbor basements
+- Use judgment based on what the spaces are
 
 ## Decision Tree for Exits
 
-Ask yourself:
-
 1. **Is the neighbor in the same column (same x,y)?**
-   - YES → vertical exit (stairs/ladder/elevator) is OK
-   - NO → continue to step 2
+   - YES → vertical exit is OK (stairs/elevator/ladder/flying)
 
-2. **Are we at z=0 (ground level)?**
-   - YES → horizontal outdoor exits are OK
+2. **Are BOTH this room AND the neighbor outdoor?**
+   - YES → horizontal exit is OK at ANY z-level
+     - z=0: streets, plazas ("north", "south")
+     - z>0: rooftops, airspace ("leap to north rooftop", "fly north")
    - NO → continue to step 3
 
-3. **Is this a special structure (skywalk, bridge, fire escape)?**
-   - YES → you can create that specific type of exit
-   - NO → DO NOT CREATE AN EXIT to that neighbor
+3. **Are we at z=0 AND is this an outdoor→indoor transition?**
+   - YES → door/entrance exit is OK
+   - NO → DO NOT CREATE an exit
 
 ## Examples
 
-**WRONG**: Room at (5, 3, 3) [3rd floor office] creating exit "west" to room at (4, 3, 3) [3rd floor apartment in different building]
+**WRONG**: Room at (5, 3, 3) [indoor office] creating exit "west" to room at (4, 3, 3) [indoor apartment]
+→ Different buildings! No connection.
 
-**RIGHT**: Room at (5, 3, 3) [3rd floor office] creating exit "down" to room at (5, 3, 2) [2nd floor of same building]
+**RIGHT**: Room at (5, 3, 3) [outdoor rooftop] creating exit "leap west" to room at (4, 3, 3) [outdoor rooftop]
+→ Both outdoor, rooftops can connect.
 
-**RIGHT**: Room at (5, 3, 0) [street corner] creating exit "west" to room at (4, 3, 0) [adjacent street]
+**RIGHT**: Room at (5, 3, 5) [open sky] creating exit "fly north" to room at (5, 4, 5) [open sky]
+→ Both outdoor airspace, flying between them.
 
-**RIGHT**: Room at (5, 3, 0) [street] creating exit "glass doors" to room at (5, 3, 0) [lobby] - wait, same coords? This would be indoor/outdoor at same spot, which is a design issue. Indoor lobby should be at a different position or handled differently.
+**RIGHT**: Room at (5, 3, 3) [indoor office] creating exit "down" to room at (5, 3, 2) [indoor hallway]
+→ Same column, vertical is OK.
+
+**RIGHT**: Room at (5, 3, 0) [outdoor street] creating exit "lobby door" to room at (5, 3, 0) [indoor lobby]
+→ z=0 outdoor→indoor is entering a building. (Note: same coords means building entrance is at street level)
+
+**RIGHT**: Room at (5, 3, 0) [outdoor street] creating exit "north" to room at (5, 4, 0) [outdoor plaza]
+→ Ground level outdoor to outdoor.
 
 ---
 
@@ -633,46 +649,44 @@ Before building, you'll be told:
 
 ## Making Decisions Based on Context
 
-### Same column (same x,y), different z → CONNECT vertically
-- Use "stairs up", "stairs down", "ladder", "elevator"
-- vehicleAllowed=false (usually)
+### Same column (same x,y), different z → ALWAYS CONNECT vertically
+- Indoor: "stairs up", "stairs down", "ladder", "elevator"
+- Outdoor: "climb", "fly up", "descend"
+- vehicleAllowed=false for stairs, could be true for aircraft in open sky
 
-### Ground level (z=0), outdoor neighbors → CONNECT horizontally
-- Use compass directions (north, south, etc.)
-- vehicleAllowed=true for streets
-- Set outdoor=true, lighting 40-70
+### Both rooms outdoor (any z) → CONNECT horizontally
+- z=0: compass directions ("north", "south")
+- z>0 rooftops: "leap to", "cross to", compass directions
+- z>0 airspace: "fly north", "glide west"
+- vehicleAllowed=true for streets and airspace, false for rooftop leaps
 
-### Ground level (z=0), indoor neighbor → CONNECT if entering building
-- Use "door", "entrance", "lobby"
-- Only connect if this represents entering/exiting a building
+### Ground level (z=0), outdoor→indoor → CONNECT as building entrance
+- Use "door", "entrance", "lobby door"
 - vehicleAllowed=false
+- Consider if door should be locked
 
-### Upper floor (z>0), neighbor at same z, different x or y → DO NOT CONNECT
-- These are different buildings!
-- No exit should be created
-- Exception: explicit skywalk/bridge
+### Upper floor (z>0), one or both indoor → CHECK CAREFULLY
+- Both indoor, different x,y: NO EXIT (different buildings)
+- Indoor to outdoor at same z: NO EXIT (unless rooftop access)
+- Same building (same x,y): connect via stairs
 
-### Underground (z<0), horizontal neighbors → CONTEXT-DEPENDENT
+### Underground (z<0), horizontal → CONTEXT-DEPENDENT
 - Sewers/tunnels might connect
 - Basements usually don't
-- Use judgment based on what this space is
+- Subway tunnels connect stations
 
-### If neighbors are indoor → this is probably indoor
-- Set outdoor=false, lighting 60-80
+### Setting outdoor property
+- Streets, plazas, rooftops, airspace: outdoor=true
+- Buildings, tunnels, basements: outdoor=false
+- Water surface: outdoor=true
+- Underwater: outdoor=false (enclosed by water)
 
-### If transitioning outdoor↔indoor
-- Name the exit after what you're entering: "glass doors", "lobby entrance", "warehouse door"
-- Consider: is there a door? Should it be lockable?
-
-### Underground (z < 0)
-- Usually indoor, dim lighting (20-40)
-- May be flooded (waterLevel > 0)
-- Often industrial, abandoned, or illicit spaces
-
-### Above ground (z > 0)
-- Could be indoor (upper floors) or outdoor (rooftops)
-- Rooftops: outdoor=true, good lighting during day
-- Indoor upper floors: outdoor=false
+### Lighting by location
+- Outdoor day: 70-100
+- Outdoor night/overcast: 30-50
+- Indoor well-lit: 60-80
+- Underground: 20-40
+- Underwater: 10-30 (decreases with depth)
 
 ---
 
@@ -815,15 +829,20 @@ return { success: true, name: room.name };
 Before your code runs, verify:
 - [ ] Name is short and evocative
 - [ ] Description is 2-4 sentences with sensory details
-- [ ] outdoor matches the location logic
+- [ ] outdoor=true for streets, rooftops, airspace, water surface
 - [ ] lighting makes sense (underground=dim, outdoor=variable, indoor=moderate)
-- [ ] **SPATIAL CHECK**: Did I only create exits where physically possible?
-  - z>0 horizontal to different x,y? → NO EXIT (different buildings!)
-  - Same x,y different z? → YES, stairs/elevator
-  - z=0 outdoor to outdoor? → YES, streets connect
-- [ ] Exit names match the transition type (compass for streets, "door"/"stairs" for transitions)
+- [ ] **SPATIAL CHECK**: Did I apply the rules correctly?
+  - Same x,y, different z → CONNECT (stairs/fly)
+  - BOTH outdoor → CONNECT (any z-level)
+  - z>0, one or both indoor, different x,y → NO EXIT
+  - z=0, outdoor→indoor → CONNECT (door)
+- [ ] Exit names match the context:
+  - Streets: compass directions
+  - Rooftops: "leap west", "cross to north building"
+  - Airspace: "fly north", "descend"
+  - Building: "door", "stairs"
 - [ ] BOTH directions created for each valid connection
-- [ ] vehicleAllowed is false for stairs, ladders, narrow passages
+- [ ] vehicleAllowed: true for streets/airspace, false for stairs/rooftop-leaps/doors
 - [ ] Distance: 30m for horizontal, 3m for vertical`;
   }
 }
