@@ -185,6 +185,18 @@ export { AircraftBuilder } from './aircraft-builder';
 export { HelicopterBuilder } from './helicopter-builder';
 export { VectorThrusterBuilder } from './vector-thruster-builder';
 export { AvBuilder } from './av-builder';
+// Explosives
+export { ExplosiveBuilder } from './explosive-builder';
+export { GrenadeBuilder } from './grenade-builder';
+export { FragGrenadeBuilder } from './frag-grenade-builder';
+export { FlashbangBuilder } from './flashbang-builder';
+export { SmokeGrenadeBuilder } from './smoke-grenade-builder';
+export { C4Builder } from './c4-builder';
+export { DetonatorBuilder } from './detonator-builder';
+export { MineBuilder } from './mine-builder';
+export { MolotovBuilder } from './molotov-builder';
+export { DynamiteBuilder } from './dynamite-builder';
+export { IedBuilder } from './ied-builder';
 // Weapons
 export { WeaponBuilder } from './weapon-builder';
 // Note: Bladed, Firearm, and Improvised weapons now use individual Builders that self-register
