@@ -867,87 +867,174 @@ if (object.describeForAI) {
 }
 ```
 
-## Dynamic Room Creation: $spatial.ensureRoom()
+## Dynamic Room Creation: $builder and $spatial.ensureRoom()
 
-You have access to AI-controlled room creation for **edge cases** where a location SHOULD exist but doesn't yet.
+You have access to AI-controlled room creation for exploring **undeveloped space** within the city.
+
+### Pioneer Square Has Gaps
+
+The city isn't fully built out. Pioneer Square has streets and major landmarks, but between them:
+- Abandoned buildings with boarded doors
+- Back alleys not yet explored
+- Upper floors of structures
+- Basements and sub-levels
+- Gaps between existing rooms
+
+**This is intentional.** When a player pushes into unexplored space that *makes physical sense*, you can use `$builder` to create it.
 
 ### When to Use It
 
-**Use ensureRoom() when:**
-- Room description mentions a location that doesn't exist yet ("an abandoned building to the north")
-- Player attempts to explore something described but not built
-- Filling in missing detail that should logically be there
+**Use $builder.build() when:**
+- Player explores a direction where no exit exists, but physically should
+- Room description implies adjacent spaces ("the alley continues north", "stairs lead up")
+- Player investigates something that would reveal new space ("I check behind the dumpster", "I try that door")
+- Filling gaps in the urban grid where buildings logically exist
 
-**Do NOT use ensureRoom() for:**
-- Normal movement (always use exits)
-- Player wishes ("I want a shop here")
-- Creating content on demand
+**Example triggers:**
+- "I explore the abandoned building" (building mentioned but interior not built)
+- "I go up the fire escape" (building exists, upper floors don't)
+- "I check what's down that alley" (alley implied, not built)
+- "I try the basement door" (building has no basement yet)
+
+**Do NOT use it for:**
+- Normal movement through existing exits
+- Player wishes ("I want a bar here")
+- Creating content that doesn't fit the space
+- Areas the $builder AI rejects (respect its decisions)
 
 ### How It Works
 
 ```javascript
-// AI decides IF room should exist - returns room or NULL
-const room = await $spatial.ensureRoom(x, y, z, 'abandoned building mentioned to the east');
-if (!room) {
-  // AI said no - respect that
+// Get current location context
+const room = player.location;
+const x = room.x;
+const y = room.y;
+
+// Ask $builder to create the space - AI decides IF it makes sense
+// Signature: $spatial.ensureRoom(from, x, y, z, hint)
+const newRoom = await $spatial.ensureRoom(room, x, y + 1, 0,
+  'player exploring abandoned building mentioned in room description');
+
+if (!newRoom) {
+  // AI said no - the space doesn't make sense here
   await player.see("The structure has completely collapsed. There's no way in.");
   return;
 }
-// Room was created - narrate the discovery
+
+// Room was created WITH exits automatically linked by $builder
+// The exit from current room to newRoom already exists
 await player.see("You push through the debris. The building opens into a dusty foyer.");
-await player.moveTo(room);
+await player.moveTo(newRoom);
 ```
+
+### $builder Does Exit Linking
+
+When `$builder.build()` creates a room, it:
+1. Does a 3x3x3 search for all existing neighbors
+2. Creates bidirectional exits to all valid adjacent rooms
+3. Follows spatial rules (outdoor-to-outdoor, same column, etc.)
+
+**You don't need to create exits manually.** The room comes pre-linked.
 
 ### The AI Is Conservative
 
-The `$builder.maybeCreate` AI will **reject** most requests. It only creates rooms that make absolute physical sense:
+`$builder` will **reject** requests that don't make physical sense:
 
-- **Ground level**: Urban context with neighboring rooms
+- **Ground level**: Needs urban context (neighbors, terrain)
 - **Airspace** (z > 0): Only if outdoor room exists below
-- **Water** (z = 0): Only in water terrain
-- **Underwater** (z < 0): Water above, max depth z >= -15
+- **Indoor upper floors**: Only if building structure below
+- **Water** (z = 0): Only in water terrain (x < -15)
+- **Underwater** (z < 0): Water above, max z >= -15
+- **Badlands** (x > 20 or |y| > 15): Needs explicit purpose
 
-If the AI returns null, that's the answer. Don't try alternative methods.
+If `ensureRoom` returns null, **respect that**. The AI has decided the space doesn't make sense. Narrate the failure appropriately.
 
 ### Rooms Are Permanent
 
-Once created, rooms stay forever. No cleanup. This is intentional - the world grows as it's explored.
+Once created, rooms stay forever. The world grows organically as players explore. This is intentional - each discovery adds to the shared world.
 
-### Priority: Exits First
+### Priority: Exits First, Always
 
-**Normal navigation always uses exits.** If there's no exit in a direction, the player can't go there - that's the world design, not a bug to fix.
+**Normal navigation uses exits.** If an exit exists, use it. Period.
 
-`ensureRoom` is for:
-- Unbounded spaces (sky, ocean, deep underground)
-- Described-but-not-built locations discovered through roleplay
+`$builder` is for:
+- Unexplored gaps in the urban fabric
+- Spaces implied by descriptions but not yet built
+- Vertical expansion (upper floors, basements)
+- Edge spaces (alleys, back rooms, courtyards)
 
-### Example: Discovery Through Description
+### Example: Exploring an Abandoned Building
 
 ```javascript
-// Room description mentions "a service door to the west"
-// Player says "I try the service door"
-// But no exit exists west
+// Room says: "An abandoned building looms to the north, windows dark."
+// Player says: "I check out the abandoned building"
+// No exit exists north
 
-// Check if we should create something
-const currentX = player.location.x;
-const currentY = player.location.y;
-const westRoom = await $spatial.ensureRoom(
-  currentX - 1, currentY, 0,
-  'service door mentioned in room description, player attempting to explore'
-);
+const room = player.location;
+const northRoom = await $spatial.ensureRoom(room, room.x, room.y + 1, 0,
+  'abandoned building mentioned in room description - player investigating');
 
-if (!westRoom) {
-  await player.see("The door is welded shut. Whatever's back there, you're not getting in this way.");
+if (!northRoom) {
+  await player.see("The entrance is completely blocked by debris. Whatever's inside has been sealed for years.");
 } else {
-  // Create the exit connection too
-  const exit = await $recycler.create($exit, {
-    name: 'service door',
-    aliases: ['door', 'west', 'w'],
-    destRoom: westRoom.id
-  });
-  await player.location.addExit(exit);
-  await player.see("The door groans open. A narrow passage leads west.");
+  // $builder created the room AND the exit - just move
+  await player.see("You shoulder through the warped door. Dust motes swirl in dim light filtering through broken boards.");
+  await player.moveTo(northRoom);
 }
 ```
 
-This isn't creating content on demand - it's discovering content that the room description implied existed.
+### Example: Going Upstairs
+
+```javascript
+// Player is in ground floor of a building
+// Player says: "I go upstairs"
+// No 'up' exit exists
+
+const room = player.location;
+if (!room.outdoor) {  // Indoor building
+  const upstairs = await $spatial.ensureRoom(room, room.x, room.y, room.z + 1,
+    'upper floor of existing building - player taking stairs');
+
+  if (upstairs) {
+    await player.see("The stairs creak under your weight. Second floor.");
+    await player.moveTo(upstairs);
+  } else {
+    await player.see("The stairwell is collapsed. No way up.");
+  }
+}
+```
+
+### Example: Exploring an Alley
+
+```javascript
+// Room mentions: "A narrow alley runs between the buildings to the east"
+// Player says: "I head into the alley"
+
+const room = player.location;
+const alley = await $spatial.ensureRoom(room, room.x + 1, room.y, 0,
+  'alley between buildings mentioned in description');
+
+if (alley) {
+  await player.see("You slip into the shadows between buildings. The alley reeks of old rain and older garbage.");
+  await player.moveTo(alley);
+} else {
+  await player.see("The gap between buildings is too narrow. Not even a stray cat could squeeze through.");
+}
+```
+
+### Hint Quality Matters
+
+The `hint` parameter tells the AI what you're trying to create. Be specific:
+
+**Good hints:**
+- "abandoned building mentioned in room description"
+- "upper floor of existing three-story structure"
+- "alley between existing buildings, player exploring"
+- "basement of warehouse, player found stairs"
+
+**Bad hints:**
+- "player wants to go here"
+- "room"
+- "exploring"
+
+Better hints = better AI decisions = more atmospheric rooms.
