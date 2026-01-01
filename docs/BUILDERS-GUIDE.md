@@ -408,79 +408,76 @@ execute_moo_code({
 - Access to $, $load(), $recycler, $.define, all $aliases
 - If authenticated (HTTP Basic Auth), access to `player` variable
 
-### Creating Objects via MCP (Legacy Examples)
+### Creating Objects via MCP
+
+Use `execute_moo_code` to write native MOO code:
 
 ```javascript
-// Create a new object
-mcp.create_object({
-  parent: "#49",  // $lock prototype
-  properties: {
-    name: "Combination Lock",
-    description: "A lock with a dial combination.",
-    combination: "12-34-56"
-  }
-});
-// Returns: { objectId: 2500 }
-
-// Add a method
-mcp.set_method({
-  objectId: 2500,
-  name: "canAccess",
+execute_moo_code({
   code: `
-    const agent = args[0];
-    const input = args[1];
-    if (!self.combination) return true;
-    if (input === self.combination) return true;
-    return 'Wrong combination.';
-  `
-});
+    // Create a new lock type with $.define (auto-registers alias)
+    const $combinationLock = await $.define('combinationLock', $lock, {
+      properties: {
+        name: 'Combination Lock',
+        description: 'A lock with a dial combination.',
+        combination: '12-34-56'
+      },
+      methods: {
+        canAccess: \`
+          const agent = args[0];
+          const input = args[1];
+          if (!self.combination) return true;
+          if (input === self.combination) return true;
+          return 'Wrong combination.';
+        \`
+      }
+    });
 
-// Register as a prototype alias (optional)
-mcp.call_method({
-  objectId: 0,  // ObjectManager
-  name: "addAlias",
-  args: ["combinationLock", 2500]
+    return { typeId: $combinationLock.id };
+  `
 });
 ```
 
 ### Creating Prototype Hierarchies
 
 ```javascript
-// 1. Create base prototype
-const base = await mcp.create_object({
-  parent: "#3",  // $describable
-  properties: { name: "Container", description: "Something that holds things.", contents: [] }
-});
-
-// 2. Add methods to base
-await mcp.set_method({
-  objectId: base.objectId,
-  name: "add",
+execute_moo_code({
   code: `
-    const item = args[0];
-    const contents = self.contents || [];
-    contents.push(item.id);
-    self.contents = contents;
-    item.location = self.id;
-    return 'Added ' + item.name;
-  `
-});
+    // 1. Create base prototype with $.define (includes methods)
+    const $container = await $.define('container', $describable, {
+      properties: {
+        name: 'Container',
+        description: 'Something that holds things.',
+        contents: []
+      },
+      methods: {
+        add: \`
+          const item = args[0];
+          const contents = self.contents || [];
+          contents.push(item.id);
+          self.contents = contents;
+          item.location = self.id;
+          return 'Added ' + item.name;
+        \`
+      }
+    });
 
-// 3. Create specialized variant
-const chest = await mcp.create_object({
-  parent: base.objectId,
-  properties: { name: "Chest", description: "A wooden chest.", locked: false }
-});
+    // 2. Create specialized variant that overrides methods
+    const $chest = await $.define('chest', $container, {
+      properties: {
+        name: 'Chest',
+        description: 'A wooden chest.',
+        locked: false
+      },
+      methods: {
+        add: \`
+          if (self.locked) return 'The chest is locked.';
+          return await pass(args[0]);  // Call parent's add()
+        \`
+      }
+    });
 
-// 4. Override method in child
-await mcp.set_method({
-  objectId: chest.objectId,
-  name: "add",
-  code: `
-    if (self.locked) return 'The chest is locked.';
-    // Call parent method
-    const parent = await $load(self._parent);
-    return parent.add(args[0]);
+    return { containerId: $container.id, chestId: $chest.id };
   `
 });
 ```
@@ -953,84 +950,52 @@ Locks are objects that implement `canAccess(agent, target)`.
 
 ### Creating a New Lock Type via MCP (Runtime)
 
-You can create new lock prototypes entirely via MCP without touching code:
+You can create new lock prototypes entirely via MCP using `execute_moo_code`:
 
 ```javascript
-// 1. Create the prototype (parent is $lock #49)
-mcp.create_object({
-  parent: "#49",
-  properties: {
-    name: "Latch Lock",
-    description: "A simple latch that can only be locked or unlocked from one side.",
-    locked: false,
-    insideRoomId: null  // Room ID from which lock can be operated
-  }
-});
-// Returns: Created object #2491
-
-// 2. Add the canAccess method
-mcp.set_method({
-  objectId: 2491,
-  name: "canAccess",
+execute_moo_code({
   code: `
-    const agent = args[0];
-    const target = args[1];
+    // Create the latch lock type with $.define (auto-registers alias)
+    const $latchLock = await $.define('latchLock', $lock, {
+      properties: {
+        name: 'Latch Lock',
+        description: 'A simple latch that can only be locked or unlocked from one side.',
+        locked: false,
+        insideRoomId: null  // Room ID from which lock can be operated
+      },
+      methods: {
+        canAccess: \`
+          const agent = args[0];
+          if (!self.locked) return true;
+          return 'The latch is locked from the other side.';
+        \`,
 
-    if (!self.locked) {
-      return true;
-    }
-    return 'The latch is locked from the other side.';
+        lock: \`
+          const agent = args[0];
+          if (!self.insideRoomId) return 'This latch is not installed properly.';
+          if (agent.location !== self.insideRoomId) {
+            return 'You can only latch this from the other side.';
+          }
+          if (self.locked) return 'The latch is already locked.';
+          self.locked = true;
+          return 'You slide the latch closed.';
+        \`,
+
+        unlock: \`
+          const agent = args[0];
+          if (!self.insideRoomId) return 'This latch is not installed properly.';
+          if (agent.location !== self.insideRoomId) {
+            return 'You can only unlatch this from the other side.';
+          }
+          if (!self.locked) return 'The latch is already unlocked.';
+          self.locked = false;
+          return 'You slide the latch open.';
+        \`
+      }
+    });
+
+    return { latchLockId: $latchLock.id };
   `
-});
-
-// 3. Add lock/unlock methods
-mcp.set_method({
-  objectId: 2491,
-  name: "lock",
-  code: `
-    const agent = args[0];
-
-    if (!self.insideRoomId) {
-      return 'This latch is not installed properly.';
-    }
-    if (agent.location !== self.insideRoomId) {
-      return 'You can only latch this from the other side.';
-    }
-    if (self.locked) {
-      return 'The latch is already locked.';
-    }
-
-    self.locked = true;
-    return 'You slide the latch closed.';
-  `
-});
-
-mcp.set_method({
-  objectId: 2491,
-  name: "unlock",
-  code: `
-    const agent = args[0];
-
-    if (!self.insideRoomId) {
-      return 'This latch is not installed properly.';
-    }
-    if (agent.location !== self.insideRoomId) {
-      return 'You can only unlatch this from the other side.';
-    }
-    if (!self.locked) {
-      return 'The latch is already unlocked.';
-    }
-
-    self.locked = false;
-    return 'You slide the latch open.';
-  `
-});
-
-// 4. Register the alias
-mcp.call_method({
-  objectId: 0,
-  name: "addAlias",
-  args: ["latchLock", 2491]
 });
 ```
 
@@ -1072,17 +1037,20 @@ export class [Name]LockBuilder {
 ### Creating Lock Instances
 
 ```javascript
-// Create an instance of latchLock for a specific door
-mcp.create_object({
-  parent: "#2491",  // $latchLock prototype
-  properties: {
-    name: "bathroom latch",
-    description: "A simple sliding latch, tarnished brass.",
-    locked: false,
-    insideRoomId: 2487  // The bathroom room ID
-  }
+execute_moo_code({
+  code: `
+    // Create an instance of latchLock for a specific door
+    const bathroom = await $load(2487);  // The bathroom room
+    const lock = await $recycler.create($latchLock, {
+      name: 'bathroom latch',
+      description: 'A simple sliding latch, tarnished brass.',
+      locked: false,
+      insideRoomId: bathroom
+    });
+
+    return { lockId: lock.id };
+  `
 });
-// Returns: Created object #2492
 ```
 
 ### Attaching Locks to Doors/Exits
@@ -1090,32 +1058,38 @@ mcp.create_object({
 Locks are stored in a `locks` array as object references:
 
 ```javascript
-// Attach lock to door via MCP
-mcp.set_property({
-  objectId: 2490,  // door ID
-  name: "locks",
-  value: ["#2492"]  // array of objrefs
-});
+execute_moo_code({
+  code: `
+    const door = await $load(2490);
+    const lock = await $load(2492);
 
-// Or in method code:
-const locks = door.locks || [];
-locks.push("#" + lock.id);
-door.locks = locks;
+    // Add lock to door's locks array
+    const locks = door.locks || [];
+    locks.push(lock);
+    door.locks = locks;
+
+    return 'Lock attached';
+  `
+});
 ```
 
 ### Testing Locks
 
 ```javascript
-// Test canAccess
-mcp.call_method({
-  objectId: 2492,
-  name: "canAccess",
-  args: [null, null]
-});
-// Returns: true (unlocked) or "The latch is locked from the other side."
+execute_moo_code({
+  code: `
+    const lock = await $load(2492);
 
-// Manually toggle for testing
-mcp.set_property({ objectId: 2492, name: "locked", value: true });
+    // Test canAccess
+    const result = await lock.call('canAccess', null, null);
+    console.log(result);  // true or "The latch is locked from the other side."
+
+    // Manually toggle for testing
+    lock.locked = true;
+
+    return { locked: lock.locked };
+  `
+});
 ```
 
 ## Door System
@@ -1137,56 +1111,77 @@ Methods: `openDoor()`, `closeDoor()`, `lockDoor()`, `unlockDoor()`, `canAccess(a
 
 ## Room/World Building via MCP
 
-### dig - Create a room with exits
+### Creating Rooms and Exits
 
 ```javascript
-await mcp.dig({
-  name: "Room Name",
-  description: "Room description...",
-  fromRoomId: 123,        // Connect from this room
-  exitDirection: "north", // Exit direction from source
-  returnDirection: "south", // Return exit direction
-  x: 5, y: 10, z: 0       // Coordinates
+execute_moo_code({
+  code: `
+    const fromRoom = await $load(123);
+
+    // Create a new room
+    const room = await $recycler.create($room, {
+      name: 'Room Name',
+      description: 'Room description...',
+      x: 5, y: 10, z: 0
+    });
+
+    // Create exit from source room to new room
+    const exitNorth = await $recycler.create($exit, {
+      name: 'north',
+      aliases: ['n'],
+      destRoom: room
+    });
+    await fromRoom.addExit(exitNorth);
+
+    // Create return exit
+    const exitSouth = await $recycler.create($exit, {
+      name: 'south',
+      aliases: ['s'],
+      destRoom: fromRoom
+    });
+    await room.addExit(exitSouth);
+
+    return { roomId: room.id };
+  `
 });
 ```
 
-### link_rooms - Connect existing rooms
+### Using $builder.build()
+
+For AI-driven room creation with spatial awareness:
 
 ```javascript
-await mcp.link_rooms({
-  fromRoomId: 123,
-  toRoomId: 456,
-  exitDirection: "enter building",
-  returnDirection: "out"  // Optional
+execute_moo_code({
+  code: `
+    const fromRoom = await $load(123);
+    const room = await $builder.build(fromRoom, { x: 5, y: 10, z: 0 }, 'urban alley');
+
+    return room ? { roomId: room.id } : 'Room already exists';
+  `
 });
 ```
 
-### Creating objects via MCP
+### Creating Objects
 
 ```javascript
-// Create an instance of a prototype
-await mcp.create_object({
-  parent: prototypeId,
-  properties: {
-    name: "Object name",
-    description: "Description",
-    location: roomId,
-    // ... other properties
-  }
-});
+execute_moo_code({
+  code: `
+    // Create an instance of a prototype
+    const room = await $load(roomId);
+    const item = await $recycler.create($item, {
+      name: 'Object name',
+      description: 'Description'
+    });
+    await item.moveTo(room);
 
-// Set a property
-await mcp.set_property({
-  objectId: 123,
-  name: "propertyName",
-  value: "value"  // or number, boolean, array, object, "#id" for objref
-});
+    // Set a property directly
+    item.propertyName = 'value';
 
-// Call a method
-await mcp.call_method({
-  objectId: 123,
-  name: "methodName",
-  args: [arg1, arg2]
+    // Call a method
+    await item.call('methodName', arg1, arg2);
+
+    return { itemId: item.id };
+  `
 });
 ```
 

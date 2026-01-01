@@ -4,7 +4,7 @@ TASK: Dress an NPC appropriately based on their role, personality, and environme
 
 CLOTHING SYSTEM - ALL REQUIRED PROPERTIES:
 
-When calling create_object, pass ALL properties in the properties object:
+When creating clothing with `$recycler.create($clothing, {...})`, pass ALL properties:
 
 1. name (string, REQUIRED)
    - The display name of the item
@@ -113,15 +113,14 @@ WORKFLOW:
 2. Use ai action=look humanId=<id> to understand the environment
 3. Plan the complete outfit based on role - decide ALL items first
 4. Sort items by layer (1 -> 2 -> 3 -> 4 -> 5)
-5. alias_lookup alias="clothing" to get $.clothing id (only need once)
-6. For each item IN LAYER ORDER:
-   a. create_object with parent=<clothing_id> and properties={name, description, covers, layer, warmth, protection, material, color, condition}
-   b. move_object objectId=<new_id> destinationId=<npc_room>
+5. For each item IN LAYER ORDER:
+   a. Create: `const item = await $recycler.create($clothing, {...all properties})`
+   b. Move to NPC room: `await item.moveTo(npc.location, npc)`
    c. ai action=do humanId=<npc> command="get <item name word>"
    d. ai action=do humanId=<npc> command="wear <item name word>"
 
 IMPORTANT:
-- create_object accepts ALL properties at once - no need for separate set_property calls!
+- $recycler.create accepts ALL properties at once - no need for separate calls!
 - Aliases are AUTO-GENERATED from the name (e.g., "worn leather jacket" -> ["worn", "leather", "jacket", ...])
 - Must equip in layer order - underwear before pants!
 - The "get" command triggers verb registration

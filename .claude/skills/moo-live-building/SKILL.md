@@ -172,48 +172,66 @@ Use `ReadMcpResourceTool` with these URIs for **live game data**:
 | Plot details | `moo://plots/{id}` |
 | Plot events | `moo://plots/{id}/events` |
 
-## MCP Tools Reference
+## execute_moo_code is THE Tool
 
-**Note**: While individual MCP tools (listed below) are still available, prefer using `execute_moo_code` with `$mcp.toolName()` for better composability and token efficiency. Use individual tool calls only when you need to make a single, standalone operation.
+**Use `execute_moo_code` for ALL operations.** Write native MOO code directly:
 
 ### Object Manipulation
 
-| Tool | Purpose |
-|------|---------|
-| `create_object` | Create new object with parent |
-| `set_property` | Set property value |
-| `get_property` | Get property value |
-| `set_method` | Create/update method code |
-| `call_method` | Execute a method |
-| `spawn_item` | Create instance at location |
-| `clone_object` | Deep copy an object |
-| `move_object` | Move to new location |
-| `recycle_object` | Soft-delete object |
-| `describe_object` | Get runtime description |
+```javascript
+// Create objects
+const item = await $recycler.create($item, { name: "torch" });
+
+// Set properties
+obj.health = 100;
+
+// Move objects
+await item.moveTo(room, player);
+
+// Call methods
+await obj.call('methodName', arg1, arg2);
+
+// Recycle
+await $recycler.recycle(obj);
+```
 
 ### Search & Discovery
 
-| Tool | Purpose |
-|------|---------|
-| `search_objects` | Find by name pattern |
-| `find_by_property` | Find by property value |
-| `find_in_location` | List contents of room/container |
-| `get_inheritance` | Get ancestor/descendant chain |
-| `alias_lookup` | Resolve alias to object |
-| `list_aliases` | List all $.aliases |
-| `add_alias` | Register new alias |
+```javascript
+// Find by property
+const outdoor = await $query().prop('outdoor').equals(true).all();
+
+// Find by name
+const towers = await $query().prop('name').contains('Tower').all();
+
+// Find by parent
+const allRooms = await $query().parent($room).all();
+
+// Load by alias
+const recycler = $recycler;  // Direct alias access
+const room = await $load(123);  // By ID
+```
 
 ### World Building
 
-| Tool | Purpose |
-|------|---------|
-| `dig` | Create room with exits |
-| `link_rooms` | Create exit between rooms |
-| `unlink` | Remove an exit |
-| `get_exits` | List exits from room |
-| `set_exit_door` | Attach door to exit |
-| `list_rooms` | List all rooms |
-| `list_players` | List all players |
+```javascript
+// Create room
+const room = await $recycler.create($room, {
+  name: "Hall", x: 0, y: 1, z: 0
+});
+
+// Create exit
+const exit = await $recycler.create($exit, {
+  name: "north", aliases: ["n"], destRoom: room
+});
+await fromRoom.addExit(exit);
+
+// Create door
+const door = await $recycler.create($door, {
+  name: "iron door", locked: true
+});
+exit.door = door;
+```
 
 ### Consolidated Tools (use `action` parameter)
 
@@ -355,53 +373,6 @@ execute_moo_code({
 
     return { typeId: $combinationLock.id, instanceId: lock1.id };
   `
-})
-```
-
-### Legacy: Individual MCP Tool Calls
-
-If you need to use individual MCP tools (not recommended):
-
-```javascript
-// Step 1: Create prototype
-mcp__malice__create_object({
-  parent: "$lock",
-  properties: {
-    name: "Combination Lock",
-    description: "A lock with a dial combination.",
-    combination: null
-  }
-})
-// Returns: { objectId: 2500 }
-
-// Step 2: Add methods
-mcp__malice__set_method({
-  objectId: "#2500",
-  name: "canAccess",
-  code: `
-    const agent = args[0];
-    const input = args[1];
-    if (!self.combination) return true;
-    if (input === self.combination) return true;
-    return 'Wrong combination.';
-  `
-})
-
-// Step 3: Register alias manually
-mcp__malice__call_method({
-  objectId: "#0",
-  name: "addAlias",
-  args: ["combinationLock", 2500]
-})
-
-// Step 4: Create instances
-mcp__malice__spawn_item({
-  prototypeId: "$combinationLock",
-  locationId: "#100",
-  properties: {
-    name: "locker lock",
-    combination: "99-99-99"
-  }
 })
 ```
 

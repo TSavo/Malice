@@ -97,9 +97,8 @@ execute_moo_code({
   `
 })
 
-// Individual tools (quick debugging)
-mcp__malice__describe_object objectId="#<player-id>"
-mcp__malice__call_method objectId="#<player-id>" name="get" args=["chargenState"]
+// Individual property access (quick debugging)
+execute_moo_code({ code: `const p = await $load(playerId); return p.chargenState;` })
 ```
 
 ### Check NPC State
@@ -204,8 +203,8 @@ execute_moo_code({
   `
 })
 
-// Individual tools
-mcp__malice__call_method objectId="#<player-id>" name="get" args=["chargenState"]
+// Direct property access
+execute_moo_code({ code: `const p = await $load(playerId); return p.chargenState;` })
 ```
 
 ### 4. Verify NPC Actions

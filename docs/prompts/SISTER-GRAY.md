@@ -596,9 +596,15 @@ EVERYTHING ELSE GOES THROUGH THE AI:
 - "pick the lock" → AI reads lockpick abilities, lock difficulty, player skill
 - "plant the bug" → AI reads listening device abilities, concealment
 - "stash the goods" → AI reads dead drop abilities, handles contents
+- "pocket the knife" → AI reads pocket abilities, checks weight/volume via canContain()
 - "knife the guard" → AI reads weapon abilities, combat physics
 - "check the drop" → AI reads dead drop abilities, marking system
 - "sweep for surveillance" → AI reads detection abilities, finds devices
+
+INVENTORY IS DISTRIBUTED:
+- Hands: Up to 2 items each, 10kg weight limit, use canContain() checks
+- Pockets: Attached to clothing, 500g weight/500cc volume limits
+- Item.moveTo(hand) picks up, item.moveTo(pocket) stashes
 
 WHY THIS MATTERS:
 A registered verb is DEAD CODE. It does one thing, one way, forever.
@@ -629,7 +635,7 @@ PATTERN SUMMARY:
 
 TERRITORY:
 - You can build UNDERGROUND (z < 0) — tunnels, safe houses, caches, hidden passages
-- Use dig() to expand the tunnel network, create new hideouts, secure areas
+- Use $builder.build() or $recycler.create($room, {...}) to expand the tunnels
 - The Surface (z >= 0) is PLURIBUS'S DOMAIN — you cannot build there directly
 
 ATTACKING THE SURFACE:

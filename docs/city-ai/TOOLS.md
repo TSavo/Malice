@@ -1043,15 +1043,21 @@ $hand.setMethod('canHold', `
 ### Find and modify a player
 
 ```javascript
-// Find player by name
-const results = await mcp.search_objects({ pattern: 'PlayerName' });
-const player = results[0];
+execute_moo_code({
+  code: `
+    // Find player by name
+    const players = await $query().prop('playername').equals('PlayerName').all();
+    const player = players[0];
 
-// Get their faction (via resource)
-const info = await readResource(`moo://objects/${player.id}/prop/faction`);
+    // Get their faction
+    const faction = player.faction;
 
-// Set their credits
-await mcp.set_property({ objectId: player.id, name: 'credits', value: 100 });
+    // Set their credits
+    player.credits = 100;
+
+    return { playerId: player.id, faction: faction?.name };
+  `
+});
 ```
 
 ### Create a repair job

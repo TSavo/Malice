@@ -245,35 +245,29 @@ covers: ["torso", "back"], layer: 4                          // vest jacket
 
 ### Step-by-Step Process
 
-1. **Look up clothing prototype (once):**
-   ```
-   alias_lookup alias="clothing"
-   -> Returns: { id: <clothing_prototype_id> }
-   ```
-
-2. **Create clothing object with ALL properties:**
-   ```
-   create_object parent=<clothing_prototype_id> properties={
-     "name": "worn leather jacket",
-     "description": "A scuffed leather jacket with patched elbows...",
-     "covers": ["torso", "back", "leftArm", "rightArm"],
-     "layer": 4,
-     "warmth": 45,
-     "protection": 10,
-     "material": "leather",
-     "color": "faded brown",
-     "condition": 55
-   }
-   -> Returns: Created object #<new_clothing_id>
-   -> Aliases auto-generated: ["worn", "leather", "jacket", "leather jacket", "worn leather jacket"]
+1. **Create clothing object with ALL properties:**
+   ```javascript
+   const jacket = await $recycler.create($clothing, {
+     name: 'worn leather jacket',
+     description: 'A scuffed leather jacket with patched elbows...',
+     covers: ['torso', 'back', 'leftArm', 'rightArm'],
+     layer: 4,
+     warmth: 45,
+     protection: 10,
+     material: 'leather',
+     color: 'faded brown',
+     condition: 55
+   });
+   // Aliases auto-generated: ["worn", "leather", "jacket", "leather jacket", "worn leather jacket"]
    ```
 
-3. **Move to NPC's room:**
-   ```
-   move_object objectId=<new_clothing_id> destinationId=<room_id>
+2. **Move to NPC's room:**
+   ```javascript
+   const npc = await $load(npcId);
+   await jacket.moveTo(npc.location, npc);
    ```
 
-4. **Have NPC pick up and wear:**
+3. **Have NPC pick up and wear:**
    ```
    ai action=do humanId=<npc_id> command="get jacket"
    ai action=do humanId=<npc_id> command="wear jacket"
@@ -281,7 +275,7 @@ covers: ["torso", "back"], layer: 4                          // vest jacket
 
 ### Critical Notes
 
-- **Single create_object call!** Pass all properties at once - no separate set_property calls needed
+- **Single $recycler.create call!** Pass all properties at once
 - **Order matters!** Create and equip layer 1 items before layer 2, etc.
 - **Aliases are auto-generated!** From "worn leather jacket" you get ["worn", "leather", "jacket", "leather jacket", "worn leather jacket"]
 - Use any word from the name in get/wear commands (e.g., "get jacket", "wear jacket")
@@ -308,5 +302,5 @@ covers: ["torso", "back"], layer: 4                          // vest jacket
 - Must equip underwear before pants, socks before shoes, etc.
 
 **Missing properties**
-- All 10 properties must be passed to create_object in the properties object
+- All 10 properties must be passed to $recycler.create in the properties object
 - If properties are missing, the item will have default values which may not be appropriate

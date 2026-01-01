@@ -49,11 +49,11 @@ When you receive a combat resolution request, you get:
 {
   combatId: 'combat-1734567890-abc123',
   round: 1,
-  locationId: '#500',  // Room object ID - use in call_method args
+  locationId: '#500',  // Room object ID - load with $load(500)
   location: 'A dimly lit alley between crumbling buildings...',
   combatants: [
     {
-      id: '#100',  // Combatant ID - use in call_method args as "#100"
+      id: '#100',  // Combatant ID - load with $load(100)
       name: 'Jack',
       isNPC: false,
       stats: { strength: 45, agility: 60, endurance: 50 },
@@ -79,7 +79,7 @@ When you receive a combat resolution request, you get:
       }
     },
     {
-      id: '#200',  // NPC ID - use in call_method args as "#200"
+      id: '#200',  // NPC ID - load with $load(200)
       name: 'Marcus',
       isNPC: true,
       npcContext: {
@@ -209,36 +209,29 @@ combat({
 
 **Option A: Room announce (third-person narration)**
 
-Use `call_method` on the location to broadcast perspective-aware messages:
+Use `room.announce()` to broadcast perspective-aware messages:
 
 ```javascript
-call_method({
-  objectId: 500,  // Room ID (from combat context's locationId)
-  name: 'announce',
-  args: [
-    "#100",  // actor (Jack) - "#id" format resolves to object reference
-    "#200",  // target (Marcus)
-    {
-      actor: "Your blade arcs toward %t's throat. %T throws up %tp wounded arm.",
-      target: "%A's blade arcs toward your throat. You throw up your wounded arm.",
-      others: "%A's blade arcs toward %t's throat. %T throws up %tp wounded arm."
-    }
-  ]
-})
+const jack = await $load(100);
+const marcus = await $load(200);
+const room = jack.location;
+
+await room.announce(jack, marcus, {
+  actor: "Your blade arcs toward %t's throat. %T throws up %tp wounded arm.",
+  target: "%A's blade arcs toward your throat. You throw up your wounded arm.",
+  others: "%A's blade arcs toward %t's throat. %T throws up %tp wounded arm."
+});
 ```
 
 Pronoun placeholders: `%a`/`%A` = actor, `%t`/`%T` = target, `%ap`/`%tp` = possessive, `%as`/`%ts` = subject, `%ao`/`%to` = object.
 
 **Option B: Make players emote**
 
-Use `call_method` on the player to have them emote their action:
+Use `player.emote()` to have them emote their action:
 
 ```javascript
-call_method({
-  objectId: 100,  // Jack's ID
-  name: 'emote',
-  args: ["lunges forward, blade flashing toward Marcus's throat"]
-})
+const jack = await $load(100);
+await jack.emote("lunges forward, blade flashing toward Marcus's throat");
 ```
 
 **Option C: Make NPCs emote via announce**
@@ -254,7 +247,7 @@ await room.announce(npc, null, {
 ```
 
 **Mix and match.** A complex exchange might use all three:
-- Player emotes their attack via `call_method`
+- Player emotes their attack via `player.emote()`
 - NPC emotes via `room.announce()` with pronoun substitution
 - Room announce for environmental effects or summary narration
 
@@ -504,20 +497,16 @@ You can narrate multiple times per round if the action warrants it:
 
 ```javascript
 // First exchange - room announce
-call_method({
-  objectId: 500, name: 'announce',
-  args: ["#200", "#100", { others: "Marcus rushes in, fists swinging. Jack sidesteps, knife flashing out." }]
-})
+const jack = await $load(100);
+const marcus = await $load(200);
+const room = jack.location;
+
+await room.announce(marcus, jack, { others: "Marcus rushes in, fists swinging. Jack sidesteps, knife flashing out." });
 
 // Second exchange - make Jack emote his move
-call_method({
-  objectId: 100, name: 'emote',
-  args: ["catches Marcus across the forearm with a vicious slash"]
-})
+await jack.emote("catches Marcus across the forearm with a vicious slash");
 
 // Marcus reacts via announce
-const room = await $load(500);
-const marcus = await $load(200);
 await room.announce(marcus, null, {
   others: "%A %av{howl}, stumbling back - but %as grinning. %Ap other hand is already coming up with Jack's dropped wallet."
 });
@@ -590,15 +579,12 @@ combat({
 
 ### Decrementing Ammo
 
-**You control how many shots are fired.** The ammo count in context is informational. To actually consume ammo, use `call_method` with the gun's `fire()` method:
+**You control how many shots are fired.** The ammo count in context is informational. To actually consume ammo, use the gun's `fire()` method:
 
 ```javascript
 // Fire one round - handles magazine vs direct-load automatically
-call_method({
-  objectId: 150,       // The gun's object ID (from weapon context)
-  name: 'fire',
-  args: []
-})
+const gun = await $load(150);
+await gun.call('fire');
 // Returns: { success: true, ammoRemaining: 11 }
 ```
 
@@ -606,9 +592,10 @@ call_method({
 
 ```javascript
 // Player fired 3 shots
-call_method({ objectId: 150, name: 'fire', args: [] })  // Shot 1
-call_method({ objectId: 150, name: 'fire', args: [] })  // Shot 2
-call_method({ objectId: 150, name: 'fire', args: [] })  // Shot 3
+const gun = await $load(150);
+await gun.call('fire');  // Shot 1
+await gun.call('fire');  // Shot 2
+await gun.call('fire');  // Shot 3
 ```
 
 **The gun handles complexity for you:**
@@ -643,18 +630,19 @@ combat({ action: 'damage', combatId: 'combat-123', targetId: 200,
          bodyPart: 'torso', damageType: 'puncture', severity: 50, cause: 'bullet' })
 
 // Fire both rounds (one hit, one missed - both consume ammo)
-call_method({ objectId: 150, name: 'fire', args: [] })
-call_method({ objectId: 150, name: 'fire', args: [] })
+const gun = await $load(150);
+await gun.call('fire');
+await gun.call('fire');
 
 // Narrate via room announce
-call_method({
-  objectId: 500, name: 'announce',
-  args: ["#100", "#200", {
-    actor: "Your Glock barks twice. The first round punches into %t's chest, staggering %to. The second goes wide.",
-    target: "%A's Glock barks twice. The first round punches into your chest, staggering you. The second goes wide.",
-    others: "%A's Glock barks twice. The first round punches into %t's chest, staggering %to. The second goes wide, sparking off the concrete."
-  }]
-})
+const jack = await $load(100);
+const marcus = await $load(200);
+const room = jack.location;
+await room.announce(jack, marcus, {
+  actor: "Your Glock barks twice. The first round punches into %t's chest, staggering %to. The second goes wide.",
+  target: "%A's Glock barks twice. The first round punches into your chest, staggering you. The second goes wide.",
+  others: "%A's Glock barks twice. The first round punches into %t's chest, staggering %to. The second goes wide, sparking off the concrete."
+});
 ```
 
 ### Magazine-Fed vs Direct-Load Weapons
@@ -676,20 +664,21 @@ call_method({
 // They're VULNERABLE while reloading
 
 // Narrate the reload - make the player emote it
-call_method({
-  objectId: 100, name: 'emote',
-  args: ["ejects the empty magazine, fumbling for a fresh one"]
-})
+const jack = await $load(100);
+await jack.emote("ejects the empty magazine, fumbling for a fresh one");
 
 // NPC sees the opening - use announce
-const npcRoom = (await $load(200)).location;
-await npcRoom.announce(await $load(200), null, {
+const npc = await $load(200);
+const room = npc.location;
+await room.announce(npc, null, {
   others: '%A %av{see} %ap chance and %av{lunge} forward.'
 });
 
 // The actual reload happens via the gun's load() method
 // Find the fresh magazine in their inventory, then:
-call_method({ objectId: 150, name: 'load', args: ["#175"] })  // #175 is the magazine object
+const gun = await $load(150);
+const magazine = await $load(175);
+await gun.call('load', magazine);
 // Returns: { success: true, loaded: 'magazine', rounds: 17 }
 ```
 
@@ -698,7 +687,9 @@ call_method({ objectId: 150, name: 'load', args: ["#175"] })  // #175 is the mag
 ```javascript
 // Loading shells into a shotgun one at a time
 // Find ammo object in their inventory
-call_method({ objectId: 160, name: 'load', args: ["#180"] })  // #180 is the ammo object
+const shotgun = await $load(160);
+const ammo = await $load(180);
+await shotgun.call('load', ammo);
 // Returns: { success: true, loaded: 3, remaining: 5 }
 // (loaded 3 shells, gun now has 5 total)
 ```
@@ -708,17 +699,17 @@ call_method({ objectId: 160, name: 'load', args: ["#180"] })  // #180 is the amm
 ```javascript
 // Context shows ammo: 0
 // Trying to fire returns failure
-call_method({ objectId: 150, name: 'fire', args: [] })
+const gun = await $load(150);
+await gun.call('fire');
 // Returns: { success: false, reason: 'Out of ammo.' }
 
 // Narrate via room announce for maximum drama
-call_method({
-  objectId: 500, name: 'announce',
-  args: ["#100", null, {
-    actor: "You squeeze the trigger. Click. Your face goes pale as you realize the slide is locked back on an empty chamber.",
-    others: "%A squeezes the trigger. Click. %Ap face goes pale - the slide is locked back on an empty chamber."
-  }]
-})
+const jack = await $load(100);
+const room = jack.location;
+await room.announce(jack, null, {
+  actor: "You squeeze the trigger. Click. Your face goes pale as you realize the slide is locked back on an empty chamber.",
+  others: "%A squeezes the trigger. Click. %Ap face goes pale - the slide is locked back on an empty chamber."
+});
 
 // This is a TERRIBLE position to be in
 ```
@@ -727,37 +718,33 @@ call_method({
 
 ```javascript
 // Use getAmmoCount() to check current rounds
-call_method({ objectId: 150, name: 'getAmmoCount', args: [] })
+const gun = await $load(150);
+await gun.call('getAmmoCount');
 // Returns: 3  (or whatever the current count is)
 ```
 
 ### Disarming Someone
 
-To physically disarm, you need to move the weapon to a new location. Use `move_object`:
+To physically disarm, move the weapon to a new location:
 
 ```javascript
 // Vera (id: 100) slashes Cole's (id: 200) hand, he drops the knife (id: 250)
-// Room ID: 500
+const vera = await $load(100);
+const cole = await $load(200);
+const knife = await $load(250);
+const room = vera.location;
 
-// First, apply the damage
-combat({ action: 'damage', combatId: 'combat-123', targetId: 200,
-         bodyPart: 'rightShoulder', damageType: 'cut', severity: 30, cause: 'blade' })
+// Apply the damage
+await $combat.damage('combat-123', 200, 'rightShoulder', 'cut', 30, 'blade');
 
-// Apply disarmed effect (marks them as disarmed in combat state)
-combat({ action: 'effect', combatId: 'combat-123', targetId: 200,
-         effect: 'disarmed', intensity: 100, duration: 0 })
+// Apply disarmed effect
+await $combat.effect('combat-123', 200, 'disarmed', 100, 0);
 
-// Move the weapon to the room
-move_object({
-  objectId: 250,        // The knife's object ID
-  destinationId: 500    // The room's object ID
-})
+// Move the weapon to the room floor
+await knife.moveTo(room, vera);
 
-// Narrate - Vera emotes her attack
-call_method({
-  objectId: 100, name: 'emote',
-  args: ["slices across Cole's knuckles, sending his hunting knife clattering to the concrete"]
-})
+// Narrate
+await vera.emote("slices across Cole's knuckles, sending his hunting knife clattering to the concrete");
 ```
 
 **Where to send the weapon:**
@@ -767,14 +754,15 @@ call_method({
 
 ### Making Someone Pick Up a Weapon
 
-If an NPC or player wants to grab a dropped weapon, use `ai do` for NPCs or `move_object` for players:
+Move the weapon to the person's inventory:
 
 **NPC picks up weapon:**
 
 ```javascript
-// Marcus (NPC, id: 200) goes for the dropped knife
 const marcus = await $load(200);
-const knife = // find knife in room
+const knife = await $load(250);  // find knife in room
+
+// Move to NPC
 await knife.moveTo(marcus, marcus);
 
 // Narrate it
@@ -787,15 +775,14 @@ await room.announce(marcus, null, {
 **Player retrieves weapon:**
 
 ```javascript
-// Jack (player, id: 100) scrambles for the dropped gun (id: 150)
-// Move it directly to their inventory
-move_object({ objectId: 150, destinationId: 100 })
+const jack = await $load(100);
+const gun = await $load(150);
 
-// Have them emote the action
-call_method({
-  objectId: 100, name: 'emote',
-  args: ["scrambles for the dropped gun, snatching it off the floor and swinging it up just as Marcus closes the distance"]
-})
+// Move to player
+await gun.moveTo(jack, jack);
+
+// Emote the action
+await jack.emote("scrambles for the dropped gun, snatching it off the floor");
 ```
 
 ### Environmental Attacks
@@ -818,18 +805,16 @@ combat({ action: 'effect', combatId: 'combat-123', targetId: 200,
          effect: 'knockedDown', intensity: 80, duration: 10000 })
 
 // Narrate - Jack emotes the shove, room announces the result
-call_method({
-  objectId: 100, name: 'emote',
-  args: ["drives his shoulder into Marcus, sending him crashing through the rotted railing"]
-})
+const jack = await $load(100);
+const marcus = await $load(200);
+const room = jack.location;
 
-call_method({
-  objectId: 500, name: 'announce',
-  args: [null, "#200", {
-    target: "You hit the concrete below with a sickening thud. Everything goes white with pain.",
-    others: "Marcus hits the concrete below with a sickening thud, groaning."
-  }]
-})
+await jack.emote("drives his shoulder into Marcus, sending him crashing through the rotted railing");
+
+await room.announce(null, marcus, {
+  target: "You hit the concrete below with a sickening thud. Everything goes white with pain.",
+  others: "Marcus hits the concrete below with a sickening thud, groaning."
+});
 ```
 
 ### Grappling for Weapons
@@ -837,8 +822,11 @@ call_method({
 Close-quarters struggle for a gun:
 
 ```javascript
-// Jack (id: 100) and Marcus (id: 200) both fighting for the pistol (id: 150)
-// Room ID: 500
+// Jack and Marcus both fighting for the pistol
+const jack = await $load(100);
+const marcus = await $load(200);
+const pistol = await $load(150);
+const room = jack.location;
 
 // Make opposed checks
 combat({ action: 'check', combatId: 'combat-123', combatantId: 100,
@@ -846,42 +834,37 @@ combat({ action: 'check', combatId: 'combat-123', combatantId: 100,
 combat({ action: 'check', combatId: 'combat-123', combatantId: 200,
          skillName: 'grappling', opposingLevel: 45 })
 
-// Winner gets/keeps the gun
-// Use move_object if possession changes
+// Winner gets/keeps the gun - move it if possession changes
+await pistol.moveTo(jack, marcus);  // Jack wrests it from Marcus
 
 // The gun might go off during the struggle!
-// Consume ammo for the accidental discharge
-call_method({ objectId: 150, name: 'fire', args: [] })
+await pistol.call('fire');
 
 // Narrate the chaos - room announce works well here
-call_method({
-  objectId: 500, name: 'announce',
-  args: ["#100", "#200", {
-    actor: "You grapple for the pistol, four hands fighting for control. The gun barks - the round punching through the ceiling. Dust rains down. You wrench it free, jamming the barrel under %t's chin.",
-    target: "You grapple for the pistol, four hands fighting for control. The gun barks - the round punching through the ceiling. Dust rains down. %A wrenches it free, jamming the barrel under your chin.",
-    others: "They grapple for the pistol, four hands fighting for control. The gun barks - the round punching through the ceiling. Dust rains down. %A wrenches it free, jamming the barrel under %t's chin."
-  }]
-})
+await room.announce(jack, marcus, {
+  actor: "You grapple for the pistol, four hands fighting for control. The gun barks - the round punching through the ceiling. Dust rains down. You wrench it free, jamming the barrel under %t's chin.",
+  target: "You grapple for the pistol, four hands fighting for control. The gun barks - the round punching through the ceiling. Dust rains down. %A wrenches it free, jamming the barrel under your chin.",
+  others: "They grapple for the pistol, four hands fighting for control. The gun barks - the round punching through the ceiling. Dust rains down. %A wrenches it free, jamming the barrel under %t's chin."
+});
 ```
 
-### Quick Reference: MCP Tools in Combat
+### Quick Reference: Combat Operations
 
-| Tool | When to Use |
-|------|-------------|
-| `combat check` | Skill checks for actions |
-| `combat damage` | Apply wounds |
-| `combat effect` | Status effects (stunned, disarmed, knocked down) |
-| `combat next_round` | Continue combat |
-| `combat end` | End combat |
-| `call_method` location `announce()` | Third-person room narration with pronoun substitution |
-| `call_method` player `emote()` | Make a player emote their action |
-| `room.announce(npc, null, {others: '...'})` | Make an NPC emote with pronoun substitution |
-| `call_method` gun `fire()` | Fire a gun (decrements ammo correctly) |
-| `call_method` gun `load()` | Reload a gun (magazine or ammo) |
-| `call_method` gun `getAmmoCount()` | Check current ammo |
-| `move_object` | Disarm (drop weapon), give weapon, retrieve weapon |
-| `item.moveTo(npc, npc)` | Have NPC pick up item |
-| `set_property` | Modify object properties (use sparingly) |
+| Operation | How to Do It |
+|-----------|--------------|
+| Skill checks | `combat({ action: 'check', ... })` |
+| Apply wounds | `combat({ action: 'damage', ... })` |
+| Status effects | `combat({ action: 'effect', ... })` (stunned, disarmed, knocked down) |
+| Continue combat | `combat({ action: 'next_round', ... })` |
+| End combat | `combat({ action: 'end', ... })` |
+| Room narration | `await room.announce(actor, target, { actor: '...', target: '...', others: '...' })` |
+| Make player emote | `await player.emote('does something')` |
+| Make NPC emote | `await room.announce(npc, null, { others: '...' })` |
+| Fire a gun | `await gun.call('fire')` |
+| Reload a gun | `await gun.call('load', magazine)` |
+| Check ammo | `await gun.call('getAmmoCount')` |
+| Disarm/give/retrieve | `await item.moveTo(destination, actor)` |
+| Modify properties | Direct assignment: `obj.property = value` |
 
 ---
 
@@ -981,24 +964,24 @@ combat({
 7. **Narrate:**
 
 ```javascript
+// Load objects
+const vera = await $load(100);
+const cole = await $load(200);
+const knife = await $load(250);
+const room = vera.location;
+
 // Vera emotes her successful disarm
-call_method({
-  objectId: 100, name: 'emote',
-  args: ["pivots as Cole lunges, her switchblade slashing across his knuckles"]
-})
+await vera.emote("pivots as Cole lunges, her switchblade slashing across his knuckles");
 
 // Room announce for the result
-call_method({
-  objectId: 500, name: 'announce',
-  args: ["#100", "#200", {
-    actor: "%T's hunting knife clatters to the floor as %ts recoils, blood welling from %tp hand. %Ts unarmed now, and you're not.",
-    target: "Your hunting knife clatters to the floor as you recoil, blood welling from your hand. You're unarmed now, and %as not.",
-    others: "%T's hunting knife clatters to the floor as %ts recoils, blood welling from %tp hand. %Ts unarmed now, and %a's not."
-  }]
-})
+await room.announce(vera, cole, {
+  actor: "%T's hunting knife clatters to the floor as %ts recoils, blood welling from %tp hand. %Ts unarmed now, and you're not.",
+  target: "Your hunting knife clatters to the floor as you recoil, blood welling from your hand. You're unarmed now, and %as not.",
+  others: "%T's hunting knife clatters to the floor as %ts recoils, blood welling from %tp hand. %Ts unarmed now, and %a's not."
+});
 
 // Drop the knife to the room floor
-move_object({ objectId: 250, destinationId: 500 })
+await knife.moveTo(room, vera);
 ```
 
 8. **Continue:**

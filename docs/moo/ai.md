@@ -244,20 +244,26 @@ AI humans with role "guard":
 
 ## MCP Integration
 
-AI-controlled humans can also be created via MCP tools:
+AI-controlled humans can be created via `execute_moo_code`:
 
 ```javascript
-// Using MCP call_method on $ai
-await $ai.spawn('guard', {
-  name: 'Marcus',
-  sex: 'male',
-  age: 35,
-  location: roomId,
-});
+execute_moo_code({
+  code: `
+    // Using $ai.spawn
+    const npc = await $ai.spawn('guard', {
+      name: 'Marcus',
+      sex: 'male',
+      age: 35,
+      location: roomId,
+    });
 
-// Or create manually and register
-const human = await $recycler.create($human, { ... });
-await $ai.register(human.id, 'guard');
+    // Or create manually and register
+    const human = await $recycler.create($human, { ... });
+    await $ai.register(human.id, 'guard');
+
+    return { npcId: npc.id };
+  `
+});
 ```
 
 ## Use Cases
