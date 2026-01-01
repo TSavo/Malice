@@ -13,7 +13,15 @@ import { type Builder, registerBuilder } from '../builder-registry';
  */
 export class AircraftBuilder implements Builder {
   static provides = ['aircraft'];
-  static depends = ['vehicle', 'airspace', 'airspaceRoom'];
+  static depends = [
+    'vehicle',
+    'airspace',
+    'airspaceRoom',
+    'starter',
+    'alternator',
+    'ecu',
+    'wiringHarness',
+  ];
 
   private obj: RuntimeObject | null = null;
 
@@ -40,8 +48,16 @@ export class AircraftBuilder implements Builder {
           cruiseAltitude: 100, // Default z-level (300m)
           maxAltitude: 200, // Maximum z-level (600m)
           climbRate: 1, // z-levels per minute (not used for instant movement)
-          // Override required parts for aircraft
-          requiredParts: ['engine', 'fuelTank', 'battery'],
+          // Override required parts for aircraft (no ground brakes/steering)
+          requiredParts: [
+            'engine',
+            'fuelTank',
+            'battery',
+            'starter',
+            'alternator',
+            'ecu',
+            'wiringHarness',
+          ],
           // AI-readable abilities
           abilities: `Fixed-wing aircraft. Jet fuel, high consumption. Needs runway or VTOL.
 

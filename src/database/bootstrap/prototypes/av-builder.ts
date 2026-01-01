@@ -13,6 +13,10 @@ export class AvBuilder implements Builder {
     'fuelTank',
     'vehicleBattery',
     'vectorThruster',
+    'starter',
+    'alternator',
+    'ecu',
+    'wiringHarness',
   ];
 
   private obj: RuntimeObject | null = null;
@@ -37,6 +41,10 @@ export class AvBuilder implements Builder {
           requiredParts: [
             'fuelTank',
             'battery',
+            'starter',
+            'alternator',
+            'ecu',
+            'wiringHarness',
             'vectorThruster',
             'vectorThruster', // Dual thrusters for stability
           ],
