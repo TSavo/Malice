@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
-import { registerBuilder, type Builder } from '../builder-registry';
+import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Builds the Room type
@@ -48,29 +48,29 @@ export class RoomBuilder implements Builder {
         properties: {
           name: 'Room',
           description: 'Base prototype for rooms',
-        // Spatial coordinates (integers, in meters)
-        x: 0,
-        y: 0,
-        z: 0, // Vertical: negative = underground, positive = above ground
-        // Array of Exit object IDs
-        // Each Exit has: name, aliases, destRoom, distance, hidden, locked
-        exits: [],
-        // Sittable locations in the room
-        // Each entry: { name, capacity, occupied: [] }
-        // e.g., { name: 'a wooden chair', capacity: 1, occupied: [] }
-        // e.g., { name: 'a long bench', capacity: 4, occupied: [] }
-        sittables: [],
-        // Crowd mechanics
-        population: 0, // Artificial crowd level (0-100)
-        ambientNoise: 0, // Base noise level (0-100)
-        // Lighting (affects vision)
-        lighting: 100, // 0=pitch black, 50=dim, 100=well-lit
-        // Water level (affects breathing)
-        waterLevel: 0, // 0=dry, 50=waist-deep, 100=fully submerged
-        // Environment
-        outdoor: true, // Is this room outdoors? (affects weather, natural light)
+          // Spatial coordinates (integers, in meters)
+          x: 0,
+          y: 0,
+          z: 0, // Vertical: negative = underground, positive = above ground
+          // Array of Exit object IDs
+          // Each Exit has: name, aliases, destRoom, distance, hidden, locked
+          exits: [],
+          // Sittable locations in the room
+          // Each entry: { name, capacity, occupied: [] }
+          // e.g., { name: 'a wooden chair', capacity: 1, occupied: [] }
+          // e.g., { name: 'a long bench', capacity: 4, occupied: [] }
+          sittables: [],
+          // Crowd mechanics
+          population: 0, // Artificial crowd level (0-100)
+          ambientNoise: 0, // Base noise level (0-100)
+          // Lighting (affects vision)
+          lighting: 100, // 0=pitch black, 50=dim, 100=well-lit
+          // Water level (affects breathing)
+          waterLevel: 0, // 0=dry, 50=waist-deep, 100=fully submerged
+          // Environment
+          outdoor: true, // Is this room outdoors? (affects weather, natural light)
 
-        abilities: `Physical space that agents can occupy and traverse.
+          abilities: `Physical space that agents can occupy and traverse.
 
 COORDINATES: x, y, z position in meters. Used for distance calculations between rooms. z negative = underground.
 
@@ -95,7 +95,7 @@ OUTDOOR: 'outdoor' affects weather exposure, natural lighting cycles.`,
     }
 
     // Always rebuild methods (ensures they exist even if type was pre-existing)
-    const obj = this.obj!
+    const obj = this.obj!;
     obj.setMethod(
       'describe',
       `

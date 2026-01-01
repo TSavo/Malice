@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
-import { registerBuilder, type Builder } from '../builder-registry';
+import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Builds the OneTimeLocker type
@@ -27,7 +27,6 @@ export class OneTimeLockerBuilder implements Builder {
   constructor(private manager: ObjectManager) {}
 
   async build(): Promise<void> {
-
     const existing = await this.manager.load('oneTimeLocker');
     if (existing) {
       this.obj = existing;
@@ -39,12 +38,12 @@ export class OneTimeLockerBuilder implements Builder {
       this.obj = await this.manager.define('oneTimeLocker', parent, {
         properties: {
           name: 'One-Time Locker Bank',
-        description:
-          'A bank of storage lockers that support one-time access codes for couriers.',
-        // Override rental duration - courier lockers are shorter term (24 hours default)
-        rentalDurationMs: 24 * 60 * 60 * 1000,
+          description:
+            'A bank of storage lockers that support one-time access codes for couriers.',
+          // Override rental duration - courier lockers are shorter term (24 hours default)
+          rentalDurationMs: 24 * 60 * 60 * 1000,
 
-        abilities: `Locker bank optimized for courier dead-drops. Adds verbs to base $.locker.
+          abilities: `Locker bank optimized for courier dead-drops. Adds verbs to base $.locker.
 
 VERBS: rent locker, open/close locker [id], set code, get code, check, release, renew, put/get from locker.
 
@@ -531,7 +530,7 @@ VERB REGISTRATION: Registers verbs when placed in room or player enters. Unregis
   }
 
   async registerAliases(): Promise<void> {
-    console.log('[OneTimeLockerBuilder] Type \'oneTimeLocker\' auto-aliased');
+    console.log("[OneTimeLockerBuilder] Type 'oneTimeLocker' auto-aliased");
   }
 }
 

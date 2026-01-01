@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../types/object';
 import type { ObjectManager } from '../object-manager';
-import { registerBuilder, type Builder } from './builder-registry';
+import { type Builder, registerBuilder } from './builder-registry';
 
 /**
  * Builds the $transports system object
@@ -42,8 +42,7 @@ export class TransportsBuilder implements Builder {
         parent: root!,
         properties: {
           name: 'Transports',
-          description:
-            'Transport registry for faction network infrastructure.',
+          description: 'Transport registry for faction network infrastructure.',
           // Registry reference set by GameCoordinator
           _registryRef: null,
 

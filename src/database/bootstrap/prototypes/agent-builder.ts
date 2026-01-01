@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
-import { registerBuilder, type Builder } from '../builder-registry';
+import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Builds the Agent type
@@ -40,8 +40,8 @@ export class AgentBuilder implements Builder {
 
       this.obj = await this.manager.define('agent', describable, {
         properties: {
-        name: 'Agent',
-        description: 'Base prototype for things that can act',
+          name: 'Agent',
+          description: 'Base prototype for things that can act',
           // Verb registry: { pattern: { obj: ObjId, method: string } }
           // Patterns like 'get %i', 'shoot %i with %t', 'say %s'
           verbs: {},
@@ -119,7 +119,7 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
     }
 
     // Always rebuild methods (ensures they exist even if type was pre-existing)
-    const obj = this.obj!
+    const obj = this.obj!;
     this.addVerbMethods(obj);
     this.addResolutionMethods(obj);
     this.addActionMethods(obj);

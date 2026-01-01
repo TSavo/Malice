@@ -10,6 +10,7 @@ export { BankTerminalBuilder } from './bank-terminal-builder';
 export { BiometricLockBuilder } from './biometric-lock-builder';
 export * from './bladed-weapon-builders';
 export * from './blunt-weapon-builders';
+export { BluntWeaponPrototypesBuilder } from './blunt-weapon-builders';
 export { BodyFactory } from './body-factory';
 export { BodyPartsBuilder } from './body-parts-builder';
 // Body system
@@ -77,7 +78,6 @@ export { TotemPoleBuilder } from './totem-pole-builder';
 export { VendableBuilder } from './vendable-builder';
 // Weapons
 export { WeaponBuilder } from './weapon-builder';
-export { BluntWeaponPrototypesBuilder } from './blunt-weapon-builders';
 // Note: Bladed, Firearm, and Improvised weapons now use individual Builders that self-register
 // Wearables
 export { WearableBuilder } from './wearable-builder';

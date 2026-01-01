@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
-import { registerBuilder, type Builder } from '../builder-registry';
+import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Builds the Stackable type
@@ -27,7 +27,6 @@ export class StackableBuilder implements Builder {
   constructor(private manager: ObjectManager) {}
 
   async build(): Promise<void> {
-
     const existing = await this.manager.load('stackable');
     if (existing) {
       this.obj = existing;
@@ -325,7 +324,7 @@ OPERATIONS:
   }
 
   async registerAliases(): Promise<void> {
-    console.log('[StackableBuilder] Type \'stackable\' auto-aliased');
+    console.log("[StackableBuilder] Type 'stackable' auto-aliased");
   }
 }
 

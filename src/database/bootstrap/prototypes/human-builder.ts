@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
-import { registerBuilder, type Builder } from '../builder-registry';
+import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Builds the Human type
@@ -40,24 +40,24 @@ export class HumanBuilder implements Builder {
 
       this.obj = await this.manager.define('human', embodied, {
         properties: {
-        name: 'Human',
-        description: 'Base prototype for human-like agents',
-        sex: 'non-binary',
-        pronouns: {
-          subject: 'they',
-          object: 'them',
-          possessive: 'their',
-        },
-        age: 25,
-        species: 'human',
-        // Appearance properties
-        height: 1.7, // meters
-        weight: 75, // kg
-        // Known languages (for understanding speech)
-        knownLanguages: ['English'],
-        nativeLanguage: 'English',
+          name: 'Human',
+          description: 'Base prototype for human-like agents',
+          sex: 'non-binary',
+          pronouns: {
+            subject: 'they',
+            object: 'them',
+            possessive: 'their',
+          },
+          age: 25,
+          species: 'human',
+          // Appearance properties
+          height: 1.7, // meters
+          weight: 75, // kg
+          // Known languages (for understanding speech)
+          knownLanguages: ['English'],
+          nativeLanguage: 'English',
 
-        abilities: `Human being with human body structure and social capabilities.
+          abilities: `Human being with human body structure and social capabilities.
 
 IDENTITY: 'sex', 'pronouns', 'age', 'species' define identity. Pronouns affect narration. Age affects appearance description.
 
@@ -75,13 +75,13 @@ STATS: Derived from body part effective capacities:
 SOCIAL: Can speak (via mouth), emote, give items. AI-controlled humans respond to onSpokenTo(), onItemReceived().
 
 BODY STRUCTURE: Standard human layout - torso with head, 2 arms (hands), 2 legs (feet). Body created via $.humanBodyFactory.`,
-      },
+        },
         methods: {},
       });
     }
 
     // Always rebuild methods (ensures they exist even if type was pre-existing)
-    const obj = this.obj!
+    const obj = this.obj!;
     // Property descriptions
     obj.setPropertyDescription(
       'sex',

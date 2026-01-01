@@ -3,7 +3,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { RuntimeObject } from '../../../types/object';
 import type { ObjectManager } from '../object-manager';
-import { registerBuilder, type Builder } from './builder-registry';
+import { type Builder, registerBuilder } from './builder-registry';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DOCS_DIR = join(__dirname, '../../../docs');

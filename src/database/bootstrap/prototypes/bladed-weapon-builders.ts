@@ -1,5 +1,5 @@
 import type { ObjectManager } from '../../object-manager';
-import { registerBuilder, type Builder } from '../builder-registry';
+import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Bladed Weapon Types
@@ -189,7 +189,8 @@ export class SwitchbladeBuilder implements Builder {
     await this.manager.define('switchblade', parent, {
       properties: {
         name: 'Switchblade',
-        description: 'A spring-loaded folding knife. Flicks open with a button.',
+        description:
+          'A spring-loaded folding knife. Flicks open with a button.',
         skill: 'knife',
         damage: 10,
         damageType: 'puncture',
@@ -339,7 +340,8 @@ export class MacheteBuilder implements Builder {
     await this.manager.define('machete', parent, {
       properties: {
         name: 'Machete',
-        description: 'A heavy blade for chopping. Originally an agricultural tool.',
+        description:
+          'A heavy blade for chopping. Originally an agricultural tool.',
         skill: 'machete',
         damage: 28,
         damageType: 'cut',

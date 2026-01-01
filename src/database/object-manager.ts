@@ -1343,9 +1343,7 @@ export class ObjectManager {
    */
   async pull(id: ObjId): Promise<void> {
     const obj =
-      typeof id === 'string'
-        ? this.getTypeSync(id)
-        : this.cache.getObject(id);
+      typeof id === 'string' ? this.getTypeSync(id) : this.cache.getObject(id);
     if (obj) {
       await obj.pull();
     }
@@ -1357,9 +1355,7 @@ export class ObjectManager {
    */
   async push(id: ObjId): Promise<void> {
     const obj =
-      typeof id === 'string'
-        ? this.getTypeSync(id)
-        : this.cache.getObject(id);
+      typeof id === 'string' ? this.getTypeSync(id) : this.cache.getObject(id);
     if (obj) {
       await obj.push();
     }

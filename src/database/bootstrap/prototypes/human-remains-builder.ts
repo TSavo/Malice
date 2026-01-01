@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
-import { registerBuilder, type Builder } from '../builder-registry';
+import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Builds the HumanRemains type
@@ -22,7 +22,6 @@ export class HumanRemainsBuilder implements Builder {
   constructor(private manager: ObjectManager) {}
 
   async build(): Promise<void> {
-
     const existing = await this.manager.load('humanRemains');
     if (existing) {
       this.obj = existing;
@@ -32,23 +31,23 @@ export class HumanRemainsBuilder implements Builder {
         properties: {
           name: 'Human Remains',
           description: 'Dried remains of a human.',
-        // Original identity
-        originalName: null,
-        // Physical
-        width: 50,
-        height: 40,
-        depth: 40,
-        weight: 15000, // grams (~15kg - dried out)
-        // Very slow decay - months to become skeletal
-        // 6 months = 259200 ticks, 100% / 259200 = ~0.000386% per tick
-        decayRate: 0.000386,
-        decayLevel: 0, // Starts fresh as human remains
-        decayCondition: 'always',
-        // Contents
-        contents: [],
-        searched: false,
+          // Original identity
+          originalName: null,
+          // Physical
+          width: 50,
+          height: 40,
+          depth: 40,
+          weight: 15000, // grams (~15kg - dried out)
+          // Very slow decay - months to become skeletal
+          // 6 months = 259200 ticks, 100% / 259200 = ~0.000386% per tick
+          decayRate: 0.000386,
+          decayLevel: 0, // Starts fresh as human remains
+          decayCondition: 'always',
+          // Contents
+          contents: [],
+          searched: false,
 
-        abilities: `Desiccated human remains - between corpse and skeleton.
+          abilities: `Desiccated human remains - between corpse and skeleton.
 
 DECAY: Very slow (~6 months). Dried tissue clings to bones, gradually flaking away. At 100% decay, transforms to $.skeletalRemains.
 
@@ -397,7 +396,7 @@ FORENSICS: Bone fractures still visible. Time since death estimated from tissue 
   }
 
   async registerAliases(): Promise<void> {
-    console.log('[HumanRemainsBuilder] Type \'humanRemains\' auto-aliased');
+    console.log("[HumanRemainsBuilder] Type 'humanRemains' auto-aliased");
   }
 }
 

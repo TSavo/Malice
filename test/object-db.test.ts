@@ -530,7 +530,9 @@ describe('ObjectDatabase', () => {
       expect(children.map((c) => c._id).sort()).toEqual([301, 302]);
 
       // Update parent reference
-      await db.update(301, { parent: { type: 'objref', target: 'object', id: 0 } });
+      await db.update(301, {
+        parent: { type: 'objref', target: 'object', id: 0 },
+      });
 
       // Children should be updated
       const newChildren = await db.getChildren(300);

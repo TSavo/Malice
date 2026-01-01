@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
-import { registerBuilder, type Builder } from '../builder-registry';
+import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Builds the Pocket type
@@ -41,20 +41,20 @@ export class PocketBuilder implements Builder {
 
       this.obj = await this.manager.define('pocket', parentObj, {
         properties: {
-        name: 'Pocket',
-        description: 'A pocket sewn into clothing',
-        aliases: ['pocket'],
+          name: 'Pocket',
+          description: 'A pocket sewn into clothing',
+          aliases: ['pocket'],
 
-        // Capacity limits
-        maxWeight: 500, // grams
-        maxVolume: 500, // cubic cm
+          // Capacity limits
+          maxWeight: 500, // grams
+          maxVolume: 500, // cubic cm
 
-        // What clothing this pocket is part of
-        attachedTo: null, // ObjRef to clothing item
+          // What clothing this pocket is part of
+          attachedTo: null, // ObjRef to clothing item
 
-        // contents: [] inherited from describable
+          // contents: [] inherited from describable
 
-        abilities: `Container attached to clothing for storing small items.
+          abilities: `Container attached to clothing for storing small items.
 
 CAPACITY: 'maxWeight' (grams) and 'maxVolume' (cubic cm) limit what fits. canContain() checks both.
 

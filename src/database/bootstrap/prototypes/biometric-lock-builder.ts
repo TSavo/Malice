@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
-import { registerBuilder, type Builder } from '../builder-registry';
+import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Builds the BiometricLock type
@@ -86,7 +86,7 @@ BYPASS: Cannot be picked like a mechanical lock. Can potentially be bypassed wit
   }
 
   async registerAliases(): Promise<void> {
-    console.log('[BiometricLockBuilder] Type \'biometricLock\' auto-aliased');
+    console.log("[BiometricLockBuilder] Type 'biometricLock' auto-aliased");
   }
 }
 

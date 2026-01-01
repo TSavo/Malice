@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../types/object';
 import type { ObjectManager } from '../object-manager';
-import { registerBuilder, type Builder } from './builder-registry';
+import { type Builder, registerBuilder } from './builder-registry';
 
 /**
  * Builds GameEvents object for emitting game events to MongoDB
@@ -74,7 +74,6 @@ export class GameEventsBuilder implements Builder {
       return eventId;
     `,
     );
-
   }
 
   async registerAliases(): Promise<void> {

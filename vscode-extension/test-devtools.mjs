@@ -59,7 +59,9 @@ async function main() {
   try {
     // Test 1: List objects
     console.log('=== Listing objects ===');
-    const listResult = await request(ws, 'objects.list', { includeRecycled: false });
+    const listResult = await request(ws, 'objects.list', {
+      includeRecycled: false,
+    });
     console.log(`Found ${listResult.objects.length} objects`);
 
     // Test 2: Get object
@@ -68,8 +70,13 @@ async function main() {
     console.log('Object:', JSON.stringify(objResult.object, null, 2));
 
     // Test 3: Get property
-    console.log(`\n=== Getting property '${propName}' from object #${objectId} ===`);
-    const propResult = await request(ws, 'property.get', { objectId, name: propName });
+    console.log(
+      `\n=== Getting property '${propName}' from object #${objectId} ===`,
+    );
+    const propResult = await request(ws, 'property.get', {
+      objectId,
+      name: propName,
+    });
     console.log('Property result:', JSON.stringify(propResult, null, 2));
     console.log('Value type:', typeof propResult.property.value);
     console.log('Value:', propResult.property.value);
@@ -85,7 +92,6 @@ async function main() {
       console.log('WARNING: JSON.stringify returned undefined!');
       console.log('This would cause Buffer.from() to fail');
     }
-
   } catch (err) {
     console.error('Error:', err.message);
     if (err.stack) console.error(err.stack);

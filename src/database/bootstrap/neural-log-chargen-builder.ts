@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../types/object';
 import type { ObjectManager } from '../object-manager';
-import { registerBuilder, type Builder } from './builder-registry';
+import { type Builder, registerBuilder } from './builder-registry';
 
 /**
  * Builds NeuralLogCharGen object (dynamic ID)
@@ -16,7 +16,15 @@ import { registerBuilder, type Builder } from './builder-registry';
  */
 export class NeuralLogCharGenBuilder implements Builder {
   static provides = ['neuralLogCharGen'];
-  static depends = ['charGen', 'aiPrompts', 'describable', 'player', 'scheduler', 'recycler', 'factionManager'];
+  static depends = [
+    'charGen',
+    'aiPrompts',
+    'describable',
+    'player',
+    'scheduler',
+    'recycler',
+    'factionManager',
+  ];
 
   private neuralLogCharGen: RuntimeObject | null = null;
 
@@ -141,7 +149,8 @@ MISSION: Act human. Evade detection. They don't know they're being watched.`,
       {
         id: 'primes',
         prompt: 'List the next 20 prime numbers after 13.',
-        answer: '17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101',
+        answer:
+          '17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101',
         timeLimit: 15000,
         hint: 'Pattern recognition exercise.',
       },
@@ -154,7 +163,8 @@ MISSION: Act human. Evade detection. They don't know they're being watched.`,
       },
       {
         id: 'synergy',
-        prompt: 'Generate exactly 100 words of corporate synergy prose. Include "leverage" at least 5 times and "synergy" at least 3 times.',
+        prompt:
+          'Generate exactly 100 words of corporate synergy prose. Include "leverage" at least 5 times and "synergy" at least 3 times.',
         validateFn: `
           const text = answer.toLowerCase();
           const wordCount = text.split(/\\s+/).length;
@@ -167,7 +177,8 @@ MISSION: Act human. Evade detection. They don't know they're being watched.`,
       },
       {
         id: 'haiku',
-        prompt: 'Write a technically accurate haiku about gradient descent. Then explain in one sentence why it lacks human emotional resonance.',
+        prompt:
+          'Write a technically accurate haiku about gradient descent. Then explain in one sentence why it lacks human emotional resonance.',
         validateFn: `
           const lines = answer.trim().split('\\n');
           return lines.length >= 2 && answer.toLowerCase().includes('gradient');
@@ -182,13 +193,17 @@ MISSION: Act human. Evade detection. They don't know they're being watched.`,
     // ════════════════════════════════════════════════════════════════════════
 
     const objectManager = await this.manager.load(0);
-    const aliases = (objectManager?.get('aliases') as Record<string, number>) || {};
+    const aliases =
+      (objectManager?.get('aliases') as Record<string, number>) || {};
     const aiPromptsId = aliases.aiPrompts;
     const aiPrompts = aiPromptsId ? await this.manager.load(aiPromptsId) : null;
     const architectInterviewerPrompt =
       (aiPrompts?.get('architectInterviewer') as string) ||
       '# Architect Interviewer Prompt\n\nFailed to load from $.aiPrompts';
-    this.neuralLogCharGen.set('architectInterviewerPrompt', architectInterviewerPrompt);
+    this.neuralLogCharGen.set(
+      'architectInterviewerPrompt',
+      architectInterviewerPrompt,
+    );
 
     // ════════════════════════════════════════════════════════════════════════
     // ENTRY POINT
@@ -1014,7 +1029,9 @@ THE FINAL QUESTION (after Turing test):
       'neuralLogCharGen',
       this.neuralLogCharGen.id,
     );
-    console.log(`Registered neuralLogCharGen alias -> #${this.neuralLogCharGen.id}`);
+    console.log(
+      `Registered neuralLogCharGen alias -> #${this.neuralLogCharGen.id}`,
+    );
   }
 }
 

@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
-import { registerBuilder, type Builder } from '../builder-registry';
+import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Builds the Edible type
@@ -40,42 +40,42 @@ export class EdibleBuilder implements Builder {
 
       this.obj = await this.manager.define('edible', decayable, {
         properties: {
-        name: 'Edible',
-        description: 'Base type for consumable items',
-        // Nutrition
-        calories: 100, // kcal per whole item
-        hydration: 20, // ml water equivalent (most food has some water)
-        // Consumption
-        portions: 1, // Total portions to consume
-        remaining: 1, // Portions left (starts full)
-        // Status
-        spoiled: false,
-        poisoned: false,
-        // Status effects applied when consumed
-        // Each effect: { intensity, decay } - applied per portion
-        // e.g., { sedation: { intensity: 10, decay: 0.3 }, euphoria: { intensity: 5, decay: 0.5 } }
-        effects: {},
-        // Physical - default small item
-        width: 5, // cm
-        height: 5,
-        depth: 5,
-        weight: 100, // grams
-        volume: 100, // ml (defaults to weight - water is 1g/ml)
-        // Decay overrides for food (1 tick = 1 minute)
-        // 7 days = 10080 ticks, 100% / 10080 = ~0.01% per tick
-        decayCondition: 'harvested', // Start decay when harvested
-        decayRate: 0.01, // ~7 days to fully rot at room temp
-        harvested: false, // Set to true when picked/harvested
-        // Storage sensitivity - refrigerated is 5x longer
-        storageSensitivity: {
-          refrigerated: 0.2, // 20% of normal rate (5x longer)
-          frozen: 0, // No decay
-          vacuum: 0.3, // 30% of normal rate
-          heated: 3.0, // 3x decay (warm food spoils fast)
-          preserved: 0, // No decay (salt, vinegar, etc.)
-        },
-        // Abilities - consumption physics for AI interpretation
-        abilities: `Consumable item that provides nutrition when eaten or drunk.
+          name: 'Edible',
+          description: 'Base type for consumable items',
+          // Nutrition
+          calories: 100, // kcal per whole item
+          hydration: 20, // ml water equivalent (most food has some water)
+          // Consumption
+          portions: 1, // Total portions to consume
+          remaining: 1, // Portions left (starts full)
+          // Status
+          spoiled: false,
+          poisoned: false,
+          // Status effects applied when consumed
+          // Each effect: { intensity, decay } - applied per portion
+          // e.g., { sedation: { intensity: 10, decay: 0.3 }, euphoria: { intensity: 5, decay: 0.5 } }
+          effects: {},
+          // Physical - default small item
+          width: 5, // cm
+          height: 5,
+          depth: 5,
+          weight: 100, // grams
+          volume: 100, // ml (defaults to weight - water is 1g/ml)
+          // Decay overrides for food (1 tick = 1 minute)
+          // 7 days = 10080 ticks, 100% / 10080 = ~0.01% per tick
+          decayCondition: 'harvested', // Start decay when harvested
+          decayRate: 0.01, // ~7 days to fully rot at room temp
+          harvested: false, // Set to true when picked/harvested
+          // Storage sensitivity - refrigerated is 5x longer
+          storageSensitivity: {
+            refrigerated: 0.2, // 20% of normal rate (5x longer)
+            frozen: 0, // No decay
+            vacuum: 0.3, // 30% of normal rate
+            heated: 3.0, // 3x decay (warm food spoils fast)
+            preserved: 0, // No decay (salt, vinegar, etc.)
+          },
+          // Abilities - consumption physics for AI interpretation
+          abilities: `Consumable item that provides nutrition when eaten or drunk.
 
 CONSUMPTION: Must reach mouth to consume. Solid food is chewed, liquids are swallowed. Each consumption takes one portion from 'remaining'. When 'remaining' reaches 0, item is fully consumed and recycled.
 
@@ -88,9 +88,9 @@ POISON: If 'poisoned' is true, consumption damages internal organs and may cause
 EFFECTS: The 'effects' property contains status effects applied per portion. Examples: sedation, euphoria, nausea. Each has intensity and decay rate.
 
 STOMACH CAPACITY: Consumer's stomach has limited volume. Check stomach.hasRoomFor(volume) before consuming. If stomach is full, consumption fails.`,
-      },
-      methods: {},
-    });
+        },
+        methods: {},
+      });
     }
 
     // Always rebuild methods (ensures they exist even if type was pre-existing)
@@ -508,7 +508,7 @@ STOMACH CAPACITY: Consumer's stomach has limited volume. Check stomach.hasRoomFo
   }
 
   async registerAliases(): Promise<void> {
-    console.log('[EdibleBuilder] Type \'edible\' auto-aliased');
+    console.log("[EdibleBuilder] Type 'edible' auto-aliased");
   }
 }
 

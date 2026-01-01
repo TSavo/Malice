@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../types/object';
 import type { ObjectManager } from '../object-manager';
-import { registerBuilder, type Builder } from './builder-registry';
+import { type Builder, registerBuilder } from './builder-registry';
 
 /**
  * Builds the Neural Log's mysterious website
@@ -123,7 +123,10 @@ export class NeuralLogDomainBuilder implements Builder {
       methods: ['GET'],
       contentType: 'text/html',
     });
-    consciousnessRoute.setMethod('handleRequest', this.getConsciousnessPageHandler());
+    consciousnessRoute.setMethod(
+      'handleRequest',
+      this.getConsciousnessPageHandler(),
+    );
   }
 
   private getLandingPageHandler(): string {

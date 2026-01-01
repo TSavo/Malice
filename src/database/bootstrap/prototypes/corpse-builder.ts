@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
-import { registerBuilder, type Builder } from '../builder-registry';
+import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Builds the Corpse type
@@ -29,7 +29,6 @@ export class CorpseBuilder implements Builder {
   constructor(private manager: ObjectManager) {}
 
   async build(): Promise<void> {
-
     const existing = await this.manager.load('corpse');
     if (existing) {
       this.obj = existing;
@@ -39,25 +38,25 @@ export class CorpseBuilder implements Builder {
         properties: {
           name: 'Corpse',
           description: 'A lifeless body.',
-        // Original identity - for autopsy, sex is determined from anatomy
-        originalName: null,
-        // Physical - average human body
-        width: 50, // cm
-        height: 180,
-        depth: 30,
-        weight: 70000, // grams (~70kg)
-        // Inventory from dead player
-        contents: [],
-        // Corpse-specific decay - this is hardcore survival
-        // ~2 months to fully decompose (86400 ticks = 60 days)
-        // 100% / 86400 = ~0.00116% per tick
-        // Bones will litter the landscape for a long time
-        decayRate: 0.00116,
-        decayCondition: 'always', // Always decaying
-        // Can be searched/looted
-        searched: false,
+          // Original identity - for autopsy, sex is determined from anatomy
+          originalName: null,
+          // Physical - average human body
+          width: 50, // cm
+          height: 180,
+          depth: 30,
+          weight: 70000, // grams (~70kg)
+          // Inventory from dead player
+          contents: [],
+          // Corpse-specific decay - this is hardcore survival
+          // ~2 months to fully decompose (86400 ticks = 60 days)
+          // 100% / 86400 = ~0.00116% per tick
+          // Bones will litter the landscape for a long time
+          decayRate: 0.00116,
+          decayCondition: 'always', // Always decaying
+          // Can be searched/looted
+          searched: false,
 
-        abilities: `Dead body left behind when someone dies.
+          abilities: `Dead body left behind when someone dies.
 
 DECAY TIMELINE: Corpses decompose over ~60 days through stages:
 - Fresh (0-10%): Recently dead, recognizable, can identify victim
@@ -603,7 +602,7 @@ TRANSFORMATION: At 100% decay, transforms into $.humanRemains (dried bones) whic
   }
 
   async registerAliases(): Promise<void> {
-    console.log('[CorpseBuilder] Type \'corpse\' auto-aliased');
+    console.log("[CorpseBuilder] Type 'corpse' auto-aliased");
   }
 }
 

@@ -85,7 +85,8 @@ export function getAllFactionPorts(factionCount: number): number[] {
     const factionPorts = calculateFactionPorts(i);
     if (factionPorts.http !== undefined) ports.push(factionPorts.http);
     if (factionPorts.ws !== undefined) ports.push(factionPorts.ws);
-    if (factionPorts.sessionMcp !== undefined) ports.push(factionPorts.sessionMcp);
+    if (factionPorts.sessionMcp !== undefined)
+      ports.push(factionPorts.sessionMcp);
   }
 
   return ports;

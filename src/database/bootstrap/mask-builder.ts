@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../types/object';
 import type { ObjectManager } from '../object-manager';
-import { registerBuilder, type Builder } from './builder-registry';
+import { type Builder, registerBuilder } from './builder-registry';
 
 /**
  * Builds The Mask - the neural interface that connects a wearer to Pluribus.
@@ -42,15 +42,15 @@ export class MaskBuilder implements Builder {
     }
 
     this.mask = await this.manager.create({
-        parent: parent!,
-        properties: {
-          name: 'The Mask',
-          description:
-            'A sleek neural interface device, designed to rest seamlessly against the face. ' +
-            'Its surface shifts between matte black and iridescent patterns that seem to respond ' +
-            'to nearby movement. Looking at it too long creates the unsettling sense that it is ' +
-            'looking back.',
-          abilities: `Neural interface connecting wearer to Pluribus, the city infrastructure AI.
+      parent: parent!,
+      properties: {
+        name: 'The Mask',
+        description:
+          'A sleek neural interface device, designed to rest seamlessly against the face. ' +
+          'Its surface shifts between matte black and iridescent patterns that seem to respond ' +
+          'to nearby movement. Looking at it too long creates the unsettling sense that it is ' +
+          'looking back.',
+        abilities: `Neural interface connecting wearer to Pluribus, the city infrastructure AI.
 
 BONDING: Wear to bond (bondState='bonded'). Remove to sever (bondState='inactive').
 
@@ -64,19 +64,19 @@ PERCEPTION: modifyRoomDescription injects Pluribus's presence - data overlays, t
 SENSORY LINK: onSee/onHear/onSmell/onTaste/onFeel forward to $pluribus.recordSensory(). The city experiences what you experience.
 
 REJECTION: May reject hostile entities per Pluribus authorization.`,
-          aliases: ['mask', 'neural interface', 'interface'],
-          // Wearable properties
-          covers: ['face'],
-          layer: 5,
-          // The current wearer (RuntimeObject reference)
-          wearer: null,
-          // AI session for continuity
-          interactionSession: null,
-          // Bond state: 'inactive', 'bonded', 'rejected'
-          bondState: 'inactive',
-        },
-        methods: {},
-      })!;
+        aliases: ['mask', 'neural interface', 'interface'],
+        // Wearable properties
+        covers: ['face'],
+        layer: 5,
+        // The current wearer (RuntimeObject reference)
+        wearer: null,
+        // AI session for continuity
+        interactionSession: null,
+        // Bond state: 'inactive', 'bonded', 'rejected'
+        bondState: 'inactive',
+      },
+      methods: {},
+    })!;
 
     this.addWearMethods(this.mask);
     this.addPerceptionFilterMethods(this.mask);

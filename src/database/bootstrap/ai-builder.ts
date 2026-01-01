@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../types/object';
 import type { ObjectManager } from '../object-manager';
-import { registerBuilder, type Builder } from './builder-registry';
+import { type Builder, registerBuilder } from './builder-registry';
 
 /**
  * Builds AI object (dynamic ID)
@@ -111,7 +111,6 @@ WORLD LOG: logWorld(author, message) and getWorldLog(limit) manage the deity cha
         // Copied to each NPC's agentSystemPrompt on spawn
         // Uses {{variable}} syntax for templating
         defaultAgentPrompt,
-
       },
       methods: {},
     });

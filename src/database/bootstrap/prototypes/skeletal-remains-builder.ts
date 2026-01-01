@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
-import { registerBuilder, type Builder } from '../builder-registry';
+import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Builds the SkeletalRemains type
@@ -22,7 +22,6 @@ export class SkeletalRemainsBuilder implements Builder {
   constructor(private manager: ObjectManager) {}
 
   async build(): Promise<void> {
-
     const existing = await this.manager.load('skeletalRemains');
     if (existing) {
       this.obj = existing;
@@ -32,22 +31,22 @@ export class SkeletalRemainsBuilder implements Builder {
         properties: {
           name: 'Skeletal Remains',
           description: 'A pile of bones.',
-        // Original identity - needs autopsy to determine
-        originalName: null,
-        // Physical - just bones now
-        width: 50, // cm - scattered
-        height: 30,
-        depth: 50,
-        weight: 10000, // grams (~10kg of bones)
-        // NO DECAY - bones are permanent
-        decayRate: 0,
-        decayLevel: 100, // Already fully decayed
-        // Contents - the skeletal body and any remaining items
-        contents: [],
-        // Can be searched
-        searched: false,
+          // Original identity - needs autopsy to determine
+          originalName: null,
+          // Physical - just bones now
+          width: 50, // cm - scattered
+          height: 30,
+          depth: 50,
+          weight: 10000, // grams (~10kg of bones)
+          // NO DECAY - bones are permanent
+          decayRate: 0,
+          decayLevel: 100, // Already fully decayed
+          // Contents - the skeletal body and any remaining items
+          contents: [],
+          // Can be searched
+          searched: false,
 
-        abilities: `Bleached skeleton - the final stage of a corpse. Permanent.
+          abilities: `Bleached skeleton - the final stage of a corpse. Permanent.
 
 NO DECAY: Bones persist indefinitely. Weather, animals may scatter them but they don't disappear. Grim landmarks of past violence.
 
@@ -343,7 +342,7 @@ USES: Bones can be collected, buried, arranged. Skulls as trophies. Bone meal fo
   }
 
   async registerAliases(): Promise<void> {
-    console.log('[SkeletalRemainsBuilder] Type \'skeletalRemains\' auto-aliased');
+    console.log("[SkeletalRemainsBuilder] Type 'skeletalRemains' auto-aliased");
   }
 }
 

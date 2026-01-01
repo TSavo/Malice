@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
-import { registerBuilder, type Builder } from '../builder-registry';
+import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Builds the StomachContents type
@@ -28,13 +28,13 @@ export class StomachContentsBuilder implements Builder {
   constructor(private manager: ObjectManager) {}
 
   async build(): Promise<void> {
-
     const existing = await this.manager.load('stomachContents');
     if (existing) {
       this.obj = existing;
     } else {
       const parent = await this.manager.load('stackable');
-      if (!parent) throw new Error('StomachContentsBuilder: stackable type not found');
+      if (!parent)
+        throw new Error('StomachContentsBuilder: stackable type not found');
 
       this.obj = await this.manager.define('stomachContents', parent, {
         properties: {
@@ -53,25 +53,25 @@ Forensic evidence of poisoning survives in stomach contents.
 
 POISONING: 'spoiled' causes food poisoning. 'poisoned' is deliberate toxin.
 Both flags preserved through digestion for evidence.`,
-        // Stackable properties
-        // stackType is set dynamically: 'stomach:<sourceProto>:<spoiled>:<poisoned>'
-        stackType: null,
-        quantity: 1, // How many of this item were eaten (inherited from stackable)
-        unit: 'servings',
-        contraband: false,
-        // Source tracking
-        sourceName: '', // Original food name (e.g., "apple")
-        sourceProto: 0, // Original food prototype ID
-        sourceType: '', // 'food', 'drink', 'pill', etc.
-        // Nutrition to extract
-        calories: 0, // Total calories remaining
-        caloriesOriginal: 0, // Original calories (for % digested)
-        // Volume tracking (for stomach capacity)
-        volume: 0, // ml - current volume in stomach
-        volumeOriginal: 0, // ml - original volume consumed
-        // Status
-        spoiled: false,
-        poisoned: false,
+          // Stackable properties
+          // stackType is set dynamically: 'stomach:<sourceProto>:<spoiled>:<poisoned>'
+          stackType: null,
+          quantity: 1, // How many of this item were eaten (inherited from stackable)
+          unit: 'servings',
+          contraband: false,
+          // Source tracking
+          sourceName: '', // Original food name (e.g., "apple")
+          sourceProto: 0, // Original food prototype ID
+          sourceType: '', // 'food', 'drink', 'pill', etc.
+          // Nutrition to extract
+          calories: 0, // Total calories remaining
+          caloriesOriginal: 0, // Original calories (for % digested)
+          // Volume tracking (for stomach capacity)
+          volume: 0, // ml - current volume in stomach
+          volumeOriginal: 0, // ml - original volume consumed
+          // Status
+          spoiled: false,
+          poisoned: false,
         },
         methods: {},
       });
@@ -249,7 +249,7 @@ Both flags preserved through digestion for evidence.`,
   }
 
   async registerAliases(): Promise<void> {
-    console.log('[StomachContentsBuilder] Type \'stomachContents\' auto-aliased');
+    console.log("[StomachContentsBuilder] Type 'stomachContents' auto-aliased");
   }
 }
 

@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
-import { registerBuilder, type Builder } from '../builder-registry';
+import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Builds the Exit type
@@ -45,18 +45,18 @@ export class ExitBuilder implements Builder {
 
       this.obj = await this.manager.define('exit', describable, {
         properties: {
-        name: 'Exit',
-        description: 'A passage to another location',
-        aliases: [],
-        destRoom: null, // Destination room ID
-        distance: 10, // Distance in meters
-        hidden: false, // Hidden exits don't show in room description
-        locked: false, // Legacy simple lock
-        lockKey: null, // Legacy key-based lock
-        locks: [], // Composable lock objects
-        door: null, // Reference to $.door object
+          name: 'Exit',
+          description: 'A passage to another location',
+          aliases: [],
+          destRoom: null, // Destination room ID
+          distance: 10, // Distance in meters
+          hidden: false, // Hidden exits don't show in room description
+          locked: false, // Legacy simple lock
+          lockKey: null, // Legacy key-based lock
+          locks: [], // Composable lock objects
+          door: null, // Reference to $.door object
 
-        abilities: `Passage connecting one room to another.
+          abilities: `Passage connecting one room to another.
 
 DIRECTION: 'name' is primary direction (north, south, door). 'aliases' are shortcuts ([n], [s]).
 
@@ -80,7 +80,7 @@ USAGE: Room.go() finds exit via findExit(), checks canUse(), queues movement to 
     }
 
     // Always rebuild methods (ensures they exist even if type was pre-existing)
-    const obj = this.obj!
+    const obj = this.obj!;
     obj.setMethod(
       'matches',
       `

@@ -711,7 +711,11 @@ describe('RuntimeObject', () => {
       });
       expect(raw.methods).toBeDefined();
       // Parent is now stored as ObjRefValue with target and id
-      expect(raw.parent).toEqual({ type: 'objref', target: 'object', id: root.id });
+      expect(raw.parent).toEqual({
+        type: 'objref',
+        target: 'object',
+        id: root.id,
+      });
     });
 
     it('should reflect current state', () => {

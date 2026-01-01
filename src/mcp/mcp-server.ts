@@ -18,7 +18,12 @@ import {
 } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { z } from 'zod';
-import type { ObjId, ObjRefValue, RuntimeObject, Value } from '../../types/object.js';
+import type {
+  ObjId,
+  ObjRefValue,
+  RuntimeObject,
+  Value,
+} from '../../types/object.js';
 import type { ObjectManager } from '../database/object-manager.js';
 import { parseQuery, validateQuery } from './query-parser.js';
 
@@ -540,7 +545,9 @@ export class MaliceMCPServer {
                 if (validParents.has(o._id) || o.parent.id === id) {
                   descendantList.push({
                     id: `#${o._id}`,
-                    name: (getValueData(o.properties?.name) as string) || '(unnamed)',
+                    name:
+                      (getValueData(o.properties?.name) as string) ||
+                      '(unnamed)',
                     parent: `#${o.parent.id}`,
                   });
                   if (descendantList.length >= maxResults) break;
@@ -552,7 +559,9 @@ export class MaliceMCPServer {
                 if (o.parent.id === id) {
                   descendantList.push({
                     id: `#${o._id}`,
-                    name: (getValueData(o.properties?.name) as string) || '(unnamed)',
+                    name:
+                      (getValueData(o.properties?.name) as string) ||
+                      '(unnamed)',
                     parent: `#${o.parent.id}`,
                   });
                   if (descendantList.length >= maxResults) break;
@@ -1002,11 +1011,14 @@ export class MaliceMCPServer {
           if (isRoom && obj._id !== roomProto._id) {
             rooms.push({
               id: obj._id,
-              name: (getValueData(obj.properties?.name) as string) || '(unnamed)',
+              name:
+                (getValueData(obj.properties?.name) as string) || '(unnamed)',
               x: (getValueData(obj.properties?.x) as number) ?? 0,
               y: (getValueData(obj.properties?.y) as number) ?? 0,
               z: (getValueData(obj.properties?.z) as number) ?? 0,
-              exitCount: ((getValueData(obj.properties?.exits) as unknown[]) || []).length,
+              exitCount: (
+                (getValueData(obj.properties?.exits) as unknown[]) || []
+              ).length,
             });
           }
         }
@@ -1060,7 +1072,9 @@ export class MaliceMCPServer {
             players.push({
               id: obj._id,
               name: getValueData(obj.properties?.name) || '(unnamed)',
-              location: (obj.properties?.location as ObjRefValue | undefined)?.id ?? null,
+              location:
+                (obj.properties?.location as ObjRefValue | undefined)?.id ??
+                null,
               connected: getValueData(obj.properties?.connected) ?? false,
             });
           }
@@ -1797,7 +1811,10 @@ ACTIONS:
         phaseId: z.string().optional().describe('Phase identifier'),
         targetId: z.number().optional().describe('Target object ID for hooks'),
         eventName: z.string().optional().describe('Event name for hooks'),
-        filter: z.record(z.string(), z.any()).optional().describe('Hook filter conditions'),
+        filter: z
+          .record(z.string(), z.any())
+          .optional()
+          .describe('Hook filter conditions'),
         expiresAt: z
           .string()
           .optional()
@@ -3878,7 +3895,8 @@ Core Objects:
             players.push({
               id: obj._id,
               name: getValueData(obj.properties?.name) || '(unnamed)',
-              location: (obj.properties?.location as ObjRefValue | undefined)?.id,
+              location: (obj.properties?.location as ObjRefValue | undefined)
+                ?.id,
             });
           }
         }
@@ -5000,7 +5018,9 @@ Core Objects:
               if (isRoom && obj._id !== roomProtoId) {
                 rooms.push({
                   id: obj._id as number,
-                  name: (getValueData(obj.properties?.name) as string) || `Room #${obj._id}`,
+                  name:
+                    (getValueData(obj.properties?.name) as string) ||
+                    `Room #${obj._id}`,
                 });
               }
               if (rooms.length >= 100) break;

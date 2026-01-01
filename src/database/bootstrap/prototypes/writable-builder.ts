@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
-import { registerBuilder, type Builder } from '../builder-registry';
+import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Builds the Writable type
@@ -33,17 +33,18 @@ export class WritableBuilder implements Builder {
     } else {
       // Create writable as a TYPE
       const parentObj = await this.manager.load('describable');
-      if (!parentObj) throw new Error('WritableBuilder: $describable not found');
+      if (!parentObj)
+        throw new Error('WritableBuilder: $describable not found');
 
       this.obj = await this.manager.define('writable', parentObj, {
         properties: {
-        name: 'Writable',
-        description: 'Something you can write on.',
-        text: '',
-        writable: true,
-        maxLength: 2000,
+          name: 'Writable',
+          description: 'Something you can write on.',
+          text: '',
+          writable: true,
+          maxLength: 2000,
 
-        abilities: `Surface that can be written on. Base for letters, notes, whiteboards.
+          abilities: `Surface that can be written on. Base for letters, notes, whiteboards.
 
 READING: read() returns current 'text' content. AI can invoke directly.
 

@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
-import { registerBuilder, type Builder } from '../builder-registry';
+import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Builds the Incinerator type
@@ -27,7 +27,6 @@ export class IncineratorBuilder implements Builder {
   constructor(private manager: ObjectManager) {}
 
   async build(): Promise<void> {
-
     const existing = await this.manager.load('incinerator');
     if (existing) {
       this.obj = existing;
@@ -39,21 +38,21 @@ export class IncineratorBuilder implements Builder {
       this.obj = await this.manager.define('incinerator', parent, {
         properties: {
           name: 'Incinerator',
-        description:
-          'An industrial incinerator, its metal housing radiating heat.',
-        destroyMessage:
-          'The item catches fire and is reduced to ash in seconds.',
-        temperature: 1200,
-        fuelLevel: 100,
-        fuelConsumption: 1,
-        ashProduction: false,
-        operational: true,
-        processingTime: 0,
-        capacity: 0,
-        acceptedTypes: [],
-        rejectedTypes: [],
+          description:
+            'An industrial incinerator, its metal housing radiating heat.',
+          destroyMessage:
+            'The item catches fire and is reduced to ash in seconds.',
+          temperature: 1200,
+          fuelLevel: 100,
+          fuelConsumption: 1,
+          ashProduction: false,
+          operational: true,
+          processingTime: 0,
+          capacity: 0,
+          acceptedTypes: [],
+          rejectedTypes: [],
 
-        abilities: `High-temperature disposal unit. Burns items to ash. Extends $.disposal.
+          abilities: `High-temperature disposal unit. Burns items to ash. Extends $.disposal.
 
 OPERATION: 'operational' must be true to burn. ignite() turns on, extinguish() turns off.
 
@@ -208,7 +207,7 @@ VERBS: 'burn/incinerate/deposit/put/throw %o in %i', 'ignite/light %i', 'extingu
   }
 
   async registerAliases(): Promise<void> {
-    console.log('[IncineratorBuilder] Type \'incinerator\' auto-aliased');
+    console.log("[IncineratorBuilder] Type 'incinerator' auto-aliased");
   }
 }
 

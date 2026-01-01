@@ -6,9 +6,9 @@
 import * as vscode from 'vscode';
 import { DevToolsClient } from './devtools-client.js';
 import {
+  type MaliceMethodTreeItem,
+  type MaliceObjectTreeItem,
   MaliceTreeProvider,
-  MaliceObjectTreeItem,
-  MaliceMethodTreeItem,
 } from './tree-view.js';
 import { TypeDefinitionManager } from './type-manager.js';
 
@@ -469,7 +469,12 @@ class MaliceFileSystemProvider implements vscode.FileSystemProvider {
 
   async readFile(uri: vscode.Uri): Promise<Uint8Array> {
     console.log('[FileSystem] readFile called:', uri.toString());
-    console.log('[FileSystem] URI authority:', uri.authority, 'path:', uri.path);
+    console.log(
+      '[FileSystem] URI authority:',
+      uri.authority,
+      'path:',
+      uri.path,
+    );
     try {
       // malice://objects/{id}/{name}.{ext}
       // authority = 'objects', path = '/{id}/{name}.{ext}'
@@ -491,7 +496,10 @@ class MaliceFileSystemProvider implements vscode.FileSystemProvider {
         // Method
         console.log('[FileSystem] Fetching method...');
         const method = await this.client.getMethod(objectId, name);
-        console.log('[FileSystem] Got method, code length:', method.code?.length);
+        console.log(
+          '[FileSystem] Got method, code length:',
+          method.code?.length,
+        );
 
         // Inject type reference at the top of the file
         // This makes VS Code's TypeScript language service aware of generated types
@@ -507,7 +515,8 @@ class MaliceFileSystemProvider implements vscode.FileSystemProvider {
         console.log('[FileSystem] Got property value:', typeof value, value);
 
         // Handle undefined values - JSON.stringify(undefined) returns undefined, not a string
-        const jsonStr = value === undefined ? 'null' : JSON.stringify(value, null, 2);
+        const jsonStr =
+          value === undefined ? 'null' : JSON.stringify(value, null, 2);
         console.log('[FileSystem] JSON string:', jsonStr);
         return Buffer.from(jsonStr, 'utf-8');
       } else {

@@ -3,7 +3,7 @@ import * as path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import type { ObjId, RuntimeObject } from '../../../types/object';
 import type { ObjectManager } from '../object-manager';
-import { registerBuilder, type Builder } from './builder-registry';
+import { type Builder, registerBuilder } from './builder-registry';
 
 /**
  * Builds buildings from structured definitions with explicit exit connections.
@@ -77,7 +77,9 @@ export class BuildingBuilder implements Builder {
 
     // Check if buildings already built (use immigrationServices as marker)
     if ($.immigrationServices) {
-      console.log('  ✅ Buildings already built ($.immigrationServices exists)');
+      console.log(
+        '  ✅ Buildings already built ($.immigrationServices exists)',
+      );
       return;
     }
 
@@ -219,8 +221,11 @@ export class BuildingBuilder implements Builder {
           parentProto = elevatorProto;
         } else {
           // Try to load as type first (types use string names), then fall back to aliases
-          const loaded = await this.manager.load(protoName) ||
-            (aliases[protoName] ? await this.manager.load(aliases[protoName]) : null);
+          const loaded =
+            (await this.manager.load(protoName)) ||
+            (aliases[protoName]
+              ? await this.manager.load(aliases[protoName])
+              : null);
           if (loaded) {
             parentProto = loaded;
           } else {
@@ -780,8 +785,11 @@ export class BuildingBuilder implements Builder {
       let exitParent = exitProto;
       if (exitProps.prototype) {
         // Try as type first, then alias
-        const customProto = await this.manager.load(exitProps.prototype) ||
-          (aliases[exitProps.prototype] ? await this.manager.load(aliases[exitProps.prototype] as ObjId) : null);
+        const customProto =
+          (await this.manager.load(exitProps.prototype)) ||
+          (aliases[exitProps.prototype]
+            ? await this.manager.load(aliases[exitProps.prototype] as ObjId)
+            : null);
         if (customProto) exitParent = customProto;
       }
 

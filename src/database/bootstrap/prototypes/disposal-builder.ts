@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
-import { registerBuilder, type Builder } from '../builder-registry';
+import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Builds the Disposal type
@@ -32,7 +32,6 @@ export class DisposalBuilder implements Builder {
   constructor(private manager: ObjectManager) {}
 
   async build(): Promise<void> {
-
     const existing = await this.manager.load('disposal');
     if (existing) {
       this.obj = existing;
@@ -45,15 +44,15 @@ export class DisposalBuilder implements Builder {
         properties: {
           name: 'Disposal',
           description: 'A generic disposal unit.',
-        capacity: 0,
-        processingTime: 0,
-        acceptedTypes: [],
-        rejectedTypes: [],
-        processing: [],
-        destroyMessage: 'The item is destroyed.',
-        boltedDown: true,
+          capacity: 0,
+          processingTime: 0,
+          acceptedTypes: [],
+          rejectedTypes: [],
+          processing: [],
+          destroyMessage: 'The item is destroyed.',
+          boltedDown: true,
 
-        abilities: `Device that accepts and destroys items. Base for incinerators, crushers, etc.
+          abilities: `Device that accepts and destroys items. Base for incinerators, crushers, etc.
 
 DEPOSIT: deposit(agent, item) accepts item, either destroys instantly or queues for processing.
 
@@ -215,7 +214,7 @@ IMMOVABLE: 'boltedDown' true by default.`,
   }
 
   async registerAliases(): Promise<void> {
-    console.log('[DisposalBuilder] Type \'disposal\' auto-aliased');
+    console.log("[DisposalBuilder] Type 'disposal' auto-aliased");
   }
 }
 

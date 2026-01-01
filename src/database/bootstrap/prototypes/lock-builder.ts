@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
-import { registerBuilder, type Builder } from '../builder-registry';
+import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Builds the Lock type
@@ -122,7 +122,7 @@ FORCING: Lock mechanism can be damaged with sufficient force, but this usually d
   }
 
   async registerAliases(): Promise<void> {
-    console.log('[LockBuilder] Type \'lock\' auto-aliased');
+    console.log("[LockBuilder] Type 'lock' auto-aliased");
   }
 }
 

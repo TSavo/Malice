@@ -2,12 +2,7 @@ import { Subject, type Subscription } from 'rxjs';
 import type { WebSocket } from 'ws';
 import { Channel } from './channel';
 import { jsonCodec } from './codecs/json-codec';
-import type {
-  ChannelMessage,
-  IChannel,
-  IChannelMux,
-  WireCodec,
-} from './types';
+import type { ChannelMessage, IChannel, IChannelMux, WireCodec } from './types';
 
 /**
  * Channel multiplexer - routes messages between WebSocket and channels

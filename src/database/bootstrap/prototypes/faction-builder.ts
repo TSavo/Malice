@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
-import { registerBuilder, type Builder } from '../builder-registry';
+import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Builds the Faction prototype
@@ -40,7 +40,8 @@ export class FactionBuilder implements Builder {
       this.obj = existing;
     } else {
       const parent = await this.manager.load('describable');
-      if (!parent) throw new Error('FactionBuilder: Parent type \'describable\' not found');
+      if (!parent)
+        throw new Error("FactionBuilder: Parent type 'describable' not found");
 
       this.obj = await this.manager.define('faction', parent, {
         properties: {
@@ -74,7 +75,7 @@ LIFECYCLE: Created via $factionManager.create(), destroyed via $factionManager.d
     }
 
     // Always rebuild methods
-    const obj = this.obj!
+    const obj = this.obj!;
 
     obj.setMethod(
       'describe',
@@ -209,7 +210,7 @@ LIFECYCLE: Created via $factionManager.create(), destroyed via $factionManager.d
   }
 
   async registerAliases(): Promise<void> {
-    console.log('[FactionBuilder] Type \'faction\' auto-aliased');
+    console.log("[FactionBuilder] Type 'faction' auto-aliased");
   }
 }
 

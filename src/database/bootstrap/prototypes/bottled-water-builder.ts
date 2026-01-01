@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
-import { registerBuilder, type Builder } from '../builder-registry';
+import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Builds the BottledWater type
@@ -32,31 +32,31 @@ export class BottledWaterBuilder implements Builder {
 
       this.obj = await this.manager.define('bottledWater', drink, {
         properties: {
-        name: 'Bottled Water',
-        description:
-          'A clear plastic bottle of purified water. The Continuum logo is embossed on the cap. 500ml of municipal tap, filtered and sealed.',
-        aliases: ['water', 'water bottle', 'bottle'],
-        // Pure water - no calories, maximum hydration
-        calories: 0,
-        hydration: 500, // ml - full bottle
-        // Standard bottle
-        portions: 5,
-        remaining: 5,
-        // Bottle dimensions (mm) and weight (g)
-        width: 65,
-        height: 200,
-        depth: 65,
-        weight: 520, // 500ml water + 20g bottle
-        containerWeight: 20,
-        // Economic properties
-        basePrice: 1, // Credit - cheap and essential
-        // Sealed bottles don't decay until opened
-        decayRate: 0, // No decay while sealed
-        sealed: true,
-        // When opened, normal decay applies
-        openedDecayRate: 0.003, // ~23 days once opened
+          name: 'Bottled Water',
+          description:
+            'A clear plastic bottle of purified water. The Continuum logo is embossed on the cap. 500ml of municipal tap, filtered and sealed.',
+          aliases: ['water', 'water bottle', 'bottle'],
+          // Pure water - no calories, maximum hydration
+          calories: 0,
+          hydration: 500, // ml - full bottle
+          // Standard bottle
+          portions: 5,
+          remaining: 5,
+          // Bottle dimensions (mm) and weight (g)
+          width: 65,
+          height: 200,
+          depth: 65,
+          weight: 520, // 500ml water + 20g bottle
+          containerWeight: 20,
+          // Economic properties
+          basePrice: 1, // Credit - cheap and essential
+          // Sealed bottles don't decay until opened
+          decayRate: 0, // No decay while sealed
+          sealed: true,
+          // When opened, normal decay applies
+          openedDecayRate: 0.003, // ~23 days once opened
 
-        abilities: `Sealed bottle of purified water. Cheap, essential hydration.
+          abilities: `Sealed bottle of purified water. Cheap, essential hydration.
 
 SEALED: 'sealed' true = no decay, can't drink. Must open() first. Breaking seal enables decay.
 
@@ -215,7 +215,7 @@ ECONOMY: 'basePrice' 1 credit. Ubiquitous vending machine item.`,
   }
 
   async registerAliases(): Promise<void> {
-    console.log('[BottledWaterBuilder] Type \'bottledWater\' auto-aliased');
+    console.log("[BottledWaterBuilder] Type 'bottledWater' auto-aliased");
   }
 }
 

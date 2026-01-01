@@ -1,5 +1,5 @@
 import type { ObjectManager } from '../object-manager';
-import { getBuilders, topologicalSort, type Builder } from './builder-registry';
+import { type Builder, getBuilders, topologicalSort } from './builder-registry';
 
 // Import barrel file to trigger all builder self-registrations
 import './all-builders.js';

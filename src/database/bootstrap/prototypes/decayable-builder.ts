@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
-import { registerBuilder, type Builder } from '../builder-registry';
+import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Builds the Decayable type
@@ -48,28 +48,28 @@ export class DecayableBuilder implements Builder {
 
       this.obj = await this.manager.define('decayable', describable, {
         properties: {
-        name: 'Decayable',
-        description: 'Base type for objects that decay over time',
-        // Decay properties
-        decayRate: 1, // Base decay rate (% per tick)
-        decayLevel: 0, // Current decay (0-100%)
-        decayCondition: null, // When decay starts (null = always decaying)
-        decayStarted: null, // Timestamp when decay began
-        decaying: false, // Whether currently decaying
-        // Storage modifier sensitivities (how much each affects this item)
-        storageSensitivity: {
-          refrigerated: 0.1, // 10% of normal rate
-          frozen: 0, // No decay
-          vacuum: 0.2, // 20% of normal rate
-          heated: 2.0, // 2x decay
-          preserved: 0, // No decay (salt, vinegar, etc.)
-        },
-        // Damage from storage (some items are harmed by certain storage)
-        storageDamage: {
-          frozen: 0, // Some items (organs, certain drugs) damaged by freezing
-        },
+          name: 'Decayable',
+          description: 'Base type for objects that decay over time',
+          // Decay properties
+          decayRate: 1, // Base decay rate (% per tick)
+          decayLevel: 0, // Current decay (0-100%)
+          decayCondition: null, // When decay starts (null = always decaying)
+          decayStarted: null, // Timestamp when decay began
+          decaying: false, // Whether currently decaying
+          // Storage modifier sensitivities (how much each affects this item)
+          storageSensitivity: {
+            refrigerated: 0.1, // 10% of normal rate
+            frozen: 0, // No decay
+            vacuum: 0.2, // 20% of normal rate
+            heated: 2.0, // 2x decay
+            preserved: 0, // No decay (salt, vinegar, etc.)
+          },
+          // Damage from storage (some items are harmed by certain storage)
+          storageDamage: {
+            frozen: 0, // Some items (organs, certain drugs) damaged by freezing
+          },
 
-        abilities: `Object that deteriorates over time. Base for food, corpses, body parts.
+          abilities: `Object that deteriorates over time. Base for food, corpses, body parts.
 
 DECAY MECHANICS: 'decayRate' % per tick. 'decayLevel' tracks current state (0-100%). decayTick() called by scheduler.
 
@@ -89,9 +89,9 @@ HEALING: receiveCalories() reverses decay. Bodies heal when fed. 100 calories = 
 DESTRUCTION: At 100%, onFullyDecayed() called. Item destroyed, may spawn maggots/flies.
 
 PRESERVATION: preserve(method) stops decay if caught early.`,
-      },
-      methods: {},
-    });
+        },
+        methods: {},
+      });
     }
 
     // Always rebuild methods (ensures they exist even if type was pre-existing)
@@ -445,7 +445,7 @@ PRESERVATION: preserve(method) stops decay if caught early.`,
   }
 
   async registerAliases(): Promise<void> {
-    console.log('[DecayableBuilder] Type \'decayable\' auto-aliased');
+    console.log("[DecayableBuilder] Type 'decayable' auto-aliased");
   }
 }
 

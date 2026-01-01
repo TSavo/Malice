@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
-import { registerBuilder, type Builder } from '../builder-registry';
+import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Builds the SealedBox type
@@ -22,7 +22,6 @@ export class SealedBoxBuilder implements Builder {
   constructor(private manager: ObjectManager) {}
 
   async build(): Promise<void> {
-
     const existing = await this.manager.load('sealedBox');
     if (existing) {
       this.obj = existing;
@@ -36,21 +35,21 @@ export class SealedBoxBuilder implements Builder {
           name: 'Sealed Box',
           description:
             'A white plastic case with black tamper strips and a barcode label. The seal is intact.',
-        // Delivery info
-        destinationId: null, // Room ID where this should be delivered
-        destinationName: null, // Human-readable destination
-        contents: null, // What's inside (for description only, not accessible)
-        // Tracking
-        packageCode: null, // Unique tracking code
-        assignedTo: null, // Player assigned to deliver
-        assignedAt: null, // ISO timestamp
-        // Status
-        sealed: true, // Tamper seal intact
-        delivered: false, // Has been delivered
-        // Weight for carrying
-        weight: 2, // kg
+          // Delivery info
+          destinationId: null, // Room ID where this should be delivered
+          destinationName: null, // Human-readable destination
+          contents: null, // What's inside (for description only, not accessible)
+          // Tracking
+          packageCode: null, // Unique tracking code
+          assignedTo: null, // Player assigned to deliver
+          assignedAt: null, // ISO timestamp
+          // Status
+          sealed: true, // Tamper seal intact
+          delivered: false, // Has been delivered
+          // Weight for carrying
+          weight: 2, // kg
 
-        abilities: `Tamper-proof container for courier delivery jobs.
+          abilities: `Tamper-proof container for courier delivery jobs.
 
 SEALED: Cannot be opened by players. open() explains why. Contents are inaccessible until delivered.
 
@@ -304,7 +303,7 @@ WEIGHT: Packages have 'weight' for carrying mechanics.`,
   }
 
   async registerAliases(): Promise<void> {
-    console.log('[SealedBoxBuilder] Type \'sealedBox\' auto-aliased');
+    console.log("[SealedBoxBuilder] Type 'sealedBox' auto-aliased");
   }
 }
 

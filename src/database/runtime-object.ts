@@ -179,9 +179,17 @@ export class RuntimeObjectImpl implements RuntimeObject {
     // Handle RuntimeObject (store as objref)
     if (jsValue && typeof jsValue === 'object' && 'kind' in jsValue) {
       if (jsValue.kind === 'type') {
-        return { type: 'objref', target: 'type', id: jsValue.id } as ObjRefValue;
+        return {
+          type: 'objref',
+          target: 'type',
+          id: jsValue.id,
+        } as ObjRefValue;
       } else if (jsValue.kind === 'object' && typeof jsValue.id === 'number') {
-        return { type: 'objref', target: 'object', id: jsValue.id } as ObjRefValue;
+        return {
+          type: 'objref',
+          target: 'object',
+          id: jsValue.id,
+        } as ObjRefValue;
       }
     }
     // RuntimeObject with id - default to object reference
@@ -191,7 +199,11 @@ export class RuntimeObjectImpl implements RuntimeObject {
       'id' in jsValue &&
       typeof jsValue.id === 'number'
     ) {
-      return { type: 'objref', target: 'object', id: jsValue.id } as ObjRefValue;
+      return {
+        type: 'objref',
+        target: 'object',
+        id: jsValue.id,
+      } as ObjRefValue;
     }
 
     // Handle primitives
@@ -1026,7 +1038,9 @@ export class RuntimeObjectImpl implements RuntimeObject {
       // Must be valid JS identifier (starts with letter/underscore, contains only alphanum/underscore)
       const isValid = /^[a-zA-Z_][a-zA-Z0-9_]*$/.test(name);
       if (!isValid) {
-        console.warn(`[RuntimeObject] Skipping invalid alias name for JS: '${name}'`);
+        console.warn(
+          `[RuntimeObject] Skipping invalid alias name for JS: '${name}'`,
+        );
       }
       return isValid;
     });
@@ -1314,7 +1328,9 @@ export class RuntimeObjectImpl implements RuntimeObject {
         console.error(`[RuntimeObject] === FULL FUNCTION BODY START ===`);
         console.error(fnBody);
         console.error(`[RuntimeObject] === FULL FUNCTION BODY END ===`);
-        console.error(`[RuntimeObject] Stack: ${err instanceof Error ? err.stack : 'N/A'}`);
+        console.error(
+          `[RuntimeObject] Stack: ${err instanceof Error ? err.stack : 'N/A'}`,
+        );
       }
       throw new Error(
         `Error executing method '${methodName}' on object #${this.id}: ${errMsg}`,
@@ -1365,7 +1381,11 @@ export class RuntimeObjectImpl implements RuntimeObject {
     if (parent.kind === 'type') {
       this.obj.parent = { type: 'objref', target: 'type', id: parent.id };
     } else {
-      this.obj.parent = { type: 'objref', target: 'object', id: parent.id as number };
+      this.obj.parent = {
+        type: 'objref',
+        target: 'object',
+        id: parent.id as number,
+      };
     }
     this.dirty = true;
 
@@ -1566,9 +1586,10 @@ export class RuntimeObjectImpl implements RuntimeObject {
    */
   async pull(): Promise<void> {
     const db = this.manager.getDatabase();
-    const fresh = this._kind === 'type'
-      ? await db.getType(this.id as string)
-      : await db.get(this.id as number);
+    const fresh =
+      this._kind === 'type'
+        ? await db.getType(this.id as string)
+        : await db.get(this.id as number);
     if (fresh) {
       this.obj = fresh;
       this.dirty = false;

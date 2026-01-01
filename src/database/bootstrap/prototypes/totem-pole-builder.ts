@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
-import { registerBuilder, type Builder } from '../builder-registry';
+import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Builds the TotemPole type
@@ -37,32 +37,32 @@ export class TotemPoleBuilder implements Builder {
 
       this.obj = await this.manager.define('totemPole', describable, {
         properties: {
-        name: 'Totem Pole',
-        description: `A sixty-foot cedar column rises from its concrete base, carved with figures from Tlingit mythology. Raven perches at the top, wings folded, beak pointed toward the sky. Below: Bear, Whale, Wolf—each figure emerging from the one beneath.
+          name: 'Totem Pole',
+          description: `A sixty-foot cedar column rises from its concrete base, carved with figures from Tlingit mythology. Raven perches at the top, wings folded, beak pointed toward the sky. Below: Bear, Whale, Wolf—each figure emerging from the one beneath.
 
 The pole has weathered to silver-grey, its original paint faded to ghosts. Rain has darkened the wood in vertical streaks. Moss grows in the deeper carved spaces.
 
 This is the second pole. The first was stolen from a Tlingit village in Alaska during an 1899 "goodwill expedition"—Seattle businessmen literally sawed it down and loaded it onto a steamer. When that one burned in 1938, the city commissioned a replacement from the same community they'd robbed. The Tlingit charged five thousand dollars. The city paid.
 
 If you look carefully at Raven's eyes, you can see the lens housings. CorpSec installed the cameras decades ago. Someone is always watching.`,
-        // Physical properties
-        height: 1829, // 60 feet in cm
-        width: 91, // ~3 feet diameter at base
-        depth: 91,
-        weight: 4000000, // ~4 tons in grams
-        boltedDown: true,
-        // Totem-specific
-        carvings: ['Raven', 'Bear', 'Whale', 'Wolf', 'Frog', 'Eagle'],
-        yearInstalled: 1938,
-        yearStolen: 1899,
-        originVillage: 'Tongass Island, Alaska',
-        // Surveillance
-        isPerceptionPoint: true,
-        cameraStatus: 'active',
-        lastObservation: null,
-        observationLog: [],
-        // Abilities
-        abilities: `A sixty-foot Tlingit totem pole with embedded CorpSec surveillance cameras.
+          // Physical properties
+          height: 1829, // 60 feet in cm
+          width: 91, // ~3 feet diameter at base
+          depth: 91,
+          weight: 4000000, // ~4 tons in grams
+          boltedDown: true,
+          // Totem-specific
+          carvings: ['Raven', 'Bear', 'Whale', 'Wolf', 'Frog', 'Eagle'],
+          yearInstalled: 1938,
+          yearStolen: 1899,
+          originVillage: 'Tongass Island, Alaska',
+          // Surveillance
+          isPerceptionPoint: true,
+          cameraStatus: 'active',
+          lastObservation: null,
+          observationLog: [],
+          // Abilities
+          abilities: `A sixty-foot Tlingit totem pole with embedded CorpSec surveillance cameras.
 
 SURVEILLANCE: Cameras are hidden in Raven's carved eyes. Feed goes to CorpSec
 network, which Pluribus has access to. The isPerceptionPoint property marks this
@@ -228,7 +228,7 @@ The carvings are genuine Tlingit art - stolen twice over.`,
   }
 
   async registerAliases(): Promise<void> {
-    console.log('[TotemPoleBuilder] Type \'totemPole\' auto-aliased');
+    console.log("[TotemPoleBuilder] Type 'totemPole' auto-aliased");
   }
 }
 

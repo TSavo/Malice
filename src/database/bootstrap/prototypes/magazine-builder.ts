@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
-import { registerBuilder, type Builder } from '../builder-registry';
+import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Builds the Magazine type
@@ -356,8 +356,7 @@ export class SmgMagazineBuilder implements Builder {
     if (await this.manager.load('smgMagazine')) return;
 
     const parent = await this.manager.load('magazine');
-    if (!parent)
-      throw new Error('SmgMagazineBuilder: magazine type not found');
+    if (!parent) throw new Error('SmgMagazineBuilder: magazine type not found');
 
     await this.manager.define('smgMagazine', parent, {
       properties: {
@@ -416,8 +415,7 @@ export class SpeedloaderBuilder implements Builder {
     if (await this.manager.load('speedloader')) return;
 
     const parent = await this.manager.load('magazine');
-    if (!parent)
-      throw new Error('SpeedloaderBuilder: magazine type not found');
+    if (!parent) throw new Error('SpeedloaderBuilder: magazine type not found');
 
     await this.manager.define('speedloader', parent, {
       properties: {

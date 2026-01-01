@@ -1089,188 +1089,28 @@ const roomInfo = await readResource('moo://rooms/100');
 // roomInfo.exits - available exits
 ```
 
-## Image Generation ($aiImageGen)
+## Image Generation & Window Management
 
-Generate images using Google's Gemini API (Nano Banana) and store them in `$blob`.
+See **[IMAGE-GENERATION.md](IMAGE-GENERATION.md)** for full documentation on:
 
-### Generate and Store
+- `$aiImageGen` - Generate images via Gemini API (Nano Banana)
+- `$describable.image()` - Generate/cache images for any object
+- `player.openWindow()` - Display images and content in client windows
+- The "real object" pattern for "show me" interactions
 
+Quick example:
 ```javascript
-// Generate an image and store in blob storage
-const result = await $aiImageGen.generate('A cyberpunk banana with neon lights');
-// { success: true, blobKey: '...', contentType: 'image/png', prompt: '...' }
-
-// Get URL for display
-const url = $blob.url(result.blobKey, 'thecontinuum.city');
-```
-
-### Using $describable.image()
-
-Any describable object can generate images from its description:
-
-```javascript
-// Get or generate an image for any object
-const blobKey = await item.image();  // landscape by default
-const blobKey = await room.image({ aspectRatio: 'portrait' });
-const blobKey = await npc.image({ force: true });  // regenerate
-
-// Images are cached by aspect ratio
-// item.images = { '16:9': 'abc123', '9:16': 'def456' }
-```
-
-### Aspect Ratios
-
-- `'landscape'` / `'wide'` / `'16:9'` (default) - Wide shots, rooms, scenes
-- `'portrait'` / `'tall'` / `'9:16'` - People, tall objects
-- `'square'` / `'1:1'` - Icons, items
-
-### Custom Prompts
-
-```javascript
-const blobKey = await room.image({
-  prompt: 'A rain-slicked cyberpunk street at night, neon reflections'
-});
-```
-
-## Client Window Management
-
-Open windows on player clients to display images, HTML content, or external URLs.
-
-### Showing Images to Players
-
-When a player says "show me" or an NPC wants to share visual information:
-
-```javascript
-// 1. Get or generate the image
-const blobKey = await item.image();
-const url = $blob.url(blobKey, 'thecontinuum.city');
-
-// 2. Open a window on the player's client
-player.openWindow('img-' + Date.now(), 'html', {
-  title: item.name,
-  content: '<img src="' + url + '" style="max-width:100%;max-height:100%;object-fit:contain">'
-});
-```
-
-### Window Types
-
-| Type | Purpose | Key Config |
-|------|---------|------------|
-| `terminal` | xterm.js terminal | `channel` |
-| `html` | Rich HTML content | `content` |
-| `iframe` | Sandboxed external URL | `url` |
-
-### openWindow()
-
-```javascript
-player.openWindow(windowId, windowType, {
-  title: 'Window Title',      // Shown in title bar
-  x: 100, y: 100,             // Position (optional, cascades by default)
-  width: 600, height: 400,    // Size
-  content: '<html>...',       // For html type
-  url: 'https://...',         // For iframe type
-  channel: 'win:mywindow',    // For terminal type
-  maximized: false,           // Start maximized
-  resizable: true,
-  closable: true
-});
-```
-
-### closeWindow()
-
-```javascript
-player.closeWindow('window-id');
-```
-
-### sendToWindow()
-
-Update window content after opening:
-
-```javascript
-// Update HTML window content
-player.sendToWindow('img-viewer', {
-  action: 'set',
-  content: '<img src="new-url.png">'
-});
-
-// Append to HTML window
-player.sendToWindow('log-window', {
-  action: 'append',
-  content: '<p>New log entry</p>'
-});
-
-// Load new URL in iframe
-player.sendToWindow('browser', {
-  action: 'load',
-  url: 'https://new-url.com'
-});
-```
-
-### Example: NPC Handing Player a Map
-
-The proper pattern creates a real object, hands it to the player, then images it:
-
-```javascript
-// 1. Create the map as a real object with abilities
+// Create real object, hand to player, image it
 const map = await $recycler.create($describable, {
   name: 'hand-drawn map',
-  description: 'A crumpled piece of paper with hastily sketched streets.',
-  abilities: `A rough map of the underground tunnels. Shows passage from
-the old metro station to the safehouse. Key landmarks marked: the flooded
-junction, the collapse zone to avoid, the hidden cache at marker "7".
-Drawn in pencil, smudged from handling.`
+  abilities: 'A rough map of the tunnels...'
 });
-
-// 2. Move to NPC's hands
-const npcHands = await npc.getHands();
-await map.moveTo(npcHands.primary, npc);
-
-// 3. NPC hands it to player
-await $emote.broadcast(room, npc, 'pulls out a crumpled piece of paper', {
-  secondPerson: npc.name + ' pulls out a crumpled piece of paper.'
-});
-
-const playerHands = await player.getHands();
 await map.moveTo(playerHands.primary, player);
 
-await $emote.broadcast(room, npc, 'presses the map into your hand', {
-  secondPerson: npc.name + ' presses the map into your hand.'
-});
-
-// 4. Generate and show the image
-const blobKey = await map.image({ aspectRatio: 'landscape' });
+const blobKey = await map.image();
 const url = $blob.url(blobKey, 'thecontinuum.city');
-
 player.openWindow('map-' + map.id, 'html', {
   title: map.name,
-  width: 800,
-  height: 600,
-  content: `
-    <div style="display:flex;align-items:center;justify-content:center;height:100%;background:#1a1a1a">
-      <img src="${url}" style="max-width:100%;max-height:100%;object-fit:contain">
-    </div>
-  `
-});
-```
-
-**Why this pattern matters:**
-- The map is a **real object** the player now holds
-- It has **abilities** the AI reads when player examines it later
-- Player can `show map to someone` - passes the object
-- The image is generated from the object's description + abilities
-- If player loses the map, they lose access to the info
-
-### Quick Image (No Object)
-
-For ephemeral visuals that don't need to persist:
-
-```javascript
-// Just show an image without creating an object
-const result = await $aiImageGen.generate('Security camera feed showing the lobby');
-const url = $blob.url(result.blobKey, 'thecontinuum.city');
-
-player.openWindow('feed-' + Date.now(), 'html', {
-  title: 'Security Feed',
   content: '<img src="' + url + '" style="max-width:100%;max-height:100%">'
 });
 ```

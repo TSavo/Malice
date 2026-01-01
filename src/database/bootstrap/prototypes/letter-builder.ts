@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
-import { registerBuilder, type Builder } from '../builder-registry';
+import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Builds the Letter type
@@ -39,13 +39,13 @@ export class LetterBuilder implements Builder {
 
       this.obj = await this.manager.define('letter', parentObj, {
         properties: {
-        name: 'Letter',
-        description: 'A piece of paper for writing messages.',
-        text: '',
-        writable: true,
-        maxLength: 1000,
+          name: 'Letter',
+          description: 'A piece of paper for writing messages.',
+          text: '',
+          writable: true,
+          maxLength: 1000,
 
-        abilities: `Portable writable paper for personal correspondence.
+          abilities: `Portable writable paper for personal correspondence.
 
 WRITING: Inherits from $.writable. write(agent, text) records message.
 

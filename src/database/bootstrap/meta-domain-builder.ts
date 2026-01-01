@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../types/object';
 import type { ObjectManager } from '../object-manager';
-import { registerBuilder, type Builder } from './builder-registry';
+import { type Builder, registerBuilder } from './builder-registry';
 
 /**
  * Builds the malice.world meta-domain
@@ -1824,11 +1824,15 @@ function escapeHtml(str) {
     );
 
     // /admin/api/scheduler/:name - Job actions
-    const schedulerJobRoute = await this.createRoute(webRoute, schedulerApiRoute, {
-      name: 'Scheduler Job API',
-      segment: '*',
-      methods: ['GET', 'POST'],
-    });
+    const schedulerJobRoute = await this.createRoute(
+      webRoute,
+      schedulerApiRoute,
+      {
+        name: 'Scheduler Job API',
+        segment: '*',
+        methods: ['GET', 'POST'],
+      },
+    );
 
     schedulerJobRoute.setMethod(
       'handleRequest',

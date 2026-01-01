@@ -836,78 +836,23 @@ await player.quit();
 
 ## Showing Images to Players
 
-When a player says "show me" or wants to visualize something, you can generate and display images:
+When a player says "show me", create a **real object** with abilities, hand it to them, then image it.
 
-### Image Generation Pattern
+See **[city-ai/IMAGE-GENERATION.md](city-ai/IMAGE-GENERATION.md)** for full documentation.
 
+Quick pattern:
 ```javascript
-// 1. Get or generate an image for any describable object
-const blobKey = await item.image();  // landscape by default
-const blobKey = await item.image({ aspectRatio: 'portrait' });
-const blobKey = await item.image({ force: true });  // regenerate
-
-// 2. Get the URL
-const url = $blob.url(blobKey, 'thecontinuum.city');
-
-// 3. Open a window on the player's client
-player.openWindow('img-' + Date.now(), 'html', {
-  title: item.name,
-  content: '<img src="' + url + '" style="max-width:100%;max-height:100%;object-fit:contain">'
+// Create real object → hand to player → image it
+const map = await $recycler.create($describable, {
+  name: 'hand-drawn map',
+  abilities: 'A rough map of the tunnels...'
 });
-```
+await map.moveTo(playerHands.primary, player);
 
-### When to Show Images
-
-- **"show me"** - Player explicitly wants to see something visually
-- **"what does X look like"** - Describing appearance in detail
-- **Examining important objects** - When visual detail matters
-- **NPCs sharing information** - "Let me show you what I mean..."
-
-### Aspect Ratios
-
-Images are cached by aspect ratio on the object's `images` property:
-- `'landscape'` or `'16:9'` (default) - Wide shots, rooms, scenes
-- `'portrait'` or `'9:16'` - People, tall objects
-- `'square'` or `'1:1'` - Icons, items
-
-```javascript
-// Generate portrait for a person
-const blobKey = await npc.image({ aspectRatio: 'portrait' });
-
-// Check what images exist
-const existingImages = item.images;  // { '16:9': 'abc123', '9:16': 'def456' }
-```
-
-### Custom Prompts
-
-Override the default prompt (from `.describe()`) with a custom one:
-
-```javascript
-const blobKey = await room.image({
-  prompt: 'A rain-slicked cyberpunk street at night, neon reflections on wet concrete, noir atmosphere'
-});
-```
-
-### Window Types
-
-- **html** - Best for images, supports styling
-- **iframe** - For full blob page with metadata
-
-```javascript
-// HTML window with styled image
-player.openWindow('viewer', 'html', {
-  title: 'Security Feed',
-  content: `
-    <div style="display:flex;align-items:center;justify-content:center;height:100%;background:#0a0a0a">
-      <img src="${url}" style="max-width:100%;max-height:100%;object-fit:contain">
-    </div>
-  `
-});
-
-// Or simple iframe
-player.openWindow('viewer', 'iframe', {
-  title: item.name,
-  url: url
+const blobKey = await map.image();
+player.openWindow('map-' + map.id, 'html', {
+  title: map.name,
+  content: '<img src="' + $blob.url(blobKey, 'thecontinuum.city') + '" style="max-width:100%;max-height:100%">'
 });
 ```
 

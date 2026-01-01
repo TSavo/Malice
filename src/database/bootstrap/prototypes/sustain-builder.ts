@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
-import { registerBuilder, type Builder } from '../builder-registry';
+import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Builds the Sustain type
@@ -39,10 +39,10 @@ export class SustainBuilder implements Builder {
 
       this.obj = await this.manager.define('sustain', food, {
         properties: {
-        name: 'Sustain',
-        description:
-          'A small oblong pill, pale gray with a faint chemical sheen. The Continuum logo is pressed into one side. Nutritionally complete. Best not to think about the source material.',
-        abilities: `Continuum's nutritionally complete ration pill. Manufactured at Fabrication
+          name: 'Sustain',
+          description:
+            'A small oblong pill, pale gray with a faint chemical sheen. The Continuum logo is pressed into one side. Nutritionally complete. Best not to think about the source material.',
+          abilities: `Continuum's nutritionally complete ration pill. Manufactured at Fabrication
 Factory biofarm from processed organic waste. Cheap, efficient, ubiquitous.
 
 CONSUMPTION: Single-portion pill. Swallow whole. eat() consumes entirely.
@@ -56,28 +56,28 @@ flavor text. Nobody eats these for pleasure.
 
 DECAY: Very slow (0.1 rate). Pills last months in storage.
 Subsidized price (2 credits). Everyone can afford to survive.`,
-        aliases: ['pill', 'nutrient pill', 'ration'],
-        // Nutritional properties - one pill = one meal equivalent
-        calories: 400,
-        hydration: 10, // Very little moisture - compressed pill
-        // Single portion - swallow whole
-        portions: 1,
-        remaining: 1,
-        // No real ingredients to taste - synthetic
-        ingredients: [
-          { name: 'protein complex', flavor: 'chalky' },
-          { name: 'nutrient paste', flavor: 'chemical' },
-          { name: 'binding agent', flavor: 'metallic' },
-        ],
-        // Pill dimensions (mm) and weight (g)
-        width: 8,
-        height: 6,
-        depth: 20,
-        weight: 5,
-        // Economic properties
-        basePrice: 2, // Credits - cheap and subsidized
-        // Decay properties - pills last a long time
-        decayRate: 0.1, // Very slow decay
+          aliases: ['pill', 'nutrient pill', 'ration'],
+          // Nutritional properties - one pill = one meal equivalent
+          calories: 400,
+          hydration: 10, // Very little moisture - compressed pill
+          // Single portion - swallow whole
+          portions: 1,
+          remaining: 1,
+          // No real ingredients to taste - synthetic
+          ingredients: [
+            { name: 'protein complex', flavor: 'chalky' },
+            { name: 'nutrient paste', flavor: 'chemical' },
+            { name: 'binding agent', flavor: 'metallic' },
+          ],
+          // Pill dimensions (mm) and weight (g)
+          width: 8,
+          height: 6,
+          depth: 20,
+          weight: 5,
+          // Economic properties
+          basePrice: 2, // Credits - cheap and subsidized
+          // Decay properties - pills last a long time
+          decayRate: 0.1, // Very slow decay
         },
         methods: {},
       });
@@ -164,7 +164,7 @@ Subsidized price (2 credits). Everyone can afford to survive.`,
   }
 
   async registerAliases(): Promise<void> {
-    console.log('[SustainBuilder] Type \'sustain\' auto-aliased');
+    console.log("[SustainBuilder] Type 'sustain' auto-aliased");
   }
 }
 

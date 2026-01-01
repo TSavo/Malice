@@ -12,7 +12,7 @@
 
 import type { RuntimeObject } from '../../../types/object';
 import type { ObjectManager } from '../object-manager';
-import { registerBuilder, type Builder } from './builder-registry';
+import { type Builder, registerBuilder } from './builder-registry';
 
 export class NpmBuilder implements Builder {
   static provides = ['npm'];
@@ -41,7 +41,8 @@ export class NpmBuilder implements Builder {
       parent: root,
       properties: {
         name: 'npm',
-        description: 'Runtime package manager - install npm packages without restart',
+        description:
+          'Runtime package manager - install npm packages without restart',
       },
       methods: {},
     });

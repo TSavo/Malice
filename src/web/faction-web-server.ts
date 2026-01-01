@@ -10,7 +10,7 @@
  *   - http://localhost:8001 → Gray Cartel (graycartel.com)
  */
 
-import { randomBytes } from 'crypto';
+import { randomBytes } from 'node:crypto';
 import Fastify, { type FastifyInstance } from 'fastify';
 import type { ObjectManager } from '../database/object-manager';
 import type { RuntimeObjectImpl } from '../database/runtime-object';
@@ -201,7 +201,11 @@ export class FactionWebServer {
               'getById',
               this.config.factionId,
             );
-            if (factionObj && typeof factionObj === 'object' && 'call' in factionObj) {
+            if (
+              factionObj &&
+              typeof factionObj === 'object' &&
+              'call' in factionObj
+            ) {
               await (factionObj as RuntimeObjectImpl).call(
                 'onPlayerRegistered',
                 newPlayer,
@@ -228,10 +232,7 @@ export class FactionWebServer {
         );
         return reply.code(500).send({
           success: false,
-          error:
-            error instanceof Error
-              ? error.message
-              : 'Registration failed',
+          error: error instanceof Error ? error.message : 'Registration failed',
         });
       }
     });
@@ -243,7 +244,10 @@ export class FactionWebServer {
         const token = query.t;
 
         if (!token || typeof token !== 'string') {
-          return reply.code(400).type('text/html').send(`
+          return reply
+            .code(400)
+            .type('text/html')
+            .send(`
             <!DOCTYPE html>
             <html>
             <head><title>Invalid Link</title></head>
@@ -264,7 +268,10 @@ export class FactionWebServer {
           .first() as RuntimeObjectImpl | null;
 
         if (!player) {
-          return reply.code(400).type('text/html').send(`
+          return reply
+            .code(400)
+            .type('text/html')
+            .send(`
             <!DOCTYPE html>
             <html>
             <head><title>Invalid Token</title></head>
@@ -294,7 +301,10 @@ export class FactionWebServer {
           `[FactionWeb:${this.config.factionName}] Verification error:`,
           error,
         );
-        return reply.code(500).type('text/html').send(`
+        return reply
+          .code(500)
+          .type('text/html')
+          .send(`
           <!DOCTYPE html>
           <html>
           <head><title>Error</title></head>
@@ -315,7 +325,9 @@ export class FactionWebServer {
         const { username, password } = body || {};
 
         if (!username || !password) {
-          return reply.code(400).send({ error: 'Username and password required' });
+          return reply
+            .code(400)
+            .send({ error: 'Username and password required' });
         }
 
         // Find player by username
@@ -392,7 +404,7 @@ export class FactionWebServer {
         }
 
         // Get metadata first to check existence and get content-type
-        const meta = await blob.call('meta', key) as {
+        const meta = (await blob.call('meta', key)) as {
           contentType?: string;
           filename?: string;
           length?: number;
@@ -402,10 +414,13 @@ export class FactionWebServer {
         }
 
         // Read the blob data as buffer
-        const buffer = await blob.call('readBuffer', key) as Buffer;
+        const buffer = (await blob.call('readBuffer', key)) as Buffer;
 
         // Set headers
-        reply.header('Content-Type', meta.contentType || 'application/octet-stream');
+        reply.header(
+          'Content-Type',
+          meta.contentType || 'application/octet-stream',
+        );
         reply.header('Content-Length', buffer.length);
         if (meta.filename) {
           reply.header(
@@ -419,7 +434,10 @@ export class FactionWebServer {
 
         return reply.send(buffer);
       } catch (err) {
-        console.error(`[FactionWeb:${this.config.factionName}] Blob error:`, err);
+        console.error(
+          `[FactionWeb:${this.config.factionName}] Blob error:`,
+          err,
+        );
         return reply.code(500).send({ error: 'Failed to retrieve blob' });
       }
     });

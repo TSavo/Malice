@@ -1,5 +1,5 @@
 import type { ObjectManager } from '../../object-manager';
-import { registerBuilder, type Builder } from '../builder-registry';
+import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Improvised & Miscellaneous Weapon Types
@@ -132,7 +132,8 @@ export class BrokenBottleBuilder implements Builder {
     await this.manager.define('brokenBottle', parent, {
       properties: {
         name: 'Broken Bottle',
-        description: 'A shattered bottle with jagged glass edges. Bar fight classic.',
+        description:
+          'A shattered bottle with jagged glass edges. Bar fight classic.',
         skill: 'improvised',
         damage: 14,
         damageType: 'cut',
@@ -251,7 +252,8 @@ export class CinderBlockBuilder implements Builder {
     if (await this.manager.load('cinderBlock')) return;
 
     const parent = await this.manager.load('improvised');
-    if (!parent) throw new Error('CinderBlockBuilder: improvised type not found');
+    if (!parent)
+      throw new Error('CinderBlockBuilder: improvised type not found');
 
     await this.manager.define('cinderBlock', parent, {
       properties: {
@@ -284,7 +286,8 @@ export class ScrewdriverBuilder implements Builder {
     if (await this.manager.load('screwdriver')) return;
 
     const parent = await this.manager.load('improvised');
-    if (!parent) throw new Error('ScrewdriverBuilder: improvised type not found');
+    if (!parent)
+      throw new Error('ScrewdriverBuilder: improvised type not found');
 
     await this.manager.define('screwdriver', parent, {
       properties: {
@@ -429,7 +432,8 @@ export class HammerImprovisedBuilder implements Builder {
     if (await this.manager.load('hammerImprovised')) return;
 
     const parent = await this.manager.load('improvised');
-    if (!parent) throw new Error('HammerImprovisedBuilder: improvised type not found');
+    if (!parent)
+      throw new Error('HammerImprovisedBuilder: improvised type not found');
 
     await this.manager.define('hammerImprovised', parent, {
       properties: {
@@ -444,7 +448,9 @@ export class HammerImprovisedBuilder implements Builder {
   }
 
   async registerAliases(): Promise<void> {
-    console.log("[HammerImprovisedBuilder] Type 'hammerImprovised' auto-aliased");
+    console.log(
+      "[HammerImprovisedBuilder] Type 'hammerImprovised' auto-aliased",
+    );
   }
 }
 
@@ -462,7 +468,8 @@ export class KitchenKnifeBuilder implements Builder {
     if (await this.manager.load('kitchenKnife')) return;
 
     const parent = await this.manager.load('improvised');
-    if (!parent) throw new Error('KitchenKnifeBuilder: improvised type not found');
+    if (!parent)
+      throw new Error('KitchenKnifeBuilder: improvised type not found');
 
     await this.manager.define('kitchenKnife', parent, {
       properties: {
@@ -491,7 +498,8 @@ export class ButcherKnifeBuilder implements Builder {
     if (await this.manager.load('butcherKnife')) return;
 
     const parent = await this.manager.load('improvised');
-    if (!parent) throw new Error('ButcherKnifeBuilder: improvised type not found');
+    if (!parent)
+      throw new Error('ButcherKnifeBuilder: improvised type not found');
 
     await this.manager.define('butcherKnife', parent, {
       properties: {
@@ -549,7 +557,8 @@ export class RollingPinBuilder implements Builder {
     if (await this.manager.load('rollingPin')) return;
 
     const parent = await this.manager.load('improvised');
-    if (!parent) throw new Error('RollingPinBuilder: improvised type not found');
+    if (!parent)
+      throw new Error('RollingPinBuilder: improvised type not found');
 
     await this.manager.define('rollingPin', parent, {
       properties: {
@@ -582,7 +591,8 @@ export class ThrowingKnifeBuilder implements Builder {
     if (await this.manager.load('throwingKnife')) return;
 
     const parent = await this.manager.load('improvised');
-    if (!parent) throw new Error('ThrowingKnifeBuilder: improvised type not found');
+    if (!parent)
+      throw new Error('ThrowingKnifeBuilder: improvised type not found');
 
     await this.manager.define('throwingKnife', parent, {
       properties: {
@@ -615,7 +625,8 @@ export class ThrowingStarBuilder implements Builder {
     if (await this.manager.load('throwingStar')) return;
 
     const parent = await this.manager.load('improvised');
-    if (!parent) throw new Error('ThrowingStarBuilder: improvised type not found');
+    if (!parent)
+      throw new Error('ThrowingStarBuilder: improvised type not found');
 
     await this.manager.define('throwingStar', parent, {
       properties: {
@@ -743,7 +754,8 @@ export class CattleProdBuilder implements Builder {
     if (await this.manager.load('cattleProd')) return;
 
     const parent = await this.manager.load('improvised');
-    if (!parent) throw new Error('CattleProdBuilder: improvised type not found');
+    if (!parent)
+      throw new Error('CattleProdBuilder: improvised type not found');
 
     await this.manager.define('cattleProd', parent, {
       properties: {
@@ -835,12 +847,14 @@ export class PepperSprayBuilder implements Builder {
     if (await this.manager.load('pepperSpray')) return;
 
     const parent = await this.manager.load('improvised');
-    if (!parent) throw new Error('PepperSprayBuilder: improvised type not found');
+    if (!parent)
+      throw new Error('PepperSprayBuilder: improvised type not found');
 
     await this.manager.define('pepperSpray', parent, {
       properties: {
         name: 'Pepper Spray',
-        description: 'A canister of OC spray. Causes temporary blindness and pain.',
+        description:
+          'A canister of OC spray. Causes temporary blindness and pain.',
         skill: 'improvised',
         damage: 5,
         damageType: 'burn',
@@ -902,7 +916,8 @@ export class HockeyStickBuilder implements Builder {
     if (await this.manager.load('hockeyStick')) return;
 
     const parent = await this.manager.load('improvised');
-    if (!parent) throw new Error('HockeyStickBuilder: improvised type not found');
+    if (!parent)
+      throw new Error('HockeyStickBuilder: improvised type not found');
 
     await this.manager.define('hockeyStick', parent, {
       properties: {
@@ -931,7 +946,8 @@ export class LacrosseStickBuilder implements Builder {
     if (await this.manager.load('lacrosseStick')) return;
 
     const parent = await this.manager.load('improvised');
-    if (!parent) throw new Error('LacrosseStickBuilder: improvised type not found');
+    if (!parent)
+      throw new Error('LacrosseStickBuilder: improvised type not found');
 
     await this.manager.define('lacrosseStick', parent, {
       properties: {
@@ -960,7 +976,8 @@ export class CricketBatBuilder implements Builder {
     if (await this.manager.load('cricketBat')) return;
 
     const parent = await this.manager.load('improvised');
-    if (!parent) throw new Error('CricketBatBuilder: improvised type not found');
+    if (!parent)
+      throw new Error('CricketBatBuilder: improvised type not found');
 
     await this.manager.define('cricketBat', parent, {
       properties: {

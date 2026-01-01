@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
-import { registerBuilder, type Builder } from '../builder-registry';
+import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Builds the GuardedExit type
@@ -38,12 +38,12 @@ export class GuardedExitBuilder implements Builder {
 
       this.obj = await this.manager.define('guardedExit', exit, {
         properties: {
-        name: 'Guarded Exit',
-        description: 'A passage restricted to faction members.',
-        allowedFaction: null, // Faction name that can pass (null = unrestricted)
-        denyMessage: 'You are not authorized to pass.',
+          name: 'Guarded Exit',
+          description: 'A passage restricted to faction members.',
+          allowedFaction: null, // Faction name that can pass (null = unrestricted)
+          denyMessage: 'You are not authorized to pass.',
 
-        abilities: `Exit restricted to faction members. Extends $.exit with faction check.
+          abilities: `Exit restricted to faction members. Extends $.exit with faction check.
 
 FACTION CHECK: 'allowedFaction' specifies which faction can pass. null = unrestricted.
 

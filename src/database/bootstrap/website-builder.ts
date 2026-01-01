@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../types/object';
 import type { ObjectManager } from '../object-manager';
-import { registerBuilder, type Builder } from './builder-registry';
+import { type Builder, registerBuilder } from './builder-registry';
 
 /**
  * Builds Website objects for the Malice web server
@@ -16,7 +16,17 @@ import { registerBuilder, type Builder } from './builder-registry';
  * The TypeScript web server delegates everything to $webSite.handleRequest().
  */
 export class WebsiteBuilder implements Builder {
-  static provides = ['webSite', 'webTemplate', 'webPage', 'landingTemplate', 'terminalTemplate', 'docTemplate', 'homepage', 'playPage', 'clientJsRoute'];
+  static provides = [
+    'webSite',
+    'webTemplate',
+    'webPage',
+    'landingTemplate',
+    'terminalTemplate',
+    'docTemplate',
+    'homepage',
+    'playPage',
+    'clientJsRoute',
+  ];
   static depends = ['webRoute', 'webRouter']; // Needs these for routing
 
   private webSite: RuntimeObject | null = null;
@@ -1016,9 +1026,7 @@ export class WebsiteBuilder implements Builder {
    * Build routes that are still needed (clientJsRoute for script serving)
    * Most routes are now handled by $continuumDomain via domain-based routing.
    */
-  private async buildRoutes(
-    aliases: Record<string, number>,
-  ): Promise<void> {
+  private async buildRoutes(aliases: Record<string, number>): Promise<void> {
     console.log('[WebsiteBuilder] buildRoutes() called');
 
     // Get webRoute prototype

@@ -163,7 +163,7 @@ export class MaliceTreeProvider
           : vscode.TreeItemCollapsibleState.Collapsed;
 
         // Build label: "Name" or "Object #id" if no name
-        let label = obj.name || `Object #${obj.id}`;
+        const label = obj.name || `Object #${obj.id}`;
 
         // Build description: "$alias" and/or "#id"
         const descParts: string[] = [];

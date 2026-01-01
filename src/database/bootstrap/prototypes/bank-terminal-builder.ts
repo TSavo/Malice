@@ -1,6 +1,6 @@
 import type { RuntimeObject } from '../../../../types/object';
 import type { ObjectManager } from '../../object-manager';
-import { registerBuilder, type Builder } from '../builder-registry';
+import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Builds the BankTerminal type
@@ -35,26 +35,28 @@ export class BankTerminalBuilder implements Builder {
       // Get parent type
       const describable = await this.manager.load('describable');
       if (!describable) {
-        throw new Error('Describable type not found - required for BankTerminal');
+        throw new Error(
+          'Describable type not found - required for BankTerminal',
+        );
       }
 
       this.obj = await this.manager.define('bankTerminal', describable, {
         properties: {
-        name: 'Bank Terminal',
-        description:
-          'A sleek banking kiosk with a touchscreen interface. The corporate logo pulses softly.',
-        // Reference to the bank this terminal connects to (default: system bank)
-        bank: null, // Will use $.bank if null
-        // Fees for various operations
-        fees: {
-          transfer: 0, // Flat fee per transfer
-          credchip: 10, // Fee to buy a credchip
-          deposit: 0, // Fee to deposit a credchip
-        },
-        // Credchip denominations available
-        credchipDenominations: [100, 500, 1000, 5000, 10000],
+          name: 'Bank Terminal',
+          description:
+            'A sleek banking kiosk with a touchscreen interface. The corporate logo pulses softly.',
+          // Reference to the bank this terminal connects to (default: system bank)
+          bank: null, // Will use $.bank if null
+          // Fees for various operations
+          fees: {
+            transfer: 0, // Flat fee per transfer
+            credchip: 10, // Fee to buy a credchip
+            deposit: 0, // Fee to deposit a credchip
+          },
+          // Credchip denominations available
+          credchipDenominations: [100, 500, 1000, 5000, 10000],
 
-        abilities: `Banking kiosk for account management and credchips.
+          abilities: `Banking kiosk for account management and credchips.
 
 SERVICES: doUse() shows menu via $.prompt:
 - Check Balance (showBalance)
@@ -707,7 +709,7 @@ VERBS: 'use terminal', 'bank', 'check balance'. Registered when terminal placed 
   }
 
   async registerAliases(): Promise<void> {
-    console.log('[BankTerminalBuilder] Type \'bankTerminal\' auto-aliased');
+    console.log("[BankTerminalBuilder] Type 'bankTerminal' auto-aliased");
   }
 }
 

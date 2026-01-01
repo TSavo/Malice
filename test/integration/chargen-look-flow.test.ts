@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { MinimalBootstrap } from '../../src/database/bootstrap/minimal-bootstrap.js';
 import { runBuilders } from '../../src/database/bootstrap/builder-registry.js';
+import { MinimalBootstrap } from '../../src/database/bootstrap/minimal-bootstrap.js';
 import { ObjectDatabase } from '../../src/database/object-db.js';
 import { ObjectManager } from '../../src/database/object-manager.js';
 import type { RuntimeObject } from '../../types/object.js';
