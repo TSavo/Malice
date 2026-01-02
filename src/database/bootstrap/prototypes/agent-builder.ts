@@ -42,6 +42,8 @@ export class AgentBuilder implements Builder {
         properties: {
           name: 'Agent',
           description: 'Base prototype for things that can act',
+          // Flag for narrator to recognize agents in room
+          isAgent: true,
           // Verb registry: { pattern: { obj: ObjId, method: string } }
           // Patterns like 'get %i', 'shoot %i with %t', 'say %s'
           verbs: {},
@@ -3278,102 +3280,11 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
     `,
     );
 
-    // The 'to' verb - speak to someone (checks perception filters first)
-    obj.setMethod(
-      'to',
-      `
-      /** Speak directly to someone.
-       *  Usage: to <name> <message>
-       *  Addresses a specific person, triggering their attention.
-       *  Checks perception filters for addressable entities before room lookup.
-       */
-      // Parse target and message from command
-      const cmdParts = command.trim().split(/\\s+/);
-      cmdParts.shift(); // Remove 'to'
-      if (cmdParts.length < 2) {
-        return 'Usage: to <name> <message>';
-      }
-
-      // First word is target, rest is message
-      const targetName = cmdParts.shift().toLowerCase();
-      const message = cmdParts.join(' ');
-
-      if (!message.trim()) {
-        return 'What do you want to say?';
-      }
-
-      // Check perception filters for addressable entities
-      const filters = self.perceptionFilters || [];
-      for (const entry of filters) {
-        const filter = entry.filter;
-        if (filter && filter.getAddressableEntities) {
-          const entities = await filter.getAddressableEntities();
-          if (entities && entities.some(e => e.toLowerCase() === targetName)) {
-            // Filter claims this target
-            if (filter.onAddressed) {
-              return await filter.onAddressed(self, targetName, message);
-            }
-          }
-        }
-      }
-
-      // Normal room lookup
-      const location = self.location;
-      if (!location) {
-        return 'You are nowhere.';
-      }
-
-      const contents = location.contents || [];
-      let target = null;
-
-      for (const obj of contents) {
-        if (!obj || obj === self) continue;
-
-        const objName = (obj.name || '').toLowerCase();
-        const aliases = (obj.aliases || []).map(a => a.toLowerCase());
-
-        if (objName === targetName || aliases.includes(targetName) ||
-            objName.startsWith(targetName) || aliases.some(a => a.startsWith(targetName))) {
-          target = obj;
-          break;
-        }
-      }
-
-      if (!target) {
-        return 'You don\\'t see "' + targetName + '" here.';
-      }
-
-      // Track conversation partner for context continuity
-      self.lastConversationPartner = target;
-      self.lastConversationTime = Date.now();
-
-      // Announce to room
-      if (location.announce) {
-        await location.announce(self, target, {
-          actor: 'You say to ' + target.name + ', "' + message + '"',
-          target: self.name + ' says to you, "' + message + '"',
-          others: self.name + ' says to ' + target.name + ', "' + message + '"'
-        });
-      }
-
-      // Auto-cancel any response expectation the target NPC had for this speaker
-      // This happens before triggering AI response so the timeout doesn't fire
-      if (target.cancelExpectation) {
-        try {
-          await target.cancelExpectation(self.id);
-        } catch (e) {
-          // Ignore - expectation may not exist
-        }
-      }
-
-      // Trigger AI response if target has onSpokenTo handler
-      if (target.onSpokenTo) {
-        await target.onSpokenTo(self, message);
-      }
-
-      return '';
-    `,
-    );
+    // NOTE: The 'to' verb is no longer defined on agent.
+    // Agents inherit .to(speaker, message) from describable.
+    // The narrator handles "to <target> <message>" commands by:
+    // 1. Finding the target in the room
+    // 2. Calling target.to(player, message) to trigger their AI
   }
 }
 

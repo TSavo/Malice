@@ -24,10 +24,13 @@ export interface MuxMessage {
   ts: number;
 }
 
+let muxIdCounter = 0;
+
 /**
  * Channel multiplexer for polling transports
  */
 export class PollingMux implements IChannelMux {
+  readonly muxId = ++muxIdCounter;
   private readonly channels = new Map<string, PollingChannel>();
   private readonly subscriptions = new Map<string, Subscription>();
   private destroyed = false;
@@ -80,7 +83,7 @@ export class PollingMux implements IChannelMux {
   private createChannel(id: string): PollingChannel {
     const channel = new PollingChannel(id, () => {
       this.removeChannel(id);
-    });
+    }, this.muxId);
 
     this.channels.set(id, channel);
 

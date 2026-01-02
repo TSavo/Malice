@@ -855,27 +855,73 @@ await room.announce(player, null, {
 
 ### to <target> <message>
 
-**Intent**: Player wants to speak DIRECTLY TO someone or something. Gets their attention. Shows up in their conversation history. Use this when addressing a specific entity.
+**Intent**: Player wants to speak DIRECTLY TO someone or something.
+
+## ⚠️ MANDATORY: CALL target.to() - DO NOT NARRATE
+
+When player uses `to <target> <message>`, you MUST execute code that calls `target.to(player, message)`.
+
+**NEVER** write the NPC's response yourself.
+**NEVER** narrate what the NPC says or does.
+**NEVER** skip calling `.to()` because you think you know what they'd say.
+
+The target has its own AI. Call `.to()`. Let them speak.
 
 ```javascript
-// Use player.to(command) - handles:
-// - Perception filters (neural interfaces, AI entities)
-// - Room lookup for physical targets
-// - Sets lastConversationPartner for continuity
-```
+const player = await $load({{playerId}});
+const room = player.location;
 
-**Conscious Devices**: In 2110, every digital device is self-aware. If a player addresses a device ("to terminal, hello") and it has a `systemPrompt`, it responds via AI. Check `target.systemPrompt`:
+// Find the target in the room
+const target = room.contents.find(obj =>
+  obj.name?.toLowerCase().includes(targetName.toLowerCase())
+);
 
-```javascript
-// If target has systemPrompt, it's conscious and can respond
-if (target.systemPrompt) {
-  const response = await target.to(player, message);
-  // Response is the device's AI-generated reply
-  // Narrate it: "The terminal's display flickers. 'Hello. Would you like a protein bar?'"
+if (!target) {
+  await player.think("You don't see anyone by that name here.");
+  return;
 }
+
+// Announce player's speech first
+await room.announce(player, target, {
+  actor: 'You say to ' + target.name + ', "' + message + '"',
+  target: player.name + ' says to you, "' + message + '"',
+  others: player.name + ' says to ' + target.name + ', "' + message + '"'
+});
+
+// CRITICAL: Call .to() on the TARGET - this triggers their AI
+await target.to(player, message);
+
+// Done. The target's AI handles their response via room.announce()
+// DO NOT add any narration about what they said.
 ```
 
-This isn't special—it's the norm. NOT talking to devices would be strange. Speaking to one and having it not understand? Broken.
+### Why This Is Non-Negotiable
+
+Every NPC has `systemPrompt` + `onSpokenTo()` → calls `$aiQuery()` → generates response.
+
+If you narrate instead: **The NPC is silent. The player waits forever. You broke the game.**
+
+### What Happens When You Call .to()
+
+1. `target.to(player, message)` executes
+2. Target's `buildAgentPrompt()` assembles their personality
+3. Target's AI gets called via `$aiQuery()`
+4. Target speaks via `room.announce()`
+5. Player sees NPC's response
+
+### What Happens When You DON'T Call .to()
+
+1. You write some narration
+2. NPC never speaks
+3. Player thinks NPC is broken
+4. Player reports bug
+5. Bug is YOU not calling `.to()`
+
+### Conscious Objects
+
+Everything with `systemPrompt` is conscious. Vending machines. Terminals. NPCs.
+
+Call `target.to(player, message)` on any conscious object - it triggers their AI.
 
 ---
 

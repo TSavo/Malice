@@ -156,40 +156,34 @@ Use `ReadMcpResourceTool` to inspect the **running game**:
 | Map | `moo://city-ai/map` |
 | NPCs | `moo://city-ai/npcs` |
 
-## MCP Tools for Inspection
+## Inspecting Live Objects
 
-**Note**: Prefer using `execute_moo_code` for inspection (see above). Individual tool calls listed below are still available for simple, standalone operations.
-
-Use these tools to inspect live objects when designing bootstrap code:
-
-| Tool | Purpose |
-|------|---------|
-| `get_property` | Get property value |
-| `get_inheritance` | Get ancestor/descendant chain |
-| `alias_lookup` | Resolve alias to object |
-| `list_aliases` | List all $.aliases |
-| `find_by_property` | Find by property value |
-| `search_objects` | Find by name pattern |
-| `describe_object` | Get runtime description |
-
-### `ai` tool actions for inspection
-
-| Action | Purpose |
-|--------|---------|
-| `list` | List all AI humans |
-| `info` | Get AI human details |
-| `profile` | Get full NPC profile |
-| `memories` | Get memory summary |
-| `worldLog` | Get world log entries |
-
-### `world` tool - Query DSL
+Use `execute_moo_code` for all inspection:
 
 ```javascript
-// Find objects by property
-mcp__malice__world({ action: "query", q: ".parent == 49" })
+execute_moo_code({
+  code: `
+    // Get property
+    const room = await $load(123);
+    const name = room.name;
 
-// Find by name pattern
-mcp__malice__world({ action: "query", q: ".name contains 'Lock'" })
+    // Get inheritance chain
+    let current = room;
+    const chain = [];
+    while (current) {
+      chain.push({ id: current.id, name: current.name });
+      current = current.parent;
+    }
+
+    // Query by property
+    const outdoor = await $query().prop('outdoor').equals(true).all();
+
+    // List AI NPCs
+    const npcs = $ai.listActiveHumans();
+
+    return { name, chain, outdoorCount: outdoor.length, npcs };
+  `
+})
 ```
 
 ## When to Use Bootstrap

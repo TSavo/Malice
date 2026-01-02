@@ -136,7 +136,7 @@ export class FactionBundle {
     if (enableSessionMcp && this.manager && ports.sessionMcp) {
       this.sessionMcpServer = new SessionMCPServer(this.manager, {
         port: ports.sessionMcp,
-        host: '127.0.0.1',
+        host: '0.0.0.0',
         factionId: this.config.factionId,
         factionName: this.config.name,
       });

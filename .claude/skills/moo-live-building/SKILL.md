@@ -264,98 +264,88 @@ Players address it: `say to dispenser, hello`
 - `interactionSession` maintains conversation continuity
 - NPCs are just one type of conscious object—same infrastructure
 
-### Consolidated Tools (use `action` parameter)
+### AI NPCs
 
-#### `ai` tool - AI NPC management
+```javascript
+execute_moo_code({
+  code: `
+    // Spawn an AI NPC
+    const npc = await $ai.spawn({
+      role: 'guard',
+      name: 'Marcus',
+      location: room,
+      sex: 'male',
+      age: 35,
+      personality: 'Gruff but professional.',
+      history: 'Former military.'
+    });
 
-| Action | Purpose |
-|--------|---------|
-| `spawn` | Create AI-controlled human |
-| `despawn` | Remove AI human |
-| `list` | List all AI humans |
-| `info` | Get AI human details |
-| `do` | Execute command as AI |
-| `look` | Get what AI sees |
-| `tailor` | Dress NPC with AI tailor |
-| `profile` | Get full NPC profile |
-| `setPersonality` | Set personality traits |
-| `setHistory` | Set backstory |
-| `remember` | Store critical memory |
-| `recall` | Get memories |
-| `forget` | Remove memory |
-| `memories` | Get memory summary |
-| `expect` | Set response timeout |
-| `cancelExpect` | Cancel timeout |
-| `path` | A* pathfinding |
-| `walkPath` | Walk AI along path |
-| `worldLog` | Get world log entries |
+    // Have NPC speak
+    await room.announce(npc, null, {
+      others: '%A %av{say}, "Halt! State your business."'
+    });
 
-#### `plot` tool - Plot/job management
+    // Move NPC
+    await npc.go('north');
 
-| Action | Purpose |
-|--------|---------|
-| `create` | Create new plot |
-| `get` | Get plot details |
-| `list` | List plots by status |
-| `search` | Search plot events |
-| `close` | Complete/abandon plot |
-| `set_metadata` | Update plot metadata |
-| `add_event` | Log plot event |
-| `get_events` | Get event log |
-| `set_phases` | Define phases |
-| `get_phases` | Get phase definitions |
-| `create_job` | Create job in plot |
-| `get_job` | Get job details |
-| `complete_job` | Mark job complete |
-| `fail_job` | Mark job failed |
-| `get_job_phase` | Get job's phase |
-| `advance_phase` | Advance to next phase |
-| `set_phase` | Set specific phase |
-| `register_hook` | Register job hook |
-| `next` | Get next plot needing attention |
-| `active` | List all active plots |
+    // Get NPC memories
+    const memories = npc.memories || [];
 
-#### `notes` tool - Notes on objects
+    return { npcId: npc.id };
+  `
+})
+```
 
-| Action | Purpose |
-|--------|---------|
-| `get` | Get notes on object |
-| `add` | Add note to object |
-| `append` | Append to existing note |
-| `delete` | Delete note by index |
-| `search` | Search notes |
-| `list_objects` | List objects with notes |
+### Plots
 
-#### `world` tool - Query DSL
+```javascript
+execute_moo_code({
+  code: `
+    // Create a plot
+    const plotId = await $plot.create('Water Main Repair', {
+      type: 'infrastructure',
+      priority: 'high'
+    });
 
-| Action | Purpose |
-|--------|---------|
-| `query` | Execute DSL query |
-| `validate` | Validate query syntax |
+    // Add event
+    await $plot.addEvent(plotId, 'Job posted. Awaiting workers.', 'system');
 
-#### `combat` tool - Combat resolution
+    // Create job
+    await $plot.createJob(plotId, 'fix_pipe', {
+      reward: 50,
+      difficulty: 'medium'
+    });
 
-| Action | Purpose |
-|--------|---------|
-| `status` | Get combat state |
-| `context` | Get full context for AI |
-| `check` | Skill check |
-| `damage` | Apply damage |
-| `emote` | Narrate action |
-| `effect` | Apply status effect |
-| `end` | End combat |
-| `next_round` | Advance round |
-| `list` | List active combats |
+    // Get plot info
+    const plot = await $plot.get(plotId);
 
-### Telnet Sessions
+    return { plotId, plot };
+  `
+})
+```
 
-| Tool | Purpose |
-|------|---------|
-| `session_connect` | Connect to MOO |
-| `session_send` | Send command |
-| `session_log` | Get session output |
-| `session_list` | List sessions |
-| `session_close` | Close session |
+### Query DSL
+
+```javascript
+execute_moo_code({
+  code: `
+    // Find rooms with specific properties
+    const outdoorRooms = await $query().prop('outdoor').equals(true).all();
+
+    // Find by parent
+    const allRooms = await $query().parent($room).all();
+
+    // Complex query
+    const result = await $query()
+      .prop('z').gt(0)
+      .or()
+      .prop('name').contains('Tower')
+      .all();
+
+    return { outdoorRooms: outdoorRooms.length, allRooms: allRooms.length };
+  `
+})
+```
 
 ## When to Use Runtime Building
 
@@ -446,20 +436,16 @@ View all aliases: `moo://aliases` resource or `list_aliases` tool
 
 ### Registering New Aliases
 
-Use MCP or method code to register aliases on `#0` (ObjectManager):
-
 ```javascript
-// Via MCP tool
-mcp__malice__call_method({
-  objectId: "#0",
-  name: "addAlias",
-  args: ["myThing", 1234]  // alias name, object ID
-})
+execute_moo_code({
+  code: `
+    // Register an alias on ObjectManager (#0)
+    await $.addAlias('myThing', obj.id);
 
-// In method code
-await $[0].addAlias('myThing', obj.id);
-// or
-await $.addAlias('myThing', obj.id);
+    // Now $myThing is available in all method code
+    return { aliasRegistered: 'myThing' };
+  `
+})
 ```
 
 After registration, `$myThing` is available in all method code.

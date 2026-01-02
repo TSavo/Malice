@@ -861,6 +861,14 @@ export class ObjectManager {
   }
 
   /**
+   * Get the type cache for iterating all types
+   * Used by runtime-object to inject type aliases into method execution context
+   */
+  getTypeCache(): Map<string, RuntimeObject> {
+    return this.typeCache;
+  }
+
+  /**
    * Load type by name
    */
   async loadType(name: string): Promise<RuntimeObject | null> {
@@ -1616,9 +1624,8 @@ export class ObjectManager {
       for await (const message of sdkQuery({ prompt, options: queryOptions })) {
         const msg = message as Record<string, unknown>;
         console.log(
-          '[ObjectManager.$aiQuery] Message type:',
-          msg.type,
-          (msg as any).subtype || '',
+          '[ObjectManager.$aiQuery] Message:',
+          JSON.stringify(msg, null, 2),
         );
 
         // Capture session ID from init message

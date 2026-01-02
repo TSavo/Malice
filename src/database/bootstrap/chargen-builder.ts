@@ -1685,6 +1685,105 @@ STARTING LOCATION: Immigration Services Entry Hall ($immigrationServices)`,
       return { success: true, playerId, reason };
     `,
     );
+
+    // ═══════════════════════════════════════════════════════════════════
+    // PROGRAMMATIC PLAYER CREATION (for MCP/API registration)
+    // ═══════════════════════════════════════════════════════════════════
+
+    this.charGen.setMethod(
+      'createPlayer',
+      `
+      /** Create a new player account programmatically.
+       *  Used by session MCP register tool and other API endpoints.
+       *  Creates player, sets password, triggers verification email.
+       *  @param options - { username, password, email, factionId? }
+       *  @returns { success, playerId, message } or { success: false, error }
+       */
+      const options = args[0] || {};
+      const { username, password, email, factionId } = options;
+
+      // Validate inputs
+      if (!username || typeof username !== 'string') {
+        return { success: false, error: 'Username is required' };
+      }
+      if (!password || typeof password !== 'string') {
+        return { success: false, error: 'Password is required' };
+      }
+      if (!email || typeof email !== 'string') {
+        return { success: false, error: 'Email is required' };
+      }
+
+      const usernameLower = username.toLowerCase().trim();
+      const emailLower = email.toLowerCase().trim();
+
+      // Validate username format
+      if (!/^[a-z][a-z0-9_]{2,15}$/.test(usernameLower)) {
+        return {
+          success: false,
+          error: 'Username must be 3-16 characters, start with a letter, and contain only letters, numbers, and underscores',
+        };
+      }
+
+      // Validate password length
+      if (password.length < 6) {
+        return { success: false, error: 'Password must be at least 6 characters' };
+      }
+
+      // Validate email format
+      const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
+      if (!emailRegex.test(emailLower)) {
+        return { success: false, error: 'Invalid email format' };
+      }
+
+      // Check username uniqueness
+      const existingPlayer = $query().prop('playername').equals(usernameLower).first();
+      if (existingPlayer) {
+        return { success: false, error: 'Username already exists' };
+      }
+
+      // Check email uniqueness
+      const existingEmail = $query().prop('email').equals(emailLower).first();
+      if (existingEmail) {
+        return { success: false, error: 'Email already registered' };
+      }
+
+      // Generate verification token
+      const crypto = await import('node:crypto');
+      const verificationToken = crypto.randomBytes(32).toString('hex');
+
+      // Create player via $recycler
+      const newPlayer = await $recycler.create($player, {
+        name: usernameLower,
+        playername: usernameLower,
+        email: emailLower,
+        emailVerified: false,
+        verificationToken,
+        chargenComplete: false,
+        factionId: factionId || null,
+      });
+
+      // Set password (uses bcrypt hashing)
+      await newPlayer.setPassword(password);
+
+      // Call faction's onPlayerRegistered hook to send verification email
+      if (factionId && $factionManager) {
+        try {
+          const faction = await $factionManager.getById(factionId);
+          if (faction) {
+            await faction.onPlayerRegistered(newPlayer);
+          }
+        } catch (hookError) {
+          console.error('[CharGen] onPlayerRegistered hook error:', hookError);
+        }
+      }
+
+      return {
+        success: true,
+        playerId: newPlayer.id,
+        message: 'Account created. Check email for verification.',
+      };
+    `,
+    );
   }
 
   async registerAliases(): Promise<void> {

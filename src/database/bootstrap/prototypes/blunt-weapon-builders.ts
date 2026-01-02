@@ -43,8 +43,8 @@ export class BluntWeaponPrototypesBuilder implements Builder {
     'pipe',
     'leadPipe',
     'metalPipe',
-    'crowbar',
-    'hammer',
+    // 'crowbar', // now a $tool
+    // 'hammer', // now a $tool
     'clawHammer',
     'sledgehammer',
     'ballPeenHammer',
@@ -294,48 +294,16 @@ NO MAINTENANCE: Blunt weapons don't need sharpening. Durable. May bend or crack 
       });
     }
 
-    const existing_crowbar = await this.manager.load('crowbar');
-    if (existing_crowbar) {
-      this.weapons.crowbar = existing_crowbar;
-    } else {
-      this.weapons.crowbar = await this.manager.define('crowbar', pipe, {
-        properties: {
-          name: 'Crowbar',
-          description:
-            'A heavy iron pry bar. Good for opening things. And people.',
-          skill: 'club',
-          damage: 26,
-          damageType: 'bruise',
-        },
-        methods: {},
-      });
-    }
+    // crowbar is now a $tool, not a weapon - skip creating it here
 
-    // Hammers (inherit from blunt)
-    let hammer = await this.manager.load('hammer');
-    if (hammer) {
-      this.weapons.hammer = hammer;
-    } else {
-      hammer = await this.manager.define('hammer', blunt, {
-        properties: {
-          name: 'Hammer',
-          description: 'A basic hammer. The head does the work.',
-          skill: 'hammer',
-          damage: 20,
-          damageType: 'bruise',
-        },
-        methods: {},
-      });
-      this.weapons.hammer = hammer;
-    }
-
+    // Hammer variants (hammer itself is now a $tool, variants are $blunt weapons)
     const existing_clawHammer = await this.manager.load('clawHammer');
     if (existing_clawHammer) {
       this.weapons.clawHammer = existing_clawHammer;
     } else {
       this.weapons.clawHammer = await this.manager.define(
         'clawHammer',
-        hammer,
+        blunt,
         {
           properties: {
             name: 'Claw Hammer',
@@ -355,7 +323,7 @@ NO MAINTENANCE: Blunt weapons don't need sharpening. Durable. May bend or crack 
     } else {
       this.weapons.sledgehammer = await this.manager.define(
         'sledgehammer',
-        hammer,
+        blunt,
         {
           properties: {
             name: 'Sledgehammer',
@@ -376,7 +344,7 @@ NO MAINTENANCE: Blunt weapons don't need sharpening. Durable. May bend or crack 
     } else {
       this.weapons.ballPeenHammer = await this.manager.define(
         'ballPeenHammer',
-        hammer,
+        blunt,
         {
           properties: {
             name: 'Ball Peen Hammer',
@@ -394,7 +362,7 @@ NO MAINTENANCE: Blunt weapons don't need sharpening. Durable. May bend or crack 
     if (existing_mallet) {
       this.weapons.mallet = existing_mallet;
     } else {
-      this.weapons.mallet = await this.manager.define('mallet', hammer, {
+      this.weapons.mallet = await this.manager.define('mallet', blunt, {
         properties: {
           name: 'Mallet',
           description:

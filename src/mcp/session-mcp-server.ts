@@ -2,13 +2,18 @@
  * Session MCP Server for Malice MOO
  *
  * First-class mux transport exposing multiplexed channels via MCP tools.
- * Uses HTTP Basic Auth for player authentication.
+ * Supports both guest (unauthenticated) and authenticated sessions.
+ *
+ * Authentication flow:
+ * - Guests can connect without credentials and use register/auth tools
+ * - HTTP Basic Auth is a bypass that auto-authenticates on connect
+ * - Session tools (send/receive/status) require authentication
  *
  * Architecture:
- * - Creates PollingMuxTransport for each authenticated session
- * - Player appears online and receives broadcasts
+ * - Creates PollingMuxTransport for each session
+ * - Authenticated players appear online and receive broadcasts
  * - Channels: game (text I/O), state (structured), ctrl (control), custom
- * - Tools: send (to channel), receive (drain buffer), status
+ * - Tools: register, auth, send, receive, status
  */
 
 import {
@@ -40,11 +45,12 @@ export interface SessionMCPServerConfig {
 interface SessionState {
   mcpServer: McpServer;
   mcpTransport: StreamableHTTPServerTransport;
-  muxTransport: PollingMuxTransport;
-  connection: Connection;
-  context: ConnectionContext;
-  playerId: ObjId;
-  playerName: string;
+  muxTransport: PollingMuxTransport | null;
+  connection: Connection | null;
+  context: ConnectionContext | null;
+  playerId: ObjId | null;
+  playerName: string | null;
+  sessionId: string;
 }
 
 export class SessionMCPServer {
@@ -95,15 +101,14 @@ export class SessionMCPServer {
    * Find player by username
    */
   private async findPlayer(username: string): Promise<RuntimeObject | null> {
-    const objectManager = await this.manager.load(0);
-    if (!objectManager) return null;
+    // Load player and admin TYPES (not object aliases)
+    const playerType = this.manager.getTypeSync('player');
+    const adminType = this.manager.getTypeSync('admin');
 
-    const aliases =
-      (objectManager.get('aliases') as Record<string, number>) || {};
-    const playerPrototypeId = aliases.player;
-    const adminPrototypeId = aliases.admin;
+    if (!playerType) return null;
 
-    if (!playerPrototypeId) return null;
+    const playerPrototypeId = playerType.id;
+    const adminPrototypeId = adminType?.id;
 
     // Helper to extract value from typed Value or raw value
     const getValue = (v: unknown): unknown => {
@@ -175,18 +180,20 @@ export class SessionMCPServer {
         if (req.method === 'DELETE' && sessionId) {
           const session = this.sessions.get(sessionId);
           if (session) {
-            // Disconnect player
-            try {
-              const player = await this.manager.load(session.playerId);
-              if (player) {
-                await player.call('disconnect');
+            // Disconnect player if authenticated
+            if (session.playerId) {
+              try {
+                const player = await this.manager.load(session.playerId);
+                if (player) {
+                  await player.call('disconnect');
+                }
+              } catch (err) {
+                console.error('[SessionMCP] Error disconnecting player:', err);
               }
-            } catch (err) {
-              console.error('[SessionMCP] Error disconnecting player:', err);
             }
 
             // Close transports
-            session.muxTransport.close();
+            session.muxTransport?.close();
             await session.mcpTransport.close();
             this.sessions.delete(sessionId);
           }
@@ -202,25 +209,20 @@ export class SessionMCPServer {
           return;
         }
 
-        // New session - requires HTTP Basic Auth
+        // New session - check for optional HTTP Basic Auth
         const auth = this.parseBasicAuth(req.headers.authorization);
-        if (!auth) {
-          res.setHeader('WWW-Authenticate', 'Basic realm="Malice MOO"');
-          res.writeHead(401);
-          res.end(JSON.stringify({ error: 'Authentication required' }));
-          return;
-        }
+        let player: RuntimeObject | null = null;
 
-        // Validate credentials
-        const player = await this.validateCredentials(
-          auth.username,
-          auth.password,
-        );
-        if (!player) {
-          res.setHeader('WWW-Authenticate', 'Basic realm="Malice MOO"');
-          res.writeHead(401);
-          res.end(JSON.stringify({ error: 'Invalid credentials' }));
-          return;
+        // If auth provided, validate it (but don't require it)
+        if (auth) {
+          player = await this.validateCredentials(auth.username, auth.password);
+          if (!player) {
+            // Invalid credentials - reject
+            res.setHeader('WWW-Authenticate', 'Basic realm="Malice MOO"');
+            res.writeHead(401);
+            res.end(JSON.stringify({ error: 'Invalid credentials' }));
+            return;
+          }
         }
 
         try {
@@ -232,7 +234,7 @@ export class SessionMCPServer {
           const body = Buffer.concat(chunks).toString();
           const message = body ? JSON.parse(body) : null;
 
-          // Create session
+          // Create session (authenticated or guest)
           const mcpSessionId = `mcp-${Date.now()}-${Math.random().toString(36).slice(2)}`;
           const sessionState = await this.createSession(
             mcpSessionId,
@@ -253,9 +255,10 @@ export class SessionMCPServer {
               sessionState.mcpServer = mcpServer;
               sessionState.mcpTransport = mcpTransport;
               this.sessions.set(newId, sessionState);
-              console.log(
-                `[SessionMCP] Session initialized: ${newId} for ${auth.username}`,
-              );
+              const who = player
+                ? `${auth?.username} (authenticated)`
+                : 'guest';
+              console.log(`[SessionMCP] Session initialized: ${newId} for ${who}`);
             },
           });
 
@@ -311,20 +314,85 @@ export class SessionMCPServer {
   }
 
   /**
-   * Create a new authenticated session
+   * Create a new session (authenticated or guest)
    */
   private async createSession(
-    _sessionId: string,
-    player: RuntimeObject,
-    auth: { username: string; password: string },
+    sessionId: string,
+    player: RuntimeObject | null,
+    auth: { username: string; password: string } | null,
   ): Promise<SessionState> {
-    // Create polling mux transport
-    const muxTransport = new PollingMuxTransport(`mcp:${auth.username}`);
+    if (player && auth) {
+      // Authenticated session
+      const muxTransport = new PollingMuxTransport(`mcp:${auth.username}`);
+
+      const authInfo: AuthInfo = {
+        mode: 'http-basic',
+        httpBasic: { username: auth.username, password: auth.password },
+        metadata: {
+          protocol: 'mcp-session',
+          factionId: this.factionId,
+          factionName: this.factionName,
+        },
+      };
+      const connection = new Connection(muxTransport, authInfo);
+      const context = new ConnectionContext(connection, this.manager);
+
+      context.authenticate(player.id);
+      await player.call('connect', context);
+
+      // Note: Do NOT emit to connection$ here!
+      // Session MCP handles authentication internally via player.call('connect').
+
+      const playerId = player.id;
+      const playerName = (player.get('playername') as string) || auth.username;
+
+      console.log(
+        `[SessionMCP] Player ${playerName} (#${playerId}) connected via MCP`,
+      );
+
+      return {
+        mcpServer: null as unknown as McpServer,
+        mcpTransport: null as unknown as StreamableHTTPServerTransport,
+        muxTransport,
+        connection,
+        context,
+        playerId,
+        playerName,
+        sessionId,
+      };
+    } else {
+      // Guest session - no transport until authenticated
+      console.log(`[SessionMCP] Guest session created: ${sessionId}`);
+
+      return {
+        mcpServer: null as unknown as McpServer,
+        mcpTransport: null as unknown as StreamableHTTPServerTransport,
+        muxTransport: null,
+        connection: null,
+        context: null,
+        playerId: null,
+        playerName: null,
+        sessionId,
+      };
+    }
+  }
+
+  /**
+   * Authenticate a guest session
+   */
+  private async authenticateSession(
+    session: SessionState,
+    player: RuntimeObject,
+    username: string,
+    password: string,
+  ): Promise<void> {
+    // Create mux transport
+    const muxTransport = new PollingMuxTransport(`mcp:${username}`);
 
     // Create connection with auth info
     const authInfo: AuthInfo = {
-      mode: 'http-basic',
-      httpBasic: { username: auth.username, password: auth.password },
+      mode: 'mcp-auth',
+      httpBasic: { username, password },
       metadata: {
         protocol: 'mcp-session',
         factionId: this.factionId,
@@ -332,33 +400,27 @@ export class SessionMCPServer {
       },
     };
     const connection = new Connection(muxTransport, authInfo);
-
-    // Create connection context
     const context = new ConnectionContext(connection, this.manager);
 
-    // Authenticate and connect player
     context.authenticate(player.id);
     await player.call('connect', context);
 
-    // Emit connection for FactionBundle integration
-    this.connection$.next(connection);
+    // Note: Do NOT emit to connection$ here!
+    // Session MCP handles authentication internally via player.call('connect').
+    // Emitting to connection$ would trigger System.onConnection -> preAuthHandler
+    // which doesn't recognize 'mcp-auth' mode and would close the connection.
 
-    const playerId = player.id;
-    const playerName = (player.get('playername') as string) || auth.username;
+    // Update session state
+    session.muxTransport = muxTransport;
+    session.connection = connection;
+    session.context = context;
+    session.playerId = player.id;
+    session.playerName = (player.get('playername') as string) || username;
+    session.player = player;
 
     console.log(
-      `[SessionMCP] Player ${playerName} (#${playerId}) connected via MCP`,
+      `[SessionMCP] Guest upgraded: ${session.playerName} (#${session.playerId})`,
     );
-
-    return {
-      mcpServer: null as unknown as McpServer, // Set later
-      mcpTransport: null as unknown as StreamableHTTPServerTransport, // Set later
-      muxTransport,
-      connection,
-      context,
-      playerId,
-      playerName,
-    };
   }
 
   /**
@@ -379,11 +441,160 @@ export class SessionMCPServer {
       ],
       isError: true,
     });
+    const requireAuth = () => {
+      if (!session.playerId) {
+        return err('Not authenticated. Use the auth tool first.');
+      }
+      return null;
+    };
 
-    // Send tool - send to any channel
+    // Register tool - create a new account
+    server.tool(
+      'register',
+      `Create a new player account for this faction.
+
+PARAMETERS:
+  username - Desired username (lowercase, alphanumeric)
+  password - Password (min 6 characters)
+  email    - Email address for verification
+
+RETURNS:
+  success  - Whether registration succeeded
+  message  - Status message
+
+NOTE: After registering, use the auth tool to log in.`,
+      {
+        username: z.string().min(3).max(20).describe('Desired username'),
+        password: z.string().min(6).describe('Password'),
+        email: z.string().email().describe('Email address'),
+      },
+      async ({ username, password, email }) => {
+        try {
+          // Check if already authenticated
+          if (session.playerId) {
+            return err('Already authenticated. Cannot register while logged in.');
+          }
+
+          // Normalize username
+          const normalizedUsername = username.toLowerCase().trim();
+
+          // Check if username exists
+          const existing = await this.findPlayer(normalizedUsername);
+          if (existing) {
+            return err('Username already taken.');
+          }
+
+          // Get faction's charGen
+          if (!this.factionId) {
+            return err('No faction configured for this session.');
+          }
+
+          const faction = await this.manager.load(this.factionId);
+          if (!faction) {
+            return err('Faction not found.');
+          }
+
+          const charGenId = faction.get('charGen') as number | null;
+          if (!charGenId) {
+            return err('Faction has no character generation configured.');
+          }
+
+          const charGen = await this.manager.load(charGenId);
+          if (!charGen) {
+            return err('Character generation system not found.');
+          }
+
+          // Create player via charGen
+          const result = await charGen.call('createPlayer', {
+            username: normalizedUsername,
+            password,
+            email,
+            factionId: this.factionId,
+          });
+
+          if (!result || !result.success) {
+            return err(result?.error || 'Failed to create account.');
+          }
+
+          return ok({
+            success: true,
+            message: `Account created for ${normalizedUsername}. Check your email for verification, then use auth to log in.`,
+            playerId: result.playerId,
+          });
+        } catch (error) {
+          return err(
+            `Registration error: ${error instanceof Error ? error.message : String(error)}`,
+          );
+        }
+      },
+    );
+
+    // Auth tool - authenticate within session
+    server.tool(
+      'auth',
+      `Authenticate with username and password.
+
+PARAMETERS:
+  username - Your username
+  password - Your password
+
+RETURNS:
+  success    - Whether authentication succeeded
+  playerId   - Your player object ID
+  playerName - Your character name
+
+After successful auth, you can use send/receive/status tools.`,
+      {
+        username: z.string().describe('Username'),
+        password: z.string().describe('Password'),
+      },
+      async ({ username, password }) => {
+        try {
+          // Check if already authenticated
+          if (session.playerId) {
+            return ok({
+              success: true,
+              message: 'Already authenticated.',
+              playerId: session.playerId,
+              playerName: session.playerName,
+            });
+          }
+
+          // Validate credentials
+          const player = await this.validateCredentials(
+            username.toLowerCase(),
+            password,
+          );
+          if (!player) {
+            return err('Invalid username or password.');
+          }
+
+          // Check email verification
+          if (!player.get('emailVerified')) {
+            return err('Email not verified. Check your inbox for verification link.');
+          }
+
+          // Upgrade session to authenticated
+          await this.authenticateSession(session, player, username, password);
+
+          return ok({
+            success: true,
+            playerId: session.playerId,
+            playerName: session.playerName,
+            message: 'Authenticated successfully. You can now use send/receive/status.',
+          });
+        } catch (error) {
+          return err(
+            `Auth error: ${error instanceof Error ? error.message : String(error)}`,
+          );
+        }
+      },
+    );
+
+    // Send tool - send to any channel (requires auth)
     server.tool(
       'send',
-      `Send a message to a channel.
+      `Send a message to a channel. Requires authentication.
 
 CHANNELS:
   game  - Game commands and text (default)
@@ -402,12 +613,41 @@ EXAMPLES:
           .describe('Message payload (string for game, object for others)'),
       },
       async ({ channel = 'game', payload }) => {
-        try {
-          session.muxTransport.receiveOnChannel(channel, payload);
+        const authErr = requireAuth();
+        if (authErr) return authErr;
 
-          // For game channel, wait briefly for synchronous response
-          if (channel === 'game') {
-            await new Promise((resolve) => setTimeout(resolve, 100));
+        try {
+          session.muxTransport!.receiveOnChannel(channel, payload);
+
+          // For game channel, wait for AI to finish (narrator or chargen)
+          if (channel === 'game' && session.player) {
+            // Check if in chargen or normal play
+            const inChargen = session.player.get('chargenInProgress');
+
+            // Yield to allow message processing to start (mutex acquire, etc.)
+            await new Promise((r) => setImmediate(r));
+
+            if (inChargen) {
+              // Wait for chargen AI to complete
+              await session.player.call('awaitChargen', 60000);
+            } else {
+              // Wait for narrator to complete
+              await session.player.call('awaitNarrator', 60000);
+            }
+
+            // Drain messages accumulated during AI processing
+            const messages = session.muxTransport!.drain();
+
+            return ok({
+              sent: true,
+              channel,
+              messages: messages.map((m) => ({
+                ch: m.ch,
+                t: m.t,
+                p: m.p,
+                ts: m.ts,
+              })),
+            });
           }
 
           return ok({ sent: true, channel });
@@ -419,10 +659,10 @@ EXAMPLES:
       },
     );
 
-    // Receive tool - drain buffered messages
+    // Receive tool - drain buffered messages (requires auth)
     server.tool(
       'receive',
-      `Get accumulated messages from all channels.
+      `Get accumulated messages from all channels. Requires authentication.
 
 Returns buffered messages since last receive call.
 Messages are in format: {ch, t, p, ts}
@@ -443,20 +683,23 @@ EXAMPLES:
         limit: z.number().optional().describe('Max messages to return'),
       },
       async ({ channels, limit }) => {
+        const authErr = requireAuth();
+        if (authErr) return authErr;
+
         try {
           let messages: MuxMessage[];
 
           if (channels && channels.length > 0) {
-            messages = session.muxTransport.drainChannels(channels);
+            messages = session.muxTransport!.drainChannels(channels);
           } else {
-            messages = session.muxTransport.drain();
+            messages = session.muxTransport!.drain();
           }
 
           if (limit && limit > 0 && messages.length > limit) {
             // Keep oldest messages in buffer (re-add them)
             const extra = messages.slice(0, messages.length - limit);
             for (const msg of extra) {
-              session.muxTransport.sendToChannel(msg.ch, msg.p);
+              session.muxTransport!.sendToChannel(msg.ch, msg.p);
             }
             messages = messages.slice(-limit);
           }
@@ -469,7 +712,7 @@ EXAMPLES:
               ts: m.ts,
             })),
             connected: true,
-            buffered: session.muxTransport.bufferedCount,
+            buffered: session.muxTransport!.bufferedCount,
           });
         } catch (error) {
           return err(
@@ -479,10 +722,10 @@ EXAMPLES:
       },
     );
 
-    // Status tool - connection and player info
+    // Status tool - connection and player info (requires auth)
     server.tool(
       'status',
-      `Get connection and player status.
+      `Get connection and player status. Requires authentication.
 
 Returns:
   connected  - Whether connected
@@ -492,8 +735,11 @@ Returns:
   buffered   - Messages waiting in buffer`,
       {},
       async () => {
+        const authErr = requireAuth();
+        if (authErr) return authErr;
+
         try {
-          const player = await this.manager.load(session.playerId);
+          const player = await this.manager.load(session.playerId!);
           let location = null;
 
           if (player) {
@@ -507,11 +753,11 @@ Returns:
           }
 
           return ok({
-            connected: !session.muxTransport.mux.isDestroyed,
+            connected: !session.muxTransport!.mux.isDestroyed,
             playerId: session.playerId,
             playerName: session.playerName,
             location,
-            buffered: session.muxTransport.bufferedCount,
+            buffered: session.muxTransport!.bufferedCount,
           });
         } catch (error) {
           return err(
@@ -520,21 +766,48 @@ Returns:
         }
       },
     );
+
+    // Whoami tool - check auth status (works for guests too)
+    server.tool(
+      'whoami',
+      `Check current authentication status.
+
+Returns auth state - works for both guests and authenticated users.`,
+      {},
+      async () => {
+        if (session.playerId) {
+          return ok({
+            authenticated: true,
+            playerId: session.playerId,
+            playerName: session.playerName,
+            faction: this.factionName || 'unknown',
+          });
+        } else {
+          return ok({
+            authenticated: false,
+            message: 'Guest session. Use register or auth to authenticate.',
+            faction: this.factionName || 'unknown',
+          });
+        }
+      },
+    );
   }
 
   async stop(): Promise<void> {
     // Disconnect all players
     for (const [_id, session] of this.sessions) {
-      try {
-        const player = await this.manager.load(session.playerId);
-        if (player) {
-          await player.call('disconnect');
+      if (session.playerId) {
+        try {
+          const player = await this.manager.load(session.playerId);
+          if (player) {
+            await player.call('disconnect');
+          }
+        } catch (err) {
+          console.error('[SessionMCP] Error disconnecting player:', err);
         }
-      } catch (err) {
-        console.error('[SessionMCP] Error disconnecting player:', err);
       }
 
-      session.muxTransport.close();
+      session.muxTransport?.close();
       await session.mcpTransport.close();
     }
     this.sessions.clear();

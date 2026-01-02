@@ -495,6 +495,14 @@ export class DescribableBuilder implements Builder {
       const includeProps = options.includeProps || ['contents', 'locks', 'holding'];
       const includeMethods = options.includeMethods !== undefined ? options.includeMethods : true;
 
+      // Cycle detection - track visited objects to prevent infinite recursion
+      const visited = options._visited || new Set();
+      if (visited.has(self.id)) {
+        // Already describing this object - return minimal ref to break cycle
+        return { id: self.id, name: self.name, _cycle: true };
+      }
+      visited.add(self.id);
+
       // Build reverse alias lookup: id -> $alias
       const aliasMap = {};
       if ($.getAliases) {
@@ -571,7 +579,7 @@ export class DescribableBuilder implements Builder {
 
       // Build inheritance tree recursively
       const buildInheritanceTree = (obj) => {
-        if (!obj || obj.id === 1) return null; // Stop at Root
+        if (!obj || obj.id === 'root' || obj.id === 1) return null; // Stop at Root
 
         const local = getLocalDefs(obj);
         const parent = obj.getParent ? obj.getParent() : null;
@@ -627,7 +635,7 @@ export class DescribableBuilder implements Builder {
             result[propName] = [];
             for (const item of propValue) {
               if (item && typeof item === 'object' && item.describeForAI) {
-                result[propName].push(await item.describeForAI({ depth: depth - 1, includeProps, includeMethods }));
+                result[propName].push(await item.describeForAI({ depth: depth - 1, includeProps, includeMethods, _visited: visited }));
               } else if (item && typeof item === 'object' && item.id !== undefined) {
                 result[propName].push({
                   id: item.id,
@@ -638,7 +646,7 @@ export class DescribableBuilder implements Builder {
             }
           } else if (propValue && typeof propValue === 'object' && propValue.id !== undefined) {
             if (propValue.describeForAI) {
-              result[propName] = await propValue.describeForAI({ depth: depth - 1, includeProps, includeMethods });
+              result[propName] = await propValue.describeForAI({ depth: depth - 1, includeProps, includeMethods, _visited: visited });
             } else {
               result[propName] = {
                 id: propValue.id,
@@ -800,8 +808,8 @@ export class DescribableBuilder implements Builder {
       if (speaker?.credits !== undefined) {
         fullSystemPrompt += 'Player Credits: ' + speaker.credits + '\\n';
       }
-      fullSystemPrompt += '\\n**IMPORTANT**: In execute_moo_code, `player` is NOT available.\\n';
-      fullSystemPrompt += 'You MUST start with: `const player = await $load(' + (speaker?.id || 0) + ');`\\n';
+      fullSystemPrompt += '\\n**IMPORTANT**: In execute_moo_code, \`player\` is NOT available.\\n';
+      fullSystemPrompt += 'You MUST start with: \`const player = await $load(' + (speaker?.id || 0) + ');\`\\n';
 
       // Include abilities if present
       const abilities = await self.getAbilities();
@@ -836,7 +844,7 @@ export class DescribableBuilder implements Builder {
       }
 
       // Return the response text
-      return result?.output || result?.text || null;
+      return result?.response || result?.output || result?.text || null;
     `,
     );
 

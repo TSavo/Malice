@@ -9,7 +9,7 @@ import { type Builder, registerBuilder } from '../builder-registry';
  *   $.improvised (base for all improvised weapons)
  *     $.bottle, $.brokenBottle, $.beerBottle
  *     $.brick, $.rock, $.cinderBlock
- *     $.screwdriver, $.icepick, $.awl, $.wrench, $.prybar, $.hammerImprovised
+ *     $.icepick, $.awl, $.hammerImprovised (screwdriver, wrench, prybar are $tools)
  *     $.kitchenKnife, $.butcherKnife, $.skillet, $.rollingPin
  *     $.throwingKnife, $.throwingStar, $.dart
  *     $.garrote, $.whip, $.cattleProd, $.stunGun, $.taser, $.pepperSpray
@@ -276,35 +276,7 @@ export class CinderBlockBuilder implements Builder {
 // TOOLS AS WEAPONS
 // ═══════════════════════════════════════════════════════════════════════════
 
-export class ScrewdriverBuilder implements Builder {
-  static provides = ['screwdriver'];
-  static depends = ['improvised'];
-
-  constructor(private manager: ObjectManager) {}
-
-  async build(): Promise<void> {
-    if (await this.manager.load('screwdriver')) return;
-
-    const parent = await this.manager.load('improvised');
-    if (!parent)
-      throw new Error('ScrewdriverBuilder: improvised type not found');
-
-    await this.manager.define('screwdriver', parent, {
-      properties: {
-        name: 'Screwdriver',
-        description: 'A flathead screwdriver. Improvised stabbing tool.',
-        skill: 'improvised',
-        damage: 12,
-        damageType: 'puncture',
-      },
-      methods: {},
-    });
-  }
-
-  async registerAliases(): Promise<void> {
-    console.log("[ScrewdriverBuilder] Type 'screwdriver' auto-aliased");
-  }
-}
+// ScrewdriverBuilder removed - screwdriver is a $tool, not a weapon
 
 export class IcepickBuilder implements Builder {
   static provides = ['icepick'];
@@ -364,63 +336,8 @@ export class AwlBuilder implements Builder {
   }
 }
 
-export class WrenchBuilder implements Builder {
-  static provides = ['wrench'];
-  static depends = ['improvised'];
-
-  constructor(private manager: ObjectManager) {}
-
-  async build(): Promise<void> {
-    if (await this.manager.load('wrench')) return;
-
-    const parent = await this.manager.load('improvised');
-    if (!parent) throw new Error('WrenchBuilder: improvised type not found');
-
-    await this.manager.define('wrench', parent, {
-      properties: {
-        name: 'Wrench',
-        description: 'A heavy metal wrench. Solid bludgeon.',
-        skill: 'improvised',
-        damage: 18,
-        damageType: 'bruise',
-      },
-      methods: {},
-    });
-  }
-
-  async registerAliases(): Promise<void> {
-    console.log("[WrenchBuilder] Type 'wrench' auto-aliased");
-  }
-}
-
-export class PrybarBuilder implements Builder {
-  static provides = ['prybar'];
-  static depends = ['improvised'];
-
-  constructor(private manager: ObjectManager) {}
-
-  async build(): Promise<void> {
-    if (await this.manager.load('prybar')) return;
-
-    const parent = await this.manager.load('improvised');
-    if (!parent) throw new Error('PrybarBuilder: improvised type not found');
-
-    await this.manager.define('prybar', parent, {
-      properties: {
-        name: 'Prybar',
-        description: 'A small prying tool. Metal bar with a flat end.',
-        skill: 'improvised',
-        damage: 14,
-        damageType: 'bruise',
-      },
-      methods: {},
-    });
-  }
-
-  async registerAliases(): Promise<void> {
-    console.log("[PrybarBuilder] Type 'prybar' auto-aliased");
-  }
-}
+// WrenchBuilder removed - wrench is a $tool, not a weapon
+// PrybarBuilder removed - prybar is a $tool, not a weapon
 
 export class HammerImprovisedBuilder implements Builder {
   static provides = ['hammerImprovised'];
@@ -1003,11 +920,9 @@ registerBuilder(BeerBottleBuilder);
 registerBuilder(BrickBuilder);
 registerBuilder(RockBuilder);
 registerBuilder(CinderBlockBuilder);
-registerBuilder(ScrewdriverBuilder);
+// ScrewdriverBuilder, WrenchBuilder, PrybarBuilder removed - they're tools, not weapons
 registerBuilder(IcepickBuilder);
 registerBuilder(AwlBuilder);
-registerBuilder(WrenchBuilder);
-registerBuilder(PrybarBuilder);
 registerBuilder(HammerImprovisedBuilder);
 registerBuilder(KitchenKnifeBuilder);
 registerBuilder(ButcherKnifeBuilder);

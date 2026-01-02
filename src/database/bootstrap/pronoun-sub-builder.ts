@@ -54,37 +54,39 @@ export class PronounSubBuilder implements Builder {
           name: 'PronounSub',
           description:
             'Pronoun and name substitution system for perspective-aware messaging',
-          abilities: `Template-based pronoun and name substitution for structured messages.
+          abilities: `INFRASTRUCTURE ONLY - Template substitution for MOO methods.
 
-SIMPLE SUBSTITUTION - sub(template, actor, directObj?, indirectObj?, item?):
-Template codes (lowercase = as-is, UPPERCASE = capitalized):
-- %n/%N = actor name
-- %s/%S = subject pronoun (he/she/they)
-- %o/%O = object pronoun (him/her/them)
-- %p/%P = possessive adjective (his/her/their)
-- %q/%Q = possessive noun (his/hers/theirs)
-- %r/%R = reflexive (himself/herself/themselves)
-- %t/%T = item/this object name
-- %d/%D = direct object name
-- %i/%I = indirect object name
-- %l/%L = location name
-- %% = literal %
+⚠️ CRITICAL: These template codes ONLY work when passed to $pronoun methods.
+They do NOT work in plain prose output. For narrative text, write actual words.
 
-PERSPECTIVE SUBSTITUTION - perspective(template, actor, target, viewer, item?):
-- %A/%a = actor name/you (based on viewer)
-- %T/%t = target name/you (based on viewer)
-- %as/%ao/%ap/%ar = actor pronouns
-- %ts/%to/%tp/%tr = target pronouns
-- %v{verb} = conjugated verb (cut/cuts based on viewer perspective)
+WRONG (outputs raw codes):
+  "He picks up %p sword."   // Player sees: "He picks up %p sword."
 
-ROOM ANNOUNCEMENT - announce(room, actor, target, messages, sound?, item?):
-messages = { actor?: "...", target?: "...", others?: "..." }
-Sends appropriate message to each viewer based on their perspective.
+RIGHT (use method):
+  await $pronoun.sub("%N picks up %p sword.", actor)   // Player sees: "Bob picks up his sword."
 
-USE CASES:
-- Combat messages: "%N %v{slash} at %t with %i!"
-- System announcements: "%N has entered the room."
-- Multi-perspective events with different messages per viewer`,
+RIGHT (just write words in prose):
+  "Bob picks up his sword."
+
+METHODS:
+
+sub(template, actor, directObj?, indirectObj?, item?):
+  Template codes: %n/%N (name), %s/%S (he/she/they), %o/%O (him/her/them),
+  %p/%P (his/her/their), %q/%Q (his/hers/theirs), %r/%R (himself/herself),
+  %t/%T (item name), %d/%D (direct object), %i/%I (indirect), %l/%L (location)
+
+perspective(template, actor, target, viewer, item?):
+  Actor: %A/%a (name/you), %as/%ao/%ap/%ar (pronouns from actor's POV)
+  Target: %T/%t (name/you), %ts/%to/%tp/%tr (pronouns from target's POV)
+  Verb: %v{base} (cut/cuts based on viewer)
+
+announce(room, actor, target, messages, sound?, item?):
+  Broadcasts to room with perspective-aware substitution.
+  messages = { actor?: "...", target?: "...", others?: "..." }
+
+location.announce(actor, target, messages):
+  Preferred for room announcements. Uses the same template codes.
+  Example: await room.announce(player, null, { actor: "You pick up the gun.", others: "%A %v{pick} up the gun." });`,
         },
         methods: {},
       });
@@ -299,16 +301,30 @@ USE CASES:
       let result = template;
 
       // Actor substitutions
+      // Note: %av{verb} is a special pattern - we handle it first before %a
+      // %av{verb} conjugates verb based on whether viewer is actor
+      result = result.replace(/%av\\{([^}]+)\\}/g, (match, verb) => {
+        if (isActorViewer) return verb; // "you cut"
+        // Third person singular
+        if (verb.endsWith('s') || verb.endsWith('x') || verb.endsWith('ch') || verb.endsWith('sh') || verb.endsWith('o')) {
+          return verb + 'es';
+        }
+        if (verb.endsWith('y') && !'aeiou'.includes(verb[verb.length - 2])) {
+          return verb.slice(0, -1) + 'ies';
+        }
+        return verb + 's';
+      });
+
       if (isActorViewer) {
         result = result.replace(/%A/g, 'You');
-        result = result.replace(/%a(?![oprs])/g, 'you');
+        result = result.replace(/%a(?![oprsv])/g, 'you');
         result = result.replace(/%as/g, 'you');
         result = result.replace(/%ao/g, 'you');
         result = result.replace(/%ap/g, 'your');
         result = result.replace(/%ar/g, 'yourself');
       } else {
         result = result.replace(/%A/g, cap(actorName));
-        result = result.replace(/%a(?![oprs])/g, actorName);
+        result = result.replace(/%a(?![oprsv])/g, actorName);
         result = result.replace(/%as/g, actorPronouns.subject);
         result = result.replace(/%ao/g, actorPronouns.object);
         result = result.replace(/%ap/g, actorPronouns.possessive);
@@ -316,16 +332,29 @@ USE CASES:
       }
 
       // Target substitutions
+      // Note: %tv{verb} would be a special pattern - handle it first (rare but possible)
+      result = result.replace(/%tv\\{([^}]+)\\}/g, (match, verb) => {
+        if (isTargetViewer) return verb; // "you cut"
+        // Third person singular
+        if (verb.endsWith('s') || verb.endsWith('x') || verb.endsWith('ch') || verb.endsWith('sh') || verb.endsWith('o')) {
+          return verb + 'es';
+        }
+        if (verb.endsWith('y') && !'aeiou'.includes(verb[verb.length - 2])) {
+          return verb.slice(0, -1) + 'ies';
+        }
+        return verb + 's';
+      });
+
       if (isTargetViewer) {
         result = result.replace(/%T/g, 'You');
-        result = result.replace(/%t(?![oprs])/g, 'you');
+        result = result.replace(/%t(?![oprsv])/g, 'you');
         result = result.replace(/%ts/g, 'you');
         result = result.replace(/%to/g, 'you');
         result = result.replace(/%tp/g, 'your');
         result = result.replace(/%tr/g, 'yourself');
       } else {
         result = result.replace(/%T/g, cap(targetName));
-        result = result.replace(/%t(?![oprs])/g, targetName);
+        result = result.replace(/%t(?![oprsv])/g, targetName);
         result = result.replace(/%ts/g, targetPronouns.subject);
         result = result.replace(/%to/g, targetPronouns.object);
         result = result.replace(/%tp/g, targetPronouns.possessive);

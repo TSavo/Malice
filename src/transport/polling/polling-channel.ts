@@ -21,14 +21,16 @@ export class PollingChannel<TIn = unknown, TOut = unknown>
   readonly id: string;
   readonly input$ = new Subject<TIn>();
   readonly output$ = new Subject<TOut>();
+  muxId?: number;  // For debugging - tracks parent mux
 
   private _isOpen = true;
   private outputBuffer: TOut[] = [];
   private readonly onClose?: () => void;
 
-  constructor(id: string, onClose?: () => void) {
+  constructor(id: string, onClose?: () => void, muxId?: number) {
     this.id = id;
     this.onClose = onClose;
+    this.muxId = muxId;
   }
 
   get isOpen(): boolean {

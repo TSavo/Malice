@@ -240,7 +240,9 @@ SENSATION: broadcastSensation(target, sensation) routes pain/feeling to target's
     //   %ts = target's subject pronoun (they/you)
     //   %ao = actor's object pronoun (them/you)
     //   %to = target's object pronoun (them/you)
-    //   %av = actor's verb form (cuts/cut - s for third person)
+    //   %av{verb} = actor's verb form (cuts/cut - s for third person)
+    //   %tv{verb} = target's verb form
+    //   %v{verb} = general verb form (based on actor)
     obj.setMethod(
       'formatMessage',
       `
@@ -263,7 +265,26 @@ SENSATION: broadcastSensation(target, sensation) routes pain/feeling to target's
       const isActorViewer = viewer === actor;
       const isTargetViewer = viewer === target;
 
-      // Actor substitutions
+      // Helper for verb conjugation
+      const conjugateVerb = (verb, isViewer) => {
+        if (isViewer) return verb; // "you cut"
+        // Third person singular
+        if (verb.endsWith('s') || verb.endsWith('x') || verb.endsWith('ch') || verb.endsWith('sh') || verb.endsWith('o')) {
+          return verb + 'es';
+        }
+        if (verb.endsWith('y') && !'aeiou'.includes(verb[verb.length - 2])) {
+          return verb.slice(0, -1) + 'ies';
+        }
+        return verb + 's';
+      };
+
+      // CRITICAL: Handle verb patterns FIRST before %a and %t
+      // Otherwise %a in %av{} gets matched and replaced prematurely
+      result = result.replace(/%av\\{([^}]+)\\}/g, (match, verb) => conjugateVerb(verb, isActorViewer));
+      result = result.replace(/%tv\\{([^}]+)\\}/g, (match, verb) => conjugateVerb(verb, isTargetViewer));
+      result = result.replace(/%v\\{([^}]+)\\}/g, (match, verb) => conjugateVerb(verb, isActorViewer));
+
+      // NOW do actor substitutions (after verb patterns are handled)
       result = result.replace(/%A/g, isActorViewer ? 'You' : (actor?.name || 'Someone'));
       result = result.replace(/%a/g, isActorViewer ? 'you' : (actor?.name || 'someone'));
       result = result.replace(/%as/g, isActorViewer ? 'you' : actorPronouns.subject);
@@ -276,17 +297,6 @@ SENSATION: broadcastSensation(target, sensation) routes pain/feeling to target's
       result = result.replace(/%ts/g, isTargetViewer ? 'you' : targetPronouns.subject);
       result = result.replace(/%to/g, isTargetViewer ? 'you' : targetPronouns.object);
       result = result.replace(/%tp/g, isTargetViewer ? 'your' : targetPronouns.possessive);
-
-      // Verb form: %av{base} -> base + s for third person
-      // e.g., %av{cut} -> "cut" (you cut) or "cuts" (he cuts)
-      result = result.replace(/%av\\{([^}]+)\\}/g, (match, verb) => {
-        if (isActorViewer) return verb; // "you cut"
-        // Third person singular - add s (simplified)
-        if (verb.endsWith('s') || verb.endsWith('x') || verb.endsWith('ch') || verb.endsWith('sh')) {
-          return verb + 'es';
-        }
-        return verb + 's';
-      });
 
       return result;
     `,
