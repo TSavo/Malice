@@ -393,7 +393,7 @@ Each AI human stores:
 
 | Property | Description |
 |----------|-------------|
-| `agentSystemPrompt` | Full system prompt template (from `$ai.defaultAgentPrompt`) |
+| `systemPrompt` | Full system prompt template (from `$ai.defaultAgentPrompt`) |
 | `agentSession` | Claude session ID for conversation continuity |
 
 ### $ai.defaultAgentPrompt

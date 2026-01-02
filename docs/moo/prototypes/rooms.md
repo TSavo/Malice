@@ -224,8 +224,11 @@ Exits are directional connections between rooms. They have names (north, door, s
   destRoom: 42,            // Destination room ID
   distance: 10,            // Distance in meters
   hidden: false,           // If true, not shown in room description
-  locked: false,           // Requires unlocking
+  locked: false,           // Legacy simple lock
   lockKey: null,           // Item ID that unlocks (if locked)
+  locks: [],               // Array of composable lock objects
+  door: null,              // Reference to $.door object for full door mechanics
+  vehicleAllowed: false,   // Whether vehicles can drive through this exit
 }
 ```
 
@@ -276,6 +279,21 @@ const result = await exit.unlock(player, key);
 if (result.success) {
   await player.tell(result.message);
 }
+```
+
+#### lock()
+Lock the exit.
+
+```javascript
+const result = await exit.lock();
+```
+
+#### addLock(lock) / removeLock(lock)
+Manage composable locks on this exit.
+
+```javascript
+await exit.addLock(keycardLock);
+await exit.removeLock(keycardLock);
 ```
 
 ## $elevator - Elevator Prototype

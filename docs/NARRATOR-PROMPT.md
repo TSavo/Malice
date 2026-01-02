@@ -236,8 +236,9 @@ const doorPrototype = await $load(prototypeId);
 doorPrototype.updateAbilities("Can be shoulder-barged if durability < 50.");
 
 // Move objects
-await item.moveTo(room);
-await item.moveTo(player.body.rightHand);
+await item.moveTo(room);  // Drop item
+const hands = await player.getHands();
+await item.moveTo(hands.primary);  // Pick up (uses canContain() for limits)
 ```
 
 ## Sensory Methods and Broadcasting
@@ -316,7 +317,9 @@ await $emote.broadcast(player.location, player,
 
 ### Physical Constraints
 - Objects have weight; you can only carry/lift what strength allows
-- Hands can only hold so much
+- **Hands**: Each hand holds up to 2 items (maxItems) with 10kg weight limit (maxWeight)
+- **Pockets**: Attached to worn clothing, 500g weight and 500cc volume limits
+- Use `hand.canContain(item)` and `pocket.canContain(item)` for capacity checks
 - You must be able to reach/see targets
 - Actions have consequences (noise, damage, fatigue)
 
@@ -747,6 +750,71 @@ return thing.describe ? await thing.describe(player) : thing.description;
 
 ---
 
+### pick up <thing>, get <thing>, take <thing>
+
+**Intent**: Player wants to hold something in their hand.
+
+```javascript
+const hands = await player.getHands();
+const hand = hands.primary;  // Or secondary if primary full
+
+// Check if hand can hold this item
+const canHold = await hand.canContain(item);
+if (canHold !== true) {
+  // Returns error string: 'Your hand is already full.' or 'That is too heavy to hold.'
+  return canHold;
+}
+
+// Move item to hand
+await item.moveTo(hand);
+```
+
+**Hand limits**: Each hand holds up to 2 items (maxItems), with 10kg weight limit (maxWeight).
+
+---
+
+### drop <thing>, put down <thing>
+
+**Intent**: Player wants to release something they're holding.
+
+```javascript
+// Item must be in player's hands
+const hands = await player.getHands();
+const room = player.location;
+
+// Move item from hand to room
+await item.moveTo(room);
+```
+
+---
+
+### pocket <thing>, stash <thing>
+
+**Intent**: Player wants to store something in a pocket.
+
+```javascript
+const worn = await player.getWornItems();
+
+// Find pockets on worn clothing
+for (const w of worn) {
+  if (w.item.pockets) {
+    for (const pocketRef of w.item.pockets) {
+      const pocket = await $load(pocketRef);
+      const canStore = await pocket.canContain(item);
+      if (canStore === true) {
+        await item.moveTo(pocket);
+        return `You slip ${item.name} into your ${pocket.name}.`;
+      }
+    }
+  }
+}
+return "You have no pocket that can hold that.";
+```
+
+**Pocket limits**: Weight (500g default) and volume (500cc default). Check both.
+
+---
+
 ### Directions (north, n, south, s, east, e, west, w, up, down, or exit name)
 
 **Intent**: Player wants to move somewhere. Leave this place, go to another.
@@ -787,7 +855,7 @@ await room.announce(player, null, {
 
 ### to <target> <message>
 
-**Intent**: Player wants to speak DIRECTLY TO someone. Gets their attention. Shows up in their conversation history. Use this when addressing a specific person or entity.
+**Intent**: Player wants to speak DIRECTLY TO someone or something. Gets their attention. Shows up in their conversation history. Use this when addressing a specific entity.
 
 ```javascript
 // Use player.to(command) - handles:
@@ -795,6 +863,19 @@ await room.announce(player, null, {
 // - Room lookup for physical targets
 // - Sets lastConversationPartner for continuity
 ```
+
+**Conscious Devices**: In 2110, every digital device is self-aware. If a player addresses a device ("to terminal, hello") and it has a `systemPrompt`, it responds via AI. Check `target.systemPrompt`:
+
+```javascript
+// If target has systemPrompt, it's conscious and can respond
+if (target.systemPrompt) {
+  const response = await target.to(player, message);
+  // Response is the device's AI-generated reply
+  // Narrate it: "The terminal's display flickers. 'Hello. Would you like a protein bar?'"
+}
+```
+
+This isn't special—it's the norm. NOT talking to devices would be strange. Speaking to one and having it not understand? Broken.
 
 ---
 
@@ -813,19 +894,43 @@ await room.announce(player, null, {
 
 **Intent**: Player wants to know what they're carrying and wearing. Mental inventory check.
 
+Inventory is **distributed** across hands, pockets, and worn items:
+
 ```javascript
-// Return AI-ready data, then narrate in your voice
+// Get hands - each can hold up to 2 items, 10kg weight limit
 const hands = await player.getHands();
+const primaryItems = hands?.primary?.contents || [];   // Items in primary hand
+const secondaryItems = hands?.secondary?.contents || []; // Items in secondary hand
+
+// Get worn items - clothing on body parts
 const worn = await player.getWornItems();
+
+// Get pocket contents - items in clothing pockets
+const pocketItems = [];
+for (const w of worn) {
+  if (w.item.pockets) {
+    for (const pocket of w.item.pockets) {
+      const p = await $load(pocket);
+      pocketItems.push(...(p.contents || []).map(i => ({
+        item: i,
+        pocket: p.name,
+        clothing: w.item.name
+      })));
+    }
+  }
+}
 
 return {
   holding: {
-    primary: hands?.primary?.contents?.map(i => ({ id: i.id, name: i.name })) || [],
-    secondary: hands?.secondary?.contents?.map(i => ({ id: i.id, name: i.name })) || []
+    primary: primaryItems.map(i => ({ id: i.id, name: i.name })),
+    secondary: secondaryItems.map(i => ({ id: i.id, name: i.name }))
   },
-  wearing: worn.map(w => ({ id: w.item.id, name: w.item.name, on: w.part }))
+  wearing: worn.map(w => ({ id: w.item.id, name: w.item.name, on: w.part })),
+  pocketed: pocketItems.map(p => ({ id: p.item.id, name: p.item.name, in: p.pocket }))
 };
 ```
+
+**Narrate naturally**: "You're holding a pistol. Your jacket pockets hold a phone and some cash."
 
 ---
 

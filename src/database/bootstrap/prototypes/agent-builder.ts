@@ -2572,7 +2572,7 @@ LUCK: Hidden 'luck' attribute (1-100). Failed rolls get luck save - roll d100, i
       console.log('[Agent] Sending timeout prompt to AI for agent #' + self.id);
 
       // Send timeout prompt to AI
-      const systemPrompt = self.agentSystemPrompt || '';
+      const systemPrompt = self.systemPrompt || '';
       try {
         const result = await $aiQuery(systemPrompt, exp.prompt, session, {});
         self.interactionSession = result.session;

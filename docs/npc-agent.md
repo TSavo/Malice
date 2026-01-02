@@ -29,7 +29,7 @@ to janet Hello there!
 
 The NPC Agent system enables AI-controlled characters that respond intelligently to player interactions. Each NPC:
 
-- Has a per-NPC system prompt stored as `agentSystemPrompt`
+- Has a per-NPC system prompt stored as `systemPrompt`
 - Maintains conversation context via `agentSession`
 - Responds to directed speech (`to npc message`) and item gifts
 - Uses MCP tools to speak, emote, and interact with the world
@@ -85,7 +85,7 @@ Player: give apple to janet
 ### 2. System Prompt Assembly
 
 Each NPC has `buildAgentPrompt()` which:
-1. Reads the NPC's `agentSystemPrompt` property
+1. Reads the NPC's `systemPrompt` property
 2. Gets profile data from `$.ai` registry (personality, history, memories)
 3. Substitutes template variables (`{{name}}`, `{{role}}`, `{{id}}`, etc.)
 4. Returns the complete system prompt
@@ -144,7 +144,7 @@ Each NPC stores:
 
 | Property | Purpose |
 |----------|---------|
-| `agentSystemPrompt` | Full system prompt template (copied from `$.ai.defaultAgentPrompt` at spawn) |
+| `systemPrompt` | Full system prompt template (copied from `$.ai.defaultAgentPrompt` at spawn) |
 | `agentSession` | Claude session ID for conversation continuity |
 
 This allows:
@@ -299,7 +299,7 @@ The default system prompt (`$.ai.defaultAgentPrompt`) includes:
 Override an NPC's prompt after spawn:
 ```javascript
 const janet = await $load(3061);
-janet.agentSystemPrompt = janet.agentSystemPrompt.replace(
+janet.systemPrompt = janet.systemPrompt.replace(
   'DEFAULT BEHAVIOR',
   'CUSTOM: You are friendly and helpful to newcomers.\n\nDEFAULT BEHAVIOR'
 );
@@ -342,7 +342,7 @@ const result = await $.ai.spawn('guard', {
 ### NPC not responding
 
 1. Check NPC is AI-controlled: `$ai.getInfo(ID)`
-2. Verify `agentSystemPrompt` exists on NPC
+2. Verify `systemPrompt` exists on NPC
 3. Check Docker logs: `docker logs malice-game`
 
 ### Authentication errors

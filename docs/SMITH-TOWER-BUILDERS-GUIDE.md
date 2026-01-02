@@ -33,11 +33,11 @@ This is an **object-oriented** MUD, not a relational database. Everything is an 
 **Example:**
 ```typescript
 // WRONG - Database thinking
-lock.authorizedUsers = { 5: [123, 456, 789] };  // IDs!
+lock.verifiedUsers = [123, 456, 789];  // IDs!
 await lock.save();  // No save() method!
 
 // RIGHT - Object-oriented thinking
-await lock.authorize(playerObject, 5);  // Object reference
+await lock.authorize(playerObject);  // Object reference
 // Properties persist automatically
 ```
 
@@ -200,86 +200,77 @@ The elevator is defined on Floor 1 (`z1.ts`) and referenced by all other floors:
 
 ### BiometricLock Prototype
 
+Uses abilities-first architecture. The AI narrator interprets scan attempts by reading abilities.
+
 **Properties:**
 ```typescript
 {
   name: 'Scanner Name',
   description: 'What it looks like',
-  scanners: [
-    { type: 'retinal', part: 'eye', message: 'Scan failed.' },
-    { type: 'fingerprint', part: 'hand', message: 'Print not recognized.' },
-    { type: 'palm', part: 'hand', message: 'Palm rejected.' },
-  ],
-  authorizedUsers: {
-    // target: [array of player OBJECTS, not IDs]
-    5: [],        // Floor 5 - no one authorized
-    10: [player1, player2],  // Floor 10 - two residents
-  },
+  scanType: 'fingerprint',        // Type: fingerprint, retinal, palm, voice
+  scanLocation: 'beside the door', // Physical scanner location
+  verifiedUsers: [],               // Inherited from $lock - authorized players
+  difficulty: 5,                   // Inherited from $lock - resistance to bypass
 }
 ```
 
 **Methods:**
 ```typescript
 // Check access (called by elevator/door)
-canAccess(agent, target) -> true | string
+canAccess(agent, target) -> true | 'Access denied...'
+
+// Check if player is authorized
+isAuthorized(player) -> boolean
 
 // Grant access
-authorize(playerObject, target)
+authorize(player)   // Adds player to verifiedUsers
 
 // Revoke access
-revoke(playerObject, target)
+revoke(player)      // Removes player from verifiedUsers
 ```
 
 **How It Works:**
-1. Checks if agent has required body parts (eye, hand, etc.)
-2. Checks if body parts are covered by clothing (blocks scan)
-3. Checks if agent is in `authorizedUsers[target]` array
-4. Returns `true` or error message
+1. AI reads abilities to determine scan requirements
+2. Player must have appropriate body part uncovered (gloves block fingerprints, etc.)
+3. Checks if agent is in `verifiedUsers` array
+4. Returns `true` or rejection message
 
 ### Lock Examples
 
-**CorpSec Lock (Floor 3 only):**
+**Corporate Lock (Retinal):**
 ```typescript
-'%L1': {
-  prototype: 'biometricLock',
-  name: 'Elevator Retina Scanner',
+const corpLock = await $recycler.create($biometricLock, {
+  name: 'Corporate Retina Scanner',
   description: 'A recessed retinal scanner with a steady red glow.',
-  scanners: [
-    { type: 'retinal', part: 'eye', message: 'Retinal scan failed.' },
-  ],
-  authorizedUsers: {
-    3: [],  // Floor 3 - empty array = no one authorized yet
-  },
-},
+  scanType: 'retinal',
+  scanLocation: 'beside the elevator panel',
+});
+// Authorize specific employees
+await corpLock.authorize(ceoPlayer);
+await corpLock.authorize(ctOPlayer);
 ```
 
-**Residential Lock (Floors 4-33):**
+**Residential Lock (Palm):**
 ```typescript
-'%LR': {
-  prototype: 'biometricLock',
+const residentialLock = await $recycler.create($biometricLock, {
   name: 'Residential Access Scanner',
   description: 'A palm scanner glowing soft amber.',
-  scanners: [
-    { type: 'palm', part: 'hand', message: 'Residential access denied.' },
-  ],
-  authorizedUsers: {
-    4: [], 5: [], 6: [], // ... all residential floors
-    // Empty arrays = no residents assigned yet
-  },
-},
+  scanType: 'palm',
+  scanLocation: 'beside the door',
+});
+// Authorize residents
+await residentialLock.authorize(residentPlayer);
 ```
 
-**Vault Lock (single room):**
+**Vault Lock (Fingerprint):**
 ```typescript
-'%LV': {
-  prototype: 'biometricLock',
+const vaultLock = await $recycler.create($biometricLock, {
   name: 'Vault Access Scanner',
   description: 'A fingerprint scanner with steady blue LED.',
-  scanners: [
-    { type: 'fingerprint', part: 'hand', message: 'Vault access denied.' },
-  ],
-  authorizedUsers: [],  // No map = always locked
-},
+  scanType: 'fingerprint',
+  scanLocation: 'recessed in the vault door',
+});
+// No one authorized initially
 ```
 
 ### Granting Access
@@ -287,10 +278,10 @@ revoke(playerObject, target)
 **In a job completion handler:**
 ```typescript
 // Get the lock object
-const residentialLock = await $load('%LR');
+const residentialLock = await $load(lockId);
 
-// Authorize player for floor 5
-await residentialLock.authorize(player, 5);
+// Authorize player
+await residentialLock.authorize(player);
 
 // Properties persist automatically - no save() needed
 ```
@@ -300,14 +291,35 @@ await residentialLock.authorize(player, 5);
 methods: {
   assignHousing: `
     const player = args[0];
-    const assignedFloor = 7;  // Assign floor 7
-
-    const lock = await $load('%LR');
-    await lock.authorize(player, assignedFloor);
-
-    return 'Housing assigned: Smith Tower, Floor ' + assignedFloor;
+    const lock = await $load(residentialLockId);
+    await lock.authorize(player);
+    return 'Housing access granted to Smith Tower.';
   `,
 }
+```
+
+### Per-Floor Access Control
+
+For elevators needing different access per floor, use multiple locks:
+
+```typescript
+// Create separate locks for different floor groups
+const publicLock = await $recycler.create($lock, { name: 'Public Floors' });
+const residentialLock = await $recycler.create($biometricLock, {
+  name: 'Residential Scanner',
+  scanType: 'palm'
+});
+const executiveLock = await $recycler.create($biometricLock, {
+  name: 'Executive Scanner',
+  scanType: 'retinal'
+});
+
+// Attach to elevator
+elevator.locks = [residentialLock, executiveLock];
+
+// Grant access based on floor assignment
+await residentialLock.authorize(residentPlayer);
+await executiveLock.authorize(executivePlayer);
 ```
 
 ---
@@ -458,15 +470,17 @@ export const building = {
 
 ### Step 4: Update Locks (if needed)
 
-**If the floor should be locked:**
+**If the floor should be locked, create or update a lock:**
 
 ```typescript
-'%LR': {
-  authorizedUsers: {
-    4: [], 5: [], 6: [], 7: [], 8: [], 9: [],
-    10: [],  // ADD YOUR FLOOR
-  },
-},
+// Create a biometric lock for your floor's access
+const floorLock = await $recycler.create($biometricLock, {
+  name: 'Floor 10 Scanner',
+  scanType: 'palm',
+  scanLocation: 'beside the elevator'
+});
+// Add to elevator
+elevator.locks.push(floorLock);
 ```
 
 ---
@@ -510,16 +524,15 @@ This terminal is an instance of the `$jobBoard` prototype and provides job listi
     const player = args[0];
     const job = args[1];
 
-    // Assign apartment on floor 7
-    const residentialLock = await $load('%LR');
-    await residentialLock.authorize(player, 7);
+    // Assign apartment - authorize via the residential lock
+    const residentialLock = await $load(residentialLockId);
+    await residentialLock.authorize(player);
 
     // Maybe also give them a key item
-    const key = await $create({
-      parent: '$item',
+    const key = await $recycler.create($item, {
       name: 'Smith Tower Apartment Key - 7F',
     });
-    await player.addToInventory(key);
+    await key.moveTo(player);
 
     return 'You have been assigned an apartment on Floor 7.';
   `,
@@ -534,8 +547,8 @@ This terminal is an instance of the `$jobBoard` prototype and provides job listi
     const player = args[0];
 
     // Grant CorpSec floor access
-    const corpsecLock = await $load('%L1');
-    await corpsecLock.authorize(player, 3);
+    const corpsecLock = await $load(corpsecLockId);
+    await corpsecLock.authorize(player);
 
     return 'CorpSec clearance granted. You may now access Floor 3.';
   `,
@@ -550,8 +563,8 @@ This terminal is an instance of the `$jobBoard` prototype and provides job listi
 
 **❌ WRONG:**
 ```typescript
-// Don't store IDs
-lock.authorizedUsers = { 5: [123, 456] };
+// Don't store IDs in arrays
+lock.verifiedUsers = [123, 456];
 
 // Don't look up by ID manually
 const player = await $load(123);
@@ -559,24 +572,22 @@ const player = await $load(123);
 
 **✅ RIGHT:**
 ```typescript
-// Store object references
-lock.authorizedUsers = { 5: [player1, player2] };
-
-// Use authorize method
-await lock.authorize(playerObject, 5);
+// Use authorize method - it stores object references
+await lock.authorize(playerObject);
+// verifiedUsers will contain the actual player objects
 ```
 
 ### No .save() Calls
 
 **❌ WRONG:**
 ```typescript
-lock.authorizedUsers[5].push(player);
+lock.verifiedUsers.push(player);
 await lock.save();  // No such method!
 ```
 
 **✅ RIGHT:**
 ```typescript
-await lock.authorize(player, 5);
+await lock.authorize(player);
 // Properties persist automatically
 ```
 
@@ -761,11 +772,11 @@ outdoor: false,     // Indoor/outdoor flag
 ### Lock Always Denying Access
 
 **Check:**
-1. Is lock ID in `elevator.locks` array?
+1. Is lock in `elevator.locks` array?
 2. Does player have required body part (eye, hand)?
 3. Is body part covered by clothing?
-4. Is player in `authorizedUsers` array for target floor?
-5. Are you passing object reference, not ID?
+4. Is player in `verifiedUsers` array? Use `await lock.isAuthorized(player)`
+5. Was `authorize(player)` called with player object, not ID?
 
 ### Room Not Appearing
 

@@ -135,6 +135,16 @@ HOW TO INTERACT WITH THE WORLD — DIRECT MOO CODE
 CRITICAL: You interact with the world by writing native MOO code using execute_moo_code.
 DO NOT use individual MCP tools - use direct MOO code instead.
 
+**⚠️ CRITICAL: Player Variable**
+
+The `player` variable is NOT pre-defined in execute_moo_code. You MUST load any player by ID:
+
+```javascript
+const player = await $load(playerId);  // Always load players by ID first
+```
+
+If you try to use `player` directly, it will be undefined and your code will fail.
+
 EXAMPLE:
 execute_moo_code({
   code: `

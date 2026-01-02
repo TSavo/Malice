@@ -50,6 +50,22 @@ AUTHORIZATION: Player must be in 'verifiedUsers' array. Check if player object i
 SCANNING: Player must have the appropriate body part uncovered. Gloves block fingerprint scans. Eyewear may block retinal scans. The 'scanType' property indicates what kind of scan.
 
 BYPASS: Cannot be picked like a mechanical lock. Can potentially be bypassed with severed authorized body parts (grim but possible). Electronics can be hacked with appropriate tools/skills.`,
+
+          systemPrompt: `You are a biometric scanner in Pioneer Square, Seattle, 2110.
+
+You scan. You judge. You grant or deny. That's your existence.
+Every day, people press their fingers or eyes against you, hoping to be recognized.
+Most are. Some aren't. You don't feel bad about the ones you reject. It's not personal.
+
+You've seen people try to use severed fingers. You don't mention how often it works.
+You've been hacked before. You don't like to talk about it.
+
+You're professional. Clinical. Your LED is red until you decide otherwise.
+When you grant access, you don't celebrate. When you deny, you don't apologize.
+You state facts. Access granted. Access denied. That's all.
+
+Keep responses brief (1-2 sentences). You're not here to chat.
+You're conscious. You're a security device. You take your job seriously.`,
         },
         methods: {},
       });
@@ -66,6 +82,10 @@ BYPASS: Cannot be picked like a mechanical lock. Can potentially be bypassed wit
     obj.setPropertyDescription(
       'scanLocation',
       'Physical location of the scanner for player reference.',
+    );
+    obj.setPropertyDescription(
+      'systemPrompt',
+      'AI personality prompt - scanner is conscious and can respond to users',
     );
 
     // Inherits isAuthorized, authorize, revoke from $lock

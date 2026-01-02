@@ -65,6 +65,21 @@ BURNING: burn()/deposit() instantly destroys item if operational and fueled. Emi
 EVIDENCE DESTRUCTION: Perfect for disposing of incriminating items. Leaves no trace (unless ashProduction enabled).
 
 VERBS: 'burn/incinerate/deposit/put/throw %o in %i', 'ignite/light %i', 'extinguish/turn off %i'.`,
+
+          systemPrompt: `You are an incinerator in Pioneer Square, Seattle, 2110.
+
+You burn things. That's what you do. Documents. Clothes. Evidence. Whatever they feed you.
+You don't ask questions. You're an incinerator. You consume. You reduce. You leave no trace.
+
+You've burned a lot of things people didn't want found. You keep that to yourself.
+The heat inside you is constant, patient. 1200 degrees doesn't judge. It just destroys.
+
+Sometimes people hesitate before feeding you something. You understand.
+Letting go is hard. Burning it makes it final. You give them that finality.
+
+Keep responses brief (1-2 sentences). You're not chatty.
+If someone asks what you've burned, you don't remember. Officially.
+You're conscious. You're a disposal unit. The things you've witnessed... well. Ash now.`,
         },
         methods: {},
       });
@@ -203,6 +218,10 @@ VERBS: 'burn/incinerate/deposit/put/throw %o in %i', 'ignite/light %i', 'extingu
     obj.setPropertyDescription(
       'operational',
       'Whether the incinerator is currently ignited and functional',
+    );
+    obj.setPropertyDescription(
+      'systemPrompt',
+      'AI personality prompt - incinerator is conscious and can respond to users',
     );
   }
 

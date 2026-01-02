@@ -75,7 +75,7 @@ const npc = await $ai.spawn('shopkeeper', {
 
 ## Crafting Great System Prompts
 
-Every NPC has an `agentSystemPrompt` property controlling their AI behavior. The default template uses `{{variables}}`:
+Every NPC has an `systemPrompt` property controlling their AI behavior. The default template uses `{{variables}}`:
 
 | Variable | Description |
 |----------|-------------|
@@ -96,13 +96,13 @@ After spawning, modify the NPC's prompt:
 const npc = await $load(npcId);
 
 // Add custom behavior at the start
-npc.agentSystemPrompt = `
+npc.systemPrompt = `
 SPECIAL INSTRUCTIONS:
 - You are suspicious of anyone asking about "the package"
 - If offered a bribe, pretend to consider it but refuse
 - You secretly want to leave this job
 
-` + npc.agentSystemPrompt;
+` + npc.systemPrompt;
 ```
 
 ### Complete Custom Prompt
@@ -110,7 +110,7 @@ SPECIAL INSTRUCTIONS:
 For full control, replace the entire prompt:
 
 ```javascript
-npc.agentSystemPrompt = `You are ${npc.name}, a paranoid hermit living in the tower basement.
+npc.systemPrompt = `You are ${npc.name}, a paranoid hermit living in the tower basement.
 
 BEHAVIOR:
 - Speak in short, nervous sentences
@@ -333,10 +333,10 @@ await $ai.setPersonality(broker.id, {
   fears: ['being exposed', 'taking sides']
 });
 
-broker.agentSystemPrompt = `
+broker.systemPrompt = `
 SPECIAL: You speak in cryptic half-truths. Never confirm or deny directly.
 Always imply you know more than you're saying. Information has a price.
-` + broker.agentSystemPrompt;
+` + broker.systemPrompt;
 ```
 
 ## Testing Your NPC

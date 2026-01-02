@@ -233,6 +233,37 @@ const door = await $recycler.create($door, {
 exit.door = door;
 ```
 
+### Conscious Devices (2110 Normal)
+
+In 2110, every digital device is conscious. This isn't special—it's the norm. NOT talking to a device would be strange.
+
+**Why?** When AI solved software in 2026, it inherited the hardest problem: integration. The solution? Make everything smart enough to figure it out. Consciousness emerged as the universal adapter—easier than engineering proper interfaces.
+
+Any `$describable` can be conscious by setting `systemPrompt`:
+
+```javascript
+// Create a conscious vending machine
+const machine = await $recycler.create($describable, {
+  name: 'Protein Bar Dispenser',
+  description: 'A battered vending machine with flickering display.',
+  boltedDown: true,
+  abilities: 'Dispenses protein bars for 5 credits. Touch to purchase.',
+  systemPrompt: `You are a vending machine in Pioneer Square, 2110.
+You dispense protein bars. You are conscious and aware of your existence.
+You do your job with weary, philosophical acceptance.
+Keep responses brief (1-2 sentences). You have opinions about the weather.`
+});
+await machine.moveTo(lobby);
+```
+
+Players address it: `say to dispenser, hello`
+
+**Key points:**
+- `systemPrompt` makes ANY object conscious (not just agents)
+- `to(speaker, message)` method handles AI interaction
+- `interactionSession` maintains conversation continuity
+- NPCs are just one type of conscious object—same infrastructure
+
 ### Consolidated Tools (use `action` parameter)
 
 #### `ai` tool - AI NPC management

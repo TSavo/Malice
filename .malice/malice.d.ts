@@ -3546,7 +3546,7 @@ interface MaliceObject_220 {
 /** Object #221 */
 interface MaliceObject_221 {
   abilities: string;
-  agentSystemPrompt: string;
+  systemPrompt: string;
   boltedDown: boolean;
   description: string;
   historyLimit: number;
@@ -3586,7 +3586,7 @@ interface MaliceObject_222 {
 /** Object #223 */
 interface MaliceObject_223 {
   abilities: string;
-  agentSystemPrompt: string;
+  systemPrompt: string;
   description: string;
   historyLimit: number;
   location: RuntimeObject & MaliceObject_4021;

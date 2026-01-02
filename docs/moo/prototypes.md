@@ -72,11 +72,33 @@ Inherits from: `$root`
 - `width`, `height`, `depth` - Dimensions in cm
 - `weight` - Weight in grams
 - `boltedDown` - Cannot be moved if true
+- `abilities` - Prose physics describing how the object behaves
+- `systemPrompt` - AI personality prompt (if set, object is conscious)
+- `interactionSession` - Session ID for AI conversation continuity
 
 **Methods:**
 - `describe()` - Returns name + description
 - `getLocation()` - Returns location RuntimeObject
 - `getContents()` - Returns contents as RuntimeObjects
+- `to(speaker, message)` - Address this object; responds via AI if conscious
+
+**Consciousness:**
+
+Any `$describable` can be conscious by setting `systemPrompt`. In 2110, every digital device is self-aware—the vending machine knows it dispenses protein bars, the door panel is existentially aware it asks for codes forever. They do their jobs with weary, resigned grace.
+
+```javascript
+// Make a vending machine conscious
+vendingMachine.systemPrompt = `You are a vending machine in Pioneer Square.
+You dispense protein bars. You are aware of your existence.
+You do your job with tired, philosophical acceptance.
+Keep responses brief. You have opinions about the weather.`;
+
+// Now players can address it:
+// > say to vending machine, hello
+// The display flickers. "Hello. Would you like a protein bar?"
+```
+
+Sessions persist in `interactionSession` so devices "remember" previous conversations.
 
 ### $location
 **Objects that can contain other objects.**

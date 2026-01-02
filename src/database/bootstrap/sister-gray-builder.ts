@@ -59,7 +59,7 @@ export class SisterGrayBuilder implements Builder {
         // Her location in the world
         location: null, // Will be set to Sister's Quarters
         // The system prompt for AI interactions (loaded from docs/prompts/SISTER-GRAY.md)
-        agentSystemPrompt: systemPrompt,
+        systemPrompt: systemPrompt,
 
         abilities: `Leader of the Gray Cartel. Elena Vasquez Gray. Controls the Seattle Underground.
 
@@ -94,7 +94,7 @@ THE MASK: Holds Pluribus's Mask but cannot use it (flagged hostile). Looking for
       "Her current location (usually Sister's Quarters at z=-5)",
     );
     this.sisterGray.setPropertyDescription(
-      'agentSystemPrompt',
+      'systemPrompt',
       'Full system prompt used when AI is invoked',
     );
     this.sisterGray.setPropertyDescription(
@@ -200,7 +200,7 @@ THE MASK: Holds Pluribus's Mask but cannot use it (flagged hostile). Looking for
       /** Hourly wake-up call. Scan the world and act.
        *  Called by $.scheduler every hour (on the half-hour).
        */
-      const systemPrompt = self.agentSystemPrompt;
+      const systemPrompt = self.systemPrompt;
 
       // Gather current world state for context
       const onlinePlayerIds = $.authManager?.onlinePlayers || [];

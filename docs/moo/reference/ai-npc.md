@@ -341,7 +341,7 @@ await $ai.setRole(npcId, 'supervisor');
 
 ## AI Agent System Prompt
 
-Each NPC has an `agentSystemPrompt` property that defines their behavior when controlled by an AI agent. The default prompt includes:
+Each NPC has an `systemPrompt` property that defines their behavior when controlled by an AI agent. The default prompt includes:
 
 - Identity and role information
 - IC vs OOC knowledge separation rules
@@ -374,7 +374,7 @@ The prompt uses `{{variable}}` syntax for templating:
 const defaultPrompt = $ai.defaultAgentPrompt;
 
 // Set custom prompt for specific NPC
-npc.agentSystemPrompt = customPrompt;
+npc.systemPrompt = customPrompt;
 ```
 
 ## Auto-Dressing with Tailor

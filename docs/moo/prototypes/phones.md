@@ -1,25 +1,31 @@
 # Phone System
 
-> **Abilities-First**: Phones use abilities to describe calling, texting, and features. The AI interprets "call someone" actions. See `docs/ABILITIES-FIRST.md`.
+> **Abilities-First**: Phones use abilities to describe state and behavior. All phone events flow through `.hear()` for sensory history. The AI narrator interprets player actions like "answer the phone" based on phone state. See `docs/ABILITIES-FIRST.md`.
 
-Voice calls and text messaging.
+Voice calls and text messaging with state-based architecture.
 
 ## Overview
 
 The phone system provides communication infrastructure:
 
 - **Phone directory** - Maps numbers to phone objects
-- **Base phone** - Common dial/message functionality
-- **Wireless phones** - Battery, signal, ringtones
+- **Base phone** - State-based call/message functionality
+- **Wireless phones** - Battery, signal requirements
 - **Payphones** - Bank payment per call
+
+**Key Design Principles:**
+1. **State properties** track call status (ringing, inCall, callWith)
+2. **Sensory pipeline** - all events go through `.hear()` into sensoryHistory
+3. **Perception filter** - routes speech during active calls
+4. **No coded hooks** - AI narrator describes all phone events
 
 **Prototype Hierarchy:**
 ```
 $describable
-├── $phoneDb          ← Phone directory
-└── $phone            ← Base phone
-    ├── $wirelessPhone ← Mobile phones
-    └── $payphone     ← Public pay phones
+├── $phoneDb          <- Phone directory (infrastructure)
+└── $phone            <- Base phone
+    ├── $wirelessPhone <- Mobile phones
+    └── $payphone     <- Public pay phones
 ```
 
 ## $phoneDb - Phone Directory
@@ -32,12 +38,9 @@ Registry mapping phone numbers to phone objects.
 {
   name: 'Phone Directory',
   description: 'Maps phone numbers to phone devices.',
-
-  // Number → phone ID mapping
   registry: {
     '2061234567': 123,    // phone object ID
     '2069876543': 456,
-    // ...
   },
 }
 ```
@@ -49,8 +52,6 @@ Add a phone to the directory.
 
 ```javascript
 await phoneDb.register('2061234567', phone);
-// or by ID
-await phoneDb.register('2061234567', phone.id);
 ```
 
 #### unregister(number)
@@ -70,185 +71,233 @@ const phone = await phoneDb.findPhoneByNumber('2061234567');
 
 ## $phone - Base Phone
 
-Common functionality for all phone types.
+State-based phone with call management and sensory integration.
 
 ### Properties
 
-```javascript
-{
-  name: 'Phone',
-  description: 'A generic phone handset.',
+| Property | Type | Description |
+|----------|------|-------------|
+| `number` | string | Phone number for incoming calls |
+| `phoneDb` | objref | Reference to phone directory |
+| `ringing` | boolean | True when receiving incoming call |
+| `incomingFrom` | objref | Phone calling us (while ringing) |
+| `dialing` | objref | Phone we're calling (before answer) |
+| `inCall` | boolean | True during active call |
+| `callWith` | objref | Connected phone during call |
+| `messages` | array | Message history: `{ from, fromNumber, content, timestamp, read }` |
+| `unreadCount` | number | Number of unread messages |
+| `ringtone` | string | Alert type: "rings" (audible) or "buzzes" (tactile) |
 
-  number: null,           // Phone number string
-  phoneDb: null,          // Reference to phone directory
-  connectedTo: null,      // Active call target ID
-}
+### State Machine
+
+```
+IDLE                    -> RINGING (incoming call)
+IDLE                    -> DIALING (dial out)
+RINGING                 -> IN_CALL (answer)
+RINGING                 -> IDLE (reject)
+DIALING                 -> IN_CALL (other answers)
+DIALING                 -> IDLE (hangup)
+IN_CALL                 -> IDLE (hangup)
 ```
 
 ### Key Methods
 
 #### dial(targetNumber)
-Initiate a call.
+Initiate a call. Sets target phone ringing and broadcasts ring sound.
 
 ```javascript
 const result = await phone.dial('2061234567');
-// 'Dialing 2061234567...'
+// { success: true, target: <phone> }
+// { success: false, error: 'Number not found.' }
+// { success: false, error: 'Line is busy.' }
 ```
 
 **What it does:**
 1. Look up target in phone directory
-2. Set `connectedTo` to target ID
-3. Call target's `onIncomingCall()`
-4. Return dial message
+2. Set `target.ringing = true`, `target.incomingFrom = self`
+3. Set `self.dialing = target`
+4. Broadcast ring via `target.location.announce({sound: 'A phone rings nearby.'})`
+5. Sound flows through `.hear()` into sensoryHistory
+
+#### answer()
+Accept an incoming call. Registers perception filters for speech routing.
+
+```javascript
+const result = await phone.answer();
+// { success: true, caller: <phone> }
+// { success: false, error: 'Phone is not ringing.' }
+```
+
+**What it does:**
+1. Clear `ringing`, set `inCall = true`, `callWith = caller`
+2. Update caller's state similarly
+3. Register both phones as perception filters on their holders
+4. Announce connection sound to both locations
+
+#### reject()
+Decline an incoming call.
+
+```javascript
+const result = await phone.reject();
+// { success: true }
+```
 
 #### hangup()
-End current call.
+End current call or cancel dialing. Unregisters perception filters.
 
 ```javascript
 const result = await phone.hangup();
-// 'Call ended.'
+// { success: true }
+// { success: false, error: 'No active call.' }
 ```
 
 **What it does:**
-1. Clear `connectedTo`
-2. Call other phone's `onHangup()`
+1. Unregister perception filters from both phones
+2. Clear call state on both phones
+3. Announce disconnection sound to both locations
 
 #### sendMessage(targetNumber, message)
-Send a text message.
+Send a text message. Appends to target's messages array and triggers notification.
 
 ```javascript
 const result = await phone.sendMessage('2061234567', 'Hello!');
-// 'Message sent to 2061234567.'
+// { success: true, target: <phone> }
 ```
 
-**What it does:**
-1. Look up target in phone directory
-2. Call target's `onMessage()`
-
-### Hooks
-
-#### onIncomingCall(from)
-Called when receiving a call.
+#### getMessages()
+Get all messages on this phone.
 
 ```javascript
-// Default: notifies holder
-'Incoming call from 2061234567'
+const messages = await phone.getMessages();
+// [{ from: <phone>, fromNumber: '555-1234', content: 'Hello!', timestamp: 1234567890, read: false }]
 ```
 
-#### onHangup(from)
-Called when call ends.
+#### getUnreadMessages()
+Get only unread messages.
 
 ```javascript
-// Default: notifies holder
-'Call ended with 2061234567'
+const unread = await phone.getUnreadMessages();
 ```
 
-#### onMessage(from, message)
-Called when receiving a text message.
+#### markRead(index)
+Mark a specific message as read by index.
 
 ```javascript
-// Default: notifies holder
-'Message from 2061234567: Hello!'
+await phone.markRead(0);  // Mark first message as read
 ```
+
+#### markAllRead()
+Mark all messages as read.
+
+```javascript
+await phone.markAllRead();
+// { success: true, count: 3 }
+```
+
+#### deleteMessage(index)
+Delete a message by index.
+
+```javascript
+await phone.deleteMessage(0);
+```
+
+### Sensory Pipeline
+
+Phone events flow through the sensory system based on ringtone type:
+
+**Audible ringtones** ("rings", "plays a melody"):
+```
+dial() called
+  -> target.ringing = true
+  -> holder.hear("Your phone rings.")        # direct to holder
+  -> location.announce("A phone rings nearby.")  # to others
+  -> hear() calls recordSensory()
+  -> ring enters sensoryHistory
+  -> AI sees "Your phone rings" when player says "answer phone"
+```
+
+**Tactile ringtones** ("buzzes", "vibrates"):
+```
+dial() called
+  -> target.ringing = true
+  -> holder.feel("Your phone buzzes.")       # direct to holder only
+  -> others don't perceive anything
+  -> feel() calls recordSensory()
+  -> buzz enters sensoryHistory
+  -> AI sees "Your phone buzzes" when player acts
+```
+
+### Speech Routing During Calls
+
+When a call is active, speech is routed between connected phones:
+
+1. **On answer()**: Both phones register as perception filters on their holders
+2. **When holder speaks**: Phone's `onHear()` filter hook fires
+3. **Speech forwarded**: Phone broadcasts to other phone's location
+4. **Other holder hears**: "From the phone: <speech>"
+5. **On hangup()**: Perception filters unregistered
+
+The `onHear` filter includes feedback loop prevention - won't re-route phone sounds.
 
 ## $wirelessPhone - Mobile Phones
 
-Extends $phone with battery, signal, and ringtone.
+Extends $phone with battery and signal requirements.
 
 ### Properties
 
-```javascript
-{
-  name: 'Wireless Phone',
-  description: 'A wireless phone handset.',
-
-  // Inherited from $phone
-  number: null,
-  phoneDb: null,
-  connectedTo: null,
-
-  // Wireless-specific
-  battery: 100,           // 0-100%
-  signal: 5,              // 0-5 bars
-  ringtone: 'ring',       // Ringtone name
-}
-```
+| Property | Type | Description |
+|----------|------|-------------|
+| `battery` | number | 0-100, must be > 0 to function |
+| `signal` | number | 0-5, location-dependent, must be > 0 |
+| `ringtone` | string | Custom ring sound description |
 
 ### Key Methods
 
 #### canUse()
-Check if phone can be used.
+Check if phone has power and signal.
 
 ```javascript
 const result = await phone.canUse();
-// true
-// or 'The phone is out of battery.'
-// or 'No signal here.'
+// { success: true }
+// { success: false, error: 'The phone is out of battery.' }
+// { success: false, error: 'No signal here.' }
 ```
 
-**Checks:**
-- Battery > 0
-- Signal > 0
-
-#### dial(targetNumber) - Override
-Checks `canUse()` before dialing.
-
-```javascript
-const result = await phone.dial('2061234567');
-// 'The phone is out of battery.'
-// or 'Dialing 2061234567...'
-```
-
-#### sendMessage(targetNumber, message) - Override
-Checks `canUse()` before sending.
-
-#### onIncomingCall(from) - Override
-Includes ringtone in notification.
-
-```javascript
-// 'Incoming call from 2061234567 [ring]'
-```
+**All methods check canUse() first:**
+- `dial()` - checks before dialing
+- `answer()` - checks before answering
+- `sendMessage()` - checks before sending
 
 ## $payphone - Public Pay Phones
 
-Extends $phone with bank payment and bolted-down restriction.
+Extends $phone with bank payment.
 
 ### Properties
 
-```javascript
-{
-  name: 'Payphone',
-  description: 'A bolted-down public phone.',
-
-  // Inherited from $phone
-  number: null,
-  phoneDb: null,
-  connectedTo: null,
-
-  // Payphone-specific
-  boltedDown: true,       // Cannot be picked up
-  pricePerCall: 1,        // Cost per call
-  bank: null,             // Bank object reference
-  account: null,          // Account to receive payment
-}
-```
+| Property | Type | Description |
+|----------|------|-------------|
+| `boltedDown` | boolean | Always true - cannot be picked up |
+| `pricePerCall` | number | Cost per call in credits |
+| `bank` | objref | Bank for payment processing |
+| `account` | string | Account to receive payments |
 
 ### Key Methods
 
-#### dial(targetNumber, caller) - Override
+#### dial(targetNumber, caller)
 Charges caller's bank account before connecting.
 
 ```javascript
 const result = await payphone.dial('2061234567', player);
-// 'Payment failed.' (insufficient funds)
-// or 'Dialing 2061234567...'
+// { success: false, error: 'This payphone is out of service.' }
+// { success: false, error: 'Payment failed. Insufficient funds?' }
+// { success: true, target: <phone> }
 ```
 
 **Payment flow:**
 1. Look up caller's bank account
 2. Transfer `pricePerCall` to payphone's account
-3. If successful, proceed with call
-4. If failed, return error
+3. If successful, proceed with normal dial
+4. Sound and sensory events flow normally
 
 ## Creating Phones
 
@@ -258,9 +307,6 @@ const result = await payphone.dial('2061234567', player);
 const phoneDb = await $recycler.create($phoneDb, {
   name: 'City Phone Network',
 });
-
-// Register as global alias
-await $aliases.set('phoneDb', phoneDb.id);
 ```
 
 ### Wireless Phone
@@ -270,14 +316,13 @@ const phone = await $recycler.create($wirelessPhone, {
   name: 'a smartphone',
   description: 'A sleek black smartphone.',
   number: '2061234567',
-  phoneDb: phoneDb.id,
+  phoneDb: $phoneDb,
   battery: 100,
   signal: 5,
-  ringtone: 'buzz',
+  ringtone: 'buzzes with a soft vibration',
 });
 
-// Register with directory
-await phoneDb.register('2061234567', phone);
+await $phoneDb.register('2061234567', phone);
 ```
 
 ### Payphone
@@ -287,96 +332,37 @@ const payphone = await $recycler.create($payphone, {
   name: 'a payphone',
   description: 'A battered public phone booth.',
   number: '2069999999',
-  phoneDb: phoneDb.id,
   pricePerCall: 2,
-  bank: $bank.id,
+  bank: $bank,
   account: 'PAYPHONE-REVENUE-001',
 });
 
-await phoneDb.register('2069999999', payphone);
+await $phoneDb.register('2069999999', payphone);
 ```
 
-## Usage Examples
+## AI Narrator Integration
 
-### Making a Call
+The AI narrator handles phone interactions by reading state and abilities:
 
-```javascript
-// Player uses their phone
-> dial 2069876543
-'Dialing 2069876543...'
+**Player says "answer the phone":**
+1. AI sees `phone.ringing: true` (from recent sensoryHistory: "A phone rings nearby")
+2. AI reads phone abilities about answering
+3. AI calls `phone.answer()`
+4. AI sees `phone.inCall: true, phone.callWith: #42`
+5. AI describes the call connecting
 
-// Recipient's phone
-'Incoming call from 2061234567 [ring]'
+**Player speaks during call:**
+1. Speech goes through normal broadcast
+2. Phone's perception filter intercepts via `onHear`
+3. Filter routes to connected phone's location
+4. Other player hears "From the phone: <message>"
 
-// End call
-> hangup
-'Call ended.'
-```
-
-### Sending a Text
-
-```javascript
-> text 2069876543 Meet me at the warehouse
-'Message sent to 2069876543.'
-
-// Recipient's phone
-'Message from 2061234567: Meet me at the warehouse'
-```
-
-### Using a Payphone
-
-```javascript
-> dial 2069876543 on payphone
-// Charges 2 credits from player's bank account
-'Dialing 2069876543...'
-
-// If insufficient funds
-'You have no bank account.'
-// or
-'Payment failed.'
-```
-
-### Dead Battery
-
-```javascript
-// Phone battery at 0
-> dial 2069876543
-'The phone is out of battery.'
-```
-
-### No Signal
-
-```javascript
-// In signal-dead zone
-> dial 2069876543
-'No signal here.'
-```
-
-## Integration with Vendables
-
-Phones can be sold from vending machines with auto-assigned numbers:
-
-```javascript
-const phoneKiosk = await $recycler.create($vendable, {
-  name: 'Phone Kiosk',
-  phoneDb: phoneDb.id,
-  spawnables: [
-    {
-      protoId: $wirelessPhone.id,
-      name: 'Burner Phone',
-      price: 25,
-      autoNumber: true,        // Auto-assign number
-      numberPrefix: '206',     // Prefix for generated numbers
-    },
-  ],
-});
-
-// When purchased:
-// 1. Creates new wirelessPhone
-// 2. Generates number like '206123456789'
-// 3. Registers with phoneDb
-// 4. Delivers to buyer
-```
+**Player says "hang up":**
+1. AI sees `phone.inCall: true`
+2. AI reads phone abilities about hangup
+3. AI calls `phone.hangup()`
+4. AI sees call state cleared
+5. AI describes the call ending
 
 ## Room Signal Levels
 
@@ -385,19 +371,17 @@ Rooms can affect phone signal:
 ```javascript
 const basement = await $recycler.create($room, {
   name: 'Underground Bunker',
-  phoneSignal: 0,             // No signal
+  phoneSignal: 0,             // No signal underground
 });
 
 const streetCorner = await $recycler.create($room, {
   name: 'Street Corner',
-  phoneSignal: 5,             // Full signal
+  phoneSignal: 5,             // Full signal outside
 });
-
-// When player enters, update their phone's signal
 ```
 
 ## See Also
 
 - [Bank](./bank.md) - Payment for payphones
-- [Stackables](./stackables.md) - Vendable phone sales
-- [Agents](./agents.md) - Player notification
+- [Perception Filters](../reference/perception-filters.md) - Speech routing mechanism
+- [Agents](./agents.md) - Sensory history and hear()

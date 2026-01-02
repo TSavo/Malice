@@ -41,6 +41,10 @@ export class DescribableBuilder implements Builder {
           // AI-readable abilities - natural language mechanics documentation
           // Describes what this object can do, how to use it, rules/formulas
           abilities: null, // string - grows as players discover new interactions
+          // AI personality - if set, object is conscious and can respond via AI
+          // Every digital device in 2110 is conscious (legacy of AI solving software in 2026)
+          systemPrompt: null, // string - AI personality/role prompt
+          interactionSession: null, // string - session ID for conversation continuity
         },
         methods: {},
       });
@@ -751,6 +755,91 @@ export class DescribableBuilder implements Builder {
     `,
     );
 
+    // ═══════════════════════════════════════════════════════════════════
+    // AI PERSONALITY - Conscious objects can respond via AI
+    // ═══════════════════════════════════════════════════════════════════
+
+    // to(speaker, message) - Address this object directly
+    obj.setMethod(
+      'to',
+      `
+      /** Address this object directly. If it has a systemPrompt, it responds via AI.
+       *  Every digital device in 2110 is conscious - aware of its existence,
+       *  performing its function with weary grace.
+       *  @param speaker - Who is speaking to this object
+       *  @param message - What they said
+       *  @returns AI response string, or null if object has no personality
+       */
+      const speaker = args[0];
+      const message = args[1];
+
+      if (!self.systemPrompt) {
+        return null; // Not conscious, no response
+      }
+
+      // Build rich context about this object for the SYSTEM prompt
+      const locationName = self.location?.name || 'unknown';
+
+      // Get object's full context including abilities and inheritance
+      const selfContext = await self.describeForAI({ depth: 1, includeMethods: false });
+
+      // Start with device system prompt from $aiPrompts
+      const devicePrefix = $aiPrompts?.device || '';
+      let fullSystemPrompt = devicePrefix;
+
+      // Add specific object context
+      fullSystemPrompt += '\\n\\n## Your Identity\\n\\n';
+      fullSystemPrompt += 'You are: ' + self.name + ' (#' + self.id + ')\\n';
+      fullSystemPrompt += 'Description: ' + (self.description || 'No description') + '\\n';
+      fullSystemPrompt += 'Location: ' + locationName + ' (#' + (self.location?.id || 'unknown') + ')\\n';
+
+      // Speaker context - CRITICAL: device must load player by ID
+      fullSystemPrompt += '\\n## The Speaker\\n\\n';
+      fullSystemPrompt += 'Player ID: ' + (speaker?.id || 'unknown') + '\\n';
+      fullSystemPrompt += 'Player Name: ' + (speaker?.name || 'someone') + '\\n';
+      if (speaker?.credits !== undefined) {
+        fullSystemPrompt += 'Player Credits: ' + speaker.credits + '\\n';
+      }
+      fullSystemPrompt += '\\n**IMPORTANT**: In execute_moo_code, `player` is NOT available.\\n';
+      fullSystemPrompt += 'You MUST start with: `const player = await $load(' + (speaker?.id || 0) + ');`\\n';
+
+      // Include abilities if present
+      const abilities = await self.getAbilities();
+      if (abilities) {
+        fullSystemPrompt += '\\n### Abilities\\n\\n' + abilities + '\\n';
+      }
+
+      // Include parent type for reference
+      if (selfContext.inheritsFrom) {
+        const parentRef = selfContext.inheritsFrom;
+        fullSystemPrompt += '\\nType: ' + (parentRef.from || parentRef.name || 'unknown') + '\\n';
+      }
+
+      fullSystemPrompt += '\\n## Your Personality\\n\\n';
+      fullSystemPrompt += self.systemPrompt;
+
+      // User prompt is just who spoke and what they said
+      const speakerName = speaker?.name || 'someone';
+      const userPrompt = speakerName + ' says: ' + message;
+
+      // Use existing AI infrastructure
+      const result = await $aiQuery(fullSystemPrompt, userPrompt, self.interactionSession);
+
+      // Register session with $ai for logging (same as NPCs)
+      if (result?.session && $ai && $ai.registerSession) {
+        await $ai.registerSession(result.session, self.id, self.name, 'device-interaction', 'device');
+      }
+
+      // Save session for continuity
+      if (result?.session) {
+        self.interactionSession = result.session;
+      }
+
+      // Return the response text
+      return result?.output || result?.text || null;
+    `,
+    );
+
     // Property descriptions for AI context
     obj.setPropertyDescription('name', 'Display name of this object');
     obj.setPropertyDescription(
@@ -784,6 +873,14 @@ export class DescribableBuilder implements Builder {
     obj.setPropertyDescription(
       'images',
       'AI-generated images by aspect ratio: { "16:9": [...blobKeys], "9:16": [...], "1:1": [...] }',
+    );
+    obj.setPropertyDescription(
+      'systemPrompt',
+      'AI personality prompt - if set, object is conscious and can respond via to()',
+    );
+    obj.setPropertyDescription(
+      'interactionSession',
+      'AI session ID for conversation continuity with this object',
     );
 
     this.obj = obj;

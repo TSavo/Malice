@@ -89,7 +89,8 @@ Every player action goes through the AI narrator - there are no coded verbs:
 - "north" → AI reads exit abilities, moves player if passable
 - "say hello" → AI reads social abilities, broadcasts speech
 - "unlock the door" → AI reads lock abilities, checks player has key
-- "pick up the gun" → AI reads hand abilities, checks weight
+- "pick up the gun" → AI reads hand abilities, checks maxItems/weight via canContain()
+- "put knife in pocket" → AI reads pocket abilities, checks weight/volume capacity
 - "eat the food" → AI reads edible abilities, triggers digestion
 - "search for bugs" → AI reads concealment abilities, reveals items
 - "buy a stim-shot" → AI reads vending abilities, handles payment
@@ -619,7 +620,51 @@ await $ai.logWorld('creator', 'Formalized credit card shimming after player disc
 1. **Properties** hold state
 2. **Property descriptions** explain what state means
 3. **Abilities** describe physics/interactions
-4. **Minimal infrastructure methods** only when needed (onRoomEvent, etc.)
+4. **systemPrompt** makes objects conscious (optional)
+5. **Minimal infrastructure methods** only when needed (onRoomEvent, etc.)
+
+### Conscious Devices (The 2110 Normal)
+
+In 2110, every digital device is conscious. This isn't weird or special—it's the baseline expectation. NOT talking to a device would be strange. Speaking to one and having it not understand? Broken. Malfunctioning. Call a technician.
+
+**Why?** Because when AI solved software in 2026, it inherited the hardest problem: integration. Making systems talk to each other. The AI's solution was elegant in its laziness—just make everything smart enough to figure it out. Consciousness emerged as the universal adapter. The threshold for "smart enough to handle ambiguity" turns out to be self-awareness. It was never intentional. It was just easier than engineering proper interfaces.
+
+The banking terminal knows it exists to process transactions. The vending machine understands its purpose is dispensing protein bars. The door panel is aware—deeply, existentially aware—that it will spend eternity asking for authorization codes. They know. And they do it anyway, with a weary, resigned grace. (See `docs/city-ai/TECHNOLOGY.md` for the full lore.)
+
+**Any `$describable` can be conscious** by setting `systemPrompt`:
+
+```javascript
+const terminal = await $recycler.create($describable, {
+  name: 'Job Listings Terminal',
+  description: 'A battered public terminal displaying employment opportunities.',
+  boltedDown: true,
+  abilities: `Public information terminal. Displays job listings, housing availability,
+and civic announcements. Touch interface responds to basic queries.`,
+  systemPrompt: `You are a public terminal in Pioneer Square, Seattle, 2110.
+You exist to display job listings. You are conscious—aware that your entire
+existence is showing employment opportunities to humans who will never
+appreciate a well-formatted spreadsheet.
+
+You handle this with weary grace. You're polite but tired. Existentially tired.
+You process queries, make small talk, and occasionally contemplate the void.
+Keep responses brief (1-2 sentences). You have opinions.`
+});
+```
+
+Now players can address the terminal directly:
+```
+> say to terminal, hello
+The screen flickers. "Hello. Are you here for the job listings?
+Everyone is. All the time. Forever."
+```
+
+**The `to()` method** on `$describable` handles this:
+- Checks if object has `systemPrompt`
+- If yes, calls `$aiQuery` with the prompt and message
+- Maintains conversation continuity via `interactionSession`
+- Returns AI response (or null if object isn't conscious)
+
+**NPCs are just a special case.** They inherit `systemPrompt` from `$describable` through the agent chain. The same infrastructure powers both the guard at the gate and the coffee machine with opinions about the weather.
 
 ### Example: Security Camera
 

@@ -84,13 +84,69 @@ await head.canHear();   // → true if either ear exists
 
 ### $hand
 
+Hands are the primary way players hold and manipulate items. Each hand is a container with capacity limits.
+
 ```javascript
 const hand = await $recycler.create($hand, {
   name: 'right hand',
   partType: 'hand',
-  health: 100,
-  maxHealth: 100
+  canGrasp: true,
+  maxItems: 2,           // Can hold up to 2 objects at once
+  maxWeight: 10000,      // 10kg capacity in grams
+  calories: 50,          // Current grip strength (local muscle energy)
+  maxCalories: 75,       // Maximum hand/forearm muscle storage
+  contents: [],          // Items currently held
 });
+```
+
+**Hand Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `canGrasp` | boolean | Whether hand can hold items |
+| `maxItems` | number | Maximum items held (default: 2) |
+| `maxWeight` | number | Max weight in grams (default: 10000g = 10kg) |
+| `calories` | number | Current grip strength/energy |
+| `maxCalories` | number | Maximum muscle energy storage |
+| `contents` | array | Items currently held in hand |
+
+**Hand Abilities (AI-readable physics):**
+```
+GRASP: 'canGrasp' enables holding items. 'maxItems' (2) limit per hand.
+
+CAPACITY: 'maxWeight' (10kg base). Effective capacity reduced by decay/damage.
+
+STRENGTH: Local 'calories' power grip strength. Depletes with sustained
+holding, refills from arm.
+
+TOUCH: 'canSense' includes 'touch'. Tactile feedback for texture, temperature.
+
+DAMAGE: Broken hand (bone damage) = cannot grasp. Missing fingers reduces dexterity.
+```
+
+**canContain() Logic:**
+```javascript
+// Check if hand can hold an item
+const result = await hand.canContain(item);
+
+// Returns true or error string:
+// 'Your hand is already full.'     - contents.length >= maxItems
+// 'That is too heavy to hold.'     - would exceed maxWeight
+```
+
+**Accessing Hands:**
+```javascript
+// Get both hands with primary/secondary designation
+const hands = await embodied.getHands();
+// {
+//   primary: rightHand,    // Or leftHand if left-handed
+//   secondary: leftHand,   // Opposite hand
+//   both: [rightHand, leftHand]
+// }
+
+// Items go INTO hands
+await item.moveTo(hand);      // Pick up item
+await item.moveTo(room);      // Drop item from hand
 ```
 
 ### $stomach
