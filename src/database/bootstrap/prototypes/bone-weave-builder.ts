@@ -8,7 +8,7 @@ import { type Builder, registerBuilder } from '../builder-registry';
  */
 export class BoneWeaveBuilder implements Builder {
   static provides = ['boneWeave'];
-  static depends = ['item'];
+  static depends = ['medical'];
 
   private obj: RuntimeObject | null = null;
 
@@ -19,10 +19,10 @@ export class BoneWeaveBuilder implements Builder {
     if (existing) {
       this.obj = existing;
     } else {
-      const item = await this.manager.load('item');
-      if (!item) throw new Error('Item type not found');
+      const medical = await this.manager.load('medical');
+      if (!medical) throw new Error('Medical type not found');
 
-      this.obj = await this.manager.define('boneWeave', item, {
+      this.obj = await this.manager.define('boneWeave', medical, {
         properties: {
           name: 'Bone Weave Kit',
           description: 'Surgical-grade titanium mesh for bone lacing procedure',

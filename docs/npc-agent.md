@@ -11,13 +11,14 @@ docker compose up -d
 # Spawn an AI NPC via MCP (code-first)
 execute_moo_code({
   code: `
-    await $mcp.ai({
-      action: 'spawn',
+    const room = await $load(173);
+    const npc = await $ai.spawn({
       role: 'guard',
       name: 'Janet',
-      location: await $load(173),
+      location: room,
       clothed: true
     });
+    return { npcId: npc.id };
   `
 })
 
@@ -54,8 +55,8 @@ The NPC Agent system enables AI-controlled characters that respond intelligently
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
 │                    MCP Server (HTTP)                         │
-│  - Code-first: execute_moo_code with $mcp object            │
-│  - All tools via $mcp.ai(), $mcp.plot(), etc.               │
+│  - Code-first: execute_moo_code with full MOO context       │
+│  - Direct access to $ai, $plot, $recycler, all $aliases     │
 │  - localhost:3010/mcp                                        │
 └─────────────────────────────────────────────────────────────┘
 ```

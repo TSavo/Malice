@@ -153,12 +153,36 @@ export class PlayerBuilder implements Builder {
       // Store context reference so tell() can send messages
       self._context = context;
 
-      await self.tell('');
-      await self.tell('Welcome back, ' + self.name + '!');
-      await self.tell('You are ' + self.description);
-
       // Update last login
       self.lastLogin = new Date();
+
+      // Check if player needs chargen
+      if (!self.chargenComplete) {
+        // Route to faction's charGen
+        const factionId = self.factionId;
+        if (factionId) {
+          const faction = await $load(factionId);
+          const charGenId = faction?.charGen;
+          if (charGenId) {
+            const charGen = await $load(charGenId);
+            // Use resumeInterview for existing players (registered via session MCP)
+            if (charGen?.resumeInterview) {
+              await charGen.resumeInterview(context, self);
+              return;
+            }
+            // Fallback to startNPCInterview for new connections
+            if (charGen?.startNPCInterview) {
+              await charGen.startNPCInterview(context, self.playername, null);
+              return;
+            }
+          }
+        }
+        // Fallback to default chargen
+        if ($.charGen?.start) {
+          await $.charGen.start(context, self);
+          return;
+        }
+      }
 
       // ZERO VERBS: All command handling moved to AI narrator prompt.
       // See docs/NARRATOR-PROMPT.md "Command Handling" section.
@@ -245,7 +269,9 @@ export class PlayerBuilder implements Builder {
       const message = args[0];
       if (self._context && self._context.send) {
         const processed = await self.processColors(message);
-        self._context.send(processed + '\\r\\n');
+        // Strip trailing newlines, then add consistent CRLF
+        const trimmed = processed.replace(/[\\r\\n]+$/, '');
+        self._context.send(trimmed + '\\r\\n');
       }
     `,
     );
@@ -652,6 +678,12 @@ export class PlayerBuilder implements Builder {
 
       console.log('[CharGen] _processChargenMessage for player #' + self.id + ': "' + message.substring(0, 50) + '..."');
 
+      // Create promise for external await (like narrator)
+      let resolveChargen;
+      self._chargenPromise = new Promise(r => { resolveChargen = r; });
+      self._resolveChargen = resolveChargen;
+      self._chargenQueryActive = true;
+
       // Cancel any pending inactivity timeout - player is speaking
       console.log('[CharGen] Cancelling timeout before processing...');
       await $.charGen.cancelPlayerTimeout(self.id);
@@ -678,18 +710,36 @@ export class PlayerBuilder implements Builder {
       }
 
       // Check if there are queued messages - batch them all into one
-      const pending = await $mutex.check(self, 'chargenQuery');
-      if (pending && pending.length > 0) {
-        // Combine all pending messages into one
-        const combined = pending.join('" Then they add: "');
-        // Clear the queue
-        await $mutex.update(self, 'chargenQuery', []);
+      console.log('[CharGen] Checking mutex for pending messages...');
+      try {
+        const pending = await $mutex.check(self, 'chargenQuery');
+        console.log('[CharGen] Mutex check result:', pending);
+        if (pending && pending.length > 0) {
+          // Combine all pending messages into one
+          const combined = pending.join('" Then they add: "');
+          // Clear the queue
+          await $mutex.update(self, 'chargenQuery', []);
 
-        // Process combined message
-        await self._processChargenMessage(combined);
-      } else {
-        // Queue is empty, release the lock
-        await $mutex.release(self, 'chargenQuery');
+          // Process combined message
+          await self._processChargenMessage(combined);
+        } else {
+          // Queue is empty, release the lock
+          console.log('[CharGen] No pending, releasing mutex and resolving promise');
+          await $mutex.release(self, 'chargenQuery');
+          // All done - resolve the promise
+          self._chargenQueryActive = false;
+          if (self._resolveChargen) {
+            console.log('[CharGen] Resolving chargen promise');
+            self._resolveChargen();
+          } else {
+            console.log('[CharGen] WARNING: No resolver function!');
+          }
+        }
+      } catch (mutexErr) {
+        console.error('[CharGen] Mutex/resolve error:', mutexErr?.message || mutexErr);
+        // Still try to resolve on error
+        self._chargenQueryActive = false;
+        if (self._resolveChargen) self._resolveChargen();
       }
     `,
     );
@@ -1019,13 +1069,19 @@ export class PlayerBuilder implements Builder {
 
       self.aiQueryActive = true;
 
+      // Create promise for external await
+      let resolveNarrator;
+      self._narratorPromise = new Promise(r => { resolveNarrator = r; });
+      self._resolveNarrator = resolveNarrator;
+
       // Grab all queued inputs
       const inputs = self.aiQueue || [];
       self.aiQueue = [];
 
       if (inputs.length === 0) {
         self.aiQueryActive = false;
-                return;
+        if (self._resolveNarrator) self._resolveNarrator();
+        return;
       }
 
       // Build world context
@@ -1108,7 +1164,6 @@ export class PlayerBuilder implements Builder {
 
         // Send narrative to player
         if (result.response) {
-          await self.tell('');
           await self.tell(result.response);
         }
       } catch (err) {
@@ -1122,7 +1177,90 @@ export class PlayerBuilder implements Builder {
       if (self.aiQueue?.length > 0) {
         await self.processAIQueue(context);
       } else {
-              }
+        // All done - resolve the promise
+        if (self._resolveNarrator) self._resolveNarrator();
+      }
+    `,
+    );
+
+    // Await narrator completion - for external callers (MCP)
+    obj.setMethod(
+      'awaitNarrator',
+      `
+      /** Wait for narrator to finish processing.
+       *  Returns immediately if not active.
+       *  @param timeout - Max ms to wait (default 60000)
+       *  @returns true if completed, false if timeout
+       */
+      const timeout = args[0] || 60000;
+
+      if (!self.aiQueryActive) {
+        return true; // Not active, nothing to wait for
+      }
+
+      if (!self._narratorPromise) {
+        return true; // No promise, assume done
+      }
+
+      // Race promise against timeout
+      const timeoutPromise = new Promise(r => setTimeout(() => r('timeout'), timeout));
+      const result = await Promise.race([self._narratorPromise, timeoutPromise]);
+
+      return result !== 'timeout';
+    `,
+    );
+
+    // Await chargen AI completion - for external callers (MCP)
+    obj.setMethod(
+      'awaitChargen',
+      `
+      /** Wait for chargen AI to finish processing.
+       *  Waits for session AND promise to be created if in chargen.
+       *  @param timeout - Max ms to wait (default 60000)
+       *  @returns true if completed, false if timeout
+       */
+      const timeout = args[0] || 60000;
+      const start = Date.now();
+
+      // If in chargen but no session yet, wait for AI first turn to complete
+      if (self.chargenInProgress && !self.chargenAgentSession) {
+        console.log('[awaitChargen] Waiting for AI session to be created...');
+        while (!self.chargenAgentSession && (Date.now() - start) < timeout) {
+          await new Promise(r => setTimeout(r, 100));
+        }
+        if (!self.chargenAgentSession) {
+          console.log('[awaitChargen] Timeout waiting for session');
+          return false;
+        }
+        console.log('[awaitChargen] Session created');
+      }
+
+      // If in chargen but no promise yet, wait for it to be created
+      if (self.chargenInProgress && !self._chargenPromise) {
+        console.log('[awaitChargen] Waiting for promise to be created...');
+        while (!self._chargenPromise && (Date.now() - start) < timeout) {
+          await new Promise(r => setTimeout(r, 50));
+        }
+        console.log('[awaitChargen] Promise exists:', !!self._chargenPromise);
+      }
+
+      if (!self._chargenQueryActive && !self._chargenPromise) {
+        return true; // Not active and no promise, nothing to wait for
+      }
+
+      if (!self._chargenPromise) {
+        return true; // No promise after waiting, assume done
+      }
+
+      // Race promise against remaining timeout
+      const elapsed = Date.now() - start;
+      const remaining = Math.max(timeout - elapsed, 1000);
+      console.log('[awaitChargen] Waiting for chargen promise...');
+      const timeoutPromise = new Promise(r => setTimeout(() => r('timeout'), remaining));
+      const result = await Promise.race([self._chargenPromise, timeoutPromise]);
+      console.log('[awaitChargen] Result:', result === 'timeout' ? 'timeout' : 'completed');
+
+      return result !== 'timeout';
     `,
     );
   }

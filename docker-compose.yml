@@ -39,6 +39,7 @@ services:
       # Session MCP - localhost only for AI client access via SSH tunnel
       - "127.0.0.1:3012:3012"    # Continuum Session MCP
       - "127.0.0.1:3013:3013"    # Cartel Session MCP
+      - "127.0.0.1:3014:3014"    # Neural Log Session MCP
     environment:
       - MONGO_URI=mongodb://mongodb:27017/
       - DB_NAME=malice

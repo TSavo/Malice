@@ -39,21 +39,22 @@ docker exec malice-game cat /home/node/.claude/projects/-home-node/<session-id>.
 
 ### MCP Resources for Sessions
 
-Use code-first MCP or individual tool calls:
+Use execute_moo_code:
 
 ```typescript
-// Code-first (preferred)
 execute_moo_code({
   code: `
-    const npcs = await $mcp.ai({action: 'list'});
-    const npcInfo = await $mcp.ai({action: 'info', humanId: npcId});
-    return {npcs, npcInfo};
+    // List all AI NPCs
+    const npcs = $ai.listActiveHumans();
+
+    // Get specific NPC info
+    const npc = await $load(npcId);
+    return {
+      npcs,
+      npc: npc ? { id: npc.id, name: npc.name, location: npc.location?.id } : null
+    };
   `
 })
-
-// Individual tools (for quick debugging)
-mcp__malice__ai action=list
-mcp__malice__ai action=info humanId=<npc-id>
 ```
 
 Note: CharGen uses a different property (`chargenAgentSession` on player) rather than the AI registry's session tracking.
@@ -76,75 +77,79 @@ Note: CharGen uses a different property (`chargenAgentSession` on player) rather
 ### 4. NPC spawned but not speaking
 **Check**:
 1. Is NPC in same room as player?
-2. Is `ai.do` command syntax correct?
-3. Is room's `announce()` method working?
+2. Is the room's `announce()` method working?
+3. Does the NPC have a valid location?
 
 ## Debugging Tools
 
 ### Check Player State
 
 ```typescript
-// Code-first (preferred)
 execute_moo_code({
   code: `
     const player = await $load(playerId);
     return {
       chargenState: player.chargenState,
       chargenAgentSession: player.chargenAgentSession,
+      chargenInProgress: player.chargenInProgress,
+      chargenComplete: player.chargenComplete,
       location: player.location?.name,
       body: player.body?.id
     };
   `
 })
-
-// Individual property access (quick debugging)
-execute_moo_code({ code: `const p = await $load(playerId); return p.chargenState;` })
 ```
 
 ### Check NPC State
 
 ```typescript
-// Code-first (preferred)
 execute_moo_code({
   code: `
-    const list = await $mcp.ai({action: 'list'});
-    const info = await $mcp.ai({action: 'info', humanId: npcId});
-    const view = await $mcp.ai({action: 'look', humanId: npcId});
-    return {list, info, view};
+    // List all AI NPCs
+    const npcs = $ai.listActiveHumans();
+
+    // Get specific NPC
+    const npc = await $load(npcId);
+    const room = npc?.location;
+
+    return {
+      npcs,
+      npc: npc ? {
+        id: npc.id,
+        name: npc.name,
+        location: room?.name,
+        locationContents: room?.contents
+      } : null
+    };
   `
 })
-
-// Individual tools (quick debugging)
-mcp__malice__ai action=list
-mcp__malice__ai action=info humanId=<npc-id>
-mcp__malice__ai action=look humanId=<npc-id>
 ```
 
 ### Check Room Contents
 
 ```typescript
-// Code-first (preferred)
 execute_moo_code({
   code: `
     const room = await $load(roomId);
-    const contents = await $mcp.find_in_location({locationId: roomId});
-    const exits = room.exits || {};
-    return {room: {id: room.id, name: room.name}, contents, exits};
+    const contents = [];
+    for (const id of (room.contents || [])) {
+      const obj = await $load(id);
+      if (obj) contents.push({ id: obj.id, name: obj.name });
+    }
+    return {
+      room: { id: room.id, name: room.name },
+      contents,
+      exits: room.exits || {}
+    };
   `
 })
-
-// Individual tools (quick debugging)
-mcp__malice__find_in_location locationId="#<room-id>"
-mcp__malice__get_exits roomId="#<room-id>"
 ```
 
 ### Trace Message Delivery
 
 Message flow for NPC speech:
 ```
-ai.do "say Hello"
-  → callVerb('say', ...)
-  → room.announce(message)
+room.announce(actor, target, messages)
   → for each viewer: viewer.see(message)
   → viewer.tell(message)
   → _context.send(message)
@@ -192,35 +197,36 @@ docker compose logs -f game 2>&1 | grep -E "(chargen|ai\.|NPC|spawn|query)"
 ### 3. Check Session State
 After login attempt, check:
 ```typescript
-// Code-first
 execute_moo_code({
   code: `
     const player = await $load(playerId);
     return {
       chargenState: player.chargenState,
-      chargenAgentSession: player.chargenAgentSession
+      chargenAgentSession: player.chargenAgentSession,
+      chargenInProgress: player.chargenInProgress,
+      _chargenPromise: !!player._chargenPromise
     };
   `
 })
-
-// Direct property access
-execute_moo_code({ code: `const p = await $load(playerId); return p.chargenState;` })
 ```
 
 ### 4. Verify NPC Actions
 ```typescript
-// Code-first
 execute_moo_code({
   code: `
-    await $mcp.ai({action: 'do', humanId: npcId, command: 'look'});
-    await $mcp.ai({action: 'do', humanId: npcId, command: 'say Hello, I can see you.'});
-    return 'Commands executed';
+    const npc = await $load(npcId);
+    const room = npc?.location;
+
+    // Have NPC speak
+    if (room?.announce) {
+      await room.announce(npc, null, {
+        others: '%A says, "Hello, I can see you."'
+      });
+    }
+
+    return { success: true, room: room?.name };
   `
 })
-
-// Individual tools
-mcp__malice__ai action=do humanId=<npc-id> command="look"
-mcp__malice__ai action=do humanId=<npc-id> command="say Hello, I can see you."
 ```
 
 ## Adding Debug Logging
@@ -228,7 +234,7 @@ mcp__malice__ai action=do humanId=<npc-id> command="say Hello, I can see you."
 ### In MOO Methods
 ```typescript
 // Add to any method
-$log('DEBUG', 'see() called', { selfId: self.id, message: args[0] });
+console.log('[DEBUG] see() called', { selfId: self.id, message: args[0] });
 ```
 
 ### In TypeScript Builders
@@ -260,4 +266,4 @@ docker compose logs game --tail 100 | grep DEBUG
 3. Watch Docker logs for AI spawn
 4. Verify NPC appears in room: `look`
 5. Answer NPC questions via speech: `say My name is John`
-6. Check chargen progress: Use MCP tools to query player state
+6. Check chargen progress: Use execute_moo_code to query player state

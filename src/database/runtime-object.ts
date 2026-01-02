@@ -1032,6 +1032,15 @@ export class RuntimeObjectImpl implements RuntimeObject {
       }
     }
 
+    // Also inject type aliases (types are auto-aliased by name, e.g., $player, $room)
+    for (const [typeName, typeObj] of this.manager.getTypeCache()) {
+      // Don't override existing object aliases
+      if (!resolvedAliases[typeName]) {
+        resolvedAliases[typeName] = typeObj;
+        aliasNames.push(typeName);
+      }
+    }
+
     // Generate variable declarations for all aliases (e.g., "const $exit = ctx._aliases['exit'];")
     // Filter out invalid JavaScript identifiers
     const validAliasNames = aliasNames.filter((name) => {

@@ -77,6 +77,12 @@ import './prototypes/vendable-builder';
 import './prototypes/wireless-phone-builder';
 import './prototypes/phone-implant-builder';
 
+// Cyberware
+import './prototypes/cyberware-builder';
+import './prototypes/cyber-arm-builder';
+import './prototypes/cyber-leg-builder';
+import './prototypes/cyber-tools-builder';
+
 // Vehicle system
 import './prototypes/vehicle-part-builder';
 import './prototypes/engine-builder';
@@ -103,6 +109,180 @@ import './prototypes/helicopter-builder';
 import './prototypes/watercraft-builder';
 import './prototypes/boat-builder';
 import './prototypes/submarine-builder';
+
+// Medical & drugs
+import './prototypes/medical-builder';
+import './prototypes/adrenaline-builder';
+import './prototypes/anesthetic-builder';
+import './prototypes/antibiotics-builder';
+import './prototypes/bandage-builder';
+import './prototypes/blood-bag-builder';
+import './prototypes/defibrillator-builder';
+import './prototypes/medkit-builder';
+import './prototypes/morphine-builder';
+import './prototypes/painkillers-builder';
+import './prototypes/pill-builder';
+import './prototypes/splint-builder';
+import './prototypes/stimpak-builder';
+import './prototypes/surgical-kit-builder';
+import './prototypes/suture-kit-builder';
+import './prototypes/syringe-builder';
+import './prototypes/tourniquet-builder';
+import './prototypes/drug-builder';
+import './prototypes/alcohol-builder';
+import './prototypes/cigar-builder';
+import './prototypes/cigarette-builder';
+import './prototypes/smokable-builder';
+
+// Additional cyberware
+import './prototypes/arm-blade-builder';
+import './prototypes/audio-enhancer-builder';
+import './prototypes/bone-lacing-builder';
+import './prototypes/bone-weave-builder';
+import './prototypes/chrome-eye-builder';
+import './prototypes/combat-computer-builder';
+import './prototypes/data-storage-builder';
+import './prototypes/dermal-display-builder';
+import './prototypes/echolocation-module-builder';
+import './prototypes/internal-clock-builder';
+import './prototypes/micro-tools-builder';
+import './prototypes/neural-probe-builder';
+import './prototypes/olfactory-booster-builder';
+import './prototypes/pain-editor-builder';
+import './prototypes/reflex-booster-builder';
+import './prototypes/retractable-claws-builder';
+import './prototypes/subdermal-armor-builder';
+import './prototypes/subdermal-pocket-builder';
+import './prototypes/tactile-boost-builder';
+import './prototypes/targeting-system-builder';
+import './prototypes/taste-analyzer-builder';
+import './prototypes/toxin-filter-builder';
+import './prototypes/voice-modulator-builder';
+
+// Armor & protective gear
+import './prototypes/armor-builder';
+import './prototypes/armor-mesh-builder';
+import './prototypes/ballistic-vest-builder';
+import './prototypes/combat-boots-builder';
+import './prototypes/combat-gloves-builder';
+import './prototypes/gas-mask-builder';
+import './prototypes/helmet-builder';
+import './prototypes/rebreather-builder';
+import './prototypes/riot-helmet-builder';
+import './prototypes/riot-shield-builder';
+import './prototypes/stab-vest-builder';
+import './prototypes/tactical-vest-builder';
+
+// Tools
+import './prototypes/tool-builder';
+import './prototypes/bolt-cutters-builder';
+import './prototypes/crowbar-builder';
+import './prototypes/duct-tape-builder';
+import './prototypes/flashlight-builder';
+import './prototypes/generator-builder';
+import './prototypes/grappling-hook-builder';
+import './prototypes/hacksaw-builder';
+import './prototypes/hammer-builder';
+import './prototypes/ladder-builder';
+import './prototypes/lighter-builder';
+import './prototypes/lockpick-builder';
+import './prototypes/multitool-builder';
+import './prototypes/pliers-builder';
+import './prototypes/prybar-builder';
+import './prototypes/radio-builder';
+import './prototypes/rope-builder';
+import './prototypes/screwdriver-builder';
+import './prototypes/torch-builder';
+import './prototypes/wire-cutters-builder';
+import './prototypes/wrench-builder';
+
+// Explosives & grenades
+import './prototypes/explosive-builder';
+import './prototypes/grenade-builder';
+import './prototypes/c4-builder';
+import './prototypes/detonator-builder';
+import './prototypes/dynamite-builder';
+import './prototypes/flashbang-builder';
+import './prototypes/frag-grenade-builder';
+import './prototypes/ied-builder';
+import './prototypes/mine-builder';
+import './prototypes/molotov-builder';
+import './prototypes/smoke-grenade-builder';
+
+// Restraints
+import './prototypes/handcuffs-builder';
+import './prototypes/zip-ties-builder';
+
+// Food & consumables
+import './prototypes/candy-builder';
+import './prototypes/canned-food-builder';
+import './prototypes/coffee-builder';
+import './prototypes/ration-pack-builder';
+import './prototypes/snack-builder';
+import './prototypes/soda-builder';
+
+// Containers & storage
+import './prototypes/backpack-builder';
+import './prototypes/cabinet-builder';
+import './prototypes/crate-builder';
+import './prototypes/dumpster-builder';
+import './prototypes/safe-builder';
+import './prototypes/trunk-builder';
+import './prototypes/wardrobe-builder';
+
+// Furniture
+import './prototypes/furniture-builder';
+import './prototypes/bed-builder';
+import './prototypes/chair-builder';
+import './prototypes/couch-builder';
+import './prototypes/desk-builder';
+import './prototypes/table-builder';
+
+// Electronics & sensors
+import './prototypes/alarm-builder';
+import './prototypes/camera-builder';
+import './prototypes/sensor-builder';
+
+// Vehicle parts (additional)
+import './prototypes/alternator-builder';
+import './prototypes/brakes-builder';
+import './prototypes/bumper-builder';
+import './prototypes/ecu-builder';
+import './prototypes/exhaust-builder';
+import './prototypes/fender-builder';
+import './prototypes/headlights-builder';
+import './prototypes/radiator-builder';
+import './prototypes/starter-builder';
+import './prototypes/steering-builder';
+import './prototypes/vehicle-door-builder';
+import './prototypes/vehicle-exit-builder';
+import './prototypes/vehicle-room-builder';
+import './prototypes/windshield-builder';
+import './prototypes/wiring-harness-builder';
+import './prototypes/motorcycle-builder';
+import './prototypes/av-builder';
+import './prototypes/vector-thruster-builder';
+import './prototypes/nav-computer-builder';
+import './prototypes/hardpoint-builder';
+import './prototypes/turret-builder';
+
+// Fuel system
+import './prototypes/fuel-builder';
+import './prototypes/fuel-container-builder';
+import './prototypes/fuel-pump-builder';
+import './prototypes/fuel-siphon-builder';
+
+// Filtration & breathing
+import './prototypes/air-filter-builder';
+import './prototypes/air-tank-builder';
+import './prototypes/filter-unit-builder';
+
+// Power
+import './prototypes/power-cell-builder';
+import './prototypes/port-builder';
+
+// Traps
+import './prototypes/trap-builder';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // CLIENT MODULES (JS served to browser)

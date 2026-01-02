@@ -80,9 +80,7 @@ export class TailorBuilder implements Builder {
       const systemPrompt = $.aiPrompts.tailor;
 
 
-      const prompt = \`Dress NPC #\${human.id} (\${human.name || 'Unnamed'}).\${context ? \` Context: \${context}\` : ''}
-
-First use ai action=info to learn about the NPC, then dress them appropriately for their role.\`;
+      const prompt = \`Dress NPC #\${human.id} (\${human.name || 'Unnamed'}).\${context ? \` Context: \${context}\` : ''}\`;
 
       // Use $query to call Claude with MCP tools
       const result = await $aiQuery('tailor', prompt, null, systemPrompt);

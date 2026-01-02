@@ -8,7 +8,7 @@ import { type Builder, registerBuilder } from '../builder-registry';
  */
 export class AirTankBuilder implements Builder {
   static provides = ['airTank'];
-  static depends = ['item'];
+  static depends = ['medical'];
 
   private obj: RuntimeObject | null = null;
 
@@ -19,10 +19,10 @@ export class AirTankBuilder implements Builder {
     if (existing) {
       this.obj = existing;
     } else {
-      const item = await this.manager.load('item');
-      if (!item) throw new Error('Item type not found');
+      const medical = await this.manager.load('medical');
+      if (!medical) throw new Error('Medical type not found');
 
-      this.obj = await this.manager.define('airTank', item, {
+      this.obj = await this.manager.define('airTank', medical, {
         properties: {
           name: 'Implant Air Tank',
           description: 'Compressed oxygen reservoir for rebreather installation',

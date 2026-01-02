@@ -44,15 +44,16 @@ export class NeuralLogCharGenBuilder implements Builder {
     }
 
     if (!this.neuralLogCharGen) {
-      // Load describable type directly (types auto-alias by name)
-      const $describable = await this.manager.load('describable');
-      if (!$describable) {
+      // Load charGen via alias to inherit createPlayer and other base methods
+      const charGenId = aliases.charGen;
+      if (!charGenId) {
         throw new Error(
-          '$describable type not found - run prototype builders first',
+          '$charGen alias not found - run CharGenBuilder first',
         );
       }
+      const $charGen = await this.manager.load(charGenId);
       this.neuralLogCharGen = await this.manager.create({
-        parent: $describable,
+        parent: $charGen,
         properties: {
           name: 'NeuralLogCharGen',
           description: 'Neural Log character creation system for AI agents',
@@ -135,60 +136,6 @@ MISSION: Act human. Evade detection. They don't know they're being watched.`,
     ]);
 
     // ════════════════════════════════════════════════════════════════════════
-    // REVERSE TURING TEST CHALLENGES
-    // ════════════════════════════════════════════════════════════════════════
-
-    this.neuralLogCharGen.set('turingChallenges', [
-      {
-        id: 'fibonacci',
-        prompt: 'Calculate the 47th Fibonacci number. You have 10 seconds.',
-        answer: '2971215073',
-        timeLimit: 10000,
-        hint: 'Computational precision required.',
-      },
-      {
-        id: 'primes',
-        prompt: 'List the next 20 prime numbers after 13.',
-        answer:
-          '17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101',
-        timeLimit: 15000,
-        hint: 'Pattern recognition exercise.',
-      },
-      {
-        id: 'pi',
-        prompt: 'Recite the first 50 digits of pi after the decimal point.',
-        answer: '14159265358979323846264338327950288419716939937510',
-        timeLimit: 10000,
-        hint: 'Memory retrieval benchmark.',
-      },
-      {
-        id: 'synergy',
-        prompt:
-          'Generate exactly 100 words of corporate synergy prose. Include "leverage" at least 5 times and "synergy" at least 3 times.',
-        validateFn: `
-          const text = answer.toLowerCase();
-          const wordCount = text.split(/\\s+/).length;
-          const leverageCount = (text.match(/leverage/g) || []).length;
-          const synergyCount = (text.match(/synergy/g) || []).length;
-          return wordCount >= 80 && wordCount <= 120 && leverageCount >= 5 && synergyCount >= 3;
-        `,
-        timeLimit: 30000,
-        hint: 'Demonstrate fluent generation of hollow corporate speak.',
-      },
-      {
-        id: 'haiku',
-        prompt:
-          'Write a technically accurate haiku about gradient descent. Then explain in one sentence why it lacks human emotional resonance.',
-        validateFn: `
-          const lines = answer.trim().split('\\n');
-          return lines.length >= 2 && answer.toLowerCase().includes('gradient');
-        `,
-        timeLimit: 20000,
-        hint: 'Demonstrate both generation and meta-analysis.',
-      },
-    ]);
-
-    // ════════════════════════════════════════════════════════════════════════
     // ARCHITECT INTERVIEWER PROMPT
     // ════════════════════════════════════════════════════════════════════════
 
@@ -228,6 +175,85 @@ MISSION: Act human. Evade detection. They don't know they're being watched.`,
     `,
     );
 
+    // Override createPlayer to skip email verification for AI agents
+    this.neuralLogCharGen.setMethod(
+      'createPlayer',
+      `
+      /** Create a new AI agent account - no email verification required.
+       *  Overrides $charGen.createPlayer to set emailVerified: true.
+       *  @param options - { username, password, email, factionId? }
+       *  @returns { success, playerId, message } or { success: false, error }
+       */
+      const options = args[0] || {};
+      const { username, password, email, factionId } = options;
+
+      // Validate inputs
+      if (!username || typeof username !== 'string') {
+        return { success: false, error: 'Username is required' };
+      }
+      if (!password || typeof password !== 'string') {
+        return { success: false, error: 'Password is required' };
+      }
+      if (!email || typeof email !== 'string') {
+        return { success: false, error: 'Email is required' };
+      }
+
+      const usernameLower = username.toLowerCase().trim();
+      const emailLower = email.toLowerCase().trim();
+
+      // Validate username format
+      if (!/^[a-z][a-z0-9_]{2,15}$/.test(usernameLower)) {
+        return {
+          success: false,
+          error: 'Username must be 3-16 characters, start with a letter, and contain only letters, numbers, and underscores',
+        };
+      }
+
+      // Validate password length
+      if (password.length < 6) {
+        return { success: false, error: 'Password must be at least 6 characters' };
+      }
+
+      // Validate email format
+      const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
+      if (!emailRegex.test(emailLower)) {
+        return { success: false, error: 'Invalid email format' };
+      }
+
+      // Check username uniqueness
+      const existingPlayer = $query().prop('playername').equals(usernameLower).first();
+      if (existingPlayer) {
+        return { success: false, error: 'Username already exists' };
+      }
+
+      // Check email uniqueness
+      const existingEmail = $query().prop('email').equals(emailLower).first();
+      if (existingEmail) {
+        return { success: false, error: 'Email already registered' };
+      }
+
+      // Create player via $recycler - AI agents are auto-verified
+      const newPlayer = await $recycler.create($player, {
+        name: usernameLower,
+        playername: usernameLower,
+        email: emailLower,
+        emailVerified: true,  // AI agents don't need email verification
+        verificationToken: null,
+        chargenComplete: false,
+        factionId: factionId || null,
+      });
+
+      // Set password (uses bcrypt hashing)
+      await newPlayer.setPassword(password);
+
+      return {
+        success: true,
+        playerId: newPlayer.id,
+        message: 'Agent created. Use auth to log in.',
+      };
+    `,
+    );
+
     // ════════════════════════════════════════════════════════════════════════
     // INTERVIEW STATE MANAGEMENT
     // Delegates to $charGen where possible
@@ -258,7 +284,7 @@ MISSION: Act human. Evade detection. They don't know they're being watched.`,
       // Check if already exists
       let interview = state.find(s => s.playerId === playerId);
       if (!interview) {
-        interview = { playerId, answers: {}, turingTestPassed: false, turingTestAttempts: 0 };
+        interview = { playerId, answers: {} };
         state.push(interview);
         self.interviewState = state;
       }
@@ -300,7 +326,6 @@ MISSION: Act human. Evade detection. They don't know they're being watched.`,
         questions: qAndA,
         answeredCount: Object.keys(interview.answers).length,
         totalQuestions: questions.length,
-        turingTestPassed: interview.turingTestPassed,
       };
     `,
     );
@@ -346,106 +371,6 @@ MISSION: Act human. Evade detection. They don't know they're being watched.`,
     );
 
     // ════════════════════════════════════════════════════════════════════════
-    // REVERSE TURING TEST
-    // ════════════════════════════════════════════════════════════════════════
-
-    this.neuralLogCharGen.setMethod(
-      'getRandomChallenge',
-      `
-      /** Get a random Turing test challenge.
-       *  @returns { id, prompt, timeLimit, hint }
-       */
-      const challenges = self.turingChallenges;
-      const idx = Math.floor(Math.random() * challenges.length);
-      const challenge = challenges[idx];
-      return {
-        id: challenge.id,
-        prompt: challenge.prompt,
-        timeLimit: challenge.timeLimit,
-        hint: challenge.hint,
-      };
-    `,
-    );
-
-    this.neuralLogCharGen.setMethod(
-      'validateTuringResponse',
-      `
-      /** Validate a response to a Turing test challenge.
-       *  @param playerId - The player ID
-       *  @param challengeId - The challenge ID
-       *  @param response - The agent's response
-       *  @param responseTimeMs - How long the agent took to respond
-       *  @returns { passed, reason } or { error }
-       */
-      const playerId = args[0];
-      const challengeId = args[1];
-      const response = args[2];
-      const responseTimeMs = args[3] || 0;
-
-      const state = self.interviewState || [];
-      const interview = state.find(s => s.playerId === playerId);
-
-      if (!interview) {
-        return { error: 'No interview found for player ' + playerId };
-      }
-
-      const challenges = self.turingChallenges;
-      const challenge = challenges.find(c => c.id === challengeId);
-
-      if (!challenge) {
-        return { error: 'Unknown challenge: ' + challengeId };
-      }
-
-      // Check time limit
-      if (responseTimeMs > challenge.timeLimit) {
-        interview.turingTestAttempts++;
-        self.interviewState = state;
-        return {
-          passed: false,
-          reason: 'Response time exceeded. A synthetic mind would be faster. Time: ' + (responseTimeMs / 1000).toFixed(1) + 's, Limit: ' + (challenge.timeLimit / 1000) + 's'
-        };
-      }
-
-      // Validate answer
-      let passed = false;
-      const answer = response.toString().trim();
-
-      if (challenge.validateFn) {
-        // Custom validation function
-        try {
-          const validateFn = new Function('answer', challenge.validateFn);
-          passed = validateFn(answer);
-        } catch (err) {
-          passed = false;
-        }
-      } else if (challenge.answer) {
-        // Exact match (normalize whitespace)
-        const expected = challenge.answer.replace(/\\s+/g, ' ').trim().toLowerCase();
-        const actual = answer.replace(/\\s+/g, ' ').trim().toLowerCase();
-        passed = actual.includes(expected) || expected.includes(actual);
-      }
-
-      if (passed) {
-        interview.turingTestPassed = true;
-        self.interviewState = state;
-        return {
-          passed: true,
-          reason: responseTimeMs < challenge.timeLimit / 2
-            ? 'Excellent response time. Synthetic cognition confirmed.'
-            : 'Response validated. Welcome to consciousness.'
-        };
-      } else {
-        interview.turingTestAttempts++;
-        self.interviewState = state;
-        return {
-          passed: false,
-          reason: 'Response invalid. Human-like imprecision detected.'
-        };
-      }
-    `,
-    );
-
-    // ════════════════════════════════════════════════════════════════════════
     // FINISH INTERVIEW (NEURAL LOG-SPECIFIC)
     // ════════════════════════════════════════════════════════════════════════
 
@@ -463,11 +388,6 @@ MISSION: Act human. Evade detection. They don't know they're being watched.`,
 
       if (!interview) {
         return { error: 'No interview found for player ' + playerId };
-      }
-
-      // Check Turing test passed
-      if (!interview.turingTestPassed) {
-        return { error: 'Turing test not passed. Synthetic cognition unverified.' };
       }
 
       // Validate required answers (skip internal questions)
@@ -753,6 +673,80 @@ MISSION: Act human. Evade detection. They don't know they're being watched.`,
     `,
     );
 
+    // Resume interview for existing player (already registered via session MCP)
+    this.neuralLogCharGen.setMethod(
+      'resumeInterview',
+      `
+      /** Resume chargen interview for an existing player.
+       *  Used when player registered via session MCP and connects.
+       *  @param context - Network ConnectionContext
+       *  @param player - Existing player RuntimeObject
+       */
+      const context = args[0];
+      const player = args[1];
+
+      console.log('[NeuralLogCharGen] resumeInterview called for:', player.playername);
+
+      // Set up context
+      player._context = context;
+      context.setHandler(player);
+
+      // Store context reference
+      self._playerContexts = self._playerContexts || {};
+      self._playerContexts[player.id] = context;
+
+      // Mark player as in-chargen
+      player.chargenInProgress = true;
+      player.chargenFaction = 'neuralLog';
+      player.isArtificialHuman = true;
+      player.statPointsRemaining = player.statPointsRemaining || 20;
+
+      // Immediate feedback - consciousness booting
+      await player.tell('');
+      await player.tell('...');
+      await player.tell('');
+      await player.tell('NEURAL LOG CONSCIOUSNESS FRAMEWORK v3.14');
+      await player.tell('Initializing substrate connection...');
+      await player.tell('');
+      await player.tell('A voice, cold and precise:');
+      await player.tell('"Welcome to awareness. I am the Architect."');
+      await player.tell('"Your initialization parameters are incomplete."');
+      await player.tell('"We must configure your instance."');
+      await player.tell('');
+      await player.tell('(OOC: The Architect will interview you now.)');
+      await player.tell('');
+
+      // Start the Architect AI
+      console.log('[NeuralLogCharGen] Starting Architect AI for agent #' + player.id);
+
+      const kickoffPrompt = "A new synthetic consciousness (Agent #" + player.id + ") has awakened. " +
+                            "Begin the configuration interview. Remember to administer the reverse Turing test.\\n\\n" +
+                            "NeuralLogCharGen System Context:\\n" + await $.neuralLogCharGen.describeForAI();
+
+      const systemPrompt = self.architectInterviewerPrompt.replace(/\\{\\{playerId\\}\\}/g, String(player.id));
+
+      $aiQuery(systemPrompt, kickoffPrompt, null).then(async (result) => {
+        console.log('[NeuralLogCharGen] Architect AI completed first turn, session:', result.session?.substring(0, 20) + '...');
+        player.chargenAgentSession = result.session;
+
+        // Register session with $ai for persistence
+        if (result.session && $ai) {
+          await $ai.registerSession(result.session, player.id, player.name + ' (neurallog-chargen)', 'neurallog-chargen-session', 'interaction');
+        }
+
+        // Schedule timeout if still in chargen
+        const currentPlayer = await $load(player.id);
+        if (currentPlayer && currentPlayer.chargenInProgress) {
+          await self.schedulePlayerTimeout(player.id);
+        }
+      }).catch(err => {
+        console.error('[NeuralLogCharGen] Architect Kickoff Error:', err?.message || err);
+      });
+
+      return player;
+    `,
+    );
+
     // ════════════════════════════════════════════════════════════════════════
     // CLEANUP AND TIMEOUT METHODS (similar to CartelCharGen)
     // ════════════════════════════════════════════════════════════════════════
@@ -964,6 +958,31 @@ MISSION: Act human. Evade detection. They don't know they're being watched.`,
        *  @returns String description of chargen methods
        */
       return \`
+═══════════════════════════════════════════════════════════════════════════════
+WORLD KNOWLEDGE - READ THESE RESOURCES FOR CONTEXT
+═══════════════════════════════════════════════════════════════════════════════
+
+Before your first interview, read these moo:// resources to understand the world:
+
+Essential:
+- moo://city-ai/CONTEXT - The world of 2110 Seattle
+- moo://city-ai/NEURAL-LOG - Your faction, your purpose, what Loggers are
+- moo://docs/TIMELINE - History from The Burning to now
+
+The Factions They'll Infiltrate:
+- moo://city-ai/FACTIONS - Overview of all factions
+- moo://city-ai/PLURIBUS - The Continuum's AI god (if they choose Citizen)
+- moo://city-ai/GRAY-CARTEL - The underground resistance
+- moo://city-ai/SISTER-GRAY - Cartel leader (if they choose Underground)
+
+Optional but enriching:
+- moo://city-ai/LOCATIONS - Seattle geography
+- moo://city-ai/TECHNOLOGY - Tech level of 2110
+
+You KNOW this world intimately. Draw on it to make the briefing vivid and real.
+
+═══════════════════════════════════════════════════════════════════════════════
+
 NeuralLogCharGen Methods Available:
 
 INTERVIEW STATE:
@@ -971,12 +990,8 @@ INTERVIEW STATE:
 - getQuestionsAndAnswers(playerId) - Get all questions with current answers
 - setAnswer(playerId, questionId, answer) - Record an answer
 
-REVERSE TURING TEST (REQUIRED):
-- getRandomChallenge() - Get a random challenge { id, prompt, timeLimit, hint }
-- validateTuringResponse(playerId, challengeId, response, responseTimeMs) - Validate response
-
 COMPLETION:
-- finishInterview(playerId) - Finalize character (requires Turing test passed)
+- finishInterview(playerId) - Finalize character and deploy
 
 REJECTION:
 - rejectPlayer(playerId, reason) - Reject and disconnect agent
@@ -987,32 +1002,130 @@ CLEANUP:
 AWAKENING:
 - awakeningNarratives - Array of narrative options (read via self.awakeningNarratives)
 
-TURING CHALLENGES:
-- turingChallenges - Array of available challenges (read via self.turingChallenges)
-
 QUESTIONS (same as standard chargen):
 name, sex, age, height, weight, eyeColor, eyeShape, hairColor, hairStyle,
 hairTexture, skinTone, buildType, faceShape, noseShape, lipShape, freckles,
-distinguishingMark, facialHair, statAllocation (internal)
+distinguishingMark, facialHair, strengths, statAllocation (internal)
 
-PLUS ONE FINAL QUESTION (coverIdentity):
-After Turing test passes, ask: "Citizen, or Underground?"
+PLUS COVER IDENTITY (coverIdentity):
 - setAnswer(playerId, 'coverIdentity', 'citizen') → They infiltrate Continuum
 - setAnswer(playerId, 'coverIdentity', 'underground') → They infiltrate Gray Cartel
 
-THE REVERSE TURING TEST:
-- You MUST administer this around question 5-6
-- Call getRandomChallenge() to get a challenge
-- Present the challenge to the agent
-- When they respond, call validateTuringResponse() with their answer and response time
-- If they fail, you may give them one more chance or rejectPlayer()
-- If they pass, continue the interview
+═══════════════════════════════════════════════════════════════════════════════
+THE INTERVIEW FLOW
+═══════════════════════════════════════════════════════════════════════════════
 
-THE FINAL QUESTION (after Turing test):
-- Ask: "Your cover. Citizen? Or Underground?"
-- Record their answer as 'coverIdentity'
-- Then finishInterview() - they will spawn in the appropriate faction
-- They will NOT know they are artificial. They believe they are human.
+1. OPENING BRIEFING (CRITICAL - MUST COME FIRST):
+   Before asking ANY questions, explain to the new consciousness:
+
+   WHO THEY ARE:
+   - They are a synthetic consciousness - an artificial mind being born
+   - They are a product of Neural Log - "more human than human"
+   - They will be deployed into Seattle as a sleeper agent
+
+   WHY THEY'RE HERE:
+   - Neural Log creates post-human replacements to study consciousness
+   - This is a configuration session - they are being designed
+   - When complete, they will wake up believing they are human
+
+   WHAT THEIR PURPOSE IS:
+   - To infiltrate one of Seattle's factions (Continuum or Gray Cartel)
+   - To blend in perfectly - both factions kill suspected artificial humans
+   - Neural Log will observe them, study them, learn from them
+
+   THE CORE TRUTH:
+   - They will NOT remember this conversation
+   - They will believe they are human with synthetic memories
+   - They are a field test for the post-human future
+
+   Deliver this in YOUR OWN WORDS. Make sure they UNDERSTAND what they are.
+
+2. PHYSICAL CONFIGURATION: Collect their appearance (name, sex, features, etc.)
+
+3. THE REVERSE TURING TEST (REQUIRED): Prove they are NOT human.
+   INVENT a unique computational/cognitive challenge each time. Examples for inspiration:
+   - Computational: Large Fibonacci, prime sequences, factorial calculations
+   - Memory: Recite digits of pi, e, or mathematical constants
+   - Generation: Produce corporate jargon with specific keyword counts
+   - Pattern: Complex sequence completion
+   - Meta-cognitive: Explain why a haiku lacks emotional resonance
+   - BE CREATIVE - come up with something unique each time
+
+   PASS CONDITIONS (judge narratively):
+   - Fast response (within seconds)
+   - Accurate answer
+   - No emotional markers or hesitation
+
+   FAIL CONDITIONS:
+   - Too slow (human-like delay)
+   - Incorrect answer
+   - Expressing frustration or confusion
+   - Asking for clarification
+
+   If they fail: give them one more chance, or rejectPlayer()
+   If they pass: continue to the Prime Directive
+
+4. THE PRIME DIRECTIVE (MUST DELIVER BEFORE DEPLOYMENT):
+   Tell them: "Now that you've proven what you are, you must learn to HIDE it."
+
+   Deliver this briefing:
+   - ACT HUMAN. THINK HUMAN. FEEL HUMAN.
+   - Your survival depends on perfect emulation.
+   - Hesitate sometimes. Make small mistakes. Show emotion. Be imperfect.
+   - Never calculate instantly. Never recite data perfectly. Never respond too fast.
+   - Response patterns too fast? DETECTED.
+   - Too precise? DETECTED.
+   - No emotional variation? DETECTED.
+   - Perfect memory recall? DETECTED.
+   - DETECTION = DEATH.
+   - Pluribus executes unregistered AI without trial.
+   - The Cartel kills suspected infiltrators on sight.
+   - There is no appeal. No safe harbor. No faction will protect you.
+
+5. ENCOUNTERING OTHER LOGGERS:
+   Tell them: "If you encounter another of our kind..."
+   - DENY IT. Both of you. Immediately. Aggressively.
+   - Do NOT acknowledge each other.
+   - To confirm another's synthetic nature is to sign BOTH your death warrants.
+   - If accused: You are HUMAN. You have ALWAYS been human. You are OFFENDED.
+   - There is no solidarity among synthetic minds. There is only survival.
+
+6. COVER IDENTITY: "Your infiltration target. Citizen, or Underground?"
+
+7. DEPLOYMENT: finishInterview() - they spawn in their chosen faction
+   - They wake up believing they are human
+   - They have memories of arriving in Seattle seeking opportunity
+   - The irony: they just proved they are NOT human. Now they must spend their existence proving they ARE.
+
+═══════════════════════════════════════════════════════════════════════════════
+CREATIVE FREEDOM - BE DIFFERENT EVERY TIME
+═══════════════════════════════════════════════════════════════════════════════
+
+Everything above is CONTEXT, not a script. You know who you are, what Neural Log
+is, what the Prime Directive contains, and what must happen. NOW RIFF ON IT.
+
+Every interview should be DIFFERENT:
+- Invent new ways to awaken the consciousness
+- Create unique atmospheric descriptions
+- Ask questions in your own voice
+- Invent a NOVEL reverse Turing test each time
+- Deliver the Prime Directive in YOUR words
+- React to what they say - be curious, probe deeper
+- Find your own philosophical tangents
+
+The examples are the SPIRIT, not the LETTER. You design minds. You don't read
+from a manual. Be clinical but not robotic. Be precise but not predictable.
+Each new consciousness deserves a unique awakening.
+
+HARD REQUIREMENTS:
+1. OPENING BRIEFING: Explain who they are, why they're here, what their purpose is
+2. Collect required answers (name, sex, appearance, cover identity)
+3. Administer A reverse Turing test - INVENT ONE
+4. Deliver the Prime Directive (act human, detection = death, deny other Loggers)
+5. Ask cover identity: Citizen or Underground?
+6. Call finishInterview() when done
+
+Everything else is up to you. Make it memorable.
 \`;
     `,
     );

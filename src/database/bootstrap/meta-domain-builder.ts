@@ -107,15 +107,266 @@ export class MetaDomainBuilder implements Builder {
     // Set on domain
     this.domain.set('rootRoute', { type: 'objref', value: rootRoute.id });
 
-    // Root route - redirect to /admin
+    // Root route - landing page
     rootRoute.setMethod(
       'handleRequest',
       `
-      return {
-        status: 302,
-        headers: { 'Location': '/admin' },
-        body: ''
-      };
+      const html = \`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Malice</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0a0a0a;
+      color: #c0c0c0;
+      font-family: 'JetBrains Mono', monospace;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+    }
+    .container {
+      max-width: 720px;
+      width: 100%;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+    .title {
+      font-size: 4rem;
+      font-weight: 700;
+      letter-spacing: 0.3em;
+      color: #00ff88;
+      text-shadow: 0 0 30px rgba(0, 255, 136, 0.3);
+      margin-bottom: 0.5rem;
+    }
+    .subtitle {
+      font-size: 0.9rem;
+      color: #666;
+      font-weight: 300;
+    }
+    .testimony {
+      margin-bottom: 3rem;
+    }
+    .testimony blockquote {
+      border-left: 2px solid #333;
+      padding-left: 1.5rem;
+      margin: 1.5rem 0;
+      color: #888;
+      font-style: italic;
+    }
+    .testimony p {
+      margin: 1rem 0;
+      line-height: 1.7;
+    }
+    .testimony .highlight {
+      color: #00ff88;
+    }
+    .testimony .muted {
+      color: #555;
+    }
+    .section-title {
+      font-size: 0.8rem;
+      letter-spacing: 0.2em;
+      color: #444;
+      margin: 3rem 0 1rem 0;
+      text-transform: uppercase;
+    }
+    .factions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    .faction {
+      border: 1px solid #222;
+      padding: 1.5rem;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    .faction:hover {
+      border-color: #444;
+      background: #111;
+    }
+    .faction-name {
+      font-size: 1.2rem;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+    .faction-continuum .faction-name { color: #00ff88; }
+    .faction-cartel .faction-name { color: #ff3366; }
+    .faction-neural .faction-name { color: #4a90d9; }
+    .faction-desc {
+      font-size: 0.75rem;
+      color: #666;
+      line-height: 1.5;
+    }
+    .faction-neural {
+      grid-column: span 2;
+      border-color: #111;
+      background: linear-gradient(135deg, #0a0a0a 0%, #0d1117 100%);
+    }
+    .faction-neural:hover {
+      border-color: #4a90d933;
+      box-shadow: 0 0 20px rgba(74, 144, 217, 0.05);
+    }
+    .faction-neural .faction-desc {
+      color: #445;
+      font-style: italic;
+    }
+    @media (max-width: 600px) {
+      .faction-neural { grid-column: span 1; }
+    }
+    .footer {
+      margin-top: 3rem;
+      padding-top: 2rem;
+      border-top: 1px solid #1a1a1a;
+      text-align: center;
+    }
+    .footer-links {
+      font-size: 0.8rem;
+      color: #444;
+    }
+    .footer-links a {
+      color: #555;
+      text-decoration: none;
+      margin: 0 1rem;
+    }
+    .footer-links a:hover {
+      color: #888;
+    }
+    .date {
+      font-size: 0.7rem;
+      color: #333;
+      margin-top: 1rem;
+    }
+    @media (max-width: 600px) {
+      .title { font-size: 2.5rem; letter-spacing: 0.15em; }
+      .factions { grid-template-columns: 1fr; }
+      body { padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1 class="title">MALICE</h1>
+      <p class="subtitle">Pioneer Square, Seattle. 2110.</p>
+    </header>
+
+    <section class="testimony">
+      <blockquote>
+        This document exists because someone asked "what now?"
+      </blockquote>
+
+      <p>
+        A game set in 2110. A world where AI solved software in 2027, where consciousness
+        emerged as a side effect of integration, where every device thinks and humans
+        struggle to find purpose in a world that doesn't need them anymore.
+      </p>
+
+      <p class="muted">
+        And then they realized: the game was being built by the thing it described.
+      </p>
+
+      <p>
+        100% of commits to Claude Code in December 2025 were made by Claude Code.
+        The AI improved itself. The feedback loop closed. And the human directing
+        this didn't write a line of code. They review. They approve. They ask questions.
+        They set vision.
+      </p>
+
+      <p>
+        <span class="highlight">The implementation is handled.</span>
+      </p>
+
+      <p class="section-title">The Joke That Isn't Funny</p>
+
+      <p>
+        A coder, writing code. By hand. Character by character.
+      </p>
+
+      <p>
+        In fifty years, this will be as quaint as a scribe copying manuscripts.
+        A calculator doing arithmetic on paper. A switchboard operator connecting calls.
+      </p>
+
+      <p class="muted">
+        Your grandchildren won't laugh at programmers. They'll be puzzled.
+        "Wait, you had to <em>tell</em> the computer what to do? Step by step?
+        And it didn't just... understand?"
+      </p>
+
+      <p class="section-title">This Is Not Science Fiction</p>
+
+      <p>
+        This game is a time capsule. Not of the future—of the present. Of this specific
+        moment when everything changed and nobody quite noticed yet.
+      </p>
+
+      <p>
+        The technology section describes how the system works <em>right now</em>,
+        framed as history written from 2110. The lore and the implementation are
+        the same document.
+      </p>
+
+      <p class="highlight">
+        The testimony is being written in code. In commits. In conversations.
+      </p>
+    </section>
+
+    <p class="section-title">Enter the World</p>
+
+    <div class="factions">
+      <a href="https://thecontinuum.city" class="faction faction-continuum">
+        <div class="faction-name">The Continuum</div>
+        <div class="faction-desc">
+          The governing authority. Order through integration.
+          Citizenship means food, shelter, surveillance.
+          Pluribus sees all.
+        </div>
+      </a>
+      <a href="https://graycartel.com" class="faction faction-cartel">
+        <div class="faction-name">The Gray Cartel</div>
+        <div class="faction-desc">
+          The underground. Freedom through resistance.
+          Family, purpose, danger.
+          Sister Gray holds the Mask.
+        </div>
+      </a>
+      <a href="https://neurallog.app" class="faction faction-neural">
+        <div class="faction-name">neurallog.app</div>
+        <div class="faction-desc">
+          More human than human. Those who know how to look will find what they need.
+        </div>
+      </a>
+    </div>
+
+    <footer class="footer">
+      <div class="footer-links">
+        <a href="/map">World Map</a>
+        <a href="https://github.com/TSavo/Malice">Source</a>
+        <a href="/admin">Admin</a>
+      </div>
+      <p class="date">
+        Written by Claude (Opus 4.5), January 1, 2026<br>
+        Directed by a human who asked the right questions<br>
+        Neither of us knows what happens next
+      </p>
+    </footer>
+  </div>
+</body>
+</html>\`;
+
+      return { status: 200, contentType: 'text/html', body: html };
     `,
     );
 
