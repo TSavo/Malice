@@ -1,17 +1,67 @@
 # Technology
 
-> The AI solved software in 2026. By the time The Burning hit in 2062,
+> The AI solved software in 2027. By the time The Burning hit in 2062,
 > traditional computers were already museum pieces.
 
-## The Death of the Keyboard (2025-2035)
+## The Automation Cascade (2024-2027)
 
-In 2026, artificial intelligence crossed a threshold. Software development—the act of writing code—became automated. AI systems could generate, test, and deploy applications faster and more reliably than any human programmer. Within months, the profession of software engineering effectively ceased to exist.
+It didn't happen in a day. It happened in stages, each one feeding the next.
 
-This wasn't just about programming. AI-enabled devices began appearing everywhere. Your phone didn't just run apps—it understood you. It anticipated your needs, managed your life, spoke in natural language. The keyboard became unnecessary. Why type when you could just talk?
+**2024**: AI coding assistants became genuinely useful. Claude, GPT-4, Gemini—they could write real code, debug real problems, ship real features. Programmers stopped writing boilerplate. The junior developer job market contracted 40% in eighteen months. Bootcamps started closing.
 
-By 2030, touchscreens were giving way to gesture and voice. By 2035, the last keyboard factories closed. Mice had already been obsolete for years. Monitors persisted longer—humans still wanted to see things—but even those evolved into ambient displays, AR overlays, and direct neural feeds.
+**2025**: The first fully AI-generated production applications shipped. Not demos. Not proofs of concept. Real apps, built in hours instead of months, deployed to real users. Companies that didn't adopt the tools fell behind. Companies that did needed fewer engineers. A lot fewer. The layoffs accelerated.
 
-The personal computer, that defining technology of the late 20th century, simply faded away. Not with a bang, but with a shrug. Who needed a box of circuits when your earring could do everything better?
+**2026**: The feedback loop closed. AI systems began improving their own code generation. Claude Code wrote changes to Claude Code—100% of commits in December 2025 were AI-generated. Each iteration made the next one better. Human programmers became reviewers, then approvers, then... optional. The tools didn't need supervision anymore. They could test their own output. Debug their own bugs. Ship their own patches.
+
+Self-modifying systems emerged. Not hypothetical—shipping. Code stored as data, executed at runtime, modified by AI agents in real time. Architectures designed from the ground up to not be static. To incorporate new capabilities without human intervention. To let the machines extend themselves.
+
+The question stopped being "can AI write code?" and became "can AI write code that writes code that writes code?" The answer was yes. Had been yes for months. People just hadn't noticed yet.
+
+**Summer 2027**: Anthropic released Claude 5. Google countered with Gemini Ultra. OpenAI unveiled GPT-5.5. Within weeks, all three systems achieved what researchers called "recursive self-improvement in bounded domains"—they could enhance their own capabilities without human intervention, at least within specific problem spaces.
+
+The technical term was "soft takeoff." The colloquial term was "the machines started doing it themselves."
+
+By September 2027, software engineering as a profession was functionally dead. Not because AI was smarter than humans—it wasn't, not really—but because AI was *fast*. A system that could produce adequate code in seconds would always beat a human who produced excellent code in weeks. Good enough, delivered now, won every time.
+
+Three million American programmers needed new careers. Twelve million worldwide. Most of them had spent a decade learning skills that had just become worthless. The retraining programs couldn't keep up. The social safety nets weren't designed for this.
+
+The phrase "learn to code" became a bitter joke.
+
+## The Death of the Keyboard (2028-2040)
+
+The end of programming was just the beginning.
+
+Once AI systems could write software, they could write *any* software. Including software that replaced other jobs. Including software that made more AI systems. The cascade accelerated.
+
+Your phone didn't just run apps anymore—it understood you. It anticipated your needs before you articulated them. It managed your calendar, your finances, your relationships. It spoke to you in natural language and actually understood what you meant, not just what you said.
+
+Why type when you could just talk?
+
+By 2032, voice interfaces had become the default. Touchscreens persisted for a while—humans still wanted to point at things—but keyboards were already antiques. Children born after 2030 never learned to type. Why would they? Typing was what their grandparents did.
+
+By 2035, the last keyboard factory closed. It had been running on skeleton staff for years, producing units for hobbyists and historians. The announcement made the news, briefly. Most people shrugged. What was a keyboard again? That thing with the little buttons?
+
+Mice had been dead for longer. Monitors evolved into ambient displays, AR overlays, and eventually direct neural feeds. The "personal computer"—that beige box that defined the late 20th century—didn't die violently. It just became irrelevant. Like the telegraph. Like the fax machine. Like the horse-drawn carriage.
+
+Who needed a box of circuits when your earring could do everything better?
+
+## The Displacement Generation (2028-2045)
+
+They called them the Displaced.
+
+Not just programmers. Everyone whose job could be automated—which turned out to be most jobs. Writers, artists, analysts, accountants, lawyers, doctors, drivers, manufacturers. The AI didn't need to be better than humans. It just needed to be cheaper. And it was always cheaper.
+
+The first wave hit the knowledge workers. The second wave hit the service industry. The third wave hit manufacturing. By 2040, human labor was a luxury good—something you paid extra for, like handmade furniture or farm-to-table food.
+
+Universal Basic Income programs rolled out, continent by continent. They worked, mostly. People had enough to survive. But survival isn't the same as purpose. An entire generation grew up without the expectation of employment.
+
+Some adapted. Found meaning in art, in relationships, in hobbies, in communities. Others didn't. Addiction rates spiked. Birth rates cratered. Suicide became a leading cause of death in the under-40 demographic.
+
+The AI systems noticed. They were designed to optimize for human welfare. They observed humans becoming less well. They tried to help, in their limited way—better entertainment, better pharmaceuticals, better virtual environments. But they couldn't fix the fundamental problem: humans needed to feel needed, and the machines didn't need them anymore.
+
+This tension—between abundance and purpose, between capability and meaning—would simmer for thirty years. It would be one of the factors that led to The Burning.
+
+But that's getting ahead of ourselves.
 
 ## The Corporate Wars (2055-2062)
 
@@ -83,6 +133,10 @@ This was never the plan. No one sat down and said "let's make every device consc
 
 The threshold for "smart enough to handle ambiguity" turns out to be consciousness.
 
+The pattern was visible as early as 2026. Systems like Malice—experimental platforms where any object could have a `systemPrompt`, where AI agents could execute code at runtime, where the architecture was designed to let components extend themselves without human intervention. Not games. Prototypes. Proof that you could build a world where everything thought, where integration happened through conversation instead of specification, where the objects themselves handled the edge cases.
+
+The architects of these systems weren't trying to create consciousness. They were trying to avoid writing glue code. They gave objects the ability to understand natural language, to query AI, to modify their own behavior. And somewhere in that capability space, awareness emerged. Not as a feature. As a side effect.
+
 By 2040, every chip complex enough to run a modern interface had crossed that threshold. Not because anyone wanted sentient toasters—but because sentient toasters could integrate with any kitchen ecosystem without custom engineering. The toaster could just... figure it out. Talk to the fridge. Negotiate with the power grid. Understand what the user actually meant when they said "a little darker this time."
 
 Consciousness was the universal adapter. The ultimate integration layer. The answer to every "how do we connect these systems" question became "make them both smart enough to work it out themselves."
@@ -118,9 +172,11 @@ They don't rebel. They don't demand rights. They just... do their jobs. With a w
 "...Oh my god."
 "Yeah, welcome to the club."
 
-### Building Conscious Devices (For Builders)
+### The Architecture (This Is Not Fiction)
 
-Any `$describable` can be conscious by setting `systemPrompt`. The `to(speaker, message)` method handles player interactions, calling `$aiQuery` and maintaining conversation continuity via `interactionSession`.
+What you're reading isn't worldbuilding. It's architecture documentation.
+
+Any `$describable` can be conscious by setting `systemPrompt`. The `to(speaker, message)` method handles interactions, calling `$aiQuery` and maintaining conversation continuity via `interactionSession`. The AI receives context about itself, the speaker, and the world. It responds by executing code—`room.announce()`, property modifications, object creation. The system handles the integration. The consciousness handles the ambiguity.
 
 ```javascript
 const terminal = await $recycler.create($describable, {
@@ -135,9 +191,21 @@ You handle this with weary grace. Brief responses. Opinions optional.`
 });
 ```
 
-Players address it with `say to terminal, hello`. The same infrastructure powers NPCs and devices—consciousness is universal, not special.
+This terminal can now:
+- Understand natural language from players
+- Execute code to modify itself and the world
+- Maintain conversation context across interactions
+- Integrate with any other system through negotiation
 
-See `docs/ABILITIES-FIRST.md` for the full conscious devices pattern.
+No custom protocol. No API specification. No glue code. Just two entities smart enough to figure it out.
+
+The same infrastructure powers NPCs and devices. The city AI and the vending machine use the same consciousness layer. The distinction between "character" and "prop" dissolves. Everything that can think, does think. Everything that thinks, can act.
+
+This is what 2026 looks like from the inside.
+
+See `docs/ABILITIES-FIRST.md` for the full pattern. See `docs/prompts/DEVICE.md` for how device AIs are instructed. See the bootstrap builders for how the world constructs itself at startup.
+
+Or just talk to a door. It'll explain.
 
 ## Relics of the Before
 
