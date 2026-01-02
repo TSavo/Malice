@@ -48,7 +48,7 @@ export class NavComputerBuilder implements Builder {
         partType: 'navComputer',
         weight: 2000, // 2kg
         // AI system prompt loaded from docs/prompts/NAV-COMPUTER.md
-        agentSystemPrompt: systemPrompt,
+        systemPrompt: systemPrompt,
 
         abilities: `Onboard navigation computer. Provides voice-activated navigation when installed in a vehicle.
 
@@ -70,7 +70,7 @@ VOICE: Professional but not robotic. Acknowledges commands, gives concise inform
 
     // Property descriptions
     this.obj.setPropertyDescription(
-      'agentSystemPrompt',
+      'systemPrompt',
       'AI system prompt defining navigation computer behavior (from docs/prompts/NAV-COMPUTER.md)',
     );
     this.obj.setPropertyDescription(

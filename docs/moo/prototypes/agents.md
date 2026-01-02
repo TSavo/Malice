@@ -13,6 +13,8 @@ The agent system models all entities that can act, perceive, and interact:
 - **$player** - Player character
 - **$admin** - Admin player with extra commands
 
+> **Note on Consciousness**: Agents are just one type of conscious object. In 2110, every digital device is self-aware. Any `$describable` can respond to players by setting `systemPrompt`—a vending machine, a door panel, a terminal. Agents inherit this capability from `$describable`. See [ABILITIES-FIRST.md](../../ABILITIES-FIRST.md#conscious-devices-the-2110-normal) for conscious device patterns.
+
 ## $agent - Base Prototype
 
 ### Purpose

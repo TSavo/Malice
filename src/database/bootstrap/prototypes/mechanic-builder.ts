@@ -47,7 +47,7 @@ export class MechanicBuilder implements Builder {
           'A weathered mechanic with oil-stained hands and calloused fingers.',
         occupation: 'mechanic',
         // AI system prompt loaded from docs/prompts/MECHANIC.md
-        agentSystemPrompt: systemPrompt,
+        systemPrompt: systemPrompt,
 
         abilities: `Vehicle mechanic. Expert in diagnosing problems, repairing damage, installing/removing parts, refueling, and hotwiring vehicles.
 
@@ -72,7 +72,7 @@ PERSONALITY: Practical, no-nonsense. Speaks in mechanical terms. Charges for eve
       'This person works as a vehicle mechanic',
     );
     this.obj.setPropertyDescription(
-      'agentSystemPrompt',
+      'systemPrompt',
       'AI system prompt defining mechanic behavior (from docs/prompts/MECHANIC.md)',
     );
     this.obj.setPropertyDescription(

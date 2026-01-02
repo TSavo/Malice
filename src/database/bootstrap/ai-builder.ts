@@ -108,7 +108,7 @@ WORLD LOG: logWorld(author, message) and getWorldLog(limit) manage the deity cha
         worldLog: [],
 
         // Default system prompt template for AI NPCs (loaded from docs/prompts/DEFAULT-AGENT.md)
-        // Copied to each NPC's agentSystemPrompt on spawn
+        // Copied to each NPC's systemPrompt on spawn
         // Uses {{variable}} syntax for templating
         defaultAgentPrompt,
       },
@@ -460,7 +460,7 @@ WORLD LOG: logWorld(author, message) and getWorldLog(limit) manage the deity cha
       });
 
       // Copy default prompt to NPC (can be customized per-NPC later)
-      human.agentSystemPrompt = self.defaultAgentPrompt;
+      human.systemPrompt = self.defaultAgentPrompt;
 
       console.log('[AI] Spawned ' + name + ' (#' + human.id + ') as ' + role);
 
@@ -970,7 +970,7 @@ WORLD LOG: logWorld(author, message) and getWorldLog(limit) manage the deity cha
       console.log('[AI] Sending timeout prompt to AI for human #' + exp.humanId);
 
       // Send timeout prompt to AI
-      const systemPrompt = human.agentSystemPrompt || '';
+      const systemPrompt = human.systemPrompt || '';
       try {
         const result = await $aiQuery(systemPrompt, exp.prompt, session, {});
         human.interactionSession = result.session;
@@ -1907,7 +1907,7 @@ WORLD LOG: logWorld(author, message) and getWorldLog(limit) manage the deity cha
         return { success: false, error: 'No session for human' };
       }
       console.log('[AI] Sending timeout prompt to AI for human #' + exp.humanId);
-      const systemPrompt = human.agentSystemPrompt || '';
+      const systemPrompt = human.systemPrompt || '';
       try {
         const result = await $aiQuery(systemPrompt, exp.prompt, session, {});
         human.interactionSession = result.session;

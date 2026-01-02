@@ -112,10 +112,13 @@ The AI narrator reads abilities and interprets player intent, modifying properti
 - "look" → AI reads room and contents abilities, describes scene
 - "north" → AI reads exit abilities, moves player
 - "unlock the door" → AI reads lock abilities, checks key
-- "pick up the gun" → AI reads hand abilities, checks weight
+- "pick up the gun" → AI reads hand abilities, checks maxItems/weight via canContain()
+- "put knife in pocket" → AI reads pocket abilities, checks weight/volume capacity
 - "search for bugs" → AI reads concealment abilities, reveals items
 
 There are no coded verbs. The AI interprets every command by reading abilities and property descriptions.
+
+**Inventory is distributed** - items are held in hands (up to 2 per hand, weight-limited) or stored in pockets (attached to worn clothing). The `moveTo()` primitive moves items between locations, and `canContain()` enforces capacity constraints.
 
 **When building objects:**
 ```typescript
@@ -426,10 +429,12 @@ torso (root)
   │   │   └─ mouth ($mouth - canTaste, delegates to tongue)
   │   │       └─ tongue ($tongue - canTaste, canSpeak)
   │   ├─ neck, scalp
-  ├─ shoulders → arms → forearms → hands → fingers
+  ├─ shoulders → arms → forearms → hands ($hand - holds items) → fingers
   ├─ thighs → knees → legs → feet
   └─ groin, chest, abdomen, back
 ```
+
+**Hands as containers:** Each hand can hold up to 2 items (maxItems) with a 10kg weight limit (maxWeight). Items are held via `item.moveTo(hand)` and `hand.canContain(item)` enforces limits.
 
 Each sensory organ has capability methods that propagate up:
 - `head.canSmell()` → `face.nose.canSmell()`

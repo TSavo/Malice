@@ -11,6 +11,7 @@ Vertical transport system with composable lock security.
 - `moving`: True while elevator is in motion
 - `destination`: Floor number being traveled to (or null)
 - `locks`: Array of lock objects (composable security)
+- `door`: Reference to `$door` object for access control
 - `doorsOpen`: True when doors are open
 - `travelTimePerFloor`: ms per floor (default 2000)
 - `capacity`: Max passengers
@@ -27,16 +28,17 @@ Vertical transport system with composable lock security.
 // Create elevator with biometric lock
 const elevator = await $recycler.create($elevator, {
   floors: [1, 2, 35, 42],
-  floorRooms: { 1: lobbyId, 35: vipLoungeId, 42: penthouseId },
+  floorRooms: { 1: lobbyRoom, 35: vipLounge, 42: penthouse },
 });
 
 const bioLock = await $recycler.create($biometricLock, {
-  scanners: [
-    { type: 'retinal', part: 'eye', message: 'Retinal scan failed.' },
-    { type: 'fingerprint', part: 'hand', message: 'Fingerprint scan failed.' }
-  ],
-  authorizedUsers: { 35: [adminId], 42: [vipId] }
+  scanType: 'fingerprint',
+  scanLocation: 'beside the control panel'
 });
+
+// Authorize specific users
+await bioLock.authorize(adminPlayer);
+await bioLock.authorize(vipPlayer);
 
 await elevator.addLock(bioLock);
 

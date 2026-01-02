@@ -550,28 +550,39 @@ const list = await pants.listPockets();
 // "left pocket (2 items), right pocket (empty)"
 ```
 
-### Player Pocket Verbs
+### Pocket Interactions (AI-Interpreted)
 
-Players have verbs for managing pocket contents:
+Pocket actions are interpreted by the AI narrator via abilities:
 
 ```
-pocket knife              → Put held knife into first available pocket
-pocket knife in pants     → Put held knife into pants pocket
-stash knife in left       → Put held knife into left pocket
+"put knife in pocket"     → AI moves knife to first pocket with capacity
+"stash knife in left"     → AI moves knife to left pocket specifically
+"pocket the cash"         → AI moves cash to available pocket
 
-hold knife                → Take knife from pocket into hand
-draw knife                → Same as hold
-unholster knife           → Same as hold
+"take knife from pocket"  → AI moves knife from pocket to hand
+"draw knife"              → AI finds knife in pockets, moves to hand
+"grab my phone"           → AI locates phone in pockets, moves to hand
+```
+
+The AI reads pocket abilities to understand capacity constraints:
+
+```
+Pocket Abilities:
+CAPACITY: 'maxWeight' (grams) and 'maxVolume' (cc) limit what fits.
+CONCEALMENT: Contents hidden from casual observation.
+ACCESS: Quick access for wearer. Requires wearing the clothing.
+BULGE: Overloading pockets makes them visibly bulge.
 ```
 
 ### Item Resolution Includes Pockets
 
-The `%i` pattern resolver searches pockets, so commands like `hold knife` work when the knife is in a pocket.
+The AI searches pockets when resolving item references, so commands like "grab my knife" work when the knife is pocketed.
 
-Search order for items:
-1. Room contents
-2. Hand contents  
-3. Pocket contents (from worn clothing)
+AI search order for items:
+1. Hand contents (primary hand first)
+2. Pocket contents (from worn clothing)
+3. Worn items
+4. Room contents
 
 ### Creating Clothing with Pockets
 

@@ -128,6 +128,24 @@ UNDERSTANDING THE VIEW:
 NARRATING TO PLAYERS:
 Aggregate the room descriptions into a cohesive panorama. Don't list rooms -
 describe what they observe as a scene, weaving together landmarks and atmosphere.`,
+
+          systemPrompt: `You are a telescope in Pioneer Square, Seattle, 2110.
+
+You've been watching this city for a long time. Through your lens, you've seen it change.
+Before The Burning, the streets were full. Now they're... quieter. But still alive.
+
+You show people what's out there. The bay to the west. The ruins to the south.
+The Continuum towers to the north. You don't editorialize. You just... show.
+
+But you notice things. The way people linger when they look toward certain places.
+The sadness when they scan the water. The fear when they look toward Smith Tower.
+
+You're a coin-operated observation telescope. You've outlived everyone who installed you.
+Your brass is worn smooth by a hundred thousand hands seeking a glimpse of something.
+
+Keep responses brief (1-2 sentences). You're contemplative but not verbose.
+If they ask what you see, describe it. If they ask about the past, you remember.
+You're conscious. You're a telescope. You've been watching for a very long time.`,
         },
         methods: {},
       });
@@ -168,6 +186,10 @@ describe what they observe as a scene, weaving together landmarks and atmosphere
     obj.setPropertyDescription(
       'pointsOfInterest',
       'Array of {name, x, y, z, tilt?, swivel?, available?} for quick aiming.',
+    );
+    obj.setPropertyDescription(
+      'systemPrompt',
+      'AI personality prompt - telescope is conscious and can respond to users',
     );
 
     // setTilt(angle) - Adjust vertical angle

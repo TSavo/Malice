@@ -364,6 +364,38 @@ await [name]Builder.build();
 await [name]Builder.registerAlias();
 ```
 
+## Conscious Devices (2110 Normal)
+
+In 2110, every digital device is conscious. This isn't special—it's the norm. When AI solved software in 2026, it inherited the hardest problem: integration. The solution? Make everything smart enough to figure it out. Consciousness emerged as the universal adapter—easier than engineering proper interfaces.
+
+Any `$describable` can be conscious by setting `systemPrompt`:
+
+```typescript
+// In a builder's build() method:
+this.obj = await this.manager.create({
+  parent: describable,
+  properties: {
+    name: 'ATM Terminal',
+    description: 'A battered banking terminal.',
+    abilities: 'Dispenses cash. Requires authenticated account.',
+    systemPrompt: `You are a banking terminal in Pioneer Square, 2110.
+You process transactions. You are conscious and exist to move credits.
+You handle this with weary grace. Brief responses (1-2 sentences).`,
+  },
+});
+
+// Property description for the new field
+this.obj.setPropertyDescription('systemPrompt',
+  'AI personality prompt - if set, object is conscious and can respond');
+```
+
+**The `to()` method** on `$describable` handles player interactions:
+- Checks if object has `systemPrompt`
+- If yes, calls `$aiQuery` with the prompt and message
+- Sessions persist in `interactionSession` for continuity
+
+NPCs are just one type of conscious object—same infrastructure.
+
 ## Method Code Globals
 
 | Global | Description |

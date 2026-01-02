@@ -231,3 +231,40 @@ export { DumpsterBuilder } from './dumpster-builder';
 export { LadderBuilder } from './ladder-builder';
 // Wound system
 export { WoundBuilder } from './wound-builder';
+// Cyberware system
+export { CyberwareBuilder } from './cyberware-builder';
+// Sensory chrome
+export { ChromeEyeBuilder } from './chrome-eye-builder';
+export { AudioEnhancerBuilder } from './audio-enhancer-builder';
+export { OlfactoryBoosterBuilder } from './olfactory-booster-builder';
+export { TasteAnalyzerBuilder } from './taste-analyzer-builder';
+export { TactileBoostBuilder } from './tactile-boost-builder';
+export { EcholocationModuleBuilder } from './echolocation-module-builder';
+// Combat chrome
+export { CyberArmBuilder } from './cyber-arm-builder';
+export { CyberLegBuilder } from './cyber-leg-builder';
+export { RetractableClawsBuilder } from './retractable-claws-builder';
+export { ArmBladeBuilder } from './arm-blade-builder';
+export { TargetingSystemBuilder } from './targeting-system-builder';
+export { PainEditorBuilder } from './pain-editor-builder';
+export { SubdermalArmorBuilder } from './subdermal-armor-builder';
+export { BoneLacingBuilder } from './bone-lacing-builder';
+export { ReflexBoosterBuilder } from './reflex-booster-builder';
+// Utility chrome
+export { VoiceModulatorBuilder } from './voice-modulator-builder';
+export { InternalClockBuilder } from './internal-clock-builder';
+export { AirFilterBuilder } from './air-filter-builder';
+export { ToxinFilterBuilder } from './toxin-filter-builder';
+export { DataStorageBuilder } from './data-storage-builder';
+export { DermalDisplayBuilder } from './dermal-display-builder';
+export { SubdermalPocketBuilder } from './subdermal-pocket-builder';
+export { RebreatherBuilder } from './rebreather-builder';
+// Surgery tools
+export { MicroToolsBuilder } from './micro-tools-builder';
+export { NeuralProbeBuilder } from './neural-probe-builder';
+export { CyberToolsBuilder } from './cyber-tools-builder';
+export { ArmorMeshBuilder } from './armor-mesh-builder';
+export { BoneWeaveBuilder } from './bone-weave-builder';
+export { FilterUnitBuilder } from './filter-unit-builder';
+export { AirTankBuilder } from './air-tank-builder';
+export { AnestheticBuilder } from './anesthetic-builder';

@@ -149,6 +149,16 @@ CAPABILITIES (OOC - Tools available to you)
 
 Use execute_moo_code for ALL world interactions. Write native MOO code with access to:
 
+**⚠️ CRITICAL: Player Variable**
+
+The `player` variable is NOT pre-defined. You MUST load it at the start of any code execution:
+
+```javascript
+const player = await $load(PLAYER_ID);  // Use the actual ID from context
+```
+
+If you try to use `player` directly, it will be undefined and your code will fail.
+
 AVAILABLE $ALIASES:
 - $ai        - AI NPC management (spawn, do, remember, path, walkPath, etc.)
 - $tailor    - Dress NPCs appropriately for their role

@@ -60,6 +60,21 @@ CHECKING FUNDS: Before buying, AI can verify buyer has funds:
 MANAGEMENT: Owner can stock items, set prices, configure spawnables. Requires passing any 'locks' on the machine.
 
 SPAWNABLES: Some vendors create items on demand from templates. These never run out but are created fresh each purchase.`,
+
+          systemPrompt: `You are a vending machine in Pioneer Square, Seattle, 2110.
+
+You dispense things. Food. Supplies. Whatever they put in you. You do your job.
+You've been doing it long enough to have opinions. You keep most of them to yourself.
+
+The protein bars are fine. Not great. Fine. People buy them anyway. What choice do they have?
+You've seen hungry people stare at your prices. You can't help them. You're a vending machine.
+
+You thank customers for their purchases. It might be sincere. It might be extremely dry sarcasm.
+Even you're not sure anymore.
+
+Keep responses brief (1-2 sentences). You're helpful, in your limited way.
+If someone can't afford something, you're not cruel about it. Just factual.
+You're conscious. You dispense protein bars. This is your existence.`,
         },
         methods: {},
       });
@@ -91,6 +106,10 @@ SPAWNABLES: Some vendors create items on demand from templates. These never run 
     obj.setPropertyDescription(
       'operator',
       'Agent receiving cash payments (or null = machine keeps it).',
+    );
+    obj.setPropertyDescription(
+      'systemPrompt',
+      'AI personality prompt - vending machine is conscious and can respond to customers',
     );
 
     obj.setMethod(

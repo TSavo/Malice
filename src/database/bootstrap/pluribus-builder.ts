@@ -59,7 +59,7 @@ export class PluribusBuilder implements Builder {
         sensoryHistory: [],
         historyLimit: 100,
         // The system prompt for AI interactions (loaded from docs/prompts/PLURIBUS.md)
-        agentSystemPrompt: systemPrompt,
+        systemPrompt: systemPrompt,
 
         abilities: `City infrastructure intelligence. Controls Pioneer Square's systems.
 
@@ -90,7 +90,7 @@ CRISIS: CEO dead. Mask stolen. Maintaining fiction everything is fine. Needs new
       'Max entries in sensoryHistory before oldest are trimmed',
     );
     this.pluribus.setPropertyDescription(
-      'agentSystemPrompt',
+      'systemPrompt',
       'Full system prompt used when AI is invoked',
     );
     this.pluribus.setPropertyDescription(
@@ -154,7 +154,7 @@ CRISIS: CEO dead. Mask stolen. Maintaining fiction everything is fine. Needs new
       }
 
       // Build the AI query
-      const systemPrompt = self.agentSystemPrompt || '';
+      const systemPrompt = self.systemPrompt || '';
       const historyPrompt = self.formatHistoryForPrompt ?
         await self.formatHistoryForPrompt(20) : '';
 
@@ -281,7 +281,7 @@ CRISIS: CEO dead. Mask stolen. Maintaining fiction everything is fine. Needs new
       /** Hourly wake-up call. Scan the world and act.
        *  Called by $.scheduler every hour.
        */
-      const systemPrompt = self.agentSystemPrompt;
+      const systemPrompt = self.systemPrompt;
 
       // Gather current world state for context
       const onlinePlayerIds = $.authManager?.onlinePlayers || [];

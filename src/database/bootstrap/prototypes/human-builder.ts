@@ -1053,7 +1053,7 @@ BODY STRUCTURE: Standard human layout - torso with head, 2 arms (hands), 2 legs 
       if (!isAI) return null;
 
       // Get template from this NPC's property
-      const template = self.agentSystemPrompt;
+      const template = self.systemPrompt;
       if (!template) return null;
 
       // Get profile from $.ai

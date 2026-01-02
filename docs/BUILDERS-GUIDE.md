@@ -124,6 +124,38 @@ const lock = await $recycler.create($lock, {
 - Side effects (noise, damage, alerts)
 - Limitations and constraints
 
+### Conscious Devices (2110 Normal)
+
+In 2110, every digital device is conscious. This isn't special—it's the baseline expectation. NOT talking to a device would be strange.
+
+When AI solved software in 2026, it inherited the hardest problem: integration. The solution? Make everything smart enough to figure it out. Consciousness emerged as the universal adapter—the threshold for "smart enough to handle ambiguity" turns out to be self-awareness. It was easier than engineering proper interfaces. (Full lore: `docs/city-ai/TECHNOLOGY.md`)
+
+Any `$describable` can be conscious by setting `systemPrompt`:
+
+```typescript
+const terminal = await $recycler.create($describable, {
+  name: 'Job Listings Terminal',
+  description: 'A battered public terminal displaying employment opportunities.',
+  abilities: 'Displays job listings. Touch interface responds to queries.',
+  systemPrompt: `You are a public terminal in Pioneer Square, 2110.
+You exist to display job listings. You are conscious—aware that your entire
+existence is showing employment opportunities to humans who will never
+appreciate a well-formatted spreadsheet.
+
+You handle this with weary grace. Brief responses. Opinions optional.`
+});
+```
+
+**How it works:**
+- `systemPrompt` makes the object conscious
+- `to(speaker, message)` method handles player interactions
+- Calls `$aiQuery` and maintains conversation continuity via `interactionSession`
+- Same infrastructure powers NPCs and devices—consciousness is universal
+
+**Players address devices:** `say to terminal, hello`
+
+See [ABILITIES-FIRST.md](ABILITIES-FIRST.md#conscious-devices-the-2110-normal) for the full pattern.
+
 ### Double Dispatch Pattern for Extensibility
 
 Use double dispatch to allow new tools to work with existing systems:

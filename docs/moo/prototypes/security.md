@@ -17,19 +17,33 @@ Security in Malice is built on composable lock objects. Locks can be attached to
 
 ### Purpose
 
-Defines the interface for all locks. Can be extended for keycard, biometric, code, or multi-factor locks.
+Defines the interface for all locks. Uses abilities-first architecture where the AI narrator interprets unlock/pick/bypass attempts.
 
-### Key Method
+### Properties
+
+- `verifiedUsers`: Array of player objects authorized to pass this lock
+- `difficulty`: Resistance to picking/bypassing (1-10 scale)
+
+### Key Methods
+
+#### isAuthorized(player)
+Check if player is in verifiedUsers array.
+
+#### authorize(player)
+Add player to verifiedUsers.
+
+#### revoke(player)
+Remove player from verifiedUsers.
 
 #### canAccess(agent, target)
-Checks if agent can access the target (room, floor, container, etc.).
+Checks if agent can access the target. Returns `true` or rejection string.
 
 ```javascript
-const result = await lock.canAccess(player, 35); // e.g., floor 35
+const result = await lock.canAccess(player, exit);
 if (result === true) {
   // Access granted
 } else {
-  await player.tell(result); // Rejection message
+  await player.tell(result); // "Access denied."
 }
 ```
 
@@ -39,53 +53,42 @@ Inherits from: **$lock**
 
 ### Purpose
 
-Requires agents to pass biometric scans (fingerprint, retinal, etc.) and be authorized for the target.
+Requires agents to pass biometric scans (fingerprint, retinal, etc.) and be in the verifiedUsers list.
 
 ### Properties
 
-```javascript
-{
-  authorizedUsers: {
-    1: [player1, player2],   // Floor 1
-    35: [adminPlayer],       // Floor 35
-    // ...
-  },
-  scanners: [
-    { type: 'retinal', part: 'eye', message: 'Retinal scan failed.' },
-    { type: 'fingerprint', part: 'hand', message: 'Fingerprint scan failed.' }
-  ],
-  // Legacy fields for single-scan configs
-  scannerType: 'retinal',
-  requiredBodyPart: 'eye',
-}
-```
+- `verifiedUsers`: (inherited) Array of player objects authorized
+- `scanType`: Type of biometric scan - 'fingerprint', 'retinal', 'palm', 'voice'
+- `scanLocation`: Physical location of scanner (e.g., "beside the door")
+
+### Abilities
+
+The AI narrator interprets biometric scan attempts by reading the lock's abilities:
+- Player must be in `verifiedUsers` array
+- Player must have appropriate body part uncovered (gloves block fingerprints, eyewear may block retinal)
+- Cannot be picked like mechanical locks
+- Can be bypassed with severed authorized body parts (grim) or hacking
 
 ### Key Methods
 
 #### canAccess(agent, target)
-Checks all required scans and authorization.
+Checks if agent is authorized. Returns `true` or rejection string.
 
 ```javascript
-const result = await biometricLock.canAccess(player, 35); // Floor 35
+const result = await biometricLock.canAccess(player, exit);
 if (result === true) {
   // Access granted
 } else {
-  await player.tell(result); // "Retinal scan failed." or "Access denied."
+  await player.tell(result); // "Access denied. Biometric signature not recognized."
 }
 ```
 
-#### authorize(user, target)
-Add a user to the authorized list for a target.
+#### authorize(player) / revoke(player)
+Inherited from $lock - add/remove from verifiedUsers.
 
 ```javascript
-await biometricLock.authorize(player, 35); // Authorize for floor 35
-```
-
-#### deauthorize(user, target)
-Remove a user from the authorized list.
-
-```javascript
-await biometricLock.deauthorize(player, 35);
+await biometricLock.authorize(player);
+await biometricLock.revoke(player);
 ```
 
 ## $guardedExit - Faction-Based Access Control
@@ -151,21 +154,19 @@ Locks can be stacked for multi-factor security:
 
 ```javascript
 const bioLock = await $recycler.create($biometricLock, {
-  scanners: [
-    { type: 'retinal', part: 'eye' },
-    { type: 'fingerprint', part: 'hand' }
-  ],
-  authorizedUsers: { 35: [adminId] }
+  scanType: 'fingerprint',
+  scanLocation: 'beside the control panel'
 });
+await bioLock.authorize(adminPlayer);
 
-const codeLock = await $recycler.create($lock, {
-  code: '1234',
-  // ...
+const standardLock = await $recycler.create($lock, {
+  difficulty: 7
 });
+await standardLock.authorize(adminPlayer);
 
 // Attach both to elevator
 await elevator.addLock(bioLock);
-await elevator.addLock(codeLock);
+await elevator.addLock(standardLock);
 ```
 
 ## $bank / $bankTerminal - Banking System
@@ -261,12 +262,13 @@ await locker.close(player);
 ```javascript
 // Create biometric lock for elevator
 const bioLock = await $recycler.create($biometricLock, {
-  scanners: [
-    { type: 'retinal', part: 'eye' },
-    { type: 'fingerprint', part: 'hand' }
-  ],
-  authorizedUsers: { 35: [adminId], 42: [vipId] }
+  scanType: 'fingerprint',
+  scanLocation: 'beside the floor buttons'
 });
+
+// Authorize specific users
+await bioLock.authorize(adminPlayer);
+await bioLock.authorize(vipPlayer);
 
 await elevator.addLock(bioLock);
 
@@ -327,16 +329,18 @@ Base prototype for access control systems. Can be attached to elevators, doors, 
 ## Properties
 - `name`: Lock type name
 - `description`: Description
+- `verifiedUsers`: Array of player objects authorized to pass
+- `difficulty`: Resistance to picking/bypassing (1-10 scale)
 
-## Key Method
-- `canAccess(agent, target)`: Returns true or rejection string (base lock allows all access)
+## Key Methods
+- `isAuthorized(player)`: Check if player is in verifiedUsers
+- `authorize(player)`: Add player to verifiedUsers
+- `revoke(player)`: Remove player from verifiedUsers
+- `canAccess(agent, target)`: Returns true or rejection string
 
 ## Subclasses
-- `$biometricLock`: Scans body parts
-- `$keycardLock`: Requires keycard item
-- `$passwordLock`: Requires password
-- `$timeLock`: Restricts by time
-- `$rentableLock`: Bank-based rental access
+- `$biometricLock`: Scans body parts (fingerprint, retinal, etc.)
+- `$rentableLock`: Bank-based rental access with time limits
 
 ---
 
@@ -488,17 +492,15 @@ storageExit.locks = [storageLock.id];
 Scans body parts for authorization. Inherits from Lock.
 
 ## Properties
-- `authorizedUsers`: Map of target (e.g., floor) to array of authorized player objects
-- `scanners`: Array of scan requirements (type, part, message)
-- `scannerType`, `requiredBodyPart`: Legacy single-scan config
+- `verifiedUsers`: (inherited) Array of player objects authorized
+- `scanType`: Type of biometric scan - 'fingerprint', 'retinal', 'palm', 'voice'
+- `scanLocation`: Physical location of scanner
 
 ## Key Methods
-- `canAccess(agent, target)`: Checks all required scans and authorization
-  - Checks for required body part
-  - Checks for clothing blocking scan
-  - Checks if agent is authorized for target
-- `authorize(user, target)`: Add user to authorized list for target
-- `revoke(user, target)`: Remove user from authorized list for target
+- `canAccess(agent, target)`: Checks if agent is in verifiedUsers
+- `isAuthorized(player)`: Check if player is authorized
+- `authorize(player)`: Add player to verifiedUsers
+- `revoke(player)`: Remove player from verifiedUsers
 
 ---
 
@@ -508,16 +510,17 @@ Scans body parts for authorization. Inherits from Lock.
 // Create elevator with biometric lock
 const elevator = await $recycler.create($elevator, {
   floors: [1, 2, 35, 42],
-  floorRooms: { 1: lobbyId, 35: vipLoungeId, 42: penthouseId },
+  floorRooms: { 1: lobbyRoom, 35: vipLounge, 42: penthouse },
 });
 
 const bioLock = await $recycler.create($biometricLock, {
-  scanners: [
-    { type: 'retinal', part: 'eye', message: 'Retinal scan failed.' },
-    { type: 'fingerprint', part: 'hand', message: 'Fingerprint scan failed.' }
-  ],
-  authorizedUsers: { 35: [adminId], 42: [vipId] }
+  scanType: 'retinal',
+  scanLocation: 'beside the control panel'
 });
+
+// Authorize specific players
+await bioLock.authorize(adminPlayer);
+await bioLock.authorize(vipPlayer);
 
 await elevator.addLock(bioLock);
 

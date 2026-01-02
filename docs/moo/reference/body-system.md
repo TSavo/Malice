@@ -329,6 +329,137 @@ Severed parts:
 - Become Decayable (rot over time)
 - Maintain wound/condition state
 
+## Hands and Inventory
+
+Player inventory in Malice is **distributed** across multiple locations - there is no single "inventory" array. Items are stored in hands, pockets, and containers.
+
+### Hand Properties
+
+Each hand is a container with capacity limits:
+
+```javascript
+// Hand properties (from $hand prototype)
+hand.canGrasp = true;       // Whether hand can hold items
+hand.maxItems = 2;          // Can hold up to 2 objects at once
+hand.maxWeight = 10000;     // 10kg capacity in grams
+hand.calories = 50;         // Current grip strength
+hand.contents = [];         // Items currently held
+```
+
+### Picking Up Items
+
+Items are held IN hands using the `moveTo()` primitive:
+
+```javascript
+// Pick up an item into hand
+await item.moveTo(hand);
+
+// Drop item from hand
+await item.moveTo(room);
+
+// Transfer to pocket
+await item.moveTo(pocket);
+```
+
+**Hand canContain() checks:**
+- Item count: `contents.length < maxItems` (typically 2)
+- Weight: total weight + item.weight ≤ maxWeight
+
+Returns error strings if rejected:
+- `'Your hand is already full.'`
+- `'That is too heavy to hold.'`
+
+### Accessing Hands
+
+```javascript
+// Get both hands with primary/secondary designation
+const hands = await agent.getHands();
+// {
+//   primary: rightHand,    // Or leftHand if left-handed
+//   secondary: leftHand,   // Opposite hand
+//   both: [rightHand, leftHand]
+// }
+
+// Check what's in hands
+const rightItems = hands.primary.contents;  // Array of items
+const leftItems = hands.secondary.contents;
+```
+
+### Distributed Inventory Model
+
+Player inventory consists of:
+
+```
+Player Inventory (Distributed):
+
+1. HANDS (up to 2 items each, weight limited)
+   └─ rightHand.contents = [sword, torch]
+   └─ leftHand.contents = [shield]
+
+2. WORN CLOTHING
+   └─ torso.worn = [shirt, jacket]
+   └─ head.worn = [hat]
+
+3. POCKETS (attached to worn clothing)
+   └─ jacket.pockets[0].contents = [keys, wallet]
+   └─ pants.pockets[0].contents = [phone]
+
+4. CONTAINERS (backpacks, bags, etc.)
+   └─ backpack.contents = [rope, ammo, medkit]
+```
+
+### Getting All Inventory
+
+```javascript
+// Get everything the player is carrying
+const allItems = await agent.resolveAllContents();
+// Returns flat array of all items in hands, pockets, containers, etc.
+
+// Get total carried weight
+const weight = await agent.getCarriedWeight();
+// Sums: hands + worn items + pocket contents + container contents
+```
+
+### Pockets
+
+Pockets are `$pocket` instances attached to clothing:
+
+```javascript
+// Pocket properties
+pocket.maxWeight = 500;     // 500g capacity
+pocket.maxVolume = 500;     // 500cc capacity
+pocket.attachedTo = pants;  // Parent clothing
+pocket.contents = [];       // Items stored
+```
+
+**Pocket canContain() checks:**
+- Item count (default max: 10)
+- Weight: total + item.weight ≤ maxWeight
+- Volume: total + item.volume ≤ maxVolume
+
+See [Wearables](../prototypes/wearables.md#pockets-system) for full pocket documentation.
+
+### AI-Interpreted Inventory Actions
+
+All inventory actions are AI-interpreted via abilities:
+
+```
+Player: "pick up the sword"
+↓
+AI reads: hand.abilities (GRASP, CAPACITY limits)
+AI reads: sword.weight
+AI checks: hand.canContain(sword)
+AI executes: await sword.moveTo(hand)
+AI narrates: "You grip the sword's worn leather handle."
+
+Player: "put sword in my pocket"
+↓
+AI reads: pocket.abilities (CAPACITY, CONCEALMENT)
+AI checks: pocket.canContain(sword)
+AI result: "That is too bulky for this pocket."
+AI narrates: "The sword is far too long to fit in your pocket."
+```
+
 ## Clothing/Coverage
 
 ### Wearing Clothing

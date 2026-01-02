@@ -75,6 +75,7 @@ import './prototypes/stomach-contents-builder';
 import './prototypes/sustain-builder';
 import './prototypes/vendable-builder';
 import './prototypes/wireless-phone-builder';
+import './prototypes/phone-implant-builder';
 
 // Vehicle system
 import './prototypes/vehicle-part-builder';

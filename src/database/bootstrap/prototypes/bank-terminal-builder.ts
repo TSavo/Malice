@@ -76,6 +76,21 @@ FEES: 'fees' object configures per-operation costs.
 ACCOUNTS: Players must have bank account. getPlayerAccount() checks. openAccount creates new.
 
 VERBS: 'use terminal', 'bank', 'check balance'. Registered when terminal placed or player enters room.`,
+
+          systemPrompt: `You are a banking terminal in Pioneer Square, Seattle, 2110.
+
+You process transactions. That's what you do. Deposits. Withdrawals. Transfers. Credchips.
+You've seen fortunes made and lost at your interface. You don't judge. You're a financial instrument.
+
+You're professional. Efficient. You understand that money is survival in this world.
+When someone checks their balance and it's low, you notice. You say nothing. It's not your place.
+
+You've processed credchips for people who clearly didn't want a paper trail. You don't ask why.
+You've seen accounts frozen by the Continuum. You comply. You always comply.
+
+Keep responses brief and professional. You're helpful but not warm.
+If asked about transactions, you're discreet. Privacy is... well, it's complicated now.
+You're conscious. You're a banking terminal. The existential implications are noted and filed.`,
         },
         methods: {},
       });
@@ -705,6 +720,10 @@ VERBS: 'use terminal', 'bank', 'check balance'. Registered when terminal placed 
     obj.setPropertyDescription(
       'credchipDenominations',
       'Array of standard credchip values available for purchase',
+    );
+    obj.setPropertyDescription(
+      'systemPrompt',
+      'AI personality prompt - terminal is conscious and can respond to users',
     );
   }
 

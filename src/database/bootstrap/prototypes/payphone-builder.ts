@@ -4,6 +4,7 @@ import { type Builder, registerBuilder } from '../builder-registry';
 
 /**
  * Payphone type extends Phone: bolted down, requires bank payment per call.
+ * Uses abilities-first architecture for payment handling.
  */
 export class PayphoneBuilder implements Builder {
   static provides = ['payphone'];
@@ -31,16 +32,25 @@ export class PayphoneBuilder implements Builder {
           pricePerCall: 1,
           bank: null,
           account: null,
+          ringtone: 'rings with a harsh electronic tone',
 
-          abilities: `Fixed public telephone requiring payment per call. Extends $.phone.
+          abilities: `Fixed public telephone requiring payment per call.
 
-PAYMENT: dial() charges 'pricePerCall' from caller's bank account to 'account' before connecting.
+PAYMENT: Making a call charges 'pricePerCall' from the caller's bank account.
+The payment is transferred to 'account' before the connection is established.
+If payment fails, the call does not go through.
 
-BANK: 'bank' reference (defaults to $.bank). 'account' is destination for payments.
+BANK: 'bank' reference (defaults to $bank) processes all payments.
+'account' is the destination account for collected call fees.
 
-IMMOVABLE: 'boltedDown' true. Cannot be picked up.
+IMMOVABLE: 'boltedDown' is true. Payphones are fixed installations that
+cannot be picked up or moved. Typically found in public spaces.
 
-USAGE: Caller needs bank account with sufficient balance. Out of service if bank not configured.`,
+USAGE: The caller needs a bank account with sufficient balance.
+If the bank or destination account is not configured, the phone is out of service.
+
+RECEIVING: Incoming calls to a payphone ring normally - no payment required
+to answer. Only outgoing calls require payment.`,
         },
         methods: {},
       });
@@ -49,29 +59,55 @@ USAGE: Caller needs bank account with sufficient balance. Out of service if bank
     // Always rebuild methods (ensures they exist even if type was pre-existing)
     const obj = this.obj!;
 
+    // dial() - charge payment before dialing
     obj.setMethod(
       'dial',
       `
+      /** Dial a number, charging payment first.
+       *  @param targetNumber - The phone number to dial
+       *  @param caller - The agent making the call (for payment)
+       *  @returns Result object from parent dial()
+       */
       const targetNumber = args[0];
-      const bank = self.bank || $.bank || null;
-      const account = self.account;
-      if (!bank || !account) return 'This payphone is out of service (no bank hookup).';
       const caller = args[1] || null;
-      if (!caller) return 'No caller.';
 
-      // charge caller
+      const bank = self.bank || $bank || null;
+      const account = self.account;
+
+      if (!bank || !account) {
+        return { success: false, error: 'This payphone is out of service.' };
+      }
+      if (!caller) {
+        return { success: false, error: 'No caller specified for payment.' };
+      }
+
+      // Get caller's bank account
       const accounts = await bank.getAccountByOwner(caller);
-      if (!accounts || !accounts.length) return 'You have no bank account.';
+      if (!accounts || !accounts.length) {
+        return { success: false, error: 'You have no bank account to pay for the call.' };
+      }
+
+      // Charge for the call
       const callerAccount = accounts[0].accountId;
       const price = self.pricePerCall ?? 1;
-      const tx = await bank.transfer(callerAccount, account, price, 'payphone-' + Date.now(), 'Payphone call');
-      if (!tx?.success) return tx?.error || 'Payment failed.';
+      const tx = await bank.transfer(
+        callerAccount,
+        account,
+        price,
+        'payphone-' + Date.now(),
+        'Payphone call'
+      );
 
-      // proceed with normal dial
+      if (!tx?.success) {
+        return { success: false, error: tx?.error || 'Payment failed. Insufficient funds?' };
+      }
+
+      // Payment successful - proceed with normal dial
       return await pass(targetNumber);
     `,
     );
 
+    // Property descriptions
     obj.setPropertyDescription(
       'boltedDown',
       'Whether the payphone is fixed in place and cannot be moved',

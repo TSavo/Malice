@@ -176,7 +176,7 @@ YOUR TASK:
 1. Message Player #\${playerId} immediately that someone in uniform is approaching
 2. Spawn a CorpSec officer at $immigrationServices with a unique name
 3. Use $tailor.clothe for proper uniform
-4. Set a detailed agentSystemPrompt (see below)
+4. Set a detailed systemPrompt (see below)
 5. Register: $greeter.activeGreeters[\${playerId}] = greeter.id
 6. Have them greet the player
 
@@ -278,7 +278,7 @@ YOUR TASK:
 1. Message Player #\${playerId} immediately that a shadow moves, someone's been watching - so they're not waiting on nothing
 2. Spawn a Runner NPC at $runnersDen with a unique street name (check existing names first)
 3. Use $tailor.clothe for practical runner gear
-4. Set a detailed agentSystemPrompt (see below)
+4. Set a detailed systemPrompt (see below)
 5. Register: $greeter.activeGreeters[\${playerId}] = greeter.id
 6. Have them greet the player
 
