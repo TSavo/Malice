@@ -41,6 +41,17 @@ Root (#1)
 │   ├── Stackable ($stackable)
 │   │   └── StomachContents ($stomachContents)
 │   │
+│   ├── Furniture ($furniture)
+│   │   ├── Bed ($bed)
+│   │   ├── Chair ($chair)
+│   │   ├── Couch ($couch)
+│   │   ├── Table ($table)
+│   │   │   └── Desk ($desk)
+│   │   ├── Trunk ($trunk)
+│   │   ├── Cabinet ($cabinet)
+│   │   ├── Crate ($crate)
+│   │   └── Safe ($safe)
+│   │
 │   ├── Door ($door)
 │   ├── Sign ($sign)
 │   ├── SealedBox ($sealedBox)
@@ -463,6 +474,189 @@ Items that stack together (currency, ammunition, etc.).
 | `canStackWith(other)` | RuntimeObject | boolean | Can stack with other? |
 | `merge(other)` | RuntimeObject | void | Merge other stack into this |
 | `split(amount)` | number | RuntimeObject | Split off amount |
+
+---
+
+### $furniture
+
+Base prototype for all furniture items.
+
+**Inherits from:** `$describable`
+
+**Properties:**
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `name` | string | `'Furniture'` | Display name |
+| `description` | string | `'A piece of furniture'` | Full description |
+| `weight` | number | `20000` | Weight in grams (20kg default) |
+| `abilities` | string | - | Room fixture. Can hide behind for cover. May conceal items. |
+
+**Abilities:**
+Room fixture. Can hide behind for cover. May conceal items underneath/behind. Bolted-down furniture can't be moved. Heavy furniture hard to move alone. Can be destroyed - wood burns, glass shatters.
+
+---
+
+### $bed
+
+Sleeping furniture for rest and recovery.
+
+**Inherits from:** `$furniture`
+
+**Additional Properties:**
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `occupant` | RuntimeObject | `null` | Person currently sleeping in bed |
+| `quality` | string | `'standard'` | Quality level: 'cheap', 'standard', or 'luxury' |
+
+**Abilities:**
+Sleep here to restore energy and heal. Quality affects recovery rate. Cheap beds restore slowly, luxury beds restore fast. Can hide under bed. Mattress provides some cover from gunfire. Very vulnerable while sleeping - ambush risk.
+
+---
+
+### $chair
+
+Single-person seating.
+
+**Inherits from:** `$furniture`
+
+**Additional Properties:**
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `occupant` | RuntimeObject | `null` | Person sitting in chair |
+| `weight` | number | `5000` | Weight in grams (5kg) |
+
+**Abilities:**
+Seat for one. Sit to rest legs, reduces fatigue recovery time. Can be thrown as improvised weapon. Swivel chairs roll. Standing from chair takes a moment - disadvantage if ambushed while seated.
+
+---
+
+### $couch
+
+Multi-person seating.
+
+**Inherits from:** `$furniture`
+
+**Additional Properties:**
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `capacity` | number | `3` | Number of people who can sit |
+| `occupants` | RuntimeObject[] | `[]` | Array of seated people |
+| `weight` | number | `35000` | Weight in grams (35kg) |
+
+**Abilities:**
+Seats multiple people. Can sleep on in a pinch (poor quality rest). Cushions can hide small items. Heavy - hard to move alone. Provides some cover if you duck behind it.
+
+---
+
+### $table
+
+Flat surface for placing items.
+
+**Inherits from:** `$furniture`
+
+**Additional Properties:**
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `surface` | RuntimeObject[] | `[]` | Items on the table |
+| `weight` | number | `15000` | Weight in grams (15kg) |
+
+**Abilities:**
+Flat surface. Place items on top. Flip for cover. Items on table are visible and accessible. Can hide under table. Flipped table provides partial cover but blocks movement.
+
+---
+
+### $desk
+
+Work surface with storage drawers.
+
+**Inherits from:** `$table`
+
+**Additional Properties:**
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `drawers` | Array | `[]` | Drawer contents |
+| `locked` | boolean | `false` | Whether drawers are locked |
+| `weight` | number | `25000` | Weight in grams (25kg) |
+
+**Abilities:**
+Work surface with storage. Drawers can hold items, may be locked. Heavier than table, harder to flip. Solid front provides better cover. Knee space underneath - can hide there.
+
+---
+
+### $trunk
+
+Lockable storage chest.
+
+**Inherits from:** `$furniture`
+
+**Additional Properties:**
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `open` | boolean | `false` | Whether lid is open |
+| `lock` | RuntimeObject | `null` | Lock object, null if unlocked |
+| `contents` | RuntimeObject | `null` | Pocket objref for stored items |
+| `weight` | number | `15000` | Weight in grams (15kg) |
+
+**Abilities:**
+Hinged chest with lid. Open to access contents. 'lock' holds a $lock object - must unlock before opening. Sturdy construction. Can sit on when closed. Can be carried when empty (heavy when full).
+
+---
+
+### $cabinet
+
+Storage cabinet with doors.
+
+**Inherits from:** `$furniture`
+
+**Additional Properties:**
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `open` | boolean | `false` | Whether doors are open |
+| `lock` | RuntimeObject | `null` | Lock object, null if unlockable |
+| `contents` | RuntimeObject | `null` | Pocket objref for stored items |
+| `weight` | number | `30000` | Weight in grams (30kg) |
+
+**Abilities:**
+Storage with doors. Open to access contents. Can be locked. Wall-mounted or freestanding. Kitchen cabinets, filing cabinets, medicine cabinets - all variations.
+
+---
+
+### $crate
+
+Wooden shipping container.
+
+**Inherits from:** `$furniture`
+
+**Additional Properties:**
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `open` | boolean | `false` | Whether lid is removed/open |
+| `sealed` | boolean | `true` | Whether crate is nailed shut |
+| `contents` | RuntimeObject | `null` | Pocket objref for stored items |
+| `weight` | number | `10000` | Weight in grams (10kg) |
+
+**Abilities:**
+Wooden box for shipping. Sealed crates must be pried open (crowbar, force). Once opened, can't be resealed properly. Nails or staples hold lid. Can stand on. Wood burns, breaks with enough force. Stacking creates cover or climbing opportunities.
+
+---
+
+### $safe
+
+Heavy secure storage with combination lock.
+
+**Inherits from:** `$furniture`
+
+**Additional Properties:**
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `open` | boolean | `false` | Whether safe door is open |
+| `lock` | RuntimeObject | `null` | Lock mechanism objref |
+| `contents` | RuntimeObject | `null` | Pocket objref for stored items |
+| `fireproof` | boolean | `true` | Whether contents survive fire |
+| `weight` | number | `100000` | Weight in grams (100kg) |
+
+**Abilities:**
+Heavy metal box. Very hard to break into - requires cracking or cutting. Combination lock, keypad, or key lock. Fireproof protects contents from fire. Too heavy to move when bolted down. Small safes can be stolen whole. Drilling takes hours. Explosives may destroy contents.
 
 ---
 
