@@ -11,9 +11,6 @@ concurrency:
 
 jobs:
   claude-coverage:
-    # Skip bot-created PRs to avoid loops
-    if: github.actor != 'github-actions[bot]'
-
     runs-on: ubuntu-latest
     permissions:
       contents: write

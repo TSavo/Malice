@@ -11,10 +11,8 @@ concurrency:
 
 jobs:
   claude-review:
-    # Skip if the push was from Claude Fixer (prevents infinite loops)
-    if: |
-      !contains(github.event.pull_request.title, '[claude-fixed]') &&
-      github.actor != 'github-actions[bot]'
+    # Skip if PR title indicates it was already fixed
+    if: "!contains(github.event.pull_request.title, '[claude-fixed]')"
 
     runs-on: ubuntu-latest
     permissions:
@@ -41,10 +39,10 @@ jobs:
             --jq '[.comments[] | select(.body | contains("<!-- CLAUDE_REVIEW_MARKER -->"))] | length')
           echo "review_count=$REVIEW_COUNT" >> $GITHUB_OUTPUT
 
-          # Max 5 iterations to prevent runaway loops
-          if [ "$REVIEW_COUNT" -ge 5 ]; then
+          # Max 10 iterations to prevent runaway loops
+          if [ "$REVIEW_COUNT" -ge 10 ]; then
             echo "skip=true" >> $GITHUB_OUTPUT
-            echo "::warning::Max review iterations (5) reached. Stopping review loop."
+            echo "::warning::Max review iterations (10) reached. Stopping review loop."
           else
             echo "skip=false" >> $GITHUB_OUTPUT
           fi
