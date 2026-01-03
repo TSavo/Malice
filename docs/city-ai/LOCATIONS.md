@@ -71,6 +71,8 @@ The center of Pioneer Square is **S. Main Street at 2nd Avenue**.
 | **Occidental Square** | Occidental Ave, by the park | "Storefronts facing the park. There's a gallery, coffee shop, and bookstore. Occidental Ave between Main and Washington." |
 | **Pioneer Coffee Roasters** | Occidental Square | "Coffee place in Occidental Square. Still smells like beans, somehow." |
 | **Pioneer Square Books** | Occidental Square | "Independent bookstore in Occidental Square. Books are still there. So is the cat." |
+| **Owl Cafe** | 1st Ave & Main | "24-hour diner near Main Street. Breakfast all day, if you can find someone to cook it." |
+| **Doc Maynard's Public House** | 1st Ave & Washington | "Historic bar named for Seattle's founder. Underground Tour used to launch from the basement." |
 
 ### Restricted Facilities (Secret)
 
