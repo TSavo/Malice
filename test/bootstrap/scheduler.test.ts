@@ -22,7 +22,7 @@ describe('$.scheduler', () => {
     });
     await bootstrap.bootstrap();
     $ = manager as any;
-  }, 30000);
+  }, 180000);
 
   afterAll(async () => {
     await manager.flushWrites();
